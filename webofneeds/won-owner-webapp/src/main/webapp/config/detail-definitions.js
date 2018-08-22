@@ -144,7 +144,7 @@ export const details = {
       return { "dc:title": value };
     },
     parseFromRDF: function(jsonLDImm) {
-      return jsonLDImm && jsonLDImm.get("dc:title");
+      return won.parseFrom(jsonLDImm, ["dc:title"], "xsd:string");
     },
     generateHumanReadable: function({ value, includeLabel }) {
       if (value) {
@@ -167,7 +167,7 @@ export const details = {
       return { "dc:description": value };
     },
     parseFromRDF: function(jsonLDImm) {
-      return jsonLDImm && jsonLDImm.get("dc:description");
+      return won.parseFrom(jsonLDImm, ["dc:description"], "xsd:string");
     },
     generateHumanReadable: function({ value, includeLabel }) {
       if (value) {
@@ -218,6 +218,7 @@ export const details = {
     parseFromRDF: function(jsonLDImm) {
       //TODO: Correct parseFromRDF
       return jsonLDImm && jsonLDImm.get("dc:datetime");
+      // return won.parseFrom(jsonLDImm, ["dc:datetime"], "xsd:dateTime");
     },
     generateHumanReadable: function({ value, includeLabel }) {
       if (value) {
@@ -456,10 +457,18 @@ export const details = {
         // bio: undefined,
       };
 
-      person.name = jsonLDImm.get("foaf:name");
-      person.title = jsonLDImm.get("foaf:title");
-      person.company = jsonLDImm.getIn(["s:worksFor", "s:name"]);
-      person.position = jsonLDImm.get("s:jobTitle");
+      // person.name = jsonLDImm.get("foaf:name");
+      person.name = won.parseFrom(jsonLDImm, ["foaf:name"], "xsd:string");
+      // person.title = jsonLDImm.get("foaf:title");
+      person.title = won.parseFrom(jsonLDImm, ["foaf:title"], "xsd:string");
+      // person.company = jsonLDImm.getIn(["s:worksFor", "s:name"]);
+      person.company = won.parseFrom(
+        jsonLDImm,
+        ["s:worksFor", "s:name"],
+        "xsd:string"
+      );
+      // person.position = jsonLDImm.get("s:jobTitle");
+      person.position = won.parseFrom(jsonLDImm, ["s:jobTitle"], "xsd:string");
       //person.bio = isOrSeeksImm.get("dc:description");
 
       // if there's anything, use it

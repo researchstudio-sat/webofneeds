@@ -416,6 +416,9 @@ export function parseJsonldLeaf(val, type) {
   }
   const throwErr = msg => throwParsingError(val, type, msg);
   switch (type_) {
+    case "xsd:string":
+      return val + ""; // everything can be parsed to a string in js
+
     case "xsd:float":
       {
         const parsedVal = Number(unwrappedVal);
