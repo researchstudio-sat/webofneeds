@@ -120,7 +120,7 @@ public class MatcherPubSubActor extends UntypedActor
           loadNeedEvent = new LoadNeedEvent(1);
         } else {
           // request need events with date > last need event date
-          log.info("request missed needs from mataching service with crawl date > {}", lastSeenNeedDate);
+          log.info("request missed needs from matching service with crawl date > {}", lastSeenNeedDate);
           loadNeedEvent = new LoadNeedEvent(lastSeenNeedDate, Long.MAX_VALUE);
         }
 
