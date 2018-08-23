@@ -14,7 +14,7 @@ function genComponentConf() {
         <svg class="wid__dropzone__bg">
             <use xlink:href="{{self.getIcon()}}" href="{{self.getIcon()}}"></use>
         </svg>
-        <input type="file" accept="{{self.accepts}}" multiple />
+        <input type="file" accept="{{self.accepts}}" ng-multiple="::self.multiSelect"/>
     `;
 
   const serviceDependencies = [
@@ -69,6 +69,16 @@ function genComponentConf() {
       event.preventDefault();
       event.stopPropagation();
       const items = event.dataTransfer.items;
+
+      if (!this.multiSelect && items.length > 1) {
+        this.$element[0].classList.add("invalid");
+        this.$element[0].classList.remove("valid");
+        this.invalid = true;
+        event.dataTransfer.dropEffect = "none";
+        this.$scope.$digest();
+        return;
+      }
+
       for (const item of items) {
         if (item.kind !== "file" || !this.fileIsValid(item)) {
           //show error state
@@ -154,10 +164,28 @@ function genComponentConf() {
     scope: {
       onImagePicked: "&",
       accepts: "=",
+      multiSelect: "=",
     },
     template: template,
   };
 }
 export default angular
   .module("won.owner.components.fileDropzone", [enterModule])
+  .directive("ngMultiple", function() {
+    return {
+      restrict: "A",
+      scope: {
+        ngMultiple: "=",
+      },
+      link: function(scope, element) {
+        scope.$watch("ngMultiple", function(newValue) {
+          if (newValue) {
+            element.attr("multiple", "multiple");
+          } else {
+            element.removeAttr("multiple");
+          }
+        });
+      },
+    };
+  })
   .directive("wonFileDropzone", genComponentConf).name;

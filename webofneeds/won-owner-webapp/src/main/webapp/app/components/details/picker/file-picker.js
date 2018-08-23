@@ -8,10 +8,10 @@ import "style/_filepicker.scss";
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
   let template = `
-      <won-file-dropzone on-image-picked="::self.updateFiles(image)" accepts="::self.detail.accepts">
+      <won-file-dropzone on-image-picked="::self.updateFiles(image)" accepts="::self.detail.accepts" multi-select="::self.detail.multiSelect" ng-if="self.detail.multiSelect || !self.addedFiles || self.addedFiles.length == 0">
       </won-file-dropzone>
       <div class="filep__header" ng-if="self.addedFiles && self.addedFiles.length > 0">
-        Chosen Files:
+        {{ self.getUploadedHeader() }}
       </div>
       <div class="filep__preview" ng-if="self.addedFiles && self.addedFiles.length > 0">
         <div class="filep__preview__item"
@@ -85,6 +85,12 @@ function genComponentConf() {
 
     isImage(file) {
       return file && /^image\//.test(file.type);
+    }
+
+    getUploadedHeader() {
+      return this.addedFiles && this.addedFiles.length > 1
+        ? "Chosen Files:"
+        : "Chosen File:";
     }
   }
   Controller.$inject = serviceDependencies;
