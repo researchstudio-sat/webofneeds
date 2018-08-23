@@ -1,5 +1,6 @@
 import angular from "angular";
-import { attach } from "../../../utils.js";
+import { attach, delay } from "../../../utils.js";
+import BpmnViewer from "bpmn-js";
 
 import "style/_workflow-viewer.scss";
 
@@ -12,31 +13,14 @@ function genComponentConf() {
           </svg>
           <span class="workflowv__header__label" ng-if="self.detail.label">{{self.detail.label}}</span>
         </div>
-        <div class="workflowv__content" ng-if="self.content && self.content.size > 0">
-          <div class="workflowv__content__item"
-            ng-repeat="file in self.content.toArray()">
-            <a class="workflowv__content__item__inner"
-              ng-href="data:{{file.get('type')}};base64,{{file.get('data')}}"
-              download="{{ file.get('name') }}"
-              ng-if="!self.isImage(file)">
-              <div class="workflowv__content__item__inner__label">
-                {{ file.get('name') }}
-              </div>
-              <svg class="workflowv__content__item__inner__typeicon">
-                <use xlink:href="#ico36_uc_transport_demand" href="#ico36_uc_transport_demand"></use>
-              </svg>
-            </a>
-            <a class="workflowv__content__item__inner"
-              ng-click="self.openImageInNewTab(file)"
-              ng-if="self.isImage(file)">
-              <div class="workflowv__content__item__inner__label">
-                {{ file.get('name') }}
-              </div>
-              <img class="workflowv__content__item__inner__image"
-                alt="{{file.get('name')}}"
-                ng-src="data:{{file.get('type')}};base64,{{file.get('data')}}"/>
-            </a>
+        <div class="workflowv__content" ng-show="self.content">
+          <div class="workflowv__content__label clickable" ng-if="!self.parseError" ng-click="self.fitDiagramToViewport()">
+            {{ self.content.get('name') }} (Click to Center Diagram)
           </div>
+          <div class="workflowv__content__label" ng-if="self.parseError">
+            {{ self.content.get('name') }} - unable to display WorkFlow Diagram!
+          </div>
+          <div class="workflowv__content__diagram" ng-attr-id="{{self.getUniqueDiagramId()}}"></div>
         </div>
       </div>
     `;
@@ -52,6 +36,8 @@ function genComponentConf() {
       this.$scope.$watch("self.details", (newDetails, prevDetails) =>
         this.updatedDetails(newDetails, prevDetails)
       );
+
+      delay(0).then(() => this.loadDiagramFromContent());
     }
 
     updatedDetails(newDetails, prevDetails) {
@@ -61,21 +47,64 @@ function genComponentConf() {
     }
     updatedContent(newContent, prevContent) {
       if (newContent && newContent != prevContent) {
+        console.log("updating content");
         this.content = newContent;
+        this.loadDiagramFromContent();
       }
     }
 
-    isImage(file) {
-      return file && /^image\//.test(file.get("type"));
+    getUniqueDiagramId() {
+      return "diagram-" + this.$scope.$id;
     }
 
-    openImageInNewTab(file) {
-      if (file) {
-        let image = new Image();
-        image.src = "data:" + file.get("type") + ";base64," + file.get("data");
+    initializeBpmnViewer() {
+      console.log("init bpmnviewer for element: ", this.getUniqueDiagramId());
+      this.bpmnViewer = new BpmnViewer({
+        container: "#" + this.getUniqueDiagramId(),
+      });
 
-        let w = window.open("");
-        w.document.write(image.outerHTML);
+      if (this.bpmnViewer) {
+        console.log("Init BpmnViewer Successful");
+      } else {
+        console.log("Init BpmnViewer Failed");
+      }
+    }
+
+    loadDiagramFromContent() {
+      if (this.content && this.content.get("data")) {
+        console.log("content contains data");
+        if (!this.bpmnViewer) {
+          console.log(
+            "bpmnViewer is not initialized... starting initialization"
+          );
+          this.initializeBpmnViewer();
+        }
+        console.log("calling importXML for the data in the content");
+        this.bpmnViewer.importXML(atob(this.content.get("data")), err => {
+          if (err) {
+            console.error(
+              "Workflow was invalid and could not be parsed, reason:",
+              err
+            );
+            this.parseError = true;
+          } else {
+            console.log("Workflow rendered");
+            this.fitDiagramToViewport();
+            this.parseError = false;
+          }
+        });
+      } else {
+        console.log("content did not contain data");
+      }
+    }
+
+    fitDiagramToViewport() {
+      console.log("Fit Diagram To Viewport");
+      const scale = this.bpmnViewer.get("canvas").zoom("fit-viewport", "auto");
+      console.log("fitDiagram Scale: ", scale);
+      if (isNaN(scale) || scale == 0) {
+        console.log("scale was NaN or 0 zoom to level 0.2");
+        this.bpmnViewer.get("canvas").zoom(0.2, "auto");
       }
     }
   }

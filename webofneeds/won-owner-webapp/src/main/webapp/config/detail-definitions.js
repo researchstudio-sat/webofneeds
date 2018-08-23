@@ -953,7 +953,8 @@ export const details = {
     component: "won-workflow-picker",
     viewerComponent: "won-workflow-viewer",
     parseToRDF: function({ value }) {
-      if (value && value.name && value.type && value.data) {
+      if (value && value.name && value.data) {
+        //do not check for value.type might not be present on some systems
         let workflow = {
           "@type": "s:FileObject",
           "s:name": value.name,
@@ -973,7 +974,8 @@ export const details = {
         type: get(wflw, "s:type"),
         data: get(wflw, "s:data"),
       };
-      if (workflow.name && workflow.type && workflow.data) {
+      if (workflow.name && workflow.data) {
+        //do not check for value.type might not be present on some systems
         return Immutable.fromJS(workflow);
       }
 

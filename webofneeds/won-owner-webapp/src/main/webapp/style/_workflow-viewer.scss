@@ -4,93 +4,34 @@
 won-workflow-viewer {
   @include won-detail-viewer("workflowv");
 
-  &.won-in-message {
-    .workflowv__content {
+  .workflowv__content {
+    width: 100%;
+    display: grid;
+    grid-template-rows: min-content 1fr;
+    border: $thinGrayBorder;
+    border-radius: 0.19rem;
+    background: $won-lighter-gray;
+    grid-gap: 0.25rem;
+    padding: 0.25rem;
+    justify-items: center;
+
+    .workflowv__content__diagram {
+      grid-row: 2 / span 1;
+      height: 20rem;
+      max-width: 100%;
+      overflow-y: scroll;
+      overflow-x: hidden;
       width: 100%;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      grid-gap: 0.25rem;
     }
 
-    .workflowv__content__item {
-      .workflowv__content__item__inner {
-        display: grid;
-        grid-template-rows: min-content 1fr;
-        border: $thinGrayBorder;
-        border-radius: 0.19rem;
-        height: 5rem;
-        background: $won-lighter-gray;
-        grid-gap: 0.25rem;
-        padding: 0.25rem;
-        justify-items: center;
-
-        &:hover {
-          cursor: pointer;
-        }
-
-        .workflowv__content__item__inner__image,
-        .workflowv__content__item__inner__typeicon {
-          grid-row: 2 / span 1;
-          max-width: 100%;
-          max-height: 100%;
-          --local-primary: #{$won-line-gray};
-        }
-
-        .workflowv__content__item__inner__label {
-          grid-row: 1 / span 1;
-          font-size: $smallFontSize;
-          color: $won-primary-text-color;
-          text-overflow: ellipsis;
-          overflow: hidden;
-          max-width: 100%;
-          white-space: nowrap;
-        }
-      }
-    }
-  }
-
-  &:not(.won-in-message) {
-    .workflowv__content {
-      width: 100%;
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr 1fr;
-      grid-gap: 0.5rem;
-
-      .workflowv__content__item {
-        .workflowv__content__item__inner {
-          display: grid;
-          grid-template-rows: min-content 1fr;
-          border: $thinGrayBorder;
-          border-radius: 0.19rem;
-          height: 5rem;
-          background: $won-lighter-gray;
-          grid-gap: 0.25rem;
-          padding: 0.25rem;
-          justify-items: center;
-
-          &:hover {
-            cursor: pointer;
-          }
-
-          .workflowv__content__item__inner__image,
-          .workflowv__content__item__inner__typeicon {
-            grid-row: 2 / span 1;
-            max-width: 100%;
-            max-height: 100%;
-            --local-primary: #{$won-line-gray};
-          }
-
-          .workflowv__content__item__inner__label {
-            grid-row: 1 / span 1;
-            font-size: $smallFontSize;
-            color: $won-primary-text-color;
-            text-overflow: ellipsis;
-            overflow: hidden;
-            max-width: 100%;
-            white-space: nowrap;
-          }
-        }
-      }
+    .workflowv__content__label {
+      grid-row: 1 / span 1;
+      font-size: $smallFontSize;
+      color: $won-primary-text-color;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      max-width: 100%;
+      white-space: nowrap;
     }
   }
 }
