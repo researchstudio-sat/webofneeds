@@ -14,6 +14,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
+
 import won.matcher.service.common.service.http.HttpService;
 import won.matcher.solr.config.SolrMatcherConfig;
 import won.protocol.model.Coordinate;
@@ -117,6 +119,10 @@ public class NeedIndexer {
             indexUri += "?commit=" + config.isCommitIndexedNeedImmediately();
         }
         log.debug("Post need to solr index. \n Solr URI: {} \n Need (JSON): {}", indexUri, needJson);
-        httpService.postJsonRequest(indexUri, needJson);
+        try {
+          httpService.postJsonRequest(indexUri, needJson);
+        } catch (HttpClientErrorException e) {
+          log.info("Error indexing need with solr. \n Solr URI: {} \n Need (JSON): {}", indexUri, needJson);
+        }
     }
 }
