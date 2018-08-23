@@ -793,6 +793,7 @@ export const details = {
     icon: "#ico36_detail_files",
     placeholder: "",
     accepts: "",
+    multiSelect: true,
     component: "won-file-picker",
     viewerComponent: "won-file-viewer",
     parseToRDF: function({ value }) {
@@ -870,6 +871,7 @@ export const details = {
     icon: "#ico36_detail_media",
     placeholder: "",
     accepts: "image/*",
+    multiSelect: false,
     component: "won-file-picker",
     viewerComponent: "won-file-viewer",
     parseToRDF: function({ value }) {
@@ -932,6 +934,83 @@ export const details = {
         let humanReadable = "";
         if (value.length > 1) {
           humanReadable = value.length + " Images";
+        } else {
+          humanReadable = value[0].name;
+        }
+
+        return includeLabel ? this.label + ": " + humanReadable : humanReadable;
+      }
+      return undefined;
+    },
+  },
+  workflow: {
+    identifier: "workflow",
+    label: "Workflow",
+    icon: "#ico36_detail_files", //TODO: CORRECT ICON
+    placeholder: "",
+    accepts: "application/octet-stream",
+    component: "won-workflow-picker",
+    viewerComponent: "won-workflow-viewer",
+    parseToRDF: function({ value }) {
+      if (!value) {
+        return { "won:hasWorkflow": undefined };
+      }
+      let payload = [];
+      value.forEach(wfl => {
+        //TODO: SAVE CORRECT RDF THIS METHOD
+        if (wfl.name && wfl.type && wfl.data) {
+          let workflow = {
+            "@type": "s:FileObject",
+            "s:name": wfl.name,
+            "s:type": wfl.type,
+            "s:data": wfl.data,
+          };
+
+          payload.push(workflow);
+        }
+      });
+      if (payload.length > 0) {
+        return { "won:hasWorkflow": payload };
+      }
+      return { "won:hasWorkflow": undefined };
+    },
+    parseFromRDF: function(jsonLDImm) {
+      const workflows = jsonLDImm && jsonLDImm.get("won:hasWorkflow");
+      let wkfls = [];
+
+      if (Immutable.List.isList(workflows)) {
+        workflows &&
+          workflows.forEach(wfl => {
+            //TODO: RETRIEVE FROM CORRECT RDF THIS METHOD
+            let workflow = {
+              name: get(wfl, "s:name"),
+              type: get(wfl, "s:type"),
+              data: get(wfl, "s:data"),
+            };
+            if (workflow.name && workflow.type && workflow.data) {
+              wkfls.push(workflow);
+            }
+          });
+      } else {
+        let workflow = {
+          name: get(workflows, "s:name"),
+          type: get(workflows, "s:type"),
+          data: get(workflows, "s:data"),
+        };
+        if (workflow.name && workflow.type && workflow.data) {
+          return Immutable.fromJS([workflow]);
+        }
+      }
+      if (wkfls.length > 0) {
+        return Immutable.fromJS(wkfls);
+      }
+      return undefined;
+    },
+    generateHumanReadable: function({ value, includeLabel }) {
+      if (value) {
+        let humanReadable = "";
+        if (value.length > 1) {
+          humanReadable = value.length + " Workflows";
         } else {
           humanReadable = value[0].name;
         }
