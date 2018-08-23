@@ -73,7 +73,11 @@ public class WonMessageRoutes extends RouteBuilder
         //sends the failure response, using the current transaction
         from("direct:sendFailureResponse")
                 .routeId("direct:sendFailureResponse")
-                .onException(Exception.class).handled(true).end()
+                .onException(Exception.class)
+                  .log("failure during direct:sendFailureResponse, rolling back transaction for exchange ${exchangeId}")
+                  .rollback()
+                  .handled(true)
+                  .end()
                 .transacted("PROPAGATION_REQUIRES_NEW")
                 .to("bean:parentLocker")
                 .to("bean:failResponder");
