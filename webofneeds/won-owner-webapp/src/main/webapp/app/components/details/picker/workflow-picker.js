@@ -2,37 +2,25 @@ import angular from "angular";
 import { attach, delay } from "../../../utils.js";
 import { DomCache } from "../../../cstm-ng-utils.js";
 import dropzoneModule from "../../file-dropzone.js";
+import BpmnViewer from "bpmn-js";
 
 import "style/_workflowpicker.scss";
 
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
   let template = `
-      <won-file-dropzone on-image-picked="::self.updateFiles(image)" accepts="::self.detail.accepts" multi-select="::false" ng-if="!self.addedFiles || self.addedFiles.length == 0">
+      <won-file-dropzone on-image-picked="::self.updateWorkflow(image)" accepts="::self.detail.accepts" multi-select="::false" ng-if="!self.addedWorkflow">
       </won-file-dropzone>
-      <div class="workflowp__header" ng-if="self.addedFiles && self.addedFiles.length > 0">
-        Chosen Workflow:
-      </div>
-      <div class="workflowp__preview" ng-if="self.addedFiles && self.addedFiles.length > 0">
-        <div class="workflowp__preview__item"
-          ng-repeat="file in self.addedFiles">
-          <div class="workflowp__preview__item__label">
-            {{ file.name }}
-          </div>
-          <svg
-            class="workflowp__preview__item__remove"
-            ng-click="self.removeFile(file)">
-            <use xlink:href="#ico36_close" href="#ico36_close"></use>
-          </svg>
-          <img class="workflowp__preview__item__image"
-            ng-if="self.isImage(file)"
-            alt="{{file.name}}"
-            ng-src="data:{{file.type}};base64,{{file.data}}"/>
-          <svg ng-if="!self.isImage(file)"
-            class="workflowp__preview__item__typeicon">
-            <use xlink:href="#ico36_uc_transport_demand" href="#ico36_uc_transport_demand"></use>
-          </svg>
+      <div class="workflowp__preview" ng-show="self.addedWorkflow">
+        <div class="workflowp__preview__label clickable" ng-click="self.fitDiagramToViewport()">
+          {{ self.addedWorkflow.name }} (Click to Center Diagram)
         </div>
+        <svg
+          class="workflowp__preview__remove"
+          ng-click="self.removeWorkflow()">
+          <use xlink:href="#ico36_close" href="#ico36_close"></use>
+        </svg>
+        <div class="workflowp__preview__diagram clickable" ng-attr-id="{{self.getUniqueDiagramId()}}" ng-click="self.fitDiagramToViewport()"></div>
       </div>
     `;
 
@@ -43,48 +31,107 @@ function genComponentConf() {
 
       window.workflowp4dbg = this;
 
-      this.addedFiles = this.initialValue;
+      this.addedWorkflow = this.initialValue;
 
-      delay(0).then(() => this.showInitialFiles());
+      delay(0).then(() => this.showInitialWorkflow());
     }
 
     /**
      * Checks validity and uses callback method
      */
     update(data) {
-      if (data && data.length > 0) {
+      if (data) {
         this.onUpdate({ value: data });
       } else {
         this.onUpdate({ value: undefined });
       }
     }
 
-    showInitialFiles() {
-      this.addedFiles = this.initialValue;
+    showInitialWorkflow() {
+      this.addedWorkflow = this.initialValue;
       this.$scope.$apply();
-    }
 
-    updateFiles(file) {
-      console.log("called updateFiles: ", file);
-      if (!this.addedFiles) {
-        this.addedFiles = [];
+      if (!this.bpmnViewer) {
+        this.initializeBpmnViewer();
       }
-      this.addedFiles.push(file);
-      this.update(this.addedFiles);
-      this.$scope.$apply();
-    }
-
-    removeFile(fileToRemove) {
-      console.log("Removing file: " + fileToRemove);
-      if (!this.addedFiles) {
-        this.addedFiles = [];
+      if (this.addedWorkflow && this.addedWorkflow.data) {
+        this.bpmnViewer.importXML(atob(this.addedWorkflow.data), err => {
+          if (err) {
+            console.error(
+              "Workflow was invalid and could not be parsed, reason:",
+              err
+            );
+            this.removeWorkflow();
+            this.$scope.$apply();
+          } else {
+            console.log("Workflow rendered");
+            this.fitDiagramToViewport();
+            this.$scope.$apply();
+          }
+        });
+      } else {
+        this.$scope.$apply();
       }
-      this.addedFiles = this.addedFiles.filter(file => fileToRemove !== file);
-      this.update(this.addedFiles);
     }
 
-    isImage(file) {
-      return file && /^image\//.test(file.type);
+    updateWorkflow(file) {
+      console.log("called updateWorkflow: ", file);
+      this.addedWorkflow = file;
+      this.update(this.addedWorkflow);
+
+      if (!this.bpmnViewer) {
+        this.initializeBpmnViewer();
+      }
+      if (this.addedWorkflow && this.addedWorkflow.data) {
+        this.bpmnViewer.importXML(atob(this.addedWorkflow.data), err => {
+          if (err) {
+            console.error(
+              "Workflow was invalid and could not be parsed, reason:",
+              err
+            );
+            this.removeWorkflow();
+            this.$scope.$apply();
+          } else {
+            console.log("Workflow rendered");
+            this.fitDiagramToViewport();
+            this.$scope.$apply();
+          }
+        });
+      } else {
+        this.$scope.$apply();
+      }
+    }
+
+    removeWorkflow() {
+      this.addedWorkflow = undefined;
+      this.update(this.addedWorkflow);
+    }
+
+    initializeBpmnViewer() {
+      console.log("init bpmnviewer for element: ", this.getUniqueDiagramId());
+      this.bpmnViewer = new BpmnViewer({
+        container: "#" + this.getUniqueDiagramId(),
+      });
+
+      if (this.bpmnViewer) {
+        console.log("Init BpmnViewer Successful");
+      } else {
+        console.log("Init BpmnViewer Failed");
+      }
+    }
+
+    fitDiagramToViewport() {
+      console.log("Fit Diagram To Viewport");
+      const scale = this.bpmnViewer.get("canvas").zoom("fit-viewport", "auto");
+      console.log("fitDiagram Scale: ", scale);
+      if (isNaN(scale) || scale == 0) {
+        console.log("scale was NaN or 0 zoom to level 0.2");
+        this.bpmnViewer.get("canvas").zoom(0.2, "auto");
+      }
+    }
+
+    getUniqueDiagramId() {
+      return "diagram-" + this.$scope.$id;
     }
   }
   Controller.$inject = serviceDependencies;
