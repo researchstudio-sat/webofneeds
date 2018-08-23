@@ -1,5 +1,9 @@
 package won.matcher.solr.query;
 
+import java.io.IOException;
+
+import javax.annotation.PostConstruct;
+
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -12,12 +16,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
 import won.matcher.solr.config.SolrMatcherConfig;
 import won.matcher.solr.hints.HintBuilder;
 import won.matcher.solr.query.factory.MatchingContextQueryFactory;
-
-import javax.annotation.PostConstruct;
-import java.io.IOException;
 
 /**
  * Created by hfriedrich on 12.08.2016.
@@ -61,7 +63,20 @@ public class DefaultMatcherQueryExecuter implements SolrMatcherQueryExecutor {
 
         try {
             QueryResponse response = solrClient.query(query);
-            return response.getResults();
+            SolrDocumentList results = response.getResults();
+            //handle special case: if all results have the same score, the rows parameter does not properly restrict the size
+            //in order to enforce the restriction, we are doing it here.
+            if (results.size() > maxHints) {
+              SolrDocumentList cappedResults = new SolrDocumentList();
+              for (int i = 0; i < maxHints; i++) {
+                cappedResults.add(results.get(i));
+              }
+              cappedResults.setMaxScore(results.getMaxScore());
+              cappedResults.setNumFound(results.getNumFound());
+              cappedResults.setStart(results.getStart());
+              return cappedResults;
+            }
+            return results;
         } catch (SolrException e) {
             log.warn("Exception {} thrown for query: {}", e, queryString);
         }
