@@ -68,7 +68,7 @@ public class MatcherPubSubActor extends UntypedActor
     // Create a scheduler to request missing need events from matching service while this matcher was not available
     scheduledTick = Optional.of(getContext().system().scheduler().schedule(
       Duration.create(30, TimeUnit.SECONDS), Duration.create(60, TimeUnit.SECONDS), getSelf(), TICK,
-      getContext().dispatcher(), null))
+      getContext().dispatcher(), null));
 
     // read properties file that has the lastSeenNeedDate
     FileInputStream in = null;
