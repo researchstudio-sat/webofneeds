@@ -595,12 +595,12 @@ const realEstateFloorSizeRangeDetail = {
       return {};
     }
     return {
-      "https://www.w3.org/ns/shacl#property": {
-        "https://www.w3.org/ns/shacl#path": "s:floorSize",
-        "https://www.w3.org/ns/shacl#minInclusive": value.min && [
+      "sh:property": {
+        "sh:path": "s:floorSize",
+        "sh:minInclusive": value.min && [
           { "@value": value.min, "@type": "xsd:float" },
         ],
-        "https://www.w3.org/ns/shacl#maxInclusive": value.max && [
+        "sh:maxInclusive": value.max && [
           { "@value": value.max, "@type": "xsd:float" },
         ],
       },
