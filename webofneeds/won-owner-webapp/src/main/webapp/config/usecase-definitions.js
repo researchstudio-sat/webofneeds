@@ -95,23 +95,7 @@ const interestsDetail = {
     return { "foaf:topic_interest": value };
   },
   parseFromRDF: function(jsonLDImm) {
-    const interests = jsonLDImm && jsonLDImm.get("foaf:topic_interest");
-    if (!interests) {
-      return undefined;
-    } else if (is("String", interests)) {
-      return Immutable.fromJS([interests]);
-    } else if (is("Array", interests)) {
-      return Immutable.fromJS(interests);
-    } else if (Immutable.List.isList(interests)) {
-      return interests; // id; it is already in the format we want
-    } else {
-      console.error(
-        "Found unexpected format of interests (should be Array, " +
-          "Immutable.List, or a single tag as string): " +
-          JSON.stringify(interests)
-      );
-      return undefined;
-    }
+    return won.parseListFrom(jsonLDImm, "foaf:topic_interest");
   },
 };
 
