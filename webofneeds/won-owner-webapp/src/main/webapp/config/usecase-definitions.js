@@ -516,20 +516,23 @@ const realEstateNumberOfRoomsRangeDetail = {
       return {};
     }
     return {
-      "https://www.w3.org/ns/shacl#property": {
-        "https://www.w3.org/ns/shacl#path": "s:numberOfRooms",
-        "https://www.w3.org/ns/shacl#minInclusive": value.min && [
+      "sh:property": {
+        "sh:path": "s:numberOfRooms",
+        "sh:minInclusive": value.min && [
           { "@value": value.min, "@type": "xsd:float" },
         ],
-        "https://www.w3.org/ns/shacl#maxInclusive": value.max && [
+        "sh:maxInclusive": value.max && [
           { "@value": value.max, "@type": "xsd:float" },
         ],
       },
     };
   },
   parseFromRDF: function(jsonLDImm) {
-    let properties =
-      jsonLDImm && jsonLDImm.get("https://www.w3.org/ns/shacl#property");
+    let properties = getFromJsonLd(
+      jsonLDImm,
+      "sh:property",
+      won.defaultContext
+    );
     if (!properties) return undefined;
 
     if (!Immutable.List.isList(properties))
@@ -537,14 +540,19 @@ const realEstateNumberOfRoomsRangeDetail = {
 
     const numberOfRooms = properties.find(
       property =>
-        property.get("https://www.w3.org/ns/shacl#path") == "s:numberOfRooms"
+        getFromJsonLd(property, "sh:path", won.defaultContext) ===
+        "s:numberOfRooms"
     );
-    const minNumberOfRooms =
-      numberOfRooms &&
-      numberOfRooms.get("https://www.w3.org/ns/shacl#minInclusive");
-    const maxNumberOfRooms =
-      numberOfRooms &&
-      numberOfRooms.get("https://www.w3.org/ns/shacl#maxInclusive");
+    const minNumberOfRooms = getFromJsonLd(
+      numberOfRooms,
+      "sh:minInclusive",
+      won.defaultContext
+    );
+    const maxNumberOfRooms = getFromJsonLd(
+      numberOfRooms,
+      "sh:maxInclusive",
+      won.defaultContext
+    );
 
     if (minNumberOfRooms || maxNumberOfRooms) {
       return Immutable.fromJS({
