@@ -24,7 +24,7 @@ won-workflow-picker {
       grid-column: 1 / span 2;
       height: 20rem;
       max-width: 100%;
-      overflow-y: scroll;
+      overflow-y: auto;
       overflow-x: hidden;
       width: 100%;
     }
