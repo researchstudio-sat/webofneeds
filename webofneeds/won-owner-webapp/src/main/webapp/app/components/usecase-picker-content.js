@@ -43,9 +43,27 @@ function genComponentConf() {
           </button>
       </div>
       <won-labelled-hr label="::'Or'" class="ucpc__labelledhr"></won-labelled-hr>
+      <div class="ucpc__usecasegroup__header"
+        ng-click="self.toggleUseCaseGroups()">
+          <div class="ucpc__usecasegroup__header__label">
+                Show Template Categories
+          </div>
+          <svg
+              style="--local-primary:var(--won-secondary-color);"
+              class="ucpc__usecasegroup__header__carret__icon"
+              ng-if="self.showUseCaseGroups">
+                  <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
+          </svg>
+          <svg
+              style="--local-primary:var(--won-secondary-color);"
+              class="ucpc__usecasegroup__header__carret__icon"
+              ng-if="!self.showUseCaseGroups">
+                  <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
+          </svg>
+      </div>
       <div class="ucpc__usecasegroup"
         ng-repeat="useCaseGroup in self.useCaseGroups"
-        ng-if="self.displayableUseCaseGroup(useCaseGroup)">
+        ng-if="self.displayableUseCaseGroup(useCaseGroup) && self.showUseCaseGroups">
           <div class="ucpc__usecasegroup__header"
             ng-if="self.showUseCaseGroupHeaders">
             <svg class="ucpc__usecasegroup__header__icon"
@@ -57,7 +75,7 @@ function genComponentConf() {
                 {{ useCaseGroup.label }}
             </div>
           </div>
-          <div class="ucpc__usecasegroup__usecases">
+          <div class="ucpc__usecasegroup__usecases"> <!-- add ng-if to hide use cases here -->
             <div class="ucpc__usecasegroup__usecases__usecase clickable"
               ng-repeat="useCase in useCaseGroup.useCases"
               ng-if="self.displayableUseCase(useCase)"
@@ -82,6 +100,7 @@ function genComponentConf() {
       window.ucpc4dbg = this;
       this.useCaseGroups = useCaseGroups;
       this.showUseCaseGroupHeaders = this.showUseCaseGroups();
+      this.showUseCaseGroups = false;
 
       const selectFromState = state => {
         return {
@@ -138,6 +157,10 @@ function genComponentConf() {
         }
       }
       return false;
+    }
+
+    toggleUseCaseGroups() {
+      this.showUseCaseGroups = !this.showUseCaseGroups;
     }
 
     /**

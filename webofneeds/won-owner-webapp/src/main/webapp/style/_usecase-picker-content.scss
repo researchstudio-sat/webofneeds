@@ -47,6 +47,20 @@ won-usecase-picker-content {
         font-size: $mediumFontSize;
         font-weight: bold;
       }
+
+      &__carret {
+        // results in a clickable area as large as indicators
+        // TODO: make the value less rigid
+        // parents grid-gap takes care of margin-left
+        $padding: 0.625rem;
+        padding-top: $padding;
+        padding-bottom: $padding;
+        padding-right: $padding;
+
+        &__icon {
+          @include carretSized;
+        }
+      }
     }
 
     &__usecases {
