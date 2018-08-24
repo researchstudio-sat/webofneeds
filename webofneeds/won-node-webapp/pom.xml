@@ -2,13 +2,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>webofneeds</groupId>
+        <groupId>at.researchstudio.sat</groupId>
         <artifactId>webofneeds</artifactId>
-        <version>0.2-SNAPSHOT</version>
+        <version>0.3-SNAPSHOT</version>
     </parent>
-    <groupId>webofneeds</groupId>
+    <groupId>at.researchstudio.sat</groupId>
     <artifactId>won-node-webapp</artifactId>
-    <version>0.2-SNAPSHOT</version>
+    <version>0.3-SNAPSHOT</version>
     <packaging>war</packaging>
     <name>Node Webapp</name>
 
@@ -20,7 +20,7 @@
 
         -->
         <dependency>
-            <groupId>webofneeds</groupId>
+            <groupId>at.researchstudio.sat</groupId>
             <artifactId>won-node</artifactId>
             <version>${project.version}</version>
             <scope>${dependencies.scope}</scope>
@@ -94,7 +94,7 @@
                     </deployer>
                     <deployables>
                         <deployable>
-                            <groupId>webofneeds</groupId>
+                            <groupId>at.researchstudio.sat</groupId>
                             <artifactId>won-node-webapp</artifactId>
                             <type>war</type>
                         </deployable>

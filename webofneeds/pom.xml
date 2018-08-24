@@ -15,13 +15,62 @@
   ~ limitations under the License.
   --><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>webofneeds</groupId>
+    <groupId>at.researchstudio.sat</groupId>
     <artifactId>webofneeds</artifactId>
-    <version>0.2-SNAPSHOT</version>
+    <version>0.3-SNAPSHOT</version>
+    <description>Finding people to cooperate with. Protocol, not platform. Decentralized. Linked Data. Open Source.</description>
+    <url>https://github.com/researchstudio-sat/webofneeds</url>
+    <developers>
+        <developer>
+            <id>kweinberger</id>
+            <name>Kristina Weinberger</name>
+            <email>kristina.weinberger@researchstudio.at</email>
+        </developer>
+        <developer>
+            <id>ksinger</id>
+            <name>Kevin Singer</name>
+            <email>kevin.singer@researchstudio.at</email>
+        </developer>
+        <developer>
+            <id>gpickl</id>
+            <name>Gabriel Pickl</name>
+            <email>gabriel.pickl@researchstudio.at</email>
+        </developer>
+        <developer>
+            <id>fkleedorfer</id>
+            <name>Florian Kleedorfer</name>
+            <email>florian.fleedorfer@researchstudio.at</email>
+        </developer>
+        <developer>
+            <id>soheilhuman</id>
+            <name>Soheil Human</name>
+            <email>soheil.human@researchstudio.at</email>
+        </developer>
+        <developer>
+            <id>fsuda</id>
+            <name>Fabian Suda</name>
+            <email>fabian.suda@researchstudio.at</email>
+        </developer>
+        <developer>
+            <id>maxstolze</id>
+            <name>Max Stolze</name>
+            <email>max.stolze@researchstudio.at</email>
+        </developer>
+    </developers>
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+            <comments>A business-friendly OSS license</comments>
+        </license>
+    </licenses>
     <packaging>pom</packaging>
     <name>Web of Needs Main</name>
     <scm>
+        <connection>scm:git:git://github.com/researchstudio-sat/webofneeds.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/researchstudio-sat/webofneeds.git</developerConnection>
+        <url>https://github.com/researchstudio-sat/webofneeds.git</url>
       <tag>HEAD</tag>
   </scm>
     <modules>
@@ -125,6 +174,12 @@
                 <groupId>javax.jms</groupId>
                 <artifactId>jms</artifactId>
                 <version>${jms.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>javax.interceptor</groupId>
+                <artifactId>javax.interceptor-api</artifactId>
+                <version>1.2.2</version>
             </dependency>
 
             <!-- SPIN -->
@@ -717,15 +772,31 @@
 
         </dependencies>
     </dependencyManagement>
-
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.7</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>ossrh</serverId>
+                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>attach-javadoc</id>
                         <goals>
                             <goal>jar</goal>
                         </goals>
@@ -762,14 +833,16 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
-                    <version>2.5</version>
-                    <dependencies>
-                        <dependency>
-                            <groupId>org.apache.maven.wagon</groupId>
-                            <artifactId>wagon-http</artifactId>
-                            <version>2.8</version>
-                        </dependency>
-                    </dependencies>
+                    <version>2.8.2</version>
+                    <executions>
+                        <execution>
+                            <id>default-deploy</id>
+                            <phase>deploy</phase>
+                            <goals>
+                                <goal>deploy</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -794,7 +867,20 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
-                    <version>2.5.1</version>
+                    <version>2.5.3</version>
+                    <configuration>
+                        <localCheckout>true</localCheckout>
+                        <pushChanges>false</pushChanges>
+                        <mavenExecutorId>forked-path</mavenExecutorId>
+                        <arguments>-Dgpg.passphrase=${gpg.passphrase}</arguments>
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.apache.maven.scm</groupId>
+                            <artifactId>maven-scm-provider-gitexe</artifactId>
+                            <version>1.9.5</version>
+                        </dependency>
+                    </dependencies>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -805,6 +891,14 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
                     <version>2.1.2</version>
+                    <executions>
+                        <execution>
+                            <id>attach-sources</id>
+                            <goals>
+                                <goal>jar</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -876,14 +970,7 @@
             </snapshots>
         </repository>
     </repositories>
-
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>artifactory</id>
-            <url>http://satsrv03.researchstudio.at:8080/artifactory/repo/</url>
-        </pluginRepository>
-    </pluginRepositories>
+    
 
     <properties>
         <solr.upload.dest>${project.build.directory}</solr.upload.dest>
@@ -1063,20 +1150,43 @@
                 <dependencies.scope>provided</dependencies.scope>
             </properties>
         </profile>
+        <profile>
+            <id>release-sign-artifacts</id>
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.6</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
     <distributionManagement>
-        <repository>
-            <id>sat-maven-repository</id>
-            <name>satsrv03-releases</name>
-            <url>http://satsrv03:8080/artifactory/libs-release-local</url>
-        </repository>
         <snapshotRepository>
-            <uniqueVersion>true</uniqueVersion>
-            <id>sat-maven-repository</id>
-            <name>satsrv03-snapshot-releases</name>
-            <url>http://satsrv03:8080/artifactory/libs-snapshot-local</url>
-            <layout>default</layout>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
     </distributionManagement>
 
 </project>

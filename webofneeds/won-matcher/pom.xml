@@ -5,11 +5,11 @@
 
     <parent>
         <artifactId>webofneeds</artifactId>
-        <groupId>webofneeds</groupId>
-        <version>0.2-SNAPSHOT</version>
+        <groupId>at.researchstudio.sat</groupId>
+        <version>0.3-SNAPSHOT</version>
     </parent>
     <artifactId>won-matcher</artifactId>
-    <version>0.2-SNAPSHOT</version>
+    <version>0.3-SNAPSHOT</version>
     <name>Matcher Client</name>
 
     <properties>
@@ -24,12 +24,12 @@
 
          -->
         <dependency>
-            <groupId>webofneeds</groupId>
+            <groupId>at.researchstudio.sat</groupId>
             <artifactId>won-core</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>webofneeds</groupId>
+            <groupId>at.researchstudio.sat</groupId>
             <artifactId>won-cryptography</artifactId>
             <version>${project.version}</version>
         </dependency>
