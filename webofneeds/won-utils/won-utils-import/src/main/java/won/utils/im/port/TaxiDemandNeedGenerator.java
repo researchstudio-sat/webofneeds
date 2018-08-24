@@ -4,6 +4,7 @@ import java.io.FileOutputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Random;
 
 import org.apache.jena.rdf.model.*;
 import org.apache.jena.vocabulary.DC;
@@ -34,8 +35,11 @@ public class TaxiDemandNeedGenerator {
     }
 
     private static void generateNeeds() {
-        for (int i = 0; i < 100; i++) {
-            String needURI = "https://localhost:8443/won/resource/event/" + "taxi_demand_need_" + i + "#need";
+        final int N = 100;
+        Random random = new Random();        
+        for (int i = 0; i < N; i++) {
+            String rnd = Long.toHexString(random.nextLong());
+            String needURI = "https://localhost:8443/won/resource/event/" + "taxi_demand_need_" + rnd + "#need";
 
             model = ModelFactory.createDefaultModel();
 
@@ -62,13 +66,14 @@ public class TaxiDemandNeedGenerator {
             need.addProperty(won_seeks, seeksPart);
 
             try {
-                FileOutputStream out = new FileOutputStream("sample_needs/taxi_demand_need_" + i + ".trig");
+                FileOutputStream out = new FileOutputStream("sample_needs/taxi_demand_need_" + rnd + ".trig");
                 model.write(out, "TURTLE");
                 out.close();
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+        System.out.println("generated " + N + " sample needs");
     }
 
     private static Resource addTitle(Resource resource, double probability, int counter) {

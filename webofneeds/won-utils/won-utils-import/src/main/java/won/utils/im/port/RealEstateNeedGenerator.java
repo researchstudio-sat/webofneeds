@@ -5,8 +5,15 @@ import java.io.FileOutputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Random;
 
-import org.apache.jena.rdf.model.*;
+import org.apache.jena.datatypes.BaseDatatype;
+import org.apache.jena.datatypes.RDFDatatype;
+import org.apache.jena.datatypes.xsd.XSDDatatype;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.DC;
 import org.apache.jena.vocabulary.RDF;
 
@@ -19,6 +26,7 @@ public class RealEstateNeedGenerator {
     static Property won_seeks = model.createProperty("http://purl.org/webofneeds/model#seeks");
     static Property won_hasTag = model.createProperty("http://purl.org/webofneeds/model#hasTag");
     static Property won_hasLocation = model.createProperty("http://purl.org/webofneeds/model#hasLocation");
+    static Property won_geoSpatial = model.createProperty("http://purl.org/webofneeds/model#geoSpatial");
     static Property won_hasBoundingBox = model.createProperty("http://purl.org/webofneeds/model#hasBoundingBox");
     static Property won_hasNorthWestCorner = model
             .createProperty("http://purl.org/webofneeds/model#hasNorthWestCorner");
@@ -39,6 +47,9 @@ public class RealEstateNeedGenerator {
     static Property schema_unitCode = model.createProperty("http://schema.org/unitCode");
     static Property schema_value = model.createProperty("http://schema.org/value");
 
+    static RDFDatatype bigdata_geoSpatialDatatype = new BaseDatatype("http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon");
+    
+    
     static HashMap<String, String>[] locations = new HashMap[10];
     static String[] amenities = { "Balcony", "Parkingspace", "Garden", "Bathtub", "furnished",
             "Parquetflooring", "Elevator", "Cellar", "Pool", "Sauna", "accessible" };
@@ -51,9 +62,12 @@ public class RealEstateNeedGenerator {
 	private static void generateNeeds() {
         File parentFolder = new File("sample_needs");
         parentFolder.mkdirs();
-        for (int i = 0; i < 100; i++) {
-            String needURI = "https://localhost:8443/won/resource/event/" + "real_estate_sample_" + i + "#need";
-
+        Arrays.stream(parentFolder.listFiles()).forEach(f -> f.delete());
+        final int N = 10000;
+        Random random = new Random();
+        for (int i = 0; i < N; i++) {
+            String rnd = Long.toHexString(random.nextLong());
+            String needURI = "https://localhost:8443/won/resource/event/" + "real_estate_sample_" + rnd + "#need";
             model = ModelFactory.createDefaultModel();
 
             setPrefixes();
@@ -72,8 +86,9 @@ public class RealEstateNeedGenerator {
             isPart = addFloorSize(isPart, 0.8, 28, 250);
             isPart = addNumberOfRooms(isPart, 0.8, 1, 9);
             isPart = addPriceSpecification(isPart, 1.0, 250, 2200);
+            isPart.addProperty(won_hasTag, "RentOutRealEstate");
 
-            seeksPart.addProperty(won_hasTag, "to-rent");
+            seeksPart.addProperty(won_hasTag, "SearchRealEstateToRent");
 
             need.addProperty(RDF.type, won_Need);
             need.addProperty(won_hasFacet, won_OwnerFacet);
@@ -81,13 +96,14 @@ public class RealEstateNeedGenerator {
             need.addProperty(won_seeks, seeksPart);
 
             try {
-                FileOutputStream out = new FileOutputStream(new File(parentFolder, "real_estate_need_" + i + ".trig"));
+                FileOutputStream out = new FileOutputStream(new File(parentFolder, "real_estate_need_" + rnd + ".trig"));
                 model.write(out, "TURTLE");
                 out.close();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
+        System.out.println("generated " + N + " sample needs");
     }
 	
 	private static Resource addTitle(Resource resource, double probability, int counter) {
@@ -138,12 +154,14 @@ public class RealEstateNeedGenerator {
         geoResource.addProperty(RDF.type, schema_GeoCoordinates);
         geoResource.addProperty(schema_latitude, lat);
         geoResource.addProperty(schema_longitude, lng);
+        // add bigdata specific value: "<subj> won:geoSpatial  "48.225073#16.358398"^^<http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon>" 
+        geoResource.addProperty(won_geoSpatial, lat+"#"+lng, bigdata_geoSpatialDatatype);
         locationResource.addProperty(won_hasBoundingBox, boundingBoxResource);
         boundingBoxResource.addProperty(won_hasNorthWestCorner, nwCornerResource);
         nwCornerResource.addProperty(RDF.type, schema_GeoCoordinates);
         nwCornerResource.addProperty(schema_latitude, nwlat);
         nwCornerResource.addProperty(schema_longitude, nwlng);
-        boundingBoxResource.addProperty(won_hasNorthWestCorner, seCornerResource);
+        boundingBoxResource.addProperty(won_hasSouthEastCorner, seCornerResource);
         seCornerResource.addProperty(RDF.type, schema_GeoCoordinates);
         seCornerResource.addProperty(schema_latitude, selat);
         seCornerResource.addProperty(schema_longitude, selng);
@@ -183,7 +201,7 @@ public class RealEstateNeedGenerator {
         resource.addProperty(schema_floorSize, floorSizeResource);
         floorSizeResource.addProperty(RDF.type, schema_QuantitativeValue);
         floorSizeResource.addProperty(schema_unitCode, "MTK");
-        floorSizeResource.addProperty(schema_value, String.valueOf(floorSize));
+        floorSizeResource.addProperty(schema_value, Integer.toString(floorSize), XSDDatatype.XSDfloat);
         return resource;
     }
 
@@ -194,7 +212,7 @@ public class RealEstateNeedGenerator {
 
         int numberOfRooms = (int) (Math.random() * Math.abs(max - min + 1)) + min;
 
-        resource.addProperty(schema_numberOfRooms, String.valueOf(numberOfRooms));
+        resource.addProperty(schema_numberOfRooms, Integer.toString(numberOfRooms), XSDDatatype.XSDfloat);
         return resource;
     }
 
@@ -212,7 +230,7 @@ public class RealEstateNeedGenerator {
         resource.addProperty(schema_priceSpecification, priceSpecificationResource);
         priceSpecificationResource.addProperty(RDF.type, schema_CompoundPriceSpecification);
         priceSpecificationResource.addProperty(schema_description, "total rent per month");
-        priceSpecificationResource.addProperty(schema_price, String.valueOf(price));
+        priceSpecificationResource.addProperty(schema_price, Integer.toString(price), XSDDatatype.XSDfloat);
         priceSpecificationResource.addProperty(schema_priceCurrency, "EUR");
         return resource;
     }
