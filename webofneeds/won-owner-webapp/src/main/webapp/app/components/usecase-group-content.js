@@ -18,47 +18,9 @@ const serviceDependencies = [
 
 function genComponentConf() {
   const template = `
-  <!--
-      <div class="ucpc__createx won-pending-publishing" ng-if="self.pendingPublishing">
-          <button class="won-button--filled red ucpc__createx__button"
-                  ng-disabled="self.pendingPublishing">
-              <span>Finding out what's going on&hellip;</span>
-          </button>
-      </div>
-      <div class="ucpc__createx" ng-if="!self.pendingPublishing">
-          <button class="won-button--filled red ucpc__createx__button"
-                  ng-click="self.createWhatsAround()"
-                  ng-disabled="self.pendingPublishing">
-              <svg class="won-button-icon" style="--local-primary:white;">
-                  <use xlink:href="#ico36_location_current" href="#ico36_location_current"></use>
-              </svg>
-              <span>What's in your Area?</span>
-          </button>
-          <button class="won-button--filled red ucpc__createx__button"
-                  ng-click="self.createWhatsNew()"
-                  ng-disabled="self.pendingPublishing">
-              <span>What's new?</span>
-          </button>
-      </div>
+  TODO: show group use cases here
+  <!-- USE CASES
       <won-labelled-hr label="::'Or'" class="ucpc__labelledhr"></won-labelled-hr>
-      <div class="ucpc__usecasegroup__header"
-        ng-click="self.toggleUseCaseGroups()">
-          <div class="ucpc__usecasegroup__header__label">
-                Show Template Categories
-          </div>
-          <svg
-              style="--local-primary:var(--won-secondary-color);"
-              class="ucpc__usecasegroup__header__carret__icon"
-              ng-if="self.showUseCaseGroups">
-                  <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
-          </svg>
-          <svg
-              style="--local-primary:var(--won-secondary-color);"
-              class="ucpc__usecasegroup__header__carret__icon"
-              ng-if="!self.showUseCaseGroups">
-                  <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
-          </svg>
-      </div>
       <div class="ucpc__usecasegroup"
         ng-repeat="useCaseGroup in self.useCaseGroups"
         ng-if="self.displayableUseCaseGroup(useCaseGroup) && self.showUseCaseGroups">
@@ -73,7 +35,7 @@ function genComponentConf() {
                 {{ useCaseGroup.label }}
             </div>
           </div>
-          <div class="ucpc__usecasegroup__usecases"> <!-- add ng-if to hide use cases here -->
+          <div class="ucpc__usecasegroup__usecases">
             <div class="ucpc__usecasegroup__usecases__usecase clickable"
               ng-repeat="useCase in useCaseGroup.useCases"
               ng-if="self.displayableUseCase(useCase)"

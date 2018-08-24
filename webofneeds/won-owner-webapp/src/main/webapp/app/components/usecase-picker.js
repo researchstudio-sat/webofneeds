@@ -24,7 +24,7 @@ function genComponentConf() {
   const template = `
         <div class="ucp__header">
             <a class="ucp__header__back clickable"
-                ng-click="self.router__stateGoCurrent({showUseCases: undefined, useCase: undefined})">
+                ng-click="self.router__stateGoCurrent({showUseCases: undefined, useCase: undefined, useCaseGroup: undefined})">
                 <svg style="--local-primary:var(--won-primary-color);"
                     class="ucp__header__back__icon">
                     <use xlink:href="#ico36_close" href="#ico36_close"></use>
@@ -32,15 +32,16 @@ function genComponentConf() {
             </a>
             <span class="ucp__header__title">What do you have or want?</span>
         </div>
-        <won-usecase-picker-content ng-if="useCaseGroup===undefined">
+        <won-usecase-picker-content ng-if="!self.useCaseGroup">
         </won-usecase-picker-content>
-        <won-usecase-group-content ng-if="!!useCaseGroup">
+        <won-usecase-group-content ng-if="!!self.useCaseGroup">
         </won-usecase-group-content>
     `;
 
   class Controller {
     constructor(/* arguments <- serviceDependencies */) {
       attach(this, serviceDependencies, arguments);
+      window.ucp4dbg = this;
 
       const selectFromState = state => {
         const useCaseGroup = getIn(state, [

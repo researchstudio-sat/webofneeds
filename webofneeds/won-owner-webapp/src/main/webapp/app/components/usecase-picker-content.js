@@ -61,11 +61,13 @@ function genComponentConf() {
                   <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
           </svg>
       </div>
+      <!-- TODO: use buttons for use case groups -->
       <div class="ucpc__usecasegroup"
         ng-repeat="useCaseGroup in self.useCaseGroups"
         ng-if="self.displayableUseCaseGroup(useCaseGroup) && self.showUseCaseGroups">
           <div class="ucpc__usecasegroup__header"
-            ng-if="self.showUseCaseGroupHeaders">
+            ng-if="self.showUseCaseGroupHeaders"
+            ng-click="self.startFrom(useCaseGroup)">
             <svg class="ucpc__usecasegroup__header__icon"
               ng-if="!!useCaseGroup.icon">
               <use xlink:href="{{ useCaseGroup.icon }}" href="{{ useCaseGroup.icon }}"></use>
@@ -76,10 +78,10 @@ function genComponentConf() {
             </div>
           </div>
           <div class="ucpc__usecasegroup__usecases"> <!-- add ng-if to hide use cases here -->
+          <!--
             <div class="ucpc__usecasegroup__usecases__usecase clickable"
               ng-repeat="useCase in useCaseGroup.useCases"
-              ng-if="self.displayableUseCase(useCase)"
-              ng-click="self.startFrom(useCase)">
+              ng-if="self.displayableUseCase(useCase)">
               <svg class="ucpc__usecasegroup__usecases__usecase__icon"
                 ng-if="!!useCase.icon">
                 <use xlink:href="{{ useCase.icon }}" href="{{ useCase.icon }}"></use>
@@ -89,6 +91,7 @@ function genComponentConf() {
                   {{ useCase.label }}
               </div>
             </div>
+          -->
           </div>
       </div>
     `;
@@ -125,18 +128,19 @@ function genComponentConf() {
       }
     }
 
-    startFrom(selectedUseCase) {
-      const selectedUseCaseIdentifier =
-        selectedUseCase && selectedUseCase.identifier;
+    startFrom(selectedUseCaseGroup) {
+      const selectedGroupIdentifier =
+        selectedUseCaseGroup && selectedUseCaseGroup.identifier;
 
-      if (selectedUseCaseIdentifier) {
+      if (selectedGroupIdentifier) {
         this.router__stateGoCurrent({
-          useCase: encodeURIComponent(selectedUseCaseIdentifier),
+          showUseCases: true,
+          useCaseGroup: encodeURIComponent(selectedGroupIdentifier),
         });
       } else {
         console.log(
-          "No usecase identifier found for given usecase, ",
-          selectedUseCase
+          "No identifier found for given usecase group, ",
+          selectedUseCaseGroup
         );
       }
     }
