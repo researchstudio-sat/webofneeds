@@ -812,12 +812,12 @@ const realEstateUseCases = {
     draft: {
       ...emptyDraft,
       seeks: {
-        type: "won:Rent",
-        tags: ["for-rent"],
+        type: "won:RealEstateRentOffer",
+        tags: ["RentOutRealEstate"],
       },
       is: {
-        type: "won:SearchRent",
-        tags: ["to-rent"],
+        type: "won:RealEstateRentDemand",
+        tags: ["SearchRealEstateToRent"],
       },
     },
     isDetails: undefined,
@@ -930,11 +930,13 @@ const realEstateUseCases = {
     draft: {
       ...emptyDraft,
       is: {
+        type: "won:RealEstateRentOffer",
         title: "For Rent",
-        tags: ["for-rent"],
+        tags: ["RentOutRealEstate"],
       },
       seeks: {
-        tags: ["to-rent"],
+        type: "won:RealEstateRentDemand",
+        tags: ["SearchRealEstateToRent"],
       },
     },
     isDetails: {
