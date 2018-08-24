@@ -970,14 +970,7 @@
             </snapshots>
         </repository>
     </repositories>
-
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>artifactory</id>
-            <url>http://satsrv03.researchstudio.at:8080/artifactory/repo/</url>
-        </pluginRepository>
-    </pluginRepositories>
+    
 
     <properties>
         <solr.upload.dest>${project.build.directory}</solr.upload.dest>
