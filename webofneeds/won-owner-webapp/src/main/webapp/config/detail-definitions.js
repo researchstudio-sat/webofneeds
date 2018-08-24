@@ -793,6 +793,7 @@ export const details = {
     icon: "#ico36_detail_files",
     placeholder: "",
     accepts: "",
+    multiSelect: true,
     component: "won-file-picker",
     viewerComponent: "won-file-viewer",
     parseToRDF: function({ value }) {
@@ -870,6 +871,7 @@ export const details = {
     icon: "#ico36_detail_media",
     placeholder: "",
     accepts: "image/*",
+    multiSelect: false,
     component: "won-file-picker",
     viewerComponent: "won-file-viewer",
     parseToRDF: function({ value }) {
@@ -937,6 +939,51 @@ export const details = {
         }
 
         return includeLabel ? this.label + ": " + humanReadable : humanReadable;
+      }
+      return undefined;
+    },
+  },
+  workflow: {
+    identifier: "workflow",
+    label: "Workflow",
+    icon: "#ico36_detail_workflow",
+    placeholder: "",
+    //accepts: "application/octet-stream",
+    accepts: "",
+    component: "won-workflow-picker",
+    viewerComponent: "won-workflow-viewer",
+    parseToRDF: function({ value }) {
+      if (value && value.name && value.data) {
+        //do not check for value.type might not be present on some systems
+        let workflow = {
+          "@type": "s:FileObject",
+          "s:name": value.name,
+          "s:type": value.type,
+          "s:data": value.data,
+        };
+
+        return { "won:hasWorkflow": workflow };
+      }
+      return { "won:hasWorkflow": undefined };
+    },
+    parseFromRDF: function(jsonLDImm) {
+      const wflw = jsonLDImm && jsonLDImm.get("won:hasWorkflow");
+
+      let workflow = {
+        name: get(wflw, "s:name"),
+        type: get(wflw, "s:type"),
+        data: get(wflw, "s:data"),
+      };
+      if (workflow.name && workflow.data) {
+        //do not check for value.type might not be present on some systems
+        return Immutable.fromJS(workflow);
+      }
+
+      return undefined;
+    },
+    generateHumanReadable: function({ value, includeLabel }) {
+      if (value && value.name) {
+        return includeLabel ? this.label + ": " + value.name : value.name;
       }
       return undefined;
     },

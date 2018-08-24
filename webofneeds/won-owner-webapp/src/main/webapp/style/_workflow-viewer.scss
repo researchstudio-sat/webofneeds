@@ -1,0 +1,37 @@
+@import "won-config";
+@import "sizing-utils";
+
+won-workflow-viewer {
+  @include won-detail-viewer("workflowv");
+
+  .workflowv__content {
+    width: 100%;
+    display: grid;
+    grid-template-rows: min-content 1fr;
+    border: $thinGrayBorder;
+    border-radius: 0.19rem;
+    background: $won-lighter-gray;
+    grid-gap: 0.25rem;
+    padding: 0.25rem;
+    justify-items: center;
+
+    .workflowv__content__diagram {
+      grid-row: 2 / span 1;
+      height: 20rem;
+      max-width: 100%;
+      overflow-y: auto;
+      overflow-x: hidden;
+      width: 100%;
+    }
+
+    .workflowv__content__label {
+      grid-row: 1 / span 1;
+      font-size: $smallFontSize;
+      color: $won-primary-text-color;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      max-width: 100%;
+      white-space: nowrap;
+    }
+  }
+}
