@@ -298,6 +298,7 @@ function genComponentConf() {
         if (this.isOpenByConnection(ownNeedUri)) {
           this.router__stateGoCurrent({
             useCase: undefined,
+            useCaseGroup: undefined,
             connectionUri: undefined,
           });
         }

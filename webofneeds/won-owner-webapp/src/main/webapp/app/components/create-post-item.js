@@ -158,6 +158,7 @@ function genComponentConf() {
           postUri: undefined,
           showUseCases: undefined,
           useCase: encodeURIComponent(selectedUseCaseIdentifier),
+          useCaseGroup: undefined,
         });
       } else {
         console.log(
@@ -173,6 +174,7 @@ function genComponentConf() {
         postUri: undefined,
         showUseCases: true,
         useCase: undefined,
+        useCaseGroup: undefined,
       });
     }
 
@@ -183,6 +185,7 @@ function genComponentConf() {
         postUri: undefined,
         showUseCases: undefined,
         useCase: "search",
+        useCaseGroup: undefined,
       });
     }
   }

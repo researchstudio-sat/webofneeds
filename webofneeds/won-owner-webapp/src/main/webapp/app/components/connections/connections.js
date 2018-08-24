@@ -123,6 +123,7 @@ class ConnectionsController {
       postUri: needUri,
       showUseCases: undefined,
       useCase: undefined,
+      useCaseGroup: undefined,
     }); //TODO: Maybe leave the connectionUri in the parameters to go back when closing a selected need
   }
 
@@ -133,6 +134,7 @@ class ConnectionsController {
       postUri: undefined,
       showUseCases: undefined,
       useCase: undefined,
+      useCaseGroup: undefined,
     });
   }
 

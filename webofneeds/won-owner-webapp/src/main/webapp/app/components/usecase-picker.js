@@ -5,11 +5,12 @@ import angular from "angular";
 import ngAnimate from "angular-animate";
 
 import "ng-redux";
-import { attach } from "../utils.js";
+import { attach, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
 import { selectIsConnected } from "../selectors.js";
 import usecasePickerContentModule from "./usecase-picker-content.js";
+import usecaseGroupContentModule from "./usecase-group-content.js";
 
 import "style/_usecase-picker.scss";
 
@@ -31,8 +32,10 @@ function genComponentConf() {
             </a>
             <span class="ucp__header__title">What do you have or want?</span>
         </div>
-        <won-usecase-picker-content>
+        <won-usecase-picker-content ng-if="useCaseGroup===undefined">
         </won-usecase-picker-content>
+        <won-usecase-group-content ng-if="!!useCaseGroup">
+        </won-usecase-group-content>
     `;
 
   class Controller {
@@ -40,7 +43,14 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
 
       const selectFromState = state => {
+        const useCaseGroup = getIn(state, [
+          "router",
+          "currentParams",
+          "useCaseGroup",
+        ]);
+
         return {
+          useCaseGroup,
           connectionHasBeenLost: !selectIsConnected(state),
         };
       };
@@ -69,5 +79,6 @@ angular
   .module("won.owner.components.usecasePicker", [
     ngAnimate,
     usecasePickerContentModule,
+    usecaseGroupContentModule,
   ])
   .directive("wonUsecasePicker", genComponentConf).name;
