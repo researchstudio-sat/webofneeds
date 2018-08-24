@@ -1371,10 +1371,13 @@ export function endOfXsdDateInterval(xsdDateStr) {
 /**
  * Parses an `xsd:dateTime`-string strictly.
  * Docs on format: <http://www.datypic.com/sc/xsd/t-xsd_dateTime.html>
- * @param {*} dateTime e.g. "2018-08-21T14:05:27.568Z"
+ * @param {string} dateTime e.g. "2018-08-21T14:05:27.568Z"
  * @returns a `Date`-object, with `Invalid Date` if parsing failed.
  */
 export function parseXsdDateTime(dateTime) {
+  if (!is("String", dateTime)) {
+    return undefined;
+  }
   const validXsdDateTimeString = !!dateTime.match(
     /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/
   );
