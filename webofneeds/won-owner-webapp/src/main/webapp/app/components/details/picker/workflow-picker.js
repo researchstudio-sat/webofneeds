@@ -93,8 +93,12 @@ function genComponentConf() {
             this.$scope.$apply();
           } else {
             console.log("Workflow rendered");
-            this.fitDiagramToViewport();
             this.$scope.$apply();
+
+            const self = this;
+            setTimeout(() => {
+              self.fitDiagramToViewport();
+            }, 0);
           }
         });
       } else {
