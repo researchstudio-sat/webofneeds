@@ -946,7 +946,7 @@ export const details = {
   workflow: {
     identifier: "workflow",
     label: "Workflow",
-    icon: "#ico36_detail_files", //TODO: CORRECT ICON
+    icon: "#ico36_detail_workflow",
     placeholder: "",
     //accepts: "application/octet-stream",
     accepts: "",
