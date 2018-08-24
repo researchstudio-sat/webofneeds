@@ -1,4 +1,4 @@
-import { is } from "../app/utils.js";
+import { is, getFromJsonLd } from "../app/utils.js";
 import Immutable from "immutable";
 import { details, abstractDetails } from "detailDefinitions";
 import { Parser as SparqlParser } from "sparqljs";
@@ -607,8 +607,11 @@ const realEstateFloorSizeRangeDetail = {
     };
   },
   parseFromRDF: function(jsonLDImm) {
-    let properties =
-      jsonLDImm && jsonLDImm.get("https://www.w3.org/ns/shacl#property");
+    let properties = getFromJsonLd(
+      jsonLDImm,
+      "sh:property",
+      won.defaultContext
+    );
     if (!properties) return undefined;
 
     if (!Immutable.List.isList(properties))
@@ -616,13 +619,19 @@ const realEstateFloorSizeRangeDetail = {
 
     const floorSize = properties.find(
       property =>
-        property.get("https://www.w3.org/ns/shacl#path") == "s:floorSize"
+        getFromJsonLd(property, "sh:path", won.defaultContext) === "s:floorSize"
     );
 
-    const minFloorSize =
-      floorSize && floorSize.get("https://www.w3.org/ns/shacl#minInclusive");
-    const maxFloorSize =
-      floorSize && floorSize.get("https://www.w3.org/ns/shacl#maxInclusive");
+    const minFloorSize = getFromJsonLd(
+      floorSize,
+      "sh:minInclusive",
+      won.defaultContext
+    );
+    const maxFloorSize = getFromJsonLd(
+      floorSize,
+      "sh:maxInclusive",
+      won.defaultContext
+    );
 
     if (minFloorSize || maxFloorSize) {
       return Immutable.fromJS({
