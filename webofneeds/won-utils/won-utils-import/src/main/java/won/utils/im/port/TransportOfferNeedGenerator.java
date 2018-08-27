@@ -4,7 +4,10 @@ import java.io.FileOutputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Random;
 
+import org.apache.jena.datatypes.BaseDatatype;
+import org.apache.jena.datatypes.RDFDatatype;
 import org.apache.jena.rdf.model.*;
 import org.apache.jena.vocabulary.DC;
 import org.apache.jena.vocabulary.RDF;
@@ -18,6 +21,7 @@ public class TransportOfferNeedGenerator {
     static Property won_seeks = model.createProperty("http://purl.org/webofneeds/model#seeks");
     static Property won_hasTag = model.createProperty("http://purl.org/webofneeds/model#hasTag");
     static Property won_hasLocation = model.createProperty("http://purl.org/webofneeds/model#hasLocation");
+    static Property won_geoSpatial = model.createProperty("http://purl.org/webofneeds/model#geoSpatial");    
     static Property won_hasBoundingBox = model.createProperty("http://purl.org/webofneeds/model#hasBoundingBox");
     static Property won_hasNorthWestCorner = model
             .createProperty("http://purl.org/webofneeds/model#hasNorthWestCorner");
@@ -29,6 +33,8 @@ public class TransportOfferNeedGenerator {
     static Property schema_longitude = model.createProperty("http://schema.org/longitude");
     static Property schema_name = model.createProperty("http://schema.org/name");
 
+    static RDFDatatype bigdata_geoSpatialDatatype = new BaseDatatype("http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon");
+    
     static HashMap<String, String>[] locations = new HashMap[10];
     static String[] tags = { "quick", "<10kg", "long-distance", "cooled", "pets", "furniture", "short-distance",
             "small", "non-living", "produce", "time-sensitive" };
@@ -39,8 +45,11 @@ public class TransportOfferNeedGenerator {
     }
 
     private static void generateNeeds() {
-        for (int i = 0; i < 100; i++) {
-            String needURI = "https://localhost:8443/won/resource/event/" + "transport_offer_need_" + i + "#need";
+        final int N = 100;
+        Random random = new Random();
+        for (int i = 0; i < N; i++) {
+            String rnd = Long.toHexString(random.nextLong());
+            String needURI = "https://localhost:8443/won/resource/event/" + "transport_offer_need_" + rnd + "#need";
 
             model = ModelFactory.createDefaultModel();
 
@@ -64,13 +73,14 @@ public class TransportOfferNeedGenerator {
             need.addProperty(won_seeks, seeksPart);
 
             try {
-                FileOutputStream out = new FileOutputStream("sample_needs/transport_offer_need_" + i + ".trig");
+                FileOutputStream out = new FileOutputStream("sample_needs/transport_offer_need_" + rnd + ".trig");
                 model.write(out, "TURTLE");
                 out.close();
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+        System.out.println("generated " + N + " sample needs");
     }
 
     private static Resource addTitle(Resource resource, double probability, int counter) {
@@ -121,12 +131,14 @@ public class TransportOfferNeedGenerator {
         geoResource.addProperty(RDF.type, schema_GeoCoordinates);
         geoResource.addProperty(schema_latitude, lat);
         geoResource.addProperty(schema_longitude, lng);
+        // add bigdata specific value: "<subj> won:geoSpatial  "48.225073#16.358398"^^<http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon>" 
+        geoResource.addProperty(won_geoSpatial, lat+"#"+lng, bigdata_geoSpatialDatatype);
         locationResource.addProperty(won_hasBoundingBox, boundingBoxResource);
         boundingBoxResource.addProperty(won_hasNorthWestCorner, nwCornerResource);
         nwCornerResource.addProperty(RDF.type, schema_GeoCoordinates);
         nwCornerResource.addProperty(schema_latitude, nwlat);
         nwCornerResource.addProperty(schema_longitude, nwlng);
-        boundingBoxResource.addProperty(won_hasNorthWestCorner, seCornerResource);
+        boundingBoxResource.addProperty(won_hasSouthEastCorner, seCornerResource);
         seCornerResource.addProperty(RDF.type, schema_GeoCoordinates);
         seCornerResource.addProperty(schema_latitude, selat);
         seCornerResource.addProperty(schema_longitude, selng);
