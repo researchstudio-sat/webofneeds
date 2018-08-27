@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
+import won.protocol.exception.WonProtocolException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Connection;
@@ -44,7 +45,7 @@ public class HintMessageProcessor extends AbstractCamelProcessor {
 
         URI needURIFromWonMessage = wonMessage.getReceiverNeedURI();
         if (isTooManyHints(needURIFromWonMessage)) {
-          return;
+          throw new WonProtocolException("Too many hints for need " + needURIFromWonMessage);
         }
         
         URI wonNodeFromWonMessage = wonMessage.getReceiverNodeURI();
