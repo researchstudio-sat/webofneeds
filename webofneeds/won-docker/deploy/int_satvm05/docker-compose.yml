@@ -292,6 +292,29 @@ services:
       - wonnode1
       - wonnode2
 
+  matcher_sparql:
+    build: ../../image/matcher-sparql
+    image: webofneeds/matcher_sparql:int
+    environment:
+      - "node.host=satvm05.researchstudio.at"
+      - "cluster.seedNodes=satvm05.researchstudio.at:2551,satvm05.researchstudio.at:2552"
+      - "cluster.local.port=2554"
+      - "matcher.sparql.uri.sparql.endpoint=http://satvm05.researchstudio.at:9999/blazegraph/namespace/kb/sparql"
+      - "matcher.sparql.uri.public=http://satvm05.researchstudio.at/sparql/"
+      - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
+      - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=62923,server=y,suspend=n
+        -Dcom.sun.management.jmxremote.port=9023 -Dcom.sun.management.jmxremote.authenticate=false
+        -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9023
+        -Djava.rmi.server.hostname=satvm05.researchstudio.at"
+    ports:
+      - "2554:2554"
+      - "9023:9023"
+      - "62923:62923"
+    depends_on:
+      - matcher_service
+    volumes:
+      - $base_folder/won-client-certs/matcher_sparql:/usr/src/matcher-sparql/client-certs/
+
   # solr server as a need index
   solr:
     build: ../../image/solr
@@ -351,26 +374,3 @@ services:
       - $base_folder/agent:/opt/agent/
     depends_on:
       - matcher_service
-
-  matcher_sparql:
-    build: ../../image/matcher-sparql
-    image: webofneeds/matcher_sparql:int
-    environment:
-      - "node.host=satvm05.researchstudio.at"
-      - "cluster.seedNodes=satvm05.researchstudio.at:2551,satvm05.researchstudio.at:2552"
-      - "cluster.local.port=2554"
-      - "matcher.sparql.uri.sparql.endpoint=http://satvm05.researchstudio.at:9999/blazegraph/namespace/kb/sparql"
-      - "matcher.sparql.uri.public=http://satvm05.researchstudio.at/sparql/"
-      - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
-      - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=62923,server=y,suspend=n
-        -Dcom.sun.management.jmxremote.port=9023 -Dcom.sun.management.jmxremote.authenticate=false
-        -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9023
-        -Djava.rmi.server.hostname=satvm05.researchstudio.at"
-    ports:
-      - "2554:2554"
-      - "9023:9023"
-      - "62923:62923"
-    depends_on:
-      - matcher_service
-    volumes:
-    - $base_folder/won-client-certs/matcher_sparql:/usr/src/matcher-sparql/client-certs/
