@@ -1,0 +1,124 @@
+@prefix msg:   <http://purl.org/webofneeds/message#> .
+@prefix conn:  <https://satvm05.researchstudio.at/won/resource/connection/> .
+@prefix need:  <https://satvm05.researchstudio.at/won/resource/need/> .
+@prefix woncrypt: <http://purl.org/webofneeds/woncrypt#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix cert:  <http://www.w3.org/ns/auth/cert#> .
+@prefix local: <https://satvm05.researchstudio.at/won/resource/> .
+@prefix geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix sig:   <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#> .
+@prefix s:     <http://schema.org/> .
+@prefix sh:    <http://www.w3.org/ns/shacl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix won:   <http://purl.org/webofneeds/model#> .
+@prefix ldp:   <http://www.w3.org/ns/ldp#> .
+@prefix event: <https://satvm05.researchstudio.at/won/resource/event/> .
+@prefix dc:    <http://purl.org/dc/elements/1.1/> .
+@prefix sioc:  <http://rdfs.org/sioc/ns#> .
+
+<https://satvm05.researchstudio.at/won/resource/event/bzzhdyfl5v2r2nloruo7#content-p93v> {
+    <http://example.org/2/PlaceShape>
+            a               sh:NodeShape ;
+            sh:closed       true ;
+            sh:property     [ sh:minCount  1 ;
+                              sh:path      rdf:type
+                            ] ;
+            sh:property     [ sh:class     s:GeoCoordinates ;
+                              sh:maxCount  1 ;
+                              sh:minCount  1 ;
+                              sh:path      s:geo
+                            ] ;
+            sh:targetClass  s:Place .
+    
+    <http://example.org/2/GeoCoordinateShape>
+            a               sh:NodeShape ;
+            sh:closed       true ;
+            sh:property     [ sh:minCount  1 ;
+                              sh:path      rdf:type
+                            ] ;
+            sh:property     [ sh:maxCount  1 ;
+                              sh:minCount  1 ;
+                              sh:path      s:longitude
+                            ] ;
+            sh:property     [ sh:maxCount  1 ;
+                              sh:minCount  1 ;
+                              sh:path      s:latitude
+                            ] ;
+            sh:targetClass  s:GeoCoordinates .
+    
+    <http://example.org/2/TaxiRideShape>
+            a               sh:NodeShape ;
+            sh:closed       true ;
+            sh:property     [ sh:class     s:Place ;
+                              sh:maxCount  1 ;
+                              sh:minCount  0 ;
+                              sh:path      s:toLocation
+                            ] ;
+            sh:property     [ sh:class     s:Place ;
+                              sh:maxCount  1 ;
+                              sh:minCount  1 ;
+                              sh:path      s:fromLocation
+                            ] ;
+            sh:property     [ sh:minCount  1 ;
+                              sh:path      rdf:type
+                            ] ;
+            sh:targetClass  s:TravelAction .
+    
+    need:o21e3jpf8uqah4sn03k5
+            cert:key  [ cert:PublicKey  [ a                       woncrypt:ECCPublicKey ;
+                                          woncrypt:ecc_algorithm  "EC" ;
+                                          woncrypt:ecc_curveId    "secp384r1" ;
+                                          woncrypt:ecc_qx         "d4a4bd30cb08fbe368f12ca9d92732bfc712bf0949734c500005e49aeaed98a76bf805489f76171c5d172a1e2410839a" ;
+                                          woncrypt:ecc_qy         "6d432d8466a70ac235430b456a0226408c674842f1353c0d2b9f8282ede14977fd406315c54a48a1f2d45916e3963dd"
+                                        ] ] .
+    
+    <http://example.org/2/SelfShape>
+            a              sh:NodeShape ;
+            sh:property    [ sh:maxCount  1 ;
+                             sh:minCount  1 ;
+                             sh:path      [ sh:inversePath  rdf:type ]
+                           ] ;
+            sh:targetNode  s:TravelAction .
+}
+
+<https://satvm05.researchstudio.at/won/resource/event/bzzhdyfl5v2r2nloruo7#envelope-97ee-sig> {
+    <https://satvm05.researchstudio.at/won/resource/event/bzzhdyfl5v2r2nloruo7#envelope-97ee-sig>
+            a                               sig:Signature ;
+            sig:hasSignatureValue           "MGYCMQCHu93eVusjygFwwLfVgb3dmE54MMPeBgV18gTjeUXMfhfEIYPzC9PGRnN1FWvZIVkCMQCkTSTXrRRaVKus4jju8KgLW6qZwY1ykyntmDYdfuti3xUKAE5vP/xJEWEnwu3fjvw=" ;
+            sig:hasVerificationCertificate  need:o21e3jpf8uqah4sn03k5 ;
+            msg:hasHash                     "HiJEA/VICJs459SHIhFeJqG7b3uTAi+kCBU0Q58V1A/kJ9kxB7+8ZrgP3xSb9biGyPHxfuGdiMR28j1BtTsZ9EMGn8NcTKY1z/V48FrWaurEHwPaEZiz+Jcl0o7n0ELuwDbG40EP1KL7IbT58bJkXQm4dP1VGR9qf5dJaaojF0k=" ;
+            msg:hasPublicKeyFingerprint     "JSiFDW790YXrNG0kz72BFCo6YDc5Ba1iWlSN+90wDgk=" ;
+            msg:hasSignedGraph              <https://satvm05.researchstudio.at/won/resource/event/bzzhdyfl5v2r2nloruo7#envelope-97ee> .
+}
+
+<https://satvm05.researchstudio.at/won/resource/event/bzzhdyfl5v2r2nloruo7#content-fyqq> {
+    need:o21e3jpf8uqah4sn03k5
+            a             won:Need ;
+            won:goal      [ won:hasShapesGraph  <https://satvm05.researchstudio.at/won/resource/event/bzzhdyfl5v2r2nloruo7#content-p93v> ] ;
+            won:hasFacet  won:OwnerFacet ;
+            won:hasFlag   won:NoHintForCounterpart , won:NoHintForMe ;
+            won:is        [ dc:title  "TaxiBot Offer" ] .
+}
+
+<https://satvm05.researchstudio.at/won/resource/need/o21e3jpf8uqah4sn03k5#sysinfo> {
+    need:o21e3jpf8uqah4sn03k5
+            a                      won:Need ;
+            <http://purl.org/dc/terms/created>
+                    "2018-08-27T09:37:20.742Z"^^xsd:dateTime ;
+            <http://purl.org/dc/terms/modified>
+                    "2018-08-27T09:37:20.75Z"^^xsd:dateTime ;
+            won:hasConnections     <https://satvm05.researchstudio.at/won/resource/need/o21e3jpf8uqah4sn03k5/connections> ;
+            won:hasContentGraph    <https://satvm05.researchstudio.at/won/resource/event/bzzhdyfl5v2r2nloruo7#envelope-97ee-sig> , <https://satvm05.researchstudio.at/won/resource/event/bzzhdyfl5v2r2nloruo7#content-fyqq> , <https://satvm05.researchstudio.at/won/resource/event/bzzhdyfl5v2r2nloruo7#content-p93v> ;
+            won:hasEventContainer  <https://satvm05.researchstudio.at/won/resource/need/o21e3jpf8uqah4sn03k5#events> ;
+            won:hasWonNode         <https://satvm05.researchstudio.at/won/resource> ;
+            won:isInState          won:Active .
+    
+    <https://satvm05.researchstudio.at/won/resource/need/o21e3jpf8uqah4sn03k5#events>
+            a            won:EventContainer ;
+            rdfs:member  event:bzzhdyfl5v2r2nloruo7 , event:kh0276gl3xpqf8b7nqid .
+    
+    <https://satvm05.researchstudio.at/won/resource/need/o21e3jpf8uqah4sn03k5#sysinfo>
+            <http://www.w3.org/2004/03/trix/rdfg-1/subGraphOf>
+                    need:o21e3jpf8uqah4sn03k5 .
+}
