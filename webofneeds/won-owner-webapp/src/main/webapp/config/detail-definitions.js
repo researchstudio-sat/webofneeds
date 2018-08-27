@@ -871,7 +871,7 @@ export const details = {
     icon: "#ico36_detail_media",
     placeholder: "",
     accepts: "image/*",
-    multiSelect: false,
+    multiSelect: true,
     component: "won-file-picker",
     viewerComponent: "won-file-viewer",
     parseToRDF: function({ value }) {
@@ -943,9 +943,9 @@ export const details = {
       return undefined;
     },
   },
-  workflow: {
-    identifier: "workflow",
-    label: "Workflow",
+  bpmnWorkflow: {
+    identifier: "bpmn-workflow",
+    label: "BPMN",
     icon: "#ico36_detail_workflow",
     placeholder: "",
     //accepts: "application/octet-stream",
@@ -962,12 +962,57 @@ export const details = {
           "s:data": value.data,
         };
 
-        return { "won:hasWorkflow": workflow };
+        return { "won:hasBpmnWorkflow": workflow };
       }
-      return { "won:hasWorkflow": undefined };
+      return { "won:hasBpmnWorkflow": undefined };
     },
     parseFromRDF: function(jsonLDImm) {
-      const wflw = jsonLDImm && jsonLDImm.get("won:hasWorkflow");
+      const wflw = jsonLDImm && jsonLDImm.get("won:hasBpmnWorkflow");
+
+      let workflow = {
+        name: get(wflw, "s:name"),
+        type: get(wflw, "s:type"),
+        data: get(wflw, "s:data"),
+      };
+      if (workflow.name && workflow.data) {
+        //do not check for value.type might not be present on some systems
+        return Immutable.fromJS(workflow);
+      }
+
+      return undefined;
+    },
+    generateHumanReadable: function({ value, includeLabel }) {
+      if (value && value.name) {
+        return includeLabel ? this.label + ": " + value.name : value.name;
+      }
+      return undefined;
+    },
+  },
+  petrinetWorkflow: {
+    identifier: "petrinet-workflow",
+    label: "Petrinet",
+    icon: "#ico36_detail_workflow",
+    placeholder: "",
+    //accepts: "application/octet-stream",
+    accepts: "",
+    component: "won-petrinet-picker",
+    viewerComponent: "won-petrinet-viewer",
+    parseToRDF: function({ value }) {
+      if (value && value.name && value.data) {
+        //do not check for value.type might not be present on some systems
+        let workflow = {
+          "@type": "s:FileObject",
+          "s:name": value.name,
+          "s:type": value.type,
+          "s:data": value.data,
+        };
+
+        return { "won:hasPetrinet": workflow };
+      }
+      return { "won:hasPetrinet": undefined };
+    },
+    parseFromRDF: function(jsonLDImm) {
+      const wflw = jsonLDImm && jsonLDImm.get("won:hasPetrinet");
 
       let workflow = {
         name: get(wflw, "s:name"),

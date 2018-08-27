@@ -23,6 +23,7 @@ import selectViewerModule from "../details/viewer/select-viewer.js";
 import rangeViewerModule from "../details/viewer/range-viewer.js";
 import fileViewerModule from "../details/viewer/file-viewer.js";
 import workflowViewerModule from "../details/viewer/workflow-viewer.js";
+import petrinetViewerModule from "../details/viewer/petrinet-viewer.js";
 
 import "style/_message-content.scss";
 
@@ -148,6 +149,7 @@ export default angular
     rangeViewerModule,
     fileViewerModule,
     workflowViewerModule,
+    petrinetViewerModule,
   ])
   .directive("messageDetailViewerElement", [
     "$compile",
