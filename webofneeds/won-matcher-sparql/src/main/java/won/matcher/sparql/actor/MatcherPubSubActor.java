@@ -1,6 +1,7 @@
 package won.matcher.sparql.actor;
 
 import akka.actor.ActorRef;
+import akka.actor.Cancellable;
 import akka.actor.OneForOneStrategy;
 import akka.actor.SupervisorStrategy;
 import akka.actor.UntypedActor;
@@ -12,6 +13,8 @@ import akka.japi.Function;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import scala.Option;
 import scala.concurrent.duration.Duration;
 import won.matcher.service.common.event.*;
 import won.matcher.service.common.spring.SpringExtension;
@@ -21,6 +24,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
@@ -48,6 +52,7 @@ public class MatcherPubSubActor extends UntypedActor
   private static final String LAST_SEEN_NEED_DATE_PROPERTY_NAME = "lastSeenNeedDate";
   private boolean needsUpdateRequestReceived = false;
   private Properties appStateProps = new Properties();
+  private Optional<Cancellable> scheduledTick = Optional.empty(); 
 
   @Override
   public void preStart() throws IOException {
@@ -61,9 +66,9 @@ public class MatcherPubSubActor extends UntypedActor
         getContext().system()).fromConfigProps(SparqlMatcherActor.class), "SparqlMatcherPool");
 
     // Create a scheduler to request missing need events from matching service while this matcher was not available
-    getContext().system().scheduler().schedule(
+    scheduledTick = Optional.of(getContext().system().scheduler().schedule(
       Duration.create(30, TimeUnit.SECONDS), Duration.create(60, TimeUnit.SECONDS), getSelf(), TICK,
-      getContext().dispatcher(), null);
+      getContext().dispatcher(), null));
 
     // read properties file that has the lastSeenNeedDate
     FileInputStream in = null;
@@ -89,6 +94,23 @@ public class MatcherPubSubActor extends UntypedActor
     }
   }
 
+  @Override
+  public void preRestart(Throwable reason, Option<Object> message) throws Exception {
+    cancelScheduledTick();
+  }
+
+  @Override
+  public void postStop() throws Exception {
+    cancelScheduledTick();
+  }
+
+  private void cancelScheduledTick() {
+    if (scheduledTick.isPresent()) {
+      scheduledTick.get().cancel(); 
+    }
+  }
+  
+  
   public void saveLastSeenNeedDate() throws IOException {
 
     FileOutputStream out = null;
@@ -120,7 +142,7 @@ public class MatcherPubSubActor extends UntypedActor
           loadNeedEvent = new LoadNeedEvent(1);
         } else {
           // request need events with date > last need event date
-          log.info("request missed needs from mataching service with crawl date > {}", lastSeenNeedDate);
+          log.info("request missed needs from matching service with crawl date > {}", lastSeenNeedDate);
           loadNeedEvent = new LoadNeedEvent(lastSeenNeedDate, Long.MAX_VALUE);
         }
 

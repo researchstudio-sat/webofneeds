@@ -70,7 +70,7 @@ webofneeds/won-docker/image/owner/tomcat-libs/
 webofneeds/won-docker/image/wonnode/conf/
 webofneeds/won-docker/image/wonnode/tomcat-libs/
 webofneeds/won-docker/image/wonnode/won.war
-
+webofneeds/won-utils/won-utils-import/sample_needs/
 
 #local config and data
 webofneeds/conf.*
