@@ -133,6 +133,7 @@ public class ActiveMqWonNodeConnectionFactory {
         // about the memory issues on broker (is blocked or gets exception depending on <systemUsage> config)
         // see more info http://activemq.apache.org/producer-flow-control.html
         connectionFactory.setAlwaysSyncSend(false);
+        connectionFactory.setUseAsyncSend(true);
 
         // disable timestamps by default so that ttl of messages is not checked
         connectionFactory.setDisableTimeStampsByDefault(true);
