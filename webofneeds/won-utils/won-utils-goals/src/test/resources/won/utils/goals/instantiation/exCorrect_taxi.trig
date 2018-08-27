@@ -1,0 +1,80 @@
+@prefix msg:   <http://purl.org/webofneeds/message#> .
+@prefix conn:  <https://satvm05.researchstudio.at/won/resource/connection/> .
+@prefix need:  <https://satvm05.researchstudio.at/won/resource/need/> .
+@prefix woncrypt: <http://purl.org/webofneeds/woncrypt#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix cert:  <http://www.w3.org/ns/auth/cert#> .
+@prefix local: <https://satvm05.researchstudio.at/won/resource/> .
+@prefix geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix sig:   <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#> .
+@prefix s:     <http://schema.org/> .
+@prefix sh:    <http://www.w3.org/ns/shacl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix won:   <http://purl.org/webofneeds/model#> .
+@prefix ldp:   <http://www.w3.org/ns/ldp#> .
+@prefix event: <https://satvm05.researchstudio.at/won/resource/event/> .
+@prefix dc:    <http://purl.org/dc/elements/1.1/> .
+@prefix sioc:  <http://rdfs.org/sioc/ns#> .
+
+<https://satvm05.researchstudio.at/won/resource/need/vxesunm9q5in#sysinfo> {
+    need:vxesunm9q5in
+            a                      won:Need ;
+            <http://purl.org/dc/terms/created>
+                    "2018-08-27T09:35:28.612Z"^^xsd:dateTime ;
+            <http://purl.org/dc/terms/modified>
+                    "2018-08-27T09:35:28.623Z"^^xsd:dateTime ;
+            won:hasConnections     <https://satvm05.researchstudio.at/won/resource/need/vxesunm9q5in/connections> ;
+            won:hasContentGraph    <https://satvm05.researchstudio.at/won/resource/event/dvhqs5ewq7ce#envelope-sig> , <https://satvm05.researchstudio.at/won/resource/event/dvhqs5ewq7ce#need> ;
+            won:hasEventContainer  <https://satvm05.researchstudio.at/won/resource/need/vxesunm9q5in#events> ;
+            won:hasWonNode         <https://satvm05.researchstudio.at/won/resource> ;
+            won:isInState          won:Active .
+    
+    <https://satvm05.researchstudio.at/won/resource/need/vxesunm9q5in#events>
+            a            won:EventContainer ;
+            rdfs:member  event:dvhqs5ewq7ce , event:pq3s8g6pvibg5s56snza .
+    
+    <https://satvm05.researchstudio.at/won/resource/need/vxesunm9q5in#sysinfo>
+            <http://www.w3.org/2004/03/trix/rdfg-1/subGraphOf>
+                    need:vxesunm9q5in .
+}
+
+<https://satvm05.researchstudio.at/won/resource/event/dvhqs5ewq7ce#need> {
+    need:vxesunm9q5in
+            a             won:Need ;
+            won:hasFacet  won:OwnerFacet ;
+            won:seeks     [ dc:title          "Taxi" ;
+                            won:travelAction  [ a               s:TravelAction ;
+                                                s:fromLocation  [ a       s:Place ;
+                                                                  s:geo   [ a            s:GeoCoordinates ;
+                                                                            s:latitude   "48.225073" ;
+                                                                            s:longitude  "16.358398"
+                                                                          ] ;
+                                                                  s:name  "Alsergrund, Wien, 1090, Österreich"
+                                                                ] ;
+                                                s:toLocation    [ a       s:Place ;
+                                                                  s:geo   [ a            s:GeoCoordinates ;
+                                                                            s:latitude   "48.208039" ;
+                                                                            s:longitude  "16.373195"
+                                                                          ] ;
+                                                                  s:name  "Stephansplatz, Stubenviertel, KG Innere Stadt, Innere Stadt, Wien, 1010, Österreich"
+                                                                ]
+                                              ]
+                          ] ;
+            cert:key      [ cert:PublicKey  [ a                       woncrypt:ECCPublicKey ;
+                                              woncrypt:ecc_algorithm  "EC" ;
+                                              woncrypt:ecc_curveId    "secp384r1" ;
+                                              woncrypt:ecc_qx         "96e7a56351b0568ac9cc2ca2518206ed1f47b3014f13c41498dcc7f522b8bbc17570a55f7ffa09aea8ef7939e9a88188" ;
+                                              woncrypt:ecc_qy         "36a66f1a3194167b1c3bb3c7d44b9fe07e5848cc9a5bbb76ffdf8d5e3f570a986070fb5474f1874a4afb806382aa8abe"
+                                            ] ] .
+}
+
+<https://satvm05.researchstudio.at/won/resource/event/dvhqs5ewq7ce#envelope-sig> {
+    <https://satvm05.researchstudio.at/won/resource/event/dvhqs5ewq7ce#envelope-sig>
+            a                               sig:Signature ;
+            sig:hasSignatureValue           "MGUCMQCs1hRhDXXjvFl5lOC406rNkDtmGIhpziV203z7epp51ZGzWjshOW566YPpXKcEU5UCMHmq4ui29rQ/gKeHNeOsUEOv/SQbk+i0opI4MQf1kKqu4rk8ypukQOj2rs7wd+kOVg==" ;
+            sig:hasVerificationCertificate  need:vxesunm9q5in ;
+            msg:hasHash                     "YgFfgcSM+OQyOG4q52AazQyrdE2sy4rboUZZ5mTICCWYft1N67jgEGxsf6pGBT0ppooCSxgMYeOu6hESDJ9Y4USYzYA9NG8R/51+lZIl9+DXjn39Zj/648jQ+76t+XXrrpGiBikhszzAoya2BbrnE03VyffIAMEObuIZDLzxiTw=" ;
+            msg:hasPublicKeyFingerprint     "bYVjGX2hwZhWJEk5WKXpevw+wOFo76iYDF+9Dch0L8Y=" ;
+            msg:hasSignedGraph              <https://satvm05.researchstudio.at/won/resource/event/dvhqs5ewq7ce#envelope> .
+}
