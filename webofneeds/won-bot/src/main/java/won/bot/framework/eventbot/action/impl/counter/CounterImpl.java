@@ -53,4 +53,12 @@ public class CounterImpl implements Counter
   public String getName() {
     return name;
   }
+  
+  /**
+   * Resets the counter to 0.
+   * @return the counter's value obtained when resetting it.
+   */
+  public int reset() {
+    return count.getAndSet(0);
+  }
 }
