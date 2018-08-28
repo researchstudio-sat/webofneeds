@@ -5,16 +5,13 @@
 won-usecase-picker-content {
   display: grid;
   grid-auto-rows: min-content;
-  grid-gap: 1rem;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: $gridRowGap;
 
   .ucpc__createx {
-    display: grid;
-    grid-gap: 0.5rem;
-    grid-auto-flow: column;
-    grid-template-columns: 1fr 1fr;
-
     &.won-pending-publishing {
-      grid-template-columns: 1fr;
+      grid-column: 1/-1;
+      justify-self: center;
     }
 
     &__button {
@@ -23,73 +20,31 @@ won-usecase-picker-content {
   }
 
   .ucpc__labelledhr {
+    grid-column: 1/-1;
   }
 
-  .ucpc__usecasegroup {
-    display: grid;
-    grid-auto-flow: row;
-    grid-gap: 0.5rem;
-
-    &__header {
+  .ucpc__usecasegroups {
+    &__group {
       display: flex;
       align-items: center;
-      flex-direction: row;
-      width: 100%;
-      border-bottom: $thinGrayBorder;
-      color: $won-primary-text-color;
+      flex-direction: column;
+      justify-content: center;
+      padding: 0.5rem;
+      border-radius: 0.19rem;
+      background: $won-secondary-color-light;
+      min-height: $iconSize + $normalFontSize + 0.5rem; // icon + label + 0.5rem padding
+
+      &:hover {
+        filter: brightness(85%);
+      }
 
       &__icon {
         @include fixed-square($iconSize);
-        --local-primary: #{$won-primary-text-color};
+        --local-primary: #{$won-secondary-text-color};
       }
-
       &__label {
-        font-size: $mediumFontSize;
-        font-weight: bold;
-      }
-
-      &__carret {
-        // results in a clickable area as large as indicators
-        // TODO: make the value less rigid
-        // parents grid-gap takes care of margin-left
-        $padding: 0.625rem;
-        padding-top: $padding;
-        padding-bottom: $padding;
-        padding-right: $padding;
-
-        &__icon {
-          @include carretSized;
-        }
-      }
-    }
-
-    &__usecases {
-      display: grid;
-      grid-gap: 0.5rem;
-      grid-template-columns: 1fr 1fr 1fr;
-      grid-auto-flow: row dense;
-
-      &__usecase {
-        display: flex;
-        align-items: center;
-        flex-direction: column;
-        justify-content: center;
-        padding: 0.5rem;
-        border-radius: 0.19rem;
-        background: $won-secondary-color-light;
-
-        &:hover {
-          filter: brightness(85%);
-        }
-
-        &__icon {
-          @include fixed-square($iconSize);
-          --local-primary: #{$won-secondary-text-color};
-        }
-        &__label {
-          color: $won-secondary-text-color;
-          text-align: center;
-        }
+        color: $won-secondary-text-color;
+        text-align: center;
       }
     }
   }
