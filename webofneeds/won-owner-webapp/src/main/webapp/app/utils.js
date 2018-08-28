@@ -1375,7 +1375,11 @@ export function endOfXsdDateInterval(xsdDateStr) {
  * @returns a `Date`-object, with `Invalid Date` if parsing failed.
  */
 export function parseXsdDateTime(dateTime) {
-  if (!is("String", dateTime)) {
+  if (is("Date", dateTime)) {
+    // already parsed
+    return dateTime;
+  } else if (!is("String", dateTime)) {
+    // won't be able to parse
     return undefined;
   }
   const validXsdDateTimeString = !!dateTime.match(

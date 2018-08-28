@@ -2,7 +2,13 @@
 // TODO: each detail picker should know it's own rdf template
 // --> both for parsing to and from rdf
 // --> templates are used in need-builder (toRDF) and in parse-need (from RDF)
-import { get, getIn, isValidDate, parseXsdDateTime } from "../app/utils.js";
+import {
+  get,
+  getIn,
+  isValidDate,
+  parseXsdDateTime,
+  toLocalISODateString,
+} from "../app/utils.js";
 import Immutable from "immutable";
 import won from "../app/won-es6.js";
 
@@ -185,14 +191,11 @@ export const details = {
     viewerComponent: "won-datetime-viewer",
     parseToRDF: function({ value }) {
       // value can be an xsd:datetime-string or a javascript date object
-      if (!value || !isValidDate(parseXsdDateTime(value))) {
+      const datetime = parseXsdDateTime(value);
+      if (!isValidDate(datetime)) {
         return { "s:validFrom": undefined };
       } else {
-        const datetimeString = value.toISOString
-          ? // Date-object
-            value.toISOString()
-          : // xsd:datetime string
-            value;
+        const datetimeString = toLocalISODateString(datetime);
         return {
           "s:validFrom": { "@value": datetimeString, "@type": "s:DateTime" },
         };
@@ -222,14 +225,11 @@ export const details = {
     viewerComponent: "won-datetime-viewer",
     parseToRDF: function({ value }) {
       // value can be an xsd:datetime-string or a javascript date object
-      if (!value || !isValidDate(parseXsdDateTime(value))) {
+      const datetime = parseXsdDateTime(value);
+      if (!isValidDate(datetime)) {
         return { "s:validThrough": undefined };
       } else {
-        const datetimeString = value.toISOString
-          ? // Date-object
-            value.toISOString()
-          : // xsd:datetime string
-            value;
+        const datetimeString = toLocalISODateString(datetime);
         return {
           "s:validThrough": { "@value": datetimeString, "@type": "s:DateTime" },
         };
