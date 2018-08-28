@@ -2,13 +2,12 @@ import angular from "angular";
 import ngAnimate from "angular-animate";
 import labelledHrModule from "./labelled-hr.js";
 import "ng-redux";
-import { attach } from "../utils.js";
-// import { actionCreators } from "../actions/actions.js";
-// import { connect2Redux } from "../won-utils.js";
-// import { selectIsConnected } from "../selectors.js";
-// import { useCaseGroups } from "useCaseDefinitions";
+import { attach, getIn } from "../utils.js";
+import { actionCreators } from "../actions/actions.js";
+import { connect2Redux } from "../won-utils.js";
+import { useCaseGroups } from "useCaseDefinitions";
 
-//import "style/_usecase-group-content.scss";
+import "style/_usecase-group-content.scss";
 
 const serviceDependencies = [
   "$ngRedux",
@@ -18,142 +17,108 @@ const serviceDependencies = [
 
 function genComponentConf() {
   const template = `
-  TODO: show group use cases here
-  <!-- USE CASES
-      <won-labelled-hr label="::'Or'" class="ucpc__labelledhr"></won-labelled-hr>
-      <div class="ucpc__usecasegroup"
-        ng-repeat="useCaseGroup in self.useCaseGroups"
-        ng-if="self.displayableUseCaseGroup(useCaseGroup) && self.showUseCaseGroups">
-          <div class="ucpc__usecasegroup__header"
-            ng-if="self.showUseCaseGroupHeaders">
-            <svg class="ucpc__usecasegroup__header__icon"
-              ng-if="!!useCaseGroup.icon">
-              <use xlink:href="{{ useCaseGroup.icon }}" href="{{ useCaseGroup.icon }}"></use>
-            </svg>
-            <div class="ucpc__usecasegroup__header__label"
-              ng-if="!!useCaseGroup.label">
-                {{ useCaseGroup.label }}
-            </div>
-          </div>
-          <div class="ucpc__usecasegroup__usecases">
-            <div class="ucpc__usecasegroup__usecases__usecase clickable"
-              ng-repeat="useCase in useCaseGroup.useCases"
-              ng-if="self.displayableUseCase(useCase)"
-              ng-click="self.startFrom(useCase)">
-              <svg class="ucpc__usecasegroup__usecases__usecase__icon"
-                ng-if="!!useCase.icon">
-                <use xlink:href="{{ useCase.icon }}" href="{{ useCase.icon }}"></use>
-              </svg>
-              <div class="ucpc__usecasegroup__usecases__usecase__label"
-                ng-if="!!useCase.label">
-                  {{ useCase.label }}
-              </div>
-            </div>
-          </div>
+  <div class="ucgc__usecasegroup"
+    ng-if="self.displayableUseCaseGroup(self.useCaseGroup)">
+      <!-- HEADER -->
+      <div class="ucgc__usecasegroup__header">
+        <svg class="ucgc__usecasegroup__header__icon"
+          ng-if="!!self.useCaseGroup.icon">
+          <use xlink:href="{{ self.useCaseGroup.icon }}" href="{{ self.useCaseGroup.icon }}"></use>
+        </svg>
+        <div class="ucgc__usecasegroup__header__label"
+          ng-if="!!self.useCaseGroup.label">
+            {{ self.useCaseGroup.label }}
+        </div>
       </div>
-    -->
+      <!-- USE CASES -->
+      <div class="ucgc__usecasegroup__usecases">
+        <div class="ucgc__usecasegroup__usecases__usecase clickable"
+          ng-repeat="useCase in self.useCaseGroup.useCases"
+          ng-if="self.displayableUseCase(useCase)"
+          ng-click="self.startFrom(useCase)">
+          <svg class="ucgc__usecasegroup__usecases__usecase__icon"
+            ng-if="!!useCase.icon">
+            <use xlink:href="{{ useCase.icon }}" href="{{ useCase.icon }}"></use>
+          </svg>
+          <div class="ucgc__usecasegroup__usecases__usecase__label"
+            ng-if="!!useCase.label">
+              {{ useCase.label }}
+          </div>
+        </div>
+      </div>
+  </div>
     `;
 
   class Controller {
     constructor(/* arguments <- serviceDependencies */) {
       attach(this, serviceDependencies, arguments);
 
-      // window.ucpc4dbg = this;
-      // this.useCaseGroups = useCaseGroups;
+      window.ucgc4dbg = this;
+      this.useCaseGroups = useCaseGroups;
       // this.showUseCaseGroupHeaders = this.showUseCaseGroups();
       // this.showUseCaseGroups = false;
 
-      // const selectFromState = state => {
-      //   return {
-      //     pendingPublishing: state.get("creatingWhatsX"),
-      //     connectionHasBeenLost: !selectIsConnected(state),
-      //   };
-      // };
+      const selectFromState = state => {
+        const selectedGroup = getIn(state, [
+          "router",
+          "currentParams",
+          "useCaseGroup",
+        ]);
+        return {
+          useCaseGroup: selectUseCaseGroupFrom(selectedGroup, useCaseGroups),
+        };
+      };
 
       // Using actionCreators like this means that every action defined there is available in the template.
-      //connect2Redux(selectFromState, actionCreators, [], this);
+      connect2Redux(selectFromState, actionCreators, [], this);
     }
 
-    //   createWhatsAround() {
-    //     if (!this.pendingPublishing) {
-    //       this.needs__whatsAround();
-    //     }
-    //   }
+    /**
+     * return if the given useCaseGroup is displayable or not
+     * needs to have at least one displayable UseCase
+     * @param useCase
+     * @returns {*}
+     */
+    displayableUseCaseGroup(useCaseGroup) {
+      const useCaseGroupValid =
+        useCaseGroup &&
+        (useCaseGroup.label || useCaseGroup.icon) &&
+        useCaseGroup.useCases;
 
-    //   createWhatsNew() {
-    //     if (!this.pendingPublishing) {
-    //       this.needs__whatsNew();
-    //     }
-    //   }
+      if (useCaseGroupValid) {
+        for (const key in useCaseGroup.useCases) {
+          if (this.displayableUseCase(useCaseGroup.useCases[key])) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
 
-    //   startFrom(selectedUseCase) {
-    //     const selectedUseCaseIdentifier =
-    //       selectedUseCase && selectedUseCase.identifier;
+    /**
+     * return if the given useCase is displayable or not
+     * @param useCase
+     * @returns {*}
+     */
+    displayableUseCase(useCase) {
+      return useCase && useCase.identifier && (useCase.label || useCase.icon);
+    }
 
-    //     if (selectedUseCaseIdentifier) {
-    //       this.router__stateGoCurrent({
-    //         useCase: encodeURIComponent(selectedUseCaseIdentifier),
-    //       });
-    //     } else {
-    //       console.log(
-    //         "No usecase identifier found for given usecase, ",
-    //         selectedUseCase
-    //       );
-    //     }
-    //   }
+    startFrom(selectedUseCase) {
+      const selectedUseCaseIdentifier =
+        selectedUseCase && selectedUseCase.identifier;
 
-    //   /**
-    //    * Only display the headers of the useCaseGroups if there are multiple displayable useCaseGroups
-    //    * @returns {boolean}
-    //    */
-    //   showUseCaseGroups() {
-    //     let countDisplayedUseCaseGroups = 0;
-
-    //     for (const key in this.useCaseGroups) {
-    //       if (
-    //         this.displayableUseCaseGroup(this.useCaseGroups[key]) &&
-    //         ++countDisplayedUseCaseGroups > 1
-    //       ) {
-    //         return true;
-    //       }
-    //     }
-    //     return false;
-    //   }
-
-    //   toggleUseCaseGroups() {
-    //     this.showUseCaseGroups = !this.showUseCaseGroups;
-    //   }
-
-    //   /**
-    //    * return if the given useCaseGroup is displayable or not
-    //    * needs to have at least one displayable UseCase
-    //    * @param useCase
-    //    * @returns {*}
-    //    */
-    //   displayableUseCaseGroup(useCaseGroup) {
-    //     const useCaseGroupValid =
-    //       useCaseGroup &&
-    //       (useCaseGroup.label || useCaseGroup.icon) &&
-    //       useCaseGroup.useCases;
-
-    //     if (useCaseGroupValid) {
-    //       for (const key in useCaseGroup.useCases) {
-    //         if (this.displayableUseCase(useCaseGroup.useCases[key])) {
-    //           return true;
-    //         }
-    //       }
-    //     }
-    //     return false;
-    //   }
-
-    //   /**
-    //    * return if the given useCase is displayable or not
-    //    * @param useCase
-    //    * @returns {*}
-    //    */
-    //   displayableUseCase(useCase) {
-    //     return useCase && useCase.identifier && (useCase.label || useCase.icon);
-    //   }
+      if (selectedUseCaseIdentifier) {
+        this.router__stateGoCurrent({
+          useCase: encodeURIComponent(selectedUseCaseIdentifier),
+        });
+      } else {
+        console.log(
+          "No usecase identifier found for given usecase, ",
+          selectedUseCase
+        );
+      }
+    }
   }
 
   Controller.$inject = serviceDependencies;
@@ -168,6 +133,17 @@ function genComponentConf() {
     },
     template: template,
   };
+}
+
+function selectUseCaseGroupFrom(selectedGroup, useCaseGroups) {
+  if (selectedGroup) {
+    for (const groupName in useCaseGroups) {
+      if (selectedGroup === useCaseGroups[groupName]["identifier"]) {
+        return useCaseGroups[groupName];
+      }
+    }
+  }
+  return undefined;
 }
 
 export default //.controller('CreateNeedController', [...serviceDependencies, CreateNeedController])
