@@ -110,6 +110,7 @@ public class MessagingServiceImpl<T> implements ApplicationContextAware,Messagin
 
     public synchronized void sendInOnlyMessage(Map properties, Map headers, Object body, String endpoint){
         Exchange exchange = new DefaultExchange(getCamelContext());
+        exchange.setPattern(ExchangePattern.InOnly);
         Endpoint ep = getCamelContext().getEndpoint(endpoint);
         if (properties!=null){
             if(properties.containsKey("methodName"))
