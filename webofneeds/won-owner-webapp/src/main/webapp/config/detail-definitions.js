@@ -2,7 +2,7 @@
 // TODO: each detail picker should know it's own rdf template
 // --> both for parsing to and from rdf
 // --> templates are used in need-builder (toRDF) and in parse-need (from RDF)
-import { get, getIn } from "../app/utils.js";
+import { get, getIn, isValidDate, parseXsdDateTime } from "../app/utils.js";
 import Immutable from "immutable";
 import won from "../app/won-es6.js";
 
@@ -172,6 +172,74 @@ export const details = {
     generateHumanReadable: function({ value, includeLabel }) {
       if (value) {
         return includeLabel ? this.label + ": " + value : value;
+      }
+      return undefined;
+    },
+  },
+  fromDatetime: {
+    identifier: "fromDatetime",
+    label: "Starting at",
+    icon: "#ico36_detail_datetime",
+    placeholder: "Enter Date and Time...",
+    component: "won-datetime-picker",
+    viewerComponent: "won-datetime-viewer",
+    parseToRDF: function({ value }) {
+      // value can be an xsd:datetime-string or a javascript date object
+      if (!value || !isValidDate(parseXsdDateTime(value))) {
+        return { "s:validFrom": undefined };
+      } else {
+        const datetimeString = value.toISOString
+          ? // Date-object
+            value.toISOString()
+          : // xsd:datetime string
+            value;
+        return {
+          "s:validFrom": { "@value": datetimeString, "@type": "s:DateTime" },
+        };
+      }
+    },
+    parseFromRDF: function(jsonLDImm) {
+      return won.parseFrom(jsonLDImm, ["s:validFrom"], "s:DateTime");
+    },
+    generateHumanReadable: function({ value, includeLabel }) {
+      if (value) {
+        const maybeLabel = includeLabel ? this.label + ": " : "";
+        const timestring = parseXsdDateTime(value).toLocaleString();
+        return maybeLabel + timestring;
+      }
+      return undefined;
+    },
+  },
+  throughDatetime: {
+    identifier: "throughDatetime",
+    label: "Ending at",
+    icon: "#ico36_detail_datetime",
+    placeholder: "Enter Date and Time...",
+    component: "won-datetime-picker",
+    viewerComponent: "won-datetime-viewer",
+    parseToRDF: function({ value }) {
+      // value can be an xsd:datetime-string or a javascript date object
+      if (!value || !isValidDate(parseXsdDateTime(value))) {
+        return { "s:validThrough": undefined };
+      } else {
+        const datetimeString = value.toISOString
+          ? // Date-object
+            value.toISOString()
+          : // xsd:datetime string
+            value;
+        return {
+          "s:validThrough": { "@value": datetimeString, "@type": "s:DateTime" },
+        };
+      }
+    },
+    parseFromRDF: function(jsonLDImm) {
+      return won.parseFrom(jsonLDImm, ["s:validThrough"], "s:DateTime");
+    },
+    generateHumanReadable: function({ value, includeLabel }) {
+      if (value) {
+        const maybeLabel = includeLabel ? this.label + ": " : "";
+        const timestring = parseXsdDateTime(value).toLocaleString();
+        return maybeLabel + timestring;
       }
       return undefined;
     },

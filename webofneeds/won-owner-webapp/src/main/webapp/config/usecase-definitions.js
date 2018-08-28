@@ -121,8 +121,8 @@ const socialUseCases = {
     isDetails: {
       title: { ...details.title },
       description: { ...details.description },
-      date: { ...details.date },
-      time: { ...details.time },
+      fromDatetime: { ...details.fromDatetime },
+      throughDatetime: { ...details.throughDatetime },
       location: { ...details.location },
       interests: { ...interestsDetail },
     },
