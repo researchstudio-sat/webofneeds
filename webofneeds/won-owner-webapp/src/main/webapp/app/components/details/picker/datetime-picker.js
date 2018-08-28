@@ -41,9 +41,10 @@ function genComponentConf() {
      * Checks validity and uses callback method
      */
     update(datetime) {
-      const xsdDatetime = datetime + ":00"; // seconds need to be specified
+      const d = new Date(datetime);
       if (datetime) {
-        this.onUpdate({ value: xsdDatetime });
+        // this.onUpdate({ value: d }); // TODO return raw date
+        this.onUpdate({ value: d.toISOString() });
       } else {
         this.onUpdate({ value: undefined });
       }
