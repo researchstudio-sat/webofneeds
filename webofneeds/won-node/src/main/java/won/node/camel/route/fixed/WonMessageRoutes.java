@@ -182,13 +182,17 @@ public class WonMessageRoutes extends RouteBuilder
          * The well-formed, signed message is expected to be in the body.
          */
         from("seda:OwnerProtocolOut?concurrentConsumers=5")
+            //note: here it might happen that the recipient list contains only endpoint URIs that cannot be found
+            // e.g. when client's public keys changed and hence their queuenames did, too. Added the onException part to deal
+            // with that.
+            .onException(Exception.class)
+              .log("failure during seda:OwnerProtocolOut, ignoring")
+              .handled(true)
+              .end()
             .transacted("PROPAGATION_NEVER")
             .routeId("seda:OwnerProtocolOut")
             .to("bean:ownerProtocolOutgoingMessagesProcessor")
-            //note: here it might happen that the recipient list contains only endpoint URIs that cannot be found
-            // e.g. when client's public keys changed and hence their queuenames did, too. Added stopOnException to deal
-            // with that.
-            .recipientList(header("ownerApplicationIDs")).stopOnException();
+            .recipientList(header("ownerApplicationIDs"));
 
         /**
          * System messages: add timestamp, sign and then process completely
@@ -373,7 +377,14 @@ public class WonMessageRoutes extends RouteBuilder
             .to("bean:parentLocker")
             //call the default implementation, which may alter the message.
             .to("bean:hintMessageProcessor?method=process")
-            .to("direct:reference-sign-persist");
+            .choice()
+              .when(isNotEqualTo(header(WonCamelConstants.IGNORE_HINT), ExpressionBuilder.constantExpression(Boolean.TRUE)))
+                .to("direct:reference-sign-persist")
+              .otherwise()
+                .log(LoggingLevel.DEBUG, "suppressing sending of message to owner because the header '" + WonCamelConstants.IGNORE_HINT + "' is 'true'")
+              .endChoice()
+            .end();
+            
 
 
           /**
