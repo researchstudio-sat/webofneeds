@@ -18,7 +18,11 @@ import selectViewerModule from "./details/viewer/select-viewer.js";
 import rangeViewerModule from "./details/viewer/range-viewer.js";
 import fileViewerModule from "./details/viewer/file-viewer.js";
 import workflowViewerModule from "./details/viewer/workflow-viewer.js";
+<<<<<<< Upstream, based on origin/master
 import petrinetViewerModule from "./details/viewer/petrinet-viewer.js";
+=======
+import instrumentViewerModule from "./details/viewer/instrument-viewer.js";
+>>>>>>> eda9505 Implement musician use case
 
 import { attach } from "../utils.js";
 import { getAllDetails } from "../won-utils.js";
@@ -120,7 +124,11 @@ angular
     rangeViewerModule,
     fileViewerModule,
     workflowViewerModule,
+<<<<<<< Upstream, based on origin/master
     petrinetViewerModule,
+=======
+    instrumentViewerModule,
+>>>>>>> eda9505 Implement musician use case
   ])
   .directive("detailViewerElement", [
     "$compile",

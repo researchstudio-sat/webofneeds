@@ -1,0 +1,21 @@
+@import "won-config";
+@import "sizing-utils";
+
+won-instrument-viewer {
+  @include won-detail-viewer("iv");
+
+  .iv__content {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    grid-gap: 0.25rem;
+
+    &__label {
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      font-weight: bold;
+    }
+    &__value {
+      font-weight: normal;
+    }
+  }
+}

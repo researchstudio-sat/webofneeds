@@ -30,7 +30,11 @@ import selectPickerModule from "./details/picker/select-picker.js";
 import rangePickerModule from "./details/picker/range-picker.js";
 import filePickerModule from "./details/picker/file-picker.js";
 import workflowPickerModule from "./details/picker/workflow-picker.js";
+<<<<<<< Upstream, based on origin/master
 import petrinetPickerModule from "./details/picker/petrinet-picker.js";
+=======
+import instrumentPickerModule from "./details/picker/instrument-picker.js";
+>>>>>>> eda9505 Implement musician use case
 
 import "style/_create-post.scss";
 import "style/_responsiveness-utils.scss";
@@ -406,7 +410,11 @@ angular
     rangePickerModule,
     filePickerModule,
     workflowPickerModule,
+<<<<<<< Upstream, based on origin/master
     petrinetPickerModule,
+=======
+    instrumentPickerModule,
+>>>>>>> eda9505 Implement musician use case
     ngAnimate,
   ])
   .directive("wonCreatePost", genComponentConf).name;

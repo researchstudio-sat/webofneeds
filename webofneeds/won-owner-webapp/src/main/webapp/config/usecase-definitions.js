@@ -1263,6 +1263,65 @@ const mobilityUseCases = {
   },
 };
 
+/**
+ * band musician use cases
+ */
+
+const musicianUseCases = {
+  findBand: {
+    identifier: "findBand",
+    label: "Find Band",
+    icon: "#ico36_uc_find_band",
+    doNotMatchAfter: findLatestIntervallEndInJsonLd,
+    draft: {
+      ...emptyDraft,
+      is: {
+        title: "I'm looking for a band!",
+        tags: ["band", "musician"],
+      },
+      searchString: "band",
+    },
+    isDetails: {
+      title: { ...details.title },
+      description: { ...details.description },
+      location: { ...details.location },
+      instrument: { ...details.instrument },
+      //inerests = genre?
+      interests: { ...interestsDetail },
+    },
+    seeksDetails: {
+      description: { ...details.description },
+      //matchable with isPart?
+      //location: { ...details.location },
+    },
+  },
+  findMusician: {
+    identifier: "findMsuician",
+    label: "Find Musician",
+    icon: "#ico36_uc_find_people",
+    doNotMatchAfter: findLatestIntervallEndInJsonLd,
+    draft: {
+      ...emptyDraft,
+      is: {
+        title: "I'm looking for a Musician!",
+        tags: ["band", "musician"],
+      },
+      searchString: "musician",
+    },
+    isDetails: {
+      title: { ...details.title },
+      description: { ...details.description },
+      location: { ...details.location },
+      interests: { ...interestsDetail },
+    },
+    seeksDetails: {
+      description: { ...details.description },
+      instrument: { ...details.instrument },
+      location: { ...details.location },
+    },
+  },
+};
+
 export const useCases = {
   ...complainUseCases,
   ...socialUseCases,
@@ -1271,6 +1330,7 @@ export const useCases = {
   ...transportUseCases,
   ...mobilityUseCases,
   ...allDetailsUseCase,
+  ...musicianUseCases,
 };
 
 export const useCaseGroups = {
@@ -1297,6 +1357,12 @@ export const useCaseGroups = {
     label: "Real Estate",
     icon: undefined,
     useCases: { ...realEstateUseCases },
+  },
+  musician: {
+    identifier: "musiciangroup",
+    label: "Musician",
+    icon: undefined,
+    useCases: { ...musicianUseCases },
   },
   social: {
     identifier: "socialgroup",
