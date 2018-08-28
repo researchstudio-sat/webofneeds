@@ -1329,19 +1329,19 @@ export function findAllFieldOccurancesRecursively(fieldName, obj, _acc = []) {
 }
 
 /**
- * Takes an `dc:date` or `xsd:datetime` string and returns a `Date` that marks
- * the exact time (for `xsd:datetime`) or the end of the year, month or day (for `dc:date`)
+ * Takes an ISO-8601 string and returns a `Date` that marks
+ * the exact time or the end of the year, month or day
  * e.g. s:DateTime: "2011-04-11T10:20:30Z"
  *
- * @param {*} xsdDateStr
+ * @param {*} dateStr
  */
-export function endOfXsdDateInterval(xsdDateStr) {
+export function endOfDateStrInterval(dateStr) {
   // "2011-04-11T10:20:30Z".split(/[-T]/) => ["2011", "04", "11", "10:20:30Z"]
   // "2011-04-11".split(/[-T]/) => ["2011", "04", "11"]
-  const split = xsdDateStr.split(/[-T]/);
+  const split = dateStr.split(/[-T]/);
   if (split.length > 3) {
     // precise datetime
-    return new Date(xsdDateStr);
+    return new Date(dateStr);
   } else if (split.length === 3) {
     // end of day
     const year = split[0];
@@ -1361,19 +1361,19 @@ export function endOfXsdDateInterval(xsdDateStr) {
     return new Date(year, monthIdx, 31, 23, 59, 59);
   } else {
     console.error(
-      "Found unexpected date when calculating exact end-datetime of `dc:date` string: ",
-      xsdDateStr
+      "Found unexpected date when calculating exact end-datetime of date-string: ",
+      dateStr
     );
   }
 }
 
 /**
- * Parses an `xsd:dateTime`-string strictly.
+ * Parses an `xsd:dateTime`/ISO-8601-string strictly.
  * Docs on format: <http://www.datypic.com/sc/xsd/t-xsd_dateTime.html>
  * @param {string} dateTime e.g. "2018-08-21T14:05:27.568Z"
  * @returns a `Date`-object, with `Invalid Date` if parsing failed.
  */
-export function parseXsdDateTime(dateTime) {
+export function parseDatetimeStrictly(dateTime) {
   if (is("Date", dateTime)) {
     // already parsed
     return dateTime;

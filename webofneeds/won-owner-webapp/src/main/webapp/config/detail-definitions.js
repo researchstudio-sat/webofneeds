@@ -6,7 +6,7 @@ import {
   get,
   getIn,
   isValidDate,
-  parseXsdDateTime,
+  parseDatetimeStrictly,
   toLocalISODateString,
 } from "../app/utils.js";
 import Immutable from "immutable";
@@ -191,7 +191,7 @@ export const details = {
     viewerComponent: "won-datetime-viewer",
     parseToRDF: function({ value }) {
       // value can be an xsd:datetime-string or a javascript date object
-      const datetime = parseXsdDateTime(value);
+      const datetime = parseDatetimeStrictly(value);
       if (!isValidDate(datetime)) {
         return { "s:validFrom": undefined };
       } else {
@@ -207,7 +207,7 @@ export const details = {
     generateHumanReadable: function({ value, includeLabel }) {
       if (value) {
         const maybeLabel = includeLabel ? this.label + ": " : "";
-        const datetime = parseXsdDateTime(value);
+        const datetime = parseDatetimeStrictly(value);
         const timestring = isValidDate(datetime)
           ? datetime.toLocaleString()
           : "";
@@ -225,7 +225,7 @@ export const details = {
     viewerComponent: "won-datetime-viewer",
     parseToRDF: function({ value }) {
       // value can be an xsd:datetime-string or a javascript date object
-      const datetime = parseXsdDateTime(value);
+      const datetime = parseDatetimeStrictly(value);
       if (!isValidDate(datetime)) {
         return { "s:validThrough": undefined };
       } else {
@@ -241,7 +241,7 @@ export const details = {
     generateHumanReadable: function({ value, includeLabel }) {
       if (value) {
         const maybeLabel = includeLabel ? this.label + ": " : "";
-        const datetime = parseXsdDateTime(value);
+        const datetime = parseDatetimeStrictly(value);
         const timestring = isValidDate(datetime)
           ? datetime.toLocaleString()
           : "";

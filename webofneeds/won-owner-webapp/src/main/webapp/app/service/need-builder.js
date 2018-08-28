@@ -263,7 +263,7 @@ import { Generator } from "sparqljs";
           noHints ? "won:NoHintForCounterpart" : undefined,
         ]), ///.toArray().filter(f => f),
         "won:doNotMatchAfter": doNotMatchAfter
-          ? { "@value": doNotMatchAfter, "@type": "xsd:dateTime" }
+          ? { "@value": doNotMatchAfter, "@type": "s:DateTime" }
           : undefined,
         "won:hasMatchingContext": matchingContext ? matchingContext : undefined,
         "won:hasSearchString": searchString ? searchString : undefined,
@@ -290,9 +290,6 @@ import { Generator } from "sparqljs";
         //'geo:latitude': 'xsd:float',
         //'geo:longitude':'xsd:float',
         //'won:hasAddress': 'xsd:string',
-
-        "won:hasStartTime": "xsd:dateTime",
-        "won:hasEndTime": "xsd:dateTime",
 
         "won:hasFacet": {
           "@id": won.WON.hasFacet,
