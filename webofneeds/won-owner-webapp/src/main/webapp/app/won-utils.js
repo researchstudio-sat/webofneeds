@@ -402,8 +402,8 @@ export function parseJsonldLeafsImm(val, type) {
  *  * `{"@value": "<someval>", "@type": "<sometype>"}`, where `<sometype>` is one of:
  *    * `xsd:float`
  *    * `xsd:dateTime`
- *    * `xsd:date`
- *    * `xsd:time`
+ *    * `dc:date`
+ *    * `dc:time`
  *    * `http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon`?, e.g. `"48.225073#16.358398"`
  *  * anything, that _strictly_ parses to a number or date or is a string
  * @param {*} type passing `val` and `type` is equivalent to passing an object with `@value` and `@type`
@@ -457,8 +457,8 @@ export function parseJsonldLeaf(val, type) {
       break;
 
     // TODO
-    // case "xsd:date":
-    // case "xsd:time":
+    // case "dc:date":
+    // case "dc:time":
     // case "http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon":
     //   break;
 

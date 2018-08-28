@@ -1329,10 +1329,10 @@ export function findAllFieldOccurancesRecursively(fieldName, obj, _acc = []) {
 }
 
 /**
- * Takes an `xsd:date` or `xsd:datetime` string and returns a `Date` that marks
- * the exact time (for `xsd:datetime`) or the end of the year, month or day (for `xsd:date`)
+ * Takes an `dc:date` or `xsd:datetime` string and returns a `Date` that marks
+ * the exact time (for `xsd:datetime`) or the end of the year, month or day (for `dc:date`)
  * e.g. xsd:datetime: "2011-04-11T10:20:30Z"
- * e.g. xsd:date: "2011-04-11"
+ * e.g. dc:date: "2011-04-11"
  *
  * @param {*} xsdDateStr
  */
@@ -1362,7 +1362,7 @@ export function endOfXsdDateInterval(xsdDateStr) {
     return new Date(year, monthIdx, 31, 23, 59, 59);
   } else {
     console.error(
-      "Found unexpected date when calculating exact end-datetime of `xsd:date` string: ",
+      "Found unexpected date when calculating exact end-datetime of `dc:date` string: ",
       xsdDateStr
     );
   }
