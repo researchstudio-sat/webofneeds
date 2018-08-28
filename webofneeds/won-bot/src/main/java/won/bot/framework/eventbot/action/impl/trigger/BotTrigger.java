@@ -128,10 +128,12 @@ public class BotTrigger {
         BotTrigger.this.cancelableTask = context.getTaskScheduler().schedule(new Runnable() {
             @Override
             public void run() {
-                BotTrigger.this.context.getEventBus().publish(new BotTriggerEvent(BotTrigger.this));
+                fire();
             }
         }, myTrigger);
     }
 
-
+    protected void fire() {
+      BotTrigger.this.context.getEventBus().publish(new BotTriggerEvent(BotTrigger.this));
+    }
 }

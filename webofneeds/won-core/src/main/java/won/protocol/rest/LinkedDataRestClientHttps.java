@@ -54,8 +54,8 @@ public class LinkedDataRestClientHttps extends LinkedDataRestClient {
 
 
     public LinkedDataRestClientHttps(KeyStoreService keyStoreService, TrustStoreService trustStoreService, TrustStrategy trustStrategy, KeyPairAliasDerivationStrategy keyPairAliasDerivationStrategy) {
-        this.readTimeout = 20000;
-        this.connectionTimeout = 20000; //DEF. TIMEOUT IS 20 sec
+        this.readTimeout = 5000;
+        this.connectionTimeout = 5000; //DEF. TIMEOUT IS 5 sec
         this.keyStoreService = keyStoreService;
         this.trustStoreService = trustStoreService;
         this.trustStrategy = trustStrategy;

@@ -62,6 +62,8 @@ public interface ConnectionRepository extends WonRepository<Connection>
   List<Connection> findByNeedURIAndStateAndTypeURI(URI needURI, ConnectionState connectionState, URI facetType);
 
   List<Connection> findByNeedURIAndRemoteNeedURIAndState(URI needURI, URI remoteNeedURI, ConnectionState connectionState);
+  
+  long countByNeedURIAndState(URI needURI, ConnectionState connectionState);
 
   @Query("select connectionURI from Connection")
   List<URI> getAllConnectionURIs();
