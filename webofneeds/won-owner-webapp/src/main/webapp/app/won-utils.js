@@ -429,11 +429,16 @@ export function parseJsonldLeaf(val, type) {
     case "xsd:string":
       return unwrappedVal + ""; // everything can be parsed to a string in js
 
+    case "s:Number":
+    case "s:Float":
+    case "s:Integer":
     case "xsd:float":
       {
         const parsedVal = Number(unwrappedVal);
         if (isNaN(parsedVal)) {
-          throwErr("Annotated `xsd:float` isn't parsable to a `Number`.");
+          throwErr(
+            `Annotated value of type \`${type_}\` isn't parsable to a \`Number\`.`
+          );
         } else {
           return parsedVal;
         }

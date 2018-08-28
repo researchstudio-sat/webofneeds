@@ -429,17 +429,13 @@ const realEstateFloorSizeDetail = {
     return {
       "s:floorSize": {
         "@type": "s:QuantitativeValue",
-        "s:value": [{ "@value": value, "@type": "xsd:float" }],
+        "s:value": [{ "@value": value, "@type": "s:Float" }],
         "s:unitCode": "MTK",
       },
     };
   },
   parseFromRDF: function(jsonLDImm) {
-    const fs = getInFromJsonLd(
-      jsonLDImm,
-      ["s:floorSize", "s:value"],
-      won.defaultContext
-    );
+    const fs = won.parseFrom(jsonLDImm, ["s:floorSize", "s:value"], "s:Float");
     const unit = getInFromJsonLd(
       jsonLDImm,
       ["s:floorSize", "s:unitCode"],
@@ -477,10 +473,10 @@ const realEstateNumberOfRoomsDetail = {
     if (!value) {
       return { "s:numberOfRooms": undefined };
     }
-    return { "s:numberOfRooms": [{ "@value": value, "@type": "xsd:float" }] };
+    return { "s:numberOfRooms": [{ "@value": value, "@type": "s:Float" }] };
   },
   parseFromRDF: function(jsonLDImm) {
-    return won.parseFrom(jsonLDImm, ["s:numberOfRooms"], "xsd:float");
+    return won.parseFrom(jsonLDImm, ["s:numberOfRooms"], "s:Float");
   },
   generateHumanReadable: function({ value, includeLabel }) {
     if (value) {
@@ -687,7 +683,7 @@ const realEstateRentDetail = {
     return {
       "s:priceSpecification": {
         "@type": "s:CompoundPriceSpecification",
-        "s:price": [{ "@value": value, "@type": "xsd:float" }],
+        "s:price": [{ "@value": value, "@type": "s:Float" }],
         "s:priceCurrency": "EUR",
         "s:description": "total rent per month",
         // "s:priceComponent": {
@@ -703,7 +699,7 @@ const realEstateRentDetail = {
     const rent = won.parseFrom(
       jsonLDImm,
       ["s:priceSpecification", "s:price"],
-      "xsd:float"
+      "s:Float"
     );
 
     if (!rent) {
@@ -735,10 +731,10 @@ const realEstateRentRangeDetail = {
       "s:priceSpecification": {
         "@type": "s:CompoundPriceSpecification",
         "s:minPrice": value.min && [
-          { "@value": value.min, "@type": "xsd:float" },
+          { "@value": value.min, "@type": "s:Float" },
         ],
         "s:maxPrice": value.max && [
-          { "@value": value.max, "@type": "xsd:float" },
+          { "@value": value.max, "@type": "s:Float" },
         ],
         "s:priceCurrency": "EUR",
         "s:description": "total rent per month in between min/max",
@@ -749,12 +745,12 @@ const realEstateRentRangeDetail = {
     const minRent = won.parseFrom(
       jsonLDImm,
       ["s:priceSpecification", "s:minPrice"],
-      "xsd:float"
+      "s:Float"
     );
     const maxRent = won.parseFrom(
       jsonLDImm,
       ["s:priceSpecification", "s:maxPrice"],
-      "xsd:float"
+      "s:Float"
     );
     if (!minRent && !maxRent) {
       return undefined;
@@ -995,17 +991,17 @@ const transportUseCases = {
               "@type": "s:Product",
               "s:weight": {
                 "@type": "s:QuantitativeValue",
-                "s:value": [{ "@value": value, "@type": "xsd:float" }],
+                "s:value": [{ "@value": value, "@type": "s:Float" }],
                 "s:unitCode": "KGM",
               },
             };
           }
         },
         parseFromRDF: function(jsonLDImm) {
-          const w = getInFromJsonLd(
+          const w = won.parseFrom(
             jsonLDImm,
             ["s:weight", "s:value"],
-            won.defaultContext
+            "s:Float"
           );
           const unit = getInFromJsonLd(
             jsonLDImm,
@@ -1046,17 +1042,17 @@ const transportUseCases = {
               "@type": "s:Product",
               "s:length": {
                 "@type": "s:QuantitativeValue",
-                "s:value": [{ "@value": value, "@type": "xsd:float" }],
+                "s:value": [{ "@value": value, "@type": "s:Float" }],
                 "s:unitCode": "CMT",
               },
             };
           }
         },
         parseFromRDF: function(jsonLDImm) {
-          const l = getInFromJsonLd(
+          const l = won.parseFrom(
             jsonLDImm,
             ["s:length", "s:value"],
-            won.defaultContext
+            "s:Float"
           );
           const unit = getInFromJsonLd(
             jsonLDImm,
@@ -1097,18 +1093,14 @@ const transportUseCases = {
               "@type": "s:Product",
               "s:width": {
                 "@type": "s:QuantitativeValue",
-                "s:value": [{ "@value": value, "@type": "xsd:float" }],
+                "s:value": [{ "@value": value, "@type": "s:Float" }],
                 "s:unitCode": "CMT",
               },
             };
           }
         },
         parseFromRDF: function(jsonLDImm) {
-          const w = getInFromJsonLd(
-            jsonLDImm,
-            ["s:width", "s:value"],
-            won.defaultContext
-          );
+          const w = won.parseFrom(jsonLDImm, ["s:width", "s:value"], "s:Float");
           const unit = getInFromJsonLd(
             jsonLDImm,
             ["s:width", "s:unitCode"],
@@ -1148,17 +1140,17 @@ const transportUseCases = {
               "@type": "s:Product",
               "s:height": {
                 "@type": "s:QuantitativeValue",
-                "s:value": [{ "@value": value, "@type": "xsd:float" }],
+                "s:value": [{ "@value": value, "@type": "s:Float" }],
                 "s:unitCode": "CMT",
               },
             };
           }
         },
         parseFromRDF: function(jsonLDImm) {
-          const h = getInFromJsonLd(
+          const h = won.parseFrom(
             jsonLDImm,
             ["s:height", "s:value"],
-            won.defaultContext
+            "s:Float"
           );
           const unit = getInFromJsonLd(
             jsonLDImm,
