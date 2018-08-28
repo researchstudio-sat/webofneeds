@@ -170,8 +170,6 @@ won.WON.hasContentCompacted = won.WON.prefix + ":hasContent";
 won.WON.hasContentDescription = won.WON.baseUri + "hasContentDescription";
 won.WON.hasContentDescriptionCompacted =
   won.WON.prefix + ":hasContentDescription";
-won.WON.hasEndTime = won.WON.baseUri + "hasEndTime";
-won.WON.hasEndTimeCompacted = won.WON.prefix + ":hasEndTime";
 won.WON.hasEventContainer = won.WON.baseUri + "hasEventContainer";
 won.WON.hasEventContainerCompacted = won.WON.prefix + ":hasEventContainer";
 won.WON.hasOriginator = won.WON.baseUri + "hasOriginator";
@@ -183,8 +181,6 @@ won.WON.hasRecursIn = won.WON.baseUri + "hasRecursIn";
 won.WON.hasRecursInCompacted = won.WON.prefix + ":hasRecurInfiniteTimes";
 won.WON.hasScore = won.WON.baseUri + "hasScore";
 won.WON.hasScoreCompacted = won.WON.prefix + ":hasScore";
-won.WON.hasStartTime = won.WON.baseUri + "hasStartTime";
-won.WON.hasStartTimeCompacted = won.WON.prefix + ":hasStartTime";
 won.WON.hasTag = won.WON.baseUri + "hasTag";
 won.WON.hasTagCompacted = won.WON.prefix + ":hasTag";
 
