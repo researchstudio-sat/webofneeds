@@ -204,7 +204,10 @@ export const details = {
     generateHumanReadable: function({ value, includeLabel }) {
       if (value) {
         const maybeLabel = includeLabel ? this.label + ": " : "";
-        const timestring = parseXsdDateTime(value).toLocaleString();
+        const datetime = parseXsdDateTime(value);
+        const timestring = isValidDate(datetime)
+          ? datetime.toLocaleString()
+          : "";
         return maybeLabel + timestring;
       }
       return undefined;
@@ -238,7 +241,10 @@ export const details = {
     generateHumanReadable: function({ value, includeLabel }) {
       if (value) {
         const maybeLabel = includeLabel ? this.label + ": " : "";
-        const timestring = parseXsdDateTime(value).toLocaleString();
+        const datetime = parseXsdDateTime(value);
+        const timestring = isValidDate(datetime)
+          ? datetime.toLocaleString()
+          : "";
         return maybeLabel + timestring;
       }
       return undefined;
@@ -265,32 +271,6 @@ export const details = {
     generateHumanReadable: function({ value, includeLabel }) {
       if (value) {
         return includeLabel ? this.label + ": " + value : value;
-      }
-      return undefined;
-    },
-  },
-  datetime: {
-    identifier: "datetime",
-    label: "Date & Time",
-    icon: "#ico36_detail_datetime",
-    placeholder: "Enter Date and Time...",
-    component: "won-datetime-picker",
-    viewerComponent: "won-datetime-viewer",
-    parseToRDF: function({ value }) {
-      //TODO: Correct parseToRDF
-      if (!value) {
-        return { "dc:datetime": undefined };
-      }
-      return { "dc:datetime": value };
-    },
-    parseFromRDF: function(jsonLDImm) {
-      return won.parseFrom(jsonLDImm, ["dc:datetime"], "xsd:dateTime");
-    },
-    generateHumanReadable: function({ value, includeLabel }) {
-      if (value) {
-        const maybeLabel = includeLabel ? this.label + ": " : "";
-        const timestring = new Date(value).toLocaleString();
-        return maybeLabel + timestring;
       }
       return undefined;
     },
