@@ -46,11 +46,10 @@ function genComponentConf() {
     /**
      * Checks validity and uses callback method
      */
-    update(datetime) {
-      const d = new Date(datetime);
-      if (datetime) {
+    update(datetimeString) {
+      const d = new Date(datetimeString);
+      if (isValidDate(d)) {
         this.onUpdate({ value: d });
-        // this.onUpdate({ value: d.toISOString() });
       } else {
         this.onUpdate({ value: undefined });
       }
