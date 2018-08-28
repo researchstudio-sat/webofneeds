@@ -56,6 +56,11 @@ class ConnectionsController {
       ]);
 
       const useCase = getIn(state, ["router", "currentParams", "useCase"]);
+      const useCaseGroup = getIn(state, [
+        "router",
+        "currentParams",
+        "useCaseGroup",
+      ]);
 
       const connectionUri = decodeURIComponent(
         getIn(state, ["router", "currentParams", "connectionUri"])
@@ -97,6 +102,7 @@ class ConnectionsController {
         connection,
         connectionType,
         useCase,
+        useCaseGroup,
         showUseCases,
         hasConnections: connections && connections.size > 0,
         hasOwnNeeds: ownNeeds && ownNeeds.size > 0,

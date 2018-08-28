@@ -134,7 +134,7 @@ function genComponentConf() {
 
       if (selectedGroupIdentifier) {
         this.router__stateGoCurrent({
-          showUseCases: true,
+          showUseCases: undefined,
           useCaseGroup: encodeURIComponent(selectedGroupIdentifier),
         });
       } else {
