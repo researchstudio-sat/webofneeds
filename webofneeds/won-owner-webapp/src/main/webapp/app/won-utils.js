@@ -402,6 +402,7 @@ export function parseJsonldLeafsImm(val, type) {
  *  * `{"@value": "<someval>", "@type": "<sometype>"}`, where `<sometype>` is one of:
  *    * `xsd:float`
  *    * `xsd:dateTime`
+ *    * `s:DateTime`
  *    * `dc:date`
  *    * `dc:time`
  *    * `http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon`?, e.g. `"48.225073#16.358398"`
@@ -445,13 +446,14 @@ export function parseJsonldLeaf(val, type) {
       }
       break;
 
+    case "s:DateTime":
     case "xsd:dateTime":
       {
         const parsedDateTime = parseXsdDateTime(unwrappedVal);
         if (isValidDate(parsedDateTime)) {
           return parsedDateTime;
         } else {
-          throwErr("Annotated `xsd:dateTime` isn't parsable to a `Date`.");
+          throwErr(`Annotated \`${type_}\` isn't parsable to a \`Date\`.`);
         }
       }
       break;
