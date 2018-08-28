@@ -24,10 +24,7 @@ import tagsPickerModule from "./details/picker/tags-picker.js";
 import titlePickerModule from "./details/picker/title-picker.js";
 import ttlPickerModule from "./details/picker/ttl-picker.js";
 import numberPickerModule from "./details/picker/number-picker.js";
-import datePickerModule from "./details/picker/date-picker.js";
 import datetimePickerModule from "./details/picker/datetime-picker.js";
-import timePickerModule from "./details/picker/time-picker.js";
-import monthPickerModule from "./details/picker/month-picker.js";
 import dropdownPickerModule from "./details/picker/dropdown-picker.js";
 import selectPickerModule from "./details/picker/select-picker.js";
 import rangePickerModule from "./details/picker/range-picker.js";
@@ -399,10 +396,7 @@ angular
     tagsPickerModule,
     titlePickerModule,
     numberPickerModule,
-    datePickerModule,
-    timePickerModule,
     datetimePickerModule,
-    monthPickerModule,
     ttlPickerModule,
     dropdownPickerModule,
     createIsseeksModule,
