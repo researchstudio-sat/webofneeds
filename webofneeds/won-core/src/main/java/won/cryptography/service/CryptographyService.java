@@ -35,7 +35,7 @@ public class CryptographyService {
 
 	private KeyStoreService keyStoreService;
 	
-	@Autowired
+	@Autowired(required=false) //required only when keyToTrust* is configured 
 	private TrustStoreService trustStoreService;
 
 	private String defaultAlias;
@@ -43,19 +43,12 @@ public class CryptographyService {
 	// We want to be able to add keys from an additional key store to our trust store at startup
 	// this is required for the activemq broker to connect to itself: we force a clien cert there, 
 	// which it provides happily - therefore we have to be able to trust it.
-	@Value("${activemq.broker.keystore}")
 	private String keyToTrustFile;
-	
-	@Value("${activemq.broker.keystore.password}")
 	private String keyToTrustFilePassword;
-	
-	private String keyToTrustAlias = "1";
-	
-	@Value("${uri.host}")
-	private String keyToTrustAliasUnder;
-	
+	private String keyToTrustAlias = null;
+	private String keyToTrustAliasUnder = null;
 	private String keyToTrustProvider = null;
-	private String keyToTrustKeystoreType= "JKS";
+	private String keyToTrustKeystoreType= null;
 	
 
 	public CryptographyService(KeyStoreService keyStoreService) {
@@ -103,6 +96,10 @@ public class CryptographyService {
     
 		// uncomment for ssl handshake debugging
 		//System.setProperty("javax.net.debug", "ssl");
+		if (this.keyToTrustFile == null) {
+		  logger.info("no additional key configured to be imported into truststore");
+		  return;
+		}
 		
 		FileBasedKeyStoreService keyToTrustKeyStoreService = new FileBasedKeyStoreService(
 		      new File(this.keyToTrustFile), 
@@ -190,5 +187,29 @@ public class CryptographyService {
 	
 	public void setTrustStoreService(TrustStoreService trustStoreService) {
     this.trustStoreService = trustStoreService;
+  }
+	
+	public void setKeyToTrustAlias(String keyToTrustAlias) {
+    this.keyToTrustAlias = keyToTrustAlias;
+  }
+	
+	public void setKeyToTrustAliasUnder(String keyToTrustAliasUnder) {
+    this.keyToTrustAliasUnder = keyToTrustAliasUnder;
+  }
+	
+	public void setKeyToTrustFile(String keyToTrustFile) {
+    this.keyToTrustFile = keyToTrustFile;
+  }
+	
+	public void setKeyToTrustFilePassword(String keyToTrustFilePassword) {
+    this.keyToTrustFilePassword = keyToTrustFilePassword;
+  }
+	
+	public void setKeyToTrustKeystoreType(String keyToTrustKeystoreType) {
+    this.keyToTrustKeystoreType = keyToTrustKeystoreType;
+  }
+	
+	public void setKeyToTrustProvider(String keyToTrustProvider) {
+    this.keyToTrustProvider = keyToTrustProvider;
   }
 }

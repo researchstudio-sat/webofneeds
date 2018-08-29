@@ -55,6 +55,12 @@
     <bean id="cryptographyService" class="won.cryptography.service.CryptographyService">
         <constructor-arg ref="keyStoreService" />
         <constructor-arg name="defaultAlias" value="${uri.prefix.resource}" />
+        <!-- configure additional key to trust so that the activemq broker, which uses the tomcat certificate can connect to itself -->
+        <property name="keyToTrustAlias" value="1"/>
+        <property name="keyToTrustAliasUnder" value="${uri.host}" />
+        <property name="keyToTrustKeystoreType" value="JKS" />
+        <property name="keyToTrustFile" value="${activemq.broker.keystore}"/>        
+        <property name="keyToTrustFilePassword" value="${activemq.broker.keystore.password}" />
     </bean>
 
     <bean id="linkedDataRestClient" class="won.protocol.rest.LinkedDataRestClientHttps">
