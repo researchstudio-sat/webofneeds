@@ -30,6 +30,7 @@ import selectPickerModule from "./details/picker/select-picker.js";
 import rangePickerModule from "./details/picker/range-picker.js";
 import filePickerModule from "./details/picker/file-picker.js";
 import workflowPickerModule from "./details/picker/workflow-picker.js";
+import petrinetPickerModule from "./details/picker/petrinet-picker.js";
 
 import "style/_create-post.scss";
 import "style/_responsiveness-utils.scss";
@@ -405,6 +406,7 @@ angular
     rangePickerModule,
     filePickerModule,
     workflowPickerModule,
+    petrinetPickerModule,
     ngAnimate,
   ])
   .directive("wonCreatePost", genComponentConf).name;
