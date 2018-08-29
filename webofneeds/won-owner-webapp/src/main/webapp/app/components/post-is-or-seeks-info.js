@@ -12,10 +12,7 @@ import tagsViewerModule from "./details/viewer/tags-viewer.js";
 import travelActionViewerModule from "./details/viewer/travel-action-viewer.js";
 import titleViewerModule from "./details/viewer/title-viewer.js";
 import numberViewerModule from "./details/viewer/number-viewer.js";
-import dateViewerModule from "./details/viewer/date-viewer.js";
 import datetimeViewerModule from "./details/viewer/datetime-viewer.js";
-import monthViewerModule from "./details/viewer/month-viewer.js";
-import timeViewerModule from "./details/viewer/time-viewer.js";
 import dropdownViewerModule from "./details/viewer/dropdown-viewer.js";
 import selectViewerModule from "./details/viewer/select-viewer.js";
 import rangeViewerModule from "./details/viewer/range-viewer.js";
@@ -117,10 +114,7 @@ angular
     titleViewerModule,
     numberViewerModule,
     dropdownViewerModule,
-    dateViewerModule,
-    timeViewerModule,
     datetimeViewerModule,
-    monthViewerModule,
     selectViewerModule,
     rangeViewerModule,
     fileViewerModule,

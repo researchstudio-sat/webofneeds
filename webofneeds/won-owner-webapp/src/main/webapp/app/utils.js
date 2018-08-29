@@ -1329,20 +1329,19 @@ export function findAllFieldOccurancesRecursively(fieldName, obj, _acc = []) {
 }
 
 /**
- * Takes an `dc:date` or `xsd:datetime` string and returns a `Date` that marks
- * the exact time (for `xsd:datetime`) or the end of the year, month or day (for `dc:date`)
- * e.g. xsd:datetime: "2011-04-11T10:20:30Z"
- * e.g. dc:date: "2011-04-11"
+ * Takes an ISO-8601 string and returns a `Date` that marks
+ * the exact time or the end of the year, month or day
+ * e.g. s:DateTime: "2011-04-11T10:20:30Z"
  *
- * @param {*} xsdDateStr
+ * @param {*} dateStr
  */
-export function endOfXsdDateInterval(xsdDateStr) {
+export function endOfDateStrInterval(dateStr) {
   // "2011-04-11T10:20:30Z".split(/[-T]/) => ["2011", "04", "11", "10:20:30Z"]
   // "2011-04-11".split(/[-T]/) => ["2011", "04", "11"]
-  const split = xsdDateStr.split(/[-T]/);
+  const split = dateStr.split(/[-T]/);
   if (split.length > 3) {
     // precise datetime
-    return new Date(xsdDateStr);
+    return new Date(dateStr);
   } else if (split.length === 3) {
     // end of day
     const year = split[0];
@@ -1362,20 +1361,24 @@ export function endOfXsdDateInterval(xsdDateStr) {
     return new Date(year, monthIdx, 31, 23, 59, 59);
   } else {
     console.error(
-      "Found unexpected date when calculating exact end-datetime of `dc:date` string: ",
-      xsdDateStr
+      "Found unexpected date when calculating exact end-datetime of date-string: ",
+      dateStr
     );
   }
 }
 
 /**
- * Parses an `xsd:dateTime`-string strictly.
+ * Parses an `xsd:dateTime`/ISO-8601-string strictly.
  * Docs on format: <http://www.datypic.com/sc/xsd/t-xsd_dateTime.html>
  * @param {string} dateTime e.g. "2018-08-21T14:05:27.568Z"
  * @returns a `Date`-object, with `Invalid Date` if parsing failed.
  */
-export function parseXsdDateTime(dateTime) {
-  if (!is("String", dateTime)) {
+export function parseDatetimeStrictly(dateTime) {
+  if (is("Date", dateTime)) {
+    // already parsed
+    return dateTime;
+  } else if (!is("String", dateTime)) {
+    // won't be able to parse
     return undefined;
   }
   const validXsdDateTimeString = !!dateTime.match(
@@ -1392,3 +1395,53 @@ export function parseXsdDateTime(dateTime) {
 export function isValidDate(dateObj) {
   return dateObj && !isNaN(dateObj.valueOf());
 }
+
+/**
+ * Renders the javascript-date to an xsd:dateTime / ISO-8601 date-string
+ * with the local timezone at the end (in contrast to `dateTime.toISOString()`
+ * that normalizes the time to GMT first).
+ * adapted from: <http://usefulangle.com/post/30/javascript-get-date-time-with-offset-hours-minutes>
+ * @param {Date} dateTime
+ */
+export function toLocalISODateString(dateTime) {
+  /* ensure two digits, i.e. add 0 before 
+   * offsetHours, offsetMins,  date, month, hrs, mins or secs if they are less than 10
+   */
+  const pad = n => (n + "").padStart(2, "0");
+
+  const timezoneOffsetInMins = dateTime.getTimezoneOffset();
+  const offsetHours = pad(parseInt(Math.abs(timezoneOffsetInMins / 60)));
+  const offsetMins = pad(Math.abs(timezoneOffsetInMins % 60));
+
+  /* 
+   * Add an opposite sign to the offset
+   * If offset is 0, it means timezone is UTC
+   * => timezoneString: Timezone difference in hours and minutes
+   * String such as +5:30 or -6:00 or Z
+   */
+  let timezoneString;
+  if (timezoneOffsetInMins < 0) {
+    timezoneString = "+" + offsetHours + ":" + offsetMins;
+  } else if (timezoneOffsetInMins > 0) {
+    timezoneString = "-" + offsetHours + ":" + offsetMins;
+  } else if (timezoneOffsetInMins == 0) {
+    timezoneString = "Z";
+  }
+
+  const year = dateTime.getFullYear();
+  const month = pad(dateTime.getMonth() + 1);
+  const date = pad(dateTime.getDate());
+  const hours = pad(dateTime.getHours());
+  const mins = pad(dateTime.getMinutes());
+  const secs = pad(dateTime.getSeconds());
+
+  /* Current datetime
+   * String such as 2016-07-16T19:20:30
+   */
+  const currentDatetime =
+    year + "-" + month + "-" + date + "T" + hours + ":" + mins + ":" + secs;
+
+  return currentDatetime + timezoneString;
+}
+
+window.toLocalISODateString4dbg = toLocalISODateString;

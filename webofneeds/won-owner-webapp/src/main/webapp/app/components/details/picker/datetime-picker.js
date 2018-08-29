@@ -1,5 +1,11 @@
 import angular from "angular";
-import { attach, delay } from "../../../utils.js";
+import {
+  attach,
+  delay,
+  isValidDate,
+  toLocalISODateString,
+  get,
+} from "../../../utils.js";
 import { DomCache } from "../../../cstm-ng-utils.js";
 
 import "style/_datetimepicker.scss";
@@ -40,21 +46,30 @@ function genComponentConf() {
     /**
      * Checks validity and uses callback method
      */
-    update(datetime) {
-      const xsdDatetime = datetime + ":00"; // seconds need to be specified
-      if (datetime) {
-        this.onUpdate({ value: xsdDatetime });
+    update(datetimeString) {
+      const d = new Date(datetimeString);
+      if (isValidDate(d)) {
+        this.onUpdate({ value: d });
       } else {
         this.onUpdate({ value: undefined });
       }
     }
 
     showInitialDatetime() {
-      this.addedDatetime = this.initialValue;
-
-      if (this.initialValue && this.initialValue.trim().length > 0) {
-        this.textfield().value = this.initialValue.trim();
-        this.showResetButton = true;
+      if (isValidDate(this.initialValue)) {
+        const datetimeString = toLocalISODateString(this.initialValue);
+        const croppedDatetimeString = get(
+          // only select up till minutes; drop seconds, ms and timezone
+          // (we'll generate the local timezone anyway)
+          datetimeString &&
+            datetimeString.match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/),
+          0 // first match if any
+        );
+        if (croppedDatetimeString) {
+          this.addedDatetime = croppedDatetimeString;
+          this.textfield().value = croppedDatetimeString;
+          this.showResetButton = true;
+        }
       }
 
       this.$scope.$apply();

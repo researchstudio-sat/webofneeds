@@ -11,7 +11,7 @@ import {
   getRandomString,
   findAllFieldOccurancesRecursively,
   is,
-  endOfXsdDateInterval,
+  endOfDateStrInterval,
 } from "./utils.js";
 
 import { ownerBaseUrl } from "config";
@@ -22,7 +22,7 @@ import jsonld from "jsonld";
 window.jsonld4dbg = jsonld;
 
 import Immutable from "immutable";
-import { get, parseXsdDateTime, isValidDate } from "./utils.js";
+import { get, parseDatetimeStrictly, isValidDate } from "./utils.js";
 
 export function initLeaflet(mapMount) {
   if (!L) {
@@ -326,10 +326,9 @@ function hasSubElements(obj) {
 }
 
 export function findLatestIntervallEndInJsonLd(draft, jsonld) {
-  // get all occurrances of `dc:time`, `dc:date` or `dc:datetime` in the jsonld
+  // get all occurrances of `s:DateTime`
   const allTimes = Array.concat(
-    findAllFieldOccurancesRecursively("dc:date", jsonld),
-    findAllFieldOccurancesRecursively("dc:datetime", jsonld)
+    findAllFieldOccurancesRecursively("s:DateTime", jsonld)
   );
 
   // filter for string-literals (just in case)
@@ -347,13 +346,13 @@ export function findLatestIntervallEndInJsonLd(draft, jsonld) {
   if (allTimesStrs.length === 0) return undefined; // no time strings found
 
   // determine if any of them are intervals (e.g. days or months) and if so calculate the end of these
-  const endDatetimes = allTimesStrs.map(str => endOfXsdDateInterval(str));
+  const endDatetimes = allTimesStrs.map(str => endOfDateStrInterval(str));
 
   // find the latest mentioned point in time
   const sorted = endDatetimes.sort((a, b) => b - a); // sort descending
   const latest = sorted[0];
 
-  // convert to an `xsd:datetime` string and return
+  // convert to an `xsd:datetime`/ISO-8601 string and return
   return latest.toISOString();
 }
 
@@ -400,10 +399,13 @@ export function parseJsonldLeafsImm(val, type) {
  * @param {*} val
  *  * already parsed
  *  * `{"@value": "<someval>", "@type": "<sometype>"}`, where `<sometype>` is one of:
+ *    * `s:Number`
+ *    * `s:Float`
+ *    * `s:Integer`
  *    * `xsd:float`
  *    * `xsd:dateTime`
- *    * `dc:date`
- *    * `dc:time`
+ *    * `s:DateTime`
+ *    * `xsd:string`
  *    * `http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon`?, e.g. `"48.225073#16.358398"`
  *  * anything, that _strictly_ parses to a number or date or is a string
  * @param {*} type passing `val` and `type` is equivalent to passing an object with `@value` and `@type`
@@ -445,20 +447,19 @@ export function parseJsonldLeaf(val, type) {
       }
       break;
 
+    case "s:DateTime":
     case "xsd:dateTime":
       {
-        const parsedDateTime = parseXsdDateTime(unwrappedVal);
+        const parsedDateTime = parseDatetimeStrictly(unwrappedVal);
         if (isValidDate(parsedDateTime)) {
           return parsedDateTime;
         } else {
-          throwErr("Annotated `xsd:dateTime` isn't parsable to a `Date`.");
+          throwErr(`Annotated \`${type_}\` isn't parsable to a \`Date\`.`);
         }
       }
       break;
 
     // TODO
-    // case "dc:date":
-    // case "dc:time":
     // case "http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon":
     //   break;
 
@@ -472,7 +473,7 @@ export function parseJsonldLeaf(val, type) {
       if (!isNaN(asNum)) {
         return asNum;
       }
-      const asDateTime = parseXsdDateTime(unwrappedVal);
+      const asDateTime = parseDatetimeStrictly(unwrappedVal);
       if (isValidDate(asDateTime)) {
         return asDateTime;
       }
