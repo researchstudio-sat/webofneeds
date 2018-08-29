@@ -187,7 +187,7 @@ public class WonMessageRoutes extends RouteBuilder
             // e.g. when client's public keys changed and hence their queuenames did, too. Added the onException part to deal
             // with that.
             .onException(Exception.class)
-              .log("failure during seda:OwnerProtocolOut, ignoring. Exception message: ${exception.messsage}")
+              .log("failure during seda:OwnerProtocolOut, ignoring. Exception message: ${exception.message}")
               .handled(true)
               .stop()
               .end()
@@ -286,6 +286,7 @@ public class WonMessageRoutes extends RouteBuilder
                             .to("direct:reactToMessage")
                         .otherwise()
                             .log(LoggingLevel.DEBUG, "suppressing sending of message to owner because the header '" + WonCamelConstants.SUPPRESS_MESSAGE_TO_OWNER + "' is 'true'")
+                            .stop()
                         .endChoice()
                       .end();
 
@@ -333,6 +334,7 @@ public class WonMessageRoutes extends RouteBuilder
                                 .to("direct:sendToOwner")
                             .otherwise()
                                 .log(LoggingLevel.DEBUG, "suppressing sending of message to owner because the header '" + WonCamelConstants.SUPPRESS_MESSAGE_TO_OWNER + "' is 'true'")
+                                .stop()
                             .endChoice()
                         .end()
                         .choice()
@@ -340,6 +342,7 @@ public class WonMessageRoutes extends RouteBuilder
                                 .to("direct:reactToMessage")
                             .otherwise()
                                 .log(LoggingLevel.DEBUG, "suppressing sending of message to owner because the header '" + WonCamelConstants.SUPPRESS_MESSAGE_TO_OWNER + "' is 'true'")
+                                .stop()
                             .endChoice()
                         .end();
           /**
@@ -384,6 +387,7 @@ public class WonMessageRoutes extends RouteBuilder
                 .to("direct:reference-sign-persist")
               .otherwise()
                 .log(LoggingLevel.DEBUG, "suppressing sending of message to owner because the header '" + WonCamelConstants.IGNORE_HINT + "' is 'true'")
+                .stop()
               .endChoice()
             .end();
             
