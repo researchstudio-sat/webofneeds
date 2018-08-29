@@ -2,8 +2,9 @@
 // TODO: each detail picker should know it's own rdf template
 // --> both for parsing to and from rdf
 // --> templates are used in need-builder (toRDF) and in parse-need (from RDF)
-import { get, getIn, is } from "../app/utils.js";
+import { get, getIn } from "../app/utils.js";
 import Immutable from "immutable";
+import won from "../app/won-es6.js";
 
 /**
  * Defines a set of details that will only be visible within a specific 'implementation'
@@ -143,7 +144,7 @@ export const details = {
       return { "dc:title": value };
     },
     parseFromRDF: function(jsonLDImm) {
-      return jsonLDImm && jsonLDImm.get("dc:title");
+      return won.parseFrom(jsonLDImm, ["dc:title"], "xsd:string");
     },
     generateHumanReadable: function({ value, includeLabel }) {
       if (value) {
@@ -166,7 +167,7 @@ export const details = {
       return { "dc:description": value };
     },
     parseFromRDF: function(jsonLDImm) {
-      return jsonLDImm && jsonLDImm.get("dc:description");
+      return won.parseFrom(jsonLDImm, ["dc:description"], "xsd:string");
     },
     generateHumanReadable: function({ value, includeLabel }) {
       if (value) {
@@ -215,12 +216,13 @@ export const details = {
       return { "dc:datetime": value };
     },
     parseFromRDF: function(jsonLDImm) {
-      //TODO: Correct parseFromRDF
-      return jsonLDImm && jsonLDImm.get("dc:datetime");
+      return won.parseFrom(jsonLDImm, ["dc:datetime"], "xsd:dateTime");
     },
     generateHumanReadable: function({ value, includeLabel }) {
       if (value) {
-        return includeLabel ? this.label + ": " + value : value;
+        const maybeLabel = includeLabel ? this.label + ": " : "";
+        const timestring = new Date(value).toLocaleString();
+        return maybeLabel + timestring;
       }
       return undefined;
     },
@@ -342,73 +344,37 @@ export const details = {
         },
       };
 
-      location.address =
-        jsonldLocationImm.get("s:name") ||
-        jsonldLocationImm.get("http://schema.org/name");
-
-      location.lat = Number.parseFloat(
-        jsonldLocationImm.getIn(["s:geo", "s:latitude"]) ||
-          jsonldLocationImm.getIn([
-            "http://schema.org/geo",
-            "http://schema.org/latitude",
-          ])
-      );
-      location.lng = Number.parseFloat(
-        jsonldLocationImm.getIn(["s:geo", "s:longitude"]) ||
-          jsonldLocationImm.getIn([
-            "http://schema.org/geo",
-            "http://schema.org/longitude",
-          ])
+      location.address = won.parseFrom(
+        jsonldLocationImm,
+        ["s:name"],
+        "xsd:string"
       );
 
-      location.nwCorner.lat = Number.parseFloat(
-        jsonldLocationImm.getIn([
-          "won:hasBoundingBox",
-          "won:hasNorthWestCorner",
-          "s:latitude",
-        ]) ||
-          jsonldLocationImm.getIn([
-            "won:hasBoundingBox",
-            "won:hasNorthWestCorner",
-            "http://schema.org/latitude",
-          ])
-      );
-      location.nwCorner.lng = Number.parseFloat(
-        jsonldLocationImm.getIn([
-          "won:hasBoundingBox",
-          "won:hasNorthWestCorner",
-          "s:longitude",
-        ]) ||
-          jsonldLocationImm.getIn([
-            "won:hasBoundingBox",
-            "won:hasNorthWestCorner",
-            "http://schema.org/longitude",
-          ])
-      );
-      location.seCorner.lat = Number.parseFloat(
-        jsonldLocationImm.getIn([
-          "won:hasBoundingBox",
-          "won:hasSouthEastCorner",
-          "s:latitude",
-        ]) ||
-          jsonldLocationImm.getIn([
-            "won:hasBoundingBox",
-            "won:hasSouthEastCorner",
-            "http://schema.org/latitude",
-          ])
-      );
-      location.seCorner.lng = Number.parseFloat(
-        jsonldLocationImm.getIn([
-          "won:hasBoundingBox",
-          "won:hasSouthEastCorner",
-          "s:longitude",
-        ]) ||
-          jsonldLocationImm.getIn([
-            "won:hasBoundingBox",
-            "won:hasSouthEastCorner",
-            "http://schema.org/longitude",
-          ])
-      );
+      const parseFloatFromLocation = path =>
+        won.parseFrom(jsonldLocationImm, path, "xsd:float");
+
+      location.lat = parseFloatFromLocation(["s:geo", "s:latitude"]);
+      location.lng = parseFloatFromLocation(["s:geo", "s:longitude"]);
+      location.nwCorner.lat = parseFloatFromLocation([
+        "won:hasBoundingBox",
+        "won:hasNorthWestCorner",
+        "s:latitude",
+      ]);
+      location.nwCorner.lng = parseFloatFromLocation([
+        "won:hasBoundingBox",
+        "won:hasNorthWestCorner",
+        "s:longitude",
+      ]);
+      location.seCorner.lat = parseFloatFromLocation([
+        "won:hasBoundingBox",
+        "won:hasSouthEastCorner",
+        "s:latitude",
+      ]);
+      location.seCorner.lng = parseFloatFromLocation([
+        "won:hasBoundingBox",
+        "won:hasSouthEastCorner",
+        "s:longitude",
+      ]);
 
       if (
         location.address &&
@@ -491,11 +457,14 @@ export const details = {
         // bio: undefined,
       };
 
-      person.name = jsonLDImm.get("foaf:name");
-      person.title = jsonLDImm.get("foaf:title");
-      person.company = jsonLDImm.getIn(["s:worksFor", "s:name"]);
-      person.position = jsonLDImm.get("s:jobTitle");
-      //person.bio = isOrSeeksImm.get("dc:description");
+      person.name = won.parseFrom(jsonLDImm, ["foaf:name"], "xsd:string");
+      person.title = won.parseFrom(jsonLDImm, ["foaf:title"], "xsd:string");
+      person.company = won.parseFrom(
+        jsonLDImm,
+        ["s:worksFor", "s:name"],
+        "xsd:string"
+      );
+      person.position = won.parseFrom(jsonLDImm, ["s:jobTitle"], "xsd:string");
 
       // if there's anything, use it
       if (person.name || person.title || person.company || person.position) {
@@ -608,51 +577,42 @@ export const details = {
         },
       };
 
-      travelAction.fromAddress =
-        travelActionImm.getIn(["s:fromLocation", "s:name"]) ||
-        travelActionImm.getIn([
-          "http://schema.org/fromLocation",
-          "http://schema.org/name",
-        ]);
+      travelAction.fromAddress = won.parseFrom(
+        travelActionImm,
+        ["s:fromLocation", "s:name"],
+        "xsd:string"
+      );
 
-      travelAction.fromLocation.lat =
-        travelActionImm.getIn(["s:fromLocation", "s:geo", "s:latitude"]) ||
-        travelActionImm.getIn([
-          "http://schema.org/fromLocation",
-          "http://schema.org/geo",
-          "http://schema.org/latitude",
-        ]);
+      const parseFloatFromTravelAction = path =>
+        won.parseFrom(travelActionImm, path, "xsd:float");
 
-      travelAction.fromLocation.lng =
-        travelActionImm.getIn(["s:fromLocation", "s:geo", "s:longitude"]) ||
-        travelActionImm.getIn([
-          "http://schema.org/fromLocation",
-          "http://schema.org/geo",
-          "http://schema.org/longitude",
-        ]);
+      travelAction.fromLocation.lat = parseFloatFromTravelAction([
+        "s:fromLocation",
+        "s:geo",
+        "s:latitude",
+      ]);
+      travelAction.fromLocation.lng = parseFloatFromTravelAction([
+        "s:fromLocation",
+        "s:geo",
+        "s:longitude",
+      ]);
 
-      travelAction.toAddress =
-        travelActionImm.getIn(["s:toLocation", "s:name"]) ||
-        travelActionImm.getIn([
-          "http://schema.org/toLocation",
-          "http://schema.org/name",
-        ]);
+      travelAction.toAddress = won.parseFrom(
+        travelActionImm,
+        ["s:toLocation", "s:name"],
+        "xsd:string"
+      );
 
-      travelAction.toLocation.lat =
-        travelActionImm.getIn(["s:toLocation", "s:geo", "s:latitude"]) ||
-        travelActionImm.getIn([
-          "http://schema.org/toLocation",
-          "http://schema.org/geo",
-          "http://schema.org/latitude",
-        ]);
-
-      travelAction.toLocation.lng =
-        travelActionImm.getIn(["s:toLocation", "s:geo", "s:longitude"]) ||
-        travelActionImm.getIn([
-          "http://schema.org/toLocation",
-          "http://schema.org/geo",
-          "http://schema.org/longitude",
-        ]);
+      travelAction.toLocation.lat = parseFloatFromTravelAction([
+        "s:toLocation",
+        "s:geo",
+        "s:latitude",
+      ]);
+      travelAction.toLocation.lng = parseFloatFromTravelAction([
+        "s:toLocation",
+        "s:geo",
+        "s:longitude",
+      ]);
 
       if (
         (travelAction.fromAddress &&
@@ -663,13 +623,13 @@ export const details = {
           travelAction.toLocation.lng)
       ) {
         return Immutable.fromJS(travelAction);
+      } else {
+        console.error(
+          "Cant parse travelAction, data is an invalid travelAction-object: ",
+          travelActionImm.toJS()
+        );
+        return undefined;
       }
-
-      console.error(
-        "Cant parse travelAction, data is an invalid travelAction-object: ",
-        travelActionImm.toJS()
-      );
-      return undefined;
     },
     generateHumanReadable: function({ value, includeLabel }) {
       if (value && (value.fromLocation || value.toLocation)) {
@@ -749,24 +709,7 @@ export const details = {
       return { "won:hasTag": value };
     },
     parseFromRDF: function(jsonLDImm) {
-      const tags = jsonLDImm && jsonLDImm.get("won:hasTag");
-
-      if (!tags) {
-        return undefined;
-      } else if (is("String", tags)) {
-        return Immutable.fromJS([tags]);
-      } else if (is("Array", tags)) {
-        return Immutable.fromJS(tags);
-      } else if (Immutable.List.isList(tags)) {
-        return tags.map(tag => get(tag, "@value") || tag);
-      } else {
-        console.error(
-          "Found unexpected format of tags (should be Array, " +
-            "Immutable.List, or a single tag as string): " +
-            JSON.stringify(tags)
-        );
-        return undefined;
-      }
+      return won.parseListFrom(jsonLDImm, ["won:hasTag"], "xsd:string");
     },
     generateHumanReadable: function({ value, includeLabel }) {
       if (value) {

@@ -732,8 +732,14 @@ export function get(obj, property) {
   if (!obj) {
     return undefined;
   } else if (obj.get) {
+    /* obj is an immutabljs-object
+           * NOTE: the canonical check atm would be `Immutable.Iterable.isIterable(obj)`
+           * but that would require including immutable as dependency her and it'd be better
+           * to keep this library independent of anything.
+           */
     return obj.get(property);
   } else {
+    /* obj is a vanilla object */
     return obj[property];
   }
 }
@@ -750,18 +756,19 @@ export function getIn(obj, path) {
   if (!path || !obj || path.length === 0) {
     return undefined;
   } else {
-    let child;
-    if (obj.toJS && obj.get) {
-      /* obj is an immutabljs-object
-             * NOTE: the canonical check atm would be `Immutable.Iterable.isIterable(obj)`
-             * but that would require including immutable as dependency her and it'd be better
-             * to keep this library independent of anything.
-             */
-      child = obj.get(path[0]);
-    } else {
-      /* obj is a vanilla object */
-      child = obj[path[0]];
-    }
+    const child = get(obj, path[0]);
+    // let child;
+    // if (obj.toJS && obj.get) {
+    //   /* obj is an immutabljs-object
+    //          * NOTE: the canonical check atm would be `Immutable.Iterable.isIterable(obj)`
+    //          * but that would require including immutable as dependency her and it'd be better
+    //          * to keep this library independent of anything.
+    //          */
+    //   child = obj.get(path[0]);
+    // } else {
+    //   /* obj is a vanilla object */
+    //   child = obj[path[0]];
+    // }
     if (path.length === 1) {
       /* end of the path */
       return child;
@@ -772,6 +779,72 @@ export function getIn(obj, path) {
   }
 }
 window.getIn4dbg = getIn;
+
+/**
+ * Like `getIn` but allows passing a context
+ * that's used for prefix resolution (i.e. it
+ * checks both the prefixed and expanded version
+ * of that path-step).
+ * ```js
+ * getInFromJsonLd(
+ *   {'ex:foo': { 'http://example.org/bar' : 42 }},
+ *   ['ex:foo', 'ex:bar'],
+ *   {'ex': 'http://example.org/'}
+ * ) // => 42
+ * ```
+ * @param obj
+ * @param path
+ * @param context a standard json-ld style context. Note, that
+ * only prefix-definitions will be minded.
+ */
+export function getInFromJsonLd(obj, path, context) {
+  if (!path || !obj || path.length === 0) {
+    return undefined;
+  } else {
+    const child = getFromJsonLd(obj, path[0], context);
+    if (path.length === 1) {
+      /* end of the path */
+      return child;
+    } else {
+      /* recurse */
+      return getInFromJsonLd(child, path.slice(1), context);
+    }
+  }
+}
+window.getInFromJsonLd4dbg = getInFromJsonLd;
+
+/**
+ * Like `get` but allows passing a context
+ * that's used for prefix resolution (i.e. it
+ * checks both the prefixed and expanded version
+ * of that path-step).
+ *
+ * @param obj a json-ld object
+ * @param path an array used for traversal, e.g. `[0, "ex:foo", "ex:bar", "@value"]`. Use
+ *   the shortened form of prefixes -- full URLs won't be compacted, only prefixes expanded.
+ * @param context a standard json-ld style context. Note, that
+ * only prefix-definitions will be minded.
+ */
+export function getFromJsonLd(obj, predicate, context) {
+  if (!obj) {
+    return undefined;
+  } else {
+    // e.g. "ex:foo:bar".replace(/([^:]*):.*/, '$1') => "ex"
+    const prefixShort = predicate.replace(/^([^:]*):.*/, "$1");
+    const prefixLong = context && context[prefixShort];
+    let expandedPredicate;
+
+    if (prefixShort && prefixLong && is("String", prefixLong)) {
+      // ^ the string-check is because contexts can also have other
+      // fields beside prefix-definitions
+
+      // "ex:foo:bar:ex".replace('ex:', 'http://example.org/') => "http://example.org/foo:bar:ex"
+      expandedPredicate = predicate.replace(prefixShort + ":", prefixLong);
+    }
+
+    return get(obj, predicate) || get(obj, expandedPredicate);
+  }
+}
 
 export function contains(arr, el) {
   return arr.indexOf(el) > 0;
@@ -1256,10 +1329,10 @@ export function findAllFieldOccurancesRecursively(fieldName, obj, _acc = []) {
 }
 
 /**
- * Takes an `xsd:date` or `xsd:datetime` string and returns a `Date` that marks
- * the exact time (for `xsd:datetime`) or the end of the year, month or day (for `xsd:date`)
+ * Takes an `dc:date` or `xsd:datetime` string and returns a `Date` that marks
+ * the exact time (for `xsd:datetime`) or the end of the year, month or day (for `dc:date`)
  * e.g. xsd:datetime: "2011-04-11T10:20:30Z"
- * e.g. xsd:date: "2011-04-11"
+ * e.g. dc:date: "2011-04-11"
  *
  * @param {*} xsdDateStr
  */
@@ -1289,8 +1362,33 @@ export function endOfXsdDateInterval(xsdDateStr) {
     return new Date(year, monthIdx, 31, 23, 59, 59);
   } else {
     console.error(
-      "Found unexpected date when calculating exact end-datetime of `xsd:date` string: ",
+      "Found unexpected date when calculating exact end-datetime of `dc:date` string: ",
       xsdDateStr
     );
   }
+}
+
+/**
+ * Parses an `xsd:dateTime`-string strictly.
+ * Docs on format: <http://www.datypic.com/sc/xsd/t-xsd_dateTime.html>
+ * @param {string} dateTime e.g. "2018-08-21T14:05:27.568Z"
+ * @returns a `Date`-object, with `Invalid Date` if parsing failed.
+ */
+export function parseXsdDateTime(dateTime) {
+  if (!is("String", dateTime)) {
+    return undefined;
+  }
+  const validXsdDateTimeString = !!dateTime.match(
+    /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/
+  );
+  const asDateTime = new Date(dateTime);
+  if (validXsdDateTimeString && !isNaN(asDateTime.valueOf())) {
+    return asDateTime;
+  } else {
+    return new Date("Invalid Date"); // string here is just any unparsable date-string to get `Invalid Date`
+  }
+}
+
+export function isValidDate(dateObj) {
+  return dateObj && !isNaN(dateObj.valueOf());
 }

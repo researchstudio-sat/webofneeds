@@ -12,7 +12,7 @@ function genComponentConf() {
           </svg>
           <span class="datetimev__header__label" ng-if="self.detail.label">{{self.detail.label}}</span>
         </div>
-        <div class="datetimev__content">{{ self.content }}</div>
+        <div class="datetimev__content">{{ self.content && self.content.toLocaleString() }}</div>
     `;
 
   class Controller {
