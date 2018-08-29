@@ -51,7 +51,6 @@ export function needCreate(draft, nodeUri) {
         dispatch(
           actionCreators.router__stateGoAbs("connections", {
             postUri: undefined,
-            showUseCases: undefined,
             connectionUri: undefined,
           })
         );

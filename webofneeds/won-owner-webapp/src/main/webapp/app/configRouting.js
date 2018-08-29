@@ -30,7 +30,6 @@ import {
 export const resetParams = Object.freeze({
   connectionUri: undefined,
   postUri: undefined,
-  showUseCases: undefined,
   useCase: undefined,
   useCaseGroup: undefined,
   //sendAdHocRequest: undefined,
@@ -78,7 +77,7 @@ export const configRouting = [
       { path: "/signup?privateId", component: "signup" },
       {
         path:
-          "/connections?privateId?postUri?connectionUri?showUseCases?useCase?useCaseGroup",
+          "/connections?privateId?postUri?connectionUri?useCase?useCaseGroup",
         component: "connections",
         as: "connections",
       },

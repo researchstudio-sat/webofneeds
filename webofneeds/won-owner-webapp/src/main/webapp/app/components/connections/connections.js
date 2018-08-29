@@ -8,7 +8,6 @@ import connectionsOverviewModule from "../connections-overview.js";
 import createPostModule from "../create-post.js";
 import createSearchModule from "../create-search.js";
 import usecasePickerModule from "../usecase-picker.js";
-import usecasePickerContentModule from "../usecase-picker-content.js";
 import usecaseGroupModule from "../usecase-group.js";
 import { attach, getIn, callBuffer } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
@@ -50,11 +49,6 @@ class ConnectionsController {
       );
       const selectedPost =
         selectedPostUri && state.getIn(["needs", selectedPostUri]);
-      const showUseCases = getIn(state, [
-        "router",
-        "currentParams",
-        "showUseCases",
-      ]);
 
       const useCase = getIn(state, ["router", "currentParams", "useCase"]);
       const useCaseGroup = getIn(state, [
@@ -104,7 +98,6 @@ class ConnectionsController {
         connectionType,
         useCase,
         useCaseGroup,
-        showUseCases,
         hasConnections: connections && connections.size > 0,
         hasOwnNeeds: ownNeeds && ownNeeds.size > 0,
         open,
@@ -128,7 +121,6 @@ class ConnectionsController {
     this.router__stateGoCurrent({
       connectionUri: undefined,
       postUri: needUri,
-      showUseCases: undefined,
       useCase: undefined,
       useCaseGroup: undefined,
     }); //TODO: Maybe leave the connectionUri in the parameters to go back when closing a selected need
@@ -139,7 +131,6 @@ class ConnectionsController {
     this.router__stateGoCurrent({
       connectionUri,
       postUri: undefined,
-      showUseCases: undefined,
       useCase: undefined,
       useCaseGroup: undefined,
     });
@@ -189,7 +180,6 @@ export default angular
     postMessagesModule,
     postInfoModule,
     usecasePickerModule,
-    usecasePickerContentModule,
     usecaseGroupModule,
     createPostModule,
     createSearchModule,

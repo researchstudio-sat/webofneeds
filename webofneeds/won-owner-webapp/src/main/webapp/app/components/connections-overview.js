@@ -219,7 +219,7 @@ function genComponentConf() {
         );
 
         const routerParams = selectRouterParams(state);
-        const showUseCases = get(routerParams, "showUseCases");
+        const useCaseGroup = get(routerParams, "useCaseGroup");
         const useCase = get(routerParams, "useCase");
         const connUriInRoute = selectOpenConnectionUri(state);
         const needUriInRoute = selectOpenPostUri(state);
@@ -236,7 +236,7 @@ function genComponentConf() {
         return {
           allNeeds,
           showClosedNeeds: state.get("showClosedNeeds"),
-          showUseCases,
+          showUseCases: useCaseGroup && useCaseGroup === "all",
           useCase,
           needUriInRoute,
           needUriImpliedInRoute,

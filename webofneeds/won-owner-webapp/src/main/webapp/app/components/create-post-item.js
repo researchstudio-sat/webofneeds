@@ -76,7 +76,7 @@ function genComponentConf() {
             ng-click="self.showAvailableUseCases()"
             ng-if="!self.useCase"
             ng-class="{
-              'selected': self.showUseCases,
+              'selected': self.isSelected,
               'cpi__item--withcolspan': !self.evenUseCaseListSize,
             }">
             <svg class="cpi__item__icon"
@@ -98,10 +98,10 @@ function genComponentConf() {
       window.cpitem4dbg = this;
 
       const selectFromState = state => {
-        const showUseCases = getIn(state, [
+        const useCaseGroup = getIn(state, [
           "router",
           "currentParams",
-          "showUseCases",
+          "useCaseGroup",
         ]);
 
         const useCaseString = getIn(state, [
@@ -116,7 +116,7 @@ function genComponentConf() {
           listUseCases,
           evenUseCaseListSize:
             listUseCases && Object.keys(listUseCases).length % 2 == 0,
-          showUseCases: !!showUseCases,
+          isSelected: useCaseGroup && useCaseGroup === "all",
           useCase: useCaseString && this.getUseCase(useCaseString),
         };
       };
@@ -156,7 +156,6 @@ function genComponentConf() {
         this.router__stateGoCurrent({
           connectionUri: undefined,
           postUri: undefined,
-          showUseCases: undefined,
           useCase: encodeURIComponent(selectedUseCaseIdentifier),
           useCaseGroup: undefined,
         });
@@ -172,9 +171,8 @@ function genComponentConf() {
       this.router__stateGoCurrent({
         connectionUri: undefined,
         postUri: undefined,
-        showUseCases: true,
         useCase: undefined,
-        useCaseGroup: undefined,
+        useCaseGroup: "all",
       });
     }
 
@@ -183,7 +181,6 @@ function genComponentConf() {
       this.router__stateGoCurrent({
         connectionUri: undefined,
         postUri: undefined,
-        showUseCases: undefined,
         useCase: "search",
         useCaseGroup: undefined,
       });
