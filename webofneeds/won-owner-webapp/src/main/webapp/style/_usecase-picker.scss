@@ -4,8 +4,8 @@
 
 won-usecase-picker {
   display: grid;
-  grid-template-areas: "header" "main";
-  grid-template-rows: min-content minmax($minimalGridRows, 1fr);
+  grid-template-areas: "header" "create_x" "main";
+  grid-template-rows: min-content auto minmax($minimalGridRows, 1fr);
   grid-row-gap: $gridRowGap;
   width: 100%;
   max-width: $maxContentWidth;
@@ -57,10 +57,59 @@ won-usecase-picker {
     }
   }
 
-  won-usecase-picker-content {
+  .ucp__createx {
+    grid-area: create_x;
+    display: grid;
+    grid-gap: $gridRowGap;
+    grid-auto-rows: min-content;
+    grid-template-columns: 1fr 1fr;
+
+    &.won-pending-publishing {
+      grid-column: 1 / -1;
+      justify-self: center;
+    }
+
+    &__button {
+      white-space: normal;
+    }
+  }
+
+  .ucp__main {
     grid-area: main;
-    border-top: $thinGrayBorder;
-    padding-top: 1rem;
+    display: grid;
+    grid-auto-rows: min-content;
+    grid-auto-flow: row dense;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-gap: $gridRowGap;
     overflow: auto;
+
+    &__labelledhr,
+    &__search {
+      grid-column: 1/-1;
+    }
+
+    &__usecase-group {
+      display: flex;
+      align-items: center;
+      flex-direction: column;
+      justify-content: center;
+      padding: 0.5rem;
+      border-radius: 0.19rem;
+      background: $won-secondary-color-light;
+      min-height: $iconSize + $normalFontSize + 0.5rem; // icon + label + 0.5rem padding
+
+      &:hover {
+        filter: brightness(85%);
+      }
+
+      &__icon {
+        @include fixed-square($iconSize);
+        --local-primary: #{$won-secondary-text-color};
+      }
+      &__label {
+        color: $won-secondary-text-color;
+        text-align: center;
+      }
+    }
   }
 }
