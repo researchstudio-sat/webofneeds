@@ -34,16 +34,26 @@ public class FileBasedKeyStoreService extends AbstractKeyStoreService {
 	private java.security.KeyStore store;
 
 	private final Ehcache ehcache;
+	
+	private final String provider;
+	
+	private final String keyStoreType;
 
 	public FileBasedKeyStoreService(String filePath, String storePW) {
-		this(new File(filePath), storePW);
+		this(new File(filePath), storePW, PROVIDER_BC, KEY_STORE_TYPE);
 	}
 
 	public FileBasedKeyStoreService(File storeFile, String storePW) {
+	  this(storeFile, storePW, PROVIDER_BC, KEY_STORE_TYPE);
+	}
+	
+	public FileBasedKeyStoreService(File storeFile, String storePW, String provider, String keyStoreType) {
 		this.storeFile = storeFile;
 		this.storePW = storePW;
+		this.provider = provider;
+		this.keyStoreType = keyStoreType;
 		logger.info("Using key store file {} with key store type {}, provider {}",
-				new Object[] { storeFile, KEY_STORE_TYPE, PROVIDER_BC });
+				new Object[] { storeFile, keyStoreType, provider });
 
 		CacheManager manager = CacheManager.getInstance();
 		ehcache = new Cache("keyCache" + storeFile.hashCode(), 100, false, false, 60, 60);
@@ -231,7 +241,9 @@ public class FileBasedKeyStoreService extends AbstractKeyStoreService {
 
 	public void init() throws Exception {
 		try {
-			store = java.security.KeyStore.getInstance(KEY_STORE_TYPE, PROVIDER_BC);
+			store = (provider == null) ?
+			    java.security.KeyStore.getInstance(keyStoreType) 
+			    : java.security.KeyStore.getInstance(keyStoreType, provider);
 			logger.debug("KEYSTORE: " + store);
 
 			if (storeFile == null || !storeFile.exists() || !storeFile.isFile())
