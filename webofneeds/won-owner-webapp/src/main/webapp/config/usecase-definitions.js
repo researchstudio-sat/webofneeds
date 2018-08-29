@@ -1,4 +1,4 @@
-import { get, getFromJsonLd, getInFromJsonLd } from "../app/utils.js";
+import { is, get, getFromJsonLd, getInFromJsonLd } from "../app/utils.js";
 import Immutable from "immutable";
 import { details, abstractDetails } from "detailDefinitions";
 import { Parser as SparqlParser } from "sparqljs";
@@ -651,12 +651,12 @@ const realEstateFeaturesDetail = {
   icon: "#ico36_detail_feature",
   placeholder: "e.g. balcony, bathtub",
   parseToRDF: function({ value }) {
-    if (!value) {
+    if (!value || !is("Array", value) || value.length === 0) {
       return { "s:amenityFeature": undefined };
     } else {
       const features = value.map(feature => ({
         "@type": "s:LocationFeatureSpecification",
-        "s:name": feature,
+        "s:value": { "@value": feature, "@type": "s:Text" },
       }));
       return {
         "s:amenityFeature": features,
@@ -666,8 +666,8 @@ const realEstateFeaturesDetail = {
   parseFromRDF: function(jsonLDImm) {
     return won.parseListFrom(
       jsonLDImm,
-      ["s:amenityFeature", "s:name"],
-      "xsd:string"
+      ["s:amenityFeature"], //, "s:value"],
+      "s:Text"
     );
   },
 };
