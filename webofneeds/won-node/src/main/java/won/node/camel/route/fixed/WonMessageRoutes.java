@@ -77,6 +77,7 @@ public class WonMessageRoutes extends RouteBuilder
                   .log("failure during direct:sendFailureResponse, rolling back transaction for exchange ${exchangeId}")
                   .rollback()
                   .handled(true)
+                  .stop()
                   .end()
                 .transacted("PROPAGATION_REQUIRES_NEW")
                 .to("bean:parentLocker")
@@ -186,8 +187,9 @@ public class WonMessageRoutes extends RouteBuilder
             // e.g. when client's public keys changed and hence their queuenames did, too. Added the onException part to deal
             // with that.
             .onException(Exception.class)
-              .log("failure during seda:OwnerProtocolOut, ignoring")
+              .log("failure during seda:OwnerProtocolOut, ignoring. Exception message: ${exception.messsage}")
               .handled(true)
+              .stop()
               .end()
             .transacted("PROPAGATION_NEVER")
             .routeId("seda:OwnerProtocolOut")
