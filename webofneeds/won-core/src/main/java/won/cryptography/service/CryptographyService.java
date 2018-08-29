@@ -112,7 +112,7 @@ public class CryptographyService {
 		try {
 		    keyToTrustKeyStoreService.init();
 		} catch (Exception e) {
-		  throw new RuntimeException("unable to read key for alias " + keyToTrustAlias + " from keystore " + keyToTrustFile, e);
+		  logger.info("unable to read key for alias " + keyToTrustAlias + " from keystore " + keyToTrustFile, e);
 		}
 		Certificate cert = keyToTrustKeyStoreService.getCertificate(keyToTrustAlias);
 		if (cert == null) {
@@ -120,7 +120,7 @@ public class CryptographyService {
   		  Optional<String> aliases = Collections.list(keyToTrustKeyStoreService.getUnderlyingKeyStore().aliases()).stream().reduce((x,y) -> x+","+y);
   		  logger.info("no key for alias {} found in keystore {}. Available aliases: {}", new Object[] {keyToTrustAlias, keyToTrustFile, aliases.orElse("(none)")});
 		  } catch (Exception e) {
-		    throw new RuntimeException("no key for alias " + keyToTrustAlias + " found in keystore " + keyToTrustFile + "; caught exception while trying to log available aliases", e);
+		    logger.info("no key for alias " + keyToTrustAlias + " found in keystore " + keyToTrustFile + "; caught exception while trying to log available aliases", e);
 		  }
 		}
     //we need this so we can connect to ourself with ssl (used by the activemq broker)
@@ -129,7 +129,7 @@ public class CryptographyService {
       trustStoreService.addCertificate(keyToTrustAliasUnder, cert, true);
       trustStoreService.addCertificate(keyToTrustAlias, cert, true);
     } catch (IOException e) {
-      throw new RuntimeException("could not add certificate for alias " + keyToTrustAliasUnder + " to truststore", e); 
+      logger.info("could not add certificate for alias " + keyToTrustAliasUnder + " to truststore", e); 
     }
     logger.info("certificate with alias {} has been added to truststore", keyToTrustAliasUnder);
 
