@@ -122,13 +122,13 @@ public class CryptographyService {
 		  } catch (Exception e) {
 		    logger.info("no key for alias " + keyToTrustAlias + " found in keystore " + keyToTrustFile + "; caught exception while trying to log available aliases", e);
 		  }
+		  return;
 		}
     //we need this so we can connect to ourself with ssl (used by the activemq broker)
     logger.info("certificate with alias {} will be added/overwritten in truststore", keyToTrustAliasUnder);
     try {
       trustStoreService.addCertificate(keyToTrustAliasUnder, cert, true);
-      trustStoreService.addCertificate(keyToTrustAlias, cert, true);
-    } catch (IOException e) {
+    } catch (Exception e) {
       logger.info("could not add certificate for alias " + keyToTrustAliasUnder + " to truststore", e); 
     }
     logger.info("certificate with alias {} has been added to truststore", keyToTrustAliasUnder);
