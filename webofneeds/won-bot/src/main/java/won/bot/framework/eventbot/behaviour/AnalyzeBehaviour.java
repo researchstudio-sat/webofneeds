@@ -392,6 +392,15 @@ public class AnalyzeBehaviour extends BotBehaviour {
     }
 
     /**
+     * Removes the stored state of a given Precondition, in order to reset that there was ever a state present
+     * for the precondition
+     * @param preconditionURI
+     */
+    public void removePreconditionConversationState(String preconditionURI) {
+        botContext.removeFromObjectMap(preconditionConversationStateMapName, preconditionURI);
+    }
+
+    /**
      * Saves the state of the precondition
      * @param preconditionURI to save the state of
      * @param state to save
@@ -404,7 +413,12 @@ public class AnalyzeBehaviour extends BotBehaviour {
         botContext.saveToObjectMap(preconditionMetPending, preconditionURI, true);
     }
 
-    private void removePreconditionMetPending(String preconditionURI){
+    /**
+     * Removes the stored entry for a preconditionPending Uri
+     * This method is used so we can remove the pending precondition (e.g if a proposal can't be created)
+     * @param preconditionPendingURI the string of the preconditionUri that is not pending anymore
+     */
+    public void removePreconditionMetPending(String preconditionURI){
         botContext.removeFromObjectMap(preconditionMetPending, preconditionURI);
     }
 
