@@ -28,10 +28,14 @@ won-usecase-picker {
     display: grid;
     grid-template-columns: auto 1fr;
     grid-template-areas: "header_back header_title";
+    grid-gap: $gridRowGap;
     font-size: $normalFontSize;
     text-align: left;
     min-width: 0;
     align-items: center;
+
+    padding-bottom: 0.5rem;
+    border-bottom: $thinGrayBorder;
 
     // so it doesn't interset with the speech-bubble tail coming in from the left on the desktop version
     padding-left: 0.5rem;
@@ -64,13 +68,23 @@ won-usecase-picker {
     grid-auto-rows: min-content;
     grid-template-columns: 1fr 1fr;
 
-    &.won-pending-publishing {
+    padding-top: 0.5rem;
+
+    overflow: auto;
+
+    &__button,
+    &__button--pending {
+      white-space: normal;
+    }
+
+    &__button--pending {
       grid-column: 1 / -1;
+      align-self: center;
       justify-self: center;
     }
 
-    &__button {
-      white-space: normal;
+    &__labelledhr {
+      grid-column: 1 / -1;
     }
   }
 

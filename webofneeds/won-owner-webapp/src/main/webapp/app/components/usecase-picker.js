@@ -35,12 +35,13 @@ function genComponentConf() {
         </div>
 
         <!-- WHAT'S AROUND -->
-        <button class="ucp__createx won-pending-publishing won-button--filled red"
-                ng-if="self.pendingPublishing"
-                ng-disabled="self.pendingPublishing">
-            <span>Finding out what's going on&hellip;</span>
-        </button>
         <div class="ucp__createx">
+            <button class="ucp__createx__button--pending won-button--filled red"
+                    ng-if="self.pendingPublishing"
+                    ng-disabled="self.pendingPublishing">
+                <span>Finding out what's going on&hellip;</span>
+            </button>
+
             <button class="won-button--filled red ucp__createx__button"
                     ng-if="!self.pendingPublishing"
                     ng-click="self.createWhatsAround()"
@@ -56,10 +57,11 @@ function genComponentConf() {
                     ng-disabled="self.pendingPublishing">
                 <span>What's new?</span>
             </button>
+
+            <won-labelled-hr label="::'Or'" class="ucp__createx__labelledhr"></won-labelled-hr>
         </div>
 
         <div class="ucp__main">
-        <won-labelled-hr label="::'Or'" class="ucp__main__labelledhr"></won-labelled-hr>
 
         <!-- TODO: SEARCH FIELD -->
         <!-- TODO: SEARCH RESULTS -->
