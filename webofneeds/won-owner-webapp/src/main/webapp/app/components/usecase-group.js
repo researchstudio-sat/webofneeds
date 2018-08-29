@@ -17,36 +17,45 @@ const serviceDependencies = [
 
 function genComponentConf() {
   const template = `
-  <div class="ucg__usecasegroup"
-    ng-if="self.displayableUseCaseGroup(self.useCaseGroup)">
       <!-- HEADER -->
-      <div class="ucg__usecasegroup__header">
-        <svg class="ucg__usecasegroup__header__icon"
-          ng-if="!!self.useCaseGroup.icon">
-          <use xlink:href="{{ self.useCaseGroup.icon }}" href="{{ self.useCaseGroup.icon }}"></use>
-        </svg>
-        <div class="ucg__usecasegroup__header__label"
-          ng-if="!!self.useCaseGroup.label">
-            {{ self.useCaseGroup.label }}
-        </div>
+      <div class="ucg__header">
+          <a class="cp__header__back clickable"
+              ng-click="self.router__stateGoCurrent({useCaseGroup: undefined})">
+              <svg style="--local-primary:var(--won-primary-color);"
+                  class="ucg__header__back__icon show-in-responsive">
+                  <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
+              </svg>
+              <svg style="--local-primary:var(--won-primary-color);"
+                  class="ucg__header__back__icon hide-in-responsive">
+                  <use xlink:href="#ico36_close" href="#ico36_close"></use>
+              </svg>
+          </a>
+          <svg class="ucg__header__icon"
+              ng-if="!!self.useCaseGroup.icon">
+              <use xlink:href="{{ self.useCaseGroup.icon }}" href="{{ self.useCaseGroup.icon }}"></use>
+          </svg>
+          <div class="ucg__header__title"
+              ng-if="!!self.useCaseGroup.label">
+                {{ self.useCaseGroup.label }}
+          </div>
       </div>
+
       <!-- USE CASES -->
-      <div class="ucg__usecasegroup__usecases">
-        <div class="ucg__usecasegroup__usecases__usecase clickable"
+      <div class="ucg__main">
+        <div class="ucg__main__usecase clickable"
           ng-repeat="useCase in self.useCaseGroup.useCases"
           ng-if="self.displayableUseCase(useCase)"
           ng-click="self.startFrom(useCase)">
-          <svg class="ucg__usecasegroup__usecases__usecase__icon"
+          <svg class="ucg__main__usecase__icon"
             ng-if="!!useCase.icon">
             <use xlink:href="{{ useCase.icon }}" href="{{ useCase.icon }}"></use>
           </svg>
-          <div class="ucg__usecasegroup__usecases__usecase__label"
+          <div class="ucg__main__usecase__label"
             ng-if="!!useCase.label">
               {{ useCase.label }}
           </div>
         </div>
       </div>
-  </div>
     `;
 
   class Controller {
