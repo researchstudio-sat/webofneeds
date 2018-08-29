@@ -3,6 +3,7 @@ package won.matcher.solr.actor;
 import akka.actor.ActorRef;
 import akka.actor.Cancellable;
 import akka.actor.OneForOneStrategy;
+import akka.actor.PoisonPill;
 import akka.actor.SupervisorStrategy;
 import akka.actor.UntypedActor;
 import akka.cluster.pubsub.DistributedPubSub;
@@ -96,6 +97,9 @@ public class MatcherPubSubActor extends UntypedActor
   
   @Override
   public void preRestart(Throwable reason, Option<Object> message) throws Exception {
+    if (matcherActor != null) {
+      matcherActor.tell(PoisonPill.getInstance(), getSelf());
+    }
     cancelScheduledTick();
   }
 
