@@ -654,11 +654,12 @@ const realEstateFeaturesDetail = {
     if (!value) {
       return { "s:amenityFeature": undefined };
     } else {
+      const features = value.map(feature => ({
+        "@type": "s:LocationFeatureSpecification",
+        "s:name": feature,
+      }));
       return {
-        "s:amenityFeature": {
-          "@type": "s:LocationFeatureSpecification",
-          "s:name": value,
-        },
+        "s:amenityFeature": features,
       };
     }
   },
