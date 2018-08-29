@@ -47,7 +47,7 @@ public class OwnerProtocolOutgoingMessagesProcessor implements Processor {
         Map properties = exchange.getProperties();
         List<String> ownerApplications = (List<String>)headers.get(WonCamelConstants.OWNER_APPLICATIONS);
  //       String methodName =headers.get("methodName").toString();
-        logger.debug(ownerApplications.get(0));
+        logger.debug("number of registered owner applications: {}", ownerApplications == null ? 0 : ownerApplications.size());
         List<String> queueNames = convertToQueueName(ownerApplications,"wonMessage",exchange);
         exchange.getIn().setHeader("ownerApplicationIDs",queueNames);
     }
