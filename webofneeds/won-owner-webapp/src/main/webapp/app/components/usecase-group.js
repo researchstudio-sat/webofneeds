@@ -7,7 +7,7 @@ import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
 import { useCaseGroups } from "useCaseDefinitions";
 
-import "style/_usecase-group-content.scss";
+import "style/_usecase-group.scss";
 
 const serviceDependencies = [
   "$ngRedux",
@@ -17,30 +17,30 @@ const serviceDependencies = [
 
 function genComponentConf() {
   const template = `
-  <div class="ucgc__usecasegroup"
+  <div class="ucg__usecasegroup"
     ng-if="self.displayableUseCaseGroup(self.useCaseGroup)">
       <!-- HEADER -->
-      <div class="ucgc__usecasegroup__header">
-        <svg class="ucgc__usecasegroup__header__icon"
+      <div class="ucg__usecasegroup__header">
+        <svg class="ucg__usecasegroup__header__icon"
           ng-if="!!self.useCaseGroup.icon">
           <use xlink:href="{{ self.useCaseGroup.icon }}" href="{{ self.useCaseGroup.icon }}"></use>
         </svg>
-        <div class="ucgc__usecasegroup__header__label"
+        <div class="ucg__usecasegroup__header__label"
           ng-if="!!self.useCaseGroup.label">
             {{ self.useCaseGroup.label }}
         </div>
       </div>
       <!-- USE CASES -->
-      <div class="ucgc__usecasegroup__usecases">
-        <div class="ucgc__usecasegroup__usecases__usecase clickable"
+      <div class="ucg__usecasegroup__usecases">
+        <div class="ucg__usecasegroup__usecases__usecase clickable"
           ng-repeat="useCase in self.useCaseGroup.useCases"
           ng-if="self.displayableUseCase(useCase)"
           ng-click="self.startFrom(useCase)">
-          <svg class="ucgc__usecasegroup__usecases__usecase__icon"
+          <svg class="ucg__usecasegroup__usecases__usecase__icon"
             ng-if="!!useCase.icon">
             <use xlink:href="{{ useCase.icon }}" href="{{ useCase.icon }}"></use>
           </svg>
-          <div class="ucgc__usecasegroup__usecases__usecase__label"
+          <div class="ucg__usecasegroup__usecases__usecase__label"
             ng-if="!!useCase.label">
               {{ useCase.label }}
           </div>
@@ -53,10 +53,8 @@ function genComponentConf() {
     constructor(/* arguments <- serviceDependencies */) {
       attach(this, serviceDependencies, arguments);
 
-      window.ucgc4dbg = this;
+      window.ucg4dbg = this;
       this.useCaseGroups = useCaseGroups;
-      // this.showUseCaseGroupHeaders = this.showUseCaseGroups();
-      // this.showUseCaseGroups = false;
 
       const selectFromState = state => {
         const selectedGroup = getIn(state, [
@@ -93,6 +91,7 @@ function genComponentConf() {
         }
       }
       return false;
+      // TODO: error handling: no group found/group empty
     }
 
     /**
@@ -148,8 +147,5 @@ function selectUseCaseGroupFrom(selectedGroup, useCaseGroups) {
 
 export default //.controller('CreateNeedController', [...serviceDependencies, CreateNeedController])
 angular
-  .module("won.owner.components.usecaseGroupContent", [
-    ngAnimate,
-    labelledHrModule,
-  ])
-  .directive("wonUsecaseGroupContent", genComponentConf).name;
+  .module("won.owner.components.usecaseGroup", [ngAnimate, labelledHrModule])
+  .directive("wonUsecaseGroup", genComponentConf).name;

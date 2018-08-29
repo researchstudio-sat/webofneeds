@@ -10,7 +10,7 @@ import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
 import { selectIsConnected } from "../selectors.js";
 import usecasePickerContentModule from "./usecase-picker-content.js";
-import usecaseGroupContentModule from "./usecase-group-content.js";
+import usecaseGroupModule from "./usecase-group.js";
 
 import "style/_usecase-picker.scss";
 
@@ -34,8 +34,8 @@ function genComponentConf() {
         </div>
         <won-usecase-picker-content ng-if="!self.useCaseGroup">
         </won-usecase-picker-content>
-        <won-usecase-group-content ng-if="!!self.useCaseGroup">
-        </won-usecase-group-content>
+        <won-usecase-group ng-if="!!self.useCaseGroup">
+        </won-usecase-group>
     `;
 
   class Controller {
@@ -80,6 +80,6 @@ angular
   .module("won.owner.components.usecasePicker", [
     ngAnimate,
     usecasePickerContentModule,
-    usecaseGroupContentModule,
+    usecaseGroupModule,
   ])
   .directive("wonUsecasePicker", genComponentConf).name;

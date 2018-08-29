@@ -9,6 +9,7 @@ import createPostModule from "../create-post.js";
 import createSearchModule from "../create-search.js";
 import usecasePickerModule from "../usecase-picker.js";
 import usecasePickerContentModule from "../usecase-picker-content.js";
+import usecaseGroupModule from "../usecase-group.js";
 import { attach, getIn, callBuffer } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import {
@@ -189,6 +190,7 @@ export default angular
     postInfoModule,
     usecasePickerModule,
     usecasePickerContentModule,
+    usecaseGroupModule,
     createPostModule,
     createSearchModule,
     connectionsOverviewModule,
