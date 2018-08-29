@@ -1,5 +1,74 @@
 package won.matcher.sparql.actor;
 
+import java.io.IOException;
+import java.net.URI;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelExtract;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StatementBoundary;
+import org.apache.jena.rdf.model.StatementBoundaryBase;
+import org.apache.jena.rdf.model.impl.ResourceImpl;
+import org.apache.jena.sparql.algebra.Algebra;
+import org.apache.jena.sparql.algebra.Op;
+import org.apache.jena.sparql.algebra.OpAsQuery;
+import org.apache.jena.sparql.algebra.op.OpBGP;
+import org.apache.jena.sparql.algebra.op.OpDistinct;
+import org.apache.jena.sparql.algebra.op.OpFilter;
+import org.apache.jena.sparql.algebra.op.OpPath;
+import org.apache.jena.sparql.algebra.op.OpProject;
+import org.apache.jena.sparql.algebra.op.OpUnion;
+import org.apache.jena.sparql.core.BasicPattern;
+import org.apache.jena.sparql.core.TriplePath;
+import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.engine.binding.Binding;
+import org.apache.jena.sparql.engine.binding.BindingFactory;
+import org.apache.jena.sparql.expr.E_LogicalOr;
+import org.apache.jena.sparql.expr.E_StrContains;
+import org.apache.jena.sparql.expr.E_StrLowerCase;
+import org.apache.jena.sparql.expr.Expr;
+import org.apache.jena.sparql.expr.ExprList;
+import org.apache.jena.sparql.expr.ExprVar;
+import org.apache.jena.sparql.expr.nodevalue.NodeValueBoolean;
+import org.apache.jena.sparql.expr.nodevalue.NodeValueString;
+import org.apache.jena.sparql.path.P_Alt;
+import org.apache.jena.sparql.path.P_Link;
+import org.apache.jena.sparql.path.P_NegPropSet;
+import org.apache.jena.sparql.path.P_Seq;
+import org.apache.jena.sparql.path.P_ZeroOrOne;
+import org.apache.jena.sparql.path.Path;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+import com.github.jsonldjava.core.JsonLdError;
+
 import akka.actor.ActorRef;
 import akka.actor.OneForOneStrategy;
 import akka.actor.SupervisorStrategy;
@@ -9,28 +78,6 @@ import akka.cluster.pubsub.DistributedPubSubMediator;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.japi.Function;
-import com.github.jsonldjava.core.JsonLdError;
-import org.apache.jena.graph.Node;
-import org.apache.jena.graph.NodeFactory;
-import org.apache.jena.graph.Triple;
-import org.apache.jena.query.*;
-import org.apache.jena.rdf.model.*;
-import org.apache.jena.sparql.algebra.Algebra;
-import org.apache.jena.sparql.algebra.Op;
-import org.apache.jena.sparql.algebra.OpAsQuery;
-import org.apache.jena.sparql.algebra.op.*;
-import org.apache.jena.sparql.core.BasicPattern;
-import org.apache.jena.sparql.core.TriplePath;
-import org.apache.jena.sparql.core.Var;
-import org.apache.jena.sparql.core.VarExprList;
-import org.apache.jena.sparql.expr.*;
-import org.apache.jena.sparql.expr.nodevalue.NodeValueBoolean;
-import org.apache.jena.sparql.expr.nodevalue.NodeValueNode;
-import org.apache.jena.sparql.expr.nodevalue.NodeValueString;
-import org.apache.jena.sparql.path.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 import scala.concurrent.duration.Duration;
 import won.matcher.service.common.event.BulkHintEvent;
 import won.matcher.service.common.event.BulkNeedEvent;
@@ -39,14 +86,6 @@ import won.matcher.service.common.event.NeedEvent;
 import won.matcher.sparql.config.SparqlMatcherConfig;
 import won.protocol.util.NeedModelWrapper;
 import won.protocol.util.linkeddata.LinkedDataSource;
-
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 /**
  * Siren/Solr based abstract matcher with all implementations for querying as
@@ -193,18 +232,8 @@ public class SparqlMatcherActor extends UntypedActor {
 
         Set<NeedModelWrapper> matches = queryNeed(need);
 
-        Map<NeedModelWrapper, Set<NeedModelWrapper>> filteredNeeds = Stream.concat(
-                Stream.of(new AbstractMap.SimpleEntry<>(need, matches)),
-                matches.stream().map(matchedNeed -> {
-                    boolean noHintForCounterpart = need.hasFlag(ResourceFactory.createResource("http://purl.org/webofneeds/model#NoHintForCounterpart"));
-                    boolean noHintForMe = matchedNeed.hasFlag(ResourceFactory.createResource("http://purl.org/webofneeds/model#NoHintForMe"));
-                    if (!noHintForCounterpart && !noHintForMe && !need.getNeedUri().equals(matchedNeed.getNeedUri())) {
-                        Set<NeedModelWrapper> matchedNeedMatches = queryNeed(matchedNeed);
-                        return new AbstractMap.SimpleEntry<>(matchedNeed, matchedNeedMatches);
-                    } else {
-                        return new AbstractMap.SimpleEntry<>(matchedNeed, new HashSet<NeedModelWrapper>());
-                    }
-                }))
+        Map<NeedModelWrapper, Set<NeedModelWrapper>> filteredNeeds = 
+                Stream.of(new AbstractMap.SimpleEntry<>(need, matches))
                 .map(entry -> {
                     Set<NeedModelWrapper> filteredMatches = entry.getValue().stream().filter(f -> postFilter(entry.getKey(), f)).collect(Collectors.toSet());
                     return new AbstractMap.SimpleEntry<>(entry.getKey(), filteredMatches);
@@ -217,7 +246,7 @@ public class SparqlMatcherActor extends UntypedActor {
                 bulkHintEvent.addHintEvent(new HintEvent(hintTarget.getWonNodeUri(), hintTarget.getNeedUri(), hint.getWonNodeUri(), hint.getNeedUri(), config.getMatcherUri(), 1));
             });
         });
-
+        
         pubSubMediator.tell(new DistributedPubSubMediator.Publish(bulkHintEvent.getClass().getName(), bulkHintEvent), getSelf());
     }
 
@@ -276,6 +305,17 @@ public class SparqlMatcherActor extends UntypedActor {
     }
 
     private Set<NeedModelWrapper> queryNeed(NeedModelWrapper need) {
+      return queryNeed(need, Optional.empty());
+    }
+    
+    /**
+     * Query for matches to the need, optionally restricting the result to one need URI. The latter is 
+     * used in order to check if a match A->B also matches B->A. 
+     * @param need
+     * @param needUriToMatch
+     * @return
+     */
+    private Set<NeedModelWrapper> queryNeed(NeedModelWrapper need, Optional<String> needUriToMatch) {
         Model model = need.getNeedModel();
         String needURI = need.getNeedUri();
 
@@ -288,10 +328,23 @@ public class SparqlMatcherActor extends UntypedActor {
         } else {
             query = defaultQuery(need);
         }
-
+        
         Set<NeedModelWrapper> needs = query.map(q -> {
-
-            QueryExecution execution = QueryExecutionFactory.sparqlService(config.getSparqlEndpoint(), OpAsQuery.asQuery(q));
+            Query compiledQuery = OpAsQuery.asQuery(q);
+            
+            // if we were given a needUriToMatch, restrict the query result to that uri so that 
+            // we get exactly one result if that uri is found for the need
+            if (needUriToMatch.isPresent()) {
+              Binding binding = BindingFactory.binding(resultName, new ResourceImpl(needUriToMatch.get()).asNode());
+              compiledQuery.setValuesDataBlock(Collections.singletonList(resultName),  Collections.singletonList(binding));
+            }
+            // fetch more than the number of results we want to report 
+            // because we will do post-filtering, and we want to have some leeway for that.
+            // not limiting the query, however, is much more costly, so we use a  
+            // multiple of the final limit
+            compiledQuery.setLimit(config.getLimitResults() * 2);
+                
+            QueryExecution execution = QueryExecutionFactory.sparqlService(config.getSparqlEndpoint(), compiledQuery);
 
             ResultSet result = execution.execSelect();
 
@@ -332,28 +385,33 @@ public class SparqlMatcherActor extends UntypedActor {
 
     }
 
-    private static boolean postFilter(NeedModelWrapper need, NeedModelWrapper foundNeed) {
-        if (need.getNeedUri().equals(foundNeed.getNeedUri())) {
-            return false;
+    private boolean postFilter(NeedModelWrapper need, NeedModelWrapper foundNeed) {
+        try {
+          if (need.getNeedUri().equals(foundNeed.getNeedUri())) {
+              return false;
+          }
+          if (need.hasFlag(ResourceFactory.createResource("http://purl.org/webofneeds/model#NoHintForMe"))) {
+              return false;
+          }
+          if (foundNeed.hasFlag(ResourceFactory.createResource("http://purl.org/webofneeds/model#NoHintForCounterpart"))) {
+              return false;
+          }
+  
+          Set<String> needContexts = getMatchingContexts(need);
+          if (!needContexts.isEmpty()) {
+              Set<String> foundNeedContexts = getMatchingContexts(foundNeed);
+              foundNeedContexts.retainAll(needContexts);
+              if (foundNeedContexts.isEmpty()) {
+                  return false;
+              }
+          }
+  
+          //TODO add back time matching
+          return true;
+        } catch (Exception e) {
+          log.info("caught Exception during post-filtering, ignoring match", e);
         }
-        if (need.hasFlag(ResourceFactory.createResource("http://purl.org/webofneeds/model#NoHintForMe"))) {
-            return false;
-        }
-        if (foundNeed.hasFlag(ResourceFactory.createResource("http://purl.org/webofneeds/model#NoHintForCounterpart"))) {
-            return false;
-        }
-
-        Set<String> needContexts = getMatchingContexts(need);
-        if (!needContexts.isEmpty()) {
-            Set<String> foundNeedContexts = getMatchingContexts(foundNeed);
-            foundNeedContexts.retainAll(needContexts);
-            if (foundNeedContexts.isEmpty()) {
-                return false;
-            }
-        }
-
-        //TODO add back time matching
-        return true;
+        return false;
     }
 
     @Override
