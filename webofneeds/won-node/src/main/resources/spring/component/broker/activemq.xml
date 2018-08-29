@@ -76,6 +76,16 @@
                   </pendingQueuePolicy>
 
                 </policyEntry>
+                <policyEntry queue=">">
+					         <!-- 
+					           Tell the dead letter strategy not to process expired messages
+					           so that they will just be discarded instead of being sent to
+					           the DLQ 
+					         -->
+					         <deadLetterStrategy>
+					           <sharedDeadLetterStrategy processExpired="false" />
+					         </deadLetterStrategy>
+					       </policyEntry>
               </policyEntries>
             </policyMap>
         </destinationPolicy>
@@ -130,13 +140,13 @@
             <systemUsage sendFailIfNoSpaceAfterTimeout="3000">
                 <memoryUsage>
                     <!-- overall memory for messages on all queues/topics -->
-                    <memoryUsage limit="64 mb"/>
+                    <memoryUsage limit="20 mb"/>
                 </memoryUsage>
                 <storeUsage>
-                    <storeUsage limit="20 gb"/>
+                    <storeUsage limit="200 mb"/>
                 </storeUsage>
                 <tempUsage>
-                    <tempUsage limit="1 gb"/>
+                    <tempUsage limit="100 mb"/>
                 </tempUsage>
             </systemUsage>
         </systemUsage>
@@ -158,12 +168,12 @@
                                 uri="${uri.protocol.activemq}?maximumConnections=1000&amp;wireformat.maxFrameSize=104857600&amp;needClientAuth=true&amp;trace=true" /-->
 
             <transportConnector name="${activemq.broker.scheme}"
-                                uri="${activemq.broker.scheme}://0.0.0.0:${activemq.broker.port}?maximumConnections=1000&amp;wireformat.maxFrameSize=104857600&amp;needClientAuth=true&amp;jms.useAsyncSend=true" />
+                                uri="${activemq.broker.scheme}://0.0.0.0:${activemq.broker.port}?maximumConnections=1000&amp;wireformat.maxFrameSize=104857600&amp;needClientAuth=true&amp;jms.useAsyncSend=true&amp;transport.useInactivityMonitor=false&amp;wireFormat.maxInactivityDuration=0&amp;maximumRedeliveries=0" />
 
             <!--transportConnector name="ssl"
                                 uri="${uri.protocol.activemq}?maximumConnections=1000&amp;wireformat.maxFrameSize=104857600&amp;needClientAuth=true&amp;transport.enabledProtocols=TLSv1.2" /-->
             <!-- &amp;transport.enabledProtocols=TLSv1.2-->
-            <transportConnector name="vm" uri="vm://localhost?marshal=false&amp;broker.persistent=false&amp;jms.useAsyncSend=true" />
+            <transportConnector name="vm" uri="vm://localhost?marshal=false&amp;broker.persistent=false&amp;jms.useAsyncSend=true&amp;wireFormat.maxInactivityDuration=0&amp;transport.useInactivityMonitor=false&amp;maximumRedeliveries=0" />
 
         </transportConnectors>
         <sslContext>
