@@ -76,7 +76,7 @@ function genComponentConf() {
             ng-click="self.showAvailableUseCases()"
             ng-if="!self.useCase"
             ng-class="{
-              'selected': self.isSelected,
+              'selected': !!self.useCaseGroup,
               'cpi__item--withcolspan': !self.evenUseCaseListSize,
             }">
             <svg class="cpi__item__icon"
@@ -116,7 +116,7 @@ function genComponentConf() {
           listUseCases,
           evenUseCaseListSize:
             listUseCases && Object.keys(listUseCases).length % 2 == 0,
-          isSelected: useCaseGroup && useCaseGroup === "all",
+          useCaseGroup,
           useCase: useCaseString && this.getUseCase(useCaseString),
         };
       };
