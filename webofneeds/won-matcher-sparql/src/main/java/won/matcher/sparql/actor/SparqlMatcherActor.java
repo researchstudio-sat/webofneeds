@@ -330,42 +330,48 @@ public class SparqlMatcherActor extends UntypedActor {
         }
         
         Set<NeedModelWrapper> needs = query.map(q -> {
-            Query compiledQuery = OpAsQuery.asQuery(q);
-            
-            // if we were given a needUriToMatch, restrict the query result to that uri so that 
-            // we get exactly one result if that uri is found for the need
-            if (needUriToMatch.isPresent()) {
-              Binding binding = BindingFactory.binding(resultName, new ResourceImpl(needUriToMatch.get()).asNode());
-              compiledQuery.setValuesDataBlock(Collections.singletonList(resultName),  Collections.singletonList(binding));
+            try {
+              Query compiledQuery = OpAsQuery.asQuery(q);
+              
+              // if we were given a needUriToMatch, restrict the query result to that uri so that 
+              // we get exactly one result if that uri is found for the need
+              if (needUriToMatch.isPresent()) {
+                Binding binding = BindingFactory.binding(resultName, new ResourceImpl(needUriToMatch.get()).asNode());
+                compiledQuery.setValuesDataBlock(Collections.singletonList(resultName),  Collections.singletonList(binding));
+              }
+              // fetch more than the number of results we want to report 
+              // because we will do post-filtering, and we want to have some leeway for that.
+              // not limiting the query, however, is much more costly, so we use a  
+              // multiple of the final limit
+              compiledQuery.setLimit(config.getLimitResults() * 2);
+                  
+              QueryExecution execution = QueryExecutionFactory.sparqlService(config.getSparqlEndpoint(), compiledQuery);
+  
+              ResultSet result = execution.execSelect();
+  
+              Stream<QuerySolution> stream = StreamSupport.stream(
+                      Spliterators.spliteratorUnknownSize(result, Spliterator.CONCURRENT),
+                      false);
+  
+              Set<NeedModelWrapper> matchedNeeds = stream
+                      .map(querySolution -> {
+                          String foundNeedURI = querySolution.get(resultName.getName()).toString();
+                          try {
+                              return new NeedModelWrapper(linkedDataSource.getDataForResource(new URI(foundNeedURI)));
+                          } catch (Exception e) {
+                              e.printStackTrace();
+                              return null;
+                          }
+                      })
+                      .filter(foundNeed -> foundNeed != null)
+                      .collect(Collectors.toSet());
+  
+              return matchedNeeds;
+            } catch (Exception e) {
+              log.info("caught exception during sparql-based matching (more info on loglevel 'debug'): {} ", e.getMessage());
+              log.debug("full exception:", e);
+              return Collections.EMPTY_SET;
             }
-            // fetch more than the number of results we want to report 
-            // because we will do post-filtering, and we want to have some leeway for that.
-            // not limiting the query, however, is much more costly, so we use a  
-            // multiple of the final limit
-            compiledQuery.setLimit(config.getLimitResults() * 2);
-                
-            QueryExecution execution = QueryExecutionFactory.sparqlService(config.getSparqlEndpoint(), compiledQuery);
-
-            ResultSet result = execution.execSelect();
-
-            Stream<QuerySolution> stream = StreamSupport.stream(
-                    Spliterators.spliteratorUnknownSize(result, Spliterator.CONCURRENT),
-                    false);
-
-            Set<NeedModelWrapper> matchedNeeds = stream
-                    .map(querySolution -> {
-                        String foundNeedURI = querySolution.get(resultName.getName()).toString();
-                        try {
-                            return new NeedModelWrapper(linkedDataSource.getDataForResource(new URI(foundNeedURI)));
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            return null;
-                        }
-                    })
-                    .filter(foundNeed -> foundNeed != null)
-                    .collect(Collectors.toSet());
-
-            return matchedNeeds;
         })
                 .orElse(new HashSet<>());
 
