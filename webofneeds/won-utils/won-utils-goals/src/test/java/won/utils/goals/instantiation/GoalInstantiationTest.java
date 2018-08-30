@@ -189,6 +189,35 @@ public class GoalInstantiationTest {
     }
 
     @Test
+    public void exampleCorrectTaxi_validity() throws IOException {
+        Dataset taxiOffer = loadDataset(baseFolder + "exCorrect_taxioffer.trig");
+        Dataset taxiDemand = loadDataset(baseFolder + "exCorrect_taxi.trig");
+
+        GoalInstantiationProducer goalInstantiation = new GoalInstantiationProducer(taxiOffer, taxiDemand, null, "http://example.org/", "http://example.org/blended/");
+        Collection<GoalInstantiationResult> results = goalInstantiation.createGoalInstantiationResultsForNeed1();
+
+        for(GoalInstantiationResult res : results) {
+            System.out.println("Result::::::::::::::::::::::::::::::"+res.isConform());
+            System.out.println(res.toString());
+            if(res.isConform()) {
+                Coordinate departureAddress = getAddress(loadSparqlQuery("/won/utils/goals/extraction/address/fromLocationQuery.rq"), res.getInstanceModel());
+                Coordinate destinationAddress = getAddress(loadSparqlQuery("/won/utils/goals/extraction/address/toLocationQuery.rq"), res.getInstanceModel());
+
+                //Assert.assertEquals(departureAddress, new Coordinate(10.0f, 11.0f));
+                //Assert.assertEquals(destinationAddress, new Coordinate(12.0f, 13.0f));
+            }
+        }
+
+        NeedModelWrapper needWrapper1 = new NeedModelWrapper(taxiOffer);
+        Resource goal = needWrapper1.getGoals().iterator().next();
+        GoalInstantiationResult result = goalInstantiation.findInstantiationForGoal(goal);
+        Assert.assertTrue(result.isConform());
+
+        GoalInstantiationResult recheckResultModel = GoalInstantiationProducer.findInstantiationForGoalInDataset(taxiOffer, goal, result.getInstanceModel());
+        Assert.assertTrue(recheckResultModel.isConform());
+    }
+
+    @Test
     public void exampleTaxi_validity() throws IOException {
         Dataset taxiOffer = loadDataset(baseFolder + "ex6_taxioffer.trig");
         Dataset taxiDemand = loadDataset(baseFolder + "ex6_taxi.trig");

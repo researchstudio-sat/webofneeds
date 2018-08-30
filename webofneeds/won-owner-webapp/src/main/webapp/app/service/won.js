@@ -1737,7 +1737,7 @@ won.MessageBuilder = function MessageBuilder(messageType, content) {
   } else {
     this.data = {
       "@graph": [],
-      "@context": won.clone(won.minimalContext),
+      "@context": won.clone(won.defaultContext),
     };
   }
   this.messageGraph = null;
