@@ -87,6 +87,18 @@ public class OwnerProtocolCommunicationServiceImpl implements OwnerProtocolCommu
     this.registrationClient = registrationClient;
   }
 
+  public synchronized boolean isRegisteredWithWonNode(URI wonNodeURI) {
+      try {
+          String ownerApplicationId = calculateOwnerApplicationIdFromOwnerCertificate();
+          logger.debug("using ownerApplicationId: {}", ownerApplicationId );
+          WonNode wonNode = wonNodeRepository.findOneByWonNodeURIAndOwnerApplicationID(wonNodeURI, ownerApplicationId);
+          return ownerProtocolCamelConfigurator.getCamelContext().getComponent(wonNode.getBrokerComponent()) != null;
+      } catch (Exception e) {
+          logger.info("error while checking if we are registered with WoN node " + wonNodeURI, e);
+      }
+      return false;
+  }
+  
   /**
    * Registers the owner application at a won node. Owner Id is typically his Key ID (lower 64 bits of the owner public
    * key fingerprint). Unless there is a collision of owner ids on the node - then the owner can assign another id...
