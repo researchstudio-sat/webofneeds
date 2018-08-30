@@ -489,6 +489,83 @@ export const details = {
       return undefined;
     },
   },
+  instrument: {
+    identifier: "instrument",
+    label: "Instrument",
+    icon: "#ico36_detail_instrument",
+    placeholder: undefined,
+    component: "won-instrument-picker",
+    viewerComponent: "won-instrument-viewer",
+    parseToRDF: function({ value }) {
+      if (!value) {
+        return { "s:instrument": undefined };
+      }
+      return {
+        /* "foaf:name": getIn(value, ["name"])
+          ? getIn(value, ["name"])
+          : undefined,*/
+        "s:instrument": getIn(value, ["instrument"])
+          ? getIn(value, ["instrument"])
+          : undefined,
+        "s:genre": getIn(value, ["genre"])
+          ? getIn(value, ["genre"])
+          : undefined,
+      };
+    },
+    parseFromRDF: function(jsonLDImm) {
+      if (!jsonLDImm) return undefined;
+
+      let musician = {
+        //name: undefined,
+        instrument: undefined,
+        genre: undefined,
+      };
+
+      //musician.name = jsonLDImm.get("foaf:name");
+      musician.instrument = jsonLDImm.get("s:instrument");
+      musician.genre = jsonLDImm.get("s:genre");
+
+      // only use when instrument is there
+      if (musician.instrument) {
+        return Immutable.fromJS(musician);
+      }
+      return undefined;
+    },
+    generateHumanReadable: function({ value, includeLabel }) {
+      //const name = getIn(value, ["name"]);
+      const instrument = getIn(value, ["instrument"]);
+      const genre = getIn(value, ["genre"]);
+      let humanReadable;
+      /*if (name) {
+        if (humanReadable) {
+          humanReadable += name + " ";
+        } else {
+          humanReadable = name + " ";
+        }
+      }*/
+      if (instrument) {
+        if (humanReadable) {
+          humanReadable += "plays " + instrument;
+        } else {
+          humanReadable = instrument;
+        }
+      }
+      if (genre) {
+        if (humanReadable) {
+          humanReadable += "; Genre: " + genre;
+        } else {
+          humanReadable = genre;
+        }
+      }
+
+      if (humanReadable) {
+        return includeLabel
+          ? this.label + ": " + humanReadable.trim()
+          : humanReadable.trim();
+      }
+      return undefined;
+    },
+  },
   travelAction: {
     identifier: "travelAction",
     label: "Route (From - To)",

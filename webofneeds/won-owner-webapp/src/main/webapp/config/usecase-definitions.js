@@ -1263,6 +1263,132 @@ const mobilityUseCases = {
   },
 };
 
+/**
+ * band musician use cases
+ */
+const instrumentDetail = {
+  ...details.tags,
+  identifier: "instruments",
+  label: "Instruments",
+  icon: "#ico36_detail_instrument",
+  placeholder: "e.g. Guitar, Vocals",
+  parseToRDF: function({ value }) {
+    if (!value) {
+      return { "won:instruments": undefined };
+    }
+    return { "won:instruments": value };
+  },
+  parseFromRDF: function(jsonLDImm) {
+    const instruments = jsonLDImm && jsonLDImm.get("won:instruments");
+    if (!instruments) {
+      return undefined;
+    } else if (is("String", instruments)) {
+      return Immutable.fromJS([instruments]);
+    } else if (is("Array", instruments)) {
+      return Immutable.fromJS(instruments);
+    } else if (Immutable.List.isList(instruments)) {
+      return instruments; // id; it is already in the format we want
+    } else {
+      console.error(
+        "Found unexpected format of instruments (should be Array, " +
+          "Immutable.List, or a single tag as string): " +
+          JSON.stringify(instruments)
+      );
+      return undefined;
+    }
+  },
+};
+
+const genresDetail = {
+  ...details.tags,
+  identifier: "genres",
+  label: "Genres",
+  icon: "#ico36_detail_genre",
+  placeholder: "e.g. Rock, Pop",
+  parseToRDF: function({ value }) {
+    if (!value) {
+      return { "won:genres": undefined };
+    }
+    return { "won:genres": value };
+  },
+  parseFromRDF: function(jsonLDImm) {
+    const genres = jsonLDImm && jsonLDImm.get("won:genres");
+    if (!genres) {
+      return undefined;
+    } else if (is("String", genres)) {
+      return Immutable.fromJS([genres]);
+    } else if (is("Array", genres)) {
+      return Immutable.fromJS(genres);
+    } else if (Immutable.List.isList(genres)) {
+      return genres; // id; it is already in the format we want
+    } else {
+      console.error(
+        "Found unexpected format of genres (should be Array, " +
+          "Immutable.List, or a single tag as string): " +
+          JSON.stringify(genres)
+      );
+      return undefined;
+    }
+  },
+};
+
+const musicianUseCases = {
+  findBand: {
+    identifier: "findBand",
+    label: "Find Band",
+    icon: "#ico36_uc_find_band",
+    doNotMatchAfter: findLatestIntervallEndInJsonLd,
+    draft: {
+      ...emptyDraft,
+      is: {
+        title: "I'm looking for a band!",
+        tags: ["musician", "band"],
+      },
+      searchString: "band",
+    },
+    isDetails: {
+      title: { ...details.title },
+      description: { ...details.description },
+      instrument: {
+        ...instrumentDetail,
+        //mandatory: true,
+      },
+    },
+    seeksDetails: {
+      description: { ...details.description },
+      genres: { ...genresDetail },
+      location: { ...details.location },
+    },
+  },
+  findMusician: {
+    identifier: "findMusician",
+    label: "Find Musician",
+    icon: "#ico36_uc_find_musician",
+    doNotMatchAfter: findLatestIntervallEndInJsonLd,
+    draft: {
+      ...emptyDraft,
+      is: {
+        title: "Looking for a Musician!",
+        tags: ["band", "musician"],
+      },
+      searchString: "musician",
+    },
+    isDetails: {
+      title: { ...details.title },
+      description: { ...details.description },
+      genres: { ...genresDetail },
+      location: { ...details.location },
+    },
+    seeksDetails: {
+      description: { ...details.description },
+      instrument: {
+        ...instrumentDetail,
+        //mandatory: true,
+      },
+    },
+  },
+};
+
 export const useCases = {
   ...complainUseCases,
   ...socialUseCases,
@@ -1271,6 +1397,7 @@ export const useCases = {
   ...transportUseCases,
   ...mobilityUseCases,
   ...allDetailsUseCase,
+  ...musicianUseCases,
 };
 
 export const useCaseGroups = {
@@ -1297,6 +1424,12 @@ export const useCaseGroups = {
     label: "Real Estate",
     icon: undefined,
     useCases: { ...realEstateUseCases },
+  },
+  musician: {
+    identifier: "musiciangroup",
+    label: "Musician",
+    icon: undefined,
+    useCases: { ...musicianUseCases },
   },
   social: {
     identifier: "socialgroup",
