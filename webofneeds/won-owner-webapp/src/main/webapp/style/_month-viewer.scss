@@ -1,6 +1,0 @@
-@import "won-config";
-@import "sizing-utils";
-
-won-month-viewer {
-  @include won-detail-viewer("monthv");
-}
