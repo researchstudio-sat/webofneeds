@@ -169,12 +169,12 @@ function genTopnavConf() {
 
       const selectFromState = state => {
         const currentRoute = getIn(state, ["router", "currentState", "name"]);
-        const showUseCases = getIn(state, [
-          "router",
-          "currentParams",
-          "showUseCases",
-        ]);
         const useCase = getIn(state, ["router", "currentParams", "useCase"]);
+        const useCaseGroup = getIn(state, [
+          "route",
+          "currentParams",
+          "useCaseGroup",
+        ]);
         const selectedPostUri = decodeURIComponent(
           getIn(state, ["router", "currentParams", "postUri"])
         );
@@ -204,7 +204,7 @@ function genTopnavConf() {
           email: state.getIn(["user", "email"]),
           isPrivateIdUser: !!privateId,
           connectionOrPostDetailOpen:
-            selectedConnection || selectedPost || showUseCases || useCase,
+            selectedConnection || selectedPost || useCase || useCaseGroup,
           toastsArray: state.getIn(["toasts"]).toArray(),
           connectionHasBeenLost: state.getIn(["messages", "lostConnection"]), // name chosen to avoid name-clash with the action-creator
           reconnecting: state.getIn(["messages", "reconnecting"]),

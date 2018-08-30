@@ -37,7 +37,7 @@ import {
 const serviceDependencies = ["$ngRedux", "$scope"];
 function genComponentConf() {
   let template = `
-        <won-create-post-item ng-class="{'selected' : self.showUseCases || !!self.useCase}"></won-create-post-item>
+        <won-create-post-item ng-class="{'selected' : !!self.useCaseGroup || !!self.useCase}"></won-create-post-item>
         <div ng-repeat="need in self.beingCreatedNeeds" class="co__item">
             <!-- ng-if="self.beingCreatedNeeds.size > 0" -->
             <div class="co__item__need" ng-class="{'selected' : need.get('uri') === self.needUriInRoute}">
@@ -219,8 +219,8 @@ function genComponentConf() {
         );
 
         const routerParams = selectRouterParams(state);
-        const showUseCases = get(routerParams, "showUseCases");
         const useCase = get(routerParams, "useCase");
+        const useCaseGroup = get(routerParams, "useCaseGroup");
         const connUriInRoute = selectOpenConnectionUri(state);
         const needUriInRoute = selectOpenPostUri(state);
         const needImpliedInRoute =
@@ -236,8 +236,8 @@ function genComponentConf() {
         return {
           allNeeds,
           showClosedNeeds: state.get("showClosedNeeds"),
-          showUseCases,
           useCase,
+          useCaseGroup,
           needUriInRoute,
           needUriImpliedInRoute,
           beingCreatedNeeds: beingCreatedNeeds && beingCreatedNeeds.toArray(),
@@ -298,6 +298,7 @@ function genComponentConf() {
         if (this.isOpenByConnection(ownNeedUri)) {
           this.router__stateGoCurrent({
             useCase: undefined,
+            useCaseGroup: undefined,
             connectionUri: undefined,
           });
         }

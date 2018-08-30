@@ -1,41 +1,35 @@
 @import "won-config";
-@import "animate";
 @import "sizing-utils";
 
-won-usecase-picker {
+won-usecase-group {
   display: grid;
-  grid-template-areas: "header" "create_x" "main";
-  grid-template-rows: min-content auto minmax($minimalGridRows, 1fr);
-  grid-row-gap: $gridRowGap;
+  grid-template-areas: "header" "main";
+  grid-template-rows: min-content minmax($minimalGridRows, 1fr);
+  grid-gap: $gridRowGap;
   width: 100%;
   max-width: $maxContentWidth;
   height: 100%;
   box-sizing: border-box;
   padding: $gridRowGap;
 
-  /*
-  &.create-post-mobile {
-    grid-template-rows: min-content minmax($mobileGridRows, 1fr) min-content;
-  }*/
-
   & .clickable,
   & button {
     transform: translate3d(0, 0, 0);
   }
 
-  .ucp__header {
+  .ucg__header {
+    padding-bottom: 0.5rem;
+    border-bottom: $thinGrayBorder;
+
     grid-area: header;
     display: grid;
-    grid-template-columns: auto 1fr;
-    grid-template-areas: "header_back header_title";
+    grid-template-columns: auto auto 1fr;
+    grid-template-areas: "header_back header_icon header_title";
     grid-gap: $gridRowGap;
     font-size: $normalFontSize;
     text-align: left;
     min-width: 0;
     align-items: center;
-
-    padding-bottom: 0.5rem;
-    border-bottom: $thinGrayBorder;
 
     // so it doesn't interset with the speech-bubble tail coming in from the left on the desktop version
     padding-left: 0.5rem;
@@ -50,45 +44,22 @@ won-usecase-picker {
       font-weight: 400;
     }
 
+    &__icon {
+      grid-area: header_icon;
+      @include fixed-square($postIconSize);
+    }
+
     &__back {
       grid-area: header_back;
       &__icon {
-        /*@media (max-width: $responsivenessBreakPoint) {
-          @include fixed-square(2.5rem);
-        }*/
         @include fixed-square($backIconSize);
       }
     }
   }
 
-  .ucp__createx {
-    grid-area: create_x;
-    display: grid;
-    grid-gap: $gridRowGap;
-    grid-auto-rows: min-content;
-    grid-template-columns: 1fr 1fr;
-
+  .ucg__main {
     padding-top: 0.5rem;
 
-    overflow: auto;
-
-    &__button,
-    &__button--pending {
-      white-space: normal;
-    }
-
-    &__button--pending {
-      grid-column: 1 / -1;
-      align-self: center;
-      justify-self: center;
-    }
-
-    &__labelledhr {
-      grid-column: 1 / -1;
-    }
-  }
-
-  .ucp__main {
     grid-area: main;
     display: grid;
     grid-auto-rows: min-content;
@@ -97,12 +68,7 @@ won-usecase-picker {
     grid-gap: $gridRowGap;
     overflow: auto;
 
-    &__labelledhr,
-    &__search {
-      grid-column: 1/-1;
-    }
-
-    &__usecase-group {
+    &__usecase {
       display: flex;
       align-items: center;
       flex-direction: column;
@@ -110,19 +76,19 @@ won-usecase-picker {
       padding: 0.5rem;
       border-radius: 0.19rem;
       background: $won-secondary-color-light;
-      min-height: $iconSize + $normalFontSize + 0.5rem; // icon + label + 0.5rem padding
-
-      &:hover {
-        filter: brightness(85%);
-      }
 
       &__icon {
         @include fixed-square($iconSize);
         --local-primary: #{$won-secondary-text-color};
       }
+
       &__label {
         color: $won-secondary-text-color;
         text-align: center;
+      }
+
+      &:hover {
+        filter: brightness(85%);
       }
     }
   }
