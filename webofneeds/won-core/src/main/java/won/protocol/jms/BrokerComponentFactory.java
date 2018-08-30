@@ -32,6 +32,8 @@ import javax.net.ssl.TrustManager;
 import java.net.URI;
 
 /**
+ * Adds a camel component that is used to contact a remote ActiveMQ broker and configures its connectionFactory
+ * using the {@link WonJmsConfiguration}.
  * User: LEIH-NB
  * Date: 28.01.14
  */
@@ -40,7 +42,7 @@ public class BrokerComponentFactory {
 
     private synchronized Component getBrokerComponent(URI brokerURI, MessagingType type) {
         //TODO: make this configurable for different broker implementations.
-        logger.info("establishing activemq connection for brokerUri {}", brokerURI);
+        logger.info("establishing activemq connection for brokerUri {} (with specified type)", brokerURI);
         ActiveMQConnectionFactory activeMQConnectionFactory = new ActiveMQConnectionFactory(brokerURI + "?jms.prefetchPolicy.all=50");
         return getBrokerComponent(type, activeMQConnectionFactory);
 
@@ -49,7 +51,7 @@ public class BrokerComponentFactory {
     private synchronized Component getBrokerComponent(URI brokerURI, MessagingType type, KeyManager keyManager,
                                                       TrustManager trustManager) {
         //TODO: make this configurable for different broker implementations.
-        logger.info("establishing activemq ssl connection for brokerUri {}", brokerURI);
+        logger.info("establishing activemq ssl connection for brokerUri {} (with specified type, keyManager, and TrustManager)", brokerURI);
         // jms.prefetchPolicy parameter is added to prevent matcher-consumer death due to overflowing with messages,
         // see http://activemq.apache.org/what-is-the-prefetch-limit-for.html
         ActiveMQSslConnectionFactory activeMQConnectionFactory = new ActiveMQSslConnectionFactory(brokerURI + "?jms.prefetchPolicy.all=50");

@@ -18,6 +18,8 @@ package won.node.camel.route;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * User: LEIH-NB
@@ -26,7 +28,7 @@ import org.apache.camel.builder.RouteBuilder;
 
 public class NeedProtocolDynamicRoutes extends RouteBuilder
 {
-
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private String from;
 
@@ -37,6 +39,7 @@ public class NeedProtocolDynamicRoutes extends RouteBuilder
     }
     @Override
     public void configure() throws Exception {
+        logger.info("adding dynamic route from({}) to the recipient found in the header 'remoteBrokerEndpoint'", from);
         from(from).routeId(from)
                 .recipientList(header("remoteBrokerEndpoint"));
     }
