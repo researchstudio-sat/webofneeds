@@ -12,6 +12,7 @@ import {
   findAllFieldOccurancesRecursively,
   is,
   endOfDateStrInterval,
+  getFromJsonLd,
 } from "./utils.js";
 
 import { ownerBaseUrl } from "config";
@@ -23,6 +24,8 @@ window.jsonld4dbg = jsonld;
 
 import Immutable from "immutable";
 import { get, parseDatetimeStrictly, isValidDate } from "./utils.js";
+
+import won from "./won-es6.js";
 
 export function initLeaflet(mapMount) {
   if (!L) {
@@ -396,6 +399,13 @@ export function parseJsonldLeafsImm(val, type) {
 }
 
 /**
+ * Parses a json-ld value, in whatever way it's serialized, to a
+ * corresponding javascript-value.
+ *
+ * Will traverse into `s:value` of `s:PropertyValue` and
+ * `s:QuantiativeValue`s. Note that you'll need to pass the
+ * inner type in that case though (e.g. `s:Float` or `s:Text`)
+ *
  * @param {*} val
  *  * already parsed
  *  * `{"@value": "<someval>", "@type": "<sometype>"}`, where `<sometype>` is one of:
@@ -406,12 +416,20 @@ export function parseJsonldLeafsImm(val, type) {
  *    * `xsd:dateTime`
  *    * `s:DateTime`
  *    * `xsd:string`
+ *    * `s:Text`
  *    * `http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon`?, e.g. `"48.225073#16.358398"`
  *  * anything, that _strictly_ parses to a number or date or is a string
  * @param {*} type passing `val` and `type` is equivalent to passing an object with `@value` and `@type`
  *
  */
 export function parseJsonldLeaf(val, type) {
+  const sval = getFromJsonLd(val, "s:value", won.defaultContext);
+  if (sval) {
+    /* in schema.org's `s:PropertyValue`s and `s:QuantitativeValue`s
+     * can be nested. We need to go in a level deeper.
+     */
+    return parseJsonldLeaf(sval, type);
+  }
   const unwrappedVal = get(val, "@value") || val;
   if (unwrappedVal === undefined || unwrappedVal === null) {
     return undefined;
@@ -428,6 +446,7 @@ export function parseJsonldLeaf(val, type) {
   }
   const throwErr = msg => throwParsingError(val, type, msg);
   switch (type_) {
+    case "s:Text":
     case "xsd:string":
       return unwrappedVal + ""; // everything can be parsed to a string in js
 
