@@ -1342,7 +1342,7 @@ const musicianUseCases = {
       ...emptyDraft,
       is: {
         title: "I'm looking for a band!",
-        tags: ["musician", "band"],
+        //tags: ["musician", "band"],
       },
       searchString: "band",
     },
@@ -1369,7 +1369,7 @@ const musicianUseCases = {
       ...emptyDraft,
       is: {
         title: "Looking for a Musician!",
-        tags: ["band", "musician"],
+        //tags: ["band", "musician"],
       },
       searchString: "musician",
     },
@@ -1385,6 +1385,37 @@ const musicianUseCases = {
         ...instrumentDetail,
         //mandatory: true,
       },
+    },
+  },
+  findRehearsalRoom: {
+    identifier: "findRehearsalRoom",
+    label: "Find Rehearsal Room",
+    icon: "#ico36_uc_find_realestate",
+    doNotMatchAfter: findLatestIntervallEndInJsonLd,
+    draft: {
+      ...emptyDraft,
+      is: {
+        title: "Looking for a Rehearsal Room!",
+        //tags: ["band", "musician"],
+      },
+      searchString: "Rehearsal Room",
+    },
+    isDetails: undefined,
+    seeksDetails: this.realEstateUseCases.searchRent.seeksDetails,
+  },
+  offerRehearsalRoom: {
+    identifier: "findRehearsalRoom",
+    label: "Find Rehearsal Room",
+    icon: "#ico36_uc_find_realestate",
+    doNotMatchAfter: findLatestIntervallEndInJsonLd,
+    draft: {
+      ...emptyDraft,
+      is: {
+        title: "Offer a Rehearsal Room!",
+        //tags: ["band", "musician"],
+      },
+      isDetails: this.realEstateUseCases.offerRent.isDetails,
+      seeksDetails: undefined,
     },
   },
 };
