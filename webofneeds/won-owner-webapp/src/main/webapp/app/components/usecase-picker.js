@@ -70,7 +70,7 @@ function genComponentConf() {
         <!-- TODO: SEARCH FIELD -->
         <!-- TODO: SEARCH RESULTS -->
         <!-- USE CASE GROUPS - TODO: only show while not searching --> 
-        <div class="ucp__main__usecase-group"
+        <div class="ucp__main__usecase-group clickable"
           ng-repeat="useCaseGroup in self.useCaseGroups"
           ng-if="self.showUseCaseGroupHeaders && self.displayableUseCaseGroup(useCaseGroup)"
           ng-click="self.startFrom(useCaseGroup)">
