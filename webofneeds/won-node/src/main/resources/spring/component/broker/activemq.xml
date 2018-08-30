@@ -137,7 +137,7 @@
           <systemUsage>
           <!--sendFailIfNoSpace="true" or sendFailIfNoSpaceAfterTimeout results in ResourceAllocationException if no space on
           broker is available, we can react to this exception on Client side, e.g. an owner can connect to another node -->
-            <systemUsage sendFailIfNoSpaceAfterTimeout="3000">
+            <systemUsage sendFailIfNoSpace="true">
                 <memoryUsage>
                     <!-- overall memory for messages on all queues/topics -->
                     <memoryUsage limit="20 mb"/>
