@@ -3,6 +3,7 @@ import Immutable from "immutable";
 import { details, abstractDetails } from "detailDefinitions";
 import { Parser as SparqlParser } from "sparqljs";
 import { findLatestIntervallEndInJsonLd } from "../app/won-utils.js";
+import { reduceObjectByKeys } from "../app/utils";
 import won from "../app/won-es6.js";
 
 export const emptyDraft = {
@@ -1446,14 +1447,6 @@ const musicianUseCases = {
     seeksDetails: undefined,
   },
 };
-
-function reduceObjectByKeys(object, keys) {
-  const obj = object;
-  for (let k of keys) {
-    delete obj[k];
-  }
-  return obj;
-}
 
 export const useCases = {
   ...complainUseCases,
