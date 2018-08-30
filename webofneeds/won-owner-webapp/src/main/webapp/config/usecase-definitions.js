@@ -1266,6 +1266,71 @@ const mobilityUseCases = {
 /**
  * band musician use cases
  */
+const instrumentDetail = {
+  ...details.tags,
+  identifier: "instruments",
+  label: "Instruments",
+  icon: "#ico36_detail_instrument",
+  placeholder: "e.g. Guitar, Vocals",
+  parseToRDF: function({ value }) {
+    if (!value) {
+      return { "s:instruments": undefined };
+    }
+    return { "s:instruments": value };
+  },
+  parseFromRDF: function(jsonLDImm) {
+    const instruments = jsonLDImm && jsonLDImm.get("s:instruments");
+    if (!instruments) {
+      return undefined;
+    } else if (is("String", instruments)) {
+      return Immutable.fromJS([instruments]);
+    } else if (is("Array", instruments)) {
+      return Immutable.fromJS(instruments);
+    } else if (Immutable.List.isList(instruments)) {
+      return instruments; // id; it is already in the format we want
+    } else {
+      console.error(
+        "Found unexpected format of instruments (should be Array, " +
+          "Immutable.List, or a single tag as string): " +
+          JSON.stringify(instruments)
+      );
+      return undefined;
+    }
+  },
+};
+
+const genresDetail = {
+  ...details.tags,
+  identifier: "genres",
+  label: "Genres",
+  icon: "#ico36_detail_instrument",
+  placeholder: "e.g. Rock, Pop",
+  parseToRDF: function({ value }) {
+    if (!value) {
+      return { "s:genres": undefined };
+    }
+    return { "s:genres": value };
+  },
+  parseFromRDF: function(jsonLDImm) {
+    const genres = jsonLDImm && jsonLDImm.get("s:genres");
+    if (!genres) {
+      return undefined;
+    } else if (is("String", genres)) {
+      return Immutable.fromJS([genres]);
+    } else if (is("Array", genres)) {
+      return Immutable.fromJS(genres);
+    } else if (Immutable.List.isList(genres)) {
+      return genres; // id; it is already in the format we want
+    } else {
+      console.error(
+        "Found unexpected format of genres (should be Array, " +
+          "Immutable.List, or a single tag as string): " +
+          JSON.stringify(genres)
+      );
+      return undefined;
+    }
+  },
+};
 
 const musicianUseCases = {
   findBand: {
@@ -1285,8 +1350,8 @@ const musicianUseCases = {
       title: { ...details.title },
       description: { ...details.description },
       location: { ...details.location },
-      instrument: { ...details.instrument },
-      //inerests = genre?
+      instrument: { ...instrumentDetail },
+      genres: { ...genresDetail },
       interests: { ...interestsDetail },
     },
     seeksDetails: {
@@ -1316,8 +1381,8 @@ const musicianUseCases = {
     },
     seeksDetails: {
       description: { ...details.description },
-      instrument: { ...details.instrument },
-      location: { ...details.location },
+      instrument: { ...instrumentDetail },
+      genres: { ...genresDetail },
     },
   },
 };
