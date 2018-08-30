@@ -1390,35 +1390,70 @@ const musicianUseCases = {
   findRehearsalRoom: {
     identifier: "findRehearsalRoom",
     label: "Find Rehearsal Room",
-    icon: "#ico36_uc_find_realestate",
+    icon: "#ico36_uc_realestate",
     doNotMatchAfter: findLatestIntervallEndInJsonLd,
     draft: {
       ...emptyDraft,
       is: {
-        title: "Looking for a Rehearsal Room!",
-        //tags: ["band", "musician"],
+        title: "Looking for Rehearsal Room!",
+        tags: ["SearchRehearsal"],
+      },
+      seeks: {
+        tags: ["OfferRehearsal"],
       },
       searchString: "Rehearsal Room",
     },
     isDetails: undefined,
-    seeksDetails: this.realEstateUseCases.searchRent.seeksDetails,
+    seeksDetails: {
+      ...reduceObjectByKeys(realEstateUseCases.searchRent.seeksDetails, [
+        "numberOfRoomsRange",
+      ]),
+      features: {
+        ...realEstateFeaturesDetail,
+        placeholder: "e.g. PA, Drumkit",
+      },
+      fromDatetime: { ...details.fromDatetime },
+      throughDatetime: { ...details.throughDatetime },
+    },
   },
   offerRehearsalRoom: {
-    identifier: "findRehearsalRoom",
-    label: "Find Rehearsal Room",
-    icon: "#ico36_uc_find_realestate",
+    identifier: "OfferRehearsalRoom",
+    label: "Offer Rehearsal Room",
+    icon: "#ico36_uc_realestate",
     doNotMatchAfter: findLatestIntervallEndInJsonLd,
     draft: {
       ...emptyDraft,
       is: {
-        title: "Offer a Rehearsal Room!",
-        //tags: ["band", "musician"],
+        title: "Offer Rehearsal Room!",
+        tags: ["OfferRehearsal"],
       },
-      isDetails: this.realEstateUseCases.offerRent.isDetails,
-      seeksDetails: undefined,
+      seeks: {
+        tags: ["SearchRehearsal"],
+      },
     },
+    isDetails: {
+      ...reduceObjectByKeys(realEstateUseCases.offerRent.isDetails, [
+        "numberOfRooms",
+      ]),
+      features: {
+        ...realEstateFeaturesDetail,
+        placeholder: "e.g. PA, Drumkit",
+      },
+      fromDatetime: { ...details.fromDatetime },
+      throughDatetime: { ...details.throughDatetime },
+    },
+
+    seeksDetails: undefined,
   },
 };
+
+function reduceObjectByKeys(object, keys) {
+  const obj = object;
+  for (let k of keys) {
+    delete obj[k];
+  }
+  return obj;
+}
 
 export const useCases = {
   ...complainUseCases,
