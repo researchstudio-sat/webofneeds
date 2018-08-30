@@ -1349,12 +1349,15 @@ const musicianUseCases = {
     isDetails: {
       title: { ...details.title },
       description: { ...details.description },
-      instrument: { ...instrumentDetail, mandatory: true },
+      instrument: {
+        ...instrumentDetail,
+        //mandatory: true,
+      },
     },
     seeksDetails: {
       description: { ...details.description },
-      location: { ...details.location },
       genres: { ...genresDetail },
+      location: { ...details.location },
     },
   },
   findMusician: {
@@ -1373,12 +1376,15 @@ const musicianUseCases = {
     isDetails: {
       title: { ...details.title },
       description: { ...details.description },
-      location: { ...details.location },
       genres: { ...genresDetail },
+      location: { ...details.location },
     },
     seeksDetails: {
       description: { ...details.description },
-      instrument: { ...instrumentDetail, mandatory: true },
+      instrument: {
+        ...instrumentDetail,
+        //mandatory: true,
+      },
     },
   },
 };
