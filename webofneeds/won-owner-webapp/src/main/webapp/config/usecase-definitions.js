@@ -1274,12 +1274,12 @@ const instrumentDetail = {
   placeholder: "e.g. Guitar, Vocals",
   parseToRDF: function({ value }) {
     if (!value) {
-      return { "s:instruments": undefined };
+      return { "won:instruments": undefined };
     }
-    return { "s:instruments": value };
+    return { "won:instruments": value };
   },
   parseFromRDF: function(jsonLDImm) {
-    const instruments = jsonLDImm && jsonLDImm.get("s:instruments");
+    const instruments = jsonLDImm && jsonLDImm.get("won:instruments");
     if (!instruments) {
       return undefined;
     } else if (is("String", instruments)) {
@@ -1303,16 +1303,16 @@ const genresDetail = {
   ...details.tags,
   identifier: "genres",
   label: "Genres",
-  icon: "#ico36_detail_instrument",
+  icon: "#ico36_detail_genre",
   placeholder: "e.g. Rock, Pop",
   parseToRDF: function({ value }) {
     if (!value) {
-      return { "s:genres": undefined };
+      return { "won:genres": undefined };
     }
-    return { "s:genres": value };
+    return { "won:genres": value };
   },
   parseFromRDF: function(jsonLDImm) {
-    const genres = jsonLDImm && jsonLDImm.get("s:genres");
+    const genres = jsonLDImm && jsonLDImm.get("won:genres");
     if (!genres) {
       return undefined;
     } else if (is("String", genres)) {
@@ -1342,33 +1342,30 @@ const musicianUseCases = {
       ...emptyDraft,
       is: {
         title: "I'm looking for a band!",
-        tags: ["band", "musician"],
+        tags: ["musician", "band"],
       },
       searchString: "band",
     },
     isDetails: {
       title: { ...details.title },
       description: { ...details.description },
-      location: { ...details.location },
-      instrument: { ...instrumentDetail },
-      genres: { ...genresDetail },
-      interests: { ...interestsDetail },
+      instrument: { ...instrumentDetail, mandatory: true },
     },
     seeksDetails: {
       description: { ...details.description },
-      //matchable with isPart?
-      //location: { ...details.location },
+      location: { ...details.location },
+      genres: { ...genresDetail },
     },
   },
   findMusician: {
-    identifier: "findMsuician",
+    identifier: "findMusician",
     label: "Find Musician",
-    icon: "#ico36_uc_find_people",
+    icon: "#ico36_uc_find_musician",
     doNotMatchAfter: findLatestIntervallEndInJsonLd,
     draft: {
       ...emptyDraft,
       is: {
-        title: "I'm looking for a Musician!",
+        title: "Looking for a Musician!",
         tags: ["band", "musician"],
       },
       searchString: "musician",
@@ -1377,12 +1374,11 @@ const musicianUseCases = {
       title: { ...details.title },
       description: { ...details.description },
       location: { ...details.location },
-      interests: { ...interestsDetail },
+      genres: { ...genresDetail },
     },
     seeksDetails: {
       description: { ...details.description },
-      instrument: { ...instrumentDetail },
-      genres: { ...genresDetail },
+      instrument: { ...instrumentDetail, mandatory: true },
     },
   },
 };
