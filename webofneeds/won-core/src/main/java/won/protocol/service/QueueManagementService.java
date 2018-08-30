@@ -29,5 +29,4 @@ public interface QueueManagementService {
 
     public List<String> generateQueueNamesForOwnerApplication(OwnerApplication ownerApplication);
     public String getEndpointForMessage(String methodName, String ownerApplicationID);
-    public List<String> getEndpointsForOwnerApplication(String ownerApplicationID, Exchange exchange);
 }

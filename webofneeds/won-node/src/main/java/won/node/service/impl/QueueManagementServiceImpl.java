@@ -87,16 +87,6 @@ public class QueueManagementServiceImpl implements QueueManagementService {
         return  endpoint;
     }
 
-    @Override
-    public List<String> getEndpointsForOwnerApplication(@Header("ownerApplicationID") String ownerApplicationID, Exchange exchange) {
-        //TODO: must implement special handling of the case where the id is unknown
-        List<OwnerApplication> ownerApplications = ownerApplicationRepository.findByOwnerApplicationId(ownerApplicationID);
-        List<String> endpoints = new ArrayList<>();
-        endpoints.addAll(ownerApplications.get(0).getQueueNames());
-        return endpoints;
-    }
-
-
     public void setOwnerApplicationRepository(OwnerApplicationRepository ownerApplicationRepository) {
         this.ownerApplicationRepository = ownerApplicationRepository;
     }

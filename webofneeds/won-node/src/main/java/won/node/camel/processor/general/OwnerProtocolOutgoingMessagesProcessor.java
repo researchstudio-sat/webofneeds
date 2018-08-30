@@ -57,7 +57,6 @@ public class OwnerProtocolOutgoingMessagesProcessor implements Processor {
 
         for (int i =0;i<ownerApplications.size();i++){
              OwnerApplication ownerApplication = ownerApplicationRepository.findByOwnerApplicationId(ownerApplications.get(i)).get(i);
-             logger.debug(queueManagementService.getEndpointsForOwnerApplication(ownerApplication.getOwnerApplicationId(),exchange).get(0));
              logger.debug("ownerApplicationID: "+ownerApplications.get(i));
              ownerApplicationQueueNames.add(i, queueManagementService.getEndpointForMessage(methodName,ownerApplication.getOwnerApplicationId()));
 

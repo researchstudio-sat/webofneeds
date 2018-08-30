@@ -25,6 +25,7 @@ import java.net.URI;
  * Date: 25.02.14
  */
 public interface OwnerProtocolCommunicationService extends ProtocolCommunicationService {
+    
     public CamelConfiguration configureCamelEndpoint(URI wonNodeUri, String ownerId) throws Exception;
     public URI  getWonNodeUriWithConnectionUri(URI connectionUri) throws NoSuchConnectionException;
     public URI  getWonNodeUriWithNeedUri(URI needUri) throws NoSuchConnectionException;

@@ -30,9 +30,7 @@ import java.util.List;
 public interface OwnerProtocolCamelConfigurator extends CamelConfigurator {
     String configureCamelEndpointForNodeURI(URI wonNodeURI, URI brokerURI, String ownerProtocolQueueName) throws CamelConfigurationFailedException;
 
-    void addRemoteQueueListeners(List<String> endpoints, URI remoteEndpoint) throws CamelConfigurationFailedException;
-
-    void addRouteForEndpoint(String startingEndpoint, final URI wonNodeURI) throws CamelConfigurationFailedException;
+    void addRemoteQueueListener(String endpoint, URI remoteEndpoint) throws CamelConfigurationFailedException;
 
     String getStartingEndpoint(URI wonNodeURI);
 

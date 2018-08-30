@@ -99,26 +99,21 @@ public class OwnerProtocolCamelConfiguratorImpl implements OwnerProtocolCamelCon
 
 
     @Override
-    public synchronized void addRemoteQueueListeners(List<String> endpoints, URI remoteEndpoint) throws CamelConfigurationFailedException {
-        List<String> customSchemeEndpoints = adjustSchemeToRemoteEndpoint(endpoints, remoteEndpoint);
-        //remove endpoints already configured in the camel context
-        customSchemeEndpoints = customSchemeEndpoints.stream().filter(
-          x -> camelContext.hasEndpoint(x) == null
-        )
-                                                     .collect(Collectors.toList());
-        if (customSchemeEndpoints.size() > 0) {
-            logger.debug(
-              "Adding route for listening to remote queue {} ", remoteEndpoint);
-            OwnerApplicationListenerRouteBuilder ownerApplicationListenerRouteBuilder = new OwnerApplicationListenerRouteBuilder(
-              camelContext, customSchemeEndpoints, remoteEndpoint);
-            try {
-                camelContext.addRoutes(ownerApplicationListenerRouteBuilder);
-            } catch (Exception e) {
-                logger.debug("adding route to camel context failed", e);
-                throw new CamelConfigurationFailedException("adding route to camel context failed", e);
-            }
-        } else {
+    public synchronized void addRemoteQueueListener(String endpoint, URI remoteEndpoint) throws CamelConfigurationFailedException {
+        //sending and receiving endpoint need to have the same scheme
+        endpoint = remoteEndpoint.getScheme() + endpoint; 
+        if (camelContext.hasEndpoint(endpoint) != null) {
             logger.debug("route for listening to remote queue {} already configured", remoteEndpoint);
+            return;
+        }
+        logger.debug("Adding route for listening to remote queue {} ", endpoint);
+        OwnerApplicationListenerRouteBuilder ownerApplicationListenerRouteBuilder = new OwnerApplicationListenerRouteBuilder(
+                camelContext, endpoint, remoteEndpoint);
+        try {
+            camelContext.addRoutes(ownerApplicationListenerRouteBuilder);
+        } catch (Exception e) {
+            logger.debug("adding route to camel context failed", e);
+            throw new CamelConfigurationFailedException("adding route to camel context failed", e);
         }
     }
 
@@ -160,7 +155,11 @@ public class OwnerProtocolCamelConfiguratorImpl implements OwnerProtocolCamelCon
     }
 
     @Override
-    public synchronized void addRouteForEndpoint(String startingEndpoint, final URI wonNodeURI) throws CamelConfigurationFailedException {
+    public void addRouteForEndpoint(String startingEndpoint, URI wonNodeURI) throws CamelConfigurationFailedException {
+        addRouteForWoNNode(wonNodeURI);
+    }
+    
+    public synchronized void addRouteForWoNNode(final URI wonNodeURI) throws CamelConfigurationFailedException {
         /**
          * there can be only one route per endpoint. Thus, consuming endpoint of each route shall be unique.
          */

@@ -77,7 +77,6 @@ public class WonMessageRoutes extends RouteBuilder
                   .log("failure during direct:sendFailureResponse, rolling back transaction for exchange ${exchangeId}")
                   .rollback()
                   .handled(true)
-                  .stop()
                   .end()
                 .transacted("PROPAGATION_REQUIRES_NEW")
                 .to("bean:parentLocker")
@@ -164,19 +163,13 @@ public class WonMessageRoutes extends RouteBuilder
         from("activemq:queue:OwnerProtocol.in?concurrentConsumers=5")
                 .routeId("activemq:queue:OwnerProtocol.in")
                 .transacted("PROPAGATION_NEVER")
-                .choice()
-                    .when(header("methodName").isEqualTo("register"))
-                        .to("bean:ownerManagementService?method=registerOwnerApplication")
-                    .when(header("methodName").isEqualTo("getEndpoints"))
-                        .to("bean:queueManagementService?method=getEndpointsForOwnerApplication")
-                    .otherwise()
-                        .setHeader(WonCamelConstants.DIRECTION_HEADER, new ConstantURIExpression(URI.create(WONMSG.TYPE_FROM_OWNER_STRING)))
-                        .to("bean:wonMessageIntoCamelProcessor")
-                        .to("direct:checkMessage")
-                        .to("direct:addEnvelopeAndTimestamp")
-                        .to("bean:directionFromOwnerAdder")
-                        //route to msg processing logic
-                        .to("direct:OwnerProtocolLogic");
+                .setHeader(WonCamelConstants.DIRECTION_HEADER, new ConstantURIExpression(URI.create(WONMSG.TYPE_FROM_OWNER_STRING)))
+                .to("bean:wonMessageIntoCamelProcessor")
+                .to("direct:checkMessage")
+                .to("direct:addEnvelopeAndTimestamp")
+                .to("bean:directionFromOwnerAdder")
+                //route to msg processing logic
+                .to("direct:OwnerProtocolLogic");
 
         /**
          * Owner protocol, outgoing.
@@ -286,7 +279,6 @@ public class WonMessageRoutes extends RouteBuilder
                             .to("direct:reactToMessage")
                         .otherwise()
                             .log(LoggingLevel.DEBUG, "suppressing sending of message to owner because the header '" + WonCamelConstants.SUPPRESS_MESSAGE_TO_OWNER + "' is 'true'")
-                            .stop()
                         .endChoice()
                       .end();
 
@@ -334,7 +326,6 @@ public class WonMessageRoutes extends RouteBuilder
                                 .to("direct:sendToOwner")
                             .otherwise()
                                 .log(LoggingLevel.DEBUG, "suppressing sending of message to owner because the header '" + WonCamelConstants.SUPPRESS_MESSAGE_TO_OWNER + "' is 'true'")
-                                .stop()
                             .endChoice()
                         .end()
                         .choice()
@@ -342,7 +333,6 @@ public class WonMessageRoutes extends RouteBuilder
                                 .to("direct:reactToMessage")
                             .otherwise()
                                 .log(LoggingLevel.DEBUG, "suppressing sending of message to owner because the header '" + WonCamelConstants.SUPPRESS_MESSAGE_TO_OWNER + "' is 'true'")
-                                .stop()
                             .endChoice()
                         .end();
           /**
@@ -387,7 +377,6 @@ public class WonMessageRoutes extends RouteBuilder
                 .to("direct:reference-sign-persist")
               .otherwise()
                 .log(LoggingLevel.DEBUG, "suppressing sending of message to owner because the header '" + WonCamelConstants.IGNORE_HINT + "' is 'true'")
-                .stop()
               .endChoice()
             .end();
             
