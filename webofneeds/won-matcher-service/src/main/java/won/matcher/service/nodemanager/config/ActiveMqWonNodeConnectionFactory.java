@@ -99,6 +99,7 @@ public class ActiveMqWonNodeConnectionFactory {
         Props hintProps = SpringExtension.SpringExtProvider.get(context.system()).props(
                 HintProducerProtocolActor.class, hintComponent, null);
         ActorRef hintProducer = context.actorOf(hintProps, "ActiveMqHintProducerProtocolActor-" + uuid);
+        
         log.info("Create camel component JMS listener {} for won node {}", hintComponent, wonNodeInfo.getWonNodeURI());
 
         // watch the created consumers from the context to get informed when they are terminated
@@ -127,17 +128,15 @@ public class ActiveMqWonNodeConnectionFactory {
 
         // jms.prefetchPolicy parameter is added to prevent matcher-consumer death due to overflowing with messages,
         // see http://activemq.apache.org/what-is-the-prefetch-limit-for.html
-        ActiveMQSslConnectionFactory connectionFactory = new ActiveMQSslConnectionFactory(brokerUri + "?jms.prefetchPolicy.all=50");
+        ActiveMQSslConnectionFactory connectionFactory = new ActiveMQSslConnectionFactory(brokerUri + "?jms.prefetchPolicy.all=10?");
 
         // for non-persistent messages setting "AlwaysSyncSend" to true makes it slow, but ensures that a producer is immediately informed
         // about the memory issues on broker (is blocked or gets exception depending on <systemUsage> config)
         // see more info http://activemq.apache.org/producer-flow-control.html
         connectionFactory.setAlwaysSyncSend(false);
         connectionFactory.setUseAsyncSend(true);
-
-        // disable timestamps by default so that ttl of messages is not checked
-        connectionFactory.setDisableTimeStampsByDefault(true);
-
+        connectionFactory.setDispatchAsync(true);
+        
         if (keyManager != null && trustManager != null) {
             connectionFactory.setKeyAndTrustManagers(new KeyManager[]{keyManager}, new TrustManager[]{trustManager}, null);
         } else {

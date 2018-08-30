@@ -226,10 +226,10 @@ public class SparqlMatcherActor extends UntypedActor {
     }
 
     protected void processActiveNeedEvent(NeedEvent needEvent) throws IOException {
-        log.info("Received active need.");
-
+        
         NeedModelWrapper need = new NeedModelWrapper(needEvent.deserializeNeedDataset());
-
+        log.debug("starting sparql-based matching for need {}", need.getNeedUri());
+        
         Set<NeedModelWrapper> matches = queryNeed(need);
 
         Map<NeedModelWrapper, Set<NeedModelWrapper>> filteredNeeds = 
@@ -248,6 +248,7 @@ public class SparqlMatcherActor extends UntypedActor {
         });
         
         pubSubMediator.tell(new DistributedPubSubMediator.Publish(bulkHintEvent.getClass().getName(), bulkHintEvent), getSelf());
+        log.debug("finished sparql-based matching for need {} (found {} matches)", need.getNeedUri(), bulkHintEvent.getHintEvents().size());
     }
 
     private Optional<Op> clientSuppliedQuery(String queryString) {
