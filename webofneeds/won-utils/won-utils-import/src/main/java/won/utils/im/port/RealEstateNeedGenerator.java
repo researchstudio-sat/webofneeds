@@ -46,7 +46,8 @@ public class RealEstateNeedGenerator {
     static Property schema_priceCurrency = model.createProperty("http://schema.org/priceCurrency");
     static Property schema_unitCode = model.createProperty("http://schema.org/unitCode");
     static Property schema_value = model.createProperty("http://schema.org/value");
-
+    
+    static RDFDatatype schema_Text = new BaseDatatype("http://schema.org/Text");
     static RDFDatatype bigdata_geoSpatialDatatype = new BaseDatatype("http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon");
     
     
@@ -176,14 +177,15 @@ public class RealEstateNeedGenerator {
         int numberOfAmenities = (int) (Math.random() * Math.abs(max - min + 1) + min);
         Collections.shuffle(Arrays.asList(amenities));
 
-        Resource amenityResource = model.createResource();
+
         Resource schema_LocationFeatureSpecification = model
                 .createResource("http://schema.org/LocationFeatureSpecification");
 
-        resource.addProperty(schema_amenityFeature, amenityResource);
-        amenityResource.addProperty(RDF.type, schema_LocationFeatureSpecification);
         for (int j = 0; j < numberOfAmenities; j++) {
-            amenityResource.addProperty(schema_name, amenities[j]);
+            Resource amenityResource = model.createResource();
+            resource.addProperty(schema_amenityFeature, amenityResource);            
+            amenityResource.addProperty(RDF.type, schema_LocationFeatureSpecification);
+            amenityResource.addProperty(schema_value, amenities[j], schema_Text);
         }
         return resource;
     }
