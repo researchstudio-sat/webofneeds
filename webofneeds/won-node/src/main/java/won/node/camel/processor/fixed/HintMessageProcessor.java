@@ -45,7 +45,8 @@ public class HintMessageProcessor extends AbstractCamelProcessor {
 
         URI needURIFromWonMessage = wonMessage.getReceiverNeedURI();
         if (isTooManyHints(needURIFromWonMessage)) {
-          throw new WonProtocolException("Too many hints for need " + needURIFromWonMessage);
+          exchange.getIn().setHeader(WonCamelConstants.IGNORE_HINT, Boolean.TRUE);
+          return;
         }
         
         URI wonNodeFromWonMessage = wonMessage.getReceiverNodeURI();

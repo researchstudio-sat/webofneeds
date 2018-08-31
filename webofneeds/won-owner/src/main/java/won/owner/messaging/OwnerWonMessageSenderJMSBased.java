@@ -86,13 +86,26 @@ public class OwnerWonMessageSenderJMSBased implements ApplicationListener<WonNod
           throw new IllegalStateException("a message needs a SenderNodeUri otherwise we can't determine the won node " +
                                             "via which to send it");
       }
-
-      String ownerApplicationId = getOwnerApplicationIdAndRegisterIfNecessary(wonNodeUri);
-
-
-      //String ep = camelConfiguration.getEndpoint()
+      
+      //get the camel endpoint for talking to the WoN node 
       String ep = ownerProtocolCommunicationServiceImpl.getProtocolCamelConfigurator()
-                                           .getEndpoint(wonNodeUri);
+              .getEndpoint(wonNodeUri);
+      if (ep == null) {
+          //looks like we aren't registered - check if that's the case and register if necessary
+          if (!ownerProtocolCommunicationServiceImpl.isRegisteredWithWonNode(wonNodeUri)) {
+              ownerProtocolCommunicationServiceImpl.register(wonNodeUri, messagingService);
+          }
+          //try again to get the endpoint
+          ep = ownerProtocolCommunicationServiceImpl.getProtocolCamelConfigurator()
+                  .getEndpoint(wonNodeUri);
+          if (ep == null) {
+              throw new Exception("could not obtain camel endpoint for WoN node " + wonNodeUri + " even after trying to re-register");
+          }
+      }
+      
+      List<WonNode> wonNodeList = wonNodeRepository.findByWonNodeURI(wonNodeUri);
+      String ownerApplicationId = wonNodeList.get(0).getOwnerApplicationID();
+
       Map<String, Object> headerMap = new HashMap<>();
       headerMap.put("ownerApplicationID", ownerApplicationId);
       headerMap.put("remoteBrokerEndpoint",ep);
@@ -103,13 +116,6 @@ public class OwnerWonMessageSenderJMSBased implements ApplicationListener<WonNod
     } catch (Exception e){
       throw new RuntimeException("could not send message", e);
     }
-  }
-
-  private String getOwnerApplicationIdAndRegisterIfNecessary(final URI wonNodeUri) throws Exception {
-    ownerProtocolCommunicationServiceImpl.register(wonNodeUri, messagingService);
-    List<WonNode> wonNodeList = wonNodeRepository.findByWonNodeURI(wonNodeUri);
-    String ownerApplicationId = wonNodeList.get(0).getOwnerApplicationID();
-    return ownerApplicationId;
   }
 
   //TODO: adding public keys and signing can be removed when it happens in the browser

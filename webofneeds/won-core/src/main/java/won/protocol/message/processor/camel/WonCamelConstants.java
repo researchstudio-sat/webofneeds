@@ -38,5 +38,7 @@ public class WonCamelConstants {
 
   public static final String SUPPRESS_MESSAGE_TO_OWNER = "suppressMessageToOwner";
   public static final String SUPPRESS_MESSAGE_REACTION = "suppressMessageReaction";
+  
+  public static final String IGNORE_HINT = "ignoreHint";
 
 }

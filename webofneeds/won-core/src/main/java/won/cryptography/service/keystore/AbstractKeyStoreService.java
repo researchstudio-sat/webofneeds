@@ -138,12 +138,15 @@ public abstract class AbstractKeyStoreService implements KeyStoreService {
 		}
 
 		try {
+		  if (alias == null) {
+		    throw new RuntimeException("Could not add keystore entry: provided alias is null");  
+		  }
 			if (alias != null && key != null && certificateChain != null) {
 				store.setKeyEntry(alias, key, getPassword().toCharArray(), certificateChain);
 			} else if (alias != null && certificate != null) {
 				store.setCertificateEntry(alias, certificate);
 			} else {
-				throw new RuntimeException("Could not add entry for " + alias + " to the key store");
+	        throw new RuntimeException("Could not add keystore entry: neither key and cert chain nor certificate is provided");  
 			}
 			persistStore();
 		} catch (Exception e) {

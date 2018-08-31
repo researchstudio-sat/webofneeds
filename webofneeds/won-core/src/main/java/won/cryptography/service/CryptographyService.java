@@ -1,5 +1,6 @@
 package won.cryptography.service;
 
+import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.KeyPair;
@@ -8,12 +9,18 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.Optional;
 
 import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
+import won.cryptography.service.keystore.FileBasedKeyStoreService;
 import won.cryptography.service.keystore.KeyStoreService;
 
 /**
@@ -27,8 +34,22 @@ public class CryptographyService {
 	private CertificateService certificateService;
 
 	private KeyStoreService keyStoreService;
+	
+	@Autowired(required=false) //required only when keyToTrust* is configured 
+	private TrustStoreService trustStoreService;
 
 	private String defaultAlias;
+	
+	// We want to be able to add keys from an additional key store to our trust store at startup
+	// this is required for the activemq broker to connect to itself: we force a clien cert there, 
+	// which it provides happily - therefore we have to be able to trust it.
+	private String keyToTrustFile;
+	private String keyToTrustFilePassword;
+	private String keyToTrustAlias = null;
+	private String keyToTrustAliasUnder = null;
+	private String keyToTrustProvider = null;
+	private String keyToTrustKeystoreType= null;
+	
 
 	public CryptographyService(KeyStoreService keyStoreService) {
 		this(keyStoreService,null);
@@ -62,16 +83,52 @@ public class CryptographyService {
 		logger.debug("checking if the certificate with alias {} is in the keystore", defaultAlias);
 		if (containsEntry(defaultAlias)) {
 			logger.info("entry with alias {} found in the keystore", defaultAlias);
-			return;
+		} else {
+    		// no certificate, create it:
+    		logger.info("certificate not found under alias {}, creating new one", defaultAlias);
+    		try {
+    			createNewKeyPair(defaultAlias, null);
+    			logger.info("certificate created");
+    		} catch (IOException e) {
+    			throw new RuntimeException("Could not create certificate for " + defaultAlias, e);
+    		}
+		}		
+    
+		// uncomment for ssl handshake debugging
+		//System.setProperty("javax.net.debug", "ssl");
+		if (this.keyToTrustFile == null) {
+		  logger.info("no additional key configured to be imported into truststore");
+		  return;
 		}
-		// no certificate, create it:
-		logger.info("certificate not found under alias {}, creating new one", defaultAlias);
+		
+		FileBasedKeyStoreService keyToTrustKeyStoreService = new FileBasedKeyStoreService(
+		      new File(this.keyToTrustFile), 
+		      keyToTrustFilePassword, 
+		      keyToTrustProvider, 
+		      keyToTrustKeystoreType);
 		try {
-			createNewKeyPair(defaultAlias, null);
-			logger.info("certificate created");
-		} catch (IOException e) {
-			throw new RuntimeException("Could not create certificate for " + defaultAlias, e);
+		    keyToTrustKeyStoreService.init();
+		} catch (Exception e) {
+		  logger.info("unable to read key for alias " + keyToTrustAlias + " from keystore " + keyToTrustFile, e);
 		}
+		Certificate cert = keyToTrustKeyStoreService.getCertificate(keyToTrustAlias);
+		if (cert == null) {
+		  try {
+  		  Optional<String> aliases = Collections.list(keyToTrustKeyStoreService.getUnderlyingKeyStore().aliases()).stream().reduce((x,y) -> x+","+y);
+  		  logger.info("no key for alias {} found in keystore {}. Available aliases: {}", new Object[] {keyToTrustAlias, keyToTrustFile, aliases.orElse("(none)")});
+		  } catch (Exception e) {
+		    logger.info("no key for alias " + keyToTrustAlias + " found in keystore " + keyToTrustFile + "; caught exception while trying to log available aliases", e);
+		  }
+		  return;
+		}
+    //we need this so we can connect to ourself with ssl (used by the activemq broker)
+    logger.info("certificate with alias {} will be added/overwritten in truststore", keyToTrustAliasUnder);
+    try {
+      trustStoreService.addCertificate(keyToTrustAliasUnder, cert, true);
+    } catch (Exception e) {
+      logger.info("could not add certificate for alias " + keyToTrustAliasUnder + " to truststore", e); 
+    }
+    logger.info("certificate with alias {} has been added to truststore", keyToTrustAliasUnder);
 
 	}
 
@@ -127,4 +184,32 @@ public class CryptographyService {
 	public void setDefaultAlias(String defaultAlias) {
 		this.defaultAlias = defaultAlias;
 	}
+	
+	public void setTrustStoreService(TrustStoreService trustStoreService) {
+    this.trustStoreService = trustStoreService;
+  }
+	
+	public void setKeyToTrustAlias(String keyToTrustAlias) {
+    this.keyToTrustAlias = keyToTrustAlias;
+  }
+	
+	public void setKeyToTrustAliasUnder(String keyToTrustAliasUnder) {
+    this.keyToTrustAliasUnder = keyToTrustAliasUnder;
+  }
+	
+	public void setKeyToTrustFile(String keyToTrustFile) {
+    this.keyToTrustFile = keyToTrustFile;
+  }
+	
+	public void setKeyToTrustFilePassword(String keyToTrustFilePassword) {
+    this.keyToTrustFilePassword = keyToTrustFilePassword;
+  }
+	
+	public void setKeyToTrustKeystoreType(String keyToTrustKeystoreType) {
+    this.keyToTrustKeystoreType = keyToTrustKeystoreType;
+  }
+	
+	public void setKeyToTrustProvider(String keyToTrustProvider) {
+    this.keyToTrustProvider = keyToTrustProvider;
+  }
 }

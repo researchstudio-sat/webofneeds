@@ -77,7 +77,7 @@ public class OwnerProtocolCommunicationServiceImpl implements OwnerProtocolCommu
   //can also be autowired
   private RegistrationClient registrationClient;
 
-
+  public static final String REMOTE_INCOMING_QUEUE_PREFIX = ":queue:OwnerProtocol.Out.";
 
   Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -87,6 +87,18 @@ public class OwnerProtocolCommunicationServiceImpl implements OwnerProtocolCommu
     this.registrationClient = registrationClient;
   }
 
+  public synchronized boolean isRegisteredWithWonNode(URI wonNodeURI) {
+      try {
+          String ownerApplicationId = calculateOwnerApplicationIdFromOwnerCertificate();
+          logger.debug("using ownerApplicationId: {}", ownerApplicationId );
+          WonNode wonNode = wonNodeRepository.findOneByWonNodeURIAndOwnerApplicationID(wonNodeURI, ownerApplicationId);
+          return ownerProtocolCamelConfigurator.getCamelContext().getComponent(wonNode.getBrokerComponent()) != null;
+      } catch (Exception e) {
+          logger.info("error while checking if we are registered with WoN node " + wonNodeURI, e);
+      }
+      return false;
+  }
+  
   /**
    * Registers the owner application at a won node. Owner Id is typically his Key ID (lower 64 bits of the owner public
    * key fingerprint). Unless there is a collision of owner ids on the node - then the owner can assign another id...
@@ -107,8 +119,8 @@ public class OwnerProtocolCommunicationServiceImpl implements OwnerProtocolCommu
       try {
           logger.debug("we're already registered. Connecting with WoN node: " + wonNodeURI);
           configureCamelEndpoint(wonNodeURI, ownerApplicationId);
-          configureRemoteEndpointsForOwnerApplication(ownerApplicationId, getProtocolCamelConfigurator().getEndpoint
-            (wonNodeURI), messagingService);
+          configureRemoteEndpointForOwnerApplication(ownerApplicationId, getProtocolCamelConfigurator().getEndpoint
+            (wonNodeURI));
           logger.debug("connected with WoN node: " + wonNodeURI);
           return;
         } catch (Exception e){
@@ -129,8 +141,8 @@ public class OwnerProtocolCommunicationServiceImpl implements OwnerProtocolCommu
     logger.debug("registered with WoN node: " + wonNodeURI +",  ownerappID: " + ownerApplicationId);
     camelConfiguration = configureCamelEndpoint(wonNodeURI, ownerApplicationId);
     storeWonNode(ownerApplicationId, camelConfiguration, wonNodeURI);
-    configureRemoteEndpointsForOwnerApplication(ownerApplicationId, getProtocolCamelConfigurator().getEndpoint
-      (wonNodeURI), messagingService);
+    configureRemoteEndpointForOwnerApplication(ownerApplicationId, getProtocolCamelConfigurator().getEndpoint
+      (wonNodeURI));
     logger.info("connected with WoN node: : " + wonNodeURI);
 
   }
@@ -142,18 +154,10 @@ public class OwnerProtocolCommunicationServiceImpl implements OwnerProtocolCommu
 
   // TODO this is messy, has to be improved, maybe endpoints should be obtained in the same step as registration,
   // e.g. the register call returns not only application id, but also the endpoints...
-  private void configureRemoteEndpointsForOwnerApplication(String ownerApplicationID, String remoteEndpoint, MessagingService messagingService)
+  private void configureRemoteEndpointForOwnerApplication(String ownerApplicationID, String remoteEndpoint)
     throws CamelConfigurationFailedException, ExecutionException, InterruptedException {
-    Map<String, Object> headerMap = new HashMap<>();
-    headerMap.put("ownerApplicationID", ownerApplicationID);
-    headerMap.put("methodName", "getEndpoints");
-    headerMap.put("remoteBrokerEndpoint", remoteEndpoint);
-
-    Future<List<String>> futureResults = messagingService
-      .sendInOutMessageGeneric(headerMap, headerMap, null, "seda:outgoingMessages");
-    List<String> endpoints = futureResults.get();
-
-    getProtocolCamelConfigurator().addRemoteQueueListeners(endpoints, URI.create(remoteEndpoint));
+    
+    getProtocolCamelConfigurator().addRemoteQueueListener(REMOTE_INCOMING_QUEUE_PREFIX + ownerApplicationID, URI.create(remoteEndpoint));
     //TODO: some checks needed to assure that the application is configured correctly.
     //todo this method should return routes
   }

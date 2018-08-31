@@ -32,12 +32,12 @@ import java.util.List;
 public class OwnerApplicationListenerRouteBuilder extends RouteBuilder  {
 
 
-    private List<String> endpoints;
+    private String endpoint;
     private URI brokerUri;
 
-    public OwnerApplicationListenerRouteBuilder(CamelContext camelContext, List<String> endpoints, URI remoteEndpoint) {
+    public OwnerApplicationListenerRouteBuilder(CamelContext camelContext, String endpoint, URI remoteEndpoint) {
         super(camelContext);
-        this.endpoints = endpoints;
+        this.endpoint = endpoint;
         this.brokerUri = remoteEndpoint;
     }
 
@@ -48,12 +48,12 @@ public class OwnerApplicationListenerRouteBuilder extends RouteBuilder  {
 
     @Override
     public void configure() throws Exception {
-               for (int i = 0; i<endpoints.size();i++){
+
 // we remove the concurrentConsumers part from
 // the URI as it makes it hard to check if a given endpoint is already configured in the context by searching for its
 // name.  Also, we're unsure if the concurrentConsumers part is even interpreted anywhere // from(endpoints.get(i)
 // +"?concurrentConsumers=2")
-                 from(endpoints.get(i))
+                 from(endpoint)
                    .routeId("Node2OwnerRoute"+brokerUri)
                             .to("bean:wonMessageIntoCamelProcessor")
                             .to("bean:wellformednessChecker")
@@ -65,7 +65,6 @@ public class OwnerApplicationListenerRouteBuilder extends RouteBuilder  {
                             //this bean is *not* provided by the won-owner module. This allows the definition of a
                             //different processing chain depending on the use case.
                      .to("bean:mainOwnerMessageProcessor");
-       }
     }
 
 
