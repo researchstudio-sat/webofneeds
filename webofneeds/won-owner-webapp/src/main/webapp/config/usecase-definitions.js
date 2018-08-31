@@ -1267,7 +1267,7 @@ const mobilityUseCases = {
 /**
  * band musician use cases
  */
-const instrumentDetail = {
+const instrumentsDetail = {
   ...details.tags,
   identifier: "instruments",
   label: "Instruments",
@@ -1350,8 +1350,8 @@ const musicianUseCases = {
     isDetails: {
       title: { ...details.title },
       description: { ...details.description },
-      instrument: {
-        ...instrumentDetail,
+      instruments: {
+        ...instrumentsDetail,
         //mandatory: true,
       },
     },
@@ -1382,8 +1382,8 @@ const musicianUseCases = {
     },
     seeksDetails: {
       description: { ...details.description },
-      instrument: {
-        ...instrumentDetail,
+      instruments: {
+        ...instrumentsDetail,
         //mandatory: true,
       },
     },
