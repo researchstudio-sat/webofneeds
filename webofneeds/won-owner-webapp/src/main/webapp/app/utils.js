@@ -256,6 +256,17 @@ export function removeAllProperties(obj) {
 export function getKeySize(obj) {
   return Object.keys(obj).length;
 }
+
+/**
+ * delete keys and values of an object and returns reduced object
+ */
+export function reduceObjectByKeys(object, keys) {
+  const obj = object;
+  for (let k of keys) {
+    delete obj[k];
+  }
+  return obj;
+}
 /**
  * generates a string of random characters
  *

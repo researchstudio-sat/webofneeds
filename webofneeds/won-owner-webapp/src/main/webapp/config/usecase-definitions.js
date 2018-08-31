@@ -3,6 +3,7 @@ import Immutable from "immutable";
 import { details, abstractDetails } from "detailDefinitions";
 import { Parser as SparqlParser } from "sparqljs";
 import { findLatestIntervallEndInJsonLd } from "../app/won-utils.js";
+import { reduceObjectByKeys } from "../app/utils";
 import won from "../app/won-es6.js";
 
 export const emptyDraft = {
@@ -1342,7 +1343,7 @@ const musicianUseCases = {
       ...emptyDraft,
       is: {
         title: "I'm looking for a band!",
-        tags: ["musician", "band"],
+        //tags: ["musician", "band"],
       },
       searchString: "band",
     },
@@ -1369,7 +1370,7 @@ const musicianUseCases = {
       ...emptyDraft,
       is: {
         title: "Looking for a Musician!",
-        tags: ["band", "musician"],
+        //tags: ["band", "musician"],
       },
       searchString: "musician",
     },
@@ -1386,6 +1387,64 @@ const musicianUseCases = {
         //mandatory: true,
       },
     },
+  },
+  findRehearsalRoom: {
+    identifier: "findRehearsalRoom",
+    label: "Find Rehearsal Room",
+    icon: "#ico36_uc_realestate",
+    doNotMatchAfter: findLatestIntervallEndInJsonLd,
+    draft: {
+      ...emptyDraft,
+      is: {
+        title: "Looking for Rehearsal Room!",
+        tags: ["SearchRehearsal"],
+      },
+      seeks: {
+        tags: ["OfferRehearsal"],
+      },
+      searchString: "Rehearsal Room",
+    },
+    isDetails: undefined,
+    seeksDetails: {
+      ...reduceObjectByKeys(realEstateUseCases.searchRent.seeksDetails, [
+        "numberOfRoomsRange",
+      ]),
+      features: {
+        ...realEstateFeaturesDetail,
+        placeholder: "e.g. PA, Drumkit",
+      },
+      fromDatetime: { ...details.fromDatetime },
+      throughDatetime: { ...details.throughDatetime },
+    },
+  },
+  offerRehearsalRoom: {
+    identifier: "OfferRehearsalRoom",
+    label: "Offer Rehearsal Room",
+    icon: "#ico36_uc_realestate",
+    doNotMatchAfter: findLatestIntervallEndInJsonLd,
+    draft: {
+      ...emptyDraft,
+      is: {
+        title: "Offer Rehearsal Room!",
+        tags: ["OfferRehearsal"],
+      },
+      seeks: {
+        tags: ["SearchRehearsal"],
+      },
+    },
+    isDetails: {
+      ...reduceObjectByKeys(realEstateUseCases.offerRent.isDetails, [
+        "numberOfRooms",
+      ]),
+      features: {
+        ...realEstateFeaturesDetail,
+        placeholder: "e.g. PA, Drumkit",
+      },
+      fromDatetime: { ...details.fromDatetime },
+      throughDatetime: { ...details.throughDatetime },
+    },
+
+    seeksDetails: undefined,
   },
 };
 
