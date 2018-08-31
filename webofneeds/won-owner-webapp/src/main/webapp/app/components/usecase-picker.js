@@ -10,7 +10,7 @@ import { attach, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
 import { selectIsConnected } from "../selectors.js";
-import { useCaseGroups } from "useCaseDefinitions";
+import { useCases, useCaseGroups } from "useCaseDefinitions";
 
 import "style/_usecase-picker.scss";
 
@@ -72,8 +72,8 @@ function genComponentConf() {
         <!-- USE CASE GROUPS - TODO: only show while not searching --> 
         <div class="ucp__main__usecase-group clickable"
           ng-repeat="useCaseGroup in self.useCaseGroups"
-          ng-if="self.showUseCaseGroupHeaders && self.displayableUseCaseGroup(useCaseGroup)"
-          ng-click="self.startFrom(useCaseGroup)">
+          ng-if="self.showGroups && self.displayableUseCaseGroup(useCaseGroup)"
+          ng-click="self.viewUseCaseGroup(useCaseGroup)">
               <svg class="ucp__main__usecase-group__icon"
                 ng-if="!!useCaseGroup.icon">
                 <use xlink:href="{{ useCaseGroup.icon }}" href="{{ useCaseGroup.icon }}"></use>
@@ -83,7 +83,23 @@ function genComponentConf() {
                   {{ useCaseGroup.label }}
               </div>
         </div>
-        <!-- TODO: USE CASES WITHOUT GROUPS -->
+        <!-- USE CASES WITHOUT GROUPS - TODO: only show while not searching --> 
+        <!--
+        <div class="ucp__main__usecase-group clickable"
+          ng-repeat="useCase in self.ungroupedUseCases"
+          ng-if="self.displayableUseCase(useCase)"
+          ng-click="self.startFrom(useCase)">
+              <svg class="ucp__main__usecase-group__icon"
+                ng-if="!!useCase.icon">
+                <use xlink:href="{{ useCase.icon }}" href="{{ useCase.icon }}"></use>
+              </svg>
+              <div class="ucp__main__usecase-group__label"
+                ng-if="!!useCase.label">
+                  {{ useCase.label }}
+              </div>
+        </div>
+        -->
+
         </div>
     `;
 
@@ -93,7 +109,7 @@ function genComponentConf() {
       window.ucp4dbg = this;
 
       this.useCaseGroups = useCaseGroups;
-      this.showUseCaseGroupHeaders = this.showUseCaseGroups();
+      this.showGroups = this.countDisplayableUseCaseGroups() > 0; // TODO: change this once single use cases can be displayed here
 
       const selectFromState = state => {
         const useCaseGroup = getIn(state, [
@@ -109,9 +125,13 @@ function genComponentConf() {
         };
       };
 
+      this.ungroupedUseCases = this.getUseCasesNotInGroups(useCases);
+
       // Using actionCreators like this means that every action defined there is available in the template.
       connect2Redux(selectFromState, actionCreators, [], this);
     }
+
+    // redirects start
 
     createWhatsAround() {
       if (!this.pendingPublishing) {
@@ -125,7 +145,23 @@ function genComponentConf() {
       }
     }
 
-    startFrom(selectedUseCaseGroup) {
+    startFrom(selectedUseCase) {
+      const selectedUseCaseIdentifier =
+        selectedUseCase && selectedUseCase.identifier;
+
+      if (selectedUseCaseIdentifier) {
+        this.router__stateGoCurrent({
+          useCase: encodeURIComponent(selectedUseCaseIdentifier),
+        });
+      } else {
+        console.log(
+          "No usecase identifier found for given usecase, ",
+          selectedUseCase
+        );
+      }
+    }
+
+    viewUseCaseGroup(selectedUseCaseGroup) {
       const selectedGroupIdentifier =
         selectedUseCaseGroup && selectedUseCaseGroup.identifier;
 
@@ -141,22 +177,37 @@ function genComponentConf() {
       }
     }
 
+    // redirects end
+
     /**
-     * Only display the headers of the useCaseGroups if there are multiple displayable useCaseGroups
-     * @returns {boolean}
+     * return the amount of displayable useCases in a useCaseGroup
+     * @param useCaseGroup
+     * @return {*}
      */
-    showUseCaseGroups() {
+    countDisplayableUseCasesInGroup(useCaseGroup) {
+      let countUseCases = 0;
+
+      for (const key in useCaseGroup.useCases) {
+        if (this.displayableUseCase(useCaseGroup.useCases[key])) {
+          countUseCases++;
+        }
+      }
+      return countUseCases;
+    }
+
+    /**
+     * return the amount of displayable useCaseGroups
+     * @returns {*}
+     */
+    countDisplayableUseCaseGroups() {
       let countDisplayedUseCaseGroups = 0;
 
       for (const key in this.useCaseGroups) {
-        if (
-          this.displayableUseCaseGroup(this.useCaseGroups[key]) &&
-          ++countDisplayedUseCaseGroups > 1
-        ) {
-          return true;
+        if (this.displayableUseCaseGroup(this.useCaseGroups[key])) {
+          countDisplayedUseCaseGroups++;
         }
       }
-      return false;
+      return countDisplayedUseCaseGroups;
     }
 
     /**
@@ -188,6 +239,20 @@ function genComponentConf() {
      */
     displayableUseCase(useCase) {
       return useCase && useCase.identifier && (useCase.label || useCase.icon);
+    }
+
+    getUseCasesNotInGroups(allUseCases) {
+      for (const group in this.useCaseGroups) {
+        // if (this.countDisplayableUseCasesInGroup(group) < 2) {
+        //   // should probably be in a different function
+        //   continue;
+        // }
+        for (const useCase in group.useCases) {
+          console.log("not displaying: " + useCase);
+          delete allUseCases[useCase];
+        }
+      }
+      return allUseCases;
     }
   }
 
