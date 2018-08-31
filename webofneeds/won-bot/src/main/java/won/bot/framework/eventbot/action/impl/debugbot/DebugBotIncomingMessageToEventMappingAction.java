@@ -126,22 +126,22 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
     }
     
     public static final String[] USAGE_MESSAGES = {
-            "You are connected to the debug bot. You can issue commands that will cause interactions with your need.",
-            "Usage:",
-            "    'hint':            create a new need and send hint to it",
-            "    'connect':         create a new need and send connection request to it",
-            "    'close':           close the current connection",
-            "    'deactivate':      deactivate remote need of the current connection",
-            "    'chatty on|off':   send chat messages spontaneously every now and then? (default: on)",
-            "    'send N':          send N messages, one per second. N must be an integer between 1 and 9",
-            "    'validate':        download the connection data and validate it",
-            "    'propose (my|any) (N)':  propose one (N, max 9) of my(/your/any) messages for an agreement",
-            "    'accept':          accept the last proposal made (including cancellation proposals)",
-            "    'cancel:           propose to cancel the newest agreement (that wasn't only a cancellation)",
-            "    'retract (mine|proposal)':  retract the last (proposal) message you sent, or the last message I sent",
-            "    'reject (yours)':  reject the last rejectable message I (you) sent",
-            "    'cache eager|lazy: use lazy or eager RDF cache",
-            "    'usage':           display this message"
+            "You are connected to the debug bot. You can issue commands that will cause interactions with your need.\n\n" +
+            "Usage:\n" +
+            "    'hint':            create a new need and send hint to it\n" +
+            "    'connect':         create a new need and send connection request to it\n" +
+            "    'close':           close the current connection\n" +
+            "    'deactivate':      deactivate remote need of the current connection\n" +
+            "    'chatty on|off':   send chat messages spontaneously every now and then? (default: on)\n" +
+            "    'send N':          send N messages, one per second. N must be an integer between 1 and 9\n" +
+            "    'validate':        download the connection data and validate it\n" +
+            "    'propose (my|any) (N)':  propose one (N, max 9) of my(/your/any) messages for an agreement\n" +
+            "    'accept':          accept the last proposal made (including cancellation proposals)\n" +
+            "    'cancel:           propose to cancel the newest agreement (that wasn't only a cancellation)\n" +
+            "    'retract (mine|proposal)':  retract the last (proposal) message you sent, or the last message I sent\n" +
+            "    'reject (yours)':  reject the last rejectable message I (you) sent\n" +
+            "    'cache eager|lazy: use lazy or eager RDF cache\n" +
+            "    'usage':           display this message\n"
     };
 
     public static final String[] N_MESSAGES = {
