@@ -2147,7 +2147,12 @@ function groupByGraphs(jsonldData, addDefaultContext = true) {
  * @return the list at the path
  */
 won.parseListFrom = (jsonld, path, type, context = won.defaultContext) => {
-  return parseJsonldLeafsImm(getInFromJsonLd(jsonld, path, context), type);
+  try {
+    return parseJsonldLeafsImm(getInFromJsonLd(jsonld, path, context), type);
+  } catch (err) {
+    console.error("Could not parse From list: ", err);
+    return undefined;
+  }
 };
 
 /**
