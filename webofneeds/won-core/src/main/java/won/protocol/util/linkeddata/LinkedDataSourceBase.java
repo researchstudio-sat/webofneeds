@@ -233,7 +233,7 @@ public class LinkedDataSourceBase implements LinkedDataSource {
 				throw new RuntimeException("Could not retrieve data for multiple URIs", e);
 			}
 			if (crawledDataset.isPresent()) {
-				RdfUtils.addDatasetToDataset(dataset, crawledDataset.get());
+	            RdfUtils.addDatasetToDataset(dataset, crawledDataset.get(),true);
 			}
 			crawledURIs.addAll(urisToCrawl);
 			requests+= urisToCrawl.size();
