@@ -4,6 +4,10 @@ import { details, abstractDetails } from "detailDefinitions";
 import { Parser as SparqlParser } from "sparqljs";
 import { findLatestIntervallEndInJsonLd } from "../app/won-utils.js";
 import won from "../app/won-es6.js";
+import {
+  filterInVicinity,
+  prefixesString,
+} from "../app/sparql-builder-utils.js";
 
 export const emptyDraft = {
   is: {},
@@ -735,8 +739,12 @@ const realEstateUseCases = {
       const numberOfRoomsRange = seeksBranch && seeksBranch.numberOfRoomsRange;
       const location = seeksBranch && seeksBranch.location;
 
-      let filterStrings = [];
       let bgp = [];
+      const filterStrings = [];
+      const prefixes = {
+        s: won.defaultContext["s"],
+        won: won.defaultContext["won"],
+      };
 
       if (rentRange) {
         if ((rentRange.min || rentRange.max) && rentRange.currency) {
@@ -796,29 +804,14 @@ const realEstateUseCases = {
       }
 
       if (location) {
-        filterStrings.push(
-          `?result won:is/won:hasLocation/s:geo ?geo
-          SERVICE geo:search {
-            ?geo geo:search "inCircle" ;
-                 geo:searchDatatype geoliteral:lat-lon ;
-                 geo:predicate won:geoSpatial ;
-                 geo:spatialCircleCenter "${location.lat}#${location.lng}" ;
-                 geo:spatialCircleRadius "10" ;
-                 geo:distanceValue ?geoDistance .
-          }`
-        );
+        const vicinityFilter = filterInVicinity(location);
+        Object.assign(prefixes, vicinityFilter.prefixes);
+        filterStrings.push(vicinityFilter.filterString);
       }
 
-      const prefixes = `
-        prefix s:     <http://schema.org/>
-        prefix won:   <http://purl.org/webofneeds/model#>
-        prefix dc:    <http://purl.org/dc/elements/1.1/>
-        prefix geo: <http://www.bigdata.com/rdf/geospatial#>
-        prefix geoliteral: <http://www.bigdata.com/rdf/geospatial/literals/v1#>
-      `;
       let queryTemplate =
         `
-        ${prefixes}
+        ${prefixesString(prefixes)}
         SELECT DISTINCT ${resultName}
         WHERE {
           ${resultName} won:is ?is. 
