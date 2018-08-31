@@ -233,6 +233,10 @@ public class LinkedDataSourceBase implements LinkedDataSource {
 				throw new RuntimeException("Could not retrieve data for multiple URIs", e);
 			}
 			if (crawledDataset.isPresent()) {
+			    // Add crawledDataset to dataset, replacing any named models contained in both.
+			    // We do this because 
+			    // 1. merging does not work properly in the presence of blank nodes - they end up duplicated
+			    // 2. we do not expect to find the same named model with different content, so merging should have no visible effect at all
 	            RdfUtils.addDatasetToDataset(dataset, crawledDataset.get(),true);
 			}
 			crawledURIs.addAll(urisToCrawl);
