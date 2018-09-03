@@ -86,6 +86,7 @@ import won.matcher.service.common.event.NeedEvent;
 import won.matcher.sparql.config.SparqlMatcherConfig;
 import won.protocol.util.NeedModelWrapper;
 import won.protocol.util.linkeddata.LinkedDataSource;
+import won.protocol.vocabulary.WON;
 
 /**
  * Siren/Solr based abstract matcher with all implementations for querying as
@@ -322,10 +323,10 @@ public class SparqlMatcherActor extends UntypedActor {
 
         Optional<Op> query;
 
-        Statement userQuery = model.getProperty(model.createResource(needURI), model.createProperty("http://purl.org/webofneeds/model#hasQuery"));
+        Optional<String> userQuery = need.getQuery();
 
-        if(userQuery != null) {
-            query = clientSuppliedQuery(userQuery.getString());
+        if(userQuery.isPresent()) {
+            query = clientSuppliedQuery(userQuery.get());
         } else {
             query = defaultQuery(need);
         }

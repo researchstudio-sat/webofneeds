@@ -279,6 +279,20 @@ public class NeedModelWrapper {
     	return getNeedNode(NeedGraphType.NEED).hasProperty(WON.HAS_MATCHING_CONTEXT, context);
     }
     
+    public void addQuery(String query) {
+        getNeedNode(NeedGraphType.NEED).addProperty(WON.HAS_QUERY, query);
+    }
+    
+    public Optional<String> getQuery() {
+        Statement stmt = getNeedNode(NeedGraphType.NEED).getProperty(WON.HAS_QUERY);
+        if (stmt == null) return Optional.empty();
+        return Optional.of(stmt.getString());
+    }
+    
+    public boolean hasQuery() {
+        return getNeedNode(NeedGraphType.NEED).hasProperty(WON.HAS_QUERY);
+    }
+    
     public Collection<String> getMatchingContexts() {
         Collection<String> matchingContexts = new LinkedList<>();
         NodeIterator iter = getNeedModel().listObjectsOfProperty(getNeedNode(NeedGraphType.NEED), WON.HAS_MATCHING_CONTEXT);
