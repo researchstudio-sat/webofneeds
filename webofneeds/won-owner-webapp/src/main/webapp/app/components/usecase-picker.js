@@ -68,11 +68,36 @@ function genComponentConf() {
         <div class="ucp__main">
 
         <!-- TODO: SEARCH FIELD -->
-        <!-- TODO: SEARCH RESULTS -->
+        <input
+            type="text"
+            class="ucp__main__search"
+            ng-model="searchInput"
+            ng-init="searchInput =''"
+            placeholder="Search for use cases"
+            won-input="::self.updateSearch()" />
+
+        <!-- SEARCH RESULTS -->
+        <!-- easier: show all the usecases found, regardless of group -->
+        <!-- nicer: show group titles -->
+        <!-- potential problem: use cases that are in more than one group -->
+        <div class="ucp__main__searchresult clickable"
+            ng-repeat="useCase in self.searchArray | filter:searchInput"
+            ng-if="searchInput.length > 1">
+            <svg class="ucp__main__searchresult__icon"
+                ng-if="!!useCase.icon">
+                <use xlink:href="{{ useCase.icon }}" href="{{ useCase.icon }}"></use>
+              </svg>
+              <div class="ucp__main__searchresult__label"
+                ng-if="!!useCase.label">
+                  {{ useCase.label }}
+              </div>
+        </div>
+
+
         <!-- USE CASE GROUPS - TODO: only show while not searching --> 
         <div class="ucp__main__usecase-group clickable"
           ng-repeat="useCaseGroup in self.useCaseGroups"
-          ng-if="self.displayableUseCaseGroup(useCaseGroup) && self.countDisplayableUseCasesInGroup(useCaseGroup) > self.showGroupsThreshold"
+          ng-if="searchInput.length === 0 && self.displayableUseCaseGroup(useCaseGroup) && self.countDisplayableUseCasesInGroup(useCaseGroup) > self.showGroupsThreshold"
           ng-click="self.viewUseCaseGroup(useCaseGroup)">
               <svg class="ucp__main__usecase-group__icon"
                 ng-if="!!useCaseGroup.icon">
@@ -86,7 +111,7 @@ function genComponentConf() {
         <!-- USE CASES WITHOUT GROUPS - TODO: only show while not searching --> 
         <div class="ucp__main__usecase-group clickable"
           ng-repeat="useCase in self.ungroupedUseCases"
-          ng-if="self.displayableUseCase(useCase)"
+          ng-if="searchInput.length === 0 && self.displayableUseCase(useCase)"
           ng-click="self.startFrom(useCase)">
               <svg class="ucp__main__usecase-group__icon"
                 ng-if="!!useCase.icon">
@@ -109,6 +134,8 @@ function genComponentConf() {
       this.useCaseGroups = useCaseGroups;
       this.showGroupsThreshold = 1; // only show groups at least 1 use case(s)
       // this.showGroups = this.countDisplayableUseCaseGroups() > 0;
+      this.searchArray = Object.keys(useCases).map(i => useCases[i]);
+      this.ungroupedUseCases = this.getUngroupedUseCases(useCases);
 
       const selectFromState = state => {
         const useCaseGroup = getIn(state, [
@@ -123,8 +150,6 @@ function genComponentConf() {
           connectionHasBeenLost: !selectIsConnected(state),
         };
       };
-
-      this.ungroupedUseCases = this.getUngroupedUseCases(useCases);
 
       // Using actionCreators like this means that every action defined there is available in the template.
       connect2Redux(selectFromState, actionCreators, [], this);
@@ -177,6 +202,16 @@ function genComponentConf() {
     }
 
     // redirects end
+
+    // search start
+
+    updateSearch() {} // TODO: do something here
+
+    searchFunction() {}
+
+    // search end
+
+    // helper functions for displaying use case groups and use cases
 
     /**
      * return the amount of displayable useCases in a useCaseGroup
