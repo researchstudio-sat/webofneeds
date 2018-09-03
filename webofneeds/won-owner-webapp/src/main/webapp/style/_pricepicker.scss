@@ -1,0 +1,55 @@
+@import "won-config";
+@import "textfield";
+@import "sizing-utils";
+
+won-price-picker {
+  .pricep__input {
+    position: relative;
+    display: grid;
+
+    &__reset {
+      position: relative;
+
+      &__icon {
+        @include fixed-square($bigiconSize);
+        position: absolute;
+        left: 0;
+        top: 0.5rem;
+      }
+    }
+
+    .pricep__input__inner {
+      @extend .won-txt;
+      text-align: right;
+      border: $thinGrayBorder;
+
+      @include textfieldPadding(
+        $normalFontSize,
+        22/16,
+        $thinBorderWidth,
+        $formInputHeight
+      );
+      word-wrap: break-word;
+
+      &:invalid {
+        /*TODO: Define styling for invalid input field*/
+      }
+
+      &.pricep__input__inner--withreset {
+        $verticalPadding: calcVerticalPaddingToHeight(
+          $normalFontSize,
+          22/16,
+          $thinBorderWidth,
+          $formInputHeight
+        );
+        padding: $verticalPadding 0.438rem $verticalPadding 0.438rem +
+          $bigiconSize;
+      }
+    }
+
+    .pricep__input__inner::-ms-clear {
+      width: 0;
+      height: 0;
+    }
+  }
+}

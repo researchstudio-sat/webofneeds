@@ -159,6 +159,49 @@ export const details = {
       return undefined;
     },
   },
+  price: {
+    identifier: "price",
+    label: "Price",
+    icon: "#ico36_detail_price",
+    placeholder: "Enter Price...",
+    component: "won-price-picker",
+    viewerComponent: "won-price-viewer",
+    parseToRDF: function({ value }) {
+      if (!value) {
+        return { "s:priceSpecification": undefined };
+      }
+      return {
+        "s:priceSpecification": {
+          "@type": "s:CompoundPriceSpecification", //TODO: IMPLEMENT TYPE CORRECT
+          "s:price": [{ "@value": value, "@type": "s:Float" }],
+          "s:priceCurrency": "EUR", //TODO: IMPLEMENT CURRENCY
+          "s:description": "total rent per month", //TODO: IMPLEMENT ITEM AMOUNT (per Week, per Month, per Unit....)
+        },
+      };
+    },
+    parseFromRDF: function(jsonLDImm) {
+      const rent = won.parseFrom(
+        //TODO: IMPLEMENT CURRENCY
+        jsonLDImm,
+        ["s:priceSpecification", "s:price"], //TODO: IMPLEMENT ITEM AMOUNT (per Week, per Month, per Unit....)
+        "s:Float"
+      );
+
+      if (!rent) {
+        return undefined;
+      } else {
+        return rent + " EUR/month";
+      }
+    },
+    generateHumanReadable: function({ value, includeLabel }) {
+      if (value) {
+        return (
+          (includeLabel ? this.label + ": " + value : value) + " EUR/month"
+        );
+      }
+      return undefined;
+    },
+  },
   description: {
     identifier: "description",
     label: "Description",

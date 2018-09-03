@@ -1,0 +1,6 @@
+@import "won-config";
+@import "sizing-utils";
+
+won-price-viewer {
+  @include won-detail-viewer("pricev");
+}
