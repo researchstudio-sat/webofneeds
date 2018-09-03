@@ -72,7 +72,7 @@ function genComponentConf() {
         <!-- USE CASE GROUPS - TODO: only show while not searching --> 
         <div class="ucp__main__usecase-group clickable"
           ng-repeat="useCaseGroup in self.useCaseGroups"
-          ng-if="self.showGroups && self.displayableUseCaseGroup(useCaseGroup)"
+          ng-if="self.displayableUseCaseGroup(useCaseGroup) && self.countDisplayableUseCasesInGroup(useCaseGroup) > self.showGroupsThreshold"
           ng-click="self.viewUseCaseGroup(useCaseGroup)">
               <svg class="ucp__main__usecase-group__icon"
                 ng-if="!!useCaseGroup.icon">
@@ -84,7 +84,6 @@ function genComponentConf() {
               </div>
         </div>
         <!-- USE CASES WITHOUT GROUPS - TODO: only show while not searching --> 
-        <!--
         <div class="ucp__main__usecase-group clickable"
           ng-repeat="useCase in self.ungroupedUseCases"
           ng-if="self.displayableUseCase(useCase)"
@@ -98,7 +97,6 @@ function genComponentConf() {
                   {{ useCase.label }}
               </div>
         </div>
-        -->
 
         </div>
     `;
@@ -109,7 +107,8 @@ function genComponentConf() {
       window.ucp4dbg = this;
 
       this.useCaseGroups = useCaseGroups;
-      this.showGroups = this.countDisplayableUseCaseGroups() > 0; // TODO: change this once single use cases can be displayed here
+      this.showGroupsThreshold = 1; // only show groups at least 1 use case(s)
+      // this.showGroups = this.countDisplayableUseCaseGroups() > 0;
 
       const selectFromState = state => {
         const useCaseGroup = getIn(state, [
@@ -125,7 +124,7 @@ function genComponentConf() {
         };
       };
 
-      this.ungroupedUseCases = this.getUseCasesNotInGroups(useCases);
+      this.ungroupedUseCases = this.getUngroupedUseCases(useCases);
 
       // Using actionCreators like this means that every action defined there is available in the template.
       connect2Redux(selectFromState, actionCreators, [], this);
@@ -199,16 +198,16 @@ function genComponentConf() {
      * return the amount of displayable useCaseGroups
      * @returns {*}
      */
-    countDisplayableUseCaseGroups() {
-      let countDisplayedUseCaseGroups = 0;
+    // countDisplayableUseCaseGroups() {
+    //   let countDisplayedUseCaseGroups = 0;
 
-      for (const key in this.useCaseGroups) {
-        if (this.displayableUseCaseGroup(this.useCaseGroups[key])) {
-          countDisplayedUseCaseGroups++;
-        }
-      }
-      return countDisplayedUseCaseGroups;
-    }
+    //   for (const key in this.useCaseGroups) {
+    //     if (this.displayableUseCaseGroup(this.useCaseGroups[key])) {
+    //       countDisplayedUseCaseGroups++;
+    //     }
+    //   }
+    //   return countDisplayedUseCaseGroups;
+    // }
 
     /**
      * return if the given useCaseGroup is displayable or not
@@ -241,14 +240,20 @@ function genComponentConf() {
       return useCase && useCase.identifier && (useCase.label || useCase.icon);
     }
 
-    getUseCasesNotInGroups(allUseCases) {
-      for (const group in this.useCaseGroups) {
-        // if (this.countDisplayableUseCasesInGroup(group) < 2) {
-        //   // should probably be in a different function
-        //   continue;
-        // }
+    getUngroupedUseCases(allUseCases) {
+      for (const identifier in this.useCaseGroups) {
+        const group = this.useCaseGroups[identifier];
+        // show use cases from groups that can't be displayed
+        // don't show groups with less than threshold use cases as group
+        if (
+          !this.displayableUseCaseGroup(group) ||
+          this.countDisplayableUseCasesInGroup(group) <=
+            this.showGroupsThreshold
+        ) {
+          continue;
+        }
+        // don't show usecases in groups as single use cases
         for (const useCase in group.useCases) {
-          console.log("not displaying: " + useCase);
           delete allUseCases[useCase];
         }
       }
