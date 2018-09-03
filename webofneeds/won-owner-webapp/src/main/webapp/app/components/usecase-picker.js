@@ -276,6 +276,7 @@ function genComponentConf() {
     }
 
     getUngroupedUseCases(allUseCases) {
+      let ungroupedUseCases = JSON.parse(JSON.stringify(allUseCases));
       for (const identifier in this.useCaseGroups) {
         const group = this.useCaseGroups[identifier];
         // show use cases from groups that can't be displayed
@@ -289,10 +290,10 @@ function genComponentConf() {
         }
         // don't show usecases in groups as single use cases
         for (const useCase in group.useCases) {
-          delete allUseCases[useCase];
+          delete ungroupedUseCases[useCase];
         }
       }
-      return allUseCases;
+      return ungroupedUseCases;
     }
   }
 
