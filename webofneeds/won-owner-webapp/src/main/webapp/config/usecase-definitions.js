@@ -3,7 +3,6 @@ import Immutable from "immutable";
 import { details, abstractDetails } from "detailDefinitions";
 import { Parser as SparqlParser } from "sparqljs";
 import { findLatestIntervallEndInJsonLd } from "../app/won-utils.js";
-import { reduceObjectByKeys } from "../app/utils";
 import won from "../app/won-es6.js";
 
 export const emptyDraft = {
@@ -820,10 +819,14 @@ const realEstateUseCases = {
       const location = seeksBranch && seeksBranch.location;
 
       let filterStrings = [];
+      let bgp = [];
 
       if (rentRange) {
         if (rentRange.min || rentRange.max) {
           filterStrings.push("FILTER (?currency = 'EUR') ");
+          bgp.push("?is s:priceSpecification ?pricespec .");
+          bgp.push("?pricespec s:price ?price .");
+          bgp.push("?pricespec s:priceCurrency ?currency .");
         }
         if (rentRange.min) {
           filterStrings.push(
@@ -838,6 +841,9 @@ const realEstateUseCases = {
       }
 
       if (floorSizeRange) {
+        if (floorSizeRange.min || floorSizeRange.max) {
+          bgp.push("?is s:floorSize/s:value ?floorSize.");
+        }
         if (floorSizeRange.min) {
           filterStrings.push(
             "FILTER (?floorSize >= " + draft.seeks.floorSizeRange.min + " )"
@@ -851,6 +857,9 @@ const realEstateUseCases = {
       }
 
       if (numberOfRoomsRange) {
+        if (numberOfRoomsRange.min || numberOfRoomsRange.max) {
+          bgp.push("?is s:numberOfRooms ?numberOfRooms.");
+        }
         if (numberOfRoomsRange.min) {
           filterStrings.push(
             "FILTER (?numberOfRooms >= " +
@@ -871,12 +880,12 @@ const realEstateUseCases = {
         filterStrings.push(
           `?result won:is/won:hasLocation/s:geo ?geo
           SERVICE geo:search {
-            ?geo geo:search "inCircle" .
-            ?geo geo:searchDatatype geoliteral:lat-lon .
-            ?geo geo:predicate won:geoSpatial .
-            ?geo geo:spatialCircleCenter "${location.lat}#${location.lng}" .
-            ?geo geo:spatialCircleRadius "10" .
-            ?geo geo:distanceValue ?geoDistance .
+            ?geo geo:search "inCircle" ;
+                 geo:searchDatatype geoliteral:lat-lon ;
+                 geo:predicate won:geoSpatial ;
+                 geo:spatialCircleCenter "${location.lat}#${location.lng}" ;
+                 geo:spatialCircleRadius "10" ;
+                 geo:distanceValue ?geoDistance .
           }`
         );
       }
@@ -893,13 +902,8 @@ const realEstateUseCases = {
         ${prefixes}
         SELECT DISTINCT ${resultName}
         WHERE {
-        ${resultName}
-          won:is ?is.
-          ?is s:priceSpecification ?pricespec.
-          ?pricespec s:price ?price.
-          ?pricespec s:priceCurrency ?currency.
-          ?is s:floorSize/s:value ?floorSize.
-          ?is s:numberOfRooms ?numberOfRooms.
+          ${resultName} won:is ?is. 
+          ${bgp && bgp.join(" ")}
           ${filterStrings && filterStrings.join(" ")}
         }` + (location ? `ORDER BY ASC(?geoDistance)` : "");
 
@@ -1414,9 +1418,7 @@ const musicianUseCases = {
     },
     isDetails: undefined,
     seeksDetails: {
-      ...reduceObjectByKeys(realEstateUseCases.searchRent.seeksDetails, [
-        "numberOfRoomsRange",
-      ]),
+      numberOfRoomsRange: { ...realEstateNumberOfRoomsRangeDetail },
       features: {
         ...realEstateFeaturesDetail,
         placeholder: "e.g. PA, Drumkit",
@@ -1441,9 +1443,7 @@ const musicianUseCases = {
       },
     },
     isDetails: {
-      ...reduceObjectByKeys(realEstateUseCases.offerRent.isDetails, [
-        "numberOfRooms",
-      ]),
+      numberOfRooms: { ...realEstateNumberOfRoomsDetail },
       features: {
         ...realEstateFeaturesDetail,
         placeholder: "e.g. PA, Drumkit",
