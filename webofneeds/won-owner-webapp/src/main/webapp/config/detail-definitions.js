@@ -167,7 +167,7 @@ export const details = {
     component: "won-price-picker",
     viewerComponent: "won-price-viewer",
     currency: [
-      { value: "EUR", label: "€" },
+      { value: "EUR", label: "€", default: true },
       { value: "USD", label: "$" },
       { value: "GBP", label: "£" },
     ],
@@ -176,10 +176,10 @@ export const details = {
       { value: "WEE", label: "per week" },
       { value: "DAY", label: "per day" },
       { value: "HUR", label: "per hour" },
-      { value: "", label: "total" },
+      { value: "", label: "total", default: true },
     ],
     parseToRDF: function({ value }) {
-      if (!value || !value.amount || !value.currency || !value.unitCode) {
+      if (!value || !value.amount || !value.currency) {
         return { "s:priceSpecification": undefined };
       }
 

@@ -26,12 +26,15 @@ function genComponentConf() {
         <select
             class="pricep__input__currency"
             ng-model="self.selectedCurrency"
+            ng-disabled="self.detail.currency.length <= 1"
             won-input="::self.updateCurrency()">
             <option ng-repeat="currency in self.detail.currency" value="{{currency.value}}" selected>{{currency.label}}</option>
         </select>
         <select
             class="pricep__input__unitCode"
             ng-model="self.selectedUnitCode"
+            ng-if="!self.totalUnitCodeOnly()"
+            ng-disabled="self.detail.unitCode.length == 1"
             won-input="::self.updateUnitCode()">
             <option ng-repeat="unitCode in self.detail.unitCode" value="{{unitCode.value}}" selected>{{unitCode.label}}</option>
         </select>
@@ -62,6 +65,15 @@ function genComponentConf() {
     }
 
     /**
+     * If there is no unitCode present in the given detail other than the "" blank/total unit code then we do not show any dropdown picker
+     * @returns {boolean}
+     */
+    totalUnitCodeOnly() {
+      const unitCode = this.detail && this.detail.unitCode;
+      return unitCode && unitCode.length == 1 && unitCode[0].value == "";
+    }
+
+    /**
      * Checks validity and uses callback method
      */
     update(number, currency, unitCode) {
@@ -79,11 +91,23 @@ function genComponentConf() {
     }
 
     showInitialNumber() {
+      let defaultCurrency;
+      this.detail &&
+        this.detail.currency.forEach(curr => {
+          if (curr.default) defaultCurrency = curr.value;
+        });
+
+      let defaultUnitCode;
+      this.detail &&
+        this.detail.unitCode.forEach(uc => {
+          if (uc.default) defaultUnitCode = uc.value;
+        });
+
       this.addedNumber = this.initialValue && this.initialValue.amount;
       this.selectedCurrency =
-        (this.initialValue && this.initialValue.currency) || "EUR";
+        (this.initialValue && this.initialValue.currency) || defaultCurrency;
       this.selectedUnitCode =
-        (this.initialValue && this.initialValue.unitCode) || "";
+        (this.initialValue && this.initialValue.unitCode) || defaultUnitCode;
 
       if (this.initialValue && this.initialValue.amount) {
         this.amount().value = this.initialValue.amount;
@@ -136,7 +160,7 @@ function genComponentConf() {
           this.selectedUnitCode
         );
       } else {
-        this.update(undefined);
+        this.update(this.addedNumber, undefined, this.selectedUnitCode);
       }
     }
 
@@ -150,7 +174,7 @@ function genComponentConf() {
           this.selectedUnitCode
         );
       } else {
-        this.update(undefined);
+        this.update(this.addedNumber, this.selectedCurrency, undefined);
       }
     }
 
