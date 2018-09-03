@@ -674,46 +674,14 @@ const realEstateFeaturesDetail = {
 };
 
 const realEstateRentDetail = {
-  ...abstractDetails.number,
+  ...details.price,
   identifier: "rent",
-  label: "Rent in EUR/month",
+  label: "Rent",
   icon: "#ico36_detail_rent",
-  parseToRDF: function({ value }) {
-    if (!value) {
-      return { "s:priceSpecification": undefined };
-    }
-    return {
-      "s:priceSpecification": {
-        "@type": "s:CompoundPriceSpecification",
-        "s:price": [{ "@value": value, "@type": "s:Float" }],
-        "s:priceCurrency": "EUR",
-        "s:description": "total rent per month",
-        // "s:priceComponent": {
-        //   "@type": "s:UnitPriceSpecification",
-        //   "s:price": 0,
-        //   "s:priceCurrency": "EUR",
-        //   "s:description": "",
-        // }
-      },
-    };
-  },
-  parseFromRDF: function(jsonLDImm) {
-    const rent = won.parseFrom(
-      jsonLDImm,
-      ["s:priceSpecification", "s:price"],
-      "s:Float"
-    );
-
-    if (!rent) {
-      return undefined;
-    } else {
-      return rent + " EUR/month";
-    }
-  },
-  generateHumanReadable: function({ value, includeLabel }) {
-    if (value) {
-      return (includeLabel ? this.label + ": " + value : value) + " EUR/month";
-    }
+  currency: [{ value: "EUR", label: "€", default: true }],
+  unitCode: [{ value: "MON", label: "per month", default: true }],
+  parseFromRDF: function() {
+    //That way we can make sure that parsing fromRDF is made only by the price detail itself
     return undefined;
   },
 };

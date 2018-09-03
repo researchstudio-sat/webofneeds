@@ -28,15 +28,15 @@ function genComponentConf() {
             ng-model="self.selectedCurrency"
             ng-disabled="self.detail.currency.length <= 1"
             won-input="::self.updateCurrency()">
-            <option ng-repeat="currency in self.detail.currency" value="{{currency.value}}" selected>{{currency.label}}</option>
+            <option ng-repeat="currency in self.detail.currency" value="{{currency.value}}">{{currency.label}}</option>
         </select>
         <select
             class="pricep__input__unitCode"
             ng-model="self.selectedUnitCode"
             ng-if="!self.totalUnitCodeOnly()"
-            ng-disabled="self.detail.unitCode.length == 1"
+            ng-disabled="self.detail.unitCode.length <= 1"
             won-input="::self.updateUnitCode()">
-            <option ng-repeat="unitCode in self.detail.unitCode" value="{{unitCode.value}}" selected>{{unitCode.label}}</option>
+            <option ng-repeat="unitCode in self.detail.unitCode" value="{{unitCode.value}}">{{unitCode.label}}</option>
         </select>
       </div>
     `;
@@ -90,24 +90,35 @@ function genComponentConf() {
       }
     }
 
-    showInitialNumber() {
+    getDefaultCurrency() {
       let defaultCurrency;
+
       this.detail &&
         this.detail.currency.forEach(curr => {
           if (curr.default) defaultCurrency = curr.value;
         });
 
+      return defaultCurrency;
+    }
+    getDefaultUnitCode() {
       let defaultUnitCode;
+
       this.detail &&
         this.detail.unitCode.forEach(uc => {
           if (uc.default) defaultUnitCode = uc.value;
         });
 
+      return defaultUnitCode;
+    }
+
+    showInitialNumber() {
       this.addedNumber = this.initialValue && this.initialValue.amount;
       this.selectedCurrency =
-        (this.initialValue && this.initialValue.currency) || defaultCurrency;
+        (this.initialValue && this.initialValue.currency) ||
+        this.getDefaultCurrency();
       this.selectedUnitCode =
-        (this.initialValue && this.initialValue.unitCode) || defaultUnitCode;
+        (this.initialValue && this.initialValue.unitCode) ||
+        this.getDefaultUnitCode();
 
       if (this.initialValue && this.initialValue.amount) {
         this.amount().value = this.initialValue.amount;
@@ -180,16 +191,16 @@ function genComponentConf() {
 
     resetNumber(resetInput) {
       this.addedNumber = undefined;
-      this.selectedCurrency = "EUR";
-      this.selectedUnitCode = "";
+      this.selectedCurrency = this.getDefaultCurrency();
+      this.selectedUnitCode = this.getDefaultUnitCode();
 
       if (resetInput) {
         this.amount().value = "";
-        this.currency().value = "EUR";
-        this.unitCode().value = "";
+        this.currency().value = this.selectedCurrency;
+        this.unitCode().value = this.selectedUnitCode;
         this.showResetButton = false;
       }
-      this.update(undefined);
+      this.update(undefined, this.selectedCurrency, this.selectedUnitCode);
     }
 
     amount() {
