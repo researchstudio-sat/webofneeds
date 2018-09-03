@@ -436,7 +436,11 @@ const realEstateFloorSizeDetail = {
     };
   },
   parseFromRDF: function(jsonLDImm) {
-    const fs = won.parseFrom(jsonLDImm, ["s:floorSize", "s:value"], "xsd:float");
+    const fs = won.parseFrom(
+      jsonLDImm,
+      ["s:floorSize", "s:value"],
+      "xsd:float"
+    );
     const unit = getInFromJsonLd(
       jsonLDImm,
       ["s:floorSize", "s:unitCode"],
@@ -1102,7 +1106,11 @@ const transportUseCases = {
           }
         },
         parseFromRDF: function(jsonLDImm) {
-          const w = won.parseFrom(jsonLDImm, ["s:width", "s:value"], "xsd:float");
+          const w = won.parseFrom(
+            jsonLDImm,
+            ["s:width", "s:value"],
+            "xsd:float"
+          );
           const unit = getInFromJsonLd(
             jsonLDImm,
             ["s:width", "s:unitCode"],
