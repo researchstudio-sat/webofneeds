@@ -6,6 +6,7 @@ won-price-picker {
   .pricep__input {
     position: relative;
     display: grid;
+    grid-template-columns: auto 1fr auto;
 
     &__reset {
       position: relative;
@@ -45,6 +46,41 @@ won-price-picker {
         padding: $verticalPadding 0.438rem $verticalPadding 0.438rem +
           $bigiconSize;
       }
+    }
+
+    .pricep__input__currency {
+      border: $thinGrayBorder;
+      min-height: $formInputHeight;
+      min-height: $formInputHeight;
+      word-wrap: break-word;
+      font-size: 1rem;
+
+      $verticalPadding: calcVerticalPaddingToHeight(
+        $normalFontSize,
+        22/16,
+        $thinBorderWidth,
+        $formInputHeight
+      );
+      padding: $verticalPadding 0.438rem + $bigiconSize $verticalPadding
+        0.438rem;
+    }
+
+    .pricep__input__unitCode {
+      grid-column: 1 / span 3;
+      border: $thinGrayBorder;
+      min-height: $formInputHeight;
+      min-height: $formInputHeight;
+      word-wrap: break-word;
+      font-size: 1rem;
+
+      $verticalPadding: calcVerticalPaddingToHeight(
+        $normalFontSize,
+        22/16,
+        $thinBorderWidth,
+        $formInputHeight
+      );
+      padding: $verticalPadding 0.438rem + $bigiconSize $verticalPadding
+        0.438rem;
     }
 
     .pricep__input__inner::-ms-clear {

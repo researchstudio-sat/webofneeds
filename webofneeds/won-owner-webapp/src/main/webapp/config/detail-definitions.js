@@ -166,38 +166,92 @@ export const details = {
     placeholder: "Enter Price...",
     component: "won-price-picker",
     viewerComponent: "won-price-viewer",
+    currency: [
+      { value: "EUR", label: "€" },
+      { value: "USD", label: "$" },
+      { value: "GBP", label: "£" },
+    ],
+    unitCode: [
+      { value: "MON", label: "per month" },
+      { value: "WEE", label: "per week" },
+      { value: "DAY", label: "per day" },
+      { value: "HUR", label: "per hour" },
+      { value: "", label: "total" },
+    ],
     parseToRDF: function({ value }) {
-      if (!value) {
+      if (!value || !value.amount || !value.currency || !value.unitCode) {
         return { "s:priceSpecification": undefined };
       }
+
       return {
         "s:priceSpecification": {
-          "@type": "s:CompoundPriceSpecification", //TODO: IMPLEMENT TYPE CORRECT
-          "s:price": [{ "@value": value, "@type": "s:Float" }],
-          "s:priceCurrency": "EUR", //TODO: IMPLEMENT CURRENCY
-          "s:description": "total rent per month", //TODO: IMPLEMENT ITEM AMOUNT (per Week, per Month, per Unit....)
+          "@type": "s:CompoundPriceSpecification",
+          "s:price": [{ "@value": value.amount, "@type": "s:Float" }],
+          "s:priceCurrency": value.currency,
+          "s:unitCode": value.unitCode,
         },
       };
     },
     parseFromRDF: function(jsonLDImm) {
-      const rent = won.parseFrom(
-        //TODO: IMPLEMENT CURRENCY
+      const amount = won.parseFrom(
         jsonLDImm,
-        ["s:priceSpecification", "s:price"], //TODO: IMPLEMENT ITEM AMOUNT (per Week, per Month, per Unit....)
+        ["s:priceSpecification", "s:price"],
         "s:Float"
       );
 
-      if (!rent) {
+      const currency = won.parseFrom(
+        jsonLDImm,
+        ["s:priceSpecification", "s:priceCurrency"],
+        "xsd:string"
+      );
+
+      const unitCode = won.parseFrom(
+        jsonLDImm,
+        ["s:priceSpecification", "s:unitCode"],
+        "xsd:string"
+      );
+
+      if (!amount || !currency) {
         return undefined;
       } else {
-        return rent + " EUR/month";
+        return { amount: amount, currency: currency, unitCode: unitCode };
       }
     },
     generateHumanReadable: function({ value, includeLabel }) {
       if (value) {
-        return (
-          (includeLabel ? this.label + ": " + value : value) + " EUR/month"
-        );
+        const amount = value.amount;
+
+        let currencyLabel = undefined;
+        let unitCodeLabel = undefined;
+
+        this.currency &&
+          this.currency.forEach(curr => {
+            if (curr.value === value.currency) {
+              currencyLabel = curr.label;
+            }
+          });
+        currencyLabel = currencyLabel || value.currency;
+
+        this.unitCode &&
+          this.unitCode.forEach(uc => {
+            if (uc.value === value.unitCode) {
+              unitCodeLabel = uc.label;
+            }
+          });
+        unitCodeLabel = unitCodeLabel || value.unitCode;
+
+        if (unitCodeLabel) {
+          return (
+            (includeLabel ? this.label + ": " + amount : amount) +
+            currencyLabel +
+            " " +
+            unitCodeLabel
+          );
+        } else {
+          return (
+            (includeLabel ? this.label + ": " + amount : amount) + currencyLabel
+          );
+        }
       }
       return undefined;
     },

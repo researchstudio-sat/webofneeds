@@ -23,6 +23,18 @@ function genComponentConf() {
             ng-blur="::self.updateNumber(true)"
             won-input="::self.updateNumber(false)"
             ng-class="{'pricep__input__inner--withreset' : self.showResetButton}"/>
+        <select
+            class="pricep__input__currency"
+            ng-model="self.selectedCurrency"
+            won-input="::self.updateCurrency()">
+            <option ng-repeat="currency in self.detail.currency" value="{{currency.value}}" selected>{{currency.label}}</option>
+        </select>
+        <select
+            class="pricep__input__unitCode"
+            ng-model="self.selectedUnitCode"
+            won-input="::self.updateUnitCode()">
+            <option ng-repeat="unitCode in self.detail.unitCode" value="{{unitCode.value}}" selected>{{unitCode.label}}</option>
+        </select>
       </div>
     `;
 
@@ -32,7 +44,18 @@ function genComponentConf() {
 
       window.pricep4dbg = this;
 
-      this.addedNumber = this.initialValue;
+      this.addedNumber = this.initialValue && this.initialValue.amount;
+      this.selectedCurrency = this.initialValue && this.initialValue.currency;
+      this.selectedUnitCode = this.initialValue && this.initialValue.unitCode;
+
+      if (!this.selectedCurrency) {
+        this.selectedCurrency = "EUR";
+      }
+
+      if (!this.selectedUnitCode) {
+        this.selectedUnitCode = "";
+      }
+
       this.showResetButton = false;
 
       delay(0).then(() => this.showInitialNumber());
@@ -41,53 +64,117 @@ function genComponentConf() {
     /**
      * Checks validity and uses callback method
      */
-    update(number) {
-      if (number) {
-        this.onUpdate({ value: number });
+    update(number, currency, unitCode) {
+      if (number && currency) {
+        this.onUpdate({
+          value: {
+            amount: number,
+            currency: currency,
+            unitCode: unitCode !== "" ? unitCode : undefined,
+          },
+        });
       } else {
         this.onUpdate({ value: undefined });
       }
     }
 
     showInitialNumber() {
-      this.addedNumber = this.initialValue;
+      this.addedNumber = this.initialValue && this.initialValue.amount;
+      this.selectedCurrency =
+        (this.initialValue && this.initialValue.currency) || "EUR";
+      this.selectedUnitCode =
+        (this.initialValue && this.initialValue.unitCode) || "";
 
-      if (this.initialValue) {
-        this.textfield().value = this.initialValue;
+      if (this.initialValue && this.initialValue.amount) {
+        this.amount().value = this.initialValue.amount;
         this.showResetButton = true;
       }
 
       this.$scope.$apply();
     }
 
+    currency() {
+      if (!this._currency) {
+        this._currency = this.$element[0].querySelector(
+          ".pricep__input__currency"
+        );
+      }
+      return this._currency;
+    }
+
+    unitCode() {
+      if (!this._unitCode) {
+        this._unitCode = this.$element[0].querySelector(
+          ".pricep__input__unitCode"
+        );
+      }
+      return this._unitCode;
+    }
+
     updateNumber(resetInput) {
-      const number = this.textfield().value;
+      const number = this.amount().value;
 
       if (number) {
         this.addedNumber = number;
-        this.update(this.addedNumber);
+        this.update(
+          this.addedNumber,
+          this.selectedCurrency,
+          this.selectedUnitCode
+        );
         this.showResetButton = true;
       } else {
         this.resetNumber(resetInput);
       }
     }
 
+    updateCurrency() {
+      this.selectedCurrency = this.currency().value;
+      if (this.selectedCurrency) {
+        this.update(
+          this.addedNumber,
+          this.selectedCurrency,
+          this.selectedUnitCode
+        );
+      } else {
+        this.update(undefined);
+      }
+    }
+
+    updateUnitCode() {
+      this.selectedUnitCode = this.unitCode().value;
+
+      if (this.selectedUnitCode) {
+        this.update(
+          this.addedNumber,
+          this.selectedCurrency,
+          this.selectedUnitCode
+        );
+      } else {
+        this.update(undefined);
+      }
+    }
+
     resetNumber(resetInput) {
       this.addedNumber = undefined;
+      this.selectedCurrency = "EUR";
+      this.selectedUnitCode = "";
+
       if (resetInput) {
-        this.textfield().value = "";
+        this.amount().value = "";
+        this.currency().value = "EUR";
+        this.unitCode().value = "";
         this.showResetButton = false;
       }
       this.update(undefined);
     }
 
-    textfield() {
-      if (!this._numberInput) {
-        this._numberInput = this.$element[0].querySelector(
+    amount() {
+      if (!this._amountInput) {
+        this._amountInput = this.$element[0].querySelector(
           ".pricep__input__inner"
         );
       }
-      return this._numberInput;
+      return this._amountInput;
     }
   }
   Controller.$inject = serviceDependencies;
