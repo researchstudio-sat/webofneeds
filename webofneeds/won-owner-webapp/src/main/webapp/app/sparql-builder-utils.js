@@ -4,7 +4,7 @@
  */
 
 import won from "./won-es6.js";
-import { is } from "./utils.js";
+import { isValidNumber } from "./utils.js";
 
 /**
  * returns e.g.:
@@ -64,8 +64,8 @@ SERVICE geo:search {
 export function filterFloorSizeRange(min, max) {
   const basicGraphPattern = [];
   const filterStrings = [];
-  const minIsNum = is("Number", min);
-  const maxIsNum = is("Number", max);
+  const minIsNum = isValidNumber(min);
+  const maxIsNum = isValidNumber(max);
   if (minIsNum || maxIsNum) {
     basicGraphPattern.push("?is s:floorSize/s:value ?floorSize.");
   }
@@ -81,8 +81,8 @@ export function filterFloorSizeRange(min, max) {
 export function filterNumOfRoomsRange(min, max) {
   const basicGraphPattern = [];
   const filterStrings = [];
-  const minIsNum = is("Number", min);
-  const maxIsNum = is("Number", max);
+  const minIsNum = isValidNumber(min);
+  const maxIsNum = isValidNumber(max);
   if (minIsNum || maxIsNum) {
     basicGraphPattern.push("?is s:numberOfRooms ?numberOfRooms.");
   }
@@ -98,8 +98,8 @@ export function filterNumOfRoomsRange(min, max) {
 export function filterRentRange(min, max, currency) {
   const basicGraphPattern = [];
   const filterStrings = [];
-  const minIsNum = is("Number", min);
-  const maxIsNum = is("Number", max);
+  const minIsNum = isValidNumber(min);
+  const maxIsNum = isValidNumber(max);
   if ((minIsNum || maxIsNum) && currency) {
     filterStrings.push("FILTER (?currency = '" + currency + "') ");
     basicGraphPattern.concat([

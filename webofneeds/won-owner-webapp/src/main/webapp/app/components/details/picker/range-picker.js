@@ -1,5 +1,5 @@
 import angular from "angular";
-import { attach, delay } from "../../../utils.js";
+import { attach, delay, isValidNumber } from "../../../utils.js";
 import wonInput from "../../../directives/input.js";
 
 import "style/_rangepicker.scss";
@@ -68,12 +68,12 @@ function genComponentConf() {
      */
     updateMin(number) {
       const parsedNum = Number.parseFloat(number);
-      if (!isNaN(parsedNum)) {
+      if (isValidNumber(parsedNum)) {
         this.onUpdate({
           value: { min: parsedNum, max: this.addedMaxNumber },
         });
       } else {
-        if (!isNaN(this.addedMaxNumber)) {
+        if (isValidNumber(this.addedMaxNumber)) {
           this.onUpdate({
             value: { min: number, max: this.addedMaxNumber },
           });
@@ -86,12 +86,12 @@ function genComponentConf() {
     }
     updateMax(number) {
       const parsedNum = Number.parseFloat(number);
-      if (!isNaN(parsedNum)) {
+      if (isValidNumber(parsedNum)) {
         this.onUpdate({
           value: { min: this.addedMinNumber, max: parsedNum },
         });
       } else {
-        if (!isNaN(this.addedMinNumber)) {
+        if (isValidNumber(this.addedMinNumber)) {
           this.onUpdate({
             value: { min: this.addedMinNumber, max: number },
           });
@@ -111,11 +111,11 @@ function genComponentConf() {
         this.addedMinNumber = min;
         this.addedMaxNumber = max;
 
-        if (!isNaN(min)) {
+        if (isValidNumber(min)) {
           this.minTextfield().value = min;
           this.showMinResetButton = true;
         }
-        if (!isNaN(max)) {
+        if (isValidNumber(max)) {
           this.maxTextfield().value = max;
           this.showMaxResetButton = true;
         }
@@ -127,7 +127,7 @@ function genComponentConf() {
     updateMinNumber(resetInput) {
       const number = Number.parseFloat(this.minTextfield().value);
 
-      if (!isNaN(number)) {
+      if (isValidNumber(number)) {
         this.addedMinNumber = number;
         this.updateMin(this.addedMinNumber);
         this.showMinResetButton = true;
@@ -139,7 +139,7 @@ function genComponentConf() {
     updateMaxNumber(resetInput) {
       const number = Number.parseFloat(this.maxTextfield().value);
 
-      if (!isNaN(number)) {
+      if (isValidNumber(number)) {
         this.addedMaxNumber = number;
         this.updateMax(this.addedMaxNumber);
         this.showMaxResetButton = true;

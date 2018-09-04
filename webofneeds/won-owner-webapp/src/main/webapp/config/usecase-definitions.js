@@ -1,4 +1,10 @@
-import { is, get, getFromJsonLd, getInFromJsonLd } from "../app/utils.js";
+import {
+  is,
+  isValidNumber,
+  get,
+  getFromJsonLd,
+  getInFromJsonLd,
+} from "../app/utils.js";
 import Immutable from "immutable";
 import { details, abstractDetails } from "detailDefinitions";
 import { Parser as SparqlParser } from "sparqljs";
@@ -571,8 +577,8 @@ const realEstateNumberOfRoomsRangeDetail = {
 function minMaxLabel(min, max) {
   const min_ = Number.parseFloat(min);
   const max_ = Number.parseFloat(max);
-  const minIsNumber = !isNaN(min_);
-  const maxIsNumber = !isNaN(max_);
+  const minIsNumber = isValidNumber(min_);
+  const maxIsNumber = isValidNumber(max_);
   if (minIsNumber && maxIsNumber) {
     return min_ + "–" + max_;
   } else if (minIsNumber) {

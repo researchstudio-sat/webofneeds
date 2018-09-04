@@ -11,6 +11,7 @@ import {
   getRandomString,
   findAllFieldOccurancesRecursively,
   is,
+  isValidNumber,
   endOfDateStrInterval,
   getFromJsonLd,
 } from "./utils.js";
@@ -441,7 +442,7 @@ export function parseJsonldLeaf(val, type) {
     throwParsingError(val, type, "Conflicting types.");
   }
   const type_ = get(val, "@type") || type;
-  if (is("Number", unwrappedVal) || is("Date", unwrappedVal)) {
+  if (isValidNumber(unwrappedVal) || is("Date", unwrappedVal)) {
     // already parsed
     return unwrappedVal;
   }
@@ -457,7 +458,7 @@ export function parseJsonldLeaf(val, type) {
     case "xsd:float":
       {
         const parsedVal = Number(unwrappedVal);
-        if (isNaN(parsedVal)) {
+        if (!isValidNumber(parsedVal)) {
           throwErr(
             `Annotated value of type \`${type_}\` isn't parsable to a \`Number\`.`
           );
@@ -490,7 +491,7 @@ export function parseJsonldLeaf(val, type) {
 
       // try strictly parsing without type information
       const asNum = Number(unwrappedVal);
-      if (!isNaN(asNum)) {
+      if (isValidNumber(asNum)) {
         return asNum;
       }
       const asDateTime = parseDatetimeStrictly(unwrappedVal);
