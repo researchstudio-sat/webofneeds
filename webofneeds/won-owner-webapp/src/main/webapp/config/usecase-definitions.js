@@ -677,111 +677,28 @@ const realEstateFeaturesDetail = {
 };
 
 const realEstateRentDetail = {
-  ...abstractDetails.number,
+  ...details.price,
   identifier: "rent",
-  label: "Rent in EUR/month",
+  label: "Rent",
   icon: "#ico36_detail_rent",
-  parseToRDF: function({ value }) {
-    if (!value) {
-      return { "s:priceSpecification": undefined };
-    }
-    return {
-      "s:priceSpecification": {
-        "@type": "s:CompoundPriceSpecification",
-        "s:price": [{ "@value": value, "@type": "xsd:float" }],
-        "s:priceCurrency": "EUR",
-        "s:description": "total rent per month",
-        // "s:priceComponent": {
-        //   "@type": "s:UnitPriceSpecification",
-        //   "s:price": 0,
-        //   "s:priceCurrency": "EUR",
-        //   "s:description": "",
-        // }
-      },
-    };
-  },
-  parseFromRDF: function(jsonLDImm) {
-    const rent = won.parseFrom(
-      jsonLDImm,
-      ["s:priceSpecification", "s:price"],
-      "xsd:float"
-    );
-
-    if (!rent) {
-      return undefined;
-    } else {
-      return rent + " EUR/month";
-    }
-  },
-  generateHumanReadable: function({ value, includeLabel }) {
-    if (value) {
-      return (includeLabel ? this.label + ": " + value : value) + " EUR/month";
-    }
+  currency: [{ value: "EUR", label: "€", default: true }],
+  unitCode: [{ value: "MON", label: "per month", default: true }],
+  parseFromRDF: function() {
+    //That way we can make sure that parsing fromRDF is made only by the price detail itself
     return undefined;
   },
 };
 
 const realEstateRentRangeDetail = {
-  ...abstractDetails.range,
+  ...details.pricerange,
   identifier: "rentRange",
   label: "Rent in EUR/month",
   minLabel: "From",
   maxLabel: "To",
+  currency: [{ value: "EUR", label: "€", default: true }],
+  unitCode: [{ value: "MON", label: "per month", default: true }],
   icon: "#ico36_detail_rent",
-  parseToRDF: function({ value }) {
-    if (!value || !(value.min || value.max)) {
-      return { "s:priceSpecification": undefined };
-    }
-    return {
-      "s:priceSpecification": {
-        "@type": "s:CompoundPriceSpecification",
-        "s:minPrice": value.min && [
-          { "@value": value.min, "@type": "xsd:float" },
-        ],
-        "s:maxPrice": value.max && [
-          { "@value": value.max, "@type": "xsd:float" },
-        ],
-        "s:priceCurrency": "EUR",
-        "s:description": "total rent per month in between min/max",
-      },
-    };
-  },
-  parseFromRDF: function(jsonLDImm) {
-    const minRent = won.parseFrom(
-      jsonLDImm,
-      ["s:priceSpecification", "s:minPrice"],
-      "xsd:float"
-    );
-    const maxRent = won.parseFrom(
-      jsonLDImm,
-      ["s:priceSpecification", "s:maxPrice"],
-      "xsd:float"
-    );
-    if (!minRent && !maxRent) {
-      return undefined;
-    } else {
-      // if there's anything, use it
-      return Immutable.fromJS({
-        min: minRent && minRent + " EUR/month",
-        max: maxRent && maxRent + " EUR/month",
-      });
-    }
-  },
-  generateHumanReadable: function({ value, includeLabel }) {
-    if (value) {
-      let humanReadable;
-      if (value.min && value.max) {
-        humanReadable =
-          "between " + value.min + " and " + value.max + " EUR/month";
-      } else if (value.min) {
-        humanReadable = "at least " + value.min + "EUR/month";
-      } else if (value.max) {
-        humanReadable = "at most " + value.max + "EUR/month";
-      }
-      if (humanReadable) {
-        return includeLabel ? this.label + ": " + humanReadable : humanReadable;
-      }
-    }
+  parseFromRDF: function() {
     return undefined;
   },
 };
@@ -822,8 +739,10 @@ const realEstateUseCases = {
       let bgp = [];
 
       if (rentRange) {
-        if (rentRange.min || rentRange.max) {
-          filterStrings.push("FILTER (?currency = 'EUR') ");
+        if ((rentRange.min || rentRange.max) && rentRange.currency) {
+          filterStrings.push(
+            "FILTER (?currency = '" + rentRange.currency + "') "
+          );
           bgp.push("?is s:priceSpecification ?pricespec .");
           bgp.push("?pricespec s:price ?price .");
           bgp.push("?pricespec s:priceCurrency ?currency .");
@@ -1418,11 +1337,13 @@ const musicianUseCases = {
     },
     isDetails: undefined,
     seeksDetails: {
-      numberOfRoomsRange: { ...realEstateNumberOfRoomsRangeDetail },
+      location: { ...details.location },
+      floorSizeRange: { ...realEstateFloorSizeRangeDetail },
       features: {
         ...realEstateFeaturesDetail,
         placeholder: "e.g. PA, Drumkit",
       },
+      rentRange: { ...realEstateRentRangeDetail },
       fromDatetime: { ...details.fromDatetime },
       throughDatetime: { ...details.throughDatetime },
     },
@@ -1443,10 +1364,27 @@ const musicianUseCases = {
       },
     },
     isDetails: {
-      numberOfRooms: { ...realEstateNumberOfRoomsDetail },
+      title: { ...details.title },
+      description: { ...details.description },
+      location: {
+        ...details.location,
+        mandatory: true,
+      },
+      floorSize: {
+        ...realEstateFloorSizeDetail,
+        mandatory: true,
+      },
+      numberOfRooms: {
+        ...realEstateNumberOfRoomsDetail,
+        mandatory: true,
+      },
       features: {
         ...realEstateFeaturesDetail,
         placeholder: "e.g. PA, Drumkit",
+      },
+      rent: {
+        ...realEstateRentDetail,
+        mandatory: true,
       },
       fromDatetime: { ...details.fromDatetime },
       throughDatetime: { ...details.throughDatetime },

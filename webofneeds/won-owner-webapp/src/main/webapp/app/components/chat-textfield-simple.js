@@ -38,10 +38,12 @@ import tagsPickerModule from "./details/picker/tags-picker.js";
 import titlePickerModule from "./details/picker/title-picker.js";
 import ttlPickerModule from "./details/picker/ttl-picker.js";
 import numberPickerModule from "./details/picker/number-picker.js";
+import pricePickerModule from "./details/picker/price-picker.js";
 import datetimePickerModule from "./details/picker/datetime-picker.js";
 import dropdownPickerModule from "./details/picker/dropdown-picker.js";
 import selectPickerModule from "./details/picker/select-picker.js";
 import rangePickerModule from "./details/picker/range-picker.js";
+import priceRangePickerModule from "./details/picker/price-range-picker.js";
 import workflowPickerModule from "./details/picker/workflow-picker.js";
 import petrinetPickerModule from "./details/picker/petrinet-picker.js";
 import filePickerModule from "./details/picker/file-picker.js";
@@ -665,11 +667,13 @@ export default angular
     tagsPickerModule,
     titlePickerModule,
     numberPickerModule,
+    pricePickerModule,
     datetimePickerModule,
     ttlPickerModule,
     dropdownPickerModule,
     selectPickerModule,
     rangePickerModule,
+    priceRangePickerModule,
     petrinetPickerModule,
     workflowPickerModule,
     filePickerModule,
