@@ -164,6 +164,7 @@ public class WON {
             "hasConnectedCount");
     public static final Property HAS_CLOSED_COUNT = m.createProperty(BASE_URI,
             "hasClosedCount");
+    
     //adds a flag to a need
     public static final Property HAS_FLAG = m.createProperty(BASE_URI + "hasFlag");
 
@@ -178,7 +179,9 @@ public class WON {
     public static final Resource NO_HINT_FOR_COUNTERPART = m.createResource(BASE_URI + "NoHintForCounterpart");
     public static final Resource NO_HINT_FOR_ME = m.createResource(BASE_URI + "NoHintForMe");
     public static final Property HAS_MATCHING_CONTEXT = m.createProperty(BASE_URI + "hasMatchingContext");
+    public static final Property HAS_QUERY = m.createProperty(BASE_URI + "hasQuery");
 
+    
     public static final Property HAS_GRAPH = m.createProperty(BASE_URI, "hasGraph");
 
 

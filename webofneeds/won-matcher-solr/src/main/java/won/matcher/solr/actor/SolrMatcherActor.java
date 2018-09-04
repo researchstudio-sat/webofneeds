@@ -8,6 +8,7 @@ import akka.event.LoggingAdapter;
 import akka.japi.Function;
 import com.github.jsonldjava.core.JsonLdError;
 import org.apache.jena.query.Dataset;
+import org.apache.jena.rdf.model.Statement;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocumentList;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,6 +97,12 @@ public class SolrMatcherActor extends UntypedActor {
             log.info("Discarding received need due to flags won:NoHintForMe and won:NoHintForCounterpart: {}", needEvent);
             return;
         }
+        
+        // check if need has a sparql query attached
+        if (needModelWrapper.hasQuery()) {
+            log.debug("Need {} has a sparql query, omitting this need in Solr matcher", needModelWrapper.getNeedUri());
+            return;
+        }        
 
         // check if need is usedForTesting only
         boolean usedForTesting = needModelWrapper.hasFlag(WON.USED_FOR_TESTING);
