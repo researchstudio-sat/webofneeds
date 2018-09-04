@@ -67,22 +67,17 @@ function genComponentConf() {
 
         <div class="ucp__main">
 
-        <!-- TODO: SEARCH FIELD -->
+        <!-- SEARCH FIELD -->
         <input
             type="text"
             class="ucp__main__search"
-            ng-model="searchInput"
-            ng-init="searchInput =''"
             placeholder="Search for use cases"
             won-input="::self.updateSearch()" />
 
         <!-- SEARCH RESULTS -->
-        <!-- easier: show all the usecases found, regardless of group -->
-        <!-- nicer: show group titles -->
-        <!-- potential problem: use cases that are in more than one group -->
         <div class="ucp__main__searchresult clickable"
-            ng-repeat="useCase in self.searchArray | filter:searchInput"
-            ng-if="searchInput.length > 1">
+          ng-repeat="useCase in self.searchResults"
+          ng-click="self.startFrom(useCase)">
             <svg class="ucp__main__searchresult__icon"
                 ng-if="!!useCase.icon">
                 <use xlink:href="{{ useCase.icon }}" href="{{ useCase.icon }}"></use>
@@ -94,10 +89,11 @@ function genComponentConf() {
         </div>
 
 
-        <!-- USE CASE GROUPS - TODO: only show while not searching --> 
+        <!-- USE CASE GROUPS --> 
         <div class="ucp__main__usecase-group clickable"
           ng-repeat="useCaseGroup in self.useCaseGroups"
-          ng-if="searchInput.length === 0 && self.displayableUseCaseGroup(useCaseGroup) && self.countDisplayableUseCasesInGroup(useCaseGroup) > self.showGroupsThreshold"
+          ng-if="!self.isSearching && self.displayableUseCaseGroup(useCaseGroup)
+                 && self.countDisplayableUseCasesInGroup(useCaseGroup) > self.showGroupsThreshold"
           ng-click="self.viewUseCaseGroup(useCaseGroup)">
               <svg class="ucp__main__usecase-group__icon"
                 ng-if="!!useCaseGroup.icon">
@@ -108,10 +104,10 @@ function genComponentConf() {
                   {{ useCaseGroup.label }}
               </div>
         </div>
-        <!-- USE CASES WITHOUT GROUPS - TODO: only show while not searching --> 
+        <!-- USE CASES WITHOUT GROUPS --> 
         <div class="ucp__main__usecase-group clickable"
           ng-repeat="useCase in self.ungroupedUseCases"
-          ng-if="searchInput.length === 0 && self.displayableUseCase(useCase)"
+          ng-if="!self.isSearching && self.displayableUseCase(useCase)"
           ng-click="self.startFrom(useCase)">
               <svg class="ucp__main__usecase-group__icon"
                 ng-if="!!useCase.icon">
@@ -131,11 +127,12 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
       window.ucp4dbg = this;
 
+      this.useCases = useCases;
       this.useCaseGroups = useCaseGroups;
-      this.showGroupsThreshold = 1; // only show groups at least 1 use case(s)
-      // this.showGroups = this.countDisplayableUseCaseGroups() > 0;
-      this.searchArray = Object.keys(useCases).map(i => useCases[i]);
-      this.ungroupedUseCases = this.getUngroupedUseCases(useCases);
+      this.showGroupsThreshold = 1; // only show groups with more than 1 use case(s) as groups
+      this.ungroupedUseCases = this.getUngroupedUseCases(this.useCases);
+
+      this.searchResults = undefined;
 
       const selectFromState = state => {
         const useCaseGroup = getIn(state, [
@@ -205,13 +202,58 @@ function genComponentConf() {
 
     // search start
 
-    updateSearch() {} // TODO: do something here
+    // TODO: deal with use cases that are in more than one group - they might show up repeatedly
+    // TODO: group search results by use case groups - maybe by iterating over groups and only showing groups with results
+    updateSearch() {
+      const query = this.textfield().value;
+      let results = [];
 
-    searchFunction() {}
+      if (query && query.trim().length > 1) {
+        this.isSearching = true;
+
+        for (const key in this.useCases) {
+          const useCase = this.useCases[key];
+
+          if (this.searchFunction(useCase, query)) {
+            results.push(useCase);
+          }
+        }
+
+        if (results.size === 0) {
+          this.searchResults = undefined;
+          this.isSearching = false;
+        }
+
+        this.searchResults = results;
+      } else {
+        this.searchResults = undefined;
+        this.isSearching = false;
+      }
+    }
+
+    searchFunction(useCase, searchString) {
+      // don't treat use cases that can't be displayed as results
+      if (!this.displayableUseCase(useCase)) {
+        return false;
+      }
+
+      // check for searchString in use case label and draft
+      const useCaseLabel = JSON.stringify(useCase.label).toLowerCase();
+      const useCaseDraft = JSON.stringify(useCase.draft).toLowerCase();
+
+      const useCaseString = useCaseLabel.concat(useCaseDraft);
+      const queries = searchString.toLowerCase().split(" ");
+
+      for (let query of queries) {
+        if (useCaseString.includes(query)) {
+          return true;
+        }
+      }
+
+      return false;
+    }
 
     // search end
-
-    // helper functions for displaying use case groups and use cases
 
     /**
      * return the amount of displayable useCases in a useCaseGroup
@@ -228,21 +270,6 @@ function genComponentConf() {
       }
       return countUseCases;
     }
-
-    /**
-     * return the amount of displayable useCaseGroups
-     * @returns {*}
-     */
-    // countDisplayableUseCaseGroups() {
-    //   let countDisplayedUseCaseGroups = 0;
-
-    //   for (const key in this.useCaseGroups) {
-    //     if (this.displayableUseCaseGroup(this.useCaseGroups[key])) {
-    //       countDisplayedUseCaseGroups++;
-    //     }
-    //   }
-    //   return countDisplayedUseCaseGroups;
-    // }
 
     /**
      * return if the given useCaseGroup is displayable or not
@@ -275,12 +302,19 @@ function genComponentConf() {
       return useCase && useCase.identifier && (useCase.label || useCase.icon);
     }
 
+    /**
+     * returns an object containing all use cases that were
+     * not found in a useCaseGroup or in a group that's too
+     * small to be displayed as a group
+     * @param allUseCases
+     * @returns {*}
+     */
     getUngroupedUseCases(allUseCases) {
       let ungroupedUseCases = JSON.parse(JSON.stringify(allUseCases));
       for (const identifier in this.useCaseGroups) {
         const group = this.useCaseGroups[identifier];
         // show use cases from groups that can't be displayed
-        // don't show groups with less than threshold use cases as group
+        // show use cases from groups that have no more than threshold use cases
         if (
           !this.displayableUseCaseGroup(group) ||
           this.countDisplayableUseCasesInGroup(group) <=
@@ -294,6 +328,18 @@ function genComponentConf() {
         }
       }
       return ungroupedUseCases;
+    }
+
+    textfieldNg() {
+      return angular.element(this.textfield());
+    }
+    textfield() {
+      if (!this._searchInput) {
+        this._searchInput = this.$element[0].querySelector(
+          ".ucp__main__search"
+        );
+      }
+      return this._searchInput;
     }
   }
 
