@@ -737,8 +737,10 @@ const realEstateUseCases = {
       let bgp = [];
 
       if (rentRange) {
-        if (rentRange.min || rentRange.max) {
-          filterStrings.push("FILTER (?currency = 'EUR') ");
+        if ((rentRange.min || rentRange.max) && rentRange.currency) {
+          filterStrings.push(
+            "FILTER (?currency = '" + rentRange.currency + "') "
+          );
           bgp.push("?is s:priceSpecification ?pricespec .");
           bgp.push("?pricespec s:price ?price .");
           bgp.push("?pricespec s:priceCurrency ?currency .");
@@ -1018,7 +1020,7 @@ const transportUseCases = {
               "@type": "s:Product",
               "s:width": {
                 "@type": "s:QuantitativeValue",
-                "s:value": [{ "@value": value, "@type": "s:Float" }],
+                "s:value": [{ "@value": value, "@type": "xsd:float" }],
                 "s:unitCode": "CMT",
               },
             };

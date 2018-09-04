@@ -186,7 +186,7 @@ export const details = {
       return {
         "s:priceSpecification": {
           "@type": "s:CompoundPriceSpecification",
-          "s:price": [{ "@value": value.amount, "@type": "s:Float" }],
+          "s:price": [{ "@value": value.amount, "@type": "xsd:float" }],
           "s:priceCurrency": value.currency,
           "s:unitCode": value.unitCode,
         },
@@ -196,7 +196,7 @@ export const details = {
       const amount = won.parseFrom(
         jsonLDImm,
         ["s:priceSpecification", "s:price"],
-        "s:Float"
+        "xsd:float"
       );
 
       const currency = won.parseFrom(
@@ -1076,10 +1076,10 @@ export const details = {
         "s:priceSpecification": {
           "@type": "s:CompoundPriceSpecification",
           "s:minPrice": value.min && [
-            { "@value": value.min, "@type": "s:Float" },
+            { "@value": value.min, "@type": "xsd:float" },
           ],
           "s:maxPrice": value.max && [
-            { "@value": value.max, "@type": "s:Float" },
+            { "@value": value.max, "@type": "xsd:float" },
           ],
           "s:priceCurrency": value.currency,
           "s:unitCode": value.unitCode,
@@ -1091,17 +1091,17 @@ export const details = {
       const minRent = won.parseFrom(
         jsonLDImm,
         ["s:priceSpecification", "s:minPrice"],
-        "s:Float"
+        "xsd:float"
       );
       const maxRent = won.parseFrom(
         jsonLDImm,
         ["s:priceSpecification", "s:maxPrice"],
-        "s:Float"
+        "xsd:float"
       );
       const currency = won.parseFrom(
         jsonLDImm,
         ["s:priceSpecification", "s:priceCurrency"],
-        "s:Float"
+        "xsd:float"
       );
       const unitCode = won.parseFrom(
         jsonLDImm,
@@ -1125,19 +1125,50 @@ export const details = {
     },
     generateHumanReadable: function({ value, includeLabel }) {
       if (value) {
-        let humanReadable;
-        if (value.min && value.max) {
-          humanReadable =
-            "between " + value.min + " and " + value.max + " EUR/month";
-        } else if (value.min) {
-          humanReadable = "at least " + value.min + "EUR/month";
-        } else if (value.max) {
-          humanReadable = "at most " + value.max + "EUR/month";
+        const min = value.min;
+        const max = value.max;
+
+        let amount;
+        if (min && max) {
+          amount = min + " - " + max;
+        } else if (min) {
+          amount = "at least " + min;
+        } else if (max) {
+          amount = "at most " + max;
+        } else {
+          return undefined;
         }
-        if (humanReadable) {
-          return includeLabel
-            ? this.label + ": " + humanReadable
-            : humanReadable;
+
+        let currencyLabel = undefined;
+        let unitCodeLabel = undefined;
+
+        this.currency &&
+          this.currency.forEach(curr => {
+            if (curr.value === value.currency) {
+              currencyLabel = curr.label;
+            }
+          });
+        currencyLabel = currencyLabel || value.currency;
+
+        this.unitCode &&
+          this.unitCode.forEach(uc => {
+            if (uc.value === value.unitCode) {
+              unitCodeLabel = uc.label;
+            }
+          });
+        unitCodeLabel = unitCodeLabel || value.unitCode;
+
+        if (unitCodeLabel) {
+          return (
+            (includeLabel ? this.label + ": " + amount : amount) +
+            currencyLabel +
+            " " +
+            unitCodeLabel
+          );
+        } else {
+          return (
+            (includeLabel ? this.label + ": " + amount : amount) + currencyLabel
+          );
         }
       }
       return undefined;
