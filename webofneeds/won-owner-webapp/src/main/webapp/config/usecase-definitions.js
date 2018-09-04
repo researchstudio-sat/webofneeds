@@ -755,35 +755,23 @@ const realEstateUseCases = {
         won: won.defaultContext["won"],
       };
 
+      const concatFilter = filter => {
+        if (filter) {
+          prefixes = Object.assign(prefixes, filter.prefixes);
+          filterStrings = filterStrings.concat(filter.filterStrings);
+          basicGraphPattern = basicGraphPattern.concat(
+            filter.basicGraphPattern
+          );
+        }
+      };
+
       if (rentRange) {
         const rentRangeFilter = filterRentRange(
           rentRange.min,
           rentRange.max,
           rentRange.currency
         );
-        prefixes = Object.assign(prefixes, rentRangeFilter.prefixes);
-        filterStrings = filterStrings.concat(rentRangeFilter.filterStrings);
-        basicGraphPattern = basicGraphPattern.concat(
-          rentRangeFilter.basicGraphPattern
-        );
-        // if ((rentRange.min || rentRange.max) && rentRange.currency) {
-        //   filterStrings.push(
-        //     "FILTER (?currency = '" + rentRange.currency + "') "
-        //   );
-        //   basicGraphPattern.push("?is s:priceSpecification ?pricespec .");
-        //   basicGraphPattern.push("?pricespec s:price ?price .");
-        //   basicGraphPattern.push("?pricespec s:priceCurrency ?currency .");
-        // }
-        // if (rentRange.min) {
-        //   filterStrings.push(
-        //     "FILTER (?price >= " + draft.seeks.rentRange.min + " )"
-        //   );
-        // }
-        // if (rentRange.max) {
-        //   filterStrings.push(
-        //     "FILTER (?price <= " + draft.seeks.rentRange.max + " )"
-        //   );
-        // }
+        concatFilter(rentRangeFilter);
       }
 
       if (floorSizeRange) {
@@ -791,26 +779,7 @@ const realEstateUseCases = {
           floorSizeRange.min,
           floorSizeRange.max
         );
-        prefixes = Object.assign(prefixes, floorSizeRangeFilter.prefixes);
-        filterStrings = filterStrings.concat(
-          floorSizeRangeFilter.filterStrings
-        );
-        basicGraphPattern = basicGraphPattern.concat(
-          floorSizeRangeFilter.basicGraphPattern
-        );
-        // if (floorSizeRange.min || floorSizeRange.max) {
-        //   basicGraphPattern.push("?is s:floorSize/s:value ?floorSize.");
-        // }
-        // if (floorSizeRange.min) {
-        //   filterStrings.push(
-        //     "FILTER (?floorSize >= " + draft.seeks.floorSizeRange.min + " )"
-        //   );
-        // }
-        // if (floorSizeRange.max) {
-        //   filterStrings.push(
-        //     "FILTER (?floorSize <= " + draft.seeks.floorSizeRange.max + " )"
-        //   );
-        // }
+        concatFilter(floorSizeRangeFilter);
       }
 
       if (numberOfRoomsRange) {
@@ -818,39 +787,12 @@ const realEstateUseCases = {
           numberOfRoomsRange.min,
           numberOfRoomsRange.max
         );
-        prefixes = Object.assign(prefixes, numOfRoomsRangeFilter.prefixes);
-        filterStrings = filterStrings.concat(
-          numOfRoomsRangeFilter.filterStrings
-        );
-        basicGraphPattern = basicGraphPattern.concat(
-          numOfRoomsRangeFilter.basicGraphPattern
-        );
-        // if (numberOfRoomsRange.min || numberOfRoomsRange.max) {
-        //   basicGraphPattern.push("?is s:numberOfRooms ?numberOfRooms.");
-        // }
-        // if (numberOfRoomsRange.min) {
-        //   filterStrings.push(
-        //     "FILTER (?numberOfRooms >= " +
-        //       draft.seeks.numberOfRoomsRange.min +
-        //       " )"
-        //   );
-        // }
-        // if (numberOfRoomsRange.max) {
-        //   filterStrings.push(
-        //     "FILTER (?numberOfRooms <= " +
-        //       draft.seeks.numberOfRoomsRange.max +
-        //       " )"
-        //   );
-        // }
+        concatFilter(numOfRoomsRangeFilter);
       }
 
       if (location) {
         const vicinityFilter = filterInVicinity(location);
-        prefixes = Object.assign(prefixes, vicinityFilter.prefixes);
-        filterStrings = filterStrings.concat(vicinityFilter.filterStrings);
-        basicGraphPattern = basicGraphPattern.concat(
-          vicinityFilter.basicGraphPattern
-        );
+        concatFilter(vicinityFilter);
       }
 
       let queryTemplate =
