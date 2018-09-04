@@ -739,7 +739,7 @@ const realEstateUseCases = {
       const numberOfRoomsRange = seeksBranch && seeksBranch.numberOfRoomsRange;
       const location = seeksBranch && seeksBranch.location;
 
-      let bgp = [];
+      const basicGraphPattern = [];
       const filterStrings = [];
       const prefixes = {
         s: won.defaultContext["s"],
@@ -751,9 +751,9 @@ const realEstateUseCases = {
           filterStrings.push(
             "FILTER (?currency = '" + rentRange.currency + "') "
           );
-          bgp.push("?is s:priceSpecification ?pricespec .");
-          bgp.push("?pricespec s:price ?price .");
-          bgp.push("?pricespec s:priceCurrency ?currency .");
+          basicGraphPattern.push("?is s:priceSpecification ?pricespec .");
+          basicGraphPattern.push("?pricespec s:price ?price .");
+          basicGraphPattern.push("?pricespec s:priceCurrency ?currency .");
         }
         if (rentRange.min) {
           filterStrings.push(
@@ -769,7 +769,7 @@ const realEstateUseCases = {
 
       if (floorSizeRange) {
         if (floorSizeRange.min || floorSizeRange.max) {
-          bgp.push("?is s:floorSize/s:value ?floorSize.");
+          basicGraphPattern.push("?is s:floorSize/s:value ?floorSize.");
         }
         if (floorSizeRange.min) {
           filterStrings.push(
@@ -785,7 +785,7 @@ const realEstateUseCases = {
 
       if (numberOfRoomsRange) {
         if (numberOfRoomsRange.min || numberOfRoomsRange.max) {
-          bgp.push("?is s:numberOfRooms ?numberOfRooms.");
+          basicGraphPattern.push("?is s:numberOfRooms ?numberOfRooms.");
         }
         if (numberOfRoomsRange.min) {
           filterStrings.push(
@@ -815,7 +815,7 @@ const realEstateUseCases = {
         SELECT DISTINCT ${resultName}
         WHERE {
           ${resultName} won:is ?is. 
-          ${bgp && bgp.join(" ")}
+          ${basicGraphPattern && basicGraphPattern.join(" ")}
           ${filterStrings && filterStrings.join(" ")}
         }` + (location ? `ORDER BY ASC(?geoDistance)` : "");
 
