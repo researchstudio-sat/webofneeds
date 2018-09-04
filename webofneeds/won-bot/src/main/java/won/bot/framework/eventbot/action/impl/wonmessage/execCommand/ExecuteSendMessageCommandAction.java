@@ -32,6 +32,7 @@ import won.bot.framework.eventbot.event.impl.wonmessage.SuccessResponseEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
+import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 
 import java.net.URI;
@@ -114,7 +115,10 @@ public abstract class ExecuteSendMessageCommandAction<T extends MessageCommandEv
                         {
                             if (responseEvent instanceof FailureResponseEvent) {
                                 FailureResponseEvent failureEvent = (FailureResponseEvent) responseEvent;
-                                logger.info(makeLogMessageString(event) + " failed on remote WoN node with message: {}", WonRdfUtils.MessageUtils.getTextMessage(((FailureResponseEvent) responseEvent).getFailureMessage()));
+                                logger.info(makeLogMessageString(event) + " failed on remote WoN node with message (more on loglevel 'debug'): {}", WonRdfUtils.MessageUtils.getTextMessage(((FailureResponseEvent) responseEvent).getFailureMessage()));
+                                if (logger.isDebugEnabled()) {
+                                    logger.debug("failed message: \n {}", RdfUtils.toString(message.getCompleteDataset()));
+                                }
                                 Event eventToPublish = createRemoteNodeFailureEvent(messageCommandEvent, message, failureEvent);
                                 if (eventToPublish != null) {
                                     getEventListenerContext().getEventBus().publish(eventToPublish);
