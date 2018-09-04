@@ -16,6 +16,7 @@ import {
   filterFloorSizeRange,
   filterNumOfRoomsRange,
   filterRentRange,
+  concatenateFilters,
 } from "../app/sparql-builder-utils.js";
 
 export const emptyDraft = {
@@ -748,13 +749,6 @@ const realEstateUseCases = {
       const numberOfRoomsRange = seeksBranch && seeksBranch.numberOfRoomsRange;
       const location = seeksBranch && seeksBranch.location;
 
-      let basicGraphPattern = [];
-      let filterStrings = [];
-      let prefixes = {
-        s: won.defaultContext["s"],
-        won: won.defaultContext["won"],
-      };
-
       const filters = [
         rentRange &&
           filterRentRange(rentRange.min, rentRange.max, rentRange.currency),
@@ -768,44 +762,25 @@ const realEstateUseCases = {
         location && filterInVicinity(location),
       ];
 
-      const concatedFilter = filters.reduce(
-        (accumulatedFilter, f) => {
-          if (!f) {
-            return accumulatedFilter;
-          } else {
-            const prefixes = Object.assign(
-              {},
-              accumulatedFilter.prefixes,
-              f.prefixes
-            );
-            const filterStrings = accumulatedFilter.filterStrings.concat(
-              f.filterStrings
-            );
-            const basicGraphPattern = accumulatedFilter.basicGraphPattern.concat(
-              f.basicGraphPattern
-            );
-            return {
-              prefixes,
-              filterStrings,
-              basicGraphPattern,
-            };
-          }
-        },
+      const concatenatedFilter = concatenateFilters(filters);
+
+      const prefixes = Object.assign(
         {
-          basicGraphPattern,
-          filterStrings,
-          prefixes,
-        }
+          // prefixes needed by select itself:
+          won: won.defaultContext["won"],
+        },
+        // prefixes needed by filters
+        concatenatedFilter.prefixes
       );
 
       let queryTemplate =
         `
-        ${prefixesString(concatedFilter.prefixes)}
+        ${prefixesString(prefixes)}
         SELECT DISTINCT ${resultName}
         WHERE {
           ${resultName} won:is ?is. 
-          ${concatedFilter.basicGraphPattern.join(" ")}
-          ${concatedFilter.filterStrings.join(" ")}
+          ${concatenatedFilter.basicGraphPattern.join(" ")}
+          ${concatenatedFilter.filterStrings.join(" ")}
         }` + (location ? `ORDER BY ASC(?geoDistance)` : "");
 
       return new SparqlParser().parse(queryTemplate);
