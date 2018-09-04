@@ -1067,7 +1067,7 @@ export const details = {
       { value: "", label: "total", default: true },
     ],
     component: "won-price-range-picker",
-    viewerComponent: "won-price-range-viewer",
+    viewerComponent: "won-price-viewer",
     parseToRDF: function({ value }) {
       if (!value || !(value.min || value.max) || !value.currency) {
         return { "s:priceSpecification": undefined };
