@@ -755,54 +755,57 @@ const realEstateUseCases = {
         won: won.defaultContext["won"],
       };
 
-      const concatFilter = filter => {
-        if (filter) {
-          prefixes = Object.assign(prefixes, filter.prefixes);
-          filterStrings = filterStrings.concat(filter.filterStrings);
-          basicGraphPattern = basicGraphPattern.concat(
-            filter.basicGraphPattern
-          );
+      const filters = [
+        rentRange &&
+          filterRentRange(rentRange.min, rentRange.max, rentRange.currency),
+
+        floorSizeRange &&
+          filterFloorSizeRange(floorSizeRange.min, floorSizeRange.max),
+
+        numberOfRoomsRange &&
+          filterNumOfRoomsRange(numberOfRoomsRange.min, numberOfRoomsRange.max),
+
+        location && filterInVicinity(location),
+      ];
+
+      const concatedFilter = filters.reduce(
+        (accumulatedFilter, f) => {
+          if (!f) {
+            return accumulatedFilter;
+          } else {
+            const prefixes = Object.assign(
+              {},
+              accumulatedFilter.prefixes,
+              f.prefixes
+            );
+            const filterStrings = accumulatedFilter.filterStrings.concat(
+              f.filterStrings
+            );
+            const basicGraphPattern = accumulatedFilter.basicGraphPattern.concat(
+              f.basicGraphPattern
+            );
+            return {
+              prefixes,
+              filterStrings,
+              basicGraphPattern,
+            };
+          }
+        },
+        {
+          basicGraphPattern,
+          filterStrings,
+          prefixes,
         }
-      };
-
-      if (rentRange) {
-        const rentRangeFilter = filterRentRange(
-          rentRange.min,
-          rentRange.max,
-          rentRange.currency
-        );
-        concatFilter(rentRangeFilter);
-      }
-
-      if (floorSizeRange) {
-        const floorSizeRangeFilter = filterFloorSizeRange(
-          floorSizeRange.min,
-          floorSizeRange.max
-        );
-        concatFilter(floorSizeRangeFilter);
-      }
-
-      if (numberOfRoomsRange) {
-        const numOfRoomsRangeFilter = filterNumOfRoomsRange(
-          numberOfRoomsRange.min,
-          numberOfRoomsRange.max
-        );
-        concatFilter(numOfRoomsRangeFilter);
-      }
-
-      if (location) {
-        const vicinityFilter = filterInVicinity(location);
-        concatFilter(vicinityFilter);
-      }
+      );
 
       let queryTemplate =
         `
-        ${prefixesString(prefixes)}
+        ${prefixesString(concatedFilter.prefixes)}
         SELECT DISTINCT ${resultName}
         WHERE {
           ${resultName} won:is ?is. 
-          ${basicGraphPattern && basicGraphPattern.join(" ")}
-          ${filterStrings && filterStrings.join(" ")}
+          ${concatedFilter.basicGraphPattern.join(" ")}
+          ${concatedFilter.filterStrings.join(" ")}
         }` + (location ? `ORDER BY ASC(?geoDistance)` : "");
 
       return new SparqlParser().parse(queryTemplate);
