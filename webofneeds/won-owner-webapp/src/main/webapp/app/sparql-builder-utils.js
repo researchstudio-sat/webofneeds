@@ -136,7 +136,7 @@ export function filterRentRange(min, max, currency) {
   const minIsNum = isValidNumber(min);
   const maxIsNum = isValidNumber(max);
   if ((minIsNum || maxIsNum) && currency) {
-    filterStrings.push("FILTER (?currency = '" + currency + "') ");
+    filterStrings.push('FILTER (?currency = "' + currency + '") ');
     basicGraphPattern = basicGraphPattern.concat([
       "?is s:priceSpecification ?pricespec .",
       "?pricespec s:price ?price .",
