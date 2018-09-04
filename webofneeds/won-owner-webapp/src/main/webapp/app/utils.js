@@ -258,16 +258,6 @@ export function getKeySize(obj) {
 }
 
 /**
- * delete keys and values of an object and returns reduced object
- */
-export function reduceObjectByKeys(object, keys) {
-  const obj = object;
-  for (let k of keys) {
-    delete obj[k];
-  }
-  return obj;
-}
-/**
  * generates a string of random characters
  *
  * @param {*} length the length of the string to be generated. e.g. in the example below: 5

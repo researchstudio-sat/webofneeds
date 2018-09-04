@@ -3,7 +3,6 @@ import Immutable from "immutable";
 import { details, abstractDetails } from "detailDefinitions";
 import { Parser as SparqlParser } from "sparqljs";
 import { findLatestIntervallEndInJsonLd } from "../app/won-utils.js";
-import { reduceObjectByKeys } from "../app/utils";
 import won from "../app/won-es6.js";
 
 export const emptyDraft = {
@@ -1334,13 +1333,13 @@ const musicianUseCases = {
     },
     isDetails: undefined,
     seeksDetails: {
-      ...reduceObjectByKeys(realEstateUseCases.offerRent.seeksDetails, [
-        "numberOfRooms",
-      ]),
+      location: { ...details.location },
+      floorSizeRange: { ...realEstateFloorSizeRangeDetail },
       features: {
         ...realEstateFeaturesDetail,
         placeholder: "e.g. PA, Drumkit",
       },
+      rentRange: { ...realEstateRentRangeDetail },
       fromDatetime: { ...details.fromDatetime },
       throughDatetime: { ...details.throughDatetime },
     },
@@ -1361,12 +1360,27 @@ const musicianUseCases = {
       },
     },
     isDetails: {
-      ...reduceObjectByKeys(realEstateUseCases.offerRent.isDetails, [
-        "numberOfRooms",
-      ]),
+      title: { ...details.title },
+      description: { ...details.description },
+      location: {
+        ...details.location,
+        mandatory: true,
+      },
+      floorSize: {
+        ...realEstateFloorSizeDetail,
+        mandatory: true,
+      },
+      numberOfRooms: {
+        ...realEstateNumberOfRoomsDetail,
+        mandatory: true,
+      },
       features: {
         ...realEstateFeaturesDetail,
         placeholder: "e.g. PA, Drumkit",
+      },
+      rent: {
+        ...realEstateRentDetail,
+        mandatory: true,
       },
       fromDatetime: { ...details.fromDatetime },
       throughDatetime: { ...details.throughDatetime },
