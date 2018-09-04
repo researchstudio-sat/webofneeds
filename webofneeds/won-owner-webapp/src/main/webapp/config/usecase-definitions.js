@@ -1394,18 +1394,6 @@ const musicianUseCases = {
   },
 };
 
-// TODO: get these from useCaseGroups so this list stays up to date
-export const useCases = {
-  ...complainUseCases,
-  ...socialUseCases,
-  ...professionalUseCases,
-  ...realEstateUseCases,
-  ...transportUseCases,
-  ...mobilityUseCases,
-  ...musicianUseCases,
-  ...allDetailsUseCase,
-};
-
 export const useCaseGroups = {
   complain: {
     identifier: "complaingroup",
@@ -1456,3 +1444,25 @@ export const useCaseGroups = {
     useCases: { ...allDetailsUseCase },
   },
 };
+
+// generate a list of usecases from all use case groups
+// TODO: find a good way to handle potential ungrouped use cases
+let tempUseCases = {};
+for (let key in useCaseGroups) {
+  const useCases = useCaseGroups[key].useCases;
+  for (let identifier in useCases) {
+    tempUseCases[identifier] = useCases[identifier];
+  }
+}
+
+export const useCases = tempUseCases;
+// export const useCases = {
+//   ...complainUseCases,
+//   ...socialUseCases,
+//   ...professionalUseCases,
+//   ...realEstateUseCases,
+//   ...transportUseCases,
+//   ...mobilityUseCases,
+//   ...musicianUseCases,
+//   ...allDetailsUseCase,
+// };
