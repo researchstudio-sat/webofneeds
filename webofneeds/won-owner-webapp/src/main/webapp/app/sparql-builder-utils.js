@@ -96,13 +96,13 @@ export function filterNumOfRoomsRange(min, max) {
 }
 
 export function filterRentRange(min, max, currency) {
-  const basicGraphPattern = [];
+  let basicGraphPattern = [];
   const filterStrings = [];
   const minIsNum = isValidNumber(min);
   const maxIsNum = isValidNumber(max);
   if ((minIsNum || maxIsNum) && currency) {
     filterStrings.push("FILTER (?currency = '" + currency + "') ");
-    basicGraphPattern.concat([
+    basicGraphPattern = basicGraphPattern.concat([
       "?is s:priceSpecification ?pricespec .",
       "?pricespec s:price ?price .",
       "?pricespec s:priceCurrency ?currency .",
