@@ -167,7 +167,7 @@ export function prefixesString(prefixes) {
     return "";
   } else {
     const prefixesStrings = Object.entries(prefixes).map(
-      ([prefix, uri]) => `prefix ${prefix}: <${uri}>\n`
+      ([prefix, uri]) => `PREFIX ${prefix}: <${uri}>\n`
     );
     return prefixesStrings.join("");
   }
