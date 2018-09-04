@@ -93,37 +93,56 @@ function genComponentConf() {
      * Checks validity and uses callback method
      */
     updateMin(number) {
-      if (number) {
-        this.onUpdate({
-          value: { min: number, max: this.addedMaxNumber },
-        });
-      } else {
-        if (this.addedMaxNumber) {
-          this.onUpdate({
-            value: { min: number, max: this.addedMaxNumber },
-          });
-        } else {
-          this.onUpdate({
-            value: undefined,
-          });
-        }
-      }
+      this.update(
+        number,
+        this.addedMaxNumber,
+        this.selectedCurrency,
+        this.selectedUnitCode
+      );
     }
     updateMax(number) {
-      if (number) {
+      this.update(
+        this.addedMinNumber,
+        number,
+        this.selectedCurrency,
+        this.selectedUnitCode
+      );
+    }
+
+    updateCurrency() {
+      this.selectedCurrency = this.currency().value;
+      this.update(
+        this.addedMinNumber,
+        this.addedMaxNumber,
+        this.selectedCurrency,
+        this.selectedUnitCode
+      );
+    }
+
+    updateUnitCode() {
+      this.selectedUnitCode = this.unitCode().value;
+      this.update(
+        this.addedMinNumber,
+        this.addedMaxNumber,
+        this.selectedCurrency,
+        this.selectedUnitCode
+      );
+    }
+
+    update(min, max, currency, unitCode) {
+      if ((min || max) && currency) {
         this.onUpdate({
-          value: { min: this.addedMinNumber, max: number },
+          value: {
+            min: min,
+            max: max,
+            currency: currency,
+            unitCode: unitCode !== "" ? unitCode : undefined,
+          },
         });
       } else {
-        if (this.addedMinNumber) {
-          this.onUpdate({
-            value: { min: this.addedMinNumber, max: number },
-          });
-        } else {
-          this.onUpdate({
-            value: undefined,
-          });
-        }
+        this.onUpdate({
+          value: undefined,
+        });
       }
     }
 
@@ -239,6 +258,24 @@ function genComponentConf() {
         );
       }
       return this._maxNumberInput;
+    }
+
+    currency() {
+      if (!this._currency) {
+        this._currency = this.$element[0].querySelector(
+          ".pricerangep__input__currency"
+        );
+      }
+      return this._currency;
+    }
+
+    unitCode() {
+      if (!this._unitCode) {
+        this._unitCode = this.$element[0].querySelector(
+          ".pricerangep__input__unitCode"
+        );
+      }
+      return this._unitCode;
     }
   }
   Controller.$inject = serviceDependencies;
