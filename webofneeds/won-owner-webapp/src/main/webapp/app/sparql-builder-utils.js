@@ -64,6 +64,9 @@ SERVICE geo:search {
 export function filterFloorSizeRange(min, max) {
   const basicGraphPattern = [];
   const filterStrings = [];
+  const prefixes = {
+    s: won.defaultContext["s"],
+  };
   const minIsNum = isValidNumber(min);
   const maxIsNum = isValidNumber(max);
   if (minIsNum || maxIsNum) {
@@ -75,10 +78,13 @@ export function filterFloorSizeRange(min, max) {
   if (maxIsNum) {
     filterStrings.push("FILTER (?floorSize <= " + max + " )");
   }
-  return wellFormedFilterReturn({ basicGraphPattern, filterStrings });
+  return wellFormedFilterReturn({ basicGraphPattern, filterStrings, prefixes });
 }
 
 export function filterNumOfRoomsRange(min, max) {
+  const prefixes = {
+    s: won.defaultContext["s"],
+  };
   const basicGraphPattern = [];
   const filterStrings = [];
   const minIsNum = isValidNumber(min);
@@ -92,10 +98,13 @@ export function filterNumOfRoomsRange(min, max) {
   if (maxIsNum) {
     filterStrings.push("FILTER (?numberOfRooms <= " + max + " )");
   }
-  return wellFormedFilterReturn({ basicGraphPattern, filterStrings });
+  return wellFormedFilterReturn({ basicGraphPattern, filterStrings, prefixes });
 }
 
 export function filterRentRange(min, max, currency) {
+  const prefixes = {
+    s: won.defaultContext["s"],
+  };
   let basicGraphPattern = [];
   const filterStrings = [];
   const minIsNum = isValidNumber(min);
@@ -115,7 +124,7 @@ export function filterRentRange(min, max, currency) {
     filterStrings.push("FILTER (?price <= " + max + " )");
   }
 
-  return wellFormedFilterReturn({ basicGraphPattern, filterStrings });
+  return wellFormedFilterReturn({ basicGraphPattern, filterStrings, prefixes });
 }
 
 /**
