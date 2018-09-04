@@ -33,6 +33,7 @@ import won.protocol.agreement.effect.MessageEffect;
 import won.protocol.agreement.effect.MessageEffectsBuilder;
 import won.protocol.agreement.effect.ProposalType;
 import won.protocol.message.WonMessageDirection;
+import won.protocol.message.WonMessageType;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
@@ -555,10 +556,17 @@ public class AgreementProtocolState {
 				other.addRetractsInverseRef(message);
 				});
 			if (message.getIsResponseTo() != null && ! message.getIsResponseTo().equals(message.getMessageURI())) {
-				ConversationMessage other = messagesByURI.get(message.getIsResponseTo());
-				throwExceptionIfOtherisMissing(message.getMessageURI(), message.getIsResponseTo(), other, "msg:isResponseTo");
-				message.setIsResponseToRef(other);
-				other.setIsResponseToInverseRef(message);
+                ConversationMessage other = messagesByURI.get(message.getIsResponseTo());
+                if (message.getMessageType() != WonMessageType.FAILURE_RESPONSE ) {
+                    throwExceptionIfOtherisMissing(message.getMessageURI(), message.getIsResponseTo(), other, "msg:isResponseTo");
+                }
+                if (other != null) {
+                    // we have to check for null again because we may be processing a failure response
+                    // a failure response may refer to an original message that the server did no store
+                    // eg because it failed consistency checks
+                    message.setIsResponseToRef(other);
+                    other.setIsResponseToInverseRef(message);
+                }
 			}
 			if (message.getIsRemoteResponseTo() != null && ! message.getIsRemoteResponseTo().equals(message.getMessageURI())) {
 				ConversationMessage other = messagesByURI.get(message.getIsRemoteResponseTo());
