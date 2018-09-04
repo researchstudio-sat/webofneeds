@@ -203,7 +203,7 @@ function genComponentConf() {
     // search start
 
     // TODO: deal with use cases that are in more than one group - they might show up repeatedly
-    // TODO: group search results by use case groups - maybe by iterating over groups and only showing groups with results
+    // TODO: group search results by use case groups - only showing groups with results
     updateSearch() {
       const query = this.textfield().value;
       let results = [];
@@ -211,11 +211,13 @@ function genComponentConf() {
       if (query && query.trim().length > 1) {
         this.isSearching = true;
 
-        for (const key in this.useCases) {
-          const useCase = this.useCases[key];
+        for (const key in this.useCaseGroups) {
+          const group = Object.values(this.useCaseGroups[key].useCases);
 
-          if (this.searchFunction(useCase, query)) {
-            results.push(useCase);
+          for (const useCase of group) {
+            if (this.searchFunction(useCase, query)) {
+              results.push(useCase);
+            }
           }
         }
 
