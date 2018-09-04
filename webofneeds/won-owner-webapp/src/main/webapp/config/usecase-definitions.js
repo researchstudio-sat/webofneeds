@@ -1394,6 +1394,7 @@ const musicianUseCases = {
   },
 };
 
+// TODO: get these from useCaseGroups so this list stays up to date
 export const useCases = {
   ...complainUseCases,
   ...socialUseCases,
@@ -1401,8 +1402,8 @@ export const useCases = {
   ...realEstateUseCases,
   ...transportUseCases,
   ...mobilityUseCases,
-  ...allDetailsUseCase,
   ...musicianUseCases,
+  ...allDetailsUseCase,
 };
 
 export const useCaseGroups = {
@@ -1414,13 +1415,13 @@ export const useCaseGroups = {
   },
   transport: {
     identifier: "transportgroup",
-    label: "Transport",
+    label: "Transport and Delivery",
     icon: undefined,
     useCases: { ...transportUseCases },
   },
   mobility: {
     identifier: "mobilitygroup",
-    label: "Mobility",
+    label: "Personal Mobility",
     icon: undefined,
     useCases: { ...mobilityUseCases },
   },
@@ -1432,25 +1433,25 @@ export const useCaseGroups = {
   },
   musician: {
     identifier: "musiciangroup",
-    label: "Musician",
+    label: "Artists and Bands",
     icon: undefined,
     useCases: { ...musicianUseCases },
   },
   social: {
     identifier: "socialgroup",
-    label: "Fun activities to do together",
+    label: "Social Activities",
     icon: undefined,
     useCases: { ...socialUseCases },
   },
   professional: {
     identifier: "professionalgroup",
-    label: "Professional networking",
+    label: "Professional Networking",
     icon: undefined,
     useCases: { ...professionalUseCases },
   },
   other: {
     identifier: "othergroup",
-    label: "Something else",
+    label: "Something Else",
     icon: undefined,
     useCases: { ...allDetailsUseCase },
   },
