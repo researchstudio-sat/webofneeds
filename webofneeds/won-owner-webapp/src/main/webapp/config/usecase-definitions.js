@@ -7,6 +7,9 @@ import won from "../app/won-es6.js";
 import {
   filterInVicinity,
   prefixesString,
+  filterFloorSizeRange,
+  filterNumOfRoomsRange,
+  filterRentRange,
 } from "../app/sparql-builder-utils.js";
 
 export const emptyDraft = {
@@ -739,74 +742,109 @@ const realEstateUseCases = {
       const numberOfRoomsRange = seeksBranch && seeksBranch.numberOfRoomsRange;
       const location = seeksBranch && seeksBranch.location;
 
-      const basicGraphPattern = [];
-      const filterStrings = [];
-      const prefixes = {
+      let basicGraphPattern = [];
+      let filterStrings = [];
+      let prefixes = {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],
       };
 
       if (rentRange) {
-        if ((rentRange.min || rentRange.max) && rentRange.currency) {
-          filterStrings.push(
-            "FILTER (?currency = '" + rentRange.currency + "') "
-          );
-          basicGraphPattern.push("?is s:priceSpecification ?pricespec .");
-          basicGraphPattern.push("?pricespec s:price ?price .");
-          basicGraphPattern.push("?pricespec s:priceCurrency ?currency .");
-        }
-        if (rentRange.min) {
-          filterStrings.push(
-            "FILTER (?price >= " + draft.seeks.rentRange.min + " )"
-          );
-        }
-        if (rentRange.max) {
-          filterStrings.push(
-            "FILTER (?price <= " + draft.seeks.rentRange.max + " )"
-          );
-        }
+        const rentRangeFilter = filterRentRange(
+          rentRange.min,
+          rentRange.max,
+          rentRange.currency
+        );
+        prefixes = Object.assign(prefixes, rentRangeFilter.prefixes);
+        filterStrings = filterStrings.concat(rentRangeFilter.filterStrings);
+        basicGraphPattern = basicGraphPattern.concat(
+          rentRangeFilter.basicGraphPattern
+        );
+        // if ((rentRange.min || rentRange.max) && rentRange.currency) {
+        //   filterStrings.push(
+        //     "FILTER (?currency = '" + rentRange.currency + "') "
+        //   );
+        //   basicGraphPattern.push("?is s:priceSpecification ?pricespec .");
+        //   basicGraphPattern.push("?pricespec s:price ?price .");
+        //   basicGraphPattern.push("?pricespec s:priceCurrency ?currency .");
+        // }
+        // if (rentRange.min) {
+        //   filterStrings.push(
+        //     "FILTER (?price >= " + draft.seeks.rentRange.min + " )"
+        //   );
+        // }
+        // if (rentRange.max) {
+        //   filterStrings.push(
+        //     "FILTER (?price <= " + draft.seeks.rentRange.max + " )"
+        //   );
+        // }
       }
 
       if (floorSizeRange) {
-        if (floorSizeRange.min || floorSizeRange.max) {
-          basicGraphPattern.push("?is s:floorSize/s:value ?floorSize.");
-        }
-        if (floorSizeRange.min) {
-          filterStrings.push(
-            "FILTER (?floorSize >= " + draft.seeks.floorSizeRange.min + " )"
-          );
-        }
-        if (floorSizeRange.max) {
-          filterStrings.push(
-            "FILTER (?floorSize <= " + draft.seeks.floorSizeRange.max + " )"
-          );
-        }
+        const floorSizeRangeFilter = filterFloorSizeRange(
+          floorSizeRange.min,
+          floorSizeRange.max
+        );
+        prefixes = Object.assign(prefixes, floorSizeRangeFilter.prefixes);
+        filterStrings = filterStrings.concat(
+          floorSizeRangeFilter.filterStrings
+        );
+        basicGraphPattern = basicGraphPattern.concat(
+          floorSizeRangeFilter.basicGraphPattern
+        );
+        // if (floorSizeRange.min || floorSizeRange.max) {
+        //   basicGraphPattern.push("?is s:floorSize/s:value ?floorSize.");
+        // }
+        // if (floorSizeRange.min) {
+        //   filterStrings.push(
+        //     "FILTER (?floorSize >= " + draft.seeks.floorSizeRange.min + " )"
+        //   );
+        // }
+        // if (floorSizeRange.max) {
+        //   filterStrings.push(
+        //     "FILTER (?floorSize <= " + draft.seeks.floorSizeRange.max + " )"
+        //   );
+        // }
       }
 
       if (numberOfRoomsRange) {
-        if (numberOfRoomsRange.min || numberOfRoomsRange.max) {
-          basicGraphPattern.push("?is s:numberOfRooms ?numberOfRooms.");
-        }
-        if (numberOfRoomsRange.min) {
-          filterStrings.push(
-            "FILTER (?numberOfRooms >= " +
-              draft.seeks.numberOfRoomsRange.min +
-              " )"
-          );
-        }
-        if (numberOfRoomsRange.max) {
-          filterStrings.push(
-            "FILTER (?numberOfRooms <= " +
-              draft.seeks.numberOfRoomsRange.max +
-              " )"
-          );
-        }
+        const numOfRoomsRangeFilter = filterNumOfRoomsRange(
+          numberOfRoomsRange.min,
+          numberOfRoomsRange.max
+        );
+        prefixes = Object.assign(prefixes, numOfRoomsRangeFilter.prefixes);
+        filterStrings = filterStrings.concat(
+          numOfRoomsRangeFilter.filterStrings
+        );
+        basicGraphPattern = basicGraphPattern.concat(
+          numOfRoomsRangeFilter.basicGraphPattern
+        );
+        // if (numberOfRoomsRange.min || numberOfRoomsRange.max) {
+        //   basicGraphPattern.push("?is s:numberOfRooms ?numberOfRooms.");
+        // }
+        // if (numberOfRoomsRange.min) {
+        //   filterStrings.push(
+        //     "FILTER (?numberOfRooms >= " +
+        //       draft.seeks.numberOfRoomsRange.min +
+        //       " )"
+        //   );
+        // }
+        // if (numberOfRoomsRange.max) {
+        //   filterStrings.push(
+        //     "FILTER (?numberOfRooms <= " +
+        //       draft.seeks.numberOfRoomsRange.max +
+        //       " )"
+        //   );
+        // }
       }
 
       if (location) {
         const vicinityFilter = filterInVicinity(location);
-        Object.assign(prefixes, vicinityFilter.prefixes);
-        filterStrings.push(vicinityFilter.filterString);
+        prefixes = Object.assign(prefixes, vicinityFilter.prefixes);
+        filterStrings = filterStrings.concat(vicinityFilter.filterStrings);
+        basicGraphPattern = basicGraphPattern.concat(
+          vicinityFilter.basicGraphPattern
+        );
       }
 
       let queryTemplate =
@@ -1127,6 +1165,24 @@ const transportUseCases = {
     seeksDetails: {
       tags: { ...details.tags },
       description: { ...details.description },
+    },
+    generateQuery: (draft, resultName) => {
+      const filterStrings = [];
+      const prefixes = {
+        s: won.defaultContext["s"],
+        won: won.defaultContext["won"],
+      };
+
+      let queryTemplate =
+        `
+        ${prefixesString(prefixes)}
+        SELECT DISTINCT ${resultName}
+        WHERE {
+        ${resultName}
+          won:is ?is.
+          ${filterStrings && filterStrings.join(" ")}
+        }` + (location ? `ORDER BY ASC(?geoDistance)` : "");
+      return new SparqlParser().parse(queryTemplate);
     },
   },
 };

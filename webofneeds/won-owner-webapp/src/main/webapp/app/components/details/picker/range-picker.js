@@ -67,12 +67,13 @@ function genComponentConf() {
      * Checks validity and uses callback method
      */
     updateMin(number) {
-      if (number) {
+      const parsedNum = Number.parseFloat(number);
+      if (!isNaN(parsedNum)) {
         this.onUpdate({
-          value: { min: number, max: this.addedMaxNumber },
+          value: { min: parsedNum, max: this.addedMaxNumber },
         });
       } else {
-        if (this.addedMaxNumber) {
+        if (!isNaN(this.addedMaxNumber)) {
           this.onUpdate({
             value: { min: number, max: this.addedMaxNumber },
           });
@@ -84,12 +85,13 @@ function genComponentConf() {
       }
     }
     updateMax(number) {
-      if (number) {
+      const parsedNum = Number.parseFloat(number);
+      if (!isNaN(parsedNum)) {
         this.onUpdate({
-          value: { min: this.addedMinNumber, max: number },
+          value: { min: this.addedMinNumber, max: parsedNum },
         });
       } else {
-        if (this.addedMinNumber) {
+        if (!isNaN(this.addedMinNumber)) {
           this.onUpdate({
             value: { min: this.addedMinNumber, max: number },
           });
@@ -102,16 +104,19 @@ function genComponentConf() {
     }
 
     showInitialRange() {
-      this.addedMinNumber = this.initialValue && this.initialValue.min;
-      this.addedMaxNumber = this.initialValue && this.initialValue.max;
-
       if (this.initialValue) {
-        if (this.initialValue.min) {
-          this.minTextfield().value = this.initialValue.min;
+        const min = Number.parseFloat(this.initialValue.min);
+        const max = Number.parseFloat(this.initialValue.max);
+
+        this.addedMinNumber = min;
+        this.addedMaxNumber = max;
+
+        if (!isNaN(min)) {
+          this.minTextfield().value = min;
           this.showMinResetButton = true;
         }
-        if (this.initialValue.max) {
-          this.maxTextfield().value = this.initialValue.max;
+        if (!isNaN(max)) {
+          this.maxTextfield().value = max;
           this.showMaxResetButton = true;
         }
       }
@@ -120,9 +125,9 @@ function genComponentConf() {
     }
 
     updateMinNumber(resetInput) {
-      const number = this.minTextfield().value;
+      const number = Number.parseFloat(this.minTextfield().value);
 
-      if (number) {
+      if (!isNaN(number)) {
         this.addedMinNumber = number;
         this.updateMin(this.addedMinNumber);
         this.showMinResetButton = true;
@@ -132,9 +137,9 @@ function genComponentConf() {
     }
 
     updateMaxNumber(resetInput) {
-      const number = this.maxTextfield().value;
+      const number = Number.parseFloat(this.maxTextfield().value);
 
-      if (number) {
+      if (!isNaN(number)) {
         this.addedMaxNumber = number;
         this.updateMax(this.addedMaxNumber);
         this.showMaxResetButton = true;
