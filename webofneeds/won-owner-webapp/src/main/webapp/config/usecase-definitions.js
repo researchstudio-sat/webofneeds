@@ -430,13 +430,17 @@ const realEstateFloorSizeDetail = {
     return {
       "s:floorSize": {
         "@type": "s:QuantitativeValue",
-        "s:value": [{ "@value": value, "@type": "s:Float" }],
+        "s:value": [{ "@value": value, "@type": "xsd:float" }],
         "s:unitCode": "MTK",
       },
     };
   },
   parseFromRDF: function(jsonLDImm) {
-    const fs = won.parseFrom(jsonLDImm, ["s:floorSize", "s:value"], "s:Float");
+    const fs = won.parseFrom(
+      jsonLDImm,
+      ["s:floorSize", "s:value"],
+      "xsd:float"
+    );
     const unit = getInFromJsonLd(
       jsonLDImm,
       ["s:floorSize", "s:unitCode"],
@@ -474,10 +478,10 @@ const realEstateNumberOfRoomsDetail = {
     if (!value) {
       return { "s:numberOfRooms": undefined };
     }
-    return { "s:numberOfRooms": [{ "@value": value, "@type": "s:Float" }] };
+    return { "s:numberOfRooms": [{ "@value": value, "@type": "xsd:float" }] };
   },
   parseFromRDF: function(jsonLDImm) {
-    return won.parseFrom(jsonLDImm, ["s:numberOfRooms"], "s:Float");
+    return won.parseFrom(jsonLDImm, ["s:numberOfRooms"], "xsd:float");
   },
   generateHumanReadable: function({ value, includeLabel }) {
     if (value) {
@@ -731,10 +735,14 @@ const realEstateUseCases = {
       const location = seeksBranch && seeksBranch.location;
 
       let filterStrings = [];
+      let bgp = [];
 
       if (rentRange) {
         if (rentRange.min || rentRange.max) {
           filterStrings.push("FILTER (?currency = 'EUR') ");
+          bgp.push("?is s:priceSpecification ?pricespec .");
+          bgp.push("?pricespec s:price ?price .");
+          bgp.push("?pricespec s:priceCurrency ?currency .");
         }
         if (rentRange.min) {
           filterStrings.push(
@@ -749,6 +757,9 @@ const realEstateUseCases = {
       }
 
       if (floorSizeRange) {
+        if (floorSizeRange.min || floorSizeRange.max) {
+          bgp.push("?is s:floorSize/s:value ?floorSize.");
+        }
         if (floorSizeRange.min) {
           filterStrings.push(
             "FILTER (?floorSize >= " + draft.seeks.floorSizeRange.min + " )"
@@ -762,6 +773,9 @@ const realEstateUseCases = {
       }
 
       if (numberOfRoomsRange) {
+        if (numberOfRoomsRange.min || numberOfRoomsRange.max) {
+          bgp.push("?is s:numberOfRooms ?numberOfRooms.");
+        }
         if (numberOfRoomsRange.min) {
           filterStrings.push(
             "FILTER (?numberOfRooms >= " +
@@ -782,12 +796,12 @@ const realEstateUseCases = {
         filterStrings.push(
           `?result won:is/won:hasLocation/s:geo ?geo
           SERVICE geo:search {
-            ?geo geo:search "inCircle" .
-            ?geo geo:searchDatatype geoliteral:lat-lon .
-            ?geo geo:predicate won:geoSpatial .
-            ?geo geo:spatialCircleCenter "${location.lat}#${location.lng}" .
-            ?geo geo:spatialCircleRadius "10" .
-            ?geo geo:distanceValue ?geoDistance .
+            ?geo geo:search "inCircle" ;
+                 geo:searchDatatype geoliteral:lat-lon ;
+                 geo:predicate won:geoSpatial ;
+                 geo:spatialCircleCenter "${location.lat}#${location.lng}" ;
+                 geo:spatialCircleRadius "10" ;
+                 geo:distanceValue ?geoDistance .
           }`
         );
       }
@@ -804,13 +818,8 @@ const realEstateUseCases = {
         ${prefixes}
         SELECT DISTINCT ${resultName}
         WHERE {
-        ${resultName}
-          won:is ?is.
-          ?is s:priceSpecification ?pricespec.
-          ?pricespec s:price ?price.
-          ?pricespec s:priceCurrency ?currency.
-          ?is s:floorSize/s:value ?floorSize.
-          ?is s:numberOfRooms ?numberOfRooms.
+          ${resultName} won:is ?is. 
+          ${bgp && bgp.join(" ")}
           ${filterStrings && filterStrings.join(" ")}
         }` + (location ? `ORDER BY ASC(?geoDistance)` : "");
 
@@ -908,7 +917,7 @@ const transportUseCases = {
               "@type": "s:Product",
               "s:weight": {
                 "@type": "s:QuantitativeValue",
-                "s:value": [{ "@value": value, "@type": "s:Float" }],
+                "s:value": [{ "@value": value, "@type": "xsd:float" }],
                 "s:unitCode": "KGM",
               },
             };
@@ -918,7 +927,7 @@ const transportUseCases = {
           const w = won.parseFrom(
             jsonLDImm,
             ["s:weight", "s:value"],
-            "s:Float"
+            "xsd:float"
           );
           const unit = getInFromJsonLd(
             jsonLDImm,
@@ -959,7 +968,7 @@ const transportUseCases = {
               "@type": "s:Product",
               "s:length": {
                 "@type": "s:QuantitativeValue",
-                "s:value": [{ "@value": value, "@type": "s:Float" }],
+                "s:value": [{ "@value": value, "@type": "xsd:float" }],
                 "s:unitCode": "CMT",
               },
             };
@@ -969,7 +978,7 @@ const transportUseCases = {
           const l = won.parseFrom(
             jsonLDImm,
             ["s:length", "s:value"],
-            "s:Float"
+            "xsd:float"
           );
           const unit = getInFromJsonLd(
             jsonLDImm,
@@ -1017,7 +1026,11 @@ const transportUseCases = {
           }
         },
         parseFromRDF: function(jsonLDImm) {
-          const w = won.parseFrom(jsonLDImm, ["s:width", "s:value"], "s:Float");
+          const w = won.parseFrom(
+            jsonLDImm,
+            ["s:width", "s:value"],
+            "xsd:float"
+          );
           const unit = getInFromJsonLd(
             jsonLDImm,
             ["s:width", "s:unitCode"],
@@ -1057,7 +1070,7 @@ const transportUseCases = {
               "@type": "s:Product",
               "s:height": {
                 "@type": "s:QuantitativeValue",
-                "s:value": [{ "@value": value, "@type": "s:Float" }],
+                "s:value": [{ "@value": value, "@type": "xsd:float" }],
                 "s:unitCode": "CMT",
               },
             };
@@ -1067,7 +1080,7 @@ const transportUseCases = {
           const h = won.parseFrom(
             jsonLDImm,
             ["s:height", "s:value"],
-            "s:Float"
+            "xsd:float"
           );
           const unit = getInFromJsonLd(
             jsonLDImm,
@@ -1321,8 +1334,8 @@ const musicianUseCases = {
     },
     isDetails: undefined,
     seeksDetails: {
-      ...reduceObjectByKeys(realEstateUseCases.searchRent.seeksDetails, [
-        "numberOfRoomsRange",
+      ...reduceObjectByKeys(realEstateUseCases.offerRent.seeksDetails, [
+        "numberOfRooms",
       ]),
       features: {
         ...realEstateFeaturesDetail,
