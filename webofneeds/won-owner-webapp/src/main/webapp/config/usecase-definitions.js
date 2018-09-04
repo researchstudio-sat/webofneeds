@@ -687,66 +687,13 @@ const realEstateRentDetail = {
 };
 
 const realEstateRentRangeDetail = {
-  ...abstractDetails.range,
+  ...details.pricerange,
   identifier: "rentRange",
   label: "Rent in EUR/month",
   minLabel: "From",
   maxLabel: "To",
   icon: "#ico36_detail_rent",
-  parseToRDF: function({ value }) {
-    if (!value || !(value.min || value.max)) {
-      return { "s:priceSpecification": undefined };
-    }
-    return {
-      "s:priceSpecification": {
-        "@type": "s:CompoundPriceSpecification",
-        "s:minPrice": value.min && [
-          { "@value": value.min, "@type": "s:Float" },
-        ],
-        "s:maxPrice": value.max && [
-          { "@value": value.max, "@type": "s:Float" },
-        ],
-        "s:priceCurrency": "EUR",
-        "s:description": "total rent per month in between min/max",
-      },
-    };
-  },
-  parseFromRDF: function(jsonLDImm) {
-    const minRent = won.parseFrom(
-      jsonLDImm,
-      ["s:priceSpecification", "s:minPrice"],
-      "s:Float"
-    );
-    const maxRent = won.parseFrom(
-      jsonLDImm,
-      ["s:priceSpecification", "s:maxPrice"],
-      "s:Float"
-    );
-    if (!minRent && !maxRent) {
-      return undefined;
-    } else {
-      // if there's anything, use it
-      return Immutable.fromJS({
-        min: minRent && minRent + " EUR/month",
-        max: maxRent && maxRent + " EUR/month",
-      });
-    }
-  },
-  generateHumanReadable: function({ value, includeLabel }) {
-    if (value) {
-      let humanReadable;
-      if (value.min && value.max) {
-        humanReadable =
-          "between " + value.min + " and " + value.max + " EUR/month";
-      } else if (value.min) {
-        humanReadable = "at least " + value.min + "EUR/month";
-      } else if (value.max) {
-        humanReadable = "at most " + value.max + "EUR/month";
-      }
-      if (humanReadable) {
-        return includeLabel ? this.label + ": " + humanReadable : humanReadable;
-      }
-    }
+  parseFromRDF: function() {
     return undefined;
   },
 };

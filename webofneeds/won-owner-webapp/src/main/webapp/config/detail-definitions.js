@@ -1046,6 +1046,103 @@ export const details = {
       return undefined;
     },
   },
+  pricerange: {
+    identifier: "pricerange",
+    label: "Price range",
+    minLabel: "Min",
+    maxLabel: "Max",
+    minPlaceholder: "Min Price",
+    maxPlaceholder: "Max Price",
+    icon: "#ico36_detail_price",
+    currency: [
+      { value: "EUR", label: "€", default: true },
+      { value: "USD", label: "$" },
+      { value: "GBP", label: "£" },
+    ],
+    unitCode: [
+      { value: "MON", label: "per month" },
+      { value: "WEE", label: "per week" },
+      { value: "DAY", label: "per day" },
+      { value: "HUR", label: "per hour" },
+      { value: "", label: "total", default: true },
+    ],
+    component: "won-price-range-picker",
+    viewerComponent: "won-price-range-viewer",
+    parseToRDF: function({ value }) {
+      if (!value || !(value.min || value.max) || !value.currency) {
+        return { "s:priceSpecification": undefined };
+      }
+      return {
+        "s:priceSpecification": {
+          "@type": "s:CompoundPriceSpecification",
+          "s:minPrice": value.min && [
+            { "@value": value.min, "@type": "s:Float" },
+          ],
+          "s:maxPrice": value.max && [
+            { "@value": value.max, "@type": "s:Float" },
+          ],
+          "s:priceCurrency": value.currency,
+          "s:unitCode": value.unitCode,
+          "s:description": "total rent per month in between min/max",
+        },
+      };
+    },
+    parseFromRDF: function(jsonLDImm) {
+      const minRent = won.parseFrom(
+        jsonLDImm,
+        ["s:priceSpecification", "s:minPrice"],
+        "s:Float"
+      );
+      const maxRent = won.parseFrom(
+        jsonLDImm,
+        ["s:priceSpecification", "s:maxPrice"],
+        "s:Float"
+      );
+      const currency = won.parseFrom(
+        jsonLDImm,
+        ["s:priceSpecification", "s:priceCurrency"],
+        "s:Float"
+      );
+      const unitCode = won.parseFrom(
+        jsonLDImm,
+        ["s:priceSpecification", "s:unitCode"],
+        "xsd:string"
+      );
+
+      if (!minRent && !maxRent) {
+        return undefined;
+      } else if (!currency) {
+        return undefined;
+      } else {
+        // if there's anything, use it
+        return Immutable.fromJS({
+          min: minRent,
+          max: maxRent,
+          currency: currency,
+          unitCode: unitCode,
+        });
+      }
+    },
+    generateHumanReadable: function({ value, includeLabel }) {
+      if (value) {
+        let humanReadable;
+        if (value.min && value.max) {
+          humanReadable =
+            "between " + value.min + " and " + value.max + " EUR/month";
+        } else if (value.min) {
+          humanReadable = "at least " + value.min + "EUR/month";
+        } else if (value.max) {
+          humanReadable = "at most " + value.max + "EUR/month";
+        }
+        if (humanReadable) {
+          return includeLabel
+            ? this.label + ": " + humanReadable
+            : humanReadable;
+        }
+      }
+      return undefined;
+    },
+  },
   ttl: {
     identifier: "ttl",
     label: "Turtle (TTL)",
