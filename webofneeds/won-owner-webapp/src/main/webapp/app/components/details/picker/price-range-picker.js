@@ -47,13 +47,18 @@ function genComponentConf() {
               won-input="::self.updateMaxNumber(false)"
               ng-class="{'rangep__input__max--withreset' : self.showMaxResetButton}"/>
       </div>
-      <select
-            class="pricerangep__input__currency"
-            ng-model="self.selectedCurrency"
-            ng-disabled="self.detail.currency.length <= 1"
-            won-input="::self.updateCurrency()">
-            <option ng-repeat="currency in self.detail.currency" value="{{currency.value}}">{{currency.label}}</option>
-      </select>
+      <div class="pricerangep__input">
+        <label class="pricerangep__input__label">
+            Currency
+        </label>
+        <select
+              class="pricerangep__input__currency"
+              ng-model="self.selectedCurrency"
+              ng-disabled="self.detail.currency.length <= 1"
+              won-input="::self.updateCurrency()">
+              <option ng-repeat="currency in self.detail.currency" value="{{currency.value}}">{{currency.label}}</option>
+        </select>
+      </div>
       <select
             class="pricerangep__input__unitCode"
             ng-model="self.selectedUnitCode"

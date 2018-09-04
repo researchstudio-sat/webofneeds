@@ -1101,7 +1101,7 @@ export const details = {
       const currency = won.parseFrom(
         jsonLDImm,
         ["s:priceSpecification", "s:priceCurrency"],
-        "xsd:float"
+        "xsd:string"
       );
       const unitCode = won.parseFrom(
         jsonLDImm,

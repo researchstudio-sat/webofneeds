@@ -695,6 +695,8 @@ const realEstateRentRangeDetail = {
   label: "Rent in EUR/month",
   minLabel: "From",
   maxLabel: "To",
+  currency: [{ value: "EUR", label: "€", default: true }],
+  unitCode: [{ value: "MON", label: "per month", default: true }],
   icon: "#ico36_detail_rent",
   parseFromRDF: function() {
     return undefined;
