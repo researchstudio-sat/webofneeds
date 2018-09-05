@@ -84,6 +84,7 @@ import won.matcher.service.common.event.BulkNeedEvent;
 import won.matcher.service.common.event.HintEvent;
 import won.matcher.service.common.event.NeedEvent;
 import won.matcher.sparql.config.SparqlMatcherConfig;
+import won.protocol.model.NeedModelMapper;
 import won.protocol.util.NeedModelWrapper;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.vocabulary.WON;
@@ -232,9 +233,21 @@ public class SparqlMatcherActor extends UntypedActor {
         log.debug("starting sparql-based matching for need {}", need.getNeedUri());
         
         Set<NeedModelWrapper> matches = queryNeed(need);
-
-        Map<NeedModelWrapper, Set<NeedModelWrapper>> filteredNeeds = 
-                Stream.of(new AbstractMap.SimpleEntry<>(need, matches))
+        
+        final boolean noHintForCounterpart = need.hasFlag(WON.NO_HINT_FOR_COUNTERPART);
+        
+        Map<NeedModelWrapper, Set<NeedModelWrapper>> filteredNeeds = Stream.concat(
+                Stream.of(new AbstractMap.SimpleEntry<>(need, matches)),
+                //add the reverse match, if no flags forbid it
+                matches.stream().map(matchedNeed -> {
+                    boolean noHintForMe = matchedNeed.hasFlag(WON.NO_HINT_FOR_ME);
+                    if (!noHintForCounterpart && !noHintForMe && !need.getNeedUri().equals(matchedNeed.getNeedUri())) {
+                        return new AbstractMap.SimpleEntry<>(matchedNeed, (Set<NeedModelWrapper>) Collections.singleton(need));
+                    } else {
+                        return new AbstractMap.SimpleEntry<>(matchedNeed, (Set<NeedModelWrapper>) Collections.EMPTY_SET);
+                    }
+                    
+                }))
                 .map(entry -> {
                     Set<NeedModelWrapper> filteredMatches = entry.getValue().stream().filter(f -> postFilter(entry.getKey(), f)).collect(Collectors.toSet());
                     return new AbstractMap.SimpleEntry<>(entry.getKey(), filteredMatches);
@@ -324,7 +337,7 @@ public class SparqlMatcherActor extends UntypedActor {
         Optional<Op> query;
 
         Optional<String> userQuery = need.getQuery();
-
+        
         if(userQuery.isPresent()) {
             query = clientSuppliedQuery(userQuery.get());
         } else {
@@ -398,10 +411,10 @@ public class SparqlMatcherActor extends UntypedActor {
           if (need.getNeedUri().equals(foundNeed.getNeedUri())) {
               return false;
           }
-          if (need.hasFlag(ResourceFactory.createResource("http://purl.org/webofneeds/model#NoHintForMe"))) {
+          if (need.hasFlag(WON.NO_HINT_FOR_ME)) {
               return false;
           }
-          if (foundNeed.hasFlag(ResourceFactory.createResource("http://purl.org/webofneeds/model#NoHintForCounterpart"))) {
+          if (foundNeed.hasFlag(WON.NO_HINT_FOR_COUNTERPART)) {
               return false;
           }
   
