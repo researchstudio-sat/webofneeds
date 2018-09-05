@@ -780,7 +780,7 @@ const realEstateUseCases = {
             numberOfRoomsRange.max
           ),
 
-        location && filterInVicinity("?is", location),
+        location && filterInVicinity("?is", "won:hasLocation", location),
       ];
 
       const concatenatedFilter = concatenateFilters(filters);
@@ -1172,7 +1172,13 @@ const mobilityUseCases = {
           filterStrings: [],
         },
 
-        location && filterInVicinity("?seeks", location, /*radius=*/ 100),
+        location &&
+          filterInVicinity(
+            "?location",
+            "s:fromLocation",
+            location,
+            /*radius=*/ 100
+          ),
       ];
 
       const concatenatedFilter = concatenateFilters(filters);
