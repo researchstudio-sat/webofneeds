@@ -185,7 +185,7 @@ public class AnalyzeBehaviour extends BotBehaviour {
 
                                 if(!AnalyzeBehaviour.this.hasPreconditionProposalRelation(preconditionUri, proposal.getUri().toString())) {
                                     GoalInstantiationResult result = GoalInstantiationProducer.findInstantiationForGoalInDataset(needDataset, goal, proposalModel);
-                                    Precondition precondition = new Precondition(preconditionUri, result.isConform()); //TODO: GOAL INSTANTIATION PRODUCER DUPLICATES THE DATA SOMEHOW AND THUS MAKING THE INITIALLY CONFORM GOAL NOT MET
+                                    Precondition precondition = new Precondition(preconditionUri, result.isConform());
 
                                     logger.trace("\t\t\tPrecondition: " + precondition);
 
