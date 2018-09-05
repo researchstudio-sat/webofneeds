@@ -437,16 +437,17 @@ const realEstateFloorSizeDetail = {
   label: "Floor size in square meters",
   icon: "#ico36_detail_floorsize",
   parseToRDF: function({ value }) {
-    if (!value) {
+    if (!isValidNumber(value)) {
       return { "s:floorSize": undefined };
+    } else {
+      return {
+        "s:floorSize": {
+          "@type": "s:QuantitativeValue",
+          "s:value": [{ "@value": value, "@type": "xsd:float" }],
+          "s:unitCode": "MTK",
+        },
+      };
     }
-    return {
-      "s:floorSize": {
-        "@type": "s:QuantitativeValue",
-        "s:value": [{ "@value": value, "@type": "xsd:float" }],
-        "s:unitCode": "MTK",
-      },
-    };
   },
   parseFromRDF: function(jsonLDImm) {
     const fs = won.parseFrom(
@@ -475,7 +476,7 @@ const realEstateFloorSizeDetail = {
     }
   },
   generateHumanReadable: function({ value, includeLabel }) {
-    if (value) {
+    if (isValidNumber(value)) {
       return (includeLabel ? this.label + ": " + value : value) + "m²";
     }
     return undefined;
@@ -488,19 +489,21 @@ const realEstateNumberOfRoomsDetail = {
   label: "Number of Rooms",
   icon: "#ico36_detail_number-of-rooms",
   parseToRDF: function({ value }) {
-    if (!value) {
+    if (!isValidNumber(value)) {
       return { "s:numberOfRooms": undefined };
+    } else {
+      return { "s:numberOfRooms": [{ "@value": value, "@type": "xsd:float" }] };
     }
-    return { "s:numberOfRooms": [{ "@value": value, "@type": "xsd:float" }] };
   },
   parseFromRDF: function(jsonLDImm) {
     return won.parseFrom(jsonLDImm, ["s:numberOfRooms"], "xsd:float");
   },
   generateHumanReadable: function({ value, includeLabel }) {
-    if (value) {
+    if (isValidNumber(value)) {
       return (includeLabel ? this.label + ": " + value : value) + " Rooms";
+    } else {
+      return undefined;
     }
-    return undefined;
   },
 };
 
@@ -870,7 +873,7 @@ const transportUseCases = {
         label: "Weight in kg",
         icon: "#ico36_detail_weight",
         parseToRDF: function({ value }) {
-          if (!value) {
+          if (!isValidNumber(value)) {
             return { "s:weight": undefined };
           } else {
             return {
@@ -909,7 +912,7 @@ const transportUseCases = {
           }
         },
         generateHumanReadable: function({ value, includeLabel }) {
-          if (value) {
+          if (isValidNumber(value)) {
             return (includeLabel ? this.label + ": " + value : value) + "kg";
           }
           return undefined;
@@ -921,7 +924,7 @@ const transportUseCases = {
         label: "Length in cm",
         icon: "#ico36_detail_measurement",
         parseToRDF: function({ value }) {
-          if (!value) {
+          if (!isValidNumber(value)) {
             return { "s:length": undefined };
           } else {
             return {
@@ -960,7 +963,7 @@ const transportUseCases = {
           }
         },
         generateHumanReadable: function({ value, includeLabel }) {
-          if (value) {
+          if (isValidNumber(value)) {
             return (includeLabel ? this.label + ": " + value : value) + "cm";
           }
           return undefined;
@@ -972,7 +975,7 @@ const transportUseCases = {
         label: "Width in cm",
         icon: "#ico36_detail_measurement",
         parseToRDF: function({ value }) {
-          if (!value) {
+          if (!isValidNumber(value)) {
             return { "s:width": undefined };
           } else {
             return {
@@ -1011,7 +1014,7 @@ const transportUseCases = {
           }
         },
         generateHumanReadable: function({ value, includeLabel }) {
-          if (value) {
+          if (isValidNumber(value)) {
             return (includeLabel ? this.label + ": " + value : value) + "cm";
           }
           return undefined;
@@ -1023,7 +1026,7 @@ const transportUseCases = {
         label: "Height in cm",
         icon: "#ico36_detail_measurement",
         parseToRDF: function({ value }) {
-          if (!value) {
+          if (!isValidNumber(value)) {
             return { "s:height": undefined };
           } else {
             return {
@@ -1062,7 +1065,7 @@ const transportUseCases = {
           }
         },
         generateHumanReadable: function({ value, includeLabel }) {
-          if (value) {
+          if (isValidNumber(value)) {
             return (includeLabel ? this.label + ": " + value : value) + "cm";
           }
           return undefined;
