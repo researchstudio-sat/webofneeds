@@ -54,20 +54,40 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
           ?envsig msg:hasSignedGraph ?env .
           ?envsig signature:hasVerificationCertificate ?envsigner .
       } .
+      # prevent message content from misleading us
+      {
+        SELECT (GROUP_CONCAT(?contentGraph; separator=' ') as ?contentGraphNames) 
+        WHERE {
+          GRAPH ?g { ?x msg:hasContent ?contentGraph}
+        }
+      }
+      FILTER(!contains(?contentGraphNames, str(?g1)))
+      FILTER(!contains(?contentGraphNames, str(?g2)))
+      FILTER(!contains(?contentGraphNames, str(?g3)))
+      FILTER(!contains(?contentGraphNames, str(?env)))      
     } ORDER BY ?event
     }
 
     # count all fromSystem envelopes
-        {SELECT
-        (count (DISTINCT ?g) AS ?sysenvNum)
-        WHERE
+    {
+      SELECT
+      (count (DISTINCT ?g) AS ?sysenvNum)
+      WHERE
+      {
+        GRAPH ?g
         {
-          GRAPH ?g
-          {
-              ?event a msg:FromSystem .
-          } .
+            ?event a msg:FromSystem .
+        } .
+        # prevent message content from misleading us
+        {
+          SELECT (GROUP_CONCAT(?contentGraph; separator=' ') as ?contentGraphNames) 
+          WHERE {
+            GRAPH ?g { ?x msg:hasContent ?contentGraph}
+          }
         }
-        }
+        FILTER(!contains(?contentGraphNames, str(?g)))
+      }
+    }
 
   }
 
