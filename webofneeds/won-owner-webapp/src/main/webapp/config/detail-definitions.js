@@ -709,13 +709,13 @@ export const details = {
         let fromLocationName;
         let toLocationName;
 
-        if (fromLocation.name) {
+        if (fromLocation && fromLocation.name) {
           fromLocationName = fromLocation.name;
         } else if (value && value.fromAddress) {
           fromLocationName = value.fromAddress;
         }
 
-        if (toLocation.name) {
+        if (toLocation && toLocation.name) {
           toLocationName = toLocation.name;
         } else if (value && value.toAddress) {
           toLocationName = value.toAddress;
@@ -727,9 +727,9 @@ export const details = {
           humanReadable = "from: " + fromLocationName + " ";
         } else {
           const fromLocationLat =
-            fromLocation.lat && fromLocation.lat.toFixed(6);
+            fromLocation && fromLocation.lat && fromLocation.lat.toFixed(6);
           const fromLocationLng =
-            fromLocation.lng && fromLocation.lng.toFixed(6);
+            fromLocation && fromLocation.lng && fromLocation.lng.toFixed(6);
           if (fromLocationLat && fromLocationLng) {
             humanReadable =
               "from: @(" + fromLocationLat + " , " + fromLocationLng + ") ";
@@ -743,8 +743,10 @@ export const details = {
             humanReadable = "to: " + toLocationName + " ";
           }
         } else {
-          const toLocationLat = toLocation.lat && toLocation.lat.toFixed(6);
-          const toLocationLng = toLocation.lng && toLocation.lng.toFixed(6);
+          const toLocationLat =
+            toLocation && toLocation.lat && toLocation.lat.toFixed(6);
+          const toLocationLng =
+            toLocation && toLocation.lng && toLocation.lng.toFixed(6);
           if (toLocationLat && toLocationLng) {
             if (humanReadable) {
               humanReadable +=
