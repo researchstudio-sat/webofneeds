@@ -42,7 +42,7 @@ public class ValidationUtils {
                 WonSparqlValidator validator = new WonSparqlValidator(constraint, resource.getFilename());
                 validators.add(validator);
             } catch (Exception e){
-                throw new IllegalStateException("Error loading query from resource " + resource.toString(), e);
+                throw new IllegalStateException("Error loading query from resource " + resource.toString()  + ": " + e.getMessage(), e);
             }
         }
         return validators;
