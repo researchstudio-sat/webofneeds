@@ -64,8 +64,7 @@ export function initLeafletBaseMaps() {
     );
   }
   //const secureOsmSource = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"; // secure osm.org
-  const secureOsmSource =
-    "https://satvm05.researchstudio.at/tile/{z}/{x}/{y}.png"; // FIXME: proxy should not be hardcoded
+  const secureOsmSource = "https://www.matchat.org/tile/{z}/{x}/{y}.png"; // TODO: use own tile server instead of proxy
   const secureOsm = L.tileLayer(secureOsmSource, {
     attribution:
       '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
