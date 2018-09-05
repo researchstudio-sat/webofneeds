@@ -61,12 +61,7 @@ export function concatenateFilters(filters) {
  * @param {Number} radius: distance in km that matches can be away from the location
  * @returns see wellFormedFilterReturn
  */
-export function filterInVicinity(
-  rootSubject,
-  attachedAs,
-  location,
-  radius = 10
-) {
+export function filterInVicinity(rootSubject, location, radius = 10) {
   if (!location || !location.lat || !location.lng) {
     return wellFormedFilterReturn();
   } else {
@@ -77,7 +72,7 @@ export function filterInVicinity(
         geo: "http://www.bigdata.com/rdf/geospatial#",
         geoliteral: "http://www.bigdata.com/rdf/geospatial/literals/v1#",
       },
-      basicGraphPattern: [`${rootSubject} ${attachedAs}/s:geo ?geo`],
+      basicGraphPattern: [`${rootSubject} s:geo ?geo`],
       filterStrings: [
         `SERVICE geo:search {
   ?geo geo:search "inCircle" .

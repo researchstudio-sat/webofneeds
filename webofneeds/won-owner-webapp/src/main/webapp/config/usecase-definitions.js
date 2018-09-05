@@ -759,7 +759,10 @@ const realEstateUseCases = {
           prefixes: {
             won: won.defaultContext["won"],
           },
-          basicGraphPattern: [`${resultName} won:is ?is.`],
+          basicGraphPattern: [
+            `${resultName} won:is ?is.`,
+            location && "?is won:hasLocation ?location.",
+          ],
           filterStrings: [],
         },
         rentRange &&
@@ -780,7 +783,7 @@ const realEstateUseCases = {
             numberOfRoomsRange.max
           ),
 
-        location && filterInVicinity("?is", "won:hasLocation", location),
+        location && filterInVicinity("?location", location),
       ];
 
       const concatenatedFilter = concatenateFilters(filters);
@@ -1168,17 +1171,14 @@ const mobilityUseCases = {
           prefixes: {
             won: won.defaultContext["won"],
           },
-          basicGraphPattern: [`${resultName} won:seeks ?seeks.`],
+          basicGraphPattern: [
+            `${resultName} won:seeks ?seeks.`,
+            location && "?seeks won:travelAction/s:fromLocation ?location.",
+          ],
           filterStrings: [],
         },
 
-        location &&
-          filterInVicinity(
-            "?location",
-            "s:fromLocation",
-            location,
-            /*radius=*/ 100
-          ),
+        location && filterInVicinity("?location", location, /*radius=*/ 100),
       ];
 
       const concatenatedFilter = concatenateFilters(filters);
