@@ -614,7 +614,9 @@ export const details = {
                   "won:geoSpatial": {
                     "@type":
                       "http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon",
-                    "@value": `${value.lat.toFixed(6)}#${value.lng.toFixed(6)}`,
+                    "@value": `${value.fromLocation.lat.toFixed(
+                      6
+                    )}#${value.fromLocation.lng.toFixed(6)}`,
                   },
                 },
                 "s:name": value.fromLocation.name,
@@ -630,7 +632,9 @@ export const details = {
                   "won:geoSpatial": {
                     "@type":
                       "http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon",
-                    "@value": `${value.lat.toFixed(6)}#${value.lng.toFixed(6)}`,
+                    "@value": `${value.toLocation.lat.toFixed(
+                      6
+                    )}#${value.toLocation.lng.toFixed(6)}`,
                   },
                 },
                 "s:name": value.toLocation.name,
