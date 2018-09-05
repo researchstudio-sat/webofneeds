@@ -46,7 +46,7 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 	ConversationMessage correspondingRemoteMessageRef;
 	
 	URI isResponseTo;
-	Optional<ConversationMessage> isResponseToOption;
+	Optional<ConversationMessage> isResponseToOption = Optional.empty();
 	ConversationMessage isResponseToInverseRef;
 	
 	URI isRemoteResponseTo;
@@ -135,7 +135,11 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 	}
 	
 	public boolean isHeadOfDeliveryChain() {
-		return isFromOwner() || (isFromSystem() && !isResponse()) || (!hasCorrespondingRemoteMessage() && ! isResponse());
+		return
+            isFromOwner() || //owner initiated message
+            (isFromSystem() && !isResponse()) || //system initiated Message
+            (!hasCorrespondingRemoteMessage() && !isResponse()) || //message not going to remote need
+            (isFromSystem() && isResponse() && !getIsResponseToOption().isPresent()); //failure without original
 	}
 	
 	public boolean isEndOfDeliveryChain() {
