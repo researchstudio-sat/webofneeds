@@ -1,5 +1,9 @@
 import Immutable from "immutable";
-import { msStringToDate, trigPrefixesAndBody } from "../../utils.js";
+import {
+  msStringToDate,
+  trigPrefixesAndBody,
+  isValidNumber,
+} from "../../utils.js";
 import { isUriRead } from "../../won-localstorage.js";
 import { getAllDetails } from "../../won-utils.js";
 
@@ -29,7 +33,7 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
       content: {
         text: wonMessage.getTextMessage(),
         matchScore:
-          !isNaN(matchScoreFloat) && isFinite(matchScoreFloat)
+          isValidNumber(matchScoreFloat) && isFinite(matchScoreFloat)
             ? matchScoreFloat
             : undefined,
       },

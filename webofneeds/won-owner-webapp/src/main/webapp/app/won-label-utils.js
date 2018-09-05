@@ -1,5 +1,5 @@
 import won from "./won-es6.js";
-import { deepFreeze } from "./utils.js";
+import { deepFreeze, isValidNumber } from "./utils.js";
 
 export const labels = deepFreeze({
   type: {
@@ -54,7 +54,7 @@ export function relativeTime(now, previous) {
   const previous_ = new Date(previous);
   const elapsed = now_ - previous_; // in ms
 
-  if (isNaN(elapsed)) {
+  if (!isValidNumber(elapsed)) {
     // one of two dates was invalid
     return undefined;
   }

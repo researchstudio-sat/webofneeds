@@ -536,6 +536,10 @@ export function mapJoin(object, asyncFunction) {
 /**
  * Stable method of determining the type
  * taken from http://bonsaiden.github.io/JavaScript-Garden/
+ *
+ * NOTE: `NaN` has a type of "Number". Use `isValidNumber` to
+ * catch those as well.
+ *
  * @param type
  * @param obj
  * @return {boolean}
@@ -543,6 +547,11 @@ export function mapJoin(object, asyncFunction) {
 export function is(type, obj) {
   const clas = Object.prototype.toString.call(obj).slice(8, -1);
   return obj !== undefined && obj !== null && clas === type;
+}
+
+export function isValidNumber(num) {
+  // isNaN accepts string-numbers, `is` catches that
+  return !isNaN(num) && is("Number", num);
 }
 
 export function decodeUriComponentProperly(encodedUri) {
@@ -580,7 +589,7 @@ export function reverseSearchNominatim(lat, lon, zoom) {
     lon +
     "&format=json";
 
-  if (!isNaN(zoom)) {
+  if (isValidNumber(zoom)) {
     url += "&zoom=" + Math.max(0, Math.min(zoom, 18));
   }
 
@@ -1386,7 +1395,7 @@ export function parseDatetimeStrictly(dateTime) {
     /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/
   );
   const asDateTime = new Date(dateTime);
-  if (validXsdDateTimeString && !isNaN(asDateTime.valueOf())) {
+  if (validXsdDateTimeString && isValidNumber(asDateTime.valueOf())) {
     return asDateTime;
   } else {
     return new Date("Invalid Date"); // string here is just any unparsable date-string to get `Invalid Date`
@@ -1394,7 +1403,7 @@ export function parseDatetimeStrictly(dateTime) {
 }
 
 export function isValidDate(dateObj) {
-  return dateObj && !isNaN(dateObj.valueOf());
+  return dateObj && isValidNumber(dateObj.valueOf());
 }
 
 /**

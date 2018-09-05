@@ -1,5 +1,5 @@
 import angular from "angular";
-import { attach, delay } from "../../../utils.js";
+import { attach, delay, isValidNumber } from "../../../utils.js";
 import wonInput from "../../../directives/input.js";
 
 import "style/_numberpicker.scss";
@@ -32,7 +32,10 @@ function genComponentConf() {
 
       window.numberp4dbg = this;
 
-      this.addedNumber = this.initialValue;
+      const parsedNum = Number.parseFloat(this.initialValue);
+      if (isValidNumber(parsedNum)) {
+        this.addedNumber = parsedNum;
+      }
       this.showResetButton = false;
 
       delay(0).then(() => this.showInitialNumber());
@@ -42,17 +45,18 @@ function genComponentConf() {
      * Checks validity and uses callback method
      */
     update(number) {
-      if (number) {
-        this.onUpdate({ value: number });
+      const parsedNum = Number.parseFloat(number);
+      if (isValidNumber(parsedNum)) {
+        this.onUpdate({ value: parsedNum });
       } else {
         this.onUpdate({ value: undefined });
       }
     }
 
     showInitialNumber() {
-      this.addedNumber = this.initialValue;
-
-      if (this.initialValue) {
+      const parsedNum = Number.parseFloat(this.initialValue);
+      if (isValidNumber(parsedNum)) {
+        this.addedNumber = parsedNum;
         this.textfield().value = this.initialValue;
         this.showResetButton = true;
       }
@@ -61,9 +65,9 @@ function genComponentConf() {
     }
 
     updateNumber(resetInput) {
-      const number = this.textfield().value;
+      const number = Number.parseFloat(this.textfield().value);
 
-      if (number) {
+      if (isValidNumber(number)) {
         this.addedNumber = number;
         this.update(this.addedNumber);
         this.showResetButton = true;

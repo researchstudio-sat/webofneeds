@@ -1,9 +1,24 @@
-import { is, get, getFromJsonLd, getInFromJsonLd } from "../app/utils.js";
+import {
+  is,
+  isValidNumber,
+  get,
+  getFromJsonLd,
+  getInFromJsonLd,
+  getIn,
+} from "../app/utils.js";
 import Immutable from "immutable";
 import { details, abstractDetails } from "detailDefinitions";
 import { Parser as SparqlParser } from "sparqljs";
 import { findLatestIntervallEndInJsonLd } from "../app/won-utils.js";
 import won from "../app/won-es6.js";
+import {
+  filterInVicinity,
+  prefixesString,
+  filterFloorSizeRange,
+  filterNumOfRoomsRange,
+  filterRentRange,
+  concatenateFilters,
+} from "../app/sparql-builder-utils.js";
 
 export const emptyDraft = {
   is: {},
@@ -423,16 +438,17 @@ const realEstateFloorSizeDetail = {
   label: "Floor size in square meters",
   icon: "#ico36_detail_floorsize",
   parseToRDF: function({ value }) {
-    if (!value) {
+    if (!isValidNumber(value)) {
       return { "s:floorSize": undefined };
+    } else {
+      return {
+        "s:floorSize": {
+          "@type": "s:QuantitativeValue",
+          "s:value": [{ "@value": value, "@type": "xsd:float" }],
+          "s:unitCode": "MTK",
+        },
+      };
     }
-    return {
-      "s:floorSize": {
-        "@type": "s:QuantitativeValue",
-        "s:value": [{ "@value": value, "@type": "xsd:float" }],
-        "s:unitCode": "MTK",
-      },
-    };
   },
   parseFromRDF: function(jsonLDImm) {
     const fs = won.parseFrom(
@@ -461,7 +477,7 @@ const realEstateFloorSizeDetail = {
     }
   },
   generateHumanReadable: function({ value, includeLabel }) {
-    if (value) {
+    if (isValidNumber(value)) {
       return (includeLabel ? this.label + ": " + value : value) + "m²";
     }
     return undefined;
@@ -474,19 +490,21 @@ const realEstateNumberOfRoomsDetail = {
   label: "Number of Rooms",
   icon: "#ico36_detail_number-of-rooms",
   parseToRDF: function({ value }) {
-    if (!value) {
+    if (!isValidNumber(value)) {
       return { "s:numberOfRooms": undefined };
+    } else {
+      return { "s:numberOfRooms": [{ "@value": value, "@type": "xsd:float" }] };
     }
-    return { "s:numberOfRooms": [{ "@value": value, "@type": "xsd:float" }] };
   },
   parseFromRDF: function(jsonLDImm) {
     return won.parseFrom(jsonLDImm, ["s:numberOfRooms"], "xsd:float");
   },
   generateHumanReadable: function({ value, includeLabel }) {
-    if (value) {
+    if (isValidNumber(value)) {
       return (includeLabel ? this.label + ": " + value : value) + " Rooms";
+    } else {
+      return undefined;
     }
-    return undefined;
   },
 };
 
@@ -564,8 +582,8 @@ const realEstateNumberOfRoomsRangeDetail = {
 function minMaxLabel(min, max) {
   const min_ = Number.parseFloat(min);
   const max_ = Number.parseFloat(max);
-  const minIsNumber = !isNaN(min_);
-  const maxIsNumber = !isNaN(max_);
+  const minIsNumber = isValidNumber(min_);
+  const maxIsNumber = isValidNumber(max_);
   if (minIsNumber && maxIsNumber) {
     return min_ + "–" + max_;
   } else if (minIsNumber) {
@@ -735,95 +753,48 @@ const realEstateUseCases = {
       const numberOfRoomsRange = seeksBranch && seeksBranch.numberOfRoomsRange;
       const location = seeksBranch && seeksBranch.location;
 
-      let filterStrings = [];
-      let bgp = [];
+      const filters = [
+        {
+          // to select is-branch
+          prefixes: {
+            won: won.defaultContext["won"],
+          },
+          basicGraphPattern: [
+            `${resultName} won:is ?is.`,
+            location && "?is won:hasLocation ?location.",
+          ],
+          filterStrings: [],
+        },
+        rentRange &&
+          filterRentRange(
+            "?is",
+            rentRange.min,
+            rentRange.max,
+            rentRange.currency
+          ),
 
-      if (rentRange) {
-        if ((rentRange.min || rentRange.max) && rentRange.currency) {
-          filterStrings.push(
-            "FILTER (?currency = '" + rentRange.currency + "') "
-          );
-          bgp.push("?is s:priceSpecification ?pricespec .");
-          bgp.push("?pricespec s:price ?price .");
-          bgp.push("?pricespec s:priceCurrency ?currency .");
-        }
-        if (rentRange.min) {
-          filterStrings.push(
-            "FILTER (?price >= " + draft.seeks.rentRange.min + " )"
-          );
-        }
-        if (rentRange.max) {
-          filterStrings.push(
-            "FILTER (?price <= " + draft.seeks.rentRange.max + " )"
-          );
-        }
-      }
+        floorSizeRange &&
+          filterFloorSizeRange("?is", floorSizeRange.min, floorSizeRange.max),
 
-      if (floorSizeRange) {
-        if (floorSizeRange.min || floorSizeRange.max) {
-          bgp.push("?is s:floorSize/s:value ?floorSize.");
-        }
-        if (floorSizeRange.min) {
-          filterStrings.push(
-            "FILTER (?floorSize >= " + draft.seeks.floorSizeRange.min + " )"
-          );
-        }
-        if (floorSizeRange.max) {
-          filterStrings.push(
-            "FILTER (?floorSize <= " + draft.seeks.floorSizeRange.max + " )"
-          );
-        }
-      }
+        numberOfRoomsRange &&
+          filterNumOfRoomsRange(
+            "?is",
+            numberOfRoomsRange.min,
+            numberOfRoomsRange.max
+          ),
 
-      if (numberOfRoomsRange) {
-        if (numberOfRoomsRange.min || numberOfRoomsRange.max) {
-          bgp.push("?is s:numberOfRooms ?numberOfRooms.");
-        }
-        if (numberOfRoomsRange.min) {
-          filterStrings.push(
-            "FILTER (?numberOfRooms >= " +
-              draft.seeks.numberOfRoomsRange.min +
-              " )"
-          );
-        }
-        if (numberOfRoomsRange.max) {
-          filterStrings.push(
-            "FILTER (?numberOfRooms <= " +
-              draft.seeks.numberOfRoomsRange.max +
-              " )"
-          );
-        }
-      }
+        location && filterInVicinity("?location", location),
+      ];
 
-      if (location) {
-        filterStrings.push(
-          `?result won:is/won:hasLocation/s:geo ?geo
-          SERVICE geo:search {
-            ?geo geo:search "inCircle" ;
-                 geo:searchDatatype geoliteral:lat-lon ;
-                 geo:predicate won:geoSpatial ;
-                 geo:spatialCircleCenter "${location.lat}#${location.lng}" ;
-                 geo:spatialCircleRadius "10" ;
-                 geo:distanceValue ?geoDistance .
-          }`
-        );
-      }
+      const concatenatedFilter = concatenateFilters(filters);
 
-      const prefixes = `
-        prefix s:     <http://schema.org/>
-        prefix won:   <http://purl.org/webofneeds/model#>
-        prefix dc:    <http://purl.org/dc/elements/1.1/>
-        prefix geo: <http://www.bigdata.com/rdf/geospatial#>
-        prefix geoliteral: <http://www.bigdata.com/rdf/geospatial/literals/v1#>
-      `;
-      let queryTemplate =
+      const queryTemplate =
         `
-        ${prefixes}
+        ${prefixesString(concatenatedFilter.prefixes)}
         SELECT DISTINCT ${resultName}
         WHERE {
-          ${resultName} won:is ?is. 
-          ${bgp && bgp.join(" ")}
-          ${filterStrings && filterStrings.join(" ")}
+          ${concatenatedFilter.basicGraphPattern.join(" ")}
+          ${concatenatedFilter.filterStrings.join(" ")}
         }` + (location ? `ORDER BY ASC(?geoDistance)` : "");
 
       return new SparqlParser().parse(queryTemplate);
@@ -913,7 +884,7 @@ const transportUseCases = {
         label: "Weight in kg",
         icon: "#ico36_detail_weight",
         parseToRDF: function({ value }) {
-          if (!value) {
+          if (!isValidNumber(value)) {
             return { "s:weight": undefined };
           } else {
             return {
@@ -952,7 +923,7 @@ const transportUseCases = {
           }
         },
         generateHumanReadable: function({ value, includeLabel }) {
-          if (value) {
+          if (isValidNumber(value)) {
             return (includeLabel ? this.label + ": " + value : value) + "kg";
           }
           return undefined;
@@ -964,7 +935,7 @@ const transportUseCases = {
         label: "Length in cm",
         icon: "#ico36_detail_measurement",
         parseToRDF: function({ value }) {
-          if (!value) {
+          if (!isValidNumber(value)) {
             return { "s:length": undefined };
           } else {
             return {
@@ -1003,7 +974,7 @@ const transportUseCases = {
           }
         },
         generateHumanReadable: function({ value, includeLabel }) {
-          if (value) {
+          if (isValidNumber(value)) {
             return (includeLabel ? this.label + ": " + value : value) + "cm";
           }
           return undefined;
@@ -1015,7 +986,7 @@ const transportUseCases = {
         label: "Width in cm",
         icon: "#ico36_detail_measurement",
         parseToRDF: function({ value }) {
-          if (!value) {
+          if (!isValidNumber(value)) {
             return { "s:width": undefined };
           } else {
             return {
@@ -1054,7 +1025,7 @@ const transportUseCases = {
           }
         },
         generateHumanReadable: function({ value, includeLabel }) {
-          if (value) {
+          if (isValidNumber(value)) {
             return (includeLabel ? this.label + ": " + value : value) + "cm";
           }
           return undefined;
@@ -1066,7 +1037,7 @@ const transportUseCases = {
         label: "Height in cm",
         icon: "#ico36_detail_measurement",
         parseToRDF: function({ value }) {
-          if (!value) {
+          if (!isValidNumber(value)) {
             return { "s:height": undefined };
           } else {
             return {
@@ -1105,7 +1076,7 @@ const transportUseCases = {
           }
         },
         generateHumanReadable: function({ value, includeLabel }) {
-          if (value) {
+          if (isValidNumber(value)) {
             return (includeLabel ? this.label + ": " + value : value) + "cm";
           }
           return undefined;
@@ -1134,6 +1105,24 @@ const transportUseCases = {
     seeksDetails: {
       tags: { ...details.tags },
       description: { ...details.description },
+    },
+    generateQuery: (draft, resultName) => {
+      const filterStrings = [];
+      const prefixes = {
+        s: won.defaultContext["s"],
+        won: won.defaultContext["won"],
+      };
+
+      let queryTemplate =
+        `
+        ${prefixesString(prefixes)}
+        SELECT DISTINCT ${resultName}
+        WHERE {
+        ${resultName}
+          won:is ?is.
+          ${filterStrings && filterStrings.join(" ")}
+        }` + (location ? `ORDER BY ASC(?geoDistance)` : "");
+      return new SparqlParser().parse(queryTemplate);
     },
   },
 };
@@ -1173,6 +1162,37 @@ const mobilityUseCases = {
       title: { ...details.title },
       description: { ...details.description },
       location: { ...details.location },
+    },
+    generateQuery: (draft, resultName) => {
+      const location = getIn(draft, ["is", "location"]);
+      const filters = [
+        {
+          // to select seeks-branch
+          prefixes: {
+            won: won.defaultContext["won"],
+          },
+          basicGraphPattern: [
+            `${resultName} won:seeks ?seeks.`,
+            location && "?seeks won:travelAction/s:fromLocation ?location.",
+          ],
+          filterStrings: [],
+        },
+
+        location && filterInVicinity("?location", location, /*radius=*/ 100),
+      ];
+
+      const concatenatedFilter = concatenateFilters(filters);
+
+      const queryTemplate =
+        `
+        ${prefixesString(concatenatedFilter.prefixes)}
+        SELECT DISTINCT ${resultName}
+        WHERE {
+          ${concatenatedFilter.basicGraphPattern.join(" ")}
+          ${concatenatedFilter.filterStrings.join(" ")}
+        }` + (location ? `ORDER BY ASC(?geoDistance)` : "");
+
+      return new SparqlParser().parse(queryTemplate);
     },
   },
   rideShareOffer: {

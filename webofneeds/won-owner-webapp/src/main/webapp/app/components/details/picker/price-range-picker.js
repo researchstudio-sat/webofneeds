@@ -1,5 +1,5 @@
 import angular from "angular";
-import { attach, delay } from "../../../utils.js";
+import { getIn, attach, delay, isValidNumber } from "../../../utils.js";
 import wonInput from "../../../directives/input.js";
 
 import "style/_pricerangepicker.scss";
@@ -75,10 +75,12 @@ function genComponentConf() {
 
       window.rangep4dbg = this;
 
-      this.addedMinNumber = this.initialValue && this.initialValue.min;
-      this.addedMaxNumber = this.initialValue && this.initialValue.max;
-      this.selectedCurrency = this.initialValue && this.initialValue.currency;
-      this.selectedUnitCode = this.initialValue && this.initialValue.unitCode;
+      if (this.initialValue) {
+        this.addedMinNumber = Number.parseFloat(this.initialValue.min);
+        this.addedMaxNumber = Number.parseFloat(this.initialValue.max);
+        this.selectedCurrency = this.initialValue.currency;
+        this.selectedUnitCode = this.initialValue.unitCode;
+      }
 
       if (!this.selectedCurrency) {
         this.selectedCurrency = "EUR";
@@ -98,20 +100,26 @@ function genComponentConf() {
      * Checks validity and uses callback method
      */
     updateMin(number) {
-      this.update(
-        number,
-        this.addedMaxNumber,
-        this.selectedCurrency,
-        this.selectedUnitCode
-      );
+      const parsedNum = Number.parseFloat(number);
+      if (isValidNumber(parsedNum)) {
+        this.update(
+          parsedNum,
+          this.addedMaxNumber,
+          this.selectedCurrency,
+          this.selectedUnitCode
+        );
+      }
     }
     updateMax(number) {
-      this.update(
-        this.addedMinNumber,
-        number,
-        this.selectedCurrency,
-        this.selectedUnitCode
-      );
+      const parsedNum = Number.parseFloat(number);
+      if (isValidNumber(parsedNum)) {
+        this.update(
+          this.addedMinNumber,
+          parsedNum,
+          this.selectedCurrency,
+          this.selectedUnitCode
+        );
+      }
     }
 
     updateCurrency() {
@@ -135,11 +143,14 @@ function genComponentConf() {
     }
 
     update(min, max, currency, unitCode) {
-      if ((min || max) && currency) {
+      const minParsed = Number.parseFloat(min);
+      const maxParsed = Number.parseFloat(max);
+
+      if ((isValidNumber(minParsed) || isValidNumber(maxParsed)) && currency) {
         this.onUpdate({
           value: {
-            min: min,
-            max: max,
+            min: minParsed,
+            max: maxParsed,
             currency: currency,
             unitCode: unitCode !== "" ? unitCode : undefined,
           },
@@ -182,21 +193,21 @@ function genComponentConf() {
     }
 
     showInitialRange() {
-      this.addedMinNumber = this.initialValue && this.initialValue.min;
-      this.addedMaxNumber = this.initialValue && this.initialValue.max;
       this.selectedCurrency =
-        (this.initialValue && this.initialValue.currency) ||
-        this.getDefaultCurrency();
+        getIn(this, ["initialValue", "currency"]) || this.getDefaultCurrency();
       this.selectedUnitCode =
-        (this.initialValue && this.initialValue.unitCode) ||
-        this.getDefaultUnitCode();
-
+        getIn(this[("initialValue", "unitCode")]) || this.getDefaultUnitCode();
       if (this.initialValue) {
-        if (this.initialValue.min) {
+        const min = Number.parseFloat(this.initialValue.min);
+        const max = Number.parseFloat(this.initialValue.max);
+        this.addedMinNumber = min;
+        this.addedMaxNumber = max;
+
+        if (isValidNumber(min)) {
           this.minTextfield().value = this.initialValue.min;
           this.showMinResetButton = true;
         }
-        if (this.initialValue.max) {
+        if (isValidNumber(max)) {
           this.maxTextfield().value = this.initialValue.max;
           this.showMaxResetButton = true;
         }
@@ -206,9 +217,9 @@ function genComponentConf() {
     }
 
     updateMinNumber(resetInput) {
-      const number = this.minTextfield().value;
+      const number = Number.parseFloat(this.minTextfield().value);
 
-      if (number) {
+      if (isValidNumber(number)) {
         this.addedMinNumber = number;
         this.updateMin(this.addedMinNumber);
         this.showMinResetButton = true;
@@ -218,9 +229,9 @@ function genComponentConf() {
     }
 
     updateMaxNumber(resetInput) {
-      const number = this.maxTextfield().value;
+      const number = Number.parseFloat(this.maxTextfield().value);
 
-      if (number) {
+      if (isValidNumber(number)) {
         this.addedMaxNumber = number;
         this.updateMax(this.addedMaxNumber);
         this.showMaxResetButton = true;
