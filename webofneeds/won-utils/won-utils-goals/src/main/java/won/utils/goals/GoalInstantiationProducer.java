@@ -4,6 +4,8 @@ import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
@@ -59,7 +61,17 @@ public class GoalInstantiationProducer {
         if(conversation != null){
             String sparqlQuery =
                 "PREFIX msg: <http://purl.org/webofneeds/message#> \n" +
-                "DELETE { GRAPH ?g { ?s ?p ?o } } where { { GRAPH ?g { ?s ?p ?o } GRAPH <urn:x-arq:UnionGraph> { ?msg msg:hasContent ?content } } filter (?g != ?content) }";
+                "DELETE { \n" +
+                "    GRAPH ?g {?s ?p ?o} \n" +
+                "} \n" +
+                "WHERE { \n" +
+                "    GRAPH ?g { ?s ?p ?o } \n" +
+                "    { SELECT (GROUP_CONCAT(?content; separator=\" \") as ?contentGraphs) \n" +
+                "            WHERE { GRAPH <urn:x-arq:UnionGraph> { ?msg msg:hasContent ?content } \n" +
+                "    }\n" +
+                "} \n" +
+                "FILTER (!contains(?contentGraphs,str(?g))) \n" +
+                "} \n";
 
             UpdateRequest update = UpdateFactory.create(sparqlQuery);
 
