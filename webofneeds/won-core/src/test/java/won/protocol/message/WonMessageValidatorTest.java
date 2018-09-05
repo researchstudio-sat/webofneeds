@@ -77,6 +77,9 @@ public class WonMessageValidatorTest
 
   private static final String RESOURCE_FILE_TEXT_MSG_VALID =
     "/validation/valid/text_msg_remote.trig";
+  
+  private static final String RESOURCE_FILE_TEXT_MSG_VALID_WITH_MISLEADING_CONTENT=
+          "/validation/valid/conversation_msg_with_potentially_misleading_content.trig";
 
   private static final String TEXT_ENV1_NAME =
     "http://localhost:8080/won/resource/event/z7rgjxnyvjpo3l9m0d79#envelope-f65t";
@@ -96,12 +99,14 @@ public class WonMessageValidatorTest
     "http://localhost:8080/won/resource/event/m8cjzr6892213okiek04#envelope-ojt8-sig";
 
   private Dataset textMessageDataset;
-
+  private Dataset misleadingMessageDataset;
+  
   @Before
   public void init() throws IOException {
     createMessageDataset = Utils.createTestDataset(RESOURCE_FILE_CREATE_MSG_VALID);
     responseMessageDataset = Utils.createTestDataset(RESOURCE_FILE_RESPONSE_MSG_VALID);
     textMessageDataset = Utils.createTestDataset(RESOURCE_FILE_TEXT_MSG_VALID);
+    misleadingMessageDataset = Utils.createTestDataset(RESOURCE_FILE_TEXT_MSG_VALID_WITH_MISLEADING_CONTENT);
   }
 
   @Test
@@ -128,6 +133,14 @@ public class WonMessageValidatorTest
     WonMessageValidator validator = new WonMessageValidator();
     StringBuilder message = new StringBuilder();
     boolean valid = validator.validate(textMessageDataset, message);
+    Assert.assertTrue("validation is expected not to fail at " + message, valid);
+  }
+  
+  @Test
+  public void testValidMessageWithMisleadingContent() throws IOException {
+    WonMessageValidator validator = new WonMessageValidator();
+    StringBuilder message = new StringBuilder();
+    boolean valid = validator.validate(misleadingMessageDataset, message);
     Assert.assertTrue("validation is expected not to fail at " + message, valid);
   }
 

@@ -3,6 +3,7 @@ package won.protocol.agreement;
 import java.net.URI;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
 
@@ -45,7 +46,7 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 	ConversationMessage correspondingRemoteMessageRef;
 	
 	URI isResponseTo;
-	ConversationMessage isResponseToRef;
+	Optional<ConversationMessage> isResponseToOption = Optional.empty();
 	ConversationMessage isResponseToInverseRef;
 	
 	URI isRemoteResponseTo;
@@ -134,7 +135,11 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 	}
 	
 	public boolean isHeadOfDeliveryChain() {
-		return isFromOwner() || (isFromSystem() && !isResponse()) || (!hasCorrespondingRemoteMessage() && ! isResponse());
+		return
+            isFromOwner() || //owner initiated message
+            (isFromSystem() && !isResponse()) || //system initiated Message
+            (!hasCorrespondingRemoteMessage() && !isResponse()) || //message not going to remote need
+            (isFromSystem() && isResponse() && !getIsResponseToOption().isPresent()); //failure without original
 	}
 	
 	public boolean isEndOfDeliveryChain() {
@@ -152,8 +157,8 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 			this.deliveryChain.addMessage(this);
 			return this.deliveryChain;
 		}
-		if (isResponse()) {
-			this.deliveryChain = getIsResponseToRef().getDeliveryChain();
+		if (isResponse() && getIsResponseToOption().isPresent()) {
+			this.deliveryChain = getIsResponseToOption().get().getDeliveryChain();
 			if (this.deliveryChain != null) {
 				this.deliveryChain.addMessage(this);
 				return deliveryChain;
@@ -214,7 +219,7 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 	}
 	
 	public boolean hasResponse(ConversationMessage other) {
-		return other.getIsResponseToRef() == this;
+		return other.getIsResponseToOption().orElse(null)  == this;
 	}
 	
 	public boolean isRemoteResponseTo(ConversationMessage other) {
@@ -509,11 +514,16 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 	public void setIsResponseTo(URI isResponseTo) {
 		this.isResponseTo = isResponseTo;
 	}
-	public ConversationMessage getIsResponseToRef() {
-		return isResponseToRef;
+	/**
+	 * Return an optional conversation message here - it's possible that we only have the response, not the
+	 * original one.
+	 * @return
+	 */
+	public Optional<ConversationMessage> getIsResponseToOption() {
+		return isResponseToOption;
 	}
 	public void setIsResponseToRef(ConversationMessage ref) {
-		this.isResponseToRef = ref;
+		this.isResponseToOption = Optional.of(ref);
 	}
 	public URI getIsRemoteResponseTo() {
 		return isRemoteResponseTo;
@@ -628,7 +638,7 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 				+ ", proposesToCancelRefs:" + proposesToCancelRefs.size() + ", correspondingRemoteMessageURI="
 				+ correspondingRemoteMessageURI + ", correspondingRemoteMessageRef=" + messageUriOrNullString(correspondingRemoteMessageRef)
 				+ ", isResponseTo= " +isResponseTo + ", isRemoteResponseTo=" + isRemoteResponseTo 
-				+ ", isResponseToRef: " + messageUriOrNullString(isResponseToRef) 
+				+ ", isResponseToRef: " + messageUriOrNullString(isResponseToOption) 
 				+ ", isRemoteResponseToRef:" + messageUriOrNullString(isRemoteResponseToRef)
 				+ ", isResponseToInverse: " + messageUriOrNullString(isResponseToInverseRef)
 				+ ", isRemoteResponseToInverse: " + messageUriOrNullString(isRemoteResponseToInverseRef)
@@ -638,6 +648,10 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 	private Object messageUriOrNullString(ConversationMessage message) {
 		return message != null? message.getMessageURI():"null";
 	}
+	
+	private Object messageUriOrNullString(Optional<ConversationMessage> messageOpt) {
+        return (messageOpt.isPresent()) ? messageOpt.get().getMessageURI():"null";
+    }
 
 	@Override
 	public int hashCode() {

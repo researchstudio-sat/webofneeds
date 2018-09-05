@@ -56,8 +56,10 @@ public class WellformednessCheckingWonMessageProcessor implements WonMessageProc
         dataset.getLock().leaveCriticalSection();
     }
     if (!valid) {
-      logger.info(errorMessage.toString() + "\n Offending message:\n" + RdfUtils.writeDatasetToString(dataset, Lang
-        .TRIG));
+      logger.info(errorMessage.toString() +". More info on loglevel 'debug'", message.getMessageURI());
+      if (logger.isDebugEnabled()) {
+          logger.debug("Offending message:\n" + RdfUtils.writeDatasetToString(dataset, Lang.TRIG));
+      }
       throw new WonMessageNotWellFormedException(errorMessage.toString());
     }
     return message;
