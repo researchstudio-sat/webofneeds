@@ -4,6 +4,7 @@ import {
   get,
   getFromJsonLd,
   getInFromJsonLd,
+  getIn,
 } from "../app/utils.js";
 import Immutable from "immutable";
 import { details, abstractDetails } from "detailDefinitions";
@@ -753,35 +754,42 @@ const realEstateUseCases = {
       const location = seeksBranch && seeksBranch.location;
 
       const filters = [
+        {
+          // to select is-branch
+          prefixes: {
+            won: won.defaultContext["won"],
+          },
+          basicGraphPattern: [`${resultName} won:is ?is.`],
+          filterStrings: [],
+        },
         rentRange &&
-          filterRentRange(rentRange.min, rentRange.max, rentRange.currency),
+          filterRentRange(
+            "?is",
+            rentRange.min,
+            rentRange.max,
+            rentRange.currency
+          ),
 
         floorSizeRange &&
-          filterFloorSizeRange(floorSizeRange.min, floorSizeRange.max),
+          filterFloorSizeRange("?is", floorSizeRange.min, floorSizeRange.max),
 
         numberOfRoomsRange &&
-          filterNumOfRoomsRange(numberOfRoomsRange.min, numberOfRoomsRange.max),
+          filterNumOfRoomsRange(
+            "?is",
+            numberOfRoomsRange.min,
+            numberOfRoomsRange.max
+          ),
 
-        location && filterInVicinity(location),
+        location && filterInVicinity("?is", location),
       ];
 
       const concatenatedFilter = concatenateFilters(filters);
 
-      const prefixes = Object.assign(
-        {
-          // prefixes needed by select itself:
-          won: won.defaultContext["won"],
-        },
-        // prefixes needed by filters
-        concatenatedFilter.prefixes
-      );
-
-      let queryTemplate =
+      const queryTemplate =
         `
-        ${prefixesString(prefixes)}
+        ${prefixesString(concatenatedFilter.prefixes)}
         SELECT DISTINCT ${resultName}
         WHERE {
-          ${resultName} won:is ?is. 
           ${concatenatedFilter.basicGraphPattern.join(" ")}
           ${concatenatedFilter.filterStrings.join(" ")}
         }` + (location ? `ORDER BY ASC(?geoDistance)` : "");
@@ -1151,6 +1159,34 @@ const mobilityUseCases = {
       title: { ...details.title },
       description: { ...details.description },
       location: { ...details.location },
+    },
+    generateQuery: (draft, resultName) => {
+      const location = getIn(draft, ["is", "location"]);
+      const filters = [
+        {
+          // to select seeks-branch
+          prefixes: {
+            won: won.defaultContext["won"],
+          },
+          basicGraphPattern: [`${resultName} won:seeks ?seeks.`],
+          filterStrings: [],
+        },
+
+        location && filterInVicinity("?seeks", location, /*radius=*/ 100),
+      ];
+
+      const concatenatedFilter = concatenateFilters(filters);
+
+      const queryTemplate =
+        `
+        ${prefixesString(concatenatedFilter.prefixes)}
+        SELECT DISTINCT ${resultName}
+        WHERE {
+          ${concatenatedFilter.basicGraphPattern.join(" ")}
+          ${concatenatedFilter.filterStrings.join(" ")}
+        }` + (location ? `ORDER BY ASC(?geoDistance)` : "");
+
+      return new SparqlParser().parse(queryTemplate);
     },
   },
   rideShareOffer: {

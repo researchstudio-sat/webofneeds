@@ -61,7 +61,7 @@ export function concatenateFilters(filters) {
  * @param {Number} radius: distance in km that matches can be away from the location
  * @returns see wellFormedFilterReturn
  */
-export function filterInVicinity(location, radius = 10) {
+export function filterInVicinity(rootSubject, location, radius = 10) {
   if (!location || !location.lat || !location.lng) {
     return wellFormedFilterReturn();
   } else {
@@ -72,9 +72,9 @@ export function filterInVicinity(location, radius = 10) {
         geo: "http://www.bigdata.com/rdf/geospatial#",
         geoliteral: "http://www.bigdata.com/rdf/geospatial/literals/v1#",
       },
+      basicGraphPattern: [`${rootSubject} won:hasLocation/s:geo ?geo`],
       filterStrings: [
-        `?result won:is/won:hasLocation/s:geo ?geo
-SERVICE geo:search {
+        `SERVICE geo:search {
   ?geo geo:search "inCircle" .
   ?geo geo:searchDatatype geoliteral:lat-lon .
   ?geo geo:predicate won:geoSpatial .
@@ -87,7 +87,7 @@ SERVICE geo:search {
   }
 }
 
-export function filterFloorSizeRange(min, max) {
+export function filterFloorSizeRange(rootSubject, min, max) {
   const basicGraphPattern = [];
   const filterStrings = [];
   const prefixes = {
@@ -96,7 +96,7 @@ export function filterFloorSizeRange(min, max) {
   const minIsNum = isValidNumber(min);
   const maxIsNum = isValidNumber(max);
   if (minIsNum || maxIsNum) {
-    basicGraphPattern.push("?is s:floorSize/s:value ?floorSize.");
+    basicGraphPattern.push(`${rootSubject} s:floorSize/s:value ?floorSize.`);
   }
   if (minIsNum) {
     filterStrings.push("FILTER (?floorSize >= " + min + " )");
@@ -107,7 +107,7 @@ export function filterFloorSizeRange(min, max) {
   return wellFormedFilterReturn({ basicGraphPattern, filterStrings, prefixes });
 }
 
-export function filterNumOfRoomsRange(min, max) {
+export function filterNumOfRoomsRange(rootSubject, min, max) {
   const prefixes = {
     s: won.defaultContext["s"],
   };
@@ -116,7 +116,7 @@ export function filterNumOfRoomsRange(min, max) {
   const minIsNum = isValidNumber(min);
   const maxIsNum = isValidNumber(max);
   if (minIsNum || maxIsNum) {
-    basicGraphPattern.push("?is s:numberOfRooms ?numberOfRooms.");
+    basicGraphPattern.push(`${rootSubject} s:numberOfRooms ?numberOfRooms.`);
   }
   if (minIsNum) {
     filterStrings.push("FILTER (?numberOfRooms >= " + min + " )");
@@ -127,7 +127,7 @@ export function filterNumOfRoomsRange(min, max) {
   return wellFormedFilterReturn({ basicGraphPattern, filterStrings, prefixes });
 }
 
-export function filterRentRange(min, max, currency) {
+export function filterRentRange(rootSubject, min, max, currency) {
   const prefixes = {
     s: won.defaultContext["s"],
   };
@@ -138,7 +138,7 @@ export function filterRentRange(min, max, currency) {
   if ((minIsNum || maxIsNum) && currency) {
     filterStrings.push('FILTER (?currency = "' + currency + '") ');
     basicGraphPattern = basicGraphPattern.concat([
-      "?is s:priceSpecification ?pricespec .",
+      `${rootSubject} s:priceSpecification ?pricespec .`,
       "?pricespec s:price ?price .",
       "?pricespec s:priceCurrency ?currency .",
     ]);
