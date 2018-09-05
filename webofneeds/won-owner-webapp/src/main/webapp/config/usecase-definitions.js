@@ -1394,17 +1394,6 @@ const musicianUseCases = {
   },
 };
 
-export const useCases = {
-  ...complainUseCases,
-  ...socialUseCases,
-  ...professionalUseCases,
-  ...realEstateUseCases,
-  ...transportUseCases,
-  ...mobilityUseCases,
-  ...allDetailsUseCase,
-  ...musicianUseCases,
-};
-
 export const useCaseGroups = {
   complain: {
     identifier: "complaingroup",
@@ -1414,13 +1403,13 @@ export const useCaseGroups = {
   },
   transport: {
     identifier: "transportgroup",
-    label: "Transport",
+    label: "Transport and Delivery",
     icon: undefined,
     useCases: { ...transportUseCases },
   },
   mobility: {
     identifier: "mobilitygroup",
-    label: "Mobility",
+    label: "Personal Mobility",
     icon: undefined,
     useCases: { ...mobilityUseCases },
   },
@@ -1432,26 +1421,48 @@ export const useCaseGroups = {
   },
   musician: {
     identifier: "musiciangroup",
-    label: "Musician",
+    label: "Artists and Bands",
     icon: undefined,
     useCases: { ...musicianUseCases },
   },
   social: {
     identifier: "socialgroup",
-    label: "Fun activities to do together",
+    label: "Social Activities",
     icon: undefined,
     useCases: { ...socialUseCases },
   },
   professional: {
     identifier: "professionalgroup",
-    label: "Professional networking",
+    label: "Professional Networking",
     icon: undefined,
     useCases: { ...professionalUseCases },
   },
   other: {
     identifier: "othergroup",
-    label: "Something else",
+    label: "Something Else",
     icon: undefined,
     useCases: { ...allDetailsUseCase },
   },
 };
+
+// generate a list of usecases from all use case groups
+// TODO: find a good way to handle potential ungrouped use cases
+let tempUseCases = {};
+for (let key in useCaseGroups) {
+  const useCases = useCaseGroups[key].useCases;
+  for (let identifier in useCases) {
+    tempUseCases[identifier] = useCases[identifier];
+  }
+}
+
+export const useCases = tempUseCases;
+// export const useCases = {
+//   ...complainUseCases,
+//   ...socialUseCases,
+//   ...professionalUseCases,
+//   ...realEstateUseCases,
+//   ...transportUseCases,
+//   ...mobilityUseCases,
+//   ...musicianUseCases,
+//   ...allDetailsUseCase,
+// };
