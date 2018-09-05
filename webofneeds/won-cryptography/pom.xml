@@ -12,14 +12,6 @@
     <version>0.3-SNAPSHOT</version>
     <name>Cryptography</name>
 
-    <repositories>
-        <repository>
-            <id>signingframework-repo-local</id>
-            <name>repository for signingframework</name>
-            <url>file:${project.basedir}/signingframework-repo</url>
-        </repository>
-    </repositories>
-
     <dependencies>
 
         <dependency>
@@ -55,8 +47,9 @@
 
         <!-- doesn't exist in the public repository -->
         <dependency>
-            <groupId>de.uni_koblenz.aggrimm.icp</groupId>
+            <groupId>at.researchstudio.sat</groupId>
             <artifactId>signingframework</artifactId>
+            <version>1.4</version>
         </dependency>
 
         <!-- jena uses this to read/write Json-Ld -->
