@@ -20,10 +20,10 @@
     <parent>
         <groupId>at.researchstudio.sat</groupId>
         <artifactId>webofneeds</artifactId>
-        <version>0.3-SNAPSHOT</version>
+        <version>0.3</version>
     </parent>
     <artifactId>won-core</artifactId>
-    <version>0.3-SNAPSHOT</version>
+    <version>0.3</version>
     <name>Core</name>
 
     <dependencies>
