@@ -1,10 +1,15 @@
 package won.utils.goals;
 
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.update.UpdateExecutionFactory;
+import org.apache.jena.update.UpdateFactory;
+import org.apache.jena.update.UpdateProcessor;
+import org.apache.jena.update.UpdateRequest;
 import org.topbraid.shacl.validation.ValidationUtil;
 import won.protocol.model.NeedGraphType;
 import won.protocol.util.NeedModelWrapper;
@@ -24,7 +29,6 @@ public class GoalInstantiationProducer {
 
     private Dataset need1;
     private Dataset need2;
-    private Dataset conversation;
     private Model combinedModelWithoutGoals;
     private String variableUriPrefix;
     private String blendingUriPrefix;
@@ -42,7 +46,6 @@ public class GoalInstantiationProducer {
 
         this.need1 = need1;
         this.need2 = need2;
-        this.conversation = conversation;
         this.variableUriPrefix = variableUriPrefix;
         this.blendingUriPrefix = blendingUriPrefix;
 
@@ -55,8 +58,27 @@ public class GoalInstantiationProducer {
         Dataset combinedDataset = DatasetFactory.create();
         combinedDataset.addNamedModel("need1", strippedNeed1);
         combinedDataset.addNamedModel("need2", strippedNeed2);
-        if(this.conversation != null){
-            RdfUtils.addDatasetToDataset(combinedDataset, this.conversation, false);
+        if(conversation != null){
+            String sparqlQuery =
+                "PREFIX msg: <http://purl.org/webofneeds/message#> \n" +
+                "DELETE { \n" +
+                "    GRAPH ?g {?s ?p ?o} \n" +
+                "} \n" +
+                "WHERE { \n" +
+                "    GRAPH ?g { ?s ?p ?o } \n" +
+                "    { SELECT (GROUP_CONCAT(?content; separator=\" \") as ?contentGraphs) \n" +
+                "            WHERE { GRAPH <urn:x-arq:UnionGraph> { ?msg msg:hasContent ?content } \n" +
+                "    }\n" +
+                "} \n" +
+                "FILTER (!contains(?contentGraphs,str(?g))) \n" +
+                "} \n";
+
+            UpdateRequest update = UpdateFactory.create(sparqlQuery);
+
+            UpdateProcessor updateProcessor = UpdateExecutionFactory.create(update, conversation);
+            updateProcessor.execute();
+
+            RdfUtils.addDatasetToDataset(combinedDataset, conversation, false);
         }
         combinedModelWithoutGoals = RdfUtils.mergeAllDataToSingleModel(combinedDataset);
     }
