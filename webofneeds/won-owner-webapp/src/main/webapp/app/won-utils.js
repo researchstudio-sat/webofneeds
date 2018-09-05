@@ -63,7 +63,8 @@ export function initLeafletBaseMaps() {
       "Tried to initialize leaflet map-sources while leaflet wasn't loaded."
     );
   }
-  const secureOsmSource = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"; // secure osm.org
+  //const secureOsmSource = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"; // secure osm.org
+  const secureOsmSource = "https://www.matchat.org/tile/{z}/{x}/{y}.png"; // TODO: use own tile server instead of proxy
   const secureOsm = L.tileLayer(secureOsmSource, {
     attribution:
       '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',

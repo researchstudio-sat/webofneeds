@@ -1,6 +1,5 @@
-version: '2'
+version: "2"
 services:
-
   # letsencrypt container that helps renew the matchat.org (including www.match.org and node.matchat.org) certificate.
   # It is used by the nginx (external matchat representation of owner) and the wonnode.
   # This is only used around every 90 days to manually renew the certificate.
@@ -68,6 +67,7 @@ services:
       - $base_folder/nginx.conf:/etc/nginx/nginx.conf
       - $base_folder/nginx-uki-http.conf:/etc/nginx/conf.d/nginx-uki-http.conf
       - $base_folder/letsencrypt/acme-challenge:/usr/share/nginx/html/
+      - /data/osmcache/
     depends_on:
       - gencert
 
@@ -250,7 +250,7 @@ services:
     build: ../../image/bots
     image: webofneeds/bots:live
     environment:
-      - "uri.prefix.owner=https://matchat.org/debug_bot"  # set this for the trust store alias
+      - "uri.prefix.owner=https://matchat.org/debug_bot" # set this for the trust store alias
       - "node.default.host=node.matchat.org"
       - "node.default.http.port=443"
       - "uri.prefix.node.default=https://node.matchat.org/won"
@@ -285,21 +285,19 @@ services:
     depends_on:
       - mysql
 
-
   matcher_sparql:
     build: ../../image/matcher-sparql
     image: webofneeds/matcher_sparql:int
     environment:
-    - "node.host=satvm01.researchstudio.at"
-    - "cluster.seedNodes=satvm01.researchstudio.at:2561,satvm01.researchstudio.at:2563"
-    - "cluster.local.port=2564"
-    - "matcher.sparql.uri.sparql.endpoint=http://satvm01.researchstudio.at:10000/blazegraph/namespace/kb/sparql"
-    - "matcher.sparql.uri.public=http://satvm01.researchstudio.at/sparql/"
-    - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
+      - "node.host=satvm01.researchstudio.at"
+      - "cluster.seedNodes=satvm01.researchstudio.at:2561,satvm01.researchstudio.at:2563"
+      - "cluster.local.port=2564"
+      - "matcher.sparql.uri.sparql.endpoint=http://satvm01.researchstudio.at:10000/blazegraph/namespace/kb/sparql"
+      - "matcher.sparql.uri.public=http://satvm01.researchstudio.at/sparql/"
+      - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
     ports:
-    - "2564:2564"
+      - "2564:2564"
     depends_on:
-    - matcher_service
+      - matcher_service
     volumes:
-    - $base_folder/won-client-certs/matcher_sparql:/usr/src/matcher-sparql/client-certs/
-
+      - $base_folder/won-client-certs/matcher_sparql:/usr/src/matcher-sparql/client-certs/
