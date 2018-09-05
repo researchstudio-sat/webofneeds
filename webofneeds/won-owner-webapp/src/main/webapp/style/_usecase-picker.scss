@@ -1,6 +1,7 @@
 @import "won-config";
 @import "animate";
 @import "sizing-utils";
+@import "textfield";
 
 won-usecase-picker {
   display: grid;
@@ -102,6 +103,13 @@ won-usecase-picker {
       grid-column: 1/-1;
     }
 
+    &__search {
+      @extend .won-txt;
+      min-height: $formInputHeight;
+      max-height: $formInputHeight;
+    }
+
+    &__searchresult,
     &__usecase-group {
       display: flex;
       align-items: center;
