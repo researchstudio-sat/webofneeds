@@ -109,6 +109,7 @@ services:
     volumes:
       - $base_folder/nginx-int.conf:/etc/nginx/nginx.conf
       - $base_folder/won-server-certs2:/etc/nginx/won-server-certs/
+      - osm_cache:/data/osmcache/
     depends_on:
       - gencert2
 
@@ -374,3 +375,5 @@ services:
       - $base_folder/agent:/opt/agent/
     depends_on:
       - matcher_service
+
+volumes: osm_cache:
