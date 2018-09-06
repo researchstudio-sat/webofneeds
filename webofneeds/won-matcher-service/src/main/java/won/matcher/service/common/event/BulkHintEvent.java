@@ -26,4 +26,11 @@ public class BulkHintEvent implements Serializable
   public Collection<HintEvent> getHintEvents() {
     return Collections.unmodifiableCollection(hintEvents);
   }
+  
+  public boolean hasEvent(HintEvent tmpEvent) {
+      if(this.hintEvents.contains(tmpEvent)) {
+          return true;
+      }
+      return false;
+  }
 }

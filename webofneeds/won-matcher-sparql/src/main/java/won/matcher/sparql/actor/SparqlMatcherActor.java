@@ -261,6 +261,10 @@ public class SparqlMatcherActor extends UntypedActor {
             });
         });
         
+        System.out.println("Here BEFORE-------------------------------------");
+        System.out.println("Matches: " + bulkHintEvent.getHintEvents().size());
+        
+        
         pubSubMediator.tell(new DistributedPubSubMediator.Publish(bulkHintEvent.getClass().getName(), bulkHintEvent), getSelf());
         log.debug("finished sparql-based matching for need {} (found {} matches)", need.getNeedUri(), bulkHintEvent.getHintEvents().size());
     }
@@ -409,12 +413,15 @@ public class SparqlMatcherActor extends UntypedActor {
     private boolean postFilter(NeedModelWrapper need, NeedModelWrapper foundNeed) {
         try {
           if (need.getNeedUri().equals(foundNeed.getNeedUri())) {
+              // No matching of same need
               return false;
           }
           if (need.hasFlag(WON.NO_HINT_FOR_ME)) {
+              // No hint for old need, need is closed, etc.
               return false;
           }
           if (foundNeed.hasFlag(WON.NO_HINT_FOR_COUNTERPART)) {
+              // No hint for needs, that should not appear on counter side - (what's new, what's around)
               return false;
           }
   
