@@ -4,7 +4,7 @@
  */
 
 import won from "./won-es6.js";
-import { isValidNumber } from "./utils.js";
+import { isValidNumber, isValidDate, toLocalISODateString } from "./utils.js";
 
 /**
  * returns e.g.:
@@ -90,6 +90,43 @@ export function filterInVicinity(rootSubject, location, radius = 10) {
   ${geoVar} geo:spatialCircleRadius "${radius}" .
   ${geoVar} geo:distanceValue ${rootSubject}_geoDistance .
 }`,
+      ],
+    });
+  }
+}
+
+/**
+ * Constructs a filter for which holds:
+ *
+ * `datetime - 12h <= matchedTime <= datetime + 12h`
+ *
+ * @param {*} rootSubject the sparql-variable that is the `s:DateTime`
+ * @param {*} datetime the datetime around which to construct a filter-bracket
+ * @param {*} hoursBeforeAndAfter
+ */
+export function filterAboutTime(
+  rootSubject,
+  datetime,
+  hoursBeforeAndAfter = 12
+) {
+  if (!isValidDate(datetime)) {
+    return wellFormedFilterReturn();
+  } else {
+    const min = new Date(datetime);
+    min.setHours(min.getHours() - hoursBeforeAndAfter);
+    const minStr = toLocalISODateString(min);
+    const max = new Date(datetime);
+    max.setHours(max.getHours() + hoursBeforeAndAfter);
+    const maxStr = toLocalISODateString(max);
+
+    return wellFormedFilterReturn({
+      prefixes: {
+        s: won.defaultContext["s"],
+      },
+      basicGraphPattern: [],
+      filterStrings: [
+        `FILTER (${rootSubject} >= ${minStr} )`,
+        `FILTER (${rootSubject} <= ${maxStr} )`,
       ],
     });
   }

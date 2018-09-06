@@ -5,6 +5,7 @@ import {
   getFromJsonLd,
   getInFromJsonLd,
   getIn,
+  isValidDate,
 } from "../app/utils.js";
 import Immutable from "immutable";
 import { details, abstractDetails } from "detailDefinitions";
@@ -18,6 +19,7 @@ import {
   filterNumOfRoomsRange,
   filterRentRange,
   concatenateFilters,
+  filterAboutTime,
 } from "../app/sparql-builder-utils.js";
 
 export const emptyDraft = {
@@ -1215,6 +1217,8 @@ const mobilityUseCases = {
     generateQuery: (draft, resultName) => {
       const toLocation = getIn(draft, ["is", "travelAction", "toLocation"]);
       const fromLocation = getIn(draft, ["is", "travelAction", "fromLocation"]);
+
+      const fromTime = getIn(draft, ["is", "fromDatetime"]);
       const filters = [
         {
           // to select seeks-branch
@@ -1226,14 +1230,16 @@ const mobilityUseCases = {
             fromLocation &&
               "?seeks won:travelAction/s:fromLocation ?fromLocation.",
             toLocation && "?seeks won:travelAction/s:toLocation ?toLocation.",
+            isValidDate(fromTime) && "?seeks s:validFrom ?starttime",
           ],
           filterStrings: [],
         },
 
-        fromLocation &&
-          filterInVicinity("?fromLocation", fromLocation, /*radius=*/ 100),
-        toLocation &&
-          filterInVicinity("?toLocation", toLocation, /*radius=*/ 100),
+        filterInVicinity("?fromLocation", fromLocation, /*radius=*/ 100),
+
+        filterInVicinity("?toLocation", toLocation, /*radius=*/ 100),
+
+        filterAboutTime("?starttime", fromTime, 12 /* hours before and after*/),
       ];
 
       const concatenatedFilter = concatenateFilters(filters);
