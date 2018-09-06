@@ -27,10 +27,19 @@ public class BulkHintEvent implements Serializable
     return Collections.unmodifiableCollection(hintEvents);
   }
   
-  public boolean hasEvent(HintEvent tmpEvent) {
-      if(this.hintEvents.contains(tmpEvent)) {
-          return true;
-      }
+  public boolean hasEvent(HintEvent tmpHint) {
+      //HintEvent(hintTarget.getWonNodeUri(), hintTarget.getNeedUri(), hint.getWonNodeUri(), hint.getNeedUri(), config.getMatcherUri(), 1)
+      //TODO: real filter
+      /*
+      tmpEvent.getFromNeedUri();
+      tmpEvent.getFromWonNodeUri();
+      tmpEvent.getToNeedUri();
+      tmpEvent.getToWonNodeUri();*/
+      for(HintEvent hint : this.hintEvents) {
+          if(hint.getFromNeedUri() == tmpHint.getFromNeedUri() && hint.getToNeedUri() == tmpHint.getToNeedUri()) {
+              return true;
+          }
+      };
       return false;
   }
 }
