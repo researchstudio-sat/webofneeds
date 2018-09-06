@@ -56,7 +56,10 @@ export function concatenateFilters(filters) {
   return concatenatedFilter;
 }
 /**
- *
+ * @param {String} rootSubject: a variable name via which the location is connected
+ *  to the rest of the graph-patterns . e.g. `"?location"`. Needs to start with a
+ *  variable indicator (i.e. `?`) as other variable names will be derived by
+ *  suffixing it.
  * @param {*} location: an object containing `lat` and `lng`
  * @param {Number} radius: distance in km that matches can be away from the location
  * @returns see wellFormedFilterReturn
@@ -65,6 +68,11 @@ export function filterInVicinity(rootSubject, location, radius = 10) {
   if (!location || !location.lat || !location.lng) {
     return wellFormedFilterReturn();
   } else {
+    /* "prefix" variable name with root-subject so filter can be used 
+     * multiple times for different roots
+     * results in e.g. `?location_geo`
+     */
+    const geoVar = `${rootSubject}_geo`;
     return wellFormedFilterReturn({
       prefixes: {
         s: won.defaultContext["s"],
@@ -72,15 +80,15 @@ export function filterInVicinity(rootSubject, location, radius = 10) {
         geo: "http://www.bigdata.com/rdf/geospatial#",
         geoliteral: "http://www.bigdata.com/rdf/geospatial/literals/v1#",
       },
-      basicGraphPattern: [`${rootSubject} s:geo ?geo`],
+      basicGraphPattern: [`${rootSubject} s:geo ${geoVar}`],
       filterStrings: [
         `SERVICE geo:search {
-  ?geo geo:search "inCircle" .
-  ?geo geo:searchDatatype geoliteral:lat-lon .
-  ?geo geo:predicate won:geoSpatial .
-  ?geo geo:spatialCircleCenter "${location.lat}#${location.lng}" .
-  ?geo geo:spatialCircleRadius "${radius}" .
-  ?geo geo:distanceValue ?geoDistance .
+  ${geoVar} geo:search "inCircle" .
+  ${geoVar} geo:searchDatatype geoliteral:lat-lon .
+  ${geoVar} geo:predicate won:geoSpatial .
+  ${geoVar} geo:spatialCircleCenter "${location.lat}#${location.lng}" .
+  ${geoVar} geo:spatialCircleRadius "${radius}" .
+  ${geoVar} geo:distanceValue ${rootSubject}_geoDistance .
 }`,
       ],
     });
@@ -95,14 +103,17 @@ export function filterFloorSizeRange(rootSubject, min, max) {
   };
   const minIsNum = isValidNumber(min);
   const maxIsNum = isValidNumber(max);
+  const floorSizeVar = `${rootSubject}_floorSize.`;
   if (minIsNum || maxIsNum) {
-    basicGraphPattern.push(`${rootSubject} s:floorSize/s:value ?floorSize.`);
+    basicGraphPattern.push(
+      `${rootSubject} s:floorSize/s:value ${floorSizeVar}.`
+    );
   }
   if (minIsNum) {
-    filterStrings.push("FILTER (?floorSize >= " + min + " )");
+    filterStrings.push(`FILTER (${floorSizeVar} >= ${min} )`);
   }
   if (maxIsNum) {
-    filterStrings.push("FILTER (?floorSize <= " + max + " )");
+    filterStrings.push(`FILTER (${floorSizeVar} <= ${max} )`);
   }
   return wellFormedFilterReturn({ basicGraphPattern, filterStrings, prefixes });
 }
@@ -115,14 +126,17 @@ export function filterNumOfRoomsRange(rootSubject, min, max) {
   const filterStrings = [];
   const minIsNum = isValidNumber(min);
   const maxIsNum = isValidNumber(max);
+  const numberOfRoomsVar = `${rootSubject}_numberOfRooms`;
   if (minIsNum || maxIsNum) {
-    basicGraphPattern.push(`${rootSubject} s:numberOfRooms ?numberOfRooms.`);
+    basicGraphPattern.push(
+      `${rootSubject} s:numberOfRooms ${numberOfRoomsVar}.`
+    );
   }
   if (minIsNum) {
-    filterStrings.push("FILTER (?numberOfRooms >= " + min + " )");
+    filterStrings.push(`FILTER (${numberOfRoomsVar} >= ${min} )`);
   }
   if (maxIsNum) {
-    filterStrings.push("FILTER (?numberOfRooms <= " + max + " )");
+    filterStrings.push(`FILTER (${numberOfRoomsVar} <= ${max} )`);
   }
   return wellFormedFilterReturn({ basicGraphPattern, filterStrings, prefixes });
 }
@@ -135,19 +149,22 @@ export function filterRentRange(rootSubject, min, max, currency) {
   const filterStrings = [];
   const minIsNum = isValidNumber(min);
   const maxIsNum = isValidNumber(max);
+  const pricespecVar = `${rootSubject}_pricespec`;
+  const currencyVar = `${rootSubject}_currency`;
+  const priceVar = `${rootSubject}_price`;
   if ((minIsNum || maxIsNum) && currency) {
-    filterStrings.push('FILTER (?currency = "' + currency + '") ');
+    filterStrings.push(`FILTER (${currencyVar} = "${currency}") `);
     basicGraphPattern = basicGraphPattern.concat([
-      `${rootSubject} s:priceSpecification ?pricespec .`,
-      "?pricespec s:price ?price .",
-      "?pricespec s:priceCurrency ?currency .",
+      `${rootSubject} s:priceSpecification ${pricespecVar} .`,
+      `${pricespecVar} s:price ${priceVar} .`,
+      `${pricespecVar} s:priceCurrency ${currencyVar} .`,
     ]);
   }
   if (minIsNum) {
-    filterStrings.push("FILTER (?price >= " + min + " )");
+    filterStrings.push(`FILTER (${priceVar} >= ${min} )`);
   }
   if (maxIsNum) {
-    filterStrings.push("FILTER (?price <= " + max + " )");
+    filterStrings.push(`FILTER (${priceVar} <= ${max} )`);
   }
 
   return wellFormedFilterReturn({ basicGraphPattern, filterStrings, prefixes });

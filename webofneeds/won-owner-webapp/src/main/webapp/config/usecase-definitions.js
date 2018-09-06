@@ -795,7 +795,7 @@ const realEstateUseCases = {
         WHERE {
           ${concatenatedFilter.basicGraphPattern.join(" ")}
           ${concatenatedFilter.filterStrings.join(" ")}
-        }` + (location ? `ORDER BY ASC(?geoDistance)` : "");
+        }` + (location ? `ORDER BY ASC(?location_geoDistance)` : "");
 
       return new SparqlParser().parse(queryTemplate);
     },
@@ -1106,24 +1106,24 @@ const transportUseCases = {
       tags: { ...details.tags },
       description: { ...details.description },
     },
-    generateQuery: (draft, resultName) => {
-      const filterStrings = [];
-      const prefixes = {
-        s: won.defaultContext["s"],
-        won: won.defaultContext["won"],
-      };
+    // generateQuery: (draft, resultName) => {
+    //   const filterStrings = [];
+    //   const prefixes = {
+    //     s: won.defaultContext["s"],
+    //     won: won.defaultContext["won"],
+    //   };
 
-      let queryTemplate =
-        `
-        ${prefixesString(prefixes)}
-        SELECT DISTINCT ${resultName}
-        WHERE {
-        ${resultName}
-          won:is ?is.
-          ${filterStrings && filterStrings.join(" ")}
-        }` + (location ? `ORDER BY ASC(?geoDistance)` : "");
-      return new SparqlParser().parse(queryTemplate);
-    },
+    //   let queryTemplate =
+    //     `
+    //     ${prefixesString(prefixes)}
+    //     SELECT DISTINCT ${resultName}
+    //     WHERE {
+    //     ${resultName}
+    //       won:is ?is.
+    //       ${filterStrings && filterStrings.join(" ")}
+    //     }` + (location ? `ORDER BY ASC(?geoDistance)` : "");
+    //   return new SparqlParser().parse(queryTemplate);
+    // },
   },
 };
 
@@ -1190,7 +1190,7 @@ const mobilityUseCases = {
         WHERE {
           ${concatenatedFilter.basicGraphPattern.join(" ")}
           ${concatenatedFilter.filterStrings.join(" ")}
-        }` + (location ? `ORDER BY ASC(?geoDistance)` : "");
+        }` + (location ? `ORDER BY ASC(?location_geoDistance)` : "");
 
       return new SparqlParser().parse(queryTemplate);
     },
@@ -1212,6 +1212,43 @@ const mobilityUseCases = {
       throughDatetime: { ...details.throughDatetime },
       travelAction: { ...details.travelAction },
     },
+    // generateQuery: (draft, resultName) => {
+    //   const toLocation = getIn(draft, ["is", "toLocation"]);
+    //   const fromLocation = getIn(draft, ["is", "fromLocation"]);
+    //   const filters = [
+    //     {
+    //       // to select seeks-branch
+    //       prefixes: {
+    //         won: won.defaultContext["won"],
+    //       },
+    //       basicGraphPattern: [
+    //         `${resultName} won:seeks ?seeks.`,
+    //         fromLocation &&
+    //           "?seeks won:travelAction/s:fromLocation ?fromLocation.",
+    //         toLocation && "?seeks won:travelAction/s:toLocation ?toLocation.",
+    //       ],
+    //       filterStrings: [],
+    //     },
+
+    //     fromLocation &&
+    //       filterInVicinity("?fromLocation", fromLocation, /*radius=*/ 100),
+    //     toLocation &&
+    //       filterInVicinity("?toLocation", toLocation, /*radius=*/ 100),
+    //   ];
+
+    //   const concatenatedFilter = concatenateFilters(filters);
+
+    //   const queryTemplate =
+    //     `
+    //     ${prefixesString(concatenatedFilter.prefixes)}
+    //     SELECT DISTINCT ${resultName}
+    //     WHERE {
+    //       ${concatenatedFilter.basicGraphPattern.join(" ")}
+    //       ${concatenatedFilter.filterStrings.join(" ")}
+    //     }` + (location ? `ORDER BY ASC(?fromLocation_geoDistance)` : "");
+
+    //   return new SparqlParser().parse(queryTemplate);
+    // },
   },
 };
 
