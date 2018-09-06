@@ -1212,43 +1212,43 @@ const mobilityUseCases = {
       throughDatetime: { ...details.throughDatetime },
       travelAction: { ...details.travelAction },
     },
-    // generateQuery: (draft, resultName) => {
-    //   const toLocation = getIn(draft, ["is", "toLocation"]);
-    //   const fromLocation = getIn(draft, ["is", "fromLocation"]);
-    //   const filters = [
-    //     {
-    //       // to select seeks-branch
-    //       prefixes: {
-    //         won: won.defaultContext["won"],
-    //       },
-    //       basicGraphPattern: [
-    //         `${resultName} won:seeks ?seeks.`,
-    //         fromLocation &&
-    //           "?seeks won:travelAction/s:fromLocation ?fromLocation.",
-    //         toLocation && "?seeks won:travelAction/s:toLocation ?toLocation.",
-    //       ],
-    //       filterStrings: [],
-    //     },
+    generateQuery: (draft, resultName) => {
+      const toLocation = getIn(draft, ["is", "travelAction", "toLocation"]);
+      const fromLocation = getIn(draft, ["is", "travelAction", "fromLocation"]);
+      const filters = [
+        {
+          // to select seeks-branch
+          prefixes: {
+            won: won.defaultContext["won"],
+          },
+          basicGraphPattern: [
+            `${resultName} won:seeks ?seeks.`,
+            fromLocation &&
+              "?seeks won:travelAction/s:fromLocation ?fromLocation.",
+            toLocation && "?seeks won:travelAction/s:toLocation ?toLocation.",
+          ],
+          filterStrings: [],
+        },
 
-    //     fromLocation &&
-    //       filterInVicinity("?fromLocation", fromLocation, /*radius=*/ 100),
-    //     toLocation &&
-    //       filterInVicinity("?toLocation", toLocation, /*radius=*/ 100),
-    //   ];
+        fromLocation &&
+          filterInVicinity("?fromLocation", fromLocation, /*radius=*/ 100),
+        toLocation &&
+          filterInVicinity("?toLocation", toLocation, /*radius=*/ 100),
+      ];
 
-    //   const concatenatedFilter = concatenateFilters(filters);
+      const concatenatedFilter = concatenateFilters(filters);
 
-    //   const queryTemplate =
-    //     `
-    //     ${prefixesString(concatenatedFilter.prefixes)}
-    //     SELECT DISTINCT ${resultName}
-    //     WHERE {
-    //       ${concatenatedFilter.basicGraphPattern.join(" ")}
-    //       ${concatenatedFilter.filterStrings.join(" ")}
-    //     }` + (location ? `ORDER BY ASC(?fromLocation_geoDistance)` : "");
+      const queryTemplate =
+        `
+        ${prefixesString(concatenatedFilter.prefixes)}
+        SELECT DISTINCT ${resultName}
+        WHERE {
+          ${concatenatedFilter.basicGraphPattern.join(" ")}
+          ${concatenatedFilter.filterStrings.join(" ")}
+        }` + (location ? `ORDER BY ASC(?fromLocation_geoDistance)` : "");
 
-    //   return new SparqlParser().parse(queryTemplate);
-    // },
+      return new SparqlParser().parse(queryTemplate);
+    },
   },
 };
 

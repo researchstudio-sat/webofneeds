@@ -80,7 +80,7 @@ export function filterInVicinity(rootSubject, location, radius = 10) {
         geo: "http://www.bigdata.com/rdf/geospatial#",
         geoliteral: "http://www.bigdata.com/rdf/geospatial/literals/v1#",
       },
-      basicGraphPattern: [`${rootSubject} s:geo ${geoVar}`],
+      basicGraphPattern: [`${rootSubject} s:geo ${geoVar}.`],
       filterStrings: [
         `SERVICE geo:search {
   ${geoVar} geo:search "inCircle" .
