@@ -86,6 +86,15 @@ export function initLeafletBaseMaps() {
   return baseMaps;
 }
 
+export function leafletBounds(location) {
+  if (location && location.nwCorner && location.seCorner) {
+    return new L.latLngBounds(
+      new L.LatLng(location.nwCorner.lat, location.nwCorner.lng),
+      new L.latLng(location.seCorner.lat, location.seCorner.lng)
+    );
+  }
+}
+
 export function selectTimestamp(event) {
   /*
      * the "outer" event is from our own event
