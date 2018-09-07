@@ -11,8 +11,10 @@ import { isValidNumber, isValidDate, toLocalISODateString } from "./utils.js";
  * ```
  * {
  *   prefixes: { s: "http://schema.org/", ...},
- *   filterStrings: [ "FILTER (?currency = 'EUR')",... ],
- *   basicGraphPattern: [ "?is s:priceSpecification ?pricespec .", ...],
+ *   operations: [
+ *      "FILTER (?currency = 'EUR')",... ],
+ *      "?is s:priceSpecification ?pricespec .", ...],
+ *    ],
  * }
  * ```
  * The defaults are empty objects and arrays as properties.
@@ -23,8 +25,7 @@ function wellFormedFilterReturn(returnValue) {
   return Object.assign(
     {
       prefixes: {},
-      filterStrings: [],
-      basicGraphPattern: [],
+      operations: [], // basic graph patterns, filters etc. anything that goes into the where clause
     },
     returnValue
   );
@@ -36,22 +37,22 @@ function wellFormedFilterReturn(returnValue) {
  * @param {*} filters see `wellFormedFilterReturn` for the returned structure.
  */
 export function concatenateFilters(filters) {
-  const concatenatedFilter = filters.reduce((acc, f) => {
-    if (!f) {
-      return acc;
-    } else {
-      const prefixes = Object.assign({}, acc.prefixes, f.prefixes);
-      const filterStrings = acc.filterStrings.concat(f.filterStrings);
-      const basicGraphPattern = acc.basicGraphPattern.concat(
-        f.basicGraphPattern
-      );
-      return {
-        prefixes,
-        filterStrings,
-        basicGraphPattern,
-      };
-    }
-  }, wellFormedFilterReturn());
+  const concatenatedFilter = filters
+    .filter(f => f) // filter out undefined filters
+    .reduce((acc, f) => {
+      if (!f) {
+        return acc;
+      } else {
+        const prefixes = Object.assign({}, acc.prefixes, f.prefixes);
+        const operations = acc.filterStrings
+          .concat(f.operations)
+          .filter(o => o);
+        return {
+          prefixes,
+          operations,
+        };
+      }
+    }, wellFormedFilterReturn());
 
   return concatenatedFilter;
 }
@@ -80,8 +81,8 @@ export function filterInVicinity(rootSubject, location, radius = 10) {
         geo: "http://www.bigdata.com/rdf/geospatial#",
         geoliteral: "http://www.bigdata.com/rdf/geospatial/literals/v1#",
       },
-      basicGraphPattern: [`${rootSubject} s:geo ${geoVar}.`],
-      filterStrings: [
+      operations: [
+        `${rootSubject} s:geo ${geoVar}.`,
         `SERVICE geo:search {
   ${geoVar} geo:search "inCircle" .
   ${geoVar} geo:searchDatatype geoliteral:lat-lon .
@@ -123,8 +124,7 @@ export function filterAboutTime(
       prefixes: {
         s: won.defaultContext["s"],
       },
-      basicGraphPattern: [],
-      filterStrings: [
+      operations: [
         `FILTER (${rootSubject} >= ${minStr} )`,
         `FILTER (${rootSubject} <= ${maxStr} )`,
       ],
@@ -133,8 +133,7 @@ export function filterAboutTime(
 }
 
 export function filterFloorSizeRange(rootSubject, min, max) {
-  const basicGraphPattern = [];
-  const filterStrings = [];
+  const operations = [];
   const prefixes = {
     s: won.defaultContext["s"],
   };
@@ -142,69 +141,63 @@ export function filterFloorSizeRange(rootSubject, min, max) {
   const maxIsNum = isValidNumber(max);
   const floorSizeVar = `${rootSubject}_floorSize.`;
   if (minIsNum || maxIsNum) {
-    basicGraphPattern.push(
-      `${rootSubject} s:floorSize/s:value ${floorSizeVar}.`
-    );
+    operations.push(`${rootSubject} s:floorSize/s:value ${floorSizeVar}.`);
   }
   if (minIsNum) {
-    filterStrings.push(`FILTER (${floorSizeVar} >= ${min} )`);
+    operations.push(`FILTER (${floorSizeVar} >= ${min} )`);
   }
   if (maxIsNum) {
-    filterStrings.push(`FILTER (${floorSizeVar} <= ${max} )`);
+    operations.push(`FILTER (${floorSizeVar} <= ${max} )`);
   }
-  return wellFormedFilterReturn({ basicGraphPattern, filterStrings, prefixes });
+  return wellFormedFilterReturn({ operations, prefixes });
 }
 
 export function filterNumOfRoomsRange(rootSubject, min, max) {
   const prefixes = {
     s: won.defaultContext["s"],
   };
-  const basicGraphPattern = [];
-  const filterStrings = [];
+  const operations = [];
   const minIsNum = isValidNumber(min);
   const maxIsNum = isValidNumber(max);
   const numberOfRoomsVar = `${rootSubject}_numberOfRooms`;
   if (minIsNum || maxIsNum) {
-    basicGraphPattern.push(
-      `${rootSubject} s:numberOfRooms ${numberOfRoomsVar}.`
-    );
+    operations.push(`${rootSubject} s:numberOfRooms ${numberOfRoomsVar}.`);
   }
   if (minIsNum) {
-    filterStrings.push(`FILTER (${numberOfRoomsVar} >= ${min} )`);
+    operations.push(`FILTER (${numberOfRoomsVar} >= ${min} )`);
   }
   if (maxIsNum) {
-    filterStrings.push(`FILTER (${numberOfRoomsVar} <= ${max} )`);
+    operations.push(`FILTER (${numberOfRoomsVar} <= ${max} )`);
   }
-  return wellFormedFilterReturn({ basicGraphPattern, filterStrings, prefixes });
+  return wellFormedFilterReturn({ operations, prefixes });
 }
 
 export function filterRentRange(rootSubject, min, max, currency) {
   const prefixes = {
     s: won.defaultContext["s"],
   };
-  let basicGraphPattern = [];
-  const filterStrings = [];
+  let operations = [];
   const minIsNum = isValidNumber(min);
   const maxIsNum = isValidNumber(max);
   const pricespecVar = `${rootSubject}_pricespec`;
   const currencyVar = `${rootSubject}_currency`;
   const priceVar = `${rootSubject}_price`;
   if ((minIsNum || maxIsNum) && currency) {
-    filterStrings.push(`FILTER (${currencyVar} = "${currency}") `);
-    basicGraphPattern = basicGraphPattern.concat([
+    operations.push(`FILTER (${currencyVar} = "${currency}") `);
+    operations = operations.concat([
       `${rootSubject} s:priceSpecification ${pricespecVar} .`,
       `${pricespecVar} s:price ${priceVar} .`,
       `${pricespecVar} s:priceCurrency ${currencyVar} .`,
     ]);
   }
   if (minIsNum) {
-    filterStrings.push(`FILTER (${priceVar} >= ${min} )`);
+    operations.push(`FILTER (${priceVar} >= ${min} )`);
   }
   if (maxIsNum) {
-    filterStrings.push(`FILTER (${priceVar} <= ${max} )`);
+    operations.push(`FILTER (${priceVar} <= ${max} )`);
   }
 
-  return wellFormedFilterReturn({ basicGraphPattern, filterStrings, prefixes });
+  return wellFormedFilterReturn({ operations, prefixes });
 }
 
 /**

@@ -761,11 +761,10 @@ const realEstateUseCases = {
           prefixes: {
             won: won.defaultContext["won"],
           },
-          basicGraphPattern: [
+          operations: [
             `${resultName} won:is ?is.`,
             location && "?is won:hasLocation ?location.",
           ],
-          filterStrings: [],
         },
         rentRange &&
           filterRentRange(
@@ -785,7 +784,7 @@ const realEstateUseCases = {
             numberOfRoomsRange.max
           ),
 
-        location && filterInVicinity("?location", location),
+        filterInVicinity("?location", location),
       ];
 
       const concatenatedFilter = concatenateFilters(filters);
@@ -795,8 +794,7 @@ const realEstateUseCases = {
         ${prefixesString(concatenatedFilter.prefixes)}
         SELECT DISTINCT ${resultName}
         WHERE {
-          ${concatenatedFilter.basicGraphPattern.join(" ")}
-          ${concatenatedFilter.filterStrings.join(" ")}
+          ${concatenatedFilter.operations.join(" ")}
         }` + (location ? `ORDER BY ASC(?location_geoDistance)` : "");
 
       return new SparqlParser().parse(queryTemplate);
@@ -1173,14 +1171,13 @@ const mobilityUseCases = {
           prefixes: {
             won: won.defaultContext["won"],
           },
-          basicGraphPattern: [
+          operations: [
             `${resultName} won:seeks ?seeks.`,
             location && "?seeks won:travelAction/s:fromLocation ?location.",
           ],
-          filterStrings: [],
         },
 
-        location && filterInVicinity("?location", location, /*radius=*/ 100),
+        filterInVicinity("?location", location, /*radius=*/ 100),
       ];
 
       const concatenatedFilter = concatenateFilters(filters);
@@ -1190,8 +1187,7 @@ const mobilityUseCases = {
         ${prefixesString(concatenatedFilter.prefixes)}
         SELECT DISTINCT ${resultName}
         WHERE {
-          ${concatenatedFilter.basicGraphPattern.join(" ")}
-          ${concatenatedFilter.filterStrings.join(" ")}
+          ${concatenatedFilter.operations.join(" ")}
         }` + (location ? `ORDER BY ASC(?location_geoDistance)` : "");
 
       return new SparqlParser().parse(queryTemplate);
@@ -1225,14 +1221,13 @@ const mobilityUseCases = {
           prefixes: {
             won: won.defaultContext["won"],
           },
-          basicGraphPattern: [
+          operations: [
             `${resultName} won:seeks ?seeks.`,
             fromLocation &&
               "?seeks won:travelAction/s:fromLocation ?fromLocation.",
             toLocation && "?seeks won:travelAction/s:toLocation ?toLocation.",
             isValidDate(fromTime) && "?seeks s:validFrom ?starttime",
           ],
-          filterStrings: [],
         },
 
         filterInVicinity("?fromLocation", fromLocation, /*radius=*/ 100),
@@ -1249,8 +1244,7 @@ const mobilityUseCases = {
         ${prefixesString(concatenatedFilter.prefixes)}
         SELECT DISTINCT ${resultName}
         WHERE {
-          ${concatenatedFilter.basicGraphPattern.join(" ")}
-          ${concatenatedFilter.filterStrings.join(" ")}
+          ${concatenatedFilter.operatoins.join(" ")}
         }` + (location ? `ORDER BY ASC(?fromLocation_geoDistance)` : "");
 
       return new SparqlParser().parse(queryTemplate);
