@@ -100,7 +100,7 @@ export function filterInVicinity(rootSubject, location, radius = 10) {
  *
  * `datetime - 12h <= matchedTime <= datetime + 12h`
  *
- * @param {*} rootSubject the sparql-variable that is the `s:DateTime`
+ * @param {*} rootSubject the sparql-variable that is the `xsd:dateTime`
  * @param {*} datetime the datetime around which to construct a filter-bracket
  * @param {*} hoursBeforeAndAfter
  */

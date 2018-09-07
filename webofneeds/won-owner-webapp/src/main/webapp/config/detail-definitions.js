@@ -294,12 +294,12 @@ export const details = {
       } else {
         const datetimeString = toLocalISODateString(datetime);
         return {
-          "s:validFrom": { "@value": datetimeString, "@type": "s:DateTime" },
+          "s:validFrom": { "@value": datetimeString, "@type": "xsd:dateTime" },
         };
       }
     },
     parseFromRDF: function(jsonLDImm) {
-      return won.parseFrom(jsonLDImm, ["s:validFrom"], "s:DateTime");
+      return won.parseFrom(jsonLDImm, ["s:validFrom"], "xsd:dateTime");
     },
     generateHumanReadable: function({ value, includeLabel }) {
       if (value) {
@@ -328,12 +328,15 @@ export const details = {
       } else {
         const datetimeString = toLocalISODateString(datetime);
         return {
-          "s:validThrough": { "@value": datetimeString, "@type": "s:DateTime" },
+          "s:validThrough": {
+            "@value": datetimeString,
+            "@type": "xsd:dateTime",
+          },
         };
       }
     },
     parseFromRDF: function(jsonLDImm) {
-      return won.parseFrom(jsonLDImm, ["s:validThrough"], "s:DateTime");
+      return won.parseFrom(jsonLDImm, ["s:validThrough"], "xsd:dateTime");
     },
     generateHumanReadable: function({ value, includeLabel }) {
       if (value) {
