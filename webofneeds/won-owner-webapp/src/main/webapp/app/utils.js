@@ -638,15 +638,6 @@ export function nominatim2draftLocation(searchResult) {
   };
 }
 
-export function leafletBounds(location) {
-  if (location && location.nwCorner && location.seCorner) {
-    return [
-      [location.nwCorner.lat, location.nwCorner.lng],
-      [location.seCorner.lat, location.seCorner.lng],
-    ];
-  }
-}
-
 function fetchJSON(url) {
   return fetch(url, {
     method: "get",

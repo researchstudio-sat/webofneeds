@@ -10,13 +10,12 @@ import {
   searchNominatim,
   reverseSearchNominatim,
   nominatim2draftLocation,
-  leafletBounds,
   delay,
   getIn,
 } from "../../../utils.js";
 import { doneTypingBufferNg, DomCache } from "../../../cstm-ng-utils.js";
 
-import { initLeaflet } from "../../../won-utils.js";
+import { initLeaflet, leafletBounds } from "../../../won-utils.js";
 
 import "style/_locationpicker.scss";
 
@@ -82,7 +81,7 @@ function genComponentConf() {
                 </a>
             </li>
         </ul>
-        <div class="lp__mapmount" id="lp__mapmount"></div>
+        <div class="lp__mapmount" id="lp__mapmount" in-view="$inview && self.mapInView($inviewInfo)"></div>
             `;
 
   class Controller {
@@ -116,6 +115,12 @@ function genComponentConf() {
         this.onUpdate({ value: location });
       } else {
         this.onUpdate({ value: undefined });
+      }
+    }
+
+    mapInView(inviewInfo) {
+      if (inviewInfo.changed) {
+        this.map.invalidateSize();
       }
     }
 
@@ -233,8 +238,8 @@ function genComponentConf() {
         const initialZoom = 13; // arbitrary zoom level as there's none available
 
         // center map around current location
-        this.map.setZoom(initialZoom);
-        this.map.panTo([initialLat, initialLng]);
+        this.map.setView(new L.LatLng(initialLat, initialLng), initialZoom);
+        this.map.invalidateSize();
 
         this.textfield().value = this.pickedLocation.name;
         this.showResetButton = true;
@@ -252,8 +257,8 @@ function genComponentConf() {
 
             // center map around geolocation only if there's no initial location
             if (!this.initialValue) {
-              this.map.setZoom(geoZoom);
-              this.map.panTo([geoLat, geoLng]);
+              this.map.setView(new L.LatLng(geoLat, geoLng), geoZoom);
+              this.map.invalidateSize();
             }
 
             reverseSearchNominatim(geoLat, geoLng, geoZoom).then(

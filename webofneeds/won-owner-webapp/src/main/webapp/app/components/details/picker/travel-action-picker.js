@@ -125,7 +125,10 @@ function genComponentConf() {
             )}
         </ul>
 
-        <div class="rp__mapmount" id="rp__mapmount"></div>
+        <div class="rp__mapmount" 
+            id="rp__mapmount" 
+            in-view="$inview && self.mapInView($inviewInfo)">
+        </div>
             `;
 
   class Controller {
@@ -185,6 +188,12 @@ function genComponentConf() {
       }
     }
 
+    mapInView(inviewInfo) {
+      if (inviewInfo.changed) {
+        this.map.invalidateSize();
+      }
+    }
+
     showInitialLocations() {
       if (this.initialValue) {
         this.fromAddedLocation = this.initialValue.fromLocation;
@@ -205,13 +214,17 @@ function genComponentConf() {
         }
 
         this.placeMarkers(markedLocations);
-        this.map.fitBounds(
-          this.getBoundCoords([this.fromAddedLocation, this.toAddedLocation]),
-          {
-            animate: true,
-            maxZoom: 14,
-          }
+        // delay needed because angular
+        delay(0).then(() =>
+          this.map.fitBounds(
+            this.getBoundCoords([this.fromAddedLocation, this.toAddedLocation]),
+            {
+              maxZoom: 14,
+              padding: [50, 50],
+            }
+          )
         );
+        this.map.invalidateSize();
 
         this.$scope.$apply();
       }
@@ -243,13 +256,18 @@ function genComponentConf() {
       }
       this.placeMarkers(markers);
       this.markers[0].openPopup();
-      this.map.fitBounds(
-        this.getBoundCoords([location, this.toAddedLocation]),
-        {
-          animate: true,
-          maxZoom: 14,
-        }
+      delay(0).then(() =>
+        this.map.fitBounds(
+          this.getBoundCoords([location, this.toAddedLocation]),
+          {
+            animate: true,
+            maxZoom: 14,
+            padding: [50, 50],
+          }
+        )
       );
+      this.map.fire("moveend"); // force map to redraw
+      this.map.invalidateSize();
     }
 
     selectedToLocation(location) {
@@ -272,13 +290,18 @@ function genComponentConf() {
       }
       this.placeMarkers(markers);
       this.markers[0].openPopup();
-      this.map.fitBounds(
-        this.getBoundCoords([location, this.fromAddedLocation]),
-        {
-          animate: true,
-          maxZoom: 14,
-        }
+      delay(0).then(() =>
+        this.map.fitBounds(
+          this.getBoundCoords([location, this.fromAddedLocation]),
+          {
+            animate: true,
+            maxZoom: 14,
+            padding: [50, 50],
+          }
+        )
       );
+      this.map.fire("moveend"); // force map to redraw
+      this.map.invalidateSize();
     }
 
     doneTypingFrom() {
@@ -472,8 +495,8 @@ function genComponentConf() {
 
             // center map around geolocation only if there's no initial location
             if (!this.initialValue) {
-              this.map.setZoom(geoZoom);
-              this.map.panTo([geoLat, geoLng]);
+              this.map.setView(new L.LatLng(geoLat, geoLng), geoZoom);
+              this.map.invalidateSize();
             }
 
             reverseSearchNominatim(geoLat, geoLng, geoZoom).then(
