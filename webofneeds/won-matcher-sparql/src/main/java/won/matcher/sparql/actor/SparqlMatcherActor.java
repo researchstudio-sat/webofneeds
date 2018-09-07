@@ -261,6 +261,45 @@ public class SparqlMatcherActor extends UntypedActor {
             });
         });
         
+        System.out.println("Here BEFORE-------------------------------------");
+        System.out.println("Matches: " + bulkHintEvent.getHintEvents().size());
+        
+        //Second call!
+        Set<NeedModelWrapper> noHintMatches = queryNeed(need); //Need other function than queryNeed (Arguments)
+
+
+        //need to send out hints to factory needs (needs with no hint for counterpart)
+        Map<NeedModelWrapper, Set<NeedModelWrapper>> filteredNoHintNeeds = Stream.concat(
+                Stream.of(new AbstractMap.SimpleEntry<>(need, noHintMatches)),
+                //add the reverse match, if no flags forbid it
+                noHintMatches.stream().map(matchedNeed -> {
+                    boolean noHintForMe = matchedNeed.hasFlag(WON.NO_HINT_FOR_ME);
+                    boolean hasNoHintForCounterPart = matchedNeed.hasFlag(WON.NO_HINT_FOR_COUNTERPART);
+                    if (!noHintForCounterpart && !noHintForMe && hasNoHintForCounterPart && !need.getNeedUri().equals(matchedNeed.getNeedUri())) {
+                        return new AbstractMap.SimpleEntry<>(matchedNeed, (Set<NeedModelWrapper>) Collections.singleton(need));
+                    } else {
+                        return new AbstractMap.SimpleEntry<>(matchedNeed, (Set<NeedModelWrapper>) Collections.EMPTY_SET);
+                    }
+                    
+                }))
+                .map(entry -> {
+                    Set<NeedModelWrapper> filteredNoHintMatches = entry.getValue().stream().filter(f -> postHintFilter(entry.getKey(), f)).collect(Collectors.toSet());
+                    return new AbstractMap.SimpleEntry<>(entry.getKey(), filteredNoHintMatches);
+                }).collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
+
+
+        filteredNoHintNeeds.forEach((hintTarget, hints) -> {
+            hints.stream().limit(config.getLimitResults()).forEach(hint -> {
+                HintEvent hintEvent = new HintEvent(hintTarget.getWonNodeUri(), hintTarget.getNeedUri(), hint.getWonNodeUri(), hint.getNeedUri(), config.getMatcherUri(), 1);
+                if(!bulkHintEvent.hasEvent(hintEvent)){
+                    bulkHintEvent.addHintEvent(hintEvent);
+                }
+            });
+        });
+        System.out.println("Here AFTER-------------------------------------");
+        System.out.println("Matches: " + bulkHintEvent.getHintEvents().size());
+        
+        
         pubSubMediator.tell(new DistributedPubSubMediator.Publish(bulkHintEvent.getClass().getName(), bulkHintEvent), getSelf());
         log.debug("finished sparql-based matching for need {} (found {} matches)", need.getNeedUri(), bulkHintEvent.getHintEvents().size());
     }
@@ -337,13 +376,13 @@ public class SparqlMatcherActor extends UntypedActor {
         Optional<Op> query;
 
         Optional<String> userQuery = need.getQuery();
-        
+
         if(userQuery.isPresent()) {
             query = clientSuppliedQuery(userQuery.get());
         } else {
             query = defaultQuery(need);
         }
-        
+        System.out.println("THE DEFAULT: " + query);
         Set<NeedModelWrapper> needs = query.map(q -> {
             try {
               Query compiledQuery = OpAsQuery.asQuery(q);
@@ -409,12 +448,15 @@ public class SparqlMatcherActor extends UntypedActor {
     private boolean postFilter(NeedModelWrapper need, NeedModelWrapper foundNeed) {
         try {
           if (need.getNeedUri().equals(foundNeed.getNeedUri())) {
+              // No matching of same need
               return false;
           }
           if (need.hasFlag(WON.NO_HINT_FOR_ME)) {
+              // No hint for old need, need is closed, etc.
               return false;
           }
           if (foundNeed.hasFlag(WON.NO_HINT_FOR_COUNTERPART)) {
+              // No hint for needs, that should not appear on counter side - (what's new, what's around)
               return false;
           }
   
@@ -431,6 +473,38 @@ public class SparqlMatcherActor extends UntypedActor {
           return true;
         } catch (Exception e) {
           log.info("caught Exception during post-filtering, ignoring match", e);
+        }
+        return false;
+    }
+
+    private boolean postHintFilter(NeedModelWrapper need, NeedModelWrapper foundNeed) {
+        try {
+          if (need.getNeedUri().equals(foundNeed.getNeedUri())) {
+              // No matching of same need
+              return false;
+          }
+          if (need.hasFlag(WON.NO_HINT_FOR_ME)) {
+              // No hint for old need, need is closed, etc.
+              return false;
+          }
+          if (!foundNeed.hasFlag(WON.NO_HINT_FOR_COUNTERPART)) {
+              // only hint for needs, that should not appear on counter side - (what's new, what's around)
+              return false;
+          }
+  
+          Set<String> needContexts = getMatchingContexts(need);
+          if (!needContexts.isEmpty()) {
+              Set<String> foundNeedContexts = getMatchingContexts(foundNeed);
+              foundNeedContexts.retainAll(needContexts);
+              if (foundNeedContexts.isEmpty()) {
+                  return false;
+              }
+          }
+  
+          //TODO add back time matching
+          return true;
+        } catch (Exception e) {
+          log.info("caught Exception during post-noNoHint-filtering, ignoring match", e);
         }
         return false;
     }
