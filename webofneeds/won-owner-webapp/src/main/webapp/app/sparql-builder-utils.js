@@ -6,6 +6,8 @@
 import won from "./won-es6.js";
 import { isValidNumber, isValidDate, toLocalISODateString } from "./utils.js";
 
+// export function
+
 /**
  * returns e.g.:
  * ```
@@ -21,7 +23,7 @@ import { isValidNumber, isValidDate, toLocalISODateString } from "./utils.js";
  *
  * @param {*} returnValue
  */
-function wellFormedFilterReturn(returnValue) {
+export function wellFormedFilterReturn(returnValue) {
   return Object.assign(
     {
       prefixes: {},
@@ -55,6 +57,21 @@ export function concatenateFilters(filters) {
     }, wellFormedFilterReturn());
 
   return concatenatedFilter;
+}
+
+/**
+ * Collapses a filter's operations and wraps them in
+ * an `OPTIONAL` block.
+ * @param {*} filter
+ */
+export function optionalFilter(filter) {
+  const joinedOperations = filter.operations.join(" ");
+  const operationString =
+    joinedOperations && `OPTION { ${joinedOperations} } .`;
+  return wellFormedFilterReturn({
+    prefixes: filter.prefixes,
+    operations: [operationString],
+  });
 }
 /**
  * @param {String} rootSubject: a variable name via which the location is connected
