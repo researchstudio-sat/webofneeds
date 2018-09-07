@@ -1,6 +1,7 @@
 package won.protocol.util;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.*;
@@ -269,6 +270,40 @@ public class NeedModelWrapper {
 
     public boolean hasFlag(Resource flag) {
         return getNeedNode(NeedGraphType.NEED).hasProperty(WON.HAS_FLAG, flag);
+    }
+
+    public Calendar getDoNotMatchBefore() {
+        Statement prop = getNeedNode(NeedGraphType.NEED).getProperty(WON.DO_NOT_MATCH_BEFORE);
+        if(prop == null) {
+            return null;
+        }
+        RDFNode literal = prop.getObject();
+        if(!literal.isLiteral()) {
+            return null; //This silently fails with a null, but in our case I think this is preferred to throwing an exception
+        }
+        Object data = literal.asLiteral().getValue();
+        if(data instanceof XSDDateTime) {
+            return ((XSDDateTime) data).asCalendar();
+        } else {
+            return null;
+        }
+    }
+
+    public Calendar getDoNotMatchAfter() {
+        Statement prop = getNeedNode(NeedGraphType.NEED).getProperty(WON.DO_NOT_MATCH_AFTER);
+        if(prop == null) {
+            return null;
+        }
+        RDFNode literal = prop.getObject();
+        if(!literal.isLiteral()) {
+            return null; //This silently fails with a null, but in our case I think this is preferred to throwing an exception
+        }
+        Object data = literal.asLiteral().getValue();
+        if(data instanceof XSDDateTime) {
+            return ((XSDDateTime) data).asCalendar();
+        } else {
+            return null;
+        }
     }
     
     public void addMatchingContext(String context) {

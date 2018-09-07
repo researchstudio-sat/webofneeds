@@ -408,29 +408,34 @@ public class SparqlMatcherActor extends UntypedActor {
 
     private boolean postFilter(NeedModelWrapper need, NeedModelWrapper foundNeed) {
         try {
-          if (need.getNeedUri().equals(foundNeed.getNeedUri())) {
-              return false;
-          }
-          if (need.hasFlag(WON.NO_HINT_FOR_ME)) {
-              return false;
-          }
-          if (foundNeed.hasFlag(WON.NO_HINT_FOR_COUNTERPART)) {
-              return false;
-          }
-  
-          Set<String> needContexts = getMatchingContexts(need);
-          if (!needContexts.isEmpty()) {
-              Set<String> foundNeedContexts = getMatchingContexts(foundNeed);
-              foundNeedContexts.retainAll(needContexts);
-              if (foundNeedContexts.isEmpty()) {
-                  return false;
-              }
-          }
-  
-          //TODO add back time matching
-          return true;
+            if (need.getNeedUri().equals(foundNeed.getNeedUri())) {
+                return false;
+            }
+            if (need.hasFlag(WON.NO_HINT_FOR_ME)) {
+                return false;
+            }
+            if (foundNeed.hasFlag(WON.NO_HINT_FOR_COUNTERPART)) {
+                return false;
+            }
+
+            Set<String> needContexts = getMatchingContexts(need);
+            if (!needContexts.isEmpty()) {
+                Set<String> foundNeedContexts = getMatchingContexts(foundNeed);
+                foundNeedContexts.retainAll(needContexts);
+                if (foundNeedContexts.isEmpty()) {
+                    return false;
+                }
+            }
+
+            Calendar now = Calendar.getInstance();
+            if (now.after(foundNeed.getDoNotMatchAfter()))
+                return false;
+            if (now.before(foundNeed.getDoNotMatchBefore()))
+                return false;
+
+            return true;
         } catch (Exception e) {
-          log.info("caught Exception during post-filtering, ignoring match", e);
+            log.info("caught Exception during post-filtering, ignoring match", e);
         }
         return false;
     }
