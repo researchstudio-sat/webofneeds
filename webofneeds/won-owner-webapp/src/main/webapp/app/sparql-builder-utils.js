@@ -4,9 +4,39 @@
  */
 
 import won from "./won-es6.js";
-import { isValidNumber, isValidDate, toLocalISODateString } from "./utils.js";
+import {
+  isValidNumber,
+  isValidDate,
+  toLocalISODateString,
+  is,
+} from "./utils.js";
+import { Parser as SparqlParser } from "sparqljs";
 
-// export function
+/**
+ *
+ * @param {Object} prefixes key-value pairs of prefix and full URL
+ * @param {String} selectDistinct the variable to select
+ * @param {Array<String>} where any operations to add to the `WHERE`-block
+ * @param {*} orderBy Array of objects like `{order: "ASC", variable: "?geoDistance"}`
+ */
+export function sparqlQuery({ prefixes, selectDistinct, where, orderBy }) {
+  let orderByStr;
+  if (orderBy && is("Array", orderBy)) {
+    const orderClauses = orderBy
+      .map(o => `${o.order}(${o.variable})`)
+      .join(" ");
+    orderByStr = orderClauses ? "ORDER BY " + orderClauses : "";
+  }
+
+  const queryTemplate = `
+${prefixesString(prefixes)}
+SELECT DISTINCT ${selectDistinct}
+WHERE {
+  ${where.join(" ")}
+} ${orderByStr}`;
+
+  return new SparqlParser().parse(queryTemplate);
+}
 
 /**
  * returns e.g.:

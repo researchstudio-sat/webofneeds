@@ -9,17 +9,16 @@ import {
 } from "../app/utils.js";
 import Immutable from "immutable";
 import { details, abstractDetails } from "detailDefinitions";
-import { Parser as SparqlParser } from "sparqljs";
 import { findLatestIntervallEndInJsonLd } from "../app/won-utils.js";
 import won from "../app/won-es6.js";
 import {
   filterInVicinity,
-  prefixesString,
   filterFloorSizeRange,
   filterNumOfRoomsRange,
   filterRentRange,
   concatenateFilters,
   filterAboutTime,
+  sparqlQuery,
 } from "../app/sparql-builder-utils.js";
 
 export const emptyDraft = {
@@ -790,15 +789,17 @@ const realEstateUseCases = {
 
       const concatenatedFilter = concatenateFilters(filters);
 
-      const queryTemplate =
-        `
-        ${prefixesString(concatenatedFilter.prefixes)}
-        SELECT DISTINCT ${resultName}
-        WHERE {
-          ${concatenatedFilter.operations.join(" ")}
-        }` + (location ? `ORDER BY ASC(?location_geoDistance)` : "");
-
-      return new SparqlParser().parse(queryTemplate);
+      return sparqlQuery({
+        prefixes: concatenatedFilter.prefixes,
+        selectDistinct: resultName,
+        where: concatenatedFilter.operations,
+        orderBy: [
+          {
+            order: "ASC",
+            variable: "?location_geoDistance",
+          },
+        ],
+      });
     },
   },
   offerRent: {
@@ -1184,15 +1185,17 @@ const mobilityUseCases = {
 
       const concatenatedFilter = concatenateFilters(filters);
 
-      const queryTemplate =
-        `
-        ${prefixesString(concatenatedFilter.prefixes)}
-        SELECT DISTINCT ${resultName}
-        WHERE {
-          ${concatenatedFilter.operations.join(" ")}
-        }` + (location ? `ORDER BY ASC(?location_geoDistance)` : "");
-
-      return new SparqlParser().parse(queryTemplate);
+      return sparqlQuery({
+        prefixes: concatenatedFilter.prefixes,
+        selectDistinct: resultName,
+        where: concatenatedFilter.operations,
+        orderBy: [
+          {
+            order: "ASC",
+            variable: "?location_geoDistance",
+          },
+        ],
+      });
     },
   },
   rideShareOffer: {
@@ -1242,15 +1245,17 @@ const mobilityUseCases = {
 
       const concatenatedFilter = concatenateFilters(filters);
 
-      const queryTemplate =
-        `
-        ${prefixesString(concatenatedFilter.prefixes)}
-        SELECT DISTINCT ${resultName}
-        WHERE {
-          ${concatenatedFilter.operatoins.join(" ")}
-        }` + (location ? `ORDER BY ASC(?fromLocation_geoDistance)` : "");
-
-      return new SparqlParser().parse(queryTemplate);
+      return sparqlQuery({
+        prefixes: concatenatedFilter.prefixes,
+        selectDistinct: resultName,
+        where: concatenatedFilter.operations,
+        orderBy: [
+          {
+            order: "ASC",
+            variable: "?fromLocation_geoDistance",
+          },
+        ],
+      });
     },
   },
 };
