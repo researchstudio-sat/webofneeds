@@ -10,13 +10,12 @@ import {
   searchNominatim,
   reverseSearchNominatim,
   nominatim2draftLocation,
-  leafletBounds,
   delay,
   getIn,
 } from "../../../utils.js";
 import { doneTypingBufferNg, DomCache } from "../../../cstm-ng-utils.js";
 
-import { initLeaflet } from "../../../won-utils.js";
+import { initLeaflet, leafletBounds } from "../../../won-utils.js";
 
 import "style/_locationpicker.scss";
 
@@ -82,7 +81,7 @@ function genComponentConf() {
                 </a>
             </li>
         </ul>
-        <div class="lp__mapmount" id="lp__mapmount"></div>
+        <div class="lp__mapmount" id="lp__mapmount" in-view="$inview && self.mapInView($inviewInfo)"></div>
             `;
 
   class Controller {
@@ -116,6 +115,12 @@ function genComponentConf() {
         this.onUpdate({ value: location });
       } else {
         this.onUpdate({ value: undefined });
+      }
+    }
+
+    mapInView(inviewInfo) {
+      if (inviewInfo.changed) {
+        this.map.invalidateSize();
       }
     }
 

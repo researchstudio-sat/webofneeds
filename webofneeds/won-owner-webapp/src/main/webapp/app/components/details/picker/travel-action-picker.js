@@ -125,7 +125,7 @@ function genComponentConf() {
             )}
         </ul>
 
-        <div class="rp__mapmount" id="rp__mapmount"></div>
+        <div class="rp__mapmount" id="rp__mapmount" in-view="$inview && self.mapInView($inviewInfo)"></div>
             `;
 
   class Controller {
@@ -182,6 +182,12 @@ function genComponentConf() {
         this.onUpdate({ value: travelAction });
       } else {
         this.onUpdate({ value: undefined });
+      }
+    }
+
+    mapInView(inviewInfo) {
+      if (inviewInfo.changed) {
+        this.map.invalidateSize();
       }
     }
 
