@@ -11,6 +11,8 @@ import { initLeaflet, connect2Redux } from "../won-utils.js";
 
 import { DomCache } from "../cstm-ng-utils.js";
 
+import "leaflet/dist/leaflet.css";
+
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
