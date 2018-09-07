@@ -54,13 +54,14 @@ WHERE {
  * @param {*} returnValue
  */
 export function wellFormedFilter(returnValue) {
-  return Object.assign(
-    {
-      prefixes: {},
-      operations: [], // basic graph patterns, filters etc. anything that goes into the where clause
-    },
-    returnValue
-  );
+  return Object.assign(emptyFilter(), returnValue);
+}
+
+export function emptyFilter() {
+  return {
+    prefixes: {},
+    operations: [], // basic graph patterns, filters etc. anything that goes into the where clause
+  };
 }
 
 /**
@@ -76,15 +77,13 @@ export function concatenateFilters(filters) {
         return acc;
       } else {
         const prefixes = Object.assign({}, acc.prefixes, f.prefixes);
-        const operations = acc.filterStrings
-          .concat(f.operations)
-          .filter(o => o);
+        const operations = acc.operations.concat(f.operations).filter(o => o);
         return {
           prefixes,
           operations,
         };
       }
-    }, wellFormedFilter());
+    }, emptyFilter());
 
   return concatenatedFilter;
 }
@@ -103,6 +102,15 @@ export function optionalFilter(filter) {
     operations: [operationString],
   });
 }
+
+/**
+ * Concatenates the filters and then calls `optionalFilter`.
+ * @param {Array} filters
+ */
+export function optionalFilters(filters) {
+  return optionalFilter(concatenateFilters(filters));
+}
+
 /**
  * @param {String} rootSubject: a variable name via which the location is connected
  *  to the rest of the graph-patterns . e.g. `"?location"`. Needs to start with a
@@ -114,7 +122,7 @@ export function optionalFilter(filter) {
  */
 export function filterInVicinity(rootSubject, location, radius = 10) {
   if (!location || !location.lat || !location.lng) {
-    return wellFormedFilter();
+    return emptyFilter();
   } else {
     /* "prefix" variable name with root-subject so filter can be used 
      * multiple times for different roots
@@ -158,7 +166,7 @@ export function filterAboutTime(
   hoursBeforeAndAfter = 12
 ) {
   if (!isValidDate(datetime)) {
-    return wellFormedFilter();
+    return emptyFilter();
   } else {
     const min = new Date(datetime);
     min.setHours(min.getHours() - hoursBeforeAndAfter);

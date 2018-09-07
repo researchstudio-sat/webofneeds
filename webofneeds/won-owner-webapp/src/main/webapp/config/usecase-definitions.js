@@ -1149,6 +1149,87 @@ const mobilityUseCases = {
       fromDatetime: { ...details.fromDatetime },
       travelAction: { ...details.travelAction },
     },
+    generateQuery: (draft, resultName) => {
+      const fromLocation = getIn(draft, [
+        "seeks",
+        "travelAction",
+        "fromLocation",
+      ]);
+      const toLocation = getIn(draft, ["seeks", "travelAction", "toLocation"]);
+
+      const baseFilter = {
+        prefixes: {
+          won: won.defaultContext["won"],
+        },
+        operations: [`${resultName} a won:Need.`, `${resultName} won:is ?is.`],
+      };
+
+      const locationFilter = filterInVicinity(
+        "?location",
+        fromLocation,
+        /*radius=*/ 100
+      );
+      const fromLocationFilter = filterInVicinity(
+        "?fromLocation",
+        fromLocation,
+        /*radius=*/ 100
+      );
+      const toLocationFilter = filterInVicinity(
+        "?toLocation",
+        toLocation,
+        /*radius=*/ 100
+      );
+
+      const union = operations => {
+        if (!operations || operations.length === 0) {
+          return "";
+        } else {
+          return "{" + operations.join("} UNION {") + "}";
+        }
+      };
+      const filterAndJoin = (arrayOfStrings, seperator) =>
+        arrayOfStrings.filter(str => str).join(seperator);
+
+      const locationFilters = {
+        prefixes: locationFilter.prefixes,
+        operations: union([
+          filterAndJoin(
+            [
+              fromLocation &&
+                "?is won:travelAction/s:fromLocation ?fromLocation. ",
+              fromLocation && fromLocationFilter.operations.join(" "),
+              toLocation && "?is won:travelAction/s:toLocation ?toLocation.",
+              toLocation && toLocationFilter.operations.join(" "),
+            ],
+            " "
+          ),
+          filterAndJoin(
+            [
+              location && "?is won:hasLocation ?location .",
+              location && locationFilter.operations.join(" "),
+            ],
+            " "
+          ),
+        ]),
+      };
+
+      const concatenatedFilter = concatenateFilters([
+        baseFilter,
+        locationFilters,
+      ]);
+
+      return sparqlQuery({
+        prefixes: concatenatedFilter.prefixes,
+        selectDistinct: resultName,
+        where: concatenatedFilter.operations,
+        orderBy: [
+          {
+            order: "ASC",
+            variable: "?location_geoDistance",
+          },
+        ],
+      });
+    },
   },
   taxiOffer: {
     identifier: "taxiOffer",
