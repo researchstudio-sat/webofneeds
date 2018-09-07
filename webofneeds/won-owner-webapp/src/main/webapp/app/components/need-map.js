@@ -29,17 +29,6 @@ function genComponentConf() {
 
       this.map = initLeaflet(this.mapMount());
 
-      /* TODO: This does not work. 
-        I suppose this is because I also check this.locationRoute, which is probably not set yet.
-        -> ask fabian if watch is there in the first place because digest cycles suck and the location isn't loaded otherwise
-        -> see if there's any way to reliably use this.locationRoute, as it's kind of important to know here
-
-        intention: if a location is shown, do everything as before
-        if a route is show, use the updateRouteMap method, that shows routes
-
-        also note: using schema definitions instead of won definitions means that it's a lot of fun to get info
-        -> look at post-info to see details.
-       */
       this.$scope.$watch("self.locations", newLocations => {
         if (newLocations) {
           this.updateMap(newLocations);
@@ -47,18 +36,6 @@ function genComponentConf() {
         }
       });
 
-      // const selectFromState = state => {
-      //   const post = this.uri && state.getIn(["needs", this.uri]);
-      //   const isSeeksPart = post && post.get(this.isSeeks);
-
-      //   const location = isSeeksPart && isSeeksPart.get("location");
-      //   const travelAction = isSeeksPart && isSeeksPart.get("travelAction");
-
-      //   return {
-      //     location: location,
-      //     travelAction: travelAction,
-      //   };
-      // };
       const selectFromState = () => {
         return {};
       };
@@ -155,8 +132,6 @@ function genComponentConf() {
     template: template,
     scope: {
       locations: "=",
-      //uri: "=",
-      //isSeeks: "=",
     },
   };
 }
