@@ -35,26 +35,14 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StatementBoundary;
 import org.apache.jena.rdf.model.StatementBoundaryBase;
 import org.apache.jena.rdf.model.impl.ResourceImpl;
-import org.apache.jena.sparql.algebra.Algebra;
-import org.apache.jena.sparql.algebra.Op;
-import org.apache.jena.sparql.algebra.OpAsQuery;
-import org.apache.jena.sparql.algebra.op.OpBGP;
-import org.apache.jena.sparql.algebra.op.OpDistinct;
-import org.apache.jena.sparql.algebra.op.OpFilter;
-import org.apache.jena.sparql.algebra.op.OpPath;
-import org.apache.jena.sparql.algebra.op.OpProject;
-import org.apache.jena.sparql.algebra.op.OpUnion;
+import org.apache.jena.sparql.algebra.*;
+import org.apache.jena.sparql.algebra.op.*;
 import org.apache.jena.sparql.core.BasicPattern;
 import org.apache.jena.sparql.core.TriplePath;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.engine.binding.BindingFactory;
-import org.apache.jena.sparql.expr.E_LogicalOr;
-import org.apache.jena.sparql.expr.E_StrContains;
-import org.apache.jena.sparql.expr.E_StrLowerCase;
-import org.apache.jena.sparql.expr.Expr;
-import org.apache.jena.sparql.expr.ExprList;
-import org.apache.jena.sparql.expr.ExprVar;
+import org.apache.jena.sparql.expr.*;
 import org.apache.jena.sparql.expr.nodevalue.NodeValueBoolean;
 import org.apache.jena.sparql.expr.nodevalue.NodeValueString;
 import org.apache.jena.sparql.path.P_Alt;
@@ -337,60 +325,104 @@ public class SparqlMatcherActor extends UntypedActor {
         Optional<Op> query;
 
         Optional<String> userQuery = need.getQuery();
-        
-        if(userQuery.isPresent()) {
+
+        if (userQuery.isPresent()) {
             query = clientSuppliedQuery(userQuery.get());
         } else {
             query = defaultQuery(need);
         }
-        
+
         Set<NeedModelWrapper> needs = query.map(q -> {
-            try {
-              Query compiledQuery = OpAsQuery.asQuery(q);
-              
-              // if we were given a needUriToMatch, restrict the query result to that uri so that 
-              // we get exactly one result if that uri is found for the need
-              if (needUriToMatch.isPresent()) {
-                Binding binding = BindingFactory.binding(resultName, new ResourceImpl(needUriToMatch.get()).asNode());
-                compiledQuery.setValuesDataBlock(Collections.singletonList(resultName),  Collections.singletonList(binding));
-              }
-              // fetch more than the number of results we want to report 
-              // because we will do post-filtering, and we want to have some leeway for that.
-              // not limiting the query, however, is much more costly, so we use a  
-              // multiple of the final limit
-              compiledQuery.setLimit(config.getLimitResults() * 2);
-                  
-              QueryExecution execution = QueryExecutionFactory.sparqlService(config.getSparqlEndpoint(), compiledQuery);
-  
-              ResultSet result = execution.execSelect();
-  
-              Stream<QuerySolution> stream = StreamSupport.stream(
-                      Spliterators.spliteratorUnknownSize(result, Spliterator.CONCURRENT),
-                      false);
-  
-              Set<NeedModelWrapper> matchedNeeds = stream
-                      .map(querySolution -> {
-                          String foundNeedURI = querySolution.get(resultName.getName()).toString();
-                          try {
-                              return new NeedModelWrapper(linkedDataSource.getDataForResource(new URI(foundNeedURI)));
-                          } catch (Exception e) {
-                              e.printStackTrace();
-                              return null;
-                          }
-                      })
-                      .filter(foundNeed -> foundNeed != null)
-                      .collect(Collectors.toSet());
-  
-              return matchedNeeds;
-            } catch (Exception e) {
-              log.info("caught exception during sparql-based matching (more info on loglevel 'debug'): {} ", e.getMessage());
-              log.debug("full exception:", e);
-              return Collections.EMPTY_SET;
-            }
+
+            Op noHintForCounterpartQuery = Transformer.transform(new TransformCopy() {
+                public Op transform(OpProject op, Op subOp) {
+                    return new OpSlice(
+                            op.copy(
+                                    OpJoin.create(
+                                            new OpTriple(
+                                                    new Triple(
+                                                            resultName.asNode(),
+                                                            WON.HAS_FLAG.asNode(),
+                                                            WON.NO_HINT_FOR_COUNTERPART.asNode()
+                                                    )
+                                            ),
+                                            subOp
+                                    )
+                            ),
+                            0,
+                            config.getLimitResults() * 5);
+                }
+            }, q);
+
+            Op hintForCounterpartQuery = Transformer.transform(new TransformCopy() {
+                public Op transform(OpProject op, Op subOp) {
+                    return new OpSlice(
+                            op.copy(
+                                    OpFilter.filter(
+                                            new E_NotExists(
+                                                    new OpTriple(
+                                                            new Triple(
+                                                                    resultName.asNode(),
+                                                                    WON.HAS_FLAG.asNode(),
+                                                                    WON.NO_HINT_FOR_COUNTERPART.asNode()
+                                                            )
+                                                    )
+                                            ),
+                                            subOp
+                                    )
+                            ),
+                            0,
+                            config.getLimitResults() * 2
+                    );
+                }
+            }, q);
+
+            return Stream.concat(
+                    executeQuery(noHintForCounterpartQuery, needUriToMatch),
+                    executeQuery(hintForCounterpartQuery, needUriToMatch)
+                    ).collect(Collectors.toSet());
         })
-                .orElse(new HashSet<>());
+                .orElse(new HashSet<NeedModelWrapper>());
 
         return needs;
+    }
+
+    private Stream<NeedModelWrapper> executeQuery(Op q, Optional<String> needUriToMatch) {
+        try {
+            Query compiledQuery = OpAsQuery.asQuery(q);
+
+
+            // if we were given a needUriToMatch, restrict the query result to that uri so that
+            // we get exactly one result if that uri is found for the need
+            if (needUriToMatch.isPresent()) {
+                Binding binding = BindingFactory.binding(resultName, new ResourceImpl(needUriToMatch.get()).asNode());
+                compiledQuery.setValuesDataBlock(Collections.singletonList(resultName), Collections.singletonList(binding));
+            }
+
+            QueryExecution execution = QueryExecutionFactory.sparqlService(config.getSparqlEndpoint(), compiledQuery);
+
+            ResultSet result = execution.execSelect();
+
+            Stream<QuerySolution> stream = StreamSupport.stream(
+                    Spliterators.spliteratorUnknownSize(result, Spliterator.CONCURRENT),
+                    false);
+
+            return stream
+                    .map(querySolution -> {
+                        String foundNeedURI = querySolution.get(resultName.getName()).toString();
+                        try {
+                            return new NeedModelWrapper(linkedDataSource.getDataForResource(new URI(foundNeedURI)));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            return null;
+                        }
+                    })
+                    .filter(foundNeed -> foundNeed != null);
+        } catch (Exception e) {
+            log.info("caught exception during sparql-based matching (more info on loglevel 'debug'): {} ", e.getMessage());
+            log.debug("full exception:", e);
+            return Stream.empty();
+        }
     }
 
     private static Set<String> getMatchingContexts(NeedModelWrapper need) {
