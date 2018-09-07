@@ -238,8 +238,8 @@ function genComponentConf() {
         const initialZoom = 13; // arbitrary zoom level as there's none available
 
         // center map around current location
-        this.map.setZoom(initialZoom);
-        this.map.panTo([initialLat, initialLng]);
+        this.map.setView(new L.LatLng(initialLat, initialLng), initialZoom);
+        this.map.invalidateSize();
 
         this.textfield().value = this.pickedLocation.name;
         this.showResetButton = true;
@@ -257,8 +257,8 @@ function genComponentConf() {
 
             // center map around geolocation only if there's no initial location
             if (!this.initialValue) {
-              this.map.setZoom(geoZoom);
-              this.map.panTo([geoLat, geoLng]);
+              this.map.setView(new L.LatLng(geoLat, geoLng), geoZoom);
+              this.map.invalidateSize();
             }
 
             reverseSearchNominatim(geoLat, geoLng, geoZoom).then(
