@@ -762,6 +762,7 @@ const realEstateUseCases = {
             won: won.defaultContext["won"],
           },
           operations: [
+            `${resultName} a won:Need.`,
             `${resultName} won:is ?is.`,
             location && "?is won:hasLocation ?location.",
           ],
@@ -1172,6 +1173,7 @@ const mobilityUseCases = {
             won: won.defaultContext["won"],
           },
           operations: [
+            `${resultName} a won:Need.`,
             `${resultName} won:seeks ?seeks.`,
             location && "?seeks won:travelAction/s:fromLocation ?location.",
           ],
@@ -1222,6 +1224,7 @@ const mobilityUseCases = {
             won: won.defaultContext["won"],
           },
           operations: [
+            `${resultName} a won:Need.`,
             `${resultName} won:seeks ?seeks.`,
             fromLocation &&
               "?seeks won:travelAction/s:fromLocation ?fromLocation.",
