@@ -168,6 +168,9 @@ public class WON {
     //adds a flag to a need
     public static final Property HAS_FLAG = m.createProperty(BASE_URI + "hasFlag");
 
+    public static final Property DO_NOT_MATCH_BEFORE = m.createProperty(BASE_URI + "doNotMatchBefore");
+    public static final Property DO_NOT_MATCH_AFTER = m.createProperty(BASE_URI + "doNotMatchAfter");
+
     //the usedForTesting flag: need is not a real need, only match with other needs flagged with usedForTesting
     public static final Resource USED_FOR_TESTING = m.createResource(BASE_URI + "UsedForTesting");
 

@@ -2,16 +2,7 @@ package won.matcher.sparql.actor;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.Spliterator;
-import java.util.Spliterators;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -408,29 +399,34 @@ public class SparqlMatcherActor extends UntypedActor {
 
     private boolean postFilter(NeedModelWrapper need, NeedModelWrapper foundNeed) {
         try {
-          if (need.getNeedUri().equals(foundNeed.getNeedUri())) {
-              return false;
-          }
-          if (need.hasFlag(WON.NO_HINT_FOR_ME)) {
-              return false;
-          }
-          if (foundNeed.hasFlag(WON.NO_HINT_FOR_COUNTERPART)) {
-              return false;
-          }
-  
-          Set<String> needContexts = getMatchingContexts(need);
-          if (!needContexts.isEmpty()) {
-              Set<String> foundNeedContexts = getMatchingContexts(foundNeed);
-              foundNeedContexts.retainAll(needContexts);
-              if (foundNeedContexts.isEmpty()) {
-                  return false;
-              }
-          }
-  
-          //TODO add back time matching
-          return true;
+            if (need.getNeedUri().equals(foundNeed.getNeedUri())) {
+                return false;
+            }
+            if (need.hasFlag(WON.NO_HINT_FOR_ME)) {
+                return false;
+            }
+            if (foundNeed.hasFlag(WON.NO_HINT_FOR_COUNTERPART)) {
+                return false;
+            }
+
+            Set<String> needContexts = getMatchingContexts(need);
+            if (!needContexts.isEmpty()) {
+                Set<String> foundNeedContexts = getMatchingContexts(foundNeed);
+                foundNeedContexts.retainAll(needContexts);
+                if (foundNeedContexts.isEmpty()) {
+                    return false;
+                }
+            }
+
+            Calendar now = Calendar.getInstance();
+            if (now.after(foundNeed.getDoNotMatchAfter()))
+                return false;
+            if (now.before(foundNeed.getDoNotMatchBefore()))
+                return false;
+
+            return true;
         } catch (Exception e) {
-          log.info("caught Exception during post-filtering, ignoring match", e);
+            log.info("caught Exception during post-filtering, ignoring match", e);
         }
         return false;
     }
