@@ -5,19 +5,20 @@ import {
   getFromJsonLd,
   getInFromJsonLd,
   getIn,
+  isValidDate,
 } from "../app/utils.js";
 import Immutable from "immutable";
 import { details, abstractDetails } from "detailDefinitions";
-import { Parser as SparqlParser } from "sparqljs";
 import { findLatestIntervallEndInJsonLd } from "../app/won-utils.js";
 import won from "../app/won-es6.js";
 import {
   filterInVicinity,
-  prefixesString,
   filterFloorSizeRange,
   filterNumOfRoomsRange,
   filterRentRange,
   concatenateFilters,
+  filterAboutTime,
+  sparqlQuery,
 } from "../app/sparql-builder-utils.js";
 
 export const emptyDraft = {
@@ -759,11 +760,11 @@ const realEstateUseCases = {
           prefixes: {
             won: won.defaultContext["won"],
           },
-          basicGraphPattern: [
+          operations: [
+            `${resultName} a won:Need.`,
             `${resultName} won:is ?is.`,
             location && "?is won:hasLocation ?location.",
           ],
-          filterStrings: [],
         },
         rentRange &&
           filterRentRange(
@@ -783,21 +784,22 @@ const realEstateUseCases = {
             numberOfRoomsRange.max
           ),
 
-        location && filterInVicinity("?location", location),
+        filterInVicinity("?location", location),
       ];
 
       const concatenatedFilter = concatenateFilters(filters);
 
-      const queryTemplate =
-        `
-        ${prefixesString(concatenatedFilter.prefixes)}
-        SELECT DISTINCT ${resultName}
-        WHERE {
-          ${concatenatedFilter.basicGraphPattern.join(" ")}
-          ${concatenatedFilter.filterStrings.join(" ")}
-        }` + (location ? `ORDER BY ASC(?geoDistance)` : "");
-
-      return new SparqlParser().parse(queryTemplate);
+      return sparqlQuery({
+        prefixes: concatenatedFilter.prefixes,
+        selectDistinct: resultName,
+        where: concatenatedFilter.operations,
+        orderBy: [
+          {
+            order: "ASC",
+            variable: "?location_geoDistance",
+          },
+        ],
+      });
     },
   },
   offerRent: {
@@ -1106,24 +1108,24 @@ const transportUseCases = {
       tags: { ...details.tags },
       description: { ...details.description },
     },
-    generateQuery: (draft, resultName) => {
-      const filterStrings = [];
-      const prefixes = {
-        s: won.defaultContext["s"],
-        won: won.defaultContext["won"],
-      };
+    // generateQuery: (draft, resultName) => {
+    //   const filterStrings = [];
+    //   const prefixes = {
+    //     s: won.defaultContext["s"],
+    //     won: won.defaultContext["won"],
+    //   };
 
-      let queryTemplate =
-        `
-        ${prefixesString(prefixes)}
-        SELECT DISTINCT ${resultName}
-        WHERE {
-        ${resultName}
-          won:is ?is.
-          ${filterStrings && filterStrings.join(" ")}
-        }` + (location ? `ORDER BY ASC(?geoDistance)` : "");
-      return new SparqlParser().parse(queryTemplate);
-    },
+    //   let queryTemplate =
+    //     `
+    //     ${prefixesString(prefixes)}
+    //     SELECT DISTINCT ${resultName}
+    //     WHERE {
+    //     ${resultName}
+    //       won:is ?is.
+    //       ${filterStrings && filterStrings.join(" ")}
+    //     }` + (location ? `ORDER BY ASC(?geoDistance)` : "");
+    //   return new SparqlParser().parse(queryTemplate);
+    // },
   },
 };
 
@@ -1146,6 +1148,87 @@ const mobilityUseCases = {
     seeksDetails: {
       fromDatetime: { ...details.fromDatetime },
       travelAction: { ...details.travelAction },
+    },
+    generateQuery: (draft, resultName) => {
+      const fromLocation = getIn(draft, [
+        "seeks",
+        "travelAction",
+        "fromLocation",
+      ]);
+      const toLocation = getIn(draft, ["seeks", "travelAction", "toLocation"]);
+
+      const baseFilter = {
+        prefixes: {
+          won: won.defaultContext["won"],
+        },
+        operations: [`${resultName} a won:Need.`, `${resultName} won:is ?is.`],
+      };
+
+      const locationFilter = filterInVicinity(
+        "?location",
+        fromLocation,
+        /*radius=*/ 100
+      );
+      const fromLocationFilter = filterInVicinity(
+        "?fromLocation",
+        fromLocation,
+        /*radius=*/ 100
+      );
+      const toLocationFilter = filterInVicinity(
+        "?toLocation",
+        toLocation,
+        /*radius=*/ 100
+      );
+
+      const union = operations => {
+        if (!operations || operations.length === 0) {
+          return "";
+        } else {
+          return "{" + operations.join("} UNION {") + "}";
+        }
+      };
+      const filterAndJoin = (arrayOfStrings, seperator) =>
+        arrayOfStrings.filter(str => str).join(seperator);
+
+      const locationFilters = {
+        prefixes: locationFilter.prefixes,
+        operations: union([
+          filterAndJoin(
+            [
+              fromLocation &&
+                "?is won:travelAction/s:fromLocation ?fromLocation. ",
+              fromLocation && fromLocationFilter.operations.join(" "),
+              toLocation && "?is won:travelAction/s:toLocation ?toLocation.",
+              toLocation && toLocationFilter.operations.join(" "),
+            ],
+            " "
+          ),
+          filterAndJoin(
+            [
+              location && "?is won:hasLocation ?location .",
+              location && locationFilter.operations.join(" "),
+            ],
+            " "
+          ),
+        ]),
+      };
+
+      const concatenatedFilter = concatenateFilters([
+        baseFilter,
+        locationFilters,
+      ]);
+
+      return sparqlQuery({
+        prefixes: concatenatedFilter.prefixes,
+        selectDistinct: resultName,
+        where: concatenatedFilter.operations,
+        orderBy: [
+          {
+            order: "ASC",
+            variable: "?location_geoDistance",
+          },
+        ],
+      });
     },
   },
   taxiOffer: {
@@ -1171,28 +1254,29 @@ const mobilityUseCases = {
           prefixes: {
             won: won.defaultContext["won"],
           },
-          basicGraphPattern: [
+          operations: [
+            `${resultName} a won:Need.`,
             `${resultName} won:seeks ?seeks.`,
             location && "?seeks won:travelAction/s:fromLocation ?location.",
           ],
-          filterStrings: [],
         },
 
-        location && filterInVicinity("?location", location, /*radius=*/ 100),
+        filterInVicinity("?location", location, /*radius=*/ 100),
       ];
 
       const concatenatedFilter = concatenateFilters(filters);
 
-      const queryTemplate =
-        `
-        ${prefixesString(concatenatedFilter.prefixes)}
-        SELECT DISTINCT ${resultName}
-        WHERE {
-          ${concatenatedFilter.basicGraphPattern.join(" ")}
-          ${concatenatedFilter.filterStrings.join(" ")}
-        }` + (location ? `ORDER BY ASC(?geoDistance)` : "");
-
-      return new SparqlParser().parse(queryTemplate);
+      return sparqlQuery({
+        prefixes: concatenatedFilter.prefixes,
+        selectDistinct: resultName,
+        where: concatenatedFilter.operations,
+        orderBy: [
+          {
+            order: "ASC",
+            variable: "?location_geoDistance",
+          },
+        ],
+      });
     },
   },
   rideShareOffer: {
@@ -1211,6 +1295,48 @@ const mobilityUseCases = {
       fromDatetime: { ...details.fromDatetime },
       throughDatetime: { ...details.throughDatetime },
       travelAction: { ...details.travelAction },
+    },
+    generateQuery: (draft, resultName) => {
+      const toLocation = getIn(draft, ["is", "travelAction", "toLocation"]);
+      const fromLocation = getIn(draft, ["is", "travelAction", "fromLocation"]);
+
+      const fromTime = getIn(draft, ["is", "fromDatetime"]);
+      const filters = [
+        {
+          // to select seeks-branch
+          prefixes: {
+            won: won.defaultContext["won"],
+          },
+          operations: [
+            `${resultName} a won:Need.`,
+            `${resultName} won:seeks ?seeks.`,
+            fromLocation &&
+              "?seeks won:travelAction/s:fromLocation ?fromLocation.",
+            toLocation && "?seeks won:travelAction/s:toLocation ?toLocation.",
+            isValidDate(fromTime) && "?seeks s:validFrom ?starttime",
+          ],
+        },
+
+        filterInVicinity("?fromLocation", fromLocation, /*radius=*/ 100),
+
+        filterInVicinity("?toLocation", toLocation, /*radius=*/ 100),
+
+        filterAboutTime("?starttime", fromTime, 12 /* hours before and after*/),
+      ];
+
+      const concatenatedFilter = concatenateFilters(filters);
+
+      return sparqlQuery({
+        prefixes: concatenatedFilter.prefixes,
+        selectDistinct: resultName,
+        where: concatenatedFilter.operations,
+        orderBy: [
+          {
+            order: "ASC",
+            variable: "?fromLocation_geoDistance",
+          },
+        ],
+      });
     },
   },
 };

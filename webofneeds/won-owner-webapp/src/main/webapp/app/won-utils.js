@@ -340,9 +340,9 @@ function hasSubElements(obj) {
 }
 
 export function findLatestIntervallEndInJsonLd(draft, jsonld) {
-  // get all occurrances of `s:DateTime`
+  // get all occurrances of `xsd:dateTime`
   const allTimes = Array.concat(
-    findAllFieldOccurancesRecursively("s:DateTime", jsonld)
+    findAllFieldOccurancesRecursively("xsd:dateTime", jsonld)
   );
 
   // filter for string-literals (just in case)
@@ -425,7 +425,7 @@ export function parseJsonldLeafsImm(val, type) {
  *    * `s:Integer`
  *    * `xsd:float`
  *    * `xsd:dateTime`
- *    * `s:DateTime`
+ *    * `xsd:dateTime`
  *    * `xsd:string`
  *    * `s:Text`
  *    * `http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon`?, e.g. `"48.225073#16.358398"`

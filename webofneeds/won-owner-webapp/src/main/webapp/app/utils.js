@@ -1332,7 +1332,7 @@ export function findAllFieldOccurancesRecursively(fieldName, obj, _acc = []) {
 /**
  * Takes an ISO-8601 string and returns a `Date` that marks
  * the exact time or the end of the year, month or day
- * e.g. s:DateTime: "2011-04-11T10:20:30Z"
+ * e.g. xsd:dateTime: "2011-04-11T10:20:30Z"
  *
  * @param {*} dateStr
  */
