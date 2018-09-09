@@ -1196,7 +1196,7 @@ const mobilityUseCases = {
           filterAndJoin(
             [
               fromLocation &&
-                "?is a <http://dbpedia.org/page/Ridesharing>; won:travelAction/s:fromLocation ?fromLocation. ",
+                `${resultName} a <http://dbpedia.org/page/Ridesharing>; won:travelAction/s:fromLocation ?fromLocation. `,
               fromLocation && fromLocationFilter.operations.join(" "),
               toLocation && "?is won:travelAction/s:toLocation ?toLocation.",
               toLocation && toLocationFilter.operations.join(" "),
@@ -1205,7 +1205,7 @@ const mobilityUseCases = {
           ),
           filterAndJoin(
             [
-              location && "?is a s:TaxiService ; won:hasLocation ?location .",
+              location && `${resultName} a s:TaxiService ; won:hasLocation ?location .`,
               location && locationFilter.operations.join(" "),
             ],
             " "
