@@ -1196,7 +1196,7 @@ const mobilityUseCases = {
           filterAndJoin(
             [
               fromLocation &&
-                "?is won:travelAction/s:fromLocation ?fromLocation. ",
+                `${resultName} a <http://dbpedia.org/page/Ridesharing>. ?is won:travelAction/s:fromLocation ?fromLocation. `,
               fromLocation && fromLocationFilter.operations.join(" "),
               toLocation && "?is won:travelAction/s:toLocation ?toLocation.",
               toLocation && toLocationFilter.operations.join(" "),
@@ -1205,7 +1205,8 @@ const mobilityUseCases = {
           ),
           filterAndJoin(
             [
-              location && "?is won:hasLocation ?location .",
+              location &&
+                `${resultName} a s:TaxiService . ?is won:hasLocation ?location .`,
               location && locationFilter.operations.join(" "),
             ],
             " "
@@ -1238,8 +1239,7 @@ const mobilityUseCases = {
     doNotMatchAfter: findLatestIntervallEndInJsonLd,
     draft: {
       ...emptyDraft,
-      is: { title: "Taxi", tags: "offer-lift" },
-      searchString: "search-lift",
+      is: { title: "Taxi", type: "s:TaxiService" },
     },
     isDetails: {
       title: { ...details.title },
@@ -1286,8 +1286,10 @@ const mobilityUseCases = {
     doNotMatchAfter: findLatestIntervallEndInJsonLd,
     draft: {
       ...emptyDraft,
-      is: { title: "Share a Ride", tags: "offer-lift" },
-      searchString: "search-lift",
+      is: {
+        title: "Share a Ride",
+        type: "http://dbpedia.org/page/Ridesharing",
+      },
     },
     isDetails: {
       title: { ...details.title },
