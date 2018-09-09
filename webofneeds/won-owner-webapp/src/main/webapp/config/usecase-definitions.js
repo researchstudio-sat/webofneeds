@@ -1288,7 +1288,7 @@ const mobilityUseCases = {
       ...emptyDraft,
       is: {
         title: "Share a Ride",
-        type: "<http://dbpedia.org/page/Ridesharing>",
+        type: "http://dbpedia.org/page/Ridesharing",
       },
     },
     isDetails: {
