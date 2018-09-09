@@ -1205,7 +1205,8 @@ const mobilityUseCases = {
           ),
           filterAndJoin(
             [
-              location && `${resultName} a s:TaxiService ; won:hasLocation ?location .`,
+              location &&
+                `${resultName} a s:TaxiService ; won:hasLocation ?location .`,
               location && locationFilter.operations.join(" "),
             ],
             " "
