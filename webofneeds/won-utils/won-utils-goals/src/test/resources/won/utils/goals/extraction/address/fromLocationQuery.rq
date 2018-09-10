@@ -1,12 +1,13 @@
 prefix s:     <http://schema.org/>
 
-select ?lat ?lon
+select ?lat ?lon ?name
 
 where {
 	?main a s:TravelAction;
     	  s:fromLocation ?location.
   	?location a s:Place;
-          s:geo ?geo.
+          s:geo ?geo;
+          s:name ?name.
   	?geo a s:GeoCoordinates;
           s:latitude ?lat;
           s:longitude ?lon.
