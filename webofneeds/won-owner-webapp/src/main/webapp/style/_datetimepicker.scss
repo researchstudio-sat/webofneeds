@@ -1,11 +1,17 @@
 @import "won-config";
 @import "textfield";
 @import "sizing-utils";
+@import "button";
 
 won-datetime-picker {
   .datetimep__input {
     position: relative;
     display: grid;
+    grid-template-columns: auto 1fr;
+
+    .datetimep__input__button {
+      margin-right: 0.5rem;
+    }
 
     .datetimep__input__icon {
       @include fixed-square($bigiconSize);

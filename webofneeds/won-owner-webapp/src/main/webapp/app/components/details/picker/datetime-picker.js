@@ -14,11 +14,15 @@ const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
   let template = `
       <div class="datetimep__input">
-         <svg class="datetimep__input__icon clickable"
-            style="--local-primary:var(--won-primary-color);"
-            ng-if="self.showResetButton"
-            ng-click="self.resetDatetime()">
-            <use xlink:href="#ico36_close" href="#ico36_close"></use>
+          <button class="datetimep__input__button won-button--filled red"
+            ng-click="self.currentDatetime()">
+              Now
+          </button>
+          <svg class="datetimep__input__icon clickable"
+              style="--local-primary:var(--won-primary-color);"
+              ng-if="self.showResetButton"
+              ng-click="self.resetDatetime()">
+                  <use xlink:href="#ico36_close" href="#ico36_close"></use>
           </svg>
           <input
               type="datetime-local"
@@ -84,6 +88,23 @@ function genComponentConf() {
         this.showResetButton = true;
       } else {
         this.resetDatetime();
+      }
+    }
+
+    currentDatetime() {
+      console.log("currentDateTime");
+      const datetimeString = toLocalISODateString(new Date());
+      const croppedDatetimeString = get(
+        // only select up till minutes; drop seconds, ms and timezone
+        // (we'll generate the local timezone anyway)
+        datetimeString && datetimeString.match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/),
+        0 // first match if any
+      );
+      if (croppedDatetimeString) {
+        this.addedDatetime = croppedDatetimeString;
+        this.textfield().value = croppedDatetimeString;
+        this.update(this.addedDatetime);
+        this.showResetButton = true;
       }
     }
 
