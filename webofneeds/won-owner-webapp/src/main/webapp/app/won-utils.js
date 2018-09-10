@@ -339,7 +339,27 @@ function hasSubElements(obj) {
   return obj && obj !== {} && Object.keys(obj).length > 0;
 }
 
+export function findLatestIntervallEndInJsonLdOrNowAndAddMillis(
+  draft,
+  jsonld,
+  millis = 1000 * 60 * 30
+) {
+  const date = findLatestIntervallEndInJsonLdAsDate(draft, jsonld);
+  if (date) {
+    return new Date(date.getTime() + millis).toISOString();
+  }
+  return new Date(new Date().getTime() + millis).toISOString();
+}
+
 export function findLatestIntervallEndInJsonLd(draft, jsonld) {
+  const date = findLatestIntervallEndInJsonLdAsDate(draft, jsonld);
+  if (date) {
+    return date.toISOString();
+  }
+  return undefined;
+}
+
+function findLatestIntervallEndInJsonLdAsDate(draft, jsonld) {
   // get all occurrances of `xsd:dateTime`
   const allTimes = Array.concat(
     findAllFieldOccurancesRecursively("xsd:dateTime", jsonld)
@@ -367,7 +387,7 @@ export function findLatestIntervallEndInJsonLd(draft, jsonld) {
   const latest = sorted[0];
 
   // convert to an `xsd:datetime`/ISO-8601 string and return
-  return latest.toISOString();
+  return latest;
 }
 
 /**

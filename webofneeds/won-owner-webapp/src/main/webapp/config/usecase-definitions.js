@@ -9,7 +9,7 @@ import {
 } from "../app/utils.js";
 import Immutable from "immutable";
 import { details, abstractDetails } from "detailDefinitions";
-import { findLatestIntervallEndInJsonLd } from "../app/won-utils.js";
+import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../app/won-utils.js";
 import won from "../app/won-es6.js";
 import {
   filterInVicinity,
@@ -74,7 +74,7 @@ const allDetailsUseCase = {
     identifier: "allDetails",
     label: "New custom post",
     icon: "#ico36_uc_custom",
-    doNotMatchAfter: findLatestIntervallEndInJsonLd,
+    doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
     draft: { ...emptyDraft },
     isDetails: details,
     seeksDetails: details,
@@ -124,7 +124,7 @@ const socialUseCases = {
     identifier: "breakfast",
     label: "Get breakfast",
     icon: "#ico36_uc_breakfast",
-    doNotMatchAfter: findLatestIntervallEndInJsonLd,
+    doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
     draft: {
       ...emptyDraft,
       is: {
@@ -148,7 +148,7 @@ const socialUseCases = {
     identifier: "lunch",
     label: "Get lunch",
     icon: "#ico36_uc_meal-half",
-    doNotMatchAfter: findLatestIntervallEndInJsonLd,
+    doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
     draft: {
       ...emptyDraft,
       is: {
@@ -171,7 +171,7 @@ const socialUseCases = {
     identifier: "afterparty",
     label: "Go out",
     icon: "#ico36_uc_drinks",
-    doNotMatchAfter: findLatestIntervallEndInJsonLd,
+    doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
     draft: {
       ...emptyDraft,
       is: {
@@ -193,7 +193,7 @@ const socialUseCases = {
     identifier: "sightseeing",
     label: "Go sightseeing",
     icon: "#ico36_uc_sightseeing",
-    doNotMatchAfter: findLatestIntervallEndInJsonLd,
+    doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
     draft: {
       ...emptyDraft,
       is: { tags: ["sightseeing"] },
@@ -215,7 +215,7 @@ const complainUseCases = {
     identifier: "complain",
     label: "Complain about something",
     icon: "#ico36_uc_wtf",
-    doNotMatchAfter: findLatestIntervallEndInJsonLd,
+    doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
     draft: {
       ...emptyDraft,
       is: {
@@ -237,7 +237,7 @@ const complainUseCases = {
     identifier: "handleComplaints",
     label: "Handle complaints",
     icon: "#ico36_uc_wtf_interest",
-    doNotMatchAfter: findLatestIntervallEndInJsonLd,
+    doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
     draft: {
       ...emptyDraft,
       is: {
@@ -261,7 +261,7 @@ const professionalUseCases = {
     identifier: "getToKnow",
     label: "Find people",
     icon: "#ico36_uc_find_people",
-    doNotMatchAfter: findLatestIntervallEndInJsonLd,
+    doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
     draft: {
       ...emptyDraft,
       is: {
@@ -289,7 +289,7 @@ const professionalUseCases = {
     identifier: "phdIs",
     label: "Offer a PhD position",
     icon: "#ico36_uc_phd",
-    doNotMatchAfter: findLatestIntervallEndInJsonLd,
+    doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
     draft: {
       ...emptyDraft,
       is: {
@@ -312,7 +312,7 @@ const professionalUseCases = {
     identifier: "phdSeeks",
     label: "Find a PhD position",
     icon: "#ico36_uc_phd",
-    doNotMatchAfter: findLatestIntervallEndInJsonLd,
+    doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
     draft: {
       ...emptyDraft,
       is: {
@@ -337,7 +337,7 @@ const professionalUseCases = {
     identifier: "postDocIs",
     label: "Offer a PostDoc position",
     icon: "#ico36_uc_postdoc",
-    doNotMatchAfter: findLatestIntervallEndInJsonLd,
+    doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
     draft: {
       ...emptyDraft,
       is: {
@@ -360,7 +360,7 @@ const professionalUseCases = {
     identifier: "postDocSeeks",
     label: "Find a PostDoc position",
     icon: "#ico36_uc_postdoc",
-    doNotMatchAfter: findLatestIntervallEndInJsonLd,
+    doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
     draft: {
       ...emptyDraft,
       is: {
@@ -385,7 +385,7 @@ const professionalUseCases = {
     identifier: "consortiumIs",
     label: "Offer slot in a project consortium",
     icon: "#ico36_uc_consortium-offer",
-    doNotMatchAfter: findLatestIntervallEndInJsonLd,
+    doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
     draft: {
       ...emptyDraft,
       is: {
@@ -410,7 +410,7 @@ const professionalUseCases = {
     identifier: "consortiumSeeks",
     label: "Find a project consortium to join",
     icon: "#ico36_uc_consortium-search",
-    doNotMatchAfter: findLatestIntervallEndInJsonLd,
+    doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
     draft: {
       ...emptyDraft,
       is: {
@@ -727,7 +727,7 @@ const realEstateUseCases = {
     identifier: "searchRent",
     label: "Find a place to rent",
     icon: "#ico36_uc_realestate",
-    doNotMatchAfter: findLatestIntervallEndInJsonLd,
+    doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
     draft: {
       ...emptyDraft,
       seeks: {
@@ -806,7 +806,7 @@ const realEstateUseCases = {
     identifier: "offerRent",
     label: "Rent a place out",
     icon: "#ico36_uc_realestate",
-    doNotMatchAfter: findLatestIntervallEndInJsonLd,
+    doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
     draft: {
       ...emptyDraft,
       is: {
@@ -851,7 +851,7 @@ const transportUseCases = {
     identifier: "transportDemand",
     label: "Send something",
     icon: "#ico36_uc_transport_demand",
-    doNotMatchAfter: findLatestIntervallEndInJsonLd,
+    doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
     draft: {
       ...emptyDraft,
       is: { title: "Want to send something" },
@@ -1094,7 +1094,7 @@ const transportUseCases = {
     identifier: "transportOffer",
     label: "Offer goods transport",
     icon: "#ico36_uc_transport_offer",
-    doNotMatchAfter: findLatestIntervallEndInJsonLd,
+    doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
     draft: {
       ...emptyDraft,
       is: { title: "Transportation offer" },
@@ -1134,7 +1134,7 @@ const mobilityUseCases = {
     identifier: "liftDemand",
     label: "Need a Lift",
     icon: "#ico36_uc_route_demand",
-    doNotMatchAfter: findLatestIntervallEndInJsonLd,
+    doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
     draft: {
       ...emptyDraft,
       is: { title: "Need a lift", tags: "search-lift" },
@@ -1236,7 +1236,7 @@ const mobilityUseCases = {
     identifier: "taxiOffer",
     label: "Offer Taxi Service",
     icon: "#ico36_uc_taxi_offer",
-    doNotMatchAfter: findLatestIntervallEndInJsonLd,
+    doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
     draft: {
       ...emptyDraft,
       is: { title: "Taxi", type: "s:TaxiService" },
@@ -1283,7 +1283,7 @@ const mobilityUseCases = {
     identifier: "rideShareOffer",
     label: "Offer to Share a Ride",
     icon: "#ico36_uc_taxi_offer",
-    doNotMatchAfter: findLatestIntervallEndInJsonLd,
+    doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
     draft: {
       ...emptyDraft,
       is: {
@@ -1417,7 +1417,7 @@ const musicianUseCases = {
     identifier: "findBand",
     label: "Find Band",
     icon: "#ico36_uc_find_band",
-    doNotMatchAfter: findLatestIntervallEndInJsonLd,
+    doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
     draft: {
       ...emptyDraft,
       is: {
@@ -1444,7 +1444,7 @@ const musicianUseCases = {
     identifier: "findMusician",
     label: "Find Musician",
     icon: "#ico36_uc_find_musician",
-    doNotMatchAfter: findLatestIntervallEndInJsonLd,
+    doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
     draft: {
       ...emptyDraft,
       is: {
@@ -1471,7 +1471,7 @@ const musicianUseCases = {
     identifier: "findRehearsalRoom",
     label: "Find Rehearsal Room",
     icon: "#ico36_uc_realestate",
-    doNotMatchAfter: findLatestIntervallEndInJsonLd,
+    doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
     draft: {
       ...emptyDraft,
       is: {
@@ -1500,7 +1500,7 @@ const musicianUseCases = {
     identifier: "OfferRehearsalRoom",
     label: "Offer Rehearsal Room",
     icon: "#ico36_uc_realestate",
-    doNotMatchAfter: findLatestIntervallEndInJsonLd,
+    doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
     draft: {
       ...emptyDraft,
       is: {
