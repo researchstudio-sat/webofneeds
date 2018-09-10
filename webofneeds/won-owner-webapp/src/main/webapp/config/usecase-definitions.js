@@ -1161,7 +1161,11 @@ const mobilityUseCases = {
         prefixes: {
           won: won.defaultContext["won"],
         },
-        operations: [`${resultName} a won:Need.`, `${resultName} won:is ?is.`],
+        operations: [
+          `${resultName} a won:Need.`,
+          `${resultName} won:isInState won:Active. { {${resultName} a <http://dbpedia.org/page/Ridesharing>.  } union { ${resultName} a s:TaxiService} }`,
+          `${resultName} won:is ?is.`,
+        ],
       };
 
       const locationFilter = filterInVicinity(
