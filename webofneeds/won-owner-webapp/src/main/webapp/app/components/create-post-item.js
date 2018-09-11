@@ -85,7 +85,7 @@ function genComponentConf() {
                     <use xlink:href="#ico36_plus" href="#ico36_plus"></use>
             </svg>
             <div class="cpi__item__text">
-                I have or want…
+                New
             </div>
         </div>
     `;

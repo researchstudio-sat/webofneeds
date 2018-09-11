@@ -1304,8 +1304,15 @@ export function findAllFieldOccurancesRecursively(fieldName, obj, _acc = []) {
   if (!obj) {
     return _acc;
   }
-  if (obj[fieldName]) {
-    _acc.push(obj[fieldName]);
+  if (obj["@type"] === fieldName && obj["@value"]) {
+    _acc.push(obj["@value"]);
+    console.log(
+      'obj["@type"] is ',
+      fieldName,
+      " and value present push value to _acc",
+      _acc
+    );
+    return _acc;
   }
   if (obj.toJS && obj.get) {
     /* obj is an immutabljs-object
