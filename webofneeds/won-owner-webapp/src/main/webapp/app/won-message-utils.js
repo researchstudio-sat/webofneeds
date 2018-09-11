@@ -274,6 +274,7 @@ export function buildChatMessage({
               detail.parseToRDF({
                 value: value,
                 identifier: detail.identifier,
+                contentUri: eventUri,
               });
 
             if (detailRDF) {

@@ -8,6 +8,7 @@ import {
   isValidDate,
   parseDatetimeStrictly,
   toLocalISODateString,
+  generateIdString,
 } from "../app/utils.js";
 import Immutable from "immutable";
 import won from "../app/won-es6.js";
@@ -178,13 +179,17 @@ export const details = {
       { value: "HUR", label: "per hour" },
       { value: "", label: "total", default: true },
     ],
-    parseToRDF: function({ value }) {
+    parseToRDF: function({ value, identifier, contentUri }) {
       if (!value || !value.amount || !value.currency) {
         return { "s:priceSpecification": undefined };
       }
 
       return {
         "s:priceSpecification": {
+          "@id":
+            contentUri && identifier
+              ? contentUri + "/" + identifier + "/" + generateIdString(10)
+              : undefined,
           "@type": "s:CompoundPriceSpecification",
           "s:price": [{ "@value": value.amount, "@type": "xsd:float" }],
           "s:priceCurrency": value.currency,
@@ -357,16 +362,31 @@ export const details = {
     placeholder: "Search for location",
     component: "won-location-picker",
     viewerComponent: "won-location-viewer",
-    parseToRDF: function({ value, identifier }) {
+    parseToRDF: function({ value, identifier, contentUri }) {
       if (!value) {
         // TODO: this should happen in need-builder
         return { "won:hasLocation": undefined };
       }
+
+      const randomLocationId = generateIdString(10);
+
       return {
         "won:hasLocation": {
+          "@id":
+            contentUri && identifier
+              ? contentUri + "/" + identifier + "/" + randomLocationId
+              : undefined,
           "@type": "s:Place",
           "s:geo": {
-            "@id": "_:" + identifier + "-location",
+            "@id":
+              contentUri && identifier
+                ? contentUri +
+                  "/" +
+                  identifier +
+                  "/" +
+                  randomLocationId +
+                  "/locationgeo"
+                : undefined,
             "@type": "s:GeoCoordinates",
             "s:latitude": value.lat.toFixed(6),
             "s:longitude": value.lng.toFixed(6),
@@ -381,14 +401,39 @@ export const details = {
             !value.nwCorner || !value.seCorner
               ? undefined
               : {
+                  "@id":
+                    contentUri && identifier
+                      ? contentUri +
+                        "/" +
+                        identifier +
+                        "/" +
+                        randomLocationId +
+                        "/Bounds"
+                      : undefined,
                   "won:hasNorthWestCorner": {
-                    "@id": "_:" + identifier + "BoundsNW",
+                    "@id":
+                      contentUri && identifier
+                        ? contentUri +
+                          "/" +
+                          identifier +
+                          "/" +
+                          randomLocationId +
+                          "/Bounds/NW"
+                        : undefined,
                     "@type": "s:GeoCoordinates",
                     "s:latitude": value.nwCorner.lat.toFixed(6),
                     "s:longitude": value.nwCorner.lng.toFixed(6),
                   },
                   "won:hasSouthEastCorner": {
-                    "@id": "_:" + identifier + "BoundsSE",
+                    "@id":
+                      contentUri && identifier
+                        ? contentUri +
+                          "/" +
+                          identifier +
+                          "/" +
+                          randomLocationId +
+                          "/Bounds/SE"
+                        : undefined,
                     "@type": "s:GeoCoordinates",
                     "s:latitude": value.seCorner.lat.toFixed(6),
                     "s:longitude": value.seCorner.lng.toFixed(6),
@@ -497,7 +542,7 @@ export const details = {
     placeholder: undefined,
     component: "won-person-picker",
     viewerComponent: "won-person-viewer",
-    parseToRDF: function({ value }) {
+    parseToRDF: function({ value, identifier, contentUri }) {
       if (!value) {
         return { "foaf:person": undefined };
       }
@@ -510,6 +555,15 @@ export const details = {
           : undefined,
         "s:worksFor": getIn(value, ["company"])
           ? {
+              "@id":
+                contentUri && identifier
+                  ? contentUri +
+                    "/" +
+                    identifier +
+                    "/" +
+                    generateIdString(10) +
+                    "/organization"
+                  : undefined,
               "@type": "s:Organization",
               "s:name": getIn(value, ["company"]),
             }
@@ -599,18 +653,43 @@ export const details = {
     },
     component: "won-travel-action-picker",
     viewerComponent: "won-travel-action-viewer",
-    parseToRDF: function({ value }) {
+    parseToRDF: function({ value, identifier, contentUri }) {
       if (!value) {
         return { "won:travelAction": undefined };
       }
+
+      const randomTravelActionId = generateIdString(10);
+
       return {
         "won:travelAction": {
+          "@id":
+            contentUri && identifier
+              ? contentUri + "/" + identifier + "/" + randomTravelActionId
+              : undefined,
           "@type": "s:TravelAction",
           "s:fromLocation": !value.fromLocation
             ? undefined
             : {
+                "@id":
+                  contentUri && identifier
+                    ? contentUri +
+                      "/" +
+                      identifier +
+                      "/" +
+                      randomTravelActionId +
+                      "/fromLocation"
+                    : undefined,
                 "@type": "s:Place",
                 "s:geo": {
+                  "@id":
+                    contentUri && identifier
+                      ? contentUri +
+                        "/" +
+                        identifier +
+                        "/" +
+                        randomTravelActionId +
+                        "/fromLocation/geocoords"
+                      : undefined,
                   "@type": "s:GeoCoordinates",
                   "s:latitude": value.fromLocation.lat.toFixed(6),
                   "s:longitude": value.fromLocation.lng.toFixed(6),
@@ -627,8 +706,26 @@ export const details = {
           "s:toLocation": !value.toLocation
             ? undefined
             : {
+                "@id":
+                  contentUri && identifier
+                    ? contentUri +
+                      "/" +
+                      identifier +
+                      "/" +
+                      randomTravelActionId +
+                      "/toLocation"
+                    : undefined,
                 "@type": "s:Place",
                 "s:geo": {
+                  "@id":
+                    contentUri && identifier
+                      ? contentUri +
+                        "/" +
+                        identifier +
+                        "/" +
+                        randomTravelActionId +
+                        "/toLocation/geocoords"
+                      : undefined,
                   "@type": "s:GeoCoordinates",
                   "s:latitude": value.toLocation.lat.toFixed(6),
                   "s:longitude": value.toLocation.lng.toFixed(6),
@@ -828,7 +925,7 @@ export const details = {
     multiSelect: true,
     component: "won-file-picker",
     viewerComponent: "won-file-viewer",
-    parseToRDF: function({ value }) {
+    parseToRDF: function({ value, identifier, contentUri }) {
       if (!value) {
         return { "won:hasFile": undefined };
       }
@@ -837,6 +934,10 @@ export const details = {
         //TODO: SAVE CORRECT RDF THIS METHOD
         if (file.name && file.type && file.data) {
           let f = {
+            "@id":
+              contentUri && identifier
+                ? contentUri + "/" + identifier + "/" + generateIdString(10)
+                : undefined,
             "@type": "s:FileObject",
             "s:name": file.name,
             "s:type": file.type,
@@ -906,7 +1007,7 @@ export const details = {
     multiSelect: true,
     component: "won-file-picker",
     viewerComponent: "won-file-viewer",
-    parseToRDF: function({ value }) {
+    parseToRDF: function({ value, identifier, contentUri }) {
       if (!value) {
         return { "won:hasImage": undefined };
       }
@@ -915,6 +1016,10 @@ export const details = {
         //TODO: SAVE CORRECT RDF THIS METHOD
         if (image.name && image.type && image.data) {
           let img = {
+            "@id":
+              contentUri && identifier
+                ? contentUri + "/" + identifier + "/" + generateIdString(10)
+                : undefined,
             "@type": "s:ImageObject",
             "s:name": image.name,
             "s:type": image.type,
@@ -984,10 +1089,14 @@ export const details = {
     accepts: "",
     component: "won-workflow-picker",
     viewerComponent: "won-workflow-viewer",
-    parseToRDF: function({ value }) {
+    parseToRDF: function({ value, identifier, contentUri }) {
       if (value && value.name && value.data) {
         //do not check for value.type might not be present on some systems
         let workflow = {
+          "@id":
+            contentUri && identifier
+              ? contentUri + "/" + identifier + "/" + generateIdString(10)
+              : undefined,
           "@type": "s:FileObject",
           "s:name": value.name,
           "s:type": value.type,
@@ -1029,10 +1138,14 @@ export const details = {
     accepts: "",
     component: "won-petrinet-picker",
     viewerComponent: "won-petrinet-viewer",
-    parseToRDF: function({ value }) {
+    parseToRDF: function({ value, identifier, contentUri }) {
       if (value && value.name && value.data) {
         //do not check for value.type might not be present on some systems
         let workflow = {
+          "@id":
+            contentUri && identifier
+              ? contentUri + "/" + identifier + "/" + generateIdString(10)
+              : undefined,
           "@type": "s:FileObject",
           "s:name": value.name,
           "s:type": value.type,
@@ -1087,12 +1200,16 @@ export const details = {
     ],
     component: "won-price-range-picker",
     viewerComponent: "won-price-viewer",
-    parseToRDF: function({ value }) {
+    parseToRDF: function({ value, identifier, contentUri }) {
       if (!value || !(value.min || value.max) || !value.currency) {
         return { "s:priceSpecification": undefined };
       }
       return {
         "s:priceSpecification": {
+          "@id":
+            contentUri && identifier
+              ? contentUri + "/" + identifier + "/" + generateIdString(10)
+              : undefined,
           "@type": "s:CompoundPriceSpecification",
           "s:minPrice": value.min && [
             { "@value": value.min, "@type": "xsd:float" },
