@@ -1,0 +1,20 @@
+# find all content graphs, make sure they contain no triples with properties from the msg namespace
+
+prefix msg:   <http://purl.org/webofneeds/message#>
+
+SELECT
+  (count(distinct(?p)) as ?numMsgPropsInContent)   # number of properties from msg namespace in message content (must be 0) 
+  (if(?numMsgPropsInContent = 0, "OK", "FAIL") AS ?check)
+WHERE
+{
+  { 
+    SELECT ?contentGraph where { GRAPH ?g { ?x msg:hasContent ?contentGraph} } 
+  }
+  { 
+    GRAPH ?contentGraph 
+    { 
+      ?s ?p ?o 
+      FILTER (STRSTARTS(str(?p),"http://purl.org/webofneeds/message#"))
+    } 
+  } 
+}
