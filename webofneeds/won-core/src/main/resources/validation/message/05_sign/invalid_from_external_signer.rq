@@ -42,25 +42,15 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
   WHERE
   {
     {SELECT ?type
-    	WHERE
-     	{
-          graph ?g
-          {
+      WHERE
+      {
+          graph ?g{
             optional {
-            	?g rdfg:subGraphOf ?event.
+              ?g rdfg:subGraphOf ?event.
                    ?event msg:hasMessageType ?type.
-            	   ?event a msg:FromExternal
-            }
-          }
-          # prevent message content from misleading us
-          {
-            SELECT (GROUP_CONCAT(?contentGraph; separator=' ') as ?contentGraphNames) 
-            WHERE {
-              GRAPH ?g { ?x msg:hasContent ?contentGraph}
-            }
-          }
-          FILTER(!contains(?contentGraphNames, str(?g))) 
-       }
+                 ?event a msg:FromExternal}
+           }
+        }
     }
 
     # count fromExternal leaf envelopes that have correct (sender node) signer
@@ -89,40 +79,22 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
           ?envsig msg:hasSignedGraph ?env .
           ?envsig signature:hasVerificationCertificate ?envsigner .
       } .
-      # prevent message content from misleading us
-      {
-        SELECT (GROUP_CONCAT(?contentGraph; separator=' ') as ?contentGraphNames) 
-        WHERE {
-          GRAPH ?g { ?x msg:hasContent ?contentGraph}
-        }
-      }
-      FILTER(!contains(?contentGraphNames, str(?g1)))
-      FILTER(!contains(?contentGraphNames, str(?env)))
-      FILTER(!contains(?contentGraphNames, str(?g2)))
     } ORDER BY ?event
     }
 
 
     # count all fromExternal leaf envelopes
     {SELECT
-      (count (DISTINCT ?g) AS ?extLeafEnvNum)
-      WHERE
+    (count (DISTINCT ?g) AS ?extLeafEnvNum)
+    WHERE
+    {
+      GRAPH ?g
       {
-        GRAPH ?g
-        {
-            ?event a msg:FromExternal .
-            FILTER NOT EXISTS
-                {  ?g msg:containsEnvelope ?g2 . }
-        }
-        # prevent message content from misleading us
-        {
-          SELECT (GROUP_CONCAT(?contentGraph; separator=' ') as ?contentGraphNames) 
-          WHERE {
-            GRAPH ?g { ?x msg:hasContent ?contentGraph}
-          }
-        }
-        FILTER(!contains(?contentGraphNames, str(?g))) 
-      }
+          ?event a msg:FromExternal .
+          FILTER NOT EXISTS
+              {  ?g msg:containsEnvelope ?g2 . }
+      } .
+    }
     }
 
 
@@ -158,18 +130,6 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
           ?envsig msg:hasSignedGraph ?g .
           ?envsig signature:hasVerificationCertificate ?envsigner .
       } .
-      # prevent message content from misleading us
-      {
-        SELECT (GROUP_CONCAT(?contentGraph; separator=' ') as ?contentGraphNames) 
-        WHERE {
-          GRAPH ?g { ?x msg:hasContent ?contentGraph}
-        }
-      }
-      FILTER(!contains(?contentGraphNames, str(?g)))
-      FILTER(!contains(?contentGraphNames, str(?g3)))
-      FILTER(!contains(?contentGraphNames, str(?g4)))
-      FILTER(!contains(?contentGraphNames, str(?g1)))
-      FILTER(!contains(?contentGraphNames, str(?g5)))
     } ORDER BY ?event
     }
 
