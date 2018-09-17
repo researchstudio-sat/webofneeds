@@ -194,7 +194,7 @@ export function filterFloorSizeRange(rootSubject, min, max) {
   };
   const minIsNum = isValidNumber(min);
   const maxIsNum = isValidNumber(max);
-  const floorSizeVar = `${rootSubject}_floorSize.`;
+  const floorSizeVar = `${rootSubject}_floorSize`;
   if (minIsNum || maxIsNum) {
     operations.push(`${rootSubject} s:floorSize/s:value ${floorSizeVar}.`);
   }

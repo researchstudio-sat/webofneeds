@@ -141,7 +141,7 @@ public class WonMessageValidatorTest
     WonMessageValidator validator = new WonMessageValidator();
     StringBuilder message = new StringBuilder();
     boolean valid = validator.validate(misleadingMessageDataset, message);
-    Assert.assertTrue("validation is expected not to fail at " + message, valid);
+    Assert.assertFalse("validation is expected to fail at " + message, valid);
   }
 
   @Test
