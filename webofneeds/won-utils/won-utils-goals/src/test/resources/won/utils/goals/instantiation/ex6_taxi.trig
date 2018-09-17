@@ -60,6 +60,7 @@
                                                                             s:latitude   "10.0" ;
                                                                             s:longitude  "11.0"
                                                                         ] ;
+                                                                s:name              "From Location"
                                                              ] ;
                                               s:toLocation   [
                                                                 a       s:Place;
@@ -68,6 +69,7 @@
                                                                             s:latitude   "12.0" ;
                                                                             s:longitude  "13.0"
                                                                         ] ;
+                                                                s:name              "To Location"
                                                              ] ;
                                             ] ;
                           ] ;

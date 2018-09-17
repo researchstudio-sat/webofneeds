@@ -29,6 +29,11 @@
                               sh:minCount  1 ;
                               sh:path      s:geo
                             ] ;
+            sh:property [
+                        sh:path s:name ;
+                        sh:minCount 0 ;
+                        sh:maxCount 1 ;
+                      ] ;
             sh:targetClass  s:Place .
     
     <http://example.org/2/GeoCoordinateShape>

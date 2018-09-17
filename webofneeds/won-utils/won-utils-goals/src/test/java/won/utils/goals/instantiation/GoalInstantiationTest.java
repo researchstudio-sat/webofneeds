@@ -201,7 +201,10 @@ public class GoalInstantiationTest {
             System.out.println(res.toString());
             if(res.isConform()) {
                 Coordinate departureAddress = getAddress(loadSparqlQuery("/won/utils/goals/extraction/address/fromLocationQuery.rq"), res.getInstanceModel());
+                String departureName = getName(loadSparqlQuery("/won/utils/goals/extraction/address/fromLocationQuery.rq"), res.getInstanceModel());
                 Coordinate destinationAddress = getAddress(loadSparqlQuery("/won/utils/goals/extraction/address/toLocationQuery.rq"), res.getInstanceModel());
+                String destinationName = getName(loadSparqlQuery("/won/utils/goals/extraction/address/toLocationQuery.rq"), res.getInstanceModel());
+
 
                 //Assert.assertEquals(departureAddress, new Coordinate(10.0f, 11.0f));
                 //Assert.assertEquals(destinationAddress, new Coordinate(12.0f, 13.0f));
@@ -234,8 +237,8 @@ public class GoalInstantiationTest {
                 Coordinate departureAddress = getAddress(loadSparqlQuery("/won/utils/goals/extraction/address/fromLocationQuery.rq"), res.getInstanceModel());
                 Coordinate destinationAddress = getAddress(loadSparqlQuery("/won/utils/goals/extraction/address/toLocationQuery.rq"), res.getInstanceModel());
 
-                Assert.assertEquals(departureAddress, new Coordinate(10.0f, 11.0f));
-                Assert.assertEquals(destinationAddress, new Coordinate(12.0f, 13.0f));
+                Assert.assertEquals(new Coordinate(10.0f, 11.0f), departureAddress);
+                Assert.assertEquals(new Coordinate(12.0f, 13.0f), destinationAddress);
             }
         }
 
@@ -330,6 +333,16 @@ public class GoalInstantiationTest {
             float lat = solution.getLiteral("lat").getFloat();
             float lon = solution.getLiteral("lon").getFloat();
             return new Coordinate(lat, lon);
+        }else{
+            return null;
+        }
+    }
+
+    private static String getName(String query, Model payload) {
+        QuerySolution solution = executeQuery(query, payload);
+
+        if(solution != null){
+            return solution.getLiteral("name").getString();
         }else{
             return null;
         }

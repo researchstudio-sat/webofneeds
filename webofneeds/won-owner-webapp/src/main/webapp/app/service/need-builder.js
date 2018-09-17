@@ -152,6 +152,7 @@ import { Generator } from "sparqljs";
           ...detail.parseToRDF({
             value: isOrSeeksData[detail.identifier],
             identifier: detail.identifier,
+            contentUri: isOrSeeksData["publishedContentUri"],
           }),
         };
         // add to content node
