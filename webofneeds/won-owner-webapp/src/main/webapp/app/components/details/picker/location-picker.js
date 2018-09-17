@@ -21,7 +21,7 @@ import "style/_locationpicker.scss";
 
 import "leaflet/dist/leaflet.css";
 
-const serviceDependencies = ["$scope", "$element", "$sce"];
+const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
   let template = `
         <!-- LOCATION SEARCH BOX -->
@@ -52,8 +52,8 @@ function genComponentConf() {
                     <use xlink:href="#ico16_indicator_location" href="#ico36_location_current"></use>
                 </svg>
                 <a class="lp__searchresult__text" href=""
-                    ng-click="self.selectedLocation(self.currentLocation)"
-                    ng-bind-html="self.highlight(self.currentLocation.name, self.lastSearchedFor)">
+                    ng-click="self.selectedLocation(self.currentLocation)">
+                    {{ self.currentLocation.name }}
                 </a>
             </li>
             <!-- PREVIOUS LOCATION -->
@@ -64,8 +64,8 @@ function genComponentConf() {
                     <use xlink:href="#ico16_indicator_location" href="#ico16_indicator_location"></use>
                 </svg>
                 <a class="lp__searchresult__text" href=""
-                    ng-click="self.selectedLocation(self.previousLocation)"
-                    ng-bind-html="self.highlight(self.previousLocation.name, self.lastSearchedFor)">
+                    ng-click="self.selectedLocation(self.previousLocation)">
+                    {{ self.previousLocation.name }}
                 </a>
                 (previous)
             </li>
@@ -76,8 +76,8 @@ function genComponentConf() {
                     <use xlink:href="#ico16_indicator_location" href="#ico16_indicator_location"></use>
                 </svg>
                 <a class="lp__searchresult__text" href=""
-                    ng-click="self.selectedLocation(result)"
-                    ng-bind-html="self.highlight(result.name, self.lastSearchedFor)">
+                    ng-click="self.selectedLocation(result)">
+                    {{ result.name }}
                 </a>
             </li>
         </ul>
@@ -122,27 +122,6 @@ function genComponentConf() {
       if (inviewInfo.changed) {
         this.map.invalidateSize();
       }
-    }
-
-    /**
-     * Taken from <http://stackoverflow.com/questions/15519713/highlighting-a-filtered-result-in-angularjs>
-     * @param text
-     * @param search
-     * @return {*}
-     */
-    highlight(text, search) {
-      if (!text) {
-        text = "";
-      }
-      if (!search) {
-        return this.$sce.trustAsHtml(text);
-      }
-      return this.$sce.trustAsHtml(
-        text.replace(
-          new RegExp(search, "gi"),
-          '<span class="highlightedText">$&</span>'
-        )
-      );
     }
 
     placeMarkers(locations) {

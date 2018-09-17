@@ -16,7 +16,7 @@ import { initLeaflet } from "../../../won-utils.js";
 import "style/_travelactionpicker.scss";
 import "leaflet/dist/leaflet.css";
 
-const serviceDependencies = ["$scope", "$element", "$sce"];
+const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
   const prevLocationBlock = (
     displayBlock,
@@ -30,8 +30,8 @@ function genComponentConf() {
           <use xlink:href="#ico16_indicator_location" href="#ico16_indicator_location"></use>
       </svg>
       <a class="rp__searchresult__text" href=""
-          ng-click="${selectLocationFnctName}(${prevLocation})"
-          ng-bind-html="self.highlight(${prevLocation}.name, self.lastSearchedFor)">
+          ng-click="${selectLocationFnctName}(${prevLocation})">
+          {{ ${prevLocation}.name }}
       </a>
       (previous)
   </li>`;
@@ -44,8 +44,8 @@ function genComponentConf() {
           <use xlink:href="#ico16_indicator_location" href="#ico16_indicator_location"></use>
       </svg>
       <a class="rp__searchresult__text" href=""
-          ng-click="${selectLocationFnctName}(result)"
-          ng-bind-html="self.highlight(result.name, self.lastSearchedFor)">
+          ng-click="${selectLocationFnctName}(result)">
+          {{ result.name }}
       </a>
   </li>`;
 
@@ -77,8 +77,8 @@ function genComponentConf() {
                     <use xlink:href="#ico16_indicator_location" href="#ico36_location_current"></use>
                 </svg>
                 <a class="rp__searchresult__text" href=""
-                    ng-click="self.selectedFromLocation(self.currentLocation)"
-                    ng-bind-html="self.highlight(self.currentLocation.name, self.lastSearchedFor)">
+                    ng-click="self.selectedFromLocation(self.currentLocation)">
+                    {{ self.currentLocation.name }}
                 </a>
             </li>
             
@@ -522,27 +522,6 @@ function genComponentConf() {
           }
         );
       }
-    }
-
-    /**
-     * Taken from <http://stackoverflow.com/questions/15519713/highlighting-a-filtered-result-in-angularjs>
-     * @param text
-     * @param search
-     * @return {*}
-     */
-    highlight(text, search) {
-      if (!text) {
-        text = "";
-      }
-      if (!search) {
-        return this.$sce.trustAsHtml(text);
-      }
-      return this.$sce.trustAsHtml(
-        text.replace(
-          new RegExp(search, "gi"),
-          '<span class="highlightedText">$&</span>'
-        )
-      );
     }
 
     fromTextfieldNg() {
