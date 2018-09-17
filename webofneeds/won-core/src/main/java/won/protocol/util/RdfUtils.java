@@ -1095,6 +1095,14 @@ public class RdfUtils {
 	    }
 	    return results.stream();  
 	}
+	
+	public static Stream<Statement> toStatementStream(final Model model) {
+	    List<Statement> results = new LinkedList<Statement>();
+	    for(StmtIterator stmtIt = model.listStatements(); stmtIt.hasNext();) {
+                results.add(stmtIt.next());
+        }
+        return results.stream();
+	}
 
 	public static Stream<Model> toModelStream(final Dataset dataset) {
 		List<Model> ret = new LinkedList<Model>();
