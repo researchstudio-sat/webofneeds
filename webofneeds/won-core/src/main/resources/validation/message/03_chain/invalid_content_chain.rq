@@ -11,7 +11,7 @@ prefix won:   <http://purl.org/webofneeds/model#>
 prefix msg:   <http://purl.org/webofneeds/message#>
 prefix signature: <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#>
 prefix ldp:   <http://www.w3.org/ns/ldp#>
-
+prefix rdfg:   <http://www.w3.org/2004/03/trix/rdfg-1/>
 
 # the content should be part of the envelope chain: each content graph should be referenced from exactly one envelope
 #ASK
@@ -28,11 +28,23 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
     (if((?ttlContents*2+?ttlEnvelopes*2)!=?ttlGraphs, "a content is not referenced from an envelope", "OK") AS
     ?contentNotReferencedCheck)
 
-    (if(?numOfMultiRefContent>0 || ((?ttlContents + ?ttlEnvelopes + 1)!=?ttlGraphs), "FAIL", "OK") AS ?check)
+    (if(?type != msg:HintMessage && (?numOfMultiRefContent>0 || ((?ttlContents + ?ttlEnvelopes + 1)!=?ttlGraphs)), "FAIL", "OK") AS ?check)
 
   WHERE
   {
 
+
+    # allow hint messages that are not signed
+    {SELECT ?type
+      WHERE
+      {
+          graph ?g{
+              ?g rdfg:subGraphOf ?event.
+                   ?event msg:hasMessageType ?type.
+                 ?event a msg:FromExternal
+          }
+        }
+    }
 
     # get number of content graphs that have more than one reference from envelopes
     { SELECT (count(?multiReferenced) as ?numOfMultiRefContent)

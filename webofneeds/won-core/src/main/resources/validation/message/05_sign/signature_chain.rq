@@ -25,12 +25,24 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
     ?contentChainSize
     ?parallelContentSigChainSize
 
-    (if(?envChainSize != ?parallelEnvSigChainSize || ?contentChainSize != ?parallelContentSigChainSize, "FAIL",
+    (if(?type != msg:HintMessage && (?envChainSize != ?parallelEnvSigChainSize || ?contentChainSize != ?parallelContentSigChainSize), "FAIL",
     "OK")
     AS ?check)
 
   WHERE
   {
+
+    {SELECT ?type
+      WHERE
+      {
+          graph ?g{
+              ?g rdfg:subGraphOf ?event.
+                   ?event msg:hasMessageType ?type.
+                 ?event a msg:FromExternal
+          }
+        }
+    }
+
 
     { SELECT (count(distinct ?envelope) as ?envChainSize)
       WHERE

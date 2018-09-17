@@ -11,6 +11,7 @@ prefix won:   <http://purl.org/webofneeds/model#>
 prefix msg:   <http://purl.org/webofneeds/message#>
 prefix signature: <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#>
 prefix ldp:   <http://www.w3.org/ns/ldp#>
+prefix rdfg:   <http://www.w3.org/2004/03/trix/rdfg-1/>
 
 # any named graph in D should be either a signature graph or a signed graph.
 
@@ -22,11 +23,22 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
   ?numCorrectSignatures
 
 
-    (if(?numCorrectSignatures = 1 && ?numGraphs >= 2, "OK", "FAIL") AS ?check)
+    (if(?type = msg:HintMessage || (?numCorrectSignatures = 1 && ?numGraphs >= 2), "OK", "FAIL") AS ?check)
 
   WHERE
   {
 
+    # allow hint messages that are not signed
+    {SELECT ?type
+      WHERE
+      {
+          graph ?g{
+              ?g rdfg:subGraphOf ?event.
+                   ?event msg:hasMessageType ?type.
+                 ?event a msg:FromExternal
+          }
+        }
+    }
 
     # count number of signature graphs that have corresponding signed graph
     { SELECT (count(distinct ?g) as ?numCorrectSignatures)
