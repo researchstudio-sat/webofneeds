@@ -20,6 +20,7 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.query.*;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
+import org.apache.jena.tdb.TDB;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,10 +56,15 @@ public class WonSparqlValidator {
         if (logger.isDebugEnabled()) {
             logger.debug("validating constraint of WonSparqlValidator '{}'", name);
         }
-        if (constraint.isAskType()) {
-            return validateAsk(input);
-        } else if (constraint.isSelectType()) {
-            return validateSelect(input);
+        try {
+            input.begin(ReadWrite.READ);
+            if (constraint.isAskType()) {
+                return validateAsk(input);
+            } else if (constraint.isSelectType()) {
+                return validateSelect(input);
+            }
+        } finally {
+            input.end();
         }
         return new ValidationResult(false, "Invalid constraint: " + constraint.toString());
     }
@@ -66,7 +72,7 @@ public class WonSparqlValidator {
 
     private ValidationResult validateSelect(final Dataset input) {
         try (QueryExecution qe = QueryExecutionFactory.create(constraint, input)) {
-
+            qe.getContext().set(TDB.symUnionDefaultGraph, true);
             ResultSet result = qe.execSelect();
             if (!result.hasNext()) {
                 //this is a valid result if the projection vars don't contain 'check' (in which case we want exactly one result, see below)
@@ -102,9 +108,10 @@ public class WonSparqlValidator {
                     }
                     return new ValidationResult(false, errorMessage);
                 }
+                throw new IllegalStateException("We should have returned a result earlier. Bindings: " + binding.toString() + ", Constraint: " + constraint.toString(Syntax.syntaxSPARQL_11));
             }
-            throw new IllegalStateException("We should have returned a result earlier. Constraint: " + constraint.toString(Syntax.syntaxSPARQL_11));
-        }
+            throw new IllegalStateException("No result obtained from query, there seems to be some problem with the constraint: " + constraint.toString(Syntax.syntaxSPARQL_11));
+        } 
     }
 
     private void printResult(final ResultSet result) {
