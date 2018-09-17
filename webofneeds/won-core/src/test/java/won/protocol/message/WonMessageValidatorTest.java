@@ -143,6 +143,14 @@ public class WonMessageValidatorTest
     boolean valid = validator.validate(misleadingMessageDataset, message);
     Assert.assertFalse("validation is expected to fail at " + message, valid);
   }
+  
+  @Test
+  public void testValidHintMessage() throws IOException {
+    WonMessageValidator validator = new WonMessageValidator();
+    StringBuilder message = new StringBuilder();
+    boolean valid = validator.validate(Utils.createTestDataset("/validation/valid/hint_msg.trig"), message);
+    Assert.assertTrue("validation is expected not to fail at " + message, valid);
+  }
 
   @Test
   public void testInvalidDefaultGraph() throws IOException {
@@ -387,7 +395,6 @@ public class WonMessageValidatorTest
     // validate this invalid dataset
     boolean valid = validator.validate(invalidDataset, message);
     Assert.assertTrue("validation is expected to fail", !valid);
-    Assert.assertTrue(message.toString().contains("invalid_from_system_signer"));
 
     //reset for further testing:
     env1sigModel.remove(stmtNew);
