@@ -237,8 +237,8 @@ public class GoalInstantiationTest {
                 Coordinate departureAddress = getAddress(loadSparqlQuery("/won/utils/goals/extraction/address/fromLocationQuery.rq"), res.getInstanceModel());
                 Coordinate destinationAddress = getAddress(loadSparqlQuery("/won/utils/goals/extraction/address/toLocationQuery.rq"), res.getInstanceModel());
 
-                Assert.assertEquals(departureAddress, new Coordinate(10.0f, 11.0f));
-                Assert.assertEquals(destinationAddress, new Coordinate(12.0f, 13.0f));
+                Assert.assertEquals(new Coordinate(10.0f, 11.0f), departureAddress);
+                Assert.assertEquals(new Coordinate(12.0f, 13.0f), destinationAddress);
             }
         }
 
