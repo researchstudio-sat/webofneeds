@@ -159,49 +159,6 @@ let app = angular.module("won.owner", [
 /* create store, register middlewares, set up redux-devtool-support, etc */
 configRedux(app);
 
-app
-  .filter("filterByNeedState", function() {
-    return function(needs, state) {
-      let filtered = [];
-      angular.forEach(needs, function(need) {
-        if (need["won:isInState"]["@id"] == state) {
-          filtered.push(need);
-        }
-      });
-
-      return filtered;
-    };
-  })
-  .filter("filterEventByType", function() {
-    return function(events, uri, type) {
-      let filtered = [];
-      angular.forEach(events, function(event) {
-        if (event.hasReceiverNeed == uri && event.eventType == type) {
-          filtered.push(event);
-        }
-      });
-
-      return filtered;
-    };
-  })
-  /*Filters All events so that only the ones with textMessages remain*/
-  .filter("filterByEventMsgs", function() {
-    return function(events) {
-      let filtered = [];
-      angular.forEach(events, function(event) {
-        if (
-          event.hasTextMessage !== undefined ||
-          (event.hasCorrespondingRemoteMessage &&
-            event.hasCorrespondingRemoteMessage.hasTextMessage)
-        ) {
-          filtered.push(event);
-        }
-      });
-
-      return filtered;
-    };
-  });
-
 app.config(configRouting).config([
   "$compileProvider",
   function($compileProvider) {
