@@ -20,7 +20,7 @@ function genComponentConf() {
       <!-- HEADER -->
       <div class="ucg__header">
           <a class="cp__header__back clickable"
-              ng-click="self.router__stateGoCurrent({useCaseGroup: undefined})">
+              ng-click="self.router__stateGoCurrent({useCaseGroup: 'all'})">
               <svg style="--local-primary:var(--won-primary-color);"
                   class="ucg__header__back__icon show-in-responsive">
                   <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
