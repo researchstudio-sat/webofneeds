@@ -1,14 +1,22 @@
 import {
-  is,
   isValidNumber,
   get,
-  getFromJsonLd,
   getInFromJsonLd,
   getIn,
   isValidDate,
 } from "../app/utils.js";
-import Immutable from "immutable";
 import { details, abstractDetails } from "detailDefinitions";
+import {
+  realEstateRentRangeDetail,
+  realEstateRentDetail,
+  realEstateFloorSizeDetail,
+  realEstateNumberOfRoomsDetail,
+  realEstateFeaturesDetail,
+  realEstateFloorSizeRangeDetail,
+  realEstateNumberOfRoomsRangeDetail,
+} from "realEstateDetails";
+import { genresDetail, instrumentsDetail } from "musicianDetails";
+import { interestsDetail, skillsDetail } from "personDetails";
 import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../app/won-utils.js";
 import won from "../app/won-es6.js";
 import {
@@ -78,40 +86,6 @@ const allDetailsUseCase = {
     draft: { ...emptyDraft },
     isDetails: details,
     seeksDetails: details,
-  },
-};
-
-const skillsDetail = {
-  ...details.tags,
-  identifier: "skills",
-  label: "Skills",
-  icon: "#ico36_detail_skill",
-  placeholder: "e.g. RDF, project-management",
-  parseToRDF: function({ value }) {
-    if (!value) {
-      return { "s:knowsAbout": undefined };
-    }
-    return { "s:knowsAbout": value };
-  },
-  parseFromRDF: function(jsonLDImm) {
-    return won.parseListFrom(jsonLDImm, ["s:knowsAbout"], "xsd:string");
-  },
-};
-
-const interestsDetail = {
-  ...details.tags,
-  identifier: "interests",
-  label: "Interests",
-  icon: "#ico36_detail_interests",
-  placeholder: "e.g. food, cats",
-  parseToRDF: function({ value }) {
-    if (!value) {
-      return { "foaf:topic_interest": undefined };
-    }
-    return { "foaf:topic_interest": value };
-  },
-  parseFromRDF: function(jsonLDImm) {
-    return won.parseListFrom(jsonLDImm, "foaf:topic_interest");
   },
 };
 
@@ -430,295 +404,6 @@ const professionalUseCases = {
       description: { ...details.description },
       location: { ...details.location },
     },
-  },
-};
-
-const realEstateFloorSizeDetail = {
-  ...abstractDetails.number,
-  identifier: "floorSize",
-  label: "Floor size in square meters",
-  icon: "#ico36_detail_floorsize",
-  parseToRDF: function({ value }) {
-    if (!isValidNumber(value)) {
-      return { "s:floorSize": undefined };
-    } else {
-      return {
-        "s:floorSize": {
-          "@type": "s:QuantitativeValue",
-          "s:value": [{ "@value": value, "@type": "xsd:float" }],
-          "s:unitCode": "MTK",
-        },
-      };
-    }
-  },
-  parseFromRDF: function(jsonLDImm) {
-    const fs = won.parseFrom(
-      jsonLDImm,
-      ["s:floorSize", "s:value"],
-      "xsd:float"
-    );
-    const unit = getInFromJsonLd(
-      jsonLDImm,
-      ["s:floorSize", "s:unitCode"],
-      won.defaultContext
-    );
-    if (!fs) {
-      return undefined;
-    } else {
-      if (unit === "MTK") {
-        return fs + "m²";
-      } else if (unit === "FTK") {
-        return fs + "sq ft";
-      } else if (unit === "YDK") {
-        return fs + "sq yd";
-      } else if (!unit) {
-        return fs + " (no unit specified)";
-      }
-      return fs + " " + unit;
-    }
-  },
-  generateHumanReadable: function({ value, includeLabel }) {
-    if (isValidNumber(value)) {
-      return (includeLabel ? this.label + ": " + value : value) + "m²";
-    }
-    return undefined;
-  },
-};
-
-const realEstateNumberOfRoomsDetail = {
-  ...abstractDetails.number,
-  identifier: "numberOfRooms",
-  label: "Number of Rooms",
-  icon: "#ico36_detail_number-of-rooms",
-  parseToRDF: function({ value }) {
-    if (!isValidNumber(value)) {
-      return { "s:numberOfRooms": undefined };
-    } else {
-      return { "s:numberOfRooms": [{ "@value": value, "@type": "xsd:float" }] };
-    }
-  },
-  parseFromRDF: function(jsonLDImm) {
-    return won.parseFrom(jsonLDImm, ["s:numberOfRooms"], "xsd:float");
-  },
-  generateHumanReadable: function({ value, includeLabel }) {
-    if (isValidNumber(value)) {
-      return (includeLabel ? this.label + ": " + value : value) + " Rooms";
-    } else {
-      return undefined;
-    }
-  },
-};
-
-const realEstateNumberOfRoomsRangeDetail = {
-  ...abstractDetails.range,
-  identifier: "numberOfRoomsRange",
-  label: "Number of Rooms",
-  minLabel: "From",
-  maxLabel: "To",
-  icon: "#ico36_detail_number-of-rooms",
-  parseToRDF: function({ value }) {
-    if (!value) {
-      return {};
-    }
-    return {
-      "sh:property": {
-        "sh:path": "s:numberOfRooms",
-        "sh:minInclusive": value.min && [
-          { "@value": value.min, "@type": "xsd:float" },
-        ],
-        "sh:maxInclusive": value.max && [
-          { "@value": value.max, "@type": "xsd:float" },
-        ],
-      },
-    };
-  },
-  parseFromRDF: function(jsonLDImm) {
-    let properties = getFromJsonLd(
-      jsonLDImm,
-      "sh:property",
-      won.defaultContext
-    );
-    if (!properties) return undefined;
-
-    if (!Immutable.List.isList(properties))
-      properties = Immutable.List.of(properties);
-
-    const numberOfRooms = properties.find(
-      property =>
-        getFromJsonLd(property, "sh:path", won.defaultContext) ===
-        "s:numberOfRooms"
-    );
-    const minNumberOfRooms = getFromJsonLd(
-      numberOfRooms,
-      "sh:minInclusive",
-      won.defaultContext
-    );
-    const maxNumberOfRooms = getFromJsonLd(
-      numberOfRooms,
-      "sh:maxInclusive",
-      won.defaultContext
-    );
-
-    if (minNumberOfRooms || maxNumberOfRooms) {
-      return Immutable.fromJS({
-        min: minNumberOfRooms,
-        max: maxNumberOfRooms,
-      });
-    } else {
-      return undefined;
-    }
-  },
-  generateHumanReadable: function({ value, includeLabel }) {
-    if (value) {
-      return (
-        (includeLabel ? `${this.label}: ` : "") +
-        minMaxLabel(value.min, value.max) +
-        " Room(s)"
-      );
-    }
-    return undefined;
-  },
-};
-
-function minMaxLabel(min, max) {
-  const min_ = Number.parseFloat(min);
-  const max_ = Number.parseFloat(max);
-  const minIsNumber = isValidNumber(min_);
-  const maxIsNumber = isValidNumber(max_);
-  if (minIsNumber && maxIsNumber) {
-    return min_ + "–" + max_;
-  } else if (minIsNumber) {
-    return "At least " + min_;
-  } else if (maxIsNumber) {
-    return "At most " + max_;
-  } else {
-    return "Unspecified number of ";
-  }
-}
-
-const realEstateFloorSizeRangeDetail = {
-  ...abstractDetails.range,
-  identifier: "floorSizeRange",
-  label: "Floor size in square meters",
-  minLabel: "From",
-  maxLabel: "To",
-  icon: "#ico36_detail_floorsize",
-  parseToRDF: function({ value }) {
-    if (!value) {
-      return {};
-    }
-    return {
-      "sh:property": {
-        "sh:path": "s:floorSize",
-        "sh:minInclusive": value.min && [
-          { "@value": value.min, "@type": "xsd:float" },
-        ],
-        "sh:maxInclusive": value.max && [
-          { "@value": value.max, "@type": "xsd:float" },
-        ],
-      },
-    };
-  },
-  parseFromRDF: function(jsonLDImm) {
-    let properties = getFromJsonLd(
-      jsonLDImm,
-      "sh:property",
-      won.defaultContext
-    );
-    if (!properties) return undefined;
-
-    if (!Immutable.List.isList(properties))
-      properties = Immutable.List.of(properties);
-
-    const floorSize = properties.find(
-      property =>
-        getFromJsonLd(property, "sh:path", won.defaultContext) === "s:floorSize"
-    );
-
-    const minFloorSize = getFromJsonLd(
-      floorSize,
-      "sh:minInclusive",
-      won.defaultContext
-    );
-    const maxFloorSize = getFromJsonLd(
-      floorSize,
-      "sh:maxInclusive",
-      won.defaultContext
-    );
-
-    if (minFloorSize || maxFloorSize) {
-      return Immutable.fromJS({
-        min: minFloorSize && minFloorSize + "m²",
-        max: maxFloorSize && maxFloorSize + "m²",
-      });
-    } else {
-      return undefined;
-    }
-  },
-  generateHumanReadable: function({ value, includeLabel }) {
-    if (value) {
-      return (
-        (includeLabel ? `${this.label}: ` : "") +
-        minMaxLabel(value.min, value.max) +
-        "m²"
-      );
-    }
-    return undefined;
-  },
-};
-
-const realEstateFeaturesDetail = {
-  ...details.tags,
-  identifier: "features",
-  label: "Features",
-  icon: "#ico36_detail_feature",
-  placeholder: "e.g. balcony, bathtub",
-  parseToRDF: function({ value }) {
-    if (!value || !is("Array", value) || value.length === 0) {
-      return { "s:amenityFeature": undefined };
-    } else {
-      const features = value.map(feature => ({
-        "@type": "s:LocationFeatureSpecification",
-        "s:value": { "@value": feature, "@type": "s:Text" },
-      }));
-      return {
-        "s:amenityFeature": features,
-      };
-    }
-  },
-  parseFromRDF: function(jsonLDImm) {
-    return won.parseListFrom(
-      jsonLDImm,
-      ["s:amenityFeature"], //, "s:value"],
-      "s:Text"
-    );
-  },
-};
-
-const realEstateRentDetail = {
-  ...details.price,
-  identifier: "rent",
-  label: "Rent",
-  icon: "#ico36_detail_rent",
-  currency: [{ value: "EUR", label: "€", default: true }],
-  unitCode: [{ value: "MON", label: "per month", default: true }],
-  parseFromRDF: function() {
-    //That way we can make sure that parsing fromRDF is made only by the price detail itself
-    return undefined;
-  },
-};
-
-const realEstateRentRangeDetail = {
-  ...details.pricerange,
-  identifier: "rentRange",
-  label: "Rent in EUR/month",
-  minLabel: "From",
-  maxLabel: "To",
-  currency: [{ value: "EUR", label: "€", default: true }],
-  unitCode: [{ value: "MON", label: "per month", default: true }],
-  icon: "#ico36_detail_rent",
-  parseFromRDF: function() {
-    return undefined;
   },
 };
 
@@ -1350,72 +1035,6 @@ const mobilityUseCases = {
 /**
  * band musician use cases
  */
-const instrumentsDetail = {
-  ...details.tags,
-  identifier: "instruments",
-  label: "Instruments",
-  icon: "#ico36_detail_instrument",
-  placeholder: "e.g. Guitar, Vocals",
-  parseToRDF: function({ value }) {
-    if (!value) {
-      return { "won:instruments": undefined };
-    }
-    return { "won:instruments": value };
-  },
-  parseFromRDF: function(jsonLDImm) {
-    const instruments = jsonLDImm && jsonLDImm.get("won:instruments");
-    if (!instruments) {
-      return undefined;
-    } else if (is("String", instruments)) {
-      return Immutable.fromJS([instruments]);
-    } else if (is("Array", instruments)) {
-      return Immutable.fromJS(instruments);
-    } else if (Immutable.List.isList(instruments)) {
-      return instruments; // id; it is already in the format we want
-    } else {
-      console.error(
-        "Found unexpected format of instruments (should be Array, " +
-          "Immutable.List, or a single tag as string): " +
-          JSON.stringify(instruments)
-      );
-      return undefined;
-    }
-  },
-};
-
-const genresDetail = {
-  ...details.tags,
-  identifier: "genres",
-  label: "Genres",
-  icon: "#ico36_detail_genre",
-  placeholder: "e.g. Rock, Pop",
-  parseToRDF: function({ value }) {
-    if (!value) {
-      return { "won:genres": undefined };
-    }
-    return { "won:genres": value };
-  },
-  parseFromRDF: function(jsonLDImm) {
-    const genres = jsonLDImm && jsonLDImm.get("won:genres");
-    if (!genres) {
-      return undefined;
-    } else if (is("String", genres)) {
-      return Immutable.fromJS([genres]);
-    } else if (is("Array", genres)) {
-      return Immutable.fromJS(genres);
-    } else if (Immutable.List.isList(genres)) {
-      return genres; // id; it is already in the format we want
-    } else {
-      console.error(
-        "Found unexpected format of genres (should be Array, " +
-          "Immutable.List, or a single tag as string): " +
-          JSON.stringify(genres)
-      );
-      return undefined;
-    }
-  },
-};
-
 const musicianUseCases = {
   findBand: {
     identifier: "findBand",
