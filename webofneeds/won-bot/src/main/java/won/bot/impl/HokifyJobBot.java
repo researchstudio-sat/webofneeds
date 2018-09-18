@@ -72,6 +72,7 @@ public class HokifyJobBot extends EventBot {
             BotBehaviour connectionMessageBehaviour = new ConnectionMessageBehaviour(ctx);
             connectionMessageBehaviour.activate();
 
+            //bus.subscribe(eventClazz, listener);
             //Telegram initiated Events
             /*
             bus.subscribe(TelegramMessageReceivedEvent.class,

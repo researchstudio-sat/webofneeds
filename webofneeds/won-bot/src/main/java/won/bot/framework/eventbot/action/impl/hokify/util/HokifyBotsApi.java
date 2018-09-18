@@ -13,6 +13,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import won.bot.framework.eventbot.action.impl.hokify.HokifyJob;
 
 /**
@@ -29,7 +33,6 @@ public class HokifyBotsApi {
 
     public HokifyBotsApi(String jsonURL) {
         this.jsonURL = jsonURL;
-        System.out.println("THE URL ----------------------> " + this.jsonURL);
         fetchHokifyData();
     }
 
@@ -58,19 +61,33 @@ public class HokifyBotsApi {
             }
             JSONObject json = new JSONObject(sb.toString());
             JSONArray jobArray = new JSONArray(json.getString("jobs"));
+            ObjectMapper objectMapper = new ObjectMapper();
 
             for (int count = 0; count < jobArray.length(); count++) {
-                HokifyJob tmpJob = new HokifyJob((JSONObject) jobArray.get(count));
-                jobsList.add(tmpJob);
+                try {
+
+                    HokifyJob tmpJob = objectMapper.readValue(jobArray.getJSONObject(count).toString(),
+                            HokifyJob.class);
+                    //String value = objectMapper.writeValueAsString(tmpJob);
+                    //System.out.println("VALUE : " + value);
+                    jobsList.add(tmpJob);
+                } catch (JsonParseException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (JsonMappingException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+
             }
             httpClient.close();
             response.getEntity().getContent().close();
         } catch (ClientProtocolException e) {
-
             e.printStackTrace();
-
         } catch (IOException e) {
-
             e.printStackTrace();
         } catch (JSONException e) {
             // TODO Auto-generated catch block

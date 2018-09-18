@@ -1,10 +1,10 @@
 package won.bot.framework.eventbot.action.impl.hokify;
 
-import java.util.Date;
+import java.util.List;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * 
@@ -13,54 +13,50 @@ import org.json.JSONObject;
  */
 public class HokifyJob {
 
+    private static final String TITLE = "title";
+    private static final String DATE = "date";
+    private static final String REFERENCENUMBER = "referencenumber";
+    private static final String IMAGE = "image";
+    private static final String URL = "url";
+    private static final String COMPANY = "company";
+    private static final String CITY = "city";
+    private static final String COUNTRY = "country";
+    private static final String DESCRIPTION = "description";
+    private static final String SALARY = "salary";
+    private static final String JOBTYPE = "jobtype";
+    private static final String FIELD = "field";
+    private static final String STATS = "stats";
+
+    @JsonProperty(TITLE)
     private String title;
     // TODO Change to right date format
+    @JsonProperty(DATE)
     private String date;
+    @JsonProperty(REFERENCENUMBER)
     private String referencenumber;
+    @JsonProperty(IMAGE)
     private String image;
+    @JsonProperty(URL)
     private String url;
+    @JsonProperty(COMPANY)
     private String company;
+    @JsonProperty(CITY)
     private String city;
+    @JsonProperty(COUNTRY)
     private String country;
+    @JsonProperty(DESCRIPTION)
     private String description;
+    @JsonProperty(SALARY)
     private String salary;
+    @JsonProperty(JOBTYPE)
     private String jobtype;
-    private JSONArray field;
+    @JsonProperty(FIELD)
+    private List field;
+    @JsonProperty(STATS)
     private Stats stats;
 
-    public HokifyJob(JSONObject object) {
-        this.createJobFromJson(object);
-        System.out.println(this.toString());
-    }
+    public HokifyJob() {
 
-    public void createJobFromJson(JSONObject object) {
-        try {
-            this.title = object.getString("title");
-            this.date = object.getString("date");
-            this.referencenumber = object.getString("referencenumber");
-            this.image = object.getString("image");
-            this.url = object.getString("url");
-            this.company = object.getString("company");
-            this.city = object.getString("city");
-            this.country = object.getString("country");
-            this.description = object.getString("description");
-            try {
-                this.salary = object.getString("salary");
-            } catch (org.json.JSONException e) {
-                this.salary = "Na";
-                System.out.println("no salary for " + this.title);
-            }
-            this.jobtype = object.getString("jobtype");
-            this.field = object.getJSONArray("field");
-            try {
-                this.stats = new Stats(object.getJSONObject("stats"));
-            } catch (org.json.JSONException e) {
-                this.stats = null;
-                System.out.println("no stats for " + this.title);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -78,48 +74,232 @@ public class HokifyJob {
         }
     }
 
-}
-
-class Stats {
-    private Views views;
-    private int discarded;
-    private int saved;
-    private int applied;
-    private int appliedLast20Days;
-    private int smslink;
-
-    public Stats(JSONObject object) throws JSONException {
-        this.views = new Views(object.getJSONObject("views"));
-        this.discarded = Integer.parseInt(object.getString("discarded"));
-        this.saved = Integer.parseInt(object.getString("saved"));
-        this.applied = Integer.parseInt(object.getString("applied"));
-        this.appliedLast20Days = Integer.parseInt(object.getString("appliedLast20Days2"));
-        this.smslink = Integer.parseInt(object.getString("smslink"));
+    public String getTitle() {
+        return title;
     }
 
-    @Override
-    public String toString() {
-        return "Stats [views=" + views.toString() + ", discarded=" + discarded + ", saved=" + saved + ", applied="
-                + applied + ", appliedLast20Days=" + appliedLast20Days + ", smslink=" + smslink + "]";
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-}
-
-class Views {
-    private int web;
-    private int app;
-    private int external;
-
-    public Views(JSONObject object) throws NumberFormatException, JSONException {
-        this.web = Integer.parseInt(object.getString("web"));
-        this.app = Integer.parseInt(object.getString("app"));
-        this.external = Integer.parseInt(object.getString("external"));
-
+    public String getDate() {
+        return date;
     }
 
-    @Override
-    public String toString() {
-        return "Views [web=" + web + ", app=" + app + ", external=" + external + "]";
+    public void setDate(String date) {
+        this.date = date;
     }
 
+    public String getReferencenumber() {
+        return referencenumber;
+    }
+
+    public void setReferencenumber(String referencenumber) {
+        this.referencenumber = referencenumber;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getCompany() {
+        return company;
+    }
+
+    public void setCompany(String company) {
+        this.company = company;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getSalary() {
+        return salary;
+    }
+
+    public void setSalary(String salary) {
+        this.salary = salary;
+    }
+
+    public String getJobtype() {
+        return jobtype;
+    }
+
+    public void setJobtype(String jobtype) {
+        this.jobtype = jobtype;
+    }
+
+    public List getField() {
+        return field;
+    }
+
+    public void setField(List field) {
+        this.field = field;
+    }
+
+    public Stats getStats() {
+        return stats;
+    }
+
+    public void Stats(Stats stats) {
+        this.stats = stats;
+    }
+
+    static class Stats {
+
+        private static final String VIEWS = "views";
+        private static final String DISCARDED = "discarded";
+        private static final String SAVED = "saved";
+        private static final String APPLIED = "applied";
+        private static final String APPLIEDLAST30DAYS = "appliedLast30Days";
+        private static final String SMSLINK = "smslink";
+
+        @JsonProperty(VIEWS)
+        private Views views;
+        @JsonProperty(DISCARDED)
+        private int discarded;
+        @JsonProperty(SAVED)
+        private int saved;
+        @JsonProperty(APPLIED)
+        private int applied;
+        @JsonProperty(APPLIEDLAST30DAYS)
+        private int appliedLast30Days;
+        @JsonProperty(SMSLINK)
+        private int smslink;
+
+        public Stats() {
+        }
+
+        @Override
+        public String toString() {
+            return "Stats [views=" + views.toString() + ", discarded=" + discarded + ", saved=" + saved + ", applied="
+                    + applied + ", appliedLast30Days=" + appliedLast30Days + ", smslink=" + smslink + "]";
+        }
+
+        public Views getViews() {
+            return views;
+        }
+
+        public void setViews(Views views) {
+            this.views = views;
+        }
+
+        public int getDiscarded() {
+            return discarded;
+        }
+
+        public void setDiscarded(int discarded) {
+            this.discarded = discarded;
+        }
+
+        public int getSaved() {
+            return saved;
+        }
+
+        public void setSaved(int saved) {
+            this.saved = saved;
+        }
+
+        public int getApplied() {
+            return applied;
+        }
+
+        public void setApplied(int applied) {
+            this.applied = applied;
+        }
+
+        public int getAppliedLast30Days() {
+            return appliedLast30Days;
+        }
+
+        public void setAppliedLast30Days(int appliedLast30Days) {
+            this.appliedLast30Days = appliedLast30Days;
+        }
+
+        public int getSmslink() {
+            return smslink;
+        }
+
+        public void setSmslink(int smslink) {
+            this.smslink = smslink;
+        }
+
+        static class Views {
+            private static final String WEB = "web";
+            private static final String APP = "app";
+            private static final String EXTERNAL = "external";
+
+            @JsonProperty(WEB)
+            private int web;
+            @JsonProperty(APP)
+            private int app;
+            @JsonProperty(EXTERNAL)
+            private int external;
+
+            public Views() {
+            }
+
+            @Override
+            public String toString() {
+                return "Views [web=" + web + ", app=" + app + ", external=" + external + "]";
+            }
+
+            public int getWeb() {
+                return web;
+            }
+
+            public void setWeb(int web) {
+                this.web = web;
+            }
+
+            public int getApp() {
+                return app;
+            }
+
+            public void setApp(int app) {
+                this.app = app;
+            }
+
+            public int getExternal() {
+                return external;
+            }
+
+            public void setExternal(int external) {
+                this.external = external;
+            }
+        }
+    }
 }
