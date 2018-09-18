@@ -13,7 +13,14 @@ import {
 import { genresDetail, instrumentsDetail } from "musicianDetails";
 import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-utils.js";
 
-export const musicianUseCases = {
+export const musicianGroup = {
+  identifier: "musiciangroup",
+  label: "Artists and Bands",
+  icon: undefined,
+  useCases: { ...musicianUseCases },
+};
+
+const musicianUseCases = {
   findBand: {
     identifier: "findBand",
     label: "Find Band",

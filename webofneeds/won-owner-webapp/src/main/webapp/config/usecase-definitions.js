@@ -1,11 +1,11 @@
 import { details, emptyDraft } from "detailDefinitions";
-import { realEstateUseCases } from "realEstateUseCases";
-import { transportUseCases } from "transportUseCases";
-import { complainUseCases } from "complainUseCases";
-import { socialUseCases } from "socialUseCases";
-import { professionalUseCases } from "professionalUseCases";
-import { mobilityUseCases } from "mobilityUseCases";
-import { musicianUseCases } from "musicianUseCases";
+import { realEstateGroup } from "realEstateUseCases";
+import { transportGroup } from "transportUseCases";
+import { complainGroup } from "complainUseCases";
+import { socialGroup } from "socialUseCases";
+import { professionalGroup } from "professionalUseCases";
+import { mobilityGroup } from "mobilityUseCases";
+import { musicianGroup } from "musicianUseCases";
 
 import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../app/won-utils.js";
 
@@ -64,48 +64,13 @@ const allDetailsUseCase = {
 };
 
 export const useCaseGroups = {
-  complain: {
-    identifier: "complaingroup",
-    label: "Complaints",
-    icon: undefined,
-    useCases: { ...complainUseCases },
-  },
-  transport: {
-    identifier: "transportgroup",
-    label: "Transport and Delivery",
-    icon: undefined,
-    useCases: { ...transportUseCases },
-  },
-  mobility: {
-    identifier: "mobilitygroup",
-    label: "Personal Mobility",
-    icon: undefined,
-    useCases: { ...mobilityUseCases },
-  },
-  realEstate: {
-    identifier: "realestategroup",
-    label: "Real Estate",
-    icon: undefined,
-    useCases: { ...realEstateUseCases },
-  },
-  musician: {
-    identifier: "musiciangroup",
-    label: "Artists and Bands",
-    icon: undefined,
-    useCases: { ...musicianUseCases },
-  },
-  social: {
-    identifier: "socialgroup",
-    label: "Social Activities",
-    icon: undefined,
-    useCases: { ...socialUseCases },
-  },
-  professional: {
-    identifier: "professionalgroup",
-    label: "Professional Networking",
-    icon: undefined,
-    useCases: { ...professionalUseCases },
-  },
+  complain: complainGroup,
+  transport: transportGroup,
+  mobility: mobilityGroup,
+  realEstate: realEstateGroup,
+  musician: musicianGroup,
+  social: socialGroup,
+  professional: professionalGroup,
   other: {
     identifier: "othergroup",
     label: "Something Else",

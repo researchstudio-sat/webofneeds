@@ -5,7 +5,14 @@ import { details, emptyDraft } from "detailDefinitions";
 import { interestsDetail, skillsDetail } from "personDetails";
 import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-utils.js";
 
-export const professionalUseCases = {
+export const professionalGroup = {
+  identifier: "professionalgroup",
+  label: "Professional Networking",
+  icon: undefined,
+  useCases: { ...professionalUseCases },
+};
+
+const professionalUseCases = {
   getToKnow: {
     identifier: "getToKnow",
     label: "Find people",

@@ -4,7 +4,14 @@
 import { details, emptyDraft } from "detailDefinitions";
 import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-utils.js";
 
-export const complainUseCases = {
+export const complainGroup = {
+  identifier: "complaingroup",
+  label: "Complaints",
+  icon: undefined,
+  useCases: { ...complainUseCases },
+};
+
+const complainUseCases = {
   complain: {
     identifier: "complain",
     label: "Complain about something",

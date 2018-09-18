@@ -23,7 +23,14 @@ import {
 } from "../../app/sparql-builder-utils.js";
 import won from "../../app/won-es6.js";
 
-export const realEstateUseCases = {
+export const realEstateGroup = {
+  identifier: "realestategroup",
+  label: "Real Estate",
+  icon: undefined,
+  useCases: { ...realEstateUseCases },
+};
+
+const realEstateUseCases = {
   searchRent: {
     identifier: "searchRent",
     label: "Find a place to rent",

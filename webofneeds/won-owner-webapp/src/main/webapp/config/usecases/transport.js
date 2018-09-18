@@ -6,7 +6,14 @@ import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-u
 import won from "../../app/won-es6.js";
 import { isValidNumber, get, getInFromJsonLd } from "../../app/utils.js";
 
-export const transportUseCases = {
+export const transportGroup = {
+  identifier: "transportgroup",
+  label: "Transport and Delivery",
+  icon: undefined,
+  useCases: { ...transportUseCases },
+};
+
+const transportUseCases = {
   transportDemand: {
     identifier: "transportDemand",
     label: "Send something",

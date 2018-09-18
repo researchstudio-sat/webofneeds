@@ -5,7 +5,14 @@ import { details, emptyDraft } from "detailDefinitions";
 import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-utils.js";
 import { interestsDetail } from "personDetails";
 
-export const socialUseCases = {
+export const socialGroup = {
+  identifier: "socialgroup",
+  label: "Social Activities",
+  icon: undefined,
+  useCases: { ...socialUseCases },
+};
+
+const socialUseCases = {
   breakfast: {
     identifier: "breakfast",
     label: "Get breakfast",

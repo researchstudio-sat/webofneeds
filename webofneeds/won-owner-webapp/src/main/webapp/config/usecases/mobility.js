@@ -12,7 +12,14 @@ import {
   sparqlQuery,
 } from "../../app/sparql-builder-utils.js";
 
-export const mobilityUseCases = {
+export const mobilityGroup = {
+  identifier: "mobilitygroup",
+  label: "Personal Mobility",
+  icon: undefined,
+  useCases: { ...mobilityUseCases },
+};
+
+const mobilityUseCases = {
   liftDemand: {
     identifier: "liftDemand",
     label: "Need a Lift",
