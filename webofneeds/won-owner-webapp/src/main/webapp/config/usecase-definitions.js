@@ -90,13 +90,3 @@ for (let key in useCaseGroups) {
 }
 
 export const useCases = tempUseCases;
-// export const useCases = {
-//   ...complainUseCases,
-//   ...socialUseCases,
-//   ...professionalUseCases,
-//   ...realEstateUseCases,
-//   ...transportUseCases,
-//   ...mobilityUseCases,
-//   ...musicianUseCases,
-//   ...allDetailsUseCase,
-// };
