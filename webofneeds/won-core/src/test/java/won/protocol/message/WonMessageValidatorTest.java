@@ -153,6 +153,23 @@ public class WonMessageValidatorTest
   }
 
   @Test
+  public void testValidCreateMessage2() throws IOException {
+    WonMessageValidator validator = new WonMessageValidator();
+    StringBuilder message = new StringBuilder();
+    boolean valid = validator.validate(Utils.createTestDataset("/validation/valid/create_msg2.trig"), message);
+    Assert.assertTrue("validation is expected not to fail at " + message, valid);
+  }
+  
+  @Test
+  public void testValidFailureResponseMessage() throws IOException {
+    WonMessageValidator validator = new WonMessageValidator();
+    StringBuilder message = new StringBuilder();
+    boolean valid = validator.validate(Utils.createTestDataset("/validation/valid/failure_response_msg.trig"), message);
+    Assert.assertTrue("validation is expected not to fail at " + message, valid);
+  }
+
+  
+  @Test
   public void testInvalidDefaultGraph() throws IOException {
 
     // create invalid dataset by adding a triple into the default graph

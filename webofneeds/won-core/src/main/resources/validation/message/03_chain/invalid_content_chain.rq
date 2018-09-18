@@ -38,10 +38,12 @@ prefix rdfg:   <http://www.w3.org/2004/03/trix/rdfg-1/>
     {SELECT ?type
       WHERE
       {
-          graph ?g{
-              ?g rdfg:subGraphOf ?event.
-                   ?event msg:hasMessageType ?type.
-                 ?event a msg:FromExternal
+          optional {
+            graph ?g{
+                ?g rdfg:subGraphOf ?event.
+                     ?event msg:hasMessageType ?type.
+                   ?event a msg:FromExternal
+            }
           }
         }
     }
