@@ -178,10 +178,11 @@ export function filterAboutTime(
     return wellFormedFilter({
       prefixes: {
         s: won.defaultContext["s"],
+        xsd: won.defaultContext["xsd"],
       },
       operations: [
-        `FILTER (${rootSubject} >= ${minStr} )`,
-        `FILTER (${rootSubject} <= ${maxStr} )`,
+        `FILTER (${rootSubject} >= "${minStr}"^^xsd:dateTime )`,
+        `FILTER (${rootSubject} <= "${maxStr}"^^xsd:dateTime )`,
       ],
     });
   }
