@@ -13,6 +13,12 @@ import {
 import Immutable from "immutable";
 import won from "../app/won-es6.js";
 
+export const emptyDraft = {
+  is: {},
+  seeks: {},
+  matchingContext: undefined,
+};
+
 /**
  * Defines a set of details that will only be visible within a specific 'implementation'
  * you will need to alter the identifier, label, icon, parseToRDF, and parseFromRDF if
