@@ -1310,34 +1310,4 @@ export const details = {
       return undefined;
     },
   },
-  ttl: {
-    identifier: "ttl",
-    label: "Turtle (TTL)",
-    icon: "#ico36_detail_ttl",
-    placeholder: "Enter TTL...",
-    component: "won-ttl-picker",
-    viewerComponent: undefined,
-    parseToRDF: function({ value }) {
-      if (!value) {
-        return undefined;
-      }
-      return undefined;
-      // TODO: return value
-    },
-    parseFromRDF: function(jsonLDImm) {
-      //console.error("IMPLEMENT ME", jsonLDImm);
-      if (!jsonLDImm) {
-        return undefined;
-      }
-      return undefined;
-      // TODO: return value
-    },
-    generateHumanReadable: function({ value, includeLabel }) {
-      //TODO: implement generateHumanReadable
-      if (!value || includeLabel) {
-        return undefined;
-      }
-      return undefined;
-    },
-  },
 };

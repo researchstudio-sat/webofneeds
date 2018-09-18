@@ -36,7 +36,6 @@ import personPickerModule from "./details/picker/person-picker.js";
 import travelActionPickerModule from "./details/picker/travel-action-picker.js";
 import tagsPickerModule from "./details/picker/tags-picker.js";
 import titlePickerModule from "./details/picker/title-picker.js";
-import ttlPickerModule from "./details/picker/ttl-picker.js";
 import numberPickerModule from "./details/picker/number-picker.js";
 import pricePickerModule from "./details/picker/price-picker.js";
 import datetimePickerModule from "./details/picker/datetime-picker.js";
@@ -669,7 +668,6 @@ export default angular
     numberPickerModule,
     pricePickerModule,
     datetimePickerModule,
-    ttlPickerModule,
     dropdownPickerModule,
     selectPickerModule,
     rangePickerModule,
