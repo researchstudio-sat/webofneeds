@@ -96,7 +96,6 @@ import personPickerModule from "./components/details/picker/person-picker.js";
 import travelActionPickerModule from "./components/details/picker/travel-action-picker.js";
 import tagsPickerModule from "./components/details/picker/tags-picker.js";
 import titlePickerModule from "./components/details/picker/title-picker.js";
-import ttlPickerModule from "./components/details/picker/ttl-picker.js";
 import numberPickerModule from "./components/details/picker/number-picker.js";
 import pricePickerModule from "./components/details/picker/price-picker.js";
 import datetimePickerModule from "./components/details/picker/datetime-picker.js";
@@ -115,7 +114,6 @@ const pickerModules = [
   travelActionPickerModule,
   tagsPickerModule,
   titlePickerModule,
-  ttlPickerModule,
   numberPickerModule,
   pricePickerModule,
   datetimePickerModule,
