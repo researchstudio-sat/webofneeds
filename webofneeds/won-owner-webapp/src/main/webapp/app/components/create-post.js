@@ -15,24 +15,6 @@ import { selectIsConnected } from "../selectors.js";
 
 // import { details } from "detailDefinitions";
 import { useCases } from "useCaseDefinitions";
-// TODO: these should be replaced by importing defintions from config
-import descriptionPickerModule from "./details/picker/description-picker.js";
-import locationPickerModule from "./details/picker/location-picker.js";
-import personPickerModule from "./details/picker/person-picker.js";
-import travelActionPickerModule from "./details/picker/travel-action-picker.js";
-import tagsPickerModule from "./details/picker/tags-picker.js";
-import titlePickerModule from "./details/picker/title-picker.js";
-import ttlPickerModule from "./details/picker/ttl-picker.js";
-import numberPickerModule from "./details/picker/number-picker.js";
-import pricePickerModule from "./details/picker/price-picker.js";
-import datetimePickerModule from "./details/picker/datetime-picker.js";
-import dropdownPickerModule from "./details/picker/dropdown-picker.js";
-import selectPickerModule from "./details/picker/select-picker.js";
-import rangePickerModule from "./details/picker/range-picker.js";
-import priceRangePickerModule from "./details/picker/price-range-picker.js";
-import filePickerModule from "./details/picker/file-picker.js";
-import workflowPickerModule from "./details/picker/workflow-picker.js";
-import petrinetPickerModule from "./details/picker/petrinet-picker.js";
 
 import "style/_create-post.scss";
 import "style/_responsiveness-utils.scss";
@@ -392,25 +374,8 @@ export default //.controller('CreateNeedController', [...serviceDependencies, Cr
 angular
   .module("won.owner.components.createPost", [
     labelledHrModule,
-    descriptionPickerModule,
-    locationPickerModule,
-    personPickerModule,
-    travelActionPickerModule,
-    tagsPickerModule,
-    titlePickerModule,
-    numberPickerModule,
-    pricePickerModule,
-    datetimePickerModule,
-    ttlPickerModule,
-    dropdownPickerModule,
     createIsseeksModule,
     matchingContextModule,
-    selectPickerModule,
-    rangePickerModule,
-    priceRangePickerModule,
-    filePickerModule,
-    workflowPickerModule,
-    petrinetPickerModule,
     ngAnimate,
   ])
   .directive("wonCreatePost", genComponentConf).name;

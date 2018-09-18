@@ -12,8 +12,6 @@ import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
 import { selectIsConnected } from "../selectors.js";
 
-import titlePickerModule from "./details/picker/title-picker.js";
-
 //TODO can't inject $scope with the angular2-router, preventing redux-cleanup
 const serviceDependencies = [
   "$ngRedux",
@@ -239,7 +237,6 @@ export default //.controller('CreateNeedController', [...serviceDependencies, Cr
 angular
   .module("won.owner.components.createSearch", [
     labelledHrModule,
-    titlePickerModule,
     matchingContextModule,
     ngAnimate,
   ])

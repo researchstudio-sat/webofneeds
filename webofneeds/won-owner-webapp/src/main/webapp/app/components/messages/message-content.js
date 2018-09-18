@@ -6,22 +6,6 @@ import { getAllDetails } from "../../won-utils.js";
 import { attach, getIn, get } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import { selectNeedByConnectionUri } from "../../selectors.js";
-// TODO: these should be replaced by importing defintions from config
-import personViewerModule from "../details/viewer/person-viewer.js";
-import descriptionViewerModule from "../details/viewer/description-viewer.js";
-import locationViewerModule from "../details/viewer/location-viewer.js";
-import tagsViewerModule from "../details/viewer/tags-viewer.js";
-import travelActionViewerModule from "../details/viewer/travel-action-viewer.js";
-import titleViewerModule from "../details/viewer/title-viewer.js";
-import numberViewerModule from "../details/viewer/number-viewer.js";
-import priceViewerModule from "../details/viewer/price-viewer.js";
-import datetimeViewerModule from "../details/viewer/datetime-viewer.js";
-import dropdownViewerModule from "../details/viewer/dropdown-viewer.js";
-import selectViewerModule from "../details/viewer/select-viewer.js";
-import rangeViewerModule from "../details/viewer/range-viewer.js";
-import fileViewerModule from "../details/viewer/file-viewer.js";
-import workflowViewerModule from "../details/viewer/workflow-viewer.js";
-import petrinetViewerModule from "../details/viewer/petrinet-viewer.js";
 
 import "style/_message-content.scss";
 
@@ -130,23 +114,7 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.messageContent", [
-    personViewerModule,
-    descriptionViewerModule,
-    locationViewerModule,
-    travelActionViewerModule,
-    tagsViewerModule,
-    titleViewerModule,
-    numberViewerModule,
-    priceViewerModule,
-    dropdownViewerModule,
-    datetimeViewerModule,
-    selectViewerModule,
-    rangeViewerModule,
-    fileViewerModule,
-    workflowViewerModule,
-    petrinetViewerModule,
-  ])
+  .module("won.owner.components.messageContent", [])
   .directive("messageDetailViewerElement", [
     "$compile",
     function($compile) {
