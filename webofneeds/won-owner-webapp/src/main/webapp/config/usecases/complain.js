@@ -8,51 +8,49 @@ export const complainGroup = {
   identifier: "complaingroup",
   label: "Complaints",
   icon: undefined,
-  useCases: { ...complainUseCases },
-};
-
-const complainUseCases = {
-  complain: {
-    identifier: "complain",
-    label: "Complain about something",
-    icon: "#ico36_uc_wtf",
-    doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
-    draft: {
-      ...emptyDraft,
-      is: {
-        title: "WTF?",
-        tags: ["wtf"],
+  useCases: {
+    complain: {
+      identifier: "complain",
+      label: "Complain about something",
+      icon: "#ico36_uc_wtf",
+      doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
+      draft: {
+        ...emptyDraft,
+        is: {
+          title: "WTF?",
+          tags: ["wtf"],
+        },
+        seeks: {},
+        searchString: "wtf",
       },
-      seeks: {},
-      searchString: "wtf",
-    },
-    isDetails: {
-      title: { ...details.title },
-      description: { ...details.description },
-      location: { ...details.location },
-      tags: { ...details.tags },
-    },
-    seeksDetails: undefined,
-  },
-  handleComplaints: {
-    identifier: "handleComplaints",
-    label: "Handle complaints",
-    icon: "#ico36_uc_wtf_interest",
-    doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
-    draft: {
-      ...emptyDraft,
-      is: {
-        title: "I'll discuss complaints",
+      isDetails: {
+        title: { ...details.title },
+        description: { ...details.description },
+        location: { ...details.location },
+        tags: { ...details.tags },
       },
-      seeks: {},
-      searchString: "wtf",
+      seeksDetails: undefined,
     },
-    isDetails: {
-      title: { ...details.title },
-      description: { ...details.description },
-      location: { ...details.location },
-      tags: { ...details.tags },
+    handleComplaints: {
+      identifier: "handleComplaints",
+      label: "Handle complaints",
+      icon: "#ico36_uc_wtf_interest",
+      doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
+      draft: {
+        ...emptyDraft,
+        is: {
+          title: "I'll discuss complaints",
+        },
+        seeks: {},
+        searchString: "wtf",
+      },
+      isDetails: {
+        title: { ...details.title },
+        description: { ...details.description },
+        location: { ...details.location },
+        tags: { ...details.tags },
+      },
+      seeksDetails: undefined,
     },
-    seeksDetails: undefined,
   },
 };
