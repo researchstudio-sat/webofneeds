@@ -45,10 +45,8 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
       WHERE
       {
           graph ?g{
-            optional {
               ?g rdfg:subGraphOf ?event.
                    ?event msg:hasMessageType ?type.
-                 ?event a msg:FromExternal}
            }
         }
     }

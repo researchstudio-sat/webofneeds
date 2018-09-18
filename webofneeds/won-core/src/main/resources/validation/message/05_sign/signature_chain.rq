@@ -1,4 +1,4 @@
-prefix dc:    <http://purl.org/dc/elements/1.1/>
+  prefix dc:    <http://purl.org/dc/elements/1.1/>
 prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
 prefix geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#>
 prefix conn:  <http://localhost:8080/won/resource/connection/>
@@ -25,12 +25,26 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
     ?contentChainSize
     ?parallelContentSigChainSize
 
-    (if(?envChainSize != ?parallelEnvSigChainSize || ?contentChainSize != ?parallelContentSigChainSize, "FAIL",
-    "OK")
+    (if((bound(?type) && ?type = msg:HintMessage) || ! (?envChainSize != ?parallelEnvSigChainSize || ?contentChainSize != ?parallelContentSigChainSize), "OK",
+    "FAIL")
     AS ?check)
 
   WHERE
   {
+
+    {SELECT ?type
+      WHERE
+      { 
+        optional {
+          graph ?g{
+            ?g rdfg:subGraphOf ?event.
+                 ?event msg:hasMessageType ?type.
+               ?event a msg:FromExternal
+          }
+        }
+      }
+    }
+
 
     { SELECT (count(distinct ?envelope) as ?envChainSize)
       WHERE
