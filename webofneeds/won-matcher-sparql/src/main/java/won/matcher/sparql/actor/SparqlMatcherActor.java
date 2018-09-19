@@ -364,7 +364,7 @@ public class SparqlMatcherActor extends UntypedActor {
 
         Set<NeedModelWrapper> needs = query.map(q -> {
             if (log.isDebugEnabled()) {
-                log.debug("transforming query for (no) hint for counterpart: {}", q);
+                log.debug("transforming query, adding 'no hint for counterpart' restriction: {}", q);
             }
             Op noHintForCounterpartQuery = Transformer.transform(new TransformCopy() {
                 public Op transform(OpProject op, Op subOp) {
@@ -385,7 +385,10 @@ public class SparqlMatcherActor extends UntypedActor {
                             config.getLimitResults() * 5);
                 }
             }, q);
-
+            if (log.isDebugEnabled()) {
+                log.debug("transformed query: {}", noHintForCounterpartQuery);
+                log.debug("transforming query, adding 'wihout no hint for counterpart' restriction: {}", q);
+            }
             Op hintForCounterpartQuery = Transformer.transform(new TransformCopy() {
                 public Op transform(OpProject op, Op subOp) {
                     return new OpSlice(
@@ -408,7 +411,9 @@ public class SparqlMatcherActor extends UntypedActor {
                     );
                 }
             }, q);
-
+            if (log.isDebugEnabled()) {
+                log.debug("transformed query: {}", hintForCounterpartQuery);
+            }
             return Stream.concat(
                     executeQuery(noHintForCounterpartQuery, needUriToMatch, datasetToQuery),
                     executeQuery(hintForCounterpartQuery, needUriToMatch, datasetToQuery)
