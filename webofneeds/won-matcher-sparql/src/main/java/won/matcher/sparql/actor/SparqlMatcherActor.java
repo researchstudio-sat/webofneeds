@@ -252,9 +252,12 @@ public class SparqlMatcherActor extends UntypedActor {
                         // query for the matched need - but only in the dataset containing the original need. If we have a match, it means
                         // that the matched need should also get a hint, otherwise it should not.
                         if (log.isDebugEnabled()) {
-                            log.debug("checking for inverse matcheds of {} ", need.getNeedUri());
+                            log.debug("checking for inverse matches of {} ", need.getNeedUri());
                         }
                         Set<NeedModelWrapper> matchForMatchedNeed = queryNeed(matchedNeed, Optional.of(need.getNeedUri()), Optional.of(need.copyDataset()));
+                        if (log.isDebugEnabled()) {
+                            log.debug("inverse match {} of {} is also getting a hint: {}", new Object[] {matchedNeed.getNeedUri(), need.getNeedUri(), matchForMatchedNeed.size() > 0});
+                        }
                         return new AbstractMap.SimpleEntry<>(matchedNeed, matchForMatchedNeed);
                     } else {
                         // the flags in the original or in the matched need forbid a hint. don't add one.
