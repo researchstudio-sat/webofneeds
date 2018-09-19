@@ -10,6 +10,7 @@ export const skillsDetail = {
   label: "Skills",
   icon: "#ico36_detail_skill",
   placeholder: "e.g. RDF, project-management",
+  messageEnabled: false,
   parseToRDF: function({ value }) {
     if (!value) {
       return { "s:knowsAbout": undefined };
@@ -27,6 +28,7 @@ export const interestsDetail = {
   label: "Interests",
   icon: "#ico36_detail_interests",
   placeholder: "e.g. food, cats",
+  messageEnabled: false,
   parseToRDF: function({ value }) {
     if (!value) {
       return { "foaf:topic_interest": undefined };

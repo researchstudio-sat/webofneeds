@@ -33,6 +33,7 @@ export const realEstateFloorSizeDetail = {
   identifier: "floorSize",
   label: "Floor size in square meters",
   icon: "#ico36_detail_floorsize",
+  messageEnabled: false,
   parseToRDF: function({ value }) {
     if (!isValidNumber(value)) {
       return { "s:floorSize": undefined };
@@ -85,6 +86,7 @@ export const realEstateNumberOfRoomsDetail = {
   identifier: "numberOfRooms",
   label: "Number of Rooms",
   icon: "#ico36_detail_number-of-rooms",
+  messageEnabled: false,
   parseToRDF: function({ value }) {
     if (!isValidNumber(value)) {
       return { "s:numberOfRooms": undefined };
@@ -110,6 +112,7 @@ export const realEstateNumberOfRoomsRangeDetail = {
   label: "Number of Rooms",
   minLabel: "From",
   maxLabel: "To",
+  messageEnabled: false,
   icon: "#ico36_detail_number-of-rooms",
   parseToRDF: function({ value }) {
     if (!value) {
@@ -182,6 +185,7 @@ export const realEstateFloorSizeRangeDetail = {
   minLabel: "From",
   maxLabel: "To",
   icon: "#ico36_detail_floorsize",
+  messageEnabled: false,
   parseToRDF: function({ value }) {
     if (!value) {
       return {};
@@ -252,6 +256,7 @@ export const realEstateFeaturesDetail = {
   label: "Features",
   icon: "#ico36_detail_feature",
   placeholder: "e.g. balcony, bathtub",
+  messageEnabled: false,
   parseToRDF: function({ value }) {
     if (!value || !is("Array", value) || value.length === 0) {
       return { "s:amenityFeature": undefined };
@@ -281,6 +286,7 @@ export const realEstateRentDetail = {
   icon: "#ico36_detail_rent",
   currency: [{ value: "EUR", label: "€", default: true }],
   unitCode: [{ value: "MON", label: "per month", default: true }],
+  messageEnabled: false,
   parseFromRDF: function() {
     //That way we can make sure that parsing fromRDF is made only by the price detail itself
     return undefined;
@@ -296,6 +302,7 @@ export const realEstateRentRangeDetail = {
   currency: [{ value: "EUR", label: "€", default: true }],
   unitCode: [{ value: "MON", label: "per month", default: true }],
   icon: "#ico36_detail_rent",
+  messageEnabled: false,
   parseFromRDF: function() {
     return undefined;
   },

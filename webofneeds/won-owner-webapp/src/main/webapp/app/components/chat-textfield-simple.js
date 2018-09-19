@@ -23,7 +23,7 @@ import {
   selectProposableMessagesByConnectionUri,
   selectSelectedMessagesByConnectionUri,
 } from "../selectors.js";
-import { getAllDetails } from "../won-utils.js";
+import { getAllMessageDetails } from "../won-utils.js";
 import autoresizingTextareaModule from "../directives/textarea-autogrow.js";
 import { actionCreators } from "../actions/actions.js";
 import labelledHrModule from "./labelled-hr.js";
@@ -75,7 +75,7 @@ function genComponentConf() {
             <won-labelled-hr label="::'Details'" class="cts__details__grid__hr"
               ng-if="!self.multiSelectType && self.isConnected"></won-labelled-hr>
             <div class="cts__details__grid__detail"
-              ng-repeat="detail in self.allDetails"
+              ng-repeat="detail in self.allMessageDetails"
               ng-click="self.pickDetail(detail)">
               <svg class="cts__details__grid__detail__icon" ng-if="detail.icon">
                 <use xlink:href={{detail.icon}} href={{detail.icon}}></use>
@@ -219,11 +219,11 @@ function genComponentConf() {
             </div>
             <div class="cts__additionalcontent__list__item" ng-repeat="key in self.getAdditionalContentKeysArray()">
               <svg class="cts__additionalcontent__list__item__icon clickable"
-                ng-click="self.pickDetail(self.allDetails[key])">
-                <use xlink:href={{self.allDetails[key].icon}} href={{self.allDetails[key].icon}}></use>
+                ng-click="self.pickDetail(self.allMessageDetails[key])">
+                <use xlink:href={{self.allMessageDetails[key].icon}} href={{self.allMessageDetails[key].icon}}></use>
               </svg>
               <span class="cts__additionalcontent__list__item__label clickable"
-                ng-click="self.pickDetail(self.allDetails[key])">
+                ng-click="self.pickDetail(self.allMessageDetails[key])">
                 {{ self.getHumanReadableDetailString(key, self.additionalContent.get(key)) }}
               </span>
               <svg class="cts__additionalcontent__list__item__discard clickable"
@@ -252,7 +252,7 @@ function genComponentConf() {
     constructor(/* arguments <- serviceDependencies */) {
       attach(this, serviceDependencies, arguments);
       window.ctfs4dbg = this;
-      this.allDetails = getAllDetails();
+      this.allMessageDetails = getAllMessageDetails();
 
       this.draftObject = {};
       this.additionalContent = new Map(); //Stores the additional Detail content of a message
@@ -300,9 +300,9 @@ function genComponentConf() {
 
         const selectedDetailIdentifier = state.get("selectedAddMessageContent");
         const selectedDetail =
-          this.allDetails &&
+          this.allMessageDetails &&
           selectedDetailIdentifier &&
-          this.allDetails[selectedDetailIdentifier];
+          this.allMessageDetails[selectedDetailIdentifier];
         return {
           connectionUri,
           post,
@@ -474,7 +474,7 @@ function genComponentConf() {
     }
 
     getHumanReadableDetailString(key, value) {
-      const usedDetail = this.allDetails[key];
+      const usedDetail = this.allMessageDetails[key];
 
       return (
         usedDetail &&

@@ -12,6 +12,7 @@ export const instrumentsDetail = {
   label: "Instruments",
   icon: "#ico36_detail_instrument",
   placeholder: "e.g. Guitar, Vocals",
+  messageEnabled: false,
   parseToRDF: function({ value }) {
     if (!value) {
       return { "won:instruments": undefined };
@@ -45,6 +46,7 @@ export const genresDetail = {
   label: "Genres",
   icon: "#ico36_detail_genre",
   placeholder: "e.g. Rock, Pop",
+  messageEnabled: false,
   parseToRDF: function({ value }) {
     if (!value) {
       return { "won:genres": undefined };
