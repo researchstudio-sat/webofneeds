@@ -374,7 +374,7 @@ public class SparqlMatcherActor extends UntypedActor {
                                     OpJoin.create(
                                             new OpTriple(
                                                     new Triple(
-                                                            resultName.asNode(),
+                                                            resultName,
                                                             WON.HAS_FLAG.asNode(),
                                                             WON.NO_HINT_FOR_COUNTERPART.asNode()
                                                     )
@@ -398,7 +398,7 @@ public class SparqlMatcherActor extends UntypedActor {
                                             new E_NotExists(
                                                     new OpTriple(
                                                             new Triple(
-                                                                    resultName.asNode(),
+                                                                    resultName,
                                                                     WON.HAS_FLAG.asNode(),
                                                                     WON.NO_HINT_FOR_COUNTERPART.asNode()
                                                             )
