@@ -191,7 +191,7 @@ public class SparqlMatcherActor extends UntypedActor {
             return null;
         }
 
-        pattern.add(new Triple(resultName.asNode(), newPredicate, NodeFactory.createVariable(hashFunction(parentStatement.getObject()))));
+        pattern.add(new Triple(resultName, newPredicate, NodeFactory.createVariable(hashFunction(parentStatement.getObject()))));
 
         return new OpBGP(pattern);
     }
@@ -212,7 +212,7 @@ public class SparqlMatcherActor extends UntypedActor {
         Var textSearchTarget = Var.alloc("textSearchTarget");
 
         Op pathOp = new OpPath(new TriplePath(
-                resultName.asNode(),
+                resultName,
                 searchPath,
                 textSearchTarget.asNode()));
 
