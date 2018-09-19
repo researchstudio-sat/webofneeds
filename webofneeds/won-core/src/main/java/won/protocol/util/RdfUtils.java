@@ -783,22 +783,16 @@ public class RdfUtils {
 		Query query = QueryFactory.create(queryString);
 		QuerySolutionMap initialBinding = new QuerySolutionMap();
 		initialBinding.add("?resource", dataset.getDefaultModel().createResource(resourceURI.toString()));
-		QueryExecution qExec = QueryExecutionFactory.create(query, dataset, initialBinding);
-		qExec.getContext().set(TDB.symUnionDefaultGraph, true);
-		try {
+		try (QueryExecution qExec = QueryExecutionFactory.create(query, dataset, initialBinding)) {
+    		qExec.getContext().set(TDB.symUnionDefaultGraph, true);
 			final ResultSet results = qExec.execSelect();
 			LinkedList<RDFNode> resultNodes = new LinkedList<>();
-
 			while (results.hasNext()) {
 				QuerySolution soln = results.next();
 				RDFNode result = soln.get("obj");
 				resultNodes.add(result);
 			}
 			return resultNodes.iterator();
-		} finally {
-			if (!qExec.isClosed()) {
-				qExec.close();
-			}
 		}
 	}
 

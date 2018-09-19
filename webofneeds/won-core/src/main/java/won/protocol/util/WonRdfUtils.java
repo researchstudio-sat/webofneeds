@@ -198,19 +198,20 @@ public class WonRdfUtils
               "?c <%s> ?protocol. ?c ?param ?value. FILTER ( ?value != ?protocol ) }";
             queryString = String.format(queryString, WON.SUPPORTS_WON_PROTOCOL_IMPL.toString(), RDF.getURI() + "type");
             Query protocolQuery = QueryFactory.create(queryString);
-            QueryExecution qexec = QueryExecutionFactory.create(protocolQuery, model);
-
-            ResultSet rs = qexec.execSelect();
-            while (rs.hasNext()) {
-              QuerySolution qs = rs.nextSolution();
-
-              String protocol = rdfNodeToString(qs.get("protocol"));
-              String param = rdfNodeToString(qs.get("param"));
-              String value = rdfNodeToString(qs.get("value"));
-              wonNodeInfoBuilder.addSupportedProtocolImplParamValue(protocol, param, value);
+            try (QueryExecution qexec = QueryExecutionFactory.create(protocolQuery, model)) {
+    
+                ResultSet rs = qexec.execSelect();
+                while (rs.hasNext()) {
+                  QuerySolution qs = rs.nextSolution();
+    
+                  String protocol = rdfNodeToString(qs.get("protocol"));
+                  String param = rdfNodeToString(qs.get("param"));
+                  String value = rdfNodeToString(qs.get("value"));
+                  wonNodeInfoBuilder.addSupportedProtocolImplParamValue(protocol, param, value);
+                }
+    
+                return wonNodeInfoBuilder.build();
             }
-
-            return wonNodeInfoBuilder.build();
           }
       });
     }

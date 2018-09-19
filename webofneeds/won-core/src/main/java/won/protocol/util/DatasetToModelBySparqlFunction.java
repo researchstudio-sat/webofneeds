@@ -16,8 +16,9 @@ public class DatasetToModelBySparqlFunction extends SparqlFunction<Dataset, Mode
 	@Override
 	public Model apply(Dataset dataset) {
 		Query query = QueryFactory.create(sparql);
-        QueryExecution qexec = QueryExecutionFactory.create(query, dataset);
-        return qexec.execConstruct();
+        try (QueryExecution qexec = QueryExecutionFactory.create(query, dataset)) {
+            return qexec.execConstruct();
+        }
 	}
 
 }

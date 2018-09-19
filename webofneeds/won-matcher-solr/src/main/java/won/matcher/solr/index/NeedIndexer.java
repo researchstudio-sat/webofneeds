@@ -56,17 +56,18 @@ public class NeedIndexer {
 
         // serialize the need Dataset to jsonld
         Query query = QueryFactory.create(NEED_INDEX_QUERY);
-        QueryExecution qexec = QueryExecutionFactory.create(query, dataset);
-        Model needModel = qexec.execConstruct();
-
-        // normalize the need model for solr indexing
-        NeedModelWrapper needModelWrapper = new NeedModelWrapper(needModel, null);
-        String needUri = needModelWrapper.getNeedUri();
-        needModel = needModelWrapper.normalizeNeedModel();
-
-        // check if test index should be used for need
-        boolean usedForTesting = needModelWrapper.hasFlag(WON.USED_FOR_TESTING);
-        indexNeedModel(needModel, needUri, usedForTesting);
+        try (QueryExecution qexec = QueryExecutionFactory.create(query, dataset)) {
+            Model needModel = qexec.execConstruct();
+    
+            // normalize the need model for solr indexing
+            NeedModelWrapper needModelWrapper = new NeedModelWrapper(needModel, null);
+            String needUri = needModelWrapper.getNeedUri();
+            needModel = needModelWrapper.normalizeNeedModel();
+    
+            // check if test index should be used for need
+            boolean usedForTesting = needModelWrapper.hasFlag(WON.USED_FOR_TESTING);
+            indexNeedModel(needModel, needUri, usedForTesting);
+        }
     }
 
     public void indexNeedModel(Model needModel, String id, boolean useTestCore) throws IOException, JsonLdError {

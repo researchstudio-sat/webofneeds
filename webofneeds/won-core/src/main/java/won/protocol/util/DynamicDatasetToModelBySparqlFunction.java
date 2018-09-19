@@ -24,8 +24,9 @@ public class DynamicDatasetToModelBySparqlFunction extends SparqlFunction<Datase
 	@Override
 	public Model apply(Dataset dataset) {
 		Query query = QueryFactory.create(sparql);
-        QueryExecution qexec = QueryExecutionFactory.create(query, dataset, initialBinding);
-        return qexec.execConstruct();
+        try (QueryExecution qexec = QueryExecutionFactory.create(query, dataset, initialBinding)) {
+            return qexec.execConstruct();
+        }
 	}
 
 }

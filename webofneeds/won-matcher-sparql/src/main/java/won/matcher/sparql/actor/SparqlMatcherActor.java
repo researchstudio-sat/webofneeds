@@ -390,25 +390,31 @@ public class SparqlMatcherActor extends UntypedActor {
                 compiledQuery.setValuesDataBlock(Collections.singletonList(resultName), Collections.singletonList(binding));
             }
 
-            QueryExecution execution = QueryExecutionFactory.sparqlService(config.getSparqlEndpoint(), compiledQuery);
+            try (QueryExecution execution = QueryExecutionFactory.sparqlService(config.getSparqlEndpoint(), compiledQuery)) {
 
-            ResultSet result = execution.execSelect();
-
-            Stream<QuerySolution> stream = StreamSupport.stream(
-                    Spliterators.spliteratorUnknownSize(result, Spliterator.CONCURRENT),
-                    false);
-
-            return stream
-                    .map(querySolution -> {
-                        String foundNeedURI = querySolution.get(resultName.getName()).toString();
-                        try {
-                            return new NeedModelWrapper(linkedDataSource.getDataForResource(new URI(foundNeedURI)));
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            return null;
-                        }
-                    })
-                    .filter(foundNeed -> foundNeed != null);
+                ResultSet result = execution.execSelect();
+    
+                Stream<QuerySolution> stream = StreamSupport.stream(
+                        Spliterators.spliteratorUnknownSize(result, Spliterator.CONCURRENT),
+                        false);
+    
+                return stream
+                        .map(querySolution -> {
+                            String foundNeedURI = querySolution.get(resultName.getName()).toString();
+                            try {
+                                return new NeedModelWrapper(linkedDataSource.getDataForResource(new URI(foundNeedURI)));
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                return null;
+                            }
+                        })
+                        .filter(foundNeed -> foundNeed != null)
+                        // We have to collect all results here because at the end 
+                        // of this try-with-resources block the query execution is closed
+                        // and the stream cannot be collected any more. 
+                        // Solution: we collect it and return a new stream. 
+                        .collect(Collectors.toSet()).stream();
+            }
         } catch (Exception e) {
             log.info("caught exception during sparql-based matching (more info on loglevel 'debug'): {} ", e.getMessage());
             log.debug("full exception:", e);
