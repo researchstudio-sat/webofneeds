@@ -475,7 +475,9 @@ public class SparqlMatcherActor extends UntypedActor {
             }
         } catch (Exception e) {
             log.info("caught exception during sparql-based matching (more info on loglevel 'debug'): {} ", e.getMessage());
-            log.debug("full exception:", e);
+            if (log.isDebugEnabled()) {
+                e.printStackTrace();
+            }
             return Stream.empty();
         }
     }
