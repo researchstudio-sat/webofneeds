@@ -214,7 +214,7 @@ public class SparqlMatcherActor extends UntypedActor {
         Op pathOp = new OpPath(new TriplePath(
                 resultName,
                 searchPath,
-                textSearchTarget.asNode()));
+                textSearchTarget));
 
         Expr filterExpression = Arrays.stream(searchString.toLowerCase().split(" "))
                 .<Expr>map(searchPart ->
