@@ -72,6 +72,7 @@ import org.apache.jena.sparql.path.P_NegPropSet;
 import org.apache.jena.sparql.path.P_Seq;
 import org.apache.jena.sparql.path.P_ZeroOrOne;
 import org.apache.jena.sparql.path.Path;
+import org.apache.jena.tdb.TDB;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -450,6 +451,7 @@ public class SparqlMatcherActor extends UntypedActor {
                             : QueryExecutionFactory
                                     .sparqlService(config.getSparqlEndpoint(), compiledQuery)
                             ) {
+                execution.getContext().set(TDB.symUnionDefaultGraph, true);
                 ResultSet result = execution.execSelect();
                 Stream<QuerySolution> stream = StreamSupport.stream(
                         Spliterators.spliteratorUnknownSize(result, Spliterator.CONCURRENT),
