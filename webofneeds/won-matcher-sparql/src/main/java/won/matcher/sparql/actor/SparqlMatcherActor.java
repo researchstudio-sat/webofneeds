@@ -251,6 +251,9 @@ public class SparqlMatcherActor extends UntypedActor {
                     if (!noHintForCounterpart && !noHintForMe && !need.getNeedUri().equals(matchedNeed.getNeedUri())) {
                         // query for the matched need - but only in the dataset containing the original need. If we have a match, it means
                         // that the matched need should also get a hint, otherwise it should not.
+                        if (log.isDebugEnabled()) {
+                            log.debug("checking for inverse matcheds of {} ", need.getNeedUri());
+                        }
                         Set<NeedModelWrapper> matchForMatchedNeed = queryNeed(matchedNeed, Optional.of(need.getNeedUri()), Optional.of(need.copyDataset()));
                         return new AbstractMap.SimpleEntry<>(matchedNeed, matchForMatchedNeed);
                     } else {
@@ -357,7 +360,9 @@ public class SparqlMatcherActor extends UntypedActor {
         }
 
         Set<NeedModelWrapper> needs = query.map(q -> {
-
+            if (log.isDebugEnabled()) {
+                log.debug("transforming query for (no) hint for counterpart: {}", q);
+            }
             Op noHintForCounterpartQuery = Transformer.transform(new TransformCopy() {
                 public Op transform(OpProject op, Op subOp) {
                     return new OpSlice(
@@ -435,7 +440,9 @@ public class SparqlMatcherActor extends UntypedActor {
                     initialBinding.add(resultName.getName(), new ResourceImpl(needUriToMatch.get()));
                 }
             }
-
+            if (log.isDebugEnabled()) {
+                log.debug("executeQuery query: {}, needUriToMatch: {}, datasetToQuery: {}", new Object[] {compiledQuery, needUriToMatch, datasetToQuery});
+            }
             try (QueryExecution execution 
                         = datasetToQuery.isPresent()
                             ? QueryExecutionFactory
