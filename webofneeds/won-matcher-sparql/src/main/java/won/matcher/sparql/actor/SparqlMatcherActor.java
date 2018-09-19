@@ -163,12 +163,12 @@ public class SparqlMatcherActor extends UntypedActor {
                     Triple triple = statement.asTriple();
                     RDFNode object = statement.getObject();
 
-                    Node newSubject = NodeFactory.createVariable(hashFunction(triple.getSubject()));
+                    Node newSubject = Var.alloc(hashFunction(triple.getSubject()));
 
                     Node newObject = triple.getObject();
 
                     if (object.isAnon()) {
-                        newObject = NodeFactory.createVariable(hashFunction(newObject));
+                        newObject = Var.alloc(hashFunction(newObject));
                     }
 
                     return new Triple(newSubject, triple.getPredicate(), newObject);
@@ -191,7 +191,7 @@ public class SparqlMatcherActor extends UntypedActor {
             return null;
         }
 
-        pattern.add(new Triple(resultName, newPredicate, NodeFactory.createVariable(hashFunction(parentStatement.getObject()))));
+        pattern.add(new Triple(resultName, newPredicate, Var.alloc(hashFunction(parentStatement.getObject()))));
 
         return new OpBGP(pattern);
     }
