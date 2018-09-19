@@ -93,6 +93,7 @@ import won.matcher.service.common.event.HintEvent;
 import won.matcher.service.common.event.NeedEvent;
 import won.matcher.sparql.config.SparqlMatcherConfig;
 import won.protocol.util.NeedModelWrapper;
+import won.protocol.util.RdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.vocabulary.WON;
 
@@ -252,11 +253,13 @@ public class SparqlMatcherActor extends UntypedActor {
                         // query for the matched need - but only in the dataset containing the original need. If we have a match, it means
                         // that the matched need should also get a hint, otherwise it should not.
                         if (log.isDebugEnabled()) {
-                            log.debug("checking for inverse matches of {} ", need.getNeedUri());
+                            log.debug("checking if match {} of {} should get a hint by inverse matching it in need's dataset: \n{}", 
+                                    new Object[] {matchedNeed.getNeedUri(), need.getNeedUri(), RdfUtils.toString(need.copyDataset())});
                         }
                         Set<NeedModelWrapper> matchForMatchedNeed = queryNeed(matchedNeed, Optional.of(need.getNeedUri()), Optional.of(need.copyDataset()));
                         if (log.isDebugEnabled()) {
-                            log.debug("inverse match {} of {} is also getting a hint: {}", new Object[] {matchedNeed.getNeedUri(), need.getNeedUri(), matchForMatchedNeed.size() > 0});
+                            log.debug("match {} of {} is also getting a hint: {}", 
+                                    new Object[] {matchedNeed.getNeedUri(), need.getNeedUri(), matchForMatchedNeed.size() > 0});
                         }
                         return new AbstractMap.SimpleEntry<>(matchedNeed, matchForMatchedNeed);
                     } else {
