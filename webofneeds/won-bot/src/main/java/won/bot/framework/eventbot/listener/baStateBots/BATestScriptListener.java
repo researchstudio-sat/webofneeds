@@ -221,27 +221,29 @@ public class BATestScriptListener extends AbstractFinishingListener
     binding.add("con", new ResourceImpl(fromCon.toString()));
     binding.add("state", new ResourceImpl(action.getStateOfSenderBeforeSending().toString()));
     Query query = QueryFactory.create(queryString);
-    QueryExecution qExec = QueryExecutionFactory.create(query, dataModel, binding);
-    boolean result = qExec.execAsk();
-    //check if the connection is really in the state required for the action
-    if (result) return;
-    //we detected an error. Throw an exception.
-    //query again, this time fetch the state so we can display an informaitive error message
-    queryString = sparqlPrefix +
-      "SELECT ?state WHERE { ?con wontx:hasBAState ?state }";
-    binding = new QuerySolutionMap();
-    binding.add("con", new ResourceImpl(fromCon.toString()));
-    query = QueryFactory.create(queryString);
-    qExec = QueryExecutionFactory.create(query, dataModel, binding);
-    ResultSet res = qExec.execSelect();
-    if (! res.hasNext()) {
-      throw new IllegalStateException("connection state of connection " + fromCon +" does " +
-        "not allow next action " + action +". Could not determine actual connection state: not found");
+    try (QueryExecution qExec = QueryExecutionFactory.create(query, dataModel, binding)) {
+        boolean result = qExec.execAsk();
+        //check if the connection is really in the state required for the action
+        if (result) return;
+        //we detected an error. Throw an exception.
+        //query again, this time fetch the state so we can display an informaitive error message
+        queryString = sparqlPrefix +
+          "SELECT ?state WHERE { ?con wontx:hasBAState ?state }";
+        binding = new QuerySolutionMap();
+        binding.add("con", new ResourceImpl(fromCon.toString()));
+        query = QueryFactory.create(queryString);
     }
-    QuerySolution solution = res.next();
-    RDFNode state = solution.get("state");
-    throw new IllegalStateException("connection state " + state + " of connection " + fromCon +" does " +
-      "not allow next action " + action);
+    try (QueryExecution qExec = QueryExecutionFactory.create(query, dataModel, binding)){
+        ResultSet res = qExec.execSelect();
+        if (! res.hasNext()) {
+          throw new IllegalStateException("connection state of connection " + fromCon +" does " +
+            "not allow next action " + action +". Could not determine actual connection state: not found");
+        }
+        QuerySolution solution = res.next();
+        RDFNode state = solution.get("state");
+        throw new IllegalStateException("connection state " + state + " of connection " + fromCon +" does " +
+          "not allow next action " + action);
+    }
   }
 
   private boolean bothConnectionURIsAreKnown() {

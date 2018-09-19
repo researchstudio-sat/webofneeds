@@ -145,33 +145,33 @@ public class CrawlSparqlService extends SparqlService {
 
         log.debug("Query SPARQL Endpoint: {}", sparqlEndpoint);
         log.debug("Execute query: {}", pps.toString());
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, pps.asQuery());
-        ResultSet results = qexec.execSelect();
-
-        while (results.hasNext()) {
-
-            QuerySolution qs = results.nextSolution();
-            String uri = qs.get("uri").asResource().getURI();
-            String baseUri = qs.get("base").asResource().getURI();
-            CrawlUriMessage msg = null;
-            String wonNode = null;
-            Set<String> etags = null;
-
-            if (qs.get("wonNode") != null) {
-                wonNode = qs.get("wonNode").asResource().getURI();
+        try (QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, pps.asQuery())) {
+            ResultSet results = qexec.execSelect();
+    
+            while (results.hasNext()) {
+    
+                QuerySolution qs = results.nextSolution();
+                String uri = qs.get("uri").asResource().getURI();
+                String baseUri = qs.get("base").asResource().getURI();
+                CrawlUriMessage msg = null;
+                String wonNode = null;
+                Set<String> etags = null;
+    
+                if (qs.get("wonNode") != null) {
+                    wonNode = qs.get("wonNode").asResource().getURI();
+                }
+    
+                if (qs.get("etags") != null) {
+                    String etagsString = qs.get("etags").asLiteral().getString();
+                    etags = commaConcatenatedStringToSet(etagsString);
+                }
+    
+                msg = new CrawlUriMessage(uri, baseUri, wonNode, CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis(), etags);
+                log.debug("Created message: {}", msg);
+                msgs.add(msg);
             }
-
-            if (qs.get("etags") != null) {
-                String etagsString = qs.get("etags").asLiteral().getString();
-                etags = commaConcatenatedStringToSet(etagsString);
-            }
-
-            msg = new CrawlUriMessage(uri, baseUri, wonNode, CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis(), etags);
-            log.debug("Created message: {}", msg);
-            msgs.add(msg);
+            return msgs;
         }
-        qexec.close();
-        return msgs;
     }
 
     /**
@@ -251,32 +251,32 @@ public class CrawlSparqlService extends SparqlService {
 
         log.debug("Query SPARQL Endpoint: {}", sparqlEndpoint);
         log.debug("Execute query: {}", pps.toString());
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, pps.asQuery());
-        ResultSet results = qexec.execSelect();
-
-        while (results.hasNext()) {
-            QuerySolution qs = results.nextSolution();
-            String extractedUri = qs.get("uri").asResource().getURI();
-
-            Set<String> etags = null;
-            if (qs.get("etags") != null) {
-                String etagsString = qs.get("etags").asLiteral().getString();
-                etags = commaConcatenatedStringToSet(etagsString);
+        try (QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, pps.asQuery())) {
+            ResultSet results = qexec.execSelect();
+    
+            while (results.hasNext()) {
+                QuerySolution qs = results.nextSolution();
+                String extractedUri = qs.get("uri").asResource().getURI();
+    
+                Set<String> etags = null;
+                if (qs.get("etags") != null) {
+                    String etagsString = qs.get("etags").asLiteral().getString();
+                    etags = commaConcatenatedStringToSet(etagsString);
+                }
+    
+                CrawlUriMessage newUriMsg = null;
+                log.debug("Extracted URI: {}", extractedUri);
+                if (baseProperty) {
+                    newUriMsg = new CrawlUriMessage(
+                            extractedUri, extractedUri, wonNodeUri, CrawlUriMessage.STATUS.PROCESS, crawlDate, etags);
+                } else {
+                    newUriMsg = new CrawlUriMessage(
+                            extractedUri, baseUri, wonNodeUri, CrawlUriMessage.STATUS.PROCESS, crawlDate, etags);
+                }
+                newCrawlMessages.add(newUriMsg);
             }
-
-            CrawlUriMessage newUriMsg = null;
-            log.debug("Extracted URI: {}", extractedUri);
-            if (baseProperty) {
-                newUriMsg = new CrawlUriMessage(
-                        extractedUri, extractedUri, wonNodeUri, CrawlUriMessage.STATUS.PROCESS, crawlDate, etags);
-            } else {
-                newUriMsg = new CrawlUriMessage(
-                        extractedUri, baseUri, wonNodeUri, CrawlUriMessage.STATUS.PROCESS, crawlDate, etags);
-            }
-            newCrawlMessages.add(newUriMsg);
+            return newCrawlMessages;
         }
-        qexec.close();
-        return newCrawlMessages;
     }
 
     /**
@@ -302,15 +302,15 @@ public class CrawlSparqlService extends SparqlService {
         pps.setCommandText(queryString);
         pps.setIri("wonNodeUri", wonNodeUri);
 
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, pps.asQuery());
-        ResultSet results = qexec.execSelect();
-        String modificationDate = null;
-        if (results.hasNext()) {
-            QuerySolution qs = results.nextSolution();
-            modificationDate = qs.get("modificationDate").asLiteral().getString();
+        try (QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, pps.asQuery())) {
+            ResultSet results = qexec.execSelect();
+            String modificationDate = null;
+            if (results.hasNext()) {
+                QuerySolution qs = results.nextSolution();
+                modificationDate = qs.get("modificationDate").asLiteral().getString();
+            }
+            return modificationDate;
         }
-        qexec.close();
-        return modificationDate;
     }
 
     /**
@@ -336,15 +336,15 @@ public class CrawlSparqlService extends SparqlService {
         pps.setCommandText(queryString);
         pps.setIri("wonNodeUri", wonNodeUri);
 
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, pps.asQuery());
-        ResultSet results = qexec.execSelect();
-        String modificationDate = null;
-        if (results.hasNext()) {
-            QuerySolution qs = results.nextSolution();
-            modificationDate = qs.get("modificationDate").asLiteral().getString();
+        try (QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, pps.asQuery())) {
+            ResultSet results = qexec.execSelect();
+            String modificationDate = null;
+            if (results.hasNext()) {
+                QuerySolution qs = results.nextSolution();
+                modificationDate = qs.get("modificationDate").asLiteral().getString();
+            }
+            return modificationDate;
         }
-        qexec.close();
-        return modificationDate;
     }
 
     public BulkNeedEvent retrieveActiveNeedEvents(long fromDate, long toDate, int offset, int limit, boolean
@@ -376,28 +376,28 @@ public class CrawlSparqlService extends SparqlService {
 
         log.debug("Query SPARQL Endpoint: {}", sparqlEndpoint);
         log.debug("Execute query: {}", pps.toString());
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, pps.asQuery());
-        ResultSet results = qexec.execSelect();
-
-        // load all the needs into one bulk need event
-        BulkNeedEvent bulkNeedEvent = new BulkNeedEvent();
-        while (results.hasNext()) {
-
-            QuerySolution qs = results.nextSolution();
-            String needUri = qs.get("needUri").asResource().getURI();
-            String wonNodeUri = qs.get("wonNodeUri").asResource().getURI();
-            long crawlDate = qs.getLiteral("date").getLong();
-
-            Dataset ds = retrieveNeedDataset(needUri);
-            StringWriter sw = new StringWriter();
-            RDFDataMgr.write(sw, ds, RDFFormat.TRIG.getLang());
-            NeedEvent needEvent = new NeedEvent(needUri, wonNodeUri, NeedEvent.TYPE.ACTIVE,
-                    crawlDate, sw.toString(), RDFFormat.TRIG.getLang());
-            bulkNeedEvent.addNeedEvent(needEvent);
+        try (QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, pps.asQuery())) {
+            ResultSet results = qexec.execSelect();
+    
+            // load all the needs into one bulk need event
+            BulkNeedEvent bulkNeedEvent = new BulkNeedEvent();
+            while (results.hasNext()) {
+    
+                QuerySolution qs = results.nextSolution();
+                String needUri = qs.get("needUri").asResource().getURI();
+                String wonNodeUri = qs.get("wonNodeUri").asResource().getURI();
+                long crawlDate = qs.getLiteral("date").getLong();
+    
+                Dataset ds = retrieveNeedDataset(needUri);
+                StringWriter sw = new StringWriter();
+                RDFDataMgr.write(sw, ds, RDFFormat.TRIG.getLang());
+                NeedEvent needEvent = new NeedEvent(needUri, wonNodeUri, NeedEvent.TYPE.ACTIVE,
+                        crawlDate, sw.toString(), RDFFormat.TRIG.getLang());
+                bulkNeedEvent.addNeedEvent(needEvent);
+            }
+            log.debug("number of need events created: " + bulkNeedEvent.getNeedEvents().size());
+            return bulkNeedEvent;
         }
-        qexec.close();
-        log.debug("number of need events created: " + bulkNeedEvent.getNeedEvents().size());
-        return bulkNeedEvent;
     }
 
 }

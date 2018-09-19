@@ -216,43 +216,42 @@ public class WonMimeMessageGenerator {
 
         try {
             Query query = QueryFactory.create(WonQueries.SPARQL_TEXTMESSAGES_BY_CONNECTION_ORDERED_BY_TIMESTAMP);
-            QueryExecution qExec = QueryExecutionFactory.create(query, baseDataSet, new QuerySolutionMap());
-            qExec.getContext().set(TDB.symUnionDefaultGraph, true);
-            ResultSet results = qExec.execSelect();
-
-            Boolean lastSource = null; //must be undefined since we do not know who the source of the last retrieved message is
-            String quote = "";
-
-            List<String> messages = new ArrayList<>();
-            List<String> messageBlock = new ArrayList<>();
-
-            while (results.hasNext()) {
-                QuerySolution soln = results.nextSolution();
-                boolean msgSource = isYourMessage(soln, requesterUri); //Determine the source of this message
-
-                if(lastSource != null && msgSource != lastSource && messageBlock.size() > 0){
-                    messages.add(getMsgSourceString(quote, lastSource));
-                    Collections.reverse(messageBlock);
-                    messages.addAll(messageBlock);
-                    messages.add(quote); //ADD EMPTY LINE TO MAKE THIS MORE READABLE
-                    messageBlock.clear();
-                    quote += QUOTE_CHAR;
+            try (QueryExecution qExec = QueryExecutionFactory.create(query, baseDataSet, new QuerySolutionMap())) {
+                qExec.getContext().set(TDB.symUnionDefaultGraph, true);
+                ResultSet results = qExec.execSelect();
+    
+                Boolean lastSource = null; //must be undefined since we do not know who the source of the last retrieved message is
+                String quote = "";
+    
+                List<String> messages = new ArrayList<>();
+                List<String> messageBlock = new ArrayList<>();
+    
+                while (results.hasNext()) {
+                    QuerySolution soln = results.nextSolution();
+                    boolean msgSource = isYourMessage(soln, requesterUri); //Determine the source of this message
+    
+                    if(lastSource != null && msgSource != lastSource && messageBlock.size() > 0){
+                        messages.add(getMsgSourceString(quote, lastSource));
+                        Collections.reverse(messageBlock);
+                        messages.addAll(messageBlock);
+                        messages.add(quote); //ADD EMPTY LINE TO MAKE THIS MORE READABLE
+                        messageBlock.clear();
+                        quote += QUOTE_CHAR;
+                    }
+    
+                    if (MAX_CONVERSATION_DEPTH != -1 && quote.length() > MAX_CONVERSATION_DEPTH) { //+1 so you always retrieve the newest messages anyway
+                        messages.add(getMsgSourceString(quote, msgSource));
+                        messages.add(quote+"[...]");
+                        break;
+                    }
+    
+                    String messageLine = buildMessageLine(soln, quote);
+                    messageBlock.add(messageLine);
+    
+                    lastSource = msgSource;
                 }
-
-                if (MAX_CONVERSATION_DEPTH != -1 && quote.length() > MAX_CONVERSATION_DEPTH) { //+1 so you always retrieve the newest messages anyway
-                    messages.add(getMsgSourceString(quote, msgSource));
-                    messages.add(quote+"[...]");
-                    break;
-                }
-
-                String messageLine = buildMessageLine(soln, quote);
-                messageBlock.add(messageLine);
-
-                lastSource = msgSource;
-            }
-            qExec.close();
-
-            velocityContext.put("messages", messages);
+                velocityContext.put("messages", messages);
+            } 
         } catch (QueryParseException e) {
             logger.error("query parse exception {}", e);
         }

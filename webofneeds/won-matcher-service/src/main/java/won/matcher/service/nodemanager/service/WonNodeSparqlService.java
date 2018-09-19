@@ -46,22 +46,22 @@ public class WonNodeSparqlService extends SparqlService
 
     log.debug("Query SPARQL Endpoint: {}", sparqlEndpoint);
     log.debug("Execute query: {}", pps.toString());
-    QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, pps.asQuery());
-    ResultSet results = qexec.execSelect();
-
-    while (results.hasNext()) {
-
-      QuerySolution qs = results.nextSolution();
-      RDFNode rdfNode = qs.get("graphUri");
-      if (rdfNode != null) {
-        String graphUri = rdfNode.asResource().getURI();
-        Dataset ds = retrieveDataset(graphUri);
-        WonNodeInfo nodeInfo = getWonNodeInfoFromDataset(ds);
-        wonNodeInfos.add(nodeInfo);
-      }
+    try (QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, pps.asQuery())) {
+        ResultSet results = qexec.execSelect();
+    
+        while (results.hasNext()) {
+    
+          QuerySolution qs = results.nextSolution();
+          RDFNode rdfNode = qs.get("graphUri");
+          if (rdfNode != null) {
+            String graphUri = rdfNode.asResource().getURI();
+            Dataset ds = retrieveDataset(graphUri);
+            WonNodeInfo nodeInfo = getWonNodeInfoFromDataset(ds);
+            wonNodeInfos.add(nodeInfo);
+          }
+        }
+        return wonNodeInfos;
     }
-    qexec.close();
-    return wonNodeInfos;
   }
 
   /**

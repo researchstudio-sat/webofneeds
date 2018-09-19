@@ -568,17 +568,18 @@ public class NeedModelWrapper {
                 "SELECT DISTINCT ?contentNode WHERE { \n" + queryClause + "\n }";
 
         Query query = QueryFactory.create(queryString);
-        QueryExecution qexec = QueryExecutionFactory.create(query, getNeedModel());
-        ResultSet rs = qexec.execSelect();
-
-        while (rs.hasNext()) {
-            QuerySolution qs = rs.next();
-            if (qs.contains("contentNode")) {
-                contentNodes.add(qs.get("contentNode").asResource());
+        try (QueryExecution qexec = QueryExecutionFactory.create(query, getNeedModel())) {
+            ResultSet rs = qexec.execSelect();
+    
+            while (rs.hasNext()) {
+                QuerySolution qs = rs.next();
+                if (qs.contains("contentNode")) {
+                    contentNodes.add(qs.get("contentNode").asResource());
+                }
             }
+    
+            return contentNodes;
         }
-
-        return contentNodes;
     }
 
     public void setContentPropertyStringValue(NeedContentPropertyType type, Property p, String value) {

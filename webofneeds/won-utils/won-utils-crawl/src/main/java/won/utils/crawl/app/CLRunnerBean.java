@@ -72,14 +72,12 @@ public class CLRunnerBean implements CommandLineRunner {
                     // InitialBindings are used to set filters on the resultset
                     //initialBinding.add("need", needDataset.getDefaultModel().createResource(uri.toString()));
 
-                    QueryExecution qExec = QueryExecutionFactory.create(query, needDataset, initialBinding);
-
-                    qExec.getContext().set(TDB.symUnionDefaultGraph, true);
-                    ResultSet results = qExec.execSelect();
-
-
-                    printResults(results);
-                    qExec.close();
+                    try (QueryExecution qExec = QueryExecutionFactory.create(query, needDataset, initialBinding)) {
+                        qExec.getContext().set(TDB.symUnionDefaultGraph, true);
+                        ResultSet results = qExec.execSelect();
+                        printResults(results);
+                        qExec.close();
+                    }
                 } catch (QueryParseException e) {
                     System.out.println("INVALID SPARQL-QUERY: " + e.getMessage());
                     printHelp();
@@ -91,14 +89,12 @@ public class CLRunnerBean implements CommandLineRunner {
                     // InitialBindings are used to set filters on the resultset
                     //initialBinding.add("need", needDataset.getDefaultModel().createResource(uri.toString()));
 
-                    QueryExecution qExec = QueryExecutionFactory.create(query, needDataset, initialBinding);
-
-                    qExec.getContext().set(TDB.symUnionDefaultGraph, true);
-                    ResultSet results = qExec.execSelect();
-
-
-                    printResults(results);
-                    qExec.close();
+                    try (QueryExecution qExec = QueryExecutionFactory.create(query, needDataset, initialBinding)) {
+                        qExec.getContext().set(TDB.symUnionDefaultGraph, true);
+                        ResultSet results = qExec.execSelect();
+                        printResults(results);
+                        qExec.close();
+                    }
                 } catch (QueryParseException e) {
                     System.out.println("INVALID SPARQL-QUERY: " + e.getMessage());
                     printHelp();
@@ -122,14 +118,12 @@ public class CLRunnerBean implements CommandLineRunner {
                     // InitialBindings are used to set filters on the resultset
                     //initialBinding.add("need", needDataset.getDefaultModel().createResource(uri.toString()));
 
-                    QueryExecution qExec = QueryExecutionFactory.create(query, needDataset, initialBinding);
-
-                    qExec.getContext().set(TDB.symUnionDefaultGraph, true);
-                    ResultSet results = qExec.execSelect();
-
-
-                    printResults(results);
-                    qExec.close();
+                    try (QueryExecution qExec = QueryExecutionFactory.create(query, needDataset, initialBinding)) {
+                        qExec.getContext().set(TDB.symUnionDefaultGraph, true);
+                        ResultSet results = qExec.execSelect();
+                        printResults(results);
+                        qExec.close();
+                    }
                 } catch (QueryParseException e) {
                     System.out.println("INVALID SPARQL-QUERY: " + e.getMessage());
                     printHelp();

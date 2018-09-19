@@ -67,10 +67,10 @@ public class GoalUtils {
         combinedModel.add(report.getModel());
         combinedModel.add(shaclShapesModel);
         Query query = QueryFactory.create(goalExtractionQuery);
-        QueryExecution qexec = QueryExecutionFactory.create(query ,combinedModel);
-        Model result = qexec.execConstruct();
-
-        return result;
+        try (QueryExecution qexec = QueryExecutionFactory.create(query ,combinedModel)) {
+            Model result = qexec.execConstruct();
+            return result;
+        }
     }
 
     public static Boolean validateModelShaclConformity(Model dataModel, Model shaclShapesModel) {

@@ -51,26 +51,26 @@ public class TensorEntrySparqlGenerator implements TensorEntryGenerator {
         }
 
         Query q = pss.asQuery();
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, q);
-        ResultSet results = qexec.execSelect();
-
-        // check that the query returns the right variables
-        if (!results.getResultVars().containsAll(Arrays.asList(variableNames))) {
-            throw new DataIntegrityException("sparql query is expected to return variables: " + variableNames);
+        try (QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, q)) {
+            ResultSet results = qexec.execSelect();
+    
+            // check that the query returns the right variables
+            if (!results.getResultVars().containsAll(Arrays.asList(variableNames))) {
+                throw new DataIntegrityException("sparql query is expected to return variables: " + variableNames);
+            }
+    
+            while (results.hasNext()) {
+                TensorEntry entry = new TensorEntry();
+                QuerySolution qs = results.next();
+                RDFNode node = qs.get("slice");
+                entry.setSliceName(node.isResource() ? node.asResource().getURI() : node.asLiteral().getString());
+                node = qs.get("need");
+                entry.setNeedUri(node.isResource() ? node.asResource().getURI() : node.asLiteral().getString());
+                node = qs.get("value");
+                entry.setValue(node.isResource() ? node.asResource().getURI() : node.asLiteral().getString());
+                tensorEntries.add(entry);
+            }
+            return tensorEntries;
         }
-
-        while (results.hasNext()) {
-            TensorEntry entry = new TensorEntry();
-            QuerySolution qs = results.next();
-            RDFNode node = qs.get("slice");
-            entry.setSliceName(node.isResource() ? node.asResource().getURI() : node.asLiteral().getString());
-            node = qs.get("need");
-            entry.setNeedUri(node.isResource() ? node.asResource().getURI() : node.asLiteral().getString());
-            node = qs.get("value");
-            entry.setValue(node.isResource() ? node.asResource().getURI() : node.asLiteral().getString());
-            tensorEntries.add(entry);
-        }
-
-        return tensorEntries;
     }
 }

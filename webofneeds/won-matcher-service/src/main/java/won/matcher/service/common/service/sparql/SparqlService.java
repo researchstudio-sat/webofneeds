@@ -107,9 +107,10 @@ public class SparqlService
     pps.setCommandText(queryTemplate);
     pps.setIri("g", graphName);
     Query query = QueryFactory.create(pps.toString());
-    QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
-    Model model = qexec.execConstruct();
-    return model;
+    try(QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query)){
+        Model model = qexec.execConstruct();
+        return model;
+    }
   }
 
   public Dataset retrieveDataset(String graphName) {
@@ -132,20 +133,19 @@ public class SparqlService
     pps.setIri("uri", uri);
 
     Query query = QueryFactory.create(pps.toString());
-    QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
-    ResultSet results = qexec.execSelect();
-
-    Dataset ds = DatasetFactory.createGeneral();
-    while (results.hasNext()) {
-
-      QuerySolution qs = results.next();
-      String graphUri = qs.getResource("g").getURI();
-      Model model = retrieveModel(graphUri);
-      ds.addNamedModel(graphUri, model);
+    try (QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query)) {
+        ResultSet results = qexec.execSelect();
+        Dataset ds = DatasetFactory.createGeneral();
+        while (results.hasNext()) {
+          QuerySolution qs = results.next();
+          String graphUri = qs.getResource("g").getURI();
+          Model model = retrieveModel(graphUri);
+          ds.addNamedModel(graphUri, model);
+        }
+        return ds;
     }
-
-    return ds;
   }
+    
 
   /**
    * Execute a SPARQL Update query.

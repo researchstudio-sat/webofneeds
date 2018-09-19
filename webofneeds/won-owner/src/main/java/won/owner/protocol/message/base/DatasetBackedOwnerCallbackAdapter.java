@@ -97,18 +97,15 @@ public class DatasetBackedOwnerCallbackAdapter extends OwnerCallbackAdapter
     pss.setCommandText(QUERY_CONNECTION);
     pss.setIri("con", connUri.toString());
     Query query = pss.asQuery();
-    QueryExecution qExec = QueryExecutionFactory.create(query, dataset);
-    qExec.getContext().set(TDB.symUnionDefaultGraph, true);
-    try {
-      Connection con = null;
-      final ResultSet results = qExec.execSelect();
-      if (results.hasNext()) {
-
-
-        QuerySolution soln = results.next();
-        if (results.hasNext()){
-          throw new DataIntegrityException("Query must not yield multiple solutions");
-        }
+    try (QueryExecution qExec = QueryExecutionFactory.create(query, dataset)) {
+        qExec.getContext().set(TDB.symUnionDefaultGraph, true);
+        Connection con = null;
+        final ResultSet results = qExec.execSelect();
+        if (results.hasNext()) {
+            QuerySolution soln = results.next();
+            if (results.hasNext()){
+              throw new DataIntegrityException("Query must not yield multiple solutions");
+            }
         con = new Connection();
         con.setConnectionURI(getURIFromSolution(soln, "con"));
         con.setTypeURI(getURIFromSolution(soln, "type"));
@@ -118,10 +115,6 @@ public class DatasetBackedOwnerCallbackAdapter extends OwnerCallbackAdapter
         con.setRemoteConnectionURI(getURIFromSolution(soln, "remoteCon"));
       }
       return con;
-    } finally {
-      if (!qExec.isClosed()) {
-        qExec.close();
-      }
     }
   }
 
