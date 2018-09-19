@@ -256,7 +256,7 @@ public class SparqlMatcherActor extends UntypedActor {
                             log.debug("checking if match {} of {} should get a hint by inverse matching it in need's dataset: \n{}", 
                                     new Object[] {matchedNeed.getNeedUri(), need.getNeedUri(), RdfUtils.toString(need.copyDataset())});
                         }
-                        Set<NeedModelWrapper> matchForMatchedNeed = queryNeed(matchedNeed, Optional.of(need.getNeedUri()), Optional.of(need.copyDataset()));
+                        Set<NeedModelWrapper> matchForMatchedNeed = queryNeed(matchedNeed, Optional.of(need.copyDataset()));
                         if (log.isDebugEnabled()) {
                             log.debug("match {} of {} is also getting a hint: {}", 
                                     new Object[] {matchedNeed.getNeedUri(), need.getNeedUri(), matchForMatchedNeed.size() > 0});
@@ -340,18 +340,16 @@ public class SparqlMatcherActor extends UntypedActor {
     }
 
     private Set<NeedModelWrapper> queryNeed(NeedModelWrapper need) {
-      return queryNeed(need, Optional.empty(), Optional.empty());
+      return queryNeed(need, Optional.empty());
     }
     
     /**
-     * Query for matches to the need, optionally restricting the result to one need URI. The latter is 
-     * used in order to check if a match A->B also matches B->A. Optionally the, datasetToQuery is used to search in.
+     * Query for matches to the need, optionally the datasetToQuery is used to search in.
      * @param need
-     * @param needUriToMatch
      * @param datasetToQuery
      * @return
      */
-    private Set<NeedModelWrapper> queryNeed(NeedModelWrapper need, Optional<String> needUriToMatch, Optional<Dataset> datasetToQuery) {
+    private Set<NeedModelWrapper> queryNeed(NeedModelWrapper need, Optional<Dataset> datasetToQuery) {
         Model model = need.getNeedModel();
         String needURI = need.getNeedUri();
 
@@ -418,8 +416,8 @@ public class SparqlMatcherActor extends UntypedActor {
                 log.debug("transformed query: {}", hintForCounterpartQuery);
             }
             return Stream.concat(
-                    executeQuery(noHintForCounterpartQuery, needUriToMatch, datasetToQuery),
-                    executeQuery(hintForCounterpartQuery, needUriToMatch, datasetToQuery)
+                    executeQuery(noHintForCounterpartQuery,  datasetToQuery),
+                    executeQuery(hintForCounterpartQuery,  datasetToQuery)
                     ).collect(Collectors.toSet());
         })
                 .orElse(new HashSet<NeedModelWrapper>());
@@ -428,36 +426,23 @@ public class SparqlMatcherActor extends UntypedActor {
     }
 
     /**
-     * Executes the query, optionally binding the result variable to the specified needUriToMatch, optionally only searching in the datasetToQuery.
+     * Executes the query, optionally only searching in the datasetToQuery.
      * @param q
-     * @param needUriToMatch
      * @param datasetToQuery
      * @return
      */
-    private Stream<NeedModelWrapper> executeQuery(Op q, Optional<String> needUriToMatch, Optional<Dataset> datasetToQuery) {
+    private Stream<NeedModelWrapper> executeQuery(Op q, Optional<Dataset> datasetToQuery) {
         try {
             Query compiledQuery = OpAsQuery.asQuery(q);
 
 
-            // if we were given a needUriToMatch, restrict the query result to that uri so that
-            // we get exactly one result if that uri is found for the need
-            QuerySolutionMap initialBinding = new QuerySolutionMap();
-            if (needUriToMatch.isPresent()) {
-                if (!datasetToQuery.isPresent()) {
-                    //if we are querying a remote dataset, we use the VALUES approach, otherwise we provide bindings to the queryExecutionFactory
-                    Binding binding = BindingFactory.binding(resultName, new ResourceImpl(needUriToMatch.get()).asNode());
-                    compiledQuery.setValuesDataBlock(Collections.singletonList(resultName), Collections.singletonList(binding));
-                } else {
-                    initialBinding.add(resultName.getName(), new ResourceImpl(needUriToMatch.get()));
-                }
-            }
             if (log.isDebugEnabled()) {
-                log.debug("executeQuery query: {}, needUriToMatch: {}, datasetToQuery: {}", new Object[] {compiledQuery, needUriToMatch, datasetToQuery});
+                log.debug("executeQuery query: {}, datasetToQuery: {}", new Object[] {compiledQuery, datasetToQuery});
             }
             try (QueryExecution execution 
                         = datasetToQuery.isPresent()
                             ? QueryExecutionFactory
-                                    .create(compiledQuery, datasetToQuery.get(), initialBinding) 
+                                    .create(compiledQuery, datasetToQuery.get()) 
                             : QueryExecutionFactory
                                     .sparqlService(config.getSparqlEndpoint(), compiledQuery)
                             ) {
