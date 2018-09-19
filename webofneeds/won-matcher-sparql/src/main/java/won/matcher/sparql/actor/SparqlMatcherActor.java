@@ -454,15 +454,12 @@ public class SparqlMatcherActor extends UntypedActor {
                     execution.getContext().set(TDB.symUnionDefaultGraph, true);
                 }
                 ResultSet result = execution.execSelect();
-                Stream<QuerySolution> stream = StreamSupport.stream(
-                        Spliterators.spliteratorUnknownSize(result, Spliterator.CONCURRENT),
-                        false);
-                Set<NeedModelWrapper> results = new HashSet<>();
+                Set<NeedModelWrapper> resultNeeds = new HashSet<>();
                 while (result.hasNext()) {
                     QuerySolution solution = result.next();
                     String foundNeedURI = solution.get(resultName.getName()).toString();
                     try {
-                        results.add(new NeedModelWrapper(linkedDataSource.getDataForResource(new URI(foundNeedURI))));
+                        resultNeeds.add(new NeedModelWrapper(linkedDataSource.getDataForResource(new URI(foundNeedURI))));
                     } catch (Exception e) {
                         log.info("could not load need {} as a matching result (more on loglevel 'debug')");
                         if (log.isDebugEnabled()) {
@@ -471,9 +468,9 @@ public class SparqlMatcherActor extends UntypedActor {
                     }
                 }
                 if (log.isDebugEnabled()) {
-                    log.debug("executeQuery query found {} matches", results.size());
+                    log.debug("executeQuery query found {} matches", resultNeeds.size());
                 }
-                return results.stream();
+                return resultNeeds.stream();
             }
         } catch (Exception e) {
             log.info("caught exception during sparql-based matching (more info on loglevel 'debug'): {} ", e.getMessage());
