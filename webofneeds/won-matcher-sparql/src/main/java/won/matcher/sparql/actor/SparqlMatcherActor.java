@@ -356,8 +356,6 @@ public class SparqlMatcherActor extends UntypedActor {
      * @return
      */
     private Set<NeedModelWrapper> queryNeed(NeedModelWrapper need, Optional<Dataset> datasetToQuery) {
-        Model model = need.getNeedModel();
-        String needURI = need.getNeedUri();
 
         Optional<Op> query;
 
@@ -459,22 +457,23 @@ public class SparqlMatcherActor extends UntypedActor {
                 Stream<QuerySolution> stream = StreamSupport.stream(
                         Spliterators.spliteratorUnknownSize(result, Spliterator.CONCURRENT),
                         false);
-                return stream
-                        .map(querySolution -> {
-                            String foundNeedURI = querySolution.get(resultName.getName()).toString();
-                            try {
-                                return new NeedModelWrapper(linkedDataSource.getDataForResource(new URI(foundNeedURI)));
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                return null;
-                            }
-                        })
-                        .filter(foundNeed -> foundNeed != null)
-                        // We have to collect all results here because at the end 
-                        // of this try-with-resources block the query execution is closed
-                        // and the stream cannot be collected any more. 
-                        // Solution: we collect it and return a new stream. 
-                        .collect(Collectors.toSet()).stream();
+                Set<NeedModelWrapper> results = new HashSet<>();
+                while (result.hasNext()) {
+                    QuerySolution solution = result.next();
+                    String foundNeedURI = solution.get(resultName.getName()).toString();
+                    try {
+                        results.add(new NeedModelWrapper(linkedDataSource.getDataForResource(new URI(foundNeedURI))));
+                    } catch (Exception e) {
+                        log.info("could not load need {} as a matching result (more on loglevel 'debug')");
+                        if (log.isDebugEnabled()) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                if (log.isDebugEnabled()) {
+                    log.debug("executeQuery query found {} matches", results.size());
+                }
+                return results.stream();
             }
         } catch (Exception e) {
             log.info("caught exception during sparql-based matching (more info on loglevel 'debug'): {} ", e.getMessage());
