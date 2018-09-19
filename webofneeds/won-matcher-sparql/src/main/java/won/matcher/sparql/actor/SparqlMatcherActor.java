@@ -461,6 +461,12 @@ public class SparqlMatcherActor extends UntypedActor {
                             }
                         })
                         .filter(foundNeed -> foundNeed != null)
+                        .map(need -> {
+                            if (log.isDebugEnabled()) {
+                                log.debug("match candidate found: {}", need);
+                            }
+                            return need;
+                        })
                         // We have to collect all results here because at the end 
                         // of this try-with-resources block the query execution is closed
                         // and the stream cannot be collected any more. 
