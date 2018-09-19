@@ -2,7 +2,17 @@ package won.matcher.sparql.actor;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.*;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -10,30 +20,49 @@ import java.util.stream.StreamSupport;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Triple;
+import org.apache.jena.query.Dataset;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.QuerySolutionMap;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelExtract;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StatementBoundary;
 import org.apache.jena.rdf.model.StatementBoundaryBase;
 import org.apache.jena.rdf.model.impl.ResourceImpl;
-import org.apache.jena.sparql.algebra.*;
-import org.apache.jena.sparql.algebra.op.*;
+import org.apache.jena.sparql.algebra.Algebra;
+import org.apache.jena.sparql.algebra.Op;
+import org.apache.jena.sparql.algebra.OpAsQuery;
+import org.apache.jena.sparql.algebra.TransformCopy;
+import org.apache.jena.sparql.algebra.Transformer;
+import org.apache.jena.sparql.algebra.op.OpBGP;
+import org.apache.jena.sparql.algebra.op.OpDistinct;
+import org.apache.jena.sparql.algebra.op.OpFilter;
+import org.apache.jena.sparql.algebra.op.OpJoin;
+import org.apache.jena.sparql.algebra.op.OpPath;
+import org.apache.jena.sparql.algebra.op.OpProject;
+import org.apache.jena.sparql.algebra.op.OpSlice;
+import org.apache.jena.sparql.algebra.op.OpTriple;
+import org.apache.jena.sparql.algebra.op.OpUnion;
 import org.apache.jena.sparql.core.BasicPattern;
 import org.apache.jena.sparql.core.TriplePath;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.engine.binding.BindingFactory;
-import org.apache.jena.sparql.expr.*;
+import org.apache.jena.sparql.expr.E_LogicalOr;
+import org.apache.jena.sparql.expr.E_NotExists;
+import org.apache.jena.sparql.expr.E_StrContains;
+import org.apache.jena.sparql.expr.E_StrLowerCase;
+import org.apache.jena.sparql.expr.Expr;
+import org.apache.jena.sparql.expr.ExprList;
+import org.apache.jena.sparql.expr.ExprVar;
 import org.apache.jena.sparql.expr.nodevalue.NodeValueBoolean;
 import org.apache.jena.sparql.expr.nodevalue.NodeValueString;
 import org.apache.jena.sparql.path.P_Alt;
@@ -63,7 +92,6 @@ import won.matcher.service.common.event.BulkNeedEvent;
 import won.matcher.service.common.event.HintEvent;
 import won.matcher.service.common.event.NeedEvent;
 import won.matcher.sparql.config.SparqlMatcherConfig;
-import won.protocol.model.NeedModelMapper;
 import won.protocol.util.NeedModelWrapper;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.vocabulary.WON;
@@ -221,8 +249,12 @@ public class SparqlMatcherActor extends UntypedActor {
                 matches.stream().map(matchedNeed -> {
                     boolean noHintForMe = matchedNeed.hasFlag(WON.NO_HINT_FOR_ME);
                     if (!noHintForCounterpart && !noHintForMe && !need.getNeedUri().equals(matchedNeed.getNeedUri())) {
-                        return new AbstractMap.SimpleEntry<>(matchedNeed, (Set<NeedModelWrapper>) Collections.singleton(need));
+                        // query for the matched need - but only in the dataset containing the original need. If we have a match, it means
+                        // that the matched need should also get a hint, otherwise it should not.
+                        Set<NeedModelWrapper> matchForMatchedNeed = queryNeed(matchedNeed, Optional.of(need.getNeedUri()), Optional.of(need.copyDataset()));
+                        return new AbstractMap.SimpleEntry<>(matchedNeed, matchForMatchedNeed);
                     } else {
+                        // the flags in the original or in the matched need forbid a hint. don't add one.
                         return new AbstractMap.SimpleEntry<>(matchedNeed, (Set<NeedModelWrapper>) Collections.EMPTY_SET);
                     }
                     
@@ -299,17 +331,18 @@ public class SparqlMatcherActor extends UntypedActor {
     }
 
     private Set<NeedModelWrapper> queryNeed(NeedModelWrapper need) {
-      return queryNeed(need, Optional.empty());
+      return queryNeed(need, Optional.empty(), Optional.empty());
     }
     
     /**
      * Query for matches to the need, optionally restricting the result to one need URI. The latter is 
-     * used in order to check if a match A->B also matches B->A. 
+     * used in order to check if a match A->B also matches B->A. Optionally the, datasetToQuery is used to search in.
      * @param need
      * @param needUriToMatch
+     * @param datasetToQuery
      * @return
      */
-    private Set<NeedModelWrapper> queryNeed(NeedModelWrapper need, Optional<String> needUriToMatch) {
+    private Set<NeedModelWrapper> queryNeed(NeedModelWrapper need, Optional<String> needUriToMatch, Optional<Dataset> datasetToQuery) {
         Model model = need.getNeedModel();
         String needURI = need.getNeedUri();
 
@@ -369,8 +402,8 @@ public class SparqlMatcherActor extends UntypedActor {
             }, q);
 
             return Stream.concat(
-                    executeQuery(noHintForCounterpartQuery, needUriToMatch),
-                    executeQuery(hintForCounterpartQuery, needUriToMatch)
+                    executeQuery(noHintForCounterpartQuery, needUriToMatch, datasetToQuery),
+                    executeQuery(hintForCounterpartQuery, needUriToMatch, datasetToQuery)
                     ).collect(Collectors.toSet());
         })
                 .orElse(new HashSet<NeedModelWrapper>());
@@ -378,26 +411,42 @@ public class SparqlMatcherActor extends UntypedActor {
         return needs;
     }
 
-    private Stream<NeedModelWrapper> executeQuery(Op q, Optional<String> needUriToMatch) {
+    /**
+     * Executes the query, optionally binding the result variable to the specified needUriToMatch, optionally only searching in the datasetToQuery.
+     * @param q
+     * @param needUriToMatch
+     * @param datasetToQuery
+     * @return
+     */
+    private Stream<NeedModelWrapper> executeQuery(Op q, Optional<String> needUriToMatch, Optional<Dataset> datasetToQuery) {
         try {
             Query compiledQuery = OpAsQuery.asQuery(q);
 
 
             // if we were given a needUriToMatch, restrict the query result to that uri so that
             // we get exactly one result if that uri is found for the need
+            QuerySolutionMap initialBinding = new QuerySolutionMap();
             if (needUriToMatch.isPresent()) {
-                Binding binding = BindingFactory.binding(resultName, new ResourceImpl(needUriToMatch.get()).asNode());
-                compiledQuery.setValuesDataBlock(Collections.singletonList(resultName), Collections.singletonList(binding));
+                if (!datasetToQuery.isPresent()) {
+                    //if we are querying a remote dataset, we use the VALUES approach, otherwise we provide bindings to the queryExecutionFactory
+                    Binding binding = BindingFactory.binding(resultName, new ResourceImpl(needUriToMatch.get()).asNode());
+                    compiledQuery.setValuesDataBlock(Collections.singletonList(resultName), Collections.singletonList(binding));
+                } else {
+                    initialBinding.add(resultName.getName(), new ResourceImpl(needUriToMatch.get()));
+                }
             }
 
-            try (QueryExecution execution = QueryExecutionFactory.sparqlService(config.getSparqlEndpoint(), compiledQuery)) {
-
+            try (QueryExecution execution 
+                        = datasetToQuery.isPresent()
+                            ? QueryExecutionFactory
+                                    .create(compiledQuery, datasetToQuery.get(), initialBinding) 
+                            : QueryExecutionFactory
+                                    .sparqlService(config.getSparqlEndpoint(), compiledQuery)
+                            ) {
                 ResultSet result = execution.execSelect();
-    
                 Stream<QuerySolution> stream = StreamSupport.stream(
                         Spliterators.spliteratorUnknownSize(result, Spliterator.CONCURRENT),
                         false);
-    
                 return stream
                         .map(querySolution -> {
                             String foundNeedURI = querySolution.get(resultName.getName()).toString();
