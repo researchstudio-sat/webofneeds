@@ -27,6 +27,7 @@ import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.QuerySolutionMap;
+import org.apache.jena.query.ReadWrite;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelExtract;
@@ -241,6 +242,7 @@ public class SparqlMatcherActor extends UntypedActor {
         log.debug("starting sparql-based matching for need {}", need.getNeedUri());
         
         Set<NeedModelWrapper> matches = queryNeed(need);
+        Dataset needDataset = need.copyDataset();
         
         final boolean noHintForCounterpart = need.hasFlag(WON.NO_HINT_FOR_COUNTERPART);
         
@@ -252,15 +254,17 @@ public class SparqlMatcherActor extends UntypedActor {
                     if (!noHintForCounterpart && !noHintForMe && !need.getNeedUri().equals(matchedNeed.getNeedUri())) {
                         // query for the matched need - but only in the dataset containing the original need. If we have a match, it means
                         // that the matched need should also get a hint, otherwise it should not.
+                        needDataset.begin(ReadWrite.READ);
                         if (log.isDebugEnabled()) {
                             log.debug("checking if match {} of {} should get a hint by inverse matching it in need's dataset: \n{}", 
-                                    new Object[] {matchedNeed.getNeedUri(), need.getNeedUri(), RdfUtils.toString(need.copyDataset())});
+                                    new Object[] {matchedNeed.getNeedUri(), need.getNeedUri(), RdfUtils.toString(needDataset) } );
                         }
-                        Set<NeedModelWrapper> matchForMatchedNeed = queryNeed(matchedNeed, Optional.of(need.copyDataset()));
+                        Set<NeedModelWrapper> matchForMatchedNeed = queryNeed(matchedNeed, Optional.of(needDataset));
                         if (log.isDebugEnabled()) {
                             log.debug("match {} of {} is also getting a hint: {}", 
                                     new Object[] {matchedNeed.getNeedUri(), need.getNeedUri(), matchForMatchedNeed.size() > 0});
                         }
+                        needDataset.end();
                         return new AbstractMap.SimpleEntry<>(matchedNeed, matchForMatchedNeed);
                     } else {
                         // the flags in the original or in the matched need forbid a hint. don't add one.
