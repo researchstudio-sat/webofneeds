@@ -243,6 +243,7 @@ public class SparqlMatcherActor extends UntypedActor {
         log.debug("starting sparql-based matching for need {}", need.getNeedUri());
         
         Set<NeedModelWrapper> matches = queryNeed(need);
+        log.debug("found {} match candidates", matches.size());
         Dataset needDataset = need.copyDataset();
         
         final boolean noHintForCounterpart = need.hasFlag(WON.NO_HINT_FOR_COUNTERPART);
@@ -451,7 +452,9 @@ public class SparqlMatcherActor extends UntypedActor {
                             : QueryExecutionFactory
                                     .sparqlService(config.getSparqlEndpoint(), compiledQuery)
                             ) {
-                execution.getContext().set(TDB.symUnionDefaultGraph, true);
+                if (datasetToQuery.isPresent()) {
+                    execution.getContext().set(TDB.symUnionDefaultGraph, true);
+                }
                 ResultSet result = execution.execSelect();
                 Stream<QuerySolution> stream = StreamSupport.stream(
                         Spliterators.spliteratorUnknownSize(result, Spliterator.CONCURRENT),
