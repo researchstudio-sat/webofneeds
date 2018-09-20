@@ -442,7 +442,7 @@ public class SparqlMatcherActor extends UntypedActor {
                 // want a graph clause around our query
                 q = SparqlMatcherUtils.addGraphOp(q);
             }
-            Query compiledQuery = OpAsQuery.asQuery(q);
+            Query compiledQuery = OpAsQuery.asQuery(Algebra.optimize(q));
 
             if (log.isDebugEnabled()) {
                 log.debug("executeQuery query: {}, needToCheck: {}", new Object[] {compiledQuery, needToCheck});

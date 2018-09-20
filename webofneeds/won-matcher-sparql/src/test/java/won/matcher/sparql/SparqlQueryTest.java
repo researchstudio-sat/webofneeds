@@ -55,7 +55,7 @@ public class SparqlQueryTest  {
     }
     
     @Test
-    @Ignore // useful for trying things out, does not make so much sense as a unit test
+    //@Ignore // useful for trying things out, does not make so much sense as a unit test
     public void testQuery() throws Exception {
         Dataset dataset = DatasetFactory.create();
         RDFDataMgr.read(dataset, getResourceAsStream("sparqlquerytest/need.trig"), Lang.TRIG);
@@ -68,6 +68,7 @@ public class SparqlQueryTest  {
         
         System.out.println("query algebra: " + queryOp);
         System.out.println("transformed query algebra: " + queryWithGraphClause);
+        System.out.println("optimized query algebra:" + Algebra.optimize(queryWithGraphClause));
         System.out.println("\nDataset:");
         RDFDataMgr.write(System.out, dataset, Lang.TRIG);
         System.out.println("\nQuery:");
