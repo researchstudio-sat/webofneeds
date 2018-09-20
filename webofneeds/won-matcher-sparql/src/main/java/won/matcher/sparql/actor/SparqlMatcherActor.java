@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 import java.util.Set;
 import java.util.Spliterator;
 import java.util.Spliterators;
@@ -46,6 +47,7 @@ import org.apache.jena.sparql.algebra.Transformer;
 import org.apache.jena.sparql.algebra.op.OpBGP;
 import org.apache.jena.sparql.algebra.op.OpDistinct;
 import org.apache.jena.sparql.algebra.op.OpFilter;
+import org.apache.jena.sparql.algebra.op.OpGraph;
 import org.apache.jena.sparql.algebra.op.OpJoin;
 import org.apache.jena.sparql.algebra.op.OpPath;
 import org.apache.jena.sparql.algebra.op.OpProject;
@@ -437,8 +439,12 @@ public class SparqlMatcherActor extends UntypedActor {
      */
     private Stream<NeedModelWrapper> executeQuery(Op q, Optional<Dataset> datasetToQuery) {
         try {
+            if (datasetToQuery.isPresent()) {
+                // we're going to query an in-memory dataset. In this case, we'll 
+                // want a graph clause around our query
+                q = SparqlMatcherUtils.addGraphOp(q);
+            }
             Query compiledQuery = OpAsQuery.asQuery(q);
-
 
             if (log.isDebugEnabled()) {
                 log.debug("executeQuery query: {}, datasetToQuery: {}", new Object[] {compiledQuery, datasetToQuery});
@@ -527,6 +533,8 @@ public class SparqlMatcherActor extends UntypedActor {
         }
         return false;
     }
+    
+    
 
     @Override
     public SupervisorStrategy supervisorStrategy() {
