@@ -13,6 +13,12 @@ import {
 import Immutable from "immutable";
 import won from "../app/won-es6.js";
 
+export const emptyDraft = {
+  is: {},
+  seeks: {},
+  matchingContext: undefined,
+};
+
 /**
  * Defines a set of details that will only be visible within a specific 'implementation'
  * you will need to alter the identifier, label, icon, parseToRDF, and parseFromRDF if
@@ -179,6 +185,7 @@ export const details = {
       { value: "HUR", label: "per hour" },
       { value: "", label: "total", default: true },
     ],
+    messageEnabled: true,
     parseToRDF: function({ value, identifier, contentUri }) {
       if (!value || !value.amount || !value.currency) {
         return { "s:priceSpecification": undefined };
@@ -291,6 +298,7 @@ export const details = {
     placeholder: "Enter Date and Time...",
     component: "won-datetime-picker",
     viewerComponent: "won-datetime-viewer",
+    messageEnabled: true,
     parseToRDF: function({ value }) {
       // value can be an xsd:datetime-string or a javascript date object
       const datetime = parseDatetimeStrictly(value);
@@ -325,6 +333,7 @@ export const details = {
     placeholder: "Enter Date and Time...",
     component: "won-datetime-picker",
     viewerComponent: "won-datetime-viewer",
+    messageEnabled: true,
     parseToRDF: function({ value }) {
       // value can be an xsd:datetime-string or a javascript date object
       const datetime = parseDatetimeStrictly(value);
@@ -362,6 +371,7 @@ export const details = {
     placeholder: "Search for location",
     component: "won-location-picker",
     viewerComponent: "won-location-viewer",
+    messageEnabled: true,
     parseToRDF: function({ value, identifier, contentUri }) {
       if (!value) {
         // TODO: this should happen in need-builder
@@ -542,6 +552,7 @@ export const details = {
     placeholder: undefined,
     component: "won-person-picker",
     viewerComponent: "won-person-viewer",
+    messageEnabled: true,
     parseToRDF: function({ value, identifier, contentUri }) {
       if (!value) {
         return { "foaf:person": undefined };
@@ -653,6 +664,7 @@ export const details = {
     },
     component: "won-travel-action-picker",
     viewerComponent: "won-travel-action-viewer",
+    messageEnabled: true,
     parseToRDF: function({ value, identifier, contentUri }) {
       if (!value) {
         return { "won:travelAction": undefined };
@@ -888,6 +900,7 @@ export const details = {
     placeholder: "e.g. couch, free",
     component: "won-tags-picker",
     viewerComponent: "won-tags-viewer",
+    messageEnabled: true,
     parseToRDF: function({ value }) {
       if (!value) {
         return { "won:hasTag": undefined };
@@ -925,6 +938,7 @@ export const details = {
     multiSelect: true,
     component: "won-file-picker",
     viewerComponent: "won-file-viewer",
+    messageEnabled: true,
     parseToRDF: function({ value, identifier, contentUri }) {
       if (!value) {
         return { "won:hasFile": undefined };
@@ -1007,6 +1021,7 @@ export const details = {
     multiSelect: true,
     component: "won-file-picker",
     viewerComponent: "won-file-viewer",
+    messageEnabled: true,
     parseToRDF: function({ value, identifier, contentUri }) {
       if (!value) {
         return { "won:hasImage": undefined };
@@ -1089,6 +1104,7 @@ export const details = {
     accepts: "",
     component: "won-workflow-picker",
     viewerComponent: "won-workflow-viewer",
+    messageEnabled: true,
     parseToRDF: function({ value, identifier, contentUri }) {
       if (value && value.name && value.data) {
         //do not check for value.type might not be present on some systems
@@ -1138,6 +1154,7 @@ export const details = {
     accepts: "",
     component: "won-petrinet-picker",
     viewerComponent: "won-petrinet-viewer",
+    messageEnabled: true,
     parseToRDF: function({ value, identifier, contentUri }) {
       if (value && value.name && value.data) {
         //do not check for value.type might not be present on some systems
@@ -1200,6 +1217,7 @@ export const details = {
     ],
     component: "won-price-range-picker",
     viewerComponent: "won-price-viewer",
+    messageEnabled: true,
     parseToRDF: function({ value, identifier, contentUri }) {
       if (!value || !(value.min || value.max) || !value.currency) {
         return { "s:priceSpecification": undefined };

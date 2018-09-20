@@ -23,29 +23,11 @@ import {
   selectProposableMessagesByConnectionUri,
   selectSelectedMessagesByConnectionUri,
 } from "../selectors.js";
-import { getAllDetails } from "../won-utils.js";
+import { getAllMessageDetails } from "../won-utils.js";
 import autoresizingTextareaModule from "../directives/textarea-autogrow.js";
 import { actionCreators } from "../actions/actions.js";
 import labelledHrModule from "./labelled-hr.js";
 import { getHumanReadableStringFromMessage } from "../reducers/need-reducer/parse-message.js";
-
-// TODO: these should be replaced by importing defintions from config
-import descriptionPickerModule from "./details/picker/description-picker.js";
-import locationPickerModule from "./details/picker/location-picker.js";
-import personPickerModule from "./details/picker/person-picker.js";
-import travelActionPickerModule from "./details/picker/travel-action-picker.js";
-import tagsPickerModule from "./details/picker/tags-picker.js";
-import titlePickerModule from "./details/picker/title-picker.js";
-import numberPickerModule from "./details/picker/number-picker.js";
-import pricePickerModule from "./details/picker/price-picker.js";
-import datetimePickerModule from "./details/picker/datetime-picker.js";
-import dropdownPickerModule from "./details/picker/dropdown-picker.js";
-import selectPickerModule from "./details/picker/select-picker.js";
-import rangePickerModule from "./details/picker/range-picker.js";
-import priceRangePickerModule from "./details/picker/price-range-picker.js";
-import workflowPickerModule from "./details/picker/workflow-picker.js";
-import petrinetPickerModule from "./details/picker/petrinet-picker.js";
-import filePickerModule from "./details/picker/file-picker.js";
 
 import "style/_chattextfield.scss";
 import "style/_textfield.scss";
@@ -93,7 +75,7 @@ function genComponentConf() {
             <won-labelled-hr label="::'Details'" class="cts__details__grid__hr"
               ng-if="!self.multiSelectType && self.isConnected"></won-labelled-hr>
             <div class="cts__details__grid__detail"
-              ng-repeat="detail in self.allDetails"
+              ng-repeat="detail in self.allMessageDetails"
               ng-click="self.pickDetail(detail)">
               <svg class="cts__details__grid__detail__icon" ng-if="detail.icon">
                 <use xlink:href={{detail.icon}} href={{detail.icon}}></use>
@@ -237,11 +219,11 @@ function genComponentConf() {
             </div>
             <div class="cts__additionalcontent__list__item" ng-repeat="key in self.getAdditionalContentKeysArray()">
               <svg class="cts__additionalcontent__list__item__icon clickable"
-                ng-click="self.pickDetail(self.allDetails[key])">
-                <use xlink:href={{self.allDetails[key].icon}} href={{self.allDetails[key].icon}}></use>
+                ng-click="self.pickDetail(self.allMessageDetails[key])">
+                <use xlink:href={{self.allMessageDetails[key].icon}} href={{self.allMessageDetails[key].icon}}></use>
               </svg>
               <span class="cts__additionalcontent__list__item__label clickable"
-                ng-click="self.pickDetail(self.allDetails[key])">
+                ng-click="self.pickDetail(self.allMessageDetails[key])">
                 {{ self.getHumanReadableDetailString(key, self.additionalContent.get(key)) }}
               </span>
               <svg class="cts__additionalcontent__list__item__discard clickable"
@@ -270,7 +252,7 @@ function genComponentConf() {
     constructor(/* arguments <- serviceDependencies */) {
       attach(this, serviceDependencies, arguments);
       window.ctfs4dbg = this;
-      this.allDetails = getAllDetails();
+      this.allMessageDetails = getAllMessageDetails();
 
       this.draftObject = {};
       this.additionalContent = new Map(); //Stores the additional Detail content of a message
@@ -318,9 +300,9 @@ function genComponentConf() {
 
         const selectedDetailIdentifier = state.get("selectedAddMessageContent");
         const selectedDetail =
-          this.allDetails &&
+          this.allMessageDetails &&
           selectedDetailIdentifier &&
-          this.allDetails[selectedDetailIdentifier];
+          this.allMessageDetails[selectedDetailIdentifier];
         return {
           connectionUri,
           post,
@@ -492,7 +474,7 @@ function genComponentConf() {
     }
 
     getHumanReadableDetailString(key, value) {
-      const usedDetail = this.allDetails[key];
+      const usedDetail = this.allMessageDetails[key];
 
       return (
         usedDetail &&
@@ -659,22 +641,6 @@ export default angular
   .module("won.owner.components.chatTextfieldSimple", [
     labelledHrModule,
     autoresizingTextareaModule,
-    descriptionPickerModule,
-    locationPickerModule,
-    personPickerModule,
-    travelActionPickerModule,
-    tagsPickerModule,
-    titlePickerModule,
-    numberPickerModule,
-    pricePickerModule,
-    datetimePickerModule,
-    dropdownPickerModule,
-    selectPickerModule,
-    rangePickerModule,
-    priceRangePickerModule,
-    petrinetPickerModule,
-    workflowPickerModule,
-    filePickerModule,
     ngAnimate,
   ])
   .directive("messageDetailElement", [

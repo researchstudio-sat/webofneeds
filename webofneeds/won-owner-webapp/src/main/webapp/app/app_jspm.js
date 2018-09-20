@@ -54,6 +54,78 @@ window.won = won;
  */
 import { runMessagingAgent } from "./messaging-agent.js";
 
+//viewer-modules
+import personViewerModule from "./components/details/viewer/person-viewer.js";
+import descriptionViewerModule from "./components/details/viewer/description-viewer.js";
+import locationViewerModule from "./components/details/viewer/location-viewer.js";
+import tagsViewerModule from "./components/details/viewer/tags-viewer.js";
+import travelActionViewerModule from "./components/details/viewer/travel-action-viewer.js";
+import titleViewerModule from "./components/details/viewer/title-viewer.js";
+import numberViewerModule from "./components/details/viewer/number-viewer.js";
+import priceViewerModule from "./components/details/viewer/price-viewer.js";
+import datetimeViewerModule from "./components/details/viewer/datetime-viewer.js";
+import dropdownViewerModule from "./components/details/viewer/dropdown-viewer.js";
+import selectViewerModule from "./components/details/viewer/select-viewer.js";
+import rangeViewerModule from "./components/details/viewer/range-viewer.js";
+import fileViewerModule from "./components/details/viewer/file-viewer.js";
+import workflowViewerModule from "./components/details/viewer/workflow-viewer.js";
+import petrinetViewerModule from "./components/details/viewer/petrinet-viewer.js";
+
+const viewerModules = [
+  personViewerModule,
+  descriptionViewerModule,
+  locationViewerModule,
+  tagsViewerModule,
+  travelActionViewerModule,
+  titleViewerModule,
+  numberViewerModule,
+  priceViewerModule,
+  datetimeViewerModule,
+  dropdownViewerModule,
+  selectViewerModule,
+  rangeViewerModule,
+  fileViewerModule,
+  workflowViewerModule,
+  petrinetViewerModule,
+];
+
+//picker-modules
+import descriptionPickerModule from "./components/details/picker/description-picker.js";
+import locationPickerModule from "./components/details/picker/location-picker.js";
+import personPickerModule from "./components/details/picker/person-picker.js";
+import travelActionPickerModule from "./components/details/picker/travel-action-picker.js";
+import tagsPickerModule from "./components/details/picker/tags-picker.js";
+import titlePickerModule from "./components/details/picker/title-picker.js";
+import numberPickerModule from "./components/details/picker/number-picker.js";
+import pricePickerModule from "./components/details/picker/price-picker.js";
+import datetimePickerModule from "./components/details/picker/datetime-picker.js";
+import dropdownPickerModule from "./components/details/picker/dropdown-picker.js";
+import selectPickerModule from "./components/details/picker/select-picker.js";
+import rangePickerModule from "./components/details/picker/range-picker.js";
+import priceRangePickerModule from "./components/details/picker/price-range-picker.js";
+import filePickerModule from "./components/details/picker/file-picker.js";
+import workflowPickerModule from "./components/details/picker/workflow-picker.js";
+import petrinetPickerModule from "./components/details/picker/petrinet-picker.js";
+
+const pickerModules = [
+  descriptionPickerModule,
+  locationPickerModule,
+  personPickerModule,
+  travelActionPickerModule,
+  tagsPickerModule,
+  titlePickerModule,
+  numberPickerModule,
+  pricePickerModule,
+  datetimePickerModule,
+  dropdownPickerModule,
+  selectPickerModule,
+  rangePickerModule,
+  priceRangePickerModule,
+  filePickerModule,
+  workflowPickerModule,
+  petrinetPickerModule,
+];
+
 let app = angular.module("won.owner", [
   /* to enable legacy $stateChange* events in ui-router (see
      * here for details: https://ui-router.github.io/guide/ng1/migrate-to-1_0#state-change-events)
@@ -77,53 +149,13 @@ let app = angular.module("won.owner", [
   settingsTitleBarModule,
   avatarSettingsModule,
   generalSettingsModule,
+
+  ...viewerModules,
+  ...pickerModules,
 ]);
 
 /* create store, register middlewares, set up redux-devtool-support, etc */
 configRedux(app);
-
-app
-  .filter("filterByNeedState", function() {
-    return function(needs, state) {
-      let filtered = [];
-      angular.forEach(needs, function(need) {
-        if (need["won:isInState"]["@id"] == state) {
-          filtered.push(need);
-        }
-      });
-
-      return filtered;
-    };
-  })
-  .filter("filterEventByType", function() {
-    return function(events, uri, type) {
-      let filtered = [];
-      angular.forEach(events, function(event) {
-        if (event.hasReceiverNeed == uri && event.eventType == type) {
-          filtered.push(event);
-        }
-      });
-
-      return filtered;
-    };
-  })
-  /*Filters All events so that only the ones with textMessages remain*/
-  .filter("filterByEventMsgs", function() {
-    return function(events) {
-      let filtered = [];
-      angular.forEach(events, function(event) {
-        if (
-          event.hasTextMessage !== undefined ||
-          (event.hasCorrespondingRemoteMessage &&
-            event.hasCorrespondingRemoteMessage.hasTextMessage)
-        ) {
-          filtered.push(event);
-        }
-      });
-
-      return filtered;
-    };
-  });
 
 app.config(configRouting).config([
   "$compileProvider",

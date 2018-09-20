@@ -335,6 +335,26 @@ export function getAllDetails() {
   return details;
 }
 
+/**
+ * Returns all the details that are defined in any useCase in the useCaseDefinitions
+ * and has the messageEnabled Flag set to true
+ *
+ * the messageEnabled-flag indicates if the detail is allowed to be sent as a part of a connectionMessage
+ * @returns {{}}
+ */
+export function getAllMessageDetails() {
+  let messageDetails = {};
+
+  const allDetails = getAllDetails();
+  for (const detailKey in allDetails) {
+    if (allDetails[detailKey].messageEnabled) {
+      messageDetails[detailKey] = allDetails[detailKey];
+    }
+  }
+
+  return messageDetails;
+}
+
 function hasSubElements(obj) {
   return obj && obj !== {} && Object.keys(obj).length > 0;
 }

@@ -55,6 +55,66 @@ function config(env, argv): Configuration {
           "config",
           `usecase-definitions.js`
         ),
+        personDetails$: path.resolve(
+          __dirname,
+          "config",
+          "details",
+          `person.js`
+        ),
+        musicianDetails$: path.resolve(
+          __dirname,
+          "config",
+          "details",
+          `musician.js`
+        ),
+        realEstateDetails$: path.resolve(
+          __dirname,
+          "config",
+          "details",
+          `real-estate.js`
+        ),
+        complainUseCases$: path.resolve(
+          __dirname,
+          "config",
+          "usecases",
+          `complain.js`
+        ),
+        mobilityUseCases$: path.resolve(
+          __dirname,
+          "config",
+          "usecases",
+          `mobility.js`
+        ),
+        musicianUseCases$: path.resolve(
+          __dirname,
+          "config",
+          "usecases",
+          `musician.js`
+        ),
+        professionalUseCases$: path.resolve(
+          __dirname,
+          "config",
+          "usecases",
+          `professional.js`
+        ),
+        socialUseCases$: path.resolve(
+          __dirname,
+          "config",
+          "usecases",
+          `social.js`
+        ),
+        transportUseCases$: path.resolve(
+          __dirname,
+          "config",
+          "usecases",
+          `transport.js`
+        ),
+        realEstateUseCases$: path.resolve(
+          __dirname,
+          "config",
+          "usecases",
+          `real-estate.js`
+        ),
         config$: path.resolve(__dirname, "config", `${nodeEnv}.js`),
         jsonld$: require.resolve("jsonld/dist/jsonld.js"), // This is needed because `jsonld`s entrypoint is not compiled to compatible js (uses spread operators). With this resolve hook we instead use the compiled version.
       },
