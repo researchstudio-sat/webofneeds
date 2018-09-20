@@ -237,9 +237,18 @@ import { Generator } from "sparqljs";
 
     const doNotMatchAfterFnOrLit = useCase && useCase.doNotMatchAfter;
     const doNotMatchAfter = is("Function", doNotMatchAfterFnOrLit)
-      ? doNotMatchAfterFnOrLit(args, {
-          "@graph": [isContentNode, seeksContentNode],
-        }) // TODO pass draft and jsonld
+      ? doNotMatchAfterFnOrLit(
+          args,
+          {
+            "@graph": [isContentNode, seeksContentNode],
+          },
+          useCase && useCase.timeToLiveMillisDefault
+            ? useCase.timeToLiveMillisDefault
+            : 30 * 60 * 1000,
+          useCase && useCase.timeToLiveMillisAfterDate
+            ? useCase.timeToLiveMillisAfterDate
+            : 30 * 60 * 1000
+        ) // TODO pass draft and jsonld
       : doNotMatchAfterFnOrLit;
 
     const graph = [
