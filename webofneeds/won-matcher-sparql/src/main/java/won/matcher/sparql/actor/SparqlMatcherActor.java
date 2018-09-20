@@ -472,7 +472,10 @@ public class SparqlMatcherActor extends UntypedActor {
                                 return null;
                             }
                         })
-                        .filter(foundNeed -> foundNeed != null);
+                        .filter(foundNeed -> foundNeed != null)
+                        // we have to collect the results within the try block because
+                        // the QueryExecution will be closed as soon as we leave it:
+                        .collect(Collectors.toSet()).stream();
             }
         } catch (Exception e) {
             log.info("caught exception during sparql-based matching (more info on loglevel 'debug'): {} ", e.getMessage());
