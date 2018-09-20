@@ -431,7 +431,6 @@ public class SparqlMatcherActor extends UntypedActor {
      * @return
      */
     private Stream<NeedModelWrapper> executeQuery(Op q, Optional<NeedModelWrapperAndDataset> needToCheck) {
-        try {
             if (needToCheck.isPresent()) {
                 // we're going to query an in-memory dataset. In this case, we'll 
                 // want a graph clause around our query
@@ -442,6 +441,8 @@ public class SparqlMatcherActor extends UntypedActor {
             if (log.isDebugEnabled()) {
                 log.debug("executeQuery query: {}, needToCheck: {}", new Object[] {compiledQuery, needToCheck});
             }
+            Set<String> foundUris = new HashSet<String>();
+            // process query results iteratively
             try (QueryExecution execution 
                         = needToCheck.isPresent()
                             ? QueryExecutionFactory
@@ -450,44 +451,39 @@ public class SparqlMatcherActor extends UntypedActor {
                                     .sparqlService(config.getSparqlEndpoint(), compiledQuery)
                             ) {
 
-                // We tried using a Spliterator-based solution here, but it leads to 
-                // many concurrent requests when evaluating the query. We're better off with
-                // this iterative solution here.
                 ResultSet result = execution.execSelect();
-                Set<NeedModelWrapper> resultNeeds = new HashSet<>();
-                while (result.hasNext()) {
-                    QuerySolution solution = result.next();
-                    String foundNeedURI = solution.get(resultName.getName()).toString();
+                while(result.hasNext()) {
+                    QuerySolution querySolution = result.next();
+                    String foundNeedURI = querySolution.get(resultName.getName()).toString();
+                    foundUris.add(foundNeedURI);
+                }
+            } catch (Exception e) {
+                log.info("caught exception during sparql-based matching (more info on loglevel 'debug'): {} ", e.getMessage());
+                if (log.isDebugEnabled()) {
+                    e.printStackTrace();
+                }
+                return Stream.empty();
+            }
+            
+            //load data in parallel
+            return foundUris.parallelStream().map(foundNeedUri -> {
                     try {
                         //if we have a needToCheck, return it if the URI we found actually is its URI, otherwise null
                         if ((needToCheck.isPresent())) {
-                            if (needToCheck.get().needModelWrapper.getNeedUri().equals(foundNeedURI)) {
-                                resultNeeds.add(needToCheck.get().needModelWrapper);
-                            }
+                            return needToCheck.get().needModelWrapper.getNeedUri().equals(foundNeedUri) ? needToCheck.get().needModelWrapper : null;
                         } else {
                             // no needToCheck, which happens when we first look for matches in the graph store: 
                             // download the linked data and return a new NeedModelWrapper
-                            resultNeeds.add(new NeedModelWrapper(linkedDataSource.getDataForResource(new URI(foundNeedURI))));
+                            return new NeedModelWrapper(linkedDataSource.getDataForResource(URI.create(foundNeedUri)));
                         }
                     } catch (Exception e) {
-                        log.info("caught exception trying to load need URI {} : {} (more on loglevel 'debug')" , foundNeedURI, e.getMessage() );
+                        log.info("caught exception trying to load need URI {} : {} (more on loglevel 'debug')" , foundNeedUri, e.getMessage() );
                         if (log.isDebugEnabled()) {
                             e.printStackTrace();
                         }
+                        return null;
                     }
-                }
-                if (log.isDebugEnabled()) {
-                    log.debug("executeQuery query found {} matches", resultNeeds.size());
-                }
-                return resultNeeds.stream();
-            }
-        } catch (Exception e) {
-            log.info("caught exception during sparql-based matching (more info on loglevel 'debug'): {} ", e.getMessage());
-            if (log.isDebugEnabled()) {
-                e.printStackTrace();
-            }
-            return Stream.empty();
-        }
+                }).filter(foundNeed -> foundNeed != null);
     }
 
     private static Set<String> getMatchingContexts(NeedModelWrapper need) {
