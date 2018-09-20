@@ -13,11 +13,25 @@ import "style/_datetimepicker.scss";
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
   let template = `
+      <!-- TODO: add some indication that both date and time need to be specified -->
+      <button class="datetimep__button won-button--filled red"
+        ng-click="self.currentDatetime()">
+          Now
+      </button>
+
+      <!-- DATE -->
       <div class="datetimep__input">
-          <button class="datetimep__input__button won-button--filled red"
-            ng-click="self.currentDatetime()">
-              Now
-          </button>
+          <input
+              type="date"
+              class="datetimep__input__inner"
+              id="datetimep__input__date"
+              placeholder="{{self.detail.placeholder}}"
+              ng-model="self.date_value"
+              ng-change="::self.updateDatetime()"/>
+      </div>
+          
+      <!-- TIME -->
+      <div class="datetimep__input">
           <svg class="datetimep__input__icon clickable"
               style="--local-primary:var(--won-primary-color);"
               ng-if="self.showResetButton"
@@ -25,10 +39,11 @@ function genComponentConf() {
                   <use xlink:href="#ico36_close" href="#ico36_close"></use>
           </svg>
           <input
-              type="datetime-local"
+              type="time"
               class="datetimep__input__inner"
+              id="datetimep__input__time"
               placeholder="{{self.detail.placeholder}}"
-              ng-model="self.value"
+              ng-model="self.time_value"
               ng-change="::self.updateDatetime()"
               ng-class="{'datetimep__input__inner--withreset' : self.showResetButton}"/>
       </div>
@@ -40,8 +55,14 @@ function genComponentConf() {
       this.domCache = new DomCache(this.$element);
 
       window.datetimep4dbg = this;
-
       this.addedDatetime = this.initialValue;
+
+      const currentDate = toLocalISODateString(new Date());
+      // format: [-]yyyy-MM-DDThh:mm:ss[Z|[+|-]hh:mm]
+
+      this.fallbackDate = currentDate.split("T")[0];
+      this.fallbackTime = "12:00";
+
       this.showResetButton = false;
 
       delay(0).then(() => this.showInitialDatetime());
@@ -60,8 +81,41 @@ function genComponentConf() {
     }
 
     showInitialDatetime() {
-      if (isValidDate(this.initialValue)) {
-        const datetimeString = toLocalISODateString(this.initialValue);
+      this.setDatetime(this.initialValue);
+      this.$scope.$apply();
+    }
+
+    updateDatetime() {
+      let date = this.datefield().value;
+      let time = this.timefield().value;
+
+      // check if either time or date are set
+      if (
+        (date && date.trim().length > 0) ||
+        (time && time.trim().length > 0)
+      ) {
+        // add fallback date
+        if (!date) {
+          date = this.fallbackDate;
+          this.datefield().value = this.fallbackDate;
+        }
+        // add fallback time
+        if (!time) {
+          time = this.fallbackTime;
+          this.timefield().value = this.fallbackTime;
+        }
+
+        this.addedDatetime = date.trim() + "T" + time.trim();
+        this.update(this.addedDatetime);
+        this.showResetButton = true;
+      } else {
+        this.resetDatetime();
+      }
+    }
+
+    setDatetime(datetime) {
+      if (isValidDate(datetime)) {
+        const datetimeString = toLocalISODateString(datetime);
         const croppedDatetimeString = get(
           // only select up till minutes; drop seconds, ms and timezone
           // (we'll generate the local timezone anyway)
@@ -70,69 +124,58 @@ function genComponentConf() {
           0 // first match if any
         );
         if (croppedDatetimeString) {
+          // checking already happens with isValidDate,
+          // so valid date/time can be assumed here
+          const splitDateTimeString = croppedDatetimeString.split("T");
           this.addedDatetime = croppedDatetimeString;
-          this.textfield().value = croppedDatetimeString;
+          this.datefield().value = splitDateTimeString[0];
+          this.timefield().value = splitDateTimeString[1];
           this.showResetButton = true;
+
+          return true;
         }
+        return false;
       }
-
-      this.$scope.$apply();
-    }
-
-    updateDatetime() {
-      const text = this.textfield().value;
-
-      if (text && text.trim().length > 0) {
-        this.addedDatetime = text.trim();
-        this.update(this.addedDatetime);
-        this.showResetButton = true;
-      } else {
-        this.resetDatetime();
-      }
+      return false;
     }
 
     currentDatetime() {
-      console.log("currentDateTime");
-      const datetimeString = toLocalISODateString(new Date());
-      const croppedDatetimeString = get(
-        // only select up till minutes; drop seconds, ms and timezone
-        // (we'll generate the local timezone anyway)
-        datetimeString && datetimeString.match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/),
-        0 // first match if any
-      );
-      if (croppedDatetimeString) {
-        this.addedDatetime = croppedDatetimeString;
-        this.textfield().value = croppedDatetimeString;
+      // console.log("currentDateTime");
+      if (this.setDatetime(new Date())) {
         this.update(this.addedDatetime);
-        this.showResetButton = true;
       }
     }
 
     resetDatetime() {
       this.addedDatetime = undefined;
-      this.textfield().value = "";
+      this.datefield().value = "";
+      this.timefield().value = "";
       this.update(undefined);
       this.showResetButton = false;
     }
 
-    // textfieldNg() {
-    //   return this.domCache.ng(".datetimep__input__inner");
-    // }
-
-    // textfield() {
-    //   return this.domCache.dom(".datetimep__input__inner");
-    // } // TODO: why is this done differently for number than for any other picker?
-
-    textfieldNg() {
-      return angular.element(this.textfield());
+    datefieldNg() {
+      return angular.element(this.datefield());
     }
-    textfield() {
-      if (!this._datetimeInput) {
-        this._datetimeInput = this.$element[0].querySelector(
-          ".datetimep__input__inner"
+    datefield() {
+      if (!this._dateInput) {
+        this._dateInput = this.$element[0].querySelector(
+          "#datetimep__input__date"
         );
       }
-      return this._datetimeInput;
+      return this._dateInput;
+    }
+
+    timefieldNg() {
+      return angular.element(this.timefield());
+    }
+    timefield() {
+      if (!this._timeInput) {
+        this._timeInput = this.$element[0].querySelector(
+          "#datetimep__input__time"
+        );
+      }
+      return this._timeInput;
     }
   }
   Controller.$inject = serviceDependencies;

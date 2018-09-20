@@ -1390,7 +1390,7 @@ export function parseDatetimeStrictly(dateTime) {
     return undefined;
   }
   const validXsdDateTimeString = !!dateTime.match(
-    /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/
+    /^-?\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(([+-]\d{2}:\d{2})|Z)?/
   );
   const asDateTime = new Date(dateTime);
   if (validXsdDateTimeString && isValidNumber(asDateTime.valueOf())) {
