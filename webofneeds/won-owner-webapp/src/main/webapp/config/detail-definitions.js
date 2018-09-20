@@ -364,6 +364,29 @@ export const details = {
       return undefined;
     },
   },
+  datetimeRange: {
+    identifier: "datetimeRange",
+    label: "Timerange",
+    icon: "#ico36_detail_datetime",
+    placeholder: undefined,
+    component: "won-datetime-range-picker",
+    viewerComponent: "won-datetime-viewer",
+    parseToRDF: function({ value }) {
+      console.log("TODO: implement parse to RDF for " + value);
+      return undefined;
+    },
+    parseFromRDF: function(jsonLDImm) {
+      console.log("TODO: implement parse from RDF for " + jsonLDImm.toJS());
+      return undefined;
+    },
+    generateHumanReadable: function({ value, includeLabel }) {
+      if (value || includeLabel) {
+        // do nothing
+      }
+      console.log("TODO: implement generate human readable for datetime range");
+      return undefined;
+    },
+  },
   location: {
     identifier: "location",
     label: "Location",
