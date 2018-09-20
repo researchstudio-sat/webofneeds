@@ -367,6 +367,7 @@ export const details = {
     placeholder: undefined,
     component: "won-datetime-range-picker",
     viewerComponent: "won-datetime-viewer", // not used, values are read as fromDatetime and throughDatetime
+    messageEnabled: false,
     parseToRDF: function({ value }) {
       if (value) {
         const fromDatetime = parseDatetimeStrictly(value.fromDatetime);
