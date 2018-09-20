@@ -368,6 +368,9 @@ public class SparqlMatcherActor extends UntypedActor {
             }
             Op noHintForCounterpartQuery = Transformer.transform(new TransformCopy() {
                 public Op transform(OpProject op, Op subOp) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("transforming: opProject:{}, subOp:{}", op, subOp);
+                    }
                     return new OpSlice(
                             op.copy(
                                     OpJoin.create(
@@ -391,6 +394,9 @@ public class SparqlMatcherActor extends UntypedActor {
             }
             Op hintForCounterpartQuery = Transformer.transform(new TransformCopy() {
                 public Op transform(OpProject op, Op subOp) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("transforming: opProject:{}, subOp:{}", op, subOp);
+                    }
                     return new OpSlice(
                             op.copy(
                                     OpFilter.filter(
