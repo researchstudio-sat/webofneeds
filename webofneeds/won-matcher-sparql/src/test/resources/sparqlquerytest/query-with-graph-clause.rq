@@ -1,0 +1,54 @@
+SELECT DISTINCT  *
+WHERE
+  { SELECT  ?result
+    WHERE { graph ?g
+      {   { ?fa8bd39f  <http://purl.org/webofneeds/model#hasTag>  "SearchRealEstateToRent" .
+            ?result   <http://purl.org/webofneeds/model#is>  ?fa8bd39f
+          }
+        UNION
+          { ?f34868ae  a                    <http://schema.org/LocationFeatureSpecification> ;
+                      <http://schema.org/value>  "Pool"^^<http://schema.org/Text> .
+            ?2a6ba3e6  a                    <http://schema.org/LocationFeatureSpecification> ;
+                      <http://schema.org/value>  "furnished"^^<http://schema.org/Text> .
+            ?5e2a2197  a                    <http://schema.org/GeoCoordinates> ;
+                      <http://schema.org/latitude>  "48.385349" ;
+                      <http://schema.org/longitude>  "16.821063" .
+            ?80cc5cfe  <http://schema.org/numberOfRooms>  "3"^^<http://www.w3.org/2001/XMLSchema#float> ;
+                      <http://purl.org/dc/elements/1.1/title>  "Sample Real Estate Need 532" ;
+                      <http://purl.org/webofneeds/model#hasLocation>  ?dc9b3dfc ;
+                      <http://purl.org/dc/elements/1.1/description>  "This is a sample offer that was automatically generated." ;
+                      <http://schema.org/amenityFeature>  ?2a6ba3e6 ;
+                      <http://purl.org/webofneeds/model#hasTag>  "RentOutRealEstate" ;
+                      <http://schema.org/floorSize>  ?6665e5d2 ;
+                      <http://schema.org/amenityFeature>  ?f34868ae ;
+                      <http://schema.org/priceSpecification>  ?fbf90017 ;
+                      <http://schema.org/amenityFeature>  ?71e41eee .
+            ?71e41eee  a                    <http://schema.org/LocationFeatureSpecification> ;
+                      <http://schema.org/value>  "Parquetflooring"^^<http://schema.org/Text> .
+            ?776ae3ae  a                    <http://schema.org/GeoCoordinates> ;
+                      <http://purl.org/webofneeds/model#geoSpatial>  "48.288651#16.705195"^^<http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon> ;
+                      <http://schema.org/latitude>  "48.288651" ;
+                      <http://schema.org/longitude>  "16.705195" .
+            ?fbf90017  a                    <http://schema.org/CompoundPriceSpecification> ;
+                      <http://schema.org/description>  "total rent per month" ;
+                      <http://schema.org/price>  "1314"^^<http://www.w3.org/2001/XMLSchema#float> ;
+                      <http://schema.org/priceCurrency>  "EUR" .
+            ?6665e5d2  a                    <http://schema.org/QuantitativeValue> ;
+                      <http://schema.org/unitCode>  "MTK" ;
+                      <http://schema.org/value>  "228"^^<http://www.w3.org/2001/XMLSchema#float> .
+            ?dc9b3dfc  a                    <http://schema.org/Place> ;
+                      <http://purl.org/webofneeds/model#hasBoundingBox>  ?d724bb1a ;
+                      <http://schema.org/geo>  ?776ae3ae ;
+                      <http://schema.org/name>  "Gemeinde Weikendorf, Bezirk Gänserndorf, Lower Austria, 2253, Austria" .
+            ?d724bb1a  <http://purl.org/webofneeds/model#hasNorthWestCorner>  ?5e2a2197 ;
+                      <http://purl.org/webofneeds/model#hasSouthEastCorner>  ?d98239ac .
+            ?d98239ac  a                    <http://schema.org/GeoCoordinates> ;
+                      <http://schema.org/latitude>  "48.309745" ;
+                      <http://schema.org/longitude>  "16.729174" .
+            ?result   <http://purl.org/webofneeds/model#seeks>  ?80cc5cfe
+          }
+        FILTER NOT EXISTS { ?result  <http://purl.org/webofneeds/model#hasFlag>  <http://purl.org/webofneeds/model#NoHintForCounterpart> }
+      } }
+    OFFSET  0
+    LIMIT   20
+  }
