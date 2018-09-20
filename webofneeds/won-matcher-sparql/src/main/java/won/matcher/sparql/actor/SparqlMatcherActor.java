@@ -450,32 +450,36 @@ public class SparqlMatcherActor extends UntypedActor {
                                     .sparqlService(config.getSparqlEndpoint(), compiledQuery)
                             ) {
 
+                // We tried using a Spliterator-based solution here, but it leads to 
+                // many concurrent requests when evaluating the query. We're better off with
+                // this iterative solution here.
                 ResultSet result = execution.execSelect();
-                Stream<QuerySolution> stream = StreamSupport.stream(
-                        Spliterators.spliteratorUnknownSize(result, Spliterator.CONCURRENT),
-                        false);
-
-                return stream
-                        .map(querySolution -> {
-                            String foundNeedURI = querySolution.get(resultName.getName()).toString();
-                            try {
-                                //if we have a needToCheck, return it if the URI we found actually is its URI, otherwise null
-                                if ((needToCheck.isPresent())) {
-                                    return needToCheck.get().needModelWrapper.getNeedUri().equals(foundNeedURI) ? needToCheck.get().needModelWrapper : null;
-                                } else {
-                                    // no needToCheck, which happens when we first look for matches in the graph store: 
-                                    // download the linked data and return a new NeedModelWrapper
-                                    return new NeedModelWrapper(linkedDataSource.getDataForResource(new URI(foundNeedURI)));
-                                }
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                return null;
+                Set<NeedModelWrapper> resultNeeds = new HashSet<>();
+                while (result.hasNext()) {
+                    QuerySolution solution = result.next();
+                    String foundNeedURI = solution.get(resultName.getName()).toString();
+                    try {
+                        //if we have a needToCheck, return it if the URI we found actually is its URI, otherwise null
+                        if ((needToCheck.isPresent())) {
+                            if (needToCheck.get().needModelWrapper.getNeedUri().equals(foundNeedURI)) {
+                                resultNeeds.add(needToCheck.get().needModelWrapper);
                             }
-                        })
-                        .filter(foundNeed -> foundNeed != null)
-                        // we have to collect the results within the try block because
-                        // the QueryExecution will be closed as soon as we leave it:
-                        .collect(Collectors.toSet()).stream();
+                        } else {
+                            // no needToCheck, which happens when we first look for matches in the graph store: 
+                            // download the linked data and return a new NeedModelWrapper
+                            resultNeeds.add(new NeedModelWrapper(linkedDataSource.getDataForResource(new URI(foundNeedURI))));
+                        }
+                    } catch (Exception e) {
+                        log.info("caught exception trying to load need URI {} : {} (more on loglevel 'debug')" , foundNeedURI, e.getMessage() );
+                        if (log.isDebugEnabled()) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                if (log.isDebugEnabled()) {
+                    log.debug("executeQuery query found {} matches", resultNeeds.size());
+                }
+                return resultNeeds.stream();
             }
         } catch (Exception e) {
             log.info("caught exception during sparql-based matching (more info on loglevel 'debug'): {} ", e.getMessage());
