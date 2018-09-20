@@ -19,7 +19,7 @@ import java.io.InputStream;
 /**
  * Created by hfriedrich on 11.09.2015.
  */
-public class SparqlTest {
+public class SparqlMatcherActorExperiment {
     public static void main(String[] args) throws IOException, InterruptedException {
 
         // init basic Akka
@@ -44,7 +44,7 @@ public class SparqlTest {
         Dataset dataset = null;
         try {
             try {
-                is = SparqlTest.class.getResourceAsStream(path);
+                is = SparqlMatcherActorExperiment.class.getResourceAsStream(path);
                 dataset = DatasetFactory.create();
                 RDFDataMgr.read(dataset, is, RDFFormat.TRIG.getLang());
             } finally {
@@ -60,4 +60,6 @@ public class SparqlTest {
         String needUri = WonRdfUtils.NeedUtils.getNeedURI(dataset).toString();
         return new NeedEvent(needUri, "no_uri", NeedEvent.TYPE.ACTIVE, System.currentTimeMillis(), dataset);
     }
+    
+    
 }
