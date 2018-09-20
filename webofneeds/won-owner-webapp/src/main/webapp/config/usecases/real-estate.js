@@ -32,6 +32,7 @@ export const realEstateGroup = {
       identifier: "searchRent",
       label: "Find a place to rent",
       icon: "#ico36_uc_realestate",
+      timeToLiveMillisDefault: 1000 * 60 * 60 * 24 * 30 * 3,
       doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
       draft: {
         ...emptyDraft,
@@ -112,6 +113,7 @@ export const realEstateGroup = {
       identifier: "offerRent",
       label: "Rent a place out",
       icon: "#ico36_uc_realestate",
+      timeToLiveMillisDefault: 1000 * 60 * 60 * 24 * 30 * 3,
       doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
       draft: {
         ...emptyDraft,

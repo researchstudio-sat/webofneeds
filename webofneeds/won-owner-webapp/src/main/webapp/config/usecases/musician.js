@@ -22,6 +22,7 @@ export const musicianGroup = {
       identifier: "findBand",
       label: "Find Band",
       icon: "#ico36_uc_find_band",
+      timeToLiveMillisDefault: 1000 * 60 * 60 * 24 * 30,
       doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
       draft: {
         ...emptyDraft,
@@ -49,6 +50,7 @@ export const musicianGroup = {
       identifier: "findMusician",
       label: "Find Musician",
       icon: "#ico36_uc_find_musician",
+      timeToLiveMillisDefault: 1000 * 60 * 60 * 24 * 30,
       doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
       draft: {
         ...emptyDraft,
@@ -76,6 +78,7 @@ export const musicianGroup = {
       identifier: "findRehearsalRoom",
       label: "Find Rehearsal Room",
       icon: "#ico36_uc_realestate",
+      timeToLiveMillisDefault: 1000 * 60 * 60 * 24 * 7,
       doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
       draft: {
         ...emptyDraft,
@@ -105,6 +108,7 @@ export const musicianGroup = {
       identifier: "OfferRehearsalRoom",
       label: "Offer Rehearsal Room",
       icon: "#ico36_uc_realestate",
+      timeToLiveMillisDefault: 1000 * 60 * 60 * 24 * 30 * 3,
       doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
       draft: {
         ...emptyDraft,

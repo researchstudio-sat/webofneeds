@@ -362,13 +362,14 @@ function hasSubElements(obj) {
 export function findLatestIntervallEndInJsonLdOrNowAndAddMillis(
   draft,
   jsonld,
-  millis = 1000 * 60 * 30
+  timeToLiveMillisDefault = 1000 * 60 * 30,
+  timeToLiveMillisAfterDate = 1000 * 60 * 30
 ) {
   const date = findLatestIntervallEndInJsonLdAsDate(draft, jsonld);
   if (date) {
-    return new Date(date.getTime() + millis).toISOString();
+    return new Date(date.getTime() + timeToLiveMillisAfterDate).toISOString();
   }
-  return new Date(new Date().getTime() + millis).toISOString();
+  return new Date(new Date().getTime() + timeToLiveMillisDefault).toISOString();
 }
 
 export function findLatestIntervallEndInJsonLd(draft, jsonld) {
