@@ -150,7 +150,38 @@ export const realEstateGroup = {
       },
       seeksDetails: undefined,
     },
-    // searchBuy: {},
-    // offerBuy: {},
+    generateQuery: (draft, resultName) => {
+      const isBranch = draft && draft.is;
+      const location = isBranch && isBranch.location;
+
+      const filters = [
+        {
+          // to select is-branch
+          prefixes: {
+            won: won.defaultContext["won"],
+          },
+          operations: [
+            `${resultName} a won:Need.`,
+            `${resultName} won:seeks ?seeks.`,
+            location && "?seeks won:hasLocation ?location.",
+          ],
+        },
+        filterInVicinity("?location", location),
+      ];
+
+      const concatenatedFilter = concatenateFilters(filters);
+
+      return sparqlQuery({
+        prefixes: concatenatedFilter.prefixes,
+        selectDistinct: resultName,
+        where: concatenatedFilter.operations,
+        orderBy: [
+          {
+            order: "ASC",
+            variable: "?location_geoDistance",
+          },
+        ],
+      });
+    },
   },
 };
