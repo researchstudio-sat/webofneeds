@@ -178,7 +178,7 @@ public class TaxiDemandNeedGenerator {
         loc1.put("selng", "16.370149");
         loc1.put("lat", "48.225073");
         loc1.put("lng", "16.358398");
-        loc1.put("name", "Alsergrund, Vienna, 1090, Austria");
+        loc1.put("name", "Vienna, Austria");
         locations[1] = loc1;
 
         HashMap<String, String> loc2 = new HashMap<String, String>();

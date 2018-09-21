@@ -120,7 +120,7 @@ export const realEstateNumberOfRoomsRangeDetail = {
     }
     return {
       "sh:property": {
-        "sh:path": "s:numberOfRooms",
+        "sh:path": { "@id": "s:numberOfRooms" },
         "sh:minInclusive": value.min && [
           { "@value": value.min, "@type": "xsd:float" },
         ],
@@ -143,7 +143,7 @@ export const realEstateNumberOfRoomsRangeDetail = {
 
     const numberOfRooms = properties.find(
       property =>
-        getFromJsonLd(property, "sh:path", won.defaultContext) ===
+        getInFromJsonLd(property, ["sh:path", "@id"], won.defaultContext) ===
         "s:numberOfRooms"
     );
     const minNumberOfRooms = getFromJsonLd(
@@ -192,7 +192,7 @@ export const realEstateFloorSizeRangeDetail = {
     }
     return {
       "sh:property": {
-        "sh:path": "s:floorSize",
+        "sh:path": { "@id": "s:floorSize" },
         "sh:minInclusive": value.min && [
           { "@value": value.min, "@type": "xsd:float" },
         ],
@@ -215,7 +215,8 @@ export const realEstateFloorSizeRangeDetail = {
 
     const floorSize = properties.find(
       property =>
-        getFromJsonLd(property, "sh:path", won.defaultContext) === "s:floorSize"
+        getInFromJsonLd(property, ["sh:path", "@id"], won.defaultContext) ===
+        "s:floorSize"
     );
 
     const minFloorSize = getFromJsonLd(

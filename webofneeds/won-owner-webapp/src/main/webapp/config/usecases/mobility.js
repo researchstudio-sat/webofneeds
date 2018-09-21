@@ -59,12 +59,12 @@ const mobilityUseCases = {
       const fromLocationFilter = filterInVicinity(
         "?fromLocation",
         fromLocation,
-        /*radius=*/ 100
+        /*radius=*/ 5
       );
       const toLocationFilter = filterInVicinity(
         "?toLocation",
         toLocation,
-        /*radius=*/ 100
+        /*radius=*/ 5
       );
 
       const union = operations => {
@@ -206,9 +206,9 @@ const mobilityUseCases = {
           ],
         },
 
-        filterInVicinity("?fromLocation", fromLocation, /*radius=*/ 100),
+        filterInVicinity("?fromLocation", fromLocation, /*radius=*/ 5),
 
-        filterInVicinity("?toLocation", toLocation, /*radius=*/ 100),
+        filterInVicinity("?toLocation", toLocation, /*radius=*/ 5),
 
         filterAboutTime("?starttime", fromTime, 12 /* hours before and after*/),
       ];
