@@ -54,6 +54,8 @@ class IdenticonElement extends HTMLElement {
       "src",
       `data:image/svg+xml;base64,${identicon.toString()}`
     );
+    imgElement.style.width = "100%";
+    imgElement.style.height = "100%";
     this.appendChild(imgElement);
   }
 }

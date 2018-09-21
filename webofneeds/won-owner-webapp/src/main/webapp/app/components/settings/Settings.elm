@@ -205,8 +205,14 @@ category active icon name =
     row
         [ spacing 10
         , Font.color (toColor color)
+        , Font.size 18
         ]
-        [ svgIcon icon (toCSSColor color)
+        [ svgIcon
+            [ height (px 18)
+            , width (px 18)
+            ]
+            icon
+            (toCSSColor color)
         , text name
         ]
 
@@ -223,31 +229,19 @@ sidebar =
 identityImage : Identity -> Element msg
 identityImage identity =
     el
-        [ width (px 100)
-        , height (px 100)
+        [ width (px 50)
+        , height (px 50)
         , Background.color (toColor skin.lineGray)
         ]
     <|
         case identity.image of
             Just img ->
                 el
-                    [ centerX
-                    , centerY
+                    [ Background.uncropped img
+                    , width fill
+                    , height fill
                     ]
-                <|
-                    image
-                        [ width
-                            (shrink
-                                |> maximum 100
-                            )
-                        , height
-                            (shrink
-                                |> maximum 100
-                            )
-                        ]
-                        { src = img
-                        , description = ""
-                        }
+                    none
 
             Nothing ->
                 identicon identity
@@ -267,14 +261,19 @@ identityCard identity =
         , column
             [ height fill
             ]
-            [ case identity.description of
-                Just description ->
-                    text description
+            [ el [ Font.size 18 ] <|
+                case identity.description of
+                    Just description ->
+                        text description
 
-                Nothing ->
-                    el [ Font.italic ] <| text "Unnamed Identity"
+                    Nothing ->
+                        el [ Font.italic ] <| text "Unnamed Identity"
             , el [ height fill ] none
-            , el [ Font.size 14 ] <| text ("Name: " ++ identity.displayName)
+            , el
+                [ Font.color (toColor skin.subtitleGray)
+                ]
+              <|
+                text ("Name: " ++ identity.displayName)
             ]
         ]
 
@@ -294,52 +293,53 @@ identityEditor modified tempIdentity =
                     ( False, err )
     in
     column
-        [ Border.width 1
-        , Border.color (toColor skin.lineGray)
-        , padding 10
-        , spacing 10
+        [ spacing -1
         , width fill
         ]
-        [ Input.text []
-            { onChange = \str -> EditIdentity { tempIdentity | description = str }
-            , text = tempIdentity.description
-            , placeholder = Nothing
-            , label = Input.labelAbove [] (text "Description")
-            }
-        , Input.text []
-            { onChange = \str -> EditIdentity { tempIdentity | displayName = str }
-            , text = tempIdentity.displayName
-            , placeholder = Nothing
-            , label = Input.labelAbove [] (text "Display Name")
-            }
-        , Input.text []
-            { onChange = \str -> EditIdentity { tempIdentity | website = str }
-            , text = tempIdentity.website
-            , placeholder = Nothing
-            , label = Input.labelAbove [] (text "Website")
-            }
-        , Input.multiline []
-            { onChange = \str -> EditIdentity { tempIdentity | aboutMe = str }
-            , text = tempIdentity.aboutMe
-            , placeholder = Nothing
-            , label = Input.labelAbove [] (text "About Me")
-            , spellcheck = True
-            }
-        , column
-            [ Font.color (toColor skin.primaryColor)
-            , Font.size 14
+        [ column
+            [ padding 10
+            , spacing 10
+            , width fill
+            , Border.width 1
+            , Border.color (toColor skin.lineGray)
             ]
-            (List.map
-                text
-                errors
-            )
+            [ Input.text []
+                { onChange = \str -> EditIdentity { tempIdentity | displayName = str }
+                , text = tempIdentity.displayName
+                , placeholder = Nothing
+                , label = Input.labelAbove [] (text "Display Name")
+                }
+            , Input.text []
+                { onChange = \str -> EditIdentity { tempIdentity | website = str }
+                , text = tempIdentity.website
+                , placeholder = Nothing
+                , label = Input.labelAbove [] (text "Website")
+                }
+            , Input.multiline []
+                { onChange = \str -> EditIdentity { tempIdentity | aboutMe = str }
+                , text = tempIdentity.aboutMe
+                , placeholder = Nothing
+                , label = Input.labelAbove [] (text "About Me")
+                , spellcheck = True
+                }
+            , column
+                [ Font.color (toColor skin.primaryColor)
+                , Font.size 14
+                ]
+                (List.map
+                    text
+                    errors
+                )
+            ]
         , row
             [ alignBottom
             , spacing 10
-            , alignRight
+            , padding 10
+            , Border.width 1
+            , Border.color (toColor skin.lineGray)
+            , width fill
             ]
             [ mainButton (not isValid || not modified) "Save" SaveIdentity
-            , el [ width fill ] none
             , outlinedButton False "Cancel" CancelEditing
             ]
         ]
@@ -421,6 +421,7 @@ view model =
                 )
             , padding 20
             , spacing 20
+            , Font.size 12
             ]
             [ sidebar
             , identitySettings model
@@ -433,21 +434,21 @@ view model =
 
 identicon : Identity -> Element msg
 identicon identity =
-    el [] <|
+    el
+        []
+    <|
         html <|
             node "won-identicon"
                 [ HA.attribute "data" (identityString identity)
+                , HA.style "width" "100%"
+                , HA.style "height" "100%"
                 ]
                 []
 
 
-svgIcon : String -> String -> Element msg
-svgIcon name color =
-    el
-        [ width (px 20)
-        , height (px 20)
-        ]
-    <|
+svgIcon : List (Attribute msg) -> String -> String -> Element msg
+svgIcon attributes name color =
+    el attributes <|
         html <|
             node "svg-icon"
                 [ HA.attribute "icon" name
@@ -497,6 +498,7 @@ type alias Skin =
     { primaryColor : Col
     , lightGray : Col
     , lineGray : Col
+    , subtitleGray : Col
     }
 
 
@@ -509,6 +511,7 @@ skin =
     { primaryColor = ( 240, 70, 70 )
     , lightGray = ( 240, 242, 244 )
     , lineGray = ( 203, 210, 209 )
+    , subtitleGray = ( 128, 128, 128 )
     }
 
 
