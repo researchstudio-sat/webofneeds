@@ -1,6 +1,9 @@
 import angular from "angular";
 import { Elm } from "./Settings.elm";
+import Identicon from "identicon.js";
 import "@webcomponents/custom-elements";
+import { generateRgbColorArray } from "../../utils.js";
+import shajs from "sha.js";
 
 class SvgIcon extends HTMLElement {
   static get observedAttributes() {
@@ -27,6 +30,35 @@ class SvgIcon extends HTMLElement {
 }
 
 customElements.define("svg-icon", SvgIcon);
+
+class IdenticonElement extends HTMLElement {
+  static get observedAttributes() {
+    return ["hash"];
+  }
+
+  connectedCallback() {
+    const hash = new shajs.sha512()
+      .update(this.getAttribute("data"))
+      .digest("hex");
+    const rgbColorArray = generateRgbColorArray(hash);
+    const identicon = new Identicon(hash, {
+      size: 100,
+      foreground: [255, 255, 255, 255], // rgba white
+      background: [...rgbColorArray, 255], // rgba
+      margin: 0.2,
+      format: "svg",
+    });
+
+    const imgElement = document.createElement("img");
+    imgElement.setAttribute(
+      "src",
+      `data:image/svg+xml;base64,${identicon.toString()}`
+    );
+    this.appendChild(imgElement);
+  }
+}
+
+customElements.define("won-identicon", IdenticonElement);
 
 function genComponentConf() {
   return {

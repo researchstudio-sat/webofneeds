@@ -14,6 +14,20 @@ import String.Extra as String
 import Validate exposing (Valid, Validator)
 
 
+main =
+    Browser.sandbox
+        { init = init
+        , update = update
+        , view = view
+        }
+
+
+
+--
+-- Model
+--
+
+
 type IdentityEditor
     = NotEditing
     | Editing Int TempIdentity
@@ -24,6 +38,17 @@ type alias Model =
     { identities : Array Identity
     , editingIdentity : IdentityEditor
     }
+
+
+type Msg
+    = SelectIdentity Int
+    | SaveIdentity
+    | CancelEditing
+    | EditIdentity TempIdentity
+
+
+
+-- Identity
 
 
 type alias TempIdentity =
@@ -42,6 +67,43 @@ type alias Identity =
     , website : Maybe String
     , aboutMe : Maybe String
     }
+
+
+identityValidator : Validator String TempIdentity
+identityValidator =
+    Validate.all
+        [ Validate.ifBlank .displayName "Please enter a display name."
+        ]
+
+
+toTempIdentity : Identity -> TempIdentity
+toTempIdentity identity =
+    { description = Maybe.withDefault "" identity.description
+    , displayName = identity.displayName
+    , image = Maybe.withDefault "" identity.image
+    , website = Maybe.withDefault "" identity.website
+    , aboutMe = Maybe.withDefault "" identity.aboutMe
+    }
+
+
+toIdentity : Valid TempIdentity -> Identity
+toIdentity valid =
+    let
+        tempIdentity =
+            Validate.fromValid valid
+    in
+    { description = String.nonEmpty tempIdentity.description
+    , displayName = tempIdentity.displayName
+    , image = String.nonEmpty tempIdentity.image
+    , website = String.nonEmpty tempIdentity.website
+    , aboutMe = String.nonEmpty tempIdentity.aboutMe
+    }
+
+
+
+--
+-- Init
+--
 
 
 mockIdentities : List Identity
@@ -68,11 +130,10 @@ init =
     }
 
 
-type Msg
-    = SelectIdentity Int
-    | SaveIdentity
-    | CancelEditing
-    | EditIdentity TempIdentity
+
+--
+-- Update
+--
 
 
 update : Msg -> Model -> Model
@@ -125,81 +186,10 @@ update msg model =
                     { model | editingIdentity = Editing id tempIdentity }
 
 
-identityValidator : Validator String TempIdentity
-identityValidator =
-    Validate.all
-        [ Validate.ifBlank .displayName "Please enter a display name."
-        ]
 
-
-toTempIdentity : Identity -> TempIdentity
-toTempIdentity identity =
-    { description = Maybe.withDefault "" identity.description
-    , displayName = identity.displayName
-    , image = Maybe.withDefault "" identity.image
-    , website = Maybe.withDefault "" identity.website
-    , aboutMe = Maybe.withDefault "" identity.aboutMe
-    }
-
-
-toIdentity : Valid TempIdentity -> Identity
-toIdentity valid =
-    let
-        tempIdentity =
-            Validate.fromValid valid
-    in
-    { description = String.nonEmpty tempIdentity.description
-    , displayName = tempIdentity.displayName
-    , image = String.nonEmpty tempIdentity.image
-    , website = String.nonEmpty tempIdentity.website
-    , aboutMe = String.nonEmpty tempIdentity.aboutMe
-    }
-
-
-type alias Col =
-    ( Int, Int, Int )
-
-
-toColor : Col -> Color
-toColor ( r, g, b ) =
-    rgb255 r g b
-
-
-toCSSColor : Col -> String
-toCSSColor ( r, g, b ) =
-    "rgb(" ++ String.fromInt r ++ ", " ++ String.fromInt g ++ ", " ++ String.fromInt b ++ ")"
-
-
-primaryColor : Col
-primaryColor =
-    ( 240, 70, 70 )
-
-
-lightGray : Col
-lightGray =
-    ( 203, 210, 209 )
-
-
-black : Col
-black =
-    ( 0, 0, 0 )
-
-
-svgIcon : String -> String -> Element msg
-svgIcon name color =
-    el
-        [ width (px 20)
-        , height (px 20)
-        ]
-    <|
-        html <|
-            node "svg-icon"
-                [ HA.attribute "icon" name
-                , HA.attribute "color" color
-                , HA.style "width" "100%"
-                , HA.style "height" "100%"
-                ]
-                []
+--
+-- View
+--
 
 
 category : Bool -> String -> String -> Element msg
@@ -207,7 +197,7 @@ category active icon name =
     let
         color =
             if active then
-                primaryColor
+                skin.primaryColor
 
             else
                 black
@@ -230,77 +220,63 @@ sidebar =
         [ category True "ico36_person" "Identities" ]
 
 
+identityImage : Identity -> Element msg
+identityImage identity =
+    el
+        [ width (px 100)
+        , height (px 100)
+        , Background.color (toColor skin.lineGray)
+        ]
+    <|
+        case identity.image of
+            Just img ->
+                el
+                    [ centerX
+                    , centerY
+                    ]
+                <|
+                    image
+                        [ width
+                            (shrink
+                                |> maximum 100
+                            )
+                        , height
+                            (shrink
+                                |> maximum 100
+                            )
+                        ]
+                        { src = img
+                        , description = ""
+                        }
+
+            Nothing ->
+                identicon identity
+
+
 identityCard : Identity -> Element msg
-identityCard id =
+identityCard identity =
     row
         [ Border.width 1
-        , Border.color (toColor lightGray)
+        , Border.color (toColor skin.lineGray)
         , padding 10
-        , spacing 5
+        , spacing 10
         , width fill
+        , Background.color (toColor skin.lightGray)
         ]
-        ([ column
+        [ identityImage identity
+        , column
             [ height fill
-            , width fill
             ]
-           <|
-            case id.description of
+            [ case identity.description of
                 Just description ->
-                    [ el [ height fill ] <| none
-                    , el [ Font.size 30 ] <| text description
-                    , el [ height fill ] <| none
-                    , text id.displayName
-                    , el [ height fill ] <| none
-                    ]
+                    text description
 
                 Nothing ->
-                    [ el [ Font.size 30, centerY ] <| text id.displayName
-                    ]
-         ]
-            ++ (case id.image of
-                    Just img ->
-                        [ image
-                            [ width (shrink |> maximum 100)
-                            , height (shrink |> maximum 100)
-                            ]
-                            { src = img
-                            , description = ""
-                            }
-                        ]
-
-                    Nothing ->
-                        []
-               )
-        )
-
-
-mainButton : Bool -> String -> msg -> Element msg
-mainButton disabled text tag =
-    el [ Events.onClick tag ] <|
-        html <|
-            Html.button
-                [ HA.classList
-                    [ ( "won-button--filled", True )
-                    , ( "red", True )
-                    ]
-                , HA.disabled disabled
-                ]
-                [ Html.text text ]
-
-
-outlinedButton : Bool -> String -> msg -> Element msg
-outlinedButton disabled text tag =
-    el [ Events.onClick tag ] <|
-        html <|
-            Html.button
-                [ HA.classList
-                    [ ( "won-button--outlined", True )
-                    , ( "thin", True )
-                    , ( "red", True )
-                    ]
-                , HA.disabled disabled
-                ]
-                [ Html.text text ]
+                    el [ Font.italic ] <| text "Unnamed Identity"
+            , el [ height fill ] none
+            , el [ Font.size 14 ] <| text ("Name: " ++ identity.displayName)
+            ]
+        ]
 
 
 identityEditor : Bool -> TempIdentity -> Element Msg
@@ -317,72 +293,54 @@ identityEditor modified tempIdentity =
                 Err err ->
                     ( False, err )
     in
-    textColumn
+    column
         [ Border.width 1
-        , Border.color (toColor lightGray)
+        , Border.color (toColor skin.lineGray)
         , padding 10
         , spacing 10
         , width fill
         ]
-        [ image
-            [ width (shrink |> maximum 200)
-            , alignRight
-            ]
-            { src = tempIdentity.image
-            , description = ""
+        [ Input.text []
+            { onChange = \str -> EditIdentity { tempIdentity | description = str }
+            , text = tempIdentity.description
+            , placeholder = Nothing
+            , label = Input.labelAbove [] (text "Description")
             }
-        , paragraph []
-            [ Input.text []
-                { onChange = \str -> EditIdentity { tempIdentity | description = str }
-                , text = tempIdentity.description
-                , placeholder = Nothing
-                , label = Input.labelAbove [] (text "Description")
-                }
-            ]
-        , paragraph []
-            [ Input.text []
-                { onChange = \str -> EditIdentity { tempIdentity | displayName = str }
-                , text = tempIdentity.displayName
-                , placeholder = Nothing
-                , label = Input.labelAbove [] (text "Display Name")
-                }
-            ]
-        , paragraph []
-            [ Input.text []
-                { onChange = \str -> EditIdentity { tempIdentity | website = str }
-                , text = tempIdentity.website
-                , placeholder = Nothing
-                , label = Input.labelAbove [] (text "Website")
-                }
-            ]
-        , paragraph []
-            [ el [ width fill ] <|
-                Input.multiline []
-                    { onChange = \str -> EditIdentity { tempIdentity | aboutMe = str }
-                    , text = tempIdentity.aboutMe
-                    , placeholder = Nothing
-                    , label = Input.labelAbove [] (text "About Me")
-                    , spellcheck = True
-                    }
-            ]
-        , paragraph
-            [ Font.color (toColor primaryColor)
+        , Input.text []
+            { onChange = \str -> EditIdentity { tempIdentity | displayName = str }
+            , text = tempIdentity.displayName
+            , placeholder = Nothing
+            , label = Input.labelAbove [] (text "Display Name")
+            }
+        , Input.text []
+            { onChange = \str -> EditIdentity { tempIdentity | website = str }
+            , text = tempIdentity.website
+            , placeholder = Nothing
+            , label = Input.labelAbove [] (text "Website")
+            }
+        , Input.multiline []
+            { onChange = \str -> EditIdentity { tempIdentity | aboutMe = str }
+            , text = tempIdentity.aboutMe
+            , placeholder = Nothing
+            , label = Input.labelAbove [] (text "About Me")
+            , spellcheck = True
+            }
+        , column
+            [ Font.color (toColor skin.primaryColor)
             , Font.size 14
             ]
             (List.map
                 text
                 errors
             )
-        , paragraph []
-            [ row
-                [ alignBottom
-                , spacing 10
-                , alignRight
-                ]
-                [ mainButton (not isValid || not modified) "Save" SaveIdentity
-                , el [ width fill ] none
-                , outlinedButton False "Cancel" CancelEditing
-                ]
+        , row
+            [ alignBottom
+            , spacing 10
+            , alignRight
+            ]
+            [ mainButton (not isValid || not modified) "Save" SaveIdentity
+            , el [ width fill ] none
+            , outlinedButton False "Cancel" CancelEditing
             ]
         ]
 
@@ -393,14 +351,27 @@ identitySettings model =
         cards =
             Array.indexedMap
                 (\id identity ->
-                    el [ Events.onClick (SelectIdentity id), width fill ] (identityCard identity)
+                    el
+                        [ Events.onClick (SelectIdentity id), width fill ]
+                        (identityCard identity)
                 )
                 model.identities
 
         editingCards =
             case model.editingIdentity of
                 Editing id tempIdentity ->
-                    Array.set id (identityEditor True tempIdentity) cards
+                    updateArray
+                        (\card ->
+                            column
+                                [ spacing -1
+                                , width fill
+                                ]
+                                [ card
+                                , identityEditor True tempIdentity
+                                ]
+                        )
+                        id
+                        cards
 
                 NotEditing ->
                     cards
@@ -410,7 +381,18 @@ identitySettings model =
                         |> Maybe.map toTempIdentity
                         |> Maybe.map
                             (\tempIdentity ->
-                                Array.set id (identityEditor False tempIdentity) cards
+                                updateArray
+                                    (\card ->
+                                        column
+                                            [ spacing -1
+                                            , width fill
+                                            ]
+                                            [ card
+                                            , identityEditor False tempIdentity
+                                            ]
+                                    )
+                                    id
+                                    cards
                             )
                         |> Maybe.withDefault cards
     in
@@ -445,9 +427,117 @@ view model =
             ]
 
 
-main =
-    Browser.sandbox
-        { init = init
-        , update = update
-        , view = view
-        }
+
+-- Elements
+
+
+identicon : Identity -> Element msg
+identicon identity =
+    el [] <|
+        html <|
+            node "won-identicon"
+                [ HA.attribute "data" (identityString identity)
+                ]
+                []
+
+
+svgIcon : String -> String -> Element msg
+svgIcon name color =
+    el
+        [ width (px 20)
+        , height (px 20)
+        ]
+    <|
+        html <|
+            node "svg-icon"
+                [ HA.attribute "icon" name
+                , HA.attribute "color" color
+                , HA.style "width" "100%"
+                , HA.style "height" "100%"
+                ]
+                []
+
+
+mainButton : Bool -> String -> msg -> Element msg
+mainButton disabled text tag =
+    el [ Events.onClick tag ] <|
+        html <|
+            Html.button
+                [ HA.classList
+                    [ ( "won-button--filled", True )
+                    , ( "red", True )
+                    ]
+                , HA.disabled disabled
+                ]
+                [ Html.text text ]
+
+
+outlinedButton : Bool -> String -> msg -> Element msg
+outlinedButton disabled text tag =
+    el [ Events.onClick tag ] <|
+        html <|
+            Html.button
+                [ HA.classList
+                    [ ( "won-button--outlined", True )
+                    , ( "thin", True )
+                    , ( "red", True )
+                    ]
+                , HA.disabled disabled
+                ]
+                [ Html.text text ]
+
+
+
+--
+-- Utilities
+--
+
+
+type alias Skin =
+    { primaryColor : Col
+    , lightGray : Col
+    , lineGray : Col
+    }
+
+
+type alias Col =
+    ( Int, Int, Int )
+
+
+skin : Skin
+skin =
+    { primaryColor = ( 240, 70, 70 )
+    , lightGray = ( 240, 242, 244 )
+    , lineGray = ( 203, 210, 209 )
+    }
+
+
+toColor : Col -> Color
+toColor ( r, g, b ) =
+    rgb255 r g b
+
+
+toCSSColor : Col -> String
+toCSSColor ( r, g, b ) =
+    "rgb(" ++ String.fromInt r ++ ", " ++ String.fromInt g ++ ", " ++ String.fromInt b ++ ")"
+
+
+black : Col
+black =
+    ( 0, 0, 0 )
+
+
+identityString : Identity -> String
+identityString identity =
+    Maybe.withDefault "" identity.description
+        ++ identity.displayName
+        ++ Maybe.withDefault "" identity.website
+        ++ Maybe.withDefault "" identity.aboutMe
+
+
+updateArray : (a -> a) -> Int -> Array a -> Array a
+updateArray fn id array =
+    Array.get id array
+        |> Maybe.map fn
+        |> Maybe.map (\element -> Array.set id element array)
+        |> Maybe.withDefault array
