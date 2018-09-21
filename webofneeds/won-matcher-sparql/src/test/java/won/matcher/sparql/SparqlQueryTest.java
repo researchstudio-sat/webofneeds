@@ -58,13 +58,13 @@ public class SparqlQueryTest  {
     //@Ignore // useful for trying things out, does not make so much sense as a unit test
     public void testQuery() throws Exception {
         Dataset dataset = DatasetFactory.create();
-        RDFDataMgr.read(dataset, getResourceAsStream("sparqlquerytest/need.trig"), Lang.TRIG);
-        String queryString = getResourceAsString("sparqlquerytest/query.rq");
+        RDFDataMgr.read(dataset, getResourceAsStream("sparqlquerytest/need2.trig"), Lang.TRIG);
+        String queryString = getResourceAsString("sparqlquerytest/query2.rq");
         
         Query query = QueryFactory.create(queryString);
         Op queryOp = Algebra.compile(query);
         
-        Op queryWithGraphClause = SparqlMatcherUtils.addGraphOp(queryOp);
+        Op queryWithGraphClause = SparqlMatcherUtils.addGraphOp(queryOp, Optional.of("urn:x-arq:UnionGraph"));
         
         System.out.println("query algebra: " + queryOp);
         System.out.println("transformed query algebra: " + queryWithGraphClause);
@@ -72,10 +72,11 @@ public class SparqlQueryTest  {
         System.out.println("\nDataset:");
         RDFDataMgr.write(System.out, dataset, Lang.TRIG);
         System.out.println("\nQuery:");
+
+        query = OpAsQuery.asQuery(queryWithGraphClause);
         System.out.println(query);
         System.out.println("\nResult:");
         
-        query = OpAsQuery.asQuery(queryWithGraphClause);
         
         try (QueryExecution execution = QueryExecutionFactory.create(query, dataset)) {
             execution.getContext().set(TDB.symUnionDefaultGraph, true);

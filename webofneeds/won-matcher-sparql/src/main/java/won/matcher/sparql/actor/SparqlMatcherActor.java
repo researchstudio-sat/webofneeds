@@ -439,8 +439,8 @@ public class SparqlMatcherActor extends UntypedActor {
     private Stream<NeedModelWrapper> executeQuery(Op q, Optional<NeedModelWrapperAndDataset> needToCheck) {
             if (needToCheck.isPresent()) {
                 // we're going to query an in-memory dataset. In this case, we'll 
-                // want a graph clause around our query
-                q = SparqlMatcherUtils.addGraphOp(q);
+                // want a graph clause around our query, explicitly joining all named graphs
+                q = SparqlMatcherUtils.addGraphOp(q, Optional.of("urn:x-arq:UnionGraph"));
             }
             Query compiledQuery = OpAsQuery.asQuery(q);
 
