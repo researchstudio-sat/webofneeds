@@ -54,7 +54,7 @@ const mobilityUseCases = {
       const locationFilter = filterInVicinity(
         "?location",
         fromLocation,
-        /*radius=*/ 5
+        /*radius=*/ 100
       );
       const fromLocationFilter = filterInVicinity(
         "?fromLocation",
@@ -148,7 +148,7 @@ const mobilityUseCases = {
           ],
         },
 
-        filterInVicinity("?location", location, /*radius=*/ 5),
+        filterInVicinity("?location", location, /*radius=*/ 100),
       ];
 
       const concatenatedFilter = concatenateFilters(filters);
