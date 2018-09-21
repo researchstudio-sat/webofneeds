@@ -35,6 +35,7 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StatementBoundary;
 import org.apache.jena.rdf.model.StatementBoundaryBase;
+import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.apache.jena.sparql.algebra.Algebra;
 import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.algebra.OpAsQuery;
@@ -52,6 +53,8 @@ import org.apache.jena.sparql.algebra.op.OpUnion;
 import org.apache.jena.sparql.core.BasicPattern;
 import org.apache.jena.sparql.core.TriplePath;
 import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.engine.binding.Binding;
+import org.apache.jena.sparql.engine.binding.BindingFactory;
 import org.apache.jena.sparql.expr.E_LogicalOr;
 import org.apache.jena.sparql.expr.E_NotExists;
 import org.apache.jena.sparql.expr.E_StrContains;
@@ -437,25 +440,21 @@ public class SparqlMatcherActor extends UntypedActor {
      * @return
      */
     private Stream<NeedModelWrapper> executeQuery(Op q, Optional<NeedModelWrapperAndDataset> needToCheck) {
-            if (needToCheck.isPresent()) {
-                // we're going to query an in-memory dataset. In this case, we'll 
-                // want a graph clause around our query, explicitly joining all named graphs
-                q = SparqlMatcherUtils.addGraphOp(q, Optional.of("urn:x-arq:UnionGraph"));
-                // remove service clause that only works with blazegraph
-                q = SparqlMatcherUtils.removeServiceOp(q, Optional.of("http://www.bigdata.com/rdf/geospatial#search"));
-            }
             Query compiledQuery = OpAsQuery.asQuery(q);
 
+            // if we were given a needToCheck, restrict the query result to that uri so that 
+            // we get exactly one result if that uri is found for the need
+            if (needToCheck.isPresent()) {
+              Binding binding = BindingFactory.binding(resultName, new ResourceImpl(needToCheck.get().needModelWrapper.getNeedUri()).asNode());
+              compiledQuery.setValuesDataBlock(Collections.singletonList(resultName),  Collections.singletonList(binding));
+            }
+            
             if (log.isDebugEnabled()) {
                 log.debug("executeQuery query: {}, needToCheck: {}", new Object[] {compiledQuery, needToCheck});
             }
             Set<String> foundUris = new HashSet<String>();
             // process query results iteratively
-            try (QueryExecution execution 
-                        = needToCheck.isPresent()
-                            ? QueryExecutionFactory
-                                    .create(compiledQuery, needToCheck.get().dataset) 
-                            : QueryExecutionFactory
+            try (QueryExecution execution = QueryExecutionFactory
                                     .sparqlService(config.getSparqlEndpoint(), compiledQuery)
                             ) {
 
