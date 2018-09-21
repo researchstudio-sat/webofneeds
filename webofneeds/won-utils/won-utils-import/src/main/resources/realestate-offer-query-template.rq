@@ -32,7 +32,7 @@ SELECT DISTINCT ?result WHERE {
   
   optional {
     ?seeks sh:property ?seeks_floorsize .
-    ?seeks_floorsize sh:path "s:floorSize" .
+    ?seeks_floorsize sh:path s:floorSize .
   optional {
     ?seeks_floorsize sh:minInclusive ?seeks_minFloorSize .
     FILTER(?seeks_minFloorSize <= ?varFloorSize )
@@ -49,7 +49,7 @@ SELECT DISTINCT ?result WHERE {
   
   optional {
   ?seeks sh:property ?seeks_numberOfRooms.
-      ?seeks_numberOfRooms sh:path "s:numberOfRooms" ;
+      ?seeks_numberOfRooms sh:path s:numberOfRooms ;
           sh:minInclusive ?seeks_minNumberOfRooms ;
           sh:maxInclusive ?seeks_maxNumberOfRooms .
     FILTER(?seeks_minNumberOfRooms <= ?varNumberOfRooms )
