@@ -13,6 +13,7 @@ export const complainGroup = {
       identifier: "complain",
       label: "Complain about something",
       icon: "#ico36_uc_wtf",
+      timeToLiveMillisDefault: 1000 * 60 * 60 * 24 * 30,
       doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
       draft: {
         ...emptyDraft,
@@ -35,6 +36,7 @@ export const complainGroup = {
       identifier: "handleComplaints",
       label: "Handle complaints",
       icon: "#ico36_uc_wtf_interest",
+      timeToLiveMillisDefault: 1000 * 60 * 60 * 24 * 30,
       doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
       draft: {
         ...emptyDraft,

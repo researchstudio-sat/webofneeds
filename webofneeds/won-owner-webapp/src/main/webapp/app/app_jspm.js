@@ -99,6 +99,7 @@ import titlePickerModule from "./components/details/picker/title-picker.js";
 import numberPickerModule from "./components/details/picker/number-picker.js";
 import pricePickerModule from "./components/details/picker/price-picker.js";
 import datetimePickerModule from "./components/details/picker/datetime-picker.js";
+import datetimeRangePickerModule from "./components/details/picker/datetime-range-picker.js";
 import dropdownPickerModule from "./components/details/picker/dropdown-picker.js";
 import selectPickerModule from "./components/details/picker/select-picker.js";
 import rangePickerModule from "./components/details/picker/range-picker.js";
@@ -117,6 +118,7 @@ const pickerModules = [
   numberPickerModule,
   pricePickerModule,
   datetimePickerModule,
+  datetimeRangePickerModule,
   dropdownPickerModule,
   selectPickerModule,
   rangePickerModule,
