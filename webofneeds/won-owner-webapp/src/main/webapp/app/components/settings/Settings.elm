@@ -30,7 +30,7 @@ main =
 
 type IdentityEditor
     = NotEditing
-    | Editing Int TempIdentity
+    | Editing Int IdentityForm
     | Unchanged Int
 
 
@@ -44,14 +44,14 @@ type Msg
     = SelectIdentity Int
     | SaveIdentity
     | CancelEditing
-    | EditIdentity TempIdentity
+    | EditIdentity IdentityForm
 
 
 
 -- Identity
 
 
-type alias TempIdentity =
+type alias IdentityForm =
     { description : String
     , displayName : String
     , image : String
@@ -69,15 +69,15 @@ type alias Identity =
     }
 
 
-identityValidator : Validator String TempIdentity
+identityValidator : Validator String IdentityForm
 identityValidator =
     Validate.all
         [ Validate.ifBlank .displayName "Please enter a display name."
         ]
 
 
-toTempIdentity : Identity -> TempIdentity
-toTempIdentity identity =
+toForm : Identity -> IdentityForm
+toForm identity =
     { description = Maybe.withDefault "" identity.description
     , displayName = identity.displayName
     , image = Maybe.withDefault "" identity.image
@@ -86,17 +86,17 @@ toTempIdentity identity =
     }
 
 
-toIdentity : Valid TempIdentity -> Identity
-toIdentity valid =
+fromForm : Valid IdentityForm -> Identity
+fromForm valid =
     let
-        tempIdentity =
+        form =
             Validate.fromValid valid
     in
-    { description = String.nonEmpty tempIdentity.description
-    , displayName = tempIdentity.displayName
-    , image = String.nonEmpty tempIdentity.image
-    , website = String.nonEmpty tempIdentity.website
-    , aboutMe = String.nonEmpty tempIdentity.aboutMe
+    { description = String.nonEmpty form.description
+    , displayName = form.displayName
+    , image = String.nonEmpty form.image
+    , website = String.nonEmpty form.website
+    , aboutMe = String.nonEmpty form.aboutMe
     }
 
 
@@ -155,11 +155,11 @@ update msg model =
 
         SaveIdentity ->
             case model.editingIdentity of
-                Editing id tempIdentity ->
-                    case Validate.validate identityValidator tempIdentity of
+                Editing id form ->
+                    case Validate.validate identityValidator form of
                         Ok valid ->
                             { model
-                                | identities = Array.set id (toIdentity valid) model.identities
+                                | identities = Array.set id (fromForm valid) model.identities
                                 , editingIdentity = NotEditing
                             }
 
@@ -174,16 +174,16 @@ update msg model =
                         | editingIdentity = NotEditing
                     }
 
-        EditIdentity tempIdentity ->
+        EditIdentity form ->
             case model.editingIdentity of
                 Editing id _ ->
-                    { model | editingIdentity = Editing id tempIdentity }
+                    { model | editingIdentity = Editing id form }
 
                 NotEditing ->
                     model
 
                 Unchanged id ->
-                    { model | editingIdentity = Editing id tempIdentity }
+                    { model | editingIdentity = Editing id form }
 
 
 
@@ -249,40 +249,39 @@ identityImage identity =
 
 identityCard : Identity -> Element msg
 identityCard identity =
-    row
-        [ Border.width 1
-        , Border.color (toColor skin.lineGray)
-        , padding 10
-        , spacing 10
-        , width fill
-        , Background.color (toColor skin.lightGray)
-        ]
-        [ identityImage identity
-        , column
-            [ height fill
+    card [ width fill ]
+        (row
+            [ spacing 10
+            , width fill
             ]
-            [ el [ Font.size 18 ] <|
-                case identity.description of
-                    Just description ->
-                        text description
-
-                    Nothing ->
-                        el [ Font.italic ] <| text "Unnamed Identity"
-            , el [ height fill ] none
-            , el
-                [ Font.color (toColor skin.subtitleGray)
+            [ identityImage identity
+            , column
+                [ height fill
                 ]
-              <|
-                text ("Name: " ++ identity.displayName)
+                [ el [ Font.size 18 ] <|
+                    case identity.description of
+                        Just description ->
+                            text description
+
+                        Nothing ->
+                            el [ Font.italic ] <| text "Unnamed Identity"
+                , el [ height fill ] none
+                , el
+                    [ Font.color (toColor skin.subtitleGray)
+                    ]
+                  <|
+                    text ("Name: " ++ identity.displayName)
+                ]
             ]
-        ]
+        )
+        []
 
 
-identityEditor : Bool -> TempIdentity -> Element Msg
-identityEditor modified tempIdentity =
+identityEditor : Bool -> IdentityForm -> Element Msg
+identityEditor modified form =
     let
         validated =
-            Validate.validate identityValidator tempIdentity
+            Validate.validate identityValidator form
 
         ( isValid, errors ) =
             case validated of
@@ -296,33 +295,15 @@ identityEditor modified tempIdentity =
         [ spacing -1
         , width fill
         ]
-        [ column
-            [ padding 10
-            , spacing 10
-            , width fill
+        [ identityForm form
+        , column
+            [ width fill
             , Border.width 1
             , Border.color (toColor skin.lineGray)
+            , padding 10
+            , spacing 10
             ]
-            [ Input.text []
-                { onChange = \str -> EditIdentity { tempIdentity | displayName = str }
-                , text = tempIdentity.displayName
-                , placeholder = Nothing
-                , label = Input.labelAbove [] (text "Display Name")
-                }
-            , Input.text []
-                { onChange = \str -> EditIdentity { tempIdentity | website = str }
-                , text = tempIdentity.website
-                , placeholder = Nothing
-                , label = Input.labelAbove [] (text "Website")
-                }
-            , Input.multiline []
-                { onChange = \str -> EditIdentity { tempIdentity | aboutMe = str }
-                , text = tempIdentity.aboutMe
-                , placeholder = Nothing
-                , label = Input.labelAbove [] (text "About Me")
-                , spellcheck = True
-                }
-            , column
+            [ column
                 [ Font.color (toColor skin.primaryColor)
                 , Font.size 14
                 ]
@@ -330,18 +311,45 @@ identityEditor modified tempIdentity =
                     text
                     errors
                 )
+            , row
+                [ spacing 10
+                , width fill
+                ]
+                [ mainButton (not isValid || not modified) "Save" SaveIdentity
+                , outlinedButton False "Cancel" CancelEditing
+                ]
             ]
-        , row
-            [ alignBottom
-            , spacing 10
-            , padding 10
-            , Border.width 1
-            , Border.color (toColor skin.lineGray)
-            , width fill
-            ]
-            [ mainButton (not isValid || not modified) "Save" SaveIdentity
-            , outlinedButton False "Cancel" CancelEditing
-            ]
+        ]
+
+
+identityForm : IdentityForm -> Element Msg
+identityForm form =
+    column
+        [ padding 10
+        , spacing 10
+        , width fill
+        , Border.width 1
+        , Border.color (toColor skin.lineGray)
+        ]
+        [ Input.text []
+            { onChange = \str -> EditIdentity { form | displayName = str }
+            , text = form.displayName
+            , placeholder = Nothing
+            , label = Input.labelAbove [] (text "Display Name")
+            }
+        , Input.text []
+            { onChange = \str -> EditIdentity { form | website = str }
+            , text = form.website
+            , placeholder = Nothing
+            , label = Input.labelAbove [] (text "Website")
+            }
+        , Input.multiline []
+            { onChange = \str -> EditIdentity { form | aboutMe = str }
+            , text = form.aboutMe
+            , placeholder = Nothing
+            , label = Input.labelAbove [] (text "About Me")
+            , spellcheck = True
+            }
         ]
 
 
@@ -359,15 +367,15 @@ identitySettings model =
 
         editingCards =
             case model.editingIdentity of
-                Editing id tempIdentity ->
+                Editing id form ->
                     updateArray
-                        (\card ->
+                        (\idCard ->
                             column
                                 [ spacing -1
                                 , width fill
                                 ]
-                                [ card
-                                , identityEditor True tempIdentity
+                                [ idCard
+                                , identityEditor True form
                                 ]
                         )
                         id
@@ -378,17 +386,17 @@ identitySettings model =
 
                 Unchanged id ->
                     Array.get id model.identities
-                        |> Maybe.map toTempIdentity
+                        |> Maybe.map toForm
                         |> Maybe.map
-                            (\tempIdentity ->
+                            (\form ->
                                 updateArray
-                                    (\card ->
+                                    (\idCard ->
                                         column
                                             [ spacing -1
                                             , width fill
                                             ]
-                                            [ card
-                                            , identityEditor False tempIdentity
+                                            [ idCard
+                                            , identityEditor False form
                                             ]
                                     )
                                     id
@@ -430,6 +438,34 @@ view model =
 
 
 -- Elements
+
+
+card : List (Attribute msg) -> Element msg -> List (Element msg) -> Element msg
+card attributes header body =
+    let
+        baseStyle =
+            [ Border.width 1
+            , Border.color (toColor skin.lineGray)
+            , padding 10
+            , width fill
+            ]
+    in
+    column
+        (attributes
+            ++ [ spacing -1 ]
+        )
+        ([ el
+            (baseStyle
+                ++ [ Background.color (toColor skin.lightGray) ]
+            )
+            header
+         ]
+            ++ List.map
+                (\section ->
+                    el baseStyle section
+                )
+                body
+        )
 
 
 identicon : Identity -> Element msg
