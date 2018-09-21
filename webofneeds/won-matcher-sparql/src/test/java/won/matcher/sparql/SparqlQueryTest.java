@@ -55,7 +55,7 @@ public class SparqlQueryTest  {
     }
     
     @Test
-    //@Ignore // useful for trying things out, does not make so much sense as a unit test
+    @Ignore // useful for trying things out, does not make so much sense as a unit test
     public void testQuery() throws Exception {
         Dataset dataset = DatasetFactory.create();
         RDFDataMgr.read(dataset, getResourceAsStream("sparqlquerytest/need2.trig"), Lang.TRIG);
@@ -105,7 +105,7 @@ public class SparqlQueryTest  {
         Op queryOp = Algebra.compile(query);
         Query expectedQueryWithGraphClauseString = QueryFactory.create(queryWithGraphClauseString);
         Op expectedQueryWithGraphClause = Algebra.compile(expectedQueryWithGraphClauseString);
-        Op queryWithGraphClause = SparqlMatcherUtils.addGraphOp(queryOp, Optional.of("g"));
+        Op queryWithGraphClause = SparqlMatcherUtils.addGraphOp(queryOp, Optional.of("?g"));
         
         Assert.assertEquals("Adding graph op to query did not yield expected result", expectedQueryWithGraphClause , queryWithGraphClause);
     }

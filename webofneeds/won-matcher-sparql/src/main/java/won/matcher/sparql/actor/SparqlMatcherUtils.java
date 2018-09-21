@@ -26,7 +26,7 @@ public class SparqlMatcherUtils {
             @Override
             public Op transform(OpProject opProject, Op subOp) {
                 if (graphVariable.startsWith("?")) {
-                    return opProject.copy(new OpGraph(Var.alloc(graphVariable), subOp));
+                    return opProject.copy(new OpGraph(Var.alloc(graphVariable.substring(1)), subOp));
                 } else {
                     return opProject.copy(new OpGraph(new ResourceImpl(graphVariable).asNode(), subOp));
                 }
