@@ -119,6 +119,14 @@ function config(env, argv): Configuration {
             },
           ],
         },
+        {
+          test: /\.elm$/,
+          exclude: [/elm-stuff/, /node_modules/],
+          use: {
+            loader: "elm-webpack-loader",
+            options: {},
+          },
+        },
       ],
     },
     plugins: [

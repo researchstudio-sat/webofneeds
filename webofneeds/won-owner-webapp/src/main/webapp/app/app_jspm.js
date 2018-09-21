@@ -39,6 +39,8 @@ import postComponent from "./components/post/post.js";
 import aboutComponent from "./components/about/about.js";
 import signupComponent from "./components/signup/signup.js";
 
+import settingsWrapper from "./components/settings/settings-wrapper.js";
+
 //won import (used so you can access the debugmode variable without reloading the page)
 import won from "./service/won.js";
 window.won = won;
@@ -71,6 +73,7 @@ let app = angular.module("won.owner", [
   signupComponent,
 
   ...detailModules,
+  settingsWrapper,
 ]);
 
 /* create store, register middlewares, set up redux-devtool-support, etc */
