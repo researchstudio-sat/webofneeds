@@ -55,7 +55,7 @@ public class SparqlQueryTest  {
     }
     
     @Test
-    @Ignore // useful for trying things out, does not make so much sense as a unit test
+    //@Ignore // useful for trying things out, does not make so much sense as a unit test
     public void testQuery() throws Exception {
         Dataset dataset = DatasetFactory.create();
         RDFDataMgr.read(dataset, getResourceAsStream("sparqlquerytest/need2.trig"), Lang.TRIG);
@@ -65,15 +65,16 @@ public class SparqlQueryTest  {
         Op queryOp = Algebra.compile(query);
         
         Op queryWithGraphClause = SparqlMatcherUtils.addGraphOp(queryOp, Optional.of("urn:x-arq:UnionGraph"));
+        Op queryWithoutServiceClause = SparqlMatcherUtils.removeServiceOp(queryWithGraphClause, Optional.of("http://www.bigdata.com/rdf/geospatial#search"));
         
         System.out.println("query algebra: " + queryOp);
         System.out.println("transformed query algebra: " + queryWithGraphClause);
-        System.out.println("optimized query algebra:" + Algebra.optimize(queryWithGraphClause));
+        System.out.println("withoug service clause:" + queryWithoutServiceClause);
         System.out.println("\nDataset:");
         RDFDataMgr.write(System.out, dataset, Lang.TRIG);
         System.out.println("\nQuery:");
 
-        query = OpAsQuery.asQuery(queryWithGraphClause);
+        query = OpAsQuery.asQuery(queryWithoutServiceClause);
         System.out.println(query);
         System.out.println("\nResult:");
         
@@ -96,8 +97,6 @@ public class SparqlQueryTest  {
     
     @Test
     public void testAddGraphOp() throws Exception {
-        Dataset dataset = DatasetFactory.create();
-        RDFDataMgr.read(dataset, getResourceAsStream("sparqlquerytest/need.trig"), Lang.TRIG);
         String queryString = getResourceAsString("sparqlquerytest/query.rq");
         String queryWithGraphClauseString = getResourceAsString("sparqlquerytest/query-with-graph-clause.rq");
         
@@ -112,6 +111,39 @@ public class SparqlQueryTest  {
 
     
     
+    @Test
+    public void testRemoveServiceOpNoName() throws Exception {
+        String queryString = getResourceAsString("sparqlquerytest/query2.rq");
+        String queryWithGraphClauseString = getResourceAsString("sparqlquerytest/query2-without-service-clause.rq");
+        
+        Query query = QueryFactory.create(queryString);
+        Op queryOp = Algebra.compile(query);
+        Query expectedQuery = QueryFactory.create(queryWithGraphClauseString);
+        Op expectedOp = Algebra.compile(expectedQuery);
+        Op actualOp = SparqlMatcherUtils.removeServiceOp(queryOp);
+        Assert.assertEquals("Adding graph op to query did not yield expected result", expectedOp, actualOp);
+    }
     
+    @Test
+    public void testRemoveServiceOpWithName() throws Exception {
+        String queryString = getResourceAsString("sparqlquerytest/query2.rq");
+        String queryWithGraphClauseString = getResourceAsString("sparqlquerytest/query2-without-service-clause.rq");
+        
+        Query query = QueryFactory.create(queryString);
+        Op queryOp = Algebra.compile(query);
+        Query expectedQuery = QueryFactory.create(queryWithGraphClauseString);
+        Op expectedOp = Algebra.compile(expectedQuery);
+        Op actualOp = SparqlMatcherUtils.removeServiceOp(queryOp, Optional.of("http://www.bigdata.com/rdf/geospatial#search"));
+        Assert.assertEquals("Adding graph op to query did not yield expected result", expectedOp, actualOp);
+    }
     
+    @Test
+    public void testRemoveServiceOpWithOtherName() throws Exception {
+        String queryString = getResourceAsString("sparqlquerytest/query2.rq");
+        Query query = QueryFactory.create(queryString);
+        Op queryOp = Algebra.compile(query);
+        Op expectedOp = queryOp;
+        Op actualOp = SparqlMatcherUtils.removeServiceOp(queryOp, Optional.of("http://example.com/some-other-uri"));
+        Assert.assertEquals("Adding graph op to query did not yield expected result", expectedOp, actualOp);
+    }
 }

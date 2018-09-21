@@ -441,6 +441,8 @@ public class SparqlMatcherActor extends UntypedActor {
                 // we're going to query an in-memory dataset. In this case, we'll 
                 // want a graph clause around our query, explicitly joining all named graphs
                 q = SparqlMatcherUtils.addGraphOp(q, Optional.of("urn:x-arq:UnionGraph"));
+                // remove service clause that only works with blazegraph
+                q = SparqlMatcherUtils.removeServiceOp(q, Optional.of("http://www.bigdata.com/rdf/geospatial#search"));
             }
             Query compiledQuery = OpAsQuery.asQuery(q);
 
