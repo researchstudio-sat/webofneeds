@@ -2,9 +2,13 @@ package won.utils.im.port;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Random;
 
 import org.apache.jena.datatypes.BaseDatatype;
@@ -56,7 +60,7 @@ public class RealEstateNeedGenerator {
             "Parquetflooring", "Elevator", "Cellar", "Pool", "Sauna", "accessible" };
 
     public static void main(String[] args) {
-    	initializeLocations();
+        initializeLocations();
         generateNeeds();
     }
 
@@ -130,15 +134,22 @@ public class RealEstateNeedGenerator {
             return resource;
         }
 
-        // pick a location
+        // pick a location and change it by a random amount so that the locations are scattered around a point
         int locNr = (int) (Math.random() * 10);
-        String nwlat = locations[locNr].get("nwlat");
-        String nwlng = locations[locNr].get("nwlng");
-        String selat = locations[locNr].get("selat");
-        String selng = locations[locNr].get("selng");
-        String lat = locations[locNr].get("lat");
-        String lng = locations[locNr].get("lng");
+        double rndlat = 0.05 * Math.random(); 
+        double rndlng = 0.05 * Math.random();                
+        DecimalFormat df = new DecimalFormat("##.######");
+        df.setRoundingMode(RoundingMode.HALF_UP);
+        df.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
+        
+        String nwlat =  df.format(Double.parseDouble(locations[locNr].get("nwlat")) + rndlat);
+        String nwlng = df.format(Double.parseDouble(locations[locNr].get("nwlng")) + rndlng);
+        String selat = df.format(Double.parseDouble(locations[locNr].get("selat")) + rndlat);
+        String selng = df.format(Double.parseDouble(locations[locNr].get("selng")) + rndlng);
+        String lat = df.format(Double.parseDouble(locations[locNr].get("lat")) + rndlat);
+        String lng = df.format(Double.parseDouble(locations[locNr].get("lng")) + rndlng);
         String name = locations[locNr].get("name");
+
 
         Resource locationResource = model.createResource();
         Resource boundingBoxResource = model.createResource();
@@ -255,7 +266,7 @@ public class RealEstateNeedGenerator {
         loc1.put("selng", "16.370149");
         loc1.put("lat", "48.225073");
         loc1.put("lng", "16.358398");
-        loc1.put("name", "Alsergrund, Vienna, 1090, Austria");
+        loc1.put("name", "Vienna, Austria");
         locations[1] = loc1;
 
         HashMap<String, String> loc2 = new HashMap<String, String>();
