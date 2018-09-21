@@ -26,28 +26,6 @@ main =
 --
 -- Model
 --
-
-
-type IdentityEditor
-    = NotEditing
-    | Editing Int IdentityForm
-    | Unchanged Int
-
-
-type alias Model =
-    { identities : Array Identity
-    , editingIdentity : IdentityEditor
-    }
-
-
-type Msg
-    = SelectIdentity Int
-    | SaveIdentity
-    | CancelEditing
-    | EditIdentity IdentityForm
-
-
-
 -- Identity
 
 
@@ -101,6 +79,59 @@ fromForm valid =
 
 
 
+-- State
+
+
+type alias EditingModel =
+    { id : Int
+    , form : IdentityForm
+    }
+
+
+type alias EditingInfo =
+    { id : Int
+    , original : Identity
+    , form : IdentityForm
+    }
+
+
+editingInfo : Model -> Maybe EditingInfo
+editingInfo model =
+    let
+        editedIdentity =
+            model.editing
+                |> Maybe.andThen (\{ id } -> Array.get id model.identities)
+    in
+    Maybe.map2
+        (\{ id, form } original ->
+            { id = id
+            , form = form
+            , original = original
+            }
+        )
+        model.editing
+        editedIdentity
+
+
+modified : EditingInfo -> Bool
+modified { form, original } =
+    toForm original /= form
+
+
+type alias Model =
+    { identities : Array Identity
+    , editing : Maybe EditingModel
+    }
+
+
+type Msg
+    = SelectIdentity Int
+    | SaveIdentity
+    | CancelEditing
+    | EditIdentity IdentityForm
+
+
+
 --
 -- Init
 --
@@ -126,7 +157,7 @@ mockIdentities =
 init : Model
 init =
     { identities = Array.fromList mockIdentities
-    , editingIdentity = NotEditing
+    , editing = Nothing
     }
 
 
@@ -140,50 +171,59 @@ update : Msg -> Model -> Model
 update msg model =
     case msg of
         SelectIdentity id ->
-            case model.editingIdentity of
-                NotEditing ->
-                    { model | editingIdentity = Unchanged id }
+            let
+                edited =
+                    Maybe.map modified (editingInfo model) == Just True
+            in
+            Array.get id model.identities
+                |> Maybe.andThen
+                    (\original ->
+                        if edited then
+                            Nothing
 
-                Unchanged _ ->
-                    { model | editingIdentity = Unchanged id }
-
-                Editing _ _ ->
-                    model
+                        else
+                            Just
+                                { model
+                                    | editing =
+                                        Just
+                                            { id = id
+                                            , form = toForm original
+                                            }
+                                }
+                    )
+                |> Maybe.withDefault model
 
         CancelEditing ->
-            { model | editingIdentity = NotEditing }
+            { model | editing = Nothing }
 
         SaveIdentity ->
-            case model.editingIdentity of
-                Editing id form ->
+            case editingInfo model of
+                Just { id, form } ->
                     case Validate.validate identityValidator form of
                         Ok valid ->
                             { model
                                 | identities = Array.set id (fromForm valid) model.identities
-                                , editingIdentity = NotEditing
                             }
 
                         Err _ ->
                             model
 
-                NotEditing ->
+                Nothing ->
                     model
 
-                Unchanged _ ->
+        EditIdentity newForm ->
+            case model.editing of
+                Just { id, form } ->
                     { model
-                        | editingIdentity = NotEditing
+                        | editing =
+                            Just
+                                { id = id
+                                , form = newForm
+                                }
                     }
 
-        EditIdentity form ->
-            case model.editingIdentity of
-                Editing id _ ->
-                    { model | editingIdentity = Editing id form }
-
-                NotEditing ->
+                Nothing ->
                     model
-
-                Unchanged id ->
-                    { model | editingIdentity = Editing id form }
 
 
 
@@ -277,9 +317,12 @@ identityCard identity =
         []
 
 
-identityEditor : Bool -> IdentityForm -> Element Msg
-identityEditor modified form =
+identityEditor : EditingInfo -> Element Msg
+identityEditor info =
     let
+        form =
+            info.form
+
         validated =
             Validate.validate identityValidator form
 
@@ -291,31 +334,48 @@ identityEditor modified form =
                 Err err ->
                     ( False, err )
     in
-    column
-        [ spacing -1
-        , width fill
-        ]
+    card
+        [ width fill ]
+        (row
+            [ width fill
+            , spacing 10
+            ]
+            [ identityImage info.original
+            , Input.text [ alignTop ]
+                { onChange = \str -> EditIdentity { form | description = str }
+                , text = form.description
+                , placeholder = Just (Input.placeholder [] <| text "Unnamed Identity")
+                , label =
+                    Input.labelAbove
+                        [ width (px 0)
+                        , height (px 0)
+                        , htmlAttribute (HA.style "display" "none")
+                        ]
+                        (text "Display Name")
+                }
+            ]
+        )
         [ identityForm form
         , column
             [ width fill
-            , Border.width 1
-            , Border.color (toColor skin.lineGray)
-            , padding 10
             , spacing 10
             ]
-            [ column
-                [ Font.color (toColor skin.primaryColor)
-                , Font.size 14
-                ]
-                (List.map
-                    text
-                    errors
-                )
+            [ if isValid then
+                none
+
+              else
+                column
+                    [ Font.color (toColor skin.primaryColor)
+                    ]
+                    (List.map
+                        text
+                        errors
+                    )
             , row
                 [ spacing 10
                 , width fill
                 ]
-                [ mainButton (not isValid || not modified) "Save" SaveIdentity
+                [ mainButton (not isValid || not (modified info)) "Save" SaveIdentity
                 , outlinedButton False "Cancel" CancelEditing
                 ]
             ]
@@ -325,11 +385,8 @@ identityEditor modified form =
 identityForm : IdentityForm -> Element Msg
 identityForm form =
     column
-        [ padding 10
-        , spacing 10
+        [ spacing 10
         , width fill
-        , Border.width 1
-        , Border.color (toColor skin.lineGray)
         ]
         [ Input.text []
             { onChange = \str -> EditIdentity { form | displayName = str }
@@ -366,43 +423,12 @@ identitySettings model =
                 model.identities
 
         editingCards =
-            case model.editingIdentity of
-                Editing id form ->
-                    updateArray
-                        (\idCard ->
-                            column
-                                [ spacing -1
-                                , width fill
-                                ]
-                                [ idCard
-                                , identityEditor True form
-                                ]
-                        )
-                        id
-                        cards
+            case editingInfo model of
+                Just info ->
+                    Array.set info.id (identityEditor info) cards
 
-                NotEditing ->
+                Nothing ->
                     cards
-
-                Unchanged id ->
-                    Array.get id model.identities
-                        |> Maybe.map toForm
-                        |> Maybe.map
-                            (\form ->
-                                updateArray
-                                    (\idCard ->
-                                        column
-                                            [ spacing -1
-                                            , width fill
-                                            ]
-                                            [ idCard
-                                            , identityEditor False form
-                                            ]
-                                    )
-                                    id
-                                    cards
-                            )
-                        |> Maybe.withDefault cards
     in
     column
         [ centerX
