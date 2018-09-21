@@ -1,0 +1,80 @@
+PREFIX won: <http://purl.org/webofneeds/model#>
+PREFIX s: <http://schema.org/>
+PREFIX geo: <http://www.bigdata.com/rdf/geospatial#>
+PREFIX geoliteral: <http://www.bigdata.com/rdf/geospatial/literals/v1#>
+prefix sh:    <http://www.w3.org/ns/shacl#> 
+
+# query for real estate offers, finding real estate needs
+
+SELECT DISTINCT ?result WHERE {
+  ?result a won:Need ;
+  won:isInState won:Active ;
+  won:seeks ?seeks .
+    
+  optional {
+    ?seeks s:priceSpecification ?seeks_pricespec.
+  ?seeks_pricespec s:priceCurrency ?seeks_currency.
+  FILTER(?seeks_currency = ?varCurrency)
+  optional {
+    ?seeks_pricespec s:maxPrice ?seeks_maxPrice.
+    FILTER(?seeks_maxPrice >= ?varPrice )
+  }
+  optional {
+    ?seeks_pricespec s:minPrice ?seeks_minPrice.
+    FILTER(?seeks_minPrice <= ?varPrice )
+  }
+  FILTER (
+    bound(?seeks_currency) 
+    || bound(?seeks_minPrice) 
+    || bound(?seeks_maxPrice)
+  )
+  }
+  
+  optional {
+    ?seeks sh:property ?seeks_floorsize .
+    ?seeks_floorsize sh:path "s:floorSize" .
+  optional {
+    ?seeks_floorsize sh:minInclusive ?seeks_minFloorSize .
+    FILTER(?seeks_minFloorSize <= ?varFloorSize )
+  }
+  optional {
+    ?seeks_floorsize sh:maxInclusive ?seeks_maxFloorSize .
+    FILTER(?seeks_maxFloorSize >= ?varFloorSize )
+  }
+  filter(
+    bound(?seeks_maxFloorSize) 
+    || bound(?seeks_minFloorSize)
+  )
+  }
+  
+  optional {
+  ?seeks sh:property ?seeks_numberOfRooms.
+      ?seeks_numberOfRooms sh:path "s:numberOfRooms" ;
+          sh:minInclusive ?seeks_minNumberOfRooms ;
+          sh:maxInclusive ?seeks_maxNumberOfRooms .
+    FILTER(?seeks_minNumberOfRooms <= ?varNumberOfRooms )
+    FILTER(?seeks_maxNumberOfRooms >= ?varNumberOfRooms )
+  }
+  
+  # if we make the location query optional, it
+  # just takes too long
+  ?seeks won:hasLocation ?location.
+  ?location s:geo ?location_geo.
+  SERVICE geo:search {
+    ?location_geo geo:search "inCircle".
+    ?location_geo geo:searchDatatype geoliteral:lat-lon.
+    ?location_geo geo:predicate won:geoSpatial.
+    ?location_geo geo:spatialCircleCenter ?varLatLng.
+    ?location_geo geo:spatialCircleRadius ?varRadius.
+    ?location_geo geo:distanceValue ?location_geoDistance.
+  }
+  
+  filter (
+     bound(?seeks_pricespec) 
+  || bound(?seeks_floorsize) 
+  || bound(?seeks_numberOfRooms) 
+  || bound (?location))
+  
+}
+ORDER BY (?location_geoDistance)
+            

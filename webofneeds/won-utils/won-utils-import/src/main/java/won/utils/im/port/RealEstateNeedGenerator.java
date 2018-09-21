@@ -1,8 +1,12 @@
 package won.utils.im.port;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.StringWriter;
 import java.math.RoundingMode;
+import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Arrays;
@@ -20,6 +24,8 @@ import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.DC;
 import org.apache.jena.vocabulary.RDF;
+
+import won.protocol.vocabulary.WON;
 
 public class RealEstateNeedGenerator {
 
@@ -59,12 +65,12 @@ public class RealEstateNeedGenerator {
     static String[] amenities = { "Balcony", "Parkingspace", "Garden", "Bathtub", "furnished",
             "Parquetflooring", "Elevator", "Cellar", "Pool", "Sauna", "accessible" };
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         initializeLocations();
         generateNeeds();
     }
 
-	private static void generateNeeds() {
+	private static void generateNeeds() throws Exception {
         File parentFolder = new File("sample_needs");
         parentFolder.mkdirs();
         Arrays.stream(parentFolder.listFiles()).forEach(f -> f.delete());
@@ -86,6 +92,7 @@ public class RealEstateNeedGenerator {
             // method signatures: branch, probability that detail is added, min, max
             isPart = addTitle(isPart, 1.0, i);
             isPart = addDescription(isPart, 1.0);
+            isPart = addQuery(isPart);
             isPart = addLocation(isPart, 1.0);
             isPart = addAmenities(isPart, 0.8, 1, 4);
             isPart = addFloorSize(isPart, 0.8, 28, 250);
@@ -110,6 +117,11 @@ public class RealEstateNeedGenerator {
         }
         System.out.println("generated " + N + " sample needs");
     }
+	
+	private static Resource addQuery(Resource resource) throws Exception {
+	    String query = RealEstateNeedGenerator.getResourceAsString("realestate-offer-query-template.rq");
+	    return resource.addLiteral(WON.HAS_QUERY, query);
+	}
 	
 	private static Resource addTitle(Resource resource, double probability, int counter) {
         if (Math.random() < (1.0 - probability)) {
@@ -177,7 +189,17 @@ public class RealEstateNeedGenerator {
         seCornerResource.addProperty(RDF.type, schema_GeoCoordinates);
         seCornerResource.addProperty(schema_latitude, selat);
         seCornerResource.addProperty(schema_longitude, selng);
+        
+        //update query
+        resource = replaceInQuery(resource, "\\?varLatLng", "\""+lat+"#"+lng+"\"");
+        resource = replaceInQuery(resource, "\\?varRadius", "\"5\"");
         return resource;
+    }
+
+    private static Resource replaceInQuery(Resource resource, String toReplace, String replacement) {
+        String query = resource.getRequiredProperty(WON.HAS_QUERY).getString();
+        resource.removeAll(WON.HAS_QUERY);
+        return resource.addProperty(WON.HAS_QUERY, query.replaceAll(toReplace, replacement));
     }
 
     private static Resource addAmenities(Resource resource, double probability, int min, int max) {
@@ -215,6 +237,7 @@ public class RealEstateNeedGenerator {
         floorSizeResource.addProperty(RDF.type, schema_QuantitativeValue);
         floorSizeResource.addProperty(schema_unitCode, "MTK");
         floorSizeResource.addProperty(schema_value, Integer.toString(floorSize), XSDDatatype.XSDfloat);
+        resource = replaceInQuery(resource, "\\?varFloorSize", "\""+ floorSize +"\"");
         return resource;
     }
 
@@ -226,6 +249,7 @@ public class RealEstateNeedGenerator {
         int numberOfRooms = (int) (Math.random() * Math.abs(max - min + 1)) + min;
 
         resource.addProperty(schema_numberOfRooms, Integer.toString(numberOfRooms), XSDDatatype.XSDfloat);
+        resource = replaceInQuery(resource, "\\?varNumberOfRooms", "\""+ numberOfRooms +"\"");
         return resource;
     }
 
@@ -245,6 +269,8 @@ public class RealEstateNeedGenerator {
         priceSpecificationResource.addProperty(schema_description, "total rent per month");
         priceSpecificationResource.addProperty(schema_price, Integer.toString(price), XSDDatatype.XSDfloat);
         priceSpecificationResource.addProperty(schema_priceCurrency, "EUR");
+        resource = replaceInQuery(resource, "\\?varPrice", "\""+ price +"\"");
+        resource = replaceInQuery(resource, "\\?varCurrency", "\"EUR\"");
         return resource;
     }
 
@@ -366,4 +392,22 @@ public class RealEstateNeedGenerator {
 		model.setNsPrefix("ldp", "http://www.w3.org/ns/ldp#");
 		model.setNsPrefix("sioc", "http://rdfs.org/sioc/ns#");
 	}
+	
+	private static InputStream getResourceAsStream(String name) {
+        return Thread.currentThread().getContextClassLoader().getResourceAsStream(name);
+    }
+    
+    private static String getResourceAsString(String name) throws Exception {
+        byte[] buffer = new byte[256];
+        StringWriter sw = new StringWriter();
+        try (InputStream in = getResourceAsStream(name)) {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            int bytesRead = 0;
+            while ((bytesRead = in.read(buffer)) > -1) {
+                baos.write(buffer,0,bytesRead);
+            }
+            return new String(baos.toByteArray(),Charset.defaultCharset());
+        }
+        
+    }
 }
