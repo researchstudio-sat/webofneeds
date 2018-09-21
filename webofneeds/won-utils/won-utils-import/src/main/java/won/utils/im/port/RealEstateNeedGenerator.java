@@ -56,21 +56,21 @@ public class RealEstateNeedGenerator {
     static Property schema_priceCurrency = model.createProperty("http://schema.org/priceCurrency");
     static Property schema_unitCode = model.createProperty("http://schema.org/unitCode");
     static Property schema_value = model.createProperty("http://schema.org/value");
-    
+
     static RDFDatatype schema_Text = new BaseDatatype("http://schema.org/Text");
-    static RDFDatatype bigdata_geoSpatialDatatype = new BaseDatatype("http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon");
-    
-    
+    static RDFDatatype bigdata_geoSpatialDatatype = new BaseDatatype(
+            "http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon");
+
     static HashMap<String, String>[] locations = new HashMap[10];
-    static String[] amenities = { "Balcony", "Parkingspace", "Garden", "Bathtub", "furnished",
-            "Parquetflooring", "Elevator", "Cellar", "Pool", "Sauna", "accessible" };
+    static String[] amenities = { "Balcony", "Parkingspace", "Garden", "Bathtub", "furnished", "Parquetflooring",
+            "Elevator", "Cellar", "Pool", "Sauna", "accessible" };
 
     public static void main(String[] args) throws Exception {
         initializeLocations();
         generateNeeds();
     }
 
-	private static void generateNeeds() throws Exception {
+    private static void generateNeeds() throws Exception {
         File parentFolder = new File("sample_needs");
         parentFolder.mkdirs();
         Arrays.stream(parentFolder.listFiles()).forEach(f -> f.delete());
@@ -92,12 +92,12 @@ public class RealEstateNeedGenerator {
             // method signatures: branch, probability that detail is added, min, max
             isPart = addTitle(isPart, 1.0, i);
             isPart = addDescription(isPart, 1.0);
-            isPart = addQuery(isPart);
-            isPart = addLocation(isPart, 1.0);
+            need = addQuery(need);
+            isPart = addLocation(isPart, 1.0, need);
             isPart = addAmenities(isPart, 0.8, 1, 4);
-            isPart = addFloorSize(isPart, 0.8, 28, 250);
-            isPart = addNumberOfRooms(isPart, 0.8, 1, 9);
-            isPart = addPriceSpecification(isPart, 1.0, 250, 2200);
+            isPart = addFloorSize(isPart, 0.8, 28, 250, need);
+            isPart = addNumberOfRooms(isPart, 0.8, 1, 9, need);
+            isPart = addPriceSpecification(isPart, 1.0, 250, 2200, need);
             isPart.addProperty(won_hasTag, "RentOutRealEstate");
 
             seeksPart.addProperty(won_hasTag, "SearchRealEstateToRent");
@@ -108,7 +108,8 @@ public class RealEstateNeedGenerator {
             need.addProperty(won_seeks, seeksPart);
 
             try {
-                FileOutputStream out = new FileOutputStream(new File(parentFolder, "real_estate_need_" + rnd + ".trig"));
+                FileOutputStream out = new FileOutputStream(
+                        new File(parentFolder, "real_estate_need_" + rnd + ".trig"));
                 model.write(out, "TURTLE");
                 out.close();
             } catch (Exception e) {
@@ -117,13 +118,13 @@ public class RealEstateNeedGenerator {
         }
         System.out.println("generated " + N + " sample needs");
     }
-	
-	private static Resource addQuery(Resource resource) throws Exception {
-	    String query = RealEstateNeedGenerator.getResourceAsString("realestate-offer-query-template.rq");
-	    return resource.addLiteral(WON.HAS_QUERY, query);
-	}
-	
-	private static Resource addTitle(Resource resource, double probability, int counter) {
+
+    private static Resource addQuery(Resource resource) throws Exception {
+        String query = RealEstateNeedGenerator.getResourceAsString("realestate-offer-query-template.rq");
+        return resource.addLiteral(WON.HAS_QUERY, query);
+    }
+
+    private static Resource addTitle(Resource resource, double probability, int counter) {
         if (Math.random() < (1.0 - probability)) {
             return resource;
         }
@@ -141,27 +142,27 @@ public class RealEstateNeedGenerator {
         return resource;
     }
 
-    private static Resource addLocation(Resource resource, double probability) {
+    private static Resource addLocation(Resource resource, double probability, Resource resourceForQuery) {
         if (Math.random() < (1.0 - probability)) {
             return resource;
         }
 
-        // pick a location and change it by a random amount so that the locations are scattered around a point
+        // pick a location and change it by a random amount so that the locations are
+        // scattered around a point
         int locNr = (int) (Math.random() * 10);
-        double rndlat = 0.05 * Math.random(); 
-        double rndlng = 0.05 * Math.random();                
+        double rndlat = 0.05 * Math.random();
+        double rndlng = 0.05 * Math.random();
         DecimalFormat df = new DecimalFormat("##.######");
         df.setRoundingMode(RoundingMode.HALF_UP);
         df.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
-        
-        String nwlat =  df.format(Double.parseDouble(locations[locNr].get("nwlat")) + rndlat);
+
+        String nwlat = df.format(Double.parseDouble(locations[locNr].get("nwlat")) + rndlat);
         String nwlng = df.format(Double.parseDouble(locations[locNr].get("nwlng")) + rndlng);
         String selat = df.format(Double.parseDouble(locations[locNr].get("selat")) + rndlat);
         String selng = df.format(Double.parseDouble(locations[locNr].get("selng")) + rndlng);
         String lat = df.format(Double.parseDouble(locations[locNr].get("lat")) + rndlat);
         String lng = df.format(Double.parseDouble(locations[locNr].get("lng")) + rndlng);
         String name = locations[locNr].get("name");
-
 
         Resource locationResource = model.createResource();
         Resource boundingBoxResource = model.createResource();
@@ -178,8 +179,9 @@ public class RealEstateNeedGenerator {
         geoResource.addProperty(RDF.type, schema_GeoCoordinates);
         geoResource.addProperty(schema_latitude, lat);
         geoResource.addProperty(schema_longitude, lng);
-        // add bigdata specific value: "<subj> won:geoSpatial  "48.225073#16.358398"^^<http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon>" 
-        geoResource.addProperty(won_geoSpatial, lat+"#"+lng, bigdata_geoSpatialDatatype);
+        // add bigdata specific value: "<subj> won:geoSpatial
+        // "48.225073#16.358398"^^<http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon>"
+        geoResource.addProperty(won_geoSpatial, lat + "#" + lng, bigdata_geoSpatialDatatype);
         locationResource.addProperty(won_hasBoundingBox, boundingBoxResource);
         boundingBoxResource.addProperty(won_hasNorthWestCorner, nwCornerResource);
         nwCornerResource.addProperty(RDF.type, schema_GeoCoordinates);
@@ -189,10 +191,10 @@ public class RealEstateNeedGenerator {
         seCornerResource.addProperty(RDF.type, schema_GeoCoordinates);
         seCornerResource.addProperty(schema_latitude, selat);
         seCornerResource.addProperty(schema_longitude, selng);
-        
-        //update query
-        resource = replaceInQuery(resource, "\\?varLatLng", "\""+lat+"#"+lng+"\"");
-        resource = replaceInQuery(resource, "\\?varRadius", "\"5\"");
+
+        // update query
+        replaceInQuery(resourceForQuery, "\\?varLatLng", "\"" + lat + "#" + lng + "\"");
+        replaceInQuery(resourceForQuery, "\\?varRadius", "\"5\"");
         return resource;
     }
 
@@ -210,20 +212,20 @@ public class RealEstateNeedGenerator {
         int numberOfAmenities = (int) (Math.random() * Math.abs(max - min + 1) + min);
         Collections.shuffle(Arrays.asList(amenities));
 
-
         Resource schema_LocationFeatureSpecification = model
                 .createResource("http://schema.org/LocationFeatureSpecification");
 
         for (int j = 0; j < numberOfAmenities; j++) {
             Resource amenityResource = model.createResource();
-            resource.addProperty(schema_amenityFeature, amenityResource);            
+            resource.addProperty(schema_amenityFeature, amenityResource);
             amenityResource.addProperty(RDF.type, schema_LocationFeatureSpecification);
             amenityResource.addProperty(schema_value, amenities[j], schema_Text);
         }
         return resource;
     }
 
-    private static Resource addFloorSize(Resource resource, double probability, int min, int max) {
+    private static Resource addFloorSize(Resource resource, double probability, int min, int max,
+            Resource resourceForQuery) {
         if (Math.random() < (1.0 - probability)) {
             return resource;
         }
@@ -237,11 +239,12 @@ public class RealEstateNeedGenerator {
         floorSizeResource.addProperty(RDF.type, schema_QuantitativeValue);
         floorSizeResource.addProperty(schema_unitCode, "MTK");
         floorSizeResource.addProperty(schema_value, Integer.toString(floorSize), XSDDatatype.XSDfloat);
-        resource = replaceInQuery(resource, "\\?varFloorSize", "\""+ floorSize +"\"");
+        replaceInQuery(resourceForQuery, "\\?varFloorSize", "\"" + floorSize + "\"");
         return resource;
     }
 
-    private static Resource addNumberOfRooms(Resource resource, double probability, int min, int max) {
+    private static Resource addNumberOfRooms(Resource resource, double probability, int min, int max,
+            Resource resourceForQuery) {
         if (Math.random() < (1.0 - probability)) {
             return resource;
         }
@@ -249,11 +252,12 @@ public class RealEstateNeedGenerator {
         int numberOfRooms = (int) (Math.random() * Math.abs(max - min + 1)) + min;
 
         resource.addProperty(schema_numberOfRooms, Integer.toString(numberOfRooms), XSDDatatype.XSDfloat);
-        resource = replaceInQuery(resource, "\\?varNumberOfRooms", "\""+ numberOfRooms +"\"");
+        replaceInQuery(resourceForQuery, "\\?varNumberOfRooms", "\"" + numberOfRooms + "\"");
         return resource;
     }
 
-    private static Resource addPriceSpecification(Resource resource, double probability, double min, double max) {
+    private static Resource addPriceSpecification(Resource resource, double probability, double min, double max,
+            Resource resourceForQuery) {
         if (Math.random() < (1.0 - probability)) {
             return resource;
         }
@@ -269,13 +273,13 @@ public class RealEstateNeedGenerator {
         priceSpecificationResource.addProperty(schema_description, "total rent per month");
         priceSpecificationResource.addProperty(schema_price, Integer.toString(price), XSDDatatype.XSDfloat);
         priceSpecificationResource.addProperty(schema_priceCurrency, "EUR");
-        resource = replaceInQuery(resource, "\\?varPrice", "\""+ price +"\"");
-        resource = replaceInQuery(resource, "\\?varCurrency", "\"EUR\"");
+        replaceInQuery(resourceForQuery, "\\?varPrice", "\"" + price + "\"");
+        replaceInQuery(resourceForQuery, "\\?varCurrency", "\"EUR\"");
         return resource;
     }
 
     private static void initializeLocations() {
-		HashMap<String, String> loc0 = new HashMap<String, String>();
+        HashMap<String, String> loc0 = new HashMap<String, String>();
         loc0.put("nwlat", "48.385349");
         loc0.put("nwlng", "16.821063");
         loc0.put("selat", "48.309745");
@@ -374,29 +378,29 @@ public class RealEstateNeedGenerator {
         loc9.put("lng", "15.866162");
         loc9.put("name", "Bezirk Baden, Lower Austria, Austria");
         locations[9] = loc9;
-	}
-    
-	private static void setPrefixes() {
-		model.setNsPrefix("conn", "https://localhost:8443/won/resource/connection/");
-		model.setNsPrefix("need", "https://localhost:8443/won/resource/need/");
-		model.setNsPrefix("local", "https://localhost:8443/won/resource/");
-		model.setNsPrefix("event", "https://localhost:8443/won/resource/event/");
-		model.setNsPrefix("msg", "http://purl.org/webofneeds/message#");
-		model.setNsPrefix("won", "http://purl.org/webofneeds/model#");
-		model.setNsPrefix("woncrypt", "http://purl.org/webofneeds/woncrypt#");
-		model.setNsPrefix("cert", "http://www.w3.org/ns/auth/cert#");
-		model.setNsPrefix("geo", "http://www.w3.org/2003/01/geo/wgs84_pos#");
-		model.setNsPrefix("sig", "http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#");
-		model.setNsPrefix("s", "http://schema.org/");
-		model.setNsPrefix("sh", "http://www.w3.org/ns/shacl#");
-		model.setNsPrefix("ldp", "http://www.w3.org/ns/ldp#");
-		model.setNsPrefix("sioc", "http://rdfs.org/sioc/ns#");
-	}
-	
-	private static InputStream getResourceAsStream(String name) {
+    }
+
+    private static void setPrefixes() {
+        model.setNsPrefix("conn", "https://localhost:8443/won/resource/connection/");
+        model.setNsPrefix("need", "https://localhost:8443/won/resource/need/");
+        model.setNsPrefix("local", "https://localhost:8443/won/resource/");
+        model.setNsPrefix("event", "https://localhost:8443/won/resource/event/");
+        model.setNsPrefix("msg", "http://purl.org/webofneeds/message#");
+        model.setNsPrefix("won", "http://purl.org/webofneeds/model#");
+        model.setNsPrefix("woncrypt", "http://purl.org/webofneeds/woncrypt#");
+        model.setNsPrefix("cert", "http://www.w3.org/ns/auth/cert#");
+        model.setNsPrefix("geo", "http://www.w3.org/2003/01/geo/wgs84_pos#");
+        model.setNsPrefix("sig", "http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#");
+        model.setNsPrefix("s", "http://schema.org/");
+        model.setNsPrefix("sh", "http://www.w3.org/ns/shacl#");
+        model.setNsPrefix("ldp", "http://www.w3.org/ns/ldp#");
+        model.setNsPrefix("sioc", "http://rdfs.org/sioc/ns#");
+    }
+
+    private static InputStream getResourceAsStream(String name) {
         return Thread.currentThread().getContextClassLoader().getResourceAsStream(name);
     }
-    
+
     private static String getResourceAsString(String name) throws Exception {
         byte[] buffer = new byte[256];
         StringWriter sw = new StringWriter();
@@ -404,10 +408,10 @@ public class RealEstateNeedGenerator {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             int bytesRead = 0;
             while ((bytesRead = in.read(buffer)) > -1) {
-                baos.write(buffer,0,bytesRead);
+                baos.write(buffer, 0, bytesRead);
             }
-            return new String(baos.toByteArray(),Charset.defaultCharset());
+            return new String(baos.toByteArray(), Charset.defaultCharset());
         }
-        
+
     }
 }
