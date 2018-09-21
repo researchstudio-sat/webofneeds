@@ -381,7 +381,7 @@ identityEditor modified tempIdentity =
                 ]
                 [ mainButton (not isValid || not modified) "Save" SaveIdentity
                 , el [ width fill ] none
-                , outlinedButton (not modified) "Cancel" CancelEditing
+                , outlinedButton False "Cancel" CancelEditing
                 ]
             ]
         ]
