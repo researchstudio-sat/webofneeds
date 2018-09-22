@@ -208,6 +208,68 @@ export function filterFloorSizeRange(rootSubject, min, max) {
   return wellFormedFilter({ operations, prefixes });
 }
 
+/**
+ * Uses a given numeric property and finds needs that constrain that
+ * property using sh:property, sh:path, sh:minInclusive and sh:maxInclusive.
+ *
+ * @param {string} rootSubject sparql variable name (must start with '?') to attach triples to
+ *  (commonly '?is' or '?seeks')
+ * @param {number} number the numeric value for which we are looking for matching constraints
+ * @param {URI} property the property (off rootSubject) we're checking. If a prefix other than 's'
+ *  is used, it must be added to the query
+ * @param {string} sparqlVarPrefix a prefix that will be added to sparql variable generated here
+ *  to differentiate them through consecutive calls. The client must make sure the prefixes don't clash!
+ * @param {string} reportMatch sparql variable name (must start with '?'). If present, will be
+ *  set to true iff the filter matches something.
+ */
+export function filterNumericProperty(
+  rootSubject,
+  number,
+  property,
+  sparqlVarPrefix,
+  reportMatch = undefined
+) {
+  const prefixes = {
+    s: won.defaultContext["s"],
+  };
+  let operations = [];
+  const isNum = isValidNumber(number);
+  const shouldReportMatch = isSparqlVariable(reportMatch);
+  const prefix = `${rootSubject}_${sparqlVarPrefix}`;
+  const numberProperty = `${prefix}_prop`;
+  const maxVar = `${prefix}_max`;
+  const minVar = `${prefix}_min`;
+  if (isNum && isSparqlVariable(rootSubject)) {
+    operations.push(
+      `
+        OPTIONAL {
+          ${rootSubject} sh:property ${numberProperty} .
+          ${numberProperty} sh:path ${property} .
+          OPTIONAL {
+            ${numberProperty} sh:minInclusive ${minVar} .
+            FILTER(${minVar} <= ${number} )
+          }
+          OPTIONAL {
+            ${numberProperty} sh:maxInclusive ${maxVar} .
+            FILTER(${maxVar} >= ${number} )
+          }
+          FILTER(bound(${maxVar}) 
+            || bound(${minVar}))
+        }
+      `
+    );
+    if (shouldReportMatch) {
+      operations.push(
+        `BIND(bound(${numberProperty}) &&
+                (bound(${minVar})
+                || bound(${maxVar}))
+                as ${reportMatch})`
+      );
+    }
+  }
+  return wellFormedFilter({ operations, prefixes });
+}
+
 export function filterNumOfRoomsRange(rootSubject, min, max) {
   const prefixes = {
     s: won.defaultContext["s"],
@@ -257,6 +319,61 @@ export function filterRentRange(rootSubject, min, max, currency) {
 }
 
 /**
+ * Uses a given rent to find needs that have a matching rentRange
+ * The optional reportMatch parameter is a sparql variable name (must start with '?')
+ * and if present, will be set to true iff the filter matches something.
+ */
+export function filterRent(
+  rootSubject,
+  rent,
+  currency,
+  reportMatch = undefined
+) {
+  const prefixes = {
+    s: won.defaultContext["s"],
+  };
+  let operations = [];
+  const rentIsNum = isValidNumber(rent);
+  const shouldReportMatch = isSparqlVariable(reportMatch);
+  const priceRangeVar = `${rootSubject}_pricerange`;
+  const currencyVar = `${rootSubject}_currency`;
+  const maxPriceVar = `${rootSubject}_maxprice`;
+  const minPriceVar = `${rootSubject}_minprice`;
+  if (rentIsNum && currency) {
+    operations.push(
+      `
+       OPTIONAL { 
+          ${rootSubject} s:priceSpecification ${priceRangeVar} .
+         ${priceRangeVar} s:priceCurrency ${currencyVar} .
+         FILTER(${currencyVar} = "${currency}")
+         OPTIONAL {
+            ${priceRangeVar} s:maxPrice ${maxPriceVar} .
+            FILTER(${maxPriceVar} >= ${rent} )
+         }
+         OPTIONAL {
+            ${priceRangeVar} s:minPrice ${minPriceVar} .
+            FILTER(${minPriceVar} <= ${rent} )
+         }
+         FILTER (
+           bound(${currencyVar}) && 
+           (bound(${minPriceVar})
+           || bound(${maxPriceVar}))
+         )
+      }`
+    );
+    if (shouldReportMatch) {
+      operations.push(
+        `BIND(bound(${currencyVar}) &&
+                (bound(${minPriceVar})
+                || bound(${maxPriceVar}))
+                as ${reportMatch})`
+      );
+    }
+  }
+  return wellFormedFilter({ operations, prefixes });
+}
+
+/**
  * @param {*} prefixes an object which' keys are the prefixes
  *  and values the long-form URIs.
  * @returns {String} in the form of e.g.
@@ -274,5 +391,9 @@ export function prefixesString(prefixes) {
     );
     return prefixesStrings.join("");
   }
+}
+
+function isSparqlVariable(str) {
+  return str && str.search(/^\?\w+$/) > -1;
 }
 //TODO should return a context-def as well
