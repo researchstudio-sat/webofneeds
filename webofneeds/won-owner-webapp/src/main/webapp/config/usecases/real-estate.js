@@ -190,7 +190,12 @@ export const realEstateGroup = {
               "?matchedNumberOfRooms"
             ),
           filterInVicinity("?location", location),
-          "FILTER(?matchedRent || ?matchedFloorSize || ?matchedNumberOfRooms)",
+          {
+            prefixes: {},
+            operations: [
+              "FILTER(?matchedRent || ?matchedFloorSize || ?matchedNumberOfRooms)",
+            ],
+          },
         ];
 
         const concatenatedFilter = concatenateFilters(filters);
