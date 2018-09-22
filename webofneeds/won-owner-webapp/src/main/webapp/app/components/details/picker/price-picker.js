@@ -1,5 +1,5 @@
 import angular from "angular";
-import { attach, delay } from "../../../utils.js";
+import { attach, delay, isValidNumber } from "../../../utils.js";
 import wonInput from "../../../directives/input.js";
 
 import "style/_pricepicker.scss";
@@ -77,10 +77,11 @@ function genComponentConf() {
      * Checks validity and uses callback method
      */
     update(number, currency, unitCode) {
-      if (number && currency) {
+      const parsedNumber = Number.parseFloat(number);
+      if (isValidNumber(number) && currency) {
         this.onUpdate({
           value: {
-            amount: number,
+            amount: parsedNumber,
             currency: currency,
             unitCode: unitCode !== "" ? unitCode : undefined,
           },
@@ -147,9 +148,9 @@ function genComponentConf() {
     }
 
     updateNumber(resetInput) {
-      const number = this.amount().value;
+      const number = Number.parseFloat(this.amount().value);
 
-      if (number) {
+      if (isValidNumber(number)) {
         this.addedNumber = number;
         this.update(
           this.addedNumber,

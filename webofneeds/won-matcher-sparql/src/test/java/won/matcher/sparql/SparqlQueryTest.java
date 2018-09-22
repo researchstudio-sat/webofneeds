@@ -55,7 +55,7 @@ public class SparqlQueryTest  {
     }
     
     @Test
-    //@Ignore // useful for trying things out, does not make so much sense as a unit test
+    @Ignore // useful for trying things out, does not make so much sense as a unit test
     public void testQuery() throws Exception {
         Dataset dataset = DatasetFactory.create();
         RDFDataMgr.read(dataset, getResourceAsStream("sparqlquerytest/need2.trig"), Lang.TRIG);
