@@ -219,53 +219,46 @@ export function filterFloorSizeRange(rootSubject, min, max) {
  *  is used, it must be added to the query
  * @param {string} sparqlVarPrefix a prefix that will be added to sparql variable generated here
  *  to differentiate them through consecutive calls. The client must make sure the prefixes don't clash!
- * @param {string} reportMatch sparql variable name (must start with '?'). If present, will be
- *  set to true iff the filter matches something.
  */
 export function filterNumericProperty(
   rootSubject,
   number,
   property,
-  sparqlVarPrefix,
-  reportMatch = undefined
+  sparqlVarPrefix
 ) {
   const prefixes = {
     s: won.defaultContext["s"],
   };
   let operations = [];
   const isNum = isValidNumber(number);
-  const shouldReportMatch = isSparqlVariable(reportMatch);
   const prefix = `${rootSubject}_${sparqlVarPrefix}`;
   const numberProperty = `${prefix}_prop`;
   const maxVar = `${prefix}_max`;
   const minVar = `${prefix}_min`;
+  const restrictedVar = `${prefix}_restricted`;
+  const matchedVar = `${prefix}_matched`;
   if (isNum && isSparqlVariable(rootSubject)) {
     operations.push(
-      `
+      ` 
+      OPTIONAL {
+        ${rootSubject} sh:property ${numberProperty} .
+        ${numberProperty} sh:path ${property} .
         OPTIONAL {
-          ${rootSubject} sh:property ${numberProperty} .
-          ${numberProperty} sh:path ${property} .
-          OPTIONAL {
-            ${numberProperty} sh:minInclusive ${minVar} .
-            FILTER(${minVar} <= ${number} )
-          }
-          OPTIONAL {
-            ${numberProperty} sh:maxInclusive ${maxVar} .
-            FILTER(${maxVar} >= ${number} )
-          }
-          FILTER(bound(${maxVar}) 
-            || bound(${minVar}))
+          ${numberProperty} sh:minInclusive ${minVar} .
         }
+        OPTIONAL {
+          ${numberProperty} sh:maxInclusive ${maxVar} .
+        }
+        BIND (
+           (!BOUND(${minVar}) || ${minVar} <= ${number}) &&
+           (!BOUND(${maxVar}) || ${maxVar} >= ${number}) &&
+            (BOUND(${maxVar}) || BOUND(${minVar}) 
+        ) AS ${matchedVar}) 
+      }
+      BIND( BOUND(${numberProperty}) as ${restrictedVar})
+      FILTER( ! ${restrictedVar} || ${matchedVar} )
       `
     );
-    if (shouldReportMatch) {
-      operations.push(
-        `BIND(bound(${numberProperty}) &&
-                (bound(${minVar})
-                || bound(${maxVar}))
-                as ${reportMatch})`
-      );
-    }
   }
   return wellFormedFilter({ operations, prefixes });
 }
@@ -319,56 +312,44 @@ export function filterRentRange(rootSubject, min, max, currency) {
 }
 
 /**
- * Uses a given rent to find needs that have a matching rentRange
- * The optional reportMatch parameter is a sparql variable name (must start with '?')
- * and if present, will be set to true iff the filter matches something.
+ * Uses a given rent to find needs that have a matching rentRange. Works like filterNumericProperty (see docs there).
  */
-export function filterRent(
-  rootSubject,
-  rent,
-  currency,
-  reportMatch = undefined
-) {
+export function filterRent(rootSubject, rent, currency, sparqlVarPrefix) {
   const prefixes = {
     s: won.defaultContext["s"],
   };
   let operations = [];
   const rentIsNum = isValidNumber(rent);
-  const shouldReportMatch = isSparqlVariable(reportMatch);
-  const priceRangeVar = `${rootSubject}_pricerange`;
-  const currencyVar = `${rootSubject}_currency`;
-  const maxPriceVar = `${rootSubject}_maxprice`;
-  const minPriceVar = `${rootSubject}_minprice`;
+  const prefix = `${rootSubject}_${sparqlVarPrefix}`;
+  const priceRangeVar = `${prefix}_pricerange`;
+  const currencyVar = `${prefix}_currency`;
+  const maxVar = `${prefix}_maxprice`;
+  const minVar = `${prefix}_minprice`;
+  const restrictedVar = `${prefix}_restricted`;
+  const matchedVar = `${prefix}_matched`;
   if (rentIsNum && currency) {
     operations.push(
       `
-       OPTIONAL { 
-          ${rootSubject} s:priceSpecification ${priceRangeVar} .
+      OPTIONAL {
+         ${rootSubject} s:priceSpecification ${priceRangeVar} .
          ${priceRangeVar} s:priceCurrency ${currencyVar} .
-         FILTER(${currencyVar} = "${currency}")
          OPTIONAL {
-            ${priceRangeVar} s:maxPrice ${maxPriceVar} .
-            FILTER(${maxPriceVar} >= ${rent} )
+            ${priceRangeVar} s:maxPrice ${maxVar} .
          }
          OPTIONAL {
-            ${priceRangeVar} s:minPrice ${minPriceVar} .
-            FILTER(${minPriceVar} <= ${rent} )
+            ${priceRangeVar} s:minPrice ${minVar} .
          }
-         FILTER (
-           bound(${currencyVar}) && 
-           (bound(${minPriceVar})
-           || bound(${maxPriceVar}))
-         )
-      }`
+         BIND (
+           (${currencyVar} = "${currency}") &&
+           (!BOUND(${minVar}) || ${minVar} <= ${rent}) &&
+           (!BOUND(${maxVar}) || ${maxVar} >= ${rent}) &&
+            (BOUND(${maxVar}) || BOUND(${minVar})
+         ) AS ${matchedVar})
+      }
+      BIND( BOUND(${priceRangeVar}) as ${restrictedVar})
+      FILTER( ! ${restrictedVar} || ${matchedVar} )
+      `
     );
-    if (shouldReportMatch) {
-      operations.push(
-        `BIND(bound(${currencyVar}) &&
-                (bound(${minPriceVar})
-                || bound(${maxPriceVar}))
-                as ${reportMatch})`
-      );
-    }
   }
   return wellFormedFilter({ operations, prefixes });
 }

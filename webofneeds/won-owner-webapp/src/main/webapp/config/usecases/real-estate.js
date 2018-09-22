@@ -171,31 +171,17 @@ export const realEstateGroup = {
               location && "?seeks won:hasLocation ?location.",
             ],
           },
-          rent &&
-            filterRent("?seeks", rent.amount, rent.currency, "?matchedRent"),
+          rent && filterRent("?seeks", rent.amount, rent.currency, "rent"),
           floorSize &&
-            filterNumericProperty(
-              "?seeks",
-              floorSize,
-              "s:floorSize",
-              "flsz",
-              "?matchedFloorSize"
-            ),
+            filterNumericProperty("?seeks", floorSize, "s:floorSize", "size"),
           numberOfRooms &&
             filterNumericProperty(
               "?seeks",
               numberOfRooms,
               "s:numberOfRooms",
-              "rooms",
-              "?matchedNumberOfRooms"
+              "rooms"
             ),
           filterInVicinity("?location", location),
-          {
-            prefixes: {},
-            operations: [
-              "FILTER(?matchedRent || ?matchedFloorSize || ?matchedNumberOfRooms)",
-            ],
-          },
         ];
 
         const concatenatedFilter = concatenateFilters(filters);
