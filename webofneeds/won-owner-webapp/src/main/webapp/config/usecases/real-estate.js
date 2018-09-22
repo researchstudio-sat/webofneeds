@@ -16,8 +16,10 @@ import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-u
 import {
   filterInVicinity,
   filterFloorSizeRange,
+  filterNumericProperty,
   filterNumOfRoomsRange,
   filterRentRange,
+  filterRent,
   concatenateFilters,
   sparqlQuery,
 } from "../../app/sparql-builder-utils.js";
@@ -149,39 +151,62 @@ export const realEstateGroup = {
         },
       },
       seeksDetails: undefined,
-    },
-    generateQuery: (draft, resultName) => {
-      const isBranch = draft && draft.is;
-      const location = isBranch && isBranch.location;
+      generateQuery: (draft, resultName) => {
+        const isBranch = draft && draft.is;
+        const location = isBranch && isBranch.location;
+        const rent = isBranch && isBranch.rent;
+        const numberOfRooms = isBranch && isBranch.numberOfRooms;
+        const floorSize = isBranch && isBranch.floorSize;
 
-      const filters = [
-        {
-          // to select is-branch
-          prefixes: {
-            won: won.defaultContext["won"],
-          },
-          operations: [
-            `${resultName} a won:Need.`,
-            `${resultName} won:seeks ?seeks.`,
-            location && "?seeks won:hasLocation ?location.",
-          ],
-        },
-        filterInVicinity("?location", location),
-      ];
-
-      const concatenatedFilter = concatenateFilters(filters);
-
-      return sparqlQuery({
-        prefixes: concatenatedFilter.prefixes,
-        selectDistinct: resultName,
-        where: concatenatedFilter.operations,
-        orderBy: [
+        const filters = [
           {
-            order: "ASC",
-            variable: "?location_geoDistance",
+            // to select is-branch
+            prefixes: {
+              won: won.defaultContext["won"],
+              sh: won.defaultContext["sh"], //needed for the filterNumericProperty calls
+            },
+            operations: [
+              `${resultName} a won:Need.`,
+              `${resultName} won:seeks ?seeks.`,
+              location && "?seeks won:hasLocation ?location.",
+            ],
           },
-        ],
-      });
+          rent &&
+            filterRent("?seeks", rent.amount, rent.currency, "?matchedRent"),
+          floorSize &&
+            filterNumericProperty(
+              "?seeks",
+              floorSize,
+              "s:floorSize",
+              "flsz",
+              "?matchedFloorSize"
+            ),
+          numberOfRooms &&
+            filterNumericProperty(
+              "?seeks",
+              numberOfRooms,
+              "s:numberOfRooms",
+              "rooms",
+              "?matchedNumberOfRooms"
+            ),
+          filterInVicinity("?location", location),
+          "FILTER(?matchedRent || ?matchedFloorSize || ?matchedNumberOfRooms)",
+        ];
+
+        const concatenatedFilter = concatenateFilters(filters);
+
+        return sparqlQuery({
+          prefixes: concatenatedFilter.prefixes,
+          selectDistinct: resultName,
+          where: concatenatedFilter.operations,
+          orderBy: [
+            {
+              order: "ASC",
+              variable: "?location_geoDistance",
+            },
+          ],
+        });
+      },
     },
   },
 };
