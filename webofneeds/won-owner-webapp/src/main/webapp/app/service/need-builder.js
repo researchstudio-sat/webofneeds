@@ -246,10 +246,9 @@ import { Generator } from "sparqljs";
     const isContentNode = args.is
       ? buildContentNode(isContentUri, args.is)
       : {};
-    const seeksContentNode =
-      args.seeks && !isWhatsAround
-        ? buildContentNode(seeksContentUri, args.seeks)
-        : {};
+    const seeksContentNode = args.seeks
+      ? buildContentNode(seeksContentUri, args.seeks)
+      : {};
 
     const doNotMatchAfterFnOrLit = useCase && useCase.doNotMatchAfter;
     const doNotMatchAfter = is("Function", doNotMatchAfterFnOrLit)
