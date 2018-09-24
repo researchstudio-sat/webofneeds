@@ -379,7 +379,7 @@ function isSparqlVariable(str) {
 }
 //TODO should return a context-def as well
 
-export function whatsAroundQuery(latitude, longitude) {
+export function generateWhatsAroundQuery(latitude, longitude) {
   return (
     `PREFIX won: <http://purl.org/webofneeds/model#>
           PREFIX s: <http://schema.org/>
@@ -435,7 +435,7 @@ export function whatsAroundQuery(latitude, longitude) {
   );
 }
 
-export function whatsNewQuery() {
+export function generateWhatsNewQuery() {
   return `PREFIX won: <http://purl.org/webofneeds/model#>
         PREFIX s: <http://schema.org/>
         PREFIX dct: <http://purl.org/dc/terms/>
