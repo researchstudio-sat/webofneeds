@@ -230,7 +230,7 @@ import { Generator } from "sparqljs";
       };
 
     if (isWhatsAround) {
-      const location = args.is.location || args.seeks.location;
+      const location = args.seeks.location;
 
       if (location && location.lat && location.lng) {
         query = generateWhatsAroundQuery(location.lat, location.lng);
