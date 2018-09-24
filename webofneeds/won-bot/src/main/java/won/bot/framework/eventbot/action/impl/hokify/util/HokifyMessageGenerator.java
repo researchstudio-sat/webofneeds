@@ -24,7 +24,7 @@ public class HokifyMessageGenerator {
     private static final Logger logger = LoggerFactory.getLogger(HokifyMessageGenerator.class);
     private EventListenerContext eventListenerContext;
 
-    public SendMessage getHintMessage(Long chatId, URI remoteNeedUri, URI yourNeedUri) {
+    public SendMessage getHintMessage(URI remoteNeedUri, URI yourNeedUri) {
         Dataset remoteNeedRDF = eventListenerContext.getLinkedDataSource().getDataForResource(remoteNeedUri);
 
         DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(remoteNeedRDF);
@@ -32,7 +32,7 @@ public class HokifyMessageGenerator {
         String description = needModelWrapper.getSomeDescription(NeedContentPropertyType.ALL,"en","de");
 
         SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(chatId);
+        //sendMessage.setJobURL(jobURL);
         String text = "<b>We found a Match for you!\n\n</b><a href='"+remoteNeedUri+"'>"+title+"\n\n</a>";
 
         if(description != null){
@@ -45,7 +45,7 @@ public class HokifyMessageGenerator {
         return sendMessage;
     }
 
-    public SendMessage getConnectMessage(Long chatId, URI remoteNeedUri, URI yourNeedUri) {
+    public SendMessage getConnectMessage(URI remoteNeedUri, URI yourNeedUri) {
         Dataset remoteNeedRDF = eventListenerContext.getLinkedDataSource().getDataForResource(remoteNeedUri);
 
         DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(remoteNeedRDF);
@@ -53,7 +53,7 @@ public class HokifyMessageGenerator {
         String description = needModelWrapper.getSomeDescription(NeedContentPropertyType.ALL, "en","de");
 
         SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(chatId);
+        //sendMessage.setChatId(chatId);
 
         String text = "<b>Someone wants to connect with you!\n\n</b><a href='"+remoteNeedUri+"'>"+title+"\n\n</a>";
 
@@ -67,9 +67,9 @@ public class HokifyMessageGenerator {
         return sendMessage;
     }
 
-    public SendMessage getConnectionTextMessage(Long chatId, URI remoteNeedUri, URI yourNeedUri, WonMessage message) {
+    public SendMessage getConnectionTextMessage(URI remoteNeedUri, URI yourNeedUri, WonMessage message) {
         SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(chatId);
+        //sendMessage.setChatId(chatId);
 
         sendMessage.setText("<a href='" + remoteNeedUri + "'>URI</a>: "+ extractTextMessageFromWonMessage(message));
         sendMessage.enableHtml(true);

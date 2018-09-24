@@ -33,7 +33,7 @@ public class HokifyBotsApi {
 
     public HokifyBotsApi(String jsonURL) {
         this.jsonURL = jsonURL;
-        fetchHokifyData();
+        //fetchHokifyData();
     }
 
     public ArrayList<HokifyJob> fetchHokifyData() {

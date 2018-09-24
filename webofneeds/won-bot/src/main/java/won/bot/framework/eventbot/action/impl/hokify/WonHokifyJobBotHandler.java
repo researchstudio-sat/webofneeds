@@ -1,5 +1,6 @@
 package won.bot.framework.eventbot.action.impl.hokify;
 
+import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.AbsSender;
@@ -18,7 +19,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
-public class WonHokifyJobBotHandler extends TelegramLongPollingBot implements ICommandRegistry {
+public class WonHokifyJobBotHandler implements ICommandRegistry {
     private String token;
     private String botName;
     private EventBus bus;
@@ -35,28 +36,15 @@ public class WonHokifyJobBotHandler extends TelegramLongPollingBot implements IC
 
         this.commandRegistry = new CommandRegistry(true, botName);
 
-        BotCommand offerBotCommand = new OfferBotCommand("offer", "create a offer need", bus);
-        BotCommand demandBotCommand = new DemandBotCommand("demand", "create a demand need", bus);
-        BotCommand critiqueBotCommand = new CritiqueBotCommand("critique", "create a critique need", bus);
-        BotCommand togetherBotCommand = new TogetherBotCommand("together", "create a together need", bus);
+      //BotCommand offerBotCommand = new OfferBotCommand("offer", "create a offer need", bus);
+        //BotCommand demandBotCommand = new DemandBotCommand("demand", "create a demand need", bus);
+        //BotCommand critiqueBotCommand = new CritiqueBotCommand("critique", "create a critique need", bus);
+        //BotCommand togetherBotCommand = new TogetherBotCommand("together", "create a together need", bus);
         BotCommand helpBotCommand = new HelpBotCommand("help", "list help", bus);
-        commandRegistry.registerAll(helpBotCommand, offerBotCommand, demandBotCommand, critiqueBotCommand, togetherBotCommand);
+        //commandRegistry.registerAll(helpBotCommand, offerBotCommand, demandBotCommand, critiqueBotCommand, togetherBotCommand);
+        commandRegistry.registerAll(helpBotCommand);
     }
 
-    @Override
-    public void onUpdateReceived(Update update) {
-        bus.publish(new TelegramMessageReceivedEvent(update));
-    }
-
-    @Override
-    public String getBotToken() {
-        return token;
-    }
-
-    @Override
-    public String getBotUsername() {
-        return botName;
-    }
 
     public CommandRegistry getCommandRegistry() {
         return commandRegistry;
@@ -103,5 +91,12 @@ public class WonHokifyJobBotHandler extends TelegramLongPollingBot implements IC
     @Override
     public BotCommand getRegisteredCommand(String s) {
         return commandRegistry.getRegisteredCommand(s);
+    }
+
+
+    public Message sendMessage(SendMessage connectMessage) {
+        // TODO Auto-generated method stub
+        System.out.println("---------------------------------------------- send message: " + connectMessage);
+        return null;
     }
 }

@@ -31,6 +31,7 @@
         <property name="token" value="${hokifyjobbot.token}"/>
         <property name="botName" value="${hokifyjobbot.botname}"/>
         <property name="jsonURL" value="${hokifyjobbot.jsonURL}"/>
+        <property name="hokifyMessageGenerator" ref="hokifyGenerator"/>
         <property name="needProducer">
             <bean class="won.bot.framework.component.needproducer.impl.NopNeedProducer" />
         </property>
@@ -51,9 +52,12 @@
             </bean>
         </property>
     </bean>
-    <bean id="botContextWrapper" class="won.bot.framework.bot.context.BotContextWrapper">
+    <bean id="botContextWrapper" class="won.bot.framework.bot.context.HokifyJobBotContextWrapper">
         <constructor-arg name="botContext" ref="${botContext.impl}"/>
         <constructor-arg name="botName" value="hokifyjobbot"/>
+    </bean>
+    
+    <bean id="hokifyGenerator" class="won.bot.framework.eventbot.action.impl.hokify.util.HokifyMessageGenerator">
     </bean>
 
 </beans>
