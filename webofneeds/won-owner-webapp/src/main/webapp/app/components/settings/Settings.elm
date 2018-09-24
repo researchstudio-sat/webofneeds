@@ -26,7 +26,6 @@ main =
 --
 -- Model
 --
--- Identity
 
 
 type alias IdentityForm =
@@ -244,7 +243,7 @@ category active icon name =
     in
     row
         [ spacing 10
-        , Font.color (toColor color)
+        , Font.color color
         , Font.size 18
         ]
         [ svgIcon
@@ -252,7 +251,7 @@ category active icon name =
             , width (px 18)
             ]
             icon
-            (toCSSColor color)
+            (cssColor color)
         , text name
         ]
 
@@ -271,7 +270,7 @@ identityImage identity =
     el
         [ width (px 50)
         , height (px 50)
-        , Background.color (toColor skin.lineGray)
+        , Background.color skin.lineGray
         ]
     <|
         case identity.image of
@@ -307,7 +306,7 @@ identityCard identity =
                             el [ Font.italic ] <| text "Unnamed Identity"
                 , el [ height fill ] none
                 , el
-                    [ Font.color (toColor skin.subtitleGray)
+                    [ Font.color skin.subtitleGray
                     ]
                   <|
                     text ("Name: " ++ identity.displayName)
@@ -365,7 +364,7 @@ identityEditor info =
 
               else
                 column
-                    [ Font.color (toColor skin.primaryColor)
+                    [ Font.color skin.primaryColor
                     ]
                     (List.map
                         text
@@ -471,7 +470,7 @@ card attributes header body =
     let
         baseStyle =
             [ Border.width 1
-            , Border.color (toColor skin.lineGray)
+            , Border.color skin.lineGray
             , padding 10
             , width fill
             ]
@@ -482,7 +481,7 @@ card attributes header body =
         )
         ([ el
             (baseStyle
-                ++ [ Background.color (toColor skin.lightGray) ]
+                ++ [ Background.color skin.lightGray ]
             )
             header
          ]
@@ -557,39 +556,48 @@ outlinedButton disabled text tag =
 
 
 type alias Skin =
-    { primaryColor : Col
-    , lightGray : Col
-    , lineGray : Col
-    , subtitleGray : Col
+    { primaryColor : Color
+    , lightGray : Color
+    , lineGray : Color
+    , subtitleGray : Color
     }
-
-
-type alias Col =
-    ( Int, Int, Int )
 
 
 skin : Skin
 skin =
-    { primaryColor = ( 240, 70, 70 )
-    , lightGray = ( 240, 242, 244 )
-    , lineGray = ( 203, 210, 209 )
-    , subtitleGray = ( 128, 128, 128 )
+    { primaryColor = rgb255 240 70 70
+    , lightGray = rgb255 240 242 244
+    , lineGray = rgb255 203 210 209
+    , subtitleGray = rgb255 128 128 128
     }
 
 
-toColor : Col -> Color
-toColor ( r, g, b ) =
-    rgb255 r g b
+cssColor : Color -> String
+cssColor color =
+    let
+        { red, green, blue, alpha } =
+            toRgb color
+
+        to255 col =
+            String.fromInt <| round (col * 255)
+
+        colors =
+            ([ red
+             , green
+             , blue
+             ]
+                |> List.map to255
+            )
+                ++ [ String.fromFloat alpha ]
+    in
+    "rgba("
+        ++ String.join "," colors
+        ++ ")"
 
 
-toCSSColor : Col -> String
-toCSSColor ( r, g, b ) =
-    "rgb(" ++ String.fromInt r ++ ", " ++ String.fromInt g ++ ", " ++ String.fromInt b ++ ")"
-
-
-black : Col
+black : Color
 black =
-    ( 0, 0, 0 )
+    rgb 0 0 0
 
 
 identityString : Identity -> String
