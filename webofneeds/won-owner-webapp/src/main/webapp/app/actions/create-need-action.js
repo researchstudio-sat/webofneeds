@@ -68,18 +68,11 @@ export function createWhatsNew() {
     dispatch({ type: actionTypes.needs.whatsNew });
 
     const whatsNew = {
-      title: "What's New?",
-      type: "http://purl.org/webofneeds/model#DoTogether",
-      description:
-        "Automatically created post to see what's happening recently",
-      tags: undefined,
-      thumbnail: undefined,
       whatsNew: true,
     };
 
     //TODO: Point to same DataSet instead of double it
     const whatsNewObject = {
-      is: whatsNew,
       seeks: whatsNew,
       matchingContext: defaultContext,
     };
@@ -117,13 +110,7 @@ export function createWhatsAround() {
           reverseSearchNominatim(lat, lng, zoom).then(searchResult => {
             const location = nominatim2draftLocation(searchResult);
             let whatsAround = {
-              title: "What's Around?",
-              type: "http://purl.org/webofneeds/model#DoTogether",
-              description:
-                "Automatically created post to see what's happening in your area",
-              tags: undefined,
               location: location,
-              thumbnail: undefined,
               whatsAround: true,
             };
 
@@ -137,7 +124,6 @@ export function createWhatsAround() {
                 dispatch(actionCreators.needs__close(need.get("uri"))); //TODO action creators should not call other action creators, according to Moru
               });
             const whatsAroundObject = {
-              is: whatsAround,
               seeks: whatsAround,
               matchingContext: defaultContext,
             };
