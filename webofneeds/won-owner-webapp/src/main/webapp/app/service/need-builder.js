@@ -10,6 +10,10 @@ import won from "./won.js";
 import { getAllDetails } from "../won-utils";
 import { is } from "../utils";
 import { useCases } from "../../config/usecase-definitions.js";
+import {
+  generateWhatsAroundQuery,
+  generateWhatsNewQuery,
+} from "../sparql-builder-utils.js";
 
 import { Generator } from "sparqljs";
 
@@ -219,21 +223,32 @@ import { Generator } from "sparqljs";
       variables: ["?result"],
     };
 
-    const query = useCase &&
+    let query = useCase &&
       useCase.generateQuery && {
         ...useCase.generateQuery(args, "?result"),
         ...queryMask,
       };
+
+    if (isWhatsAround) {
+      const location = args.seeks.location;
+
+      if (location && location.lat && location.lng) {
+        query = generateWhatsAroundQuery(location.lat, location.lng);
+      }
+    }
+
+    if (isWhatsNew) {
+      query = generateWhatsNewQuery();
+    }
 
     const sparqlGenerator = new Generator();
 
     const isContentNode = args.is
       ? buildContentNode(isContentUri, args.is)
       : {};
-    const seeksContentNode =
-      args.seeks && !isWhatsAround
-        ? buildContentNode(seeksContentUri, args.seeks)
-        : {};
+    const seeksContentNode = args.seeks
+      ? buildContentNode(seeksContentUri, args.seeks)
+      : {};
 
     const doNotMatchAfterFnOrLit = useCase && useCase.doNotMatchAfter;
     const doNotMatchAfter = is("Function", doNotMatchAfterFnOrLit)
@@ -277,7 +292,12 @@ import { Generator } from "sparqljs";
           : undefined,
         "won:hasMatchingContext": matchingContext ? matchingContext : undefined,
         "won:hasSearchString": searchString ? searchString : undefined,
-        "won:hasQuery": query ? sparqlGenerator.stringify(query) : undefined,
+        "won:hasQuery":
+          isWhatsAround || isWhatsNew
+            ? query
+            : query
+              ? sparqlGenerator.stringify(query)
+              : undefined,
       },
       //, <if _hasModalities> {... (see directly below) } </if>
       isContentNode,

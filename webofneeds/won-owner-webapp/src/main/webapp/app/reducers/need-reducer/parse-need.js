@@ -197,6 +197,27 @@ function getHumanReadableStringFromNeed(need, detailsToParse) {
     const isTitle = isBranch && isBranch.title;
     const seeksTitle = seeksBranch && seeksBranch.title;
 
+    if (need.isWhatsNew) {
+      return "What's New";
+    }
+
+    if (need.isWhatsAround) {
+      let location = isBranch["location"] || seeksBranch["location"];
+
+      const locationJS =
+        location && Immutable.Iterable.isIterable(location)
+          ? location.toJS()
+          : location;
+
+      return (
+        "What's Around " +
+        detailsToParse["location"].generateHumanReadable({
+          value: locationJS,
+          includeLabel: false,
+        })
+      );
+    }
+
     if (isTitle && seeksTitle) {
       return isTitle + " - " + seeksTitle;
     } else if (seeksTitle) {
