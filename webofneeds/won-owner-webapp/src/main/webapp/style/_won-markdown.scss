@@ -1,0 +1,16 @@
+@import "won-config";
+
+@mixin won-markdown() {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5 {
+    font-size: $mediumFontSize;
+  }
+
+  p {
+    font-size: $normalFontSize;
+    white-space: pre-wrap;
+  }
+}
