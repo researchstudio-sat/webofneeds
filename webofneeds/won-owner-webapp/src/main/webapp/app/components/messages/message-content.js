@@ -6,6 +6,7 @@ import { getAllDetails } from "../../won-utils.js";
 import { attach, getIn, get } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import { selectNeedByConnectionUri } from "../../selectors.js";
+import "angular-marked";
 
 import "style/_message-content.scss";
 
@@ -13,7 +14,7 @@ const serviceDependencies = ["$ngRedux", "$scope"];
 
 function genComponentConf() {
   let template = `
-      <div class="msg__text--prewrap" ng-if="self.message && self.text">{{ self.text }}</div> <!-- no spaces or newlines within the code-tag, because it is preformatted -->
+      <div class="msg__text" ng-if="self.message && self.text" marked="self.text"></div>
       <div class="msg__content"
         ng-repeat="detail in self.allDetails"
         ng-if="self.message && detail.identifier && self.getDetailContent(detail.identifier)"
@@ -114,7 +115,7 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.messageContent", [])
+  .module("won.owner.components.messageContent", ["hc.marked"])
   .directive("messageDetailViewerElement", [
     "$compile",
     function($compile) {

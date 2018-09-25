@@ -6,11 +6,15 @@
   h3,
   h4,
   h5 {
-    font-size: $mediumFontSize;
+    font-size: $normalFontSize;
   }
 
   p {
-    font-size: $normalFontSize;
     white-space: pre-wrap;
+  }
+
+  ul,
+  ol {
+    margin-left: 1rem;
   }
 }
