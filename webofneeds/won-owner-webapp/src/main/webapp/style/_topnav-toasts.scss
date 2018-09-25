@@ -1,5 +1,6 @@
 @import "won-config";
 @import "sizing-utils";
+@import "won-markdown";
 
 won-topnav {
   .topnav__toasts {
@@ -25,6 +26,10 @@ won-topnav {
         @include fixed-square($toastIconSize);
       }
       &__text {
+        > div {
+          @include won-markdown();
+        }
+
         font-size: $smallFontSize;
         margin-right: 1rem;
         margin-left: 1rem;
