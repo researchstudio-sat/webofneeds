@@ -2,7 +2,6 @@
  * Created by ksinger on 16.09.2015.
  */
 import angular from "angular";
-import "angular-sanitize";
 import enterModule from "../directives/enter.js";
 import { dispatchEvent, attach, readAsDataURL } from "../utils.js";
 import globToRegexp from "glob-to-regexp";

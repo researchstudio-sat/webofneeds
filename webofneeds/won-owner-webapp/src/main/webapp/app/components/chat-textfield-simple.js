@@ -9,7 +9,6 @@
 // import Medium from '../mediumjs-es6.js';
 import angular from "angular";
 import "ng-redux";
-import "angular-sanitize";
 import ngAnimate from "angular-animate";
 import { dispatchEvent, attach, delay } from "../utils.js";
 import won from "../won-es6.js";
