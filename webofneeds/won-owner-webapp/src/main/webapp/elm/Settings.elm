@@ -4,6 +4,7 @@ import Browser
 import Browser.Dom
 import Browser.Events
 import Element exposing (..)
+import Element.Events as Events
 import Element.Font as Font
 import Elements
 import Html exposing (Html, node)
@@ -27,44 +28,38 @@ main =
 --
 
 
-type DisplayType
-    = Mobile
-    | Desktop
+type ViewMode
+    = Narrow (Maybe Page)
+    | Wide Page
 
 
-type Navigation
-    = Identities Identities.Model
+type Page
+    = IdentitiesPage Identities.Model
 
 
-type Model
-    = Wide
-        { skin : Skin
-        , navigation : Navigation
-        }
-    | Narrow
-        { skin : Skin
-        , navigation : Maybe Navigation
-        }
+type alias Model =
+    { skin : Skin
+    , viewMode : ViewMode
+    }
 
 
 init : () -> ( Model, Cmd Msg )
 init () =
-    ( Narrow
-        { skin =
+    ( { skin =
             { primaryColor = rgb255 240 70 70
             , lightGray = rgb255 240 242 244
             , lineGray = rgb255 203 210 209
             , subtitleGray = rgb255 128 128 128
             , black = rgb255 0 0 0
             }
-        , navigation = Nothing
-        }
+      , viewMode = Narrow Nothing
+      }
     , Task.perform
         (\{ viewport } ->
-            classifyDevice
-                (round viewport.width)
-                (round viewport.height)
-                |> ScreenResized
+            ScreenResized
+                { width = round viewport.width
+                , height = round viewport.height
+                }
         )
         Browser.Dom.getViewport
     )
@@ -76,25 +71,89 @@ init () =
 --
 
 
-classifyDevice : Int -> Int -> DisplayType
-classifyDevice w h =
-    if w > 560 then
-        Desktop
+view : Model -> Html Msg
+view model =
+    layout [] <|
+        case model.viewMode of
+            Wide page ->
+                row
+                    [ centerX
+                    , width
+                        (fill
+                            |> maximum 1000
+                        )
+                    , padding 20
+                    , spacing 20
+                    , Font.size 12
+                    ]
+                    [ sidebar
+                        { route = Just <| toRoute page
+                        , skin = model.skin
+                        }
+                    , case page of
+                        IdentitiesPage identititesModel ->
+                            Identities.view model.skin identititesModel
+                                |> map (PageMessage << IdentitiesMsg)
+                    ]
 
-    else
-        Mobile
+            Narrow (Just page) ->
+                column
+                    [ width fill
+                    , padding 20
+                    , spacing 20
+                    , Font.size 12
+                    ]
+                    [ backButton model.skin
+                    , case page of
+                        IdentitiesPage identititesModel ->
+                            Identities.view model.skin identititesModel
+                                |> map (PageMessage << IdentitiesMsg)
+                    ]
+
+            Narrow Nothing ->
+                column
+                    [ width fill
+                    , padding 20
+                    , spacing 20
+                    , Font.size 12
+                    ]
+                    [ sidebar
+                        { route = Nothing
+                        , skin = model.skin
+                        }
+                    ]
+
+
+backButton : Skin -> Element Msg
+backButton skin =
+    row
+        [ width fill
+        , spacing 10
+        , Font.size 20
+        , Font.color skin.primaryColor
+        , Events.onClick GoBack
+        ]
+        [ Elements.svgIcon
+            [ height (px 20)
+            , width (px 20)
+            ]
+            { name = "ico36_backarrow"
+            , color = skin.primaryColor
+            }
+        , text "Back"
+        ]
 
 
 type alias Category =
     { icon : String
     , skin : Skin
-    , name : String
     , active : Bool
+    , route : Route
     }
 
 
-category : Category -> Element msg
-category { icon, skin, name, active } =
+category : Category -> Element Msg
+category { icon, skin, active, route } =
     let
         color =
             if active then
@@ -107,6 +166,7 @@ category { icon, skin, name, active } =
         [ spacing 10
         , Font.color color
         , Font.size 18
+        , Events.onClick (ChangeRoute route)
         ]
         [ Elements.svgIcon
             [ height (px 18)
@@ -115,63 +175,27 @@ category { icon, skin, name, active } =
             { name = icon
             , color = color
             }
-        , text name
+        , text (routeName route)
         ]
 
 
-sidebar : Skin -> Element msg
-sidebar skin =
+sidebar :
+    { route : Maybe Route
+    , skin : Skin
+    }
+    -> Element Msg
+sidebar { route, skin } =
     column
         [ width shrink
         , alignTop
         ]
-        [ category { active = True, icon = "ico36_person", name = "Identities", skin = skin } ]
-
-
-view : Model -> Html Msg
-view model =
-    case model of
-        Wide wideModel ->
-            layout [] <|
-                row
-                    [ centerX
-                    , width
-                        (fill
-                            |> maximum 1000
-                        )
-                    , padding 20
-                    , spacing 20
-                    , Font.size 12
-                    ]
-                    [ sidebar wideModel.skin
-                    , case wideModel.navigation of
-                        Identities identitiesModel ->
-                            Identities.view wideModel.skin identitiesModel
-                                |> map (SubMessage << MessageFromIdentities)
-                    ]
-
-        Narrow narrowModel ->
-            layout [] <|
-                row
-                    [ centerX
-                    , width
-                        (fill
-                            |> maximum 1000
-                        )
-                    , padding 20
-                    , spacing 20
-                    , Font.size 12
-                    ]
-                    [ case narrowModel.navigation of
-                        Just navigation ->
-                            case navigation of
-                                Identities identitiesModel ->
-                                    Identities.view narrowModel.skin identitiesModel
-                                        |> map (SubMessage << MessageFromIdentities)
-
-                        Nothing ->
-                            sidebar narrowModel.skin
-                    ]
+        [ category
+            { active = route == Just Identities
+            , icon = "ico36_person"
+            , route = Identities
+            , skin = skin
+            }
+        ]
 
 
 
@@ -180,84 +204,151 @@ view model =
 --
 
 
-type SubMessage
-    = MessageFromIdentities Identities.Msg
+type Route
+    = Identities
+
+
+toRoute : Page -> Route
+toRoute page =
+    case page of
+        IdentitiesPage _ ->
+            Identities
+
+
+routeName : Route -> String
+routeName route =
+    case route of
+        Identities ->
+            "Identities"
+
+
+type PageMessage
+    = IdentitiesMsg Identities.Msg
 
 
 type Msg
-    = SubMessage SubMessage
-    | ScreenResized DisplayType
+    = PageMessage PageMessage
+    | ScreenResized DisplaySize
     | SkinChanged Skin
+    | ChangeRoute Route
+    | GoBack
+
+
+type alias DisplaySize =
+    { width : Int
+    , height : Int
+    }
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case ( msg, model ) of
-        ( SubMessage subMsg, Wide wideModel ) ->
-            ( Wide
-                { wideModel
-                    | navigation =
-                        updateNavigation subMsg wideModel.navigation
-                }
+    case msg of
+        PageMessage pMsg ->
+            ( { model
+                | viewMode = mapViewMode (updatePage pMsg) model.viewMode
+              }
             , Cmd.none
             )
 
-        ( SubMessage subMsg, Narrow narrowModel ) ->
-            ( Narrow
-                { narrowModel
-                    | navigation = Maybe.map (updateNavigation subMsg) narrowModel.navigation
-                }
+        ScreenResized { width } ->
+            ( { model
+                | viewMode =
+                    case ( width > 560, model.viewMode ) of
+                        ( True, Narrow Nothing ) ->
+                            Wide <| changeRoute Identities
+
+                        ( True, Narrow (Just page) ) ->
+                            Wide page
+
+                        ( True, Wide _ ) ->
+                            model.viewMode
+
+                        ( False, Wide page ) ->
+                            Narrow (Just page)
+
+                        ( False, Narrow _ ) ->
+                            model.viewMode
+              }
             , Cmd.none
             )
 
-        ( ScreenResized Desktop, Narrow narrowModel ) ->
-            ( Wide
-                { skin = narrowModel.skin
-                , navigation = Maybe.withDefault (Identities Identities.init) narrowModel.navigation
-                }
+        SkinChanged skin ->
+            ( { model
+                | skin = skin
+              }
             , Cmd.none
             )
 
-        ( ScreenResized Mobile, Wide wideModel ) ->
-            ( Narrow
-                { skin = wideModel.skin
-                , navigation = Just wideModel.navigation
-                }
+        ChangeRoute newRoute ->
+            ( { model
+                | viewMode =
+                    case model.viewMode of
+                        Narrow (Just page) ->
+                            if toRoute page /= newRoute then
+                                Narrow <| Just (changeRoute newRoute)
+
+                            else
+                                model.viewMode
+
+                        Narrow Nothing ->
+                            Narrow <| Just (changeRoute newRoute)
+
+                        Wide page ->
+                            if toRoute page /= newRoute then
+                                Wide <| changeRoute newRoute
+
+                            else
+                                model.viewMode
+              }
             , Cmd.none
             )
 
-        ( SkinChanged skin, Wide wideModel ) ->
-            ( Wide
-                { wideModel
-                    | skin = skin
-                }
+        GoBack ->
+            ( { model
+                | viewMode =
+                    case model.viewMode of
+                        Narrow _ ->
+                            Narrow Nothing
+
+                        Wide _ ->
+                            model.viewMode
+              }
             , Cmd.none
             )
 
-        ( SkinChanged skin, Narrow narrowModel ) ->
-            ( Narrow
-                { narrowModel
-                    | skin = skin
-                }
-            , Cmd.none
-            )
 
-        _ ->
-            ( model, Cmd.none )
+mapViewMode : (Page -> Page) -> ViewMode -> ViewMode
+mapViewMode f viewMode =
+    case viewMode of
+        Wide page ->
+            Wide (f page)
+
+        Narrow maybePage ->
+            Narrow <| Maybe.map f maybePage
 
 
-updateNavigation : SubMessage -> Navigation -> Navigation
-updateNavigation msg navigation =
-    case ( msg, navigation ) of
-        ( MessageFromIdentities identitiesMsg, Identities model ) ->
-            Identities (Identities.update identitiesMsg model)
+changeRoute : Route -> Page
+changeRoute route =
+    case route of
+        Identities ->
+            IdentitiesPage Identities.init
+
+
+updatePage : PageMessage -> Page -> Page
+updatePage pageMsg page =
+    case ( pageMsg, page ) of
+        ( IdentitiesMsg msg, IdentitiesPage model ) ->
+            IdentitiesPage <| Identities.update msg model
 
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
         [ Browser.Events.onResize
-            (\w h ->
-                ScreenResized <| classifyDevice w h
+            (\width height ->
+                ScreenResized
+                    { width = width
+                    , height = height
+                    }
             )
         ]
