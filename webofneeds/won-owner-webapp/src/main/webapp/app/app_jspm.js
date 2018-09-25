@@ -161,10 +161,25 @@ configRedux(app);
 
 app.config(configRouting).config([
   "$compileProvider",
-  function($compileProvider) {
+  "markedProvider",
+  function($compileProvider, markedProvider) {
     $compileProvider.aHrefSanitizationWhitelist(
       /^\s*(https?|ftp|mailto|tel|file|blob|data):/
     );
+
+    markedProvider.setRenderer({
+      link: function(href, title, text) {
+        return (
+          '<a href="' +
+          href +
+          '"' +
+          (title ? ' title="' + title + '"' : "") +
+          ' target="_blank">' +
+          text +
+          "</a>"
+        );
+      },
+    });
   },
 ]);
 app.run(["$ngRedux", $ngRedux => runMessagingAgent($ngRedux)]);
