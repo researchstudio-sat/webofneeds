@@ -9,19 +9,6 @@ import { ownerBaseUrl } from "config";
 
 import "style/_about.scss";
 
-const goodServicesOffer = "matchat.org";
-const goodServicesOfferLink = goodServicesOffer.link("https://www.matchat.org");
-
-const howSecure1 = toAbsoluteURL(ownerBaseUrl).toString();
-const howSecure1Link = howSecure1.link(ownerBaseUrl);
-const howSecure2 = toAbsoluteURL("/won/").toString();
-const howSecure2Link = howSecure2.link("/won/");
-
-const behindScenes = "here";
-const behindScenesLink = behindScenes.link(
-  "http://researchstudio-sat.github.io/webofneeds/"
-);
-
 const serviceDependencies = [
   "$ngRedux",
   "$scope" /*'$routeParams' /*injections as strings here*/,
@@ -106,9 +93,8 @@ const questions = [
       "Yes! The idea is to have an open, decentralized infrastructure that makes it easy for anyone" +
       " to post what they seek or what they offer, and to find people to interact with. " +
       " You'll have to set up a WoN node or post your offerings to a service (like " +
-      goodServicesOfferLink +
+      "[matchat.org](https://www.matchat.org)" +
       ") that handles everything for you. We can help you with that.",
-    unsafeHtmlEnabled: true,
   },
   {
     title: "Is this website production-ready?",
@@ -152,9 +138,15 @@ const questions = [
       " implemented it - in the bird's eye view: Your data is stored in clear text on our servers. The communication" +
       " between your browser and your counterpart's browser is relayed over at most four intermediate servers: your" +
       " Owner Application (" +
-      howSecure1Link +
+      "[" +
+      toAbsoluteURL(ownerBaseUrl) +
+      "](" +
+      ownerBaseUrl +
+      ")" +
       "), your WoN node (" +
-      howSecure2Link +
+      "[" +
+      toAbsoluteURL("/won/") +
+      "](/won/)" +
       "), your" +
       " counterpart's WoN node and your counterpart's Owner Application. Each one of" +
       " these communication channels are secured with TLS, so the data is encrypted as it is transmitted. Once your" +
@@ -167,7 +159,6 @@ const questions = [
       " create, so others should not be able to find out which needs are yours and which needs are from other" +
       " people. Note that this system has not had an independent security audit. If you are interested in" +
       " assessing the security of our approach, or if you have feedback for us, please contact us.",
-    unsafeHtmlEnabled: true,
   },
   {
     title:
@@ -178,8 +169,8 @@ const questions = [
   },
   {
     title: "What is going on behind the scenes?",
-    detail: "You may go " + behindScenesLink + " for an explanation.",
-    unsafeHtmlEnabled: true,
+    detail:
+      "You may go [here](http://researchstudio-sat.github.io/webofneeds/) for an explanation.",
   },
   {
     title: "Is there a native mobile app?",

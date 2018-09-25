@@ -1,4 +1,5 @@
 import angular from "angular";
+import "angular-marked";
 
 import "style/_accordion.scss";
 
@@ -17,8 +18,7 @@ function genComponentConf() {
                     ng-show="$index === self.selectedIdx">
                         <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
                 </svg>
-                <div class="detail" ng-show="$index === self.selectedIdx && item.unsafeHtmlEnabled" ng-bind-html="item.detail"></div>
-                <div class="detail" ng-show="$index === self.selectedIdx && !item.unsafeHtmlEnabled">{{item.detail}}</div>         
+                <div class="detail" ng-show="$index === self.selectedIdx" marked="item.detail"></div>
             </div>
     `;
 
@@ -45,5 +45,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.accordion", [])
+  .module("won.owner.components.accordion", ["hc.marked"])
   .directive("wonAccordion", genComponentConf).name;
