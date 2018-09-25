@@ -1,5 +1,5 @@
 import angular from "angular";
-import { Elm } from "./Settings.elm";
+import { Elm } from "../../../elm/Settings.elm";
 import Identicon from "identicon.js";
 import "@webcomponents/custom-elements";
 import { generateRgbColorArray } from "../../utils.js";
@@ -66,7 +66,7 @@ function genComponentConf() {
   return {
     restrict: "E",
     link: (scope, element) => {
-      Elm.Main.init({ node: element[0] });
+      Elm.Settings.init({ node: element[0] });
     },
   };
 }
