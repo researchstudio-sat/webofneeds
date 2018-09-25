@@ -167,6 +167,8 @@ app.config(configRouting).config([
       /^\s*(https?|ftp|mailto|tel|file|blob|data):/
     );
     markedProvider.setOptions({ sanitize: true });
+    /*
+    //removed this codesnippet due to problems with link rendering -> xss vulnerability
     markedProvider.setRenderer({
       link: function(href, title, text) {
         return (
@@ -179,7 +181,7 @@ app.config(configRouting).config([
           "</a>"
         );
       },
-    });
+    });*/
   },
 ]);
 app.run(["$ngRedux", $ngRedux => runMessagingAgent($ngRedux)]);
