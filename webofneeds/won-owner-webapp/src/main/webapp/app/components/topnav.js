@@ -13,6 +13,7 @@ import { attach, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
 import { selectNeedByConnectionUri } from "../selectors.js";
+import "angular-marked";
 
 import * as srefUtils from "../sref-utils.js";
 
@@ -129,12 +130,7 @@ function genTopnavConf() {
                 </svg>
 
                 <div class="topnav__toasts__element__text">
-                    <p ng-show="!toast.get('unsafeHtmlEnabled')">
-                        {{toast.get('msg')}}
-                    </p>
-                    <p ng-show="toast.get('unsafeHtmlEnabled')"
-                        ng-bind-html="toast.get('msg')">
-                    </p>
+                    <div marked="toast.get('msg')"></div>
                     <p ng-show="toast.get('type') === self.WON.errorToast">
                         If the problem persists please contact
                         <a href="mailto:{{self.adminEmail}}">
@@ -156,7 +152,6 @@ function genTopnavConf() {
   const serviceDependencies = [
     "$ngRedux",
     "$scope",
-    "$sanitize",
     "$state" /*injections as strings here*/,
   ];
 
@@ -231,7 +226,7 @@ function genTopnavConf() {
 
 export default angular
   .module("won.owner.components.topnav", [
-    "ngSanitize",
+    "hc.marked",
     //loginComponent,
     //logoutComponent,
     dropdownModule,

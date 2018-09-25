@@ -21,8 +21,7 @@ export default function(allToasts = initialState, action = {}) {
       return pushNewToast(
         allToasts,
         "Error while processing chat message: \n\n" + msg,
-        won.WON.errorToast,
-        {}
+        won.WON.errorToast
       );
     }
 
@@ -34,8 +33,7 @@ export default function(allToasts = initialState, action = {}) {
           "Sorry, something failed when posting/generating a new private-ID (the one in " +
             "your url-bar). Copy the text you've written somewhere safe, then log out / remove " +
             "the ID, then refresh the page and try posting again.",
-          won.WON.errorToast,
-          {}
+          won.WON.errorToast
         );
       } else {
         return allToasts;
@@ -47,14 +45,12 @@ export default function(allToasts = initialState, action = {}) {
         return pushNewToast(
           allToasts,
           "Sorry, we couldn't find the private ID (the one in your url-bar). If " +
-            "you copied this address make sure you <strong>copied everything</strong> and try " +
-            "<strong>reloading the page</strong>. " +
+            "you copied this address make sure you **copied everything** and try " +
+            "**reloading the page**. " +
             "If this doesn't work you can try " +
-            '<a href="#">' +
-            "removing it" +
-            "</a> to start fresh.",
-          won.WON.errorToast,
-          { unsafeHtmlEnabled: true }
+            "[removing it](#) " +
+            "to start fresh.",
+          won.WON.errorToast
         );
       } else {
         return allToasts;
@@ -67,12 +63,11 @@ export default function(allToasts = initialState, action = {}) {
           "because you have denied us accesss to your current location. " +
           'To enable it, reload the page and click on "allow access". If' +
           "you've disabled it permanently you can find instructions here for  " +
-          '<a href="https://support.google.com/chrome/answer/142065">Chrome</a>, ' +
-          '<a href="https://www.mozilla.org/en-US/firefox/geolocation/">Firefox</a>, ' +
-          '<a href="https://support.apple.com/en-us/HT204690">Safari</a> and ' +
-          '<a href="https://privacy.microsoft.com/en-us/windows-10-location-and-privacy">Internet Explorer Edge</a>.',
-        won.WON.warnToast,
-        { unsafeHtmlEnabled: true }
+          "[Chrome](https://support.google.com/chrome/answer/142065), " +
+          "[Firefox](https://www.mozilla.org/en-US/firefox/geolocation/), " +
+          "[Safari](https://support.apple.com/en-us/HT204690), " +
+          "[Internet Explorer Edge](https://privacy.microsoft.com/en-us/windows-10-location-and-privacy).",
+        won.WON.warnToast
       );
 
     //INFO TOASTS: won.WON.infoToast
@@ -142,20 +137,9 @@ export default function(allToasts = initialState, action = {}) {
  * @param allToasts
  * @param msg
  * @param type
- * @param options
- *   * unsafeHtmlEnabled: set this to true only if it's really necessary and never
- *   with non-static text (e.g. never use this with toasts that show need-contents
- *   as this would open the possibility for XSS-attacks)
  * @returns {*}
  */
-function pushNewToast(allToasts, msg, type, options) {
-  const options_ = Object.assign(
-    {
-      unsafeHtmlEnabled: false,
-    },
-    options
-  );
-
+function pushNewToast(allToasts, msg, type) {
   let toastType = type;
   if (!toastType) {
     toastType = won.WON.infoToast;
@@ -168,7 +152,6 @@ function pushNewToast(allToasts, msg, type, options) {
       id: id,
       type: toastType,
       msg: msg,
-      unsafeHtmlEnabled: options_.unsafeHtmlEnabled,
     })
   );
 }
