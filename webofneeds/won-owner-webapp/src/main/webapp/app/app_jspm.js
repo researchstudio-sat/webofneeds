@@ -166,7 +166,7 @@ app.config(configRouting).config([
     $compileProvider.aHrefSanitizationWhitelist(
       /^\s*(https?|ftp|mailto|tel|file|blob|data):/
     );
-
+    markedProvider.setOptions({ sanitize: true });
     markedProvider.setRenderer({
       link: function(href, title, text) {
         return (
