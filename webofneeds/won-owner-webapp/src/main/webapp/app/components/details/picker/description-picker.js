@@ -2,6 +2,7 @@ import angular from "angular";
 import { attach, delay } from "../../../utils.js";
 import { DomCache } from "../../../cstm-ng-utils.js";
 import wonInput from "../../../directives/input.js";
+import "angular-marked";
 
 import "style/_descriptionpicker.scss";
 
@@ -20,7 +21,10 @@ function genComponentConf() {
           class="dp__input__inner"
           won-input="::self.updateDescription()"
           placeholder="{{self.detail.placeholder}}"></textarea>
-      </div> 
+      </div>
+      <div class="dp__preview__header">Preview</div>
+      <div ng-if="self.addedDescription" class="dp__preview__content" marked="self.addedDescription"></div>
+      <div ng-if="!self.addedDescription" class="dp__preview__content--empty>Add Content to see instant preview</div>
     `;
 
   class Controller {
@@ -102,5 +106,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.descriptionPicker", [wonInput])
+  .module("won.owner.components.descriptionPicker", [wonInput, "hc.marked"])
   .directive("wonDescriptionPicker", genComponentConf).name;

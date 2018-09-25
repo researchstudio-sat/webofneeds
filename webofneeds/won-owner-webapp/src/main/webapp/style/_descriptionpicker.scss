@@ -3,9 +3,12 @@
 @import "sizing-utils";
 
 won-description-picker {
+  display: grid;
+  grid-row-gap: 0.25rem;
+
   .dp__input {
-    position: relative;
     display: grid;
+    position: relative;
 
     .dp__input__icon {
       @include fixed-square($bigiconSize);
@@ -46,6 +49,15 @@ won-description-picker {
     .dp__input__inner::-ms-clear {
       width: 0;
       height: 0;
+    }
+  }
+  .dp__preview__header {
+    color: $won-primary-color;
+  }
+
+  .dp__preview__content {
+    &--empty {
+      color: $won-line-gray;
     }
   }
 }

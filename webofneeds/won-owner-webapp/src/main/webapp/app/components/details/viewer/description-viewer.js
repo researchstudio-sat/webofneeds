@@ -1,5 +1,6 @@
 import angular from "angular";
 import { attach } from "../../../utils.js";
+import "angular-marked";
 
 import "style/_description-viewer.scss";
 
@@ -12,7 +13,7 @@ function genComponentConf() {
           </svg>
           <span class="dv__header__label" ng-if="self.detail.label">{{self.detail.label}}</span>
         </div>
-        <div class="dv__content">{{ self.content }}</div>  <!-- no spaces or newlines within the code-tag, because it is preformatted -->
+        <div class="dv__content" marked="self.content"></div>  <!-- no spaces or newlines within the code-tag, because it is preformatted -->
     `;
 
   class Controller {
@@ -55,5 +56,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.descriptionViewer", [])
+  .module("won.owner.components.descriptionViewer", ["hc.marked"])
   .directive("wonDescriptionViewer", genComponentConf).name;
