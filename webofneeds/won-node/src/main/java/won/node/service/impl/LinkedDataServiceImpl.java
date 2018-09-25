@@ -398,9 +398,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
    */
   @Override
   @Transactional
-  public DataWithEtag<Dataset> getConnectionDataset(final URI connectionUri, final boolean includeEventContainer, final
-  boolean
-    includeLatestEvent, final String etag)
+  public DataWithEtag<Dataset> getConnectionDataset(final URI connectionUri, final boolean includeEventContainer, final String etag)
 
   {
     DataWithEtag<Connection> data = null;
@@ -435,19 +433,6 @@ public class LinkedDataServiceImpl implements LinkedDataService
       Resource eventContainer = model.createResource(connection.getConnectionURI().toString()+"/events");
       connectionResource.addProperty(WON.HAS_EVENT_CONTAINER, eventContainer);
       eventContainer.addProperty(RDF.type, WON.EVENT_CONTAINER);
-      if (includeLatestEvent) {
-        //we add the latest event in the connection
-        Slice<MessageEventPlaceholder> latestEvents =
-          messageEventRepository.findByParentURIFetchDatasetEagerly(connectionUri, new PageRequest(0, 1, new Sort(Sort
-                                                                                                           .Direction.DESC, "creationDate")));
-        if (latestEvents.hasContent()) {
-          MessageEventPlaceholder event = latestEvents.getContent().get(0);
-          //add the event's dataset
-          eventDataset = setDefaults(event.getDatasetHolder().getDataset());
-          //connect the event to its container
-          eventContainer.addProperty(RDFS.member, model.getResource(event.getMessageURI().toString()));
-        }
-      }
       DatasetHolder datasetHolder = connection.getDatasetHolder();
       if (datasetHolder != null) {
         addAdditionalData(model, datasetHolder.getDataset().getDefaultModel(), connectionResource);
@@ -916,7 +901,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
     //add the connection model for each connection URI
     for (URI connectionURI : connectionURIs) {
       DataWithEtag<Dataset> connectionDataset =
-        getConnectionDataset(connectionURI, true, true, null);
+        getConnectionDataset(connectionURI, true, null);
       RdfUtils.addDatasetToDataset(dataset, connectionDataset.getData());
     }
   }
