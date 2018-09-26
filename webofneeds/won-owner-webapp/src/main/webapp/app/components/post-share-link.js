@@ -4,8 +4,6 @@ import { actionCreators } from "../actions/actions.js";
 import { attach, toAbsoluteURL } from "../utils.js";
 
 import { connect2Redux } from "../won-utils.js";
-import qrcode from "qrcode-generator";
-import qrcode_UTF8 from "../../node_modules/qrcode-generator/qrcode_UTF8";
 import ngQrcode from "angular-qrcode";
 
 import { ownerBaseUrl } from "config";
@@ -49,11 +47,6 @@ function genComponentConf() {
       const selectFromState = state => {
         const post = this.postUri && state.getIn(["needs", this.postUri]);
         this.showLink = true;
-
-        if (!(qrcode && qrcode_UTF8)) {
-          //this clause is necessary otherwise our imports seem to be unused
-          console.error("qrcode or qrcode_UTF8 not present");
-        }
 
         let linkToPost;
         if (ownerBaseUrl && post) {
