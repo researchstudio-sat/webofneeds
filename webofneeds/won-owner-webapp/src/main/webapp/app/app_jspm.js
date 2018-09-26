@@ -163,25 +163,30 @@ app.config(configRouting).config([
   "$compileProvider",
   "markedProvider",
   function($compileProvider, markedProvider) {
+    const urlSanitizationRegex = /^\s*(https?|ftp|mailto|tel|file|blob|data):/;
+
     $compileProvider.aHrefSanitizationWhitelist(
-      /^\s*(https?|ftp|mailto|tel|file|blob|data):/
+      urlSanitizationRegex
     );
     markedProvider.setOptions({ sanitize: true });
-    /*
     //removed this codesnippet due to problems with link rendering -> xss vulnerability
     markedProvider.setRenderer({
       link: function(href, title, text) {
-        return (
-          '<a href="' +
-          href +
-          '"' +
-          (title ? ' title="' + title + '"' : "") +
-          ' target="_blank">' +
-          text +
-          "</a>"
-        );
+        if (urlSanitizationRegex.test(href)) {
+          return (
+            '<a href="' +
+            href +
+            '"' +
+            (title ? ' title="' + title + '"' : "") +
+            ' target="_blank">' +
+            text +
+            "</a>"
+          );
+        } else {
+          return text;
+        }
       },
-    });*/
+    });
   },
 ]);
 app.run(["$ngRedux", $ngRedux => runMessagingAgent($ngRedux)]);
