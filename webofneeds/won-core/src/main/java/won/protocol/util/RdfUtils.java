@@ -1658,7 +1658,7 @@ public class RdfUtils {
 	public static Dataset addDatasetToDataset(final Dataset baseDataset, final Dataset toBeAddedtoBase,
 			boolean replaceNamedModel) {
 		if (baseDataset == null) throw new IllegalArgumentException("baseDataset must not be null");
-		if (toBeAddedtoBase != null) throw new IllegalArgumentException("toBeAddedToBase must not be null");
+		if (toBeAddedtoBase == null) throw new IllegalArgumentException("toBeAddedToBase must not be null");
 		baseDataset.getDefaultModel().add(toBeAddedtoBase.getDefaultModel());
 		for (Iterator<String> nameIt = toBeAddedtoBase.listNames(); nameIt.hasNext();) {
 			String modelName = nameIt.next();
