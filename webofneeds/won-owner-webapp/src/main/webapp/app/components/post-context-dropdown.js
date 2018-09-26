@@ -6,9 +6,16 @@ import angular from "angular";
 import ngAnimate from "angular-animate";
 import { actionCreators } from "../actions/actions.js";
 import won from "../won-es6.js";
-import { attach } from "../utils.js";
-import { connect2Redux } from "../won-utils.js";
+import { attach, toAbsoluteURL } from "../utils.js";
+import {
+  connect2Redux,
+  createDocumentDefinitionFromPost,
+} from "../won-utils.js";
 import { selectOpenPostUri } from "../selectors.js";
+import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts";
+
+import { ownerBaseUrl } from "config";
 
 import "style/_context-dropdown.scss";
 
@@ -48,6 +55,10 @@ function genComponentConf() {
                         Reopen Post
                     </button>
                     <button class="won-button--filled red"
+                        ng-click="self.exportPdf()">
+                        Export as PDF
+                    </button>
+                    <button class="won-button--filled red"
                         ng-if="self.isOwnPost && self.isActive"
                         ng-click="self.closePost()">
                         Archive Post
@@ -65,12 +76,20 @@ function genComponentConf() {
         const post = postUri && state.getIn(["needs", postUri]);
         const postState = post && post.get("state");
 
+        let linkToPost;
+        if (ownerBaseUrl && post) {
+          const path = "#!post/" + `?postUri=${encodeURI(post.get("uri"))}`;
+
+          linkToPost = toAbsoluteURL(ownerBaseUrl).toString() + path;
+        }
+
         return {
           isOwnPost: post && post.get("ownNeed"),
           isActive: postState === won.WON.ActiveCompacted,
           isInactive: postState === won.WON.InactiveCompacted,
           shouldShowRdf: state.get("showRdf"),
           post,
+          linkToPost,
           postUri,
         };
       };
@@ -135,6 +154,18 @@ function genComponentConf() {
       if (this.isOwnPost) {
         console.log("RE-OPENING THE POST: " + this.post.get("uri"));
         this.needs__reopen(this.post.get("uri"));
+      }
+    }
+
+    exportPdf() {
+      if (!this.post) return;
+
+      console.log("Export PDF");
+      const docDefinition = createDocumentDefinitionFromPost(this.post);
+
+      if (docDefinition) {
+        pdfMake.vfs = pdfFonts.pdfMake.vfs;
+        pdfMake.createPdf(docDefinition).download();
       }
     }
   }

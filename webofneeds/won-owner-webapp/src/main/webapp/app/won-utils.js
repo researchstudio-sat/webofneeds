@@ -450,6 +450,87 @@ export function parseJsonldLeafsImm(val, type) {
   }
 }
 
+export function createDocumentDefinitionFromPost(post) {
+  if (!post) return;
+
+  let title = { text: post.get("humanReadable"), style: "title" };
+  let isHeader = { text: "I Offer", style: "branchHeader" };
+  let seeksHeader = { text: "Looking For", style: "branchHeader" };
+
+  let content = [];
+  content.push(title);
+
+  const allDetails = getAllDetails();
+
+  const isBranch = post.get("is");
+  if (isBranch) {
+    content.push(isHeader);
+    isBranch.map((detailValue, detailKey) => {
+      const detailJS =
+        detailValue && Immutable.Iterable.isIterable(detailValue)
+          ? detailValue.toJS()
+          : detailValue;
+
+      const detailDefinition = allDetails[detailKey];
+      if (detailDefinition && detailJS) {
+        content.push({ text: detailDefinition.label, style: "detailHeader" });
+        content.push({
+          text: detailDefinition.generateHumanReadable({
+            value: detailJS,
+            includeLabel: false,
+          }),
+          style: "detailText",
+        });
+      }
+    });
+  }
+
+  const seeksBranch = post.get("seeks");
+  if (seeksBranch) {
+    content.push(seeksHeader);
+    seeksBranch.map((detailValue, detailKey) => {
+      const detailJS =
+        detailValue && Immutable.Iterable.isIterable(detailValue)
+          ? detailValue.toJS()
+          : detailValue;
+
+      const detailDefinition = allDetails[detailKey];
+      if (detailDefinition && detailJS) {
+        content.push({ text: detailDefinition.label, style: "detailHeader" });
+        content.push({
+          text: detailDefinition.generateHumanReadable({
+            value: detailJS,
+            includeLabel: false,
+          }),
+          style: "detailText",
+        });
+      }
+    });
+  }
+
+  let styles = {
+    title: {
+      fontSize: 20,
+      bold: true,
+    },
+    branchHeader: {
+      fontSize: 18,
+      bold: true,
+    },
+    detailHeader: {
+      fontSize: 12,
+      bold: true,
+    },
+    detailText: {
+      fontSize: 12,
+    },
+  };
+  return {
+    content: content /*[title, 'This is an sample PDF printed with pdfMake '+this.linkToPost]*/,
+    styles: styles,
+  };
+}
+
 /**
  * Parses a json-ld value, in whatever way it's serialized, to a
  * corresponding javascript-value.
