@@ -165,9 +165,7 @@ app.config(configRouting).config([
   function($compileProvider, markedProvider) {
     const urlSanitizationRegex = /^\s*(https?|ftp|mailto|tel|file|blob|data):/;
 
-    $compileProvider.aHrefSanitizationWhitelist(
-      urlSanitizationRegex
-    );
+    $compileProvider.aHrefSanitizationWhitelist(urlSanitizationRegex);
     markedProvider.setOptions({ sanitize: true });
     //removed this codesnippet due to problems with link rendering -> xss vulnerability
     markedProvider.setRenderer({
