@@ -427,7 +427,6 @@ public class LinkedDataServiceImpl implements LinkedDataService
 
     // add WON node link
     connectionResource.addProperty(WON.HAS_WON_NODE, model.createResource(this.resourceURIPrefix));
-    Dataset eventDataset = null;
     if (includeEventContainer) {
       //create event container and attach it to the member
       Resource eventContainer = model.createResource(connection.getConnectionURI().toString()+"/events");
@@ -441,7 +440,6 @@ public class LinkedDataServiceImpl implements LinkedDataService
 
     Dataset connectionDataset = addBaseUriAndDefaultPrefixes(newDatasetWithNamedModel(createDataGraphUriFromResource
                                                                        (connectionResource), model));
-    RdfUtils.addDatasetToDataset(connectionDataset, eventDataset);
     return new DataWithEtag<>(connectionDataset,newEtag, etag);
   }
 
