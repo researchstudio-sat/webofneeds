@@ -171,15 +171,29 @@ app.config(configRouting).config([
     markedProvider.setRenderer({
       link: function(href, title, text) {
         if (urlSanitizationRegex.test(href)) {
-          return (
-            '<a href="' +
-            href +
-            '"' +
-            (title ? ' title="' + title + '"' : "") +
-            ' target="_blank">' +
-            text +
-            "</a>"
-          );
+          if (text === href) {
+            return (
+              '<a href="' +
+              href +
+              '"' +
+              (title ? ' title="' + title + '"' : "") +
+              ' target="_blank">' +
+              text +
+              "</a>"
+            );
+          } else {
+            return (
+              "[" +
+              text +
+              '](<a href="' +
+              href +
+              '"' +
+              (title ? ' title="' + title + '"' : "") +
+              ' target="_blank">' +
+              href +
+              "</a>)"
+            );
+          }
         } else {
           return text;
         }
