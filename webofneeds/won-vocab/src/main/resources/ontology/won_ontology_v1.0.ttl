@@ -70,6 +70,15 @@
           rdfs:comment "Indicates that a need or connection supports the specified facet (=behavior)."@en ;
           rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 
+		  
+###  http://purl.org/webofneeds/model#hasDefaultFacet
+:hasDefaultFacet rdf:type owl:ObjectProperty ;
+          rdfs:domain :Need ;
+          rdfs:range :Facet ;
+          rdfs:comment "Indicates the facet to connect to by default."@en ;
+          rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
+
+		  
 
 ###  http://purl.org/webofneeds/model#hasFlag
 :hasFlag rdf:type owl:ObjectProperty ;
