@@ -3,9 +3,7 @@ import ngAnimate from "angular-animate";
 import { actionCreators } from "../actions/actions.js";
 import { attach, toAbsoluteURL } from "../utils.js";
 
-import { connect2Redux } from "../won-utils.js";
-import ngQrcode from "angular-qrcode";
-
+import { connect2Redux, generateSvgQrCode } from "../won-utils.js";
 import { ownerBaseUrl } from "config";
 
 import "style/_post-share-link.scss";
@@ -35,7 +33,7 @@ function genComponentConf() {
               </div>
             </div>
             <div class="psl__qrcode" ng-if="!self.showLink">
-              <qrcode data="{{self.linkToPost}}" href="{{self.linkToPost}}" size="200"></qrcode>
+              <img class="psl__qrcode__code" src="data:image/svg+xml;utf8,{{self.svgQrCodeToPost}}"/>
             </div>
         </div>
     `;
@@ -43,6 +41,7 @@ function genComponentConf() {
   class Controller {
     constructor() {
       attach(this, serviceDependencies, arguments);
+      window.postShareLink4dbg = this;
 
       const selectFromState = state => {
         const post = this.postUri && state.getIn(["needs", this.postUri]);
@@ -54,10 +53,12 @@ function genComponentConf() {
 
           linkToPost = toAbsoluteURL(ownerBaseUrl).toString() + path;
         }
+        let svgQrCodeToPost = generateSvgQrCode(linkToPost);
 
         return {
           post,
           linkToPost,
+          svgQrCodeToPost,
         };
       };
       connect2Redux(selectFromState, actionCreators, ["self.postUri"], this);
@@ -122,5 +123,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.postShareLink", [ngAnimate, ngQrcode])
+  .module("won.owner.components.postShareLink", [ngAnimate])
   .directive("wonPostShareLink", genComponentConf).name;

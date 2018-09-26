@@ -14,12 +14,13 @@ import {
   isValidNumber,
   endOfDateStrInterval,
   getFromJsonLd,
+  toAbsoluteURL,
 } from "./utils.js";
 
 import { ownerBaseUrl } from "config";
 import urljoin from "url-join";
 import { useCases } from "useCaseDefinitions";
-
+import qr from "qr-image";
 import jsonld from "jsonld";
 window.jsonld4dbg = jsonld;
 
@@ -508,6 +509,23 @@ export function createDocumentDefinitionFromPost(post) {
     });
   }
 
+  if (ownerBaseUrl && post) {
+    const path = "#!post/" + `?postUri=${encodeURI(post.get("uri"))}`;
+    const linkToPost = toAbsoluteURL(ownerBaseUrl).toString() + path;
+
+    if (linkToPost) {
+      content.push({ text: linkToPost, style: "postLink" });
+      const base64PngQrCode = generateBase64PngQrCode(linkToPost);
+      if (base64PngQrCode) {
+        content.push({
+          image: "data:image/png;base64," + base64PngQrCode,
+          width: 200,
+          height: 200,
+        });
+      }
+    }
+  }
+
   let styles = {
     title: {
       fontSize: 20,
@@ -523,6 +541,9 @@ export function createDocumentDefinitionFromPost(post) {
     },
     detailText: {
       fontSize: 12,
+    },
+    postLink: {
+      fontSize: 10,
     },
   };
   return {
@@ -646,4 +667,22 @@ function throwParsingError(val, type, prependedMsg = "") {
     ` Failed to parse jsonld value of type \`${type}\`:\n` +
     JSON.stringify(val);
   throw new Error(fullMsg.trim());
+}
+
+export function generateSvgQrCode(link) {
+  return link && qr.imageSync(link, { type: "svg" });
+}
+
+export function generatePngQrCode(link) {
+  return link && qr.imageSync(link, { type: "png" });
+}
+
+export function generateBase64PngQrCode(link) {
+  const pngQrCode = generatePngQrCode(link);
+  return pngQrCode && btoa(String.fromCharCode.apply(null, pngQrCode));
+}
+
+export function generateBase64SvgQrCode(link) {
+  const svgQrCode = generateSvgQrCode(link);
+  return svgQrCode && btoa(svgQrCode);
 }

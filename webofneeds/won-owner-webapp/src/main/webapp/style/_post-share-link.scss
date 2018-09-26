@@ -74,5 +74,9 @@ won-post-share-link {
     align-items: center;
     background: white;
     padding: 0.5rem;
+
+    &__code {
+      height: 10rem;
+    }
   }
 }
