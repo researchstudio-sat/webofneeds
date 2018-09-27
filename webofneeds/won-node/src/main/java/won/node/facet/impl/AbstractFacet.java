@@ -33,7 +33,7 @@ import java.util.concurrent.ExecutorService;
  * Time: 17:09
  * To change this template use File | Settings | File Templates.
  */
-public abstract class AbstractFacet implements Facet
+public abstract class AbstractFacet implements FacetLogic
 {
   //string to be appended to the need uri, and prepended to a facet-specific identifier
   // so as to form a unique graph name used for storing data that is managed by the facet
