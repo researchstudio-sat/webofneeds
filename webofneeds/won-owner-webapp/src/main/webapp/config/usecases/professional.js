@@ -10,6 +10,33 @@ export const professionalGroup = {
   label: "Professional Networking",
   icon: undefined,
   useCases: {
+    jobOffer: {
+      label: "Offer a Job",
+      icon: "#ico36_uc_find_people",
+      doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
+      draft: {
+        ...emptyDraft,
+        is: {
+          title: "We're looking for people!",
+          tags: ["offer-job"],
+        },
+        searchString: "search-job",
+      },
+      isDetails: {
+        title: { ...details.title },
+        description: { ...details.description },
+        location: { ...details.location },
+        person: { ...details.person },
+        skills: { ...skillsDetail },
+        interests: { ...interestsDetail },
+      },
+      seeksDetails: {
+        description: { ...details.description },
+        location: { ...details.location },
+        skills: { ...skillsDetail },
+        interests: { ...interestsDetail },
+      },
+    },
     getToKnow: {
       identifier: "getToKnow",
       label: "Find people",
