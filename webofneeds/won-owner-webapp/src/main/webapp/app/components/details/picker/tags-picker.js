@@ -1,5 +1,10 @@
 import angular from "angular";
-import { attach, delay, extractHashtags } from "../../../utils.js";
+import {
+  attach,
+  delay,
+  extractHashtags,
+  dispatchEvent,
+} from "../../../utils.js";
 import { DomCache } from "../../../cstm-ng-utils.js";
 import wonInput from "../../../directives/input.js";
 
@@ -50,12 +55,15 @@ function genComponentConf() {
      * Checks validity and uses callback method
      */
     update(tags) {
-      // check if there are tags
-      if (tags && tags.length > 0) {
-        this.onUpdate({ value: tags });
-      } else {
-        this.onUpdate({ value: undefined });
-      }
+      const payload = {
+        value:
+          tags && tags.length > 0
+            ? // check if there are tags
+              tags
+            : undefined,
+      };
+      this.onUpdate(payload);
+      dispatchEvent(this.$lement[0], "update", payload);
     }
 
     showInitialTags() {
