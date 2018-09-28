@@ -27,6 +27,24 @@ class SvgIcon extends HTMLElement {
     svgElement.appendChild(useElement);
     this.appendChild(svgElement);
   }
+
+  attributeChangedCallback(name, oldValue, newValue) {
+    switch (name) {
+      case "icon": {
+        const link = this.querySelector("svg > use");
+        if (link) {
+          link.setAttribute("xlink:href", "#" + newValue);
+          link.setAttribute("href", "#" + newValue);
+        }
+        break;
+      }
+      case "color": {
+        const svg = this.querySelector("svg");
+        if (svg) svg.style.setProperty("--local-primary", newValue);
+        break;
+      }
+    }
+  }
 }
 
 customElements.define("svg-icon", SvgIcon);
