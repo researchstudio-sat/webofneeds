@@ -1,13 +1,13 @@
 /**
  * Created by fsuda on 18.09.2018.
  */
-import { details } from "detailDefinitions";
+import basicDetails from "./basic.js";
 import won from "../../app/won-es6.js";
 import { getIn, generateIdString } from "../../app/utils.js";
 import Immutable from "immutable";
 
 export const skillsDetail = {
-  ...details.tags,
+  ...basicDetails.tags,
   identifier: "skills",
   label: "Skills",
   icon: "#ico36_detail_skill",
@@ -25,7 +25,7 @@ export const skillsDetail = {
 };
 
 export const interestsDetail = {
-  ...details.tags,
+  ...basicDetails.tags,
   identifier: "interests",
   label: "Interests",
   icon: "#ico36_detail_interests",

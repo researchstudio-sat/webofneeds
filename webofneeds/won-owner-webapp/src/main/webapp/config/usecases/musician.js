@@ -1,7 +1,7 @@
 /**
  * Created by fsuda on 18.09.2018.
  */
-import { details, emptyDraft } from "../detail-definitions";
+import { details, emptyDraft } from "../detail-definitions.js";
 import {
   realEstateRentRangeDetail,
   realEstateRentDetail,
