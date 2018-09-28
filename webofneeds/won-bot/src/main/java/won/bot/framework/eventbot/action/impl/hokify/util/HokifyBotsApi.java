@@ -29,11 +29,9 @@ import won.bot.framework.eventbot.action.impl.hokify.HokifyJob;
 public class HokifyBotsApi {
 
     private String jsonURL;
-    // private String jsonString;
 
     public HokifyBotsApi(String jsonURL) {
         this.jsonURL = jsonURL;
-        //fetchHokifyData();
     }
 
     public ArrayList<HokifyJob> fetchHokifyData() {
@@ -68,8 +66,6 @@ public class HokifyBotsApi {
 
                     HokifyJob tmpJob = objectMapper.readValue(jobArray.getJSONObject(count).toString(),
                             HokifyJob.class);
-                    //String value = objectMapper.writeValueAsString(tmpJob);
-                    //System.out.println("VALUE : " + value);
                     jobsList.add(tmpJob);
                 } catch (JsonParseException e) {
                     // TODO Auto-generated catch block

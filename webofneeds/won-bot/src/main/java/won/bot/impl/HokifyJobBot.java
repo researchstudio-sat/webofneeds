@@ -46,16 +46,13 @@ import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
  */
 public class HokifyJobBot extends EventBot {
     private String botName;
-    private String token;
+    //private String token;
     private String jsonURL;
 
     private EventBus bus;
-    private WonHokifyJobBotHandler wonHokifyJobBotHandler;
+    //private WonHokifyJobBotHandler wonHokifyJobBotHandler;
 
-    //@Autowired
-    //private TelegramContentExtractor telegramContentExtractor;
-
-    //@Autowired
+    // @Autowired
     private HokifyMessageGenerator hokifyMessageGenerator;
 
     @Override
@@ -65,93 +62,56 @@ public class HokifyJobBot extends EventBot {
         this.hokifyMessageGenerator.setEventListenerContext(ctx);
         bus = getEventBus();
 
-        //Initiate Telegram Bot Handler
-        ApiContextInitializer.init();
-
         HokifyBotsApi hokifyBotsApi = new HokifyBotsApi(this.jsonURL);
-        
+
         try {
             ArrayList<HokifyJob> hokifyJobs = hokifyBotsApi.fetchHokifyData();
-            
-            wonHokifyJobBotHandler = new WonHokifyJobBotHandler(bus, hokifyMessageGenerator, botName, token);
-            //logger.debug("botName: " + wonHokifyJobBotHandler.getBotUsername());
-            //logger.debug("botTokn: " + wonHokifyJobBotHandler.getBotToken());
-            //hokifyBotsApi.registerBot(wonHokifyJobBotHandler);
+
+            // wonHokifyJobBotHandler = new WonHokifyJobBotHandler(bus,
+            // hokifyMessageGenerator, botName, token);
 
             bus = getEventBus();
-          
+
             BotBehaviour executeWonMessageCommandBehaviour = new ExecuteWonMessageCommandBehaviour(ctx);
             executeWonMessageCommandBehaviour.activate();
-            
+
             bus.subscribe(CreateNeedFromJobEvent.class,
-                    new ActionOnEventListener(
-                            ctx,
-                            "CreateNeedFromJobEvent",
-                            new CreateNeedFromJobAction(ctx)
+                    new ActionOnEventListener(ctx, "CreateNeedFromJobEvent", new CreateNeedFromJobAction(ctx)
 
                     ));
             bus.publish(new CreateNeedFromJobEvent(hokifyJobs));
 
-            //bus.subscribe(eventClazz, listener);
-            //Hokify initiated Events
             /*
-            bus.subscribe(TelegramMessageReceivedEvent.class,
-                    new ActionOnEventListener(
-                            ctx,
-                            "TelegramMessageReceived",
-                            new TelegramMessageReceivedAction(ctx, wonTelegramBotHandler, telegramContentExtractor)
-                    ));
-            */
-            bus.subscribe(SendHelpEvent.class,
-                    new ActionOnEventListener(
-                            ctx,
-                            "HokifyHelpAction",
-                            new HokifyHelpAction(ctx, wonHokifyJobBotHandler)
-                    ));
-            /*
-            bus.subscribe(TelegramCreateNeedEvent.class,
-                    new ActionOnEventListener(
-                            ctx,
-                            "TelegramCreateAction",
-                            new TelegramCreateAction(ctx, wonTelegramBotHandler, telegramContentExtractor)
-                    ));
+             * bus.subscribe(SendHelpEvent.class, new ActionOnEventListener( ctx,
+             * "HokifyHelpAction", new HokifyHelpAction(ctx, wonHokifyJobBotHandler) ));
+             */
+            // WON initiated Events
 
-            //WON initiated Events
-            */
             bus.subscribe(HintFromMatcherEvent.class,
-                    new ActionOnEventListener(
-                            ctx,
-                            "HintReceived",
-                            new Hint2HokifyAction(ctx, wonHokifyJobBotHandler)
-                    ));
-            
-            bus.subscribe(ConnectFromOtherNeedEvent.class,
-                    new ActionOnEventListener(
-                            ctx,
-                            "ConnectReceived",
-                            new Connect2HokifyAction(ctx, wonHokifyJobBotHandler)
-                    ));
-            
-            bus.subscribe(MessageFromOtherNeedEvent.class,
-                    new ActionOnEventListener(
-                            ctx,
-                            "ReceivedTextMessage",
-                            new Message2HokifyAction(ctx, wonHokifyJobBotHandler)
-                    ));
+                    new ActionOnEventListener(ctx, "HintReceived", new Hint2HokifyAction(ctx)));
+
+            bus.subscribe(ConnectFromOtherNeedEvent.class, new ActionOnEventListener(ctx, "ConnectReceived",
+                    new Connect2HokifyAction(ctx)));
+
+            bus.subscribe(MessageFromOtherNeedEvent.class, new ActionOnEventListener(ctx, "ReceivedTextMessage",
+                    new Message2HokifyAction(ctx)));
 
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
     }
 
+    
+
+    public String getBotName() {
+        return this.botName;
+    }
+    
     public void setBotName(final String botName) {
         this.botName = botName;
     }
 
-    public void setToken(final String token) {
-        this.token = token;
-    }
-    
+
     public void setJsonURL(final String jsonURL) {
         this.jsonURL = jsonURL;
     }
@@ -164,5 +124,4 @@ public class HokifyJobBot extends EventBot {
         this.hokifyMessageGenerator = hokifyMessageGenerator;
     }
 
-    
 }

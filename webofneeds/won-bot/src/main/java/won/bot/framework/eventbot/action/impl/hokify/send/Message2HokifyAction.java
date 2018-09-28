@@ -30,45 +30,37 @@ public class Message2HokifyAction extends BaseEventBotAction {
 
     WonHokifyJobBotHandler wonHokifyBotHandler;
 
-    public Message2HokifyAction(EventListenerContext ctx, WonHokifyJobBotHandler wonHokifyBotHandler) {
+    public Message2HokifyAction(EventListenerContext ctx) {
         super(ctx);
-        this.wonHokifyBotHandler = wonHokifyBotHandler;
     }
 
     @Override
     protected void doRun(Event event, EventListener executingListener) throws Exception {
-        
+
         logger.info("MessageEvent received");
-        
+
         EventListenerContext ctx = getEventListenerContext();
 
-        if(event instanceof MessageFromOtherNeedEvent && ctx.getBotContextWrapper() instanceof HokifyJobBotContextWrapper) {
+        if (event instanceof MessageFromOtherNeedEvent
+                && ctx.getBotContextWrapper() instanceof HokifyJobBotContextWrapper) {
             HokifyJobBotContextWrapper botContextWrapper = (HokifyJobBotContextWrapper) ctx.getBotContextWrapper();
 
             Connection con = ((MessageFromOtherNeedEvent) event).getCon();
-            WonMessage wonMessage =((MessageFromOtherNeedEvent) event).getWonMessage();
 
             URI yourNeedUri = con.getNeedURI();
-            URI remoteNeedUri = con.getRemoteNeedURI();
-            String jobURL = botContextWrapper.getJobURLForURI(yourNeedUri);
-            if(jobURL == null) {
-                logger.error("No JobURL found for the specified needUri");
-                return;
-            }
+            String jobUrl = botContextWrapper.getJobURLForURI(yourNeedUri);
+            String respondWith = jobUrl != null ? "You need more information?\n Just follow this link: " + jobUrl
+                    : "The job is no longer available, sorry!";
 
-            try{
-                //TODO
-                String respondWith = "No informations so far;
-
+            try {
                 Model messageModel = WonRdfUtils.MessageUtils.textMessage(respondWith);
-                //TODO: Create Message that tells the other side which preconditions(shapes) are not yet met in a better way and not just by pushing a string into the conversation
+
                 getEventListenerContext().getEventBus().publish(new ConnectionMessageCommandEvent(con, messageModel));
-                
-                //Message message = wonHokifyBotHandler.getHokifyMessageGenerator().getConnectionTextMessage(remoteNeedUri, yourNeedUri, wonMessage));
-                //botContextWrapper.addMessageIdWonURIRelation(message.getMessageId(), new WonURI(con.getConnectionURI(), UriType.CONNECTION));
-            }catch (Exception te){
+
+            } catch (Exception te) {
                 logger.error(te.getMessage());
             }
+
         }
     }
 }

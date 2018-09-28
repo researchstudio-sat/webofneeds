@@ -26,9 +26,8 @@ import java.net.URI;
 public class Hint2HokifyAction extends BaseEventBotAction {
     WonHokifyJobBotHandler wonHokifyJobBotHandler;
 
-    public Hint2HokifyAction(EventListenerContext ctx, WonHokifyJobBotHandler wonHokifyJobBotHandler) {
+    public Hint2HokifyAction(EventListenerContext ctx) {
         super(ctx);
-        this.wonHokifyJobBotHandler = wonHokifyJobBotHandler;
     }
 
     @Override
@@ -53,10 +52,10 @@ public class Hint2HokifyAction extends BaseEventBotAction {
             }
 
             try{
-                Message message = wonHokifyJobBotHandler.sendMessage(wonHokifyJobBotHandler.getHokifyMessageGenerator().getHintMessage(remoteNeedUri, yourNeedUri));
-                botContextWrapper.addMessageIdWonURIRelation(message.getMessageId(), new WonURI(wonMessage.getReceiverURI(), UriType.CONNECTION));
+                //Message message = wonHokifyJobBotHandler.sendMessage(wonHokifyJobBotHandler.getHokifyMessageGenerator().getHintMessage(remoteNeedUri, yourNeedUri));
+                //botContextWrapper.addMessageIdWonURIRelation(wonMessage.getMessageURI(), new WonURI(wonMessage.getReceiverURI(), UriType.CONNECTION));
             }catch (Exception te){
-                logger.error(te.getMessage());
+                logger.error("HERE is the Hint Exception" + te.getMessage());
             }
         }
     }

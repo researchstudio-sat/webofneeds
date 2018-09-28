@@ -19,6 +19,13 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
+/**
+ * 
+ * @author MS
+ * 
+ * Handle messagest and requests to hokify in the future
+ *
+ */
 public class WonHokifyJobBotHandler implements ICommandRegistry {
     private String token;
     private String botName;
