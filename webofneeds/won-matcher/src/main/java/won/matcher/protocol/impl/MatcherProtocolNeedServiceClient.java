@@ -1,14 +1,16 @@
 package won.matcher.protocol.impl;
 
+import java.net.URI;
+import java.util.Optional;
+
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import won.protocol.matcher.MatcherProtocolNeedServiceClientSide;
 import won.protocol.message.WonMessage;
-import won.protocol.model.FacetType;
 import won.protocol.util.WonRdfUtils;
-
-import java.net.URI;
 
 /**
  * User: gabriel
@@ -24,7 +26,7 @@ public class MatcherProtocolNeedServiceClient implements MatcherProtocolNeedServ
             throws Exception {
         logger.info("need-facing: HINT called for needURI {} and otherNeed {} " +
                 "with score {} from originator {}.", new Object[]{needURI, otherNeed, score, originator});
-        Model facetModel = WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(FacetType.OwnerFacet.getURI(), FacetType.OwnerFacet.getURI());
+        Model facetModel = ModelFactory.createDefaultModel();
         delegate.hint(needURI, otherNeed, score, originator, facetModel, wonMessage);
     }
 

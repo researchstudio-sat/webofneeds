@@ -117,8 +117,10 @@ public class CreateDebugNeedWithFacetsAction extends AbstractCreateNeedAction
         needModelWrapper.setTitle(NeedContentPropertyType.IS_AND_SEEKS, replyText);
         needModelWrapper.setDescription(NeedContentPropertyType.IS_AND_SEEKS,
                                         "This is a need automatically created by the DebugBot.");
+        int i = 0;
         for (URI facet : facets) {
-            needModelWrapper.addFacetUri(facet.toString());
+            i++;
+            needModelWrapper.addFacet(needURI + "#facet" + i, facet.toString());
         }
         final Dataset debugNeedDataset = needModelWrapper.copyDataset();
         final Event origEvent = event;

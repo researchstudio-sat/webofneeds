@@ -18,9 +18,13 @@ package won.protocol.message.processor.impl;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import com.github.andrewoma.dexx.collection.Sets;
+
 import won.cryptography.rdfsign.SignatureVerificationState;
 import won.cryptography.rdfsign.WonKeysReaderWriter;
 import won.protocol.message.WonMessage;
@@ -35,6 +39,7 @@ import java.security.NoSuchProviderException;
 import java.security.PublicKey;
 import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 
@@ -103,13 +108,16 @@ public class SignatureCheckingWonMessageProcessor implements WonMessageProcessor
    */
   private Map<String, PublicKey> getRequiredPublicKeys(final Dataset msgDataset)
     throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
-
+      
     //extracted and then
     WonKeysReaderWriter keyReader = new WonKeysReaderWriter();
     // extract keys if directly provided in the message content:
     Map<String,PublicKey> keys = keyReader.readFromDataset(msgDataset);
     // extract referenced key by dereferencing a (kind of) webid of a signer
     Set<String> refKeys = keyReader.readKeyReferences(msgDataset);
+    if (logger.isDebugEnabled()) {
+        logger.debug("referenced keys: " + Arrays.toString(refKeys.toArray()));
+    }
     for (String refKey : refKeys) {
       if (!keys.containsKey(refKey)) {
         Dataset keyDataset = linkedDataSource.getDataForResource(URI.create(refKey));
@@ -123,6 +131,10 @@ public class SignatureCheckingWonMessageProcessor implements WonMessageProcessor
         }
       }
     }
+    if (logger.isDebugEnabled()) {
+        logger.debug("retrieved public keys of these webids: " + Arrays.toString(keys.keySet().toArray()));
+    }
     return keys;
   }
+  
 }

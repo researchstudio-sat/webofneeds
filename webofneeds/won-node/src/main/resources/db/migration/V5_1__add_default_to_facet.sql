@@ -1,0 +1,2 @@
+ALTER TABLE facet ADD COLUMN faceturi VARCHAR(255);
+ALTER TABLE facet ADD COLUMN defaultfacet CHAR;

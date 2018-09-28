@@ -76,8 +76,10 @@ public class CreateNeedFromMailAction extends AbstractCreateNeedAction {
                     needModelWrapper.addTag(type, tag);
                 }
 
+                int i = 1;
                 for (URI facet : facets) {
-                    needModelWrapper.addFacetUri(facet.toString());
+                    needModelWrapper.addFacet(needURI.toString()+"#facet"+i, facet.toString());
+                    i++;
                 }
 
                 Dataset dataset = needModelWrapper.copyDataset();

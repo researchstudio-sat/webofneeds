@@ -209,12 +209,16 @@ won.WONMSG.hasReceiver = won.WONMSG.baseUri + "hasReceiver";
 won.WONMSG.hasReceiverCompacted = won.WONMSG.prefix + ":hasReceiver";
 won.WONMSG.hasReceiverNode = won.WONMSG.baseUri + "hasReceiverNode";
 won.WONMSG.hasReceiverNodeCompacted = won.WONMSG.prefix + ":hasReceiverNode";
+won.WONMSG.hasReceiverFacet = won.WONMSG.baseUri + "hasReceiverFacet";
+won.WONMSG.hasReceiverFacetCompacted = won.WONMSG.prefix + ":hasReceiverFacet";
 won.WONMSG.hasSenderNeed = won.WONMSG.baseUri + "hasSenderNeed";
 won.WONMSG.hasSenderNeedCompacted = won.WONMSG.prefix + ":hasSenderNeed";
 won.WONMSG.hasSender = won.WONMSG.baseUri + "hasSender";
 won.WONMSG.hasSenderCompacted = won.WONMSG.prefix + ":hasSender";
 won.WONMSG.hasSenderNode = won.WONMSG.baseUri + "hasSenderNode";
 won.WONMSG.hasSenderNodeCompacted = won.WONMSG.prefix + ":hasSenderNode";
+won.WONMSG.hasSenderFacet = won.WONMSG.baseUri + "hasSenderFacet";
+won.WONMSG.hasSenderFacetCompacted = won.WONMSG.prefix + ":hasSenderFacet";
 won.WONMSG.hasMessageType = won.WONMSG.baseUri + ":hasMessageType";
 won.WONMSG.hasMessageTypeCompacted = won.WONMSG.prefix + ":hasMessageType";
 won.WONMSG.hasTimestamp = won.WONMSG.baseUri + "hasTimestamp";
@@ -1245,7 +1249,6 @@ WonMessage.prototype = {
       "http://purl.org/webofneeds/model#hasMatchCounterpart"
     );
   },
-
   getIsResponseTo: function() {
     return this.getProperty("http://purl.org/webofneeds/message#isResponseTo");
   },
@@ -1399,7 +1402,9 @@ WonMessage.prototype = {
       this.getMessageType() === "http://purl.org/webofneeds/message#NeedMessage"
     );
   },
-
+  isResponse: function() {
+    return this.isSuccessResponse() || this.isFailureResponse();
+  },
   isSuccessResponse: function() {
     return (
       this.getMessageType() ===
@@ -1823,7 +1828,9 @@ won.MessageBuilder.prototype = {
    * @returns {won.MessageBuilder}
    */
   hasFacet: function(facetURI) {
-    this.getContentGraphNode()[won.WON.hasFacetCompacted] = { "@id": facetURI };
+    this.getMessageEventNode()[won.WONMSG.hasSenderFacetCompacted] = {
+      "@id": facetURI,
+    };
     return this;
   },
   /**
@@ -1833,7 +1840,7 @@ won.MessageBuilder.prototype = {
    * @returns {won.MessageBuilder}
    */
   hasRemoteFacet: function(facetURI) {
-    this.getContentGraphNode()[won.WON.hasRemoteFacetCompacted] = {
+    this.getMessageEventNode()[won.WONMSG.hasReceiverFacetCompacted] = {
       "@id": facetURI,
     };
     return this;

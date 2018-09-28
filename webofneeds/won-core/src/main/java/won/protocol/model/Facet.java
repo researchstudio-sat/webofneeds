@@ -13,7 +13,7 @@ import javax.persistence.*;
 import java.net.URI;
 
 @Entity
-@Table(name = "facet", indexes = { @Index(name = "IDX_FACET_NEEEDURI_TYPEURI", columnList = "needURI, typeURI")})
+@Table(name = "facet", indexes = { @Index(name = "IDX_UNIQUE_FACET", columnList = "facetURI")})
 public class Facet {
     @Id
     @GeneratedValue
@@ -29,6 +29,15 @@ public class Facet {
     @Column( name = "typeURI")
     @Convert( converter = URIConverter.class)
     private URI typeURI;
+    
+    /* The uri of the facet - must be defined in the need's content */
+    @Column( name = "facetURI")
+    @Convert( converter = URIConverter.class)
+    private URI facetURI;
+    
+    @Column( name = "defaultFacet")
+    @Convert( converter = BooleanTFConverter.class)
+    private boolean isDefaultFacet = false;
 
     public Long getId() {
         return id;
@@ -52,6 +61,22 @@ public class Facet {
 
     public void setTypeURI(URI typeURI) {
         this.typeURI = typeURI;
+    }
+
+    public URI getFacetURI() {
+        return facetURI;
+    }
+
+    public void setFacetURI(URI facetURI) {
+        this.facetURI = facetURI;
+    }
+
+    public boolean isDefaultFacet() {
+        return isDefaultFacet;
+    }
+
+    public void setDefaultFacet(boolean isDefaultFacet) {
+        this.isDefaultFacet = isDefaultFacet;
     }
 
     @Override

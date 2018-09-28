@@ -336,6 +336,26 @@ public class RdfUtils {
 		}
 	}
 
+	/**
+	 * Set's the model's base URI. (i.e. the URI prefix for all relative or null relative URIs).
+	 * Does nothing else.
+	 * 
+	 * @param model
+	 */
+	public static void setBaseURI(final Model model, final String baseURI) {
+	   model.getNsPrefixMap().put("",baseURI);
+	}
+	
+	/**
+	 * Sets the model's base URI (i.e. the URI prefix for all relative or null relative URIs).
+	 * If the base URI was set previously, replace it in all statements with the new base URI.
+	 * Note that replacement operation does not do substring replacement, so any resources that
+	 * were created as relative to the base uri may or may not be altered, depending on the model 
+	 * implementation. 
+	 *     
+	 * @param model
+	 * @param baseURI
+	 */
 	public static void replaceBaseURI(final Model model, final String baseURI) {
 		// we assume that the RDF content is self-referential, i.e., it 'talks about
 		// itself': the graph is connected to
@@ -368,7 +388,8 @@ public class RdfUtils {
 
 	/**
 	 * Replaces the base URI that's set as the model's default URI prfefix in all
-	 * statements by replacement.
+	 * statements by replacement and changes the base URI to replacement.
+	 * Does not do anything if no base URI is set.
 	 *
 	 * @param model
 	 * @param replacement

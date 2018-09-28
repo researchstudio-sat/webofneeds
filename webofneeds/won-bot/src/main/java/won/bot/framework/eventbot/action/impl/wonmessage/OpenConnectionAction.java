@@ -17,6 +17,7 @@
 package won.bot.framework.eventbot.action.impl.wonmessage;
 
 import java.net.URI;
+import java.util.Optional;
 
 import org.apache.jena.query.Dataset;
 
@@ -78,8 +79,7 @@ public class OpenConnectionAction extends BaseEventBotAction
       logger.debug("opening connection based on hint {}", event);
       getEventListenerContext().getWonMessageSender().sendWonMessage(
         createConnectWonMessage(
-          hintEvent.getMatch().getFromNeed(), hintEvent.getMatch().getToNeed(),
-          FacetType.OwnerFacet.getURI(), FacetType.OwnerFacet.getURI()));
+          hintEvent.getMatch().getFromNeed(), hintEvent.getMatch().getToNeed(), Optional.empty(), Optional.empty()));
     }
   }
 
@@ -110,7 +110,7 @@ public class OpenConnectionAction extends BaseEventBotAction
       .build();
   }
 
-  private WonMessage createConnectWonMessage(URI fromUri, URI toUri, URI localFacet, URI remoteFacet)
+  private WonMessage createConnectWonMessage(URI fromUri, URI toUri, Optional<URI> localFacet, Optional<URI> remoteFacet)
     throws WonMessageBuilderException {
 
     WonNodeInformationService wonNodeInformationService =

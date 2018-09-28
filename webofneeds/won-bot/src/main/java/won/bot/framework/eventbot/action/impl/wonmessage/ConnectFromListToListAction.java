@@ -16,7 +16,14 @@
 
 package won.bot.framework.eventbot.action.impl.wonmessage;
 
+import java.net.URI;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+
 import org.apache.jena.query.Dataset;
+
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
@@ -26,10 +33,7 @@ import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
-
-import java.net.URI;
-import java.util.Date;
-import java.util.List;
+import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
 /**
    * BaseEventBotAction connecting two needs on the specified facets. The need's URIs are obtained from
@@ -39,35 +43,61 @@ public class ConnectFromListToListAction extends BaseEventBotAction
 {
       private String fromListName;
       private String toListName;
-      private URI fromFacet;
-      private URI toFacet;
+      private Optional<URI> fromFacetType = Optional.empty();
+      private Optional<URI> toFacetType = Optional.empty();
       private long millisBetweenCalls;
       private ConnectHook connectHook;
       private String welcomeMessage;
 
   public ConnectFromListToListAction(EventListenerContext eventListenerContext, String fromListName, String
-    toListName, URI fromFacet, URI toFacet, final long millisBetweenCalls, String welcomeMessage) {
+    toListName, URI fromFacetType, URI toFacetType, final long millisBetweenCalls, String welcomeMessage) {
       super(eventListenerContext);
+      Objects.requireNonNull(fromFacetType);
+      Objects.requireNonNull(toFacetType);
       this.fromListName = fromListName;
       this.toListName = toListName;
-      this.fromFacet = fromFacet;
-      this.toFacet = toFacet;
+      this.fromFacetType = Optional.of(fromFacetType);
+      this.toFacetType = Optional.of(toFacetType);
       this.millisBetweenCalls = millisBetweenCalls;
       this.welcomeMessage = welcomeMessage;
   }
 
   public ConnectFromListToListAction(final EventListenerContext eventListenerContext, final String fromListName,
-                                     final String toListName, final URI fromFacet, final URI toFacet, final long
+                                     final String toListName, final URI fromFacetType, final URI toFacetType, final long
                                        millisBetweenCalls, final ConnectHook connectHook, String welcomeMessage) {
     super(eventListenerContext);
+    Objects.requireNonNull(fromFacetType);
+    Objects.requireNonNull(toFacetType);
     this.fromListName = fromListName;
     this.toListName = toListName;
-    this.fromFacet = fromFacet;
-    this.toFacet = toFacet;
+    this.fromFacetType = Optional.of(fromFacetType);
+    this.toFacetType = Optional.of(toFacetType);
     this.millisBetweenCalls = millisBetweenCalls;
     this.connectHook = connectHook;
     this.welcomeMessage = welcomeMessage;
   }
+
+  
+  public ConnectFromListToListAction(EventListenerContext eventListenerContext, String fromListName, String
+          toListName, final long millisBetweenCalls, String welcomeMessage) {
+            super(eventListenerContext);
+            this.fromListName = fromListName;
+            this.toListName = toListName;
+            this.millisBetweenCalls = millisBetweenCalls;
+            this.welcomeMessage = welcomeMessage;
+        }
+
+        public ConnectFromListToListAction(final EventListenerContext eventListenerContext, final String fromListName,
+                                           final String toListName, final long
+                                             millisBetweenCalls, final ConnectHook connectHook, String welcomeMessage) {
+          super(eventListenerContext);
+          this.fromListName = fromListName;
+          this.toListName = toListName;
+          this.millisBetweenCalls = millisBetweenCalls;
+          this.connectHook = connectHook;
+          this.welcomeMessage = welcomeMessage;
+        }
+  
 
   @Override
       public void doRun(Event event, EventListener executingListener)
@@ -151,10 +181,10 @@ public class ConnectFromListToListAction extends BaseEventBotAction
       .setMessagePropertiesForConnect(
         wonNodeInformationService.generateEventURI(
           localWonNode),
-        fromFacet,
+        fromFacetType.map(facetType -> WonLinkedDataUtils.getFacetsOfType(fromUri, facetType, getEventListenerContext().getLinkedDataSource()).stream().findFirst().orElse(null)),
         fromUri,
         localWonNode,
-        toFacet,
+        toFacetType.map(facetType -> WonLinkedDataUtils.getFacetsOfType(toUri, facetType, getEventListenerContext().getLinkedDataSource()).stream().findFirst().orElse(null)),
         toUri,
         remoteWonNode, welcomeMessage)
       .build();

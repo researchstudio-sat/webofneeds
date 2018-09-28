@@ -39,7 +39,12 @@ public class ConnectionModelMapper implements ModelMapper<Connection> {
             connectionMember.addProperty(DCTerms.modified, lastUpdate);
         }
 
-        connectionMember.addProperty(WON.HAS_FACET, model.createResource(connection.getTypeURI().toString()));
+        Resource facet = model.createResource(connection.getFacetURI().toString());
+        connectionMember.addProperty(WON.HAS_FACET, facet);
+        facet.addProperty(RDF.type, model.getResource(connection.getTypeURI().toString()));
+        if (connection.getRemoteFacetURI() != null) {
+            connectionMember.addProperty(WON.HAS_REMOTE_FACET, model.getResource(connection.getRemoteFacetURI().toString()));
+        }
         return model;
     }
 
@@ -61,11 +66,15 @@ public class ConnectionModelMapper implements ModelMapper<Connection> {
         }
         connection.setNeedURI(URI.create(connectionRes.getProperty(WON.BELONGS_TO_NEED).getResource().getURI()));
         connection.setRemoteNeedURI(URI.create(connectionRes.getProperty(WON.HAS_REMOTE_NEED).getResource().getURI()));
-        connection.setTypeURI(URI.create(connectionRes.getProperty(WON.HAS_FACET).getResource().getURI()));
-
+        connection.setFacetURI(URI.create(connectionRes.getProperty(WON.HAS_FACET).getResource().getURI()));
+        if (connectionRes.hasProperty(WON.HAS_REMOTE_FACET)) {
+            connection.setRemoteFacetURI(URI.create(connectionRes.getProperty(WON.HAS_REMOTE_FACET).getResource().getURI()));
+        }
+        connection.setTypeURI(URI.create(connectionRes.getProperty(WON.HAS_FACET).getProperty(RDF.type).getResource().getURI()));
         Date lastUpdate = DateTimeUtils.parse(connectionRes.getProperty(DCTerms.modified).getString(), model);
         connection.setLastUpdate(lastUpdate);
 
         return connection;
     }
 }
+

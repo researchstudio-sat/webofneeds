@@ -139,8 +139,8 @@ public class NeedModelWrapperTest {
         needModelWrapper.setConnectionContainerUri("https://connnection1");
         needModelWrapper.setConnectionContainerUri("https://connnection2");
         Assert.assertEquals("https://connnection2", needModelWrapper.getConnectionContainerUri());
-        needModelWrapper.addFacetUri("https://facet1");
-        needModelWrapper.addFacetUri("https://facet2");
+        needModelWrapper.addFacet("#facet1", WON.OWNER_FACET_STRING);
+        needModelWrapper.addFacet("#facet2", WON.GROUP_FACET_STRING);
         Assert.assertEquals(2, needModelWrapper.getFacetUris().size());
         needModelWrapper.setWonNodeUri("https://wonnode1");
         needModelWrapper.setWonNodeUri("https://wonnode2");

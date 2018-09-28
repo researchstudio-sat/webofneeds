@@ -30,6 +30,7 @@ import won.protocol.util.WonRdfUtils;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Optional;
 
 /**
  * BaseEventBotAction that sends a hint message to the first need in the context to the second.
@@ -73,10 +74,10 @@ public class MatchNeedsAction extends BaseEventBotAction
         wonNodeInformationService.generateEventURI(
           localWonNode),
         needURI,
-        FacetType.OwnerFacet.getURI(),
+        Optional.empty(),
         localWonNode,
         otherNeedURI,
-        FacetType.OwnerFacet.getURI(),
+        Optional.empty(),
         originator,
         score)
       .build();

@@ -33,8 +33,8 @@ import java.util.Date;
     },
     uniqueConstraints = {
             @UniqueConstraint(name = "IDX_CONNECTION_UNIQUE_EVENT_CONTAINER_ID", columnNames = "event_container_id"),
-            @UniqueConstraint(name="IDX_UNIQUE_CONNECTION", columnNames = {"needURI", "remoteNeedURI", "typeURI"}),
-            @UniqueConstraint(name = "IDX_CONNECTION_UNIQUE_DATASETHOLDER_ID", columnNames = "datasetholder_id")
+            @UniqueConstraint(name = "IDX_CONNECTION_UNIQUE_DATASETHOLDER_ID", columnNames = "datasetholder_id"),
+            @UniqueConstraint(name = "IDX_UNIQUE_CONNECTION", columnNames = { "needURI", "remoteNeedURI", "facetURI", "remoteFacetURI"})
     })
 public class Connection implements ParentAware<ConnectionContainer>, VersionedEntity {
   @Id
@@ -63,6 +63,16 @@ public class Connection implements ParentAware<ConnectionContainer>, VersionedEn
   @Column(name = "typeURI")
   @Convert(converter = URIConverter.class)
   private URI typeURI;
+  
+  /* The uri of the facet. This must be a resource defined in the need's content. The type of that resource is the typeURI*/
+  @Column(name = "facetURI")
+  @Convert(converter = URIConverter.class)
+  private URI facetURI;
+  
+  /* The uri of the remote facet. This must be a resource defined in the remote need's content or null, if we don't know it yet */
+  @Column(name = "remoteFacetURI")
+  @Convert(converter = URIConverter.class)
+  private URI remoteFacetURI;
 
   /* The URI of the remote connection */
   /* Caution: on the owner side, the remote connection URI is never known. */
@@ -120,31 +130,43 @@ public class Connection implements ParentAware<ConnectionContainer>, VersionedEn
 
   //TODO: we may want to introduce a creation date?
 
-
-  @Override
-  public String toString()
-  {
-    return "Connection{" +
-        "id=" + id +
-        ", connectionURI=" + connectionURI +
-        ", needURI=" + needURI +
-        ", remoteConnectionURI=" + remoteConnectionURI +
-        ", remoteNeedURI=" + remoteNeedURI +
-        ", state=" + state +
-        '}';
-  }
+  
+  
 
     public URI getTypeURI() {
         return typeURI;
     }
 
+    @Override
+    public String toString() {
+        return "Connection [id=" + id + ", connectionURI=" + connectionURI + ", needURI=" + needURI + ", typeURI="
+                + typeURI + ", facetURI=" + facetURI + ", remoteFacetURI=" + remoteFacetURI + ", remoteConnectionURI="
+                + remoteConnectionURI + ", remoteNeedURI=" + remoteNeedURI + ", state=" + state + "]";
+    }
+
     public void setTypeURI(URI typeURI) {
         this.typeURI = typeURI;
     }
+    
+    public URI getFacetURI() {
+        return facetURI;
+    }
+
+    public void setFacetURI(URI facetURI) {
+        this.facetURI = facetURI;
+    }    
+
+    public URI getRemoteFacetURI() {
+        return remoteFacetURI;
+    }
+
+    public void setRemoteFacetURI(URI remoteFacetURI) {
+        this.remoteFacetURI = remoteFacetURI;
+    }
 
     public Long getId() {
-      return id;
-  }
+        return id;
+    }
 
   public void setId(Long id) {
       this.id = id;

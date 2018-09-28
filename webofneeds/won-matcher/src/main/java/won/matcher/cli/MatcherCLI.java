@@ -18,6 +18,7 @@ import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Optional;
 
 /**
  * User: gabriel
@@ -89,10 +90,10 @@ public class MatcherCLI implements CommandLineRunner
         wonNodeInformationService.generateEventURI(
           wonNode),
         needURI,
-        FacetType.OwnerFacet.getURI(),
+        Optional.empty(),
         wonNode,
         otherNeedURI,
-        FacetType.OwnerFacet.getURI(),
+        Optional.empty(),
         originator,
         score)
       .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL)

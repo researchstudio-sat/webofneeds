@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.apache.jena.query.Dataset;
@@ -40,9 +41,11 @@ public class WonMessageBuilder
   private URI senderURI;
   private URI senderNeedURI;
   private URI senderNodeURI;
+  private URI senderFacetURI;
   private URI receiverURI;
   private URI receiverNeedURI;
   private URI receiverNodeURI;
+  private URI receiverFacetURI;
 
   private WonMessageType wonMessageType;
   private WonMessageDirection wonMessageDirection;
@@ -148,7 +151,12 @@ public class WonMessageBuilder
       messageEventResource.addProperty(
         WONMSG.SENDER_NODE_PROPERTY,
         envelopeGraph.createResource(senderNodeURI.toString()));
-
+    if (senderFacetURI != null) {
+        messageEventResource.addProperty(
+        WONMSG.HAS_SENDER_FACET, 
+        envelopeGraph.createResource(senderFacetURI.toString()));
+    }
+    
     // add receiver
     if (receiverURI != null)
       messageEventResource.addProperty(
@@ -162,7 +170,12 @@ public class WonMessageBuilder
       messageEventResource.addProperty(
         WONMSG.RECEIVER_NODE_PROPERTY,
         envelopeGraph.createResource(receiverNodeURI.toString()));
-
+    if (receiverFacetURI != null) {
+        messageEventResource.addProperty(
+        WONMSG.HAS_RECEIVER_FACET, 
+        envelopeGraph.createResource(receiverFacetURI.toString()));
+    }
+    
     // add refersTo
     for (URI refersToURI : refersToURIs) {
       messageEventResource.addProperty(
@@ -319,9 +332,11 @@ public class WonMessageBuilder
     URI localWonNode,
     URI remoteConnection,
     URI remoteNeed,
-    URI remoteWonNode, String welcomeMessage) {
+    URI remoteWonNode,
+    Optional<URI> remoteFacet,
+    String welcomeMessage) {
 
-    return new WonMessageBuilder(messageURI)
+    WonMessageBuilder builder = new WonMessageBuilder(messageURI)
       .setWonMessageDirection(WonMessageDirection.FROM_OWNER)
       .setWonMessageType(WonMessageType.OPEN)
       .setSenderURI(localConnection)
@@ -329,11 +344,27 @@ public class WonMessageBuilder
       .setSenderNodeURI(localWonNode)
       .setReceiverURI(remoteConnection)
       .setReceiverNeedURI(remoteNeed)
-      .setReceiverNodeURI(remoteWonNode)
-      .setTextMessage(welcomeMessage)
+      .setReceiverNodeURI(remoteWonNode);
+    if (remoteFacet.isPresent()) {
+        builder.setSenderFacetURI(remoteFacet.get());
+    }
+    return builder.setTextMessage(welcomeMessage)
       .setSentTimestampToNow();
   }
 
+
+  public static WonMessageBuilder setMessagePropertiesForOpen(
+    URI messageURI,
+    URI localConnection,
+    URI localNeed,
+    URI localWonNode,
+    URI remoteConnection,
+    URI remoteNeed,
+    URI remoteWonNode,
+    String welcomeMessage) {
+      return setMessagePropertiesForOpen(messageURI, localConnection, localNeed, localWonNode, remoteConnection, remoteNeed, remoteWonNode, Optional.empty(), welcomeMessage);
+  }
+  
   public static WonMessageBuilder setMessagePropertiesForClose(
     URI messageURI,
     URI localConnection,
@@ -471,28 +502,35 @@ public class WonMessageBuilder
 
   public static WonMessageBuilder setMessagePropertiesForConnect(
     URI messageURI,
-    URI localFacet,
+    Optional<URI> localFacet,
     URI localNeed,
     URI localWonNode,
-    URI remoteFacet,
+    Optional<URI> remoteFacet,
     URI remoteNeed,
     URI remoteWonNode,
     String welcomeMessage) {
 
-    // create facet model
-    Model facetModel = WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(localFacet, remoteFacet);
-    RdfUtils.replaceBaseResource(facetModel, facetModel.createResource(messageURI.toString()));
+    // create content model
+    Model model = ModelFactory.createDefaultModel();
+    RdfUtils.findOrCreateBaseResource(model);
+    RdfUtils.replaceBaseResource(model, model.createResource(messageURI.toString()));
     if (welcomeMessage != null){
-      WonRdfUtils.MessageUtils.addMessage(facetModel, welcomeMessage);
+      WonRdfUtils.MessageUtils.addMessage(model, welcomeMessage);
     }
-    return new WonMessageBuilder(messageURI)
+    WonMessageBuilder builder =  new WonMessageBuilder(messageURI)
       .setWonMessageDirection(WonMessageDirection.FROM_OWNER)
       .setWonMessageType(WonMessageType.CONNECT)
       .setSenderNeedURI(localNeed)
       .setSenderNodeURI(localWonNode)
       .setReceiverNeedURI(remoteNeed)
-      .setReceiverNodeURI(remoteWonNode)
-      .addContent(facetModel)
+      .setReceiverNodeURI(remoteWonNode);
+    if (localFacet.isPresent()) {
+        builder.setSenderFacetURI(localFacet.get());
+    }
+    if (remoteFacet.isPresent()) {
+        builder.setReceiverFacetURI(remoteFacet.get());
+    }
+    return builder.addContent(model)
       .setSentTimestampToNow();
   }
 
@@ -512,28 +550,35 @@ public class WonMessageBuilder
   public static WonMessageBuilder setMessagePropertiesForHint(
     URI messageURI,
     URI needURI,
-    URI needFacetURI,
+    Optional<URI> needFacetURI,
     URI wonNodeURI,
     URI otherNeedURI,
-    URI otherNeedFacet,
+    Optional<URI> otherNeedFacet,
     URI matcherURI,
     double score) {
 
-    Model contentModel = WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(needFacetURI, otherNeedFacet);
+    Model contentModel =  ModelFactory.createDefaultModel();
+    RdfUtils.findOrCreateBaseResource(contentModel);
     Resource msgResource = contentModel.createResource(messageURI.toString());
     RdfUtils.replaceBaseResource(contentModel, msgResource);
     contentModel.add(msgResource, WON.HAS_MATCH_SCORE,
-      contentModel.createTypedLiteral(score));
+    contentModel.createTypedLiteral(score));
     contentModel.add(msgResource, WON.HAS_MATCH_COUNTERPART,
-      contentModel.createResource(otherNeedURI.toString()));
+    contentModel.createResource(otherNeedURI.toString()));
 
-    return new WonMessageBuilder(messageURI)
+    WonMessageBuilder builder = new WonMessageBuilder(messageURI)
       .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL)
       .setWonMessageType(WonMessageType.HINT_MESSAGE)
       .setSenderNodeURI(matcherURI)
       .setReceiverNeedURI(needURI)
-      .setReceiverNodeURI(wonNodeURI)
-      .setSentTimestampToNow()
+      .setReceiverNodeURI(wonNodeURI);
+    if (needFacetURI.isPresent()) {
+        builder.setSenderFacetURI(needFacetURI.get());
+    }
+    if (otherNeedFacet.isPresent()) {
+        builder.setReceiverFacetURI(otherNeedFacet.get());
+    }
+    return builder.setSentTimestampToNow()
       .addContent(contentModel);
   }
 
@@ -559,36 +604,6 @@ public class WonMessageBuilder
       .setSenderURI(connectionURI)
       .setSentTimestampToNow()
       .addContent(contentModel);
-  }
-
-  public static WonMessageBuilder setMessagePropertiesForHintNotification(
-    URI messageURI,
-    URI needURI,
-    URI needFacetURI,
-    URI needConnectionURI,
-    URI wonNodeURI,
-    URI otherNeedURI,
-    URI otherNeedFacet,
-    URI matcherURI,
-    double score) {
-
-    Model contentModel = WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(needFacetURI, otherNeedFacet);
-    Resource msgResource = contentModel.createResource(messageURI.toString());
-    RdfUtils.replaceBaseResource(contentModel, msgResource);
-    contentModel.add(msgResource, WON.HAS_MATCH_SCORE,
-                     contentModel.createTypedLiteral(score));
-    contentModel.add(msgResource, WON.HAS_MATCH_COUNTERPART,
-                     contentModel.createResource(otherNeedURI.toString()));
-
-    return new WonMessageBuilder(messageURI)
-      .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL)
-      .setWonMessageType(WonMessageType.HINT_MESSAGE)
-      .setSenderNodeURI(matcherURI)
-      .setReceiverURI(needConnectionURI)
-      .setReceiverNeedURI(needURI)
-      .setReceiverNodeURI(wonNodeURI)
-      .addContent(contentModel)
-      .setSentTimestampToNow();
   }
 
   public static WonMessageBuilder setMessagePropertiesForConnectionMessage(
@@ -742,11 +757,16 @@ public class WonMessageBuilder
     return this;
   }
 
+  public WonMessageBuilder setSenderFacetURI(URI senderFacetURI) {
+      this.senderFacetURI = senderFacetURI;
+      return this;
+  }
+  
   public WonMessageBuilder setReceiverURI(URI receiverURI) {
     this.receiverURI = receiverURI;
     return this;
   }
-
+  
   public WonMessageBuilder setReceiverNeedURI(URI receiverNeedURI) {
     this.receiverNeedURI = receiverNeedURI;
     return this;
@@ -755,6 +775,11 @@ public class WonMessageBuilder
   public WonMessageBuilder setReceiverNodeURI(URI receiverNodeURI) {
     this.receiverNodeURI = receiverNodeURI;
     return this;
+  }
+  
+  public WonMessageBuilder setReceiverFacetURI(URI receiverFacetURI) {
+      this.receiverFacetURI = receiverFacetURI;
+      return this;
   }
 
   public WonMessageBuilder setWonMessageType(WonMessageType wonMessageType) {
