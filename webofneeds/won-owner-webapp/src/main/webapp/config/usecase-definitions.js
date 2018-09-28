@@ -1,11 +1,12 @@
-import { details, emptyDraft } from "detailDefinitions";
-import { realEstateGroup } from "realEstateUseCases";
-import { transportGroup } from "transportUseCases";
-import { complainGroup } from "complainUseCases";
-import { socialGroup } from "socialUseCases";
-import { professionalGroup } from "professionalUseCases";
-import { mobilityGroup } from "mobilityUseCases";
-import { musicianGroup } from "musicianUseCases";
+import { details, emptyDraft } from "./detail-definitions.js";
+
+import { realEstateGroup } from "./usecases/real-estate.js";
+import { transportGroup } from "./usecases/transport.js";
+import { complainGroup } from "./usecases/complain.js";
+import { socialGroup } from "./usecases/social.js";
+import { professionalGroup } from "./usecases/professional.js";
+import { mobilityGroup } from "./usecases/mobility.js";
+import { musicianGroup } from "./usecases/musician.js";
 
 import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../app/won-utils.js";
 
