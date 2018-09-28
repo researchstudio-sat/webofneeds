@@ -29,22 +29,8 @@ main =
 
 
 type ViewMode
-    = Wide
-    | Narrow
-
-
-classifyViewMode : Int -> ViewMode
-classifyViewMode width =
-    if width > 560 then
-        Wide
-
-    else
-        Narrow
-
-
-type View
-    = Page ViewMode Page
-    | Overview
+    = Narrow (Maybe Page)
+    | Wide Page
 
 
 type Page
@@ -53,7 +39,7 @@ type Page
 
 type alias Model =
     { skin : Skin
-    , view : View
+    , viewMode : ViewMode
     }
 
 
@@ -66,7 +52,7 @@ init () =
             , subtitleGray = rgb255 128 128 128
             , black = rgb255 0 0 0
             }
-      , view = Overview
+      , viewMode = Narrow Nothing
       }
     , Task.perform
         (\{ viewport } ->
@@ -88,8 +74,8 @@ init () =
 view : Model -> Html Msg
 view model =
     layout [] <|
-        case model.view of
-            Page Wide page ->
+        case model.viewMode of
+            Wide page ->
                 row
                     [ centerX
                     , width
@@ -110,7 +96,7 @@ view model =
                                 |> map (PageMessage << IdentitiesMsg)
                     ]
 
-            Page Narrow page ->
+            Narrow (Just page) ->
                 column
                     [ width fill
                     , padding 20
@@ -124,7 +110,7 @@ view model =
                                 |> map (PageMessage << IdentitiesMsg)
                     ]
 
-            Overview ->
+            Narrow Nothing ->
                 column
                     [ width fill
                     , padding 20
@@ -259,32 +245,29 @@ update msg model =
     case msg of
         PageMessage pMsg ->
             ( { model
-                | view = mapView (updatePage pMsg) model.view
+                | viewMode = mapViewMode (updatePage pMsg) model.viewMode
               }
             , Cmd.none
             )
 
         ScreenResized { width } ->
             ( { model
-                | view =
-                    case ( classifyViewMode width, model.view ) of
-                        ( Wide, Overview ) ->
-                            Page Wide <| changeRoute Identities
+                | viewMode =
+                    case ( width > 560, model.viewMode ) of
+                        ( True, Narrow Nothing ) ->
+                            Wide <| changeRoute Identities
 
-                        ( Wide, Page Narrow page ) ->
-                            Page Wide page
+                        ( True, Narrow (Just page) ) ->
+                            Wide page
 
-                        ( Wide, Page Wide _ ) ->
-                            model.view
+                        ( True, Wide _ ) ->
+                            model.viewMode
 
-                        ( Narrow, Overview ) ->
-                            Overview
+                        ( False, Wide page ) ->
+                            Narrow (Just page)
 
-                        ( Narrow, Page Wide page ) ->
-                            Page Narrow page
-
-                        ( Narrow, Page Narrow _ ) ->
-                            model.view
+                        ( False, Narrow _ ) ->
+                            model.viewMode
               }
             , Cmd.none
             )
@@ -298,46 +281,50 @@ update msg model =
 
         ChangeRoute newRoute ->
             ( { model
-                | view =
-                    case model.view of
-                        Page width page ->
+                | viewMode =
+                    case model.viewMode of
+                        Narrow (Just page) ->
                             if toRoute page /= newRoute then
-                                Page width (changeRoute newRoute)
+                                Narrow <| Just (changeRoute newRoute)
 
                             else
-                                model.view
+                                model.viewMode
 
-                        Overview ->
-                            Page Narrow (changeRoute newRoute)
+                        Narrow Nothing ->
+                            Narrow <| Just (changeRoute newRoute)
+
+                        Wide page ->
+                            if toRoute page /= newRoute then
+                                Wide <| changeRoute newRoute
+
+                            else
+                                model.viewMode
               }
             , Cmd.none
             )
 
         GoBack ->
             ( { model
-                | view =
-                    case model.view of
-                        Page Narrow _ ->
-                            Overview
+                | viewMode =
+                    case model.viewMode of
+                        Narrow _ ->
+                            Narrow Nothing
 
-                        Overview ->
-                            Overview
-
-                        Page Wide _ ->
-                            model.view
+                        Wide _ ->
+                            model.viewMode
               }
             , Cmd.none
             )
 
 
-mapView : (Page -> Page) -> View -> View
-mapView f oldView =
-    case oldView of
-        Overview ->
-            Overview
+mapViewMode : (Page -> Page) -> ViewMode -> ViewMode
+mapViewMode f viewMode =
+    case viewMode of
+        Wide page ->
+            Wide (f page)
 
-        Page width page ->
-            Page width (f page)
+        Narrow maybePage ->
+            Narrow <| Maybe.map f maybePage
 
 
 changeRoute : Route -> Page
