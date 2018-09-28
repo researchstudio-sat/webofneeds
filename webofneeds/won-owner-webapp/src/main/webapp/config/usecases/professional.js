@@ -1,8 +1,8 @@
 /**
  * Created by fsuda on 18.09.2018.
  */
-import { details, emptyDraft } from "detailDefinitions";
-import { interestsDetail, skillsDetail } from "personDetails";
+import { details, emptyDraft } from "../detail-definitions.js";
+import { interestsDetail, skillsDetail } from "../details/person.js";
 import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-utils.js";
 
 export const professionalGroup = {

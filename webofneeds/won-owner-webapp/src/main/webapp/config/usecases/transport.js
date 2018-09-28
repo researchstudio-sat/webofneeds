@@ -1,7 +1,7 @@
 /**
  * Created by fsuda on 18.09.2018.
  */
-import { details, abstractDetails, emptyDraft } from "detailDefinitions";
+import { details, abstractDetails, emptyDraft } from "../detail-definitions.js";
 import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-utils.js";
 import won from "../../app/won-es6.js";
 import { isValidNumber, get, getInFromJsonLd } from "../../app/utils.js";
