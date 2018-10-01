@@ -35,8 +35,9 @@ public class DerivationService {
     Map<URI, FacetDerivationConfig> hardcodedConfigs = new HashMap<>();
     
     public DerivationService() {
+        addConfig(new DerivationConfigOfHoldableFacet());
+        addConfig(new DerivationConfigOfHolderFacet());        
         addConfig(new DerivationConfigOfGroupFacet());
-        addConfig(new DerivationConfigOfOwnableFacet());
         addConfig(new DerivationConfigOfChatFacet());
     }
     

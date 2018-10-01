@@ -204,6 +204,10 @@ public class WON {
     public static final Property HAS_GROUP_MEMBER = m.createProperty(BASE_URI, "hasGroupMember");
     public static final String OWNED_BY_STRING = BASE_URI + "ownedBy";
     public static final Property OWNED_BY = m.createProperty(BASE_URI + "ownedBy");
+    public static final String HELD_BY_STRING = BASE_URI + "heldBy";
+    public static final Property HELD_BY = m.createProperty(BASE_URI + "heldBy");
+    public static final String HOLDS_STRING = BASE_URI + "holds";
+    public static final Property HOLDS = m.createProperty(BASE_URI + "holds");
     public static final String OWNS_STRING = BASE_URI + "owns";
     public static final Property OWNS = m.createProperty(BASE_URI + "owns");
     public static final String CONNECTED_WITH_STRING = BASE_URI + "connectedWith";

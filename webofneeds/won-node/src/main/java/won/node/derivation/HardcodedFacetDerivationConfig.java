@@ -17,7 +17,7 @@ public abstract class HardcodedFacetDerivationConfig implements FacetDerivationC
     }
 
     @Override
-    public Set<Property> getDerivationProperties() {
+    final public Set<Property> getDerivationProperties() {
         return derivationProperties;
     }
 }

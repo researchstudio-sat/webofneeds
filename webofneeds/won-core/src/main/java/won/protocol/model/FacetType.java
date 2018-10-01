@@ -13,6 +13,8 @@ import java.net.URI;
  */
 public enum FacetType {
     ChatFacet("ChatFacet"),
+    HolderFacet("HolderFacet"),
+    HoldableFacet("HoldableFacet"),
     GroupFacet("GroupFacet"),
     CoordinatorFacet("CoordinatorFacet"),
     ParticipantFacet("ParticipantFacet"),
