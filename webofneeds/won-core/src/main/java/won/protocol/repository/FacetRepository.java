@@ -16,4 +16,10 @@ public interface FacetRepository extends WonRepository<Facet> {
     List<Facet> findByNeedURI(URI needURI);
 
     List<Facet> findByNeedURIAndTypeURI(URI needURI, URI typeURI);
+    
+    List<Facet> findByNeedURIAndFacetURI(URI needURI, URI facetURI);
+    
+    Facet findOneByNeedURIAndTypeURI(URI needURI, URI typeURI);
+    
+    Facet findOneByNeedURIAndFacetURI(URI needURI, URI facetURI);
 }

@@ -16,19 +16,22 @@
 
 package won.protocol.repository;
 
+import java.net.URI;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+
+import javax.persistence.LockModeType;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
 import won.protocol.message.WonMessageType;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionState;
-
-import javax.persistence.LockModeType;
-import java.net.URI;
-import java.util.Date;
-import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -45,14 +48,19 @@ public interface ConnectionRepository extends WonRepository<Connection>
 
   @Lock(LockModeType.PESSIMISTIC_WRITE)
   @Query("select con from Connection con where connectionURI = :uri")
-  Connection findOneByConnectionURIForUpdate(@Param("uri") URI uri);
+  Optional<Connection> findOneByConnectionURIForUpdate(@Param("uri") URI uri);
 
   Connection findOneByConnectionURIAndVersionNot(URI URI, int version);
 
   @Lock(LockModeType.PESSIMISTIC_WRITE)
-  @Query("select con from Connection con where needURI = :needUri and remoteNeedURI = :remoteNeedUri and typeURI = :typeUri")
-  Connection findOneByNeedURIAndRemoteNeedURIAndTypeURIForUpdate(@Param("needUri") URI needURI, @Param("remoteNeedUri") URI remoteNeedURI, @Param("typeUri") URI typeUri);
-
+  @Query("select con from Connection con where needURI = :needUri and remoteNeedURI = :remoteNeedUri and facetURI = :facetUri and remoteFacetURI = :remoteFacetUri")
+  Optional<Connection> findOneByNeedURIAndRemoteNeedURIAndFacetURIAndRemoteFacetURIForUpdate(@Param("needUri") URI needURI, @Param("remoteNeedUri") URI remoteNeedURI, @Param("facetUri") URI facetUri, @Param("remoteFacetUri") URI remoteFacetURI);
+ 
+  @Lock(LockModeType.PESSIMISTIC_WRITE)
+  @Query("select con from Connection con where needURI = :needUri and remoteNeedURI = :remoteNeedUri and facetURI = :facetUri and remoteFacetURI is null")
+  Optional<Connection> findOneByNeedURIAndRemoteNeedURIAndFacetURIAndNullRemoteFacetForUpdate(@Param("needUri") URI needURI, @Param("remoteNeedUri") URI remoteNeedURI, @Param("facetUri") URI facetUri);
+ 
+  
   List<Connection> findByNeedURI(URI URI);
 
   Slice<Connection> findByNeedURI(URI URI, Pageable pageable);
@@ -60,6 +68,8 @@ public interface ConnectionRepository extends WonRepository<Connection>
   List<Connection> findByNeedURIAndRemoteNeedURI(URI needURI, URI remoteNeedURI);
 
   List<Connection> findByNeedURIAndStateAndTypeURI(URI needURI, ConnectionState connectionState, URI facetType);
+  
+  List<Connection> findByFacetURIAndState(URI facetURI, ConnectionState connectionState);
 
   List<Connection> findByNeedURIAndRemoteNeedURIAndState(URI needURI, URI remoteNeedURI, ConnectionState connectionState);
   

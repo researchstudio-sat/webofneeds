@@ -16,9 +16,13 @@
 
 package won.node.camel.processor.general;
 
+import java.net.URI;
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageUtils;
 import won.protocol.message.processor.WonMessageProcessor;
@@ -28,8 +32,6 @@ import won.protocol.repository.ConnectionEventContainerRepository;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.NeedEventContainerRepository;
 import won.protocol.repository.NeedRepository;
-
-import java.net.URI;
 
 /**
  * Acquires a pessimistic read lock on the message's parent.
@@ -68,8 +70,8 @@ public class LockMessageParentWonMessageProcessor implements WonMessageProcessor
         //get the parent's URI (either a connection or a need
         URI parentURI = WonMessageUtils.getParentEntityUri(message);
         //try a connection:
-        Connection con = connectionRepository.findOneByConnectionURIForUpdate(parentURI);
-        if (con != null) {
+        Optional<Connection> con = connectionRepository.findOneByConnectionURIForUpdate(parentURI);
+        if (con.isPresent()) {
             connectionEventContainerRepository.findOneByParentUriForUpdate(parentURI);
         } else {
             needRepository.findOneByNeedURIForUpdate(parentURI);

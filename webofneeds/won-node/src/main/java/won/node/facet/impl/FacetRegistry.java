@@ -21,26 +21,26 @@ public class FacetRegistry {
   @Autowired
   private ConnectionRepository connectionRepository;
 
-  private HashMap<FacetType, Facet> map;
+  private HashMap<FacetType, FacetLogic> map;
 
-  public Facet get(Connection con)  {
+  public FacetLogic get(Connection con)  {
     return get(FacetType.getFacetType(con.getTypeURI()));
   }
 
-  public Facet get(URI connectionURI) throws NoSuchConnectionException {
+  public FacetLogic get(URI connectionURI) throws NoSuchConnectionException {
     return get(FacetType.getFacetType(
         DataAccessUtils.loadConnection(connectionRepository, connectionURI).getTypeURI()));
   }
 
-  public Facet get(FacetType ft) {
+  public FacetLogic get(FacetType ft) {
     return map.get(ft);
   }
 
-  public void register(FacetType ft, Facet fi) {
+  public void register(FacetType ft, FacetLogic fi) {
     map.put(ft, fi);
   }
 
-  public void setMap(HashMap<FacetType, Facet> map) {
+  public void setMap(HashMap<FacetType, FacetLogic> map) {
     this.map = map;
   }
 }

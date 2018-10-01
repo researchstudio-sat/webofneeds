@@ -28,7 +28,7 @@ import java.net.URI;
  * User: fkleedorfer
  * Date: 25.03.14
  */
-public interface Facet
+public interface FacetLogic
 {
 
   FacetType getFacetType();

@@ -26,6 +26,7 @@ import won.protocol.model.FacetType;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Akka camel actor used to send out hints to won nodes
@@ -100,10 +101,10 @@ public class HintProducerProtocolActor extends UntypedProducerActor
       .setMessagePropertiesForHint(
         hint.getGeneratedEventUri(),
         URI.create(hint.getFromNeedUri()),
-        FacetType.OwnerFacet.getURI(),
+        Optional.empty(),
         wonNode,
         URI.create(hint.getToNeedUri()),
-        FacetType.OwnerFacet.getURI(),
+        Optional.empty(),        
         URI.create(hint.getMatcherUri()),
         hint.getScore())
       .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL)

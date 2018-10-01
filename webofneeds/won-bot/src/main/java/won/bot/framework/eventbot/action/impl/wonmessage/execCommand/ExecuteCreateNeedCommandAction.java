@@ -77,8 +77,10 @@ public class ExecuteCreateNeedCommandAction extends BaseEventBotAction {
 
         NeedModelWrapper needModelWrapper = new NeedModelWrapper(needDataset);
 
+        int i = 0;
         for (URI facetURI : facets) {
-            WonRdfUtils.FacetUtils.addFacet(needModelWrapper.getNeedModel(), facetURI);
+            i++;
+            needModelWrapper.addFacet(needUriBeforeCreation.toString()+"#facet" + i, facetURI.toString());
         }
         final Dataset needDatasetWithFacets = needModelWrapper.copyDataset();
         final URI wonNodeUri = getEventListenerContext().getNodeURISource().getNodeURI();

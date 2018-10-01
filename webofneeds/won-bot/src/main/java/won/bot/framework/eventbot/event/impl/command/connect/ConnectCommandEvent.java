@@ -16,39 +16,43 @@
 
 package won.bot.framework.eventbot.event.impl.command.connect;
 
+import java.net.URI;
+import java.util.Objects;
+import java.util.Optional;
+
 import won.bot.framework.eventbot.event.BaseNeedSpecificEvent;
 import won.bot.framework.eventbot.event.RemoteNeedSpecificEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandEvent;
 import won.protocol.message.WonMessageType;
 import won.protocol.model.FacetType;
 
-import java.net.URI;
-
 /**
  * Instructs the bot to connect to the specified remoteNeed on behalf of the need.
  */
 public class ConnectCommandEvent extends BaseNeedSpecificEvent implements MessageCommandEvent, RemoteNeedSpecificEvent {
     private URI remoteNeedURI;
-    private URI localFacet;
-    private URI remoteFacet;
+    private Optional<URI> localFacet = Optional.empty();
+    private Optional<URI> remoteFacet = Optional.empty();
     private String welcomeMessage;
 
     public ConnectCommandEvent(URI needURI, URI remoteNeedURI, URI localFacet, URI remoteFacet, String welcomeMessage) {
         super(needURI);
+        Objects.requireNonNull(localFacet);
+        Objects.requireNonNull(remoteFacet);
         this.remoteNeedURI = remoteNeedURI;
-        this.localFacet = localFacet;
-        this.remoteFacet = remoteFacet;
+        this.localFacet = Optional.of(localFacet);
+        this.remoteFacet = Optional.of(remoteFacet);
         this.welcomeMessage = welcomeMessage;
     }
 
-
-
     public ConnectCommandEvent(URI needURI, URI remoteNeedURI, String welcomeMessage) {
-       this(needURI, remoteNeedURI, FacetType.OwnerFacet.getURI(), FacetType.OwnerFacet.getURI(), welcomeMessage);
+        super(needURI);
+        this.remoteNeedURI = remoteNeedURI;
+        this.welcomeMessage = welcomeMessage;
     }
 
     public ConnectCommandEvent(URI needURI, URI remoteNeedURI) {
-        this(needURI, remoteNeedURI, FacetType.OwnerFacet.getURI(), FacetType.OwnerFacet.getURI(), "Hello!");
+        this(needURI, remoteNeedURI, "Hello!");
     }
 
     @Override
@@ -60,11 +64,11 @@ public class ConnectCommandEvent extends BaseNeedSpecificEvent implements Messag
         return remoteNeedURI;
     }
 
-    public URI getLocalFacet() {
+    public Optional<URI> getLocalFacet() {
         return localFacet;
     }
 
-    public URI getRemoteFacet() {
+    public Optional<URI> getRemoteFacet() {
         return remoteFacet;
     }
 

@@ -1,7 +1,7 @@
 package won.node.camel.processor.fixed;
 
 import java.net.URI;
-import java.util.Collection;
+import java.util.Optional;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
@@ -11,12 +11,12 @@ import org.springframework.stereotype.Component;
 
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
-import won.protocol.exception.WonProtocolException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEventType;
 import won.protocol.model.ConnectionState;
+import won.protocol.model.Facet;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
@@ -63,27 +63,29 @@ public class HintMessageProcessor extends AbstractCamelProcessor {
             throw new IllegalArgumentException("originator is not set");
 
 
-        URI facet = WonRdfUtils.FacetUtils.getFacet(wonMessage);
-        if (facet == null) {
-            //get the first one of the need's supported facets. TODO: implement some sort of strategy for choosing a facet here (and in the matcher)
-            Collection<URI> facets = dataService.getSupportedFacets(needURIFromWonMessage);
-            if (facets.isEmpty()) throw new IllegalArgumentException(
-                    "hint does not specify facets, falling back to using one of the need's supported facets failed as the need does not support any facets");
-            //add the facet to the model.
-            facet = facets.iterator().next();
-        }
+        //facet: either specified or default
+        URI facetURI = WonRdfUtils.FacetUtils.getFacet(wonMessage);
+        //remote facet: either specified or null
+        Optional<URI> remoteFacetURI = Optional.ofNullable(WonRdfUtils.FacetUtils.getRemoteFacet(wonMessage));
+        Facet facet = dataService.getFacet(needURIFromWonMessage, facetURI == null ? Optional.empty() : Optional.of(facetURI));
+        
         //create Connection in Database
-        Connection con = connectionRepository.findOneByNeedURIAndRemoteNeedURIAndTypeURIForUpdate(needURIFromWonMessage, otherNeedURIFromWonMessage, facet);
-        if (con == null) {
+        Optional<Connection> con = Optional.empty();
+        if (remoteFacetURI.isPresent()) {
+             con = connectionRepository.findOneByNeedURIAndRemoteNeedURIAndFacetURIAndRemoteFacetURIForUpdate(needURIFromWonMessage, otherNeedURIFromWonMessage, facet.getFacetURI(), remoteFacetURI.get());
+        } else {
+            con = connectionRepository.findOneByNeedURIAndRemoteNeedURIAndFacetURIAndNullRemoteFacetForUpdate(needURIFromWonMessage, otherNeedURIFromWonMessage, facet.getFacetURI());
+        }
+        if (!con.isPresent()) {
             URI connectionUri = wonNodeInformationService.generateConnectionURI(
                     wonNodeFromWonMessage);
-            con = dataService.createConnection(
+            con = Optional.of(dataService.createConnection(
                     connectionUri, needURIFromWonMessage, otherNeedURIFromWonMessage,
-                    null, facet, ConnectionState.SUGGESTED, ConnectionEventType.MATCHER_HINT);
+                    null, facet.getFacetURI(), facet.getTypeURI(), remoteFacetURI.orElse(null), ConnectionState.SUGGESTED, ConnectionEventType.MATCHER_HINT));
         }
         //build message to send to owner, put in header
         //set the receiver to the newly generated connection uri
-        wonMessage.addMessageProperty(WONMSG.RECEIVER_PROPERTY, con.getConnectionURI());
+        wonMessage.addMessageProperty(WONMSG.RECEIVER_PROPERTY, con.get().getConnectionURI());
     }
 
     private boolean isTooManyHints(URI needURIFromWonMessage) {

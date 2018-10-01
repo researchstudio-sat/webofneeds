@@ -57,7 +57,7 @@ public class CloseMessageFromSystemProcessor extends AbstractCamelProcessor
 
     logger.debug("CLOSE received from the system side for connection {}", wonMessage.getSenderURI());
 
-    Connection con = connectionRepository.findOneByConnectionURIForUpdate(wonMessage.getSenderURI());
+    Connection con = connectionRepository.findOneByConnectionURIForUpdate(wonMessage.getSenderURI()).get();
     ConnectionState originalState = con.getState();
       //TODO: we could introduce SYSTEM_CLOSE here
     con = dataService.nextConnectionState(con, ConnectionEventType.OWNER_CLOSE);

@@ -75,8 +75,10 @@ public class CreateNeedWithFacetsAction extends AbstractCreateNeedAction {
 
         NeedModelWrapper needModelWrapper = new NeedModelWrapper(needDataset);
 
-        for (URI facetURI : facets) {
-            WonRdfUtils.FacetUtils.addFacet(needModelWrapper.getNeedModel(), facetURI);
+        int i = 1;
+        for (URI facet : facets) {
+            needModelWrapper.addFacet(needUriBeforeCreation.toString()+"#facet"+i, facet.toString());
+            i++;
         }
         final Dataset needDatasetWithFacets = needModelWrapper.copyDataset();
         final URI wonNodeUri = ctx.getNodeURISource().getNodeURI();

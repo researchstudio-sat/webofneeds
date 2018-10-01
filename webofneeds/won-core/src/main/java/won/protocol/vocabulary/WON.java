@@ -85,6 +85,7 @@ public class WON {
     public static final Property HAS_QUANTITATIVE_PROPERTY = m.createProperty(BASE_URI, "hasQuantitativeProperty");
 
     public static final Property HAS_FACET = m.createProperty(BASE_URI, "hasFacet");
+    public static final Property HAS_DEFAULT_FACET = m.createProperty(BASE_URI, "hasDefaultFacet");
     public static final Resource FACET = m.createResource(BASE_URI + "Facet");
     //This property is used in the rdf-model part of connect (from owner) and hint
     //to specify a facet to which a connection is created

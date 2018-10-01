@@ -7,6 +7,8 @@ import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.*;
 import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.apache.jena.rdf.model.impl.StatementImpl;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.sparql.path.Path;
 import org.apache.jena.sparql.path.PathParser;
 import org.apache.jena.vocabulary.DCTerms;
@@ -337,21 +339,54 @@ public class NeedModelWrapper {
         return matchingContexts;
     }
 
-
-    public void addFacetUri(String facetUri) {
-
-        Resource facet = getNeedModel().createResource(facetUri);
+    /**
+     * Add a facet. The facetURI must be a fragment URI off the need URI, i.e. [needuri]#facetid, or it is
+     * just a fragment identifier, which will be interpreted relative to the needURI, i.e. #facetid -> [needuri]#facetid.
+     * @param facetUri uniquely identifies this facet of this need
+     * @param facetTypeUri the type of the facet, e.g. won:OwnerFacet
+     */
+    public void addFacet(String facetUri, String facetTypeUri) {
+        if (facetUri.startsWith("#")) {
+            facetUri = getNeedUri()+facetUri;
+        } else if (! facetUri.startsWith(getNeedUri())) {
+            throw new IllegalArgumentException("The facetURI must start with '[needURI]#' or '#' but was: " +facetUri);
+        }
+        Resource facet = getNeedModel().getResource(facetUri);
+        Resource facetType = getNeedModel().createResource(facetTypeUri);
         getNeedNode(NeedGraphType.NEED).addProperty(WON.HAS_FACET, facet);
+        facet.addProperty(RDF.type, facetType);
     }
+    
+    public void setDefaultFacet(String facetUri) {
+        Resource facet = getNeedModel().getResource(facetUri);
+        getNeedNode(NeedGraphType.NEED).addProperty(WON.HAS_DEFAULT_FACET, facet);
+    }
+    
+    public Optional<String> getDefaultFacet() {
+        Statement stmt = getNeedNode(NeedGraphType.NEED).getProperty(WON.HAS_DEFAULT_FACET);
+        if (stmt == null) return Optional.empty();
+        return Optional.of(stmt.getObject().toString());
+    }
+    
+    
 
     public Collection<String> getFacetUris() {
-
         Collection<String> facetUris = new LinkedList<>();
         NodeIterator iter = getNeedModel().listObjectsOfProperty(getNeedNode(NeedGraphType.NEED), WON.HAS_FACET);
         while (iter.hasNext()) {
             facetUris.add(iter.next().asResource().getURI());
         }
         return facetUris;
+    }
+    
+    public Optional<String> getFacetType(String facetUri) {
+        Resource facet = getNeedModel().createResource(facetUri);
+        if(! getNeedNode(NeedGraphType.NEED).hasProperty(WON.HAS_FACET, facet)) {
+            return Optional.empty(); 
+        }
+        Statement stmt = facet.getProperty(RDF.type);
+        if (stmt == null) return Optional.empty();
+        return Optional.of(stmt.getObject().toString());
     }
 
     public Collection<Resource> getGoals() {
@@ -939,4 +974,5 @@ public class NeedModelWrapper {
             model.remove(this.statementsToRemove);
         }
     }
+
 }

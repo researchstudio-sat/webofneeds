@@ -94,8 +94,10 @@ public class TelegramCreateAction extends AbstractCreateNeedAction {
 
                 DefaultNeedModelWrapper wrapper = new DefaultNeedModelWrapper(needURI.toString());
                 wrapper.setTitle(type, title);
+                int i = 1;
                 for (URI facet : facets) {
-                    wrapper.addFacetUri(facet.toString());
+                    wrapper.addFacet("#facet"+ i, facet.toString());
+                    i++;
                 }
 
                 Dataset needDataset = wrapper.copyDataset();

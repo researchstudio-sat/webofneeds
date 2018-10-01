@@ -161,6 +161,9 @@ public class WONMSG
   public static final Property HAS_SIGNATURE_GRAPH_PROPERTY = m.createProperty(BASE_URI, "hasSignatureGraph");
   public static final Property HAS_PUBLIC_KEY_FINGERPRINT_PROPERTY = m.createProperty(BASE_URI,
                                                                                       "hasPublicKeyFingerprint");
+  
+  public static final Property HAS_RECEIVER_FACET = m.createProperty(BASE_URI, "hasReceiverFacet");
+  public static final Property HAS_SENDER_FACET = m.createProperty(BASE_URI, "hasSenderFacet");
 
   public static final Property CONTENT_TYPE = m.createProperty(BASE_URI,"contentType");
 
