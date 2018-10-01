@@ -10,32 +10,32 @@ export const professionalGroup = {
   label: "Professional Networking",
   icon: undefined,
   useCases: {
-    jobSearch: {
-      label: "Search a Job",
-      icon: "#ico36_uc_find_people",
-      doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
-      draft: {
-        ...emptyDraft,
-        is: {
-          tags: ["search-job"],
-        },
-        searchString: "offer-job",
-      },
-      isDetails: {
-        title: { ...details.title },
-        description: { ...details.description },
-        location: { ...details.location },
-        person: { ...details.person },
-        skills: { ...skillsDetail },
-        interests: { ...interestsDetail },
-      },
-      seeksDetails: {
-        description: { ...details.description },
-        location: { ...details.location },
-        skills: { ...skillsDetail },
-        interests: { ...interestsDetail },
-      },
-    },
+    // jobSearch: {
+    //   label: "Search a Job",
+    //   icon: "#ico36_uc_find_people",
+    //   doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
+    //   draft: {
+    //     ...emptyDraft,
+    //     is: {
+    //       tags: ["search-job"],
+    //     },
+    //     searchString: "offer-job",
+    //   },
+    //   isDetails: {
+    //     title: { ...details.title },
+    //     description: { ...details.description },
+    //     location: { ...details.location },
+    //     person: { ...details.person },
+    //     skills: { ...skillsDetail },
+    //     interests: { ...interestsDetail },
+    //   },
+    //   seeksDetails: {
+    //     description: { ...details.description },
+    //     location: { ...details.location },
+    //     skills: { ...skillsDetail },
+    //     interests: { ...interestsDetail },
+    //   },
+    // },
     getToKnow: {
       identifier: "getToKnow",
       label: "Find people",
