@@ -1,9 +1,9 @@
-import personDetails from "./details/person.js";
-import locationDetails from "./details/location.js";
-import timeDetails from "./details/datetime.js";
-import fileDetails from "./details/files.js";
-import priceDetails from "./details/price.js";
-import basicDetails from "./details/basic.js";
+import * as personDetails from "./details/person.js";
+import * as locationDetails from "./details/location.js";
+import * as timeDetails from "./details/datetime.js";
+import * as fileDetails from "./details/files.js";
+import * as priceDetails from "./details/price.js";
+import * as basicDetails from "./details/basic.js";
 
 import abstractDetails_ from "./details/abstract.js";
 export const abstractDetails = abstractDetails_; // reexport
@@ -13,6 +13,8 @@ export const emptyDraft = {
   seeks: {},
   matchingContext: undefined,
 };
+
+console.log(timeDetails);
 
 export const details = {
   title: basicDetails.title,
