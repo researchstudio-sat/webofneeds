@@ -16,17 +16,24 @@ import Element.Events as Events
 import Element.Font as Font
 import Element.Input as Input
 import Elements
-import Html exposing (node)
+import Html exposing (Html, node)
 import Html.Attributes as HA
 import Skin exposing (Skin)
 import String.Extra as String
 import Validate exposing (Valid, Validator)
 
 
+main =
+    Browser.element
+        { init = \() -> ( init, Cmd.none )
+        , update = update
+        , view = view
+        , subscriptions = always Sub.none
+        }
 
---
--- Identity
---
+
+
+---- IDENTIY ----
 
 
 type alias IdentityForm =
@@ -79,14 +86,13 @@ fromForm valid =
 
 
 
---
--- Model
---
+---- MODEL ----
 
 
 type alias Model =
     { identities : Dict Url Identity
     , editing : EditingModel
+    , skin : Skin
     }
 
 
@@ -141,31 +147,38 @@ init : Model
 init =
     { identities = mockIdentities
     , editing = NotEditing
+    , skin =
+        { primaryColor = rgb255 240 70 70
+        , lightGray = rgb255 240 242 244
+        , lineGray = rgb255 203 210 209
+        , subtitleGray = rgb255 128 128 128
+        , black = rgb255 0 0 0
+        }
     }
 
 
 
---
--- View
---
+---- VIEW ----
 
 
-view : Skin -> Model -> Element Msg
-view skin model =
-    column
-        [ centerX
-        , spacing 10
-        , width
-            (fill
-                |> maximum 600
-            )
-        ]
-    <|
-        [ viewIdentities skin model ]
+view : Model -> Html Msg
+view model =
+    layout [] <|
+        column
+            [ centerX
+            , spacing 10
+            , width
+                (fill
+                    |> maximum 600
+                )
+            , padding 10
+            ]
+        <|
+            [ viewIdentities model ]
 
 
-viewIdentities : Skin -> Model -> Element Msg
-viewIdentities skin model =
+viewIdentities : Model -> Element Msg
+viewIdentities model =
     column
         [ width fill
         , spacing 10
@@ -173,17 +186,17 @@ viewIdentities skin model =
     <|
         case model.editing of
             NotEditing ->
-                Dict.map (identityCard skin) model.identities
+                Dict.map (identityCard model.skin) model.identities
                     |> Dict.values
 
             Editing info ->
                 Dict.map
                     (\url identity ->
                         if url == info.url then
-                            identityEditor skin info
+                            identityEditor model.skin info
 
                         else
-                            identityCard skin url identity
+                            identityCard model.skin url identity
                     )
                     model.identities
                     |> Dict.values
@@ -191,7 +204,7 @@ viewIdentities skin model =
 
 identityCard : Skin -> Url -> Identity -> Element Msg
 identityCard skin url identity =
-    Elements.card
+    card
         [ width fill
         , Events.onClick (SelectIdentity url)
         ]
@@ -276,7 +289,7 @@ identityEditor skin info =
                 Err err ->
                     ( False, err )
     in
-    Elements.card
+    card
         [ width fill ]
         { skin = skin
         , header =
@@ -364,14 +377,12 @@ identityForm form =
 
 
 
---
--- Update
---
+---- UPDATE ----
 
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case msg of
+    ( case msg of
         SelectIdentity url ->
             { model | editing = selectIdentity url model }
 
@@ -384,10 +395,12 @@ update msg model =
         SaveIdentity ->
             case model.editing of
                 Editing info ->
-                    saveIdentity info model.identities
+                    saveIdentity info model
 
                 NotEditing ->
                     model
+    , Cmd.none
+    )
 
 
 selectIdentity : Url -> Model -> EditingModel
@@ -430,15 +443,72 @@ editIdentity form model =
             model
 
 
-saveIdentity : EditingInfo -> Dict Url Identity -> Model
-saveIdentity info identities =
+saveIdentity : EditingInfo -> Model -> Model
+saveIdentity info model =
     case Validate.validate identityValidator info.form of
         Ok valid ->
-            { identities = Dict.insert info.url (fromForm valid) identities
-            , editing = NotEditing
+            { model
+                | identities = Dict.insert info.url (fromForm valid) model.identities
+                , editing = NotEditing
             }
 
         Err _ ->
-            { identities = identities
-            , editing = Editing info
-            }
+            model
+
+
+
+---- ELEMENTS ----
+
+
+card :
+    List (Attribute msg)
+    ->
+        { skin : Skin
+        , header : Element msg
+        , sections : List (Element msg)
+        }
+    -> Element msg
+card attributes { skin, header, sections } =
+    let
+        baseStyle =
+            [ Border.width 1
+            , Border.color skin.lineGray
+            , padding 10
+            , width fill
+            ]
+    in
+    column
+        (attributes
+            ++ [ spacing -1 ]
+        )
+        ([ el
+            (baseStyle
+                ++ [ Background.color skin.lightGray ]
+            )
+            header
+         ]
+            ++ List.map
+                (\section ->
+                    el baseStyle section
+                )
+                sections
+        )
+
+
+svgIcon :
+    List (Attribute msg)
+    ->
+        { color : Color
+        , name : String
+        }
+    -> Element msg
+svgIcon attributes { color, name } =
+    el attributes <|
+        html <|
+            node "svg-icon"
+                [ HA.attribute "icon" name
+                , HA.attribute "color" (Skin.cssColor color)
+                , HA.style "width" "100%"
+                , HA.style "height" "100%"
+                ]
+                []
