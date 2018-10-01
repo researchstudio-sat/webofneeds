@@ -34,10 +34,11 @@ export const description = {
   component: "won-description-picker",
   viewerComponent: "won-description-viewer",
   parseToRDF: function({ value }) {
-    if (!value) {
-      return { "dc:description": undefined };
-    }
-    return { "dc:description": value };
+    const val = value ? value : undefined;
+    return {
+      "dc:description": val,
+      "s:description": val,
+    };
   },
   parseFromRDF: function(jsonLDImm) {
     const dcDescription = won.parseFrom(
