@@ -5,7 +5,7 @@ import * as fileDetails from "./details/files.js";
 import * as priceDetails from "./details/price.js";
 import * as basicDetails from "./details/basic.js";
 
-import abstractDetails_ from "./details/abstract.js";
+import * as abstractDetails_ from "./details/abstract.js";
 export const abstractDetails = abstractDetails_; // reexport
 
 export const emptyDraft = {

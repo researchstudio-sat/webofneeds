@@ -1,7 +1,7 @@
 /**
  * Created by fsuda on 18.09.2018.
  */
-import basicDetails from "./basic.js";
+import * as basicDetails from "./basic.js";
 import won from "../../app/won-es6.js";
 import { getIn, generateIdString } from "../../app/utils.js";
 import Immutable from "immutable";
