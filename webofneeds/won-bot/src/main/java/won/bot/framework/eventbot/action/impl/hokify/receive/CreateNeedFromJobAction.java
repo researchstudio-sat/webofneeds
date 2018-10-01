@@ -33,6 +33,7 @@ import won.protocol.util.DefaultNeedModelWrapper;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WON;
+import won.protocol.vocabulary.SCHEMA;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -48,7 +49,6 @@ public class CreateNeedFromJobAction extends AbstractCreateNeedAction {
 
     public CreateNeedFromJobAction(EventListenerContext eventListenerContext, URI... facets) {
 
-        
         super(eventListenerContext);
 
         if (facets == null || facets.length == 0) {
@@ -71,9 +71,9 @@ public class CreateNeedFromJobAction extends AbstractCreateNeedAction {
             try {
                 // for (HokifyJob hokifyJob : hokifyJobs) {
                 for (int i = 0; i < 1; i++) {
-                    
+
                     Random random = new Random();
-                    
+
                     int rnd = random.nextInt(1000);
                     HokifyJob hokifyJob = hokifyJobs.get(rnd);
 
@@ -85,82 +85,73 @@ public class CreateNeedFromJobAction extends AbstractCreateNeedAction {
                                 + hokifyJob.getUrl());
                     } else {
                         Model model = ModelFactory.createDefaultModel();
-                        
-                        
-                        Property schema_name = model.createProperty("http://schema.org/name");
-                        Property schema_organisation = model.createProperty("http://schema.org/Organization");
-                        
-                        Property type = model.createProperty("@type");
-                        
+
                         final URI wonNodeUri = ctx.getNodeURISource().getNodeURI();
                         WonNodeInformationService wonNodeInformationService = ctx.getWonNodeInformationService();
                         final URI needURI = wonNodeInformationService.generateNeedURI(wonNodeUri);
-                        //URI needURI = URI.create("https://localhost:8443/won/resource/event/" + "hokify_job" + rnd + "#need");
-                        DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(needURI.toString());
-                        
-                        Resource need = needModelWrapper.getNeedModel().createResource(needURI.toString());//model.createResource(needURI.toString());
-                        Resource isPart = need.getModel().createResource();
-                        //isPart.add
-                        //isPart.addProperty(type, "s:JobPosting");
-                        isPart.addProperty(DC.title, hokifyJob.getTitle() + " - ALLNEW");
-                        String[] tags = { "job", "new", "debug" };
-                        for (String tag : tags) {
-                            isPart.addProperty(WON.HAS_TAG, tag);
-                        }
-                        
+                        // URI needURI = URI.create("https://localhost:8443/won/resource/event/" +
+                        // "hokify_job" + rnd + "#need");
                         /*
-                        Resource hiringOrganisation = isPart.getModel().createResource();
-                        //hiringOrganisation.addLiteral(type, "s:Organization");
-                        hiringOrganisation.addProperty(schema_name, hokifyJob.getCompany());
-                        isPart.addProperty(schema_organisation, hiringOrganisation);
-                        */
-                        
-                        for (URI facet : facets) {
-                            //isPart.addProperty(WON.HAS_FACET, facet.toString());
-                            needModelWrapper.addFacetUri(facet.toString());
-                        }
-                        //TODO VOCAB!
-                        //isPart.addProperty(model.createProperty("http://schema.org/description"), hokifyJob.getDescription());
-                        isPart.addProperty(DC.description, hokifyJob.getDescription());
-                        need.addProperty(WON.IS, isPart);
-                        
-                        // TODO find and declare properties
-                        /*
-                        NeedContentPropertyType type = NeedContentPropertyType.IS;
-                        String title = hokifyJob.getTitle() + " - Corner";
-                        String description = hokifyJob.getDescription();
-                        String[] tags = { "job", "hokify", "debug" };
-                        boolean isUsedForTesting = false;
-                        boolean isDoNotMatch = false;
+                         * DefaultNeedModelWrapper needModelWrapper = new
+                         * DefaultNeedModelWrapper(needURI.toString());
+                         * 
+                         * Resource need =
+                         * needModelWrapper.getNeedModel().createResource(needURI.toString());//model.
+                         * createResource(needURI.toString()); Resource isPart =
+                         * need.getModel().createResource();
+                         * 
+                         * isPart.addProperty(RDF.type, SCHEMA.JOBPOSTING); isPart.addProperty(DC.title,
+                         * hokifyJob.getTitle() + " - ALLNEW"); String[] tags = { "job", "new", "debug"
+                         * }; for (String tag : tags) { isPart.addProperty(WON.HAS_TAG, tag); }
+                         * 
+                         * 
+                         * //Hiring organization Resource hiringOrganisation =
+                         * isPart.getModel().createResource(); hiringOrganisation.addProperty(RDF.type,
+                         * SCHEMA.ORGANIZATION); hiringOrganisation.addProperty(SCHEMA.NAME,
+                         * hokifyJob.getCompany()); isPart.addProperty(SCHEMA.ORGANIZATION,
+                         * hiringOrganisation);
+                         * 
+                         * 
+                         * //for (URI facet : facets) { //isPart.addProperty(WON.HAS_FACET,
+                         * facet.toString()); needModelWrapper.addFacet("#OwnerFacet",
+                         * WON.OWNER_FACET_STRING); //} //TODO VOCAB!
+                         * //isPart.addProperty(model.createProperty("http://schema.org/description"),
+                         * hokifyJob.getDescription()); isPart.addProperty(DC.description,
+                         * hokifyJob.getDescription()); need.addProperty(WON.IS, isPart);
+                         * 
+                         * // TODO find and declare properties /* NeedContentPropertyType type =
+                         * NeedContentPropertyType.IS; String title = hokifyJob.getTitle() +
+                         * " - Corner"; String description = hokifyJob.getDescription(); String[] tags =
+                         * { "job", "hokify", "debug" }; boolean isUsedForTesting = false; boolean
+                         * isDoNotMatch = false;
+                         * 
+                         * 
+                         * //System.out.println("-------------- ----------- NODE URI" + wonNodeUri);
+                         * 
+                         * 
+                         * //final URI needURI = wonNodeInformationService.generateNeedURI(wonNodeUri);
+                         * System.out.println("-------------- ----------- NODE URI" + wonNodeUri);
+                         */
 
-                        
-                        //System.out.println("-------------- ----------- NODE URI" + wonNodeUri);
-                        
-                        
-                        //final URI needURI = wonNodeInformationService.generateNeedURI(wonNodeUri);
-                        System.out.println("-------------- ----------- NODE URI" + wonNodeUri);*/
-                        
-                        //needModelWrapper.createContentNodeIfNonExist(NeedContentPropertyType.IS);
-                        //needModelWrapper.setTitle(NeedContentPropertyType.IS, hokifyJob.getTitle() + " - 42");
-                        //needModelWrapper.setDescription(NeedContentPropertyType.SEEKS, "lala lala laaa");
-                        //needModelWrapper.addTag(NeedContentPropertyType.SEEKS, "test");
+                        // needModelWrapper.createContentNodeIfNonExist(NeedContentPropertyType.IS);
+                        // needModelWrapper.setTitle(NeedContentPropertyType.IS, hokifyJob.getTitle() +
+                        // " - 42");
+                        // needModelWrapper.setDescription(NeedContentPropertyType.SEEKS, "lala lala
+                        // laaa");
+                        // needModelWrapper.addTag(NeedContentPropertyType.SEEKS, "test");
                         /*
-                        for (String tag : tags) {
-                            needModelWrapper.addTag(type, tag);
-                        }
-                        
-                        
-                        for (URI facet : facets) {
-                            needModelWrapper.addFacetUri(facet.toString());
-                        }
-                        //DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(needURI.toString());
-                        //need.addProperty(RDF.type, WON.NEED);
-                        need.addProperty(WON.HAS_FACET, WON.OWNER_FACET_STRING);
-                       */
-                        Dataset dataset = needModelWrapper.copyDataset();
-                     
-                        //HERE
-                        dataset.setDefaultModel(model);
+                         * for (String tag : tags) { needModelWrapper.addTag(type, tag); }
+                         * 
+                         * 
+                         * for (URI facet : facets) { needModelWrapper.addFacetUri(facet.toString()); }
+                         * //DefaultNeedModelWrapper needModelWrapper = new
+                         * DefaultNeedModelWrapper(needURI.toString()); //need.addProperty(RDF.type,
+                         * WON.NEED); need.addProperty(WON.HAS_FACET, WON.OWNER_FACET_STRING);
+                         */
+                        // Dataset dataset = needModelWrapper.copyDataset();
+                        Dataset dataset = this.generateJobNeedStructure(needURI, hokifyJob);
+                        // HERE
+                        // dataset.setDefaultModel(model);
 
                         logger.info("creating need on won node {} with content {} ", wonNodeUri,
                                 StringUtils.abbreviate(RdfUtils.toString(dataset), 150));
@@ -211,4 +202,88 @@ public class CreateNeedFromJobAction extends AbstractCreateNeedAction {
             }
         }
     }
+
+    private Dataset generateJobNeedStructure(URI needURI, HokifyJob hokifyJob) {
+        DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(needURI.toString());
+
+        Resource need = needModelWrapper.getNeedModel().createResource(needURI.toString());
+        Resource isPart = need.getModel().createResource();
+        Resource seeksPart = need.getModel().createResource();
+        //@type
+        isPart.addProperty(RDF.type, SCHEMA.JOBPOSTING);
+        
+        //s:url
+        isPart.addProperty(SCHEMA.URL, "");
+        
+        //dc:title + s:title
+        //isPart.addProperty(DC.title, hokifyJob.getTitle() + " - FINAL?");
+        isPart.addProperty(SCHEMA.TITLE, hokifyJob.getTitle());
+        
+        //s:datePosted
+        //TODO:convert to s:Date (ISO 8601)
+        isPart.addProperty(SCHEMA.DATEPOSTED, hokifyJob.getDate());
+        
+        //s:image
+        Resource image = isPart.getModel().createResource();
+        image.addProperty(RDF.type, SCHEMA.URL);
+        image.addProperty(SCHEMA.VALUE, hokifyJob.getImage());
+        isPart.addProperty(SCHEMA.IMAGE, image);
+        
+        //s:hiringOrganization
+        Resource hiringOrganisation = isPart.getModel().createResource();
+        hiringOrganisation.addProperty(RDF.type, SCHEMA.ORGANIZATION);
+        hiringOrganisation.addProperty(SCHEMA.NAME, hokifyJob.getCompany());
+        isPart.addProperty(SCHEMA.ORGANIZATION, hiringOrganisation);
+        
+        //s:jobLocation
+        Resource jobLocation = isPart.getModel().createResource();
+        jobLocation.addProperty(RDF.type, SCHEMA.PLACE);
+        //TODO look up lon/lat via nominatim 
+        jobLocation.addProperty(SCHEMA.GEO, "");
+        isPart.addProperty(SCHEMA.JOBLOCATION, jobLocation);
+        
+        //dc:description + s:description
+        //isPart.addProperty(DC.description, hokifyJob.getDescription());
+        isPart.addProperty(SCHEMA.DESCRIPTION, hokifyJob.getDescription());
+        
+        //s:baseSalary
+        isPart.addProperty(SCHEMA.BASESALARY, hokifyJob.getSalary());
+        
+        //s:employmentType
+        isPart.addProperty(SCHEMA.EMPLYOMENTTYPE, hokifyJob.getJobtype());
+        
+        //s:industry
+        for (Object field : hokifyJob.getField()) {
+           
+            System.out.println("--------------------------------------- the field : " + parseField(field));
+            
+            isPart.addProperty(SCHEMA.INDUSTRY, parseField(field));
+        }
+        
+        
+        
+        
+        String[] tags = { "job", "new", "debug" };
+        
+        for (String tag : tags) {
+            isPart.addProperty(WON.HAS_TAG, tag);
+        }
+
+        seeksPart.addProperty(RDF.type, SCHEMA.PERSON);
+
+        needModelWrapper.addFacet("#OwnerFacet", WON.OWNER_FACET_STRING);
+
+        
+        need.addProperty(WON.IS, isPart);
+        need.addProperty(WON.SEEKS, seeksPart);
+
+        return needModelWrapper.copyDataset();
+    }
+    
+    private String parseField(Object field) {
+        
+        
+        return field.toString();
+    }
+
 }
