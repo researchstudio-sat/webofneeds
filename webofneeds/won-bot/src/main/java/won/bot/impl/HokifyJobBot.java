@@ -81,15 +81,17 @@ public class HokifyJobBot extends EventBot {
                     ));
             bus.publish(new CreateNeedFromJobEvent(hokifyJobs));
 
+            
             /*
              * bus.subscribe(SendHelpEvent.class, new ActionOnEventListener( ctx,
              * "HokifyHelpAction", new HokifyHelpAction(ctx, wonHokifyJobBotHandler) ));
              */
             // WON initiated Events
 
+            /*
             bus.subscribe(HintFromMatcherEvent.class,
                     new ActionOnEventListener(ctx, "HintReceived", new Hint2HokifyAction(ctx)));
-
+            */
             bus.subscribe(ConnectFromOtherNeedEvent.class, new ActionOnEventListener(ctx, "ConnectReceived",
                     new Connect2HokifyAction(ctx)));
 
