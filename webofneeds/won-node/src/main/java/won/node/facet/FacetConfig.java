@@ -1,4 +1,4 @@
-package won.node.derivation;
+package won.node.facet;
 
 import java.net.URI;
 import java.util.Set;
@@ -6,7 +6,7 @@ import java.util.Set;
 import org.apache.jena.rdf.model.Property;
 
 
-public interface FacetDerivationConfig {
+public interface FacetConfig {
     /*
      * Returns the type that this confi is applicable for 
      */
@@ -16,4 +16,9 @@ public interface FacetDerivationConfig {
      * Returns the set of derivation properties to be used for this type.
      */
     public Set<Property> getDerivationProperties();
+    
+    /**
+     * Indicates if a connection between this facet and the specified facet is allowed.
+     */
+    public boolean isConnectionAllowedToType(URI remoteFacetType);
 }

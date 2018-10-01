@@ -8,8 +8,8 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import won.node.derivation.DerivationService;
-import won.node.derivation.ConnectionStateChange;
+import won.node.facet.ConnectionStateChange;
+import won.node.facet.FacetService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.processor.camel.WonCamelConstants;
@@ -23,7 +23,7 @@ import won.protocol.repository.NeedRepository;
  * the state the connection is in now and triggers the data derivation.
  * 
  */
-public class DerivationProcessor implements Processor {
+public class FacetDerivationProcessor implements Processor {
 
     @Autowired
     ConnectionRepository connectionRepository;
@@ -32,10 +32,10 @@ public class DerivationProcessor implements Processor {
     NeedRepository needRepository;
 
     @Autowired
-    DerivationService derivationService;
+    FacetService derivationService;
 
 
-    public DerivationProcessor() {
+    public FacetDerivationProcessor() {
     }
 
     @Override

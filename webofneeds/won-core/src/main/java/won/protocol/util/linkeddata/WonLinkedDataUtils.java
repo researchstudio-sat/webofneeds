@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.activemq.blob.FTPBlobUploadStrategy;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
@@ -258,6 +259,9 @@ public class WonLinkedDataUtils
       return WonRdfUtils.FacetUtils.getFacetsOfType(getDataForResource(needURI, linkedDataSource), needURI, facetTypeURI);
   }
 
+  public static Optional<URI> getTypeOfFacet(URI facetURI, LinkedDataSource linkedDataSource) {
+      return WonRdfUtils.FacetUtils.getTypeOfFacet(getDataForResource(facetURI, linkedDataSource), facetURI);
+  }
 
   /**
    * Iterator implementation that fetches linked data lazily for the specified iterator of URIs.

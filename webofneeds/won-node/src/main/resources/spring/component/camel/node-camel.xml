@@ -251,6 +251,6 @@
   <bean name="connectionStateChangeBuilder" class="won.node.camel.processor.general.ConnectionStateChangeBuilderCamelProcessor" />
   
   <!--  data derivation processor -->
-  <bean name="dataDeriver" class="won.node.camel.processor.general.DerivationProcessor" />
+  <bean name="dataDeriver" class="won.node.camel.processor.general.FacetDerivationProcessor" />
   
 </beans>

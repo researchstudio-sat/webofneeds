@@ -1,4 +1,4 @@
-package won.node.derivation;
+package won.node.facet;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import won.protocol.model.Connection;
 import won.protocol.model.Need;
@@ -25,26 +24,32 @@ import won.protocol.repository.NeedRepository;
  */
 
 @Component
-public class DerivationService {
+public class FacetService {
     
     Logger logger = LoggerFactory.getLogger(getClass());
     
     @Autowired
     NeedRepository needRepository;
     
-    Map<URI, FacetDerivationConfig> hardcodedConfigs = new HashMap<>();
+    Map<URI, FacetConfig> hardcodedConfigs = new HashMap<>();
     
-    public DerivationService() {
-        addConfig(new DerivationConfigOfHoldableFacet());
-        addConfig(new DerivationConfigOfHolderFacet());        
-        addConfig(new DerivationConfigOfGroupFacet());
-        addConfig(new DerivationConfigOfChatFacet());
+    public FacetService() {
+        addConfig(new HoldableFacetConfig());
+        addConfig(new HolderFacetConfig());        
+        addConfig(new GroupFacetConfig());
+        addConfig(new ChatFacetConfig());
     }
     
-    private void addConfig(FacetDerivationConfig config) {
+    private void addConfig(FacetConfig config) {
         this.hardcodedConfigs.put(config.getFacetType(), config);
     }
     
+    public boolean isConnectionAllowedToType(URI localFacetType, URI remoteFacetType) {
+        if (hardcodedConfigs.containsKey(localFacetType)) {
+            return hardcodedConfigs.get(localFacetType).isConnectionAllowedToType(remoteFacetType);
+        }
+        return false;
+    }
     
     public void deriveDataForStateChange(ConnectionStateChange stateChange, Need need, Connection con)  {
         if (stateChange.isConnect() || stateChange.isDisconnect()) {
@@ -60,7 +65,7 @@ public class DerivationService {
             if (hardcodedConfigs.containsKey(facetType)) {
                 Resource needRes = derivationModel.getResource(need.getNeedURI().toString());
                 Resource remoteNeedRes = derivationModel.getResource(con.getRemoteNeedURI().toString());
-                FacetDerivationConfig config = hardcodedConfigs.get(facetType);
+                FacetConfig config = hardcodedConfigs.get(facetType);
                 if (stateChange.isConnect()) {
                     logger.info("adding data for connection {}" + con.getConnectionURI());        
                     config.getDerivationProperties().stream().forEach(p -> modelToManipulate.add(needRes, p, remoteNeedRes));
