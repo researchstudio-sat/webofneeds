@@ -64,6 +64,7 @@ public class WON {
     public static final Property IS_IN_STATE = m.createProperty(BASE_URI, "isInState");
 
     public static final Property HAS_CONTENT_GRAPH = m.createProperty(BASE_URI, "hasContentGraph");
+    public static final Property HAS_DERIVED_GRAPH = m.createProperty(BASE_URI, "hasDerivedGraph");
 
     public static final Property HAS_TEXT_MESSAGE = m.createProperty(BASE_URI + "hasTextMessage");
     public static final Property IS_PROCESSING = m.createProperty(BASE_URI + "isProcessing");
@@ -198,8 +199,18 @@ public class WON {
 
 
     public static final String GROUP_FACET_STRING = BASE_URI + "GroupFacet";
+    
+    public static final String HAS_GROUP_MEMBER_String = BASE_URI + "hasGroupMember";
+    public static final Property HAS_GROUP_MEMBER = m.createProperty(BASE_URI, "hasGroupMember");
+    public static final String OWNED_BY_STRING = BASE_URI + "ownedBy";
+    public static final Property OWNED_BY = m.createProperty(BASE_URI + "ownedBy");
+    public static final String OWNS_STRING = BASE_URI + "owns";
+    public static final Property OWNS = m.createProperty(BASE_URI + "owns");
+    public static final String CONNECTED_WITH_STRING = BASE_URI + "connectedWith";
+    public static final Property CONNECTED_WITH = m.createProperty(BASE_URI + "connectedWith");
+    
     public static final String OWNER_FACET_STRING = BASE_URI + "OwnerFacet";
-
+    
     //unread information
 	public static final Property HAS_UNREAD_SUGGESTED = m.createProperty(BASE_URI + "hasUnreadSuggested");
 	public static final Property HAS_UNREAD_REQUEST_SENT = m.createProperty(BASE_URI + "hasUnreadRequestSent");

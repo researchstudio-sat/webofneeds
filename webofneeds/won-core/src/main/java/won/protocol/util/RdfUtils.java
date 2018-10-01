@@ -1439,8 +1439,19 @@ public class RdfUtils {
 		return findOnePropertyFromResource(model, resource, property);
 	}
 
+	public static RDFNode findFirstPropertyOf(Resource resource, Property property) {
+	    return findFirstPropertyFromResource(resource.getModel(), resource, property);
+	}
+	
+	public static Optional<RDFNode> findFirstPropertyOfO(Resource resource, Property property) {
+        return Optional.ofNullable(findFirstPropertyOf(resource, property));
+    }
+	
 	public static RDFNode findFirstPropertyFromResource(final Model model, final Resource resource,
 			final Property property) {
+	    Objects.nonNull(model);
+	    Objects.nonNull(resource);
+	    Objects.nonNull(property);
 		NodeIterator iterator = model.listObjectsOfProperty(resource, property);
 		if (iterator.hasNext())
 			return iterator.next();
@@ -1776,4 +1787,6 @@ public class RdfUtils {
 	public static interface GraphNameCheck {
 		public boolean isGraphUriOk(String graphUri);
 	}
+	
+	
 }

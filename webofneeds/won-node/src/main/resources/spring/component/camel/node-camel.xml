@@ -246,4 +246,11 @@
   </bean>
   <!-- routing logic for wonMessages, computing which facet-specific processor to use -->
   <bean name="facetTypeSlip" class="won.node.camel.processor.general.FacetTypeSlipComputer"/>
+  
+  <!-- extraction of connection state for data derivation -->
+  <bean name="connectionStateChangeBuilder" class="won.node.camel.processor.general.ConnectionStateChangeBuilderCamelProcessor" />
+  
+  <!--  data derivation processor -->
+  <bean name="dataDeriver" class="won.node.camel.processor.general.DerivationProcessor" />
+  
 </beans>

@@ -31,6 +31,8 @@ public class WonCamelConstants {
   public static final String ORIGINAL_MESSAGE_HEADER = "wonOriginalMessage";
   public static final String OUTBOUND_MESSAGE_HEADER = "wonOutboundMessage";
   public static final String CONNECTION_URI_HEADER = "wonConnectionURI";
+  public static final String CONNECTION_STATE_CHANGE_BUILDER_HEADER = "connectionStateChangeBuilder";
+  
   public static final String OUTBOUND_MESSAGE_FACTORY_HEADER = "wonOutboundMessageFactory";
 
   public static final String OWNER_APPLICATION_ID = "ownerApplicationId";

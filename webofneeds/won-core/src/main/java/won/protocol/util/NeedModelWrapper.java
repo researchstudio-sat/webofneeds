@@ -216,6 +216,28 @@ public class NeedModelWrapper {
         }
         return null;
     }
+    
+    public boolean hasDerivedModel() {
+        Optional<RDFNode> derivedGraphName = RdfUtils.findFirstPropertyOfO(getNeedNode(NeedGraphType.SYSINFO), WON.HAS_DERIVED_GRAPH);
+        if (derivedGraphName.isPresent() && derivedGraphName.get().isURIResource()) {
+            String name = derivedGraphName.get().asResource().getURI();
+            if (this.needDataset.containsNamedModel(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public Optional<Model> getDerivedModel() {
+         Optional<RDFNode> derivedGraphName = RdfUtils.findFirstPropertyOfO(getNeedNode(NeedGraphType.SYSINFO), WON.HAS_DERIVED_GRAPH);
+         if (derivedGraphName.isPresent() && derivedGraphName.get().isURIResource()) {
+             String name = derivedGraphName.get().asResource().getURI();
+             if (this.needDataset.containsNamedModel(name)) {
+                 return Optional.of(RdfUtils.cloneModel(this.needDataset.getNamedModel(name)));
+             }
+         }
+         return Optional.empty();
+    }
 
     /**
      * get the need or sysinfo model
@@ -440,6 +462,8 @@ public class NeedModelWrapper {
 
         return null;
     }
+    
+    
     
     public String getDataGraphName(Resource goalNode) {
         if (goalNode != null) {
