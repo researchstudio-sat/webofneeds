@@ -153,7 +153,8 @@ export const details = {
       return { "dc:title": value };
     },
     parseFromRDF: function(jsonLDImm) {
-      return won.parseFrom(jsonLDImm, ["dc:title"], "xsd:string");
+      const dcTitle = won.parseFrom(jsonLDImm, ["dc:title"], "xsd:string");
+      return dcTitle || won.parseFrom(jsonLDImm, ["s:title"], "xsd:string");
     },
     generateHumanReadable: function({ value, includeLabel }) {
       if (value) {
@@ -278,7 +279,15 @@ export const details = {
       return { "dc:description": value };
     },
     parseFromRDF: function(jsonLDImm) {
-      return won.parseFrom(jsonLDImm, ["dc:description"], "xsd:string");
+      const dcDescription = won.parseFrom(
+        jsonLDImm,
+        ["dc:description"],
+        "xsd:string"
+      );
+      return (
+        dcDescription ||
+        won.parseFrom(jsonLDImm, ["s:description"], "xsd:string")
+      );
     },
     generateHumanReadable: function({ value, includeLabel }) {
       if (value) {
