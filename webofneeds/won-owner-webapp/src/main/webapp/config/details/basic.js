@@ -8,10 +8,11 @@ export const title = {
   component: "won-title-picker",
   viewerComponent: "won-title-viewer",
   parseToRDF: function({ value }) {
-    if (!value) {
-      return { "dc:title": undefined };
-    }
-    return { "dc:title": value };
+    const val = value ? value : undefined;
+    return {
+      "dc:title": val,
+      "s:title": val,
+    };
   },
   parseFromRDF: function(jsonLDImm) {
     const dcTitle = won.parseFrom(jsonLDImm, ["dc:title"], "xsd:string");
