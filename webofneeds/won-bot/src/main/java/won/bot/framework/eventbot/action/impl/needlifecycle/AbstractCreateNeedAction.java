@@ -47,7 +47,7 @@ public abstract class AbstractCreateNeedAction extends BaseEventBotAction {
 
     /**
      * Creates a need with the specified facets.
-     * If no facet is specified, the ownerFacet will be used, Flag 'UsedForTesting' will be set.
+     * If no facet is specified, the chatFacet will be used, Flag 'UsedForTesting' will be set.
      * uriListName is used from the set botcontextwrapper getNeedCreateListName
      */
     public AbstractCreateNeedAction(EventListenerContext eventListenerContext, URI... facets) {
@@ -56,7 +56,7 @@ public abstract class AbstractCreateNeedAction extends BaseEventBotAction {
 
     /**
     * Creates a need with the specified facets.
-    * If no facet is specified, the ownerFacet will be used, Flag 'UsedForTesting' will be set.
+    * If no facet is specified, the chatFacet will be used, Flag 'UsedForTesting' will be set.
     */
     public AbstractCreateNeedAction(EventListenerContext eventListenerContext, String uriListName, URI... facets) {
         this(eventListenerContext, uriListName, true, false, facets);
@@ -64,14 +64,14 @@ public abstract class AbstractCreateNeedAction extends BaseEventBotAction {
 
     /**
     * Creates a need with the specified facets.
-    * If no facet is specified, the ownerFacet will be used.
+    * If no facet is specified, the chatFacet will be used.
     */
     public AbstractCreateNeedAction(EventListenerContext eventListenerContext, String uriListName, final boolean usedForTesting, final boolean doNotMatch, URI... facets) {
         super(eventListenerContext);
         if (facets == null || facets.length == 0) {
             //add the default facet if none is present.
             this.facets = new ArrayList<URI>(1);
-            this.facets.add(FacetType.OwnerFacet.getURI());
+            this.facets.add(FacetType.ChatFacet.getURI());
         } else {
             this.facets = Arrays.asList(facets);
         }

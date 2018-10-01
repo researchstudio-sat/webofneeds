@@ -87,7 +87,7 @@ public class RealEstateNeedGenerator {
             Resource isPart = model.createResource();
             Resource seeksPart = model.createResource();
             Resource won_Need = model.createResource("http://purl.org/webofneeds/model#Need");
-            Resource won_OwnerFacet = model.createResource("http://purl.org/webofneeds/model#OwnerFacet");
+            Resource won_ChatFacet = model.createResource("http://purl.org/webofneeds/model#ChatFacet");
 
             // method signatures: branch, probability that detail is added, min, max
             isPart = addTitle(isPart, 1.0, i);
@@ -103,7 +103,7 @@ public class RealEstateNeedGenerator {
             seeksPart.addProperty(won_hasTag, "SearchRealEstateToRent");
 
             need.addProperty(RDF.type, won_Need);
-            need.addProperty(won_hasFacet, won_OwnerFacet);
+            need.addProperty(won_hasFacet, won_ChatFacet);
             need.addProperty(won_is, isPart);
             need.addProperty(won_seeks, seeksPart);
 

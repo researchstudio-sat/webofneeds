@@ -79,8 +79,8 @@ public class ConversationBot extends EventBot
         NO_OF_NEEDS, new ConnectFromListToListAction(ctx,
             ctx.getBotContextWrapper().getNeedCreateListName(),
             ctx.getBotContextWrapper().getNeedCreateListName(),
-            FacetType.OwnerFacet.getURI(),
-            FacetType.OwnerFacet.getURI(),
+            FacetType.ChatFacet.getURI(),
+            FacetType.ChatFacet.getURI(),
             MILLIS_BETWEEN_MESSAGES, "Hi, I am the ConversationBot."));
     bus.subscribe(NeedCreatedEvent.class, this.needConnector);
 

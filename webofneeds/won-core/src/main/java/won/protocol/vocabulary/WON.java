@@ -209,7 +209,7 @@ public class WON {
     public static final String CONNECTED_WITH_STRING = BASE_URI + "connectedWith";
     public static final Property CONNECTED_WITH = m.createProperty(BASE_URI + "connectedWith");
     
-    public static final String OWNER_FACET_STRING = BASE_URI + "OwnerFacet";
+    public static final String CHAT_FACET_STRING = BASE_URI + "ChatFacet";
     
     //unread information
 	public static final Property HAS_UNREAD_SUGGESTED = m.createProperty(BASE_URI + "hasUnreadSuggested");

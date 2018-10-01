@@ -54,7 +54,7 @@
 <https://localhost:8443/won/resource/event/7zc7w4ebflv7uf00654i#content-ol6x> {
     need:8uiuri25l2b84oywmgsy
             a             won:Need ;
-            won:hasFacet  won:OwnerFacet ;
+            won:hasFacet  won:ChatFacet ;
             won:is        _:b0 ;
             won:seeks     _:b0 ;
             cert:key      [ cert:PublicKey  [ a                       woncrypt:ECCPublicKey ;

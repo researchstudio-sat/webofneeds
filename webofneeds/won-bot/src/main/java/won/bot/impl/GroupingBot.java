@@ -148,7 +148,7 @@ public class GroupingBot extends EventBot
                                                                                               botContextWrapper.getGroupMembersListName(),
                                                                                              FacetType.GroupFacet
                                                                                                       .getURI(),
-                                                                                             FacetType.OwnerFacet
+                                                                                             FacetType.ChatFacet
                                                                                                       .getURI(),
                                                                                              MILLIS_BETWEEN_MESSAGES,
                                                                                              "Hi from the " +
@@ -190,7 +190,7 @@ public class GroupingBot extends EventBot
     //create needs every trigger execution until N needs are created
     this.groupMemberCreator = new ActionOnEventListener(
             ctx, "groupMemberCreator",
-            new CreateNeedWithFacetsAction(ctx, botContextWrapper.getGroupMembersListName(), FacetType.OwnerFacet.getURI()),
+            new CreateNeedWithFacetsAction(ctx, botContextWrapper.getGroupMembersListName(), FacetType.ChatFacet.getURI()),
             NO_OF_GROUPMEMBERS
     );
     bus.subscribe(ActEvent.class, this.groupMemberCreator);

@@ -31,7 +31,7 @@ GRAPH :[randomNeedID_1]/meta#data {
         won:isInState
             won:Active ;
         won:hasFacet
-            won:OwnerFacet ;
+            won:ChatFacet ;
 
         :[randomNeedID_1]/needEvents
             rdfs:member

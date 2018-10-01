@@ -52,7 +52,7 @@
 <https://localhost:8443/won/resource/event/8297793462831835000#need> {
     need:6462959329580403000
             a             won:Need ;
-            won:hasFacet  won:OwnerFacet ;
+            won:hasFacet  won:ChatFacet ;
             won:hasFlag   won:UsedForTesting ;
             won:seeks     [ dc:description   "next 10 minutes" ;
                             dc:title         "taxi in Vienna" ;

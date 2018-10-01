@@ -37,7 +37,7 @@ public class DerivationService {
     public DerivationService() {
         addConfig(new DerivationConfigOfGroupFacet());
         addConfig(new DerivationConfigOfOwnableFacet());
-        addConfig(new DerivationConfigOfOwnerFacet());
+        addConfig(new DerivationConfigOfChatFacet());
     }
     
     private void addConfig(FacetDerivationConfig config) {

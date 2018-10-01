@@ -34,7 +34,7 @@
     <https://satvm05.researchstudio.at/won/resource/need/fw1tqsz1grkz>
             a                    won:Need ;
             won:doNotMatchAfter  "2018-09-18T07:14:57.185Z"^^xsd:dateTime ;
-            won:hasFacet         won:OwnerFacet ;
+            won:hasFacet         won:ChatFacet ;
             won:is               [ dc:title    "Title" ;
                                    won:hasTag  "Tag"
                                  ] ;

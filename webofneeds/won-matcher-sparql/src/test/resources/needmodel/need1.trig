@@ -52,7 +52,7 @@
                                                                     s:name            "Alsergrund, Wien, 1090, Österreich"
                                                                           ]
                           ] ;
-            won:hasFacet          won:OwnerFacet ;
+            won:hasFacet          won:ChatFacet ;
             won:hasFlag           won:UsedForTesting ;
             won:hasMatchingBehavior won:Mutual;
             cert:key              [ cert:PublicKey  [ a                       woncrypt:ECCPublicKey ;

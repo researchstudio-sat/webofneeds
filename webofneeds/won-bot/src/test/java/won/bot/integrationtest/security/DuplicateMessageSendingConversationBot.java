@@ -86,8 +86,8 @@ public class DuplicateMessageSendingConversationBot extends IntegrationtestBot
 
     //connect needs
     bus.subscribe(NeedCreatedEvent.class, new ActionOnceAfterNEventsListener(ctx, "needConnector",
-                                                                             NO_OF_NEEDS * 2, new ConnectFromListToListAction(ctx, getBotContextWrapper().getNeedCreateListName(), getBotContextWrapper().getNeedCreateListName(), FacetType.OwnerFacet.getURI(),
-                                                                                                                              FacetType.OwnerFacet.getURI(), MILLIS_BETWEEN_MESSAGES,
+                                                                             NO_OF_NEEDS * 2, new ConnectFromListToListAction(ctx, getBotContextWrapper().getNeedCreateListName(), getBotContextWrapper().getNeedCreateListName(), FacetType.ChatFacet.getURI(),
+                                                                                                                              FacetType.ChatFacet.getURI(), MILLIS_BETWEEN_MESSAGES,
                                                                                                                               "Hi!"
                                                              )));
 

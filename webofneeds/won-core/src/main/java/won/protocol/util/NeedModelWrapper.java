@@ -365,7 +365,7 @@ public class NeedModelWrapper {
      * Add a facet. The facetURI must be a fragment URI off the need URI, i.e. [needuri]#facetid, or it is
      * just a fragment identifier, which will be interpreted relative to the needURI, i.e. #facetid -> [needuri]#facetid.
      * @param facetUri uniquely identifies this facet of this need
-     * @param facetTypeUri the type of the facet, e.g. won:OwnerFacet
+     * @param facetTypeUri the type of the facet, e.g. won:ChatFacet
      */
     public void addFacet(String facetUri, String facetTypeUri) {
         if (facetUri.startsWith("#")) {

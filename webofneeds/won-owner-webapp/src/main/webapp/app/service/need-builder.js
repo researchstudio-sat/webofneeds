@@ -43,9 +43,9 @@ import { Generator } from "sparqljs";
    *    args.tags = 'Couch, furniture';
    *
    *    // this is the default
-   *    args.facet = 'won:OwnerFacet';
+   *    args.facet = 'won:ChatFacet';
    *    // the options here are:
-   *    // * won.WON.OwnerFacetCompacted
+   *    // * won.WON.ChatFacetCompacted
    *    // * won.WON.GroupFacetCompacted
    *    // * won.WON.CoordinatorFacetCompacted
    *    // * won.WON.ParticipantFacetCompacted
@@ -278,7 +278,7 @@ import { Generator } from "sparqljs";
         "won:seeks": seeksContentUri ? { "@id": seeksContentUri } : undefined,
         "won:hasFacet": args.facet
           ? args.facet
-          : { "@id": "#ownerFacet", "@type": "won:OwnerFacet" },
+          : { "@id": "#chatFacet", "@type": "won:ChatFacet" },
         "won:hasFlag": new Set([
           won.debugmode ? "won:UsedForTesting" : undefined,
 

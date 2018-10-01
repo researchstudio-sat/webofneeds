@@ -5,15 +5,15 @@ import java.net.URI;
 import won.protocol.model.FacetType;
 import won.protocol.vocabulary.WON;
 
-public class DerivationConfigOfOwnerFacet extends HardcodedFacetDerivationConfig {
+public class DerivationConfigOfChatFacet extends HardcodedFacetDerivationConfig {
     
-    public DerivationConfigOfOwnerFacet() {
+    public DerivationConfigOfChatFacet() {
         this.derivationProperties.add(WON.CONNECTED_WITH);
     }
     
     @Override
     public URI getFacetType() {
-        return FacetType.OwnerFacet.getURI();
+        return FacetType.ChatFacet.getURI();
     }
     
 }

@@ -39,7 +39,7 @@ import java.net.URI;
 
 /**
  * Creates a need with the specified facets.
- * If no facet is specified, the ownerFacet will be used.
+ * If no facet is specified, the chatFacet will be used.
  */
 public class CreateEchoNeedWithFacetsAction extends AbstractCreateNeedAction {
     public CreateEchoNeedWithFacetsAction(EventListenerContext eventListenerContext, URI... facets) {

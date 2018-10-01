@@ -12,7 +12,7 @@ import java.net.URI;
  * To change this template use File | Settings | File Templates.
  */
 public enum FacetType {
-    OwnerFacet("OwnerFacet"),
+    ChatFacet("ChatFacet"),
     GroupFacet("GroupFacet"),
     CoordinatorFacet("CoordinatorFacet"),
     ParticipantFacet("ParticipantFacet"),
@@ -42,8 +42,8 @@ public enum FacetType {
         return FacetType.ControlFacet;
        else if(uri.equals(FacetType.GroupFacet.getURI()))
            return FacetType.GroupFacet;
-       else if(uri.equals(FacetType.OwnerFacet.getURI()))
-           return FacetType.OwnerFacet;
+       else if(uri.equals(FacetType.ChatFacet.getURI()))
+           return FacetType.ChatFacet;
        else if(uri.equals(FacetType.CoordinatorFacet.getURI()))
            return FacetType.CoordinatorFacet;
        else if(uri.equals(FacetType.ParticipantFacet.getURI()))

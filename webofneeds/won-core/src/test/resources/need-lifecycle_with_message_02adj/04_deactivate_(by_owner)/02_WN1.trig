@@ -33,7 +33,7 @@
         won:isInState
             won:InActive ;
         won:hasFacet
-            won:OwnerFacet .
+            won:ChatFacet .
 
         <http://www.example.com/resource/need/randomNeedID_1/needEvents>
             rdfs:member
