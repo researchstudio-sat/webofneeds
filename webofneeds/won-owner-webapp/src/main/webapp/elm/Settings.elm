@@ -29,23 +29,17 @@ main =
 
 
 type ViewMode
-    = Narrow
-    | Wide
+    = Narrow (Maybe Page)
+    | Wide Page
 
 
-type Category
+type Page
     = IdentitiesPage Identities.Model
-
-
-type View
-    = Category Category
-    | Overview
 
 
 type alias Model =
     { skin : Skin
     , viewMode : ViewMode
-    , view : View
     }
 
 
@@ -58,8 +52,7 @@ init () =
             , subtitleGray = rgb255 128 128 128
             , black = rgb255 0 0 0
             }
-      , viewMode = Narrow
-      , view = Overview
+      , viewMode = Narrow Nothing
       }
     , Task.perform
         (\{ viewport } ->
@@ -81,45 +74,43 @@ init () =
 view : Model -> Html Msg
 view model =
     layout [] <|
-        case model.view of
-            Category cat ->
-                case model.viewMode of
-                    Wide ->
-                        row
-                            [ centerX
-                            , width
-                                (fill
-                                    |> maximum 1000
-                                )
-                            , padding 20
-                            , spacing 20
-                            , Font.size 12
-                            ]
-                            [ sidebar
-                                { route = Just <| toRoute cat
-                                , skin = model.skin
-                                }
-                            , case cat of
-                                IdentitiesPage identititesModel ->
-                                    Identities.view model.skin identititesModel
-                                        |> map (PageMessage << IdentitiesMsg)
-                            ]
+        case model.viewMode of
+            Wide page ->
+                row
+                    [ centerX
+                    , width
+                        (fill
+                            |> maximum 1000
+                        )
+                    , padding 20
+                    , spacing 20
+                    , Font.size 12
+                    ]
+                    [ sidebar
+                        { route = Just <| toRoute page
+                        , skin = model.skin
+                        }
+                    , case page of
+                        IdentitiesPage identititesModel ->
+                            Identities.view model.skin identititesModel
+                                |> map (PageMessage << IdentitiesMsg)
+                    ]
 
-                    Narrow ->
-                        column
-                            [ width fill
-                            , padding 20
-                            , spacing 20
-                            , Font.size 12
-                            ]
-                            [ backButton model.skin
-                            , case cat of
-                                IdentitiesPage identititesModel ->
-                                    Identities.view model.skin identititesModel
-                                        |> map (PageMessage << IdentitiesMsg)
-                            ]
+            Narrow (Just page) ->
+                column
+                    [ width fill
+                    , padding 20
+                    , spacing 20
+                    , Font.size 12
+                    ]
+                    [ backButton model.skin
+                    , case page of
+                        IdentitiesPage identititesModel ->
+                            Identities.view model.skin identititesModel
+                                |> map (PageMessage << IdentitiesMsg)
+                    ]
 
-            Overview ->
+            Narrow Nothing ->
                 column
                     [ width fill
                     , padding 20
@@ -153,7 +144,7 @@ backButton skin =
         ]
 
 
-type alias CategoryOptions =
+type alias Category =
     { icon : String
     , skin : Skin
     , active : Bool
@@ -161,7 +152,7 @@ type alias CategoryOptions =
     }
 
 
-category : CategoryOptions -> Element Msg
+category : Category -> Element Msg
 category { icon, skin, active, route } =
     let
         color =
@@ -217,7 +208,7 @@ type Route
     = Identities
 
 
-toRoute : Category -> Route
+toRoute : Page -> Route
 toRoute page =
     case page of
         IdentitiesPage _ ->
@@ -254,28 +245,30 @@ update msg model =
     case msg of
         PageMessage pMsg ->
             ( { model
-                | view = mapView (updateCategory pMsg) model.view
+                | viewMode = mapViewMode (updatePage pMsg) model.viewMode
               }
             , Cmd.none
             )
 
         ScreenResized { width } ->
-            ( if width > 560 then
-                { model
-                    | viewMode = Wide
-                    , view =
-                        case model.view of
-                            Overview ->
-                                Category <| changeRoute Identities
+            ( { model
+                | viewMode =
+                    case ( width > 560, model.viewMode ) of
+                        ( True, Narrow Nothing ) ->
+                            Wide <| changeRoute Identities
 
-                            Category _ ->
-                                model.view
-                }
+                        ( True, Narrow (Just page) ) ->
+                            Wide page
 
-              else
-                { model
-                    | viewMode = Narrow
-                }
+                        ( True, Wide _ ) ->
+                            model.viewMode
+
+                        ( False, Wide page ) ->
+                            Narrow (Just page)
+
+                        ( False, Narrow _ ) ->
+                            model.viewMode
+              }
             , Cmd.none
             )
 
@@ -288,58 +281,61 @@ update msg model =
 
         ChangeRoute newRoute ->
             ( { model
-                | view =
-                    let
-                        sameRoute =
-                            case model.view of
-                                Overview ->
-                                    False
+                | viewMode =
+                    case model.viewMode of
+                        Narrow (Just page) ->
+                            if toRoute page /= newRoute then
+                                Narrow <| Just (changeRoute newRoute)
 
-                                Category cat ->
-                                    toRoute cat == newRoute
-                    in
-                    if sameRoute then
-                        model.view
+                            else
+                                model.viewMode
 
-                    else
-                        Category <| changeRoute newRoute
+                        Narrow Nothing ->
+                            Narrow <| Just (changeRoute newRoute)
+
+                        Wide page ->
+                            if toRoute page /= newRoute then
+                                Wide <| changeRoute newRoute
+
+                            else
+                                model.viewMode
               }
             , Cmd.none
             )
 
         GoBack ->
             ( { model
-                | view =
+                | viewMode =
                     case model.viewMode of
-                        Narrow ->
-                            Overview
+                        Narrow _ ->
+                            Narrow Nothing
 
-                        Wide ->
-                            model.view
+                        Wide _ ->
+                            model.viewMode
               }
             , Cmd.none
             )
 
 
-mapView : (Category -> Category) -> View -> View
-mapView f oldView =
-    case oldView of
-        Overview ->
-            Overview
+mapViewMode : (Page -> Page) -> ViewMode -> ViewMode
+mapViewMode f viewMode =
+    case viewMode of
+        Wide page ->
+            Wide (f page)
 
-        Category cat ->
-            Category <| f cat
+        Narrow maybePage ->
+            Narrow <| Maybe.map f maybePage
 
 
-changeRoute : Route -> Category
+changeRoute : Route -> Page
 changeRoute route =
     case route of
         Identities ->
             IdentitiesPage Identities.init
 
 
-updateCategory : PageMessage -> Category -> Category
-updateCategory pageMsg page =
+updatePage : PageMessage -> Page -> Page
+updatePage pageMsg page =
     case ( pageMsg, page ) of
         ( IdentitiesMsg msg, IdentitiesPage model ) ->
             IdentitiesPage <| Identities.update msg model
