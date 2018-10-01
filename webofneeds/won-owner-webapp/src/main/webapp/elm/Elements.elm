@@ -1,8 +1,6 @@
 module Elements exposing
-    ( card
-    , mainButton
+    ( mainButton
     , outlinedButton
-    , svgIcon
     )
 
 import Element exposing (..)
@@ -12,60 +10,6 @@ import Element.Events as Events
 import Html exposing (node)
 import Html.Attributes as HA
 import Skin exposing (Skin)
-
-
-type alias Card msg =
-    { skin : Skin
-    , header : Element msg
-    , sections : List (Element msg)
-    }
-
-
-card : List (Attribute msg) -> Card msg -> Element msg
-card attributes { skin, header, sections } =
-    let
-        baseStyle =
-            [ Border.width 1
-            , Border.color skin.lineGray
-            , padding 10
-            , width fill
-            ]
-    in
-    column
-        (attributes
-            ++ [ spacing -1 ]
-        )
-        ([ el
-            (baseStyle
-                ++ [ Background.color skin.lightGray ]
-            )
-            header
-         ]
-            ++ List.map
-                (\section ->
-                    el baseStyle section
-                )
-                sections
-        )
-
-
-type alias SvgIcon =
-    { color : Color
-    , name : String
-    }
-
-
-svgIcon : List (Attribute msg) -> SvgIcon -> Element msg
-svgIcon attributes { color, name } =
-    el attributes <|
-        html <|
-            node "svg-icon"
-                [ HA.attribute "icon" name
-                , HA.attribute "color" (Skin.cssColor color)
-                , HA.style "width" "100%"
-                , HA.style "height" "100%"
-                ]
-                []
 
 
 type alias Button msg =
