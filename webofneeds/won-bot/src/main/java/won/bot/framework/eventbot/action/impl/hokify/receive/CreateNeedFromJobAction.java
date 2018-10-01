@@ -101,18 +101,19 @@ public class CreateNeedFromJobAction extends AbstractCreateNeedAction {
                         Resource need = needModelWrapper.getNeedModel().createResource(needURI.toString());//model.createResource(needURI.toString());
                         Resource isPart = need.getModel().createResource();
                         //isPart.add
-                        isPart.addProperty(type, "s:JobPosting");
+                        //isPart.addProperty(type, "s:JobPosting");
                         isPart.addProperty(DC.title, hokifyJob.getTitle() + " - ALLNEW");
                         String[] tags = { "job", "new", "debug" };
                         for (String tag : tags) {
                             isPart.addProperty(WON.HAS_TAG, tag);
                         }
                         
+                        /*
                         Resource hiringOrganisation = isPart.getModel().createResource();
-                        hiringOrganisation.addLiteral(type, "s:Organization");
+                        //hiringOrganisation.addLiteral(type, "s:Organization");
                         hiringOrganisation.addProperty(schema_name, hokifyJob.getCompany());
                         isPart.addProperty(schema_organisation, hiringOrganisation);
-                        
+                        */
                         
                         for (URI facet : facets) {
                             //isPart.addProperty(WON.HAS_FACET, facet.toString());
