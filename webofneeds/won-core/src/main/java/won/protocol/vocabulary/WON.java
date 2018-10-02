@@ -201,6 +201,11 @@ public class WON {
 
     public static final String PRIVATE_DATA_GRAPH_URI = BASE_URI + "privateDataGraph";
 
+<<<<<<< Upstream, based on origin/master
+=======
+    public static final String GROUP_FACET_STRING = BASE_URI + "GroupFacet";
+    public static final String CHAT_FACET_STRING = BASE_URI + "ChatFacet";
+>>>>>>> 1264a09 Change facet again because of rebase problems
 
     public static final String GROUP_FACET_STRING = BASE_URI + "GroupFacet";
     
