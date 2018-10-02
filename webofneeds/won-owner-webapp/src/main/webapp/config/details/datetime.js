@@ -62,6 +62,18 @@ export const throughDatetime = {
       };
     }
   },
+  parseFromRDF: function(jsonLDImm) {
+    return won.parseFrom(jsonLDImm, ["s:validThrough"], "xsd:dateTime");
+  },
+  generateHumanReadable: function({ value, includeLabel }) {
+    if (value) {
+      const maybeLabel = includeLabel ? this.label + ": " : "";
+      const datetime = parseDatetimeStrictly(value);
+      const timestring = isValidDate(datetime) ? datetime.toLocaleString() : "";
+      return maybeLabel + timestring;
+    }
+    return undefined;
+  },
 };
 
 export const datetimeRange = {
