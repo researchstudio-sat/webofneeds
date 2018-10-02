@@ -3,6 +3,7 @@
  */
 import { details, emptyDraft } from "../detail-definitions.js";
 import { interestsDetail, skillsDetail } from "../details/person.js";
+import { jobLocation } from "../details/location.js";
 import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-utils.js";
 
 export const professionalGroup = {
@@ -60,7 +61,7 @@ export const professionalGroup = {
     ],
     */
         },
-        searchString: "offer-job",
+        searchString: ["offer-job", "job"],
       },
       isDetails: {
         title: { ...details.title },
@@ -72,7 +73,7 @@ export const professionalGroup = {
       },
       seeksDetails: {
         description: { ...details.description },
-        jobLocation: { ...details.jobLocation },
+        jobLocation: { ...jobLocation },
         skills: { ...skillsDetail },
         interests: { ...interestsDetail },
       },
