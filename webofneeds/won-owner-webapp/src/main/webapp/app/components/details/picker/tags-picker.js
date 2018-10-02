@@ -63,7 +63,7 @@ function genComponentConf() {
             : undefined,
       };
       this.onUpdate(payload);
-      dispatchEvent(this.$lement[0], "update", payload);
+      dispatchEvent(this.$element[0], "update", payload);
     }
 
     showInitialTags() {
