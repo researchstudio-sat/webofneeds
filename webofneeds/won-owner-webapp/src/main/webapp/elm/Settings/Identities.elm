@@ -1,11 +1,4 @@
-module Settings.Identities exposing
-    ( Identity
-    , Model
-    , Msg
-    , init
-    , update
-    , view
-    )
+module Settings.Identities exposing (main)
 
 import Browser
 import Dict exposing (Dict)
@@ -39,7 +32,6 @@ main =
 type alias IdentityForm =
     { description : String
     , displayName : String
-    , image : String
     , website : String
     , aboutMe : String
     }
@@ -48,7 +40,6 @@ type alias IdentityForm =
 type alias Identity =
     { description : Maybe String
     , displayName : String
-    , image : Maybe String
     , website : Maybe String
     , aboutMe : Maybe String
     }
@@ -61,13 +52,12 @@ identityValidator =
         ]
 
 
-toForm : Identity -> IdentityForm
-toForm identity =
-    { description = Maybe.withDefault "" identity.description
-    , displayName = identity.displayName
-    , image = Maybe.withDefault "" identity.image
-    , website = Maybe.withDefault "" identity.website
-    , aboutMe = Maybe.withDefault "" identity.aboutMe
+blankForm : IdentityForm
+blankForm =
+    { description = ""
+    , displayName = ""
+    , website = ""
+    , aboutMe = ""
     }
 
 
@@ -79,7 +69,6 @@ fromForm valid =
     in
     { description = String.nonEmpty form.description
     , displayName = form.displayName
-    , image = String.nonEmpty form.image
     , website = String.nonEmpty form.website
     , aboutMe = String.nonEmpty form.aboutMe
     }
@@ -89,72 +78,223 @@ fromForm valid =
 ---- MODEL ----
 
 
-type alias Model =
-    { identities : Dict Url Identity
-    , editing : EditingModel
-    , skin : Skin
-    }
+type Model
+    = Loading
+        { skin : Skin
+        , creating : Maybe IdentityForm
+        , createQueue : List Identity
+        }
+    | Loaded
+        { skin : Skin
+        , viewState : ViewState
+        , createQueue : List Identity
+        , identities : Dict Url Identity
+        }
 
 
-type alias EditingInfo =
-    { url : Url
-    , original : Identity
-    , form : IdentityForm
-    }
-
-
-type EditingModel
-    = NotEditing
-    | Editing EditingInfo
+type ViewState
+    = Inactive
+    | Creating IdentityForm
+    | Viewing Url
 
 
 type alias Url =
     String
 
 
-type Msg
-    = SelectIdentity Url
-    | SaveIdentity
-    | CancelEditing
-    | EditIdentity IdentityForm
-
-
-modified : EditingInfo -> Bool
-modified { form, original } =
-    toForm original /= form
-
-
-mockIdentities : Dict String Identity
-mockIdentities =
-    Dict.empty
-        |> Dict.insert "https://node.matchat.org/won/resource/need/kc9lvmo7sz0p"
-            { description = Nothing
-            , displayName = "Test"
-            , image = Nothing
-            , aboutMe = Nothing
-            , website = Nothing
-            }
-        |> Dict.insert "https://node.matchat.org/won/resource/need/5kmlvmo7sz9x"
-            { description = Just "my id"
-            , displayName = "John"
-            , image = Just "https://foxrudor.de/"
-            , aboutMe = Nothing
-            , website = Nothing
-            }
-
-
 init : Model
 init =
-    { identities = mockIdentities
-    , editing = NotEditing
-    , skin =
-        { primaryColor = rgb255 240 70 70
-        , lightGray = rgb255 240 242 244
-        , lineGray = rgb255 203 210 209
-        , subtitleGray = rgb255 128 128 128
-        , black = rgb255 0 0 0
+    Loading
+        { skin =
+            { primaryColor = rgb255 240 70 70
+            , lightGray = rgb255 240 242 244
+            , lineGray = rgb255 203 210 209
+            , subtitleGray = rgb255 128 128 128
+            , black = rgb255 0 0 0
+            }
+        , creating = Nothing
+        , createQueue = []
         }
-    }
+
+
+
+---- UPDATE ----
+
+
+type Msg
+    = Create
+    | Save
+    | ReceivedIdentity Url Identity
+    | View Url
+    | Cancel
+    | FormUpdated IdentityForm
+
+
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg model =
+    case model of
+        --
+        -- Loading State --
+        --
+        Loading loadingModel ->
+            case ( msg, loadingModel.creating ) of
+                ( Create, Nothing ) ->
+                    ( Loading
+                        { loadingModel
+                            | creating = Just blankForm
+                        }
+                    , Cmd.none
+                    )
+
+                ( Save, Just form ) ->
+                    case saveForm form of
+                        Ok ( identity, cmd ) ->
+                            ( Loading
+                                { loadingModel
+                                    | creating = Nothing
+                                    , createQueue = identity :: loadingModel.createQueue
+                                }
+                            , cmd
+                            )
+
+                        Err cmd ->
+                            ( model, cmd )
+
+                ( Cancel, Just _ ) ->
+                    ( Loading
+                        { loadingModel
+                            | creating = Nothing
+                        }
+                    , Cmd.none
+                    )
+
+                ( ReceivedIdentity url id, _ ) ->
+                    ( Loaded
+                        { skin = loadingModel.skin
+                        , viewState =
+                            case loadingModel.creating of
+                                Just form ->
+                                    Creating form
+
+                                Nothing ->
+                                    Inactive
+                        , identities = Dict.singleton url id
+                        , createQueue =
+                            List.filter (\identity -> identity /= id) loadingModel.createQueue
+                        }
+                    , Cmd.none
+                    )
+
+                ( FormUpdated newForm, Just _ ) ->
+                    ( Loading
+                        { loadingModel
+                            | creating = Just newForm
+                        }
+                    , Cmd.none
+                    )
+
+                _ ->
+                    ( model, Cmd.none )
+
+        --
+        -- Loaded State --
+        --
+        Loaded loadedModel ->
+            let
+                unsavedContent =
+                    case loadedModel.viewState of
+                        Creating form ->
+                            form /= blankForm
+
+                        _ ->
+                            False
+            in
+            case msg of
+                Save ->
+                    case loadedModel.viewState of
+                        Creating form ->
+                            case saveForm form of
+                                Ok ( identity, cmd ) ->
+                                    ( Loaded
+                                        { loadedModel
+                                            | viewState = Inactive
+                                            , createQueue = identity :: loadedModel.createQueue
+                                        }
+                                    , cmd
+                                    )
+
+                                Err cmd ->
+                                    ( model, cmd )
+
+                        _ ->
+                            ( model, Cmd.none )
+
+                Cancel ->
+                    ( Loaded
+                        { loadedModel
+                            | viewState = Inactive
+                        }
+                    , Cmd.none
+                    )
+
+                View url ->
+                    if unsavedContent then
+                        ( model, Cmd.none )
+
+                    else
+                        ( Loaded
+                            { loadedModel
+                                | viewState = Viewing url
+                            }
+                        , Cmd.none
+                        )
+
+                Create ->
+                    if unsavedContent then
+                        ( model, Cmd.none )
+
+                    else
+                        ( Loaded
+                            { loadedModel
+                                | viewState = Creating blankForm
+                            }
+                        , Cmd.none
+                        )
+
+                ReceivedIdentity url id ->
+                    ( Loaded
+                        { loadedModel
+                            | identities = Dict.insert url id loadedModel.identities
+                            , createQueue =
+                                List.filter (\identity -> identity /= id) loadedModel.createQueue
+                        }
+                    , Cmd.none
+                    )
+
+                FormUpdated newForm ->
+                    case loadedModel.viewState of
+                        Creating _ ->
+                            ( Loaded
+                                { loadedModel
+                                    | viewState = Creating newForm
+                                }
+                            , Cmd.none
+                            )
+
+                        _ ->
+                            ( model, Cmd.none )
+
+
+saveForm : IdentityForm -> Result (Cmd Msg) ( Identity, Cmd Msg )
+saveForm form =
+    case Validate.validate identityValidator form of
+        Ok valid ->
+            -- TODO: Send create command
+            Ok ( fromForm valid, Cmd.none )
+
+        Err error ->
+            -- TODO: Send error to toast
+            Err Cmd.none
 
 
 
@@ -164,120 +304,94 @@ init =
 view : Model -> Html Msg
 view model =
     layout [] <|
-        column
-            [ centerX
-            , spacing 10
-            , width
-                (fill
-                    |> maximum 600
-                )
-            , padding 10
+        el
+            [ padding 20
+            , Font.size 14
+            , width <| maximum 600 fill
+            , centerX
             ]
         <|
-            [ viewIdentities model ]
-
-
-viewIdentities : Model -> Element Msg
-viewIdentities model =
-    column
-        [ width fill
-        , spacing 10
-        ]
-    <|
-        case model.editing of
-            NotEditing ->
-                Dict.map (identityCard model.skin) model.identities
-                    |> Dict.values
-
-            Editing info ->
-                Dict.map
-                    (\url identity ->
-                        if url == info.url then
-                            identityEditor model.skin info
-
-                        else
-                            identityCard model.skin url identity
-                    )
-                    model.identities
-                    |> Dict.values
-
-
-identityCard : Skin -> Url -> Identity -> Element Msg
-identityCard skin url identity =
-    card
-        [ width fill
-        , Events.onClick (SelectIdentity url)
-        ]
-        { skin = skin
-        , header =
-            row
-                [ spacing 10
-                , width fill
-                ]
-                [ identityImage skin url identity
-                , column
-                    [ height fill
-                    ]
-                    [ el [ Font.size 18 ] <|
-                        case identity.description of
-                            Just description ->
-                                text description
+            case model of
+                --
+                -- Loading
+                --
+                Loading { skin, creating, createQueue } ->
+                    column
+                        [ width fill
+                        , spacing 20
+                        ]
+                        [ el [ Font.color skin.subtitleGray ] <|
+                            text "Loading Identities..."
+                        , case creating of
+                            Just form ->
+                                createInterface skin form
 
                             Nothing ->
-                                el [ Font.italic ] <| text "Unnamed Identity"
-                    , el [ height fill ] none
-                    , el
-                        [ Font.color skin.subtitleGray
+                                createButton skin
+                        , viewUnsaved skin createQueue
                         ]
-                      <|
-                        text ("Name: " ++ identity.displayName)
-                    ]
+
+                --
+                -- Loaded
+                --
+                Loaded { skin, viewState, identities, createQueue } ->
+                    case viewState of
+                        Inactive ->
+                            column [ spacing 20 ]
+                                [ createButton skin
+                                , viewUnsaved skin createQueue
+                                , viewIdentities
+                                    { skin = skin
+                                    , viewedUrl = Nothing
+                                    , identities = identities
+                                    }
+                                ]
+
+                        Viewing url ->
+                            column [ spacing 20 ]
+                                [ createButton skin
+                                , viewUnsaved skin createQueue
+                                , viewIdentities
+                                    { skin = skin
+                                    , viewedUrl = Just url
+                                    , identities = identities
+                                    }
+                                ]
+
+                        Creating form ->
+                            column [ spacing 20 ]
+                                [ createInterface skin form
+                                , viewUnsaved skin createQueue
+                                , viewIdentities
+                                    { skin = skin
+                                    , viewedUrl = Nothing
+                                    , identities = identities
+                                    }
+                                ]
+
+
+createButton : Skin -> Element Msg
+createButton skin =
+    Input.button
+        [ width fill
+        , Border.color skin.lineGray
+        , Border.width 2
+        ]
+        { onPress = Just Create
+        , label =
+            el
+                [ Font.color skin.lineGray
+                , centerX
+                , Font.size 32
                 ]
-        , sections = []
+            <|
+                text "+"
         }
 
 
-identityImage : Skin -> Url -> Identity -> Element msg
-identityImage skin url identity =
-    el
-        [ width (px 50)
-        , height (px 50)
-        , Background.color skin.lineGray
-        ]
-    <|
-        case identity.image of
-            Just img ->
-                el
-                    [ Background.uncropped img
-                    , width fill
-                    , height fill
-                    ]
-                    none
-
-            Nothing ->
-                identicon [] url
-
-
-identicon : List (Attribute msg) -> String -> Element msg
-identicon attributes string =
-    el
-        attributes
-    <|
-        html <|
-            node "won-identicon"
-                [ HA.attribute "data" string
-                , HA.style "width" "100%"
-                , HA.style "height" "100%"
-                ]
-                []
-
-
-identityEditor : Skin -> EditingInfo -> Element Msg
-identityEditor skin info =
+createInterface : Skin -> IdentityForm -> Element Msg
+createInterface skin form =
     let
-        form =
-            info.form
-
         validated =
             Validate.validate identityValidator form
 
@@ -297,9 +411,14 @@ identityEditor skin info =
                 [ width fill
                 , spacing 10
                 ]
-                [ identityImage skin info.url info.original
-                , Input.text [ alignTop ]
-                    { onChange = \str -> EditIdentity { form | description = str }
+                [ el
+                    [ width (px 100)
+                    , height (px 100)
+                    , Background.color skin.lineGray
+                    ]
+                    none
+                , Input.text [ centerY ]
+                    { onChange = \str -> FormUpdated { form | description = str }
                     , text = form.description
                     , placeholder = Just (Input.placeholder [] <| text "Unnamed Identity")
                     , label =
@@ -324,22 +443,19 @@ identityEditor skin info =
                     column
                         [ Font.color skin.primaryColor
                         ]
-                        (List.map
-                            text
-                            errors
-                        )
+                        (List.map text errors)
                 , row
                     [ spacing 10
                     , width fill
                     ]
                     [ Elements.mainButton
-                        { disabled = not isValid || not (modified info)
-                        , onClick = SaveIdentity
+                        { disabled = not isValid || form == blankForm
+                        , onClick = Save
                         , text = "Save"
                         }
                     , Elements.outlinedButton
                         { disabled = False
-                        , onClick = CancelEditing
+                        , onClick = Cancel
                         , text = "Cancel"
                         }
                     ]
@@ -355,19 +471,19 @@ identityForm form =
         , width fill
         ]
         [ Input.text []
-            { onChange = \str -> EditIdentity { form | displayName = str }
+            { onChange = \str -> FormUpdated { form | displayName = str }
             , text = form.displayName
             , placeholder = Nothing
             , label = Input.labelAbove [] (text "Display Name")
             }
         , Input.text []
-            { onChange = \str -> EditIdentity { form | website = str }
+            { onChange = \str -> FormUpdated { form | website = str }
             , text = form.website
             , placeholder = Nothing
             , label = Input.labelAbove [] (text "Website")
             }
         , Input.multiline []
-            { onChange = \str -> EditIdentity { form | aboutMe = str }
+            { onChange = \str -> FormUpdated { form | aboutMe = str }
             , text = form.aboutMe
             , placeholder = Nothing
             , label = Input.labelAbove [] (text "About Me")
@@ -376,84 +492,137 @@ identityForm form =
         ]
 
 
-
----- UPDATE ----
-
-
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
-    ( case msg of
-        SelectIdentity url ->
-            { model | editing = selectIdentity url model }
-
-        CancelEditing ->
-            { model | editing = NotEditing }
-
-        EditIdentity newForm ->
-            editIdentity newForm model
-
-        SaveIdentity ->
-            case model.editing of
-                Editing info ->
-                    saveIdentity info model
-
-                NotEditing ->
-                    model
-    , Cmd.none
-    )
-
-
-selectIdentity : Url -> Model -> EditingModel
-selectIdentity url model =
-    let
-        edited =
-            case model.editing of
-                Editing info ->
-                    modified info
-
-                NotEditing ->
-                    False
-    in
-    if not edited then
-        case Dict.get url model.identities of
-            Just identity ->
-                Editing
-                    { url = url
-                    , original = identity
-                    , form = toForm identity
+viewUnsaved : Skin -> List Identity -> Element Msg
+viewUnsaved skin unsaved =
+    column
+        [ spacing 20
+        , width fill
+        ]
+    <|
+        List.map
+            (\id ->
+                viewIdentity
+                    { skin = skin
+                    , open = False
+                    , url = Nothing
+                    , identity = id
                     }
-
-            Nothing ->
-                model.editing
-
-    else
-        model.editing
+            )
+            unsaved
 
 
-editIdentity : IdentityForm -> Model -> Model
-editIdentity form model =
-    case model.editing of
-        Editing info ->
-            { model
-                | editing =
-                    Editing { info | form = form }
-            }
+viewIdentities :
+    { skin : Skin
+    , viewedUrl : Maybe Url
+    , identities : Dict Url Identity
+    }
+    -> Element Msg
+viewIdentities { skin, viewedUrl, identities } =
+    column
+        [ spacing 20
+        , width fill
+        ]
+    <|
+        let
+            open =
+                case viewedUrl of
+                    Just url ->
+                        \targetUrl -> url == targetUrl
 
-        NotEditing ->
-            model
+                    Nothing ->
+                        always False
+        in
+        Dict.map
+            (\url id ->
+                viewIdentity
+                    { skin = skin
+                    , open = open url
+                    , url = Just url
+                    , identity = id
+                    }
+            )
+            identities
+            |> Dict.values
 
 
-saveIdentity : EditingInfo -> Model -> Model
-saveIdentity info model =
-    case Validate.validate identityValidator info.form of
-        Ok valid ->
-            { model
-                | identities = Dict.insert info.url (fromForm valid) model.identities
-                , editing = NotEditing
-            }
+viewIdentity :
+    { skin : Skin
+    , open : Bool
+    , url : Maybe Url
+    , identity : Identity
+    }
+    -> Element Msg
+viewIdentity config =
+    case config.url of
+        Just url ->
+            card
+                [ width fill
+                , Events.onClick (View url)
+                ]
+                { skin = config.skin
+                , header =
+                    row
+                        [ spacing 10
+                        , width fill
+                        ]
+                        [ identicon [] url
+                        , column
+                            [ height fill
+                            ]
+                            [ el [ Font.size 18 ] <|
+                                case config.identity.description of
+                                    Just description ->
+                                        text description
 
-        Err _ ->
-            model
+                                    Nothing ->
+                                        el [ Font.italic ] <| text "Unnamed Identity"
+                            , el [ height fill ] none
+                            , el
+                                [ Font.color config.skin.subtitleGray
+                                ]
+                              <|
+                                text ("Name: " ++ config.identity.displayName)
+                            ]
+                        ]
+                , sections = []
+                }
+
+        Nothing ->
+            card
+                [ width fill
+                ]
+                { skin = config.skin
+                , header =
+                    row
+                        [ spacing 10
+                        , width fill
+                        ]
+                        [ el
+                            [ width (px 100)
+                            , height (px 100)
+                            , Background.color config.skin.lineGray
+                            ]
+                            none
+                        , column
+                            [ height fill
+                            ]
+                            [ el [ Font.size 18 ] <|
+                                case config.identity.description of
+                                    Just description ->
+                                        text description
+
+                                    Nothing ->
+                                        el [ Font.italic ] <| text "Unnamed Identity"
+                            , el [ height fill ] none
+                            , el
+                                [ Font.color config.skin.subtitleGray
+                                ]
+                              <|
+                                text ("Name: " ++ config.identity.displayName)
+                            ]
+                        ]
+                , sections = []
+                }
 
 
 
@@ -495,19 +664,50 @@ card attributes { skin, header, sections } =
         )
 
 
-svgIcon :
-    List (Attribute msg)
-    ->
-        { color : Color
-        , name : String
-        }
-    -> Element msg
-svgIcon attributes { color, name } =
-    el attributes <|
+type alias ButtonConfig msg =
+    { disabled : Bool
+    , text : String
+    , onClick : msg
+    }
+
+
+mainButton : ButtonConfig msg -> Element msg
+mainButton { disabled, text, onClick } =
+    el [ Events.onClick onClick ] <|
         html <|
-            node "svg-icon"
-                [ HA.attribute "icon" name
-                , HA.attribute "color" (Skin.cssColor color)
+            Html.button
+                [ HA.classList
+                    [ ( "won-button--filled", True )
+                    , ( "red", True )
+                    ]
+                , HA.disabled disabled
+                ]
+                [ Html.text text ]
+
+
+outlinedButton : ButtonConfig msg -> Element msg
+outlinedButton { disabled, text, onClick } =
+    el [ Events.onClick onClick ] <|
+        html <|
+            Html.button
+                [ HA.classList
+                    [ ( "won-button--outlined", True )
+                    , ( "thin", True )
+                    , ( "red", True )
+                    ]
+                , HA.disabled disabled
+                ]
+                [ Html.text text ]
+
+
+identicon : List (Attribute msg) -> String -> Element msg
+identicon attributes string =
+    el
+        attributes
+    <|
+        html <|
+            node "won-identicon"
+                [ HA.attribute "data" string
                 , HA.style "width" "100%"
                 , HA.style "height" "100%"
                 ]
