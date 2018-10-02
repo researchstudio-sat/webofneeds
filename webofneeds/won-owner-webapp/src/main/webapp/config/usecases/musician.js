@@ -1,7 +1,7 @@
 /**
  * Created by fsuda on 18.09.2018.
  */
-import { details, emptyDraft } from "detailDefinitions";
+import { details, emptyDraft } from "../detail-definitions.js";
 import {
   realEstateRentRangeDetail,
   realEstateRentDetail,
@@ -9,8 +9,8 @@ import {
   realEstateNumberOfRoomsDetail,
   realEstateFeaturesDetail,
   realEstateFloorSizeRangeDetail,
-} from "realEstateDetails";
-import { genresDetail, instrumentsDetail } from "musicianDetails";
+} from "../details/real-estate.js";
+import { genresDetail, instrumentsDetail } from "../details/musician.js";
 import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-utils.js";
 
 export const musicianGroup = {

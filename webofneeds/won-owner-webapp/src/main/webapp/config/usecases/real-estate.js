@@ -1,7 +1,7 @@
 /**
  * Created by fsuda on 18.09.2018.
  */
-import { details, emptyDraft } from "detailDefinitions";
+import { details, emptyDraft } from "../detail-definitions.js";
 import {
   realEstateRentRangeDetail,
   realEstateRentDetail,
@@ -10,7 +10,7 @@ import {
   realEstateFeaturesDetail,
   realEstateFloorSizeRangeDetail,
   realEstateNumberOfRoomsRangeDetail,
-} from "realEstateDetails";
+} from "../details/real-estate.js";
 
 import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-utils.js";
 import {

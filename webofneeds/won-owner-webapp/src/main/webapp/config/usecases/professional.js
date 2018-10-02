@@ -1,8 +1,8 @@
 /**
  * Created by fsuda on 18.09.2018.
  */
-import { details, emptyDraft } from "detailDefinitions";
-import { interestsDetail, skillsDetail } from "personDetails";
+import { details, emptyDraft } from "../detail-definitions.js";
+import { interestsDetail, skillsDetail } from "../details/person.js";
 import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-utils.js";
 
 export const professionalGroup = {
@@ -10,6 +10,32 @@ export const professionalGroup = {
   label: "Professional Networking",
   icon: undefined,
   useCases: {
+    // jobSearch: {
+    //   label: "Search a Job",
+    //   icon: "#ico36_uc_find_people",
+    //   doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
+    //   draft: {
+    //     ...emptyDraft,
+    //     is: {
+    //       tags: ["search-job"],
+    //     },
+    //     searchString: "offer-job",
+    //   },
+    //   isDetails: {
+    //     title: { ...details.title },
+    //     description: { ...details.description },
+    //     location: { ...details.location },
+    //     person: { ...details.person },
+    //     skills: { ...skillsDetail },
+    //     interests: { ...interestsDetail },
+    //   },
+    //   seeksDetails: {
+    //     description: { ...details.description },
+    //     location: { ...details.location },
+    //     skills: { ...skillsDetail },
+    //     interests: { ...interestsDetail },
+    //   },
+    // },
     getToKnow: {
       identifier: "getToKnow",
       label: "Find people",
