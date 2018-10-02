@@ -61,7 +61,7 @@
     need:qhj15b6jojuk
             a                    won:Need ;
             won:doNotMatchAfter  "2018-09-19T14:57:31.676Z"^^xsd:dateTime ;
-            won:hasFacet         won:OwnerFacet ;
+            won:hasFacet         won:ChatFacet ;
             won:is               [ a           won:RealEstateRentDemand ;
                                    won:hasTag  "SearchRealEstateToRent"
                                  ] ;

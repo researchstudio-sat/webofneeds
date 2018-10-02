@@ -216,6 +216,28 @@ public class NeedModelWrapper {
         }
         return null;
     }
+    
+    public boolean hasDerivedModel() {
+        Optional<RDFNode> derivedGraphName = RdfUtils.findFirstPropertyOfO(getNeedNode(NeedGraphType.SYSINFO), WON.HAS_DERIVED_GRAPH);
+        if (derivedGraphName.isPresent() && derivedGraphName.get().isURIResource()) {
+            String name = derivedGraphName.get().asResource().getURI();
+            if (this.needDataset.containsNamedModel(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public Optional<Model> getDerivedModel() {
+         Optional<RDFNode> derivedGraphName = RdfUtils.findFirstPropertyOfO(getNeedNode(NeedGraphType.SYSINFO), WON.HAS_DERIVED_GRAPH);
+         if (derivedGraphName.isPresent() && derivedGraphName.get().isURIResource()) {
+             String name = derivedGraphName.get().asResource().getURI();
+             if (this.needDataset.containsNamedModel(name)) {
+                 return Optional.of(RdfUtils.cloneModel(this.needDataset.getNamedModel(name)));
+             }
+         }
+         return Optional.empty();
+    }
 
     /**
      * get the need or sysinfo model
@@ -343,7 +365,7 @@ public class NeedModelWrapper {
      * Add a facet. The facetURI must be a fragment URI off the need URI, i.e. [needuri]#facetid, or it is
      * just a fragment identifier, which will be interpreted relative to the needURI, i.e. #facetid -> [needuri]#facetid.
      * @param facetUri uniquely identifies this facet of this need
-     * @param facetTypeUri the type of the facet, e.g. won:OwnerFacet
+     * @param facetTypeUri the type of the facet, e.g. won:ChatFacet
      */
     public void addFacet(String facetUri, String facetTypeUri) {
         if (facetUri.startsWith("#")) {
@@ -440,6 +462,8 @@ public class NeedModelWrapper {
 
         return null;
     }
+    
+    
     
     public String getDataGraphName(Resource goalNode) {
         if (goalNode != null) {

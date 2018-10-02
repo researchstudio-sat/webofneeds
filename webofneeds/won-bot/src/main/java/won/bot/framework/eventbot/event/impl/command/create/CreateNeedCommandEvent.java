@@ -51,7 +51,7 @@ public class CreateNeedCommandEvent implements MessageCommandEvent {
         if (facets != null && facets.length > 0) {
             this.facets = Arrays.asList(facets);
         } else {
-            this.facets = Arrays.asList(new URI[]{FacetType.OwnerFacet.getURI()});
+            this.facets = Arrays.asList(new URI[]{FacetType.ChatFacet.getURI()});
         }
         this.usedForTesting = usedForTesting;
         this.doNotMatch = doNotMatch;

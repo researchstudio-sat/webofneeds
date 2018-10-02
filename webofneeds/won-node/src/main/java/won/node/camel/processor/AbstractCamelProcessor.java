@@ -16,26 +16,46 @@
 
 package won.node.camel.processor;
 
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+
+import org.apache.activemq.transport.udp.UdpTransportFactory;
 import org.apache.camel.Processor;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import won.cryptography.service.RandomNumberService;
+import won.node.facet.FacetService;
 import won.node.protocol.MatcherProtocolMatcherServiceClientSide;
 import won.node.service.DataAccessService;
+import won.protocol.exception.IncompatibleFacetTypesException;
 import won.protocol.jms.MessagingService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
+import won.protocol.model.Facet;
 import won.protocol.model.Need;
 import won.protocol.model.OwnerApplication;
-import won.protocol.repository.*;
+import won.protocol.repository.ConnectionContainerRepository;
+import won.protocol.repository.ConnectionEventContainerRepository;
+import won.protocol.repository.ConnectionRepository;
+import won.protocol.repository.DatasetHolderRepository;
+import won.protocol.repository.FacetRepository;
+import won.protocol.repository.MessageEventRepository;
+import won.protocol.repository.NeedEventContainerRepository;
+import won.protocol.repository.NeedRepository;
+import won.protocol.repository.OwnerApplicationRepository;
 import won.protocol.service.LinkedDataService;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
-
-import java.net.URI;
-import java.util.*;
-import java.util.concurrent.ExecutorService;
+import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
 /**
  * User: syim
@@ -81,7 +101,8 @@ public abstract class AbstractCamelProcessor implements Processor
   protected RandomNumberService randomNumberService;
   @Autowired
   protected ExecutorService executorService;
-
+  @Autowired
+  protected FacetService facetService;
 
 
 
@@ -177,4 +198,21 @@ public abstract class AbstractCamelProcessor implements Processor
     return ownerApplicationIds;
   }
 
+    protected void failForIncompatibleFacets(URI facetURI, URI facetTypeURI, URI remoteFacetURI)
+            throws IncompatibleFacetTypesException {
+        Optional<URI> remoteFacetType = WonLinkedDataUtils.getTypeOfFacet(remoteFacetURI, linkedDataSource);
+        if (!remoteFacetType.isPresent()) {
+            throw new IllegalStateException("Could not determine type of remote facet " + remoteFacetURI);
+        }
+        if (!facetService.isConnectionAllowedToType(facetTypeURI, remoteFacetType.get())) {
+            throw new IncompatibleFacetTypesException(facetURI, facetTypeURI, remoteFacetURI, remoteFacetType.get());
+        }
+    }
+
+    
+    protected void failIfIsNotFacetOfNeed(Optional<URI> facetURI, Optional<URI> needURI) {
+        if (facetURI.isPresent() && needURI.isPresent() && !facetURI.get().toString().startsWith(needURI.get().toString())){
+            throw new IllegalArgumentException("User-defined facet "+ facetURI +" is not a facet of need " + needURI);
+        }
+    }
 }

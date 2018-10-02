@@ -139,7 +139,7 @@ public class GroupCycleBot extends EventBot {
     }
 
     /**
-     * Creates a need with an owner facet and a group facet, then stops.
+     * Creates a need with a chat facet and a group facet, then stops.
      * Its deactivate message is the URI of the created group need.
      */
     private class CreateGroupBehaviour extends BotBehaviour {
@@ -151,7 +151,7 @@ public class GroupCycleBot extends EventBot {
         protected void onActivate(Optional<Object> message) {
             GroupBotContextWrapper botContextWrapper = (GroupBotContextWrapper) getBotContextWrapper();
             Dataset needDataset = createNeedDataset("Group Need", "Used for testing if groups suppress echos");
-            CommandEvent command = new CreateNeedCommandEvent(needDataset, botContextWrapper.getGroupListName(), true, true, FacetType.OwnerFacet.getURI(), FacetType.GroupFacet.getURI());
+            CommandEvent command = new CreateNeedCommandEvent(needDataset, botContextWrapper.getGroupListName(), true, true, FacetType.ChatFacet.getURI(), FacetType.GroupFacet.getURI());
             subscribeWithAutoCleanup(
                     CreateNeedCommandResultEvent.class,
                     new ActionOnFirstEventListener(context, new CommandResultFilter(command), new BaseEventBotAction(context) {
@@ -190,7 +190,7 @@ public class GroupCycleBot extends EventBot {
             //create N group members
             for (int i = 0; i < NUMBER_OF_GROUPMEMBERS; i++) {
                 Dataset needDataset = createNeedDataset("Group Memeber Need", "Used for testing if groups suppress echos");
-                CommandEvent command = new CreateNeedCommandEvent(needDataset, botContextWrapper.getGroupMembersListName(), true, true, FacetType.OwnerFacet.getURI());
+                CommandEvent command = new CreateNeedCommandEvent(needDataset, botContextWrapper.getGroupMembersListName(), true, true, FacetType.ChatFacet.getURI());
                 subscribeWithAutoCleanup(
                         CreateNeedCommandResultEvent.class,
                         new ActionOnFirstEventListener(context, new CommandResultFilter(command), new BaseEventBotAction(context) {
@@ -228,7 +228,7 @@ public class GroupCycleBot extends EventBot {
                                                 new ConnectCommandEvent(
                                                         memberURI,
                                                         groupNeedURI,
-                                                        FacetType.OwnerFacet.getURI(),
+                                                        FacetType.ChatFacet.getURI(),
                                                         FacetType.GroupFacet.getURI(),
                                                         "Hello from your latest would-be member!");
                                         //set up a listener for the result of the command

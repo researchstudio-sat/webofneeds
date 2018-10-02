@@ -60,7 +60,7 @@ public class NeedModelWrapperTest {
         // query the need model values
         Assert.assertTrue(needModelWrapper.hasFlag(WON.USED_FOR_TESTING));
         Assert.assertEquals(1, needModelWrapper.getFacetUris().size());
-        Assert.assertEquals("http://purl.org/webofneeds/model#OwnerFacet", needModelWrapper.getFacetUris().iterator().next());
+        Assert.assertEquals("http://purl.org/webofneeds/model#ChatFacet", needModelWrapper.getFacetUris().iterator().next());
         Assert.assertTrue(needModelWrapper.hasFlag(WON.NO_HINT_FOR_ME));
 
         // query the content nodes
@@ -139,7 +139,7 @@ public class NeedModelWrapperTest {
         needModelWrapper.setConnectionContainerUri("https://connnection1");
         needModelWrapper.setConnectionContainerUri("https://connnection2");
         Assert.assertEquals("https://connnection2", needModelWrapper.getConnectionContainerUri());
-        needModelWrapper.addFacet("#facet1", WON.OWNER_FACET_STRING);
+        needModelWrapper.addFacet("#facet1", WON.CHAT_FACET_STRING);
         needModelWrapper.addFacet("#facet2", WON.GROUP_FACET_STRING);
         Assert.assertEquals(2, needModelWrapper.getFacetUris().size());
         needModelWrapper.setWonNodeUri("https://wonnode1");

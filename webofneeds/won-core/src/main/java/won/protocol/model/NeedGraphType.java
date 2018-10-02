@@ -5,5 +5,5 @@ package won.protocol.model;
  */
 public enum NeedGraphType
 {
-  NEED, SYSINFO
+  NEED, SYSINFO, DERIVED
 }

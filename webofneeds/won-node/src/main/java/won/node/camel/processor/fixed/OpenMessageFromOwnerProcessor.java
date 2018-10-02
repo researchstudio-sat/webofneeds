@@ -58,9 +58,10 @@ public class OpenMessageFromOwnerProcessor extends AbstractFromOwnerCamelProcess
     
     // facets: the remote facet in the connection may be null before the open. 
     // check if the owner sent a remote facet. there must not be a clash
-    Optional<URI> userDefinedRemoteFacetURI = Optional.ofNullable(WonRdfUtils.FacetUtils.getFacet(wonMessage));
+    Optional<URI> userDefinedRemoteFacetURI = Optional.ofNullable(WonRdfUtils.FacetUtils.getRemoteFacet(wonMessage));
     Optional<URI> userDefinedFacetURI = Optional.ofNullable(WonRdfUtils.FacetUtils.getFacet(wonMessage));
-    
+    failIfIsNotFacetOfNeed(userDefinedFacetURI, Optional.of(wonMessage.getSenderNeedURI()));
+    failIfIsNotFacetOfNeed(userDefinedRemoteFacetURI, Optional.of(wonMessage.getReceiverNeedURI()));
     Optional<URI> connectionsRemoteFacetURI = Optional.ofNullable(con.getRemoteFacetURI());
 
     // check remote facet info
@@ -80,7 +81,7 @@ public class OpenMessageFromOwnerProcessor extends AbstractFromOwnerCamelProcess
             con.setRemoteFacetURI(lookupDefaultFacet(con.getRemoteNeedURI()));        
         }
     }
-
+    failForIncompatibleFacets(con.getFacetURI(), con.getTypeURI(), con.getRemoteFacetURI());
     con.setState(con.getState().transit(ConnectionEventType.OWNER_OPEN));
     connectionRepository.save(con);
 

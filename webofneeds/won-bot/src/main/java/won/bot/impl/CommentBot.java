@@ -82,7 +82,7 @@ public class CommentBot extends EventBot {
         bus.subscribe(NeedCreatedEvent.class, this.commentFacetCreator);
 
         this.needConnector = new ActionOnceAfterNEventsListener(ctx,
-                2, new ConnectFromListToListAction(ctx, botContextWrapper.getNeedCreateListName(), botContextWrapper.getCommentListName(), FacetType.OwnerFacet.getURI(),
+                2, new ConnectFromListToListAction(ctx, botContextWrapper.getNeedCreateListName(), botContextWrapper.getCommentListName(), FacetType.ChatFacet.getURI(),
                 FacetType.CommentFacet.getURI(), MILLIS_BETWEEN_MESSAGES, "Hi, I am the " +
                 "CommentBot.")
         );

@@ -101,7 +101,7 @@
     need:o21e3jpf8uqah4sn03k5
             a             won:Need ;
             won:goal      [ won:hasShapesGraph  <https://satvm05.researchstudio.at/won/resource/event/bzzhdyfl5v2r2nloruo7#content-p93v> ] ;
-            won:hasFacet  won:OwnerFacet ;
+            won:hasFacet  won:ChatFacet ;
             won:hasFlag   won:NoHintForCounterpart , won:NoHintForMe ;
             won:is        [ dc:title  "TaxiBot Offer" ] .
 }

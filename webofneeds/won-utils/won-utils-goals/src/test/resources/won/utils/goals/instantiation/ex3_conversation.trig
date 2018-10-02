@@ -139,7 +139,7 @@
             won:belongsToNeed        need:8uiuri25l2b84oywmgsy ;
             won:hasConnectionState   won:Connected ;
             won:hasEventContainer    <https://localhost:8443/won/resource/connection/huii1voxuizcg4isuvkf/events> ;
-            won:hasFacet             won:OwnerFacet ;
+            won:hasFacet             won:ChatFacet ;
             won:hasRemoteConnection  conn:4jetg6bdrez9tds6zwmz ;
             won:hasRemoteNeed        need:6462959329580403000 ;
             won:hasWonNode           <https://localhost:8443/won/resource> .
@@ -414,8 +414,8 @@
 
 <https://localhost:8443/won/resource/event/2178696747724085200#content> {
     event:2178696747724085200
-            won:hasFacet        won:OwnerFacet ;
-            won:hasRemoteFacet  won:OwnerFacet .
+            won:hasFacet        won:ChatFacet ;
+            won:hasRemoteFacet  won:ChatFacet .
 }
 
 <https://localhost:8443/won/resource/event/42aok9j00v5hcn00w618#envelope-es3d-sig> {
@@ -2140,8 +2140,8 @@
 
 <https://localhost:8443/won/resource/event/7mdtft0gjbr2m4kw2t13#content-hf80> {
     event:7mdtft0gjbr2m4kw2t13
-            won:hasFacet        won:OwnerFacet ;
-            won:hasRemoteFacet  won:OwnerFacet ;
+            won:hasFacet        won:ChatFacet ;
+            won:hasRemoteFacet  won:ChatFacet ;
             won:hasTextMessage  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." .
 }
 

@@ -21,9 +21,9 @@
 <https://localhost:8443/won/resource/event/5669098069340991000> {
     <https://localhost:8443/won/resource/event/6671551888677331000>
             <http://purl.org/webofneeds/model#hasFacet>
-                    <http://purl.org/webofneeds/model#OwnerFacet> ;
+                    <http://purl.org/webofneeds/model#ChatFacet> ;
             <http://purl.org/webofneeds/model#hasRemoteFacet>
-                    <http://purl.org/webofneeds/model#OwnerFacet> ;
+                    <http://purl.org/webofneeds/model#ChatFacet> ;
             <http://purl.org/webofneeds/model#hasTextMessage>
                     "hi" .
 }

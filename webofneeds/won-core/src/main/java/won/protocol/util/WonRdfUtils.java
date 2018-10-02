@@ -812,6 +812,26 @@ public class WonRdfUtils
       return ret;
     }
     
+    /**
+     * Returns all facets found in the model, attached to the null relative URI
+     * '<>'. Returns an empty collection if there is no such facet.
+     * 
+     * @param content
+     * @return
+     */
+    public static Optional<URI> getTypeOfFacet(Model content, URI facet) {
+        Resource resource = content.getResource(facet.toString());
+        Resource facetType = resource.getPropertyResourceValue(RDF.type);
+        if (facetType != null && facetType.isURIResource()) {
+            return Optional.of(URI.create(facetType.asResource().getURI()));
+        }
+        return Optional.empty();
+    }
+    
+    public static Optional<URI> getTypeOfFacet(Dataset content, final URI facet) {
+        return Optional.ofNullable(RdfUtils.findFirst(content, m -> getTypeOfFacet(m, facet).orElse(null)));
+    }
+    
     
     /**
      * Returns all facets of the base resource of the given type.
@@ -859,8 +879,6 @@ public class WonRdfUtils
     public static Collection<URI> getFacetsOfType(Dataset needDataset, URI needURI, URI facetType) {
         return RdfUtils.visitFlattenedToList(needDataset, m -> getFacetsOfType(m, needURI, facetType));
     }
-    
-    
     
     public static Optional<URI> getDefaultFacet(Model model, boolean returnAnyIfNoDefaultFound) {
         return getDefaultFacet(model, RdfUtils.getBaseResource(model), returnAnyIfNoDefaultFound);

@@ -64,9 +64,9 @@ public class WonRdfUtilsTest {
     public void testGetFacetsOfTypeOneFacet() {
         Dataset needDataset = loadTestDatasetFromClasspathResource("wonrdfutils/need1.trig");
         URI needURI = WonRdfUtils.NeedUtils.getNeedURI(needDataset);
-        Collection<URI> facets = WonRdfUtils.FacetUtils.getFacetsOfType(needDataset, needURI, URI.create(WON.OWNER_FACET_STRING));
+        Collection<URI> facets = WonRdfUtils.FacetUtils.getFacetsOfType(needDataset, needURI, URI.create(WON.CHAT_FACET_STRING));
         Assert.assertEquals(1, facets.size());
-        Assert.assertEquals(URI.create("https://192.168.124.49:8443/won/resource/need/cbfgi37je6kr#ownerFacet"), facets.stream().findFirst().get());
+        Assert.assertEquals(URI.create("https://192.168.124.49:8443/won/resource/need/cbfgi37je6kr#chatFacet"), facets.stream().findFirst().get());
         
     }
     

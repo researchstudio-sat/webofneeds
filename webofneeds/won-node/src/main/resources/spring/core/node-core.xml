@@ -88,7 +88,9 @@
     </bean>
 
     <bean id="ownerManagementService" class="won.node.service.impl.OwnerManagementServiceImpl"/>
-
+    
+    
+    <bean id="facetService" class="won.node.facet.FacetService" />
     <!--
     <bean id="keyStoreService" class="won.cryptography.service.keystore.FileBasedKeyStoreService" init-method="init">
         <constructor-arg type="java.lang.String" value="${keystore.location}" />

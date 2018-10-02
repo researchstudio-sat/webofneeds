@@ -43,7 +43,7 @@
     need:cbfgi37je6kr
             a                    won:Need ;
             won:doNotMatchAfter  "2018-10-28T06:50:11.152Z"^^xsd:dateTime ;
-            won:hasFacet         <https://192.168.124.49:8443/won/resource/need/cbfgi37je6kr#ownerFacet> ;
+            won:hasFacet         <https://192.168.124.49:8443/won/resource/need/cbfgi37je6kr#chatFacet> ;
             won:hasFacet         <https://192.168.124.49:8443/won/resource/need/cbfgi37je6kr#groupFacet1> ;
             won:hasFacet         <https://192.168.124.49:8443/won/resource/need/cbfgi37je6kr#groupFacet2> ;
             won:hasSearchString  "test" ;
@@ -57,8 +57,8 @@
                                                      woncrypt:ecc_qy         "483c83006d524e13bb17cb0ec4687f7b7c188a76378c6df6a0be6a1204f9edd29c1d79399ade1e6cf97d7ecf77d7be5f"
                                                    ] ] .
     
-    <https://192.168.124.49:8443/won/resource/need/cbfgi37je6kr#ownerFacet>
-            a       won:OwnerFacet .
+    <https://192.168.124.49:8443/won/resource/need/cbfgi37je6kr#chatFacet>
+            a       won:ChatFacet .
     <https://192.168.124.49:8443/won/resource/need/cbfgi37je6kr#groupFacet1>
             a       won:GroupFacet .
     <https://192.168.124.49:8443/won/resource/need/cbfgi37je6kr#groupFacet2>

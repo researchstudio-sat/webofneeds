@@ -42,7 +42,10 @@ public class OpenMessageFromNodeProcessor extends AbstractCamelProcessor
       // As the call is coming from the node, it must be present 
       // (the node fills it in if the owner leaves it out)
       Optional<URI> facetURI = Optional.of(WonRdfUtils.FacetUtils.getFacet(wonMessage));
+      failIfIsNotFacetOfNeed(facetURI, Optional.of(wonMessage.getReceiverNeedURI()));
       Optional<URI> remoteFacetURI = Optional.of(WonRdfUtils.FacetUtils.getRemoteFacet(wonMessage));
+      failIfIsNotFacetOfNeed(remoteFacetURI, Optional.of(wonMessage.getSenderNeedURI()));
+      
       if (!facetURI.isPresent()) throw new IllegalArgumentException("Cannot process OPEN FROM_EXTERNAl as no facet information is present");
       if (!remoteFacetURI.isPresent()) throw new IllegalArgumentException("Cannot process OPEN FROM_EXTERNAl as no remote facet information is present");
 
@@ -81,6 +84,7 @@ public class OpenMessageFromNodeProcessor extends AbstractCamelProcessor
       con.get().setRemoteConnectionURI(wonMessage.getSenderURI());
     }
     if (!con.get().getRemoteConnectionURI().equals(wonMessage.getSenderURI())) throw new IllegalStateException("the sender uri of the message must be equal to the remote connection uri");
+    failForIncompatibleFacets(con.get().getFacetURI(), con.get().getTypeURI(), con.get().getRemoteFacetURI());
     con.get().setState(con.get().getState().transit(ConnectionEventType.PARTNER_OPEN));
     connectionRepository.save(con.get());
 

@@ -19,7 +19,6 @@ import won.protocol.model.ConnectionEventType;
 import won.protocol.model.ConnectionState;
 import won.protocol.model.Facet;
 import won.protocol.util.WonRdfUtils;
-import won.protocol.util.linkeddata.WonLinkedDataUtils;
 import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
 
@@ -42,11 +41,13 @@ public class ConnectMessageFromNodeProcessor extends AbstractCamelProcessor
     URI remoteNeedUri = wonMessage.getSenderNeedURI();
     URI remoteConnectionUri = wonMessage.getSenderURI();
     URI facetURI = WonRdfUtils.FacetUtils.getFacet(wonMessage);
+    failIfIsNotFacetOfNeed(Optional.of(facetURI), Optional.of(needUri));
     Facet facet = dataService.getFacet(needUri, facetURI == null ? Optional.empty() : Optional.of(facetURI));
     URI connectionURI = wonMessage.getReceiverURI(); //if the uri is known already, we can load the connection!
 
     // the remote facet must be specified in a message coming from another node 
     URI remoteFacetURI = WonRdfUtils.FacetUtils.getRemoteFacet(wonMessage);
+    failIfIsNotFacetOfNeed(Optional.of(remoteFacetURI), Optional.of(remoteNeedUri));
     // we complain about hasFacet, not hasRemoteFacet, because it's a remote message!
     if (remoteFacetURI == null) throw new MissingMessagePropertyException(URI.create(WONMSG.HAS_RECEIVER_FACET.toString())); 
     if (remoteConnectionUri == null) throw new MissingMessagePropertyException(URI.create(WONMSG.SENDER_PROPERTY.getURI().toString()));
@@ -84,6 +85,7 @@ public class ConnectMessageFromNodeProcessor extends AbstractCamelProcessor
           }
       }
     }
+    failForIncompatibleFacets(facet.getFacetURI(), facet.getFacetType().getURI(), remoteFacetURI);
     if (con == null){
       //create Connection in Database
       URI connectionUri = wonNodeInformationService.generateConnectionURI(

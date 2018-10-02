@@ -35,5 +35,5 @@
                                     a""" ;
                                     dc:description     "hi  i havae a briken wahing machine   come take it away.\r\n \r\n \r\ns d"
                                   ] ;
-            won:hasFacet          won:OwnerFacet .
+            won:hasFacet          won:ChatFacet .
 }

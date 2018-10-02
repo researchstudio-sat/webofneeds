@@ -128,7 +128,7 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
 	 * needPojo.getCreationDate() + "/" + needPojo.getLongitude() + "/" +
 	 * needPojo.getLatitude() + "/" + (needPojo.getState() == NeedState.ACTIVE));
 	 * //TODO: using fixed Facets - change this needPojo.setFacetTypes(new String[]{
-	 * FacetType.OwnerFacet.getURI().toString()}); NeedPojo createdNeedPojo =
+	 * FacetType.ChatFacet.getURI().toString()}); NeedPojo createdNeedPojo =
 	 * resolve(needPojo); Need need =
 	 * needRepository.findOne(createdNeedPojo.getNeedId());
 	 * user.getNeeds().add(need); wonUserDetailService.save(user); HttpHeaders

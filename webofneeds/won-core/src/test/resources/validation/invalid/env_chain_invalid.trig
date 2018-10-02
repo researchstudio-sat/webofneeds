@@ -120,7 +120,7 @@
                                     won:hasTag                 "fish" ;
                                     dc:description     "fish"
                                   ] ;
-            won:hasFacet          won:OwnerFacet ;
+            won:hasFacet          won:ChatFacet ;
             <http://www.w3.org/ns/auth/cert#key>
                     [ <http://www.w3.org/ns/auth/cert#PublicKey>
                               [ a                       woncrypt:ECCPublicKey ;

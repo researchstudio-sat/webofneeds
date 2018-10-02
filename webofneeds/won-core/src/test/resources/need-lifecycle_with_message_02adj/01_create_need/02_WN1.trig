@@ -30,7 +30,7 @@
         won:isInState
             won:Active ;
         won:hasFacet
-            won:OwnerFacet .
+            won:ChatFacet .
 	# would require constant resigning?
     <http://www.example.com/resource/need/randomNeedID_1/needEvents>
             rdfs:member

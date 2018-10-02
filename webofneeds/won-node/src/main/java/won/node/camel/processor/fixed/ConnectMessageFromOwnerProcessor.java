@@ -43,8 +43,9 @@ public class ConnectMessageFromOwnerProcessor extends AbstractFromOwnerCamelProc
     // this is a connect from owner. We allow owners to omit facets for ease of use.
     // If local or remote facets were not specified, we define them now.
     Optional<URI> userDefinedFacetURI = Optional.ofNullable(WonRdfUtils.FacetUtils.getFacet(wonMessage));
-
-    Optional<URI> userDefinedRemoteFacetURI = Optional.ofNullable(WonRdfUtils.FacetUtils.getFacet(wonMessage));
+    failIfIsNotFacetOfNeed(userDefinedFacetURI, Optional.of(senderNeedURI));
+    Optional<URI> userDefinedRemoteFacetURI = Optional.ofNullable(WonRdfUtils.FacetUtils.getRemoteFacet(wonMessage));
+    failIfIsNotFacetOfNeed(userDefinedRemoteFacetURI, Optional.of(receiverNeedURI));
     Optional<URI> connectionURI = Optional.ofNullable(wonMessage.getSenderURI()); //if the uri is known already, we can load the connection!
 
     Optional<Connection> con = Optional.empty();
@@ -75,7 +76,7 @@ public class ConnectMessageFromOwnerProcessor extends AbstractFromOwnerCamelProc
         
         Facet actualFacet = dataService.getFacet(senderNeedURI, userDefinedFacetURI);
         Optional<URI> actualFacetURI = Optional.of(actualFacet.getFacetURI());
-        Optional<URI> actualRemoteFacetURI = Optional.of(userDefinedRemoteFacetURI.orElse(lookupDefaultFacet(receiverNeedURI)));
+        Optional<URI> actualRemoteFacetURI = Optional.of(userDefinedRemoteFacetURI.orElse(lookupDefaultFacet(senderNeedURI)));
             
         con = connectionRepository.findOneByNeedURIAndRemoteNeedURIAndFacetURIAndRemoteFacetURIForUpdate(senderNeedURI, receiverNeedURI, actualFacetURI.get(), actualRemoteFacetURI.get());
         if (con.isPresent()) {
@@ -95,6 +96,7 @@ public class ConnectMessageFromOwnerProcessor extends AbstractFromOwnerCamelProc
             }
         } 
     }
+    failForIncompatibleFacets(con.get().getFacetURI(), con.get().getTypeURI(), con.get().getRemoteFacetURI());
     //state transiation
     con.get().setState(con.get().getState().transit(ConnectionEventType.OWNER_OPEN));
     connectionRepository.save(con.get());

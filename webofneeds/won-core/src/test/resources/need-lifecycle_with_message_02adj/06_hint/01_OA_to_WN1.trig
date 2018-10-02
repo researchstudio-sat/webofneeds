@@ -33,7 +33,7 @@ _:message msg:containsMessage
         a msg:HintMessage ;
 
         msg:senderNode <http://www.won-matcher.com/webID> ;
-        msg:receiver <http://www.example.com/resource/need/randomNeedID_1/facets#ownerFacet> ;
+        msg:receiver <http://www.example.com/resource/need/randomNeedID_1/facets#chatFacet> ;
         msg:receiverNeed <http://www.example.com/resource/need/randomNeedID_1> ;
         msg:receiverNode <http://www.example.com> ;
 
