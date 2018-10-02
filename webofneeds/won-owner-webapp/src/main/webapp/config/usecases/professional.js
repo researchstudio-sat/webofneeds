@@ -4,6 +4,11 @@
 import { details, emptyDraft } from "../detail-definitions.js";
 import { interestsDetail, skillsDetail } from "../details/person.js";
 import { jobLocation } from "../details/location.js";
+import {
+  industryDetail,
+  employmentTypesDetail,
+  organizationNamesDetail,
+} from "../details/jobs.js";
 import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-utils.js";
 
 export const professionalGroup = {
@@ -35,7 +40,7 @@ export const professionalGroup = {
       "s:name": "", // JSON - company
     },
 
-    "s:jobLocation": [
+    "s:jobLocation":
       {
         "@type": "s:Place",
         "s:geo": {
@@ -44,24 +49,10 @@ export const professionalGroup = {
           "s:latitude": "48.216931",
           "s:longitude": "16.361197"
         },
-        "s:address": {
-          "@type": "s:PostalAddress",
-          "s:addressCountry": "AT",
-          "s:addressLocality": "Vienna"
-        }
       },
-      {
-        "@type": "s:Place",
-        //...
-        "s:address": {
-          //...
-          "s:addressLocality": "Graz"
-        }
-      }
-    ],
     */
         },
-        searchString: ["offer-job", "job"],
+        searchString: ["offer-job"],
       },
       isDetails: {
         title: { ...details.title },
@@ -76,6 +67,9 @@ export const professionalGroup = {
         jobLocation: { ...jobLocation },
         skills: { ...skillsDetail },
         interests: { ...interestsDetail },
+        industry: { ...industryDetail },
+        employmentTypes: { ...employmentTypesDetail },
+        organizationNames: { ...organizationNamesDetail },
       },
     },
     getToKnow: {

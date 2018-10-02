@@ -1,4 +1,5 @@
 import won from "../../app/won-es6.js";
+import { is } from "../../app/utils.js";
 
 export const title = {
   identifier: "title",
@@ -76,19 +77,11 @@ export const tags = {
     return won.parseListFrom(jsonLDImm, ["won:hasTag"], "xsd:string");
   },
   generateHumanReadable: function({ value, includeLabel }) {
-    if (value) {
-      let humanReadable = "";
-
-      for (const key in value) {
-        humanReadable += value[key] + ", ";
-      }
-      humanReadable = humanReadable.trim();
-
-      if (humanReadable.length > 0) {
-        humanReadable = humanReadable.substr(0, humanReadable.length - 1);
-        return includeLabel ? this.label + ": " + humanReadable : humanReadable;
-      }
+    if (value && is("Array", value) && value.length > 0) {
+      const prefix = includeLabel ? this.label + ": " : "";
+      return prefix + value.join(", ");
+    } else {
+      return undefined;
     }
-    return undefined;
   },
 };
