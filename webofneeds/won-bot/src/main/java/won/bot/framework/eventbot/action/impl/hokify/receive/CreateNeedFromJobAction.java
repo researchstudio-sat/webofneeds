@@ -220,7 +220,7 @@ public class CreateNeedFromJobAction extends AbstractCreateNeedAction {
 
         seeksPart.addProperty(RDF.type, SCHEMA.PERSON);
 
-        needModelWrapper.addFacet("#OwnerFacet", WON.OWNER_FACET_STRING);
+        needModelWrapper.addFacet("#ChatFacet", WON.CHAT_FACET_STRING);
 
         needModelWrapper.addFlag(WON.NO_HINT_FOR_ME);
 
