@@ -28,9 +28,12 @@ export const location = {
 };
 
 export const jobLocation = {
-  ...location,
-  identifier: "joblocation",
+  identifier: "jobLocation",
+  label: "Jobs Near…",
   placeholder: "Location: Jobs in Vicinity of...",
+  icon: "#ico36_detail_location",
+  component: "won-location-picker",
+  viewerComponent: "won-location-viewer",
   parseToRDF: function({ value, identifier, contentUri }) {
     return {
       "s:jobLocation": genSPlace({
@@ -42,6 +45,9 @@ export const jobLocation = {
   parseFromRDF: function(jsonLDImm) {
     const jsonldLocation = jsonLDImm && jsonLDImm.get("s:jobLocation");
     return parseSPlace(jsonldLocation);
+  },
+  generateHumanReadable: function({ value, includeLabel }) {
+    return sPlaceToHumanReadable({ value, includeLabel });
   },
 };
 

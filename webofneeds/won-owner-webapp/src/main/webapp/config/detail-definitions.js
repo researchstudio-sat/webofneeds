@@ -26,6 +26,7 @@ export const details = {
   datetimeRange: timeDetails.datetimeRange,
 
   location: locationDetails.location,
+  jobLocation: locationDetails.jobLocation,
   travelAction: locationDetails.travelAction,
 
   person: personDetails.person,
