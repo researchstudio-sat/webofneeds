@@ -53,18 +53,19 @@ public class CreateNeedFromJobAction extends AbstractCreateNeedAction {
         if (event instanceof CreateNeedFromJobEvent
                 && ctx.getBotContextWrapper() instanceof HokifyJobBotContextWrapper) {
             HokifyJobBotContextWrapper botContextWrapper = (HokifyJobBotContextWrapper) ctx.getBotContextWrapper();
-            //HokifyBotsApi hokifyBotsApi = ((CreateNeedFromJobEvent) event).getHokifyBotsApi();
+            // HokifyBotsApi hokifyBotsApi = ((CreateNeedFromJobEvent)
+            // event).getHokifyBotsApi();
 
             try {
-                logger.info("---------------------- here we go");
-                
+
                 this.hokifyJobs = hokifyBotsApi.fetchHokifyData();
-                // for (HokifyJob hokifyJob : hokifyJobs) {
+                //for (HokifyJob hokifyJob : hokifyJobs) {
                 for (int i = 0; i < 1; i++) {
 
                     Random random = new Random();
 
-                    int rnd = random.nextInt(1000);
+                    //Only one single random job
+                    int rnd = random.nextInt(3000);
                     HokifyJob hokifyJob = hokifyJobs.get(rnd);
 
                     // Check if need already exists
@@ -159,9 +160,9 @@ public class CreateNeedFromJobAction extends AbstractCreateNeedAction {
         Resource jobLocation = isPart.getModel().createResource();
         jobLocation.addProperty(RDF.type, SCHEMA.PLACE);
         // TODO look up lon/lat via nominatim
-        
+
         isPart.addProperty(SCHEMA.JOBLOCATION, jobLocation);
-        
+
         HashMap<String, String> location = hokifyBotsApi.fetchGeoLocation(hokifyJob.getCity(), hokifyJob.getCountry());
         DecimalFormat df = new DecimalFormat("##.######");
         String nwlat = df.format(Double.parseDouble(location.get("nwlat")));
@@ -181,10 +182,10 @@ public class CreateNeedFromJobAction extends AbstractCreateNeedAction {
         geoResource.addProperty(RDF.type, SCHEMA.GEOCOORDINATES);
         geoResource.addProperty(SCHEMA.LATITUDE, lat);
         geoResource.addProperty(SCHEMA.LONGITUDE, lng);
-        
+
         RDFDatatype bigdata_geoSpatialDatatype = new BaseDatatype(
                 "http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon");
-        
+
         geoResource.addProperty(WON.GEO_SPATIAL, lat + "#" + lng, bigdata_geoSpatialDatatype);
         jobLocation.addProperty(WON.HAS_BOUNDING_BOX, boundingBoxResource);
         boundingBoxResource.addProperty(WON.HAS_NORTH_WEST_CORNER, nwCornerResource);
@@ -195,8 +196,6 @@ public class CreateNeedFromJobAction extends AbstractCreateNeedAction {
         seCornerResource.addProperty(RDF.type, SCHEMA.GEOCOORDINATES);
         seCornerResource.addProperty(SCHEMA.LATITUDE, selat);
         seCornerResource.addProperty(SCHEMA.LONGITUDE, selng);
-        
-        
 
         // s:description
         isPart.addProperty(SCHEMA.DESCRIPTION, filterDescriptionString(hokifyJob.getDescription()));
@@ -229,10 +228,10 @@ public class CreateNeedFromJobAction extends AbstractCreateNeedAction {
 
         return needModelWrapper.copyDataset();
     }
-    
+
     private String filterDescriptionString(String description) {
-        
-        //TODO filter out contact information
+
+        // TODO filter out contact information
         return description;
     }
 

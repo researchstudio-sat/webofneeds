@@ -100,12 +100,11 @@ public class HokifyBotsApi {
 
     public HashMap<String, String> fetchGeoLocation(String city, String country) {
         HashMap<String, String> loc = new HashMap<String, String>();
-        
+
         String cityString = city.replace(" ", "+");
         String countrySting = country.replace(" ", "+");
-        
+
         String searchString = geoURL + "?city=" + cityString + "&country=" + countrySting + "&format=json";
-        System.out.println("------------geo location: " + searchString);
         try {
             DefaultHttpClient httpClient = new DefaultHttpClient();
             HttpGet getRequest = new HttpGet(searchString);
@@ -117,12 +116,10 @@ public class HokifyBotsApi {
                 throw new RuntimeException("Failed : HTTP error code : " + response.getStatusLine().getStatusCode());
             }
 
-            System.out.println("-------------- RESPONSE: " + response);
             BufferedReader br = new BufferedReader(new InputStreamReader((response.getEntity().getContent())));
 
             StringBuilder sb = new StringBuilder();
             String line;
-            System.out.println("GEO Service RESPONSE: ");
             while ((line = br.readLine()) != null) {
                 sb.append(line);
                 System.out.println("line: " + line);
@@ -130,13 +127,11 @@ public class HokifyBotsApi {
             JSONArray jsonArray = new JSONArray(sb.toString());
             JSONObject obj = jsonArray.getJSONObject(0);
             obj.get("display_name");
-            //JSONArray jobArray = new JSONArray(json.getString("jobs"));
             httpClient.close();
             response.getEntity().getContent().close();
-            
+
             JSONArray bBox = (JSONArray) obj.get("boundingbox");
-            
-           
+
             loc.put("nwlat", (String) bBox.get(1));
             loc.put("nwlng", (String) bBox.get(3));
             loc.put("selat", (String) bBox.get(0));
@@ -144,13 +139,11 @@ public class HokifyBotsApi {
             loc.put("lat", (String) obj.get("lat"));
             loc.put("lng", (String) obj.get("lon"));
             loc.put("name", (String) obj.get("display_name"));
-           
+
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println("THE HASH MAP " + loc.toString());
         return loc;
     }
 
-    
 }
