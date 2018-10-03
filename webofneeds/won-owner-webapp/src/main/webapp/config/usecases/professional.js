@@ -57,16 +57,14 @@ export const professionalGroup = {
       isDetails: {
         title: { ...details.title },
         description: { ...details.description },
-        location: { ...details.location },
-        person: { ...details.person },
+        // location: { ...details.location }, // why would your current location of residency matter?
+        // person: { ...details.person }, // has current company fields, that are weird for a search
         skills: { ...skillsDetail },
         interests: { ...interestsDetail },
       },
       seeksDetails: {
         description: { ...details.description },
         jobLocation: { ...jobLocation },
-        skills: { ...skillsDetail },
-        interests: { ...interestsDetail },
         industry: { ...industryDetail },
         employmentTypes: { ...employmentTypesDetail },
         organizationNames: { ...organizationNamesDetail },
