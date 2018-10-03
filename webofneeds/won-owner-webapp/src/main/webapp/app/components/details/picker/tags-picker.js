@@ -1,10 +1,5 @@
 import angular from "angular";
-import {
-  attach,
-  delay,
-  extractHashtags,
-  dispatchEvent,
-} from "../../../utils.js";
+import { attach, delay, dispatchEvent, is } from "../../../utils.js";
 import { DomCache } from "../../../cstm-ng-utils.js";
 import wonInput from "../../../directives/input.js";
 
@@ -127,3 +122,19 @@ function genComponentConf() {
 export default angular
   .module("won.owner.components.tagsPicker", [wonInput])
   .directive("wonTagsPicker", genComponentConf).name;
+
+function extractHashtags(str) {
+  if (!str) {
+    return [];
+  }
+  if (!is("String", str)) {
+    "utils.js: extractHashtags expects a string but got: " + str;
+  }
+  const seperatorChars = ",;#";
+  const tags = str
+    .split(new RegExp(`[${seperatorChars}]+`, "i"))
+    .map(t => t.trim())
+    .filter(t => t); // filter empty after trimming
+
+  return Array.from(new Set(tags)); // filter out duplicates and return
+}

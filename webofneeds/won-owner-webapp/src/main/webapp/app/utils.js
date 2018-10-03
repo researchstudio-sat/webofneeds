@@ -1177,20 +1177,6 @@ export function mergeAsSet(arr1, arr2) {
   return Array.from(res);
 }
 
-export function extractHashtags(str) {
-  if (!str) {
-    return [];
-  }
-  if (!is("String", str)) {
-    "utils.js: extractHashtags expects a string but got: " + str;
-  }
-  const tags = (str.trim().split(/\s*,\s*|\s+/) || [])
-    .map(str => (str.startsWith("#") ? str.substring(1) : str))
-    .filter(str => str != ""); // remove leading `#`-character
-
-  return Array.from(new Set(tags)); // filter out duplicates and return
-}
-
 export function generateHexColor(text) {
   let hash = 0;
 
