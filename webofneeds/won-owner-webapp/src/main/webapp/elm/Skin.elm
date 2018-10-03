@@ -9,6 +9,7 @@ type alias Skin =
     , lineGray : Color
     , subtitleGray : Color
     , black : Color
+    , white : Color
     }
 
 
@@ -33,3 +34,15 @@ cssColor color =
     "rgba("
         ++ String.join "," colors
         ++ ")"
+
+
+setAlpha : Float -> Color -> Color
+setAlpha alpha color =
+    let
+        oldRgb =
+            toRgb color
+    in
+    fromRgb
+        { oldRgb
+            | alpha = alpha
+        }

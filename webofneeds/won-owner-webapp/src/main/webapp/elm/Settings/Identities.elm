@@ -8,7 +8,6 @@ import Element.Border as Border
 import Element.Events as Events
 import Element.Font as Font
 import Element.Input as Input
-import Elements
 import Html exposing (Html, node)
 import Html.Attributes as HA
 import Skin exposing (Skin)
@@ -111,6 +110,7 @@ init =
             , lineGray = rgb255 203 210 209
             , subtitleGray = rgb255 128 128 128
             , black = rgb255 0 0 0
+            , white = rgb255 255 255 255
             }
         , creating = Nothing
         , createQueue = []
@@ -328,7 +328,7 @@ view model =
 
                             Nothing ->
                                 createButton skin
-                        , viewUnsaved skin createQueue
+                        , listUnsaved skin createQueue
                         ]
 
                 --
@@ -339,7 +339,7 @@ view model =
                         Inactive ->
                             column [ spacing 20 ]
                                 [ createButton skin
-                                , viewUnsaved skin createQueue
+                                , listUnsaved skin createQueue
                                 , viewIdentities
                                     { skin = skin
                                     , viewedUrl = Nothing
@@ -350,7 +350,7 @@ view model =
                         Viewing url ->
                             column [ spacing 20 ]
                                 [ createButton skin
-                                , viewUnsaved skin createQueue
+                                , listUnsaved skin createQueue
                                 , viewIdentities
                                     { skin = skin
                                     , viewedUrl = Just url
@@ -361,7 +361,7 @@ view model =
                         Creating form ->
                             column [ spacing 20 ]
                                 [ createInterface skin form
-                                , viewUnsaved skin createQueue
+                                , listUnsaved skin createQueue
                                 , viewIdentities
                                     { skin = skin
                                     , viewedUrl = Nothing
@@ -448,12 +448,12 @@ createInterface skin form =
                     [ spacing 10
                     , width fill
                     ]
-                    [ Elements.mainButton
+                    [ mainButton
                         { disabled = not isValid || form == blankForm
                         , onClick = Save
                         , text = "Save"
                         }
-                    , Elements.outlinedButton
+                    , outlinedButton
                         { disabled = False
                         , onClick = Cancel
                         , text = "Cancel"
@@ -492,8 +492,8 @@ identityForm form =
         ]
 
 
-viewUnsaved : Skin -> List Identity -> Element Msg
-viewUnsaved skin unsaved =
+listUnsaved : Skin -> List Identity -> Element Msg
+listUnsaved skin unsaved =
     column
         [ spacing 20
         , width fill
@@ -501,12 +501,7 @@ viewUnsaved skin unsaved =
     <|
         List.map
             (\id ->
-                viewIdentity
-                    { skin = skin
-                    , open = False
-                    , url = Nothing
-                    , identity = id
-                    }
+                viewUnsaved skin id
             )
             unsaved
 
@@ -537,7 +532,7 @@ viewIdentities { skin, viewedUrl, identities } =
                 viewIdentity
                     { skin = skin
                     , open = open url
-                    , url = Just url
+                    , url = url
                     , identity = id
                     }
             )
@@ -545,84 +540,105 @@ viewIdentities { skin, viewedUrl, identities } =
             |> Dict.values
 
 
+viewUnsaved : Skin -> Identity -> Element Msg
+viewUnsaved skin identity =
+    card
+        [ width fill
+        , inFront <|
+            el
+                [ width fill
+                , height fill
+                , behindContent <|
+                    el
+                        [ Background.color skin.black
+                        , alpha 0.5
+                        , width fill
+                        , height fill
+                        ]
+                        none
+                ]
+            <|
+                el
+                    [ Font.color skin.white
+                    , Font.size 18
+                    , centerX
+                    , centerY
+                    ]
+                    (text "Saving...")
+        ]
+        { skin = skin
+        , header =
+            row
+                [ spacing 10
+                , width fill
+                ]
+                [ el
+                    [ width (px 100)
+                    , height (px 100)
+                    , Background.color skin.lineGray
+                    ]
+                    none
+                , column
+                    [ height fill
+                    ]
+                    [ el [ Font.size 18 ] <|
+                        case identity.description of
+                            Just description ->
+                                text description
+
+                            Nothing ->
+                                el [ Font.italic ] <| text "Unnamed Identity"
+                    , el [ height fill ] none
+                    , el
+                        [ Font.color skin.subtitleGray
+                        ]
+                      <|
+                        text ("Name: " ++ identity.displayName)
+                    ]
+                ]
+        , sections = []
+        }
+
+
 viewIdentity :
     { skin : Skin
     , open : Bool
-    , url : Maybe Url
+    , url : Url
     , identity : Identity
     }
     -> Element Msg
-viewIdentity config =
-    case config.url of
-        Just url ->
-            card
-                [ width fill
-                , Events.onClick (View url)
+viewIdentity { skin, open, url, identity } =
+    card
+        [ width fill
+        , Events.onClick (View url)
+        ]
+        { skin = skin
+        , header =
+            row
+                [ spacing 10
+                , width fill
                 ]
-                { skin = config.skin
-                , header =
-                    row
-                        [ spacing 10
-                        , width fill
-                        ]
-                        [ identicon [] url
-                        , column
-                            [ height fill
-                            ]
-                            [ el [ Font.size 18 ] <|
-                                case config.identity.description of
-                                    Just description ->
-                                        text description
+                [ identicon [] url
+                , column
+                    [ height fill
+                    ]
+                    [ el [ Font.size 18 ] <|
+                        case identity.description of
+                            Just description ->
+                                text description
 
-                                    Nothing ->
-                                        el [ Font.italic ] <| text "Unnamed Identity"
-                            , el [ height fill ] none
-                            , el
-                                [ Font.color config.skin.subtitleGray
-                                ]
-                              <|
-                                text ("Name: " ++ config.identity.displayName)
-                            ]
+                            Nothing ->
+                                el [ Font.italic ] <| text "Unnamed Identity"
+                    , el [ height fill ] none
+                    , el
+                        [ Font.color skin.subtitleGray
                         ]
-                , sections = []
-                }
-
-        Nothing ->
-            card
-                [ width fill
+                      <|
+                        text ("Name: " ++ identity.displayName)
+                    ]
                 ]
-                { skin = config.skin
-                , header =
-                    row
-                        [ spacing 10
-                        , width fill
-                        ]
-                        [ el
-                            [ width (px 100)
-                            , height (px 100)
-                            , Background.color config.skin.lineGray
-                            ]
-                            none
-                        , column
-                            [ height fill
-                            ]
-                            [ el [ Font.size 18 ] <|
-                                case config.identity.description of
-                                    Just description ->
-                                        text description
-
-                                    Nothing ->
-                                        el [ Font.italic ] <| text "Unnamed Identity"
-                            , el [ height fill ] none
-                            , el
-                                [ Font.color config.skin.subtitleGray
-                                ]
-                              <|
-                                text ("Name: " ++ config.identity.displayName)
-                            ]
-                        ]
-                , sections = []
-                }
+        , sections = []
+        }
 
 
 
