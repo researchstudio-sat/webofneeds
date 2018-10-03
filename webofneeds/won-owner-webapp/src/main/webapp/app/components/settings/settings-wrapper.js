@@ -84,7 +84,13 @@ function genComponentConf() {
   return {
     restrict: "E",
     link: (scope, element) => {
-      Elm.Settings.Identities.init({ node: element[0] });
+      const elmApp = Elm.Settings.Identities.init({ node: element[0] });
+      elmApp.ports.identitiesOutPort.subscribe(identity => {
+        console.log(identity);
+      });
+      scope.$on("$destroy", () => {
+        elmApp.ports.identitiesOutPort.unsubscribe();
+      });
     },
   };
 }
