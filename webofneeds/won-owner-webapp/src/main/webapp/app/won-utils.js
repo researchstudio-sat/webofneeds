@@ -14,12 +14,13 @@ import {
   isValidNumber,
   endOfDateStrInterval,
   getFromJsonLd,
+  toAbsoluteURL,
 } from "./utils.js";
 
 import { ownerBaseUrl } from "config";
 import urljoin from "url-join";
 import { useCases } from "useCaseDefinitions";
-
+import qr from "qr-image";
 import jsonld from "jsonld";
 window.jsonld4dbg = jsonld;
 
@@ -450,6 +451,107 @@ export function parseJsonldLeafsImm(val, type) {
   }
 }
 
+export function createDocumentDefinitionFromPost(post) {
+  if (!post) return;
+
+  let title = { text: post.get("humanReadable"), style: "title" };
+  let isHeader = { text: "I Offer", style: "branchHeader" };
+  let seeksHeader = { text: "Looking For", style: "branchHeader" };
+
+  let content = [];
+  content.push(title);
+
+  const allDetails = getAllDetails();
+
+  const isBranch = post.get("is");
+  if (isBranch) {
+    content.push(isHeader);
+    isBranch.map((detailValue, detailKey) => {
+      const detailJS =
+        detailValue && Immutable.Iterable.isIterable(detailValue)
+          ? detailValue.toJS()
+          : detailValue;
+
+      const detailDefinition = allDetails[detailKey];
+      if (detailDefinition && detailJS) {
+        content.push({ text: detailDefinition.label, style: "detailHeader" });
+        content.push({
+          text: detailDefinition.generateHumanReadable({
+            value: detailJS,
+            includeLabel: false,
+          }),
+          style: "detailText",
+        });
+      }
+    });
+  }
+
+  const seeksBranch = post.get("seeks");
+  if (seeksBranch) {
+    content.push(seeksHeader);
+    seeksBranch.map((detailValue, detailKey) => {
+      const detailJS =
+        detailValue && Immutable.Iterable.isIterable(detailValue)
+          ? detailValue.toJS()
+          : detailValue;
+
+      const detailDefinition = allDetails[detailKey];
+      if (detailDefinition && detailJS) {
+        content.push({ text: detailDefinition.label, style: "detailHeader" });
+        content.push({
+          text: detailDefinition.generateHumanReadable({
+            value: detailJS,
+            includeLabel: false,
+          }),
+          style: "detailText",
+        });
+      }
+    });
+  }
+
+  if (ownerBaseUrl && post) {
+    const path = "#!post/" + `?postUri=${encodeURI(post.get("uri"))}`;
+    const linkToPost = toAbsoluteURL(ownerBaseUrl).toString() + path;
+
+    if (linkToPost) {
+      content.push({ text: linkToPost, style: "postLink" });
+      const base64PngQrCode = generateBase64PngQrCode(linkToPost);
+      if (base64PngQrCode) {
+        content.push({
+          image: "data:image/png;base64," + base64PngQrCode,
+          width: 200,
+          height: 200,
+        });
+      }
+    }
+  }
+
+  let styles = {
+    title: {
+      fontSize: 20,
+      bold: true,
+    },
+    branchHeader: {
+      fontSize: 18,
+      bold: true,
+    },
+    detailHeader: {
+      fontSize: 12,
+      bold: true,
+    },
+    detailText: {
+      fontSize: 12,
+    },
+    postLink: {
+      fontSize: 10,
+    },
+  };
+  return {
+    content: content /*[title, 'This is an sample PDF printed with pdfMake '+this.linkToPost]*/,
+    styles: styles,
+  };
+}
+
 /**
  * Parses a json-ld value, in whatever way it's serialized, to a
  * corresponding javascript-value.
@@ -565,4 +667,22 @@ function throwParsingError(val, type, prependedMsg = "") {
     ` Failed to parse jsonld value of type \`${type}\`:\n` +
     JSON.stringify(val);
   throw new Error(fullMsg.trim());
+}
+
+export function generateSvgQrCode(link) {
+  return link && qr.imageSync(link, { type: "svg" });
+}
+
+export function generatePngQrCode(link) {
+  return link && qr.imageSync(link, { type: "png" });
+}
+
+export function generateBase64PngQrCode(link) {
+  const pngQrCode = generatePngQrCode(link);
+  return pngQrCode && btoa(String.fromCharCode.apply(null, pngQrCode));
+}
+
+export function generateBase64SvgQrCode(link) {
+  const svgQrCode = generateSvgQrCode(link);
+  return svgQrCode && btoa(svgQrCode);
 }

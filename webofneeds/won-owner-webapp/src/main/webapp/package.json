@@ -18,6 +18,8 @@
     "loadcss": "^0.0.2",
     "n3": "^1.0.0-beta.1",
     "ng-redux": "^3.5.2",
+    "pdfmake": "^0.1.38",
+    "qr-image": "^3.2.0",
     "rangy": "^1.3.0",
     "reduce-reducers": "^0.1.5",
     "redux": "^3.7.2",

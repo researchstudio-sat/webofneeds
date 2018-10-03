@@ -3,8 +3,7 @@ import ngAnimate from "angular-animate";
 import { actionCreators } from "../actions/actions.js";
 import { attach, toAbsoluteURL } from "../utils.js";
 
-import { connect2Redux } from "../won-utils.js";
-
+import { connect2Redux, generateSvgQrCode } from "../won-utils.js";
 import { ownerBaseUrl } from "config";
 
 import "style/_post-share-link.scss";
@@ -19,13 +18,22 @@ function genComponentConf() {
             <p class="psl__text" ng-if="(self.post.get('connections').size != 0 && self.post.get('ownNeed')) || !self.post.get('ownNeed')">
                 Know someone who might also be interested in this posting? Consider sharing the link below in social media.
             </p>
-            <div class="psl__inputline">
-              <input class="psl__link" value="{{self.linkToPost}}" readonly type="text" ng-focus="self.selectLink()" ng-blur="self.clearSelection()">
-              <button class="red won-button--filled psl__copy-button" ng-click="self.copyLink()">
-                <svg class="psl__button-icon" style="--local-primary:white;">
-                  <use xlink:href="{{ self.copied === true ? '#ico16_checkmark' : '#ico16_copy_to_clipboard'}}" href="{{ self.copied ? '#ico16_checkmark' : '#ico16_copy_to_clipboard'}}"></use>
-                </svg>
-              </button>
+            <div class="psl__tabs">
+              <div class="psl__tabs__tab clickable" ng-class="{'psl__tabs__tab--selected': self.showLink}" ng-click="self.showLink = true">Link</div>
+              <div class="psl__tabs__tab clickable" ng-class="{'psl__tabs__tab--selected': !self.showLink}" ng-click="self.showLink = false">QR-Code</div>
+            </div>
+            <div class="psl__link" ng-if="self.showLink">
+              <div class="psl__link__copyfield" ng-if="self.showLink">
+                <input class="psl__link__copyfield__input" value="{{self.linkToPost}}" readonly type="text" ng-focus="self.selectLink()" ng-blur="self.clearSelection()">
+                <button class="red won-button--filled psl__link__copyfield__copy-button" ng-click="self.copyLink()">
+                  <svg class="psl__link__copyfield__copy-button__icon" style="--local-primary:white;">
+                    <use xlink:href="{{ self.copied === true ? '#ico16_checkmark' : '#ico16_copy_to_clipboard'}}" href="{{ self.copied ? '#ico16_checkmark' : '#ico16_copy_to_clipboard'}}"></use>
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div class="psl__qrcode" ng-if="!self.showLink">
+              <img class="psl__qrcode__code" src="data:image/svg+xml;utf8,{{self.svgQrCodeToPost}}"/>
             </div>
         </div>
     `;
@@ -33,9 +41,11 @@ function genComponentConf() {
   class Controller {
     constructor() {
       attach(this, serviceDependencies, arguments);
+      window.postShareLink4dbg = this;
 
       const selectFromState = state => {
         const post = this.postUri && state.getIn(["needs", this.postUri]);
+        this.showLink = true;
 
         let linkToPost;
         if (ownerBaseUrl && post) {
@@ -43,10 +53,12 @@ function genComponentConf() {
 
           linkToPost = toAbsoluteURL(ownerBaseUrl).toString() + path;
         }
+        let svgQrCodeToPost = generateSvgQrCode(linkToPost);
 
         return {
           post,
           linkToPost,
+          svgQrCodeToPost,
         };
       };
       connect2Redux(selectFromState, actionCreators, ["self.postUri"], this);
