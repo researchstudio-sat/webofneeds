@@ -566,12 +566,12 @@ viewUnsaved skin identity =
                     , Background.color skin.lineGray
                     ]
                     none
-                , column
-                    [ height fill
+                , el
+                    [ centerY
+                    , Font.size 18
                     ]
-                    [ el [ Font.size 18 ] <|
-                        text identity.displayName
-                    ]
+                  <|
+                    text identity.displayName
                 ]
         , sections = []
         }
