@@ -1,4 +1,8 @@
-module Skin exposing (Skin, cssColor)
+module Skin exposing
+    ( Skin
+    , cssColor
+    , setAlpha
+    )
 
 import Element exposing (..)
 

@@ -544,18 +544,13 @@ viewUnsaved : Skin -> Identity -> Element Msg
 viewUnsaved skin identity =
     card
         [ width fill
+
+        -- overlay: "Saving..." --
         , inFront <|
             el
                 [ width fill
                 , height fill
-                , behindContent <|
-                    el
-                        [ Background.color skin.black
-                        , alpha 0.5
-                        , width fill
-                        , height fill
-                        ]
-                        none
+                , Background.color (Skin.setAlpha 0.5 skin.black)
                 ]
             <|
                 el
@@ -566,6 +561,7 @@ viewUnsaved skin identity =
                     ]
                     (text "Saving...")
         ]
+        -- card in background --
         { skin = skin
         , header =
             row
