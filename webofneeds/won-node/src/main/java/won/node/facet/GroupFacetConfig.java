@@ -5,14 +5,11 @@ import java.net.URI;
 import won.protocol.model.FacetType;
 import won.protocol.vocabulary.WON;
 
-public class GroupFacetConfig extends HardcodedFacetDerivationConfig {
+public class GroupFacetConfig extends HardcodedFacetConfig {
 
-    @Override
-    public URI getFacetType() {
-        return FacetType.GroupFacet.getURI();
-    }
     
     public GroupFacetConfig() {
+        super(FacetType.GroupFacet.getURI());
         this.derivationProperties.add(WON.HAS_GROUP_MEMBER);
     }
     

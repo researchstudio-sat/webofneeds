@@ -8,16 +8,12 @@ import org.apache.jena.rdf.model.Property;
 import won.protocol.model.FacetType;
 import won.protocol.vocabulary.WON;
 
-public class HolderFacetConfig extends HardcodedFacetDerivationConfig {
+public class HolderFacetConfig extends HardcodedFacetConfig {
 
    
     public HolderFacetConfig() {
+        super(FacetType.HoldableFacet.getURI());
         this.derivationProperties.add(WON.HOLDS);
-    }
-    
-    @Override
-    public URI getFacetType() {
-        return FacetType.HolderFacet.getURI();
     }
     
     @Override
