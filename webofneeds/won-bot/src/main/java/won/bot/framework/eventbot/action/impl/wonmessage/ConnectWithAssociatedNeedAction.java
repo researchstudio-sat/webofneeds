@@ -16,10 +16,14 @@
 
 package won.bot.framework.eventbot.action.impl.wonmessage;
 
+import java.net.URI;
+import java.util.Objects;
+import java.util.Optional;
+
 import org.apache.jena.query.Dataset;
+
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
-import won.bot.framework.eventbot.action.impl.needlifecycle.AbstractCreateNeedAction;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.NeedSpecificEvent;
 import won.bot.framework.eventbot.listener.EventListener;
@@ -28,30 +32,40 @@ import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
-
-import java.net.URI;
+import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
 /**
- * BaseEventBotAction connecting two needs on the specified facets.
+ * BaseEventBotAction connecting two needs on the specified facets or on their default facets.
  * Requires a NeedSpecificEvent to run and expeects the needURI from the event
  * to be associated with another need URI via the botContext.saveToObjectMap method.
  */
 public class ConnectWithAssociatedNeedAction extends BaseEventBotAction
 {
-  private URI remoteFacet;
-  private URI localFacet;
+  private Optional<URI> remoteFacetType = Optional.empty();
+  private Optional<URI> localFacetType = Optional.empty();
   private String welcomeMessage;
 
-  public ConnectWithAssociatedNeedAction(final EventListenerContext eventListenerContext, final URI remoteFacet,
-                                         final URI localFacet, String welcomeMessage)
+  public ConnectWithAssociatedNeedAction(final EventListenerContext eventListenerContext, final URI remoteFacetType,
+                                         final URI localFacetType, String welcomeMessage)
   {
     super(eventListenerContext);
-    this.remoteFacet = remoteFacet;
-    this.localFacet = localFacet;
+    Objects.requireNonNull(remoteFacetType);
+    Objects.requireNonNull(localFacetType);
+    this.remoteFacetType = Optional.of(remoteFacetType);
+    this.localFacetType = Optional.of(localFacetType);
     this.welcomeMessage = welcomeMessage;
   }
+  
+  
 
-  @Override
+  public ConnectWithAssociatedNeedAction(EventListenerContext eventListenerContext, String welcomeMessage) {
+    super(eventListenerContext);
+    this.welcomeMessage = welcomeMessage;
+}
+
+
+
+@Override
   public void doRun(Event event, EventListener executingListener)
   {
     if (! (event instanceof NeedSpecificEvent)){
@@ -89,10 +103,10 @@ public class ConnectWithAssociatedNeedAction extends BaseEventBotAction
       .setMessagePropertiesForConnect(
         wonNodeInformationService.generateEventURI(
           localWonNode),
-        localFacet,
+        localFacetType.map(facetType -> WonLinkedDataUtils.getFacetsOfType(fromUri, facetType, getEventListenerContext().getLinkedDataSource()).stream().findFirst().orElse(null)),
         fromUri,
         localWonNode,
-        remoteFacet,
+        remoteFacetType.map(facetType -> WonLinkedDataUtils.getFacetsOfType(toUri, facetType, getEventListenerContext().getLinkedDataSource()).stream().findFirst().orElse(null)),
         toUri,
         remoteWonNode, welcomeMessage)
       .build();

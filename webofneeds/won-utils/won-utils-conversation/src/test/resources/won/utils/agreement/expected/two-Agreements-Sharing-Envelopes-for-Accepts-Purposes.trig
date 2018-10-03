@@ -25,8 +25,8 @@
 
 <https://localhost:8443/won/resource/event/5669098069340991000> {
     event:6671551888677331000
-            won:hasFacet        won:OwnerFacet ;
-            won:hasRemoteFacet  won:OwnerFacet ;
+            won:hasFacet        won:ChatFacet ;
+            won:hasRemoteFacet  won:ChatFacet ;
             won:hasTextMessage  "hi" .
 }
 

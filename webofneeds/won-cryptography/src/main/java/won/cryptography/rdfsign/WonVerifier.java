@@ -89,7 +89,10 @@ public class WonVerifier
     // verify each signature's graph
     for (WonSignatureData wonSignatureData: verificationState.getSignatures()) {
       // extract signature graph, signature data and corresponding signed graph
-
+      if (logger.isDebugEnabled()) {
+          String loaded = publicKeys.containsKey(wonSignatureData.getVerificationCertificateUri()) ? "loaded" : "NOT LOADED";
+          logger.debug("checking signature {} by certificate {}, which is {}", new Object[] {wonSignatureData.getSignatureUri(), wonSignatureData.getVerificationCertificateUri(), loaded});
+      }
       // make sure the signed graph specified in signature exists in the message
       if (!dataset.containsNamedModel(wonSignatureData.getSignedGraphUri())) {
         logger.debug("cannot verify signature {} as it is not part of this message ", wonSignatureData.getSignatureUri());
@@ -119,6 +122,9 @@ public class WonVerifier
       if (publicKey == null) {
         verificationState
           .setVerificationFailed(wonSignatureData.getSignatureUri(), "No public key found for " + wonSignatureData.getSignatureUri());
+        if (logger.isDebugEnabled()) {
+            logger.debug("offending message:\n" + RdfUtils.toString(dataset));
+        }
         return verificationState.isVerificationPassed();
       }
 

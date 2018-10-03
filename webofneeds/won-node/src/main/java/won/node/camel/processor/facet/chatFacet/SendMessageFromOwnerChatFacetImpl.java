@@ -1,4 +1,4 @@
-package won.node.camel.processor.facet.ownerFacet;
+package won.node.camel.processor.facet.chatFacet;
 
 import org.apache.camel.Exchange;
 import org.springframework.stereotype.Component;
@@ -13,10 +13,11 @@ import won.protocol.vocabulary.WONMSG;
  * Date: 05.03.2015
  */
 @Component
-@DefaultFacetMessageProcessor(direction=WONMSG.TYPE_FROM_OWNER_STRING,messageType = WONMSG.TYPE_OPEN_STRING)
-@FacetMessageProcessor(facetType = WON.OWNER_FACET_STRING,direction=WONMSG.TYPE_FROM_OWNER_STRING,messageType =
-  WONMSG.TYPE_OPEN_STRING)
-public class OpenFromOwnerOwnerFacetImpl extends AbstractFromOwnerCamelProcessor
+@DefaultFacetMessageProcessor(direction=WONMSG.TYPE_FROM_OWNER_STRING,messageType = WONMSG
+  .TYPE_CONNECTION_MESSAGE_STRING)
+@FacetMessageProcessor(facetType = WON.CHAT_FACET_STRING,direction=WONMSG.TYPE_FROM_OWNER_STRING,messageType =
+  WONMSG.TYPE_CONNECTION_MESSAGE_STRING)
+public class SendMessageFromOwnerChatFacetImpl extends AbstractFromOwnerCamelProcessor
 {
   @Override
   public void process(final Exchange exchange) {

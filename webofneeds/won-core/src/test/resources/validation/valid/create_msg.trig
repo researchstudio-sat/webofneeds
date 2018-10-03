@@ -25,7 +25,7 @@
                                     dc:title                "[FCNYC] OFFER:   Trifle Dessert Bowl (UES/90th Street)"^^xsd:string ;
                                     dc:description  "8\" diameter, bowl is 5\" deep, whole bowl stands 9\" tall\r\n\r\n\r\nLooks like This:\r\n\r\n\r\nhttp://www.pier1.com/Large-Trifle-Bowl/2292937,default,pd.html?utm_source=Google&utm_medium=PLA&utm_campaign=google_pla&utm_content=2292937&s_cid=pla0000001&kpid=2292937\r\n\r\nPick up after noon on Sunday\r\n"^^xsd:string
                                   ] ;
-            won:hasFacet          won:OwnerFacet ;
+            won:hasFacet          won:ChatFacet ;
             won:hasNeedModality   [ a  won:NeedModality ] ;
             cert:key              [ cert:PublicKey  [ a                       woncrypt:ECCPublicKey ;
                                                       woncrypt:ecc_algorithm  "EC" ;

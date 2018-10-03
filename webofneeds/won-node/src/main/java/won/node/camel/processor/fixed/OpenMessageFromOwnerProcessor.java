@@ -12,10 +12,14 @@ import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEventType;
+import won.protocol.util.WonRdfUtils;
+import won.protocol.util.linkeddata.WonLinkedDataUtils;
+import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
 
 import java.net.URI;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * User: syim
@@ -38,6 +42,7 @@ public class OpenMessageFromOwnerProcessor extends AbstractFromOwnerCamelProcess
 
     if (!con.getRemoteNeedURI().equals(wonMessage.getReceiverNeedURI())) throw new IllegalStateException("remote need uri must be equal to receiver need uri");
     if (con.getConnectionURI() == null) throw new IllegalStateException("connection uri must not be null");
+    if (con.getFacetURI() == null) throw new IllegalStateException("connection's facet uri must not be null");
     if (!con.getConnectionURI().equals(wonMessage.getSenderURI())) throw new IllegalStateException("connection uri must be equal to sender uri");
     if (wonMessage.getReceiverURI() != null) {
       if (!wonMessage.getReceiverURI().equals(con.getRemoteConnectionURI()))
@@ -50,13 +55,50 @@ public class OpenMessageFromOwnerProcessor extends AbstractFromOwnerCamelProcess
       // do nothing. it's not clean, but easier to implement on the client side
       // TODO: refactor connection state and open/connect
     }
+    
+    // facets: the remote facet in the connection may be null before the open. 
+    // check if the owner sent a remote facet. there must not be a clash
+    Optional<URI> userDefinedRemoteFacetURI = Optional.ofNullable(WonRdfUtils.FacetUtils.getRemoteFacet(wonMessage));
+    Optional<URI> userDefinedFacetURI = Optional.ofNullable(WonRdfUtils.FacetUtils.getFacet(wonMessage));
+    failIfIsNotFacetOfNeed(userDefinedFacetURI, Optional.of(wonMessage.getSenderNeedURI()));
+    failIfIsNotFacetOfNeed(userDefinedRemoteFacetURI, Optional.of(wonMessage.getReceiverNeedURI()));
+    Optional<URI> connectionsRemoteFacetURI = Optional.ofNullable(con.getRemoteFacetURI());
 
+    // check remote facet info
+    if (userDefinedRemoteFacetURI.isPresent()) {
+        if (connectionsRemoteFacetURI.isPresent()) {
+            if (!userDefinedRemoteFacetURI.get().equals(connectionsRemoteFacetURI.get())) {
+                throw new IllegalArgumentException("Cannot process OPEN FROM_OWNER: remote facet uri clashes with value already set in connection");
+            }
+        } else {
+            // use the one from the message
+            con.setRemoteFacetURI(userDefinedRemoteFacetURI.get());
+        }
+    } else {
+        // check if neither the message nor the connection have a remote facet set 
+        if (!connectionsRemoteFacetURI.isPresent()) {
+            // none defined at all: look up default remote facet
+            con.setRemoteFacetURI(lookupDefaultFacet(con.getRemoteNeedURI()));        
+        }
+    }
+    failForIncompatibleFacets(con.getFacetURI(), con.getTypeURI(), con.getRemoteFacetURI());
     con.setState(con.getState().transit(ConnectionEventType.OWNER_OPEN));
     connectionRepository.save(con);
 
     URI remoteMessageUri = wonNodeInformationService
             .generateEventURI(wonMessage.getReceiverNodeURI());
 
+    //add the facets to the message if necessary
+    if (!userDefinedFacetURI.isPresent()) {
+        //the user did not specify a facet uri. we have to add it
+        wonMessage.addMessageProperty(WONMSG.HAS_SENDER_FACET, con.getFacetURI());
+    }
+    
+    if (!userDefinedRemoteFacetURI.isPresent()) {
+        //the user did not specify a remote uri. we have to add it
+        wonMessage.addMessageProperty(WONMSG.HAS_RECEIVER_FACET, con.getRemoteFacetURI());
+    }
+    
     //add the information about the corresponding message to the local one
     wonMessage.addMessageProperty(WONMSG.HAS_CORRESPONDING_REMOTE_MESSAGE, remoteMessageUri);
     //the persister will pick it up later
@@ -69,6 +111,12 @@ public class OpenMessageFromOwnerProcessor extends AbstractFromOwnerCamelProcess
 
   }
 
+  private URI lookupDefaultFacet(URI needURI) {
+      //look up the default facet and use that one
+      return WonLinkedDataUtils.getDefaultFacet(needURI, true, linkedDataSource)
+              .orElseThrow(() -> new IllegalStateException("No default facet found on " + needURI));
+  }
+  
   private class OutboundMessageFactory extends OutboundMessageFactoryProcessor
   {
     private Connection connection;

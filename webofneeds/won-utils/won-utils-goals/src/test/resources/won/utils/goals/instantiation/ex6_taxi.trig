@@ -32,7 +32,7 @@
 <https://satvm05.researchstudio.at/won/resource/event/7684802668741646000#need> {
     need:1196850096998977500
             a             won:Need ;
-            won:hasFacet  won:OwnerFacet ;
+            won:hasFacet  won:ChatFacet ;
             won:seeks     [ dc:title         "Taxi" ;
                             won:hasLocation  [ a                   s:Place ;
                                                won:hasBoundingBox  [

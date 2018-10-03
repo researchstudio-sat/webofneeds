@@ -18,9 +18,12 @@ package won.protocol.util.linkeddata;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
+import org.apache.activemq.blob.FTPBlobUploadStrategy;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
@@ -36,6 +39,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import won.protocol.util.RdfUtils;
+import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
 
@@ -48,42 +52,42 @@ public class WonLinkedDataUtils
 
   public static URI getConnectionStateforConnectionURI(URI connectionURI, LinkedDataSource linkedDataSource) {
 	    assert linkedDataSource != null : "linkedDataSource must not be null";
-	    Dataset dataset = getDatalForResource(connectionURI, linkedDataSource);
+	    Dataset dataset = getDataForResource(connectionURI, linkedDataSource);
 	    Path propertyPath = PathParser.parse("<" + WON.HAS_CONNECTION_STATE+ ">", PrefixMapping.Standard);
 	    return RdfUtils.getURIPropertyForPropertyPath(dataset, connectionURI, propertyPath);
 	}
   
   public static URI getNeedURIforConnectionURI(URI connectionURI, LinkedDataSource linkedDataSource) {
 	    assert linkedDataSource != null : "linkedDataSource must not be null";
-	    Dataset dataset = getDatalForResource(connectionURI, linkedDataSource);
+	    Dataset dataset = getDataForResource(connectionURI, linkedDataSource);
 	    Path propertyPath = PathParser.parse("<" + WON.BELONGS_TO_NEED + ">", PrefixMapping.Standard);
 	    return RdfUtils.getURIPropertyForPropertyPath(dataset, connectionURI, propertyPath);
 	  }
   
   public static URI getRemoteConnectionURIforConnectionURI(URI connectionURI, LinkedDataSource linkedDataSource) {
     assert linkedDataSource != null : "linkedDataSource must not be null";
-    Dataset dataset = getDatalForResource(connectionURI, linkedDataSource);
+    Dataset dataset = getDataForResource(connectionURI, linkedDataSource);
     Path propertyPath = PathParser.parse("<" + WON.HAS_REMOTE_CONNECTION + ">", PrefixMapping.Standard);
     return RdfUtils.getURIPropertyForPropertyPath(dataset, connectionURI, propertyPath);
   }
 
   public static URI getRemoteNeedURIforConnectionURI(URI connectionURI, LinkedDataSource linkedDataSource) {
     assert linkedDataSource != null : "linkedDataSource must not be null";
-    Dataset dataset = getDatalForResource(connectionURI, linkedDataSource);
+    Dataset dataset = getDataForResource(connectionURI, linkedDataSource);
     Path propertyPath = PathParser.parse("<" + WON.HAS_REMOTE_NEED + ">", PrefixMapping.Standard);
     return RdfUtils.getURIPropertyForPropertyPath(dataset, connectionURI, propertyPath);
   }
   
   public static URI getEventContainerURIforConnectionURI(URI connectionURI, LinkedDataSource linkedDataSource) {
 	    assert linkedDataSource != null : "linkedDataSource must not be null";
-	    Dataset dataset = getDatalForResource(connectionURI, linkedDataSource);
+	    Dataset dataset = getDataForResource(connectionURI, linkedDataSource);
 	    Path propertyPath = PathParser.parse("<" + WON.HAS_EVENT_CONTAINER+ ">", PrefixMapping.Standard);
 	    return RdfUtils.getURIPropertyForPropertyPath(dataset, connectionURI, propertyPath);
   }
   
   public static URI getEventContainerURIforNeedURI(URI needURI, LinkedDataSource linkedDataSource) {
 	    assert linkedDataSource != null : "linkedDataSource must not be null";
-	    Dataset dataset = getDatalForResource(needURI, linkedDataSource);
+	    Dataset dataset = getDataForResource(needURI, linkedDataSource);
 	    Path propertyPath = PathParser.parse("<" + WON.HAS_EVENT_CONTAINER+ ">", PrefixMapping.Standard);
 	    return RdfUtils.getURIPropertyForPropertyPath(dataset, needURI, propertyPath);
 }
@@ -147,7 +151,7 @@ public class WonLinkedDataUtils
     }
 
     
-  public static Dataset getDatalForResource(final URI connectionURI, final LinkedDataSource linkedDataSource) {
+  public static Dataset getDataForResource(final URI connectionURI, final LinkedDataSource linkedDataSource) {
     assert linkedDataSource != null : "linkedDataSource must not be null";
     assert connectionURI != null : "connection URI must not be null";
     Dataset dataset = null;
@@ -246,8 +250,18 @@ public class WonLinkedDataUtils
     );
   }
 
+  
+  public static Optional<URI> getDefaultFacet(URI needURI, boolean returnAnyIfNoDefaultFound, LinkedDataSource linkedDataSource) {
+      return WonRdfUtils.FacetUtils.getDefaultFacet(getDataForResource(needURI, linkedDataSource), needURI, returnAnyIfNoDefaultFound);
+  }
 
+  public static Collection<URI> getFacetsOfType(URI needURI, URI facetTypeURI, LinkedDataSource linkedDataSource) {
+      return WonRdfUtils.FacetUtils.getFacetsOfType(getDataForResource(needURI, linkedDataSource), needURI, facetTypeURI);
+  }
 
+  public static Optional<URI> getTypeOfFacet(URI facetURI, LinkedDataSource linkedDataSource) {
+      return WonRdfUtils.FacetUtils.getTypeOfFacet(getDataForResource(facetURI, linkedDataSource), facetURI);
+  }
 
   /**
    * Iterator implementation that fetches linked data lazily for the specified iterator of URIs.

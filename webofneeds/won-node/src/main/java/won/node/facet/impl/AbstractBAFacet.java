@@ -27,7 +27,7 @@ import java.util.concurrent.ExecutorService;
  * User: Danijel
  * Date: 4.6.14.
  */
-public abstract class AbstractBAFacet implements Facet
+public abstract class AbstractBAFacet implements FacetLogic
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 

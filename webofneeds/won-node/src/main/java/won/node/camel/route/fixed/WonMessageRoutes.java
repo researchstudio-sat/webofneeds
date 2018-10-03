@@ -120,8 +120,13 @@ public class WonMessageRoutes extends RouteBuilder
                 .transacted("PROPAGATION_REQUIRES_NEW")
                 .routeId("direct:executeAndStoreMessage")
                 .to("bean:parentLocker")
-                //call the default implementation, which may alter the message.
+                // remember the connection state (if any)
+                .to("bean:connectionStateChangeBuilder")
+                // call the default implementation, which may alter the message.
                 .routingSlip(method("fixedMessageProcessorSlip"))
+                // depending on connection state change, make/delete derivations
+                .to("bean:dataDeriver")
+                // now persist the message
                 .to("direct:reference-sign-persist");
 
         //adds message references, signature and persists the message, in the current transaction

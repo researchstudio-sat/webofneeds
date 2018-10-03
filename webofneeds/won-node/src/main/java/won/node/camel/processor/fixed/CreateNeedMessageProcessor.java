@@ -1,5 +1,12 @@
 package won.node.camel.processor.fixed;
 
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.jena.query.Dataset;
@@ -7,21 +14,22 @@ import org.javasimon.SimonManager;
 import org.javasimon.Split;
 import org.javasimon.Stopwatch;
 import org.springframework.stereotype.Service;
+
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.message.processor.exception.UriAlreadyInUseException;
-import won.protocol.model.*;
+import won.protocol.model.ConnectionContainer;
+import won.protocol.model.DatasetHolder;
+import won.protocol.model.Facet;
+import won.protocol.model.Need;
+import won.protocol.model.NeedEventContainer;
+import won.protocol.model.NeedState;
+import won.protocol.model.OwnerApplication;
 import won.protocol.util.NeedModelWrapper;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WONMSG;
-
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * User: syim
@@ -83,13 +91,19 @@ public class CreateNeedMessageProcessor extends AbstractCamelProcessor
 
     NeedModelWrapper needModelWrapper = new NeedModelWrapper(needContent);
     Collection<String> facets = needModelWrapper.getFacetUris();
+    Optional<String> defaultFacet = needModelWrapper.getDefaultFacet();
     if (facets.size() == 0)
       throw new IllegalArgumentException("at least one property won:hasFacet required ");
     for (String facetUri : facets) {
       // TODO: check if there is a implementation for the facet on the node
       Facet f = new Facet();
       f.setNeedURI(needURI);
-      f.setTypeURI(URI.create(facetUri));
+      f.setFacetURI(URI.create(facetUri));
+      Optional<String> facetType = needModelWrapper.getFacetType(facetUri);
+      if (!facetType.isPresent()) {
+          throw new IllegalArgumentException("cannot determine type of facet " + facetUri);
+      }
+      f.setTypeURI(URI.create(facetType.get()));
       facetRepository.save(f);
     }
 

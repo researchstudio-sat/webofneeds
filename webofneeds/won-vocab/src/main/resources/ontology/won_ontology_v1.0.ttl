@@ -70,6 +70,15 @@
           rdfs:comment "Indicates that a need or connection supports the specified facet (=behavior)."@en ;
           rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 
+		  
+###  http://purl.org/webofneeds/model#hasDefaultFacet
+:hasDefaultFacet rdf:type owl:ObjectProperty ;
+          rdfs:domain :Need ;
+          rdfs:range :Facet ;
+          rdfs:comment "Indicates the facet to connect to by default."@en ;
+          rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
+
+		  
 
 ###  http://purl.org/webofneeds/model#hasFlag
 :hasFlag rdf:type owl:ObjectProperty ;
@@ -470,8 +479,8 @@ It specifies a content - what the need is about, which may be something that is 
           rdfs:comment "The incative state. Needs do not communicate in this state. Intended to stop receiving messages for something not currently of interest."@en ;
           rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 
-###  http://purl.org/webofneeds/model#OwnerFacet
-:OwnerFacet rdf:type owl:NamedIndividual ,
+###  http://purl.org/webofneeds/model#ChatFacet
+:ChatFacet rdf:type owl:NamedIndividual ,
                      :Facet ;
             rdfs:comment "The Default facet. All messages and events are forwarded to the owner, no action is taken automatically."@en ;
             rdfs:isDefinedBy <http://purl.org/webofneeds/model> .

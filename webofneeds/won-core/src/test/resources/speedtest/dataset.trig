@@ -21,7 +21,7 @@
             won:belongsToNeed        need:8786539650086094000 ;
             won:hasConnectionState   won:Connected ;
             won:hasEventContainer    <https://satsrv04.researchstudio.at:8889/won/resource/connection/rt3odkhf6vizxrox61sp/events> ;
-            won:hasFacet             won:OwnerFacet ;
+            won:hasFacet             won:ChatFacet ;
             won:hasRemoteConnection  conn:9vhal0rnjshfx4x6j5ro ;
             won:hasRemoteNeed        need:e80lv765n203u2iv8fb7 ;
             won:hasWonNode           <https://satsrv04.researchstudio.at:8889/won/resource> .

@@ -199,7 +199,7 @@ public class LinkedDataWebController {
 	@RequestMapping("${uri.path.page.connection}/{identifier}")
 	public String showConnectionPage(@PathVariable String identifier, Model model, HttpServletResponse response) {
 		URI connectionURI = uriService.createConnectionURIForId(identifier);
-		DataWithEtag<Dataset> rdfDataset = linkedDataService.getConnectionDataset(connectionURI, true, true, null);
+		DataWithEtag<Dataset> rdfDataset = linkedDataService.getConnectionDataset(connectionURI, true, null);
 		if (rdfDataset.isNotFound()) {
 			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 			return "notFoundView";
@@ -875,7 +875,7 @@ public class LinkedDataWebController {
 
 			@Override
 			public DataWithEtag<Dataset> loadDataWithEtag(final URI uri, final String etag) {
-				return linkedDataService.getConnectionDataset(uri, true, true, etag);
+				return linkedDataService.getConnectionDataset(uri, true, etag);
 			}
 
 			@Override

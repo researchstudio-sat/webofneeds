@@ -38,7 +38,7 @@ import java.net.URI;
 
 /**
  * Creates a need with the specified facets.
- * If no facet is specified, the ownerFacet will be used.
+ * If no facet is specified, the chatFacet will be used.
  */
 public class CreateNeedWithFacetsAction extends AbstractCreateNeedAction {
     public CreateNeedWithFacetsAction(EventListenerContext eventListenerContext, String uriListName, URI... facets) {
@@ -75,8 +75,10 @@ public class CreateNeedWithFacetsAction extends AbstractCreateNeedAction {
 
         NeedModelWrapper needModelWrapper = new NeedModelWrapper(needDataset);
 
-        for (URI facetURI : facets) {
-            WonRdfUtils.FacetUtils.addFacet(needModelWrapper.getNeedModel(), facetURI);
+        int i = 1;
+        for (URI facet : facets) {
+            needModelWrapper.addFacet(needUriBeforeCreation.toString()+"#facet"+i, facet.toString());
+            i++;
         }
         final Dataset needDatasetWithFacets = needModelWrapper.copyDataset();
         final URI wonNodeUri = ctx.getNodeURISource().getNodeURI();

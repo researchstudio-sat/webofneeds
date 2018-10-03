@@ -39,7 +39,7 @@ import java.net.URI;
 
 /**
  * Creates a need with the specified facets.
- * If no facet is specified, the ownerFacet will be used.
+ * If no facet is specified, the chatFacet will be used.
  */
 public class CreateEchoNeedWithFacetsAction extends AbstractCreateNeedAction {
     public CreateEchoNeedWithFacetsAction(EventListenerContext eventListenerContext, URI... facets) {
@@ -76,8 +76,10 @@ public class CreateEchoNeedWithFacetsAction extends AbstractCreateNeedAction {
         needModelWrapper.setTitle(NeedContentPropertyType.IS_AND_SEEKS, "RE: " + replyText);
         needModelWrapper.setDescription(NeedContentPropertyType.IS_AND_SEEKS,
                 "This is a need automatically created by the EchoBot.");
-        for (URI facetUri : facets) {
-            needModelWrapper.addFacetUri(facetUri.toString());
+        int i = 1;
+        for (URI facet : facets) {
+            needModelWrapper.addFacet(needURI.toString()+"#facet"+i, facet.toString());
+            i++;
         }
 
         final Dataset echoNeedDataset = needModelWrapper.copyDataset();

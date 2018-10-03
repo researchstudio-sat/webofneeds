@@ -46,7 +46,7 @@ public class TelegramCreateAction extends AbstractCreateNeedAction {
         if (facets == null || facets.length == 0) {
             //add the default facet if none is present.
             this.facets = new ArrayList<URI>(1);
-            this.facets.add(FacetType.OwnerFacet.getURI());
+            this.facets.add(FacetType.ChatFacet.getURI());
         } else {
             this.facets = Arrays.asList(facets);
         }
@@ -94,8 +94,10 @@ public class TelegramCreateAction extends AbstractCreateNeedAction {
 
                 DefaultNeedModelWrapper wrapper = new DefaultNeedModelWrapper(needURI.toString());
                 wrapper.setTitle(type, title);
+                int i = 1;
                 for (URI facet : facets) {
-                    wrapper.addFacetUri(facet.toString());
+                    wrapper.addFacet("#facet"+ i, facet.toString());
+                    i++;
                 }
 
                 Dataset needDataset = wrapper.copyDataset();

@@ -154,8 +154,8 @@ public class DebugBot extends EventBot {
                 "needConnector",
                 new RandomDelayedAction(ctx, CONNECT_DELAY_MILLIS, CONNECT_DELAY_MILLIS, 1,
                         new ConnectWithAssociatedNeedAction(ctx,
-                                FacetType.OwnerFacet.getURI(),
-                                FacetType.OwnerFacet.getURI(),
+                                FacetType.ChatFacet.getURI(),
+                                FacetType.ChatFacet.getURI(),
                                 welcomeMessage + " " + welcomeHelpMessage)));
         bus.subscribe(NeedCreatedEventForDebugConnect.class, this.needConnector);
 
@@ -164,7 +164,7 @@ public class DebugBot extends EventBot {
                 ctx,
                 "needHinter",
                 new RandomDelayedAction(ctx, CONNECT_DELAY_MILLIS, CONNECT_DELAY_MILLIS, 1,
-                        new HintAssociatedNeedAction(ctx, FacetType.OwnerFacet.getURI(), FacetType.OwnerFacet.getURI(), matcherUri)
+                        new HintAssociatedNeedAction(ctx, matcherUri)
                 ));
         bus.subscribe(NeedCreatedEventForDebugHint.class, this.needHinter);
 

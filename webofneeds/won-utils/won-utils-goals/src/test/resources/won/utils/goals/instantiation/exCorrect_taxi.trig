@@ -42,7 +42,7 @@
 <https://satvm05.researchstudio.at/won/resource/event/dvhqs5ewq7ce#need> {
     need:vxesunm9q5in
             a             won:Need ;
-            won:hasFacet  won:OwnerFacet ;
+            won:hasFacet  won:ChatFacet ;
             won:seeks     [ dc:title          "Taxi" ;
                             won:travelAction  [ a               s:TravelAction ;
                                                 s:fromLocation  [ a       s:Place ;

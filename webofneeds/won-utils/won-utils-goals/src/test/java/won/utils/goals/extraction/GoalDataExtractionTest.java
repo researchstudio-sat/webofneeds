@@ -8,7 +8,12 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import won.utils.goals.GoalUtils;
 
 import java.io.IOException;
@@ -17,6 +22,13 @@ import java.io.InputStream;
 public class GoalDataExtractionTest {
 
     private static final String baseFolder = "/won/utils/goals/extraction/";
+    
+
+    @BeforeClass
+    public static void setLogLevel() {
+        Logger root = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+        root.setLevel(Level.INFO);  
+    }
 
     @Test
     public void additionalNodeNotCoveredByShape() throws IOException {

@@ -34,7 +34,7 @@
                                     won:hasTag                 "aaa" ;
                                     dc:description     "a"
                                   ] ;
-            won:hasFacet          won:OwnerFacet ;
+            won:hasFacet          won:ChatFacet ;
             cert:key [ cert:PublicKey
                                 [
                                     a woncrypt:ECCPublicKey ;

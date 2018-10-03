@@ -2259,10 +2259,10 @@
 
 <https://localhost:8443/won/resource/event/u3op66771mcm3ibsrr31#content-4i2l> {
     event:u3op66771mcm3ibsrr31
-            won:hasFacet             won:OwnerFacet ;
+            won:hasFacet             won:ChatFacet ;
             won:hasMatchCounterpart  need:ekdwt2a60tesl77r13mu ;
             won:hasMatchScore        "0.9"^^xsd:double ;
-            won:hasRemoteFacet       won:OwnerFacet .
+            won:hasRemoteFacet       won:ChatFacet .
 }
 
 <https://localhost/won/resource/connection/lhrkbkodc0y4rmc7z51y/events#data> {
@@ -3067,7 +3067,7 @@
 <https://localhost:8443/won/resource/event/5946672495584215000#need> {
     need:2615528351738345500
             a             won:Need ;
-            won:hasFacet  won:OwnerFacet ;
+            won:hasFacet  won:ChatFacet ;
             won:hasFlag   won:UsedForTesting ;
             won:is        [ dc:title  "Burritos" ] ;
             cert:key      [ cert:PublicKey  [ a                       woncrypt:ECCPublicKey ;
@@ -4728,7 +4728,7 @@
             won:belongsToNeed        need:ekdwt2a60tesl77r13mu ;
             won:hasConnectionState   won:Connected ;
             won:hasEventContainer    <https://localhost:8443/won/resource/connection/lhrkbkodc0y4rmc7z51y/events> ;
-            won:hasFacet             won:OwnerFacet ;
+            won:hasFacet             won:ChatFacet ;
             won:hasRemoteConnection  conn:b4vtw60q5p3ro3yfjybs ;
             won:hasRemoteNeed        need:2615528351738345500 ;
             won:hasWonNode           <https://localhost:8443/won/resource> .
@@ -5903,7 +5903,7 @@
 <https://localhost:8443/won/resource/event/h2lo8jybm27ouaa4wuqs#content-xewr> {
     need:ekdwt2a60tesl77r13mu
             a             won:Need ;
-            won:hasFacet  won:OwnerFacet ;
+            won:hasFacet  won:ChatFacet ;
             won:is        _:b0 , _:b1 , _:b2 , _:b3 ;
             won:seeks     _:b0 , _:b1 , _:b2 , _:b3 ;
             cert:key      [ cert:PublicKey  [ a                       woncrypt:ECCPublicKey ;
@@ -7414,8 +7414,8 @@
 
 <https://localhost:8443/won/resource/event/6149800720990867000#content> {
     event:6149800720990867000
-            won:hasFacet        won:OwnerFacet ;
-            won:hasRemoteFacet  won:OwnerFacet ;
+            won:hasFacet        won:ChatFacet ;
+            won:hasRemoteFacet  won:ChatFacet ;
             won:hasTextMessage  "Hello, debugbot!" .
 }
 

@@ -47,7 +47,7 @@ import java.net.URI;
 
 /**
  * Creates a need with the specified facets.
- * If no facet is specified, the ownerFacet will be used.
+ * If no facet is specified, the chatFacet will be used.
  */
 public class CreateDebugNeedWithFacetsAction extends AbstractCreateNeedAction
 {
@@ -117,8 +117,10 @@ public class CreateDebugNeedWithFacetsAction extends AbstractCreateNeedAction
         needModelWrapper.setTitle(NeedContentPropertyType.IS_AND_SEEKS, replyText);
         needModelWrapper.setDescription(NeedContentPropertyType.IS_AND_SEEKS,
                                         "This is a need automatically created by the DebugBot.");
+        int i = 1;
         for (URI facet : facets) {
-            needModelWrapper.addFacetUri(facet.toString());
+            needModelWrapper.addFacet(needURI + "#facet" + i, facet.toString());
+            i++;
         }
         final Dataset debugNeedDataset = needModelWrapper.copyDataset();
         final Event origEvent = event;

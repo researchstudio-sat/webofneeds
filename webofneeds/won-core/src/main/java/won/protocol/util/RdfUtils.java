@@ -336,6 +336,26 @@ public class RdfUtils {
 		}
 	}
 
+	/**
+	 * Set's the model's base URI. (i.e. the URI prefix for all relative or null relative URIs).
+	 * Does nothing else.
+	 * 
+	 * @param model
+	 */
+	public static void setBaseURI(final Model model, final String baseURI) {
+	   model.getNsPrefixMap().put("",baseURI);
+	}
+	
+	/**
+	 * Sets the model's base URI (i.e. the URI prefix for all relative or null relative URIs).
+	 * If the base URI was set previously, replace it in all statements with the new base URI.
+	 * Note that replacement operation does not do substring replacement, so any resources that
+	 * were created as relative to the base uri may or may not be altered, depending on the model 
+	 * implementation. 
+	 *     
+	 * @param model
+	 * @param baseURI
+	 */
 	public static void replaceBaseURI(final Model model, final String baseURI) {
 		// we assume that the RDF content is self-referential, i.e., it 'talks about
 		// itself': the graph is connected to
@@ -359,6 +379,43 @@ public class RdfUtils {
 		model.setNsPrefix("", baseURI);
 	}
 
+    public static void renameResourceWithPrefix(Dataset dataset, String prefix, String replacement) {
+        visit(dataset, new ModelVisitor<Void>() {
+            public Void visit(Model model) {
+                renameResourceWithPrefix(model, prefix, replacement);
+                return null;
+            }
+        });
+    }
+	
+	/**
+	 * Renames all URI resources in the model that start with the specified prefix by replacing it with replacement. 
+	 */
+	public static void renameResourceWithPrefix(Model model, String prefix, String replacement) {
+	    listURIResources(model)
+	        .filter(r -> 
+	            r.getURI().startsWith(prefix))
+	        .map(r -> ResourceUtils
+	                    .renameResource(r, r.getURI().replaceFirst(prefix, replacement)));
+	}
+	
+	public static Stream<Resource> listURIResources(Model model) {
+	    Set<Resource> uriResources = new HashSet();
+        StmtIterator it = model.listStatements();
+        while(it.hasNext()) {
+            Statement s = it.next();
+            Resource subject = s.getSubject();
+            RDFNode object = s.getObject();
+            if (subject.isURIResource()) {
+                uriResources.add(subject);
+            }
+            if (object.isURIResource()) {
+                uriResources.add(object.asResource());
+            }
+        }
+        return uriResources.stream();
+	}
+
 	public static void replaceBaseURI(final Dataset dataset, final String baseURI) {
 		visit(dataset, model -> {
 			replaceBaseURI(model, baseURI);
@@ -368,7 +425,8 @@ public class RdfUtils {
 
 	/**
 	 * Replaces the base URI that's set as the model's default URI prfefix in all
-	 * statements by replacement.
+	 * statements by replacement and changes the base URI to replacement.
+	 * Does not do anything if no base URI is set.
 	 *
 	 * @param model
 	 * @param replacement
@@ -1418,8 +1476,19 @@ public class RdfUtils {
 		return findOnePropertyFromResource(model, resource, property);
 	}
 
+	public static RDFNode findFirstPropertyOf(Resource resource, Property property) {
+	    return findFirstPropertyFromResource(resource.getModel(), resource, property);
+	}
+	
+	public static Optional<RDFNode> findFirstPropertyOfO(Resource resource, Property property) {
+        return Optional.ofNullable(findFirstPropertyOf(resource, property));
+    }
+	
 	public static RDFNode findFirstPropertyFromResource(final Model model, final Resource resource,
 			final Property property) {
+	    Objects.nonNull(model);
+	    Objects.nonNull(resource);
+	    Objects.nonNull(property);
 		NodeIterator iterator = model.listObjectsOfProperty(resource, property);
 		if (iterator.hasNext())
 			return iterator.next();
@@ -1657,8 +1726,8 @@ public class RdfUtils {
 	 */
 	public static Dataset addDatasetToDataset(final Dataset baseDataset, final Dataset toBeAddedtoBase,
 			boolean replaceNamedModel) {
-		assert baseDataset != null : "baseDataset must not be null";
-		assert toBeAddedtoBase != null : "toBeAddedToBase must not be null";
+		if (baseDataset == null) throw new IllegalArgumentException("baseDataset must not be null");
+		if (toBeAddedtoBase == null) throw new IllegalArgumentException("toBeAddedToBase must not be null");
 		baseDataset.getDefaultModel().add(toBeAddedtoBase.getDefaultModel());
 		for (Iterator<String> nameIt = toBeAddedtoBase.listNames(); nameIt.hasNext();) {
 			String modelName = nameIt.next();
@@ -1755,4 +1824,6 @@ public class RdfUtils {
 	public static interface GraphNameCheck {
 		public boolean isGraphUriOk(String graphUri);
 	}
+	
+	
 }

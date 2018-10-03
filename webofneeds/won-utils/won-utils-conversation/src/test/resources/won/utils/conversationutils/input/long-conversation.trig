@@ -235,7 +235,7 @@
 <https://localhost:8443/won/resource/event/tqjuk5oivtq1u5b1bkuo#content-5a2k> {
     need:2ovsiwhi5f7ok5t29gzm
             a             won:Need ;
-            won:hasFacet  won:OwnerFacet ;
+            won:hasFacet  won:ChatFacet ;
             won:hasFlag   won:UsedForTesting , won:NoHintForCounterpart , won:NoHintForMe ;
             won:is        _:b0 , _:b1 , _:b2 ;
             won:seeks     _:b0 , _:b1 , _:b2 .
@@ -2429,7 +2429,7 @@
             won:belongsToNeed        need:4517796920802783000 ;
             won:hasConnectionState   won:Connected ;
             won:hasEventContainer    <https://localhost:8443/won/resource/connection/o37u13lt3wy5edoexjmi/events> ;
-            won:hasFacet             won:OwnerFacet ;
+            won:hasFacet             won:ChatFacet ;
             won:hasRemoteConnection  conn:yukor5g3pjkfwxhap907 ;
             won:hasRemoteNeed        need:2ovsiwhi5f7ok5t29gzm ;
             won:hasWonNode           <https://localhost:8443/won/resource> .
@@ -3225,8 +3225,8 @@
 
 <https://localhost:8443/won/resource/event/3294287262210695000#content> {
     event:3294287262210695000
-            won:hasFacet        won:OwnerFacet ;
-            won:hasRemoteFacet  won:OwnerFacet ;
+            won:hasFacet        won:ChatFacet ;
+            won:hasRemoteFacet  won:ChatFacet ;
             won:hasTextMessage  "hello" .
 }
 
@@ -5625,7 +5625,7 @@
 <https://localhost:8443/won/resource/event/6806941562298968000#need> {
     need:4517796920802783000
             a             won:Need ;
-            won:hasFacet  won:OwnerFacet ;
+            won:hasFacet  won:ChatFacet ;
             won:hasFlag   won:UsedForTesting ;
             won:is        [ dc:title  "Test" ] ;
             won:is        [ dc:title  "Test" ] ;
@@ -8109,10 +8109,10 @@
 
 <https://localhost:8443/won/resource/event/e1er6lkkd3m15q3sel7e#content-nf27> {
     event:e1er6lkkd3m15q3sel7e
-            won:hasFacet             won:OwnerFacet ;
+            won:hasFacet             won:ChatFacet ;
             won:hasMatchCounterpart  need:2ovsiwhi5f7ok5t29gzm ;
             won:hasMatchScore        "0.9"^^xsd:double ;
-            won:hasRemoteFacet       won:OwnerFacet .
+            won:hasRemoteFacet       won:ChatFacet .
 }
 
 <https://localhost:8443/won/resource/event/c7mrdzpptwg8gba7yxjw#envelope-nysk> {
@@ -8350,7 +8350,7 @@
             won:belongsToNeed        need:2ovsiwhi5f7ok5t29gzm ;
             won:hasConnectionState   won:Connected ;
             won:hasEventContainer    <https://localhost:8443/won/resource/connection/yukor5g3pjkfwxhap907/events> ;
-            won:hasFacet             won:OwnerFacet ;
+            won:hasFacet             won:ChatFacet ;
             won:hasRemoteConnection  conn:o37u13lt3wy5edoexjmi ;
             won:hasRemoteNeed        need:4517796920802783000 ;
             won:hasWonNode           <https://localhost:8443/won/resource> .

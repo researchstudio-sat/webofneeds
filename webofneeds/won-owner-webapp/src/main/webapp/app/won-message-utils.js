@@ -199,8 +199,7 @@ export function buildConnectMessage({
   const message = new won.MessageBuilder(won.WONMSG.connectMessage)
     .eventURI(eventUri)
     .forEnvelopeData(envelopeData)
-    .hasFacet(won.WON.OwnerFacet)
-    .hasRemoteFacet(won.WON.OwnerFacet)
+    //do not set facets: connect the default facets with each other
     .hasTextMessage(textMessage)
     .hasOwnerDirection()
     .hasSentTimestamp(new Date().getTime().toString())
@@ -382,8 +381,6 @@ export function buildOpenMessage(
       const message = new won.MessageBuilder(won.WONMSG.openMessage)
         .eventURI(eventUri)
         .forEnvelopeData(envelopeData)
-        .hasFacet(won.WON.OwnerFacet) //TODO: check. looks like a copy-paste-leftover from connect
-        .hasRemoteFacet(won.WON.OwnerFacet) //TODO: check. looks like a copy-paste-leftover from connect
         .hasTextMessage(chatMessage)
         .hasOwnerDirection()
         .hasSentTimestamp(new Date().getTime().toString())
@@ -473,6 +470,8 @@ export async function buildCreateMessage(needData, wonNodeUri) {
     msgUri: msgUri,
     attachments: imgs, //optional, should be same as in `attachmentUris` above
   });
+  //add the @base definition to the @context so we can use #fragments in the need structure
+  msgJson["@context"]["@base"] = publishedContentUri;
   return {
     message: msgJson,
     eventUri: msgUri,
@@ -692,39 +691,14 @@ export async function fetchDataForOwnedNeeds(
   );
 
   /**
-     const allAccessibleAndRelevantData = {
-        ownNeeds: {
-            <needUri> : {
-                *:*,
-                connections: [<connectionUri>, <connectionUri>]
-            }
-            <needUri> : {
-                *:*,
-                connections: [<connectionUri>, <connectionUri>]
-            }
-        },
-        theirNeeds: {
-            <needUri>: {
-                *:*,
-                connections: [<connectionUri>, <connectionUri>] <--?
-            }
-        },
-        connections: {
-            <connectionUri> : {
-                *:*,
-                events: [<eventUri>, <eventUri>]
-            }
-            <connectionUri> : {
-                *:*,
-                events: [<eventUri>, <eventUri>]
-            }
-        }
-        events: {
-            <eventUri> : { *:* },
-            <eventUri> : { *:* }
-        }
-     }
-     */
+   * const allAccessibleAndRelevantData = { ownNeeds: { <needUri> : { :*,
+   * connections: [<connectionUri>, <connectionUri>] } <needUri> : { :*,
+   * connections: [<connectionUri>, <connectionUri>] } }, theirNeeds: {
+   * <needUri>: { :*, connections: [<connectionUri>, <connectionUri>] <--? } },
+   * connections: { <connectionUri> : { :*, events: [<eventUri>, <eventUri>] }
+   * <connectionUri> : { :*, events: [<eventUri>, <eventUri>] } } events: {
+   * <eventUri> : { *:* }, <eventUri> : { *:* } } }
+   */
 }
 
 async function fetchConnectionsOfNeedAndDispatch(

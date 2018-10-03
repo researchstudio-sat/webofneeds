@@ -16,6 +16,8 @@
 
 package won.bot.framework.eventbot.action;
 
+import java.util.Objects;
+
 import org.javasimon.SimonManager;
 import org.javasimon.Split;
 import org.javasimon.Stopwatch;
@@ -38,6 +40,7 @@ public abstract class BaseEventBotAction implements won.bot.framework.eventbot.a
 
   protected BaseEventBotAction(final EventListenerContext eventListenerContext)
   {
+    Objects.requireNonNull(eventListenerContext);
     this.eventListenerContext = eventListenerContext;
   }
 

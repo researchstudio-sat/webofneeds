@@ -44,7 +44,7 @@ public class CreateNeedFromMailAction extends AbstractCreateNeedAction {
         if (facets == null || facets.length == 0) {
             //add the default facet if none is present.
             this.facets = new ArrayList<URI>(1);
-            this.facets.add(FacetType.OwnerFacet.getURI());
+            this.facets.add(FacetType.ChatFacet.getURI());
         } else {
             this.facets = Arrays.asList(facets);
         }
@@ -76,8 +76,10 @@ public class CreateNeedFromMailAction extends AbstractCreateNeedAction {
                     needModelWrapper.addTag(type, tag);
                 }
 
+                int i = 1;
                 for (URI facet : facets) {
-                    needModelWrapper.addFacetUri(facet.toString());
+                    needModelWrapper.addFacet(needURI.toString()+"#facet"+i, facet.toString());
+                    i++;
                 }
 
                 Dataset dataset = needModelWrapper.copyDataset();

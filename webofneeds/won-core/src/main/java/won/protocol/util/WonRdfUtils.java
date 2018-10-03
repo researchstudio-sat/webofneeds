@@ -4,13 +4,15 @@ import static won.protocol.util.RdfUtils.findOnePropertyFromResource;
 import static won.protocol.util.RdfUtils.findOrCreateBaseResource;
 import static won.protocol.util.RdfUtils.visit;
 
+import java.awt.TrayIcon.MessageType;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Set;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.query.Dataset;
@@ -43,6 +45,8 @@ import org.slf4j.LoggerFactory;
 
 import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageDirection;
+import won.protocol.message.WonMessageType;
 import won.protocol.message.WonSignatureData;
 import won.protocol.model.ConnectionState;
 import won.protocol.model.Match;
@@ -729,11 +733,11 @@ public class WonRdfUtils
      * @return
        */
     public static URI getFacet(WonMessage message){
-      URI uri = getObjectOfMessageProperty(message, WON.HAS_FACET);
-      if (uri == null) {
-        uri = getObjectOfRemoteMessageProperty(message, WON.HAS_REMOTE_FACET);
-      }
-      return uri;
+        if (message.getEnvelopeType() == WonMessageDirection.FROM_EXTERNAL) {
+            return message.getReceiverFacetURI();
+        } else {
+            return message.getSenderFacetURI();
+        }
     }
 
     /**
@@ -743,11 +747,11 @@ public class WonRdfUtils
      * @return
      */
     public static URI getRemoteFacet(WonMessage message) {
-      URI uri = getObjectOfMessageProperty(message, WON.HAS_REMOTE_FACET);
-      if (uri == null) {
-        uri = getObjectOfRemoteMessageProperty(message, WON.HAS_FACET);
-      }
-      return uri;
+        if (message.getEnvelopeType() == WonMessageDirection.FROM_EXTERNAL) {
+            return message.getSenderFacetURI();
+        } else {
+            return message.getReceiverFacetURI();
+        }
     }
 
     /**
@@ -807,23 +811,136 @@ public class WonRdfUtils
       }
       return ret;
     }
+    
+    /**
+     * Returns all facets found in the model, attached to the null relative URI
+     * '<>'. Returns an empty collection if there is no such facet.
+     * 
+     * @param content
+     * @return
+     */
+    public static Optional<URI> getTypeOfFacet(Model content, URI facet) {
+        Resource resource = content.getResource(facet.toString());
+        Resource facetType = resource.getPropertyResourceValue(RDF.type);
+        if (facetType != null && facetType.isURIResource()) {
+            return Optional.of(URI.create(facetType.asResource().getURI()));
+        }
+        return Optional.empty();
+    }
+    
+    public static Optional<URI> getTypeOfFacet(Dataset content, final URI facet) {
+        return Optional.ofNullable(RdfUtils.findFirst(content, m -> getTypeOfFacet(m, facet).orElse(null)));
+    }
+    
+    
+    /**
+     * Returns all facets of the base resource of the given type.
+     * @param model
+     * @param subject
+     * @param facetType
+     * @return
+     */
+    public static Collection<URI> getFacetsOfType(Model model, URI facetType){
+        return getFacetsOfType(model, RdfUtils.getBaseResource(model), facetType);
+    }
+    
+    /**
+     * Returns all facets of subject with the given type found in the model.
+     * @param model
+     * @param facetType
+     * @return
+     */
+    public static Collection<URI> getFacetsOfType(Model model, URI subject, URI facetType){
+        return getFacetsOfType(model, model.getResource(subject.toString()), facetType);
+    }
+    
+    /**
+     * Returns all facets of the given type found in the model.
+     * @param model
+     * @param facetType
+     * @return
+     */
+    public static Collection<URI> getFacetsOfType(Model model, Resource subject, URI facetType){
+        StmtIterator stmtIterator = subject.listProperties(WON.HAS_FACET);
+        Resource facetTypeResource = model.getResource(facetType.toString());
+        LinkedList<URI> ret = new LinkedList<URI>();
+        while (stmtIterator.hasNext()){
+          RDFNode facet = stmtIterator.nextStatement().getObject();
+          if (facet.isResource() && facet.isURIResource()) {
+              if (facet.asResource().hasProperty(RDF.type, facetTypeResource)) {
+                  ret.add(URI.create(facet.toString()));
+              }
+          }
+        }
+        return ret;
+    }
+    
 
+    public static Collection<URI> getFacetsOfType(Dataset needDataset, URI needURI, URI facetType) {
+        return RdfUtils.visitFlattenedToList(needDataset, m -> getFacetsOfType(m, needURI, facetType));
+    }
+    
+    public static Optional<URI> getDefaultFacet(Model model, boolean returnAnyIfNoDefaultFound) {
+        return getDefaultFacet(model, RdfUtils.getBaseResource(model), returnAnyIfNoDefaultFound);
+    }
+    
+    public static Optional<URI> getDefaultFacet(Model model, URI subject, boolean returnAnyIfNoDefaultFound) {
+        return getDefaultFacet(model, model.getResource(subject.toString()), returnAnyIfNoDefaultFound);
+    }
+    
+    /**
+     * Returns the default facet found in the model. If there is no default facet, the result is empty. 
+     * unless returnAnyIfNoDefaultFound is true, in which case any facet may be returned.
+     * and there is no default facet, any facet may be returned 
+     * @param model 
+     * @param subject
+     * @param boolean returnAnyIfNoDefaultFound 
+     * @return
+     */
+    public static Optional<URI> getDefaultFacet(Model model, Resource subject, boolean returnAnyIfNoDefaultFound){
+        RDFNode facet = subject.getPropertyResourceValue(WON.HAS_DEFAULT_FACET);
+        if (facet != null && facet.isURIResource()) {
+            return Optional.of(URI.create(facet.toString()));
+        }
+        if (returnAnyIfNoDefaultFound) {
+            StmtIterator stmtIterator = subject.listProperties(WON.HAS_FACET);
+            while (stmtIterator.hasNext()){
+                  facet = stmtIterator.next().getObject();
+                  if (facet.isResource() && facet.isURIResource()) {
+                      return Optional.of(URI.create(facet.toString()));
+                  }
+            }
+        }
+        return Optional.empty();
+    }
+
+    public static Optional<URI> getDefaultFacet(Dataset needDataset, URI needURI, boolean returnAnyIfNoDefaultFound){
+        return Optional.ofNullable(RdfUtils.findFirst(needDataset, m -> getDefaultFacet(m, needURI, returnAnyIfNoDefaultFound).orElse(null)));
+    }
 
 
     /**
      * Adds a triple to the model of the form <> won:hasFacet [facetURI].
-     * @param content
+     * @param model
      * @param facetURI
      */
-    public static void addFacet(final Model content, final URI facetURI)
+    public static void addFacet(final Model model, final URI facetURI, final URI facetTypeURI, final boolean isDefaultFacet)
     {
-      Resource baseRes = RdfUtils.getBaseResource(content);
-      baseRes.addProperty(WON.HAS_FACET, content.createResource(facetURI.toString()));
+      Resource baseRes = RdfUtils.getBaseResource(model);
+      Resource facet = model.createResource(facetURI.toString());
+      baseRes.addProperty(WON.HAS_FACET, facet);
+      facet.addProperty(RDF.type, model.createResource(facetTypeURI.toString()));
+      if (isDefaultFacet) {
+          if (baseRes.hasProperty(WON.HAS_DEFAULT_FACET)) {
+              baseRes.removeAll(WON.HAS_DEFAULT_FACET);
+          }
+          baseRes.addProperty(WON.HAS_DEFAULT_FACET, facet);
+      }
     }
 
-      public static void addFacet(final Dataset dataset, final URI facetURI) {
+      public static void addFacet(final Dataset dataset, final URI facetURI, final URI facetTypeURI, final boolean isDefaultFacet) {
           visit(dataset, model -> {
-              addFacet(model, facetURI);
+              addFacet(model, facetURI, facetTypeURI, isDefaultFacet);
               return null;
           });
       }
@@ -840,17 +957,24 @@ public class WonRdfUtils
     }
 
     /**
-     * Creates a model for connecting two facets.CONNECTED.getURI().equals(connectionState)
+     * Creates a model for connecting two facets. Both facets are optional, if none are given
+     * the returned Optional is empty
      * @return
      */
-    public static Model createFacetModelForHintOrConnect(URI facet, URI remoteFacet)
+    public static Optional<Model> createFacetModelForHintOrConnect(Optional<URI> facet, Optional<URI> remoteFacet)
     {
+      if (!facet.isPresent() && !remoteFacet.isPresent()) {
+          return Optional.empty();
+      }
       Model model = ModelFactory.createDefaultModel();
       Resource baseResource = findOrCreateBaseResource(model);
-      WonRdfUtils.FacetUtils.addFacet(model, facet);
-      WonRdfUtils.FacetUtils.addRemoteFacet(model, remoteFacet);
-      logger.debug("facet model contains these facets: from:{} to:{}", facet, remoteFacet);
-      return model;
+      if (facet.isPresent()) {
+          baseResource.addProperty(WON.HAS_FACET, model.getResource(facet.toString()));
+      }
+      if (remoteFacet.isPresent()) {
+          baseResource.addProperty(WON.HAS_REMOTE_FACET, model.getResource(remoteFacet.toString()));
+      }
+      return Optional.of(model);
     }
 
   }

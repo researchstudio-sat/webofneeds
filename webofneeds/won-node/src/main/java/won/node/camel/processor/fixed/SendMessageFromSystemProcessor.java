@@ -47,7 +47,7 @@ public class SendMessageFromSystemProcessor extends AbstractFromOwnerCamelProces
     if (connectionUri == null){
       throw new MissingMessagePropertyException(URI.create(WONMSG.SENDER_PROPERTY.toString()));
     }
-    Connection con = connectionRepository.findOneByConnectionURIForUpdate(connectionUri);
+    Connection con = connectionRepository.findOneByConnectionURIForUpdate(connectionUri).get();
     if (con.getState() != ConnectionState.CONNECTED) {
       throw new IllegalMessageForConnectionStateException(connectionUri, "CONNECTION_MESSAGE", con.getState());
     }

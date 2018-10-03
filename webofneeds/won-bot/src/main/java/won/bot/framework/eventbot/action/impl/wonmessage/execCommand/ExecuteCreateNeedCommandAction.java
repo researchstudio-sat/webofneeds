@@ -77,8 +77,10 @@ public class ExecuteCreateNeedCommandAction extends BaseEventBotAction {
 
         NeedModelWrapper needModelWrapper = new NeedModelWrapper(needDataset);
 
+        int i = 0;
         for (URI facetURI : facets) {
-            WonRdfUtils.FacetUtils.addFacet(needModelWrapper.getNeedModel(), facetURI);
+            i++;
+            needModelWrapper.addFacet(needUriBeforeCreation.toString()+"#facet" + i, facetURI.toString());
         }
         final Dataset needDatasetWithFacets = needModelWrapper.copyDataset();
         final URI wonNodeUri = getEventListenerContext().getNodeURISource().getNodeURI();
@@ -86,6 +88,7 @@ public class ExecuteCreateNeedCommandAction extends BaseEventBotAction {
         WonNodeInformationService wonNodeInformationService =
                 getEventListenerContext().getWonNodeInformationService();
         final URI needURI = wonNodeInformationService.generateNeedURI(wonNodeUri);
+        RdfUtils.renameResourceWithPrefix(needDataset, needResource.getURI(), needURI.toString());        
         WonMessage createNeedMessage = createWonMessage(wonNodeInformationService,
                 needURI, wonNodeUri, needDatasetWithFacets, createNeedCommandEvent.isUsedForTesting(), createNeedCommandEvent.isDoNotMatch());
         //remember the need URI so we can react to success/failure responses

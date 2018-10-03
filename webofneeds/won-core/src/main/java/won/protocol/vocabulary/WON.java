@@ -64,6 +64,7 @@ public class WON {
     public static final Property IS_IN_STATE = m.createProperty(BASE_URI, "isInState");
 
     public static final Property HAS_CONTENT_GRAPH = m.createProperty(BASE_URI, "hasContentGraph");
+    public static final Property HAS_DERIVED_GRAPH = m.createProperty(BASE_URI, "hasDerivedGraph");
 
     public static final Property HAS_TEXT_MESSAGE = m.createProperty(BASE_URI + "hasTextMessage");
     public static final Property IS_PROCESSING = m.createProperty(BASE_URI + "isProcessing");
@@ -85,6 +86,7 @@ public class WON {
     public static final Property HAS_QUANTITATIVE_PROPERTY = m.createProperty(BASE_URI, "hasQuantitativeProperty");
 
     public static final Property HAS_FACET = m.createProperty(BASE_URI, "hasFacet");
+    public static final Property HAS_DEFAULT_FACET = m.createProperty(BASE_URI, "hasDefaultFacet");
     public static final Resource FACET = m.createResource(BASE_URI + "Facet");
     //This property is used in the rdf-model part of connect (from owner) and hint
     //to specify a facet to which a connection is created
@@ -197,8 +199,22 @@ public class WON {
 
 
     public static final String GROUP_FACET_STRING = BASE_URI + "GroupFacet";
-    public static final String OWNER_FACET_STRING = BASE_URI + "OwnerFacet";
-
+    
+    public static final String HAS_GROUP_MEMBER_String = BASE_URI + "hasGroupMember";
+    public static final Property HAS_GROUP_MEMBER = m.createProperty(BASE_URI, "hasGroupMember");
+    public static final String OWNED_BY_STRING = BASE_URI + "ownedBy";
+    public static final Property OWNED_BY = m.createProperty(BASE_URI + "ownedBy");
+    public static final String HELD_BY_STRING = BASE_URI + "heldBy";
+    public static final Property HELD_BY = m.createProperty(BASE_URI + "heldBy");
+    public static final String HOLDS_STRING = BASE_URI + "holds";
+    public static final Property HOLDS = m.createProperty(BASE_URI + "holds");
+    public static final String OWNS_STRING = BASE_URI + "owns";
+    public static final Property OWNS = m.createProperty(BASE_URI + "owns");
+    public static final String CONNECTED_WITH_STRING = BASE_URI + "connectedWith";
+    public static final Property CONNECTED_WITH = m.createProperty(BASE_URI + "connectedWith");
+    
+    public static final String CHAT_FACET_STRING = BASE_URI + "ChatFacet";
+    
     //unread information
 	public static final Property HAS_UNREAD_SUGGESTED = m.createProperty(BASE_URI + "hasUnreadSuggested");
 	public static final Property HAS_UNREAD_REQUEST_SENT = m.createProperty(BASE_URI + "hasUnreadRequestSent");

@@ -1,4 +1,4 @@
-package won.node.camel.processor.facet.ownerFacet;
+package won.node.camel.processor.facet.chatFacet;
 
 import org.apache.camel.Exchange;
 import org.springframework.stereotype.Component;
@@ -14,9 +14,9 @@ import won.protocol.vocabulary.WONMSG;
  */
 @Component
 @DefaultFacetMessageProcessor(direction=WONMSG.TYPE_FROM_EXTERNAL_STRING,messageType = WONMSG.TYPE_OPEN_STRING)
-@FacetMessageProcessor(facetType = WON.OWNER_FACET_STRING,direction=WONMSG.TYPE_FROM_EXTERNAL_STRING,messageType =
+@FacetMessageProcessor(facetType = WON.CHAT_FACET_STRING,direction=WONMSG.TYPE_FROM_EXTERNAL_STRING,messageType =
   WONMSG.TYPE_OPEN_STRING)
-public class OpenFromNodeOwnerFacetImpl extends AbstractCamelProcessor
+public class OpenFromNodeChatFacetImpl extends AbstractCamelProcessor
 {
   @Override
   public void process(final Exchange exchange) {

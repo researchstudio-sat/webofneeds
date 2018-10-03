@@ -17,13 +17,13 @@ import won.protocol.model.FacetType;
  * Time: 18:42
  * To change this template use File | Settings | File Templates.
  */
-public class OwnerFacetImpl extends AbstractFacet
+public class ChatFacetImpl extends AbstractFacet
 {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
   @Override
   public FacetType getFacetType() {
-      return FacetType.OwnerFacet;
+      return FacetType.ChatFacet;
   }
 
   @Override

@@ -43,9 +43,9 @@ import { Generator } from "sparqljs";
    *    args.tags = 'Couch, furniture';
    *
    *    // this is the default
-   *    args.facet = 'won:OwnerFacet';
+   *    args.facet = 'won:ChatFacet';
    *    // the options here are:
-   *    // * won.WON.OwnerFacetCompacted
+   *    // * won.WON.ChatFacetCompacted
    *    // * won.WON.GroupFacetCompacted
    *    // * won.WON.CoordinatorFacetCompacted
    *    // * won.WON.ParticipantFacetCompacted
@@ -276,7 +276,9 @@ import { Generator } from "sparqljs";
         "@type": "won:Need",
         "won:is": isContentUri ? { "@id": isContentUri } : undefined,
         "won:seeks": seeksContentUri ? { "@id": seeksContentUri } : undefined,
-        "won:hasFacet": args.facet ? args.facet : "won:OwnerFacet",
+        "won:hasFacet": args.facet
+          ? args.facet
+          : { "@id": "#chatFacet", "@type": "won:ChatFacet" },
         "won:hasFlag": new Set([
           won.debugmode ? "won:UsedForTesting" : undefined,
 
@@ -311,7 +313,6 @@ import { Generator } from "sparqljs";
       "@graph": graph,
       "@context": {
         ...won.defaultContext, // needed for the arbitrary rdf
-
         //TODO probably an alias instead of an type declaration as it's intended here
         "won:hasCurrency": "xsd:string",
         "won:hasLowerPriceLimit": "xsd:float",

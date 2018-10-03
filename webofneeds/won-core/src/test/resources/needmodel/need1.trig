@@ -47,7 +47,7 @@
                             dc:description  "people learning tennis"
                                                           ] ;
 
-            won:hasFacet          won:OwnerFacet ;
+            won:hasFacet          won:ChatFacet ;
             won:hasFlag           won:UsedForTesting ;
             won:hasFlag           won:NoHintForMe;
             cert:key              [ cert:PublicKey  [ a                       woncrypt:ECCPublicKey ;

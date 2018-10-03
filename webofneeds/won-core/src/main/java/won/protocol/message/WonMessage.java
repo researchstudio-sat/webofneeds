@@ -42,9 +42,11 @@ public class WonMessage implements Serializable {
     private URI senderURI;
     private URI senderNeedURI;
     private URI senderNodeURI;
+    private URI senderFacetURI;
     private URI receiverURI;
     private URI receiverNeedURI;
     private URI receiverNodeURI;
+    private URI receiverFacetURI;
     private List<URI> refersTo = new ArrayList<>();
     private List<URI> previousMessages = new ArrayList<>();
     private URI isResponseToMessageURI;
@@ -426,6 +428,13 @@ public class WonMessage implements Serializable {
         }
         return this.senderNodeURI;
     }
+    
+    public synchronized URI getSenderFacetURI() {
+        if (this.senderFacetURI == null) {
+            this.senderFacetURI = getEnvelopePropertyURIValue(WONMSG.HAS_SENDER_FACET);
+        }
+        return this.senderFacetURI;
+    }
 
 
     public synchronized URI getReceiverURI() {
@@ -450,7 +459,13 @@ public class WonMessage implements Serializable {
         }
         return this.receiverNodeURI;
     }
-
+    
+    public synchronized URI getReceiverFacetURI() {
+        if (this.receiverFacetURI == null) {
+            this.receiverFacetURI = getEnvelopePropertyURIValue(WONMSG.HAS_RECEIVER_FACET);
+        }
+        return this.receiverFacetURI;
+    }
 
     public synchronized List<URI> getRefersTo() {
         if (this.refersTo == null) {

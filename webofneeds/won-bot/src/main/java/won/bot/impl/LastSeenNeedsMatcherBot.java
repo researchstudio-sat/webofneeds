@@ -37,6 +37,7 @@ import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 
 import java.net.URI;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -116,10 +117,10 @@ public class LastSeenNeedsMatcherBot extends EventBot
         wonNodeInformationService.generateEventURI(
           localWonNode),
         needURI,
-        FacetType.OwnerFacet.getURI(),
+        Optional.empty(),
         localWonNode,
         otherNeedURI,
-        FacetType.OwnerFacet.getURI(),
+        Optional.empty(),
         originator,
         score)
       .build();

@@ -26,10 +26,12 @@ import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
+import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
 import java.net.URI;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Optional;
 
 /**
  * BaseEventBotAction connecting two needs on the specified facets. The need's URIs are obtained from
@@ -37,16 +39,16 @@ import java.util.Iterator;
  */
 public class ConnectTwoNeedsAction extends BaseEventBotAction
 {
-  private URI remoteFacet;
-  private URI localFacet;
+  private Optional<URI> remoteFacetType = Optional.empty();
+  private Optional<URI> localFacetType = Optional.empty();
   private String welcomeMessage;
 
-  public ConnectTwoNeedsAction(final EventListenerContext eventListenerContext, final URI remoteFacet, final URI
-    localFacet, final String welcomeMessage)
+  public ConnectTwoNeedsAction(final EventListenerContext eventListenerContext, final URI remoteFacetType, final URI
+    localFacetType, final String welcomeMessage)
   {
     super(eventListenerContext);
-    this.remoteFacet = remoteFacet;
-    this.localFacet = localFacet;
+    this.remoteFacetType = Optional.of(remoteFacetType);
+    this.localFacetType = Optional.of(localFacetType);
     this.welcomeMessage = welcomeMessage;
   }
 
@@ -83,10 +85,10 @@ public class ConnectTwoNeedsAction extends BaseEventBotAction
       WonMessageBuilder.setMessagePropertiesForConnect(
         wonNodeInformationService.generateEventURI(
           localWonNode),
-        localFacet,
+        localFacetType.map(facetType -> WonLinkedDataUtils.getFacetsOfType(fromUri, facetType, getEventListenerContext().getLinkedDataSource()).stream().findFirst().orElse(null)),
         fromUri,
         localWonNode,
-        remoteFacet,
+        remoteFacetType.map(facetType -> WonLinkedDataUtils.getFacetsOfType(toUri, facetType, getEventListenerContext().getLinkedDataSource()).stream().findFirst().orElse(null)),
         toUri,
         remoteWonNode,
         welcomeMessage)

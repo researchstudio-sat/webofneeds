@@ -69,8 +69,8 @@ public class SendMessageFromNodeGroupFacetImpl extends AbstractFromOwnerCamelPro
 
         final Connection conOfIncomingMessage = connectionRepository.findByConnectionURI(wonMessage.getReceiverURI()).get(0);
 
-        final List<Connection> consInGroup = connectionRepository.findByNeedURIAndStateAndTypeURI(conOfIncomingMessage.getNeedURI(),
-                ConnectionState.CONNECTED, FacetType.GroupFacet.getURI());
+        final List<Connection> consInGroup = connectionRepository.findByFacetURIAndState(conOfIncomingMessage.getFacetURI(),
+                ConnectionState.CONNECTED);
 
         if (consInGroup == null || consInGroup.size() < 2) return;
         if (logger.isDebugEnabled()) {

@@ -366,13 +366,11 @@ public interface LinkedDataService {
 	 * 
 	 * @param connectionUri
 	 * @param includeEventContainer
-	 * @param includeLatestEvent
 	 * @param etag
 	 * @return
 	 * @throws NoSuchConnectionException
 	 */
-	DataWithEtag<Dataset> getConnectionDataset(URI connectionUri, boolean includeEventContainer,
-			boolean includeLatestEvent, String etag);
+	DataWithEtag<Dataset> getConnectionDataset(URI connectionUri, boolean includeEventContainer, String etag);
 
 	/**
 	 * Returns a dataset containing all event uris belonging to the specified

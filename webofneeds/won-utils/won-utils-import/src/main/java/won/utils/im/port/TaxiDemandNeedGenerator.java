@@ -39,7 +39,7 @@ public class TaxiDemandNeedGenerator {
         Random random = new Random();        
         for (int i = 0; i < N; i++) {
             String rnd = Long.toHexString(random.nextLong());
-            String needURI = "https://localhost:8443/won/resource/event/" + "taxi_demand_need_" + rnd + "#need";
+            String needURI = "https://localhost:8443/won/resource/event/" + "taxi_demand_need_" + rnd ;
 
             model = ModelFactory.createDefaultModel();
 
@@ -49,7 +49,6 @@ public class TaxiDemandNeedGenerator {
             Resource isPart = model.createResource();
             Resource seeksPart = model.createResource();
             Resource won_Need = model.createResource("http://purl.org/webofneeds/model#Need");
-            Resource won_OwnerFacet = model.createResource("http://purl.org/webofneeds/model#OwnerFacet");
 
             // method signatures: branch, probability that detail is added, min, max
             isPart = addTitle(isPart, 1.0, i);
@@ -61,7 +60,6 @@ public class TaxiDemandNeedGenerator {
             seeksPart = addTravelAction(seeksPart, 0.9);
 
             need.addProperty(RDF.type, won_Need);
-            need.addProperty(won_hasFacet, won_OwnerFacet);
             need.addProperty(won_is, isPart);
             need.addProperty(won_seeks, seeksPart);
 
