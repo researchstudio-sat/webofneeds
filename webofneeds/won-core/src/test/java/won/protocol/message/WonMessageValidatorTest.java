@@ -168,6 +168,21 @@ public class WonMessageValidatorTest
     Assert.assertTrue("validation is expected not to fail at " + message, valid);
   }
 
+  @Test
+  public void testValidForwardToReceiverMessage() throws IOException {
+    WonMessageValidator validator = new WonMessageValidator();
+    StringBuilder message = new StringBuilder();
+    boolean valid = validator.validate(Utils.createTestDataset("/validation/valid/conversation_msg_with_forward.trig"), message);
+    Assert.assertTrue("validation is expected not to fail at " + message, valid);
+  }
+
+  @Test
+  public void testInvalidForwardToReceiverMessage() throws IOException {
+    WonMessageValidator validator = new WonMessageValidator();
+    StringBuilder message = new StringBuilder();
+    boolean valid = validator.validate(Utils.createTestDataset("/validation/invalid/create_msg_with_forward.trig"), message);
+    Assert.assertFalse("validation is expected to fail at " + message, valid);
+  }
   
   @Test
   public void testInvalidDefaultGraph() throws IOException {
