@@ -76,6 +76,7 @@ public class RealEstateNeedGenerator {
         parentFolder.mkdirs();
         Arrays.stream(parentFolder.listFiles()).forEach(f -> f.delete());
         final int N = 10000;
+        int outputSteps = N/10/10*10;
         Random random = new Random();
         for (int i = 0; i < N; i++) {
             String rnd = Long.toHexString(random.nextLong());
@@ -85,7 +86,7 @@ public class RealEstateNeedGenerator {
 
             setPrefixes();
 
-            Resource need = model.createResource(needURI+"#need");
+            Resource need = model.createResource(needURI);
             Resource isPart = model.createResource();
             Resource seeksPart = model.createResource();
             Resource won_Need = model.createResource("http://purl.org/webofneeds/model#Need");
@@ -106,13 +107,15 @@ public class RealEstateNeedGenerator {
 
             need.addProperty(RDF.type, won_Need);
             
-            Resource holdableFacet = need.getModel().getResource(needURI + "holdableFacet");
+            /* no facets - they are added by the bot
+            Resource holdableFacet = need.getModel().getResource(needURI + "#holdableFacet");
             holdableFacet.addProperty(RDF.type, holdableFacet.getModel().getResource(FacetType.HoldableFacet.getURI().toString()));
             need.addProperty(won_hasFacet, holdableFacet);
 
-            Resource chatFacet = need.getModel().getResource(needURI + "chatFacet");
+            Resource chatFacet = need.getModel().getResource(needURI + "#chatFacet");
             chatFacet.addProperty(RDF.type, chatFacet.getModel().getResource(FacetType.ChatFacet.getURI().toString()));
             need.addProperty(won_hasFacet, chatFacet);
+            */
             
             need.addProperty(won_is, isPart);
             need.addProperty(won_seeks, seeksPart);
@@ -124,6 +127,9 @@ public class RealEstateNeedGenerator {
                 out.close();
             } catch (Exception e) {
                 throw new RuntimeException(e);
+            }
+            if (i % outputSteps == 0) {
+                System.out.println("generated " + i + " sample needs");
             }
         }
         System.out.println("generated " + N + " sample needs");

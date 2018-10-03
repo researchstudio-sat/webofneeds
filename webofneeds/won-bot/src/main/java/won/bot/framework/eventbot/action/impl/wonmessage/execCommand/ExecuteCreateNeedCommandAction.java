@@ -88,6 +88,7 @@ public class ExecuteCreateNeedCommandAction extends BaseEventBotAction {
         WonNodeInformationService wonNodeInformationService =
                 getEventListenerContext().getWonNodeInformationService();
         final URI needURI = wonNodeInformationService.generateNeedURI(wonNodeUri);
+        RdfUtils.renameResourceWithPrefix(needDataset, needResource.getURI(), needURI.toString());        
         WonMessage createNeedMessage = createWonMessage(wonNodeInformationService,
                 needURI, wonNodeUri, needDatasetWithFacets, createNeedCommandEvent.isUsedForTesting(), createNeedCommandEvent.isDoNotMatch());
         //remember the need URI so we can react to success/failure responses

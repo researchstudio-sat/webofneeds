@@ -379,6 +379,43 @@ public class RdfUtils {
 		model.setNsPrefix("", baseURI);
 	}
 
+    public static void renameResourceWithPrefix(Dataset dataset, String prefix, String replacement) {
+        visit(dataset, new ModelVisitor<Void>() {
+            public Void visit(Model model) {
+                renameResourceWithPrefix(model, prefix, replacement);
+                return null;
+            }
+        });
+    }
+	
+	/**
+	 * Renames all URI resources in the model that start with the specified prefix by replacing it with replacement. 
+	 */
+	public static void renameResourceWithPrefix(Model model, String prefix, String replacement) {
+	    listURIResources(model)
+	        .filter(r -> 
+	            r.getURI().startsWith(prefix))
+	        .map(r -> ResourceUtils
+	                    .renameResource(r, r.getURI().replaceFirst(prefix, replacement)));
+	}
+	
+	public static Stream<Resource> listURIResources(Model model) {
+	    Set<Resource> uriResources = new HashSet();
+        StmtIterator it = model.listStatements();
+        while(it.hasNext()) {
+            Statement s = it.next();
+            Resource subject = s.getSubject();
+            RDFNode object = s.getObject();
+            if (subject.isURIResource()) {
+                uriResources.add(subject);
+            }
+            if (object.isURIResource()) {
+                uriResources.add(object.asResource());
+            }
+        }
+        return uriResources.stream();
+	}
+
 	public static void replaceBaseURI(final Dataset dataset, final String baseURI) {
 		visit(dataset, model -> {
 			replaceBaseURI(model, baseURI);
