@@ -212,6 +212,8 @@ public class WON {
     public static final Property OWNS = m.createProperty(BASE_URI + "owns");
     public static final String CONNECTED_WITH_STRING = BASE_URI + "connectedWith";
     public static final Property CONNECTED_WITH = m.createProperty(BASE_URI + "connectedWith");
+    public static final Property REVIEWS = m.createProperty(BASE_URI + "reviews");
+    public static final String REVIEWS_STRING = BASE_URI + "reviews";
     
     public static final String CHAT_FACET_STRING = BASE_URI + "ChatFacet";
     

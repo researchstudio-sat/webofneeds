@@ -5,15 +5,11 @@ import java.net.URI;
 import won.protocol.model.FacetType;
 import won.protocol.vocabulary.WON;
 
-public class HoldableFacetConfig extends HardcodedFacetDerivationConfig {
+public class HoldableFacetConfig extends HardcodedFacetConfig {
     
     public HoldableFacetConfig() {
+        super(FacetType.HoldableFacet.getURI());
         this.derivationProperties.add(WON.HELD_BY);
-    }
-    
-    @Override
-    public URI getFacetType() {
-        return FacetType.HoldableFacet.getURI();
     }
     
     @Override

@@ -46,6 +46,7 @@ public class WonMessageBuilder
   private URI receiverNeedURI;
   private URI receiverNodeURI;
   private URI receiverFacetURI;
+  private Set<URI> forwardToReceiverURIs = new HashSet<>();
 
   private WonMessageType wonMessageType;
   private WonMessageDirection wonMessageDirection;
@@ -174,6 +175,12 @@ public class WonMessageBuilder
         messageEventResource.addProperty(
         WONMSG.HAS_RECEIVER_FACET, 
         envelopeGraph.createResource(receiverFacetURI.toString()));
+    }
+    
+    // add forwards
+    if (!forwardToReceiverURIs.isEmpty()) {
+        forwardToReceiverURIs.forEach(receiver -> messageEventResource.addProperty(WONMSG.HAS_FORWARD_TO_RECEIVER,
+                envelopeGraph.getResource(receiver.toString())));
     }
     
     // add refersTo

@@ -1,3 +1,4 @@
+
 package won.protocol.model;
 
 import won.protocol.vocabulary.WON;
@@ -16,6 +17,7 @@ public enum FacetType {
     HolderFacet("HolderFacet"),
     HoldableFacet("HoldableFacet"),
     GroupFacet("GroupFacet"),
+    ReviewFacet("ReviewFacet"),
     CoordinatorFacet("CoordinatorFacet"),
     ParticipantFacet("ParticipantFacet"),
     CommentFacet("CommentFacet"),
