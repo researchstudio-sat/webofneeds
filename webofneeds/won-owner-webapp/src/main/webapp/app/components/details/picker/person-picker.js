@@ -78,11 +78,8 @@ function genComponentConf() {
           let personIndex = this.personDetails.findIndex(
             personDetail => personDetail.name === dtl
           );
-          if (personIndex !== -1 && dtl !== "skills") {
+          if (personIndex !== -1) {
             this.personDetails[personIndex].value = value;
-          } else if (personIndex !== -1 && dtl === "skills") {
-            let valueText = value.size > 0 ? value.toJS() : [];
-            this.personDetails[personIndex].value = valueText.toString();
           }
           if (value && value.length > 0) {
             this.visibleResetButtons.add(dtl);
