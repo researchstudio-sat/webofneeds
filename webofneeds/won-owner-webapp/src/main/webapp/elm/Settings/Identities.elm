@@ -1,4 +1,4 @@
-module Settings.Identities exposing (main)
+port module Settings.Identities exposing (main)
 
 import Browser
 import Dict exposing (Dict)
@@ -20,7 +20,7 @@ main =
         { init = \() -> ( init, Cmd.none )
         , update = update
         , view = view
-        , subscriptions = always Sub.none
+        , subscriptions = subscriptions
         }
 
 
@@ -71,6 +71,22 @@ fromForm valid =
     , website = String.nonEmpty form.website
     , aboutMe = String.nonEmpty form.aboutMe
     }
+
+
+
+---- PORTS ----
+
+
+port identitiesInPort :
+    ({ url : Url
+     , identity : Identity
+     }
+     -> msg
+    )
+    -> Sub msg
+
+
+port identitiesOutPort : Identity -> Cmd msg
 
 
 
@@ -148,7 +164,7 @@ update msg model =
 
                 ( Save, Just form ) ->
                     case saveForm form of
-                        Ok ( identity, cmd ) ->
+                        Just ( identity, cmd ) ->
                             ( Loading
                                 { loadingModel
                                     | creating = Nothing
@@ -157,8 +173,8 @@ update msg model =
                             , cmd
                             )
 
-                        Err cmd ->
-                            ( model, cmd )
+                        Nothing ->
+                            ( model, Cmd.none )
 
                 ( Cancel, Just _ ) ->
                     ( Loading
@@ -214,7 +230,7 @@ update msg model =
                     case loadedModel.viewState of
                         Creating form ->
                             case saveForm form of
-                                Ok ( identity, cmd ) ->
+                                Just ( identity, cmd ) ->
                                     ( Loaded
                                         { loadedModel
                                             | viewState = Inactive
@@ -223,8 +239,8 @@ update msg model =
                                     , cmd
                                     )
 
-                                Err cmd ->
-                                    ( model, cmd )
+                                Nothing ->
+                                    ( model, Cmd.none )
 
                         _ ->
                             ( model, Cmd.none )
@@ -285,16 +301,24 @@ update msg model =
                             ( model, Cmd.none )
 
 
-saveForm : IdentityForm -> Result (Cmd Msg) ( Identity, Cmd Msg )
+saveForm : IdentityForm -> Maybe ( Identity, Cmd Msg )
 saveForm form =
     case Validate.validate identityValidator form of
         Ok valid ->
             -- TODO: Send create command
-            Ok ( fromForm valid, Cmd.none )
+            let
+                identity =
+                    fromForm valid
+            in
+            Just ( identity, identitiesOutPort identity )
 
-        Err error ->
-            -- TODO: Send error to toast
-            Err Cmd.none
+        Err _ ->
+            Nothing
+
+
+subscriptions : Model -> Sub Msg
+subscriptions _ =
+    identitiesInPort (\{ url, identity } -> ReceivedIdentity url identity)
 
 
 
