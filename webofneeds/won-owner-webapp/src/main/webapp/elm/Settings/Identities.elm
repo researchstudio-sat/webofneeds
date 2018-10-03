@@ -29,32 +29,33 @@ main =
 
 
 type alias IdentityForm =
-    { description : String
-    , displayName : String
+    { displayName : String
     , website : String
     , aboutMe : String
     }
 
 
 type alias Identity =
-    { description : Maybe String
-    , displayName : String
+    { displayName : String
     , website : Maybe String
     , aboutMe : Maybe String
     }
 
 
-identityValidator : Validator String IdentityForm
+type ValidationError
+    = DisplayNameError String
+
+
+identityValidator : Validator ValidationError IdentityForm
 identityValidator =
     Validate.all
-        [ Validate.ifBlank .displayName "Please enter a display name."
+        [ Validate.ifBlank .displayName (DisplayNameError "Please enter a display name.")
         ]
 
 
 blankForm : IdentityForm
 blankForm =
-    { description = ""
-    , displayName = ""
+    { displayName = ""
     , website = ""
     , aboutMe = ""
     }
@@ -66,8 +67,7 @@ fromForm valid =
         form =
             Validate.fromValid valid
     in
-    { description = String.nonEmpty form.description
-    , displayName = form.displayName
+    { displayName = form.displayName
     , website = String.nonEmpty form.website
     , aboutMe = String.nonEmpty form.aboutMe
     }
@@ -375,6 +375,7 @@ createButton skin =
     Input.button
         [ width fill
         , Border.color skin.lineGray
+        , padding 5
         , Border.width 2
         ]
         { onPress = Just Create
@@ -407,20 +408,16 @@ createInterface skin form =
         [ width fill ]
         { skin = skin
         , header =
-            row
+            column
                 [ width fill
                 , spacing 10
                 ]
-                [ el
-                    [ width (px 100)
-                    , height (px 100)
-                    , Background.color skin.lineGray
+                [ Input.text
+                    [ centerY
                     ]
-                    none
-                , Input.text [ centerY ]
-                    { onChange = \str -> FormUpdated { form | description = str }
-                    , text = form.description
-                    , placeholder = Just (Input.placeholder [] <| text "Unnamed Identity")
+                    { onChange = \str -> FormUpdated { form | displayName = str }
+                    , text = form.displayName
+                    , placeholder = Just (Input.placeholder [] <| text "Display Name")
                     , label =
                         Input.labelAbove
                             [ width (px 0)
@@ -429,36 +426,37 @@ createInterface skin form =
                             ]
                             (text "Display Name")
                     }
+                , errors
+                    |> List.filterMap
+                        (\error ->
+                            case error of
+                                DisplayNameError str ->
+                                    Just str
+                        )
+                    |> List.head
+                    |> Maybe.map
+                        (\str ->
+                            el [ Font.color skin.primaryColor ] <|
+                                text str
+                        )
+                    |> Maybe.withDefault none
                 ]
         , sections =
             [ identityForm form
-            , column
-                [ width fill
-                , spacing 10
+            , row
+                [ spacing 10
+                , width fill
                 ]
-                [ if isValid then
-                    none
-
-                  else
-                    column
-                        [ Font.color skin.primaryColor
-                        ]
-                        (List.map text errors)
-                , row
-                    [ spacing 10
-                    , width fill
-                    ]
-                    [ mainButton
-                        { disabled = not isValid || form == blankForm
-                        , onClick = Save
-                        , text = "Save"
-                        }
-                    , outlinedButton
-                        { disabled = False
-                        , onClick = Cancel
-                        , text = "Cancel"
-                        }
-                    ]
+                [ mainButton
+                    { disabled = not isValid || form == blankForm
+                    , onClick = Save
+                    , text = "Save"
+                    }
+                , outlinedButton
+                    { disabled = False
+                    , onClick = Cancel
+                    , text = "Cancel"
+                    }
                 ]
             ]
         }
@@ -471,12 +469,6 @@ identityForm form =
         , width fill
         ]
         [ Input.text []
-            { onChange = \str -> FormUpdated { form | displayName = str }
-            , text = form.displayName
-            , placeholder = Nothing
-            , label = Input.labelAbove [] (text "Display Name")
-            }
-        , Input.text []
             { onChange = \str -> FormUpdated { form | website = str }
             , text = form.website
             , placeholder = Nothing
@@ -578,18 +570,7 @@ viewUnsaved skin identity =
                     [ height fill
                     ]
                     [ el [ Font.size 18 ] <|
-                        case identity.description of
-                            Just description ->
-                                text description
-
-                            Nothing ->
-                                el [ Font.italic ] <| text "Unnamed Identity"
-                    , el [ height fill ] none
-                    , el
-                        [ Font.color skin.subtitleGray
-                        ]
-                      <|
-                        text ("Name: " ++ identity.displayName)
+                        text identity.displayName
                     ]
                 ]
         , sections = []
@@ -619,18 +600,7 @@ viewIdentity { skin, open, url, identity } =
                     [ height fill
                     ]
                     [ el [ Font.size 18 ] <|
-                        case identity.description of
-                            Just description ->
-                                text description
-
-                            Nothing ->
-                                el [ Font.italic ] <| text "Unnamed Identity"
-                    , el [ height fill ] none
-                    , el
-                        [ Font.color skin.subtitleGray
-                        ]
-                      <|
-                        text ("Name: " ++ identity.displayName)
+                        text identity.displayName
                     ]
                 ]
         , sections = []
