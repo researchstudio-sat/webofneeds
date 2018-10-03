@@ -55,11 +55,11 @@ function genComponentConf() {
      * Checks validity and uses callback method
      */
     update(text, rating) {
-      const trimmedText = text.trim();
+      const trimmedText = text && text.trim();
       if (rating) {
         this.onUpdate({
           value: {
-            text: trimmedText === "" ? undefined : trimmedText,
+            text: trimmedText,
             rating: rating,
           },
         });
@@ -103,9 +103,9 @@ function genComponentConf() {
     }
 
     updateText() {
-      const text = this.text().value;
+      this.addedText = this.text().value;
 
-      this.update(text, this.selectedRating);
+      this.update(this.addedText, this.selectedRating);
       this.showResetButton = true;
     }
 
