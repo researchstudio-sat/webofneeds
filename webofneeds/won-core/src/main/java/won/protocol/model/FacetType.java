@@ -17,7 +17,7 @@ public enum FacetType {
     HolderFacet("HolderFacet"),
     HoldableFacet("HoldableFacet"),
     GroupFacet("GroupFacet"),
-    RateFacet("RateFacet"),
+    ReviewFacet("ReviewFacet"),
     CoordinatorFacet("CoordinatorFacet"),
     ParticipantFacet("ParticipantFacet"),
     CommentFacet("CommentFacet"),
