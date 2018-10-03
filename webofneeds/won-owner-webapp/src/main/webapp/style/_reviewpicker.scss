@@ -6,7 +6,7 @@ won-review-picker {
   .reviewp__input {
     position: relative;
     display: grid;
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: 1fr auto;
 
     &__reset {
       position: relative;
@@ -14,14 +14,13 @@ won-review-picker {
       &__icon {
         @include fixed-square($bigiconSize);
         position: absolute;
-        left: 0;
+        right: 0;
         top: 0.5rem;
       }
     }
 
     .reviewp__input__inner {
       @extend .won-txt;
-      text-align: right;
       border: $thinGrayBorder;
 
       @include textfieldPadding(
@@ -43,12 +42,13 @@ won-review-picker {
           $thinBorderWidth,
           $formInputHeight
         );
-        padding: $verticalPadding 0.438rem $verticalPadding 0.438rem +
-          $bigiconSize;
+        padding: $verticalPadding 0.438rem + $bigiconSize $verticalPadding
+          0.438rem;
       }
     }
 
-    .reviewp__input__currency {
+    .reviewp__input__rating {
+      grid-column: 1 / span 2;
       border: $thinGrayBorder;
       min-height: $formInputHeight;
       min-height: $formInputHeight;
@@ -63,29 +63,6 @@ won-review-picker {
       );
       padding: $verticalPadding 0.438rem + $bigiconSize $verticalPadding
         0.438rem;
-    }
-
-    .reviewp__input__unitCode {
-      grid-column: 1 / span 3;
-      border: $thinGrayBorder;
-      min-height: $formInputHeight;
-      min-height: $formInputHeight;
-      word-wrap: break-word;
-      font-size: 1rem;
-
-      $verticalPadding: calcVerticalPaddingToHeight(
-        $normalFontSize,
-        22/16,
-        $thinBorderWidth,
-        $formInputHeight
-      );
-      padding: $verticalPadding 0.438rem + $bigiconSize $verticalPadding
-        0.438rem;
-    }
-
-    .reviewp__input__inner::-ms-clear {
-      width: 0;
-      height: 0;
     }
   }
 }

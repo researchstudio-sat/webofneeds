@@ -1,5 +1,5 @@
 import angular from "angular";
-import { attach, delay, isValidNumber } from "../../../utils.js";
+import { attach, delay } from "../../../utils.js";
 import wonInput from "../../../directives/input.js";
 
 import "style/_reviewpicker.scss";
@@ -8,36 +8,28 @@ const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
   let template = `
       <div class="reviewp__input">
+        <select
+            class="reviewp__input__rating"
+            ng-model="self.selectedRating"
+            ng-disabled="self.detail.rating.length <= 1"
+            won-input="::self.updateRating()">
+            <option ng-repeat="rating in self.detail.rating" value="{{rating.value}}">{{rating.label}}</option>
+        </select>
+        <input
+            type="text"
+            class="reviewp__input__inner"
+            placeholder="{{self.detail.placeholder}}"
+            ng-blur="::self.updateText(true)"
+            won-input="::self.updateText(false)"
+            ng-class="{'reviewp__input__inner--withreset' : self.showResetButton}"/>
         <div class="reviewp__input__reset clickable">
           <svg class="reviewp__input__reset__icon"
             style="--local-primary:var(--won-primary-color);"
             ng-if="self.showResetButton"
-            ng-click="self.resetNumber(true)">
+            ng-click="self.resetText(true)">
             <use xlink:href="#ico36_close" href="#ico36_close"></use>
           </svg>
         </div>
-        <input
-            type="number"
-            class="reviewp__input__inner"
-            placeholder="{{self.detail.placeholder}}"
-            ng-blur="::self.updateNumber(true)"
-            won-input="::self.updateNumber(false)"
-            ng-class="{'reviewp__input__inner--withreset' : self.showResetButton}"/>
-        <select
-            class="reviewp__input__currency"
-            ng-model="self.selectedCurrency"
-            ng-disabled="self.detail.currency.length <= 1"
-            won-input="::self.updateCurrency()">
-            <option ng-repeat="currency in self.detail.currency" value="{{currency.value}}">{{currency.label}}</option>
-        </select>
-        <select
-            class="reviewp__input__unitCode"
-            ng-model="self.selectedUnitCode"
-            ng-if="!self.totalUnitCodeOnly()"
-            ng-disabled="self.detail.unitCode.length <= 1"
-            won-input="::self.updateUnitCode()">
-            <option ng-repeat="unitCode in self.detail.unitCode" value="{{unitCode.value}}">{{unitCode.label}}</option>
-        </select>
       </div>
     `;
 
@@ -47,43 +39,28 @@ function genComponentConf() {
 
       window.reviewp4dbg = this;
 
-      this.addedNumber = this.initialValue && this.initialValue.amount;
-      this.selectedCurrency = this.initialValue && this.initialValue.currency;
-      this.selectedUnitCode = this.initialValue && this.initialValue.unitCode;
+      this.addedText = this.initialValue && this.initialValue.text;
+      this.selectedRating = this.initialValue && this.initialValue.rating;
 
-      if (!this.selectedCurrency) {
-        this.selectedCurrency = "EUR";
-      }
-
-      if (!this.selectedUnitCode) {
-        this.selectedUnitCode = "";
+      if (!this.selectedRating) {
+        this.selectedRating = "3";
       }
 
       this.showResetButton = false;
 
-      delay(0).then(() => this.showInitialNumber());
-    }
-
-    /**
-     * If there is no unitCode present in the given detail other than the "" blank/total unit code then we do not show any dropdown picker
-     * @returns {boolean}
-     */
-    totalUnitCodeOnly() {
-      const unitCode = this.detail && this.detail.unitCode;
-      return unitCode && unitCode.length == 1 && unitCode[0].value == "";
+      delay(0).then(() => this.showInitialText());
     }
 
     /**
      * Checks validity and uses callback method
      */
-    update(number, currency, unitCode) {
-      const parsedNumber = Number.parseFloat(number);
-      if (isValidNumber(number) && currency) {
+    update(text, rating) {
+      const trimmedText = text.trim();
+      if (rating) {
         this.onUpdate({
           value: {
-            amount: parsedNumber,
-            currency: currency,
-            unitCode: unitCode !== "" ? unitCode : undefined,
+            text: trimmedText === "" ? undefined : trimmedText,
+            rating: rating,
           },
         });
       } else {
@@ -91,126 +68,71 @@ function genComponentConf() {
       }
     }
 
-    getDefaultCurrency() {
-      let defaultCurrency;
+    getDefaultRating() {
+      let defaultRating;
 
       this.detail &&
-        this.detail.currency.forEach(curr => {
-          if (curr.default) defaultCurrency = curr.value;
+        this.detail.rating.forEach(rating => {
+          if (rating.default) defaultRating = rating.value;
         });
 
-      return defaultCurrency;
-    }
-    getDefaultUnitCode() {
-      let defaultUnitCode;
-
-      this.detail &&
-        this.detail.unitCode.forEach(uc => {
-          if (uc.default) defaultUnitCode = uc.value;
-        });
-
-      return defaultUnitCode;
+      return defaultRating;
     }
 
-    showInitialNumber() {
-      this.addedNumber = this.initialValue && this.initialValue.amount;
-      this.selectedCurrency =
-        (this.initialValue && this.initialValue.currency) ||
-        this.getDefaultCurrency();
-      this.selectedUnitCode =
-        (this.initialValue && this.initialValue.unitCode) ||
-        this.getDefaultUnitCode();
+    showInitialText() {
+      this.addedText = this.initialValue && this.initialValue.text;
+      this.selectedRating =
+        (this.initialValue && this.initialValue.rating) ||
+        this.getDefaultRating();
 
-      if (this.initialValue && this.initialValue.amount) {
-        this.amount().value = this.initialValue.amount;
+      if (this.initialValue && this.initialValue.text) {
+        this.text().value = this.initialValue.text;
         this.showResetButton = true;
       }
 
       this.$scope.$apply();
     }
 
-    currency() {
-      if (!this._currency) {
-        this._currency = this.$element[0].querySelector(
-          ".reviewp__input__currency"
+    rating() {
+      if (!this._rating) {
+        this._rating = this.$element[0].querySelector(
+          ".reviewp__input__rating"
         );
       }
-      return this._currency;
+      return this._rating;
     }
 
-    unitCode() {
-      if (!this._unitCode) {
-        this._unitCode = this.$element[0].querySelector(
-          ".reviewp__input__unitCode"
-        );
-      }
-      return this._unitCode;
+    updateText() {
+      const text = this.text().value;
+
+      this.update(text, this.selectedRating);
+      this.showResetButton = true;
     }
 
-    updateNumber(resetInput) {
-      const number = Number.parseFloat(this.amount().value);
-
-      if (isValidNumber(number)) {
-        this.addedNumber = number;
-        this.update(
-          this.addedNumber,
-          this.selectedCurrency,
-          this.selectedUnitCode
-        );
-        this.showResetButton = true;
-      } else {
-        this.resetNumber(resetInput);
-      }
+    updateRating() {
+      this.selectedRating = this.rating().value;
+      this.update(this.addedText, this.selectedRating);
     }
 
-    updateCurrency() {
-      this.selectedCurrency = this.currency().value;
-      if (this.selectedCurrency) {
-        this.update(
-          this.addedNumber,
-          this.selectedCurrency,
-          this.selectedUnitCode
-        );
-      } else {
-        this.update(this.addedNumber, undefined, this.selectedUnitCode);
-      }
-    }
-
-    updateUnitCode() {
-      this.selectedUnitCode = this.unitCode().value;
-
-      if (this.selectedUnitCode) {
-        this.update(
-          this.addedNumber,
-          this.selectedCurrency,
-          this.selectedUnitCode
-        );
-      } else {
-        this.update(this.addedNumber, this.selectedCurrency, undefined);
-      }
-    }
-
-    resetNumber(resetInput) {
-      this.addedNumber = undefined;
-      this.selectedCurrency = this.getDefaultCurrency();
-      this.selectedUnitCode = this.getDefaultUnitCode();
+    resetText(resetInput) {
+      this.addedText = undefined;
+      this.selectedRating = this.getDefaultRating();
 
       if (resetInput) {
-        this.amount().value = "";
-        this.currency().value = this.selectedCurrency;
-        this.unitCode().value = this.selectedUnitCode;
+        this.text().value = "";
+        this.rating().value = this.selectedRating;
         this.showResetButton = false;
       }
-      this.update(undefined, this.selectedCurrency, this.selectedUnitCode);
+      this.update(this.addedText, this.selectedRating);
     }
 
-    amount() {
-      if (!this._amountInput) {
-        this._amountInput = this.$element[0].querySelector(
+    text() {
+      if (!this._textInput) {
+        this._textInput = this.$element[0].querySelector(
           ".reviewp__input__inner"
         );
       }
-      return this._amountInput;
+      return this._textInput;
     }
   }
   Controller.$inject = serviceDependencies;
