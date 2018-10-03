@@ -100,45 +100,6 @@ import { Generator } from "sparqljs";
       );
     }
 
-    /*
-        const putIntoBoth =
-            args.type === won.WON.BasicNeedTypeDotogetherCompacted;
-
-        const putIntoIs =
-            putIntoBoth ||
-            args.type === won.WON.BasicNeedTypeSupplyCompacted;
-
-        const putIntoSeeks =
-            putIntoBoth ||
-            args.type === won.WON.BasicNeedTypeDemandCompacted;
-
-        let hasFlag = [];
-
-        if(!!won.debugmode) {
-            hasFlag.push("won:UsedForTesting");
-        }
-
-        if(!!args.whatsAround){
-            hasFlag.push("won:WhatsAround");
-            hasFlag.push("won:NoHintForCounterpart");
-        }
-
-        if(!!args.noHints){
-            hasFlag.push("won:NoHintForMe");
-            hasFlag.push("won:NoHintForCounterpart");
-        }
-        *
-
-        //remove possible duplicates in hasFlag
-        const result = [];
-        hasFlag.forEach(function(item) {
-            if(result.indexOf(item) < 0) {
-                result.push(item);
-            }
-        });
-        hasFlag = result;
-        */
-
     const buildContentNode = (id, isOrSeeksData) => {
       let contentNode = {
         "@id": id,
