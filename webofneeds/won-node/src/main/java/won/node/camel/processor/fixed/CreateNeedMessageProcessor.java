@@ -6,6 +6,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
@@ -83,31 +85,31 @@ public class CreateNeedMessageProcessor extends AbstractCamelProcessor
       datasetHolder = new DatasetHolder(attachmentHolder.getDestinationUri(), attachmentHolder.getAttachmentDataset());
       attachments.add(datasetHolder);
     }
-    //add everything to the need model class and save it
-    need.setDatatsetHolder(datasetHolder);
-    need.setAttachmentDatasetHolders(attachments);
-    need = needRepository.save(need);
-    connectionContainerRepository.save(connectionContainer);
-
+    
     NeedModelWrapper needModelWrapper = new NeedModelWrapper(needContent);
     Collection<String> facets = needModelWrapper.getFacetUris();
     Optional<String> defaultFacet = needModelWrapper.getDefaultFacet();
     if (facets.size() == 0)
       throw new IllegalArgumentException("at least one property won:hasFacet required ");
-    for (String facetUri : facets) {
-      // TODO: check if there is a implementation for the facet on the node
-      Facet f = new Facet();
-      f.setNeedURI(needURI);
-      f.setFacetURI(URI.create(facetUri));
-      Optional<String> facetType = needModelWrapper.getFacetType(facetUri);
-      if (!facetType.isPresent()) {
+
+    Set<Facet> facetEntities = facets.stream().map(facetUri -> {
+        Optional<String> facetType = needModelWrapper.getFacetType(facetUri);
+        if (!facetType.isPresent()) {
           throw new IllegalArgumentException("cannot determine type of facet " + facetUri);
-      }
-      f.setTypeURI(URI.create(facetType.get()));
-      facetRepository.save(f);
-    }
-
-
+        }
+        Facet f = new Facet();
+        f.setNeedURI(needURI);
+        f.setFacetURI(URI.create(facetUri));
+        f.setTypeURI(URI.create(facetType.get()));
+        return f;
+    }).collect(Collectors.toSet());
+    
+    //add everything to the need model class and save it
+    need.setDatatsetHolder(datasetHolder);
+    need.setAttachmentDatasetHolders(attachments);
+    need = needRepository.save(need);
+    connectionContainerRepository.save(connectionContainer);
+    facetEntities.forEach(facet -> facetRepository.saveAndFlush(facet));
     return need;
   }
 
