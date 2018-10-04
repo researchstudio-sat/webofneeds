@@ -72,11 +72,12 @@ public class NeedInactivityChecker implements InitializingBean, DisposableBean {
     @Override
     public void afterPropertiesSet() throws Exception {
         if (this.taskScheduler == null) throw new IllegalStateException("taskScheduler must be set");
-        if (this.inactivityCheckInterval > 0) {
-            PeriodicTrigger periodicTrigger = new PeriodicTrigger(this.inactivityCheckInterval, TimeUnit.SECONDS);
-            periodicTrigger.setInitialDelay(this.inactivityCheckInterval);
-            this.trigger = periodicTrigger;
+        if (this.inactivityCheckInterval <= 0) {
+            return;
         }
+        PeriodicTrigger periodicTrigger = new PeriodicTrigger(this.inactivityCheckInterval, TimeUnit.SECONDS);
+        periodicTrigger.setInitialDelay(this.inactivityCheckInterval);
+        this.trigger = periodicTrigger;
         this.inactivityCheckTask = new InactivityCheckTask();
         taskScheduler.schedule(this.inactivityCheckTask, trigger);
         if (logger.isDebugEnabled()){
@@ -86,7 +87,9 @@ public class NeedInactivityChecker implements InitializingBean, DisposableBean {
 
     @Override
     public void destroy() throws Exception {
-        this.inactivityCheckTask.cancel();
+        if (this.inactivityCheckTask != null) {
+            this.inactivityCheckTask.cancel();
+        }
     }
 
     public void setInactivityCheckInterval(int inactivityCheckInterval) {
