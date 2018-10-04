@@ -101,7 +101,6 @@ public class NeedModelWrapper {
             }
         }
 
-        checkModels();
     }
 
     /**
@@ -147,7 +146,6 @@ public class NeedModelWrapper {
             }
         }
 
-        checkModels();
     }
 
     /**
@@ -155,19 +153,8 @@ public class NeedModelWrapper {
      * @return
      */
     public static boolean isANeed(Dataset ds){
-        try{
-            new NeedModelWrapper(ds, false);
-            return true;
-        }catch (DataIntegrityException e){
-            return false;
-        }
-    }
-
-
-    private void checkModels() {
-        if (getNeedNode(NeedGraphType.SYSINFO) == null || getNeedNode(NeedGraphType.NEED) == null) {
-            throw new DataIntegrityException("need and sysinfo models must contain a resource of type won:Need");
-        }
+        NeedModelWrapper wrapper = new NeedModelWrapper(ds, false);
+        return wrapper.getNeedNode(NeedGraphType.NEED) != null && wrapper.getNeedNode(NeedGraphType.SYSINFO) != null;
     }
 
     public Model getNeedModel() {
