@@ -23,8 +23,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.query.Dataset;
@@ -55,6 +57,7 @@ import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.agreement.AgreementProtocolState;
 import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
+import won.protocol.model.ConnectionState;
 import won.protocol.util.WonConversationUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
@@ -82,6 +85,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
     Pattern PATTERN_PROPOSE = Pattern.compile("^propose(\\s+((my)|(any))?\\s*([1-9])?)?$", Pattern.CASE_INSENSITIVE);
     Pattern PATTERN_ACCEPT = Pattern.compile("^accept$", Pattern.CASE_INSENSITIVE);
     Pattern PATTERN_CANCEL = Pattern.compile("^cancel$", Pattern.CASE_INSENSITIVE);
+    Pattern PATTERN_FORWARD = Pattern.compile("^forward$", Pattern.CASE_INSENSITIVE);
 
     public static void main(String[] args) {
     	Pattern p = Pattern.compile("^reject(\\s+(yours))?$", Pattern.CASE_INSENSITIVE);
@@ -141,6 +145,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
             "    'retract (mine|proposal)':  retract the last (proposal) message you sent, or the last message I sent\n" +
             "    'reject (yours)':  reject the last rejectable message I (you) sent\n" +
             "    'cache eager|lazy: use lazy or eager RDF cache\n" +
+            "    'forward'          send a message in this connection that will be forwarded to all other connections we have\n" +
             "    'usage':           display this message\n"
     };
 
@@ -257,6 +262,8 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
                 	accept(ctx, bus, con);
                 } else if (PATTERN_CANCEL.matcher(message).matches()) {
                 	cancel(ctx, bus, con);
+                } else if (PATTERN_FORWARD.matcher(message).matches()) {
+                    forward(ctx, bus, con);
                 } else {
                     //default: answer with eliza.
                     bus.publish(new MessageToElizaEvent(con, message));
@@ -270,6 +277,26 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
     }
     
     
+
+    private void forward(EventListenerContext ctx, EventBus bus, Connection con) {
+        Model messageModel = WonRdfUtils.MessageUtils.textMessage("Ok, I'll send you one message that will be injected into our other connections by your WoN node if the inject permission is granted");
+        bus.publish(new ConnectionMessageCommandEvent(con, messageModel));
+        //build a message to be injected into all connections of the receiver need (not controlled by us)
+        messageModel = WonRdfUtils.MessageUtils.textMessage("This is the injected message.");
+        //the need whose connections we want to inject into
+        URI remoteNeed = con.getRemoteNeedURI();
+        //we iterate over our needs and see which of them are connected to the remote need
+        List<URI> myneeds = ctx.getBotContextWrapper().getNeedCreateList(); 
+        Set<URI> remoteConnections = myneeds.stream()
+                //don't inject into the current connection
+                .filter(uri -> !con.getNeedURI().equals(uri))
+                .map(uri -> {
+                    //for each of my (the bot's) needs, check if they are connected to the remote need of the current conversation
+                    Dataset needNetwork = WonLinkedDataUtils.getConnectionNetwork(uri, ctx.getLinkedDataSource());
+                    return (Set<URI>) WonRdfUtils.NeedUtils.getRemoteConnectionURIsForRemoteNeeds(needNetwork, Arrays.asList(remoteNeed), Optional.of(ConnectionState.CONNECTED));
+                }).flatMap(set -> set.stream()).collect(Collectors.toSet());
+        bus.publish(new ConnectionMessageCommandEvent(con, messageModel, remoteConnections));
+    }
 
     private String extractTextMessageFromWonMessage(WonMessage wonMessage) {
         if (wonMessage == null) return null;

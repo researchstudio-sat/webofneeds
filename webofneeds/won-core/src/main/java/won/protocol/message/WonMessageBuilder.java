@@ -1,6 +1,7 @@
 package won.protocol.message;
 
 import java.net.URI;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -920,7 +921,6 @@ public class WonMessageBuilder
     return this;
   }
 
-
   public WonMessageBuilder setCorrespondingRemoteMessageURI(URI correspondingRemoteMessageURI){
     this.correspondingRemoteMessageURI = correspondingRemoteMessageURI;
     return this;
@@ -929,6 +929,11 @@ public class WonMessageBuilder
   public WonMessageBuilder setForwardedMessageURI(URI forwardedMessageURI) {
     this.forwardedMessageURI = forwardedMessageURI;
     return this;
+  }
+  
+  public WonMessageBuilder setForwardToReceiverURIs(Collection<URI> forwardToReceiverUris) {
+      this.forwardToReceiverURIs.addAll(forwardToReceiverUris);
+      return this;
   }
 
   public WonMessageBuilder setSentTimestamp(final long sentTimestamp) {
