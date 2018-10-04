@@ -60,14 +60,14 @@ public class CreateNeedFromJobAction extends AbstractCreateNeedAction {
             try {
 
                 this.hokifyJobs = hokifyBotsApi.fetchHokifyData();
-                //for (HokifyJob hokifyJob : hokifyJobs) {
-                for (int i = 0; i < 1; i++) {
+                for (HokifyJob hokifyJob : hokifyJobs) {
+                    // for (int i = 0; i < 1; i++) {
 
-                    Random random = new Random();
+                    // Random random = new Random();
 
-                    //Only one single random job
-                    int rnd = random.nextInt(3000);
-                    HokifyJob hokifyJob = hokifyJobs.get(rnd);
+                    // Only one single random job
+                    // int rnd = random.nextInt(3000);
+                    // HokifyJob hokifyJob = hokifyJobs.get(rnd);
 
                     // Check if need already exists
                     if (botContextWrapper.getNeedUriForJobURL(hokifyJob.getUrl()) != null) {
@@ -165,42 +165,46 @@ public class CreateNeedFromJobAction extends AbstractCreateNeedAction {
         isPart.addProperty(SCHEMA.JOBLOCATION, jobLocation);
 
         HashMap<String, String> location = hokifyBotsApi.fetchGeoLocation(hokifyJob.getCity(), hokifyJob.getCountry());
-        DecimalFormat df = new DecimalFormat("##.######");
-        df.setRoundingMode(RoundingMode.HALF_UP);
-        df.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
-        
-        String nwlat = df.format(Double.parseDouble(location.get("nwlat")));
-        String nwlng = df.format(Double.parseDouble(location.get("nwlng")));
-        String selat = df.format(Double.parseDouble(location.get("selat")));
-        String selng = df.format(Double.parseDouble(location.get("selng")));
-        String lat = df.format(Double.parseDouble(location.get("lat")));
-        String lng = df.format(Double.parseDouble(location.get("lng")));
-        String name = location.get("name");
+        if (location != null) {
+            DecimalFormat df = new DecimalFormat("##.######");
+            df.setRoundingMode(RoundingMode.HALF_UP);
+            df.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
 
-        Resource boundingBoxResource = isPart.getModel().createResource();
-        Resource nwCornerResource = isPart.getModel().createResource();
-        Resource seCornerResource = isPart.getModel().createResource();
-        Resource geoResource = isPart.getModel().createResource();
-        jobLocation.addProperty(SCHEMA.NAME, name);
-        jobLocation.addProperty(SCHEMA.GEO, geoResource);
-        geoResource.addProperty(RDF.type, SCHEMA.GEOCOORDINATES);
-        geoResource.addProperty(SCHEMA.LATITUDE, lat);
-        geoResource.addProperty(SCHEMA.LONGITUDE, lng);
+            String nwlat = df.format(Double.parseDouble(location.get("nwlat")));
+            String nwlng = df.format(Double.parseDouble(location.get("nwlng")));
+            String selat = df.format(Double.parseDouble(location.get("selat")));
+            String selng = df.format(Double.parseDouble(location.get("selng")));
+            String lat = df.format(Double.parseDouble(location.get("lat")));
+            String lng = df.format(Double.parseDouble(location.get("lng")));
+            String name = location.get("name");
 
-        RDFDatatype bigdata_geoSpatialDatatype = new BaseDatatype(
-                "http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon");
+            Resource boundingBoxResource = isPart.getModel().createResource();
+            Resource nwCornerResource = isPart.getModel().createResource();
+            Resource seCornerResource = isPart.getModel().createResource();
+            Resource geoResource = isPart.getModel().createResource();
+            jobLocation.addProperty(SCHEMA.NAME, name);
+            jobLocation.addProperty(SCHEMA.GEO, geoResource);
+            geoResource.addProperty(RDF.type, SCHEMA.GEOCOORDINATES);
+            geoResource.addProperty(SCHEMA.LATITUDE, lat);
+            geoResource.addProperty(SCHEMA.LONGITUDE, lng);
 
-        geoResource.addProperty(WON.GEO_SPATIAL, lat + "#" + lng, bigdata_geoSpatialDatatype);
-        jobLocation.addProperty(WON.HAS_BOUNDING_BOX, boundingBoxResource);
-        boundingBoxResource.addProperty(WON.HAS_NORTH_WEST_CORNER, nwCornerResource);
-        nwCornerResource.addProperty(RDF.type, SCHEMA.GEOCOORDINATES);
-        nwCornerResource.addProperty(SCHEMA.LATITUDE, nwlat);
-        nwCornerResource.addProperty(SCHEMA.LONGITUDE, nwlng);
-        boundingBoxResource.addProperty(WON.HAS_SOUTH_EAST_CORNER, seCornerResource);
-        seCornerResource.addProperty(RDF.type, SCHEMA.GEOCOORDINATES);
-        seCornerResource.addProperty(SCHEMA.LATITUDE, selat);
-        seCornerResource.addProperty(SCHEMA.LONGITUDE, selng);
+            RDFDatatype bigdata_geoSpatialDatatype = new BaseDatatype(
+                    "http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon");
 
+            geoResource.addProperty(WON.GEO_SPATIAL, lat + "#" + lng, bigdata_geoSpatialDatatype);
+            jobLocation.addProperty(WON.HAS_BOUNDING_BOX, boundingBoxResource);
+            boundingBoxResource.addProperty(WON.HAS_NORTH_WEST_CORNER, nwCornerResource);
+            nwCornerResource.addProperty(RDF.type, SCHEMA.GEOCOORDINATES);
+            nwCornerResource.addProperty(SCHEMA.LATITUDE, nwlat);
+            nwCornerResource.addProperty(SCHEMA.LONGITUDE, nwlng);
+            boundingBoxResource.addProperty(WON.HAS_SOUTH_EAST_CORNER, seCornerResource);
+            seCornerResource.addProperty(RDF.type, SCHEMA.GEOCOORDINATES);
+            seCornerResource.addProperty(SCHEMA.LATITUDE, selat);
+            seCornerResource.addProperty(SCHEMA.LONGITUDE, selng);
+        } else {
+            String alternateLocation = hokifyJob.getCity() +" "+ hokifyJob.getCountry();
+            jobLocation.addProperty(SCHEMA.NAME, alternateLocation);
+        }
         // s:description
         isPart.addProperty(SCHEMA.DESCRIPTION, filterDescriptionString(hokifyJob.getDescription()));
 

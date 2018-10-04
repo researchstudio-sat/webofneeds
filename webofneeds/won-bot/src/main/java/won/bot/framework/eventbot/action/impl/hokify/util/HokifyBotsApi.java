@@ -17,6 +17,7 @@ import org.json.JSONObject;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.media.jfxmedia.logging.Logger;
 
 import won.bot.framework.eventbot.action.impl.hokify.HokifyJob;
 
@@ -123,7 +124,6 @@ public class HokifyBotsApi {
             String line;
             while ((line = br.readLine()) != null) {
                 sb.append(line);
-                System.out.println("line: " + line);
             }
             JSONArray jsonArray = new JSONArray(sb.toString());
             JSONObject obj = jsonArray.getJSONObject(0);
@@ -143,6 +143,7 @@ public class HokifyBotsApi {
 
         } catch (Exception e) {
             e.printStackTrace();
+            return null;
         }
         return loc;
     }
