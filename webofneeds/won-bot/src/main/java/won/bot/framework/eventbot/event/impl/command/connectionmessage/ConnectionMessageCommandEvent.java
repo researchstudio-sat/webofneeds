@@ -15,13 +15,13 @@ import won.protocol.model.Connection;
 
 public class ConnectionMessageCommandEvent extends BaseNeedAndConnectionSpecificEvent implements MessageCommandEvent, ConnectionSpecificEvent {
     private Model messageModel;
-    private Set<URI> forwardToReceivers = new HashSet<>();
+    private Set<URI> injectIntoConnections = new HashSet<>();
 
-    public ConnectionMessageCommandEvent(Connection con, Model messageModel, Collection<URI> forwardToReceivers) {
+    public ConnectionMessageCommandEvent(Connection con, Model messageModel, Collection<URI> injectionTargets) {
         super(con);
         this.messageModel = messageModel;
-        if (forwardToReceivers != null) {
-            this.forwardToReceivers.addAll(forwardToReceivers);
+        if (injectionTargets != null) {
+            this.injectIntoConnections.addAll(injectionTargets);
         }
     }
     
@@ -39,8 +39,8 @@ public class ConnectionMessageCommandEvent extends BaseNeedAndConnectionSpecific
         return WonMessageType.CONNECTION_MESSAGE;
     }
     
-    public Set<URI> getForwardToReceivers() {
-        return forwardToReceivers;
+    public Set<URI> getInjectIntoConnections() {
+        return injectIntoConnections;
     }
 
     public Model getMessageModel() {

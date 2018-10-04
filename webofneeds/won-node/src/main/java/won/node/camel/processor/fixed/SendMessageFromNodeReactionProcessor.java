@@ -23,7 +23,7 @@ import won.protocol.vocabulary.WONMSG;
 @Component
 @FixedMessageReactionProcessor(direction = WONMSG.TYPE_FROM_EXTERNAL_STRING, messageType = WONMSG.TYPE_CONNECTION_MESSAGE_STRING)
 /**
- * If the message has a msg:hasForwardToReceiver property, try to forward it.
+ * If the message has a msg:hasInjectIntoConnection property, try to forward it.
  */
 public class SendMessageFromNodeReactionProcessor extends AbstractCamelProcessor {
 
@@ -36,20 +36,20 @@ public class SendMessageFromNodeReactionProcessor extends AbstractCamelProcessor
         WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
         Objects.nonNull(wonMessage);
         logger.debug("reacting to ConnectionMessage {}", wonMessage.getMessageURI());        
-        List<URI> forwardToReceivers = wonMessage.getForwardToReceiverURIs();
-        if (forwardToReceivers.isEmpty()) {
-            logger.debug("no forwarding attempted - nothing to do for us here");            
+        List<URI> injectTargets = wonMessage.getInjectIntoConnectionURIs();
+        if (injectTargets.isEmpty()) {
+            logger.debug("no injection attempted - nothing to do for us here");            
             return;
         }
-        forwardToReceivers.forEach(forwardTo -> {
+        injectTargets.forEach(target -> {
             try {
-                // don't forward to the connection we're currently on.
-                if (forwardTo.equals(wonMessage.getReceiverURI())) {
+                // don't inject into the connection we're currently on.
+                if (target.equals(wonMessage.getReceiverURI())) {
                     return;
                 }
-                // only forward to those connections that belong to the receiver need of this
+                // only inject into those connections that belong to the receiver need of this
                 // message
-                Connection con = connectionRepository.findOneByConnectionURI(forwardTo);
+                Connection con = connectionRepository.findOneByConnectionURI(target);
                 if (con.getNeedURI().equals(wonMessage.getReceiverNeedURI())) {
                     forward(wonMessage, con);
                 }
@@ -68,14 +68,14 @@ public class SendMessageFromNodeReactionProcessor extends AbstractCamelProcessor
             return;
         }
         if (logger.isDebugEnabled()) {
-            logger.debug("forwarding message {} received from need {} to receiver {}",
+            logger.debug("injecting message {} received from need {} to connection {}",
                     new Object[] { wonMessage.getMessageURI(), wonMessage.getSenderNeedURI(), conToSendTo.getConnectionURI() });
         }
-        URI forwardedMessageURI = wonNodeInformationService.generateEventURI(wonMessage.getReceiverNodeURI());
+        URI injectedMessageURI = wonNodeInformationService.generateEventURI(wonMessage.getReceiverNodeURI());
         URI remoteWonNodeUri = WonLinkedDataUtils
                 .getWonNodeURIForNeedOrConnectionURI(conToSendTo.getRemoteConnectionURI(), linkedDataSource);
         WonMessage newWonMessage = WonMessageBuilder.forwardReceivedNodeToNodeMessageAsNodeToNodeMessage(
-                forwardedMessageURI, wonMessage, conToSendTo.getConnectionURI(), conToSendTo.getNeedURI(),
+                injectedMessageURI, wonMessage, conToSendTo.getConnectionURI(), conToSendTo.getNeedURI(),
                 wonMessage.getReceiverNodeURI(), conToSendTo.getRemoteConnectionURI(), conToSendTo.getRemoteNeedURI(),
                 remoteWonNodeUri);
         sendSystemMessage(newWonMessage);

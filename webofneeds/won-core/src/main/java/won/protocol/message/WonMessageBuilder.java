@@ -47,7 +47,7 @@ public class WonMessageBuilder
   private URI receiverNeedURI;
   private URI receiverNodeURI;
   private URI receiverFacetURI;
-  private Set<URI> forwardToReceiverURIs = new HashSet<>();
+  private Set<URI> injectIntoConnections = new HashSet<>();
 
   private WonMessageType wonMessageType;
   private WonMessageDirection wonMessageDirection;
@@ -179,8 +179,8 @@ public class WonMessageBuilder
     }
     
     // add forwards
-    if (!forwardToReceiverURIs.isEmpty()) {
-        forwardToReceiverURIs.forEach(receiver -> messageEventResource.addProperty(WONMSG.HAS_FORWARD_TO_RECEIVER,
+    if (!injectIntoConnections.isEmpty()) {
+        injectIntoConnections.forEach(receiver -> messageEventResource.addProperty(WONMSG.HAS_INJECT_INTO_CONNECTION,
                 envelopeGraph.getResource(receiver.toString())));
     }
     
@@ -931,8 +931,8 @@ public class WonMessageBuilder
     return this;
   }
   
-  public WonMessageBuilder setForwardToReceiverURIs(Collection<URI> forwardToReceiverUris) {
-      this.forwardToReceiverURIs.addAll(forwardToReceiverUris);
+  public WonMessageBuilder setInjectIntoConnections(Collection<URI> forwardToReceiverUris) {
+      this.injectIntoConnections.addAll(forwardToReceiverUris);
       return this;
   }
 

@@ -1196,9 +1196,4 @@ public class WonRdfUtils
     
   }
   
-  
-  public static void main (String...strings) {
-      NeedUtils.getRemoteConnectionURIsForRemoteNeeds(null, Arrays.asList(URI.create("http://ex.com/1")));
-      NeedUtils.getRemoteConnectionURIsForRemoteNeeds(null, Arrays.asList(URI.create("http://ex.com/1"), URI.create("http://ex.com/2"), URI.create("http://ex.com/3")));
-  }
 }

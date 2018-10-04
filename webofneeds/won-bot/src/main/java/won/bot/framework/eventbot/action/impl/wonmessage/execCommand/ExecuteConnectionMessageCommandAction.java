@@ -83,9 +83,9 @@ public class ExecuteConnectionMessageCommandAction extends ExecuteSendMessageCom
                         remoteNeed,
                         WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, remoteNeed),
                         localMessageModel);
-        Set<URI> forwardToReceivers = messageCommandEvent.getForwardToReceivers();
-        if (!forwardToReceivers.isEmpty()) {
-            wmb.setForwardToReceiverURIs(forwardToReceivers);
+        Set<URI> injectionTargets = messageCommandEvent.getInjectIntoConnections();
+        if (!injectionTargets.isEmpty()) {
+            wmb.setInjectIntoConnections(injectionTargets);
         }
         return wmb.build();
     }

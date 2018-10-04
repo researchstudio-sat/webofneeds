@@ -49,7 +49,7 @@ public class WonMessage implements Serializable {
     private URI receiverFacetURI;
     private List<URI> refersTo = null;
     private List<URI> previousMessages = null;
-    private List<URI> forwardToReceiverURI = null;    
+    private List<URI> injectIntoConnections = null;    
     private URI isResponseToMessageURI;
     private URI isRemoteResponseToMessageURI;
     private List<String> contentGraphNames;
@@ -475,11 +475,11 @@ public class WonMessage implements Serializable {
         return this.refersTo;
     }
     
-    public synchronized List<URI> getForwardToReceiverURIs() {
-        if (this.forwardToReceiverURI == null) {
-            this.forwardToReceiverURI = getEnvelopePropertyURIValues(WONMSG.HAS_FORWARD_TO_RECEIVER);
+    public synchronized List<URI> getInjectIntoConnectionURIs() {
+        if (this.injectIntoConnections == null) {
+            this.injectIntoConnections = getEnvelopePropertyURIValues(WONMSG.HAS_INJECT_INTO_CONNECTION);
         }
-        return this.forwardToReceiverURI;
+        return this.injectIntoConnections;
     }
 
 

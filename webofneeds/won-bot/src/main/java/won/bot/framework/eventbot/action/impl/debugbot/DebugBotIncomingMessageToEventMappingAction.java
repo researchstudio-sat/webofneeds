@@ -85,7 +85,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
     Pattern PATTERN_PROPOSE = Pattern.compile("^propose(\\s+((my)|(any))?\\s*([1-9])?)?$", Pattern.CASE_INSENSITIVE);
     Pattern PATTERN_ACCEPT = Pattern.compile("^accept$", Pattern.CASE_INSENSITIVE);
     Pattern PATTERN_CANCEL = Pattern.compile("^cancel$", Pattern.CASE_INSENSITIVE);
-    Pattern PATTERN_FORWARD = Pattern.compile("^forward$", Pattern.CASE_INSENSITIVE);
+    Pattern PATTERN_INJECT = Pattern.compile("^inject$", Pattern.CASE_INSENSITIVE);
 
     public static void main(String[] args) {
     	Pattern p = Pattern.compile("^reject(\\s+(yours))?$", Pattern.CASE_INSENSITIVE);
@@ -132,21 +132,21 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
     public static final String[] USAGE_MESSAGES = {
             "You are connected to the debug bot. You can issue commands that will cause interactions with your need.\n\n" +
             "Usage:\n" +
-            "    'hint':            create a new need and send hint to it\n" +
-            "    'connect':         create a new need and send connection request to it\n" +
-            "    'close':           close the current connection\n" +
-            "    'deactivate':      deactivate remote need of the current connection\n" +
-            "    'chatty on|off':   send chat messages spontaneously every now and then? (default: on)\n" +
-            "    'send N':          send N messages, one per second. N must be an integer between 1 and 9\n" +
-            "    'validate':        download the connection data and validate it\n" +
-            "    'propose (my|any) (N)':  propose one (N, max 9) of my(/your/any) messages for an agreement\n" +
-            "    'accept':          accept the last proposal made (including cancellation proposals)\n" +
-            "    'cancel:           propose to cancel the newest agreement (that wasn't only a cancellation)\n" +
-            "    'retract (mine|proposal)':  retract the last (proposal) message you sent, or the last message I sent\n" +
-            "    'reject (yours)':  reject the last rejectable message I (you) sent\n" +
-            "    'cache eager|lazy: use lazy or eager RDF cache\n" +
-            "    'forward'          send a message in this connection that will be forwarded to all other connections we have\n" +
-            "    'usage':           display this message\n"
+            "    `hint`:            create a new need and send hint to it\n" +
+            "    `connect`:         create a new need and send connection request to it\n" +
+            "    `close`:           close the current connection\n" +
+            "    `deactivate`:      deactivate remote need of the current connection\n" +
+            "    `chatty on|off`:   send chat messages spontaneously every now and then? (default: on)\n" +
+            "    `send N`:          send N messages, one per second. N must be an integer between 1 and 9\n" +
+            "    `validate'`:        download the connection data and validate it\n" +
+            "    `propose (my|any) (N)`:  propose one (N, max 9) of my(/your/any) messages for an agreement\n" +
+            "    `accept`:          accept the last proposal made (including cancellation proposals)\n" +
+            "    `cancel`:           propose to cancel the newest agreement (that wasn't only a cancellation)\n" +
+            "    `retract (mine|proposal)`:  retract the last (proposal) message you sent, or the last message I sent\n" +
+            "    `reject (yours)`:  reject the last rejectable message I (you) sent\n" +
+            "    `cache eager|lazy`: use lazy or eager RDF cache\n" +
+            "    `inject`           send a message in this connection that will be forwarded to all other connections we have\n" +
+            "    `usage`:           display this message\n"
     };
 
     public static final String[] N_MESSAGES = {
@@ -262,8 +262,8 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
                 	accept(ctx, bus, con);
                 } else if (PATTERN_CANCEL.matcher(message).matches()) {
                 	cancel(ctx, bus, con);
-                } else if (PATTERN_FORWARD.matcher(message).matches()) {
-                    forward(ctx, bus, con);
+                } else if (PATTERN_INJECT.matcher(message).matches()) {
+                    inject(ctx, bus, con);
                 } else {
                     //default: answer with eliza.
                     bus.publish(new MessageToElizaEvent(con, message));
@@ -278,7 +278,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
     
     
 
-    private void forward(EventListenerContext ctx, EventBus bus, Connection con) {
+    private void inject(EventListenerContext ctx, EventBus bus, Connection con) {
         Model messageModel = WonRdfUtils.MessageUtils.textMessage("Ok, I'll send you one message that will be injected into our other connections by your WoN node if the inject permission is granted");
         bus.publish(new ConnectionMessageCommandEvent(con, messageModel));
         //build a message to be injected into all connections of the receiver need (not controlled by us)
