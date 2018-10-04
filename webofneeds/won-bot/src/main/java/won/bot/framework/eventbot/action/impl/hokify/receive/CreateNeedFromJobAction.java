@@ -1,9 +1,12 @@
 package won.bot.framework.eventbot.action.impl.hokify.receive;
 
+import java.math.RoundingMode;
 import java.net.URI;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Random;
 
 import org.apache.commons.lang3.StringUtils;
@@ -163,6 +166,9 @@ public class CreateNeedFromJobAction extends AbstractCreateNeedAction {
 
         HashMap<String, String> location = hokifyBotsApi.fetchGeoLocation(hokifyJob.getCity(), hokifyJob.getCountry());
         DecimalFormat df = new DecimalFormat("##.######");
+        df.setRoundingMode(RoundingMode.HALF_UP);
+        df.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
+        
         String nwlat = df.format(Double.parseDouble(location.get("nwlat")));
         String nwlng = df.format(Double.parseDouble(location.get("nwlng")));
         String selat = df.format(Double.parseDouble(location.get("selat")));
