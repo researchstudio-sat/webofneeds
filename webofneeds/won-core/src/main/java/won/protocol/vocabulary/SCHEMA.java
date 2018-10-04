@@ -33,6 +33,7 @@ public class SCHEMA {
     public static final Property URL = m.createProperty(BASE_URI + "URL");
     public static final Property DATEPOSTED = m.createProperty(BASE_URI + "datePosted");
     public static final Property IMAGE = m.createProperty(BASE_URI + "image");
+    public static final Property GEOCOORDINATES = m.createProperty(BASE_URI + "GeoCoordinates");
     
     public static final Property AMENITYFEATURE = m.createProperty(BASE_URI + "amenityFeature");
     public static final Property FLOORSIZE = m.createProperty(BASE_URI + "floorSize");

@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -29,13 +30,17 @@ import won.bot.framework.eventbot.action.impl.hokify.HokifyJob;
 public class HokifyBotsApi {
 
     private String jsonURL;
+    private String geoURL;
 
-    public HokifyBotsApi(String jsonURL) {
+    public HokifyBotsApi(String jsonURL, String geoURL) {
         this.jsonURL = jsonURL;
+        this.geoURL = geoURL;
     }
 
     public ArrayList<HokifyJob> fetchHokifyData() {
         ArrayList<HokifyJob> jobsList = new ArrayList<HokifyJob>();
+        System.out.println("----------------- ----------------- Start fetchHokifyData()");
+
         System.out.println("Requeted URL:" + jsonURL);
         try {
 
@@ -93,4 +98,59 @@ public class HokifyBotsApi {
         return jobsList;
     }
 
+    public HashMap<String, String> fetchGeoLocation(String city, String country) {
+        HashMap<String, String> loc = new HashMap<String, String>();
+        
+        String cityString = city.replace(" ", "+");
+        String countrySting = country.replace(" ", "+");
+        
+        String searchString = geoURL + "?city=" + cityString + "&country=" + countrySting + "&format=json";
+        System.out.println("------------geo location: " + searchString);
+        try {
+            DefaultHttpClient httpClient = new DefaultHttpClient();
+            HttpGet getRequest = new HttpGet(searchString);
+            getRequest.addHeader("accept", "application/json");
+
+            HttpResponse response = httpClient.execute(getRequest);
+
+            if (response.getStatusLine().getStatusCode() != 200) {
+                throw new RuntimeException("Failed : HTTP error code : " + response.getStatusLine().getStatusCode());
+            }
+
+            System.out.println("-------------- RESPONSE: " + response);
+            BufferedReader br = new BufferedReader(new InputStreamReader((response.getEntity().getContent())));
+
+            StringBuilder sb = new StringBuilder();
+            String line;
+            System.out.println("GEO Service RESPONSE: ");
+            while ((line = br.readLine()) != null) {
+                sb.append(line);
+                System.out.println("line: " + line);
+            }
+            JSONArray jsonArray = new JSONArray(sb.toString());
+            JSONObject obj = jsonArray.getJSONObject(0);
+            obj.get("display_name");
+            //JSONArray jobArray = new JSONArray(json.getString("jobs"));
+            httpClient.close();
+            response.getEntity().getContent().close();
+            
+            JSONArray bBox = (JSONArray) obj.get("boundingbox");
+            
+           
+            loc.put("nwlat", (String) bBox.get(1));
+            loc.put("nwlng", (String) bBox.get(3));
+            loc.put("selat", (String) bBox.get(0));
+            loc.put("selng", (String) bBox.get(2));
+            loc.put("lat", (String) obj.get("lat"));
+            loc.put("lng", (String) obj.get("lon"));
+            loc.put("name", (String) obj.get("display_name"));
+           
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        System.out.println("THE HASH MAP " + loc.toString());
+        return loc;
+    }
+
+    
 }

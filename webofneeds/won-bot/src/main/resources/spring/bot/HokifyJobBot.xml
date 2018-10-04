@@ -31,6 +31,8 @@
         <!--property name="token" value="${hokifyjobbot.token}"/-->
         <property name="botName" value="${hokifyjobbot.botname}"/>
         <property name="jsonURL" value="${hokifyjobbot.jsonURL}"/>
+        <property name="geoURL" value="${hokifyjobbot.geoURL}"/>
+        <property name ="updateTime" value="${hokifyjobbot.updateTime}"/>
         <property name="hokifyMessageGenerator" ref="hokifyGenerator"/>
         <property name="needProducer">
             <bean class="won.bot.framework.component.needproducer.impl.NopNeedProducer" />

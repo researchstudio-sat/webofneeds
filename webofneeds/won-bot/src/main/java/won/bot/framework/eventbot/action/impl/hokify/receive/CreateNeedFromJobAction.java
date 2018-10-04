@@ -1,11 +1,15 @@
 package won.bot.framework.eventbot.action.impl.hokify.receive;
 
 import java.net.URI;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Random;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.jena.datatypes.BaseDatatype;
+import org.apache.jena.datatypes.RDFDatatype;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
@@ -14,6 +18,7 @@ import won.bot.framework.bot.context.HokifyJobBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
 import won.bot.framework.eventbot.action.impl.hokify.HokifyJob;
+import won.bot.framework.eventbot.action.impl.hokify.util.HokifyBotsApi;
 import won.bot.framework.eventbot.action.impl.needlifecycle.AbstractCreateNeedAction;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.Event;
@@ -35,17 +40,12 @@ import won.protocol.vocabulary.WON;
  */
 public class CreateNeedFromJobAction extends AbstractCreateNeedAction {
 
-    public CreateNeedFromJobAction(EventListenerContext eventListenerContext, URI... facets) {
+    private ArrayList<HokifyJob> hokifyJobs = new ArrayList<HokifyJob>();
+    private HokifyBotsApi hokifyBotsApi;
 
+    public CreateNeedFromJobAction(EventListenerContext eventListenerContext, HokifyBotsApi hokifyBotsApi) {
         super(eventListenerContext);
-
-        if (facets == null || facets.length == 0) {
-            // add the default facet if none is present.
-            this.facets = new ArrayList<URI>(1);
-            this.facets.add(FacetType.OwnerFacet.getURI());
-        } else {
-            this.facets = Arrays.asList(facets);
-        }
+        this.hokifyBotsApi = hokifyBotsApi;
     }
 
     protected void doRun(Event event, EventListener executingListener) throws Exception {
@@ -53,8 +53,12 @@ public class CreateNeedFromJobAction extends AbstractCreateNeedAction {
         if (event instanceof CreateNeedFromJobEvent
                 && ctx.getBotContextWrapper() instanceof HokifyJobBotContextWrapper) {
             HokifyJobBotContextWrapper botContextWrapper = (HokifyJobBotContextWrapper) ctx.getBotContextWrapper();
-            ArrayList<HokifyJob> hokifyJobs = ((CreateNeedFromJobEvent) event).getHokifyJobs();
+            //HokifyBotsApi hokifyBotsApi = ((CreateNeedFromJobEvent) event).getHokifyBotsApi();
+
             try {
+                logger.info("---------------------- here we go");
+                
+                this.hokifyJobs = hokifyBotsApi.fetchHokifyData();
                 // for (HokifyJob hokifyJob : hokifyJobs) {
                 for (int i = 0; i < 1; i++) {
 
@@ -62,8 +66,7 @@ public class CreateNeedFromJobAction extends AbstractCreateNeedAction {
 
                     int rnd = random.nextInt(1000);
                     HokifyJob hokifyJob = hokifyJobs.get(rnd);
-                    
-                    
+
                     // Check if need already exists
                     if (botContextWrapper.getNeedUriForJobURL(hokifyJob.getUrl()) != null) {
                         logger.info("Need already exists for job: {}", hokifyJob.getUrl());
@@ -156,11 +159,47 @@ public class CreateNeedFromJobAction extends AbstractCreateNeedAction {
         Resource jobLocation = isPart.getModel().createResource();
         jobLocation.addProperty(RDF.type, SCHEMA.PLACE);
         // TODO look up lon/lat via nominatim
-        jobLocation.addProperty(SCHEMA.GEO, "");
+        
         isPart.addProperty(SCHEMA.JOBLOCATION, jobLocation);
+        
+        HashMap<String, String> location = hokifyBotsApi.fetchGeoLocation(hokifyJob.getCity(), hokifyJob.getCountry());
+        DecimalFormat df = new DecimalFormat("##.######");
+        String nwlat = df.format(Double.parseDouble(location.get("nwlat")));
+        String nwlng = df.format(Double.parseDouble(location.get("nwlng")));
+        String selat = df.format(Double.parseDouble(location.get("selat")));
+        String selng = df.format(Double.parseDouble(location.get("selng")));
+        String lat = df.format(Double.parseDouble(location.get("lat")));
+        String lng = df.format(Double.parseDouble(location.get("lng")));
+        String name = location.get("name");
+
+        Resource boundingBoxResource = isPart.getModel().createResource();
+        Resource nwCornerResource = isPart.getModel().createResource();
+        Resource seCornerResource = isPart.getModel().createResource();
+        Resource geoResource = isPart.getModel().createResource();
+        jobLocation.addProperty(SCHEMA.NAME, name);
+        jobLocation.addProperty(SCHEMA.GEO, geoResource);
+        geoResource.addProperty(RDF.type, SCHEMA.GEOCOORDINATES);
+        geoResource.addProperty(SCHEMA.LATITUDE, lat);
+        geoResource.addProperty(SCHEMA.LONGITUDE, lng);
+        
+        RDFDatatype bigdata_geoSpatialDatatype = new BaseDatatype(
+                "http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon");
+        
+        geoResource.addProperty(WON.GEO_SPATIAL, lat + "#" + lng, bigdata_geoSpatialDatatype);
+        jobLocation.addProperty(WON.HAS_BOUNDING_BOX, boundingBoxResource);
+        boundingBoxResource.addProperty(WON.HAS_NORTH_WEST_CORNER, nwCornerResource);
+        nwCornerResource.addProperty(RDF.type, SCHEMA.GEOCOORDINATES);
+        nwCornerResource.addProperty(SCHEMA.LATITUDE, nwlat);
+        nwCornerResource.addProperty(SCHEMA.LONGITUDE, nwlng);
+        boundingBoxResource.addProperty(WON.HAS_SOUTH_EAST_CORNER, seCornerResource);
+        seCornerResource.addProperty(RDF.type, SCHEMA.GEOCOORDINATES);
+        seCornerResource.addProperty(SCHEMA.LATITUDE, selat);
+        seCornerResource.addProperty(SCHEMA.LONGITUDE, selng);
+        
+        
 
         // s:description
-        isPart.addProperty(SCHEMA.DESCRIPTION, hokifyJob.getDescription());
+        isPart.addProperty(SCHEMA.DESCRIPTION, filterDescriptionString(hokifyJob.getDescription()));
 
         // s:baseSalary
         isPart.addProperty(SCHEMA.BASESALARY, hokifyJob.getSalary());
@@ -190,11 +229,16 @@ public class CreateNeedFromJobAction extends AbstractCreateNeedAction {
 
         return needModelWrapper.copyDataset();
     }
+    
+    private String filterDescriptionString(String description) {
+        
+        //TODO filter out contact information
+        return description;
+    }
 
     private String parseField(Object field) {
 
         // TODO parse the field string
         return field.toString();
     }
-
 }

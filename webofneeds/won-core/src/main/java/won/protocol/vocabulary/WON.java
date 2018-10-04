@@ -130,9 +130,13 @@ public class WON {
     public static final Property HAS_CURRENCY = m.createProperty(BASE_URI, "hasCurrency");
 
     public static final Property HAS_LOCATION = m.createProperty(BASE_URI, "hasLocation");
+    public static final Property HAS_BOUNDING_BOX = m.createProperty(BASE_URI, "hasBoundingBox");
+    public static final Property HAS_NORTH_WEST_CORNER = m.createProperty(BASE_URI, "hasNorthWestCorner");
+    public static final Property HAS_SOUTH_EAST_CORNER = m.createProperty(BASE_URI, "hasSouthEastCorner");
     public static final Property HAS_BOUNDS_NORTH_WEST = m.createProperty(BASE_URI, "hasBoundsNorthWest");
     public static final Property HAS_BOUNDS_SOUTH_EAST = m.createProperty(BASE_URI, "hasBoundsSouthEast");
     public static final Resource LOCATION_SPECIFICATION = m.createResource(BASE_URI + "Location");
+    public static final Property GEO_SPATIAL = m.createProperty(BASE_URI + "geoSpatial");
     public static final Property IS_CONCEALED = m.createProperty(BASE_URI, "isConcealed");
     public static final Resource REGION = m.createResource(BASE_URI + "Region");
     public static final Property HAS_ISO_CODE = m.createProperty(BASE_URI, "hasISOCode");
