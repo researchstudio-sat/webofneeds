@@ -3,7 +3,6 @@ package won.bot.framework.eventbot.action.impl.hokify.receive;
 import java.net.URI;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -27,7 +26,6 @@ import won.bot.framework.eventbot.event.impl.needlifecycle.NeedCreatedEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.message.WonMessage;
-import won.protocol.model.FacetType;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.DefaultNeedModelWrapper;
 import won.protocol.util.RdfUtils;
@@ -211,7 +209,7 @@ public class CreateNeedFromJobAction extends AbstractCreateNeedAction {
             isPart.addProperty(SCHEMA.INDUSTRY, parseField(field));
         }
 
-        String[] tags = { "job", "hokify" };
+        String[] tags = { "job", "hokify", "offer-job" };
 
         for (String tag : tags) {
             isPart.addProperty(WON.HAS_TAG, tag);

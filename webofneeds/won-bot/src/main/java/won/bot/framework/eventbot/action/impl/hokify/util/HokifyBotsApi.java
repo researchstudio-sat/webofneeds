@@ -101,11 +101,12 @@ public class HokifyBotsApi {
     public HashMap<String, String> fetchGeoLocation(String city, String country) {
         HashMap<String, String> loc = new HashMap<String, String>();
 
-        String cityString = city.replace(" ", "+");
-        String countrySting = country.replace(" ", "+");
-
-        String searchString = geoURL + "?city=" + cityString + "&country=" + countrySting + "&format=json";
         try {
+            String cityString = city != null ? city.replace(" ", "+") : "";
+            String countrySting = country != null ? country.replace(" ", "+") : "";
+
+            String searchString = geoURL + "?city=" + cityString + "&country=" + countrySting + "&format=json";
+
             DefaultHttpClient httpClient = new DefaultHttpClient();
             HttpGet getRequest = new HttpGet(searchString);
             getRequest.addHeader("accept", "application/json");
