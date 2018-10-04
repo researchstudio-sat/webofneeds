@@ -344,15 +344,15 @@ view model =
                         [ width fill
                         , spacing 20
                         ]
-                        [ el [ Font.color skin.subtitleGray ] <|
-                            text "Loading Identities..."
-                        , case creating of
+                        [ case creating of
                             Just form ->
                                 createInterface skin form
 
                             Nothing ->
                                 createButton skin
                         , listUnsaved skin createQueue
+                        , el [ Font.color skin.subtitleGray ] <|
+                            text "Loading Identities..."
                         ]
 
                 --
