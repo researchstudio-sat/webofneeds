@@ -4,6 +4,7 @@ import Identicon from "identicon.js";
 import "@webcomponents/custom-elements";
 import { generateRgbColorArray } from "../../utils.js";
 import shajs from "sha.js";
+import { actionCreators } from "../../actions/actions";
 
 class SvgIcon extends HTMLElement {
   static get observedAttributes() {
@@ -80,13 +81,13 @@ class IdenticonElement extends HTMLElement {
 
 customElements.define("won-identicon", IdenticonElement);
 
-function genComponentConf() {
+function genComponentConf($ngRedux) {
   return {
     restrict: "E",
     link: (scope, element) => {
       const elmApp = Elm.Settings.Identities.init({ node: element[0] });
       elmApp.ports.identitiesOutPort.subscribe(identity => {
-        console.log(identity);
+        $ngRedux.dispatch(actionCreators.identities__create(identity));
       });
       scope.$on("$destroy", () => {
         elmApp.ports.identitiesOutPort.unsubscribe();
@@ -94,6 +95,8 @@ function genComponentConf() {
     },
   };
 }
+
+genComponentConf.$inject = ["$ngRedux"];
 export default angular
   .module("won.owner.components.settingsWrapper", [])
   .directive("settingsWrapper", genComponentConf).name;
