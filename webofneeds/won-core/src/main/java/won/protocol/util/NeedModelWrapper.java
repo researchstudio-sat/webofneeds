@@ -165,7 +165,7 @@ public class NeedModelWrapper {
         }
 
         Model defaultModel = needDataset.getDefaultModel();
-        if(defaultModel.listSubjectsWithProperty(RDF.type, WON.NEED).hasNext()) {
+        if(defaultModel.listSubjectsWithProperty(RDF.type, WON.NEED).hasNext() && ! defaultModel.listSubjectsWithProperty(WON.IS_IN_STATE).hasNext()) {
             return defaultModel;
         }
 
@@ -173,7 +173,7 @@ public class NeedModelWrapper {
             String tempModelName = modelNameIter.next();
             Model model = needDataset.getNamedModel(tempModelName);
 
-            if(model.listSubjectsWithProperty(RDF.type, WON.NEED).hasNext()) {
+            if(model.listSubjectsWithProperty(RDF.type, WON.NEED).hasNext() && ! model.listSubjectsWithProperty(WON.IS_IN_STATE).hasNext()) {
                 this.needModelGraphName = tempModelName;
                 return model;
             }
@@ -188,7 +188,7 @@ public class NeedModelWrapper {
         }
 
         Model defaultModel = needDataset.getDefaultModel();
-        if(defaultModel.listSubjectsWithProperty(RDF.type, WON.NEED).hasNext()){
+        if(defaultModel.listSubjectsWithProperty(RDF.type, WON.NEED).hasNext() && defaultModel.listSubjectsWithProperty(WON.IS_IN_STATE).hasNext()){
             return defaultModel;
         }
 
@@ -196,7 +196,7 @@ public class NeedModelWrapper {
             String tempModelName = modelNameIter.next();
             Model model = needDataset.getNamedModel(tempModelName);
 
-            if(model.listSubjectsWithProperty(RDF.type, WON.NEED).hasNext()){
+            if(model.listSubjectsWithProperty(RDF.type, WON.NEED).hasNext() && model.listSubjectsWithProperty(WON.IS_IN_STATE).hasNext()){
                 this.sysInfoGraphName = tempModelName;
                 return model;
             }
