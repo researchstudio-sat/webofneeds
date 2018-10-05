@@ -150,7 +150,7 @@ import { Generator } from "sparqljs";
 
       const detailList = getAllDetails();
 
-      for (const [detailName, detail] of Object.entries(detailList)) {
+      for (const detail of Object.values(detailList)) {
         // const detail = detailList[detailName];
         const detailRDF = {
           ...detail.parseToRDF({
@@ -159,10 +159,6 @@ import { Generator } from "sparqljs";
             contentUri: isOrSeeksData["publishedContentUri"],
           }),
         };
-
-        if (detailName === "organizationNames") {
-          console.log("DELETEME bb");
-        }
 
         // add to content node
         for (const key of Object.keys(detailRDF)) {

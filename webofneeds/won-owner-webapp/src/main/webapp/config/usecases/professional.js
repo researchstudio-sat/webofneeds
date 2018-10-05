@@ -70,7 +70,7 @@ export const professionalGroup = {
         jobLocation: { ...jobLocation },
         industry: { ...industryDetail },
         employmentTypes: { ...employmentTypesDetail },
-        organizationName: { ...organizationNamesDetail },
+        organizationNames: { ...organizationNamesDetail },
       },
       seeksDetails: {
         description: { ...details.description },
