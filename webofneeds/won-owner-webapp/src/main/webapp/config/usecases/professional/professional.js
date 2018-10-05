@@ -1,83 +1,19 @@
 /**
  * Created by fsuda on 18.09.2018.
  */
-import { details, emptyDraft } from "../detail-definitions.js";
-import { interestsDetail, skillsDetail } from "../details/person.js";
-import { jobLocation } from "../details/location.js";
-import {
-  industryDetail,
-  employmentTypesDetail,
-  organizationNamesDetail,
-} from "../details/jobs.js";
-import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-utils.js";
+import { details, emptyDraft } from "../../detail-definitions.js";
+import { interestsDetail, skillsDetail } from "../../details/person.js";
+import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../../app/won-utils.js";
+import { jobSearch } from "./job-search.js";
+import { jobOffer } from "./job-offer.js";
 
 export const professionalGroup = {
   identifier: "professionalgroup",
   label: "Professional Networking",
   icon: undefined,
   useCases: {
-    jobSearch: {
-      identifier: "jobSearch",
-      label: "Search a Job",
-      // icon: "#ico36_uc_find_people", TODO
-      doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
-      draft: {
-        ...emptyDraft,
-        is: {
-          "@type": "s:Person",
-          tags: ["search-job"],
-        },
-        seeks: {
-          "@type": "s:JobPosting",
-        },
-        searchString: ["offer-job"],
-      },
-      isDetails: {
-        title: { ...details.title },
-        description: { ...details.description },
-        // location: { ...details.location }, // why would your current location of residency matter?
-        // person: { ...details.person }, // has current company fields, that are weird for a search
-        skills: { ...skillsDetail },
-        interests: { ...interestsDetail },
-      },
-      seeksDetails: {
-        description: { ...details.description },
-        jobLocation: { ...jobLocation },
-        industry: { ...industryDetail },
-        employmentTypes: { ...employmentTypesDetail },
-        organizationNames: { ...organizationNamesDetail },
-      },
-    },
-    jobOffer: {
-      identifier: "jobOffer",
-      label: "Find people for a Job",
-      // icon: "#ico36_uc_find_people", TODO
-      doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
-      draft: {
-        ...emptyDraft,
-        is: {
-          "@type": "s:JobPosting",
-          tags: ["offer-job"],
-        },
-        seeks: {
-          "@type": "s:Person",
-        },
-        searchString: ["search-job"],
-      },
-      isDetails: {
-        title: { ...details.title },
-        description: { ...details.description },
-        jobLocation: { ...jobLocation },
-        industry: { ...industryDetail },
-        employmentTypes: { ...employmentTypesDetail },
-        organizationNames: { ...organizationNamesDetail },
-      },
-      seeksDetails: {
-        description: { ...details.description },
-        skills: { ...skillsDetail },
-        interests: { ...interestsDetail },
-      },
-    },
+    jobSearch: jobSearch,
+    jobOffer: jobOffer,
     getToKnow: {
       identifier: "getToKnow",
       label: "Find people",

@@ -4,7 +4,7 @@ import { realEstateGroup } from "./usecases/real-estate.js";
 import { transportGroup } from "./usecases/transport.js";
 import { complainGroup } from "./usecases/complain.js";
 import { socialGroup } from "./usecases/social.js";
-import { professionalGroup } from "./usecases/professional.js";
+import { professionalGroup } from "./usecases/professional/professional.js";
 import { mobilityGroup } from "./usecases/mobility.js";
 import { musicianGroup } from "./usecases/musician.js";
 
