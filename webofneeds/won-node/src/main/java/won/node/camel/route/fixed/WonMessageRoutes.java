@@ -151,6 +151,22 @@ public class WonMessageRoutes extends RouteBuilder
                 //now, we expect the message we want to pass on to the owner in the exchange's in header.
                 .to("bean:toOwnerSender");    //--> seda:OwnerProtocolOut
 
+        //sends the message to the owner of the connection in the won:hasSender property. 
+        //In the case of an outbound message, this is an echo of the message back to the owner, in the
+        //case of a system generated outbound message, this copies the message to the owner 
+        from("direct:echoToOwner")
+            .transacted("PROPAGATION_REQUIRES_NEW")
+            .routeId("direct:echoToOwner")
+            // we wait until we obtain a lock on the message's parent
+            // so that we can be sure that processing the message is finished before we send it to the owner
+            // if we did not do that, the owner may respond before processing the current message is finished,
+            // which, in case of a connect/open/connectionmesssage sequence may lead to a failure that is not
+            // expected by the client.
+            .to("bean:parentLocker")
+            //now, we expect the message we want to pass on to the owner in the exchange's in header.
+            .to("bean:toOwnerEchoer");    //--> seda:OwnerProtocolOut
+
+        
         from("direct:sendToNode")
                 .transacted("PROPAGATION_REQUIRES_NEW")
                 .routeId("direct:sendToNode")
@@ -252,12 +268,12 @@ public class WonMessageRoutes extends RouteBuilder
                         .when(
                             // we want to send a FROM_SYSTEM message to the owner if it is addressed at the owner.
                             // this is the case if senderURI equals receiverURI and both are non-null.
-                            PredicateBuilder.and(
-                                    header(WonCamelConstants.ORIGINAL_MESSAGE_HEADER).isNotNull(),
-                                    new IsSystemMessageToOwnerPredicate()))
+                            header(WonCamelConstants.ORIGINAL_MESSAGE_HEADER).isNotNull())
                             //swap back: original into MESSAGE_HEADER
                             .setHeader(WonCamelConstants.MESSAGE_HEADER, header(WonCamelConstants.ORIGINAL_MESSAGE_HEADER))
-                            .to("direct:sendToOwner")  //--> seda:OwnerProtocolOut
+                            // here, we use the echo functionality so a message always gets delivered to the owner, even if
+                            // it is a copy of an outgoing message
+                            .to("direct:echoToOwner")  //--> seda:OwnerProtocolOut
                             .endChoice()
                 .end()
                 // if we didn't raise an exception so far, send a success response

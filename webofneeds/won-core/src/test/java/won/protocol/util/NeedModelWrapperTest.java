@@ -1,21 +1,23 @@
 package won.protocol.util;
 
+import java.io.IOException;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Collection;
+
 import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.DC;
 import org.junit.Assert;
 import org.junit.Test;
+
 import won.protocol.message.Utils;
 import won.protocol.model.NeedContentPropertyType;
 import won.protocol.model.NeedGraphType;
 import won.protocol.model.NeedState;
 import won.protocol.vocabulary.WON;
-
-import java.io.IOException;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Collection;
 
 /**
  * Created by hfriedrich on 16.03.2017.
@@ -114,42 +116,7 @@ public class NeedModelWrapperTest {
         Assert.assertTrue("did not expect to find matching contexts", needModelWrapper.getMatchingContexts().isEmpty());
     }
 
-    @Test
-    public void createSysInfoModel() {
-
-        // create a empty wrapper with a need uri, check that the need and sysinfo models are there
-        NeedModelWrapper needModelWrapper = new NeedModelWrapper(NEED_URI);
-        Assert.assertNotNull(needModelWrapper.copyNeedModel(NeedGraphType.SYSINFO));
-        Assert.assertEquals(NEED_URI, needModelWrapper.getNeedUri());
-
-        // check that wrapper is empty
-        Assert.assertFalse(needModelWrapper.hasFlag(WON.USED_FOR_TESTING));
-        Assert.assertEquals(0, needModelWrapper.getContentNodes(NeedContentPropertyType.ALL).size());
-        Assert.assertEquals(0, needModelWrapper.getContentNodes(NeedContentPropertyType.ALL).size());
-        Assert.assertEquals(0, needModelWrapper.getFacetUris().size());
-
-        // set some values to the sysinfo model and check them
-        needModelWrapper.setNeedState(NeedState.INACTIVE);
-        needModelWrapper.setNeedState(NeedState.ACTIVE);
-        Assert.assertEquals(NeedState.ACTIVE, needModelWrapper.getNeedState());
-        needModelWrapper.addFlag(WON.USED_FOR_TESTING);
-        needModelWrapper.addFlag(WON.GOOD);
-        Assert.assertTrue(needModelWrapper.hasFlag(WON.USED_FOR_TESTING));
-        Assert.assertTrue(needModelWrapper.hasFlag(WON.GOOD));
-        needModelWrapper.setConnectionContainerUri("https://connnection1");
-        needModelWrapper.setConnectionContainerUri("https://connnection2");
-        Assert.assertEquals("https://connnection2", needModelWrapper.getConnectionContainerUri());
-        needModelWrapper.addFacet("#facet1", WON.CHAT_FACET_STRING);
-        needModelWrapper.addFacet("#facet2", WON.GROUP_FACET_STRING);
-        Assert.assertEquals(2, needModelWrapper.getFacetUris().size());
-        needModelWrapper.setWonNodeUri("https://wonnode1");
-        needModelWrapper.setWonNodeUri("https://wonnode2");
-        Assert.assertEquals("https://wonnode2", needModelWrapper.getWonNodeUri());
-
-        //make sure we don't find a matching context:
-        Assert.assertTrue("did not expect to find matching contexts", needModelWrapper.getMatchingContexts().isEmpty());
-    }
-
+    
     @Test
     public void createNeedWithShapesModel() throws IOException{
         Dataset ds = Utils.createTestDataset("/needmodel/needwithshapes.trig");

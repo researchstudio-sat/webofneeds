@@ -14,25 +14,22 @@
  *    limitations under the License.
  */
 
-package won.node.camel.predicate;
-
+package won.node.camel.processor.general;
 
 import org.apache.camel.Exchange;
-import org.apache.camel.Predicate;
+import won.node.camel.processor.AbstractCamelProcessor;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageDirection;
 import won.protocol.message.processor.camel.WonCamelConstants;
 
 /**
- * Ture if the WonMessage in the wonOriginalMessage header is FROM_SYSTEM.
+ * Sends the WonMessage found in the exchange's in (in the 'wonMessage' header) to
+ * the respective owner application(s).
  */
-public class IsSystemMessageToOwnerPredicate implements Predicate {
-
-    @Override
-    public boolean matches(Exchange exchange) {
-        WonMessage message = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.ORIGINAL_MESSAGE_HEADER);
-        if (message == null) return false;
-        if (message.getEnvelopeType() != WonMessageDirection.FROM_SYSTEM) return false;
-        return true;
-    }
+public class ToOwnerEchoer extends AbstractCamelProcessor
+{
+  @Override
+  public void process(final Exchange exchange) throws Exception {
+    WonMessage message = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
+    sendMessageToOwner(message, message.getSenderNeedURI(), (String) exchange.getIn().getHeader(WonCamelConstants.OWNER_APPLICATION_ID));
+  }
 }
