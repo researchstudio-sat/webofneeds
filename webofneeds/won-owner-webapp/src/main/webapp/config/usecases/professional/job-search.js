@@ -39,4 +39,77 @@ export const jobSearch = {
     employmentTypes: { ...employmentTypesDetail },
     organizationNames: { ...organizationNamesDetail },
   },
+
+  generateQuery: (draft, resultName) => {
+    console.log(draft, resultName, "deleteme");
+
+    //
+    // # index for industries using binds
+    // prefix s: <http://schema.org/>
+    // prefix won:   <http://purl.org/webofneeds/model#>
+    // select distinct * where {
+    //   {
+    //     select ?need (sum(?var1) + sum(?var2) as ?targetOverlap) (count(?need) as ?targetTotal) where {
+    //       ?need a won:Need;
+    //             won:is ?is.
+    //             ?is s:industry ?value .
+    //       bind(if(str(?value) = "foo",1,0) as ?var1)
+    //       bind(if(str(?value) = "bar",1,0) as ?var2)
+    //     } group by (?need)
+    //   }
+    //   bind (?targetOverlap / ( ?targetTotal + 2 - ?targetOverlap ) as ?jaccardIndex )
+    // } order by desc(?jaccardIndex)
+    // limit 100
+    //
+    //
+    //     const seeksBranch = draft && draft.seeks;
+    //     const rentRange = seeksBranch && seeksBranch.rentRange;
+    //     const floorSizeRange = seeksBranch && seeksBranch.floorSizeRange;
+    //     const numberOfRoomsRange =
+    //       seeksBranch && seeksBranch.numberOfRoomsRange;
+    //     const location = seeksBranch && seeksBranch.location;
+    //     const filters = [
+    //       {
+    //         // to select is-branch
+    //         prefixes: {
+    //           won: won.defaultContext["won"],
+    //         },
+    //         operations: [
+    //           `${resultName} a won:Need.`,
+    //           `${resultName} won:is ?is.`,
+    //           location && "?is won:hasLocation ?location.",
+    //         ],
+    //       },
+    //       rentRange &&
+    //         filterRentRange(
+    //           "?is",
+    //           rentRange.min,
+    //           rentRange.max,
+    //           rentRange.currency
+    //         ),
+    //       floorSizeRange &&
+    //         filterFloorSizeRange("?is", floorSizeRange.min, floorSizeRange.max),
+    //       numberOfRoomsRange &&
+    //         filterNumOfRoomsRange(
+    //           "?is",
+    //           numberOfRoomsRange.min,
+    //           numberOfRoomsRange.max
+    //         ),
+    //       filterInVicinity("?location", location),
+    //     ];
+    //     const concatenatedFilter = concatenateFilters(filters);
+    //     return sparqlQuery({
+    //       prefixes: concatenatedFilter.prefixes,
+    //       selectDistinct: resultName,
+    //       where: concatenatedFilter.operations,
+    //       orderBy: [
+    //         {
+    //           order: "ASC",
+    //           variable: "?location_geoDistance",
+    //         },
+    //       ],
+    //     });
+    //   },
+    // },
+  },
 };
