@@ -48,17 +48,15 @@ public class NeedModelWrapper {
      */
     public NeedModelWrapper(String needUri) {
 
-        needDataset = DatasetFactory.create();
+        needDataset = DatasetFactory.createGeneral();
         Model needModel = ModelFactory.createDefaultModel();
         DefaultPrefixUtils.setDefaultPrefixes(needModel);
         needModel.createResource(needUri, WON.NEED);
         Model sysInfoModel = ModelFactory.createDefaultModel();
         DefaultPrefixUtils.setDefaultPrefixes(sysInfoModel);
         sysInfoModel.createResource(needUri, WON.NEED);
-        this.needModelGraphName = "dummy#need";
+        this.needModelGraphName = needUri + "#need";
         needDataset.addNamedModel(this.needModelGraphName, needModel);
-        this.sysInfoGraphName = "dummy#sysinfo";
-        needDataset.addNamedModel(this.sysInfoGraphName, sysInfoModel);
     }
 
     /**
@@ -67,7 +65,7 @@ public class NeedModelWrapper {
      * @param ds need dataset to load
      */
     public NeedModelWrapper(Dataset ds) {
-        this(ds, true);
+        this(ds, false);
     }
 
     /**
@@ -111,7 +109,7 @@ public class NeedModelWrapper {
      */
     public NeedModelWrapper(Model needModel, Model sysInfoModel) {
 
-        needDataset = DatasetFactory.create();
+        needDataset = DatasetFactory.createGeneral();
         String needUri = null;
 
         if (sysInfoModel != null) {
@@ -172,7 +170,10 @@ public class NeedModelWrapper {
         while(modelNameIter.hasNext()) {
             String tempModelName = modelNameIter.next();
             Model model = needDataset.getNamedModel(tempModelName);
-
+            if (tempModelName.equals("dummy#sysinfo")) {
+                continue;  
+            }
+            
             if(model.listSubjectsWithProperty(RDF.type, WON.NEED).hasNext() && ! model.listSubjectsWithProperty(WON.IS_IN_STATE).hasNext()) {
                 this.needModelGraphName = tempModelName;
                 return model;
@@ -194,6 +195,9 @@ public class NeedModelWrapper {
 
         while(modelNameIter.hasNext()) {
             String tempModelName = modelNameIter.next();
+            if (tempModelName.equals("dummy#need")) {
+                continue;  
+            }
             Model model = needDataset.getNamedModel(tempModelName);
 
             if(model.listSubjectsWithProperty(RDF.type, WON.NEED).hasNext() && model.listSubjectsWithProperty(WON.IS_IN_STATE).hasNext()){
@@ -318,11 +322,11 @@ public class NeedModelWrapper {
     }
     
     public void addMatchingContext(String context) {
-    	getNeedNode(NeedGraphType.NEED).addProperty(WON.HAS_MATCHING_CONTEXT, context);
+        getNeedNode(NeedGraphType.NEED).addProperty(WON.HAS_MATCHING_CONTEXT, context);
     }
     
     public boolean hasMatchingContext(String context) {
-    	return getNeedNode(NeedGraphType.NEED).hasProperty(WON.HAS_MATCHING_CONTEXT, context);
+        return getNeedNode(NeedGraphType.NEED).hasProperty(WON.HAS_MATCHING_CONTEXT, context);
     }
     
     public void addQuery(String query) {
