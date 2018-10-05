@@ -14,8 +14,6 @@ export const emptyDraft = {
   matchingContext: undefined,
 };
 
-console.log(timeDetails);
-
 export const details = {
   title: basicDetails.title,
   description: basicDetails.description,
