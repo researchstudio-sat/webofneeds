@@ -504,81 +504,131 @@ public class AgreementProtocolState {
 		Set<ConversationMessage> roots = new HashSet();
 		Collection<ConversationMessage> messages = messagesByURI.values();
 		
-		
+		Set<DeadReferenceConversationMessage> messagesWithDeadReferences = new HashSet<>();
 		//iterate over messages and interconnect them
 		messages.stream().forEach(message -> {
 			if (message.getCorrespondingRemoteMessageURI() != null && ! message.getCorrespondingRemoteMessageURI().equals(message.getMessageURI())) {
 				ConversationMessage other = messagesByURI.get(message.getCorrespondingRemoteMessageURI());
-				throwExceptionIfOtherisMissing(message.getMessageURI(), message.getCorrespondingRemoteMessageURI(), other, "msg:hasCorrespondingRemoteMessage");
-				message.setCorrespondingRemoteMessageRef(other);
-                other.setCorrespondingRemoteMessageRef(message);
+				if (other != null) {
+    				message.setCorrespondingRemoteMessageRef(other);
+                    other.setCorrespondingRemoteMessageRef(message);
+				} else {
+				    messagesWithDeadReferences.add(new DeadReferenceConversationMessage(message, "msg:hasCorrespondingRemoteMessage", message.getCorrespondingRemoteMessageURI()));
+				}
 			}
 			message.getPrevious().stream().filter(uri -> !uri.equals(message.getMessageURI()))
 				.forEach(uri -> {
 				ConversationMessage other = messagesByURI.get(uri);
-				throwExceptionIfOtherisMissing(message.getMessageURI(), uri, other, "msg:hasPreviousMessage");
-				message.addPreviousRef(other);
-				other.addPreviousInverseRef(message);
+				if (other != null) {
+				    message.addPreviousRef(other);
+    				other.addPreviousInverseRef(message);
+				} else {
+                    messagesWithDeadReferences.add(new DeadReferenceConversationMessage(message, "msg:hasPreviousMessage", uri));
+                }
 			});
+			message.getForwarded().stream().filter(uri -> !uri.equals(message.getMessageURI()))
+                .forEach(uri -> {
+                ConversationMessage other = messagesByURI.get(uri);
+                if (other != null) {
+                    message.addForwardedRef(other);
+                    other.addForwardedInverseRef(message);
+                } else {
+                    messagesWithDeadReferences.add(new DeadReferenceConversationMessage(message, "msg:hasForwardedMessage", uri));
+                }
+            });
 			message.getAccepts().stream().filter(uri -> !uri.equals(message.getMessageURI()))
 				.forEach(uri -> {
 				ConversationMessage other = messagesByURI.get(uri);
-				throwExceptionIfOtherisMissing(message.getMessageURI(), uri, other, "agr:accepts");
-				message.addAcceptsRef(other);
-				other.addAcceptsInverseRef(message);
+				if (other != null) {
+				    message.addAcceptsRef(other);
+    				other.addAcceptsInverseRef(message);
+				} else {
+				    messagesWithDeadReferences.add(new DeadReferenceConversationMessage(message, "agr:accepts", uri));
+                }
 			});
 			message.getProposes().stream().filter(uri -> !uri.equals(message.getMessageURI()))
 				.forEach(uri -> {
 				ConversationMessage other = messagesByURI.get(uri);
-				throwExceptionIfOtherisMissing(message.getMessageURI(), uri, other, "agr:proposes");
-				message.addProposesRef(other);
-				other.addProposesInverseRef(message);
-				});
+				if (other != null) {
+				    message.addProposesRef(other);
+    				other.addProposesInverseRef(message);
+				} else {
+				    messagesWithDeadReferences.add(new DeadReferenceConversationMessage(message, "agr:proposes", uri));
+                }
+			});
 			message.getRejects().stream().filter(uri -> !uri.equals(message.getMessageURI()))
 				.forEach(uri -> {
 				ConversationMessage other = messagesByURI.get(uri);
-				throwExceptionIfOtherisMissing(message.getMessageURI(), uri, other, "agr:rejects");
-				message.addRejectsRef(other);
-				other.addRejectsInverseRef(message);
-				});
+				if (other != null) {
+				    message.addRejectsRef(other);
+    				other.addRejectsInverseRef(message);
+				} else {
+				    messagesWithDeadReferences.add(new DeadReferenceConversationMessage(message, "agr:rejects", uri));
+                }
+			});
 			message.getProposesToCancel().stream().filter(uri -> !uri.equals(message.getMessageURI()))
 				.forEach(uri -> {
 				ConversationMessage other = messagesByURI.get(uri);
-				throwExceptionIfOtherisMissing(message.getMessageURI(), uri, other, "agr:proposesToCancel");
-				message.addProposesToCancelRef(other);
-				other.addProposesToCancelInverseRef(message);
-				});
+				if (other != null) {
+				    message.addProposesToCancelRef(other);
+				    other.addProposesToCancelInverseRef(message);
+				} else {
+				    messagesWithDeadReferences.add(new DeadReferenceConversationMessage(message, "agr:proposesToCancel", uri));
+                }
+		    });
 			message.getRetracts().stream().filter(uri -> !uri.equals(message.getMessageURI()))
 				.forEach(uri -> {
 				ConversationMessage other = messagesByURI.get(uri);
-				throwExceptionIfOtherisMissing(message.getMessageURI(), uri, other, "mod:retracts");
-				message.addRetractsRef(other);
-				other.addRetractsInverseRef(message);
-				});
+				if (other != null) {
+				    message.addRetractsRef(other);
+				    other.addRetractsInverseRef(message);
+				} else {
+				    messagesWithDeadReferences.add(new DeadReferenceConversationMessage(message, "mod:retracts", uri));
+                }
+			});
 			if (message.getIsResponseTo() != null && ! message.getIsResponseTo().equals(message.getMessageURI())) {
                 ConversationMessage other = messagesByURI.get(message.getIsResponseTo());
-                if (message.getMessageType() != WonMessageType.FAILURE_RESPONSE ) {
-                    throwExceptionIfOtherisMissing(message.getMessageURI(), message.getIsResponseTo(), other, "msg:isResponseTo");
-                }
                 if (other != null) {
-                    // we have to check for null again because we may be processing a failure response
-                    // a failure response may refer to an original message that the server did no store
-                    // eg because it failed consistency checks
                     message.setIsResponseToRef(other);
                     other.setIsResponseToInverseRef(message);
+                } else {
+                    messagesWithDeadReferences.add(new DeadReferenceConversationMessage(message, "msg:isResponseTo", message.getIsResponseTo()));
                 }
 			}
 			if (message.getIsRemoteResponseTo() != null && ! message.getIsRemoteResponseTo().equals(message.getMessageURI())) {
 				ConversationMessage other = messagesByURI.get(message.getIsRemoteResponseTo());
-				throwExceptionIfOtherisMissing(message.getMessageURI(), message.getIsRemoteResponseTo(), other, "msg:isRemoteResponseTo");
-				message.setIsRemoteResponseToRef(other);
-				other.setIsRemoteResponseToInverseRef(message);
+				if (other != null) {
+    				message.setIsRemoteResponseToRef(other);
+    				other.setIsRemoteResponseToInverseRef(message);
+				} else {
+				    messagesWithDeadReferences.add(new DeadReferenceConversationMessage(message, "msg:isRemoteResponseTo", message.getIsRemoteResponseTo()));
+				}
 			}
 			if (message.getPrevious().isEmpty()) {
 				roots.add(message);
 			}
 		});
 
+        //
+		
+
+		//now revisit all messages with dead references. Throw an exception if the message is not a forwarded message
+		messagesWithDeadReferences.stream().forEach(deadRef -> {
+            if (deadRef.message.getMessageType() == WonMessageType.FAILURE_RESPONSE ) {
+                // we are lenient here because we may be processing a failure response
+                // a failure response may refer to an original message that the server did no store
+                // eg because it failed consistency checks
+                return;
+            }
+            if (deadRef.message.isForwardedOrRemoteMessageOfForwarded()) {
+                // we are lenient here because a forwarded message should not cause an exception, even 
+                //if it points to a missing message
+                return;
+            }
+            throw new IncompleteConversationDataException(deadRef.message.getMessageURI(), deadRef.deadReference, deadRef.predicate);
+		});
+		
+		
 		//link messages to deliveryChains
 		deliveryChains = 
 				messages.stream().map(m -> {
@@ -789,14 +839,6 @@ public class AgreementProtocolState {
 		rejected.commit();
 		conversationDataset.end();
 	}
-	
-	private void throwExceptionIfOtherisMissing(URI messageUri, URI otherMessageUri, ConversationMessage otherMessage, String predicate) {
-		if (otherMessage != null) {
-			return;
-		}
-		throw new IncompleteConversationDataException(messageUri, otherMessageUri, predicate);
-	}
-	
 	
 	private  Dataset acknowledgedSelection(Dataset conversationDataset, Collection<ConversationMessage> messages ) {
 		Dataset copy = RdfUtils.cloneDataset(conversationDataset);
@@ -1016,5 +1058,18 @@ public class AgreementProtocolState {
 		return changedSomething;
 	}
 
-
+	private class DeadReferenceConversationMessage {
+	    ConversationMessage message; 
+	    String predicate;
+	    URI deadReference;
+        public DeadReferenceConversationMessage(ConversationMessage message, String predicate, URI deadReference) {
+            super();
+            this.message = message;
+            this.predicate = predicate;
+            this.deadReference = deadReference;
+        }
+	    
+	    
+	}
+	
 }

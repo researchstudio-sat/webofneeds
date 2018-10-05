@@ -45,6 +45,10 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 	URI correspondingRemoteMessageURI;
 	ConversationMessage correspondingRemoteMessageRef;
 	
+	Set<URI> forwarded = new HashSet<>();
+    Set<ConversationMessage> forwardedRefs = new HashSet<ConversationMessage>();
+    Set<ConversationMessage> forwardedInverseRefs = new HashSet<ConversationMessage>();
+	
 	URI isResponseTo;
 	Optional<ConversationMessage> isResponseToOption = Optional.empty();
 	ConversationMessage isResponseToInverseRef;
@@ -129,6 +133,14 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 	private void removeRetractsInverseRef(ConversationMessage other) {
 		this.proposesInverseRefs.remove(other);
 	}
+	
+	public boolean isForwardedMessage() {
+	    return ! this.forwardedInverseRefs.isEmpty();
+	}
+	
+	public boolean isForwardedOrRemoteMessageOfForwarded() {
+        return isForwardedMessage() || hasCorrespondingRemoteMessage() && correspondingRemoteMessageRef.isForwardedMessage();
+    }
 	
 	public ConversationMessage getRootOfDeliveryChain() {
 		return getDeliveryChain().getHead();
@@ -455,6 +467,21 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 		this.previousRefs.add(ref);
 	}
 	
+	public Set<URI> getForwarded() {
+        return forwarded;
+    }
+    public Set<ConversationMessage> getForwardedRefs(){
+        return forwardedRefs;
+    }
+    public void addForwarded(URI forwarded) {
+        this.forwarded.add(forwarded);
+    }
+    public void addForwardedRef(ConversationMessage ref) {
+        this.forwardedRefs.add(ref);
+    }
+
+	
+	
 	public Set<URI> getAccepts() {
 		return accepts;
 	}
@@ -557,6 +584,12 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 	public void addPreviousInverseRef(ConversationMessage ref) {
 		this.previousInverseRefs.add(ref);
 	}
+	public Set<ConversationMessage> getForwardedInverseRefs() {
+        return forwardedInverseRefs;
+    }
+    public void addForwardedInverseRef(ConversationMessage ref) {
+        this.forwardedInverseRefs.add(ref);
+    }
 	public Set<ConversationMessage> getAcceptsInverseRefs() {
 		return acceptsInverseRefs;
 	}
@@ -642,6 +675,7 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 				+ ", isRemoteResponseToRef:" + messageUriOrNullString(isRemoteResponseToRef)
 				+ ", isResponseToInverse: " + messageUriOrNullString(isResponseToInverseRef)
 				+ ", isRemoteResponseToInverse: " + messageUriOrNullString(isRemoteResponseToInverseRef)
+				+ ", isForwarded: " + isForwardedMessage()
 				+ "]";
 	}
 

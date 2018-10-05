@@ -62,6 +62,12 @@ public class ConversationMessagesReader {
 						Statement s) -> getOrCreateMessage(messages, getUri(s.getSubject()))
 								.setCorrespondingRemoteMessageURI(getUri(s.getObject())));
 
+		inithandlers.put(WONMSG.HAS_FORWARDED_MESSAGE,
+                (Map<URI, ConversationMessage> messages,
+                        Statement s) -> getOrCreateMessage(messages, getUri(s.getSubject()))
+                                .addForwarded(getUri(s.getObject())));
+
+		
 		inithandlers.put(WONMSG.HAS_PREVIOUS_MESSAGE_PROPERTY,
 				(Map<URI, ConversationMessage> messages,
 						Statement s) -> getOrCreateMessage(messages, getUri(s.getSubject()))
