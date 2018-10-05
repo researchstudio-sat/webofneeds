@@ -7,7 +7,6 @@ import { jobLocation } from "../details/location.js";
 import {
   industryDetail,
   employmentTypesDetail,
-  organizationNameDetail,
   organizationNamesDetail,
 } from "../details/jobs.js";
 import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-utils.js";
@@ -71,7 +70,7 @@ export const professionalGroup = {
         jobLocation: { ...jobLocation },
         industry: { ...industryDetail },
         employmentTypes: { ...employmentTypesDetail },
-        organizationName: { ...organizationNameDetail },
+        organizationName: { ...organizationNamesDetail },
       },
       seeksDetails: {
         description: { ...details.description },

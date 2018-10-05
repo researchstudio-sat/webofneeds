@@ -42,7 +42,7 @@ export const employmentTypesDetail = {
 export const organizationNamesDetail = {
   ...details.tags,
   identifier: "organizationNames",
-  label: "Organization Names",
+  label: "Organization Name(s)",
   placeholder:
     "e.g. Shiawase Corp., Simmerling Constructions, Daily Bugle, etc",
   // icon: "#ico36_detail_tags", //TODO proper icon
@@ -77,48 +77,3 @@ export const organizationNamesDetail = {
     }
   },
 };
-
-/**
- * For the job-offering side we only need one organization name
- */
-export const organizationNameDetail = {
-  identifier: "organizationName",
-  label: "Organization Name",
-  // icon: "#ico36_detail_tags", //TODO proper icon
-  icon: "#TODO", //TODO proper icon
-  placeholder: 'e.g. "Simmerling Constructions"',
-  component: "won-title-picker",
-  viewerComponent: "won-title-viewer",
-  parseToRDF: function({ value }) {
-    if (!value) {
-      return { "s:hiringOrganization": undefined };
-    } else {
-      return {
-        "s:hiringOrganization": {
-          "@type": "s:Organization",
-          "s:name": value, // JSON - company
-        },
-      };
-    }
-  },
-  parseFromRDF: function(jsonLDImm) {
-    return won.parseFrom(
-      jsonLDImm,
-      ["s:hiringOrganization", "s:name"],
-      "xsd:string"
-    );
-  },
-  generateHumanReadable: function({ value, includeLabel }) {
-    if (value) {
-      return includeLabel ? this.label + ": " + value : value;
-    }
-    return undefined;
-  },
-};
-
-/*
-    "s:hiringOrganization": { // for ppl who only want offers from a specific organization (rather niche tho)
-      "@type": "s:Organization",
-      "s:name": "", // JSON - company
-    },
-    */
