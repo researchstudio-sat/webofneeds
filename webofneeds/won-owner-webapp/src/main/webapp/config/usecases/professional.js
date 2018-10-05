@@ -56,8 +56,8 @@ export const professionalGroup = {
       draft: {
         ...emptyDraft,
         is: {
-          tags: ["offer-job"],
           "@type": "s:JobPosting",
+          tags: ["offer-job"],
         },
         seeks: {
           "@type": "s:Person",
