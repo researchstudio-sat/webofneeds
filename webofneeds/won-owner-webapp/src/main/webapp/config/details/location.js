@@ -28,7 +28,10 @@ export const location = {
     return parseSPlace(jsonldLocation);
   },
   generateHumanReadable: function({ value, includeLabel }) {
-    return sPlaceToHumanReadable({ value, includeLabel });
+    return sPlaceToHumanReadable({
+      value,
+      label: includeLabel ? this.label : "",
+    });
   },
 };
 
@@ -53,7 +56,10 @@ export const jobLocation = {
     return parseSPlace(jsonldLocation);
   },
   generateHumanReadable: function({ value, includeLabel }) {
-    return sPlaceToHumanReadable({ value, includeLabel });
+    return sPlaceToHumanReadable({
+      value,
+      label: includeLabel ? this.label : "",
+    });
   },
 };
 
@@ -355,7 +361,7 @@ function parsePlaceLeniently(jsonldLocation) {
   return place;
 }
 
-function sPlaceToHumanReadable({ value, includeLabel }) {
+function sPlaceToHumanReadable({ value, label }) {
   if (value) {
     let humanReadable;
     if (value.name) {
@@ -370,9 +376,7 @@ function sPlaceToHumanReadable({ value, includeLabel }) {
       }
     }
     if (humanReadable) {
-      return includeLabel
-        ? this.label + ": " + humanReadable.trim()
-        : humanReadable.trim();
+      return (label ? `${label}: ` : "") + humanReadable.trim();
     }
   }
   return undefined;
