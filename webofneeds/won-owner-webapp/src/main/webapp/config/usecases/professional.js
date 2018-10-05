@@ -7,6 +7,7 @@ import { jobLocation } from "../details/location.js";
 import {
   industryDetail,
   employmentTypesDetail,
+  organizationNameDetail,
   organizationNamesDetail,
 } from "../details/jobs.js";
 import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-utils.js";
@@ -17,7 +18,7 @@ export const professionalGroup = {
   icon: undefined,
   useCases: {
     jobSearch: {
-      identifier: "getToKnow",
+      identifier: "jobSearch",
       label: "Search a Job",
       // icon: "#ico36_uc_find_people", TODO
       doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
@@ -29,28 +30,6 @@ export const professionalGroup = {
         },
         seeks: {
           "@type": "s:JobPosting",
-          /* example to match hokify-offers:
-          "s:employmentType": "Full-time", // full-time/vollzeit, part-time,... - use a dropdown
-    "s:industry": ["Computer Software", "Design"], // match by checking for intersection + text-similarity and translations
-
-    //"s:baseSalary": {...}, // free-form-text in hokify json :|
-
-    "s:hiringOrganization": { // for ppl who only want offers from a specific organization (rather niche tho)
-      "@type": "s:Organization",
-      "s:name": "", // JSON - company
-    },
-
-    "s:jobLocation":
-      {
-        "@type": "s:Place",
-        "s:geo": {
-          "@id": "https://satvm05.researchstudio.at/won/resource/need/rsiiungn085u/location/6l7plycz2g", // unique id; i assume it's necessary for the geo-service
-          "@type": "s:GeoCoordinates",
-          "s:latitude": "48.216931",
-          "s:longitude": "16.361197"
-        },
-      },
-    */
         },
         searchString: ["offer-job"],
       },
@@ -68,6 +47,36 @@ export const professionalGroup = {
         industry: { ...industryDetail },
         employmentTypes: { ...employmentTypesDetail },
         organizationNames: { ...organizationNamesDetail },
+      },
+    },
+    jobOffer: {
+      identifier: "jobOffer",
+      label: "Find people for a Job",
+      // icon: "#ico36_uc_find_people", TODO
+      doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
+      draft: {
+        ...emptyDraft,
+        is: {
+          tags: ["offer-job"],
+          "@type": "s:JobPosting",
+        },
+        seeks: {
+          "@type": "s:Person",
+        },
+        searchString: ["search-job"],
+      },
+      isDetails: {
+        title: { ...details.title },
+        description: { ...details.description },
+        jobLocation: { ...jobLocation },
+        industry: { ...industryDetail },
+        employmentTypes: { ...employmentTypesDetail },
+        organizationName: { ...organizationNameDetail },
+      },
+      seeksDetails: {
+        description: { ...details.description },
+        skills: { ...skillsDetail },
+        interests: { ...interestsDetail },
       },
     },
     getToKnow: {
