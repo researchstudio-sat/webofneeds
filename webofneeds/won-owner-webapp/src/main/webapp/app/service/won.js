@@ -1336,7 +1336,12 @@ WonMessage.prototype = {
       "http://purl.org/webofneeds/modification#retracts"
     );
   },
-
+  isOutgoingMessage: function() {
+    return (
+      this.isFromOwner() ||
+      (this.isFromSystem() && this.getSender() !== this.getReceiver())
+    );
+  },
   isFromSystem: function() {
     let direction = this.getMessageDirection();
     return direction === "http://purl.org/webofneeds/message#FromSystem";
