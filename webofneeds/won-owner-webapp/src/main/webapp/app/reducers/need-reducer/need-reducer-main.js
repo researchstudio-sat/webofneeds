@@ -384,19 +384,26 @@ export default function(allNeedsInState = initialState, action = {}) {
             [needUri, "connections", connectionUri],
             properConnection
           );
-
-        allNeedsInState = allNeedsInState.setIn(
-          [
-            needUri,
-            "connections",
-            connectionUri,
-            "messages",
-            eventUri,
-            "isReceivedByOwn",
-          ],
-          true
-        );
-
+        const path = [
+          needUri,
+          "connections",
+          connectionUri,
+          "messages",
+          eventUri,
+        ];
+        if (allNeedsInState.getIn[path]) {
+          allNeedsInState = allNeedsInState.setIn(
+            [...path, "isReceivedByOwn"],
+            true
+          );
+        } else {
+          console.error(
+            "connect.successOwn for message that was not sent(or was not loaded in the state yet, wonMessage: ",
+            wonMessage,
+            "messageUri: ",
+            eventUri
+          );
+        }
         return allNeedsInState;
       } else {
         // connection has been stored as match first
@@ -412,19 +419,27 @@ export default function(allNeedsInState = initialState, action = {}) {
         );
 
         if (needFromConnection) {
-          allNeedsInState = allNeedsInState.setIn(
-            [
-              needFromConnection.get("uri"),
-              "connections",
-              connectionUri,
-              "messages",
-              eventUri,
-              "isReceivedByOwn",
-            ],
-            true
-          );
+          const path = [
+            needFromConnection.get("uri"),
+            "connections",
+            connectionUri,
+            "messages",
+            eventUri,
+          ];
+          if (allNeedsInState.getIn[path]) {
+            allNeedsInState = allNeedsInState.setIn(
+              [...path, "isReceivedByOwn"],
+              true
+            );
+          } else {
+            console.error(
+              "connect.successOwn for message that was not sent(or was not loaded in the state yet, wonMessage: ",
+              wonMessage,
+              "messageUri: ",
+              eventUri
+            );
+          }
         }
-
         return allNeedsInState;
       }
     }
@@ -623,18 +638,26 @@ export default function(allNeedsInState = initialState, action = {}) {
       const eventUri = wonMessage.getIsRemoteResponseTo();
       const needUri = wonMessage.getReceiverNeed();
       const connectionUri = wonMessage.getReceiver();
-
-      allNeedsInState = allNeedsInState.setIn(
-        [
-          needUri,
-          "connections",
-          connectionUri,
-          "messages",
-          eventUri,
-          "isReceivedByRemote",
-        ],
-        true
-      );
+      const path = [
+        needUri,
+        "connections",
+        connectionUri,
+        "messages",
+        eventUri,
+      ];
+      if (allNeedsInState.getIn(path)) {
+        allNeedsInState = allNeedsInState.setIn(
+          [...path, "isReceivedByRemote"],
+          true
+        );
+      } else {
+        console.error(
+          "chatMessage.successRemote for message that was not sent(or was not loaded in the state yet, wonMessage: ",
+          wonMessage,
+          "messageUri: ",
+          eventUri
+        );
+      }
       return allNeedsInState;
     }
 
