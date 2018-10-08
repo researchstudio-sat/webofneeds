@@ -237,7 +237,13 @@ function genComponentConf() {
         let sortedMessages = chatMessages && chatMessages.toArray();
         sortedMessages &&
           sortedMessages.sort(function(a, b) {
-            return a.get("date").getTime() - b.get("date").getTime();
+            const aDate = a.get("date");
+            const bDate = b.get("date");
+
+            const aTime = aDate && aDate.getTime();
+            const bTime = bDate && bDate.getTime();
+
+            return aTime - bTime;
           });
 
         const unreadMessages = selectUnreadMessagesByConnectionUri(

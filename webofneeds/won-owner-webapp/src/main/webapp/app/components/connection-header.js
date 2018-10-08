@@ -107,7 +107,13 @@ function genComponentConf() {
         const sortedMessages = allMessages && allMessages.toArray();
         if (sortedMessages) {
           sortedMessages.sort(function(a, b) {
-            return b.get("date").getTime() - a.get("date").getTime();
+            const aDate = a.get("date");
+            const bDate = b.get("date");
+
+            const aTime = aDate && aDate.getTime();
+            const bTime = bDate && bDate.getTime();
+
+            return bTime - aTime;
           });
         }
 
