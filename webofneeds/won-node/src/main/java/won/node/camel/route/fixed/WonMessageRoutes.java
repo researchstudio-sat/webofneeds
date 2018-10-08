@@ -201,7 +201,7 @@ public class WonMessageRoutes extends RouteBuilder
             // e.g. when client's public keys changed and hence their queuenames did, too. Added the onException part to deal
             // with that.
             .onException(Exception.class)
-              .log("failure during seda:OwnerProtocolOut, ignoring. Exception message: ${exception.message}")
+              .log("failure during seda:OwnerProtocolOut, ignoring. Exception message: ${exception.messsage}")
               .handled(true)
               .stop()
               .end()
@@ -268,7 +268,9 @@ public class WonMessageRoutes extends RouteBuilder
                         .when(
                             // we want to send a FROM_SYSTEM message to the owner if it is addressed at the owner.
                             // this is the case if senderURI equals receiverURI and both are non-null.
-                            header(WonCamelConstants.ORIGINAL_MESSAGE_HEADER).isNotNull())
+                            PredicateBuilder.and(
+                                    header(WonCamelConstants.ORIGINAL_MESSAGE_HEADER).isNotNull(),
+                                    new IsSystemMessageToOwnerPredicate()))
                             //swap back: original into MESSAGE_HEADER
                             .setHeader(WonCamelConstants.MESSAGE_HEADER, header(WonCamelConstants.ORIGINAL_MESSAGE_HEADER))
                             // here, we use the echo functionality so a message always gets delivered to the owner, even if

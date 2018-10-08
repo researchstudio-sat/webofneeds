@@ -21,6 +21,7 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Predicate;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDirection;
+import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.camel.WonCamelConstants;
 
 /**
@@ -32,6 +33,8 @@ public class IsSystemMessageToOwnerPredicate implements Predicate {
     public boolean matches(Exchange exchange) {
         WonMessage message = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.ORIGINAL_MESSAGE_HEADER);
         if (message == null) return false;
+        if (message.getMessageType() == WonMessageType.SUCCESS_RESPONSE) return false;
+        if (message.getMessageType() == WonMessageType.FAILURE_RESPONSE) return false;
         if (message.getEnvelopeType() != WonMessageDirection.FROM_SYSTEM) return false;
         return true;
     }
