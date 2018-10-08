@@ -41,7 +41,6 @@ import won.protocol.vocabulary.WON;
  */
 public class CreateNeedFromJobAction extends AbstractCreateNeedAction {
 
-    // private ArrayList<HokifyJob> hokifyJobs = new ArrayList<HokifyJob>();
     private HokifyBotsApi hokifyBotsApi;
     private boolean createAllInOne;
 
@@ -67,13 +66,11 @@ public class CreateNeedFromJobAction extends AbstractCreateNeedAction {
                     }
                 } else {
                     boolean created = false;
+                    Random random = new Random();
                     while (!created) {
-                        logger.info("Create one random job needs");
-                        Random random = new Random();
                         // Only one single random job
-                        int rnd = random.nextInt(hokifyJobs.size());
-                        HokifyJob hokifyJob = hokifyJobs.get(rnd);
-                        // Check if need already exists
+                        logger.info("Create 1 random job need");
+                        HokifyJob hokifyJob = hokifyJobs.get(random.nextInt(hokifyJobs.size()));
                         if (this.createNeedFromJob(ctx, botContextWrapper, hokifyJob)) {
                             created = true;
                         }

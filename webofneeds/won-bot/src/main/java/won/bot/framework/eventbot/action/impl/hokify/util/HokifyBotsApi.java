@@ -40,9 +40,7 @@ public class HokifyBotsApi {
 
     public ArrayList<HokifyJob> fetchHokifyData() {
         ArrayList<HokifyJob> jobsList = new ArrayList<HokifyJob>();
-        System.out.println("----------------- ----------------- Start fetchHokifyData()");
 
-        System.out.println("Requeted URL:" + jsonURL);
         try {
 
             DefaultHttpClient httpClient = new DefaultHttpClient();
@@ -59,7 +57,6 @@ public class HokifyBotsApi {
 
             StringBuilder sb = new StringBuilder();
             String line;
-            System.out.println("Output from Server .... \n");
             while ((line = br.readLine()) != null) {
                 sb.append(line);
             }
@@ -74,13 +71,10 @@ public class HokifyBotsApi {
                             HokifyJob.class);
                     jobsList.add(tmpJob);
                 } catch (JsonParseException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 } catch (JsonMappingException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 } catch (IOException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
 
@@ -92,27 +86,27 @@ public class HokifyBotsApi {
         } catch (IOException e) {
             e.printStackTrace();
         } catch (JSONException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        System.out.println("The jobsList contains " + jobsList.size() + " jobs");
+
         return jobsList;
     }
 
     public HashMap<String, String> fetchGeoLocation(String city, String country) {
         HashMap<String, String> loc = new HashMap<String, String>();
 
+        String cityString = city != null ? city.replace(" ", "+") : "";
+        String countrySting = country != null ? country.replace(" ", "+") : "";
+
+        String searchString = geoURL + "?city=" + cityString + "&country=" + countrySting + "&format=json";
+
+        DefaultHttpClient httpClient = new DefaultHttpClient();
+        HttpGet getRequest = new HttpGet(searchString);
+        getRequest.addHeader("accept", "application/json");
+
+        HttpResponse response;
         try {
-            String cityString = city != null ? city.replace(" ", "+") : "";
-            String countrySting = country != null ? country.replace(" ", "+") : "";
-
-            String searchString = geoURL + "?city=" + cityString + "&country=" + countrySting + "&format=json";
-
-            DefaultHttpClient httpClient = new DefaultHttpClient();
-            HttpGet getRequest = new HttpGet(searchString);
-            getRequest.addHeader("accept", "application/json");
-
-            HttpResponse response = httpClient.execute(getRequest);
+            response = httpClient.execute(getRequest);
 
             if (response.getStatusLine().getStatusCode() != 200) {
                 throw new RuntimeException("Failed : HTTP error code : " + response.getStatusLine().getStatusCode());
@@ -125,25 +119,39 @@ public class HokifyBotsApi {
             while ((line = br.readLine()) != null) {
                 sb.append(line);
             }
-            JSONArray jsonArray = new JSONArray(sb.toString());
-            JSONObject obj = jsonArray.getJSONObject(0);
-            obj.get("display_name");
+
+             JSONArray jsonArray = new JSONArray(sb.toString());
+
+            if (jsonArray.length() > 0) {
+                JSONObject obj = jsonArray.getJSONObject(0);
+
+                JSONArray bBox = (JSONArray) obj.get("boundingbox");
+
+                loc.put("nwlat", (String) bBox.get(1));
+                loc.put("nwlng", (String) bBox.get(3));
+                loc.put("selat", (String) bBox.get(0));
+                loc.put("selng", (String) bBox.get(2));
+                loc.put("lat", (String) obj.get("lat"));
+                loc.put("lng", (String) obj.get("lon"));
+                loc.put("name", (String) obj.get("display_name"));
+            } else {
+                loc.put("nwlat", "0");
+                loc.put("nwlng", "0");
+                loc.put("selat", "0");
+                loc.put("selng", "0");
+                loc.put("lat", "0");
+                loc.put("lng", "0");
+                loc.put("name", "no location");
+            }
             httpClient.close();
             response.getEntity().getContent().close();
 
-            JSONArray bBox = (JSONArray) obj.get("boundingbox");
-
-            loc.put("nwlat", (String) bBox.get(1));
-            loc.put("nwlng", (String) bBox.get(3));
-            loc.put("selat", (String) bBox.get(0));
-            loc.put("selng", (String) bBox.get(2));
-            loc.put("lat", (String) obj.get("lat"));
-            loc.put("lng", (String) obj.get("lon"));
-            loc.put("name", (String) obj.get("display_name"));
-
-        } catch (Exception e) {
+        } catch (ClientProtocolException e) {
             e.printStackTrace();
-            return null;
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
         return loc;
     }

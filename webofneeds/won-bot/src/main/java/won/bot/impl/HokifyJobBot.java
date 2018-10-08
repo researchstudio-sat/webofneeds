@@ -94,6 +94,7 @@ public class HokifyJobBot extends EventBot {
                     new ActionOnTriggerEventListener(ctx, fetchHokifyJobDataTrigger, new BaseEventBotAction(ctx) {
                         @Override
                         protected void doRun(Event event, EventListener executingListener) throws Exception {
+                            logger.info("Update Hokify Job Data");
                             hokifyJobsList = hokifyBotsApi.fetchHokifyData();
                             
                         }
@@ -111,6 +112,7 @@ public class HokifyJobBot extends EventBot {
                     new ActionOnEventListener(ctx, "ReceivedTextMessage", new Message2HokifyAction(ctx)));
 
             bus.publish(new StartHokifyFetchEvent());
+            bus.publish(new FetchHokifyJobDataEvent());
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
