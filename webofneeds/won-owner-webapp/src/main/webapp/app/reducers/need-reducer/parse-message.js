@@ -67,7 +67,7 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
       hasContent: false, //will be determined by the hasContent function
       isParsable: false, //will be determined by the clause (hasReferences || hasContent) function
       date: msStringToDate(wonMessage.getTimestamp()),
-      outgoingMessage: wonMessage.isFromOwner(),
+      outgoingMessage: wonMessage.isOutgoingMessage(),
       systemMessage:
         !wonMessage.isFromOwner() &&
         !wonMessage.getSenderNeed() &&
@@ -101,6 +101,8 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
   };
 
   if (wonMessage.isFromOwner()) {
+    parsedMessage.belongsToUri = wonMessage.getSender();
+  } else if (wonMessage.isFromSystem()) {
     parsedMessage.belongsToUri = wonMessage.getSender();
   } else {
     parsedMessage.belongsToUri = wonMessage.getReceiver();
