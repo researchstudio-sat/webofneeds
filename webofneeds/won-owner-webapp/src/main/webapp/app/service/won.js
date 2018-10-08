@@ -405,15 +405,15 @@ won.merge = function(/*args...*/) {
   return o;
 };
 /*
-     * Recursively merge properties of several objects
-     * Copies all properties from the passed objects into the last one starting
-     * from the left (thus the further right, the higher the priority in
-     * case of name-clashes)
-     * You might prefer this function over won.merge for performance reasons
-     * (e.g. if you're copying into a very large object). Otherwise the former
-     * is recommended.
-     * @param args merges all passed objects onto the first passed
-     */
+ * Recursively merge properties of several objects
+ * Copies all properties from the passed objects into the last one starting
+ * from the left (thus the further right, the higher the priority in
+ * case of name-clashes)
+ * You might prefer this function over won.merge for performance reasons
+ * (e.g. if you're copying into a very large object). Otherwise the former
+ * is recommended.
+ * @param args merges all passed objects onto the first passed
+ */
 won.mergeIntoLast = function(/*args...*/) {
   let obj1;
   for (const argument of arguments) {
@@ -811,10 +811,10 @@ won.addMessageGraph = function(builder, graphURIs, messageType) {
 };
 
 /*
-     * Creates a JSON-LD stucture containing a named graph with default 'unset' event URI
-     * plus the specified hashFragment
-     *
-     */
+ * Creates a JSON-LD stucture containing a named graph with default 'unset' event URI
+ * plus the specified hashFragment
+ *
+ */
 won.newGraph = function(hashFragement) {
   hashFragement = hashFragement || "graph1";
   return {
@@ -1529,6 +1529,13 @@ WonMessage.prototype = {
           node.correspondingRemoteMessageUri =
             messageUriAndCorrespondingRemoteMessageUri.correspondingRemoteMessageUri;
         }
+        let messageUriAndForwardedMessageUri = this.__getMessageUriAndForwardedMessageUri(
+          graph
+        );
+        if (messageUriAndForwardedMessageUri) {
+          node.forwardedMessageUri =
+            messageUriAndForwardedMessageUri.forwardedMessageUri;
+        }
         nodes[graphUri] = node;
       } else if (this.__isSignatureGraph(graph)) {
         //do nothing - we don't want to handle signatures in the client for now
@@ -1543,13 +1550,22 @@ WonMessage.prototype = {
       let node = nodes[graphUri];
       if (this.__isEnvelopeGraph(graph)) {
         let containedEnvelopes = this.__getContainedEnvelopeUris(graph);
+        let referencesOtherGraphs = false;
         if (containedEnvelopes.length > 0) {
+          referencesOtherGraphs = true;
           node.containsEnvelopes = containedEnvelopes.map(uri => nodes[uri]);
           //remember that these envelopes are now referenced
           unreferencedEnvelopes = unreferencedEnvelopes.filter(
             uri => !containedEnvelopes.includes(uri)
           );
-        } else if (!node.correspondingRemoteMessageUri) {
+        }
+        if (node.correspondingRemoteMessageUri) {
+          referencesOtherGraphs = true;
+        }
+        if (node.forwardedMessageUri) {
+          referencesOtherGraphs = true;
+        }
+        if (!referencesOtherGraphs) {
           //remember that this envelope contains no envelopes (and points to no remote messages)
           innermostEnvelopes.push(graphUri);
         }
@@ -1569,7 +1585,7 @@ WonMessage.prototype = {
     });
     //now we should have the envelope inclusion trees for all messages
     //unreferencedEnvelopes now points to all roots.
-    //walk over the roots and connect them via remoteMessage connections
+    //walk over the roots and connect them via remoteMessage or forwardedMessage connections
     if (unreferencedEnvelopes.length > 1) {
       unreferencedEnvelopes.forEach(node => {
         if (node.correspondingRemoteMessageUri) {
@@ -1595,6 +1611,23 @@ WonMessage.prototype = {
               "more than one candidate for the outermost remoteMessage envelope found"
             );
           }
+        }
+      });
+    }
+    // if we still have more than 1 unreferenced envelope, it must be because there is
+    // a forwarded message.
+    if (unreferencedEnvelopes.length > 1) {
+      // one more pass: we did not connect the message and the forwardedMessage so their
+      // respective local and remote messages could be connected. now we connect
+      // them and remove the forwarded message from the unreferenced list
+      this.graphs.forEach(graph => {
+        let graphUri = graph["@id"];
+        let node = nodes[graphUri];
+        if (node.forwardedMessageUri) {
+          node.forwardedMessage = nodes[node.forwardedMessageUri];
+          unreferencedEnvelopes = unreferencedEnvelopes.filter(
+            uri => uri != node.forwardedMessageUri
+          );
         }
       });
     }
@@ -1712,6 +1745,29 @@ WonMessage.prototype = {
           resource[
             "http://purl.org/webofneeds/message#hasCorrespondingRemoteMessage"
           ][0]["@id"],
+      }))
+      .filter(x => !!x); //if that property was not present, filter out undefineds
+    if (Array.isArray(data)) {
+      if (data.length == 0) {
+        return null;
+      }
+      return data[0];
+    }
+    return data;
+  },
+  __getMessageUriAndForwardedMessageUri: graph => {
+    let graphData = graph["@graph"];
+    let data = graphData
+      .filter(
+        resource =>
+          resource["http://purl.org/webofneeds/message#hasForwardedMessage"]
+      )
+      .map(resource => ({
+        messageUri: resource["@id"],
+        forwardedMessageUri:
+          resource["http://purl.org/webofneeds/message#hasForwardedMessage"][0][
+            "@id"
+          ],
       }))
       .filter(x => !!x); //if that property was not present, filter out undefineds
     if (Array.isArray(data)) {
