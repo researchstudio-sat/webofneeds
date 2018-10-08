@@ -41,10 +41,13 @@ import won.protocol.vocabulary.WON;
  */
 public class CreateNeedFromJobAction extends AbstractCreateNeedAction {
 
-    //private ArrayList<HokifyJob> hokifyJobs = new ArrayList<HokifyJob>();
+    // private ArrayList<HokifyJob> hokifyJobs = new ArrayList<HokifyJob>();
     private HokifyBotsApi hokifyBotsApi;
-    public CreateNeedFromJobAction(EventListenerContext eventListenerContext) {
+    private boolean createAllInOne;
+
+    public CreateNeedFromJobAction(EventListenerContext eventListenerContext, boolean createAllInOne) {
         super(eventListenerContext);
+        this.createAllInOne = createAllInOne;
 
     }
 
@@ -53,75 +56,87 @@ public class CreateNeedFromJobAction extends AbstractCreateNeedAction {
         if (event instanceof CreateNeedFromJobEvent
                 && ctx.getBotContextWrapper() instanceof HokifyJobBotContextWrapper) {
             HokifyJobBotContextWrapper botContextWrapper = (HokifyJobBotContextWrapper) ctx.getBotContextWrapper();
-            this.hokifyBotsApi = ((CreateNeedFromJobEvent)event).getHokifyBotsApi();
-            ArrayList<HokifyJob> hokifyJobs =((CreateNeedFromJobEvent)event).getHokifyJobs();
+            this.hokifyBotsApi = ((CreateNeedFromJobEvent) event).getHokifyBotsApi();
+            ArrayList<HokifyJob> hokifyJobs = ((CreateNeedFromJobEvent) event).getHokifyJobs();
 
             try {
-
-                //this.hokifyJobs = hokifyBotsApi.fetchHokifyData();
-                //for (HokifyJob hokifyJob : hokifyJobs) {
-                for (int i = 0; i < 1; i++) {
-
-                    Random random = new Random();
-
-                    // Only one single random job
-                    int rnd = random.nextInt(3000);
-                    HokifyJob hokifyJob = hokifyJobs.get(rnd);
-
-                    // Check if need already exists
-                    if (botContextWrapper.getNeedUriForJobURL(hokifyJob.getUrl()) != null) {
-                        logger.info("Need already exists for job: {}", hokifyJob.getUrl());
-                    } else {
-
-                        final URI wonNodeUri = ctx.getNodeURISource().getNodeURI();
-                        WonNodeInformationService wonNodeInformationService = ctx.getWonNodeInformationService();
-                        final URI needURI = wonNodeInformationService.generateNeedURI(wonNodeUri);
-
-                        Dataset dataset = this.generateJobNeedStructure(needURI, hokifyJob);
-
-                        logger.debug("creating need on won node {} with content {} ", wonNodeUri,
-                                StringUtils.abbreviate(RdfUtils.toString(dataset), 150));
-
-                        WonMessage createNeedMessage = createWonMessage(wonNodeInformationService, needURI, wonNodeUri,
-                                dataset, false, false);
-                        EventBotActionUtils.rememberInList(ctx, needURI, uriListName);
-                        botContextWrapper.addURIJobURLRelation(hokifyJob.getUrl(), needURI);
-                        EventBus bus = ctx.getEventBus();
-                        EventListener successCallback = new EventListener() {
-                            @Override
-                            public void onEvent(Event event) throws Exception {
-                                logger.debug("need creation successful, new need URI is {}", needURI);
-
-                                bus.publish(new NeedCreatedEvent(needURI, wonNodeUri, dataset, null));
-
-                            }
-                        };
-
-                        EventListener failureCallback = new EventListener() {
-                            @Override
-                            public void onEvent(Event event) throws Exception {
-                                String textMessage = WonRdfUtils.MessageUtils
-                                        .getTextMessage(((FailureResponseEvent) event).getFailureMessage());
-                                logger.error("need creation failed for need URI {}, original message URI {}: {}",
-                                        new Object[] { needURI, ((FailureResponseEvent) event).getOriginalMessageURI(),
-                                                textMessage });
-                                EventBotActionUtils.removeFromList(ctx, needURI, uriListName);
-                                botContextWrapper.removeURIJobURLRelation(needURI);
-                            }
-                        };
-                        EventBotActionUtils.makeAndSubscribeResponseListener(createNeedMessage, successCallback,
-                                failureCallback, ctx);
-
-                        logger.debug("registered listeners for response to message URI {}",
-                                createNeedMessage.getMessageURI());
-                        ctx.getWonMessageSender().sendWonMessage(createNeedMessage);
-                        logger.debug("need creation message sent with message URI {}",
-                                createNeedMessage.getMessageURI());
+                if (createAllInOne) {
+                    logger.info("Create all job needs");
+                    for (HokifyJob hokifyJob : hokifyJobs) {
+                        this.createNeedFromJob(ctx, botContextWrapper, hokifyJob);
+                    }
+                } else {
+                    boolean created = false;
+                    while (!created) {
+                        logger.info("Create one random job needs");
+                        Random random = new Random();
+                        // Only one single random job
+                        int rnd = random.nextInt(hokifyJobs.size());
+                        HokifyJob hokifyJob = hokifyJobs.get(rnd);
+                        // Check if need already exists
+                        if (this.createNeedFromJob(ctx, botContextWrapper, hokifyJob)) {
+                            created = true;
+                        }
                     }
                 }
             } catch (Exception me) {
                 logger.error("messaging exception occurred: {}", me);
             }
+        }
+
+    }
+
+    protected boolean createNeedFromJob(EventListenerContext ctx, HokifyJobBotContextWrapper botContextWrapper,
+            HokifyJob hokifyJob) {
+        if (botContextWrapper.getNeedUriForJobURL(hokifyJob.getUrl()) != null) {
+            logger.info("Need already exists for job: {}", hokifyJob.getUrl());
+            return false;
+        } else {
+            final URI wonNodeUri = ctx.getNodeURISource().getNodeURI();
+            WonNodeInformationService wonNodeInformationService = ctx.getWonNodeInformationService();
+            final URI needURI = wonNodeInformationService.generateNeedURI(wonNodeUri);
+
+            Dataset dataset = this.generateJobNeedStructure(needURI, hokifyJob);
+
+            logger.debug("creating need on won node {} with content {} ", wonNodeUri,
+                    StringUtils.abbreviate(RdfUtils.toString(dataset), 150));
+
+            WonMessage createNeedMessage = createWonMessage(wonNodeInformationService, needURI, wonNodeUri, dataset,
+                    false, false);
+            EventBotActionUtils.rememberInList(ctx, needURI, uriListName);
+            botContextWrapper.addURIJobURLRelation(hokifyJob.getUrl(), needURI);
+            EventBus bus = ctx.getEventBus();
+            EventListener successCallback = new EventListener() {
+                @Override
+                public void onEvent(Event event) throws Exception {
+                    logger.debug("need creation successful, new need URI is {}", needURI);
+
+                    bus.publish(new NeedCreatedEvent(needURI, wonNodeUri, dataset, null));
+
+                }
+            };
+
+            EventListener failureCallback = new EventListener() {
+                @Override
+                public void onEvent(Event event) throws Exception {
+                    String textMessage = WonRdfUtils.MessageUtils
+                            .getTextMessage(((FailureResponseEvent) event).getFailureMessage());
+                    logger.error("need creation failed for need URI {}, original message URI {}: {}", new Object[] {
+                            needURI, ((FailureResponseEvent) event).getOriginalMessageURI(), textMessage });
+                    EventBotActionUtils.removeFromList(ctx, needURI, uriListName);
+                    botContextWrapper.removeURIJobURLRelation(needURI);
+
+                }
+
+            };
+            EventBotActionUtils.makeAndSubscribeResponseListener(createNeedMessage, successCallback, failureCallback,
+                    ctx);
+
+            logger.debug("registered listeners for response to message URI {}", createNeedMessage.getMessageURI());
+            ctx.getWonMessageSender().sendWonMessage(createNeedMessage);
+            logger.debug("need creation message sent with message URI {}", createNeedMessage.getMessageURI());
+
+            return true;
         }
     }
 
@@ -201,7 +216,7 @@ public class CreateNeedFromJobAction extends AbstractCreateNeedAction {
             seCornerResource.addProperty(SCHEMA.LATITUDE, selat);
             seCornerResource.addProperty(SCHEMA.LONGITUDE, selng);
         } else {
-            String alternateLocation = hokifyJob.getCity() +" "+ hokifyJob.getCountry();
+            String alternateLocation = hokifyJob.getCity() + " " + hokifyJob.getCountry();
             jobLocation.addProperty(SCHEMA.NAME, alternateLocation);
         }
         // s:description
