@@ -33,6 +33,8 @@
         <property name="jsonURL" value="${hokifyjobbot.jsonURL}"/>
         <property name="geoURL" value="${hokifyjobbot.geoURL}"/>
         <property name ="updateTime" value="${hokifyjobbot.updateTime}"/>
+        <property name ="publishTime" value ="${hokifyjobbot.publishTime}"/>
+        <property name ="createAllInOne" value ="${hokifyjobbot.createAllInOne}"/>
         <property name="hokifyMessageGenerator" ref="hokifyGenerator"/>
         <property name="needProducer">
             <bean class="won.bot.framework.component.needproducer.impl.NopNeedProducer" />

@@ -1,11 +1,13 @@
 package won.bot.impl;
 
 import java.time.Duration;
+import java.util.ArrayList;
 
 import won.bot.framework.bot.base.EventBot;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.impl.PublishEventAction;
+import won.bot.framework.eventbot.action.impl.hokify.HokifyJob;
 import won.bot.framework.eventbot.action.impl.hokify.receive.CreateNeedFromJobAction;
 import won.bot.framework.eventbot.action.impl.hokify.send.Connect2HokifyAction;
 import won.bot.framework.eventbot.action.impl.hokify.send.Message2HokifyAction;
@@ -36,6 +38,8 @@ public class HokifyJobBot extends EventBot {
     private int updateTime;
     private String jsonURL;
     private String geoURL;
+    private int publishTime;
+    private boolean createAllInOne;
 
     private EventBus bus;
     // private WonHokifyJobBotHandler wonHokifyJobBotHandler;
@@ -50,7 +54,10 @@ public class HokifyJobBot extends EventBot {
         this.hokifyMessageGenerator.setEventListenerContext(ctx);
         bus = getEventBus();
 
+        
         HokifyBotsApi hokifyBotsApi = new HokifyBotsApi(this.jsonURL, this.geoURL);
+        ArrayList<HokifyJob> hokifyJobsList = hokifyBotsApi.fetchHokifyData();
+        
         logger.info("Register JobBot with update time {}", updateTime);
         try {
             bus = getEventBus();
@@ -59,9 +66,9 @@ public class HokifyJobBot extends EventBot {
             executeWonMessageCommandBehaviour.activate();
 
             bus.subscribe(CreateNeedFromJobEvent.class, new ActionOnEventListener(ctx, "CreateNeedFromJobEvent",
-                    new CreateNeedFromJobAction(ctx, hokifyBotsApi)));
+                    new CreateNeedFromJobAction(ctx)));
 
-            BotTrigger createHokifyJobBotTrigger = new BotTrigger(ctx, Duration.ofMinutes(updateTime));
+            BotTrigger createHokifyJobBotTrigger = new BotTrigger(ctx, Duration.ofMinutes(publishTime));
             createHokifyJobBotTrigger.activate();
             bus.subscribe(StartHokifyFetchEvent.class, new ActionOnFirstEventListener(ctx,
                     new PublishEventAction(ctx, new StartBotTriggerCommandEvent(createHokifyJobBotTrigger))));
@@ -69,7 +76,8 @@ public class HokifyJobBot extends EventBot {
                     new ActionOnTriggerEventListener(ctx, createHokifyJobBotTrigger, new BaseEventBotAction(ctx) {
                         @Override
                         protected void doRun(Event event, EventListener executingListener) throws Exception {
-                            bus.publish(new CreateNeedFromJobEvent(hokifyBotsApi));
+                            
+                            bus.publish(new CreateNeedFromJobEvent(hokifyJobsList, hokifyBotsApi));
                         }
                     }));
 
@@ -125,6 +133,22 @@ public class HokifyJobBot extends EventBot {
 
     public void setGeoURL(String geoURL) {
         this.geoURL = geoURL;
+    }
+
+    public int getPublishTime() {
+        return publishTime;
+    }
+
+    public void setPublishTime(int publishTime) {
+        this.publishTime = publishTime;
+    }
+
+    public boolean isCreateAllInOne() {
+        return createAllInOne;
+    }
+
+    public void setCreateAllInOne(boolean createAllInOne) {
+        this.createAllInOne = createAllInOne;
     }
 
 }

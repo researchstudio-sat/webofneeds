@@ -41,12 +41,11 @@ import won.protocol.vocabulary.WON;
  */
 public class CreateNeedFromJobAction extends AbstractCreateNeedAction {
 
-    private ArrayList<HokifyJob> hokifyJobs = new ArrayList<HokifyJob>();
+    //private ArrayList<HokifyJob> hokifyJobs = new ArrayList<HokifyJob>();
     private HokifyBotsApi hokifyBotsApi;
-
-    public CreateNeedFromJobAction(EventListenerContext eventListenerContext, HokifyBotsApi hokifyBotsApi) {
+    public CreateNeedFromJobAction(EventListenerContext eventListenerContext) {
         super(eventListenerContext);
-        this.hokifyBotsApi = hokifyBotsApi;
+
     }
 
     protected void doRun(Event event, EventListener executingListener) throws Exception {
@@ -54,20 +53,20 @@ public class CreateNeedFromJobAction extends AbstractCreateNeedAction {
         if (event instanceof CreateNeedFromJobEvent
                 && ctx.getBotContextWrapper() instanceof HokifyJobBotContextWrapper) {
             HokifyJobBotContextWrapper botContextWrapper = (HokifyJobBotContextWrapper) ctx.getBotContextWrapper();
-            // HokifyBotsApi hokifyBotsApi = ((CreateNeedFromJobEvent)
-            // event).getHokifyBotsApi();
+            this.hokifyBotsApi = ((CreateNeedFromJobEvent)event).getHokifyBotsApi();
+            ArrayList<HokifyJob> hokifyJobs =((CreateNeedFromJobEvent)event).getHokifyJobs();
 
             try {
 
-                this.hokifyJobs = hokifyBotsApi.fetchHokifyData();
-                for (HokifyJob hokifyJob : hokifyJobs) {
-                    // for (int i = 0; i < 1; i++) {
+                //this.hokifyJobs = hokifyBotsApi.fetchHokifyData();
+                //for (HokifyJob hokifyJob : hokifyJobs) {
+                for (int i = 0; i < 1; i++) {
 
-                    // Random random = new Random();
+                    Random random = new Random();
 
                     // Only one single random job
-                    // int rnd = random.nextInt(3000);
-                    // HokifyJob hokifyJob = hokifyJobs.get(rnd);
+                    int rnd = random.nextInt(3000);
+                    HokifyJob hokifyJob = hokifyJobs.get(rnd);
 
                     // Check if need already exists
                     if (botContextWrapper.getNeedUriForJobURL(hokifyJob.getUrl()) != null) {
