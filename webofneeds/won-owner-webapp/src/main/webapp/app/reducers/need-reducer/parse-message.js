@@ -20,6 +20,7 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
   const acceptedMessages = wonMessage.getAcceptedMessages();
   const rejectedMessages = wonMessage.getRejectsMessages();
   const retractedMessages = wonMessage.getRetractMessages();
+  //const forwardedMessages = wonMessage.getForwardedMessage();
 
   const matchScoreFloat = parseFloat(wonMessage.getMatchScore());
 
