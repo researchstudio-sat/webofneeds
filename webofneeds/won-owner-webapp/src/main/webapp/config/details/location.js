@@ -1,4 +1,9 @@
-import { generateIdString } from "../../app/utils.js";
+import {
+  get,
+  getIn,
+  generateIdString,
+  getFromJsonLd,
+} from "../../app/utils.js";
 import Immutable from "immutable";
 import won from "../../app/won-es6.js";
 
@@ -11,175 +16,50 @@ export const location = {
   viewerComponent: "won-location-viewer",
   messageEnabled: true,
   parseToRDF: function({ value, identifier, contentUri }) {
-    if (!value) {
-      return { "won:hasLocation": undefined };
-    }
-
-    const randomLocationId = generateIdString(10);
-
     return {
-      "won:hasLocation": {
-        "@id":
-          contentUri && identifier
-            ? contentUri + "/" + identifier + "/" + randomLocationId
-            : undefined,
-        "@type": "s:Place",
-        "s:geo": {
-          "@id":
-            contentUri && identifier
-              ? contentUri +
-                "/" +
-                identifier +
-                "/" +
-                randomLocationId +
-                "/locationgeo"
-              : undefined,
-          "@type": "s:GeoCoordinates",
-          "s:latitude": value.lat.toFixed(6),
-          "s:longitude": value.lng.toFixed(6),
-          "won:geoSpatial": {
-            "@type":
-              "http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon",
-            "@value": `${value.lat.toFixed(6)}#${value.lng.toFixed(6)}`,
-          },
-        },
-        "s:name": value.name,
-        "won:hasBoundingBox":
-          !value.nwCorner || !value.seCorner
-            ? undefined
-            : {
-                "@id":
-                  contentUri && identifier
-                    ? contentUri +
-                      "/" +
-                      identifier +
-                      "/" +
-                      randomLocationId +
-                      "/Bounds"
-                    : undefined,
-                "won:hasNorthWestCorner": {
-                  "@id":
-                    contentUri && identifier
-                      ? contentUri +
-                        "/" +
-                        identifier +
-                        "/" +
-                        randomLocationId +
-                        "/Bounds/NW"
-                      : undefined,
-                  "@type": "s:GeoCoordinates",
-                  "s:latitude": value.nwCorner.lat.toFixed(6),
-                  "s:longitude": value.nwCorner.lng.toFixed(6),
-                },
-                "won:hasSouthEastCorner": {
-                  "@id":
-                    contentUri && identifier
-                      ? contentUri +
-                        "/" +
-                        identifier +
-                        "/" +
-                        randomLocationId +
-                        "/Bounds/SE"
-                      : undefined,
-                  "@type": "s:GeoCoordinates",
-                  "s:latitude": value.seCorner.lat.toFixed(6),
-                  "s:longitude": value.seCorner.lng.toFixed(6),
-                },
-              },
-      },
+      "won:hasLocation": genSPlace({
+        geoData: value,
+        baseUri: genDetailBaseUri(identifier, contentUri),
+      }),
     };
   },
   parseFromRDF: function(jsonLDImm) {
     const jsonldLocation = jsonLDImm && jsonLDImm.get("won:hasLocation");
-    if (!jsonldLocation) return undefined; // NO LOCATION PRESENT
-
-    const jsonldLocationImm = Immutable.fromJS(jsonldLocation);
-
-    let location = {
-      address: undefined,
-      lat: undefined,
-      lng: undefined,
-      nwCorner: {
-        lat: undefined,
-        lng: undefined,
-      },
-      seCorner: {
-        lat: undefined,
-        lng: undefined,
-      },
-    };
-
-    location.address = won.parseFrom(
-      jsonldLocationImm,
-      ["s:name"],
-      "xsd:string"
-    );
-
-    const parseFloatFromLocation = path =>
-      won.parseFrom(jsonldLocationImm, path, "xsd:float");
-
-    location.lat = parseFloatFromLocation(["s:geo", "s:latitude"]);
-    location.lng = parseFloatFromLocation(["s:geo", "s:longitude"]);
-    location.nwCorner.lat = parseFloatFromLocation([
-      "won:hasBoundingBox",
-      "won:hasNorthWestCorner",
-      "s:latitude",
-    ]);
-    location.nwCorner.lng = parseFloatFromLocation([
-      "won:hasBoundingBox",
-      "won:hasNorthWestCorner",
-      "s:longitude",
-    ]);
-    location.seCorner.lat = parseFloatFromLocation([
-      "won:hasBoundingBox",
-      "won:hasSouthEastCorner",
-      "s:latitude",
-    ]);
-    location.seCorner.lng = parseFloatFromLocation([
-      "won:hasBoundingBox",
-      "won:hasSouthEastCorner",
-      "s:longitude",
-    ]);
-
-    if (
-      location.address &&
-      location.lat &&
-      location.lng &&
-      location.nwCorner.lat &&
-      location.nwCorner.lng &&
-      location.seCorner.lat &&
-      location.seCorner.lng
-    ) {
-      return Immutable.fromJS(location);
-    }
-
-    console.error(
-      "Cant parse location, data is an invalid location-object: ",
-      jsonldLocationImm.toJS()
-    );
-    return undefined;
+    return parseSPlace(jsonldLocation);
   },
   generateHumanReadable: function({ value, includeLabel }) {
-    if (value) {
-      let humanReadable;
-      if (value.name) {
-        humanReadable = value.name;
-      } else if (value.address) {
-        humanReadable = value.address;
-      } else {
-        const locationLat = value.lat && value.lat.toFixed(6);
-        const locationLng = value.lng && value.lng.toFixed(6);
-        if (locationLat && locationLng) {
-          humanReadable = "@(" + locationLat + " , " + locationLng + ")";
-        }
-      }
-      if (humanReadable) {
-        return includeLabel
-          ? this.label + ": " + humanReadable.trim()
-          : humanReadable.trim();
-      }
-    }
-    return undefined;
+    return sPlaceToHumanReadable({
+      value,
+      label: includeLabel ? this.label : "",
+    });
+  },
+};
+
+export const jobLocation = {
+  identifier: "jobLocation",
+  label: "Job Location",
+  placeholder: "Search for location",
+  icon: "#ico36_detail_location",
+  component: "won-location-picker",
+  viewerComponent: "won-location-viewer",
+  messageEnabled: true,
+  parseToRDF: function({ value, identifier, contentUri }) {
+    return {
+      "s:jobLocation": genSPlace({
+        geoData: value,
+        baseUri: genDetailBaseUri(contentUri, identifier),
+      }),
+    };
+  },
+  parseFromRDF: function(jsonLDImm) {
+    const jsonldLocation = jsonLDImm && jsonLDImm.get("s:jobLocation");
+    return parseSPlace(jsonldLocation);
+  },
+  generateHumanReadable: function({ value, includeLabel }) {
+    return sPlaceToHumanReadable({
+      value,
+      label: includeLabel ? this.label : "",
+    });
   },
 };
 
@@ -199,145 +79,58 @@ export const travelAction = {
       return { "won:travelAction": undefined };
     }
 
-    const randomTravelActionId = generateIdString(10);
-
+    const baseUri = genDetailBaseUri(contentUri, identifier);
     return {
       "won:travelAction": {
-        "@id":
-          contentUri && identifier
-            ? contentUri + "/" + identifier + "/" + randomTravelActionId
-            : undefined,
+        "@id": baseUri,
         "@type": "s:TravelAction",
-        "s:fromLocation": !value.fromLocation
-          ? undefined
-          : {
-              "@id":
-                contentUri && identifier
-                  ? contentUri +
-                    "/" +
-                    identifier +
-                    "/" +
-                    randomTravelActionId +
-                    "/fromLocation"
-                  : undefined,
-              "@type": "s:Place",
-              "s:geo": {
-                "@id":
-                  contentUri && identifier
-                    ? contentUri +
-                      "/" +
-                      identifier +
-                      "/" +
-                      randomTravelActionId +
-                      "/fromLocation/geocoords"
-                    : undefined,
-                "@type": "s:GeoCoordinates",
-                "s:latitude": value.fromLocation.lat.toFixed(6),
-                "s:longitude": value.fromLocation.lng.toFixed(6),
-                "won:geoSpatial": {
-                  "@type":
-                    "http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon",
-                  "@value": `${value.fromLocation.lat.toFixed(
-                    6
-                  )}#${value.fromLocation.lng.toFixed(6)}`,
-                },
-              },
-              "s:name": value.fromLocation.name,
-            },
-        "s:toLocation": !value.toLocation
-          ? undefined
-          : {
-              "@id":
-                contentUri && identifier
-                  ? contentUri +
-                    "/" +
-                    identifier +
-                    "/" +
-                    randomTravelActionId +
-                    "/toLocation"
-                  : undefined,
-              "@type": "s:Place",
-              "s:geo": {
-                "@id":
-                  contentUri && identifier
-                    ? contentUri +
-                      "/" +
-                      identifier +
-                      "/" +
-                      randomTravelActionId +
-                      "/toLocation/geocoords"
-                    : undefined,
-                "@type": "s:GeoCoordinates",
-                "s:latitude": value.toLocation.lat.toFixed(6),
-                "s:longitude": value.toLocation.lng.toFixed(6),
-                "won:geoSpatial": {
-                  "@type":
-                    "http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon",
-                  "@value": `${value.toLocation.lat.toFixed(
-                    6
-                  )}#${value.toLocation.lng.toFixed(6)}`,
-                },
-              },
-              "s:name": value.toLocation.name,
-            },
+        "s:fromLocation": genSPlace({
+          geoData: {
+            lat: getIn(value, ["fromLocation", "lat"]),
+            lng: getIn(value, ["fromLocation", "lng"]),
+            name: getIn(value, ["fromLocation", "name"]),
+            // excluding nwCorner and seCorner as travelaction calculates its bounding box differently
+          },
+          baseUri: baseUri && baseUri + "/fromLocation",
+        }),
+
+        "s:toLocation": genSPlace({
+          geoData: {
+            lat: getIn(value, ["toLocation", "lat"]),
+            lng: getIn(value, ["toLocation", "lng"]),
+            name: getIn(value, ["toLocation", "name"]),
+            // excluding nwCorner and seCorner as travelaction calculates its bounding box differently
+          },
+          baseUri: baseUri && baseUri + "/toLocation",
+        }),
       },
     };
   },
   parseFromRDF: function(jsonLDImm) {
-    const jsonTravelAction = jsonLDImm && jsonLDImm.get("won:travelAction");
-    if (!jsonTravelAction) return undefined;
+    const jsonLdTravelAction = jsonLDImm && jsonLDImm.get("won:travelAction");
+    if (!jsonLdTravelAction) return undefined;
 
-    const travelActionImm = Immutable.fromJS(jsonTravelAction);
+    const jsonLdTravelActionImm = Immutable.fromJS(jsonLdTravelAction);
 
-    let travelAction = {
-      fromAddress: undefined,
+    const fromLocation = parsePlaceLeniently(
+      getFromJsonLd(jsonLdTravelActionImm, "s:fromLocation", won.defaultContext)
+    );
+    const toLocation = parsePlaceLeniently(
+      getFromJsonLd(jsonLdTravelActionImm, "s:toLocation", won.defaultContext)
+    );
+
+    const travelAction = {
+      fromAddress: get(fromLocation, "address"),
       fromLocation: {
-        lat: undefined,
-        lng: undefined,
+        lat: get(fromLocation, "lat"),
+        lng: get(fromLocation, "lng"),
       },
-      toAddress: undefined,
+      toAddress: get(toLocation, "address"),
       toLocation: {
-        lat: undefined,
-        lng: undefined,
+        lat: get(toLocation, "lat"),
+        lng: get(toLocation, "lng"),
       },
     };
-
-    travelAction.fromAddress = won.parseFrom(
-      travelActionImm,
-      ["s:fromLocation", "s:name"],
-      "xsd:string"
-    );
-
-    const parseFloatFromTravelAction = path =>
-      won.parseFrom(travelActionImm, path, "xsd:float");
-
-    travelAction.fromLocation.lat = parseFloatFromTravelAction([
-      "s:fromLocation",
-      "s:geo",
-      "s:latitude",
-    ]);
-    travelAction.fromLocation.lng = parseFloatFromTravelAction([
-      "s:fromLocation",
-      "s:geo",
-      "s:longitude",
-    ]);
-
-    travelAction.toAddress = won.parseFrom(
-      travelActionImm,
-      ["s:toLocation", "s:name"],
-      "xsd:string"
-    );
-
-    travelAction.toLocation.lat = parseFloatFromTravelAction([
-      "s:toLocation",
-      "s:geo",
-      "s:latitude",
-    ]);
-    travelAction.toLocation.lng = parseFloatFromTravelAction([
-      "s:toLocation",
-      "s:geo",
-      "s:longitude",
-    ]);
 
     if (
       (travelAction.fromAddress &&
@@ -351,7 +144,7 @@ export const travelAction = {
     } else {
       console.error(
         "Cant parse travelAction, data is an invalid travelAction-object: ",
-        travelActionImm.toJS()
+        jsonLdTravelActionImm.toJS()
       );
       return undefined;
     }
@@ -422,3 +215,169 @@ export const travelAction = {
     return undefined;
   },
 };
+
+function genDetailBaseUri(baseUri, detailIdentifier) {
+  if (!baseUri || !detailIdentifier) {
+    return undefined;
+  }
+  const randomId = generateIdString(10);
+  return baseUri + "/" + detailIdentifier + "/" + randomId;
+}
+
+function genSPlace({ geoData, baseUri }) {
+  if (!geoData) {
+    return undefined;
+  }
+
+  return {
+    "@id": baseUri,
+    "@type": "s:Place",
+    "s:name": geoData.name,
+    "s:geo": genGeo({ lat: geoData.lat, lng: geoData.lng, baseUri }),
+    "won:hasBoundingBox": genBoundingBox({
+      nwCorner: geoData.nwCorner,
+      seCorner: geoData.seCorner,
+      baseUri,
+    }),
+  };
+}
+
+function genGeo({ lat, lng, baseUri }) {
+  if (isNaN(lat) || isNaN(lng)) {
+    return undefined;
+  }
+  return {
+    "@id": baseUri ? baseUri + "/geo" : undefined,
+    "@type": "s:GeoCoordinates",
+    "s:latitude": lat.toFixed(6),
+    "s:longitude": lng.toFixed(6),
+    "won:geoSpatial": {
+      "@type": "http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon",
+      "@value": `${lat.toFixed(6)}#${lng.toFixed(6)}`,
+    },
+  };
+}
+
+function genBoundingBox({ nwCorner, seCorner, baseUri }) {
+  return !nwCorner || !seCorner
+    ? undefined
+    : {
+        "@id": baseUri ? baseUri + "/bounds" : undefined,
+        "won:hasNorthWestCorner": {
+          "@id": baseUri ? baseUri + "/bounds/nw" : undefined,
+          "@type": "s:GeoCoordinates",
+          "s:latitude": nwCorner.lat.toFixed(6),
+          "s:longitude": nwCorner.lng.toFixed(6),
+        },
+        "won:hasSouthEastCorner": {
+          "@id": baseUri ? baseUri + "/bounds/se" : undefined,
+          "@type": "s:GeoCoordinates",
+          "s:latitude": seCorner.lat.toFixed(6),
+          "s:longitude": seCorner.lng.toFixed(6),
+        },
+      };
+}
+
+function parseSPlace(jsonldLocation) {
+  // const jsonldLocation = jsonLDImm && jsonLDImm.get("won:hasLocation");
+  if (!jsonldLocation) return undefined; // NO LOCATION PRESENT
+
+  const location = parsePlaceLeniently(jsonldLocation);
+
+  if (
+    location &&
+    location.address &&
+    location.lat &&
+    location.lng &&
+    location.nwCorner.lat &&
+    location.nwCorner.lng &&
+    location.seCorner.lat &&
+    location.seCorner.lng
+  ) {
+    return Immutable.fromJS(location);
+  } else {
+    console.error(
+      "Cant parse location, data is an invalid location-object: ",
+      jsonldLocation
+    );
+    return undefined;
+  }
+}
+
+/**
+ * Parses json-ld of an `s:Place` in a best-effort kinda style.
+ * Any data missing in the RDF will be missing in the result object.
+ * @param {*} jsonldLocation
+ */
+function parsePlaceLeniently(jsonldLocation) {
+  if (!jsonldLocation) return undefined; // NO LOCATION PRESENT
+
+  const jsonldLocationImm = Immutable.fromJS(jsonldLocation);
+
+  const parseFloatFromLocation = path =>
+    won.parseFrom(jsonldLocationImm, path, "xsd:float");
+
+  const place = {
+    address: won.parseFrom(jsonldLocationImm, ["s:name"], "xsd:string"),
+    lat: parseFloatFromLocation(["s:geo", "s:latitude"]),
+    lng: parseFloatFromLocation(["s:geo", "s:longitude"]),
+    // nwCorner if present (see below)
+    // seCorner if present (see below)
+  };
+
+  const nwCornerLat = parseFloatFromLocation([
+    "won:hasBoundingBox",
+    "won:hasNorthWestCorner",
+    "s:latitude",
+  ]);
+  const nwCornerLng = parseFloatFromLocation([
+    "won:hasBoundingBox",
+    "won:hasNorthWestCorner",
+    "s:longitude",
+  ]);
+  const seCornerLat = parseFloatFromLocation([
+    "won:hasBoundingBox",
+    "won:hasSouthEastCorner",
+    "s:latitude",
+  ]);
+  const seCornerLng = parseFloatFromLocation([
+    "won:hasBoundingBox",
+    "won:hasSouthEastCorner",
+    "s:longitude",
+  ]);
+
+  if (nwCornerLat || nwCornerLng) {
+    place.nwCorner = {
+      lat: nwCornerLat,
+      lng: nwCornerLng,
+    };
+  }
+  if (seCornerLat || seCornerLng) {
+    place.seCorner = {
+      lat: seCornerLat,
+      lng: seCornerLng,
+    };
+  }
+  return place;
+}
+
+function sPlaceToHumanReadable({ value, label }) {
+  if (value) {
+    let humanReadable;
+    if (value.name) {
+      humanReadable = value.name;
+    } else if (value.address) {
+      humanReadable = value.address;
+    } else {
+      const locationLat = value.lat && value.lat.toFixed(6);
+      const locationLng = value.lng && value.lng.toFixed(6);
+      if (locationLat && locationLng) {
+        humanReadable = "@(" + locationLat + " , " + locationLng + ")";
+      }
+    }
+    if (humanReadable) {
+      return (label ? `${label}: ` : "") + humanReadable.trim();
+    }
+  }
+  return undefined;
+}

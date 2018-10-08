@@ -3,6 +3,12 @@
  */
 import { details, emptyDraft } from "../detail-definitions.js";
 import { interestsDetail, skillsDetail } from "../details/person.js";
+import { jobLocation } from "../details/location.js";
+import {
+  industryDetail,
+  employmentTypesDetail,
+  organizationNamesDetail,
+} from "../details/jobs.js";
 import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-utils.js";
 
 export const professionalGroup = {
@@ -10,32 +16,60 @@ export const professionalGroup = {
   label: "Professional Networking",
   icon: undefined,
   useCases: {
-    // jobSearch: {
-    //   label: "Search a Job",
-    //   icon: "#ico36_uc_find_people",
-    //   doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
-    //   draft: {
-    //     ...emptyDraft,
-    //     is: {
-    //       tags: ["search-job"],
-    //     },
-    //     searchString: "offer-job",
-    //   },
-    //   isDetails: {
-    //     title: { ...details.title },
-    //     description: { ...details.description },
-    //     location: { ...details.location },
-    //     person: { ...details.person },
-    //     skills: { ...skillsDetail },
-    //     interests: { ...interestsDetail },
-    //   },
-    //   seeksDetails: {
-    //     description: { ...details.description },
-    //     location: { ...details.location },
-    //     skills: { ...skillsDetail },
-    //     interests: { ...interestsDetail },
-    //   },
-    // },
+    jobSearch: {
+      identifier: "getToKnow",
+      label: "Search a Job",
+      // icon: "#ico36_uc_find_people", TODO
+      doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
+      draft: {
+        ...emptyDraft,
+        is: {
+          "@type": "s:Person",
+          tags: ["search-job"],
+        },
+        seeks: {
+          "@type": "s:JobPosting",
+          /* example to match hokify-offers:
+          "s:employmentType": "Full-time", // full-time/vollzeit, part-time,... - use a dropdown
+    "s:industry": ["Computer Software", "Design"], // match by checking for intersection + text-similarity and translations
+
+    //"s:baseSalary": {...}, // free-form-text in hokify json :|
+
+    "s:hiringOrganization": { // for ppl who only want offers from a specific organization (rather niche tho)
+      "@type": "s:Organization",
+      "s:name": "", // JSON - company
+    },
+
+    "s:jobLocation":
+      {
+        "@type": "s:Place",
+        "s:geo": {
+          "@id": "https://satvm05.researchstudio.at/won/resource/need/rsiiungn085u/location/6l7plycz2g", // unique id; i assume it's necessary for the geo-service
+          "@type": "s:GeoCoordinates",
+          "s:latitude": "48.216931",
+          "s:longitude": "16.361197"
+        },
+      },
+    */
+        },
+        searchString: ["offer-job"],
+      },
+      isDetails: {
+        title: { ...details.title },
+        description: { ...details.description },
+        // location: { ...details.location }, // why would your current location of residency matter?
+        // person: { ...details.person }, // has current company fields, that are weird for a search
+        skills: { ...skillsDetail },
+        interests: { ...interestsDetail },
+      },
+      seeksDetails: {
+        description: { ...details.description },
+        jobLocation: { ...jobLocation },
+        industry: { ...industryDetail },
+        employmentTypes: { ...employmentTypesDetail },
+        organizationNames: { ...organizationNamesDetail },
+      },
+    },
     getToKnow: {
       identifier: "getToKnow",
       label: "Find people",

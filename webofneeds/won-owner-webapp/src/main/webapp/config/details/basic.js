@@ -1,4 +1,5 @@
 import won from "../../app/won-es6.js";
+import { is } from "../../app/utils.js";
 
 export const title = {
   identifier: "title",
@@ -8,10 +9,11 @@ export const title = {
   component: "won-title-picker",
   viewerComponent: "won-title-viewer",
   parseToRDF: function({ value }) {
-    if (!value) {
-      return { "dc:title": undefined };
-    }
-    return { "dc:title": value };
+    const val = value ? value : undefined;
+    return {
+      "dc:title": val,
+      "s:title": val,
+    };
   },
   parseFromRDF: function(jsonLDImm) {
     const dcTitle = won.parseFrom(jsonLDImm, ["dc:title"], "xsd:string");
@@ -33,10 +35,11 @@ export const description = {
   component: "won-description-picker",
   viewerComponent: "won-description-viewer",
   parseToRDF: function({ value }) {
-    if (!value) {
-      return { "dc:description": undefined };
-    }
-    return { "dc:description": value };
+    const val = value ? value : undefined;
+    return {
+      "dc:description": val,
+      "s:description": val,
+    };
   },
   parseFromRDF: function(jsonLDImm) {
     const dcDescription = won.parseFrom(
@@ -74,19 +77,11 @@ export const tags = {
     return won.parseListFrom(jsonLDImm, ["won:hasTag"], "xsd:string");
   },
   generateHumanReadable: function({ value, includeLabel }) {
-    if (value) {
-      let humanReadable = "";
-
-      for (const key in value) {
-        humanReadable += value[key] + ", ";
-      }
-      humanReadable = humanReadable.trim();
-
-      if (humanReadable.length > 0) {
-        humanReadable = humanReadable.substr(0, humanReadable.length - 1);
-        return includeLabel ? this.label + ": " + humanReadable : humanReadable;
-      }
+    if (value && is("Array", value) && value.length > 0) {
+      const prefix = includeLabel ? this.label + ": " : "";
+      return prefix + value.join(", ");
+    } else {
+      return undefined;
     }
-    return undefined;
   },
 };
