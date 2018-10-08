@@ -25,7 +25,9 @@ import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.camel.WonCamelConstants;
 
 /**
- * Ture if the WonMessage in the wonOriginalMessage header is FROM_SYSTEM.
+ * True if the WonMessage in the wonOriginalMessage header meets the criteria for echoing it to the owner:
+ * - sent from the system
+ * - if it is a response, it is not directed at the remote need
  */
 public class IsSystemMessageToOwnerPredicate implements Predicate {
 
@@ -33,9 +35,13 @@ public class IsSystemMessageToOwnerPredicate implements Predicate {
     public boolean matches(Exchange exchange) {
         WonMessage message = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.ORIGINAL_MESSAGE_HEADER);
         if (message == null) return false;
-        if (message.getMessageType() == WonMessageType.SUCCESS_RESPONSE) return false;
-        if (message.getMessageType() == WonMessageType.FAILURE_RESPONSE) return false;
-        if (message.getEnvelopeType() != WonMessageDirection.FROM_SYSTEM) return false;
+        if (message.getEnvelopeType() != WonMessageDirection.FROM_SYSTEM) return false;        
+        if (
+            (message.getMessageType() == WonMessageType.SUCCESS_RESPONSE || message.getMessageType() == WonMessageType.FAILURE_RESPONSE) 
+            && (message.getSenderNeedURI() != null && ! message.getSenderNeedURI().equals(message.getReceiverNeedURI()))) {
+            //responses directed at remote needs are not to be echoed to the owner
+            return false;
+        }
         return true;
     }
 }
