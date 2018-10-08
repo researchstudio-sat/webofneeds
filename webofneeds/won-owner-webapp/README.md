@@ -126,6 +126,7 @@ $ngRedux.getState();
                        }
                        hasReferences: true|false //whether it contains any non-null/non-undefined references within the references block of the message
                        hasContent: true|false //whether it contains any non-null/non-undefined content within the content block of the message
+                       injectInto: undefined or an array of connectionUris this message is injected into
                        isParsable: true|false //true if hasReferences or hasContent is true
                        isMessageStatusUpToDate: true|false //true if the agreementData has been checked to define the status of the message
                        messageStatus: {
