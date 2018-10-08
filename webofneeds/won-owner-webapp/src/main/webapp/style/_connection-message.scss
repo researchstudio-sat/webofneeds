@@ -176,5 +176,12 @@ won-connection-message {
         color: #8f8f8f;
       }
     }
+
+    &.won-cm__center--inject-into {
+      .won-cm__center__bubble {
+        background-color: red; // TODO: CHANGE STYLING FOR INJECTINTO MESSAGE
+        color: white;
+      }
+    }
   }
 }

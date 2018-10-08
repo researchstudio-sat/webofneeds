@@ -1217,6 +1217,11 @@ WonMessage.prototype = {
       "http://purl.org/webofneeds/message#hasMessageType"
     );
   },
+  getInjectIntoConnection: function() {
+    return this.getProperty(
+      "http://purl.org/webofneeds/message#hasInjectIntoConnection"
+    );
+  },
   getReceivedTimestamp: function() {
     return this.getPropertyFromLocalMessage(
       "http://purl.org/webofneeds/message#hasReceivedTimestamp"

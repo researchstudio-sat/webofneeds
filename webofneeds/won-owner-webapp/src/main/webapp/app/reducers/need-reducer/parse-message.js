@@ -13,6 +13,8 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
     wonMessage.contentGraphTrig
   );
 
+  const injectInto = wonMessage.getInjectIntoConnection();
+
   const proposedMessages = wonMessage.getProposedMessages();
   const proposedToCancelMessages = wonMessage.getProposedToCancelMessages();
   const acceptedMessages = wonMessage.getAcceptedMessages();
@@ -37,6 +39,8 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
             ? matchScoreFloat
             : undefined,
       },
+      injectInto:
+        !injectInto || Array.isArray(injectInto) ? injectInto : [injectInto],
       references: {
         proposes:
           !proposedMessages || Array.isArray(proposedMessages)
