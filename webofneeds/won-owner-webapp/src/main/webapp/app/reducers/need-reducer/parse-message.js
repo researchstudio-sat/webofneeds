@@ -20,7 +20,7 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
   const acceptedMessages = wonMessage.getAcceptedMessages();
   const rejectedMessages = wonMessage.getRejectsMessages();
   const retractedMessages = wonMessage.getRetractMessages();
-  //const forwardedMessages = wonMessage.getForwardedMessage();
+  const forwardedMessages = wonMessage.getForwardedMessage();
 
   const matchScoreFloat = parseFloat(wonMessage.getMatchScore());
 
@@ -115,6 +115,14 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
       detailsToParse,
       parsedMessage.data.content
     );
+  }
+
+  if (forwardedMessages) {
+    const forwardedMessagesArray = Array.isArray(forwardedMessages)
+      ? forwardedMessages
+      : [forwardedMessages];
+    parsedMessage.data.content.text =
+      "Forwarded Messages: " + forwardedMessagesArray;
   }
 
   parsedMessage.data.hasContent = hasContent(parsedMessage.data.content);
