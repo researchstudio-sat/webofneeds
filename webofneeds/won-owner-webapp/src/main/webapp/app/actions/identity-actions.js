@@ -17,15 +17,18 @@ export function createIdentity(identity, nodeUri) {
       "@graph": [
         {
           "@id": publishedContentUri,
-          "@type": "won:Need",
+          "@type": ["won:Need", "won:Persona"],
           "won:hasFacet": {
             "@id": "#holderFacet",
             "@type": "won:HolderFacet",
           },
-          "won:hasFlag": ["won:NoHintForCounterpart", "won:NoHintForMe"],
+          "won:hasFlag": [
+            { "@id": "won:NoHintForCounterpart" },
+            { "@id": "won:NoHintForMe" },
+          ],
           "s:name": identity.displayName,
           "s:description": identity.aboutMe || undefined,
-          "s:url": identity.homepage || undefined,
+          "s:url": identity.website || undefined,
         },
       ],
     };

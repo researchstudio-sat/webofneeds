@@ -10,6 +10,7 @@ import reduceReducers from "reduce-reducers";
 import needReducer from "./need-reducer/need-reducer-main.js";
 import userReducer from "./user-reducer.js";
 import toastReducer from "./toast-reducer.js";
+import identityReducer from "./identity-reducer.js";
 import { getIn } from "../utils.js";
 
 /*
@@ -37,6 +38,7 @@ const reducers = {
   needs: needReducer,
   messages: messagesReducer,
   toasts: toastReducer,
+  identities: identityReducer,
 
   // contains the Date.now() of the last action
   // lastUpdateTime: (state = Date.now(), action = {}) => Date.now(),
