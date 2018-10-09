@@ -45,5 +45,7 @@ export default function(allIdentitiesInState = initialState, action = {}) {
       );
       return stateWithLoadedIdentities;
     }
+    default:
+      return allIdentitiesInState;
   }
 }
