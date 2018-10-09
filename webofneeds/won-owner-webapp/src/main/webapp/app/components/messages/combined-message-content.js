@@ -24,17 +24,22 @@ function genComponentConf() {
           <div class="msg__header__type">{{ self.getHeaderLabel() }}</div>
       </div>
       <div class="msg__header msg__header--inject-into" ng-if="self.isConnectionMessage && self.isInjectIntoMessage && !self.hasNotBeenLoaded">
-          <div class="msg__header__type">Inject this message into:</div>
-          <div class="msg__header__inject">
-            <won-square-image
-              class="msg__header__inject__connection"
-              ng-class="{'clickable': self.isConnectionPresent(connUri)}"
-              ng-repeat="connUri in self.injectIntoArray"
-              title="self.getRemoteNeedTitle(connUri)"
-              uri="self.getRemoteNeedUri(connUri)"
-              ng-click="!self.multiSelectType && self.isConnectionPresent(connUri) && self.router__stateGoCurrent({connectionUri: connUri})">
-            </won-square-image>
-          </div>
+          <div class="msg__header__type">Forward to:</div>
+          <won-square-image
+            class="msg__header__inject"
+            ng-class="{'clickable': self.isConnectionPresent(connUri)}"
+            ng-repeat="connUri in self.injectIntoArray"
+            title="self.getRemoteNeedTitle(connUri)"
+            uri="self.getRemoteNeedUri(connUri)"
+            ng-click="!self.multiSelectType && self.isConnectionPresent(connUri) && self.router__stateGoCurrent({connectionUri: connUri})">
+          </won-square-image>
+      </div>
+      <div class="msg__header msg__header--forwarded-from" ng-if="self.isConnectionMessage && self.originatorUri && !self.hasNotBeenLoaded">
+          <div class="msg__header__type">Forwarded from:</div>
+          <won-square-image
+            class="msg__header__originator"
+            uri="self.originatorUri">
+          </won-square-image>
       </div>
       <won-message-content
           ng-if="self.hasContent || self.hasNotBeenLoaded"
@@ -84,6 +89,7 @@ function genComponentConf() {
           hasNotBeenLoaded: !message,
           hasReferences: message && message.get("hasReferences"),
           isInjectIntoMessage: injectInto && injectInto.size > 0,
+          originatorUri: message && message.get("originatorUri"),
           injectIntoArray: injectInto && Array.from(injectInto.toSet()),
           messageType,
           isConnectionMessage: messageType === won.WONMSG.connectionMessage,
