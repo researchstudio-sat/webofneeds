@@ -65,7 +65,10 @@ export function runMessagingAgent(redux) {
         );
         return true;
       } else if (message.isConnectionMessage()) {
-        console.log("Message received over ws that is an outgoing message");
+        console.log(
+          "Message received over ws that is an outgoing message",
+          message
+        );
         redux.dispatch(
           actionCreators.messages__processConnectionMessage(message)
         );
