@@ -13,14 +13,14 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
     wonMessage.contentGraphTrig
   );
 
-  const injectInto = wonMessage.getInjectIntoConnection();
+  const injectInto = wonMessage.getInjectIntoConnections();
+  const forwardedMessages = wonMessage.getForwardedMessages();
 
   const proposedMessages = wonMessage.getProposedMessages();
   const proposedToCancelMessages = wonMessage.getProposedToCancelMessages();
-  const acceptedMessages = wonMessage.getAcceptedMessages();
-  const rejectedMessages = wonMessage.getRejectsMessages();
-  const retractedMessages = wonMessage.getRetractMessages();
-  const forwardedMessages = wonMessage.getForwardedMessage();
+  const acceptsMessages = wonMessage.getAcceptsMessages();
+  const rejectsMessages = wonMessage.getRejectsMessages();
+  const retractsMessages = wonMessage.getRetractsMessages();
 
   const matchScoreFloat = parseFloat(wonMessage.getMatchScore());
 
@@ -33,6 +33,7 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
       remoteUri: !wonMessage.isFromOwner() //THIS HAS TO STAY UNDEFINED If the message is not a received message
         ? wonMessage.getRemoteMessageUri()
         : undefined,
+      originatorUri: undefined,
       content: {
         text: wonMessage.getTextMessage(),
         matchScore:
@@ -40,29 +41,13 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
             ? matchScoreFloat
             : undefined,
       },
-      injectInto:
-        !injectInto || Array.isArray(injectInto) ? injectInto : [injectInto],
+      injectInto: injectInto,
       references: {
-        proposes:
-          !proposedMessages || Array.isArray(proposedMessages)
-            ? proposedMessages
-            : [proposedMessages],
-        proposesToCancel:
-          !proposedToCancelMessages || Array.isArray(proposedToCancelMessages)
-            ? proposedToCancelMessages
-            : [proposedToCancelMessages],
-        accepts:
-          !acceptedMessages || Array.isArray(acceptedMessages)
-            ? acceptedMessages
-            : [acceptedMessages],
-        rejects:
-          !rejectedMessages || Array.isArray(rejectedMessages)
-            ? rejectedMessages
-            : [rejectedMessages],
-        retracts:
-          !retractedMessages || Array.isArray(retractedMessages)
-            ? retractedMessages
-            : [retractedMessages],
+        proposes: proposedMessages,
+        proposesToCancel: proposedToCancelMessages,
+        accepts: acceptsMessages,
+        rejects: rejectsMessages,
+        retracts: retractsMessages,
       },
       hasReferences: false, //will be determined by the hasReferences function
       hasContent: false, //will be determined by the hasContent function
@@ -109,20 +94,55 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
     parsedMessage.belongsToUri = wonMessage.getReceiver();
   }
 
-  if (wonMessage.getCompactFramedMessageContent()) {
-    parsedMessage.data.content = generateContent(
-      Immutable.fromJS(wonMessage.getCompactFramedMessageContent()),
-      detailsToParse,
-      parsedMessage.data.content
-    );
-  }
+  //PARSE MESSAGE CONTENT
+  if (forwardedMessages && forwardedMessages.length == 1) {
+    //FORWARDED MESSAGE ONLY WORKS IF THERE IS ONLY ONE FORWARD MESSAGE NOW
+    const forwardedMessageContent = wonMessage.getCompactFramedForwardedMessageContent();
 
-  if (forwardedMessages) {
-    const forwardedMessagesArray = Array.isArray(forwardedMessages)
-      ? forwardedMessages
-      : [forwardedMessages];
-    parsedMessage.data.content.text =
-      "Forwarded Messages: " + forwardedMessagesArray;
+    if (forwardedMessageContent) {
+      parsedMessage.data.originatorUri =
+        forwardedMessageContent["msg:hasSenderNeed"];
+      parsedMessage.data.content.text =
+        forwardedMessageContent["won:hasTextMessage"];
+
+      parsedMessage.data.content = generateContent(
+        Immutable.fromJS(wonMessage.getCompactFramedForwardedMessageContent()),
+        detailsToParse,
+        parsedMessage.data.content
+      );
+    } else {
+      console.error(
+        "Cant parse chat-message, forwardedMessageContent is missing",
+        wonMessage
+      );
+      return undefined;
+    }
+  } else if (forwardedMessages && forwardedMessages.length > 1) {
+    console.error(
+      "Cant parse chat-message, more than one forwardedMessage: ",
+      wonMessage
+    );
+    return undefined;
+  } else if (forwardedMessages) {
+    console.error(
+      "Cant parse chat-message, forwardedMessage is present but did not go in any valid branches: ",
+      wonMessage
+    );
+    return undefined;
+  } else {
+    parsedMessage.data.content.text = wonMessage.getTextMessage();
+    parsedMessage.data.content.matchScore =
+      isValidNumber(matchScoreFloat) && isFinite(matchScoreFloat)
+        ? matchScoreFloat
+        : undefined;
+
+    if (wonMessage.getCompactFramedMessageContent()) {
+      parsedMessage.data.content = generateContent(
+        Immutable.fromJS(wonMessage.getCompactFramedMessageContent()),
+        detailsToParse,
+        parsedMessage.data.content
+      );
+    }
   }
 
   parsedMessage.data.hasContent = hasContent(parsedMessage.data.content);
@@ -144,6 +164,16 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
     );
     return undefined;
   } else {
+    if (forwardedMessages) {
+      console.log(
+        "RECEIVED A FORWARDED MESSAGE!!!\nwonMessage:\n",
+        wonMessage,
+        "\nparsedMessage:\n",
+        parsedMessage,
+        "\nForwarded Message Content:\n",
+        wonMessage.getCompactFramedForwardedMessageContent()
+      );
+    }
     return Immutable.fromJS(parsedMessage);
   }
 }
