@@ -361,7 +361,10 @@ view model =
                 Loaded { skin, viewState, identities, createQueue } ->
                     case viewState of
                         Inactive ->
-                            column [ spacing 20 ]
+                            column
+                                [ width fill
+                                , spacing 20
+                                ]
                                 [ createButton skin
                                 , listUnsaved skin createQueue
                                 , viewIdentities
@@ -372,7 +375,10 @@ view model =
                                 ]
 
                         Viewing url ->
-                            column [ spacing 20 ]
+                            column
+                                [ width fill
+                                , spacing 20
+                                ]
                                 [ createButton skin
                                 , listUnsaved skin createQueue
                                 , viewIdentities
@@ -383,7 +389,10 @@ view model =
                                 ]
 
                         Creating form ->
-                            column [ spacing 20 ]
+                            column
+                                [ width fill
+                                , spacing 20
+                                ]
                                 [ createInterface skin form
                                 , listUnsaved skin createQueue
                                 , viewIdentities
@@ -510,16 +519,20 @@ identityForm form =
 
 listUnsaved : Skin -> List Identity -> Element Msg
 listUnsaved skin unsaved =
-    column
-        [ spacing 20
-        , width fill
-        ]
-    <|
-        List.map
-            (\id ->
-                viewUnsaved skin id
-            )
-            unsaved
+    if List.isEmpty unsaved then
+        none
+
+    else
+        column
+            [ spacing 20
+            , width fill
+            ]
+        <|
+            List.map
+                (\id ->
+                    viewUnsaved skin id
+                )
+                unsaved
 
 
 viewIdentities :
@@ -619,10 +632,13 @@ viewIdentity { skin, open, url, identity } =
                 [ spacing 10
                 , width fill
                 ]
-                [ identicon [] url
-                , column
-                    [ height fill
+                [ identicon
+                    [ width (px 100)
+                    , height (px 100)
                     ]
+                    url
+                , column
+                    [ height fill ]
                     [ el [ Font.size 18 ] <|
                         text identity.displayName
                     ]
