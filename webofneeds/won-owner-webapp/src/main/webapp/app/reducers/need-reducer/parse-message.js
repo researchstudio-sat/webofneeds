@@ -96,7 +96,11 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
 
   //PARSE MESSAGE CONTENT
   if (forwardedMessages && forwardedMessages.length == 1) {
-    //FORWARDED MESSAGE ONLY WORKS IF THERE IS ONLY ONE FORWARD MESSAGE NOW
+    /*
+    TODO: FORWARDED MESSAGE ONLY WORKS IF THERE IS ONLY ONE FORWARD MESSAGE NOW, not sure if that is per definition
+    also does not handle any references that are stored within the forwarded message itself (e.g. proposes etc.)
+    not sure if these are a necessity or if these can be ommitted
+    */
     const forwardedMessageContent = wonMessage.getCompactFramedForwardedMessageContent();
 
     if (forwardedMessageContent) {
