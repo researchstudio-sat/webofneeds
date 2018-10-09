@@ -409,7 +409,7 @@ createButton skin =
         [ width fill
         , Border.color skin.lineGray
         , padding 5
-        , Border.width 2
+        , Border.width 1
         ]
         { onPress = Just Create
         , label =
@@ -598,8 +598,8 @@ viewUnsaved skin identity =
                 , width fill
                 ]
                 [ el
-                    [ width (px 100)
-                    , height (px 100)
+                    [ width (px 50)
+                    , height (px 50)
                     , Background.color skin.lineGray
                     ]
                     none
@@ -624,27 +624,105 @@ viewIdentity :
 viewIdentity { skin, open, url, identity } =
     card
         [ width fill
-        , Events.onClick (View url)
+        , Events.onClick
+            (if open then
+                Cancel
+
+             else
+                View url
+            )
         ]
         { skin = skin
         , header =
             row
-                [ spacing 10
+                [ spacing 15
                 , width fill
                 ]
                 [ identicon
-                    [ width (px 100)
-                    , height (px 100)
+                    [ width (px 50)
+                    , height (px 50)
                     ]
                     url
                 , column
-                    [ height fill ]
+                    [ centerY ]
                     [ el [ Font.size 18 ] <|
                         text identity.displayName
                     ]
                 ]
-        , sections = []
+        , sections =
+            if open then
+                [ details skin
+                    [ Maybe.map
+                        (\website ->
+                            Inline
+                                { title = "Website"
+                                , value = website
+                                }
+                        )
+                        identity.website
+                    , Maybe.map
+                        (\aboutMe ->
+                            Block
+                                { title = "About Me"
+                                , value = aboutMe
+                                }
+                        )
+                        identity.aboutMe
+                    ]
+                ]
+
+            else
+                []
         }
+
+
+type Detail
+    = Inline
+        { title : String
+        , value : String
+        }
+    | Block
+        { title : String
+        , value : String
+        }
+
+
+details : Skin -> List (Maybe Detail) -> Element msg
+details skin d =
+    let
+        detailList =
+            List.filterMap
+                (Maybe.map
+                    (\detail ->
+                        case detail of
+                            Inline { title, value } ->
+                                row [ spacing 10 ]
+                                    [ el [ Font.bold, width (minimum 80 shrink) ] <| text (title ++ ":")
+                                    , text value
+                                    ]
+
+                            Block { title, value } ->
+                                column [ spacing 10 ]
+                                    [ el [ Font.bold ] <| text (title ++ ":")
+                                    , paragraph [] [ text value ]
+                                    ]
+                    )
+                )
+                d
+    in
+    if List.isEmpty detailList then
+        el
+            [ Font.size 20
+            , width fill
+            , padding 10
+            , Font.center
+            , Font.color skin.lineGray
+            ]
+        <|
+            text "No Details"
+
+    else
+        column [ spacing 10 ] detailList
 
 
 
