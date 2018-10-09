@@ -721,18 +721,53 @@ import won from "./won.js";
                           }
                           `
           );
-          console.log("queryResult:", queryResult);
           if (!queryResult || queryResult.length == 0) {
+            console.log(
+              "QueryResult was null for docUri: ",
+              docUri,
+              "executing old query"
+            );
+            const correspondingRemoteMessageUri = getIn(
+              await executeQueryOnRdfStore(
+                tmpstore,
+                `
+                        prefix event: <${baseUriForEvents}>
+                        prefix msg: <http://purl.org/webofneeds/message#>
+
+                        select distinct ?remoteUri where {
+                            { <${messageUri}> msg:hasCorrespondingRemoteMessage ?remoteUri } union
+                            { ?remoteUri msg:hasCorrespondingRemoteMessage <${messageUri}> }
+                        }
+                        `
+              ),
+              [0, "remoteUri", "value"] // the result is nested a bit, so we need to extract the uri here
+            );
+
+            const urisInStoreThatStartWith = uri =>
+              Array.from(
+                new Set(
+                  Object.values(tmpstore.engine.lexicon.OIDToUri).filter(u =>
+                    u.startsWith(uri)
+                  )
+                )
+              );
+
+            const graphUrisInEventDocOld = urisInStoreThatStartWith(
+              messageUri + "#"
+            ).concat(
+              urisInStoreThatStartWith(correspondingRemoteMessageUri + "#")
+            );
+
             return {
               uri: messageUri,
-              containedGraphUris: [],
+              correspondingRemoteMessageUri,
+              containedGraphUris: graphUrisInEventDocOld,
             };
           }
 
           const graphUrisOfMessage = queryResult.map(result =>
             getIn(result, ["graphOfMessage", "value"])
           );
-          console.log("graphUrisOfMessage:", graphUrisOfMessage);
           const urisInStoreThatStartWith = uri =>
             Array.from(
               new Set(
@@ -749,14 +784,16 @@ import won from "./won.js";
               .map(uri => urisInStoreThatStartWith(uri + "#"))
               .reduce((arr1, arr2) => arr1.concat(arr2))
           );
-          console.log("graphUrisInEventDoc:", graphUrisInEventDoc);
           return {
             uri: messageUri,
             containedGraphUris: Array.from(new Set(graphUrisInEventDoc)), //deduplicate
           };
         }
       } catch (ex) {
-        console.error("caught:" + ex);
+        console.error(
+          "An Exception occured while retrieving the query results",
+          ex
+        );
         rethrow(ex, `failed to loadDocumentUris due to reason: `);
       }
     });
