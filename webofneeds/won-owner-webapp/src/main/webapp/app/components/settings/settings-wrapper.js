@@ -115,6 +115,20 @@ function genComponentConf($ngRedux) {
         $ngRedux.dispatch(actionCreators.identities__create(identity));
       });
 
+      const identities = $ngRedux.getState().get("identitites");
+      if (identities) {
+        for (const [url, identity] of identities.entries()) {
+          elmApp.ports.identitiesInPort.send({
+            url: url,
+            identity: {
+              displayName: identity.displayName,
+              aboutMe: identity.aboutMe || null,
+              website: identity.website || null,
+            },
+          });
+        }
+      }
+
       const disconnect = $ngRedux.connect(state => {
         return { identities: state.get("identities") };
       })(state => {
