@@ -34,9 +34,9 @@ export function messageHasReferences(wonMsg) {
   return (
     wonMsg &&
     (wonMsg.getProposedMessages() ||
-      wonMsg.getRetractMessages() ||
+      wonMsg.getRetractsMessages() ||
       wonMsg.getRejectsMessages() ||
-      wonMsg.getAcceptedMessages() ||
+      wonMsg.getAcceptsMessages() ||
       wonMsg.getProposedToCancelMessages())
   );
 }

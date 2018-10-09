@@ -1212,20 +1212,34 @@ WonMessage.prototype = {
       return this.compactFramedMessage["msg:hasCorrespondingRemoteMessage"];
     }
   },
+  getCompactFramedForwardedMessageContent: function() {
+    const forwardedMessage =
+      this.compactFramedMessage &&
+      this.compactFramedMessage["msg:hasForwardedMessage"];
+    const forwardedMessageContent =
+      forwardedMessage && forwardedMessage["msg:hasCorrespondingRemoteMessage"];
+    return forwardedMessageContent;
+  },
   getMessageType: function() {
     return this.getProperty(
       "http://purl.org/webofneeds/message#hasMessageType"
     );
   },
-  getInjectIntoConnection: function() {
-    return this.getProperty(
+  getInjectIntoConnections: function() {
+    const injectInto = this.getProperty(
       "http://purl.org/webofneeds/message#hasInjectIntoConnection"
     );
+
+    return !injectInto || Array.isArray(injectInto) ? injectInto : [injectInto];
   },
-  getForwardedMessage: function() {
-    return this.getProperty(
+  getForwardedMessages: function() {
+    const forwardedMessages = this.getProperty(
       "http://purl.org/webofneeds/message#hasForwardedMessage"
     );
+
+    return !forwardedMessages || Array.isArray(forwardedMessages)
+      ? forwardedMessages
+      : [forwardedMessages];
   },
   getReceivedTimestamp: function() {
     return this.getPropertyFromLocalMessage(
@@ -1297,22 +1311,46 @@ WonMessage.prototype = {
   },
 
   getProposedMessages: function() {
-    return this.getProperty("http://purl.org/webofneeds/agreement#proposes");
+    const proposedMessages = this.getProperty(
+      "http://purl.org/webofneeds/agreement#proposes"
+    );
+    return !proposedMessages || Array.isArray(proposedMessages)
+      ? proposedMessages
+      : [proposedMessages];
   },
 
-  getAcceptedMessages: function() {
-    return this.getProperty("http://purl.org/webofneeds/agreement#accepts");
+  getAcceptsMessages: function() {
+    const acceptsMessages = this.getProperty(
+      "http://purl.org/webofneeds/agreement#accepts"
+    );
+    return !acceptsMessages || Array.isArray(acceptsMessages)
+      ? acceptsMessages
+      : [acceptsMessages];
   },
   getProposedToCancelMessages: function() {
-    return this.getProperty(
+    const proposedToCancelMessages = this.getProperty(
       "http://purl.org/webofneeds/agreement#proposesToCancel"
     );
+
+    return !proposedToCancelMessages || Array.isArray(proposedToCancelMessages)
+      ? proposedToCancelMessages
+      : [proposedToCancelMessages];
   },
   getRejectsMessages: function() {
-    return this.getProperty("http://purl.org/webofneeds/agreement#rejects");
+    const rejectsMessages = this.getProperty(
+      "http://purl.org/webofneeds/agreement#rejects"
+    );
+    return !rejectsMessages || Array.isArray(rejectsMessages)
+      ? rejectsMessages
+      : [rejectsMessages];
   },
-  getRetractMessages: function() {
-    return this.getProperty("http://purl.org/webofneeds/modification#retracts");
+  getRetractsMessages: function() {
+    const retractsMessages = this.getProperty(
+      "http://purl.org/webofneeds/modification#retracts"
+    );
+    return !retractsMessages || Array.isArray(retractsMessages)
+      ? retractsMessages
+      : [retractsMessages];
   },
 
   isProposeMessage: function() {
