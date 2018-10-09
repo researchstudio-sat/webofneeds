@@ -868,25 +868,6 @@ won.DomainObjectFactory.prototype = {
   jsonLdToWonDomainObjects: function(/*jsonLdContent*/) {},
 };
 
-/**
- * This function should take any of the different chat-message-structures flying around in this code-base
- * and return a WonMessage object.
- * @param message
- * @returns {*|Promise.<WonMessage>}
- */
-won.toWonMessage = function(message) {
-  if (message["@graph"]) {
-    return won.wonMessageFromJsonLd(message);
-  } else if (message instanceof WonMessage) {
-    return Promise.resolve(message);
-  } else {
-    throw new Error(
-      "Couldn't convert the following to a WonMessage: ",
-      message
-    );
-  }
-};
-
 won.wonMessageFromJsonLd = async function(wonMessageAsJsonLD) {
   //console.log("converting this JSON-LD to WonMessage", wonMessageAsJsonLD)
   const expandedJsonLd = await jsonld.promises.expand(wonMessageAsJsonLD);
