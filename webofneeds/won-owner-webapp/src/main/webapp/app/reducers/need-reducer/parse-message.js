@@ -101,7 +101,7 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
 
     if (forwardedMessageContent) {
       parsedMessage.data.originatorUri =
-        forwardedMessageContent["msg:hasSenderNeed"];
+        forwardedMessageContent["msg:hasSenderNeed"]["@id"];
       parsedMessage.data.content.text =
         forwardedMessageContent["won:hasTextMessage"];
 
