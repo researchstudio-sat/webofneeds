@@ -20,15 +20,12 @@ function genComponentConf() {
         ng-click="self.hideMainMenuDisplay()">
         Sign up
     </a>
-    <!--
     <a
-        ng-if="!self.isPrivateIdUser"
         href="{{ self.absHRef(self.$state, 'settings') }}"
         class="won-button--outlined thin red"
         ng-click="self.hideMainMenuDisplay()">
         <span>Account Settings</span>
     </a>
-    -->
     <a
         href="{{ self.absHRef(self.$state, 'about') }}"
         class="won-button--outlined thin red"
