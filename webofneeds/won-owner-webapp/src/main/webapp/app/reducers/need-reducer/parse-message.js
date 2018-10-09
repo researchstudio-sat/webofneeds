@@ -164,16 +164,6 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
     );
     return undefined;
   } else {
-    if (forwardedMessages) {
-      console.log(
-        "RECEIVED A FORWARDED MESSAGE!!!\nwonMessage:\n",
-        wonMessage,
-        "\nparsedMessage:\n",
-        parsedMessage,
-        "\nForwarded Message Content:\n",
-        wonMessage.getCompactFramedForwardedMessageContent()
-      );
-    }
     return Immutable.fromJS(parsedMessage);
   }
 }
