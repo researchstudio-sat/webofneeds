@@ -7,6 +7,10 @@ import {
   organizationNamesDetail,
 } from "../../details/jobs.js";
 import { jobLocation } from "../../details/location.js";
+import { sparqlQuery } from "../../../app/sparql-builder-utils.js";
+
+import won from "../../../app/won-es6.js";
+import { getIn, is } from "../../../app/utils.js";
 
 export const jobSearch = {
   identifier: "jobSearch",
@@ -40,26 +44,70 @@ export const jobSearch = {
     organizationNames: { ...organizationNamesDetail },
   },
 
+  /**
+   *
+   * e.g.: with just industries:
+   * ```
+   * # index for industries using binds
+   * prefix s: <http://schema.org/>
+   * prefix won:   <http://purl.org/webofneeds/model#>
+   * select distinct * where {
+   *   {
+   *     select ${resultName} (sum(?var1) + sum(?var2) as ?targetOverlap) (count(${resultName}) as ?targetTotal) where {
+   *       ${resultName} a won:Need;
+   *             won:is ?is.
+   *             ?is s:industry ?industry .
+   *       bind(if(str(?industry) = "design",1,0) as ?var1)
+   *       bind(if(str(?industry) = "computer science",1,0) as ?var2)
+   *     } group by (${resultName})
+   *   }
+   *   bind (?targetOverlap / ( ?targetTotal + 2 - ?targetOverlap ) as ?jaccardIndex )
+   * } order by desc(?jaccardIndex)
+   * limit 100
+   * ```
+   */
   generateQuery: (draft, resultName) => {
-    console.log(draft, resultName, "deleteme");
+    const pathInDraft = ["seeks", "industry"];
+    const sparqlPredicatePath = "won:is/s:industry";
+    const sparqlVarName = "?industry";
 
+    const tagLikes = getIn(draft, pathInDraft);
+    if (!is("Array", tagLikes)) {
+      console.error("Expected array, got ", tagLikes);
+      return;
+    }
+
+    // ----------------
+
+    if (tagLikes.length == 0) {
+      // TODO don't generate sub-query
+    }
+    const partialSums = Object.keys(tagLikes).map(idx => `sum(?var${idx})`);
+    const targetOverlapSelect =
+      "(" + partialSums.join(" + ") + " as ?targetOverlap)"; // TODO prefix/suffix variable to make it unique
+    const targetTotalSelect = `(count(${resultName}) as ?targetTotal)`; // TODO prefix/suffix variable to make it unique
+
+    const bindOps = Object.entries(tagLikes).map(
+      ([idx, tagLike]) =>
+        `bind(if(str(${sparqlVarName}) = "${tagLike}",1,0) as ?var${idx})` // TODO prefix/suffix variable to make it unique
+    );
+
+    const innerQuery = sparqlQuery({
+      prefixes: {
+        s: won.defaultContext["s"], // TODO needs to be moved to outermost query
+        won: won.defaultContext["won"],
+      },
+      selectDistinct: `${resultName} ${targetOverlapSelect} ${targetTotalSelect}`,
+      //  ${resultName} (sum(?var1) + sum(?var2) as ?targetOverlap) (count(${resultName}) as ?targetTotal) {
+      where: [
+        `${resultName} a won:Need .`,
+        `${resultName} ${sparqlPredicatePath} ${sparqlVarName} .`,
+        ...bindOps,
+      ],
+    });
+
+    console.log(draft, resultName, innerQuery, tagLikes, "deleteme");
     //
-    // # index for industries using binds
-    // prefix s: <http://schema.org/>
-    // prefix won:   <http://purl.org/webofneeds/model#>
-    // select distinct * where {
-    //   {
-    //     select ?need (sum(?var1) + sum(?var2) as ?targetOverlap) (count(?need) as ?targetTotal) where {
-    //       ?need a won:Need;
-    //             won:is ?is.
-    //             ?is s:industry ?value .
-    //       bind(if(str(?value) = "foo",1,0) as ?var1)
-    //       bind(if(str(?value) = "bar",1,0) as ?var2)
-    //     } group by (?need)
-    //   }
-    //   bind (?targetOverlap / ( ?targetTotal + 2 - ?targetOverlap ) as ?jaccardIndex )
-    // } order by desc(?jaccardIndex)
-    // limit 100
     //
     //
     //     const seeksBranch = draft && draft.seeks;

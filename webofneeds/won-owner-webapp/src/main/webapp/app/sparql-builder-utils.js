@@ -32,8 +32,8 @@ export function sparqlQuery({ prefixes, selectDistinct, where, orderBy }) {
 ${prefixesString(prefixes)}
 SELECT DISTINCT ${selectDistinct}
 WHERE {
-  ${where.join(" ")}
-} ${orderByStr}`;
+  ${where ? where.join(" ") : ""}
+} ${orderByStr ? orderByStr : ""}`;
 
   return new SparqlParser().parse(queryTemplate);
 }
