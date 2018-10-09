@@ -704,42 +704,60 @@ import won from "./won.js";
     }
 
     const mappingsPromises = loadedDocumentUris.map(async docUri => {
-      if (docUri.startsWith("event") || docUri.startsWith(baseUriForEvents)) {
-        const messageUri = docUri;
-        const correspondingRemoteMessageUri = getIn(
-          await executeQueryOnRdfStore(
+      try {
+        if (docUri.startsWith("event") || docUri.startsWith(baseUriForEvents)) {
+          const messageUri = docUri;
+          const queryResult = await executeQueryOnRdfStore(
             tmpstore,
             `
-                        prefix event: <${baseUriForEvents}>
-                        prefix msg: <http://purl.org/webofneeds/message#>
+                          prefix event: <${baseUriForEvents}>
+                          prefix msg: <http://purl.org/webofneeds/message#>
 
-                        select distinct ?remoteUri where {
-                            { <${messageUri}> msg:hasCorrespondingRemoteMessage ?remoteUri } union
-                            { ?remoteUri msg:hasCorrespondingRemoteMessage <${messageUri}> }
-                        }
-                        `
-          ),
-          [0, "remoteUri", "value"] // the result is nested a bit, so we need to extract the uri here
-        );
-
-        const urisInStoreThatStartWith = uri =>
-          Array.from(
-            new Set(
-              Object.values(tmpstore.engine.lexicon.OIDToUri).filter(u =>
-                u.startsWith(uri)
-              )
-            )
+                          select distinct ?graphOfMessage where {
+                              { <${messageUri}> msg:hasCorrespondingRemoteMessage ?graphOfMessage } union
+                              { ?graphOfMessage msg:hasCorrespondingRemoteMessage <${messageUri}> } union
+                              { <${messageUri}> msg:hasForwardedMessage ?graphOfMessage } union
+                              { <${messageUri}> msg:hasForwardedMessage/msg:hasCorrespondingRemoteMessage ?graphOfMessage }
+                          }
+                          `
           );
+          console.log("queryResult:", queryResult);
+          if (!queryResult || queryResult.length == 0) {
+            return {
+              uri: messageUri,
+              containedGraphUris: [],
+            };
+          }
 
-        const graphUrisInEventDoc = urisInStoreThatStartWith(
-          messageUri + "#"
-        ).concat(urisInStoreThatStartWith(correspondingRemoteMessageUri + "#"));
+          const graphUrisOfMessage = queryResult.map(result =>
+            getIn(result, ["graphOfMessage", "value"])
+          );
+          console.log("graphUrisOfMessage:", graphUrisOfMessage);
+          const urisInStoreThatStartWith = uri =>
+            Array.from(
+              new Set(
+                Object.values(tmpstore.engine.lexicon.OIDToUri).filter(u =>
+                  u.startsWith(uri)
+                )
+              )
+            );
 
-        return {
-          uri: messageUri,
-          correspondingRemoteMessageUri,
-          containedGraphUris: graphUrisInEventDoc,
-        };
+          const graphUrisInEventDoc = urisInStoreThatStartWith(
+            messageUri + "#"
+          ).concat(
+            graphUrisOfMessage
+              .map(uri => urisInStoreThatStartWith(uri + "#"))
+              .reduce((arr1, arr2) => arr1.concat(arr2))
+          );
+          console.log("graphUrisInEventDoc:", graphUrisInEventDoc);
+          return {
+            uri: messageUri,
+            containedGraphUris: Array.from(new Set(graphUrisInEventDoc)), //deduplicate
+          };
+        }
+      } catch (ex) {
+        console.error("caught:" + ex);
+        rethrow(ex, `failed to loadDocumentUris due to reason: `);
       }
     });
     const mappingsArray = (await Promise.all(mappingsPromises)).filter(m => m);
