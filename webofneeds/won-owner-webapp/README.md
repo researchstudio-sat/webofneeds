@@ -120,13 +120,14 @@ $ngRedux.getState();
                            //These references are parsed in a way that it will always be a list no matter if there is only a single element or an array
                            proposes: wonMessage.getProposedMessages(),
                            proposesToCancel: wonMessage.getProposedToCancelMessages(),
-                           accepts: wonMessage.getAcceptedMessages(),
+                           accepts: wonMessage.getAcceptsMessages(),
                            rejects: wonMessage.getRejectsMessages(),
-                           retracts: wonMessage.getRetractMessages(),
+                           retracts: wonMessage.getRetractsMessages(),
                        }
                        hasReferences: true|false //whether it contains any non-null/non-undefined references within the references block of the message
                        hasContent: true|false //whether it contains any non-null/non-undefined content within the content block of the message
                        injectInto: undefined or an array of connectionUris this message is injected into
+                       originatorUri: undefined or the uri of the post/need which initiated the forwardMessage (the one who injected the msg)
                        isParsable: true|false //true if hasReferences or hasContent is true
                        isMessageStatusUpToDate: true|false //true if the agreementData has been checked to define the status of the message
                        messageStatus: {
