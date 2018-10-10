@@ -164,6 +164,7 @@ $ngRedux.getState();
                unread: true|false, //whether or not this connection is new (or already seen if you will)
                isRated: true|false, //whether or not this connection has been rated yet
                remoteNeedUri: string, //corresponding remote Need identifier
+               remoteConnectionUri: string, //corresponding remote Connection uri
                state: string, //state of the connection
                uri: string //unique identifier of this connection
            }
