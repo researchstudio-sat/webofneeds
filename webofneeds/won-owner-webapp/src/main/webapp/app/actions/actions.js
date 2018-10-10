@@ -82,7 +82,7 @@ import * as configActions from "./config-actions.js";
 
 import { pageLoadAction } from "./load-action.js";
 import { stateGo, stateReload } from "redux-ui-router";
-import { createIdentity } from "./identity-actions.js";
+import { createPersona } from "./persona-actions.js";
 
 // </action-creators>
 
@@ -125,8 +125,8 @@ const actionHierarchy = {
     connect: needsConnect,
     fetchUnloadedNeeds: fetchUnloadedNeeds,
   },
-  identities: {
-    create: createIdentity,
+  personas: {
+    create: createPersona,
     createSuccessful: INJ_DEFAULT,
   },
   router: {

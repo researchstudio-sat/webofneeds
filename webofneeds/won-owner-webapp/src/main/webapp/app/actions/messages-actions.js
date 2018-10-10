@@ -135,10 +135,10 @@ export function successfulCreate(event) {
       //If the need is a persona, do not forward it
       if (need["@type"].includes && need["@type"].includes("won:Persona")) {
         dispatch(
-          actionCreators.identities__createSuccessful({
+          actionCreators.personas__createSuccessful({
             publishEventUri: event.getIsResponseTo(),
             needUri: event.getSenderNeed(),
-            identity: need,
+            persona: need,
           })
         );
       } else {

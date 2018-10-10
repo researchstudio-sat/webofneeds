@@ -3,7 +3,7 @@ import won from "../won-es6";
 import { getRandomWonId } from "../won-utils";
 import { actionTypes } from "./actions";
 
-export function createIdentity(identity, nodeUri) {
+export function createPersona(persona, nodeUri) {
   return (dispatch, getState) => {
     const state = getState();
     if (!nodeUri) {
@@ -26,9 +26,9 @@ export function createIdentity(identity, nodeUri) {
             { "@id": "won:NoHintForCounterpart" },
             { "@id": "won:NoHintForMe" },
           ],
-          "s:name": identity.displayName,
-          "s:description": identity.aboutMe || undefined,
-          "s:url": identity.website || undefined,
+          "s:name": persona.displayName,
+          "s:description": persona.aboutMe || undefined,
+          "s:url": persona.website || undefined,
         },
       ],
     };
@@ -44,7 +44,7 @@ export function createIdentity(identity, nodeUri) {
     msg["@context"]["@base"] = publishedContentUri;
 
     dispatch({
-      type: actionTypes.identities.create,
+      type: actionTypes.personas.create,
       payload: { eventUri: msgUri, message: msg, needUri: publishedContentUri },
     });
   };

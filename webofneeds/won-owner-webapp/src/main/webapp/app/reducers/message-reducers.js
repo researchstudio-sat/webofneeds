@@ -17,14 +17,14 @@ const initialState = Immutable.fromJS({
 export function messagesReducer(messages = initialState, action = {}) {
   switch (action.type) {
     case actionTypes.needs.connect:
-    case actionTypes.identities.create:
+    case actionTypes.personas.create:
     case actionTypes.needs.create:
       return messages.setIn(
         ["enqueued", action.payload.eventUri],
         action.payload.message
       );
 
-    case actionTypes.identities.createSuccessful:
+    case actionTypes.personas.createSuccessful:
     case actionTypes.needs.createSuccessful:
       return messages.removeIn([
         "waitingForAnswer",
