@@ -7,7 +7,10 @@ import {
   organizationNamesDetail,
 } from "../../details/jobs.js";
 import { jobLocation } from "../../details/location.js";
-import { sparqlQuery } from "../../../app/sparql-builder-utils.js";
+import {
+  sparqlQuery,
+  filterInVicinity,
+} from "../../../app/sparql-builder-utils.js";
 
 import won from "../../../app/won-es6.js";
 import { getIn, is } from "../../../app/utils.js";
@@ -87,9 +90,13 @@ export const jobSearch = {
     // const sparqlVarName = "?employmentType";
 
     // industry:
+    const fieldName = "industry";
     const pathInDraft = ["seeks", "industry"];
     const sparqlPredicatePath = "won:is/s:industry";
-    const sparqlVarName = "?industry";
+    const sparqlVarName = "?" + fieldName;
+    const targetTotalVar = `?${fieldName}_targetTotal`;
+    const targetOverlapVar = `?${fieldName}_targetOverlap`;
+    const jaccardIndexVar = `?${fieldName}_jaccardIndex`;
 
     const tagLikes = getIn(draft, pathInDraft);
     if (!is("Array", tagLikes)) {
@@ -111,16 +118,17 @@ export const jobSearch = {
 
     // operations to sum up to cardinality/size of intersection
     const partialSums = Object.keys(tagLikes).map(idx => `sum(?var${idx})`);
-    const targetOverlapSelect =
-      "(" + partialSums.join(" + ") + " as ?targetOverlap)"; // TODO prefix/suffix variable to make it unique
+    const targetOverlapSelect = `( ${partialSums.join(
+      " + "
+    )} as ${targetOverlapVar} )`; // TODO prefix/suffix variable to make it unique
 
     // operations to sum up to cardinality/size of union
-    const targetTotalSelect = `(count(${resultName}) as ?targetTotal)`; // TODO prefix/suffix variable to make it unique
+    const targetTotalSelect = `(count(${resultName}) as ${targetTotalVar})`; // TODO prefix/suffix variable to make it unique
 
     // sub-query that actually calculates cardinality of union and intersection
     const subQuery = sparqlQuery({
       prefixes: {
-        s: won.defaultContext["s"], // TODO needs to be moved to outermost query
+        s: won.defaultContext["s"],
         won: won.defaultContext["won"],
       },
       //  ?result (sum(?var1) + sum(?var2) as ?targetOverlap) (count(${resultName}) as ?targetTotal) {
@@ -133,23 +141,32 @@ export const jobSearch = {
       groupBy: resultName,
     });
 
+    const jobLocation = getIn(draft, ["seeks", "jobLocation"]); // TODO move to better place
+
     // outer query that calculates jaccard-index (see https://en.wikipedia.org/wiki/Jaccard_index)
     const query = sparqlQuery({
-      prefixes: {},
+      prefixes: {
+        s: won.defaultContext["s"],
+        won: won.defaultContext["won"],
+      },
       variables: [resultName],
       distinct: true,
       where: [
-        `bind (?targetOverlap / ( ?targetTotal + ${
+        `bind (${targetOverlapVar} / ( ${targetTotalVar} + ${
           tagLikes.length
-        } - ?targetOverlap ) as ?jaccardIndex )`, // intersection over union, see https://en.wikipedia.org/wiki/Jaccard_index
-        `filter(?jaccardIndex > 0)`, // filter out posts without any common tag-likes
+        } - ${targetOverlapVar} ) as ${jaccardIndexVar} )`, // intersection over union, see https://en.wikipedia.org/wiki/Jaccard_index
+        `filter(${jaccardIndexVar} > 0)`, // filter out posts without any common tag-likes
+        jobLocation && `${resultName} won:is/s:jobLocation ?jobLocation.`,
       ],
       subQueries: [subQuery],
       orderBy: {
         order: "DESC",
-        variable: "?jaccardIndex",
+        variable: jaccardIndexVar, // TODO combined sort
       },
     });
+
+    const locationFilter = filterInVicinity("?jobLocation", jobLocation);
+    console.log("job location filter deleteme 2: ", locationFilter);
 
     // console.log(draft, resultName, subQuery, tagLikes, query, "deleteme");
 
