@@ -83,16 +83,6 @@ validatePersona draftToValidate =
 
 
 
--- fromDraft : Valid Draft -> PersonaData
--- fromDraft valid =
---     let
---         draft =
---             Validate.fromValid valid
---     in
---     { displayName = draft.displayName
---     , website = String.nonEmpty draft.website
---     , aboutMe = String.nonEmpty draft.aboutMe
---     }
 ---- MODEL ----
 
 

@@ -16,6 +16,9 @@ export default function(allPersonasInState = initialState, action = {}) {
       });
     }
 
+    case actionTypes.logout:
+      return initialState;
+
     case actionTypes.personas.create:
       //Ignored for now because we don't want to populate our state with unsaved personas
       return allPersonasInState;
