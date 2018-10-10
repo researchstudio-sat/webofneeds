@@ -874,27 +874,34 @@ won.wonMessageFromJsonLd = async function(wonMessageAsJsonLD) {
   await wonMessage.frameInPromise();
   await wonMessage.generateContentGraphTrig();
   await wonMessage.generateCompactedFramedMessage();
-
-  const forwardedMessageUris = wonMessage.getForwardedMessageUris();
-  if (forwardedMessageUris) {
-    //TODO: RECURSIVELY CREATE wonMessageObjects from all the forwarded Messages within this message
-    //const forwardedMessages = wonMessage.compactFramedMessage["msg:hasForwardedMessage"];
-    console.log(
-      "WonMessage",
-      wonMessage,
-      " contains forwarded Messages:",
-      forwardedMessageUris
-    );
-    forwardedMessageUris.map(fwdMessageUri => {
-      console.log("fwdMessageUri: ", fwdMessageUri);
-      //const wonMessage = await won.wonMessageFromJsonLd(expandedJsonLd);
-      console.log(wonMessage);
-    });
-  }
+  await wonMessage.generateContainedForwardedWonMessages();
 
   return wonMessage;
 };
 
+/*traverseMessageStructure: async function(rawMessage,structure){
+  const uris = [];
+  if (structure.containedContent) {
+    uris.concat(structure.containedContent);
+  }
+  if (!structure.containsEnvelopes) {
+    return {uris : uris};
+  } else {
+    structure.containsEnvelopes.forEach(env => {
+      const sub = traverseMessageStructure(rawMessage, env);
+      if (sub.uris) {
+        sub.concat(uris);
+      }
+    });
+    if (structure.messageDirection === "http://purl.org/webofneeds/message#FromExternal") {
+      const subRawMessage = rawMessage.filter(graph => uris.includes(graph['@id']));
+      const messages = sub.messages || [];
+      return {
+        uris,
+        messages: messages.push(won.wonMessageFromJsonLd(subRawMessage));
+    }
+  }
+}*/
 /**
  * Serializes the jsonldData into trig.
  *
@@ -1031,6 +1038,7 @@ function WonMessage(jsonLdContent) {
   }
   this.rawMessage = jsonLdContent;
   this.parseErrors = [];
+  this.containedForwardedWonMessages = [];
   this.__init();
 }
 
@@ -1133,6 +1141,41 @@ WonMessage.prototype = {
         console.error(msg);
         this.compactFramedMessageError = msg;
       }
+    }
+  },
+  generateContainedForwardedWonMessages: async function() {
+    const forwardedMessageUris = this.getForwardedMessageUris();
+    if (forwardedMessageUris) {
+      //TODO: RECURSIVELY CREATE wonMessageObjects from all the forwarded Messages within this message
+      //const forwardedMessages = wonMessage.compactFramedMessage["msg:hasForwardedMessage"];
+      const encapsulatingMessageUri = this.messageStructure.messageUri;
+      const rawMessageWithoutEncapsulatingUri = this.rawMessage.filter(
+        elem => !elem["@id"].startsWith(encapsulatingMessageUri)
+      );
+
+      console.log(
+        "WonMessage\n",
+        this,
+        "\nforwardedMessageUris:\n",
+        forwardedMessageUris,
+        "\nencapsulatingMessageUri\n",
+        encapsulatingMessageUri,
+        "\nrawMessageWithouthEncapsulatingUri\n",
+        rawMessageWithoutEncapsulatingUri
+      );
+
+      const fwdMessage = await won.wonMessageFromJsonLd(
+        rawMessageWithoutEncapsulatingUri
+      );
+      this.containedForwardedWonMessages.push(fwdMessage);
+
+      /*forwardedMessageUris.map(fwdMessageUri => {
+        console.log("fwdMessageUri: ", fwdMessageUri);
+        //TODO: WORK WITH MULTIPLE FORWARDS IN MESSAGE
+      });*/
+      return Promise.resolve(this.containedForwardedWonMessages); //TODO: RESOLVE THE CORRECT PROMISE
+    } else {
+      return Promise.resolve(this.containedForwardedWonMessages);
     }
   },
   frameInPromise: function() {
@@ -1362,6 +1405,15 @@ WonMessage.prototype = {
       this.isFromOwner() ||
       (this.isFromSystem() && this.getSender() !== this.getReceiver())
     );
+  },
+  hasContainedForwardedWonMessages: function() {
+    return (
+      this.containedForwardedWonMessages &&
+      this.containedForwardedWonMessages.length > 0
+    );
+  },
+  getContainedForwardedWonMessages: function() {
+    return this.containedForwardedWonMessages;
   },
   isFromSystem: function() {
     let direction = this.getMessageDirection();
