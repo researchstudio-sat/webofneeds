@@ -71,6 +71,22 @@ export const jobSearch = {
    * ```
    */
   generateQuery: (draft, resultName) => {
+    // skills
+    // const pathInDraft = ["is", "skills"];
+    // const sparqlPredicatePath = "won:seeks/s:knowsAbout";
+    // const sparqlVarName = "?skills";
+
+    // hiringOrganizationName
+    // const pathInDraft = ["seeks", "organizationNames"];
+    // const sparqlPredicatePath = "won:is/s:hiringOrganization/s:name";
+    // const sparqlVarName = "?organizationName";
+
+    // employmentType
+    // const pathInDraft = ["seeks", "employmentTypes"];
+    // const sparqlPredicatePath = "won:is/s:employmentType";
+    // const sparqlVarName = "?employmentType";
+
+    // industry:
     const pathInDraft = ["seeks", "industry"];
     const sparqlPredicatePath = "won:is/s:industry";
     const sparqlVarName = "?industry";
