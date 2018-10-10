@@ -1438,4 +1438,14 @@ export function toLocalISODateString(dateTime) {
   return currentDatetime + timezoneString;
 }
 
+/**
+ * Method that checks if the given element is already an array, if so return it, if not
+ * return the element as a single element array, if element is undefined return undefined
+ * @param elements
+ * @returns {*}
+ */
+export function createArray(elements) {
+  return !elements || Array.isArray(elements) ? elements : [elements];
+}
+
 window.toLocalISODateString4dbg = toLocalISODateString;

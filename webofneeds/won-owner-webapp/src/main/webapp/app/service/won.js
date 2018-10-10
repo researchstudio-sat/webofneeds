@@ -18,7 +18,7 @@
  * Created by LEIH-NB on 19.08.2014.
  */
 "format es6" /* required to force babel to transpile this so the minifier is happy */;
-import { is, prefixOfUri, isArray, clone } from "../utils.js";
+import { is, prefixOfUri, isArray, clone, createArray } from "../utils.js";
 import {
   clearPrivateId,
   clearReadUris,
@@ -869,12 +869,29 @@ won.DomainObjectFactory.prototype = {
 };
 
 won.wonMessageFromJsonLd = async function(wonMessageAsJsonLD) {
-  //console.log("converting this JSON-LD to WonMessage", wonMessageAsJsonLD)
   const expandedJsonLd = await jsonld.promises.expand(wonMessageAsJsonLD);
   const wonMessage = new WonMessage(expandedJsonLd);
   await wonMessage.frameInPromise();
   await wonMessage.generateContentGraphTrig();
   await wonMessage.generateCompactedFramedMessage();
+
+  const forwardedMessageUris = wonMessage.getForwardedMessageUris();
+  if (forwardedMessageUris) {
+    //TODO: RECURSIVELY CREATE wonMessageObjects from all the forwarded Messages within this message
+    //const forwardedMessages = wonMessage.compactFramedMessage["msg:hasForwardedMessage"];
+    console.log(
+      "WonMessage",
+      wonMessage,
+      " contains forwarded Messages:",
+      forwardedMessageUris
+    );
+    forwardedMessageUris.map(fwdMessageUri => {
+      console.log("fwdMessageUri: ", fwdMessageUri);
+      //const wonMessage = await won.wonMessageFromJsonLd(expandedJsonLd);
+      console.log(wonMessage);
+    });
+  }
+
   return wonMessage;
 };
 
@@ -1206,21 +1223,17 @@ WonMessage.prototype = {
       "http://purl.org/webofneeds/message#hasMessageType"
     );
   },
-  getInjectIntoConnections: function() {
-    const injectInto = this.getProperty(
-      "http://purl.org/webofneeds/message#hasInjectIntoConnection"
+  getInjectIntoConnectionUris: function() {
+    return createArray(
+      this.getProperty(
+        "http://purl.org/webofneeds/message#hasInjectIntoConnection"
+      )
     );
-
-    return !injectInto || Array.isArray(injectInto) ? injectInto : [injectInto];
   },
-  getForwardedMessages: function() {
-    const forwardedMessages = this.getProperty(
-      "http://purl.org/webofneeds/message#hasForwardedMessage"
+  getForwardedMessageUris: function() {
+    return createArray(
+      this.getProperty("http://purl.org/webofneeds/message#hasForwardedMessage")
     );
-
-    return !forwardedMessages || Array.isArray(forwardedMessages)
-      ? forwardedMessages
-      : [forwardedMessages];
   },
   getReceivedTimestamp: function() {
     return this.getPropertyFromLocalMessage(
@@ -1291,47 +1304,31 @@ WonMessage.prototype = {
     return this.getProperty("http://purl.org/webofneeds/message#hasReceiver");
   },
 
-  getProposedMessages: function() {
-    const proposedMessages = this.getProperty(
-      "http://purl.org/webofneeds/agreement#proposes"
+  getProposedMessageUris: function() {
+    return createArray(
+      this.getProperty("http://purl.org/webofneeds/agreement#proposes")
     );
-    return !proposedMessages || Array.isArray(proposedMessages)
-      ? proposedMessages
-      : [proposedMessages];
   },
 
-  getAcceptsMessages: function() {
-    const acceptsMessages = this.getProperty(
-      "http://purl.org/webofneeds/agreement#accepts"
+  getAcceptsMessageUris: function() {
+    return createArray(
+      this.getProperty("http://purl.org/webofneeds/agreement#accepts")
     );
-    return !acceptsMessages || Array.isArray(acceptsMessages)
-      ? acceptsMessages
-      : [acceptsMessages];
   },
-  getProposedToCancelMessages: function() {
-    const proposedToCancelMessages = this.getProperty(
-      "http://purl.org/webofneeds/agreement#proposesToCancel"
+  getProposedToCancelMessageUris: function() {
+    return createArray(
+      this.getProperty("http://purl.org/webofneeds/agreement#proposesToCancel")
     );
-
-    return !proposedToCancelMessages || Array.isArray(proposedToCancelMessages)
-      ? proposedToCancelMessages
-      : [proposedToCancelMessages];
   },
-  getRejectsMessages: function() {
-    const rejectsMessages = this.getProperty(
-      "http://purl.org/webofneeds/agreement#rejects"
+  getRejectsMessageUris: function() {
+    return createArray(
+      this.getProperty("http://purl.org/webofneeds/agreement#rejects")
     );
-    return !rejectsMessages || Array.isArray(rejectsMessages)
-      ? rejectsMessages
-      : [rejectsMessages];
   },
-  getRetractsMessages: function() {
-    const retractsMessages = this.getProperty(
-      "http://purl.org/webofneeds/modification#retracts"
+  getRetractsMessageUris: function() {
+    return createArray(
+      this.getProperty("http://purl.org/webofneeds/modification#retracts")
     );
-    return !retractsMessages || Array.isArray(retractsMessages)
-      ? retractsMessages
-      : [retractsMessages];
   },
 
   isProposeMessage: function() {
