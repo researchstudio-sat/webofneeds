@@ -7,7 +7,13 @@ import { getCorrectMessageUri } from "../../selectors.js";
  "alreadyProcessed" flag, which indicates that we do not care about the
  sent status anymore and assume that it has been successfully sent to each server (incl. the remote)
  */
-export function addMessage(state, wonMessage, alreadyProcessed = false) {
+export function addMessage(
+  state,
+  wonMessage,
+  alreadyProcessed = false,
+  insertIntoConnUri = undefined,
+  insertIntoNeedUri = undefined
+) {
   // we used to exclude messages without content here, using
   // if (wonMessage.getContentGraphs().length > 0) as the condition
   // however, after moving the facet info of connect/open messages from
@@ -21,14 +27,20 @@ export function addMessage(state, wonMessage, alreadyProcessed = false) {
   // throwing off the message rendering.
   // New solution: parse anything that is not a response, but allow responses with content
   if (!wonMessage.isResponse() || wonMessage.getContentGraphs().length > 0) {
-    let parsedMessage = parseMessage(wonMessage, alreadyProcessed);
+    let parsedMessage = parseMessage(
+      wonMessage,
+      alreadyProcessed,
+      insertIntoConnUri && insertIntoNeedUri
+    );
     if (parsedMessage) {
-      const connectionUri = parsedMessage.get("belongsToUri");
-      let needUri = null;
-      if (parsedMessage.getIn(["data", "outgoingMessage"])) {
+      const connectionUri =
+        insertIntoConnUri || parsedMessage.get("belongsToUri");
+
+      let needUri = insertIntoNeedUri;
+      if (!needUri && parsedMessage.getIn(["data", "outgoingMessage"])) {
         // needUri is the message's hasSenderNeed
         needUri = wonMessage.getSenderNeed();
-      } else {
+      } else if (!needUri) {
         // needUri is the remote message's hasReceiverNeed
         needUri = wonMessage.getReceiverNeed();
         if (parsedMessage.getIn(["data", "unread"])) {
@@ -47,8 +59,35 @@ export function addMessage(state, wonMessage, alreadyProcessed = false) {
             true
           );
         }
+      } else {
+        console.log(
+          "needUri was already set by method call as seen the params: insertIntoConnUri: ",
+          insertIntoConnUri,
+          "insertIntoNeedUri: ",
+          insertIntoNeedUri
+        );
       }
+
       if (needUri) {
+        if (wonMessage.hasContainedForwardedWonMessages()) {
+          const containedForwardedWonMessages = wonMessage.getContainedForwardedWonMessages();
+          console.log(
+            "containedForwardedWonMessages: ",
+            containedForwardedWonMessages
+          );
+          containedForwardedWonMessages.map(forwardedWonMessage => {
+            console.log("forwardedWonMessage: ", forwardedWonMessage);
+            state = addMessage(
+              state,
+              forwardedWonMessage,
+              true,
+              connectionUri,
+              needUri
+            );
+            //PARSE MESSAGE DIFFERENTLY FOR FORWARDED MESSAGES
+          });
+        }
+
         let messages = state.getIn([
           needUri,
           "connections",

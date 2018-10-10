@@ -7,7 +7,11 @@ import {
 import { isUriRead } from "../../won-localstorage.js";
 import { getAllDetails } from "../../won-utils.js";
 
-export function parseMessage(wonMessage, alreadyProcessed = false) {
+export function parseMessage(
+  wonMessage,
+  alreadyProcessed = false,
+  forwardMessage = false
+) {
   //seperating off header/@prefix-statements, so they can be folded in
   const { trigPrefixes, trigBody } = trigPrefixesAndBody(
     wonMessage.contentGraphTrig
@@ -33,7 +37,8 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
       remoteUri: !wonMessage.isFromOwner() //THIS HAS TO STAY UNDEFINED If the message is not a received message
         ? wonMessage.getRemoteMessageUri()
         : undefined,
-      originatorUri: undefined,
+      forwardMessage: forwardMessage,
+      originatorUri: forwardMessage ? wonMessage.getSenderNeed() : undefined,
       content: {
         text: wonMessage.getTextMessage(),
         matchScore:
