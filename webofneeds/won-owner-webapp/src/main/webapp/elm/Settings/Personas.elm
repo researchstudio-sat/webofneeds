@@ -1,4 +1,4 @@
-port module Settings.Personas exposing (main)
+module Settings.Personas exposing (main)
 
 import Browser
 import Dict exposing (Dict)
@@ -10,8 +10,13 @@ import Element.Font as Font
 import Element.Input as Input
 import Html exposing (Html, node)
 import Html.Attributes as HA
+import Json.Decode as Decode
+import NonEmpty
+import Persona exposing (Persona, PersonaData, SaveState(..))
 import Skin exposing (Skin)
 import String.Extra as String
+import Time
+import Url
 import Validate exposing (Valid, Validator)
 
 
@@ -35,15 +40,9 @@ type alias Draft =
     }
 
 
-type alias Persona =
-    { displayName : String
-    , website : Maybe String
-    , aboutMe : Maybe String
-    }
-
-
 type ValidationError
     = DisplayNameError String
+    | UnknownError String
 
 
 personaValidator : Validator ValidationError Draft
@@ -61,35 +60,39 @@ blankDraft =
     }
 
 
-fromDraft : Valid Draft -> Persona
-fromDraft valid =
-    let
-        draft =
-            Validate.fromValid valid
-    in
-    { displayName = draft.displayName
-    , website = String.nonEmpty draft.website
-    , aboutMe = String.nonEmpty draft.aboutMe
-    }
+validatePersona : Draft -> Result (List ValidationError) PersonaData
+validatePersona draftToValidate =
+    Validate.validate personaValidator draftToValidate
+        |> Result.andThen
+            (\valid ->
+                let
+                    draft =
+                        Validate.fromValid valid
+                in
+                case NonEmpty.string draft.displayName of
+                    Just displayName ->
+                        Ok
+                            { displayName = displayName
+                            , website = NonEmpty.string draft.website
+                            , aboutMe = NonEmpty.string draft.aboutMe
+                            }
+
+                    Nothing ->
+                        Err [ UnknownError "Unknown error occurred while parsing persona data" ]
+            )
 
 
 
----- PORTS ----
-
-
-port personasInPort :
-    ({ url : Url
-     , persona : Persona
-     }
-     -> msg
-    )
-    -> Sub msg
-
-
-port personasOutPort : Persona -> Cmd msg
-
-
-
+-- fromDraft : Valid Draft -> PersonaData
+-- fromDraft valid =
+--     let
+--         draft =
+--             Validate.fromValid valid
+--     in
+--     { displayName = draft.displayName
+--     , website = String.nonEmpty draft.website
+--     , aboutMe = String.nonEmpty draft.aboutMe
+--     }
 ---- MODEL ----
 
 
@@ -97,12 +100,12 @@ type Model
     = Loading
         { skin : Skin
         , creating : Maybe Draft
-        , createQueue : List Persona
+        , createQueue : List PersonaData
         }
     | Loaded
         { skin : Skin
         , viewState : ViewState
-        , createQueue : List Persona
+        , createQueue : List PersonaData
         , personas : Dict Url Persona
         }
 
@@ -140,10 +143,11 @@ init =
 type Msg
     = Create
     | Save
-    | ReceivedPersona Url Persona
+    | ReceivedPersonas (Dict Url Persona)
     | View Url
     | Cancel
     | DraftUpdated Draft
+    | NoOp
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -184,7 +188,7 @@ update msg model =
                     , Cmd.none
                     )
 
-                ( ReceivedPersona url p, _ ) ->
+                ( ReceivedPersonas newPersonas, _ ) ->
                     ( Loaded
                         { skin = loadingModel.skin
                         , viewState =
@@ -194,9 +198,8 @@ update msg model =
 
                                 Nothing ->
                                     Inactive
-                        , personas = Dict.singleton url p
-                        , createQueue =
-                            List.filter (\persona -> persona /= p) loadingModel.createQueue
+                        , personas = newPersonas
+                        , createQueue = pruneSaveQueue newPersonas loadingModel.createQueue
                         }
                     , Cmd.none
                     )
@@ -277,12 +280,11 @@ update msg model =
                         , Cmd.none
                         )
 
-                ReceivedPersona url p ->
+                ReceivedPersonas newPersonas ->
                     ( Loaded
                         { loadedModel
-                            | personas = Dict.insert url p loadedModel.personas
-                            , createQueue =
-                                List.filter (\persona -> persona /= p) loadedModel.createQueue
+                            | personas = newPersonas
+                            , createQueue = pruneSaveQueue newPersonas loadedModel.createQueue
                         }
                     , Cmd.none
                     )
@@ -300,24 +302,32 @@ update msg model =
                         _ ->
                             ( model, Cmd.none )
 
+                NoOp ->
+                    ( model, Cmd.none )
 
-saveDraft : Draft -> Maybe ( Persona, Cmd Msg )
+
+pruneSaveQueue : Dict Url Persona -> List PersonaData -> List PersonaData
+pruneSaveQueue personas queue =
+    let
+        newData =
+            List.map Persona.data (Dict.values personas)
+    in
+    List.filter (\persona -> not <| List.member persona newData) queue
+
+
+saveDraft : Draft -> Maybe ( PersonaData, Cmd Msg )
 saveDraft draft =
-    case Validate.validate personaValidator draft of
-        Ok valid ->
-            let
-                persona =
-                    fromDraft valid
-            in
-            Just ( persona, personasOutPort persona )
-
-        Err _ ->
-            Nothing
+    validatePersona draft
+        |> Result.map
+            (\personaData ->
+                ( personaData, Persona.savePersona personaData )
+            )
+        |> Result.toMaybe
 
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-    personasInPort (\{ url, persona } -> ReceivedPersona url persona)
+    Persona.subscription ReceivedPersonas (\err -> Debug.log (Decode.errorToString err) NoOp)
 
 
 
@@ -464,6 +474,9 @@ createInterface skin draft =
                             case error of
                                 DisplayNameError str ->
                                     Just str
+
+                                _ ->
+                                    Nothing
                         )
                     |> List.head
                     |> Maybe.map
@@ -516,7 +529,7 @@ personaForm draft =
         ]
 
 
-listUnsaved : Skin -> List Persona -> Element Msg
+listUnsaved : Skin -> List PersonaData -> Element Msg
 listUnsaved skin unsaved =
     if List.isEmpty unsaved then
         none
@@ -555,20 +568,48 @@ listPersonas { skin, viewedUrl, personas } =
                     Nothing ->
                         always False
         in
-        Dict.map
-            (\url persona ->
-                viewPersona
-                    { skin = skin
-                    , open = open url
-                    , url = url
-                    , persona = persona
-                    }
-            )
-            personas
-            |> Dict.values
+        Dict.values personas
+            |> List.filterMap
+                (\persona ->
+                    case Persona.saved persona of
+                        Saved timestamp ->
+                            Just
+                                { timestamp = timestamp
+                                , url = Persona.url persona
+                                , data = Persona.data persona
+                                }
+
+                        Unsaved ->
+                            Nothing
+                )
+            |> List.sortWith
+                (\left right ->
+                    case
+                        compare
+                            (Time.posixToMillis left.timestamp)
+                            (Time.posixToMillis right.timestamp)
+                    of
+                        LT ->
+                            GT
+
+                        GT ->
+                            LT
+
+                        EQ ->
+                            EQ
+                )
+            |> List.map
+                (\{ url, data } ->
+                    viewPersona
+                        { skin = skin
+                        , open = open (Url.toString url)
+                        , url = Url.toString url
+                        , data = data
+                        }
+                )
 
 
-viewUnsaved : Skin -> Persona -> Element Msg
+viewUnsaved : Skin -> PersonaData -> Element Msg
 viewUnsaved skin persona =
     card
         [ width fill
@@ -607,7 +648,8 @@ viewUnsaved skin persona =
                     , Font.size 18
                     ]
                   <|
-                    text persona.displayName
+                    text <|
+                        NonEmpty.get persona.displayName
                 ]
         , sections = []
         }
@@ -617,10 +659,10 @@ viewPersona :
     { skin : Skin
     , open : Bool
     , url : Url
-    , persona : Persona
+    , data : PersonaData
     }
     -> Element Msg
-viewPersona { skin, open, url, persona } =
+viewPersona { skin, open, url, data } =
     card
         [ width fill
         , Events.onClick
@@ -645,7 +687,8 @@ viewPersona { skin, open, url, persona } =
                 , column
                     [ centerY ]
                     [ el [ Font.size 18 ] <|
-                        text persona.displayName
+                        text <|
+                            NonEmpty.get data.displayName
                     ]
                 ]
         , sections =
@@ -655,18 +698,18 @@ viewPersona { skin, open, url, persona } =
                         (\website ->
                             Inline
                                 { title = "Website"
-                                , value = website
+                                , value = NonEmpty.get website
                                 }
                         )
-                        persona.website
+                        data.website
                     , Maybe.map
                         (\aboutMe ->
                             Block
                                 { title = "About Me"
-                                , value = aboutMe
+                                , value = NonEmpty.get aboutMe
                                 }
                         )
-                        persona.aboutMe
+                        data.aboutMe
                     ]
                 ]
 

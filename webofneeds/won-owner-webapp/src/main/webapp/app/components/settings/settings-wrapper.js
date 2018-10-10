@@ -111,22 +111,24 @@ function genComponentConf($ngRedux) {
     restrict: "E",
     link: (scope, element) => {
       const elmApp = Elm.Settings.Personas.init({ node: element[0] });
-      elmApp.ports.personasOutPort.subscribe(persona => {
+      elmApp.ports.personaOut.subscribe(persona => {
         $ngRedux.dispatch(actionCreators.personas__create(persona));
       });
-
+      const convertPersonas = personas => {
+        const conversion = personas
+          .entrySeq()
+          .map(([url, persona]) => {
+            return {
+              url: url,
+              ...persona,
+            };
+          })
+          .toJS();
+        return conversion;
+      };
       const personas = $ngRedux.getState().get("personas");
       if (personas) {
-        for (const [url, persona] of personas.entries()) {
-          elmApp.ports.personasInPort.send({
-            url: url,
-            persona: {
-              displayName: persona.displayName,
-              aboutMe: persona.aboutMe || null,
-              website: persona.website || null,
-            },
-          });
-        }
+        elmApp.ports.personaIn.send(convertPersonas(personas));
       }
 
       const disconnect = $ngRedux.connect(state => {
@@ -135,20 +137,11 @@ function genComponentConf($ngRedux) {
         if (!state.personas) {
           return;
         }
-        for (const [url, persona] of state.personas.entries()) {
-          elmApp.ports.personasInPort.send({
-            url: url,
-            persona: {
-              displayName: persona.displayName,
-              aboutMe: persona.aboutMe || null,
-              website: persona.website || null,
-            },
-          });
-        }
+        elmApp.ports.personaIn.send(convertPersonas(state.personas));
       });
 
       scope.$on("$destroy", () => {
-        elmApp.ports.personasOutPort.unsubscribe();
+        elmApp.ports.personaOut.unsubscribe();
         disconnect();
       });
     },
