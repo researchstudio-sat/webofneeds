@@ -13,14 +13,14 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
     wonMessage.contentGraphTrig
   );
 
-  const injectInto = wonMessage.getInjectIntoConnections();
-  const forwardedMessages = wonMessage.getForwardedMessages();
+  const injectInto = wonMessage.getInjectIntoConnectionUris();
+  const forwardedMessages = wonMessage.getForwardedMessageUris();
 
-  const proposedMessages = wonMessage.getProposedMessages();
-  const proposedToCancelMessages = wonMessage.getProposedToCancelMessages();
-  const acceptsMessages = wonMessage.getAcceptsMessages();
-  const rejectsMessages = wonMessage.getRejectsMessages();
-  const retractsMessages = wonMessage.getRetractsMessages();
+  const proposedMessages = wonMessage.getProposedMessageUris();
+  const proposedToCancelMessages = wonMessage.getProposedToCancelMessageUris();
+  const acceptsMessages = wonMessage.getAcceptsMessageUris();
+  const rejectsMessages = wonMessage.getRejectsMessageUris();
+  const retractsMessages = wonMessage.getRetractsMessageUris();
 
   const matchScoreFloat = parseFloat(wonMessage.getMatchScore());
 
@@ -43,6 +43,7 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
       },
       injectInto: injectInto,
       references: {
+        forwards: forwardedMessages,
         proposes: proposedMessages,
         proposesToCancel: proposedToCancelMessages,
         accepts: acceptsMessages,
@@ -95,12 +96,7 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
   }
 
   //PARSE MESSAGE CONTENT
-  if (forwardedMessages && forwardedMessages.length == 1) {
-    /*
-    TODO: FORWARDED MESSAGE ONLY WORKS IF THERE IS ONLY ONE FORWARD MESSAGE NOW, not sure if that is per definition
-    also does not handle any references that are stored within the forwarded message itself (e.g. proposes etc.)
-    not sure if these are a necessity or if these can be ommitted
-    */
+  /*if (forwardedMessages && forwardedMessages.length == 1) {
     const forwardedMessageContent = wonMessage.getCompactFramedForwardedMessageContent();
 
     if (forwardedMessageContent) {
@@ -147,6 +143,14 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
         parsedMessage.data.content
       );
     }
+  }*/
+
+  if (wonMessage.getCompactFramedMessageContent()) {
+    parsedMessage.data.content = generateContent(
+      Immutable.fromJS(wonMessage.getCompactFramedMessageContent()),
+      detailsToParse,
+      parsedMessage.data.content
+    );
   }
 
   parsedMessage.data.hasContent = hasContent(parsedMessage.data.content);

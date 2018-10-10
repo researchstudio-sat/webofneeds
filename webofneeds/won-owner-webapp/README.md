@@ -118,11 +118,12 @@ $ngRedux.getState();
                        },
                        references: {
                            //These references are parsed in a way that it will always be a list no matter if there is only a single element or an array
-                           proposes: wonMessage.getProposedMessages(),
-                           proposesToCancel: wonMessage.getProposedToCancelMessages(),
-                           accepts: wonMessage.getAcceptsMessages(),
-                           rejects: wonMessage.getRejectsMessages(),
-                           retracts: wonMessage.getRetractsMessages(),
+                           forwards: wonMessage.getForwardMessageUris(),
+                           proposes: wonMessage.getProposedMessageUris(),
+                           proposesToCancel: wonMessage.getProposedToCancelMessageUris(),
+                           accepts: wonMessage.getAcceptsMessageUris(),
+                           rejects: wonMessage.getRejectsMessageUris(),
+                           retracts: wonMessage.getRetractsMessageUris(),
                        }
                        hasReferences: true|false //whether it contains any non-null/non-undefined references within the references block of the message
                        hasContent: true|false //whether it contains any non-null/non-undefined content within the content block of the message
