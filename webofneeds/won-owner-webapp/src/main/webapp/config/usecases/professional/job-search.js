@@ -127,60 +127,8 @@ export const jobSearch = {
       },
     });
 
-    console.log(draft, resultName, subQuery, tagLikes, query, "deleteme");
+    // console.log(draft, resultName, subQuery, tagLikes, query, "deleteme");
 
     return query;
-    //
-    //
-    //
-    //     const seeksBranch = draft && draft.seeks;
-    //     const rentRange = seeksBranch && seeksBranch.rentRange;
-    //     const floorSizeRange = seeksBranch && seeksBranch.floorSizeRange;
-    //     const numberOfRoomsRange =
-    //       seeksBranch && seeksBranch.numberOfRoomsRange;
-    //     const location = seeksBranch && seeksBranch.location;
-    //     const filters = [
-    //       {
-    //         // to select is-branch
-    //         prefixes: {
-    //           won: won.defaultContext["won"],
-    //         },
-    //         operations: [
-    //           `${resultName} a won:Need.`,
-    //           `${resultName} won:is ?is.`,
-    //           location && "?is won:hasLocation ?location.",
-    //         ],
-    //       },
-    //       rentRange &&
-    //         filterRentRange(
-    //           "?is",
-    //           rentRange.min,
-    //           rentRange.max,
-    //           rentRange.currency
-    //         ),
-    //       floorSizeRange &&
-    //         filterFloorSizeRange("?is", floorSizeRange.min, floorSizeRange.max),
-    //       numberOfRoomsRange &&
-    //         filterNumOfRoomsRange(
-    //           "?is",
-    //           numberOfRoomsRange.min,
-    //           numberOfRoomsRange.max
-    //         ),
-    //       filterInVicinity("?location", location),
-    //     ];
-    //     const concatenatedFilter = concatenateFilters(filters);
-    //     return sparqlQuery({
-    //       prefixes: concatenatedFilter.prefixes,
-    //       selectDistinct: resultName,
-    //       where: concatenatedFilter.operations,
-    //       orderBy: [
-    //         {
-    //           order: "ASC",
-    //           variable: "?location_geoDistance",
-    //         },
-    //       ],
-    //     });
-    //   },
-    // },
   },
 };
