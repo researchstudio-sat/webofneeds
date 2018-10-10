@@ -38,7 +38,7 @@ export function messageHasReferences(wonMsg) {
       wonMsg.getRejectsMessageUris() ||
       wonMsg.getAcceptsMessageUris() ||
       wonMsg.getProposedToCancelMessageUris() ||
-      wonMsg.getForwardMessageUris())
+      wonMsg.getForwardedMessageUris())
   );
 }
 
