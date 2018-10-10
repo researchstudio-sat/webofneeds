@@ -8,6 +8,8 @@ export default function(allPersonasInState = initialState, action = {}) {
     case actionTypes.personas.createSuccessful: {
       const persona = action.payload.persona;
       return allPersonasInState.set(persona["@id"], {
+        saved: true,
+        timestamp: persona["dct:created"],
         displayName: persona["s:name"],
         aboutMe: persona["s:description"],
         website: persona["s:url"],
@@ -32,6 +34,8 @@ export default function(allPersonasInState = initialState, action = {}) {
             persona.get("@type").includes("won:Persona")
           ) {
             return updatedState.set(persona.get("@id"), {
+              saved: true,
+              timestamp: persona.get("dct:created"),
               displayName: persona.get("s:name"),
               aboutMe: persona.get("s:description"),
               website: persona.get("s:url"),
