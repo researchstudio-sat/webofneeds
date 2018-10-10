@@ -53,7 +53,11 @@ export const jobSearch = {
    * prefix won:   <http://purl.org/webofneeds/model#>
    * select distinct * where {
    *   {
-   *     select ${resultName} (sum(?var1) + sum(?var2) as ?targetOverlap) (count(${resultName}) as ?targetTotal) where {
+   *     select
+   *       ${resultName}
+   *       (sum(?var1) + sum(?var2) as ?targetOverlap)
+   *       (count(${resultName}) as ?targetTotal)
+   *     where {
    *       ${resultName} a won:Need;
    *             won:is ?is.
    *             ?is s:industry ?industry .
@@ -97,7 +101,7 @@ export const jobSearch = {
         s: won.defaultContext["s"], // TODO needs to be moved to outermost query
         won: won.defaultContext["won"],
       },
-      selectDistinct: `${resultName} ${targetOverlapSelect} ${targetTotalSelect}`,
+      variables: [resultName, targetOverlapSelect, targetTotalSelect],
       //  ${resultName} (sum(?var1) + sum(?var2) as ?targetOverlap) (count(${resultName}) as ?targetTotal) {
       where: [
         `${resultName} a won:Need .`,
@@ -106,7 +110,14 @@ export const jobSearch = {
       ],
     });
 
-    console.log(draft, resultName, innerQuery, tagLikes, "deleteme");
+    console.log(
+      draft,
+      resultName,
+      innerQuery,
+      innerQuery.prefixes,
+      tagLikes,
+      "deleteme"
+    );
     //
     //
     //
