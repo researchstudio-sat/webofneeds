@@ -102,16 +102,22 @@ export const jobSearch = {
     if (tagLikes.length == 0) {
       // TODO don't generate sub-query
     }
-    const partialSums = Object.keys(tagLikes).map(idx => `sum(?var${idx})`);
-    const targetOverlapSelect =
-      "(" + partialSums.join(" + ") + " as ?targetOverlap)"; // TODO prefix/suffix variable to make it unique
-    const targetTotalSelect = `(count(${resultName}) as ?targetTotal)`; // TODO prefix/suffix variable to make it unique
 
+    // ?varX is 1 if the tag-like occurs in the match
     const bindOps = Object.entries(tagLikes).map(
       ([idx, tagLike]) =>
         `bind(if(str(${sparqlVarName}) = "${tagLike}",1,0) as ?var${idx})` // TODO prefix/suffix variable to make it unique
     );
 
+    // operations to sum up to cardinality/size of intersection
+    const partialSums = Object.keys(tagLikes).map(idx => `sum(?var${idx})`);
+    const targetOverlapSelect =
+      "(" + partialSums.join(" + ") + " as ?targetOverlap)"; // TODO prefix/suffix variable to make it unique
+
+    // operations to sum up to cardinality/size of union
+    const targetTotalSelect = `(count(${resultName}) as ?targetTotal)`; // TODO prefix/suffix variable to make it unique
+
+    // sub-query that actually calculates cardinality of union and intersection
     const subQuery = sparqlQuery({
       prefixes: {
         s: won.defaultContext["s"], // TODO needs to be moved to outermost query
@@ -127,6 +133,7 @@ export const jobSearch = {
       groupBy: resultName,
     });
 
+    // outer query that calculates jaccard-index (see https://en.wikipedia.org/wiki/Jaccard_index)
     const query = sparqlQuery({
       prefixes: {},
       variables: [resultName],
@@ -134,7 +141,8 @@ export const jobSearch = {
       where: [
         `bind (?targetOverlap / ( ?targetTotal + ${
           tagLikes.length
-        } - ?targetOverlap ) as ?jaccardIndex )`,
+        } - ?targetOverlap ) as ?jaccardIndex )`, // intersection over union, see https://en.wikipedia.org/wiki/Jaccard_index
+        `filter(?jaccardIndex > 0)`, // filter out posts without any common tag-likes
       ],
       subQueries: [subQuery],
       orderBy: {
