@@ -7,7 +7,7 @@ import { actionCreators } from "../../actions/actions.js";
 import {
   selectNeedByConnectionUri,
   selectAllConnections,
-  selectAllTheirNeeds,
+  selectAllNeeds,
 } from "../../selectors.js";
 import trigModule from "../trig.js";
 import { labels } from "../../won-label-utils.js";
@@ -27,11 +27,11 @@ function genComponentConf() {
           <div class="msg__header__type">Forward to:</div>
           <won-square-image
             class="msg__header__inject"
-            ng-class="{'clickable': self.isConnectionPresent(connUri)}"
+            ng-class="{'clickable': self.isInjectIntoConnectionPresent(connUri)}"
             ng-repeat="connUri in self.injectIntoArray"
-            title="self.getRemoteNeedTitle(connUri)"
-            uri="self.getRemoteNeedUri(connUri)"
-            ng-click="!self.multiSelectType && self.isConnectionPresent(connUri) && self.router__stateGoCurrent({connectionUri: connUri})">
+            title="self.getInjectIntoNeedTitle(connUri)"
+            uri="self.getInjectIntoNeedUri(connUri)"
+            ng-click="!self.multiSelectType && self.isInjectIntoConnectionPresent(connUri) && self.router__stateGoCurrent({connectionUri: connUri})">
           </won-square-image>
       </div>
       <div class="msg__header msg__header--forwarded-from" ng-if="self.isConnectionMessage && self.originatorUri && !self.hasNotBeenLoaded">
@@ -77,10 +77,10 @@ function genComponentConf() {
         const injectInto = message && message.get("injectInto");
 
         const allConnections = selectAllConnections(state);
-        const theirNeeds = selectAllTheirNeeds(state);
+        const allNeeds = selectAllNeeds(state);
 
         return {
-          theirNeeds,
+          allNeeds,
           allConnections,
           multiSelectType: connection && connection.get("multiSelectType"),
           contentGraphTrig: get(message, "contentGraphTrigRaw"),
@@ -88,7 +88,7 @@ function genComponentConf() {
           hasContent: message && message.get("hasContent"),
           hasNotBeenLoaded: !message,
           hasReferences: message && message.get("hasReferences"),
-          isInjectIntoMessage: injectInto && injectInto.size > 0,
+          isInjectIntoMessage: injectInto && injectInto.size > 0, //contains the remoteConnectionUris
           originatorUri: message && message.get("originatorUri"),
           injectIntoArray: injectInto && Array.from(injectInto.toSet()),
           messageType,
@@ -121,21 +121,55 @@ function genComponentConf() {
       return headerLabel || this.messageType;
     }
 
-    getRemoteNeedUri(connectionUri) {
-      const connection =
+    getInjectIntoNeedUri(connectionUri) {
+      //TODO: THIS MIGHT BE A CONNECTION THAT WE DONT EVEN OWN, SO WE NEED TO BE MORE SMART ABOUT IT
+      let connection =
         this.allConnections && this.allConnections.get(connectionUri);
-      return connection && connection.get("remoteNeedUri");
+
+      if (connection) {
+        return connection.get("remoteNeedUri");
+      } else {
+        connection =
+          this.allConnections &&
+          this.allConnections.filter(
+            conn => conn.get("remoteConnectionUri") === connectionUri
+          );
+
+        if (connection && connection.size > 0) {
+          return connection.first().get("remoteNeedUri");
+        }
+      }
+      return undefined;
     }
 
-    getRemoteNeedTitle(connectionUri) {
-      const remoteNeedUri = this.getRemoteNeedUri(connectionUri);
-      const remoteNeed = remoteNeedUri && this.theirNeeds.get(remoteNeedUri);
+    getInjectIntoNeedTitle(connectionUri) {
+      //TODO: THIS MIGHT BE A CONNECTION THAT WE DONT EVEN OWN, SO WE NEED TO BE MORE SMART ABOUT IT
+      const injectIntoNeedUri = this.getInjectIntoNeedUri(connectionUri);
+      const injectIntoNeed =
+        injectIntoNeedUri && this.allNeeds.get(injectIntoNeedUri);
 
-      return remoteNeed && remoteNeed.get("humanReadable");
+      return injectIntoNeed && injectIntoNeed.get("humanReadable");
     }
 
-    isConnectionPresent(connectionUri) {
-      return this.allConnections && !!this.allConnections.get(connectionUri);
+    isInjectIntoConnectionPresent(connectionUri) {
+      //TODO: THIS MIGHT BE A CONNECTION THAT WE DONT EVEN OWN, SO WE NEED TO BE MORE SMART ABOUT IT
+      let connection =
+        this.allConnections && this.allConnections.get(connectionUri);
+
+      if (connection) {
+        return true;
+      } else {
+        connection =
+          this.allConnections &&
+          this.allConnections.filter(
+            conn => conn.get("remoteConnectionUri") === connectionUri
+          );
+
+        if (connection && connection.size > 0) {
+          return true;
+        }
+      }
+      return false;
     }
   }
   Controller.$inject = serviceDependencies;
