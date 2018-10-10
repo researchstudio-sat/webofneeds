@@ -108,7 +108,38 @@ export const jobSearch = {
         `${resultName} ${sparqlPredicatePath} ${sparqlVarName} .`,
         ...bindOps,
       ],
+      groupBy: resultName,
     });
+
+    // const query = sparqlQuery({
+    //   prefixes: { /* get prefixes from inner query */}
+    // })
+    /*
+   *
+   * e.g.: with just industries:
+   * ```
+   * # index for industries using binds
+   * prefix s: <http://schema.org/>
+   * prefix won:   <http://purl.org/webofneeds/model#>
+   * select distinct * where {
+   *   {
+   *     select
+   *       ?needUri 
+   *       (sum(?var1) + sum(?var2) as ?targetOverlap)
+   *       (count(?needUri as ?targetTotal)
+   *     where {
+   *       needUria won:Need;
+   *             won:is ?is.
+   *             ?is s:industry ?industry .
+   *       bind(if(str(?industry) = "design",1,0) as ?var1)
+   *       bind(if(str(?industry) = "computer science",1,0) as ?var2)
+   *     } group by (?needUri)
+   *   }
+   *   bind (?targetOverlap / ( ?targetTotal + 2 - ?targetOverlap ) as ?jaccardIndex )
+   * } order by desc(?jaccardIndex)
+   * limit 100
+   * ```
+   */
 
     console.log(
       draft,

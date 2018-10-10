@@ -19,22 +19,35 @@ import { Parser as SparqlParser } from "sparqljs";
  * @param {Array<String>} where any operations to add to the `WHERE`-block
  * @param {*} orderBy Array of objects like `{order: "ASC", variable: "?geoDistance"}`
  */
-export function sparqlQuery({ prefixes, variables, distinct, where, orderBy }) {
-  let orderByStr;
+export function sparqlQuery({
+  prefixes,
+  variables,
+  distinct,
+  where,
+  orderBy,
+  groupBy,
+}) {
+  const distinctStr = distinct ? "DISTINCT" : "";
+
+  let orderByStr = "";
   if (orderBy && is("Array", orderBy)) {
     const orderClauses = orderBy
       .map(o => `${o.order}(${o.variable})`)
       .join(" ");
     orderByStr = orderClauses ? "ORDER BY " + orderClauses : "";
   }
-  const distinctStr = distinct ? "DISTINCT" : "";
+
+  let groupByStr = "";
+  if (groupBy) {
+    groupByStr = `GROUP BY (${groupBy})`;
+  }
 
   const queryTemplate = `
 ${prefixesString(prefixes)}
 SELECT ${distinctStr} ${variables.join(" ")}
 WHERE {
   ${where ? where.join(" ") : ""}
-} ${orderByStr ? orderByStr : ""}`;
+} ${orderByStr} ${groupByStr}`;
 
   return new SparqlParser().parse(queryTemplate);
 }
