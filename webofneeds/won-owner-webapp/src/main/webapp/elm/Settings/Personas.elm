@@ -1,4 +1,4 @@
-port module Settings.Identities exposing (main)
+port module Settings.Personas exposing (main)
 
 import Browser
 import Dict exposing (Dict)
@@ -25,17 +25,17 @@ main =
 
 
 
----- IDENTIY ----
+---- PERSONA ----
 
 
-type alias IdentityForm =
+type alias Draft =
     { displayName : String
     , website : String
     , aboutMe : String
     }
 
 
-type alias Identity =
+type alias Persona =
     { displayName : String
     , website : Maybe String
     , aboutMe : Maybe String
@@ -46,30 +46,30 @@ type ValidationError
     = DisplayNameError String
 
 
-identityValidator : Validator ValidationError IdentityForm
-identityValidator =
+personaValidator : Validator ValidationError Draft
+personaValidator =
     Validate.all
         [ Validate.ifBlank .displayName (DisplayNameError "Please enter a display name.")
         ]
 
 
-blankForm : IdentityForm
-blankForm =
+blankDraft : Draft
+blankDraft =
     { displayName = ""
     , website = ""
     , aboutMe = ""
     }
 
 
-fromForm : Valid IdentityForm -> Identity
-fromForm valid =
+fromDraft : Valid Draft -> Persona
+fromDraft valid =
     let
-        form =
+        draft =
             Validate.fromValid valid
     in
-    { displayName = form.displayName
-    , website = String.nonEmpty form.website
-    , aboutMe = String.nonEmpty form.aboutMe
+    { displayName = draft.displayName
+    , website = String.nonEmpty draft.website
+    , aboutMe = String.nonEmpty draft.aboutMe
     }
 
 
@@ -77,16 +77,16 @@ fromForm valid =
 ---- PORTS ----
 
 
-port identitiesInPort :
+port personasInPort :
     ({ url : Url
-     , identity : Identity
+     , persona : Persona
      }
      -> msg
     )
     -> Sub msg
 
 
-port identitiesOutPort : Identity -> Cmd msg
+port personasOutPort : Persona -> Cmd msg
 
 
 
@@ -96,20 +96,20 @@ port identitiesOutPort : Identity -> Cmd msg
 type Model
     = Loading
         { skin : Skin
-        , creating : Maybe IdentityForm
-        , createQueue : List Identity
+        , creating : Maybe Draft
+        , createQueue : List Persona
         }
     | Loaded
         { skin : Skin
         , viewState : ViewState
-        , createQueue : List Identity
-        , identities : Dict Url Identity
+        , createQueue : List Persona
+        , personas : Dict Url Persona
         }
 
 
 type ViewState
     = Inactive
-    | Creating IdentityForm
+    | Creating Draft
     | Viewing Url
 
 
@@ -140,10 +140,10 @@ init =
 type Msg
     = Create
     | Save
-    | ReceivedIdentity Url Identity
+    | ReceivedPersona Url Persona
     | View Url
     | Cancel
-    | FormUpdated IdentityForm
+    | DraftUpdated Draft
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -157,18 +157,18 @@ update msg model =
                 ( Create, Nothing ) ->
                     ( Loading
                         { loadingModel
-                            | creating = Just blankForm
+                            | creating = Just blankDraft
                         }
                     , Cmd.none
                     )
 
-                ( Save, Just form ) ->
-                    case saveForm form of
-                        Just ( identity, cmd ) ->
+                ( Save, Just draft ) ->
+                    case saveDraft draft of
+                        Just ( persona, cmd ) ->
                             ( Loading
                                 { loadingModel
                                     | creating = Nothing
-                                    , createQueue = identity :: loadingModel.createQueue
+                                    , createQueue = persona :: loadingModel.createQueue
                                 }
                             , cmd
                             )
@@ -184,27 +184,27 @@ update msg model =
                     , Cmd.none
                     )
 
-                ( ReceivedIdentity url id, _ ) ->
+                ( ReceivedPersona url p, _ ) ->
                     ( Loaded
                         { skin = loadingModel.skin
                         , viewState =
                             case loadingModel.creating of
-                                Just form ->
-                                    Creating form
+                                Just draft ->
+                                    Creating draft
 
                                 Nothing ->
                                     Inactive
-                        , identities = Dict.singleton url id
+                        , personas = Dict.singleton url p
                         , createQueue =
-                            List.filter (\identity -> identity /= id) loadingModel.createQueue
+                            List.filter (\persona -> persona /= p) loadingModel.createQueue
                         }
                     , Cmd.none
                     )
 
-                ( FormUpdated newForm, Just _ ) ->
+                ( DraftUpdated newDraft, Just _ ) ->
                     ( Loading
                         { loadingModel
-                            | creating = Just newForm
+                            | creating = Just newDraft
                         }
                     , Cmd.none
                     )
@@ -219,8 +219,8 @@ update msg model =
             let
                 unsavedContent =
                     case loadedModel.viewState of
-                        Creating form ->
-                            form /= blankForm
+                        Creating draft ->
+                            draft /= blankDraft
 
                         _ ->
                             False
@@ -228,13 +228,13 @@ update msg model =
             case msg of
                 Save ->
                     case loadedModel.viewState of
-                        Creating form ->
-                            case saveForm form of
-                                Just ( identity, cmd ) ->
+                        Creating draft ->
+                            case saveDraft draft of
+                                Just ( persona, cmd ) ->
                                     ( Loaded
                                         { loadedModel
                                             | viewState = Inactive
-                                            , createQueue = identity :: loadedModel.createQueue
+                                            , createQueue = persona :: loadedModel.createQueue
                                         }
                                     , cmd
                                     )
@@ -272,27 +272,27 @@ update msg model =
                     else
                         ( Loaded
                             { loadedModel
-                                | viewState = Creating blankForm
+                                | viewState = Creating blankDraft
                             }
                         , Cmd.none
                         )
 
-                ReceivedIdentity url id ->
+                ReceivedPersona url p ->
                     ( Loaded
                         { loadedModel
-                            | identities = Dict.insert url id loadedModel.identities
+                            | personas = Dict.insert url p loadedModel.personas
                             , createQueue =
-                                List.filter (\identity -> identity /= id) loadedModel.createQueue
+                                List.filter (\persona -> persona /= p) loadedModel.createQueue
                         }
                     , Cmd.none
                     )
 
-                FormUpdated newForm ->
+                DraftUpdated newDraft ->
                     case loadedModel.viewState of
                         Creating _ ->
                             ( Loaded
                                 { loadedModel
-                                    | viewState = Creating newForm
+                                    | viewState = Creating newDraft
                                 }
                             , Cmd.none
                             )
@@ -301,16 +301,15 @@ update msg model =
                             ( model, Cmd.none )
 
 
-saveForm : IdentityForm -> Maybe ( Identity, Cmd Msg )
-saveForm form =
-    case Validate.validate identityValidator form of
+saveDraft : Draft -> Maybe ( Persona, Cmd Msg )
+saveDraft draft =
+    case Validate.validate personaValidator draft of
         Ok valid ->
-            -- TODO: Send create command
             let
-                identity =
-                    fromForm valid
+                persona =
+                    fromDraft valid
             in
-            Just ( identity, identitiesOutPort identity )
+            Just ( persona, personasOutPort persona )
 
         Err _ ->
             Nothing
@@ -318,7 +317,7 @@ saveForm form =
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-    identitiesInPort (\{ url, identity } -> ReceivedIdentity url identity)
+    personasInPort (\{ url, persona } -> ReceivedPersona url persona)
 
 
 
@@ -345,20 +344,20 @@ view model =
                         , spacing 20
                         ]
                         [ case creating of
-                            Just form ->
-                                createInterface skin form
+                            Just draft ->
+                                createInterface skin draft
 
                             Nothing ->
                                 createButton skin
                         , listUnsaved skin createQueue
                         , el [ Font.color skin.subtitleGray ] <|
-                            text "Loading Identities..."
+                            text "Loading Personas..."
                         ]
 
                 --
                 -- Loaded
                 --
-                Loaded { skin, viewState, identities, createQueue } ->
+                Loaded { skin, viewState, personas, createQueue } ->
                     case viewState of
                         Inactive ->
                             column
@@ -367,10 +366,10 @@ view model =
                                 ]
                                 [ createButton skin
                                 , listUnsaved skin createQueue
-                                , viewIdentities
+                                , listPersonas
                                     { skin = skin
                                     , viewedUrl = Nothing
-                                    , identities = identities
+                                    , personas = personas
                                     }
                                 ]
 
@@ -381,24 +380,24 @@ view model =
                                 ]
                                 [ createButton skin
                                 , listUnsaved skin createQueue
-                                , viewIdentities
+                                , listPersonas
                                     { skin = skin
                                     , viewedUrl = Just url
-                                    , identities = identities
+                                    , personas = personas
                                     }
                                 ]
 
-                        Creating form ->
+                        Creating draft ->
                             column
                                 [ width fill
                                 , spacing 20
                                 ]
-                                [ createInterface skin form
+                                [ createInterface skin draft
                                 , listUnsaved skin createQueue
-                                , viewIdentities
+                                , listPersonas
                                     { skin = skin
                                     , viewedUrl = Nothing
-                                    , identities = identities
+                                    , personas = personas
                                     }
                                 ]
 
@@ -423,11 +422,11 @@ createButton skin =
         }
 
 
-createInterface : Skin -> IdentityForm -> Element Msg
-createInterface skin form =
+createInterface : Skin -> Draft -> Element Msg
+createInterface skin draft =
     let
         validated =
-            Validate.validate identityValidator form
+            Validate.validate personaValidator draft
 
         ( isValid, errors ) =
             case validated of
@@ -448,8 +447,8 @@ createInterface skin form =
                 [ Input.text
                     [ centerY
                     ]
-                    { onChange = \str -> FormUpdated { form | displayName = str }
-                    , text = form.displayName
+                    { onChange = \str -> DraftUpdated { draft | displayName = str }
+                    , text = draft.displayName
                     , placeholder = Just (Input.placeholder [] <| text "Display Name")
                     , label =
                         Input.labelAbove
@@ -475,13 +474,13 @@ createInterface skin form =
                     |> Maybe.withDefault none
                 ]
         , sections =
-            [ identityForm form
+            [ personaForm draft
             , row
                 [ spacing 10
                 , width fill
                 ]
                 [ mainButton
-                    { disabled = not isValid || form == blankForm
+                    { disabled = not isValid || draft == blankDraft
                     , onClick = Save
                     , text = "Save"
                     }
@@ -495,21 +494,21 @@ createInterface skin form =
         }
 
 
-identityForm : IdentityForm -> Element Msg
-identityForm form =
+personaForm : Draft -> Element Msg
+personaForm draft =
     column
         [ spacing 10
         , width fill
         ]
         [ Input.text []
-            { onChange = \str -> FormUpdated { form | website = str }
-            , text = form.website
+            { onChange = \str -> DraftUpdated { draft | website = str }
+            , text = draft.website
             , placeholder = Nothing
             , label = Input.labelAbove [] (text "Website")
             }
         , Input.multiline []
-            { onChange = \str -> FormUpdated { form | aboutMe = str }
-            , text = form.aboutMe
+            { onChange = \str -> DraftUpdated { draft | aboutMe = str }
+            , text = draft.aboutMe
             , placeholder = Nothing
             , label = Input.labelAbove [] (text "About Me")
             , spellcheck = True
@@ -517,7 +516,7 @@ identityForm form =
         ]
 
 
-listUnsaved : Skin -> List Identity -> Element Msg
+listUnsaved : Skin -> List Persona -> Element Msg
 listUnsaved skin unsaved =
     if List.isEmpty unsaved then
         none
@@ -535,13 +534,13 @@ listUnsaved skin unsaved =
                 unsaved
 
 
-viewIdentities :
+listPersonas :
     { skin : Skin
     , viewedUrl : Maybe Url
-    , identities : Dict Url Identity
+    , personas : Dict Url Persona
     }
     -> Element Msg
-viewIdentities { skin, viewedUrl, identities } =
+listPersonas { skin, viewedUrl, personas } =
     column
         [ spacing 20
         , width fill
@@ -557,20 +556,20 @@ viewIdentities { skin, viewedUrl, identities } =
                         always False
         in
         Dict.map
-            (\url id ->
-                viewIdentity
+            (\url persona ->
+                viewPersona
                     { skin = skin
                     , open = open url
                     , url = url
-                    , identity = id
+                    , persona = persona
                     }
             )
-            identities
+            personas
             |> Dict.values
 
 
-viewUnsaved : Skin -> Identity -> Element Msg
-viewUnsaved skin identity =
+viewUnsaved : Skin -> Persona -> Element Msg
+viewUnsaved skin persona =
     card
         [ width fill
 
@@ -608,20 +607,20 @@ viewUnsaved skin identity =
                     , Font.size 18
                     ]
                   <|
-                    text identity.displayName
+                    text persona.displayName
                 ]
         , sections = []
         }
 
 
-viewIdentity :
+viewPersona :
     { skin : Skin
     , open : Bool
     , url : Url
-    , identity : Identity
+    , persona : Persona
     }
     -> Element Msg
-viewIdentity { skin, open, url, identity } =
+viewPersona { skin, open, url, persona } =
     card
         [ width fill
         , Events.onClick
@@ -646,7 +645,7 @@ viewIdentity { skin, open, url, identity } =
                 , column
                     [ centerY ]
                     [ el [ Font.size 18 ] <|
-                        text identity.displayName
+                        text persona.displayName
                     ]
                 ]
         , sections =
@@ -659,7 +658,7 @@ viewIdentity { skin, open, url, identity } =
                                 , value = website
                                 }
                         )
-                        identity.website
+                        persona.website
                     , Maybe.map
                         (\aboutMe ->
                             Block
@@ -667,7 +666,7 @@ viewIdentity { skin, open, url, identity } =
                                 , value = aboutMe
                                 }
                         )
-                        identity.aboutMe
+                        persona.aboutMe
                     ]
                 ]
 

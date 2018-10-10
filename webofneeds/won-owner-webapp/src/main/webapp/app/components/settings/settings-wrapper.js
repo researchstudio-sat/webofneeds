@@ -1,5 +1,5 @@
 import angular from "angular";
-import { Elm } from "../../../elm/Settings/Identities.elm";
+import { Elm } from "../../../elm/Settings/Personas.elm";
 import Identicon from "identicon.js";
 import "@webcomponents/custom-elements";
 import { generateRgbColorArray } from "../../utils.js";
@@ -110,45 +110,45 @@ function genComponentConf($ngRedux) {
   return {
     restrict: "E",
     link: (scope, element) => {
-      const elmApp = Elm.Settings.Identities.init({ node: element[0] });
-      elmApp.ports.identitiesOutPort.subscribe(identity => {
-        $ngRedux.dispatch(actionCreators.identities__create(identity));
+      const elmApp = Elm.Settings.Personas.init({ node: element[0] });
+      elmApp.ports.personasOutPort.subscribe(persona => {
+        $ngRedux.dispatch(actionCreators.personas__create(persona));
       });
 
-      const identities = $ngRedux.getState().get("identitites");
-      if (identities) {
-        for (const [url, identity] of identities.entries()) {
-          elmApp.ports.identitiesInPort.send({
+      const personas = $ngRedux.getState().get("personas");
+      if (personas) {
+        for (const [url, persona] of personas.entries()) {
+          elmApp.ports.personasInPort.send({
             url: url,
-            identity: {
-              displayName: identity.displayName,
-              aboutMe: identity.aboutMe || null,
-              website: identity.website || null,
+            persona: {
+              displayName: persona.displayName,
+              aboutMe: persona.aboutMe || null,
+              website: persona.website || null,
             },
           });
         }
       }
 
       const disconnect = $ngRedux.connect(state => {
-        return { identities: state.get("identities") };
+        return { personas: state.get("personas") };
       })(state => {
-        if (!state.identities) {
+        if (!state.personas) {
           return;
         }
-        for (const [url, identity] of state.identities.entries()) {
-          elmApp.ports.identitiesInPort.send({
+        for (const [url, persona] of state.personas.entries()) {
+          elmApp.ports.personasInPort.send({
             url: url,
-            identity: {
-              displayName: identity.displayName,
-              aboutMe: identity.aboutMe || null,
-              website: identity.website || null,
+            persona: {
+              displayName: persona.displayName,
+              aboutMe: persona.aboutMe || null,
+              website: persona.website || null,
             },
           });
         }
       });
 
       scope.$on("$destroy", () => {
-        elmApp.ports.identitiesOutPort.unsubscribe();
+        elmApp.ports.personasOutPort.unsubscribe();
         disconnect();
       });
     },
