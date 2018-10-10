@@ -23,6 +23,13 @@ function genComponentConf() {
       <div class="msg__header" ng-if="!self.isConnectionMessage && !self.hasNotBeenLoaded">
           <div class="msg__header__type">{{ self.getHeaderLabel() }}</div>
       </div>
+      <div class="msg__header msg__header--forwarded-from" ng-if="self.isConnectionMessage && self.originatorUri && !self.hasNotBeenLoaded">
+          <div class="msg__header__type">Forwarded from:</div>
+          <won-square-image
+            class="msg__header__originator"
+            uri="self.originatorUri">
+          </won-square-image>
+      </div>
       <div class="msg__header msg__header--inject-into" ng-if="self.isConnectionMessage && self.isInjectIntoMessage && !self.hasNotBeenLoaded">
           <div class="msg__header__type">Forward to:</div>
           <won-square-image
@@ -32,13 +39,6 @@ function genComponentConf() {
             title="self.getInjectIntoNeedTitle(connUri)"
             uri="self.getInjectIntoNeedUri(connUri)"
             ng-click="!self.multiSelectType && self.isInjectIntoConnectionPresent(connUri) && self.router__stateGoCurrent({connectionUri: connUri})">
-          </won-square-image>
-      </div>
-      <div class="msg__header msg__header--forwarded-from" ng-if="self.isConnectionMessage && self.originatorUri && !self.hasNotBeenLoaded">
-          <div class="msg__header__type">Forwarded from:</div>
-          <won-square-image
-            class="msg__header__originator"
-            uri="self.originatorUri">
           </won-square-image>
       </div>
       <won-message-content
