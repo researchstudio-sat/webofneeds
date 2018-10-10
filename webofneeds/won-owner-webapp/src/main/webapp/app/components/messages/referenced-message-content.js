@@ -97,10 +97,7 @@ function genComponentConf() {
           <won-combined-message-content
             ng-click="self.loadMessage(msgUri)"
             ng-repeat="msgUri in self.forwardUrisArray"
-            ng-class="{
-              'won-cm--left' : self.getReferencedMessage(msgUri) && !self.getReferencedMessage(msgUri).get('outgoingMessage'),
-              'won-cm--right' : self.getReferencedMessage(msgUri) && self.getReferencedMessage(msgUri).get('outgoingMessage'),
-            }"
+            class="won-cm--forward"
             message-uri="self.getReferencedMessage(msgUri).get('uri')"
             connection-uri="self.connection.get('uri')">
           </won-combined-message-content>
