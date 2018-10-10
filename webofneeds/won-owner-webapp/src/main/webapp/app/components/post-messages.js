@@ -212,7 +212,10 @@ function genComponentConf() {
 
         const theirNeedUri = connection && connection.get("remoteNeedUri");
         const theirNeed = theirNeedUri && state.getIn(["needs", theirNeedUri]);
-        const chatMessages = connection && connection.get("messages");
+        const chatMessages =
+          connection &&
+          connection.get("messages") &&
+          connection.get("messages").filter(msg => !msg.get("forwardMessage"));
         const allMessagesLoaded =
           chatMessages &&
           chatMessages.filter(
