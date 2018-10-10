@@ -17,6 +17,8 @@ import { Parser as SparqlParser } from "sparqljs";
  * @param {Object} prefixes key-value pairs of prefix and full URL
  * @param {String} selectDistinct the variable to select
  * @param {Array<String>} where any operations to add to the `WHERE`-block
+ * @param {Array<Object>} subQueries array of sparql-query objects. will be placed
+ *   in `where`-block and their prefixes lifted to the overall-queries prefix block.
  * @param {*} orderBy Array of objects like `{order: "ASC", variable: "?geoDistance"}`
  */
 export function sparqlQuery({
@@ -26,7 +28,10 @@ export function sparqlQuery({
   where,
   orderBy,
   groupBy,
+  subQueries,
 }) {
+  // ---------- prepare query string ----------
+
   const distinctStr = distinct ? "DISTINCT" : "";
 
   let orderByStr = "";
@@ -46,10 +51,39 @@ export function sparqlQuery({
 ${prefixesString(prefixes)}
 SELECT ${distinctStr} ${variables.join(" ")}
 WHERE {
-  ${where ? where.join(" ") : ""}
+  ${where ? where.join("\n") : ""}
 } ${orderByStr} ${groupByStr}`;
 
-  return new SparqlParser().parse(queryTemplate);
+  // ---------- parse root-query ----------
+
+  const queryAST = new SparqlParser().parse(queryTemplate);
+
+  // ---------- if there are sub-queries, add their ASTs and prefixes ----------
+
+  if (subQueries && is("Array", subQueries)) {
+    subQueries.forEach(q => addSubQuery(queryAST, q));
+  }
+
+  // ---------- return AST ----------
+
+  return queryAST;
+}
+
+function addSubQuery(queryAST, subQuery) {
+  // add prefixes
+  Object.assign(queryAST.prefixes, subQuery.prefixes);
+
+  // inject sub-query (without the lifted prefixes) into where-block
+  queryAST.where.push({
+    type: "group",
+    patterns: [
+      {
+        ...subQuery,
+        prefixes: undefined, // overwrites any `prefixes` that might come from `subQuery`
+      },
+    ],
+  });
+  return queryAST;
 }
 
 /**

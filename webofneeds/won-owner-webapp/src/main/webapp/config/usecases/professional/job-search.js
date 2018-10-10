@@ -96,13 +96,13 @@ export const jobSearch = {
         `bind(if(str(${sparqlVarName}) = "${tagLike}",1,0) as ?var${idx})` // TODO prefix/suffix variable to make it unique
     );
 
-    const innerQuery = sparqlQuery({
+    const subQuery = sparqlQuery({
       prefixes: {
         s: won.defaultContext["s"], // TODO needs to be moved to outermost query
         won: won.defaultContext["won"],
       },
+      //  ?result (sum(?var1) + sum(?var2) as ?targetOverlap) (count(${resultName}) as ?targetTotal) {
       variables: [resultName, targetOverlapSelect, targetTotalSelect],
-      //  ${resultName} (sum(?var1) + sum(?var2) as ?targetOverlap) (count(${resultName}) as ?targetTotal) {
       where: [
         `${resultName} a won:Need .`,
         `${resultName} ${sparqlPredicatePath} ${sparqlVarName} .`,
@@ -111,44 +111,25 @@ export const jobSearch = {
       groupBy: resultName,
     });
 
-    // const query = sparqlQuery({
-    //   prefixes: { /* get prefixes from inner query */}
-    // })
-    /*
-   *
-   * e.g.: with just industries:
-   * ```
-   * # index for industries using binds
-   * prefix s: <http://schema.org/>
-   * prefix won:   <http://purl.org/webofneeds/model#>
-   * select distinct * where {
-   *   {
-   *     select
-   *       ?needUri 
-   *       (sum(?var1) + sum(?var2) as ?targetOverlap)
-   *       (count(?needUri as ?targetTotal)
-   *     where {
-   *       needUria won:Need;
-   *             won:is ?is.
-   *             ?is s:industry ?industry .
-   *       bind(if(str(?industry) = "design",1,0) as ?var1)
-   *       bind(if(str(?industry) = "computer science",1,0) as ?var2)
-   *     } group by (?needUri)
-   *   }
-   *   bind (?targetOverlap / ( ?targetTotal + 2 - ?targetOverlap ) as ?jaccardIndex )
-   * } order by desc(?jaccardIndex)
-   * limit 100
-   * ```
-   */
+    const query = sparqlQuery({
+      prefixes: {},
+      variables: [resultName],
+      distinct: true,
+      where: [
+        `bind (?targetOverlap / ( ?targetTotal + ${
+          tagLikes.length
+        } - ?targetOverlap ) as ?jaccardIndex )`,
+      ],
+      subQueries: [subQuery],
+      orderBy: {
+        order: "DESC",
+        variable: "?jaccardIndex",
+      },
+    });
 
-    console.log(
-      draft,
-      resultName,
-      innerQuery,
-      innerQuery.prefixes,
-      tagLikes,
-      "deleteme"
-    );
+    console.log(draft, resultName, subQuery, tagLikes, query, "deleteme");
+
+    return query;
     //
     //
     //
