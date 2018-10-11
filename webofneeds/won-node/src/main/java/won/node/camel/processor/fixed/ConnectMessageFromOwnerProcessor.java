@@ -76,7 +76,7 @@ public class ConnectMessageFromOwnerProcessor extends AbstractFromOwnerCamelProc
         
         Facet actualFacet = dataService.getFacet(senderNeedURI, userDefinedFacetURI);
         Optional<URI> actualFacetURI = Optional.of(actualFacet.getFacetURI());
-        Optional<URI> actualRemoteFacetURI = Optional.of(userDefinedRemoteFacetURI.orElse(lookupDefaultFacet(senderNeedURI)));
+        Optional<URI> actualRemoteFacetURI = Optional.of(userDefinedRemoteFacetURI.orElse(lookupDefaultFacet(receiverNeedURI)));
             
         con = connectionRepository.findOneByNeedURIAndRemoteNeedURIAndFacetURIAndRemoteFacetURIForUpdate(senderNeedURI, receiverNeedURI, actualFacetURI.get(), actualRemoteFacetURI.get());
         if (con.isPresent()) {
