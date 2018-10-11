@@ -7,6 +7,12 @@ import {
 import { isUriRead } from "../../won-localstorage.js";
 import { getAllDetails } from "../../won-utils.js";
 
+/*
+  "alreadyProcessed" flag sets the sentOwn/Remote flags to true
+   "forwardMessage" flag is used to set an originatorUri (uri of the need that the forwardedMessage was sent from)
+   and a flag to indicate that the message should not be displayed in the chat as it is used purely used for reference
+   purposes
+*/
 export function parseMessage(
   wonMessage,
   alreadyProcessed = false,
