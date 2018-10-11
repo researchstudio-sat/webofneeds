@@ -1,5 +1,6 @@
 package won.owner.web.rest;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import won.owner.model.User;
 import won.owner.model.UserNeed;
-import won.owner.pojo.ConnectAction;
 import won.owner.pojo.FacetToConnect;
 import won.owner.repository.UserNeedRepository;
 import won.owner.service.impl.UserService;
@@ -39,7 +39,7 @@ public class ServerSideActionController {
             value = "/connect",
             method = RequestMethod.POST
     )
-    public ResponseEntity connectFacets(@RequestBody(required = true) ConnectAction connectAction) {
+    public ResponseEntity connectFacets(@RequestBody(required = true) FacetToConnect[] connectAction) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         // cannot use user object from context since hw doesn't know about created in this session need,
         // therefore, we have to retrieve the user object from the user repository
@@ -47,7 +47,7 @@ public class ServerSideActionController {
         if (user == null) {
             return new ResponseEntity("Cannot process connect action: not logged in.", HttpStatus.FORBIDDEN);
         }
-        List<FacetToConnect> facets = connectAction.getFacets();
+        List<FacetToConnect> facets = Arrays.asList(connectAction);
         if (facets == null || facets.isEmpty()) {
             return new ResponseEntity("Cannot process connect action: no facets specified to be connected.", HttpStatus.CONFLICT);
         }
