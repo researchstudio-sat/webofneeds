@@ -1,16 +1,13 @@
 import angular from "angular";
-import { Elm } from "../../../elm/Settings/Personas.elm";
-import { actionCreators } from "../../actions/actions";
-import "../identicon.js";
+import { Elm } from "../../elm/PublishButton.elm";
+import "./svg-icon.js";
 
 function genComponentConf($ngRedux) {
   return {
     restrict: "E",
     link: (scope, element) => {
-      const elmApp = Elm.Settings.Personas.init({ node: element[0] });
-      elmApp.ports.personaOut.subscribe(persona => {
-        $ngRedux.dispatch(actionCreators.personas__create(persona));
-      });
+      const elmApp = Elm.PublishButton.init({ node: element[0] });
+
       const convertPersonas = personas => {
         const conversion = personas
           .entrySeq()
@@ -23,6 +20,7 @@ function genComponentConf($ngRedux) {
           .toJS();
         return conversion;
       };
+
       const personas = $ngRedux.getState().get("personas");
       if (personas) {
         elmApp.ports.personaIn.send(convertPersonas(personas));
@@ -38,7 +36,6 @@ function genComponentConf($ngRedux) {
       });
 
       scope.$on("$destroy", () => {
-        elmApp.ports.personaOut.unsubscribe();
         disconnect();
       });
     },
@@ -47,5 +44,5 @@ function genComponentConf($ngRedux) {
 
 genComponentConf.$inject = ["$ngRedux"];
 export default angular
-  .module("won.owner.components.settingsWrapper", [])
-  .directive("wonSettingsWrapper", genComponentConf).name;
+  .module("won.owner.components.publishButton", [])
+  .directive("wonPublishButton", genComponentConf).name;
