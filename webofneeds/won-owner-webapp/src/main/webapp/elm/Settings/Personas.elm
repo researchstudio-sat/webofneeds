@@ -8,6 +8,7 @@ import Element.Border as Border
 import Element.Events as Events
 import Element.Font as Font
 import Element.Input as Input
+import Elements
 import Html exposing (Html, node)
 import Html.Attributes as HA
 import Json.Decode as Decode
@@ -317,7 +318,7 @@ saveDraft draft =
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-    Persona.subscription ReceivedPersonas (\err -> Debug.log (Decode.errorToString err) NoOp)
+    Persona.subscription ReceivedPersonas (\_ -> NoOp)
 
 
 
@@ -482,12 +483,12 @@ createInterface skin draft =
                 [ spacing 10
                 , width fill
                 ]
-                [ mainButton
+                [ Elements.mainButton
                     { disabled = not isValid || draft == blankDraft
                     , onClick = Save
                     , text = "Save"
                     }
-                , outlinedButton
+                , Elements.outlinedButton
                     { disabled = False
                     , onClick = Cancel
                     , text = "Cancel"
@@ -669,7 +670,7 @@ viewPersona { skin, open, url, data } =
                 [ spacing 15
                 , width fill
                 ]
-                [ identicon
+                [ Elements.identicon
                     [ width (px 50)
                     , height (px 50)
                     ]
@@ -794,53 +795,3 @@ card attributes { skin, header, sections } =
                 )
                 sections
         )
-
-
-type alias ButtonConfig msg =
-    { disabled : Bool
-    , text : String
-    , onClick : msg
-    }
-
-
-mainButton : ButtonConfig msg -> Element msg
-mainButton { disabled, text, onClick } =
-    el [ Events.onClick onClick ] <|
-        html <|
-            Html.button
-                [ HA.classList
-                    [ ( "won-button--filled", True )
-                    , ( "red", True )
-                    ]
-                , HA.disabled disabled
-                ]
-                [ Html.text text ]
-
-
-outlinedButton : ButtonConfig msg -> Element msg
-outlinedButton { disabled, text, onClick } =
-    el [ Events.onClick onClick ] <|
-        html <|
-            Html.button
-                [ HA.classList
-                    [ ( "won-button--outlined", True )
-                    , ( "thin", True )
-                    , ( "red", True )
-                    ]
-                , HA.disabled disabled
-                ]
-                [ Html.text text ]
-
-
-identicon : List (Attribute msg) -> String -> Element msg
-identicon attributes string =
-    el
-        attributes
-    <|
-        html <|
-            node "won-identicon"
-                [ HA.attribute "data" string
-                , HA.style "width" "100%"
-                , HA.style "height" "100%"
-                ]
-                []
