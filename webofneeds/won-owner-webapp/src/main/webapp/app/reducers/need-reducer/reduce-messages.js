@@ -6,6 +6,9 @@ import { getCorrectMessageUri } from "../../selectors.js";
 /*
  "alreadyProcessed" flag, which indicates that we do not care about the
  sent status anymore and assume that it has been successfully sent to each server (incl. the remote)
+ "insertIntoConnUri" and "insertIntoNeedUri" are used for forwardedMessages so that the message is
+ stored within the given connection/need and not in the original need or connection as we might not
+ have these stored in the state
  */
 export function addMessage(
   state,
@@ -59,24 +62,12 @@ export function addMessage(
             true
           );
         }
-      } else {
-        console.log(
-          "needUri was already set by method call as seen the params: insertIntoConnUri: ",
-          insertIntoConnUri,
-          "insertIntoNeedUri: ",
-          insertIntoNeedUri
-        );
       }
 
       if (needUri) {
         if (wonMessage.hasContainedForwardedWonMessages()) {
           const containedForwardedWonMessages = wonMessage.getContainedForwardedWonMessages();
-          console.log(
-            "containedForwardedWonMessages: ",
-            containedForwardedWonMessages
-          );
           containedForwardedWonMessages.map(forwardedWonMessage => {
-            console.log("forwardedWonMessage: ", forwardedWonMessage);
             state = addMessage(
               state,
               forwardedWonMessage,
