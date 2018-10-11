@@ -66,6 +66,15 @@ public class GetAgreementsTests {
 		test(input, expectedOutput);
 	}
 
+	// This is the case where there is one claim that gets accepted. The output should be an agreement.
+	@Test
+	public void oneAcceptedClaimTest() throws IOException {
+		Dataset input = loadDataset(inputFolder + "one-accepted-claim.trig");
+		Dataset expectedOutput = loadDataset(expectedOutputFolder + "one-accepted-claim.trig");
+		test(input, expectedOutput);
+	}
+
+	
 	// This the case where there is one agreement that is cancelled. That is one
 	// proposal and one accept making one agreement, and one proposeToCancel and one
 	// accept making an
@@ -409,6 +418,15 @@ public class GetAgreementsTests {
 				expectedOutputFolder + "one-proposal-rejected-before-accept.trig");
 		test(input, expectedOutput);
 	}
+	
+	@Test
+	public void oneClaimRejectedBeforeAccept() throws IOException {
+		Dataset input = loadDataset(inputFolder + "one-claim-rejected-before-accept.trig");
+		Dataset expectedOutput = loadDataset(
+				expectedOutputFolder + "one-claim-rejected-before-accept.trig");
+		test(input, expectedOutput);
+	}
+
 	
 	private static boolean passesTest(Dataset input, Dataset expectedOutput) {
 		Dataset actual = HighlevelFunctionFactory.getAgreementFunction().apply(input);
