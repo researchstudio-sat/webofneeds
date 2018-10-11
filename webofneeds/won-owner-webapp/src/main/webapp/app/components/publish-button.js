@@ -5,8 +5,16 @@ import "./svg-icon.js";
 function genComponentConf($ngRedux) {
   return {
     restrict: "E",
+    scope: {
+      isValid: "=",
+      onPublish: "&",
+    },
     link: (scope, element) => {
       const elmApp = Elm.PublishButton.init({ node: element[0] });
+
+      scope.$watch("isValid", newValue => {
+        elmApp.ports.publishIn.send(newValue ? true : false);
+      });
 
       const convertPersonas = personas => {
         const conversion = personas
@@ -20,6 +28,8 @@ function genComponentConf($ngRedux) {
           .toJS();
         return conversion;
       };
+
+      elmApp.ports.publishIn.send(scope.isValid ? true : false);
 
       const personas = $ngRedux.getState().get("personas");
       if (personas) {
@@ -35,8 +45,13 @@ function genComponentConf($ngRedux) {
         elmApp.ports.personaIn.send(convertPersonas(state.personas));
       });
 
+      elmApp.ports.publishOut.subscribe(url => {
+        scope.onPublish({ persona: url });
+      });
+
       scope.$on("$destroy", () => {
         disconnect();
+        elmApp.ports.publishOut.unsubscribe();
       });
     },
   };

@@ -238,9 +238,12 @@ import { Generator } from "sparqljs";
         "@type": "won:Need",
         "won:is": isContentUri ? { "@id": isContentUri } : undefined,
         "won:seeks": seeksContentUri ? { "@id": seeksContentUri } : undefined,
-        "won:hasFacet": args.facet
-          ? args.facet
-          : { "@id": "#chatFacet", "@type": "won:ChatFacet" },
+        "won:hasFacet": [
+          args.facet
+            ? args.facet
+            : { "@id": "#chatFacet", "@type": "won:ChatFacet" },
+          { "@id": "#holdableFacet", "@type": "won:HoldableFacet" },
+        ],
         "won:hasFlag": new Set([
           won.debugmode ? "won:UsedForTesting" : undefined,
 
