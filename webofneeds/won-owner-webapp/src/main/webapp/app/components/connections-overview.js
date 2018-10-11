@@ -228,8 +228,8 @@ function genComponentConf() {
         const needUriImpliedInRoute =
           needImpliedInRoute && needImpliedInRoute.get("uri");
 
-        const sortedOpenNeeds = sortByDate(openNeeds);
-        const sortedClosedNeeds = sortByDate(closedNeeds);
+        const sortedOpenNeeds = sortByDate(openNeeds, "creationDate");
+        const sortedClosedNeeds = sortByDate(closedNeeds, "creationDate");
 
         const unloadedNeeds = closedNeeds.filter(need => need.get("toLoad"));
 
@@ -400,7 +400,8 @@ function genComponentConf() {
           return (
             remoteNeedActiveOrLoading && conn.get("state") !== won.WON.Closed
           );
-        })
+        }),
+        "creationDate"
       );
     }
   }
