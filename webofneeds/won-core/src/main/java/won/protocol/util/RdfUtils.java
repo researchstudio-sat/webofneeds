@@ -357,6 +357,10 @@ public class RdfUtils {
 	 * @param baseURI
 	 */
 	public static void replaceBaseURI(final Model model, final String baseURI) {
+        replaceBaseURI(model, baseURI, false);
+    }
+
+    public static void replaceBaseURI(final Model model, final String baseURI, boolean renamePrefixedURIs) {
 		// we assume that the RDF content is self-referential, i.e., it 'talks about
 		// itself': the graph is connected to
 		// the public resource URI which, when de-referenced, returns that graph. So,
@@ -372,8 +376,12 @@ public class RdfUtils {
 		// null relative uris to refer to the newly set prefix.
 		// - If there is one, fetch it as a resource and 'rename' it (i.e., replace all
 		// statements with exchanged name)
-		if (model.getNsPrefixURI("") != null) {
-			ResourceUtils.renameResource(model.getResource(model.getNsPrefixURI("")), baseURI);
+        Resource oldBase = model.getResource(model.getNsPrefixURI(""));
+		if (oldBase != null) {
+            if (renamePrefixedURIs){
+                renameResourceWithPrefix(model,oldBase.toString(), baseURI );
+            }
+			ResourceUtils.renameResource(oldBase, baseURI);
 		}
 		// whatever the base uri (default URI prefix) was, set it to the need URI.
 		model.setNsPrefix("", baseURI);
@@ -392,14 +400,23 @@ public class RdfUtils {
 	 * Renames all URI resources in the model that start with the specified prefix by replacing it with replacement. 
 	 */
 	public static void renameResourceWithPrefix(Model model, String prefix, String replacement) {
-	    listURIResources(model)
-	        .filter(r -> 
-	            r.getURI().startsWith(prefix))
+	    /*listURIResources(model)
+	        .filter(r -> {
+                System.out.println("Filter, prefix: " + prefix + "replacement: " + replacement);
+                return r.getURI().startsWith(prefix);
+            })
 	        .map(r -> ResourceUtils
-	                    .renameResource(r, r.getURI().replaceFirst(prefix, replacement)));
+                    .renameResource(r, r.getURI().replaceFirst(prefix, replacement)));
+        */
+        Set<Resource> uriResources = listUriResources(model);
+        for(Resource r : uriResources) {
+            if(r.getURI().startsWith(prefix)) {
+                ResourceUtils.renameResource(r, r.getURI().replaceFirst(prefix, replacement));
+            }
+        }
 	}
 	
-	public static Stream<Resource> listURIResources(Model model) {
+	/*public static Stream<Resource> listURIResources(Model model) {
 	    Set<Resource> uriResources = new HashSet();
         StmtIterator it = model.listStatements();
         while(it.hasNext()) {
@@ -414,14 +431,35 @@ public class RdfUtils {
             }
         }
         return uriResources.stream();
-	}
+	}*/
+
+    public static Set<Resource> listUriResources(Model model) {
+        Set<Resource> uriResources = new HashSet<>();
+        StmtIterator it = model.listStatements();
+        while(it.hasNext()) {
+            Statement s = it.next();
+            Resource subject = s.getSubject();
+            RDFNode object = s.getObject();
+            if (subject.isURIResource()) {
+                uriResources.add(subject);
+            }
+            if (object.isURIResource()) {
+                uriResources.add(object.asResource());
+            }
+        }
+        return uriResources;
+    }
 
 	public static void replaceBaseURI(final Dataset dataset, final String baseURI) {
-		visit(dataset, model -> {
-			replaceBaseURI(model, baseURI);
-			return null;
-		});
+		replaceBaseURI(dataset, baseURI, false);
 	}
+
+    public static void replaceBaseURI(final Dataset dataset, final String baseURI, boolean renamePrefixedURIs) {
+        visit(dataset, model -> {
+            replaceBaseURI(model, baseURI, renamePrefixedURIs);
+            return null;
+        });
+    }
 
 	/**
 	 * Replaces the base URI that's set as the model's default URI prfefix in all
@@ -432,19 +470,31 @@ public class RdfUtils {
 	 * @param replacement
 	 */
 	public static void replaceBaseResource(final Model model, final Resource replacement) {
+        replaceBaseResource(model, replacement, false);
+    }
+
+    public static void replaceBaseResource(final Model model, final Resource replacement, boolean renamePrefixedURIs) {
 		String baseURI = model.getNsPrefixURI("");
 		if (baseURI == null)
 			return;
 		Resource baseUriResource = model.getResource(baseURI);
-		replaceResourceInModel(baseUriResource, replacement);
+        if (renamePrefixedURIs){
+            renameResourceWithPrefix(model, baseUriResource.getURI(), replacement.getURI());
+        } else {
+            replaceResourceInModel(baseUriResource, replacement);
+        }
 		model.setNsPrefix("", replacement.getURI());
 	}
 
 	public static void replaceBaseResource(Dataset dataset, final Resource replacement) {
+        replaceBaseResource(dataset, replacement, false);
+    }
+
+    public static void replaceBaseResource(Dataset dataset, final Resource replacement, boolean renamePrefixedURIs) {
 		visit(dataset, new ModelVisitor<Object>() {
 			@Override
 			public Object visit(Model model) {
-				replaceBaseResource(model, replacement);
+				replaceBaseResource(model, replacement, renamePrefixedURIs);
 				return null;
 			}
 		});
