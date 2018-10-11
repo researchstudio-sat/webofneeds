@@ -879,29 +879,6 @@ won.wonMessageFromJsonLd = async function(wonMessageAsJsonLD) {
   return wonMessage;
 };
 
-/*traverseMessageStructure: async function(rawMessage,structure){
-  const uris = [];
-  if (structure.containedContent) {
-    uris.concat(structure.containedContent);
-  }
-  if (!structure.containsEnvelopes) {
-    return {uris : uris};
-  } else {
-    structure.containsEnvelopes.forEach(env => {
-      const sub = traverseMessageStructure(rawMessage, env);
-      if (sub.uris) {
-        sub.concat(uris);
-      }
-    });
-    if (structure.messageDirection === "http://purl.org/webofneeds/message#FromExternal") {
-      const subRawMessage = rawMessage.filter(graph => uris.includes(graph['@id']));
-      const messages = sub.messages || [];
-      return {
-        uris,
-        messages: messages.push(won.wonMessageFromJsonLd(subRawMessage));
-    }
-  }
-}*/
 /**
  * Serializes the jsonldData into trig.
  *
@@ -1145,7 +1122,7 @@ WonMessage.prototype = {
   },
   generateContainedForwardedWonMessages: async function() {
     const forwardedMessageUris = this.getForwardedMessageUris();
-    if (forwardedMessageUris) {
+    if (forwardedMessageUris && forwardedMessageUris.length == 1) {
       //TODO: RECURSIVELY CREATE wonMessageObjects from all the forwarded Messages within this message
       //const forwardedMessages = wonMessage.compactFramedMessage["msg:hasForwardedMessage"];
       const encapsulatingMessageUri = this.messageStructure.messageUri;
@@ -1153,7 +1130,7 @@ WonMessage.prototype = {
         elem => !elem["@id"].startsWith(encapsulatingMessageUri)
       );
 
-      console.log(
+      /*console.log(
         "WonMessage\n",
         this,
         "\nforwardedMessageUris:\n",
@@ -1162,18 +1139,20 @@ WonMessage.prototype = {
         encapsulatingMessageUri,
         "\nrawMessageWithouthEncapsulatingUri\n",
         rawMessageWithoutEncapsulatingUri
-      );
+      );*/
 
       const fwdMessage = await won.wonMessageFromJsonLd(
         rawMessageWithoutEncapsulatingUri
       );
       this.containedForwardedWonMessages.push(fwdMessage);
 
-      /*forwardedMessageUris.map(fwdMessageUri => {
-        console.log("fwdMessageUri: ", fwdMessageUri);
-        //TODO: WORK WITH MULTIPLE FORWARDS IN MESSAGE
-      });*/
-      return Promise.resolve(this.containedForwardedWonMessages); //TODO: RESOLVE THE CORRECT PROMISE
+      return Promise.resolve(this.containedForwardedWonMessages);
+    } else if (forwardedMessageUris) {
+      console.warn(
+        "WonMessage contains more than one forwardedMessage on the same level: omitting forwardMessages, wonMessage:",
+        this
+      );
+      return Promise.resolve(this.containedForwardedWonMessages);
     } else {
       return Promise.resolve(this.containedForwardedWonMessages);
     }
