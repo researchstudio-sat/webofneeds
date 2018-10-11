@@ -68,9 +68,9 @@ public class ExecuteCreateNeedCommandAction extends BaseEventBotAction {
         Resource needResource = WonRdfUtils.NeedUtils.getNeedResource(needDataset);
         if (needResource.isURIResource()) {
             needUriFromProducer = URI.create(needResource.getURI().toString());
-            RdfUtils.replaceBaseURI(needDataset, needResource.getURI());
+            RdfUtils.replaceBaseURI(needDataset, needResource.getURI(), true);
         } else {
-            RdfUtils.replaceBaseResource(needDataset, needResource);
+            RdfUtils.replaceBaseResource(needDataset, needResource, true);
         }
 
         final URI needUriBeforeCreation = needUriFromProducer;
@@ -125,7 +125,7 @@ public class ExecuteCreateNeedCommandAction extends BaseEventBotAction {
             WonNodeInformationService wonNodeInformationService, URI needURI, URI wonNodeURI, Dataset needDataset,
             final boolean usedForTesting, final boolean doNotMatch) throws WonMessageBuilderException {
 
-        RdfUtils.replaceBaseURI(needDataset, needURI.toString());
+        RdfUtils.replaceBaseURI(needDataset, needURI.toString(), true);
 
         NeedModelWrapper needModelWrapper = new NeedModelWrapper(needDataset);
 

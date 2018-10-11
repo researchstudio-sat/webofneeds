@@ -103,7 +103,7 @@ public abstract class AbstractCreateNeedAction extends BaseEventBotAction {
       needModelWrapper.addFlag( WON.USED_FOR_TESTING);
     }
 
-        RdfUtils.replaceBaseURI(needDataset, needURI.toString());
+        RdfUtils.replaceBaseURI(needDataset, needURI.toString(), true);
 
         return WonMessageBuilder.setMessagePropertiesForCreate(
             wonNodeInformationService.generateEventURI(wonNodeURI),
