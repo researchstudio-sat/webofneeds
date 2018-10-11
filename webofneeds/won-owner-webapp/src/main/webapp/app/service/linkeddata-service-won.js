@@ -721,49 +721,6 @@ import won from "./won.js";
                           }
                           `
           );
-          if (!queryResult || queryResult.length == 0) {
-            console.log(
-              "QueryResult was null for docUri: ",
-              docUri,
-              "executing old query"
-            );
-            const correspondingRemoteMessageUri = getIn(
-              await executeQueryOnRdfStore(
-                tmpstore,
-                `
-                        prefix event: <${baseUriForEvents}>
-                        prefix msg: <http://purl.org/webofneeds/message#>
-
-                        select distinct ?remoteUri where {
-                            { <${messageUri}> msg:hasCorrespondingRemoteMessage ?remoteUri } union
-                            { ?remoteUri msg:hasCorrespondingRemoteMessage <${messageUri}> }
-                        }
-                        `
-              ),
-              [0, "remoteUri", "value"] // the result is nested a bit, so we need to extract the uri here
-            );
-
-            const urisInStoreThatStartWith = uri =>
-              Array.from(
-                new Set(
-                  Object.values(tmpstore.engine.lexicon.OIDToUri).filter(u =>
-                    u.startsWith(uri)
-                  )
-                )
-              );
-
-            const graphUrisInEventDocOld = urisInStoreThatStartWith(
-              messageUri + "#"
-            ).concat(
-              urisInStoreThatStartWith(correspondingRemoteMessageUri + "#")
-            );
-
-            return {
-              uri: messageUri,
-              correspondingRemoteMessageUri,
-              containedGraphUris: graphUrisInEventDocOld,
-            };
-          }
 
           const graphUrisOfMessage = queryResult.map(result =>
             getIn(result, ["graphOfMessage", "value"])
@@ -782,7 +739,7 @@ import won from "./won.js";
           ).concat(
             graphUrisOfMessage
               .map(uri => urisInStoreThatStartWith(uri + "#"))
-              .reduce((arr1, arr2) => arr1.concat(arr2))
+              .reduce((arr1, arr2) => arr1.concat(arr2), []) //parse empty array of initial value to avoid exception
           );
           return {
             uri: messageUri,
