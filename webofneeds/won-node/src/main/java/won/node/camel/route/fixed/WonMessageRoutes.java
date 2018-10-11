@@ -151,6 +151,22 @@ public class WonMessageRoutes extends RouteBuilder
                 //now, we expect the message we want to pass on to the owner in the exchange's in header.
                 .to("bean:toOwnerSender");    //--> seda:OwnerProtocolOut
 
+        //sends the message to the owner of the connection in the won:hasSender property. 
+        //In the case of an outbound message, this is an echo of the message back to the owner, in the
+        //case of a system generated outbound message, this copies the message to the owner 
+        from("direct:echoToOwner")
+            .transacted("PROPAGATION_REQUIRES_NEW")
+            .routeId("direct:echoToOwner")
+            // we wait until we obtain a lock on the message's parent
+            // so that we can be sure that processing the message is finished before we send it to the owner
+            // if we did not do that, the owner may respond before processing the current message is finished,
+            // which, in case of a connect/open/connectionmesssage sequence may lead to a failure that is not
+            // expected by the client.
+            .to("bean:parentLocker")
+            //now, we expect the message we want to pass on to the owner in the exchange's in header.
+            .to("bean:toOwnerEchoer");    //--> seda:OwnerProtocolOut
+
+        
         from("direct:sendToNode")
                 .transacted("PROPAGATION_REQUIRES_NEW")
                 .routeId("direct:sendToNode")
@@ -185,7 +201,7 @@ public class WonMessageRoutes extends RouteBuilder
             // e.g. when client's public keys changed and hence their queuenames did, too. Added the onException part to deal
             // with that.
             .onException(Exception.class)
-              .log("failure during seda:OwnerProtocolOut, ignoring. Exception message: ${exception.message}")
+              .log("failure during seda:OwnerProtocolOut, ignoring. Exception message: ${exception.messsage}")
               .handled(true)
               .stop()
               .end()
@@ -234,20 +250,6 @@ public class WonMessageRoutes extends RouteBuilder
                   .to("bean:outboundMessageCreator")
                   //remember our original WonMessage, currently in the MESSAGE_HEADER, in the ORIGINAL_MESSAGE_HEADER
                   .setHeader(WonCamelConstants.ORIGINAL_MESSAGE_HEADER, header(WonCamelConstants.MESSAGE_HEADER))
-                  //now if the outbound message is one that facet implementations can
-                  //process, let them do that, then send the resulting message to the remote end.
-                  .choice()
-                        .when(
-                            //check if the outbound message header is set, otherwise we don't have anything to
-                            //send to the remote node
-                            //(CAUTION: the actual message is in the MESSAGE_HEADER and as a backup in the ORIGINAL_MESSAGE_HEADER).
-                            header(WonCamelConstants.OUTBOUND_MESSAGE_HEADER).isNotNull())
-                            //put outbound message into the MESSAGE_HEADER so the processing chain can use the normal
-                            //header.
-                            .setHeader(WonCamelConstants.MESSAGE_HEADER, header(WonCamelConstants.OUTBOUND_MESSAGE_HEADER))
-                            .to("direct:sendToNode")  // --> seda:NeedProtocolOut
-                            .endChoice()
-                  .end()
                   .choice()
                         .when(
                             // we want to send a FROM_SYSTEM message to the owner if it is addressed at the owner.
@@ -257,35 +259,51 @@ public class WonMessageRoutes extends RouteBuilder
                                     new IsSystemMessageToOwnerPredicate()))
                             //swap back: original into MESSAGE_HEADER
                             .setHeader(WonCamelConstants.MESSAGE_HEADER, header(WonCamelConstants.ORIGINAL_MESSAGE_HEADER))
-                            .to("direct:sendToOwner")  //--> seda:OwnerProtocolOut
-                            .endChoice()
-                .end()
-                // if we didn't raise an exception so far, send a success response
-                // for that, we have to re-instate the original (not the outbound) messagge, so we reply to the right one
-                // this may or may not already have happened
-                .setHeader(WonCamelConstants.MESSAGE_HEADER, header(WonCamelConstants.ORIGINAL_MESSAGE_HEADER))
-                //now, call the facet implementation
-                .choice()
-                    .when(PredicateBuilder.and(
-                        header(WonCamelConstants.DIRECTION_HEADER).isEqualTo(URI.create(WONMSG.TYPE_FROM_OWNER_STRING)),
-                        PredicateBuilder.and(
-                            header(WonCamelConstants.MESSAGE_HEADER).isNotNull(),
-                            new ShouldCallFacetImplForMessagePredicate())))
-                        //put the local connection URI into the header
-                        .setHeader(WonCamelConstants.CONNECTION_URI_HEADER,
-                                          new GetEnvelopePropertyExpression(WonCamelConstants.ORIGINAL_MESSAGE_HEADER,
-                                                                                                              URI.create(WONMSG.SENDER_PROPERTY.getURI().toString())))
-
-                        .to("direct:invokeFacetLogic")
+                            // here, we use the echo functionality so a message always gets delivered to the owner, even if
+                            // it is a copy of an outgoing message
+                            .to("direct:echoToOwner")  //--> seda:OwnerProtocolOut
+                         .endChoice()
+                    .end()
+                    //now if the outbound message is one that facet implementations can
+                    //process, let them do that, then send the resulting message to the remote end.
+                    .choice()
+                          .when(
+                              //check if the outbound message header is set, otherwise we don't have anything to
+                              //send to the remote node
+                              //(CAUTION: the actual message is in the MESSAGE_HEADER and as a backup in the ORIGINAL_MESSAGE_HEADER).
+                              header(WonCamelConstants.OUTBOUND_MESSAGE_HEADER).isNotNull())
+                              //put outbound message into the MESSAGE_HEADER so the processing chain can use the normal
+                              //header.
+                              .setHeader(WonCamelConstants.MESSAGE_HEADER, header(WonCamelConstants.OUTBOUND_MESSAGE_HEADER))
+                              .to("direct:sendToNode")  // --> seda:NeedProtocolOut
+                          .endChoice()
+                    .end()
+                    // if we didn't raise an exception so far, send a success response
+                    // for that, we have to re-instate the original (not the outbound) messagge, so we reply to the right one
+                    // this may or may not already have happened
+                    .setHeader(WonCamelConstants.MESSAGE_HEADER, header(WonCamelConstants.ORIGINAL_MESSAGE_HEADER))
+                    //now, call the facet implementation
+                    .choice()
+                        .when(PredicateBuilder.and(
+                            header(WonCamelConstants.DIRECTION_HEADER).isEqualTo(URI.create(WONMSG.TYPE_FROM_OWNER_STRING)),
+                            PredicateBuilder.and(
+                                header(WonCamelConstants.MESSAGE_HEADER).isNotNull(),
+                                new ShouldCallFacetImplForMessagePredicate())))
+                            //put the local connection URI into the header
+                            .setHeader(WonCamelConstants.CONNECTION_URI_HEADER,
+                                              new GetEnvelopePropertyExpression(WonCamelConstants.ORIGINAL_MESSAGE_HEADER,
+                                                                                                                  URI.create(WONMSG.SENDER_PROPERTY.getURI().toString())))
+    
+                            .to("direct:invokeFacetLogic")
                         .endChoice() //end choice
                     .end()
-                      .choice()
+                    .choice()
                         .when(isNotEqualTo(header(WonCamelConstants.SUPPRESS_MESSAGE_REACTION), ExpressionBuilder.constantExpression(Boolean.TRUE)))
                             .to("direct:reactToMessage")
                         .otherwise()
                             .log(LoggingLevel.DEBUG, "suppressing sending of message to owner because the header '" + WonCamelConstants.SUPPRESS_MESSAGE_TO_OWNER + "' is 'true'")
                         .endChoice()
-                      .end();
+                  .end();
 
 
           from("direct:invokeFacetLogic")

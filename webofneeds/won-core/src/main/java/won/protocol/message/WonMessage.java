@@ -47,8 +47,9 @@ public class WonMessage implements Serializable {
     private URI receiverNeedURI;
     private URI receiverNodeURI;
     private URI receiverFacetURI;
-    private List<URI> refersTo = new ArrayList<>();
-    private List<URI> previousMessages = new ArrayList<>();
+    private List<URI> refersTo = null;
+    private List<URI> previousMessages = null;
+    private List<URI> injectIntoConnections = null;    
     private URI isResponseToMessageURI;
     private URI isRemoteResponseToMessageURI;
     private List<String> contentGraphNames;
@@ -443,8 +444,8 @@ public class WonMessage implements Serializable {
         }
         return this.receiverURI;
     }
-
-
+    
+   
     public synchronized URI getReceiverNeedURI() {
         if (this.receiverNeedURI == null) {
             this.receiverNeedURI = getEnvelopePropertyURIValue(WONMSG.RECEIVER_NEED_PROPERTY);
@@ -472,8 +473,16 @@ public class WonMessage implements Serializable {
             this.refersTo = getEnvelopePropertyURIValues(WONMSG.REFERS_TO_PROPERTY);
         }
         return this.refersTo;
-
     }
+    
+    public synchronized List<URI> getInjectIntoConnectionURIs() {
+        if (this.injectIntoConnections == null) {
+            this.injectIntoConnections = getEnvelopePropertyURIValues(WONMSG.HAS_INJECT_INTO_CONNECTION);
+        }
+        return this.injectIntoConnections;
+    }
+
+
     
     public synchronized List<URI> getPreviousMessageURIs() {
         if (this.previousMessages == null) {

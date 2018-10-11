@@ -4,17 +4,21 @@ import static won.protocol.util.RdfUtils.findOnePropertyFromResource;
 import static won.protocol.util.RdfUtils.findOrCreateBaseResource;
 import static won.protocol.util.RdfUtils.visit;
 
-import java.awt.TrayIcon.MessageType;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 import org.apache.jena.datatypes.xsd.XSDDatatype;
+import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.graph.Triple;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -35,6 +39,16 @@ import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.rdf.model.impl.PropertyImpl;
 import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.apache.jena.riot.Lang;
+import org.apache.jena.shared.PrefixMapping;
+import org.apache.jena.shared.impl.PrefixMappingImpl;
+import org.apache.jena.sparql.algebra.Op;
+import org.apache.jena.sparql.algebra.OpAsQuery;
+import org.apache.jena.sparql.algebra.op.OpBGP;
+import org.apache.jena.sparql.algebra.op.OpGraph;
+import org.apache.jena.sparql.algebra.op.OpProject;
+import org.apache.jena.sparql.algebra.op.OpUnion;
+import org.apache.jena.sparql.core.BasicPattern;
+import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.path.Path;
 import org.apache.jena.sparql.path.PathParser;
 import org.apache.jena.tdb.TDB;
@@ -43,10 +57,11 @@ import org.hibernate.cfg.NotYetImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.andrewoma.dexx.collection.Sets;
+
 import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDirection;
-import won.protocol.message.WonMessageType;
 import won.protocol.message.WonSignatureData;
 import won.protocol.model.ConnectionState;
 import won.protocol.model.Match;
@@ -1119,6 +1134,66 @@ public class WonRdfUtils
       return URI.create(findOnePropertyFromResource(
         dataset, needURI, WON.HAS_WON_NODE).asResource().getURI());
     }
+    
+    /**
+     * 
+     */
+    public static Iterator<URI> getConnectedNeeds(Dataset dataset, final URI needURI) {
+        PrefixMapping pmap = new PrefixMappingImpl();
+        pmap.withDefaultMappings(PrefixMapping.Standard);
+        pmap.setNsPrefix("won", WON.getURI());
+        pmap.setNsPrefix("msg", WONMSG.getURI());
+        Path path = PathParser.parse("won:hasConnectionContainer/rdfs:member/won:hasRemoteNeed", pmap);
+        return RdfUtils.getURIsForPropertyPath(dataset, needURI, path);
+    }
+    
+    /**
+     * Assumes that the dataset contains a need's connection information, looks for the specified remote needs and returns the remote connection uris.
+     * Optionally the result can be filtered by connection state. 
+     */
+    public static Set<URI> getRemoteConnectionURIsForRemoteNeeds(Dataset dataset, final Collection<URI> remoteNeeds, final Optional<ConnectionState> state) {
+        Optional<Object> unions = 
+            remoteNeeds.stream()
+                .map(uri -> {
+                    BasicPattern pattern = new BasicPattern();
+                    pattern.add(Triple.create(Var.alloc("localCon"), NodeFactory.createURI("http://purl.org/webofneeds/model#hasRemoteNeed"), NodeFactory.createURI(uri.toString())));
+                    pattern.add(Triple.create(Var.alloc("localCon"), NodeFactory.createURI("http://purl.org/webofneeds/model#hasRemoteConnection"), Var.alloc("remoteCon")));
+                    if (state.isPresent()) {
+                        pattern.add(Triple.create(Var.alloc("localCon"), NodeFactory.createURI("http://purl.org/webofneeds/model#hasConnectionState"), NodeFactory.createURI(state.get().getURI().toString())));
+                    }
+                    return pattern;
+                })
+                .map(pattern -> new OpBGP(pattern))
+                .map(bgp -> new OpGraph(Var.alloc("g"), bgp))
+                .reduce(
+                    Optional.empty(), 
+                    (union, pattern) -> {
+                        if (!union.isPresent()) {
+                            return Optional.of(pattern);
+                        } 
+                        return Optional.of(new OpUnion((Op) union.get(), pattern));
+                    }, (union1, union2) -> {
+                       if (!union1.isPresent()) return union2;
+                       if (!union2.isPresent()) return union1;
+                       return Optional.of(new OpUnion((Op)union1.get(), (Op)union2.get()));
+                    });
+        if (!unions.isPresent()) {
+            return Collections.EMPTY_SET;
+        }
+        Op op = new OpProject((Op) unions.get(), Arrays.asList(Var.alloc("remoteCon"))); 
+        Query q = OpAsQuery.asQuery(op);                       
+        q.setQuerySelectType();                                
+        Set<URI> result = new HashSet();
+        try (QueryExecution qexec = QueryExecutionFactory.create(q, dataset)){
+            ResultSet resultSet = qexec.execSelect();
+            while(resultSet.hasNext()) {
+                QuerySolution solution = resultSet.next();
+                result.add(URI.create(solution.get("remoteCon").asResource().getURI()));
+            }
+        }
+        return result;
+    }
+    
   }
-
+  
 }

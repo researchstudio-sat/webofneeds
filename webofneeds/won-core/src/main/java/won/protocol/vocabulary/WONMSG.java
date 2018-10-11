@@ -143,7 +143,7 @@ public class WONMSG
   public static final Property HAS_CORRESPONDING_REMOTE_MESSAGE = m.createProperty(BASE_URI, "hasCorrespondingRemoteMessage");
   public static final Property HAS_FORWARDED_MESSAGE = m.createProperty(BASE_URI, "hasForwardedMessage");
   
-  public static final Property HAS_FORWARD_TO_RECEIVER = m.createProperty(BASE_URI, "hasForwardToReceiver");
+  public static final Property HAS_INJECT_INTO_CONNECTION = m.createProperty(BASE_URI, "hasInjectIntoConnection");
 
   public static final Property HAS_PREVIOUS_MESSAGE_PROPERTY = m.createProperty(BASE_URI + "hasPreviousMessage");
   public static final Property NEW_NEED_STATE_PROPERTY = m.createProperty(BASE_URI, "newNeedState");

@@ -212,7 +212,10 @@ function genComponentConf() {
 
         const theirNeedUri = connection && connection.get("remoteNeedUri");
         const theirNeed = theirNeedUri && state.getIn(["needs", theirNeedUri]);
-        const chatMessages = connection && connection.get("messages");
+        const chatMessages =
+          connection &&
+          connection.get("messages") &&
+          connection.get("messages").filter(msg => !msg.get("forwardMessage"));
         const allMessagesLoaded =
           chatMessages &&
           chatMessages.filter(
@@ -237,7 +240,13 @@ function genComponentConf() {
         let sortedMessages = chatMessages && chatMessages.toArray();
         sortedMessages &&
           sortedMessages.sort(function(a, b) {
-            return a.get("date").getTime() - b.get("date").getTime();
+            const aDate = a.get("date");
+            const bDate = b.get("date");
+
+            const aTime = aDate && aDate.getTime();
+            const bTime = bDate && bDate.getTime();
+
+            return aTime - bTime;
           });
 
         const unreadMessages = selectUnreadMessagesByConnectionUri(

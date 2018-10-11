@@ -67,9 +67,9 @@ public class CreateNeedWithFacetsAction extends AbstractCreateNeedAction {
         Resource needResource = WonRdfUtils.NeedUtils.getNeedResource(needDataset);
         if (needResource.isURIResource()) {
             needUriFromProducer = URI.create(needResource.getURI().toString());
-            RdfUtils.replaceBaseURI(needDataset, needResource.getURI());
+            RdfUtils.replaceBaseURI(needDataset, needResource.getURI(), true);
         } else {
-            RdfUtils.replaceBaseResource(needDataset, needResource);
+            RdfUtils.replaceBaseResource(needDataset, needResource, true);
         }
         final URI needUriBeforeCreation = needUriFromProducer;
 

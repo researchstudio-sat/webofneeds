@@ -91,6 +91,18 @@ function genComponentConf() {
           </won-combined-message-content>
         </div>
       </div>
+      <div class="refmsgcontent__fragment" ng-if="self.hasForwardUris">
+        <div class="refmsgcontent__fragment__header">Forwarded {{ self.getCountString(self.forwardUrisSize)}}</div>
+        <div class="refmsgcontent__fragment__body">
+          <won-combined-message-content
+            ng-click="self.loadMessage(msgUri)"
+            ng-repeat="msgUri in self.forwardUrisArray"
+            class="won-cm--forward"
+            message-uri="self.getReferencedMessage(msgUri).get('uri')"
+            connection-uri="self.connection.get('uri')">
+          </won-combined-message-content>
+        </div>
+      </div>
     `;
 
   class Controller {
@@ -120,6 +132,7 @@ function genComponentConf() {
         const proposeToCancelUris =
           references && references.get("proposesToCancel");
         const acceptUris = references && references.get("accepts");
+        const forwardUris = references && references.get("forwards");
 
         const acceptUrisSize = acceptUris ? acceptUris.size : 0;
         const proposeUrisSize = proposeUris ? proposeUris.size : 0;
@@ -128,6 +141,7 @@ function genComponentConf() {
           : 0;
         const rejectUrisSize = rejectUris ? rejectUris.size : 0;
         const retractUrisSize = retractUris ? retractUris.size : 0;
+        const forwardUrisSize = forwardUris ? forwardUris.size : 0;
 
         return {
           ownNeedUri: ownNeed && ownNeed.get("uri"),
@@ -138,14 +152,17 @@ function genComponentConf() {
           proposeToCancelUrisSize,
           rejectUrisSize,
           retractUrisSize,
+          forwardUrisSize,
           hasProposeUris: proposeUrisSize > 0,
           hasAcceptUris: acceptUrisSize > 0,
           hasProposeToCancelUris: proposeToCancelUrisSize > 0,
           hasRetractUris: retractUrisSize > 0,
           hasRejectUris: rejectUrisSize > 0,
+          hasForwardUris: forwardUrisSize > 0,
           proposeUrisArray: proposeUris && Array.from(proposeUris.toSet()),
           retractUrisArray: retractUris && Array.from(retractUris.toSet()),
           rejectUrisArray: rejectUris && Array.from(rejectUris.toSet()),
+          forwardUrisArray: forwardUris && Array.from(forwardUris.toSet()),
           proposeToCancelUrisArray:
             proposeToCancelUris && Array.from(proposeToCancelUris.toSet()),
           acceptUrisArray: acceptUris && Array.from(acceptUris.toSet()),

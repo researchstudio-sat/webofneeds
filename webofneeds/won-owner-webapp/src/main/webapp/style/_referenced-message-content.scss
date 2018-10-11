@@ -54,6 +54,10 @@ won-referenced-message-content {
             0.25rem
           );
         }
+        &.won-cm--forward {
+          background-color: $won-light-gray;
+          border: $thinGrayBorder;
+        }
       }
     }
   }

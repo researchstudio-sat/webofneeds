@@ -18,7 +18,7 @@
  * Created by LEIH-NB on 19.08.2014.
  */
 "format es6" /* required to force babel to transpile this so the minifier is happy */;
-import { is, prefixOfUri, isArray, clone } from "../utils.js";
+import { is, prefixOfUri, isArray, clone, createArray } from "../utils.js";
 import {
   clearPrivateId,
   clearReadUris,
@@ -405,15 +405,15 @@ won.merge = function(/*args...*/) {
   return o;
 };
 /*
-     * Recursively merge properties of several objects
-     * Copies all properties from the passed objects into the last one starting
-     * from the left (thus the further right, the higher the priority in
-     * case of name-clashes)
-     * You might prefer this function over won.merge for performance reasons
-     * (e.g. if you're copying into a very large object). Otherwise the former
-     * is recommended.
-     * @param args merges all passed objects onto the first passed
-     */
+ * Recursively merge properties of several objects
+ * Copies all properties from the passed objects into the last one starting
+ * from the left (thus the further right, the higher the priority in
+ * case of name-clashes)
+ * You might prefer this function over won.merge for performance reasons
+ * (e.g. if you're copying into a very large object). Otherwise the former
+ * is recommended.
+ * @param args merges all passed objects onto the first passed
+ */
 won.mergeIntoLast = function(/*args...*/) {
   let obj1;
   for (const argument of arguments) {
@@ -811,10 +811,10 @@ won.addMessageGraph = function(builder, graphURIs, messageType) {
 };
 
 /*
-     * Creates a JSON-LD stucture containing a named graph with default 'unset' event URI
-     * plus the specified hashFragment
-     *
-     */
+ * Creates a JSON-LD stucture containing a named graph with default 'unset' event URI
+ * plus the specified hashFragment
+ *
+ */
 won.newGraph = function(hashFragement) {
   hashFragement = hashFragement || "graph1";
   return {
@@ -868,32 +868,14 @@ won.DomainObjectFactory.prototype = {
   jsonLdToWonDomainObjects: function(/*jsonLdContent*/) {},
 };
 
-/**
- * This function should take any of the different chat-message-structures flying around in this code-base
- * and return a WonMessage object.
- * @param message
- * @returns {*|Promise.<WonMessage>}
- */
-won.toWonMessage = function(message) {
-  if (message["@graph"]) {
-    return won.wonMessageFromJsonLd(message);
-  } else if (message instanceof WonMessage) {
-    return Promise.resolve(message);
-  } else {
-    throw new Error(
-      "Couldn't convert the following to a WonMessage: ",
-      message
-    );
-  }
-};
-
 won.wonMessageFromJsonLd = async function(wonMessageAsJsonLD) {
-  //console.log("converting this JSON-LD to WonMessage", wonMessageAsJsonLD)
   const expandedJsonLd = await jsonld.promises.expand(wonMessageAsJsonLD);
   const wonMessage = new WonMessage(expandedJsonLd);
   await wonMessage.frameInPromise();
   await wonMessage.generateContentGraphTrig();
   await wonMessage.generateCompactedFramedMessage();
+  await wonMessage.generateContainedForwardedWonMessages();
+
   return wonMessage;
 };
 
@@ -1033,6 +1015,7 @@ function WonMessage(jsonLdContent) {
   }
   this.rawMessage = jsonLdContent;
   this.parseErrors = [];
+  this.containedForwardedWonMessages = [];
   this.__init();
 }
 
@@ -1137,6 +1120,43 @@ WonMessage.prototype = {
       }
     }
   },
+  generateContainedForwardedWonMessages: async function() {
+    const forwardedMessageUris = this.getForwardedMessageUris();
+    if (forwardedMessageUris && forwardedMessageUris.length == 1) {
+      //TODO: RECURSIVELY CREATE wonMessageObjects from all the forwarded Messages within this message
+      //const forwardedMessages = wonMessage.compactFramedMessage["msg:hasForwardedMessage"];
+      const encapsulatingMessageUri = this.messageStructure.messageUri;
+      const rawMessageWithoutEncapsulatingUri = this.rawMessage.filter(
+        elem => !elem["@id"].startsWith(encapsulatingMessageUri)
+      );
+
+      /*console.log(
+        "WonMessage\n",
+        this,
+        "\nforwardedMessageUris:\n",
+        forwardedMessageUris,
+        "\nencapsulatingMessageUri\n",
+        encapsulatingMessageUri,
+        "\nrawMessageWithouthEncapsulatingUri\n",
+        rawMessageWithoutEncapsulatingUri
+      );*/
+
+      const fwdMessage = await won.wonMessageFromJsonLd(
+        rawMessageWithoutEncapsulatingUri
+      );
+      this.containedForwardedWonMessages.push(fwdMessage);
+
+      return Promise.resolve(this.containedForwardedWonMessages);
+    } else if (forwardedMessageUris) {
+      console.warn(
+        "WonMessage contains more than one forwardedMessage on the same level: omitting forwardMessages, wonMessage:",
+        this
+      );
+      return Promise.resolve(this.containedForwardedWonMessages);
+    } else {
+      return Promise.resolve(this.containedForwardedWonMessages);
+    }
+  },
   frameInPromise: function() {
     if (this.framedMessage) {
       return Promise.resolve(this.framedMessage);
@@ -1212,9 +1232,29 @@ WonMessage.prototype = {
       return this.compactFramedMessage["msg:hasCorrespondingRemoteMessage"];
     }
   },
+  getCompactFramedForwardedMessageContent: function() {
+    const forwardedMessage =
+      this.compactFramedMessage &&
+      this.compactFramedMessage["msg:hasForwardedMessage"];
+    const forwardedMessageContent =
+      forwardedMessage && forwardedMessage["msg:hasCorrespondingRemoteMessage"];
+    return forwardedMessageContent;
+  },
   getMessageType: function() {
     return this.getProperty(
       "http://purl.org/webofneeds/message#hasMessageType"
+    );
+  },
+  getInjectIntoConnectionUris: function() {
+    return createArray(
+      this.getProperty(
+        "http://purl.org/webofneeds/message#hasInjectIntoConnection"
+      )
+    );
+  },
+  getForwardedMessageUris: function() {
+    return createArray(
+      this.getProperty("http://purl.org/webofneeds/message#hasForwardedMessage")
     );
   },
   getReceivedTimestamp: function() {
@@ -1286,23 +1326,31 @@ WonMessage.prototype = {
     return this.getProperty("http://purl.org/webofneeds/message#hasReceiver");
   },
 
-  getProposedMessages: function() {
-    return this.getProperty("http://purl.org/webofneeds/agreement#proposes");
-  },
-
-  getAcceptedMessages: function() {
-    return this.getProperty("http://purl.org/webofneeds/agreement#accepts");
-  },
-  getProposedToCancelMessages: function() {
-    return this.getProperty(
-      "http://purl.org/webofneeds/agreement#proposesToCancel"
+  getProposedMessageUris: function() {
+    return createArray(
+      this.getProperty("http://purl.org/webofneeds/agreement#proposes")
     );
   },
-  getRejectsMessages: function() {
-    return this.getProperty("http://purl.org/webofneeds/agreement#rejects");
+
+  getAcceptsMessageUris: function() {
+    return createArray(
+      this.getProperty("http://purl.org/webofneeds/agreement#accepts")
+    );
   },
-  getRetractMessages: function() {
-    return this.getProperty("http://purl.org/webofneeds/modification#retracts");
+  getProposedToCancelMessageUris: function() {
+    return createArray(
+      this.getProperty("http://purl.org/webofneeds/agreement#proposesToCancel")
+    );
+  },
+  getRejectsMessageUris: function() {
+    return createArray(
+      this.getProperty("http://purl.org/webofneeds/agreement#rejects")
+    );
+  },
+  getRetractsMessageUris: function() {
+    return createArray(
+      this.getProperty("http://purl.org/webofneeds/modification#retracts")
+    );
   },
 
   isProposeMessage: function() {
@@ -1331,7 +1379,21 @@ WonMessage.prototype = {
       "http://purl.org/webofneeds/modification#retracts"
     );
   },
-
+  isOutgoingMessage: function() {
+    return (
+      this.isFromOwner() ||
+      (this.isFromSystem() && this.getSender() !== this.getReceiver())
+    );
+  },
+  hasContainedForwardedWonMessages: function() {
+    return (
+      this.containedForwardedWonMessages &&
+      this.containedForwardedWonMessages.length > 0
+    );
+  },
+  getContainedForwardedWonMessages: function() {
+    return this.containedForwardedWonMessages;
+  },
   isFromSystem: function() {
     let direction = this.getMessageDirection();
     return direction === "http://purl.org/webofneeds/message#FromSystem";
@@ -1529,6 +1591,13 @@ WonMessage.prototype = {
           node.correspondingRemoteMessageUri =
             messageUriAndCorrespondingRemoteMessageUri.correspondingRemoteMessageUri;
         }
+        let messageUriAndForwardedMessageUri = this.__getMessageUriAndForwardedMessageUri(
+          graph
+        );
+        if (messageUriAndForwardedMessageUri) {
+          node.forwardedMessageUri =
+            messageUriAndForwardedMessageUri.forwardedMessageUri;
+        }
         nodes[graphUri] = node;
       } else if (this.__isSignatureGraph(graph)) {
         //do nothing - we don't want to handle signatures in the client for now
@@ -1543,13 +1612,22 @@ WonMessage.prototype = {
       let node = nodes[graphUri];
       if (this.__isEnvelopeGraph(graph)) {
         let containedEnvelopes = this.__getContainedEnvelopeUris(graph);
+        let referencesOtherGraphs = false;
         if (containedEnvelopes.length > 0) {
+          referencesOtherGraphs = true;
           node.containsEnvelopes = containedEnvelopes.map(uri => nodes[uri]);
           //remember that these envelopes are now referenced
           unreferencedEnvelopes = unreferencedEnvelopes.filter(
             uri => !containedEnvelopes.includes(uri)
           );
-        } else if (!node.correspondingRemoteMessageUri) {
+        }
+        if (node.correspondingRemoteMessageUri) {
+          referencesOtherGraphs = true;
+        }
+        if (node.forwardedMessageUri) {
+          referencesOtherGraphs = true;
+        }
+        if (!referencesOtherGraphs) {
           //remember that this envelope contains no envelopes (and points to no remote messages)
           innermostEnvelopes.push(graphUri);
         }
@@ -1569,7 +1647,7 @@ WonMessage.prototype = {
     });
     //now we should have the envelope inclusion trees for all messages
     //unreferencedEnvelopes now points to all roots.
-    //walk over the roots and connect them via remoteMessage connections
+    //walk over the roots and connect them via remoteMessage or forwardedMessage connections
     if (unreferencedEnvelopes.length > 1) {
       unreferencedEnvelopes.forEach(node => {
         if (node.correspondingRemoteMessageUri) {
@@ -1595,6 +1673,23 @@ WonMessage.prototype = {
               "more than one candidate for the outermost remoteMessage envelope found"
             );
           }
+        }
+      });
+    }
+    // if we still have more than 1 unreferenced envelope, it must be because there is
+    // a forwarded message.
+    if (unreferencedEnvelopes.length > 1) {
+      // one more pass: we did not connect the message and the forwardedMessage so their
+      // respective local and remote messages could be connected. now we connect
+      // them and remove the forwarded message from the unreferenced list
+      this.graphs.forEach(graph => {
+        let graphUri = graph["@id"];
+        let node = nodes[graphUri];
+        if (node.forwardedMessageUri) {
+          node.forwardedMessage = nodes[node.forwardedMessageUri];
+          unreferencedEnvelopes = unreferencedEnvelopes.filter(
+            uri => uri != node.forwardedMessageUri
+          );
         }
       });
     }
@@ -1712,6 +1807,29 @@ WonMessage.prototype = {
           resource[
             "http://purl.org/webofneeds/message#hasCorrespondingRemoteMessage"
           ][0]["@id"],
+      }))
+      .filter(x => !!x); //if that property was not present, filter out undefineds
+    if (Array.isArray(data)) {
+      if (data.length == 0) {
+        return null;
+      }
+      return data[0];
+    }
+    return data;
+  },
+  __getMessageUriAndForwardedMessageUri: graph => {
+    let graphData = graph["@graph"];
+    let data = graphData
+      .filter(
+        resource =>
+          resource["http://purl.org/webofneeds/message#hasForwardedMessage"]
+      )
+      .map(resource => ({
+        messageUri: resource["@id"],
+        forwardedMessageUri:
+          resource["http://purl.org/webofneeds/message#hasForwardedMessage"][0][
+            "@id"
+          ],
       }))
       .filter(x => !!x); //if that property was not present, filter out undefineds
     if (Array.isArray(data)) {

@@ -94,8 +94,7 @@ public class SendMessageFromNodeGroupFacetImpl extends AbstractFromOwnerCamelPro
                         logger.debug("forwarding message {} received from need {} in group {} to group member {}", new Object[]{wonMessage.getMessageURI(), wonMessage.getSenderNeedURI(), wonMessage.getReceiverNeedURI(),  conToSendTo.getRemoteNeedURI()});
                     }
                     URI forwardedMessageURI = wonNodeInformationService.generateEventURI(wonMessage.getReceiverNodeURI());
-                    URI remoteWonNodeUri = WonLinkedDataUtils.getWonNodeURIForNeedOrConnectionURI(conOfIncomingMessage.getRemoteConnectionURI(),
-                            linkedDataSource);
+                    URI remoteWonNodeUri = WonLinkedDataUtils.getWonNodeURIForNeedOrConnectionURI(conToSendTo.getRemoteConnectionURI(),linkedDataSource);
                     WonMessage newWonMessage = WonMessageBuilder.forwardReceivedNodeToNodeMessageAsNodeToNodeMessage(
                             forwardedMessageURI, wonMessage,
                             conToSendTo.getConnectionURI(), conToSendTo.getNeedURI(), wonMessage.getReceiverNodeURI(),

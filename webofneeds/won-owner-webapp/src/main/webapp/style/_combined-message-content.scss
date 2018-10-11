@@ -24,5 +24,29 @@ won-combined-message-content {
     &__type {
       color: $won-subtitle-gray;
     }
+
+    &--forwarded-from,
+    &--inject-into {
+      display: grid;
+      grid-auto-columns: max-content;
+      grid-auto-flow: column;
+      grid-gap: 0.25rem;
+      align-items: center;
+
+      .msg_header_type {
+        grid-area: auto;
+      }
+
+      .msg__header__originator,
+      .msg__header__inject {
+        grid-area: auto;
+        margin: 0;
+        @include fixed-square(1.5rem);
+
+        img {
+          @include fixed-square(1.5rem);
+        }
+      }
+    }
   }
 }

@@ -129,6 +129,8 @@
           class="won.node.camel.processor.general.ToNodeSender" />
     <bean id="toOwnerSender"
           class="won.node.camel.processor.general.ToOwnerSender" />
+    <bean id="toOwnerEchoer"
+          class="won.node.camel.processor.general.ToOwnerEchoer" />          
     <bean id="wonMessageCloner"
           class="won.node.camel.processor.general.WonMessageCloner" />
     <bean id="facetExtractor"

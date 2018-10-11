@@ -11,6 +11,7 @@ import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.message.processor.exception.MissingMessagePropertyException;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionState;
+import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WONMSG;
 
 import java.net.URI;
@@ -24,6 +25,8 @@ import java.net.URI;
 public class SendMessageFromNodeProcessor extends AbstractCamelProcessor
 {
 
+    
+    
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
     WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
@@ -34,6 +37,12 @@ public class SendMessageFromNodeProcessor extends AbstractCamelProcessor
     Connection con = connectionRepository.findOneByConnectionURIForUpdate(connectionUri).get();
     if (con.getState() != ConnectionState.CONNECTED) {
       throw new IllegalMessageForConnectionStateException(connectionUri, "CONNECTION_MESSAGE", con.getState());
+    }
+    if (logger.isDebugEnabled()) {
+        logger.debug("received this ConnectioMessage FromExternal:\n{}", RdfUtils.toString(wonMessage.getCompleteDataset()));
+        if (wonMessage.getForwardedMessageURI() != null) {
+            logger.debug("This message contains the forwarded message {}", wonMessage.getForwardedMessageURI());
+        }
     }
   }
 

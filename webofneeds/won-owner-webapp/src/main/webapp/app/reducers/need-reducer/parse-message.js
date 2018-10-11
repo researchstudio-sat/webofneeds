@@ -7,17 +7,30 @@ import {
 import { isUriRead } from "../../won-localstorage.js";
 import { getAllDetails } from "../../won-utils.js";
 
-export function parseMessage(wonMessage, alreadyProcessed = false) {
+/*
+  "alreadyProcessed" flag sets the sentOwn/Remote flags to true
+   "forwardMessage" flag is used to set an originatorUri (uri of the need that the forwardedMessage was sent from)
+   and a flag to indicate that the message should not be displayed in the chat as it is used purely used for reference
+   purposes
+*/
+export function parseMessage(
+  wonMessage,
+  alreadyProcessed = false,
+  forwardMessage = false
+) {
   //seperating off header/@prefix-statements, so they can be folded in
   const { trigPrefixes, trigBody } = trigPrefixesAndBody(
     wonMessage.contentGraphTrig
   );
 
-  const proposedMessages = wonMessage.getProposedMessages();
-  const proposedToCancelMessages = wonMessage.getProposedToCancelMessages();
-  const acceptedMessages = wonMessage.getAcceptedMessages();
-  const rejectedMessages = wonMessage.getRejectsMessages();
-  const retractedMessages = wonMessage.getRetractMessages();
+  const injectInto = wonMessage.getInjectIntoConnectionUris();
+  const forwardedMessages = wonMessage.getForwardedMessageUris();
+
+  const proposedMessages = wonMessage.getProposedMessageUris();
+  const proposedToCancelMessages = wonMessage.getProposedToCancelMessageUris();
+  const acceptsMessages = wonMessage.getAcceptsMessageUris();
+  const rejectsMessages = wonMessage.getRejectsMessageUris();
+  const retractsMessages = wonMessage.getRetractsMessageUris();
 
   const matchScoreFloat = parseFloat(wonMessage.getMatchScore());
 
@@ -30,6 +43,8 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
       remoteUri: !wonMessage.isFromOwner() //THIS HAS TO STAY UNDEFINED If the message is not a received message
         ? wonMessage.getRemoteMessageUri()
         : undefined,
+      forwardMessage: forwardMessage,
+      originatorUri: forwardMessage ? wonMessage.getSenderNeed() : undefined,
       content: {
         text: wonMessage.getTextMessage(),
         matchScore:
@@ -37,33 +52,20 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
             ? matchScoreFloat
             : undefined,
       },
+      injectInto: injectInto,
       references: {
-        proposes:
-          !proposedMessages || Array.isArray(proposedMessages)
-            ? proposedMessages
-            : [proposedMessages],
-        proposesToCancel:
-          !proposedToCancelMessages || Array.isArray(proposedToCancelMessages)
-            ? proposedToCancelMessages
-            : [proposedToCancelMessages],
-        accepts:
-          !acceptedMessages || Array.isArray(acceptedMessages)
-            ? acceptedMessages
-            : [acceptedMessages],
-        rejects:
-          !rejectedMessages || Array.isArray(rejectedMessages)
-            ? rejectedMessages
-            : [rejectedMessages],
-        retracts:
-          !retractedMessages || Array.isArray(retractedMessages)
-            ? retractedMessages
-            : [retractedMessages],
+        forwards: forwardedMessages,
+        proposes: proposedMessages,
+        proposesToCancel: proposedToCancelMessages,
+        accepts: acceptsMessages,
+        rejects: rejectsMessages,
+        retracts: retractsMessages,
       },
       hasReferences: false, //will be determined by the hasReferences function
       hasContent: false, //will be determined by the hasContent function
       isParsable: false, //will be determined by the clause (hasReferences || hasContent) function
       date: msStringToDate(wonMessage.getTimestamp()),
-      outgoingMessage: wonMessage.isFromOwner(),
+      outgoingMessage: wonMessage.isOutgoingMessage(),
       systemMessage:
         !wonMessage.isFromOwner() &&
         !wonMessage.getSenderNeed() &&
@@ -98,9 +100,61 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
 
   if (wonMessage.isFromOwner()) {
     parsedMessage.belongsToUri = wonMessage.getSender();
+  } else if (wonMessage.isFromSystem()) {
+    parsedMessage.belongsToUri = wonMessage.getSender();
   } else {
     parsedMessage.belongsToUri = wonMessage.getReceiver();
   }
+
+  //PARSE MESSAGE CONTENT
+  /*if (forwardedMessages && forwardedMessages.length == 1) {
+    const forwardedMessageContent = wonMessage.getCompactFramedForwardedMessageContent();
+
+    if (forwardedMessageContent) {
+      parsedMessage.data.originatorUri =
+        forwardedMessageContent["msg:hasSenderNeed"]["@id"];
+      parsedMessage.data.content.text =
+        forwardedMessageContent["won:hasTextMessage"];
+
+      parsedMessage.data.content = generateContent(
+        Immutable.fromJS(wonMessage.getCompactFramedForwardedMessageContent()),
+        detailsToParse,
+        parsedMessage.data.content
+      );
+    } else {
+      console.error(
+        "Cant parse chat-message, forwardedMessageContent is missing",
+        wonMessage
+      );
+      return undefined;
+    }
+  } else if (forwardedMessages && forwardedMessages.length > 1) {
+    console.error(
+      "Cant parse chat-message, more than one forwardedMessage: ",
+      wonMessage
+    );
+    return undefined;
+  } else if (forwardedMessages) {
+    console.error(
+      "Cant parse chat-message, forwardedMessage is present but did not go in any valid branches: ",
+      wonMessage
+    );
+    return undefined;
+  } else {
+    parsedMessage.data.content.text = wonMessage.getTextMessage();
+    parsedMessage.data.content.matchScore =
+      isValidNumber(matchScoreFloat) && isFinite(matchScoreFloat)
+        ? matchScoreFloat
+        : undefined;
+
+    if (wonMessage.getCompactFramedMessageContent()) {
+      parsedMessage.data.content = generateContent(
+        Immutable.fromJS(wonMessage.getCompactFramedMessageContent()),
+        detailsToParse,
+        parsedMessage.data.content
+      );
+    }
+  }*/
 
   if (wonMessage.getCompactFramedMessageContent()) {
     parsedMessage.data.content = generateContent(

@@ -1123,14 +1123,14 @@ export function prefixOfUri(uri) {
  * @param order if "ASC" then the order will be ascending, everything else resorts to the default sort of descending order
  * @returns {*} sorted Elements array
  */
-export function sortByDate(elementsImm, selector, order) {
+export function sortByDate(
+  elementsImm,
+  selector = "lastUpdateDate",
+  order = "DESC"
+) {
   let sortedElements = elementsImm && elementsImm.toArray();
 
   if (sortedElements) {
-    if (!selector) {
-      selector = "lastUpdateDate";
-    }
-
     sortedElements.sort(function(a, b) {
       const bDate = b.get(selector) && b.get(selector).getTime();
       const aDate = a.get(selector) && a.get(selector).getTime();
@@ -1436,6 +1436,16 @@ export function toLocalISODateString(dateTime) {
     year + "-" + month + "-" + date + "T" + hours + ":" + mins + ":" + secs;
 
   return currentDatetime + timezoneString;
+}
+
+/**
+ * Method that checks if the given element is already an array, if so return it, if not
+ * return the element as a single element array, if element is undefined return undefined
+ * @param elements
+ * @returns {*}
+ */
+export function createArray(elements) {
+  return !elements || Array.isArray(elements) ? elements : [elements];
 }
 
 window.toLocalISODateString4dbg = toLocalISODateString;

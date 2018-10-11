@@ -228,8 +228,8 @@ function genComponentConf() {
         const needUriImpliedInRoute =
           needImpliedInRoute && needImpliedInRoute.get("uri");
 
-        const sortedOpenNeeds = sortByDate(openNeeds);
-        const sortedClosedNeeds = sortByDate(closedNeeds);
+        const sortedOpenNeeds = sortByDate(openNeeds, "creationDate");
+        const sortedClosedNeeds = sortByDate(closedNeeds, "creationDate");
 
         const unloadedNeeds = closedNeeds.filter(need => need.get("toLoad"));
 
@@ -276,6 +276,12 @@ function genComponentConf() {
           const messageCount = messages ? messages.size : 0;
 
           if (messageCount == 0) {
+            console.log(
+              "DISPATCH connections__showLatestMessages for connUri:",
+              conn.get("uri"),
+              " -> NO messages have already been loaded in the connection: ",
+              conn
+            );
             this.connections__showLatestMessages(conn.get("uri"), MESSAGECOUNT);
           } else {
             const receivedMessages = messages.filter(
@@ -285,6 +291,12 @@ function genComponentConf() {
               receivedMessages.filter(msg => !msg.get("unread")).size > 0;
 
             if (!receivedMessagesReadPresent) {
+              console.log(
+                "DISPATCH connections__showMoreMessages for connUri:",
+                conn.get("uri"),
+                " -> ONLY unread messages are currently present:",
+                conn
+              );
               this.connections__showMoreMessages(conn.get("uri"), MESSAGECOUNT);
             }
           }
@@ -392,7 +404,8 @@ function genComponentConf() {
           return (
             remoteNeedActiveOrLoading && conn.get("state") !== won.WON.Closed
           );
-        })
+        }),
+        "creationDate"
       );
     }
   }

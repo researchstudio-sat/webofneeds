@@ -264,6 +264,24 @@ public class WonLinkedDataUtils
   }
 
   /**
+   * Crawls all connections of the specified need without messages. 
+   * 
+   */
+  public static Dataset getConnectionNetwork(URI needURI, LinkedDataSource linkedDataSource) {
+      assert linkedDataSource != null : "linkedDataSource must not be null";
+      int depth = 5; 
+      int maxRequests = 1000;
+      List<Path> propertyPaths = new ArrayList<>();
+      PrefixMapping pmap = new PrefixMappingImpl();
+      pmap.withDefaultMappings(PrefixMapping.Standard);
+      pmap.setNsPrefix("won", WON.getURI());
+      pmap.setNsPrefix("msg", WONMSG.getURI());
+      propertyPaths.add(PathParser.parse("won:hasConnections", pmap));
+      propertyPaths.add(PathParser.parse("won:hasConnections/rdfs:member", pmap));
+      return linkedDataSource.getDataForResourceWithPropertyPath(needURI, needURI, propertyPaths, maxRequests, depth);
+  }
+  
+  /**
    * Iterator implementation that fetches linked data lazily for the specified iterator of URIs.
    */
   private static class ModelFetchingIterator implements Iterator<Dataset> {

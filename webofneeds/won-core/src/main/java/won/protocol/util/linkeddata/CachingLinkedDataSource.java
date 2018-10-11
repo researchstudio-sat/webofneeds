@@ -302,6 +302,9 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
 		DatasetResponseWithStatusCodeAndHeaders responseData = fetchWithEtagValidation(resource, requesterWebID,
 				linkedDataCacheEntry, headers);
 		Date expires = parseCacheControlMaxAgeValue(resource, responseData);
+		if (responseData.getDataset() == null ) {
+		    throw new IllegalStateException("Could not load dataset for URI " + resource + " and requesterWebID " + requesterWebID);
+		}
 		if (expires == null) {
 			expires = parseExpiresHeader(resource, responseData);
 			if (expires != null && expires.getTime() == 0) {

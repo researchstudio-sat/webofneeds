@@ -33,11 +33,12 @@ export function wellFormedPayload(payload) {
 export function messageHasReferences(wonMsg) {
   return (
     wonMsg &&
-    (wonMsg.getProposedMessages() ||
-      wonMsg.getRetractMessages() ||
-      wonMsg.getRejectsMessages() ||
-      wonMsg.getAcceptedMessages() ||
-      wonMsg.getProposedToCancelMessages())
+    (wonMsg.getProposedMessageUris() ||
+      wonMsg.getRetractsMessageUris() ||
+      wonMsg.getRejectsMessageUris() ||
+      wonMsg.getAcceptsMessageUris() ||
+      wonMsg.getProposedToCancelMessageUris() ||
+      wonMsg.getForwardedMessageUris())
   );
 }
 

@@ -41,6 +41,7 @@ import won.owner.service.impl.OwnerApplicationService;
 import won.owner.web.WonOwnerMailSender;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDecoder;
+import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageEncoder;
 import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.WonMessageProcessor;
@@ -229,7 +230,7 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
 
 		String wonMessageJsonLdString = WonMessageEncoder.encodeAsJsonLd(wonMessage);
 		WebSocketMessage<String> webSocketMessage = new TextMessage(wonMessageJsonLdString);
-		URI needUri = wonMessage.getReceiverNeedURI();
+		URI needUri = getOwnNeedURI(wonMessage);
 		User user = getUserForWonMessage(wonMessage);
 
 		Set<WebSocketSession> webSocketSessions = findWebSocketSessionsForWonMessage(wonMessage, needUri, user);
@@ -363,7 +364,7 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
 	}
 
 	private User getUserForWonMessage(final WonMessage wonMessage) {
-		URI needUri = wonMessage.getReceiverNeedURI();
+		URI needUri = getOwnNeedURI(wonMessage);
 		return userRepository.findByNeedUri(needUri);
 	}
 
@@ -457,8 +458,8 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
 
 	private void saveNeedUriWithUser(final WonMessage wonMessage, final WebSocketSession session) {
 		User user = getUserForSession(session);
-		URI needURI = wonMessage.getReceiverNeedURI();
-		UserNeed userNeed = new UserNeed(needURI);
+		URI needUri = getOwnNeedURI(wonMessage);
+		UserNeed userNeed = new UserNeed(needUri);
 		// reload the user so we can save it
 		// (the user object we get from getUserForSession is detached)
 		user = userRepository.findOne(user.getId());
@@ -477,8 +478,8 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
 
     private void updateNeedUriState(final WonMessage wonMessage, final WebSocketSession session, NeedState newState) {
         User user = getUserForSession(session);
-        URI needURI = wonMessage.getReceiverNeedURI();
-        UserNeed userNeed = userNeedRepository.findByNeedUri(needURI);
+        URI needUri = getOwnNeedURI(wonMessage);
+        UserNeed userNeed = userNeedRepository.findByNeedUri(needUri);
         userNeed.setState(newState);
         // reload the user so we can save it
         // (the user object we get from getUserForSession is detached)
@@ -505,6 +506,12 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
 
 	public void setEagerlyCachePopulatingProcessor(EagerlyCachePopulatingMessageProcessor eagerlyCachePopulatingProcessor) {
 		this.eagerlyCachePopulatingProcessor = eagerlyCachePopulatingProcessor;
+	}
+	
+	private URI getOwnNeedURI(WonMessage message) {
+	    return message.getEnvelopeType() == WonMessageDirection.FROM_SYSTEM 
+            ? message.getSenderNeedURI() 
+            : message.getReceiverNeedURI();    
 	}
 
 }

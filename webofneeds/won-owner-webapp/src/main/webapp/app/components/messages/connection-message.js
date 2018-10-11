@@ -60,7 +60,8 @@ function genComponentConf() {
         <div class="won-cm__center"
                 ng-class="{
                   'won-cm__center--nondisplayable': self.isConnectionMessage && !self.isParsable,
-                  'won-cm__center--system': self.isFromSystem
+                  'won-cm__center--system': self.isFromSystem,
+                  'won-cm__center--inject-into': self.isInjectIntoMessage
                 }"
                 in-view="$inview && self.markAsRead()">
             <div class="won-cm__center__bubble"
@@ -146,6 +147,8 @@ function genComponentConf() {
           (!(isReceivedByOwn && isReceivedByRemote) &&
             (isReceivedByOwn || isReceivedByRemote));
 
+        const injectInto = message && message.get("injectInto");
+
         return {
           ownNeed,
           theirNeed,
@@ -173,6 +176,8 @@ function genComponentConf() {
           isRejectable: isMessageRejectable(message),
           isAcceptable: isMessageAcceptable(message),
           isUnread: isMessageUnread(message),
+          isInjectIntoMessage: injectInto && injectInto.size > 0,
+          injectInto: injectInto,
           isReceived,
           isSent,
           isFailedToSend,
