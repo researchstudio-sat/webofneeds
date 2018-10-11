@@ -110,7 +110,7 @@ export function createWhatsNew() {
         dispatch(actionCreators.needs__close(need.get("uri")));
       });
 
-    dispatch(actionCreators.needs__create(whatsNewObject, nodeUri));
+    dispatch(actionCreators.needs__create(whatsNewObject, null, nodeUri));
   };
 }
 
@@ -151,7 +151,9 @@ export function createWhatsAround() {
               matchingContext: defaultContext,
             };
 
-            dispatch(actionCreators.needs__create(whatsAroundObject, nodeUri));
+            dispatch(
+              actionCreators.needs__create(whatsAroundObject, null, nodeUri)
+            );
           });
         },
         error => {
