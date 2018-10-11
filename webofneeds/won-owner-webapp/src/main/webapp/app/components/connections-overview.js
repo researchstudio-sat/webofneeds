@@ -277,7 +277,9 @@ function genComponentConf() {
 
           if (messageCount == 0) {
             console.log(
-              "DISPATCH connections__showLatestMessages -> NO messages have already been loaded in the connection: ",
+              "DISPATCH connections__showLatestMessages for connUri:",
+              conn.get("uri"),
+              " -> NO messages have already been loaded in the connection: ",
               conn
             );
             this.connections__showLatestMessages(conn.get("uri"), MESSAGECOUNT);
@@ -290,7 +292,9 @@ function genComponentConf() {
 
             if (!receivedMessagesReadPresent) {
               console.log(
-                "DISPATCH connections__showMoreMessages -> ONLY unread messages are currently present:",
+                "DISPATCH connections__showMoreMessages for connUri:",
+                conn.get("uri"),
+                " -> ONLY unread messages are currently present:",
                 conn
               );
               this.connections__showMoreMessages(conn.get("uri"), MESSAGECOUNT);
