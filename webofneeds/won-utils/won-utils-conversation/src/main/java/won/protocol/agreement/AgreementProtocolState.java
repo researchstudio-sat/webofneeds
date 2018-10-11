@@ -556,6 +556,16 @@ public class AgreementProtocolState {
 				    messagesWithDeadReferences.add(new DeadReferenceConversationMessage(message, "agr:proposes", uri));
                 }
 			});
+			message.getClaims().stream().filter(uri -> !uri.equals(message.getMessageURI()))
+				.forEach(uri -> {
+				ConversationMessage other = messagesByURI.get(uri);
+				if (other != null) {
+				    message.addClaimsRef(other);
+					other.addClaimsInverseRef(message);
+				} else {
+				    messagesWithDeadReferences.add(new DeadReferenceConversationMessage(message, "agr:claims", uri));
+	            }
+			});
 			message.getRejects().stream().filter(uri -> !uri.equals(message.getMessageURI()))
 				.forEach(uri -> {
 				ConversationMessage other = messagesByURI.get(uri);
