@@ -102,7 +102,7 @@ function genComponentConf() {
         </div>
         <div class="cp__footer" >
             <won-labelled-hr label="::'done?'" class="cp__footer__labelledhr"></won-labelled-hr>
-            <won-publish-button></won-publish-button>
+            <won-publish-button on-publish="self.publish(persona)" is-valid="self.isValid()"></won-publish-button>
         </div>
     `;
 
@@ -269,7 +269,7 @@ function genComponentConf() {
       this.draftObject[isSeeks] = updatedDraft;
     }
 
-    publish() {
+    publish(persona) {
       if (!this.pendingPublishing) {
         this.pendingPublishing = true;
 
@@ -279,6 +279,7 @@ function genComponentConf() {
 
         this.needs__create(
           this.draftObject,
+          persona,
           this.$ngRedux.getState().getIn(["config", "defaultNodeUri"])
         );
       }

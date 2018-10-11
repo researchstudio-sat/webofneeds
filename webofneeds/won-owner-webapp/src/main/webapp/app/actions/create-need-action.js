@@ -14,7 +14,7 @@ import {
   nominatim2draftLocation,
 } from "../utils.js";
 
-export function needCreate(draft, nodeUri) {
+export function needCreate(draft, persona, nodeUri) {
   return (dispatch, getState) => {
     const state = getState();
 
@@ -43,6 +43,26 @@ export function needCreate(draft, nodeUri) {
           draft,
           nodeUri
         );
+        if (persona) {
+          const response = await fetch("rest/action/connect", {
+            method: "POST",
+            body: JSON.stringify([
+              {
+                pending: true,
+                facet: `${needUri}#holdableFacet`,
+              },
+              {
+                pending: false,
+                facet: `${persona}#holderFacet`,
+              },
+            ]),
+            credentials: "include",
+          });
+          if (!response.ok) {
+            const errorMsg = await response.text();
+            throw new Error(`Could not connect identity: ${errorMsg}`);
+          }
+        }
         dispatch({
           type: actionTypes.needs.create,
           payload: { eventUri, message, needUri, need: draft },

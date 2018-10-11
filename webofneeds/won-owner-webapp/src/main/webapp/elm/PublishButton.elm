@@ -1,4 +1,4 @@
-module PublishButton exposing (Model)
+port module PublishButton exposing (main)
 
 import Browser
 import Dict exposing (Dict)
@@ -79,7 +79,11 @@ view model =
             model.skin
 
         buttonColor =
-            skin.primaryColor
+            if model.draftValid then
+                skin.primaryColor
+
+            else
+                skin.lineGray
 
         focusStyle =
             focused
@@ -141,6 +145,12 @@ view model =
                         , bottomRight = 0
                         }
                     , focusStyle
+                    , paddingEach
+                        { left = 42
+                        , right = 0
+                        , top = 0
+                        , bottom = 0
+                        }
                     ]
                     { onPress =
                         if model.draftValid then
@@ -149,7 +159,12 @@ view model =
                         else
                             Nothing
                     , label =
-                        el [ centerY, centerX, Font.color skin.white ] <|
+                        el
+                            [ centerY
+                            , centerX
+                            , Font.color skin.white
+                            ]
+                        <|
                             text
                                 (case model.selectedPersona of
                                     Persona url ->
@@ -176,18 +191,17 @@ view model =
                     , topRight = 3
                     , bottomRight = 3
                     }
-                , padding 10
+                , width (px 40)
                 , height fill
                 , focusStyle
                 ]
                 { onPress = Just ToggleDropdown
                 , label =
                     svgIcon
-                        [ width (px 16)
-                        , height (px 16)
+                        [ width (px 20)
+                        , height (px 20)
                         , centerX
                         , centerY
-                        , moveUp 2
                         ]
                         { color = skin.white
                         , name =
@@ -229,8 +243,8 @@ personaList skin personas =
                         , spacing 5
                         ]
                         [ el
-                            [ width (px 32)
-                            , height (px 32)
+                            [ width (px 45)
+                            , height (px 45)
                             ]
                             none
                         , text "Anonymous"
@@ -277,8 +291,8 @@ personaEntry skin persona =
                 , spacing 5
                 ]
                 [ Elements.identicon
-                    [ width (px 32)
-                    , height (px 32)
+                    [ width (px 45)
+                    , height (px 45)
                     ]
                     (Url.toString persona.url)
                 , text <| NonEmpty.get persona.data.displayName
@@ -352,7 +366,18 @@ update msg model =
             )
 
         Publish ->
-            ( model, Cmd.none )
+            ( { model
+                | state = Closed
+              }
+            , publishOut
+                (case model.selectedPersona of
+                    Persona url ->
+                        Just url
+
+                    Anonymous ->
+                        Nothing
+                )
+            )
 
         DraftValidityChanged valid ->
             ( { model
@@ -367,7 +392,20 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Persona.subscription ReceivedPersonas (always NoOp)
+    Sub.batch
+        [ Persona.subscription ReceivedPersonas (always NoOp)
+        , publishIn DraftValidityChanged
+        ]
+
+
+
+---- PORTS ----
+
+
+port publishIn : (Bool -> msg) -> Sub msg
+
+
+port publishOut : Maybe String -> Cmd msg
 
 
 
