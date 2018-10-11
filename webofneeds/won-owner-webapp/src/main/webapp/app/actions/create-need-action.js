@@ -46,6 +46,9 @@ export function needCreate(draft, persona, nodeUri) {
         if (persona) {
           const response = await fetch("rest/action/connect", {
             method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
             body: JSON.stringify([
               {
                 pending: true,
