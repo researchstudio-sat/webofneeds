@@ -101,119 +101,139 @@ view model =
         , Font.size 16
         ]
     <|
-        row
-            [ width fill
-            , spacing 2
-            , height (px 43)
-            , above <|
-                case model.state of
-                    Open ->
-                        personaList skin
-                            (model.personas
-                                |> Dict.values
-                                |> List.filterMap
-                                    (\persona ->
-                                        case Persona.saved persona of
-                                            Saved timestamp ->
-                                                Just
-                                                    { timestamp = timestamp
-                                                    , data = Persona.data persona
-                                                    , url = Persona.url persona
-                                                    }
-
-                                            Unsaved ->
-                                                Nothing
-                                    )
-                            )
-
-                    Closed ->
-                        none
-            ]
-            [ el
+        if Dict.isEmpty model.personas then
+            Input.button
                 [ width fill
-                , height fill
-                ]
-              <|
-                Input.button
-                    [ Background.color buttonColor
-                    , width fill
-                    , height fill
-                    , Border.roundEach
-                        { topLeft = 3
-                        , bottomLeft = 3
-                        , topRight = 0
-                        , bottomRight = 0
-                        }
-                    , focusStyle
-                    , paddingEach
-                        { left = 42
-                        , right = 0
-                        , top = 0
-                        , bottom = 0
-                        }
-                    ]
-                    { onPress =
-                        if model.draftValid then
-                            Just Publish
-
-                        else
-                            Nothing
-                    , label =
-                        el
-                            [ centerY
-                            , centerX
-                            , Font.color skin.white
-                            ]
-                        <|
-                            text
-                                (case model.selectedPersona of
-                                    Persona url ->
-                                        case Dict.get url model.personas of
-                                            Just persona ->
-                                                "Publish as "
-                                                    ++ (Persona.data persona
-                                                            |> .displayName
-                                                            |> NonEmpty.get
-                                                       )
-
-                                            Nothing ->
-                                                ""
-
-                                    Anonymous ->
-                                        "Publish anonymously"
-                                )
-                    }
-            , Input.button
-                [ Background.color buttonColor
-                , Border.roundEach
-                    { topLeft = 0
-                    , bottomLeft = 0
-                    , topRight = 3
-                    , bottomRight = 3
-                    }
-                , width (px 40)
-                , height fill
+                , height (px 43)
                 , focusStyle
+                , Background.color buttonColor
+                , Border.rounded 3
                 ]
-                { onPress = Just ToggleDropdown
+                { onPress = Just Publish
                 , label =
-                    svgIcon
-                        [ width (px 20)
-                        , height (px 20)
+                    el
+                        [ centerY
                         , centerX
-                        , centerY
+                        , Font.color skin.white
                         ]
-                        { color = skin.white
-                        , name =
-                            case model.state of
-                                Open ->
-                                    "ico16_arrow_down"
-
-                                Closed ->
-                                    "ico16_arrow_up"
-                        }
+                    <|
+                        text "Publish"
                 }
-            ]
+
+        else
+            row
+                [ width fill
+                , spacing 2
+                , height (px 43)
+                , above <|
+                    case model.state of
+                        Open ->
+                            personaList skin
+                                (model.personas
+                                    |> Dict.values
+                                    |> List.filterMap
+                                        (\persona ->
+                                            case Persona.saved persona of
+                                                Saved timestamp ->
+                                                    Just
+                                                        { timestamp = timestamp
+                                                        , data = Persona.data persona
+                                                        , url = Persona.url persona
+                                                        }
+
+                                                Unsaved ->
+                                                    Nothing
+                                        )
+                                )
+
+                        Closed ->
+                            none
+                ]
+                [ el
+                    [ width fill
+                    , height fill
+                    ]
+                  <|
+                    Input.button
+                        [ Background.color buttonColor
+                        , width fill
+                        , height fill
+                        , Border.roundEach
+                            { topLeft = 3
+                            , bottomLeft = 3
+                            , topRight = 0
+                            , bottomRight = 0
+                            }
+                        , focusStyle
+                        , paddingEach
+                            { left = 42
+                            , right = 0
+                            , top = 0
+                            , bottom = 0
+                            }
+                        ]
+                        { onPress =
+                            if model.draftValid then
+                                Just Publish
+
+                            else
+                                Nothing
+                        , label =
+                            el
+                                [ centerY
+                                , centerX
+                                , Font.color skin.white
+                                ]
+                            <|
+                                text
+                                    (case model.selectedPersona of
+                                        Persona url ->
+                                            case Dict.get url model.personas of
+                                                Just persona ->
+                                                    "Publish as "
+                                                        ++ (Persona.data persona
+                                                                |> .displayName
+                                                                |> NonEmpty.get
+                                                           )
+
+                                                Nothing ->
+                                                    ""
+
+                                        Anonymous ->
+                                            "Publish anonymously"
+                                    )
+                        }
+                , Input.button
+                    [ Background.color buttonColor
+                    , Border.roundEach
+                        { topLeft = 0
+                        , bottomLeft = 0
+                        , topRight = 3
+                        , bottomRight = 3
+                        }
+                    , width (px 40)
+                    , height fill
+                    , focusStyle
+                    ]
+                    { onPress = Just ToggleDropdown
+                    , label =
+                        svgIcon
+                            [ width (px 20)
+                            , height (px 20)
+                            , centerX
+                            , centerY
+                            ]
+                            { color = skin.white
+                            , name =
+                                case model.state of
+                                    Open ->
+                                        "ico16_arrow_down"
+
+                                    Closed ->
+                                        "ico16_arrow_up"
+                            }
+                    }
+                ]
 
 
 personaList :
