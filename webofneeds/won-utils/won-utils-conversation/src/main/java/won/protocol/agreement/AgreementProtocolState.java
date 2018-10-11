@@ -46,6 +46,7 @@ public class AgreementProtocolState {
 	
 	private final Dataset pendingProposals = DatasetFactory.createGeneral();
 	private final Dataset agreements = DatasetFactory.createGeneral();
+	private final Dataset claims = DatasetFactory.createGeneral();
 	private final Dataset cancelledAgreements = DatasetFactory.createGeneral();
 	private final Dataset rejected = DatasetFactory.createGeneral();
 	private Dataset conversation = null;
@@ -94,7 +95,14 @@ public class AgreementProtocolState {
 						.map(e -> e.asProposes())
 						.flatMap(e -> e.getProposes().stream())
 						.collect(Collectors.toSet());
-						
+				
+				Set<URI> claimed = m.getEffects().stream()
+                        .filter(e -> e.isClaims())
+                        .map(e -> e.asClaims())
+                        .map(e -> e.getClaimedMessageUri())
+                        .filter(this::isClaim)
+                        .collect(Collectors.toSet());
+				
 				uris.addCancellationPendingAgreementUris(cancelled);
 				boolean isProposal = false;
 				if (!cancelled.isEmpty()) {
@@ -105,6 +113,9 @@ public class AgreementProtocolState {
 					uris.addPendingProposalUri(m.getMessageURI());
 					isProposal = true;
 				}
+				
+				
+				
 				if (isProposal) {
 					ProposalUris proposal = new ProposalUris(m.getMessageURI(), m.getSenderNeedURI());
 					proposal.addProposes(proposed);
@@ -151,6 +162,18 @@ public class AgreementProtocolState {
 	public boolean isAgreement(URI agreementUri) {
 		return agreements.containsNamedModel(agreementUri.toString());
 	}
+	
+    public Dataset getClaims() {
+        return claims;
+    }
+    
+    public Model getClaim(URI claimURI) {
+        return claims.getNamedModel(claimURI.toString());
+    }
+    
+    public boolean isClaim(URI claimUri) {
+        return claims.containsNamedModel(claimUri.toString());
+    }
 	
 	public Dataset getPendingProposals() {
 		return pendingProposals;
@@ -666,10 +689,10 @@ public class AgreementProtocolState {
 				new PriorityQueue<ConversationMessage>();
 		currentMessages.addAll(messages);
 		
-		//TODO: we need to use a priority queue for the messages, which is 
-		//sorted by temporal ordering. Each time we process a message, we 
-		//add the subsequent ones to the queue, the retrieve the 
-		//oldest from the queue for the next iteration.
+		// we need to use a priority queue for the messages, which is 
+		// sorted by temporal ordering. Each time we process a message, we 
+		// add the subsequent ones to the queue, the retrieve the 
+		// oldest from the queue for the next iteration.
 
 		Set<ConversationMessage> processed = new HashSet<>();
 		List<ConversationMessage> processedInOrder = null;

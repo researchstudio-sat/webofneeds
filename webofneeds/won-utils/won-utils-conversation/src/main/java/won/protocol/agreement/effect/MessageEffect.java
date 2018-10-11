@@ -38,6 +38,10 @@ public abstract class MessageEffect {
 		return type == MessageEffectType.RETRACTS;
 	}
 	
+	public boolean isClaims() {
+	    return type == MessageEffectType.CLAIMS;
+	}
+	
 	public Accepts asAccepts() {
 		return (Accepts) this;
 	}
@@ -52,5 +56,9 @@ public abstract class MessageEffect {
 	
 	public Retracts asRetracts() {
 		return (Retracts) this;
+	}
+	
+	public Claims asClaims() {
+	    return (Claims) this;
 	}
 }
