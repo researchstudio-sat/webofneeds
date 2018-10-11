@@ -13,7 +13,10 @@ function genComponentConf($ngRedux) {
       const elmApp = Elm.PublishButton.init({ node: element[0] });
 
       scope.$watch("isValid", newValue => {
-        elmApp.ports.publishIn.send(newValue ? true : false);
+        elmApp.ports.publishIn.send({
+          draftValid: newValue ? true : false,
+          loggedIn: $ngRedux.getState().getIn(["user", "loggedIn"]),
+        });
       });
 
       const convertPersonas = personas => {
@@ -29,7 +32,10 @@ function genComponentConf($ngRedux) {
         return conversion;
       };
 
-      elmApp.ports.publishIn.send(scope.isValid ? true : false);
+      elmApp.ports.publishIn.send({
+        draftValid: scope.isValid ? true : false,
+        loggedIn: $ngRedux.getState().getIn(["user", "loggedIn"]),
+      });
 
       const personas = $ngRedux.getState().get("personas");
       if (personas) {
@@ -37,8 +43,15 @@ function genComponentConf($ngRedux) {
       }
 
       const disconnect = $ngRedux.connect(state => {
-        return { personas: state.get("personas") };
+        return {
+          personas: state.get("personas"),
+          loggedIn: state.getIn(["user", "loggedIn"]),
+        };
       })(state => {
+        elmApp.ports.publishIn.send({
+          draftValid: scope.isValid ? true : false,
+          loggedIn: state.loggedIn,
+        });
         if (!state.personas) {
           return;
         }
