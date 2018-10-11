@@ -472,7 +472,10 @@ export async function loadLatestMessagesOfConnection({
   if (actionTypesToDispatch.start) {
     dispatch({
       type: actionTypesToDispatch.start,
-      payload: Immutable.fromJS({ connectionUri_, isLoadingMessages: true }),
+      payload: Immutable.fromJS({
+        connectionUri: connectionUri_,
+        isLoadingMessages: true,
+      }),
     });
   }
 
@@ -557,7 +560,7 @@ export function showMoreMessages(connectionUriParam, numberOfEvents) {
     const connection = need && need.getIn(["connections", connectionUri]);
     const connectionMessages = connection && connection.get("messages");
 
-    if (connection.get("isLoadingMessages")) return; // only start loading once.
+    if (!connection || connection.get("isLoadingMessages")) return; // only start loading once, or not if no connection was found
 
     // determine the oldest loaded event
     const sortedConnectionMessages = connectionMessages
