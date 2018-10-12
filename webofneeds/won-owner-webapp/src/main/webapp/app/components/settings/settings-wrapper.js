@@ -2,12 +2,17 @@ import angular from "angular";
 import { Elm } from "../../../elm/Settings/Personas.elm";
 import { actionCreators } from "../../actions/actions";
 import "../identicon.js";
+import { currentSkin } from "../../selectors";
 
 function genComponentConf($ngRedux) {
   return {
     restrict: "E",
     link: (scope, element) => {
-      const elmApp = Elm.Settings.Personas.init({ node: element[0] });
+      const elmApp = Elm.Settings.Personas.init({
+        node: element[0],
+        flags: currentSkin(),
+      });
+
       elmApp.ports.personaOut.subscribe(persona => {
         $ngRedux.dispatch(actionCreators.personas__create(persona));
       });

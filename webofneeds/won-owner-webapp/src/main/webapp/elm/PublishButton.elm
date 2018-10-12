@@ -10,6 +10,7 @@ import Element.Input as Input
 import Elements
 import Html exposing (Html)
 import Html.Attributes as HA
+import Json.Decode as Decode exposing (Value)
 import NonEmpty
 import Persona exposing (Persona, PersonaData, SaveState(..))
 import Skin exposing (Skin)
@@ -55,19 +56,14 @@ type SelectedPersona
     | Persona String
 
 
-init : () -> ( Model, Cmd Msg )
-init () =
+init : Value -> ( Model, Cmd Msg )
+init skin =
     ( { personas = Dict.empty
       , state = Closed
       , selectedPersona = Anonymous
       , skin =
-            { primaryColor = rgb255 240 70 70
-            , lightGray = rgb255 240 242 244
-            , lineGray = rgb255 203 210 209
-            , subtitleGray = rgb255 128 128 128
-            , black = rgb255 0 0 0
-            , white = rgb255 255 255 255
-            }
+            Decode.decodeValue Skin.decoder skin
+                |> Result.withDefault Skin.default
       , options =
             { draftValid = False
             , loggedIn = False
@@ -123,7 +119,7 @@ view model =
                     el
                         [ centerY
                         , centerX
-                        , Font.color skin.white
+                        , Font.color Skin.white
                         ]
                     <|
                         text "Publish"
@@ -191,7 +187,7 @@ view model =
                             el
                                 [ centerY
                                 , centerX
-                                , Font.color skin.white
+                                , Font.color Skin.white
                                 ]
                             <|
                                 text
@@ -232,7 +228,7 @@ view model =
                             , centerX
                             , centerY
                             ]
-                            { color = skin.white
+                            { color = Skin.white
                             , name =
                                 case model.state of
                                     Open ->
@@ -309,7 +305,7 @@ personaList skin personas =
         , Border.color skin.lineGray
         , Border.width 1
         , moveUp 5
-        , Background.color skin.white
+        , Background.color Skin.white
         ]
         (List.intersperse line listElements)
 

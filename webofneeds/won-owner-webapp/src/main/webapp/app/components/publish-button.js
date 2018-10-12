@@ -1,6 +1,7 @@
 import angular from "angular";
 import { Elm } from "../../elm/PublishButton.elm";
 import "./svg-icon.js";
+import { currentSkin } from "../selectors";
 
 function genComponentConf($ngRedux) {
   return {
@@ -10,7 +11,11 @@ function genComponentConf($ngRedux) {
       onPublish: "&",
     },
     link: (scope, element) => {
-      const elmApp = Elm.PublishButton.init({ node: element[0] });
+      console.log(currentSkin());
+      const elmApp = Elm.PublishButton.init({
+        node: element[0],
+        flags: currentSkin(),
+      });
 
       scope.$watch("isValid", newValue => {
         elmApp.ports.publishIn.send({

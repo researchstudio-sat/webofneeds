@@ -11,7 +11,7 @@ import Element.Input as Input
 import Elements
 import Html exposing (Html, node)
 import Html.Attributes as HA
-import Json.Decode as Decode
+import Json.Decode as Decode exposing (Value)
 import NonEmpty
 import Persona exposing (Persona, PersonaData, SaveState(..))
 import Skin exposing (Skin)
@@ -23,7 +23,7 @@ import Validate exposing (Valid, Validator)
 
 main =
     Browser.element
-        { init = \() -> ( init, Cmd.none )
+        { init = init
         , update = update
         , view = view
         , subscriptions = subscriptions
@@ -111,20 +111,17 @@ type alias Url =
     String
 
 
-init : Model
-init =
-    Loading
+init : Value -> ( Model, Cmd Msg )
+init skin =
+    ( Loading
         { skin =
-            { primaryColor = rgb255 240 70 70
-            , lightGray = rgb255 240 242 244
-            , lineGray = rgb255 203 210 209
-            , subtitleGray = rgb255 128 128 128
-            , black = rgb255 0 0 0
-            , white = rgb255 255 255 255
-            }
+            Decode.decodeValue Skin.decoder skin
+                |> Result.withDefault Skin.default
         , creating = Nothing
         , createQueue = []
         }
+    , Cmd.none
+    )
 
 
 
@@ -610,11 +607,11 @@ viewUnsaved skin persona =
             el
                 [ width fill
                 , height fill
-                , Background.color (Skin.setAlpha 0.5 skin.black)
+                , Background.color (Skin.setAlpha 0.5 Skin.black)
                 ]
             <|
                 el
-                    [ Font.color skin.white
+                    [ Font.color Skin.white
                     , Font.size 18
                     , centerX
                     , centerY
