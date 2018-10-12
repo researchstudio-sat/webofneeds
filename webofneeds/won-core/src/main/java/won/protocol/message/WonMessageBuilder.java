@@ -373,6 +373,22 @@ public class WonMessageBuilder
       return setMessagePropertiesForOpen(messageURI, localConnection, localNeed, localWonNode, remoteConnection, remoteNeed, remoteWonNode, Optional.empty(), welcomeMessage);
   }
   
+  public static WonMessageBuilder setMessagePropertiesForOpen(
+          URI messageURI,
+          WonMessage connectToReactTo,
+          String welcomeMessage) {
+            return setMessagePropertiesForOpen(
+                    messageURI, 
+                    connectToReactTo.getReceiverURI(), 
+                    connectToReactTo.getReceiverNeedURI(), 
+                    connectToReactTo.getReceiverNodeURI(), 
+                    connectToReactTo.getSenderURI(), 
+                    connectToReactTo.getSenderNeedURI(), 
+                    connectToReactTo.getSenderNodeURI(),
+                    Optional.of(connectToReactTo.getSenderFacetURI()), 
+                    welcomeMessage);
+  }
+  
   public static WonMessageBuilder setMessagePropertiesForClose(
     URI messageURI,
     URI localConnection,
