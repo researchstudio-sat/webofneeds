@@ -20,6 +20,7 @@ import won.owner.model.UserNeed;
 import won.owner.pojo.FacetToConnect;
 import won.owner.repository.UserNeedRepository;
 import won.owner.service.impl.UserService;
+import won.owner.web.service.ServerSideActionService;
 
 @Controller
 @RequestMapping("/rest/action")
@@ -32,6 +33,9 @@ public class ServerSideActionController {
 
     @Autowired
     private UserService userService;
+    
+    @Autowired 
+    private ServerSideActionService serverSideActionService;
 
     
     //rsponses: 204 (no content) or 409 (conflict)
@@ -68,7 +72,20 @@ public class ServerSideActionController {
         if (problematicFacet.isPresent()) {
             return new ResponseEntity("Cannot process connect action: facet " + problematicFacet.get().getFacet() + " does not belong to any of the user's needs.", HttpStatus.CONFLICT);
         }
+        serverSideActionService.connect(facets, SecurityContextHolder.getContext().getAuthentication());
         return new ResponseEntity(HttpStatus.NO_CONTENT);
+    }
+    
+    public void setServerSideActionService(ServerSideActionService serverSideActionService) {
+        this.serverSideActionService = serverSideActionService;
+    }
+    
+    public void setUserNeedRepository(UserNeedRepository userNeedRepository) {
+        this.userNeedRepository = userNeedRepository;
+    }
+    
+    public void setUserService(UserService userService) {
+        this.userService = userService;
     }
 }
 
