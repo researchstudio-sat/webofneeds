@@ -6,6 +6,7 @@ import { createSelector } from "reselect";
 import Immutable from "immutable";
 import won from "./won-es6.js";
 import { decodeUriComponentProperly, getIn } from "./utils.js";
+import Color from "color";
 
 export const selectLastUpdateTime = state => state.get("lastUpdateTime");
 export const selectRouterParams = state =>
@@ -361,4 +362,19 @@ export function getCorrectMessageUri(messages, messageUri) {
     }
   }
   return undefined;
+}
+
+export function currentSkin() {
+  const style = getComputedStyle(document.body);
+  const getColor = name => {
+    return Color(style.getPropertyValue(name).trim())
+      .rgb()
+      .array();
+  };
+  return {
+    primaryColor: getColor("--won-primary-color"),
+    lightGray: getColor("--won-light-gray"),
+    lineGray: getColor("--won-line-gray"),
+    subtitleGray: getColor("--won-subtitle-gray"),
+  };
 }
