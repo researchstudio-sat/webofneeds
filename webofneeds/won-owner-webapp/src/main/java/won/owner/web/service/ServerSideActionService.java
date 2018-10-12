@@ -177,4 +177,13 @@ public class ServerSideActionService implements WonMessageProcessor {
         return message;
     }
     
+    public void setOwnerApplicationService(OwnerApplicationService ownerApplicationService) {
+        this.ownerApplicationService = ownerApplicationService;
+    }
+    
+    public void setLinkedDataSourceOnBehalfOfNeed(LinkedDataSource linkedDataSourceOnBehalfOfNeed) {
+        this.linkedDataSourceOnBehalfOfNeed = linkedDataSourceOnBehalfOfNeed;
+    }
+    
+    
 }
