@@ -47,7 +47,7 @@ function genComponentConf($ngRedux) {
         elmApp.ports.personaIn.send(convertPersonas(personas));
       }
 
-      const disconnect = $ngRedux.connect(state => {
+      const disconnectOptions = $ngRedux.connect(state => {
         return {
           personas: state.get("personas"),
           loggedIn: state.getIn(["user", "loggedIn"]),
@@ -63,12 +63,21 @@ function genComponentConf($ngRedux) {
         elmApp.ports.personaIn.send(convertPersonas(state.personas));
       });
 
+      const disconnectSkin = $ngRedux.connect(state => {
+        return {
+          skin: state.getIn(["config", "theme"]),
+        };
+      })(() => {
+        elmApp.ports.skin.send(currentSkin());
+      });
+
       elmApp.ports.publishOut.subscribe(url => {
         scope.onPublish({ persona: url });
       });
 
       scope.$on("$destroy", () => {
-        disconnect();
+        disconnectOptions();
+        disconnectSkin();
         elmApp.ports.publishOut.unsubscribe();
       });
     },

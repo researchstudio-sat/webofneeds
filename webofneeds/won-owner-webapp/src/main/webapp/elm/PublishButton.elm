@@ -346,6 +346,7 @@ type Msg
     | ReceivedPersonas (Dict String Persona)
     | OptionsUpdated Options
     | Publish
+    | SkinUpdated Skin
     | NoOp
 
 
@@ -422,6 +423,13 @@ update msg model =
             , Cmd.none
             )
 
+        SkinUpdated skin ->
+            ( { model
+                | skin = skin
+              }
+            , Cmd.none
+            )
+
         NoOp ->
             ( model, Cmd.none )
 
@@ -431,6 +439,7 @@ subscriptions model =
     Sub.batch
         [ Persona.subscription ReceivedPersonas (always NoOp)
         , publishIn OptionsUpdated
+        , Skin.subscription SkinUpdated (\_ -> NoOp)
         ]
 
 

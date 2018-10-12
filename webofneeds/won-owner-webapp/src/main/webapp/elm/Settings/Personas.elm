@@ -135,6 +135,7 @@ type Msg
     | View Url
     | Cancel
     | DraftUpdated Draft
+    | SkinUpdated Skin
     | NoOp
 
 
@@ -196,6 +197,14 @@ update msg model =
                     ( Loading
                         { loadingModel
                             | creating = Just newDraft
+                        }
+                    , Cmd.none
+                    )
+
+                ( SkinUpdated skin, _ ) ->
+                    ( Loading
+                        { loadingModel
+                            | skin = skin
                         }
                     , Cmd.none
                     )
@@ -289,6 +298,14 @@ update msg model =
 
                         _ ->
                             ( model, Cmd.none )
+
+                SkinUpdated skin ->
+                    ( Loaded
+                        { loadedModel
+                            | skin = skin
+                        }
+                    , Cmd.none
+                    )
 
                 NoOp ->
                     ( model, Cmd.none )

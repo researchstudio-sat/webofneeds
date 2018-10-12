@@ -1,15 +1,16 @@
-module Skin exposing
+port module Skin exposing
     ( Skin
     , black
     , cssColor
     , decoder
     , default
     , setAlpha
+    , subscription
     , white
     )
 
 import Element exposing (..)
-import Json.Decode as Decode exposing (Decoder)
+import Json.Decode as Decode exposing (Decoder, Error, Value)
 
 
 type alias Skin =
@@ -95,3 +96,19 @@ decoder =
         (Decode.field "lightGray" colorDecoder)
         (Decode.field "lineGray" colorDecoder)
         (Decode.field "subtitleGray" colorDecoder)
+
+
+port skin : (Value -> msg) -> Sub msg
+
+
+subscription : (Skin -> msg) -> (Error -> msg) -> Sub msg
+subscription tag errorTag =
+    skin
+        (\value ->
+            case Decode.decodeValue decoder value of
+                Ok skin_ ->
+                    tag skin_
+
+                Err error ->
+                    errorTag error
+        )
