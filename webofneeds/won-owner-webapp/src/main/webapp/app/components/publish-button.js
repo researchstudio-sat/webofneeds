@@ -11,7 +11,6 @@ function genComponentConf($ngRedux) {
       onPublish: "&",
     },
     link: (scope, element) => {
-      console.log(currentSkin());
       const elmApp = Elm.PublishButton.init({
         node: element[0],
         flags: currentSkin(),
