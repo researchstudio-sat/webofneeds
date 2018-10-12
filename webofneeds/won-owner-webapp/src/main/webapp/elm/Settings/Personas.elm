@@ -332,7 +332,10 @@ saveDraft draft =
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-    Persona.subscription ReceivedPersonas (\_ -> NoOp)
+    Sub.batch
+        [ Persona.subscription ReceivedPersonas (\_ -> NoOp)
+        , Skin.subscription SkinUpdated (\_ -> NoOp)
+        ]
 
 
 
