@@ -85,7 +85,7 @@ public class ConnectMessageFromNodeProcessor extends AbstractCamelProcessor
           }
       }
     }
-    failForIncompatibleFacets(facet.getFacetURI(), facet.getFacetType().getURI(), remoteFacetURI);
+    failForIncompatibleFacets(facet.getFacetURI(), facet.getTypeURI(), remoteFacetURI);
     if (con == null){
       //create Connection in Database
       URI connectionUri = wonNodeInformationService.generateConnectionURI(

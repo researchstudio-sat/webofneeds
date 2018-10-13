@@ -41,6 +41,9 @@ public class ServerSideActionService implements WonMessageProcessor {
     @Autowired
     private LinkedDataSource linkedDataSourceOnBehalfOfNeed;
     
+    @Autowired
+    private LinkedDataSource linkedDataSource;
+    
     // ownerApplicationService for sending messages from the owner to the node
     private OwnerApplicationService ownerApplicationService;
     
@@ -85,12 +88,12 @@ public class ServerSideActionService implements WonMessageProcessor {
                             sendConnect(fromFacet, toFacet, authentication);
                             return Arrays.asList(
                                     new EventTriggeredAction<WonMessage>(
-                                            String.format("Expecting incoming connect from %s for %s", fromFacet, toFacet),
+                                            String.format("Connect %s and %s: Expecting incoming connect from %s for %s", fromFacet, toFacet, fromFacet, toFacet),
                                             m -> isConnectFromFacetForFacet(m.get(), fromFacet, toFacet), this));
                         } else {
                             // we have sent the connect, check if we're processing the connect on the 
                             // receiving end. If so, send an open.
-                            if (isConnectFromFacetForFacet(msg.get(), fromFacet, toFacet) && isSuccessResponse(msg.get())) {
+                            if (isConnectFromFacetForFacet(msg.get(), fromFacet, toFacet)) {
                                 sendOpen(msg.get(), authentication);
                                 //that's it - don't register any more actions
                             }
@@ -98,7 +101,7 @@ public class ServerSideActionService implements WonMessageProcessor {
                     } else {
                         //we are still waiting for need creation to finish. return this action waiting for another create response 
                         return Arrays.asList(
-                                new EventTriggeredAction<>("Expecting response for create", 
+                                new EventTriggeredAction<>(String.format("Connect %s and %s: Expecting response for create", fromFacet, toFacet), 
                                         m -> m.isPresent() && isResponseToCreateOfFacets(m.get(), facets), 
                                         this));
                         
@@ -139,8 +142,8 @@ public class ServerSideActionService implements WonMessageProcessor {
     private void sendConnect(URI fromFacet, URI toFacet, Authentication authentication){
         URI fromNeedURI = URI.create(fromFacet.toString().replaceFirst("#.+$", ""));
         URI toNeedURI = URI.create(toFacet.toString().replaceFirst("#.+$", ""));
-        URI fromWonNodeURI = WonLinkedDataUtils.getWonNodeURIForNeedOrConnectionURI(fromNeedURI, linkedDataSourceOnBehalfOfNeed);
-        URI toWonNodeURI = WonLinkedDataUtils.getWonNodeURIForNeedOrConnectionURI(toNeedURI, linkedDataSourceOnBehalfOfNeed);
+        URI fromWonNodeURI = WonLinkedDataUtils.getWonNodeURIForNeedOrConnectionURI(fromNeedURI, linkedDataSource);
+        URI toWonNodeURI = WonLinkedDataUtils.getWonNodeURIForNeedOrConnectionURI(toNeedURI, linkedDataSource);
         URI messageURI = wonNodeInformationService.generateEventURI(fromWonNodeURI);
         WonMessage msgToSend =  WonMessageBuilder.setMessagePropertiesForConnect(
                 messageURI, Optional.of(fromFacet), fromNeedURI, fromWonNodeURI, 
