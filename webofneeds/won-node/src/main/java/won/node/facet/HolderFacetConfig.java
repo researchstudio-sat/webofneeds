@@ -12,7 +12,7 @@ public class HolderFacetConfig extends HardcodedFacetConfig {
 
    
     public HolderFacetConfig() {
-        super(FacetType.HoldableFacet.getURI());
+        super(FacetType.HolderFacet.getURI());
         this.derivationProperties.add(WON.HOLDS);
     }
     

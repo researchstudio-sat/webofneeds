@@ -39,6 +39,7 @@ import won.owner.repository.UserRepository;
 import won.owner.service.impl.KeystoreEnabledUserDetails;
 import won.owner.service.impl.OwnerApplicationService;
 import won.owner.web.WonOwnerMailSender;
+import won.owner.web.service.ServerSideActionService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDecoder;
 import won.protocol.message.WonMessageDirection;
@@ -86,6 +87,9 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
 
 	@Autowired
 	private EagerlyCachePopulatingMessageProcessor eagerlyCachePopulatingProcessor;
+	
+	@Autowired
+	private ServerSideActionService serverSideActionService;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -227,7 +231,10 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
 	public WonMessage process(final WonMessage wonMessage) {
-
+	    
+	    //first, let the serversideactionservice do its work, if there is any to do:
+	    serverSideActionService.process(wonMessage);
+	    
 		String wonMessageJsonLdString = WonMessageEncoder.encodeAsJsonLd(wonMessage);
 		WebSocketMessage<String> webSocketMessage = new TextMessage(wonMessageJsonLdString);
 		URI needUri = getOwnNeedURI(wonMessage);
@@ -507,6 +514,10 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
 	public void setEagerlyCachePopulatingProcessor(EagerlyCachePopulatingMessageProcessor eagerlyCachePopulatingProcessor) {
 		this.eagerlyCachePopulatingProcessor = eagerlyCachePopulatingProcessor;
 	}
+	
+	public void setServerSideActionService(ServerSideActionService serverSideActionService) {
+        this.serverSideActionService = serverSideActionService;
+    }
 	
 	private URI getOwnNeedURI(WonMessage message) {
 	    return message.getEnvelopeType() == WonMessageDirection.FROM_SYSTEM 
