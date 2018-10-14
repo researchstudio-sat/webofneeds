@@ -354,7 +354,7 @@ public class WonMessageBuilder
       .setReceiverNeedURI(remoteNeed)
       .setReceiverNodeURI(remoteWonNode);
     if (remoteFacet.isPresent()) {
-        builder.setSenderFacetURI(remoteFacet.get());
+        builder.setReceiverFacetURI(remoteFacet.get());
     }
     return builder.setTextMessage(welcomeMessage)
       .setSentTimestampToNow();
