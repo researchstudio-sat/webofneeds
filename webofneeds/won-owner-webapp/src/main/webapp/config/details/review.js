@@ -13,11 +13,12 @@ export const review = {
   viewerComponent: "won-review-viewer",
   placeholder: "Review Text (optional)",
   rating: [
-    { value: "1", label: "1 Star" },
-    { value: "2", label: "2 Stars" },
-    { value: "3", label: "3 Stars", default: true },
-    { value: "4", label: "4 Stars" },
-    { value: "5", label: "5 Stars" }, //TODO: change value to numbers
+    { value: undefined, label: "Select a Rating", default: true },
+    { value: 1, label: "1 Star" },
+    { value: 2, label: "2 Stars" },
+    { value: 3, label: "3 Stars" },
+    { value: 4, label: "4 Stars" },
+    { value: 5, label: "5 Stars" },
   ],
   messageEnabled: true,
   parseToRDF: function({ value, identifier, contentUri }) {
@@ -50,9 +51,9 @@ export const review = {
                 "/" +
                 generateIdString(10)
               : undefined,
-          "s:bestRating": [{ "@value": 5, "@type": "xsd:int" }], //not necessary but possible
-          "s:ratingValue": [{ "@value": value.rating, "@type": "xsd:int" }],
-          "s:worstRating": [{ "@value": 1, "@type": "xsd:int" }], //not necessary but possible
+          "s:bestRating": { "@value": 5, "@type": "xsd:int" }, //not necessary but possible
+          "s:ratingValue": { "@value": value.rating, "@type": "xsd:int" },
+          "s:worstRating": { "@value": 1, "@type": "xsd:int" }, //not necessary but possible
         },
         "s:description": value.text,
       },
@@ -68,7 +69,7 @@ export const review = {
     const rating = won.parseFrom(
       jsonLDImm,
       ["s:review", "s:reviewRating", "s:ratingValue"],
-      "xsd:string"
+      "xsd:int"
     );
 
     //TODO: EXTRACT AUTHOR AND ABOUT URI
