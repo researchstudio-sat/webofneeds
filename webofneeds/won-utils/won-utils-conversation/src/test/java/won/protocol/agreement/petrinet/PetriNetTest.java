@@ -11,17 +11,22 @@ import java.util.stream.Collectors;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.query.ReadWrite;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.LoggerFactory;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import uk.ac.imperial.pipe.animation.PetriNetAnimator;
 import uk.ac.imperial.pipe.models.petrinet.PetriNet;
 import uk.ac.imperial.pipe.models.petrinet.Place;
 import uk.ac.imperial.pipe.models.petrinet.Transition;
 
-public class PetriNetTests {
+public class PetriNetTest {
 
     private InputStream getResourceAsStream(String name) {
         return getClass().getClassLoader().getResourceAsStream(name);
@@ -57,11 +62,17 @@ public class PetriNetTests {
                     is.close();
                 }
             }
-    
+            dataset.commit();
             return dataset;
         } catch (Exception e) {
             throw new IllegalStateException("could not load resource " + path, e);
         }
+    }
+
+    @BeforeClass
+    public static void setLogLevel() {
+        Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+        root.setLevel(Level.INFO);
     }
     
     @Test
@@ -140,8 +151,9 @@ public class PetriNetTests {
     public void testConversationPetriNets() {
                                            
         Dataset conversation = loadDataset("won/protocol/petrinet/conversations/simple-petri-net-one-event.trig");
-        ConversationPetriNets nets = ConversationPetriNets.of(conversation);
+        PetriNetStates nets = PetriNetStates.of(conversation);
         Collection<PetriNetState> states = nets.getPetrinetStates();
+        conversation.end();
         Assert.assertTrue(!states.isEmpty());
         Assert.assertEquals(1, states.size());
         PetriNetState state = states.iterator().next();

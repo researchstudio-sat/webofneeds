@@ -1,11 +1,8 @@
 package won.protocol.agreement.petrinet;
 
 import java.net.URI;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import org.apache.jena.query.Dataset;
 
 import uk.ac.imperial.pipe.animation.PetriNetAnimator;
 import uk.ac.imperial.pipe.models.petrinet.PetriNet;
@@ -19,34 +16,11 @@ public class PetriNetState {
     private PetriNetAnimator petriNetAnimator;
 
     // The URI chosen by one of the participants for this petri net
-    private URI petrinetURI;
-
-    // indicates that there are conflicting interpretations about the state of the
-    // petri net
-    private boolean inConflict = false;
-
-    // indicates the participants in whose point of view the petri net is in the
-    // state we are describing. If there are no conflicting interpretations,
-    // this contains all participants.
-    private Set<URI> participants;
-
-    // holds the xml defining the petri net
-    private String definition;
-
-    // derived data for the state of the petrinet
-    private Dataset derivedData;
-
-    private Set<URI> markedPlaces = new HashSet<>();
-
-    private Set<URI> enabledTransitions = new HashSet<>();
-
-    private Set<URI> places = new HashSet<>();
-
-    private Set<URI> transitions = new HashSet<>();
+    private URI petriNetURI;
 
     public PetriNetState(URI petrinetURI, PetriNet petriNet) {
         super();
-        this.petrinetURI = petrinetURI;
+        this.petriNetURI = petrinetURI;
         this.petriNet = petriNet;
         this.petriNetAnimator = new PetriNetAnimator(petriNet);
     }
@@ -69,10 +43,10 @@ public class PetriNetState {
                 .collect(Collectors.toSet());
     }
     
-    public void fireForEvent(URI eventUri) {
+    public void fireTransition(URI transitionURI) {
         petriNetAnimator.getEnabledTransitions()
              .stream()
-             .filter(t -> eventUri.toString().equals(t.getId()))
+             .filter(t -> transitionURI.toString().equals(t.getId()))
              .forEach(petriNetAnimator::fireTransition);
     }
 
@@ -83,13 +57,9 @@ public class PetriNetState {
     public Set<URI> getTransitions() {
         return petriNet.getTransitions().stream().map(p -> URI.create(p.getId())).collect(Collectors.toSet());
     }
-
-    /**
-     * Returns all data that can be derived from the current state of the petrinet.
-     * This dataset may change whenever the petrinet state changes.
-     */
-    public Dataset getDerivedData() {
-        return derivedData;
+    
+    public URI getPetriNetURI() {
+        return petriNetURI;
     }
 
 }

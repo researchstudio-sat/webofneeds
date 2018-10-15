@@ -3,8 +3,10 @@ package won.protocol.agreement.petrinet;
 import java.net.URI;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
@@ -16,9 +18,9 @@ import org.slf4j.LoggerFactory;
 
 import uk.ac.imperial.pipe.models.petrinet.PetriNet;
 import won.protocol.agreement.AgreementProtocolState;
-import won.protocol.vocabulary.WONPROC;
+import won.protocol.vocabulary.WONWF;
 
-public class ConversationPetriNets {
+public class PetriNetStates {
     
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private AgreementProtocolState agreementProtocolState;
@@ -27,21 +29,21 @@ public class ConversationPetriNets {
     private PetriNetLoader petriNetLoader = new PetriNetLoader();
 
     
-    public static ConversationPetriNets of(Dataset conversation) {
-        return new ConversationPetriNets(conversation);
+    public static PetriNetStates of(Dataset conversation) {
+        return new PetriNetStates(conversation);
     }
     
-    public static ConversationPetriNets of(AgreementProtocolState agreementProtocolState) {
-        return new ConversationPetriNets(agreementProtocolState);
+    public static PetriNetStates of(AgreementProtocolState agreementProtocolState) {
+        return new PetriNetStates(agreementProtocolState);
     }
     
-    private ConversationPetriNets(Dataset conversation) {
+    private PetriNetStates(Dataset conversation) {
         this.conversation = conversation;
         this.agreementProtocolState = AgreementProtocolState.of(conversation);
         calculate();
     }
     
-    private ConversationPetriNets(AgreementProtocolState agreementProtocolState) {
+    private PetriNetStates(AgreementProtocolState agreementProtocolState) {
         this.agreementProtocolState = agreementProtocolState;
         this.conversation = agreementProtocolState.getConversationDataset();
         calculate();
@@ -63,7 +65,6 @@ public class ConversationPetriNets {
         
         //walk over agreements
         agreementUris.forEach(agreementURI -> {
-            System.out.println("processing agreement: " + agreementURI);
             Model agreement = agreementProtocolState.getAgreement(agreementURI);
         
             //first, find petri net in current agreement
@@ -76,7 +77,7 @@ public class ConversationPetriNets {
     }
 
     private void loadPetrinetsForAgreement(Model agreement, URI agreementUri) {
-        StmtIterator it = agreement.listStatements(null, WONPROC.HAS_INLINE_PETRI_NET_DEFINITION, (RDFNode) null);
+        StmtIterator it = agreement.listStatements(null, WONWF.HAS_INLINE_PETRI_NET_DEFINITION, (RDFNode) null);
         while(it.hasNext()) {
             Statement stmt = it.next();
             if (stmt.getSubject().isURIResource() && stmt.getObject().isLiteral()) {
@@ -94,7 +95,7 @@ public class ConversationPetriNets {
     }
     
     private void executePetriNetEventsForAgreement(Model agreement, URI agreementUri) {
-        StmtIterator it = agreement.listStatements(null, WONPROC.HAS_PROCESS_EVENT, (RDFNode) null);
+        StmtIterator it = agreement.listStatements(null, WONWF.FIRES_TRANSITION, (RDFNode) null);
         while(it.hasNext()) {
             Statement stmt = it.next();
             if (stmt.getSubject().isURIResource() && stmt.getObject().isURIResource()) {
@@ -102,7 +103,7 @@ public class ConversationPetriNets {
                 URI eventURI = URI.create(stmt.getObject().asResource().getURI());
                 PetriNetState state = petrinetStates.get(petriNetUri);
                 if (state != null) {
-                    state.fireForEvent(eventURI);
+                    state.fireTransition(eventURI);
                 } else {
                     logger.info("ignoring event {} for unknown petri net {} in agreement {}", new Object[] {eventURI, petriNetUri, agreementUri});
                 }
@@ -116,5 +117,16 @@ public class ConversationPetriNets {
         return petrinetStates.values();
     }
     
+    public Set<PetriNetUris> getPetriNetUris() {
+        Set<PetriNetUris> petriNetUriSet = new HashSet<>();
+        this.petrinetStates.values().forEach(petriNetState -> {
+            PetriNetUris petriNetUris = new PetriNetUris();
+            petriNetUris.setEnabledTransitions(petriNetState.getEnabledTransitions());
+            petriNetUris.setMarkedPlaces(petriNetState.getMarkedPlaces());
+            petriNetUris.setPetriNetURI(petriNetState.getPetriNetURI());
+            petriNetUriSet.add(petriNetUris);
+        });
+        return petriNetUriSet;
+    }
     
 }
