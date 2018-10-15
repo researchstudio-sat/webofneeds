@@ -464,6 +464,7 @@ export function parseJsonldLeafsImm(val, type) {
  *    * `s:Number`
  *    * `s:Float`
  *    * `s:Integer`
+ *    * `xsd:int`
  *    * `xsd:float`
  *    * `xsd:dateTime`
  *    * `xsd:dateTime`
@@ -505,6 +506,7 @@ export function parseJsonldLeaf(val, type) {
     case "s:Number":
     case "s:Float":
     case "s:Integer":
+    case "xsd:int":
     case "xsd:float":
       {
         const parsedVal = Number(unwrappedVal);
