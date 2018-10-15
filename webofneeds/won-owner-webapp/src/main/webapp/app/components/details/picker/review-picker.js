@@ -101,7 +101,7 @@ function genComponentConf() {
 
     resetText() {
       this.addedText = undefined;
-      this.text().value = this.addedText;
+      this.text().value = "";
       this.showResetButton = false;
 
       this.update(this.addedText, this.selectedRating);
