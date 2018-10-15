@@ -20,6 +20,7 @@ import {
 import { ownerBaseUrl } from "config";
 import urljoin from "url-join";
 import { useCases } from "useCaseDefinitions";
+import { messageDetails } from "detailDefinitions";
 import qr from "qr-image";
 import jsonld from "jsonld";
 window.jsonld4dbg = jsonld;
@@ -319,6 +320,7 @@ export function getRandomWonId() {
 }
 /**
  * Returns all the details that are defined in any useCase Defined in the useCaseDefinitions
+ * and in the messageDetails
  */
 export function getAllDetails() {
   let details = {};
@@ -333,27 +335,48 @@ export function getAllDetails() {
       }
     }
   }
-  return details;
+
+  return Object.assign({}, messageDetails, details);
 }
 
 /**
  * Returns all the details that are defined in any useCase in the useCaseDefinitions
  * and has the messageEnabled Flag set to true
  *
+ * as well as every detail that is defined in the messageDetail object from detail-definitions (for details that are only available in
+ * messages)
+ *
  * the messageEnabled-flag indicates if the detail is allowed to be sent as a part of a connectionMessage
  * @returns {{}}
  */
 export function getAllMessageDetails() {
-  let messageDetails = {};
+  let allDetails = {};
 
-  const allDetails = getAllDetails();
-  for (const detailKey in allDetails) {
-    if (allDetails[detailKey].messageEnabled) {
-      messageDetails[detailKey] = allDetails[detailKey];
+  if (hasSubElements(useCases)) {
+    for (const useCaseKey in useCases) {
+      const useCase = useCases[useCaseKey];
+      if (useCase) {
+        const isDetails = useCase.isDetails ? useCase.isDetails : {};
+        const seeksDetails = useCase.seeksDetails ? useCase.seeksDetails : {};
+        allDetails = { ...allDetails, ...isDetails, ...seeksDetails };
+      }
     }
   }
 
-  return messageDetails;
+  let usecaseMessageDetails = {};
+
+  for (const detailKey in allDetails) {
+    if (allDetails[detailKey].messageEnabled) {
+      usecaseMessageDetails[detailKey] = allDetails[detailKey];
+    }
+  }
+  const allMessageDetails = Object.assign(
+    {},
+    messageDetails,
+    usecaseMessageDetails
+  );
+  console.log("allMessageDetails: ", allMessageDetails);
+  return allMessageDetails;
 }
 
 function hasSubElements(obj) {

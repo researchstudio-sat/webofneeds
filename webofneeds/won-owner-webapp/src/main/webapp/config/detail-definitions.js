@@ -30,9 +30,12 @@ export const details = {
 
   files: fileDetails.files,
   images: fileDetails.images,
-  bpmnWorkflow: fileDetails.bpmnWorkflow,
-  petrinetWorkflow: fileDetails.petrinetWorkflow,
 
   pricerange: priceDetails.pricerange,
   price: priceDetails.price,
+};
+
+export const messageDetails = {
+  bpmnWorkflow: fileDetails.bpmnWorkflow,
+  petrinetWorkflow: fileDetails.petrinetWorkflow,
 };
