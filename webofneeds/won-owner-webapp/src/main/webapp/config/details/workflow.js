@@ -72,7 +72,7 @@ export const petrinetWorkflow = {
         "@type": "s:FileObject",
         "s:name": value.name,
         "s:type": value.type,
-        "proc:hasInlinePetriNetDefinition": value.data,
+        "wf:hasInlinePetriNetDefinition": value.data,
       };
 
       return { "won:hasPetrinet": workflow };
@@ -125,7 +125,7 @@ export const fireTransition = {
         "@type": "s:FileObject",
         "s:name": value.name,
         "s:type": value.type,
-        "proc:hasInlinePetriNetDefinition": value.data,
+        "wf:hasInlinePetriNetDefinition": value.data,
       };
 
       return { "won:hasPetrinet": workflow };
