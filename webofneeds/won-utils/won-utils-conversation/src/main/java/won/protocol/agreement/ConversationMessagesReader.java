@@ -122,6 +122,11 @@ public class ConversationMessagesReader {
 				(Map<URI, ConversationMessage> messages,
 						Statement s) -> getOrCreateMessage(messages, getUri(s.getSubject()))
 								.addProposes(getUri(s.getObject())));
+		
+		inithandlers.put(WONAGR.CLAIMS,
+                (Map<URI, ConversationMessage> messages,
+                        Statement s) -> getOrCreateMessage(messages, getUri(s.getSubject()))
+                                .addClaims(getUri(s.getObject())));
 
 		inithandlers.put(WONAGR.PROPOSES_TO_CANCEL,
 				(Map<URI, ConversationMessage> messages,

@@ -32,6 +32,9 @@ import org.slf4j.LoggerFactory;
 import won.protocol.agreement.effect.MessageEffect;
 import won.protocol.agreement.effect.MessageEffectsBuilder;
 import won.protocol.agreement.effect.ProposalType;
+import won.protocol.agreement.petrinet.PetriNetStates;
+import won.protocol.agreement.petrinet.PetriNetState;
+import won.protocol.agreement.petrinet.PetriNetUris;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageType;
 import won.protocol.util.RdfUtils;
@@ -774,7 +777,7 @@ public class AgreementProtocolState {
 				msg.getRejectsRefs()
 					.stream()
 					.filter(other -> msg != other)
-					.filter(other -> other.isProposesMessage() || other.isProposesToCancelMessage())
+					.filter(other -> other.isProposesMessage() || other.isProposesToCancelMessage() || other.isClaimsMessage())
 					.filter(other -> other.isHeadOfDeliveryChain())
 					.filter(other -> ! other.getSenderNeedURI().equals(msg.getSenderNeedURI()))
 					.filter(other -> msg.isMessageOnPathToRoot(other))
@@ -788,7 +791,7 @@ public class AgreementProtocolState {
 							logger.debug("{} rejects {}: valid, computing effects", msg.getMessageURI(), other.getMessageURI());
 						}
 						boolean changedSomething = false;
-						if (other.isProposesMessage()) {
+						if (other.isProposesMessage() || other.isProposesToCancelMessage()) {
 							changedSomething = rejectProposal(other.getMessageURI()) || changedSomething;
 						}
 						if (other.isClaimsMessage()) {
@@ -823,6 +826,28 @@ public class AgreementProtocolState {
 
 				pendingProposals.addNamedModel(msg.getMessageURI().toString(), proposalContent);
 			}
+			if (msg.isClaimsMessage()) {
+                if (logger.isDebugEnabled()) {
+                    msg.getClaimsRefs().forEach(other -> {
+                        logger.debug("{} claims {}", msg.getMessageURI(), other.getMessageURI());
+                    });
+                }
+                Model claimContent = ModelFactory.createDefaultModel();
+                msg.getClaimsRefs().stream()
+                .filter(other -> msg != other)
+                .filter(other -> other.isHeadOfDeliveryChain())
+                .filter(other -> msg.isMessageOnPathToRoot(other))
+                .forEach(other -> {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("{} claims {}: valid, computing effects", msg.getMessageURI(), other.getMessageURI());
+                    }
+                    boolean changedSomething =  claim(conversationDataset, other.getContentGraphs(), claimContent);
+                    if (changedSomething) {
+                        effectsBuilder.claims(other.getMessageURI());
+                    }
+                });
+                claims.addNamedModel(msg.getMessageURI().toString(), claimContent);
+            }
 			if (msg.isAcceptsMessage()) {
 				if (logger.isDebugEnabled()) {
 					msg.getAcceptsRefs().forEach(other -> {
@@ -845,7 +870,7 @@ public class AgreementProtocolState {
 							logger.debug("{} accepts {}: valid, computing effects", msg.getMessageURI(), other.getMessageURI());
 						}
 						boolean changedSomething = false;
-						if (other.isProposesMessage()) { 
+						if (other.isProposesMessage() || other.isProposesToCancelMessage()) { 
 							changedSomething = acceptProposal(other.getMessageURI()) || changedSomething;
 						}
 						if (other.isClaimsMessage()) { 
@@ -1022,12 +1047,32 @@ public class AgreementProtocolState {
 	}
 	
 	/**
+	 *  
+	 */
+    private boolean claim(Dataset conversationDataset, Collection<URI> graphURIs, Model claim) {
+        long initialSize = claim.size();
+        graphURIs.forEach(uri -> {
+            Model graph = conversationDataset.getNamedModel(uri.toString());
+            if (graph != null) {
+                claim.add(RdfUtils.cloneModel(graph));
+            }
+        });
+        //did we add anything?
+        return claim.size() - initialSize > 0;
+    }
+	
+	/**
 	 * 
 	 * @param proposalUri
 	 * @return true if the operation had any effect, false otherwise
 	 */
 	private boolean acceptProposal(URI proposalUri) {
 		boolean changedSomething = false;
+		//check if the proposal has already been accepted:
+		if (isAgreement(proposalUri)) {
+		    // accepting a proposal another time has no effect 
+		    return changedSomething;
+		}
 		// first process proposeToCancel triples - this avoids that a message can 
 		// successfully propose to cancel itself, as agreements are only made after the
 		// cancellations are processed.		
@@ -1057,6 +1102,10 @@ public class AgreementProtocolState {
 	 */
 	private boolean acceptClaim(URI claimUri) {
 		boolean changedSomething = false;
+		if (isAgreement(claimUri)) {
+		    //accepting a claim one more time has no effect
+		    return changedSomething;
+		}
 		// move proposal to agreements
 		changedSomething = moveNamedGraph(claimUri, claims, agreements) || changedSomething;
 		return changedSomething;

@@ -476,8 +476,8 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 	public Set<ConversationMessage> getClaimsRefs(){
 		return claimsRefs;
 	}
-	public void addClaims(URI proposes) {
-		this.claims.add(proposes);
+	public void addClaims(URI claims) {
+		this.claims.add(claims);
 	}
 	public void addClaimsRef(ConversationMessage ref) {
 		this.claimsRefs.add(ref);

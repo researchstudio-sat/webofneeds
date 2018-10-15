@@ -2,12 +2,8 @@ package won.protocol.agreement;
 
 import java.net.URI;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
-
-import javax.xml.bind.annotation.XmlTransient;
 
 public class AgreementProtocolUris {
 	private Set<URI> retractedUris = new HashSet<URI>();

@@ -41,7 +41,6 @@ public class PetriNetLoader {
             try (FileWriter fw = new FileWriter(tempfile.get())) {;
                 fw.write(pnml);
             }
-            System.out.println("tempfile: " + tempfile.get().getAbsolutePath());
             return petriNetIO.read(tempfile.get().getAbsolutePath());
         } catch (Exception e) {
             throw new IllegalStateException("Error reading petrinet from base64 String", e);

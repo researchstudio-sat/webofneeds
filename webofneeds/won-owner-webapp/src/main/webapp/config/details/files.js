@@ -238,7 +238,7 @@ export const petrinetWorkflow = {
         "@type": "s:FileObject",
         "s:name": value.name,
         "s:type": value.type,
-        "s:data": value.data,
+        "proc:hasInlinePetriNetDefinition": value.data,
       };
 
       return { "won:hasPetrinet": workflow };
@@ -251,7 +251,7 @@ export const petrinetWorkflow = {
     let workflow = {
       name: get(wflw, "s:name"),
       type: get(wflw, "s:type"),
-      data: get(wflw, "s:data"),
+      data: get(wflw, "wf:hasInlinePetriNetDefinition"),
     };
     if (workflow.name && workflow.data) {
       //do not check for value.type might not be present on some systems
