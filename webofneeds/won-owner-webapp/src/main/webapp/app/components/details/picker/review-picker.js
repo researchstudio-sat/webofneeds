@@ -11,22 +11,22 @@ function genComponentConf() {
         <select
             class="reviewp__input__rating"
             ng-model="self.selectedRating"
-            ng-disabled="self.detail.rating.length <= 1"
-            won-input="::self.updateRating()">
-            <option ng-repeat="rating in self.detail.rating" value="{{rating.value}}">{{rating.label}}</option>
+            ng-options="r.value as r.label for r in self.detail.rating"
+            ng-change="::self.updateContent()"
+            ng-disabled="self.detail.rating.length <= 1">
         </select>
         <input
             type="text"
             class="reviewp__input__inner"
             placeholder="{{self.detail.placeholder}}"
-            ng-blur="::self.updateText(true)"
-            won-input="::self.updateText(false)"
+            ng-blur="::self.updateContent()"
+            won-input="::self.updateContent()"
             ng-class="{'reviewp__input__inner--withreset' : self.showResetButton}"/>
         <div class="reviewp__input__reset clickable">
           <svg class="reviewp__input__reset__icon"
             style="--local-primary:var(--won-primary-color);"
             ng-if="self.showResetButton"
-            ng-click="self.resetText(true)">
+            ng-click="self.resetText()">
             <use xlink:href="#ico36_close" href="#ico36_close"></use>
           </svg>
         </div>
@@ -41,25 +41,19 @@ function genComponentConf() {
 
       this.addedText = this.initialValue && this.initialValue.text;
       this.selectedRating = this.initialValue && this.initialValue.rating;
-
-      if (!this.selectedRating) {
-        this.selectedRating = "3";
-      }
-
       this.showResetButton = false;
 
-      delay(0).then(() => this.showInitialText());
+      delay(0).then(() => this.showInitialValues());
     }
 
     /**
      * Checks validity and uses callback method
      */
     update(text, rating) {
-      const trimmedText = text && text.trim();
       if (rating) {
         this.onUpdate({
           value: {
-            text: trimmedText,
+            text: text && text.trim(),
             rating: rating,
           },
         });
@@ -79,50 +73,37 @@ function genComponentConf() {
       return defaultRating;
     }
 
-    showInitialText() {
-      this.addedText = this.initialValue && this.initialValue.text;
-      this.selectedRating =
-        (this.initialValue && this.initialValue.rating) ||
-        this.getDefaultRating();
+    showInitialValues() {
+      const initialText = this.initialValue && this.initialValue.text;
+      const initialRating = this.initialValue && this.initialValue.rating;
 
-      if (this.initialValue && this.initialValue.text) {
-        this.text().value = this.initialValue.text;
+      if (initialRating) {
+        this.selectedRating = initialRating;
+      } else {
+        this.selectedRating = this.getDefaultRating();
+      }
+
+      if (initialText) {
         this.showResetButton = true;
+        this.addedText = initialText;
+        this.text().value = this.addedText;
       }
 
       this.$scope.$apply();
     }
 
-    rating() {
-      if (!this._rating) {
-        this._rating = this.$element[0].querySelector(
-          ".reviewp__input__rating"
-        );
-      }
-      return this._rating;
-    }
-
-    updateText() {
+    updateContent() {
       this.addedText = this.text().value;
+      this.showResetButton = !!this.addedText;
 
-      this.update(this.addedText, this.selectedRating);
-      this.showResetButton = true;
-    }
-
-    updateRating() {
-      this.selectedRating = this.rating().value;
       this.update(this.addedText, this.selectedRating);
     }
 
-    resetText(resetInput) {
+    resetText() {
       this.addedText = undefined;
-      this.selectedRating = this.getDefaultRating();
+      this.text().value = this.addedText;
+      this.showResetButton = false;
 
-      if (resetInput) {
-        this.text().value = "";
-        this.rating().value = this.selectedRating;
-        this.showResetButton = false;
-      }
       this.update(this.addedText, this.selectedRating);
     }
 
