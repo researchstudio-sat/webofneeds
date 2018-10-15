@@ -13,6 +13,7 @@ public class MessageEffectsBuilder {
 	private Set<Accepts> accepts = new HashSet<>(); 
 	private Set<Retracts> retracts = new HashSet<>();
 	private Set<Rejects> rejects = new HashSet<>();
+	private Set<Claims> claims = new HashSet<>();
 	
 	public MessageEffectsBuilder(URI messageUri) {
 		this.messageUri = messageUri;
@@ -59,5 +60,11 @@ public class MessageEffectsBuilder {
 		this.retracts.add(new Retracts(messageUri, uri));
 		return this;
 	}
+	
+    public MessageEffectsBuilder claims(URI uri) {
+        this.claims.add(new Claims(messageUri, uri));
+        return this;
+    }
+
 	
 }

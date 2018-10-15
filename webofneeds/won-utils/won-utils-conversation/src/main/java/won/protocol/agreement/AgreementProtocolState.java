@@ -46,10 +46,12 @@ public class AgreementProtocolState {
 	
 	private final Dataset pendingProposals = DatasetFactory.createGeneral();
 	private final Dataset agreements = DatasetFactory.createGeneral();
+	private final Dataset claims = DatasetFactory.createGeneral();
 	private final Dataset cancelledAgreements = DatasetFactory.createGeneral();
 	private final Dataset rejected = DatasetFactory.createGeneral();
 	private Dataset conversation = null;
 	private final Set<URI> retractedUris = new HashSet<URI>();
+	private final Set<URI> claimedUris = new HashSet<URI>();
 	private final Set<URI> acceptedCancellationProposalUris = new HashSet<URI>();
 	private Map<URI, ConversationMessage> messagesByURI = new HashMap<>();
 	private Set<DeliveryChain> deliveryChains = new HashSet<>();
@@ -80,7 +82,9 @@ public class AgreementProtocolState {
 			.stream()
 			.filter(m -> isPendingProposal(m.getMessageURI()))
 			.forEach(m -> {
+				// so this is a pending proposal.
 				
+				// determine what it would cancel
 				Set<URI> cancelled = 
 						m.getEffects().stream()
 						.filter(e -> e.isProposes())
@@ -88,24 +92,28 @@ public class AgreementProtocolState {
 						.flatMap(e -> e.getProposesToCancel().stream())
 						.filter(this::isAgreement)
 						.collect(Collectors.toSet());
-			
+				uris.addCancellationPendingAgreementUris(cancelled);
+				
+				// determine what it proposes
 				Set<URI> proposed = m.getEffects().stream()
 						.filter(e -> e.isProposes())
 						.map(e -> e.asProposes())
 						.flatMap(e -> e.getProposes().stream())
 						.collect(Collectors.toSet());
-						
-				uris.addCancellationPendingAgreementUris(cancelled);
+				
 				boolean isProposal = false;
 				if (!cancelled.isEmpty()) {
+					//remember this is a pending proposal that would cancel stuff
 					uris.addPendingCancellationProposalUri(m.getMessageURI());
 					isProposal = true;
 				}
 				if (!proposed.isEmpty()) {
+					//remember this is a pending proposal that proposes stuff
 					uris.addPendingProposalUri(m.getMessageURI());
 					isProposal = true;
 				}
 				if (isProposal) {
+					// this proposal is not empty - add it to the pending proposals
 					ProposalUris proposal = new ProposalUris(m.getMessageURI(), m.getSenderNeedURI());
 					proposal.addProposes(proposed);
 					proposal.addProposesToCancel(cancelled);
@@ -115,7 +123,7 @@ public class AgreementProtocolState {
 		
 		uris.addRejectedMessageUris(getRejectedUris());
 		uris.addRetractedMessageUris(getRetractedUris());
-		
+		uris.addClaimedMessageUris(getClaimedUris());
 		return uris;
 	}
 	
@@ -151,6 +159,18 @@ public class AgreementProtocolState {
 	public boolean isAgreement(URI agreementUri) {
 		return agreements.containsNamedModel(agreementUri.toString());
 	}
+	
+    public Dataset getClaims() {
+        return claims;
+    }
+    
+    public Model getClaim(URI claimURI) {
+        return claims.getNamedModel(claimURI.toString());
+    }
+    
+    public boolean isClaim(URI claimUri) {
+        return claims.containsNamedModel(claimUri.toString());
+    }
 	
 	public Dataset getPendingProposals() {
 		return pendingProposals;
@@ -253,6 +273,10 @@ public class AgreementProtocolState {
 	
 	public Set<URI> getRetractedUris() {
 		return retractedUris;
+	}
+	
+	public Set<URI> getClaimedUris() {
+		return claimedUris;
 	}
 	
 	public Set<URI> getAcceptedCancellationProposalUris() {
@@ -496,6 +520,7 @@ public class AgreementProtocolState {
 		agreements.begin(ReadWrite.WRITE);
 		cancelledAgreements.begin(ReadWrite.WRITE);
 		rejected.begin(ReadWrite.WRITE);
+		claims.begin(ReadWrite.WRITE);
 		conversationDataset.begin(ReadWrite.READ);
 		
 		
@@ -555,6 +580,16 @@ public class AgreementProtocolState {
 				} else {
 				    messagesWithDeadReferences.add(new DeadReferenceConversationMessage(message, "agr:proposes", uri));
                 }
+			});
+			message.getClaims().stream().filter(uri -> !uri.equals(message.getMessageURI()))
+				.forEach(uri -> {
+				ConversationMessage other = messagesByURI.get(uri);
+				if (other != null) {
+				    message.addClaimsRef(other);
+					other.addClaimsInverseRef(message);
+				} else {
+				    messagesWithDeadReferences.add(new DeadReferenceConversationMessage(message, "agr:claims", uri));
+	            }
 			});
 			message.getRejects().stream().filter(uri -> !uri.equals(message.getMessageURI()))
 				.forEach(uri -> {
@@ -656,10 +691,10 @@ public class AgreementProtocolState {
 				new PriorityQueue<ConversationMessage>();
 		currentMessages.addAll(messages);
 		
-		//TODO: we need to use a priority queue for the messages, which is 
-		//sorted by temporal ordering. Each time we process a message, we 
-		//add the subsequent ones to the queue, the retrieve the 
-		//oldest from the queue for the next iteration.
+		// we need to use a priority queue for the messages, which is 
+		// sorted by temporal ordering. Each time we process a message, we 
+		// add the subsequent ones to the queue, the retrieve the 
+		// oldest from the queue for the next iteration.
 
 		Set<ConversationMessage> processed = new HashSet<>();
 		List<ConversationMessage> processedInOrder = null;
@@ -668,7 +703,6 @@ public class AgreementProtocolState {
 		}
 		ConversationMessage last = null;
 		while(!currentMessages.isEmpty()) {
-
 			ConversationMessage msg = currentMessages.poll();
 			if (processed.contains(msg)) {
 				continue;
@@ -678,7 +712,6 @@ public class AgreementProtocolState {
 			if (logger.isDebugEnabled() && processedInOrder != null) {
 				processedInOrder.add(msg);
 			}
-			
 			
 			last = msg;
 			if (!msg.isHeadOfDeliveryChain() ) {
@@ -711,6 +744,9 @@ public class AgreementProtocolState {
                         if (other.isProposesMessage() || other.isProposesToCancelMessage()) {
                             changedSomething = retractProposal(other.getMessageURI()) || changedSomething;
                         }
+                        if (other.isClaimsMessage()) {
+                        	changedSomething = retractClaim(other.getMessageURI()) || changedSomething;
+                        }
                         if (changedSomething) {
                             effectsBuilder.retracts(other.getMessageURI());
                         }
@@ -739,7 +775,13 @@ public class AgreementProtocolState {
 						if (logger.isDebugEnabled()) {
 							logger.debug("{} rejects {}: valid, computing effects", msg.getMessageURI(), other.getMessageURI());
 						}
-						boolean changedSomething = rejectProposal(other.getMessageURI());
+						boolean changedSomething = false;
+						if (other.isProposesMessage()) {
+							changedSomething = rejectProposal(other.getMessageURI()) || changedSomething;
+						}
+						if (other.isClaimsMessage()) {
+							changedSomething = rejectClaim(other.getMessageURI()) || changedSomething;
+						}
 						if (changedSomething) {
 							effectsBuilder.rejects(other.getMessageURI());
 						}
@@ -790,8 +832,14 @@ public class AgreementProtocolState {
 						if (logger.isDebugEnabled()) {
 							logger.debug("{} accepts {}: valid, computing effects", msg.getMessageURI(), other.getMessageURI());
 						}
-						boolean changedSomething = acceptProposal(other.getMessageURI());
-						if (changedSomething) { 
+						boolean changedSomething = false;
+						if (other.isProposesMessage()) { 
+							changedSomething = acceptProposal(other.getMessageURI()) || changedSomething;
+						}
+						if (other.isClaimsMessage()) { 
+							changedSomething = acceptClaim(other.getMessageURI()) || changedSomething;
+						}
+						if (changedSomething) {
 							effectsBuilder.accepts(other.getMessageURI(), other.getProposesToCancel().stream().collect(Collectors.toSet()));
 						}
 					});
@@ -837,6 +885,7 @@ public class AgreementProtocolState {
 		agreements.commit();
 		cancelledAgreements.commit();
 		rejected.commit();
+		claims.commit();
 		conversationDataset.end();
 	}
 	
@@ -991,6 +1040,18 @@ public class AgreementProtocolState {
 	
 	/**
 	 * 
+	 * @param claimUri
+	 * @return true if the operation had any effect, false otherwise
+	 */
+	private boolean acceptClaim(URI claimUri) {
+		boolean changedSomething = false;
+		// move proposal to agreements
+		changedSomething = moveNamedGraph(claimUri, claims, agreements) || changedSomething;
+		return changedSomething;
+	}
+	
+	/**
+	 * 
 	 * @param proposalUri
 	 * @return true if the operation had any effect, false otherwise
 	 */
@@ -1008,12 +1069,38 @@ public class AgreementProtocolState {
 	
 	/**
 	 * 
+	 * @param claimUri
+	 * @return true if the operation had any effect, false otherwise
+	 */
+	private boolean retractClaim(URI claimUri) {
+		boolean changedSomething = false;
+		// we don't track retracted claims (nobody cares about retracted proposals)
+		// so just remove them
+		if (claims.containsNamedModel(claimUri.toString())){
+			changedSomething = true;
+		}
+		claims.removeNamedModel(claimUri.toString());
+		return changedSomething;
+	}
+	
+	/**
+	 * 
 	 * @param proposalUri
 	 * @return true if the operation had any effect, false otherwise
 	 */
 	private boolean rejectProposal(URI proposalUri) {
 		boolean changedSomething = moveNamedGraph(proposalUri, pendingProposals, rejected);
 		changedSomething = removeCancellationProposal(proposalUri) || changedSomething;
+		return changedSomething;
+	}
+	
+	/**
+	 * 
+	 * @param claimUri
+	 * @return true if the operation had any effect, false otherwise
+	 */
+	private boolean rejectClaim(URI claimUri) {
+		boolean changedSomething = moveNamedGraph(claimUri, claims, rejected);
 		return changedSomething;
 	}
 	

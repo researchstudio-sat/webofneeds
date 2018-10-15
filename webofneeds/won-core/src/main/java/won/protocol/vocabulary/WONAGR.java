@@ -11,5 +11,6 @@ public class WONAGR {
 	 public static Property PROPOSES_TO_CANCEL = m.createProperty(BASE_URI+"proposesToCancel");
 	 public static Property ACCEPTS = m.createProperty(BASE_URI+"accepts");
      public static Property REJECTS = m.createProperty(BASE_URI+"rejects");
+     public static Property CLAIMS = m.createProperty(BASE_URI+"claims");
     
 }
