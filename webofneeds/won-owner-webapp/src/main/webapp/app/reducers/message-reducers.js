@@ -24,7 +24,6 @@ export function messagesReducer(messages = initialState, action = {}) {
         action.payload.message
       );
 
-    case actionTypes.personas.createSuccessful:
     case actionTypes.needs.createSuccessful:
       return messages.removeIn([
         "waitingForAnswer",

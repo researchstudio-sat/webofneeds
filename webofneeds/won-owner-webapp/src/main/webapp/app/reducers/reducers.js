@@ -10,7 +10,6 @@ import reduceReducers from "reduce-reducers";
 import needReducer from "./need-reducer/need-reducer-main.js";
 import userReducer from "./user-reducer.js";
 import toastReducer from "./toast-reducer.js";
-import personaReducer from "./persona-reducer.js";
 import { getIn } from "../utils.js";
 
 /*
@@ -38,7 +37,6 @@ const reducers = {
   needs: needReducer,
   messages: messagesReducer,
   toasts: toastReducer,
-  personas: personaReducer,
 
   // contains the Date.now() of the last action
   // lastUpdateTime: (state = Date.now(), action = {}) => Date.now(),
@@ -275,7 +273,9 @@ function deleteConnectionsBetweenOwnNeeds(state) {
       let connections = need.get("connections");
 
       connections = connections.filter(function(conn) {
-        return !state.getIn(["needs", conn.get("remoteNeedUri"), "ownNeed"]);
+        if (conn.get("connectionState") == "won:Suggested")
+          return !state.getIn(["needs", conn.get("remoteNeedUri"), "ownNeed"]);
+        else return true;
       });
       return need.set("connections", connections);
     });

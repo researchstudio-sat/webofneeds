@@ -132,24 +132,13 @@ export function successfulCreate(event) {
     const needURI = event.getReceiverNeed();
 
     won.getNeed(needURI).then(need => {
-      //If the need is a persona, do not forward it
-      if (need["@type"].includes && need["@type"].includes("won:Persona")) {
-        dispatch(
-          actionCreators.personas__createSuccessful({
-            publishEventUri: event.getIsResponseTo(),
-            needUri: event.getSenderNeed(),
-            persona: need,
-          })
-        );
-      } else {
-        dispatch(
-          actionCreators.needs__createSuccessful({
-            publishEventUri: event.getIsResponseTo(),
-            needUri: event.getSenderNeed(),
-            need: need,
-          })
-        );
-      }
+      dispatch(
+        actionCreators.needs__createSuccessful({
+          publishEventUri: event.getIsResponseTo(),
+          needUri: event.getSenderNeed(),
+          need: need,
+        })
+      );
     });
   };
 }

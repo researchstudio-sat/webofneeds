@@ -95,18 +95,10 @@ export default function(allNeedsInState = initialState, action = {}) {
         activeNeedUris
       );
 
-      const stateWithOwnNeeds = ownNeeds.reduce((updatedState, ownNeed) => {
-        if (
-          ownNeed.get("@type") &&
-          ownNeed.get("@type").includes &&
-          ownNeed.get("@type").includes("won:Persona")
-        ) {
-          return updatedState.remove(ownNeed.get("@id"));
-        }
-        {
-          return addNeed(updatedState, ownNeed, true);
-        }
-      }, stateWithOwnNeedUrisInLoading);
+      const stateWithOwnNeeds = ownNeeds.reduce(
+        (updatedState, ownNeed) => addNeed(updatedState, ownNeed, true),
+        stateWithOwnNeedUrisInLoading
+      );
 
       const stateWithOwnNeedsAndTheirNeedsInLoading = addTheirNeedsInLoading(
         stateWithOwnNeeds,

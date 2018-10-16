@@ -18,6 +18,18 @@ export const selectAllOwnNeeds = state =>
 export const selectAllTheirNeeds = state =>
   selectAllNeeds(state).filter(need => !need.get("ownNeed"));
 
+export function selectAllPosts(state) {
+  const needs = selectAllNeeds(state);
+  return needs.filter(need => {
+    if (!need.get("types")) return true;
+
+    return Immutable.is(need.get("types"), Immutable.Set(["won:Need"]));
+  });
+}
+
+export const selectAllOwnPosts = state =>
+  selectAllPosts(state).filter(need => need.get("ownNeed"));
+
 export function selectOpenNeeds(state) {
   const allOwnNeeds = selectAllOwnNeeds(state);
   return (
@@ -25,6 +37,15 @@ export function selectOpenNeeds(state) {
     allOwnNeeds.filter(post => post.get("state") === won.WON.ActiveCompacted)
   );
 }
+
+export function selectOpenPosts(state) {
+  const allOwnNeeds = selectAllOwnPosts(state);
+  return (
+    allOwnNeeds &&
+    allOwnNeeds.filter(post => post.get("state") === won.WON.ActiveCompacted)
+  );
+}
+
 export function selectClosedNeeds(state) {
   const allOwnNeeds = selectAllOwnNeeds(state);
   return (
@@ -36,6 +57,19 @@ export function selectClosedNeeds(state) {
     )
   ); //Filter whatsAround and whatsNew needs automatically
 }
+
+export function selectClosedPosts(state) {
+  const allOwnNeeds = selectAllOwnPosts(state);
+  return (
+    allOwnNeeds &&
+    allOwnNeeds.filter(
+      post =>
+        post.get("state") === won.WON.InactiveCompacted &&
+        !(post.get("isWhatsAround") || post.get("isWhatsNew"))
+    )
+  ); //Filter whatsAround and whatsNew needs automatically
+}
+
 export function selectNeedsInCreationProcess(state) {
   const allOwnNeeds = selectAllOwnNeeds(state);
   // needs that have been created but are not confirmed by the server yet
@@ -364,12 +398,28 @@ export function getCorrectMessageUri(messages, messageUri) {
   return undefined;
 }
 
+export function getPersonas(needs) {
+  const personas = needs
+    .toList()
+    .filter(need => need.get("types") && need.get("types").has("won:Persona"));
+  return personas.map(persona => {
+    const graph = persona.get("jsonld");
+    return {
+      displayName: graph.get("s:name"),
+      website: graph.get("s:url"),
+      aboutMe: graph.get("s:description"),
+      url: persona.get("uri"),
+      saved: !persona.get("isBeingCreated"),
+      timestamp: persona.get("creationDate").toISOString(),
+    };
+  });
+}
+
 export function currentSkin() {
   const style = getComputedStyle(document.body);
   const getColor = name => {
-    return Color(style.getPropertyValue(name).trim())
-      .rgb()
-      .array();
+    const color = Color(style.getPropertyValue(name).trim());
+    return color.rgbArray();
   };
   return {
     primaryColor: getColor("--won-primary-color"),
