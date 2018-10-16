@@ -2013,6 +2013,9 @@ won.MessageBuilder.prototype = {
   getContentGraphNode: function() {
     return this.getContentGraph()["@graph"][0];
   },
+  getContentGraphNodes: function() {
+    return this.getContentGraph()["@graph"];
+  },
   /**
    * takes a lists of json-ld-objects and merges them into the content-graph
    */
