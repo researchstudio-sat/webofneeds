@@ -1,7 +1,7 @@
 import angular from "angular";
 import { Elm } from "../../elm/PublishButton.elm";
 import "./svg-icon.js";
-import { currentSkin } from "../selectors";
+import { currentSkin, getPersonas } from "../selectors";
 
 function genComponentConf($ngRedux) {
   return {
@@ -23,32 +23,19 @@ function genComponentConf($ngRedux) {
         });
       });
 
-      const convertPersonas = personas => {
-        const conversion = personas
-          .entrySeq()
-          .map(([url, persona]) => {
-            return {
-              url: url,
-              ...persona,
-            };
-          })
-          .toJS();
-        return conversion;
-      };
-
       elmApp.ports.publishIn.send({
         draftValid: scope.isValid ? true : false,
         loggedIn: $ngRedux.getState().getIn(["user", "loggedIn"]),
       });
 
-      const personas = $ngRedux.getState().get("personas");
+      const personas = getPersonas($ngRedux.getState().get("needs"));
       if (personas) {
-        elmApp.ports.personaIn.send(convertPersonas(personas));
+        elmApp.ports.personaIn.send(personas.toJS());
       }
 
       const disconnectOptions = $ngRedux.connect(state => {
         return {
-          personas: state.get("personas"),
+          personas: getPersonas(state.get("needs")),
           loggedIn: state.getIn(["user", "loggedIn"]),
         };
       })(state => {
@@ -59,7 +46,7 @@ function genComponentConf($ngRedux) {
         if (!state.personas) {
           return;
         }
-        elmApp.ports.personaIn.send(convertPersonas(state.personas));
+        elmApp.ports.personaIn.send(state.personas.toJS());
       });
 
       const disconnectSkin = $ngRedux.connect(state => {

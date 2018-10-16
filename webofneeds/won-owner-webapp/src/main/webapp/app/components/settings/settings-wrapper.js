@@ -2,7 +2,7 @@ import angular from "angular";
 import { Elm } from "../../../elm/Settings/Personas.elm";
 import { actionCreators } from "../../actions/actions";
 import "../identicon.js";
-import { currentSkin } from "../../selectors";
+import { currentSkin, getPersonas } from "../../selectors";
 
 function genComponentConf($ngRedux) {
   return {
@@ -16,30 +16,19 @@ function genComponentConf($ngRedux) {
       elmApp.ports.personaOut.subscribe(persona => {
         $ngRedux.dispatch(actionCreators.personas__create(persona));
       });
-      const convertPersonas = personas => {
-        const conversion = personas
-          .entrySeq()
-          .map(([url, persona]) => {
-            return {
-              url: url,
-              ...persona,
-            };
-          })
-          .toJS();
-        return conversion;
-      };
-      const personas = $ngRedux.getState().get("personas");
+
+      const personas = getPersonas($ngRedux.getState().get("needs"));
       if (personas) {
-        elmApp.ports.personaIn.send(convertPersonas(personas));
+        elmApp.ports.personaIn.send(personas.toJS());
       }
 
       const disconnect = $ngRedux.connect(state => {
-        return { personas: state.get("personas") };
+        return { personas: getPersonas(state.get("needs")) };
       })(state => {
         if (!state.personas) {
           return;
         }
-        elmApp.ports.personaIn.send(convertPersonas(state.personas));
+        elmApp.ports.personaIn.send(state.personas.toJS());
       });
 
       const disconnectSkin = $ngRedux.connect(state => {

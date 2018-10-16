@@ -23,15 +23,15 @@ import { actionCreators } from "../actions/actions.js";
 import "style/_connections-overview.scss";
 
 import {
-  selectAllNeeds,
   selectRouterParams,
   selectNeedByConnectionUri,
-  selectOpenNeeds,
-  selectClosedNeeds,
   selectNeedsInCreationProcess,
   selectConnectionsWithoutConnectMessage,
   selectOpenConnectionUri,
   selectOpenPostUri,
+  selectAllPosts,
+  selectClosedPosts,
+  selectOpenPosts,
 } from "../selectors.js";
 
 const serviceDependencies = ["$ngRedux", "$scope"];
@@ -207,9 +207,9 @@ function genComponentConf() {
 
       const self = this;
       const selectFromState = state => {
-        const allNeeds = selectAllNeeds(state);
-        const openNeeds = selectOpenNeeds(state);
-        const closedNeeds = selectClosedNeeds(state);
+        const allNeeds = selectAllPosts(state);
+        const openNeeds = selectOpenPosts(state);
+        const closedNeeds = selectClosedPosts(state);
 
         // needs that have been created but are not confirmed by the server yet
         const beingCreatedNeeds = selectNeedsInCreationProcess(state);
@@ -394,7 +394,7 @@ function genComponentConf() {
           const remoteNeedPresent =
             remoteNeedUri && allNeeds && !!allNeeds.get(remoteNeedUri);
 
-          if (!remoteNeedPresent) return true; //if the remoteNeed is not present yet we assume its a connection we want
+          if (!remoteNeedPresent) return false;
 
           const remoteNeedActiveOrLoading =
             allNeeds.getIn([remoteNeedUri, "isLoading"]) ||

@@ -386,7 +386,7 @@ export function runMessagingAgent(redux) {
     if (reconnecting) {
       // successful reconnect (failure is handled via connectionLost)
       reconnecting = false;
-      redux.dispatch(actionCreators.reconnectSuccess());
+      redux.dispatch(actionCreators.reconnect__success());
     }
 
     const sendFirstInBuffer = function(newMsgBuffer) {
