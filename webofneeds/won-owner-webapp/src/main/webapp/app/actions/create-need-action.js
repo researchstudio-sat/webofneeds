@@ -51,12 +51,12 @@ export function needCreate(draft, persona, nodeUri) {
             },
             body: JSON.stringify([
               {
-                pending: true,
-                facet: `${needUri}#holdableFacet`,
-              },
-              {
                 pending: false,
                 facet: `${persona}#holderFacet`,
+              },
+              {
+                pending: true,
+                facet: `${needUri}#holdableFacet`,
               },
             ]),
             credentials: "include",
