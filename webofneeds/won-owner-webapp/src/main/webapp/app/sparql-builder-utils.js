@@ -201,7 +201,7 @@ export function filterInVicinity(rootSubject, location, radius = 10) {
 
 /**
  * @param {String} rootSubject: a variable name that the score judges, e.g. `?need`
- * @param {String} scoreName: the variable name for the score (use the same name for
+ * @param {String} bindScoreAs: the variable name for the score (use the same name for
  *   sorting/aggregating in the parent query)
  * @param {String} pathToLocation: the predicates to be traversed to get to the root
  *   of the location (i.e. the `s:Place`) in the RDF-graph.
@@ -211,7 +211,7 @@ export function filterInVicinity(rootSubject, location, radius = 10) {
  */
 export function vicinityScoreSubQuery(
   resultName,
-  scoreName,
+  bindScoreAs,
   pathToLocation,
   location,
   radius = 10
@@ -224,7 +224,7 @@ export function vicinityScoreSubQuery(
       geo: "http://www.bigdata.com/rdf/geospatial#",
       geoliteral: "http://www.bigdata.com/rdf/geospatial/literals/v1#",
     },
-    variables: [resultName, scoreName],
+    variables: [resultName, bindScoreAs],
     where: [
       `${resultName} ${pathToLocation}/s:geo ?geo`,
       `SERVICE geo:search {
@@ -236,14 +236,14 @@ export function vicinityScoreSubQuery(
             ?geo geo:distanceValue ?geoDistance .
           }`,
       `BIND((${radius} - ?geoDistance) / ${radius} as ?geoScoreRaw)`, // 100 is the spatialCircleRadius / maxDistance in km
-      `BIND(IF(?geoScoreRaw > 0, ?geoScoreRaw , 0 ) as ${scoreName})`,
+      `BIND(IF(?geoScoreRaw > 0, ?geoScoreRaw , 0 ) as ${bindScoreAs})`,
     ],
   });
 }
 
 export function tagOverlapScoreSubQuery(
   resultName,
-  scoreName,
+  bindScoreAs,
   pathToTags,
   tagLikes
 ) {
@@ -296,8 +296,8 @@ export function tagOverlapScoreSubQuery(
     where: [
       `bind (?targetOverlap / ( ?targetTotal + ${
         tagLikes.length
-      } - ?targetOverlap ) as ${scoreName} )`, // intersection over union, see https://en.wikipedia.org/wiki/Jaccard_index
-      `filter(${scoreName} > 0)`, // filter out posts without any common tag-likes
+      } - ?targetOverlap ) as ${bindScoreAs} )`, // intersection over union, see https://en.wikipedia.org/wiki/Jaccard_index
+      `filter(${bindScoreAs} > 0)`, // filter out posts without any common tag-likes
     ],
     subQueries: [subQuery],
   });
