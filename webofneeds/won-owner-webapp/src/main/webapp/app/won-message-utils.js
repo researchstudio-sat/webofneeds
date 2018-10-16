@@ -266,6 +266,7 @@ export function buildChatMessage({
 
         if (additionalContent) {
           const contentNode = wonMessageBuilder.getContentGraphNode();
+          const contentNodes = wonMessageBuilder.getContentGraphNodes();
           const detailList = getAllDetails();
           additionalContent.forEach((value, key) => {
             const detail = detailList[key];
@@ -278,15 +279,29 @@ export function buildChatMessage({
               });
 
             if (detailRDF) {
-              for (const key in detailRDF) {
-                //if contentNode[key] and detailRDF[key] both have values we ommit adding new content (until we implement a merge function)
-                if (contentNode[key]) {
-                  if (!Array.isArray(contentNode[key]))
-                    contentNode[key] = Array.of(contentNode[key]);
+              const detailRDFArray = Array.isArray(detailRDF)
+                ? detailRDF
+                : [detailRDF];
 
-                  contentNode[key] = contentNode[key].concat(detailRDF[key]);
+              for (const i in detailRDFArray) {
+                const detailRDFToAdd = detailRDFArray[i];
+
+                if (detailRDFToAdd["@id"]) {
+                  contentNodes.push(detailRDFToAdd);
                 } else {
-                  contentNode[key] = detailRDF[key];
+                  for (const key in detailRDFToAdd) {
+                    //if contentNode[key] and detailRDF[key] both have values we ommit adding new content (until we implement a merge function)
+                    if (contentNode[key]) {
+                      if (!Array.isArray(contentNode[key]))
+                        contentNode[key] = Array.of(contentNode[key]);
+
+                      contentNode[key] = contentNode[key].concat(
+                        detailRDFToAdd[key]
+                      );
+                    } else {
+                      contentNode[key] = detailRDFToAdd[key];
+                    }
+                  }
                 }
               }
             }
