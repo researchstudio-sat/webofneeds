@@ -241,26 +241,66 @@ export function vicinityScoreSubQuery(
   });
 }
 
-export function tagOverlapScoreSubQuery() {
-  /*
-  TODO use code from job-search.js' generateQuery
-  {
-SELECT DISTINCT ?result ?industry_jaccardIndex WHERE {
-  BIND(?industry_targetOverlap / ((?industry_targetTotal + 2 ) - ?industry_targetOverlap) AS ?industry_jaccardIndex)
-  FILTER(?industry_jaccardIndex > 0 )
-  ?result (won:is/s:jobLocation) ?jobLocation.
-  {
-    SELECT ?result ((SUM(?var0)) + (SUM(?var1)) AS ?industry_targetOverlap) (COUNT(?result) AS ?industry_targetTotal) WHERE {
-      ?result <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> won:Need.
-      ?result (won:is/s:industry) ?industry.
-      BIND(IF((STR(?industry)) = "notconstruction", 1 , 0 ) AS ?var0)
-      BIND(IF((STR(?industry)) = "design", 1 , 0 ) AS ?var1)
-    }
-    GROUP BY ?result
+export function tagOverlapScoreSubQuery(
+  resultName,
+  scoreName,
+  pathToTags,
+  tagLikes
+) {
+  if (!is("Array", tagLikes) || tagLikes.length == 0) {
+    console.error("Expected non-empty array, got ", tagLikes);
+    return;
   }
-}
-}
-*/
+
+  // sub-query that actually calculates cardinality of union and intersection
+  const subQuery = sparqlQuery({
+    prefixes: {
+      s: won.defaultContext["s"],
+    },
+    variables: [
+      resultName,
+
+      /* operations to sum up to cardinality/size of intersection
+       * e.g. `((SUM(?var0)) + (SUM(?var1)) AS ?targetOverlap)`
+       */
+      "( " +
+        Object.keys(tagLikes)
+          .map(idx => `sum(?var${idx})`)
+          .join(" + ") +
+        "as ?targetOverlap )",
+
+      // operations to sum up to cardinality/size of union
+      `(count(${resultName}) as ?targetTotal)`,
+    ],
+    where: [
+      `${resultName} ${pathToTags} ?tag .`,
+
+      /* ?varX is 1 if the tag-like occurs in the match
+       * e.g. BIND(IF((STR(?industry)) = "graphic design", 1, 0) AS ? var1)
+       */
+      ...Object.entries(tagLikes).map(
+        ([idx, tagLike]) =>
+          `bind(if(str(?tag) = "${tagLike}",1,0) as ?var${idx})`
+      ),
+    ],
+    groupBy: resultName,
+  });
+
+  // outer query that calculates jaccard-index (see https://en.wikipedia.org/wiki/Jaccard_index)
+  return sparqlQuery({
+    prefixes: {
+      s: won.defaultContext["s"],
+    },
+    variables: [resultName],
+    distinct: true,
+    where: [
+      `bind (?targetOverlap / ( ?targetTotal + ${
+        tagLikes.length
+      } - ?targetOverlap ) as ${scoreName} )`, // intersection over union, see https://en.wikipedia.org/wiki/Jaccard_index
+      `filter(${scoreName} > 0)`, // filter out posts without any common tag-likes
+    ],
+    subQueries: [subQuery],
+  });
 }
 
 /**

@@ -8,12 +8,11 @@ import {
 } from "../../details/jobs.js";
 import { jobLocation } from "../../details/location.js";
 import {
-  sparqlQuery,
   vicinityScoreSubQuery,
+  tagOverlapScoreSubQuery,
 } from "../../../app/sparql-builder-utils.js";
 
-import won from "../../../app/won-es6.js";
-import { getIn, is } from "../../../app/utils.js";
+import { getIn } from "../../../app/utils.js";
 
 export const jobSearch = {
   identifier: "jobSearch",
@@ -90,92 +89,34 @@ export const jobSearch = {
     // const sparqlVarName = "?employmentType";
 
     // industry:
-    const fieldName = "industry";
-    const pathInDraft = ["seeks", "industry"];
-    const sparqlPredicatePath = "won:is/s:industry";
-    const sparqlVarName = "?" + fieldName;
-    const targetTotalVar = `?${fieldName}_targetTotal`;
-    const targetOverlapVar = `?${fieldName}_targetOverlap`;
-    const jaccardIndexVar = `?${fieldName}_jaccardIndex`;
-
-    const tagLikes = getIn(draft, pathInDraft);
-    if (!is("Array", tagLikes)) {
-      console.error("Expected array, got ", tagLikes);
-      return;
-    }
-
-    // ----------------
-
-    if (tagLikes.length == 0) {
-      // TODO don't generate sub-query
-    }
-
-    // ?varX is 1 if the tag-like occurs in the match
-    const bindOps = Object.entries(tagLikes).map(
-      ([idx, tagLike]) =>
-        `bind(if(str(${sparqlVarName}) = "${tagLike}",1,0) as ?var${idx})` // TODO prefix/suffix variable to make it unique
+    const industries = getIn(draft, ["seeks", "industry"]);
+    const industryScoreSQ = tagOverlapScoreSubQuery(
+      resultName,
+      "?industry_jaccardIndex",
+      "won:is/s:industry",
+      industries
     );
 
-    // operations to sum up to cardinality/size of intersection
-    const partialSums = Object.keys(tagLikes).map(idx => `sum(?var${idx})`);
-    const targetOverlapSelect = `( ${partialSums.join(
-      " + "
-    )} as ${targetOverlapVar} )`; // TODO prefix/suffix variable to make it unique
-
-    // operations to sum up to cardinality/size of union
-    const targetTotalSelect = `(count(${resultName}) as ${targetTotalVar})`; // TODO prefix/suffix variable to make it unique
-
-    // sub-query that actually calculates cardinality of union and intersection
-    const subQuery = sparqlQuery({
-      prefixes: {
-        s: won.defaultContext["s"],
-        won: won.defaultContext["won"],
-      },
-      //  ?result (sum(?var1) + sum(?var2) as ?targetOverlap) (count(${resultName}) as ?targetTotal) {
-      variables: [resultName, targetOverlapSelect, targetTotalSelect],
-      where: [
-        `${resultName} a won:Need .`,
-        `${resultName} ${sparqlPredicatePath} ${sparqlVarName} .`,
-        ...bindOps,
-      ],
-      groupBy: resultName,
-    });
-
     const jobLocation = getIn(draft, ["seeks", "jobLocation"]); // TODO move to better place
-
-    // outer query that calculates jaccard-index (see https://en.wikipedia.org/wiki/Jaccard_index)
-    const query = sparqlQuery({
-      prefixes: {
-        s: won.defaultContext["s"],
-        won: won.defaultContext["won"],
-      },
-      variables: [resultName],
-      distinct: true,
-      where: [
-        `bind (${targetOverlapVar} / ( ${targetTotalVar} + ${
-          tagLikes.length
-        } - ${targetOverlapVar} ) as ${jaccardIndexVar} )`, // intersection over union, see https://en.wikipedia.org/wiki/Jaccard_index
-        `filter(${jaccardIndexVar} > 0)`, // filter out posts without any common tag-likes
-        jobLocation && `${resultName} won:is/s:jobLocation ?jobLocation.`,
-      ],
-      subQueries: [subQuery],
-      orderBy: {
-        order: "DESC",
-        variable: jaccardIndexVar, // TODO combined sort
-      },
-    });
-
-    const vicinity = vicinityScoreSubQuery(
+    const vicinityScoreSQ = vicinityScoreSubQuery(
       resultName,
       "?jobLocation_geoScore",
       "won:is/s:jobLocation",
       jobLocation
     );
 
-    console.log("job location filter deleteme 2: ", vicinity);
+    console.log(
+      "job location filter deleteme 2: ",
+      vicinityScoreSQ,
+      industryScoreSQ
+    );
 
     // console.log(draft, resultName, subQuery, tagLikes, query, "deleteme");
 
-    return query;
+    //TODO: STOPPED HERE
+    // use `subQueries` field of args to `sparqlQuery` to combine the queries
+
+    // return query;
+    throw new Error("NOT IMPLEMENTED YET");
   },
 };
