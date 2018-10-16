@@ -9,7 +9,7 @@ import {
 import { jobLocation } from "../../details/location.js";
 import {
   sparqlQuery,
-  filterInVicinity,
+  vicinityScoreSubQuery,
 } from "../../../app/sparql-builder-utils.js";
 
 import won from "../../../app/won-es6.js";
@@ -165,8 +165,14 @@ export const jobSearch = {
       },
     });
 
-    const locationFilter = filterInVicinity("?jobLocation", jobLocation);
-    console.log("job location filter deleteme 2: ", locationFilter);
+    const vicinity = vicinityScoreSubQuery(
+      resultName,
+      "?jobLocation_geoScore",
+      "won:is/s:jobLocation",
+      jobLocation
+    );
+
+    console.log("job location filter deleteme 2: ", vicinity);
 
     // console.log(draft, resultName, subQuery, tagLikes, query, "deleteme");
 

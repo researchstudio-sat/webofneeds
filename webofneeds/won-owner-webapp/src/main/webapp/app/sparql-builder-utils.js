@@ -200,6 +200,70 @@ export function filterInVicinity(rootSubject, location, radius = 10) {
 }
 
 /**
+ * @param {String} rootSubject: a variable name that the score judges, e.g. `?need`
+ * @param {String} scoreName: the variable name for the score (use the same name for
+ *   sorting/aggregating in the parent query)
+ * @param {String} pathToLocation: the predicates to be traversed to get to the root
+ *   of the location (i.e. the `s:Place`) in the RDF-graph.
+ * @param {*} location: an object containing `lat` and `lng`
+ * @param {Number} radius: distance in km that matches can be away from the location
+ * @returns see `sparqlQuery`
+ */
+export function vicinityScoreSubQuery(
+  resultName,
+  scoreName,
+  pathToLocation,
+  location,
+  radius = 10
+) {
+  // const locationFilter = filterInVicinity("?jobLocation", jobLocation);
+  return sparqlQuery({
+    prefixes: {
+      s: won.defaultContext["s"],
+      won: won.defaultContext["won"],
+      geo: "http://www.bigdata.com/rdf/geospatial#",
+      geoliteral: "http://www.bigdata.com/rdf/geospatial/literals/v1#",
+    },
+    variables: [resultName, scoreName],
+    where: [
+      `${resultName} ${pathToLocation}/s:geo ?geo`,
+      `SERVICE geo:search {
+            ?geo geo:search "inCircle" .
+            ?geo geo:searchDatatype geoliteral:lat-lon .
+            ?geo geo:predicate won:geoSpatial .
+            ?geo geo:spatialCircleCenter "${location.lat}#${location.lng}" .
+            ?geo geo:spatialCircleRadius "${radius}" .
+            ?geo geo:distanceValue ?geoDistance .
+          }`,
+      `BIND((${radius} - ?geoDistance) / ${radius} as ?geoScoreRaw)`, // 100 is the spatialCircleRadius / maxDistance in km
+      `BIND(IF(?geoScoreRaw > 0, ?geoScoreRaw , 0 ) as ${scoreName})`,
+    ],
+  });
+}
+
+export function tagOverlapScoreSubQuery() {
+  /*
+  TODO use code from job-search.js' generateQuery
+  {
+SELECT DISTINCT ?result ?industry_jaccardIndex WHERE {
+  BIND(?industry_targetOverlap / ((?industry_targetTotal + 2 ) - ?industry_targetOverlap) AS ?industry_jaccardIndex)
+  FILTER(?industry_jaccardIndex > 0 )
+  ?result (won:is/s:jobLocation) ?jobLocation.
+  {
+    SELECT ?result ((SUM(?var0)) + (SUM(?var1)) AS ?industry_targetOverlap) (COUNT(?result) AS ?industry_targetTotal) WHERE {
+      ?result <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> won:Need.
+      ?result (won:is/s:industry) ?industry.
+      BIND(IF((STR(?industry)) = "notconstruction", 1 , 0 ) AS ?var0)
+      BIND(IF((STR(?industry)) = "design", 1 , 0 ) AS ?var1)
+    }
+    GROUP BY ?result
+  }
+}
+}
+*/
+}
+
+/**
  * Constructs a filter for which holds:
  *
  * `datetime - 12h <= matchedTime <= datetime + 12h`
