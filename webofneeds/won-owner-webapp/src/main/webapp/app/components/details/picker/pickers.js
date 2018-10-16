@@ -15,7 +15,7 @@ import priceRangePickerModule from "./price-range-picker.js";
 import filePickerModule from "./file-picker.js";
 import workflowPickerModule from "./workflow-picker.js";
 import petrinetPickerModule from "./petrinet-picker.js";
-import firetransitionPickerModule from "./firetransition-picker.js";
+import petrinettransitionPickerModule from "./petrinettransition-picker.js";
 import reviewPickerModule from "./review-picker.js";
 import suggestPostPickerModule from "./suggestpost-picker.js";
 
@@ -40,7 +40,7 @@ export default [
   filePickerModule,
   workflowPickerModule,
   petrinetPickerModule,
-  firetransitionPickerModule,
+  petrinettransitionPickerModule,
   reviewPickerModule,
   suggestPostPickerModule,
 ];

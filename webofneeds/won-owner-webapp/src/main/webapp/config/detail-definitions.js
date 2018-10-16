@@ -41,6 +41,6 @@ export const details = {
 export const messageDetails = {
   suggestPost: basicDetails.suggestPost,
   bpmnWorkflow: workflowDetails.bpmnWorkflow,
-  petrinetWorkflow: workflowDetails.petrinetWorkflow,
-  fireTransition: workflowDetails.fireTransition,
+  petriNetWorkflow: workflowDetails.petriNetWorkflow,
+  petriNetTransition: workflowDetails.petriNetTransition,
 };

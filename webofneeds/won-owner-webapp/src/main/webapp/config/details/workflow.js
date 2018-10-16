@@ -51,8 +51,8 @@ export const bpmnWorkflow = {
     return undefined;
   },
 };
-export const petrinetWorkflow = {
-  identifier: "petrinetWorkflow",
+export const petriNetWorkflow = {
+  identifier: "petriNetWorkflow",
   label: "Petrinet",
   icon: "#ico36_detail_workflow",
   placeholder: "",
@@ -75,12 +75,12 @@ export const petrinetWorkflow = {
         "wf:hasInlinePetriNetDefinition": value.data,
       };
 
-      return { "won:hasPetrinet": workflow };
+      return { "won:hasPetriNet": workflow };
     }
-    return { "won:hasPetrinet": undefined };
+    return { "won:hasPetriNet": undefined };
   },
   parseFromRDF: function(jsonLDImm) {
-    const wflw = jsonLDImm && jsonLDImm.get("won:hasPetrinet");
+    const wflw = jsonLDImm && jsonLDImm.get("won:hasPetriNet");
 
     let workflow = {
       name: get(wflw, "s:name"),
@@ -103,55 +103,46 @@ export const petrinetWorkflow = {
 };
 /*<https://192.168.124.49:8443/won/resource/event/xlifb1yz7opl/petrinetWorkflow/fzkwlb9xdp> wf:firesTransition <http://purl.org/webofneeds/process/taxi#DriverArrivedAtPickupLocation> .
  <this:eventuri> won:hasTextMessage "Dear passenger, I'm waiting at the pickup location. You have 5 minutes." .*/
-export const fireTransition = {
-  identifier: "fireTransition",
+
+export const petriNetTransition = {
+  identifier: "petriNetTransition",
   label: "Transition",
   icon: "#ico36_detail_workflow", //TODO: CORRECT ICON
-  placeholder: "",
-  //accepts: "application/octet-stream",
-  accepts: "",
-  component: "won-firetransition-picker",
-  viewerComponent: "won-firetransition-viewer",
+  component: "won-petrinettransition-picker",
+  viewerComponent: "won-petrinettransition-viewer",
   messageEnabled: true,
-  parseToRDF: function({ value, identifier, contentUri }) {
-    //TODO: CORRECT PARSETORDF
-    if (value && value.name && value.data) {
-      //do not check for value.type might not be present on some systems
-      let workflow = {
-        "@id":
-          contentUri && identifier
-            ? contentUri + "/" + identifier + "/" + generateIdString(10)
-            : undefined,
-        "@type": "s:FileObject",
-        "s:name": value.name,
-        "s:type": value.type,
-        "wf:hasInlinePetriNetDefinition": value.data,
+  parseToRDF: function({ value }) {
+    if (value && value.petriNetUri && value.transitionUri) {
+      let transition = {
+        "wf:firesTransition": { "@id": value.transitionUri },
       };
 
-      return { "won:hasPetrinet": workflow };
+      return { "@id": value.petriNetUri, transition };
     }
-    return { "won:hasPetrinet": undefined };
+
+    return { "won:hasPetriNetTransition": undefined };
   },
   parseFromRDF: function(jsonLDImm) {
-    //TODO: CORRECT PARSEFROMRDF
-    const wflw = jsonLDImm && jsonLDImm.get("won:hasPetrinet");
+    //TODO: PARSEFROMRDF
+    const trns = jsonLDImm && jsonLDImm.get("won:hasPetriNetTransition");
+    console.log("trns: ", trns);
 
-    let workflow = {
-      name: get(wflw, "s:name"),
-      type: get(wflw, "s:type"),
-      data: get(wflw, "wf:hasInlinePetriNetDefinition"),
+    let transition = {
+      petriNetUri: "test-petriNetUri",
+      transitionUri: "test-transitionUri",
     };
-    if (workflow.name && workflow.data) {
+    if (transition.petriNetUri && transition.transitionUri) {
       //do not check for value.type might not be present on some systems
-      return Immutable.fromJS(workflow);
+      //return Immutable.fromJS(transition);
+      return undefined;
     }
 
     return undefined;
   },
   generateHumanReadable: function({ value, includeLabel }) {
-    //TODO: GENERATE HUMANREADABL
-    if (value && value.name) {
-      return includeLabel ? this.label + ": " + value.name : value.name;
+    //TODO: GENERATE HUMANREADABLE
+    if (value) {
+      return includeLabel ? this.label + ": " + value : value;
     }
     return undefined;
   },

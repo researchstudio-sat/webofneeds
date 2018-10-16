@@ -1,0 +1,94 @@
+@import "won-config";
+@import "textfield";
+@import "sizing-utils";
+
+won-petrinettransition-picker {
+  grid-gap: 0.25rem;
+  display: grid;
+
+  .petrinettransitionp__petrineturi {
+    display: grid;
+
+    .petrinettransitionp__petrineturi__label {
+      font-size: $smallFontSize;
+    }
+
+    .petrinettransitionp__petrineturi__input {
+      position: relative;
+      display: grid;
+
+      .petrinettransitionp__petrineturi__input__icon {
+        @include fixed-square($bigiconSize);
+        position: absolute;
+        right: 0.5rem;
+        top: $formInputHeight / 2 - $bigiconSize / 2;
+        z-index: 1;
+      }
+
+      .petrinettransitionp__petrineturi__input__inner {
+        @extend .won-txt;
+        border: $thinGrayBorder;
+        min-height: $formInputHeight;
+        min-height: $formInputHeight;
+        word-wrap: break-word;
+
+        $verticalPadding: calcVerticalPaddingToHeight(
+          $normalFontSize,
+          22/16,
+          $thinBorderWidth,
+          $formInputHeight
+        );
+        padding: $verticalPadding 0.438rem + $bigiconSize $verticalPadding
+          0.438rem;
+      }
+
+      .petrinettransitionp__petrineturi__input__inner::-ms-clear {
+        width: 0;
+        height: 0;
+      }
+    }
+  }
+
+  .petrinettransitionp__transitionuri {
+    display: grid;
+
+    .petrinettransitionp__transitionuri__label {
+      font-size: $smallFontSize;
+    }
+
+    .petrinettransitionp__transitionuri__input {
+      position: relative;
+      display: grid;
+
+      .petrinettransitionp__transitionuri__input__icon {
+        @include fixed-square($bigiconSize);
+        position: absolute;
+        right: 0.5rem;
+        top: $formInputHeight / 2 - $bigiconSize / 2;
+        z-index: 1;
+      }
+
+      .petrinettransitionp__transitionuri__input__inner {
+        @extend .won-txt;
+        border: $thinGrayBorder;
+        min-height: $formInputHeight;
+        min-height: $formInputHeight;
+        word-wrap: break-word;
+
+        $verticalPadding: calcVerticalPaddingToHeight(
+          $normalFontSize,
+          22/16,
+          $thinBorderWidth,
+          $formInputHeight
+        );
+        padding: $verticalPadding 0.438rem + $bigiconSize $verticalPadding
+          0.438rem;
+      }
+
+      .petrinettransitionp__transitionuri__input__inner::-ms-clear {
+        width: 0;
+        height: 0;
+      }
+    }
+  }
+}

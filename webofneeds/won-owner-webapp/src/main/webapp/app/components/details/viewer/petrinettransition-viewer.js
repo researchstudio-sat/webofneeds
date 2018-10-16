@@ -1,24 +1,24 @@
 import angular from "angular";
 import { attach } from "../../../utils.js";
 
-import "style/_firetransition-viewer.scss";
+import "style/_petrinettransition-viewer.scss";
 
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
   let template = `
-        <div class="firetransitionv__header">
-          <svg class="firetransitionv__header__icon" ng-if="self.detail.icon">
+        <div class="petrinettransitionv__header">
+          <svg class="petrinettransitionv__header__icon" ng-if="self.detail.icon">
               <use xlink:href={{self.detail.icon}} href={{self.detail.icon}}></use>
           </svg>
-          <span class="firetransitionv__header__label" ng-if="self.detail.label">{{self.detail.label}}</span>
+          <span class="petrinettransitionv__header__label" ng-if="self.detail.label">{{self.detail.label}}</span>
         </div>
-        <div class="firetransitionv__content">{{ self.content }}</div>
+        <div class="petrinettransitionv__content">{{ self.content }}</div>
     `;
 
   class Controller {
     constructor() {
       attach(this, serviceDependencies, arguments);
-      window.firetransitionv4dbg = this;
+      window.petrinettransitionv4dbg = this;
 
       this.$scope.$watch("self.content", (newContent, prevContent) =>
         this.updatedContent(newContent, prevContent)
@@ -55,5 +55,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.firetransitionViewer", [])
-  .directive("wonFiretransitionViewer", genComponentConf).name;
+  .module("won.owner.components.petrinettransitionViewer", [])
+  .directive("wonPetrinettransitionViewer", genComponentConf).name;
