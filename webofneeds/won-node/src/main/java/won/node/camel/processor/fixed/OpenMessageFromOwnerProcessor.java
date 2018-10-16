@@ -36,7 +36,7 @@ public class OpenMessageFromOwnerProcessor extends AbstractFromOwnerCamelProcess
 
     logger.debug("OPEN received from the owner side for connection {}", wonMessage.getSenderURI());
 
-    Connection con = dataService.nextConnectionState(wonMessage.getSenderURI(), ConnectionEventType.OWNER_OPEN);
+    Connection con = connectionRepository.findOneByConnectionURI(wonMessage.getSenderURI());
     Objects.requireNonNull(con);
     Objects.requireNonNull(con.getRemoteNeedURI());
 

@@ -21,6 +21,7 @@ import won.owner.web.service.serversideaction.EventTriggeredAction;
 import won.owner.web.service.serversideaction.EventTriggeredActionContainer;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
+import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
@@ -130,11 +131,13 @@ public class ServerSideActionService implements WonMessageProcessor {
     
     private boolean isResponseToCreateOfFacet(WonMessage msg, FacetToConnect facet){
         return msg.getIsResponseToMessageType() == WonMessageType.CREATE_NEED
-            && facet.getFacet().startsWith(msg.getReceiverNeedURI().toString());
+            && msg.getEnvelopeType() == WonMessageDirection.FROM_SYSTEM
+            && facet.getFacet().startsWith(msg.getReceiverNeedURI().toString()+"#");
     }
     
     private boolean isConnectFromFacetForFacet(WonMessage msg, URI sender, URI receiver){
         return msg.getMessageType() == WonMessageType.CONNECT
+            && msg.getEnvelopeType() == WonMessageDirection.FROM_EXTERNAL
             && msg.getSenderFacetURI() != null && sender.equals(msg.getSenderFacetURI())
             && msg.getReceiverFacetURI() != null && receiver.equals(msg.getReceiverFacetURI());
     }
