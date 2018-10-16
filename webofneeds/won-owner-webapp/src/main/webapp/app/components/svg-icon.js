@@ -17,7 +17,11 @@ class SvgIcon extends HTMLElement {
       "http://www.w3.org/2000/svg",
       "use"
     );
-    useElement.setAttribute("xlink:href", "#" + this.getAttribute("icon"));
+    useElement.setAttributeNS(
+      "http://www.w3.org/1999/xlink",
+      "xlink:href",
+      "#" + this.getAttribute("icon")
+    );
     useElement.setAttribute("href", "#" + this.getAttribute("icon"));
     svgElement.appendChild(useElement);
     this.appendChild(svgElement);
@@ -28,7 +32,11 @@ class SvgIcon extends HTMLElement {
       case "icon": {
         const link = this.querySelector("svg > use");
         if (link) {
-          link.setAttribute("xlink:href", "#" + newValue);
+          link.setAttributeNS(
+            "http://www.w3.org/1999/xlink",
+            "xlink:href",
+            "#" + newValue
+          );
           link.setAttribute("href", "#" + newValue);
         }
         break;
