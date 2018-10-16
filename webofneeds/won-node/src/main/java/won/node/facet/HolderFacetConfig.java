@@ -21,4 +21,8 @@ public class HolderFacetConfig extends HardcodedFacetConfig {
         return FacetType.HoldableFacet.getURI().equals(remoteFacetType);
     }
 
+    @Override
+    public boolean isAutoOpen(URI remoteFacetType) {
+        return false;
+    }
 }

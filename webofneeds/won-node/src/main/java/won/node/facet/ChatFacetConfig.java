@@ -20,4 +20,9 @@ public class ChatFacetConfig extends HardcodedFacetConfig {
     public boolean isConnectionAllowedToType(URI remoteFacetType) {
         return true;
     }
+    
+    @Override
+    public boolean isAutoOpen(URI remoteFacetType) {
+        return false;
+    }
 }

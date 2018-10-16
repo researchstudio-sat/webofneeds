@@ -51,6 +51,13 @@ public class FacetService {
         return false;
     }
     
+    public boolean isAutoOpen(URI localFacetType, URI remoteFacetType) {
+        if (hardcodedConfigs.containsKey(localFacetType)) {
+            return hardcodedConfigs.get(localFacetType).isAutoOpen(remoteFacetType);
+        }
+        return false;
+    }
+    
     public void deriveDataForStateChange(ConnectionStateChange stateChange, Need need, Connection con)  {
         if (stateChange.isConnect() || stateChange.isDisconnect()) {
             logger.info("performing data derivation for connection {}", con.getConnectionURI());

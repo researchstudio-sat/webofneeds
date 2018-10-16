@@ -17,4 +17,9 @@ public class GroupFacetConfig extends HardcodedFacetConfig {
     public boolean isConnectionAllowedToType(URI remoteFacetType) {
         return FacetType.ChatFacet.getURI().equals(remoteFacetType);
     }
+    
+    @Override
+    public boolean isAutoOpen(URI remoteFacetType) {
+        return false;
+    }
 }
