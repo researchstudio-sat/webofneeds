@@ -101,7 +101,7 @@ public class CreateNeedMessageProcessor extends AbstractCamelProcessor
         f.setNeedURI(needURI);
         f.setFacetURI(URI.create(facetUri));
         f.setTypeURI(URI.create(facetType.get()));
-        if (facetUri.equals(defaultFacet)) {
+        if (defaultFacet.isPresent() && facetUri.equals(defaultFacet.get())) {
             f.setDefaultFacet(true);
         }
         return f;
