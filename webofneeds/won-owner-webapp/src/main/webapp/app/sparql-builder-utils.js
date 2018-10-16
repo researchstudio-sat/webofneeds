@@ -200,7 +200,10 @@ export function filterInVicinity(rootSubject, location, radius = 10) {
 }
 
 /**
- * @param {String} rootSubject: a variable name that the score judges, e.g. `?need`
+ * Subquery that generates a score [1,0] (1 for exact location matches, 0 for anything
+ * further away than the `radius`, linearly degrading inbetween)
+ *
+ * @param {String} resultName: a variable name that the score judges, e.g. `?need`
  * @param {String} bindScoreAs: the variable name for the score (use the same name for
  *   sorting/aggregating in the parent query)
  * @param {String} pathToLocation: the predicates to be traversed to get to the root
@@ -241,6 +244,19 @@ export function vicinityScoreSubQuery(
   });
 }
 
+/**
+ * Calculates the jaccard-index (i.e. normalized set-overlap) between own and a
+ * potential match's set of tags. Full overlap means 1, having no shared tags
+ * means 0.
+ *
+ * @param {String} resultName: a variable name that the score judges, e.g. `?need`
+ * @param {String} bindScoreAs: the variable name for the score (use the same name for
+ *   sorting/aggregating in the parent query)
+ * @param {String} pathToTags: the predicates to be traversed to get to the tags
+ *   in the RDF-graph.
+ * @param {Array<String>} tagLikes: an array of own tags to intersect matches' tags with
+ * @returns see `sparqlQuery`
+ */
 export function tagOverlapScoreSubQuery(
   resultName,
   bindScoreAs,
