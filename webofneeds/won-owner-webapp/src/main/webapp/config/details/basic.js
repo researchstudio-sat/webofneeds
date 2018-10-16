@@ -85,3 +85,34 @@ export const tags = {
     }
   },
 };
+
+export const suggestPost = {
+  identifier: "suggestPost",
+  label: "Suggest Post",
+  icon: "#ico36_detail_title", //TODO: CORRECT ICON
+  placeholder: "What? (Short title shown in lists)",
+  component: "won-suggestpost-picker",
+  viewerComponent: "won-suggestpost-viewer",
+  parseToRDF: function({ value }) {
+    const val = value ? value : undefined;
+
+    if (val) {
+      return {
+        "won:suggestPostUri": { "@id": val },
+      };
+    } else {
+      return { "won:suggestPostUri": undefined };
+    }
+  },
+  parseFromRDF: function(jsonLDImm) {
+    const suggestUriJsonLDImm =
+      jsonLDImm && jsonLDImm.get("won:suggestPostUri");
+    return suggestUriJsonLDImm && suggestUriJsonLDImm.get("@id");
+  },
+  generateHumanReadable: function({ value, includeLabel }) {
+    if (value) {
+      return includeLabel ? this.label + ": " + value : value;
+    }
+    return undefined;
+  },
+};

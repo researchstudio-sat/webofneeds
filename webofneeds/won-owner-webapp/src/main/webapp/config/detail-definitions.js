@@ -38,6 +38,7 @@ export const details = {
 };
 
 export const messageDetails = {
+  suggestPost: basicDetails.suggestPost,
   bpmnWorkflow: fileDetails.bpmnWorkflow,
   petrinetWorkflow: fileDetails.petrinetWorkflow,
 };

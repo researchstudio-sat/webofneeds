@@ -1,0 +1,5 @@
+@import "sizing-utils";
+
+won-suggestpost-viewer {
+  @include won-detail-viewer("suggestpostv");
+}

@@ -16,6 +16,7 @@ import filePickerModule from "./file-picker.js";
 import workflowPickerModule from "./workflow-picker.js";
 import petrinetPickerModule from "./petrinet-picker.js";
 import reviewPickerModule from "./review-picker.js";
+import suggestPostPickerModule from "./suggestpost-picker.js";
 
 /**
  * module names for angular's module system
@@ -39,4 +40,5 @@ export default [
   workflowPickerModule,
   petrinetPickerModule,
   reviewPickerModule,
+  suggestPostPickerModule,
 ];
