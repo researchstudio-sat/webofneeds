@@ -113,14 +113,16 @@ export const petriNetTransition = {
   messageEnabled: true,
   parseToRDF: function({ value }) {
     if (value && value.petriNetUri && value.transitionUri) {
-      let transition = {
-        "wf:firesTransition": { "@id": value.transitionUri },
+      return {
+        "@id": value.petriNetUri,
+        "wf:firesTransition": {
+          "@id": value.transitionUri,
+        },
       };
-
-      return { "@id": value.petriNetUri, transition };
+    } else {
+      //we need to return this predicate object part so we do not run into troubles on creating needs/messages
+      return undefined;
     }
-
-    return { "won:hasPetriNetTransition": undefined };
   },
   parseFromRDF: function(jsonLDImm) {
     //TODO: PARSEFROMRDF
