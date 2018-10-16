@@ -12,7 +12,7 @@ function genComponentConf() {
           </svg>
           <span class="petrinettransitionv__header__label" ng-if="self.detail.label">{{self.detail.label}}</span>
         </div>
-        <div class="petrinettransitionv__content">{{ self.content }}</div>
+        <div class="petrinettransitionv__content">{{ self.detail.generateHumanReadable({value: self.content.toJS(), includeLabel: false}) }}</div>
     `;
 
   class Controller {

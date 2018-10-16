@@ -1100,10 +1100,15 @@ WonMessage.prototype = {
     if (this.compactFramedMessage) {
       return this.compactFramedMessage;
     }
-    if (this.framedMessage) {
+    if (this.framedMessage && this.rawMessage) {
       try {
         this.compactFramedMessage = await jsonld.compact(
           this.framedMessage,
+          won.defaultContext
+        );
+
+        this.compactRawMessage = await jsonld.compact(
+          this.rawMessage,
           won.defaultContext
         );
 
@@ -1240,6 +1245,9 @@ WonMessage.prototype = {
     const forwardedMessageContent =
       forwardedMessage && forwardedMessage["msg:hasCorrespondingRemoteMessage"];
     return forwardedMessageContent;
+  },
+  getCompactRawMessage: function() {
+    return this.compactRawMessage;
   },
   getMessageType: function() {
     return this.getProperty(

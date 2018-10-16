@@ -124,27 +124,70 @@ export const petriNetTransition = {
       return undefined;
     }
   },
-  parseFromRDF: function(jsonLDImm) {
-    //TODO: PARSEFROMRDF
-    const trns = jsonLDImm && jsonLDImm.get("won:hasPetriNetTransition");
-    console.log("trns: ", trns);
+  parseFromRDF: function(jsonLDImm, rawMessageJsonLDImm) {
+    //ParseFromRDF currently only works with one found transitionUri petriNetUri Triple
+    if (rawMessageJsonLDImm) {
+      const crawlRawMessageContentGraphs = function(rawMessageJsonLDImm) {
+        const rawMessageJsonLdContentGraphs =
+          rawMessageJsonLDImm && rawMessageJsonLDImm.get("@graph");
 
-    let transition = {
-      petriNetUri: "test-petriNetUri",
-      transitionUri: "test-transitionUri",
-    };
-    if (transition.petriNetUri && transition.transitionUri) {
-      //do not check for value.type might not be present on some systems
-      //return Immutable.fromJS(transition);
-      return undefined;
+        if (
+          rawMessageJsonLdContentGraphs &&
+          Immutable.List.isList(rawMessageJsonLdContentGraphs)
+        ) {
+          let result;
+
+          rawMessageJsonLdContentGraphs.map(value => {
+            const partialResult = crawlRawMessageContentGraphs(value);
+            if (partialResult) {
+              result = partialResult;
+            }
+          });
+          return result;
+        } else {
+          const fireTransitionContent = rawMessageJsonLDImm.get(
+            "wf:firesTransition"
+          );
+
+          if (fireTransitionContent) {
+            const transitionUri = fireTransitionContent.get("@id");
+            const petriNetUri = rawMessageJsonLDImm.get("@id");
+
+            if (transitionUri && petriNetUri) {
+              console.log(
+                "reached graph-end and found firesTransition",
+                rawMessageJsonLDImm.toJS(),
+                rawMessageJsonLDImm
+              );
+
+              return {
+                petriNetUri: petriNetUri,
+                transitionUri: transitionUri,
+              };
+            }
+          }
+          return undefined;
+        }
+      };
+
+      const results = crawlRawMessageContentGraphs(rawMessageJsonLDImm);
+
+      return results && Immutable.fromJS(results);
     }
-
     return undefined;
   },
   generateHumanReadable: function({ value, includeLabel }) {
-    //TODO: GENERATE HUMANREADABLE
-    if (value) {
-      return includeLabel ? this.label + ": " + value : value;
+    if (value && value.petriNetUri && value.transitionUri) {
+      const humanReadableString =
+        " fire: <" +
+        value.transitionUri +
+        "> in PetriNetUri: <" +
+        value.petriNetUri +
+        ">";
+
+      return includeLabel
+        ? this.label + ": " + humanReadableString
+        : humanReadableString;
     }
     return undefined;
   },
