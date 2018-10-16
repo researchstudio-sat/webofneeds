@@ -134,7 +134,7 @@ view model =
                         , Font.color Skin.white
                         ]
                     <|
-                        text "Publish"
+                        text "Publish Anonymously"
                 }
 
         else
