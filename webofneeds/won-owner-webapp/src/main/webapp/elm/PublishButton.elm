@@ -1,6 +1,7 @@
 port module PublishButton exposing (main)
 
 import Browser
+import Browser.Events
 import Dict exposing (Dict)
 import Element exposing (..)
 import Element.Background as Background
@@ -37,6 +38,13 @@ type alias Model =
     , selectedPersona : SelectedPersona
     , skin : Skin
     , options : Options
+    , size : Size
+    }
+
+
+type alias Size =
+    { width : Int
+    , height : Int
     }
 
 
@@ -56,8 +64,8 @@ type SelectedPersona
     | Persona String
 
 
-init : Value -> ( Model, Cmd Msg )
-init skin =
+init : { width : Int, height : Int, skin : Value } -> ( Model, Cmd Msg )
+init { width, height, skin } =
     ( { personas = Dict.empty
       , state = Closed
       , selectedPersona = Anonymous
@@ -67,6 +75,10 @@ init skin =
       , options =
             { draftValid = False
             , loggedIn = False
+            }
+      , size =
+            { width = width
+            , height = height
             }
       }
     , Cmd.none
@@ -134,6 +146,7 @@ view model =
                     case model.state of
                         Open ->
                             personaList skin
+                                model.size
                                 (model.personas
                                     |> Dict.values
                                     |> List.filterMap
@@ -243,6 +256,7 @@ view model =
 
 personaList :
     Skin
+    -> Size
     ->
         List
             { url : Url
@@ -250,7 +264,7 @@ personaList :
             , data : PersonaData
             }
     -> Element Msg
-personaList skin personas =
+personaList skin screenSize personas =
     let
         listElements =
             if List.isEmpty personas then
@@ -299,6 +313,9 @@ personaList skin personas =
                 , Border.color skin.lightGray
                 ]
                 none
+
+        maxHeight =
+            screenSize.height - 70
     in
     column
         [ width fill
@@ -306,6 +323,8 @@ personaList skin personas =
         , Border.width 1
         , moveUp 5
         , Background.color Skin.white
+        , scrollbarY
+        , height (maximum maxHeight shrink)
         ]
         (List.intersperse line listElements)
 
@@ -347,6 +366,7 @@ type Msg
     | OptionsUpdated Options
     | Publish
     | SkinUpdated Skin
+    | SizeChanged Size
     | NoOp
 
 
@@ -430,6 +450,13 @@ update msg model =
             , Cmd.none
             )
 
+        SizeChanged size ->
+            ( { model
+                | size = size
+              }
+            , Cmd.none
+            )
+
         NoOp ->
             ( model, Cmd.none )
 
@@ -440,6 +467,11 @@ subscriptions model =
         [ Persona.subscription ReceivedPersonas (always NoOp)
         , publishIn OptionsUpdated
         , Skin.subscription SkinUpdated (\_ -> NoOp)
+        , Browser.Events.onResize
+            (\width height ->
+                SizeChanged <|
+                    Size width height
+            )
         ]
 
 

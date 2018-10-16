@@ -13,7 +13,11 @@ function genComponentConf($ngRedux) {
     link: (scope, element) => {
       const elmApp = Elm.PublishButton.init({
         node: element[0],
-        flags: currentSkin(),
+        flags: {
+          width: window.innerWidth,
+          height: window.innerHeight,
+          skin: currentSkin(),
+        },
       });
 
       scope.$watch("isValid", newValue => {
