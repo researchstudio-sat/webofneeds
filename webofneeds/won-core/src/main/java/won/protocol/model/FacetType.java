@@ -30,6 +30,7 @@ public enum FacetType {
     BACCParticipantFacet("BACCParticipantFacet"),
     BAAtomicPCCoordinatorFacet("BAAtomicPCCoordinatorFacet"),
     BAAtomicCCCoordinatorFacet("BAAtomicCCCoordinatorFacet");
+    
 
     public static String[] getNames() {
         String[] ret = new String[FacetType.values().length];
@@ -48,6 +49,10 @@ public enum FacetType {
            return FacetType.GroupFacet;
        else if(uri.equals(FacetType.ChatFacet.getURI()))
            return FacetType.ChatFacet;
+       else if(uri.equals(FacetType.HolderFacet.getURI()))
+           return FacetType.HolderFacet;
+       else if(uri.equals(FacetType.HoldableFacet.getURI()))
+           return FacetType.HoldableFacet;
        else if(uri.equals(FacetType.CoordinatorFacet.getURI()))
            return FacetType.CoordinatorFacet;
        else if(uri.equals(FacetType.ParticipantFacet.getURI()))

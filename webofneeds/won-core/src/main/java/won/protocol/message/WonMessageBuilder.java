@@ -354,7 +354,7 @@ public class WonMessageBuilder
       .setReceiverNeedURI(remoteNeed)
       .setReceiverNodeURI(remoteWonNode);
     if (remoteFacet.isPresent()) {
-        builder.setSenderFacetURI(remoteFacet.get());
+        builder.setReceiverFacetURI(remoteFacet.get());
     }
     return builder.setTextMessage(welcomeMessage)
       .setSentTimestampToNow();
@@ -371,6 +371,22 @@ public class WonMessageBuilder
     URI remoteWonNode,
     String welcomeMessage) {
       return setMessagePropertiesForOpen(messageURI, localConnection, localNeed, localWonNode, remoteConnection, remoteNeed, remoteWonNode, Optional.empty(), welcomeMessage);
+  }
+  
+  public static WonMessageBuilder setMessagePropertiesForOpen(
+          URI messageURI,
+          WonMessage connectToReactTo,
+          String welcomeMessage) {
+            return setMessagePropertiesForOpen(
+                    messageURI, 
+                    connectToReactTo.getReceiverURI(), 
+                    connectToReactTo.getReceiverNeedURI(), 
+                    connectToReactTo.getReceiverNodeURI(), 
+                    connectToReactTo.getSenderURI(), 
+                    connectToReactTo.getSenderNeedURI(), 
+                    connectToReactTo.getSenderNodeURI(),
+                    Optional.of(connectToReactTo.getSenderFacetURI()), 
+                    welcomeMessage);
   }
   
   public static WonMessageBuilder setMessagePropertiesForClose(

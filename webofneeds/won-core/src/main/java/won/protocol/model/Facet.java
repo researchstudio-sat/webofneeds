@@ -47,6 +47,10 @@ public class Facet {
         return needURI;
     }
 
+    /**
+     * Not safe to use unless we know the typeURI is a known facet type. Use getTypeURI instead.
+     * @Deprecated
+     * */
     public FacetType getFacetType() {
         return FacetType.getFacetType(typeURI);
     }
