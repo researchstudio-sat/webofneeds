@@ -23,10 +23,10 @@ function genComponentConf() {
         <div class="suggestpostv__content">
           <div class="suggestpostv__content__post" ng-if="self.suggestedPost">
             <won-post-header
-                class="clickable"
+               
                 need-uri="self.suggestedPost.get('uri')"
                 timestamp="self.suggestedPost.get('creationDate')"
-                ng-click="!self.multiSelectType && self.router__stateGoCurrent({postUri: self.suggestedPost.get('uri')})"
+             
                 hide-image="::false">
             </won-post-header>
           </div>
