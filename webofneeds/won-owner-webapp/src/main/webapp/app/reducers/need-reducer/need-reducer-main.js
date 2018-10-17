@@ -58,6 +58,19 @@ export default function(allNeedsInState = initialState, action = {}) {
         need.set("ownNeed", false).set("connections", Immutable.Map())
       );
 
+    case actionTypes.needs.fetchSuggested: {
+      console.log("action: ", action);
+      let suggestedPosts = action.payload.get("suggestedPosts");
+      suggestedPosts = suggestedPosts ? suggestedPosts : Immutable.Set();
+
+      const stateWithSuggestedPosts = suggestedPosts.reduce(
+        (updatedState, suggestedPost) =>
+          addNeed(updatedState, suggestedPost, false),
+        allNeedsInState
+      );
+
+      return stateWithSuggestedPosts;
+    }
     case actionTypes.initialPageLoad:
     case actionTypes.needs.fetchUnloadedNeeds:
     case actionTypes.login: {
