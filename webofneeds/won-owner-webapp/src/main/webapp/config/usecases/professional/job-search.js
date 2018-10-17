@@ -80,19 +80,40 @@ export const jobSearch = {
    */
   generateQuery: (draft, resultName) => {
     // skills
-    // const pathInDraft = ["is", "skills"];
-    // const sparqlPredicatePath = "won:seeks/s:knowsAbout";
-    // const sparqlVarName = "?skills";
+    const skillsSQ = tagOverlapScoreSubQuery({
+      resultName: resultName,
+      bindScoreAs: "?skills_jaccardIndex",
+      pathToTags: "won:seeks/s:knowsAbout",
+      prefixesInPath: {
+        s: won.defaultContext["s"],
+        won: won.defaultContext["won"],
+      },
+      tagLikes: getIn(draft, ["is", "skills"]),
+    });
 
     // hiringOrganizationName
-    // const pathInDraft = ["seeks", "organizationNames"];
-    // const sparqlPredicatePath = "won:is/s:hiringOrganization/s:name";
-    // const sparqlVarName = "?organizationName";
+    const organizationNameSQ = tagOverlapScoreSubQuery({
+      resultName: resultName,
+      bindScoreAs: "?organizationName_jaccardIndex",
+      pathToTags: "won:is/s:hiringOrganization/s:name",
+      prefixesInPath: {
+        s: won.defaultContext["s"],
+        won: won.defaultContext["won"],
+      },
+      tagLikes: getIn(draft, ["seeks", "organizationNames"]),
+    });
 
     // employmentType
-    // const pathInDraft = ["seeks", "employmentTypes"];
-    // const sparqlPredicatePath = "won:is/s:employmentType";
-    // const sparqlVarName = "?employmentType";
+    const employmentTypesSQ = tagOverlapScoreSubQuery({
+      resultName: resultName,
+      bindScoreAs: "?employmentTypes_jaccardIndex",
+      pathToTags: "won:is/s:employmentTypes",
+      prefixesInPath: {
+        s: won.defaultContext["s"],
+        won: won.defaultContext["won"],
+      },
+      tagLikes: getIn(draft, ["seeks", "employmentTypes"]),
+    });
 
     // industry:
     const industryScoreSQ = tagOverlapScoreSubQuery({
@@ -127,9 +148,21 @@ export const jobSearch = {
         `${resultName} a won:Need.`,
 
         // calculate average of scores; can be weighed if necessary
-        `bind ( ( ?industry_jaccardIndex + ?jobLocation_geoScore ) / 2  as ?aggregatedScore )`,
+        `bind ( ( 
+          ?industry_jaccardIndex + 
+          ?skills_jaccardIndex + 
+          ?organizationName_jaccardIndex + 
+          ?employmentTypes_jaccardIndex + 
+          ?jobLocation_geoScore 
+        ) / 5  as ?aggregatedScore )`,
       ],
-      subQueries: [industryScoreSQ, vicinityScoreSQ],
+      subQueries: [
+        industryScoreSQ,
+        vicinityScoreSQ,
+        employmentTypesSQ,
+        organizationNameSQ,
+        skillsSQ,
+      ],
       orderBy: [{ order: "DESC", variable: "?aggregatedScore" }],
       limit: 20,
     });
