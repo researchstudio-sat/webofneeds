@@ -138,6 +138,19 @@ export const jobSearch = {
       geoCoordinates: getIn(draft, ["seeks", "jobLocation"]),
     });
 
+    const subQueries = [
+      industryScoreSQ,
+      vicinityScoreSQ,
+      employmentTypesSQ,
+      organizationNameSQ,
+      skillsSQ,
+    ]
+      .filter(sq => sq) // filter out non-existing details (the SQs should be `undefined` for them)
+      .map(sq => ({
+        query: sq,
+        optional: true, // so counterparts without that detail don't get filtered out (just assigned a score of 0 via `coalesce`)
+      }));
+
     const query = sparqlQuery({
       prefixes: {
         won: won.defaultContext["won"],
@@ -145,24 +158,19 @@ export const jobSearch = {
       },
       distinct: true,
       variables: [resultName],
+      subQueries: subQueries,
       where: [
         `${resultName} a won:Need.`,
 
         // calculate average of scores; can be weighed if necessary
-        `bind ( ( 
-          ?industry_jaccardIndex + 
-          ?skills_jaccardIndex + 
-          ?organizationName_jaccardIndex + 
-          ?employmentTypes_jaccardIndex + 
-          ?jobLocation_geoScore 
-        ) / 5  as ?aggregatedScore )`,
-      ],
-      subQueries: [
-        industryScoreSQ,
-        vicinityScoreSQ,
-        employmentTypesSQ,
-        organizationNameSQ,
-        skillsSQ,
+        `BIND( ( 
+          COALESCE(?industry_jaccardIndex, 0) + 
+          COALESCE(?skills_jaccardIndex, 0) + 
+          COALESCE(?organizationName_jaccardIndex, 0) + 
+          COALESCE(?employmentTypes_jaccardIndex, 0) + 
+          COALESCE(?jobLocation_geoScore, 0) 
+        ) / 5  as ?aggregatedScore)`,
+        `FILTER(?aggregatedScore > 0)`,
       ],
       orderBy: [{ order: "DESC", variable: "?aggregatedScore" }],
       limit: 20,

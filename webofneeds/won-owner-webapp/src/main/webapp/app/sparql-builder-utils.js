@@ -17,7 +17,7 @@ import { Parser as SparqlParser } from "sparqljs";
  * @param {Object} prefixes key-value pairs of prefix and full URL
  * @param {String} selectDistinct the variable to select
  * @param {Array<String>} where any operations to add to the `WHERE`-block
- * @param {Array<Object>} subQueries array of sparql-query objects. will be placed
+ * @param {Array<Object>} subQueries array of `{query: <SparqlQuery>, optional = false}` objects . will be placed
  *   in `where`-block and their prefixes lifted to the overall-queries prefix block.
  * @param {Array<Object>} orderBy Array of objects like `{order: "ASC", variable: "?geoDistance"}`
  * @param {Number} limit an integer that limits the number of results
@@ -66,30 +66,40 @@ WHERE {
   const queryAST = new SparqlParser().parse(queryTemplate);
 
   // ---------- if there are sub-queries, add their ASTs and prefixes ----------
-
-  if (subQueries && is("Array", subQueries)) {
-    subQueries.forEach(q => addSubQuery(queryAST, q));
-  }
+  addSubQueries(queryAST, subQueries);
 
   // ---------- return AST ----------
 
   return queryAST;
 }
 
-function addSubQuery(queryAST, subQuery) {
+function addSubQueries(queryAST, subQueries) {
+  if (!subQueries || !is("Array", subQueries)) {
+    return queryAST;
+  }
   // add prefixes
-  Object.assign(queryAST.prefixes, subQuery.prefixes);
+  subQueries.forEach(subQuery => {
+    Object.assign(queryAST.prefixes, subQuery.query.prefixes);
+  });
 
   // inject sub-query (without the lifted prefixes) into where-block
-  queryAST.where.push({
-    type: "group",
+  const subQueryBlocks = subQueries.map(subQuery => ({
+    type: subQuery.optional ? "optional" : "group",
     patterns: [
       {
-        ...subQuery,
+        ...subQuery.query,
         prefixes: undefined, // overwrites any `prefixes` that might come from `subQuery`
       },
     ],
-  });
+  }));
+  queryAST.where = [
+    /* @ why prepend?: evaluate subqueries first, so e.g.
+     * later `coalesce` statements can define default values
+     */
+    ...subQueryBlocks,
+    ...queryAST.where,
+  ];
+
   return queryAST;
 }
 
@@ -231,6 +241,9 @@ export function vicinityScoreSubQuery({
   radius = 10,
 }) {
   // const locationFilter = filterInVicinity("?jobLocation", jobLocation);
+  if (!geoCoordinates || !geoCoordinates.lat || !geoCoordinates.lng) {
+    return undefined;
+  }
   const { lat, lng } = geoCoordinates;
   return sparqlQuery({
     prefixes: {
@@ -281,8 +294,7 @@ export function tagOverlapScoreSubQuery({
   tagLikes,
 }) {
   if (!is("Array", tagLikes) || tagLikes.length == 0) {
-    console.error("Expected non-empty array, got ", tagLikes);
-    return;
+    return undefined;
   }
 
   // sub-query that actually calculates cardinality of union and intersection
@@ -332,7 +344,7 @@ export function tagOverlapScoreSubQuery({
       } - ?targetOverlap ) as ${bindScoreAs} )`, // intersection over union, see https://en.wikipedia.org/wiki/Jaccard_index
       `filter(${bindScoreAs} > 0)`, // filter out posts without any common tag-likes
     ],
-    subQueries: [subQuery],
+    subQueries: [{ query: subQuery }],
   });
 }
 
