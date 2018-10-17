@@ -57,9 +57,7 @@ export default function(allNeedsInState = initialState, action = {}) {
       return allNeedsInState.map(need =>
         need.set("ownNeed", false).set("connections", Immutable.Map())
       );
-
     case actionTypes.needs.fetchSuggested: {
-      console.log("action: ", action);
       let suggestedPosts = action.payload.get("suggestedPosts");
       suggestedPosts = suggestedPosts ? suggestedPosts : Immutable.Set();
 

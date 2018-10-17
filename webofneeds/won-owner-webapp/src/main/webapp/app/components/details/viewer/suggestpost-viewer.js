@@ -1,6 +1,5 @@
 import angular from "angular";
 import "ng-redux";
-import Immutable from "immutable";
 import { actionCreators } from "../../../actions/actions.js";
 import postHeaderModule from "../../post-header.js";
 import { attach } from "../../../utils.js";
@@ -9,7 +8,6 @@ import {
   selectOpenConnectionUri,
   selectNeedByConnectionUri,
 } from "../../../selectors.js";
-import { fetchDataForNonOwnedNeedOnly } from "../../../won-message-utils.js";
 
 import "style/_suggestpost-viewer.scss";
 
@@ -100,20 +98,10 @@ function genComponentConf() {
     }
 
     loadPost() {
-      console.log("Trying to retrieve Post: ", this.content);
-      const suggestedPostUri = this.content;
-      fetchDataForNonOwnedNeedOnly(suggestedPostUri).then(response => {
-        console.log("response after fetchDataForNonOwnedNeedOnly: ", response);
-        const suggestedPosts = response && response.get("theirNeeds");
-
-        if (suggestedPosts && suggestedPosts.size > 0) {
-          this.needs__fetchSuggested(
-            Immutable.fromJS({
-              suggestedPosts: suggestedPosts,
-            })
-          );
-        }
-      });
+      if (this.content) {
+        //this.content is the suggestedPostUri
+        this.needs__fetchSuggested(this.content);
+      }
     }
 
     connectWithPost() {

@@ -3,12 +3,14 @@
  */
 
 import won from "../won-es6.js";
+import Immutable from "immutable";
 
 import { actionTypes } from "./actions.js";
 
 import {
   buildConnectMessage,
   fetchUnloadedData,
+  fetchDataForNonOwnedNeedOnly,
 } from "../won-message-utils.js";
 
 export function fetchUnloadedNeeds() {
@@ -20,6 +22,25 @@ export function fetchUnloadedNeeds() {
       });
     };
     fetchUnloadedData(curriedDispatch);
+  };
+}
+
+export function fetchSuggested(needUri) {
+  return async dispatch => {
+    fetchDataForNonOwnedNeedOnly(needUri).then(response => {
+      const suggestedPosts = response && response.get("theirNeeds");
+
+      if (suggestedPosts && suggestedPosts.size > 0) {
+        const payload = Immutable.fromJS({
+          suggestedPosts: suggestedPosts,
+        });
+
+        dispatch({
+          type: actionTypes.needs.fetchSuggestedNeed,
+          payload: payload,
+        });
+      }
+    });
   };
 }
 
