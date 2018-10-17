@@ -26,7 +26,7 @@ import {
   selectRouterParams,
   selectNeedByConnectionUri,
   selectNeedsInCreationProcess,
-  selectConnectionsWithoutConnectMessage,
+  selectPostConnectionsWithoutConnectMessage,
   selectOpenConnectionUri,
   selectOpenPostUri,
   selectAllPosts,
@@ -214,7 +214,7 @@ function genComponentConf() {
         // needs that have been created but are not confirmed by the server yet
         const beingCreatedNeeds = selectNeedsInCreationProcess(state);
 
-        const connectionsToCrawl = selectConnectionsWithoutConnectMessage(
+        const connectionsToCrawl = selectPostConnectionsWithoutConnectMessage(
           state
         );
 

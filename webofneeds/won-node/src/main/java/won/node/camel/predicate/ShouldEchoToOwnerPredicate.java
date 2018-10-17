@@ -26,16 +26,16 @@ import won.protocol.message.processor.camel.WonCamelConstants;
 
 /**
  * True if the WonMessage in the wonOriginalMessage header meets the criteria for echoing it to the owner:
- * - sent from the system
+ * - sent FROM_SYSTEM or FROM_OWNER
  * - if it is a response, it is not directed at the remote need
  */
-public class IsSystemMessageToOwnerPredicate implements Predicate {
+public class ShouldEchoToOwnerPredicate implements Predicate {
 
     @Override
     public boolean matches(Exchange exchange) {
         WonMessage message = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.ORIGINAL_MESSAGE_HEADER);
         if (message == null) return false;
-        if (message.getEnvelopeType() != WonMessageDirection.FROM_SYSTEM) return false;        
+        if (message.getEnvelopeType() == WonMessageDirection.FROM_EXTERNAL) return false;        
         if (
             (message.getMessageType() == WonMessageType.SUCCESS_RESPONSE || message.getMessageType() == WonMessageType.FAILURE_RESPONSE) 
             && (message.getSenderNeedURI() != null && ! message.getSenderNeedURI().equals(message.getReceiverNeedURI()))) {

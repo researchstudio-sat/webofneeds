@@ -244,6 +244,9 @@ import { Generator } from "sparqljs";
             : { "@id": "#chatFacet", "@type": "won:ChatFacet" },
           { "@id": "#holdableFacet", "@type": "won:HoldableFacet" },
         ],
+        "won:hasDefaultFacet": args.facet
+          ? args.facet
+          : { "@id": "#chatFacet", "@type": "won:ChatFacet" },
         "won:hasFlag": new Set([
           won.debugmode ? "won:UsedForTesting" : undefined,
 

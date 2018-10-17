@@ -41,6 +41,9 @@ public class ConnectMessageFromNodeProcessor extends AbstractCamelProcessor
     URI remoteNeedUri = wonMessage.getSenderNeedURI();
     URI remoteConnectionUri = wonMessage.getSenderURI();
     URI facetURI = WonRdfUtils.FacetUtils.getFacet(wonMessage);
+    if (facetURI == null) {
+        throw new IllegalArgumentException("cannot process FROM_EXTERNAL connect without receiverFacetURI");
+    }    
     failIfIsNotFacetOfNeed(Optional.of(facetURI), Optional.of(needUri));
     Facet facet = dataService.getFacet(needUri, facetURI == null ? Optional.empty() : Optional.of(facetURI));
     URI connectionURI = wonMessage.getReceiverURI(); //if the uri is known already, we can load the connection!

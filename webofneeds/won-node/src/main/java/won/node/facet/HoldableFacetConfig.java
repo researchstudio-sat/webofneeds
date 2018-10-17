@@ -16,4 +16,9 @@ public class HoldableFacetConfig extends HardcodedFacetConfig {
     public boolean isConnectionAllowedToType(URI remoteFacetType) {
         return FacetType.HolderFacet.getURI().equals(remoteFacetType);
     }
+    
+    @Override
+    public boolean isAutoOpen(URI remoteFacetType) {
+         return false;
+    }
 }
