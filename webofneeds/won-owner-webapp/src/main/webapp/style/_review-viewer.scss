@@ -1,0 +1,6 @@
+@import "won-config";
+@import "sizing-utils";
+
+won-review-viewer {
+  @include won-detail-viewer("reviewv");
+}

@@ -38,12 +38,15 @@ public class ConnectionModelMapper implements ModelMapper<Connection> {
         if (lastUpdate != null) {
             connectionMember.addProperty(DCTerms.modified, lastUpdate);
         }
-
-        Resource facet = model.createResource(connection.getFacetURI().toString());
-        connectionMember.addProperty(WON.HAS_FACET, facet);
-        facet.addProperty(RDF.type, model.getResource(connection.getTypeURI().toString()));
-        if (connection.getRemoteFacetURI() != null) {
-            connectionMember.addProperty(WON.HAS_REMOTE_FACET, model.getResource(connection.getRemoteFacetURI().toString()));
+        
+        //we need the following check for old connections so we can still generate RDF for them.  
+        if (connection.getFacetURI() != null) {
+            Resource facet = model.createResource(connection.getFacetURI().toString());
+            connectionMember.addProperty(WON.HAS_FACET, facet);
+            facet.addProperty(RDF.type, model.getResource(connection.getTypeURI().toString()));
+            if (connection.getRemoteFacetURI() != null) {
+                connectionMember.addProperty(WON.HAS_REMOTE_FACET, model.getResource(connection.getRemoteFacetURI().toString()));
+            }
         }
         return model;
     }

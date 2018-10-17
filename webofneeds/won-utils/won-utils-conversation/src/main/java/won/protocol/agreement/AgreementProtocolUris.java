@@ -2,16 +2,13 @@ package won.protocol.agreement;
 
 import java.net.URI;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
-
-import javax.xml.bind.annotation.XmlTransient;
 
 public class AgreementProtocolUris {
 	private Set<URI> retractedUris = new HashSet<URI>();
 	private Set<URI> rejectedUris = new HashSet<URI>();
+	private Set<URI> claimedUris = new HashSet<URI>();
 	private Set<URI> agreementUris = new HashSet<URI>();
 	private Set<URI> pendingProposalUris = new HashSet<URI>();
 	private Set<URI> cancelledAgreementUris = new HashSet<URI>();
@@ -30,6 +27,10 @@ public class AgreementProtocolUris {
 	
 	public void addRejectedMessageUris(Collection<URI> uris) {
 		this.rejectedUris.addAll(uris);
+	}
+
+	public void addClaimedMessageUris(Collection<URI> uris) {
+		this.claimedUris.addAll(uris);
 	}
 	
 	public void addAgreementUris(Collection<URI> uris) {
@@ -76,6 +77,10 @@ public class AgreementProtocolUris {
 	public Set<URI> getRejectedMessageUris() {
 		return rejectedUris;
 	}
+	
+	public Set<URI> getClaimedMessageUris() {
+		return claimedUris;
+	}
 
 	public Set<URI> getAgreementUris() {
 		return agreementUris;
@@ -107,7 +112,8 @@ public class AgreementProtocolUris {
 
 	@Override
 	public String toString() {
-		return "AgreementProtocolUris [retracted=" + retractedUris + ", rejected=" + rejectedUris + ", agreements=" + agreementUris
+		return "AgreementProtocolUris [retracted=" + retractedUris + ", rejected=" + rejectedUris + ", claimed=" + claimedUris 
+				+ ", agreements=" + agreementUris
 				+ ", pendingProposals=" + pendingProposalUris + ", cancelledAgreements=" + cancelledAgreementUris
 				+ ", cancellationPendingAgreements=" + cancellationPendingAgreementUris + ", pendingCancellationProposals="
 				+ pendingCancellationProposalUris + ", acceptedCancellationProposals=" + acceptedCancellationProposalUris

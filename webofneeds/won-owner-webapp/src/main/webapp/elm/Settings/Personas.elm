@@ -424,14 +424,13 @@ createButton : Skin -> Element Msg
 createButton skin =
     Input.button
         [ width fill
-        , Border.color skin.lineGray
+        , Background.color skin.primaryColor
         , padding 5
-        , Border.width 1
         ]
         { onPress = Just Create
         , label =
             el
-                [ Font.color skin.lineGray
+                [ Font.color Skin.white
                 , centerX
                 , Font.size 32
                 ]

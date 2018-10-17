@@ -4,6 +4,7 @@ import * as timeDetails from "./details/datetime.js";
 import * as fileDetails from "./details/files.js";
 import * as priceDetails from "./details/price.js";
 import * as basicDetails from "./details/basic.js";
+import * as reviewDetails from "./details/review.js";
 
 import * as abstractDetails_ from "./details/abstract.js";
 export const abstractDetails = abstractDetails_; // reexport
@@ -30,9 +31,13 @@ export const details = {
 
   files: fileDetails.files,
   images: fileDetails.images,
-  bpmnWorkflow: fileDetails.bpmnWorkflow,
-  petrinetWorkflow: fileDetails.petrinetWorkflow,
 
   pricerange: priceDetails.pricerange,
   price: priceDetails.price,
+  review: reviewDetails.review,
+};
+
+export const messageDetails = {
+  bpmnWorkflow: fileDetails.bpmnWorkflow,
+  petrinetWorkflow: fileDetails.petrinetWorkflow,
 };

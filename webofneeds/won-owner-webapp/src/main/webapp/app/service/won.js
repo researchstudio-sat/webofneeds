@@ -623,6 +623,7 @@ won.minimalContext = {
   won: "http://purl.org/webofneeds/model#",
   rdf: "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
   agr: "http://purl.org/webofneeds/agreement#",
+  wf: "http://purl.org/webofneeds/workflow#",
   rdfg: "http://www.w3.org/2004/03/trix/rdfg-1/",
 };
 won.minimalTurtlePrefixes = context2ttlPrefixes(won.minimalContext);

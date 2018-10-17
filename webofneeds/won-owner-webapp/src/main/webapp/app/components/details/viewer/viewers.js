@@ -13,6 +13,7 @@ import rangeViewerModule from "./range-viewer.js";
 import fileViewerModule from "./file-viewer.js";
 import workflowViewerModule from "./workflow-viewer.js";
 import petrinetViewerModule from "./petrinet-viewer.js";
+import reviewViewerModule from "./review-viewer.js";
 
 /**
  * module names for angular's module system
@@ -33,4 +34,5 @@ export default [
   fileViewerModule,
   workflowViewerModule,
   petrinetViewerModule,
+  reviewViewerModule,
 ];

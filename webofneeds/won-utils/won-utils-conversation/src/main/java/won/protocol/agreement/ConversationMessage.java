@@ -24,6 +24,9 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 	Set<URI> proposes = new HashSet<>();
 	Set<ConversationMessage> proposesRefs = new HashSet<ConversationMessage>();
 	Set<ConversationMessage> proposesInverseRefs = new HashSet<ConversationMessage>();
+	Set<URI> claims = new HashSet<>();
+	Set<ConversationMessage> claimsRefs = new HashSet<ConversationMessage>();
+	Set<ConversationMessage> claimsInverseRefs = new HashSet<ConversationMessage>();
 	Set<URI> rejects = new HashSet<>();
 	Set<ConversationMessage> rejectsRefs = new HashSet<ConversationMessage>();
 	Set<ConversationMessage> rejectsInverseRefs = new HashSet<ConversationMessage>();
@@ -74,7 +77,7 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 	}
 	
 	/**
-	 * Removes all proposes, rejects, accepts, proposesToCancel, contentGraphs
+	 * Removes all proposes, claims, rejects, accepts, proposesToCancel, contentGraphs
 	 */
 	public void removeHighlevelProtocolProperties() {
 		removeProposes();
@@ -82,6 +85,7 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 		removeProposesToCancel();
 		removeRejects();
 		removeRetracts();
+		removeClaims();
 	}
 	
 	private void removeProposes() {
@@ -89,11 +93,17 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 		this.proposesRefs.forEach(other -> other.removeProposesInverseRef(this));
 		this.proposesRefs = new HashSet<>();
 	}
-	
+	private void removeClaims() {
+		this.claims = new HashSet<>();
+		this.claimsRefs.forEach(other -> other.removeClaimsInverseRef(this));
+		this.claimsRefs = new HashSet<>();
+	}
 	private void removeProposesInverseRef(ConversationMessage other) {
 		this.proposesInverseRefs.remove(other);
 	}
-	
+	private void removeClaimsInverseRef(ConversationMessage other) {
+		this.claimsInverseRefs.remove(other);
+	}
 	private void removeProposesToCancel() {
 		this.proposesToCancel = new HashSet<>();
 		this.proposesToCancelRefs.forEach(other -> other.removeProposesToCancelInverseRef(this));
@@ -111,7 +121,7 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 	}
 	
 	private void removeAcceptsInverseRef(ConversationMessage other) {
-		this.proposesInverseRefs.remove(other);
+		this.acceptsInverseRefs.remove(other);
 	}
 	
 	private void removeRejects() {
@@ -121,7 +131,7 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 	}
 	
 	private void removeRejectsInverseRef(ConversationMessage other) {
-		this.proposesInverseRefs.remove(other);
+		this.rejectsInverseRefs.remove(other);
 	}
 	
 	private void removeRetracts() {
@@ -131,7 +141,7 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 	}
 	
 	private void removeRetractsInverseRef(ConversationMessage other) {
-		this.proposesInverseRefs.remove(other);
+		this.retractsInverseRefs.remove(other);
 	}
 	
 	public boolean isForwardedMessage() {
@@ -181,6 +191,16 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 			if (this.deliveryChain != null) {
 				this.deliveryChain.addMessage(this);
 				return deliveryChain;
+			}
+		}
+		if (isForwardedMessage()) {
+			Optional<ConversationMessage> forwardingMsg = getForwardedInverseRefs().stream().findFirst();
+			if (forwardingMsg.isPresent()) {
+				this.deliveryChain = forwardingMsg.get().getDeliveryChain();
+				if (this.deliveryChain != null) {
+					this.deliveryChain.addMessage(this);
+					return deliveryChain;
+				}
 			}
 		}
 		throw new IllegalStateException("did not manage to obtain the delivery chain for message " + this.getMessageURI());
@@ -361,7 +381,7 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 	}
 	
 	public boolean isAgreementProtocolMessage() {
-		return this.isRetractsMessage() || this.isProposesMessage() || this.isProposesToCancelMessage() || this.isAcceptsMessage() || this.isRejectsMessage(); 
+		return this.isRetractsMessage() || this.isProposesMessage() || this.isProposesToCancelMessage() || this.isAcceptsMessage() || this.isRejectsMessage() || this.isClaimsMessage(); 
 	}
 	
 	public boolean isFromOwner() {
@@ -392,6 +412,9 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 	public boolean isProposesMessage() {
 		return !this.proposesRefs.isEmpty();
 	}
+	public boolean isClaimsMessage() {
+		return !this.claimsRefs.isEmpty();
+	}
 	
 	public boolean isRejectsMessage() {
 		return !this.rejectsRefs.isEmpty();
@@ -404,7 +427,9 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 	public boolean proposes(ConversationMessage other) {
 		return this.proposesRefs.contains(other);
 	}
-	
+	public boolean claims(ConversationMessage other) {
+		return this.claimsRefs.contains(other);
+	}
 	public boolean accepts(ConversationMessage other) {
 		return this.acceptsRefs.contains(other);
 	}
@@ -433,6 +458,9 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 	public Set<URI> getProposes() {
 		return proposes;
 	}
+	public Set<URI> getClaims() {
+		return claims;
+	}
 	public Set<URI> getRejects() {
 		return rejects;
 	}
@@ -444,6 +472,15 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 	}
 	public void addProposesRef(ConversationMessage ref) {
 		this.proposesRefs.add(ref);
+	}
+	public Set<ConversationMessage> getClaimsRefs(){
+		return claimsRefs;
+	}
+	public void addClaims(URI claims) {
+		this.claims.add(claims);
+	}
+	public void addClaimsRef(ConversationMessage ref) {
+		this.claimsRefs.add(ref);
 	}
 	public Set<ConversationMessage> getRejectsRefs(){
 		return rejectsRefs;
@@ -572,6 +609,12 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 	public void addProposesInverseRef(ConversationMessage ref) {
 		this.proposesInverseRefs.add(ref);
 	}
+	public Set<ConversationMessage> getClaimsInverseRefs() {
+		return claimsInverseRefs;
+	}
+	public void addClaimsInverseRef(ConversationMessage ref) {
+		this.claimsInverseRefs.add(ref);
+	}
 	public Set<ConversationMessage> getRejectsInverseRefs() {
 		return rejectsInverseRefs;
 	}
@@ -664,6 +707,7 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 				+ ", deliveryChainHead:" + getDeliveryChain().getHeadURI()
 				+ ", senderNeedURI=" + senderNeedURI				
 				+ ", proposes=" + proposes + ", proposesRefs:" + proposesRefs.size()
+				+ ", claims=" + claims + ", claimsRefs:" + claimsRefs.size()
 				+ ", rejects=" + rejects + ", rejectsRefs:" + rejectsRefs.size()
 				+ ", previous=" + previous + ", previousRefs:"
 				+ previousRefs.size() + ", accepts=" + accepts + ", acceptsRefs:" + acceptsRefs.size() + ", retracts=" + retracts
