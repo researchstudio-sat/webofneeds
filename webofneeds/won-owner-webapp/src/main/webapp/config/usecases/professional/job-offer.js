@@ -11,7 +11,7 @@ import { jobLocation } from "../../details/location.js";
 export const jobOffer = {
   identifier: "jobOffer",
   label: "Find people for a Job",
-  // icon: "#ico36_uc_find_people", TODO
+  icon: "#ico36_uc_consortium-offer", //TODO proper icon
   doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
     ...emptyDraft,

@@ -7,7 +7,7 @@ export const industryDetail = {
   identifier: "industry",
   label: "Industries and Fields",
   placeholder: "e.g. construction, graphic design, metal industry, etc",
-  icon: "#TODO", //TODO proper icon
+  icon: "#ico36_detail_tags", //TODO proper icon
   parseToRDF: function({ value }) {
     if (!value) {
       return { "s:industry": undefined };
@@ -25,8 +25,7 @@ export const employmentTypesDetail = {
   identifier: "employmentTypes",
   label: "Employment Types",
   placeholder: "e.g. full-time, part-time, internship, self-employed, etc",
-  // icon: "#ico36_detail_tags", //TODO proper icon
-  icon: "#TODO", //TODO proper icon
+  icon: "#ico36_detail_tags", //TODO proper icon
   parseToRDF: function({ value }) {
     if (!value) {
       return { "s:employmentType": undefined };
@@ -45,8 +44,7 @@ export const organizationNamesDetail = {
   label: "Organization Name(s)",
   placeholder:
     "e.g. Shiawase Corp., Simmerling Constructions, Daily Bugle, etc",
-  // icon: "#ico36_detail_tags", //TODO proper icon
-  icon: "#TODO", //TODO proper icon
+  icon: "#ico36_detail_tags", //TODO proper icon
   parseToRDF: function({ value }) {
     if (!value) {
       return { "s:hiringOrganization": undefined };

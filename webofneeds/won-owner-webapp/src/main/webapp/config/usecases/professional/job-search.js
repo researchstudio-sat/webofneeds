@@ -23,7 +23,7 @@ window.SparqlGenerator4dbg = Generator;
 export const jobSearch = {
   identifier: "jobSearch",
   label: "Search a Job",
-  // icon: "#ico36_uc_find_people", TODO
+  icon: "#ico36_uc_consortium-search", //TODO proper icon
   doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
     ...emptyDraft,
