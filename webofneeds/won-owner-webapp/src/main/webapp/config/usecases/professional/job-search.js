@@ -107,7 +107,7 @@ export const jobSearch = {
     const employmentTypesSQ = tagOverlapScoreSubQuery({
       resultName: resultName,
       bindScoreAs: "?employmentTypes_jaccardIndex",
-      pathToTags: "won:is/s:employmentTypes",
+      pathToTags: "won:is/s:employmentType",
       prefixesInPath: {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],
@@ -141,6 +141,7 @@ export const jobSearch = {
     const query = sparqlQuery({
       prefixes: {
         won: won.defaultContext["won"],
+        rdfs: won.defaultContext["rdfs"],
       },
       distinct: true,
       variables: [resultName],
