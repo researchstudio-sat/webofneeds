@@ -36,7 +36,7 @@ export function fetchSuggested(needUri) {
         });
 
         dispatch({
-          type: actionTypes.needs.fetchSuggestedNeed,
+          type: actionTypes.needs.fetchSuggested,
           payload: payload,
         });
       }
