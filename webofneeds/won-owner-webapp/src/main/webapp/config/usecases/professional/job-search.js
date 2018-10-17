@@ -95,7 +95,6 @@ export const jobSearch = {
     // const sparqlVarName = "?employmentType";
 
     // industry:
-    const industries = getIn(draft, ["seeks", "industry"]);
     const industryScoreSQ = tagOverlapScoreSubQuery({
       resultName: resultName,
       bindScoreAs: "?industry_jaccardIndex",
@@ -104,10 +103,9 @@ export const jobSearch = {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],
       },
-      tagLikes: industries,
+      tagLikes: getIn(draft, ["seeks", "industry"]),
     });
 
-    const jobLocation = getIn(draft, ["seeks", "jobLocation"]); // TODO move to better place
     const vicinityScoreSQ = vicinityScoreSubQuery({
       resultName: resultName,
       bindScoreAs: "?jobLocation_geoScore",
@@ -116,7 +114,7 @@ export const jobSearch = {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],
       },
-      geoCoordinates: jobLocation,
+      geoCoordinates: getIn(draft, ["seeks", "jobLocation"]),
     });
 
     const query = sparqlQuery({
