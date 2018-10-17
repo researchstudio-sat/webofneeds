@@ -262,14 +262,6 @@ function generateHumanReadableArray(presentDetails, detailsToParse) {
     for (const key in presentDetails) {
       const detailToParse = detailsToParse[key];
       if (detailToParse) {
-        console.log(
-          "Generating HumanReadable for: ",
-          key,
-          "detailToParse: ",
-          detailToParse,
-          " detailValue: ",
-          presentDetails[key]
-        );
         const detailValue = presentDetails[key];
         const detailValueJS =
           detailValue && Immutable.Iterable.isIterable(detailValue)
