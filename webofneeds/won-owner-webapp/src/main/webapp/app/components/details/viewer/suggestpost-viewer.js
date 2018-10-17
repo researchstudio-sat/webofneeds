@@ -127,7 +127,7 @@ function genComponentConf() {
           this.openedOwnPost.get("uri"),
           undefined,
           this.suggestedPost.get("uri"),
-          "THIS IS FROM A SUGGEST NEED"
+          "Hey a Friend told me about you, let's chat!"
         );
       } else {
         console.warn(
