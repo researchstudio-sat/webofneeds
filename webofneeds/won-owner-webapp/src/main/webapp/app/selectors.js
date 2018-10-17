@@ -24,6 +24,15 @@ export function selectOpenNeeds(state) {
     allOwnNeeds.filter(post => post.get("state") === won.WON.ActiveCompacted)
   );
 }
+
+export function selectAllOpenNeeds(state) {
+  const allNeeds = selectAllNeeds(state);
+  return (
+    allNeeds &&
+    allNeeds.filter(post => post.get("state") === won.WON.ActiveCompacted)
+  );
+}
+
 export function selectClosedNeeds(state) {
   const allOwnNeeds = selectAllOwnNeeds(state);
   return (
