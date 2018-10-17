@@ -112,6 +112,16 @@ export function selectAllConnections(state) {
   return connections;
 }
 
+/**
+ * Get all post connections stored within your own needs as a map
+ * @returns Immutable.Map with all connections
+ */
+export function selectAllPostConnections(state) {
+  const needs = selectAllOwnPosts(state); //we only check own posts as these are the only ones who have connections stored
+  const connections = needs && needs.flatMap(need => need.get("connections"));
+  return connections;
+}
+
 export function selectAllConnectionUris(state) {
   const connections = selectAllConnections(state);
   return connections && connections.keySeq().toSet();
@@ -121,16 +131,16 @@ export function selectAllConnectionUris(state) {
  * Get all connections stored within your own needs as a map with a status of Connected
  * @returns Immutable.Map with all connections
  */
-export function selectAllConnectionsInStateConnected(state) {
-  const allConnections = selectAllConnections(state);
+export function selectAllPostConnectionsInStateConnected(state) {
+  const allConnections = selectAllPostConnections(state);
   return (
     allConnections &&
     allConnections.filter(conn => conn.get("state") === won.WON.Connected)
   );
 }
 
-export function selectConnectionsWithoutConnectMessage(state) {
-  const connectionsInStateConnected = selectAllConnectionsInStateConnected(
+export function selectPostConnectionsWithoutConnectMessage(state) {
+  const connectionsInStateConnected = selectAllPostConnectionsInStateConnected(
     state
   );
 
