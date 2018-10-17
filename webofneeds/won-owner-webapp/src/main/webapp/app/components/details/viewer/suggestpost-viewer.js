@@ -54,10 +54,9 @@ function genComponentConf() {
 
       const selectFromState = state => {
         const openedConnectionUri = selectOpenConnectionUri(state);
-        const openedOwnPost = selectNeedByConnectionUri(
-          state,
-          openedConnectionUri
-        );
+        const openedOwnPost =
+          openedConnectionUri &&
+          selectNeedByConnectionUri(state, openedConnectionUri);
         const connection =
           openedOwnPost &&
           openedOwnPost.getIn(["connections", openedConnectionUri]);
