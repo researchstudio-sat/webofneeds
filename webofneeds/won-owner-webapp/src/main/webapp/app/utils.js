@@ -1146,6 +1146,36 @@ export function sortByDate(
   return sortedElements;
 }
 
+/**
+ * Sorts the elements by Selector (default order is ascending)
+ * @param elementsImm elements from state that need to be returned as a sorted array
+ * @param selector selector for the date that will be used to sort the elements (default is "lastUpdateDate")
+ * @param order if "ASC" then the order will be ascending, everything else resorts to the default sort of descending order
+ * @returns {*} sorted Elements array
+ */
+export function sortBy(elementsImm, selector = "humanReadable", order = "ASC") {
+  let sortedElements = elementsImm && elementsImm.toArray();
+
+  if (sortedElements) {
+    sortedElements.sort(function(a, b) {
+      const bValue = b && b.get(selector);
+      const aValue = a && a.get(selector);
+
+      if (order === "ASC") {
+        if (aValue < bValue) return -1;
+        if (aValue > bValue) return 1;
+        return 0;
+      } else {
+        if (bValue < aValue) return -1;
+        if (bValue > aValue) return 1;
+        return 0;
+      }
+    });
+  }
+
+  return sortedElements;
+}
+
 export function clamp(value, lower, upper) {
   if (lower > value) return lower;
   if (upper < value) return upper;
