@@ -16,11 +16,11 @@ export const jobOffer = {
   draft: {
     ...emptyDraft,
     is: {
-      "@type": "s:JobPosting",
+      type: "s:JobPosting",
       tags: ["offer-job"],
     },
     seeks: {
-      "@type": "s:Person",
+      type: "s:Person",
     },
     searchString: ["search-job"],
   },

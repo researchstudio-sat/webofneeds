@@ -28,11 +28,11 @@ export const jobSearch = {
   draft: {
     ...emptyDraft,
     is: {
-      "@type": "s:Person",
+      type: "s:Person",
       tags: ["search-job"],
     },
     seeks: {
-      "@type": "s:JobPosting",
+      type: "s:JobPosting",
     },
     searchString: ["offer-job"],
   },
@@ -154,13 +154,15 @@ export const jobSearch = {
     const query = sparqlQuery({
       prefixes: {
         won: won.defaultContext["won"],
-        rdfs: won.defaultContext["rdfs"],
+        rdf: won.defaultContext["rdf"],
+        s: won.defaultContext["s"],
       },
       distinct: true,
       variables: [resultName],
       subQueries: subQueries,
       where: [
-        `${resultName} a won:Need.`,
+        `${resultName} rdf:type won:Need.`,
+        `${resultName} won:is/rdf:type s:JobPosting.`,
 
         // calculate average of scores; can be weighed if necessary
         `BIND( ( 
@@ -170,7 +172,7 @@ export const jobSearch = {
           COALESCE(?employmentTypes_jaccardIndex, 0) + 
           COALESCE(?jobLocation_geoScore, 0) 
         ) / 5  as ?aggregatedScore)`,
-        `FILTER(?aggregatedScore > 0)`,
+        // `FILTER(?aggregatedScore > 0)`, // not necessary atm to filter; there are parts of job-postings we can't match yet (e.g. NLP on description). also content's sparse anyway.
       ],
       orderBy: [{ order: "DESC", variable: "?aggregatedScore" }],
       limit: 20,
