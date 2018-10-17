@@ -3,6 +3,28 @@
 @import "sizing-utils";
 
 won-suggestpost-picker {
+  display: grid;
+  grid-gap: 0.5rem;
+
+  .suggestpostp__posts {
+    display: grid;
+    grid-gap: 0.25rem;
+
+    &__post {
+      border: $thinGrayBorder;
+      padding: 0.25rem;
+      background: white;
+
+      &.won--selected {
+        background: $won-line-gray;
+      }
+    }
+  }
+
+  .suggestpostp__noposts {
+    font-size: $normalFontSize;
+  }
+
   .suggestpostp__input {
     position: relative;
     display: grid;
