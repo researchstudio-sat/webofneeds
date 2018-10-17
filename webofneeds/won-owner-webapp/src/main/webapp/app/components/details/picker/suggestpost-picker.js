@@ -6,6 +6,7 @@ import wonInput from "../../../directives/input.js";
 import { connect2Redux } from "../../../won-utils.js";
 import { actionCreators } from "../../../actions/actions.js";
 import postHeaderModule from "../../post-header.js";
+import labelledHrModule from "../../labelled-hr.js";
 import {
   selectOpenConnectionUri,
   selectNeedByConnectionUri,
@@ -32,17 +33,25 @@ function genComponentConf() {
       <div class="suggestpostp__noposts" ng-if="!self.suggestionsAvailable">
         No Posts available to suggest
       </div>
+      <won-labelled-hr label="::'Not happy with the options? Add a Post-URI below'" class="suggestpostp__labelledhr"></won-labelled-hr>
       <div class="suggestpostp__input">
          <svg class="suggestpostp__input__icon clickable"
             style="--local-primary:var(--won-primary-color);"
+            ng-if="self.showFetchButton"
+            ng-click="self.fetchPost()">
+            <use xlink:href="#ico16_checkmark" href="#ico16_checkmark"></use>
+         </svg>
+         <svg class="suggestpostp__input__icon clickable"
+            style="--local-primary:var(--won-primary-color);"
             ng-if="self.showResetButton"
-            ng-click="self.resetTitle()">
+            ng-click="self.resetPostUriField()">
             <use xlink:href="#ico36_close" href="#ico36_close"></use>
          </svg>
          <input
-            type="text"
+            type="url"
+            placeholder="{{self.detail.placeholder}}"
             class="suggestpostp__input__inner"
-            won-input="::self.updateTitle()" />
+            won-input="::self.updateFetchPostUriField()"/>
       </div>
     `;
 
@@ -53,6 +62,7 @@ function genComponentConf() {
 
       window.suggestpostp4dbg = this;
 
+      this.showFetchButton = false;
       this.showResetButton = false;
 
       const selectFromState = state => {
@@ -68,7 +78,7 @@ function genComponentConf() {
         const openedTheirPostUri =
           connection && connection.get("remoteNeedUri");
 
-        const addedTitle = this.initialValue;
+        const suggestedPostUri = this.initialValue;
         const allOpenNeeds = selectAllOpenNeeds(state);
 
         const allOpenNeedsWithoutCurrent =
@@ -81,14 +91,14 @@ function genComponentConf() {
           );
         const suggestedPost =
           allOpenNeedsWithoutCurrent &&
-          addedTitle &&
-          allOpenNeedsWithoutCurrent.get(addedTitle);
+          suggestedPostUri &&
+          allOpenNeedsWithoutCurrent.get(suggestedPostUri);
 
         const sortedOpenNeeds =
           allOpenNeedsWithoutCurrent && sortBy(allOpenNeedsWithoutCurrent);
 
         return {
-          addedTitle,
+          suggestedPostUri,
           suggestionsAvailable:
             allOpenNeedsWithoutCurrent && allOpenNeedsWithoutCurrent.size > 0,
           sortedOpenNeeds,
@@ -123,45 +133,50 @@ function genComponentConf() {
       }
     }
 
-    updateTitle() {
-      const text = this.textfield().value;
+    updateFetchPostUriField() {
+      const text = this.fetchUriField().value;
 
       if (text && text.trim().length > 0) {
-        this.addedTitle = text.trim();
-        this.update(this.addedTitle);
-        this.showResetButton = true;
-      } else {
-        this.resetTitle();
+        if (this.fetchUriField().checkValidity()) {
+          this.showResetButton = false;
+          this.showFetchButton = true;
+        } else {
+          this.showResetButton = true;
+          this.showFetchButton = false;
+        }
       }
     }
 
-    resetTitle() {
-      this.addedTitle = undefined;
-      this.textfield().value = "";
-      this.update(undefined);
+    resetPostUriField() {
+      this.fetchUriField().value = "";
       this.showResetButton = false;
+      this.showFetchButton = false;
     }
 
-    textfieldNg() {
-      return angular.element(this.textfield());
+    fetchPost() {
+      let uriToFetch = this.fetchUriField().value;
+      uriToFetch = uriToFetch.trim();
+
+      //TODO: ERROR HANDLING IF URL WAS NOT A FETCHABLE URL
+      this.needs__fetchSuggested(uriToFetch);
+      //this.update(uriToFetch);
+      this.resetPostUriField();
     }
-    textfield() {
-      if (!this._titleInput) {
-        this._titleInput = this.$element[0].querySelector(
+
+    fetchUriField() {
+      if (!this._fetchUriInput) {
+        this._fetchUriInput = this.$element[0].querySelector(
           ".suggestpostp__input__inner"
         );
       }
-      return this._titleInput;
+      return this._fetchUriInput;
     }
 
     selectPost(post) {
-      console.log("TODO: IMPL POST SELECTION: ", post);
       const postUri = post && post.get("uri");
 
       if (postUri) {
-        this.textfield().value = postUri;
-        this.initialValue = postUri;
-        this.updateTitle();
+        this.update(postUri);
       }
     }
   }
@@ -185,5 +200,6 @@ export default angular
   .module("won.owner.components.suggestpostPicker", [
     wonInput,
     postHeaderModule,
+    labelledHrModule,
   ])
   .directive("wonSuggestpostPicker", genComponentConf).name;

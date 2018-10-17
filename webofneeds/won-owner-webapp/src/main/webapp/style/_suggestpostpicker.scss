@@ -25,6 +25,15 @@ won-suggestpost-picker {
     font-size: $normalFontSize;
   }
 
+  .suggestpostp__labelledhr {
+    .wlh__label {
+      .wlh__label__text {
+        background: $won-light-gray;
+        white-space: nowrap;
+      }
+    }
+  }
+
   .suggestpostp__input {
     position: relative;
     display: grid;
