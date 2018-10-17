@@ -136,19 +136,6 @@ export const jobSearch = {
       limit: 20,
     });
 
-    console.log(
-      "job location filter deleteme 2: ",
-      vicinityScoreSQ,
-      industryScoreSQ,
-      query
-    );
-
-    // console.log(draft, resultName, subQuery, tagLikes, query, "deleteme");
-
-    //TODO: STOPPED HERE
-    // use `subQueries` field of args to `sparqlQuery` to combine the queries
-
     return query;
-    // throw new Error("NOT IMPLEMENTED YET");
   },
 };
