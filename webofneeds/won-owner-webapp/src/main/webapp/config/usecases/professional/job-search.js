@@ -10,9 +10,15 @@ import { jobLocation } from "../../details/location.js";
 import {
   vicinityScoreSubQuery,
   tagOverlapScoreSubQuery,
+  sparqlQuery,
 } from "../../../app/sparql-builder-utils.js";
 
+import won from "../../../app/won-es6.js";
+
 import { getIn } from "../../../app/utils.js";
+
+import { Generator } from "sparqljs";
+window.SparqlGenerator4dbg = Generator;
 
 export const jobSearch = {
   identifier: "jobSearch",
@@ -90,25 +96,51 @@ export const jobSearch = {
 
     // industry:
     const industries = getIn(draft, ["seeks", "industry"]);
-    const industryScoreSQ = tagOverlapScoreSubQuery(
-      resultName,
-      "?industry_jaccardIndex",
-      "won:is/s:industry",
-      industries
-    );
+    const industryScoreSQ = tagOverlapScoreSubQuery({
+      resultName: resultName,
+      bindScoreAs: "?industry_jaccardIndex",
+      pathToTags: "won:is/s:industry",
+      prefixesInPath: {
+        s: won.defaultContext["s"],
+        won: won.defaultContext["won"],
+      },
+      tagLikes: industries,
+    });
 
     const jobLocation = getIn(draft, ["seeks", "jobLocation"]); // TODO move to better place
-    const vicinityScoreSQ = vicinityScoreSubQuery(
-      resultName,
-      "?jobLocation_geoScore",
-      "won:is/s:jobLocation",
-      jobLocation
-    );
+    const vicinityScoreSQ = vicinityScoreSubQuery({
+      resultName: resultName,
+      bindScoreAs: "?jobLocation_geoScore",
+      pathToGeoCoords: "won:is/s:jobLocation/s:geo",
+      prefixesInPath: {
+        s: won.defaultContext["s"],
+        won: won.defaultContext["won"],
+      },
+      geoCoordinates: jobLocation,
+    });
+
+    const query = sparqlQuery({
+      prefixes: {
+        won: won.defaultContext["won"],
+      },
+      distinct: true,
+      variables: [resultName],
+      where: [
+        `${resultName} a won:Need.`,
+
+        // calculate average of scores; can be weighed if necessary
+        `bind ( ( ?industry_jaccardIndex + ?jobLocation_geoScore ) / 2  as ?aggregatedScore )`,
+      ],
+      subQueries: [industryScoreSQ, vicinityScoreSQ],
+      orderBy: [{ order: "DESC", variable: "?aggregatedScore" }],
+      limit: 20,
+    });
 
     console.log(
       "job location filter deleteme 2: ",
       vicinityScoreSQ,
-      industryScoreSQ
+      industryScoreSQ,
+      query
     );
 
     // console.log(draft, resultName, subQuery, tagLikes, query, "deleteme");
@@ -116,7 +148,7 @@ export const jobSearch = {
     //TODO: STOPPED HERE
     // use `subQueries` field of args to `sparqlQuery` to combine the queries
 
-    // return query;
-    throw new Error("NOT IMPLEMENTED YET");
+    return query;
+    // throw new Error("NOT IMPLEMENTED YET");
   },
 };

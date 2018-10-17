@@ -19,16 +19,18 @@ import { Parser as SparqlParser } from "sparqljs";
  * @param {Array<String>} where any operations to add to the `WHERE`-block
  * @param {Array<Object>} subQueries array of sparql-query objects. will be placed
  *   in `where`-block and their prefixes lifted to the overall-queries prefix block.
- * @param {*} orderBy Array of objects like `{order: "ASC", variable: "?geoDistance"}`
+ * @param {Array<Object>} orderBy Array of objects like `{order: "ASC", variable: "?geoDistance"}`
+ * @param {Number} limit an integer that limits the number of results
  */
 export function sparqlQuery({
   prefixes,
   variables,
   distinct,
   where,
+  subQueries,
   orderBy,
   groupBy,
-  subQueries,
+  limit,
 }) {
   // ---------- prepare query string ----------
 
@@ -47,12 +49,17 @@ export function sparqlQuery({
     groupByStr = `GROUP BY (${groupBy})`;
   }
 
+  let limitStr = "";
+  if (limit) {
+    limitStr = `LIMIT ${parseInt(limit)}`;
+  }
+
   const queryTemplate = `
 ${prefixesString(prefixes)}
 SELECT ${distinctStr} ${variables.join(" ")}
 WHERE {
-  ${where ? where.join("\n") : ""}
-} ${orderByStr} ${groupByStr}`;
+  ${where ? where.join(" \n") : ""}
+} ${orderByStr} ${groupByStr} ${limitStr}`;
 
   // ---------- parse root-query ----------
 
@@ -206,22 +213,28 @@ export function filterInVicinity(rootSubject, location, radius = 10) {
  * @param {String} resultName: a variable name that the score judges, e.g. `?need`
  * @param {String} bindScoreAs: the variable name for the score (use the same name for
  *   sorting/aggregating in the parent query)
- * @param {String} pathToLocation: the predicates to be traversed to get to the root
- *   of the location (i.e. the `s:Place`) in the RDF-graph.
- * @param {*} location: an object containing `lat` and `lng`
+ * @param {String} pathToGeoCoords: the predicates to be traversed to get to the
+ *   of the  `s:GeoCoordinates` in the RDF-graph of potential matches.
+ * @param {*} prefixesInPath: an object/map of prefix to full base-URL for all prefixes used
+ *   in the `pathToGeoCoords`
+ * @param {*} geoCoordinates: an object containing `lat` and `lng` to compare potential
+ *   matches to.
  * @param {Number} radius: distance in km that matches can be away from the location
  * @returns see `sparqlQuery`
  */
-export function vicinityScoreSubQuery(
+export function vicinityScoreSubQuery({
   resultName,
   bindScoreAs,
-  pathToLocation,
-  location,
-  radius = 10
-) {
+  pathToGeoCoords,
+  prefixesInPath,
+  geoCoordinates,
+  radius = 10,
+}) {
   // const locationFilter = filterInVicinity("?jobLocation", jobLocation);
+  const { lat, lng } = geoCoordinates;
   return sparqlQuery({
     prefixes: {
+      ...prefixesInPath,
       s: won.defaultContext["s"],
       won: won.defaultContext["won"],
       geo: "http://www.bigdata.com/rdf/geospatial#",
@@ -229,12 +242,12 @@ export function vicinityScoreSubQuery(
     },
     variables: [resultName, bindScoreAs],
     where: [
-      `${resultName} ${pathToLocation}/s:geo ?geo`,
+      `${resultName} ${pathToGeoCoords} ?geo`,
       `SERVICE geo:search {
             ?geo geo:search "inCircle" .
             ?geo geo:searchDatatype geoliteral:lat-lon .
             ?geo geo:predicate won:geoSpatial .
-            ?geo geo:spatialCircleCenter "${location.lat}#${location.lng}" .
+            ?geo geo:spatialCircleCenter "${lat}#${lng}" .
             ?geo geo:spatialCircleRadius "${radius}" .
             ?geo geo:distanceValue ?geoDistance .
           }`,
@@ -254,15 +267,19 @@ export function vicinityScoreSubQuery(
  *   sorting/aggregating in the parent query)
  * @param {String} pathToTags: the predicates to be traversed to get to the tags
  *   in the RDF-graph.
- * @param {Array<String>} tagLikes: an array of own tags to intersect matches' tags with
+ * @param {*} prefixesInPath: an object/map of prefix to full base-URL for all prefixes
+ *   used in the `pathToTags`
+ * @param {Array<String>} tagLikes: an array of own tags to intersect with potential
+ *   matches' tags
  * @returns see `sparqlQuery`
  */
-export function tagOverlapScoreSubQuery(
+export function tagOverlapScoreSubQuery({
   resultName,
   bindScoreAs,
   pathToTags,
-  tagLikes
-) {
+  prefixesInPath,
+  tagLikes,
+}) {
   if (!is("Array", tagLikes) || tagLikes.length == 0) {
     console.error("Expected non-empty array, got ", tagLikes);
     return;
@@ -271,7 +288,7 @@ export function tagOverlapScoreSubQuery(
   // sub-query that actually calculates cardinality of union and intersection
   const subQuery = sparqlQuery({
     prefixes: {
-      s: won.defaultContext["s"],
+      ...prefixesInPath,
     },
     variables: [
       resultName,
@@ -307,7 +324,7 @@ export function tagOverlapScoreSubQuery(
     prefixes: {
       s: won.defaultContext["s"],
     },
-    variables: [resultName],
+    variables: [resultName, bindScoreAs],
     distinct: true,
     where: [
       `bind (?targetOverlap / ( ?targetTotal + ${
