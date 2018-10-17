@@ -14,6 +14,7 @@ import fileViewerModule from "./file-viewer.js";
 import workflowViewerModule from "./workflow-viewer.js";
 import petrinetViewerModule from "./petrinet-viewer.js";
 import reviewViewerModule from "./review-viewer.js";
+import suggestPostViewerModule from "./suggestpost-viewer.js";
 
 /**
  * module names for angular's module system
@@ -35,4 +36,5 @@ export default [
   workflowViewerModule,
   petrinetViewerModule,
   reviewViewerModule,
+  suggestPostViewerModule,
 ];

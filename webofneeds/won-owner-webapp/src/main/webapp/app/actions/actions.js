@@ -52,7 +52,11 @@ import {
   createWhatsAround,
 } from "./create-need-action.js";
 
-import { needsConnect, fetchUnloadedNeeds } from "./needs-actions.js";
+import {
+  needsConnect,
+  fetchUnloadedNeeds,
+  fetchSuggested,
+} from "./needs-actions.js";
 
 import {
   stateBack,
@@ -124,6 +128,7 @@ const actionHierarchy = {
     failed: INJ_DEFAULT,
     connect: needsConnect,
     fetchUnloadedNeeds: fetchUnloadedNeeds,
+    fetchSuggested: fetchSuggested,
   },
   personas: {
     create: createPersona,

@@ -49,14 +49,14 @@ function genComponentConf() {
                         </svg>
                         <span>{{self.shouldShowRdf? "Hide raw RDF data" : "Show raw RDF data"}}</span>
                     </button>
+                    <button class="won-button--outlined thin red"
+                        ng-click="self.exportPdf()">
+                        Export as PDF
+                    </button>
                     <button class="won-button--filled red"
                         ng-if="self.isOwnPost && self.isInactive"
                         ng-click="self.reOpenPost()">
                         Reopen Post
-                    </button>
-                    <button class="won-button--filled red"
-                        ng-click="self.exportPdf()">
-                        Export as PDF
                     </button>
                     <button class="won-button--filled red"
                         ng-if="self.isOwnPost && self.isActive"

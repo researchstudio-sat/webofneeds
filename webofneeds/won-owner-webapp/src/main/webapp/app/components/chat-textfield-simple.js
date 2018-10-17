@@ -167,7 +167,7 @@ function genComponentConf() {
             <div class="cts__details__input__content"
               message-detail-element="{{self.selectedDetailComponent}}"
               on-update="::self.updateDetail(identifier, value)"
-              initial-value="::self.additionalContent.get(self.selectedDetail.identifier)"
+              initial-value="self.additionalContent.get(self.selectedDetail.identifier)"
               identifier="self.selectedDetail.identifier"
               detail="self.selectedDetail">
             </div>

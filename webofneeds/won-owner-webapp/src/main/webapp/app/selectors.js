@@ -46,6 +46,14 @@ export function selectOpenPosts(state) {
   );
 }
 
+export function selectAllOpenPosts(state) {
+  const allPosts = selectAllPosts(state);
+  return (
+    allPosts &&
+    allPosts.filter(post => post.get("state") === won.WON.ActiveCompacted)
+  );
+}
+
 export function selectClosedNeeds(state) {
   const allOwnNeeds = selectAllOwnNeeds(state);
   return (

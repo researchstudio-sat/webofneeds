@@ -26,8 +26,11 @@ function genComponentConf() {
               <div class="psl__link__copyfield" ng-if="self.showLink">
                 <input class="psl__link__copyfield__input" value="{{self.linkToPost}}" readonly type="text" ng-focus="self.selectLink()" ng-blur="self.clearSelection()">
                 <button class="red won-button--filled psl__link__copyfield__copy-button" ng-click="self.copyLink()">
-                  <svg class="psl__link__copyfield__copy-button__icon" style="--local-primary:white;">
-                    <use xlink:href="{{ self.copied === true ? '#ico16_checkmark' : '#ico16_copy_to_clipboard'}}" href="{{ self.copied ? '#ico16_checkmark' : '#ico16_copy_to_clipboard'}}"></use>
+                  <svg ng-if="self.copied" class="psl__link__copyfield__copy-button__icon" style="--local-primary:white;">
+                    <use xlink:href="#ico16_checkmark" href="#ico16_checkmark"></use>
+                  </svg>
+                  <svg ng-if="!self.copied" class="psl__link__copyfield__copy-button__icon" style="--local-primary:white;">
+                    <use xlink:href="#ico16_copy_to_clipboard" href="#ico16_copy_to_clipboard"></use>
                   </svg>
                 </button>
               </div>
@@ -66,7 +69,9 @@ function genComponentConf() {
 
     getLinkField() {
       if (!this._linkField) {
-        this._linkField = this.$element[0].querySelector(".psl__link");
+        this._linkField = this.$element[0].querySelector(
+          ".psl__link__copyfield__input"
+        );
       }
       return this._linkField;
     }
