@@ -90,7 +90,6 @@ export const suggestPost = {
   identifier: "suggestPost",
   label: "Suggest Post",
   icon: "#ico36_detail_title", //TODO: CORRECT ICON
-  placeholder: "What? (Short title shown in lists)",
   component: "won-suggestpost-picker",
   viewerComponent: "won-suggestpost-viewer",
   parseToRDF: function({ value }) {

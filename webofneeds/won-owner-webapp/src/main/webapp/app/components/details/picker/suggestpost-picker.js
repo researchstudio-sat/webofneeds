@@ -18,7 +18,6 @@ function genComponentConf() {
           <input
               type="text"
               class="suggestpostp__input__inner"
-              placeholder="{{self.detail.placeholder}}"
               won-input="::self.updateTitle()" />
       </div>
     `;
