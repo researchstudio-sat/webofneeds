@@ -100,19 +100,10 @@ export const configRouting = [
 
     $urlRouterProvider.when("/settings/", "/settings/general");
 
-    $stateProvider
-      .state("settings", {
-        url: "/settings",
-        templateUrl: "./app/components/settings/settings.html",
-      })
-      .state("settings.avatars", {
-        url: "/avatars",
-        template: `<won-avatar-settings></won-avatar-settings>`,
-      })
-      .state("settings.general", {
-        url: "/general",
-        template: `<won-general-settings></won-general-settings>`,
-      });
+    $stateProvider.state("settings", {
+      url: "/settings",
+      templateUrl: "./app/components/settings/settings.html",
+    });
   },
 ];
 

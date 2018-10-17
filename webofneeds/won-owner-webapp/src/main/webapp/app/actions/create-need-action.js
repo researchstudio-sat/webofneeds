@@ -14,7 +14,7 @@ import {
   nominatim2draftLocation,
 } from "../utils.js";
 
-export function needCreate(draft, nodeUri) {
+export function needCreate(draft, persona, nodeUri) {
   return (dispatch, getState) => {
     const state = getState();
 
@@ -43,6 +43,29 @@ export function needCreate(draft, nodeUri) {
           draft,
           nodeUri
         );
+        if (persona) {
+          const response = await fetch("rest/action/connect", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify([
+              {
+                pending: false,
+                facet: `${persona}#holderFacet`,
+              },
+              {
+                pending: true,
+                facet: `${needUri}#holdableFacet`,
+              },
+            ]),
+            credentials: "include",
+          });
+          if (!response.ok) {
+            const errorMsg = await response.text();
+            throw new Error(`Could not connect identity: ${errorMsg}`);
+          }
+        }
         dispatch({
           type: actionTypes.needs.create,
           payload: { eventUri, message, needUri, need: draft },
@@ -87,7 +110,7 @@ export function createWhatsNew() {
         dispatch(actionCreators.needs__close(need.get("uri")));
       });
 
-    dispatch(actionCreators.needs__create(whatsNewObject, nodeUri));
+    dispatch(actionCreators.needs__create(whatsNewObject, null, nodeUri));
   };
 }
 
@@ -128,7 +151,9 @@ export function createWhatsAround() {
               matchingContext: defaultContext,
             };
 
-            dispatch(actionCreators.needs__create(whatsAroundObject, nodeUri));
+            dispatch(
+              actionCreators.needs__create(whatsAroundObject, null, nodeUri)
+            );
           });
         },
         error => {

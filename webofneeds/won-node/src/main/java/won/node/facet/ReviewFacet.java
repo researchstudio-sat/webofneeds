@@ -16,4 +16,9 @@ public class ReviewFacet extends HardcodedFacetConfig {
     public boolean isConnectionAllowedToType(URI remoteFacetType) {
         return FacetType.ReviewFacet.getURI().equals(remoteFacetType);
     }
+    
+    @Override
+    public boolean isAutoOpen(URI remoteFacetType) {
+        return true;
+    }
 }

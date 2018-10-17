@@ -273,7 +273,9 @@ function deleteConnectionsBetweenOwnNeeds(state) {
       let connections = need.get("connections");
 
       connections = connections.filter(function(conn) {
-        return !state.getIn(["needs", conn.get("remoteNeedUri"), "ownNeed"]);
+        if (conn.get("state") == "http://purl.org/webofneeds/model#Suggested")
+          return !state.getIn(["needs", conn.get("remoteNeedUri"), "ownNeed"]);
+        else return true;
       });
       return need.set("connections", connections);
     });

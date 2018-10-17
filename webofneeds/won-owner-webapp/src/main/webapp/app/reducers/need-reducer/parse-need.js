@@ -8,7 +8,7 @@ export function parseNeed(jsonldNeed, ownNeed) {
   let parsedNeed = {
     uri: undefined,
     nodeUri: undefined,
-    type: undefined,
+    types: undefined,
     state: undefined,
     connections: Immutable.Map(),
     creationDate: undefined,
@@ -95,14 +95,18 @@ export function parseNeed(jsonldNeed, ownNeed) {
     let type = undefined;
     const detailsToParse = getAllDetails();
 
+    parsedNeed.types = (rawTypes => {
+      if (Immutable.List.isList(rawTypes)) {
+        return Immutable.Set(rawTypes);
+      } else {
+        return Immutable.Set([rawTypes]);
+      }
+    })(jsonldNeedImm.get("@type"));
+
     if (isPresent) {
-      type = seeksPresent
-        ? won.WON.BasicNeedTypeCombinedCompacted
-        : won.WON.BasicNeedTypeSupplyCompacted;
       isPart = generateContent(is, type, detailsToParse);
     }
     if (seeksPresent) {
-      type = isPresent ? type : won.WON.BasicNeedTypeDemandCompacted;
       seeksPart = generateContent(seeks, type, detailsToParse);
     }
     if (searchString) {
@@ -111,14 +115,6 @@ export function parseNeed(jsonldNeed, ownNeed) {
 
     parsedNeed.is = isPart;
     parsedNeed.seeks = seeksPart;
-
-    if (isWhatsAround) {
-      parsedNeed.type = won.WON.BasicNeedTypeWhatsAroundCompacted;
-    } else if (isWhatsNew) {
-      parsedNeed.type = won.WON.BasicNeedTypeWhatsNewCompacted;
-    } else {
-      parsedNeed.type = type;
-    }
 
     parsedNeed.isWhatsAround = !!isWhatsAround;
     parsedNeed.isWhatsNew = !!isWhatsNew;
@@ -266,14 +262,6 @@ function generateHumanReadableArray(presentDetails, detailsToParse) {
     for (const key in presentDetails) {
       const detailToParse = detailsToParse[key];
       if (detailToParse) {
-        console.log(
-          "Generating HumanReadable for: ",
-          key,
-          "detailToParse: ",
-          detailToParse,
-          " detailValue: ",
-          presentDetails[key]
-        );
         const detailValue = presentDetails[key];
         const detailValueJS =
           detailValue && Immutable.Iterable.isIterable(detailValue)

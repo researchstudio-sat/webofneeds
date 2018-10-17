@@ -39,10 +39,7 @@ import postComponent from "./components/post/post.js";
 import aboutComponent from "./components/about/about.js";
 import signupComponent from "./components/signup/signup.js";
 
-//settings
-import settingsTitleBarModule from "./components/settings-title-bar.js";
-import avatarSettingsModule from "./components/settings/avatar-settings.js";
-import generalSettingsModule from "./components/settings/general-settings.js";
+import settingsWrapper from "./components/settings/settings-wrapper.js";
 
 //won import (used so you can access the debugmode variable without reloading the page)
 import won from "./service/won.js";
@@ -75,12 +72,8 @@ let app = angular.module("won.owner", [
   aboutComponent,
   signupComponent,
 
-  //views.settings
-  settingsTitleBarModule,
-  avatarSettingsModule,
-  generalSettingsModule,
-
   ...detailModules,
+  settingsWrapper,
 ]);
 
 /* create store, register middlewares, set up redux-devtool-support, etc */

@@ -6,6 +6,7 @@ import { createSelector } from "reselect";
 import Immutable from "immutable";
 import won from "./won-es6.js";
 import { decodeUriComponentProperly, getIn } from "./utils.js";
+import Color from "color";
 
 export const selectLastUpdateTime = state => state.get("lastUpdateTime");
 export const selectRouterParams = state =>
@@ -17,6 +18,18 @@ export const selectAllOwnNeeds = state =>
 export const selectAllTheirNeeds = state =>
   selectAllNeeds(state).filter(need => !need.get("ownNeed"));
 
+export function selectAllPosts(state) {
+  const needs = selectAllNeeds(state);
+  return needs.filter(need => {
+    if (!need.get("types")) return true;
+
+    return Immutable.is(need.get("types"), Immutable.Set(["won:Need"]));
+  });
+}
+
+export const selectAllOwnPosts = state =>
+  selectAllPosts(state).filter(need => need.get("ownNeed"));
+
 export function selectOpenNeeds(state) {
   const allOwnNeeds = selectAllOwnNeeds(state);
   return (
@@ -25,11 +38,19 @@ export function selectOpenNeeds(state) {
   );
 }
 
-export function selectAllOpenNeeds(state) {
-  const allNeeds = selectAllNeeds(state);
+export function selectOpenPosts(state) {
+  const allOwnNeeds = selectAllOwnPosts(state);
   return (
-    allNeeds &&
-    allNeeds.filter(post => post.get("state") === won.WON.ActiveCompacted)
+    allOwnNeeds &&
+    allOwnNeeds.filter(post => post.get("state") === won.WON.ActiveCompacted)
+  );
+}
+
+export function selectAllOpenPosts(state) {
+  const allPosts = selectAllPosts(state);
+  return (
+    allPosts &&
+    allPosts.filter(post => post.get("state") === won.WON.ActiveCompacted)
   );
 }
 
@@ -44,6 +65,19 @@ export function selectClosedNeeds(state) {
     )
   ); //Filter whatsAround and whatsNew needs automatically
 }
+
+export function selectClosedPosts(state) {
+  const allOwnNeeds = selectAllOwnPosts(state);
+  return (
+    allOwnNeeds &&
+    allOwnNeeds.filter(
+      post =>
+        post.get("state") === won.WON.InactiveCompacted &&
+        !(post.get("isWhatsAround") || post.get("isWhatsNew"))
+    )
+  ); //Filter whatsAround and whatsNew needs automatically
+}
+
 export function selectNeedsInCreationProcess(state) {
   const allOwnNeeds = selectAllOwnNeeds(state);
   // needs that have been created but are not confirmed by the server yet
@@ -86,6 +120,16 @@ export function selectAllConnections(state) {
   return connections;
 }
 
+/**
+ * Get all post connections stored within your own needs as a map
+ * @returns Immutable.Map with all connections
+ */
+export function selectAllPostConnections(state) {
+  const needs = selectAllOwnPosts(state); //we only check own posts as these are the only ones who have connections stored
+  const connections = needs && needs.flatMap(need => need.get("connections"));
+  return connections;
+}
+
 export function selectAllConnectionUris(state) {
   const connections = selectAllConnections(state);
   return connections && connections.keySeq().toSet();
@@ -95,16 +139,16 @@ export function selectAllConnectionUris(state) {
  * Get all connections stored within your own needs as a map with a status of Connected
  * @returns Immutable.Map with all connections
  */
-export function selectAllConnectionsInStateConnected(state) {
-  const allConnections = selectAllConnections(state);
+export function selectAllPostConnectionsInStateConnected(state) {
+  const allConnections = selectAllPostConnections(state);
   return (
     allConnections &&
     allConnections.filter(conn => conn.get("state") === won.WON.Connected)
   );
 }
 
-export function selectConnectionsWithoutConnectMessage(state) {
-  const connectionsInStateConnected = selectAllConnectionsInStateConnected(
+export function selectPostConnectionsWithoutConnectMessage(state) {
+  const connectionsInStateConnected = selectAllPostConnectionsInStateConnected(
     state
   );
 
@@ -370,4 +414,35 @@ export function getCorrectMessageUri(messages, messageUri) {
     }
   }
   return undefined;
+}
+
+export function getPersonas(needs) {
+  const personas = needs
+    .toList()
+    .filter(need => need.get("types") && need.get("types").has("won:Persona"));
+  return personas.map(persona => {
+    const graph = persona.get("jsonld");
+    return {
+      displayName: graph.get("s:name"),
+      website: graph.get("s:url"),
+      aboutMe: graph.get("s:description"),
+      url: persona.get("uri"),
+      saved: !persona.get("isBeingCreated"),
+      timestamp: persona.get("creationDate").toISOString(),
+    };
+  });
+}
+
+export function currentSkin() {
+  const style = getComputedStyle(document.body);
+  const getColor = name => {
+    const color = Color(style.getPropertyValue(name).trim());
+    return color.rgb().array();
+  };
+  return {
+    primaryColor: getColor("--won-primary-color"),
+    lightGray: getColor("--won-light-gray"),
+    lineGray: getColor("--won-line-gray"),
+    subtitleGray: getColor("--won-subtitle-gray"),
+  };
 }

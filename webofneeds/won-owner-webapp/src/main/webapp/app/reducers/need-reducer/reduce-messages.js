@@ -85,6 +85,10 @@ export function addMessage(
           connectionUri,
           "messages",
         ]);
+        if (!messages) {
+          //ignore messages for nonexistant connections
+          return state;
+        }
         messages = messages.set(
           parsedMessage.getIn(["data", "uri"]),
           parsedMessage.get("data")

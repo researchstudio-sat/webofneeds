@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.orm.jpa.JpaSystemException;
 import won.node.camel.predicate.IsResponseMessagePredicate;
-import won.node.camel.predicate.IsSystemMessageToOwnerPredicate;
+import won.node.camel.predicate.ShouldEchoToOwnerPredicate;
 import won.node.camel.predicate.ShouldCallFacetImplForMessagePredicate;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
@@ -256,7 +256,7 @@ public class WonMessageRoutes extends RouteBuilder
                             // this is the case if senderURI equals receiverURI and both are non-null.
                             PredicateBuilder.and(
                                     header(WonCamelConstants.ORIGINAL_MESSAGE_HEADER).isNotNull(),
-                                    new IsSystemMessageToOwnerPredicate()))
+                                    new ShouldEchoToOwnerPredicate()))
                             //swap back: original into MESSAGE_HEADER
                             .setHeader(WonCamelConstants.MESSAGE_HEADER, header(WonCamelConstants.ORIGINAL_MESSAGE_HEADER))
                             // here, we use the echo functionality so a message always gets delivered to the owner, even if

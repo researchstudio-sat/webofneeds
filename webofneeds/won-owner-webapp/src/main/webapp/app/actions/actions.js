@@ -86,6 +86,7 @@ import * as configActions from "./config-actions.js";
 
 import { pageLoadAction } from "./load-action.js";
 import { stateGo, stateReload } from "redux-ui-router";
+import { createPersona } from "./persona-actions.js";
 
 // </action-creators>
 
@@ -128,6 +129,10 @@ const actionHierarchy = {
     connect: needsConnect,
     fetchUnloadedNeeds: fetchUnloadedNeeds,
     fetchSuggested: fetchSuggested,
+  },
+  personas: {
+    create: createPersona,
+    createSuccessful: INJ_DEFAULT,
   },
   router: {
     stateGo, // only overwrites parameters that are explicitly mentioned, unless called without queryParams object (which also resets "pervasive" parameters, that shouldn't be removed

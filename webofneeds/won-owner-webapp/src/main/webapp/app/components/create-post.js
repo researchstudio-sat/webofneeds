@@ -8,6 +8,7 @@ import "ng-redux";
 import labelledHrModule from "./labelled-hr.js";
 import matchingContextModule from "./details/picker/matching-context-picker.js"; // TODO: should be renamed
 import createIsseeksModule from "./create-isseeks.js";
+import publishButtonModule from "./publish-button.js";
 import { get, getIn, attach, delay } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
@@ -98,35 +99,10 @@ function genComponentConf() {
                     </won-matching-context-picker>
                 </div>
             </div>
-
-            <!-- PUBLISH BUTTON - RESPONSIVE MODE -->
-            <div class="cp__content__responsivebuttons show-in-responsive">
-              <won-labelled-hr label="::'done?'" class="cp__content__labelledhr"></won-labelled-hr>
-              <button type="submit" class="won-button--filled red cp__content__publish"
-                      ng-disabled="!self.isValid()"
-                      ng-click="::self.publish()">
-                  <span ng-show="!self.pendingPublishing">
-                      Publish
-                  </span>
-                  <span ng-show="self.pendingPublishing">
-                      Publishing&nbsp;&hellip;
-                  </span>
-              </button>
-            </div>
         </div>
-        <!-- PUBLISH BUTTON - NON-RESPONSIVE MODE -->
-        <div class="cp__footer hide-in-responsive" >
+        <div class="cp__footer" >
             <won-labelled-hr label="::'done?'" class="cp__footer__labelledhr"></won-labelled-hr>
-            <button type="submit" class="won-button--filled red cp__footer__publish"
-                    ng-disabled="!self.isValid()"
-                    ng-click="::self.publish()">
-                <span ng-show="!self.pendingPublishing">
-                    Publish
-                </span>
-                <span ng-show="self.pendingPublishing">
-                    Publishing&nbsp;&hellip;
-                </span>
-            </button>
+            <won-publish-button on-publish="self.publish(persona)" is-valid="self.isValid()"></won-publish-button>
         </div>
     `;
 
@@ -293,7 +269,7 @@ function genComponentConf() {
       this.draftObject[isSeeks] = updatedDraft;
     }
 
-    publish() {
+    publish(persona) {
       if (!this.pendingPublishing) {
         this.pendingPublishing = true;
 
@@ -303,6 +279,7 @@ function genComponentConf() {
 
         this.needs__create(
           this.draftObject,
+          persona,
           this.$ngRedux.getState().getIn(["config", "defaultNodeUri"])
         );
       }
@@ -377,5 +354,6 @@ angular
     createIsseeksModule,
     matchingContextModule,
     ngAnimate,
+    publishButtonModule,
   ])
   .directive("wonCreatePost", genComponentConf).name;

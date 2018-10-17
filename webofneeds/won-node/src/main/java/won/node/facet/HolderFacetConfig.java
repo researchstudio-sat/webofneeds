@@ -12,7 +12,7 @@ public class HolderFacetConfig extends HardcodedFacetConfig {
 
    
     public HolderFacetConfig() {
-        super(FacetType.HoldableFacet.getURI());
+        super(FacetType.HolderFacet.getURI());
         this.derivationProperties.add(WON.HOLDS);
     }
     
@@ -21,4 +21,8 @@ public class HolderFacetConfig extends HardcodedFacetConfig {
         return FacetType.HoldableFacet.getURI().equals(remoteFacetType);
     }
 
+    @Override
+    public boolean isAutoOpen(URI remoteFacetType) {
+        return false;
+    }
 }
