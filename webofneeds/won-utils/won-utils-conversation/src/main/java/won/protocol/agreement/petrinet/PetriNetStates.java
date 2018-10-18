@@ -52,10 +52,10 @@ public class PetriNetStates {
     private void calculate() {
         // use only agreements and claims, process them in chronological order, leaving out 
         // those that have been cancelled (agreements) or rejected (claims)
-        // 1. when we find a petrinet definition: "x proc:hasInlinePetrinetDefinition [base64string]"
+        // 1. when we find a petrinet definition: "x wf:hasInlinePetrinetDefinition [base64string]"
         //  1.1. read petrinet definition
         //  1.2 initialize petrinet state from file
-        // 2.when we find a transition-firing triple: "x proc:event [eventURI]" 
+        // 2.when we find a transition-firing triple: "x wf:firesTransition [eventURI]"
         //     (transitions are annotated with unique event URIs that fire them)
         //  1. find the transition annotated with the event URI and fire it
         //  2. update the petrinet state

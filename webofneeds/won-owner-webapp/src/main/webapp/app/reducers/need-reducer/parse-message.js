@@ -106,59 +106,13 @@ export function parseMessage(
     parsedMessage.belongsToUri = wonMessage.getReceiver();
   }
 
-  //PARSE MESSAGE CONTENT
-  /*if (forwardedMessages && forwardedMessages.length == 1) {
-    const forwardedMessageContent = wonMessage.getCompactFramedForwardedMessageContent();
-
-    if (forwardedMessageContent) {
-      parsedMessage.data.originatorUri =
-        forwardedMessageContent["msg:hasSenderNeed"]["@id"];
-      parsedMessage.data.content.text =
-        forwardedMessageContent["won:hasTextMessage"];
-
-      parsedMessage.data.content = generateContent(
-        Immutable.fromJS(wonMessage.getCompactFramedForwardedMessageContent()),
-        detailsToParse,
-        parsedMessage.data.content
-      );
-    } else {
-      console.error(
-        "Cant parse chat-message, forwardedMessageContent is missing",
-        wonMessage
-      );
-      return undefined;
-    }
-  } else if (forwardedMessages && forwardedMessages.length > 1) {
-    console.error(
-      "Cant parse chat-message, more than one forwardedMessage: ",
-      wonMessage
-    );
-    return undefined;
-  } else if (forwardedMessages) {
-    console.error(
-      "Cant parse chat-message, forwardedMessage is present but did not go in any valid branches: ",
-      wonMessage
-    );
-    return undefined;
-  } else {
-    parsedMessage.data.content.text = wonMessage.getTextMessage();
-    parsedMessage.data.content.matchScore =
-      isValidNumber(matchScoreFloat) && isFinite(matchScoreFloat)
-        ? matchScoreFloat
-        : undefined;
-
-    if (wonMessage.getCompactFramedMessageContent()) {
-      parsedMessage.data.content = generateContent(
-        Immutable.fromJS(wonMessage.getCompactFramedMessageContent()),
-        detailsToParse,
-        parsedMessage.data.content
-      );
-    }
-  }*/
-
-  if (wonMessage.getCompactFramedMessageContent()) {
+  if (
+    wonMessage.getCompactFramedMessageContent() &&
+    wonMessage.getCompactRawMessage()
+  ) {
     parsedMessage.data.content = generateContent(
       Immutable.fromJS(wonMessage.getCompactFramedMessageContent()),
+      Immutable.fromJS(wonMessage.getCompactRawMessage()),
       detailsToParse,
       parsedMessage.data.content
     );
@@ -217,13 +171,19 @@ export function getHumanReadableStringFromMessage(message) {
  * @param detailsToParse
  * @returns {{title: *, type: *}}
  */
-function generateContent(contentJsonLd, detailsToParse, content) {
+function generateContent(
+  contentJsonLd,
+  rawMessageContentJsonLd,
+  detailsToParse,
+  content
+) {
   if (detailsToParse) {
     for (const detailKey in detailsToParse) {
       const detailToParse = detailsToParse[detailKey];
       const detailIdentifier = detailToParse && detailToParse.identifier;
       const detailValue =
-        detailToParse && detailToParse.parseFromRDF(contentJsonLd);
+        detailToParse &&
+        detailToParse.parseFromRDF(contentJsonLd, rawMessageContentJsonLd);
 
       if (detailIdentifier && detailValue) {
         content[detailIdentifier] = detailValue;

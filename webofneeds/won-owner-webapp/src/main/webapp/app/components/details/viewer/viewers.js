@@ -13,6 +13,7 @@ import rangeViewerModule from "./range-viewer.js";
 import fileViewerModule from "./file-viewer.js";
 import workflowViewerModule from "./workflow-viewer.js";
 import petrinetViewerModule from "./petrinet-viewer.js";
+import petrinettransitionViewerModule from "./petrinettransition-viewer.js";
 import reviewViewerModule from "./review-viewer.js";
 import suggestPostViewerModule from "./suggestpost-viewer.js";
 
@@ -35,6 +36,7 @@ export default [
   fileViewerModule,
   workflowViewerModule,
   petrinetViewerModule,
+  petrinettransitionViewerModule,
   reviewViewerModule,
   suggestPostViewerModule,
 ];
