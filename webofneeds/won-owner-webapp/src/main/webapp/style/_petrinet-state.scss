@@ -3,8 +3,48 @@
 @import "sizing-utils";
 
 won-petrinet-state {
+  display: grid;
+  grid-gap: 0.25rem;
+
   .ps__active {
-    color: $won-primary-text-color;
+    display: grid;
+    grid-gap: 0.5rem;
+
+    .ps__active__header {
+      font-weight: bold;
+      padding-bottom: 0.25rem;
+      border-bottom: $thinGrayBorder;
+    }
+
+    .ps__active__markedPlace {
+      background-color: white;
+      border: $thinGrayBorder;
+      padding: 0.5rem;
+    }
+
+    .ps__active__noMarkedPlace {
+      color: $won-subtitle-gray;
+      padding: 0.5rem 0;
+    }
+
+    .ps__active__enabledTransition {
+      display: grid;
+      grid-gap: 0.25rem;
+      grid-template-columns: 1fr min-content;
+      align-items: center;
+
+      .ps__active__enabledTransition__label {
+      }
+
+      .ps__active__enabledTransition__button {
+        font-size: $smallFontSize;
+      }
+    }
+
+    .ps__active__noEnabledTransition {
+      color: $won-subtitle-gray;
+      padding: 0.5rem 0;
+    }
   }
 
   .ps__inactive {

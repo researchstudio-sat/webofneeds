@@ -19,7 +19,36 @@ const serviceDependencies = ["$ngRedux", "$scope"];
 function genComponentConf() {
   let template = `
         <div class="ps__active" ng-if="self.process && !self.isLoading">
-            {{ self.process.toJS() }}
+          <div class="ps__active__header">
+            Marked Places
+          </div>
+          <div class="ps__active__markedPlace"
+            ng-if="self.hasMarkedPlaces"
+            ng-repeat="markedPlace in self.markedPlacesArray">
+              {{ self.getSimpleLabel(markedPlace) }}
+          </div>
+          <div class="ps__active__noMarkedPlace" ng-if="!self.hasMarkedPlaces">
+            No Marked Places in PetriNet
+          </div>
+          <div class="ps__active__header">
+            Enabled Transitions
+          </div>
+          <div class="ps__active__enabledTransition"
+            ng-if="self.hasEnabledTransitions"
+            ng-repeat="enabledTransition in self.enabledTransitionsArray">
+              <div class="ps__active__enabledTransition__label">
+                {{ self.getSimpleLabel(enabledTransition) }}
+              </div>
+              <!-- The button is labelled 'send' at the moment because we jsut send the transition but not claim it right away -->
+              <button class="ps__active__enabledTransition__button won-button--filled thin red"
+                ng-disabled="self.multiSelectType"
+                ng-click="self.sendClaim(enabledTransition)">
+                  Send
+              </button>
+          </div>
+          <div class="ps__active__noEnabledTransition" ng-if="!self.hasEnabledTransitions">
+            No Enabled Transitions in PetriNet
+          </div>
         </div>
         <div class="ps__inactive" ng-if="!self.process && !self.isLoading">
             This PetriNet, is not active (yet).
@@ -45,14 +74,62 @@ function genComponentConf() {
           connection.getIn(["petriNetData", this.processUri]);
 
         const isLoading = false; //TODO: Implement Loading in state first
+        const markedPlaces = process && process.get("markedPlaces");
+        const enabledTransitions = process && process.get("enabledTransitions");
+
+        const markedPlacesSize = markedPlaces ? markedPlaces.size : 0;
+        const enabledTransitionsSize = enabledTransitions
+          ? enabledTransitions.size
+          : 0;
 
         return {
+          connectionUri: connectionUri,
+          multiSelectType: connection && connection.get("multiSelectType"),
           process: process,
+          hasEnabledTransitions: enabledTransitionsSize > 0,
+          hasMarkedPlaces: markedPlacesSize > 0,
+          enabledTransitionsArray:
+            enabledTransitions && enabledTransitions.toArray(),
+          markedPlacesArray: markedPlaces && markedPlaces.toArray(),
           isLoading: isLoading,
         };
       };
 
       connect2Redux(selectFromState, actionCreators, ["self.processUri"], this);
+    }
+
+    getSimpleLabel(str) {
+      if (str) {
+        const indexOfLastSharp = str.lastIndexOf("#");
+
+        if (indexOfLastSharp != -1 && indexOfLastSharp + 1 < str.length) {
+          return str.substr(indexOfLastSharp + 1);
+        }
+      }
+      return str;
+    }
+
+    //TODO: IMPL ADHOC CLAIM
+    sendTransition(transitionUri) {
+      if (transitionUri && this.processUri && this.connectionUri) {
+        console.log(
+          "send transition 'claim' ",
+          transitionUri,
+          " for processUri: ",
+          this.processUri
+        );
+
+        this.connections__sendChatMessage(
+          undefined,
+          new Map().set("petriNetTransition", {
+            petriNetUri: this.processUri,
+            transitionUri: transitionUri,
+          }),
+          undefined,
+          this.connectionUri,
+          false
+        );
+      }
     }
   }
   Controller.$inject = serviceDependencies;
