@@ -56,7 +56,7 @@ export function parseMessage(
       injectInto: injectInto,
       references: {
         forwards: forwardedMessages,
-        claimsMessages: claimsMessages,
+        claims: claimsMessages,
         proposes: proposedMessages,
         proposesToCancel: proposedToCancelMessages,
         accepts: acceptsMessages,
