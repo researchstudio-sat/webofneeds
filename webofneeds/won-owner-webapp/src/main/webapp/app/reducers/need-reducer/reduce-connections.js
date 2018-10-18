@@ -221,11 +221,35 @@ export function changeConnectionStateByFun(state, connectionUri, fun) {
   return changeConnectionState(state, connectionUri, fun(connectionState));
 }
 
+export function updatePetriNetStateData(state, connectionUri, petriNetData) {
+  const need = selectNeedByConnectionUri(state, connectionUri);
+
+  if (!need || !petriNetData) {
+    console.error(
+      "no need found for connectionUri",
+      connectionUri,
+      " or no petriNetData present"
+    );
+    return state;
+  }
+
+  const needUri = need.get("uri");
+
+  return state.setIn(
+    [needUri, "connections", connectionUri, "petriNetData"],
+    petriNetData
+  );
+}
+
 export function updateAgreementStateData(state, connectionUri, agreementData) {
   const need = selectNeedByConnectionUri(state, connectionUri);
 
   if (!need || !agreementData) {
-    console.error("no need found for connectionUri", connectionUri);
+    console.error(
+      "no need found for connectionUri",
+      connectionUri,
+      " or no petriNetData present"
+    );
     return state;
   }
 
