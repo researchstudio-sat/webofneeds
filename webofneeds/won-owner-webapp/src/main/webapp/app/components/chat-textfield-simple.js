@@ -20,6 +20,7 @@ import {
   selectRejectableMessagesByConnectionUri,
   selectCancelableMessagesByConnectionUri,
   selectProposableMessagesByConnectionUri,
+  selectClaimableMessagesByConnectionUri,
   selectSelectedMessagesByConnectionUri,
 } from "../selectors.js";
 import { getAllMessageDetails } from "../won-utils.js";
@@ -45,6 +46,13 @@ function genComponentConf() {
                 ng-click="self.activateMultiSelect('proposes')"
                 ng-disabled="!self.hasProposableMessages">
                 Make Proposal
+            </button>
+            <button
+                ng-if="!self.showAgreementData"
+                class="cts__details__grid__action won-button--filled red"
+                ng-click="self.activateMultiSelect('claims')"
+                ng-disabled="!self.hasClaimableMessages">
+                Make Claim
             </button>
             <button
                 ng-if="self.showAgreementData"
@@ -284,6 +292,10 @@ function genComponentConf() {
           state,
           connectionUri
         );
+        const claimableMessages = selectClaimableMessagesByConnectionUri(
+          state,
+          connectionUri
+        );
 
         const hasRejectableMessages =
           rejectableMessages && rejectableMessages.size > 0;
@@ -296,6 +308,8 @@ function genComponentConf() {
           proposableMessages && proposableMessages.size > 0;
         const hasCancelableMessages =
           cancelableMessages && cancelableMessages.size > 0;
+        const hasClaimableMessages =
+          claimableMessages && claimableMessages.size > 0;
 
         const selectedDetailIdentifier = state.get("selectedAddMessageContent");
         const selectedDetail =
@@ -312,6 +326,7 @@ function genComponentConf() {
             state,
             connectionUri
           ),
+          hasClaimableMessages,
           hasProposableMessages,
           hasCancelableMessages,
           hasAcceptableMessages,
@@ -572,6 +587,9 @@ function genComponentConf() {
           break;
         case "retracts":
           humanReadableReferenceString = "Retract ";
+          break;
+        case "claims":
+          humanReadableReferenceString = "Claims ";
           break;
         case "proposes":
           humanReadableReferenceString = "Propose ";

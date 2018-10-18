@@ -1341,6 +1341,12 @@ WonMessage.prototype = {
     );
   },
 
+  getClaimsMessageUris: function() {
+    return createArray(
+      this.getProperty("http://purl.org/webofneeds/agreement#claims")
+    );
+  },
+
   getAcceptsMessageUris: function() {
     return createArray(
       this.getProperty("http://purl.org/webofneeds/agreement#accepts")

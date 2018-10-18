@@ -333,6 +333,18 @@ public class AgreementProtocolState {
 	}
 	
 	/**
+     * Returns a list of all agreement URIs in the order they were made. The oldestFirst parameter controls ascending or descending order. 
+     */
+    public List<URI> getAgreementsAndClaimsInChronologicalOrder(boolean oldestFirst) {
+        return deliveryChains.stream()
+                .map(m -> m.getHead())
+                .filter(x -> isAgreement(x.getMessageURI()) || isClaim(x.getMessageURI()))
+                .sorted((x1,x2) -> (oldestFirst ? -1 : 1 ) * x2.getOrder() - x1.getOrder())
+                .map(x -> x.getMessageURI())
+                .collect(Collectors.toList());
+    }
+	
+	/**
 	 * Returns the n latest message uris filtered by the specified predicate, sorted descending by order (latest first).
 	 * @param filterPredicate
 	 * @param n use 0 for the latest message.
@@ -397,6 +409,15 @@ public class AgreementProtocolState {
 		}
 		return uri;
 	}
+	
+	public URI getLatestProposesOrClaimsMessageSentByNeed(URI needUri) {
+        URI uri = getNthLatestMessage(m -> needUri.equals(m.getSenderNeedURI()) 
+                && m.isProposesMessage() && m.getEffects().stream().anyMatch(e->e.isProposes() || e.isClaims()), 0);
+        if (logger.isDebugEnabled()) {
+            logNthLatestMessage(0, needUri, null, uri);
+        }
+        return uri;
+    }
 	
 	public URI getLatestPendingProposesMessageSentByNeed(URI needUri) {
 		URI uri = getNthLatestMessage(m -> needUri.equals(m.getSenderNeedURI()) 
@@ -465,9 +486,17 @@ public class AgreementProtocolState {
 		return getLatestPendingProposal(Optional.empty(), Optional.empty());
 	}
 	
+	public URI getLatestPendingProposalOrClaim() {
+        return getLatestPendingProposalOrClaim(Optional.empty(), Optional.empty());
+    }
+	
 	public URI getLatestPendingProposal(Optional<ProposalType> type) {
 		return getLatestPendingProposal(type, Optional.empty());
 	}
+	
+	public URI getLatestPendingProposalOrClaim(Optional<ProposalType> type) {
+        return getLatestPendingProposalOrClaim(type, Optional.empty());
+    }
 	
 	public URI getLatestPendingProposal(Optional<ProposalType> type, Optional<URI> senderNeedUri) {
 		URI uri = getNthLatestMessage(
@@ -483,6 +512,21 @@ public class AgreementProtocolState {
 		}
 		return uri;
 	}
+	
+	public URI getLatestPendingProposalOrClaim(Optional<ProposalType> type, Optional<URI> senderNeedUri) {
+        URI uri = getNthLatestMessage(
+                m -> (m.isProposesMessage() || m.isProposesToCancelMessage() || m.isClaimsMessage()) &&
+                (! senderNeedUri.isPresent() || senderNeedUri.get().equals(m.getSenderNeedURI())) && 
+                m.getEffects()
+                    .stream()
+                    .filter(e->e.isProposes() && (!type.isPresent() || e.asProposes().getProposalType() == type.get()) || e.isClaims())
+                    .map(e -> e.getMessageUri())
+                    .anyMatch(msgUri -> isPendingProposal(msgUri) || isPendingCancellation(msgUri) || isClaim(msgUri)), 0);
+        if (logger.isDebugEnabled()) {
+            logNthLatestMessage(0, senderNeedUri.orElse(null), null, uri);
+        }
+        return uri;
+    }
 	
 	public URI getLatestRejectsMessageSentByNeed(URI needUri) {
 		URI uri = getNthLatestMessage(m -> needUri.equals(m.getSenderNeedURI()) 

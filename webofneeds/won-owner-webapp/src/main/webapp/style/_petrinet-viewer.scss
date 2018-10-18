@@ -5,32 +5,42 @@ won-petrinet-viewer {
   @include won-detail-viewer("petrinetv");
 
   .petrinetv__content {
-    width: 100%;
     display: grid;
-    grid-template-rows: min-content 1fr;
-    border: $thinGrayBorder;
-    border-radius: 0.19rem;
-    background: $won-lighter-gray;
     grid-gap: 0.25rem;
-    padding: 0.25rem;
-    justify-items: center;
 
-    .petrinetv__content__typeicon {
-      grid-row: 2 / span 1;
-      height: 5rem;
-      max-width: 100%;
+    .petrinetv__content__download {
       width: 100%;
-      --local-primary: #{$won-line-gray};
+      display: grid;
+      grid-template-rows: min-content 1fr;
+      border: $thinGrayBorder;
+      border-radius: 0.19rem;
+      background: $won-lighter-gray;
+      grid-gap: 0.25rem;
+      padding: 0.25rem;
+      justify-items: center;
+
+      .petrinetv__content__download__typeicon {
+        grid-row: 2 / span 1;
+        height: 5rem;
+        max-width: 100%;
+        width: 100%;
+        --local-primary: #{$won-line-gray};
+      }
+
+      .petrinetv__content__download__label {
+        grid-row: 1 / span 1;
+        font-size: $smallFontSize;
+        color: $won-primary-text-color;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        max-width: 100%;
+        white-space: nowrap;
+      }
     }
 
-    .petrinetv__content__label {
-      grid-row: 1 / span 1;
-      font-size: $smallFontSize;
-      color: $won-primary-text-color;
-      text-overflow: ellipsis;
-      overflow: hidden;
-      max-width: 100%;
-      white-space: nowrap;
+    .petrinetv__content__state {
+      .petrinetv__content__state__processUri {
+      }
     }
   }
 }

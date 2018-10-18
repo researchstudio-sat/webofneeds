@@ -124,6 +124,7 @@ $ngRedux.getState();
                            accepts: wonMessage.getAcceptsMessageUris(),
                            rejects: wonMessage.getRejectsMessageUris(),
                            retracts: wonMessage.getRetractsMessageUris(),
+                           claims: wonMessage.getClaimsMessageUris(),
                        }
                        hasReferences: true|false //whether it contains any non-null/non-undefined references within the references block of the message
                        hasContent: true|false //whether it contains any non-null/non-undefined content within the content block of the message

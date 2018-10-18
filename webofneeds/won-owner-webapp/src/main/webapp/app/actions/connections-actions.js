@@ -108,6 +108,7 @@ export function connectionsChatMessage(
                 },
               });
               break;
+            case "claims":
             case "proposes":
               break;
             default:

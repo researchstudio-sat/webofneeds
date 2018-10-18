@@ -31,6 +31,7 @@ export function parseMessage(
   const acceptsMessages = wonMessage.getAcceptsMessageUris();
   const rejectsMessages = wonMessage.getRejectsMessageUris();
   const retractsMessages = wonMessage.getRetractsMessageUris();
+  const claimsMessages = wonMessage.getClaimsMessageUris();
 
   const matchScoreFloat = parseFloat(wonMessage.getMatchScore());
 
@@ -55,6 +56,7 @@ export function parseMessage(
       injectInto: injectInto,
       references: {
         forwards: forwardedMessages,
+        claims: claimsMessages,
         proposes: proposedMessages,
         proposesToCancel: proposedToCancelMessages,
         accepts: acceptsMessages,
