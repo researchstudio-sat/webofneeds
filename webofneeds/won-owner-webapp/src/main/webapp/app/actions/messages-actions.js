@@ -15,7 +15,7 @@ import { getCorrectMessageUri } from "../selectors.js";
 import {
   fetchDataForOwnedNeeds,
   fetchMessageEffects,
-  messageHasReferences,
+  isFetchMessageEffectsNeeded,
 } from "../won-message-utils.js";
 
 export function successfulCloseNeed(event) {
@@ -197,7 +197,7 @@ export function processAgreementMessage(event) {
 
 export function processConnectionMessage(event) {
   return (dispatch, getState) => {
-    if (messageHasReferences(event)) {
+    if (isFetchMessageEffectsNeeded(event)) {
       const _needUri = event.getSenderNeed();
       const isSentEvent = getState().getIn(["needs", _needUri, "ownNeed"]);
 

@@ -16,6 +16,21 @@ const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 
 function genComponentConf() {
   let template = `
+      <div class="refmsgcontent__fragment" ng-if="self.hasClaimUris">
+        <div class="refmsgcontent__fragment__header">Claims {{ self.getCountString(self.claimUrisSize)}}</div>
+        <div class="refmsgcontent__fragment__body">
+          <won-combined-message-content
+            ng-click="self.loadMessage(msgUri)"
+            ng-repeat="msgUri in self.claimUrisArray"
+            ng-class="{
+              'won-cm--left' : self.getReferencedMessage(msgUri) && !self.getReferencedMessage(msgUri).get('outgoingMessage'),
+              'won-cm--right' : self.getReferencedMessage(msgUri) && self.getReferencedMessage(msgUri).get('outgoingMessage'),
+            }"
+            message-uri="self.getReferencedMessage(msgUri).get('uri')"
+            connection-uri="self.connection.get('uri')">
+          </won-combined-message-content>
+        </div>
+      </div>
       <div class="refmsgcontent__fragment" ng-if="self.hasProposeUris">
         <div class="refmsgcontent__fragment__header">Proposes {{ self.getCountString(self.proposeUrisSize)}}</div>
         <div class="refmsgcontent__fragment__body">
@@ -133,6 +148,7 @@ function genComponentConf() {
           references && references.get("proposesToCancel");
         const acceptUris = references && references.get("accepts");
         const forwardUris = references && references.get("forwards");
+        const claimUris = references && references.get("claims");
 
         const acceptUrisSize = acceptUris ? acceptUris.size : 0;
         const proposeUrisSize = proposeUris ? proposeUris.size : 0;
@@ -142,6 +158,7 @@ function genComponentConf() {
         const rejectUrisSize = rejectUris ? rejectUris.size : 0;
         const retractUrisSize = retractUris ? retractUris.size : 0;
         const forwardUrisSize = forwardUris ? forwardUris.size : 0;
+        const claimUrisSize = claimUris ? claimUris.size : 0;
 
         return {
           ownNeedUri: ownNeed && ownNeed.get("uri"),
@@ -153,12 +170,14 @@ function genComponentConf() {
           rejectUrisSize,
           retractUrisSize,
           forwardUrisSize,
+          claimUrisSize,
           hasProposeUris: proposeUrisSize > 0,
           hasAcceptUris: acceptUrisSize > 0,
           hasProposeToCancelUris: proposeToCancelUrisSize > 0,
           hasRetractUris: retractUrisSize > 0,
           hasRejectUris: rejectUrisSize > 0,
           hasForwardUris: forwardUrisSize > 0,
+          hasClaimUris: claimUrisSize > 0,
           proposeUrisArray: proposeUris && Array.from(proposeUris.toSet()),
           retractUrisArray: retractUris && Array.from(retractUris.toSet()),
           rejectUrisArray: rejectUris && Array.from(rejectUris.toSet()),
@@ -166,6 +185,7 @@ function genComponentConf() {
           proposeToCancelUrisArray:
             proposeToCancelUris && Array.from(proposeToCancelUris.toSet()),
           acceptUrisArray: acceptUris && Array.from(acceptUris.toSet()),
+          claimUrisArray: claimUris && Array.from(claimUris.toSet()),
           hasContent: message && message.get("hasContent"),
           hasNotBeenLoaded: !message,
         };

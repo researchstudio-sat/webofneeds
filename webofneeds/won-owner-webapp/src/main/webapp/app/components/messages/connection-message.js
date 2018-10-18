@@ -16,6 +16,7 @@ import { actionCreators } from "../../actions/actions.js";
 import {
   selectNeedByConnectionUri,
   isMessageProposable,
+  isMessageClaimable,
   isMessageCancelable,
   isMessageRejectable,
   isMessageRetractable,
@@ -27,6 +28,7 @@ import {
   isMessageCancellationPending,
   isMessageUnread,
   hasProposesReferences,
+  hasClaimsReferences,
   hasProposesToCancelReferences,
 } from "../../selectors.js";
 import { classOnComponentRoot } from "../../cstm-ng-utils.js";
@@ -76,7 +78,7 @@ function genComponentConf() {
                   connection-uri="self.connectionUri">
     			      </won-combined-message-content>
                 <div class="won-cm__center__bubble__carret clickable"
-                    ng-if="self.isProposable && !self.multiSelectType"
+                    ng-if="(self.isProposable || self.isClaimable) && !self.multiSelectType"
                     ng-click="self.showDetail = !self.showDetail">
                     <svg ng-show="!self.showDetail">
                         <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
@@ -171,6 +173,10 @@ function genComponentConf() {
             connection &&
             connection.get("state") === won.WON.Connected &&
             isMessageProposable(message),
+          isClaimable:
+            connection &&
+            connection.get("state") === won.WON.Connected &&
+            isMessageClaimable(message),
           isCancelable: isMessageCancelable(message),
           isRetractable: isMessageRetractable(message),
           isRejectable: isMessageRejectable(message),
@@ -233,6 +239,8 @@ function genComponentConf() {
             return this.isAcceptable;
           case "proposes":
             return this.isProposable;
+          case "claims":
+            return this.isClaimable;
         }
       }
       return false;
@@ -242,6 +250,7 @@ function genComponentConf() {
       return (
         this.showDetail ||
         hasProposesReferences(this.message) ||
+        hasClaimsReferences(this.message) ||
         hasProposesToCancelReferences(this.message)
       );
     }

@@ -12,6 +12,7 @@ import { connect2Redux } from "../won-utils.js";
 import { attach, delay } from "../utils.js";
 import {
   fetchAgreementProtocolUris,
+  fetchPetriNetUris,
   fetchMessage,
 } from "../won-message-utils.js";
 import { actionCreators } from "../actions/actions.js";
@@ -350,6 +351,20 @@ function genComponentConf() {
           );
         }
       });
+    }
+
+    //TODO: THIS IS SOLELY FOR TESTING PURPOSES
+    loadPetriNetUris4Dbg() {
+      const connectionUri = this.connection && this.connection.get("uri");
+      if (connectionUri) {
+        fetchPetriNetUris(connectionUri)
+          .then(response => {
+            console.log("Response: ", response);
+          })
+          .catch(error => {
+            console.error("Error: ", error);
+          });
+      }
     }
 
     ensureAgreementDataIsLoaded(forceFetch = false) {

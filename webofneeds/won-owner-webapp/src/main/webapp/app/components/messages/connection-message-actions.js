@@ -8,6 +8,7 @@ import { actionCreators } from "../../actions/actions.js";
 import {
   selectNeedByConnectionUri,
   isMessageProposable,
+  isMessageClaimable,
   isMessageCancelable,
   isMessageRejectable,
   isMessageRetractable,
@@ -30,7 +31,13 @@ function genComponentConf() {
           ng-if="self.isProposable"
           ng-disabled="self.multiSelectType || self.clicked"
           ng-click="self.sendActionMessage('proposes')">
-          Propose <span ng-show="self.clicked">(again)</span>
+          Propose
+      </button>
+      <button class="won-button--filled thin black"
+          ng-if="self.isClaimable"
+          ng-disabled="self.multiSelectType || self.clicked"
+          ng-click="self.sendActionMessage('claims')">
+          Claim
       </button>
       <button class="won-button--filled thin red"
           ng-if="self.isAcceptable"
@@ -107,6 +114,10 @@ function genComponentConf() {
             connection &&
             connection.get("state") === won.WON.Connected &&
             isMessageProposable(message),
+          isClaimable:
+            connection &&
+            connection.get("state") === won.WON.Connected &&
+            isMessageClaimable(message),
           isCancelable: isMessageCancelable(message),
           isRetractable: isMessageRetractable(message),
           isRejectable: isMessageRejectable(message),

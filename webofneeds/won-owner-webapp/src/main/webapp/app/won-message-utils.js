@@ -30,7 +30,13 @@ export function wellFormedPayload(payload) {
   return emptyDataset.mergeDeep(Immutable.fromJS(payload));
 }
 
-export function messageHasReferences(wonMsg) {
+/**
+ * Checks if a wonMessage contains content/references that make it necessary for us to check which effects
+ * this message has caused (in relation to other messages, necessary e.g. AgreementData
+ * @param wonMsg
+ * @returns {*}
+ */
+export function isFetchMessageEffectsNeeded(wonMsg) {
   return (
     wonMsg &&
     (wonMsg.getProposedMessageUris() ||
@@ -38,7 +44,7 @@ export function messageHasReferences(wonMsg) {
       wonMsg.getRejectsMessageUris() ||
       wonMsg.getAcceptsMessageUris() ||
       wonMsg.getProposedToCancelMessageUris() ||
-      wonMsg.getForwardedMessageUris())
+      wonMsg.getClaimsMessageUris())
   );
 }
 
@@ -328,6 +334,11 @@ export function buildChatMessage({
                     "http://purl.org/webofneeds/agreement#proposes"
                   ] = uris;
                   break;
+                case "claims":
+                  contentNode[
+                    "http://purl.org/webofneeds/agreement#claims"
+                  ] = uris;
+                  break;
                 case "proposesToCancel":
                   contentNode[
                     "http://purl.org/webofneeds/agreement#proposesToCancel"
@@ -583,6 +594,26 @@ export function fetchAgreementProtocolUris(connectionUri) {
   const url = urljoin(
     ownerBaseUrl,
     "/rest/agreement/getAgreementProtocolUris",
+    `?connectionUri=${connectionUri}`
+  );
+
+  return fetch(url, {
+    method: "get",
+    headers: {
+      Accept: "application/ld+json",
+      "Content-Type": "application/ld+json",
+    },
+    credentials: "include",
+  })
+    .then(checkHttpStatus)
+    .then(response => response.json());
+}
+
+export function fetchPetriNetUris(connectionUri) {
+  console.log("fetchPetriNetUris: ", connectionUri);
+  const url = urljoin(
+    ownerBaseUrl,
+    "/rest/petrinet/getPetriNetUris",
     `?connectionUri=${connectionUri}`
   );
 

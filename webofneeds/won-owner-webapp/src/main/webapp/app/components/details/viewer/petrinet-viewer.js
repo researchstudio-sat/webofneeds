@@ -12,16 +12,24 @@ function genComponentConf() {
           </svg>
           <span class="petrinetv__header__label" ng-if="self.detail.label">{{self.detail.label}}</span>
         </div>
-        <a class="petrinetv__content" ng-show="self.content"
-          ng-href="data:{{self.content.get('type')}};base64,{{self.content.get('data')}}"
-          download="{{ self.content.get('name') }}">
-          <div class="petrinetv__content__label clickable">
-            {{ self.content.get('name') }}
+        <div class="petrinetv__content">
+          <a class="petrinetv__content__download" ng-show="self.content"
+            ng-href="data:{{self.content.get('type')}};base64,{{self.content.get('data')}}"
+            download="{{ self.content.get('name') }}">
+            <div class="petrinetv__content__download__label clickable">
+              {{ self.content.get('name') }}
+            </div>
+            <svg class="petrinetv__content__download__typeicon">
+              <use xlink:href="#ico36_uc_transport_demand" href="#ico36_uc_transport_demand"></use>
+            </svg>
+          </a>
+          <div class="petrinetv__content__state" ng-if="false && self.content">
+            <! -- TODO: PetriNet State could also be displayed here -->
+            <div class="petrinetv__content__state__processUri">
+              {{ self.content.get('processUri') }}
+            </div>
           </div>
-          <svg class="petrinetv__content__typeicon">
-            <use xlink:href="#ico36_uc_transport_demand" href="#ico36_uc_transport_demand"></use>
-          </svg>
-        </a>
+        </div>
       </div>
     `;
 
