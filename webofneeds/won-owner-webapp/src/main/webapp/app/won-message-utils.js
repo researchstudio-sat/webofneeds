@@ -334,6 +334,11 @@ export function buildChatMessage({
                     "http://purl.org/webofneeds/agreement#proposes"
                   ] = uris;
                   break;
+                case "claims":
+                  contentNode[
+                    "http://purl.org/webofneeds/agreement#claims"
+                  ] = uris;
+                  break;
                 case "proposesToCancel":
                   contentNode[
                     "http://purl.org/webofneeds/agreement#proposesToCancel"
