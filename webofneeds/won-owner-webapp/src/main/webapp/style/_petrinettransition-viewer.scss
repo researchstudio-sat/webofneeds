@@ -1,0 +1,5 @@
+@import "sizing-utils";
+
+won-petrinettransition-viewer {
+  @include won-detail-viewer("petrinettransitionv");
+}

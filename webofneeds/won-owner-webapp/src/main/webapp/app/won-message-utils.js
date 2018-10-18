@@ -30,7 +30,13 @@ export function wellFormedPayload(payload) {
   return emptyDataset.mergeDeep(Immutable.fromJS(payload));
 }
 
-export function messageHasReferences(wonMsg) {
+/**
+ * Checks if a wonMessage contains content/references that make it necessary for us to check which effects
+ * this message has caused (in relation to other messages, necessary e.g. AgreementData
+ * @param wonMsg
+ * @returns {*}
+ */
+export function isFetchMessageEffectsNeeded(wonMsg) {
   return (
     wonMsg &&
     (wonMsg.getProposedMessageUris() ||
@@ -38,7 +44,7 @@ export function messageHasReferences(wonMsg) {
       wonMsg.getRejectsMessageUris() ||
       wonMsg.getAcceptsMessageUris() ||
       wonMsg.getProposedToCancelMessageUris() ||
-      wonMsg.getForwardedMessageUris())
+      wonMsg.getClaimsMessageUris())
   );
 }
 
@@ -266,6 +272,7 @@ export function buildChatMessage({
 
         if (additionalContent) {
           const contentNode = wonMessageBuilder.getContentGraphNode();
+          const contentNodes = wonMessageBuilder.getContentGraphNodes();
           const detailList = getAllDetails();
           additionalContent.forEach((value, key) => {
             const detail = detailList[key];
@@ -278,15 +285,29 @@ export function buildChatMessage({
               });
 
             if (detailRDF) {
-              for (const key in detailRDF) {
-                //if contentNode[key] and detailRDF[key] both have values we ommit adding new content (until we implement a merge function)
-                if (contentNode[key]) {
-                  if (!Array.isArray(contentNode[key]))
-                    contentNode[key] = Array.of(contentNode[key]);
+              const detailRDFArray = Array.isArray(detailRDF)
+                ? detailRDF
+                : [detailRDF];
 
-                  contentNode[key] = contentNode[key].concat(detailRDF[key]);
+              for (const i in detailRDFArray) {
+                const detailRDFToAdd = detailRDFArray[i];
+
+                if (detailRDFToAdd["@id"]) {
+                  contentNodes.push(detailRDFToAdd);
                 } else {
-                  contentNode[key] = detailRDF[key];
+                  for (const key in detailRDFToAdd) {
+                    //if contentNode[key] and detailRDF[key] both have values we ommit adding new content (until we implement a merge function)
+                    if (contentNode[key]) {
+                      if (!Array.isArray(contentNode[key]))
+                        contentNode[key] = Array.of(contentNode[key]);
+
+                      contentNode[key] = contentNode[key].concat(
+                        detailRDFToAdd[key]
+                      );
+                    } else {
+                      contentNode[key] = detailRDFToAdd[key];
+                    }
+                  }
                 }
               }
             }
@@ -311,6 +332,11 @@ export function buildChatMessage({
                 case "proposes":
                   contentNode[
                     "http://purl.org/webofneeds/agreement#proposes"
+                  ] = uris;
+                  break;
+                case "claims":
+                  contentNode[
+                    "http://purl.org/webofneeds/agreement#claims"
                   ] = uris;
                   break;
                 case "proposesToCancel":
@@ -568,6 +594,26 @@ export function fetchAgreementProtocolUris(connectionUri) {
   const url = urljoin(
     ownerBaseUrl,
     "/rest/agreement/getAgreementProtocolUris",
+    `?connectionUri=${connectionUri}`
+  );
+
+  return fetch(url, {
+    method: "get",
+    headers: {
+      Accept: "application/ld+json",
+      "Content-Type": "application/ld+json",
+    },
+    credentials: "include",
+  })
+    .then(checkHttpStatus)
+    .then(response => response.json());
+}
+
+export function fetchPetriNetUris(connectionUri) {
+  console.log("fetchPetriNetUris: ", connectionUri);
+  const url = urljoin(
+    ownerBaseUrl,
+    "/rest/petrinet/getPetriNetUris",
     `?connectionUri=${connectionUri}`
   );
 

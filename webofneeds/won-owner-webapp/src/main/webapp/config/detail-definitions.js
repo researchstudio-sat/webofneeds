@@ -4,6 +4,7 @@ import * as timeDetails from "./details/datetime.js";
 import * as fileDetails from "./details/files.js";
 import * as priceDetails from "./details/price.js";
 import * as basicDetails from "./details/basic.js";
+import * as workflowDetails from "./details/workflow.js";
 import * as reviewDetails from "./details/review.js";
 
 import * as abstractDetails_ from "./details/abstract.js";
@@ -39,6 +40,7 @@ export const details = {
 
 export const messageDetails = {
   suggestPost: basicDetails.suggestPost,
-  bpmnWorkflow: fileDetails.bpmnWorkflow,
-  petrinetWorkflow: fileDetails.petrinetWorkflow,
+  bpmnWorkflow: workflowDetails.bpmnWorkflow,
+  petriNetWorkflow: workflowDetails.petriNetWorkflow,
+  petriNetTransition: workflowDetails.petriNetTransition,
 };

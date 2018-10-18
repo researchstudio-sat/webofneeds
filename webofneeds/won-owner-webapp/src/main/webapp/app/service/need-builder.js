@@ -101,6 +101,7 @@ import { Generator } from "sparqljs";
     }
 
     const buildContentNode = (id, isOrSeeksData) => {
+      //TODO: CANT HANDLE "@id" details yet (see won-message-utils.js buildChatMessage(..) additionalContent part
       let contentNode = {
         "@id": id,
         "@type": isOrSeeksData.type,

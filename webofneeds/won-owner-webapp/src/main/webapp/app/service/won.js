@@ -1100,10 +1100,15 @@ WonMessage.prototype = {
     if (this.compactFramedMessage) {
       return this.compactFramedMessage;
     }
-    if (this.framedMessage) {
+    if (this.framedMessage && this.rawMessage) {
       try {
         this.compactFramedMessage = await jsonld.compact(
           this.framedMessage,
+          won.defaultContext
+        );
+
+        this.compactRawMessage = await jsonld.compact(
+          this.rawMessage,
           won.defaultContext
         );
 
@@ -1241,6 +1246,9 @@ WonMessage.prototype = {
       forwardedMessage && forwardedMessage["msg:hasCorrespondingRemoteMessage"];
     return forwardedMessageContent;
   },
+  getCompactRawMessage: function() {
+    return this.compactRawMessage;
+  },
   getMessageType: function() {
     return this.getProperty(
       "http://purl.org/webofneeds/message#hasMessageType"
@@ -1330,6 +1338,12 @@ WonMessage.prototype = {
   getProposedMessageUris: function() {
     return createArray(
       this.getProperty("http://purl.org/webofneeds/agreement#proposes")
+    );
+  },
+
+  getClaimsMessageUris: function() {
+    return createArray(
+      this.getProperty("http://purl.org/webofneeds/agreement#claims")
     );
   },
 
@@ -2012,6 +2026,9 @@ won.MessageBuilder.prototype = {
   },
   getContentGraphNode: function() {
     return this.getContentGraph()["@graph"][0];
+  },
+  getContentGraphNodes: function() {
+    return this.getContentGraph()["@graph"];
   },
   /**
    * takes a lists of json-ld-objects and merges them into the content-graph
