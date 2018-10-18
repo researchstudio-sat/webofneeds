@@ -6,18 +6,16 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.media.jfxmedia.logging.Logger;
 
 import won.bot.framework.eventbot.action.impl.hokify.HokifyJob;
 
@@ -40,14 +38,12 @@ public class HokifyBotsApi {
 
     public ArrayList<HokifyJob> fetchHokifyData() {
         ArrayList<HokifyJob> jobsList = new ArrayList<HokifyJob>();
-
-        try {
-
-            DefaultHttpClient httpClient = new DefaultHttpClient();
+        CloseableHttpResponse  response = null;
+        try(CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpGet getRequest = new HttpGet(jsonURL);
             getRequest.addHeader("accept", "application/json");
 
-            HttpResponse response = httpClient.execute(getRequest);
+            response = httpClient.execute(getRequest);
 
             if (response.getStatusLine().getStatusCode() != 200) {
                 throw new RuntimeException("Failed : HTTP error code : " + response.getStatusLine().getStatusCode());
@@ -79,14 +75,16 @@ public class HokifyBotsApi {
                 }
 
             }
-            httpClient.close();
-            response.getEntity().getContent().close();
-        } catch (ClientProtocolException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
+        } finally {
+            if (response != null) {
+                try {
+                    response.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
         return jobsList;
@@ -100,12 +98,12 @@ public class HokifyBotsApi {
 
         String searchString = geoURL + "?city=" + cityString + "&country=" + countrySting + "&format=json";
 
-        DefaultHttpClient httpClient = new DefaultHttpClient();
+        
         HttpGet getRequest = new HttpGet(searchString);
         getRequest.addHeader("accept", "application/json");
 
-        HttpResponse response;
-        try {
+        CloseableHttpResponse response = null;
+        try(CloseableHttpClient httpClient = HttpClients.createDefault()) {
             response = httpClient.execute(getRequest);
 
             if (response.getStatusLine().getStatusCode() != 200) {
@@ -146,12 +144,16 @@ public class HokifyBotsApi {
             httpClient.close();
             response.getEntity().getContent().close();
 
-        } catch (ClientProtocolException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
+        } finally {
+            if (response != null) {
+                try {
+                    response.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
         }
         return loc;
     }
