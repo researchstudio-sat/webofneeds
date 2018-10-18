@@ -235,10 +235,21 @@ export function isMessageProposable(msg) {
   );
 }
 
+export function isMessageClaimable(msg) {
+  return (
+    msg &&
+    msg.get("hasContent") &&
+    msg.get("messageType") !== won.WONMSG.connectMessage &&
+    !msg.get("hasReferences")
+  );
+}
+
 export function isMessageCancelable(msg) {
   return (
     msg &&
-    (hasProposesReferences(msg) || hasProposesToCancelReferences(msg)) &&
+    (hasClaimsReferences(msg) ||
+      hasProposesReferences(msg) ||
+      hasProposesToCancelReferences(msg)) &&
     isMessageAccepted(msg) &&
     !isMessageCancelled(msg) &&
     !isMessageCancellationPending(msg)
@@ -260,7 +271,9 @@ export function isMessageRetractable(msg) {
 export function isMessageAcceptable(msg) {
   return (
     msg &&
-    (hasProposesReferences(msg) || hasProposesToCancelReferences(msg)) &&
+    (hasClaimsReferences(msg) ||
+      hasProposesReferences(msg) ||
+      hasProposesToCancelReferences(msg)) &&
     !msg.get("outgoingMessage") &&
     !isMessageAccepted(msg) &&
     !isMessageCancelled(msg) &&
@@ -273,7 +286,9 @@ export function isMessageAcceptable(msg) {
 export function isMessageRejectable(msg) {
   return (
     msg &&
-    (hasProposesReferences(msg) || hasProposesToCancelReferences(msg)) &&
+    (hasClaimsReferences(msg) ||
+      hasProposesReferences(msg) ||
+      hasProposesToCancelReferences(msg)) &&
     !msg.get("outgoingMessage") &&
     !isMessageAccepted(msg) &&
     !isMessageCancelled(msg) &&
@@ -291,6 +306,14 @@ export function hasProposesReferences(msg) {
     references.get("proposes").size > 0
   );
 }
+
+export function hasClaimsReferences(msg) {
+  const references = msg && msg.get("references");
+  return (
+    references && references.get("claims") && references.get("claims").size > 0
+  );
+}
+
 export function hasProposesToCancelReferences(msg) {
   const references = msg && msg.get("references");
   return (
@@ -332,6 +355,19 @@ export function isMessageUnread(msg) {
 export function isMessageProposal(msg) {
   return (
     (hasProposesToCancelReferences(msg) || hasProposesReferences(msg)) &&
+    !(
+      isMessageAccepted(msg) ||
+      isMessageCancellationPending(msg) ||
+      isMessageCancelled(msg) ||
+      isMessageRejected(msg) ||
+      isMessageRetracted(msg)
+    )
+  );
+}
+
+export function isMessageClaim(msg) {
+  return (
+    hasClaimsReferences(msg) &&
     !(
       isMessageAccepted(msg) ||
       isMessageCancellationPending(msg) ||
@@ -393,6 +429,11 @@ export function selectCancellationPendingMessagesByConnectionUri(
 export function selectProposalMessagesByConnectionUri(state, connectionUri) {
   const messages = selectAllMessagesByConnectionUri(state, connectionUri);
   return messages && messages.filter(msg => isMessageProposal(msg));
+}
+
+export function selectClaimMessagesByConnectionUri(state, connectionUri) {
+  const messages = selectAllMessagesByConnectionUri(state, connectionUri);
+  return messages && messages.filter(msg => isMessageClaim(msg));
 }
 
 export function selectUnreadMessagesByConnectionUri(state, connectionUri) {
