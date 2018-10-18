@@ -1,0 +1,17 @@
+@import "won-config";
+@import "flex-layout";
+@import "sizing-utils";
+
+won-petrinet-state {
+  .ps__active {
+    color: $won-primary-text-color;
+  }
+
+  .ps__inactive {
+    color: $won-line-gray;
+  }
+
+  .ps__loading {
+    color: $won-subtitle-gray;
+  }
+}

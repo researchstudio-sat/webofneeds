@@ -1,5 +1,6 @@
 import angular from "angular";
 import { attach } from "../../../utils.js";
+import petrinetStateModule from "../../petrinet-state.js";
 
 import "style/_petrinet-viewer.scss";
 
@@ -23,12 +24,11 @@ function genComponentConf() {
               <use xlink:href="#ico36_uc_transport_demand" href="#ico36_uc_transport_demand"></use>
             </svg>
           </a>
-          <div class="petrinetv__content__state" ng-if="false && self.content">
-            <! -- TODO: PetriNet State could also be displayed here -->
-            <div class="petrinetv__content__state__processUri">
-              {{ self.content.get('processURI') }}
-            </div>
-          </div>
+          <won-petrinet-state
+            class="petrinetv__content__state"
+            ng-if="self.content && self.content.get('processURI')"
+            process-uri="self.content.get('processURI')">
+          </won-petrinet-state>
         </div>
       </div>
     `;
@@ -73,5 +73,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.petrinetViewer", [])
+  .module("won.owner.components.petrinetViewer", [petrinetStateModule])
   .directive("wonPetrinetViewer", genComponentConf).name;
