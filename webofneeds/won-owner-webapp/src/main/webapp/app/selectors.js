@@ -403,6 +403,11 @@ export function selectProposableMessagesByConnectionUri(state, connectionUri) {
   return messages && messages.filter(msg => isMessageProposable(msg));
 }
 
+export function selectClaimableMessagesByConnectionUri(state, connectionUri) {
+  const messages = selectAllMessagesByConnectionUri(state, connectionUri);
+  return messages && messages.filter(msg => isMessageClaimable(msg));
+}
+
 export function selectSelectedMessagesByConnectionUri(state, connectionUri) {
   const messages = selectAllMessagesByConnectionUri(state, connectionUri);
   return messages && messages.filter(msg => msg.get("isSelected"));
