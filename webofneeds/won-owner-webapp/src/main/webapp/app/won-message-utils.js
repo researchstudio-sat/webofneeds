@@ -598,6 +598,26 @@ export function fetchAgreementProtocolUris(connectionUri) {
     .then(response => response.json());
 }
 
+export function fetchPetriNetUris(connectionUri) {
+  console.log("fetchPetriNetUris: ", connectionUri);
+  const url = urljoin(
+    ownerBaseUrl,
+    "/rest/petrinet/getPetriNetUris",
+    `?connectionUri=${connectionUri}`
+  );
+
+  return fetch(url, {
+    method: "get",
+    headers: {
+      Accept: "application/ld+json",
+      "Content-Type": "application/ld+json",
+    },
+    credentials: "include",
+  })
+    .then(checkHttpStatus)
+    .then(response => response.json());
+}
+
 export function fetchMessageEffects(connectionUri, messageUri) {
   console.log(
     "fetchMessageEffects: ",
