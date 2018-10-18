@@ -140,7 +140,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
             "    `send N`:          send N messages, one per second. N must be an integer between 1 and 9\n" +
             "    `validate'`:        download the connection data and validate it\n" +
             "    `propose (my|any) (N)`:  propose one (N, max 9) of my(/your/any) messages for an agreement\n" +
-            "    `accept`:          accept the last proposal made (including cancellation proposals)\n" +
+            "    `accept`:          accept the last proposal/claim made (including cancellation proposals)\n" +
             "    `cancel`:           propose to cancel the newest agreement (that wasn't only a cancellation)\n" +
             "    `retract (mine|proposal)`:  retract the last (proposal) message you sent, or the last message I sent\n" +
             "    `reject (yours)`:  reject the last rejectable message I (you) sent\n" +
@@ -388,7 +388,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 		referToEarlierMessages(ctx, bus, con, 
 				"ok, I'll reject " + whose +" latest rejectable message - but I'll need to crawl the connection data first, please be patient.", 
 				state -> {
-					URI uri = state.getLatestProposesMessageSentByNeed( useWrongSender ? con.getNeedURI() : con.getRemoteNeedURI());
+					URI uri = state.getLatestProposesOrClaimsMessageSentByNeed( useWrongSender ? con.getNeedURI() : con.getRemoteNeedURI());
 					return uri == null ? Collections.EMPTY_LIST : Arrays.asList(uri);
 				}, 
 				(messageModel, uris) -> WonRdfUtils.MessageUtils.addRejects(messageModel, uris),
@@ -469,7 +469,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 		referToEarlierMessages(ctx, bus, con, 
 				"ok, I'll accept your latest proposal - but I'll need to crawl the connection data first, please be patient.", 
 				state -> {
-					URI uri = state.getLatestPendingProposal(Optional.empty(), Optional.of(con.getRemoteNeedURI()));
+					URI uri = state.getLatestPendingProposalOrClaim(Optional.empty(), Optional.of(con.getRemoteNeedURI()));
 					return uri == null ? Collections.EMPTY_LIST : Arrays.asList(uri);
 				}, 
 				(messageModel, uris) -> WonRdfUtils.MessageUtils.addAccepts(messageModel, uris),

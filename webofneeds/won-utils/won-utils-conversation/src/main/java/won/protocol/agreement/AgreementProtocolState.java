@@ -410,6 +410,15 @@ public class AgreementProtocolState {
 		return uri;
 	}
 	
+	public URI getLatestProposesOrClaimsMessageSentByNeed(URI needUri) {
+        URI uri = getNthLatestMessage(m -> needUri.equals(m.getSenderNeedURI()) 
+                && m.isProposesMessage() && m.getEffects().stream().anyMatch(e->e.isProposes() || e.isClaims()), 0);
+        if (logger.isDebugEnabled()) {
+            logNthLatestMessage(0, needUri, null, uri);
+        }
+        return uri;
+    }
+	
 	public URI getLatestPendingProposesMessageSentByNeed(URI needUri) {
 		URI uri = getNthLatestMessage(m -> needUri.equals(m.getSenderNeedURI()) 
 				&& m.isProposesMessage() && m.getEffects().stream().anyMatch(e->e.isProposes()
@@ -477,9 +486,17 @@ public class AgreementProtocolState {
 		return getLatestPendingProposal(Optional.empty(), Optional.empty());
 	}
 	
+	public URI getLatestPendingProposalOrClaim() {
+        return getLatestPendingProposalOrClaim(Optional.empty(), Optional.empty());
+    }
+	
 	public URI getLatestPendingProposal(Optional<ProposalType> type) {
 		return getLatestPendingProposal(type, Optional.empty());
 	}
+	
+	public URI getLatestPendingProposalOrClaim(Optional<ProposalType> type) {
+        return getLatestPendingProposalOrClaim(type, Optional.empty());
+    }
 	
 	public URI getLatestPendingProposal(Optional<ProposalType> type, Optional<URI> senderNeedUri) {
 		URI uri = getNthLatestMessage(
@@ -495,6 +512,21 @@ public class AgreementProtocolState {
 		}
 		return uri;
 	}
+	
+	public URI getLatestPendingProposalOrClaim(Optional<ProposalType> type, Optional<URI> senderNeedUri) {
+        URI uri = getNthLatestMessage(
+                m -> (m.isProposesMessage() || m.isProposesToCancelMessage() || m.isClaimsMessage()) &&
+                (! senderNeedUri.isPresent() || senderNeedUri.get().equals(m.getSenderNeedURI())) && 
+                m.getEffects()
+                    .stream()
+                    .filter(e->e.isProposes() && (!type.isPresent() || e.asProposes().getProposalType() == type.get()) || e.isClaims())
+                    .map(e -> e.getMessageUri())
+                    .anyMatch(msgUri -> isPendingProposal(msgUri) || isPendingCancellation(msgUri) || isClaim(msgUri)), 0);
+        if (logger.isDebugEnabled()) {
+            logNthLatestMessage(0, senderNeedUri.orElse(null), null, uri);
+        }
+        return uri;
+    }
 	
 	public URI getLatestRejectsMessageSentByNeed(URI needUri) {
 		URI uri = getNthLatestMessage(m -> needUri.equals(m.getSenderNeedURI()) 
