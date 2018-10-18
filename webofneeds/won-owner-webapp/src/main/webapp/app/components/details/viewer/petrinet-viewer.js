@@ -26,7 +26,7 @@ function genComponentConf() {
           <div class="petrinetv__content__state" ng-if="false && self.content">
             <! -- TODO: PetriNet State could also be displayed here -->
             <div class="petrinetv__content__state__processUri">
-              {{ self.content.get('processUri') }}
+              {{ self.content.get('processURI') }}
             </div>
           </div>
         </div>
@@ -53,7 +53,6 @@ function genComponentConf() {
     }
     updatedContent(newContent, prevContent) {
       if (newContent && newContent != prevContent) {
-        console.log("updating content");
         this.content = newContent;
       }
     }
