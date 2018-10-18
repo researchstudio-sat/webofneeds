@@ -61,22 +61,30 @@ public class PetriNetStates {
         //  2. update the petrinet state
 
         //get agreement uris in chronological order
-        List<URI> agreementUris = agreementProtocolState.getAgreementsInChronologicalOrder(true);
+        List<URI> uris = agreementProtocolState.getAgreementsAndClaimsInChronologicalOrder(true);
         
         //walk over agreements
-        agreementUris.forEach(agreementURI -> {
-            Model agreement = agreementProtocolState.getAgreement(agreementURI);
-        
+        uris.forEach(uri -> {
+            boolean isAgreement = agreementProtocolState.isAgreement(uri);
+            if (!isAgreement && !agreementProtocolState.isClaim(uri)) {
+                throw new IllegalStateException(uri + " was reported as agreement or claim but is neither");
+            }
+            Model agreementOrClaim =  isAgreement
+                    ? agreementProtocolState.getAgreement(uri) 
+                    : agreementProtocolState.getClaim(uri);
+            logger.info("processing petri net data in {} {}", 
+                    isAgreement ? "agreement" : "claim", 
+                            uri);
             //first, find petri net in current agreement
-            loadPetrinetsForAgreement(agreement, agreementURI);
+            loadPetrinetsForAgreement(agreementOrClaim, uri, isAgreement);
             
             //now see if there are events and execute them as transition firings
-            executePetriNetEventsForAgreement(agreement, agreementURI);
+            executePetriNetEventsForAgreement(agreementOrClaim, uri, isAgreement);
         });
         
     }
 
-    private void loadPetrinetsForAgreement(Model agreement, URI agreementUri) {
+    private void loadPetrinetsForAgreement(Model agreement, URI agreementUri, boolean isAgreement) {
         StmtIterator it = agreement.listStatements(null, WONWF.HAS_INLINE_PETRI_NET_DEFINITION, (RDFNode) null);
         while(it.hasNext()) {
             Statement stmt = it.next();
@@ -84,8 +92,9 @@ public class PetriNetStates {
                 URI petriNetUri = URI.create(stmt.getSubject().asResource().getURI());
                 String base64EncodedPnml = stmt.getObject().asLiteral().getString();
                 if (petrinetStates.containsKey(petriNetUri)) {
-                    logger.info("ignoring redefinition of petri net {} in agreement {}", petriNetUri, agreementUri);
+                    logger.info("ignoring redefinition of petri net {} in {} {}", new Object[] { petriNetUri, isAgreement ? "agreement" : "claim", agreementUri});
                 } else {
+                    logger.info("found petri net definition {} in {} {}", new Object[] {petriNetUri, isAgreement ? "agreement" : "claim", agreementUri});
                     PetriNet petriNet = petriNetLoader.readBase64EncodedPNML(base64EncodedPnml);
                     PetriNetState state = new PetriNetState(petriNetUri, petriNet);
                     petrinetStates.put(petriNetUri, state);
@@ -94,7 +103,7 @@ public class PetriNetStates {
         }
     }
     
-    private void executePetriNetEventsForAgreement(Model agreement, URI agreementUri) {
+    private void executePetriNetEventsForAgreement(Model agreement, URI agreementUri, boolean isAgreement) {
         StmtIterator it = agreement.listStatements(null, WONWF.FIRES_TRANSITION, (RDFNode) null);
         while(it.hasNext()) {
             Statement stmt = it.next();
@@ -103,9 +112,11 @@ public class PetriNetStates {
                 URI eventURI = URI.create(stmt.getObject().asResource().getURI());
                 PetriNetState state = petrinetStates.get(petriNetUri);
                 if (state != null) {
+                    logger.info("firing transition {} on petri net {} because of data found in {} {}", 
+                            new Object[] {eventURI, petriNetUri, isAgreement ? "agreement" : "claim", agreementUri});
                     state.fireTransition(eventURI);
                 } else {
-                    logger.info("ignoring event {} for unknown petri net {} in agreement {}", new Object[] {eventURI, petriNetUri, agreementUri});
+                    logger.info("ignoring event {} for unknown petri net {} in {} {}", new Object[] {eventURI, petriNetUri, isAgreement ? "agreement" : "claim", agreementUri});
                 }
             }
         }
