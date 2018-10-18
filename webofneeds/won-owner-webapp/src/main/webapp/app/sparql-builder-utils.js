@@ -17,10 +17,26 @@ import { Parser as SparqlParser } from "sparqljs";
  * @param {Object} prefixes key-value pairs of prefix and full URL
  * @param {String} selectDistinct the variable to select
  * @param {Array<String>} where any operations to add to the `WHERE`-block
- * @param {*} orderBy Array of objects like `{order: "ASC", variable: "?geoDistance"}`
+ * @param {Array<Object>} subQueries array of `{query: <SparqlQuery>, optional = false}` objects . will be placed
+ *   in `where`-block and their prefixes lifted to the overall-queries prefix block.
+ * @param {Array<Object>} orderBy Array of objects like `{order: "ASC", variable: "?geoDistance"}`
+ * @param {Number} limit an integer that limits the number of results
  */
-export function sparqlQuery({ prefixes, selectDistinct, where, orderBy }) {
-  let orderByStr;
+export function sparqlQuery({
+  prefixes,
+  variables,
+  distinct,
+  where,
+  subQueries,
+  orderBy,
+  groupBy,
+  limit,
+}) {
+  // ---------- prepare query string ----------
+
+  const distinctStr = distinct ? "DISTINCT" : "";
+
+  let orderByStr = "";
   if (orderBy && is("Array", orderBy)) {
     const orderClauses = orderBy
       .map(o => `${o.order}(${o.variable})`)
@@ -28,14 +44,63 @@ export function sparqlQuery({ prefixes, selectDistinct, where, orderBy }) {
     orderByStr = orderClauses ? "ORDER BY " + orderClauses : "";
   }
 
+  let groupByStr = "";
+  if (groupBy) {
+    groupByStr = `GROUP BY (${groupBy})`;
+  }
+
+  let limitStr = "";
+  if (limit) {
+    limitStr = `LIMIT ${parseInt(limit)}`;
+  }
+
   const queryTemplate = `
 ${prefixesString(prefixes)}
-SELECT DISTINCT ${selectDistinct}
+SELECT ${distinctStr} ${variables.join(" ")}
 WHERE {
-  ${where.join(" ")}
-} ${orderByStr}`;
+  ${where ? where.join(" \n") : ""}
+} ${orderByStr} ${groupByStr} ${limitStr}`;
 
-  return new SparqlParser().parse(queryTemplate);
+  // ---------- parse root-query ----------
+
+  const queryAST = new SparqlParser().parse(queryTemplate);
+
+  // ---------- if there are sub-queries, add their ASTs and prefixes ----------
+  addSubQueries(queryAST, subQueries);
+
+  // ---------- return AST ----------
+
+  return queryAST;
+}
+
+function addSubQueries(queryAST, subQueries) {
+  if (!subQueries || !is("Array", subQueries)) {
+    return queryAST;
+  }
+  // add prefixes
+  subQueries.forEach(subQuery => {
+    Object.assign(queryAST.prefixes, subQuery.query.prefixes);
+  });
+
+  // inject sub-query (without the lifted prefixes) into where-block
+  const subQueryBlocks = subQueries.map(subQuery => ({
+    type: subQuery.optional ? "optional" : "group",
+    patterns: [
+      {
+        ...subQuery.query,
+        prefixes: undefined, // overwrites any `prefixes` that might come from `subQuery`
+      },
+    ],
+  }));
+  queryAST.where = [
+    /* @ why prepend?: evaluate subqueries first, so e.g.
+     * later `coalesce` statements can define default values
+     */
+    ...subQueryBlocks,
+    ...queryAST.where,
+  ];
+
+  return queryAST;
 }
 
 /**
@@ -149,6 +214,138 @@ export function filterInVicinity(rootSubject, location, radius = 10) {
       ],
     });
   }
+}
+
+/**
+ * Subquery that generates a score [1,0] (1 for exact location matches, 0 for anything
+ * further away than the `radius`, linearly degrading inbetween)
+ *
+ * @param {String} resultName: a variable name that the score judges, e.g. `?need`
+ * @param {String} bindScoreAs: the variable name for the score (use the same name for
+ *   sorting/aggregating in the parent query)
+ * @param {String} pathToGeoCoords: the predicates to be traversed to get to the
+ *   of the  `s:GeoCoordinates` in the RDF-graph of potential matches.
+ * @param {*} prefixesInPath: an object/map of prefix to full base-URL for all prefixes used
+ *   in the `pathToGeoCoords`
+ * @param {*} geoCoordinates: an object containing `lat` and `lng` to compare potential
+ *   matches to.
+ * @param {Number} radius: distance in km that matches can be away from the location
+ * @returns see `sparqlQuery`
+ */
+export function vicinityScoreSubQuery({
+  resultName,
+  bindScoreAs,
+  pathToGeoCoords,
+  prefixesInPath,
+  geoCoordinates,
+  radius = 10,
+}) {
+  // const locationFilter = filterInVicinity("?jobLocation", jobLocation);
+  if (!geoCoordinates || !geoCoordinates.lat || !geoCoordinates.lng) {
+    return undefined;
+  }
+  const { lat, lng } = geoCoordinates;
+  return sparqlQuery({
+    prefixes: {
+      ...prefixesInPath,
+      s: won.defaultContext["s"],
+      won: won.defaultContext["won"],
+      geo: "http://www.bigdata.com/rdf/geospatial#",
+      geoliteral: "http://www.bigdata.com/rdf/geospatial/literals/v1#",
+    },
+    variables: [resultName, bindScoreAs],
+    where: [
+      `${resultName} ${pathToGeoCoords} ?geo`,
+      `SERVICE geo:search {
+            ?geo geo:search "inCircle" .
+            ?geo geo:searchDatatype geoliteral:lat-lon .
+            ?geo geo:predicate won:geoSpatial .
+            ?geo geo:spatialCircleCenter "${lat}#${lng}" .
+            ?geo geo:spatialCircleRadius "${radius}" .
+            ?geo geo:distanceValue ?geoDistance .
+          }`,
+      `BIND((${radius} - ?geoDistance) / ${radius} as ?geoScoreRaw)`, // 100 is the spatialCircleRadius / maxDistance in km
+      `BIND(IF(?geoScoreRaw > 0, ?geoScoreRaw , 0 ) as ${bindScoreAs})`,
+    ],
+  });
+}
+
+/**
+ * Calculates the jaccard-index (i.e. normalized set-overlap) between own and a
+ * potential match's set of tags. Full overlap means 1, having no shared tags
+ * means 0.
+ *
+ * @param {String} resultName: a variable name that the score judges, e.g. `?need`
+ * @param {String} bindScoreAs: the variable name for the score (use the same name for
+ *   sorting/aggregating in the parent query)
+ * @param {String} pathToTags: the predicates to be traversed to get to the tags
+ *   in the RDF-graph.
+ * @param {*} prefixesInPath: an object/map of prefix to full base-URL for all prefixes
+ *   used in the `pathToTags`
+ * @param {Array<String>} tagLikes: an array of own tags to intersect with potential
+ *   matches' tags
+ * @returns see `sparqlQuery`
+ */
+export function tagOverlapScoreSubQuery({
+  resultName,
+  bindScoreAs,
+  pathToTags,
+  prefixesInPath,
+  tagLikes,
+}) {
+  if (!is("Array", tagLikes) || tagLikes.length == 0) {
+    return undefined;
+  }
+
+  // sub-query that actually calculates cardinality of union and intersection
+  const subQuery = sparqlQuery({
+    prefixes: {
+      ...prefixesInPath,
+    },
+    variables: [
+      resultName,
+
+      /* operations to sum up to cardinality/size of intersection
+       * e.g. `((SUM(?var0)) + (SUM(?var1)) AS ?targetOverlap)`
+       */
+      "( " +
+        Object.keys(tagLikes)
+          .map(idx => `sum(?var${idx})`)
+          .join(" + ") +
+        "as ?targetOverlap )",
+
+      // operations to sum up to cardinality/size of union
+      `(count(${resultName}) as ?targetTotal)`,
+    ],
+    where: [
+      `${resultName} ${pathToTags} ?tag .`,
+
+      /* ?varX is 1 if the tag-like occurs in the match
+       * e.g. BIND(IF((STR(?industry)) = "graphic design", 1, 0) AS ? var1)
+       */
+      ...Object.entries(tagLikes).map(
+        ([idx, tagLike]) =>
+          `bind(if(str(?tag) = "${tagLike}",1,0) as ?var${idx})`
+      ),
+    ],
+    groupBy: resultName,
+  });
+
+  // outer query that calculates jaccard-index (see https://en.wikipedia.org/wiki/Jaccard_index)
+  return sparqlQuery({
+    prefixes: {
+      s: won.defaultContext["s"],
+    },
+    variables: [resultName, bindScoreAs],
+    distinct: true,
+    where: [
+      `bind (?targetOverlap / ( ?targetTotal + ${
+        tagLikes.length
+      } - ?targetOverlap ) as ${bindScoreAs} )`, // intersection over union, see https://en.wikipedia.org/wiki/Jaccard_index
+      `filter(${bindScoreAs} > 0)`, // filter out posts without any common tag-likes
+    ],
+    subQueries: [{ query: subQuery }],
+  });
 }
 
 /**

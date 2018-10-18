@@ -100,7 +100,8 @@ export const realEstateGroup = {
 
         return sparqlQuery({
           prefixes: concatenatedFilter.prefixes,
-          selectDistinct: resultName,
+          distinct: true,
+          variables: [resultName],
           where: concatenatedFilter.operations,
           orderBy: [
             {
@@ -188,7 +189,8 @@ export const realEstateGroup = {
 
         return sparqlQuery({
           prefixes: concatenatedFilter.prefixes,
-          selectDistinct: resultName,
+          distinct: true,
+          variables: [resultName],
           where: concatenatedFilter.operations,
           orderBy: [
             {

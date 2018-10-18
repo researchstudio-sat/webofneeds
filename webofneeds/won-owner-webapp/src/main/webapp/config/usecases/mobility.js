@@ -108,7 +108,8 @@ const mobilityUseCases = {
 
       return sparqlQuery({
         prefixes: concatenatedFilter.prefixes,
-        selectDistinct: resultName,
+        distinct: true,
+        variables: [resultName],
         where: concatenatedFilter.operations,
         orderBy: [
           {
@@ -155,7 +156,8 @@ const mobilityUseCases = {
 
       return sparqlQuery({
         prefixes: concatenatedFilter.prefixes,
-        selectDistinct: resultName,
+        distinct: true,
+        variables: [resultName],
         where: concatenatedFilter.operations,
         orderBy: [
           {
@@ -217,7 +219,8 @@ const mobilityUseCases = {
 
       return sparqlQuery({
         prefixes: concatenatedFilter.prefixes,
-        selectDistinct: resultName,
+        distinct: true,
+        variables: [resultName],
         where: concatenatedFilter.operations,
         orderBy: [
           {
