@@ -83,6 +83,7 @@ export const petriNetWorkflow = {
     const wflw = jsonLDImm && jsonLDImm.get("won:hasPetriNet");
 
     let workflow = {
+      processUri: get(wflw, "@id"),
       name: get(wflw, "s:name"),
       type: get(wflw, "s:type"),
       data: get(wflw, "wf:hasInlinePetriNetDefinition"),
