@@ -27,6 +27,7 @@ public class MessageEffectsBuilder {
 		ret.addAll(accepts);
 		ret.addAll(rejects);
 		ret.addAll(retracts);
+		ret.addAll(claims);
 		return ret;
 	}
 	
