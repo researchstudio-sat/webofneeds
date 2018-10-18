@@ -30,7 +30,13 @@ export function wellFormedPayload(payload) {
   return emptyDataset.mergeDeep(Immutable.fromJS(payload));
 }
 
-export function messageHasReferences(wonMsg) {
+/**
+ * Checks if a wonMessage contains content/references that make it necessary for us to check which effects
+ * this message has caused (in relation to other messages, necessary e.g. AgreementData
+ * @param wonMsg
+ * @returns {*}
+ */
+export function isFetchMessageEffectsNeeded(wonMsg) {
   return (
     wonMsg &&
     (wonMsg.getProposedMessageUris() ||
@@ -38,7 +44,7 @@ export function messageHasReferences(wonMsg) {
       wonMsg.getRejectsMessageUris() ||
       wonMsg.getAcceptsMessageUris() ||
       wonMsg.getProposedToCancelMessageUris() ||
-      wonMsg.getForwardedMessageUris())
+      wonMsg.getClaimsMessageUris())
   );
 }
 
