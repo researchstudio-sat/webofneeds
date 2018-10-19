@@ -232,38 +232,40 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
 	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
 	public WonMessage process(final WonMessage wonMessage) {
 	    
-	    //first, let the serversideactionservice do its work, if there is any to do:
-	    serverSideActionService.process(wonMessage);
-	    
-		String wonMessageJsonLdString = WonMessageEncoder.encodeAsJsonLd(wonMessage);
-		WebSocketMessage<String> webSocketMessage = new TextMessage(wonMessageJsonLdString);
-		URI needUri = getOwnNeedURI(wonMessage);
-		User user = getUserForWonMessage(wonMessage);
-
-		Set<WebSocketSession> webSocketSessions = findWebSocketSessionsForWonMessage(wonMessage, needUri, user);
-
-		// check if we can deliver the message. If not, send email.
-		if (webSocketSessions.size() == 0) {
-			logger.info("cannot deliver message of type {} for need {}, receiver {}: no websocket session found",
-					new Object[] { wonMessage.getMessageType(), wonMessage.getReceiverNeedURI(),
-							wonMessage.getReceiverURI() });
-			// send per email notifications if it applies:
-			notifyPerEmail(user, needUri, wonMessage);
+	    try {
+			String wonMessageJsonLdString = WonMessageEncoder.encodeAsJsonLd(wonMessage);
+			WebSocketMessage<String> webSocketMessage = new TextMessage(wonMessageJsonLdString);
+			URI needUri = getOwnNeedURI(wonMessage);
+			User user = getUserForWonMessage(wonMessage);
+	
+			Set<WebSocketSession> webSocketSessions = findWebSocketSessionsForWonMessage(wonMessage, needUri, user);
+	
+			// check if we can deliver the message. If not, send email.
+			if (webSocketSessions.size() == 0) {
+				logger.info("cannot deliver message of type {} for need {}, receiver {}: no websocket session found",
+						new Object[] { wonMessage.getMessageType(), wonMessage.getReceiverNeedURI(),
+								wonMessage.getReceiverURI() });
+				// send per email notifications if it applies:
+				notifyPerEmail(user, needUri, wonMessage);
+				return wonMessage;
+			}
+			// we can send it - pre-cache the delivery chain:
+			eagerlyCachePopulatingProcessor.process(wonMessage);
+			
+			// send to owner webapp
+			int successfullySent = 0;
+			for (WebSocketSession session : webSocketSessions) {
+				successfullySent += sendMessageForSession(wonMessage, webSocketMessage, session, needUri, user) ? 1 : 0;
+			}
+			if (successfullySent == 0) {
+				//we did not manage to send the message via the websocket, send it by email.
+				notifyPerEmail(user, needUri, wonMessage);
+			}
 			return wonMessage;
-		}
-		// we can send it - pre-cache the delivery chain:
-		eagerlyCachePopulatingProcessor.process(wonMessage);
-		
-		// send to owner webapp
-		int successfullySent = 0;
-		for (WebSocketSession session : webSocketSessions) {
-			successfullySent += sendMessageForSession(wonMessage, webSocketMessage, session, needUri, user) ? 1 : 0;
-		}
-		if (successfullySent == 0) {
-			//we did not manage to send the message via the websocket, send it by email.
-			notifyPerEmail(user, needUri, wonMessage);
-		}
-		return wonMessage;
+	    } finally {
+		    //in any case, let the serversideactionservice do its work, if there is any to do:
+		    serverSideActionService.process(wonMessage);
+	    }
 	}
 
 	private void notifyPerEmail(final User user, final URI needUri, final WonMessage wonMessage) {
