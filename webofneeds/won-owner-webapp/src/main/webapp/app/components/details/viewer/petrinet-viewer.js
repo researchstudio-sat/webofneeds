@@ -1,5 +1,6 @@
 import angular from "angular";
 import { attach } from "../../../utils.js";
+import petrinetStateModule from "../../petrinet-state.js";
 
 import "style/_petrinet-viewer.scss";
 
@@ -13,22 +14,21 @@ function genComponentConf() {
           <span class="petrinetv__header__label" ng-if="self.detail.label">{{self.detail.label}}</span>
         </div>
         <div class="petrinetv__content">
+          <won-petrinet-state
+            class="petrinetv__content__state"
+            ng-if="self.content && self.content.get('processURI')"
+            process-uri="self.content.get('processURI')">
+          </won-petrinet-state>
           <a class="petrinetv__content__download" ng-show="self.content"
             ng-href="data:{{self.content.get('type')}};base64,{{self.content.get('data')}}"
             download="{{ self.content.get('name') }}">
-            <div class="petrinetv__content__download__label clickable">
-              {{ self.content.get('name') }}
-            </div>
             <svg class="petrinetv__content__download__typeicon">
               <use xlink:href="#ico36_uc_transport_demand" href="#ico36_uc_transport_demand"></use>
             </svg>
-          </a>
-          <div class="petrinetv__content__state" ng-if="false && self.content">
-            <! -- TODO: PetriNet State could also be displayed here -->
-            <div class="petrinetv__content__state__processUri">
-              {{ self.content.get('processUri') }}
+            <div class="petrinetv__content__download__label clickable">
+              Download '{{ self.content.get('name') }}'
             </div>
-          </div>
+          </a>
         </div>
       </div>
     `;
@@ -53,7 +53,6 @@ function genComponentConf() {
     }
     updatedContent(newContent, prevContent) {
       if (newContent && newContent != prevContent) {
-        console.log("updating content");
         this.content = newContent;
       }
     }
@@ -74,5 +73,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.petrinetViewer", [])
+  .module("won.owner.components.petrinetViewer", [petrinetStateModule])
   .directive("wonPetrinetViewer", genComponentConf).name;

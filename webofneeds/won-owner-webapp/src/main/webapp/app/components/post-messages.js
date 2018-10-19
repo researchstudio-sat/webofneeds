@@ -353,16 +353,30 @@ function genComponentConf() {
       });
     }
 
-    //TODO: THIS IS SOLELY FOR TESTING PURPOSES
-    loadPetriNetUris4Dbg() {
+    loadPetriNetUris() {
+      //TODO: THIS IS NEEDS TO BE CALLED
       const connectionUri = this.connection && this.connection.get("uri");
       if (connectionUri) {
         fetchPetriNetUris(connectionUri)
           .then(response => {
-            console.log("Response: ", response);
+            const petriNetData = {};
+
+            response.forEach(entry => {
+              if (entry.processURI) {
+                petriNetData[entry.processURI] = entry;
+              }
+            });
+
+            const petriNetDataImm = Immutable.fromJS(petriNetData);
+
+            this.connections__updatePetriNetData({
+              connectionUri: this.connectionUri,
+              petriNetData: petriNetDataImm,
+            });
           })
           .catch(error => {
             console.error("Error: ", error);
+            //TODO: ERROR HANDLING
           });
       }
     }

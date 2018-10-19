@@ -38,6 +38,7 @@ import {
   changeConnectionStateByFun,
   storeConnectionsData,
   updateAgreementStateData,
+  updatePetriNetStateData,
   setShowAgreementData,
   setMultiSelectType,
 } from "./reduce-connections.js";
@@ -541,7 +542,12 @@ export default function(allNeedsInState = initialState, action = {}) {
         action.payload.connectionUri,
         action.payload.isLoadingMessages
       );
-
+    case actionTypes.connections.updatePetriNetData:
+      return updatePetriNetStateData(
+        allNeedsInState,
+        action.payload.connectionUri,
+        action.payload.petriNetData
+      );
     case actionTypes.connections.updateAgreementData:
       return updateAgreementStateData(
         allNeedsInState,
