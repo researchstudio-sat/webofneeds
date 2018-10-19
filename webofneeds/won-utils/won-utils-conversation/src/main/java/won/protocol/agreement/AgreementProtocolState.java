@@ -327,7 +327,7 @@ public class AgreementProtocolState {
 	    return deliveryChains.stream()
                 .map(m -> m.getHead())
                 .filter(x -> isAgreement(x.getMessageURI()))
-                .sorted((x1,x2) -> (oldestFirst ? -1 : 1 ) * x2.getOrder() - x1.getOrder())
+                .sorted((x1,x2) -> (oldestFirst ? -1 : 1 ) * (x2.getOrder() - x1.getOrder()))
                 .map(x -> x.getMessageURI())
                 .collect(Collectors.toList());
 	}
@@ -339,7 +339,7 @@ public class AgreementProtocolState {
         return deliveryChains.stream()
                 .map(m -> m.getHead())
                 .filter(x -> isAgreement(x.getMessageURI()) || isClaim(x.getMessageURI()))
-                .sorted((x1,x2) -> (oldestFirst ? -1 : 1 ) * x2.getOrder() - x1.getOrder())
+                .sorted((x1,x2) -> (oldestFirst ? -1 : 1 ) * (x2.getOrder() - x1.getOrder()))
                 .map(x -> x.getMessageURI())
                 .collect(Collectors.toList());
     }
