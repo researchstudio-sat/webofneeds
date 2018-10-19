@@ -161,4 +161,21 @@ public class PetriNetTest {
         Assert.assertEquals(1, marked.size());
         Assert.assertEquals(URI.create("http://example.com/state/end"), marked.iterator().next());
     }
+    
+    @Test
+    public void testTaxiNoShowPetriNet() {
+                                           
+        Dataset conversation = loadDataset("won/protocol/petrinet/conversations/taxi-no-show.trig");
+        PetriNetStates nets = PetriNetStates.of(conversation);
+        Collection<PetriNetState> states = nets.getPetrinetStates();
+        conversation.end();
+        Assert.assertTrue(!states.isEmpty());
+        Assert.assertEquals(1, states.size());
+        PetriNetState state = states.iterator().next();
+        Set<URI> marked = state.getMarkedPlaces();
+        Assert.assertEquals(3, marked.size());
+        Assert.assertTrue(marked.contains(URI.create("http://purl.org/webofneeds/process/taxi#TaxiNoShow")));
+        Assert.assertTrue(marked.contains(URI.create("http://purl.org/webofneeds/process/taxi#PassengerCanReview")));
+        Assert.assertTrue(marked.contains(URI.create("http://purl.org/webofneeds/process/taxi#DriverCanReview")));
+    }
 }
