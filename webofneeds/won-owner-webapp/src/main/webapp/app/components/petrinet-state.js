@@ -109,7 +109,6 @@ function genComponentConf() {
       return str;
     }
 
-    //TODO: IMPL ADHOC CLAIM
     sendClaim(transitionUri) {
       if (transitionUri && this.processUri && this.connectionUri) {
         console.log(
@@ -119,15 +118,13 @@ function genComponentConf() {
           this.processUri
         );
 
-        this.connections__sendChatMessage(
+        this.connections__sendChatMessageClaimOnSuccess(
           undefined,
           new Map().set("petriNetTransition", {
             petriNetUri: this.processUri,
             transitionUri: transitionUri,
           }),
-          undefined,
-          this.connectionUri,
-          false
+          this.connectionUri
         );
       }
     }

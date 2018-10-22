@@ -26,6 +26,75 @@ import {
   buildConnectMessage,
 } from "../won-message-utils.js";
 
+export function connectionsChatMessageClaimOnSuccess(
+  chatMessage,
+  additionalContent,
+  connectionUri
+) {
+  return (dispatch, getState) => {
+    const ownNeed = getState()
+      .get("needs")
+      .filter(need => need.getIn(["connections", connectionUri]))
+      .first();
+    const theirNeedUri = getState().getIn([
+      "needs",
+      ownNeed.get("uri"),
+      "connections",
+      connectionUri,
+      "remoteNeedUri",
+    ]);
+    const theirNeed = getState().getIn(["needs", theirNeedUri]);
+    const theirConnectionUri = ownNeed.getIn([
+      "connections",
+      connectionUri,
+      "remoteConnectionUri",
+    ]);
+
+    buildChatMessage({
+      chatMessage: chatMessage,
+      additionalContent: additionalContent,
+      referencedContentUris: undefined,
+      connectionUri,
+      ownNeedUri: ownNeed.get("uri"),
+      theirNeedUri: theirNeedUri,
+      ownNodeUri: ownNeed.get("nodeUri"),
+      theirNodeUri: theirNeed.get("nodeUri"),
+      theirConnectionUri,
+      isTTL: false,
+    })
+      .then(msgData =>
+        Promise.all([
+          won.wonMessageFromJsonLd(msgData.message),
+          msgData.message,
+        ])
+      )
+      .then(([optimisticEvent, jsonldMessage]) => {
+        console.log(
+          "Sending connectionsAutoClaimMessage for: ",
+          optimisticEvent.getMessageUri()
+        );
+        dispatch({
+          type: actionTypes.connections.sendChatMessageClaimOnSuccess,
+          payload: {
+            eventUri: optimisticEvent.getMessageUri(),
+            message: jsonldMessage,
+            optimisticEvent,
+          },
+        });
+      })
+      .catch(e => {
+        console.error("Error while processing chat message: ", e);
+        dispatch({
+          type: actionTypes.connections.sendChatMessageFailed,
+          payload: {
+            error: e,
+            message: e.message,
+          },
+        });
+      });
+  };
+}
+
 export function connectionsChatMessage(
   chatMessage,
   additionalContent,
