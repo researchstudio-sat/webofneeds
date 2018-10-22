@@ -421,42 +421,6 @@ function genComponentConf() {
       });
     }
 
-    loadPetriNetUris() {
-      //TODO: THIS IS NEEDS TO BE CALLED
-      const connectionUri = this.connection && this.connection.get("uri");
-      if (connectionUri) {
-        this.connections__setLoadingPetriNetData({
-          connectionUri: connectionUri,
-          isLoadingPetriNetData: true,
-        });
-
-        fetchPetriNetUris(connectionUri)
-          .then(response => {
-            const petriNetData = {};
-
-            response.forEach(entry => {
-              if (entry.processURI) {
-                petriNetData[entry.processURI] = entry;
-              }
-            });
-
-            const petriNetDataImm = Immutable.fromJS(petriNetData);
-
-            this.connections__updatePetriNetData({
-              connectionUri: this.connectionUri,
-              petriNetData: petriNetDataImm,
-            });
-          })
-          .catch(error => {
-            console.error("Error:", error);
-            this.connections__setLoadingPetriNetData({
-              connectionUri: this.connectionUri,
-              isLoadingPetriNetData: false,
-            });
-          });
-      }
-    }
-
     ensurePetriNetDataIsLoaded(forceFetch = false) {
       delay(0).then(() => {
         if (
