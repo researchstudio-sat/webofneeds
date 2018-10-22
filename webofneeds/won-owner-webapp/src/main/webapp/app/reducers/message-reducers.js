@@ -13,6 +13,7 @@ import { getIn } from "../utils.js";
 const initialState = Immutable.fromJS({
   enqueued: {},
   waitingForAnswer: {},
+  claimOnSuccess: {},
 });
 export function messagesReducer(messages = initialState, action = {}) {
   switch (action.type) {
@@ -51,6 +52,14 @@ export function messagesReducer(messages = initialState, action = {}) {
         ["enqueued", action.payload.eventUri],
         action.payload.message
       );
+
+    case actionTypes.connections.sendChatMessageClaimOnSuccess:
+      return messages
+        .setIn(["enqueued", action.payload.eventUri], action.payload.message)
+        .setIn(
+          ["claimOnSuccess", action.payload.eventUri],
+          action.payload.message
+        );
 
     case actionTypes.lostConnection:
       return messages.set("lostConnection", true).set("reconnecting", false);
@@ -167,9 +176,13 @@ export function messagesReducer(messages = initialState, action = {}) {
         .removeIn(["dispatchOnFailureOwn", action.payload.eventUri]);
 
     case actionTypes.messages.dispatchActionOn.failureRemote:
-    case actionTypes.messages.dispatchActionOn.successRemote:
-      //all the dispatching was done by the action creator. remove the queued actions now:
       return messages
+        .removeIn(["dispatchOnSuccessRemote", action.payload.eventUri])
+        .removeIn(["dispatchOnFailureRemote", action.payload.eventUri]);
+
+    case actionTypes.messages.dispatchActionOn.successRemote:
+      return messages
+        .removeIn(["claimOnSuccess", action.payload.eventUri])
         .removeIn(["dispatchOnSuccessRemote", action.payload.eventUri])
         .removeIn(["dispatchOnFailureRemote", action.payload.eventUri]);
 
