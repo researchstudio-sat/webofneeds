@@ -828,9 +828,8 @@ export function dispatchActionOnSuccessRemote(event) {
           ])
         )
         .then(([optimisticEvent, jsonldMessage]) => {
-          // dispatch(actionCreators.messages__send(messageData));
           dispatch({
-            type: actionTypes.connections.sendChatMessage,
+            type: actionTypes.connections.sendChatMessageRefreshDataOnSuccess,
             payload: {
               eventUri: optimisticEvent.getMessageUri(),
               message: jsonldMessage,
