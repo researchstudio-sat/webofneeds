@@ -624,7 +624,7 @@ function genComponentConf() {
       if (this.showAgreementData) {
         this.setShowAgreementData(false);
       }
-      if (this.showPetriNedData) {
+      if (this.showPetriNetData) {
         this.setShowPetriNetData(false);
       }
       this.snapToBottom();
