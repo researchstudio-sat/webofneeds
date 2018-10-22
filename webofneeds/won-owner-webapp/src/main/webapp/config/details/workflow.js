@@ -1,4 +1,8 @@
-import { generateIdString, get } from "../../app/utils.js";
+import {
+  generateIdString,
+  generateSimpleTransitionLabel,
+  get,
+} from "../../app/utils.js";
 import Immutable from "immutable";
 
 export const bpmnWorkflow = {
@@ -181,7 +185,7 @@ export const petriNetTransition = {
     if (value && value.petriNetUri && value.transitionUri) {
       const humanReadableString =
         " fire: <" +
-        value.transitionUri +
+        generateSimpleTransitionLabel(value.transitionUri) +
         "> in PetriNetUri: <" +
         value.petriNetUri +
         ">";
@@ -190,6 +194,7 @@ export const petriNetTransition = {
         ? this.label + ": " + humanReadableString
         : humanReadableString;
     }
+
     return undefined;
   },
 };

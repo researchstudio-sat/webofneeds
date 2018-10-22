@@ -1478,4 +1478,20 @@ export function createArray(elements) {
   return !elements || Array.isArray(elements) ? elements : [elements];
 }
 
+/**
+ * Method to create a simple Label for a given uri
+ * @param str
+ * @returns {*}
+ */
+export function generateSimpleTransitionLabel(str) {
+  if (str) {
+    const indexOfLastSharp = str.lastIndexOf("#");
+
+    if (indexOfLastSharp != -1 && indexOfLastSharp + 1 < str.length) {
+      return str.substr(indexOfLastSharp + 1);
+    }
+  }
+  return str;
+}
+
 window.toLocalISODateString4dbg = toLocalISODateString;
