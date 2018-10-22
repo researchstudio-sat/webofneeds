@@ -148,6 +148,32 @@ export function setConnectionLoadingAgreementData(
   );
 }
 
+export function setConnectionLoadingPetriNetData(
+  state,
+  connectionUri,
+  isLoadingPetriNetData
+) {
+  const need = connectionUri && selectNeedByConnectionUri(state, connectionUri);
+  const needUri = need && need.get("uri");
+  const connection = need && need.getIn(["connections", connectionUri]);
+
+  if (!connection) {
+    console.error(
+      "no connection with connectionUri: <",
+      connectionUri,
+      "> found within needUri: <",
+      needUri,
+      ">"
+    );
+    return state;
+  }
+
+  return state.setIn(
+    [needUri, "connections", connectionUri, "isLoadingPetriNetData"],
+    isLoadingPetriNetData
+  );
+}
+
 export function markConnectionAsRated(state, connectionUri) {
   let need = connectionUri && selectNeedByConnectionUri(state, connectionUri);
   let connection = need && need.getIn(["connections", connectionUri]);
@@ -283,6 +309,22 @@ export function setShowAgreementData(state, connectionUri, showAgreementData) {
   return state.setIn(
     [needUri, "connections", connectionUri, "showAgreementData"],
     showAgreementData
+  );
+}
+
+export function setShowPetriNetData(state, connectionUri, showPetriNetData) {
+  const need = selectNeedByConnectionUri(state, connectionUri);
+
+  if (!need) {
+    console.error("no need found for connectionUri", connectionUri);
+    return state;
+  }
+
+  const needUri = need.get("uri");
+
+  return state.setIn(
+    [needUri, "connections", connectionUri, "showPetriNetData"],
+    showPetriNetData
   );
 }
 

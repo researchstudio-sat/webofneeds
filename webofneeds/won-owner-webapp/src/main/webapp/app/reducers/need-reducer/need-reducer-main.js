@@ -32,6 +32,7 @@ import {
   markConnectionAsRated,
   setConnectionLoadingMessages,
   setConnectionLoadingAgreementData,
+  setConnectionLoadingPetriNetData,
   markConnectionAsRead,
   selectNeedByConnectionUri,
   changeConnectionState,
@@ -40,6 +41,7 @@ import {
   updateAgreementStateData,
   updatePetriNetStateData,
   setShowAgreementData,
+  setShowPetriNetData,
   setMultiSelectType,
 } from "./reduce-connections.js";
 
@@ -554,11 +556,23 @@ export default function(allNeedsInState = initialState, action = {}) {
         action.payload.connectionUri,
         action.payload.agreementData
       );
+    case actionTypes.connections.setLoadingPetriNetData:
+      return setConnectionLoadingPetriNetData(
+        allNeedsInState,
+        action.payload.connectionUri,
+        action.payload.isLoadingPetriNetData
+      );
     case actionTypes.connections.setLoadingAgreementData:
       return setConnectionLoadingAgreementData(
         allNeedsInState,
         action.payload.connectionUri,
         action.payload.isLoadingAgreementData
+      );
+    case actionTypes.connections.showPetriNetData:
+      return setShowPetriNetData(
+        allNeedsInState,
+        action.payload.connectionUri,
+        action.payload.showPetriNetData
       );
     case actionTypes.connections.showAgreementData:
       return setShowAgreementData(

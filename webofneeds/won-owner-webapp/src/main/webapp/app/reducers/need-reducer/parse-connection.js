@@ -33,8 +33,10 @@ export function parseConnection(jsonldConnection) {
       isRated: false,
       isLoadingMessages: false,
       isLoadingAgreementData: false,
+      isLoadingPetriNetData: false,
       isLoading: false,
       showAgreementData: false,
+      showPetriNetData: false,
       multiSelectType: undefined,
     },
   };

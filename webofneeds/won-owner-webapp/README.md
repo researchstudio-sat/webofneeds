@@ -161,8 +161,10 @@ $ngRedux.getState();
                petriNetData: Immutable.Map, //default is empty Map
                isLoadingMessages: true|false, //default is false, whether or not this connection is currently loading messages or processing agreements
                isLoadingAgreementData: true|false, //default is false, whether or not the agreementData has been loaded,
+               isLoadingPetriNetData: true|false, //default is false, whether or not the petriNetData has been loaded,
                isLoading: true|false, //default is false, whether or not this connection is currently loading itself (similar to the isLoading in the need)
                showAgreementData: true|false // default is false, whether or not the agreementDataPanel is active
+               showPetriNetData: true|false // defautl is false, whether or not the petriNetDataPanel is active
                multiSelectType: String // default is undefined, indicates which action is supposed to happen for the multiselect messages
                unread: true|false, //whether or not this connection is new (or already seen if you will)
                isRated: true|false, //whether or not this connection has been rated yet
