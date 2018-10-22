@@ -42,6 +42,7 @@ import {
   updatePetriNetStateData,
   setShowAgreementData,
   setShowPetriNetData,
+  setPetriNetDataDirty,
   setMultiSelectType,
 } from "./reduce-connections.js";
 
@@ -596,6 +597,18 @@ export default function(allNeedsInState = initialState, action = {}) {
       return addMessage(allNeedsInState, action.payload);
 
     case actionTypes.connections.sendChatMessageClaimOnSuccess:
+    case actionTypes.connections.sendChatMessageRefreshDataOnSuccess: {
+      const allNeedsInStateWithDirtyPetriNetData = setPetriNetDataDirty(
+        allNeedsInState,
+        action.payload.optimisticEvent.getSender(),
+        true
+      );
+      return addMessage(
+        allNeedsInStateWithDirtyPetriNetData,
+        action.payload.optimisticEvent
+      );
+    }
+
     case actionTypes.connections.sendChatMessage:
       // ADD SENT TEXT MESSAGE
       /*
