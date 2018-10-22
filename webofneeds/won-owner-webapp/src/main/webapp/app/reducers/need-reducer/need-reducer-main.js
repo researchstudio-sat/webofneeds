@@ -595,6 +595,7 @@ export default function(allNeedsInState = initialState, action = {}) {
       // payload; { events }
       return addMessage(allNeedsInState, action.payload);
 
+    case actionTypes.connections.sendChatMessageClaimOnSuccess:
     case actionTypes.connections.sendChatMessage:
       // ADD SENT TEXT MESSAGE
       /*
