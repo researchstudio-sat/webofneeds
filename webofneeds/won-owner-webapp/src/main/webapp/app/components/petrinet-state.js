@@ -41,7 +41,7 @@ function genComponentConf() {
               </div>
               <!-- The button is labelled 'send' at the moment because we jsut send the transition but not claim it right away -->
               <button class="ps__active__enabledTransition__button won-button--filled thin red"
-                ng-disabled="self.multiSelectType"
+                ng-disabled="self.multiSelectType || self.isDirty"
                 ng-click="self.sendClaim(enabledTransition)">
                   Claim
               </button>
@@ -69,12 +69,15 @@ function genComponentConf() {
           connectionUri && selectNeedByConnectionUri(state, connectionUri);
         const connection = need && need.getIn(["connections", connectionUri]);
 
+        const petriNetData = connection && connection.get("petriNetData");
+
         const process =
           this.processUri &&
-          connection &&
-          connection.getIn(["petriNetData", "data", this.processUri]);
+          petriNetData &&
+          petriNetData.getIn(["data", this.processUri]);
 
-        const isLoading = false; //TODO: Implement Loading in state first
+        const isLoading = connection && connection.get("isLoadingPetriNetData");
+        const isDirty = petriNetData && petriNetData.get("isDirty");
         const markedPlaces = process && process.get("markedPlaces");
         const enabledTransitions = process && process.get("enabledTransitions");
 
@@ -92,6 +95,7 @@ function genComponentConf() {
           enabledTransitionsArray:
             enabledTransitions && enabledTransitions.toArray(),
           markedPlacesArray: markedPlaces && markedPlaces.toArray(),
+          isDirty: isDirty,
           isLoading: isLoading,
         };
       };
