@@ -161,6 +161,7 @@ $ngRedux.getState();
                petriNetData: {
                     data: Immutable.Map(),
                     isLoaded: true|false //default is false, whether or not the petriNetData has been loaded already
+                    isDirty: true|false //default is false, whether or not the currently stored petriNetData is (assumed to be) not correct anymore
                },
                isLoadingMessages: true|false, //default is false, whether or not this connection is currently loading messages or processing agreements
                isLoadingAgreementData: true|false, //default is false, whether or not the agreementData has been loaded,
