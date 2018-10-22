@@ -261,10 +261,15 @@ export function updatePetriNetStateData(state, connectionUri, petriNetData) {
 
   const needUri = need.get("uri");
 
-  return state.setIn(
-    [needUri, "connections", connectionUri, "petriNetData"],
-    petriNetData
-  );
+  return state
+    .setIn(
+      [needUri, "connections", connectionUri, "petriNetData"],
+      petriNetData
+    )
+    .setIn(
+      [needUri, "connections", connectionUri, "isLoadingPetriNetData"],
+      false
+    );
 }
 
 export function updateAgreementStateData(state, connectionUri, agreementData) {
@@ -274,7 +279,7 @@ export function updateAgreementStateData(state, connectionUri, agreementData) {
     console.error(
       "no need found for connectionUri",
       connectionUri,
-      " or no petriNetData present"
+      " or no agreementData present"
     );
     return state;
   }

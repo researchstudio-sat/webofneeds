@@ -58,6 +58,12 @@ function genComponentConf() {
                         Show Agreement Data
                     </button>
                     <button
+                        ng-if="self.isConnected && !self.showPetriNetData"
+                        class="won-button--outlined thin red"
+                        ng-click="self.showPetriNetDataField()">
+                        Show PetriNet Data
+                    </button>
+                    <button
                         ng-if="self.isConnected || self.isSuggested"
                         class="won-button--filled red"
                         ng-click="self.closeConnection()">
@@ -142,6 +148,7 @@ function genComponentConf() {
     bindToController: true, //scope-bindings -> ctrl
     scope: {
       showAgreementDataField: "&",
+      showPetriNetDataField: "&",
     },
     template: template,
   };

@@ -34,7 +34,7 @@ const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 
 function genComponentConf() {
   let template = `
-        <div class="pm__header" ng-if="!self.showAgreementData">
+        <div class="pm__header" ng-if="self.showChatData">
             <a class="pm__header__back clickable"
                ng-click="self.router__stateGoCurrent({connectionUri : undefined})">
                 <svg style="--local-primary:var(--won-primary-color);"
@@ -47,7 +47,7 @@ function genComponentConf() {
                 timestamp="self.lastUpdateTimestamp"
                 hide-image="::false">
             </won-connection-header>
-            <won-connection-context-dropdown ng-if="self.isConnected || self.isSentRequest || self.isReceivedRequest || (self.isSuggested && self.connection.get('isRated'))" show-agreement-data-field="::self.showAgreementDataField()"></won-connection-context-dropdown>
+            <won-connection-context-dropdown ng-if="self.isConnected || self.isSentRequest || self.isReceivedRequest || (self.isSuggested && self.connection.get('isRated'))" show-petri-net-data-field="::self.showPetriNetDataField()" show-agreement-data-field="::self.showAgreementDataField()"></won-connection-context-dropdown>
         </div>
         <div class="pm__header" ng-if="self.showAgreementData">
             <a class="pm__header__back clickable"
@@ -61,11 +61,30 @@ function genComponentConf() {
                 ng-click="self.setShowAgreementData(false)">
               Showing Agreement Data
             </div>
-            <won-connection-context-dropdown ng-if="self.isConnected || self.isSentRequest || self.isReceivedRequest || (self.isSuggested && self.connection.get('isRated'))" show-agreement-data-field="::self.showAgreementDataField()"></won-connection-context-dropdown>
+            <won-connection-context-dropdown ng-if="self.isConnected || self.isSentRequest || self.isReceivedRequest || (self.isSuggested && self.connection.get('isRated'))" show-petri-net-data-field="::self.showPetriNetDataField()" show-agreement-data-field="::self.showAgreementDataField()"></won-connection-context-dropdown>
         </div>
-        <div class="pm__content" ng-class="{'won-agreement-content': self.showAgreementData}">
+        <div class="pm__header" ng-if="self.showPetriNetData">
+            <a class="pm__header__back clickable"
+                ng-click="self.setShowPetriNetData(false)">
+                <svg style="--local-primary:var(--won-primary-color);"
+                     class="pm__header__back__icon clickable">
+                    <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
+                </svg>
+            </a>
+            <div class="pm__header__title clickable"
+                ng-click="self.setShowAgreementData(false)">
+              Showing PetriNet Data
+            </div>
+            <won-connection-context-dropdown ng-if="self.isConnected || self.isSentRequest || self.isReceivedRequest || (self.isSuggested && self.connection.get('isRated'))" show-petri-net-data-field="::self.showPetriNetDataField()" show-agreement-data-field="::self.showAgreementDataField()"></won-connection-context-dropdown>
+        </div>
+        <div
+          class="pm__content"
+          ng-class="{
+            'won-agreement-content': self.showAgreementData,
+            'won-petrinet-content': self.showPetriNetData,
+          }">
             <div class="pm__content__unreadindicator"
-              ng-if="self.unreadMessageCount && (!self._snapBottom || self.showAgreementData)">
+              ng-if="self.unreadMessageCount && (!self._snapBottom || !self.showChatView)">
               <div class="pm__content__unreadindicator__content won-button--filled red"
                 ng-click="self.goToUnreadMessages()">
                 {{self.unreadMessageCount}} unread Messages
@@ -73,11 +92,11 @@ function genComponentConf() {
             </div>
             <won-post-content-message
               class="won-cm--left"
-              ng-if="!self.showAgreementData && !self.multiSelectType && self.theirNeedUri"
+              ng-if="self.showChatData && !self.multiSelectType && self.theirNeedUri"
               post-uri="self.theirNeedUri">
             </won-post-content-message>
             <div class="pm__content__loadspinner"
-                ng-if="self.isLoadingMessages || (self.showAgreementData && self.isLoadingAgreementData)">
+                ng-if="self.isLoadingMessages || (self.showAgreementData && self.isLoadingAgreementData) || (self.showPetriNetData && self.isLoadingPetriNetData)">
                 <svg class="hspinner">
                   <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
               </svg>
@@ -85,18 +104,26 @@ function genComponentConf() {
             <div class="pm__content__agreement__loadingtext"  ng-if="self.showAgreementData && self.isLoadingAgreementData">
               Calculating Agreement Status
             </div>
+            <div class="pm__content__petrinet__loadingtext"  ng-if="self.showPetriNetData && self.isLoadingPetriNetData">
+              Calculating PetriNet Status
+            </div>
             <button class="pm__content__loadbutton won-button--outlined thin red"
-                ng-if="!self.isSuggested && !self.showAgreementData && !self.isLoadingMessages && !self.allMessagesLoaded"
+                ng-if="!self.isSuggested && self.showChatData && !self.isLoadingMessages && !self.allMessagesLoaded"
                 ng-click="self.loadPreviousMessages()">
                 Load previous messages
             </button>
+
+            <!-- CHATVIEW SPECIFIC CONTENT START-->
             <won-connection-message
-                ng-if="!self.showAgreementData"
+                ng-if="self.showChatData"
                 ng-click="self.multiSelectType && self.selectMessage(msg)"
                 ng-repeat="msg in self.sortedMessages"
                 connection-uri="self.connectionUri"
                 message-uri="msg.get('uri')">
             </won-connection-message>
+            <!-- CHATVIEW SPECIFIC CONTENT END-->
+
+            <!-- AGREEMENTVIEW SPECIFIC CONTENT START-->
             <div class="pm__content__agreement__emptytext"  ng-if="self.showAgreementData && !(self.hasAgreementMessages || self.hasCancellationPendingMessages || self.hasProposalMessages) && !self.isLoadingAgreementData">
               No Agreements within this Conversation
             </div>
@@ -130,6 +157,14 @@ function genComponentConf() {
               connection-uri="self.connectionUri"
               message-uri="proposal.get('uri')">
             </won-connection-message>
+            <!-- AGREEMENTVIEW SPECIFIC CONTENT END-->
+
+            <!-- PETRINETVIEW SPECIFIC CONTENT START -->
+            <div class="pm__content__agreement__emptytext"  ng-if="self.showPetriNetData && !self.hasPetriNetData && !self.isLoadingPetriNetData">
+              No PetriNet Data within this Conversation
+            </div>
+            <!-- PETRINETVIEW SPECIFIC CONTENT END -->
+
             <a class="rdflink clickable"
                ng-if="self.shouldShowRdf"
                target="_blank"
@@ -224,6 +259,7 @@ function genComponentConf() {
           ).size > 0;
 
         const agreementData = connection && connection.get("agreementData");
+        const petriNetData = connection && connection.get("petriNetData");
 
         const agreementMessages = selectAgreementMessagesByConnectionUri(
           state,
@@ -273,8 +309,18 @@ function genComponentConf() {
           isLoadingMessages: connection && connection.get("isLoadingMessages"),
           isLoadingAgreementData:
             connection && connection.get("isLoadingAgreementData"),
+          isLoadingPetriNetData:
+            connection && connection.get("isLoadingPetriNetData"),
           showAgreementData: connection && connection.get("showAgreementData"),
+          showPetriNetData: connection && connection.get("showPetriNetData"),
+          showChatData:
+            connection &&
+            !(
+              connection.get("showAgreementData") ||
+              connection.get("showPetriNetData")
+            ),
           agreementData,
+          petriNetData,
           agreementDataLoaded: agreementData && agreementData.get("isLoaded"),
           multiSelectType: connection && connection.get("multiSelectType"),
           lastUpdateTimestamp: connection && connection.get("lastUpdateDate"),
@@ -291,6 +337,7 @@ function genComponentConf() {
           // if the connect-message is here, everything else should be as well
           allMessagesLoaded,
           hasAgreementMessages: agreementMessages && agreementMessages.size > 0,
+          hasPetriNetData: petriNetData && petriNetData.size > 0,
           agreementMessagesArray:
             agreementMessages && agreementMessages.toArray(),
           hasProposalMessages: proposalMessages && proposalMessages.size > 0,
@@ -357,6 +404,11 @@ function genComponentConf() {
       //TODO: THIS IS NEEDS TO BE CALLED
       const connectionUri = this.connection && this.connection.get("uri");
       if (connectionUri) {
+        this.connections__setLoadingPetriNetData({
+          connectionUri: connectionUri,
+          isLoadingPetriNetData: true,
+        });
+
         fetchPetriNetUris(connectionUri)
           .then(response => {
             const petriNetData = {};
@@ -375,8 +427,11 @@ function genComponentConf() {
             });
           })
           .catch(error => {
-            console.error("Error: ", error);
-            //TODO: ERROR HANDLING
+            console.error("Error:", error);
+            this.connections__setLoadingPetriNetData({
+              connectionUri: this.connectionUri,
+              isLoadingPetriNetData: false,
+            });
           });
       }
     }
@@ -599,13 +654,26 @@ function genComponentConf() {
     }
 
     showAgreementDataField() {
+      this.setShowPetriNetData(false);
       this.setShowAgreementData(true);
+    }
+
+    showPetriNetDataField() {
+      this.setShowAgreementData(false);
+      this.setShowPetriNetData(true);
     }
 
     setShowAgreementData(value) {
       this.connections__showAgreementData({
         connectionUri: this.connectionUri,
         showAgreementData: value,
+      });
+    }
+
+    setShowPetriNetData(value) {
+      this.connections__showPetriNetData({
+        connectionUri: this.connectionUri,
+        showPetriNetData: value,
       });
     }
 

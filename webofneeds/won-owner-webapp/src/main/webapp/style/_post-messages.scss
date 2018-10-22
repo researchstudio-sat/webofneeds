@@ -117,14 +117,17 @@ won-post-messages {
       text-align: center;
       box-sizing: border-box;
     }
+    &.won-petrinet-content,
     &.won-agreement-content {
       background: $won-lighter-gray;
     }
+    &__petrinet__loadingtext,
     &__agreement__loadingtext {
       font-size: $smallFontSize;
       color: $won-subtitle-gray;
       text-align: center;
     }
+    &__petrinet__emptytext,
     &__agreement__emptytext {
       text-align: center;
       font-size: $normalFontSize;
