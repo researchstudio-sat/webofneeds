@@ -161,11 +161,11 @@ function genComponentConf() {
             <!-- AGREEMENTVIEW SPECIFIC CONTENT END-->
 
             <!-- PETRINETVIEW SPECIFIC CONTENT START -->
-            <div class="pm__content__petrinet__emptytext"  ng-if="self.showPetriNetData && !self.hasPetriNetData && !self.isLoadingPetriNetData">
+            <div class="pm__content__petrinet__emptytext"  ng-if="self.showPetriNetData && !self.isLoadingPetriNetData && !self.hasPetriNetData">
               No PetriNet Data within this Conversation
             </div>
             <div class="pm__content__petrinet__process"
-              ng-if="self.showPetriNetData && self.hasPetriNetData && process.get('processURI')"
+              ng-if="self.showPetriNetData && !self.isLoadingPetriNetData && self.hasPetriNetData && process.get('processURI')"
               ng-repeat="process in self.petriNetDataArray">
               <div class="pm__content__petrinet__process__header">
                 ProcessURI: {{ process.get('processURI') }}
@@ -623,6 +623,9 @@ function genComponentConf() {
     goToUnreadMessages() {
       if (this.showAgreementData) {
         this.setShowAgreementData(false);
+      }
+      if (this.showPetriNedData) {
+        this.setShowPetriNetData(false);
       }
       this.snapToBottom();
     }

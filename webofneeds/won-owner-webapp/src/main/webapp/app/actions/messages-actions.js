@@ -15,6 +15,7 @@ import { getCorrectMessageUri } from "../selectors.js";
 import {
   fetchDataForOwnedNeeds,
   fetchMessageEffects,
+  fetchPetriNetUris,
   isFetchMessageEffectsNeeded,
 } from "../won-message-utils.js";
 
@@ -221,6 +222,50 @@ export function processConnectionMessage(event) {
         "messages",
       ]);
 
+      //PETRINET DATA PART START *********************
+      dispatch({
+        type: actionTypes.connections.setLoadingPetriNetData,
+        payload: {
+          connectionUri: connectionUri,
+          isLoadingPetriNetData: true,
+        },
+      });
+
+      fetchPetriNetUris(connectionUri)
+        .then(response => {
+          console.log(
+            "FETCH PETRINETURIS FOR INCOMING MESSAGE THAT MADE THAT NECESSARY"
+          );
+          const petriNetData = {};
+
+          response.forEach(entry => {
+            if (entry.processURI) {
+              petriNetData[entry.processURI] = entry;
+            }
+          });
+
+          const petriNetDataImm = Immutable.fromJS(petriNetData);
+
+          dispatch({
+            type: actionTypes.connections.updatePetriNetData,
+            payload: {
+              connectionUri: connectionUri,
+              petriNetData: petriNetDataImm,
+            },
+          });
+        })
+        .catch(error => {
+          console.error("Error:", error);
+          dispatch({
+            type: actionTypes.connections.setLoadingPetriNetData,
+            payload: {
+              connectionUri: connectionUri,
+              isLoadingPetriNetData: false,
+            },
+          });
+        });
+
+      //PETRINET DATA PART END **************************
       fetchMessageEffects(connectionUri, event.getMessageUri()).then(
         response => {
           if (response && response.length > 0) {

@@ -43,7 +43,7 @@ function genComponentConf() {
               <button class="ps__active__enabledTransition__button won-button--filled thin red"
                 ng-disabled="self.multiSelectType"
                 ng-click="self.sendClaim(enabledTransition)">
-                  Send
+                  Claim
               </button>
           </div>
           <div class="ps__active__noEnabledTransition" ng-if="!self.hasEnabledTransitions">
@@ -110,7 +110,7 @@ function genComponentConf() {
     }
 
     //TODO: IMPL ADHOC CLAIM
-    sendTransition(transitionUri) {
+    sendClaim(transitionUri) {
       if (transitionUri && this.processUri && this.connectionUri) {
         console.log(
           "send transition 'claim' ",
