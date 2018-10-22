@@ -4,6 +4,7 @@ import angular from "angular";
 import chatTextFieldSimpleModule from "./chat-textfield-simple.js";
 import connectionMessageModule from "./messages/connection-message.js";
 import postContentMessageModule from "./messages/post-content-message.js";
+import petrinetStateModule from "./petrinet-state.js";
 import connectionHeaderModule from "./connection-header.js";
 import labelledHrModule from "./labelled-hr.js";
 import connectionContextDropdownModule from "./connection-context-dropdown.js";
@@ -160,8 +161,19 @@ function genComponentConf() {
             <!-- AGREEMENTVIEW SPECIFIC CONTENT END-->
 
             <!-- PETRINETVIEW SPECIFIC CONTENT START -->
-            <div class="pm__content__agreement__emptytext"  ng-if="self.showPetriNetData && !self.hasPetriNetData && !self.isLoadingPetriNetData">
+            <div class="pm__content__petrinet__emptytext"  ng-if="self.showPetriNetData && !self.hasPetriNetData && !self.isLoadingPetriNetData">
               No PetriNet Data within this Conversation
+            </div>
+            <div class="pm__content__petrinet__process"
+              ng-if="self.showPetriNetData && self.hasPetriNetData && process.get('processURI')"
+              ng-repeat="process in self.petriNetDataArray">
+              <div class="pm__content__petrinet__process__header">
+                ProcessURI: {{ process.get('processURI') }}
+              </div>
+              <won-petrinet-state
+                class="pm__content__petrinet__process__content"
+                process-uri="process.get('processURI')">
+              </won-petrinet-state>
             </div>
             <!-- PETRINETVIEW SPECIFIC CONTENT END -->
 
@@ -175,7 +187,7 @@ function genComponentConf() {
                     <span class="rdflink__label">Connection</span>
             </a>
         </div>
-        <div class="pm__footer" ng-if="self.isConnected">
+        <div class="pm__footer" ng-if="!self.showPetriNetData && self.isConnected">
             <chat-textfield-simple
                 class="pm__footer__chattexfield"
                 placeholder="self.shouldShowRdf? 'Enter TTL...' : 'Your message...'"
@@ -188,11 +200,11 @@ function genComponentConf() {
             >
             </chat-textfield-simple>
         </div>
-        <div class="pm__footer" ng-if="!self.multiSelectType && self.isSentRequest">
+        <div class="pm__footer" ng-if="!self.showPetriNetData && !self.multiSelectType && self.isSentRequest">
             Waiting for them to accept your chat request.
         </div>
 
-        <div class="pm__footer" ng-if="!self.multiSelectType && self.isReceivedRequest">
+        <div class="pm__footer" ng-if="!self.showPetriNetData && !self.multiSelectType && self.isReceivedRequest">
             <chat-textfield-simple
                 class="pm__footer__chattexfield"
                 placeholder="::'Message (optional)'"
@@ -207,7 +219,7 @@ function genComponentConf() {
                 Decline
             </button>
         </div>
-        <div class="pm__footer" ng-if="!self.multiSelectType && self.isSuggested">
+        <div class="pm__footer" ng-if="!self.showPetriNetData && !self.multiSelectType && self.isSuggested">
             <won-feedback-grid ng-if="self.connection && !self.connection.get('isRated')" connection-uri="self.connectionUri"></won-feedback-grid>
 
             <chat-textfield-simple
@@ -321,6 +333,7 @@ function genComponentConf() {
             ),
           agreementData,
           petriNetData,
+          petriNetDataArray: petriNetData && petriNetData.toArray(),
           agreementDataLoaded: agreementData && agreementData.get("isLoaded"),
           multiSelectType: connection && connection.get("multiSelectType"),
           lastUpdateTimestamp: connection && connection.get("lastUpdateDate"),
@@ -792,5 +805,6 @@ export default angular
     connectionContextDropdownModule,
     feedbackGridModule,
     postContentMessageModule,
+    petrinetStateModule,
   ])
   .directive("wonPostMessages", genComponentConf).name;

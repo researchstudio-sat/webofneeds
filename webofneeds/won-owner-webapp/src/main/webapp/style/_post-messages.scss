@@ -133,13 +133,31 @@ won-post-messages {
       font-size: $normalFontSize;
       color: $won-subtitle-gray;
     }
+    &__petrinet__process {
+      display: grid;
+      grid-gap: 0.5rem;
+      padding: 0.5rem;
+      margin: 0 0 1rem 0;
+      border: $thinGrayBorder;
+      background: white;
+      &__header {
+        color: $won-subtitle-gray;
+        border-bottom: $thinGrayBorder;
+        padding-bottom: 0.25rem;
+        word-break: break-all;
+      }
+      &__content {
+      }
+    }
     &__agreement__title {
       color: $won-subtitle-gray;
       font-size: $normalFontSize;
       border-bottom: $thinGrayBorder;
+
       padding-bottom: 0.25rem;
       margin-bottom: 0.25rem;
     }
+
     &__loadbutton, /* just so the button and spinner won't make the chatmessages "jump"*/
     &__loadspinner {
       width: 100%;
