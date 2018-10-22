@@ -333,8 +333,12 @@ function genComponentConf() {
             ),
           agreementData,
           petriNetData,
-          petriNetDataArray: petriNetData && petriNetData.toArray(),
+          petriNetDataArray:
+            petriNetData &&
+            petriNetData.get("data") &&
+            petriNetData.get("data").toArray(),
           agreementDataLoaded: agreementData && agreementData.get("isLoaded"),
+          petriNetDataLoaded: petriNetData && petriNetData.get("isLoaded"),
           multiSelectType: connection && connection.get("multiSelectType"),
           lastUpdateTimestamp: connection && connection.get("lastUpdateDate"),
           isSentRequest:
@@ -350,7 +354,10 @@ function genComponentConf() {
           // if the connect-message is here, everything else should be as well
           allMessagesLoaded,
           hasAgreementMessages: agreementMessages && agreementMessages.size > 0,
-          hasPetriNetData: petriNetData && petriNetData.size > 0,
+          hasPetriNetData:
+            petriNetData &&
+            petriNetData.get("data") &&
+            petriNetData.get("data").size > 0,
           agreementMessagesArray:
             agreementMessages && agreementMessages.toArray(),
           hasProposalMessages: proposalMessages && proposalMessages.size > 0,
@@ -370,6 +377,7 @@ function genComponentConf() {
       this.$scope.$watchGroup(["self.connection"], () => {
         this.ensureMessagesAreLoaded();
         this.ensureAgreementDataIsLoaded();
+        this.ensurePetriNetDataIsLoaded();
         this.ensureMessageStateIsUpToDate();
       });
 
@@ -447,6 +455,49 @@ function genComponentConf() {
             });
           });
       }
+    }
+
+    ensurePetriNetDataIsLoaded(forceFetch = false) {
+      delay(0).then(() => {
+        if (
+          forceFetch ||
+          (this.isConnected &&
+            !this.isLoadingPetriNetData &&
+            !this.petriNetDataLoaded)
+        ) {
+          const connectionUri = this.connection && this.connection.get("uri");
+
+          this.connections__setLoadingPetriNetData({
+            connectionUri: connectionUri,
+            isLoadingPetriNetData: true,
+          });
+
+          fetchPetriNetUris(connectionUri)
+            .then(response => {
+              const petriNetData = {};
+
+              response.forEach(entry => {
+                if (entry.processURI) {
+                  petriNetData[entry.processURI] = entry;
+                }
+              });
+
+              const petriNetDataImm = Immutable.fromJS(petriNetData);
+
+              this.connections__updatePetriNetData({
+                connectionUri: connectionUri,
+                petriNetData: petriNetDataImm,
+              });
+            })
+            .catch(error => {
+              console.error("Error:", error);
+              this.connections__setLoadingPetriNetData({
+                connectionUri: connectionUri,
+                isLoadingPetriNetData: false,
+              });
+            });
+        }
+      });
     }
 
     ensureAgreementDataIsLoaded(forceFetch = false) {

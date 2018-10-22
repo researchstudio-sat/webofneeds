@@ -198,6 +198,7 @@ export function processAgreementMessage(event) {
 export function processConnectionMessage(event) {
   return (dispatch, getState) => {
     if (isFetchMessageEffectsNeeded(event)) {
+      //TODO: INCLUDE PETRINETDATA RETRIEVAL IN HERE
       const _needUri = event.getSenderNeed();
       const isSentEvent = getState().getIn(["needs", _needUri, "ownNeed"]);
 

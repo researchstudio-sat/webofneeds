@@ -158,7 +158,10 @@ $ngRedux.getState();
                    retractedMessageUris: Immutable.Set(),
                    isLoaded: true|false, //default is false, whether or not the agreementData has been loaded already
                },
-               petriNetData: Immutable.Map, //default is empty Map
+               petriNetData: {
+                    data: Immutable.Map(),
+                    isLoaded: true|false //default is false, whether or not the petriNetData has been loaded already
+               },
                isLoadingMessages: true|false, //default is false, whether or not this connection is currently loading messages or processing agreements
                isLoadingAgreementData: true|false, //default is false, whether or not the agreementData has been loaded,
                isLoadingPetriNetData: true|false, //default is false, whether or not the petriNetData has been loaded,

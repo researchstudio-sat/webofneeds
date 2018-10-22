@@ -263,8 +263,12 @@ export function updatePetriNetStateData(state, connectionUri, petriNetData) {
 
   return state
     .setIn(
-      [needUri, "connections", connectionUri, "petriNetData"],
+      [needUri, "connections", connectionUri, "petriNetData", "data"],
       petriNetData
+    )
+    .setIn(
+      [needUri, "connections", connectionUri, "petriNetData", "isLoaded"],
+      true
     )
     .setIn(
       [needUri, "connections", connectionUri, "isLoadingPetriNetData"],

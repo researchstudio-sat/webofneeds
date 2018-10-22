@@ -71,7 +71,7 @@ function genComponentConf() {
         const process =
           this.processUri &&
           connection &&
-          connection.getIn(["petriNetData", this.processUri]);
+          connection.getIn(["petriNetData", "data", this.processUri]);
 
         const isLoading = false; //TODO: Implement Loading in state first
         const markedPlaces = process && process.get("markedPlaces");
