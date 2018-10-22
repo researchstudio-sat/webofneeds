@@ -17,6 +17,7 @@ import {
   fetchMessageEffects,
   fetchPetriNetUris,
   isFetchMessageEffectsNeeded,
+  buildChatMessage,
 } from "../won-message-utils.js";
 
 export function successfulCloseNeed(event) {
@@ -199,7 +200,6 @@ export function processAgreementMessage(event) {
 export function processConnectionMessage(event) {
   return (dispatch, getState) => {
     if (isFetchMessageEffectsNeeded(event)) {
-      //TODO: INCLUDE PETRINETDATA RETRIEVAL IN HERE
       const _needUri = event.getSenderNeed();
       const isSentEvent = getState().getIn(["needs", _needUri, "ownNeed"]);
 
@@ -736,11 +736,73 @@ export function dispatchActionOnFailureOwn(event) {
  */
 export function dispatchActionOnSuccessRemote(event) {
   return (dispatch, getState) => {
+    const messageUri = event.getIsRemoteResponseTo();
+    const connectionUri = event.getReceiver();
+
     const toDispatchList = getState().getIn([
       "messages",
       "dispatchOnSuccessRemote",
-      event.getIsRemoteResponseTo(),
+      messageUri,
     ]);
+
+    const toAutoClaim = getState().getIn([
+      "messages",
+      "claimOnSuccess",
+      messageUri,
+    ]);
+
+    if (toAutoClaim) {
+      const theirConnectionUri = event.getSender();
+      const ownNeedUri = event.getReceiverNeed();
+      const ownNodeUri = event.getReceiverNode();
+      const theirNeedUri = event.getSenderNeed();
+      const theirNodeUri = event.getSenderNode();
+
+      let referencedContentUris = new Map().set("claims", [
+        { "@id": event.getIsRemoteResponseTo() },
+      ]);
+
+      buildChatMessage({
+        chatMessage: undefined,
+        additionalContent: undefined,
+        referencedContentUris: referencedContentUris,
+        connectionUri,
+        ownNeedUri,
+        theirNeedUri,
+        ownNodeUri,
+        theirNodeUri,
+        theirConnectionUri,
+        isTTL: false,
+      })
+        .then(msgData =>
+          Promise.all([
+            won.wonMessageFromJsonLd(msgData.message),
+            msgData.message,
+          ])
+        )
+        .then(([optimisticEvent, jsonldMessage]) => {
+          // dispatch(actionCreators.messages__send(messageData));
+          dispatch({
+            type: actionTypes.connections.sendChatMessage,
+            payload: {
+              eventUri: optimisticEvent.getMessageUri(),
+              message: jsonldMessage,
+              optimisticEvent,
+            },
+          });
+        })
+        .catch(e => {
+          console.error("Error while processing chat message: ", e);
+          dispatch({
+            type: actionTypes.connections.sendChatMessageFailed,
+            payload: {
+              error: e,
+              message: e.message,
+            },
+          });
+        });
+    }
+
     if (toDispatchList) {
       toDispatchList.forEach(d => {
         if (d.type) {
@@ -750,7 +812,7 @@ export function dispatchActionOnSuccessRemote(event) {
           if (d.connectionUri === "responseEvent::receiverUri") {
             dispatch(
               actionCreators.router__stateGoCurrent({
-                connectionUri: event.getReceiver(),
+                connectionUri,
               })
             );
           }
@@ -761,7 +823,7 @@ export function dispatchActionOnSuccessRemote(event) {
     dispatch({
       type: actionTypes.messages.dispatchActionOn.successRemote,
       payload: {
-        eventUri: event.getIsRemoteResponseTo(),
+        eventUri: messageUri,
       },
     });
   };
