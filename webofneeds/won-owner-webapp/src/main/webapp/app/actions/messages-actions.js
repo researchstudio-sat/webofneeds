@@ -751,6 +751,53 @@ export function dispatchActionOnSuccessRemote(event) {
       messageUri,
     ]);
 
+    const toRefreshData = getState().getIn([
+      "messages",
+      "refreshDataOnSuccess",
+      messageUri,
+    ]);
+
+    if (toRefreshData) {
+      dispatch({
+        type: actionTypes.connections.setLoadingPetriNetData,
+        payload: {
+          connectionUri: connectionUri,
+          isLoadingPetriNetData: true,
+        },
+      });
+
+      fetchPetriNetUris(connectionUri)
+        .then(response => {
+          const petriNetData = {};
+
+          response.forEach(entry => {
+            if (entry.processURI) {
+              petriNetData[entry.processURI] = entry;
+            }
+          });
+
+          const petriNetDataImm = Immutable.fromJS(petriNetData);
+
+          dispatch({
+            type: actionTypes.connections.updatePetriNetData,
+            payload: {
+              connectionUri: connectionUri,
+              petriNetData: petriNetDataImm,
+            },
+          });
+        })
+        .catch(error => {
+          console.error("Error:", error);
+          dispatch({
+            type: actionTypes.connections.setLoadingPetriNetData,
+            payload: {
+              connectionUri: connectionUri,
+              isLoadingPetriNetData: false,
+            },
+          });
+        });
+    }
+
     if (toAutoClaim) {
       const theirConnectionUri = event.getSender();
       const ownNeedUri = event.getReceiverNeed();
