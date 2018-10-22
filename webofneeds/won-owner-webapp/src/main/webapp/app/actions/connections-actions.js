@@ -210,7 +210,9 @@ export function connectionsChatMessage(
       .then(([optimisticEvent, jsonldMessage]) => {
         // dispatch(actionCreators.messages__send(messageData));
         dispatch({
-          type: actionTypes.connections.sendChatMessage,
+          type: referencedContentUris
+            ? actionTypes.connections.sendChatMessageRefreshDataOnSuccess
+            : actionTypes.connections.sendChatMessage,
           payload: {
             eventUri: optimisticEvent.getMessageUri(),
             message: jsonldMessage,
