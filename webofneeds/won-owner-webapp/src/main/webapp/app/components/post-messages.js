@@ -97,15 +97,15 @@ function genComponentConf() {
               post-uri="self.theirNeedUri">
             </won-post-content-message>
             <div class="pm__content__loadspinner"
-                ng-if="self.isLoadingMessages || (self.showAgreementData && self.isLoadingAgreementData) || (self.showPetriNetData && self.isLoadingPetriNetData)">
+                ng-if="self.isLoadingMessages || (self.showAgreementData && self.isLoadingAgreementData) || (self.showPetriNetData && self.isLoadingPetriNetData && !self.hasPetriNetData)">
                 <svg class="hspinner">
                   <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
-              </svg>
+                </svg>
             </div>
             <div class="pm__content__agreement__loadingtext"  ng-if="self.showAgreementData && self.isLoadingAgreementData">
               Calculating Agreement Status
             </div>
-            <div class="pm__content__petrinet__loadingtext"  ng-if="self.showPetriNetData && self.isLoadingPetriNetData">
+            <div class="pm__content__petrinet__loadingtext"  ng-if="self.showPetriNetData && self.isLoadingPetriNetData && !self.hasPetriNetData">
               Calculating PetriNet Status
             </div>
             <button class="pm__content__loadbutton won-button--outlined thin red"
@@ -165,7 +165,7 @@ function genComponentConf() {
               No PetriNet Data within this Conversation
             </div>
             <div class="pm__content__petrinet__process"
-              ng-if="self.showPetriNetData && !self.isLoadingPetriNetData && self.hasPetriNetData && process.get('processURI')"
+              ng-if="self.showPetriNetData && (!self.isLoadingPetriNetData || self.hasPetriNetData) && process.get('processURI')"
               ng-repeat="process in self.petriNetDataArray">
               <div class="pm__content__petrinet__process__header">
                 ProcessURI: {{ process.get('processURI') }}
