@@ -105,7 +105,7 @@ const actionHierarchy = {
     rate: cnct.connectionsRate,
     sendChatMessage: cnct.connectionsChatMessage,
     sendChatMessageClaimOnSuccess: cnct.connectionsChatMessageClaimOnSuccess,
-    sendChatMessageRefreshDataOnSuccess: INJ_DEFAULT,
+    sendChatMessageRefreshDataOnSuccess: INJ_DEFAULT, //will be dispatched solely within sendChatMessage (only if chatMessage that is sent contains References)
     sendChatMessageFailed: INJ_DEFAULT,
     showLatestMessages: cnct.showLatestMessages,
     showMoreMessages: cnct.showMoreMessages,
