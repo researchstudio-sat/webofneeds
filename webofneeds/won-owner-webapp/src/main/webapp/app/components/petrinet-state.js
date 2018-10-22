@@ -18,7 +18,7 @@ import "style/_petrinet-state.scss";
 const serviceDependencies = ["$ngRedux", "$scope"];
 function genComponentConf() {
   let template = `
-        <div class="ps__active" ng-if="self.process && !self.isLoading">
+        <div class="ps__active" ng-if="self.process && (self.isLoaded || !self.isLoading)">
           <div class="ps__active__header">
             Marked Places
           </div>
@@ -50,11 +50,14 @@ function genComponentConf() {
             No Enabled Transitions in PetriNet
           </div>
         </div>
-        <div class="ps__inactive" ng-if="!self.process && !self.isLoading">
+        <div class="ps__inactive" ng-if="!self.process && !self.isLoading && self.isLoaded">
             This PetriNet, is not active (yet).
         </div>
-        <div class="ps__loading" ng-if="!self.process && self.isLoading">
-            The PetriNet-State, is currently loading
+        <div class="ps__loading" ng-if="self.isLoaded && (self.isLoading || self.isDirty)">
+            <svg class="ps__loading__spinner">
+              <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
+            </svg>
+            <div class="ps__loading__label">The PetriNet-State, is currently being calculated</div>
         </div>
     `;
 
@@ -77,6 +80,7 @@ function genComponentConf() {
           petriNetData.getIn(["data", this.processUri]);
 
         const isLoading = connection && connection.get("isLoadingPetriNetData");
+        const isLoaded = petriNetData && petriNetData.get("isLoaded");
         const isDirty = petriNetData && petriNetData.get("isDirty");
         const markedPlaces = process && process.get("markedPlaces");
         const enabledTransitions = process && process.get("enabledTransitions");
@@ -89,6 +93,7 @@ function genComponentConf() {
         return {
           connectionUri: connectionUri,
           multiSelectType: connection && connection.get("multiSelectType"),
+          petriNetData: petriNetData,
           process: process,
           hasEnabledTransitions: enabledTransitionsSize > 0,
           hasMarkedPlaces: markedPlacesSize > 0,
@@ -97,6 +102,7 @@ function genComponentConf() {
           markedPlacesArray: markedPlaces && markedPlaces.toArray(),
           isDirty: isDirty,
           isLoading: isLoading,
+          isLoaded: isLoaded,
         };
       };
 
