@@ -219,6 +219,7 @@ const actionHierarchy = {
       markAsCollapsed: INJ_DEFAULT,
       markAsSelected: INJ_DEFAULT,
       markShowActions: INJ_DEFAULT,
+      markExpandReference: INJ_DEFAULT,
     },
     updateMessageStatus: messages.updateMessageStatus,
     processConnectionMessage: messages.processConnectionMessage,

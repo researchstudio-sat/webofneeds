@@ -209,6 +209,46 @@ export function markMessageAsCollapsed(
   );
 }
 
+export function markMessageExpandReferences(
+  state,
+  messageUri,
+  connectionUri,
+  needUri,
+  isExpanded,
+  reference
+) {
+  const need = state.get(needUri);
+  const connection = need && need.getIn(["connections", connectionUri]);
+  const message = connection && connection.getIn(["messages", messageUri]);
+
+  if (!message) {
+    console.error(
+      "no message with messageUri: <",
+      messageUri,
+      "> found within needUri: <",
+      needUri,
+      "> connectionUri: <",
+      connectionUri,
+      ">"
+    );
+    return state;
+  }
+
+  return state.setIn(
+    [
+      needUri,
+      "connections",
+      connectionUri,
+      "messages",
+      messageUri,
+      "viewState",
+      "expandedReferences",
+      reference,
+    ],
+    isExpanded
+  );
+}
+
 export function markMessageShowActions(
   state,
   messageUri,
