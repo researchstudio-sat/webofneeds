@@ -480,6 +480,20 @@ function genComponentConf() {
           fetchAgreementProtocolUris(this.connection.get("uri"))
             .then(response => {
               console.log("retrieved agreement Protocol Uris: ", response);
+
+              let proposedMessageUris = [];
+              const pendingProposals = response.pendingProposals;
+
+              if (pendingProposals) {
+                pendingProposals.forEach(prop => {
+                  if (prop.proposes) {
+                    proposedMessageUris = proposedMessageUris.concat(
+                      prop.proposes
+                    );
+                  }
+                });
+              }
+
               const agreementData = Immutable.fromJS({
                 agreementUris: Immutable.Set(response.agreementUris),
                 pendingProposalUris: Immutable.Set(
@@ -503,6 +517,8 @@ function genComponentConf() {
                 retractedMessageUris: Immutable.Set(
                   response.retractedMessageUris
                 ),
+                proposedMessageUris: Immutable.Set(proposedMessageUris),
+                claimedMessageUris: Immutable.Set(response.claimedMessageUris),
               });
 
               this.connections__updateAgreementData({
