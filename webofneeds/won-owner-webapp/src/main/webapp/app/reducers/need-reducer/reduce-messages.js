@@ -280,6 +280,57 @@ export function markMessageAsRejected(
           needUri,
           false
         );
+        state = markMessageAsCollapsed(
+          state,
+          correctMessageUri,
+          connectionUri,
+          needUri,
+          false
+        );
+      });
+    }
+
+    const proposesReferences = message.getIn(["references", "proposes"]);
+
+    if (proposesReferences) {
+      proposesReferences.forEach(proposesRef => {
+        const correctMessageUri = getCorrectMessageUri(messages, proposesRef);
+        state = markMessageAsProposed(
+          state,
+          correctMessageUri,
+          connectionUri,
+          needUri,
+          false
+        );
+        state = markMessageAsCollapsed(
+          state,
+          correctMessageUri,
+          connectionUri,
+          needUri,
+          false
+        );
+      });
+    }
+
+    const claimsReferences = message.getIn(["references", "claims"]);
+
+    if (claimsReferences) {
+      claimsReferences.forEach(claimsRef => {
+        const correctMessageUri = getCorrectMessageUri(messages, claimsRef);
+        state = markMessageAsClaimed(
+          state,
+          correctMessageUri,
+          connectionUri,
+          needUri,
+          false
+        );
+        state = markMessageAsCollapsed(
+          state,
+          correctMessageUri,
+          connectionUri,
+          needUri,
+          false
+        );
       });
     }
 
@@ -382,6 +433,57 @@ export function markMessageAsRetracted(
           proposedToCancelRef
         );
         state = markMessageAsCancellationPending(
+          state,
+          correctMessageUri,
+          connectionUri,
+          needUri,
+          false
+        );
+        state = markMessageAsCollapsed(
+          state,
+          correctMessageUri,
+          connectionUri,
+          needUri,
+          false
+        );
+      });
+    }
+
+    const proposesReferences = message.getIn(["references", "proposes"]);
+
+    if (proposesReferences) {
+      proposesReferences.forEach(proposesRef => {
+        const correctMessageUri = getCorrectMessageUri(messages, proposesRef);
+        state = markMessageAsProposed(
+          state,
+          correctMessageUri,
+          connectionUri,
+          needUri,
+          false
+        );
+        state = markMessageAsCollapsed(
+          state,
+          correctMessageUri,
+          connectionUri,
+          needUri,
+          false
+        );
+      });
+    }
+
+    const claimsReferences = message.getIn(["references", "claims"]);
+
+    if (claimsReferences) {
+      claimsReferences.forEach(claimsRef => {
+        const correctMessageUri = getCorrectMessageUri(messages, claimsRef);
+        state = markMessageAsClaimed(
+          state,
+          correctMessageUri,
+          connectionUri,
+          needUri,
+          false
+        );
+        state = markMessageAsCollapsed(
           state,
           correctMessageUri,
           connectionUri,
@@ -520,6 +622,13 @@ export function markMessageAsAccepted(
           proposedToCancelRef
         );
         state = markMessageAsCancelled(
+          state,
+          correctMessageUri,
+          connectionUri,
+          needUri,
+          true
+        );
+        state = markMessageAsCollapsed(
           state,
           correctMessageUri,
           connectionUri,
