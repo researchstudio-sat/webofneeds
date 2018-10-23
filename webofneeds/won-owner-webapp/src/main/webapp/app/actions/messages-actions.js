@@ -233,9 +233,6 @@ export function processConnectionMessage(event) {
 
       fetchPetriNetUris(connectionUri)
         .then(response => {
-          console.log(
-            "FETCH PETRINETURIS FOR INCOMING MESSAGE THAT MADE THAT NECESSARY"
-          );
           const petriNetData = {};
 
           response.forEach(entry => {
@@ -268,7 +265,6 @@ export function processConnectionMessage(event) {
       //PETRINET DATA PART END **************************
       fetchMessageEffects(connectionUri, event.getMessageUri()).then(
         response => {
-          //TODO: ADD CLAIM AND PROPOSE MESSAGE STATE HANDLING!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
           if (response && response.length > 0) {
             console.log("agreement response : ", response);
           }
@@ -299,7 +295,53 @@ export function processConnectionMessage(event) {
                   });
                 }
                 break;
+              case "CLAIMS":
+                if (effect.claims) {
+                  let claimedMessageUris = Array.isArray(effect.claims)
+                    ? effect.claims
+                    : [effect.claims];
+
+                  claimedMessageUris.forEach(claimedMessageUris => {
+                    let messageUri = getCorrectMessageUri(
+                      messages,
+                      claimedMessageUris
+                    );
+                    dispatch({
+                      type: actionTypes.messages.messageStatus.markAsClaimed,
+                      payload: {
+                        messageUri: messageUri,
+                        connectionUri: connectionUri,
+                        needUri: needUri,
+                        claimed: true,
+                      },
+                    });
+                  });
+                }
+                break;
+
               case "PROPOSES":
+                if (effect.proposes) {
+                  let proposedMessageUris = Array.isArray(effect.proposes)
+                    ? effect.proposes
+                    : [effect.proposes];
+
+                  proposedMessageUris.forEach(proposedMessageUri => {
+                    let messageUri = getCorrectMessageUri(
+                      messages,
+                      proposedMessageUri
+                    );
+                    dispatch({
+                      type: actionTypes.messages.messageStatus.markAsProposed,
+                      payload: {
+                        messageUri: messageUri,
+                        connectionUri: connectionUri,
+                        needUri: needUri,
+                        proposed: true,
+                      },
+                    });
+                  });
+                }
+
                 if (effect.proposalType === "CANCELS") {
                   let proposesToCancelUris = Array.isArray(
                     effect.proposesToCancel
