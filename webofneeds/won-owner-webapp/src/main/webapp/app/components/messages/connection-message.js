@@ -21,6 +21,8 @@ import {
   isMessageRejectable,
   isMessageRetractable,
   isMessageAcceptable,
+  isMessageProposed,
+  isMessageClaimed,
   isMessageRejected,
   isMessageAccepted,
   isMessageRetracted,
@@ -164,6 +166,8 @@ function genComponentConf() {
           shouldShowRdf,
           rdfLinkURL,
           isParsable: message.get("isParsable"),
+          isClaimed: isMessageClaimed(this.message),
+          isProposed: isMessageProposed(this.message),
           isAccepted: isMessageAccepted(this.message),
           isRejected: isMessageRejected(this.message),
           isRetracted: isMessageRetracted(this.message),
@@ -214,6 +218,8 @@ function genComponentConf() {
         this
       );
       classOnComponentRoot("won-is-selected", () => this.isSelected, this);
+      classOnComponentRoot("won-is-proposed", () => this.isProposed, this);
+      classOnComponentRoot("won-is-claimed", () => this.isClaimed, this);
       classOnComponentRoot("won-is-rejected", () => this.isRejected, this);
       classOnComponentRoot("won-is-retracted", () => this.isRetracted, this);
       classOnComponentRoot("won-is-accepted", () => this.isAccepted, this);
