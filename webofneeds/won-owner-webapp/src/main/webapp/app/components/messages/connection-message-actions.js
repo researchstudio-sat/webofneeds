@@ -107,13 +107,13 @@ function genComponentConf() {
           ownNeed,
           message,
           multiSelectType: connection && connection.get("multiSelectType"),
-          isProposed: isMessageProposed(this.message),
-          isClaimed: isMessageClaimed(this.message),
-          isAccepted: isMessageAccepted(this.message),
-          isRejected: isMessageRejected(this.message),
-          isRetracted: isMessageRetracted(this.message),
-          isCancellationPending: isMessageCancellationPending(this.message),
-          isCancelled: isMessageCancelled(this.message),
+          isProposed: isMessageProposed(message),
+          isClaimed: isMessageClaimed(message),
+          isAccepted: isMessageAccepted(message),
+          isRejected: isMessageRejected(message),
+          isRetracted: isMessageRetracted(message),
+          isCancellationPending: isMessageCancellationPending(message),
+          isCancelled: isMessageCancelled(message),
           isProposable:
             connection &&
             connection.get("state") === won.WON.Connected &&
