@@ -24,7 +24,7 @@ function genComponentConf() {
             </div>
             <div class="pcg__columns__left__item__value">
               {{ self.persona.getIn(['jsonld', 's:name']) }}
-              (Reputation: <span style="color: var(--won-primary-color)">{{self.ratingStars(3)}}</span>)
+              <span style="color: var(--won-primary-color)">{{self.ratingStars(3)}}</span>
             </div>
           </div>
           <div class="pcg__columns__left__item" ng-if="self.friendlyTimestamp">
