@@ -109,12 +109,14 @@ $ngRedux.getState();
                        messageType: //no default but is always set to the specific message type of the received/sent wonMessage
                        date: date, //creation Date of this message
                        unread: true|false, //whether or not this message is new (or already seen if you will)
+                       forwardMessage: true|false, //default is false, flag to indicate if this is a message coming from another connection, and is referenced in the references->forwards of another message (this is a flag to indicate if the message is visible or not)
                        outgoingMessage: true|false, //flag to indicate if this was an outgoing or incoming message
                        systemMessage: true|false, //flag to indicate if this message came from the system (e.g. hint messages) !wonMessage.isFromOwner() && !wonMessage.getSenderNeed() && wonMessage.getSenderNode(),
                        senderUri: uri //to indicate which need or node sent the message itself, wonMessage.getSenderNeed() || wonMessage.getSenderNode(),
                        content: {
                            text: wonMessage.getTextMessage(),
                            matchScore: wonMessage.getMatchScore(),
+                           [and other details which are parsed from the detail-definitions are stored here]
                        },
                        references: {
                            //These references are parsed in a way that it will always be a list no matter if there is only a single element or an array
@@ -141,7 +143,7 @@ $ngRedux.getState();
                            isCancellationPending: true|false //if the message is pending to be cancelled
                            isCancelled: true|false //if the message was cancelled
                        },
-                       uri: string //unique identifier of this message
+                       uri: string //unique identifier of this message (same as messageUri)
                        isReceivedByOwn: true|false //whether the sent request/message is received by the own server or not (default: false, if its not an outgoingMessage the default is true)
                        isReceivedByRemote: true|false //whether the sent request/message is received by the remote server or not (default: false, if its not an outgoingMessage the default is true)
                        isSelected: true|false //whether or not the message is Selected in the MultiSelect view
