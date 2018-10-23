@@ -399,72 +399,6 @@ export function markMessageAsRejected(
   }
 }
 
-export function updateMessageStatus(
-  state,
-  messageUri,
-  connectionUri,
-  needUri,
-  messageStatus
-) {
-  let need = state.get(needUri);
-  let connection = need && need.getIn(["connections", connectionUri]);
-  let message = connection && connection.getIn(["messages", messageUri]);
-
-  if (!message) {
-    console.error(
-      "no message with messageUri: <",
-      messageUri,
-      "> found within needUri: <",
-      needUri,
-      "> connectionUri: <",
-      connectionUri,
-      ">"
-    );
-    return state;
-  }
-
-  //Check if there is any "positive" messageStatus, we assume that we do not want to display this message "fully"
-  const hasCollapsedMessageState =
-    messageStatus.get("isProposed") ||
-    messageStatus.get("isClaimed") ||
-    messageStatus.get("isAccepted") ||
-    messageStatus.get("isRejected") ||
-    messageStatus.get("isCancelled") ||
-    messageStatus.get("isCancellationPending");
-
-  state = markMessageAsCollapsed(
-    state,
-    messageUri,
-    connectionUri,
-    needUri,
-    hasCollapsedMessageState
-  );
-
-  return state
-    .setIn(
-      [
-        needUri,
-        "connections",
-        connectionUri,
-        "messages",
-        messageUri,
-        "messageStatus",
-      ],
-      messageStatus
-    )
-    .setIn(
-      [
-        needUri,
-        "connections",
-        connectionUri,
-        "messages",
-        messageUri,
-        "isMessageStatusUpToDate",
-      ],
-      true
-    );
-}
-
 export function markMessageAsRetracted(
   state,
   messageUri,
@@ -488,92 +422,78 @@ export function markMessageAsRetracted(
       ">"
     );
     return state;
-  } else {
-    const proposedToCancelReferences = message.getIn([
-      "references",
-      "proposesToCancel",
-    ]);
-
-    if (proposedToCancelReferences) {
-      proposedToCancelReferences.forEach(proposedToCancelRef => {
-        const correctMessageUri = getCorrectMessageUri(
-          messages,
-          proposedToCancelRef
-        );
-        state = markMessageAsCancellationPending(
-          state,
-          correctMessageUri,
-          connectionUri,
-          needUri,
-          false
-        );
-        state = markMessageAsCollapsed(
-          state,
-          correctMessageUri,
-          connectionUri,
-          needUri,
-          false
-        );
-      });
-    }
-
-    const proposesReferences = message.getIn(["references", "proposes"]);
-
-    if (proposesReferences) {
-      proposesReferences.forEach(proposesRef => {
-        const correctMessageUri = getCorrectMessageUri(messages, proposesRef);
-        state = markMessageAsProposed(
-          state,
-          correctMessageUri,
-          connectionUri,
-          needUri,
-          false
-        );
-        state = markMessageAsCollapsed(
-          state,
-          correctMessageUri,
-          connectionUri,
-          needUri,
-          false
-        );
-      });
-    }
-
-    const claimsReferences = message.getIn(["references", "claims"]);
-
-    if (claimsReferences) {
-      claimsReferences.forEach(claimsRef => {
-        const correctMessageUri = getCorrectMessageUri(messages, claimsRef);
-        state = markMessageAsClaimed(
-          state,
-          correctMessageUri,
-          connectionUri,
-          needUri,
-          false
-        );
-        state = markMessageAsCollapsed(
-          state,
-          correctMessageUri,
-          connectionUri,
-          needUri,
-          false
-        );
-      });
-    }
-
-    return state.setIn(
-      [
-        needUri,
-        "connections",
-        connectionUri,
-        "messages",
-        messageUri,
-        "messageStatus",
-        "isRetracted",
-      ],
-      retracted
-    );
   }
+  const proposedToCancelReferences = message.getIn([
+    "references",
+    "proposesToCancel",
+  ]);
+
+  if (proposedToCancelReferences) {
+    proposedToCancelReferences.forEach(proposedToCancelRef => {
+      const correctMessageUri = getCorrectMessageUri(
+        messages,
+        proposedToCancelRef
+      );
+      state = markMessageAsCancellationPending(
+        state,
+        correctMessageUri,
+        connectionUri,
+        needUri,
+        false
+      );
+    });
+  }
+
+  const proposesReferences = message.getIn(["references", "proposes"]);
+
+  if (proposesReferences) {
+    proposesReferences.forEach(proposesRef => {
+      const correctMessageUri = getCorrectMessageUri(messages, proposesRef);
+      state = markMessageAsProposed(
+        state,
+        correctMessageUri,
+        connectionUri,
+        needUri,
+        false
+      );
+    });
+  }
+
+  const claimsReferences = message.getIn(["references", "claims"]);
+
+  if (claimsReferences) {
+    claimsReferences.forEach(claimsRef => {
+      const correctMessageUri = getCorrectMessageUri(messages, claimsRef);
+      state = markMessageAsClaimed(
+        state,
+        correctMessageUri,
+        connectionUri,
+        needUri,
+        false
+      );
+    });
+  }
+
+  state = markMessageAsCollapsed(
+    state,
+    messageUri,
+    connectionUri,
+    needUri,
+    retracted
+  );
+
+  return state.setIn(
+    [
+      needUri,
+      "connections",
+      connectionUri,
+      "messages",
+      messageUri,
+      "messageStatus",
+      "isRetracted",
+    ],
+    retracted
+  );
 }
 
 export function markMessageAsClaimed(
@@ -864,4 +784,70 @@ export function markMessageAsCancellationPending(
     ],
     cancellationPending
   );
+}
+
+export function updateMessageStatus(
+  state,
+  messageUri,
+  connectionUri,
+  needUri,
+  messageStatus
+) {
+  let need = state.get(needUri);
+  let connection = need && need.getIn(["connections", connectionUri]);
+  let message = connection && connection.getIn(["messages", messageUri]);
+
+  if (!message) {
+    console.error(
+      "no message with messageUri: <",
+      messageUri,
+      "> found within needUri: <",
+      needUri,
+      "> connectionUri: <",
+      connectionUri,
+      ">"
+    );
+    return state;
+  }
+
+  //Check if there is any "positive" messageStatus, we assume that we do not want to display this message "fully"
+  const hasCollapsedMessageState =
+    messageStatus.get("isProposed") ||
+    messageStatus.get("isClaimed") ||
+    messageStatus.get("isAccepted") ||
+    messageStatus.get("isRejected") ||
+    messageStatus.get("isCancelled") ||
+    messageStatus.get("isCancellationPending");
+
+  state = markMessageAsCollapsed(
+    state,
+    messageUri,
+    connectionUri,
+    needUri,
+    hasCollapsedMessageState
+  );
+
+  return state
+    .setIn(
+      [
+        needUri,
+        "connections",
+        connectionUri,
+        "messages",
+        messageUri,
+        "messageStatus",
+      ],
+      messageStatus
+    )
+    .setIn(
+      [
+        needUri,
+        "connections",
+        connectionUri,
+        "messages",
+        messageUri,
+        "isMessageStatusUpToDate",
+      ],
+      true
+    );
 }
