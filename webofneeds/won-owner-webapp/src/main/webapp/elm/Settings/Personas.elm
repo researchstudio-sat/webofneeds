@@ -22,7 +22,7 @@ import Validate exposing (Valid, Validator)
 
 
 main =
-    Browser.element
+    Skin.skinnedElement
         { init = init
         , update = update
         , view = view
@@ -89,13 +89,11 @@ validatePersona draftToValidate =
 
 type Model
     = Loading
-        { skin : Skin
-        , creating : Maybe Draft
+        { creating : Maybe Draft
         , createQueue : List PersonaData
         }
     | Loaded
-        { skin : Skin
-        , viewState : ViewState
+        { viewState : ViewState
         , createQueue : List PersonaData
         , personas : Dict Url Persona
         }
@@ -111,13 +109,10 @@ type alias Url =
     String
 
 
-init : Value -> ( Model, Cmd Msg )
-init skin =
+init : () -> ( Model, Cmd Msg )
+init () =
     ( Loading
-        { skin =
-            Decode.decodeValue Skin.decoder skin
-                |> Result.withDefault Skin.default
-        , creating = Nothing
+        { creating = Nothing
         , createQueue = []
         }
     , Cmd.none
@@ -135,7 +130,6 @@ type Msg
     | View Url
     | Cancel
     | DraftUpdated Draft
-    | SkinUpdated Skin
     | NoOp
 
 
@@ -179,8 +173,7 @@ update msg model =
 
                 ( ReceivedPersonas newPersonas, _ ) ->
                     ( Loaded
-                        { skin = loadingModel.skin
-                        , viewState =
+                        { viewState =
                             case loadingModel.creating of
                                 Just draft ->
                                     Creating draft
@@ -197,14 +190,6 @@ update msg model =
                     ( Loading
                         { loadingModel
                             | creating = Just newDraft
-                        }
-                    , Cmd.none
-                    )
-
-                ( SkinUpdated skin, _ ) ->
-                    ( Loading
-                        { loadingModel
-                            | skin = skin
                         }
                     , Cmd.none
                     )
@@ -299,14 +284,6 @@ update msg model =
                         _ ->
                             ( model, Cmd.none )
 
-                SkinUpdated skin ->
-                    ( Loaded
-                        { loadedModel
-                            | skin = skin
-                        }
-                    , Cmd.none
-                    )
-
                 NoOp ->
                     ( model, Cmd.none )
 
@@ -334,7 +311,6 @@ subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.batch
         [ Persona.subscription ReceivedPersonas (\_ -> NoOp)
-        , Skin.subscription SkinUpdated (\_ -> NoOp)
         ]
 
 
@@ -342,8 +318,8 @@ subscriptions _ =
 ---- VIEW ----
 
 
-view : Model -> Html Msg
-view model =
+view : Skin -> Model -> Html Msg
+view skin model =
     layout [] <|
         el
             [ padding 20
@@ -356,7 +332,7 @@ view model =
                 --
                 -- Loading
                 --
-                Loading { skin, creating, createQueue } ->
+                Loading { creating, createQueue } ->
                     column
                         [ width fill
                         , spacing 20
@@ -375,7 +351,7 @@ view model =
                 --
                 -- Loaded
                 --
-                Loaded { skin, viewState, personas, createQueue } ->
+                Loaded { viewState, personas, createQueue } ->
                     case viewState of
                         Inactive ->
                             column

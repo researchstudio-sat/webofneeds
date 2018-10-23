@@ -483,7 +483,7 @@ export function currentSkin() {
   const style = getComputedStyle(document.body);
   const getColor = name => {
     const color = Color(style.getPropertyValue(name).trim());
-    return color.rgb().array();
+    return color.rgb().object();
   };
   return {
     primaryColor: getColor("--won-primary-color"),

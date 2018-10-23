@@ -5,11 +5,13 @@ port module Skin exposing
     , decoder
     , default
     , setAlpha
-    , subscription
+    , skinnedElement
     , white
     )
 
+import Browser
 import Element exposing (..)
+import Html exposing (Html)
 import Json.Decode as Decode exposing (Decoder, Error, Value)
 
 
@@ -98,17 +100,97 @@ decoder =
         (Decode.field "subtitleGray" colorDecoder)
 
 
-port skin : (Value -> msg) -> Sub msg
+port skin : (SkinFlags -> msg) -> Sub msg
 
 
-subscription : (Skin -> msg) -> (Error -> msg) -> Sub msg
-subscription tag errorTag =
-    skin
-        (\value ->
-            case Decode.decodeValue decoder value of
-                Ok skin_ ->
-                    tag skin_
+type alias Rgb =
+    { r : Int, g : Int, b : Int }
 
-                Err error ->
-                    errorTag error
-        )
+
+type alias Model model =
+    { skin : Skin
+    , model : model
+    }
+
+
+type Msg msg
+    = MsgReceived msg
+    | SkinReceived Skin
+    | NoOp
+
+
+type alias SkinFlags =
+    { primaryColor : Rgb
+    , lightGray : Rgb
+    , lineGray : Rgb
+    , subtitleGray : Rgb
+    }
+
+
+fromFlags : SkinFlags -> Skin
+fromFlags flags =
+    let
+        frgb { r, g, b } =
+            fromRgb255 { red = r, green = g, blue = b, alpha = 1 }
+    in
+    { primaryColor = frgb flags.primaryColor
+    , lightGray = frgb flags.lightGray
+    , lineGray = frgb flags.lineGray
+    , subtitleGray = frgb flags.subtitleGray
+    }
+
+
+skinnedElement :
+    { init : flags -> ( model, Cmd msg )
+    , update : msg -> model -> ( model, Cmd msg )
+    , subscriptions : model -> Sub msg
+    , view : Skin -> model -> Html msg
+    }
+    -> Program { skin : SkinFlags, flags : flags } (Model model) (Msg msg)
+skinnedElement { init, update, subscriptions, view } =
+    Browser.element
+        { init =
+            \flags ->
+                let
+                    ( model, cmds ) =
+                        init flags.flags
+                in
+                ( { skin = fromFlags flags.skin
+                  , model = model
+                  }
+                , Cmd.map MsgReceived cmds
+                )
+        , update =
+            \msg model ->
+                case msg of
+                    MsgReceived subMsg ->
+                        let
+                            ( subModel, cmds ) =
+                                update subMsg model.model
+                        in
+                        ( { model
+                            | model = subModel
+                          }
+                        , Cmd.map MsgReceived cmds
+                        )
+
+                    SkinReceived skin_ ->
+                        ( { model
+                            | skin = skin_
+                          }
+                        , Cmd.none
+                        )
+
+                    NoOp ->
+                        ( model, Cmd.none )
+        , view =
+            \model ->
+                view model.skin model.model
+                    |> Html.map MsgReceived
+        , subscriptions =
+            \model ->
+                Sub.batch
+                    [ skin (fromFlags >> SkinReceived)
+                    , Sub.map MsgReceived (subscriptions model.model)
+                    ]
+        }

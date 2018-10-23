@@ -1,7 +1,7 @@
 import angular from "angular";
 import { Elm } from "../../elm/PublishButton.elm";
 import "./svg-icon.js";
-import { currentSkin, getPersonas } from "../selectors";
+import { getPersonas, currentSkin } from "../selectors";
 
 function genComponentConf($ngRedux) {
   return {
@@ -14,9 +14,11 @@ function genComponentConf($ngRedux) {
       const elmApp = Elm.PublishButton.init({
         node: element[0],
         flags: {
-          width: window.innerWidth,
-          height: window.innerHeight,
           skin: currentSkin(),
+          flags: {
+            width: window.innerWidth,
+            height: window.innerHeight,
+          },
         },
       });
 
@@ -58,7 +60,8 @@ function genComponentConf($ngRedux) {
           skin: state.getIn(["config", "theme"]),
         };
       })(() => {
-        elmApp.ports.skin.send(currentSkin());
+        const skin = currentSkin();
+        elmApp.ports.skin.send(skin);
       });
 
       elmApp.ports.publishOut.subscribe(url => {
