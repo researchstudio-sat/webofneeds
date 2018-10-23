@@ -27,6 +27,11 @@ won-connection-message {
     background-color: $won-unread;
   }
 
+  &.won-is-collapsed {
+    filter: opacity(25%);
+    @include square-image($postIconSizeCollapsed, 0 0.5rem 0 0);
+  }
+
   &.won-is-loading {
     @include animateOpacityHeartBeat();
 
@@ -96,13 +101,13 @@ won-connection-message {
   &.won-is-accepted {
     //TODO: STYLING
   }
-  &.won-is-rejected,
-  &.won-is-cancellationPending,
-  &.won-is-cancelled {
+  &.won-is-rejected:not(.won-is-collapsed),
+  &.won-is-cancellationPending:not(.won-is-collapsed),
+  &.won-is-cancelled:not(.won-is-collapsed) {
     pointer-events: none;
   }
 
-  &.won-is-retracted {
+  &.won-is-retracted:not(.won-is-collapsed) {
     opacity: 0.35;
     pointer-events: none;
     .won-cm__center__bubble {
@@ -126,6 +131,10 @@ won-connection-message {
       box-sizing: border-box; // background: $won-light-gray;
       background-color: $won-light-gray; // like the error toast-notifications
       color: black;
+
+      &__collapsed {
+        padding: 0.25rem 0.5rem;
+      }
 
       &__carret {
         padding: 0.5rem;
@@ -166,6 +175,7 @@ won-connection-message {
         //TODO: FAILURE MESSAGE STYLING
       }
     }
+
     &.won-cm__center--system,
     &.won-cm__center--nondisplayable {
       // hsla(57, 100%, 95%, 1);
