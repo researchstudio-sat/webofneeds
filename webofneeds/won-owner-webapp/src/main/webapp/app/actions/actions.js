@@ -206,7 +206,6 @@ const actionHierarchy = {
       failure: messages.failedReopenNeed,
     },
     markAsRead: INJ_DEFAULT,
-    setMessageSelected: INJ_DEFAULT,
     messageStatus: {
       markAsProposed: messages.markAsProposed,
       markAsClaimed: messages.markAsClaimed,
@@ -215,6 +214,10 @@ const actionHierarchy = {
       markAsAccepted: messages.markAsAccepted,
       markAsCancelled: messages.markAsCancelled,
       markAsCancellationPending: messages.markAsCancellationPending,
+    },
+    viewState: {
+      markAsCollapsed: INJ_DEFAULT,
+      markAsSelected: INJ_DEFAULT,
     },
     updateMessageStatus: messages.updateMessageStatus,
     processConnectionMessage: messages.processConnectionMessage,
