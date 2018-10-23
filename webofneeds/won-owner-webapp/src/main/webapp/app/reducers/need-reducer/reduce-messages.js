@@ -693,46 +693,53 @@ export function markMessageAsCancelled(
       ">"
     );
     return state;
-  } else {
-    state = state.setIn(
-      [
-        needUri,
-        "connections",
-        connectionUri,
-        "messages",
-        messageUri,
-        "messageStatus",
-        "isCancelled",
-      ],
-      cancelled
-    );
-
-    state = state.setIn(
-      [
-        needUri,
-        "connections",
-        connectionUri,
-        "messages",
-        messageUri,
-        "messageStatus",
-        "isAccepted",
-      ],
-      false
-    );
-
-    return state.setIn(
-      [
-        needUri,
-        "connections",
-        connectionUri,
-        "messages",
-        messageUri,
-        "messageStatus",
-        "isCancellationPending",
-      ],
-      false
-    );
   }
+  state = markMessageAsCollapsed(
+    state,
+    messageUri,
+    connectionUri,
+    needUri,
+    cancelled
+  );
+
+  state = state.setIn(
+    [
+      needUri,
+      "connections",
+      connectionUri,
+      "messages",
+      messageUri,
+      "messageStatus",
+      "isCancelled",
+    ],
+    cancelled
+  );
+
+  state = state.setIn(
+    [
+      needUri,
+      "connections",
+      connectionUri,
+      "messages",
+      messageUri,
+      "messageStatus",
+      "isAccepted",
+    ],
+    false
+  );
+
+  return state.setIn(
+    [
+      needUri,
+      "connections",
+      connectionUri,
+      "messages",
+      messageUri,
+      "messageStatus",
+      "isCancellationPending",
+    ],
+    false
+  );
 }
 
 export function markMessageAsCancellationPending(
