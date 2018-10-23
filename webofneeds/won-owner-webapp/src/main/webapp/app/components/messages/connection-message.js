@@ -87,11 +87,11 @@ function genComponentConf() {
     			      </div>
                 <div class="won-cm__center__bubble__carret clickable"
                     ng-if="!self.isCollapsed && (self.isProposable || self.isClaimable) && !self.multiSelectType"
-                    ng-click="self.showDetail = !self.showDetail">
-                    <svg ng-show="!self.showDetail">
+                    ng-click="self.toggleActions()">
+                    <svg ng-show="!self.showActions">
                         <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
                     </svg>
-                    <svg ng-show="self.showDetail">
+                    <svg ng-show="self.showActions">
                         <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
                     </svg>
                 </div>
@@ -111,8 +111,6 @@ function genComponentConf() {
   class Controller {
     constructor(/* arguments = dependency injections */) {
       attach(this, serviceDependencies, arguments);
-      this.clicked = false;
-      this.showDetail = false;
       this.won = won;
 
       const selectFromState = state => {
@@ -169,6 +167,7 @@ function genComponentConf() {
             message.get("messageType") === won.WONMSG.connectionMessage,
           isSelected: message && message.getIn(["viewState", "isSelected"]),
           isCollapsed: message && message.getIn(["viewState", "isCollapsed"]),
+          showActions: message && message.getIn(["viewState", "showActions"]),
           multiSelectType: connection && connection.get("multiSelectType"),
           shouldShowRdf,
           rdfLinkURL,
@@ -252,6 +251,15 @@ function genComponentConf() {
       }
     }
 
+    toggleActions() {
+      this.messages__viewState__markShowActions({
+        messageUri: this.message.get("uri"),
+        connectionUri: this.connectionUri,
+        needUri: this.ownNeed.get("uri"),
+        showActions: !this.showActions,
+      });
+    }
+
     generateCollapsedLabel() {
       if (this.message) {
         let label;
@@ -292,7 +300,7 @@ function genComponentConf() {
 
     showActionButtons() {
       return (
-        this.showDetail ||
+        this.showActions ||
         hasProposesReferences(this.message) ||
         hasClaimsReferences(this.message) ||
         hasProposesToCancelReferences(this.message)
