@@ -22,9 +22,23 @@ won-referenced-message-content {
     background-color: white;
 
     &__header {
-      font-weight: bold;
+      display: grid;
+      grid-template-columns: 1fr min-content;
       border-bottom: $thinGrayBorder;
+      grid-gap: 0.25rem;
       padding: 0.5rem;
+      align-items: center;
+      cursor: pointer;
+
+      &__label {
+        font-weight: bold;
+      }
+
+      &__carret {
+        svg {
+          @include fixed-square(1rem); // visually center icon on line
+        }
+      }
     }
 
     &__body {
