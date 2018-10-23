@@ -292,6 +292,8 @@ export default function(allNeedsInState = initialState, action = {}) {
               unread: true,
               messageType: won.WONMSG.connectMessage,
               messageStatus: {
+                isProposed: false,
+                isClaimed: false,
                 isRetracted: false,
                 isRejected: false,
                 isAccepted: false,
