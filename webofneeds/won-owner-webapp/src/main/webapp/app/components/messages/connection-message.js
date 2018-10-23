@@ -161,7 +161,7 @@ function genComponentConf() {
           isConnectionMessage:
             message &&
             message.get("messageType") === won.WONMSG.connectionMessage,
-          isSelected: message && message.get("isSelected"),
+          isSelected: message && message.getIn(["viewState", "isSelected"]),
           multiSelectType: connection && connection.get("multiSelectType"),
           shouldShowRdf,
           rdfLinkURL,
