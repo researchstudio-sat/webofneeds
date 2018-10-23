@@ -422,6 +422,24 @@ export function updateMessageStatus(
     );
     return state;
   }
+
+  //Check if there is any "positive" messageStatus, we assume that we do not want to display this message "fully"
+  const hasCollapsedMessageState =
+    messageStatus.get("isProposed") ||
+    messageStatus.get("isClaimed") ||
+    messageStatus.get("isAccepted") ||
+    messageStatus.get("isRejected") ||
+    messageStatus.get("isCancelled") ||
+    messageStatus.get("isCancellationPending");
+
+  state = markMessageAsCollapsed(
+    state,
+    messageUri,
+    connectionUri,
+    needUri,
+    hasCollapsedMessageState
+  );
+
   return state
     .setIn(
       [

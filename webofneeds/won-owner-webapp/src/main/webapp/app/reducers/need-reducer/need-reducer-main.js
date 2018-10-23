@@ -513,23 +513,6 @@ export default function(allNeedsInState = initialState, action = {}) {
         messageStatus
       );
 
-      if (
-        messageStatus.isProposed ||
-        messageStatus.isClaimed ||
-        messageStatus.isAccepted ||
-        messageStatus.isRejected ||
-        messageStatus.isCancelled ||
-        messageStatus.isCancellationPending
-      ) {
-        return markMessageAsCollapsed(
-          allNeedsInStateWithUpdatedStatus,
-          action.payload.messageUri,
-          action.payload.connectionUri,
-          action.payload.needUri,
-          true
-        );
-      }
-
       return allNeedsInStateWithUpdatedStatus;
     }
 
