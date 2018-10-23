@@ -86,6 +86,15 @@ export function parseMessage(
       viewState: {
         isSelected: false,
         isCollapsed: false,
+        expandedReferences: {
+          forwards: true,
+          claims: false,
+          proposes: false,
+          proposesToCancel: false,
+          accepts: false,
+          rejects: false,
+          retracts: false,
+        },
       },
       isMessageStatusUpToDate: false,
       contentGraphTrig: {

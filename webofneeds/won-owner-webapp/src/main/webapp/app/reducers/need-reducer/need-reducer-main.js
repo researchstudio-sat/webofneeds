@@ -29,6 +29,7 @@ import {
   markMessageAsAccepted,
   markMessageAsCancelled,
   markMessageAsCancellationPending,
+  markMessageExpandReferences,
 } from "./reduce-messages.js";
 import {
   addConnectionFull,
@@ -470,6 +471,15 @@ export default function(allNeedsInState = initialState, action = {}) {
         allNeedsInState,
         action.payload.getReceiver(),
         won.WON.Closed
+      );
+    case actionTypes.messages.viewState.markExpandReferences:
+      return markMessageExpandReferences(
+        allNeedsInState,
+        action.payload.messageUri,
+        action.payload.connectionUri,
+        action.payload.needUri,
+        action.payload.isExpanded,
+        action.payload.reference
       );
     case actionTypes.messages.viewState.markAsSelected:
       return markMessageAsSelected(
