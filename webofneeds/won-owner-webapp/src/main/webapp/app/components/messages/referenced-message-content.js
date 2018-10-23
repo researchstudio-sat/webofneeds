@@ -17,7 +17,17 @@ const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
       <div class="refmsgcontent__fragment" ng-if="self.hasClaimUris">
-        <div class="refmsgcontent__fragment__header">Claims {{ self.getCountString(self.claimUrisSize)}}</div>
+        <div class="refmsgcontent__fragment__header" ng-click="self.toggleReferenceExpansion('claims')">
+          <div class="refmsgcontent__fragment__header__label">Claims {{ self.getCountString(self.claimUrisSize)}}</div>
+          <div class="refmsgcontent__fragment__header__carret">
+              <svg ng-show="!self.isReferenceExpanded('claims')">
+                  <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
+              </svg>
+              <svg ng-show="self.isReferenceExpanded('claims')">
+                  <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
+              </svg>
+          </div>
+        </div>
         <div class="refmsgcontent__fragment__body" ng-if="self.isReferenceExpanded('claims')">
           <won-combined-message-content
             ng-click="self.loadMessage(msgUri)"
@@ -32,7 +42,17 @@ function genComponentConf() {
         </div>
       </div>
       <div class="refmsgcontent__fragment" ng-if="self.hasProposeUris">
-        <div class="refmsgcontent__fragment__header">Proposes {{ self.getCountString(self.proposeUrisSize)}}</div>
+        <div class="refmsgcontent__fragment__header" ng-click="self.toggleReferenceExpansion('proposes')">
+          <div class="refmsgcontent__fragment__header__label">Proposes {{ self.getCountString(self.proposeUrisSize)}}</div>
+          <div class="refmsgcontent__fragment__header__carret">
+              <svg ng-show="!self.isReferenceExpanded('proposes')">
+                  <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
+              </svg>
+              <svg ng-show="self.isReferenceExpanded('proposes')">
+                  <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
+              </svg>
+          </div>
+        </div>
         <div class="refmsgcontent__fragment__body" ng-if="self.isReferenceExpanded('proposes')">
           <won-combined-message-content
             ng-click="self.loadMessage(msgUri)"
@@ -47,7 +67,17 @@ function genComponentConf() {
         </div>
       </div>
       <div class="refmsgcontent__fragment" ng-if="self.hasRetractUris">
-        <div class="refmsgcontent__fragment__header">Retracts {{ self.getCountString(self.retractUrisSize)}}</div>
+        <div class="refmsgcontent__fragment__header" ng-click="self.toggleReferenceExpansion('retracts')">
+          <div class="refmsgcontent__fragment__header__label">Retracts {{ self.getCountString(self.retractUrisSize)}}</div>
+          <div class="refmsgcontent__fragment__header__carret clickable">
+              <svg ng-show="!self.isReferenceExpanded('retracts')">
+                  <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
+              </svg>
+              <svg ng-show="self.isReferenceExpanded('retracts')">
+                  <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
+              </svg>
+          </div>
+        </div>
         <div class="refmsgcontent__fragment__body" ng-if="self.isReferenceExpanded('retracts')">
           <won-combined-message-content
             ng-click="self.loadMessage(msgUri)"
@@ -62,7 +92,17 @@ function genComponentConf() {
         </div>
       </div>
       <div class="refmsgcontent__fragment" ng-if="self.hasAcceptUris">
-        <div class="refmsgcontent__fragment__header">Accepts {{ self.getCountString(self.acceptUrisSize)}}</div>
+        <div class="refmsgcontent__fragment__header" ng-click="self.toggleReferenceExpansion('accepts')">
+          <div class="refmsgcontent__fragment__header__label">Accepts {{ self.getCountString(self.acceptUrisSize)}}</div>
+          <div class="refmsgcontent__fragment__header__carret">
+              <svg ng-show="!self.isReferenceExpanded('accepts')">
+                  <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
+              </svg>
+              <svg ng-show="self.isReferenceExpanded('accepts')">
+                  <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
+              </svg>
+          </div>
+        </div>
         <div class="refmsgcontent__fragment__body" ng-if="self.isReferenceExpanded('accepts')">
           <won-combined-message-content
             ng-click="self.loadMessage(msgUri)"
@@ -77,7 +117,17 @@ function genComponentConf() {
         </div>
       </div>
       <div class="refmsgcontent__fragment" ng-if="self.hasProposeToCancelUris">
-        <div class="refmsgcontent__fragment__header">Propose to cancel {{ self.getCountString(self.proposeToCancelUrisSize)}}</div>
+        <div class="refmsgcontent__fragment__header" ng-click="self.toggleReferenceExpansion('proposesToCancel')">
+          <div class="refmsgcontent__fragment__header__label">Propose to cancel {{ self.getCountString(self.proposeToCancelUrisSize)}}</div>
+          <div class="refmsgcontent__fragment__header__carret">
+              <svg ng-show="!self.isReferenceExpanded('proposesToCancel')">
+                  <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
+              </svg>
+              <svg ng-show="self.isReferenceExpanded('proposesToCancel')">
+                  <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
+              </svg>
+          </div>
+        </div>
         <div class="refmsgcontent__fragment__body" ng-if="self.isReferenceExpanded('proposesToCancel')">
           <won-combined-message-content
             ng-click="self.loadMessage(msgUri)"
@@ -92,7 +142,17 @@ function genComponentConf() {
         </div>
       </div>
       <div class="refmsgcontent__fragment" ng-if="self.hasRejectUris">
-        <div class="refmsgcontent__fragment__header">Rejects {{ self.getCountString(self.rejectUrisSize)}}</div>
+        <div class="refmsgcontent__fragment__header" ng-click="self.toggleReferenceExpansion('rejects')">
+          <div class="refmsgcontent__fragment__header__label">Rejects {{ self.getCountString(self.rejectUrisSize)}}</div>
+          <div class="refmsgcontent__fragment__header__carret">
+              <svg ng-show="!self.isReferenceExpanded('rejects')">
+                  <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
+              </svg>
+              <svg ng-show="self.isReferenceExpanded('rejects')">
+                  <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
+              </svg>
+          </div>
+        </div>
         <div class="refmsgcontent__fragment__body" ng-if="self.isReferenceExpanded('rejects')">
           <won-combined-message-content
             ng-click="self.loadMessage(msgUri)"
@@ -107,7 +167,17 @@ function genComponentConf() {
         </div>
       </div>
       <div class="refmsgcontent__fragment" ng-if="self.hasForwardUris">
-        <div class="refmsgcontent__fragment__header">Forwarded {{ self.getCountString(self.forwardUrisSize)}}</div>
+        <div class="refmsgcontent__fragment__header" ng-click="self.toggleReferenceExpansion('forwards')">
+          <div class="refmsgcontent__fragment__header__label">Forwarded {{ self.getCountString(self.forwardUrisSize)}}</div>
+          <div class="refmsgcontent__fragment__header__carret">
+              <svg ng-show="!self.isReferenceExpanded('forwards')">
+                  <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
+              </svg>
+              <svg ng-show="self.isReferenceExpanded('forwards')">
+                  <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
+              </svg>
+          </div>
+        </div>
         <div class="refmsgcontent__fragment__body" ng-if="self.isReferenceExpanded('forwards')">
           <won-combined-message-content
             ng-click="self.loadMessage(msgUri)"

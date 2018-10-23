@@ -472,7 +472,7 @@ export default function(allNeedsInState = initialState, action = {}) {
         action.payload.getReceiver(),
         won.WON.Closed
       );
-    case actionTypes.messages.viewState.markExpandReferences:
+    case actionTypes.messages.viewState.markExpandReference:
       return markMessageExpandReferences(
         allNeedsInState,
         action.payload.messageUri,
