@@ -599,20 +599,27 @@ export function markMessageAsClaimed(
       ">"
     );
     return state;
-  } else {
-    return state.setIn(
-      [
-        needUri,
-        "connections",
-        connectionUri,
-        "messages",
-        messageUri,
-        "messageStatus",
-        "isClaimed",
-      ],
-      claimed
-    );
   }
+  state = markMessageAsCollapsed(
+    state,
+    messageUri,
+    connectionUri,
+    needUri,
+    claimed
+  );
+
+  return state.setIn(
+    [
+      needUri,
+      "connections",
+      connectionUri,
+      "messages",
+      messageUri,
+      "messageStatus",
+      "isClaimed",
+    ],
+    claimed
+  );
 }
 
 export function markMessageAsProposed(
@@ -638,20 +645,28 @@ export function markMessageAsProposed(
       ">"
     );
     return state;
-  } else {
-    return state.setIn(
-      [
-        needUri,
-        "connections",
-        connectionUri,
-        "messages",
-        messageUri,
-        "messageStatus",
-        "isProposed",
-      ],
-      proposed
-    );
   }
+
+  state = markMessageAsCollapsed(
+    state,
+    messageUri,
+    connectionUri,
+    needUri,
+    proposed
+  );
+
+  return state.setIn(
+    [
+      needUri,
+      "connections",
+      connectionUri,
+      "messages",
+      messageUri,
+      "messageStatus",
+      "isProposed",
+    ],
+    proposed
+  );
 }
 
 export function markMessageAsAccepted(
