@@ -365,6 +365,84 @@ export function markMessageAsRetracted(
   }
 }
 
+export function markMessageAsClaimed(
+  state,
+  messageUri,
+  connectionUri,
+  needUri,
+  claimed
+) {
+  let need = state.get(needUri);
+  let connection = need && need.getIn(["connections", connectionUri]);
+  let messages = connection && connection.get("messages");
+  let message = messages && messages.get(messageUri);
+
+  if (!message) {
+    console.error(
+      "no message with messageUri: <",
+      messageUri,
+      "> found within needUri: <",
+      needUri,
+      "> connectionUri: <",
+      connectionUri,
+      ">"
+    );
+    return state;
+  } else {
+    return state.setIn(
+      [
+        needUri,
+        "connections",
+        connectionUri,
+        "messages",
+        messageUri,
+        "messageStatus",
+        "isClaimed",
+      ],
+      claimed
+    );
+  }
+}
+
+export function markMessageAsProposed(
+  state,
+  messageUri,
+  connectionUri,
+  needUri,
+  proposed
+) {
+  let need = state.get(needUri);
+  let connection = need && need.getIn(["connections", connectionUri]);
+  let messages = connection && connection.get("messages");
+  let message = messages && messages.get(messageUri);
+
+  if (!message) {
+    console.error(
+      "no message with messageUri: <",
+      messageUri,
+      "> found within needUri: <",
+      needUri,
+      "> connectionUri: <",
+      connectionUri,
+      ">"
+    );
+    return state;
+  } else {
+    return state.setIn(
+      [
+        needUri,
+        "connections",
+        connectionUri,
+        "messages",
+        messageUri,
+        "messageStatus",
+        "isProposed",
+      ],
+      proposed
+    );
+  }
+}
+
 export function markMessageAsAccepted(
   state,
   messageUri,

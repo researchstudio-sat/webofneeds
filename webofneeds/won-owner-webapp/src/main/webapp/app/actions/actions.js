@@ -208,6 +208,8 @@ const actionHierarchy = {
     markAsRead: INJ_DEFAULT,
     setMessageSelected: INJ_DEFAULT,
     messageStatus: {
+      markAsProposed: messages.markAsProposed,
+      markAsClaimed: messages.markAsClaimed,
       markAsRetracted: messages.markAsRetracted,
       markAsRejected: messages.markAsRejected,
       markAsAccepted: messages.markAsAccepted,

@@ -75,6 +75,8 @@ export function parseMessage(
       senderUri: wonMessage.getSenderNeed() || wonMessage.getSenderNode(),
       messageType: wonMessage.getMessageType(),
       messageStatus: {
+        isProposed: false,
+        isClaimed: false,
         isRetracted: false,
         isRejected: false,
         isAccepted: false,

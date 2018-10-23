@@ -178,7 +178,26 @@ export function connectionsChatMessage(
               });
               break;
             case "claims":
+              dispatch({
+                type: actionTypes.messages.messageStatus.markAsClaimed,
+                payload: {
+                  messageUri: msg.get("uri"),
+                  connectionUri: connectionUri,
+                  needUri: ownNeed.get("uri"),
+                  claimed: true,
+                },
+              });
+              break;
             case "proposes":
+              dispatch({
+                type: actionTypes.messages.messageStatus.markAsProposed,
+                payload: {
+                  messageUri: msg.get("uri"),
+                  connectionUri: connectionUri,
+                  needUri: ownNeed.get("uri"),
+                  proposed: true,
+                },
+              });
               break;
             default:
               console.error("referenced key/type is not valid: ", key);
