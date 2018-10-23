@@ -765,6 +765,15 @@ export function markMessageAsCancellationPending(
     );
     return state;
   }
+
+  state = markMessageAsCollapsed(
+    state,
+    messageUri,
+    connectionUri,
+    needUri,
+    cancellationPending
+  );
+
   return state.setIn(
     [
       needUri,
