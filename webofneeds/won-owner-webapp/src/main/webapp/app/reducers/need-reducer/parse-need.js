@@ -22,6 +22,8 @@ export function parseNeed(jsonldNeed, ownNeed) {
     matchingContexts: undefined,
     searchString: undefined,
     jsonld: jsonldNeed,
+    heldBy: undefined,
+    holds: undefined,
   };
 
   if (jsonldNeedImm) {
@@ -90,10 +92,20 @@ export function parseNeed(jsonldNeed, ownNeed) {
       parsedNeed.state = won.WON.InactiveCompacted;
     }
 
+    parsedNeed.heldBy = jsonldNeedImm.getIn(["won:heldBy", "@id"]);
+
     let isPart = undefined;
     let seeksPart = undefined;
     let type = undefined;
     const detailsToParse = getAllDetails();
+
+    parsedNeed.holds = won.parseListFrom(
+      jsonldNeedImm,
+      ["won:holds"],
+      "xsd:ID"
+    );
+
+    parsedNeed.heldBy = won.parseFrom(jsonldNeedImm, ["won:heldBy"], "xsd:ID");
 
     parsedNeed.types = (rawTypes => {
       if (Immutable.List.isList(rawTypes)) {

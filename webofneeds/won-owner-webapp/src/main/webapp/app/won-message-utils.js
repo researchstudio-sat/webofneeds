@@ -797,8 +797,18 @@ function fetchConnectionAndDispatch(
 
 function fetchTheirNeedAndDispatch(needUri, curriedDispatch = () => undefined) {
   const needP = won.getNeed(needUri);
-  needP.then(need =>
-    curriedDispatch(wellFormedPayload({ theirNeeds: { [needUri]: need } }))
-  );
+  needP.then(need => {
+    if (need["won:heldBy"] && need["won:heldBy"]["@id"]) {
+      const personaUri = need["won:heldBy"]["@id"];
+      won
+        .getNeed(personaUri)
+        .then(personaNeed =>
+          curriedDispatch(
+            wellFormedPayload({ theirNeeds: { [personaUri]: personaNeed } })
+          )
+        );
+    }
+    curriedDispatch(wellFormedPayload({ theirNeeds: { [needUri]: need } }));
+  });
   return needP;
 }

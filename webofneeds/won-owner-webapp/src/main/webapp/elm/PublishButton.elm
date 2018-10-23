@@ -20,7 +20,7 @@ import Url exposing (Url)
 
 
 main =
-    Browser.element
+    Skin.skinnedElement
         { init = init
         , subscriptions = subscriptions
         , update = update
@@ -36,7 +36,6 @@ type alias Model =
     { personas : Dict String Persona
     , state : State
     , selectedPersona : SelectedPersona
-    , skin : Skin
     , options : Options
     , size : Size
     }
@@ -64,14 +63,11 @@ type SelectedPersona
     | Persona String
 
 
-init : { width : Int, height : Int, skin : Value } -> ( Model, Cmd Msg )
-init { width, height, skin } =
+init : { width : Int, height : Int } -> ( Model, Cmd Msg )
+init { width, height } =
     ( { personas = Dict.empty
       , state = Closed
       , selectedPersona = Anonymous
-      , skin =
-            Decode.decodeValue Skin.decoder skin
-                |> Result.withDefault Skin.default
       , options =
             { draftValid = False
             , loggedIn = False
@@ -89,12 +85,9 @@ init { width, height, skin } =
 ---- VIEW ----
 
 
-view : Model -> Html Msg
-view model =
+view : Skin -> Model -> Html Msg
+view skin model =
     let
-        skin =
-            model.skin
-
         buttonColor =
             if model.options.draftValid then
                 skin.primaryColor
@@ -365,7 +358,6 @@ type Msg
     | ReceivedPersonas (Dict String Persona)
     | OptionsUpdated Options
     | Publish
-    | SkinUpdated Skin
     | SizeChanged Size
     | NoOp
 
@@ -443,13 +435,6 @@ update msg model =
             , Cmd.none
             )
 
-        SkinUpdated skin ->
-            ( { model
-                | skin = skin
-              }
-            , Cmd.none
-            )
-
         SizeChanged size ->
             ( { model
                 | size = size
@@ -466,7 +451,6 @@ subscriptions model =
     Sub.batch
         [ Persona.subscription ReceivedPersonas (always NoOp)
         , publishIn OptionsUpdated
-        , Skin.subscription SkinUpdated (\_ -> NoOp)
         , Browser.Events.onResize
             (\width height ->
                 SizeChanged <|
