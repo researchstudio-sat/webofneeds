@@ -598,64 +598,30 @@ export function markMessageAsAccepted(
       ">"
     );
     return state;
-  } else {
-    const proposedToCancelReferences = message.getIn([
-      "references",
-      "proposesToCancel",
-    ]);
+  }
+  const proposedToCancelReferences = message.getIn([
+    "references",
+    "proposesToCancel",
+  ]);
 
-    if (proposedToCancelReferences) {
-      proposedToCancelReferences.forEach(proposedToCancelRef => {
-        const correctMessageUri = getCorrectMessageUri(
-          messages,
-          proposedToCancelRef
-        );
-        state = markMessageAsCancelled(
-          state,
-          correctMessageUri,
-          connectionUri,
-          needUri,
-          true
-        );
-        state = markMessageAsCollapsed(
-          state,
-          correctMessageUri,
-          connectionUri,
-          needUri,
-          true
-        );
-      });
-    }
-
-    if (accepted) {
-      state = state.setIn(
-        [
-          needUri,
-          "connections",
-          connectionUri,
-          "messages",
-          messageUri,
-          "messageStatus",
-          "isCancelled",
-        ],
-        false
+  if (proposedToCancelReferences) {
+    proposedToCancelReferences.forEach(proposedToCancelRef => {
+      const correctMessageUri = getCorrectMessageUri(
+        messages,
+        proposedToCancelRef
       );
-
-      state = state.setIn(
-        [
-          needUri,
-          "connections",
-          connectionUri,
-          "messages",
-          messageUri,
-          "messageStatus",
-          "isCancellationPending",
-        ],
-        false
+      state = markMessageAsCancelled(
+        state,
+        correctMessageUri,
+        connectionUri,
+        needUri,
+        true
       );
-    }
+    });
+  }
 
-    return state.setIn(
+  if (accepted) {
+    state = state.setIn(
       [
         needUri,
         "connections",
@@ -663,11 +629,45 @@ export function markMessageAsAccepted(
         "messages",
         messageUri,
         "messageStatus",
-        "isAccepted",
+        "isCancelled",
       ],
-      accepted
+      false
+    );
+
+    state = state.setIn(
+      [
+        needUri,
+        "connections",
+        connectionUri,
+        "messages",
+        messageUri,
+        "messageStatus",
+        "isCancellationPending",
+      ],
+      false
     );
   }
+
+  state = markMessageAsCollapsed(
+    state,
+    messageUri,
+    connectionUri,
+    needUri,
+    accepted
+  );
+
+  return state.setIn(
+    [
+      needUri,
+      "connections",
+      connectionUri,
+      "messages",
+      messageUri,
+      "messageStatus",
+      "isAccepted",
+    ],
+    accepted
+  );
 }
 
 export function markMessageAsCancelled(
