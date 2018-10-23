@@ -493,14 +493,37 @@ export default function(allNeedsInState = initialState, action = {}) {
         action.payload.connectionUri,
         action.payload.needUri
       );
-    case actionTypes.messages.updateMessageStatus:
-      return updateMessageStatus(
+    case actionTypes.messages.updateMessageStatus: {
+      const messageStatus = action.payload.messageStatus;
+
+      const allNeedsInStateWithUpdatedStatus = updateMessageStatus(
         allNeedsInState,
         action.payload.messageUri,
         action.payload.connectionUri,
         action.payload.needUri,
-        action.payload.messageStatus
+        messageStatus
       );
+
+      if (
+        messageStatus.isProposed ||
+        messageStatus.isClaimed ||
+        messageStatus.isAccepted ||
+        messageStatus.isRejected ||
+        messageStatus.isCancelled ||
+        messageStatus.isCancellationPending
+      ) {
+        return markMessageAsCollapsed(
+          allNeedsInStateWithUpdatedStatus,
+          action.payload.messageUri,
+          action.payload.connectionUri,
+          action.payload.needUri,
+          true
+        );
+      }
+
+      return allNeedsInStateWithUpdatedStatus;
+    }
+
     case actionTypes.messages.messageStatus.markAsProposed: {
       const allNeedsInStateMarkedProposed = markMessageAsProposed(
         allNeedsInState,
@@ -516,7 +539,7 @@ export default function(allNeedsInState = initialState, action = {}) {
           action.payload.messageUri,
           action.payload.connectionUri,
           action.payload.needUri,
-          action.payload.proposed
+          true
         );
       }
       return allNeedsInStateMarkedProposed;
@@ -537,7 +560,7 @@ export default function(allNeedsInState = initialState, action = {}) {
           action.payload.messageUri,
           action.payload.connectionUri,
           action.payload.needUri,
-          action.payload.claimed
+          true
         );
       }
       return allNeedsInStateMarkedClaimed;
@@ -558,7 +581,7 @@ export default function(allNeedsInState = initialState, action = {}) {
           action.payload.messageUri,
           action.payload.connectionUri,
           action.payload.needUri,
-          action.payload.rejected
+          true
         );
       }
       return allNeedsInStateMarkedRejected;
@@ -579,7 +602,7 @@ export default function(allNeedsInState = initialState, action = {}) {
           action.payload.messageUri,
           action.payload.connectionUri,
           action.payload.needUri,
-          action.payload.retracted
+          true
         );
       }
       return allNeedsInStateMarkedRetracted;
@@ -600,7 +623,7 @@ export default function(allNeedsInState = initialState, action = {}) {
           action.payload.messageUri,
           action.payload.connectionUri,
           action.payload.needUri,
-          action.payload.accepted
+          true
         );
       }
       return allNeedsInStateMarkedAccepted;
@@ -621,7 +644,7 @@ export default function(allNeedsInState = initialState, action = {}) {
           action.payload.messageUri,
           action.payload.connectionUri,
           action.payload.needUri,
-          action.payload.cancelled
+          true
         );
       }
       return allNeedsInStateMarkedCancelled;
@@ -642,7 +665,7 @@ export default function(allNeedsInState = initialState, action = {}) {
           action.payload.messageUri,
           action.payload.connectionUri,
           action.payload.needUri,
-          action.payload.cancellationPending
+          true
         );
       }
       return allNeedsInStateMarkedCancellationPending;
