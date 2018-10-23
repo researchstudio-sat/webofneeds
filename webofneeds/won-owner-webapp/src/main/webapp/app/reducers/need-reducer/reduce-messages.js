@@ -311,92 +311,78 @@ export function markMessageAsRejected(
       ">"
     );
     return state;
-  } else {
-    const proposedToCancelReferences = message.getIn([
-      "references",
-      "proposesToCancel",
-    ]);
-
-    if (proposedToCancelReferences) {
-      proposedToCancelReferences.forEach(proposedToCancelRef => {
-        const correctMessageUri = getCorrectMessageUri(
-          messages,
-          proposedToCancelRef
-        );
-        state = markMessageAsCancellationPending(
-          state,
-          correctMessageUri,
-          connectionUri,
-          needUri,
-          false
-        );
-        state = markMessageAsCollapsed(
-          state,
-          correctMessageUri,
-          connectionUri,
-          needUri,
-          false
-        );
-      });
-    }
-
-    const proposesReferences = message.getIn(["references", "proposes"]);
-
-    if (proposesReferences) {
-      proposesReferences.forEach(proposesRef => {
-        const correctMessageUri = getCorrectMessageUri(messages, proposesRef);
-        state = markMessageAsProposed(
-          state,
-          correctMessageUri,
-          connectionUri,
-          needUri,
-          false
-        );
-        state = markMessageAsCollapsed(
-          state,
-          correctMessageUri,
-          connectionUri,
-          needUri,
-          false
-        );
-      });
-    }
-
-    const claimsReferences = message.getIn(["references", "claims"]);
-
-    if (claimsReferences) {
-      claimsReferences.forEach(claimsRef => {
-        const correctMessageUri = getCorrectMessageUri(messages, claimsRef);
-        state = markMessageAsClaimed(
-          state,
-          correctMessageUri,
-          connectionUri,
-          needUri,
-          false
-        );
-        state = markMessageAsCollapsed(
-          state,
-          correctMessageUri,
-          connectionUri,
-          needUri,
-          false
-        );
-      });
-    }
-
-    return state.setIn(
-      [
-        needUri,
-        "connections",
-        connectionUri,
-        "messages",
-        messageUri,
-        "messageStatus",
-        "isRejected",
-      ],
-      rejected
-    );
   }
+  const proposedToCancelReferences = message.getIn([
+    "references",
+    "proposesToCancel",
+  ]);
+
+  if (proposedToCancelReferences) {
+    proposedToCancelReferences.forEach(proposedToCancelRef => {
+      const correctMessageUri = getCorrectMessageUri(
+        messages,
+        proposedToCancelRef
+      );
+      state = markMessageAsCancellationPending(
+        state,
+        correctMessageUri,
+        connectionUri,
+        needUri,
+        false
+      );
+    });
+  }
+
+  const proposesReferences = message.getIn(["references", "proposes"]);
+
+  if (proposesReferences) {
+    proposesReferences.forEach(proposesRef => {
+      const correctMessageUri = getCorrectMessageUri(messages, proposesRef);
+      state = markMessageAsProposed(
+        state,
+        correctMessageUri,
+        connectionUri,
+        needUri,
+        false
+      );
+    });
+  }
+
+  const claimsReferences = message.getIn(["references", "claims"]);
+
+  if (claimsReferences) {
+    claimsReferences.forEach(claimsRef => {
+      const correctMessageUri = getCorrectMessageUri(messages, claimsRef);
+      state = markMessageAsClaimed(
+        state,
+        correctMessageUri,
+        connectionUri,
+        needUri,
+        false
+      );
+    });
+  }
+
+  state = markMessageAsCollapsed(
+    state,
+    messageUri,
+    connectionUri,
+    needUri,
+    rejected
+  );
+
+  return state.setIn(
+    [
+      needUri,
+      "connections",
+      connectionUri,
+      "messages",
+      messageUri,
+      "messageStatus",
+      "isRejected",
+    ],
+    rejected
+  );
 }
 
 export function markMessageAsRetracted(
