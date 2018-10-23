@@ -143,10 +143,13 @@ $ngRedux.getState();
                            isCancellationPending: true|false //if the message is pending to be cancelled
                            isCancelled: true|false //if the message was cancelled
                        },
+                       viewState: {
+                           //TODO: everything in this state should be extracted into its own (view/ui)-state, this is only here so we do not have a huge (fail prone refactoring shortly before the codefreeze)
+                           isSelected: true|false //whether or not the message is Selected in the MultiSelect view
+                       }
                        uri: string //unique identifier of this message (same as messageUri)
                        isReceivedByOwn: true|false //whether the sent request/message is received by the own server or not (default: false, if its not an outgoingMessage the default is true)
                        isReceivedByRemote: true|false //whether the sent request/message is received by the remote server or not (default: false, if its not an outgoingMessage the default is true)
-                       isSelected: true|false //whether or not the message is Selected in the MultiSelect view
                        failedToSend: true|false //whether the sent message failed for whatever reason (default: false, only relevant in outgoingMessages)
                    }
                    ...

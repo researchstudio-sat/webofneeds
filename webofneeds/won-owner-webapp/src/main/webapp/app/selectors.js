@@ -422,7 +422,9 @@ export function selectClaimableMessagesByConnectionUri(state, connectionUri) {
 
 export function selectSelectedMessagesByConnectionUri(state, connectionUri) {
   const messages = selectAllMessagesByConnectionUri(state, connectionUri);
-  return messages && messages.filter(msg => msg.get("isSelected"));
+  return (
+    messages && messages.filter(msg => msg.getIn(["viewState", "isSelected"]))
+  );
 }
 
 export function selectAgreementMessagesByConnectionUri(state, connectionUri) {

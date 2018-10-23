@@ -395,7 +395,7 @@ export function setMultiSelectType(
 
   if (!multiSelectType) {
     messages = messages.map(msg => {
-      msg = msg.set("isSelected", false);
+      msg = msg.setIn(["viewState", "isSelected"], false);
       return msg;
     });
     state = state.setIn(

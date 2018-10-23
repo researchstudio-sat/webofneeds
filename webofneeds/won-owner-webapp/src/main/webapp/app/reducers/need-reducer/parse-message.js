@@ -83,6 +83,9 @@ export function parseMessage(
         isCancellationPending: false,
         isCancelled: false,
       },
+      viewState: {
+        isSelected: false,
+      },
       isMessageStatusUpToDate: false,
       contentGraphTrig: {
         prefixes: trigPrefixes,
@@ -97,7 +100,6 @@ export function parseMessage(
       //Send Status Flags
       isReceivedByOwn: alreadyProcessed || !wonMessage.isFromOwner(), //if the message is not from the owner we know it has been received anyway
       isReceivedByRemote: alreadyProcessed || !wonMessage.isFromOwner(), //if the message is not from the owner we know it has been received anyway
-      isSelected: false,
       failedToSend: false,
     },
   };

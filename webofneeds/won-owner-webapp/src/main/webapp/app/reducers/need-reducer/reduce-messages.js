@@ -152,6 +152,7 @@ export function setMessageSelected(
       connectionUri,
       "messages",
       messageUri,
+      "viewState",
       "isSelected",
     ],
     isSelected
