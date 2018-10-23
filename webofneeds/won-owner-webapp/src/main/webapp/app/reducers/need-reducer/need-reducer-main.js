@@ -501,62 +501,153 @@ export default function(allNeedsInState = initialState, action = {}) {
         action.payload.needUri,
         action.payload.messageStatus
       );
-    case actionTypes.messages.messageStatus.markAsProposed:
-      return markMessageAsProposed(
+    case actionTypes.messages.messageStatus.markAsProposed: {
+      const allNeedsInStateMarkedProposed = markMessageAsProposed(
         allNeedsInState,
         action.payload.messageUri,
         action.payload.connectionUri,
         action.payload.needUri,
         action.payload.proposed
       );
-    case actionTypes.messages.messageStatus.markAsClaimed:
-      return markMessageAsClaimed(
+
+      if (action.payload.proposed) {
+        return markMessageAsCollapsed(
+          allNeedsInStateMarkedProposed,
+          action.payload.messageUri,
+          action.payload.connectionUri,
+          action.payload.needUri,
+          action.payload.proposed
+        );
+      }
+      return allNeedsInStateMarkedProposed;
+    }
+
+    case actionTypes.messages.messageStatus.markAsClaimed: {
+      const allNeedsInStateMarkedClaimed = markMessageAsClaimed(
         allNeedsInState,
         action.payload.messageUri,
         action.payload.connectionUri,
         action.payload.needUri,
         action.payload.claimed
       );
-    case actionTypes.messages.messageStatus.markAsRejected:
-      return markMessageAsRejected(
+
+      if (action.payload.claimed) {
+        return markMessageAsCollapsed(
+          allNeedsInStateMarkedClaimed,
+          action.payload.messageUri,
+          action.payload.connectionUri,
+          action.payload.needUri,
+          action.payload.claimed
+        );
+      }
+      return allNeedsInStateMarkedClaimed;
+    }
+
+    case actionTypes.messages.messageStatus.markAsRejected: {
+      const allNeedsInStateMarkedRejected = markMessageAsRejected(
         allNeedsInState,
         action.payload.messageUri,
         action.payload.connectionUri,
         action.payload.needUri,
         action.payload.rejected
       );
-    case actionTypes.messages.messageStatus.markAsRetracted:
-      return markMessageAsRetracted(
+
+      if (action.payload.rejected) {
+        return markMessageAsCollapsed(
+          allNeedsInStateMarkedRejected,
+          action.payload.messageUri,
+          action.payload.connectionUri,
+          action.payload.needUri,
+          action.payload.rejected
+        );
+      }
+      return allNeedsInStateMarkedRejected;
+    }
+
+    case actionTypes.messages.messageStatus.markAsRetracted: {
+      const allNeedsInStateMarkedRetracted = markMessageAsRetracted(
         allNeedsInState,
         action.payload.messageUri,
         action.payload.connectionUri,
         action.payload.needUri,
         action.payload.retracted
       );
-    case actionTypes.messages.messageStatus.markAsAccepted:
-      return markMessageAsAccepted(
+
+      if (action.payload.retracted) {
+        return markMessageAsCollapsed(
+          allNeedsInStateMarkedRetracted,
+          action.payload.messageUri,
+          action.payload.connectionUri,
+          action.payload.needUri,
+          action.payload.retracted
+        );
+      }
+      return allNeedsInStateMarkedRetracted;
+    }
+
+    case actionTypes.messages.messageStatus.markAsAccepted: {
+      const allNeedsInStateMarkedAccepted = markMessageAsAccepted(
         allNeedsInState,
         action.payload.messageUri,
         action.payload.connectionUri,
         action.payload.needUri,
         action.payload.accepted
       );
-    case actionTypes.messages.messageStatus.markAsCancelled:
-      return markMessageAsCancelled(
+
+      if (action.payload.accepted) {
+        return markMessageAsCollapsed(
+          allNeedsInStateMarkedAccepted,
+          action.payload.messageUri,
+          action.payload.connectionUri,
+          action.payload.needUri,
+          action.payload.accepted
+        );
+      }
+      return allNeedsInStateMarkedAccepted;
+    }
+
+    case actionTypes.messages.messageStatus.markAsCancelled: {
+      const allNeedsInStateMarkedCancelled = markMessageAsCancelled(
         allNeedsInState,
         action.payload.messageUri,
         action.payload.connectionUri,
         action.payload.needUri,
         action.payload.cancelled
       );
-    case actionTypes.messages.messageStatus.markAsCancellationPending:
-      return markMessageAsCancellationPending(
+
+      if (action.payload.cancelled) {
+        return markMessageAsCollapsed(
+          allNeedsInStateMarkedCancelled,
+          action.payload.messageUri,
+          action.payload.connectionUri,
+          action.payload.needUri,
+          action.payload.cancelled
+        );
+      }
+      return allNeedsInStateMarkedCancelled;
+    }
+
+    case actionTypes.messages.messageStatus.markAsCancellationPending: {
+      const allNeedsInStateMarkedCancellationPending = markMessageAsCancellationPending(
         allNeedsInState,
         action.payload.messageUri,
         action.payload.connectionUri,
         action.payload.needUri,
         action.payload.cancellationPending
       );
+
+      if (action.payload.cancellationPending) {
+        return markMessageAsCollapsed(
+          allNeedsInStateMarkedCancellationPending,
+          action.payload.messageUri,
+          action.payload.connectionUri,
+          action.payload.needUri,
+          action.payload.cancellationPending
+        );
+      }
+      return allNeedsInStateMarkedCancellationPending;
+    }
+
     case actionTypes.connections.markAsRead:
       return markConnectionAsRead(
         allNeedsInState,
