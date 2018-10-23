@@ -597,26 +597,28 @@ function genComponentConf() {
 
             const isOldProposed =
               proposedUris &&
-              (proposedUris.get(msgUri) || proposedUris.get(remoteMsgUri));
+              !!(proposedUris.get(msgUri) || proposedUris.get(remoteMsgUri));
             const isOldClaimed =
               claimedUris &&
-              (claimedUris.get(msgUri) || claimedUris.get(remoteMsgUri));
+              !!(claimedUris.get(msgUri) || claimedUris.get(remoteMsgUri));
             const isOldAccepted =
               acceptedUris &&
-              (acceptedUris.get(msgUri) || acceptedUris.get(remoteMsgUri));
+              !!(acceptedUris.get(msgUri) || acceptedUris.get(remoteMsgUri));
             const isOldRejected =
               rejectedUris &&
-              (rejectedUris.get(msgUri) || rejectedUris.get(remoteMsgUri));
+              !!(rejectedUris.get(msgUri) || rejectedUris.get(remoteMsgUri));
             const isOldRetracted =
               retractedUris &&
-              (retractedUris.get(msgUri) || retractedUris.get(remoteMsgUri));
+              !!(retractedUris.get(msgUri) || retractedUris.get(remoteMsgUri));
             const isOldCancelled =
               cancelledUris &&
-              (cancelledUris.get(msgUri) || cancelledUris.get(remoteMsgUri));
+              !!(cancelledUris.get(msgUri) || cancelledUris.get(remoteMsgUri));
             const isOldCancellationPending =
               cancellationPendingUris &&
-              (cancellationPendingUris.get(msgUri) ||
-                cancellationPendingUris.get(remoteMsgUri));
+              !!(
+                cancellationPendingUris.get(msgUri) ||
+                cancellationPendingUris.get(remoteMsgUri)
+              );
 
             messageStatus = messageStatus
               .set("isProposed", isProposed || isOldProposed)
@@ -630,12 +632,15 @@ function genComponentConf() {
                 isCancellationPending || isOldCancellationPending
               );
 
-            this.messages__updateMessageStatus({
-              messageUri: msgUri,
-              connectionUri: this.connectionUri,
-              needUri: this.ownNeed.get("uri"),
-              messageStatus: messageStatus,
-            });
+            //Only update messageState if the state was actually different
+            if (!Immutable.is(msg.get("messageStatus"), messageStatus)) {
+              this.messages__updateMessageStatus({
+                messageUri: msgUri,
+                connectionUri: this.connectionUri,
+                needUri: this.ownNeed.get("uri"),
+                messageStatus: messageStatus,
+              });
+            }
           });
         }
       });
