@@ -185,6 +185,16 @@ export function markMessageAsCollapsed(
     return state;
   }
 
+  if (isCollapsed) {
+    state = markMessageShowActions(
+      state,
+      messageUri,
+      connectionUri,
+      needUri,
+      false
+    );
+  }
+
   return state.setIn(
     [
       needUri,
@@ -196,6 +206,46 @@ export function markMessageAsCollapsed(
       "isCollapsed",
     ],
     isCollapsed
+  );
+}
+
+export function markMessageShowActions(
+  state,
+  messageUri,
+  connectionUri,
+  needUri,
+  showActions
+) {
+  const need = state.get(needUri);
+  const connection = need && need.getIn(["connections", connectionUri]);
+  const message = connection && connection.getIn(["messages", messageUri]);
+
+  markUriAsRead(messageUri);
+
+  if (!message) {
+    console.error(
+      "no message with messageUri: <",
+      messageUri,
+      "> found within needUri: <",
+      needUri,
+      "> connectionUri: <",
+      connectionUri,
+      ">"
+    );
+    return state;
+  }
+
+  return state.setIn(
+    [
+      needUri,
+      "connections",
+      connectionUri,
+      "messages",
+      messageUri,
+      "viewState",
+      "showActions",
+    ],
+    showActions
   );
 }
 

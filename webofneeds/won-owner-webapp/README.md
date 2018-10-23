@@ -147,6 +147,7 @@ $ngRedux.getState();
                            //TODO: everything in this state should be extracted into its own (view/ui)-state, this is only here so we do not have a huge (fail prone refactoring shortly before the codefreeze)
                            isSelected: true|false //whether or not the message is Selected in the MultiSelect view
                            isCollapsed: true|false //default is false, whether or not the message should be displayed in a minimized fashion
+                           showActions: true|false //default is false, whether or not the actionButtons of a message are visible
                        },
                        uri: string //unique identifier of this message (same as messageUri)
                        isReceivedByOwn: true|false //whether the sent request/message is received by the own server or not (default: false, if its not an outgoingMessage the default is true)

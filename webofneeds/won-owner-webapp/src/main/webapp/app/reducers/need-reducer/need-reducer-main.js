@@ -20,6 +20,7 @@ import {
   updateMessageStatus,
   markMessageAsSelected,
   markMessageAsCollapsed,
+  markMessageShowActions,
   markMessageAsRead,
   markMessageAsClaimed,
   markMessageAsProposed,
@@ -485,6 +486,14 @@ export default function(allNeedsInState = initialState, action = {}) {
         action.payload.connectionUri,
         action.payload.needUri,
         action.payload.isCollapsed
+      );
+    case actionTypes.messages.viewState.markShowActions:
+      return markMessageShowActions(
+        allNeedsInState,
+        action.payload.messageUri,
+        action.payload.connectionUri,
+        action.payload.needUri,
+        action.payload.showActions
       );
     case actionTypes.messages.markAsRead:
       return markMessageAsRead(

@@ -218,6 +218,7 @@ const actionHierarchy = {
     viewState: {
       markAsCollapsed: INJ_DEFAULT,
       markAsSelected: INJ_DEFAULT,
+      markShowActions: INJ_DEFAULT,
     },
     updateMessageStatus: messages.updateMessageStatus,
     processConnectionMessage: messages.processConnectionMessage,
