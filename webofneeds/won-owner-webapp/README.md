@@ -133,12 +133,14 @@ $ngRedux.getState();
                        isParsable: true|false //true if hasReferences or hasContent is true
                        isMessageStatusUpToDate: true|false //true if the agreementData has been checked to define the status of the message
                        messageStatus: {
+                           isProposed: true|false //if the message was proposed
+                           isClaimed: true|false //if the message was claimed
                            isRetracted: true|false //if the message was retracted
                            isRejected: true|false //if the message was rejected
                            isAccepted: true|false //if the message was accepted
                            isCancellationPending: true|false //if the message is pending to be cancelled
                            isCancelled: true|false //if the message was cancelled
-                       }
+                       },
                        uri: string //unique identifier of this message
                        isReceivedByOwn: true|false //whether the sent request/message is received by the own server or not (default: false, if its not an outgoingMessage the default is true)
                        isReceivedByRemote: true|false //whether the sent request/message is received by the remote server or not (default: false, if its not an outgoingMessage the default is true)

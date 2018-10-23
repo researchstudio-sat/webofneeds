@@ -20,6 +20,8 @@ import {
   updateMessageStatus,
   setMessageSelected,
   markMessageAsRead,
+  markMessageAsClaimed,
+  markMessageAsProposed,
   markMessageAsRejected,
   markMessageAsRetracted,
   markMessageAsAccepted,
@@ -487,6 +489,22 @@ export default function(allNeedsInState = initialState, action = {}) {
         action.payload.connectionUri,
         action.payload.needUri,
         action.payload.messageStatus
+      );
+    case actionTypes.messages.messageStatus.markAsProposed:
+      return markMessageAsProposed(
+        allNeedsInState,
+        action.payload.messageUri,
+        action.payload.connectionUri,
+        action.payload.needUri,
+        action.payload.proposed
+      );
+    case actionTypes.messages.messageStatus.markAsClaimed:
+      return markMessageAsClaimed(
+        allNeedsInState,
+        action.payload.messageUri,
+        action.payload.connectionUri,
+        action.payload.needUri,
+        action.payload.claimed
       );
     case actionTypes.messages.messageStatus.markAsRejected:
       return markMessageAsRejected(

@@ -268,6 +268,7 @@ export function processConnectionMessage(event) {
       //PETRINET DATA PART END **************************
       fetchMessageEffects(connectionUri, event.getMessageUri()).then(
         response => {
+          //TODO: ADD CLAIM AND PROPOSE MESSAGE STATE HANDLING!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
           if (response && response.length > 0) {
             console.log("agreement response : ", response);
           }
@@ -521,6 +522,56 @@ export function markAsRejected(event) {
 
     dispatch({
       type: actionTypes.messages.messageStatus.markAsRejected,
+      payload: payload,
+    });
+  };
+}
+
+export function markAsProposed(event) {
+  return (dispatch, getState) => {
+    const messages = getState().getIn([
+      "needs",
+      event.needUri,
+      "connections",
+      event.connectionUri,
+      "messages",
+    ]);
+    const messageUri = getCorrectMessageUri(messages, event.messageUri);
+
+    const payload = {
+      messageUri: messageUri,
+      connectionUri: event.connectionUri,
+      needUri: event.needUri,
+      proposed: event.proposed,
+    };
+
+    dispatch({
+      type: actionTypes.messages.messageStatus.markAsProposed,
+      payload: payload,
+    });
+  };
+}
+
+export function markAsClaimed(event) {
+  return (dispatch, getState) => {
+    const messages = getState().getIn([
+      "needs",
+      event.needUri,
+      "connections",
+      event.connectionUri,
+      "messages",
+    ]);
+    const messageUri = getCorrectMessageUri(messages, event.messageUri);
+
+    const payload = {
+      messageUri: messageUri,
+      connectionUri: event.connectionUri,
+      needUri: event.needUri,
+      claimed: event.claimed,
+    };
+
+    dispatch({
+      type: actionTypes.messages.messageStatus.markAsClaimed,
       payload: payload,
     });
   };
