@@ -476,7 +476,6 @@ function genComponentConf() {
             connectionUri: this.connectionUri,
             isLoadingAgreementData: true,
           });
-          //TODO: WE PROBABLY NEED A DIFFERENT APPROACH FOR AGREEMENTDATA INCLUDE THE MESSAGES THAT HAVE BEEN PROPOSED OR CLAIMED WITHIN TOO
           fetchAgreementProtocolUris(this.connection.get("uri"))
             .then(response => {
               console.log("retrieved agreement Protocol Uris: ", response);
@@ -558,7 +557,6 @@ function genComponentConf() {
             " Messages"
           );
           this.chatMessagesWithUnknownState.forEach(msg => {
-            //TODO: WE PROBABLY NEED A DIFFERENT APPROACH FOR AGREEMENTDATA AS IS ENSURE THAT isProposed and isClaimed is handled in here as well
             let messageStatus = msg && msg.get("messageStatus");
             const msgUri = msg.get("uri");
             const remoteMsgUri = msg.get("remoteUri");

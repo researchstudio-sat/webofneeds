@@ -163,6 +163,8 @@ $ngRedux.getState();
                    cancellationPendingAgreementUris: Immutable.Set(),
                    acceptedCancellationProposalUris: Immutable.Set(),
                    cancelledAgreementUris: Immutable.Set(),
+                   proposedMessageUris: Immutable.Set(),
+                   claimedMessageUris: Immutable.Set(),
                    rejectedMessageUris: Immutable.Set(),
                    retractedMessageUris: Immutable.Set(),
                    isLoaded: true|false, //default is false, whether or not the agreementData has been loaded already
