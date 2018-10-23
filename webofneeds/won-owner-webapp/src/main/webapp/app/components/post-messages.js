@@ -476,7 +476,7 @@ function genComponentConf() {
             connectionUri: this.connectionUri,
             isLoadingAgreementData: true,
           });
-
+          //TODO: WE PROBABLY NEED A DIFFERENT APPROACH FOR AGREEMENTDATA INCLUDE THE MESSAGES THAT HAVE BEEN PROPOSED OR CLAIMED WITHIN TOO
           fetchAgreementProtocolUris(this.connection.get("uri"))
             .then(response => {
               console.log("retrieved agreement Protocol Uris: ", response);
@@ -542,6 +542,7 @@ function genComponentConf() {
             " Messages"
           );
           this.chatMessagesWithUnknownState.forEach(msg => {
+            //TODO: WE PROBABLY NEED A DIFFERENT APPROACH FOR AGREEMENTDATA AS IS ENSURE THAT isProposed and isClaimed is handled in here as well
             let messageStatus = msg && msg.get("messageStatus");
             const msgUri = msg.get("uri");
             const remoteMsgUri = msg.get("remoteUri");
@@ -560,7 +561,15 @@ function genComponentConf() {
             const cancellationPendingUris =
               this.agreementData &&
               this.agreementData.get("cancellationPendingAgreementUris");
+            const claimedUris =
+              this.agreementData &&
+              this.agreementData.get("claimedMessageUris"); //TODO not sure if this is correct
+            const proposedUris =
+              this.agreementData &&
+              this.agreementData.get("proposedMessageUris"); //TODO not sure if this is correct
 
+            const isProposed = messageStatus && messageStatus.get("isProposed");
+            const isClaimed = messageStatus && messageStatus.get("isClaimed");
             const isAccepted = messageStatus && messageStatus.get("isAccepted");
             const isRejected = messageStatus && messageStatus.get("isRejected");
             const isRetracted =
@@ -570,24 +579,32 @@ function genComponentConf() {
             const isCancellationPending =
               messageStatus && messageStatus.get("isCancellationPending");
 
+            const isOldProposed =
+              proposedUris &&
+              (proposedUris.get(msgUri) || proposedUris.get(remoteMsgUri));
+            const isOldClaimed =
+              claimedUris &&
+              (claimedUris.get(msgUri) || claimedUris.get(remoteMsgUri));
             const isOldAccepted =
-              (acceptedUris && acceptedUris.get(msgUri)) ||
-              acceptedUris.get(remoteMsgUri);
+              acceptedUris &&
+              (acceptedUris.get(msgUri) || acceptedUris.get(remoteMsgUri));
             const isOldRejected =
-              (rejectedUris && rejectedUris.get(msgUri)) ||
-              rejectedUris.get(remoteMsgUri);
+              rejectedUris &&
+              (rejectedUris.get(msgUri) || rejectedUris.get(remoteMsgUri));
             const isOldRetracted =
-              (retractedUris && retractedUris.get(msgUri)) ||
-              retractedUris.get(remoteMsgUri);
+              retractedUris &&
+              (retractedUris.get(msgUri) || retractedUris.get(remoteMsgUri));
             const isOldCancelled =
-              (cancelledUris && cancelledUris.get(msgUri)) ||
-              cancelledUris.get(remoteMsgUri);
+              cancelledUris &&
+              (cancelledUris.get(msgUri) || cancelledUris.get(remoteMsgUri));
             const isOldCancellationPending =
-              (cancellationPendingUris &&
-                cancellationPendingUris.get(msgUri)) ||
-              cancellationPendingUris.get(remoteMsgUri);
+              cancellationPendingUris &&
+              (cancellationPendingUris.get(msgUri) ||
+                cancellationPendingUris.get(remoteMsgUri));
 
             messageStatus = messageStatus
+              .set("isProposed", isProposed || isOldProposed)
+              .set("isClaimed", isClaimed || isOldClaimed)
               .set("isAccepted", isAccepted || isOldAccepted)
               .set("isRejected", isRejected || isOldRejected)
               .set("isRetracted", isRetracted || isOldRetracted)
