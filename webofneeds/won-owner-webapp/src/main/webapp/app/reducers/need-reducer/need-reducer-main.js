@@ -18,7 +18,8 @@ import {
   addMessage,
   addExistingMessages,
   updateMessageStatus,
-  setMessageSelected,
+  markMessageAsSelected,
+  markMessageAsCollapsed,
   markMessageAsRead,
   markMessageAsClaimed,
   markMessageAsProposed,
@@ -469,13 +470,21 @@ export default function(allNeedsInState = initialState, action = {}) {
         action.payload.getReceiver(),
         won.WON.Closed
       );
-    case actionTypes.messages.setMessageSelected:
-      return setMessageSelected(
+    case actionTypes.messages.viewState.markAsSelected:
+      return markMessageAsSelected(
         allNeedsInState,
         action.payload.messageUri,
         action.payload.connectionUri,
         action.payload.needUri,
         action.payload.isSelected
+      );
+    case actionTypes.messages.viewState.markAsCollapsed:
+      return markMessageAsCollapsed(
+        allNeedsInState,
+        action.payload.messageUri,
+        action.payload.connectionUri,
+        action.payload.needUri,
+        action.payload.isCollapsed
       );
     case actionTypes.messages.markAsRead:
       return markMessageAsRead(

@@ -119,7 +119,7 @@ export function addExistingMessages(state, wonMessages) {
   return state;
 }
 
-export function setMessageSelected(
+export function markMessageAsSelected(
   state,
   messageUri,
   connectionUri,
@@ -156,6 +156,46 @@ export function setMessageSelected(
       "isSelected",
     ],
     isSelected
+  );
+}
+
+export function markMessageAsCollapsed(
+  state,
+  messageUri,
+  connectionUri,
+  needUri,
+  isCollapsed
+) {
+  const need = state.get(needUri);
+  const connection = need && need.getIn(["connections", connectionUri]);
+  const message = connection && connection.getIn(["messages", messageUri]);
+
+  markUriAsRead(messageUri);
+
+  if (!message) {
+    console.error(
+      "no message with messageUri: <",
+      messageUri,
+      "> found within needUri: <",
+      needUri,
+      "> connectionUri: <",
+      connectionUri,
+      ">"
+    );
+    return state;
+  }
+
+  return state.setIn(
+    [
+      needUri,
+      "connections",
+      connectionUri,
+      "messages",
+      messageUri,
+      "viewState",
+      "isCollapsed",
+    ],
+    isCollapsed
   );
 }
 

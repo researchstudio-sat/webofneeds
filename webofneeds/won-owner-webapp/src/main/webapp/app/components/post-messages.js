@@ -810,7 +810,7 @@ function genComponentConf() {
     selectMessage(msg) {
       const selected = msg.getIn(["viewState", "isSelected"]);
 
-      this.messages__setMessageSelected({
+      this.messages__viewState__markAsSelected({
         messageUri: msg.get("uri"),
         connectionUri: this.connection.get("uri"),
         needUri: this.ownNeed.get("uri"),

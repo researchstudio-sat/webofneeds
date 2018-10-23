@@ -85,6 +85,7 @@ export function parseMessage(
       },
       viewState: {
         isSelected: false,
+        isCollapsed: false,
       },
       isMessageStatusUpToDate: false,
       contentGraphTrig: {
