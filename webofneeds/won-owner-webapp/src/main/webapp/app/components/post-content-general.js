@@ -18,6 +18,14 @@ function genComponentConf() {
   let template = `
       <div class="pcg__columns">
         <div class="pcg__columns__left">
+          <div class="pcg__columns__left__item" ng-if="self.persona">
+            <div class="pcg__columns__left__item__label">
+              Author
+            </div>
+            <div class="pcg__columns__left__item__value">
+              {{ self.persona.getIn(['jsonld', 's:name']) }}
+            </div>
+          </div>
           <div class="pcg__columns__left__item" ng-if="self.friendlyTimestamp">
             <div class="pcg__columns__left__item__label">
               Created
@@ -62,11 +70,19 @@ function genComponentConf() {
         const post = this.postUri && state.getIn(["needs", this.postUri]);
         const hasFlags = post && post.get("hasFlags");
 
+        const persona = post
+          ? state.getIn(["needs", post.get("heldBy")])
+          : undefined;
+
         return {
           WON: won.WON,
           post,
           type: post && post.get("type"),
           hasFlags,
+          persona:
+            persona && persona.get("holds").includes(post.get("uri"))
+              ? persona
+              : undefined,
           preventSharing:
             (post && post.get("state") === won.WON.InactiveCompacted) ||
             (hasFlags &&

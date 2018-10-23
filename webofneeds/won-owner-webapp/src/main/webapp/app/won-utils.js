@@ -657,6 +657,15 @@ export function parseJsonldLeaf(val, type) {
       }
       break;
 
+    case "xsd:id":
+    case "xsd:ID": {
+      const id = get(val, "@id");
+      if (!id) {
+        throwErr(`Could not parse \`${val}\` to an id.`);
+      }
+      return id;
+    }
+
     // TODO
     // case "http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon":
     //   break;
