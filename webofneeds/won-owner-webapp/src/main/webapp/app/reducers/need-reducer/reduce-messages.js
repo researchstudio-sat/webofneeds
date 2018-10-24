@@ -328,6 +328,19 @@ export function markMessageAsRead(state, messageUri, connectionUri, needUri) {
   );
 }
 
+/**
+ * Sets the given messageUri messageStatus->isRejected to the given parameter (rejected).
+ * Additionally calls markMessageAsCollapsed to the given parameter (rejected) as well
+ * Additionally calls markMessageAsCancellationPending to the referencedMessages with the parameter false
+ * Additionally calls markMessageAsProposed to the referencedMessages with the parameter false
+ * Additionally calls markMessageAsClaimed to the referencedMessages with the parameter false
+ * @param state
+ * @param messageUri
+ * @param connectionUri
+ * @param needUri
+ * @param rejected
+ * @returns {*}
+ */
 export function markMessageAsRejected(
   state,
   messageUri,
@@ -425,6 +438,19 @@ export function markMessageAsRejected(
   );
 }
 
+/**
+ * Sets the given messageUri messageStatus->isRetracted to the given parameter (retracted).
+ * Additionally calls markMessageAsCollapsed to the given parameter (retracted) as well
+ * Additionally calls markMessageAsCancellationPending to the referencedMessages with the parameter false
+ * Additionally calls markMessageAsProposed to the referencedMessages with the parameter false
+ * Additionally calls markMessageAsClaimed to the referencedMessages with the parameter false
+ * @param state
+ * @param messageUri
+ * @param connectionUri
+ * @param needUri
+ * @param retracted
+ * @returns {*}
+ */
 export function markMessageAsRetracted(
   state,
   messageUri,
@@ -522,6 +548,16 @@ export function markMessageAsRetracted(
   );
 }
 
+/**
+ * Sets the given messageUri messageStatus->isClaimed to the given parameter (claimed).
+ * Additionally calls markMessageAsCollapsed to the given parameter (claimed) as well
+ * @param state
+ * @param messageUri
+ * @param connectionUri
+ * @param needUri
+ * @param claimed
+ * @returns {*}
+ */
 export function markMessageAsClaimed(
   state,
   messageUri,
@@ -567,7 +603,16 @@ export function markMessageAsClaimed(
     claimed
   );
 }
-
+/**
+ * Sets the given messageUri messageStatus->isProposed to the given parameter (proposed).
+ * Additionally calls markMessageAsCollapsed to the given parameter (proposed) as well
+ * @param state
+ * @param messageUri
+ * @param connectionUri
+ * @param needUri
+ * @param proposed
+ * @returns {*}
+ */
 export function markMessageAsProposed(
   state,
   messageUri,
@@ -688,14 +733,6 @@ export function markMessageAsAccepted(
     );
   }
 
-  state = markMessageAsCollapsed(
-    state,
-    messageUri,
-    connectionUri,
-    needUri,
-    accepted
-  );
-
   return state.setIn(
     [
       needUri,
@@ -734,13 +771,6 @@ export function markMessageAsCancelled(
     );
     return state;
   }
-  state = markMessageAsCollapsed(
-    state,
-    messageUri,
-    connectionUri,
-    needUri,
-    cancelled
-  );
 
   state = state.setIn(
     [
@@ -806,14 +836,6 @@ export function markMessageAsCancellationPending(
     return state;
   }
 
-  state = markMessageAsCollapsed(
-    state,
-    messageUri,
-    connectionUri,
-    needUri,
-    cancellationPending
-  );
-
   return state.setIn(
     [
       needUri,
@@ -827,7 +849,16 @@ export function markMessageAsCancellationPending(
     cancellationPending
   );
 }
-
+/**
+ * Sets the given messageUri messageStatus to the given parameter (messageStatus).
+ * Additionally calls markMessageAsCollapsed to the bool-exp from messageStatus data => (isProposed || isClaimed ||isRejected || isRetracted)
+ * @param state
+ * @param messageUri
+ * @param connectionUri
+ * @param needUri
+ * @param messageStatus
+ * @returns {*}
+ */
 export function updateMessageStatus(
   state,
   messageUri,
@@ -856,10 +887,8 @@ export function updateMessageStatus(
   const hasCollapsedMessageState =
     messageStatus.get("isProposed") ||
     messageStatus.get("isClaimed") ||
-    messageStatus.get("isAccepted") ||
     messageStatus.get("isRejected") ||
-    messageStatus.get("isCancelled") ||
-    messageStatus.get("isCancellationPending");
+    messageStatus.get("isRetracted");
 
   state = markMessageAsCollapsed(
     state,
