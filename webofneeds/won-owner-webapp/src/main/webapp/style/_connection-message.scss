@@ -101,15 +101,9 @@ won-connection-message {
   &.won-is-accepted {
     //TODO: STYLING
   }
-  &.won-is-rejected:not(.won-is-collapsed),
-  &.won-is-cancellationPending:not(.won-is-collapsed),
-  &.won-is-cancelled:not(.won-is-collapsed) {
-    pointer-events: none;
-  }
 
   &.won-is-retracted:not(.won-is-collapsed) {
     opacity: 0.35;
-    pointer-events: none;
     .won-cm__center__bubble {
       won-combined-message-content {
         text-decoration: line-through;
