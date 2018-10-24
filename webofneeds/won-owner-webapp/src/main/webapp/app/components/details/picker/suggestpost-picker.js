@@ -95,7 +95,10 @@ function genComponentConf() {
           allOpenNeedsWithoutCurrent.get(suggestedPostUri);
 
         const sortedOpenNeeds =
-          allOpenNeedsWithoutCurrent && sortBy(allOpenNeedsWithoutCurrent);
+          allOpenNeedsWithoutCurrent &&
+          sortBy(allOpenNeedsWithoutCurrent, elem =>
+            (elem.get("humanReadable") || "").toLowerCase()
+          );
 
         return {
           suggestedPostUri,
