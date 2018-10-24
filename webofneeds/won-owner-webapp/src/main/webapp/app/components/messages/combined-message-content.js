@@ -23,7 +23,7 @@ function genComponentConf() {
       <div class="msg__header" ng-if="!self.isConnectionMessage && !self.hasNotBeenLoaded">
           <div class="msg__header__type">{{ self.getTypeHeaderLabel() }}</div>
       </div>
-      <div class="msg__header msg__header--agreement" ng-if="self.isConnectionMessage && (this.hasClaims || this.hasProposes) && !self.hasNotBeenLoaded">
+      <div class="msg__header msg__header--agreement" ng-if="self.isConnectionMessage && (self.hasClaims || self.hasProposes) && !self.hasNotBeenLoaded">
           <div class="msg__header__type">{{ self.getAgreementHeaderLabel() }}</div>
       </div>
       <div class="msg__header msg__header--forwarded-from" ng-if="self.isConnectionMessage && self.originatorUri && !self.hasNotBeenLoaded">
@@ -122,7 +122,7 @@ function genComponentConf() {
           this.hasNotBeenLoaded ||
           this.hasClaims ||
           this.hasProposes ||
-          self.originatorUri,
+          this.originatorUri,
         this
       );
       classOnComponentRoot(
