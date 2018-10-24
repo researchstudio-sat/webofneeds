@@ -46,7 +46,7 @@ const mobilityUseCases = {
         },
         operations: [
           `${resultName} a won:Need.`,
-          `${resultName} won:isInState won:Active. { ?is a <http://dbpedia.org/resource/Ridesharing>.  } union { ?is a s:TaxiService} }`,
+          `${resultName} won:isInState won:Active. { { ?is a <http://dbpedia.org/resource/Ridesharing>.  } union { ?is a s:TaxiService} }`,
           `${resultName} won:is ?is.`,
         ],
       };
