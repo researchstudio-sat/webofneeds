@@ -23,7 +23,10 @@ export const transportGroup = {
       doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
       draft: {
         ...emptyDraft,
-        is: { title: "Want to send something" },
+        is: {
+          title: "Want to send something",
+          type: "http://dbpedia.org/resource/Cargo",
+        },
       },
       isDetails: {
         title: { ...details.title },
@@ -362,7 +365,6 @@ export const transportGroup = {
           title: "Transportation offer",
           type: "http://dbpedia.org/resource/Transport",
         },
-        searchString: "transport", // TODO: replace this with a query
       },
       isDetails: {
         title: { ...details.title },
@@ -384,7 +386,7 @@ export const transportGroup = {
               `${resultName} a won:Need.`,
               `${resultName} won:seeks ?seeks.`,
               `${resultName} won:is ?is.`,
-              `?is a s:Product.`,
+              `?is a <http://dbpedia.org/resource/Cargo>.`,
               location && "?seeks won:travelAction/s:fromLocation ?location.",
             ],
           },
