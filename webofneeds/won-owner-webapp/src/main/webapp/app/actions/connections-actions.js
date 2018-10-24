@@ -122,6 +122,9 @@ export function connectionsChatMessage(
     ]);
 
     let referencedContentUris = undefined;
+    /*TODO: Since we set messages to be (successfully) claimed/proposed/accepted... before we even know if the transition was successful we might
+     need to rethink this implementation in favor of a dirtyState somehow, and remove the dirty state on successRemote of the message -> handling is in
+     messages-actions.js (dispatchActionOnSuccessRemote part if(toRefreshData) ... but for now this will do*/
     if (referencedContent) {
       referencedContentUris = new Map();
       referencedContent.forEach((referencedMessages, key) => {
@@ -178,7 +181,26 @@ export function connectionsChatMessage(
               });
               break;
             case "claims":
+              dispatch({
+                type: actionTypes.messages.messageStatus.markAsClaimed,
+                payload: {
+                  messageUri: msg.get("uri"),
+                  connectionUri: connectionUri,
+                  needUri: ownNeed.get("uri"),
+                  claimed: true,
+                },
+              });
+              break;
             case "proposes":
+              dispatch({
+                type: actionTypes.messages.messageStatus.markAsProposed,
+                payload: {
+                  messageUri: msg.get("uri"),
+                  connectionUri: connectionUri,
+                  needUri: ownNeed.get("uri"),
+                  proposed: true,
+                },
+              });
               break;
             default:
               console.error("referenced key/type is not valid: ", key);

@@ -476,10 +476,23 @@ function genComponentConf() {
             connectionUri: this.connectionUri,
             isLoadingAgreementData: true,
           });
-
           fetchAgreementProtocolUris(this.connection.get("uri"))
             .then(response => {
               console.log("retrieved agreement Protocol Uris: ", response);
+
+              let proposedMessageUris = [];
+              const pendingProposals = response.pendingProposals;
+
+              if (pendingProposals) {
+                pendingProposals.forEach(prop => {
+                  if (prop.proposes) {
+                    proposedMessageUris = proposedMessageUris.concat(
+                      prop.proposes
+                    );
+                  }
+                });
+              }
+
               const agreementData = Immutable.fromJS({
                 agreementUris: Immutable.Set(response.agreementUris),
                 pendingProposalUris: Immutable.Set(
@@ -503,6 +516,8 @@ function genComponentConf() {
                 retractedMessageUris: Immutable.Set(
                   response.retractedMessageUris
                 ),
+                proposedMessageUris: Immutable.Set(proposedMessageUris),
+                claimedMessageUris: Immutable.Set(response.claimedMessageUris),
               });
 
               this.connections__updateAgreementData({
@@ -560,7 +575,15 @@ function genComponentConf() {
             const cancellationPendingUris =
               this.agreementData &&
               this.agreementData.get("cancellationPendingAgreementUris");
+            const claimedUris =
+              this.agreementData &&
+              this.agreementData.get("claimedMessageUris"); //TODO not sure if this is correct
+            const proposedUris =
+              this.agreementData &&
+              this.agreementData.get("proposedMessageUris"); //TODO not sure if this is correct
 
+            const isProposed = messageStatus && messageStatus.get("isProposed");
+            const isClaimed = messageStatus && messageStatus.get("isClaimed");
             const isAccepted = messageStatus && messageStatus.get("isAccepted");
             const isRejected = messageStatus && messageStatus.get("isRejected");
             const isRetracted =
@@ -570,24 +593,34 @@ function genComponentConf() {
             const isCancellationPending =
               messageStatus && messageStatus.get("isCancellationPending");
 
+            const isOldProposed =
+              proposedUris &&
+              !!(proposedUris.get(msgUri) || proposedUris.get(remoteMsgUri));
+            const isOldClaimed =
+              claimedUris &&
+              !!(claimedUris.get(msgUri) || claimedUris.get(remoteMsgUri));
             const isOldAccepted =
-              (acceptedUris && acceptedUris.get(msgUri)) ||
-              acceptedUris.get(remoteMsgUri);
+              acceptedUris &&
+              !!(acceptedUris.get(msgUri) || acceptedUris.get(remoteMsgUri));
             const isOldRejected =
-              (rejectedUris && rejectedUris.get(msgUri)) ||
-              rejectedUris.get(remoteMsgUri);
+              rejectedUris &&
+              !!(rejectedUris.get(msgUri) || rejectedUris.get(remoteMsgUri));
             const isOldRetracted =
-              (retractedUris && retractedUris.get(msgUri)) ||
-              retractedUris.get(remoteMsgUri);
+              retractedUris &&
+              !!(retractedUris.get(msgUri) || retractedUris.get(remoteMsgUri));
             const isOldCancelled =
-              (cancelledUris && cancelledUris.get(msgUri)) ||
-              cancelledUris.get(remoteMsgUri);
+              cancelledUris &&
+              !!(cancelledUris.get(msgUri) || cancelledUris.get(remoteMsgUri));
             const isOldCancellationPending =
-              (cancellationPendingUris &&
-                cancellationPendingUris.get(msgUri)) ||
-              cancellationPendingUris.get(remoteMsgUri);
+              cancellationPendingUris &&
+              !!(
+                cancellationPendingUris.get(msgUri) ||
+                cancellationPendingUris.get(remoteMsgUri)
+              );
 
             messageStatus = messageStatus
+              .set("isProposed", isProposed || isOldProposed)
+              .set("isClaimed", isClaimed || isOldClaimed)
               .set("isAccepted", isAccepted || isOldAccepted)
               .set("isRejected", isRejected || isOldRejected)
               .set("isRetracted", isRetracted || isOldRetracted)
@@ -791,9 +824,9 @@ function genComponentConf() {
     }
 
     selectMessage(msg) {
-      const selected = msg.get("isSelected");
+      const selected = msg.getIn(["viewState", "isSelected"]);
 
-      this.messages__setMessageSelected({
+      this.messages__viewState__markAsSelected({
         messageUri: msg.get("uri"),
         connectionUri: this.connection.get("uri"),
         needUri: this.ownNeed.get("uri"),

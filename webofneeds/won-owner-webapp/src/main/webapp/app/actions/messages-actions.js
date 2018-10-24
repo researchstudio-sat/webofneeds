@@ -233,9 +233,6 @@ export function processConnectionMessage(event) {
 
       fetchPetriNetUris(connectionUri)
         .then(response => {
-          console.log(
-            "FETCH PETRINETURIS FOR INCOMING MESSAGE THAT MADE THAT NECESSARY"
-          );
           const petriNetData = {};
 
           response.forEach(entry => {
@@ -298,7 +295,53 @@ export function processConnectionMessage(event) {
                   });
                 }
                 break;
+              case "CLAIMS":
+                if (effect.claims) {
+                  let claimedMessageUris = Array.isArray(effect.claims)
+                    ? effect.claims
+                    : [effect.claims];
+
+                  claimedMessageUris.forEach(claimedMessageUris => {
+                    let messageUri = getCorrectMessageUri(
+                      messages,
+                      claimedMessageUris
+                    );
+                    dispatch({
+                      type: actionTypes.messages.messageStatus.markAsClaimed,
+                      payload: {
+                        messageUri: messageUri,
+                        connectionUri: connectionUri,
+                        needUri: needUri,
+                        claimed: true,
+                      },
+                    });
+                  });
+                }
+                break;
+
               case "PROPOSES":
+                if (effect.proposes) {
+                  let proposedMessageUris = Array.isArray(effect.proposes)
+                    ? effect.proposes
+                    : [effect.proposes];
+
+                  proposedMessageUris.forEach(proposedMessageUri => {
+                    let messageUri = getCorrectMessageUri(
+                      messages,
+                      proposedMessageUri
+                    );
+                    dispatch({
+                      type: actionTypes.messages.messageStatus.markAsProposed,
+                      payload: {
+                        messageUri: messageUri,
+                        connectionUri: connectionUri,
+                        needUri: needUri,
+                        proposed: true,
+                      },
+                    });
+                  });
+                }
+
                 if (effect.proposalType === "CANCELS") {
                   let proposesToCancelUris = Array.isArray(
                     effect.proposesToCancel
@@ -521,6 +564,56 @@ export function markAsRejected(event) {
 
     dispatch({
       type: actionTypes.messages.messageStatus.markAsRejected,
+      payload: payload,
+    });
+  };
+}
+
+export function markAsProposed(event) {
+  return (dispatch, getState) => {
+    const messages = getState().getIn([
+      "needs",
+      event.needUri,
+      "connections",
+      event.connectionUri,
+      "messages",
+    ]);
+    const messageUri = getCorrectMessageUri(messages, event.messageUri);
+
+    const payload = {
+      messageUri: messageUri,
+      connectionUri: event.connectionUri,
+      needUri: event.needUri,
+      proposed: event.proposed,
+    };
+
+    dispatch({
+      type: actionTypes.messages.messageStatus.markAsProposed,
+      payload: payload,
+    });
+  };
+}
+
+export function markAsClaimed(event) {
+  return (dispatch, getState) => {
+    const messages = getState().getIn([
+      "needs",
+      event.needUri,
+      "connections",
+      event.connectionUri,
+      "messages",
+    ]);
+    const messageUri = getCorrectMessageUri(messages, event.messageUri);
+
+    const payload = {
+      messageUri: messageUri,
+      connectionUri: event.connectionUri,
+      needUri: event.needUri,
+      claimed: event.claimed,
+    };
+
+    dispatch({
+      type: actionTypes.messages.messageStatus.markAsClaimed,
       payload: payload,
     });
   };
@@ -808,6 +901,29 @@ export function dispatchActionOnSuccessRemote(event) {
       let referencedContentUris = new Map().set("claims", [
         { "@id": event.getIsRemoteResponseTo() },
       ]);
+
+      /*
+      This Dispatch is similar to the one we use in connection-actions.js ->
+        function connectionsChatMessage(...)
+        The part where we iterate over all the references and send the dispatches to mark the
+        message appropriately. usually we need to check whether the messageUri to be marked is
+        the remoteMessageUri or the ownMessageUri, but since the autoClaim will only be executed
+        on ownMessages we do not need this check here
+       */
+      /*TODO:
+       Since we set a messageToBe (successfully) claimed before we even know if the transition was successful
+       we might need to rethink this implementation in favor of a dirtyState somehow, and remove the dirty state on success
+       of the message(if(toRefreshData)-part above)... but for now and because
+       connectionsChateMessage does not do this either it will do...*/
+      dispatch({
+        type: actionTypes.messages.messageStatus.markAsClaimed,
+        payload: {
+          messageUri: event.getIsRemoteResponseTo(),
+          connectionUri: connectionUri,
+          needUri: ownNeedUri,
+          claimed: true,
+        },
+      });
 
       buildChatMessage({
         chatMessage: undefined,

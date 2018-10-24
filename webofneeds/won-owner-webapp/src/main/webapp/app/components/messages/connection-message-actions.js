@@ -13,6 +13,8 @@ import {
   isMessageRejectable,
   isMessageRetractable,
   isMessageAcceptable,
+  isMessageProposed,
+  isMessageClaimed,
   isMessageRejected,
   isMessageAccepted,
   isMessageRetracted,
@@ -31,7 +33,7 @@ function genComponentConf() {
           ng-if="self.isProposable"
           ng-disabled="self.multiSelectType || self.clicked"
           ng-click="self.sendActionMessage('proposes')">
-          Propose
+          {{ self.getProposeLabel() }}
       </button>
       <button class="won-button--filled thin black"
           ng-if="self.isClaimable"
@@ -105,11 +107,13 @@ function genComponentConf() {
           ownNeed,
           message,
           multiSelectType: connection && connection.get("multiSelectType"),
-          isAccepted: isMessageAccepted(this.message),
-          isRejected: isMessageRejected(this.message),
-          isRetracted: isMessageRetracted(this.message),
-          isCancellationPending: isMessageCancellationPending(this.message),
-          isCancelled: isMessageCancelled(this.message),
+          isProposed: isMessageProposed(message),
+          isClaimed: isMessageClaimed(message),
+          isAccepted: isMessageAccepted(message),
+          isRejected: isMessageRejected(message),
+          isRetracted: isMessageRetracted(message),
+          isCancellationPending: isMessageCancellationPending(message),
+          isCancelled: isMessageCancelled(message),
           isProposable:
             connection &&
             connection.get("state") === won.WON.Connected &&
@@ -148,6 +152,10 @@ function genComponentConf() {
         this.connectionUri,
         false
       );
+    }
+
+    getProposeLabel() {
+      return this.isProposed ? "Propose (again)" : "Propose";
     }
   }
 

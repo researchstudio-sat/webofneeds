@@ -75,11 +75,26 @@ export function parseMessage(
       senderUri: wonMessage.getSenderNeed() || wonMessage.getSenderNode(),
       messageType: wonMessage.getMessageType(),
       messageStatus: {
+        isProposed: false,
+        isClaimed: false,
         isRetracted: false,
         isRejected: false,
         isAccepted: false,
         isCancellationPending: false,
         isCancelled: false,
+      },
+      viewState: {
+        isSelected: false,
+        isCollapsed: false,
+        expandedReferences: {
+          forwards: true,
+          claims: true,
+          proposes: true,
+          proposesToCancel: false,
+          accepts: false,
+          rejects: false,
+          retracts: false,
+        },
       },
       isMessageStatusUpToDate: false,
       contentGraphTrig: {
@@ -95,7 +110,6 @@ export function parseMessage(
       //Send Status Flags
       isReceivedByOwn: alreadyProcessed || !wonMessage.isFromOwner(), //if the message is not from the owner we know it has been received anyway
       isReceivedByRemote: alreadyProcessed || !wonMessage.isFromOwner(), //if the message is not from the owner we know it has been received anyway
-      isSelected: false,
       failedToSend: false,
     },
   };

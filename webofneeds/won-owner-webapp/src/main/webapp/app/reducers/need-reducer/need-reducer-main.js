@@ -18,13 +18,18 @@ import {
   addMessage,
   addExistingMessages,
   updateMessageStatus,
-  setMessageSelected,
+  markMessageAsSelected,
+  markMessageAsCollapsed,
+  markMessageShowActions,
   markMessageAsRead,
+  markMessageAsClaimed,
+  markMessageAsProposed,
   markMessageAsRejected,
   markMessageAsRetracted,
   markMessageAsAccepted,
   markMessageAsCancelled,
   markMessageAsCancellationPending,
+  markMessageExpandReferences,
 } from "./reduce-messages.js";
 import {
   addConnectionFull,
@@ -290,6 +295,8 @@ export default function(allNeedsInState = initialState, action = {}) {
               unread: true,
               messageType: won.WONMSG.connectMessage,
               messageStatus: {
+                isProposed: false,
+                isClaimed: false,
                 isRetracted: false,
                 isRejected: false,
                 isAccepted: false,
@@ -465,13 +472,38 @@ export default function(allNeedsInState = initialState, action = {}) {
         action.payload.getReceiver(),
         won.WON.Closed
       );
-    case actionTypes.messages.setMessageSelected:
-      return setMessageSelected(
+    case actionTypes.messages.viewState.markExpandReference:
+      return markMessageExpandReferences(
+        allNeedsInState,
+        action.payload.messageUri,
+        action.payload.connectionUri,
+        action.payload.needUri,
+        action.payload.isExpanded,
+        action.payload.reference
+      );
+    case actionTypes.messages.viewState.markAsSelected:
+      return markMessageAsSelected(
         allNeedsInState,
         action.payload.messageUri,
         action.payload.connectionUri,
         action.payload.needUri,
         action.payload.isSelected
+      );
+    case actionTypes.messages.viewState.markAsCollapsed:
+      return markMessageAsCollapsed(
+        allNeedsInState,
+        action.payload.messageUri,
+        action.payload.connectionUri,
+        action.payload.needUri,
+        action.payload.isCollapsed
+      );
+    case actionTypes.messages.viewState.markShowActions:
+      return markMessageShowActions(
+        allNeedsInState,
+        action.payload.messageUri,
+        action.payload.connectionUri,
+        action.payload.needUri,
+        action.payload.showActions
       );
     case actionTypes.messages.markAsRead:
       return markMessageAsRead(
@@ -480,6 +512,7 @@ export default function(allNeedsInState = initialState, action = {}) {
         action.payload.connectionUri,
         action.payload.needUri
       );
+
     case actionTypes.messages.updateMessageStatus:
       return updateMessageStatus(
         allNeedsInState,
@@ -488,6 +521,25 @@ export default function(allNeedsInState = initialState, action = {}) {
         action.payload.needUri,
         action.payload.messageStatus
       );
+
+    case actionTypes.messages.messageStatus.markAsProposed:
+      return markMessageAsProposed(
+        allNeedsInState,
+        action.payload.messageUri,
+        action.payload.connectionUri,
+        action.payload.needUri,
+        action.payload.proposed
+      );
+
+    case actionTypes.messages.messageStatus.markAsClaimed:
+      return markMessageAsClaimed(
+        allNeedsInState,
+        action.payload.messageUri,
+        action.payload.connectionUri,
+        action.payload.needUri,
+        action.payload.claimed
+      );
+
     case actionTypes.messages.messageStatus.markAsRejected:
       return markMessageAsRejected(
         allNeedsInState,
@@ -496,6 +548,7 @@ export default function(allNeedsInState = initialState, action = {}) {
         action.payload.needUri,
         action.payload.rejected
       );
+
     case actionTypes.messages.messageStatus.markAsRetracted:
       return markMessageAsRetracted(
         allNeedsInState,
@@ -504,6 +557,7 @@ export default function(allNeedsInState = initialState, action = {}) {
         action.payload.needUri,
         action.payload.retracted
       );
+
     case actionTypes.messages.messageStatus.markAsAccepted:
       return markMessageAsAccepted(
         allNeedsInState,
@@ -512,6 +566,7 @@ export default function(allNeedsInState = initialState, action = {}) {
         action.payload.needUri,
         action.payload.accepted
       );
+
     case actionTypes.messages.messageStatus.markAsCancelled:
       return markMessageAsCancelled(
         allNeedsInState,
@@ -520,6 +575,7 @@ export default function(allNeedsInState = initialState, action = {}) {
         action.payload.needUri,
         action.payload.cancelled
       );
+
     case actionTypes.messages.messageStatus.markAsCancellationPending:
       return markMessageAsCancellationPending(
         allNeedsInState,
@@ -528,6 +584,7 @@ export default function(allNeedsInState = initialState, action = {}) {
         action.payload.needUri,
         action.payload.cancellationPending
       );
+
     case actionTypes.connections.markAsRead:
       return markConnectionAsRead(
         allNeedsInState,

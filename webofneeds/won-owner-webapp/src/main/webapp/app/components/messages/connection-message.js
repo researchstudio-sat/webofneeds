@@ -21,6 +21,8 @@ import {
   isMessageRejectable,
   isMessageRetractable,
   isMessageAcceptable,
+  isMessageProposed,
+  isMessageClaimed,
   isMessageRejected,
   isMessageAccepted,
   isMessageRetracted,
@@ -67,27 +69,33 @@ function genComponentConf() {
                 }"
                 in-view="$inview && self.markAsRead()">
             <div class="won-cm__center__bubble"
-    			      ng-class="{
+                ng-class="{
     			        'references' : 	self.hasReferences,
                   'pending': self.isPending,
                   'partiallyLoaded': self.isPartiallyLoaded,
                   'failure': self.isSent && self.isFailedToSend,
     			      }">
     			      <won-combined-message-content
+    			        ng-if="!self.isCollapsed"
     			        message-uri="self.messageUri"
                   connection-uri="self.connectionUri">
     			      </won-combined-message-content>
+    			      <div class="won-cm__center__bubble__collapsed clickable"
+    			        ng-if="self.isCollapsed"
+    			        ng-click="self.expandMessage()">
+                  {{ self.generateCollapsedLabel() }}
+    			      </div>
                 <div class="won-cm__center__bubble__carret clickable"
-                    ng-if="(self.isProposable || self.isClaimable) && !self.multiSelectType"
-                    ng-click="self.showDetail = !self.showDetail">
-                    <svg ng-show="!self.showDetail">
+                    ng-if="!self.isCollapsed && (self.isProposable || self.isClaimable) && !self.multiSelectType"
+                    ng-click="self.toggleActions()">
+                    <svg ng-show="!self.showActions">
                         <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
                     </svg>
-                    <svg ng-show="self.showDetail">
+                    <svg ng-show="self.showActions">
                         <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
                     </svg>
                 </div>
-                <won-connection-message-actions message-uri="self.messageUri" connection-uri="self.connectionUri" ng-if="self.showActionButtons()">
+                <won-connection-message-actions message-uri="self.messageUri" connection-uri="self.connectionUri" ng-if="!self.isCollapsed && self.showActionButtons()">
                 </won-connection-message-actions>
             </div>
             <won-connection-message-status message-uri="self.messageUri" connection-uri="self.connectionUri">
@@ -103,8 +111,6 @@ function genComponentConf() {
   class Controller {
     constructor(/* arguments = dependency injections */) {
       attach(this, serviceDependencies, arguments);
-      this.clicked = false;
-      this.showDetail = false;
       this.won = won;
 
       const selectFromState = state => {
@@ -159,11 +165,15 @@ function genComponentConf() {
           isConnectionMessage:
             message &&
             message.get("messageType") === won.WONMSG.connectionMessage,
-          isSelected: message && message.get("isSelected"),
+          isSelected: message && message.getIn(["viewState", "isSelected"]),
+          isCollapsed: message && message.getIn(["viewState", "isCollapsed"]),
+          showActions: message && message.getIn(["viewState", "showActions"]),
           multiSelectType: connection && connection.get("multiSelectType"),
           shouldShowRdf,
           rdfLinkURL,
           isParsable: message.get("isParsable"),
+          isClaimed: isMessageClaimed(this.message),
+          isProposed: isMessageProposed(this.message),
           isAccepted: isMessageAccepted(this.message),
           isRejected: isMessageRejected(this.message),
           isRetracted: isMessageRetracted(this.message),
@@ -214,16 +224,58 @@ function genComponentConf() {
         this
       );
       classOnComponentRoot("won-is-selected", () => this.isSelected, this);
+      classOnComponentRoot("won-is-proposed", () => this.isProposed, this);
+      classOnComponentRoot("won-is-claimed", () => this.isClaimed, this);
       classOnComponentRoot("won-is-rejected", () => this.isRejected, this);
       classOnComponentRoot("won-is-retracted", () => this.isRetracted, this);
       classOnComponentRoot("won-is-accepted", () => this.isAccepted, this);
       classOnComponentRoot("won-is-cancelled", () => this.isCancelled, this);
+      classOnComponentRoot("won-is-collapsed", () => this.isCollapsed, this);
+
       classOnComponentRoot(
         "won-is-cancellationPending",
         () => this.isCancellationPending,
         this
       );
       classOnComponentRoot("won-unread", () => this.isUnread, this);
+    }
+
+    expandMessage() {
+      if (this.message && !this.multiSelectType) {
+        this.messages__viewState__markAsCollapsed({
+          messageUri: this.message.get("uri"),
+          connectionUri: this.connectionUri,
+          needUri: this.ownNeed.get("uri"),
+          isCollapsed: false,
+        });
+      }
+    }
+
+    toggleActions() {
+      this.messages__viewState__markShowActions({
+        messageUri: this.message.get("uri"),
+        connectionUri: this.connectionUri,
+        needUri: this.ownNeed.get("uri"),
+        showActions: !this.showActions,
+      });
+    }
+
+    generateCollapsedLabel() {
+      if (this.message) {
+        let label;
+
+        if (this.isClaimed) label = "Message was claimed.";
+        else if (this.isProposed) label = "Message was proposed.";
+        else if (this.isAccepted) label = "Message was accepted.";
+        else if (this.isRejected) label = "Message was rejected.";
+        else if (this.isRetracted) label = "Message was retracted.";
+        else if (this.isCancellationPending) label = "Cancellation pending.";
+        else if (this.isCancelled) label = "Cancelled.";
+        else label = "Message collapsed.";
+
+        return label + " Click to expand.";
+      }
+      return undefined;
     }
 
     isSelectable() {
@@ -248,10 +300,11 @@ function genComponentConf() {
 
     showActionButtons() {
       return (
-        this.showDetail ||
+        this.showActions ||
         hasProposesReferences(this.message) ||
         hasClaimsReferences(this.message) ||
         hasProposesToCancelReferences(this.message)
+        //TODO: check if action can even be executed if not do not showActionButtons at all
       );
     }
 

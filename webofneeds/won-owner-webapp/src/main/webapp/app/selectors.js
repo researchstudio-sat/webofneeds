@@ -227,6 +227,7 @@ export function isPrivateUser(state) {
 }
 
 export function isMessageProposable(msg) {
+  //TODO: should a message be proposable if it was already proposed? or even accepted? and what if the ref are only forwardedMessages?
   return (
     msg &&
     msg.get("hasContent") &&
@@ -236,6 +237,7 @@ export function isMessageProposable(msg) {
 }
 
 export function isMessageClaimable(msg) {
+  //TODO: should a message be claimable if it was already claimed or proposed or even accepted? what if the ref are only forwardedMessages?
   return (
     msg &&
     msg.get("hasContent") &&
@@ -321,6 +323,16 @@ export function hasProposesToCancelReferences(msg) {
     references.get("proposesToCancel") &&
     references.get("proposesToCancel").size > 0
   );
+}
+
+export function isMessageProposed(msg) {
+  const messageStatus = msg && msg.get("messageStatus");
+  return messageStatus && messageStatus.get("isProposed");
+}
+
+export function isMessageClaimed(msg) {
+  const messageStatus = msg && msg.get("messageStatus");
+  return messageStatus && messageStatus.get("isClaimed");
 }
 
 export function isMessageRejected(msg) {
@@ -410,7 +422,9 @@ export function selectClaimableMessagesByConnectionUri(state, connectionUri) {
 
 export function selectSelectedMessagesByConnectionUri(state, connectionUri) {
   const messages = selectAllMessagesByConnectionUri(state, connectionUri);
-  return messages && messages.filter(msg => msg.get("isSelected"));
+  return (
+    messages && messages.filter(msg => msg.getIn(["viewState", "isSelected"]))
+  );
 }
 
 export function selectAgreementMessagesByConnectionUri(state, connectionUri) {

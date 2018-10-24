@@ -17,8 +17,20 @@ const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
       <div class="refmsgcontent__fragment" ng-if="self.hasClaimUris">
-        <div class="refmsgcontent__fragment__header">Claims {{ self.getCountString(self.claimUrisSize)}}</div>
-        <div class="refmsgcontent__fragment__body">
+        <div class="refmsgcontent__fragment__header"
+          ng-click="self.toggleReferenceExpansion('claims')"
+          ng-class="{'refmsgcontent__fragment__header--collapsed': !self.isReferenceExpanded('claims')}">
+          <div class="refmsgcontent__fragment__header__label">Claiming {{ self.getCountString(self.claimUrisSize)}}</div>
+          <div class="refmsgcontent__fragment__header__carret">
+              <svg ng-show="!self.isReferenceExpanded('claims')">
+                  <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
+              </svg>
+              <svg ng-show="self.isReferenceExpanded('claims')">
+                  <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
+              </svg>
+          </div>
+        </div>
+        <div class="refmsgcontent__fragment__body" ng-if="self.isReferenceExpanded('claims')">
           <won-combined-message-content
             ng-click="self.loadMessage(msgUri)"
             ng-repeat="msgUri in self.claimUrisArray"
@@ -32,8 +44,20 @@ function genComponentConf() {
         </div>
       </div>
       <div class="refmsgcontent__fragment" ng-if="self.hasProposeUris">
-        <div class="refmsgcontent__fragment__header">Proposes {{ self.getCountString(self.proposeUrisSize)}}</div>
-        <div class="refmsgcontent__fragment__body">
+        <div class="refmsgcontent__fragment__header"
+          ng-click="self.toggleReferenceExpansion('proposes')"
+          ng-class="{'refmsgcontent__fragment__header--collapsed': !self.isReferenceExpanded('proposes')}">
+          <div class="refmsgcontent__fragment__header__label">Proposing {{ self.getCountString(self.proposeUrisSize)}}</div>
+          <div class="refmsgcontent__fragment__header__carret">
+              <svg ng-show="!self.isReferenceExpanded('proposes')">
+                  <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
+              </svg>
+              <svg ng-show="self.isReferenceExpanded('proposes')">
+                  <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
+              </svg>
+          </div>
+        </div>
+        <div class="refmsgcontent__fragment__body" ng-if="self.isReferenceExpanded('proposes')">
           <won-combined-message-content
             ng-click="self.loadMessage(msgUri)"
             ng-repeat="msgUri in self.proposeUrisArray"
@@ -47,8 +71,20 @@ function genComponentConf() {
         </div>
       </div>
       <div class="refmsgcontent__fragment" ng-if="self.hasRetractUris">
-        <div class="refmsgcontent__fragment__header">Retracts {{ self.getCountString(self.retractUrisSize)}}</div>
-        <div class="refmsgcontent__fragment__body">
+        <div class="refmsgcontent__fragment__header"
+          ng-click="self.toggleReferenceExpansion('retracts')"
+          ng-class="{'refmsgcontent__fragment__header--collapsed': !self.isReferenceExpanded('retracts')}">
+          <div class="refmsgcontent__fragment__header__label">Retracting {{ self.getCountString(self.retractUrisSize)}}</div>
+          <div class="refmsgcontent__fragment__header__carret clickable">
+              <svg ng-show="!self.isReferenceExpanded('retracts')">
+                  <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
+              </svg>
+              <svg ng-show="self.isReferenceExpanded('retracts')">
+                  <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
+              </svg>
+          </div>
+        </div>
+        <div class="refmsgcontent__fragment__body" ng-if="self.isReferenceExpanded('retracts')">
           <won-combined-message-content
             ng-click="self.loadMessage(msgUri)"
             ng-repeat="msgUri in self.retractUrisArray"
@@ -62,8 +98,20 @@ function genComponentConf() {
         </div>
       </div>
       <div class="refmsgcontent__fragment" ng-if="self.hasAcceptUris">
-        <div class="refmsgcontent__fragment__header">Accepts {{ self.getCountString(self.acceptUrisSize)}}</div>
-        <div class="refmsgcontent__fragment__body">
+        <div class="refmsgcontent__fragment__header"
+          ng-click="self.toggleReferenceExpansion('accepts')"
+          ng-class="{'refmsgcontent__fragment__header--collapsed': !self.isReferenceExpanded('accepts')}">
+          <div class="refmsgcontent__fragment__header__label">Accepting {{ self.getCountString(self.acceptUrisSize)}}</div>
+          <div class="refmsgcontent__fragment__header__carret">
+              <svg ng-show="!self.isReferenceExpanded('accepts')">
+                  <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
+              </svg>
+              <svg ng-show="self.isReferenceExpanded('accepts')">
+                  <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
+              </svg>
+          </div>
+        </div>
+        <div class="refmsgcontent__fragment__body" ng-if="self.isReferenceExpanded('accepts')">
           <won-combined-message-content
             ng-click="self.loadMessage(msgUri)"
             ng-repeat="msgUri in self.acceptUrisArray"
@@ -77,8 +125,20 @@ function genComponentConf() {
         </div>
       </div>
       <div class="refmsgcontent__fragment" ng-if="self.hasProposeToCancelUris">
-        <div class="refmsgcontent__fragment__header">Propose to cancel {{ self.getCountString(self.proposeToCancelUrisSize)}}</div>
-        <div class="refmsgcontent__fragment__body">
+        <div class="refmsgcontent__fragment__header"
+          ng-click="self.toggleReferenceExpansion('proposesToCancel')"
+          ng-class="{'refmsgcontent__fragment__header--collapsed': !self.isReferenceExpanded('proposesToCancel')}">
+          <div class="refmsgcontent__fragment__header__label">Proposing to cancel {{ self.getCountString(self.proposeToCancelUrisSize)}}</div>
+          <div class="refmsgcontent__fragment__header__carret">
+              <svg ng-show="!self.isReferenceExpanded('proposesToCancel')">
+                  <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
+              </svg>
+              <svg ng-show="self.isReferenceExpanded('proposesToCancel')">
+                  <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
+              </svg>
+          </div>
+        </div>
+        <div class="refmsgcontent__fragment__body" ng-if="self.isReferenceExpanded('proposesToCancel')">
           <won-combined-message-content
             ng-click="self.loadMessage(msgUri)"
             ng-repeat="msgUri in self.proposeToCancelUrisArray"
@@ -92,8 +152,20 @@ function genComponentConf() {
         </div>
       </div>
       <div class="refmsgcontent__fragment" ng-if="self.hasRejectUris">
-        <div class="refmsgcontent__fragment__header">Rejects {{ self.getCountString(self.rejectUrisSize)}}</div>
-        <div class="refmsgcontent__fragment__body">
+        <div class="refmsgcontent__fragment__header"
+          ng-click="self.toggleReferenceExpansion('rejects')"
+          ng-class="{'refmsgcontent__fragment__header--collapsed': !self.isReferenceExpanded('rejects')}">
+          <div class="refmsgcontent__fragment__header__label">Rejecting {{ self.getCountString(self.rejectUrisSize)}}</div>
+          <div class="refmsgcontent__fragment__header__carret">
+              <svg ng-show="!self.isReferenceExpanded('rejects')">
+                  <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
+              </svg>
+              <svg ng-show="self.isReferenceExpanded('rejects')">
+                  <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
+              </svg>
+          </div>
+        </div>
+        <div class="refmsgcontent__fragment__body" ng-if="self.isReferenceExpanded('rejects')">
           <won-combined-message-content
             ng-click="self.loadMessage(msgUri)"
             ng-repeat="msgUri in self.rejectUrisArray"
@@ -107,8 +179,20 @@ function genComponentConf() {
         </div>
       </div>
       <div class="refmsgcontent__fragment" ng-if="self.hasForwardUris">
-        <div class="refmsgcontent__fragment__header">Forwarded {{ self.getCountString(self.forwardUrisSize)}}</div>
-        <div class="refmsgcontent__fragment__body">
+        <div class="refmsgcontent__fragment__header"
+          ng-click="self.toggleReferenceExpansion('forwards')"
+          ng-class="{'refmsgcontent__fragment__header--collapsed': !self.isReferenceExpanded('forwards')}">
+          <div class="refmsgcontent__fragment__header__label">Forwarding {{ self.getCountString(self.forwardUrisSize)}}</div>
+          <div class="refmsgcontent__fragment__header__carret">
+              <svg ng-show="!self.isReferenceExpanded('forwards')">
+                  <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
+              </svg>
+              <svg ng-show="self.isReferenceExpanded('forwards')">
+                  <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
+              </svg>
+          </div>
+        </div>
+        <div class="refmsgcontent__fragment__body" ng-if="self.isReferenceExpanded('forwards')">
           <won-combined-message-content
             ng-click="self.loadMessage(msgUri)"
             ng-repeat="msgUri in self.forwardUrisArray"
@@ -137,6 +221,9 @@ function genComponentConf() {
             ? getIn(connection, ["messages", this.messageUri])
             : Immutable.Map();
 
+        const expandedReferences =
+          message && message.getIn(["viewState", "expandedReferences"]);
+
         const chatMessages = connection && connection.get("messages");
 
         const references = message && message.get("references");
@@ -162,6 +249,7 @@ function genComponentConf() {
 
         return {
           ownNeedUri: ownNeed && ownNeed.get("uri"),
+          message,
           chatMessages: chatMessages,
           connection,
           acceptUrisSize,
@@ -171,6 +259,7 @@ function genComponentConf() {
           retractUrisSize,
           forwardUrisSize,
           claimUrisSize,
+          expandedReferences,
           hasProposeUris: proposeUrisSize > 0,
           hasAcceptUris: acceptUrisSize > 0,
           hasProposeToCancelUris: proposeToCancelUrisSize > 0,
@@ -220,6 +309,25 @@ function genComponentConf() {
           return undefined;
         }
       }
+    }
+
+    toggleReferenceExpansion(reference) {
+      const currentExpansionState =
+        this.expandedReferences && this.expandedReferences.get(reference);
+
+      if (this.message && !this.multiSelectType) {
+        this.messages__viewState__markExpandReference({
+          messageUri: this.messageUri,
+          connectionUri: this.connectionUri,
+          needUri: this.ownNeedUri,
+          isExpanded: !currentExpansionState,
+          reference: reference,
+        });
+      }
+    }
+
+    isReferenceExpanded(reference) {
+      return this.expandedReferences && this.expandedReferences.get(reference);
     }
 
     getCountString(elements) {

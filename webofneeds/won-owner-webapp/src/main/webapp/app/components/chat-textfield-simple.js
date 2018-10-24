@@ -514,7 +514,7 @@ function genComponentConf() {
         this.referencedContent && this.referencedContent.get(type);
       if (referencedContent) {
         referencedContent.forEach(msg => {
-          this.messages__setMessageSelected({
+          this.messages__viewState__markAsSelected({
             messageUri: msg.get("uri"),
             connectionUri: this.connectionUri,
             needUri: this.post.get("uri"),
@@ -565,7 +565,7 @@ function genComponentConf() {
     }
 
     removeMessageFromSelection(msg) {
-      this.messages__setMessageSelected({
+      this.messages__viewState__markAsSelected({
         messageUri: msg.get("uri"),
         connectionUri: this.connectionUri,
         needUri: this.post.get("uri"),

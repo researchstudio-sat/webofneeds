@@ -109,12 +109,14 @@ $ngRedux.getState();
                        messageType: //no default but is always set to the specific message type of the received/sent wonMessage
                        date: date, //creation Date of this message
                        unread: true|false, //whether or not this message is new (or already seen if you will)
+                       forwardMessage: true|false, //default is false, flag to indicate if this is a message coming from another connection, and is referenced in the references->forwards of another message (this is a flag to indicate if the message is visible or not)
                        outgoingMessage: true|false, //flag to indicate if this was an outgoing or incoming message
                        systemMessage: true|false, //flag to indicate if this message came from the system (e.g. hint messages) !wonMessage.isFromOwner() && !wonMessage.getSenderNeed() && wonMessage.getSenderNode(),
                        senderUri: uri //to indicate which need or node sent the message itself, wonMessage.getSenderNeed() || wonMessage.getSenderNode(),
                        content: {
                            text: wonMessage.getTextMessage(),
                            matchScore: wonMessage.getMatchScore(),
+                           [and other details which are parsed from the detail-definitions are stored here]
                        },
                        references: {
                            //These references are parsed in a way that it will always be a list no matter if there is only a single element or an array
@@ -133,16 +135,32 @@ $ngRedux.getState();
                        isParsable: true|false //true if hasReferences or hasContent is true
                        isMessageStatusUpToDate: true|false //true if the agreementData has been checked to define the status of the message
                        messageStatus: {
+                           isProposed: true|false //if the message was proposed
+                           isClaimed: true|false //if the message was claimed
                            isRetracted: true|false //if the message was retracted
                            isRejected: true|false //if the message was rejected
                            isAccepted: true|false //if the message was accepted
                            isCancellationPending: true|false //if the message is pending to be cancelled
                            isCancelled: true|false //if the message was cancelled
-                       }
-                       uri: string //unique identifier of this message
+                       },
+                       viewState: {
+                           //TODO: everything in this state should be extracted into its own (view/ui)-state, this is only here so we do not have a huge (fail prone refactoring shortly before the codefreeze)
+                           isSelected: true|false //whether or not the message is Selected in the MultiSelect view
+                           isCollapsed: true|false //default is false, whether or not the message should be displayed in a minimized fashion
+                           showActions: true|false //default is false, whether or not the actionButtons of a message are visible
+                           expandedReferences: {
+                             forwards: true,
+                             claims: false,
+                             proposes: false,
+                             proposesToCancel: false,
+                             accepts: false,
+                             rejects: false,
+                             retracts: false,
+                           }
+                       },
+                       uri: string //unique identifier of this message (same as messageUri)
                        isReceivedByOwn: true|false //whether the sent request/message is received by the own server or not (default: false, if its not an outgoingMessage the default is true)
                        isReceivedByRemote: true|false //whether the sent request/message is received by the remote server or not (default: false, if its not an outgoingMessage the default is true)
-                       isSelected: true|false //whether or not the message is Selected in the MultiSelect view
                        failedToSend: true|false //whether the sent message failed for whatever reason (default: false, only relevant in outgoingMessages)
                    }
                    ...
@@ -154,6 +172,8 @@ $ngRedux.getState();
                    cancellationPendingAgreementUris: Immutable.Set(),
                    acceptedCancellationProposalUris: Immutable.Set(),
                    cancelledAgreementUris: Immutable.Set(),
+                   proposedMessageUris: Immutable.Set(),
+                   claimedMessageUris: Immutable.Set(),
                    rejectedMessageUris: Immutable.Set(),
                    retractedMessageUris: Immutable.Set(),
                    isLoaded: true|false, //default is false, whether or not the agreementData has been loaded already
