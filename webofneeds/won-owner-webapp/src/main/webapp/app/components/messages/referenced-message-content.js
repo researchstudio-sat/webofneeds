@@ -20,7 +20,7 @@ function genComponentConf() {
         <div class="refmsgcontent__fragment__header"
           ng-click="self.toggleReferenceExpansion('claims')"
           ng-class="{'refmsgcontent__fragment__header--collapsed': !self.isReferenceExpanded('claims')}">
-          <div class="refmsgcontent__fragment__header__label">Claims {{ self.getCountString(self.claimUrisSize)}}</div>
+          <div class="refmsgcontent__fragment__header__label">Claiming {{ self.getCountString(self.claimUrisSize)}}</div>
           <div class="refmsgcontent__fragment__header__carret">
               <svg ng-show="!self.isReferenceExpanded('claims')">
                   <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
@@ -47,7 +47,7 @@ function genComponentConf() {
         <div class="refmsgcontent__fragment__header"
           ng-click="self.toggleReferenceExpansion('proposes')"
           ng-class="{'refmsgcontent__fragment__header--collapsed': !self.isReferenceExpanded('proposes')}">
-          <div class="refmsgcontent__fragment__header__label">Proposes {{ self.getCountString(self.proposeUrisSize)}}</div>
+          <div class="refmsgcontent__fragment__header__label">Proposing {{ self.getCountString(self.proposeUrisSize)}}</div>
           <div class="refmsgcontent__fragment__header__carret">
               <svg ng-show="!self.isReferenceExpanded('proposes')">
                   <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
@@ -74,7 +74,7 @@ function genComponentConf() {
         <div class="refmsgcontent__fragment__header"
           ng-click="self.toggleReferenceExpansion('retracts')"
           ng-class="{'refmsgcontent__fragment__header--collapsed': !self.isReferenceExpanded('retracts')}">
-          <div class="refmsgcontent__fragment__header__label">Retracts {{ self.getCountString(self.retractUrisSize)}}</div>
+          <div class="refmsgcontent__fragment__header__label">Retracting {{ self.getCountString(self.retractUrisSize)}}</div>
           <div class="refmsgcontent__fragment__header__carret clickable">
               <svg ng-show="!self.isReferenceExpanded('retracts')">
                   <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
@@ -101,7 +101,7 @@ function genComponentConf() {
         <div class="refmsgcontent__fragment__header"
           ng-click="self.toggleReferenceExpansion('accepts')"
           ng-class="{'refmsgcontent__fragment__header--collapsed': !self.isReferenceExpanded('accepts')}">
-          <div class="refmsgcontent__fragment__header__label">Accepts {{ self.getCountString(self.acceptUrisSize)}}</div>
+          <div class="refmsgcontent__fragment__header__label">Accepting {{ self.getCountString(self.acceptUrisSize)}}</div>
           <div class="refmsgcontent__fragment__header__carret">
               <svg ng-show="!self.isReferenceExpanded('accepts')">
                   <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
@@ -128,7 +128,7 @@ function genComponentConf() {
         <div class="refmsgcontent__fragment__header"
           ng-click="self.toggleReferenceExpansion('proposesToCancel')"
           ng-class="{'refmsgcontent__fragment__header--collapsed': !self.isReferenceExpanded('proposesToCancel')}">
-          <div class="refmsgcontent__fragment__header__label">Propose to cancel {{ self.getCountString(self.proposeToCancelUrisSize)}}</div>
+          <div class="refmsgcontent__fragment__header__label">Proposing to cancel {{ self.getCountString(self.proposeToCancelUrisSize)}}</div>
           <div class="refmsgcontent__fragment__header__carret">
               <svg ng-show="!self.isReferenceExpanded('proposesToCancel')">
                   <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
@@ -155,7 +155,7 @@ function genComponentConf() {
         <div class="refmsgcontent__fragment__header"
           ng-click="self.toggleReferenceExpansion('rejects')"
           ng-class="{'refmsgcontent__fragment__header--collapsed': !self.isReferenceExpanded('rejects')}">
-          <div class="refmsgcontent__fragment__header__label">Rejects {{ self.getCountString(self.rejectUrisSize)}}</div>
+          <div class="refmsgcontent__fragment__header__label">Rejecting {{ self.getCountString(self.rejectUrisSize)}}</div>
           <div class="refmsgcontent__fragment__header__carret">
               <svg ng-show="!self.isReferenceExpanded('rejects')">
                   <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
@@ -182,7 +182,7 @@ function genComponentConf() {
         <div class="refmsgcontent__fragment__header"
           ng-click="self.toggleReferenceExpansion('forwards')"
           ng-class="{'refmsgcontent__fragment__header--collapsed': !self.isReferenceExpanded('forwards')}">
-          <div class="refmsgcontent__fragment__header__label">Forwarded {{ self.getCountString(self.forwardUrisSize)}}</div>
+          <div class="refmsgcontent__fragment__header__label">Forwarding {{ self.getCountString(self.forwardUrisSize)}}</div>
           <div class="refmsgcontent__fragment__header__carret">
               <svg ng-show="!self.isReferenceExpanded('forwards')">
                   <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>

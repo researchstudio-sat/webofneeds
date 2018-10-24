@@ -25,6 +25,13 @@ won-combined-message-content {
       color: $won-subtitle-gray;
     }
 
+    &--agreement {
+      .msg__header__type {
+        font-size: $normalFontSize;
+        color: black;
+      }
+    }
+
     &--forwarded-from,
     &--inject-into {
       display: grid;
@@ -33,7 +40,7 @@ won-combined-message-content {
       grid-gap: 0.25rem;
       align-items: center;
 
-      .msg_header_type {
+      .msg__header__type {
         grid-area: auto;
       }
 
