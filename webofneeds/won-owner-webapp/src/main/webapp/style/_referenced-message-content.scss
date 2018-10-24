@@ -30,6 +30,10 @@ won-referenced-message-content {
       align-items: center;
       cursor: pointer;
 
+      &.refmsgcontent__fragment__header--collapsed {
+        border-bottom: $thinBorderWidth solid white;
+      }
+
       &__label {
         font-weight: bold;
       }

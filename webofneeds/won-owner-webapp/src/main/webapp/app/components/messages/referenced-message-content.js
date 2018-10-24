@@ -17,7 +17,9 @@ const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
       <div class="refmsgcontent__fragment" ng-if="self.hasClaimUris">
-        <div class="refmsgcontent__fragment__header" ng-click="self.toggleReferenceExpansion('claims')">
+        <div class="refmsgcontent__fragment__header"
+          ng-click="self.toggleReferenceExpansion('claims')"
+          ng-class="{'refmsgcontent__fragment__header--collapsed': !self.isReferenceExpanded('claims')}">
           <div class="refmsgcontent__fragment__header__label">Claims {{ self.getCountString(self.claimUrisSize)}}</div>
           <div class="refmsgcontent__fragment__header__carret">
               <svg ng-show="!self.isReferenceExpanded('claims')">
@@ -42,7 +44,9 @@ function genComponentConf() {
         </div>
       </div>
       <div class="refmsgcontent__fragment" ng-if="self.hasProposeUris">
-        <div class="refmsgcontent__fragment__header" ng-click="self.toggleReferenceExpansion('proposes')">
+        <div class="refmsgcontent__fragment__header"
+          ng-click="self.toggleReferenceExpansion('proposes')"
+          ng-class="{'refmsgcontent__fragment__header--collapsed': !self.isReferenceExpanded('proposes')}">
           <div class="refmsgcontent__fragment__header__label">Proposes {{ self.getCountString(self.proposeUrisSize)}}</div>
           <div class="refmsgcontent__fragment__header__carret">
               <svg ng-show="!self.isReferenceExpanded('proposes')">
@@ -67,7 +71,9 @@ function genComponentConf() {
         </div>
       </div>
       <div class="refmsgcontent__fragment" ng-if="self.hasRetractUris">
-        <div class="refmsgcontent__fragment__header" ng-click="self.toggleReferenceExpansion('retracts')">
+        <div class="refmsgcontent__fragment__header"
+          ng-click="self.toggleReferenceExpansion('retracts')"
+          ng-class="{'refmsgcontent__fragment__header--collapsed': !self.isReferenceExpanded('retracts')}">
           <div class="refmsgcontent__fragment__header__label">Retracts {{ self.getCountString(self.retractUrisSize)}}</div>
           <div class="refmsgcontent__fragment__header__carret clickable">
               <svg ng-show="!self.isReferenceExpanded('retracts')">
@@ -92,7 +98,9 @@ function genComponentConf() {
         </div>
       </div>
       <div class="refmsgcontent__fragment" ng-if="self.hasAcceptUris">
-        <div class="refmsgcontent__fragment__header" ng-click="self.toggleReferenceExpansion('accepts')">
+        <div class="refmsgcontent__fragment__header"
+          ng-click="self.toggleReferenceExpansion('accepts')"
+          ng-class="{'refmsgcontent__fragment__header--collapsed': !self.isReferenceExpanded('accepts')}">
           <div class="refmsgcontent__fragment__header__label">Accepts {{ self.getCountString(self.acceptUrisSize)}}</div>
           <div class="refmsgcontent__fragment__header__carret">
               <svg ng-show="!self.isReferenceExpanded('accepts')">
@@ -117,7 +125,9 @@ function genComponentConf() {
         </div>
       </div>
       <div class="refmsgcontent__fragment" ng-if="self.hasProposeToCancelUris">
-        <div class="refmsgcontent__fragment__header" ng-click="self.toggleReferenceExpansion('proposesToCancel')">
+        <div class="refmsgcontent__fragment__header"
+          ng-click="self.toggleReferenceExpansion('proposesToCancel')"
+          ng-class="{'refmsgcontent__fragment__header--collapsed': !self.isReferenceExpanded('proposesToCancel')}">
           <div class="refmsgcontent__fragment__header__label">Propose to cancel {{ self.getCountString(self.proposeToCancelUrisSize)}}</div>
           <div class="refmsgcontent__fragment__header__carret">
               <svg ng-show="!self.isReferenceExpanded('proposesToCancel')">
@@ -142,7 +152,9 @@ function genComponentConf() {
         </div>
       </div>
       <div class="refmsgcontent__fragment" ng-if="self.hasRejectUris">
-        <div class="refmsgcontent__fragment__header" ng-click="self.toggleReferenceExpansion('rejects')">
+        <div class="refmsgcontent__fragment__header"
+          ng-click="self.toggleReferenceExpansion('rejects')"
+          ng-class="{'refmsgcontent__fragment__header--collapsed': !self.isReferenceExpanded('rejects')}">
           <div class="refmsgcontent__fragment__header__label">Rejects {{ self.getCountString(self.rejectUrisSize)}}</div>
           <div class="refmsgcontent__fragment__header__carret">
               <svg ng-show="!self.isReferenceExpanded('rejects')">
@@ -167,7 +179,9 @@ function genComponentConf() {
         </div>
       </div>
       <div class="refmsgcontent__fragment" ng-if="self.hasForwardUris">
-        <div class="refmsgcontent__fragment__header" ng-click="self.toggleReferenceExpansion('forwards')">
+        <div class="refmsgcontent__fragment__header"
+          ng-click="self.toggleReferenceExpansion('forwards')"
+          ng-class="{'refmsgcontent__fragment__header--collapsed': !self.isReferenceExpanded('forwards')}">
           <div class="refmsgcontent__fragment__header__label">Forwarded {{ self.getCountString(self.forwardUrisSize)}}</div>
           <div class="refmsgcontent__fragment__header__carret">
               <svg ng-show="!self.isReferenceExpanded('forwards')">
