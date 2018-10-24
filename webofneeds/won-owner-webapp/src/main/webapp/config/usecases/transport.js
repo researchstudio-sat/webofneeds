@@ -327,7 +327,7 @@ export const transportGroup = {
             filterAndJoin(
               [
                 location &&
-                  `${resultName} a s:TaxiService . ?is won:hasLocation ?location .`,
+                  `${resultName} a <http://dbpedia.org/resource/Transport> . ?is won:hasLocation ?location .`,
                 location && locationFilter.operations.join(" "),
               ],
               " "
