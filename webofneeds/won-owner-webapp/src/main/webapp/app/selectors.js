@@ -465,6 +465,7 @@ export function getCorrectMessageUri(messages, messageUri) {
 export function getPersonas(needs) {
   const personas = needs
     .toList()
+    .filter(need => need.get("ownNeed"))
     .filter(need => need.get("types") && need.get("types").has("won:Persona"));
   return personas.map(persona => {
     const graph = persona.get("jsonld");
