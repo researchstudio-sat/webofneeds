@@ -4,7 +4,12 @@
 import { details, abstractDetails, emptyDraft } from "../detail-definitions.js";
 import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-utils.js";
 import won from "../../app/won-es6.js";
-import { isValidNumber, get, getInFromJsonLd } from "../../app/utils.js";
+import { isValidNumber, get, getIn, getInFromJsonLd } from "../../app/utils.js";
+import {
+  filterInVicinity,
+  concatenateFilters,
+  sparqlQuery,
+} from "../../app/sparql-builder-utils.js";
 
 export const transportGroup = {
   identifier: "transportgroup",
@@ -253,6 +258,98 @@ export const transportGroup = {
       seeksDetails: {
         travelAction: { ...details.travelAction },
       },
+      generateQuery: (draft, resultName) => {
+        const fromLocation = getIn(draft, [
+          "seeks",
+          "travelAction",
+          "fromLocation",
+        ]);
+        const toLocation = getIn(draft, [
+          "seeks",
+          "travelAction",
+          "toLocation",
+        ]);
+
+        const baseFilter = {
+          prefixes: {
+            won: won.defaultContext["won"],
+          },
+          operations: [
+            `${resultName} a won:Need.`,
+            `${resultName} won:isInState won:Active;
+                           a <http://dbpedia.org/resource/Transport>. `,
+            `${resultName} won:is ?is.`,
+          ],
+        };
+
+        const locationFilter = filterInVicinity(
+          "?location",
+          fromLocation,
+          /*radius=*/ 100
+        );
+        const fromLocationFilter = filterInVicinity(
+          "?fromLocation",
+          fromLocation,
+          /*radius=*/ 5
+        );
+        const toLocationFilter = filterInVicinity(
+          "?toLocation",
+          toLocation,
+          /*radius=*/ 5
+        );
+
+        const union = operations => {
+          if (!operations || operations.length === 0) {
+            return "";
+          } else {
+            return "{" + operations.join("} UNION {") + "}";
+          }
+        };
+        const filterAndJoin = (arrayOfStrings, seperator) =>
+          arrayOfStrings.filter(str => str).join(seperator);
+
+        const locationFilters = {
+          prefixes: locationFilter.prefixes,
+          operations: union([
+            filterAndJoin(
+              [
+                fromLocation &&
+                  `${resultName} a <http://dbpedia.org/resource/Transport>. ?is won:travelAction/s:fromLocation ?fromLocation. `,
+                fromLocation && fromLocationFilter.operations.join(" "),
+                toLocation && "?is won:travelAction/s:toLocation ?toLocation.",
+                toLocation && toLocationFilter.operations.join(" "),
+              ],
+              " "
+            ),
+            filterAndJoin(
+              [
+                location &&
+                  `${resultName} a s:TaxiService . ?is won:hasLocation ?location .`,
+                location && locationFilter.operations.join(" "),
+              ],
+              " "
+            ),
+          ]),
+        };
+
+        const concatenatedFilter = concatenateFilters([
+          baseFilter,
+          locationFilters,
+        ]);
+
+        return sparqlQuery({
+          prefixes: concatenatedFilter.prefixes,
+          distinct: true,
+          variables: [resultName],
+          where: concatenatedFilter.operations,
+          orderBy: [
+            {
+              order: "ASC",
+              variable: "?location_geoDistance",
+            },
+          ],
+        });
+      },
     },
     transportOffer: {
       identifier: "transportOffer",
@@ -261,7 +358,10 @@ export const transportGroup = {
       doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
       draft: {
         ...emptyDraft,
-        is: { title: "Transportation offer" },
+        is: {
+          title: "Transportation offer",
+          type: "http://dbpedia.org/resource/Transport",
+        },
         searchString: "transport", // TODO: replace this with a query
       },
       isDetails: {
@@ -272,24 +372,41 @@ export const transportGroup = {
         tags: { ...details.tags },
         description: { ...details.description },
       },
-      // generateQuery: (draft, resultName) => {
-      //   const filterStrings = [];
-      //   const prefixes = {
-      //     s: won.defaultContext["s"],
-      //     won: won.defaultContext["won"],
-      //   };
+      generateQuery: (draft, resultName) => {
+        const location = getIn(draft, ["is", "location"]);
+        const filters = [
+          {
+            // to select seeks-branch
+            prefixes: {
+              won: won.defaultContext["won"],
+            },
+            operations: [
+              `${resultName} a won:Need.`,
+              `${resultName} won:seeks ?seeks.`,
+              `${resultName} won:is ?is.`,
+              `?is a s:Product.`,
+              location && "?seeks won:travelAction/s:fromLocation ?location.",
+            ],
+          },
 
-      //   let queryTemplate =
-      //     `
-      //     ${prefixesString(prefixes)}
-      //     SELECT DISTINCT ${resultName}
-      //     WHERE {
-      //     ${resultName}
-      //       won:is ?is.
-      //       ${filterStrings && filterStrings.join(" ")}
-      //     }` + (location ? `ORDER BY ASC(?geoDistance)` : "");
-      //   return new SparqlParser().parse(queryTemplate);
-      // },
+          filterInVicinity("?location", location, /*radius=*/ 100),
+        ];
+
+        const concatenatedFilter = concatenateFilters(filters);
+
+        return sparqlQuery({
+          prefixes: concatenatedFilter.prefixes,
+          distinct: true,
+          variables: [resultName],
+          where: concatenatedFilter.operations,
+          orderBy: [
+            {
+              order: "ASC",
+              variable: "?location_geoDistance",
+            },
+          ],
+        });
+      },
     },
   },
 };
