@@ -122,6 +122,9 @@ export function connectionsChatMessage(
     ]);
 
     let referencedContentUris = undefined;
+    /*TODO: Since we set messages to be (successfully) claimed/proposed/accepted... before we even know if the transition was successful we might
+     need to rethink this implementation in favor of a dirtyState somehow, and remove the dirty state on successRemote of the message -> handling is in
+     messages-actions.js (dispatchActionOnSuccessRemote part if(toRefreshData) ... but for now this will do*/
     if (referencedContent) {
       referencedContentUris = new Map();
       referencedContent.forEach((referencedMessages, key) => {
