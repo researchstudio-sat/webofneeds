@@ -88,8 +88,8 @@ export function parseMessage(
         isCollapsed: false,
         expandedReferences: {
           forwards: true,
-          claims: false,
-          proposes: false,
+          claims: true,
+          proposes: true,
           proposesToCancel: false,
           accepts: false,
           rejects: false,
