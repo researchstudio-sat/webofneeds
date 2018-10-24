@@ -193,6 +193,14 @@ export function markMessageAsCollapsed(
       needUri,
       false
     );
+
+    state = markMessageExpandAllReferences(
+      state,
+      messageUri,
+      connectionUri,
+      needUri,
+      false
+    );
   }
 
   return state.setIn(
@@ -209,6 +217,87 @@ export function markMessageAsCollapsed(
   );
 }
 
+/**
+ * Collapses/Expands all available references within the viewState of a message based on the isExpanded value
+ * @param state
+ * @param messageUri
+ * @param connectionUri
+ * @param needUri
+ * @param isExpanded
+ * @param reference
+ * @returns {*}
+ */
+export function markMessageExpandAllReferences(
+  state,
+  messageUri,
+  connectionUri,
+  needUri,
+  isExpanded
+) {
+  const need = state.get(needUri);
+  const connection = need && need.getIn(["connections", connectionUri]);
+  const message = connection && connection.getIn(["messages", messageUri]);
+
+  if (!message) {
+    console.error(
+      "no message with messageUri: <",
+      messageUri,
+      "> found within needUri: <",
+      needUri,
+      "> connectionUri: <",
+      connectionUri,
+      ">"
+    );
+    return state;
+  }
+
+  const expandedReferences = state.getIn([
+    needUri,
+    "connections",
+    connectionUri,
+    "messages",
+    messageUri,
+    "viewState",
+    "expandedReferences",
+  ]);
+
+  if (!expandedReferences) {
+    console.error(
+      "no expandedReferences found within messageUri: <",
+      messageUri,
+      "> found within needUri: <",
+      needUri,
+      "> connectionUri: <",
+      connectionUri,
+      ">"
+    );
+    return state;
+  }
+
+  return state.setIn(
+    [
+      needUri,
+      "connections",
+      connectionUri,
+      "messages",
+      messageUri,
+      "viewState",
+      "expandedReferences",
+    ],
+    expandedReferences.map(() => isExpanded)
+  );
+}
+
+/**
+ * Collapses/Expands the given reference within the viewState of a message based on the isExpanded value
+ * @param state
+ * @param messageUri
+ * @param connectionUri
+ * @param needUri
+ * @param isExpanded
+ * @param reference
+ * @returns {*}
+ */
 export function markMessageExpandReferences(
   state,
   messageUri,
