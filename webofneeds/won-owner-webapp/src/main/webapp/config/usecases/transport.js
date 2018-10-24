@@ -279,8 +279,7 @@ export const transportGroup = {
           },
           operations: [
             `${resultName} a won:Need.`,
-            `${resultName} won:isInState won:Active;
-                           a <http://dbpedia.org/resource/Transport>. `,
+            `${resultName} won:isInState won:Active. ?is a <http://dbpedia.org/resource/Transport>. `,
             `${resultName} won:is ?is.`,
           ],
         };
@@ -317,7 +316,7 @@ export const transportGroup = {
             filterAndJoin(
               [
                 fromLocation &&
-                  `${resultName} a <http://dbpedia.org/resource/Transport>. ?is won:travelAction/s:fromLocation ?fromLocation. `,
+                  `?is a <http://dbpedia.org/resource/Transport>. ?is won:travelAction/s:fromLocation ?fromLocation. `,
                 fromLocation && fromLocationFilter.operations.join(" "),
                 toLocation && "?is won:travelAction/s:toLocation ?toLocation.",
                 toLocation && toLocationFilter.operations.join(" "),
@@ -327,7 +326,7 @@ export const transportGroup = {
             filterAndJoin(
               [
                 location &&
-                  `${resultName} a <http://dbpedia.org/resource/Transport> . ?is won:hasLocation ?location .`,
+                  `?is a <http://dbpedia.org/resource/Transport> . ?is won:hasLocation ?location .`,
                 location && locationFilter.operations.join(" "),
               ],
               " "
