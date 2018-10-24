@@ -46,7 +46,7 @@ const mobilityUseCases = {
         },
         operations: [
           `${resultName} a won:Need.`,
-          `${resultName} won:isInState won:Active. { {${resultName} a <http://dbpedia.org/page/Ridesharing>.  } union { ${resultName} a s:TaxiService} }`,
+          `${resultName} won:isInState won:Active. { {${resultName} a <http://dbpedia.org/resource/Ridesharing>.  } union { ${resultName} a s:TaxiService} }`,
           `${resultName} won:is ?is.`,
         ],
       };
@@ -83,7 +83,7 @@ const mobilityUseCases = {
           filterAndJoin(
             [
               fromLocation &&
-                `${resultName} a <http://dbpedia.org/page/Ridesharing>. ?is won:travelAction/s:fromLocation ?fromLocation. `,
+                `${resultName} a <http://dbpedia.org/resource/Ridesharing>. ?is won:travelAction/s:fromLocation ?fromLocation. `,
               fromLocation && fromLocationFilter.operations.join(" "),
               toLocation && "?is won:travelAction/s:toLocation ?toLocation.",
               toLocation && toLocationFilter.operations.join(" "),
@@ -177,7 +177,7 @@ const mobilityUseCases = {
       ...emptyDraft,
       is: {
         title: "Share a Ride",
-        type: "http://dbpedia.org/page/Ridesharing",
+        type: "http://dbpedia.org/resource/Ridesharing",
       },
     },
     isDetails: {
