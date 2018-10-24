@@ -630,15 +630,12 @@ function genComponentConf() {
                 isCancellationPending || isOldCancellationPending
               );
 
-            //Only update messageState if the state was actually different
-            if (!Immutable.is(msg.get("messageStatus"), messageStatus)) {
-              this.messages__updateMessageStatus({
-                messageUri: msgUri,
-                connectionUri: this.connectionUri,
-                needUri: this.ownNeed.get("uri"),
-                messageStatus: messageStatus,
-              });
-            }
+            this.messages__updateMessageStatus({
+              messageUri: msgUri,
+              connectionUri: this.connectionUri,
+              needUri: this.ownNeed.get("uri"),
+              messageStatus: messageStatus,
+            });
           });
         }
       });
