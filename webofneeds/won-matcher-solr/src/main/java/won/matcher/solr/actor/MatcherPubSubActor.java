@@ -103,10 +103,13 @@ public class MatcherPubSubActor extends UntypedActor
     cancelScheduledTick();
   }
 
-  @Override
-  public void postStop() throws Exception {
-    cancelScheduledTick();
-  }
+	@Override
+	public void postStop() throws Exception {
+		if (matcherActor != null) {
+			matcherActor.tell(PoisonPill.getInstance(), getSelf());
+		}
+		cancelScheduledTick();
+	}
 
   private void cancelScheduledTick() {
     if (scheduledTick.isPresent()) {
