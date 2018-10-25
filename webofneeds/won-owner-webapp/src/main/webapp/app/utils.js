@@ -1232,20 +1232,6 @@ export function generateRgbColorArray(text) {
   return colorArray;
 }
 
-export function generateTitleCharacter(title) {
-  if (title) {
-    try {
-      return title.charAt(0).toUpperCase();
-    } catch (err) {
-      //for resilience purposes, since we can't be sure whether a need is a string or anything else
-      console.warn("Title Character could not be retrieved from: ", title);
-      return "?";
-    }
-  } else {
-    return "?";
-  }
-}
-
 /**
  * Returns the URL if it's already absolute,
  * otherwise prepends window.location.origin.
