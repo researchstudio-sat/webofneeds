@@ -69,10 +69,6 @@ export function connectionsChatMessageClaimOnSuccess(
         ])
       )
       .then(([optimisticEvent, jsonldMessage]) => {
-        console.log(
-          "Sending connectionsAutoClaimMessage for: ",
-          optimisticEvent.getMessageUri()
-        );
         dispatch({
           type: actionTypes.connections.sendChatMessageClaimOnSuccess,
           payload: {

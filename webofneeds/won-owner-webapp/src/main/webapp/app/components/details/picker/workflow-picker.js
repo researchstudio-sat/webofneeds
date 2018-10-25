@@ -64,7 +64,7 @@ function genComponentConf() {
             this.removeWorkflow();
             this.$scope.$apply();
           } else {
-            console.log("Workflow rendered");
+            console.debug("Workflow rendered");
             this.fitDiagramToViewport();
             this.$scope.$apply();
           }
@@ -75,7 +75,7 @@ function genComponentConf() {
     }
 
     updateWorkflow(file) {
-      console.log("called updateWorkflow: ", file);
+      console.debug("called updateWorkflow: ", file);
       this.addedWorkflow = file;
       this.update(this.addedWorkflow);
 
@@ -92,7 +92,7 @@ function genComponentConf() {
             this.removeWorkflow();
             this.$scope.$apply();
           } else {
-            console.log("Workflow rendered");
+            console.debug("Workflow rendered");
             this.$scope.$apply();
 
             const self = this;
@@ -112,24 +112,24 @@ function genComponentConf() {
     }
 
     initializeBpmnViewer() {
-      console.log("init bpmnviewer for element: ", this.getUniqueDiagramId());
+      console.debug("init bpmnviewer for element: ", this.getUniqueDiagramId());
       this.bpmnViewer = new BpmnViewer({
         container: "#" + this.getUniqueDiagramId(),
       });
 
       if (this.bpmnViewer) {
-        console.log("Init BpmnViewer Successful");
+        console.debug("Init BpmnViewer Successful");
       } else {
-        console.log("Init BpmnViewer Failed");
+        console.debug("Init BpmnViewer Failed");
       }
     }
 
     fitDiagramToViewport() {
-      console.log("Fit Diagram To Viewport");
+      console.debug("Fit Diagram To Viewport");
       const scale = this.bpmnViewer.get("canvas").zoom("fit-viewport", "auto");
-      console.log("fitDiagram Scale: ", scale);
+      console.debug("fitDiagram Scale: ", scale);
       if (isNaN(scale) || scale == 0) {
-        console.log("scale was NaN or 0 zoom to level 0.2");
+        console.debug("scale was NaN or 0 zoom to level 0.2");
         this.bpmnViewer.get("canvas").zoom(0.2, "auto");
       }
     }

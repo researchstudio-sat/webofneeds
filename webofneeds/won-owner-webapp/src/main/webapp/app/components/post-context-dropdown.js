@@ -120,8 +120,6 @@ function genComponentConf() {
 
     closePost() {
       if (this.isOwnPost) {
-        console.log("CLOSING THE POST: " + this.post.get("uri"));
-
         const payload = {
           caption: "Attention!",
           text:
@@ -139,7 +137,7 @@ function genComponentConf() {
               },
             },
             {
-              caption: "No, I'm scared",
+              caption: "No, Keep It",
               callback: () => {
                 this.closeModalDialog();
               },
@@ -152,15 +150,12 @@ function genComponentConf() {
 
     reOpenPost() {
       if (this.isOwnPost) {
-        console.log("RE-OPENING THE POST: " + this.post.get("uri"));
         this.needs__reopen(this.post.get("uri"));
       }
     }
 
     exportPdf() {
       if (!this.post) return;
-
-      console.log("Export PDF");
       const docDefinition = createDocumentDefinitionFromPost(this.post);
 
       if (docDefinition) {

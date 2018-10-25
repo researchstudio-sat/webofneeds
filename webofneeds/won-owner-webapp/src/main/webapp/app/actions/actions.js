@@ -414,7 +414,7 @@ export function needsClosedBySystem(event) {
     //first check if we really have the 'own' need in the state - otherwise we'll ignore the message
     const need = getState().getIn(["needs", event.getReceiverNeed()]);
     if (!need) {
-      console.log(
+      console.debug(
         "ignoring deactivateMessage for a need that is not ours:",
         event.getReceiverNeed()
       );

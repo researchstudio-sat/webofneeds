@@ -57,7 +57,7 @@ function genComponentConf() {
 
       for (let location of locations) {
         if (!location || !location.get("lat") || !location.get("lng")) {
-          console.log("no marker set for location: ", location);
+          console.warn("no marker set for location: ", location);
           continue;
         }
 
@@ -84,13 +84,13 @@ function genComponentConf() {
       }
 
       if (markedLocations.length === 0) {
-        console.log("no markers set for locations: ", locations.toJS());
+        console.warn("no markers set for locations: ", locations.toJS());
         return;
       }
       this.placeMarkers(markedLocations);
 
       if (boundCoords.length === 0) {
-        console.log(
+        console.warn(
           "no map coordinates found for locations: ",
           locations.toJS()
         );

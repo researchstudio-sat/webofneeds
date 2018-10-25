@@ -375,7 +375,6 @@ export function getAllMessageDetails() {
     messageDetails,
     usecaseMessageDetails
   );
-  console.log("allMessageDetails: ", allMessageDetails);
   return allMessageDetails;
 }
 

@@ -149,7 +149,7 @@ function genComponentConf() {
             dispatchEvent(this.$element[0], "image-picked", imageData);
           });
       } else {
-        console.log("FILE TYPE NOT ACCEPTED");
+        console.warn("FILE TYPE NOT ACCEPTED");
       }
     }
   }

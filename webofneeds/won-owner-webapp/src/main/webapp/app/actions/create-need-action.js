@@ -83,7 +83,6 @@ export function needCreate(draft, persona, nodeUri) {
 
 export function createWhatsNew() {
   return (dispatch, getState) => {
-    console.log("Create Whats New");
     const state = getState();
     const nodeUri = getIn(state, ["config", "defaultNodeUri"]);
     const defaultContext = getIn(state, ["config", "theme", "defaultContext"]);
@@ -116,7 +115,6 @@ export function createWhatsNew() {
 
 export function createWhatsAround() {
   return (dispatch, getState) => {
-    console.log("Create Whats Around");
     const state = getState();
     const nodeUri = getIn(state, ["config", "defaultNodeUri"]);
     const defaultContext = getIn(state, ["config", "theme", "defaultContext"]);

@@ -136,7 +136,7 @@ export function accountLogin(credentials, options) {
       state.get("loginInProcessFor") === email ||
       _loginInProcessFor === email
     ) {
-      console.info(
+      console.debug(
         "Already logging in as ",
         email,
         ". Canceling redundant attempt."
@@ -149,7 +149,7 @@ export function accountLogin(credentials, options) {
       ((credentials.privateId && credentials.privateId === prevPrivateId) ||
         (credentials.email && credentials.email === prevEmail))
     ) {
-      console.info(
+      console.debug(
         "Already logged into this account (" +
           (credentials.privateId || credentials.email) +
           "). Aborting second login attempt."
@@ -273,7 +273,7 @@ export function accountLogout(options) {
     const state = getState();
 
     if (state.get("logoutInProcess") || _logoutInProcess) {
-      console.info(
+      console.debug(
         "There's already a logout in process. Aborting redundant attempt."
       );
       return;
@@ -290,7 +290,7 @@ export function accountLogout(options) {
       .then(() => logout())
       .catch(error => {
         //TODO: PRINT ERROR MESSAGE AND CHANGE STATE ACCORDINGLY
-        console.log("Error while trying to log out: ", error);
+        console.error("Error while trying to log out: ", error);
       })
       .then(() => {
         // for the case that we've been logged in to an anonymous account, we need to remove the privateId here.
@@ -396,7 +396,6 @@ export function reconnect() {
       // await pageLoadAction()(dispatch, getState);
       // const email = getIn(state, ["user", "email"]);
       // await fetchOwnedData(email, payload => {
-      //   console.log("deleteme -- fetched and would dispatch: ", payload);
       //   dispatch({
       //     type: actionTypes.initialPageLoad, // TODO make this it's own type
       //     payload: wellFormedPayload(payload),

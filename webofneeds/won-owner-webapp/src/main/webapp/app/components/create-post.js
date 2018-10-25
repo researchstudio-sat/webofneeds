@@ -149,7 +149,6 @@ function genComponentConf() {
         };
       };
 
-      // TODO: think about how to deal with contexts predefined in usecases
       delay(0).then(() => {
         this.loadInitialDraft();
       });
@@ -159,8 +158,6 @@ function genComponentConf() {
     }
 
     onResize() {
-      //TODO: delete
-      //console.log("ResizeEvent: ", window.screen.height);
       if (this.focusedElement) {
         if (this.windowHeight < window.screen.height) {
           this.windowHeight < window.screen.height;

@@ -511,7 +511,6 @@ export function isSuccessMessage(event) {
 }
 
 export function fetchDataForNonOwnedNeedOnly(needUri) {
-  console.log("fetchDataForNonOwnedNeedOnly");
   return won
     .getNeed(needUri)
     .then(need =>
@@ -522,8 +521,6 @@ export function fetchDataForNonOwnedNeedOnly(needUri) {
 }
 
 export function fetchUnloadedData(curriedDispatch) {
-  console.log("fetchUnloadedData");
-
   return fetchOwnedInactiveNeedUris().then(needUris => {
     curriedDispatch(wellFormedPayload({ inactiveNeedUrisLoading: needUris }));
     return fetchDataForOwnedNeeds(needUris, curriedDispatch, []);
@@ -531,7 +528,6 @@ export function fetchUnloadedData(curriedDispatch) {
 }
 
 export function fetchOwnedData(email, curriedDispatch) {
-  console.log("fetchOwnedData");
   return fetchOwnedInactiveNeedUris().then(inactiveNeedUris => {
     curriedDispatch(wellFormedPayload({ inactiveNeedUris: inactiveNeedUris }));
 
@@ -548,7 +544,7 @@ export function fetchOwnedData(email, curriedDispatch) {
 //        });
 //}
 //function fetchOwnedNeedUris() {
-//  console.log("fetchOwnedNeedUris");
+//  console.debug("fetchOwnedNeedUris");
 //  return fetch(urljoin(ownerBaseUrl, "/rest/needs/"), {
 //    method: "get",
 //    headers: {
@@ -562,7 +558,7 @@ export function fetchOwnedData(email, curriedDispatch) {
 //}
 
 function fetchOwnedInactiveNeedUris() {
-  console.log("fetchOwnedInactiveNeedUris");
+  console.debug("fetchOwnedInactiveNeedUris");
   return fetch(urljoin(ownerBaseUrl, "/rest/needs?state=INACTIVE"), {
     method: "get",
     headers: {
@@ -576,7 +572,7 @@ function fetchOwnedInactiveNeedUris() {
 }
 
 function fetchOwnedActiveNeedUris() {
-  console.log("fetchOwnedActiveNeedUris");
+  console.debug("fetchOwnedActiveNeedUris");
   return fetch(urljoin(ownerBaseUrl, "/rest/needs?state=ACTIVE"), {
     method: "get",
     headers: {
@@ -590,7 +586,7 @@ function fetchOwnedActiveNeedUris() {
 }
 
 export function fetchAgreementProtocolUris(connectionUri) {
-  console.log("fetchAgreementProtocolUris: ", connectionUri);
+  console.debug("fetchAgreementProtocolUris: ", connectionUri);
   const url = urljoin(
     ownerBaseUrl,
     "/rest/agreement/getAgreementProtocolUris",
@@ -610,7 +606,7 @@ export function fetchAgreementProtocolUris(connectionUri) {
 }
 
 export function fetchPetriNetUris(connectionUri) {
-  console.log("fetchPetriNetUris: ", connectionUri);
+  console.debug("fetchPetriNetUris: ", connectionUri);
   const url = urljoin(
     ownerBaseUrl,
     "/rest/petrinet/getPetriNetUris",
@@ -630,7 +626,7 @@ export function fetchPetriNetUris(connectionUri) {
 }
 
 export function fetchMessageEffects(connectionUri, messageUri) {
-  console.log(
+  console.debug(
     "fetchMessageEffects: ",
     connectionUri,
     " messageUri:",
@@ -657,7 +653,7 @@ export function fetchMessageEffects(connectionUri, messageUri) {
 }
 
 export function fetchMessage(needUri, eventUri) {
-  console.log("fetchMessage: ", needUri, " eventUri: ", eventUri);
+  console.debug("fetchMessage: ", needUri, " eventUri: ", eventUri);
   const url = urljoin(
     ownerBaseUrl,
     "/rest/linked-data/",
@@ -686,7 +682,7 @@ export async function fetchDataForOwnedNeeds(
     return emptyDataset;
   }
 
-  console.log("fetchOwnNeedAndDispatch for: ", ownNeedUris);
+  console.debug("fetchOwnNeedAndDispatch for: ", ownNeedUris);
   const allOwnNeeds = await urisToLookupMap(ownNeedUris, uri =>
     fetchOwnNeedAndDispatch(uri, curriedDispatch)
   );
@@ -713,7 +709,7 @@ export async function fetchDataForOwnedNeeds(
   curriedDispatch(
     wellFormedPayload({ theirNeedUrisInLoading: theirNeedUris_ })
   );
-  console.log("fetchTheirNeedAndDispatch for: ", theirNeedUris_);
+  console.debug("fetchTheirNeedAndDispatch for: ", theirNeedUris_);
   const allTheirNeeds = await urisToLookupMap(theirNeedUris_, uri =>
     fetchTheirNeedAndDispatch(uri, curriedDispatch)
   );
@@ -766,7 +762,7 @@ async function fetchConnectionsOfNeedAndDispatch(
       activeConnectionUrisLoading: activeConnectionUris,
     })
   );
-  console.log("fetchConnectionAndDispatch for: ", activeConnectionUris);
+  console.debug("fetchConnectionAndDispatch for: ", activeConnectionUris);
   return urisToLookupMap(activeConnectionUris, uri =>
     fetchConnectionAndDispatch(uri, curriedDispatch)
   );

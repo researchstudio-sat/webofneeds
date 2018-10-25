@@ -160,7 +160,7 @@ function genComponentConf() {
           useCaseGroup: undefined,
         });
       } else {
-        console.log(
+        console.error(
           "No usecase identifier found for given usecase, ",
           selectedUseCase
         );

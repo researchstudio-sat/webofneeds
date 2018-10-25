@@ -159,7 +159,7 @@ export const petriNetTransition = {
             const petriNetUri = rawMessageJsonLDImm.get("@id");
 
             if (transitionUri && petriNetUri) {
-              console.log(
+              console.debug(
                 "reached graph-end and found firesTransition",
                 rawMessageJsonLDImm.toJS(),
                 rawMessageJsonLDImm

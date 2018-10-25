@@ -439,7 +439,6 @@ export function urisToLookupMap(uris, asyncLookupFunction, excludeUris = []) {
     if (exclude) {
       return true;
     } else {
-      console.log(uri, "closed, ommit further crawl for this uri");
       return false;
     }
   });
@@ -1322,7 +1321,7 @@ export function findAllFieldOccurancesRecursively(fieldName, obj, _acc = []) {
   }
   if (obj["@type"] === fieldName && obj["@value"]) {
     _acc.push(obj["@value"]);
-    console.log(
+    console.debug(
       'obj["@type"] is ',
       fieldName,
       " and value present push value to _acc",

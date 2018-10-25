@@ -354,10 +354,10 @@ export function processConnectionMessage(event) {
       fetchMessageEffects(connectionUri, event.getMessageUri()).then(
         response => {
           if (response && response.length > 0) {
-            console.log("agreement response : ", response);
+            // console.debug("agreement response : ", response);
           }
           for (const effect of response) {
-            console.log("effect : ", effect, "effect-type: ", effect.type);
+            // console.debug("effect : ", effect, "effect-type: ", effect.type);
             switch (effect.type) {
               case "ACCEPTS":
                 if (effect.accepts) {
@@ -441,12 +441,6 @@ export function processConnectionMessage(event) {
                     let messageUri = getCorrectMessageUri(
                       messages,
                       proposesToCancelURI
-                    );
-                    console.log(
-                      "proposesToCancelURI: ",
-                      proposesToCancelURI,
-                      "messageUri: ",
-                      messageUri
                     );
                     dispatch({
                       type:
@@ -878,7 +872,7 @@ export function needMessageReceived(event) {
     //first check if we really have the 'own' need in the state - otherwise we'll ignore the hint
     const need = getState().getIn(["needs", event.getReceiverNeed()]);
     if (!need) {
-      console.log(
+      console.debug(
         "ignoring needMessage for a need that is not ours:",
         event.getReceiverNeed()
       );
@@ -898,7 +892,7 @@ export function hintMessageReceived(event) {
   return (dispatch, getState) => {
     //first check if we really have the 'own' need in the state - otherwise we'll ignore the hint
     if (!getState().getIn(["needs", event.getReceiverNeed()])) {
-      console.log(
+      console.debug(
         "ignoring hint for a need that is not ours:",
         event.getReceiverNeed()
       );
@@ -906,7 +900,7 @@ export function hintMessageReceived(event) {
       getState().getIn(["needs", event.getMatchCounterpart(), "state"]) ===
       won.WON.InactiveCompacted
     ) {
-      console.log(
+      console.debug(
         "ignoring hint for an inactive  need:",
         event.getMatchCounterpart()
       );

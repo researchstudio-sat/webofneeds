@@ -478,8 +478,6 @@ function genComponentConf() {
           });
           fetchAgreementProtocolUris(this.connection.get("uri"))
             .then(response => {
-              console.log("retrieved agreement Protocol Uris: ", response);
-
               let proposedMessageUris = [];
               const pendingProposals = response.pendingProposals;
 
@@ -551,7 +549,7 @@ function genComponentConf() {
           this.chatMessagesWithUnknownState &&
           this.chatMessagesWithUnknownState.size > 0
         ) {
-          console.log(
+          console.debug(
             "Ensure Message Status is up-to-date for: ",
             this.chatMessagesWithUnknownState.size,
             " Messages"
@@ -742,20 +740,10 @@ function genComponentConf() {
     }
 
     addMessageToState(eventUri, key) {
-      console.log(
-        "addMessageToState: key:[",
-        key,
-        "] eventUri: [",
-        eventUri,
-        "]"
-      );
       const ownNeedUri = this.ownNeed.get("uri");
       return fetchMessage(ownNeedUri, eventUri).then(response => {
         won.wonMessageFromJsonLd(response).then(msg => {
           if (msg.isFromOwner() && msg.getReceiverNeed() === ownNeedUri) {
-            console.log(
-              "eventUri was from other try again with remoteMessageUri"
-            );
             /*if we find out that the receiverneed of the crawled event is actually our
               need we will call the method again but this time with the correct eventUri
             */
@@ -763,22 +751,7 @@ function genComponentConf() {
           } else {
             //If message isnt in the state we add it
             if (!this.chatMessages.get(eventUri)) {
-              console.log(
-                "AgreementMessage not present in state, adding message: key:[",
-                key,
-                "] eventUri: [",
-                eventUri,
-                "]"
-              );
               this.messages__processAgreementMessage(msg);
-            } else {
-              console.log(
-                "AgreementMessage already present in state: key:[",
-                key,
-                "] eventUri: [",
-                eventUri,
-                "]"
-              );
             }
           }
         });

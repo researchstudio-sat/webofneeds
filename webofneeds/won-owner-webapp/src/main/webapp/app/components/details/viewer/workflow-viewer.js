@@ -47,7 +47,6 @@ function genComponentConf() {
     }
     updatedContent(newContent, prevContent) {
       if (newContent && newContent != prevContent) {
-        console.log("updating content");
         this.content = newContent;
         this.loadDiagramFromContent();
       }
@@ -58,28 +57,20 @@ function genComponentConf() {
     }
 
     initializeBpmnViewer() {
-      console.log("init bpmnviewer for element: ", this.getUniqueDiagramId());
       this.bpmnViewer = new BpmnViewer({
         container: "#" + this.getUniqueDiagramId(),
       });
 
-      if (this.bpmnViewer) {
-        console.log("Init BpmnViewer Successful");
-      } else {
-        console.log("Init BpmnViewer Failed");
+      if (!this.bpmnViewer) {
+        console.warn("Init BpmnViewer Failed");
       }
     }
 
     loadDiagramFromContent() {
       if (this.content && this.content.get("data")) {
-        console.log("content contains data");
         if (!this.bpmnViewer) {
-          console.log(
-            "bpmnViewer is not initialized... starting initialization"
-          );
           this.initializeBpmnViewer();
         }
-        console.log("calling importXML for the data in the content");
         this.bpmnViewer.importXML(atob(this.content.get("data")), err => {
           if (err) {
             console.error(
@@ -88,22 +79,16 @@ function genComponentConf() {
             );
             this.parseError = true;
           } else {
-            console.log("Workflow rendered");
             this.fitDiagramToViewport();
             this.parseError = false;
           }
         });
-      } else {
-        console.log("content did not contain data");
       }
     }
 
     fitDiagramToViewport() {
-      console.log("Fit Diagram To Viewport");
       const scale = this.bpmnViewer.get("canvas").zoom("fit-viewport", "auto");
-      console.log("fitDiagram Scale: ", scale);
       if (isNaN(scale) || scale == 0) {
-        console.log("scale was NaN or 0 zoom to level 0.2");
         this.bpmnViewer.get("canvas").zoom(0.2, "auto");
       }
     }

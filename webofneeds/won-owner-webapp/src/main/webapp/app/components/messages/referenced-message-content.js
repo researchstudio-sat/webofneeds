@@ -340,7 +340,6 @@ function genComponentConf() {
 
     loadMessage(messageUri) {
       if (!this.getReferencedMessage(messageUri)) {
-        console.log("Trying to retrieve msg: ", messageUri);
         this.addMessageToState(messageUri);
       }
     }
@@ -353,14 +352,9 @@ function genComponentConf() {
             /*if we find out that the receiverneed of the crawled event is actually our
              need we will call the method again but this time with the correct eventUri
              */
-            console.log(
-              "Message is not from you, so we need to retrieve the remoteMessageUri",
-              msg
-            );
             this.addMessageToState(msg.getRemoteMessageUri());
           } else {
             //If message isnt in the state we add it
-            console.log("retrieved message: ", msg);
             this.messages__processAgreementMessage(msg);
           }
         });
