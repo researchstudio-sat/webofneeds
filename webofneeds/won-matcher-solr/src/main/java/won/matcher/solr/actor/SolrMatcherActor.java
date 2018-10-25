@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.time.temporal.ChronoUnit;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Siren/Solr based abstract matcher with all implementations for querying as well as indexing needs.
@@ -60,23 +61,35 @@ public class SolrMatcherActor extends UntypedActor {
 
     @Override
     public void onReceive(final Object o) throws Exception {
-
-        if (o instanceof NeedEvent) {
-            NeedEvent needEvent = (NeedEvent) o;
-            if (needEvent.getEventType().equals(NeedEvent.TYPE.ACTIVE)) {
-                processActiveNeedEvent(needEvent);
-            } else if (needEvent.getEventType().equals(NeedEvent.TYPE.INACTIVE)) {
-                processInactiveNeedEvent(needEvent);
+        String eventTypeForLogging = "unknown";
+        Optional<String> uriForLogging = Optional.empty();
+        try {
+            if (o instanceof NeedEvent) {
+                eventTypeForLogging = "NeedEvent";
+                NeedEvent needEvent = (NeedEvent) o;
+                uriForLogging = Optional.ofNullable(needEvent.getUri());
+                if (needEvent.getEventType().equals(NeedEvent.TYPE.ACTIVE)) {
+                    processActiveNeedEvent(needEvent);
+                } else if (needEvent.getEventType().equals(NeedEvent.TYPE.INACTIVE)) {
+                    processInactiveNeedEvent(needEvent);
+                } else {
+                    unhandled(o);
+                }
+            } else if (o instanceof BulkNeedEvent) {
+                eventTypeForLogging = "BulkNeedEvent";
+                log.info("received bulk need event, processing {} need events ...",
+                        ((BulkNeedEvent) o).getNeedEvents().size());
+                for (NeedEvent event : ((BulkNeedEvent) o).getNeedEvents()) {
+                    processActiveNeedEvent(event);
+                }
             } else {
+                eventTypeForLogging = "unhandled";
                 unhandled(o);
             }
-        } else if (o instanceof BulkNeedEvent) {
-            log.info("received bulk need event, processing {} need events ...", ((BulkNeedEvent) o).getNeedEvents().size());
-            for (NeedEvent event : ((BulkNeedEvent) o).getNeedEvents()) {
-                processActiveNeedEvent(event);
-            }
-        } else {
-            unhandled(o);
+        } catch (Exception e) {
+            log.info(String.format("Caught exception when processing %s event %s. More info on loglevel 'debug'",
+                    eventTypeForLogging, uriForLogging.orElse("[no uri available]")));
+            log.debug("caught exception", e);
         }
     }
 
