@@ -284,7 +284,9 @@ public class NeedModelWrapper {
     }
 
     public boolean hasFlag(Resource flag) {
-        return getNeedNode(NeedGraphType.NEED).hasProperty(WON.HAS_FLAG, flag);
+    	Resource needRes = getNeedNode(NeedGraphType.NEED);
+    	if (needRes == null) return false;
+        return needRes.hasProperty(WON.HAS_FLAG, flag);
     }
 
     public Calendar getDoNotMatchBefore() {
