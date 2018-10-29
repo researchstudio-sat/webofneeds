@@ -87,16 +87,11 @@ validatePersona draftToValidate =
 ---- MODEL ----
 
 
-type Model
-    = Loading
-        { creating : Maybe Draft
-        , createQueue : List PersonaData
-        }
-    | Loaded
-        { viewState : ViewState
-        , createQueue : List PersonaData
-        , personas : Dict Url Persona
-        }
+type alias Model =
+    { viewState : ViewState
+    , createQueue : List PersonaData
+    , personas : Dict Url Persona
+    }
 
 
 type ViewState
@@ -111,10 +106,10 @@ type alias Url =
 
 init : () -> ( Model, Cmd Msg )
 init () =
-    ( Loading
-        { creating = Nothing
-        , createQueue = []
-        }
+    ( { viewState = Inactive
+      , createQueue = []
+      , personas = Dict.empty
+      }
     , Cmd.none
     )
 
@@ -135,157 +130,85 @@ type Msg
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case model of
-        --
-        -- Loading State --
-        --
-        Loading loadingModel ->
-            case ( msg, loadingModel.creating ) of
-                ( Create, Nothing ) ->
-                    ( Loading
-                        { loadingModel
-                            | creating = Just blankDraft
-                        }
-                    , Cmd.none
-                    )
+    let
+        unsavedContent =
+            case model.viewState of
+                Creating draft ->
+                    draft /= blankDraft
 
-                ( Save, Just draft ) ->
+                _ ->
+                    False
+    in
+    case msg of
+        Save ->
+            case model.viewState of
+                Creating draft ->
                     case saveDraft draft of
                         Just ( persona, cmd ) ->
-                            ( Loading
-                                { loadingModel
-                                    | creating = Nothing
-                                    , createQueue = persona :: loadingModel.createQueue
-                                }
+                            ( { model
+                                | viewState = Inactive
+                                , createQueue = persona :: model.createQueue
+                              }
                             , cmd
                             )
 
                         Nothing ->
                             ( model, Cmd.none )
 
-                ( Cancel, Just _ ) ->
-                    ( Loading
-                        { loadingModel
-                            | creating = Nothing
-                        }
-                    , Cmd.none
-                    )
+                _ ->
+                    ( model, Cmd.none )
 
-                ( ReceivedPersonas newPersonas, _ ) ->
-                    ( Loaded
-                        { viewState =
-                            case loadingModel.creating of
-                                Just draft ->
-                                    Creating draft
+        Cancel ->
+            ( { model
+                | viewState = Inactive
+              }
+            , Cmd.none
+            )
 
-                                Nothing ->
-                                    Inactive
-                        , personas = newPersonas
-                        , createQueue = pruneSaveQueue newPersonas loadingModel.createQueue
-                        }
-                    , Cmd.none
-                    )
+        View url ->
+            if unsavedContent then
+                ( model, Cmd.none )
 
-                ( DraftUpdated newDraft, Just _ ) ->
-                    ( Loading
-                        { loadingModel
-                            | creating = Just newDraft
-                        }
+            else
+                ( { model
+                    | viewState = Viewing url
+                  }
+                , Cmd.none
+                )
+
+        Create ->
+            if unsavedContent then
+                ( model, Cmd.none )
+
+            else
+                ( { model
+                    | viewState = Creating blankDraft
+                  }
+                , Cmd.none
+                )
+
+        ReceivedPersonas newPersonas ->
+            ( { model
+                | personas = newPersonas
+                , createQueue = pruneSaveQueue newPersonas model.createQueue
+              }
+            , Cmd.none
+            )
+
+        DraftUpdated newDraft ->
+            case model.viewState of
+                Creating _ ->
+                    ( { model
+                        | viewState = Creating newDraft
+                      }
                     , Cmd.none
                     )
 
                 _ ->
                     ( model, Cmd.none )
 
-        --
-        -- Loaded State --
-        --
-        Loaded loadedModel ->
-            let
-                unsavedContent =
-                    case loadedModel.viewState of
-                        Creating draft ->
-                            draft /= blankDraft
-
-                        _ ->
-                            False
-            in
-            case msg of
-                Save ->
-                    case loadedModel.viewState of
-                        Creating draft ->
-                            case saveDraft draft of
-                                Just ( persona, cmd ) ->
-                                    ( Loaded
-                                        { loadedModel
-                                            | viewState = Inactive
-                                            , createQueue = persona :: loadedModel.createQueue
-                                        }
-                                    , cmd
-                                    )
-
-                                Nothing ->
-                                    ( model, Cmd.none )
-
-                        _ ->
-                            ( model, Cmd.none )
-
-                Cancel ->
-                    ( Loaded
-                        { loadedModel
-                            | viewState = Inactive
-                        }
-                    , Cmd.none
-                    )
-
-                View url ->
-                    if unsavedContent then
-                        ( model, Cmd.none )
-
-                    else
-                        ( Loaded
-                            { loadedModel
-                                | viewState = Viewing url
-                            }
-                        , Cmd.none
-                        )
-
-                Create ->
-                    if unsavedContent then
-                        ( model, Cmd.none )
-
-                    else
-                        ( Loaded
-                            { loadedModel
-                                | viewState = Creating blankDraft
-                            }
-                        , Cmd.none
-                        )
-
-                ReceivedPersonas newPersonas ->
-                    ( Loaded
-                        { loadedModel
-                            | personas = newPersonas
-                            , createQueue = pruneSaveQueue newPersonas loadedModel.createQueue
-                        }
-                    , Cmd.none
-                    )
-
-                DraftUpdated newDraft ->
-                    case loadedModel.viewState of
-                        Creating _ ->
-                            ( Loaded
-                                { loadedModel
-                                    | viewState = Creating newDraft
-                                }
-                            , Cmd.none
-                            )
-
-                        _ ->
-                            ( model, Cmd.none )
-
-                NoOp ->
-                    ( model, Cmd.none )
+        NoOp ->
+            ( model, Cmd.none )
 
 
 pruneSaveQueue : Dict Url Persona -> List PersonaData -> List PersonaData
@@ -319,7 +242,7 @@ subscriptions _ =
 
 
 view : Skin -> Model -> Html Msg
-view skin model =
+view skin { viewState, personas, createQueue } =
     layout [] <|
         el
             [ padding 20
@@ -328,72 +251,48 @@ view skin model =
             , centerX
             ]
         <|
-            case model of
-                --
-                -- Loading
-                --
-                Loading { creating, createQueue } ->
+            case viewState of
+                Inactive ->
                     column
                         [ width fill
                         , spacing 20
                         ]
-                        [ case creating of
-                            Just draft ->
-                                createInterface skin draft
-
-                            Nothing ->
-                                createButton skin
+                        [ createButton skin
                         , listUnsaved skin createQueue
-                        , el [ Font.color skin.subtitleGray ] <|
-                            text "Loading Personas..."
+                        , listPersonas
+                            { skin = skin
+                            , viewedUrl = Nothing
+                            , personas = personas
+                            }
                         ]
 
-                --
-                -- Loaded
-                --
-                Loaded { viewState, personas, createQueue } ->
-                    case viewState of
-                        Inactive ->
-                            column
-                                [ width fill
-                                , spacing 20
-                                ]
-                                [ createButton skin
-                                , listUnsaved skin createQueue
-                                , listPersonas
-                                    { skin = skin
-                                    , viewedUrl = Nothing
-                                    , personas = personas
-                                    }
-                                ]
+                Viewing url ->
+                    column
+                        [ width fill
+                        , spacing 20
+                        ]
+                        [ createButton skin
+                        , listUnsaved skin createQueue
+                        , listPersonas
+                            { skin = skin
+                            , viewedUrl = Just url
+                            , personas = personas
+                            }
+                        ]
 
-                        Viewing url ->
-                            column
-                                [ width fill
-                                , spacing 20
-                                ]
-                                [ createButton skin
-                                , listUnsaved skin createQueue
-                                , listPersonas
-                                    { skin = skin
-                                    , viewedUrl = Just url
-                                    , personas = personas
-                                    }
-                                ]
-
-                        Creating draft ->
-                            column
-                                [ width fill
-                                , spacing 20
-                                ]
-                                [ createInterface skin draft
-                                , listUnsaved skin createQueue
-                                , listPersonas
-                                    { skin = skin
-                                    , viewedUrl = Nothing
-                                    , personas = personas
-                                    }
-                                ]
+                Creating draft ->
+                    column
+                        [ width fill
+                        , spacing 20
+                        ]
+                        [ createInterface skin draft
+                        , listUnsaved skin createQueue
+                        , listPersonas
+                            { skin = skin
+                            , viewedUrl = Nothing
+                            , personas = personas
+                            }
+                        ]
 
 
 createButton : Skin -> Element Msg
