@@ -177,6 +177,20 @@ export default function(allNeedsInState = initialState, action = {}) {
         won.WON.InactiveCompacted
       );
 
+    case actionTypes.personas.create: {
+      return allNeedsInState.set(
+        action.payload.needUri,
+        Immutable.fromJS({
+          jsonld: action.payload.persona,
+          ownNeed: true,
+          isBeingCreated: true,
+          uri: action.payload.needUri,
+          creationDate: new Date(),
+          types: Immutable.Set(["won:Need", "won:Persona"]),
+        })
+      );
+    }
+
     case actionTypes.needs.create: // optimistic need adding
       return addNeedInCreation(
         allNeedsInState,

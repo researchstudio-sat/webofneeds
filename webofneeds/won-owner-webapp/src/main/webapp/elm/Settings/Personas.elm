@@ -89,7 +89,6 @@ validatePersona draftToValidate =
 
 type alias Model =
     { viewState : ViewState
-    , createQueue : List PersonaData
     , personas : Dict Url Persona
     }
 
@@ -107,7 +106,6 @@ type alias Url =
 init : () -> ( Model, Cmd Msg )
 init () =
     ( { viewState = Inactive
-      , createQueue = []
       , personas = Dict.empty
       }
     , Cmd.none
@@ -147,7 +145,6 @@ update msg model =
                         Just ( persona, cmd ) ->
                             ( { model
                                 | viewState = Inactive
-                                , createQueue = persona :: model.createQueue
                               }
                             , cmd
                             )
@@ -190,7 +187,6 @@ update msg model =
         ReceivedPersonas newPersonas ->
             ( { model
                 | personas = newPersonas
-                , createQueue = pruneSaveQueue newPersonas model.createQueue
               }
             , Cmd.none
             )
@@ -242,7 +238,7 @@ subscriptions _ =
 
 
 view : Skin -> Model -> Html Msg
-view skin { viewState, personas, createQueue } =
+view skin { viewState, personas } =
     layout [] <|
         el
             [ padding 20
@@ -258,7 +254,7 @@ view skin { viewState, personas, createQueue } =
                         , spacing 20
                         ]
                         [ createButton skin
-                        , listUnsaved skin createQueue
+                        , listUnsaved skin personas
                         , listPersonas
                             { skin = skin
                             , viewedUrl = Nothing
@@ -272,7 +268,7 @@ view skin { viewState, personas, createQueue } =
                         , spacing 20
                         ]
                         [ createButton skin
-                        , listUnsaved skin createQueue
+                        , listUnsaved skin personas
                         , listPersonas
                             { skin = skin
                             , viewedUrl = Just url
@@ -286,7 +282,7 @@ view skin { viewState, personas, createQueue } =
                         , spacing 20
                         ]
                         [ createInterface skin draft
-                        , listUnsaved skin createQueue
+                        , listUnsaved skin personas
                         , listPersonas
                             { skin = skin
                             , viewedUrl = Nothing
@@ -411,8 +407,24 @@ personaForm draft =
         ]
 
 
-listUnsaved : Skin -> List PersonaData -> Element Msg
-listUnsaved skin unsaved =
+listUnsaved : Skin -> Dict Url Persona -> Element Msg
+listUnsaved skin personas =
+    let
+        unsaved =
+            Dict.values personas
+                |> List.filterMap
+                    (\persona ->
+                        case Persona.saved persona of
+                            Saved _ ->
+                                Nothing
+
+                            Unsaved ->
+                                Just
+                                    { url = Persona.url persona
+                                    , data = Persona.data persona
+                                    }
+                    )
+    in
     if List.isEmpty unsaved then
         none
 
@@ -423,8 +435,12 @@ listUnsaved skin unsaved =
             ]
         <|
             List.map
-                (\id ->
-                    viewUnsaved skin id
+                (\{ url, data } ->
+                    viewUnsaved
+                        { skin = skin
+                        , data = data
+                        , url = Url.toString url
+                        }
                 )
                 unsaved
 
@@ -491,8 +507,13 @@ listPersonas { skin, viewedUrl, personas } =
                 )
 
 
-viewUnsaved : Skin -> PersonaData -> Element Msg
-viewUnsaved skin persona =
+viewUnsaved :
+    { skin : Skin
+    , data : PersonaData
+    , url : Url
+    }
+    -> Element Msg
+viewUnsaved { skin, data, url } =
     card
         [ width fill
 
@@ -519,19 +540,18 @@ viewUnsaved skin persona =
                 [ spacing 10
                 , width fill
                 ]
-                [ el
+                [ Elements.identicon
                     [ width (px 50)
                     , height (px 50)
-                    , Background.color skin.lineGray
                     ]
-                    none
+                    url
                 , el
                     [ centerY
                     , Font.size 18
                     ]
                   <|
                     text <|
-                        NonEmpty.get persona.displayName
+                        NonEmpty.get data.displayName
                 ]
         , sections = []
         }

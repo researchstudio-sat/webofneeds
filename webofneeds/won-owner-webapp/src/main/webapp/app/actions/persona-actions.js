@@ -14,26 +14,25 @@ export function createPersona(persona, nodeUri) {
     const msgUri = nodeUri + "/event/" + getRandomWonId();
 
     const graph = {
-      "@graph": [
-        {
-          "@id": publishedContentUri,
-          "@type": ["won:Need", "won:Persona"],
-          "won:hasFacet": {
-            "@id": "#holderFacet",
-            "@type": "won:HolderFacet",
-          },
-          "won:hasFlag": [
-            { "@id": "won:NoHintForCounterpart" },
-            { "@id": "won:NoHintForMe" },
-          ],
-          "s:name": persona.displayName,
-          "s:description": persona.aboutMe || undefined,
-          "s:url": persona.website || undefined,
-        },
+      "@id": publishedContentUri,
+      "@type": ["won:Need", "won:Persona"],
+      "won:hasFacet": {
+        "@id": "#holderFacet",
+        "@type": "won:HolderFacet",
+      },
+      "won:hasFlag": [
+        { "@id": "won:NoHintForCounterpart" },
+        { "@id": "won:NoHintForMe" },
       ],
+      "s:name": persona.displayName,
+      "s:description": persona.aboutMe || undefined,
+      "s:url": persona.website || undefined,
+    };
+    const graphEnvelope = {
+      "@graph": [graph],
     };
 
-    const msg = won.buildMessageRdf(graph, {
+    const msg = won.buildMessageRdf(graphEnvelope, {
       receiverNode: nodeUri, //mandatory
       senderNode: nodeUri, //mandatory
       msgType: won.WONMSG.createMessage, //mandatory
@@ -45,7 +44,12 @@ export function createPersona(persona, nodeUri) {
 
     dispatch({
       type: actionTypes.personas.create,
-      payload: { eventUri: msgUri, message: msg, needUri: publishedContentUri },
+      payload: {
+        eventUri: msgUri,
+        message: msg,
+        needUri: publishedContentUri,
+        persona: graph,
+      },
     });
   };
 }
