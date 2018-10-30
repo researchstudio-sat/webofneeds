@@ -213,6 +213,7 @@ function genComponentConf() {
 
         this.needs__create(
           this.draftObject,
+          undefined,
           this.$ngRedux.getState().getIn(["config", "defaultNodeUri"])
         );
       }
