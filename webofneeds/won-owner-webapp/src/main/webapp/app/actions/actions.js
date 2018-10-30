@@ -225,9 +225,13 @@ const actionHierarchy = {
     processConnectionMessage: messages.processConnectionMessage,
     processAgreementMessage: messages.processAgreementMessage,
     needMessageReceived: messages.needMessageReceived,
-    connectMessageReceived: messages.connectMessageReceived,
+    processConnectMessage: messages.processConnectMessage,
+    connectMessageReceived: INJ_DEFAULT,
+    connectMessageSent: INJ_DEFAULT,
     hintMessageReceived: messages.hintMessageReceived,
-    openMessageReceived: messages.openMessageReceived,
+    openMessageReceived: INJ_DEFAULT,
+    openMessageSent: INJ_DEFAULT,
+    processOpenMessage: messages.processOpenMessage,
 
     // register a fully prepared action object to be dispatched
     // after a specific message (identified by URI)  has been processed
