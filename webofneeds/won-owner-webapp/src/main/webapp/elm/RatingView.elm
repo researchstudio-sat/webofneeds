@@ -57,7 +57,6 @@ fromInt rating =
 type alias Model =
     { rating : Maybe Rating
     , popupState : PopupState
-    , mouseOver : Bool
     }
 
 
@@ -70,6 +69,7 @@ type alias Popup =
 
 type PopupState
     = Closed
+    | Hovered
     | Open Popup
 
 
@@ -77,7 +77,6 @@ init : Int -> ( Model, Cmd Msg )
 init ratingFlag =
     ( { rating = fromInt ratingFlag
       , popupState = Closed
-      , mouseOver = False
       }
     , Cmd.none
     )
@@ -91,6 +90,7 @@ type PopupMsg
     = ReviewChanged String
     | HoveredValue (Maybe Rating)
     | SelectedValue (Maybe Rating)
+    | SubmitReview
 
 
 type Msg
@@ -104,26 +104,22 @@ update msg model =
     ( case msg of
         Hover hovered ->
             { model
-                | mouseOver = hovered
+                | popupState = updateHover hovered model.popupState
             }
 
         TogglePopup ->
-            case model.popupState of
-                Closed ->
-                    { model
-                        | popupState =
-                            Open
-                                { reviewText = ""
-                                , selectedValue = Nothing
-                                , hoveredValue = Nothing
-                                }
-                    }
+            { model
+                | popupState =
+                    case model.popupState of
+                        Closed ->
+                            Open initialPopup
 
-                Open _ ->
-                    { model
-                        | popupState = Closed
-                        , mouseOver = False
-                    }
+                        Hovered ->
+                            Open initialPopup
+
+                        Open _ ->
+                            Closed
+            }
 
         PopupMsg popupMsg ->
             { model
@@ -133,11 +129,35 @@ update msg model =
     )
 
 
+initialPopup : Popup
+initialPopup =
+    { reviewText = ""
+    , selectedValue = Nothing
+    , hoveredValue = Nothing
+    }
+
+
+updateHover : Bool -> PopupState -> PopupState
+updateHover hovered state =
+    case ( hovered, state ) of
+        ( _, Open _ ) ->
+            state
+
+        ( True, _ ) ->
+            Hovered
+
+        ( False, _ ) ->
+            Closed
+
+
 updatePopup : PopupMsg -> PopupState -> PopupState
 updatePopup msg popupState =
     case popupState of
         Closed ->
             Closed
+
+        Hovered ->
+            Hovered
 
         Open state ->
             case msg of
@@ -158,6 +178,15 @@ updatePopup msg popupState =
                         { state
                             | selectedValue = rating
                         }
+
+                SubmitReview ->
+                    case state.selectedValue of
+                        Just value ->
+                            -- TODO: actually do something
+                            Closed
+
+                        Nothing ->
+                            Open state
 
 
 subscriptions : Model -> Sub Msg
@@ -239,12 +268,15 @@ view skin model =
                         Closed ->
                             none
 
+                        Hovered ->
+                            none
+
                         Open popupState ->
                             popup skin popupState
                 ]
               <|
                 viewMaybeRating skin model.rating
-            , if model.mouseOver && model.popupState == Closed then
+            , if model.popupState == Hovered then
                 el
                     [ Font.size 14
                     , Font.color skin.primaryColor
@@ -260,6 +292,15 @@ view skin model =
 
 popup : Skin -> Popup -> Element Msg
 popup skin state =
+    let
+        canSubmit =
+            case state.selectedValue of
+                Just _ ->
+                    True
+
+                Nothing ->
+                    False
+    in
     column
         [ Background.color Skin.white
         , moveDown 3
@@ -280,11 +321,21 @@ popup skin state =
             , spellcheck = False
             }
         , Input.button
-            [ Background.color skin.primaryColor
-            , padding 14
-            , width fill
-            , Border.rounded 3
-            ]
+            ((if canSubmit then
+                [ Background.color skin.primaryColor
+                ]
+
+              else
+                [ Background.color skin.lightGray
+                , htmlAttribute <| HA.style "cursor" "auto"
+                , focused []
+                ]
+             )
+                ++ [ padding 14
+                   , width fill
+                   , Border.rounded 3
+                   ]
+            )
             { label =
                 el
                     [ centerX
@@ -293,7 +344,12 @@ popup skin state =
                     ]
                 <|
                     text "Submit"
-            , onPress = Just TogglePopup
+            , onPress =
+                if canSubmit then
+                    Just (PopupMsg SubmitReview)
+
+                else
+                    Nothing
             }
         ]
 
