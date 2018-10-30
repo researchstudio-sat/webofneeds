@@ -52,12 +52,6 @@ export function addConnectionFull(state, connection) {
               holdsList.push(holdsUri)
             );
           }
-
-          //ToDo: Not sure if we should add this to the remoteNeed here
-          const currentHoldsNeed = state.get("holdsUri");
-          if (currentHoldsNeed) {
-            state = state.setIn([holdsUri, "heldBy"], needUri);
-          }
         }
       } else if (facet === "holdableFacet") {
         //holdableFacet Connection from need to persona -> need to add heldBy remoteNeedUri to the need
@@ -71,14 +65,6 @@ export function addConnectionFull(state, connection) {
 
         if (heldByUri) {
           state = state.setIn([needUri, "heldBy"], heldByUri);
-        }
-
-        //ToDo: Not sure if we should add this to the remoteNeed here
-        const currentHolds = state.getIn([heldByUri, "holds"]);
-        if (currentHolds && !currentHolds.includes(needUri)) {
-          state = state.updateIn([heldByUri, "holds"], holdsList =>
-            holdsList.push(needUri)
-          );
         }
       } else if (facet !== "chatFacet") {
         console.warn("Unknown Facet(", facet, ") do not add Connection");
