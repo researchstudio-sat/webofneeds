@@ -323,7 +323,7 @@ view skin model =
     layout [] <|
         el
             [ padding 20
-            , Font.size 14
+            , Font.size 16
             , width <| maximum 600 fill
             , centerX
             ]
