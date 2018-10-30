@@ -26,14 +26,64 @@ export function addConnectionFull(state, connection) {
   let parsedConnection = parseConnection(connection);
 
   if (parsedConnection) {
-    // console.log("parsedConnection: ", parsedConnection.toJS(), "immutable
-    // ", parsedConnection);
+    // console.log("parsedConnection: ", parsedConnection.toJS(), "immutable", parsedConnection);
 
     const needUri = parsedConnection.get("belongsToUri");
     let connections = state.getIn([needUri, "connections"]);
 
     if (connections) {
       const connectionUri = parsedConnection.getIn(["data", "uri"]);
+
+      const facet = parsedConnection.getIn(["data", "facet"]);
+
+      if (facet === "holderFacet") {
+        const holdsUri = parsedConnection.getIn(["data", "remoteNeedUri"]);
+        console.log(
+          "Handling a holderFacet-connection within need: ",
+          needUri,
+          " setting holds to holdsUri: ",
+          holdsUri
+        );
+
+        if (holdsUri) {
+          const currentHolds = state.getIn([needUri, "holds"]);
+          if (currentHolds && !currentHolds.includes(holdsUri)) {
+            state = state.updateIn([needUri, "holds"], holdsList =>
+              holdsList.push(holdsUri)
+            );
+          }
+
+          //ToDo: Not sure if we should add this to the remoteNeed here
+          const currentHoldsNeed = state.get("holdsUri");
+          if (currentHoldsNeed) {
+            state = state.setIn([holdsUri, "heldBy"], needUri);
+          }
+        }
+      } else if (facet === "holdableFacet") {
+        //holdableFacet Connection from need to persona -> need to add heldBy remoteNeedUri to the need
+        const heldByUri = parsedConnection.getIn(["data", "remoteNeedUri"]);
+        console.log(
+          "Handling a holdableFacet-connection within need: ",
+          needUri,
+          " setting heldBy to heldByUri: ",
+          heldByUri
+        );
+
+        if (heldByUri) {
+          state = state.setIn([needUri, "heldBy"], heldByUri);
+        }
+
+        //ToDo: Not sure if we should add this to the remoteNeed here
+        const currentHolds = state.getIn([heldByUri, "holds"]);
+        if (currentHolds && !currentHolds.includes(needUri)) {
+          state = state.updateIn([heldByUri, "holds"], holdsList =>
+            holdsList.push(needUri)
+          );
+        }
+      } else if (facet !== "chatFacet") {
+        console.warn("Unknown Facet(", facet, ") do not add Connection");
+        return state;
+      }
 
       if (parsedConnection.getIn(["data", "unread"])) {
         //If there is a new message for the connection we will set the connection to newConnection
