@@ -75,6 +75,7 @@ function genComponentConf() {
         const persona = post
           ? state.getIn(["needs", post.get("heldBy")])
           : undefined;
+        const personaHolds = persona && persona.get("holds");
 
         return {
           WON: won.WON,
@@ -82,7 +83,7 @@ function genComponentConf() {
           type: post && post.get("type"),
           hasFlags,
           persona:
-            persona && persona.get("holds").includes(post.get("uri"))
+            personaHolds && personaHolds.includes(post.get("uri"))
               ? persona
               : undefined,
           preventSharing:
