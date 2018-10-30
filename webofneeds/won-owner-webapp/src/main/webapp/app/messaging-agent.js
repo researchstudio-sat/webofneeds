@@ -42,33 +42,22 @@ export function runMessagingAgent(redux) {
       return false;
     },
     function(message) {
-      if (message.isFromExternal() && message.isConnectMessage()) {
-        redux.dispatch(
-          actionCreators.messages__connectMessageReceived(message)
-        );
+      if (message.isConnectMessage()) {
+        redux.dispatch(actionCreators.messages__processConnectMessage(message));
         return true;
       }
       return false;
     },
     function(message) {
-      if (message.isFromExternal() && message.isOpenMessage()) {
+      if (message.isOpenMessage()) {
         //someone accepted our contact request
-        redux.dispatch(actionCreators.messages__openMessageReceived(message));
+        redux.dispatch(actionCreators.messages__processOpenMessage(message));
         return true;
       }
       return false;
     },
     function(message) {
-      if (message.isFromExternal() && message.isConnectionMessage()) {
-        redux.dispatch(
-          actionCreators.messages__processConnectionMessage(message)
-        );
-        return true;
-      } else if (message.isConnectionMessage()) {
-        console.log(
-          "Message received over ws that is an outgoing message",
-          message
-        );
+      if (message.isConnectionMessage()) {
         redux.dispatch(
           actionCreators.messages__processConnectionMessage(message)
         );
