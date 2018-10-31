@@ -230,7 +230,6 @@ export function connectionsChatMessage(
         ])
       )
       .then(([optimisticEvent, jsonldMessage]) => {
-        // dispatch(actionCreators.messages__send(messageData));
         dispatch({
           type: referencedContentUris
             ? actionTypes.connections.sendChatMessageRefreshDataOnSuccess //If there are references in the message we need to Refresh the Data from the backend on msg success

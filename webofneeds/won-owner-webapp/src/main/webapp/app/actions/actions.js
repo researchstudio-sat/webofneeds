@@ -307,20 +307,6 @@ const actionHierarchy = {
     update: configActions.update,
   },
   tick: startTicking,
-
-  /*
-     runMessagingAgent: () => (dispatch) => {
-     //TODO  move here?
-     // would require to make sendmsg an actionCreator as well
-     // con: aren't stateless functions (then again: the other async-creators aren't either)
-     //        - need to share reference to websocket for the send-method
-     //        - need to keep internal mq
-     // pro: everything that can create actions is listed here
-     createWs
-     ws.onmessage = parse && dispatch(...)^n
-     },
-     send = dispatch("pending")
-     */
 };
 
 //as string constans, e.g. actionTypes.needs.close === "needs.close"
