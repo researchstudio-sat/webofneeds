@@ -907,6 +907,7 @@
                     <configuration>
                       <reuseForks>false</reuseForks>
                       <forkCount>1</forkCount>
+                      <useSystemClassLoader>true</useSystemClassLoader>
                     </configuration>
                 </plugin>
                 <plugin>
