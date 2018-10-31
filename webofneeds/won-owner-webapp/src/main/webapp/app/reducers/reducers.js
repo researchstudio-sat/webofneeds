@@ -11,7 +11,7 @@ import needReducer from "./need-reducer/need-reducer-main.js";
 import userReducer from "./user-reducer.js";
 import toastReducer from "./toast-reducer.js";
 import { getIn } from "../utils.js";
-
+import won from "../won-es6.js";
 /*
  * this reducer attaches a 'router' object to our state that keeps the routing state.
  */
@@ -277,7 +277,7 @@ function deleteChatConnectionsBetweenOwnNeeds(state) {
         connections &&
         connections.filter(function(conn) {
           //Any connection that is not of type chatFacet will be exempt from deletion
-          if (conn.get("facet") === "chatFacet") {
+          if (conn.get("facet") === won.WON.ChatFacet) {
             //Any other connection will be checked if it would be connected to the ownNeed, if so we remove it.
             return !state.getIn([
               "needs",

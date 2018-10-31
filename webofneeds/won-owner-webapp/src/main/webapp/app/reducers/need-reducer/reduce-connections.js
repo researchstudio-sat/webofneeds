@@ -34,9 +34,12 @@ export function addConnectionFull(state, connection) {
     if (need) {
       const connectionUri = parsedConnection.getIn(["data", "uri"]);
 
-      const facet = parsedConnection.getIn(["data", "facet"]);
+      const facetUri = parsedConnection.get("facetUri");
+      const realFacet = need.getIn(["hasFacets", facetUri]);
 
-      if (facet === "holderFacet") {
+      parsedConnection = parsedConnection.setIn(["data", "facet"], realFacet);
+
+      if (realFacet === won.WON.HolderFacet) {
         const holdsUri = parsedConnection.getIn(["data", "remoteNeedUri"]);
         console.log(
           "Handling a holderFacet-connection within need: ",
@@ -53,7 +56,7 @@ export function addConnectionFull(state, connection) {
             );
           }
         }
-      } else if (facet === "holdableFacet") {
+      } else if (realFacet === won.WON.HoldableFacet) {
         //holdableFacet Connection from need to persona -> need to add heldBy remoteNeedUri to the need
         const heldByUri = parsedConnection.getIn(["data", "remoteNeedUri"]);
         console.log(
@@ -66,8 +69,8 @@ export function addConnectionFull(state, connection) {
         if (heldByUri) {
           state = state.setIn([needUri, "heldBy"], heldByUri);
         }
-      } else if (facet !== "chatFacet") {
-        console.warn("Unknown Facet(", facet, ") do not add Connection");
+      } else if (realFacet !== won.WON.ChatFacet) {
+        console.warn("Unknown Facet(", realFacet, ") do not add Connection");
         return state;
       }
 

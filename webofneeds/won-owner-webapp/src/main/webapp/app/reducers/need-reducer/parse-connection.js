@@ -9,11 +9,12 @@ export function parseConnection(jsonldConnection) {
 
   let parsedConnection = {
     belongsToUri: undefined,
+    facetUri: jsonldConnectionImm.get("hasFacet"),
     data: {
       uri: undefined,
       state: undefined,
       messages: Immutable.Map(),
-      facet: generateFacetType(jsonldConnectionImm.get("hasFacet")),
+      facet: undefined, //will be determined by the reduce-connections
       agreementData: {
         agreementUris: Immutable.Set(),
         pendingProposalUris: Immutable.Set(),
@@ -87,19 +88,4 @@ export function parseConnection(jsonldConnection) {
     );
     return undefined;
   }
-}
-/*
- This method is solely used to define a common facetType (aka connection Type for the connection)
- because the facet is [needUri]#[type]
- //TODO: REFACTOR THIS SO WE USE THE REAL FACET TYPE OF THE CONNECTION FROM THE NEED, but we have to add facetUri -> facetType Map in the need in the state first before we can do this.
- */
-function generateFacetType(uri) {
-  if (uri) {
-    const indexOfLastSharp = uri.lastIndexOf("#");
-
-    if (indexOfLastSharp != -1 && indexOfLastSharp + 1 < uri.length) {
-      return uri.substr(indexOfLastSharp + 1);
-    }
-  }
-  return uri;
 }
