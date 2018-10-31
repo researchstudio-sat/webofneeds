@@ -29,9 +29,9 @@ export function addConnectionFull(state, connection) {
     // console.log("parsedConnection: ", parsedConnection.toJS(), "immutable", parsedConnection);
 
     const needUri = parsedConnection.get("belongsToUri");
-    let connections = state.getIn([needUri, "connections"]);
+    const need = state.get(needUri);
 
-    if (connections) {
+    if (need) {
       const connectionUri = parsedConnection.getIn(["data", "uri"]);
 
       const facet = parsedConnection.getIn(["data", "facet"]);
@@ -89,16 +89,13 @@ export function addConnectionFull(state, connection) {
         parsedConnection.get("data")
       );
     } else {
-      console.error(
+      console.warn(
         "Couldnt add valid connection - missing need data in state",
         needUri,
         "parsedConnection: ",
         parsedConnection.toJS()
       );
     }
-  } else {
-    // console.log("No connection parsed, add no connection to this state:
-    // ", state);
   }
   return state;
 }
