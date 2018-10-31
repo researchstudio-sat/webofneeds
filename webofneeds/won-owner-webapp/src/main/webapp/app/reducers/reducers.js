@@ -277,7 +277,7 @@ function deleteChatConnectionsBetweenOwnNeeds(state) {
         connections &&
         connections.filter(function(conn) {
           //Any connection that is not of type chatFacet will be exempt from deletion
-          if (conn.get("facet") === won.WON.ChatFacet) {
+          if (conn.get("facet") === won.WON.ChatFacetCompacted) {
             //Any other connection will be checked if it would be connected to the ownNeed, if so we remove it.
             return !state.getIn([
               "needs",
