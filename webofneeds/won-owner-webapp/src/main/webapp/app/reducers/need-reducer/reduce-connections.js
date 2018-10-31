@@ -280,7 +280,11 @@ export function changeConnectionState(state, connectionUri, newState) {
   const need = selectNeedByConnectionUri(state, connectionUri);
 
   if (!need) {
-    console.error("no need found for connectionUri", connectionUri);
+    console.warn(
+      "No need found for connection(",
+      connectionUri,
+      ") -> return unaltered state"
+    );
     return state;
   }
 
@@ -299,7 +303,11 @@ export function changeConnectionStateByFun(state, connectionUri, fun) {
   const need = selectNeedByConnectionUri(state, connectionUri);
 
   if (!need) {
-    console.error("no need found for connectionUri", connectionUri);
+    console.warn(
+      "No need found for connection(",
+      connectionUri,
+      ") -> return unaltered state"
+    );
     return state;
   }
 
@@ -318,10 +326,10 @@ export function updatePetriNetStateData(state, connectionUri, petriNetData) {
   const need = selectNeedByConnectionUri(state, connectionUri);
 
   if (!need || !petriNetData) {
-    console.error(
-      "no need found for connectionUri",
+    console.warn(
+      "No need found for connection(",
       connectionUri,
-      " or no petriNetData present"
+      ") or no petriNetData set in params -> return unaltered state"
     );
     return state;
   }
@@ -351,10 +359,10 @@ export function updateAgreementStateData(state, connectionUri, agreementData) {
   const need = selectNeedByConnectionUri(state, connectionUri);
 
   if (!need || !agreementData) {
-    console.error(
-      "no need found for connectionUri",
+    console.warn(
+      "No need found for connection(",
       connectionUri,
-      " or no agreementData present"
+      ") or no agreementData set in params -> return unaltered state"
     );
     return state;
   }
@@ -380,7 +388,11 @@ export function setShowAgreementData(state, connectionUri, showAgreementData) {
   const need = selectNeedByConnectionUri(state, connectionUri);
 
   if (!need) {
-    console.error("no need found for connectionUri", connectionUri);
+    console.warn(
+      "No need found for connection(",
+      connectionUri,
+      ") -> return unaltered state"
+    );
     return state;
   }
 
@@ -396,7 +408,11 @@ export function setShowPetriNetData(state, connectionUri, showPetriNetData) {
   const need = selectNeedByConnectionUri(state, connectionUri);
 
   if (!need) {
-    console.error("no need found for connectionUri", connectionUri);
+    console.warn(
+      "No need found for connection(",
+      connectionUri,
+      ") -> return unaltered state"
+    );
     return state;
   }
 
@@ -416,7 +432,11 @@ export function setMultiSelectType(
   const need = selectNeedByConnectionUri(state, connectionUri);
 
   if (!need) {
-    console.error("no need found for connectionUri", connectionUri);
+    console.warn(
+      "No need found for connection(",
+      connectionUri,
+      ") -> return unaltered state"
+    );
     return state;
   }
 
