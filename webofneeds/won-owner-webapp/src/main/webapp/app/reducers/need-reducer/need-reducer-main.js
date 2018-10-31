@@ -178,6 +178,7 @@ export default function(allNeedsInState = initialState, action = {}) {
       );
 
     case actionTypes.personas.create: {
+      //TODO: Please let us use the addNeed method as a single entry point to add Needs(even Personas) to the State
       return allNeedsInState.set(
         action.payload.needUri,
         Immutable.fromJS({
@@ -187,6 +188,9 @@ export default function(allNeedsInState = initialState, action = {}) {
           uri: action.payload.needUri,
           creationDate: new Date(),
           types: Immutable.Set(["won:Need", "won:Persona"]),
+          connections: Immutable.Map(),
+          holds: Immutable.List(),
+          hasFacets: Immutable.Map(),
         })
       );
     }
@@ -197,7 +201,6 @@ export default function(allNeedsInState = initialState, action = {}) {
         action.payload.need,
         action.payload.needUri
       );
-    //return addNeedInCreation(allNeedsInState, action.payload.needList, action.payload.needUri);
     case actionTypes.needs.createSuccessful:
       return addNeed(allNeedsInState, action.payload.need, true);
 
@@ -232,12 +235,7 @@ export default function(allNeedsInState = initialState, action = {}) {
 
       //guarantee that remoteNeed is in state
       changedState = addNeed(changedState, remoteNeed, false);
-      if (action.type == actionTypes.messages.connectMessageReceived) {
-        changedState = addConnectionFull(
-          changedState,
-          action.payload.connection
-        );
-      }
+      changedState = addConnectionFull(changedState, action.payload.connection);
 
       if (action.payload.message) {
         changedState = addMessage(changedState, action.payload.message);
@@ -270,6 +268,31 @@ export default function(allNeedsInState = initialState, action = {}) {
         won.WON.Closed
       );
 
+    case actionTypes.messages.connectMessageSent: {
+      // received a message saying we sent a connect request
+      const senderConnectionUri = action.payload.senderConnectionUri;
+      let stateUpdated;
+
+      if (senderConnectionUri) {
+        stateUpdated = addConnectionFull(
+          allNeedsInState,
+          action.payload.connection
+        );
+        stateUpdated = changeConnectionState(
+          allNeedsInState,
+          senderConnectionUri,
+          won.WON.RequestSent
+        );
+        return addMessage(stateUpdated, action.payload.event);
+      } else {
+        console.warn(
+          "actionTypes.messages.connectMessageSent: senderConnectionUri was undefined for payload: ",
+          action.payload,
+          " -> return unchangedState"
+        );
+      }
+      return allNeedsInState;
+    }
     case actionTypes.needs.connect: {
       // user has sent a connect request
       const optimisticEvent = action.payload.optimisticEvent;
@@ -326,6 +349,38 @@ export default function(allNeedsInState = initialState, action = {}) {
         );
       }
     }
+
+    case actionTypes.messages.openMessageSent: {
+      const senderNeedUri = action.payload.senderNeedUri;
+      const senderConnectionUri = action.payload.senderConnectionUri;
+      let stateUpdated;
+
+      if (senderConnectionUri) {
+        const senderNeed = allNeedsInState.get(senderNeedUri);
+        const existingConnection =
+          senderNeed && senderNeed.getIn(["connections", senderConnectionUri]);
+
+        if (existingConnection) {
+          stateUpdated = changeConnectionState(
+            allNeedsInState,
+            senderConnectionUri,
+            won.WON.Connected //TODO EITHER SET TO REQUEST SENT OR CONNECTED DEPENDING ON THE CURRENT STATE
+          );
+          //because we have a connection uri, we can add the message
+          return addMessage(stateUpdated, action.payload.event);
+        } else {
+          return addConnectionFull(allNeedsInState, action.payload.connection);
+        }
+      } else {
+        console.warn(
+          "actionTypes.messages.openMessageSent: senderConnectionUri was undefined for payload: ",
+          action.payload,
+          " -> return unchangedState"
+        );
+      }
+      return allNeedsInState;
+    }
+
     case actionTypes.connections.open: {
       // user has sent an open request
       const cnctStateUpdated = changeConnectionStateByFun(
@@ -347,7 +402,43 @@ export default function(allNeedsInState = initialState, action = {}) {
         won.WON.RequestReceived
       );
 
-    case actionTypes.messages.open.successRemote:
+    case actionTypes.messages.open.successRemote: {
+      // use the remote success message to obtain the remote connection
+      // uri (which we may not have known)
+      const wonMessage = action.payload;
+      const connectionUri = wonMessage.getReceiver();
+      const needUri = wonMessage.getReceiverNeed();
+      const remoteConnectionUri = wonMessage.getSender();
+
+      if (allNeedsInState.getIn([needUri, "connections", connectionUri])) {
+        const eventUri = wonMessage.getIsRemoteResponseTo();
+        // we want to use the response date to update the original message
+        // date
+        allNeedsInState = allNeedsInState.setIn(
+          [
+            needUri,
+            "connections",
+            connectionUri,
+            "messages",
+            eventUri,
+            "isReceivedByRemote",
+          ],
+          true
+        );
+
+        return allNeedsInState.setIn(
+          [needUri, "connections", connectionUri, "remoteConnectionUri"],
+          remoteConnectionUri
+        );
+      } else {
+        console.warn(
+          "Open success for a connection that is not stored in the state yet, connUri: ",
+          connectionUri
+        );
+        return allNeedsInState;
+      }
+    }
+
     case actionTypes.messages.connect.successRemote: {
       // use the remote success message to obtain the remote connection
       // uri (which we may not have known)
@@ -378,7 +469,7 @@ export default function(allNeedsInState = initialState, action = {}) {
         );
       } else {
         console.warn(
-          "Open/Connect success for a connection that is not stored in the state yet, connUri: ",
+          "Connect success for a connection that is not stored in the state yet, connUri: ",
           connectionUri
         );
         return allNeedsInState;
@@ -442,29 +533,37 @@ export default function(allNeedsInState = initialState, action = {}) {
         }
         return allNeedsInState;
       } else {
-        // connection has been stored as match first
-        allNeedsInState = changeConnectionState(
-          allNeedsInState,
-          connectionUri,
-          won.WON.RequestSent
-        );
-
-        const needFromConnection = selectNeedByConnectionUri(
+        const needByConnectionUri = selectNeedByConnectionUri(
           allNeedsInState,
           connectionUri
         );
 
-        if (needFromConnection) {
-          const path = [
-            needFromConnection.get("uri"),
-            "connections",
+        if (needByConnectionUri) {
+          // connection has been stored as match first
+          allNeedsInState = changeConnectionState(
+            allNeedsInState,
             connectionUri,
-            "messages",
-            eventUri,
-          ];
-          if (allNeedsInState.getIn[path]) {
+            won.WON.RequestSent
+          );
+
+          if (
+            allNeedsInState.getIn[
+              (needByConnectionUri.get("uri"),
+              "connections",
+              connectionUri,
+              "messages",
+              eventUri)
+            ]
+          ) {
             allNeedsInState = allNeedsInState.setIn(
-              [...path, "isReceivedByOwn"],
+              [
+                needByConnectionUri.get("uri"),
+                "connections",
+                connectionUri,
+                "messages",
+                eventUri,
+                "isReceivedByOwn",
+              ],
               true
             );
           } else {
@@ -475,6 +574,12 @@ export default function(allNeedsInState = initialState, action = {}) {
               eventUri
             );
           }
+        } else {
+          console.warn(
+            "Can't add the connection(",
+            connectionUri,
+            ") the need is not stored in the state yet"
+          );
         }
         return allNeedsInState;
       }

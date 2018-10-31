@@ -22,6 +22,7 @@ export function parseNeed(jsonldNeed, ownNeed) {
     matchingContexts: undefined,
     searchString: undefined,
     jsonld: jsonldNeed,
+    hasFacets: Immutable.Map(),
     heldBy: undefined,
     holds: undefined,
   };
@@ -99,11 +100,9 @@ export function parseNeed(jsonldNeed, ownNeed) {
     let type = undefined;
     const detailsToParse = getAllDetails();
 
-    parsedNeed.holds = won.parseListFrom(
-      jsonldNeedImm,
-      ["won:holds"],
-      "xsd:ID"
-    );
+    parsedNeed.holds =
+      won.parseListFrom(jsonldNeedImm, ["won:holds"], "xsd:ID") ||
+      Immutable.List();
 
     parsedNeed.heldBy = won.parseFrom(jsonldNeedImm, ["won:heldBy"], "xsd:ID");
 
@@ -136,6 +135,7 @@ export function parseNeed(jsonldNeed, ownNeed) {
         : Immutable.List.of(wonHasMatchingContexts)
       : undefined;
     parsedNeed.hasFlags = hasFlags;
+    parsedNeed.hasFacets = extractFacets(jsonldNeedImm.get("won:hasFacet"));
     parsedNeed.nodeUri = nodeUri;
     parsedNeed.humanReadable = getHumanReadableStringFromNeed(
       parsedNeed,
@@ -195,6 +195,22 @@ function extractFlags(wonHasFlags) {
     });
 
   return hasFlags;
+}
+
+function extractFacets(wonHasFacets) {
+  let hasFacets = Immutable.Map();
+
+  if (wonHasFacets) {
+    if (Immutable.List.isList(wonHasFacets)) {
+      wonHasFacets.map(facet => {
+        hasFacets = hasFacets.set(facet.get("@id"), facet.get("@type"));
+      });
+      return hasFacets;
+    } else {
+      return hasFacets.set(wonHasFacets.get("@id"), wonHasFacets.get("@type"));
+    }
+  }
+  return hasFacets;
 }
 
 function getHumanReadableStringFromNeed(need, detailsToParse) {

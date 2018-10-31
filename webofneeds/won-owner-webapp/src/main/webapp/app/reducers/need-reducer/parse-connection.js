@@ -9,10 +9,12 @@ export function parseConnection(jsonldConnection) {
 
   let parsedConnection = {
     belongsToUri: undefined,
+    facetUri: jsonldConnectionImm.get("hasFacet"),
     data: {
       uri: undefined,
       state: undefined,
       messages: Immutable.Map(),
+      facet: undefined, //will be determined by the reduce-connections
       agreementData: {
         agreementUris: Immutable.Set(),
         pendingProposalUris: Immutable.Set(),

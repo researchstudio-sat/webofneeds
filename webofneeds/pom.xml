@@ -906,7 +906,8 @@
                     <version>2.17</version>
                     <configuration>
                       <reuseForks>false</reuseForks>
-                      <forkCount>1</forkCount>
+                      <forkCount>0</forkCount>
+                      <useSystemClassLoader>false</useSystemClassLoader>
                     </configuration>
                 </plugin>
                 <plugin>

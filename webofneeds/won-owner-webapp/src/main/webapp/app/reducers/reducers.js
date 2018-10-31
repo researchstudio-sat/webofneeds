@@ -11,7 +11,7 @@ import needReducer from "./need-reducer/need-reducer-main.js";
 import userReducer from "./user-reducer.js";
 import toastReducer from "./toast-reducer.js";
 import { getIn } from "../utils.js";
-
+import won from "../won-es6.js";
 /*
  * this reducer attaches a 'router' object to our state that keeps the routing state.
  */
@@ -242,9 +242,10 @@ export default reduceReducers(
        */
       case actionTypes.initialPageLoad:
       case actionTypes.login:
+      case actionTypes.messages.connectMessageSent:
       case actionTypes.messages.connectMessageReceived:
       case actionTypes.messages.hintMessageReceived:
-        return deleteConnectionsBetweenOwnNeeds(state);
+        return deleteChatConnectionsBetweenOwnNeeds(state);
 
       case actionTypes.mainViewScrolled:
         return state.set("mainViewScroll", action.payload);
@@ -265,18 +266,27 @@ export default reduceReducers(
 
 window.Immutable4dbg = Immutable;
 
-function deleteConnectionsBetweenOwnNeeds(state) {
+function deleteChatConnectionsBetweenOwnNeeds(state) {
   let needs = state.get("needs");
 
   if (needs) {
     needs = needs.map(function(need) {
       let connections = need.get("connections");
 
-      connections = connections.filter(function(conn) {
-        if (conn.get("state") == "http://purl.org/webofneeds/model#Suggested")
-          return !state.getIn(["needs", conn.get("remoteNeedUri"), "ownNeed"]);
-        else return true;
-      });
+      connections =
+        connections &&
+        connections.filter(function(conn) {
+          //Any connection that is not of type chatFacet will be exempt from deletion
+          if (conn.get("facet") === won.WON.ChatFacetCompacted) {
+            //Any other connection will be checked if it would be connected to the ownNeed, if so we remove it.
+            return !state.getIn([
+              "needs",
+              conn.get("remoteNeedUri"),
+              "ownNeed",
+            ]);
+          }
+          return true;
+        });
       return need.set("connections", connections);
     });
     return state.set("needs", needs);

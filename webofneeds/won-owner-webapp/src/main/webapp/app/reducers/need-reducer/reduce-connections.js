@@ -26,14 +26,53 @@ export function addConnectionFull(state, connection) {
   let parsedConnection = parseConnection(connection);
 
   if (parsedConnection) {
-    // console.log("parsedConnection: ", parsedConnection.toJS(), "immutable
-    // ", parsedConnection);
+    // console.log("parsedConnection: ", parsedConnection.toJS(), "immutable", parsedConnection);
 
     const needUri = parsedConnection.get("belongsToUri");
-    let connections = state.getIn([needUri, "connections"]);
+    const need = state.get(needUri);
 
-    if (connections) {
+    if (need) {
       const connectionUri = parsedConnection.getIn(["data", "uri"]);
+
+      const facetUri = parsedConnection.get("facetUri");
+      const realFacet = need.getIn(["hasFacets", facetUri]);
+
+      parsedConnection = parsedConnection.setIn(["data", "facet"], realFacet);
+
+      if (realFacet === won.WON.HolderFacetCompacted) {
+        const holdsUri = parsedConnection.getIn(["data", "remoteNeedUri"]);
+        console.log(
+          "Handling a holderFacet-connection within need: ",
+          needUri,
+          " setting holds to holdsUri: ",
+          holdsUri
+        );
+
+        if (holdsUri) {
+          const currentHolds = state.getIn([needUri, "holds"]);
+          if (currentHolds && !currentHolds.includes(holdsUri)) {
+            state = state.updateIn([needUri, "holds"], holdsList =>
+              holdsList.push(holdsUri)
+            );
+          }
+        }
+      } else if (realFacet === won.WON.HoldableFacetCompacted) {
+        //holdableFacet Connection from need to persona -> need to add heldBy remoteNeedUri to the need
+        const heldByUri = parsedConnection.getIn(["data", "remoteNeedUri"]);
+        console.log(
+          "Handling a holdableFacet-connection within need: ",
+          needUri,
+          " setting heldBy to heldByUri: ",
+          heldByUri
+        );
+
+        if (heldByUri) {
+          state = state.setIn([needUri, "heldBy"], heldByUri);
+        }
+      } else if (realFacet !== won.WON.ChatFacetCompacted) {
+        console.warn("Unknown Facet(", realFacet, ") do not add Connection");
+        return state;
+      }
 
       if (parsedConnection.getIn(["data", "unread"])) {
         //If there is a new message for the connection we will set the connection to newConnection
@@ -53,16 +92,13 @@ export function addConnectionFull(state, connection) {
         parsedConnection.get("data")
       );
     } else {
-      console.error(
+      console.warn(
         "Couldnt add valid connection - missing need data in state",
         needUri,
         "parsedConnection: ",
         parsedConnection.toJS()
       );
     }
-  } else {
-    // console.log("No connection parsed, add no connection to this state:
-    // ", state);
   }
   return state;
 }
@@ -244,7 +280,11 @@ export function changeConnectionState(state, connectionUri, newState) {
   const need = selectNeedByConnectionUri(state, connectionUri);
 
   if (!need) {
-    console.error("no need found for connectionUri", connectionUri);
+    console.warn(
+      "No need found for connection(",
+      connectionUri,
+      ") -> return unaltered state"
+    );
     return state;
   }
 
@@ -263,7 +303,11 @@ export function changeConnectionStateByFun(state, connectionUri, fun) {
   const need = selectNeedByConnectionUri(state, connectionUri);
 
   if (!need) {
-    console.error("no need found for connectionUri", connectionUri);
+    console.warn(
+      "No need found for connection(",
+      connectionUri,
+      ") -> return unaltered state"
+    );
     return state;
   }
 
@@ -282,10 +326,10 @@ export function updatePetriNetStateData(state, connectionUri, petriNetData) {
   const need = selectNeedByConnectionUri(state, connectionUri);
 
   if (!need || !petriNetData) {
-    console.error(
-      "no need found for connectionUri",
+    console.warn(
+      "No need found for connection(",
       connectionUri,
-      " or no petriNetData present"
+      ") or no petriNetData set in params -> return unaltered state"
     );
     return state;
   }
@@ -315,10 +359,10 @@ export function updateAgreementStateData(state, connectionUri, agreementData) {
   const need = selectNeedByConnectionUri(state, connectionUri);
 
   if (!need || !agreementData) {
-    console.error(
-      "no need found for connectionUri",
+    console.warn(
+      "No need found for connection(",
       connectionUri,
-      " or no agreementData present"
+      ") or no agreementData set in params -> return unaltered state"
     );
     return state;
   }
@@ -344,7 +388,11 @@ export function setShowAgreementData(state, connectionUri, showAgreementData) {
   const need = selectNeedByConnectionUri(state, connectionUri);
 
   if (!need) {
-    console.error("no need found for connectionUri", connectionUri);
+    console.warn(
+      "No need found for connection(",
+      connectionUri,
+      ") -> return unaltered state"
+    );
     return state;
   }
 
@@ -360,7 +408,11 @@ export function setShowPetriNetData(state, connectionUri, showPetriNetData) {
   const need = selectNeedByConnectionUri(state, connectionUri);
 
   if (!need) {
-    console.error("no need found for connectionUri", connectionUri);
+    console.warn(
+      "No need found for connection(",
+      connectionUri,
+      ") -> return unaltered state"
+    );
     return state;
   }
 
@@ -380,7 +432,11 @@ export function setMultiSelectType(
   const need = selectNeedByConnectionUri(state, connectionUri);
 
   if (!need) {
-    console.error("no need found for connectionUri", connectionUri);
+    console.warn(
+      "No need found for connection(",
+      connectionUri,
+      ") -> return unaltered state"
+    );
     return state;
   }
 
