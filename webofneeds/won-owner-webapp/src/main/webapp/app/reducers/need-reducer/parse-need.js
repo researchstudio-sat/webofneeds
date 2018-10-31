@@ -99,11 +99,9 @@ export function parseNeed(jsonldNeed, ownNeed) {
     let type = undefined;
     const detailsToParse = getAllDetails();
 
-    parsedNeed.holds = won.parseListFrom(
-      jsonldNeedImm,
-      ["won:holds"],
-      "xsd:ID"
-    );
+    parsedNeed.holds =
+      won.parseListFrom(jsonldNeedImm, ["won:holds"], "xsd:ID") ||
+      Immutable.List();
 
     parsedNeed.heldBy = won.parseFrom(jsonldNeedImm, ["won:heldBy"], "xsd:ID");
 
