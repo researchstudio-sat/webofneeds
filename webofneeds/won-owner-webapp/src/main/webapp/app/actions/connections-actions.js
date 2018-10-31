@@ -387,8 +387,7 @@ function generateResponseContentNodeTo(contentNode) {
   const theirTitle = get(contentNode, "title");
   return {
     title: theirTitle ? "Re: " + theirTitle : undefined,
-    description: "Direct response to : " + theirTitle,
-    //type: reNeedType,
+    description: theirTitle ? "Direct response to: " + theirTitle : undefined,
     tags: cloneAsMutable(get(contentNode, "tags")),
     location: cloneAsMutable(get(contentNode, "location")),
     noHints: true,
