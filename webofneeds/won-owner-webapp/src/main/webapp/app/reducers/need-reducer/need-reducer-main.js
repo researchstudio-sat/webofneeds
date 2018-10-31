@@ -281,7 +281,11 @@ export default function(allNeedsInState = initialState, action = {}) {
         );
         return addMessage(stateUpdated, action.payload.event);
       } else {
-        console.warn("TODO: this should not have happened oh boy");
+        console.warn(
+          "actionTypes.messages.connectMessageSent: senderConnectionUri was undefined for payload: ",
+          action.payload,
+          " -> return unchangedState"
+        );
       }
       return allNeedsInState;
     }
@@ -364,7 +368,11 @@ export default function(allNeedsInState = initialState, action = {}) {
           return addConnectionFull(allNeedsInState, action.payload.connection);
         }
       } else {
-        console.warn("TODO: this should not have happened oh boy");
+        console.warn(
+          "actionTypes.messages.openMessageSent: senderConnectionUri was undefined for payload: ",
+          action.payload,
+          " -> return unchangedState"
+        );
       }
       return allNeedsInState;
     }
