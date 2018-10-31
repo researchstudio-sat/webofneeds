@@ -281,9 +281,9 @@ function deleteChatConnectionsBetweenOwnNeeds(state) {
         }
         return true;
       });
-      need.set("connections", connections); //return once implemented the todo
+      return need.set("connections", connections);
     });
-    state.set("needs", needs); //return once implemented the todo
+    return state.set("needs", needs);
   }
 
   return state;
