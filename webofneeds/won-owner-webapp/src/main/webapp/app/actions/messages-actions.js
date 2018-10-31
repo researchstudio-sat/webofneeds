@@ -943,7 +943,6 @@ export function hintMessageReceived(event) {
         event.getMatchCounterpart()
       );
     } else {
-      //event.eventType = won.messageType2EventType[event.hasMessageType]; TODO needed?
       won
         .invalidateCacheForNewConnection(
           event.getReceiver(),
