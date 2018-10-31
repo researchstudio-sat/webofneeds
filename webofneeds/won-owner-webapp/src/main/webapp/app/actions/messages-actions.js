@@ -153,7 +153,7 @@ export function processOpenMessage(event) {
     const senderNeedUri = event.getSenderNeed();
     const senderConnectionUri = event.getSender();
 
-    console.log(
+    /*console.log(
       "Received an open Message\n",
       "   senderConnectionUri: ",
       senderConnectionUri,
@@ -167,7 +167,7 @@ export function processOpenMessage(event) {
       "   receiverNeedUri: ",
       receiverNeedUri,
       "\n"
-    );
+    );*/
 
     const currentState = getState();
     const senderNeed = currentState.getIn(["needs", senderNeedUri]);
@@ -175,16 +175,10 @@ export function processOpenMessage(event) {
     const isOwnSenderNeed = senderNeed && senderNeed.get("ownNeed");
     const isOwnReceiverNeed = receiverNeed && receiverNeed.get("ownNeed");
 
-    if (isOwnReceiverNeed && isOwnSenderNeed) {
-      console.log(
-        "   Received an open Message for two needs were both belong to you"
-      );
-    }
-
     let senderConnectionP;
     if (!senderConnectionUri || !isOwnSenderNeed) {
       console.log(
-        "    senderConnectionUri was null or senderNeed is not ownNeed, resolve promise with undefined -> ignore the connection"
+        "senderConnectionUri was null or senderNeed is not ownNeed, resolve promise with undefined -> ignore the connection"
       );
       senderConnectionP = Promise.resolve(undefined);
     } else if (
@@ -208,7 +202,7 @@ export function processOpenMessage(event) {
     let receiverConnectionP;
     if (!receiverConnectionUri || !isOwnReceiverNeed) {
       console.log(
-        "    receiverConnectionUri was null or receiverNeed is not ownNeed, resolve promise with undefined -> ignore the connection"
+        "receiverConnectionUri was null or receiverNeed is not ownNeed, resolve promise with undefined -> ignore the connection"
       );
       receiverConnectionP = Promise.resolve(undefined);
     } else if (
@@ -239,7 +233,7 @@ export function processOpenMessage(event) {
       won.getNeed(receiverNeedUri), //TODO: PROMISE IF LOADED (WE MIGHT HAVE IT IN THE STATE ALREADY)
     ]).then(
       ([senderConnection, receiverConnection, senderNeed, receiverNeed]) => {
-        console.log(
+        /*console.log(
           "   senderConnection: ",
           senderConnection,
           " receiverConnection: ",
@@ -248,7 +242,7 @@ export function processOpenMessage(event) {
           senderNeed,
           " receiverNeed: ",
           receiverNeed
-        );
+        );*/
 
         if (receiverConnection) {
           dispatch({
@@ -263,11 +257,6 @@ export function processOpenMessage(event) {
               message: event,
             },
           });
-        } else {
-          console.warn(
-            "processOpenMessage - No Receiver Connection retrievable from event: ",
-            event
-          );
         }
 
         if (senderConnection) {
@@ -282,11 +271,6 @@ export function processOpenMessage(event) {
               connection: senderConnection,
             },
           });
-        } else {
-          console.warn(
-            "processOpenMessage - No Sender Connection retrievable from event: ",
-            event
-          );
         }
       }
     );
@@ -559,7 +543,7 @@ export function processConnectMessage(event) {
     const senderNeedUri = event.getSenderNeed();
     const senderConnectionUri = event.getSender();
 
-    console.log(
+    /*console.log(
       "Received a connect Message\n",
       "   senderConnectionUri: ",
       senderConnectionUri,
@@ -573,7 +557,7 @@ export function processConnectMessage(event) {
       "   receiverNeedUri: ",
       receiverNeedUri,
       "\n"
-    );
+    );*/
 
     const currentState = getState();
     const senderNeed = currentState.getIn(["needs", senderNeedUri]);
@@ -581,16 +565,10 @@ export function processConnectMessage(event) {
     const isOwnSenderNeed = senderNeed && senderNeed.get("ownNeed");
     const isOwnReceiverNeed = receiverNeed && receiverNeed.get("ownNeed");
 
-    if (isOwnReceiverNeed && isOwnSenderNeed) {
-      console.log(
-        "   Received a connect Message for two needs were both belong to you"
-      );
-    }
-
     let senderCP;
     if (!senderConnectionUri || !isOwnSenderNeed) {
       console.log(
-        "    senderConnectionUri was null or senderNeed is not ownNeed, resolve promise with undefined -> ignore the connection"
+        "senderConnectionUri was null or senderNeed is not ownNeed, resolve promise with undefined -> ignore the connection"
       );
       senderCP = Promise.resolve(undefined);
     } else if (
@@ -614,7 +592,7 @@ export function processConnectMessage(event) {
     let receiverCP;
     if (!receiverConnectionUri || !isOwnReceiverNeed) {
       console.log(
-        "    receiverConnectionUri was null or receiverNeed is not ownNeed, resolve promise with undefined -> ignore the connection"
+        "receiverConnectionUri was null or receiverNeed is not ownNeed, resolve promise with undefined -> ignore the connection"
       );
       receiverCP = Promise.resolve(undefined);
     } else if (
@@ -645,7 +623,7 @@ export function processConnectMessage(event) {
       won.getNeed(receiverNeedUri), //TODO: PROMISE IF LOADED (WE MIGHT HAVE IT IN THE STATE ALREADY)
     ]).then(
       ([senderConnection, receiverConnection, senderNeed, receiverNeed]) => {
-        console.log(
+        /*console.log(
           "   senderConnection: ",
           senderConnection,
           " receiverConnection: ",
@@ -654,7 +632,7 @@ export function processConnectMessage(event) {
           senderNeed,
           " receiverNeed: ",
           receiverNeed
-        );
+        );*/
 
         if (receiverConnection) {
           dispatch({
@@ -672,11 +650,6 @@ export function processConnectMessage(event) {
               message: event,
             },
           });
-        } else {
-          console.warn(
-            "processConnectMessage - No Receiver Connection retrievable from event: ",
-            event
-          );
         }
 
         if (senderConnection) {
@@ -694,11 +667,6 @@ export function processConnectMessage(event) {
               ),
             },
           });
-        } else {
-          console.warn(
-            "processConnectMessage - No Sender Connection retrievable from event: ",
-            event
-          );
         }
       }
     );
