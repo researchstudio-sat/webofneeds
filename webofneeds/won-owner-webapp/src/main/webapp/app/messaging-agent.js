@@ -325,7 +325,7 @@ export function runMessagingAgent(redux) {
      */
 
   let ws = newSock();
-  window.ws4dbg = ws; //TODO deletme
+  window.ws4dbg = ws;
   let unsubscribeWatches = [];
 
   let reconnectAttempts = 0; // should be increased when a socket is opened, reset to 0 after opening was successful
