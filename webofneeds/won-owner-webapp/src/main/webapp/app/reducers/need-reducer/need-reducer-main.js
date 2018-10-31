@@ -178,6 +178,7 @@ export default function(allNeedsInState = initialState, action = {}) {
       );
 
     case actionTypes.personas.create: {
+      //TODO: Please let us use the addNeed method as a single entry point to add Needs(even Personas) to the State
       return allNeedsInState.set(
         action.payload.needUri,
         Immutable.fromJS({
@@ -187,6 +188,8 @@ export default function(allNeedsInState = initialState, action = {}) {
           uri: action.payload.needUri,
           creationDate: new Date(),
           types: Immutable.Set(["won:Need", "won:Persona"]),
+          connections: Immutable.Map(),
+          holds: Immutable.List(),
         })
       );
     }
