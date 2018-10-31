@@ -93,7 +93,7 @@ export function messagesReducer(messages = initialState, action = {}) {
         /*
          * now that the session has been upgraded, we need to set the flag
          * that triggers a websocket reset.
-         * TODO this is part of the session-upgrade hack documented in:
+         * This is part of the session-upgrade hack documented in:
          * https://github.com/researchstudio-sat/webofneeds/issues/381#issuecomment-172569377
          */
         return messages.set("reconnecting", true);
@@ -114,7 +114,7 @@ export function messagesReducer(messages = initialState, action = {}) {
         /*
          * now that the session has been downgraded, we need to set the flag
          * that triggers a websocket reset.
-         * TODO this is part of the session-upgrade hack documented in:
+         * This is part of the session-upgrade hack documented in:
          * https://github.com/researchstudio-sat/webofneeds/issues/381#issuecomment-172569377
          */
         return messages.set("reconnecting", true);
