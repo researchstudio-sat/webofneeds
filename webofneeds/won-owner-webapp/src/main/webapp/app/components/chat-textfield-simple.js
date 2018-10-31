@@ -31,12 +31,14 @@ import autoresizingTextareaModule from "../directives/textarea-autogrow.js";
 import { actionCreators } from "../actions/actions.js";
 import labelledHrModule from "./labelled-hr.js";
 import { getHumanReadableStringFromMessage } from "../reducers/need-reducer/parse-message.js";
+import submitButtonModule from "./submit-button.js";
 
 import "style/_chattextfield.scss";
 import "style/_textfield.scss";
 
 function genComponentConf() {
   let template = `
+      <!-- DETAILS DRAWER START -->  
         <div class="cts__details"
           ng-if="self.allowDetails && self.showAddMessageContent">
           <div class="cts__details__grid"
@@ -184,6 +186,8 @@ function genComponentConf() {
             </div>
           </div>
         </div>
+      <!-- DETAILS DRAWER END -->
+      <!-- OPEN/CLOSE DETAILS BTN -->
         <button class="cts__add"
           ng-disabled="!self.allowDetails"
           ng-click="self.toggleAdditionalContentDisplay()">
@@ -194,6 +198,7 @@ function genComponentConf() {
                 <use xlink:href="#ico36_close" href="#ico36_close"></use>
             </svg>
         </button>
+      <!-- OPEN/CLOSE DETAILS BTN -->
         <textarea 
             won-textarea-autogrow
             data-min-rows="1"
@@ -203,6 +208,7 @@ function genComponentConf() {
             tabindex="0"
             placeholder="{{self.placeholder}}"></textarea>
 
+        <!-- old send button, to be deleted
         <button
             class="cts__submitbutton red"
             ng-show="self.submitButtonLabel"
@@ -210,6 +216,17 @@ function genComponentConf() {
             ng-disabled="!self.valid()">
             {{ (self.submitButtonLabel || 'Submit') }}
         </button>
+         -->
+      <!-- PERSONA SELECTION START -->
+        <won-submit-button
+            is-valid="self.valid()"
+            on-submit="self.submit(persona)" 
+            show-persona="self.showPersonas"
+            label="self.submitButtonLabel">
+        </won-submit-button>
+      <!-- PERSONA SELECTION END -->
+
+      <!-- ADDED DETAILS START -->  
         <div class="cts__additionalcontent" ng-if="self.hasAdditionalContent() || self.hasReferencedContent()">
           <div class="cts__additionalcontent__header">Additional Content to send:</div>
           <div class="cts__additionalcontent__list">
@@ -243,6 +260,7 @@ function genComponentConf() {
             </div>
           </div>
         </div>
+      <!-- ADDED DETAILS END -->
         <div class="cts__charcount" ng-show="self.maxChars">
             {{ self.charactersLeft() }} characters left
         </div>
@@ -330,6 +348,7 @@ function genComponentConf() {
           showAddMessageContent: state.get("showAddMessageContent"),
           selectedDetail,
           selectedDetailComponent: selectedDetail && selectedDetail.component,
+          isLoggedIn: state.getIn(["user", "loggedIn"]),
         };
       };
 
@@ -623,6 +642,7 @@ function genComponentConf() {
       allowDetails: "=", //whether or not it is allowed to add content other than text
 
       allowEmptySubmit: "=", // allows submitting empty messages
+      showPersonas: "=", // show a persona drop-up
 
       /*
              * Usage:
@@ -650,6 +670,7 @@ export default angular
   .module("won.owner.components.chatTextfieldSimple", [
     labelledHrModule,
     autoresizingTextareaModule,
+    submitButtonModule,
     ngAnimate,
   ])
   .directive("messageDetailElement", [
