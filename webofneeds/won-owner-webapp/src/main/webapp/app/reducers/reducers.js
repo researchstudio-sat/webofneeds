@@ -242,9 +242,10 @@ export default reduceReducers(
        */
       case actionTypes.initialPageLoad:
       case actionTypes.login:
+      case actionTypes.messages.connectMessageSent:
       case actionTypes.messages.connectMessageReceived:
       case actionTypes.messages.hintMessageReceived:
-        return deleteConnectionsBetweenOwnNeeds(state);
+        return deleteChatConnectionsBetweenOwnNeeds(state);
 
       case actionTypes.mainViewScrolled:
         return state.set("mainViewScroll", action.payload);
@@ -265,7 +266,7 @@ export default reduceReducers(
 
 window.Immutable4dbg = Immutable;
 
-function deleteConnectionsBetweenOwnNeeds(state) {
+function deleteChatConnectionsBetweenOwnNeeds(state) {
   let needs = state.get("needs");
 
   if (needs) {
@@ -273,13 +274,16 @@ function deleteConnectionsBetweenOwnNeeds(state) {
       let connections = need.get("connections");
 
       connections = connections.filter(function(conn) {
-        if (conn.get("state") == "http://purl.org/webofneeds/model#Suggested")
+        //Any connection that is not of type chatFacet will be exempt from deletion
+        if (conn.get("facet") !== "chatFacet") {
+          //Any other connection will be checked if it would be connected to the ownNeed, if so we remove it.
           return !state.getIn(["needs", conn.get("remoteNeedUri"), "ownNeed"]);
-        else return true;
+        }
+        return true;
       });
-      return need.set("connections", connections);
+      need.set("connections", connections); //return once implemented the todo
     });
-    return state.set("needs", needs);
+    state.set("needs", needs); //return once implemented the todo
   }
 
   return state;
