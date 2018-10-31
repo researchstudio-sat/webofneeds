@@ -147,6 +147,8 @@ won.WON.NoHintForCounterpartCompacted =
   won.WON.prefix + ":NoHintForCounterpart";
 won.WON.UsedForTestingCompacted = won.WON.prefix + ":UsedForTesting";
 won.WON.NoHintForMeCompacted = won.WON.prefix + ":NoHintForMe";
+won.WON.HoldableFacet = won.WON.baseUri + "HoldableFacet";
+won.WON.HolderFacet = won.WON.baseUri + "HolderFacet";
 won.WON.ChatFacet = won.WON.baseUri + "ChatFacet";
 won.WON.ChatFacetCompacted = won.WON.prefix + ":ChatFacet";
 won.WON.GroupFacet = won.WON.baseUri + "GroupFacet";
