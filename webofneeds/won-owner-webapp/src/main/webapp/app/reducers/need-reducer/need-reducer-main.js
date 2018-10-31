@@ -529,12 +529,12 @@ export default function(allNeedsInState = initialState, action = {}) {
         }
         return allNeedsInState;
       } else {
-        const needFromConnection = selectNeedByConnectionUri(
+        const needByConnectionUri = selectNeedByConnectionUri(
           allNeedsInState,
           connectionUri
         );
 
-        if (needFromConnection) {
+        if (needByConnectionUri) {
           // connection has been stored as match first
           allNeedsInState = changeConnectionState(
             allNeedsInState,
@@ -544,7 +544,7 @@ export default function(allNeedsInState = initialState, action = {}) {
 
           if (
             allNeedsInState.getIn[
-              (needFromConnection.get("uri"),
+              (needByConnectionUri.get("uri"),
               "connections",
               connectionUri,
               "messages",
@@ -553,7 +553,7 @@ export default function(allNeedsInState = initialState, action = {}) {
           ) {
             allNeedsInState = allNeedsInState.setIn(
               [
-                needFromConnection.get("uri"),
+                needByConnectionUri.get("uri"),
                 "connections",
                 connectionUri,
                 "messages",
@@ -571,53 +571,11 @@ export default function(allNeedsInState = initialState, action = {}) {
             );
           }
         } else {
-          const senderNeedUri = wonMessage.getSenderNeed();
-          const senderNeed = allNeedsInState.get(senderNeedUri);
-
-          if (senderNeed) {
-            const newConnection = Immutable.fromJS({
-              uri: connectionUri,
-              state: won.WON.RequestSent,
-              remoteNeedUri: wonMessage.getReceiverNeed(), //TODO: IDK HOW TO FIND OUT WHICH REMOTENEEDURI WE SHOULD USE HERE, IT IS NOT in the wonMessage.getReceiverNeed();
-              unread: false,
-              messages: {
-                [eventUri]: {
-                  uri: eventUri,
-                  content: {
-                    text: wonMessage.getTextMessage(),
-                  },
-                  isParsable: !!wonMessage.getTextMessage(),
-                  hasContent: !!wonMessage.getTextMessage(),
-                  hasReferences: false,
-                  date: msStringToDate(wonMessage.getSentTimestamp()),
-                  outgoingMessage: true,
-                  unread: true,
-                  messageType: won.WONMSG.connectMessage,
-                  messageStatus: {
-                    isProposed: false,
-                    isClaimed: false,
-                    isRetracted: false,
-                    isRejected: false,
-                    isAccepted: false,
-                    isCancelled: false,
-                    isCancellationPending: false,
-                  },
-                },
-              },
-            });
-            return allNeedsInState.setIn(
-              [senderNeedUri, "connections", connectionUri],
-              newConnection
-            );
-          } else {
-            console.warn(
-              "Can't add the connection(",
-              connectionUri,
-              ") the need(",
-              senderNeedUri,
-              ") is not stored in the state yet"
-            );
-          }
+          console.warn(
+            "Can't add the connection(",
+            connectionUri,
+            ") the need is not stored in the state yet"
+          );
         }
         return allNeedsInState;
       }

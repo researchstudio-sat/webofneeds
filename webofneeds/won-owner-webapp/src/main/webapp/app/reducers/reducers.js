@@ -273,14 +273,20 @@ function deleteChatConnectionsBetweenOwnNeeds(state) {
     needs = needs.map(function(need) {
       let connections = need.get("connections");
 
-      connections = connections.filter(function(conn) {
-        //Any connection that is not of type chatFacet will be exempt from deletion
-        if (conn.get("facet") !== "chatFacet") {
-          //Any other connection will be checked if it would be connected to the ownNeed, if so we remove it.
-          return !state.getIn(["needs", conn.get("remoteNeedUri"), "ownNeed"]);
-        }
-        return true;
-      });
+      connections =
+        connections &&
+        connections.filter(function(conn) {
+          //Any connection that is not of type chatFacet will be exempt from deletion
+          if (conn.get("facet") === "chatFacet") {
+            //Any other connection will be checked if it would be connected to the ownNeed, if so we remove it.
+            return !state.getIn([
+              "needs",
+              conn.get("remoteNeedUri"),
+              "ownNeed",
+            ]);
+          }
+          return true;
+        });
       return need.set("connections", connections);
     });
     return state.set("needs", needs);
