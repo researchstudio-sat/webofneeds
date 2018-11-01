@@ -7,6 +7,14 @@ import {
   organizationNamesDetail,
 } from "../../details/jobs.js";
 import { jobLocation } from "../../details/location.js";
+import {
+  vicinityScoreSubQuery,
+  tagOverlapScoreSubQuery,
+  sparqlQuery,
+} from "../../../app/sparql-builder-utils.js";
+import won from "../../../app/won-es6.js";
+
+import { getIn } from "../../../app/utils.js";
 
 export const jobOffer = {
   identifier: "jobOffer",
@@ -17,12 +25,10 @@ export const jobOffer = {
     ...emptyDraft,
     is: {
       type: "s:JobPosting",
-      tags: ["offer-job"],
     },
     seeks: {
       type: "s:Person",
     },
-    searchString: ["search-job"],
   },
   isDetails: {
     title: { ...details.title },
@@ -36,5 +42,132 @@ export const jobOffer = {
     description: { ...details.description },
     skills: { ...skillsDetail },
     interests: { ...interestsDetail },
+  },
+  /**
+   *
+   * e.g.: with just industries:
+   * ```
+   * # index for industries using binds
+   * prefix s: <http://schema.org/>
+   * prefix won:   <http://purl.org/webofneeds/model#>
+   * select distinct * where {
+   *   {
+   *     select
+   *       ${resultName}
+   *       (sum(?var1) + sum(?var2) as ?targetOverlap)
+   *       (count(${resultName}) as ?targetTotal)
+   *     where {
+   *       ${resultName} a won:Need;
+   *             won:is ?is.
+   *             ?is s:industry ?industry .
+   *       bind(if(str(?industry) = "design",1,0) as ?var1)
+   *       bind(if(str(?industry) = "computer science",1,0) as ?var2)
+   *     } group by (${resultName})
+   *   }
+   *   bind (?targetOverlap / ( ?targetTotal + 2 - ?targetOverlap ) as ?jaccardIndex )
+   * } order by desc(?jaccardIndex)
+   * limit 100
+   * ```
+   */
+  generateQuery: (draft, resultName) => {
+    // skills
+    const skillsSQ = tagOverlapScoreSubQuery({
+      resultName: resultName,
+      bindScoreAs: "?skills_jaccardIndex",
+      pathToTags: "won:is/s:knowsAbout",
+      prefixesInPath: {
+        s: won.defaultContext["s"],
+        won: won.defaultContext["won"],
+      },
+      tagLikes: getIn(draft, ["seeks", "skills"]),
+    });
+
+    // hiringOrganizationName
+    const organizationNameSQ = tagOverlapScoreSubQuery({
+      resultName: resultName,
+      bindScoreAs: "?organizationName_jaccardIndex",
+      pathToTags: "won:seeks/s:hiringOrganization/s:name",
+      prefixesInPath: {
+        s: won.defaultContext["s"],
+        won: won.defaultContext["won"],
+      },
+      tagLikes: getIn(draft, ["is", "organizationNames"]),
+    });
+
+    // employmentType
+    const employmentTypesSQ = tagOverlapScoreSubQuery({
+      resultName: resultName,
+      bindScoreAs: "?employmentTypes_jaccardIndex",
+      pathToTags: "won:seeks/s:employmentType",
+      prefixesInPath: {
+        s: won.defaultContext["s"],
+        won: won.defaultContext["won"],
+      },
+      tagLikes: getIn(draft, ["is", "employmentTypes"]),
+    });
+
+    // industry:
+    const industryScoreSQ = tagOverlapScoreSubQuery({
+      resultName: resultName,
+      bindScoreAs: "?industry_jaccardIndex",
+      pathToTags: "won:seeks/s:industry",
+      prefixesInPath: {
+        s: won.defaultContext["s"],
+        won: won.defaultContext["won"],
+      },
+      tagLikes: getIn(draft, ["is", "industry"]),
+    });
+
+    const vicinityScoreSQ = vicinityScoreSubQuery({
+      resultName: resultName,
+      bindScoreAs: "?jobLocation_geoScore",
+      pathToGeoCoords: "won:seeks/s:jobLocation/s:geo",
+      prefixesInPath: {
+        s: won.defaultContext["s"],
+        won: won.defaultContext["won"],
+      },
+      geoCoordinates: getIn(draft, ["is", "jobLocation"]),
+    });
+
+    const subQueries = [
+      industryScoreSQ,
+      vicinityScoreSQ,
+      employmentTypesSQ,
+      organizationNameSQ,
+      skillsSQ,
+    ]
+      .filter(sq => sq) // filter out non-existing details (the SQs should be `undefined` for them)
+      .map(sq => ({
+        query: sq,
+        optional: true, // so counterparts without that detail don't get filtered out (just assigned a score of 0 via `coalesce`)
+      }));
+
+    const query = sparqlQuery({
+      prefixes: {
+        won: won.defaultContext["won"],
+        rdf: won.defaultContext["rdf"],
+        s: won.defaultContext["s"],
+      },
+      distinct: true,
+      variables: [resultName],
+      subQueries: subQueries,
+      where: [
+        `${resultName} rdf:type won:Need.`,
+        `${resultName} won:is/rdf:type s:Person.`,
+
+        // calculate average of scores; can be weighed if necessary
+        `BIND( ( 
+          COALESCE(?industry_jaccardIndex, 0) + 
+          COALESCE(?skills_jaccardIndex, 0) + 
+          COALESCE(?organizationName_jaccardIndex, 0) + 
+          COALESCE(?employmentTypes_jaccardIndex, 0) + 
+          COALESCE(?jobLocation_geoScore, 0) 
+        ) / 5  as ?aggregatedScore)`,
+        // `FILTER(?aggregatedScore > 0)`, // not necessary atm to filter; there are parts of job-postings we can't match yet (e.g. NLP on description). also content's sparse anyway.
+      ],
+      orderBy: [{ order: "DESC", variable: "?aggregatedScore" }],
+    });
+
+    return query;
   },
 };

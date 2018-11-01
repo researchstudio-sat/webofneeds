@@ -34,7 +34,6 @@ export const jobSearch = {
     seeks: {
       type: "s:JobPosting",
     },
-    searchString: ["offer-job"],
   },
   isDetails: {
     title: { ...details.title },
@@ -175,7 +174,6 @@ export const jobSearch = {
         // `FILTER(?aggregatedScore > 0)`, // not necessary atm to filter; there are parts of job-postings we can't match yet (e.g. NLP on description). also content's sparse anyway.
       ],
       orderBy: [{ order: "DESC", variable: "?aggregatedScore" }],
-      limit: 20,
     });
 
     return query;
