@@ -12,6 +12,15 @@ import {
 } from "../details/real-estate.js";
 import { genresDetail, instrumentsDetail } from "../details/musician.js";
 import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-utils.js";
+import {
+  vicinityScoreSubQuery,
+  tagOverlapScoreSubQuery,
+  sparqlQuery,
+} from "../../app/sparql-builder-utils.js";
+
+import won from "../../app/won-es6.js";
+
+import { getIn } from "../../app/utils.js";
 
 export const musicianGroup = {
   identifier: "musiciangroup",
@@ -45,6 +54,75 @@ export const musicianGroup = {
         genres: { ...genresDetail },
         location: { ...details.location },
       },
+      generateQuery: (draft, resultName) => {
+        // genres
+        const genresSQ = tagOverlapScoreSubQuery({
+          resultName: resultName,
+          bindScoreAs: "?genres_jaccardIndex",
+          pathToTags: "won:is/won:genres",
+          prefixesInPath: {
+            s: won.defaultContext["s"],
+            won: won.defaultContext["won"],
+          },
+          tagLikes: getIn(draft, ["seeks", "genres"]),
+        });
+
+        // instruments
+        const instrumentsSQ = tagOverlapScoreSubQuery({
+          resultName: resultName,
+          bindScoreAs: "?instruments_jaccardIndex",
+          pathToTags: "won:seeks/won:instruments",
+          prefixesInPath: {
+            s: won.defaultContext["s"],
+            won: won.defaultContext["won"],
+          },
+          tagLikes: getIn(draft, ["is", "instruments"]),
+        });
+
+        const vicinityScoreSQ = vicinityScoreSubQuery({
+          resultName: resultName,
+          bindScoreAs: "?location_geoScore",
+          pathToGeoCoords: "won:is/s:location/s:geo",
+          prefixesInPath: {
+            s: won.defaultContext["s"],
+            won: won.defaultContext["won"],
+          },
+          geoCoordinates: getIn(draft, ["seeks", "location"]),
+        });
+
+        const subQueries = [genresSQ, instrumentsSQ, vicinityScoreSQ]
+          .filter(sq => sq) // filter out non-existing details (the SQs should be `undefined` for them)
+          .map(sq => ({
+            query: sq,
+            optional: true, // so counterparts without that detail don't get filtered out (just assigned a score of 0 via `coalesce`)
+          }));
+
+        const query = sparqlQuery({
+          prefixes: {
+            won: won.defaultContext["won"],
+            rdf: won.defaultContext["rdf"],
+            s: won.defaultContext["s"],
+          },
+          distinct: true,
+          variables: [resultName],
+          subQueries: subQueries,
+          where: [
+            `${resultName} rdf:type won:Need.`,
+            `${resultName} won:is/rdf:type s:Person.`,
+
+            // calculate average of scores; can be weighed if necessary
+            `BIND( ( 
+              COALESCE(?instruments_jaccardIndex, 0) + 
+              COALESCE(?genres_jaccardIndex, 0) + 
+              COALESCE(?location_geoScore, 0) 
+            ) / 3  as ?aggregatedScore)`,
+            `FILTER(?aggregatedScore > 0)`,
+          ],
+          orderBy: [{ order: "DESC", variable: "?aggregatedScore" }],
+        });
+
+        return query;
+      },
     },
     findMusician: {
       identifier: "findMusician",
@@ -72,6 +150,75 @@ export const musicianGroup = {
           ...instrumentsDetail,
           //mandatory: true,
         },
+      },
+      generateQuery: (draft, resultName) => {
+        // genres
+        const genresSQ = tagOverlapScoreSubQuery({
+          resultName: resultName,
+          bindScoreAs: "?genres_jaccardIndex",
+          pathToTags: "won:seeks/won:genres",
+          prefixesInPath: {
+            s: won.defaultContext["s"],
+            won: won.defaultContext["won"],
+          },
+          tagLikes: getIn(draft, ["is", "genres"]),
+        });
+
+        // instruments
+        const instrumentsSQ = tagOverlapScoreSubQuery({
+          resultName: resultName,
+          bindScoreAs: "?instruments_jaccardIndex",
+          pathToTags: "won:is/won:instruments",
+          prefixesInPath: {
+            s: won.defaultContext["s"],
+            won: won.defaultContext["won"],
+          },
+          tagLikes: getIn(draft, ["seeks", "instruments"]),
+        });
+
+        const vicinityScoreSQ = vicinityScoreSubQuery({
+          resultName: resultName,
+          bindScoreAs: "?location_geoScore",
+          pathToGeoCoords: "won:seeks/s:location/s:geo",
+          prefixesInPath: {
+            s: won.defaultContext["s"],
+            won: won.defaultContext["won"],
+          },
+          geoCoordinates: getIn(draft, ["is", "location"]),
+        });
+
+        const subQueries = [genresSQ, instrumentsSQ, vicinityScoreSQ]
+          .filter(sq => sq) // filter out non-existing details (the SQs should be `undefined` for them)
+          .map(sq => ({
+            query: sq,
+            optional: true, // so counterparts without that detail don't get filtered out (just assigned a score of 0 via `coalesce`)
+          }));
+
+        const query = sparqlQuery({
+          prefixes: {
+            won: won.defaultContext["won"],
+            rdf: won.defaultContext["rdf"],
+            s: won.defaultContext["s"],
+          },
+          distinct: true,
+          variables: [resultName],
+          subQueries: subQueries,
+          where: [
+            `${resultName} rdf:type won:Need.`,
+            `${resultName} won:is/rdf:type s:Person.`,
+
+            // calculate average of scores; can be weighed if necessary
+            `BIND( ( 
+              COALESCE(?instruments_jaccardIndex, 0) + 
+              COALESCE(?genres_jaccardIndex, 0) + 
+              COALESCE(?location_geoScore, 0) 
+            ) / 3  as ?aggregatedScore)`,
+            `FILTER(?aggregatedScore > 0)`,
+          ],
+          orderBy: [{ order: "DESC", variable: "?aggregatedScore" }],
+        });
+
+        return query;
       },
     },
     findRehearsalRoom: {
