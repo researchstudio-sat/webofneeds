@@ -5,8 +5,11 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+import org.apache.jena.graph.Triple;
 import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.apache.jena.sparql.algebra.Op;
+import org.apache.jena.sparql.algebra.OpVisitor;
+import org.apache.jena.sparql.algebra.OpVisitorByTypeBase;
 import org.apache.jena.sparql.algebra.TransformBase;
 import org.apache.jena.sparql.algebra.TransformCopy;
 import org.apache.jena.sparql.algebra.Transformer;
@@ -15,6 +18,7 @@ import org.apache.jena.sparql.algebra.op.Op1;
 import org.apache.jena.sparql.algebra.op.Op2;
 import org.apache.jena.sparql.algebra.op.OpConditional;
 import org.apache.jena.sparql.algebra.op.OpExt;
+import org.apache.jena.sparql.algebra.op.OpFilter;
 import org.apache.jena.sparql.algebra.op.OpGraph;
 import org.apache.jena.sparql.algebra.op.OpJoin;
 import org.apache.jena.sparql.algebra.op.OpLeftJoin;
@@ -24,8 +28,14 @@ import org.apache.jena.sparql.algebra.op.OpNull;
 import org.apache.jena.sparql.algebra.op.OpProject;
 import org.apache.jena.sparql.algebra.op.OpSequence;
 import org.apache.jena.sparql.algebra.op.OpService;
+import org.apache.jena.sparql.algebra.op.OpSlice;
+import org.apache.jena.sparql.algebra.op.OpTriple;
 import org.apache.jena.sparql.algebra.op.OpUnion;
+import org.apache.jena.sparql.algebra.walker.Walker;
 import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.expr.E_NotExists;
+
+import won.protocol.vocabulary.WON;
 
 public class SparqlMatcherUtils {
     /**
@@ -117,5 +127,88 @@ public class SparqlMatcherUtils {
     
     public static Op removeServiceOp(Op queryOp) {
         return removeServiceOp(queryOp, Optional.empty());
+    }
+    
+    /**
+     * Finds the top-level projection of the query.
+     */
+    public static Optional<Op> findToplevelOpProject(Op op) {
+        // use a final array to obtain the result of the visit
+        final Op[] toplevelOpProject = new Op[]{null}; 
+        Walker.walk(op, new OpVisitorByTypeBase() {
+            @Override
+            public void visit(OpProject opProject) {
+                //the visitor is called after returning from the recursion, so
+                //we have to replace any project op we found deeper in the tree
+                //to end up with the toplevel one in the end
+                toplevelOpProject[0] = opProject;
+            }
+        });
+        return Optional.ofNullable(toplevelOpProject[0]);
+    }
+    
+    public static Op hintForCounterpartQuery(Op q, Var resultName, long limit) {
+        Optional<Op> topLevelProject = findToplevelOpProject(q);
+        if (!topLevelProject.isPresent()) {
+            return q;
+        }
+        return Transformer.transform(new TransformCopy() {
+            public Op transform(OpProject op, Op subOp) {
+                if (op == topLevelProject.get()) {
+                    //only transform the toplevel projection
+                    return new OpSlice(
+                            op.copy(
+                                    OpFilter.filter(
+                                            new E_NotExists(
+                                                    new OpTriple(
+                                                            new Triple(
+                                                                    resultName,
+                                                                    WON.HAS_FLAG.asNode(),
+                                                                    WON.NO_HINT_FOR_COUNTERPART.asNode()
+                                                            )
+                                                    )
+                                            ),
+                                            subOp
+                                    )
+                            ),
+                            0,
+                            limit
+                    );
+                } else {
+                    return super.transform(op, subOp);
+                }
+            }
+        }, q);
+    }
+
+    public static Op noHintForCounterpartQuery(Op q, Var resultName, long limit) {
+        Optional<Op> topLevelProject = findToplevelOpProject(q);
+        if (!topLevelProject.isPresent()) {
+            return q;
+        }
+        return Transformer.transform(new TransformCopy() {
+            public Op transform(OpProject op, Op subOp) {
+                if (op == topLevelProject.get()) {
+                    //only transform the toplevel projection
+                    return new OpSlice(
+                            op.copy(
+                                    OpJoin.create(
+                                            new OpTriple(
+                                                    new Triple(
+                                                            resultName,
+                                                            WON.HAS_FLAG.asNode(),
+                                                            WON.NO_HINT_FOR_COUNTERPART.asNode()
+                                                    )
+                                            ),
+                                            subOp
+                                    )
+                            ),
+                            0,
+                            limit);
+                } else {
+                    return super.transform(op, subOp);
+                }
+            }
+        }, q);
     }
 }
