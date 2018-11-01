@@ -1,0 +1,41 @@
+PREFIX won: <http://purl.org/webofneeds/model#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX s: <http://schema.org/>
+PREFIX geo: <http://www.bigdata.com/rdf/geospatial#>
+PREFIX geoliteral: <http://www.bigdata.com/rdf/geospatial/literals/v1#>
+SELECT DISTINCT ?result WHERE {
+  OPTIONAL {
+    SELECT ?result ?jobLocation_geoScore WHERE {
+      ?result (won:is/s:jobLocation/s:geo) ?geo.
+      SERVICE geo:search {
+        ?geo geo:search "inCircle".
+        ?geo geo:searchDatatype geoliteral:lat-lon.
+        ?geo geo:predicate won:geoSpatial.
+        ?geo geo:spatialCircleCenter "48.2202097#16.3712159737999".
+        ?geo geo:spatialCircleRadius "10".
+        ?geo geo:distanceValue ?geoDistance.
+      }
+      BIND((10  - ?geoDistance) / 10  AS ?geoScoreRaw)
+      BIND(IF(?geoScoreRaw > 0 , ?geoScoreRaw, 0 ) AS ?jobLocation_geoScore)
+    }
+  }
+  OPTIONAL {
+    SELECT DISTINCT ?result ?skills_jaccardIndex WHERE {
+      {
+        SELECT ?result (SUM(?var0) AS ?targetOverlap) (COUNT(?result) AS ?targetTotal) WHERE {
+          ?result (won:seeks/s:knowsAbout) ?tag.
+          BIND(IF((STR(?tag)) = "Java", 1 , 0 ) AS ?var0)
+        }
+        GROUP BY ?result
+      }
+      BIND(?targetOverlap / ((?targetTotal + 1 ) - ?targetOverlap) AS ?skills_jaccardIndex)
+      FILTER(?skills_jaccardIndex > 0 )
+    }
+  }
+  ?result rdf:type won:Need.
+  ?result (won:is/rdf:type) s:JobPosting.
+  BIND((((((COALESCE(?industry_jaccardIndex, 0 )) + (COALESCE(?skills_jaccardIndex, 0 ))) + (COALESCE(?organizationName_jaccardIndex, 0 ))) + (COALESCE(?employmentTypes_jaccardIndex, 0 ))) + (COALESCE(?jobLocation_geoScore, 0 ))) / 5  AS ?aggregatedScore)
+}
+ORDER BY DESC (?aggregatedScore)
+LIMIT 20
+   

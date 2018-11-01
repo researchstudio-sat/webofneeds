@@ -21,6 +21,7 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.sparql.algebra.Algebra;
 import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.algebra.OpAsQuery;
+import org.apache.jena.sparql.core.Var;
 import org.apache.jena.tdb.TDB;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -55,26 +56,25 @@ public class SparqlQueryTest  {
     }
     
     @Test
-    @Ignore // useful for trying things out, does not make so much sense as a unit test
+    //@Ignore // useful for trying things out, does not make so much sense as a unit test
     public void testQuery() throws Exception {
         Dataset dataset = DatasetFactory.create();
         RDFDataMgr.read(dataset, getResourceAsStream("sparqlquerytest/need2.trig"), Lang.TRIG);
-        String queryString = getResourceAsString("sparqlquerytest/query2.rq");
+        String queryString = getResourceAsString("sparqlquerytest/jobquery-orig.rq");
         
         Query query = QueryFactory.create(queryString);
         Op queryOp = Algebra.compile(query);
         
-        Op queryWithGraphClause = SparqlMatcherUtils.addGraphOp(queryOp, Optional.of("urn:x-arq:UnionGraph"));
-        Op queryWithoutServiceClause = SparqlMatcherUtils.removeServiceOp(queryWithGraphClause, Optional.of("http://www.bigdata.com/rdf/geospatial#search"));
+        Op transformed = SparqlMatcherUtils.hintForCounterpartQuery(queryOp, Var.alloc("result"), 10);
+        
         
         System.out.println("query algebra: " + queryOp);
-        System.out.println("transformed query algebra: " + queryWithGraphClause);
-        System.out.println("withoug service clause:" + queryWithoutServiceClause);
+        System.out.println("transformed query algebra: " + transformed);
         System.out.println("\nDataset:");
         RDFDataMgr.write(System.out, dataset, Lang.TRIG);
         System.out.println("\nQuery:");
 
-        query = OpAsQuery.asQuery(queryWithoutServiceClause);
+        query = OpAsQuery.asQuery(transformed);
         System.out.println(query);
         System.out.println("\nResult:");
         

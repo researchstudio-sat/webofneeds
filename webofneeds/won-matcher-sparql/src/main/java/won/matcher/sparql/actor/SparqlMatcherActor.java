@@ -379,57 +379,12 @@ public class SparqlMatcherActor extends UntypedActor {
             if (log.isDebugEnabled()) {
                 log.debug("transforming query, adding 'no hint for counterpart' restriction: {}", q);
             }
-            Op noHintForCounterpartQuery = Transformer.transform(new TransformCopy() {
-                public Op transform(OpProject op, Op subOp) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("transforming: opProject:{}, subOp:{}", op, subOp);
-                    }
-                    return new OpSlice(
-                            op.copy(
-                                    OpJoin.create(
-                                            new OpTriple(
-                                                    new Triple(
-                                                            resultName,
-                                                            WON.HAS_FLAG.asNode(),
-                                                            WON.NO_HINT_FOR_COUNTERPART.asNode()
-                                                    )
-                                            ),
-                                            subOp
-                                    )
-                            ),
-                            0,
-                            config.getLimitResults() * 5);
-                }
-            }, q);
+            Op noHintForCounterpartQuery = SparqlMatcherUtils.noHintForCounterpartQuery(q, resultName, config.getLimitResults()*5);
             if (log.isDebugEnabled()) {
                 log.debug("transformed query: {}", noHintForCounterpartQuery);
                 log.debug("transforming query, adding 'wihout no hint for counterpart' restriction: {}", q);
             }
-            Op hintForCounterpartQuery = Transformer.transform(new TransformCopy() {
-                public Op transform(OpProject op, Op subOp) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("transforming: opProject:{}, subOp:{}", op, subOp);
-                    }
-                    return new OpSlice(
-                            op.copy(
-                                    OpFilter.filter(
-                                            new E_NotExists(
-                                                    new OpTriple(
-                                                            new Triple(
-                                                                    resultName,
-                                                                    WON.HAS_FLAG.asNode(),
-                                                                    WON.NO_HINT_FOR_COUNTERPART.asNode()
-                                                            )
-                                                    )
-                                            ),
-                                            subOp
-                                    )
-                            ),
-                            0,
-                            config.getLimitResults() * 2
-                    );
-                }
-            }, q);
+            Op hintForCounterpartQuery = SparqlMatcherUtils.hintForCounterpartQuery(q, resultName, config.getLimitResults() * 5);
             if (log.isDebugEnabled()) {
                 log.debug("transformed query: {}", hintForCounterpartQuery);
             }
@@ -442,6 +397,8 @@ public class SparqlMatcherActor extends UntypedActor {
 
         return needs;
     }
+
+   
 
     /**
      * Executes the query, optionally only searching in the datasetToQuery.
