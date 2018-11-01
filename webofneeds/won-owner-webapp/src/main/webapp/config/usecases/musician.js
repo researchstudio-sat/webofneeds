@@ -3,15 +3,32 @@
  */
 import { details, emptyDraft } from "../detail-definitions.js";
 import {
-  realEstateRentRangeDetail,
-  realEstateRentDetail,
   realEstateFloorSizeDetail,
   realEstateNumberOfRoomsDetail,
   realEstateFeaturesDetail,
   realEstateFloorSizeRangeDetail,
 } from "../details/real-estate.js";
-import { genresDetail, instrumentsDetail } from "../details/musician.js";
+import won from "../../app/won-es6.js";
+import {
+  genresDetail,
+  instrumentsDetail,
+  perHourRentRangeDetail,
+  perHourRentDetail,
+} from "../details/musician.js";
 import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-utils.js";
+import {
+  filterInVicinity,
+  filterFloorSizeRange,
+  filterNumericProperty,
+  filterRentRange,
+  filterRent,
+  concatenateFilters,
+  vicinityScoreSubQuery,
+  tagOverlapScoreSubQuery,
+  sparqlQuery,
+} from "../../app/sparql-builder-utils.js";
+
+import { getIn } from "../../app/utils.js";
 
 export const musicianGroup = {
   identifier: "musiciangroup",
@@ -28,9 +45,11 @@ export const musicianGroup = {
         ...emptyDraft,
         is: {
           title: "I'm looking for a band!",
-          //tags: ["musician", "band"],
+          type: "won:Musician",
         },
-        searchString: "band",
+        seeks: {
+          type: "s:MusicGroup",
+        },
       },
       isDetails: {
         title: { ...details.title },
@@ -44,6 +63,76 @@ export const musicianGroup = {
         description: { ...details.description },
         genres: { ...genresDetail },
         location: { ...details.location },
+      },
+      generateQuery: (draft, resultName) => {
+        // genres
+        const genresSQ = tagOverlapScoreSubQuery({
+          resultName: resultName,
+          bindScoreAs: "?genres_jaccardIndex",
+          pathToTags: "won:is/won:genres",
+          prefixesInPath: {
+            s: won.defaultContext["s"],
+            won: won.defaultContext["won"],
+          },
+          tagLikes: getIn(draft, ["seeks", "genres"]),
+        });
+
+        // instruments
+        const instrumentsSQ = tagOverlapScoreSubQuery({
+          resultName: resultName,
+          bindScoreAs: "?instruments_jaccardIndex",
+          pathToTags: "won:seeks/won:instruments",
+          prefixesInPath: {
+            s: won.defaultContext["s"],
+            won: won.defaultContext["won"],
+          },
+          tagLikes: getIn(draft, ["is", "instruments"]),
+        });
+
+        const vicinityScoreSQ = vicinityScoreSubQuery({
+          resultName: resultName,
+          bindScoreAs: "?location_geoScore",
+          pathToGeoCoords: "won:is/s:location/s:geo",
+          prefixesInPath: {
+            s: won.defaultContext["s"],
+            won: won.defaultContext["won"],
+          },
+
+          geoCoordinates: getIn(draft, ["seeks", "location"]),
+        });
+
+        const subQueries = [genresSQ, instrumentsSQ, vicinityScoreSQ]
+          .filter(sq => sq) // filter out non-existing details (the SQs should be `undefined` for them)
+          .map(sq => ({
+            query: sq,
+            optional: true, // so counterparts without that detail don't get filtered out (just assigned a score of 0 via `coalesce`)
+          }));
+
+        const query = sparqlQuery({
+          prefixes: {
+            won: won.defaultContext["won"],
+            rdf: won.defaultContext["rdf"],
+            s: won.defaultContext["s"],
+          },
+          distinct: true,
+          variables: [resultName],
+          subQueries: subQueries,
+          where: [
+            `${resultName} rdf:type won:Need.`,
+            `${resultName} won:is/rdf:type s:MusicGroup.`,
+
+            // calculate average of scores; can be weighed if necessary
+            `BIND( ( 
+              COALESCE(?instruments_jaccardIndex, 0) + 
+              COALESCE(?genres_jaccardIndex, 0) + 
+              COALESCE(?location_geoScore, 0) 
+            ) / 3  as ?aggregatedScore)`,
+            `FILTER(?aggregatedScore > 0)`,
+          ],
+          orderBy: [{ order: "DESC", variable: "?aggregatedScore" }],
+        });
+
+        return query;
       },
     },
     findMusician: {
@@ -56,9 +145,11 @@ export const musicianGroup = {
         ...emptyDraft,
         is: {
           title: "Looking for a Musician!",
-          //tags: ["band", "musician"],
+          type: "s:MusicGroup",
         },
-        searchString: "musician",
+        seeks: {
+          type: "won:Musician",
+        },
       },
       isDetails: {
         title: { ...details.title },
@@ -73,6 +164,75 @@ export const musicianGroup = {
           //mandatory: true,
         },
       },
+      generateQuery: (draft, resultName) => {
+        // genres
+        const genresSQ = tagOverlapScoreSubQuery({
+          resultName: resultName,
+          bindScoreAs: "?genres_jaccardIndex",
+          pathToTags: "won:seeks/won:genres",
+          prefixesInPath: {
+            s: won.defaultContext["s"],
+            won: won.defaultContext["won"],
+          },
+          tagLikes: getIn(draft, ["is", "genres"]),
+        });
+
+        // instruments
+        const instrumentsSQ = tagOverlapScoreSubQuery({
+          resultName: resultName,
+          bindScoreAs: "?instruments_jaccardIndex",
+          pathToTags: "won:is/won:instruments",
+          prefixesInPath: {
+            s: won.defaultContext["s"],
+            won: won.defaultContext["won"],
+          },
+          tagLikes: getIn(draft, ["seeks", "instruments"]),
+        });
+
+        const vicinityScoreSQ = vicinityScoreSubQuery({
+          resultName: resultName,
+          bindScoreAs: "?location_geoScore",
+          pathToGeoCoords: "won:seeks/s:location/s:geo",
+          prefixesInPath: {
+            s: won.defaultContext["s"],
+            won: won.defaultContext["won"],
+          },
+          geoCoordinates: getIn(draft, ["is", "location"]),
+        });
+
+        const subQueries = [genresSQ, instrumentsSQ, vicinityScoreSQ]
+          .filter(sq => sq) // filter out non-existing details (the SQs should be `undefined` for them)
+          .map(sq => ({
+            query: sq,
+            optional: true, // so counterparts without that detail don't get filtered out (just assigned a score of 0 via `coalesce`)
+          }));
+
+        const query = sparqlQuery({
+          prefixes: {
+            won: won.defaultContext["won"],
+            rdf: won.defaultContext["rdf"],
+            s: won.defaultContext["s"],
+          },
+          distinct: true,
+          variables: [resultName],
+          subQueries: subQueries,
+          where: [
+            `${resultName} rdf:type won:Need.`,
+            `${resultName} won:is/rdf:type won:Musician.`,
+
+            // calculate average of scores; can be weighed if necessary
+            `BIND( ( 
+              COALESCE(?instruments_jaccardIndex, 0) + 
+              COALESCE(?genres_jaccardIndex, 0) + 
+              COALESCE(?location_geoScore, 0) 
+            ) / 3  as ?aggregatedScore)`,
+            `FILTER(?aggregatedScore > 0)`,
+          ],
+          orderBy: [{ order: "DESC", variable: "?aggregatedScore" }],
+        });
+
+        return query;
+      },
     },
     findRehearsalRoom: {
       identifier: "findRehearsalRoom",
@@ -83,11 +243,11 @@ export const musicianGroup = {
       draft: {
         ...emptyDraft,
         is: {
+          type: "won:RehearsalRoomRentDemand",
           title: "Looking for Rehearsal Room!",
-          tags: ["SearchRehearsal"],
         },
         seeks: {
-          tags: ["OfferRehearsal"],
+          type: "won:RehearsalRoomRentOffer",
         },
         searchString: "Rehearsal Room",
       },
@@ -99,9 +259,58 @@ export const musicianGroup = {
           ...realEstateFeaturesDetail,
           placeholder: "e.g. PA, Drumkit",
         },
-        rentRange: { ...realEstateRentRangeDetail },
+        rentRange: { ...perHourRentRangeDetail },
         fromDatetime: { ...details.fromDatetime },
         throughDatetime: { ...details.throughDatetime },
+      },
+      generateQuery: (draft, resultName) => {
+        const seeksBranch = draft && draft.seeks;
+        const rentRange = seeksBranch && seeksBranch.rentRange;
+        const floorSizeRange = seeksBranch && seeksBranch.floorSizeRange;
+        const location = seeksBranch && seeksBranch.location;
+
+        const filters = [
+          {
+            // to select is-branch
+            prefixes: {
+              won: won.defaultContext["won"],
+              rdf: won.defaultContext["rdf"],
+            },
+            operations: [
+              `${resultName} a won:Need.`,
+              `${resultName} won:is ?is.`,
+              `?is rdf:type won:RehearsalRoomRentOffer.`,
+              location && "?is won:hasLocation ?location.",
+            ],
+          },
+          rentRange &&
+            filterRentRange(
+              "?is",
+              rentRange.min,
+              rentRange.max,
+              rentRange.currency
+            ),
+
+          floorSizeRange &&
+            filterFloorSizeRange("?is", floorSizeRange.min, floorSizeRange.max),
+
+          filterInVicinity("?location", location),
+        ];
+
+        const concatenatedFilter = concatenateFilters(filters);
+
+        return sparqlQuery({
+          prefixes: concatenatedFilter.prefixes,
+          distinct: true,
+          variables: [resultName],
+          where: concatenatedFilter.operations,
+          orderBy: [
+            {
+              order: "ASC",
+              variable: "?location_geoDistance",
+            },
+          ],
+        });
       },
     },
     offerRehearsalRoom: {
@@ -113,11 +322,11 @@ export const musicianGroup = {
       draft: {
         ...emptyDraft,
         is: {
+          type: "won:RehearsalRoomRentOffer",
           title: "Offer Rehearsal Room!",
-          tags: ["OfferRehearsal"],
         },
         seeks: {
-          tags: ["SearchRehearsal"],
+          type: "won:RehearsalRoomRentDemand",
         },
       },
       isDetails: {
@@ -140,7 +349,7 @@ export const musicianGroup = {
           placeholder: "e.g. PA, Drumkit",
         },
         rent: {
-          ...realEstateRentDetail,
+          ...perHourRentDetail,
           mandatory: true,
         },
         fromDatetime: { ...details.fromDatetime },
@@ -148,6 +357,48 @@ export const musicianGroup = {
       },
 
       seeksDetails: undefined,
+      generateQuery: (draft, resultName) => {
+        const isBranch = draft && draft.is;
+        const location = isBranch && isBranch.location;
+        const rent = isBranch && isBranch.rent;
+        const floorSize = isBranch && isBranch.floorSize;
+
+        const filters = [
+          {
+            // to select is-branch
+            prefixes: {
+              won: won.defaultContext["won"],
+              rdf: won.defaultContext["rdf"],
+              sh: won.defaultContext["sh"], //needed for the filterNumericProperty calls
+            },
+            operations: [
+              `${resultName} a won:Need.`,
+              `${resultName} won:seeks ?seeks.`,
+              `${resultName} won:is/rdf:type won:RehearsalRoomRentDemand.`,
+              location && "?seeks won:hasLocation ?location.",
+            ],
+          },
+          rent && filterRent("?seeks", rent.amount, rent.currency, "rent"),
+          floorSize &&
+            filterNumericProperty("?seeks", floorSize, "s:floorSize", "size"),
+          filterInVicinity("?location", location),
+        ];
+
+        const concatenatedFilter = concatenateFilters(filters);
+
+        return sparqlQuery({
+          prefixes: concatenatedFilter.prefixes,
+          distinct: true,
+          variables: [resultName],
+          where: concatenatedFilter.operations,
+          orderBy: [
+            {
+              order: "ASC",
+              variable: "?location_geoDistance",
+            },
+          ],
+        });
+      },
     },
   },
 };

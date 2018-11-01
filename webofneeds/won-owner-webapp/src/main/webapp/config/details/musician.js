@@ -73,3 +73,32 @@ export const genresDetail = {
     }
   },
 };
+
+export const perHourRentDetail = {
+  ...details.price,
+  identifier: "rent",
+  label: "Rent",
+  icon: "#ico36_detail_rent",
+  currency: [{ value: "EUR", label: "€", default: true }],
+  unitCode: [{ value: "HUR", label: "per hour", default: true }],
+  messageEnabled: false,
+  parseFromRDF: function() {
+    //That way we can make sure that parsing fromRDF is made only by the price detail itself
+    return undefined;
+  },
+};
+
+export const perHourRentRangeDetail = {
+  ...details.pricerange,
+  identifier: "rentRange",
+  label: "Rent in EUR/hour",
+  minLabel: "From",
+  maxLabel: "To",
+  currency: [{ value: "EUR", label: "€", default: true }],
+  unitCode: [{ value: "HUR", label: "per hour", default: true }],
+  icon: "#ico36_detail_rent",
+  messageEnabled: false,
+  parseFromRDF: function() {
+    return undefined;
+  },
+};
