@@ -95,7 +95,7 @@ export const perHourRentRangeDetail = {
   minLabel: "From",
   maxLabel: "To",
   currency: [{ value: "EUR", label: "€", default: true }],
-  unitCode: [{ value: "HUR", label: "per month", default: true }],
+  unitCode: [{ value: "HUR", label: "per hour", default: true }],
   icon: "#ico36_detail_rent",
   messageEnabled: false,
   parseFromRDF: function() {
