@@ -274,6 +274,7 @@ export const musicianGroup = {
             // to select is-branch
             prefixes: {
               won: won.defaultContext["won"],
+              rdf: won.defaultContext["rdf"],
             },
             operations: [
               `${resultName} a won:Need.`,
@@ -367,6 +368,7 @@ export const musicianGroup = {
             // to select is-branch
             prefixes: {
               won: won.defaultContext["won"],
+              rdf: won.defaultContext["rdf"],
               sh: won.defaultContext["sh"], //needed for the filterNumericProperty calls
             },
             operations: [
