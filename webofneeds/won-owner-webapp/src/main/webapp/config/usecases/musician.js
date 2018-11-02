@@ -127,7 +127,7 @@ export const musicianGroup = {
               COALESCE(?genres_jaccardIndex, 0) + 
               COALESCE(?location_geoScore, 0) 
             ) / 3  as ?aggregatedScore)`,
-            `FILTER(?aggregatedScore > 0)`,
+            //`FILTER(?aggregatedScore > 0)`,
           ],
           orderBy: [{ order: "DESC", variable: "?aggregatedScore" }],
         });
@@ -226,7 +226,7 @@ export const musicianGroup = {
               COALESCE(?genres_jaccardIndex, 0) + 
               COALESCE(?location_geoScore, 0) 
             ) / 3  as ?aggregatedScore)`,
-            `FILTER(?aggregatedScore > 0)`,
+            //`FILTER(?aggregatedScore > 0)`,
           ],
           orderBy: [{ order: "DESC", variable: "?aggregatedScore" }],
         });
