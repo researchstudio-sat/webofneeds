@@ -56,13 +56,15 @@ export const musicianGroup = {
         description: { ...details.description },
         instruments: {
           ...instrumentsDetail,
-          //mandatory: true,
         },
       },
       seeksDetails: {
         description: { ...details.description },
         genres: { ...genresDetail },
-        location: { ...details.location },
+        location: {
+          ...details.location,
+          mandatory: true,
+        },
       },
       generateQuery: (draft, resultName) => {
         // genres
@@ -155,13 +157,15 @@ export const musicianGroup = {
         title: { ...details.title },
         description: { ...details.description },
         genres: { ...genresDetail },
-        location: { ...details.location },
+        location: {
+          ...details.location,
+          mandatory: true,
+        },
       },
       seeksDetails: {
         description: { ...details.description },
         instruments: {
           ...instrumentsDetail,
-          //mandatory: true,
         },
       },
       generateQuery: (draft, resultName) => {
