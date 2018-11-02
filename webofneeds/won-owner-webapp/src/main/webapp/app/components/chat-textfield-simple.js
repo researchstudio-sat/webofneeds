@@ -221,7 +221,7 @@ function genComponentConf() {
         <won-submit-button
             is-valid="self.valid()"
             on-submit="self.submit(persona)" 
-            show-persona="self.showPersonas"
+            show-personas="self.showPersonasSelection"
             label="self.submitButtonLabel">
         </won-submit-button>
       <!-- PERSONA SELECTION END -->
@@ -285,6 +285,12 @@ function genComponentConf() {
       this.draftObject = {};
       this.additionalContent = new Map(); //Stores the additional Detail content of a message
       this.referencedContent = new Map(); //Stores the reference Content of a message (e.g. proposes, retracts...)
+
+      // keep up-to-date on whether we need to show personas or not
+      this.showPersonasSelection = this.showPersonas || undefined;
+      this.$scope.$watch("self.showPersonas", newValue => {
+        this.showPersonasSelection = newValue;
+      });
 
       const selectFromState = state => {
         const connectionUri = getConnectionUriFromRoute(state);

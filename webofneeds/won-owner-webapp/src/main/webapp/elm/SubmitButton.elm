@@ -113,7 +113,7 @@ view skin model =
         , Font.size 16
         ]
     <|
-        if not model.options.showPersonas then
+        if not model.options.loggedIn then
             Input.button
                 [ width fill
                 , height (px 43)
@@ -131,7 +131,24 @@ view skin model =
                     <|
                         text model.options.label
                 }
-
+        else if not model.options.showPersonas then
+            Input.button
+                [ width fill
+                , height (px 43)
+                , focusStyle
+                , Background.color buttonColor
+                , Border.rounded 3
+                ]
+                { onPress = Just Publish
+                , label =
+                    el
+                        [ centerY
+                        , centerX
+                        , Font.color Skin.white
+                        ]
+                    <|
+                        text model.options.label
+                }
         else
             row
                 [ width fill
@@ -203,7 +220,8 @@ view skin model =
                                         Persona url ->
                                             case Dict.get url model.personas of
                                                 Just persona ->
-                                                    "Publish as "
+                                                    model.options.label
+                                                        ++ " as "
                                                         ++ (Persona.data persona
                                                                 |> .displayName
                                                                 |> NonEmpty.get
@@ -213,7 +231,7 @@ view skin model =
                                                     ""
 
                                         Anonymous ->
-                                            "Publish Anonymously"
+                                            model.options.label ++ " Anonymously"
                                     )
                         }
                 , Input.button

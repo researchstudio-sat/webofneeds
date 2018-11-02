@@ -33,6 +33,15 @@ function genComponentConf($ngRedux) {
         });
       });
 
+      scope.$watch("showPersonas", newValue => {
+        elmApp.ports.publishIn.send({
+          isValid: scope.isValid ? true : false,
+          loggedIn: $ngRedux.getState().getIn(["user", "loggedIn"]),
+          showPersonas: newValue ? true : false,
+          label: scope.label ? scope.label : "Submit",
+        });
+      });
+
       elmApp.ports.publishIn.send({
         isValid: scope.isValid ? true : false,
         loggedIn: $ngRedux.getState().getIn(["user", "loggedIn"]),

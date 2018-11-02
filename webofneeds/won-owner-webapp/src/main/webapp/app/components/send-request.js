@@ -25,7 +25,7 @@ function genComponentConf() {
                 placeholder="::'Message (optional)'"
                 on-submit="::self.sendRequest(value)"
                 allow-empty-submit="::true"
-                show-personas="::true"
+                show-personas="true"
                 submit-button-label="::'Ask to Chat'"
                 ng-if="!self.connection || self.connection.get('isRated')"
             >
