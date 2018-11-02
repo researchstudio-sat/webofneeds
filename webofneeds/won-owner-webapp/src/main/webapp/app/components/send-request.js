@@ -23,7 +23,7 @@ function genComponentConf() {
 
             <chat-textfield-simple
                 placeholder="::'Message (optional)'"
-                on-submit="::self.sendRequest(value)"
+                on-submit="::self.sendRequest(value, selectedPersona)"
                 allow-empty-submit="::true"
                 show-personas="true"
                 submit-button-label="::'Ask to Chat'"
@@ -68,7 +68,7 @@ function genComponentConf() {
       return !this.displayedPost || this.displayedPost.get("isLoading");
     }
 
-    sendRequest(message) {
+    sendRequest(message, persona) {
       const isOwnNeedWhatsX =
         this.ownNeed &&
         (this.ownNeed.get("isWhatsAround") || this.ownNeed.get("isWhatsNew"));
@@ -82,7 +82,11 @@ function genComponentConf() {
         }
 
         if (this.postUriToConnectTo) {
-          this.connections__connectAdHoc(this.postUriToConnectTo, message);
+          this.connections__connectAdHoc(
+            this.postUriToConnectTo,
+            message,
+            persona
+          );
         }
 
         //this.router__stateGoCurrent({connectionUri: null, sendAdHocRequest: null});

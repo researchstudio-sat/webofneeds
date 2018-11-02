@@ -226,7 +226,7 @@ function genComponentConf() {
 
             <chat-textfield-simple
                 placeholder="::'Message (optional)'"
-                on-submit="::self.sendRequest(value)"
+                on-submit="::self.sendRequest(value, selectedPersona)"
                 allow-details="::false"
                 allow-empty-submit="::true"
                 show-personas="::true"
@@ -766,7 +766,7 @@ function genComponentConf() {
       this.connections__open(this.connectionUri, message);
     }
 
-    sendRequest(message) {
+    sendRequest(message, persona) {
       const isOwnNeedWhatsX =
         this.ownedNeed &&
         (this.ownedNeed.get("isWhatsAround") ||
@@ -781,7 +781,7 @@ function genComponentConf() {
         }
 
         if (this.nonOwnedNeedUri) {
-          this.connections__connectAdHoc(this.nonOwnedNeedUri, message);
+          this.connections__connectAdHoc(this.theirNeedUri, message, persona);
         }
 
         //this.router__stateGoCurrent({connectionUri: null, sendAdHocRequest: null});

@@ -375,6 +375,7 @@ function genComponentConf() {
         return false;
       });
     }
+
     keydown(e) {
       if (e.keyCode === 13 && !e.shiftKey) {
         e.preventDefault(); // prevent a newline from being entered
@@ -382,6 +383,7 @@ function genComponentConf() {
         return false;
       }
     }
+
     paste() {
       const payload = {
         value: this.value(),
@@ -390,6 +392,7 @@ function genComponentConf() {
       this.onPaste(payload);
       dispatchEvent(this.$element[0], "paste", payload);
     }
+
     input() {
       const payload = {
         value: this.value(),
@@ -406,7 +409,8 @@ function genComponentConf() {
              */
       delay(0).then(() => this.$scope.$digest());
     }
-    submit() {
+
+    submit(selectedPersona) {
       const value = this.value();
       const valid = this.valid();
       if (valid) {
@@ -421,6 +425,7 @@ function genComponentConf() {
           valid,
           additionalContent: this.additionalContent,
           referencedContent: this.referencedContent,
+          selectedPersona: selectedPersona || undefined,
         };
         if (this.additionalContent) {
           this.additionalContent = new Map();
@@ -433,12 +438,15 @@ function genComponentConf() {
         dispatchEvent(this.$element[0], "submit", payload);
       }
     }
+
     charactersLeft() {
       return this.maxChars - this.value().length;
     }
+
     belowMaxLength() {
       return !this.maxChars || this.charactersLeft() >= 0;
     }
+
     valid() {
       return (
         !this.connectionHasBeenLost &&
@@ -449,6 +457,7 @@ function genComponentConf() {
         this.belowMaxLength()
       );
     }
+
     value() {
       const txtEl = this.textField();
       if (txtEl) {
@@ -465,6 +474,7 @@ function genComponentConf() {
       }
       return this._textField;
     }
+
     pickDetail(detail) {
       this.selectAddMessageContent({ selectedDetail: detail.identifier });
     }

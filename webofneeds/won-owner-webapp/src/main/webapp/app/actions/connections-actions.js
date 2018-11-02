@@ -301,11 +301,11 @@ export function connectionsOpen(connectionUri, textMessage) {
   };
 }
 
-export function connectionsConnectAdHoc(theirNeedUri, textMessage) {
+export function connectionsConnectAdHoc(theirNeedUri, textMessage, persona) {
   return (dispatch, getState) =>
-    connectAdHoc(theirNeedUri, textMessage, dispatch, getState); // moved to separate function to make transpilation work properly
+    connectAdHoc(theirNeedUri, textMessage, persona, dispatch, getState); // moved to separate function to make transpilation work properly
 }
-function connectAdHoc(theirNeedUri, textMessage, dispatch, getState) {
+function connectAdHoc(theirNeedUri, textMessage, persona, dispatch, getState) {
   ensureLoggedIn(dispatch, getState).then(async () => {
     const state = getState();
     const theirNeed = getIn(state, ["needs", theirNeedUri]);
@@ -361,6 +361,7 @@ function connectAdHoc(theirNeedUri, textMessage, dispatch, getState) {
       });
 
       // create the new need
+      // TODO: add persona
       dispatch({
         type: actionTypes.needs.create, // TODO custom action
         payload: { eventUri, message, needUri, need: adHocDraft },
