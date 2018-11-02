@@ -19,7 +19,7 @@ export const location = {
     return {
       "won:hasLocation": genSPlace({
         geoData: value,
-        baseUri: genDetailBaseUri(identifier, contentUri),
+        baseUri: genDetailBaseUri(contentUri, identifier),
       }),
     };
   },
