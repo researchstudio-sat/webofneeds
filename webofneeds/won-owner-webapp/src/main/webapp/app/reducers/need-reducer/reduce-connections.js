@@ -39,7 +39,7 @@ export function addConnectionFull(state, connection) {
 
       if (realFacet === won.WON.HolderFacetCompacted) {
         const holdsUri = parsedConnection.getIn(["data", "remoteNeedUri"]);
-        console.log(
+        console.debug(
           "Handling a holderFacet-connection within need: ",
           needUri,
           " setting holds to holdsUri: ",
@@ -57,7 +57,7 @@ export function addConnectionFull(state, connection) {
       } else if (realFacet === won.WON.HoldableFacetCompacted) {
         //holdableFacet Connection from need to persona -> need to add heldBy remoteNeedUri to the need
         const heldByUri = parsedConnection.getIn(["data", "remoteNeedUri"]);
-        console.log(
+        console.debug(
           "Handling a holdableFacet-connection within need: ",
           needUri,
           " setting heldBy to heldByUri: ",

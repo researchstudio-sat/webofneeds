@@ -153,22 +153,6 @@ export function processOpenMessage(event) {
     const senderNeedUri = event.getSenderNeed();
     const senderConnectionUri = event.getSender();
 
-    /*console.log(
-      "Received an open Message\n",
-      "   senderConnectionUri: ",
-      senderConnectionUri,
-      "\n",
-      "   senderNeedUri: ",
-      senderNeedUri,
-      "\n",
-      "   receiverConnectionUri: ",
-      receiverConnectionUri,
-      "\n",
-      "   receiverNeedUri: ",
-      receiverNeedUri,
-      "\n"
-    );*/
-
     const currentState = getState();
     const senderNeed = currentState.getIn(["needs", senderNeedUri]);
     const receiverNeed = currentState.getIn(["needs", receiverNeedUri]);
@@ -177,7 +161,7 @@ export function processOpenMessage(event) {
 
     let senderConnectionP;
     if (!senderConnectionUri || !isOwnSenderNeed) {
-      console.log(
+      console.debug(
         "senderConnectionUri was null or senderNeed is not ownNeed, resolve promise with undefined -> ignore the connection"
       );
       senderConnectionP = Promise.resolve(undefined);
@@ -201,7 +185,7 @@ export function processOpenMessage(event) {
 
     let receiverConnectionP;
     if (!receiverConnectionUri || !isOwnReceiverNeed) {
-      console.log(
+      console.debug(
         "receiverConnectionUri was null or receiverNeed is not ownNeed, resolve promise with undefined -> ignore the connection"
       );
       receiverConnectionP = Promise.resolve(undefined);
@@ -233,17 +217,6 @@ export function processOpenMessage(event) {
       won.getNeed(receiverNeedUri), //TODO: PROMISE IF LOADED (WE MIGHT HAVE IT IN THE STATE ALREADY)
     ]).then(
       ([senderConnection, receiverConnection, senderNeed, receiverNeed]) => {
-        /*console.log(
-          "   senderConnection: ",
-          senderConnection,
-          " receiverConnection: ",
-          receiverConnection,
-          " senderNeed: ",
-          senderNeed,
-          " receiverNeed: ",
-          receiverNeed
-        );*/
-
         if (receiverConnection) {
           dispatch({
             type: actionTypes.messages.openMessageReceived,
@@ -353,11 +326,7 @@ export function processConnectionMessage(event) {
       //PETRINET DATA PART END **************************
       fetchMessageEffects(connectionUri, event.getMessageUri()).then(
         response => {
-          if (response && response.length > 0) {
-            // console.debug("agreement response : ", response);
-          }
           for (const effect of response) {
-            // console.debug("effect : ", effect, "effect-type: ", effect.type);
             switch (effect.type) {
               case "ACCEPTS":
                 if (effect.accepts) {
@@ -537,22 +506,6 @@ export function processConnectMessage(event) {
     const senderNeedUri = event.getSenderNeed();
     const senderConnectionUri = event.getSender();
 
-    /*console.log(
-      "Received a connect Message\n",
-      "   senderConnectionUri: ",
-      senderConnectionUri,
-      "\n",
-      "   senderNeedUri: ",
-      senderNeedUri,
-      "\n",
-      "   receiverConnectionUri: ",
-      receiverConnectionUri,
-      "\n",
-      "   receiverNeedUri: ",
-      receiverNeedUri,
-      "\n"
-    );*/
-
     const currentState = getState();
     const senderNeed = currentState.getIn(["needs", senderNeedUri]);
     const receiverNeed = currentState.getIn(["needs", receiverNeedUri]);
@@ -561,7 +514,7 @@ export function processConnectMessage(event) {
 
     let senderCP;
     if (!senderConnectionUri || !isOwnSenderNeed) {
-      console.log(
+      console.debug(
         "senderConnectionUri was null or senderNeed is not ownNeed, resolve promise with undefined -> ignore the connection"
       );
       senderCP = Promise.resolve(undefined);
@@ -585,7 +538,7 @@ export function processConnectMessage(event) {
 
     let receiverCP;
     if (!receiverConnectionUri || !isOwnReceiverNeed) {
-      console.log(
+      console.debug(
         "receiverConnectionUri was null or receiverNeed is not ownNeed, resolve promise with undefined -> ignore the connection"
       );
       receiverCP = Promise.resolve(undefined);
@@ -617,17 +570,6 @@ export function processConnectMessage(event) {
       won.getNeed(receiverNeedUri), //TODO: PROMISE IF LOADED (WE MIGHT HAVE IT IN THE STATE ALREADY)
     ]).then(
       ([senderConnection, receiverConnection, senderNeed, receiverNeed]) => {
-        /*console.log(
-          "   senderConnection: ",
-          senderConnection,
-          " receiverConnection: ",
-          receiverConnection,
-          " senderNeed: ",
-          senderNeed,
-          " receiverNeed: ",
-          receiverNeed
-        );*/
-
         if (receiverConnection) {
           dispatch({
             type: actionTypes.messages.connectMessageReceived,
