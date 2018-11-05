@@ -13,7 +13,7 @@ import { attach, getIn, callBuffer } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import {
   selectNeedByConnectionUri,
-  getOwnNeeds,
+  getOwnedNeeds,
 } from "../../selectors/general-selectors.js";
 import { resetParams } from "../../configRouting.js";
 
@@ -68,7 +68,7 @@ class ConnectionsController {
         connectionUri &&
         need.getIn(["connections", connectionUri, "state"]);
 
-      const ownNeeds = getOwnNeeds(state).filter(
+      const ownNeeds = getOwnedNeeds(state).filter(
         post =>
           !(
             (post.get("isWhatsAround") || post.get("isWhatsNew")) &&
