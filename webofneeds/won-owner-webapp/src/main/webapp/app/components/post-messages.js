@@ -20,11 +20,13 @@ import { actionCreators } from "../actions/actions.js";
 import {
   selectOpenConnectionUri,
   selectNeedByConnectionUri,
+} from "../selectors/general-selectors.js";
+import {
   selectAgreementMessagesByConnectionUri,
   selectCancellationPendingMessagesByConnectionUri,
   selectProposalMessagesByConnectionUri,
   selectUnreadMessagesByConnectionUri,
-} from "../selectors/general-selectors.js";
+} from "../selectors/message-selectors.js";
 import autoresizingTextareaModule from "../directives/textarea-autogrow.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 

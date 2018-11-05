@@ -15,9 +15,9 @@ import {
   selectLastUpdateTime,
   selectNeedByConnectionUri,
   selectAllTheirNeeds,
-  selectAllMessagesByConnectionUri,
-  selectUnreadMessagesByConnectionUri,
 } from "../selectors/general-selectors.js";
+import { selectUnreadMessagesByConnectionUri } from "../selectors/message-selectors.js";
+import { selectAllMessagesByConnectionUri } from "../selectors/message-selectors.js";
 import connectionStateModule from "./connection-state.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 

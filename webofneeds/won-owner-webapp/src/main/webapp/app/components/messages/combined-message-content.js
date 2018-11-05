@@ -6,9 +6,9 @@ import { attach, get, getIn } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import {
   selectNeedByConnectionUri,
-  selectAllConnections,
   selectAllNeeds,
 } from "../../selectors/general-selectors.js";
+import { selectAllConnections } from "../../selectors/connection-selectors.js";
 import trigModule from "../trig.js";
 import { labels } from "../../won-label-utils.js";
 import { classOnComponentRoot } from "../../cstm-ng-utils.js";

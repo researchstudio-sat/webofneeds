@@ -26,13 +26,13 @@ import {
   selectRouterParams,
   selectNeedByConnectionUri,
   selectNeedsInCreationProcess,
-  selectPostConnectionsWithoutConnectMessage,
   selectOpenConnectionUri,
   selectOpenPostUri,
   selectAllPosts,
   selectClosedPosts,
   selectOpenPosts,
 } from "../selectors/general-selectors.js";
+import { selectPostConnectionsWithoutConnectMessage } from "../selectors/connection-selectors.js";
 
 const serviceDependencies = ["$ngRedux", "$scope"];
 function genComponentConf() {

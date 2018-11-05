@@ -3,19 +3,7 @@
  */
 
 import { createSelector } from "reselect";
-import {
-  isMessageProposable,
-  isMessageClaimable,
-  isMessageCancelable,
-  isMessageRetractable,
-  isMessageAcceptable,
-  isMessageRejectable,
-  isMessageAccepted,
-  isMessageCancellationPending,
-  isMessageProposal,
-  isMessageClaim,
-  isMessageUnread,
-} from "../message-utils.js";
+
 import Immutable from "immutable";
 import won from "../won-es6.js";
 import { decodeUriComponentProperly, getIn } from "../utils.js";
@@ -113,104 +101,6 @@ export function selectNeedByConnectionUri(state, connectionUri) {
     .first();
 }
 
-/**
- * Get the connection for a given connectionUri
- * @param state to retrieve data from
- * @param connectionUri to find corresponding connection for
- */
-export function selectConnection(state, connectionUri) {
-  let need = selectNeedByConnectionUri(state, connectionUri);
-  return need.getIn(["connections", connectionUri]);
-}
-
-/**
- * Get all connections stored within your own needs as a map
- * @returns Immutable.Map with all connections
- */
-export function selectAllConnections(state) {
-  const needs = selectAllOwnNeeds(state); //we only check own needs as these are the only ones who have connections stored
-  const connections = needs && needs.flatMap(need => need.get("connections"));
-  return connections;
-}
-
-/**
- * Get all post connections stored within your own needs as a map
- * @returns Immutable.Map with all connections
- */
-export function selectAllPostConnections(state) {
-  const needs = selectAllOwnPosts(state); //we only check own posts as these are the only ones who have connections stored
-  const connections = needs && needs.flatMap(need => need.get("connections"));
-  return connections;
-}
-
-export function selectAllConnectionUris(state) {
-  const connections = selectAllConnections(state);
-  return connections && connections.keySeq().toSet();
-}
-
-/**
- * Get all connections stored within your own needs as a map with a status of Connected
- * @returns Immutable.Map with all connections
- */
-export function selectAllPostConnectionsInStateConnected(state) {
-  const allConnections = selectAllPostConnections(state);
-  return (
-    allConnections &&
-    allConnections.filter(conn => conn.get("state") === won.WON.Connected)
-  );
-}
-
-export function selectPostConnectionsWithoutConnectMessage(state) {
-  const connectionsInStateConnected = selectAllPostConnectionsInStateConnected(
-    state
-  );
-
-  const connectionsWithoutConnectMessage =
-    connectionsInStateConnected &&
-    connectionsInStateConnected.filter(
-      conn =>
-        !conn.get("messages") ||
-        conn
-          .get("messages")
-          .filter(msg => msg.get("messageType") === won.WONMSG.connectMessage)
-          .size == 0
-    );
-  return connectionsWithoutConnectMessage;
-}
-
-export function selectAllMessages(state) {
-  const connections = selectAllConnections(state);
-  const messages = connections && connections.flatMap(c => c.get("messages"));
-  return messages;
-}
-
-export function selectAllMessagesByNeedUri(state, needUri) {
-  const connections = state.getIn(["needs", needUri, "connections"]);
-  const messages = connections && connections.flatMap(c => c.get("messages"));
-  return messages;
-}
-
-export function selectAllMessagesByConnectionUri(state, connectionUri) {
-  const need = selectNeedByConnectionUri(state, connectionUri);
-  return need && need.getIn(["connections", connectionUri, "messages"]);
-}
-
-export function selectAllMessagesByNeedUriAndConnected(state, needUri) {
-  const connections = state.getIn(["needs", needUri, "connections"]);
-  const connectionsWithoutClosed =
-    connections &&
-    connections.filter(conn => conn.get("state") === won.WON.Connected);
-  let messages = Immutable.Map();
-
-  if (connectionsWithoutClosed) {
-    connectionsWithoutClosed.map(function(conn) {
-      messages = messages.merge(conn.get("messages"));
-    });
-  }
-
-  return messages;
-}
-
 export const selectOpenConnectionUri = createSelector(
   selectRouterParams,
   routerParams => {
@@ -237,76 +127,6 @@ export const selectOpenPostUri = createSelector(
 
 export function isPrivateUser(state) {
   return !!getIn(state, ["router", "currentParams", "privateId"]);
-}
-
-export function selectAcceptableMessagesByConnectionUri(state, connectionUri) {
-  const messages = selectAllMessagesByConnectionUri(state, connectionUri);
-  return messages && messages.filter(msg => isMessageAcceptable(msg));
-}
-
-export function selectRejectableMessagesByConnectionUri(state, connectionUri) {
-  const messages = selectAllMessagesByConnectionUri(state, connectionUri);
-  return messages && messages.filter(msg => isMessageRejectable(msg));
-}
-
-export function selectRetractableMessagesByConnectionUri(state, connectionUri) {
-  const messages = selectAllMessagesByConnectionUri(state, connectionUri);
-  return messages && messages.filter(msg => isMessageRetractable(msg));
-}
-
-export function selectCancelableMessagesByConnectionUri(state, connectionUri) {
-  const messages = selectAllMessagesByConnectionUri(state, connectionUri);
-  return messages && messages.filter(msg => isMessageCancelable(msg));
-}
-
-export function selectProposableMessagesByConnectionUri(state, connectionUri) {
-  const messages = selectAllMessagesByConnectionUri(state, connectionUri);
-  return messages && messages.filter(msg => isMessageProposable(msg));
-}
-
-export function selectClaimableMessagesByConnectionUri(state, connectionUri) {
-  const messages = selectAllMessagesByConnectionUri(state, connectionUri);
-  return messages && messages.filter(msg => isMessageClaimable(msg));
-}
-
-export function selectSelectedMessagesByConnectionUri(state, connectionUri) {
-  const messages = selectAllMessagesByConnectionUri(state, connectionUri);
-  return (
-    messages && messages.filter(msg => msg.getIn(["viewState", "isSelected"]))
-  );
-}
-
-export function selectAgreementMessagesByConnectionUri(state, connectionUri) {
-  const messages = selectAllMessagesByConnectionUri(state, connectionUri);
-  return (
-    messages &&
-    messages.filter(
-      msg => isMessageAccepted(msg) && !isMessageCancellationPending(msg)
-    )
-  );
-}
-
-export function selectCancellationPendingMessagesByConnectionUri(
-  state,
-  connectionUri
-) {
-  const messages = selectAllMessagesByConnectionUri(state, connectionUri);
-  return messages && messages.filter(msg => isMessageCancellationPending(msg));
-}
-
-export function selectProposalMessagesByConnectionUri(state, connectionUri) {
-  const messages = selectAllMessagesByConnectionUri(state, connectionUri);
-  return messages && messages.filter(msg => isMessageProposal(msg));
-}
-
-export function selectClaimMessagesByConnectionUri(state, connectionUri) {
-  const messages = selectAllMessagesByConnectionUri(state, connectionUri);
-  return messages && messages.filter(msg => isMessageClaim(msg));
-}
-
-export function selectUnreadMessagesByConnectionUri(state, connectionUri) {
-  const messages = selectAllMessagesByConnectionUri(state, connectionUri);
-  return messages && messages.filter(msg => isMessageUnread(msg));
 }
 
 export function getPersonas(needs) {

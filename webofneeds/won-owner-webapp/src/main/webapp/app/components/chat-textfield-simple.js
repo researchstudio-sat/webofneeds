@@ -15,14 +15,16 @@ import won from "../won-es6.js";
 import {
   selectOpenConnectionUri,
   selectNeedByConnectionUri,
+} from "../selectors/general-selectors.js";
+import {
   selectAcceptableMessagesByConnectionUri,
-  selectRetractableMessagesByConnectionUri,
   selectRejectableMessagesByConnectionUri,
+  selectRetractableMessagesByConnectionUri,
   selectCancelableMessagesByConnectionUri,
   selectProposableMessagesByConnectionUri,
   selectClaimableMessagesByConnectionUri,
   selectSelectedMessagesByConnectionUri,
-} from "../selectors/general-selectors.js";
+} from "../selectors/message-selectors.js";
 import { getAllMessageDetails } from "../won-utils.js";
 import autoresizingTextareaModule from "../directives/textarea-autogrow.js";
 import { actionCreators } from "../actions/actions.js";

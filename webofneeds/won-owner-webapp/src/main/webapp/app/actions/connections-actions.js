@@ -8,8 +8,8 @@ import Immutable from "immutable";
 import {
   selectOpenConnectionUri,
   selectNeedByConnectionUri,
-  selectConnection,
 } from "../selectors/general-selectors.js";
+import { selectConnectionByUri } from "../selectors/connection-selectors.js";
 
 import { getIn, get, cloneAsMutable } from "../utils.js";
 
@@ -548,7 +548,8 @@ export async function loadLatestMessagesOfConnection({
   const need =
     connectionUri_ && selectNeedByConnectionUri(state, connectionUri_);
   const needUri = need && need.get("uri");
-  const connection = connectionUri_ && selectConnection(state, connectionUri_);
+  const connection =
+    connectionUri_ && selectConnectionByUri(state, connectionUri_);
   if (
     !connectionUri_ ||
     !connection ||
