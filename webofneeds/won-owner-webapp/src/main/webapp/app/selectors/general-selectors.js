@@ -129,7 +129,8 @@ export function isPrivateUser(state) {
   return !!getIn(state, ["router", "currentParams", "privateId"]);
 }
 
-export function getPersonas(needs) {
+export function getOwnPersonas(state) {
+  const needs = selectAllOwnNeeds(state);
   const personas = needs
     .toList()
     .filter(need => need.get("ownNeed"))
