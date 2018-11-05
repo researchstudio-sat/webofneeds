@@ -47,19 +47,8 @@ export function getOpenPosts(state) {
   );
 }
 
-export function selectClosedNeeds(state) {
-  const allOwnNeeds = getOwnedNeeds(state);
-  return (
-    allOwnNeeds &&
-    allOwnNeeds.filter(
-      post =>
-        post.get("state") === won.WON.InactiveCompacted &&
-        !(post.get("isWhatsAround") || post.get("isWhatsNew"))
-    )
-  ); //Filter whatsAround and whatsNew needs automatically
-}
-
-export function selectClosedPosts(state) {
+//TODO: METHOD NAME TO ACTUALLY REPRESENT WHAT THE SELECTOR DOES (e.g. ...WithoutWhatsX)
+export function getOwnedClosedPosts(state) {
   const allOwnNeeds = getOwnedPosts(state);
   return (
     allOwnNeeds &&
@@ -71,7 +60,7 @@ export function selectClosedPosts(state) {
   ); //Filter whatsAround and whatsNew needs automatically
 }
 
-export function selectNeedsInCreationProcess(state) {
+export function getOwnedNeedsInCreation(state) {
   const allOwnNeeds = getOwnedNeeds(state);
   // needs that have been created but are not confirmed by the server yet
   return allOwnNeeds && allOwnNeeds.filter(post => post.get("isBeingCreated"));

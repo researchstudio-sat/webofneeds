@@ -25,11 +25,11 @@ import "style/_connections-overview.scss";
 import {
   selectRouterParams,
   selectNeedByConnectionUri,
-  selectNeedsInCreationProcess,
+  getOwnedNeedsInCreation,
   selectOpenConnectionUri,
   selectOpenPostUri,
   getPosts,
-  selectClosedPosts,
+  getOwnedClosedPosts,
   getOwnedOpenPosts,
 } from "../selectors/general-selectors.js";
 import { selectPostConnectionsWithoutConnectMessage } from "../selectors/connection-selectors.js";
@@ -209,10 +209,10 @@ function genComponentConf() {
       const selectFromState = state => {
         const allNeeds = getPosts(state);
         const openNeeds = getOwnedOpenPosts(state);
-        const closedNeeds = selectClosedPosts(state);
+        const closedNeeds = getOwnedClosedPosts(state);
 
         // needs that have been created but are not confirmed by the server yet
-        const beingCreatedNeeds = selectNeedsInCreationProcess(state);
+        const beingCreatedNeeds = getOwnedNeedsInCreation(state);
 
         const connectionsToCrawl = selectPostConnectionsWithoutConnectMessage(
           state
