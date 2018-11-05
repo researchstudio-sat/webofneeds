@@ -6,7 +6,9 @@ import {
   getOwnedNeedByConnectionUri,
   getOwnedNeeds,
   getOwnedPosts,
+  getNeeds,
 } from "./general-selectors.js";
+import { isChatConnection } from "../connection-utils.js";
 import won from "../won-es6.js";
 
 /**
@@ -37,6 +39,14 @@ export function getOwnedConnectionUris(state) {
   return connections && connections.keySeq().toSet();
 }
 
+export function getChatConnectionsByNeedUri(state, needUri) {
+  const needs = getNeeds(state);
+  const need = needs && needs.get(needUri);
+  const connections = need && need.get("connections");
+
+  return connections && connections.filter(conn => isChatConnection(conn));
+}
+
 /**
  * @param state
  * @returns {Immutable.Map|*}
@@ -46,10 +56,7 @@ export function getChatConnectionsToCrawl(state) {
   const allConnections =
     needs && needs.flatMap(need => need.get("connections"));
   const chatConnections =
-    allConnections &&
-    allConnections.filter(
-      conn => conn.get("facet") === won.WON.ChatFacetCompacted
-    );
+    allConnections && allConnections.filter(conn => isChatConnection(conn));
 
   const connectionsInStateConnected =
     chatConnections &&
