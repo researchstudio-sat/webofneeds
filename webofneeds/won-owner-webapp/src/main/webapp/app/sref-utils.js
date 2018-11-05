@@ -61,22 +61,6 @@ export function absHRef($state, toRouterState, queryParams) {
 }
 
 /**
- * e.g. `resetParamsSRef('post')` + pre-existing private Id =>
- *     `"post({privateId: 'http://..', privatId: '...'})"`
- * NOTE: depending on your version of ui-router, interpolation might not update the hrefs
- * @param toRouterState
- * @returns {string} a string that can be used with `ui-sref` and then the same
- *                   behaviour as e.g. `ng-click="self.router__stateGoResetParams('post')"`
- *                   except that it supports middle-mouse-button clicks and shows
- *                   the right cursor by default (i.e. it is a regular link)
- */
-export function resetParamsSRef(toRouterState) {
-  const paramsString = JSON.stringify(onlyConstParams());
-  const srefString = toRouterState + "(" + paramsString + ")";
-  return srefString;
-}
-
-/**
  * Generates an object that only contains any "constant"
  * parameters that were already present.
  * NOTE: depending on your version of ui-router, interpolation might not update the hrefs
