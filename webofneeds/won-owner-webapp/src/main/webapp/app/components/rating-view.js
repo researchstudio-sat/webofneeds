@@ -1,6 +1,6 @@
 import angular from "angular";
 import { Elm } from "../../elm/RatingView.elm";
-import { currentSkin } from "../selectors/selectors.js";
+import { currentSkin } from "../selectors/general-selectors.js";
 
 function genComponentConf($ngRedux) {
   return {

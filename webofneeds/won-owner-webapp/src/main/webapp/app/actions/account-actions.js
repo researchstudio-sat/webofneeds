@@ -24,7 +24,7 @@ import { stateGoCurrent } from "./cstm-router-actions.js";
 import { checkAccessToCurrentRoute } from "../configRouting.js";
 
 import { getIn } from "../utils.js";
-import { selectAllConnectionUris } from "../selectors/selectors.js";
+import { selectAllConnectionUris } from "../selectors/general-selectors.js";
 import { loadLatestMessagesOfConnection } from "./connections-actions.js";
 
 // import { Observable } from "rxjs";

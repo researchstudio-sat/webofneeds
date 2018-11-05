@@ -12,7 +12,7 @@ import publishButtonModule from "./publish-button.js";
 import { get, getIn, attach, delay } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
-import { selectIsConnected } from "../selectors/selectors.js";
+import { selectIsConnected } from "../selectors/general-selectors.js";
 
 // import { details } from "detailDefinitions";
 import { useCases } from "useCaseDefinitions";

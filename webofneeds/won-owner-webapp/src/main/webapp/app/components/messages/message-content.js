@@ -5,7 +5,7 @@ import { connect2Redux } from "../../won-utils.js";
 import { getAllDetails } from "../../won-utils.js";
 import { attach, getIn, get } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
-import { selectNeedByConnectionUri } from "../../selectors/selectors.js";
+import { selectNeedByConnectionUri } from "../../selectors/general-selectors.js";
 import "angular-marked";
 
 import "style/_message-content.scss";

@@ -11,7 +11,7 @@ import {
   connect2Redux,
   createDocumentDefinitionFromPost,
 } from "../won-utils.js";
-import { selectOpenPostUri } from "../selectors/selectors.js";
+import { selectOpenPostUri } from "../selectors/general-selectors.js";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 

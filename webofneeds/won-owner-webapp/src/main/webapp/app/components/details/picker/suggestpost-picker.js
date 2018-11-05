@@ -11,7 +11,7 @@ import {
   selectOpenConnectionUri,
   selectNeedByConnectionUri,
   selectAllOpenPosts,
-} from "../../../selectors/selectors.js";
+} from "../../../selectors/general-selectors.js";
 
 import "style/_suggestpostpicker.scss";
 

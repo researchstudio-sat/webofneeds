@@ -17,7 +17,7 @@ import {
   selectAllTheirNeeds,
   selectAllMessagesByConnectionUri,
   selectUnreadMessagesByConnectionUri,
-} from "../selectors/selectors.js";
+} from "../selectors/general-selectors.js";
 import connectionStateModule from "./connection-state.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 

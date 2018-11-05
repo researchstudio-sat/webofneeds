@@ -8,7 +8,7 @@ import { classOnComponentRoot } from "../cstm-ng-utils.js";
 import {
   selectOpenPostUri,
   selectNeedByConnectionUri,
-} from "../selectors/selectors.js";
+} from "../selectors/general-selectors.js";
 import { connect2Redux } from "../won-utils.js";
 import { attach, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";

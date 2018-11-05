@@ -8,7 +8,7 @@ import won from "../../won-es6.js";
 import { actionCreators } from "../../actions/actions.js";
 import sendRequestModule from "../send-request.js";
 import visitorTitleBarModule from "../visitor-title-bar.js";
-import { selectOpenPostUri } from "../../selectors/selectors.js";
+import { selectOpenPostUri } from "../../selectors/general-selectors.js";
 
 import "style/_post-visitor.scss";
 

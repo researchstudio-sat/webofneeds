@@ -14,7 +14,7 @@ import { actionCreators } from "../../actions/actions.js";
 import {
   selectNeedByConnectionUri,
   selectAllOwnNeeds,
-} from "../../selectors/selectors.js";
+} from "../../selectors/general-selectors.js";
 import { resetParams } from "../../configRouting.js";
 
 import "style/_connections.scss";

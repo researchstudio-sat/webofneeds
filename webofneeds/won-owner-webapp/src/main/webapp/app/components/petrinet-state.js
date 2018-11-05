@@ -10,7 +10,7 @@ import { attach, generateSimpleTransitionLabel } from "../utils.js";
 import {
   selectNeedByConnectionUri,
   selectOpenConnectionUri,
-} from "../selectors/selectors.js";
+} from "../selectors/general-selectors.js";
 import { connect2Redux } from "../won-utils.js";
 
 import "style/_petrinet-state.scss";

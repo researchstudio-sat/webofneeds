@@ -4,7 +4,7 @@
 
 import Immutable from "immutable";
 import { actionTypes, actionCreators } from "./actions.js";
-import { selectOpenPostUri } from "../selectors/selectors.js";
+import { selectOpenPostUri } from "../selectors/general-selectors.js";
 
 import { checkAccessToCurrentRoute } from "../configRouting.js";
 

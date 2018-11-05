@@ -12,7 +12,7 @@ import loginFormModule from "./login-form.js";
 import loggedInMenuModule from "./logged-in-menu.js";
 
 import * as srefUtils from "../sref-utils.js";
-import { isPrivateUser } from "../selectors/selectors.js";
+import { isPrivateUser } from "../selectors/general-selectors.js";
 
 import "style/_login.scss";
 

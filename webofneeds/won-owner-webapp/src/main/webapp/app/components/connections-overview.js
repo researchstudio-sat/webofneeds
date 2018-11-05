@@ -32,7 +32,7 @@ import {
   selectAllPosts,
   selectClosedPosts,
   selectOpenPosts,
-} from "../selectors/selectors.js";
+} from "../selectors/general-selectors.js";
 
 const serviceDependencies = ["$ngRedux", "$scope"];
 function genComponentConf() {

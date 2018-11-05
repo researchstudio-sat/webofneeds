@@ -9,7 +9,7 @@ import { actionCreators } from "../actions/actions.js";
 import {
   selectOpenConnectionUri,
   selectNeedByConnectionUri,
-} from "../selectors/selectors.js";
+} from "../selectors/general-selectors.js";
 
 import connectionHeaderModule from "./connection-header.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";

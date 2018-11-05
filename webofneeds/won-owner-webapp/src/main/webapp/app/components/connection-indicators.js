@@ -7,7 +7,10 @@ import won from "../won-es6.js";
 import "ng-redux";
 import { labels } from "../won-label-utils.js";
 import { actionCreators } from "../actions/actions.js";
-import { selectAllPosts, selectAllOwnPosts } from "../selectors/selectors.js";
+import {
+  selectAllPosts,
+  selectAllOwnPosts,
+} from "../selectors/general-selectors.js";
 
 import { attach, sortByDate } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";

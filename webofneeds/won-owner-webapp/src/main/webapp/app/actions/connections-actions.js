@@ -9,7 +9,7 @@ import {
   selectOpenConnectionUri,
   selectNeedByConnectionUri,
   selectConnection,
-} from "../selectors/selectors.js";
+} from "../selectors/general-selectors.js";
 
 import { getIn, get, cloneAsMutable } from "../utils.js";
 

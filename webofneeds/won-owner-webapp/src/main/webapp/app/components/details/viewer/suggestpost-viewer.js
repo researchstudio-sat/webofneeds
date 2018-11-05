@@ -7,7 +7,7 @@ import { connect2Redux } from "../../../won-utils.js";
 import {
   selectOpenConnectionUri,
   selectNeedByConnectionUri,
-} from "../../../selectors/selectors.js";
+} from "../../../selectors/general-selectors.js";
 
 import "style/_suggestpost-viewer.scss";
 

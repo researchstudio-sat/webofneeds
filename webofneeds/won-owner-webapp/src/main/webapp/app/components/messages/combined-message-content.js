@@ -8,7 +8,7 @@ import {
   selectNeedByConnectionUri,
   selectAllConnections,
   selectAllNeeds,
-} from "../../selectors/selectors.js";
+} from "../../selectors/general-selectors.js";
 import trigModule from "../trig.js";
 import { labels } from "../../won-label-utils.js";
 import { classOnComponentRoot } from "../../cstm-ng-utils.js";
