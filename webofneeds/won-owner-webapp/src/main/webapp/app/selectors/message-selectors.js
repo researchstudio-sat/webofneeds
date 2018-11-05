@@ -3,11 +3,11 @@
  */
 
 import {
-  isMessageAccepted,
   isMessageCancellationPending,
   isMessageProposal,
   isMessageClaim,
   isMessageUnread,
+  isMessageAgreement,
 } from "../message-utils.js";
 import { getOwnedNeedByConnectionUri } from "./general-selectors.js";
 
@@ -18,12 +18,7 @@ export function getMessagesByConnectionUri(state, connectionUri) {
 
 export function getAgreementMessagesByConnectionUri(state, connectionUri) {
   const messages = getMessagesByConnectionUri(state, connectionUri);
-  return (
-    messages &&
-    messages.filter(
-      msg => isMessageAccepted(msg) && !isMessageCancellationPending(msg)
-    )
-  );
+  return messages && messages.filter(msg => isMessageAgreement(msg));
 }
 
 export function getCancellationPendingMessagesByConnectionUri(

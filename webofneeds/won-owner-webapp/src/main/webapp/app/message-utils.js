@@ -273,6 +273,15 @@ export function isMessageClaim(msg) {
 }
 
 /**
+ * Determines if a given message is an agreement
+ * @param msg
+ * @returns {*|boolean}
+ */
+export function isMessageAgreement(msg) {
+  return isMessageAccepted(msg) && !isMessageCancellationPending(msg);
+}
+
+/**
  * Returns the own-messageUri for the given messageUri, this is due to the fact that referenced messages are
  * referenced by a messageUri that is not necessarily the owned messageUri, since our state maps are based
  * on the owned messageUri we need to determine the correct/own messageUri to ensure correct state updates
