@@ -32,10 +32,8 @@ import {
   getOwnedClosedPosts,
   getOwnedOpenPosts,
 } from "../selectors/general-selectors.js";
-import {
-  getChatConnectionsToCrawl,
-  getChatConnectionsByNeedUri,
-} from "../selectors/connection-selectors.js";
+import { getChatConnectionsToCrawl } from "../selectors/connection-selectors.js";
+import { isChatConnection } from "../connection-utils.js";
 
 const serviceDependencies = ["$ngRedux", "$scope"];
 function genComponentConf() {
@@ -365,7 +363,8 @@ function genComponentConf() {
     hasOpenOrLoadingChatConnections(need, allNeeds) {
       return (
         need.get("state") === won.WON.ActiveCompacted &&
-        getChatConnectionsByNeedUri(need.get("uri")).filter(conn => {
+        need.get("connections").filter(conn => {
+          if (!isChatConnection(conn)) return false;
           if (conn.get("isLoading")) return true; //if connection is currently loading we assume its a connection we want to show
 
           const remoteNeedUri = conn.get("remoteNeedUri");
@@ -388,7 +387,8 @@ function genComponentConf() {
 
     getOpenChatConnectionsArraySorted(need, allNeeds) {
       return sortByDate(
-        getChatConnectionsByNeedUri(need.get("uri")).filter(conn => {
+        need.get("connections").filter(conn => {
+          if (!isChatConnection(conn)) return false;
           if (conn.get("isLoading")) return true; //if connection is currently loading we assume its a connection we want to show
 
           const remoteNeedUri = conn.get("remoteNeedUri");

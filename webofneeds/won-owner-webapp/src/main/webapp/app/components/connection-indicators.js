@@ -103,7 +103,7 @@ function genComponentConf() {
         const allPosts = getPosts(state);
         const ownedPost = ownedPosts && ownedPosts.get(this.needUri);
         const chatConnectionsByNeedUri =
-          this.needUri && getChatConnectionsByNeedUri(this.needUri);
+          this.needUri && getChatConnectionsByNeedUri(state, this.needUri);
 
         const matches =
           chatConnectionsByNeedUri &&
