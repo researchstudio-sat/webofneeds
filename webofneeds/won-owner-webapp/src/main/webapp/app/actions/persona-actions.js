@@ -18,10 +18,16 @@ export function createPersona(persona, nodeUri) {
     const graph = {
       "@id": publishedContentUri,
       "@type": ["won:Need", "won:Persona"],
-      "won:hasFacet": {
-        "@id": "#holderFacet",
-        "@type": "won:HolderFacet",
-      },
+      "won:hasFacet": [
+        {
+          "@id": "#holderFacet",
+          "@type": "won:HolderFacet",
+        },
+        {
+          "@id": "#reviewFacet",
+          "@type": "won:ReviewFacet",
+        },
+      ],
       "won:hasFlag": [
         { "@id": "won:NoHintForCounterpart" },
         { "@id": "won:NoHintForMe" },
