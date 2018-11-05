@@ -3,6 +3,19 @@
  */
 
 import { createSelector } from "reselect";
+import {
+  isMessageProposable,
+  isMessageClaimable,
+  isMessageCancelable,
+  isMessageRetractable,
+  isMessageAcceptable,
+  isMessageRejectable,
+  isMessageAccepted,
+  isMessageCancellationPending,
+  isMessageProposal,
+  isMessageClaim,
+  isMessageUnread,
+} from "./message-utils.js";
 import Immutable from "immutable";
 import won from "./won-es6.js";
 import { decodeUriComponentProperly, getIn } from "./utils.js";
@@ -226,170 +239,6 @@ export function isPrivateUser(state) {
   return !!getIn(state, ["router", "currentParams", "privateId"]);
 }
 
-export function isMessageProposable(msg) {
-  //TODO: should a message be proposable if it was already proposed? or even accepted? and what if the ref are only forwardedMessages?
-  return (
-    msg &&
-    msg.get("hasContent") &&
-    msg.get("messageType") !== won.WONMSG.connectMessage &&
-    !msg.get("hasReferences")
-  );
-}
-
-export function isMessageClaimable(msg) {
-  //TODO: should a message be claimable if it was already claimed or proposed or even accepted? what if the ref are only forwardedMessages?
-  return (
-    msg &&
-    msg.get("hasContent") &&
-    msg.get("messageType") !== won.WONMSG.connectMessage &&
-    !msg.get("hasReferences")
-  );
-}
-
-export function isMessageCancelable(msg) {
-  return (
-    msg &&
-    (hasClaimsReferences(msg) ||
-      hasProposesReferences(msg) ||
-      hasProposesToCancelReferences(msg)) &&
-    isMessageAccepted(msg) &&
-    !isMessageCancelled(msg) &&
-    !isMessageCancellationPending(msg)
-  );
-}
-
-export function isMessageRetractable(msg) {
-  return (
-    msg &&
-    msg.get("outgoingMessage") &&
-    !isMessageAccepted(msg) &&
-    !isMessageCancelled(msg) &&
-    !isMessageCancellationPending(msg) &&
-    !isMessageRetracted(msg) &&
-    !isMessageRejected(msg)
-  );
-}
-
-export function isMessageAcceptable(msg) {
-  return (
-    msg &&
-    (hasClaimsReferences(msg) ||
-      hasProposesReferences(msg) ||
-      hasProposesToCancelReferences(msg)) &&
-    !msg.get("outgoingMessage") &&
-    !isMessageAccepted(msg) &&
-    !isMessageCancelled(msg) &&
-    !isMessageCancellationPending(msg) &&
-    !isMessageRetracted(msg) &&
-    !isMessageRejected(msg)
-  );
-}
-
-export function isMessageRejectable(msg) {
-  return (
-    msg &&
-    (hasClaimsReferences(msg) ||
-      hasProposesReferences(msg) ||
-      hasProposesToCancelReferences(msg)) &&
-    !msg.get("outgoingMessage") &&
-    !isMessageAccepted(msg) &&
-    !isMessageCancelled(msg) &&
-    !isMessageCancellationPending(msg) &&
-    !isMessageRetracted(msg) &&
-    !isMessageRejected(msg)
-  );
-}
-
-export function hasProposesReferences(msg) {
-  const references = msg && msg.get("references");
-  return (
-    references &&
-    references.get("proposes") &&
-    references.get("proposes").size > 0
-  );
-}
-
-export function hasClaimsReferences(msg) {
-  const references = msg && msg.get("references");
-  return (
-    references && references.get("claims") && references.get("claims").size > 0
-  );
-}
-
-export function hasProposesToCancelReferences(msg) {
-  const references = msg && msg.get("references");
-  return (
-    references &&
-    references.get("proposesToCancel") &&
-    references.get("proposesToCancel").size > 0
-  );
-}
-
-export function isMessageProposed(msg) {
-  const messageStatus = msg && msg.get("messageStatus");
-  return messageStatus && messageStatus.get("isProposed");
-}
-
-export function isMessageClaimed(msg) {
-  const messageStatus = msg && msg.get("messageStatus");
-  return messageStatus && messageStatus.get("isClaimed");
-}
-
-export function isMessageRejected(msg) {
-  const messageStatus = msg && msg.get("messageStatus");
-  return messageStatus && messageStatus.get("isRejected");
-}
-
-export function isMessageAccepted(msg) {
-  const messageStatus = msg && msg.get("messageStatus");
-  return messageStatus && messageStatus.get("isAccepted");
-}
-
-export function isMessageRetracted(msg) {
-  const messageStatus = msg && msg.get("messageStatus");
-  return messageStatus && messageStatus.get("isRetracted");
-}
-
-export function isMessageCancelled(msg) {
-  const messageStatus = msg && msg.get("messageStatus");
-  return messageStatus && messageStatus.get("isCancelled");
-}
-
-export function isMessageCancellationPending(msg) {
-  const messageStatus = msg && msg.get("messageStatus");
-  return messageStatus && messageStatus.get("isCancellationPending");
-}
-
-export function isMessageUnread(msg) {
-  return msg && msg.get("unread");
-}
-
-export function isMessageProposal(msg) {
-  return (
-    (hasProposesToCancelReferences(msg) || hasProposesReferences(msg)) &&
-    !(
-      isMessageAccepted(msg) ||
-      isMessageCancellationPending(msg) ||
-      isMessageCancelled(msg) ||
-      isMessageRejected(msg) ||
-      isMessageRetracted(msg)
-    )
-  );
-}
-
-export function isMessageClaim(msg) {
-  return (
-    hasClaimsReferences(msg) &&
-    !(
-      isMessageAccepted(msg) ||
-      isMessageCancellationPending(msg) ||
-      isMessageCancelled(msg) ||
-      isMessageRejected(msg) ||
-      isMessageRetracted(msg)
-    )
-  );
-}
-
 export function selectAcceptableMessagesByConnectionUri(state, connectionUri) {
   const messages = selectAllMessagesByConnectionUri(state, connectionUri);
   return messages && messages.filter(msg => isMessageAcceptable(msg));
@@ -458,22 +307,6 @@ export function selectClaimMessagesByConnectionUri(state, connectionUri) {
 export function selectUnreadMessagesByConnectionUri(state, connectionUri) {
   const messages = selectAllMessagesByConnectionUri(state, connectionUri);
   return messages && messages.filter(msg => isMessageUnread(msg));
-}
-
-export function getCorrectMessageUri(messages, messageUri) {
-  if (messageUri) {
-    if (messages.filter(msg => msg.get("uri") === messageUri).size > 0) {
-      return messageUri;
-    } else {
-      const messagesOfRemoteUri = messages.filter(
-        msg => msg.get("remoteUri") === messageUri
-      );
-      if (messagesOfRemoteUri.size > 0) {
-        return messagesOfRemoteUri.first().get("uri");
-      }
-    }
-  }
-  return undefined;
 }
 
 export function getPersonas(needs) {

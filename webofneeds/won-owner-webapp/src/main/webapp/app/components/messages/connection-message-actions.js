@@ -5,14 +5,14 @@ import Immutable from "immutable";
 import { connect2Redux } from "../../won-utils.js";
 import { attach, getIn } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
+import { selectNeedByConnectionUri } from "../../selectors.js";
 import {
-  selectNeedByConnectionUri,
   isMessageProposable,
   isMessageClaimable,
   isMessageCancelable,
-  isMessageRejectable,
   isMessageRetractable,
   isMessageAcceptable,
+  isMessageRejectable,
   isMessageProposed,
   isMessageClaimed,
   isMessageRejected,
@@ -21,7 +21,7 @@ import {
   isMessageCancelled,
   isMessageCancellationPending,
   isMessageUnread,
-} from "../../selectors.js";
+} from "../../message-utils.js";
 
 import "style/_connection-message-actions.scss";
 

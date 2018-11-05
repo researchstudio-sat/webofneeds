@@ -10,7 +10,7 @@ import {
 } from "./actions.js";
 
 import Immutable from "immutable";
-import { getCorrectMessageUri } from "../selectors.js";
+import { getOwnMessageUri } from "../message-utils.js";
 
 import {
   fetchDataForOwnedNeeds,
@@ -336,7 +336,7 @@ export function processConnectionMessage(event) {
                     ? effect.acceptedMessageUri
                     : [effect.acceptedMessageUri];
                   acceptedMessageUris.forEach(acceptedMessageUri => {
-                    let messageUri = getCorrectMessageUri(
+                    let messageUri = getOwnMessageUri(
                       messages,
                       acceptedMessageUri
                     );
@@ -359,7 +359,7 @@ export function processConnectionMessage(event) {
                     : [effect.claims];
 
                   claimedMessageUris.forEach(claimedMessageUris => {
-                    let messageUri = getCorrectMessageUri(
+                    let messageUri = getOwnMessageUri(
                       messages,
                       claimedMessageUris
                     );
@@ -383,7 +383,7 @@ export function processConnectionMessage(event) {
                     : [effect.proposes];
 
                   proposedMessageUris.forEach(proposedMessageUri => {
-                    let messageUri = getCorrectMessageUri(
+                    let messageUri = getOwnMessageUri(
                       messages,
                       proposedMessageUri
                     );
@@ -407,7 +407,7 @@ export function processConnectionMessage(event) {
                     : [effect.proposesToCancel];
 
                   proposesToCancelUris.forEach(proposesToCancelURI => {
-                    let messageUri = getCorrectMessageUri(
+                    let messageUri = getOwnMessageUri(
                       messages,
                       proposesToCancelURI
                     );
@@ -435,7 +435,7 @@ export function processConnectionMessage(event) {
                     : [effect.rejectedMessageUri];
 
                   rejectedMessageUris.forEach(rejectedMessageUri => {
-                    let messageUri = getCorrectMessageUri(
+                    let messageUri = getOwnMessageUri(
                       messages,
                       rejectedMessageUri
                     );
@@ -461,7 +461,7 @@ export function processConnectionMessage(event) {
                     : [effect.retractedMessageUri];
 
                   retractedMessageUris.forEach(retractedMessageUri => {
-                    let messageUri = getCorrectMessageUri(
+                    let messageUri = getOwnMessageUri(
                       messages,
                       retractedMessageUri
                     );
@@ -618,7 +618,7 @@ export function markAsRetracted(event) {
       event.connectionUri,
       "messages",
     ]);
-    const messageUri = getCorrectMessageUri(messages, event.messageUri);
+    const messageUri = getOwnMessageUri(messages, event.messageUri);
 
     const payload = {
       messageUri: messageUri,
@@ -643,7 +643,7 @@ export function updateMessageStatus(event) {
       event.connectionUri,
       "messages",
     ]);
-    const messageUri = getCorrectMessageUri(messages, event.messageUri);
+    const messageUri = getOwnMessageUri(messages, event.messageUri);
 
     const payload = {
       messageUri: messageUri,
@@ -668,7 +668,7 @@ export function markAsRejected(event) {
       event.connectionUri,
       "messages",
     ]);
-    const messageUri = getCorrectMessageUri(messages, event.messageUri);
+    const messageUri = getOwnMessageUri(messages, event.messageUri);
 
     const payload = {
       messageUri: messageUri,
@@ -693,7 +693,7 @@ export function markAsProposed(event) {
       event.connectionUri,
       "messages",
     ]);
-    const messageUri = getCorrectMessageUri(messages, event.messageUri);
+    const messageUri = getOwnMessageUri(messages, event.messageUri);
 
     const payload = {
       messageUri: messageUri,
@@ -718,7 +718,7 @@ export function markAsClaimed(event) {
       event.connectionUri,
       "messages",
     ]);
-    const messageUri = getCorrectMessageUri(messages, event.messageUri);
+    const messageUri = getOwnMessageUri(messages, event.messageUri);
 
     const payload = {
       messageUri: messageUri,
@@ -743,7 +743,7 @@ export function markAsAccepted(event) {
       event.connectionUri,
       "messages",
     ]);
-    const messageUri = getCorrectMessageUri(messages, event.messageUri);
+    const messageUri = getOwnMessageUri(messages, event.messageUri);
 
     const payload = {
       messageUri: messageUri,
@@ -768,7 +768,7 @@ export function markAsCancelled(event) {
       event.connectionUri,
       "messages",
     ]);
-    const messageUri = getCorrectMessageUri(messages, event.messageUri);
+    const messageUri = getOwnMessageUri(messages, event.messageUri);
 
     const payload = {
       messageUri: messageUri,
@@ -793,7 +793,7 @@ export function markAsCancellationPending(event) {
       event.connectionUri,
       "messages",
     ]);
-    const messageUri = getCorrectMessageUri(messages, event.messageUri);
+    const messageUri = getOwnMessageUri(messages, event.messageUri);
 
     const payload = {
       messageUri: messageUri,

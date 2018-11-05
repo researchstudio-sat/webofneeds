@@ -13,14 +13,17 @@ import combinedMessageContentModule from "./combined-message-content.js";
 import { connect2Redux } from "../../won-utils.js";
 import { attach, getIn } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
+import { selectNeedByConnectionUri } from "../../selectors.js";
 import {
-  selectNeedByConnectionUri,
   isMessageProposable,
   isMessageClaimable,
   isMessageCancelable,
-  isMessageRejectable,
   isMessageRetractable,
   isMessageAcceptable,
+  isMessageRejectable,
+  hasProposesReferences,
+  hasClaimsReferences,
+  hasProposesToCancelReferences,
   isMessageProposed,
   isMessageClaimed,
   isMessageRejected,
@@ -29,10 +32,7 @@ import {
   isMessageCancelled,
   isMessageCancellationPending,
   isMessageUnread,
-  hasProposesReferences,
-  hasClaimsReferences,
-  hasProposesToCancelReferences,
-} from "../../selectors.js";
+} from "../../message-utils.js";
 import { classOnComponentRoot } from "../../cstm-ng-utils.js";
 
 import { ownerBaseUrl } from "config";
