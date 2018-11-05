@@ -32,7 +32,7 @@ export function getOwnedConnections(state) {
 /**
  * Get all the connectionUris storid within the state
  */
-export function selectAllConnectionUris(state) {
+export function getOwnedConnectionUris(state) {
   const connections = getOwnedConnections(state);
   return connections && connections.keySeq().toSet();
 }
