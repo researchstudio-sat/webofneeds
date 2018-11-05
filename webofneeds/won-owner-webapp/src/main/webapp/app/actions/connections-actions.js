@@ -9,7 +9,7 @@ import {
   getConnectionUriFromRoute,
   getOwnedNeedByConnectionUri,
 } from "../selectors/general-selectors.js";
-import { selectConnectionByUri } from "../selectors/connection-selectors.js";
+import { getOwnedConnectionByUri } from "../selectors/connection-selectors.js";
 
 import { getIn, get, cloneAsMutable } from "../utils.js";
 
@@ -549,7 +549,7 @@ export async function loadLatestMessagesOfConnection({
     connectionUri_ && getOwnedNeedByConnectionUri(state, connectionUri_);
   const needUri = need && need.get("uri");
   const connection =
-    connectionUri_ && selectConnectionByUri(state, connectionUri_);
+    connectionUri_ && getOwnedConnectionByUri(state, connectionUri_);
   if (
     !connectionUri_ ||
     !connection ||

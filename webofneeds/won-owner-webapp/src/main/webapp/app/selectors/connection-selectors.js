@@ -14,7 +14,7 @@ import won from "../won-es6.js";
  * @param state to retrieve data from
  * @param connectionUri to find corresponding connection for
  */
-export function selectConnectionByUri(state, connectionUri) {
+export function getOwnedConnectionByUri(state, connectionUri) {
   let need = getOwnedNeedByConnectionUri(state, connectionUri);
   return need.getIn(["connections", connectionUri]);
 }
