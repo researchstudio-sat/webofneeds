@@ -17,7 +17,7 @@ import {
   getNonOwnedNeeds,
 } from "../selectors/general-selectors.js";
 import { selectUnreadMessagesByConnectionUri } from "../selectors/message-selectors.js";
-import { selectAllMessagesByConnectionUri } from "../selectors/message-selectors.js";
+import { getMessagesByConnectionUri } from "../selectors/message-selectors.js";
 import connectionStateModule from "./connection-state.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
@@ -95,7 +95,7 @@ function genComponentConf() {
         const theirNeed =
           connection &&
           getNonOwnedNeeds(state).get(connection.get("remoteNeedUri"));
-        const allMessages = selectAllMessagesByConnectionUri(
+        const allMessages = getMessagesByConnectionUri(
           state,
           this.connectionUri
         );
