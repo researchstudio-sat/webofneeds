@@ -8,7 +8,7 @@ import {
   getOwnedNeedByConnectionUri,
   getNeeds,
 } from "../../selectors/general-selectors.js";
-import { selectAllConnections } from "../../selectors/connection-selectors.js";
+import { getOwnedConnections } from "../../selectors/connection-selectors.js";
 import trigModule from "../trig.js";
 import { labels } from "../../won-label-utils.js";
 import { classOnComponentRoot } from "../../cstm-ng-utils.js";
@@ -84,7 +84,7 @@ function genComponentConf() {
         const referencesProposes = references && references.get("proposes");
         const referencesClaims = references && references.get("claims");
 
-        const allConnections = selectAllConnections(state);
+        const allConnections = getOwnedConnections(state);
         const allNeeds = getNeeds(state);
 
         return {

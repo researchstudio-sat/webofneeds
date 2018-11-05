@@ -23,7 +23,7 @@ export function getOwnedConnectionByUri(state, connectionUri) {
  * Get all connections stored within your own needs as a map
  * @returns Immutable.Map with all connections
  */
-export function selectAllConnections(state) {
+export function getOwnedConnections(state) {
   const needs = getOwnedNeeds(state); //we only check own needs as these are the only ones who have connections stored
   const connections = needs && needs.flatMap(need => need.get("connections"));
   return connections;
@@ -33,7 +33,7 @@ export function selectAllConnections(state) {
  * Get all the connectionUris storid within the state
  */
 export function selectAllConnectionUris(state) {
-  const connections = selectAllConnections(state);
+  const connections = getOwnedConnections(state);
   return connections && connections.keySeq().toSet();
 }
 
