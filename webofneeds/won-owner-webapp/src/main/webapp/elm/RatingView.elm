@@ -87,15 +87,21 @@ type alias Popup =
 
 
 type PopupState
-    = Closed
+    = CannotRate
+    | Closed
     | Hovered
     | Open Popup
 
 
-init : Int -> ( Model, Cmd Msg )
-init ratingFlag =
-    ( { rating = fromInt ratingFlag
-      , popupState = Closed
+init : { rating : Int, canRate : Bool } -> ( Model, Cmd Msg )
+init { rating, canRate } =
+    ( { rating = fromInt rating
+      , popupState =
+            if canRate then
+                Closed
+
+            else
+                CannotRate
       }
     , Cmd.none
     )
@@ -139,6 +145,9 @@ update msg model =
             ( { model
                 | popupState =
                     case model.popupState of
+                        CannotRate ->
+                            CannotRate
+
                         Closed ->
                             Open initialPopup
 
@@ -174,6 +183,9 @@ initialPopup =
 updateHover : Bool -> PopupState -> PopupState
 updateHover hovered state =
     case ( hovered, state ) of
+        ( _, CannotRate ) ->
+            state
+
         ( _, Open _ ) ->
             state
 
@@ -187,6 +199,9 @@ updateHover hovered state =
 updatePopup : PopupMsg -> PopupState -> ( PopupState, Cmd PopupMsg )
 updatePopup msg popupState =
     case popupState of
+        CannotRate ->
+            ( CannotRate, Cmd.none )
+
         Closed ->
             ( Closed, Cmd.none )
 
@@ -296,6 +311,9 @@ view skin model =
             [ el
                 [ below <|
                     case model.popupState of
+                        CannotRate ->
+                            none
+
                         Closed ->
                             none
 

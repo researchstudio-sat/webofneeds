@@ -1,7 +1,9 @@
-import { getIn } from "../utils";
+import { getIn, get } from "../utils";
 import won from "../won-es6";
 import { getRandomWonId } from "../won-utils";
 import { actionTypes } from "./actions";
+import { getOwnedNeedByConnectionUri } from "../selectors/general-selectors";
+import { getOwnedConnectionByUri } from "../selectors/connection-selectors";
 
 export function createPersona(persona, nodeUri) {
   return (dispatch, getState) => {
@@ -54,9 +56,34 @@ export function createPersona(persona, nodeUri) {
   };
 }
 
-export function reviewPersona(ownedPersonaUri, foreignPersonaUri, review) {
+export function reviewPersona(reviewableConnectionUri, review) {
   return (dispatch, getState) => {
-    review;
-    getState;
+    const state = getState();
+    const connection = getOwnedConnectionByUri(state, reviewableConnectionUri);
+
+    const ownNeed = getOwnedNeedByConnectionUri(state, reviewableConnectionUri);
+    const foreignNeedUri = get(connection, "remoteNeedUri");
+    const foreignNeed = getIn(state, ["needs", foreignNeedUri]);
+
+    const ownPersonaUri = get(ownNeed, "heldBy");
+    const foreignPersonaUri = get(foreignNeed, "heldBy");
+
+    if (!ownPersonaUri) {
+      throw new Error(
+        `No own persona found for rating when looking at ${reviewableConnectionUri}`
+      );
+    }
+
+    if (!foreignPersonaUri) {
+      throw new Error(
+        `No foreign persona found for rating when looking at ${reviewableConnectionUri}`
+      );
+    }
+
+    console.info(
+      `${ownPersonaUri} reviewing ${foreignPersonaUri} with value ${
+        review.value
+      } and message "${review.message}"`
+    );
   };
 }
