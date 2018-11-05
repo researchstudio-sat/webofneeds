@@ -30,7 +30,7 @@ import {
   selectOpenPostUri,
   getPosts,
   selectClosedPosts,
-  selectOpenPosts,
+  getOwnedOpenPosts,
 } from "../selectors/general-selectors.js";
 import { selectPostConnectionsWithoutConnectMessage } from "../selectors/connection-selectors.js";
 
@@ -208,7 +208,7 @@ function genComponentConf() {
       const self = this;
       const selectFromState = state => {
         const allNeeds = getPosts(state);
-        const openNeeds = selectOpenPosts(state);
+        const openNeeds = getOwnedOpenPosts(state);
         const closedNeeds = selectClosedPosts(state);
 
         // needs that have been created but are not confirmed by the server yet

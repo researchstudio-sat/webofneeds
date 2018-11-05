@@ -31,15 +31,7 @@ export function getPosts(state) {
 export const getOwnedPosts = state =>
   getPosts(state).filter(need => need.get("ownNeed"));
 
-export function selectOpenNeeds(state) {
-  const allOwnNeeds = getOwnedNeeds(state);
-  return (
-    allOwnNeeds &&
-    allOwnNeeds.filter(post => post.get("state") === won.WON.ActiveCompacted)
-  );
-}
-
-export function selectOpenPosts(state) {
+export function getOwnedOpenPosts(state) {
   const allOwnNeeds = getOwnedPosts(state);
   return (
     allOwnNeeds &&
