@@ -7,9 +7,9 @@ import { attach } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import {
-  selectOpenConnectionUri,
-  selectNeedByConnectionUri,
-} from "../selectors.js";
+  getConnectionUriFromRoute,
+  getOwnedNeedByConnectionUri,
+} from "../selectors/general-selectors.js";
 
 import connectionHeaderModule from "./connection-header.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
@@ -32,12 +32,12 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
 
       const selectFromState = state => {
-        const ownNeed = selectNeedByConnectionUri(state, this.connectionUri);
+        const ownNeed = getOwnedNeedByConnectionUri(state, this.connectionUri);
         const connection =
           ownNeed && ownNeed.getIn(["connections", this.connectionUri]);
 
         return {
-          openConnectionUri: selectOpenConnectionUri(state),
+          openConnectionUri: getConnectionUriFromRoute(state),
           lastUpdateTimestamp: connection && connection.get("lastUpdateDate"),
         };
       };

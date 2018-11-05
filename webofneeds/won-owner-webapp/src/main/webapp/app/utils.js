@@ -127,19 +127,6 @@ export function reduceAndMapTreeKeys(reducer, mapper, acc, obj) {
 }
 
 /**
- * Generates an array consisting of n times x. e.g.:
- * ```javascript
- * repeatconst('a', 3); // ['a', 'a', 'a']
- * ```
- * @param x
- * @param n
- * @returns {*}
- */
-export function repeatconst(x, n) {
-  return Array.apply(null, Array(n)).map(() => x);
-}
-
-/**
  * Traverses an object-tree and produces an object
  * that is just one level deep but concatenating the
  * traversal path.
@@ -230,32 +217,6 @@ export function watch(subscribe, select, callback) {
 export function watchImmutableRdxState(redux, path, callback) {
   return watch(redux.subscribe, () => getIn(redux.getState(), path), callback);
 }
-export function mapToMatches(connections) {
-  let needMap = {};
-  if (connections) {
-    Object.keys(connections).forEach(
-      function(key) {
-        const needUri = connections[key].ownNeed["@id"];
-
-        if (!needMap[needUri]) {
-          let connectionsArr = [connections[key]];
-          needMap[needUri] = connectionsArr;
-        } else {
-          needMap[needUri].push(connections[key]);
-        }
-      }.bind(this)
-    );
-  }
-  return needMap;
-}
-export function removeAllProperties(obj) {
-  Object.keys(obj).forEach(function(element) {
-    delete obj[element];
-  });
-}
-export function getKeySize(obj) {
-  return Object.keys(obj).length;
-}
 
 /**
  * generates a string of random characters
@@ -274,14 +235,6 @@ export function getRandomString(
     },
     randomChar
   ).join("");
-}
-
-export function getRandomPosInt() {
-  return getRandomInt(1, 9223372036854775807);
-}
-
-export function getRandomInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 export function isString(o) {
@@ -336,28 +289,6 @@ export function checkHttpStatus(response) {
     error.response = response;
     throw error;
   }
-}
-
-/**
- *
- * e.g.
- * ```
- * withDefaults({a: 1}, {a: 4, b: 8}) // {a: 1, b: 8}
- * withDefaults({a: 1, b: 2, c: 3}, {a: 4, b: 8}) // {a: 1, b: 2}
- * withDefaults(undefined, {a: 4, b: 8}) // {a: 4, b: 8}
- * ```
- * @param defaults
- * @param obj
- * @returns {object} an object with the fields from defaults
- *                   overwritten by the ones in obj where they exist.
- *                   always returns an object as long as `defaults` is one
- */
-export function withDefaults(obj, defaults) {
-  const ret = {};
-  for (const k in defaults) {
-    ret[k] = obj && obj[k] ? obj[k] : defaults[k];
-  }
-  return ret;
 }
 
 /**
@@ -466,40 +397,6 @@ export function urisToLookupMap(uris, asyncLookupFunction, excludeUris = []) {
       if (dataObjects[i]) {
         lookupMap[uri] = dataObjects[i];
       }
-    });
-    return lookupMap;
-  });
-}
-
-/**
- * Takes a single uri or an array of uris, performs the lookup function on each
- * of them seperately, collects the results and builds an map/object
- * with the uris as keys and the results as values.
- * Will throw an error if any of the asyncLookupFunction fails. If it
- * doesn't fail, the result is guaranteed to have the same number of
- * uri-value-pairs as uris where passed.
- * @param uris
- * @param asyncLookupFunction
- * @return {*}
- */
-export function urisToLookupMapStrict(uris, asyncLookupFunction) {
-  //make sure we have an array and not a single uri.
-  const urisAsArray = is("Array", uris) ? uris : [uris];
-  const asyncLookups = urisAsArray.map(uri =>
-    asyncLookupFunction(uri).catch(error => {
-      throw {
-        msg: `failed lookup for ${uri} in utils.js:urisToLookupMap`,
-        error,
-        urisAsArray,
-        uris,
-      };
-    })
-  );
-  return Promise.all(asyncLookups).then(dataObjects => {
-    const lookupMap = {};
-    //make sure there's the same
-    uris.forEach((uri, i) => {
-      lookupMap[uri] = dataObjects[i];
     });
     return lookupMap;
   });
@@ -884,89 +781,6 @@ export function arrEq(xs, ys) {
 }
 
 /**
- * Converts from proper json-ld to the format
- * that is returned by `rdfstore.node`. Note that
- * the process isn't reversible, as rdf-prefixes
- * are stripped as part of it.
- * @param jsonldObj
- * @returns {{}}
- */
-export function jsonld2simpleFormat(jsonldObj, context = undefined) {
-  if (!jsonldObj) {
-    return;
-  }
-  if (!context && jsonldObj["@context"]) {
-    context = jsonldObj["@context"]; // needed for expanding values
-  }
-  if (is("String", jsonldObj)) {
-    // try to expand any existing prefixes
-    if (context) {
-      for (let prefix of Object.keys(context)) {
-        if (jsonldObj.startsWith(prefix + ":")) {
-          // found a compacted prefix that we can expand using the context
-          return jsonldObj.replace(prefix + ":", context[prefix]);
-        }
-      }
-    }
-
-    // no prefix found -- it's either a plain value or the prefix isn't in the context
-    return jsonldObj;
-  } else if (is("Array", jsonldObj)) {
-    return jsonldObj.map(x => jsonld2simpleFormat(x, context));
-  } else if (is("Object", jsonldObj)) {
-    if (Object.keys(jsonldObj).length === 1 && jsonldObj["@id"]) {
-      // current node is an URL. return it as string.
-      return jsonld2simpleFormat(jsonldObj["@id"], context);
-    } else if (Object.keys(jsonldObj).length === 2 && jsonldObj["@value"]) {
-      // encountered value with datatype. we're interested in the @value
-      return jsonld2simpleFormat(jsonldObj["@value"], context);
-    } else {
-      // full fledged jsonld-node. iterate over the keys and recurse into the values.
-
-      const newObj = {};
-      for (let k of Object.keys(jsonldObj)) {
-        let newKey;
-        switch (k) {
-          case "@context":
-            // drop it. we can't use the json-ld context in
-            // the simplified object-format anyway, as there's no prefixes
-            continue;
-
-          case "@id":
-            newKey = "uri";
-            //newObj['uri'] = jsonldObj['@id'];
-            break;
-
-          case "@type":
-            newKey = "type";
-            // newObj['type'] = jsonldObj['@type'];
-            break;
-
-          default: {
-            const split = k.split(":");
-            if (split.length !== 2) {
-              throw new Error(
-                'encountered unexpected predicate when parsing json-ld. it doesn\'t follow the "<prefix>:<postfix> structure: "' +
-                  k
-              );
-            }
-            newKey = split[1];
-            break;
-          }
-        }
-        newObj[newKey] = jsonld2simpleFormat(jsonldObj[k], context);
-      }
-      return newObj;
-    }
-  } else {
-    throw new Error(
-      "Encountered unexpected value while parsing json-ld: ",
-      jsonldObj
-    );
-  }
-}
-
-/**
  *
  * Adapted from https://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
  *
@@ -1179,31 +993,6 @@ export function clamp(value, lower, upper) {
   if (lower > value) return lower;
   if (upper < value) return upper;
   return value;
-}
-
-/**
- * Merges two arrays as if they were sets (by passing them through sets). Returns an array.
- * @param {*} arr1
- * @param {*} arr2
- */
-export function mergeAsSet(arr1, arr2) {
-  if (!is("Array", arr1) || !is("Array", arr2)) {
-    throw new Error(
-      "utils.js: mergeAsSet expects two arrays but got \n\n" +
-        JSON.stringify(arr1) +
-        "(" +
-        arr1.toString() +
-        ")" +
-        "\n\n and \n\n" +
-        JSON.stringify(arr2) +
-        "(" +
-        arr2.toString() +
-        ")"
-    );
-  }
-  const res = new Set(arr1);
-  arr2.forEach(el => res.add(el));
-  return Array.from(res);
 }
 
 export function generateHexColor(text) {

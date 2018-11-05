@@ -8,7 +8,7 @@ import won from "../../won-es6.js";
 import { actionCreators } from "../../actions/actions.js";
 import sendRequestModule from "../send-request.js";
 import visitorTitleBarModule from "../visitor-title-bar.js";
-import { selectOpenPostUri } from "../../selectors.js";
+import { getPostUriFromRoute } from "../../selectors/general-selectors.js";
 
 import "style/_post-visitor.scss";
 
@@ -21,7 +21,7 @@ class Controller {
     this.WON = won.WON;
 
     const selectFromState = state => {
-      const postUri = selectOpenPostUri(state);
+      const postUri = getPostUriFromRoute(state);
       const post = state.getIn(["needs", postUri]);
 
       const isOwnPost = post && post.get("ownNeed");

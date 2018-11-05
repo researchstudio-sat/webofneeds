@@ -24,7 +24,7 @@ import { stateGoCurrent } from "./cstm-router-actions.js";
 import { checkAccessToCurrentRoute } from "../configRouting.js";
 
 import { getIn } from "../utils.js";
-import { selectAllConnectionUris } from "../selectors.js";
+import { getOwnedConnectionUris } from "../selectors/connection-selectors.js";
 import { loadLatestMessagesOfConnection } from "./connections-actions.js";
 
 // import { Observable } from "rxjs";
@@ -406,7 +406,7 @@ export function reconnect() {
       /* 
        * -- loading latest messages for all connections (we might have missed some during the dc) --
        */
-      const connectionUris = selectAllConnectionUris(state);
+      const connectionUris = getOwnedConnectionUris(state);
       await Promise.all(
         connectionUris.map(async connectionUri => {
           await loadLatestMessagesOfConnection({

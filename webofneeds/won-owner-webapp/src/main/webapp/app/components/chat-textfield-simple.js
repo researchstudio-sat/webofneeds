@@ -13,16 +13,19 @@ import ngAnimate from "angular-animate";
 import { dispatchEvent, attach, delay } from "../utils.js";
 import won from "../won-es6.js";
 import {
-  selectOpenConnectionUri,
-  selectNeedByConnectionUri,
-  selectAcceptableMessagesByConnectionUri,
-  selectRetractableMessagesByConnectionUri,
-  selectRejectableMessagesByConnectionUri,
-  selectCancelableMessagesByConnectionUri,
-  selectProposableMessagesByConnectionUri,
-  selectClaimableMessagesByConnectionUri,
-  selectSelectedMessagesByConnectionUri,
-} from "../selectors.js";
+  getConnectionUriFromRoute,
+  getOwnedNeedByConnectionUri,
+} from "../selectors/general-selectors.js";
+import { getMessagesByConnectionUri } from "../selectors/message-selectors.js";
+import {
+  isMessageProposable,
+  isMessageClaimable,
+  isMessageCancelable,
+  isMessageRetractable,
+  isMessageAcceptable,
+  isMessageRejectable,
+  isMessageSelected,
+} from "../message-utils.js";
 import { getAllMessageDetails } from "../won-utils.js";
 import autoresizingTextareaModule from "../directives/textarea-autogrow.js";
 import { actionCreators } from "../actions/actions.js";
@@ -266,36 +269,28 @@ function genComponentConf() {
       this.referencedContent = new Map(); //Stores the reference Content of a message (e.g. proposes, retracts...)
 
       const selectFromState = state => {
-        const connectionUri = selectOpenConnectionUri(state);
+        const connectionUri = getConnectionUriFromRoute(state);
         const post =
-          connectionUri && selectNeedByConnectionUri(state, connectionUri);
+          connectionUri && getOwnedNeedByConnectionUri(state, connectionUri);
         const connection = post && post.getIn(["connections", connectionUri]);
         const connectionState = connection && connection.get("state");
 
-        const rejectableMessages = selectRejectableMessagesByConnectionUri(
-          state,
-          connectionUri
-        );
-        const retractableMessages = selectRetractableMessagesByConnectionUri(
-          state,
-          connectionUri
-        );
-        const acceptableMessages = selectAcceptableMessagesByConnectionUri(
-          state,
-          connectionUri
-        );
-        const proposableMessages = selectProposableMessagesByConnectionUri(
-          state,
-          connectionUri
-        );
-        const cancelableMessages = selectCancelableMessagesByConnectionUri(
-          state,
-          connectionUri
-        );
-        const claimableMessages = selectClaimableMessagesByConnectionUri(
-          state,
-          connectionUri
-        );
+        const messages = getMessagesByConnectionUri(state, connectionUri);
+
+        const selectedMessages =
+          messages && messages.filter(msg => isMessageSelected(msg));
+        const rejectableMessages =
+          messages && messages.filter(msg => isMessageRejectable(msg));
+        const retractableMessages =
+          messages && messages.filter(msg => isMessageRetractable(msg));
+        const acceptableMessages =
+          messages && messages.filter(msg => isMessageAcceptable(msg));
+        const proposableMessages =
+          messages && messages.filter(msg => isMessageProposable(msg));
+        const cancelableMessages =
+          messages && messages.filter(msg => isMessageCancelable(msg));
+        const claimableMessages =
+          messages && messages.filter(msg => isMessageClaimable(msg));
 
         const hasRejectableMessages =
           rejectableMessages && rejectableMessages.size > 0;
@@ -322,10 +317,7 @@ function genComponentConf() {
           multiSelectType: connection && connection.get("multiSelectType"),
           showAgreementData: connection && connection.get("showAgreementData"),
           isConnected: connectionState && connectionState === won.WON.Connected,
-          selectedMessages: selectSelectedMessagesByConnectionUri(
-            state,
-            connectionUri
-          ),
+          selectedMessages: selectedMessages,
           hasClaimableMessages,
           hasProposableMessages,
           hasCancelableMessages,

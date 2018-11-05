@@ -6,10 +6,10 @@ import won from "../won-es6.js";
 import Immutable from "immutable";
 
 import {
-  selectOpenConnectionUri,
-  selectNeedByConnectionUri,
-  selectConnection,
-} from "../selectors.js";
+  getConnectionUriFromRoute,
+  getOwnedNeedByConnectionUri,
+} from "../selectors/general-selectors.js";
+import { getOwnedConnectionByUri } from "../selectors/connection-selectors.js";
 
 import { getIn, get, cloneAsMutable } from "../utils.js";
 
@@ -544,11 +544,12 @@ export async function loadLatestMessagesOfConnection({
   actionTypesToDispatch,
   dispatch,
 }) {
-  const connectionUri_ = connectionUri || selectOpenConnectionUri(state);
+  const connectionUri_ = connectionUri || getConnectionUriFromRoute(state);
   const need =
-    connectionUri_ && selectNeedByConnectionUri(state, connectionUri_);
+    connectionUri_ && getOwnedNeedByConnectionUri(state, connectionUri_);
   const needUri = need && need.get("uri");
-  const connection = connectionUri_ && selectConnection(state, connectionUri_);
+  const connection =
+    connectionUri_ && getOwnedConnectionByUri(state, connectionUri_);
   if (
     !connectionUri_ ||
     !connection ||
@@ -641,9 +642,10 @@ export async function loadLatestMessagesOfConnection({
 export function showMoreMessages(connectionUriParam, numberOfEvents) {
   return (dispatch, getState) => {
     const state = getState();
-    const connectionUri = connectionUriParam || selectOpenConnectionUri(state);
+    const connectionUri =
+      connectionUriParam || getConnectionUriFromRoute(state);
     const need =
-      connectionUri && selectNeedByConnectionUri(state, connectionUri);
+      connectionUri && getOwnedNeedByConnectionUri(state, connectionUri);
     const needUri = need && need.get("uri");
     const connection = need && need.getIn(["connections", connectionUri]);
     const connectionMessages = connection && connection.get("messages");

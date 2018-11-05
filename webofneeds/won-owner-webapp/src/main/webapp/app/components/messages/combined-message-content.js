@@ -5,10 +5,10 @@ import { connect2Redux } from "../../won-utils.js";
 import { attach, get, getIn } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import {
-  selectNeedByConnectionUri,
-  selectAllConnections,
-  selectAllNeeds,
-} from "../../selectors.js";
+  getOwnedNeedByConnectionUri,
+  getNeeds,
+} from "../../selectors/general-selectors.js";
+import { getOwnedConnections } from "../../selectors/connection-selectors.js";
 import trigModule from "../trig.js";
 import { labels } from "../../won-label-utils.js";
 import { classOnComponentRoot } from "../../cstm-ng-utils.js";
@@ -67,7 +67,7 @@ function genComponentConf() {
       const selectFromState = state => {
         const ownNeed =
           this.connectionUri &&
-          selectNeedByConnectionUri(state, this.connectionUri);
+          getOwnedNeedByConnectionUri(state, this.connectionUri);
         const connection =
           ownNeed && ownNeed.getIn(["connections", this.connectionUri]);
 
@@ -84,8 +84,8 @@ function genComponentConf() {
         const referencesProposes = references && references.get("proposes");
         const referencesClaims = references && references.get("claims");
 
-        const allConnections = selectAllConnections(state);
-        const allNeeds = selectAllNeeds(state);
+        const allConnections = getOwnedConnections(state);
+        const allNeeds = getNeeds(state);
 
         return {
           allNeeds,

@@ -11,7 +11,7 @@ import {
   connect2Redux,
   createDocumentDefinitionFromPost,
 } from "../won-utils.js";
-import { selectOpenPostUri } from "../selectors.js";
+import { getPostUriFromRoute } from "../selectors/general-selectors.js";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 
@@ -72,7 +72,7 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
 
       const selectFromState = state => {
-        const postUri = selectOpenPostUri(state);
+        const postUri = getPostUriFromRoute(state);
         const post = postUri && state.getIn(["needs", postUri]);
         const postState = post && post.get("state");
 

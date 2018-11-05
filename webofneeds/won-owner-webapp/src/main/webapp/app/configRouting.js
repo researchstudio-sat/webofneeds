@@ -9,7 +9,7 @@ import { accountLogin } from "./actions/account-actions.js";
 
 import { privateId2Credentials } from "./won-utils.js";
 
-import { selectAllNeeds } from "./selectors.js";
+import { getNeeds } from "./selectors/general-selectors.js";
 
 import {
   decodeUriComponentProperly,
@@ -111,7 +111,7 @@ function postViewEnsureLoaded(dispatch, getState, encodedPostUri) {
   const postUri = decodeUriComponentProperly(encodedPostUri);
   const state = getState();
 
-  if (postUri && !selectAllNeeds(state).has(postUri)) {
+  if (postUri && !getNeeds(state).has(postUri)) {
     /*
          * got an uri but no post loaded to the state yet ->
          * assuming that if you're logged in you either did a
@@ -310,22 +310,3 @@ export function addConstParams(params, paramsInState) {
   );
   return currentConstParams.merge(params).toJS();
 }
-
-/**
- * As we have configured our router to keep parameters unchanged,
- * that aren't mentioned in the `stateGo`-calls, you can use this
- * function to reset all parameters not mentioned in the arguments
- * and set those to their values.
- * @param params: object with params that should be placed
- * in the url.
- */
-//export function makeParams(params) {
-//    const currentParams = getState().getIn(['router', 'currentParams']);
-//    const currentConstParams = Immutable.Map(
-//        constantParams.map(p => [p, currentParams.get(p)]) // [ [ paramName, paramValue] ]
-//    );
-//    return Immutable.Map().merge(params).merge(currentConstParams).toJS();
-//    //let resetParamsCopy = Object.assign({}, resetParams);
-//    //return Object.assign(resetParamsCopy, params);
-//}
-export const makeParams = undefined;

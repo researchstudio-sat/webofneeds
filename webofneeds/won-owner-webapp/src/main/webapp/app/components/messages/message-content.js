@@ -5,7 +5,7 @@ import { connect2Redux } from "../../won-utils.js";
 import { getAllDetails } from "../../won-utils.js";
 import { attach, getIn, get } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
-import { selectNeedByConnectionUri } from "../../selectors.js";
+import { getOwnedNeedByConnectionUri } from "../../selectors/general-selectors.js";
 import "angular-marked";
 
 import "style/_message-content.scss";
@@ -43,7 +43,7 @@ function genComponentConf() {
       const selectFromState = state => {
         const ownNeed =
           this.connectionUri &&
-          selectNeedByConnectionUri(state, this.connectionUri);
+          getOwnedNeedByConnectionUri(state, this.connectionUri);
         const connection =
           ownNeed && ownNeed.getIn(["connections", this.connectionUri]);
         const message =

@@ -8,10 +8,10 @@ import { actionCreators } from "../../../actions/actions.js";
 import postHeaderModule from "../../post-header.js";
 import labelledHrModule from "../../labelled-hr.js";
 import {
-  selectOpenConnectionUri,
-  selectNeedByConnectionUri,
-  selectAllOpenPosts,
-} from "../../../selectors.js";
+  getConnectionUriFromRoute,
+  getOwnedNeedByConnectionUri,
+  getOpenPosts,
+} from "../../../selectors/general-selectors.js";
 
 import "style/_suggestpostpicker.scss";
 
@@ -66,10 +66,10 @@ function genComponentConf() {
       this.showResetButton = false;
 
       const selectFromState = state => {
-        const openedConnectionUri = selectOpenConnectionUri(state);
+        const openedConnectionUri = getConnectionUriFromRoute(state);
         const openedOwnPost =
           openedConnectionUri &&
-          selectNeedByConnectionUri(state, openedConnectionUri);
+          getOwnedNeedByConnectionUri(state, openedConnectionUri);
         const connection =
           openedOwnPost &&
           openedOwnPost.getIn(["connections", openedConnectionUri]);
@@ -79,7 +79,7 @@ function genComponentConf() {
           connection && connection.get("remoteNeedUri");
 
         const suggestedPostUri = this.initialValue;
-        const allOpenNeeds = selectAllOpenPosts(state);
+        const allOpenNeeds = getOpenPosts(state);
 
         const allOpenNeedsWithoutCurrent =
           allOpenNeeds &&

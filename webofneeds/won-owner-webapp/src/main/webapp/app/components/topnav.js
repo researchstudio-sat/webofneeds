@@ -12,7 +12,7 @@ import modalDialogModule from "./modal-dialog.js";
 import { attach, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
-import { selectNeedByConnectionUri } from "../selectors.js";
+import { getOwnedNeedByConnectionUri } from "../selectors/general-selectors.js";
 import "angular-marked";
 
 import * as srefUtils from "../sref-utils.js";
@@ -185,7 +185,7 @@ function genTopnavConf() {
         ]);
         const need =
           selectedConnectionUri &&
-          selectNeedByConnectionUri(state, selectedConnectionUri);
+          getOwnedNeedByConnectionUri(state, selectedConnectionUri);
         const selectedConnection =
           need && need.getIn(["connections", selectedConnectionUri]);
 

@@ -7,7 +7,7 @@ import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
 
 import * as srefUtils from "../sref-utils.js";
-import { isPrivateUser } from "../selectors.js";
+import { isPrivateUser } from "../selectors/general-selectors.js";
 
 function genComponentConf() {
   let template = `

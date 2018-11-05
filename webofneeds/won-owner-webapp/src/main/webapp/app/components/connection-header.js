@@ -13,11 +13,11 @@ import { connect2Redux } from "../won-utils.js";
 import { getHumanReadableStringFromMessage } from "../reducers/need-reducer/parse-message.js";
 import {
   selectLastUpdateTime,
-  selectNeedByConnectionUri,
-  selectAllTheirNeeds,
-  selectAllMessagesByConnectionUri,
-  selectUnreadMessagesByConnectionUri,
-} from "../selectors.js";
+  getOwnedNeedByConnectionUri,
+  getNonOwnedNeeds,
+} from "../selectors/general-selectors.js";
+import { getUnreadMessagesByConnectionUri } from "../selectors/message-selectors.js";
+import { getMessagesByConnectionUri } from "../selectors/message-selectors.js";
 import connectionStateModule from "./connection-state.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
@@ -89,17 +89,17 @@ function genComponentConf() {
       this.labels = labels;
       this.WON = won.WON;
       const selectFromState = state => {
-        const ownNeed = selectNeedByConnectionUri(state, this.connectionUri);
+        const ownNeed = getOwnedNeedByConnectionUri(state, this.connectionUri);
         const connection =
           ownNeed && ownNeed.getIn(["connections", this.connectionUri]);
         const theirNeed =
           connection &&
-          selectAllTheirNeeds(state).get(connection.get("remoteNeedUri"));
-        const allMessages = selectAllMessagesByConnectionUri(
+          getNonOwnedNeeds(state).get(connection.get("remoteNeedUri"));
+        const allMessages = getMessagesByConnectionUri(
           state,
           this.connectionUri
         );
-        const unreadMessages = selectUnreadMessagesByConnectionUri(
+        const unreadMessages = getUnreadMessagesByConnectionUri(
           state,
           this.connectionUri
         );

@@ -7,7 +7,8 @@ import won from "../won-es6.js";
 import "ng-redux";
 import { labels } from "../won-label-utils.js";
 import { actionCreators } from "../actions/actions.js";
-import { selectAllPosts, selectAllOwnPosts } from "../selectors.js";
+import { getPosts, getOwnedPosts } from "../selectors/general-selectors.js";
+import { getChatConnectionsByNeedUri } from "../selectors/connection-selectors.js";
 
 import { attach, sortByDate } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
@@ -98,21 +99,22 @@ function genComponentConf() {
       this.labels = labels;
 
       const selectFromState = state => {
-        const ownNeeds = selectAllOwnPosts(state);
-        const allNeeds = selectAllPosts(state);
-        const need = ownNeeds && ownNeeds.get(this.needUri);
-        const allConnectionsByNeedUri = need && need.get("connections");
+        const ownedPosts = getOwnedPosts(state);
+        const allPosts = getPosts(state);
+        const ownedPost = ownedPosts && ownedPosts.get(this.needUri);
+        const chatConnectionsByNeedUri =
+          this.needUri && getChatConnectionsByNeedUri(state, this.needUri);
 
         const matches =
-          allConnectionsByNeedUri &&
-          allConnectionsByNeedUri.filter(conn => {
+          chatConnectionsByNeedUri &&
+          chatConnectionsByNeedUri.filter(conn => {
             const remoteNeedUri = conn.get("remoteNeedUri");
             const remoteNeedActiveOrLoading =
               remoteNeedUri &&
-              allNeeds &&
-              allNeeds.get(remoteNeedUri) &&
-              (allNeeds.getIn([remoteNeedUri, "isLoading"]) ||
-                allNeeds.getIn([remoteNeedUri, "state"]) ===
+              allPosts &&
+              allPosts.get(remoteNeedUri) &&
+              (allPosts.getIn([remoteNeedUri, "isLoading"]) ||
+                allPosts.getIn([remoteNeedUri, "state"]) ===
                   won.WON.ActiveCompacted);
 
             return (
@@ -121,15 +123,15 @@ function genComponentConf() {
             );
           });
         const connected =
-          allConnectionsByNeedUri &&
-          allConnectionsByNeedUri.filter(conn => {
+          chatConnectionsByNeedUri &&
+          chatConnectionsByNeedUri.filter(conn => {
             const remoteNeedUri = conn.get("remoteNeedUri");
             const remoteNeedActiveOrLoading =
               remoteNeedUri &&
-              allNeeds &&
-              allNeeds.get(remoteNeedUri) &&
-              (allNeeds.getIn([remoteNeedUri, "isLoading"]) ||
-                allNeeds.getIn([remoteNeedUri, "state"]) ===
+              allPosts &&
+              allPosts.get(remoteNeedUri) &&
+              (allPosts.getIn([remoteNeedUri, "isLoading"]) ||
+                allPosts.getIn([remoteNeedUri, "state"]) ===
                   won.WON.ActiveCompacted);
 
             return (
@@ -152,7 +154,7 @@ function genComponentConf() {
 
         return {
           WON: won.WON,
-          need,
+          ownedPost,
           unreadCountSum: unreadCountSum > 0 ? unreadCountSum : undefined,
           unreadConnectedCount:
             unreadConnectedCount > 0 ? unreadConnectedCount : undefined,
@@ -169,7 +171,7 @@ function genComponentConf() {
     }
 
     isLoading() {
-      return !this.need || this.need.get("isLoading");
+      return !this.ownedPost || this.ownedPost.get("isLoading");
     }
 
     /**

@@ -5,7 +5,7 @@ import angular from "angular";
 import { attach } from "../utils.js";
 import { labels } from "../won-label-utils.js";
 import { connect2Redux } from "../won-utils.js";
-import { selectOpenPostUri } from "../selectors.js";
+import { getPostUriFromRoute } from "../selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";
 
 import "style/_visitor-title-bar.scss";
@@ -36,7 +36,7 @@ function genComponentConf() {
       this.labels = labels;
       window.vtb4dbg = this;
       const selectFromState = state => {
-        const postUri = selectOpenPostUri(state);
+        const postUri = getPostUriFromRoute(state);
         const post = state.getIn(["needs", postUri]);
         return {
           postUri,

@@ -97,20 +97,6 @@ export function leafletBounds(location) {
   }
 }
 
-export function selectTimestamp(event) {
-  /*
-     * the "outer" event is from our own event
-     * container. The receivedTimestamp there
-     * should have been placed by our own node.
-     *
-     * The error are events that haven't
-     * been confirmed yet. They don't have a
-     * received timestamp, as these are optimistic
-     * assumptions with only sent timestamps.
-     */
-  return event.get("hasReceivedTimestamp") || event.get("hasSentTimestamp");
-}
-
 /**
  * Makes sure the select-statement is reevaluated, should
  * one of the watched fields change.
@@ -126,11 +112,7 @@ export function selectTimestamp(event) {
  * @returns {*}
  * @returns a function to unregister the watch
  */
-export function reduxSelectDependsOnProperties(
-  properties,
-  selectFromState,
-  ctrl
-) {
+function reduxSelectDependsOnProperties(properties, selectFromState, ctrl) {
   const firstVals = properties.map(p => getIn(ctrl.$scope, p.split(".")));
   let firstTime = true;
   return ctrl.$scope.$watchGroup(properties, (newVals, oldVals) => {
@@ -713,9 +695,4 @@ export function generatePngQrCode(link) {
 export function generateBase64PngQrCode(link) {
   const pngQrCode = generatePngQrCode(link);
   return pngQrCode && btoa(String.fromCharCode.apply(null, pngQrCode));
-}
-
-export function generateBase64SvgQrCode(link) {
-  const svgQrCode = generateSvgQrCode(link);
-  return svgQrCode && btoa(svgQrCode);
 }
