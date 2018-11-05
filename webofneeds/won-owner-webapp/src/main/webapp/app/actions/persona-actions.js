@@ -53,3 +53,10 @@ export function createPersona(persona, nodeUri) {
     });
   };
 }
+
+export function reviewPersona(ownedPersonaUri, foreignPersonaUri, review) {
+  return (dispatch, getState) => {
+    review;
+    getState;
+  };
+}
