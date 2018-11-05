@@ -32,7 +32,7 @@ import {
   getOwnedClosedPosts,
   getOwnedOpenPosts,
 } from "../selectors/general-selectors.js";
-import { getOwnedPostConnectionsToCrawl } from "../selectors/connection-selectors.js";
+import { getChatConnectionsToCrawl } from "../selectors/connection-selectors.js";
 
 const serviceDependencies = ["$ngRedux", "$scope"];
 function genComponentConf() {
@@ -214,7 +214,7 @@ function genComponentConf() {
         // needs that have been created but are not confirmed by the server yet
         const beingCreatedNeeds = getOwnedNeedsInCreation(state);
 
-        const connectionsToCrawl = getOwnedPostConnectionsToCrawl(state);
+        const connectionsToCrawl = getChatConnectionsToCrawl(state);
 
         const routerParams = getRouterParams(state);
         const useCase = get(routerParams, "useCase");

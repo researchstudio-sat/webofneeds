@@ -38,17 +38,22 @@ export function getOwnedConnectionUris(state) {
 }
 
 /**
- * TODO: REFACTOR THE METHOD/METHODNAME this method returns all the connections that need to be crawled (all chatconnections basically)
  * @param state
  * @returns {Immutable.Map|*}
  */
-export function getOwnedPostConnectionsToCrawl(state) {
+export function getChatConnectionsToCrawl(state) {
   const needs = getOwnedPosts(state); //we only check own posts as these are the only ones who have connections stored
   const allConnections =
     needs && needs.flatMap(need => need.get("connections"));
-  const connectionsInStateConnected =
+  const chatConnections =
     allConnections &&
-    allConnections.filter(conn => conn.get("state") === won.WON.Connected);
+    allConnections.filter(
+      conn => conn.get("facet") === won.WON.ChatFacetCompacted
+    );
+
+  const connectionsInStateConnected =
+    chatConnections &&
+    chatConnections.filter(conn => conn.get("state") === won.WON.Connected);
 
   const connectionsWithoutConnectMessage =
     connectionsInStateConnected &&
