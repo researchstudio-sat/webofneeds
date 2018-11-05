@@ -23,7 +23,7 @@ import { actionCreators } from "../actions/actions.js";
 import "style/_connections-overview.scss";
 
 import {
-  selectRouterParams,
+  getRouterParams,
   getOwnedNeedByConnectionUri,
   getOwnedNeedsInCreation,
   selectOpenConnectionUri,
@@ -218,7 +218,7 @@ function genComponentConf() {
           state
         );
 
-        const routerParams = selectRouterParams(state);
+        const routerParams = getRouterParams(state);
         const useCase = get(routerParams, "useCase");
         const useCaseGroup = get(routerParams, "useCaseGroup");
         const connUriInRoute = selectOpenConnectionUri(state);

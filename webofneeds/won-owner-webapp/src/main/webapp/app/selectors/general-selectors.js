@@ -10,7 +10,7 @@ import { decodeUriComponentProperly, getIn } from "../utils.js";
 import Color from "color";
 
 export const selectLastUpdateTime = state => state.get("lastUpdateTime");
-export const selectRouterParams = state =>
+export const getRouterParams = state =>
   getIn(state, ["router", "currentParams"]);
 
 export const getNeeds = state => state.get("needs");
@@ -83,7 +83,7 @@ export function getOwnedNeedByConnectionUri(state, connectionUri) {
 }
 
 export const selectOpenConnectionUri = createSelector(
-  selectRouterParams,
+  getRouterParams,
   routerParams => {
     //de-escaping is lost in transpiling if not done in two steps :|
     const openConnectionUri = decodeUriComponentProperly(
@@ -128,6 +128,7 @@ export function getOwnedPersonas(state) {
   });
 }
 
+//TODO: move this method to a place that makes more sense, its not really a selector function
 export function currentSkin() {
   const style = getComputedStyle(document.body);
   const getColor = name => {
