@@ -95,8 +95,8 @@ function genComponentConf() {
             </div>
             <won-post-content-message
               class="won-cm--left"
-              ng-if="self.showChatData && !self.multiSelectType && self.theirNeedUri"
-              post-uri="self.theirNeedUri">
+              ng-if="self.showChatData && !self.multiSelectType && self.nonOwnedNeedUri"
+              post-uri="self.nonOwnedNeedUri">
             </won-post-content-message>
             <div class="pm__content__loadspinner"
                 ng-if="self.isLoadingMessages || (self.showAgreementData && self.isLoadingAgreementData) || (self.showPetriNetData && self.isLoadingPetriNetData && !self.hasPetriNetData)">
@@ -256,12 +256,13 @@ function genComponentConf() {
 
       const selectFromState = state => {
         const connectionUri = getConnectionUriFromRoute(state);
-        const ownNeed = getOwnedNeedByConnectionUri(state, connectionUri);
+        const ownedNeed = getOwnedNeedByConnectionUri(state, connectionUri);
         const connection =
-          ownNeed && ownNeed.getIn(["connections", connectionUri]);
+          ownedNeed && ownedNeed.getIn(["connections", connectionUri]);
 
-        const theirNeedUri = connection && connection.get("remoteNeedUri");
-        const theirNeed = theirNeedUri && state.getIn(["needs", theirNeedUri]);
+        const nonOwnedNeedUri = connection && connection.get("remoteNeedUri");
+        const nonOwnedNeed =
+          nonOwnedNeedUri && state.getIn(["needs", nonOwnedNeedUri]);
         const chatMessages =
           connection &&
           connection.get("messages") &&
@@ -310,9 +311,9 @@ function genComponentConf() {
           chatMessages.filter(msg => !msg.get("isMessageStatusUpToDate"));
 
         return {
-          ownNeed,
-          theirNeed,
-          theirNeedUri,
+          ownedNeed,
+          nonOwnedNeed,
+          nonOwnedNeedUri,
           connectionUri,
           connection,
 
@@ -398,10 +399,10 @@ function genComponentConf() {
     isLoading() {
       return (
         !this.connection ||
-        !this.theirNeed ||
-        !this.ownNeed ||
-        this.ownNeed.get("isLoading") ||
-        this.theirNeed.get("isLoading") ||
+        !this.nonOwnedNeed ||
+        !this.ownedNeed ||
+        this.ownedNeed.get("isLoading") ||
+        this.nonOwnedNeed.get("isLoading") ||
         this.connection.get("isLoading")
       );
     }
@@ -633,7 +634,7 @@ function genComponentConf() {
             this.messages__updateMessageStatus({
               messageUri: msgUri,
               connectionUri: this.connectionUri,
-              needUri: this.ownNeed.get("uri"),
+              needUri: this.ownedNeed.get("uri"),
               messageStatus: messageStatus,
             });
           });
@@ -742,7 +743,7 @@ function genComponentConf() {
     }
 
     addMessageToState(eventUri, key) {
-      const ownNeedUri = this.ownNeed.get("uri");
+      const ownNeedUri = this.ownedNeed.get("uri");
       return fetchMessage(ownNeedUri, eventUri).then(response => {
         won.wonMessageFromJsonLd(response).then(msg => {
           if (msg.isFromOwner() && msg.getReceiverNeed() === ownNeedUri) {
@@ -766,8 +767,9 @@ function genComponentConf() {
 
     sendRequest(message) {
       const isOwnNeedWhatsX =
-        this.ownNeed &&
-        (this.ownNeed.get("isWhatsAround") || this.ownNeed.get("isWhatsNew"));
+        this.ownedNeed &&
+        (this.ownedNeed.get("isWhatsAround") ||
+          this.ownedNeed.get("isWhatsNew"));
 
       if (!this.connection || isOwnNeedWhatsX) {
         this.router__stateGoResetParams("connections");
@@ -777,16 +779,16 @@ function genComponentConf() {
           this.connections__close(this.connectionUri);
         }
 
-        if (this.theirNeedUri) {
-          this.connections__connectAdHoc(this.theirNeedUri, message);
+        if (this.nonOwnedNeedUri) {
+          this.connections__connectAdHoc(this.nonOwnedNeedUri, message);
         }
 
         //this.router__stateGoCurrent({connectionUri: null, sendAdHocRequest: null});
       } else {
         this.needs__connect(
-          this.ownNeed.get("uri"),
+          this.ownedNeed.get("uri"),
           this.connectionUri,
-          this.theirNeedUri,
+          this.nonOwnedNeedUri,
           message
         );
         this.router__stateGoCurrent({ connectionUri: this.connectionUri });
@@ -804,7 +806,7 @@ function genComponentConf() {
       this.messages__viewState__markAsSelected({
         messageUri: msg.get("uri"),
         connectionUri: this.connection.get("uri"),
-        needUri: this.ownNeed.get("uri"),
+        needUri: this.ownedNeed.get("uri"),
         isSelected: !selected,
       });
     }
