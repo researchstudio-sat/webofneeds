@@ -13,7 +13,7 @@ import combinedMessageContentModule from "./combined-message-content.js";
 import { connect2Redux } from "../../won-utils.js";
 import { attach, getIn } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
-import { selectNeedByConnectionUri } from "../../selectors.js";
+import { selectNeedByConnectionUri } from "../../selectors/selectors.js";
 import {
   isMessageProposable,
   isMessageClaimable,

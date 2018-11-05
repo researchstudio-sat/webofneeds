@@ -1,7 +1,7 @@
 import angular from "angular";
 import { Elm } from "../../elm/PublishButton.elm";
 import "./svg-icon.js";
-import { getPersonas, currentSkin } from "../selectors";
+import { getPersonas, currentSkin } from "../selectors/selectors";
 
 function genComponentConf($ngRedux) {
   return {

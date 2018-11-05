@@ -9,7 +9,7 @@ import { accountLogin } from "./actions/account-actions.js";
 
 import { privateId2Credentials } from "./won-utils.js";
 
-import { selectAllNeeds } from "./selectors.js";
+import { selectAllNeeds } from "./selectors/selectors.js";
 
 import {
   decodeUriComponentProperly,

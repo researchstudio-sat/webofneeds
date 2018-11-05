@@ -11,7 +11,7 @@ import { attach } from "../utils.js";
 import won from "../won-es6.js";
 import { labels } from "../won-label-utils.js";
 import { connect2Redux } from "../won-utils.js";
-import { selectOpenConnectionUri } from "../selectors.js";
+import { selectOpenConnectionUri } from "../selectors/selectors.js";
 import { actionCreators } from "../actions/actions.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 

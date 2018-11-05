@@ -22,7 +22,7 @@ import {
   selectProposableMessagesByConnectionUri,
   selectClaimableMessagesByConnectionUri,
   selectSelectedMessagesByConnectionUri,
-} from "../selectors.js";
+} from "../selectors/selectors.js";
 import { getAllMessageDetails } from "../won-utils.js";
 import autoresizingTextareaModule from "../directives/textarea-autogrow.js";
 import { actionCreators } from "../actions/actions.js";

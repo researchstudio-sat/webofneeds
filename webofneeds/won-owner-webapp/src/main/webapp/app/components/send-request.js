@@ -5,7 +5,10 @@ import postContentModule from "./post-content.js";
 import chatTextFieldSimpleModule from "./chat-textfield-simple.js";
 import connectionContextDropdownModule from "./connection-context-dropdown.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
-import { selectOpenPostUri, selectNeedByConnectionUri } from "../selectors.js";
+import {
+  selectOpenPostUri,
+  selectNeedByConnectionUri,
+} from "../selectors/selectors.js";
 import { connect2Redux } from "../won-utils.js";
 import { attach, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";

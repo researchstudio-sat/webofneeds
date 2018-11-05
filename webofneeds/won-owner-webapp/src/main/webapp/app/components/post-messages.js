@@ -24,7 +24,7 @@ import {
   selectCancellationPendingMessagesByConnectionUri,
   selectProposalMessagesByConnectionUri,
   selectUnreadMessagesByConnectionUri,
-} from "../selectors.js";
+} from "../selectors/selectors.js";
 import autoresizingTextareaModule from "../directives/textarea-autogrow.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 

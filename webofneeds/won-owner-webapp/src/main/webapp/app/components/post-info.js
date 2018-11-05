@@ -8,7 +8,7 @@ import postContextDropdownModule from "./post-context-dropdown.js";
 import postContentModule from "./post-content.js";
 import { attach } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
-import { selectOpenPostUri } from "../selectors.js";
+import { selectOpenPostUri } from "../selectors/selectors.js";
 import { actionCreators } from "../actions/actions.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 

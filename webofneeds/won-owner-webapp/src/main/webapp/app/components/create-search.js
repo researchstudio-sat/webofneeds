@@ -10,7 +10,7 @@ import matchingContextModule from "./details/picker/matching-context-picker.js";
 import { getIn, attach, delay } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
-import { selectIsConnected } from "../selectors.js";
+import { selectIsConnected } from "../selectors/selectors.js";
 
 //TODO can't inject $scope with the angular2-router, preventing redux-cleanup
 const serviceDependencies = [

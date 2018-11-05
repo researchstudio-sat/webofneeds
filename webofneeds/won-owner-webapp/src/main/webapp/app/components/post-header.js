@@ -9,7 +9,7 @@ import { actionCreators } from "../actions/actions.js";
 import { labels, relativeTime } from "../won-label-utils.js";
 import { attach } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
-import { selectLastUpdateTime } from "../selectors.js";
+import { selectLastUpdateTime } from "../selectors/selectors.js";
 import won from "../won-es6.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 

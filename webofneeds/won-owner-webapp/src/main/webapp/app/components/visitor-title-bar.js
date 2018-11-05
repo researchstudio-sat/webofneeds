@@ -5,7 +5,7 @@ import angular from "angular";
 import { attach } from "../utils.js";
 import { labels } from "../won-label-utils.js";
 import { connect2Redux } from "../won-utils.js";
-import { selectOpenPostUri } from "../selectors.js";
+import { selectOpenPostUri } from "../selectors/selectors.js";
 import { actionCreators } from "../actions/actions.js";
 
 import "style/_visitor-title-bar.scss";

@@ -15,10 +15,10 @@ import {
   isMessageProposal,
   isMessageClaim,
   isMessageUnread,
-} from "./message-utils.js";
+} from "../message-utils.js";
 import Immutable from "immutable";
-import won from "./won-es6.js";
-import { decodeUriComponentProperly, getIn } from "./utils.js";
+import won from "../won-es6.js";
+import { decodeUriComponentProperly, getIn } from "../utils.js";
 import Color from "color";
 
 export const selectLastUpdateTime = state => state.get("lastUpdateTime");

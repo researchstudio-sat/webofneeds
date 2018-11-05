@@ -10,7 +10,7 @@ import { attach } from "../utils.js";
 import {
   selectOpenConnectionUri,
   selectNeedByConnectionUri,
-} from "../selectors.js";
+} from "../selectors/selectors.js";
 import { connect2Redux } from "../won-utils.js";
 
 import "style/_context-dropdown.scss";
