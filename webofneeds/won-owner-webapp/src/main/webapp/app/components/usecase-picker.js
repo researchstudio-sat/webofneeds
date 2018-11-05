@@ -175,7 +175,7 @@ function genComponentConf() {
           useCase: encodeURIComponent(selectedUseCaseIdentifier),
         });
       } else {
-        console.log(
+        console.warn(
           "No usecase identifier found for given usecase, ",
           selectedUseCase
         );
@@ -191,7 +191,7 @@ function genComponentConf() {
           useCaseGroup: encodeURIComponent(selectedGroupIdentifier),
         });
       } else {
-        console.log(
+        console.warn(
           "No identifier found for given usecase group, ",
           selectedUseCaseGroup
         );

@@ -26,8 +26,6 @@ export function addConnectionFull(state, connection) {
   let parsedConnection = parseConnection(connection);
 
   if (parsedConnection) {
-    // console.log("parsedConnection: ", parsedConnection.toJS(), "immutable", parsedConnection);
-
     const needUri = parsedConnection.get("belongsToUri");
     const need = state.get(needUri);
 
@@ -41,7 +39,7 @@ export function addConnectionFull(state, connection) {
 
       if (realFacet === won.WON.HolderFacetCompacted) {
         const holdsUri = parsedConnection.getIn(["data", "remoteNeedUri"]);
-        console.log(
+        console.debug(
           "Handling a holderFacet-connection within need: ",
           needUri,
           " setting holds to holdsUri: ",
@@ -59,7 +57,7 @@ export function addConnectionFull(state, connection) {
       } else if (realFacet === won.WON.HoldableFacetCompacted) {
         //holdableFacet Connection from need to persona -> need to add heldBy remoteNeedUri to the need
         const heldByUri = parsedConnection.getIn(["data", "remoteNeedUri"]);
-        console.log(
+        console.debug(
           "Handling a holdableFacet-connection within need: ",
           needUri,
           " setting heldBy to heldByUri: ",
@@ -92,8 +90,8 @@ export function addConnectionFull(state, connection) {
         parsedConnection.get("data")
       );
     } else {
-      console.warn(
-        "Couldnt add valid connection - missing need data in state",
+      console.error(
+        "Couldn't add valid connection - missing need data in state",
         needUri,
         "parsedConnection: ",
         parsedConnection.toJS()
@@ -111,7 +109,7 @@ export function markConnectionAsRead(state, connectionUri, needUri) {
 
   if (!connection) {
     console.error(
-      "no connection with connectionUri: <",
+      "No connection with connectionUri: <",
       connectionUri,
       "> found within needUri: <",
       needUri,
@@ -143,7 +141,7 @@ export function setConnectionLoadingMessages(
 
   if (!connection) {
     console.error(
-      "no connection with connectionUri: <",
+      "No connection with connectionUri: <",
       connectionUri,
       "> found within needUri: <",
       needUri,
@@ -169,7 +167,7 @@ export function setConnectionLoadingAgreementData(
 
   if (!connection) {
     console.error(
-      "no connection with connectionUri: <",
+      "No connection with connectionUri: <",
       connectionUri,
       "> found within needUri: <",
       needUri,
@@ -195,7 +193,7 @@ export function setConnectionLoadingPetriNetData(
 
   if (!connection) {
     console.error(
-      "no connection with connectionUri: <",
+      "No connection with connectionUri: <",
       connectionUri,
       "> found within needUri: <",
       needUri,
@@ -226,7 +224,7 @@ export function setPetriNetDataDirty(
 
   if (!connection) {
     console.error(
-      "no connection with connectionUri: <",
+      "No connection with connectionUri: <",
       connectionUri,
       "> found within needUri: <",
       needUri,
@@ -247,7 +245,7 @@ export function markConnectionAsRated(state, connectionUri) {
 
   if (!connection) {
     console.error(
-      "no connection with connectionUri: <",
+      "No connection with connectionUri: <",
       connectionUri,
       "> found within needUri: <",
       need && need.get("uri"),
@@ -476,7 +474,7 @@ export function addActiveConnectionsToNeedInLoading(state, needUri, connUris) {
   needUri &&
     connUris &&
     connUris.size > 0 &&
-    console.log("addActiveConnectionsToNeedInLoading: ", connUris);
+    console.debug("addActiveConnectionsToNeedInLoading: ", connUris);
   let newState = state;
   needUri &&
     connUris &&

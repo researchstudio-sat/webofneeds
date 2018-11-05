@@ -108,7 +108,6 @@ export const configRouting = [
 ];
 
 function postViewEnsureLoaded(dispatch, getState, encodedPostUri) {
-  //console.log('in postViewEnsureLoaded');
   const postUri = decodeUriComponentProperly(encodedPostUri);
   const state = getState();
 
@@ -133,7 +132,7 @@ function postViewEnsureLoaded(dispatch, getState, encodedPostUri) {
         })
       )
       .catch(error => {
-        console.log(
+        console.error(
           `Failed to load need ${postUri}.`,
           `Reverting to previous router-state.`,
           `Error: `,
@@ -270,7 +269,7 @@ function reactToPrivateIdChanges(
 
   const { email } = toPrivateId ? privateId2Credentials(toPrivateId) : {};
   if (state.get("loginInProcessFor")) {
-    console.info(
+    console.debug(
       "There's already a login in process with the email " +
         email +
         " derived from the privateId " +

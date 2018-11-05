@@ -1140,7 +1140,7 @@ WonMessage.prototype = {
         elem => !elem["@id"].startsWith(encapsulatingMessageUri)
       );
 
-      /*console.log(
+      /*console.debug(
         "WonMessage\n",
         this,
         "\nforwardedMessageUris:\n",

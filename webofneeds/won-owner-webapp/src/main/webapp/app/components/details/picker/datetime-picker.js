@@ -140,7 +140,6 @@ function genComponentConf() {
     }
 
     currentDatetime() {
-      // console.log("currentDateTime");
       if (this.setDatetime(new Date())) {
         this.update(this.addedDatetime);
       }

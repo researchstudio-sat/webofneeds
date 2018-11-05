@@ -58,7 +58,7 @@ async function loadDefaultNodeUri() {
       const defaultNodeUri = `${location.protocol}://${
         location.host
       }/won/resource`;
-      console.info(
+      console.warn(
         "Failed to fetch default node uri at the relative path `",
         "appConfig/getDefaultWonNodeUri",
         "` (is the API endpoint there up and reachable?) -> falling back to the default ",

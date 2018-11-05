@@ -54,7 +54,6 @@ function genComponentConf() {
     }
 
     updateWorkflow(file) {
-      console.log("called updateWorkflow: ", file);
       this.addedWorkflow = file;
       this.update(this.addedWorkflow);
       this.$scope.$apply();

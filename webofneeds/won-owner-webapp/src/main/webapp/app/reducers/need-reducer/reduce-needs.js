@@ -58,7 +58,7 @@ export function addNeed(needs, jsonldNeed, ownNeed) {
 }
 
 export function addNeedInLoading(needs, needUri, state, ownNeed) {
-  console.log("addNeedInLoading: ", needUri);
+  console.debug("addNeedInLoading: ", needUri);
   const oldNeed = needs.get(needUri);
   if (oldNeed && !oldNeed.get("isLoading")) {
     return needs;
@@ -94,7 +94,7 @@ export function addTheirNeedInLoading(needs, needUri) {
 export function addOwnActiveNeedsInLoading(needs, needUris) {
   needUris &&
     needUris.size > 0 &&
-    console.log("addOwnActiveNeedsInLoading: ", needUris);
+    console.debug("addOwnActiveNeedsInLoading: ", needUris);
   let newState = needs;
   needUris &&
     needUris.forEach(needUri => {
@@ -111,7 +111,7 @@ export function addOwnActiveNeedsInLoading(needs, needUris) {
 export function addOwnInactiveNeedsInLoading(needs, needUris) {
   needUris &&
     needUris.size > 0 &&
-    console.log("addOwnInactiveNeedsInLoading: ", needUris);
+    console.debug("addOwnInactiveNeedsInLoading: ", needUris);
   let newState = needs;
   needUris &&
     needUris.forEach(needUri => {
@@ -128,7 +128,7 @@ export function addOwnInactiveNeedsInLoading(needs, needUris) {
 export function addTheirNeedsInLoading(needs, needUris) {
   needUris &&
     needUris.size > 0 &&
-    console.log("addOwnInactiveNeedsInLoading: ", needUris);
+    console.debug("addOwnInactiveNeedsInLoading: ", needUris);
   let newState = needs;
   needUris &&
     needUris.forEach(needUri => {
@@ -140,7 +140,7 @@ export function addTheirNeedsInLoading(needs, needUris) {
 export function addOwnInactiveNeedsToLoad(needs, needUris) {
   needUris &&
     needUris.size > 0 &&
-    console.log("addOwnInactiveNeedsToLoad: ", needUris);
+    console.debug("addOwnInactiveNeedsToLoad: ", needUris);
   let newState = needs;
   needUris &&
     needUris.forEach(needUri => {
@@ -155,7 +155,7 @@ export function addOwnInactiveNeedsToLoad(needs, needUris) {
 }
 
 export function addNeedToLoad(needs, needUri, state, ownNeed) {
-  console.log("addNeedToLoad: ", needUri);
+  console.debug("addNeedToLoad: ", needUri);
   if (needs.get(needUri)) {
     return needs;
   } else {
@@ -189,7 +189,6 @@ export function addNeedInCreation(needs, needInCreation, needUri) {
         ? won.WON.BasicNeedTypeCombinedCompacted
         : won.WON.BasicNeedTypeSupplyCompacted;
       title = need.getIn(["is", "title"]);
-      console.log("is title: ", title);
     }
 
     if (need.get("seeks")) {
@@ -197,7 +196,6 @@ export function addNeedInCreation(needs, needInCreation, needUri) {
         ? won.WON.BasicNeedTypeCombinedCompacted
         : won.WON.BasicNeedTypeDemandCompacted;
       title = need.getIn(["seeks", "title"]);
-      console.log("seeks title: ", title);
     }
 
     need = need.set("type", type);
@@ -220,7 +218,7 @@ export function addNeedInCreation(needs, needInCreation, needUri) {
     need = need.set("isWhatsNew", isWhatsNew);
 
     newState = needs.setIn([needUri], need);
-    console.log("need-reducer create new need: ", need.toJS());
+    console.debug("need-reducer create new need: ", need.toJS());
   } else {
     console.error("Tried to add invalid need-object: ", needInCreation);
     newState = needs;
@@ -244,7 +242,7 @@ export function markNeedAsRead(state, needUri) {
   const need = state.get(needUri);
 
   if (!need) {
-    console.error("no need with needUri: <", needUri, ">");
+    console.error("No need with needUri: <", needUri, ">");
     return state;
   }
   return state.setIn([needUri, "unread"], false);

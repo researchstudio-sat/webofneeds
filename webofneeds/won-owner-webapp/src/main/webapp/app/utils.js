@@ -439,7 +439,6 @@ export function urisToLookupMap(uris, asyncLookupFunction, excludeUris = []) {
     if (exclude) {
       return true;
     } else {
-      console.log(uri, "closed, ommit further crawl for this uri");
       return false;
     }
   });
@@ -1233,20 +1232,6 @@ export function generateRgbColorArray(text) {
   return colorArray;
 }
 
-export function generateTitleCharacter(title) {
-  if (title) {
-    try {
-      return title.charAt(0).toUpperCase();
-    } catch (err) {
-      //for resilience purposes, since we can't be sure whether a need is a string or anything else
-      console.warn("Title Character could not be retrieved from: ", title);
-      return "?";
-    }
-  } else {
-    return "?";
-  }
-}
-
 /**
  * Returns the URL if it's already absolute,
  * otherwise prepends window.location.origin.
@@ -1322,7 +1307,7 @@ export function findAllFieldOccurancesRecursively(fieldName, obj, _acc = []) {
   }
   if (obj["@type"] === fieldName && obj["@value"]) {
     _acc.push(obj["@value"]);
-    console.log(
+    console.debug(
       'obj["@type"] is ',
       fieldName,
       " and value present push value to _acc",

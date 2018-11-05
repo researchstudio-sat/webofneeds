@@ -5,7 +5,6 @@ import { isUriRead } from "../../won-localstorage.js";
 
 export function parseConnection(jsonldConnection) {
   const jsonldConnectionImm = Immutable.fromJS(jsonldConnection);
-  // console.log("Connection to parse: ", jsonldConnectionImm.toJS());
 
   let parsedConnection = {
     belongsToUri: undefined,

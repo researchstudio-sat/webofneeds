@@ -65,7 +65,6 @@ function genComponentConf() {
     }
 
     updateFiles(file) {
-      console.log("called updateFiles: ", file);
       if (!this.addedFiles) {
         this.addedFiles = [];
       }
@@ -75,7 +74,6 @@ function genComponentConf() {
     }
 
     removeFile(fileToRemove) {
-      console.log("Removing file: " + fileToRemove);
       if (!this.addedFiles) {
         this.addedFiles = [];
       }

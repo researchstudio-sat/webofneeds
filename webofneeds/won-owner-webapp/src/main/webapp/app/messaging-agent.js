@@ -393,15 +393,13 @@ export function runMessagingAgent(redux) {
             }
             const [eventUri, msg] = firstEntry;
             ws.send(JSON.stringify(msg));
-            //console.log("messaging-agent.js: sent message: " + JSON.stringify(msg));
-
             // move message to next stat ("waitingForAnswer"). Also triggers this watch again as a result.
             redux.dispatch(
               actionCreators.messages__waitingForAnswer({ eventUri, msg })
             );
           }
         } catch (error) {
-          console.log("could not send message due to this error", error);
+          console.error("could not send message due to this error", error);
         }
       }
     };
@@ -418,7 +416,9 @@ export function runMessagingAgent(redux) {
         (newState, oldState) => {
           reconnecting = newState;
           if (!oldState && newState) {
-            console.log("messaging-agent.js: Resetting web-socket connection");
+            console.debug(
+              "messaging-agent.js: Resetting web-socket connection"
+            );
             reconnectAttempts = 0;
             if (ws.readyState !== WebSocket.CLOSED) {
               ws.close(); // a new ws-connection should be opened automatically in onClose
@@ -444,7 +444,7 @@ export function runMessagingAgent(redux) {
 
   function onClose(e) {
     if (e.wasClean) {
-      console.log(
+      console.debug(
         "messaging-agent.js: websocket closed cleanly. reconnectAttempts = ",
         reconnectAttempts
       );

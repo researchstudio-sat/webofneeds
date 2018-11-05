@@ -113,8 +113,6 @@ export function addExistingMessages(state, wonMessages) {
     wonMessages.map(wonMessage => {
       state = addMessage(state, wonMessage, true);
     });
-  } else {
-    console.log("no messages to add");
   }
   return state;
 }
@@ -134,7 +132,7 @@ export function markMessageAsSelected(
 
   if (!message) {
     console.error(
-      "no message with messageUri: <",
+      "No message with messageUri: <",
       messageUri,
       "> found within needUri: <",
       needUri,
@@ -174,7 +172,7 @@ export function markMessageAsCollapsed(
 
   if (!message) {
     console.error(
-      "no message with messageUri: <",
+      "No message with messageUri: <",
       messageUri,
       "> found within needUri: <",
       needUri,
@@ -240,7 +238,7 @@ export function markMessageExpandAllReferences(
 
   if (!message) {
     console.error(
-      "no message with messageUri: <",
+      "No message with messageUri: <",
       messageUri,
       "> found within needUri: <",
       needUri,
@@ -263,7 +261,7 @@ export function markMessageExpandAllReferences(
 
   if (!expandedReferences) {
     console.error(
-      "no expandedReferences found within messageUri: <",
+      "No expandedReferences found within messageUri: <",
       messageUri,
       "> found within needUri: <",
       needUri,
@@ -312,7 +310,7 @@ export function markMessageExpandReferences(
 
   if (!message) {
     console.error(
-      "no message with messageUri: <",
+      "No message with messageUri: <",
       messageUri,
       "> found within needUri: <",
       needUri,
@@ -353,7 +351,7 @@ export function markMessageShowActions(
 
   if (!message) {
     console.error(
-      "no message with messageUri: <",
+      "No message with messageUri: <",
       messageUri,
       "> found within needUri: <",
       needUri,
@@ -387,7 +385,7 @@ export function markMessageAsRead(state, messageUri, connectionUri, needUri) {
 
   if (!message) {
     console.error(
-      "no message with messageUri: <",
+      "No message with messageUri: <",
       messageUri,
       "> found within needUri: <",
       needUri,
@@ -444,7 +442,7 @@ export function markMessageAsRejected(
 
   if (!message) {
     console.error(
-      "no message with messageUri: <",
+      "No message with messageUri: <",
       messageUri,
       "> found within needUri: <",
       needUri,
@@ -554,7 +552,7 @@ export function markMessageAsRetracted(
 
   if (!message) {
     console.error(
-      "no message with messageUri: <",
+      "No message with messageUri: <",
       messageUri,
       "> found within needUri: <",
       needUri,
@@ -661,7 +659,7 @@ export function markMessageAsClaimed(
 
   if (!message) {
     console.error(
-      "no message with messageUri: <",
+      "No message with messageUri: <",
       messageUri,
       "> found within needUri: <",
       needUri,
@@ -716,7 +714,7 @@ export function markMessageAsProposed(
 
   if (!message) {
     console.error(
-      "no message with messageUri: <",
+      "No message with messageUri: <",
       messageUri,
       "> found within needUri: <",
       needUri,
@@ -763,7 +761,7 @@ export function markMessageAsAccepted(
 
   if (!message) {
     console.error(
-      "no message with messageUri: <",
+      "No message with messageUri: <",
       messageUri,
       "> found within needUri: <",
       needUri,
@@ -850,7 +848,7 @@ export function markMessageAsCancelled(
 
   if (!message) {
     console.error(
-      "no message with messageUri: <",
+      "No message with messageUri: <",
       messageUri,
       "> found within needUri: <",
       needUri,
@@ -914,7 +912,7 @@ export function markMessageAsCancellationPending(
 
   if (!message) {
     console.error(
-      "no message with messageUri: <",
+      "No message with messageUri: <",
       messageUri,
       "> found within needUri: <",
       needUri,
@@ -961,7 +959,7 @@ export function updateMessageStatus(
 
   if (!message) {
     console.error(
-      "no message with messageUri: <",
+      "No message with messageUri: <",
       messageUri,
       "> found within needUri: <",
       needUri,

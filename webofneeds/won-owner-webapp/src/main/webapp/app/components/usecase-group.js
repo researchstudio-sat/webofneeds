@@ -121,7 +121,7 @@ function genComponentConf() {
           useCase: encodeURIComponent(selectedUseCaseIdentifier),
         });
       } else {
-        console.log(
+        console.warn(
           "No usecase identifier found for given usecase, ",
           selectedUseCase
         );

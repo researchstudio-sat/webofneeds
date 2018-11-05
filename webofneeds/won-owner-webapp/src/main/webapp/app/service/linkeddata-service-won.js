@@ -307,12 +307,10 @@ import won from "./won.js";
     const entry = privateData.cacheStatus[uri];
     if (typeof entry === "undefined") {
       const message = "Trying to mark unloaded uri " + uri + " as accessed";
-      //console.error(message);
       throw { message };
     } else if (entry.state === CACHE_ITEM_STATE.DIRTY) {
       const message =
         "Trying to mark uri " + uri + " as accessed, but it is already dirty";
-      //console.error(message);
       throw { message };
     }
     privateData.cacheStatus[uri].timestamp = new Date().getTime();
@@ -470,7 +468,6 @@ import won from "./won.js";
     } else {
       // observation: the error happens for #hasRemoteConnection property of suggested connection, but this
       // property is really not there (and should not be), so in that case it's not an error...
-      //console.error(options.message + " " + errorMessage);
       return options.message + " " + errorMessage;
     }
   }
@@ -873,8 +870,6 @@ import won from "./won.js";
             ". jsonld: " +
             JSON.stringify(grouped)
         );
-        //TODO: reactivate error msg
-        //console.error('Error:', error);
       }
     });
 
@@ -2119,8 +2114,6 @@ function groupByGraphs(jsonldData, addDefaultContext = true) {
         " with the following jsonld: \n\n" +
         JSON.stringify(graphWithContext) +
         "\n\n";
-      //TODO: reactivate error msg
-      //console.error(msg);
       return Promise.reject(msg);
     } else {
       /*

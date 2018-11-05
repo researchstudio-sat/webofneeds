@@ -33,7 +33,7 @@ function piwikCall(args) {
     if (tracker) {
       // piwik has loaded, we can properly call functions
       tracker[args[0]].call(tracker, ...args.slice(1));
-      //console.log('piwik.js -- about to call ', args[0], ' with args: ', ...args.slice(1));
+      //console.debug('piwik.js -- about to call ', args[0], ' with args: ', ...args.slice(1));
     } else {
       // push calls to _paq array, that piwik tracker will execute automatically
       // once it loads.

@@ -104,18 +104,6 @@ function genComponentConf() {
     }
 
     connectWithPost() {
-      console.log(
-        "Trying to connect with Post: ",
-        this.content,
-        " postData: ",
-        this.suggestedPost
-      );
-      console.log(
-        "Connect openedOwnPost: ",
-        this.openedOwnPost,
-        " with suggestedPost: ",
-        this.suggestedPost
-      );
       const openedOwnPostUri =
         this.openedOwnPost && this.openedOwnPost.get("uri");
       const suggestedPostUri =

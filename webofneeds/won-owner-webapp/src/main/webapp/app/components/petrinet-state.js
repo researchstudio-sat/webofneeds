@@ -111,7 +111,7 @@ function genComponentConf() {
 
     sendClaim(transitionUri) {
       if (transitionUri && this.processUri && this.connectionUri) {
-        console.log(
+        console.debug(
           "send transition 'claim' ",
           transitionUri,
           " for processUri: ",
