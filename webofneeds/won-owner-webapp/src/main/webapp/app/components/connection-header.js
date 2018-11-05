@@ -14,7 +14,7 @@ import { getHumanReadableStringFromMessage } from "../reducers/need-reducer/pars
 import {
   selectLastUpdateTime,
   selectNeedByConnectionUri,
-  selectAllTheirNeeds,
+  getNonOwnedNeeds,
 } from "../selectors/general-selectors.js";
 import { selectUnreadMessagesByConnectionUri } from "../selectors/message-selectors.js";
 import { selectAllMessagesByConnectionUri } from "../selectors/message-selectors.js";
@@ -94,7 +94,7 @@ function genComponentConf() {
           ownNeed && ownNeed.getIn(["connections", this.connectionUri]);
         const theirNeed =
           connection &&
-          selectAllTheirNeeds(state).get(connection.get("remoteNeedUri"));
+          getNonOwnedNeeds(state).get(connection.get("remoteNeedUri"));
         const allMessages = selectAllMessagesByConnectionUri(
           state,
           this.connectionUri

@@ -16,7 +16,7 @@ export const selectRouterParams = state =>
 export const getNeeds = state => state.get("needs");
 export const getOwnedNeeds = state =>
   getNeeds(state).filter(need => need.get("ownNeed"));
-export const selectAllTheirNeeds = state =>
+export const getNonOwnedNeeds = state =>
   getNeeds(state).filter(need => !need.get("ownNeed"));
 
 export function selectAllPosts(state) {
