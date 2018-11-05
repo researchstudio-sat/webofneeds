@@ -38,36 +38,17 @@ export function getOwnedConnectionUris(state) {
 }
 
 /**
- * Get all post connections stored within your own needs as a map
- * @returns Immutable.Map with all connections
- */
-function getOwnedPostConnections(state) {
-  const needs = getOwnedPosts(state); //we only check own posts as these are the only ones who have connections stored
-  const connections = needs && needs.flatMap(need => need.get("connections"));
-  return connections;
-}
-
-/**
- * Get all connections stored within your own needs as a map with a status of Connected
- * @returns Immutable.Map with all connections
- */
-function selectAllPostConnectionsInStateConnected(state) {
-  const allConnections = getOwnedPostConnections(state);
-  return (
-    allConnections &&
-    allConnections.filter(conn => conn.get("state") === won.WON.Connected)
-  );
-}
-
-/**
  * TODO: REFACTOR THE METHOD/METHODNAME this method returns all the connections that need to be crawled (all chatconnections basically)
  * @param state
  * @returns {Immutable.Map|*}
  */
-export function selectPostConnectionsWithoutConnectMessage(state) {
-  const connectionsInStateConnected = selectAllPostConnectionsInStateConnected(
-    state
-  );
+export function getOwnedPostConnectionsToCrawl(state) {
+  const needs = getOwnedPosts(state); //we only check own posts as these are the only ones who have connections stored
+  const allConnections =
+    needs && needs.flatMap(need => need.get("connections"));
+  const connectionsInStateConnected =
+    allConnections &&
+    allConnections.filter(conn => conn.get("state") === won.WON.Connected);
 
   const connectionsWithoutConnectMessage =
     connectionsInStateConnected &&
