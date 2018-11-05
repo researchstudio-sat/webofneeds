@@ -6,7 +6,7 @@ import chatTextFieldSimpleModule from "./chat-textfield-simple.js";
 import connectionContextDropdownModule from "./connection-context-dropdown.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 import {
-  selectOpenPostUri,
+  getPostUriFromRoute,
   getOwnedNeedByConnectionUri,
 } from "../selectors/general-selectors.js";
 import { connect2Redux } from "../won-utils.js";
@@ -45,7 +45,7 @@ function genComponentConf() {
         const connection =
           ownNeed && ownNeed.getIn(["connections", connectionUri]);
         const postUriToConnectTo = !connection
-          ? selectOpenPostUri(state)
+          ? getPostUriFromRoute(state)
           : connection && connection.get("remoteNeedUri");
 
         const displayedPost = state.getIn(["needs", postUriToConnectTo]);

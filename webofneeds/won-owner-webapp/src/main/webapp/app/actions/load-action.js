@@ -4,7 +4,7 @@
 
 import Immutable from "immutable";
 import { actionTypes, actionCreators } from "./actions.js";
-import { selectOpenPostUri } from "../selectors/general-selectors.js";
+import { getPostUriFromRoute } from "../selectors/general-selectors.js";
 
 import { checkAccessToCurrentRoute } from "../configRouting.js";
 
@@ -125,7 +125,7 @@ function loginSuccess(username, loginStatus, dispatch, getState) {
 function loadingWhileSignedOut(dispatch, getState) {
   let dataPromise;
   const state = getState();
-  const postUri = selectOpenPostUri(state);
+  const postUri = getPostUriFromRoute(state);
   if (postUri && !state.getIn(["needs", postUri])) {
     //got an uri but no post loaded yet
     dataPromise = fetchDataForNonOwnedNeedOnly(postUri);

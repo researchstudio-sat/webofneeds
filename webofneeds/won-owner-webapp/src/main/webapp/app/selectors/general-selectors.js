@@ -98,7 +98,7 @@ export const getConnectionUriFromRoute = createSelector(
   }
 );
 
-export const selectOpenPostUri = createSelector(
+export const getPostUriFromRoute = createSelector(
   state => state,
   state => {
     const encodedPostUri = getIn(state, ["router", "currentParams", "postUri"]);

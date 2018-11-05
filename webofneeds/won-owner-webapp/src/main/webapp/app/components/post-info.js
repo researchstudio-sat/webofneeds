@@ -8,7 +8,7 @@ import postContextDropdownModule from "./post-context-dropdown.js";
 import postContentModule from "./post-content.js";
 import { attach } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
-import { selectOpenPostUri } from "../selectors/general-selectors.js";
+import { getPostUriFromRoute } from "../selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
@@ -56,7 +56,7 @@ function genComponentConf() {
       window.pi4dbg = this;
 
       const selectFromState = state => {
-        const postUri = selectOpenPostUri(state);
+        const postUri = getPostUriFromRoute(state);
         const post = state.getIn(["needs", postUri]);
 
         return {
