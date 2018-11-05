@@ -14,7 +14,7 @@ export const selectRouterParams = state =>
   getIn(state, ["router", "currentParams"]);
 
 export const getNeeds = state => state.get("needs");
-export const selectAllOwnNeeds = state =>
+export const getOwnNeeds = state =>
   getNeeds(state).filter(need => need.get("ownNeed"));
 export const selectAllTheirNeeds = state =>
   getNeeds(state).filter(need => !need.get("ownNeed"));
@@ -32,7 +32,7 @@ export const selectAllOwnPosts = state =>
   selectAllPosts(state).filter(need => need.get("ownNeed"));
 
 export function selectOpenNeeds(state) {
-  const allOwnNeeds = selectAllOwnNeeds(state);
+  const allOwnNeeds = getOwnNeeds(state);
   return (
     allOwnNeeds &&
     allOwnNeeds.filter(post => post.get("state") === won.WON.ActiveCompacted)
@@ -56,7 +56,7 @@ export function selectAllOpenPosts(state) {
 }
 
 export function selectClosedNeeds(state) {
-  const allOwnNeeds = selectAllOwnNeeds(state);
+  const allOwnNeeds = getOwnNeeds(state);
   return (
     allOwnNeeds &&
     allOwnNeeds.filter(
@@ -80,7 +80,7 @@ export function selectClosedPosts(state) {
 }
 
 export function selectNeedsInCreationProcess(state) {
-  const allOwnNeeds = selectAllOwnNeeds(state);
+  const allOwnNeeds = getOwnNeeds(state);
   // needs that have been created but are not confirmed by the server yet
   return allOwnNeeds && allOwnNeeds.filter(post => post.get("isBeingCreated"));
 }
@@ -95,7 +95,7 @@ export const selectIsConnected = state =>
  * @param connectionUri to find corresponding need for
  */
 export function selectNeedByConnectionUri(state, connectionUri) {
-  let needs = selectAllOwnNeeds(state); //we only check own needs as these are the only ones who have connections stored
+  let needs = getOwnNeeds(state); //we only check own needs as these are the only ones who have connections stored
   return needs
     .filter(need => need.getIn(["connections", connectionUri]))
     .first();
@@ -130,7 +130,7 @@ export function isPrivateUser(state) {
 }
 
 export function getOwnPersonas(state) {
-  const needs = selectAllOwnNeeds(state);
+  const needs = getOwnNeeds(state);
   const personas = needs
     .toList()
     .filter(need => need.get("types") && need.get("types").has("won:Persona"));

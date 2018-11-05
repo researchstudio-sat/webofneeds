@@ -4,7 +4,7 @@
 
 import {
   selectNeedByConnectionUri,
-  selectAllOwnNeeds,
+  getOwnNeeds,
   selectAllOwnPosts,
 } from "./general-selectors.js";
 import won from "../won-es6.js";
@@ -24,7 +24,7 @@ export function selectConnectionByUri(state, connectionUri) {
  * @returns Immutable.Map with all connections
  */
 export function selectAllConnections(state) {
-  const needs = selectAllOwnNeeds(state); //we only check own needs as these are the only ones who have connections stored
+  const needs = getOwnNeeds(state); //we only check own needs as these are the only ones who have connections stored
   const connections = needs && needs.flatMap(need => need.get("connections"));
   return connections;
 }
