@@ -228,6 +228,15 @@ export function isMessageUnread(msg) {
 }
 
 /**
+ * determines whether the given message is currently selected or not
+ * @param msg
+ * @returns {*|any}
+ */
+export function isMessageSelected(msg) {
+  return msg && msg.getIn(["viewState", "isSelected"]);
+}
+
+/**
  * Determines if a given message is considered a proposal
  * @param msg
  * @returns {*|boolean}

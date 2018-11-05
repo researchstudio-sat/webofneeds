@@ -16,15 +16,16 @@ import {
   getConnectionUriFromRoute,
   getOwnedNeedByConnectionUri,
 } from "../selectors/general-selectors.js";
+import { getMessagesByConnectionUri } from "../selectors/message-selectors.js";
 import {
-  getAcceptableMessagesByConnectionUri,
-  getRejectableMessagesByConnectionUri,
-  getRetractableMessagesByConnectionUri,
-  getCancelableMessagesByConnectionUri,
-  getProposableMessagesByConnectionUri,
-  getClaimableMessagesByConnectionUri,
-  getSelectedMessagesByConnectionUri,
-} from "../selectors/message-selectors.js";
+  isMessageProposable,
+  isMessageClaimable,
+  isMessageCancelable,
+  isMessageRetractable,
+  isMessageAcceptable,
+  isMessageRejectable,
+  isMessageSelected,
+} from "../message-utils.js";
 import { getAllMessageDetails } from "../won-utils.js";
 import autoresizingTextareaModule from "../directives/textarea-autogrow.js";
 import { actionCreators } from "../actions/actions.js";
@@ -274,30 +275,22 @@ function genComponentConf() {
         const connection = post && post.getIn(["connections", connectionUri]);
         const connectionState = connection && connection.get("state");
 
-        const rejectableMessages = getRejectableMessagesByConnectionUri(
-          state,
-          connectionUri
-        );
-        const retractableMessages = getRetractableMessagesByConnectionUri(
-          state,
-          connectionUri
-        );
-        const acceptableMessages = getAcceptableMessagesByConnectionUri(
-          state,
-          connectionUri
-        );
-        const proposableMessages = getProposableMessagesByConnectionUri(
-          state,
-          connectionUri
-        );
-        const cancelableMessages = getCancelableMessagesByConnectionUri(
-          state,
-          connectionUri
-        );
-        const claimableMessages = getClaimableMessagesByConnectionUri(
-          state,
-          connectionUri
-        );
+        const messages = getMessagesByConnectionUri(state, connectionUri);
+
+        const selectedMessages =
+          messages && messages.filter(msg => isMessageSelected(msg));
+        const rejectableMessages =
+          messages && messages.filter(msg => isMessageRejectable(msg));
+        const retractableMessages =
+          messages && messages.filter(msg => isMessageRetractable(msg));
+        const acceptableMessages =
+          messages && messages.filter(msg => isMessageAcceptable(msg));
+        const proposableMessages =
+          messages && messages.filter(msg => isMessageProposable(msg));
+        const cancelableMessages =
+          messages && messages.filter(msg => isMessageCancelable(msg));
+        const claimableMessages =
+          messages && messages.filter(msg => isMessageClaimable(msg));
 
         const hasRejectableMessages =
           rejectableMessages && rejectableMessages.size > 0;
@@ -324,10 +317,7 @@ function genComponentConf() {
           multiSelectType: connection && connection.get("multiSelectType"),
           showAgreementData: connection && connection.get("showAgreementData"),
           isConnected: connectionState && connectionState === won.WON.Connected,
-          selectedMessages: getSelectedMessagesByConnectionUri(
-            state,
-            connectionUri
-          ),
+          selectedMessages: selectedMessages,
           hasClaimableMessages,
           hasProposableMessages,
           hasCancelableMessages,

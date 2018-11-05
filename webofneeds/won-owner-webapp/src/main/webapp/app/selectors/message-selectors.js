@@ -3,12 +3,6 @@
  */
 
 import {
-  isMessageProposable,
-  isMessageClaimable,
-  isMessageCancelable,
-  isMessageRetractable,
-  isMessageAcceptable,
-  isMessageRejectable,
   isMessageAccepted,
   isMessageCancellationPending,
   isMessageProposal,
@@ -20,43 +14,6 @@ import { getOwnedNeedByConnectionUri } from "./general-selectors.js";
 export function getMessagesByConnectionUri(state, connectionUri) {
   const need = getOwnedNeedByConnectionUri(state, connectionUri);
   return need && need.getIn(["connections", connectionUri, "messages"]);
-}
-
-export function getAcceptableMessagesByConnectionUri(state, connectionUri) {
-  const messages = getMessagesByConnectionUri(state, connectionUri);
-  return messages && messages.filter(msg => isMessageAcceptable(msg));
-}
-
-export function getRejectableMessagesByConnectionUri(state, connectionUri) {
-  const messages = getMessagesByConnectionUri(state, connectionUri);
-  return messages && messages.filter(msg => isMessageRejectable(msg));
-}
-
-export function getRetractableMessagesByConnectionUri(state, connectionUri) {
-  const messages = getMessagesByConnectionUri(state, connectionUri);
-  return messages && messages.filter(msg => isMessageRetractable(msg));
-}
-
-export function getCancelableMessagesByConnectionUri(state, connectionUri) {
-  const messages = getMessagesByConnectionUri(state, connectionUri);
-  return messages && messages.filter(msg => isMessageCancelable(msg));
-}
-
-export function getProposableMessagesByConnectionUri(state, connectionUri) {
-  const messages = getMessagesByConnectionUri(state, connectionUri);
-  return messages && messages.filter(msg => isMessageProposable(msg));
-}
-
-export function getClaimableMessagesByConnectionUri(state, connectionUri) {
-  const messages = getMessagesByConnectionUri(state, connectionUri);
-  return messages && messages.filter(msg => isMessageClaimable(msg));
-}
-
-export function getSelectedMessagesByConnectionUri(state, connectionUri) {
-  const messages = getMessagesByConnectionUri(state, connectionUri);
-  return (
-    messages && messages.filter(msg => msg.getIn(["viewState", "isSelected"]))
-  );
 }
 
 export function getAgreementMessagesByConnectionUri(state, connectionUri) {
