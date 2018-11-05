@@ -8,7 +8,7 @@ import { connect2Redux } from "../won-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import {
   selectOpenConnectionUri,
-  selectNeedByConnectionUri,
+  getOwnedNeedByConnectionUri,
 } from "../selectors/general-selectors.js";
 
 import connectionHeaderModule from "./connection-header.js";
@@ -32,7 +32,7 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
 
       const selectFromState = state => {
-        const ownNeed = selectNeedByConnectionUri(state, this.connectionUri);
+        const ownNeed = getOwnedNeedByConnectionUri(state, this.connectionUri);
         const connection =
           ownNeed && ownNeed.getIn(["connections", this.connectionUri]);
 

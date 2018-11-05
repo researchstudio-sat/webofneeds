@@ -7,7 +7,7 @@ import Immutable from "immutable";
 
 import {
   selectOpenConnectionUri,
-  selectNeedByConnectionUri,
+  getOwnedNeedByConnectionUri,
 } from "../selectors/general-selectors.js";
 import { selectConnectionByUri } from "../selectors/connection-selectors.js";
 
@@ -546,7 +546,7 @@ export async function loadLatestMessagesOfConnection({
 }) {
   const connectionUri_ = connectionUri || selectOpenConnectionUri(state);
   const need =
-    connectionUri_ && selectNeedByConnectionUri(state, connectionUri_);
+    connectionUri_ && getOwnedNeedByConnectionUri(state, connectionUri_);
   const needUri = need && need.get("uri");
   const connection =
     connectionUri_ && selectConnectionByUri(state, connectionUri_);
@@ -644,7 +644,7 @@ export function showMoreMessages(connectionUriParam, numberOfEvents) {
     const state = getState();
     const connectionUri = connectionUriParam || selectOpenConnectionUri(state);
     const need =
-      connectionUri && selectNeedByConnectionUri(state, connectionUri);
+      connectionUri && getOwnedNeedByConnectionUri(state, connectionUri);
     const needUri = need && need.get("uri");
     const connection = need && need.getIn(["connections", connectionUri]);
     const connectionMessages = connection && connection.get("messages");

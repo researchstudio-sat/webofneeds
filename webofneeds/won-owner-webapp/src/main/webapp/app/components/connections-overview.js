@@ -24,7 +24,7 @@ import "style/_connections-overview.scss";
 
 import {
   selectRouterParams,
-  selectNeedByConnectionUri,
+  getOwnedNeedByConnectionUri,
   getOwnedNeedsInCreation,
   selectOpenConnectionUri,
   selectOpenPostUri,
@@ -224,7 +224,7 @@ function genComponentConf() {
         const connUriInRoute = selectOpenConnectionUri(state);
         const needUriInRoute = selectOpenPostUri(state);
         const needImpliedInRoute =
-          connUriInRoute && selectNeedByConnectionUri(state, connUriInRoute);
+          connUriInRoute && getOwnedNeedByConnectionUri(state, connUriInRoute);
         const needUriImpliedInRoute =
           needImpliedInRoute && needImpliedInRoute.get("uri");
 

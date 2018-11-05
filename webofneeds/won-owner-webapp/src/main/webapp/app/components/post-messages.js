@@ -19,7 +19,7 @@ import {
 import { actionCreators } from "../actions/actions.js";
 import {
   selectOpenConnectionUri,
-  selectNeedByConnectionUri,
+  getOwnedNeedByConnectionUri,
 } from "../selectors/general-selectors.js";
 import {
   selectAgreementMessagesByConnectionUri,
@@ -256,7 +256,7 @@ function genComponentConf() {
 
       const selectFromState = state => {
         const connectionUri = selectOpenConnectionUri(state);
-        const ownNeed = selectNeedByConnectionUri(state, connectionUri);
+        const ownNeed = getOwnedNeedByConnectionUri(state, connectionUri);
         const connection =
           ownNeed && ownNeed.getIn(["connections", connectionUri]);
 

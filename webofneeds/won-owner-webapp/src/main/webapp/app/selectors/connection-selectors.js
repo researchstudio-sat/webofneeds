@@ -3,7 +3,7 @@
  */
 
 import {
-  selectNeedByConnectionUri,
+  getOwnedNeedByConnectionUri,
   getOwnedNeeds,
   getOwnedPosts,
 } from "./general-selectors.js";
@@ -15,7 +15,7 @@ import won from "../won-es6.js";
  * @param connectionUri to find corresponding connection for
  */
 export function selectConnectionByUri(state, connectionUri) {
-  let need = selectNeedByConnectionUri(state, connectionUri);
+  let need = getOwnedNeedByConnectionUri(state, connectionUri);
   return need.getIn(["connections", connectionUri]);
 }
 

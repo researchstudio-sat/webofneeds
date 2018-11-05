@@ -6,7 +6,7 @@ import { attach } from "../../../utils.js";
 import { connect2Redux } from "../../../won-utils.js";
 import {
   selectOpenConnectionUri,
-  selectNeedByConnectionUri,
+  getOwnedNeedByConnectionUri,
 } from "../../../selectors/general-selectors.js";
 
 import "style/_suggestpost-viewer.scss";
@@ -56,7 +56,7 @@ function genComponentConf() {
         const openedConnectionUri = selectOpenConnectionUri(state);
         const openedOwnPost =
           openedConnectionUri &&
-          selectNeedByConnectionUri(state, openedConnectionUri);
+          getOwnedNeedByConnectionUri(state, openedConnectionUri);
         const connection =
           openedOwnPost &&
           openedOwnPost.getIn(["connections", openedConnectionUri]);

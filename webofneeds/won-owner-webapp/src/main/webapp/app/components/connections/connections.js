@@ -12,7 +12,7 @@ import usecaseGroupModule from "../usecase-group.js";
 import { attach, getIn, callBuffer } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import {
-  selectNeedByConnectionUri,
+  getOwnedNeedByConnectionUri,
   getOwnedNeeds,
 } from "../../selectors/general-selectors.js";
 import { resetParams } from "../../configRouting.js";
@@ -61,7 +61,7 @@ class ConnectionsController {
         getIn(state, ["router", "currentParams", "connectionUri"])
       );
       const need =
-        connectionUri && selectNeedByConnectionUri(state, connectionUri);
+        connectionUri && getOwnedNeedByConnectionUri(state, connectionUri);
       const connection = need && need.getIn(["connections", connectionUri]);
       const connectionType =
         need &&
@@ -148,7 +148,7 @@ class ConnectionsController {
   }*/
 
   markAsRead(connectionUri) {
-    const need = selectNeedByConnectionUri(
+    const need = getOwnedNeedByConnectionUri(
       this.$ngRedux.getState(),
       connectionUri
     );

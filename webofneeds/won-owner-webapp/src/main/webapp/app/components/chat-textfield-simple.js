@@ -14,7 +14,7 @@ import { dispatchEvent, attach, delay } from "../utils.js";
 import won from "../won-es6.js";
 import {
   selectOpenConnectionUri,
-  selectNeedByConnectionUri,
+  getOwnedNeedByConnectionUri,
 } from "../selectors/general-selectors.js";
 import {
   selectAcceptableMessagesByConnectionUri,
@@ -270,7 +270,7 @@ function genComponentConf() {
       const selectFromState = state => {
         const connectionUri = selectOpenConnectionUri(state);
         const post =
-          connectionUri && selectNeedByConnectionUri(state, connectionUri);
+          connectionUri && getOwnedNeedByConnectionUri(state, connectionUri);
         const connection = post && post.getIn(["connections", connectionUri]);
         const connectionState = connection && connection.get("state");
 

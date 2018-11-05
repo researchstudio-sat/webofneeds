@@ -135,7 +135,8 @@ export function setConnectionLoadingMessages(
   connectionUri,
   isLoadingMessages
 ) {
-  const need = connectionUri && selectNeedByConnectionUri(state, connectionUri);
+  const need =
+    connectionUri && getOwnedNeedByConnectionUri(state, connectionUri);
   const needUri = need && need.get("uri");
   const connection = need && need.getIn(["connections", connectionUri]);
 
@@ -161,7 +162,8 @@ export function setConnectionLoadingAgreementData(
   connectionUri,
   isLoadingAgreementData
 ) {
-  const need = connectionUri && selectNeedByConnectionUri(state, connectionUri);
+  const need =
+    connectionUri && getOwnedNeedByConnectionUri(state, connectionUri);
   const needUri = need && need.get("uri");
   const connection = need && need.getIn(["connections", connectionUri]);
 
@@ -187,7 +189,8 @@ export function setConnectionLoadingPetriNetData(
   connectionUri,
   isLoadingPetriNetData
 ) {
-  const need = connectionUri && selectNeedByConnectionUri(state, connectionUri);
+  const need =
+    connectionUri && getOwnedNeedByConnectionUri(state, connectionUri);
   const needUri = need && need.get("uri");
   const connection = need && need.getIn(["connections", connectionUri]);
 
@@ -218,7 +221,8 @@ export function setPetriNetDataDirty(
   connectionUri,
   isPetriNetDataDirty
 ) {
-  const need = connectionUri && selectNeedByConnectionUri(state, connectionUri);
+  const need =
+    connectionUri && getOwnedNeedByConnectionUri(state, connectionUri);
   const needUri = need && need.get("uri");
   const connection = need && need.getIn(["connections", connectionUri]);
 
@@ -240,7 +244,7 @@ export function setPetriNetDataDirty(
 }
 
 export function markConnectionAsRated(state, connectionUri) {
-  let need = connectionUri && selectNeedByConnectionUri(state, connectionUri);
+  let need = connectionUri && getOwnedNeedByConnectionUri(state, connectionUri);
   let connection = need && need.getIn(["connections", connectionUri]);
 
   if (!connection) {
@@ -268,14 +272,14 @@ export function markConnectionAsRated(state, connectionUri) {
  * @param connectionUri
  *            to find corresponding need for
  */
-export function selectNeedByConnectionUri(allNeedsInState, connectionUri) {
+export function getOwnedNeedByConnectionUri(allNeedsInState, connectionUri) {
   return allNeedsInState
     .filter(need => need.getIn(["connections", connectionUri]))
     .first();
 }
 
 export function changeConnectionState(state, connectionUri, newState) {
-  const need = selectNeedByConnectionUri(state, connectionUri);
+  const need = getOwnedNeedByConnectionUri(state, connectionUri);
 
   if (!need) {
     console.warn(
@@ -298,7 +302,7 @@ export function changeConnectionState(state, connectionUri, newState) {
 }
 
 export function changeConnectionStateByFun(state, connectionUri, fun) {
-  const need = selectNeedByConnectionUri(state, connectionUri);
+  const need = getOwnedNeedByConnectionUri(state, connectionUri);
 
   if (!need) {
     console.warn(
@@ -321,7 +325,7 @@ export function changeConnectionStateByFun(state, connectionUri, fun) {
 }
 
 export function updatePetriNetStateData(state, connectionUri, petriNetData) {
-  const need = selectNeedByConnectionUri(state, connectionUri);
+  const need = getOwnedNeedByConnectionUri(state, connectionUri);
 
   if (!need || !petriNetData) {
     console.warn(
@@ -354,7 +358,7 @@ export function updatePetriNetStateData(state, connectionUri, petriNetData) {
 }
 
 export function updateAgreementStateData(state, connectionUri, agreementData) {
-  const need = selectNeedByConnectionUri(state, connectionUri);
+  const need = getOwnedNeedByConnectionUri(state, connectionUri);
 
   if (!need || !agreementData) {
     console.warn(
@@ -383,7 +387,7 @@ export function updateAgreementStateData(state, connectionUri, agreementData) {
 }
 
 export function setShowAgreementData(state, connectionUri, showAgreementData) {
-  const need = selectNeedByConnectionUri(state, connectionUri);
+  const need = getOwnedNeedByConnectionUri(state, connectionUri);
 
   if (!need) {
     console.warn(
@@ -403,7 +407,7 @@ export function setShowAgreementData(state, connectionUri, showAgreementData) {
 }
 
 export function setShowPetriNetData(state, connectionUri, showPetriNetData) {
-  const need = selectNeedByConnectionUri(state, connectionUri);
+  const need = getOwnedNeedByConnectionUri(state, connectionUri);
 
   if (!need) {
     console.warn(
@@ -427,7 +431,7 @@ export function setMultiSelectType(
   connectionUri,
   multiSelectType = undefined
 ) {
-  const need = selectNeedByConnectionUri(state, connectionUri);
+  const need = getOwnedNeedByConnectionUri(state, connectionUri);
 
   if (!need) {
     console.warn(

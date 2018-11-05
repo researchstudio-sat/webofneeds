@@ -75,7 +75,7 @@ export const selectIsConnected = state =>
  * @param state to retrieve data from
  * @param connectionUri to find corresponding need for
  */
-export function selectNeedByConnectionUri(state, connectionUri) {
+export function getOwnedNeedByConnectionUri(state, connectionUri) {
   let needs = getOwnedNeeds(state); //we only check own needs as these are the only ones who have connections stored
   return needs
     .filter(need => need.getIn(["connections", connectionUri]))

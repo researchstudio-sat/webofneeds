@@ -15,10 +15,10 @@ import {
   isMessageClaim,
   isMessageUnread,
 } from "../message-utils.js";
-import { selectNeedByConnectionUri } from "./general-selectors.js";
+import { getOwnedNeedByConnectionUri } from "./general-selectors.js";
 
 export function selectAllMessagesByConnectionUri(state, connectionUri) {
-  const need = selectNeedByConnectionUri(state, connectionUri);
+  const need = getOwnedNeedByConnectionUri(state, connectionUri);
   return need && need.getIn(["connections", connectionUri, "messages"]);
 }
 

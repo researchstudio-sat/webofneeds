@@ -13,7 +13,7 @@ import combinedMessageContentModule from "./combined-message-content.js";
 import { connect2Redux } from "../../won-utils.js";
 import { attach, getIn } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
-import { selectNeedByConnectionUri } from "../../selectors/general-selectors.js";
+import { getOwnedNeedByConnectionUri } from "../../selectors/general-selectors.js";
 import {
   isMessageProposable,
   isMessageClaimable,
@@ -116,7 +116,7 @@ function genComponentConf() {
       const selectFromState = state => {
         const ownNeed =
           this.connectionUri &&
-          selectNeedByConnectionUri(state, this.connectionUri);
+          getOwnedNeedByConnectionUri(state, this.connectionUri);
         const connection =
           ownNeed && ownNeed.getIn(["connections", this.connectionUri]);
         const theirNeed =

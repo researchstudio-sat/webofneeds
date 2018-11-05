@@ -9,7 +9,7 @@ import postHeaderModule from "../../post-header.js";
 import labelledHrModule from "../../labelled-hr.js";
 import {
   selectOpenConnectionUri,
-  selectNeedByConnectionUri,
+  getOwnedNeedByConnectionUri,
   getOpenPosts,
 } from "../../../selectors/general-selectors.js";
 
@@ -69,7 +69,7 @@ function genComponentConf() {
         const openedConnectionUri = selectOpenConnectionUri(state);
         const openedOwnPost =
           openedConnectionUri &&
-          selectNeedByConnectionUri(state, openedConnectionUri);
+          getOwnedNeedByConnectionUri(state, openedConnectionUri);
         const connection =
           openedOwnPost &&
           openedOwnPost.getIn(["connections", openedConnectionUri]);

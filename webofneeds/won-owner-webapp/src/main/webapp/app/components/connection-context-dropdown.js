@@ -9,7 +9,7 @@ import won from "../won-es6.js";
 import { attach } from "../utils.js";
 import {
   selectOpenConnectionUri,
-  selectNeedByConnectionUri,
+  getOwnedNeedByConnectionUri,
 } from "../selectors/general-selectors.js";
 import { connect2Redux } from "../won-utils.js";
 
@@ -87,7 +87,7 @@ function genComponentConf() {
         const connectionUri = selectOpenConnectionUri(state);
 
         const post =
-          connectionUri && selectNeedByConnectionUri(state, connectionUri);
+          connectionUri && getOwnedNeedByConnectionUri(state, connectionUri);
         const connection = post && post.getIn(["connections", connectionUri]);
         const connectionState = connection && connection.get("state");
 

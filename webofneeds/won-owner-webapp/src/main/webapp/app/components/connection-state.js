@@ -9,7 +9,7 @@ import { labels } from "../won-label-utils.js";
 import { actionCreators } from "../actions/actions.js";
 
 import { attach } from "../utils.js";
-import { selectNeedByConnectionUri } from "../selectors/general-selectors.js";
+import { getOwnedNeedByConnectionUri } from "../selectors/general-selectors.js";
 import { connect2Redux } from "../won-utils.js";
 
 const serviceDependencies = ["$ngRedux", "$scope"];
@@ -55,7 +55,7 @@ function genComponentConf() {
       this.labels = labels;
 
       const selectFromState = state => {
-        const need = selectNeedByConnectionUri(state, this.connectionUri);
+        const need = getOwnedNeedByConnectionUri(state, this.connectionUri);
         const connection =
           need && need.getIn(["connections", this.connectionUri]);
 

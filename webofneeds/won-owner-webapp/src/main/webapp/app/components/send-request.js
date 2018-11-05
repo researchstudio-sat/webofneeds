@@ -7,7 +7,7 @@ import connectionContextDropdownModule from "./connection-context-dropdown.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 import {
   selectOpenPostUri,
-  selectNeedByConnectionUri,
+  getOwnedNeedByConnectionUri,
 } from "../selectors/general-selectors.js";
 import { connect2Redux } from "../won-utils.js";
 import { attach, getIn } from "../utils.js";
@@ -41,7 +41,7 @@ function genComponentConf() {
           getIn(state, ["router", "currentParams", "connectionUri"])
         );
         const ownNeed =
-          connectionUri && selectNeedByConnectionUri(state, connectionUri);
+          connectionUri && getOwnedNeedByConnectionUri(state, connectionUri);
         const connection =
           ownNeed && ownNeed.getIn(["connections", connectionUri]);
         const postUriToConnectTo = !connection

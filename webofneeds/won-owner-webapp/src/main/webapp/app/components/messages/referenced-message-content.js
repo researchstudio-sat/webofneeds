@@ -5,7 +5,7 @@ import won from "../../won-es6.js";
 import { connect2Redux } from "../../won-utils.js";
 import { attach, getIn } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
-import { selectNeedByConnectionUri } from "../../selectors/general-selectors.js";
+import { getOwnedNeedByConnectionUri } from "../../selectors/general-selectors.js";
 import { labels } from "../../won-label-utils.js";
 import { fetchMessage } from "../../won-message-utils.js";
 import { classOnComponentRoot } from "../../cstm-ng-utils.js";
@@ -213,7 +213,7 @@ function genComponentConf() {
       const selectFromState = state => {
         const ownNeed =
           this.connectionUri &&
-          selectNeedByConnectionUri(state, this.connectionUri);
+          getOwnedNeedByConnectionUri(state, this.connectionUri);
         const connection =
           ownNeed && ownNeed.getIn(["connections", this.connectionUri]);
         const message =

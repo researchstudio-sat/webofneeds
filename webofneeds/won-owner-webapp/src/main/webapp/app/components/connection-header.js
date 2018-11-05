@@ -13,7 +13,7 @@ import { connect2Redux } from "../won-utils.js";
 import { getHumanReadableStringFromMessage } from "../reducers/need-reducer/parse-message.js";
 import {
   selectLastUpdateTime,
-  selectNeedByConnectionUri,
+  getOwnedNeedByConnectionUri,
   getNonOwnedNeeds,
 } from "../selectors/general-selectors.js";
 import { selectUnreadMessagesByConnectionUri } from "../selectors/message-selectors.js";
@@ -89,7 +89,7 @@ function genComponentConf() {
       this.labels = labels;
       this.WON = won.WON;
       const selectFromState = state => {
-        const ownNeed = selectNeedByConnectionUri(state, this.connectionUri);
+        const ownNeed = getOwnedNeedByConnectionUri(state, this.connectionUri);
         const connection =
           ownNeed && ownNeed.getIn(["connections", this.connectionUri]);
         const theirNeed =

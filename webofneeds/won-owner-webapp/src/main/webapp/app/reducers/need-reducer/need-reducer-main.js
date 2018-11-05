@@ -39,7 +39,7 @@ import {
   setConnectionLoadingAgreementData,
   setConnectionLoadingPetriNetData,
   markConnectionAsRead,
-  selectNeedByConnectionUri,
+  getOwnedNeedByConnectionUri,
   changeConnectionState,
   changeConnectionStateByFun,
   storeConnectionsData,
@@ -483,7 +483,7 @@ export default function(allNeedsInState = initialState, action = {}) {
       const eventUri = wonMessage.getIsResponseTo();
       const tmpConnectionUri = "connectionFrom:" + wonMessage.getIsResponseTo();
       const connectionUri = wonMessage.getReceiver();
-      const needForTmpCnct = selectNeedByConnectionUri(
+      const needForTmpCnct = getOwnedNeedByConnectionUri(
         allNeedsInState,
         tmpConnectionUri
       );
@@ -533,7 +533,7 @@ export default function(allNeedsInState = initialState, action = {}) {
         }
         return allNeedsInState;
       } else {
-        const needByConnectionUri = selectNeedByConnectionUri(
+        const needByConnectionUri = getOwnedNeedByConnectionUri(
           allNeedsInState,
           connectionUri
         );
