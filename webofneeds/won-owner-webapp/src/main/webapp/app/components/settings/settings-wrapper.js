@@ -3,7 +3,7 @@ import { Elm } from "../../../elm/Settings/Personas.elm";
 import { actionCreators } from "../../actions/actions";
 import "../identicon.js";
 import {
-  getOwnPersonas,
+  getOwnedPersonas,
   currentSkin,
 } from "../../selectors/general-selectors.js";
 
@@ -23,13 +23,13 @@ function genComponentConf($ngRedux) {
         $ngRedux.dispatch(actionCreators.personas__create(persona));
       });
 
-      const personas = getOwnPersonas($ngRedux.getState());
+      const personas = getOwnedPersonas($ngRedux.getState());
       if (personas) {
         elmApp.ports.personaIn.send(personas.toJS());
       }
 
       const disconnect = $ngRedux.connect(state => {
-        return { personas: getOwnPersonas(state) };
+        return { personas: getOwnedPersonas(state) };
       })(state => {
         if (!state.personas) {
           return;

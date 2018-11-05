@@ -1,7 +1,10 @@
 import angular from "angular";
 import { Elm } from "../../elm/PublishButton.elm";
 import "./svg-icon.js";
-import { getOwnPersonas, currentSkin } from "../selectors/general-selectors.js";
+import {
+  getOwnedPersonas,
+  currentSkin,
+} from "../selectors/general-selectors.js";
 
 function genComponentConf($ngRedux) {
   return {
@@ -34,14 +37,14 @@ function genComponentConf($ngRedux) {
         loggedIn: $ngRedux.getState().getIn(["user", "loggedIn"]),
       });
 
-      const personas = getOwnPersonas($ngRedux.getState());
+      const personas = getOwnedPersonas($ngRedux.getState());
       if (personas) {
         elmApp.ports.personaIn.send(personas.toJS());
       }
 
       const disconnectOptions = $ngRedux.connect(state => {
         return {
-          personas: getOwnPersonas(state),
+          personas: getOwnedPersonas(state),
           loggedIn: state.getIn(["user", "loggedIn"]),
         };
       })(state => {
