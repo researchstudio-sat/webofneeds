@@ -10,7 +10,7 @@ import labelledHrModule from "../../labelled-hr.js";
 import {
   selectOpenConnectionUri,
   selectNeedByConnectionUri,
-  selectAllOpenPosts,
+  getOpenPosts,
 } from "../../../selectors/general-selectors.js";
 
 import "style/_suggestpostpicker.scss";
@@ -79,7 +79,7 @@ function genComponentConf() {
           connection && connection.get("remoteNeedUri");
 
         const suggestedPostUri = this.initialValue;
-        const allOpenNeeds = selectAllOpenPosts(state);
+        const allOpenNeeds = getOpenPosts(state);
 
         const allOpenNeedsWithoutCurrent =
           allOpenNeeds &&

@@ -39,7 +39,7 @@ export function getOwnedOpenPosts(state) {
   );
 }
 
-export function selectAllOpenPosts(state) {
+export function getOpenPosts(state) {
   const allPosts = getPosts(state);
   return (
     allPosts &&
