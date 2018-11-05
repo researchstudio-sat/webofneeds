@@ -8,7 +8,7 @@ import { actionCreators } from "../../../actions/actions.js";
 import postHeaderModule from "../../post-header.js";
 import labelledHrModule from "../../labelled-hr.js";
 import {
-  selectOpenConnectionUri,
+  getConnectionUriFromRoute,
   getOwnedNeedByConnectionUri,
   getOpenPosts,
 } from "../../../selectors/general-selectors.js";
@@ -66,7 +66,7 @@ function genComponentConf() {
       this.showResetButton = false;
 
       const selectFromState = state => {
-        const openedConnectionUri = selectOpenConnectionUri(state);
+        const openedConnectionUri = getConnectionUriFromRoute(state);
         const openedOwnPost =
           openedConnectionUri &&
           getOwnedNeedByConnectionUri(state, openedConnectionUri);

@@ -13,7 +13,7 @@ import ngAnimate from "angular-animate";
 import { dispatchEvent, attach, delay } from "../utils.js";
 import won from "../won-es6.js";
 import {
-  selectOpenConnectionUri,
+  getConnectionUriFromRoute,
   getOwnedNeedByConnectionUri,
 } from "../selectors/general-selectors.js";
 import {
@@ -268,7 +268,7 @@ function genComponentConf() {
       this.referencedContent = new Map(); //Stores the reference Content of a message (e.g. proposes, retracts...)
 
       const selectFromState = state => {
-        const connectionUri = selectOpenConnectionUri(state);
+        const connectionUri = getConnectionUriFromRoute(state);
         const post =
           connectionUri && getOwnedNeedByConnectionUri(state, connectionUri);
         const connection = post && post.getIn(["connections", connectionUri]);

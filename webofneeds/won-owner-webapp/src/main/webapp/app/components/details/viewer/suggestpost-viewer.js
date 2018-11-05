@@ -5,7 +5,7 @@ import postHeaderModule from "../../post-header.js";
 import { attach } from "../../../utils.js";
 import { connect2Redux } from "../../../won-utils.js";
 import {
-  selectOpenConnectionUri,
+  getConnectionUriFromRoute,
   getOwnedNeedByConnectionUri,
 } from "../../../selectors/general-selectors.js";
 
@@ -53,7 +53,7 @@ function genComponentConf() {
       window.suggestpostv4dbg = this;
 
       const selectFromState = state => {
-        const openedConnectionUri = selectOpenConnectionUri(state);
+        const openedConnectionUri = getConnectionUriFromRoute(state);
         const openedOwnPost =
           openedConnectionUri &&
           getOwnedNeedByConnectionUri(state, openedConnectionUri);

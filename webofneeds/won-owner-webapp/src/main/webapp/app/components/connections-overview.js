@@ -26,7 +26,7 @@ import {
   getRouterParams,
   getOwnedNeedByConnectionUri,
   getOwnedNeedsInCreation,
-  selectOpenConnectionUri,
+  getConnectionUriFromRoute,
   selectOpenPostUri,
   getPosts,
   getOwnedClosedPosts,
@@ -221,7 +221,7 @@ function genComponentConf() {
         const routerParams = getRouterParams(state);
         const useCase = get(routerParams, "useCase");
         const useCaseGroup = get(routerParams, "useCaseGroup");
-        const connUriInRoute = selectOpenConnectionUri(state);
+        const connUriInRoute = getConnectionUriFromRoute(state);
         const needUriInRoute = selectOpenPostUri(state);
         const needImpliedInRoute =
           connUriInRoute && getOwnedNeedByConnectionUri(state, connUriInRoute);

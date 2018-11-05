@@ -18,7 +18,7 @@ import {
 } from "../won-message-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import {
-  selectOpenConnectionUri,
+  getConnectionUriFromRoute,
   getOwnedNeedByConnectionUri,
 } from "../selectors/general-selectors.js";
 import {
@@ -255,7 +255,7 @@ function genComponentConf() {
       this.scrollContainer().addEventListener("scroll", e => this.onScroll(e));
 
       const selectFromState = state => {
-        const connectionUri = selectOpenConnectionUri(state);
+        const connectionUri = getConnectionUriFromRoute(state);
         const ownNeed = getOwnedNeedByConnectionUri(state, connectionUri);
         const connection =
           ownNeed && ownNeed.getIn(["connections", connectionUri]);

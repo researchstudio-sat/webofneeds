@@ -7,7 +7,7 @@ import { attach } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import {
-  selectOpenConnectionUri,
+  getConnectionUriFromRoute,
   getOwnedNeedByConnectionUri,
 } from "../selectors/general-selectors.js";
 
@@ -37,7 +37,7 @@ function genComponentConf() {
           ownNeed && ownNeed.getIn(["connections", this.connectionUri]);
 
         return {
-          openConnectionUri: selectOpenConnectionUri(state),
+          openConnectionUri: getConnectionUriFromRoute(state),
           lastUpdateTimestamp: connection && connection.get("lastUpdateDate"),
         };
       };

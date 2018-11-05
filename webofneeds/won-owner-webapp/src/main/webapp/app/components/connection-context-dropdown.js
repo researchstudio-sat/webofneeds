@@ -8,7 +8,7 @@ import { actionCreators } from "../actions/actions.js";
 import won from "../won-es6.js";
 import { attach } from "../utils.js";
 import {
-  selectOpenConnectionUri,
+  getConnectionUriFromRoute,
   getOwnedNeedByConnectionUri,
 } from "../selectors/general-selectors.js";
 import { connect2Redux } from "../won-utils.js";
@@ -84,7 +84,7 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
 
       const selectFromState = state => {
-        const connectionUri = selectOpenConnectionUri(state);
+        const connectionUri = getConnectionUriFromRoute(state);
 
         const post =
           connectionUri && getOwnedNeedByConnectionUri(state, connectionUri);

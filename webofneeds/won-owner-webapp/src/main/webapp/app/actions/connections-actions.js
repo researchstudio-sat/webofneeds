@@ -6,7 +6,7 @@ import won from "../won-es6.js";
 import Immutable from "immutable";
 
 import {
-  selectOpenConnectionUri,
+  getConnectionUriFromRoute,
   getOwnedNeedByConnectionUri,
 } from "../selectors/general-selectors.js";
 import { selectConnectionByUri } from "../selectors/connection-selectors.js";
@@ -544,7 +544,7 @@ export async function loadLatestMessagesOfConnection({
   actionTypesToDispatch,
   dispatch,
 }) {
-  const connectionUri_ = connectionUri || selectOpenConnectionUri(state);
+  const connectionUri_ = connectionUri || getConnectionUriFromRoute(state);
   const need =
     connectionUri_ && getOwnedNeedByConnectionUri(state, connectionUri_);
   const needUri = need && need.get("uri");
@@ -642,7 +642,8 @@ export async function loadLatestMessagesOfConnection({
 export function showMoreMessages(connectionUriParam, numberOfEvents) {
   return (dispatch, getState) => {
     const state = getState();
-    const connectionUri = connectionUriParam || selectOpenConnectionUri(state);
+    const connectionUri =
+      connectionUriParam || getConnectionUriFromRoute(state);
     const need =
       connectionUri && getOwnedNeedByConnectionUri(state, connectionUri);
     const needUri = need && need.get("uri");

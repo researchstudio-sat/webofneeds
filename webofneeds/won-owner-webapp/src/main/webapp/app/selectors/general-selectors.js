@@ -82,7 +82,7 @@ export function getOwnedNeedByConnectionUri(state, connectionUri) {
     .first();
 }
 
-export const selectOpenConnectionUri = createSelector(
+export const getConnectionUriFromRoute = createSelector(
   getRouterParams,
   routerParams => {
     //de-escaping is lost in transpiling if not done in two steps :|
