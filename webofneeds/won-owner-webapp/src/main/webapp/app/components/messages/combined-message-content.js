@@ -6,7 +6,7 @@ import { attach, get, getIn } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import {
   selectNeedByConnectionUri,
-  selectAllNeeds,
+  getNeeds,
 } from "../../selectors/general-selectors.js";
 import { selectAllConnections } from "../../selectors/connection-selectors.js";
 import trigModule from "../trig.js";
@@ -85,7 +85,7 @@ function genComponentConf() {
         const referencesClaims = references && references.get("claims");
 
         const allConnections = selectAllConnections(state);
-        const allNeeds = selectAllNeeds(state);
+        const allNeeds = getNeeds(state);
 
         return {
           allNeeds,

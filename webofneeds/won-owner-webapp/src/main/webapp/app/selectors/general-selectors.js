@@ -13,14 +13,14 @@ export const selectLastUpdateTime = state => state.get("lastUpdateTime");
 export const selectRouterParams = state =>
   getIn(state, ["router", "currentParams"]);
 
-export const selectAllNeeds = state => state.get("needs");
+export const getNeeds = state => state.get("needs");
 export const selectAllOwnNeeds = state =>
-  selectAllNeeds(state).filter(need => need.get("ownNeed"));
+  getNeeds(state).filter(need => need.get("ownNeed"));
 export const selectAllTheirNeeds = state =>
-  selectAllNeeds(state).filter(need => !need.get("ownNeed"));
+  getNeeds(state).filter(need => !need.get("ownNeed"));
 
 export function selectAllPosts(state) {
-  const needs = selectAllNeeds(state);
+  const needs = getNeeds(state);
   return needs.filter(need => {
     if (!need.get("types")) return true;
 

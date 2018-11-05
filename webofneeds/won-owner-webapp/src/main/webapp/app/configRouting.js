@@ -9,7 +9,7 @@ import { accountLogin } from "./actions/account-actions.js";
 
 import { privateId2Credentials } from "./won-utils.js";
 
-import { selectAllNeeds } from "./selectors/general-selectors.js";
+import { getNeeds } from "./selectors/general-selectors.js";
 
 import {
   decodeUriComponentProperly,
@@ -111,7 +111,7 @@ function postViewEnsureLoaded(dispatch, getState, encodedPostUri) {
   const postUri = decodeUriComponentProperly(encodedPostUri);
   const state = getState();
 
-  if (postUri && !selectAllNeeds(state).has(postUri)) {
+  if (postUri && !getNeeds(state).has(postUri)) {
     /*
          * got an uri but no post loaded to the state yet ->
          * assuming that if you're logged in you either did a
