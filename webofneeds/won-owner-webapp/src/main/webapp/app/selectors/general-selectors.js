@@ -28,7 +28,7 @@ export function getPosts(state) {
   });
 }
 
-export const selectAllOwnPosts = state =>
+export const getOwnedPosts = state =>
   getPosts(state).filter(need => need.get("ownNeed"));
 
 export function selectOpenNeeds(state) {
@@ -40,7 +40,7 @@ export function selectOpenNeeds(state) {
 }
 
 export function selectOpenPosts(state) {
-  const allOwnNeeds = selectAllOwnPosts(state);
+  const allOwnNeeds = getOwnedPosts(state);
   return (
     allOwnNeeds &&
     allOwnNeeds.filter(post => post.get("state") === won.WON.ActiveCompacted)
@@ -68,7 +68,7 @@ export function selectClosedNeeds(state) {
 }
 
 export function selectClosedPosts(state) {
-  const allOwnNeeds = selectAllOwnPosts(state);
+  const allOwnNeeds = getOwnedPosts(state);
   return (
     allOwnNeeds &&
     allOwnNeeds.filter(

@@ -7,7 +7,7 @@ import won from "../won-es6.js";
 import "ng-redux";
 import { labels } from "../won-label-utils.js";
 import { actionCreators } from "../actions/actions.js";
-import { getPosts, selectAllOwnPosts } from "../selectors/general-selectors.js";
+import { getPosts, getOwnedPosts } from "../selectors/general-selectors.js";
 
 import { attach, sortByDate } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
@@ -131,7 +131,7 @@ function genComponentConf() {
       this.labels = labels;
 
       const selectFromState = state => {
-        const ownNeeds = selectAllOwnPosts(state);
+        const ownNeeds = getOwnedPosts(state);
         const allNeeds = getPosts(state);
         const need = ownNeeds && ownNeeds.get(this.needUri);
         const allConnectionsByNeedUri = need && need.get("connections");
