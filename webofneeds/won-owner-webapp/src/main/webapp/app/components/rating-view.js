@@ -17,6 +17,10 @@ function genComponentConf($ngRedux) {
         },
       });
 
+      elmApp.ports.reviewSubmitted.subscribe(({ value, message }) => {
+        console.log(`review submitted: ${value} stars. Message: "${message}"`);
+      });
+
       const disconnectSkin = $ngRedux.connect(state => {
         return {
           skin: state.getIn(["config", "theme"]),
@@ -28,6 +32,7 @@ function genComponentConf($ngRedux) {
 
       scope.$on("$destroy", () => {
         disconnectSkin();
+        elmApp.ports.reviewSubmitted.unsubscribe();
       });
     },
   };

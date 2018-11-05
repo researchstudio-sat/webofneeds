@@ -1,4 +1,4 @@
-module RatingView exposing (main)
+port module RatingView exposing (main)
 
 import Element exposing (..)
 import Element.Background as Background
@@ -54,6 +54,25 @@ fromInt rating =
             Nothing
 
 
+toInt : Rating -> Int
+toInt rating =
+    case rating of
+        One ->
+            1
+
+        Two ->
+            2
+
+        Three ->
+            3
+
+        Four ->
+            4
+
+        Five ->
+            5
+
+
 type alias Model =
     { rating : Maybe Rating
     , popupState : PopupState
@@ -83,6 +102,13 @@ init ratingFlag =
 
 
 
+---- PORT ----
+
+
+port reviewSubmitted : { value : Int, message : String } -> Cmd msg
+
+
+
 ---- UPDATE ----
 
 
@@ -101,14 +127,16 @@ type Msg
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    ( case msg of
+    case msg of
         Hover hovered ->
-            { model
+            ( { model
                 | popupState = updateHover hovered model.popupState
-            }
+              }
+            , Cmd.none
+            )
 
         TogglePopup ->
-            { model
+            ( { model
                 | popupState =
                     case model.popupState of
                         Closed ->
@@ -119,14 +147,20 @@ update msg model =
 
                         Open _ ->
                             Closed
-            }
+              }
+            , Cmd.none
+            )
 
         PopupMsg popupMsg ->
-            { model
-                | popupState = updatePopup popupMsg model.popupState
-            }
-    , Cmd.none
-    )
+            let
+                ( newPopupState, popupCmd ) =
+                    updatePopup popupMsg model.popupState
+            in
+            ( { model
+                | popupState = newPopupState
+              }
+            , Cmd.map PopupMsg popupCmd
+            )
 
 
 initialPopup : Popup
@@ -150,43 +184,54 @@ updateHover hovered state =
             Closed
 
 
-updatePopup : PopupMsg -> PopupState -> PopupState
+updatePopup : PopupMsg -> PopupState -> ( PopupState, Cmd PopupMsg )
 updatePopup msg popupState =
     case popupState of
         Closed ->
-            Closed
+            ( Closed, Cmd.none )
 
         Hovered ->
-            Hovered
+            ( Hovered, Cmd.none )
 
         Open state ->
             case msg of
                 ReviewChanged review ->
-                    Open
+                    ( Open
                         { state
                             | reviewText = review
                         }
+                    , Cmd.none
+                    )
 
                 HoveredValue rating ->
-                    Open
+                    ( Open
                         { state
                             | hoveredValue = rating
                         }
+                    , Cmd.none
+                    )
 
                 SelectedValue rating ->
-                    Open
+                    ( Open
                         { state
                             | selectedValue = rating
                         }
+                    , Cmd.none
+                    )
 
                 SubmitReview ->
                     case state.selectedValue of
                         Just value ->
                             -- TODO: actually do something
-                            Closed
+                            ( Closed
+                            , reviewSubmitted
+                                { value = toInt value
+                                , message = state.reviewText
+                                }
+                            )
 
                         Nothing ->
-                            Open state
+                            ( popupState, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
@@ -202,21 +247,7 @@ viewRating : Skin -> Rating -> Element msg
 viewRating skin rating =
     let
         numberOfFilled =
-            case rating of
-                One ->
-                    1
-
-                Two ->
-                    2
-
-                Three ->
-                    3
-
-                Four ->
-                    4
-
-                Five ->
-                    5
+            toInt rating
     in
     row
         [ spacing 2
@@ -372,24 +403,8 @@ starSelector skin { selectedValue, hoveredValue } =
             orElse hoveredValue selectedValue
 
         numberOfFilled =
-            case displayedValue of
-                Just One ->
-                    1
-
-                Just Two ->
-                    2
-
-                Just Three ->
-                    3
-
-                Just Four ->
-                    4
-
-                Just Five ->
-                    5
-
-                Nothing ->
-                    0
+            Maybe.map toInt displayedValue
+                |> Maybe.withDefault 0
     in
     row
         [ Font.size 18
