@@ -22,10 +22,10 @@ import {
   getOwnedNeedByConnectionUri,
 } from "../selectors/general-selectors.js";
 import {
-  selectAgreementMessagesByConnectionUri,
-  selectCancellationPendingMessagesByConnectionUri,
-  selectProposalMessagesByConnectionUri,
-  selectUnreadMessagesByConnectionUri,
+  getAgreementMessagesByConnectionUri,
+  getCancellationPendingMessagesByConnectionUri,
+  getProposalMessagesByConnectionUri,
+  getUnreadMessagesByConnectionUri,
 } from "../selectors/message-selectors.js";
 import autoresizingTextareaModule from "../directives/textarea-autogrow.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
@@ -275,15 +275,15 @@ function genComponentConf() {
         const agreementData = connection && connection.get("agreementData");
         const petriNetData = connection && connection.get("petriNetData");
 
-        const agreementMessages = selectAgreementMessagesByConnectionUri(
+        const agreementMessages = getAgreementMessagesByConnectionUri(
           state,
           connectionUri
         );
-        const cancellationPendingMessages = selectCancellationPendingMessagesByConnectionUri(
+        const cancellationPendingMessages = getCancellationPendingMessagesByConnectionUri(
           state,
           connectionUri
         );
-        const proposalMessages = selectProposalMessagesByConnectionUri(
+        const proposalMessages = getProposalMessagesByConnectionUri(
           state,
           connectionUri
         );
@@ -300,7 +300,7 @@ function genComponentConf() {
             return aTime - bTime;
           });
 
-        const unreadMessages = selectUnreadMessagesByConnectionUri(
+        const unreadMessages = getUnreadMessagesByConnectionUri(
           state,
           connectionUri
         );

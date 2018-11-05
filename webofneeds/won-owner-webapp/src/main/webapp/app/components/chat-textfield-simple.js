@@ -17,13 +17,13 @@ import {
   getOwnedNeedByConnectionUri,
 } from "../selectors/general-selectors.js";
 import {
-  selectAcceptableMessagesByConnectionUri,
-  selectRejectableMessagesByConnectionUri,
-  selectRetractableMessagesByConnectionUri,
-  selectCancelableMessagesByConnectionUri,
-  selectProposableMessagesByConnectionUri,
-  selectClaimableMessagesByConnectionUri,
-  selectSelectedMessagesByConnectionUri,
+  getAcceptableMessagesByConnectionUri,
+  getRejectableMessagesByConnectionUri,
+  getRetractableMessagesByConnectionUri,
+  getCancelableMessagesByConnectionUri,
+  getProposableMessagesByConnectionUri,
+  getClaimableMessagesByConnectionUri,
+  getSelectedMessagesByConnectionUri,
 } from "../selectors/message-selectors.js";
 import { getAllMessageDetails } from "../won-utils.js";
 import autoresizingTextareaModule from "../directives/textarea-autogrow.js";
@@ -274,27 +274,27 @@ function genComponentConf() {
         const connection = post && post.getIn(["connections", connectionUri]);
         const connectionState = connection && connection.get("state");
 
-        const rejectableMessages = selectRejectableMessagesByConnectionUri(
+        const rejectableMessages = getRejectableMessagesByConnectionUri(
           state,
           connectionUri
         );
-        const retractableMessages = selectRetractableMessagesByConnectionUri(
+        const retractableMessages = getRetractableMessagesByConnectionUri(
           state,
           connectionUri
         );
-        const acceptableMessages = selectAcceptableMessagesByConnectionUri(
+        const acceptableMessages = getAcceptableMessagesByConnectionUri(
           state,
           connectionUri
         );
-        const proposableMessages = selectProposableMessagesByConnectionUri(
+        const proposableMessages = getProposableMessagesByConnectionUri(
           state,
           connectionUri
         );
-        const cancelableMessages = selectCancelableMessagesByConnectionUri(
+        const cancelableMessages = getCancelableMessagesByConnectionUri(
           state,
           connectionUri
         );
-        const claimableMessages = selectClaimableMessagesByConnectionUri(
+        const claimableMessages = getClaimableMessagesByConnectionUri(
           state,
           connectionUri
         );
@@ -324,7 +324,7 @@ function genComponentConf() {
           multiSelectType: connection && connection.get("multiSelectType"),
           showAgreementData: connection && connection.get("showAgreementData"),
           isConnected: connectionState && connectionState === won.WON.Connected,
-          selectedMessages: selectSelectedMessagesByConnectionUri(
+          selectedMessages: getSelectedMessagesByConnectionUri(
             state,
             connectionUri
           ),

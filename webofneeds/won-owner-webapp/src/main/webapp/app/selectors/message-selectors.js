@@ -22,44 +22,44 @@ export function getMessagesByConnectionUri(state, connectionUri) {
   return need && need.getIn(["connections", connectionUri, "messages"]);
 }
 
-export function selectAcceptableMessagesByConnectionUri(state, connectionUri) {
+export function getAcceptableMessagesByConnectionUri(state, connectionUri) {
   const messages = getMessagesByConnectionUri(state, connectionUri);
   return messages && messages.filter(msg => isMessageAcceptable(msg));
 }
 
-export function selectRejectableMessagesByConnectionUri(state, connectionUri) {
+export function getRejectableMessagesByConnectionUri(state, connectionUri) {
   const messages = getMessagesByConnectionUri(state, connectionUri);
   return messages && messages.filter(msg => isMessageRejectable(msg));
 }
 
-export function selectRetractableMessagesByConnectionUri(state, connectionUri) {
+export function getRetractableMessagesByConnectionUri(state, connectionUri) {
   const messages = getMessagesByConnectionUri(state, connectionUri);
   return messages && messages.filter(msg => isMessageRetractable(msg));
 }
 
-export function selectCancelableMessagesByConnectionUri(state, connectionUri) {
+export function getCancelableMessagesByConnectionUri(state, connectionUri) {
   const messages = getMessagesByConnectionUri(state, connectionUri);
   return messages && messages.filter(msg => isMessageCancelable(msg));
 }
 
-export function selectProposableMessagesByConnectionUri(state, connectionUri) {
+export function getProposableMessagesByConnectionUri(state, connectionUri) {
   const messages = getMessagesByConnectionUri(state, connectionUri);
   return messages && messages.filter(msg => isMessageProposable(msg));
 }
 
-export function selectClaimableMessagesByConnectionUri(state, connectionUri) {
+export function getClaimableMessagesByConnectionUri(state, connectionUri) {
   const messages = getMessagesByConnectionUri(state, connectionUri);
   return messages && messages.filter(msg => isMessageClaimable(msg));
 }
 
-export function selectSelectedMessagesByConnectionUri(state, connectionUri) {
+export function getSelectedMessagesByConnectionUri(state, connectionUri) {
   const messages = getMessagesByConnectionUri(state, connectionUri);
   return (
     messages && messages.filter(msg => msg.getIn(["viewState", "isSelected"]))
   );
 }
 
-export function selectAgreementMessagesByConnectionUri(state, connectionUri) {
+export function getAgreementMessagesByConnectionUri(state, connectionUri) {
   const messages = getMessagesByConnectionUri(state, connectionUri);
   return (
     messages &&
@@ -69,7 +69,7 @@ export function selectAgreementMessagesByConnectionUri(state, connectionUri) {
   );
 }
 
-export function selectCancellationPendingMessagesByConnectionUri(
+export function getCancellationPendingMessagesByConnectionUri(
   state,
   connectionUri
 ) {
@@ -77,17 +77,17 @@ export function selectCancellationPendingMessagesByConnectionUri(
   return messages && messages.filter(msg => isMessageCancellationPending(msg));
 }
 
-export function selectProposalMessagesByConnectionUri(state, connectionUri) {
+export function getProposalMessagesByConnectionUri(state, connectionUri) {
   const messages = getMessagesByConnectionUri(state, connectionUri);
   return messages && messages.filter(msg => isMessageProposal(msg));
 }
 
-export function selectClaimMessagesByConnectionUri(state, connectionUri) {
+export function getClaimMessagesByConnectionUri(state, connectionUri) {
   const messages = getMessagesByConnectionUri(state, connectionUri);
   return messages && messages.filter(msg => isMessageClaim(msg));
 }
 
-export function selectUnreadMessagesByConnectionUri(state, connectionUri) {
+export function getUnreadMessagesByConnectionUri(state, connectionUri) {
   const messages = getMessagesByConnectionUri(state, connectionUri);
   return messages && messages.filter(msg => isMessageUnread(msg));
 }
