@@ -41,7 +41,7 @@ export function getOwnedConnectionUris(state) {
  * Get all post connections stored within your own needs as a map
  * @returns Immutable.Map with all connections
  */
-function selectAllPostConnections(state) {
+function getOwnedPostConnections(state) {
   const needs = getOwnedPosts(state); //we only check own posts as these are the only ones who have connections stored
   const connections = needs && needs.flatMap(need => need.get("connections"));
   return connections;
@@ -52,7 +52,7 @@ function selectAllPostConnections(state) {
  * @returns Immutable.Map with all connections
  */
 function selectAllPostConnectionsInStateConnected(state) {
-  const allConnections = selectAllPostConnections(state);
+  const allConnections = getOwnedPostConnections(state);
   return (
     allConnections &&
     allConnections.filter(conn => conn.get("state") === won.WON.Connected)
