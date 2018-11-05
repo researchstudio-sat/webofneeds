@@ -28,7 +28,7 @@ import {
   selectNeedsInCreationProcess,
   selectOpenConnectionUri,
   selectOpenPostUri,
-  selectAllPosts,
+  getPosts,
   selectClosedPosts,
   selectOpenPosts,
 } from "../selectors/general-selectors.js";
@@ -207,7 +207,7 @@ function genComponentConf() {
 
       const self = this;
       const selectFromState = state => {
-        const allNeeds = selectAllPosts(state);
+        const allNeeds = getPosts(state);
         const openNeeds = selectOpenPosts(state);
         const closedNeeds = selectClosedPosts(state);
 

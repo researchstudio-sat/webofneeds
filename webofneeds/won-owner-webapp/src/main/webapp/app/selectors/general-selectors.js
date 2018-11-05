@@ -19,7 +19,7 @@ export const getOwnedNeeds = state =>
 export const getNonOwnedNeeds = state =>
   getNeeds(state).filter(need => !need.get("ownNeed"));
 
-export function selectAllPosts(state) {
+export function getPosts(state) {
   const needs = getNeeds(state);
   return needs.filter(need => {
     if (!need.get("types")) return true;
@@ -29,7 +29,7 @@ export function selectAllPosts(state) {
 }
 
 export const selectAllOwnPosts = state =>
-  selectAllPosts(state).filter(need => need.get("ownNeed"));
+  getPosts(state).filter(need => need.get("ownNeed"));
 
 export function selectOpenNeeds(state) {
   const allOwnNeeds = getOwnedNeeds(state);
@@ -48,7 +48,7 @@ export function selectOpenPosts(state) {
 }
 
 export function selectAllOpenPosts(state) {
-  const allPosts = selectAllPosts(state);
+  const allPosts = getPosts(state);
   return (
     allPosts &&
     allPosts.filter(post => post.get("state") === won.WON.ActiveCompacted)
