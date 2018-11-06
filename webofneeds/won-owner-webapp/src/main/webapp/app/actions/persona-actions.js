@@ -1,9 +1,10 @@
-import { getIn, get } from "../utils";
+import { getIn, get, generateIdString } from "../utils";
 import won from "../won-es6";
 import { getRandomWonId } from "../won-utils";
 import { actionTypes } from "./actions";
 import { getOwnedNeedByConnectionUri } from "../selectors/general-selectors";
 import { getOwnedConnectionByUri } from "../selectors/connection-selectors";
+import { buildConnectMessage } from "../won-message-utils";
 
 export function createPersona(persona, nodeUri) {
   return (dispatch, getState) => {
@@ -62,6 +63,50 @@ export function createPersona(persona, nodeUri) {
   };
 }
 
+async function connectReview(
+  dispatch,
+  ownPersona,
+  foreignPersona,
+  connectMessage,
+  connectionUri = undefined
+) {
+  const getFacet = persona => {
+    const reviewFacet = persona
+      .get("hasFacets")
+      .filter(facetType => facetType == "won:ReviewFacet")
+      .keySeq()
+      .first();
+
+    if (!reviewFacet) {
+      throw new Error(
+        `Persona ${persona.get("uri")} does not have a review facet`
+      );
+    }
+    return reviewFacet;
+  };
+
+  const cnctMsg = buildConnectMessage({
+    ownNeedUri: ownPersona.get("uri"),
+    theirNeedUri: foreignPersona.get("uri"),
+    ownNodeUri: ownPersona.get("nodeUri"),
+    theirNodeUri: foreignPersona.get("nodeUri"),
+    connectMessage: connectMessage,
+    optionalOwnConnectionUri: connectionUri,
+    ownFacet: getFacet(ownPersona),
+    theirFacet: getFacet(foreignPersona),
+  });
+  const optimisticEvent = await won.wonMessageFromJsonLd(cnctMsg.message);
+  dispatch({
+    type: actionTypes.needs.connect,
+    payload: {
+      eventUri: cnctMsg.eventUri,
+      message: cnctMsg.message,
+      ownConnectionUri: connectionUri,
+      optimisticEvent: optimisticEvent,
+    },
+  });
+}
+
 export function reviewPersona(reviewableConnectionUri, review) {
   return (dispatch, getState) => {
     const state = getState();
@@ -71,31 +116,47 @@ export function reviewPersona(reviewableConnectionUri, review) {
     const foreignNeedUri = get(connection, "remoteNeedUri");
     const foreignNeed = getIn(state, ["needs", foreignNeedUri]);
 
-    const getReviewFacet = need => {
+    const getPersona = need => {
       const personaUri = get(need, "heldBy");
       const persona = state.getIn(["needs", personaUri]);
-      if (!persona) {
-        return undefined;
-      }
-      const reviewFacet = persona
-        .get("hasFacets")
-        .filter(facetType => facetType == "won:ReviewFacet")
-        .keySeq()
-        .first();
 
-      if (!reviewFacet) {
-        throw new Error(`Persona ${personaUri} does not have a review facet`);
-      }
-      return reviewFacet;
+      return persona;
     };
 
-    const ownReviewFacet = getReviewFacet(ownNeed);
-    const foreignReviewFacet = getReviewFacet(foreignNeed);
+    const getConnection = (ownPersona, foreignPersona) => {
+      return ownPersona
+        .get("connections")
+        .filter(
+          connection =>
+            connection.get("remoteNeedUri") == foreignPersona.get("uri")
+        )
+        .keySeq()
+        .first();
+    };
 
-    console.info(
-      `Review from ${ownReviewFacet} to ${foreignReviewFacet} with value ${
-        review.value
-      }`
+    const ownPersona = getPersona(ownNeed);
+    const foreignPersona = getPersona(foreignNeed);
+
+    const reviewRdf = {
+      "@type": "s:Review",
+      "@id": reviewableConnectionUri + "/" + generateIdString(10),
+      "s:about": reviewableConnectionUri,
+      "s:reviewRating": {
+        "@type": "s:Rating",
+        "@id": reviewableConnectionUri + "/" + generateIdString(10),
+        "s:bestRating": { "@value": 5, "@type": "xsd:int" }, //not necessary but possible
+        "s:ratingValue": { "@value": review.value, "@type": "xsd:int" },
+        "s:worstRating": { "@value": 1, "@type": "xsd:int" }, //not necessary but possible
+      },
+      "s:description": review.message,
+    };
+
+    connectReview(
+      dispatch,
+      ownPersona,
+      foreignPersona,
+      reviewRdf,
+      getConnection(ownPersona, foreignPersona)
     );
   };
 }
