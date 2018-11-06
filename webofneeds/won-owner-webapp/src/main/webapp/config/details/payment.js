@@ -94,7 +94,6 @@ export const paypalPayment = {
       const amount = value.amount;
 
       let currencyLabel = undefined;
-      let unitCodeLabel = undefined;
 
       this.currency &&
         this.currency.forEach(curr => {
@@ -104,26 +103,9 @@ export const paypalPayment = {
         });
       currencyLabel = currencyLabel || value.currency;
 
-      this.unitCode &&
-        this.unitCode.forEach(uc => {
-          if (uc.value === value.unitCode) {
-            unitCodeLabel = uc.label;
-          }
-        });
-      unitCodeLabel = unitCodeLabel || value.unitCode;
-
-      if (unitCodeLabel) {
-        return (
-          (includeLabel ? this.label + ": " + amount : amount) +
-          currencyLabel +
-          " " +
-          unitCodeLabel
-        );
-      } else {
-        return (
-          (includeLabel ? this.label + ": " + amount : amount) + currencyLabel
-        );
-      }
+      return (
+        (includeLabel ? this.label + ": " + amount : amount) + currencyLabel
+      );
     }
     return undefined;
   },
