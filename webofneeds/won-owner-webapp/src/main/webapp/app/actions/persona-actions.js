@@ -71,25 +71,31 @@ export function reviewPersona(reviewableConnectionUri, review) {
     const foreignNeedUri = get(connection, "remoteNeedUri");
     const foreignNeed = getIn(state, ["needs", foreignNeedUri]);
 
-    const ownPersonaUri = get(ownNeed, "heldBy");
-    const foreignPersonaUri = get(foreignNeed, "heldBy");
+    const getReviewFacet = need => {
+      const personaUri = get(need, "heldBy");
+      const persona = state.getIn(["needs", personaUri]);
+      if (!persona) {
+        return undefined;
+      }
+      const reviewFacet = persona
+        .get("hasFacets")
+        .filter(facetType => facetType == "won:ReviewFacet")
+        .keySeq()
+        .first();
 
-    if (!ownPersonaUri) {
-      throw new Error(
-        `No own persona found for rating when looking at ${reviewableConnectionUri}`
-      );
-    }
+      if (!reviewFacet) {
+        throw new Error(`Persona ${personaUri} does not have a review facet`);
+      }
+      return reviewFacet;
+    };
 
-    if (!foreignPersonaUri) {
-      throw new Error(
-        `No foreign persona found for rating when looking at ${reviewableConnectionUri}`
-      );
-    }
+    const ownReviewFacet = getReviewFacet(ownNeed);
+    const foreignReviewFacet = getReviewFacet(foreignNeed);
 
     console.info(
-      `${ownPersonaUri} reviewing ${foreignPersonaUri} with value ${
+      `Review from ${ownReviewFacet} to ${foreignReviewFacet} with value ${
         review.value
-      } and message "${review.message}"`
+      }`
     );
   };
 }
