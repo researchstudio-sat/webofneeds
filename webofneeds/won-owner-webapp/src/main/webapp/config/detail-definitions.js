@@ -6,6 +6,7 @@ import * as priceDetails from "./details/price.js";
 import * as basicDetails from "./details/basic.js";
 import * as workflowDetails from "./details/workflow.js";
 import * as reviewDetails from "./details/review.js";
+import * as paymentDetails from "./details/payment.js";
 
 import * as abstractDetails_ from "./details/abstract.js";
 export const abstractDetails = abstractDetails_; // reexport
@@ -48,4 +49,5 @@ export const messageDetails = {
   bpmnWorkflow: workflowDetails.bpmnWorkflow,
   petriNetWorkflow: workflowDetails.petriNetWorkflow,
   petriNetTransition: workflowDetails.petriNetTransition,
+  paypalPayment: paymentDetails.paypalPayment,
 };

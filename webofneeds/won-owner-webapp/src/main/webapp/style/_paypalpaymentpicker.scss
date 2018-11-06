@@ -1,0 +1,181 @@
+@import "won-config";
+@import "textfield";
+@import "sizing-utils";
+
+won-paypal-payment-picker {
+  .paypalpaymentp__textinput {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr auto;
+
+    &__reset {
+      position: relative;
+
+      &__icon {
+        @include fixed-square($bigiconSize);
+        position: absolute;
+        right: 0;
+        top: 0.5rem;
+      }
+    }
+
+    .paypalpaymentp__textinput__secret {
+      @extend .won-txt;
+      border: $thinGrayBorder;
+
+      @include textfieldPadding(
+        $normalFontSize,
+        22/16,
+        $thinBorderWidth,
+        $formInputHeight
+      );
+      word-wrap: break-word;
+
+      &:invalid {
+        /*TODO: Define styling for invalid input field*/
+      }
+
+      &.paypalpaymentp__textinput__inner--withreset {
+        $verticalPadding: calcVerticalPaddingToHeight(
+          $normalFontSize,
+          22/16,
+          $thinBorderWidth,
+          $formInputHeight
+        );
+        padding: $verticalPadding 0.438rem + $bigiconSize $verticalPadding
+          0.438rem;
+      }
+    }
+
+    .paypalpaymentp__textinput__receiver {
+      @extend .won-txt;
+      border: $thinGrayBorder;
+
+      @include textfieldPadding(
+        $normalFontSize,
+        22/16,
+        $thinBorderWidth,
+        $formInputHeight
+      );
+      word-wrap: break-word;
+
+      &:invalid {
+        /*TODO: Define styling for invalid input field*/
+      }
+
+      &.paypalpaymentp__textinput__secret--withreset {
+        $verticalPadding: calcVerticalPaddingToHeight(
+          $normalFontSize,
+          22/16,
+          $thinBorderWidth,
+          $formInputHeight
+        );
+        padding: $verticalPadding 0.438rem + $bigiconSize $verticalPadding
+          0.438rem;
+      }
+    }
+
+    .paypalpaymentp__textinput__amount {
+      @extend .won-txt;
+      text-align: right;
+      border: $thinGrayBorder;
+
+      @include textfieldPadding(
+        $normalFontSize,
+        22/16,
+        $thinBorderWidth,
+        $formInputHeight
+      );
+      word-wrap: break-word;
+
+      &:invalid {
+        /*TODO: Define styling for invalid input field*/
+      }
+
+      &.paypalpaymentp__textinput__receiver--withreset {
+        $verticalPadding: calcVerticalPaddingToHeight(
+          $normalFontSize,
+          22/16,
+          $thinBorderWidth,
+          $formInputHeight
+        );
+        padding: $verticalPadding 0.438rem $verticalPadding 0.438rem +
+          $bigiconSize;
+      }
+    }
+
+    .paypalpaymentp__textinput__receiver::-ms-clear,
+    .paypalpaymentp__textinput__secret::-ms-clear {
+      width: 0;
+      height: 0;
+    }
+  }
+
+  .paypalpaymentp__input {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+
+    &__reset {
+      position: relative;
+
+      &__icon {
+        @include fixed-square($bigiconSize);
+        position: absolute;
+        left: 0;
+        top: 0.5rem;
+      }
+    }
+
+    .paypalpaymentp__input__amount {
+      @extend .won-txt;
+      text-align: right;
+      border: $thinGrayBorder;
+
+      @include textfieldPadding(
+        $normalFontSize,
+        22/16,
+        $thinBorderWidth,
+        $formInputHeight
+      );
+      word-wrap: break-word;
+
+      &:invalid {
+        /*TODO: Define styling for invalid input field*/
+      }
+
+      &.paypalpaymentp__input__amount--withreset {
+        $verticalPadding: calcVerticalPaddingToHeight(
+          $normalFontSize,
+          22/16,
+          $thinBorderWidth,
+          $formInputHeight
+        );
+        padding: $verticalPadding 0.438rem $verticalPadding 0.438rem +
+          $bigiconSize;
+      }
+    }
+
+    .paypalpaymentp__input__currency {
+      border: $thinGrayBorder;
+      min-height: $formInputHeight;
+      min-height: $formInputHeight;
+      word-wrap: break-word;
+      font-size: 1rem;
+
+      $verticalPadding: calcVerticalPaddingToHeight(
+        $normalFontSize,
+        22/16,
+        $thinBorderWidth,
+        $formInputHeight
+      );
+      padding: $verticalPadding 0.438rem + $bigiconSize $verticalPadding
+        0.438rem;
+    }
+
+    .paypalpaymentp__input__amount::-ms-clear {
+      width: 0;
+      height: 0;
+    }
+  }
+}

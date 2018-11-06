@@ -18,6 +18,7 @@ import petrinetPickerModule from "./petrinet-picker.js";
 import petrinettransitionPickerModule from "./petrinettransition-picker.js";
 import reviewPickerModule from "./review-picker.js";
 import suggestPostPickerModule from "./suggestpost-picker.js";
+import paypalPaymentPickerModule from "./paypal-payment-picker.js";
 
 /**
  * module names for angular's module system
@@ -43,4 +44,5 @@ export default [
   petrinettransitionPickerModule,
   reviewPickerModule,
   suggestPostPickerModule,
+  paypalPaymentPickerModule,
 ];
