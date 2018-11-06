@@ -6,7 +6,7 @@
 
 chat-textfield-simple {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto 1fr min-content;
   grid-template-rows: auto auto;
   min-width: 0; // so a size is specified and break-word works
 

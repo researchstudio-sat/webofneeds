@@ -110,31 +110,41 @@ view skin model =
                 ]
     in
     layout
-        [ Font.size 16 ]
+        [ Font.size 16
+        , width shrink ]
     <|
         if not model.options.loggedIn || not model.options.showPersonas then
             Input.button
-                [ width fill
+                [ width (maximum (model.size.width // 2) shrink)
                 , height fill
                 , focusStyle
                 , Background.color buttonColor
-                , Border.rounded 3
+                , Border.roundEach
+                    { topLeft = 0
+                    , bottomLeft = 0
+                    , topRight = 3
+                    , bottomRight = 3
+                    }
+                , paddingEach
+                    { left = 10
+                    , right = 10
+                    , top = 0
+                    , bottom = 0
+                    }
                 ]
                 { onPress = Just Publish
                 , label =
-                    el
+                    paragraph
                         [ centerY
                         , centerX
                         , Font.color Skin.white
                         ]
-                    <|
-                        text model.options.label
+                        [ text model.options.label ]
                 }
 
         else
             row
-                [ width fill
-                , spacing 2
+                [ spacing 2
                 , height fill
                 , above <|
                     case model.state of
@@ -162,13 +172,12 @@ view skin model =
                             none
                 ]
                 [ el
-                    [ width fill
-                    , height fill
+                    [ height fill
                     ]
                   <|
                     Input.button
                         [ Background.color buttonColor
-                        , width fill
+                        , width (maximum (model.size.width // 2) fill)
                         , height fill
                         , focusStyle
                         , paddingEach
@@ -185,13 +194,13 @@ view skin model =
                             else
                                 Nothing
                         , label =
-                            el
-                                [ centerY
+                            paragraph
+                                [ width fill
+                                , centerY
                                 , centerX
                                 , Font.color Skin.white
                                 ]
-                            <|
-                                text
+                                [ text
                                     (case model.selectedPersona of
                                         Persona url ->
                                             case Dict.get url model.personas of
@@ -209,7 +218,10 @@ view skin model =
                                         Anonymous ->
                                             model.options.label ++ " Anonymously"
                                     )
+                                ]
                         }
+
+                -- Persona-Drop-Up Button
                 , Input.button
                     [ Background.color skin.primaryColor
                     , Border.roundEach
@@ -313,6 +325,7 @@ personaList skin screenSize personas =
         , moveUp 5
         , Background.color Skin.white
         , scrollbarY
+        , alignLeft
         , height (maximum maxHeight shrink)
         ]
         (List.intersperse line listElements)
