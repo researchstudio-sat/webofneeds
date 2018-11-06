@@ -87,6 +87,8 @@ init { width, height } =
 
 
 ---- VIEW ----
+
+
 view : Skin -> Model -> Html Msg
 view skin model =
     let
@@ -108,15 +110,12 @@ view skin model =
                 ]
     in
     layout
-        [ -- This is needed so .ui doesn't set the min-height to 100%
-          height (minimum 0 shrink)
-        , Font.size 16
-        ]
+        [ Font.size 16 ]
     <|
-        if not model.options.loggedIn then
+        if not model.options.loggedIn || not model.options.showPersonas then
             Input.button
                 [ width fill
-                , height (px 43)
+                , height fill
                 , focusStyle
                 , Background.color buttonColor
                 , Border.rounded 3
@@ -131,29 +130,12 @@ view skin model =
                     <|
                         text model.options.label
                 }
-        else if not model.options.showPersonas then
-            Input.button
-                [ width fill
-                , height (px 43)
-                , focusStyle
-                , Background.color buttonColor
-                , Border.rounded 3
-                ]
-                { onPress = Just Publish
-                , label =
-                    el
-                        [ centerY
-                        , centerX
-                        , Font.color Skin.white
-                        ]
-                    <|
-                        text model.options.label
-                }
+
         else
             row
                 [ width fill
                 , spacing 2
-                , height (px 43)
+                , height fill
                 , above <|
                     case model.state of
                         Open ->
@@ -188,16 +170,10 @@ view skin model =
                         [ Background.color buttonColor
                         , width fill
                         , height fill
-                        , Border.roundEach
-                            { topLeft = 3
-                            , bottomLeft = 3
-                            , topRight = 0
-                            , bottomRight = 0
-                            }
                         , focusStyle
                         , paddingEach
-                            { left = 42
-                            , right = 0
+                            { left = 10
+                            , right = 10
                             , top = 0
                             , bottom = 0
                             }

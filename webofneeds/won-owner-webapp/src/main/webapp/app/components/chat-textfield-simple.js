@@ -199,6 +199,7 @@ function genComponentConf() {
             </svg>
         </button>
       <!-- OPEN/CLOSE DETAILS BTN -->
+      
         <textarea 
             won-textarea-autogrow
             data-min-rows="1"
@@ -208,22 +209,15 @@ function genComponentConf() {
             tabindex="0"
             placeholder="{{self.placeholder}}"></textarea>
 
-        <!-- old send button, to be deleted
-        <button
-            class="cts__submitbutton red"
-            ng-show="self.submitButtonLabel"
-            ng-click="self.submit()"
-            ng-disabled="!self.valid()">
-            {{ (self.submitButtonLabel || 'Submit') }}
-        </button>
-         -->
       <!-- PERSONA SELECTION START -->
-        <won-submit-button
-            is-valid="self.valid()"
-            on-submit="self.submit(persona)" 
-            show-personas="self.showPersonasSelection"
-            label="self.submitButtonLabel">
-        </won-submit-button>
+        <div class="cts__submitbutton">
+            <won-submit-button
+                is-valid="self.valid()"
+                on-submit="self.submit(persona)" 
+                show-personas="self.showPersonasSelection"
+                label="self.submitButtonLabel">
+            </won-submit-button>
+        </div>
       <!-- PERSONA SELECTION END -->
 
       <!-- ADDED DETAILS START -->  

@@ -193,6 +193,7 @@ chat-textfield-simple {
     grid-area: button;
     grid-row: 2 / span 1;
     grid-column: 3 / span 1;
+    display: flex;
   }
   .cts__additionalcontent {
     grid-area: additionalcontent;
@@ -242,11 +243,6 @@ chat-textfield-simple {
   .cts__helptext {
     grid-area: help;
     grid-column: 1 / span 3;
-  }
-  .cts__submitbutton {
-    @extend .won-button--filled;
-    border-bottom-left-radius: 0;
-    border-top-left-radius: 0;
   }
   .cts__charcount,
   .cts__helptext {
