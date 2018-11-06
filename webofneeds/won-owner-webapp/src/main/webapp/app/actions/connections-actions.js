@@ -311,10 +311,39 @@ function connectAdHoc(theirNeedUri, textMessage, persona, dispatch, getState) {
     const theirNeed = getIn(state, ["needs", theirNeedUri]);
     const adHocDraft = generateResponseNeedTo(theirNeed);
     const nodeUri = getIn(state, ["config", "defaultNodeUri"]);
+
+    // create new need
     const { message, eventUri, needUri } = await buildCreateMessage(
       adHocDraft,
       nodeUri
     );
+
+    // add persona
+    if (persona) {
+      const response = await fetch("rest/action/connect", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify([
+          {
+            pending: false,
+            facet: `${persona}#holderFacet`,
+          },
+          {
+            pending: true,
+            facet: `${needUri}#holdableFacet`,
+          },
+        ]),
+        credentials: "include",
+      });
+      if (!response.ok) {
+        const errorMsg = await response.text();
+        throw new Error(`Could not connect identity: ${errorMsg}`);
+      }
+    }
+
+    // establish connection
     const cnctMsg = buildConnectMessage({
       ownNeedUri: needUri,
       theirNeedUri: theirNeedUri,
@@ -361,7 +390,6 @@ function connectAdHoc(theirNeedUri, textMessage, persona, dispatch, getState) {
       });
 
       // create the new need
-      // TODO: add persona
       dispatch({
         type: actionTypes.needs.create, // TODO custom action
         payload: { eventUri, message, needUri, need: adHocDraft },
