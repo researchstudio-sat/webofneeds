@@ -3,6 +3,17 @@
 @import "sizing-utils";
 
 won-paypal-payment-picker {
+  display: grid;
+
+  .paypalpaymentp__label {
+    padding-bottom: 0.25rem;
+    padding-top: 0.75rem;
+
+    &:first-of-type {
+      padding-top: 0;
+    }
+  }
+
   .paypalpaymentp__textinput {
     position: relative;
     display: grid;

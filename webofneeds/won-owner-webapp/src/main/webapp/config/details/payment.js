@@ -6,11 +6,15 @@ export const paypalPayment = {
   identifier: "paypalPayment",
   label: "PayPal Payment",
   icon: "#ico36_detail_price", //TODO: ADAPT
-  amountPlaceholder: "Enter Amount...", //TODO: ADAPT
-  receiverPlaceholder: "PayPal Accountname...",
+  amountLabel: "Price:",
+  amountPlaceholder: "Enter Amount...",
+  receiverLabel: "PayPal Account that should receive Payment:",
+  receiverPlaceholder: "PayPal Account ID...",
+  secretLabel: "Secret:",
   secretPlaceholder: "Enter Secret...",
-  component: "won-paypal-payment-picker", //TODO: CHANGE
-  viewerComponent: "won-paypal-payment-viewer", //TODO: CHANGE
+  costumerLabel: "Who pays?",
+  component: "won-paypal-payment-picker",
+  viewerComponent: "won-paypal-payment-viewer",
   currency: [
     { value: "EUR", label: "€", default: true },
     { value: "USD", label: "$" },

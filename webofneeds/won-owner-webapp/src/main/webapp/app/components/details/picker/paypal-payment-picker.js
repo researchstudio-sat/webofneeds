@@ -9,6 +9,9 @@ import "style/_paypalpaymentpicker.scss";
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
   let template = `
+      <div class="paypalpaymentp__label">
+        {{self.detail.amountLabel}}
+      </div>
       <div class="paypalpaymentp__input">
         <div class="paypalpaymentp__input__reset clickable">
           <svg class="paypalpaymentp__input__reset__icon"
@@ -33,6 +36,9 @@ function genComponentConf() {
             <option ng-repeat="currency in self.detail.currency" value="{{currency.value}}">{{currency.label}}</option>
         </select>
       </div>
+      <div class="paypalpaymentp__label">
+        {{self.detail.receiverLabel}}
+      </div>
       <div class="paypalpaymentp__textinput">
         <input
             type="email"
@@ -50,6 +56,9 @@ function genComponentConf() {
           </svg>
         </div>
       </div>
+      <div class="paypalpaymentp__label">
+        {{self.detail.secretLabel}}
+      </div>
       <div class="paypalpaymentp__textinput">
         <input
             type="text"
@@ -66,6 +75,9 @@ function genComponentConf() {
             <use xlink:href="#ico36_close" href="#ico36_close"></use>
           </svg>
         </div>
+      </div>
+      <div class="paypalpaymentp__label">
+        {{self.detail.costumerLabel}}
       </div>
       <won-suggestpost-picker
           initial-value="self.initialValue && self.initialValue.costumerUri"
