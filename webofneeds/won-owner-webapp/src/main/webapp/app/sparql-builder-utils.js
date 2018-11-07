@@ -584,7 +584,7 @@ export function generateWhatsAroundQuery(latitude, longitude) {
           PREFIX geoliteral: <http://www.bigdata.com/rdf/geospatial/literals/v1#>
           SELECT DISTINCT ?result WHERE {
             {
-              SELECT DISTINCT ?result WHERE {
+              SELECT DISTINCT ?result ?location_geoDistance WHERE {
                   ?result <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> won:Need.
                   ?result won:is ?is.
                   ?is won:hasLocation ?location.
@@ -606,7 +606,7 @@ export function generateWhatsAroundQuery(latitude, longitude) {
               }
             }
           UNION {
-            SELECT DISTINCT ?result WHERE {
+            SELECT DISTINCT ?result ?location_geoDistance WHERE {
                   ?result <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> won:Need.
                   ?result won:seeks ?seeks.
                   ?seeks won:hasLocation ?location.
