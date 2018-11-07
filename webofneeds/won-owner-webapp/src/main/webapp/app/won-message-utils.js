@@ -473,18 +473,16 @@ export async function buildCreateMessage(needData, wonNodeUri) {
   }
 
   //if type  create -> use needBuilder as well
-  const prepareContentNodeData = async needDataIsOrSeeks => ({
+  const prepareContentNodeData = async needData => ({
     // Adds all fields from needDataIsOrSeeks:
     // title, description, tags, matchingContext, location,...
-    ...needDataIsOrSeeks,
+    ...needData,
 
     publishedContentUri: publishedContentUri, //mandatory
-    type: won.toCompacted(needDataIsOrSeeks.type), //mandatory
+    type: won.toCompacted(needData.type), //mandatory
     //TODO attach to either is or seeks?
     attachmentUris: attachmentUris, //optional, should be same as in `attachments` below
-    arbitraryJsonLd: needDataIsOrSeeks.ttl
-      ? await won.ttlToJsonLd(needDataIsOrSeeks.ttl)
-      : [],
+    arbitraryJsonLd: needData.ttl ? await won.ttlToJsonLd(needData.ttl) : [],
   });
 
   let contentRdf = won.buildNeedRdf({
