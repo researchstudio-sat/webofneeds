@@ -488,7 +488,9 @@ export async function buildCreateMessage(needData, wonNodeUri) {
   });
 
   let contentRdf = won.buildNeedRdf({
-    is: needData.is ? await prepareContentNodeData(needData.is) : undefined,
+    content: needData.is
+      ? await prepareContentNodeData(needData.is)
+      : undefined,
     seeks: needData.seeks
       ? await prepareContentNodeData(needData.seeks)
       : undefined,

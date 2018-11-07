@@ -93,14 +93,14 @@ import { Generator } from "sparqljs";
    * contentId, e.g. 'http://localhost:8080/won/resource/event/1997814854983652400#content-need';
    */
   won.buildNeedRdf = function(args) {
-    if (!args.is && !args.seeks && !args.searchString) {
+    if (!args.content && !args.seeks && !args.searchString) {
       throw new Error(
         "Expected an object with an is- and/or a seeks-subobject. Something like `{ is: {...}, seeks: {...} }`. Got " +
           JSON.stringify(args)
       );
     }
 
-    const addIsContent = (contentNode, isData) => {
+    const addContent = (contentNode, contentData) => {
       //TODO: CANT HANDLE "@id" details yet (see won-message-utils.js buildChatMessage(..) additionalContent part
       const detailList = getAllDetails();
 
@@ -108,9 +108,9 @@ import { Generator } from "sparqljs";
         // const detail = detailList[detailName];
         const detailRDF = {
           ...detail.parseToRDF({
-            value: isData[detail.identifier],
+            value: contentData[detail.identifier],
             identifier: detail.identifier,
-            contentUri: isData["publishedContentUri"],
+            contentUri: contentData["publishedContentUri"],
           }),
         };
 
@@ -128,29 +128,31 @@ import { Generator } from "sparqljs";
         }
       }
       if (contentNode["@type"]) {
-        if (isData["@type"]) {
-          contentNode["@type"] = contentNode["@type"].concat(isData["@type"]);
-        } else if (isData.type) {
-          contentNode["@type"] = contentNode["@type"].concat(isData.type);
+        if (contentData["@type"]) {
+          contentNode["@type"] = contentNode["@type"].concat(
+            contentData["@type"]
+          );
+        } else if (contentData.type) {
+          contentNode["@type"] = contentNode["@type"].concat(contentData.type);
         }
       } else {
-        if (isData["@type"]) {
-          contentNode["@type"] = isData["@type"];
-        } else if (isData.type) {
-          contentNode["@type"] = isData.type;
+        if (contentData["@type"]) {
+          contentNode["@type"] = contentData["@type"];
+        } else if (contentData.type) {
+          contentNode["@type"] = contentData.type;
         }
       }
 
       return contentNode;
     };
 
-    const buildContentNode = (id, isOrSeeksData) => {
+    const buildContentNode = (id, seeksData) => {
       //TODO: CANT HANDLE "@id" details yet (see won-message-utils.js buildChatMessage(..) additionalContent part
       let contentNode = {
         "@id": id,
-        "@type": isOrSeeksData.type,
-        "won:hasAttachment": hasAttachmentUrls(isOrSeeksData)
-          ? isOrSeeksData.attachmentUris.map(uri => ({ "@id": uri }))
+        "@type": seeksData.type || seeksData["@type"],
+        "won:hasAttachment": hasAttachmentUrls(seeksData)
+          ? seeksData.attachmentUris.map(uri => ({ "@id": uri }))
           : undefined,
       };
 
@@ -160,9 +162,9 @@ import { Generator } from "sparqljs";
         // const detail = detailList[detailName];
         const detailRDF = {
           ...detail.parseToRDF({
-            value: isOrSeeksData[detail.identifier],
+            value: seeksData[detail.identifier],
             identifier: detail.identifier,
-            contentUri: isOrSeeksData["publishedContentUri"],
+            contentUri: seeksData["publishedContentUri"],
           }),
         };
 
@@ -186,18 +188,18 @@ import { Generator } from "sparqljs";
     const searchString = args.searchString;
 
     // TODO: if both is and seeks are present, the seeks content gets ignored here
-    const isWhatsAround = args.is
-      ? args.is.whatsAround
+    const isWhatsAround = args.content
+      ? args.content.whatsAround
       : args.seeks
         ? args.seeks.whatsAround
         : undefined;
-    const isWhatsNew = args.is
-      ? args.is.whatsNew
+    const isWhatsNew = args.content
+      ? args.content.whatsNew
       : args.seeks
         ? args.seeks.whatsNew
         : undefined;
-    const noHints = args.is
-      ? args.is.noHints
+    const noHints = args.content
+      ? args.content.noHints
       : args.seeks
         ? args.seeks.noHints
         : undefined;
@@ -268,8 +270,8 @@ import { Generator } from "sparqljs";
       : doNotMatchAfterFnOrLit;
 
     let contentGraph = {
-      "@id": args.is
-        ? args.is.publishedContentUri
+      "@id": args.content
+        ? args.content.publishedContentUri
         : args.seeks
           ? args.seeks.publishedContentUri
           : undefined,
@@ -307,14 +309,16 @@ import { Generator } from "sparqljs";
             : undefined,
     };
 
-    if (args.is) {
-      contentGraph = addIsContent(contentGraph, args.is);
+    if (args.content) {
+      contentGraph = addContent(contentGraph, args.content);
     }
     const graph = [
       contentGraph,
       //, <if _hasModalities> {... (see directly below) } </if>
       seeksContentNode,
-      ...(args.is && args.is.arbitraryJsonLd ? args.is.arbitraryJsonLd : []),
+      ...(args.content && args.content.arbitraryJsonLd
+        ? args.content.arbitraryJsonLd
+        : []),
       ...(args.seeks && args.seeks.arbitraryJsonLd
         ? args.seeks.arbitraryJsonLd
         : []),
