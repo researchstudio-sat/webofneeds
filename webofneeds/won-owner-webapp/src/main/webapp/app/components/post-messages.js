@@ -781,7 +781,11 @@ function genComponentConf() {
         }
 
         if (this.nonOwnedNeedUri) {
-          this.connections__connectAdHoc(this.theirNeedUri, message, persona);
+          this.connections__connectAdHoc(
+            this.nonOwnedNeedUri,
+            message,
+            persona
+          );
         }
 
         //this.router__stateGoCurrent({connectionUri: null, sendAdHocRequest: null});
