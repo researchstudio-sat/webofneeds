@@ -115,7 +115,6 @@ export const paypalPayment = {
     };
   },
   generateHumanReadable: function({ value, includeLabel }) {
-    //TODO: IMPL
     if (value) {
       const amount = value.amount;
       const secret = value.secret;
