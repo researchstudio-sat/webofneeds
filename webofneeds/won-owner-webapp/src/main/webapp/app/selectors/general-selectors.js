@@ -4,7 +4,6 @@
 
 import { createSelector } from "reselect";
 
-import Immutable from "immutable";
 import won from "../won-es6.js";
 import { decodeUriComponentProperly, getIn } from "../utils.js";
 import Color from "color";
@@ -24,7 +23,9 @@ export function getPosts(state) {
   return needs.filter(need => {
     if (!need.get("types")) return true;
 
-    return Immutable.is(need.get("types"), Immutable.Set(["won:Need"]));
+    return (
+      need.get("types").has("won:Need") && !need.get("types").has("won:Persona")
+    );
   });
 }
 

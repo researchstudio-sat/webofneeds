@@ -30,9 +30,7 @@ export function parseNeed(jsonldNeed, ownNeed) {
   if (jsonldNeedImm) {
     const uri = jsonldNeedImm.get("@id");
     const nodeUri = jsonldNeedImm.getIn(["won:hasWonNode", "@id"]);
-    const is = jsonldNeedImm.get("won:is");
     const seeks = jsonldNeedImm.get("won:seeks");
-    const isPresent = is && is.size > 0;
     const seeksPresent = seeks && seeks.size > 0;
 
     const searchString = jsonldNeedImm.get("won:hasSearchString");
@@ -114,9 +112,8 @@ export function parseNeed(jsonldNeed, ownNeed) {
       }
     })(jsonldNeedImm.get("@type"));
 
-    if (isPresent) {
-      isPart = generateContent(is, type, detailsToParse);
-    }
+    isPart = generateContent(jsonldNeedImm, type, detailsToParse);
+
     if (seeksPresent) {
       seeksPart = generateContent(seeks, type, detailsToParse);
     }
