@@ -9,11 +9,11 @@ export const paypalPayment = {
   icon: "#ico36_detail_price", //TODO: ADAPT
   amountLabel: "Price:",
   amountPlaceholder: "Enter Amount...",
-  receiverLabel: "PayPal Account that should receive Payment:",
+  receiverLabel: "Recipient:",
   receiverPlaceholder: "PayPal Account ID (Email)...",
   secretLabel: "Secret:",
   secretPlaceholder: "Enter Secret...",
-  costumerLabel: "Who pays?",
+  customerLabel: "Who pays?",
   component: "won-paypal-payment-picker",
   viewerComponent: "won-paypal-payment-viewer",
   currency: [

@@ -10,7 +10,7 @@ const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
   let template = `
       <div class="paypalpaymentp__label">
-        {{self.detail.amountLabel}}
+        {{ self.detail.amountLabel }}
       </div>
       <div class="paypalpaymentp__input">
         <div class="paypalpaymentp__input__reset clickable">
@@ -33,11 +33,11 @@ function genComponentConf() {
             ng-model="self.selectedCurrency"
             ng-disabled="self.detail.currency.length <= 1"
             won-input="::self.updateCurrency()">
-            <option ng-repeat="currency in self.detail.currency" value="{{currency.value}}">{{currency.label}}</option>
+            <option ng-repeat="currency in self.detail.currency" value="{{currency.value}}">{{ currency.label }}</option>
         </select>
       </div>
       <div class="paypalpaymentp__label">
-        {{self.detail.receiverLabel}}
+        {{ self.detail.receiverLabel }}
       </div>
       <div class="paypalpaymentp__textinput">
         <input
@@ -57,7 +57,7 @@ function genComponentConf() {
         </div>
       </div>
       <div class="paypalpaymentp__label">
-        {{self.detail.secretLabel}}
+        {{ self.detail.secretLabel }}
       </div>
       <div class="paypalpaymentp__textinput">
         <input
@@ -77,7 +77,7 @@ function genComponentConf() {
         </div>
       </div>
       <div class="paypalpaymentp__label">
-        {{self.detail.customerLabel}}
+        {{ self.detail.customerLabel }}
       </div>
       <won-suggestpost-picker
           initial-value="self.initialValue && self.initialValue.customerUri"
