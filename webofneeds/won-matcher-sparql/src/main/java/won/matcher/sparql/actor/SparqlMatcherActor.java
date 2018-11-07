@@ -7,7 +7,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -39,16 +40,11 @@ import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.apache.jena.sparql.algebra.Algebra;
 import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.algebra.OpAsQuery;
-import org.apache.jena.sparql.algebra.TransformCopy;
-import org.apache.jena.sparql.algebra.Transformer;
 import org.apache.jena.sparql.algebra.op.OpBGP;
 import org.apache.jena.sparql.algebra.op.OpDistinct;
 import org.apache.jena.sparql.algebra.op.OpFilter;
-import org.apache.jena.sparql.algebra.op.OpJoin;
 import org.apache.jena.sparql.algebra.op.OpPath;
 import org.apache.jena.sparql.algebra.op.OpProject;
-import org.apache.jena.sparql.algebra.op.OpSlice;
-import org.apache.jena.sparql.algebra.op.OpTriple;
 import org.apache.jena.sparql.algebra.op.OpUnion;
 import org.apache.jena.sparql.core.BasicPattern;
 import org.apache.jena.sparql.core.TriplePath;
@@ -56,7 +52,6 @@ import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.engine.binding.BindingFactory;
 import org.apache.jena.sparql.expr.E_LogicalOr;
-import org.apache.jena.sparql.expr.E_NotExists;
 import org.apache.jena.sparql.expr.E_StrContains;
 import org.apache.jena.sparql.expr.E_StrLowerCase;
 import org.apache.jena.sparql.expr.Expr;
@@ -249,13 +244,13 @@ public class SparqlMatcherActor extends UntypedActor {
         NeedModelWrapper need = new NeedModelWrapper(needEvent.deserializeNeedDataset());
         log.debug("starting sparql-based matching for need {}", need.getNeedUri());
         
-        Set<NeedModelWrapper> matches = queryNeed(need);
+        List<NeedModelWrapper> matches = queryNeed(need);
         log.debug("found {} match candidates", matches.size());
         Dataset needDataset = need.copyDataset();
         
         final boolean noHintForCounterpart = need.hasFlag(WON.NO_HINT_FOR_COUNTERPART);
         
-        Map<NeedModelWrapper, Set<NeedModelWrapper>> filteredNeeds = Stream.concat(
+        Map<NeedModelWrapper, List<NeedModelWrapper>> filteredNeeds = Stream.concat(
                 Stream.of(new AbstractMap.SimpleEntry<>(need, matches)),
                 //add the reverse match, if no flags forbid it
                 matches.stream().map(matchedNeed -> {
@@ -267,7 +262,7 @@ public class SparqlMatcherActor extends UntypedActor {
                             log.debug("checking if match {} of {} should get a hint by inverse matching it in need's dataset: \n{}", 
                                     new Object[] {matchedNeed.getNeedUri(), need.getNeedUri(), RdfUtils.toString(needDataset) } );
                         }
-                        Set<NeedModelWrapper> matchForMatchedNeed = queryNeed(matchedNeed, Optional.of(new NeedModelWrapperAndDataset(need, needDataset)));
+                        List<NeedModelWrapper> matchForMatchedNeed = queryNeed(matchedNeed, Optional.of(new NeedModelWrapperAndDataset(need, needDataset)));
                         if (log.isDebugEnabled()) {
                             log.debug("match {} of {} is also getting a hint: {}", 
                                     new Object[] {matchedNeed.getNeedUri(), need.getNeedUri(), matchForMatchedNeed.size() > 0});
@@ -275,12 +270,12 @@ public class SparqlMatcherActor extends UntypedActor {
                         return new AbstractMap.SimpleEntry<>(matchedNeed, matchForMatchedNeed);
                     } else {
                         // the flags in the original or in the matched need forbid a hint. don't add one.
-                        return new AbstractMap.SimpleEntry<>(matchedNeed, (Set<NeedModelWrapper>) Collections.EMPTY_SET);
+                        return new AbstractMap.SimpleEntry<>(matchedNeed, (List<NeedModelWrapper>) Collections.EMPTY_LIST);
                     }
                     
                 }))
                 .map(entry -> {
-                    Set<NeedModelWrapper> filteredMatches = entry.getValue().stream().filter(f -> postFilter(entry.getKey(), f)).collect(Collectors.toSet());
+                    List<NeedModelWrapper> filteredMatches = entry.getValue().stream().filter(f -> postFilter(entry.getKey(), f)).collect(Collectors.toList());
                     return new AbstractMap.SimpleEntry<>(entry.getKey(), filteredMatches);
                 }).collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
 
@@ -350,7 +345,7 @@ public class SparqlMatcherActor extends UntypedActor {
                 );
     }
 
-    private Set<NeedModelWrapper> queryNeed(NeedModelWrapper need) {
+    private List<NeedModelWrapper> queryNeed(NeedModelWrapper need) {
       return queryNeed(need, Optional.empty());
     }
     
@@ -363,7 +358,7 @@ public class SparqlMatcherActor extends UntypedActor {
      * @param needToCheck
      * @return
      */
-    private Set<NeedModelWrapper> queryNeed(NeedModelWrapper need, Optional<NeedModelWrapperAndDataset> needToCheck) {
+    private List<NeedModelWrapper> queryNeed(NeedModelWrapper need, Optional<NeedModelWrapperAndDataset> needToCheck) {
 
         Optional<Op> query;
 
@@ -375,7 +370,7 @@ public class SparqlMatcherActor extends UntypedActor {
             query = defaultQuery(need);
         }
 
-        Set<NeedModelWrapper> needs = query.map(q -> {
+        List<NeedModelWrapper> needs = query.map(q -> {
             if (log.isDebugEnabled()) {
                 log.debug("transforming query, adding 'no hint for counterpart' restriction: {}", q);
             }
@@ -391,9 +386,9 @@ public class SparqlMatcherActor extends UntypedActor {
             return Stream.concat(
                     executeQuery(noHintForCounterpartQuery,  needToCheck),
                     executeQuery(hintForCounterpartQuery,  needToCheck)
-                    ).collect(Collectors.toSet());
+                    ).collect(Collectors.toList());
         })
-                .orElse(new HashSet<NeedModelWrapper>());
+                .orElse(Collections.EMPTY_LIST);
 
         return needs;
     }
@@ -419,7 +414,7 @@ public class SparqlMatcherActor extends UntypedActor {
             if (log.isDebugEnabled()) {
                 log.debug("executeQuery query: {}, needToCheck: {}", new Object[] {compiledQuery, needToCheck});
             }
-            Set<String> foundUris = new HashSet<String>();
+            List<String> foundUris = new LinkedList<String>();
             // process query results iteratively
             try (QueryExecution execution = QueryExecutionFactory
                                     .sparqlService(config.getSparqlEndpoint(), compiledQuery)

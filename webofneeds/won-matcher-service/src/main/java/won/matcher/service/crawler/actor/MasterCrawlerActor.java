@@ -95,15 +95,22 @@ public class MasterCrawlerActor extends UntypedActor {
         pubSubMediator.tell(new DistributedPubSubMediator.Subscribe(CrawlUriMessage.class.getName(), getSelf()), getSelf());
         pubSubMediator.tell(new DistributedPubSubMediator.Subscribe(
                 ResourceCrawlUriMessage.class.getName(), getSelf()), getSelf());
-
-        // load the unfinished uris and start crawling
-        for (CrawlUriMessage msg : sparqlService.retrieveMessagesForCrawling(CrawlUriMessage.STATUS.PROCESS)) {
-            pendingMessages.put(msg.getUri(), msg);
-            crawlingWorker.tell(msg, getSelf());
+        try {
+            // load the unfinished uris and start crawling
+            for (CrawlUriMessage msg : sparqlService.retrieveMessagesForCrawling(CrawlUriMessage.STATUS.PROCESS)) {
+                pendingMessages.put(msg.getUri(), msg);
+                crawlingWorker.tell(msg, getSelf());
+            }
+        } catch (Exception e) {
+            log.info("caught exception while obtaining unfinished crawl URIs, we may be missing some needs", e);
         }
-
-        for (CrawlUriMessage msg : sparqlService.retrieveMessagesForCrawling(CrawlUriMessage.STATUS.FAILED)) {
-            getSelf().tell(msg, getSelf());
+            
+        try {
+            for (CrawlUriMessage msg : sparqlService.retrieveMessagesForCrawling(CrawlUriMessage.STATUS.FAILED)) {
+                getSelf().tell(msg, getSelf());
+            }
+        } catch (Exception e) {
+            log.info("caught exception while obtaining failed crawl URIs, we may be missing some needs", e);
         }
     }
 
