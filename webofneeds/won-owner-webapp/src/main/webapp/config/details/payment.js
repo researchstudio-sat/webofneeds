@@ -1,6 +1,7 @@
 import { generateIdString } from "../../app/utils.js";
 //import Immutable from "immutable";
 import won from "../../app/won-es6.js";
+import { get } from "../../app/utils.js";
 
 export const paypalPayment = {
   identifier: "paypalPayment",
@@ -9,7 +10,7 @@ export const paypalPayment = {
   amountLabel: "Price:",
   amountPlaceholder: "Enter Amount...",
   receiverLabel: "PayPal Account that should receive Payment:",
-  receiverPlaceholder: "PayPal Account ID...",
+  receiverPlaceholder: "PayPal Account ID (Email)...",
   secretLabel: "Secret:",
   secretPlaceholder: "Enter Secret...",
   costumerLabel: "Who pays?",
@@ -30,7 +31,7 @@ export const paypalPayment = {
       !value.currency ||
       !value.secret ||
       !value.receiver ||
-      !value.costumerUri
+      !value.customerUri
     ) {
       return { "s:invoice": undefined };
     }
@@ -44,7 +45,7 @@ export const paypalPayment = {
         "@id": idString,
         "@type": "s:Invoice",
         "s:paymentMethod": {
-          "@type": "PaymentMethod",
+          "@type": "s:PaymentMethod",
           "@id": "gr:PayPal",
         },
         "s:paymentStatus": { "@id": "s:PaymentDue" },
@@ -54,11 +55,11 @@ export const paypalPayment = {
           "s:price": [{ "@value": value.amount, "@type": "xsd:float" }],
           "s:priceCurrency": value.currency,
         },
-        "s:paymentMethodId": value.secret, //TODO not sure if this would be the correctSecret
+        "s:paymentMethodId": value.secret, //TODO not sure if this would be the correct predicate for our Secret
         "s:accountId": value.receiver,
         "s:customer": {
           "@type": "won:Need",
-          "@id": value.costumerUri,
+          "@id": value.customerUri,
         },
         //"pay:hasFeePayer": "feePayer", //TODO Adapt and include Optional
         //"pay:hasTax": "hasTax", //TODO Adapt and include Optional
@@ -69,29 +70,57 @@ export const paypalPayment = {
     };
   },
   parseFromRDF: function(jsonLDImm) {
-    //TODO: IMPL
+    const invoice = get(jsonLDImm, "s:invoice");
+    if (!invoice) return undefined;
+
+    //Only Parse PayPal Payments
+    const paymentMethod = get(invoice, "s:paymentMethod");
+    if (
+      !paymentMethod ||
+      paymentMethod.get("@type") !== "s:PaymentMethod" ||
+      paymentMethod.get("@id") !== "gr:PayPal"
+    ) {
+      return undefined;
+    }
+
+    const customer = get(invoice, "s:customer");
+    if (!customer || customer.get("@type") !== won.WON.NeedCompacted) {
+      return undefined;
+    }
+
+    const customerUri = get(customer, "@id");
     const amount = won.parseFrom(
-      jsonLDImm,
-      ["s:invoice", "s:price"],
+      invoice,
+      ["s:totalPaymentDue", "s:price"],
       "xsd:float"
     );
-
     const currency = won.parseFrom(
-      jsonLDImm,
-      ["s:invoice", "s:priceCurrency"],
+      invoice,
+      ["s:totalPaymentDue", "s:priceCurrency"],
       "xsd:string"
     );
+    const secret = get(invoice, "s:paymentMethodId");
+    const receiver = get(invoice, "s:accountId");
 
-    if (!amount || !currency) {
+    if (!amount || !currency || !secret || !receiver || !customerUri) {
       return undefined;
-    } else {
-      return { amount: amount, currency: currency };
     }
+
+    return {
+      amount: amount,
+      currency: currency,
+      secret: secret,
+      receiver: receiver,
+      customerUri: customerUri,
+    };
   },
   generateHumanReadable: function({ value, includeLabel }) {
     //TODO: IMPL
     if (value) {
       const amount = value.amount;
+      const secret = value.secret;
+      const receiver = value.receiver;
+      const customerUri = value.customerUri;
 
       let currencyLabel = undefined;
 
@@ -103,9 +132,23 @@ export const paypalPayment = {
         });
       currencyLabel = currencyLabel || value.currency;
 
-      return (
-        (includeLabel ? this.label + ": " + amount : amount) + currencyLabel
-      );
+      const amountString = "Amount: " + amount + currencyLabel;
+      const receiverString = "Recipient: " + receiver;
+      const customerString = "Customer: <" + customerUri + ">";
+      const secretString = "Secret: " + secret;
+
+      const fullHumanReadable =
+        amountString +
+        " " +
+        receiverString +
+        " " +
+        customerString +
+        " " +
+        secretString;
+
+      return includeLabel
+        ? this.label + ": " + fullHumanReadable
+        : fullHumanReadable;
     }
     return undefined;
   },

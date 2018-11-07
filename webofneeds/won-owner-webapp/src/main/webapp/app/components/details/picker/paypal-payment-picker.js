@@ -77,10 +77,10 @@ function genComponentConf() {
         </div>
       </div>
       <div class="paypalpaymentp__label">
-        {{self.detail.costumerLabel}}
+        {{self.detail.customerLabel}}
       </div>
       <won-suggestpost-picker
-          initial-value="self.initialValue && self.initialValue.costumerUri"
+          initial-value="self.initialValue && self.initialValue.customerUri"
           on-update="self.updateCostumerUri(value)"
           detail="self.detail && self.detail.suggestPost"
       ></won-suggestpost-picker>
@@ -94,7 +94,7 @@ function genComponentConf() {
 
       this.addedNumber = this.initialValue && this.initialValue.amount;
       this.selectedCurrency = this.initialValue && this.initialValue.currency;
-      this.costumerUri = this.initialValue && this.initialValue.costumerUri;
+      this.customerUri = this.initialValue && this.initialValue.customerUri;
       this.secret = this.initialValue && this.initialValue.secret;
       this.receiver = this.initialValue && this.initialValue.receiver;
 
@@ -112,12 +112,12 @@ function genComponentConf() {
     /**
      * Checks validity and uses callback method
      */
-    update(number, currency, costumerUri, secret, receiver) {
+    update(number, currency, customerUri, secret, receiver) {
       const parsedNumber = Number.parseFloat(number);
       if (
         isValidNumber(number) &&
         currency &&
-        costumerUri &&
+        customerUri &&
         secret &&
         receiver
       ) {
@@ -125,7 +125,7 @@ function genComponentConf() {
           value: {
             amount: parsedNumber,
             currency: currency,
-            costumerUri: costumerUri,
+            customerUri: customerUri,
             secret: secret,
             receiver: receiver,
           },
@@ -148,7 +148,7 @@ function genComponentConf() {
 
     showInitialValues() {
       this.addedNumber = this.initialValue && this.initialValue.amount;
-      this.costumerUri = this.initialValue && this.initialValue.costumerUri;
+      this.customerUri = this.initialValue && this.initialValue.customerUri;
       this.secret = this.initialValue && this.initialValue.secret;
       this.receiver = this.initialValue && this.initialValue.receiver;
       this.selectedCurrency =
@@ -178,7 +178,7 @@ function genComponentConf() {
         this.update(
           this.addedNumber,
           this.selectedCurrency,
-          this.costumerUri,
+          this.customerUri,
           this.secret,
           this.receiver
         );
@@ -188,12 +188,12 @@ function genComponentConf() {
       }
     }
 
-    updateCostumerUri(costumerUri) {
-      this.costumerUri = costumerUri;
+    updateCostumerUri(customerUri) {
+      this.customerUri = customerUri;
       this.update(
         this.addedNumber,
         this.selectedCurrency,
-        this.costumerUri,
+        this.customerUri,
         this.secret,
         this.receiver
       );
@@ -203,12 +203,13 @@ function genComponentConf() {
       this.secret = this.secretInput().value;
 
       if (this.secret) {
+        //todo: check if secret is at least 4 chars long
         this.showSecretResetButton = true;
       }
       this.update(
         this.addedNumber,
         this.selectedCurrency,
-        this.costumerUri,
+        this.customerUri,
         this.secret,
         this.receiver
       );
@@ -218,12 +219,13 @@ function genComponentConf() {
       this.receiver = this.receiverInput().value;
 
       if (this.receiver) {
+        //TODO: check if receiver is valid email
         this.showReceiverResetButton = true;
       }
       this.update(
         this.addedNumber,
         this.selectedCurrency,
-        this.costumerUri,
+        this.customerUri,
         this.secret,
         this.receiver
       );
@@ -235,7 +237,7 @@ function genComponentConf() {
         this.update(
           this.addedNumber,
           this.selectedCurrency,
-          this.costumerUri,
+          this.customerUri,
           this.secret,
           this.receiver
         );
@@ -243,7 +245,7 @@ function genComponentConf() {
         this.update(
           this.addedNumber,
           this.selectedCurrency,
-          this.costumerUri,
+          this.customerUri,
           this.secret,
           this.receiver
         );
@@ -262,7 +264,7 @@ function genComponentConf() {
       this.update(
         this.addedNumber,
         this.selectedCurrency,
-        this.costumerUri,
+        this.customerUri,
         this.secret,
         this.receiver
       );
@@ -278,7 +280,7 @@ function genComponentConf() {
       this.update(
         this.addedNumber,
         this.selectedCurrency,
-        this.costumerUri,
+        this.customerUri,
         this.secret,
         this.receiver
       );
@@ -294,7 +296,7 @@ function genComponentConf() {
       this.update(
         this.addedNumber,
         this.selectedCurrency,
-        this.costumerUri,
+        this.customerUri,
         this.secret,
         this.receiver
       );
