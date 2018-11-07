@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -414,7 +414,7 @@ public class SparqlMatcherActor extends UntypedActor {
             if (log.isDebugEnabled()) {
                 log.debug("executeQuery query: {}, needToCheck: {}", new Object[] {compiledQuery, needToCheck});
             }
-            Set<String> foundUris = new HashSet<String>();
+            List<String> foundUris = new LinkedList<String>();
             // process query results iteratively
             try (QueryExecution execution = QueryExecutionFactory
                                     .sparqlService(config.getSparqlEndpoint(), compiledQuery)
