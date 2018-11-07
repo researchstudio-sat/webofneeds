@@ -112,7 +112,6 @@ export const piwikMiddleware = () => next => action => {
       "messages.processOpenMessage",
       "connections.connect",
       "messages.processConnectMessage",
-      //            'messages.hintMessageReceived',
       "connections.close",
     ],
     Needs: ["drafts.publish", "needs.close", "needs.reopen"],

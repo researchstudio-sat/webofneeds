@@ -926,12 +926,21 @@ export default function(allNeedsInState = initialState, action = {}) {
 }
 
 function storeConnectionAndRelatedData(state, connectionWithRelatedData) {
-  const { ownNeed, remoteNeed, connection } = connectionWithRelatedData;
+  const {
+    ownNeed,
+    remoteNeed,
+    connection,
+    ownPersona,
+    remotePersona,
+  } = connectionWithRelatedData;
   // guarantee that ownNeed is in state:
-  const stateWithOwnNeed = addNeed(state, ownNeed, true);
+  state = addNeed(state, ownNeed, true);
 
   // guarantee that  remoteNeed  is  in  state:
-  const stateWithBothNeeds = addNeed(stateWithOwnNeed, remoteNeed, false);
+  state = addNeed(state, remoteNeed, false);
 
-  return addConnectionFull(stateWithBothNeeds, connection);
+  state = remotePersona ? addNeed(state, remotePersona, false) : state;
+  state = ownPersona ? addNeed(state, ownPersona, true) : state;
+
+  return addConnectionFull(state, connection);
 }

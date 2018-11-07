@@ -36,7 +36,7 @@ export function runMessagingAgent(redux) {
     function(message) {
       /* Other clients or matcher initiated stuff: */
       if (message.isFromExternal() && message.isHintMessage()) {
-        redux.dispatch(actionCreators.messages__hintMessageReceived(message));
+        redux.dispatch(actionCreators.messages__processHintMessage(message));
         return true;
       }
       return false;
