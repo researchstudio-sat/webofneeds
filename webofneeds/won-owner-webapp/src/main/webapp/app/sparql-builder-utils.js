@@ -586,6 +586,7 @@ export function generateWhatsAroundQuery(latitude, longitude) {
             {
               SELECT DISTINCT ?result ?location_geoDistance WHERE {
                   ?result <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> won:Need.
+                  ?result won:isInState  won:Active .
                   ?result won:is ?is.
                   ?is won:hasLocation ?location.
                   ?location s:geo ?location_geo.
@@ -602,12 +603,12 @@ export function generateWhatsAroundQuery(latitude, longitude) {
                       ?location_geo geo:distanceValue ?location_geoDistance.
                   }
                   FILTER NOT EXISTS { ?result won:hasFlag won:NoHintForCounterpart }
-                  FILTER EXISTS { ?result won:isInState  won:Active }
               }
             }
           UNION {
             SELECT DISTINCT ?result ?location_geoDistance WHERE {
                   ?result <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> won:Need.
+                  ?result won:isInState  won:Active .                  
                   ?result won:seeks ?seeks.
                   ?seeks won:hasLocation ?location.
                   ?location s:geo ?location_geo.
@@ -624,7 +625,6 @@ export function generateWhatsAroundQuery(latitude, longitude) {
                       ?location_geo geo:distanceValue ?location_geoDistance.
                   }
                   FILTER NOT EXISTS { ?result won:hasFlag won:NoHintForCounterpart }
-                  FILTER EXISTS { ?result won:isInState  won:Active }
               }
             }
           }
@@ -638,9 +638,9 @@ export function generateWhatsNewQuery() {
         PREFIX dct: <http://purl.org/dc/terms/>
         SELECT DISTINCT ?result WHERE {
           ?result <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> won:Need.
+          ?result won:isInState  won:Active .
           ?result dct:created ?created.
           FILTER NOT EXISTS { ?result won:hasFlag won:NoHintForCounterpart }
-          FILTER EXISTS { ?result won:isInState  won:Active }
         }
         ORDER BY DESC(?created)`;
 }
