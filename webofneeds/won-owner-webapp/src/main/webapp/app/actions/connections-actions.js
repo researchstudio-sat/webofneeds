@@ -328,11 +328,18 @@ function connectAdHoc(theirNeedUri, textMessage, persona, dispatch, getState) {
         body: JSON.stringify([
           {
             pending: false,
-            facet: `${persona}#holderFacet`,
+            //facet: `${persona}#holderFacet`,
+            facet: getIn(state, ["needs", persona, "hasFacets"]).keyOf(
+              "won:HolderFacet"
+            ),
           },
           {
             pending: true,
             facet: `${needUri}#holdableFacet`,
+            // FIXME: does not work as new need is not in state yet
+            //facet: getIn(state, ["needs", needUri, "hasFacets"]).keyOf(
+            //  "won:HoldableFacet"
+            //),
           },
         ]),
         credentials: "include",
