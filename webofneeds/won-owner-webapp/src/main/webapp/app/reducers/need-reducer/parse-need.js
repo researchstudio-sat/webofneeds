@@ -21,6 +21,8 @@ export function parseNeed(jsonldNeed, ownNeed) {
     ownNeed: !!ownNeed,
 
     isBeingCreated: false,
+    toLoad: false,
+    isLoading: false,
 
     matchingContexts: undefined,
     searchString: undefined,
