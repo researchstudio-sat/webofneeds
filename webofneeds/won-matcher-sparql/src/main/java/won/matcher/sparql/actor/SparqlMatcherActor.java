@@ -158,6 +158,7 @@ public class SparqlMatcherActor extends UntypedActor {
     }
 
     private static final Var resultName = Var.alloc("result");
+    private static final Var scoreName = Var.alloc("score");
 
     private static BasicPattern createDetailsQuery(Model model) {
         BasicPattern pattern = new BasicPattern();
@@ -244,46 +245,57 @@ public class SparqlMatcherActor extends UntypedActor {
         NeedModelWrapper need = new NeedModelWrapper(needEvent.deserializeNeedDataset());
         log.debug("starting sparql-based matching for need {}", need.getNeedUri());
         
-        List<NeedModelWrapper> matches = queryNeed(need);
+        List<ScoredNeed> matches = queryNeed(need);
         log.debug("found {} match candidates", matches.size());
         Dataset needDataset = need.copyDataset();
         
         final boolean noHintForCounterpart = need.hasFlag(WON.NO_HINT_FOR_COUNTERPART);
         
-        Map<NeedModelWrapper, List<NeedModelWrapper>> filteredNeeds = Stream.concat(
+        Map<NeedModelWrapper, List<ScoredNeed>> filteredNeeds = Stream.concat(
                 Stream.of(new AbstractMap.SimpleEntry<>(need, matches)),
                 //add the reverse match, if no flags forbid it
                 matches.stream().map(matchedNeed -> {
-                    boolean noHintForMe = matchedNeed.hasFlag(WON.NO_HINT_FOR_ME);
-                    if (!noHintForCounterpart && !noHintForMe && !need.getNeedUri().equals(matchedNeed.getNeedUri())) {
+                    boolean noHintForMe = matchedNeed.need.hasFlag(WON.NO_HINT_FOR_ME);
+                    if (!noHintForCounterpart && !noHintForMe && !need.getNeedUri().equals(matchedNeed.need.getNeedUri())) {
                         // query for the matched need - but only in the dataset containing the original need. If we have a match, it means
                         // that the matched need should also get a hint, otherwise it should not.
                         if (log.isDebugEnabled()) {
                             log.debug("checking if match {} of {} should get a hint by inverse matching it in need's dataset: \n{}", 
-                                    new Object[] {matchedNeed.getNeedUri(), need.getNeedUri(), RdfUtils.toString(needDataset) } );
+                                    new Object[] {matchedNeed.need.getNeedUri(), need.getNeedUri(), RdfUtils.toString(needDataset) } );
                         }
-                        List<NeedModelWrapper> matchForMatchedNeed = queryNeed(matchedNeed, Optional.of(new NeedModelWrapperAndDataset(need, needDataset)));
+                        List<ScoredNeed> matchForMatchedNeed = queryNeed(matchedNeed.need, Optional.of(new NeedModelWrapperAndDataset(need, needDataset)));
                         if (log.isDebugEnabled()) {
                             log.debug("match {} of {} is also getting a hint: {}", 
-                                    new Object[] {matchedNeed.getNeedUri(), need.getNeedUri(), matchForMatchedNeed.size() > 0});
+                                    new Object[] {matchedNeed.need.getNeedUri(), need.getNeedUri(), matchForMatchedNeed.size() > 0});
                         }
-                        return new AbstractMap.SimpleEntry<>(matchedNeed, matchForMatchedNeed);
+                        return new AbstractMap.SimpleEntry<>(matchedNeed.need, matchForMatchedNeed);
                     } else {
                         // the flags in the original or in the matched need forbid a hint. don't add one.
-                        return new AbstractMap.SimpleEntry<>(matchedNeed, (List<NeedModelWrapper>) Collections.EMPTY_LIST);
+                        return new AbstractMap.SimpleEntry<>(matchedNeed.need, (List<ScoredNeed>) Collections.EMPTY_LIST);
                     }
                     
                 }))
                 .map(entry -> {
-                    List<NeedModelWrapper> filteredMatches = entry.getValue().stream().filter(f -> postFilter(entry.getKey(), f)).collect(Collectors.toList());
+                    List<ScoredNeed> filteredMatches = entry.getValue().stream().filter(f -> postFilter(entry.getKey(), f.need)).collect(Collectors.toList());
                     return new AbstractMap.SimpleEntry<>(entry.getKey(), filteredMatches);
                 }).collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
 
         BulkHintEvent bulkHintEvent = new BulkHintEvent();
 
         filteredNeeds.forEach((hintTarget, hints) -> {
-            hints.stream().limit(config.getLimitResults()).forEach(hint -> {
-                bulkHintEvent.addHintEvent(new HintEvent(hintTarget.getWonNodeUri(), hintTarget.getNeedUri(), hint.getWonNodeUri(), hint.getNeedUri(), config.getMatcherUri(), 1));
+            hints
+            .stream()
+            .sorted((hint1, hint2) -> (int) Math.signum(hint2.score - hint1.score)) //sort descending
+            .limit(config.getLimitResults())
+            .forEach(hint -> {
+                bulkHintEvent.addHintEvent(
+                        new HintEvent(
+                                hintTarget.getWonNodeUri(), 
+                                hintTarget.getNeedUri(), 
+                                hint.need.getWonNodeUri(), 
+                                hint.need.getNeedUri(), 
+                                config.getMatcherUri(), 
+                                hint.score));
             });
         });
         
@@ -345,7 +357,7 @@ public class SparqlMatcherActor extends UntypedActor {
                 );
     }
 
-    private List<NeedModelWrapper> queryNeed(NeedModelWrapper need) {
+    private List<ScoredNeed> queryNeed(NeedModelWrapper need) {
       return queryNeed(need, Optional.empty());
     }
     
@@ -358,7 +370,7 @@ public class SparqlMatcherActor extends UntypedActor {
      * @param needToCheck
      * @return
      */
-    private List<NeedModelWrapper> queryNeed(NeedModelWrapper need, Optional<NeedModelWrapperAndDataset> needToCheck) {
+    private List<ScoredNeed> queryNeed(NeedModelWrapper need, Optional<NeedModelWrapperAndDataset> needToCheck) {
 
         Optional<Op> query;
 
@@ -370,7 +382,7 @@ public class SparqlMatcherActor extends UntypedActor {
             query = defaultQuery(need);
         }
 
-        List<NeedModelWrapper> needs = query.map(q -> {
+        List<ScoredNeed> needs = query.map(q -> {
             if (log.isDebugEnabled()) {
                 log.debug("transforming query, adding 'no hint for counterpart' restriction: {}", q);
             }
@@ -401,7 +413,7 @@ public class SparqlMatcherActor extends UntypedActor {
      * @param datasetToQuery
      * @return
      */
-    private Stream<NeedModelWrapper> executeQuery(Op q, Optional<NeedModelWrapperAndDataset> needToCheck) {
+    private Stream<ScoredNeed> executeQuery(Op q, Optional<NeedModelWrapperAndDataset> needToCheck) {
             Query compiledQuery = OpAsQuery.asQuery(q);
 
             // if we were given a needToCheck, restrict the query result to that uri so that 
@@ -414,7 +426,7 @@ public class SparqlMatcherActor extends UntypedActor {
             if (log.isDebugEnabled()) {
                 log.debug("executeQuery query: {}, needToCheck: {}", new Object[] {compiledQuery, needToCheck});
             }
-            List<String> foundUris = new LinkedList<String>();
+            List<ScoredNeedUri> foundUris = new LinkedList<>();
             // process query results iteratively
             try (QueryExecution execution = QueryExecutionFactory
                                     .sparqlService(config.getSparqlEndpoint(), compiledQuery)
@@ -424,7 +436,18 @@ public class SparqlMatcherActor extends UntypedActor {
                 while(result.hasNext()) {
                     QuerySolution querySolution = result.next();
                     String foundNeedURI = querySolution.get(resultName.getName()).toString();
-                    foundUris.add(foundNeedURI);
+                    double score = 1.0;
+                    if (querySolution.contains(scoreName.getName())) {
+                        RDFNode scoreNode = querySolution.get(scoreName.getName());
+                        if (scoreNode != null && scoreNode.isLiteral()) {
+                            try {
+                                score = scoreNode.asLiteral().getDouble();
+                            } catch (NumberFormatException e) {
+                                //if the score is not interpretable as double, ignore it
+                            }
+                        }
+                    }
+                    foundUris.add(new ScoredNeedUri(foundNeedURI, score));
                 }
             } catch (Exception e) {
                 log.info("caught exception during sparql-based matching (more info on loglevel 'debug'): {} ", e.getMessage());
@@ -439,11 +462,15 @@ public class SparqlMatcherActor extends UntypedActor {
                     try {
                         //if we have a needToCheck, return it if the URI we found actually is its URI, otherwise null
                         if ((needToCheck.isPresent())) {
-                            return needToCheck.get().needModelWrapper.getNeedUri().equals(foundNeedUri) ? needToCheck.get().needModelWrapper : null;
+                            NeedModelWrapper result = needToCheck.get().needModelWrapper.getNeedUri().equals(foundNeedUri.uri) ? needToCheck.get().needModelWrapper : null;
+                            if (result == null) {
+                                return null;
+                            }
+                            return new ScoredNeed(result, foundNeedUri.score);
                         } else {
                             // no needToCheck, which happens when we first look for matches in the graph store: 
                             // download the linked data and return a new NeedModelWrapper
-                            return new NeedModelWrapper(linkedDataSource.getDataForResource(URI.create(foundNeedUri)));
+                            return new ScoredNeed(new NeedModelWrapper(linkedDataSource.getDataForResource(URI.create(foundNeedUri.uri))), foundNeedUri.score);
                         }
                     } catch (Exception e) {
                         log.info("caught exception trying to load need URI {} : {} (more on loglevel 'debug')" , foundNeedUri, e.getMessage() );
@@ -533,4 +560,26 @@ public class SparqlMatcherActor extends UntypedActor {
         
     }
     
+    private class ScoredNeed {
+        private NeedModelWrapper need;
+        private double score;
+        public ScoredNeed(NeedModelWrapper need, double score) {
+            super();
+            this.need = need;
+            this.score = score;
+        }
+        
+    }
+    
+    private class ScoredNeedUri {
+        private String uri;
+        private double score;
+        public ScoredNeedUri(String uri, double score) {
+            super();
+            this.uri = uri;
+            this.score = score;
+        }
+        
+    }
+
 }
