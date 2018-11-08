@@ -146,42 +146,15 @@ import { Generator } from "sparqljs";
       return contentNode;
     };
 
-    const buildContentNode = (id, seeksData) => {
-      //TODO: CANT HANDLE "@id" details yet (see won-message-utils.js buildChatMessage(..) additionalContent part
+    const buildSeeksContentNode = (id, seeksData) => {
       let contentNode = {
         "@id": id,
-        "@type": seeksData.type || seeksData["@type"],
         "won:hasAttachment": hasAttachmentUrls(seeksData)
           ? seeksData.attachmentUris.map(uri => ({ "@id": uri }))
           : undefined,
       };
 
-      const detailList = getAllDetails();
-
-      for (const detail of Object.values(detailList)) {
-        // const detail = detailList[detailName];
-        const detailRDF = {
-          ...detail.parseToRDF({
-            value: seeksData[detail.identifier],
-            identifier: detail.identifier,
-            contentUri: seeksData["publishedContentUri"],
-          }),
-        };
-
-        // add to content node
-        for (const key of Object.keys(detailRDF)) {
-          //if contentNode[key] and detailRDF[key] both have values we ommit adding new content (until we implement a merge function)
-          if (contentNode[key]) {
-            if (!Array.isArray(contentNode[key]))
-              contentNode[key] = Array.of(contentNode[key]);
-
-            contentNode[key] = contentNode[key].concat(detailRDF[key]);
-          } else {
-            contentNode[key] = detailRDF[key];
-          }
-        }
-      }
-      return contentNode;
+      return addContent(contentNode, seeksData);
     };
 
     const matchingContext = args.matchingContext;
@@ -250,7 +223,7 @@ import { Generator } from "sparqljs";
     const sparqlGenerator = new Generator();
 
     const seeksContentNode = args.seeks
-      ? buildContentNode(seeksContentUri, args.seeks)
+      ? buildSeeksContentNode(seeksContentUri, args.seeks)
       : {};
 
     const doNotMatchAfterFnOrLit = useCase && useCase.doNotMatchAfter;
