@@ -6,103 +6,46 @@ import { isWhatsNewNeed, isWhatsAroundNeed } from "../../need-utils.js";
 export function parseNeed(jsonldNeed, ownNeed) {
   const jsonldNeedImm = Immutable.fromJS(jsonldNeed);
 
-  let parsedNeed = {
-    uri: undefined,
-    nodeUri: undefined,
-
-    types: undefined,
-
-    facets: undefined,
-    flags: undefined,
-
-    state: undefined,
-    connections: Immutable.Map(),
-    unread: false,
-    ownNeed: !!ownNeed,
-
-    isBeingCreated: false,
-    toLoad: false,
-    isLoading: false,
-
-    matchingContexts: undefined,
-    searchString: undefined,
-    jsonld: jsonldNeed,
-
-    heldBy: undefined,
-    holds: undefined,
-
-    content: undefined,
-    seeks: undefined,
-
-    creationDate: undefined,
-    lastUpdateDate: undefined,
-  };
-
-  if (jsonldNeedImm) {
-    parsedNeed.uri = jsonldNeedImm.get("@id");
-
-    if (!parsedNeed.uri) {
-      //If there was no uri we do not add the need
-      return undefined;
-    }
-
-    parsedNeed.nodeUri = jsonldNeedImm.getIn(["won:hasWonNode", "@id"]);
-
-    const wonHasMatchingContexts = jsonldNeedImm.get("won:hasMatchingContext");
-
-    const creationDate =
-      jsonldNeedImm.get("dct:created") ||
-      jsonldNeedImm.get("http://purl.org/dc/terms/created");
-    if (creationDate) {
-      parsedNeed.creationDate = new Date(creationDate);
-      parsedNeed.lastUpdateDate = parsedNeed.creationDate;
-    }
-
-    // we use to check for active
-    // state and everything else
-    // will be inactive
-    parsedNeed.state =
-      jsonldNeedImm.getIn([won.WON.isInStateCompacted, "@id"]) ===
-      won.WON.ActiveCompacted
-        ? won.WON.ActiveCompacted
-        : won.WON.InactiveCompacted;
-
-    parsedNeed.heldBy = jsonldNeedImm.getIn(["won:heldBy", "@id"]);
-
+  if (jsonldNeedImm && jsonldNeedImm.get("@id")) {
     const detailsToParse = getAllDetails();
 
-    parsedNeed.holds =
-      won.parseListFrom(jsonldNeedImm, ["won:holds"], "xsd:ID") ||
-      Immutable.List();
+    let parsedNeed = {
+      uri: jsonldNeedImm.get("@id"),
+      nodeUri: jsonldNeedImm.getIn(["won:hasWonNode", "@id"]),
+      types: extractTypes(jsonldNeedImm),
+      facets: extractFacets(jsonldNeedImm.get("won:hasFacet")),
+      flags: extractFlags(jsonldNeedImm.get("won:hasFlag")),
+      state: extractState(jsonldNeedImm),
+      matchingContexts: extractMatchingContext(jsonldNeedImm),
+      searchString: jsonldNeedImm.get("won:hasSearchString"),
+      heldBy: won.parseFrom(jsonldNeedImm, ["won:heldBy"], "xsd:ID"),
+      holds:
+        won.parseListFrom(jsonldNeedImm, ["won:holds"], "xsd:ID") ||
+        Immutable.List(),
+      content: generateContent(jsonldNeedImm, detailsToParse),
+      seeks: generateContent(jsonldNeedImm.get("won:seeks"), detailsToParse),
+      creationDate:
+        jsonldNeedImm.get("dct:created") ||
+        jsonldNeedImm.get("http://purl.org/dc/terms/created"),
+      lastUpdateDate:
+        jsonldNeedImm.get("dct:created") ||
+        jsonldNeedImm.get("http://purl.org/dc/terms/created"),
+      humanReadable: undefined, //can only be determined after we generated The Content
+      unread: false,
+      ownNeed: !!ownNeed,
+      isBeingCreated: false,
+      toLoad: false,
+      isLoading: false,
+      jsonld: jsonldNeed,
+      connections: Immutable.Map(),
+    };
 
-    parsedNeed.heldBy = won.parseFrom(jsonldNeedImm, ["won:heldBy"], "xsd:ID");
-
-    parsedNeed.types = (rawTypes => {
-      if (Immutable.List.isList(rawTypes)) {
-        return Immutable.Set(rawTypes);
-      } else {
-        return Immutable.Set([rawTypes]);
-      }
-    })(jsonldNeedImm.get("@type"));
-
-    parsedNeed.searchString = jsonldNeedImm.get("won:hasSearchString");
-    parsedNeed.content = generateContent(jsonldNeedImm, detailsToParse);
-    parsedNeed.seeks = generateContent(
-      jsonldNeedImm.get("won:seeks"),
-      detailsToParse
-    );
-
-    parsedNeed.matchingContexts = wonHasMatchingContexts
-      ? Immutable.List.isList(wonHasMatchingContexts)
-        ? wonHasMatchingContexts
-        : Immutable.List.of(wonHasMatchingContexts)
-      : undefined;
-    parsedNeed.flags = extractFlags(jsonldNeedImm.get("won:hasFlag"));
-    parsedNeed.facets = extractFacets(jsonldNeedImm.get("won:hasFacet"));
     parsedNeed.humanReadable = getHumanReadableStringFromNeed(
       parsedNeed,
       detailsToParse
     );
+
+    return Immutable.fromJS(parsedNeed);
   } else {
     console.error(
       "Cant parse need, data is an invalid need-object: ",
@@ -110,8 +53,6 @@ export function parseNeed(jsonldNeed, ownNeed) {
     );
     return undefined;
   }
-
-  return Immutable.fromJS(parsedNeed);
 }
 
 /**
@@ -138,6 +79,37 @@ function generateContent(contentJsonLd, detailsToParse) {
   }
 
   return content;
+}
+
+function extractState(needJsonLd) {
+  // we use to check for active
+  // state and everything else
+  // will be inactive
+  return needJsonLd.getIn([won.WON.isInStateCompacted, "@id"]) ===
+    won.WON.ActiveCompacted
+    ? won.WON.ActiveCompacted
+    : won.WON.InactiveCompacted;
+}
+
+function extractMatchingContext(needJsonLd) {
+  const wonHasMatchingContexts = needJsonLd.get("won:hasMatchingContext");
+  return wonHasMatchingContexts
+    ? Immutable.List.isList(wonHasMatchingContexts)
+      ? wonHasMatchingContexts
+      : Immutable.List.of(wonHasMatchingContexts)
+    : undefined;
+}
+
+function extractTypes(needJsonLd) {
+  const types = (rawTypes => {
+    if (Immutable.List.isList(rawTypes)) {
+      return Immutable.Set(rawTypes);
+    } else {
+      return Immutable.Set([rawTypes]);
+    }
+  })(needJsonLd.get("@type"));
+
+  return types;
 }
 
 function extractFlags(wonHasFlags) {
