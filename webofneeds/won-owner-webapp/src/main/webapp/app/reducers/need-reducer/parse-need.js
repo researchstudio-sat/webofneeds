@@ -23,12 +23,8 @@ export function parseNeed(jsonldNeed, ownNeed) {
         Immutable.List(),
       content: generateContent(jsonldNeedImm, detailsToParse),
       seeks: generateContent(jsonldNeedImm.get("won:seeks"), detailsToParse),
-      creationDate:
-        jsonldNeedImm.get("dct:created") ||
-        jsonldNeedImm.get("http://purl.org/dc/terms/created"),
-      lastUpdateDate:
-        jsonldNeedImm.get("dct:created") ||
-        jsonldNeedImm.get("http://purl.org/dc/terms/created"),
+      creationDate: extractCreationDate(jsonldNeedImm),
+      lastUpdateDate: extractCreationDate(jsonldNeedImm),
       humanReadable: undefined, //can only be determined after we generated The Content
       unread: false,
       ownNeed: !!ownNeed,
@@ -38,6 +34,14 @@ export function parseNeed(jsonldNeed, ownNeed) {
       jsonld: jsonldNeed,
       connections: Immutable.Map(),
     };
+
+    if (!parsedNeed.creationDate || !parsedNeed.lastUpdateDate) {
+      console.error(
+        "Cant parse need, creationDate or lastUpdateDate not set",
+        jsonldNeedImm && jsonldNeedImm.toJS()
+      );
+      return undefined;
+    }
 
     parsedNeed.humanReadable = getHumanReadableStringFromNeed(
       parsedNeed,
@@ -109,6 +113,16 @@ function extractTypes(needJsonLd) {
   })(needJsonLd.get("@type"));
 
   return types;
+}
+
+function extractCreationDate(needJsonLd) {
+  const creationDate =
+    needJsonLd.get("dct:created") ||
+    needJsonLd.get("http://purl.org/dc/terms/created");
+  if (creationDate) {
+    return new Date(creationDate);
+  }
+  return undefined;
 }
 
 function extractFlags(wonHasFlags) {
