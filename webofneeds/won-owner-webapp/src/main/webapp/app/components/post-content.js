@@ -50,7 +50,7 @@ function genComponentConf() {
 
           <!-- DETAIL INFORMATION -->
           <won-post-is-or-seeks-info branch="::'content'" ng-if="self.hasContent" post-uri="self.post.get('uri')"></won-post-is-or-seeks-info>
-          <won-labelled-hr label="::'Search'" class="cp__labelledhr" ng-show="self.hasIsBranch && self.hasSeeksBranch"></won-labelled-hr>
+          <won-labelled-hr label="::'Search'" class="cp__labelledhr" ng-show="self.hasContent && self.hasSeeksBranch"></won-labelled-hr>
           <won-post-is-or-seeks-info branch="::'seeks'" ng-if="self.hasSeeksBranch && !self.isPureSearch" post-uri="self.post.get('uri')"></won-post-is-or-seeks-info>
           <div class="post-info__content__rdf" ng-if="self.shouldShowRdf">
             <h2 class="post-info__heading">
