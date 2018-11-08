@@ -15,7 +15,6 @@ export function parseNeed(jsonldNeed, ownNeed) {
     lastUpdateDate: undefined,
     unread: false,
     ownNeed: !!ownNeed,
-    is: undefined,
     seeks: undefined,
     isBeingCreated: false,
     isWhatsAround: false,
@@ -27,6 +26,7 @@ export function parseNeed(jsonldNeed, ownNeed) {
     hasFacets: Immutable.Map(),
     heldBy: undefined,
     holds: undefined,
+    content: undefined,
   };
 
   if (jsonldNeedImm) {
@@ -107,7 +107,7 @@ export function parseNeed(jsonldNeed, ownNeed) {
     })(jsonldNeedImm.get("@type"));
 
     parsedNeed.searchString = jsonldNeedImm.get("won:hasSearchString");
-    parsedNeed.is = generateContent(jsonldNeedImm, detailsToParse);
+    parsedNeed.content = generateContent(jsonldNeedImm, detailsToParse);
     parsedNeed.seeks = generateContent(
       jsonldNeedImm.get("won:seeks"),
       detailsToParse
@@ -196,10 +196,10 @@ function extractFacets(wonHasFacets) {
 
 function getHumanReadableStringFromNeed(need, detailsToParse) {
   if (need && detailsToParse) {
-    const isBranch = need.is;
+    const needContent = need.content;
     const seeksBranch = need.seeks;
 
-    const isTitle = isBranch && isBranch.title;
+    const title = needContent && needContent.title;
     const seeksTitle = seeksBranch && seeksBranch.title;
 
     if (need.isWhatsNew) {
@@ -207,7 +207,7 @@ function getHumanReadableStringFromNeed(need, detailsToParse) {
     }
 
     if (need.isWhatsAround) {
-      let location = isBranch["location"] || seeksBranch["location"];
+      let location = needContent["location"] || seeksBranch["location"];
 
       const locationJS =
         location && Immutable.Iterable.isIterable(location)
@@ -223,12 +223,12 @@ function getHumanReadableStringFromNeed(need, detailsToParse) {
       );
     }
 
-    if (isTitle && seeksTitle) {
-      return isTitle + " - " + seeksTitle;
+    if (title && seeksTitle) {
+      return title + " - " + seeksTitle;
     } else if (seeksTitle) {
       return seeksTitle;
-    } else if (isTitle) {
-      return isTitle;
+    } else if (title) {
+      return title;
     } else {
       const searchString = need && need.searchString;
 
@@ -237,8 +237,8 @@ function getHumanReadableStringFromNeed(need, detailsToParse) {
       }
     }
 
-    let humanReadableIsDetails = generateHumanReadableArray(
-      isBranch,
+    let humanReadableDetails = generateHumanReadableArray(
+      needContent,
       detailsToParse
     );
     let humanReadableSeeksDetails = generateHumanReadableArray(
@@ -247,17 +247,16 @@ function getHumanReadableStringFromNeed(need, detailsToParse) {
     );
 
     if (
-      humanReadableIsDetails.length > 0 &&
+      humanReadableDetails.length > 0 &&
       humanReadableSeeksDetails.length > 0
     ) {
       return (
-        "Is: " +
-        humanReadableIsDetails.join(" ") +
+        humanReadableDetails.join(" ") +
         " Seeks: " +
         humanReadableSeeksDetails.join(", ")
       );
-    } else if (humanReadableIsDetails.length > 0) {
-      return humanReadableIsDetails.join(", ");
+    } else if (humanReadableDetails.length > 0) {
+      return humanReadableDetails.join(", ");
     } else if (humanReadableSeeksDetails.length > 0) {
       return humanReadableSeeksDetails.join(", ");
     }
