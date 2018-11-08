@@ -209,7 +209,7 @@ $ngRedux.getState();
        hasFlags: Immutable.List //all the flags that are present within the won:hasFlags predicate of a need
        searchString: string, //optional parameter, used for full text matching
        state: "won:Active" | "won:Inactive", //state of the need
-       type: "won:Supply" | "won:Demand" | "won:Offer", //type of the need
+       types: Immutable.Set() // of need types e.g. won:Persona, won:Need, and any other types
        unread: true|false, //whether or not this need has new information that has not been read yet
        uri: string, //unique identifier of this need
        humanReadable: string, //a human Readable String that parses the content from is or seeks and searchString and makes a title out of it based on a certain logic

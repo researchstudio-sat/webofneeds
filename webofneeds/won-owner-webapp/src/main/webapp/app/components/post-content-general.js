@@ -41,6 +41,7 @@ function genComponentConf() {
               {{ self.friendlyTimestamp }}
             </div>
           </div>
+          <!-- TODO: We Do not store a single type anymore but a list of types... adapt accordingly -->
           <div class="pcg__columns__left__item" ng-if="self.post.get('type')">
             <div class="pcg__columns__left__item__label">
               Type

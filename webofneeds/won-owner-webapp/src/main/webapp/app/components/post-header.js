@@ -37,6 +37,7 @@ function genComponentConf() {
       </div>
       <div class="ph__right__subtitle">
         <span class="ph__right__subtitle__type">
+          <!-- TODO: We Do not store a single type anymore but a list of types... adapt accordingly -->
           {{self.labels.type[self.need.get('type')]}}{{self.need.get('matchingContexts')? ' in '+ self.need.get('matchingContexts').join(', ') : '' }}
         </span>
         <div class="ph__right__subtitle__date">
@@ -53,6 +54,7 @@ function genComponentConf() {
       </div>
       <div class="ph__right__subtitle">
         <span class="ph__right__subtitle__type">
+          <!-- TODO: We Do not store a single type anymore but a list of types... adapt accordingly -->
           {{self.labels.type[self.need.get('type')]}}
         </span>
       </div>
