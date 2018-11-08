@@ -155,7 +155,9 @@ function getHumanReadableStringFromNeed(need, detailsToParse) {
     }
 
     if (isWhatsAroundNeed(Immutable.fromJS(need))) {
-      let location = needContent["location"] || seeksBranch["location"];
+      let location =
+        (needContent && needContent["location"]) ||
+        (seeksBranch && seeksBranch["location"]);
 
       const locationJS =
         location && Immutable.Iterable.isIterable(location)

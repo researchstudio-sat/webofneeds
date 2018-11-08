@@ -91,13 +91,9 @@ export function createWhatsNew() {
 
     dispatch({ type: actionTypes.needs.whatsNew });
 
-    const whatsNew = {
-      whatsNew: true,
-    };
-
-    //TODO: Point to same DataSet instead of double it
     const whatsNewObject = {
-      seeks: whatsNew,
+      content: { whatsNew: true },
+      seeks: {},
       matchingContext: defaultContext,
     };
 
@@ -132,10 +128,6 @@ export function createWhatsAround() {
 
           reverseSearchNominatim(lat, lng, zoom).then(searchResult => {
             const location = nominatim2draftLocation(searchResult);
-            let whatsAround = {
-              location: location,
-              whatsAround: true,
-            };
 
             getIn(state, ["needs"])
               .filter(
@@ -147,7 +139,8 @@ export function createWhatsAround() {
                 dispatch(actionCreators.needs__close(need.get("uri"))); //TODO action creators should not call other action creators, according to Moru
               });
             const whatsAroundObject = {
-              seeks: whatsAround,
+              content: { whatsAround: true },
+              seeks: { location: location },
               matchingContext: defaultContext,
             };
 
