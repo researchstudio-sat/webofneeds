@@ -407,10 +407,12 @@ function connectAdHoc(theirNeedUri, textMessage, persona, dispatch, getState) {
 
 function generateResponseNeedTo(theirNeed) {
   const theirSeeks = get(theirNeed, "seeks");
-  const theirIs = get(theirNeed, "is");
+  const theirContent = get(theirNeed, "content");
   return {
     is: theirSeeks ? generateResponseContentNodeTo(theirSeeks) : undefined,
-    seeks: theirIs ? generateResponseContentNodeTo(theirIs) : undefined,
+    seeks: theirContent
+      ? generateResponseContentNodeTo(theirContent)
+      : undefined,
   };
 }
 
