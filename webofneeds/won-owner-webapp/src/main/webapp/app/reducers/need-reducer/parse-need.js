@@ -15,6 +15,8 @@ export function parseNeed(jsonldNeed, ownNeed) {
     lastUpdateDate: undefined,
     unread: false,
     ownNeed: !!ownNeed,
+    is: undefined,
+    seeks: undefined,
     isBeingCreated: false,
     isWhatsAround: false,
     isWhatsNew: false,
@@ -28,18 +30,14 @@ export function parseNeed(jsonldNeed, ownNeed) {
   };
 
   if (jsonldNeedImm) {
-    const uri = jsonldNeedImm.get("@id");
-    const nodeUri = jsonldNeedImm.getIn(["won:hasWonNode", "@id"]);
-    const seeks = jsonldNeedImm.get("won:seeks");
-    const seeksPresent = seeks && seeks.size > 0;
+    parsedNeed.uri = jsonldNeedImm.get("@id");
 
-    const searchString = jsonldNeedImm.get("won:hasSearchString");
-
-    if (uri) {
-      parsedNeed.uri = uri;
-    } else {
+    if (!parsedNeed.uri) {
+      //If there was no uri we do not add the need
       return undefined;
     }
+
+    parsedNeed.nodeUri = jsonldNeedImm.getIn(["won:hasWonNode", "@id"]);
 
     /*
      * The following code-snippet is solely to determine if the parsed need
@@ -81,21 +79,17 @@ export function parseNeed(jsonldNeed, ownNeed) {
       parsedNeed.lastUpdateDate = parsedNeed.creationDate;
     }
 
-    const state = jsonldNeedImm.getIn([won.WON.isInStateCompacted, "@id"]);
-    if (state === won.WON.ActiveCompacted) {
-      // we use to check for active
-      // state and everything else
-      // will be inactive
-      parsedNeed.state = state;
-    } else {
-      parsedNeed.state = won.WON.InactiveCompacted;
-    }
+    // we use to check for active
+    // state and everything else
+    // will be inactive
+    parsedNeed.state =
+      jsonldNeedImm.getIn([won.WON.isInStateCompacted, "@id"]) ===
+      won.WON.ActiveCompacted
+        ? won.WON.ActiveCompacted
+        : won.WON.InactiveCompacted;
 
     parsedNeed.heldBy = jsonldNeedImm.getIn(["won:heldBy", "@id"]);
 
-    let isPart = undefined;
-    let seeksPart = undefined;
-    let type = undefined;
     const detailsToParse = getAllDetails();
 
     parsedNeed.holds =
@@ -112,17 +106,12 @@ export function parseNeed(jsonldNeed, ownNeed) {
       }
     })(jsonldNeedImm.get("@type"));
 
-    isPart = generateContent(jsonldNeedImm, type, detailsToParse);
-
-    if (seeksPresent) {
-      seeksPart = generateContent(seeks, type, detailsToParse);
-    }
-    if (searchString) {
-      parsedNeed.searchString = searchString;
-    }
-
-    parsedNeed.is = isPart;
-    parsedNeed.seeks = seeksPart;
+    parsedNeed.searchString = jsonldNeedImm.get("won:hasSearchString");
+    parsedNeed.is = generateContent(jsonldNeedImm, detailsToParse);
+    parsedNeed.seeks = generateContent(
+      jsonldNeedImm.get("won:seeks"),
+      detailsToParse
+    );
 
     parsedNeed.isWhatsAround = !!isWhatsAround;
     parsedNeed.isWhatsNew = !!isWhatsNew;
@@ -133,7 +122,6 @@ export function parseNeed(jsonldNeed, ownNeed) {
       : undefined;
     parsedNeed.hasFlags = hasFlags;
     parsedNeed.hasFacets = extractFacets(jsonldNeedImm.get("won:hasFacet"));
-    parsedNeed.nodeUri = nodeUri;
     parsedNeed.humanReadable = getHumanReadableStringFromNeed(
       parsedNeed,
       detailsToParse
@@ -154,16 +142,12 @@ export function parseNeed(jsonldNeed, ownNeed) {
  * uses the parseFromRdf function defined in the detail to extract the content
  * uses the detail identifier as the key of the contentDetail that is to be added
  * @param contentJsonLd
- * @param type
  * @param detailsToParse
- * @returns {{title: *, type: *}}
+ * @returns {title: *, tags: *}
  */
-function generateContent(contentJsonLd, type, detailsToParse) {
-  let content = {
-    type: type,
-  };
-
-  if (detailsToParse) {
+function generateContent(contentJsonLd, detailsToParse) {
+  let content = {};
+  if (contentJsonLd && contentJsonLd.size > 0 && detailsToParse) {
     for (const detailKey in detailsToParse) {
       const detailToParse = detailsToParse[detailKey];
       const detailIdentifier = detailToParse && detailToParse.identifier;
