@@ -59,6 +59,7 @@ import org.apache.jena.sparql.expr.ExprList;
 import org.apache.jena.sparql.expr.ExprVar;
 import org.apache.jena.sparql.expr.nodevalue.NodeValueBoolean;
 import org.apache.jena.sparql.expr.nodevalue.NodeValueString;
+import org.apache.jena.sparql.function.library.min;
 import org.apache.jena.sparql.path.P_Alt;
 import org.apache.jena.sparql.path.P_Link;
 import org.apache.jena.sparql.path.P_NegPropSet;
@@ -287,12 +288,19 @@ public class SparqlMatcherActor extends UntypedActor {
             //this should not happen
             return;
         }
+        Optional<Double> minScore = filteredNeeds.values().stream().flatMap(value -> value.stream()).map(n -> n.score).min((x, y) -> (int) Math.signum(x - y));
+        if (!maxScore.isPresent()) {
+            //this should not happen
+            return;
+        }
+        double range = (maxScore.get() - minScore.get());        
         filteredNeeds.forEach((hintTarget, hints) -> {
             hints
             .stream()
             .sorted((hint1, hint2) -> (int) Math.signum(hint2.score - hint1.score)) //sort descending
             .limit(config.getLimitResults())
             .forEach(hint -> {
+                double score = range == 0 ? hint.score - minScore.get() : (hint.score - minScore.get()) / range; 
                 bulkHintEvent.addHintEvent(
                         new HintEvent(
                                 hintTarget.getWonNodeUri(), 
@@ -300,7 +308,7 @@ public class SparqlMatcherActor extends UntypedActor {
                                 hint.need.getWonNodeUri(), 
                                 hint.need.getNeedUri(), 
                                 config.getMatcherUri(), 
-                                hint.score/maxScore.get()));
+                                score));
             });
         });
         
