@@ -206,7 +206,8 @@ $ngRedux.getState();
        isBeingCreated: true|false, //whether or not the creation of this need was successfully completed yet
        isLoading: true|false, //whether or not the need is currently in the process of being loaded
        toLoad: true|false, //whether or not the need is flagged as toLoad (for future loading purposes)
-       hasFlags: Immutable.List //all the flags that are present within the won:hasFlags predicate of a need
+       flags: Immutable.List //all the flags that are present within the won:hasFlags predicate of a need
+       facets: Immutable.Map //all the facets that are present within the won:hasFacets predicate of a need
        searchString: string, //optional parameter, used for full text matching
        state: "won:Active" | "won:Inactive", //state of the need
        types: Immutable.Set() // of need types e.g. won:Persona, won:Need, and any other types

@@ -190,7 +190,7 @@ export default function(allNeedsInState = initialState, action = {}) {
           types: Immutable.Set(["won:Need", "won:Persona"]),
           connections: Immutable.Map(),
           holds: Immutable.List(),
-          hasFacets: Immutable.Map(),
+          facets: Immutable.Map(),
         })
       );
     }

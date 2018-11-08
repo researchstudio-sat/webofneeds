@@ -9,9 +9,7 @@
  */
 export function isWhatsAroundNeed(need) {
   return (
-    need &&
-    need.get("hasFlags") &&
-    need.get("hasFlags").contains("won:WhatsAround")
+    need && need.get("flags") && need.get("flags").contains("won:WhatsAround")
   );
 }
 
@@ -22,8 +20,6 @@ export function isWhatsAroundNeed(need) {
  */
 export function isWhatsNewNeed(need) {
   return (
-    need &&
-    need.get("hasFlags") &&
-    need.get("hasFlags").contains("won:WhatsNew")
+    need && need.get("flags") && need.get("flags").contains("won:WhatsNew")
   );
 }

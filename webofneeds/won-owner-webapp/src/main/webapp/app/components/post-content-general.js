@@ -51,13 +51,13 @@ function genComponentConf() {
             </div>
           </div>
         </div>
-        <div class="pcg__columns__right" ng-if="self.hasFlags && self.hasFlags.size > 0">
+        <div class="pcg__columns__right" ng-if="self.flags && self.flags.size > 0">
           <div class="pcg__columns__right__item">
             <div class="pcg__columns__right__item__label">
               Flags
             </div>
             <div class="pcg__columns__right__item__value">
-              <span class="pcg__columns__right__item__value__flag" ng-repeat="flag in self.hasFlags.toArray()">{{ self.labels.flags[flag]? self.labels.flags[flag] : flag }}</span>
+              <span class="pcg__columns__right__item__value__flag" ng-repeat="flag in self.flags.toArray()">{{ self.labels.flags[flag]? self.labels.flags[flag] : flag }}</span>
             </div>
           </div>
         </div>
@@ -87,7 +87,7 @@ function genComponentConf() {
             : null;
 
         const post = this.postUri && state.getIn(["needs", this.postUri]);
-        const hasFlags = post && post.get("hasFlags");
+        const flags = post && post.get("flags");
 
         const persona = post
           ? state.getIn(["needs", post.get("heldBy")])
@@ -98,15 +98,15 @@ function genComponentConf() {
           WON: won.WON,
           post,
           type: post && post.get("type"),
-          hasFlags,
+          flags,
           persona:
             personaHolds && personaHolds.includes(post.get("uri"))
               ? persona
               : undefined,
           preventSharing:
             (post && post.get("state") === won.WON.InactiveCompacted) ||
-            (hasFlags &&
-              hasFlags.filter(
+            (flags &&
+              flags.filter(
                 flag => flag === won.WON.NoHintForCounterpartCompacted
               ).size > 0),
           friendlyTimestamp:
