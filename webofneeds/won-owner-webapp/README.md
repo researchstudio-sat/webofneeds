@@ -215,7 +215,7 @@ $ngRedux.getState();
        unread: true|false, //whether or not this need has new information that has not been read yet
        uri: string, //unique identifier of this need
        humanReadable: string, //a human Readable String that parses the content from is or seeks and searchString and makes a title out of it based on a certain logic
-       is : {...},
+       content : {...},
        seeks: {...}
    },
    ...
