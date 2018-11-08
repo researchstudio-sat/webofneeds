@@ -11,7 +11,7 @@ import * as abstractDetails_ from "./details/abstract.js";
 export const abstractDetails = abstractDetails_; // reexport
 
 export const emptyDraft = {
-  is: {},
+  content: {},
   seeks: {},
   matchingContext: undefined,
 };

@@ -20,11 +20,11 @@ const mobilityUseCases = {
     doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
     draft: {
       ...emptyDraft,
-      is: { title: "Need a lift", tags: "search-lift" },
+      content: { title: "Need a lift", tags: "search-lift" },
       searchString: "offer-lift",
     },
     // TODO: amount of people? other details?
-    isDetails: {
+    details: {
       title: { ...details.title },
       description: { ...details.description },
     },
@@ -127,15 +127,15 @@ const mobilityUseCases = {
     doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
     draft: {
       ...emptyDraft,
-      is: { title: "Taxi", type: "s:TaxiService" },
+      content: { title: "Taxi", type: "s:TaxiService" },
     },
-    isDetails: {
+    details: {
       title: { ...details.title },
       description: { ...details.description },
       location: { ...details.location },
     },
     generateQuery: (draft, resultName) => {
-      const location = getIn(draft, ["is", "location"]);
+      const location = getIn(draft, ["content", "location"]);
       const filters = [
         {
           // to select seeks-branch
@@ -175,12 +175,12 @@ const mobilityUseCases = {
     doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
     draft: {
       ...emptyDraft,
-      is: {
+      content: {
         title: "Share a Ride",
         type: "http://dbpedia.org/resource/Ridesharing",
       },
     },
-    isDetails: {
+    details: {
       title: { ...details.title },
       description: { ...details.description },
       fromDatetime: { ...details.fromDatetime },
@@ -188,10 +188,18 @@ const mobilityUseCases = {
       travelAction: { ...details.travelAction },
     },
     generateQuery: (draft, resultName) => {
-      const toLocation = getIn(draft, ["is", "travelAction", "toLocation"]);
-      const fromLocation = getIn(draft, ["is", "travelAction", "fromLocation"]);
+      const toLocation = getIn(draft, [
+        "content",
+        "travelAction",
+        "toLocation",
+      ]);
+      const fromLocation = getIn(draft, [
+        "content",
+        "travelAction",
+        "fromLocation",
+      ]);
 
-      const fromTime = getIn(draft, ["is", "fromDatetime"]);
+      const fromTime = getIn(draft, ["content", "fromDatetime"]);
       const filters = [
         {
           // to select seeks-branch

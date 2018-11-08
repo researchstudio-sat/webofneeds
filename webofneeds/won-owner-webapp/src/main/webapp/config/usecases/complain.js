@@ -17,14 +17,14 @@ export const complainGroup = {
       doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
       draft: {
         ...emptyDraft,
-        is: {
+        content: {
           title: "WTF?",
           tags: ["wtf"],
         },
         seeks: {},
         searchString: "wtf",
       },
-      isDetails: {
+      details: {
         title: { ...details.title },
         description: { ...details.description },
         location: { ...details.location },
@@ -40,13 +40,13 @@ export const complainGroup = {
       doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
       draft: {
         ...emptyDraft,
-        is: {
+        content: {
           title: "I'll discuss complaints",
         },
         seeks: {},
         searchString: "wtf",
       },
-      isDetails: {
+      details: {
         title: { ...details.title },
         description: { ...details.description },
         location: { ...details.location },

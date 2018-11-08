@@ -23,12 +23,12 @@ export const transportGroup = {
       doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
       draft: {
         ...emptyDraft,
-        is: {
+        content: {
           title: "Want to send something",
           type: "http://dbpedia.org/resource/Cargo",
         },
       },
-      isDetails: {
+      details: {
         title: { ...details.title },
         content: {
           ...details.description,
@@ -360,12 +360,12 @@ export const transportGroup = {
       doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
       draft: {
         ...emptyDraft,
-        is: {
+        content: {
           title: "Transportation offer",
           type: "http://dbpedia.org/resource/Transport",
         },
       },
-      isDetails: {
+      details: {
         title: { ...details.title },
         location: { ...details.location },
       },
@@ -374,7 +374,7 @@ export const transportGroup = {
         description: { ...details.description },
       },
       generateQuery: (draft, resultName) => {
-        const location = getIn(draft, ["is", "location"]);
+        const location = getIn(draft, ["content", "location"]);
         const filters = [
           {
             // to select seeks-branch

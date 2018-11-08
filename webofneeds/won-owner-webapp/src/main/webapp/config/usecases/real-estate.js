@@ -42,12 +42,12 @@ export const realEstateGroup = {
           type: "won:RealEstateRentOffer",
           tags: ["RentOutRealEstate"],
         },
-        is: {
+        content: {
           type: "won:RealEstateRentDemand",
           tags: ["SearchRealEstateToRent"],
         },
       },
-      isDetails: undefined,
+      details: undefined,
       seeksDetails: {
         location: { ...details.location },
         floorSizeRange: { ...realEstateFloorSizeRangeDetail },
@@ -120,7 +120,7 @@ export const realEstateGroup = {
       doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
       draft: {
         ...emptyDraft,
-        is: {
+        content: {
           type: "won:RealEstateRentOffer",
           title: "For Rent",
           tags: ["RentOutRealEstate"],
@@ -130,7 +130,7 @@ export const realEstateGroup = {
           tags: ["SearchRealEstateToRent"],
         },
       },
-      isDetails: {
+      details: {
         title: { ...details.title },
         description: { ...details.description },
         location: {
@@ -153,11 +153,11 @@ export const realEstateGroup = {
       },
       seeksDetails: undefined,
       generateQuery: (draft, resultName) => {
-        const isBranch = draft && draft.is;
-        const location = isBranch && isBranch.location;
-        const rent = isBranch && isBranch.rent;
-        const numberOfRooms = isBranch && isBranch.numberOfRooms;
-        const floorSize = isBranch && isBranch.floorSize;
+        const draftContent = draft && draft.content;
+        const location = draftContent && draftContent.location;
+        const rent = draftContent && draftContent.rent;
+        const numberOfRooms = draftContent && draftContent.numberOfRooms;
+        const floorSize = draftContent && draftContent.floorSize;
 
         const filters = [
           {

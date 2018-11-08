@@ -27,7 +27,7 @@ export const jobSearch = {
   doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
     ...emptyDraft,
-    is: {
+    content: {
       type: "s:Person",
       tags: ["search-job"],
     },
@@ -35,7 +35,7 @@ export const jobSearch = {
       type: "s:JobPosting",
     },
   },
-  isDetails: {
+  details: {
     title: { ...details.title },
     description: { ...details.description },
     // location: { ...details.location }, // why would your current location of residency matter?
@@ -87,7 +87,7 @@ export const jobSearch = {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],
       },
-      tagLikes: getIn(draft, ["is", "skills"]),
+      tagLikes: getIn(draft, ["content", "skills"]),
     });
 
     // hiringOrganizationName

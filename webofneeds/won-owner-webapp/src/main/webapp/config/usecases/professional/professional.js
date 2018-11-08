@@ -21,13 +21,13 @@ export const professionalGroup = {
       doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
       draft: {
         ...emptyDraft,
-        is: {
+        content: {
           title: "I'm up for meeting new people!",
           tags: ["meetup"],
         },
         searchString: "meetup",
       },
-      isDetails: {
+      details: {
         title: { ...details.title },
         description: { ...details.description },
         location: { ...details.location },
@@ -49,13 +49,13 @@ export const professionalGroup = {
       doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
       draft: {
         ...emptyDraft,
-        is: {
+        content: {
           title: "I'm offering a PhD position!",
           tags: ["offer-phd"],
         },
         searchString: "search-phd",
       },
-      isDetails: {
+      details: {
         title: { ...details.title },
         description: { ...details.description },
         location: { ...details.location },
@@ -72,13 +72,13 @@ export const professionalGroup = {
       doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
       draft: {
         ...emptyDraft,
-        is: {
+        content: {
           title: "I'm looking for a PhD position!",
           tags: ["search-phd"],
         },
         searchString: "offer-phd",
       },
-      isDetails: {
+      details: {
         title: { ...details.title },
         description: { ...details.description },
         person: { ...details.person },
@@ -97,13 +97,13 @@ export const professionalGroup = {
       doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
       draft: {
         ...emptyDraft,
-        is: {
+        content: {
           title: "I'm offering a PostDoc position!",
           tags: ["offer-postdoc"],
         },
         searchString: "search-postdoc",
       },
-      isDetails: {
+      details: {
         title: { ...details.title },
         description: { ...details.description },
         location: { ...details.location },
@@ -120,13 +120,13 @@ export const professionalGroup = {
       doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
       draft: {
         ...emptyDraft,
-        is: {
+        content: {
           title: "I'm looking for a PostDoc position!",
           tags: ["search-postdoc"],
         },
         searchString: "offer-postdoc",
       },
-      isDetails: {
+      details: {
         title: { ...details.title },
         description: { ...details.description },
         person: { ...details.person },
@@ -145,13 +145,13 @@ export const professionalGroup = {
       doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
       draft: {
         ...emptyDraft,
-        is: {
+        content: {
           title: "Offering a slot in a project consortium",
           tags: ["offer-consortium"],
         },
         searchString: "search-consortium",
       },
-      isDetails: {
+      details: {
         title: { ...details.title },
         description: { ...details.description },
         location: { ...details.location },
@@ -170,13 +170,13 @@ export const professionalGroup = {
       doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
       draft: {
         ...emptyDraft,
-        is: {
+        content: {
           title: "Looking for a slot in a project consortium",
           tags: ["search-consortium"],
         },
         searchString: "offer-consortium",
       },
-      isDetails: {
+      details: {
         title: { ...details.title },
         description: { ...details.description },
         location: { ...details.location },
