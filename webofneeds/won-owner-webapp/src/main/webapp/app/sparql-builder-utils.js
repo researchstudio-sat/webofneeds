@@ -636,14 +636,14 @@ export function generateWhatsNewQuery() {
   return `PREFIX won: <http://purl.org/webofneeds/model#>
         PREFIX s: <http://schema.org/>
         PREFIX dct: <http://purl.org/dc/terms/>
-        SELECT DISTINCT ?result ?score
-            BIND ((YEAR(?created) - 1970) * 315360000
+        SELECT DISTINCT ?result ?score WHERE {
+          BIND ((YEAR(?created) - 1970) * 315360000
                + MONTH(?created) * 26280000
                + DAY(?created) * 86400
                + HOURS(?created) * 3600
                + MINUTES(?created) * 60
                + SECONDS(?created)
-                as ?score) WHERE {
+                as ?score)
           ?result <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> won:Need.
           ?result won:isInState  won:Active .
           ?result dct:created ?created.
