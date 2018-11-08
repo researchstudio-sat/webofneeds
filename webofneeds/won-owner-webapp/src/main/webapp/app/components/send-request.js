@@ -11,6 +11,7 @@ import {
 } from "../selectors/general-selectors.js";
 import { connect2Redux } from "../won-utils.js";
 import { attach, getIn } from "../utils.js";
+import { isWhatsAroundNeed, isWhatsNewNeed } from "../need-utils.js";
 import { actionCreators } from "../actions/actions.js";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
@@ -41,10 +42,10 @@ function genComponentConf() {
         const connectionUri = decodeURIComponent(
           getIn(state, ["router", "currentParams", "connectionUri"])
         );
-        const ownNeed =
+        const ownedNeed =
           connectionUri && getOwnedNeedByConnectionUri(state, connectionUri);
         const connection =
-          ownNeed && ownNeed.getIn(["connections", connectionUri]);
+          ownedNeed && ownedNeed.getIn(["connections", connectionUri]);
         const postUriToConnectTo = !connection
           ? getPostUriFromRoute(state)
           : connection && connection.get("remoteNeedUri");
@@ -54,7 +55,7 @@ function genComponentConf() {
         return {
           connection,
           connectionUri,
-          ownNeed,
+          ownedNeed,
           displayedPost,
           postUriToConnectTo,
         };
@@ -70,8 +71,8 @@ function genComponentConf() {
 
     sendRequest(message, persona) {
       const isOwnNeedWhatsX =
-        this.ownNeed &&
-        (this.ownNeed.get("isWhatsAround") || this.ownNeed.get("isWhatsNew"));
+        this.ownedNeed &&
+        (isWhatsAroundNeed(this.ownedNeed) || isWhatsNewNeed(this.ownedNeed));
 
       if (!this.connection || isOwnNeedWhatsX) {
         this.router__stateGoResetParams("connections");
@@ -92,9 +93,9 @@ function genComponentConf() {
         //this.router__stateGoCurrent({connectionUri: null, sendAdHocRequest: null});
       } else {
         this.needs__connect(
-          this.ownNeed.get("uri"),
+          this.ownedNeed.get("uri"),
           this.connectionUri,
-          this.ownNeed
+          this.ownedNeed
             .getIn(["connections", this.connectionUri])
             .get("remoteNeedUri"),
           message

@@ -1,6 +1,7 @@
 import Immutable from "immutable";
 import won from "../../won-es6.js";
 import { getAllDetails } from "../../won-utils.js";
+import { isWhatsNewNeed, isWhatsAroundNeed } from "../../need-utils.js";
 
 export function parseNeed(jsonldNeed, ownNeed) {
   const jsonldNeedImm = Immutable.fromJS(jsonldNeed);
@@ -9,24 +10,22 @@ export function parseNeed(jsonldNeed, ownNeed) {
     uri: undefined,
     nodeUri: undefined,
     types: undefined,
+    hasFacets: Immutable.Map(),
     state: undefined,
     connections: Immutable.Map(),
-    creationDate: undefined,
-    lastUpdateDate: undefined,
     unread: false,
     ownNeed: !!ownNeed,
     seeks: undefined,
     isBeingCreated: false,
-    isWhatsAround: false,
-    isWhatsNew: false,
     hasFlags: undefined,
     matchingContexts: undefined,
     searchString: undefined,
     jsonld: jsonldNeed,
-    hasFacets: Immutable.Map(),
     heldBy: undefined,
     holds: undefined,
     content: undefined,
+    creationDate: undefined,
+    lastUpdateDate: undefined,
   };
 
   if (jsonldNeedImm) {
@@ -39,36 +38,7 @@ export function parseNeed(jsonldNeed, ownNeed) {
 
     parsedNeed.nodeUri = jsonldNeedImm.getIn(["won:hasWonNode", "@id"]);
 
-    /*
-     * The following code-snippet is solely to determine if the parsed need
-     * is a special "whats around"-need, in order to do this we have to make
-     * sure that the won:hasFlag is checked in two forms, both as a string
-     * and an immutable object
-     */
-    const wonHasFlags = jsonldNeedImm.get("won:hasFlag");
-
     const hasFlags = extractFlags(jsonldNeedImm.get("won:hasFlag"));
-
-    const isWhatsAround =
-      wonHasFlags &&
-      wonHasFlags.filter(function(flag) {
-        if (flag instanceof Immutable.Map) {
-          return flag.get("@id") === "won:WhatsAround";
-        } else {
-          return flag === "won:WhatsAround";
-        }
-      }).size > 0;
-
-    const isWhatsNew =
-      wonHasFlags &&
-      wonHasFlags.filter(function(flag) {
-        if (flag instanceof Immutable.Map) {
-          return flag.get("@id") === "won:WhatsNew";
-        } else {
-          return flag === "won:WhatsNew";
-        }
-      }).size > 0;
-
     const wonHasMatchingContexts = jsonldNeedImm.get("won:hasMatchingContext");
 
     const creationDate =
@@ -113,8 +83,6 @@ export function parseNeed(jsonldNeed, ownNeed) {
       detailsToParse
     );
 
-    parsedNeed.isWhatsAround = !!isWhatsAround;
-    parsedNeed.isWhatsNew = !!isWhatsNew;
     parsedNeed.matchingContexts = wonHasMatchingContexts
       ? Immutable.List.isList(wonHasMatchingContexts)
         ? wonHasMatchingContexts
@@ -202,11 +170,11 @@ function getHumanReadableStringFromNeed(need, detailsToParse) {
     const title = needContent && needContent.title;
     const seeksTitle = seeksBranch && seeksBranch.title;
 
-    if (need.isWhatsNew) {
+    if (isWhatsNewNeed(Immutable.fromJS(need))) {
       return "What's New";
     }
 
-    if (need.isWhatsAround) {
+    if (isWhatsAroundNeed(Immutable.fromJS(need))) {
       let location = needContent["location"] || seeksBranch["location"];
 
       const locationJS =

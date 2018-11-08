@@ -201,25 +201,6 @@ export function addNeedInCreation(needs, needInCreation, needUri) {
     need = need.set("type", type);
     need = need.set("humanReadable", title);
 
-    let isWhatsAround = false;
-    let isWhatsNew = false;
-
-    if (
-      need.getIn(["content", "whatsAround"]) ||
-      need.getIn(["seeks", "whatsAround"])
-    ) {
-      isWhatsAround = true;
-    }
-    if (
-      need.getIn(["content", "whatsNew"]) ||
-      need.getIn(["seeks", "whatsNew"])
-    ) {
-      isWhatsNew = true;
-    }
-
-    need = need.set("isWhatsAround", isWhatsAround);
-    need = need.set("isWhatsNew", isWhatsNew);
-
     newState = needs.setIn([needUri], need);
     console.debug("need-reducer create new need: ", need.toJS());
   } else {

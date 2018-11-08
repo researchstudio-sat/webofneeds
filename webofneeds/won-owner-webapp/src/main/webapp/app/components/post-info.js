@@ -8,6 +8,7 @@ import postContextDropdownModule from "./post-context-dropdown.js";
 import postContentModule from "./post-content.js";
 import { attach } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
+import { isWhatsNew } from "../need-utils.js";
 import { getPostUriFromRoute } from "../selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
@@ -35,7 +36,7 @@ function genComponentConf() {
         <won-post-content post-uri="self.postUri"></won-post-content>
         <div class="post-info__footer" ng-if="!self.isLoading()">
             <button class="won-button--filled red post-info__footer__button"
-                ng-if="self.post.get('ownNeed') && self.post.get('isWhatsNew')"
+                ng-if="self.showCreateWhatsAround()"
                 ng-click="self.createWhatsAround()"
                 ng-disabled="self.pendingPublishing">
                 <svg class="won-button-icon" style="--local-primary:white;">
@@ -73,6 +74,10 @@ function genComponentConf() {
       );
 
       classOnComponentRoot("won-is-loading", () => this.isLoading(), this);
+    }
+
+    showCreateWhatsAround() {
+      return this.post && this.post.get("ownNeed") && isWhatsNew(this.post);
     }
 
     isLoading() {

@@ -7,6 +7,7 @@ import { createSelector } from "reselect";
 import won from "../won-es6.js";
 import { decodeUriComponentProperly, getIn } from "../utils.js";
 import Color from "color";
+import { isWhatsAroundNeed, isWhatsNewNeed } from "../need-utils.js";
 
 export const selectLastUpdateTime = state => state.get("lastUpdateTime");
 export const getRouterParams = state =>
@@ -56,7 +57,7 @@ export function getOwnedClosedPosts(state) {
     allOwnNeeds.filter(
       post =>
         post.get("state") === won.WON.InactiveCompacted &&
-        !(post.get("isWhatsAround") || post.get("isWhatsNew"))
+        !(isWhatsAroundNeed(post) || isWhatsNewNeed(post))
     )
   ); //Filter whatsAround and whatsNew needs automatically
 }

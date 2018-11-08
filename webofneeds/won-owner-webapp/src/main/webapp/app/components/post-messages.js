@@ -11,6 +11,7 @@ import connectionContextDropdownModule from "./connection-context-dropdown.js";
 import feedbackGridModule from "./feedback-grid.js";
 import { connect2Redux } from "../won-utils.js";
 import { attach, delay } from "../utils.js";
+import { isWhatsAroundNeed, isWhatsNewNeed } from "../need-utils.js";
 import {
   fetchAgreementProtocolUris,
   fetchPetriNetUris,
@@ -260,11 +261,9 @@ function genComponentConf() {
         const ownedNeed = getOwnedNeedByConnectionUri(state, connectionUri);
         const connection =
           ownedNeed && ownedNeed.getIn(["connections", connectionUri]);
-
         const isOwnNeedWhatsX =
-          ownedNeed &&
-          (ownedNeed.get("isWhatsAround") || ownedNeed.get("isWhatsNew"));
-
+          this.ownedNeed &&
+          (isWhatsAroundNeed(this.ownedNeed) || isWhatsNewNeed(this.ownedNeed));
         const nonOwnedNeedUri = connection && connection.get("remoteNeedUri");
         const nonOwnedNeed =
           nonOwnedNeedUri && state.getIn(["needs", nonOwnedNeedUri]);
@@ -771,7 +770,7 @@ function genComponentConf() {
       this.connections__open(this.connectionUri, message);
     }
 
-    sendRequest(message, persona) {
+    sendRequest(message) {
       if (!this.connection || this.isOwnNeedWhatsX) {
         this.router__stateGoResetParams("connections");
 

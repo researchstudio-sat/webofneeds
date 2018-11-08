@@ -10,6 +10,7 @@ import createSearchModule from "../create-search.js";
 import usecasePickerModule from "../usecase-picker.js";
 import usecaseGroupModule from "../usecase-group.js";
 import { attach, getIn, callBuffer } from "../../utils.js";
+import { isWhatsAroundNeed, isWhatsNewNeed } from "../../need-utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import {
   getOwnedNeedByConnectionUri,
@@ -71,7 +72,7 @@ class ConnectionsController {
       const ownNeeds = getOwnedNeeds(state).filter(
         post =>
           !(
-            (post.get("isWhatsAround") || post.get("isWhatsNew")) &&
+            (isWhatsAroundNeed(post) || isWhatsNewNeed(post)) &&
             post.get("state") === won.WON.InactiveCompacted
           )
       );

@@ -14,6 +14,8 @@ import {
   nominatim2draftLocation,
 } from "../utils.js";
 
+import { isWhatsAroundNeed, isWhatsNewNeed } from "../need-utils.js";
+
 export function needCreate(draft, persona, nodeUri) {
   return (dispatch, getState) => {
     const state = getState();
@@ -103,7 +105,7 @@ export function createWhatsNew() {
       .filter(
         need =>
           need.get("state") === "won:Active" &&
-          (need.get("isWhatsAround") || need.get("isWhatsNew"))
+          (isWhatsAroundNeed(need) || isWhatsNewNeed(need))
       )
       .map(need => {
         dispatch(actionCreators.needs__close(need.get("uri")));
@@ -139,7 +141,7 @@ export function createWhatsAround() {
               .filter(
                 need =>
                   need.get("state") === "won:Active" &&
-                  (need.get("isWhatsAround") || need.get("isWhatsNew"))
+                  (isWhatsAroundNeed(need) || isWhatsNewNeed(need))
               )
               .map(need => {
                 dispatch(actionCreators.needs__close(need.get("uri"))); //TODO action creators should not call other action creators, according to Moru
