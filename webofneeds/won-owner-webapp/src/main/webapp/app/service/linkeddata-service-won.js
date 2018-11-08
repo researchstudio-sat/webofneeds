@@ -983,23 +983,6 @@ import won from "./won.js";
       return { "@context": flattenedNeedJsonLd["@context"] };
     }
 
-    // some needs point to the same blank node for `won:is` and `won:seeks`
-    // e.g. "what's around" needs. the framing algorithm emits one of these
-    // just as `{ "@id": ... }`. for improved usefulness of the results the
-    // the full node is assigned to the other predicate.
-    const isNode = get(flattenedNeedJsonLd, "won:is");
-    const seeksNode = get(flattenedNeedJsonLd, "won:seeks");
-
-    if (get(isNode, "@id") && get(isNode, "@id") === get(seeksNode, "@id")) {
-      if (Object.keys(isNode).length > Object.keys(seeksNode).length) {
-        // "is" has all the content, use it for both
-        flattenedNeedJsonLd["won:seeks"] = isNode;
-      } else {
-        // "seeks" has all the content, use it for both
-        flattenedNeedJsonLd["won:is"] = seeksNode;
-      }
-    }
-
     return flattenedNeedJsonLd;
   };
 
