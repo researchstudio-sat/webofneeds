@@ -492,12 +492,11 @@ export async function buildCreateMessage(needData, wonNodeUri) {
     seeks: needData.seeks
       ? await prepareContentNodeData(needData.seeks)
       : undefined,
+    useCase: needData.useCase ? needData.useCase : undefined, //only needed for need building
     // FIXME: find a better way to include need details that are not part of is or seeks
     matchingContext: needData.matchingContext
       ? needData.matchingContext
       : undefined,
-    searchString: needData.searchString ? needData.searchString : undefined,
-    useCase: needData.useCase ? needData.useCase : undefined, //only needed for need building
   });
 
   const msgUri = wonNodeUri + "/event/" + getRandomWonId(); //mandatory

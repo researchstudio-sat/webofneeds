@@ -181,24 +181,16 @@ export function addNeedInCreation(needs, needInCreation, needUri) {
     need = need.set("isBeingCreated", true);
     need = need.set("connections", Immutable.Map());
 
-    let type = undefined; //TODO: I THINK WE CAN REMOVE THIS
     let title = undefined;
 
     if (need.get("content")) {
-      type = need.get("seeks")
-        ? won.WON.BasicNeedTypeCombinedCompacted
-        : won.WON.BasicNeedTypeSupplyCompacted;
       title = need.getIn(["content", "title"]);
     }
 
     if (need.get("seeks")) {
-      type = need.get("content")
-        ? won.WON.BasicNeedTypeCombinedCompacted
-        : won.WON.BasicNeedTypeDemandCompacted;
       title = need.getIn(["seeks", "title"]);
     }
 
-    need = need.set("type", type);
     need = need.set("humanReadable", title);
 
     newState = needs.setIn([needUri], need);

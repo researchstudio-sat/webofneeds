@@ -93,7 +93,7 @@ import { Generator } from "sparqljs";
    * contentId, e.g. 'http://localhost:8080/won/resource/event/1997814854983652400#content-need';
    */
   won.buildNeedRdf = function(args) {
-    if (!args.content && !args.seeks && !args.searchString) {
+    if (!args.content && !args.seeks) {
       throw new Error(
         "Expected an object with an is- and/or a seeks-subobject. Something like `{ is: {...}, seeks: {...} }`. Got " +
           JSON.stringify(args)
@@ -158,7 +158,6 @@ import { Generator } from "sparqljs";
     };
 
     const matchingContext = args.matchingContext;
-    const searchString = args.searchString;
 
     // TODO: if both is and seeks are present, the seeks content gets ignored here
     const isWhatsAround = args.content
@@ -273,7 +272,6 @@ import { Generator } from "sparqljs";
         ? { "@value": doNotMatchAfter, "@type": "xsd:dateTime" }
         : undefined,
       "won:hasMatchingContext": matchingContext ? matchingContext : undefined,
-      "won:hasSearchString": searchString ? searchString : undefined,
       "won:hasQuery":
         isWhatsAround || isWhatsNew
           ? query

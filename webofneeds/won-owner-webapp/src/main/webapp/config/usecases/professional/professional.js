@@ -24,8 +24,8 @@ export const professionalGroup = {
         content: {
           title: "I'm up for meeting new people!",
           tags: ["meetup"],
+          searchString: "meetup",
         },
-        searchString: "meetup",
       },
       details: {
         title: { ...details.title },
@@ -52,8 +52,8 @@ export const professionalGroup = {
         content: {
           title: "I'm offering a PhD position!",
           tags: ["offer-phd"],
+          searchString: "search-phd",
         },
-        searchString: "search-phd",
       },
       details: {
         title: { ...details.title },
@@ -75,8 +75,8 @@ export const professionalGroup = {
         content: {
           title: "I'm looking for a PhD position!",
           tags: ["search-phd"],
+          searchString: "offer-phd",
         },
-        searchString: "offer-phd",
       },
       details: {
         title: { ...details.title },
@@ -100,8 +100,8 @@ export const professionalGroup = {
         content: {
           title: "I'm offering a PostDoc position!",
           tags: ["offer-postdoc"],
+          searchString: "search-postdoc",
         },
-        searchString: "search-postdoc",
       },
       details: {
         title: { ...details.title },
@@ -123,8 +123,8 @@ export const professionalGroup = {
         content: {
           title: "I'm looking for a PostDoc position!",
           tags: ["search-postdoc"],
+          searchString: "offer-postdoc",
         },
-        searchString: "offer-postdoc",
       },
       details: {
         title: { ...details.title },
@@ -148,8 +148,8 @@ export const professionalGroup = {
         content: {
           title: "Offering a slot in a project consortium",
           tags: ["offer-consortium"],
+          searchString: "search-consortium",
         },
-        searchString: "search-consortium",
       },
       details: {
         title: { ...details.title },
@@ -173,8 +173,8 @@ export const professionalGroup = {
         content: {
           title: "Looking for a slot in a project consortium",
           tags: ["search-consortium"],
+          searchString: "offer-consortium",
         },
-        searchString: "offer-consortium",
       },
       details: {
         title: { ...details.title },

@@ -20,9 +20,9 @@ export const complainGroup = {
         content: {
           title: "WTF?",
           tags: ["wtf"],
+          searchString: "wtf",
         },
         seeks: {},
-        searchString: "wtf",
       },
       details: {
         title: { ...details.title },
@@ -42,9 +42,9 @@ export const complainGroup = {
         ...emptyDraft,
         content: {
           title: "I'll discuss complaints",
+          searchString: "wtf",
         },
         seeks: {},
-        searchString: "wtf",
       },
       details: {
         title: { ...details.title },

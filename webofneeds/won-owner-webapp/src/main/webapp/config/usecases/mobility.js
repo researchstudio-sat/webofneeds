@@ -20,8 +20,11 @@ const mobilityUseCases = {
     doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
     draft: {
       ...emptyDraft,
-      content: { title: "Need a lift", tags: "search-lift" },
-      searchString: "offer-lift",
+      content: {
+        title: "Need a lift",
+        tags: "search-lift",
+        searchString: "offer-lift",
+      },
     },
     // TODO: amount of people? other details?
     details: {

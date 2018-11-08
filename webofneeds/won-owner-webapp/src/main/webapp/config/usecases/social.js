@@ -20,9 +20,9 @@ export const socialGroup = {
         content: {
           title: "I'm up for breakfast! Any plans?",
           tags: ["breakfast"],
+          searchString: "breakfast",
         },
         seeks: { title: "breakfast" },
-        searchString: "breakfast",
       },
       details: {
         title: { ...details.title },
@@ -44,8 +44,8 @@ export const socialGroup = {
         content: {
           title: "I'm up for lunch! Any plans?",
           tags: ["lunch"],
+          searchString: "lunch",
         },
-        searchString: "lunch",
       },
       details: {
         title: { ...details.title },
@@ -67,8 +67,8 @@ export const socialGroup = {
         content: {
           title: "I'm up for partying! Any plans?",
           tags: ["afterparty"],
+          searchString: "afterparty",
         },
-        searchString: "afterparty",
       },
       details: {
         title: { ...details.title },
@@ -86,8 +86,7 @@ export const socialGroup = {
       doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
       draft: {
         ...emptyDraft,
-        content: { tags: ["sightseeing"] },
-        searchString: "sightseeing",
+        content: { tags: ["sightseeing"], searchString: "sightseeing" },
       },
       details: {
         title: { ...details.title },

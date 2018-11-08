@@ -208,7 +208,6 @@ $ngRedux.getState();
        toLoad: true|false, //whether or not the need is flagged as toLoad (for future loading purposes)
        flags: Immutable.List //all the flags that are present within the won:hasFlags predicate of a need
        facets: Immutable.Map //all the facets that are present within the won:hasFacets predicate of a need
-       searchString: string, //optional parameter, used for full text matching
        state: "won:Active" | "won:Inactive", //state of the need
        types: Immutable.Set() // of need types e.g. won:Persona, won:Need, and any other types
        unread: true|false, //whether or not this need has new information that has not been read yet

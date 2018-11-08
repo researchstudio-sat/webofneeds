@@ -8,7 +8,7 @@ import postContextDropdownModule from "./post-context-dropdown.js";
 import postContentModule from "./post-content.js";
 import { attach } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
-import { isWhatsNew } from "../need-utils.js";
+import { isWhatsNewNeed } from "../need-utils.js";
 import { getPostUriFromRoute } from "../selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
@@ -77,7 +77,7 @@ function genComponentConf() {
     }
 
     showCreateWhatsAround() {
-      return this.post && this.post.get("ownNeed") && isWhatsNew(this.post);
+      return this.post && this.post.get("ownNeed") && isWhatsNewNeed(this.post);
     }
 
     isLoading() {

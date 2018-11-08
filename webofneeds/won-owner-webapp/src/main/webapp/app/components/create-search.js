@@ -48,7 +48,7 @@ function genComponentConf() {
             <!-- ADD SEARCH STRING -->
             <won-title-picker
               on-update="::self.updateDetail(value)"
-              initial-value="::self.draftObject.searchString">
+              initial-value="::self.draftObject.content.searchString">
             </won-title-picker>
             
 
@@ -116,9 +116,12 @@ function genComponentConf() {
       this.windowHeight = window.screen.height;
       this.scrollContainer().addEventListener("scroll", e => this.onResize(e));
 
-      this.draftObject = {};
-      this.draftObject.useCase = "search";
-      this.draftObject.seeks = {};
+      this.draftObject = {
+        content: {},
+        seeks: {},
+        useCase: "search",
+        matchingContext: undefined,
+      };
 
       this.showTuningOptions = false;
 
@@ -188,8 +191,9 @@ function genComponentConf() {
       const draft = this.draftObject;
       const hasSearchString =
         this.draftObject &&
-        this.draftObject.searchString &&
-        this.draftObject.searchString.trim().length > 0;
+        this.draftObject.content &&
+        this.draftObject.content.searchString &&
+        this.draftObject.content.searchString.trim().length > 0;
       return !this.connectionHasBeenLost && !!draft && hasSearchString;
     }
 
@@ -203,7 +207,7 @@ function genComponentConf() {
       if (this.isNew) {
         this.isNew = false;
       }
-      this.draftObject.searchString = value;
+      this.draftObject.content.searchString = value;
     }
 
     publish() {

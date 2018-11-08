@@ -17,7 +17,6 @@ export function parseNeed(jsonldNeed, ownNeed) {
       flags: extractFlags(jsonldNeedImm.get("won:hasFlag")),
       state: extractState(jsonldNeedImm),
       matchingContexts: extractMatchingContext(jsonldNeedImm),
-      searchString: jsonldNeedImm.get("won:hasSearchString"),
       heldBy: won.parseFrom(jsonldNeedImm, ["won:heldBy"], "xsd:ID"),
       holds:
         won.parseListFrom(jsonldNeedImm, ["won:holds"], "xsd:ID") ||
@@ -179,7 +178,7 @@ function getHumanReadableStringFromNeed(need, detailsToParse) {
     } else if (title) {
       return title;
     } else {
-      const searchString = need && need.searchString;
+      const searchString = need && need.content && need.content.searchString;
 
       if (searchString) {
         return "Search: " + searchString;

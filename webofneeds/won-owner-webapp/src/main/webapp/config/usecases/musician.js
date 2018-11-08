@@ -249,11 +249,11 @@ export const musicianGroup = {
         content: {
           type: "won:RehearsalRoomRentDemand",
           title: "Looking for Rehearsal Room!",
+          searchString: "Rehearsal Room",
         },
         seeks: {
           type: "won:RehearsalRoomRentOffer",
         },
-        searchString: "Rehearsal Room",
       },
       details: undefined,
       seeksDetails: {

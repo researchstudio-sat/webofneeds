@@ -20,6 +20,7 @@ export const details = {
   title: basicDetails.title,
   description: basicDetails.description,
   tags: basicDetails.tags,
+  searchString: basicDetails.searchString,
 
   fromDatetime: timeDetails.fromDatetime,
   throughDatetime: timeDetails.throughDatetime,
