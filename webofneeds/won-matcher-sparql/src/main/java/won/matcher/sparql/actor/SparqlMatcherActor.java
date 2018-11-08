@@ -281,7 +281,12 @@ public class SparqlMatcherActor extends UntypedActor {
                 }).collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
 
         BulkHintEvent bulkHintEvent = new BulkHintEvent();
-
+        
+        Optional<Double> maxScore = filteredNeeds.values().stream().flatMap(value -> value.stream()).map(n -> n.score).max((x, y) -> (int) Math.signum(x - y));
+        if (!maxScore.isPresent()) {
+            //this should not happen
+            return;
+        }
         filteredNeeds.forEach((hintTarget, hints) -> {
             hints
             .stream()
@@ -295,7 +300,7 @@ public class SparqlMatcherActor extends UntypedActor {
                                 hint.need.getWonNodeUri(), 
                                 hint.need.getNeedUri(), 
                                 config.getMatcherUri(), 
-                                hint.score));
+                                hint.score/maxScore.get()));
             });
         });
         
