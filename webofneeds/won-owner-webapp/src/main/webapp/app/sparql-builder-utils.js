@@ -636,8 +636,8 @@ export function generateWhatsNewQuery() {
   return `PREFIX won: <http://purl.org/webofneeds/model#>
         PREFIX s: <http://schema.org/>
         PREFIX dct: <http://purl.org/dc/terms/>
-        SELECT DISTINCT ?result 
-            ((YEAR(?created) - 1970) * 315360000
+        SELECT DISTINCT ?result ?score
+            BIND ((YEAR(?created) - 1970) * 315360000
                + MONTH(?created) * 26280000
                + DAY(?created) * 86400
                + HOURS(?created) * 3600
