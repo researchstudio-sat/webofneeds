@@ -193,7 +193,8 @@ chat-textfield-simple {
     grid-area: button;
     grid-row: 2 / span 1;
     grid-column: 3 / span 1;
-    display: flex;
+    display: block;
+    height: 100%;
   }
   .cts__additionalcontent {
     grid-area: additionalcontent;
