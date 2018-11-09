@@ -193,7 +193,7 @@ function genComponentConf() {
             <chat-textfield-simple
                 class="pm__footer__chattexfield"
                 placeholder="self.shouldShowRdf? 'Enter TTL...' : 'Your message...'"
-                submit-button-label="self.shouldShowRdf? 'Send RDF' : 'Send'"
+                submit-button-label="self.shouldShowRdf? 'Send&#160;RDF' : 'Send'"
                 on-submit="self.send(value, additionalContent, referencedContent, self.shouldShowRdf)"
                 help-text="self.shouldShowRdf? self.rdfTextfieldHelpText : ''"
                 allow-empty-submit="::false"
@@ -213,7 +213,7 @@ function genComponentConf() {
                 on-submit="::self.openRequest(value)"
                 allow-details="::false"
                 allow-empty-submit="::true"
-                submit-button-label="::'Accept Chat'"
+                submit-button-label="::'Accept&#160;Chat'"
             >
             </chat-textfield-simple>
             <won-labelled-hr label="::'Or'" class="pm__footer__labelledhr"></won-labelled-hr>
@@ -229,8 +229,8 @@ function genComponentConf() {
                 on-submit="::self.sendRequest(value, selectedPersona)"
                 allow-details="::false"
                 allow-empty-submit="::true"
-                show-personas="::true"
-                submit-button-label="::'Ask to Chat'"
+                show-personas="self.isOwnNeedWhatsX"
+                submit-button-label="::'Ask&#160;to&#160;Chat'"
                 ng-if="!self.connection || self.connection.get('isRated')"
             >
             </chat-textfield-simple>
@@ -260,6 +260,10 @@ function genComponentConf() {
         const ownedNeed = getOwnedNeedByConnectionUri(state, connectionUri);
         const connection =
           ownedNeed && ownedNeed.getIn(["connections", connectionUri]);
+
+        const isOwnNeedWhatsX =
+          ownedNeed &&
+          (ownedNeed.get("isWhatsAround") || ownedNeed.get("isWhatsNew"));
 
         const nonOwnedNeedUri = connection && connection.get("remoteNeedUri");
         const nonOwnedNeed =
@@ -317,6 +321,7 @@ function genComponentConf() {
           nonOwnedNeedUri,
           connectionUri,
           connection,
+          isOwnNeedWhatsX,
 
           sortedMessages: sortedMessages,
           chatMessages,
@@ -767,15 +772,10 @@ function genComponentConf() {
     }
 
     sendRequest(message, persona) {
-      const isOwnNeedWhatsX =
-        this.ownedNeed &&
-        (this.ownedNeed.get("isWhatsAround") ||
-          this.ownedNeed.get("isWhatsNew"));
-
-      if (!this.connection || isOwnNeedWhatsX) {
+      if (!this.connection || this.isOwnNeedWhatsX) {
         this.router__stateGoResetParams("connections");
 
-        if (isOwnNeedWhatsX) {
+        if (this.isOwnNeedWhatsX) {
           //Close the connection if there was a present connection for a whatsaround need
           this.connections__close(this.connectionUri);
         }

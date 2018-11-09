@@ -26,7 +26,7 @@ function genComponentConf() {
                 on-submit="::self.sendRequest(value, selectedPersona)"
                 allow-empty-submit="::true"
                 show-personas="true"
-                submit-button-label="::'Ask to Chat'"
+                submit-button-label="::'Ask&#160;to&#160;Chat'"
                 ng-if="!self.connection || self.connection.get('isRated')"
             >
             </chat-textfield-simple>
