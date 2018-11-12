@@ -23,7 +23,7 @@ function genComponentConf() {
                     </won-square-image>
                     <hgroup>
                         <h1 class="vtb__title">{{ self.post.get('humanReadable') }}</h1>
-                        <div class="vtb__titles__type">{{ self.generateNeedTypesLabel }}</div>
+                        <div class="vtb__titles__type">{{ self.generateNeedTypesLabel(self.post) }}</div>
                     </hgroup>
                 </div>
             </div>
