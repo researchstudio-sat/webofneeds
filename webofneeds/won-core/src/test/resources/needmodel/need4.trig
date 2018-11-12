@@ -20,7 +20,7 @@
         a                       won:Need ;
         won:hasFlag             won:UsedForTesting ;
         won:hasMatchingBehavior won:Mutual ;
-        won:is                  _:is_and_seeks ;
+        dc:title                "title1" ;
         won:seeks               _:is_and_seeks ;
         won:seeks               [
                                     a           won:NeedContent ;
