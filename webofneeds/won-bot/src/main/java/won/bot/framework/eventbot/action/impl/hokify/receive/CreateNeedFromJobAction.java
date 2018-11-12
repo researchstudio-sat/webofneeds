@@ -162,7 +162,7 @@ public class CreateNeedFromJobAction extends AbstractCreateNeedAction {
         need.addProperty(SCHEMA.IMAGE, image);
 
         // s:hiringOrganization
-        Resource hiringOrganisation = isPart.getModel().createResource();
+        Resource hiringOrganisation = need.getModel().createResource();
         hiringOrganisation.addProperty(RDF.type, SCHEMA.ORGANIZATION);
         hiringOrganisation.addProperty(SCHEMA.NAME, hokifyJob.getCompany());
         need.addProperty(SCHEMA.ORGANIZATION, hiringOrganisation);

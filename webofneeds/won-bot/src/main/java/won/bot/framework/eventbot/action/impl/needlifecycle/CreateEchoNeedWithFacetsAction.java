@@ -18,7 +18,6 @@ package won.bot.framework.eventbot.action.impl.needlifecycle;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
 import won.bot.framework.eventbot.event.Event;
@@ -28,8 +27,6 @@ import won.bot.framework.eventbot.event.impl.needlifecycle.NeedCreatedEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.message.WonMessage;
-import won.protocol.model.NeedContentPropertyType;
-import won.protocol.model.NeedGraphType;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.DefaultNeedModelWrapper;
 import won.protocol.util.RdfUtils;
@@ -74,8 +71,8 @@ public class CreateEchoNeedWithFacetsAction extends AbstractCreateNeedAction {
 
         needModelWrapper.setTitle("RE: " + replyText);
         needModelWrapper.setDescription("This is a need automatically created by the EchoBot.");
-        needModelWrapper.setTitle(NeedContentPropertyType.SEEKS, "RE: " + replyText);
-        needModelWrapper.setDescription(NeedContentPropertyType.SEEKS, "This is a need automatically created by the EchoBot.");
+        needModelWrapper.setSeeksTitle("RE: " + replyText);
+        needModelWrapper.setSeeksDescription("This is a need automatically created by the EchoBot.");
         int i = 1;
         for (URI facet : facets) {
             needModelWrapper.addFacet(needURI.toString()+"#facet"+i, facet.toString());
