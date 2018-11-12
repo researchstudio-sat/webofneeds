@@ -174,13 +174,6 @@
                       rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 
 
-###  http://purl.org/webofneeds/model#is
-:is rdf:type owl:ObjectProperty ;
-    rdfs:domain :Need ;
-    rdfs:comment "This optional property is one of the two properties that defines the content of every need (the other is the \"seeks\" property). It is used to describe that part of the content that is available (e.g. for exchange) in contrast to the part that is sought." ;
-    rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
-
-
 ###  http://purl.org/webofneeds/model#isInState
 :isInState rdf:type owl:ObjectProperty ,
                     owl:FunctionalProperty ;
