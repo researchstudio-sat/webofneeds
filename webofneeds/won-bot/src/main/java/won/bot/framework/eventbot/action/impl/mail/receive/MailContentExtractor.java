@@ -1,7 +1,7 @@
 package won.bot.framework.eventbot.action.impl.mail.receive;
 
 import won.bot.framework.eventbot.action.impl.mail.model.ActionType;
-import won.protocol.model.NeedContentPropertyType;
+import won.bot.framework.eventbot.action.impl.mail.model.MailPropertyType;
 
 import javax.mail.Address;
 import javax.mail.BodyPart;
@@ -68,20 +68,20 @@ public class MailContentExtractor
     return m.find() ? m.group(1) : null;
   }
 
-  public NeedContentPropertyType getNeedType(MimeMessage message) throws MessagingException {
-    return getNeedType(message.getSubject());
+  public MailPropertyType getMailType(MimeMessage message) throws MessagingException {
+    return getMailType(message.getSubject());
   }
 
-  public NeedContentPropertyType getNeedType(String subject) {
+  public MailPropertyType getMailType(String subject) {
 
     if (demandTypePattern.matcher(subject).matches()) {
-      return NeedContentPropertyType.SEEKS;
+      return MailPropertyType.DEMAND;
     } else if (supplyTypePattern.matcher(subject).matches()) {
-      return NeedContentPropertyType.IS;
+      return MailPropertyType.OFFER;
     } else if (doTogetherTypePattern.matcher(subject).matches()) {
-      return NeedContentPropertyType.IS_AND_SEEKS;
+      return MailPropertyType.BOTH;
     } else if (critiqueTypePattern.matcher(subject).matches()) {
-      return NeedContentPropertyType.IS_AND_SEEKS;
+      return MailPropertyType.BOTH;
     }
 
     return null;
@@ -177,8 +177,8 @@ public class MailContentExtractor
     this.cmdTakenPattern = cmdTakenPattern;
   }
 
-  public boolean isCreateNeedMail(MimeMessage messsage) throws MessagingException {
-    return getNeedType(messsage) != null;
+  public boolean isCreateNeedMail(MimeMessage message) throws MessagingException {
+    return getMailType(message) != null;
   }
 
   public boolean isCommandMail(MimeMessage message) throws IOException, MessagingException {
