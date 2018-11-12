@@ -8,6 +8,7 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.DC;
 import won.protocol.model.Coordinate;
 import won.protocol.model.NeedContentPropertyType;
+import won.protocol.model.NeedGraphType;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
@@ -38,6 +39,12 @@ public class DefaultNeedModelWrapper extends NeedModelWrapper {
         if (type == null || getContentNodes(type).size() == 0) {
             createContentNode(type, null);
         }
+    }
+
+    public void setTitle(String title) {
+        Resource needNode = getNeedNode(NeedGraphType.NEED);
+        needNode.removeAll(DC.title);
+        needNode.addLiteral(DC.title, title);
     }
 
     public void setTitle(NeedContentPropertyType type, String title) {
@@ -98,6 +105,12 @@ public class DefaultNeedModelWrapper extends NeedModelWrapper {
         setContentPropertyStringValue(type, DC.description, description);
     }
 
+    public void setDescription(String description) {
+        Resource needNode = getNeedNode(NeedGraphType.NEED);
+        needNode.removeAll(DC.description);
+        needNode.addLiteral(DC.description, description);
+    }
+
     public String getSomeDescription(NeedContentPropertyType type, String... preferredLanguages) {
         return getSomeContentPropertyStringValue(type, DC.description, preferredLanguages);
     }
@@ -114,6 +127,11 @@ public class DefaultNeedModelWrapper extends NeedModelWrapper {
     public Collection<String> getDescriptions(NeedContentPropertyType type) { return getDescriptions(type, null);}
     public Collection<String> getDescriptions(NeedContentPropertyType type, String language) {
         return getContentPropertyStringValues(type, DC.description, language);
+    }
+
+    public void addTag(String tag) {
+        Resource needNode = getNeedNode(NeedGraphType.NEED);
+        needNode.addLiteral(WON.HAS_TAG, tag);
     }
 
     public void addTag(NeedContentPropertyType type, String tag) {
