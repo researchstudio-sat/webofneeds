@@ -59,7 +59,7 @@ function genComponentConf() {
                     <button class="won-button--filled red"
                         ng-if="self.isOwnPost && self.isActive"
                         ng-click="self.closePost()">
-                        Archive Post
+                        Remove Post
                     </button>
                 </div>
             </div>
@@ -121,10 +121,21 @@ function genComponentConf() {
         const payload = {
           caption: "Attention!",
           text:
-            "Archiving the Post will close all connections, do you want to proceed?",
+            "Deleting or archiving the Post will close all connections, do you want to proceed?",
           buttons: [
             {
-              caption: "Yes, Archive!",
+              caption: "Delete",
+              callback: () => {
+                this.needs__delete(this.post.get("uri"));
+                this.router__stateGoCurrent({
+                  useCase: undefined,
+                  postUri: undefined,
+                });
+                this.closeModalDialog();
+              },
+            },
+            {
+              caption: "Archive",
               callback: () => {
                 this.needs__close(this.post.get("uri"));
                 this.router__stateGoCurrent({
@@ -135,7 +146,7 @@ function genComponentConf() {
               },
             },
             {
-              caption: "No, Keep It",
+              caption: "Cancel",
               callback: () => {
                 this.view__hideModalDialog();
               },

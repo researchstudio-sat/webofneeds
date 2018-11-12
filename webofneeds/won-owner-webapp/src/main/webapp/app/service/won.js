@@ -252,6 +252,11 @@ won.WONMSG.createMessageCompacted = won.WONMSG.prefix + ":CreateMessage";
 won.WONMSG.activateNeedMessage = won.WONMSG.baseUri + "ActivateMessage";
 won.WONMSG.activateNeedMessageCompacted =
   won.WONMSG.prefix + ":ActivateMessage";
+won.WONMSG.deleteNeedMessage = won.WONMSG.baseUri + "DeleteMessage";
+won.WONMSG.deleteNeedMessageCompacted = won.WONMSG.prefix + ":DeleteMessage";
+won.WONMSG.deleteNeedSentMessage = won.WONMSG.baseUri + "DeleteSentMessage";
+won.WONMSG.deleteNeedSentMessageCompacted =
+  won.WONMSG.prefix + ":DeleteSentMessage";
 won.WONMSG.closeNeedMessage = won.WONMSG.baseUri + "DeactivateMessage";
 won.WONMSG.closeNeedMessageCompacted = won.WONMSG.prefix + ":DeactivateMessage";
 won.WONMSG.closeNeedSentMessage = won.WONMSG.baseUri + "DeactivateSentMessage";

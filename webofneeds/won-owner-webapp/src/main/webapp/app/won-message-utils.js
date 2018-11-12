@@ -137,6 +137,29 @@ export function buildCloseNeedMessage(needUri, wonNodeUri) {
     );
 }
 
+export function buildDeleteNeedMessage(needUri, wonNodeUri) {
+  const buildMessage = function(envelopeData) {
+    const eventUri =
+      envelopeData[won.WONMSG.hasSenderNode] + "/event/" + getRandomWonId();
+    const message = new won.MessageBuilder(won.WONMSG.deleteNeedMessage)
+      .eventURI(eventUri)
+      .hasReceiverNode(wonNodeUri)
+      .hasOwnerDirection()
+      .hasSentTimestamp(new Date().getTime().toString())
+      .forEnvelopeData(envelopeData)
+      .build();
+
+    return { eventUri: eventUri, message: message };
+  };
+
+  return won
+    .getEnvelopeDataForNeed(needUri, wonNodeUri)
+    .then(
+      envelopeData => buildMessage(envelopeData),
+      () => won.reportError("cannot delete need " + needUri)
+    );
+}
+
 export function buildOpenNeedMessage(needUri, wonNodeUri) {
   const buildMessage = function(envelopeData) {
     const eventUri =

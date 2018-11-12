@@ -42,6 +42,7 @@ public class WONMSG
   public static final String TYPE_ACTIVATE_STRING = BASE_URI + "ActivateMessage";
   public static final String TYPE_OPEN_STRING = BASE_URI + "OpenMessage";
   public static final String TYPE_CLOSE_STRING =BASE_URI + "CloseMessage";
+  public static final String TYPE_DELETE_STRING =BASE_URI + "DeleteMessage";
   public static final String TYPE_CONNECTION_MESSAGE_STRING =BASE_URI + "ConnectionMessage";
   public static final String TYPE_NEED_MESSAGE_STRING =BASE_URI + "NeedMessage";
   public static final String TYPE_HINT_STRING =BASE_URI + "HintMessage";

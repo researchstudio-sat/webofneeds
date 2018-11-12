@@ -38,6 +38,14 @@
 
 import { tree2constants } from "../utils.js";
 import { hierarchy2Creators } from "./action-utils.js";
+<<<<<<< Upstream, based on origin/master
+=======
+import {
+  buildCloseNeedMessage,
+  buildOpenNeedMessage,
+  buildDeleteNeedMessage,
+} from "../won-message-utils.js";
+>>>>>>> 4d3f6c2 Allow deletion of needs.
 
 import {
   needCreate,
@@ -133,6 +141,7 @@ const actionHierarchy = {
     createSuccessful: INJ_DEFAULT,
     reopen: needsOpen,
     close: needsClose,
+    delete: needsDelete,
     closedBySystem: needsClosedBySystem,
     failed: INJ_DEFAULT,
     connect: needsConnect,
@@ -399,3 +408,159 @@ export function startTicking() {
       60000
     );
 }
+<<<<<<< Upstream, based on origin/master
+=======
+
+/**
+ * @deprecated used for keeping old code.
+ * @param needUri
+ * @param remoteNeedUri
+ * @param connectionUri
+ * @return {*}
+ */
+export function getConnectionRelatedData(
+  needUri,
+  remoteNeedUri,
+  connectionUri
+) {
+  const remoteNeed = won.getNeed(remoteNeedUri);
+  const ownNeed = won.getNeed(needUri);
+  const connection = won.getConnectionWithEventUris(connectionUri, {
+    requesterWebId: needUri,
+  });
+  const events = won
+    .getEventsOfConnection(connectionUri, { requesterWebId: needUri })
+    .then(eventsLookup => {
+      const eventList = [];
+      for (let [, event] of entries(eventsLookup)) {
+        eventList.push(event);
+      }
+      return eventList;
+    });
+
+  return Promise.all([remoteNeed, ownNeed, connection, events]).then(
+    results => ({
+      remoteNeed: results[0],
+      ownNeed: results[1],
+      connection: results[2],
+      events: results[3],
+    })
+  );
+}
+
+export function needsOpen(needUri) {
+  return (dispatch, getState) => {
+    buildOpenNeedMessage(
+      needUri,
+      getState().getIn(["config", "defaultNodeUri"])
+    )
+      .then(data => {
+        dispatch(
+          actionCreators.messages__send({
+            eventUri: data.eventUri,
+            message: data.message,
+          })
+        );
+      })
+      .then(() =>
+        // assume close went through successfully, update GUI
+        dispatch({
+          type: actionTypes.needs.reopen,
+          payload: {
+            ownNeedUri: needUri,
+          },
+        })
+      );
+  };
+}
+
+export function needsClosedBySystem(event) {
+  return (dispatch, getState) => {
+    //first check if we really have the 'own' need in the state - otherwise we'll ignore the message
+    const need = getState().getIn(["needs", event.getReceiverNeed()]);
+    if (!need) {
+      console.debug(
+        "ignoring deactivateMessage for a need that is not ours:",
+        event.getReceiverNeed()
+      );
+    }
+    dispatch({
+      type: actionTypes.needs.closedBySystem,
+      payload: {
+        needUri: event.getReceiverNeed(),
+        humanReadable: need.get("humanReadable"),
+        message: event.getTextMessage(),
+      },
+    });
+  };
+}
+
+export function needsClose(needUri) {
+  return (dispatch, getState) => {
+    buildCloseNeedMessage(
+      needUri,
+      getState().getIn(["config", "defaultNodeUri"])
+    )
+      .then(data => {
+        dispatch(
+          actionCreators.messages__send({
+            eventUri: data.eventUri,
+            message: data.message,
+          })
+        );
+
+        //Close all the open connections of the need
+        getState()
+          .getIn(["needs", needUri, "connections"])
+          .map(function(con) {
+            if (
+              getState().getIn([
+                "needs",
+                needUri,
+                "connections",
+                con.get("uri"),
+                "state",
+              ]) === won.WON.Connected
+            ) {
+              dispatch(actionCreators.connections__close(con.get("uri")));
+            }
+          });
+      })
+      .then(() =>
+        // assume close went through successfully, update GUI
+        dispatch({
+          type: actionTypes.needs.close,
+          payload: {
+            ownNeedUri: needUri,
+          },
+        })
+      );
+  };
+}
+
+export function needsDelete(needUri) {
+  return (dispatch, getState) => {
+    buildDeleteNeedMessage(
+      needUri,
+      getState().getIn(["config", "defaultNodeUri"])
+    )
+      .then(data => {
+        dispatch(
+          actionCreators.messages__send({
+            eventUri: data.eventUri,
+            message: data.message,
+          })
+        );
+      })
+      .then(() =>
+        // assume close went through successfully, update GUI
+        dispatch({
+          type: actionTypes.needs.delete,
+          payload: {
+            ownNeedUri: needUri,
+          },
+        })
+      );
+  };
+}
+>>>>>>> 4d3f6c2 Allow deletion of needs.
