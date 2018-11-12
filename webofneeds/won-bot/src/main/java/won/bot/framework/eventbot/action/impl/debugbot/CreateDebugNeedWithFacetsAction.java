@@ -36,7 +36,6 @@ import won.bot.framework.eventbot.event.impl.needlifecycle.NeedCreatedEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.message.WonMessage;
-import won.protocol.model.NeedContentPropertyType;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.DefaultNeedModelWrapper;
 import won.protocol.util.RdfUtils;
@@ -116,8 +115,8 @@ public class CreateDebugNeedWithFacetsAction extends AbstractCreateNeedAction
         DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(needURI.toString());
         needModelWrapper.setTitle(replyText);
         needModelWrapper.setDescription("This is a need automatically created by the DebugBot.");
-        needModelWrapper.setTitle(NeedContentPropertyType.SEEKS, replyText);
-        needModelWrapper.setDescription(NeedContentPropertyType.SEEKS, "This is a need automatically created by the DebugBot.");
+        needModelWrapper.setSeeksTitle(replyText);
+        needModelWrapper.setSeeksDescription("This is a need automatically created by the DebugBot.");
         
         int i = 1;
         for (URI facet : facets) {
