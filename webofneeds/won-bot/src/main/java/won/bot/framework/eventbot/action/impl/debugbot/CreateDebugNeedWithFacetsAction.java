@@ -114,9 +114,11 @@ public class CreateDebugNeedWithFacetsAction extends AbstractCreateNeedAction
         final URI wonNodeUri = ctx.getNodeURISource().getNodeURI();
         final URI needURI = wonNodeInformationService.generateNeedURI(wonNodeUri);
         DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(needURI.toString());
-        needModelWrapper.setTitle(NeedContentPropertyType.IS_AND_SEEKS, replyText);
-        needModelWrapper.setDescription(NeedContentPropertyType.IS_AND_SEEKS,
-                                        "This is a need automatically created by the DebugBot.");
+        needModelWrapper.setTitle(replyText);
+        needModelWrapper.setDescription("This is a need automatically created by the DebugBot.");
+        needModelWrapper.setTitle(NeedContentPropertyType.SEEKS, replyText);
+        needModelWrapper.setDescription(NeedContentPropertyType.SEEKS, "This is a need automatically created by the DebugBot.");
+        
         int i = 1;
         for (URI facet : facets) {
             needModelWrapper.addFacet(needURI + "#facet" + i, facet.toString());
