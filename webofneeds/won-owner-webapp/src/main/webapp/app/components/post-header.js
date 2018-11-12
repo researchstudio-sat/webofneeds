@@ -6,12 +6,13 @@ import angular from "angular";
 import "ng-redux";
 import squareImageModule from "./square-image.js";
 import { actionCreators } from "../actions/actions.js";
-import { labels, relativeTime } from "../won-label-utils.js";
+import { relativeTime } from "../won-label-utils.js";
 import { attach } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { selectLastUpdateTime } from "../selectors/general-selectors.js";
 import won from "../won-es6.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
+import { generateNeedTypesLabel } from "../need-utils.js";
 
 import "style/_post-header.scss";
 
@@ -38,7 +39,7 @@ function genComponentConf() {
       <div class="ph__right__subtitle">
         <span class="ph__right__subtitle__type">
           <!-- TODO: We Do not store a single type anymore but a list of types... adapt accordingly -->
-          {{self.labels.type[self.need.get('type')]}}{{self.need.get('matchingContexts')? ' in '+ self.need.get('matchingContexts').join(', ') : '' }}
+          {{ self.generateNeedTypesLabel(self.need) }}
         </span>
         <div class="ph__right__subtitle__date">
           {{ self.friendlyTimestamp }}
@@ -55,7 +56,7 @@ function genComponentConf() {
       <div class="ph__right__subtitle">
         <span class="ph__right__subtitle__type">
           <!-- TODO: We Do not store a single type anymore but a list of types... adapt accordingly -->
-          {{self.labels.type[self.need.get('type')]}}
+          {{ self.generateNeedTypesLabel(self.need) }}
         </span>
       </div>
     </div>
@@ -74,7 +75,7 @@ function genComponentConf() {
     constructor() {
       attach(this, serviceDependencies, arguments);
       window.ph4dbg = this;
-      this.labels = labels;
+      this.generateNeedTypesLabel = generateNeedTypesLabel;
       this.WON = won.WON;
       const selectFromState = state => {
         const need = state.getIn(["needs", this.needUri]);

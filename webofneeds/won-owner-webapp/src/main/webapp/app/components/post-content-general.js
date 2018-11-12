@@ -8,6 +8,7 @@ import { attach, get } from "../utils.js";
 import won from "../won-es6.js";
 import { labels, relativeTime } from "../won-label-utils.js";
 import { connect2Redux } from "../won-utils.js";
+import { generateNeedTypesLabel } from "../need-utils.js";
 import {
   selectLastUpdateTime,
   getConnectionUriFromRoute,
@@ -42,12 +43,12 @@ function genComponentConf() {
             </div>
           </div>
           <!-- TODO: We Do not store a single type anymore but a list of types... adapt accordingly -->
-          <div class="pcg__columns__left__item" ng-if="self.post.get('type')">
+          <div class="pcg__columns__left__item">
             <div class="pcg__columns__left__item__label">
-              Type
+              Types
             </div>
             <div class="pcg__columns__left__item__value">
-              {{self.labels.type[self.post.get('type')]}}{{self.post.get('matchingContexts')? ' in '+ self.post.get('matchingContexts').join(', ') : '' }}
+              {{ self.generateNeedTypesLabel(self.post) }}
             </div>
           </div>
         </div>
@@ -73,6 +74,7 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
       window.pcg4dbg = this;
       this.labels = labels;
+      this.generateNeedTypesLabel = generateNeedTypesLabel;
 
       const selectFromState = state => {
         const connectionUri = getConnectionUriFromRoute(state);
@@ -97,7 +99,6 @@ function genComponentConf() {
         return {
           WON: won.WON,
           post,
-          type: post && post.get("type"),
           flags,
           persona:
             personaHolds && personaHolds.includes(post.get("uri"))
