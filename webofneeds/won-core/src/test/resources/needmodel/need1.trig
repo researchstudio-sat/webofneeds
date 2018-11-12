@@ -71,7 +71,7 @@ won:shapesGraph1 {
    	    a sh:NodeShape;
         sh:targetClass won:Need ;
         sh:property [
-            sh:path ( won:is dc:title );
+            sh:path ( dc:title );
             sh:minCount 1 ;
             sh:maxCount 1 ;
         ] ;

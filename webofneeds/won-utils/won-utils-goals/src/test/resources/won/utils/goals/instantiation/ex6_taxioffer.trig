@@ -23,10 +23,8 @@
             won:goal      [ won:hasShapesGraph  <https://satvm05.researchstudio.at/won/resource/event/qkrivynfftr9gtl3u8im#content-fsw0> ] ;
             won:hasFacet  won:ChatFacet ;
             won:hasFlag   won:NoHintForCounterpart , won:NoHintForMe ;
-            won:is        [ dc:description  "This is a automatically created need by the TaxiBot" ;
-                            dc:title        "Taxi in Wien<->Taxi"
-                          ] ;
-
+            dc:description  "This is a automatically created need by the TaxiBot" ;
+            dc:title        "Taxi in Wien<->Taxi" ;
             cert:key      [ cert:PublicKey  [ a                       woncrypt:ECCPublicKey ;
                                               woncrypt:ecc_algorithm  "EC" ;
                                               woncrypt:ecc_curveId    "secp384r1" ;

@@ -28,30 +28,29 @@
     oln-test:taxiService1
 		a             won:Need ;
 		won:hasFlag   won:NoHintForCounterpart ;
-		won:is     [ dc:description   "next 10 minutes" ;
-						dc:title "Taxi in Wien"@de ;
-						dc:description "Biete Taxidienstleistungen im Raum Wien und Umgebung"@de ;
-						dc:title "Taxi in Vienna"@en ;
-						dc:description "Offering taxi services in Vienna and around"@en ;
-						won:hasTag "Taxi", "PersonenTransport"@de, "People transport"@en ;
-						won:hasLocation  [ a                   s:Place ;
-										   won:hasBoundingBox  [ won:hasNorthWestCorner  [ a            s:GeoCoordinates ;
-																						   s:latitude   "48.199528" ;
-																						   s:longitude  "16.355209"
-																						 ] ;
-																 won:hasSouthEastCorner  [ a            s:GeoCoordinates ;
-																						   s:latitude   "48.218489" ;
-																						   s:longitude  "16.384895"
-																						 ]
-															   ] ;
-										   s:geo               [ a            s:GeoCoordinates ;
-																 s:latitude   "48.209269" ;
-																 s:longitude  "16.370831"
-															   ] ;
-										   s:name              "Wien, Österreich"@de;
-										   s:name              "Vienna, Austria"@en
-										 ]
-					  ] ;
+		dc:description   "next 10 minutes" ;
+        dc:title "Taxi in Wien"@de ;
+        dc:description "Biete Taxidienstleistungen im Raum Wien und Umgebung"@de ;
+        dc:title "Taxi in Vienna"@en ;
+        dc:description "Offering taxi services in Vienna and around"@en ;
+        won:hasTag "Taxi", "PersonenTransport"@de, "People transport"@en ;
+        won:hasLocation  [ a                   s:Place ;
+                           won:hasBoundingBox  [ won:hasNorthWestCorner  [ a            s:GeoCoordinates ;
+                                                                           s:latitude   "48.199528" ;
+                                                                           s:longitude  "16.355209"
+                                                                         ] ;
+                                                 won:hasSouthEastCorner  [ a            s:GeoCoordinates ;
+                                                                           s:latitude   "48.218489" ;
+                                                                           s:longitude  "16.384895"
+                                                                         ]
+                                               ] ;
+                           s:geo               [ a            s:GeoCoordinates ;
+                                                 s:latitude   "48.209269" ;
+                                                 s:longitude  "16.370831"
+                                               ] ;
+                           s:name              "Wien, Österreich"@de;
+                           s:name              "Vienna, Austria"@en
+                         ] ;
 		won:seeks [
             won:seeks [
                 dc:title "Taxi";
