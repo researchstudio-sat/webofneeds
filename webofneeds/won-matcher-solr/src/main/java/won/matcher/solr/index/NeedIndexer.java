@@ -19,7 +19,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import won.matcher.service.common.service.http.HttpService;
 import won.matcher.solr.config.SolrMatcherConfig;
 import won.protocol.model.Coordinate;
-import won.protocol.model.NeedContentPropertyType;
 import won.protocol.util.DefaultNeedModelWrapper;
 import won.protocol.util.NeedModelWrapper;
 import won.protocol.vocabulary.WON;
@@ -87,21 +86,20 @@ public class NeedIndexer {
         // add latitude and longitude values in one field for Solr spatial queries
         DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(needModel, null);
 
-        for (Resource contentNode : needModelWrapper.getContentNodes(NeedContentPropertyType.IS)) {
-            Coordinate coordinate = needModelWrapper.getLocationCoordinate(contentNode);
-            if (coordinate != null) {
-                framed.put(SOLR_IS_LOCATION_COORDINATES_FIELD, String.valueOf(coordinate.getLatitude()) + "," + String.valueOf(coordinate.getLongitude()));
-            }
+        Resource needContentNode = needModelWrapper.getNeedContentNode();
+        Coordinate needCoordinate = needModelWrapper.getLocationCoordinate(needContentNode);
+        if (needCoordinate != null) {
+            framed.put(SOLR_IS_LOCATION_COORDINATES_FIELD, String.valueOf(needCoordinate.getLatitude()) + "," + String.valueOf(needCoordinate.getLongitude()));
         }
 
-        for (Resource contentNode : needModelWrapper.getContentNodes(NeedContentPropertyType.SEEKS)) {
+        for (Resource contentNode : needModelWrapper.getSeeksNodes()) {
             Coordinate coordinate = needModelWrapper.getLocationCoordinate(contentNode);
             if (coordinate != null) {
                 framed.put(SOLR_SEEKS_LOCATION_COORDINATES_FIELD, String.valueOf(coordinate.getLatitude()) + "," + String.valueOf(coordinate.getLongitude()));
             }
         }
 
-        for (Resource contentNode : needModelWrapper.getContentNodes(NeedContentPropertyType.SEEKS_SEEKS)) {
+        for (Resource contentNode : needModelWrapper.getSeeksSeeksNodes()) {
             Coordinate coordinate = needModelWrapper.getLocationCoordinate(contentNode);
             if (coordinate != null) {
                 framed.put(SOLR_SEEKS_SEEKS_LOCATION_COORDINATES_FIELD, String.valueOf(coordinate.getLatitude()) + "," + String.valueOf(coordinate.getLongitude()));

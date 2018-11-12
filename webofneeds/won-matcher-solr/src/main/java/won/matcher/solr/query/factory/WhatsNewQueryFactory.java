@@ -16,16 +16,16 @@ public class WhatsNewQueryFactory extends BasicNeedQueryFactory {
         // add "is" terms/location to "seeks" part of the query and vice versa
         // add "seeks" terms to the "seeks/seeks" part of the query and vice versa
 
-        /*for (Resource contentNode : needModelWrapper.getContentNodes(NeedContentPropertyType.IS)) {
+        /*for (Resource contentNode : needModelWrapper.getSeeksSeeksNodes(NeedContentPropertyType.IS)) {
             addLocationFilters(contentNode, NeedContentPropertyType.SEEKS);
         }
 
-        for (Resource contentNode : needModelWrapper.getContentNodes(NeedContentPropertyType.SEEKS)) {
+        for (Resource contentNode : needModelWrapper.getSeeksSeeksNodes(NeedContentPropertyType.SEEKS)) {
             addLocationFilters(contentNode, NeedContentPropertyType.IS);
             addLocationFilters(contentNode, NeedContentPropertyType.SEEKS_SEEKS);
         }
 
-        for (Resource contentNode : needModelWrapper.getContentNodes(NeedContentPropertyType.SEEKS_SEEKS)) {
+        for (Resource contentNode : needModelWrapper.getSeeksSeeksNodes(NeedContentPropertyType.SEEKS_SEEKS)) {
             addLocationFilters(contentNode, NeedContentPropertyType.SEEKS);
         }*/
 
