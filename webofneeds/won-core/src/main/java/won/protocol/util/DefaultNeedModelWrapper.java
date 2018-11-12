@@ -7,17 +7,14 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.DC;
 import won.protocol.model.Coordinate;
-import won.protocol.model.NeedContentPropertyType;
 import won.protocol.model.NeedGraphType;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
 import java.util.Collection;
-import java.util.Collections;
 
 /**
  * Extends {@link NeedModelWrapper} to add matchat specific methods to access content fields like title, description, tags, etc.
- * In many methods {@link NeedContentPropertyType} is used as a parameter to specify which content node you want to access.
  * <p>
  * Created by hfriedrich on 16.03.2017.
  */
@@ -35,9 +32,9 @@ public class DefaultNeedModelWrapper extends NeedModelWrapper {
         super(needModel, sysInfoModel);
     }
 
-    private void createContentNodeIfNonExist(NeedContentPropertyType type) {
-        if (type == null || getContentNodes(type).size() == 0) {
-            createContentNode(type, null);
+    private void createSeeksNodeIfNonExist() {
+        if(getSeeksNodes().size() == 0) {
+            createSeeksNode(null);
         }
     }
 
@@ -47,62 +44,37 @@ public class DefaultNeedModelWrapper extends NeedModelWrapper {
         needNode.addLiteral(DC.title, title);
     }
 
-    public void setTitle(NeedContentPropertyType type, String title) {
-        createContentNodeIfNonExist(type);
-        setContentPropertyStringValue(type, DC.title, title);
+    public void setSeeksTitle(String title) {
+        createSeeksNodeIfNonExist();
+        setSeeksPropertyStringValue(DC.title, title);
     }
 
     public void setShapesGraphReference(URI shapesGraphReference) {
-        createContentNodeIfNonExist(NeedContentPropertyType.GOAL);
+        if (getGoalNodes().size() == 0) {
+            createGoalNode(null);
+        }
 
-        Collection<Resource> nodes = getContentNodes(NeedContentPropertyType.GOAL);
+        Collection<Resource> nodes = getGoalNodes();
         for (Resource node : nodes) {
             node.removeAll(WON.HAS_SHAPES_GRAPH);
             node.addProperty(WON.HAS_SHAPES_GRAPH, getNeedModel().getResource(shapesGraphReference.toString()));
         }
     }
 
-    public Collection<String> getTitlesFromIsOrAll() {
-        return getTitlesFromIsOrAll(null);
-    }
-
-    public Collection<String> getTitlesFromIsOrAll(String language) {
-
-        Collection<String> titles = null;
-        titles = getContentPropertyStringValues(NeedContentPropertyType.IS, DC.title, language);
-        if (titles != null && titles.size() > 0) return titles;
-        titles = getContentPropertyStringValues(NeedContentPropertyType.IS, DC.title, null);
-        if (titles != null && titles.size() > 0) return titles;
-        titles = getContentPropertyStringValues(NeedContentPropertyType.ALL, DC.title, language);
-        if (titles != null && titles.size() > 0) return titles;
-        titles = getContentPropertyStringValues(NeedContentPropertyType.ALL, DC.title, null);
-        if (titles != null && titles.size() > 0) return titles;
-        return Collections.emptyList();
-    }
-
     public String getSomeTitleFromIsOrAll(String... preferredLanguages) {
-        String title = null;
-        title = getSomeContentPropertyStringValue(NeedContentPropertyType.IS, DC.title, preferredLanguages);
+        String title = getNeedContentPropertyStringValue(DC.title, preferredLanguages);
         if (title != null) return title;
-        title = getSomeContentPropertyStringValue(NeedContentPropertyType.ALL, DC.title, preferredLanguages);
+        title = getSomeContentPropertyStringValue(DC.title, preferredLanguages);
         if (title != null) return title;
         return null;
     }
 
-    public String getSomeTitle(Resource contentNode, String... preferredLanguages) {
-        String title = null;
-        return getSomeContentPropertyStringValue(contentNode, DC.title, preferredLanguages);
-    }
-
     public Collection<String> getTitles(Resource contentNode){ return getTitles(contentNode, null);}
-    public Collection<String> getTitles(Resource contentNode, String language) { return getContentPropertyStringValues(contentNode, DC.title, language);}
+    Collection<String> getTitles(Resource contentNode, String language) { return getContentPropertyStringValues(contentNode, DC.title, language);}
 
-    public Collection<String> getTitles(NeedContentPropertyType type) { return getTitles(type, null);}
-    public Collection<String> getTitles(NeedContentPropertyType type, String language) { return getContentPropertyStringValues(type, DC.title, language);}
-
-    public void setDescription(NeedContentPropertyType type, String description) {
-        createContentNodeIfNonExist(type);
-        setContentPropertyStringValue(type, DC.description, description);
+    public void setSeeksDescription(String description) {
+        createSeeksNodeIfNonExist();
+        setSeeksPropertyStringValue(DC.description, description);
     }
 
     public void setDescription(String description) {
@@ -111,22 +83,13 @@ public class DefaultNeedModelWrapper extends NeedModelWrapper {
         needNode.addLiteral(DC.description, description);
     }
 
-    public String getSomeDescription(NeedContentPropertyType type, String... preferredLanguages) {
-        return getSomeContentPropertyStringValue(type, DC.description, preferredLanguages);
+    public String getSomeDescription(String... preferredLanguages) {
+        return getSomeContentPropertyStringValue(DC.description, preferredLanguages);
     }
-
-    public String getSomeDescription(Resource contentNode, String... preferredLanguages){
-        return getSomeContentPropertyStringValue(contentNode, DC.description, preferredLanguages);
-    }
-
 
     public Collection<String> getDescriptions(Resource contentNode) { return getDescriptions(contentNode, null); }
-    public Collection<String> getDescriptions(Resource contentNode, String language) {
+    Collection<String> getDescriptions(Resource contentNode, String language) {
         return getContentPropertyStringValues(contentNode,DC.description, language);
-    }
-    public Collection<String> getDescriptions(NeedContentPropertyType type) { return getDescriptions(type, null);}
-    public Collection<String> getDescriptions(NeedContentPropertyType type, String language) {
-        return getContentPropertyStringValues(type, DC.description, language);
     }
 
     public void addTag(String tag) {
@@ -134,17 +97,21 @@ public class DefaultNeedModelWrapper extends NeedModelWrapper {
         needNode.addLiteral(WON.HAS_TAG, tag);
     }
 
-    public void addTag(NeedContentPropertyType type, String tag) {
-        createContentNodeIfNonExist(type);
-        addContentPropertyStringValue(type, WON.HAS_TAG, tag);
+    public void addSeeksTag(String tag) {
+        createSeeksNodeIfNonExist();
+        addSeeksPropertyStringValue(WON.HAS_TAG, tag);
     }
 
     public Collection<String> getTags(Resource contentNode) {
         return getContentPropertyStringValues(contentNode, WON.HAS_TAG, null);
     }
 
-    public Collection<String> getTags(NeedContentPropertyType type) {
-        return getContentPropertyStringValues(type, WON.HAS_TAG, null);
+    public Collection<String> getAllTags() {
+        return getAllContentPropertyStringValues(WON.HAS_TAG, null);
+    }
+
+    public Collection<String> getAllTitles() {
+        return getAllContentPropertyStringValues(DC.title, null);
     }
 
     public Coordinate getLocationCoordinate(Resource contentNode) {

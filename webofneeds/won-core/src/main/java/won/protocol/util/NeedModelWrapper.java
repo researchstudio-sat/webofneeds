@@ -12,7 +12,6 @@ import org.apache.jena.sparql.path.PathParser;
 import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.RDF;
 import won.protocol.exception.IncorrectPropertyCountException;
-import won.protocol.model.NeedContentPropertyType;
 import won.protocol.model.NeedGraphType;
 import won.protocol.model.NeedState;
 import won.protocol.vocabulary.WON;
@@ -74,7 +73,7 @@ public class NeedModelWrapper {
     public NeedModelWrapper(Dataset ds, boolean addDefaultGraphs) {
 
         needDataset = ds;
-        Resource needNode = getNeedNode(NeedGraphType.NEED);
+        Resource needNode = getNeedContentNode();
         needNode = (needNode != null) ? needNode : getNeedNode(NeedGraphType.SYSINFO);
         String needUri = (needNode != null) ? needNode.getURI() : null;
 
@@ -118,7 +117,7 @@ public class NeedModelWrapper {
         if (needModel != null) {
             this.needModelGraphName = "dummy#need";
             needDataset.addNamedModel(this.needModelGraphName, needModel);
-            needUri = getNeedNode(NeedGraphType.NEED).getURI();
+            needUri = getNeedContentNode().getURI();
         }
 
         if (needUri != null) {
@@ -149,7 +148,7 @@ public class NeedModelWrapper {
      */
     public static boolean isANeed(Dataset ds){
         NeedModelWrapper wrapper = new NeedModelWrapper(ds, false);
-        return wrapper.getNeedNode(NeedGraphType.NEED) != null && wrapper.getNeedNode(NeedGraphType.SYSINFO) != null;
+        return wrapper.getNeedContentNode() != null && wrapper.getNeedNode(NeedGraphType.SYSINFO) != null;
     }
 
     public Model getNeedModel() {
@@ -272,22 +271,29 @@ public class NeedModelWrapper {
         return null;
     }
 
+    /**
+     * get the content node of the need
+     * @return
+     */
+    public Resource getNeedContentNode() {
+        return getNeedNode(NeedGraphType.NEED);
+    }
+
     public String getNeedUri() {
-        return getNeedNode(NeedGraphType.NEED).getURI();
+        return getNeedContentNode().getURI();
     }
 
     public void addFlag(Resource flag) {
-        getNeedNode(NeedGraphType.NEED).addProperty(WON.HAS_FLAG, flag);
+        getNeedContentNode().addProperty(WON.HAS_FLAG, flag);
     }
 
     public boolean hasFlag(Resource flag) {
-    	Resource needRes = getNeedNode(NeedGraphType.NEED);
-    	if (needRes == null) return false;
-        return needRes.hasProperty(WON.HAS_FLAG, flag);
+        Resource needRes = getNeedContentNode();
+        return needRes != null && needRes.hasProperty(WON.HAS_FLAG, flag);
     }
 
     public Calendar getDoNotMatchBefore() {
-        Statement prop = getNeedNode(NeedGraphType.NEED).getProperty(WON.DO_NOT_MATCH_BEFORE);
+        Statement prop = getNeedContentNode().getProperty(WON.DO_NOT_MATCH_BEFORE);
         if(prop == null) {
             return null;
         }
@@ -304,7 +310,7 @@ public class NeedModelWrapper {
     }
 
     public Calendar getDoNotMatchAfter() {
-        Statement prop = getNeedNode(NeedGraphType.NEED).getProperty(WON.DO_NOT_MATCH_AFTER);
+        Statement prop = getNeedContentNode().getProperty(WON.DO_NOT_MATCH_AFTER);
         if(prop == null) {
             return null;
         }
@@ -321,30 +327,30 @@ public class NeedModelWrapper {
     }
     
     public void addMatchingContext(String context) {
-        getNeedNode(NeedGraphType.NEED).addProperty(WON.HAS_MATCHING_CONTEXT, context);
+        getNeedContentNode().addProperty(WON.HAS_MATCHING_CONTEXT, context);
     }
     
     public boolean hasMatchingContext(String context) {
-        return getNeedNode(NeedGraphType.NEED).hasProperty(WON.HAS_MATCHING_CONTEXT, context);
+        return getNeedContentNode().hasProperty(WON.HAS_MATCHING_CONTEXT, context);
     }
     
     public void addQuery(String query) {
-        getNeedNode(NeedGraphType.NEED).addProperty(WON.HAS_QUERY, query);
+        getNeedContentNode().addProperty(WON.HAS_QUERY, query);
     }
     
     public Optional<String> getQuery() {
-        Statement stmt = getNeedNode(NeedGraphType.NEED).getProperty(WON.HAS_QUERY);
+        Statement stmt = getNeedContentNode().getProperty(WON.HAS_QUERY);
         if (stmt == null) return Optional.empty();
         return Optional.of(stmt.getString());
     }
     
     public boolean hasQuery() {
-        return getNeedNode(NeedGraphType.NEED).hasProperty(WON.HAS_QUERY);
+        return getNeedContentNode().hasProperty(WON.HAS_QUERY);
     }
     
     public Collection<String> getMatchingContexts() {
         Collection<String> matchingContexts = new LinkedList<>();
-        NodeIterator iter = getNeedModel().listObjectsOfProperty(getNeedNode(NeedGraphType.NEED), WON.HAS_MATCHING_CONTEXT);
+        NodeIterator iter = getNeedModel().listObjectsOfProperty(getNeedContentNode(), WON.HAS_MATCHING_CONTEXT);
         while (iter.hasNext()) {
             matchingContexts.add(iter.next().asLiteral().getString());
         }
@@ -365,17 +371,17 @@ public class NeedModelWrapper {
         }
         Resource facet = getNeedModel().getResource(facetUri);
         Resource facetType = getNeedModel().createResource(facetTypeUri);
-        getNeedNode(NeedGraphType.NEED).addProperty(WON.HAS_FACET, facet);
+        getNeedContentNode().addProperty(WON.HAS_FACET, facet);
         facet.addProperty(RDF.type, facetType);
     }
     
     public void setDefaultFacet(String facetUri) {
         Resource facet = getNeedModel().getResource(facetUri);
-        getNeedNode(NeedGraphType.NEED).addProperty(WON.HAS_DEFAULT_FACET, facet);
+        getNeedContentNode().addProperty(WON.HAS_DEFAULT_FACET, facet);
     }
     
     public Optional<String> getDefaultFacet() {
-        Statement stmt = getNeedNode(NeedGraphType.NEED).getProperty(WON.HAS_DEFAULT_FACET);
+        Statement stmt = getNeedContentNode().getProperty(WON.HAS_DEFAULT_FACET);
         if (stmt == null) return Optional.empty();
         return Optional.of(stmt.getObject().toString());
     }
@@ -384,7 +390,7 @@ public class NeedModelWrapper {
 
     public Collection<String> getFacetUris() {
         Collection<String> facetUris = new LinkedList<>();
-        NodeIterator iter = getNeedModel().listObjectsOfProperty(getNeedNode(NeedGraphType.NEED), WON.HAS_FACET);
+        NodeIterator iter = getNeedModel().listObjectsOfProperty(getNeedContentNode(), WON.HAS_FACET);
         while (iter.hasNext()) {
             facetUris.add(iter.next().asResource().getURI());
         }
@@ -393,7 +399,7 @@ public class NeedModelWrapper {
     
     public Optional<String> getFacetType(String facetUri) {
         Resource facet = getNeedModel().createResource(facetUri);
-        if(! getNeedNode(NeedGraphType.NEED).hasProperty(WON.HAS_FACET, facet)) {
+        if(!getNeedContentNode().hasProperty(WON.HAS_FACET, facet)) {
             return Optional.empty(); 
         }
         Statement stmt = facet.getProperty(RDF.type);
@@ -404,7 +410,7 @@ public class NeedModelWrapper {
     public Collection<Resource> getGoals() {
 
         Collection<Resource> goalUris = new LinkedList<>();
-        NodeIterator iter = getNeedModel().listObjectsOfProperty(getNeedNode(NeedGraphType.NEED), WON.GOAL);
+        NodeIterator iter = getNeedModel().listObjectsOfProperty(getNeedContentNode(), WON.GOAL);
         while (iter.hasNext()) {
             goalUris.add(iter.next().asResource());
         }
@@ -518,73 +524,40 @@ public class NeedModelWrapper {
     }
 
     /**
-     * create a content node below the need node of the need model.
-     *
-     * @param type specifies which property (e.g. IS, SEEKS, ...) is used to connect the need node with the content node
+     * create a goal content node below the need node of the need model.
      * @param uri  uri of the content node, if null then create blank node
      * @return content node created
      */
-    public Resource createContentNode(NeedContentPropertyType type, String uri) {
-
-        if (NeedContentPropertyType.ALL.equals(type)) {
-            throw new IllegalArgumentException("NeedContentPropertyType.ALL not defined for this method");
-        }
-
+    public Resource createGoalNode(String uri) {
         Resource contentNode = (uri != null) ? getNeedModel().createResource(uri) : getNeedModel().createResource();
-        addContentPropertyToNeedNode(type, contentNode);
+        addGoalPropertyToNeedNode(contentNode);
         return contentNode;
     }
 
-    private void addContentPropertyToNeedNode(NeedContentPropertyType type, RDFNode contentNode) {
-
-        Resource needNode = getNeedNode(NeedGraphType.NEED);
-        if (NeedContentPropertyType.SEEKS.equals(type) || NeedContentPropertyType.IS_AND_SEEKS.equals(type)) {
-            needNode.addProperty(WON.SEEKS, contentNode);
-        } else if (NeedContentPropertyType.SEEKS_SEEKS.equals(type)) {
-            Resource intermediate = getNeedModel().createResource();
-            needNode.addProperty(WON.SEEKS, intermediate);
-            intermediate.addProperty(WON.SEEKS, contentNode);
-        } else if (NeedContentPropertyType.GOAL.equals(type)) {
-            needNode.addProperty(WON.GOAL, contentNode);
-        }
+    /**
+     * create a goal content node below the need node of the need model.
+     * @param uri  uri of the content node, if null then create blank node
+     * @return content node created
+     */
+    public Resource createSeeksNode(String uri) {
+        Resource contentNode = (uri != null) ? getNeedModel().createResource(uri) : getNeedModel().createResource();
+        addSeeksPropertyToNeedNode(contentNode);
+        return contentNode;
     }
 
-    /**
-     * get all content nodes of a specified type
-     *
-     * @param type specifies which content nodes to return (IS, SEEKS, ALL, ...)
-     * @return content nodes
-     */
-    public Collection<Resource> getContentNodes(NeedContentPropertyType type) {
+    private void addGoalPropertyToNeedNode(RDFNode contentNode) {
+        Resource needNode = getNeedContentNode();
+        needNode.addProperty(WON.GOAL, contentNode);
+    }
 
+    private void addSeeksPropertyToNeedNode(RDFNode contentNode) {
+        Resource needNode = getNeedContentNode();
+        needNode.addProperty(WON.SEEKS, contentNode);
+    }
+
+    public Collection<Resource> getGoalNodes() {
         Collection<Resource> contentNodes = new LinkedList<>();
-        String queryClause = null;
-        String isClause = "{ ?needNode a won:Need. ?needNode won:is ?contentNode. }"; //TODO: MANAGE THE REMOVED won:is please
-        String isAndSeeksClause = "{ ?needNode a won:Need. ?needNode won:is ?contentNode. ?needNode won:seeks ?contentNode. }"; //TODO: MANAGE THE REMOVED won:is please
-        String seeksClause = "{ ?needNode a won:Need. ?needNode won:seeks ?contentNode. FILTER NOT EXISTS { ?needNode won:seeks/won:seeks ?contentNode. } }";
-        String seeksSeeksClause = "{ ?needNode a won:Need. ?needNode won:seeks/won:seeks ?contentNode. }";
-        String goalClause = "{ ?needNode a won:Need. ?needNode won:goal ?contentNode. }";
-
-
-        switch (type) {
-            case IS:
-                queryClause = isClause;
-                break;
-            case SEEKS:
-                queryClause = seeksClause;
-                break;
-            case IS_AND_SEEKS:
-                queryClause = isAndSeeksClause;
-                break;
-            case SEEKS_SEEKS:
-                queryClause = seeksSeeksClause;
-                break;
-            case GOAL:
-                queryClause = goalClause;
-                break;
-            case ALL:
-                queryClause = isClause + "UNION \n" + seeksClause + "UNION \n" + seeksSeeksClause;
-        }
+        String queryClause = "{ ?needNode a won:Need. ?needNode won:goal ?contentNode. }";
 
         String queryString = "prefix won: <http://purl.org/webofneeds/model#> \n" +
                 "SELECT DISTINCT ?contentNode WHERE { \n" + queryClause + "\n }";
@@ -604,18 +577,127 @@ public class NeedModelWrapper {
         }
     }
 
-    public void setContentPropertyStringValue(NeedContentPropertyType type, Property p, String value) {
+    /**
+     * get all content nodes of a specified type
+     *
+     * @param type specifies which content nodes to return (IS, SEEKS, ALL, ...)
+     * @return content nodes
+     */
+    public Collection<Resource> getSeeksNodes() {
 
-        Collection<Resource> nodes = getContentNodes(type);
+        Collection<Resource> contentNodes = new LinkedList<>();
+        String queryClause = "{ ?needNode a won:Need. ?needNode won:seeks ?contentNode. FILTER NOT EXISTS { ?needNode won:seeks/won:seeks ?contentNode. } }";
+        String queryString = "prefix won: <http://purl.org/webofneeds/model#> \n" +
+                "SELECT DISTINCT ?contentNode WHERE { \n" + queryClause + "\n }";
+
+        Query query = QueryFactory.create(queryString);
+        try (QueryExecution qexec = QueryExecutionFactory.create(query, getNeedModel())) {
+            ResultSet rs = qexec.execSelect();
+
+            while (rs.hasNext()) {
+                QuerySolution qs = rs.next();
+                if (qs.contains("contentNode")) {
+                    contentNodes.add(qs.get("contentNode").asResource());
+                }
+            }
+
+            return contentNodes;
+        }
+    }
+
+    /**
+     * get all seeks, seeks_seeks node including the resource for the needcontent itself (former is-node)
+     *
+     * @return content nodes
+     */
+    public Collection<Resource> getAllContentNodes() {
+
+        Collection<Resource> contentNodes = new LinkedList<>();
+        String queryClause = null;
+        String seeksClause = "{ ?needNode a won:Need. ?needNode won:seeks ?contentNode. FILTER NOT EXISTS { ?needNode won:seeks/won:seeks ?contentNode. } }";
+        String seeksSeeksClause = "{ ?needNode a won:Need. ?needNode won:seeks/won:seeks ?contentNode. }";
+
+        queryClause = seeksClause + "UNION \n" + seeksSeeksClause;
+
+        String queryString = "prefix won: <http://purl.org/webofneeds/model#> \n" +
+                "SELECT DISTINCT ?contentNode WHERE { \n" + queryClause + "\n }";
+
+        Query query = QueryFactory.create(queryString);
+        try (QueryExecution qexec = QueryExecutionFactory.create(query, getNeedModel())) {
+            ResultSet rs = qexec.execSelect();
+
+            while (rs.hasNext()) {
+                QuerySolution qs = rs.next();
+                if (qs.contains("contentNode")) {
+                    contentNodes.add(qs.get("contentNode").asResource());
+                }
+            }
+
+            contentNodes.add(getNeedContentNode());
+
+            return contentNodes;
+        }
+    }
+    /**
+     * get all content nodes of a specified type
+     *
+     * @param type specifies which content nodes to return (IS, SEEKS, ALL, ...)
+     * @return content nodes
+     */
+    public Collection<Resource> getSeeksSeeksNodes() {
+
+        Collection<Resource> contentNodes = new LinkedList<>();
+        String queryClause = null;
+        String seeksSeeksClause = "{ ?needNode a won:Need. ?needNode won:seeks/won:seeks ?contentNode. }";
+
+        queryClause = seeksSeeksClause;
+
+        String queryString = "prefix won: <http://purl.org/webofneeds/model#> \n" +
+                "SELECT DISTINCT ?contentNode WHERE { \n" + queryClause + "\n }";
+
+        Query query = QueryFactory.create(queryString);
+        try (QueryExecution qexec = QueryExecutionFactory.create(query, getNeedModel())) {
+            ResultSet rs = qexec.execSelect();
+
+            while (rs.hasNext()) {
+                QuerySolution qs = rs.next();
+                if (qs.contains("contentNode")) {
+                    contentNodes.add(qs.get("contentNode").asResource());
+                }
+            }
+
+            return contentNodes;
+        }
+    }
+
+    public void setContentPropertyStringValue(Property p, String value) {
+
+        Resource node = getNeedContentNode();
+
+        node.removeAll(p);
+        node.addLiteral(p, value);
+    }
+
+    public void setSeeksPropertyStringValue(Property p, String value) {
+        Collection<Resource> nodes = getSeeksNodes();
         for (Resource node : nodes) {
             node.removeAll(p);
             node.addLiteral(p, value);
         }
     }
 
-    public void addContentPropertyStringValue(NeedContentPropertyType type, Property p, String value) {
+    /**
+     * Adds a property directly into the contentNode of the need
+     * @param p
+     * @param value
+     */
+    public void addPropertyStringValue(Property p, String value) {
+        Resource node = getNeedContentNode();
+        node.addLiteral(p, value);
+    }
 
-        Collection<Resource> nodes = getContentNodes(type);
+    public void addSeeksPropertyStringValue(Property p, String value) {
+        Collection<Resource> nodes = getSeeksNodes();
         for (Resource node : nodes) {
             node.addLiteral(p, value);
         }
@@ -631,12 +713,12 @@ public class NeedModelWrapper {
         return null;
     }
 
-    public String getContentPropertyStringValue(NeedContentPropertyType type, Property p) {
-        return getContentPropertyObject(type, p).asLiteral().getString();
+    public String getContentPropertyStringValue(Property p) {
+        return getContentPropertyObject(p).asLiteral().getString();
     }
 
-    public String getContentPropertyStringValue(NeedContentPropertyType type, String propertyPath) {
-        Node node = getContentPropertyObject(type, propertyPath);
+    public String getContentPropertyStringValue(String propertyPath) {
+        Node node = getContentPropertyObject(propertyPath);
         return node != null ? node.getLiteralLexicalForm() : null;
     }
 
@@ -654,10 +736,41 @@ public class NeedModelWrapper {
         return values;
     }
 
-    public Collection<String> getContentPropertyStringValues(NeedContentPropertyType type, Property p, String language) {
+    public Collection<String> getAllContentPropertyStringValues(Property p, String language) {
 
         Collection<String> values = new LinkedList<>();
-        Collection<Resource> nodes = getContentNodes(type);
+        Collection<Resource> nodes = getSeeksNodes();
+
+        for (Resource node : nodes) {
+            Collection valuesOfContentNode = getContentPropertyStringValues(node, p, language);
+            values.addAll(valuesOfContentNode);
+        }
+
+        Resource node = getNeedContentNode();
+        Collection valuesOfContentNode = getContentPropertyStringValues(node, p, language);
+        values.addAll(valuesOfContentNode);
+
+        return values;
+    }
+
+    public Collection<String> getContentPropertyStringValues(Property p, String language) {
+
+        Collection<String> values = new LinkedList<>();
+
+        Resource node = getNeedContentNode();
+        Collection valuesOfContentNode = getContentPropertyStringValues(node, p, language);
+        values.addAll(valuesOfContentNode);
+
+        return values;
+    }
+
+    public Collection<String> getSeeksPropertyStringValues(Property p) {
+        return getSeeksPropertyStringValues(p, null);
+    }
+
+    public Collection<String> getSeeksPropertyStringValues(Property p, String language) {
+        Collection<String> values = new LinkedList<>();
+        Collection<Resource> nodes = getSeeksNodes();
         for (Resource node : nodes) {
             Collection valuesOfContentNode = getContentPropertyStringValues(node, p, language);
             values.addAll(valuesOfContentNode);
@@ -698,8 +811,18 @@ public class NeedModelWrapper {
      * @param preferredLanguages String array of a non-empty language tag as defined by https://tools.ietf.org/html/bcp47. The language tag must be well-formed according to section 2.2.9 of https://tools.ietf.org/html/bcp47.
      * @return the string value or null if nothing is found
      */
-    public String getSomeContentPropertyStringValue(NeedContentPropertyType type, Property p, String... preferredLanguages){
-        Collection<Resource> nodes = getContentNodes(type);
+    public String getSomeContentPropertyStringValue(Property p, String... preferredLanguages){
+        Resource contentNode = getNeedContentNode();
+        if(preferredLanguages != null) {
+            for (int i = 0; i < preferredLanguages.length; i++) {
+                String valueOfContentNode = getSomeContentPropertyStringValue(contentNode, p, preferredLanguages[i]);
+                if (valueOfContentNode != null) return valueOfContentNode;
+            }
+        }
+        String valueOfNeedContentNode = getSomeContentPropertyStringValue(contentNode, p);
+        if (valueOfNeedContentNode != null) return valueOfNeedContentNode;
+
+        Collection<Resource> nodes = getSeeksNodes();
         if(preferredLanguages != null) {
             for (int i = 0; i < preferredLanguages.length; i++) {
                 for (Resource node : nodes) {
@@ -715,19 +838,36 @@ public class NeedModelWrapper {
         return null;
     }
 
-
-    private RDFNode getContentPropertyObject(NeedContentPropertyType type, Property p) {
-
-        Collection<Resource> nodes = getContentNodes(type);
-        RDFNode object = null;
-        for (Resource node : nodes) {
-            NodeIterator nodeIterator = getNeedModel().listObjectsOfProperty(node, p);
-            if (nodeIterator.hasNext()) {
-                if (object != null) {
-                    throw new IncorrectPropertyCountException("expected exactly one occurrence of property " + p.getURI(), 1, 2);
-                }
-                object = nodeIterator.next();
+    /**
+     * Returns one of the possibly many specified values. The specified preferred languages will be tried first in the specified order.
+     * @param preferredLanguages String array of a non-empty language tag as defined by https://tools.ietf.org/html/bcp47. The language tag must be well-formed according to section 2.2.9 of https://tools.ietf.org/html/bcp47.
+     * @return the string value or null if nothing is found
+     */
+    public String getNeedContentPropertyStringValue(Property p, String... preferredLanguages){
+        Resource node = getNeedContentNode();
+        if(preferredLanguages != null) {
+            for (int i = 0; i < preferredLanguages.length; i++) {
+                String valueOfContentNode = getSomeContentPropertyStringValue(node, p, preferredLanguages[i]);
+                if (valueOfContentNode != null) return valueOfContentNode;
             }
+        }
+        String valueOfContentNode = getSomeContentPropertyStringValue(node, p);
+        if (valueOfContentNode != null) return valueOfContentNode;
+        return null;
+    }
+
+
+    private RDFNode getContentPropertyObject(Property p) {
+
+        Resource node = getNeedContentNode();
+        RDFNode object = null;
+
+        NodeIterator nodeIterator = getNeedModel().listObjectsOfProperty(node, p);
+        if (nodeIterator.hasNext()) {
+            if (object != null) {
+                throw new IncorrectPropertyCountException("expected exactly one occurrence of property " + p.getURI(), 1, 2);
+            }
+            object = nodeIterator.next();
         }
 
         if (object == null) {
@@ -737,17 +877,12 @@ public class NeedModelWrapper {
         return object;
     }
 
-    private Node getContentPropertyObject(NeedContentPropertyType type, String propertyPath) {
+    private Node getContentPropertyObject(String propertyPath) {
 
         Path path = PathParser.parse(propertyPath, DefaultPrefixUtils.getDefaultPrefixes());
-        Collection<Resource> nodes = getContentNodes(type);
+        Resource resource = getNeedContentNode();
 
-        if (nodes.size() != 1) {
-            throw new IncorrectPropertyCountException("expected exactly one occurrence of object for property path " +
-                    propertyPath, 1, nodes.size());
-        }
-
-        Node node = nodes.iterator().next().asNode();
+        Node node = resource.asNode();
         return RdfUtils.getNodeForPropertyPath(getNeedModel(), node, path);
     }
 
@@ -883,7 +1018,7 @@ public class NeedModelWrapper {
     }
 
     private RDFNode recursiveCopy(RDFNode node, ModelModification modelModification){
-        return recursiveCopy(node, modelModification, null,null, new HashSet<>());
+        return recursiveCopy(node, modelModification, null, null, new HashSet<>());
     }
 
     private RDFNode recursiveCopy(RDFNode node, ModelModification modelModification, RDFNode toReplace, RDFNode replacement, Collection<RDFNode> visited){
