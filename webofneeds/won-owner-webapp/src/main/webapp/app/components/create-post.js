@@ -269,7 +269,12 @@ function genComponentConf() {
 
         this.draftObject.useCase = get(this.useCase, "identifier");
 
-        sanitizeDraft(this.draftObject);
+        if (!isBranchContentPresent(this.draftObject.content)) {
+          delete this.draftObject.content;
+        }
+        if (!isBranchContentPresent(this.draftObject.seeks)) {
+          delete this.draftObject.seeks;
+        }
 
         this.needs__create(
           this.draftObject,
@@ -303,14 +308,6 @@ function selectUseCaseFrom(useCaseString, useCases) {
     }
   }
   return undefined;
-}
-function sanitizeDraft(draft) {
-  if (!isBranchContentPresent(draft.is)) {
-    delete draft.is;
-  }
-  if (!isBranchContentPresent(draft.seeks)) {
-    delete draft.seeks;
-  }
 }
 // returns true if the branch has any content present
 function isBranchContentPresent(isOrSeeks) {
