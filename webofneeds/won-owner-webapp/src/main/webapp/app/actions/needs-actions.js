@@ -49,7 +49,7 @@ export function needsConnect(
   ownNeedUri,
   ownConnectionUri,
   theirNeedUri,
-  textMessage
+  connectMessage
 ) {
   return async (dispatch, getState) => {
     const state = getState();
@@ -60,7 +60,7 @@ export function needsConnect(
       theirNeedUri: theirNeedUri,
       ownNodeUri: ownNeed.get("nodeUri"),
       theirNodeUri: theirNeed.get("nodeUri"),
-      textMessage: textMessage,
+      connectMessage: connectMessage,
       optionalOwnConnectionUri: ownConnectionUri,
     });
     const optimisticEvent = await won.wonMessageFromJsonLd(cnctMsg.message);

@@ -10,6 +10,7 @@ import {
 } from "./general-selectors.js";
 import { isChatConnection } from "../connection-utils.js";
 import won from "../won-es6.js";
+import { getIn } from "../utils.js";
 
 /**
  * Get the connection for a given connectionUri
@@ -18,7 +19,7 @@ import won from "../won-es6.js";
  */
 export function getOwnedConnectionByUri(state, connectionUri) {
   let need = getOwnedNeedByConnectionUri(state, connectionUri);
-  return need.getIn(["connections", connectionUri]);
+  return getIn(need, ["connections", connectionUri]);
 }
 
 /**

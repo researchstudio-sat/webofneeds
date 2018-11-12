@@ -4,15 +4,20 @@
 
 import angular from "angular";
 import postShareLinkModule from "./post-share-link.js";
-import { attach } from "../utils.js";
+import { attach, get } from "../utils.js";
 import won from "../won-es6.js";
 import { labels, relativeTime } from "../won-label-utils.js";
 import { connect2Redux } from "../won-utils.js";
-import { selectLastUpdateTime } from "../selectors/general-selectors.js";
+import {
+  selectLastUpdateTime,
+  getConnectionUriFromRoute,
+  getOwnedNeedByConnectionUri,
+} from "../selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";
 import ratingView from "./rating-view.js";
 
 import "style/_post-content-general.scss";
+import { getOwnedConnectionByUri } from "../selectors/connection-selectors.js";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
@@ -25,7 +30,7 @@ function genComponentConf() {
             </div>
             <div class="pcg__columns__left__item__value">
               {{ self.persona.getIn(['jsonld', 's:name']) }}
-              <won-rating-view rating="self.rating()"></won-rating-view>
+              <won-rating-view rating="self.rating()" rating-connection-uri="self.ratingConnectionUri"></won-rating-view>
             </div>
           </div>
           <div class="pcg__columns__left__item" ng-if="self.friendlyTimestamp">
@@ -69,6 +74,17 @@ function genComponentConf() {
       this.labels = labels;
 
       const selectFromState = state => {
+        const connectionUri = getConnectionUriFromRoute(state);
+        const connection = getOwnedConnectionByUri(state, connectionUri);
+
+        const ownNeed = getOwnedNeedByConnectionUri(state, connectionUri);
+
+        const ratingConnectionUri =
+          get(connection, "remoteNeedUri") == this.postUri &&
+          get(ownNeed, "heldBy")
+            ? connectionUri
+            : null;
+
         const post = this.postUri && state.getIn(["needs", this.postUri]);
         const hasFlags = post && post.get("hasFlags");
 
@@ -95,6 +111,7 @@ function genComponentConf() {
           friendlyTimestamp:
             post &&
             relativeTime(selectLastUpdateTime(state), post.get("creationDate")),
+          ratingConnectionUri: ratingConnectionUri,
         };
       };
       connect2Redux(selectFromState, actionCreators, ["self.postUri"], this);

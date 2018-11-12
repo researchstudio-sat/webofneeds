@@ -188,8 +188,10 @@ export function buildConnectMessage({
   theirNeedUri,
   ownNodeUri,
   theirNodeUri,
-  textMessage,
+  connectMessage,
   optionalOwnConnectionUri,
+  ownFacet,
+  theirFacet,
 }) {
   const envelopeData = won.getEnvelopeDataforNewConnection(
     ownNeedUri,
@@ -200,17 +202,27 @@ export function buildConnectMessage({
   if (optionalOwnConnectionUri) {
     envelopeData[won.WONMSG.hasSender] = optionalOwnConnectionUri;
   }
+  if (ownFacet) {
+    envelopeData[won.WONMSG.hasSenderFacet] = ownFacet;
+  }
+  if (theirFacet) {
+    envelopeData[won.WONMSG.hasReceiverFacet] = theirFacet;
+  }
   //TODO: use event URI pattern specified by WoN node
   const eventUri =
     envelopeData[won.WONMSG.hasSenderNode] + "/event/" + getRandomWonId();
-  const message = new won.MessageBuilder(won.WONMSG.connectMessage)
-    .eventURI(eventUri)
-    .forEnvelopeData(envelopeData)
-    //do not set facets: connect the default facets with each other
-    .hasTextMessage(textMessage)
-    .hasOwnerDirection()
-    .hasSentTimestamp(new Date().getTime().toString())
-    .build();
+  const messageBuilder = new won.MessageBuilder(won.WONMSG.connectMessage);
+  messageBuilder.eventURI(eventUri);
+  messageBuilder.forEnvelopeData(envelopeData);
+  //do not set facets: connect the default facets with each other
+  if (typeof connectMessage === "string") {
+    messageBuilder.hasTextMessage(connectMessage);
+  } else {
+    messageBuilder.mergeIntoContentGraph(connectMessage);
+  }
+  messageBuilder.hasOwnerDirection();
+  messageBuilder.hasSentTimestamp(new Date().getTime().toString());
+  const message = messageBuilder.build();
 
   return { eventUri: eventUri, message: message };
 }
