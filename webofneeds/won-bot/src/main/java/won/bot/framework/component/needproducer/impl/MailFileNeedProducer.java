@@ -19,14 +19,11 @@ package won.bot.framework.component.needproducer.impl;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.mail.util.MimeMessageParser;
 import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.bot.framework.component.needproducer.FileBasedNeedProducer;
-import won.protocol.model.NeedContentPropertyType;
-import won.protocol.model.NeedGraphType;
 import won.protocol.util.DefaultNeedModelWrapper;
 
 import javax.mail.internet.MimeMessage;
