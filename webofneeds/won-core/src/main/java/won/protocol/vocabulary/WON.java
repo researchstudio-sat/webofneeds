@@ -113,7 +113,6 @@ public class WON {
     public static final Property HAS_MATCH_SCORE = m.createProperty(BASE_URI, "hasMatchScore");
     public static final Property HAS_MATCH_COUNTERPART = m.createProperty(BASE_URI, "hasMatchCounterpart");
 
-    public static final Property IS = m.createProperty(BASE_URI, "is");
     public static final Property SEEKS = m.createProperty(BASE_URI, "seeks");
 
     public static final Property GOAL = m.createProperty(BASE_URI, "goal");
