@@ -22,7 +22,7 @@ public class BasicNeedQueryFactory extends NeedDatasetQueryFactory {
     {
         titleFieldMap = new HashMap<>();
         titleFieldMap.put(NeedContentPropertyType.IS,
-                "_graph.http___purl.org_webofneeds_model_is.http___purl.org_dc_elements_1.1_title");
+                "_graph.http___purl.org_dc_elements_1.1_title");
         titleFieldMap.put(NeedContentPropertyType.SEEKS,
                 "_graph.http___purl.org_webofneeds_model_seeks.http___purl.org_dc_elements_1.1_title");
         titleFieldMap.put(NeedContentPropertyType.SEEKS_SEEKS,
@@ -34,7 +34,7 @@ public class BasicNeedQueryFactory extends NeedDatasetQueryFactory {
     {
         descriptionFieldMap = new HashMap<>();
         descriptionFieldMap.put(NeedContentPropertyType.IS,
-                "_graph.http___purl.org_webofneeds_model_is.http___purl.org_dc_elements_1.1_description");
+                "_graph.http___purl.org_dc_elements_1.1_description");
         descriptionFieldMap.put(NeedContentPropertyType.SEEKS,
                 "_graph.http___purl.org_webofneeds_model_seeks.http___purl.org_dc_elements_1.1_description");
         descriptionFieldMap.put(NeedContentPropertyType.SEEKS_SEEKS,
@@ -46,7 +46,7 @@ public class BasicNeedQueryFactory extends NeedDatasetQueryFactory {
     {
         tagFieldMap = new HashMap<>();
         tagFieldMap.put(NeedContentPropertyType.IS,
-                "_graph.http___purl.org_webofneeds_model_is.http___purl.org_webofneeds_model_hasTag");
+                "_graph.http___purl.org_webofneeds_model_hasTag");
         tagFieldMap.put(NeedContentPropertyType.SEEKS,
                 "_graph.http___purl.org_webofneeds_model_seeks.http___purl.org_webofneeds_model_hasTag");
         tagFieldMap.put(NeedContentPropertyType.SEEKS_SEEKS,
