@@ -72,10 +72,10 @@ public class CreateEchoNeedWithFacetsAction extends AbstractCreateNeedAction {
         final URI needURI = wonNodeInformationService.generateNeedURI(wonNodeUri);
         needModelWrapper = new DefaultNeedModelWrapper(needURI.toString());
 
-        needModelWrapper.createContentNode(NeedContentPropertyType.IS_AND_SEEKS, needURI.toString());
-        needModelWrapper.setTitle(NeedContentPropertyType.IS_AND_SEEKS, "RE: " + replyText);
-        needModelWrapper.setDescription(NeedContentPropertyType.IS_AND_SEEKS,
-                "This is a need automatically created by the EchoBot.");
+        needModelWrapper.setTitle("RE: " + replyText);
+        needModelWrapper.setDescription("This is a need automatically created by the EchoBot.");
+        needModelWrapper.setTitle(NeedContentPropertyType.SEEKS, "RE: " + replyText);
+        needModelWrapper.setDescription(NeedContentPropertyType.SEEKS, "This is a need automatically created by the EchoBot.");
         int i = 1;
         for (URI facet : facets) {
             needModelWrapper.addFacet(needURI.toString()+"#facet"+i, facet.toString());
