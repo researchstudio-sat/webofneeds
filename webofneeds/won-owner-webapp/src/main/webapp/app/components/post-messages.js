@@ -230,7 +230,7 @@ function genComponentConf() {
                 on-submit="::self.sendRequest(value, selectedPersona)"
                 allow-details="::false"
                 allow-empty-submit="::true"
-                show-personas="self.isOwnNeedWhatsX"
+                show-personas="self.isOwnedNeedWhatsX"
                 submit-button-label="::'Ask&#160;to&#160;Chat'"
                 ng-if="!self.connection || self.connection.get('isRated')"
             >
@@ -261,7 +261,7 @@ function genComponentConf() {
         const ownedNeed = getOwnedNeedByConnectionUri(state, connectionUri);
         const connection =
           ownedNeed && ownedNeed.getIn(["connections", connectionUri]);
-        const isOwnNeedWhatsX =
+        const isOwnedNeedWhatsX =
           this.ownedNeed &&
           (isWhatsAroundNeed(this.ownedNeed) || isWhatsNewNeed(this.ownedNeed));
         const nonOwnedNeedUri = connection && connection.get("remoteNeedUri");
@@ -320,7 +320,7 @@ function genComponentConf() {
           nonOwnedNeedUri,
           connectionUri,
           connection,
-          isOwnNeedWhatsX,
+          isOwnedNeedWhatsX,
 
           sortedMessages: sortedMessages,
           chatMessages,
@@ -748,10 +748,10 @@ function genComponentConf() {
     }
 
     addMessageToState(eventUri, key) {
-      const ownNeedUri = this.ownedNeed.get("uri");
-      return fetchMessage(ownNeedUri, eventUri).then(response => {
+      const ownedNeedUri = this.ownedNeed.get("uri");
+      return fetchMessage(ownedNeedUri, eventUri).then(response => {
         won.wonMessageFromJsonLd(response).then(msg => {
-          if (msg.isFromOwner() && msg.getReceiverNeed() === ownNeedUri) {
+          if (msg.isFromOwner() && msg.getReceiverNeed() === ownedNeedUri) {
             /*if we find out that the receiverneed of the crawled event is actually our
               need we will call the method again but this time with the correct eventUri
             */
@@ -771,10 +771,10 @@ function genComponentConf() {
     }
 
     sendRequest(message) {
-      if (!this.connection || this.isOwnNeedWhatsX) {
+      if (!this.connection || this.isOwnedNeedWhatsX) {
         this.router__stateGoResetParams("connections");
 
-        if (this.isOwnNeedWhatsX) {
+        if (this.isOwnedNeedWhatsX) {
           //Close the connection if there was a present connection for a whatsaround need
           this.connections__close(this.connectionUri);
         }

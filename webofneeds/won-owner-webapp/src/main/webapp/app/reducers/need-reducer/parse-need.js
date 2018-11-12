@@ -3,7 +3,7 @@ import won from "../../won-es6.js";
 import { getAllDetails } from "../../won-utils.js";
 import { isWhatsNewNeed, isWhatsAroundNeed } from "../../need-utils.js";
 
-export function parseNeed(jsonldNeed, ownNeed) {
+export function parseNeed(jsonldNeed, isOwned) {
   const jsonldNeedImm = Immutable.fromJS(jsonldNeed);
 
   if (jsonldNeedImm && jsonldNeedImm.get("@id")) {
@@ -27,7 +27,7 @@ export function parseNeed(jsonldNeed, ownNeed) {
       lastUpdateDate: extractCreationDate(jsonldNeedImm),
       humanReadable: undefined, //can only be determined after we generated The Content
       unread: false,
-      ownNeed: !!ownNeed,
+      isOwned: !!isOwned,
       isBeingCreated: false,
       toLoad: false,
       isLoading: false,

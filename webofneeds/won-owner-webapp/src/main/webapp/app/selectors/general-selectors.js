@@ -15,9 +15,9 @@ export const getRouterParams = state =>
 
 export const getNeeds = state => state.get("needs");
 export const getOwnedNeeds = state =>
-  getNeeds(state).filter(need => need.get("ownNeed"));
+  getNeeds(state).filter(need => need.get("isOwned"));
 export const getNonOwnedNeeds = state =>
-  getNeeds(state).filter(need => !need.get("ownNeed"));
+  getNeeds(state).filter(need => !need.get("isOwned"));
 
 export function getPosts(state) {
   const needs = getNeeds(state);
@@ -31,13 +31,13 @@ export function getPosts(state) {
 }
 
 export const getOwnedPosts = state =>
-  getPosts(state).filter(need => need.get("ownNeed"));
+  getPosts(state).filter(need => need.get("isOwned"));
 
 export function getOwnedOpenPosts(state) {
-  const allOwnNeeds = getOwnedPosts(state);
+  const allOwnedNeeds = getOwnedPosts(state);
   return (
-    allOwnNeeds &&
-    allOwnNeeds.filter(post => post.get("state") === won.WON.ActiveCompacted)
+    allOwnedNeeds &&
+    allOwnedNeeds.filter(post => post.get("state") === won.WON.ActiveCompacted)
   );
 }
 
@@ -51,10 +51,10 @@ export function getOpenPosts(state) {
 
 //TODO: METHOD NAME TO ACTUALLY REPRESENT WHAT THE SELECTOR DOES (e.g. ...WithoutWhatsX)
 export function getOwnedClosedPosts(state) {
-  const allOwnNeeds = getOwnedPosts(state);
+  const allOwnedNeeds = getOwnedPosts(state);
   return (
-    allOwnNeeds &&
-    allOwnNeeds.filter(
+    allOwnedNeeds &&
+    allOwnedNeeds.filter(
       post =>
         post.get("state") === won.WON.InactiveCompacted &&
         !(isWhatsAroundNeed(post) || isWhatsNewNeed(post))
@@ -63,9 +63,11 @@ export function getOwnedClosedPosts(state) {
 }
 
 export function getOwnedNeedsInCreation(state) {
-  const allOwnNeeds = getOwnedNeeds(state);
+  const allOwnedNeeds = getOwnedNeeds(state);
   // needs that have been created but are not confirmed by the server yet
-  return allOwnNeeds && allOwnNeeds.filter(post => post.get("isBeingCreated"));
+  return (
+    allOwnedNeeds && allOwnedNeeds.filter(post => post.get("isBeingCreated"))
+  );
 }
 
 export const selectIsConnected = state =>

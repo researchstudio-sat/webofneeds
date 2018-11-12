@@ -70,14 +70,14 @@ function genComponentConf() {
     }
 
     sendRequest(message, persona) {
-      const isOwnNeedWhatsX =
+      const isOwnedNeedWhatsX =
         this.ownedNeed &&
         (isWhatsAroundNeed(this.ownedNeed) || isWhatsNewNeed(this.ownedNeed));
 
-      if (!this.connection || isOwnNeedWhatsX) {
+      if (!this.connection || isOwnedNeedWhatsX) {
         this.router__stateGoResetParams("connections");
 
-        if (isOwnNeedWhatsX) {
+        if (isOwnedNeedWhatsX) {
           //Close the connection if there was a present connection for a whatsaround need
           this.connections__close(this.connectionUri);
         }

@@ -1158,14 +1158,15 @@ import won from "./won.js";
   };
 
   won.getEnvelopeDataforNewConnection = function(
-    ownNeedUri,
+    ownedNeedUri,
     theirNeedUri,
     ownNodeUri,
     theirNodeUri
   ) {
-    if (!ownNeedUri) {
+    if (!ownedNeedUri) {
       throw {
-        message: "getEnvelopeDataforNewConnection: ownNeedUri must not be null",
+        message:
+          "getEnvelopeDataforNewConnection: ownedNeedUri must not be null",
       };
     }
     if (!theirNeedUri) {
@@ -1175,7 +1176,7 @@ import won from "./won.js";
       };
     }
     return {
-      [won.WONMSG.hasSenderNeed]: ownNeedUri,
+      [won.WONMSG.hasSenderNeed]: ownedNeedUri,
       [won.WONMSG.hasSenderNode]: ownNodeUri,
       [won.WONMSG.hasReceiverNeed]: theirNeedUri,
       [won.WONMSG.hasReceiverNode]: theirNodeUri,
@@ -1190,7 +1191,7 @@ import won from "./won.js";
    */
   won.getEnvelopeDataforConnection = async function(
     connectionUri,
-    ownNeedUri,
+    ownedNeedUri,
     theirNeedUri,
     ownNodeUri,
     theirNodeUri,
@@ -1204,7 +1205,7 @@ import won from "./won.js";
 
     const ret = {
       [won.WONMSG.hasSender]: connectionUri,
-      [won.WONMSG.hasSenderNeed]: ownNeedUri,
+      [won.WONMSG.hasSenderNeed]: ownedNeedUri,
       [won.WONMSG.hasSenderNode]: ownNodeUri,
       [won.WONMSG.hasReceiverNeed]: theirNeedUri,
       [won.WONMSG.hasReceiverNode]: theirNodeUri,
@@ -1815,8 +1816,11 @@ import won from "./won.js";
       .then(() => won.getCachedGraphTriples(graphUri));
   };
 
-  won.getConnectionWithOwnAndRemoteNeed = function(ownNeedUri, remoteNeedUri) {
-    return won.getConnectionsOfNeed(ownNeedUri).then(connections => {
+  won.getConnectionWithOwnAndRemoteNeed = function(
+    ownedNeedUri,
+    remoteNeedUri
+  ) {
+    return won.getConnectionsOfNeed(ownedNeedUri).then(connections => {
       for (let connectionUri of Object.keys(connections)) {
         if (connections[connectionUri].hasRemoteNeed === remoteNeedUri) {
           return connections[connectionUri];
@@ -1824,7 +1828,7 @@ import won from "./won.js";
       }
       throw new Error(
         "Couldn't find connection between own need <" +
-          ownNeedUri +
+          ownedNeedUri +
           "> and remote need <" +
           remoteNeedUri +
           ">."

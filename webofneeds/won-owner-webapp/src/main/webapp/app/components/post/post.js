@@ -24,7 +24,7 @@ class Controller {
       const postUri = getPostUriFromRoute(state);
       const post = state.getIn(["needs", postUri]);
 
-      const isOwnPost = post && post.get("ownNeed");
+      const isOwnPost = post && post.get("isOwned");
       return {
         postUri,
         isOwnPost: isOwnPost,

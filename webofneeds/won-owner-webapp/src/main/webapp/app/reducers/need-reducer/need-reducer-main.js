@@ -64,7 +64,7 @@ export default function(allNeedsInState = initialState, action = {}) {
       // to a different session. we need to mark any needs
       // that are already loaded as non-owned.
       return allNeedsInState.map(need =>
-        need.set("ownNeed", false).set("connections", Immutable.Map())
+        need.set("isOwned", false).set("connections", Immutable.Map())
       );
     case actionTypes.needs.fetchSuggested: {
       let suggestedPosts = action.payload.get("suggestedPosts");
@@ -95,8 +95,8 @@ export default function(allNeedsInState = initialState, action = {}) {
         "activeConnectionUrisLoading"
       );
 
-      let ownNeeds = action.payload.get("ownNeeds");
-      ownNeeds = ownNeeds ? ownNeeds : Immutable.Set();
+      let ownedNeeds = action.payload.get("ownedNeeds");
+      ownedNeeds = ownedNeeds ? ownedNeeds : Immutable.Set();
       let theirNeeds = action.payload.get("theirNeeds");
       theirNeeds = theirNeeds ? theirNeeds : Immutable.Set();
 
@@ -110,24 +110,24 @@ export default function(allNeedsInState = initialState, action = {}) {
         inactiveNeedUrisLoading
       );
 
-      const stateWithOwnNeedUrisInLoading = addOwnActiveNeedsInLoading(
+      const stateWithOwnedNeedUrisInLoading = addOwnActiveNeedsInLoading(
         stateWithOwnInactiveNeedUrisInLoading,
         activeNeedUris
       );
 
-      const stateWithOwnNeeds = ownNeeds.reduce(
-        (updatedState, ownNeed) => addNeed(updatedState, ownNeed, true),
-        stateWithOwnNeedUrisInLoading
+      const stateWithOwnedNeeds = ownedNeeds.reduce(
+        (updatedState, ownedNeed) => addNeed(updatedState, ownedNeed, true),
+        stateWithOwnedNeedUrisInLoading
       );
 
-      const stateWithOwnNeedsAndTheirNeedsInLoading = addTheirNeedsInLoading(
-        stateWithOwnNeeds,
+      const stateWithOwnedNeedsAndTheirNeedsInLoading = addTheirNeedsInLoading(
+        stateWithOwnedNeeds,
         theirNeedUrisInLoading
       );
 
       const stateWithOwnAndTheirNeeds = theirNeeds.reduce(
         (updatedState, theirNeed) => addNeed(updatedState, theirNeed, false),
-        stateWithOwnNeedsAndTheirNeedsInLoading
+        stateWithOwnedNeedsAndTheirNeedsInLoading
       );
 
       const stateWithConnectionsToLoad = addActiveConnectionsToNeedInLoading(
@@ -153,7 +153,7 @@ export default function(allNeedsInState = initialState, action = {}) {
 
     case actionTypes.needs.fetch:
       return action.payload.reduce(
-        (updatedState, ownNeed) => addNeed(updatedState, ownNeed, true),
+        (updatedState, ownedNeed) => addNeed(updatedState, ownedNeed, true),
         allNeedsInState
       );
 
@@ -166,14 +166,14 @@ export default function(allNeedsInState = initialState, action = {}) {
     case actionTypes.needs.reopen:
       return changeNeedState(
         allNeedsInState,
-        action.payload.ownNeedUri,
+        action.payload.ownedNeedUri,
         won.WON.ActiveCompacted
       );
 
     case actionTypes.needs.close:
       return changeNeedState(
         allNeedsInState,
-        action.payload.ownNeedUri,
+        action.payload.ownedNeedUri,
         won.WON.InactiveCompacted
       );
 
@@ -183,7 +183,7 @@ export default function(allNeedsInState = initialState, action = {}) {
         action.payload.needUri,
         Immutable.fromJS({
           jsonld: action.payload.persona,
-          ownNeed: true,
+          isOwned: true,
           isBeingCreated: true,
           uri: action.payload.needUri,
           creationDate: new Date(),
@@ -217,17 +217,19 @@ export default function(allNeedsInState = initialState, action = {}) {
 
     case actionTypes.messages.openMessageReceived:
     case actionTypes.messages.connectMessageReceived: {
-      const ownNeedFromState = allNeedsInState.get(action.payload.ownNeedUri);
+      const ownedNeedFromState = allNeedsInState.get(
+        action.payload.ownedNeedUri
+      );
       const remoteNeed = action.payload.remoteNeed;
 
-      // let changedState = ownNeedFromState
+      // let changedState = ownedNeedFromState
       //   ? allNeedsInState
-      //   : addNeed(allNeedsInState, ownNeed, true);
+      //   : addNeed(allNeedsInState, ownedNeed, true);
       let changedState;
 
-      if (!ownNeedFromState) {
+      if (!ownedNeedFromState) {
         throw new Error(
-          "Would need to call addNeed with ownNeed, but it is not defined!"
+          "Would need to call addNeed with ownedNeed, but it is not defined!"
         );
       } else {
         changedState = allNeedsInState;
@@ -296,7 +298,7 @@ export default function(allNeedsInState = initialState, action = {}) {
     case actionTypes.needs.connect: {
       // user has sent a connect request
       const optimisticEvent = action.payload.optimisticEvent;
-      const ownNeedUri = optimisticEvent.getSenderNeed();
+      const ownedNeedUri = optimisticEvent.getSenderNeed();
       const theirNeedUri = optimisticEvent.getReceiverNeed();
       const eventUri = optimisticEvent.getMessageUri();
       let stateUpdated;
@@ -344,7 +346,7 @@ export default function(allNeedsInState = initialState, action = {}) {
           },
         });
         return allNeedsInState.setIn(
-          [ownNeedUri, "connections", tmpConnectionUri],
+          [ownedNeedUri, "connections", tmpConnectionUri],
           optimisticConnection
         );
       }
@@ -495,9 +497,9 @@ export default function(allNeedsInState = initialState, action = {}) {
         // connection uri. now that we have the uri, we can store it
         // (see connectAdHoc)
         const needUri = needForTmpCnct.get("uri");
-        if (!needForTmpCnct.get("ownNeed")) {
+        if (!needForTmpCnct.get("isOwned")) {
           throw new Error(
-            'Trying to add/change connection for need that\'s not an "ownNeed".'
+            'Trying to add/change connection for need that\'s not an "ownedNeed".'
           );
         }
 
@@ -927,14 +929,14 @@ export default function(allNeedsInState = initialState, action = {}) {
 
 function storeConnectionAndRelatedData(state, connectionWithRelatedData) {
   const {
-    ownNeed,
+    ownedNeed,
     remoteNeed,
     connection,
     ownPersona,
     remotePersona,
   } = connectionWithRelatedData;
-  // guarantee that ownNeed is in state:
-  state = addNeed(state, ownNeed, true);
+  // guarantee that ownedNeed is in state:
+  state = addNeed(state, ownedNeed, true);
 
   // guarantee that  remoteNeed  is  in  state:
   state = addNeed(state, remoteNeed, false);

@@ -445,10 +445,10 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 				"ok, I'll make a proposal containing " + count + " of " + whose + " latest messages as clauses - but I'll need to crawl the connection data first, please be patient.", 
 				state -> {
 					return state.getNLatestMessageUris(m -> {
-						URI ownNeedUri = con.getNeedURI();
+						URI ownedNeedUri = con.getNeedURI();
 						URI remoteNeedUri = con.getRemoteNeedURI();
 						return 
-								ownNeedUri != null && ownNeedUri.equals(m.getSenderNeedURI()) && allowOwnClauses || 
+								ownedNeedUri != null && ownedNeedUri.equals(m.getSenderNeedURI()) && allowOwnClauses ||
 						   	    remoteNeedUri != null && remoteNeedUri.equals(m.getSenderNeedURI()) && allowCounterpartClauses;
 								
 					},count+1).subList(1, count+1);
