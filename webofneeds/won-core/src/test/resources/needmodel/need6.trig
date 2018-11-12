@@ -22,7 +22,7 @@
         won:hasMatchingBehavior won:Mutual ;
         won:is2                  _:is_and_seeks ;
         dc:title                "is" ;
-        won:connectsTo _:closesTheLoop. ;
+        won:connectsTo _:closesTheLoop ;
         won:seeks2               _:is_and_seeks ;
         won:seeks               _:seeks.
     _:seeks
