@@ -7,13 +7,10 @@ import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.*;
 import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.apache.jena.rdf.model.impl.StatementImpl;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.sparql.path.Path;
 import org.apache.jena.sparql.path.PathParser;
 import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.RDF;
-import won.protocol.exception.DataIntegrityException;
 import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.model.NeedContentPropertyType;
 import won.protocol.model.NeedGraphType;
@@ -436,8 +433,7 @@ public class NeedModelWrapper {
         if (goalNode != null) {
             NodeIterator nodeIter = getNeedModel().listObjectsOfProperty(goalNode, WON.HAS_SHAPES_GRAPH);
             if (nodeIter.hasNext()) {
-                String shapesGraphUri = nodeIter.next().asResource().getURI();
-                return shapesGraphUri;
+                return nodeIter.next().asResource().getURI();
             }
         }
 
@@ -462,8 +458,7 @@ public class NeedModelWrapper {
         if (goalNode != null) {
             NodeIterator nodeIter = getNeedModel().listObjectsOfProperty(goalNode, WON.HAS_DATA_GRAPH);
             if (nodeIter.hasNext()) {
-                String dataGraphUri = nodeIter.next().asResource().getURI();
-                return dataGraphUri;
+                return nodeIter.next().asResource().getURI();
             }
         }
 
@@ -543,41 +538,15 @@ public class NeedModelWrapper {
     private void addContentPropertyToNeedNode(NeedContentPropertyType type, RDFNode contentNode) {
 
         Resource needNode = getNeedNode(NeedGraphType.NEED);
-        if (NeedContentPropertyType.IS.equals(type)) {
-            needNode.addProperty(WON.IS, contentNode);
-        } else if (NeedContentPropertyType.SEEKS.equals(type)) {
+        if (NeedContentPropertyType.SEEKS.equals(type) || NeedContentPropertyType.IS_AND_SEEKS.equals(type)) {
             needNode.addProperty(WON.SEEKS, contentNode);
         } else if (NeedContentPropertyType.SEEKS_SEEKS.equals(type)) {
             Resource intermediate = getNeedModel().createResource();
             needNode.addProperty(WON.SEEKS, intermediate);
             intermediate.addProperty(WON.SEEKS, contentNode);
-        } else if (NeedContentPropertyType.IS_AND_SEEKS.equals(type)) {
-            needNode.addProperty(WON.IS, contentNode);
-            needNode.addProperty(WON.SEEKS, contentNode);
         } else if (NeedContentPropertyType.GOAL.equals(type)) {
             needNode.addProperty(WON.GOAL, contentNode);
         }
-    }
-
-    public NeedContentPropertyType getContentPropertyType(Resource contentNode) {
-
-        boolean is = getContentNodes(NeedContentPropertyType.IS).size() > 0;
-        boolean seeks = getContentNodes(NeedContentPropertyType.SEEKS).size() > 0;
-        boolean seeksSeeks = getContentNodes(NeedContentPropertyType.SEEKS_SEEKS).size() > 0;
-
-        if (is && seeks && seeksSeeks) {
-            return NeedContentPropertyType.ALL;
-        } else if (is && seeks) {
-            return NeedContentPropertyType.IS_AND_SEEKS;
-        } else if (is) {
-            return NeedContentPropertyType.IS;
-        } else if (seeks) {
-            return NeedContentPropertyType.SEEKS;
-        } else if (seeksSeeks) {
-            return NeedContentPropertyType.SEEKS_SEEKS;
-        }
-
-        return null;
     }
 
     /**
@@ -590,11 +559,12 @@ public class NeedModelWrapper {
 
         Collection<Resource> contentNodes = new LinkedList<>();
         String queryClause = null;
-        String isClause = "{ ?needNode a won:Need. ?needNode won:is ?contentNode. }";
-        String isAndSeeksClause = "{ ?needNode a won:Need. ?needNode won:is ?contentNode. ?needNode won:seeks ?contentNode. }";
+        String isClause = "{ ?needNode a won:Need. ?needNode won:is ?contentNode. }"; //TODO: MANAGE THE REMOVED won:is please
+        String isAndSeeksClause = "{ ?needNode a won:Need. ?needNode won:is ?contentNode. ?needNode won:seeks ?contentNode. }"; //TODO: MANAGE THE REMOVED won:is please
         String seeksClause = "{ ?needNode a won:Need. ?needNode won:seeks ?contentNode. FILTER NOT EXISTS { ?needNode won:seeks/won:seeks ?contentNode. } }";
         String seeksSeeksClause = "{ ?needNode a won:Need. ?needNode won:seeks/won:seeks ?contentNode. }";
         String goalClause = "{ ?needNode a won:Need. ?needNode won:goal ?contentNode. }";
+
 
         switch (type) {
             case IS:
@@ -622,14 +592,14 @@ public class NeedModelWrapper {
         Query query = QueryFactory.create(queryString);
         try (QueryExecution qexec = QueryExecutionFactory.create(query, getNeedModel())) {
             ResultSet rs = qexec.execSelect();
-    
+
             while (rs.hasNext()) {
                 QuerySolution qs = rs.next();
                 if (qs.contains("contentNode")) {
                     contentNodes.add(qs.get("contentNode").asResource());
                 }
             }
-    
+
             return contentNodes;
         }
     }
@@ -818,7 +788,7 @@ public class NeedModelWrapper {
     public Model normalizeNeedModel() {
         Model copy = RdfUtils.cloneModel(getNeedModel());
         Set<RDFNode> blacklist = new HashSet<>();
-        RDFNode needNode = copy.getResource(getNeedUri().toString());
+        RDFNode needNode = copy.getResource(getNeedUri());
         //System.out.println("model before modification:");
         //RDFDataMgr.write(System.out, copy, Lang.TRIG);
         recursiveCopyWhereMultipleInEdges(needNode);
