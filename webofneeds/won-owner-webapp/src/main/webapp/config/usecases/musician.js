@@ -282,21 +282,24 @@ export const musicianGroup = {
             },
             operations: [
               `${resultName} a won:Need.`,
-              `${resultName} won:is ?is.`,
-              `?is rdf:type won:RehearsalRoomRentOffer.`,
-              location && "?is won:hasLocation ?location.",
+              `${resultName} rdf:type won:RehearsalRoomRentOffer.`,
+              location && `${resultName} won:hasLocation ?location.`,
             ],
           },
           rentRange &&
             filterRentRange(
-              "?is",
+              `${resultName}`,
               rentRange.min,
               rentRange.max,
               rentRange.currency
             ),
 
           floorSizeRange &&
-            filterFloorSizeRange("?is", floorSizeRange.min, floorSizeRange.max),
+            filterFloorSizeRange(
+              `${resultName}`,
+              floorSizeRange.min,
+              floorSizeRange.max
+            ),
 
           filterInVicinity("?location", location),
         ];

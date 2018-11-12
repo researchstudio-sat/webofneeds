@@ -49,8 +49,7 @@ const mobilityUseCases = {
         },
         operations: [
           `${resultName} a won:Need.`,
-          `${resultName} won:isInState won:Active. { { ?is a <http://dbpedia.org/resource/Ridesharing>.  } union { ?is a s:TaxiService} }`,
-          `${resultName} won:is ?is.`,
+          `${resultName} won:isInState won:Active. { { ${resultName} a <http://dbpedia.org/resource/Ridesharing>.  } union { ${resultName} a s:TaxiService} }`,
         ],
       };
 
@@ -86,9 +85,10 @@ const mobilityUseCases = {
           filterAndJoin(
             [
               fromLocation &&
-                `?is a <http://dbpedia.org/resource/Ridesharing>. ?is won:travelAction/s:fromLocation ?fromLocation. `,
+                `${resultName} a <http://dbpedia.org/resource/Ridesharing>. ${resultName} won:travelAction/s:fromLocation ?fromLocation. `,
               fromLocation && fromLocationFilter.operations.join(" "),
-              toLocation && "?is won:travelAction/s:toLocation ?toLocation.",
+              toLocation &&
+                "${resultName} won:travelAction/s:toLocation ?toLocation.",
               toLocation && toLocationFilter.operations.join(" "),
             ],
             " "
@@ -96,7 +96,7 @@ const mobilityUseCases = {
           filterAndJoin(
             [
               location &&
-                `?is a s:TaxiService . ?is won:hasLocation ?location .`,
+                `${resultName} a s:TaxiService . ${resultName} won:hasLocation ?location .`,
               location && locationFilter.operations.join(" "),
             ],
             " "

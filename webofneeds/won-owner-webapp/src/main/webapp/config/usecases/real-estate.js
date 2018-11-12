@@ -71,24 +71,27 @@ export const realEstateGroup = {
             },
             operations: [
               `${resultName} a won:Need.`,
-              `${resultName} won:is ?is.`,
-              location && "?is won:hasLocation ?location.",
+              location && `${resultName} won:hasLocation ?location.`,
             ],
           },
           rentRange &&
             filterRentRange(
-              "?is",
+              `${resultName}`,
               rentRange.min,
               rentRange.max,
               rentRange.currency
             ),
 
           floorSizeRange &&
-            filterFloorSizeRange("?is", floorSizeRange.min, floorSizeRange.max),
+            filterFloorSizeRange(
+              `${resultName}`,
+              floorSizeRange.min,
+              floorSizeRange.max
+            ),
 
           numberOfRoomsRange &&
             filterNumOfRoomsRange(
-              "?is",
+              `${resultName}`,
               numberOfRoomsRange.min,
               numberOfRoomsRange.max
             ),

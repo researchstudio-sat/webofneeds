@@ -279,8 +279,7 @@ export const transportGroup = {
           },
           operations: [
             `${resultName} a won:Need.`,
-            `${resultName} won:isInState won:Active. ?is a <http://dbpedia.org/resource/Transport>. `,
-            `${resultName} won:is ?is.`,
+            `${resultName} won:isInState won:Active. ${resultName} a <http://dbpedia.org/resource/Transport>. `,
           ],
         };
 
@@ -316,9 +315,10 @@ export const transportGroup = {
             filterAndJoin(
               [
                 fromLocation &&
-                  `?is a <http://dbpedia.org/resource/Transport>. ?is won:travelAction/s:fromLocation ?fromLocation. `,
+                  `${resultName} a <http://dbpedia.org/resource/Transport>. ${resultName} won:travelAction/s:fromLocation ?fromLocation. `,
                 fromLocation && fromLocationFilter.operations.join(" "),
-                toLocation && "?is won:travelAction/s:toLocation ?toLocation.",
+                toLocation &&
+                  `${resultName} won:travelAction/s:toLocation ?toLocation.`,
                 toLocation && toLocationFilter.operations.join(" "),
               ],
               " "
@@ -326,7 +326,7 @@ export const transportGroup = {
             filterAndJoin(
               [
                 location &&
-                  `?is a <http://dbpedia.org/resource/Transport> . ?is won:hasLocation ?location .`,
+                  `${resultName} a <http://dbpedia.org/resource/Transport> . ${resultName} won:hasLocation ?location .`,
                 location && locationFilter.operations.join(" "),
               ],
               " "
@@ -384,8 +384,7 @@ export const transportGroup = {
             operations: [
               `${resultName} a won:Need.`,
               `${resultName} won:seeks ?seeks.`,
-              `${resultName} won:is ?is.`,
-              `?is a <http://dbpedia.org/resource/Cargo>.`,
+              `${resultName} a <http://dbpedia.org/resource/Cargo>.`,
               location && "?seeks won:travelAction/s:fromLocation ?location.",
             ],
           },

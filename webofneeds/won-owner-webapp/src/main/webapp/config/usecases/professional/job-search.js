@@ -66,8 +66,7 @@ export const jobSearch = {
    *       (count(${resultName}) as ?targetTotal)
    *     where {
    *       ${resultName} a won:Need;
-   *             won:is ?is.
-   *             ?is s:industry ?industry .
+   *             s:industry ?industry .
    *       bind(if(str(?industry) = "design",1,0) as ?var1)
    *       bind(if(str(?industry) = "computer science",1,0) as ?var2)
    *     } group by (${resultName})
