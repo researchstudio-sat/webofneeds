@@ -424,15 +424,15 @@ public class SparqlMatcherActor extends UntypedActor {
    
 
     /**
-     * Executes the query, optionally only searching in the datasetToQuery.
+     * Executes the query, optionally only searching in the needToCheck.
      * @param q
-     * @param datasetToQuery
+     * @param needToCheck
      * @return
      */
     private Stream<ScoredNeed> executeQuery(Op q, Optional<NeedModelWrapperAndDataset> needToCheck) {
             Query compiledQuery = OpAsQuery.asQuery(q);
 
-            // if we were given a needToCheck, restrict the query result to that uri so that 
+        // if we were given a needToCheck, restrict the query result to that uri so that
             // we get exactly one result if that uri is found for the need
             if (needToCheck.isPresent()) {
               Binding binding = BindingFactory.binding(resultName, new ResourceImpl(needToCheck.get().needModelWrapper.getNeedUri()).asNode());
