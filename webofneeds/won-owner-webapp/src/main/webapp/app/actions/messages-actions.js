@@ -563,11 +563,13 @@ export function processConnectMessage(event) {
         .then(cnct => Immutable.fromJS(cnct));
     }
 
+    //TODO: A CONNECT MESSAGE TO/FROM A NEED THAT IS NOT KNOWN BUT CONTAINS A PERSONA WILL RESULT IN THE PERSONA BEING NOT VISIBLE
+    //we have to retrieve the personas too
     Promise.all([
       senderCP,
       receiverCP,
-      won.getNeed(senderNeedUri), //TODO: PROMISE IF LOADED (WE MIGHT HAVE IT IN THE STATE ALREADY)
-      won.getNeed(receiverNeedUri), //TODO: PROMISE IF LOADED (WE MIGHT HAVE IT IN THE STATE ALREADY)
+      won.getNeed(senderNeedUri), //TODO: PROMISE IF LOADED (WE MIGHT HAVE IT IN THE STATE ALREADY) ALSO WHAT ABOUT PERSONA RETRIEVAL
+      won.getNeed(receiverNeedUri), //TODO: PROMISE IF LOADED (WE MIGHT HAVE IT IN THE STATE ALREADY) ALSO WHAT ABOUT PERSONA RETRIEVAL
     ]).then(
       ([senderConnection, receiverConnection, senderNeed, receiverNeed]) => {
         if (receiverConnection) {
@@ -830,7 +832,7 @@ export function needMessageReceived(event) {
   };
 }
 
-export function hintMessageReceived(event) {
+export function processHintMessage(event) {
   return (dispatch, getState) => {
     //first check if we really have the 'own' need in the state - otherwise we'll ignore the hint
     if (!getState().getIn(["needs", event.getReceiverNeed()])) {

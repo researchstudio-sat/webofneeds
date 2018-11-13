@@ -229,7 +229,8 @@ const actionHierarchy = {
     processConnectMessage: messages.processConnectMessage,
     connectMessageReceived: INJ_DEFAULT,
     connectMessageSent: INJ_DEFAULT,
-    hintMessageReceived: messages.hintMessageReceived,
+    processHintMessage: messages.processHintMessage,
+    hintMessageReceived: INJ_DEFAULT,
     openMessageReceived: INJ_DEFAULT,
     openMessageSent: INJ_DEFAULT,
     processOpenMessage: messages.processOpenMessage,
@@ -348,7 +349,6 @@ export function startTicking() {
 }
 
 /**
- * @deprecated used for keeping old code.
  * @param needUri
  * @param remoteNeedUri
  * @param connectionUri
@@ -359,12 +359,12 @@ export function getConnectionRelatedData(
   remoteNeedUri,
   connectionUri
 ) {
-  const remoteNeed = won.getNeed(remoteNeedUri);
-  const ownNeed = won.getNeed(needUri);
-  const connection = won.getConnectionWithEventUris(connectionUri, {
+  const remoteNeedP = won.getNeed(remoteNeedUri);
+  const ownNeedP = won.getNeed(needUri);
+  const connectionP = won.getConnectionWithEventUris(connectionUri, {
     requesterWebId: needUri,
   });
-  const events = won
+  const eventsP = won
     .getEventsOfConnection(connectionUri, { requesterWebId: needUri })
     .then(eventsLookup => {
       const eventList = [];
@@ -374,14 +374,45 @@ export function getConnectionRelatedData(
       return eventList;
     });
 
-  return Promise.all([remoteNeed, ownNeed, connection, events]).then(
-    results => ({
+  const remotePersonaP = remoteNeedP.then(remoteNeed => {
+    const remoteHeldBy = remoteNeed && remoteNeed["won:heldBy"];
+    const remotePersonaUri = remoteHeldBy && remoteHeldBy["@id"];
+
+    if (remotePersonaUri) {
+      return won.getNeed(remotePersonaUri);
+    } else {
+      return Promise.resolve(undefined);
+    }
+  });
+
+  const ownPersonaP = ownNeedP.then(ownNeed => {
+    const ownHeldBy = ownNeed && ownNeed["won:heldBy"];
+    const ownPersonaUri = ownHeldBy && ownHeldBy["@id"];
+
+    if (ownPersonaUri) {
+      return won.getNeed(ownPersonaUri);
+    } else {
+      return Promise.resolve(undefined);
+    }
+  });
+
+  return Promise.all([
+    remoteNeedP,
+    ownNeedP,
+    connectionP,
+    eventsP,
+    remotePersonaP,
+    ownPersonaP,
+  ]).then(results => {
+    return {
       remoteNeed: results[0],
       ownNeed: results[1],
       connection: results[2],
       events: results[3],
-    })
-  );
+      remotePersona: results[4],
+      ownPersona: results[5],
+    };
+  });
 }
 
 export function needsOpen(needUri) {
