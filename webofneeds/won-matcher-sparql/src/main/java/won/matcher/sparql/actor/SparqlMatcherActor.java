@@ -210,6 +210,7 @@ public class SparqlMatcherActor extends UntypedActor {
         negation.add(blankPath);
         P_Alt any = new P_Alt(blankPath, negation);
 
+        //TODO: REMOVE "http://purl.org/webofneeds/model#is"
         P_Link isPath = new P_Link(NodeFactory.createURI("http://purl.org/webofneeds/model#is"));
         P_Link seeksPath = new P_Link(NodeFactory.createURI("http://purl.org/webofneeds/model#seeks"));
 
@@ -339,11 +340,13 @@ public class SparqlMatcherActor extends UntypedActor {
         Statement seeks = model.getProperty(model.createResource(needURI), model.createProperty("http://purl.org/webofneeds/model#seeks"));
 
         if (seeks != null) {
+            //TODO: REMOVE "http://purl.org/webofneeds/model#is"
             Op seeksQuery = createNeedQuery(model, seeks, NodeFactory.createURI("http://purl.org/webofneeds/model#is"));
             if(seeksQuery != null)
                 queries.add(seeksQuery);
         }
 
+        //TODO: REMOVE "http://purl.org/webofneeds/model#is"
         Statement is = model.getProperty(model.createResource(needURI), model.createProperty("http://purl.org/webofneeds/model#is"));
 
         if (is != null) {
