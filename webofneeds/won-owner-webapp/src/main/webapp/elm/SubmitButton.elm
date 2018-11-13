@@ -111,7 +111,8 @@ view skin model =
     in
     layout
         [ Font.size 16
-        , width shrink ]
+        , width shrink
+        ]
     <|
         if not model.options.loggedIn || not model.options.showPersonas then
             Input.button
@@ -146,6 +147,7 @@ view skin model =
             row
                 [ spacing 2
                 , height fill
+                , width (maximum (model.size.width // 2) fill)
                 , above <|
                     case model.state of
                         Open ->
@@ -177,7 +179,7 @@ view skin model =
                   <|
                     Input.button
                         [ Background.color buttonColor
-                        , width (maximum (model.size.width // 2) fill)
+                        , width fill
                         , height fill
                         , focusStyle
                         , paddingEach
