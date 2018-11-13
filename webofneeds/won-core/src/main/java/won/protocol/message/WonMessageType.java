@@ -84,6 +84,8 @@ public enum WonMessageType
       return OPEN;
     if (WONMSG.TYPE_CLOSE.equals(resource))
       return CLOSE;
+    if (WONMSG.TYPE_DELETE.equals(resource))
+      return DELETE;
     if (WONMSG.TYPE_CONNECTION_MESSAGE.equals(resource))
       return CONNECTION_MESSAGE;
     if (WONMSG.TYPE_NEED_MESSAGE.equals(resource))
