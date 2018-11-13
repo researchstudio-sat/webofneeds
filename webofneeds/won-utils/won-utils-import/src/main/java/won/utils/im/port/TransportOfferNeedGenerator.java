@@ -15,27 +15,12 @@ import org.apache.jena.datatypes.RDFDatatype;
 import org.apache.jena.rdf.model.*;
 import org.apache.jena.vocabulary.DC;
 import org.apache.jena.vocabulary.RDF;
+import won.protocol.vocabulary.SCHEMA;
+import won.protocol.vocabulary.WON;
 
 public class TransportOfferNeedGenerator {
 
     static Model model = ModelFactory.createDefaultModel();
-
-    static Property won_hasFacet = model.createProperty("http://purl.org/webofneeds/model#hasFacet");
-    static Property won_is = model.createProperty("http://purl.org/webofneeds/model#is");
-    static Property won_seeks = model.createProperty("http://purl.org/webofneeds/model#seeks");
-    static Property won_hasTag = model.createProperty("http://purl.org/webofneeds/model#hasTag");
-    static Property won_hasLocation = model.createProperty("http://purl.org/webofneeds/model#hasLocation");
-    static Property won_geoSpatial = model.createProperty("http://purl.org/webofneeds/model#geoSpatial");    
-    static Property won_hasBoundingBox = model.createProperty("http://purl.org/webofneeds/model#hasBoundingBox");
-    static Property won_hasNorthWestCorner = model
-            .createProperty("http://purl.org/webofneeds/model#hasNorthWestCorner");
-    static Property won_hasSouthEastCorner = model
-            .createProperty("http://purl.org/webofneeds/model#hasSouthEastCorner");
-
-    static Property schema_geo = model.createProperty("http://schema.org/geo");
-    static Property schema_latitude = model.createProperty("http://schema.org/latitude");
-    static Property schema_longitude = model.createProperty("http://schema.org/longitude");
-    static Property schema_name = model.createProperty("http://schema.org/name");
 
     static RDFDatatype bigdata_geoSpatialDatatype = new BaseDatatype("http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon");
     
@@ -60,19 +45,17 @@ public class TransportOfferNeedGenerator {
             setPrefixes();
 
             Resource need = model.createResource(needURI);
-            Resource isPart = model.createResource();
             Resource seeksPart = model.createResource();
             Resource won_Need = model.createResource("http://purl.org/webofneeds/model#Need");
 
             // method signatures: branch, probability that detail is added, min, max
-            isPart = addTitle(isPart, 1.0, i);
-            isPart = addLocation(isPart, 1.0);
+            need = addTitle(need, 1.0, i);
+            need = addLocation(need, 1.0);
             seeksPart = addDescription(seeksPart, 1.0);
             seeksPart = addTags(seeksPart, 0.8, 1, 3);
 
             need.addProperty(RDF.type, won_Need);
-            need.addProperty(won_is, isPart);
-            need.addProperty(won_seeks, seeksPart);
+            need.addProperty(WON.SEEKS, seeksPart);
 
             try {
                 FileOutputStream out = new FileOutputStream("sample_needs/transport_offer_need_" + rnd + ".trig");
@@ -133,24 +116,24 @@ public class TransportOfferNeedGenerator {
         Resource schema_Place = model.createResource("http://schema.org/Place");
         Resource schema_GeoCoordinates = model.createResource("http://schema.org/GeoCoordinates");
 
-        resource.addProperty(won_hasLocation, locationResource);
+        resource.addProperty(WON.HAS_LOCATION, locationResource);
         locationResource.addProperty(RDF.type, schema_Place);
-        locationResource.addProperty(schema_name, name);
-        locationResource.addProperty(schema_geo, geoResource);
+        locationResource.addProperty(SCHEMA.NAME, name);
+        locationResource.addProperty(SCHEMA.GEO, geoResource);
         geoResource.addProperty(RDF.type, schema_GeoCoordinates);
-        geoResource.addProperty(schema_latitude, lat);
-        geoResource.addProperty(schema_longitude, lng);
+        geoResource.addProperty(SCHEMA.LATITUDE, lat);
+        geoResource.addProperty(SCHEMA.LONGITUDE, lng);
         // add bigdata specific value: "<subj> won:geoSpatial  "48.225073#16.358398"^^<http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon>" 
-        geoResource.addProperty(won_geoSpatial, lat+"#"+lng, bigdata_geoSpatialDatatype);
-        locationResource.addProperty(won_hasBoundingBox, boundingBoxResource);
-        boundingBoxResource.addProperty(won_hasNorthWestCorner, nwCornerResource);
+        geoResource.addProperty(WON.GEO_SPATIAL, lat+"#"+lng, bigdata_geoSpatialDatatype);
+        locationResource.addProperty(WON.HAS_BOUNDING_BOX, boundingBoxResource);
+        boundingBoxResource.addProperty(WON.HAS_NORTH_WEST_CORNER, nwCornerResource);
         nwCornerResource.addProperty(RDF.type, schema_GeoCoordinates);
-        nwCornerResource.addProperty(schema_latitude, nwlat);
-        nwCornerResource.addProperty(schema_longitude, nwlng);
-        boundingBoxResource.addProperty(won_hasSouthEastCorner, seCornerResource);
+        nwCornerResource.addProperty(SCHEMA.LATITUDE, nwlat);
+        nwCornerResource.addProperty(SCHEMA.LONGITUDE, nwlng);
+        boundingBoxResource.addProperty(WON.HAS_SOUTH_EAST_CORNER, seCornerResource);
         seCornerResource.addProperty(RDF.type, schema_GeoCoordinates);
-        seCornerResource.addProperty(schema_latitude, selat);
-        seCornerResource.addProperty(schema_longitude, selng);
+        seCornerResource.addProperty(SCHEMA.LATITUDE, selat);
+        seCornerResource.addProperty(SCHEMA.LONGITUDE, selng);
         return resource;
     }
 
@@ -163,7 +146,7 @@ public class TransportOfferNeedGenerator {
         Collections.shuffle(Arrays.asList(tags));
 
         for (int j = 0; j < numberOfTags; j++) {
-            resource.addProperty(won_hasTag, tags[j]);
+            resource.addProperty(WON.HAS_TAG, tags[j]);
         }
         return resource;
     }
