@@ -71,8 +71,8 @@
         <connection>scm:git:git://github.com/researchstudio-sat/webofneeds.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/researchstudio-sat/webofneeds.git</developerConnection>
         <url>https://github.com/researchstudio-sat/webofneeds.git</url>
-      <tag>HEAD</tag>
-  </scm>
+        <tag>HEAD</tag>
+    </scm>
     <modules>
         <module>won-core</module>
         <module>won-node-webapp</module>
@@ -299,7 +299,7 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
-                <version>2.8.7</version>
+                <version>2.8.11.2</version>
             </dependency>
 
             <!-- Signingframework - doesn't exist in the public repository -->
@@ -427,7 +427,7 @@
             <dependency>
                 <groupId>org.springframework.data</groupId>
                 <artifactId>spring-data-commons</artifactId>
-                <version>1.13.3.RELEASE</version>
+                <version>1.13.16.RELEASE</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.data</groupId>
@@ -905,9 +905,9 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>2.17</version>
                     <configuration>
-                      <reuseForks>false</reuseForks>
-                      <forkCount>0</forkCount>
-                      <useSystemClassLoader>false</useSystemClassLoader>
+                        <reuseForks>false</reuseForks>
+                        <forkCount>0</forkCount>
+                        <useSystemClassLoader>false</useSystemClassLoader>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -975,7 +975,7 @@
             </snapshots>
         </repository>
     </repositories>
-    
+
 
     <properties>
         <solr.upload.dest>${project.build.directory}</solr.upload.dest>
@@ -1020,9 +1020,9 @@
         <org.javasimon.version>3.4.0</org.javasimon.version>
         <org.jboss.jandex.version>1.1.0.Final</org.jboss.jandex.version>
         <org.quartz-scheduler.version>2.2.1</org.quartz-scheduler.version>
-        <org.springframework.boot.version>1.5.3.RELEASE</org.springframework.boot.version>
-        <org.springframework.version>4.3.8.RELEASE</org.springframework.version>
-        <org.springframework.security.version>4.2.3.RELEASE</org.springframework.security.version>
+        <org.springframework.boot.version>1.5.17.RELEASE</org.springframework.boot.version>
+        <org.springframework.version>4.3.20.RELEASE</org.springframework.version>
+        <org.springframework.security.version>4.2.9.RELEASE</org.springframework.security.version>
         <org.slf4j.version>1.6.6</org.slf4j.version>
         <org.hsqldb.version>2.3.2</org.hsqldb.version>
         <postgresql.version>42.1.1</postgresql.version>
