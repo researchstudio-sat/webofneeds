@@ -31,12 +31,14 @@ import autoresizingTextareaModule from "../directives/textarea-autogrow.js";
 import { actionCreators } from "../actions/actions.js";
 import labelledHrModule from "./labelled-hr.js";
 import { getHumanReadableStringFromMessage } from "../reducers/need-reducer/parse-message.js";
+import submitButtonModule from "./submit-button.js";
 
 import "style/_chattextfield.scss";
 import "style/_textfield.scss";
 
 function genComponentConf() {
   let template = `
+      <!-- DETAILS DRAWER START -->  
         <div class="cts__details"
           ng-if="self.allowDetails && self.showAddMessageContent">
           <div class="cts__details__grid"
@@ -184,6 +186,8 @@ function genComponentConf() {
             </div>
           </div>
         </div>
+      <!-- DETAILS DRAWER END -->
+      <!-- OPEN/CLOSE DETAILS BTN -->
         <button class="cts__add"
           ng-disabled="!self.allowDetails"
           ng-click="self.toggleAdditionalContentDisplay()">
@@ -194,6 +198,8 @@ function genComponentConf() {
                 <use xlink:href="#ico36_close" href="#ico36_close"></use>
             </svg>
         </button>
+      <!-- OPEN/CLOSE DETAILS BTN -->
+      
         <textarea 
             won-textarea-autogrow
             data-min-rows="1"
@@ -203,13 +209,18 @@ function genComponentConf() {
             tabindex="0"
             placeholder="{{self.placeholder}}"></textarea>
 
-        <button
-            class="cts__submitbutton red"
-            ng-show="self.submitButtonLabel"
-            ng-click="self.submit()"
-            ng-disabled="!self.valid()">
-            {{ (self.submitButtonLabel || 'Submit') }}
-        </button>
+      <!-- PERSONA SELECTION START -->
+        <div class="cts__submitbutton">
+            <won-submit-button
+                is-valid="self.valid()"
+                on-submit="self.submit(persona)" 
+                show-personas="self.showPersonasSelection"
+                label="self.submitButtonLabel">
+            </won-submit-button>
+        </div>
+      <!-- PERSONA SELECTION END -->
+
+      <!-- ADDED DETAILS START -->  
         <div class="cts__additionalcontent" ng-if="self.hasAdditionalContent() || self.hasReferencedContent()">
           <div class="cts__additionalcontent__header">Additional Content to send:</div>
           <div class="cts__additionalcontent__list">
@@ -243,6 +254,7 @@ function genComponentConf() {
             </div>
           </div>
         </div>
+      <!-- ADDED DETAILS END -->
         <div class="cts__charcount" ng-show="self.maxChars">
             {{ self.charactersLeft() }} characters left
         </div>
@@ -267,6 +279,12 @@ function genComponentConf() {
       this.draftObject = {};
       this.additionalContent = new Map(); //Stores the additional Detail content of a message
       this.referencedContent = new Map(); //Stores the reference Content of a message (e.g. proposes, retracts...)
+
+      // keep up-to-date on whether we need to show personas or not
+      this.showPersonasSelection = this.showPersonas || undefined;
+      this.$scope.$watch("self.showPersonas", newValue => {
+        this.showPersonasSelection = newValue;
+      });
 
       const selectFromState = state => {
         const connectionUri = getConnectionUriFromRoute(state);
@@ -330,6 +348,7 @@ function genComponentConf() {
           showAddMessageContent: state.get("showAddMessageContent"),
           selectedDetail,
           selectedDetailComponent: selectedDetail && selectedDetail.component,
+          isLoggedIn: state.getIn(["user", "loggedIn"]),
         };
       };
 
@@ -350,6 +369,7 @@ function genComponentConf() {
         return false;
       });
     }
+
     keydown(e) {
       if (e.keyCode === 13 && !e.shiftKey) {
         e.preventDefault(); // prevent a newline from being entered
@@ -357,6 +377,7 @@ function genComponentConf() {
         return false;
       }
     }
+
     paste() {
       const payload = {
         value: this.value(),
@@ -365,6 +386,7 @@ function genComponentConf() {
       this.onPaste(payload);
       dispatchEvent(this.$element[0], "paste", payload);
     }
+
     input() {
       const payload = {
         value: this.value(),
@@ -381,7 +403,8 @@ function genComponentConf() {
              */
       delay(0).then(() => this.$scope.$digest());
     }
-    submit() {
+
+    submit(selectedPersona) {
       const value = this.value();
       const valid = this.valid();
       if (valid) {
@@ -396,6 +419,7 @@ function genComponentConf() {
           valid,
           additionalContent: this.additionalContent,
           referencedContent: this.referencedContent,
+          selectedPersona: selectedPersona || undefined,
         };
         if (this.additionalContent) {
           this.additionalContent = new Map();
@@ -408,12 +432,15 @@ function genComponentConf() {
         dispatchEvent(this.$element[0], "submit", payload);
       }
     }
+
     charactersLeft() {
       return this.maxChars - this.value().length;
     }
+
     belowMaxLength() {
       return !this.maxChars || this.charactersLeft() >= 0;
     }
+
     valid() {
       return (
         !this.connectionHasBeenLost &&
@@ -424,6 +451,7 @@ function genComponentConf() {
         this.belowMaxLength()
       );
     }
+
     value() {
       const txtEl = this.textField();
       if (txtEl) {
@@ -440,6 +468,7 @@ function genComponentConf() {
       }
       return this._textField;
     }
+
     pickDetail(detail) {
       this.selectAddMessageContent({ selectedDetail: detail.identifier });
     }
@@ -623,6 +652,7 @@ function genComponentConf() {
       allowDetails: "=", //whether or not it is allowed to add content other than text
 
       allowEmptySubmit: "=", // allows submitting empty messages
+      showPersonas: "=", // show a persona drop-up
 
       /*
              * Usage:
@@ -650,6 +680,7 @@ export default angular
   .module("won.owner.components.chatTextfieldSimple", [
     labelledHrModule,
     autoresizingTextareaModule,
+    submitButtonModule,
     ngAnimate,
   ])
   .directive("messageDetailElement", [

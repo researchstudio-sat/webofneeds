@@ -301,20 +301,56 @@ export function connectionsOpen(connectionUri, textMessage) {
   };
 }
 
-export function connectionsConnectAdHoc(theirNeedUri, textMessage) {
+export function connectionsConnectAdHoc(theirNeedUri, textMessage, persona) {
   return (dispatch, getState) =>
-    connectAdHoc(theirNeedUri, textMessage, dispatch, getState); // moved to separate function to make transpilation work properly
+    connectAdHoc(theirNeedUri, textMessage, persona, dispatch, getState); // moved to separate function to make transpilation work properly
 }
-function connectAdHoc(theirNeedUri, textMessage, dispatch, getState) {
+function connectAdHoc(theirNeedUri, textMessage, persona, dispatch, getState) {
   ensureLoggedIn(dispatch, getState).then(async () => {
     const state = getState();
     const theirNeed = getIn(state, ["needs", theirNeedUri]);
     const adHocDraft = generateResponseNeedTo(theirNeed);
     const nodeUri = getIn(state, ["config", "defaultNodeUri"]);
+
+    // create new need
     const { message, eventUri, needUri } = await buildCreateMessage(
       adHocDraft,
       nodeUri
     );
+
+    // add persona
+    if (persona) {
+      const response = await fetch("rest/action/connect", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify([
+          {
+            pending: false,
+            //facet: `${persona}#holderFacet`,
+            facet: getIn(state, ["needs", persona, "hasFacets"]).keyOf(
+              "won:HolderFacet"
+            ),
+          },
+          {
+            pending: true,
+            facet: `${needUri}#holdableFacet`,
+            // FIXME: does not work as new need is not in state yet
+            //facet: getIn(state, ["needs", needUri, "hasFacets"]).keyOf(
+            //  "won:HoldableFacet"
+            //),
+          },
+        ]),
+        credentials: "include",
+      });
+      if (!response.ok) {
+        const errorMsg = await response.text();
+        throw new Error(`Could not connect identity: ${errorMsg}`);
+      }
+    }
+
+    // establish connection
     const cnctMsg = buildConnectMessage({
       ownNeedUri: needUri,
       theirNeedUri: theirNeedUri,
