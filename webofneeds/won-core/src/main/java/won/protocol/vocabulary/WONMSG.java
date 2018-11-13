@@ -57,6 +57,7 @@ public class WONMSG
   public static final Resource TYPE_ACTIVATE = m.createResource(TYPE_ACTIVATE_STRING);
   public static final Resource TYPE_OPEN = m.createResource(TYPE_OPEN_STRING);
   public static final Resource TYPE_CLOSE = m.createResource(TYPE_CLOSE_STRING);
+  public static final Resource TYPE_DELETE = m.createResource(TYPE_DELETE_STRING);
   public static final Resource TYPE_CONNECTION_MESSAGE = m.createResource(TYPE_CONNECTION_MESSAGE_STRING);
   public static final Resource TYPE_NEED_MESSAGE = m.createResource(TYPE_NEED_MESSAGE_STRING);
   public static final Resource TYPE_HINT = m.createResource(TYPE_HINT_STRING);
