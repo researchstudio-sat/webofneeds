@@ -66,7 +66,7 @@ function genComponentConf() {
                     <button
                         class="won-button--filled red"
                         ng-click="self.closeConnection()">
-                        self.generateCloseConnectionLabel()
+                        {{ self.generateCloseConnectionLabel() }}
                     </button>
                 </div>
             </div>
