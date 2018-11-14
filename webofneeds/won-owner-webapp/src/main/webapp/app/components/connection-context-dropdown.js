@@ -64,16 +64,9 @@ function genComponentConf() {
                         Show PetriNet Data
                     </button>
                     <button
-                        ng-if="self.isConnected || self.isSuggested"
                         class="won-button--filled red"
                         ng-click="self.closeConnection()">
-                        Remove Connection
-                    </button>
-                    <button
-                        ng-if="self.isSentRequest"
-                        class="won-button--filled red"
-                        ng-click="self.closeConnection()">
-                        Cancel Request
+                        self.generateCloseConnectionLabel()
                     </button>
                 </div>
             </div>
@@ -137,6 +130,18 @@ function genComponentConf() {
 
     goToPost(postUri) {
       this.router__stateGoCurrent({ useCase: undefined, postUri: postUri });
+    }
+
+    generateCloseConnectionLabel() {
+      if (this.isConnected) {
+        return "Close Connection";
+      } else if (this.isSuggested) {
+        return "Remove Connection";
+      } else if (this.isSentRequest) {
+        return "Cancel Request";
+      } else if (this.isReceivedRequest) {
+        return "Deny Request";
+      }
     }
   }
   Controller.$inject = serviceDependencies;
