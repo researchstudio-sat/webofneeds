@@ -16,6 +16,12 @@
         <div class="conn__content__welcome">
             <div class="conn__content__welcome__text" ng-include="self.welcomeTemplate"></div>
             <won-usecase-picker></won-usecase-picker>
+            <div class="conn__content__welcome__howto">
+                <div  class="conn__content__welcome__howto__label">{{ self.appTitle }} connects people's needs to their solutions</div>
+                <a class="conn__content__welcome__howto__button won-button--filled red" href="{{ self.absHRef(self.$state, 'about') }}">
+                    <span>How {{ self.appTitle }} works?</span>
+                </a>
+            </div>
         </div>
     </div>
     <div class="conn__content" ng-if="self.useCase || self.useCaseGroup || self.selectedPost || (self.connection && self.connectionType !== self.WON.Closed)">

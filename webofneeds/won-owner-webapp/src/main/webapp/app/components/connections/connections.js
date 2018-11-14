@@ -16,15 +16,17 @@ import {
   getOwnedNeeds,
 } from "../../selectors/general-selectors.js";
 import { resetParams } from "../../configRouting.js";
+import * as srefUtils from "../../sref-utils.js";
 
 import "style/_connections.scss";
 import "style/_responsiveness-utils.scss";
 
-const serviceDependencies = ["$element", "$ngRedux", "$scope"];
+const serviceDependencies = ["$element", "$ngRedux", "$scope", "$state"];
 
 class ConnectionsController {
   constructor() {
     attach(this, serviceDependencies, arguments);
+    Object.assign(this, srefUtils);
     const self = this;
     this.WON = won.WON;
     this.resetParams = resetParams;
@@ -92,6 +94,7 @@ class ConnectionsController {
           theme +
           "/" +
           getIn(state, ["config", "theme", "welcomeTemplate"]),
+        appTitle: getIn(state, ["config", "theme", "title"]),
         WON: won.WON,
         selectedPost,
         connection,
