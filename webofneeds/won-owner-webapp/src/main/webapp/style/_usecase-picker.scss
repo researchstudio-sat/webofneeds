@@ -72,7 +72,9 @@ won-usecase-picker {
 
     overflow: auto;
 
-    &__button,
+    &__button {
+      white-space: nowrap;
+    }
     &__button--pending {
       white-space: normal;
     }
