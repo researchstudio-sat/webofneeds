@@ -6,7 +6,7 @@ import angular from "angular";
 import ngAnimate from "angular-animate";
 import { actionCreators } from "../actions/actions.js";
 import won from "../won-es6.js";
-import { attach, toAbsoluteURL } from "../utils.js";
+import { attach, toAbsoluteURL, getIn } from "../utils.js";
 import {
   connect2Redux,
   createDocumentDefinitionFromPost,
@@ -53,6 +53,11 @@ function genComponentConf() {
                         ng-click="self.exportPdf()">
                         Export as PDF
                     </button>
+                    <a class="won-button--outlined thin red"
+                        ng-if="self.adminEmail"
+                        href="mailto:{{ self.adminEmail }}?{{ self.generateReportPostMailParams()}}">
+                        Report Post
+                    </a>
                     <button class="won-button--filled red"
                         ng-if="self.isOwnPost && self.isInactive"
                         ng-click="self.reOpenPost()">
@@ -84,6 +89,7 @@ function genComponentConf() {
         }
 
         return {
+          adminEmail: getIn(state, ["config", "theme", "adminEmail"]),
           isOwnPost: post && post.get("ownNeed"),
           isActive: postState === won.WON.ActiveCompacted,
           isInactive: postState === won.WON.InactiveCompacted,
@@ -146,6 +152,13 @@ function genComponentConf() {
         };
         this.openModalDialog(payload);
       }
+    }
+
+    generateReportPostMailParams() {
+      const subject = `[Report Post] - ${this.postUri}`;
+      const body = `Link to Post: ${this.linkToPost}%0D%0AReason:%0D%0A`; //hint: %0D%0A adds a linebreak
+
+      return `subject=${subject}&body=${body}`;
     }
 
     reOpenPost() {
