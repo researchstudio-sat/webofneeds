@@ -16,6 +16,77 @@
 main.about {
   font-weight: 300;
 
+  & > .about__howto {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 1rem 2rem;
+    @media (max-width: $responsivenessBreakPoint) {
+      padding: 0.5rem;
+    }
+
+    .about__howto__title {
+      text-align: center;
+      color: $won-primary-color;
+      padding-bottom: 0.25rem;
+      font-weight: normal;
+    }
+    h1.about__howto__title {
+      font-size: $bigFontSize;
+    }
+    h2.about__howto__title {
+      font-size: $mediumFontSize;
+    }
+
+    h3.about__howto__subtitle {
+      text-align: center;
+      font-size: $normalFontSize;
+      font-weight: 400;
+      max-width: 16rem;
+      margin: 0 auto;
+    }
+
+    .about__howto__content {
+      display: grid;
+      grid-gap: 1rem;
+
+      &__icon {
+        background: $won-subtitle-gray;
+        --local-primary: #{$won-primary-color};
+      }
+      &__stepcount {
+        background: $won-primary-color;
+      }
+    }
+
+    .about__howto__createx {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-column-gap: 0.5rem;
+      max-width: 30rem;
+      padding-top: 1.5rem;
+      margin: 0 auto;
+      grid-row-gap: 1.5rem;
+
+      &__button {
+        white-space: nowrap;
+      }
+      &__button--pending {
+        white-space: normal;
+      }
+
+      &__button--pending {
+        grid-column: 1 / -1;
+        align-self: center;
+        justify-self: center;
+      }
+
+      &__spanbutton,
+      &__labelledhr {
+        grid-column: 1 / -1;
+      }
+    }
+  }
+
   & > div,
   & > section {
     width: calc(
@@ -100,8 +171,6 @@ main.about {
       }
     }
   }
-  .howto {
-  }
   .spitter-within-section {
     width: 15%;
     margin-top: 3rem;
@@ -140,7 +209,6 @@ main.about {
     background-color: $won-lighter-gray;
     max-width: $maxContentWidth;
     margin: 0 auto;
-
     h2 {
       margin-top: 2em;
       margin-bottom: 1em;

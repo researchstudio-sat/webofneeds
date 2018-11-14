@@ -14,7 +14,7 @@ const serviceDependencies = [
   "$scope" /*'$routeParams' /*injections as strings here*/,
 ];
 
-const workGrid = [
+const howItWorksSteps = [
   {
     svgSrc: "#ico36_description",
     text: "Post your need anonymously",
@@ -190,6 +190,7 @@ class AboutController {
       const theme = getIn(state, ["config", "theme", "name"]);
       return {
         theme,
+        appTitle: getIn(state, ["config", "theme", "title"]),
         imprintTemplate:
           "./skin/" +
           theme +
@@ -201,6 +202,7 @@ class AboutController {
           "/" +
           getIn(state, ["config", "theme", "privacyPolicyTemplate"]),
         peopleGrid: peopleGrid({ theme }),
+        pendingPublishing: state.get("creatingWhatsX"),
       };
     };
     const disconnect = this.$ngRedux.connect(select, actionCreators)(this);
@@ -209,12 +211,37 @@ class AboutController {
 
     this.questions = questions;
     this.peopleGrid = [];
-    this.workGrid = workGrid;
+    this.howItWorksSteps = howItWorksSteps;
     this.moreInfo = false;
+  }
+
+  showAvailableUseCases() {
+    this.router__stateGoAbs("connections", {
+      connectionUri: undefined,
+      postUri: undefined,
+      useCase: undefined,
+      useCaseGroup: "all",
+    });
+  }
+
+  createWhatsAround() {
+    if (!this.pendingPublishing) {
+      this.needs__whatsAround();
+    }
+  }
+
+  createWhatsNew() {
+    if (!this.pendingPublishing) {
+      this.needs__whatsNew();
+    }
   }
 
   toggleMoreInfo() {
     this.moreInfo = !this.moreInfo;
+  }
+
+  getSvgIconFromItem(item) {
+    return item.svgSrc ? item.svgSrc : "#ico36_uc_question";
   }
 }
 

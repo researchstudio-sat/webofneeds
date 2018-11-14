@@ -2,6 +2,49 @@
     <won-topnav></won-topnav>
 </header>
 <main class="about" id="allSections">
+    <section class="about__howto">
+        <h1 class="about__howto__title">How it works</div>
+        <h3 class="about__howto__subtitle">in {{self.howItWorksSteps.length}} Steps</h3>
+        <div class="about__howto__content">
+            <svg class="about__howto__content__icon" ng-repeat="item in self.howItWorksSteps">
+                <use xlink:href="{{ self.getSvgIconFromItem(item) }}" href="{{ self.getSvgIconFromItem(item) }}"/>
+            </svg>
+            <div class="about__howto__content__stepcount" ng-repeat="item in self.howItWorksSteps">
+                {{ $index+1 }}
+            </div>
+        </div>
+        <h2 class="about__howto__title">Ready to start?</h2>
+        <h3 class="about__howto__subtitle">Post your need or offer and let {{ self.appTitle }} do the rest</h3>
+        <div class="about__howto__createx">
+            <button class="about__howto__createx__button--pending won-button--filled red"
+                    ng-if="self.pendingPublishing"
+                    ng-disabled="self.pendingPublishing">
+                <span>Finding out what's going on&hellip;</span>
+            </button>
+
+            <button class="won-button--filled red about__howto__createx__button"
+                    ng-if="!self.pendingPublishing"
+                    ng-click="self.createWhatsAround()"
+                    ng-disabled="self.pendingPublishing">
+                <svg class="won-button-icon" style="--local-primary:white;">
+                    <use xlink:href="#ico36_location_current" href="#ico36_location_current"></use>
+                </svg>
+                <span>What's in your Area?</span>
+            </button>
+            <button class="won-button--filled red about__howto__createx__button"
+                    ng-if="!self.pendingPublishing"
+                    ng-click="self.createWhatsNew()"
+                    ng-disabled="self.pendingPublishing">
+                <span>What's new?</span>
+            </button>
+            <won-labelled-hr label="::'Or'" class="about__howto__createx__labelledhr"></won-labelled-hr>
+            <button class="won-button--filled red about__howto__createx__spanbutton"
+                    ng-click="self.showAvailableUseCases()"
+                    ng-disabled="self.pendingPublishing">
+                <span>Post something now!</span>
+            </button>
+        </div>
+    </section>
     <section class="welcome">
         <div class="title">What is the Web of Needs?</div>
         <won-flex-grid class="fourimgs" items="::self.peopleGrid"></won-flex-grid>
@@ -24,10 +67,6 @@
         </div>
     </section>
     <section>
-        <div class="howto">
-            <div class="title">How it works</div>
-            <won-flex-grid class="fourimgs" items="::self.workGrid"></won-flex-grid>
-        </div>
         <hr class="splitter-within-section" />
         <div class="faq">
             <div class="title">FAQs</div>
