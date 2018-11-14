@@ -770,7 +770,7 @@ function genComponentConf() {
       this.connections__open(this.connectionUri, message);
     }
 
-    sendRequest(message) {
+    sendRequest(message, persona) {
       if (!this.connection || this.isOwnedNeedWhatsX) {
         this.router__stateGoResetParams("connections");
 
