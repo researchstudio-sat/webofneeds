@@ -50,8 +50,7 @@ import won.bot.framework.eventbot.listener.impl.ActionOnFirstEventListener;
 import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.FacetType;
-import won.protocol.model.NeedContentPropertyType;
-import won.protocol.util.NeedModelWrapper;
+import won.protocol.util.DefaultNeedModelWrapper;
 import won.protocol.util.WonRdfUtils;
 
 import java.net.URI;
@@ -658,9 +657,9 @@ public class GroupCycleBot extends EventBot {
 
     private Dataset createNeedDataset(String title, String description) {
         URI needURI = getEventListenerContext().getWonNodeInformationService().generateNeedURI();
-        NeedModelWrapper needModelWrapper = new NeedModelWrapper(needURI.toString());
-        needModelWrapper.setContentPropertyStringValue(NeedContentPropertyType.IS, DC.title, title);
-        needModelWrapper.setContentPropertyStringValue(NeedContentPropertyType.IS, DC.description, description);
+        DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(needURI.toString());
+        needModelWrapper.setTitle(title);
+        needModelWrapper.setDescription(description);
         return needModelWrapper.copyDataset();
     }
 }

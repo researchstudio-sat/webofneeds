@@ -47,9 +47,8 @@
             won:hasFacet         <https://192.168.124.49:8443/won/resource/need/cbfgi37je6kr#groupFacet1> ;
             won:hasFacet         <https://192.168.124.49:8443/won/resource/need/cbfgi37je6kr#groupFacet2> ;
             won:hasSearchString  "test" ;
-            won:is               [ dc:title    "test" ;
-                                   won:hasTag  "test"
-                                 ] ;
+            dc:title    "test" ;
+            won:hasTag  "test" ;
             cert:key             [ cert:PublicKey  [ a                       woncrypt:ECCPublicKey ;
                                                      woncrypt:ecc_algorithm  "EC" ;
                                                      woncrypt:ecc_curveId    "secp384r1" ;

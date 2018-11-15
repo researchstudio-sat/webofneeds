@@ -156,13 +156,13 @@ export function processOpenMessage(event) {
     const currentState = getState();
     const senderNeed = currentState.getIn(["needs", senderNeedUri]);
     const receiverNeed = currentState.getIn(["needs", receiverNeedUri]);
-    const isOwnSenderNeed = senderNeed && senderNeed.get("ownNeed");
-    const isOwnReceiverNeed = receiverNeed && receiverNeed.get("ownNeed");
+    const isOwnSenderNeed = senderNeed && senderNeed.get("isOwned");
+    const isOwnReceiverNeed = receiverNeed && receiverNeed.get("isOwned");
 
     let senderConnectionP;
     if (!senderConnectionUri || !isOwnSenderNeed) {
       console.debug(
-        "senderConnectionUri was null or senderNeed is not ownNeed, resolve promise with undefined -> ignore the connection"
+        "senderConnectionUri was null or senderNeed is not ownedNeed, resolve promise with undefined -> ignore the connection"
       );
       senderConnectionP = Promise.resolve(undefined);
     } else if (
@@ -186,7 +186,7 @@ export function processOpenMessage(event) {
     let receiverConnectionP;
     if (!receiverConnectionUri || !isOwnReceiverNeed) {
       console.debug(
-        "receiverConnectionUri was null or receiverNeed is not ownNeed, resolve promise with undefined -> ignore the connection"
+        "receiverConnectionUri was null or receiverNeed is not ownedNeed, resolve promise with undefined -> ignore the connection"
       );
       receiverConnectionP = Promise.resolve(undefined);
     } else if (
@@ -223,8 +223,8 @@ export function processOpenMessage(event) {
             payload: {
               updatedConnection: receiverConnectionUri,
               connection: receiverConnection,
-              ownNeedUri: receiverNeedUri,
-              ownNeed: receiverNeed,
+              ownedNeedUri: receiverNeedUri,
+              ownedNeed: receiverNeed,
               remoteNeed: senderNeed,
               receivedEvent: event.getMessageUri(), // the more relevant event. used for unread-counter.
               message: event,
@@ -262,7 +262,7 @@ export function processConnectionMessage(event) {
   return (dispatch, getState) => {
     if (isFetchMessageEffectsNeeded(event)) {
       const _needUri = event.getSenderNeed();
-      const isSentEvent = getState().getIn(["needs", _needUri, "ownNeed"]);
+      const isSentEvent = getState().getIn(["needs", _needUri, "isOwned"]);
 
       let connectionUri;
       let needUri;
@@ -509,13 +509,13 @@ export function processConnectMessage(event) {
     const currentState = getState();
     const senderNeed = currentState.getIn(["needs", senderNeedUri]);
     const receiverNeed = currentState.getIn(["needs", receiverNeedUri]);
-    const isOwnSenderNeed = senderNeed && senderNeed.get("ownNeed");
-    const isOwnReceiverNeed = receiverNeed && receiverNeed.get("ownNeed");
+    const isOwnSenderNeed = senderNeed && senderNeed.get("isOwned");
+    const isOwnReceiverNeed = receiverNeed && receiverNeed.get("isOwned");
 
     let senderCP;
     if (!senderConnectionUri || !isOwnSenderNeed) {
       console.debug(
-        "senderConnectionUri was null or senderNeed is not ownNeed, resolve promise with undefined -> ignore the connection"
+        "senderConnectionUri was null or senderNeed is not ownedNeed, resolve promise with undefined -> ignore the connection"
       );
       senderCP = Promise.resolve(undefined);
     } else if (
@@ -539,7 +539,7 @@ export function processConnectMessage(event) {
     let receiverCP;
     if (!receiverConnectionUri || !isOwnReceiverNeed) {
       console.debug(
-        "receiverConnectionUri was null or receiverNeed is not ownNeed, resolve promise with undefined -> ignore the connection"
+        "receiverConnectionUri was null or receiverNeed is not ownedNeed, resolve promise with undefined -> ignore the connection"
       );
       receiverCP = Promise.resolve(undefined);
     } else if (
@@ -581,8 +581,8 @@ export function processConnectMessage(event) {
                 "hasConnectionState",
                 won.WON.RequestReceived
               ),
-              ownNeedUri: receiverNeedUri,
-              ownNeed: receiverNeed,
+              ownedNeedUri: receiverNeedUri,
+              ownedNeed: receiverNeed,
               remoteNeed: senderNeed,
               receivedEvent: event.getMessageUri(), // the more relevant event. used for unread-counter.
               message: event,
@@ -1009,7 +1009,7 @@ export function dispatchActionOnSuccessRemote(event) {
 
     if (toAutoClaim) {
       const theirConnectionUri = event.getSender();
-      const ownNeedUri = event.getReceiverNeed();
+      const ownedNeedUri = event.getReceiverNeed();
       const ownNodeUri = event.getReceiverNode();
       const theirNeedUri = event.getSenderNeed();
       const theirNodeUri = event.getSenderNode();
@@ -1036,7 +1036,7 @@ export function dispatchActionOnSuccessRemote(event) {
         payload: {
           messageUri: event.getIsRemoteResponseTo(),
           connectionUri: connectionUri,
-          needUri: ownNeedUri,
+          needUri: ownedNeedUri,
           claimed: true,
         },
       });
@@ -1046,7 +1046,7 @@ export function dispatchActionOnSuccessRemote(event) {
         additionalContent: undefined,
         referencedContentUris: referencedContentUris,
         connectionUri,
-        ownNeedUri,
+        ownedNeedUri,
         theirNeedUri,
         ownNodeUri,
         theirNodeUri,

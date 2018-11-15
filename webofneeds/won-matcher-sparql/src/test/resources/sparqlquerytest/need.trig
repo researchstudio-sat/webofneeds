@@ -62,9 +62,8 @@
             a                    won:Need ;
             won:doNotMatchAfter  "2018-09-19T14:57:31.676Z"^^xsd:dateTime ;
             won:hasFacet         won:ChatFacet ;
-            won:is               [ a           won:RealEstateRentDemand ;
-                                   won:hasTag  "SearchRealEstateToRent"
-                                 ] ;
+            a           won:RealEstateRentDemand ;
+            won:hasTag  "SearchRealEstateToRent" ;
             won:seeks            [ a                     won:RealEstateRentOffer ;
                                    won:hasTag            "RentOutRealEstate" ;
                                    s:priceSpecification  <https://satvm05.researchstudio.at/won/resource/need/qhj15b6jojuk/rentRange/wjcmtrhwuh>

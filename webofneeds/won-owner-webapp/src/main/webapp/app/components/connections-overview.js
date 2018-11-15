@@ -303,10 +303,10 @@ function genComponentConf() {
       });
     }
 
-    toggleDetails(ownNeedUri) {
-      if (this.isOpen(ownNeedUri)) {
-        this.open[ownNeedUri] = false;
-        if (this.isOpenByConnection(ownNeedUri)) {
+    toggleDetails(ownedNeedUri) {
+      if (this.isOpen(ownedNeedUri)) {
+        this.open[ownedNeedUri] = false;
+        if (this.isOpenByConnection(ownedNeedUri)) {
           this.router__stateGoCurrent({
             useCase: undefined,
             useCaseGroup: undefined,
@@ -314,7 +314,7 @@ function genComponentConf() {
           });
         }
       } else {
-        this.open[ownNeedUri] = true;
+        this.open[ownedNeedUri] = true;
       }
     }
 
@@ -341,16 +341,16 @@ function genComponentConf() {
       this.toggleClosedNeedsDisplay();
     }
 
-    isOpen(ownNeedUri) {
-      return this.isOpenByConnection(ownNeedUri) || !!this.open[ownNeedUri];
+    isOpen(ownedNeedUri) {
+      return this.isOpenByConnection(ownedNeedUri) || !!this.open[ownedNeedUri];
     }
 
-    isLoading(ownNeed) {
-      return ownNeed.get("isLoading");
+    isLoading(ownedNeed) {
+      return ownedNeed.get("isLoading");
     }
 
-    isOpenByConnection(ownNeedUri) {
-      return this.needUriImpliedInRoute === ownNeedUri;
+    isOpenByConnection(ownedNeedUri) {
+      return this.needUriImpliedInRoute === ownedNeedUri;
     }
 
     selectConnection(connectionUri) {

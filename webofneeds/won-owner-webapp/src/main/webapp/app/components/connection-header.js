@@ -89,9 +89,12 @@ function genComponentConf() {
       this.labels = labels;
       this.WON = won.WON;
       const selectFromState = state => {
-        const ownNeed = getOwnedNeedByConnectionUri(state, this.connectionUri);
+        const ownedNeed = getOwnedNeedByConnectionUri(
+          state,
+          this.connectionUri
+        );
         const connection =
-          ownNeed && ownNeed.getIn(["connections", this.connectionUri]);
+          ownedNeed && ownedNeed.getIn(["connections", this.connectionUri]);
         const theirNeed =
           connection &&
           getNonOwnedNeeds(state).get(connection.get("remoteNeedUri"));
@@ -125,7 +128,7 @@ function genComponentConf() {
 
         return {
           connection,
-          ownNeed,
+          ownedNeed,
           theirNeed,
           latestMessageHumanReadableString,
           latestMessageUnread,
@@ -156,8 +159,8 @@ function genComponentConf() {
       return (
         !this.connection ||
         !this.theirNeed ||
-        !this.ownNeed ||
-        this.ownNeed.get("isLoading") ||
+        !this.ownedNeed ||
+        this.ownedNeed.get("isLoading") ||
         this.theirNeed.get("isLoading") ||
         this.connection.get("isLoading")
       );

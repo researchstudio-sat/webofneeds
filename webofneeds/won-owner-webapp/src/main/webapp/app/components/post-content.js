@@ -41,17 +41,10 @@ function genComponentConf() {
           <won-gallery ng-if="self.post.get('hasImages')">
           </won-gallery>
 
-          <!-- SEARCH STRING -->
-          <won-title-viewer
-            ng-if="self.isPureSearch && self.searchString"
-            content="self.searchString"
-            detail="::{ label: 'Searching for' }">
-          </won-title-viewer>
-
           <!-- DETAIL INFORMATION -->
-          <won-post-is-or-seeks-info branch="::'is'" ng-if="self.hasIsBranch" post-uri="self.post.get('uri')"></won-post-is-or-seeks-info>
-          <won-labelled-hr label="::'Search'" class="cp__labelledhr" ng-show="self.hasIsBranch && self.hasSeeksBranch"></won-labelled-hr>
-          <won-post-is-or-seeks-info branch="::'seeks'" ng-if="self.hasSeeksBranch && !self.isPureSearch" post-uri="self.post.get('uri')"></won-post-is-or-seeks-info>
+          <won-post-is-or-seeks-info branch="::'content'" ng-if="self.hasContent" post-uri="self.post.get('uri')"></won-post-is-or-seeks-info>
+          <won-labelled-hr label="::'Search'" class="cp__labelledhr" ng-show="self.hasContent && self.hasSeeksBranch"></won-labelled-hr>
+          <won-post-is-or-seeks-info branch="::'seeks'" ng-if="self.hasSeeksBranch" post-uri="self.post.get('uri')"></won-post-is-or-seeks-info>
           <div class="post-info__content__rdf" ng-if="self.shouldShowRdf">
             <h2 class="post-info__heading">
                 RDF
@@ -84,9 +77,6 @@ function genComponentConf() {
   class Controller {
     constructor() {
       attach(this, serviceDependencies, arguments);
-
-      this.is = "is";
-      this.seeks = "seeks";
       this.labels = labels;
 
       window.postcontent4dbg = this;
@@ -94,30 +84,23 @@ function genComponentConf() {
       const selectFromState = state => {
         const openConnectionUri = getConnectionUriFromRoute(state);
         const post = state.getIn(["needs", this.postUri]);
-        const is = post ? post.get("is") : undefined;
+        const content = post ? post.get("content") : undefined;
 
         //TODO it will be possible to have more than one seeks
-        const seeks = post ? post.get("seeks") : undefined;
+        const seeks = post && post.get("seeks");
 
-        const isPureSearch =
-          post &&
-          is === undefined &&
-          seeks === undefined &&
-          post.get("searchString");
-
-        const searchString = post ? post.get("searchString") : undefined; //workaround to display searchString only in seeks
+        const hasContent = content && content.size > 0;
+        const hasSeeksBranch = seeks && seeks.size > 0;
 
         return {
           WON: won.WON,
-          hasIsBranch: !!is,
-          hasSeeksBranch: !!seeks,
+          hasContent,
+          hasSeeksBranch,
           post,
           createdTimestamp: post && post.get("creationDate"),
           shouldShowRdf: state.get("showRdf"),
           fromConnection: !!openConnectionUri,
           openConnectionUri,
-          isPureSearch: isPureSearch,
-          searchString: searchString,
         };
       };
       connect2Redux(selectFromState, actionCreators, ["self.postUri"], this);

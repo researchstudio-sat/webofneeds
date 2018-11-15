@@ -305,20 +305,20 @@ export function getRandomWonId() {
  * and in the messageDetails
  */
 export function getAllDetails() {
-  let details = {};
+  let allDetails = {};
 
   if (hasSubElements(useCases)) {
     for (const useCaseKey in useCases) {
       const useCase = useCases[useCaseKey];
       if (useCase) {
-        const isDetails = useCase.isDetails ? useCase.isDetails : {};
+        const details = useCase.details ? useCase.details : {};
         const seeksDetails = useCase.seeksDetails ? useCase.seeksDetails : {};
-        details = { ...details, ...isDetails, ...seeksDetails };
+        allDetails = { ...allDetails, ...details, ...seeksDetails };
       }
     }
   }
 
-  return Object.assign({}, messageDetails, details);
+  return Object.assign({}, messageDetails, allDetails);
 }
 
 /**
@@ -338,9 +338,9 @@ export function getAllMessageDetails() {
     for (const useCaseKey in useCases) {
       const useCase = useCases[useCaseKey];
       if (useCase) {
-        const isDetails = useCase.isDetails ? useCase.isDetails : {};
+        const details = useCase.details ? useCase.details : {};
         const seeksDetails = useCase.seeksDetails ? useCase.seeksDetails : {};
-        allDetails = { ...allDetails, ...isDetails, ...seeksDetails };
+        allDetails = { ...allDetails, ...details, ...seeksDetails };
       }
     }
   }
@@ -459,7 +459,7 @@ export function createDocumentDefinitionFromPost(post) {
   if (!post) return;
 
   let title = { text: post.get("humanReadable"), style: "title" };
-  let isHeader = { text: "I Offer", style: "branchHeader" };
+  let contentHeader = { text: "Description", style: "branchHeader" };
   let seeksHeader = { text: "Looking For", style: "branchHeader" };
 
   let content = [];
@@ -467,10 +467,10 @@ export function createDocumentDefinitionFromPost(post) {
 
   const allDetails = getAllDetails();
 
-  const isBranch = post.get("is");
-  if (isBranch) {
-    content.push(isHeader);
-    isBranch.map((detailValue, detailKey) => {
+  const postContent = post.get("content");
+  if (postContent) {
+    content.push(contentHeader);
+    postContent.map((detailValue, detailKey) => {
       const detailJS =
         detailValue && Immutable.Iterable.isIterable(detailValue)
           ? detailValue.toJS()
