@@ -33,7 +33,7 @@ class ConnectionsController {
     this.SEARCH = "search";
     this.POST = "post";
 
-    const scrollArea = this.$element[0].querySelector(".connectionscontent");
+    const scrollArea = this.$element[0].querySelector(".overview__content");
 
     this.scrollBuffer = callBuffer(scrollPosition => {
       self.mainViewScrolled(scrollPosition);

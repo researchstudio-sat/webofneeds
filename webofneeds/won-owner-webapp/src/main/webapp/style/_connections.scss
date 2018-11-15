@@ -3,7 +3,10 @@
 @import "fonts";
 @import "flex-layout";
 
-.connectionscontent {
+header.overview__header {
+}
+
+main.overview__content {
   display: flex;
   justify-content: center;
   align-content: center;
@@ -13,7 +16,7 @@
 
   @include empty-description("opc");
 
-  .conn__list {
+  .overview__content__left {
     flex-grow: 1;
     max-width: $maxContentWidth / 2;
 
@@ -22,7 +25,7 @@
     }
   }
 
-  .conn__content {
+  .overview__content__right {
     display: flex;
     flex-grow: 1;
     height: 100%;
@@ -84,4 +87,10 @@
       }
     }
   }
+}
+
+footer.overview__footer {
+  border-top: $thinBorderWidth solid $won-line-gray;
+  background: white;
+  padding: 0.5rem;
 }

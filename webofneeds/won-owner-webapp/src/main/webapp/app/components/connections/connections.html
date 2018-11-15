@@ -1,30 +1,29 @@
-<header>
+<header class="overview__header">
     <won-topnav></won-topnav>
 </header>
-<main class="connectionscontent">
-
+<main class="overview__content">
     <!-- LEFT SIDE -->
-    <div class="conn__list" ng-class="{'hide-in-responsive': !self.hasOwnNeeds || self.connection || self.selectedPost || !!self.useCaseGroup || !!self.useCase}">
+    <div class="overview__content__left" ng-class="{'hide-in-responsive': !self.hasOwnNeeds || self.connection || self.selectedPost || !!self.useCaseGroup || !!self.useCase}">
         <won-connections-overview on-selected-connection="self.selectedConnection(connectionUri)" on-selected-need="self.selectedNeed(needUri)"
             open="self.open">
         </won-connections-overview>
     </div>
 
     <!-- RIGHT SIDE -->
-    <div class="conn__content" ng-if="!self.selectedPost && (!self.connection || self.connectionType === self.WON.Closed) && !self.useCase && !self.useCaseGroup"
+    <div class="overview__content__right" ng-if="!self.selectedPost && (!self.connection || self.connectionType === self.WON.Closed) && !self.useCase && !self.useCaseGroup"
         ng-class="{'hide-in-responsive' : self.hasOwnNeeds}">
-        <div class="conn__content__welcome">
-            <div class="conn__content__welcome__text" ng-include="self.welcomeTemplate"></div>
+        <div class="overview__content__right__welcome">
+            <div class="overview__content__right__welcome__text" ng-include="self.welcomeTemplate"></div>
             <won-usecase-picker></won-usecase-picker>
-            <div class="conn__content__welcome__howto">
-                <div  class="conn__content__welcome__howto__label">{{ self.appTitle }} connects people's needs to their solutions</div>
-                <a class="conn__content__welcome__howto__button won-button--filled red" href="{{ self.absHRef(self.$state, 'about', {'#': 'aboutHowTo'}) }}">
+            <div class="overview__content__right__welcome__howto">
+                <div  class="overview__content__right__welcome__howto__label">{{ self.appTitle }} connects people's needs to their solutions</div>
+                <a class="overview__content__right__welcome__howto__button won-button--filled red" href="{{ self.absHRef(self.$state, 'about', {'#': 'aboutHowTo'}) }}">
                     <span>How {{ self.appTitle }} works?</span>
                 </a>
             </div>
         </div>
     </div>
-    <div class="conn__content" ng-if="self.useCase || self.useCaseGroup || self.selectedPost || (self.connection && self.connectionType !== self.WON.Closed)">
+    <div class="overview__content__right" ng-if="self.useCase || self.useCaseGroup || self.selectedPost || (self.connection && self.connectionType !== self.WON.Closed)">
         <won-usecase-picker ng-if="!self.useCase && (!!self.useCaseGroup) && self.useCaseGroup === 'all' && !self.selectedPost && !self.connection"></won-usecase-picker>
         <won-usecase-group ng-if="!self.useCase && (!!self.useCaseGroup) && self.useCaseGroup !== 'all' && !self.selectedPost && !self.connection"></won-usecase-group>
         <won-create-post ng-if="(!!self.useCase) && self.useCase !== 'search' && !self.selectedPost && !self.connection"></won-create-post>
@@ -33,3 +32,12 @@
         <won-post-info include-header="true" ng-if="self.selectedPost && !self.useCaseGroup"></won-post-info>
     </div>
 </main>
+<footer class="overview__footer">
+    <div class="overview__footer__links">
+        <a class="overview__footer__links__link" href="{{ self.absHRef(self.$state, 'about', {'#': 'aboutImprint'}) }}">About</a>
+        <span class="overview__footer__links__divider">|</span>
+        <a class="overview__footer__links__link" href="{{ self.absHRef(self.$state, 'about', {'#': 'aboutPrivacyPolicy'}) }}">Privacy</a>
+        <span class="overview__footer__links__divider">|</span>
+        <a class="overview__footer__links__link" href="{{ self.absHRef(self.$state, 'about', {'#': 'aboutFaq'}) }}">FAQ</a>
+    </div>
+</footer>
