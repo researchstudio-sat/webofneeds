@@ -5,13 +5,37 @@
     <section class="about__howto">
         <h1 class="about__howto__title">How it works</div>
         <h3 class="about__howto__subtitle">in {{self.howItWorksSteps.length}} Steps</h3>
-        <div class="about__howto__content">
-            <svg class="about__howto__content__icon" ng-repeat="item in self.howItWorksSteps">
-                <use xlink:href="{{ self.getSvgIconFromItem(item) }}" href="{{ self.getSvgIconFromItem(item) }}"/>
-            </svg>
-            <div class="about__howto__content__stepcount" ng-repeat="item in self.howItWorksSteps">
-                {{ $index+1 }}
+        <div class="about__howto__grid">
+            <div class="about__howto__content" ng-style="{'--howToColCount': self.howItWorksSteps.length}"> <!-- TODO: this var injection does not work -->
+                <svg class="about__howto__content__icon" ng-repeat="item in self.howItWorksSteps">
+                    <use xlink:href="{{ self.getSvgIconFromItem(item) }}" href="{{ self.getSvgIconFromItem(item) }}"/>
+                </svg>
+                <div class="about__howto__content__stepcount"
+                     ng-repeat="item in self.howItWorksSteps"
+                     ng-class="{'about__howto__content__stepcount--selected': $index == self.selectedHowItWorksStep}"
+                     ng-click="self.selectedHowItWorksStep = $index">
+                    {{ $index+1 }}
+                </div>
+                <div class="about__howto__content__stepline"></div>
             </div>
+            <svg class="about__howto__step__icon about__howto__step__icon--prev"
+                 ng-class="{'about__howto__step__icon--invisible': self.selectedHowItWorksStep <= 0}"
+                 ng-click="self.selectedHowItWorksStep = self.selectedHowItWorksStep - 1">
+                <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"/>
+            </svg>
+            <div class="about__howto__step__description">
+                <div class="about__howto__step__description__title">
+                    {{ self.howItWorksSteps[self.selectedHowItWorksStep].title }}
+                </div>
+                <div class="about__howto__step__description__text">
+                    {{ self.howItWorksSteps[self.selectedHowItWorksStep].text }}
+                </div>
+            </div>
+            <svg class="about__howto__step__icon about__howto__step__icon--next"
+                 ng-class="{'about__howto__step__icon--invisible': self.selectedHowItWorksStep >= (self.howItWorksSteps.length-1)}"
+                 ng-click="self.selectedHowItWorksStep = self.selectedHowItWorksStep + 1">
+                <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"/>
+            </svg>
         </div>
         <h2 class="about__howto__title">Ready to start?</h2>
         <h3 class="about__howto__subtitle">Post your need or offer and let {{ self.appTitle }} do the rest</h3>

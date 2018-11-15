@@ -17,28 +17,28 @@ const serviceDependencies = [
 const howItWorksSteps = [
   {
     svgSrc: "#ico36_description",
-    text: "Post your need anonymously",
-    detail:
+    title: "Post your need anonymously",
+    text:
       "Needs can be very personal, so privacy is important. You don't have to reveal your identity here.",
   },
   {
     svgSrc: "#ico36_match",
-    text: "Get matches",
-    detail:
+    title: "Get matches",
+    text:
       "Based on the" +
       " information you provide, we will try to connect you with others",
   },
   {
     svgSrc: "#ico36_incoming",
-    text: "Request contact – or be contacted",
-    detail:
+    title: "Request contact – or be contacted",
+    text:
       "If you're interested," +
       " make a contact request - or get one if your counterpart is faster than you",
   },
   {
     svgSrc: "#ico36_message",
-    text: "Interact and exchange",
-    detail:
+    title: "Interact and exchange",
+    text:
       "You found someone" +
       " who has what you need, wants to meet or change something in your common environment? Go chat with them! ",
   },
@@ -212,6 +212,7 @@ class AboutController {
     this.questions = questions;
     this.peopleGrid = [];
     this.howItWorksSteps = howItWorksSteps;
+    this.selectedHowItWorksStep = 0;
     this.moreInfo = false;
   }
 
