@@ -15,7 +15,6 @@ import {
   getOwnedNeedByConnectionUri,
   getOwnedNeeds,
 } from "../../selectors/general-selectors.js";
-import { resetParams } from "../../configRouting.js";
 import * as srefUtils from "../../sref-utils.js";
 
 import "style/_connections.scss";
@@ -29,7 +28,6 @@ class ConnectionsController {
     Object.assign(this, srefUtils);
     const self = this;
     this.WON = won.WON;
-    this.resetParams = resetParams;
     this.open = {};
 
     this.SEARCH = "search";

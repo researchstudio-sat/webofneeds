@@ -2,7 +2,30 @@
     <won-topnav></won-topnav>
 </header>
 <main class="about" id="allSections">
+    <a id="aboutTop"></a>
+    <section class="about__welcome">
+        <div class="about__welcome__title">What is the Web of Needs?</div>
+        <won-flex-grid class="about__welcome__grid" items="::self.peopleGrid"></won-flex-grid>
+        <div class="about__welcome__description">
+            <span class="about__welcome__description__title">What is a &laquo;need&raquo;?</span>
+            <span class="about__welcome__description__text">A need helps you find people who can help you - or who share your interest.</span>
+            <span class="about__welcome__description__more clickable" ng-click="::self.toggleMoreInfo()">Read more</span>
+
+            <svg style="--local-primary:var(--won-primary-color);" class="about__welcome__description__arrow clickable" ng-click="::self.toggleMoreInfo()" ng-show="!self.moreInfo">
+                <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
+            </svg>
+
+            <svg style="--local-primary:var(--won-primary-color);" class="about__welcome__description__arrow clickable" ng-click="::self.toggleMoreInfo()" ng-show="self.moreInfo">
+                <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
+            </svg>
+
+            <span class="about__welcome__description__text" ng-show="self.moreInfo">A need is much like an automatic classified ad. You say what you are looking for, and other such ads will be
+                matched with yours. You could think of it as of a long-lived search query that can itself be found by others.
+                Once you found a useful match, you can connect to it and start to chat.</span>
+        </div>
+    </section>
     <section class="about__howto">
+        <a id="aboutHowTo"></a>
         <h1 class="about__howto__title">How it works</div>
         <h3 class="about__howto__subtitle">in {{self.howItWorksSteps.length}} Steps</h3>
         <div class="about__howto__steps">
@@ -69,42 +92,36 @@
             </button>
         </div>
     </section>
-    <section class="welcome">
-        <div class="title">What is the Web of Needs?</div>
-        <won-flex-grid class="fourimgs" items="::self.peopleGrid"></won-flex-grid>
-        <div class="w__description">
-            <span class="wd__title">What is a &laquo;need&raquo;?</span>
-            <span class="wd__text">A need helps you find people who can help you - or who share your interest.</span>
-            <span class="wd__more clickable" ng-click="::self.toggleMoreInfo()">Read more</span>
-
-            <svg style="--local-primary:var(--won-primary-color);" class="wd__arrow clickable" ng-click="::self.toggleMoreInfo()" ng-show="!self.moreInfo">
-                <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
-            </svg>
-
-            <svg style="--local-primary:var(--won-primary-color);" class="wd__arrow clickable" ng-click="::self.toggleMoreInfo()" ng-show="self.moreInfo">
-                <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
-            </svg>
-
-            <span class="wd__text" ng-show="self.moreInfo">A need is much like an automatic classified ad. You say what you are looking for, and other such ads will be
-                matched with yours. You could think of it as of a long-lived search query that can itself be found by others.
-                Once you found a useful match, you can connect to it and start to chat.</span>
+    <section class="about__footer">
+        <a id="aboutFooter"></a>
+        <div class="about__footer__title">
+            <img src="skin/{{self.themeName}}/images/logo.svg" class="about__footer__title__logo">
+            <div class="about__footer__title__appTitle">
+                {{ self.appTitle }}
+            </div>
+            <div class="about__footer__title__tagLine">Web Of Needs</div>
+        </div>
+        <div class="about__footer__links"> <!-- TODO FIX LINKS -->
+            <a class="about__footer__links__link" href="{{ self.absHRef(self.$state, 'about', {'#': 'aboutImprint'}) }}">About</a>
+            <span class="about__footer__links__divider">|</span>
+            <a class="about__footer__links__link" href="{{ self.absHRef(self.$state, 'about', {'#': 'aboutPrivacyPolicy'}) }}">Privacy</a>
+            <span class="about__footer__links__divider">|</span>
+            <a class="about__footer__links__link" href="{{ self.absHRef(self.$state, 'about', {'#': 'aboutFaq'}) }}">FAQ</a>
         </div>
     </section>
-    <section>
-        <hr class="splitter-within-section" />
-        <div class="faq">
-            <div class="title">FAQs</div>
-            <won-accordion items="::self.questions"></won-accordion>
-        </div>
+    <section class="about__faq">
+        <a id="aboutFaq"></a>
+        <div class="about__faq__title">FAQs</div>
+        <won-accordion class="about__faq__questions" items="::self.questions"></won-accordion>
     </section>
-    <section class="imprint">
-        <a id="imprint"></a>
-        <div class="title">Imprint</div>
-        <div class="sub title" ng-include="self.imprintTemplate"></div>
+    <section class="about__privacyPolicy">
+        <a id="aboutPrivacyPolicy"></a>
+        <div class="about__privacyPolicy__title">Privacy Policy</div>
+        <div class="about__privacyPolicy__text" ng-include="self.privacyPolicyTemplate"></div>
     </section>
-    <section class="privacyPolicy">
-        <a id="privacyPolicy"></a>
-        <div class="title">Privacy Policy</div>
-        <div ng-include="self.privacyPolicyTemplate"></div>
+    <section class="about__imprint">
+        <a id="aboutImprint"></a>
+        <div class="about__imprint__title">Imprint</div>
+        <div class="about__imprint__text" ng-include="self.imprintTemplate"></div>
     </section>
 </main>

@@ -2,28 +2,97 @@
 @import "sizing-utils";
 @import "fonts";
 
-.curtain {
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background: $won-dark-purple;
-  opacity: 0.5;
-  z-index: 1001;
-}
-
 main.about {
   font-weight: 300;
 
-  & > .about__howto {
+  //General Section styling
+  & > section {
     width: 100%;
     box-sizing: border-box;
-    padding: 1rem 2rem;
+
+    padding: 4rem $minContentPadding 7rem $minContentPadding;
     @media (max-width: $responsivenessBreakPoint) {
-      padding: 0.5rem;
+      padding-top: 2rem;
+      padding-bottom: 4rem;
+      padding-left: 0.5rem;
+      padding-right: 0.5rem;
+    }
+  }
+
+  & > .about__welcome {
+    background-color: $won-secondary-color;
+    color: white;
+    font-family: $font-family-sans-serif;
+    background-image: url("../images/network_left-upper-corner.svg"),
+      url("../images/network_right-lower-corner.svg");
+    background-position: left top, right bottom;
+    background-repeat: no-repeat;
+    /* * @ background-size:
+       * values have been determined via fiddling/experimenting and should provide
+       * a smooth transition with a relative size for the background up to a
+       * maximum size. */
+    background-size: auto 70%, auto 100%;
+    @media (max-width: 85rem) {
+      background-size: auto 70%, 31.7% auto;
+    }
+    @media (max-width: 63rem) {
+      background-size: 60% auto, 31.7% auto;
     }
 
+    .about__welcome__title {
+      text-align: center;
+      font-size: $bigFontSize;
+      padding-bottom: 2rem;
+      color: white;
+    }
+
+    .about__welcome__grid {
+      margin-left: auto;
+      margin-right: auto;
+      $fourPortraitsWidth: 59rem;
+      width: $fourPortraitsWidth;
+      @media (max-width: $fourPortraitsWidth) {
+        width: $fourPortraitsWidth / 2;
+      }
+      @media (max-width: $responsivenessBreakPoint) {
+        width: $fourPortraitsWidth / 4;
+      }
+      @media (max-width: $fourPortraitsWidth / 2) {
+        width: $fourPortraitsWidth / 4;
+      }
+    }
+
+    .about__welcome__description {
+      margin: 0 auto;
+      max-width: 30rem;
+      text-align: center;
+      padding: 1rem;
+      font-size: $smallFontSize;
+      font-weight: 400;
+      &__title {
+        display: block;
+        color: $won-primary-color;
+        font-size: $normalFontSize;
+        border-top: $thinBorderWidth solid $won-dark-purple;
+        max-width: 22rem;
+        margin: 0 auto;
+      }
+      &__text {
+        text-align: left;
+        display: block;
+      }
+      &__more {
+        color: $won-primary-color;
+      }
+      &__arrow {
+        display: block;
+        margin: 0 auto;
+        @include fixed-square(1rem);
+      }
+    }
+  }
+
+  & > .about__howto {
     .about__howto__title {
       text-align: center;
       color: $won-primary-color;
@@ -59,13 +128,13 @@ main.about {
 
       &__process {
         --howToColCount: 4; //Todo: figure out a way to inject this var from angular
-        --iconSize: 4rem;
+        --iconSize: 7rem;
         --stepIndicatorSize: 2rem;
         --stepIndicatorBorderWidth: 0.25rem;
 
         grid-column: 2;
         display: grid;
-        grid-column-gap: 1rem;
+        grid-column-gap: 2rem;
         grid-template-columns: repeat(var(--howToColCount), min-content);
         justify-items: center;
 
@@ -209,138 +278,137 @@ main.about {
     }
   }
 
-  & > div,
-  & > section {
-    width: calc(
-      100% - #{$minContentPadding} * 2
-    ); //we do have to remove the 2rem padding for each subdiv otherwise we would have a horizontal scrollbar
-    // box-sizing: border-box did not work (the height property was faulty then
-    padding-left: $minContentPadding;
-    padding-right: $minContentPadding;
-    padding-top: 7rem;
-    padding-bottom: 4rem;
-    @media (max-width: $responsivenessBreakPoint) {
-      padding-top: 4rem;
+  & > .about__imprint {
+    background-color: $won-primary-color;
+    .about__imprint__title {
+      color: white;
+      text-align: center;
+      font-size: $bigFontSize;
       padding-bottom: 2rem;
     }
-  }
-  .fourimgs {
-    margin-left: auto;
-    margin-right: auto;
-    $fourPortraitsWidth: 59rem;
-    width: $fourPortraitsWidth;
-    @media (max-width: $fourPortraitsWidth) {
-      width: $fourPortraitsWidth / 2;
-    }
-    @media (max-width: $responsivenessBreakPoint) {
-      width: $fourPortraitsWidth / 4;
-    }
-    @media (max-width: $fourPortraitsWidth / 2) {
-      width: $fourPortraitsWidth / 4;
-    }
-  }
-  .welcome {
-    background-color: $won-secondary-color;
-    color: white;
-    font-family: $font-family-sans-serif;
-    background-image: url("../images/network_left-upper-corner.svg"),
-      url("../images/network_right-lower-corner.svg");
-    background-position: left top, right bottom;
-    background-repeat: no-repeat;
-    /* * @ background-size:
-       * values have been determined via fiddling/experimenting and should provide
-       * a smooth transition with a relative size for the background up to a
-       * maximum size. */
-    background-size: auto 70%, auto 100%;
-    @media (max-width: 85rem) {
-      background-size: auto 70%, 31.7% auto;
-    }
-    @media (max-width: 63rem) {
-      background-size: 60% auto, 31.7% auto;
-    }
-    .title {
-      color: white;
-    }
-    .w__description {
-      margin: 0 auto;
-      max-width: 30rem;
-      text-align: center;
-      padding: 1rem;
-      font-size: $smallFontSize;
-      font-weight: 400;
-      .wd__title {
-        display: block;
-        color: $won-primary-color;
-        font-size: $normalFontSize;
-        border-top: $thinBorderWidth solid $won-dark-purple;
-        padding-top: 0.5rem;
-        max-width: 22rem;
-        margin: 0 auto;
-      }
-      .wd__text {
-        padding-top: 1rem;
-        padding-bottom: 0.5rem;
-        text-align: left;
-        display: block;
-      }
-      .wd__more {
-        color: $won-primary-color;
-      }
-      .wd__arrow {
-        display: block;
-        margin: 0 auto;
-        width: 1rem;
-      }
-    }
-  }
-  .spitter-within-section {
-    width: 15%;
-    margin-top: 3rem;
-    margin-bottom: 3rem;
-  }
-  .faq {
-    background-color: $won-lighter-gray;
-    won-accordion {
-      display: block;
-      max-width: 30rem;
-      margin: 0 auto;
-    }
-  }
-  .title {
-    text-align: center;
-    font-size: $bigFontSize;
-    padding-bottom: 2rem;
-  }
-  .imprint {
-    background-color: $won-primary-color;
-    .title {
-      color: white;
-    }
-    .sub {
+
+    .about__imprint__text {
       font-size: $normalFontSize;
-    }
-    a {
-      text-decoration: none;
       color: white;
-    }
-    p {
-      margin-bottom: 1em;
+      text-align: center;
+
+      a {
+        text-decoration: none;
+        color: white;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+
+      p {
+        margin-bottom: 1em;
+      }
     }
   }
-  .privacyPolicy {
+
+  & > .about__footer {
+    background-color: $won-secondary-color; //TODO: change to primary-color when you figured out where the stylable logo is
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+    @media (max-width: $responsivenessBreakPoint) {
+      padding-top: 1rem;
+      padding-bottom: 1rem;
+    }
+
+    .about__footer__title {
+      display: grid;
+      grid-template-columns: max-content max-content;
+      grid-template-rows: min-content min-content;
+      grid-column-gap: 0.5rem;
+      color: #fff;
+      justify-content: center;
+
+      &__logo {
+        grid-row: 1 / span 2;
+        --local-primary: white;
+        height: 5rem;
+      }
+
+      &__appTitle {
+        align-self: flex-end;
+        font-size: $mediumFontSize;
+      }
+      &__tagLine {
+        align-self: flex-start;
+        font-size: $smallFontSize;
+      }
+    }
+    .about__footer__links {
+      padding-top: 3rem;
+      display: flex;
+      justify-content: center;
+      font-size: $smallFontSize;
+
+      &__divider {
+        color: #fff;
+        user-select: none;
+        padding: 0 0.5rem;
+      }
+
+      &__link {
+        color: #fff;
+        text-decoration: none;
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+
+  & > .about__privacyPolicy {
+    background-color: var(--won-secondary-color);
+    color: #fff;
+
+    .about__privacyPolicy__title {
+      font-size: $bigFontSize;
+      text-align: center;
+      color: #fff;
+
+      padding-bottom: 2rem;
+      font-weight: normal;
+    }
+
+    .about__privacyPolicy__text {
+      margin: 0 auto;
+      max-width: 45rem;
+      font-size: $smallFontSize;
+      h2 {
+        font-size: $normalFontSize;
+        margin-top: 2em;
+        margin-bottom: 1em;
+      }
+      a {
+        text-decoration: none;
+        //color: $won-primary-color;
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+      p {
+        margin-bottom: 1em;
+      }
+    }
+  }
+
+  & > .about__faq {
     background-color: $won-lighter-gray;
-    max-width: $maxContentWidth;
-    margin: 0 auto;
-    h2 {
-      margin-top: 2em;
-      margin-bottom: 1em;
+
+    .about__faq__title {
+      text-align: center;
+      font-size: $bigFontSize;
+      padding-bottom: 2rem;
     }
-    a {
-      text-decoration: none;
-      color: $won-primary-color;
-    }
-    p {
-      margin-bottom: 1em;
+
+    won-accordion.about__faq__questions {
+      display: block;
+      max-width: 45rem;
+      margin: 0 auto;
     }
   }
 }

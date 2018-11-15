@@ -6,11 +6,13 @@ import flexGridModule from "../flexgrid.js";
 import { attach, getIn, toAbsoluteURL } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import { ownerBaseUrl } from "config";
+import * as srefUtils from "../../sref-utils.js";
 
 import "style/_about.scss";
 
 const serviceDependencies = [
   "$ngRedux",
+  "$state",
   "$scope" /*'$routeParams' /*injections as strings here*/,
 ];
 
@@ -44,18 +46,21 @@ const howItWorksSteps = [
   },
 ];
 
-const peopleGrid = ({ theme }) => [
+const peopleGrid = ({ themeName }) => [
   {
-    imageSrc: `skin/${theme}/images/face1.png`,
+    imageSrc: `skin/${themeName}/images/face1.png`,
     text: '"I have something to offer"',
   },
-  { imageSrc: `skin/${theme}/images/face2.png`, text: '"I want something"' },
   {
-    imageSrc: `skin/${theme}/images/face3.png`,
+    imageSrc: `skin/${themeName}/images/face2.png`,
+    text: '"I want something"',
+  },
+  {
+    imageSrc: `skin/${themeName}/images/face3.png`,
     text: '"I want to do something together"',
   },
   {
-    imageSrc: `skin/${theme}/images/face4.png`,
+    imageSrc: `skin/${themeName}/images/face4.png`,
     text: '"I want to change something"',
   },
 ];
@@ -183,25 +188,26 @@ const questions = [
 class AboutController {
   constructor(/* arguments <- serviceDependencies */) {
     attach(this, serviceDependencies, arguments);
+    Object.assign(this, srefUtils);
 
     window.ab4dbg = this;
 
     const select = state => {
-      const theme = getIn(state, ["config", "theme", "name"]);
+      const themeName = getIn(state, ["config", "theme", "name"]);
       return {
-        theme,
+        themeName,
         appTitle: getIn(state, ["config", "theme", "title"]),
         imprintTemplate:
           "./skin/" +
-          theme +
+          themeName +
           "/" +
           getIn(state, ["config", "theme", "imprintTemplate"]),
         privacyPolicyTemplate:
           "./skin/" +
-          theme +
+          themeName +
           "/" +
           getIn(state, ["config", "theme", "privacyPolicyTemplate"]),
-        peopleGrid: peopleGrid({ theme }),
+        peopleGrid: peopleGrid({ themeName }),
         pendingPublishing: state.get("creatingWhatsX"),
       };
     };

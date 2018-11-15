@@ -18,7 +18,7 @@
             <won-usecase-picker></won-usecase-picker>
             <div class="conn__content__welcome__howto">
                 <div  class="conn__content__welcome__howto__label">{{ self.appTitle }} connects people's needs to their solutions</div>
-                <a class="conn__content__welcome__howto__button won-button--filled red" href="{{ self.absHRef(self.$state, 'about') }}">
+                <a class="conn__content__welcome__howto__button won-button--filled red" href="{{ self.absHRef(self.$state, 'about', {'#': 'aboutHowTo'}) }}">
                     <span>How {{ self.appTitle }} works?</span>
                 </a>
             </div>
