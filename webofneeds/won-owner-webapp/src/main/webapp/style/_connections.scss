@@ -3,50 +3,25 @@
 @import "fonts";
 @import "flex-layout";
 
-header.overview__header {
-}
-
 main.overview__content {
-  display: flex;
-  justify-content: center;
-  align-content: center;
-  flex-direction: row;
-
-  align-items: flex-start;
-
-  @include empty-description("opc");
+  display: grid;
+  grid-template-columns: 1fr 1fr; //TODO: DO NOT DO HALF AND HALF
+  @media (max-width: $responsivenessBreakPoint) {
+    grid-template-columns: 1fr;
+  }
+  margin: 0 auto;
+  max-width: $maxContentWidth;
 
   .overview__content__left {
-    flex-grow: 1;
-    max-width: $maxContentWidth / 2;
-
-    @media (min-width: $responsivenessBreakPoint) {
-      min-width: 28rem;
-    }
+    border-right: $thinGrayBorder;
   }
 
   .overview__content__right {
-    display: flex;
-    flex-grow: 1;
-    height: 100%;
-    justify-content: center;
-    align-content: center;
-    flex-direction: row;
-
-    border-left: $thinGrayBorder;
     border-right: $thinGrayBorder;
-    border-bottom: $thinGrayBorder;
-    background: white;
-    width: 100%;
-    max-width: ($maxContentWidth / 2);
-    //margin-ri: 0.5rem;
-
-    box-sizing: border-box;
-
     @media (max-width: $responsivenessBreakPoint) {
-      border-left: none;
       border-right: none;
     }
+    background: white;
 
     &__welcome {
       padding: 0.5rem;
@@ -87,10 +62,4 @@ main.overview__content {
       }
     }
   }
-}
-
-footer.overview__footer {
-  border-top: $thinBorderWidth solid $won-line-gray;
-  background: white;
-  padding: 0.5rem;
 }
