@@ -69,6 +69,11 @@ main.about {
         grid-template-columns: repeat(var(--howToColCount), min-content);
         justify-items: center;
 
+        @media (max-width: $responsivenessBreakPoint) {
+          --iconSize: 3rem;
+          grid-column-gap: 0.5rem;
+        }
+
         &__icon {
           --local-primary: #{$won-primary-color};
           @include fixed-square(var(--iconSize));
@@ -83,7 +88,6 @@ main.about {
           color: $won-primary-color;
           border: var(--stepIndicatorBorderWidth) solid $won-primary-color;
           box-sizing: border-box;
-          line-height: 1.7rem;
           font-weight: bold;
           cursor: pointer;
 
@@ -189,8 +193,12 @@ main.about {
       grid-row-gap: 1.5rem;
 
       &__button {
-        white-space: nowrap;
+        @media (min-width: $responsivenessBreakPoint) {
+          white-space: nowrap;
+        }
       }
+
+      &__button,
       &__button--pending {
         white-space: normal;
       }

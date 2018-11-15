@@ -73,8 +73,12 @@ won-usecase-picker {
     overflow: auto;
 
     &__button {
-      white-space: nowrap;
+      @media (min-width: $responsivenessBreakPoint) {
+        white-space: nowrap;
+      }
     }
+
+    &__button,
     &__button--pending {
       white-space: normal;
     }
