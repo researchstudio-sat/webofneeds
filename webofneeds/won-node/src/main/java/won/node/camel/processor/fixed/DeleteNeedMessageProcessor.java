@@ -32,7 +32,7 @@ public class DeleteNeedMessageProcessor extends AbstractCamelProcessor
     logger.debug("DELETING need. needURI:{}", receiverNeedURI);
     if (receiverNeedURI == null) throw new WonMessageProcessingException("receiverNeedURI is not set");
     Need need = DataAccessUtils.loadNeed(needRepository, receiverNeedURI);
-    needRepository.delete(need);
+    needRepository.delete(need.getId());
   }
 
 }
