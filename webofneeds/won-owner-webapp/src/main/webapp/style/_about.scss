@@ -44,7 +44,7 @@ main.about {
       max-width: 16rem;
       margin: 0 auto;
     }
-    .about__howto__grid {
+    .about__howto__steps {
       display: grid;
       grid-column-gap: 1rem;
       grid-row-gap: 2rem;
@@ -57,7 +57,7 @@ main.about {
         padding: 1rem 0.5rem 1rem 0.5rem;
       }
 
-      .about__howto__content {
+      &__process {
         --howToColCount: 4; //Todo: figure out a way to inject this var from angular
         --iconSize: 4rem;
         --stepIndicatorSize: 2rem;
@@ -140,46 +140,39 @@ main.about {
         }
       }
 
-      .about__howto__step {
-        display: grid;
-        grid-template-columns: repeat(3, min-content);
-        justify-content: center;
-        justify-items: center;
+      &__button {
+        margin-top: 1rem;
+        cursor: pointer;
+        --local-primary: #{$won-primary-color};
+        @include fixed-square(2.5rem);
 
-        &__icon {
-          margin-top: 1rem;
-          cursor: pointer;
-          --local-primary: #{$won-primary-color};
-          @include fixed-square(2.5rem);
-
-          &--invisible {
-            visibility: hidden;
-          }
-
-          &--prev {
-            grid-column: 1;
-            grid-row: 2;
-          }
-
-          &--next {
-            grid-column: 3;
-            grid-row: 2;
-            transform: rotate(180deg);
-          }
+        &--invisible {
+          visibility: hidden;
         }
 
-        &__description {
-          text-align: center;
-          grid-column: 2;
+        &--prev {
+          grid-column: 1;
           grid-row: 2;
-          &__title {
-            padding-bottom: 0.5rem;
-            font-size: $normalFontSize;
-            font-weight: bold;
-          }
-          &__text {
-            font-weight: 200;
-          }
+        }
+
+        &--next {
+          grid-column: 3;
+          grid-row: 2;
+          transform: rotate(180deg);
+        }
+      }
+
+      &__detail {
+        text-align: center;
+        grid-column: 2;
+        grid-row: 2;
+        &__title {
+          padding-bottom: 0.5rem;
+          font-size: $normalFontSize;
+          font-weight: bold;
+        }
+        &__text {
+          font-weight: 200;
         }
       }
     }
