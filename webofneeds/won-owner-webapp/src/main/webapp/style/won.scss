@@ -38,7 +38,7 @@ body {
       }
     }
 
-    main {
+    main.overview__right {
       @media (min-width: $responsivenessBreakPoint) {
         justify-self: start;
       }
@@ -54,14 +54,20 @@ body {
       }
     }
 
+    main.signup,
+    main.about,
     main.settingscontent {
       grid-column: 1 / -1;
+      @media (min-width: $responsivenessBreakPoint) {
+        justify-self: stretch;
+      }
+      @media (max-width: $responsivenessBreakPoint) {
+        justify-self: stretch;
+      }
     }
 
     .gridview-placeholder {
       grid-column: 1 / -1;
-      //TODO: REMOVE THIS FUGLY BACKGROUND its only here for debug purposes
-      background: #fab;
     }
 
     footer {
