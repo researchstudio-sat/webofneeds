@@ -92,28 +92,6 @@
             </button>
         </div>
     </section>
-    <a id="aboutFooter"></a>
-    <section class="about__footer">
-        <div class="about__footer__title">
-            <img src="skin/{{self.themeName}}/images/logo.svg" class="about__footer__title__logo">
-            <div class="about__footer__title__appTitle">
-                {{ self.appTitle }}
-            </div>
-            <div class="about__footer__title__tagLine">Web Of Needs</div>
-        </div>
-        <div class="about__footer__links">
-            <a class="about__footer__links__link" href="{{ self.absHRef(self.$state, 'about', {'#': 'aboutImprint'}) }}">About</a>
-            <span class="about__footer__links__divider">|</span>
-            <a class="about__footer__links__link" href="{{ self.absHRef(self.$state, 'about', {'#': 'aboutPrivacyPolicy'}) }}">Privacy</a>
-            <span class="about__footer__links__divider">|</span>
-            <a class="about__footer__links__link" href="{{ self.absHRef(self.$state, 'about', {'#': 'aboutFaq'}) }}">FAQ</a>
-        </div>
-    </section>
-    <a id="aboutFaq"></a>
-    <section class="about__faq">
-        <div class="about__faq__title">FAQs</div>
-        <won-accordion class="about__faq__questions" items="::self.questions"></won-accordion>
-    </section>
     <a id="aboutPrivacyPolicy"></a>
     <section class="about__privacyPolicy">
         <div class="about__privacyPolicy__title">Privacy Policy</div>
@@ -124,4 +102,25 @@
         <div class="about__imprint__title">Imprint</div>
         <div class="about__imprint__text" ng-include="self.imprintTemplate"></div>
     </section>
+    <a id="aboutFaq"></a>
+    <section class="about__faq">
+        <div class="about__faq__title">FAQs</div>
+        <won-accordion class="about__faq__questions" items="::self.questions"></won-accordion>
+    </section>
 </main>
+<footer>
+    <div class="footer__title">
+        <img src="skin/{{self.themeName}}/images/logo.svg" class="footer__title__logo">
+        <div class="footer__title__appTitle">
+            {{ self.appTitle }}
+        </div>
+        <div class="footer__title__tagLine">Web Of Needs</div>
+    </div>
+    <div class="footer__links">
+        <a class="footer__links__link" href="{{ self.absHRef(self.$state, 'about') }}">About</a>
+        <span class="footer__links__divider">|</span>
+        <a class="footer__links__link" href="{{ self.absHRef(self.$state, 'about', {'#': 'aboutPrivacyPolicy'}) }}">Privacy</a>
+        <span class="footer__links__divider">|</span>
+        <a class="footer__links__link" href="{{ self.absHRef(self.$state, 'about', {'#': 'aboutFaq'}) }}">FAQ</a>
+    </div>
+</footer>

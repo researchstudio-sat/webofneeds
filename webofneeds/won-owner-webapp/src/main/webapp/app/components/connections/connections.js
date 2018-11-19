@@ -83,13 +83,13 @@ class ConnectionsController {
           connections = connections.merge(need.get("connections"));
         });
 
-      const theme = getIn(state, ["config", "theme", "name"]);
+      const themeName = getIn(state, ["config", "theme", "name"]);
 
       return {
-        theme,
+        themeName,
         welcomeTemplate:
           "./skin/" +
-          theme +
+          themeName +
           "/" +
           getIn(state, ["config", "theme", "welcomeTemplate"]),
         appTitle: getIn(state, ["config", "theme", "title"]),

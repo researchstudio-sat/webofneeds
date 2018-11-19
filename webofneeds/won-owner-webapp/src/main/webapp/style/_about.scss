@@ -308,60 +308,6 @@ main.about {
     }
   }
 
-  & > .about__footer {
-    background-color: $won-secondary-color; //TODO: change to primary-color when you figured out where the stylable logo is
-    padding-top: 4rem;
-    padding-bottom: 4rem;
-    @media (max-width: $responsivenessBreakPoint) {
-      padding-top: 1rem;
-      padding-bottom: 1rem;
-    }
-
-    .about__footer__title {
-      display: grid;
-      grid-template-columns: max-content max-content;
-      grid-template-rows: min-content min-content;
-      grid-column-gap: 0.5rem;
-      color: #fff;
-      justify-content: center;
-
-      &__logo {
-        grid-row: 1 / span 2;
-        --local-primary: white;
-        height: 5rem;
-      }
-
-      &__appTitle {
-        align-self: flex-end;
-        font-size: $mediumFontSize;
-      }
-      &__tagLine {
-        align-self: flex-start;
-        font-size: $smallFontSize;
-      }
-    }
-    .about__footer__links {
-      padding-top: 3rem;
-      display: flex;
-      justify-content: center;
-      font-size: $smallFontSize;
-
-      &__divider {
-        color: #fff;
-        user-select: none;
-        padding: 0 0.5rem;
-      }
-
-      &__link {
-        color: #fff;
-        text-decoration: none;
-        &:hover {
-          text-decoration: underline;
-        }
-      }
-    }
-  }
-
   & > .about__privacyPolicy {
     background-color: var(--won-secondary-color);
     color: #fff;

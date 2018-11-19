@@ -32,6 +32,8 @@ main.overview__right {
   }
 
   border-right: $thinGrayBorder;
+  border-bottom: $thinGrayBorder;
+
   @media (max-width: $responsivenessBreakPoint) {
     grid-column: 1 / -1;
     border-right: none;

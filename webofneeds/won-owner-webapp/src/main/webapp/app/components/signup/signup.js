@@ -29,8 +29,12 @@ class SignupController {
     const select = state => {
       const privateId = getIn(state, ["router", "currentParams", "privateId"]);
 
+      const themeName = getIn(state, ["config", "theme", "name"]);
+
       return {
         //focusSignup: state.getIn(['router', 'currentParams', 'focusSignup']) === "true",
+        themeName,
+        appTitle: getIn(state, ["config", "theme", "title"]),
         loggedIn: state.getIn(["user", "loggedIn"]),
         registerError: state.getIn(["user", "registerError"]),
         isPrivateIdUser: !!privateId,

@@ -26,12 +26,6 @@ function genComponentConf() {
         ng-click="self.hideMainMenuDisplay()">
         <span>Account Settings</span>
     </a>
-    <a
-        href="{{ self.absHRef(self.$state, 'about') }}"
-        class="won-button--outlined thin red"
-        ng-click="self.hideMainMenuDisplay()">
-        <span>About</span>
-    </a>
     <a class="won-button--outlined thin red"
         ng-click="self.toggleRdfDisplay()">
         <svg class="won-button-icon" style="--local-primary:var(--won-primary-color);">
