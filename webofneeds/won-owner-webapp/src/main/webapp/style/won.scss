@@ -11,52 +11,70 @@ body {
   section.ng-scope {
     display: grid;
     grid-template-rows: min-content min-content 1fr min-content;
+    grid-template-columns: 1fr 1fr;
     min-height: 100vh;
 
     header {
+      grid-column: 1 / -1;
       position: sticky;
       top: 0;
       border-bottom: $thinBorderWidth solid $won-line-gray;
+      z-index: 1000;
+    }
+
+    aside {
+      @media (min-width: $responsivenessBreakPoint) {
+        justify-self: end;
+      }
+      @media (max-width: $responsivenessBreakPoint) {
+        justify-self: stretch;
+      }
+      > * {
+        max-width: $maxContentWidth/2;
+
+        @media (min-width: $maxContentWidth) {
+          min-width: $maxContentWidth/2;
+        }
+      }
     }
 
     main {
-      z-index: -1;
+      @media (min-width: $responsivenessBreakPoint) {
+        justify-self: start;
+      }
+      @media (max-width: $responsivenessBreakPoint) {
+        justify-self: stretch;
+      }
+      > * {
+        max-width: $maxContentWidth/2;
+
+        @media (min-width: $maxContentWidth) {
+          min-width: $maxContentWidth/2;
+        }
+      }
+    }
+
+    main.settingscontent {
+      grid-column: 1 / -1;
+    }
+
+    aside {
     }
 
     .gridview-placeholder {
+      grid-column: 1 / -1;
       //TODO: REMOVE THIS FUGLY BACKGROUND its only here for debug purposes
       background: #fab;
     }
 
     footer {
+      grid-column: 1 / -1;
       border-top: $thinBorderWidth solid $won-line-gray;
       background: white;
       padding: 0.5rem;
     }
   }
 }
-
-/*body {
-  @extend %fixed-fill;
-
-  @include flex-column;
-  align-items: stretch; //TODO this is bad style! it overwrites flex-col's align-items
-  & > .contentArea {
-    flex-grow: 1;
-  }
-}
-
-/* FIXED HEADER STYLING */ /*
-
-main {
-  display: flex;
-  flex-direction: column;
-  flex: 1 1 auto;
-  position: relative;
-  width: 100%;
-  overflow-y: auto;
-  align-items: baseline;
-}*/
 
 input[type="text"],
 input[type="password"],

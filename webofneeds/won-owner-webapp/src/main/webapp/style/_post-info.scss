@@ -8,9 +8,6 @@ won-post-info {
   grid-template-areas: "header" "main" "footer";
   grid-template-rows: min-content minmax($minimalGridRows, 1fr) min-content;
   grid-row-gap: $gridRowGap;
-  width: 100%;
-  max-width: $maxContentWidth;
-  height: 100%;
   box-sizing: border-box;
   padding: $gridRowGap;
 

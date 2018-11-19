@@ -3,6 +3,7 @@
 @import "fonts";
 
 main.about {
+  grid-column: 1 / -1;
   font-weight: 300;
 
   //General Section styling

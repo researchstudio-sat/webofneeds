@@ -24,8 +24,8 @@
                 Once you found a useful match, you can connect to it and start to chat.</span>
         </div>
     </section>
+    <a id="aboutHowTo"></a>
     <section class="about__howto">
-        <a id="aboutHowTo"></a>
         <h1 class="about__howto__title">How it works</div>
         <h3 class="about__howto__subtitle">in {{self.howItWorksSteps.length}} Steps</h3>
         <div class="about__howto__steps">
@@ -92,8 +92,8 @@
             </button>
         </div>
     </section>
+    <a id="aboutFooter"></a>
     <section class="about__footer">
-        <a id="aboutFooter"></a>
         <div class="about__footer__title">
             <img src="skin/{{self.themeName}}/images/logo.svg" class="about__footer__title__logo">
             <div class="about__footer__title__appTitle">
@@ -109,18 +109,18 @@
             <a class="about__footer__links__link" href="{{ self.absHRef(self.$state, 'about', {'#': 'aboutFaq'}) }}">FAQ</a>
         </div>
     </section>
+    <a id="aboutFaq"></a>
     <section class="about__faq">
-        <a id="aboutFaq"></a>
         <div class="about__faq__title">FAQs</div>
         <won-accordion class="about__faq__questions" items="::self.questions"></won-accordion>
     </section>
+    <a id="aboutPrivacyPolicy"></a>
     <section class="about__privacyPolicy">
-        <a id="aboutPrivacyPolicy"></a>
         <div class="about__privacyPolicy__title">Privacy Policy</div>
         <div class="about__privacyPolicy__text" ng-include="self.privacyPolicyTemplate"></div>
     </section>
+    <a id="aboutImprint"></a>
     <section class="about__imprint">
-        <a id="aboutImprint"></a>
         <div class="about__imprint__title">Imprint</div>
         <div class="about__imprint__text" ng-include="self.imprintTemplate"></div>
     </section>

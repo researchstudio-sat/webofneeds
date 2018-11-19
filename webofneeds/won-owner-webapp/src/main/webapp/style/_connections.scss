@@ -3,62 +3,59 @@
 @import "fonts";
 @import "flex-layout";
 
-main.overview__content {
-  display: grid;
-  grid-template-columns: 1fr 1fr; //TODO: DO NOT DO HALF AND HALF
+aside.overview__left {
+  border-right: $thinGrayBorder;
   @media (max-width: $responsivenessBreakPoint) {
-    grid-template-columns: 1fr;
+    grid-column: 1 / -1;
   }
-  margin: 0 auto;
-  max-width: $maxContentWidth;
+}
 
-  .overview__content__left {
-    border-right: $thinGrayBorder;
+main.overview__right {
+  border-right: $thinGrayBorder;
+  @media (max-width: $responsivenessBreakPoint) {
+    grid-column: 1 / -1;
+    border-right: none;
   }
+  background: white;
 
-  .overview__content__right {
-    border-right: $thinGrayBorder;
-    @media (max-width: $responsivenessBreakPoint) {
-      border-right: none;
+  .overview__right__welcome {
+    padding: 0.5rem;
+    width: 100%;
+    overflow: auto;
+    box-sizing: border-box;
+    background: $won-lighter-gray;
+
+    > won-usecase-picker {
+      padding: 0;
     }
-    background: white;
 
-    &__welcome {
-      padding: 0.5rem;
+    &__text {
       width: 100%;
-      overflow: auto;
-      box-sizing: border-box;
+      padding-bottom: 1rem;
+      h1 {
+        padding-bottom: 1.5rem;
+        text-align: center;
+      }
+      p {
+        padding-bottom: 1.5rem;
+        text-align: center;
+      }
+      h3 {
+        text-align: center;
+      }
+    }
 
-      background: $won-lighter-gray;
+    &__howto {
+      padding-top: 3rem;
 
-      &__text {
-        width: 100%;
-        padding-bottom: 1rem;
-        h1 {
-          padding-bottom: 1.5rem;
-          text-align: center;
-        }
-        p {
-          padding-bottom: 1.5rem;
-          text-align: center;
-        }
-        h3 {
-          text-align: center;
-        }
+      &__label {
+        text-align: center;
+        margin-bottom: 1rem;
+        display: block;
       }
 
-      &__howto {
-        padding-top: 3rem;
-
-        &__label {
-          text-align: center;
-          margin-bottom: 1rem;
-          display: block;
-        }
-
-        &__button {
-          width: 100%;
-        }
+      &__button {
+        width: 100%;
       }
     }
   }
