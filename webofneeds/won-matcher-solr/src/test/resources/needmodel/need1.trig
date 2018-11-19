@@ -19,27 +19,25 @@
 <https://node.matchat.org/won/resource/event/6899375303355711000#need> {
     need:3030440624813201400
             a                     won:Need ;
-            won:is        [ a                       won:NeedContent ;
-                            dc:title                "Offering tennis lessons";
-                            won:hasTag              "tennis" , "lesson", "offer" ;
-                            dc:description  "tennis lessons for kids and adults of all levels";
-                            won:hasLocation  [ a                   <s:Place> ;
-                                                won:hasBoundingBox  [ won:hasNorthWestCorner  [ a              s:GeoCoordinates ;
-                                                                                                s:latitude   "48.213814" ;
-                                                                                                s:longitude  "16.340870"
-                                                                                              ] ;
-                                                                      won:hasSouthEastCorner  [ a              s:GeoCoordinates ;
-                                                                                                s:latitude   "48.236309" ;
-                                                                                                s:longitude  "16.370149"
-                                                                                              ]
-                                                                    ] ;
-                                                s:geo               [ a              s:GeoCoordinates ;
-                                                                      s:latitude   "48.225073" ;
-                                                                      s:longitude  "16.358398"
-                                                                    ] ;
-                                                s:name             "Alsergrund, Wien, 1090, Österreich"
-                                              ]
-                          ] ;
+            dc:title                "Offering tennis lessons";
+            won:hasTag              "tennis" , "lesson", "offer" ;
+            dc:description  "tennis lessons for kids and adults of all levels";
+            won:hasLocation  [ a                   <s:Place> ;
+                                won:hasBoundingBox  [ won:hasNorthWestCorner  [ a              s:GeoCoordinates ;
+                                                                                s:latitude   "48.213814" ;
+                                                                                s:longitude  "16.340870"
+                                                                              ] ;
+                                                      won:hasSouthEastCorner  [ a              s:GeoCoordinates ;
+                                                                                s:latitude   "48.236309" ;
+                                                                                s:longitude  "16.370149"
+                                                                              ]
+                                                    ] ;
+                                s:geo               [ a              s:GeoCoordinates ;
+                                                      s:latitude   "48.225073" ;
+                                                      s:longitude  "16.358398"
+                                                    ] ;
+                                s:name             "Alsergrund, Wien, 1090, Österreich"
+                              ]  ;
             won:seeks     [ a                       won:NeedContent ;
                             dc:title                "tennis students";
                             won:hasTag              "tennis" , "lesson" ;

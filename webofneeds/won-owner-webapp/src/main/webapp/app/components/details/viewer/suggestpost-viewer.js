@@ -39,7 +39,7 @@ function genComponentConf() {
               Load Post
           </button>
           <button class="suggestpostv__content__action won-button--outlined thin red"
-              ng-if="self.suggestedPost && !self.suggestedPost.get('ownNeed') && self.openedOwnPost"
+              ng-if="self.suggestedPost && !self.suggestedPost.get('isOwned') && self.openedOwnPost"
               ng-disabled="self.hasConnectionBetweenPosts"
               ng-click="self.connectWithPost()">
               {{ self.getConnectButtonLabel() }}

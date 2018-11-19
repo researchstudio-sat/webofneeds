@@ -13,7 +13,7 @@ import { getRandomWonId, getAllDetails } from "./won-utils.js";
 import { isConnUriClosed } from "./won-localstorage.js";
 
 export const emptyDataset = Immutable.fromJS({
-  ownNeeds: {},
+  ownedNeeds: {},
   connections: {},
   events: {},
   theirNeeds: {},
@@ -50,7 +50,7 @@ export function isFetchMessageEffectsNeeded(wonMsg) {
 
 export function buildRateMessage(
   msgToRateFor,
-  ownNeedUri,
+  ownedNeedUri,
   theirNeedUri,
   ownNodeUri,
   theirNodeUri,
@@ -77,7 +77,7 @@ export function buildRateMessage(
     won
       .getEnvelopeDataforConnection(
         msgToRateFor.connection.uri,
-        ownNeedUri,
+        ownedNeedUri,
         theirNeedUri,
         ownNodeUri,
         theirNodeUri,
@@ -93,7 +93,7 @@ export function buildRateMessage(
 
 export function buildCloseMessage(
   connectionUri,
-  ownNeedUri,
+  ownedNeedUri,
   theirNeedUri,
   ownNodeUri,
   theirNodeUri,
@@ -117,7 +117,7 @@ export function buildCloseMessage(
   return won
     .getEnvelopeDataforConnection(
       connectionUri,
-      ownNeedUri,
+      ownedNeedUri,
       theirNeedUri,
       ownNodeUri,
       theirNodeUri,
@@ -184,7 +184,7 @@ export function buildOpenNeedMessage(needUri, wonNodeUri) {
  * @returns {{eventUri, message}|*}
  */
 export function buildConnectMessage({
-  ownNeedUri,
+  ownedNeedUri,
   theirNeedUri,
   ownNodeUri,
   theirNodeUri,
@@ -194,7 +194,7 @@ export function buildConnectMessage({
   theirFacet,
 }) {
   const envelopeData = won.getEnvelopeDataforNewConnection(
-    ownNeedUri,
+    ownedNeedUri,
     theirNeedUri,
     ownNodeUri,
     theirNodeUri
@@ -232,7 +232,7 @@ export function buildChatMessage({
   additionalContent,
   referencedContentUris, //this is a map of corresponding uris to be e.g. proposes or retracted... (it already includes the correct uri -> remoteUri for received messages, and uri for sent messages)
   connectionUri,
-  ownNeedUri,
+  ownedNeedUri,
   theirNeedUri,
   ownNodeUri,
   theirNodeUri,
@@ -245,7 +245,7 @@ export function buildChatMessage({
 
   const envelopeDataP = won.getEnvelopeDataforConnection(
     connectionUri,
-    ownNeedUri,
+    ownedNeedUri,
     theirNeedUri,
     ownNodeUri,
     theirNodeUri,
@@ -397,7 +397,7 @@ export function buildChatMessage({
 
 export function buildOpenMessage(
   connectionUri,
-  ownNeedUri,
+  ownedNeedUri,
   theirNeedUri,
   ownNodeUri,
   theirNodeUri,
@@ -407,7 +407,7 @@ export function buildOpenMessage(
   const messageP = won
     .getEnvelopeDataforConnection(
       connectionUri,
-      ownNeedUri,
+      ownedNeedUri,
       theirNeedUri,
       ownNodeUri,
       theirNodeUri,
@@ -473,31 +473,30 @@ export async function buildCreateMessage(needData, wonNodeUri) {
   }
 
   //if type  create -> use needBuilder as well
-  const prepareContentNodeData = async needDataIsOrSeeks => ({
+  const prepareContentNodeData = async needData => ({
     // Adds all fields from needDataIsOrSeeks:
     // title, description, tags, matchingContext, location,...
-    ...needDataIsOrSeeks,
+    ...needData,
 
     publishedContentUri: publishedContentUri, //mandatory
-    type: won.toCompacted(needDataIsOrSeeks.type), //mandatory
+    type: won.toCompacted(needData.type), //mandatory
     //TODO attach to either is or seeks?
     attachmentUris: attachmentUris, //optional, should be same as in `attachments` below
-    arbitraryJsonLd: needDataIsOrSeeks.ttl
-      ? await won.ttlToJsonLd(needDataIsOrSeeks.ttl)
-      : [],
+    arbitraryJsonLd: needData.ttl ? await won.ttlToJsonLd(needData.ttl) : [],
   });
 
   let contentRdf = won.buildNeedRdf({
-    is: needData.is ? await prepareContentNodeData(needData.is) : undefined,
+    content: needData.content
+      ? await prepareContentNodeData(needData.content)
+      : undefined,
     seeks: needData.seeks
       ? await prepareContentNodeData(needData.seeks)
       : undefined,
+    useCase: needData.useCase ? needData.useCase : undefined, //only needed for need building
     // FIXME: find a better way to include need details that are not part of is or seeks
     matchingContext: needData.matchingContext
       ? needData.matchingContext
       : undefined,
-    searchString: needData.searchString ? needData.searchString : undefined,
-    useCase: needData.useCase ? needData.useCase : undefined, //only needed for need building
   });
 
   const msgUri = wonNodeUri + "/event/" + getRandomWonId(); //mandatory
@@ -687,22 +686,22 @@ export function fetchMessage(needUri, eventUri) {
 
 window.fetchAll4dbg = fetchDataForOwnedNeeds;
 export async function fetchDataForOwnedNeeds(
-  ownNeedUris,
+  ownedNeedUris,
   curriedDispatch = () => undefined
 ) {
-  if (!is("Array", ownNeedUris) || ownNeedUris.length === 0) {
+  if (!is("Array", ownedNeedUris) || ownedNeedUris.length === 0) {
     return emptyDataset;
   }
 
-  console.debug("fetchOwnNeedAndDispatch for: ", ownNeedUris);
-  const allOwnNeeds = await urisToLookupMap(ownNeedUris, uri =>
-    fetchOwnNeedAndDispatch(uri, curriedDispatch)
+  console.debug("fetchOwnedNeedAndDispatch for: ", ownedNeedUris);
+  const allOwnedNeeds = await urisToLookupMap(ownedNeedUris, uri =>
+    fetchOwnedNeedAndDispatch(uri, curriedDispatch)
   );
 
   // wait for the own needs to be dispatched then load connections
   //[{ uri -> cnct }]
   const connectionMaps = await Promise.all(
-    ownNeedUris.map(needUri =>
+    ownedNeedUris.map(needUri =>
       fetchConnectionsOfNeedAndDispatch(needUri, curriedDispatch)
     )
   );
@@ -727,15 +726,15 @@ export async function fetchDataForOwnedNeeds(
   );
 
   const allDataRawPromise = Promise.all([
-    allOwnNeeds,
+    allOwnedNeeds,
     allConnections,
     allTheirNeeds,
   ]);
 
   return allDataRawPromise.then(
-    ([ownNeeds, connections, /* events, */ theirNeeds]) => {
+    ([ownedNeeds, connections, /* events, */ theirNeeds]) => {
       wellFormedPayload({
-        ownNeeds,
+        ownedNeeds,
         connections,
         events: {
           /* will be loaded later when connection is accessed */
@@ -746,7 +745,7 @@ export async function fetchDataForOwnedNeeds(
   );
 
   /**
-   * const allAccessibleAndRelevantData = { ownNeeds: { <needUri> : { :*,
+   * const allAccessibleAndRelevantData = { ownedNeeds: { <needUri> : { :*,
    * connections: [<connectionUri>, <connectionUri>] } <needUri> : { :*,
    * connections: [<connectionUri>, <connectionUri>] } }, theirNeeds: {
    * <needUri>: { :*, connections: [<connectionUri>, <connectionUri>] <--? } },
@@ -780,12 +779,12 @@ async function fetchConnectionsOfNeedAndDispatch(
   );
 }
 
-function fetchOwnNeedAndDispatch(needUri, curriedDispatch = () => undefined) {
+function fetchOwnedNeedAndDispatch(needUri, curriedDispatch = () => undefined) {
   const needP = won
     .ensureLoaded(needUri, { requesterWebId: needUri }) //ensure loaded does net seem to be necessary as it is called within getNeed also the requesterWebId is not necessary for need requests
     .then(() => won.getNeed(needUri));
   needP.then(need =>
-    curriedDispatch(wellFormedPayload({ ownNeeds: { [needUri]: need } }))
+    curriedDispatch(wellFormedPayload({ ownedNeeds: { [needUri]: need } }))
   );
   return needP;
 }

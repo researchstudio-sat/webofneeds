@@ -2,8 +2,7 @@ SELECT DISTINCT  *
 WHERE
   { SELECT  ?result
     WHERE { graph ?g
-      {   { ?fa8bd39f  <http://purl.org/webofneeds/model#hasTag>  "SearchRealEstateToRent" .
-            ?result   <http://purl.org/webofneeds/model#is>  ?fa8bd39f
+      {   { ?result  <http://purl.org/webofneeds/model#hasTag>  "SearchRealEstateToRent" .
           }
         UNION
           { ?f34868ae  a                    <http://schema.org/LocationFeatureSpecification> ;

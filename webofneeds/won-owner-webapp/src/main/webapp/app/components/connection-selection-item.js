@@ -32,9 +32,12 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
 
       const selectFromState = state => {
-        const ownNeed = getOwnedNeedByConnectionUri(state, this.connectionUri);
+        const ownedNeed = getOwnedNeedByConnectionUri(
+          state,
+          this.connectionUri
+        );
         const connection =
-          ownNeed && ownNeed.getIn(["connections", this.connectionUri]);
+          ownedNeed && ownedNeed.getIn(["connections", this.connectionUri]);
 
         return {
           openConnectionUri: getConnectionUriFromRoute(state),

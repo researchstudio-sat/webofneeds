@@ -35,9 +35,8 @@
             a                    won:Need ;
             won:doNotMatchAfter  "2018-09-18T07:14:57.185Z"^^xsd:dateTime ;
             won:hasFacet         won:ChatFacet ;
-            won:is               [ dc:title    "Title" ;
-                                   won:hasTag  "Tag"
-                                 ] ;
+            dc:title    "Title" ;
+            won:hasTag  "Tag" ;
             cert:key             [ cert:PublicKey  [ a                       woncrypt:ECCPublicKey ;
                                                      woncrypt:ecc_algorithm  "EC" ;
                                                      woncrypt:ecc_curveId    "secp384r1" ;

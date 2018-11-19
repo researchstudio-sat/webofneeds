@@ -4,10 +4,10 @@
 
 import { createSelector } from "reselect";
 
-import Immutable from "immutable";
 import won from "../won-es6.js";
 import { decodeUriComponentProperly, getIn } from "../utils.js";
 import Color from "color";
+import { isWhatsAroundNeed, isWhatsNewNeed } from "../need-utils.js";
 
 export const selectLastUpdateTime = state => state.get("lastUpdateTime");
 export const getRouterParams = state =>
@@ -15,27 +15,29 @@ export const getRouterParams = state =>
 
 export const getNeeds = state => state.get("needs");
 export const getOwnedNeeds = state =>
-  getNeeds(state).filter(need => need.get("ownNeed"));
+  getNeeds(state).filter(need => need.get("isOwned"));
 export const getNonOwnedNeeds = state =>
-  getNeeds(state).filter(need => !need.get("ownNeed"));
+  getNeeds(state).filter(need => !need.get("isOwned"));
 
 export function getPosts(state) {
   const needs = getNeeds(state);
   return needs.filter(need => {
     if (!need.get("types")) return true;
 
-    return Immutable.is(need.get("types"), Immutable.Set(["won:Need"]));
+    return (
+      need.get("types").has("won:Need") && !need.get("types").has("won:Persona")
+    );
   });
 }
 
 export const getOwnedPosts = state =>
-  getPosts(state).filter(need => need.get("ownNeed"));
+  getPosts(state).filter(need => need.get("isOwned"));
 
 export function getOwnedOpenPosts(state) {
-  const allOwnNeeds = getOwnedPosts(state);
+  const allOwnedNeeds = getOwnedPosts(state);
   return (
-    allOwnNeeds &&
-    allOwnNeeds.filter(post => post.get("state") === won.WON.ActiveCompacted)
+    allOwnedNeeds &&
+    allOwnedNeeds.filter(post => post.get("state") === won.WON.ActiveCompacted)
   );
 }
 
@@ -49,21 +51,23 @@ export function getOpenPosts(state) {
 
 //TODO: METHOD NAME TO ACTUALLY REPRESENT WHAT THE SELECTOR DOES (e.g. ...WithoutWhatsX)
 export function getOwnedClosedPosts(state) {
-  const allOwnNeeds = getOwnedPosts(state);
+  const allOwnedNeeds = getOwnedPosts(state);
   return (
-    allOwnNeeds &&
-    allOwnNeeds.filter(
+    allOwnedNeeds &&
+    allOwnedNeeds.filter(
       post =>
         post.get("state") === won.WON.InactiveCompacted &&
-        !(post.get("isWhatsAround") || post.get("isWhatsNew"))
+        !(isWhatsAroundNeed(post) || isWhatsNewNeed(post))
     )
   ); //Filter whatsAround and whatsNew needs automatically
 }
 
 export function getOwnedNeedsInCreation(state) {
-  const allOwnNeeds = getOwnedNeeds(state);
+  const allOwnedNeeds = getOwnedNeeds(state);
   // needs that have been created but are not confirmed by the server yet
-  return allOwnNeeds && allOwnNeeds.filter(post => post.get("isBeingCreated"));
+  return (
+    allOwnedNeeds && allOwnedNeeds.filter(post => post.get("isBeingCreated"))
+  );
 }
 
 export const selectIsConnected = state =>

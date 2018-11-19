@@ -2,7 +2,7 @@ package won.matcher.solr.query.factory;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Resource;
-import won.protocol.model.NeedContentPropertyType;
+import won.matcher.solr.utils.MatcherNeedContentPropertyType;
 
 /**
  * Created by hfriedrich on 29.08.2017.
@@ -18,17 +18,16 @@ public class WhatsAroundQueryFactory extends BasicNeedQueryFactory {
         // add "is" terms/location to "seeks" part of the query and vice versa
         // add "seeks" terms to the "seeks/seeks" part of the query and vice versa
 
-        for (Resource contentNode : needModelWrapper.getContentNodes(NeedContentPropertyType.IS)) {
-            addLocationFilters(contentNode, NeedContentPropertyType.SEEKS);
+        Resource needContentNode = needModelWrapper.getNeedContentNode();
+        addLocationFilters(needContentNode, MatcherNeedContentPropertyType.SEEKS);
+
+        for (Resource contentNode : needModelWrapper.getSeeksNodes()) {
+            addLocationFilters(contentNode, MatcherNeedContentPropertyType.IS);
+            addLocationFilters(contentNode, MatcherNeedContentPropertyType.SEEKS_SEEKS);
         }
 
-        for (Resource contentNode : needModelWrapper.getContentNodes(NeedContentPropertyType.SEEKS)) {
-            addLocationFilters(contentNode, NeedContentPropertyType.IS);
-            addLocationFilters(contentNode, NeedContentPropertyType.SEEKS_SEEKS);
-        }
-
-        for (Resource contentNode : needModelWrapper.getContentNodes(NeedContentPropertyType.SEEKS_SEEKS)) {
-            addLocationFilters(contentNode, NeedContentPropertyType.SEEKS);
+        for (Resource contentNode : needModelWrapper.getSeeksSeeksNodes()) {
+            addLocationFilters(contentNode, MatcherNeedContentPropertyType.SEEKS);
         }
 
         // create a dummy query, this is the minimal part of a query that has no search term content

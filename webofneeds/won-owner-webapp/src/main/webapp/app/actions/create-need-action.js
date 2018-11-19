@@ -14,6 +14,8 @@ import {
   nominatim2draftLocation,
 } from "../utils.js";
 
+import { isWhatsAroundNeed, isWhatsNewNeed } from "../need-utils.js";
+
 export function needCreate(draft, persona, nodeUri) {
   return (dispatch, getState) => {
     const state = getState();
@@ -89,13 +91,9 @@ export function createWhatsNew() {
 
     dispatch({ type: actionTypes.needs.whatsNew });
 
-    const whatsNew = {
-      whatsNew: true,
-    };
-
-    //TODO: Point to same DataSet instead of double it
     const whatsNewObject = {
-      seeks: whatsNew,
+      content: { whatsNew: true },
+      seeks: {},
       matchingContext: defaultContext,
     };
 
@@ -103,7 +101,7 @@ export function createWhatsNew() {
       .filter(
         need =>
           need.get("state") === "won:Active" &&
-          (need.get("isWhatsAround") || need.get("isWhatsNew"))
+          (isWhatsAroundNeed(need) || isWhatsNewNeed(need))
       )
       .map(need => {
         dispatch(actionCreators.needs__close(need.get("uri")));
@@ -130,22 +128,19 @@ export function createWhatsAround() {
 
           reverseSearchNominatim(lat, lng, zoom).then(searchResult => {
             const location = nominatim2draftLocation(searchResult);
-            let whatsAround = {
-              location: location,
-              whatsAround: true,
-            };
 
             getIn(state, ["needs"])
               .filter(
                 need =>
                   need.get("state") === "won:Active" &&
-                  (need.get("isWhatsAround") || need.get("isWhatsNew"))
+                  (isWhatsAroundNeed(need) || isWhatsNewNeed(need))
               )
               .map(need => {
                 dispatch(actionCreators.needs__close(need.get("uri"))); //TODO action creators should not call other action creators, according to Moru
               });
             const whatsAroundObject = {
-              seeks: whatsAround,
+              content: { whatsAround: true },
+              seeks: { location: location },
               matchingContext: defaultContext,
             };
 

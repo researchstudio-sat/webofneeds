@@ -27,6 +27,30 @@ export const title = {
   },
 };
 
+export const searchString = {
+  identifier: "searchString",
+  label: "Searching for",
+  icon: "#ico36_search",
+  placeholder: "What do you look for?",
+  component: "won-title-picker",
+  viewerComponent: "won-title-viewer",
+  parseToRDF: function({ value }) {
+    const val = value ? value : undefined;
+    return {
+      "won:hasSearchString": val,
+    };
+  },
+  parseFromRDF: function(jsonLDImm) {
+    return won.parseFrom(jsonLDImm, ["won:hasSearchString"], "xsd:string");
+  },
+  generateHumanReadable: function({ value, includeLabel }) {
+    if (value) {
+      return includeLabel ? this.label + ": " + value : value;
+    }
+    return undefined;
+  },
+};
+
 export const description = {
   identifier: "description",
   label: "Description",

@@ -9,23 +9,12 @@ import java.util.Random;
 import org.apache.jena.rdf.model.*;
 import org.apache.jena.vocabulary.DC;
 import org.apache.jena.vocabulary.RDF;
+import won.protocol.vocabulary.SCHEMA;
+import won.protocol.vocabulary.WON;
 
 public class TaxiDemandNeedGenerator {
 
     static Model model = ModelFactory.createDefaultModel();
-
-    static Property won_hasFacet = model.createProperty("http://purl.org/webofneeds/model#hasFacet");
-    static Property won_is = model.createProperty("http://purl.org/webofneeds/model#is");
-    static Property won_seeks = model.createProperty("http://purl.org/webofneeds/model#seeks");
-    static Property won_hasTag = model.createProperty("http://purl.org/webofneeds/model#hasTag");
-    static Property won_hasLocation = model.createProperty("http://purl.org/webofneeds/model#hasLocation");
-    static Property won_travelAction = model.createProperty("http://purl.org/webofneeds/model#travelAction");
-
-    static Property schema_priceSpecification = model.createProperty("http://schema.org/priceSpecification");
-    static Property schema_geo = model.createProperty("http://schema.org/geo");
-    static Property schema_latitude = model.createProperty("http://schema.org/latitude");
-    static Property schema_longitude = model.createProperty("http://schema.org/longitude");
-    static Property schema_name = model.createProperty("http://schema.org/name");
 
     static HashMap<String, String>[] locations = new HashMap[10];
 
@@ -46,22 +35,21 @@ public class TaxiDemandNeedGenerator {
             setPrefixes();
 
             Resource need = model.createResource(needURI);
-            Resource isPart = model.createResource();
+            //Resource isPart = model.createResource();
             Resource seeksPart = model.createResource();
             Resource won_Need = model.createResource("http://purl.org/webofneeds/model#Need");
 
             // method signatures: branch, probability that detail is added, min, max
-            isPart = addTitle(isPart, 1.0, i);
-            isPart = addDescription(isPart, 1.0);
-            isPart.addProperty(won_hasTag, "search-lift");
+            need = addTitle(need, 1.0, i);
+            need = addDescription(need, 1.0);
+            need.addProperty(WON.HAS_TAG, "search-lift");
 
             seeksPart = addDate(seeksPart, 0.9);
             // seeksPart = addTime(seeksPart, 0.9);
             seeksPart = addTravelAction(seeksPart, 0.9);
 
             need.addProperty(RDF.type, won_Need);
-            need.addProperty(won_is, isPart);
-            need.addProperty(won_seeks, seeksPart);
+            need.addProperty(WON.SEEKS, seeksPart);
 
             try {
                 FileOutputStream out = new FileOutputStream("sample_needs/taxi_demand_need_" + rnd + ".trig");
@@ -130,13 +118,13 @@ public class TaxiDemandNeedGenerator {
         Resource fromSchema_Place = model.createResource("http://schema.org/Place");
         Resource fromSchema_GeoCoordinates = model.createResource("http://schema.org/GeoCoordinates");
 
-        resource.addProperty(won_travelAction, fromLocationResource);
+        resource.addProperty(WON.TRAVEL_ACTION, fromLocationResource);
         fromLocationResource.addProperty(RDF.type, fromSchema_Place);
-        fromLocationResource.addProperty(schema_name, locations[0].get("name"));
-        fromLocationResource.addProperty(schema_geo, fromGeoResource);
+        fromLocationResource.addProperty(SCHEMA.NAME, locations[0].get("name"));
+        fromLocationResource.addProperty(SCHEMA.GEO, fromGeoResource);
         fromGeoResource.addProperty(RDF.type, fromSchema_GeoCoordinates);
-        fromGeoResource.addProperty(schema_latitude, locations[0].get("lat"));
-        fromGeoResource.addProperty(schema_longitude, locations[0].get("lng"));
+        fromGeoResource.addProperty(SCHEMA.LATITUDE, locations[0].get("lat"));
+        fromGeoResource.addProperty(SCHEMA.LONGITUDE, locations[0].get("lng"));
 
         if (Math.random() < (1.0 - probability)) {
             return resource;
@@ -146,13 +134,13 @@ public class TaxiDemandNeedGenerator {
         Resource toSchema_Place = model.createResource("http://schema.org/Place");
         Resource toSchema_GeoCoordinates = model.createResource("http://schema.org/GeoCoordinates");
 
-        resource.addProperty(won_travelAction, toLocationResource);
+        resource.addProperty(WON.TRAVEL_ACTION, toLocationResource);
         toLocationResource.addProperty(RDF.type, toSchema_Place);
-        toLocationResource.addProperty(schema_name, locations[1].get("name"));
-        toLocationResource.addProperty(schema_geo, toGeoResource);
+        toLocationResource.addProperty(SCHEMA.NAME, locations[1].get("name"));
+        toLocationResource.addProperty(SCHEMA.GEO, toGeoResource);
         toGeoResource.addProperty(RDF.type, toSchema_GeoCoordinates);
-        toGeoResource.addProperty(schema_latitude, locations[1].get("lat"));
-        toGeoResource.addProperty(schema_longitude, locations[1].get("lng"));
+        toGeoResource.addProperty(SCHEMA.LATITUDE, locations[1].get("lat"));
+        toGeoResource.addProperty(SCHEMA.LONGITUDE, locations[1].get("lng"));
 
         return resource;
 

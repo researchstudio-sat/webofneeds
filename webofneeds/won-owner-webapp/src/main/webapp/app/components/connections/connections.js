@@ -10,6 +10,7 @@ import createSearchModule from "../create-search.js";
 import usecasePickerModule from "../usecase-picker.js";
 import usecaseGroupModule from "../usecase-group.js";
 import { attach, getIn, callBuffer } from "../../utils.js";
+import { isWhatsAroundNeed, isWhatsNewNeed } from "../../need-utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import {
   getOwnedNeedByConnectionUri,
@@ -68,18 +69,18 @@ class ConnectionsController {
         connectionUri &&
         need.getIn(["connections", connectionUri, "state"]);
 
-      const ownNeeds = getOwnedNeeds(state).filter(
+      const ownedNeeds = getOwnedNeeds(state).filter(
         post =>
           !(
-            (post.get("isWhatsAround") || post.get("isWhatsNew")) &&
+            (isWhatsAroundNeed(post) || isWhatsNewNeed(post)) &&
             post.get("state") === won.WON.InactiveCompacted
           )
       );
 
       let connections = Immutable.Map();
 
-      ownNeeds &&
-        ownNeeds.map(function(need) {
+      ownedNeeds &&
+        ownedNeeds.map(function(need) {
           connections = connections.merge(need.get("connections"));
         });
 
@@ -99,10 +100,10 @@ class ConnectionsController {
         useCase,
         useCaseGroup,
         hasConnections: connections && connections.size > 0,
-        hasOwnNeeds: ownNeeds && ownNeeds.size > 0,
+        hasOwnedNeeds: ownedNeeds && ownedNeeds.size > 0,
         open,
         mainViewScroll: state.get("mainViewScroll"),
-        showWelcomePage: !(ownNeeds && ownNeeds.size > 0),
+        showWelcomePage: !(ownedNeeds && ownedNeeds.size > 0),
       };
     };
 

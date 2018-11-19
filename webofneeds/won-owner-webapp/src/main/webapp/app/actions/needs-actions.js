@@ -46,19 +46,19 @@ export function fetchSuggested(needUri) {
 
 //ownConnectionUri is optional - set if known
 export function needsConnect(
-  ownNeedUri,
+  ownedNeedUri,
   ownConnectionUri,
   theirNeedUri,
   connectMessage
 ) {
   return async (dispatch, getState) => {
     const state = getState();
-    const ownNeed = state.getIn(["needs", ownNeedUri]);
+    const ownedNeed = state.getIn(["needs", ownedNeedUri]);
     const theirNeed = state.getIn(["needs", theirNeedUri]);
     const cnctMsg = await buildConnectMessage({
-      ownNeedUri: ownNeedUri,
+      ownedNeedUri: ownedNeedUri,
       theirNeedUri: theirNeedUri,
-      ownNodeUri: ownNeed.get("nodeUri"),
+      ownNodeUri: ownedNeed.get("nodeUri"),
       theirNodeUri: theirNeed.get("nodeUri"),
       connectMessage: connectMessage,
       optionalOwnConnectionUri: ownConnectionUri,

@@ -17,14 +17,14 @@ export const socialGroup = {
       doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
       draft: {
         ...emptyDraft,
-        is: {
+        content: {
           title: "I'm up for breakfast! Any plans?",
           tags: ["breakfast"],
+          searchString: "breakfast",
         },
         seeks: { title: "breakfast" },
-        searchString: "breakfast",
       },
-      isDetails: {
+      details: {
         title: { ...details.title },
         description: { ...details.description },
         fromDatetime: { ...details.fromDatetime },
@@ -41,13 +41,13 @@ export const socialGroup = {
       doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
       draft: {
         ...emptyDraft,
-        is: {
+        content: {
           title: "I'm up for lunch! Any plans?",
           tags: ["lunch"],
+          searchString: "lunch",
         },
-        searchString: "lunch",
       },
-      isDetails: {
+      details: {
         title: { ...details.title },
         description: { ...details.description },
         fromDatetime: { ...details.fromDatetime },
@@ -64,13 +64,13 @@ export const socialGroup = {
       doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
       draft: {
         ...emptyDraft,
-        is: {
+        content: {
           title: "I'm up for partying! Any plans?",
           tags: ["afterparty"],
+          searchString: "afterparty",
         },
-        searchString: "afterparty",
       },
-      isDetails: {
+      details: {
         title: { ...details.title },
         fromDatetime: { ...details.fromDatetime },
         throughDatetime: { ...details.throughDatetime },
@@ -86,10 +86,9 @@ export const socialGroup = {
       doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
       draft: {
         ...emptyDraft,
-        is: { tags: ["sightseeing"] },
-        searchString: "sightseeing",
+        content: { tags: ["sightseeing"], searchString: "sightseeing" },
       },
-      isDetails: {
+      details: {
         title: { ...details.title },
         description: { ...details.description },
         fromDatetime: { ...details.fromDatetime },

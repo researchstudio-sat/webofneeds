@@ -4,7 +4,7 @@
 <main class="connectionscontent">
 
     <!-- LEFT SIDE -->
-    <div class="conn__list" ng-class="{'hide-in-responsive': !self.hasOwnNeeds || self.connection || self.selectedPost || !!self.useCaseGroup || !!self.useCase}">
+    <div class="conn__list" ng-class="{'hide-in-responsive': !self.hasOwnedNeeds || self.connection || self.selectedPost || !!self.useCaseGroup || !!self.useCase}">
         <won-connections-overview on-selected-connection="self.selectedConnection(connectionUri)" on-selected-need="self.selectedNeed(needUri)"
             open="self.open">
         </won-connections-overview>
@@ -12,7 +12,7 @@
 
     <!-- RIGHT SIDE -->
     <div class="conn__content" ng-if="!self.selectedPost && (!self.connection || self.connectionType === self.WON.Closed) && !self.useCase && !self.useCaseGroup"
-        ng-class="{'hide-in-responsive' : self.hasOwnNeeds}">
+        ng-class="{'hide-in-responsive' : self.hasOwnedNeeds}">
         <div class="conn__content__welcome">
             <div class="conn__content__welcome__text" ng-include="self.welcomeTemplate"></div>
             <won-usecase-picker></won-usecase-picker>

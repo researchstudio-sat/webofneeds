@@ -983,23 +983,6 @@ import won from "./won.js";
       return { "@context": flattenedNeedJsonLd["@context"] };
     }
 
-    // some needs point to the same blank node for `won:is` and `won:seeks`
-    // e.g. "what's around" needs. the framing algorithm emits one of these
-    // just as `{ "@id": ... }`. for improved usefulness of the results the
-    // the full node is assigned to the other predicate.
-    const isNode = get(flattenedNeedJsonLd, "won:is");
-    const seeksNode = get(flattenedNeedJsonLd, "won:seeks");
-
-    if (get(isNode, "@id") && get(isNode, "@id") === get(seeksNode, "@id")) {
-      if (Object.keys(isNode).length > Object.keys(seeksNode).length) {
-        // "is" has all the content, use it for both
-        flattenedNeedJsonLd["won:seeks"] = isNode;
-      } else {
-        // "seeks" has all the content, use it for both
-        flattenedNeedJsonLd["won:is"] = seeksNode;
-      }
-    }
-
     return flattenedNeedJsonLd;
   };
 
@@ -1175,14 +1158,15 @@ import won from "./won.js";
   };
 
   won.getEnvelopeDataforNewConnection = function(
-    ownNeedUri,
+    ownedNeedUri,
     theirNeedUri,
     ownNodeUri,
     theirNodeUri
   ) {
-    if (!ownNeedUri) {
+    if (!ownedNeedUri) {
       throw {
-        message: "getEnvelopeDataforNewConnection: ownNeedUri must not be null",
+        message:
+          "getEnvelopeDataforNewConnection: ownedNeedUri must not be null",
       };
     }
     if (!theirNeedUri) {
@@ -1192,7 +1176,7 @@ import won from "./won.js";
       };
     }
     return {
-      [won.WONMSG.hasSenderNeed]: ownNeedUri,
+      [won.WONMSG.hasSenderNeed]: ownedNeedUri,
       [won.WONMSG.hasSenderNode]: ownNodeUri,
       [won.WONMSG.hasReceiverNeed]: theirNeedUri,
       [won.WONMSG.hasReceiverNode]: theirNodeUri,
@@ -1207,7 +1191,7 @@ import won from "./won.js";
    */
   won.getEnvelopeDataforConnection = async function(
     connectionUri,
-    ownNeedUri,
+    ownedNeedUri,
     theirNeedUri,
     ownNodeUri,
     theirNodeUri,
@@ -1221,7 +1205,7 @@ import won from "./won.js";
 
     const ret = {
       [won.WONMSG.hasSender]: connectionUri,
-      [won.WONMSG.hasSenderNeed]: ownNeedUri,
+      [won.WONMSG.hasSenderNeed]: ownedNeedUri,
       [won.WONMSG.hasSenderNode]: ownNodeUri,
       [won.WONMSG.hasReceiverNeed]: theirNeedUri,
       [won.WONMSG.hasReceiverNode]: theirNodeUri,
@@ -1832,8 +1816,11 @@ import won from "./won.js";
       .then(() => won.getCachedGraphTriples(graphUri));
   };
 
-  won.getConnectionWithOwnAndRemoteNeed = function(ownNeedUri, remoteNeedUri) {
-    return won.getConnectionsOfNeed(ownNeedUri).then(connections => {
+  won.getConnectionWithOwnAndRemoteNeed = function(
+    ownedNeedUri,
+    remoteNeedUri
+  ) {
+    return won.getConnectionsOfNeed(ownedNeedUri).then(connections => {
       for (let connectionUri of Object.keys(connections)) {
         if (connections[connectionUri].hasRemoteNeed === remoteNeedUri) {
           return connections[connectionUri];
@@ -1841,7 +1828,7 @@ import won from "./won.js";
       }
       throw new Error(
         "Couldn't find connection between own need <" +
-          ownNeedUri +
+          ownedNeedUri +
           "> and remote need <" +
           remoteNeedUri +
           ">."

@@ -14,7 +14,6 @@ import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
 import { selectIsConnected } from "../selectors/general-selectors.js";
 
-// import { details } from "detailDefinitions";
 import { useCases } from "useCaseDefinitions";
 
 import "style/_create-post.scss";
@@ -52,15 +51,15 @@ function genComponentConf() {
 
             <!-- ADD TITLE AND DETAILS -->
             <div class="cp__content__branchheader"
-              ng-if="self.useCase.isDetails">
+              ng-if="self.useCase.details">
               Your offer or self description
             </div>
             <won-create-isseeks 
-                ng-if="self.useCase.isDetails" 
+                ng-if="self.useCase.details"
                 is-or-seeks="::'Description'"
-                detail-list="self.useCase.isDetails"
-                initial-draft="self.useCase.draft.is"
-                on-update="::self.updateDraft(draft, 'is')" 
+                detail-list="self.useCase.details"
+                initial-draft="self.useCase.draft.content"
+                on-update="::self.updateDraft(draft, 'content')"
                 on-scroll="::self.scrollIntoView(element)">
             </won-create-isseeks>
             <div class="cp__content__branchheader"
@@ -78,7 +77,7 @@ function genComponentConf() {
 
             <!-- TUNE MATCHING -->
             <div class="cp__content__branchheader b detailPicker clickable"
-                ng-if="self.useCase.isDetails || self.useCase.seeksDetails"
+                ng-if="self.useCase.details || self.useCase.seeksDetails"
                 ng-click="self.toggleTuningOptions()">
                 <span>Tune Matching Behaviour</span>
                 <svg class="cp__content__branchheader__carret" ng-show="!self.showTuningOptions">
@@ -89,7 +88,7 @@ function genComponentConf() {
                 </svg>
             </div>
             <div class="cp__content__tuning"
-            ng-if="self.useCase.isDetails || self.useCase.seeksDetails">
+            ng-if="self.useCase.details || self.useCase.seeksDetails">
                 <div class="cp__content__tuning_matching-context">
                     <won-matching-context-picker
                       ng-if="self.showTuningOptions"
@@ -189,25 +188,23 @@ function genComponentConf() {
 
     isValid() {
       const draft = this.draftObject;
-      const isBranch = get(draft, "is");
+      const draftContent = get(draft, "content");
       const seeksBranch = get(draft, "seeks");
 
-      if (isBranch || seeksBranch) {
-        const mandatoryIsDetailsSet = mandatoryDetailsSet(
-          isBranch,
-          this.useCase.isDetails
+      if (draftContent || seeksBranch) {
+        const mandatoryContentDetailsSet = mandatoryDetailsSet(
+          draftContent,
+          this.useCase.details
         );
         const mandatorySeeksDetailsSet = mandatoryDetailsSet(
           seeksBranch,
           this.useCase.seeksDetails
         );
-        if (mandatoryIsDetailsSet && mandatorySeeksDetailsSet) {
-          const hasIsContent = isBranchContentPresent(isBranch);
+        if (mandatoryContentDetailsSet && mandatorySeeksDetailsSet) {
+          const hasContent = isBranchContentPresent(draftContent);
           const hasSeeksContent = isBranchContentPresent(seeksBranch);
 
-          return (
-            !this.connectionHasBeenLost && (hasIsContent || hasSeeksContent)
-          );
+          return !this.connectionHasBeenLost && (hasContent || hasSeeksContent);
         }
       }
       return false;
@@ -258,12 +255,12 @@ function genComponentConf() {
       }
     }
 
-    updateDraft(updatedDraft, isSeeks) {
+    updateDraft(updatedDraft, branch) {
       if (this.isNew) {
         this.isNew = false;
       }
 
-      this.draftObject[isSeeks] = updatedDraft;
+      this.draftObject[branch] = updatedDraft;
     }
 
     publish(persona) {
@@ -272,7 +269,12 @@ function genComponentConf() {
 
         this.draftObject.useCase = get(this.useCase, "identifier");
 
-        sanitizeDraft(this.draftObject);
+        if (!isBranchContentPresent(this.draftObject.content)) {
+          delete this.draftObject.content;
+        }
+        if (!isBranchContentPresent(this.draftObject.seeks)) {
+          delete this.draftObject.seeks;
+        }
 
         this.needs__create(
           this.draftObject,
@@ -306,14 +308,6 @@ function selectUseCaseFrom(useCaseString, useCases) {
     }
   }
   return undefined;
-}
-function sanitizeDraft(draft) {
-  if (!isBranchContentPresent(draft.is)) {
-    delete draft.is;
-  }
-  if (!isBranchContentPresent(draft.seeks)) {
-    delete draft.seeks;
-  }
 }
 // returns true if the branch has any content present
 function isBranchContentPresent(isOrSeeks) {

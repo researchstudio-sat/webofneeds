@@ -231,7 +231,7 @@ export function runMessagingAgent(redux) {
         redux.dispatch({
           type: actionTypes.needs.close,
           payload: {
-            ownNeedUri: message.getReceiverNeed(),
+            ownedNeedUri: message.getReceiverNeed(),
           },
         });
         return true;

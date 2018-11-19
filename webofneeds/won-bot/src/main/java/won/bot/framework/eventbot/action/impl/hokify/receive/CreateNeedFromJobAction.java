@@ -141,39 +141,38 @@ public class CreateNeedFromJobAction extends AbstractCreateNeedAction {
         DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(needURI.toString());
 
         Resource need = needModelWrapper.getNeedModel().createResource(needURI.toString());
-        Resource isPart = need.getModel().createResource();
         Resource seeksPart = need.getModel().createResource();
         // @type
-        isPart.addProperty(RDF.type, SCHEMA.JOBPOSTING);
+        need.addProperty(RDF.type, SCHEMA.JOBPOSTING);
 
         // s:url
-        isPart.addProperty(SCHEMA.URL, "");
+        need.addProperty(SCHEMA.URL, "");
 
         // s:title
-        isPart.addProperty(SCHEMA.TITLE, hokifyJob.getTitle());
+        need.addProperty(SCHEMA.TITLE, hokifyJob.getTitle());
 
         // s:datePosted
         // TODO:convert to s:Date (ISO 8601)
-        isPart.addProperty(SCHEMA.DATEPOSTED, hokifyJob.getDate());
+        need.addProperty(SCHEMA.DATEPOSTED, hokifyJob.getDate());
 
         // s:image
-        Resource image = isPart.getModel().createResource();
+        Resource image = need.getModel().createResource();
         image.addProperty(RDF.type, SCHEMA.URL);
         image.addProperty(SCHEMA.VALUE, hokifyJob.getImage());
-        isPart.addProperty(SCHEMA.IMAGE, image);
+        need.addProperty(SCHEMA.IMAGE, image);
 
         // s:hiringOrganization
-        Resource hiringOrganisation = isPart.getModel().createResource();
+        Resource hiringOrganisation = need.getModel().createResource();
         hiringOrganisation.addProperty(RDF.type, SCHEMA.ORGANIZATION);
         hiringOrganisation.addProperty(SCHEMA.NAME, hokifyJob.getCompany());
-        isPart.addProperty(SCHEMA.ORGANIZATION, hiringOrganisation);
+        need.addProperty(SCHEMA.ORGANIZATION, hiringOrganisation);
 
         // s:jobLocation
-        Resource jobLocation = isPart.getModel().createResource();
+        Resource jobLocation = need.getModel().createResource();
         jobLocation.addProperty(RDF.type, SCHEMA.PLACE);
         // TODO look up lon/lat via nominatim
 
-        isPart.addProperty(SCHEMA.JOBLOCATION, jobLocation);
+        need.addProperty(SCHEMA.JOBLOCATION, jobLocation);
 
         HashMap<String, String> location = hokifyBotsApi.fetchGeoLocation(hokifyJob.getCity(), hokifyJob.getCountry());
         if (location != null) {
@@ -189,10 +188,10 @@ public class CreateNeedFromJobAction extends AbstractCreateNeedAction {
             String lng = df.format(Double.parseDouble(location.get("lng")));
             String name = location.get("name");
 
-            Resource boundingBoxResource = isPart.getModel().createResource();
-            Resource nwCornerResource = isPart.getModel().createResource();
-            Resource seCornerResource = isPart.getModel().createResource();
-            Resource geoResource = isPart.getModel().createResource();
+            Resource boundingBoxResource = need.getModel().createResource();
+            Resource nwCornerResource = need.getModel().createResource();
+            Resource seCornerResource = need.getModel().createResource();
+            Resource geoResource = need.getModel().createResource();
             jobLocation.addProperty(SCHEMA.NAME, name);
             jobLocation.addProperty(SCHEMA.GEO, geoResource);
             geoResource.addProperty(RDF.type, SCHEMA.GEOCOORDINATES);
@@ -217,23 +216,23 @@ public class CreateNeedFromJobAction extends AbstractCreateNeedAction {
             jobLocation.addProperty(SCHEMA.NAME, alternateLocation);
         }
         // s:description
-        isPart.addProperty(SCHEMA.DESCRIPTION, filterDescriptionString(hokifyJob.getDescription()));
+        need.addProperty(SCHEMA.DESCRIPTION, filterDescriptionString(hokifyJob.getDescription()));
 
         // s:baseSalary
-        isPart.addProperty(SCHEMA.BASESALARY, hokifyJob.getSalary());
+        need.addProperty(SCHEMA.BASESALARY, hokifyJob.getSalary());
 
         // s:employmentType
-        isPart.addProperty(SCHEMA.EMPLYOMENTTYPE, hokifyJob.getJobtype() != null ? hokifyJob.getJobtype() : "");
+        need.addProperty(SCHEMA.EMPLYOMENTTYPE, hokifyJob.getJobtype() != null ? hokifyJob.getJobtype() : "");
 
         // s:industry
         for (Object field : hokifyJob.getField()) {
-            isPart.addProperty(SCHEMA.INDUSTRY, parseField(field));
+            need.addProperty(SCHEMA.INDUSTRY, parseField(field));
         }
 
         String[] tags = { "job", "hokify", "offer-job" };
 
         for (String tag : tags) {
-            isPart.addProperty(WON.HAS_TAG, tag);
+            need.addProperty(WON.HAS_TAG, tag);
         }
 
         seeksPart.addProperty(RDF.type, SCHEMA.PERSON);
@@ -241,8 +240,6 @@ public class CreateNeedFromJobAction extends AbstractCreateNeedAction {
         needModelWrapper.addFacet("#ChatFacet", WON.CHAT_FACET_STRING);
 
         needModelWrapper.addFlag(WON.NO_HINT_FOR_ME);
-
-        need.addProperty(WON.IS, isPart);
         need.addProperty(WON.SEEKS, seeksPart);
 
         return needModelWrapper.copyDataset();

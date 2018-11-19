@@ -235,7 +235,7 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
 	    try {
 			String wonMessageJsonLdString = WonMessageEncoder.encodeAsJsonLd(wonMessage);
 			WebSocketMessage<String> webSocketMessage = new TextMessage(wonMessageJsonLdString);
-			URI needUri = getOwnNeedURI(wonMessage);
+			URI needUri = getOwnedNeedURI(wonMessage);
 			User user = getUserForWonMessage(wonMessage);
 	
 			Set<WebSocketSession> webSocketSessions = findWebSocketSessionsForWonMessage(wonMessage, needUri, user);
@@ -373,7 +373,7 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
 	}
 
 	private User getUserForWonMessage(final WonMessage wonMessage) {
-		URI needUri = getOwnNeedURI(wonMessage);
+		URI needUri = getOwnedNeedURI(wonMessage);
 		return userRepository.findByNeedUri(needUri);
 	}
 
@@ -467,7 +467,7 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
 
 	private void saveNeedUriWithUser(final WonMessage wonMessage, final WebSocketSession session) {
 		User user = getUserForSession(session);
-		URI needUri = getOwnNeedURI(wonMessage);
+		URI needUri = getOwnedNeedURI(wonMessage);
 		UserNeed userNeed = new UserNeed(needUri);
 		// reload the user so we can save it
 		// (the user object we get from getUserForSession is detached)
@@ -487,7 +487,7 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
 
     private void updateNeedUriState(final WonMessage wonMessage, final WebSocketSession session, NeedState newState) {
         User user = getUserForSession(session);
-        URI needUri = getOwnNeedURI(wonMessage);
+        URI needUri = getOwnedNeedURI(wonMessage);
         UserNeed userNeed = userNeedRepository.findByNeedUri(needUri);
         userNeed.setState(newState);
         // reload the user so we can save it
@@ -521,7 +521,7 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
         this.serverSideActionService = serverSideActionService;
     }
 	
-	private URI getOwnNeedURI(WonMessage message) {
+	private URI getOwnedNeedURI(WonMessage message) {
 	    return message.getEnvelopeType() == WonMessageDirection.FROM_SYSTEM 
             ? message.getSenderNeedURI() 
             : message.getReceiverNeedURI();    

@@ -41,11 +41,11 @@ function genComponentConf() {
       this.allDetails = getAllDetails();
 
       const selectFromState = state => {
-        const ownNeed =
+        const ownedNeed =
           this.connectionUri &&
           getOwnedNeedByConnectionUri(state, this.connectionUri);
         const connection =
-          ownNeed && ownNeed.getIn(["connections", this.connectionUri]);
+          ownedNeed && ownedNeed.getIn(["connections", this.connectionUri]);
         const message =
           connection &&
           this.messageUri &&

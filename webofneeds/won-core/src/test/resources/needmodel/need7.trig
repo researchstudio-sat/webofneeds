@@ -23,9 +23,7 @@
             won:hasMatchingContext  "TU_Wien" ;
             won:hasMatchingContext  "Vienna" ;
             won:hasMatchingContext  "Ball" ;
-            won:is        [ a                       won:NeedContent ;
-                            dc:title                "Ballkleid"
-                          ] ;
+            dc:title                "Ballkleid" ;
             won:hasFacet          won:ChatFacet ;
             won:hasFlag           won:UsedForTesting ;
             won:hasFlag           won:NoHintForMe;

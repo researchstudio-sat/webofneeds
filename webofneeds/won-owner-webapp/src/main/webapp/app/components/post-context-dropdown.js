@@ -90,7 +90,7 @@ function genComponentConf() {
 
         return {
           adminEmail: getIn(state, ["config", "theme", "adminEmail"]),
-          isOwnPost: post && post.get("ownNeed"),
+          isOwnPost: post && post.get("isOwned"),
           isActive: postState === won.WON.ActiveCompacted,
           isInactive: postState === won.WON.InactiveCompacted,
           shouldShowRdf: state.get("showRdf"),

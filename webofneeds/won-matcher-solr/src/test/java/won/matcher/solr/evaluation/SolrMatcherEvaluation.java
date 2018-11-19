@@ -16,7 +16,6 @@ import won.matcher.solr.query.factory.BasicNeedQueryFactory;
 import won.matcher.solr.query.factory.TestNeedQueryFactory;
 import won.matcher.utils.tensor.TensorMatchingData;
 import won.protocol.exception.IncorrectPropertyCountException;
-import won.protocol.model.NeedContentPropertyType;
 import won.protocol.util.DefaultNeedModelWrapper;
 
 import javax.annotation.PostConstruct;
@@ -83,12 +82,12 @@ public class SolrMatcherEvaluation
 
     try {
       DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(need);
-      title = needModelWrapper.getTitles(NeedContentPropertyType.ALL).iterator().next();
+      title = needModelWrapper.getAllTitles().iterator().next();
       title = title.replaceAll("[^A-Za-z0-9 ]", "_");
       title = title.replaceAll("NOT", "_");
       title = title.replaceAll("AND", "_");
       title = title.replaceAll("OR", "_");
-      description = needModelWrapper.getSomeDescription(NeedContentPropertyType.ALL);
+      description = needModelWrapper.getSomeDescription();
     } catch (IncorrectPropertyCountException e) {
 
       // do nothing

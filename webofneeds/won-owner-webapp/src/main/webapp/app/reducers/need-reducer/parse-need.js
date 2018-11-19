@@ -1,146 +1,54 @@
 import Immutable from "immutable";
 import won from "../../won-es6.js";
 import { getAllDetails } from "../../won-utils.js";
+import { isWhatsNewNeed, isWhatsAroundNeed } from "../../need-utils.js";
 
-export function parseNeed(jsonldNeed, ownNeed) {
+export function parseNeed(jsonldNeed, isOwned) {
   const jsonldNeedImm = Immutable.fromJS(jsonldNeed);
 
-  let parsedNeed = {
-    uri: undefined,
-    nodeUri: undefined,
-    types: undefined,
-    state: undefined,
-    connections: Immutable.Map(),
-    creationDate: undefined,
-    lastUpdateDate: undefined,
-    unread: false,
-    ownNeed: !!ownNeed,
-    isBeingCreated: false,
-    isWhatsAround: false,
-    isWhatsNew: false,
-    hasFlags: undefined,
-    matchingContexts: undefined,
-    searchString: undefined,
-    jsonld: jsonldNeed,
-    hasFacets: Immutable.Map(),
-    heldBy: undefined,
-    holds: undefined,
-  };
+  if (jsonldNeedImm && jsonldNeedImm.get("@id")) {
+    const detailsToParse = getAllDetails();
 
-  if (jsonldNeedImm) {
-    const uri = jsonldNeedImm.get("@id");
-    const nodeUri = jsonldNeedImm.getIn(["won:hasWonNode", "@id"]);
-    const is = jsonldNeedImm.get("won:is");
-    const seeks = jsonldNeedImm.get("won:seeks");
-    const isPresent = is && is.size > 0;
-    const seeksPresent = seeks && seeks.size > 0;
+    let parsedNeed = {
+      uri: jsonldNeedImm.get("@id"),
+      nodeUri: jsonldNeedImm.getIn(["won:hasWonNode", "@id"]),
+      types: extractTypes(jsonldNeedImm),
+      facets: extractFacets(jsonldNeedImm.get("won:hasFacet")),
+      flags: extractFlags(jsonldNeedImm.get("won:hasFlag")),
+      state: extractState(jsonldNeedImm),
+      matchingContexts: extractMatchingContext(jsonldNeedImm),
+      heldBy: won.parseFrom(jsonldNeedImm, ["won:heldBy"], "xsd:ID"),
+      holds:
+        won.parseListFrom(jsonldNeedImm, ["won:holds"], "xsd:ID") ||
+        Immutable.List(),
+      content: generateContent(jsonldNeedImm, detailsToParse),
+      seeks: generateContent(jsonldNeedImm.get("won:seeks"), detailsToParse),
+      creationDate: extractCreationDate(jsonldNeedImm),
+      lastUpdateDate: extractCreationDate(jsonldNeedImm),
+      humanReadable: undefined, //can only be determined after we generated The Content
+      unread: false,
+      isOwned: !!isOwned,
+      isBeingCreated: false,
+      toLoad: false,
+      isLoading: false,
+      jsonld: jsonldNeed,
+      connections: Immutable.Map(),
+    };
 
-    const searchString = jsonldNeedImm.get("won:hasSearchString");
-
-    if (uri) {
-      parsedNeed.uri = uri;
-    } else {
+    if (!parsedNeed.creationDate || !parsedNeed.lastUpdateDate) {
+      console.error(
+        "Cant parse need, creationDate or lastUpdateDate not set",
+        jsonldNeedImm && jsonldNeedImm.toJS()
+      );
       return undefined;
     }
 
-    /*
-     * The following code-snippet is solely to determine if the parsed need
-     * is a special "whats around"-need, in order to do this we have to make
-     * sure that the won:hasFlag is checked in two forms, both as a string
-     * and an immutable object
-     */
-    const wonHasFlags = jsonldNeedImm.get("won:hasFlag");
-
-    const hasFlags = extractFlags(jsonldNeedImm.get("won:hasFlag"));
-
-    const isWhatsAround =
-      wonHasFlags &&
-      wonHasFlags.filter(function(flag) {
-        if (flag instanceof Immutable.Map) {
-          return flag.get("@id") === "won:WhatsAround";
-        } else {
-          return flag === "won:WhatsAround";
-        }
-      }).size > 0;
-
-    const isWhatsNew =
-      wonHasFlags &&
-      wonHasFlags.filter(function(flag) {
-        if (flag instanceof Immutable.Map) {
-          return flag.get("@id") === "won:WhatsNew";
-        } else {
-          return flag === "won:WhatsNew";
-        }
-      }).size > 0;
-
-    const wonHasMatchingContexts = jsonldNeedImm.get("won:hasMatchingContext");
-
-    const creationDate =
-      jsonldNeedImm.get("dct:created") ||
-      jsonldNeedImm.get("http://purl.org/dc/terms/created");
-    if (creationDate) {
-      parsedNeed.creationDate = new Date(creationDate);
-      parsedNeed.lastUpdateDate = parsedNeed.creationDate;
-    }
-
-    const state = jsonldNeedImm.getIn([won.WON.isInStateCompacted, "@id"]);
-    if (state === won.WON.ActiveCompacted) {
-      // we use to check for active
-      // state and everything else
-      // will be inactive
-      parsedNeed.state = state;
-    } else {
-      parsedNeed.state = won.WON.InactiveCompacted;
-    }
-
-    parsedNeed.heldBy = jsonldNeedImm.getIn(["won:heldBy", "@id"]);
-
-    let isPart = undefined;
-    let seeksPart = undefined;
-    let type = undefined;
-    const detailsToParse = getAllDetails();
-
-    parsedNeed.holds =
-      won.parseListFrom(jsonldNeedImm, ["won:holds"], "xsd:ID") ||
-      Immutable.List();
-
-    parsedNeed.heldBy = won.parseFrom(jsonldNeedImm, ["won:heldBy"], "xsd:ID");
-
-    parsedNeed.types = (rawTypes => {
-      if (Immutable.List.isList(rawTypes)) {
-        return Immutable.Set(rawTypes);
-      } else {
-        return Immutable.Set([rawTypes]);
-      }
-    })(jsonldNeedImm.get("@type"));
-
-    if (isPresent) {
-      isPart = generateContent(is, type, detailsToParse);
-    }
-    if (seeksPresent) {
-      seeksPart = generateContent(seeks, type, detailsToParse);
-    }
-    if (searchString) {
-      parsedNeed.searchString = searchString;
-    }
-
-    parsedNeed.is = isPart;
-    parsedNeed.seeks = seeksPart;
-
-    parsedNeed.isWhatsAround = !!isWhatsAround;
-    parsedNeed.isWhatsNew = !!isWhatsNew;
-    parsedNeed.matchingContexts = wonHasMatchingContexts
-      ? Immutable.List.isList(wonHasMatchingContexts)
-        ? wonHasMatchingContexts
-        : Immutable.List.of(wonHasMatchingContexts)
-      : undefined;
-    parsedNeed.hasFlags = hasFlags;
-    parsedNeed.hasFacets = extractFacets(jsonldNeedImm.get("won:hasFacet"));
-    parsedNeed.nodeUri = nodeUri;
     parsedNeed.humanReadable = getHumanReadableStringFromNeed(
       parsedNeed,
       detailsToParse
     );
+
+    return Immutable.fromJS(parsedNeed);
   } else {
     console.error(
       "Cant parse need, data is an invalid need-object: ",
@@ -148,8 +56,6 @@ export function parseNeed(jsonldNeed, ownNeed) {
     );
     return undefined;
   }
-
-  return Immutable.fromJS(parsedNeed);
 }
 
 /**
@@ -157,16 +63,12 @@ export function parseNeed(jsonldNeed, ownNeed) {
  * uses the parseFromRdf function defined in the detail to extract the content
  * uses the detail identifier as the key of the contentDetail that is to be added
  * @param contentJsonLd
- * @param type
  * @param detailsToParse
- * @returns {{title: *, type: *}}
+ * @returns {title: *, tags: *}
  */
-function generateContent(contentJsonLd, type, detailsToParse) {
-  let content = {
-    type: type,
-  };
-
-  if (detailsToParse) {
+function generateContent(contentJsonLd, detailsToParse) {
+  let content = {};
+  if (contentJsonLd && contentJsonLd.size > 0 && detailsToParse) {
     for (const detailKey in detailsToParse) {
       const detailToParse = detailsToParse[detailKey];
       const detailIdentifier = detailToParse && detailToParse.identifier;
@@ -182,51 +84,94 @@ function generateContent(contentJsonLd, type, detailsToParse) {
   return content;
 }
 
+function extractState(needJsonLd) {
+  // we use to check for active
+  // state and everything else
+  // will be inactive
+  return needJsonLd.getIn([won.WON.isInStateCompacted, "@id"]) ===
+    won.WON.ActiveCompacted
+    ? won.WON.ActiveCompacted
+    : won.WON.InactiveCompacted;
+}
+
+function extractMatchingContext(needJsonLd) {
+  const wonHasMatchingContexts = needJsonLd.get("won:hasMatchingContext");
+  return wonHasMatchingContexts
+    ? Immutable.List.isList(wonHasMatchingContexts)
+      ? wonHasMatchingContexts
+      : Immutable.List.of(wonHasMatchingContexts)
+    : undefined;
+}
+
+function extractTypes(needJsonLd) {
+  const types = (rawTypes => {
+    if (Immutable.List.isList(rawTypes)) {
+      return Immutable.Set(rawTypes);
+    } else {
+      return Immutable.Set([rawTypes]);
+    }
+  })(needJsonLd.get("@type"));
+
+  return types;
+}
+
+function extractCreationDate(needJsonLd) {
+  const creationDate =
+    needJsonLd.get("dct:created") ||
+    needJsonLd.get("http://purl.org/dc/terms/created");
+  if (creationDate) {
+    return new Date(creationDate);
+  }
+  return undefined;
+}
+
 function extractFlags(wonHasFlags) {
-  let hasFlags = Immutable.List();
+  let flags = Immutable.List();
 
   wonHasFlags &&
     wonHasFlags.map(function(flag) {
       if (flag instanceof Immutable.Map) {
-        hasFlags = hasFlags.push(flag.get("@id"));
+        flags = flags.push(flag.get("@id"));
       } else {
-        hasFlags = hasFlags.push(flag);
+        flags = flags.push(flag);
       }
     });
 
-  return hasFlags;
+  return flags;
 }
 
 function extractFacets(wonHasFacets) {
-  let hasFacets = Immutable.Map();
+  let facets = Immutable.Map();
 
   if (wonHasFacets) {
     if (Immutable.List.isList(wonHasFacets)) {
       wonHasFacets.map(facet => {
-        hasFacets = hasFacets.set(facet.get("@id"), facet.get("@type"));
+        facets = facets.set(facet.get("@id"), facet.get("@type"));
       });
-      return hasFacets;
+      return facets;
     } else {
-      return hasFacets.set(wonHasFacets.get("@id"), wonHasFacets.get("@type"));
+      return facets.set(wonHasFacets.get("@id"), wonHasFacets.get("@type"));
     }
   }
-  return hasFacets;
+  return facets;
 }
 
 function getHumanReadableStringFromNeed(need, detailsToParse) {
   if (need && detailsToParse) {
-    const isBranch = need.is;
+    const needContent = need.content;
     const seeksBranch = need.seeks;
 
-    const isTitle = isBranch && isBranch.title;
+    const title = needContent && needContent.title;
     const seeksTitle = seeksBranch && seeksBranch.title;
 
-    if (need.isWhatsNew) {
+    if (isWhatsNewNeed(Immutable.fromJS(need))) {
       return "What's New";
     }
 
-    if (need.isWhatsAround) {
-      let location = isBranch["location"] || seeksBranch["location"];
+    if (isWhatsAroundNeed(Immutable.fromJS(need))) {
+      let location =
+        (needContent && needContent["location"]) ||
+        (seeksBranch && seeksBranch["location"]);
 
       const locationJS =
         location && Immutable.Iterable.isIterable(location)
@@ -242,22 +187,22 @@ function getHumanReadableStringFromNeed(need, detailsToParse) {
       );
     }
 
-    if (isTitle && seeksTitle) {
-      return isTitle + " - " + seeksTitle;
+    if (title && seeksTitle) {
+      return title + " - " + seeksTitle;
     } else if (seeksTitle) {
       return seeksTitle;
-    } else if (isTitle) {
-      return isTitle;
+    } else if (title) {
+      return title;
     } else {
-      const searchString = need && need.searchString;
+      const searchString = need && need.content && need.content.searchString;
 
       if (searchString) {
         return "Search: " + searchString;
       }
     }
 
-    let humanReadableIsDetails = generateHumanReadableArray(
-      isBranch,
+    let humanReadableDetails = generateHumanReadableArray(
+      needContent,
       detailsToParse
     );
     let humanReadableSeeksDetails = generateHumanReadableArray(
@@ -266,17 +211,16 @@ function getHumanReadableStringFromNeed(need, detailsToParse) {
     );
 
     if (
-      humanReadableIsDetails.length > 0 &&
+      humanReadableDetails.length > 0 &&
       humanReadableSeeksDetails.length > 0
     ) {
       return (
-        "Is: " +
-        humanReadableIsDetails.join(" ") +
+        humanReadableDetails.join(" ") +
         " Seeks: " +
         humanReadableSeeksDetails.join(", ")
       );
-    } else if (humanReadableIsDetails.length > 0) {
-      return humanReadableIsDetails.join(", ");
+    } else if (humanReadableDetails.length > 0) {
+      return humanReadableDetails.join(", ");
     } else if (humanReadableSeeksDetails.length > 0) {
       return humanReadableSeeksDetails.join(", ");
     }
