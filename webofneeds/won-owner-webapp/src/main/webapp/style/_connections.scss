@@ -11,6 +11,14 @@ aside.overview__left {
 }
 
 main.overview__right {
+  @media (min-width: $responsivenessBreakPoint) {
+    //ALWAYS SHOW RIGHT HAND SIDE IF IN DESKTOP VIEW
+    > * {
+      position: sticky;
+      top: 3.3rem;
+    }
+  }
+
   border-right: $thinGrayBorder;
   @media (max-width: $responsivenessBreakPoint) {
     grid-column: 1 / -1;
@@ -21,7 +29,6 @@ main.overview__right {
   .overview__right__welcome {
     padding: 0.5rem;
     width: 100%;
-    overflow: auto;
     box-sizing: border-box;
     background: $won-lighter-gray;
 
