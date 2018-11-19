@@ -44,11 +44,11 @@ function genTopnavConf() {
             <svg class="si__icon" style="--local-primary:white;">
                 <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_info"></use>
             </svg>
-            <div class="si__text">
+            <div class="si__smalltext">
                 This is the demonstrator of an ongoing research project. Please keep in mind:
                 <ul>
                 	<li> Your posts are public. </li>
-					<li> Your user account is not publicly linked to your posts.</li>
+					        <li> Your user account is not publicly linked to your posts.</li>
                 	<li> The connections of your posts are public.</li>
                 	<li> The messages you exchange with others are private, but stored in clear text on our servers. </li>
                 </ul>     
@@ -62,10 +62,10 @@ function genTopnavConf() {
                    href="/piwik/index.php?module=CoreAdminHome&action=optOut&language=en">
                    Suppress tracking.
                 </a>
-	  		</div>
+	  		    </div>
             <button
                 ng-click="self.acceptDisclaimer()"
-                class="si__button">
+                class="si__smallbutton">
                     Ok, I'll keep that in mind
             </button>
         </div>
