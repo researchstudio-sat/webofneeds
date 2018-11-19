@@ -17,10 +17,10 @@
         <div class="footer__title__tagLine">Web Of Needs</div>
     </div>
     <div class="footer__links">
-        <a class="footer__links__link" href="{{ self.absHRef(self.$state, 'about') }}">About</a>
+        <a class="footer__links__link" href="{{ self.absHRef(self.$state, 'about', {'aboutSection': undefined}) }}">About</a>
         <span class="footer__links__divider">|</span>
-        <a class="footer__links__link" href="{{ self.absHRef(self.$state, 'about', {'#': 'aboutPrivacyPolicy'}) }}">Privacy</a>
+        <a class="footer__links__link" href="{{ self.absHRef(self.$state, 'about', {'aboutSection': 'aboutPrivacyPolicy'}) }}">Privacy</a>
         <span class="footer__links__divider">|</span>
-        <a class="footer__links__link" href="{{ self.absHRef(self.$state, 'about', {'#': 'aboutFaq'}) }}">FAQ</a>
+        <a class="footer__links__link" href="{{ self.absHRef(self.$state, 'about', {'aboutSection': 'aboutFaq'}) }}">FAQ</a>
     </div>
 </footer>

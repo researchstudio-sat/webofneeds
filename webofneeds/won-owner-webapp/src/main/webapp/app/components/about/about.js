@@ -7,6 +7,7 @@ import { attach, getIn, toAbsoluteURL } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import { ownerBaseUrl } from "config";
 import * as srefUtils from "../../sref-utils.js";
+import { getAboutSectionFromRoute } from "../../selectors/general-selectors.js";
 
 import "style/_about.scss";
 
@@ -193,9 +194,11 @@ class AboutController {
     window.ab4dbg = this;
 
     const select = state => {
+      const visibleSection = getAboutSectionFromRoute(state);
       const themeName = getIn(state, ["config", "theme", "name"]);
       return {
         themeName,
+        visibleSection,
         appTitle: getIn(state, ["config", "theme", "title"]),
         tosTemplate:
           "./skin/" +

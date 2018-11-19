@@ -13,7 +13,7 @@
         <won-usecase-picker></won-usecase-picker>
         <div class="overview__right__welcome__howto">
             <div  class="overview__right__welcome__howto__label">{{ self.appTitle }} connects people's needs to their solutions</div>
-            <a class="overview__right__welcome__howto__button won-button--filled red" href="{{ self.absHRef(self.$state, 'about', {'#': 'aboutHowTo'}) }}">
+            <a class="overview__right__welcome__howto__button won-button--filled red" href="{{ self.absHRef(self.$state, 'about', {'aboutSection': 'aboutHowTo'}) }}">
                 <span>How {{ self.appTitle }} works?</span>
             </a>
         </div>
@@ -36,10 +36,10 @@
         <div class="footer__title__tagLine">Web Of Needs</div>
     </div>
     <div class="footer__links">
-        <a class="footer__links__link" href="{{ self.absHRef(self.$state, 'about') }}">About</a>
+        <a class="footer__links__link" href="{{ self.absHRef(self.$state, 'about', {'aboutSection': undefined}) }}">About</a>
         <span class="footer__links__divider">|</span>
-        <a class="footer__links__link" href="{{ self.absHRef(self.$state, 'about', {'#': 'aboutPrivacyPolicy'}) }}">Privacy</a>
+        <a class="footer__links__link" href="{{ self.absHRef(self.$state, 'about', {'aboutSection': 'aboutPrivacyPolicy'}) }}">Privacy</a>
         <span class="footer__links__divider">|</span>
-        <a class="footer__links__link" href="{{ self.absHRef(self.$state, 'about', {'#': 'aboutFaq'}) }}">FAQ</a>
+        <a class="footer__links__link" href="{{ self.absHRef(self.$state, 'about', {'aboutSection': 'aboutFaq'}) }}">FAQ</a>
     </div>
 </footer>

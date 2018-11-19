@@ -2,8 +2,7 @@
     <won-topnav></won-topnav>
 </header>
 <main class="about" id="allSections">
-    <a id="aboutTop"></a>
-    <section class="about__welcome">
+    <section class="about__welcome" ng-if="!self.visibleSection">
         <div class="about__welcome__title">What is the Web of Needs?</div>
         <won-flex-grid class="about__welcome__grid" items="::self.peopleGrid"></won-flex-grid>
         <div class="about__welcome__description">
@@ -24,9 +23,8 @@
                 Once you found a useful match, you can connect to it and start to chat.</span>
         </div>
     </section>
-    <a id="aboutHowTo"></a>
-    <section class="about__howto">
-        <h1 class="about__howto__title">How it works</div>
+    <section class="about__howto" ng-if="!self.visibleSection || self.visibleSection === 'aboutHowTo'">
+        <h1 class="about__howto__title">How it works</h1>
         <h3 class="about__howto__subtitle">in {{self.howItWorksSteps.length}} Steps</h3>
         <div class="about__howto__steps">
             <div class="about__howto__steps__process" ng-style="{'--howToColCount': self.howItWorksSteps.length}"> <!-- TODO: this var injection does not work -->
@@ -92,23 +90,19 @@
             </button>
         </div>
     </section>
-    <a id="aboutPrivacyPolicy"></a>
-    <section class="about__privacyPolicy">
+    <section class="about__privacyPolicy" ng-if="!self.visibleSection || self.visibleSection === 'aboutPrivacyPolicy'">
         <div class="about__privacyPolicy__title">Privacy Policy</div>
         <div class="about__privacyPolicy__text" ng-include="self.privacyPolicyTemplate"></div>
     </section>
-    <a id="aboutTermsOfService"></a>
-    <section class="about__termsOfService">
+    <section class="about__termsOfService" ng-if="!self.visibleSection || self.visibleSection === 'aboutTermsOfService'">
         <div class="about__termsOfService__title">Terms Of Service</div>
         <div class="about__termsOfService__text" ng-include="self.tosTemplate"></div>
     </section>
-    <a id="aboutImprint"></a>
-    <section class="about__imprint">
+    <section class="about__imprint" ng-if="!self.visibleSection || self.visibleSection === 'aboutImprint'">
         <div class="about__imprint__title">Imprint</div>
         <div class="about__imprint__text" ng-include="self.imprintTemplate"></div>
     </section>
-    <a id="aboutFaq"></a>
-    <section class="about__faq">
+    <section class="about__faq" ng-if="!self.visibleSection || self.visibleSection === 'aboutFaq'">
         <div class="about__faq__title">FAQs</div>
         <won-accordion class="about__faq__questions" items="::self.questions"></won-accordion>
     </section>
@@ -122,10 +116,10 @@
         <div class="footer__title__tagLine">Web Of Needs</div>
     </div>
     <div class="footer__links">
-        <a class="footer__links__link" href="{{ self.absHRef(self.$state, 'about') }}">About</a>
+        <a class="footer__links__link" href="{{ self.absHRef(self.$state, 'about', {'aboutSection': undefined}) }}">About</a>
         <span class="footer__links__divider">|</span>
-        <a class="footer__links__link" href="{{ self.absHRef(self.$state, 'about', {'#': 'aboutPrivacyPolicy'}) }}">Privacy</a>
+        <a class="footer__links__link" href="{{ self.absHRef(self.$state, 'about', {'aboutSection': 'aboutPrivacyPolicy'}) }}">Privacy</a>
         <span class="footer__links__divider">|</span>
-        <a class="footer__links__link" href="{{ self.absHRef(self.$state, 'about', {'#': 'aboutFaq'}) }}">FAQ</a>
+        <a class="footer__links__link" href="{{ self.absHRef(self.$state, 'about', {'aboutSection': 'aboutFaq'}) }}">FAQ</a>
     </div>
 </footer>

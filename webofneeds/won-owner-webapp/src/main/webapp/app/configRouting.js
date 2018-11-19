@@ -73,7 +73,7 @@ export const configRouting = [
     });
 
     [
-      { path: "/about?privateId", component: "about" },
+      { path: "/about?privateId?aboutSection", component: "about" },
       { path: "/signup?privateId", component: "signup" },
       { path: "/settings?privateId", component: "settings" },
       {

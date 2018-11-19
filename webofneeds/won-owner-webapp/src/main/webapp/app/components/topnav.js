@@ -53,7 +53,7 @@ function genTopnavConf() {
                 	<li> The messages you exchange with others are private, but stored in clear text on our servers. </li>
                 </ul>     
                 <a target="_blank"
-                   href="{{ self.absHRef(self.$state, 'about', {'#': 'aboutPrivacyPolicy'}) }}">
+                   href="{{ self.absHRef(self.$state, 'about', {'aboutSection': 'aboutPrivacyPolicy'}) }}">
                    See Privacy Policy.
                 </a>
                 <br />
