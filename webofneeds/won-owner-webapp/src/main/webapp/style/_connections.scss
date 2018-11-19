@@ -12,10 +12,15 @@ aside.overview__left {
 
 main.overview__right {
   > won-post-messages {
-    max-height: 90vh; //TODO: FIND A SANE VIEWPORT MAX HEIGHT
-  }
-  > * {
-    min-height: 90vh; //TODO: FIND A SANE VIEWPORT MAX HEIGHT
+    max-height: 95.7vh; //TODO: FIND A SANE VIEWPORT MAX HEIGHT
+    min-height: 95.7vh;
+    height: 95.7vh;
+
+    @media (max-width: $responsivenessBreakPoint) {
+      max-height: 99.9vh;
+      min-height: 99.9vh;
+      height: 99.9vh;
+    }
   }
 
   @media (min-width: $responsivenessBreakPoint) {
