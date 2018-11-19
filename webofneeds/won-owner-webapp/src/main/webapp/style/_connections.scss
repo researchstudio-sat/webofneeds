@@ -11,6 +11,13 @@ aside.overview__left {
 }
 
 main.overview__right {
+  > won-post-messages {
+    max-height: 90vh; //TODO: FIND A SANE VIEWPORT MAX HEIGHT
+  }
+  > * {
+    min-height: 90vh; //TODO: FIND A SANE VIEWPORT MAX HEIGHT
+  }
+
   @media (min-width: $responsivenessBreakPoint) {
     //ALWAYS SHOW RIGHT HAND SIDE IF IN DESKTOP VIEW
     > * {

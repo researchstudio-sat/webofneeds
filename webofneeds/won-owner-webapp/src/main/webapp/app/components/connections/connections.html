@@ -27,7 +27,6 @@
     <won-post-messages ng-if="!self.selectedPost && !self.useCaseGroup && (self.connectionType === self.WON.Connected || self.connectionType === self.WON.RequestReceived || self.connectionType === self.WON.RequestSent || self.connectionType === self.WON.Suggested)"></won-post-messages>
     <won-post-info include-header="true" ng-if="self.selectedPost && !self.useCaseGroup"></won-post-info>
 </main>
-<div class="gridview-placeholder"></div>
 <footer class="overview__footer">
     <div class="overview__footer__links">
         <a class="overview__footer__links__link" href="{{ self.absHRef(self.$state, 'about', {'#': 'aboutImprint'}) }}">About</a>
