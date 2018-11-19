@@ -24,6 +24,7 @@ class SignupController {
   constructor(/* arguments <- serviceDependencies */) {
     attach(this, serviceDependencies, arguments);
     this.rememberMe = false;
+    this.acceptToS = false;
     Object.assign(this, srefUtils); // bind srefUtils to scope
 
     const select = state => {

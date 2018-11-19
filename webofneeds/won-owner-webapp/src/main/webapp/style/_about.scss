@@ -343,6 +343,39 @@ main.about {
     }
   }
 
+  & > .about__termsOfService {
+    background-color: $won-lighter-gray;
+
+    .about__termsOfService__title {
+      font-size: $bigFontSize;
+      text-align: center;
+
+      padding-bottom: 2rem;
+      font-weight: normal;
+    }
+
+    .about__termsOfService__text {
+      margin: 0 auto;
+      max-width: 45rem;
+      font-size: $smallFontSize;
+      h2 {
+        font-size: $normalFontSize;
+        margin-top: 2em;
+        margin-bottom: 1em;
+      }
+      a {
+        text-decoration: none;
+        color: $won-primary-color;
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+      p {
+        margin-bottom: 1em;
+      }
+    }
+  }
+
   & > .about__faq {
     background-color: $won-lighter-gray;
 

@@ -197,6 +197,11 @@ class AboutController {
       return {
         themeName,
         appTitle: getIn(state, ["config", "theme", "title"]),
+        tosTemplate:
+          "./skin/" +
+          themeName +
+          "/" +
+          getIn(state, ["config", "theme", "tosTemplate"]),
         imprintTemplate:
           "./skin/" +
           themeName +
