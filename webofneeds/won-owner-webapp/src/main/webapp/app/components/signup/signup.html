@@ -3,60 +3,56 @@
     <won-signup-title-bar></won-signup-title-bar>
 </header>
 <main class="signup" id="signupSection">
-    <div class="su__inner">
-        <div class="trygrid">
-            <div class="tg__signup">
-                <div class="block" ng-form name="registerForm">
-                    <input id="registerEmail" name="email" placeholder="Email address" ng-model="self.email" ng-class="{'ng-invalid': self.registerError}"
-                        required type="email" ng-keyup="self.formKeyup($event)" />
+    <div class="signup__content">
+        <div class="signup__content__form" ng-form name="registerForm">
+            <input id="registerEmail" name="email" placeholder="Email address" ng-model="self.email" ng-class="{'ng-invalid': self.registerError}"
+                required type="email" ng-keyup="self.formKeyup($event)" />
 
-                    <div class="tg__errormsg" ng-show="registerForm.email.$error.email">
-                        <svg class="tg__errormsg__icon">
-                            <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
-                        </svg>
-                        Not a valid E-Mail address
-                    </div>
-                    <div class="tg__errormsg" ng-show="self.registerError">
-                        <svg class="tg__errormsg__icon">
-                            <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
-                        </svg>
-                        {{self.registerError}}
-                    </div>
+            <div class="signup__content__form__errormsg" ng-if="registerForm.email.$error.email">
+                <svg class="signup__content__form__errormsg__icon">
+                    <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
+                </svg>
+                Not a valid E-Mail address
+            </div>
+            <div class="signup__content__form__errormsg" ng-if="self.registerError">
+                <svg class="signup__content__form__errormsg__icon">
+                    <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
+                </svg>
+                {{self.registerError}}
+            </div>
 
-                    <input name="password" placeholder="Password" ng-minlength="6" ng-model="self.password" required type="password" ng-keyup="self.formKeyup($event)"
-                    />
+            <input name="password" placeholder="Password" ng-minlength="6" ng-model="self.password" required type="password" ng-keyup="self.formKeyup($event)"/>
 
-                    <div class="tg__errormsg" ng-show="registerForm.password.$error.minlength">
-                        <svg class="tg__errormsg__icon">
-                            <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
-                        </svg>
-                        Password too short, must be at least 6 Characters
-                    </div>
+            <div class="signup__content__form__errormsg" ng-if="registerForm.password.$error.minlength">
+                <svg class="signup__content__form__errormsg__icon">
+                    <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
+                </svg>
+                Password too short, must be at least 6 Characters
+            </div>
 
-                    <input name="password_repeat" placeholder="Repeat Password" ng-minlength="6" ng-model="self.passwordAgain" required type="password"
-                        compare-to="self.password" ng-keyup="self.formKeyup($event)" />
+            <input name="password_repeat" placeholder="Repeat Password" ng-minlength="6" ng-model="self.passwordAgain" required type="password"
+                compare-to="self.password" ng-keyup="self.formKeyup($event)" />
 
-                    <div class="tg__errormsg" ng-show="registerForm.password_repeat.$error.compareTo">
-                        <svg class="tg__errormsg__icon">
-                            <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
-                        </svg>
-                        Password is not equal
-                    </div>
+            <div class="signup__content__form__errormsg" ng-if="registerForm.password_repeat.$error.compareTo">
+                <svg class="signup__content__form__errormsg__icon">
+                    <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
+                </svg>
+                Password is not equal
+            </div>
 
-                    <div>
-                        <input id="remember-me" ng-model="self.rememberMe" type="checkbox" /> remember me
-                    </div>
-                </div>
-                <button id="signup" class="won-button--filled red" ng-if="self.isPrivateIdUser" ng-disabled="registerForm.$invalid" ng-click="::self.transfer({email: self.email, password: self.password, privateId: self.privateId, rememberMe: self.rememberMe})">
-                    <span>Keep Postings</span>
-                </button>
-                <won-labelled-hr label="or" ng-if="self.isPrivateIdUser"></won-labelled-hr>
-                <button id="signup" class="won-button--filled red" ng-disabled="registerForm.$invalid" ng-click="::self.register({email: self.email, password: self.password, rememberMe: self.rememberMe})">
-                    <span ng-if="!self.isPrivateIdUser">That’s all we need. Let’s go!</span>
-                    <span ng-if="self.isPrivateIdUser">Start from Scratch</span>
-                </button>
+            <div>
+                <input id="rememberMe" ng-model="self.rememberMe" type="checkbox"/>
+                <label for="rememberMe">remember me</label>
             </div>
         </div>
+        <button id="signup" class="won-button--filled red" ng-if="self.isPrivateIdUser" ng-disabled="registerForm.$invalid" ng-click="::self.transfer({email: self.email, password: self.password, privateId: self.privateId, rememberMe: self.rememberMe})">
+            <span>Keep Postings</span>
+        </button>
+        <won-labelled-hr label="or" ng-if="self.isPrivateIdUser"></won-labelled-hr>
+        <button id="signup" class="won-button--filled red" ng-disabled="registerForm.$invalid" ng-click="::self.register({email: self.email, password: self.password, rememberMe: self.rememberMe})">
+            <span ng-if="!self.isPrivateIdUser">That’s all we need. Let’s go!</span>
+            <span ng-if="self.isPrivateIdUser">Start from Scratch</span>
+        </button>
     </div>
 </main>
 <footer>
