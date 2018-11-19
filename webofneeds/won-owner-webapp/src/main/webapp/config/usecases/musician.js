@@ -43,7 +43,7 @@ export const musicianGroup = {
       doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
       draft: {
         ...emptyDraft,
-        is: {
+        content: {
           title: "I'm looking for a band!",
           type: "won:Musician",
         },
@@ -51,7 +51,7 @@ export const musicianGroup = {
           type: "s:MusicGroup",
         },
       },
-      isDetails: {
+      details: {
         title: { ...details.title },
         description: { ...details.description },
         instruments: {
@@ -88,7 +88,7 @@ export const musicianGroup = {
             s: won.defaultContext["s"],
             won: won.defaultContext["won"],
           },
-          tagLikes: getIn(draft, ["is", "instruments"]),
+          tagLikes: getIn(draft, ["content", "instruments"]),
         });
 
         const vicinityScoreSQ = vicinityScoreSubQuery({
@@ -145,7 +145,7 @@ export const musicianGroup = {
       doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
       draft: {
         ...emptyDraft,
-        is: {
+        content: {
           title: "Looking for a Musician!",
           type: "s:MusicGroup",
         },
@@ -153,7 +153,7 @@ export const musicianGroup = {
           type: "won:Musician",
         },
       },
-      isDetails: {
+      details: {
         title: { ...details.title },
         description: { ...details.description },
         genres: { ...genresDetail },
@@ -178,7 +178,7 @@ export const musicianGroup = {
             s: won.defaultContext["s"],
             won: won.defaultContext["won"],
           },
-          tagLikes: getIn(draft, ["is", "genres"]),
+          tagLikes: getIn(draft, ["content", "genres"]),
         });
 
         // instruments
@@ -201,7 +201,7 @@ export const musicianGroup = {
             s: won.defaultContext["s"],
             won: won.defaultContext["won"],
           },
-          geoCoordinates: getIn(draft, ["is", "location"]),
+          geoCoordinates: getIn(draft, ["content", "location"]),
         });
 
         const subQueries = [genresSQ, instrumentsSQ, vicinityScoreSQ]
@@ -246,16 +246,16 @@ export const musicianGroup = {
       doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
       draft: {
         ...emptyDraft,
-        is: {
+        content: {
           type: "won:RehearsalRoomRentDemand",
           title: "Looking for Rehearsal Room!",
+          searchString: "Rehearsal Room",
         },
         seeks: {
           type: "won:RehearsalRoomRentOffer",
         },
-        searchString: "Rehearsal Room",
       },
-      isDetails: undefined,
+      details: undefined,
       seeksDetails: {
         location: { ...details.location },
         floorSizeRange: { ...realEstateFloorSizeRangeDetail },
@@ -282,21 +282,24 @@ export const musicianGroup = {
             },
             operations: [
               `${resultName} a won:Need.`,
-              `${resultName} won:is ?is.`,
-              `?is rdf:type won:RehearsalRoomRentOffer.`,
-              location && "?is won:hasLocation ?location.",
+              `${resultName} rdf:type won:RehearsalRoomRentOffer.`,
+              location && `${resultName} won:hasLocation ?location.`,
             ],
           },
           rentRange &&
             filterRentRange(
-              "?is",
+              `${resultName}`,
               rentRange.min,
               rentRange.max,
               rentRange.currency
             ),
 
           floorSizeRange &&
-            filterFloorSizeRange("?is", floorSizeRange.min, floorSizeRange.max),
+            filterFloorSizeRange(
+              `${resultName}`,
+              floorSizeRange.min,
+              floorSizeRange.max
+            ),
 
           filterInVicinity("?location", location),
         ];
@@ -325,7 +328,7 @@ export const musicianGroup = {
       doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
       draft: {
         ...emptyDraft,
-        is: {
+        content: {
           type: "won:RehearsalRoomRentOffer",
           title: "Offer Rehearsal Room!",
         },
@@ -333,7 +336,7 @@ export const musicianGroup = {
           type: "won:RehearsalRoomRentDemand",
         },
       },
-      isDetails: {
+      details: {
         title: { ...details.title },
         description: { ...details.description },
         location: {
@@ -362,10 +365,10 @@ export const musicianGroup = {
 
       seeksDetails: undefined,
       generateQuery: (draft, resultName) => {
-        const isBranch = draft && draft.is;
-        const location = isBranch && isBranch.location;
-        const rent = isBranch && isBranch.rent;
-        const floorSize = isBranch && isBranch.floorSize;
+        const draftContent = draft && draft.content;
+        const location = draftContent && draftContent.location;
+        const rent = draftContent && draftContent.rent;
+        const floorSize = draftContent && draftContent.floorSize;
 
         const filters = [
           {

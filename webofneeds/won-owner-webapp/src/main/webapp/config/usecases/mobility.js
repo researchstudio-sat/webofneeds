@@ -20,11 +20,14 @@ const mobilityUseCases = {
     doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
     draft: {
       ...emptyDraft,
-      is: { title: "Need a lift", tags: "search-lift" },
-      searchString: "offer-lift",
+      content: {
+        title: "Need a lift",
+        tags: "search-lift",
+        searchString: "offer-lift",
+      },
     },
     // TODO: amount of people? other details?
-    isDetails: {
+    details: {
       title: { ...details.title },
       description: { ...details.description },
     },
@@ -46,8 +49,7 @@ const mobilityUseCases = {
         },
         operations: [
           `${resultName} a won:Need.`,
-          `${resultName} won:isInState won:Active. { { ?is a <http://dbpedia.org/resource/Ridesharing>.  } union { ?is a s:TaxiService} }`,
-          `${resultName} won:is ?is.`,
+          `${resultName} won:isInState won:Active. { { ${resultName} a <http://dbpedia.org/resource/Ridesharing>.  } union { ${resultName} a s:TaxiService} }`,
         ],
       };
 
@@ -83,9 +85,10 @@ const mobilityUseCases = {
           filterAndJoin(
             [
               fromLocation &&
-                `?is a <http://dbpedia.org/resource/Ridesharing>. ?is won:travelAction/s:fromLocation ?fromLocation. `,
+                `${resultName} a <http://dbpedia.org/resource/Ridesharing>. ${resultName} won:travelAction/s:fromLocation ?fromLocation. `,
               fromLocation && fromLocationFilter.operations.join(" "),
-              toLocation && "?is won:travelAction/s:toLocation ?toLocation.",
+              toLocation &&
+                "${resultName} won:travelAction/s:toLocation ?toLocation.",
               toLocation && toLocationFilter.operations.join(" "),
             ],
             " "
@@ -93,7 +96,7 @@ const mobilityUseCases = {
           filterAndJoin(
             [
               location &&
-                `?is a s:TaxiService . ?is won:hasLocation ?location .`,
+                `${resultName} a s:TaxiService . ${resultName} won:hasLocation ?location .`,
               location && locationFilter.operations.join(" "),
             ],
             " "
@@ -127,15 +130,15 @@ const mobilityUseCases = {
     doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
     draft: {
       ...emptyDraft,
-      is: { title: "Taxi", type: "s:TaxiService" },
+      content: { title: "Taxi", type: "s:TaxiService" },
     },
-    isDetails: {
+    details: {
       title: { ...details.title },
       description: { ...details.description },
       location: { ...details.location },
     },
     generateQuery: (draft, resultName) => {
-      const location = getIn(draft, ["is", "location"]);
+      const location = getIn(draft, ["content", "location"]);
       const filters = [
         {
           // to select seeks-branch
@@ -175,12 +178,12 @@ const mobilityUseCases = {
     doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
     draft: {
       ...emptyDraft,
-      is: {
+      content: {
         title: "Share a Ride",
         type: "http://dbpedia.org/resource/Ridesharing",
       },
     },
-    isDetails: {
+    details: {
       title: { ...details.title },
       description: { ...details.description },
       fromDatetime: { ...details.fromDatetime },
@@ -188,10 +191,18 @@ const mobilityUseCases = {
       travelAction: { ...details.travelAction },
     },
     generateQuery: (draft, resultName) => {
-      const toLocation = getIn(draft, ["is", "travelAction", "toLocation"]);
-      const fromLocation = getIn(draft, ["is", "travelAction", "fromLocation"]);
+      const toLocation = getIn(draft, [
+        "content",
+        "travelAction",
+        "toLocation",
+      ]);
+      const fromLocation = getIn(draft, [
+        "content",
+        "travelAction",
+        "fromLocation",
+      ]);
 
-      const fromTime = getIn(draft, ["is", "fromDatetime"]);
+      const fromTime = getIn(draft, ["content", "fromDatetime"]);
       const filters = [
         {
           // to select seeks-branch

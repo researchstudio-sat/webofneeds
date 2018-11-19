@@ -23,14 +23,14 @@ export const jobOffer = {
   doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
     ...emptyDraft,
-    is: {
+    content: {
       type: "s:JobPosting",
     },
     seeks: {
       type: "s:Person",
     },
   },
-  isDetails: {
+  details: {
     title: { ...details.title },
     description: { ...details.description },
     jobLocation: { ...jobLocation },
@@ -58,8 +58,7 @@ export const jobOffer = {
    *       (count(${resultName}) as ?targetTotal)
    *     where {
    *       ${resultName} a won:Need;
-   *             won:is ?is.
-   *             ?is s:industry ?industry .
+   *             s:industry ?industry .
    *       bind(if(str(?industry) = "design",1,0) as ?var1)
    *       bind(if(str(?industry) = "computer science",1,0) as ?var2)
    *     } group by (${resultName})
@@ -91,7 +90,7 @@ export const jobOffer = {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],
       },
-      tagLikes: getIn(draft, ["is", "organizationNames"]),
+      tagLikes: getIn(draft, ["content", "organizationNames"]),
     });
 
     // employmentType
@@ -103,7 +102,7 @@ export const jobOffer = {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],
       },
-      tagLikes: getIn(draft, ["is", "employmentTypes"]),
+      tagLikes: getIn(draft, ["content", "employmentTypes"]),
     });
 
     // industry:
@@ -115,7 +114,7 @@ export const jobOffer = {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],
       },
-      tagLikes: getIn(draft, ["is", "industry"]),
+      tagLikes: getIn(draft, ["content", "industry"]),
     });
 
     const vicinityScoreSQ = vicinityScoreSubQuery({
@@ -126,7 +125,7 @@ export const jobOffer = {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],
       },
-      geoCoordinates: getIn(draft, ["is", "jobLocation"]),
+      geoCoordinates: getIn(draft, ["content", "jobLocation"]),
     });
 
     const subQueries = [

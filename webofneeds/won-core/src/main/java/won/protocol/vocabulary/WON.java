@@ -85,6 +85,8 @@ public class WON {
     public static final Property HAS_WEIGHT = m.createProperty(BASE_URI, "hasWeight");
     public static final Property HAS_QUANTITATIVE_PROPERTY = m.createProperty(BASE_URI, "hasQuantitativeProperty");
 
+    public static final Property TRAVEL_ACTION = m.createProperty("http://purl.org/webofneeds/model#travelAction");
+
     public static final Property HAS_FACET = m.createProperty(BASE_URI, "hasFacet");
     public static final Property HAS_DEFAULT_FACET = m.createProperty(BASE_URI, "hasDefaultFacet");
     public static final Resource FACET = m.createResource(BASE_URI + "Facet");
@@ -113,7 +115,6 @@ public class WON {
     public static final Property HAS_MATCH_SCORE = m.createProperty(BASE_URI, "hasMatchScore");
     public static final Property HAS_MATCH_COUNTERPART = m.createProperty(BASE_URI, "hasMatchCounterpart");
 
-    public static final Property IS = m.createProperty(BASE_URI, "is");
     public static final Property SEEKS = m.createProperty(BASE_URI, "seeks");
 
     public static final Property GOAL = m.createProperty(BASE_URI, "goal");

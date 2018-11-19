@@ -114,11 +114,11 @@ function genComponentConf() {
       this.won = won;
 
       const selectFromState = state => {
-        const ownNeed =
+        const ownedNeed =
           this.connectionUri &&
           getOwnedNeedByConnectionUri(state, this.connectionUri);
         const connection =
-          ownNeed && ownNeed.getIn(["connections", this.connectionUri]);
+          ownedNeed && ownedNeed.getIn(["connections", this.connectionUri]);
         const theirNeed =
           connection && state.getIn(["needs", connection.get("remoteNeedUri")]);
         const message =
@@ -129,11 +129,11 @@ function genComponentConf() {
         const shouldShowRdf = state.get("showRdf");
 
         let rdfLinkURL;
-        if (shouldShowRdf && ownerBaseUrl && ownNeed && message) {
+        if (shouldShowRdf && ownerBaseUrl && ownedNeed && message) {
           rdfLinkURL = urljoin(
             ownerBaseUrl,
             "/rest/linked-data/",
-            `?requester=${this.encodeParam(ownNeed.get("uri"))}`,
+            `?requester=${this.encodeParam(ownedNeed.get("uri"))}`,
             `&uri=${this.encodeParam(message.get("uri"))}`,
             message.get("outgoingMessage") ? "&deep=true" : ""
           );
@@ -158,7 +158,7 @@ function genComponentConf() {
         const injectInto = message && message.get("injectInto");
 
         return {
-          ownNeed,
+          ownedNeed,
           theirNeed,
           message,
           messageSenderUri: message && message.get("senderUri"),
@@ -245,7 +245,7 @@ function genComponentConf() {
         this.messages__viewState__markAsCollapsed({
           messageUri: this.message.get("uri"),
           connectionUri: this.connectionUri,
-          needUri: this.ownNeed.get("uri"),
+          needUri: this.ownedNeed.get("uri"),
           isCollapsed: false,
         });
       }
@@ -255,7 +255,7 @@ function genComponentConf() {
       this.messages__viewState__markShowActions({
         messageUri: this.message.get("uri"),
         connectionUri: this.connectionUri,
-        needUri: this.ownNeed.get("uri"),
+        needUri: this.ownedNeed.get("uri"),
         showActions: !this.showActions,
       });
     }
@@ -313,7 +313,7 @@ function genComponentConf() {
         const payload = {
           messageUri: this.messageUri,
           connectionUri: this.connectionUri,
-          needUri: this.ownNeed.get("uri"),
+          needUri: this.ownedNeed.get("uri"),
         };
 
         const tmp_messages__markAsRead = this.messages__markAsRead;

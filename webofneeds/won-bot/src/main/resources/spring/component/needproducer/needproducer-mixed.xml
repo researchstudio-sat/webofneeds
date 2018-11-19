@@ -33,7 +33,6 @@
                             <property name="repeat" value="true"/>
                             <property name="fileBasedNeedProducer">
                                 <bean class="won.bot.framework.component.needproducer.impl.MailFileNeedProducer">
-                                    <property name="needContentPropertyType" value="IS"/>
                                 </bean>
                             </property>
                         </bean>
@@ -49,7 +48,6 @@
                             <property name="repeat" value="true"/>
                             <property name="fileBasedNeedProducer">
                                 <bean class="won.bot.framework.component.needproducer.impl.MailFileNeedProducer">
-                                    <property name="needContentPropertyType" value="SEEKS"/>
                                 </bean>
                             </property>
                         </bean>
@@ -65,7 +63,6 @@
                             <property name="repeat" value="false"/>
                             <property name="fileBasedNeedProducer">
                                 <bean class="won.bot.framework.component.needproducer.impl.MailFileNeedProducer">
-                                    <property name="needContentPropertyType" value="IS_AND_SEEKS"/>
                                 </bean>
                             </property>
                         </bean>

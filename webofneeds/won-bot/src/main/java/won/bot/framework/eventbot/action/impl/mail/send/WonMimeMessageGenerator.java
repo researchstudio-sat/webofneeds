@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.impl.mail.receive.MailContentExtractor;
-import won.protocol.model.NeedContentPropertyType;
 import won.protocol.util.DefaultNeedModelWrapper;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.sparql.WonQueries;
@@ -158,9 +157,9 @@ public class WonMimeMessageGenerator {
         velocityContext.put("remoteNeedTitle", StringUtils.trim(needModelWrapper.getSomeTitleFromIsOrAll("en","de")).replaceAll(
           "\\n", "\n" + QUOTE_CHAR));
         velocityContext.put("remoteNeedDescription", StringUtils.trim(needModelWrapper.getSomeDescription(
-                NeedContentPropertyType.ALL,"en","de")).replaceAll("\\n", "\n" + QUOTE_CHAR));
+                "en","de")).replaceAll("\\n", "\n" + QUOTE_CHAR));
 
-        Collection<String> tags = needModelWrapper.getTags(NeedContentPropertyType.ALL);
+        Collection<String> tags = needModelWrapper.getAllTags();
         velocityContext.put("remoteNeedTags", tags.size() > 0 ? tags : null);
         velocityContext.put("remoteNeedUri", remoteNeedUri);
     }

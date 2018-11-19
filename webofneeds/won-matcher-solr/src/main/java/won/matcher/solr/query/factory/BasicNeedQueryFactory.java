@@ -4,8 +4,8 @@ import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import won.matcher.solr.utils.MatcherNeedContentPropertyType;
 import won.protocol.model.Coordinate;
-import won.protocol.model.NeedContentPropertyType;
 import won.protocol.util.DefaultNeedModelWrapper;
 
 import java.util.ArrayList;
@@ -17,49 +17,49 @@ import java.util.Map;
  */
 public class BasicNeedQueryFactory extends NeedDatasetQueryFactory {
 
-    public static final Map<NeedContentPropertyType, String> titleFieldMap;
+    public static final Map<MatcherNeedContentPropertyType, String> titleFieldMap;
     static
     {
         titleFieldMap = new HashMap<>();
-        titleFieldMap.put(NeedContentPropertyType.IS,
-                "_graph.http___purl.org_webofneeds_model_is.http___purl.org_dc_elements_1.1_title");
-        titleFieldMap.put(NeedContentPropertyType.SEEKS,
+        titleFieldMap.put(MatcherNeedContentPropertyType.IS,
+                "_graph.http___purl.org_dc_elements_1.1_title");
+        titleFieldMap.put(MatcherNeedContentPropertyType.SEEKS,
                 "_graph.http___purl.org_webofneeds_model_seeks.http___purl.org_dc_elements_1.1_title");
-        titleFieldMap.put(NeedContentPropertyType.SEEKS_SEEKS,
+        titleFieldMap.put(MatcherNeedContentPropertyType.SEEKS_SEEKS,
                 "_graph.http___purl.org_webofneeds_model_seeks.http___purl.org_webofneeds_model_seeks.http___purl.org_dc_elements_1.1_title");
     }
 
-    public static final Map<NeedContentPropertyType, String> descriptionFieldMap;
+    public static final Map<MatcherNeedContentPropertyType, String> descriptionFieldMap;
     static
     {
         descriptionFieldMap = new HashMap<>();
-        descriptionFieldMap.put(NeedContentPropertyType.IS,
-                "_graph.http___purl.org_webofneeds_model_is.http___purl.org_dc_elements_1.1_description");
-        descriptionFieldMap.put(NeedContentPropertyType.SEEKS,
+        descriptionFieldMap.put(MatcherNeedContentPropertyType.IS,
+                "_graph.http___purl.org_dc_elements_1.1_description");
+        descriptionFieldMap.put(MatcherNeedContentPropertyType.SEEKS,
                 "_graph.http___purl.org_webofneeds_model_seeks.http___purl.org_dc_elements_1.1_description");
-        descriptionFieldMap.put(NeedContentPropertyType.SEEKS_SEEKS,
+        descriptionFieldMap.put(MatcherNeedContentPropertyType.SEEKS_SEEKS,
                 "_graph.http___purl.org_webofneeds_model_seeks.http___purl.org_webofneeds_model_seeks.http___purl.org_dc_elements_1.1_description");
     }
 
-    public static final Map<NeedContentPropertyType, String> tagFieldMap;
+    public static final Map<MatcherNeedContentPropertyType, String> tagFieldMap;
     static
     {
         tagFieldMap = new HashMap<>();
-        tagFieldMap.put(NeedContentPropertyType.IS,
-                "_graph.http___purl.org_webofneeds_model_is.http___purl.org_webofneeds_model_hasTag");
-        tagFieldMap.put(NeedContentPropertyType.SEEKS,
+        tagFieldMap.put(MatcherNeedContentPropertyType.IS,
+                "_graph.http___purl.org_webofneeds_model_hasTag");
+        tagFieldMap.put(MatcherNeedContentPropertyType.SEEKS,
                 "_graph.http___purl.org_webofneeds_model_seeks.http___purl.org_webofneeds_model_hasTag");
-        tagFieldMap.put(NeedContentPropertyType.SEEKS_SEEKS,
+        tagFieldMap.put(MatcherNeedContentPropertyType.SEEKS_SEEKS,
                 "_graph.http___purl.org_webofneeds_model_seeks.http___purl.org_webofneeds_model_seeks.http___purl.org_webofneeds_model_hasTag");
     }
 
-    public static final Map<NeedContentPropertyType, String> locationFieldMap;
+    public static final Map<MatcherNeedContentPropertyType, String> locationFieldMap;
     static
     {
         locationFieldMap = new HashMap<>();
-        locationFieldMap.put(NeedContentPropertyType.IS, "is_need_location");
-        locationFieldMap.put(NeedContentPropertyType.SEEKS, "seeks_need_location");
-        locationFieldMap.put(NeedContentPropertyType.SEEKS_SEEKS, "seeksSeeks_need_location");
+        locationFieldMap.put(MatcherNeedContentPropertyType.IS, "is_need_location");
+        locationFieldMap.put(MatcherNeedContentPropertyType.SEEKS, "seeks_need_location");
+        locationFieldMap.put(MatcherNeedContentPropertyType.SEEKS_SEEKS, "seeksSeeks_need_location");
     }
 
     private final Logger log = LoggerFactory.getLogger(getClass());
@@ -74,7 +74,7 @@ public class BasicNeedQueryFactory extends NeedDatasetQueryFactory {
         needModelWrapper = new DefaultNeedModelWrapper(need);
     }
 
-    public void addTermsToTitleQuery(String terms, NeedContentPropertyType fieldType, double boost) {
+    public void addTermsToTitleQuery(String terms, MatcherNeedContentPropertyType fieldType, double boost) {
 
         terms = filterCharsAndKeyWords(terms);
         if (terms != null && !terms.trim().isEmpty()) {
@@ -85,7 +85,7 @@ public class BasicNeedQueryFactory extends NeedDatasetQueryFactory {
         }
     }
 
-    public void addTermsToDescriptionQuery(String terms, NeedContentPropertyType fieldType, double boost) {
+    public void addTermsToDescriptionQuery(String terms, MatcherNeedContentPropertyType fieldType, double boost) {
 
         terms = filterCharsAndKeyWords(terms);
         if (terms != null && !terms.trim().isEmpty()) {
@@ -96,7 +96,7 @@ public class BasicNeedQueryFactory extends NeedDatasetQueryFactory {
         }
     }
 
-    public void addTermsToTagQuery(String terms, NeedContentPropertyType fieldType, double boost) {
+    public void addTermsToTagQuery(String terms, MatcherNeedContentPropertyType fieldType, double boost) {
 
         terms = filterCharsAndKeyWords(terms);
         if (terms != null && !terms.trim().isEmpty()) {
@@ -107,7 +107,7 @@ public class BasicNeedQueryFactory extends NeedDatasetQueryFactory {
         }
     }
 
-    public void addLocationFilters(Resource contentNode, NeedContentPropertyType fieldType) {
+    public void addLocationFilters(Resource contentNode, MatcherNeedContentPropertyType fieldType) {
 
         Coordinate coordinate = needModelWrapper.getLocationCoordinate(contentNode);
         if (coordinate != null) {

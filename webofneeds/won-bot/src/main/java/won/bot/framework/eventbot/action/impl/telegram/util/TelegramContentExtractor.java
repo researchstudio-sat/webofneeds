@@ -1,6 +1,6 @@
 package won.bot.framework.eventbot.action.impl.telegram.util;
 
-import won.protocol.model.NeedContentPropertyType;
+import won.bot.framework.eventbot.action.impl.telegram.send.MessagePropertyType;
 
 import java.util.regex.Pattern;
 
@@ -28,15 +28,15 @@ public class TelegramContentExtractor {
         this.critiqueTypePattern = critiqueTypePattern;
     }
 
-    public NeedContentPropertyType getNeedContentType(String subject){
+    public MessagePropertyType getMessageContentType(String subject){
         if (demandTypePattern.matcher(subject).matches()) {
-            return NeedContentPropertyType.SEEKS;
+            return MessagePropertyType.DEMAND;
         } else if (supplyTypePattern.matcher(subject).matches()) {
-            return NeedContentPropertyType.IS;
+            return MessagePropertyType.OFFER;
         } else if (doTogetherTypePattern.matcher(subject).matches()) {
-            return NeedContentPropertyType.IS_AND_SEEKS;
+            return MessagePropertyType.BOTH;
         } else if (critiqueTypePattern.matcher(subject).matches()) {
-            return NeedContentPropertyType.IS_AND_SEEKS;
+            return MessagePropertyType.BOTH;
         }
 
         return null;

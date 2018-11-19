@@ -3072,7 +3072,7 @@
             a             won:Need ;
             won:hasFacet  won:ChatFacet ;
             won:hasFlag   won:UsedForTesting ;
-            won:is        [ dc:title  "Burritos" ] ;
+            dc:title "Burritos" ;
             cert:key      [ cert:PublicKey  [ a                       woncrypt:ECCPublicKey ;
                                               woncrypt:ecc_algorithm  "EC" ;
                                               woncrypt:ecc_curveId    "secp384r1" ;
@@ -5907,7 +5907,7 @@
     need:ekdwt2a60tesl77r13mu
             a             won:Need ;
             won:hasFacet  won:ChatFacet ;
-            won:is        _:b0 , _:b1 , _:b2 , _:b3 ;
+            dc:description  "This is a need automatically created by the DebugBot." ;             dc:title        "Debugging with initial hint: Burritos" ;             dc:description  "This is a need automatically created by the DebugBot." ;             dc:title        "Debugging with initial hint: Burritos" ;             dc:description  "This is a need automatically created by the DebugBot." ;             dc:title        "Debugging with initial hint: Burritos" ;             dc:description  "This is a need automatically created by the DebugBot." ;             dc:title        "Debugging with initial hint: Burritos" ;
             won:seeks     _:b0 , _:b1 , _:b2 , _:b3 ;
             cert:key      [ cert:PublicKey  [ a                       woncrypt:ECCPublicKey ;
                                               woncrypt:ecc_algorithm  "EC" ;

@@ -26,39 +26,13 @@ import org.apache.jena.vocabulary.DC;
 import org.apache.jena.vocabulary.RDF;
 
 import won.protocol.model.FacetType;
+import won.protocol.vocabulary.SCHEMA;
 import won.protocol.vocabulary.WON;
 
 public class RealEstateNeedGenerator {
 
     static Model model = ModelFactory.createDefaultModel();
 
-    static Property won_hasFacet = model.createProperty("http://purl.org/webofneeds/model#hasFacet");
-    static Property won_is = model.createProperty("http://purl.org/webofneeds/model#is");
-    static Property won_seeks = model.createProperty("http://purl.org/webofneeds/model#seeks");
-    static Property won_hasTag = model.createProperty("http://purl.org/webofneeds/model#hasTag");
-    static Property won_hasLocation = model.createProperty("http://purl.org/webofneeds/model#hasLocation");
-    static Property won_geoSpatial = model.createProperty("http://purl.org/webofneeds/model#geoSpatial");
-    static Property won_hasBoundingBox = model.createProperty("http://purl.org/webofneeds/model#hasBoundingBox");
-    static Property won_hasNorthWestCorner = model
-            .createProperty("http://purl.org/webofneeds/model#hasNorthWestCorner");
-    static Property won_hasSouthEastCorner = model
-            .createProperty("http://purl.org/webofneeds/model#hasSouthEastCorner");
-
-    static Property schema_amenityFeature = model.createProperty("http://schema.org/amenityFeature");
-    static Property schema_floorSize = model.createProperty("http://schema.org/floorSize");
-    static Property schema_numberOfRooms = model.createProperty("http://schema.org/numberOfRooms");
-    static Property schema_priceSpecification = model.createProperty("http://schema.org/priceSpecification");
-    static Property schema_geo = model.createProperty("http://schema.org/geo");
-    static Property schema_latitude = model.createProperty("http://schema.org/latitude");
-    static Property schema_longitude = model.createProperty("http://schema.org/longitude");
-    static Property schema_name = model.createProperty("http://schema.org/name");
-    static Property schema_description = model.createProperty("http://schema.org/description");
-    static Property schema_price = model.createProperty("http://schema.org/price");
-    static Property schema_priceCurrency = model.createProperty("http://schema.org/priceCurrency");
-    static Property schema_unitCode = model.createProperty("http://schema.org/unitCode");
-    static Property schema_value = model.createProperty("http://schema.org/value");
-
-    static RDFDatatype schema_Text = new BaseDatatype("http://schema.org/Text");
     static RDFDatatype bigdata_geoSpatialDatatype = new BaseDatatype(
             "http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon");
 
@@ -87,27 +61,25 @@ public class RealEstateNeedGenerator {
             setPrefixes();
 
             Resource need = model.createResource(needURI);
-            Resource isPart = model.createResource();
             Resource seeksPart = model.createResource();
-            Resource won_Need = model.createResource("http://purl.org/webofneeds/model#Need");
-            Resource won_ChatFacet = model.createResource("http://purl.org/webofneeds/model#ChatFacet");
 
             // method signatures: branch, probability that detail is added, min, max
-            isPart = addTitle(isPart, 1.0, i);
-            isPart = addDescription(isPart, 1.0);
+            need = addTitle(need, 1.0, i);
+            need = addDescription(need, 1.0);
             need = addQuery(need);
-            isPart = addLocation(isPart, 1.0, need);
-            isPart = addAmenities(isPart, 0.8, 1, 4);
-            isPart = addFloorSize(isPart, 0.8, 28, 250, need);
-            isPart = addNumberOfRooms(isPart, 0.8, 1, 9, need);
-            isPart = addPriceSpecification(isPart, 1.0, 250, 2200, need);
-            isPart.addProperty(won_hasTag, "RentOutRealEstate");
+            need = addLocation(need, 1.0, need);
+            need = addAmenities(need, 0.8, 1, 4);
+            need = addFloorSize(need, 0.8, 28, 250, need);
+            need = addNumberOfRooms(need, 0.8, 1, 9, need);
+            need = addPriceSpecification(need, 1.0, 250, 2200, need);
+            need.addProperty(WON.HAS_TAG, "RentOutRealEstate");
 
-            seeksPart.addProperty(won_hasTag, "SearchRealEstateToRent");
+            seeksPart.addProperty(WON.HAS_TAG, "SearchRealEstateToRent");
 
-            need.addProperty(RDF.type, won_Need);
+            need.addProperty(RDF.type, WON.NEED);
             
             /* no facets - they are added by the bot
+            Resource won_ChatFacet = model.createResource("http://purl.org/webofneeds/model#ChatFacet");
             Resource holdableFacet = need.getModel().getResource(needURI + "#holdableFacet");
             holdableFacet.addProperty(RDF.type, holdableFacet.getModel().getResource(FacetType.HoldableFacet.getURI().toString()));
             need.addProperty(won_hasFacet, holdableFacet);
@@ -117,8 +89,7 @@ public class RealEstateNeedGenerator {
             need.addProperty(won_hasFacet, chatFacet);
             */
             
-            need.addProperty(won_is, isPart);
-            need.addProperty(won_seeks, seeksPart);
+            need.addProperty(WON.SEEKS, seeksPart);
 
             try {
                 FileOutputStream out = new FileOutputStream(
@@ -188,25 +159,25 @@ public class RealEstateNeedGenerator {
         Resource schema_Place = model.createResource("http://schema.org/Place");
         Resource schema_GeoCoordinates = model.createResource("http://schema.org/GeoCoordinates");
 
-        resource.addProperty(won_hasLocation, locationResource);
+        resource.addProperty(WON.HAS_LOCATION, locationResource);
         locationResource.addProperty(RDF.type, schema_Place);
-        locationResource.addProperty(schema_name, name);
-        locationResource.addProperty(schema_geo, geoResource);
+        locationResource.addProperty(SCHEMA.NAME, name);
+        locationResource.addProperty(SCHEMA.GEO, geoResource);
         geoResource.addProperty(RDF.type, schema_GeoCoordinates);
-        geoResource.addProperty(schema_latitude, lat);
-        geoResource.addProperty(schema_longitude, lng);
+        geoResource.addProperty(SCHEMA.LATITUDE, lat);
+        geoResource.addProperty(SCHEMA.LONGITUDE, lng);
         // add bigdata specific value: "<subj> won:geoSpatial
         // "48.225073#16.358398"^^<http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon>"
-        geoResource.addProperty(won_geoSpatial, lat + "#" + lng, bigdata_geoSpatialDatatype);
-        locationResource.addProperty(won_hasBoundingBox, boundingBoxResource);
-        boundingBoxResource.addProperty(won_hasNorthWestCorner, nwCornerResource);
+        geoResource.addProperty(WON.GEO_SPATIAL, lat + "#" + lng, bigdata_geoSpatialDatatype);
+        locationResource.addProperty(WON.HAS_BOUNDING_BOX, boundingBoxResource);
+        boundingBoxResource.addProperty(WON.HAS_NORTH_WEST_CORNER, nwCornerResource);
         nwCornerResource.addProperty(RDF.type, schema_GeoCoordinates);
-        nwCornerResource.addProperty(schema_latitude, nwlat);
-        nwCornerResource.addProperty(schema_longitude, nwlng);
-        boundingBoxResource.addProperty(won_hasSouthEastCorner, seCornerResource);
+        nwCornerResource.addProperty(SCHEMA.LATITUDE, nwlat);
+        nwCornerResource.addProperty(SCHEMA.LONGITUDE, nwlng);
+        boundingBoxResource.addProperty(WON.HAS_SOUTH_EAST_CORNER, seCornerResource);
         seCornerResource.addProperty(RDF.type, schema_GeoCoordinates);
-        seCornerResource.addProperty(schema_latitude, selat);
-        seCornerResource.addProperty(schema_longitude, selng);
+        seCornerResource.addProperty(SCHEMA.LATITUDE, selat);
+        seCornerResource.addProperty(SCHEMA.LONGITUDE, selng);
 
         // update query
         replaceInQuery(resourceForQuery, "\\?varLatLng", "\"" + lat + "#" + lng + "\"");
@@ -233,9 +204,9 @@ public class RealEstateNeedGenerator {
 
         for (int j = 0; j < numberOfAmenities; j++) {
             Resource amenityResource = model.createResource();
-            resource.addProperty(schema_amenityFeature, amenityResource);
+            resource.addProperty(SCHEMA.AMENITYFEATURE, amenityResource);
             amenityResource.addProperty(RDF.type, schema_LocationFeatureSpecification);
-            amenityResource.addProperty(schema_value, amenities[j], schema_Text);
+            amenityResource.addProperty(SCHEMA.VALUE, amenities[j], SCHEMA.TEXT);
         }
         return resource;
     }
@@ -251,10 +222,10 @@ public class RealEstateNeedGenerator {
         Resource floorSizeResource = model.createResource();
         Resource schema_QuantitativeValue = model.createResource("http://schema.org/QuantitativeValue");
 
-        resource.addProperty(schema_floorSize, floorSizeResource);
+        resource.addProperty(SCHEMA.FLOORSIZE, floorSizeResource);
         floorSizeResource.addProperty(RDF.type, schema_QuantitativeValue);
-        floorSizeResource.addProperty(schema_unitCode, "MTK");
-        floorSizeResource.addProperty(schema_value, Integer.toString(floorSize), XSDDatatype.XSDfloat);
+        floorSizeResource.addProperty(SCHEMA.UNITCODE, "MTK");
+        floorSizeResource.addProperty(SCHEMA.VALUE, Integer.toString(floorSize), XSDDatatype.XSDfloat);
         replaceInQuery(resourceForQuery, "\\?varFloorSize", "\"" + floorSize + "\"");
         return resource;
     }
@@ -267,7 +238,7 @@ public class RealEstateNeedGenerator {
 
         int numberOfRooms = (int) (Math.random() * Math.abs(max - min + 1)) + min;
 
-        resource.addProperty(schema_numberOfRooms, Integer.toString(numberOfRooms), XSDDatatype.XSDfloat);
+        resource.addProperty(SCHEMA.NUMBEROFROOMS, Integer.toString(numberOfRooms), XSDDatatype.XSDfloat);
         replaceInQuery(resourceForQuery, "\\?varNumberOfRooms", "\"" + numberOfRooms + "\"");
         return resource;
     }
@@ -284,11 +255,11 @@ public class RealEstateNeedGenerator {
                 .createResource("http://schema.org/CompoundPriceSpecification");
         Resource priceSpecificationResource = model.createResource();
 
-        resource.addProperty(schema_priceSpecification, priceSpecificationResource);
+        resource.addProperty(SCHEMA.PRICESPECIFICATION, priceSpecificationResource);
         priceSpecificationResource.addProperty(RDF.type, schema_CompoundPriceSpecification);
-        priceSpecificationResource.addProperty(schema_description, "total rent per month");
-        priceSpecificationResource.addProperty(schema_price, Integer.toString(price), XSDDatatype.XSDfloat);
-        priceSpecificationResource.addProperty(schema_priceCurrency, "EUR");
+        priceSpecificationResource.addProperty(SCHEMA.DESCRIPTION, "total rent per month");
+        priceSpecificationResource.addProperty(SCHEMA.PRICE, Integer.toString(price), XSDDatatype.XSDfloat);
+        priceSpecificationResource.addProperty(SCHEMA.PRICECURRENCY, "EUR");
         replaceInQuery(resourceForQuery, "\\?varPrice", "\"" + price + "\"");
         replaceInQuery(resourceForQuery, "\\?varCurrency", "\"EUR\"");
         return resource;

@@ -33,7 +33,7 @@ export function addConnectionFull(state, connection) {
       const connectionUri = parsedConnection.getIn(["data", "uri"]);
 
       const facetUri = parsedConnection.get("facetUri");
-      const realFacet = need.getIn(["hasFacets", facetUri]);
+      const realFacet = need.getIn(["facets", facetUri]);
 
       parsedConnection = parsedConnection.setIn(["data", "facet"], realFacet);
 

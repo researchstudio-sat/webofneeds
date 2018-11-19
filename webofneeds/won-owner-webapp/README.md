@@ -202,20 +202,18 @@ $ngRedux.getState();
        creationDate: Date, //creationDate of this need
        lastUpdateDate: date, //date of lastUpdate of this need (last date of the message or connection that was added)
        nodeUri: string, //identifier of this need's server
-       ownNeed: true|false, //whether this need is owned or not
+       isOwned: true|false, //whether this need is owned or not
        isBeingCreated: true|false, //whether or not the creation of this need was successfully completed yet
        isLoading: true|false, //whether or not the need is currently in the process of being loaded
        toLoad: true|false, //whether or not the need is flagged as toLoad (for future loading purposes)
-       isWhatsAround: true|false, //whether or not the need is a whatsaround need
-       isWhatsNew: true|false, //whether or not this need is a whatsnew need
-       hasFlags: Immutable.List //all the flags that are present within the won:hasFlags predicate of a need
-       searchString: string, //optional parameter, used for full text matching
+       flags: Immutable.List //all the flags that are present within the won:hasFlags predicate of a need
+       facets: Immutable.Map //all the facets that are present within the won:hasFacets predicate of a need
        state: "won:Active" | "won:Inactive", //state of the need
-       type: "won:Supply" | "won:Demand" | "won:Offer", //type of the need
+       types: Immutable.Set() // of need types e.g. won:Persona, won:Need, and any other types
        unread: true|false, //whether or not this need has new information that has not been read yet
        uri: string, //unique identifier of this need
        humanReadable: string, //a human Readable String that parses the content from is or seeks and searchString and makes a title out of it based on a certain logic
-       is : {...},
+       content : {...},
        seeks: {...}
    },
    ...
@@ -253,7 +251,7 @@ $ngRedux.getState();
 As you can see in this State all "visible" Data is stored within the needs and the corresponding connections and messages are stored within this tree.
 Example: If you want to retrieve all present connections for a given need you will access it by `$ngRedux.getState().getIn(["needs", [needUri], "connections"])`.
 
-All The DataParsing happens within the `need-reducer.js` and should only be implemented here, in their respective Methods `parseNeed(jsonLdNeed, ownNeed)`, `parseConnection(jsonLdConnection, unread)` and `parseMessage(jsonLdMessage, outgoingMessage, unread)`.
+All The DataParsing happens within the `need-reducer.js` and should only be implemented here, in their respective Methods `parseNeed(jsonLdNeed, isOwned)`, `parseConnection(jsonLdConnection, unread)` and `parseMessage(jsonLdMessage, outgoingMessage, unread)`.
 It is very important to not parse needs/connections/messages in any other place or in any other way to make sure that the structure of the corresponding items is always the same, and so that the Views don't have to implement fail-safes when accessing elements, e.g. a Location is only present if the whole location data can be parsed/stored within the state, otherwise the location will stay empty.
 This is also true for every message connection and need, as soon as the data is in the state you can be certain that all the mandatory values are set correctly.
 

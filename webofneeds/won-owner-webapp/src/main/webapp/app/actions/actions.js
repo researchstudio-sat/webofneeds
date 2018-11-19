@@ -360,7 +360,7 @@ export function getConnectionRelatedData(
   connectionUri
 ) {
   const remoteNeedP = won.getNeed(remoteNeedUri);
-  const ownNeedP = won.getNeed(needUri);
+  const ownedNeedP = won.getNeed(needUri);
   const connectionP = won.getConnectionWithEventUris(connectionUri, {
     requesterWebId: needUri,
   });
@@ -385,8 +385,8 @@ export function getConnectionRelatedData(
     }
   });
 
-  const ownPersonaP = ownNeedP.then(ownNeed => {
-    const ownHeldBy = ownNeed && ownNeed["won:heldBy"];
+  const ownPersonaP = ownedNeedP.then(ownedNeed => {
+    const ownHeldBy = ownedNeed && ownedNeed["won:heldBy"];
     const ownPersonaUri = ownHeldBy && ownHeldBy["@id"];
 
     if (ownPersonaUri) {
@@ -398,7 +398,7 @@ export function getConnectionRelatedData(
 
   return Promise.all([
     remoteNeedP,
-    ownNeedP,
+    ownedNeedP,
     connectionP,
     eventsP,
     remotePersonaP,
@@ -406,7 +406,7 @@ export function getConnectionRelatedData(
   ]).then(results => {
     return {
       remoteNeed: results[0],
-      ownNeed: results[1],
+      ownedNeed: results[1],
       connection: results[2],
       events: results[3],
       remotePersona: results[4],
@@ -434,7 +434,7 @@ export function needsOpen(needUri) {
         dispatch({
           type: actionTypes.needs.reopen,
           payload: {
-            ownNeedUri: needUri,
+            ownedNeedUri: needUri,
           },
         })
       );
@@ -498,7 +498,7 @@ export function needsClose(needUri) {
         dispatch({
           type: actionTypes.needs.close,
           payload: {
-            ownNeedUri: needUri,
+            ownedNeedUri: needUri,
           },
         })
       );

@@ -1,13 +1,13 @@
 <header class="overview__header">
     <won-topnav></won-topnav>
 </header>
-<aside class="overview__left" ng-class="{'hide-in-responsive': !self.hasOwnNeeds || self.connection || self.selectedPost || !!self.useCaseGroup || !!self.useCase}">
+<aside class="overview__left" ng-class="{'hide-in-responsive': !self.hasOwnedNeeds || self.connection || self.selectedPost || !!self.useCaseGroup || !!self.useCase}">
     <won-connections-overview on-selected-connection="self.selectedConnection(connectionUri)" on-selected-need="self.selectedNeed(needUri)"
                               open="self.open">
     </won-connections-overview>
 </aside>
 <!-- RIGHT SIDE -->
-<main class="overview__right" ng-if="!self.selectedPost && (!self.connection || self.connectionType === self.WON.Closed) && !self.useCase && !self.useCaseGroup" ng-class="{'hide-in-responsive' : self.hasOwnNeeds}">
+<main class="overview__right" ng-if="!self.selectedPost && (!self.connection || self.connectionType === self.WON.Closed) && !self.useCase && !self.useCaseGroup" ng-class="{'hide-in-responsive' : self.hasOwnedNeeds}">
     <div class="overview__right__welcome">
         <div class="overview__right__welcome__text" ng-include="self.welcomeTemplate"></div>
         <won-usecase-picker></won-usecase-picker>
@@ -27,7 +27,7 @@
     <won-post-messages ng-if="!self.selectedPost && !self.useCaseGroup && (self.connectionType === self.WON.Connected || self.connectionType === self.WON.RequestReceived || self.connectionType === self.WON.RequestSent || self.connectionType === self.WON.Suggested)"></won-post-messages>
     <won-post-info include-header="true" ng-if="self.selectedPost && !self.useCaseGroup"></won-post-info>
 </main>
-<footer ng-class="{'hide-in-responsive': !self.hasOwnNeeds || self.connection || self.selectedPost || !!self.useCaseGroup || !!self.useCase}">
+<footer ng-class="{'hide-in-responsive': !self.hasOwnedNeeds || self.connection || self.selectedPost || !!self.useCaseGroup || !!self.useCase}">
     <div class="footer__title">
         <img src="skin/{{self.themeName}}/images/logo.svg" class="footer__title__logo">
         <div class="footer__title__appTitle">

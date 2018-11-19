@@ -110,7 +110,7 @@ function addSubQueries(queryAST, subQueries) {
  *   prefixes: { s: "http://schema.org/", ...},
  *   operations: [
  *      "FILTER (?currency = 'EUR')",... ],
- *      "?is s:priceSpecification ?pricespec .", ...],
+ *      "?seeks s:priceSpecification ?pricespec .", ...],
  *    ],
  * }
  * ```
@@ -410,7 +410,6 @@ export function filterFloorSizeRange(rootSubject, min, max) {
  * property using sh:property, sh:path, sh:minInclusive and sh:maxInclusive.
  *
  * @param {string} rootSubject sparql variable name (must start with '?') to attach triples to
- *  (commonly '?is' or '?seeks')
  * @param {number} number the numeric value for which we are looking for matching constraints
  * @param {URI} property the property (off rootSubject) we're checking. If a prefix other than 's'
  *  is used, it must be added to the query
@@ -588,8 +587,7 @@ export function generateWhatsAroundQuery(latitude, longitude) {
               SELECT DISTINCT ?result ?location_geoDistance WHERE {
                   ?result <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> won:Need.
                   ?result won:isInState  won:Active .
-                  ?result won:is ?is.
-                  ?is won:hasLocation ?location.
+                  ?result won:hasLocation ?location.
                   ?location s:geo ?location_geo.
                   SERVICE geo:search {
                       ?location_geo geo:search "inCircle".

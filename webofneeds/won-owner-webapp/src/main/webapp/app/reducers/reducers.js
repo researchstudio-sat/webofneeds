@@ -244,7 +244,7 @@ export default reduceReducers(
       case actionTypes.messages.connectMessageSent:
       case actionTypes.messages.connectMessageReceived:
       case actionTypes.messages.hintMessageReceived:
-        return deleteChatConnectionsBetweenOwnNeeds(state);
+        return deleteChatConnectionsBetweenOwnedNeeds(state);
 
       case actionTypes.mainViewScrolled:
         return state.set("mainViewScroll", action.payload);
@@ -265,7 +265,7 @@ export default reduceReducers(
 
 window.Immutable4dbg = Immutable;
 
-function deleteChatConnectionsBetweenOwnNeeds(state) {
+function deleteChatConnectionsBetweenOwnedNeeds(state) {
   let needs = state.get("needs");
 
   if (needs) {
@@ -277,11 +277,11 @@ function deleteChatConnectionsBetweenOwnNeeds(state) {
         connections.filter(function(conn) {
           //Any connection that is not of type chatFacet will be exempt from deletion
           if (isChatConnection(conn)) {
-            //Any other connection will be checked if it would be connected to the ownNeed, if so we remove it.
+            //Any other connection will be checked if it would be connected to the ownedNeed, if so we remove it.
             return !state.getIn([
               "needs",
               conn.get("remoteNeedUri"),
-              "ownNeed",
+              "isOwned",
             ]);
           }
           return true;

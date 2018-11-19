@@ -2,7 +2,7 @@ package won.matcher.solr.query.factory;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Resource;
-import won.protocol.model.NeedContentPropertyType;
+import won.matcher.solr.utils.MatcherNeedContentPropertyType;
 
 import java.util.Collection;
 
@@ -16,26 +16,25 @@ public class DefaultNeedQueryFactory extends BasicNeedQueryFactory {
 
         // add "is" terms/location to "seeks" part of the query and vice versa
         // add "seeks" terms to the "seeks/seeks" part of the query and vice versa
-        
-        for (Resource contentNode : needModelWrapper.getContentNodes(NeedContentPropertyType.IS)) {
-            addTermsToQuery(contentNode, NeedContentPropertyType.SEEKS);
-            addLocationFilters(contentNode, NeedContentPropertyType.SEEKS);
+
+        Resource needContentNode = needModelWrapper.getNeedContentNode();
+        addTermsToQuery(needContentNode, MatcherNeedContentPropertyType.SEEKS);
+        addLocationFilters(needContentNode, MatcherNeedContentPropertyType.SEEKS);
+
+        for (Resource contentNode : needModelWrapper.getSeeksNodes()) {
+            addTermsToQuery(contentNode, MatcherNeedContentPropertyType.IS);
+            addTermsToQuery(contentNode, MatcherNeedContentPropertyType.SEEKS_SEEKS);
+            addLocationFilters(contentNode, MatcherNeedContentPropertyType.IS);
+            addLocationFilters(contentNode, MatcherNeedContentPropertyType.SEEKS_SEEKS);
         }
 
-        for (Resource contentNode : needModelWrapper.getContentNodes(NeedContentPropertyType.SEEKS)) {
-            addTermsToQuery(contentNode, NeedContentPropertyType.IS);
-            addTermsToQuery(contentNode, NeedContentPropertyType.SEEKS_SEEKS);
-            addLocationFilters(contentNode, NeedContentPropertyType.IS);
-            addLocationFilters(contentNode, NeedContentPropertyType.SEEKS_SEEKS);
-        }
-
-        for (Resource contentNode : needModelWrapper.getContentNodes(NeedContentPropertyType.SEEKS_SEEKS)) {
-            addTermsToQuery(contentNode, NeedContentPropertyType.SEEKS);
-            addLocationFilters(contentNode, NeedContentPropertyType.SEEKS);
+        for (Resource contentNode : needModelWrapper.getSeeksSeeksNodes()) {
+            addTermsToQuery(contentNode, MatcherNeedContentPropertyType.SEEKS);
+            addLocationFilters(contentNode, MatcherNeedContentPropertyType.SEEKS);
         }
     }
 
-    private void addTermsToQuery(Resource contentNode, NeedContentPropertyType fieldType) {
+    private void addTermsToQuery(Resource contentNode, MatcherNeedContentPropertyType fieldType) {
 
         Collection<String> titles = needModelWrapper.getTitles(contentNode);
         Collection<String> descriptions = needModelWrapper.getDescriptions(contentNode);

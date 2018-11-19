@@ -19,14 +19,11 @@ package won.bot.framework.component.needproducer.impl;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.mail.util.MimeMessageParser;
 import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.bot.framework.component.needproducer.FileBasedNeedProducer;
-import won.protocol.model.NeedContentPropertyType;
-import won.protocol.model.NeedGraphType;
 import won.protocol.util.DefaultNeedModelWrapper;
 
 import javax.mail.internet.MimeMessage;
@@ -41,11 +38,6 @@ import java.io.IOException;
 public class MailFileNeedProducer implements FileBasedNeedProducer
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
-  private NeedContentPropertyType needContentPropertyType = NeedContentPropertyType.IS_AND_SEEKS;
-
-  public void setNeedContentPropertyType(NeedContentPropertyType needContentPropertyType) {
-    this.needContentPropertyType = needContentPropertyType;
-  }
 
   @Override
   public  synchronized Dataset readNeedFromFile(final File file) throws IOException
@@ -57,7 +49,7 @@ public class MailFileNeedProducer implements FileBasedNeedProducer
       MimeMessage emailMessage = new MimeMessage(null, fis);
       MimeMessageParser parser = new MimeMessageParser(emailMessage);
       parser.parse();
-      needModelWrapper.setTitle(needContentPropertyType, parser.getSubject());
+      needModelWrapper.setTitle(parser.getSubject());
       String content = null;
       if (parser.hasPlainContent()){
         content = parser.getPlainContent();
@@ -66,7 +58,7 @@ public class MailFileNeedProducer implements FileBasedNeedProducer
         content = doc.text();
       }
       if (content != null) {
-        needModelWrapper.setDescription(needContentPropertyType, content);
+        needModelWrapper.setDescription(content);
       }
       logger.debug("mail subject          : {}", parser.getSubject());
       logger.debug("mail has plain content: {}", parser.hasPlainContent());

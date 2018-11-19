@@ -83,9 +83,8 @@
             won:goal      [ won:hasShapesGraph  <https://satvm05.researchstudio.at/won/resource/event/uz35pxareinysmin8p1c#content-j7h4> ] ;
             won:hasFacet  won:ChatFacet ;
             won:hasFlag   won:NoHintForCounterpart , won:NoHintForMe ;
-            won:is        [ dc:description  "This is a automatically created need by the TaxiBot" ;
-                            dc:title        "Taxi in Wien<->Taxi Wien"
-                          ] .
+            dc:description  "This is a automatically created need by the TaxiBot" ;
+            dc:title        "Taxi in Wien<->Taxi Wien" .
 }
 
 <https://satvm05.researchstudio.at/won/resource/event/uz35pxareinysmin8p1c#envelope-phwh-sig> {

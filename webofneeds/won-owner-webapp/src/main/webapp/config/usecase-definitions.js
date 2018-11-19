@@ -19,7 +19,7 @@ import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../app/won-util
  * Example:
  * useCase: {
  *    identifier: "useCase",
- *    isDetails: {
+ *    details: {
  *        detailA: {...details.description, identifier: "detailA"},
  *        detailB: {...details.description, identifier: "detailB"},
  *    }
@@ -59,7 +59,7 @@ const allDetailsUseCase = {
     icon: "#ico36_uc_custom",
     doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
     draft: { ...emptyDraft },
-    isDetails: details,
+    details: details,
     seeksDetails: details,
   },
 };

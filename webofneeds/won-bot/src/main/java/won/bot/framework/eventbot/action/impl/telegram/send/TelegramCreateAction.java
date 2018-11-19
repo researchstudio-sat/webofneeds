@@ -2,7 +2,6 @@ package won.bot.framework.eventbot.action.impl.telegram.send;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
 import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import won.bot.framework.bot.context.TelegramBotContextWrapper;
@@ -19,8 +18,6 @@ import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.message.WonMessage;
 import won.protocol.model.FacetType;
-import won.protocol.model.NeedContentPropertyType;
-import won.protocol.model.NeedGraphType;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.DefaultNeedModelWrapper;
 import won.protocol.util.RdfUtils;
@@ -67,7 +64,7 @@ public class TelegramCreateAction extends AbstractCreateNeedAction {
                 return;
             }
             try{
-                NeedContentPropertyType type = telegramContentExtractor.getNeedContentType(parameters[0]);
+                MessagePropertyType type = telegramContentExtractor.getMessageContentType(parameters[0]);
 
                 if(type == null) {
                     throw new InvalidParameterException("no valid type was given");
@@ -93,7 +90,19 @@ public class TelegramCreateAction extends AbstractCreateNeedAction {
                 final URI needURI = wonNodeInformationService.generateNeedURI(wonNodeUri);
 
                 DefaultNeedModelWrapper wrapper = new DefaultNeedModelWrapper(needURI.toString());
-                wrapper.setTitle(type, title);
+                switch (type) {
+                    case OFFER:
+                        wrapper.setTitle(title);
+                        break;
+                    case DEMAND:
+                        wrapper.setSeeksTitle(title);
+                        break;
+                    case BOTH:
+                        wrapper.setTitle(title);
+                        wrapper.setSeeksTitle(title);
+                        break;
+                }
+
                 int i = 1;
                 for (URI facet : facets) {
                     wrapper.addFacet("#facet"+ i, facet.toString());

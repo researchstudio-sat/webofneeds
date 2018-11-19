@@ -8222,7 +8222,10 @@
             a             won:Need ;
             won:hasFacet  <https://localhost:8443/won/resource/need/uutczz8f1sqgofbdn3g1#facet1> ;
             won:hasFlag   won:NoHintForCounterpart , won:UsedForTesting , won:NoHintForMe ;
-            won:is        _:b1 , _:b0 ;
+            dc:description  "This is a need automatically created by the DebugBot." ;
+            dc:title        "Debugging with initial connect: WTF?" ;
+            dc:description  "This is a need automatically created by the DebugBot." ;
+            dc:title        "Debugging with initial connect: WTF?" ;
             won:seeks     _:b0 , _:b1 ;
             cert:key      [ cert:PublicKey  [ a                       woncrypt:ECCPublicKey ;
                                               woncrypt:ecc_algorithm  "EC" ;
@@ -8702,14 +8705,12 @@
             won:hasFacet         <https://localhost:8443/won/resource/need/ps4cebtiwriz#chatFacet> , <https://localhost:8443/won/resource/need/ps4cebtiwriz#holdableFacet> ;
             won:hasFlag          won:UsedForTesting ;
             won:hasSearchString  "wtf" ;
-            won:is               [ dc:title    "WTF?" ;
-                                   won:hasTag  "wtf" ;
-                                   s:title     "WTF?"
-                                 ] ;
-            won:is               [ dc:title    "WTF?" ;
-                                   won:hasTag  "wtf" ;
-                                   s:title     "WTF?"
-                                 ] ;
+            dc:title    "WTF?" ;
+            won:hasTag  "wtf" ;
+            s:title     "WTF?";
+            dc:title    "WTF?" ;
+            won:hasTag  "wtf" ;
+            s:title     "WTF?";
             cert:key             [ cert:PublicKey  [ a                       woncrypt:ECCPublicKey ;
                                                      woncrypt:ecc_algorithm  "EC" ;
                                                      woncrypt:ecc_curveId    "secp384r1" ;

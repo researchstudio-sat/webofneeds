@@ -9,7 +9,6 @@ import org.telegram.telegrambots.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.protocol.message.WonMessage;
-import won.protocol.model.NeedContentPropertyType;
 import won.protocol.util.DefaultNeedModelWrapper;
 import won.protocol.util.WonRdfUtils;
 
@@ -29,7 +28,7 @@ public class HokifyMessageGenerator {
 
         DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(remoteNeedRDF);
         String title = needModelWrapper.getSomeTitleFromIsOrAll("en","de");
-        String description = needModelWrapper.getSomeDescription(NeedContentPropertyType.ALL,"en","de");
+        String description = needModelWrapper.getSomeDescription("en","de");
 
         SendMessage sendMessage = new SendMessage();
         //sendMessage.setJobURL(jobURL);
@@ -50,7 +49,7 @@ public class HokifyMessageGenerator {
 
         DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(remoteNeedRDF);
         String title = needModelWrapper.getSomeTitleFromIsOrAll("en","de");
-        String description = needModelWrapper.getSomeDescription(NeedContentPropertyType.ALL, "en","de");
+        String description = needModelWrapper.getSomeDescription("en","de");
 
         SendMessage sendMessage = new SendMessage();
         //sendMessage.setChatId(chatId);
@@ -82,7 +81,7 @@ public class HokifyMessageGenerator {
 
         DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(createdNeedRDF);
         String title = needModelWrapper.getSomeTitleFromIsOrAll("en","de");
-        String description = needModelWrapper.getSomeDescription(NeedContentPropertyType.ALL, "en","de");
+        String description = needModelWrapper.getSomeDescription("en","de");
 
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);

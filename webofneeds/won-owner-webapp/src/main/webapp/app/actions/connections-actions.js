@@ -32,19 +32,19 @@ export function connectionsChatMessageClaimOnSuccess(
   connectionUri
 ) {
   return (dispatch, getState) => {
-    const ownNeed = getState()
+    const ownedNeed = getState()
       .get("needs")
       .filter(need => need.getIn(["connections", connectionUri]))
       .first();
     const theirNeedUri = getState().getIn([
       "needs",
-      ownNeed.get("uri"),
+      ownedNeed.get("uri"),
       "connections",
       connectionUri,
       "remoteNeedUri",
     ]);
     const theirNeed = getState().getIn(["needs", theirNeedUri]);
-    const theirConnectionUri = ownNeed.getIn([
+    const theirConnectionUri = ownedNeed.getIn([
       "connections",
       connectionUri,
       "remoteConnectionUri",
@@ -55,9 +55,9 @@ export function connectionsChatMessageClaimOnSuccess(
       additionalContent: additionalContent,
       referencedContentUris: undefined,
       connectionUri,
-      ownNeedUri: ownNeed.get("uri"),
+      ownedNeedUri: ownedNeed.get("uri"),
       theirNeedUri: theirNeedUri,
-      ownNodeUri: ownNeed.get("nodeUri"),
+      ownNodeUri: ownedNeed.get("nodeUri"),
       theirNodeUri: theirNeed.get("nodeUri"),
       theirConnectionUri,
       isTTL: false,
@@ -99,19 +99,19 @@ export function connectionsChatMessage(
   isTTL = false
 ) {
   return (dispatch, getState) => {
-    const ownNeed = getState()
+    const ownedNeed = getState()
       .get("needs")
       .filter(need => need.getIn(["connections", connectionUri]))
       .first();
     const theirNeedUri = getState().getIn([
       "needs",
-      ownNeed.get("uri"),
+      ownedNeed.get("uri"),
       "connections",
       connectionUri,
       "remoteNeedUri",
     ]);
     const theirNeed = getState().getIn(["needs", theirNeedUri]);
-    const theirConnectionUri = ownNeed.getIn([
+    const theirConnectionUri = ownedNeed.getIn([
       "connections",
       connectionUri,
       "remoteConnectionUri",
@@ -137,7 +137,7 @@ export function connectionsChatMessage(
                 payload: {
                   messageUri: msg.get("uri"),
                   connectionUri: connectionUri,
-                  needUri: ownNeed.get("uri"),
+                  needUri: ownedNeed.get("uri"),
                   retracted: true,
                 },
               });
@@ -148,7 +148,7 @@ export function connectionsChatMessage(
                 payload: {
                   messageUri: msg.get("uri"),
                   connectionUri: connectionUri,
-                  needUri: ownNeed.get("uri"),
+                  needUri: ownedNeed.get("uri"),
                   rejected: true,
                 },
               });
@@ -160,7 +160,7 @@ export function connectionsChatMessage(
                 payload: {
                   messageUri: msg.get("uri"),
                   connectionUri: connectionUri,
-                  needUri: ownNeed.get("uri"),
+                  needUri: ownedNeed.get("uri"),
                   cancellationPending: true,
                 },
               });
@@ -171,7 +171,7 @@ export function connectionsChatMessage(
                 payload: {
                   messageUri: msg.get("uri"),
                   connectionUri: connectionUri,
-                  needUri: ownNeed.get("uri"),
+                  needUri: ownedNeed.get("uri"),
                   accepted: true,
                 },
               });
@@ -182,7 +182,7 @@ export function connectionsChatMessage(
                 payload: {
                   messageUri: msg.get("uri"),
                   connectionUri: connectionUri,
-                  needUri: ownNeed.get("uri"),
+                  needUri: ownedNeed.get("uri"),
                   claimed: true,
                 },
               });
@@ -193,7 +193,7 @@ export function connectionsChatMessage(
                 payload: {
                   messageUri: msg.get("uri"),
                   connectionUri: connectionUri,
-                  needUri: ownNeed.get("uri"),
+                  needUri: ownedNeed.get("uri"),
                   proposed: true,
                 },
               });
@@ -212,9 +212,9 @@ export function connectionsChatMessage(
       additionalContent: additionalContent,
       referencedContentUris: referencedContentUris,
       connectionUri,
-      ownNeedUri: ownNeed.get("uri"),
+      ownedNeedUri: ownedNeed.get("uri"),
       theirNeedUri: theirNeedUri,
-      ownNodeUri: ownNeed.get("nodeUri"),
+      ownNodeUri: ownedNeed.get("nodeUri"),
       theirNodeUri: theirNeed.get("nodeUri"),
       theirConnectionUri,
       isTTL,
@@ -252,19 +252,19 @@ export function connectionsChatMessage(
 
 export function connectionsOpen(connectionUri, textMessage) {
   return async (dispatch, getState) => {
-    const ownNeed = getState()
+    const ownedNeed = getState()
       .get("needs")
       .filter(need => need.getIn(["connections", connectionUri]))
       .first();
     const theirNeedUri = getState().getIn([
       "needs",
-      ownNeed.get("uri"),
+      ownedNeed.get("uri"),
       "connections",
       connectionUri,
       "remoteNeedUri",
     ]);
     const theirNeed = getState().getIn(["needs", theirNeedUri]);
-    const theirConnectionUri = ownNeed.getIn([
+    const theirConnectionUri = ownedNeed.getIn([
       "connections",
       connectionUri,
       "remoteConnectionUri",
@@ -272,9 +272,9 @@ export function connectionsOpen(connectionUri, textMessage) {
 
     const openMsg = await buildOpenMessage(
       connectionUri,
-      ownNeed.get("uri"),
+      ownedNeed.get("uri"),
       theirNeedUri,
-      ownNeed.get("nodeUri"),
+      ownedNeed.get("nodeUri"),
       theirNeed.get("nodeUri"),
       theirConnectionUri,
       textMessage
@@ -352,7 +352,7 @@ function connectAdHoc(theirNeedUri, textMessage, persona, dispatch, getState) {
 
     // establish connection
     const cnctMsg = buildConnectMessage({
-      ownNeedUri: needUri,
+      ownedNeedUri: needUri,
       theirNeedUri: theirNeedUri,
       ownNodeUri: nodeUri,
       theirNodeUri: theirNeed.get("nodeUri"),
@@ -407,10 +407,12 @@ function connectAdHoc(theirNeedUri, textMessage, persona, dispatch, getState) {
 
 function generateResponseNeedTo(theirNeed) {
   const theirSeeks = get(theirNeed, "seeks");
-  const theirIs = get(theirNeed, "is");
+  const theirContent = get(theirNeed, "content");
   return {
     is: theirSeeks ? generateResponseContentNodeTo(theirSeeks) : undefined,
-    seeks: theirIs ? generateResponseContentNodeTo(theirIs) : undefined,
+    seeks: theirContent
+      ? generateResponseContentNodeTo(theirContent)
+      : undefined,
   };
 }
 
@@ -427,19 +429,19 @@ function generateResponseContentNodeTo(contentNode) {
 
 export function connectionsClose(connectionUri) {
   return (dispatch, getState) => {
-    const ownNeed = getState()
+    const ownedNeed = getState()
       .get("needs")
       .filter(need => need.getIn(["connections", connectionUri]))
       .first();
     const theirNeedUri = getState().getIn([
       "needs",
-      ownNeed.get("uri"),
+      ownedNeed.get("uri"),
       "connections",
       connectionUri,
       "remoteNeedUri",
     ]);
     const theirNeed = getState().getIn(["needs", theirNeedUri]);
-    const theirConnectionUri = ownNeed.getIn([
+    const theirConnectionUri = ownedNeed.getIn([
       "connections",
       connectionUri,
       "remoteConnectionUri",
@@ -447,9 +449,9 @@ export function connectionsClose(connectionUri) {
 
     buildCloseMessage(
       connectionUri,
-      ownNeed.get("uri"),
+      ownedNeed.get("uri"),
       theirNeedUri,
-      ownNeed.get("nodeUri"),
+      ownedNeed.get("nodeUri"),
       theirNeed.get("nodeUri"),
       theirConnectionUri
     ).then(({ eventUri, message }) => {
@@ -471,13 +473,13 @@ export function connectionsCloseRemote(message) {
     const connectionUri = message.getSender();
     const remoteNeedUri = message.getSenderNeed();
     const remoteNode = message.getSenderNode();
-    const ownNeedUri = message.getReceiverNeed();
+    const ownedNeedUri = message.getReceiverNeed();
     const ownNode = message.getReceiverNode();
 
     buildCloseMessage(
       connectionUri,
       remoteNeedUri,
-      ownNeedUri,
+      ownedNeedUri,
       ownNode,
       remoteNode,
       null
@@ -496,19 +498,19 @@ export function connectionsRate(connectionUri, rating) {
   return (dispatch, getState) => {
     const state = getState();
 
-    const ownNeed = state
+    const ownedNeed = state
       .get("needs")
       .filter(need => need.getIn(["connections", connectionUri]))
       .first();
     const theirNeedUri = state.getIn([
       "needs",
-      ownNeed.get("uri"),
+      ownedNeed.get("uri"),
       "connections",
       connectionUri,
       "remoteNeedUri",
     ]);
     const theirNeed = state.getIn(["needs", theirNeedUri]);
-    const theirConnectionUri = ownNeed.getIn([
+    const theirConnectionUri = ownedNeed.getIn([
       "connections",
       connectionUri,
       "remoteConnectionUri",
@@ -516,16 +518,16 @@ export function connectionsRate(connectionUri, rating) {
 
     won
       .getConnectionWithEventUris(connectionUri, {
-        requesterWebId: ownNeed.get("uri"),
+        requesterWebId: ownedNeed.get("uri"),
       })
       .then(connection => {
         let msgToRateFor = { connection: connection };
 
         return buildRateMessage(
           msgToRateFor,
-          ownNeed.get("uri"),
+          ownedNeed.get("uri"),
           theirNeedUri,
-          ownNeed.get("nodeUri"),
+          ownedNeed.get("nodeUri"),
           theirNeed.get("nodeUri"),
           theirConnectionUri,
           rating
