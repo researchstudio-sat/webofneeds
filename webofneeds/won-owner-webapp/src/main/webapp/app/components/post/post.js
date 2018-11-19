@@ -3,11 +3,12 @@
  */
 import angular from "angular";
 import ngAnimate from "angular-animate";
-import { attach, getIn } from "../../utils.js";
+import { attach } from "../../utils.js";
 import won from "../../won-es6.js";
 import { actionCreators } from "../../actions/actions.js";
 import sendRequestModule from "../send-request.js";
 import visitorTitleBarModule from "../visitor-title-bar.js";
+import footerModule from "../footer.js";
 import { getPostUriFromRoute } from "../../selectors/general-selectors.js";
 
 import * as srefUtils from "../../sref-utils.js";
@@ -28,11 +29,8 @@ class Controller {
       const post = state.getIn(["needs", postUri]);
 
       const isOwnPost = post && post.get("isOwned");
-      const themeName = getIn(state, ["config", "theme", "name"]);
 
       return {
-        themeName,
-        appTitle: getIn(state, ["config", "theme", "title"]),
         postUri,
         isOwnPost: isOwnPost,
         post,
@@ -62,5 +60,6 @@ export default angular
     sendRequestModule,
     ngAnimate,
     visitorTitleBarModule,
+    footerModule,
   ])
   .controller("PostController", Controller).name;

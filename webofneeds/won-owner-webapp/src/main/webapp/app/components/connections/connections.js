@@ -17,6 +17,7 @@ import {
   getOwnedNeeds,
 } from "../../selectors/general-selectors.js";
 import * as srefUtils from "../../sref-utils.js";
+import footerModule from "../footer.js";
 
 import "style/_connections.scss";
 import "style/_responsiveness-utils.scss";
@@ -184,6 +185,7 @@ export default angular
     createPostModule,
     createSearchModule,
     connectionsOverviewModule,
+    footerModule,
   ])
   .controller("ConnectionsController", [
     ...serviceDependencies,

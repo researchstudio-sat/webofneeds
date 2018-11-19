@@ -27,19 +27,5 @@
     <won-post-messages ng-if="!self.selectedPost && !self.useCaseGroup && (self.connectionType === self.WON.Connected || self.connectionType === self.WON.RequestReceived || self.connectionType === self.WON.RequestSent || self.connectionType === self.WON.Suggested)"></won-post-messages>
     <won-post-info include-header="true" ng-if="self.selectedPost && !self.useCaseGroup"></won-post-info>
 </main>
-<footer ng-class="{'hide-in-responsive': !self.hasOwnedNeeds || self.connection || self.selectedPost || !!self.useCaseGroup || !!self.useCase}">
-    <div class="footer__title">
-        <img src="skin/{{self.themeName}}/images/logo.svg" class="footer__title__logo">
-        <div class="footer__title__appTitle">
-            {{ self.appTitle }}
-        </div>
-        <div class="footer__title__tagLine">Web Of Needs</div>
-    </div>
-    <div class="footer__links">
-        <a class="footer__links__link" href="{{ self.absHRef(self.$state, 'about', {'aboutSection': undefined}) }}">About</a>
-        <span class="footer__links__divider">|</span>
-        <a class="footer__links__link" href="{{ self.absHRef(self.$state, 'about', {'aboutSection': 'aboutPrivacyPolicy'}) }}">Privacy</a>
-        <span class="footer__links__divider">|</span>
-        <a class="footer__links__link" href="{{ self.absHRef(self.$state, 'about', {'aboutSection': 'aboutFaq'}) }}">FAQ</a>
-    </div>
-</footer>
+<won-footer ng-class="{'hide-in-responsive': !self.hasOwnedNeeds || self.connection || self.selectedPost || !!self.useCaseGroup || !!self.useCase}">
+</won-footer>

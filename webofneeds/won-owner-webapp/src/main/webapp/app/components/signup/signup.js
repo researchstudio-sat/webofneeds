@@ -9,6 +9,7 @@ import signupTitleBarModule from "../signup-title-bar.js";
 import labelledHrModule from "../labelled-hr.js";
 
 import topNavModule from "../topnav.js";
+import footerModule from "../footer.js";
 
 import * as srefUtils from "../../sref-utils.js";
 
@@ -30,12 +31,7 @@ class SignupController {
     const select = state => {
       const privateId = getIn(state, ["router", "currentParams", "privateId"]);
 
-      const themeName = getIn(state, ["config", "theme", "name"]);
-
       return {
-        //focusSignup: state.getIn(['router', 'currentParams', 'focusSignup']) === "true",
-        themeName,
-        appTitle: getIn(state, ["config", "theme", "title"]),
         loggedIn: state.getIn(["user", "loggedIn"]),
         registerError: state.getIn(["user", "registerError"]),
         isPrivateIdUser: !!privateId,
@@ -69,13 +65,10 @@ class SignupController {
 
 export default angular
   .module("won.owner.components.signup", [
-    //overviewTitleBarModule,
-    //accordionModule,
     signupTitleBarModule,
     topNavModule,
     labelledHrModule,
-    //flexGridModule,
-    //compareToModule,
+    footerModule,
   ])
   .controller("SignupController", [...serviceDependencies, SignupController])
   .name;

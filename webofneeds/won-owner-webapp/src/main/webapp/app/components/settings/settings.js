@@ -7,6 +7,7 @@ import { actionCreators } from "../../actions/actions.js";
 import settingsWrapper from "./settings-wrapper.js";
 
 import topNavModule from "../topnav.js";
+import footerModule from "../footer.js";
 
 import * as srefUtils from "../../sref-utils.js";
 
@@ -25,10 +26,7 @@ class SettingsController {
     Object.assign(this, srefUtils); // bind srefUtils to scope
 
     const select = state => {
-      const themeName = getIn(state, ["config", "theme", "name"]);
-
       return {
-        themeName,
         appTitle: getIn(state, ["config", "theme", "title"]),
       };
     };
@@ -38,7 +36,11 @@ class SettingsController {
 }
 
 export default angular
-  .module("won.owner.components.settings", [topNavModule, settingsWrapper])
+  .module("won.owner.components.settings", [
+    topNavModule,
+    footerModule,
+    settingsWrapper,
+  ])
   .controller("SettingsController", [
     ...serviceDependencies,
     SettingsController,
