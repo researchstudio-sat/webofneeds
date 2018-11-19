@@ -3,12 +3,14 @@
  */
 import angular from "angular";
 import ngAnimate from "angular-animate";
-import { attach } from "../../utils.js";
+import { attach, getIn } from "../../utils.js";
 import won from "../../won-es6.js";
 import { actionCreators } from "../../actions/actions.js";
 import sendRequestModule from "../send-request.js";
 import visitorTitleBarModule from "../visitor-title-bar.js";
 import { getPostUriFromRoute } from "../../selectors/general-selectors.js";
+
+import * as srefUtils from "../../sref-utils.js";
 
 import "style/_post-visitor.scss";
 
@@ -19,13 +21,18 @@ class Controller {
     this.selection = 0;
     window.p4dbg = this;
     this.WON = won.WON;
+    Object.assign(this, srefUtils); // bind srefUtils to scope
 
     const selectFromState = state => {
       const postUri = getPostUriFromRoute(state);
       const post = state.getIn(["needs", postUri]);
 
       const isOwnPost = post && post.get("isOwned");
+      const themeName = getIn(state, ["config", "theme", "name"]);
+
       return {
+        themeName,
+        appTitle: getIn(state, ["config", "theme", "title"]),
         postUri,
         isOwnPost: isOwnPost,
         post,
