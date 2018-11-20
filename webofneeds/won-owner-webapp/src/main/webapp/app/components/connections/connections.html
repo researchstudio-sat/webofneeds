@@ -30,5 +30,5 @@
     <won-post-messages ng-if="!self.selectedPost && !self.useCaseGroup && (self.connectionType === self.WON.Connected || self.connectionType === self.WON.RequestReceived || self.connectionType === self.WON.RequestSent || self.connectionType === self.WON.Suggested)"></won-post-messages>
     <won-post-info include-header="true" ng-if="self.selectedPost && !self.useCaseGroup"></won-post-info>
 </main>
-<won-footer ng-class="{'hide-in-responsive': !self.hasOwnedNeeds || self.connection || self.selectedPost || !!self.useCaseGroup || !!self.useCase}">
+<won-footer ng-class="{'hide-in-responsive': self.connection }"> <!-- Connection view does not show the footer in responsive mode as there should not be two scrollable areas imho-->
 </won-footer>
