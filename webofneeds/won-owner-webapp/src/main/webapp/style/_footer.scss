@@ -1,52 +1,65 @@
 @import "won-config";
 
 won-footer {
-  background-color: $won-secondary-color; //TODO: change to primary-color when you figured out where the stylable logo is
-  padding-top: 1rem;
-  padding-bottom: 1rem;
+  display: grid;
+  grid-gap: 0.5rem;
+  grid-template-areas: ". footerContent .";
+  grid-template-columns: 1fr $maxContentWidth 1fr;
 
-  .footer__title {
+  margin: 0.5rem 0.5rem 0 0.5rem;
+  padding: 0.5rem 0;
+  border-top: $thinGrayBorder;
+
+  > .footer {
+    grid-area: footerContent;
     display: grid;
-    grid-template-columns: max-content max-content;
+    grid-template-areas:
+      "footerLogo footerTitle footerLinks"
+      "footerLogo footerSubTitle footerLinks";
+    grid-template-columns: min-content max-content 1fr;
     grid-template-rows: min-content min-content;
     grid-column-gap: 0.5rem;
-    color: #fff;
-    justify-content: center;
 
-    &__logo {
-      grid-row: 1 / span 2;
-      --local-primary: white;
-      height: 5rem;
+    .footer__logo {
+      grid-area: footerLogo;
+      --local-primary: $won-subtitle-gray;
+      height: 3rem;
+      width: 3rem;
     }
 
-    &__appTitle {
-      align-self: flex-end;
+    .footer__appTitle {
+      align-self: end;
+      grid-area: footerTitle;
+      color: $won-subtitle-gray;
       font-size: $mediumFontSize;
     }
-    &__tagLine {
-      align-self: flex-start;
+
+    .footer__tagLine {
+      grid-area: footerSubTitle;
+      color: $won-subtitle-gray;
       font-size: $smallFontSize;
     }
-  }
-  .footer__links {
-    padding-top: 1.5rem;
-    display: flex;
-    justify-content: center;
-    font-size: $smallFontSize;
 
-    &__divider {
-      color: #fff;
-      user-select: none;
-      padding: 0 0.5rem;
-    }
+    .footer__links {
+      grid-area: footerLinks;
+      display: flex;
+      font-size: $smallFontSize;
+      align-items: center;
 
-    &__link:visited,
-    &__link {
-      color: #fff;
-      text-decoration: none;
+      &__divider {
+        color: $won-subtitle-gray;
+        user-select: none;
+        padding: 0 0.5rem;
+      }
 
-      &:hover {
-        text-decoration: underline;
+      &__link:visited,
+      &__link {
+        color: $won-subtitle-gray;
+        text-decoration: none;
+
+        &:hover {
+          text-decoration: underline;
+        }
       }
     }
   }

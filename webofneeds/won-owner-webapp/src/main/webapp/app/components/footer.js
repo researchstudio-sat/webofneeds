@@ -12,21 +12,21 @@ import "style/_footer.scss";
 
 function genTopnavConf() {
   let template = `
-      <div class="footer__title">
-          <img src="skin/{{self.themeName}}/images/logo.svg" class="footer__title__logo">
-          <div class="footer__title__appTitle">
-              {{ self.appTitle }}
-          </div>
-          <div class="footer__title__tagLine">Web Of Needs</div>
+      <div class="footer">
+        <img src="skin/{{self.themeName}}/images/logo.svg" class="footer__logo"> <!-- find or create logos that are stylable -->
+        <div class="footer__appTitle">
+            {{ self.appTitle }}
+        </div>
+        <div class="footer__tagLine">Web Of Needs</div>
+        <div class="footer__links">
+            <a class="footer__links__link" href="{{ self.absHRef(self.$state, 'about', {'aboutSection': undefined}) }}">About</a>
+            <span class="footer__links__divider">|</span>
+            <a class="footer__links__link" href="{{ self.absHRef(self.$state, 'about', {'aboutSection': 'aboutPrivacyPolicy'}) }}">Privacy</a>
+            <span class="footer__links__divider">|</span>
+            <a class="footer__links__link" href="{{ self.absHRef(self.$state, 'about', {'aboutSection': 'aboutFaq'}) }}">FAQ</a>
+        </div>
       </div>
-      <div class="footer__links">
-          <a class="footer__links__link" href="{{ self.absHRef(self.$state, 'about', {'aboutSection': undefined}) }}">About</a>
-          <span class="footer__links__divider">|</span>
-          <a class="footer__links__link" href="{{ self.absHRef(self.$state, 'about', {'aboutSection': 'aboutPrivacyPolicy'}) }}">Privacy</a>
-          <span class="footer__links__divider">|</span>
-          <a class="footer__links__link" href="{{ self.absHRef(self.$state, 'about', {'aboutSection': 'aboutFaq'}) }}">FAQ</a>
-      </div>
-    `;
+  `;
 
   const serviceDependencies = [
     "$ngRedux",
