@@ -148,6 +148,11 @@ main.about {
           --local-primary: #{$won-primary-color};
           @include fixed-square(var(--iconSize));
           margin-bottom: 1rem;
+          cursor: pointer;
+
+          &--selected {
+            cursor: default;
+          }
         }
 
         &__stepcount {

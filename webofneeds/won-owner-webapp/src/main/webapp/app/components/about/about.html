@@ -28,7 +28,10 @@
         <h3 class="about__howto__subtitle">in {{self.howItWorksSteps.length}} Steps</h3>
         <div class="about__howto__steps">
             <div class="about__howto__steps__process" ng-style="{'--howToColCount': self.howItWorksSteps.length}"> <!-- TODO: this var injection does not work -->
-                <svg class="about__howto__steps__process__icon" ng-repeat="item in self.howItWorksSteps">
+                <svg class="about__howto__steps__process__icon"
+                     ng-class="{'about__howto__steps__process__icon--selected': $index == self.selectedHowItWorksStep}"
+                     ng-repeat="item in self.howItWorksSteps"
+                     ng-click="self.selectedHowItWorksStep = $index">
                     <use xlink:href="{{ self.getSvgIconFromItem(item) }}" href="{{ self.getSvgIconFromItem(item) }}"/>
                 </svg>
                 <div class="about__howto__steps__process__stepcount"
