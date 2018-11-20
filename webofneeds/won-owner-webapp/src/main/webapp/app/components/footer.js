@@ -25,6 +25,8 @@ function genTopnavConf() {
             <a class="footer__links__link" href="{{ self.absHRef(self.$state, 'about', {'aboutSection': 'aboutPrivacyPolicy'}) }}">Privacy</a>
             <span class="footer__links__divider">|</span>
             <a class="footer__links__link" href="{{ self.absHRef(self.$state, 'about', {'aboutSection': 'aboutFaq'}) }}">FAQ</a>
+            <span class="footer__links__divider">|</span>
+            <a class="footer__links__link" href="{{ self.absHRef(self.$state, 'about', {'aboutSection': 'aboutTermsOfService'}) }}">Terms Of Service</a>
         </div>
       </div>
   `;
