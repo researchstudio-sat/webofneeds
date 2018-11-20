@@ -2,6 +2,7 @@
  * Created by ksinger on 21.08.2017.
  */
 import angular from "angular";
+import ngAnimate from "angular-animate";
 import { attach, getIn } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import settingsWrapper from "./settings-wrapper.js";
@@ -34,7 +35,7 @@ class SettingsController {
 }
 
 export default angular
-  .module("won.owner.components.settings", [settingsWrapper])
+  .module("won.owner.components.settings", [settingsWrapper, ngAnimate])
   .controller("SettingsController", [
     ...serviceDependencies,
     SettingsController,

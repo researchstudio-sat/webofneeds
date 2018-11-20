@@ -2,6 +2,7 @@
  * Created by ksinger on 21.08.2017.
  */
 import angular from "angular";
+import ngAnimate from "angular-animate";
 import { attach, getIn } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 
@@ -65,6 +66,7 @@ export default angular
   .module("won.owner.components.signup", [
     signupTitleBarModule,
     labelledHrModule,
+    ngAnimate,
   ])
   .controller("SignupController", [...serviceDependencies, SignupController])
   .name;

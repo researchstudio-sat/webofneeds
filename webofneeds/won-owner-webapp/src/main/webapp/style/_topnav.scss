@@ -1,6 +1,4 @@
 @import "flex-layout";
-@import "topnav-toasts";
-@import "animate";
 @import "button";
 @import "positioning-utils";
 
@@ -88,8 +86,4 @@
     @include won-button--filled(white, $won-primary-color);
     @extend .topnav__button;
   }
-}
-
-won-modal-dialog {
-  @include appearAnimation(0.5s);
 }

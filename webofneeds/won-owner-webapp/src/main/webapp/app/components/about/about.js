@@ -1,4 +1,5 @@
 import angular from "angular";
+import ngAnimate from "angular-animate";
 import compareToModule from "../../directives/compareTo.js";
 import accordionModule from "../accordion.js";
 import flexGridModule from "../flexgrid.js";
@@ -265,6 +266,7 @@ export default angular
     accordionModule,
     flexGridModule,
     compareToModule,
+    ngAnimate,
   ])
   .controller("AboutController", [...serviceDependencies, AboutController])
   .name;
