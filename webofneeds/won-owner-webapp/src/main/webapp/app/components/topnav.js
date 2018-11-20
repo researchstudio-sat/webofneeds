@@ -10,7 +10,6 @@ import modalDialogModule from "./modal-dialog.js";
 import { attach, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
-import { getOwnedNeedByConnectionUri } from "../selectors/general-selectors.js";
 import "angular-marked";
 
 import * as srefUtils from "../sref-utils.js";
@@ -71,7 +70,7 @@ function genTopnavConf() {
         </div>
         <won-modal-dialog ng-if="self.showModalDialog"></won-modal-dialog>
 
-        <nav class="topnav" ng-class="{'hide-in-responsive': !self.isPostView && self.connectionOrPostDetailOpen}">
+        <nav class="topnav">
             <div class="topnav__inner">
                 <div class="topnav__inner__left">
                     <a href="{{ self.defaultRouteHRef(self.$state) }}"
@@ -162,30 +161,11 @@ function genTopnavConf() {
 
       const selectFromState = state => {
         const currentRoute = getIn(state, ["router", "currentState", "name"]);
-        const useCase = getIn(state, ["router", "currentParams", "useCase"]);
-        const useCaseGroup = getIn(state, [
-          "route",
-          "currentParams",
-          "useCaseGroup",
-        ]);
-        const selectedPostUri = decodeURIComponent(
-          getIn(state, ["router", "currentParams", "postUri"])
-        );
-        const selectedPost =
-          selectedPostUri && state.getIn(["needs", selectedPostUri]);
-        const selectedConnectionUri = decodeURIComponent(
-          getIn(state, ["router", "currentParams", "connectionUri"])
-        );
         const privateId = getIn(state, [
           "router",
           "currentParams",
           "privateId",
         ]);
-        const need =
-          selectedConnectionUri &&
-          getOwnedNeedByConnectionUri(state, selectedConnectionUri);
-        const selectedConnection =
-          need && need.getIn(["connections", selectedConnectionUri]);
 
         return {
           themeName: getIn(state, ["config", "theme", "name"]),
@@ -196,14 +176,11 @@ function genTopnavConf() {
           acceptedDisclaimer: state.getIn(["user", "acceptedDisclaimer"]),
           email: state.getIn(["user", "email"]),
           isPrivateIdUser: !!privateId,
-          connectionOrPostDetailOpen:
-            selectedConnection || selectedPost || useCase || useCaseGroup,
           toastsArray: state.getIn(["toasts"]).toArray(),
           connectionHasBeenLost: state.getIn(["messages", "lostConnection"]), // name chosen to avoid name-clash with the action-creator
           reconnecting: state.getIn(["messages", "reconnecting"]),
           showModalDialog: state.get("showModalDialog"),
           isSignUpView: currentRoute === "signup",
-          isPostView: currentRoute === "post",
         };
       };
 
