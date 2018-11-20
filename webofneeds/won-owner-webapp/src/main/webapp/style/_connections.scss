@@ -11,46 +11,14 @@ aside.overview__left {
 }
 
 main.overview__right {
-  > won-post-messages {
-    max-height: 95.7vh; //TODO: FIND A SANE VIEWPORT MAX HEIGHT
-    min-height: 95.7vh;
-    height: 95.7vh;
-
-    @media (max-width: $responsivenessBreakPoint) {
-      max-height: 99.9vh;
-      min-height: 99.9vh;
-      height: 99.9vh;
-    }
-  }
-
-  @media (min-width: $responsivenessBreakPoint) {
-    //ALWAYS SHOW RIGHT HAND SIDE IF IN DESKTOP VIEW
-    > * {
-      position: sticky;
-      top: 3.3rem;
-    }
-  }
-
-  border-right: $thinGrayBorder;
-  border-bottom: $thinGrayBorder;
-
-  @media (max-width: $responsivenessBreakPoint) {
-    grid-column: 1 / -1;
-    border-right: none;
-  }
-  background: white;
-
   .overview__right__welcome {
     padding: 0.5rem;
-    width: 100%;
-    box-sizing: border-box;
 
     > won-usecase-picker {
       padding: 0;
     }
 
     &__text {
-      width: 100%;
       padding-bottom: 1rem;
       h1 {
         padding-bottom: 1.5rem;

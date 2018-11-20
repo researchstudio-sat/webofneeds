@@ -4,74 +4,87 @@
 @import "reset";
 
 body {
+  --headerHeight: 3.3rem;
+
   //this font will be inherited down the cascade
   @include default-font;
   background-color: $won-lighter-gray;
 
   > section.ng-scope {
     display: grid;
-    grid-template-rows: min-content 1fr minmax(0, min-content);
-    grid-template-columns: 1fr 1fr;
     min-height: 100vh;
 
+    @media (max-width: $responsivenessBreakPoint) {
+      grid-template-areas:
+        "header"
+        "list"
+        "content"
+        "footer";
+      grid-template-rows: min-content min-content 1fr min-content;
+    }
+
+    @media (min-width: $responsivenessBreakPoint) {
+      grid-template-areas:
+        "header header header header"
+        ". list content ."
+        ". . . ."
+        "footer footer footer footer";
+      grid-template-rows: min-content max-content 1fr min-content;
+      grid-template-columns: 1fr minmax(min-content, $maxContentWidth/2) minmax(
+          min-content,
+          $maxContentWidth/2
+        ) 1fr;
+    }
+
     header {
-      grid-column: 1 / -1;
+      grid-area: header;
       position: sticky;
       top: 0;
       border-bottom: $thinBorderWidth solid $won-line-gray;
       z-index: 1000;
+      box-sizing: border-box;
+      &.overview__header {
+        height: var(--headerHeight);
+      }
     }
 
-    aside {
-      @media (min-width: $responsivenessBreakPoint) {
-        justify-self: end;
-      }
-      @media (max-width: $responsivenessBreakPoint) {
-        justify-self: stretch;
-      }
-      > * {
-        max-width: $maxContentWidth/2;
-
-        @media (min-width: $maxContentWidth) {
-          min-width: $maxContentWidth/2;
-        }
-      }
+    aside.overview__left {
+      grid-area: list;
+      z-index: 2;
     }
 
     main.overview__right {
-      @media (min-width: $responsivenessBreakPoint) {
-        justify-self: start;
-      }
-      @media (max-width: $responsivenessBreakPoint) {
-        justify-self: stretch;
-      }
-      > * {
-        max-width: $maxContentWidth/2;
+      grid-area: content;
 
-        @media (min-width: $maxContentWidth) {
-          min-width: $maxContentWidth/2;
+      > * {
+        box-sizing: border-box;
+        position: sticky;
+        top: var(--headerHeight);
+
+        border-right: $thinGrayBorder;
+        border-bottom: $thinGrayBorder;
+        @media (max-width: $responsivenessBreakPoint) {
+          border-right: none;
         }
+        background: white;
+      }
+
+      > won-post-messages {
+        height: calc(100vh - var(--headerHeight));
       }
     }
 
     main.signup,
     main.about,
     main.settings {
-      grid-column: 1 / -1;
+      grid-area: list;
       @media (min-width: $responsivenessBreakPoint) {
-        justify-self: stretch;
+        grid-column: 1 / -1;
       }
-      @media (max-width: $responsivenessBreakPoint) {
-        justify-self: stretch;
-      }
-    }
-
-    .gridview-placeholder {
-      grid-column: 1 / -1;
     }
 
     won-footer {
-      grid-column: 1 / -1;
+      grid-area: footer;
     }
   }
 }
