@@ -25,6 +25,7 @@ class SettingsController {
     const select = state => {
       return {
         appTitle: getIn(state, ["config", "theme", "title"]),
+        showModalDialog: state.get("showModalDialog"),
       };
     };
     const disconnect = this.$ngRedux.connect(select, actionCreators)(this);

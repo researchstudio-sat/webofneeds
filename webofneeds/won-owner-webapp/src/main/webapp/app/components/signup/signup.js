@@ -33,6 +33,7 @@ class SignupController {
         registerError: state.getIn(["user", "registerError"]),
         isPrivateIdUser: !!privateId,
         privateId,
+        showModalDialog: state.get("showModalDialog"),
       };
     };
     const disconnect = this.$ngRedux.connect(select, actionCreators)(this);

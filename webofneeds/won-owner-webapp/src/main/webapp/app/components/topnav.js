@@ -67,8 +67,6 @@ function genTopnavConf() {
                     Ok, I'll keep that in mind
             </button>
         </div>
-        <won-modal-dialog ng-if="self.showModalDialog"></won-modal-dialog>
-
         <nav class="topnav">
             <div class="topnav__inner">
                 <div class="topnav__inner__left">
@@ -178,7 +176,6 @@ function genTopnavConf() {
           toastsArray: state.getIn(["toasts"]).toArray(),
           connectionHasBeenLost: state.getIn(["messages", "lostConnection"]), // name chosen to avoid name-clash with the action-creator
           reconnecting: state.getIn(["messages", "reconnecting"]),
-          showModalDialog: state.get("showModalDialog"),
           isSignUpView: currentRoute === "signup",
         };
       };

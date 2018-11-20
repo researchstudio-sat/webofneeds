@@ -105,6 +105,7 @@ class ConnectionsController {
         open,
         mainViewScroll: state.get("mainViewScroll"),
         showWelcomePage: !(ownedNeeds && ownedNeeds.size > 0),
+        showModalDialog: state.get("showModalDialog"),
       };
     };
 
