@@ -8,7 +8,6 @@ import won from "../../won-es6.js";
 import { actionCreators } from "../../actions/actions.js";
 import sendRequestModule from "../send-request.js";
 import visitorTitleBarModule from "../visitor-title-bar.js";
-import footerModule from "../footer.js";
 import { getPostUriFromRoute } from "../../selectors/general-selectors.js";
 
 import * as srefUtils from "../../sref-utils.js";
@@ -60,6 +59,5 @@ export default angular
     sendRequestModule,
     ngAnimate,
     visitorTitleBarModule,
-    footerModule,
   ])
   .controller("PostController", Controller).name;

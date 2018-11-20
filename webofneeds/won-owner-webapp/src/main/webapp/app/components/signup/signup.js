@@ -8,9 +8,6 @@ import { actionCreators } from "../../actions/actions.js";
 import signupTitleBarModule from "../signup-title-bar.js";
 import labelledHrModule from "../labelled-hr.js";
 
-import topNavModule from "../topnav.js";
-import footerModule from "../footer.js";
-
 import * as srefUtils from "../../sref-utils.js";
 
 import "style/_signup.scss";
@@ -66,9 +63,7 @@ class SignupController {
 export default angular
   .module("won.owner.components.signup", [
     signupTitleBarModule,
-    topNavModule,
     labelledHrModule,
-    footerModule,
   ])
   .controller("SignupController", [...serviceDependencies, SignupController])
   .name;

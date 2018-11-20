@@ -6,7 +6,6 @@ import angular from "angular";
 import ngAnimate from "angular-animate";
 import dropdownModule from "./covering-dropdown.js";
 import accountMenuModule from "./account-menu.js";
-import modalDialogModule from "./modal-dialog.js";
 import { attach, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
@@ -202,11 +201,8 @@ function genTopnavConf() {
 export default angular
   .module("won.owner.components.topnav", [
     "hc.marked",
-    //loginComponent,
-    //logoutComponent,
     dropdownModule,
     accountMenuModule,
-    modalDialogModule,
     ngAnimate,
   ])
   .directive("wonTopnav", genTopnavConf).name;

@@ -1,6 +1,4 @@
 import angular from "angular";
-import topNavModule from "../topnav.js";
-import footerModele from "../footer.js";
 import compareToModule from "../../directives/compareTo.js";
 import accordionModule from "../accordion.js";
 import flexGridModule from "../flexgrid.js";
@@ -264,10 +262,8 @@ class AboutController {
 export default angular
   .module("won.owner.components.about", [
     accordionModule,
-    topNavModule,
     flexGridModule,
     compareToModule,
-    footerModele,
   ])
   .controller("AboutController", [...serviceDependencies, AboutController])
   .name;

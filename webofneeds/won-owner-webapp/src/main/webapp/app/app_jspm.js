@@ -34,6 +34,8 @@ import { actionCreators } from "./actions/actions.js";
 
 //-------- Components ---------
 import topnav from "./components/topnav.js";
+import footer from "./components/footer.js";
+import modalDialogModule from "./components/modal-dialog.js";
 import connectionsComponent from "./components/connections/connections.js";
 import postComponent from "./components/post/post.js";
 import aboutComponent from "./components/about/about.js";
@@ -64,6 +66,7 @@ let app = angular.module("won.owner", [
 
   //components
   topnav,
+  footer,
 
   //views
   connectionsComponent,
@@ -71,7 +74,7 @@ let app = angular.module("won.owner", [
   aboutComponent,
   signupComponent,
   settingsComponent,
-
+  modalDialogModule,
   ...detailModules,
 ]);
 

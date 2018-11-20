@@ -6,9 +6,6 @@ import { attach, getIn } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import settingsWrapper from "./settings-wrapper.js";
 
-import topNavModule from "../topnav.js";
-import footerModule from "../footer.js";
-
 import * as srefUtils from "../../sref-utils.js";
 
 import "style/_signup.scss";
@@ -36,11 +33,7 @@ class SettingsController {
 }
 
 export default angular
-  .module("won.owner.components.settings", [
-    topNavModule,
-    footerModule,
-    settingsWrapper,
-  ])
+  .module("won.owner.components.settings", [settingsWrapper])
   .controller("SettingsController", [
     ...serviceDependencies,
     SettingsController,
