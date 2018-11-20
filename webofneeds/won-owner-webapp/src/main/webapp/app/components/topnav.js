@@ -19,54 +19,6 @@ import "style/_topnav.scss";
 
 function genTopnavConf() {
   let template = `
-        <div class="slide-in" ng-class="{'visible': self.connectionHasBeenLost}">
-            <svg class="si__icon" style="--local-primary:white;">
-                <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
-            </svg>
-            <span class="si__text">
-                Lost connection &ndash; make sure your internet-connection
-                is working, then click &ldquo;reconnect&rdquo;.
-            </span>
-            <button
-                ng-show="self.connectionHasBeenLost && !self.reconnecting"
-                ng-click="self.reconnect__start()"
-                class="si__button">
-                    Reconnect
-            </button>
-
-            <svg class="hspinner" ng-show="self.reconnecting">
-                <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
-            </svg>
-        </div>
-        <div class="slide-in" ng-class="{'visible': !self.acceptedDisclaimer}">
-            <svg class="si__icon" style="--local-primary:white;">
-                <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_info"></use>
-            </svg>
-            <div class="si__smalltext">
-                This is the demonstrator of an ongoing research project. Please keep in mind:
-                <ul>
-                	<li> Your posts are public. </li>
-					        <li> Your user account is not publicly linked to your posts.</li>
-                	<li> The connections of your posts are public.</li>
-                	<li> The messages you exchange with others are private, but stored in clear text on our servers. </li>
-                </ul>     
-                <a target="_blank"
-                   href="{{ self.absHRef(self.$state, 'about', {'aboutSection': 'aboutPrivacyPolicy'}) }}">
-                   See Privacy Policy.
-                </a>
-                <br />
-                We use cookies to track your session using a self-hosted analytics tool.
-                <a target="_blank"
-                   href="/piwik/index.php?module=CoreAdminHome&action=optOut&language=en">
-                   Suppress tracking.
-                </a>
-	  		    </div>
-            <button
-                ng-click="self.acceptDisclaimer()"
-                class="si__smallbutton">
-                    Ok, I'll keep that in mind
-            </button>
-        </div>
         <nav class="topnav">
             <div class="topnav__inner">
                 <div class="topnav__inner__left">
@@ -170,12 +122,9 @@ function genTopnavConf() {
           adminEmail: getIn(state, ["config", "theme", "adminEmail"]),
           WON: won.WON,
           loggedIn: state.getIn(["user", "loggedIn"]),
-          acceptedDisclaimer: state.getIn(["user", "acceptedDisclaimer"]),
           email: state.getIn(["user", "email"]),
           isPrivateIdUser: !!privateId,
           toastsArray: state.getIn(["toasts"]).toArray(),
-          connectionHasBeenLost: state.getIn(["messages", "lostConnection"]), // name chosen to avoid name-clash with the action-creator
-          reconnecting: state.getIn(["messages", "reconnecting"]),
           isSignUpView: currentRoute === "signup",
         };
       };
