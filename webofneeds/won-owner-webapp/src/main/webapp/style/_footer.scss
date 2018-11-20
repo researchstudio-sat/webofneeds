@@ -2,7 +2,6 @@
 
 won-footer {
   display: grid;
-  grid-gap: 0.5rem;
   grid-template-areas: ". footerContent .";
   grid-template-columns: 1fr $maxContentWidth 1fr;
 
@@ -18,7 +17,7 @@ won-footer {
       "footerLogo footerSubTitle footerLinks";
     grid-template-columns: min-content max-content 1fr;
     grid-template-rows: min-content min-content;
-    grid-column-gap: 0.5rem;
+    /*grid-column-gap: 0.5rem;*/
 
     .footer__logo {
       grid-area: footerLogo;

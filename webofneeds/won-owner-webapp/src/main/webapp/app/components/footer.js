@@ -13,11 +13,12 @@ import "style/_footer.scss";
 function genTopnavConf() {
   let template = `
       <div class="footer">
-        <img src="skin/{{self.themeName}}/images/logo.svg" class="footer__logo"> <!-- find or create logos that are stylable -->
+        <!-- TODO: find or create logos that are stylable -->
+        <!--<img src="skin/{{self.themeName}}/images/logo.svg" class="footer__logo">
         <div class="footer__appTitle">
             {{ self.appTitle }}
         </div>
-        <div class="footer__tagLine">Web Of Needs</div>
+        <div class="footer__tagLine">Web Of Needs</div>-->
         <div class="footer__links">
             <a class="footer__links__link" href="{{ self.absHRef(self.$state, 'about', {'aboutSection': undefined}) }}">About</a>
             <span class="footer__links__divider">|</span>
