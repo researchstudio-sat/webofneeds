@@ -2,8 +2,15 @@
 
 won-footer {
   display: grid;
-  grid-template-areas: ". footerContent .";
-  grid-template-columns: 1fr $maxContentWidth 1fr;
+
+  @media (max-width: $responsivenessBreakPoint) {
+    grid-template-areas: "footerContent";
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: $responsivenessBreakPoint) {
+    grid-template-areas: ". footerContent .";
+    grid-template-columns: 1fr minmax(min-content, $maxContentWidth) 1fr;
+  }
 
   margin: 0.5rem 0.5rem 0 0.5rem;
   padding: 0.5rem 0;
