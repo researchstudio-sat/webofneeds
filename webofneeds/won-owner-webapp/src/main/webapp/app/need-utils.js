@@ -14,6 +14,17 @@ export function isWhatsAroundNeed(need) {
 }
 
 /**
+ * Determines if a given need is a DirectResponse-Need
+ * @param msg
+ * @returns {*|boolean}
+ */
+export function isDirectResponseNeed(need) {
+  return (
+    need && need.get("flags") && need.get("flags").contains("won:responseToUri")
+  );
+}
+
+/**
  * Determines if a given need is a WhatsNew-Need
  * @param msg
  * @returns {*|boolean}
