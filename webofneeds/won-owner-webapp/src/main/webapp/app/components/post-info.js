@@ -31,7 +31,7 @@ function genComponentConf() {
                 timestamp="self.createdTimestamp"
                 hide-image="::false">
             </won-post-header>
-            <won-post-context-dropdown ng-if="self.post.get('isOwned')"></won-post-context-dropdown>
+            <won-post-context-dropdown></won-post-context-dropdown>
         </div>
         <won-post-content post-uri="self.postUri"></won-post-content>
         <div class="post-info__footer" ng-if="!self.isLoading()">
