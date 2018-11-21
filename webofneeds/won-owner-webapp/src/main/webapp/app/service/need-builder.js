@@ -160,28 +160,34 @@ import { Generator } from "sparqljs";
     const matchingContext = args.matchingContext;
 
     // TODO: if both is and seeks are present, the seeks content gets ignored here
-    const isWhatsAround = args.content
+    const isDirectResponse = args.content //TODO: refactor this and use a won:hasFlags-Detail in the content instead
+      ? args.content.directResponseNeed
+      : args.seeks
+        ? args.seeks.directResponseNeed
+        : undefined;
+    const isWhatsAround = args.content //TODO: refactor this and use a won:hasFlags-Detail in the content instead
       ? args.content.whatsAround
       : args.seeks
         ? args.seeks.whatsAround
         : undefined;
-    const isWhatsNew = args.content
+    const isWhatsNew = args.content //TODO: refactor this and use a won:hasFlags-Detail in the content instead
       ? args.content.whatsNew
       : args.seeks
         ? args.seeks.whatsNew
         : undefined;
-    const noHints = args.content
+    const noHints = args.content //TODO: refactor this and use a won:hasFlags-Detail in the content instead
       ? args.content.noHints
       : args.seeks
         ? args.seeks.noHints
         : undefined;
-    const noHintForCounterpart = isWhatsAround
+    const noHintForCounterpart = isWhatsAround //TODO: refactor this and use a won:hasFlags-Detail in the content instead
       ? true
       : isWhatsNew
         ? true
         : args.useCase === "search" //hack: no hint for counterpart if it's a pure search
           ? true
           : false;
+
     let seeksContentUri;
     if (isWhatsAround) {
       seeksContentUri = won.WON.contentNodeBlankUri.whatsAround;
@@ -259,14 +265,15 @@ import { Generator } from "sparqljs";
         ? args.facet
         : { "@id": "#chatFacet", "@type": "won:ChatFacet" },
       "won:hasFlag": new Set([
-        won.debugmode ? "won:UsedForTesting" : undefined,
+        won.debugmode ? "won:UsedForTesting" : undefined, //TODO: refactor this and use a won:hasFlags-Detail in the content instead
 
-        isWhatsAround ? "won:WhatsAround" : undefined,
-        isWhatsNew ? "won:WhatsNew" : undefined,
-        noHintForCounterpart ? "won:NoHintForCounterpart" : undefined,
+        isWhatsAround ? "won:WhatsAround" : undefined, //TODO: refactor this and use a won:hasFlags-Detail in the content instead
+        isWhatsNew ? "won:WhatsNew" : undefined, //TODO: refactor this and use a won:hasFlags-Detail in the content instead
+        isDirectResponse ? "won:DirectResponse" : undefined, //TODO: refactor this and use a won:hasFlags-Detail in the content instead
+        noHintForCounterpart ? "won:NoHintForCounterpart" : undefined, //TODO: refactor this and use a won:hasFlags-Detail in the content instead
 
-        noHints ? "won:NoHintForMe" : undefined,
-        noHints ? "won:NoHintForCounterpart" : undefined,
+        noHints ? "won:NoHintForMe" : undefined, //TODO: refactor this and use a won:hasFlags-Detail in the content instead
+        noHints ? "won:NoHintForCounterpart" : undefined, //TODO: refactor this and use a won:hasFlags-Detail in the content instead
       ]), ///.toArray().filter(f => f),
       "won:doNotMatchAfter": doNotMatchAfter
         ? { "@value": doNotMatchAfter, "@type": "xsd:dateTime" }
