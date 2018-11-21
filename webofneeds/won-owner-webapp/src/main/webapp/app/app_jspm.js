@@ -34,12 +34,15 @@ import { actionCreators } from "./actions/actions.js";
 
 //-------- Components ---------
 import topnav from "./components/topnav.js";
+import footer from "./components/footer.js";
+import modalDialog from "./components/modal-dialog.js";
+import toasts from "./components/toasts.js";
+import slideIn from "./components/slide-in.js";
 import connectionsComponent from "./components/connections/connections.js";
 import postComponent from "./components/post/post.js";
 import aboutComponent from "./components/about/about.js";
 import signupComponent from "./components/signup/signup.js";
-
-import settingsWrapper from "./components/settings/settings-wrapper.js";
+import settingsComponent from "./components/settings/settings.js";
 
 //won import (used so you can access the debugmode variable without reloading the page)
 import won from "./service/won.js";
@@ -65,15 +68,20 @@ let app = angular.module("won.owner", [
 
   //components
   topnav,
+  footer,
+  modalDialog,
+  toasts,
+  slideIn,
+
+  //details
+  ...detailModules,
 
   //views
   connectionsComponent,
   postComponent,
   aboutComponent,
   signupComponent,
-
-  ...detailModules,
-  settingsWrapper,
+  settingsComponent,
 ]);
 
 /* create store, register middlewares, set up redux-devtool-support, etc */

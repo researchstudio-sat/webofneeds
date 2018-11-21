@@ -110,6 +110,13 @@ export const getPostUriFromRoute = createSelector(
   }
 );
 
+export const getAboutSectionFromRoute = createSelector(
+  state => state,
+  state => {
+    return getIn(state, ["router", "currentParams", "aboutSection"]);
+  }
+);
+
 export function isPrivateUser(state) {
   return !!getIn(state, ["router", "currentParams", "privateId"]);
 }

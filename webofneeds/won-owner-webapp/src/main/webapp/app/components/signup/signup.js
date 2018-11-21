@@ -2,13 +2,12 @@
  * Created by ksinger on 21.08.2017.
  */
 import angular from "angular";
+import ngAnimate from "angular-animate";
 import { attach, getIn } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 
 import signupTitleBarModule from "../signup-title-bar.js";
 import labelledHrModule from "../labelled-hr.js";
-
-import topNavModule from "../topnav.js";
 
 import * as srefUtils from "../../sref-utils.js";
 
@@ -24,17 +23,18 @@ class SignupController {
   constructor(/* arguments <- serviceDependencies */) {
     attach(this, serviceDependencies, arguments);
     this.rememberMe = false;
+    this.acceptToS = false;
     Object.assign(this, srefUtils); // bind srefUtils to scope
 
     const select = state => {
       const privateId = getIn(state, ["router", "currentParams", "privateId"]);
 
       return {
-        //focusSignup: state.getIn(['router', 'currentParams', 'focusSignup']) === "true",
         loggedIn: state.getIn(["user", "loggedIn"]),
         registerError: state.getIn(["user", "registerError"]),
         isPrivateIdUser: !!privateId,
         privateId,
+        showModalDialog: state.get("showModalDialog"),
       };
     };
     const disconnect = this.$ngRedux.connect(select, actionCreators)(this);
@@ -64,13 +64,9 @@ class SignupController {
 
 export default angular
   .module("won.owner.components.signup", [
-    //overviewTitleBarModule,
-    //accordionModule,
     signupTitleBarModule,
-    topNavModule,
     labelledHrModule,
-    //flexGridModule,
-    //compareToModule,
+    ngAnimate,
   ])
   .controller("SignupController", [...serviceDependencies, SignupController])
   .name;

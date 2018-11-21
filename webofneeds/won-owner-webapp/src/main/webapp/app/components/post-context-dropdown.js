@@ -42,13 +42,6 @@ function genComponentConf() {
                         </svg>
                     </div>
                     <!-- Buttons for post -->
-                    <button class="won-button--outlined thin red show-in-responsive"
-                        ng-click="self.toggleRdfDisplay()">
-                        <svg class="won-button-icon" style="--local-primary:var(--won-primary-color);">
-                            <use xlink:href="#ico36_rdf_logo" href="#ico36_rdf_logo"></use>
-                        </svg>
-                        <span>{{self.shouldShowRdf? "Hide raw RDF data" : "Show raw RDF data"}}</span>
-                    </button>
                     <button class="won-button--outlined thin red"
                         ng-click="self.exportPdf()">
                         Export as PDF
@@ -87,7 +80,6 @@ function genComponentConf() {
           isOwnPost: post && post.get("isOwned"),
           isActive: postState === won.WON.ActiveCompacted,
           isInactive: postState === won.WON.InactiveCompacted,
-          shouldShowRdf: state.get("showRdf"),
           post,
           linkToPost,
           postUri,

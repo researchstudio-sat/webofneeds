@@ -8,8 +8,6 @@ won-usecase-picker {
   grid-template-areas: "header" "create_x" "main";
   grid-template-rows: min-content auto minmax($minimalGridRows, 1fr);
   grid-row-gap: $gridRowGap;
-  width: 100%;
-  max-width: $maxContentWidth;
   box-sizing: border-box;
   padding: $gridRowGap;
 
@@ -71,6 +69,12 @@ won-usecase-picker {
     padding-top: 0.5rem;
 
     overflow: auto;
+
+    &__button {
+      @media (min-width: $responsivenessBreakPoint) {
+        white-space: nowrap;
+      }
+    }
 
     &__button,
     &__button--pending {

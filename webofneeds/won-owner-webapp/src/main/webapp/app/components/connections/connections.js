@@ -9,40 +9,40 @@ import createPostModule from "../create-post.js";
 import createSearchModule from "../create-search.js";
 import usecasePickerModule from "../usecase-picker.js";
 import usecaseGroupModule from "../usecase-group.js";
-import { attach, getIn, callBuffer } from "../../utils.js";
+import { attach, getIn /*callBuffer*/ } from "../../utils.js";
 import { isWhatsAroundNeed, isWhatsNewNeed } from "../../need-utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import {
   getOwnedNeedByConnectionUri,
   getOwnedNeeds,
 } from "../../selectors/general-selectors.js";
-import { resetParams } from "../../configRouting.js";
+import * as srefUtils from "../../sref-utils.js";
 
 import "style/_connections.scss";
 import "style/_responsiveness-utils.scss";
 
-const serviceDependencies = ["$element", "$ngRedux", "$scope"];
+const serviceDependencies = ["$element", "$ngRedux", "$scope", "$state"];
 
 class ConnectionsController {
   constructor() {
     attach(this, serviceDependencies, arguments);
-    const self = this;
+    Object.assign(this, srefUtils);
+    //const self = this;
     this.WON = won.WON;
-    this.resetParams = resetParams;
     this.open = {};
 
     this.SEARCH = "search";
     this.POST = "post";
 
-    const scrollArea = this.$element[0].querySelector(".connectionscontent");
+    //const scrollArea = this.$element[0].querySelector(".overview__content");
 
-    this.scrollBuffer = callBuffer(scrollPosition => {
+    /*this.scrollBuffer = callBuffer(scrollPosition => {
       self.mainViewScrolled(scrollPosition);
-    }, 100);
+    }, 100);*/
 
-    scrollArea.addEventListener("scroll", () => {
+    /*scrollArea.addEventListener("scroll", () => {
       self.scrollBuffer(scrollArea.scrollTop);
-    });
+    });*/
 
     const selectFromState = state => {
       const selectedPostUri = decodeURIComponent(
@@ -84,15 +84,16 @@ class ConnectionsController {
           connections = connections.merge(need.get("connections"));
         });
 
-      const theme = getIn(state, ["config", "theme", "name"]);
+      const themeName = getIn(state, ["config", "theme", "name"]);
 
       return {
-        theme,
+        themeName,
         welcomeTemplate:
           "./skin/" +
-          theme +
+          themeName +
           "/" +
           getIn(state, ["config", "theme", "welcomeTemplate"]),
+        appTitle: getIn(state, ["config", "theme", "title"]),
         WON: won.WON,
         selectedPost,
         connection,
@@ -104,6 +105,7 @@ class ConnectionsController {
         open,
         mainViewScroll: state.get("mainViewScroll"),
         showWelcomePage: !(ownedNeeds && ownedNeeds.size > 0),
+        showModalDialog: state.get("showModalDialog"),
       };
     };
 
@@ -112,10 +114,10 @@ class ConnectionsController {
     );
     this.$scope.$on("$destroy", disconnect);
 
-    this.$scope.$watch("self.mainViewScroll", newValue => {
+    /*this.$scope.$watch("self.mainViewScroll", newValue => {
       if (newValue !== undefined)
         requestAnimationFrame(() => (scrollArea.scrollTop = newValue));
-    });
+    });*/
   }
 
   selectedNeed(needUri) {

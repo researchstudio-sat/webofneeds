@@ -40,7 +40,7 @@ export default function(allToasts = initialState, action = {}) {
       }
     }
 
-    case actionTypes.loginFailed:
+    case actionTypes.loginFailed: {
       if (getIn(action, ["payload", "loginError"]) === "invalid privateId") {
         return pushNewToast(
           allToasts,
@@ -55,6 +55,17 @@ export default function(allToasts = initialState, action = {}) {
       } else {
         return allToasts;
       }
+    }
+
+    case actionTypes.toasts.push: {
+      const text = getIn(action, ["payload", "text"]);
+      if (text) {
+        const type = getIn(action, ["payload", "type"]);
+        return pushNewToast(allToasts, text, type ? type : won.WON.infoToast);
+      } else {
+        return allToasts;
+      }
+    }
 
     case actionTypes.geoLocationDenied:
       return pushNewToast(

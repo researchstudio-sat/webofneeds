@@ -73,8 +73,9 @@ export const configRouting = [
     });
 
     [
-      { path: "/about?privateId", component: "about" },
+      { path: "/about?privateId?aboutSection", component: "about" },
       { path: "/signup?privateId", component: "signup" },
+      { path: "/settings?privateId", component: "settings" },
       {
         path:
           "/connections?privateId?postUri?connectionUri?useCase?useCaseGroup",
@@ -96,13 +97,6 @@ export const configRouting = [
         controllerAs: "self",
         scope: {},
       });
-    });
-
-    $urlRouterProvider.when("/settings/", "/settings/general");
-
-    $stateProvider.state("settings", {
-      url: "/settings",
-      templateUrl: "./app/components/settings/settings.html",
     });
   },
 ];

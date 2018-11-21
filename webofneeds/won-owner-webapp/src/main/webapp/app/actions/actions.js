@@ -303,6 +303,7 @@ const actionHierarchy = {
   toasts: {
     delete: INJ_DEFAULT,
     test: INJ_DEFAULT,
+    push: INJ_DEFAULT,
   },
   config: {
     init: configActions.configInit,

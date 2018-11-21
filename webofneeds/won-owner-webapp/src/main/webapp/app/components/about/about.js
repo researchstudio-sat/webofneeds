@@ -1,61 +1,67 @@
 import angular from "angular";
-import topNavModule from "../topnav.js";
+import ngAnimate from "angular-animate";
 import compareToModule from "../../directives/compareTo.js";
 import accordionModule from "../accordion.js";
 import flexGridModule from "../flexgrid.js";
 import { attach, getIn, toAbsoluteURL } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import { ownerBaseUrl } from "config";
+import * as srefUtils from "../../sref-utils.js";
+import { getAboutSectionFromRoute } from "../../selectors/general-selectors.js";
 
 import "style/_about.scss";
 
 const serviceDependencies = [
   "$ngRedux",
+  "$state",
   "$scope" /*'$routeParams' /*injections as strings here*/,
 ];
 
-const workGrid = [
+const howItWorksSteps = [
   {
     svgSrc: "#ico36_description",
-    text: "Post your need anonymously",
-    detail:
+    title: "Post your need anonymously",
+    text:
       "Needs can be very personal, so privacy is important. You don't have to reveal your identity here.",
   },
   {
     svgSrc: "#ico36_match",
-    text: "Get matches",
-    detail:
+    title: "Get matches",
+    text:
       "Based on the" +
       " information you provide, we will try to connect you with others",
   },
   {
     svgSrc: "#ico36_incoming",
-    text: "Request contact – or be contacted",
-    detail:
+    title: "Request contact – or be contacted",
+    text:
       "If you're interested," +
       " make a contact request - or get one if your counterpart is faster than you",
   },
   {
     svgSrc: "#ico36_message",
-    text: "Interact and exchange",
-    detail:
+    title: "Interact and exchange",
+    text:
       "You found someone" +
       " who has what you need, wants to meet or change something in your common environment? Go chat with them! ",
   },
 ];
 
-const peopleGrid = ({ theme }) => [
+const peopleGrid = ({ themeName }) => [
   {
-    imageSrc: `skin/${theme}/images/face1.png`,
+    imageSrc: `skin/${themeName}/images/face1.png`,
     text: '"I have something to offer"',
   },
-  { imageSrc: `skin/${theme}/images/face2.png`, text: '"I want something"' },
   {
-    imageSrc: `skin/${theme}/images/face3.png`,
+    imageSrc: `skin/${themeName}/images/face2.png`,
+    text: '"I want something"',
+  },
+  {
+    imageSrc: `skin/${themeName}/images/face3.png`,
     text: '"I want to do something together"',
   },
   {
-    imageSrc: `skin/${theme}/images/face4.png`,
+    imageSrc: `skin/${themeName}/images/face4.png`,
     text: '"I want to change something"',
   },
 ];
@@ -183,24 +189,35 @@ const questions = [
 class AboutController {
   constructor(/* arguments <- serviceDependencies */) {
     attach(this, serviceDependencies, arguments);
+    Object.assign(this, srefUtils);
 
     window.ab4dbg = this;
 
     const select = state => {
-      const theme = getIn(state, ["config", "theme", "name"]);
+      const visibleSection = getAboutSectionFromRoute(state);
+      const themeName = getIn(state, ["config", "theme", "name"]);
       return {
-        theme,
+        themeName,
+        visibleSection,
+        appTitle: getIn(state, ["config", "theme", "title"]),
+        tosTemplate:
+          "./skin/" +
+          themeName +
+          "/" +
+          getIn(state, ["config", "theme", "tosTemplate"]),
         imprintTemplate:
           "./skin/" +
-          theme +
+          themeName +
           "/" +
           getIn(state, ["config", "theme", "imprintTemplate"]),
         privacyPolicyTemplate:
           "./skin/" +
-          theme +
+          themeName +
           "/" +
           getIn(state, ["config", "theme", "privacyPolicyTemplate"]),
-        peopleGrid: peopleGrid({ theme }),
+        peopleGrid: peopleGrid({ themeName }),
+        pendingPublishing: state.get("creatingWhatsX"),
+        showModalDialog: state.get("showModalDialog"),
       };
     };
     const disconnect = this.$ngRedux.connect(select, actionCreators)(this);
@@ -209,21 +226,47 @@ class AboutController {
 
     this.questions = questions;
     this.peopleGrid = [];
-    this.workGrid = workGrid;
+    this.howItWorksSteps = howItWorksSteps;
+    this.selectedHowItWorksStep = 0;
     this.moreInfo = false;
+  }
+
+  showAvailableUseCases() {
+    this.router__stateGoAbs("connections", {
+      connectionUri: undefined,
+      postUri: undefined,
+      useCase: undefined,
+      useCaseGroup: "all",
+    });
+  }
+
+  createWhatsAround() {
+    if (!this.pendingPublishing) {
+      this.needs__whatsAround();
+    }
+  }
+
+  createWhatsNew() {
+    if (!this.pendingPublishing) {
+      this.needs__whatsNew();
+    }
   }
 
   toggleMoreInfo() {
     this.moreInfo = !this.moreInfo;
+  }
+
+  getSvgIconFromItem(item) {
+    return item.svgSrc ? item.svgSrc : "#ico36_uc_question";
   }
 }
 
 export default angular
   .module("won.owner.components.about", [
     accordionModule,
-    topNavModule,
     flexGridModule,
     compareToModule,
+    ngAnimate,
   ])
   .controller("AboutController", [...serviceDependencies, AboutController])
   .name;

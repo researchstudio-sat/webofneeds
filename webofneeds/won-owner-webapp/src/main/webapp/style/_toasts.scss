@@ -2,11 +2,11 @@
 @import "sizing-utils";
 @import "won-markdown";
 
-won-topnav {
+won-toasts {
   .topnav__toasts {
     position: absolute;
-    z-index: 999;
-    right: 0rem;
+    z-index: 9999;
+    right: 0;
 
     &__element {
       margin: 1rem;

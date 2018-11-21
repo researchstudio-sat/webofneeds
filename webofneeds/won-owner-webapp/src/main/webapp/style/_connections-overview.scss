@@ -9,12 +9,10 @@ won-connections-overview {
   .co__item {
     background-color: $won-light-gray;
     border-left: $thinGrayBorder;
-    border-right: $thinGrayBorder;
     border-bottom: $thinGrayBorder;
 
     @media (max-width: $responsivenessBreakPoint) {
       border-left: none;
-      border-right: none;
     }
 
     &__need {

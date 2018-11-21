@@ -10,6 +10,8 @@ import sendRequestModule from "../send-request.js";
 import visitorTitleBarModule from "../visitor-title-bar.js";
 import { getPostUriFromRoute } from "../../selectors/general-selectors.js";
 
+import * as srefUtils from "../../sref-utils.js";
+
 import "style/_post-visitor.scss";
 
 const serviceDependencies = ["$ngRedux", "$scope"];
@@ -19,17 +21,20 @@ class Controller {
     this.selection = 0;
     window.p4dbg = this;
     this.WON = won.WON;
+    Object.assign(this, srefUtils); // bind srefUtils to scope
 
     const selectFromState = state => {
       const postUri = getPostUriFromRoute(state);
       const post = state.getIn(["needs", postUri]);
 
       const isOwnPost = post && post.get("isOwned");
+
       return {
         postUri,
         isOwnPost: isOwnPost,
         post,
         won: won.WON,
+        showModalDialog: state.get("showModalDialog"),
       };
     };
 

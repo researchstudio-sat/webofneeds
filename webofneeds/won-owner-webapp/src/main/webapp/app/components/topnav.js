@@ -1,79 +1,22 @@
 /**
  * Created by ksinger on 20.08.2015.
  */
-import won from "../won-es6.js";
 import angular from "angular";
 import ngAnimate from "angular-animate";
-//import loginComponent from './login.js';
-//import logoutComponent from './logout.js';
 import dropdownModule from "./covering-dropdown.js";
 import accountMenuModule from "./account-menu.js";
-import modalDialogModule from "./modal-dialog.js";
 import { attach, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
-import { getOwnedNeedByConnectionUri } from "../selectors/general-selectors.js";
-import "angular-marked";
 
 import * as srefUtils from "../sref-utils.js";
 
 import "style/_responsiveness-utils.scss";
-import "style/_slidein.scss";
 import "style/_topnav.scss";
 
 function genTopnavConf() {
   let template = `
-        <div class="slide-in" ng-class="{'visible': self.connectionHasBeenLost}">
-            <svg class="si__icon" style="--local-primary:white;">
-                <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
-            </svg>
-            <span class="si__text">
-                Lost connection &ndash; make sure your internet-connection
-                is working, then click &ldquo;reconnect&rdquo;.
-            </span>
-            <button
-                ng-show="self.connectionHasBeenLost && !self.reconnecting"
-                ng-click="self.reconnect__start()"
-                class="si__button">
-                    Reconnect
-            </button>
-
-            <svg class="hspinner" ng-show="self.reconnecting">
-                <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
-            </svg>
-        </div>
-        <div class="slide-in" ng-class="{'visible': !self.acceptedDisclaimer}">
-            <svg class="si__icon" style="--local-primary:white;">
-                <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_info"></use>
-            </svg>
-            <div class="si__text">
-                This is the demonstrator of an ongoing research project. Please keep in mind:
-                <ul>
-                	<li> Your posts are public. </li>
-					<li> Your user account is not publicly linked to your posts.</li>
-                	<li> The connections of your posts are public.</li>
-                	<li> The messages you exchange with others are private, but stored in clear text on our servers. </li>
-                </ul>     
-                <a target="_blank"
-                   href="{{ self.absHRef(self.$state, 'about', {'#': 'privacyPolicy'}) }}">
-                   See Privacy Policy.
-                </a>
-                <br />
-                We use cookies to track your session using a self-hosted analytics tool.
-                <a target="_blank"
-                   href="/piwik/index.php?module=CoreAdminHome&action=optOut&language=en">
-                   Suppress tracking.
-                </a>
-	  		</div>
-            <button
-                ng-click="self.acceptDisclaimer()"
-                class="si__button">
-                    Ok, I'll keep that in mind
-            </button>
-        </div>
-        <won-modal-dialog ng-if="self.showModalDialog"></won-modal-dialog>
-
-        <nav class="topnav" ng-class="{'hide-in-responsive': !self.isPostView && self.connectionOrPostDetailOpen}">
+        <nav class="topnav">
             <div class="topnav__inner">
                 <div class="topnav__inner__left">
                     <a href="{{ self.defaultRouteHRef(self.$state) }}"
@@ -102,51 +45,6 @@ function genTopnavConf() {
                 </div>
             </div>
         </nav>
-
-        <div class="topnav__toasts">
-            <div class="topnav__toasts__element" 
-            ng-class="{ 'info' : toast.get('type') === self.WON.infoToast,
-                        'warn' : toast.get('type') === self.WON.warnToast,
-                        'error' : toast.get('type') === self.WON.errorToast
-                      }"
-            ng-repeat="toast in self.toastsArray">
-
-                <svg class="topnav__toasts__element__icon"
-                    ng-show="toast.get('type') === self.WON.infoToast"
-                    style="--local-primary:#CCD2D2">
-                        <use xlink:href="#ico16_indicator_info" href="#ico16_indicator_info"></use>
-                </svg>
-
-                <svg class="topnav__toasts__element__icon"
-                    ng-show="toast.get('type') === self.WON.warnToast"
-                    style="--local-primary:#CCD2D2">
-                        <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
-                </svg>
-
-                <svg class="topnav__toasts__element__icon"
-                    ng-show="toast.get('type') === self.WON.errorToast"
-                    style="--local-primary:#CCD2D2">
-                        <use xlink:href="#ico16_indicator_error" href="#ico16_indicator_error"></use>
-                </svg>
-
-                <div class="topnav__toasts__element__text">
-                    <div marked="toast.get('msg')"></div>
-                    <p ng-show="toast.get('type') === self.WON.errorToast">
-                        If the problem persists please contact
-                        <a href="mailto:{{self.adminEmail}}">
-                            {{self.adminEmail}}
-                        </a>
-                    </p>
-                </div>
-
-                <svg class="topnav__toasts__element__close clickable"
-                    ng-click="self.toasts__delete(toast)"
-                    style="--local-primary:var(--won-primary-color);">
-                        <use xlink:href="#ico27_close" href="#ico27_close"></use>
-                </svg>
-
-            </div>
-        </div>
     `;
 
   const serviceDependencies = [
@@ -164,48 +62,18 @@ function genTopnavConf() {
 
       const selectFromState = state => {
         const currentRoute = getIn(state, ["router", "currentState", "name"]);
-        const useCase = getIn(state, ["router", "currentParams", "useCase"]);
-        const useCaseGroup = getIn(state, [
-          "route",
-          "currentParams",
-          "useCaseGroup",
-        ]);
-        const selectedPostUri = decodeURIComponent(
-          getIn(state, ["router", "currentParams", "postUri"])
-        );
-        const selectedPost =
-          selectedPostUri && state.getIn(["needs", selectedPostUri]);
-        const selectedConnectionUri = decodeURIComponent(
-          getIn(state, ["router", "currentParams", "connectionUri"])
-        );
         const privateId = getIn(state, [
           "router",
           "currentParams",
           "privateId",
         ]);
-        const need =
-          selectedConnectionUri &&
-          getOwnedNeedByConnectionUri(state, selectedConnectionUri);
-        const selectedConnection =
-          need && need.getIn(["connections", selectedConnectionUri]);
 
         return {
           themeName: getIn(state, ["config", "theme", "name"]),
           appTitle: getIn(state, ["config", "theme", "title"]),
-          adminEmail: getIn(state, ["config", "theme", "adminEmail"]),
-          WON: won.WON,
           loggedIn: state.getIn(["user", "loggedIn"]),
-          acceptedDisclaimer: state.getIn(["user", "acceptedDisclaimer"]),
-          email: state.getIn(["user", "email"]),
           isPrivateIdUser: !!privateId,
-          connectionOrPostDetailOpen:
-            selectedConnection || selectedPost || useCase || useCaseGroup,
-          toastsArray: state.getIn(["toasts"]).toArray(),
-          connectionHasBeenLost: state.getIn(["messages", "lostConnection"]), // name chosen to avoid name-clash with the action-creator
-          reconnecting: state.getIn(["messages", "reconnecting"]),
-          showModalDialog: state.get("showModalDialog"),
           isSignUpView: currentRoute === "signup",
-          isPostView: currentRoute === "post",
         };
       };
 
@@ -226,12 +94,8 @@ function genTopnavConf() {
 
 export default angular
   .module("won.owner.components.topnav", [
-    "hc.marked",
-    //loginComponent,
-    //logoutComponent,
     dropdownModule,
     accountMenuModule,
-    modalDialogModule,
     ngAnimate,
   ])
   .directive("wonTopnav", genTopnavConf).name;

@@ -2,4 +2,5 @@
 
 .visitor-title-bar {
   @include need-tab-bar("vtb");
+  border-top: none;
 }

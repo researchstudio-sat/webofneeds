@@ -2,6 +2,7 @@
   "title": "Web of Needs – Master Green",
   "adminEmail": "office.sat@researchstudio.at",
   "imprintTemplate": "imprint.html",
+  "tosTemplate": "tos.html",
   "privacyPolicyTemplate": "privacyPolicy.html",
   "welcomeTemplate": "welcomeTemplate.html",
   "defaultContext": []

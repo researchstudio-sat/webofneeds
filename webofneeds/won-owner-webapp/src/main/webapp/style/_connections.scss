@@ -3,70 +3,47 @@
 @import "fonts";
 @import "flex-layout";
 
-.connectionscontent {
-  display: flex;
-  justify-content: center;
-  align-content: center;
-  flex-direction: row;
-
-  align-items: flex-start;
-
-  @include empty-description("opc");
-
-  .conn__list {
-    flex-grow: 1;
-    max-width: $maxContentWidth / 2;
-
-    @media (min-width: $responsivenessBreakPoint) {
-      min-width: 28rem;
-    }
+aside.overview__left {
+  border-right: $thinGrayBorder;
+  @media (max-width: $responsivenessBreakPoint) {
+    grid-column: 1 / -1;
   }
+}
 
-  .conn__content {
-    display: flex;
-    flex-grow: 1;
-    height: 100%;
-    justify-content: center;
-    align-content: center;
-    flex-direction: row;
+main.overview__right {
+  .overview__right__welcome {
+    padding: 0.5rem;
 
-    border-left: $thinGrayBorder;
-    border-right: $thinGrayBorder;
-    border-bottom: $thinGrayBorder;
-    background: white;
-    width: 100%;
-    max-width: ($maxContentWidth / 2);
-    //margin-ri: 0.5rem;
-
-    box-sizing: border-box;
-
-    @media (max-width: $responsivenessBreakPoint) {
-      border-left: none;
-      border-right: none;
+    > won-usecase-picker {
+      padding: 0;
     }
 
-    &__welcome {
-      padding: 0.5rem;
-      width: 100%;
-      overflow: auto;
-      box-sizing: border-box;
+    &__text {
+      padding-bottom: 1rem;
+      h1 {
+        padding-bottom: 1.5rem;
+        text-align: center;
+      }
+      p {
+        padding-bottom: 1.5rem;
+        text-align: center;
+      }
+      h3 {
+        text-align: center;
+      }
+    }
 
-      background: $won-lighter-gray;
+    &__howto {
+      padding-top: 3rem;
 
-      &__text {
+      &__label {
+        text-align: center;
+        margin-bottom: 1rem;
+        display: block;
+      }
+
+      &__button {
         width: 100%;
-        padding-bottom: 1rem;
-        h1 {
-          padding-bottom: 1.5rem;
-          text-align: center;
-        }
-        p {
-          padding-bottom: 1.5rem;
-          text-align: center;
-        }
-        h3 {
-          text-align: center;
-        }
       }
     }
   }

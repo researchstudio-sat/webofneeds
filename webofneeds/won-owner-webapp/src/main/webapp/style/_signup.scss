@@ -2,74 +2,35 @@
 @import "sizing-utils";
 @import "fonts";
 
-.signup {
+main.signup {
   font-weight: 300;
 
-  @include max-content-width($maxContentWidth / 2, $minContentPadding, "su");
+  > .signup__content {
+    display: grid;
+    grid-row-gap: 0.5rem;
+    max-width: $maxContentWidth/2;
+    margin: 0 auto;
+    padding: 1rem;
 
-  .su__inner {
-    padding-top: 3rem;
-  }
-
-  .title {
-    text-align: center;
-    font-size: $bigFontSize;
-    padding-bottom: 2rem;
-  }
-  .title {
-    position: relative;
-  }
-
-  .sub {
-    font-size: $normalFontSize;
-  }
-
-  .trygrid {
-    display: flex;
-    justify-content: center;
-    align-items: stretch;
-    flex-wrap: wrap;
-
-    .block {
-      padding-bottom: 1rem;
+    @media (max-width: $responsivenessBreakPoint) {
+      padding: 0.5rem;
     }
 
-    .tg__signup {
-      padding: 0 4rem;
-      margin: 0 1rem;
-    }
+    .signup__content__form {
+      display: grid;
+      grid-row-gap: 0.5rem;
 
-    .tg__signup {
-      max-width: 18rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
+      &__errormsg {
+        font-size: $smallFontSize;
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+        color: $won-primary-color;
 
-      @media (max-width: $responsivenessBreakPoint) {
-        max-width: 18rem;
-        padding: 0.5rem;
-        border: 0;
-        margin: 0;
+        &__icon {
+          @include fixed-square(1em);
+          --local-primary: #{$won-primary-color};
+        }
       }
-    }
-
-    .tg__errormsg {
-      font-size: $smallFontSize;
-      margin-top: 1rem;
-      margin-bottom: 1rem;
-      color: $won-primary-color;
-
-      &__icon {
-        @include fixed-square(1em);
-        --local-primary: #{$won-primary-color};
-      }
-    }
-
-    input[type="text"],
-    input[type="password"],
-    input[type="email"] {
-      margin: 1rem 0;
-      width: 100%;
     }
   }
 }

@@ -7,14 +7,8 @@ won-post-messages {
   grid-template-areas: "header" "main" "footer";
   grid-template-rows: min-content minmax($minimalGridRows, 1fr) min-content;
   grid-row-gap: $gridRowGap;
-  width: 100%;
   box-sizing: border-box;
   padding: $gridRowGap;
-
-  /*
-  &.chattextfield-mobile {
-    grid-template-rows: min-content minmax($mobileGridRows, 1fr) min-content;
-  }*/
 
   .pm__header {
     display: grid;
@@ -153,11 +147,9 @@ won-post-messages {
       color: $won-subtitle-gray;
       font-size: $normalFontSize;
       border-bottom: $thinGrayBorder;
-
       padding-bottom: 0.25rem;
       margin-bottom: 0.25rem;
     }
-
     &__loadbutton, /* just so the button and spinner won't make the chatmessages "jump"*/
     &__loadspinner {
       width: 100%;

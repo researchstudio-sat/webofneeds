@@ -4,17 +4,95 @@
 @import "reset";
 
 body {
+  --headerHeight: 3.3rem;
+
   //this font will be inherited down the cascade
   @include default-font;
-
   background-color: $won-lighter-gray;
 
-  @extend %fixed-fill;
+  > section.ng-scope {
+    display: grid;
+    min-height: 100vh;
 
-  @include flex-column;
-  align-items: stretch; //TODO this is bad style! it overwrites flex-col's align-items
-  & > .contentArea {
-    flex-grow: 1;
+    @media (max-width: $responsivenessBreakPoint) {
+      grid-template-areas:
+        "header"
+        "info"
+        "list"
+        "content"
+        "footer";
+      grid-template-rows: min-content min-content min-content 1fr min-content;
+    }
+
+    @media (min-width: $responsivenessBreakPoint) {
+      grid-template-areas:
+        "header header header header"
+        "info info info info"
+        ". list content ."
+        ". . . ."
+        "footer footer footer footer";
+      grid-template-rows: min-content min-content max-content 1fr min-content;
+      grid-template-columns:
+        1fr minmax(min-content, $maxContentWidth/2) minmax(
+          min-content,
+          $maxContentWidth/2
+        )
+        1fr;
+    }
+
+    > header {
+      grid-area: header;
+      position: sticky;
+      top: 0;
+      border-bottom: $thinBorderWidth solid $won-line-gray;
+      z-index: 1000;
+      box-sizing: border-box;
+      height: var(--headerHeight);
+    }
+
+    > won-toasts,
+    > won-slide-in {
+      grid-area: info;
+    }
+
+    > aside.overview__left {
+      grid-area: list;
+      z-index: 2;
+    }
+
+    > main.overview__right {
+      grid-area: content;
+
+      > * {
+        box-sizing: border-box;
+        position: sticky;
+        top: var(--headerHeight);
+
+        border-right: $thinGrayBorder;
+        border-bottom: $thinGrayBorder;
+        @media (max-width: $responsivenessBreakPoint) {
+          border-right: none;
+        }
+        background: white;
+      }
+
+      > won-post-messages {
+        height: calc(100vh - var(--headerHeight));
+      }
+    }
+
+    > main.signup,
+    > main.about,
+    > main.settings {
+      grid-area: list;
+      @media (min-width: $responsivenessBreakPoint) {
+        grid-column: 1 / -1;
+      }
+    }
+
+    > won-footer {
+      grid-area: footer;
+    }
   }
 }
 
@@ -39,38 +117,6 @@ input[type="email"] {
   max-height: 2.25rem;
   --local-primary: #{$won-primary-color};
   --local-secondary: #{$won-secondary-color};
-}
-
-/* FIXED HEADER STYLING */
-html,
-body,
-main {
-  height: 100%;
-}
-body {
-  overflow: hidden;
-}
-
-section.ng-scope {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-header {
-  flex: 0 0 auto;
-  display: block;
-  border-bottom: $thinBorderWidth solid $won-line-gray;
-}
-
-main {
-  display: flex;
-  flex-direction: column;
-  flex: 1 1 auto;
-  position: relative;
-  width: 100%;
-  overflow-y: auto;
-  align-items: baseline;
 }
 
 hr {

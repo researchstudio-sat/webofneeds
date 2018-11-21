@@ -1,0 +1,73 @@
+@import "won-config";
+
+won-footer {
+  display: grid;
+
+  @media (max-width: $responsivenessBreakPoint) {
+    grid-template-areas: "footerContent";
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: $responsivenessBreakPoint) {
+    grid-template-areas: ". footerContent .";
+    grid-template-columns: 1fr minmax(min-content, $maxContentWidth) 1fr;
+  }
+
+  margin: 0.5rem 0.5rem 0 0.5rem;
+  padding: 0.5rem 0;
+  border-top: $thinGrayBorder;
+
+  > .footer {
+    grid-area: footerContent;
+    display: grid;
+    grid-template-areas:
+      "footerLogo footerTitle footerLinks"
+      "footerLogo footerSubTitle footerLinks";
+    grid-template-columns: min-content max-content 1fr;
+    grid-template-rows: min-content min-content;
+    /*grid-column-gap: 0.5rem;*/
+
+    .footer__logo {
+      grid-area: footerLogo;
+      --local-primary: $won-subtitle-gray;
+      height: 3rem;
+      width: 3rem;
+    }
+
+    .footer__appTitle {
+      align-self: end;
+      grid-area: footerTitle;
+      color: $won-subtitle-gray;
+      font-size: $mediumFontSize;
+    }
+
+    .footer__tagLine {
+      grid-area: footerSubTitle;
+      color: $won-subtitle-gray;
+      font-size: $smallFontSize;
+    }
+
+    .footer__links {
+      grid-area: footerLinks;
+      display: flex;
+      font-size: $smallFontSize;
+      align-items: center;
+
+      &__divider {
+        color: $won-subtitle-gray;
+        user-select: none;
+        padding: 0 0.5rem;
+      }
+
+      &__link:visited,
+      &__link {
+        cursor: pointer;
+        color: $won-subtitle-gray;
+        text-decoration: none;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+}

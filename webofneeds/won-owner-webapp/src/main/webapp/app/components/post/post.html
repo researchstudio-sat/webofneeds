@@ -1,10 +1,13 @@
-<!-- TODO parametrize by selected tab -->
+<won-modal-dialog ng-if="self.showModalDialog"></won-modal-dialog>
 <header>
     <won-topnav></won-topnav>
-    <won-visitor-title-bar item="self.post"></won-visitor-title-bar>
 </header>
+<won-toasts></won-toasts>
+<won-slide-in></won-slide-in>
 <main class="postcontent">
     <!-- Post info view when there's no connection-state/-type selected -->
+    <won-visitor-title-bar item="self.post"></won-visitor-title-bar>
     <won-send-request ng-if="self.post && !self.isOwnPost" class="won-send-request--noheader"></won-send-request>
     <button ng-click="self.goToOwnPost()" ng-if="self.post && self.isOwnPost " class="won-button--filled red">GO TO POST VIEW TODO: AUTOMATICALLY DO THIS</button>
 </main>
+<won-footer></won-footer>

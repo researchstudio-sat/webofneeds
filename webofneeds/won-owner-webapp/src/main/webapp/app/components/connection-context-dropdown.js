@@ -44,13 +44,6 @@ function genComponentConf() {
                         ng-click="self.goToPost(self.connection.get('remoteNeedUri'))">
                         Show Details
                     </button>
-                    <button class="won-button--outlined thin red show-in-responsive"
-                        ng-click="self.toggleRdfDisplay()">
-                        <svg class="won-button-icon" style="--local-primary:var(--won-primary-color);">
-                            <use xlink:href="#ico36_rdf_logo" href="#ico36_rdf_logo"></use>
-                        </svg>
-                        <span>{{self.shouldShowRdf? "Hide raw RDF data" : "Show raw RDF data"}}</span>
-                    </button>
                     <button
                         ng-if="self.isConnected && !self.showAgreementData"
                         class="won-button--outlined thin red"
@@ -88,7 +81,6 @@ function genComponentConf() {
           connection,
           connectionUri,
           showAgreementData: connection && connection.get("showAgreementData"),
-          shouldShowRdf: state.get("showRdf"),
           isConnected: connectionState === won.WON.Connected,
           isSentRequest: connectionState === won.WON.RequestSent,
           isReceivedRequest: connectionState === won.WON.RequestReceived,

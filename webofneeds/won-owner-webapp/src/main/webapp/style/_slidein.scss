@@ -1,6 +1,7 @@
 @import "won-config";
 @import "button";
 @import "collapsible";
+@import "responsiveness-utils";
 
 .slide-in {
   @extend .collapsible;
@@ -39,6 +40,7 @@
     @include fixed-square(2rem);
   }
 
+  & > .si__smalltext,
   & > .si__text {
     @media (max-width: $responsivenessBreakPoint) {
       margin: 0;
@@ -63,6 +65,11 @@
     }
   }
 
+  & > .si__smalltext {
+    font-size: $smallFontSize;
+  }
+
+  & > .si__smallbutton,
   & > .si__button {
     @media (max-width: $responsivenessBreakPoint) {
       margin: 0.5rem 0 0 0;
@@ -79,5 +86,9 @@
   > img {
     // height: 2rem;
     max-height: 2rem;
+  }
+
+  & > .si__smallbutton {
+    font-size: $smallFontSize;
   }
 }
