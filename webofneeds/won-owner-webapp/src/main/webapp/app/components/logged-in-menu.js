@@ -26,13 +26,6 @@ function genComponentConf() {
         ng-click="self.hideMainMenuDisplay()">
         <span>Account Settings</span>
     </a>
-    <a class="won-button--outlined thin red"
-        ng-click="self.toggleRdfDisplay()">
-        <svg class="won-button-icon" style="--local-primary:var(--won-primary-color);">
-            <use xlink:href="#ico36_rdf_logo" href="#ico36_rdf_logo"></use>
-        </svg>
-        <span>{{self.shouldShowRdf? "Hide raw RDF data" : "Show raw RDF data"}}</span>
-    </a>
     <hr/>
     <button
         class="won-button--filled lighterblue"
@@ -61,7 +54,6 @@ function genComponentConf() {
       const logout = state => {
         return {
           loggedIn: state.getIn(["user", "loggedIn"]),
-          shouldShowRdf: state.get("showRdf"),
           email: state.getIn(["user", "email"]),
           isPrivateIdUser: isPrivateUser(state),
         };

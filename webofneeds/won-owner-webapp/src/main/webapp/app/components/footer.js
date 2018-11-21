@@ -1,7 +1,9 @@
 /**
  * Created by quasarchimaere on 19.11.2018.
  */
+import won from "../won-es6.js";
 import angular from "angular";
+import Immutable from "immutable";
 import { attach, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
@@ -27,6 +29,10 @@ function genTopnavConf() {
             <a class="footer__links__link" href="{{ self.absHRef(self.$state, 'about', {'aboutSection': 'aboutFaq'}) }}">FAQ</a>
             <span class="footer__links__divider">|</span>
             <a class="footer__links__link" href="{{ self.absHRef(self.$state, 'about', {'aboutSection': 'aboutTermsOfService'}) }}">Terms Of Service</a>
+            <span class="footer__links__divider">|</span>
+            <span class="footer__links__link" ng-click="self.toggleDebugMode()">{{ self.getDebugModeLabel() }}</span>
+            <span class="footer__links__divider">|</span>
+            <span class="footer__links__link" ng-click="self.toggleRdfDisplay()">{{self.shouldShowRdf? "Hide raw RDF data" : "Show raw RDF data"}}</span>
         </div>
       </div>
   `;
@@ -48,10 +54,21 @@ function genTopnavConf() {
         return {
           themeName: getIn(state, ["config", "theme", "name"]),
           appTitle: getIn(state, ["config", "theme", "title"]),
+          shouldShowRdf: state.get("showRdf"),
         };
       };
 
       connect2Redux(selectFromState, actionCreators, [], this);
+    }
+
+    toggleDebugMode() {
+      won.debugmode = !won.debugmode;
+      const text = won.debugmode ? "Debugmode On" : "Debugmode Off";
+      this.toasts__push(Immutable.fromJS({ text }));
+    }
+
+    getDebugModeLabel() {
+      return won.debugmode ? "Turn Off Debugmode" : "Turn On Debugmode";
     }
   }
   Controller.$inject = serviceDependencies;

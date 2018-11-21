@@ -60,6 +60,7 @@ won-footer {
 
       &__link:visited,
       &__link {
+        cursor: pointer;
         color: $won-subtitle-gray;
         text-decoration: none;
 
