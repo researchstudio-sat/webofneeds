@@ -72,7 +72,7 @@ async function connectReview(
 ) {
   const getFacet = persona => {
     const reviewFacet = persona
-      .get("hasFacets")
+      .get("facets")
       .filter(facetType => facetType == "won:ReviewFacet")
       .keySeq()
       .first();
@@ -86,7 +86,7 @@ async function connectReview(
   };
 
   const cnctMsg = buildConnectMessage({
-    ownNeedUri: ownPersona.get("uri"),
+    ownedNeedUri: ownPersona.get("uri"),
     theirNeedUri: foreignPersona.get("uri"),
     ownNodeUri: ownPersona.get("nodeUri"),
     theirNodeUri: foreignPersona.get("nodeUri"),
