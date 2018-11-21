@@ -17,7 +17,7 @@ body {
     @media (max-width: $responsivenessBreakPoint) {
       grid-template-areas:
         "header"
-        "slideIn"
+        "info"
         "list"
         "content"
         "footer";
@@ -27,7 +27,7 @@ body {
     @media (min-width: $responsivenessBreakPoint) {
       grid-template-areas:
         "header header header header"
-        "slideIn slideIn slideIn slideIn"
+        "info info info info"
         ". list content ."
         ". . . ."
         "footer footer footer footer";
@@ -50,8 +50,9 @@ body {
       height: var(--headerHeight);
     }
 
+    > won-toasts,
     > won-slide-in {
-      grid-area: slideIn;
+      grid-area: info;
     }
 
     > aside.overview__left {
