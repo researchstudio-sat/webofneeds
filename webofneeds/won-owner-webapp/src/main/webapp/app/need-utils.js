@@ -20,7 +20,9 @@ export function isWhatsAroundNeed(need) {
  */
 export function isDirectResponseNeed(need) {
   return (
-    need && need.get("flags") && need.get("flags").contains("won:responseToUri")
+    need &&
+    need.get("flags") &&
+    need.get("flags").contains("won:DirectResponse")
   );
 }
 
