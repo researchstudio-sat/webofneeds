@@ -606,20 +606,6 @@ export function clone(obj) {
 }
 
 /**
- * Returns a mutable object (or undefined if undefined was passed)
- * @param obj immutable or mutable object, or undefined
- */
-export function cloneAsMutable(obj) {
-  if (!obj) {
-    return obj;
-  } else if (obj.toJS) {
-    return obj.toJS();
-  } else {
-    return clone(obj);
-  }
-}
-
-/**
  * Returns a property of a given object, no matter whether
  * it's a normal or an immutable-js object.
  * @param obj
