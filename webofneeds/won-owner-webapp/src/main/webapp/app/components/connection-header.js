@@ -10,6 +10,7 @@ import { actionCreators } from "../actions/actions.js";
 import { labels, relativeTime } from "../won-label-utils.js";
 import { attach } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
+import { isDirectResponseNeed } from "../need-utils.js";
 import { getHumanReadableStringFromMessage } from "../reducers/need-reducer/parse-message.js";
 import {
   selectLastUpdateTime,
@@ -38,11 +39,14 @@ function genComponentConf() {
       </div>
       <div class="ch__right" ng-if="!self.isLoading()">
         <div class="ch__right__topline">
-          <div class="ch__right__topline__title" ng-if="self.theirNeed.get('humanReadable')" title="{{ self.theirNeed.get('humanReadable') }}">
+          <div class="ch__right__topline__title" ng-if="!self.isDirectResponseFromRemote && self.theirNeed.get('humanReadable')" title="{{ self.theirNeed.get('humanReadable') }}">
             {{ self.theirNeed.get('humanReadable') }}
           </div>
-          <div class="ch__right__topline__notitle" ng-if="!self.theirNeed.get('humanReadable')" title="no title">
+          <div class="ch__right__topline__notitle" ng-if="!self.isDirectResponseFromRemote && !self.theirNeed.get('humanReadable')" title="no title">
             no title
+          </div>
+          <div class="ch__right__topline__notitle" ng-if="self.isDirectResponseFromRemote" title="Direct Response">
+            Direct Response
           </div>
         </div>
         <div class="ch__right__subtitle">
@@ -130,6 +134,7 @@ function genComponentConf() {
           connection,
           ownedNeed,
           theirNeed,
+          isDirectResponseFromRemote: isDirectResponseNeed(theirNeed),
           latestMessageHumanReadableString,
           latestMessageUnread,
           unreadMessageCount:

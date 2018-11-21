@@ -7,12 +7,12 @@ import "ng-redux";
 import squareImageModule from "./square-image.js";
 import { actionCreators } from "../actions/actions.js";
 import { relativeTime } from "../won-label-utils.js";
-import { attach } from "../utils.js";
+import { attach, getIn } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { selectLastUpdateTime } from "../selectors/general-selectors.js";
 import won from "../won-es6.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
-import { generateNeedTypesLabel } from "../need-utils.js";
+import { generateNeedTypesLabel, isDirectResponseNeed } from "../need-utils.js";
 
 import "style/_post-header.scss";
 
@@ -29,11 +29,14 @@ function genComponentConf() {
     </won-square-image>
     <div class="ph__right" ng-if="!self.need.get('isBeingCreated') && !self.isLoading()">
       <div class="ph__right__topline">
-        <div class="ph__right__topline__title" ng-if="self.need.get('humanReadable')">
-         {{ self.need.get('humanReadable') }}
+        <div class="ph__right__topline__title" ng-if="self.hasTitle()">
+         {{ self.generateTitle() }}
         </div>
-        <div class="ph__right__topline__notitle" ng-if="!self.need.get('humanReadable')">
-         no title
+        <div class="ph__right__topline__notitle" ng-if="!self.hasTitle() && !self.isDirectResponse">
+          RE: no title
+        </div>
+        <div class="ph__right__topline__notitle" ng-if="!self.hasTitle() && self.isDirectResponse">
+          no title
         </div>
       </div>
       <div class="ph__right__subtitle">
@@ -78,10 +81,17 @@ function genComponentConf() {
       this.generateNeedTypesLabel = generateNeedTypesLabel;
       this.WON = won.WON;
       const selectFromState = state => {
-        const need = state.getIn(["needs", this.needUri]);
+        const need = getIn(state, ["needs", this.needUri]);
+        const isDirectResponse = isDirectResponseNeed(need);
+        const responseToUri =
+          isDirectResponse && getIn(need, ["content", "responseToUri"]);
+        const responseToNeed =
+          responseToUri && getIn(state, ["needs", responseToUri]);
 
         return {
+          responseToNeed,
           need,
+          isDirectResponse: isDirectResponse,
           friendlyTimestamp:
             need &&
             relativeTime(
@@ -107,6 +117,22 @@ function genComponentConf() {
     }
     isToLoad() {
       return !this.need || this.need.get("toLoad");
+    }
+
+    hasTitle() {
+      if (this.isDirectResponse && this.responseToNeed) {
+        return !!this.responseToNeed.get("humanReadable");
+      } else {
+        return !!this.need.get("humanReadable");
+      }
+    }
+
+    generateTitle() {
+      if (this.isDirectResponse && this.responseToNeed) {
+        return "Re: " + this.responseToNeed.get("humanReadable");
+      } else {
+        return this.need.get("humanReadable");
+      }
     }
   }
   Controller.$inject = serviceDependencies;

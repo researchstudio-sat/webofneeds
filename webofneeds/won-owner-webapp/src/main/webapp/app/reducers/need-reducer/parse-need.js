@@ -1,11 +1,7 @@
 import Immutable from "immutable";
 import won from "../../won-es6.js";
 import { getAllDetails } from "../../won-utils.js";
-import {
-  isWhatsNewNeed,
-  isWhatsAroundNeed,
-  isDirectResponseNeed,
-} from "../../need-utils.js";
+import { isWhatsNewNeed, isWhatsAroundNeed } from "../../need-utils.js";
 
 export function parseNeed(jsonldNeed, isOwned) {
   const jsonldNeedImm = Immutable.fromJS(jsonldNeed);
@@ -189,10 +185,6 @@ function getHumanReadableStringFromNeed(need, detailsToParse) {
           includeLabel: false,
         })
       );
-    }
-
-    if (isDirectResponseNeed(Immutable.fromJS(need))) {
-      return "Direct Response Need (formerly known as Re: Need)"; //TODO: FIGURE OUT A BETTER NAMING INCLUDE THE HUMANREADABLE OF THE RELATED POST MAYBE
     }
 
     if (title && seeksTitle) {
