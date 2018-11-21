@@ -37,6 +37,7 @@ export const details = {
   pricerange: priceDetails.pricerange,
   price: priceDetails.price,
   review: reviewDetails.review,
+  responseToUri: basicDetails.responseToUri,
 };
 
 export const messageDetails = {

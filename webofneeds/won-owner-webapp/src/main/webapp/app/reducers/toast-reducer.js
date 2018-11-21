@@ -16,6 +16,7 @@ export default function(allToasts = initialState, action = {}) {
     case actionTypes.logout:
       return initialState;
 
+    case actionTypes.messages.connect.failure:
     case actionTypes.connections.sendChatMessageFailed: {
       const msg = getIn(action, ["payload", "message"]);
       return pushNewToast(

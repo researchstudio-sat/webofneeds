@@ -319,7 +319,33 @@ export default function(allNeedsInState = initialState, action = {}) {
           usingTemporaryUri: true,
           state: won.WON.RequestSent,
           remoteNeedUri: theirNeedUri,
+          remoteConnectionUri: undefined,
           unread: true,
+          facet: won.WON.ChatFacetCompacted, //TODO: INSERT CORRECT FACET FROM NEEDS
+          agreementData: {
+            agreementUris: Immutable.Set(),
+            pendingProposalUris: Immutable.Set(),
+            pendingCancellationProposalUris: Immutable.Set(),
+            cancellationPendingAgreementUris: Immutable.Set(),
+            acceptedCancellationProposalUris: Immutable.Set(),
+            cancelledAgreementUris: Immutable.Set(),
+            rejectedMessageUris: Immutable.Set(),
+            retractedMessageUris: Immutable.Set(),
+            proposedMessageUris: Immutable.Set(),
+            claimedMessageUris: Immutable.Set(),
+            isLoaded: false,
+          },
+          petriNetData: Immutable.Map(),
+          creationDate: undefined,
+          lastUpdateDate: undefined,
+          isRated: false,
+          isLoadingMessages: false,
+          isLoadingAgreementData: false,
+          isLoadingPetriNetData: false,
+          isLoading: false,
+          showAgreementData: false,
+          showPetriNetData: false,
+          multiSelectType: undefined,
           messages: {
             [eventUri]: {
               uri: eventUri,
@@ -520,7 +546,7 @@ export default function(allNeedsInState = initialState, action = {}) {
           "messages",
           eventUri,
         ];
-        if (allNeedsInState.getIn[path]) {
+        if (allNeedsInState.getIn(path)) {
           allNeedsInState = allNeedsInState.setIn(
             [...path, "isReceivedByOwn"],
             true
@@ -549,13 +575,13 @@ export default function(allNeedsInState = initialState, action = {}) {
           );
 
           if (
-            allNeedsInState.getIn[
-              (needByConnectionUri.get("uri"),
+            allNeedsInState.getIn([
+              needByConnectionUri.get("uri"),
               "connections",
               connectionUri,
               "messages",
-              eventUri)
-            ]
+              eventUri,
+            ])
           ) {
             allNeedsInState = allNeedsInState.setIn(
               [

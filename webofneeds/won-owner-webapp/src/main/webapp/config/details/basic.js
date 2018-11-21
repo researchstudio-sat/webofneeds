@@ -140,3 +140,35 @@ export const suggestPost = {
     return undefined;
   },
 };
+
+export const responseToUri = {
+  identifier: "responseToUri",
+  label: "Response To Post",
+  icon: "#ico36_detail_title", //TODO: CORRECT ICON
+  placeholder: "Insert PostUri and Accept",
+  component: "won-suggestpost-picker",
+  viewerComponent: "won-suggestpost-viewer",
+  messageEnabled: false,
+  parseToRDF: function({ value }) {
+    const val = value ? value : undefined;
+
+    if (val) {
+      return {
+        "won:responseToUri": { "@id": val },
+      };
+    } else {
+      return { "won:responseToUri": undefined };
+    }
+  },
+  parseFromRDF: function(jsonLDImm) {
+    const responseToUriJsonLDImm =
+      jsonLDImm && jsonLDImm.get("won:responseToUri");
+    return responseToUriJsonLDImm && responseToUriJsonLDImm.get("@id");
+  },
+  generateHumanReadable: function({ value, includeLabel }) {
+    if (value) {
+      return includeLabel ? this.label + ": " + value : value;
+    }
+    return undefined;
+  },
+};

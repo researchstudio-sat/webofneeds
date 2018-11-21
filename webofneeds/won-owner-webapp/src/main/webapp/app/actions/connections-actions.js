@@ -11,7 +11,7 @@ import {
 } from "../selectors/general-selectors.js";
 import { getOwnedConnectionByUri } from "../selectors/connection-selectors.js";
 
-import { getIn, get, cloneAsMutable } from "../utils.js";
+import { getIn } from "../utils.js";
 
 import { ensureLoggedIn } from "./account-actions";
 
@@ -309,7 +309,13 @@ function connectAdHoc(theirNeedUri, textMessage, persona, dispatch, getState) {
   ensureLoggedIn(dispatch, getState).then(async () => {
     const state = getState();
     const theirNeed = getIn(state, ["needs", theirNeedUri]);
-    const adHocDraft = generateResponseNeedTo(theirNeed);
+    const adHocDraft = {
+      content: {
+        responseToUri: theirNeedUri,
+        directResponseNeed: true,
+        noHints: true,
+      },
+    };
     const nodeUri = getIn(state, ["config", "defaultNodeUri"]);
 
     // create new need
@@ -329,7 +335,7 @@ function connectAdHoc(theirNeedUri, textMessage, persona, dispatch, getState) {
           {
             pending: false,
             //facet: `${persona}#holderFacet`,
-            facet: getIn(state, ["needs", persona, "hasFacets"]).keyOf(
+            facet: getIn(state, ["needs", persona, "facets"]).keyOf(
               "won:HolderFacet"
             ),
           },
@@ -337,7 +343,7 @@ function connectAdHoc(theirNeedUri, textMessage, persona, dispatch, getState) {
             pending: true,
             facet: `${needUri}#holdableFacet`,
             // FIXME: does not work as new need is not in state yet
-            //facet: getIn(state, ["needs", needUri, "hasFacets"]).keyOf(
+            //facet: getIn(state, ["needs", needUri, "facets"]).keyOf(
             //  "won:HoldableFacet"
             //),
           },
@@ -356,7 +362,7 @@ function connectAdHoc(theirNeedUri, textMessage, persona, dispatch, getState) {
       theirNeedUri: theirNeedUri,
       ownNodeUri: nodeUri,
       theirNodeUri: theirNeed.get("nodeUri"),
-      textMessage: textMessage,
+      connectMessage: textMessage,
     });
 
     won.wonMessageFromJsonLd(cnctMsg.message).then(optimisticEvent => {
@@ -403,28 +409,6 @@ function connectAdHoc(theirNeedUri, textMessage, persona, dispatch, getState) {
       });
     });
   });
-}
-
-function generateResponseNeedTo(theirNeed) {
-  const theirSeeks = get(theirNeed, "seeks");
-  const theirContent = get(theirNeed, "content");
-  return {
-    is: theirSeeks ? generateResponseContentNodeTo(theirSeeks) : undefined,
-    seeks: theirContent
-      ? generateResponseContentNodeTo(theirContent)
-      : undefined,
-  };
-}
-
-function generateResponseContentNodeTo(contentNode) {
-  const theirTitle = get(contentNode, "title");
-  return {
-    title: theirTitle ? "Re: " + theirTitle : undefined,
-    description: theirTitle ? "Direct response to: " + theirTitle : undefined,
-    tags: cloneAsMutable(get(contentNode, "tags")),
-    location: cloneAsMutable(get(contentNode, "location")),
-    noHints: true,
-  };
 }
 
 export function connectionsClose(connectionUri) {
