@@ -24,7 +24,7 @@ function genComponentConf() {
       <!-- COMPONENT -->
         <div class="pis__component"
           ng-repeat="detail in self.allDetails"
-          ng-if="detail.identifier && self.getDetailContent(detail.identifier)"
+          ng-if="detail.identifier && detail.viewerComponent && self.getDetailContent(detail.identifier)"
           detail-viewer-element="{{detail.viewerComponent}}"
           detail="detail"
           content="self.getDetailContent(detail.identifier)">

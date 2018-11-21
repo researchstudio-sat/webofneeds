@@ -17,7 +17,7 @@ function genComponentConf() {
       <div class="msg__text" ng-if="self.message && self.text" marked="self.text"></div>
       <div class="msg__content"
         ng-repeat="detail in self.allDetails"
-        ng-if="self.message && detail.identifier && self.getDetailContent(detail.identifier)"
+        ng-if="self.message && detail.identifier && detail.viewerComponent && self.getDetailContent(detail.identifier)"
         message-detail-viewer-element="{{detail.viewerComponent}}"
         detail="detail"
         content="self.getDetailContent(detail.identifier)">
