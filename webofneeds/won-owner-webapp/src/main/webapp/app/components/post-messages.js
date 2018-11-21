@@ -51,7 +51,7 @@ function genComponentConf() {
                 timestamp="self.lastUpdateTimestamp"
                 hide-image="::false">
             </won-connection-header>
-            <won-connection-context-dropdown ng-if="self.isConnected || self.isSentRequest || self.isReceivedRequest || (self.isSuggested && self.connection.get('isRated'))" show-petri-net-data-field="::self.showPetriNetDataField()" show-agreement-data-field="::self.showAgreementDataField()"></won-connection-context-dropdown>
+            <won-connection-context-dropdown show-petri-net-data-field="::self.showPetriNetDataField()" show-agreement-data-field="::self.showAgreementDataField()"></won-connection-context-dropdown>
         </div>
         <div class="pm__header" ng-if="self.showAgreementData">
             <a class="pm__header__back clickable"
@@ -65,7 +65,7 @@ function genComponentConf() {
                 ng-click="self.setShowAgreementData(false)">
               Showing Agreement Data
             </div>
-            <won-connection-context-dropdown ng-if="self.isConnected || self.isSentRequest || self.isReceivedRequest || (self.isSuggested && self.connection.get('isRated'))" show-petri-net-data-field="::self.showPetriNetDataField()" show-agreement-data-field="::self.showAgreementDataField()"></won-connection-context-dropdown>
+            <won-connection-context-dropdown show-petri-net-data-field="::self.showPetriNetDataField()" show-agreement-data-field="::self.showAgreementDataField()"></won-connection-context-dropdown>
         </div>
         <div class="pm__header" ng-if="self.showPetriNetData">
             <a class="pm__header__back clickable"
@@ -79,7 +79,7 @@ function genComponentConf() {
                 ng-click="self.setShowAgreementData(false)">
               Showing PetriNet Data
             </div>
-            <won-connection-context-dropdown ng-if="self.isConnected || self.isSentRequest || self.isReceivedRequest || (self.isSuggested && self.connection.get('isRated'))" show-petri-net-data-field="::self.showPetriNetDataField()" show-agreement-data-field="::self.showAgreementDataField()"></won-connection-context-dropdown>
+            <won-connection-context-dropdown show-petri-net-data-field="::self.showPetriNetDataField()" show-agreement-data-field="::self.showAgreementDataField()"></won-connection-context-dropdown>
         </div>
         <div
           class="pm__content"
