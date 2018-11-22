@@ -372,8 +372,6 @@ won.WONMSG.uriPlaceholder = Object.freeze({
 
 won.WON.contentNodeBlankUri = Object.freeze({
   seeks: "_:seeksNeedContent",
-  whatsAround: "_:needContent",
-  whatsNew: "_:needContent",
 });
 
 /**
