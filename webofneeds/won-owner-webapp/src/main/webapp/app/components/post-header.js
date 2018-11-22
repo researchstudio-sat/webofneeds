@@ -32,11 +32,11 @@ function genComponentConf() {
         <div class="ph__right__topline__title" ng-if="self.hasTitle()">
          {{ self.generateTitle() }}
         </div>
-        <div class="ph__right__topline__notitle" ng-if="!self.hasTitle() && !self.isDirectResponse">
-          no title
-        </div>
         <div class="ph__right__topline__notitle" ng-if="!self.hasTitle() && self.isDirectResponse">
           RE: no title
+        </div>
+        <div class="ph__right__topline__notitle" ng-if="!self.hasTitle() && !self.isDirectResponse">
+          no title
         </div>
       </div>
       <div class="ph__right__subtitle">
