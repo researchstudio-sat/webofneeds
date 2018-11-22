@@ -14,7 +14,6 @@ export function parseNeed(jsonldNeed, isOwned) {
       nodeUri: jsonldNeedImm.getIn(["won:hasWonNode", "@id"]),
       types: extractTypes(jsonldNeedImm),
       facets: extractFacets(jsonldNeedImm.get("won:hasFacet")),
-      flags: extractFlags(jsonldNeedImm.get("won:hasFlag")),
       state: extractState(jsonldNeedImm),
       matchingContexts: extractMatchingContext(jsonldNeedImm),
       heldBy: won.parseFrom(jsonldNeedImm, ["won:heldBy"], "xsd:ID"),
@@ -123,21 +122,6 @@ function extractCreationDate(needJsonLd) {
     return new Date(creationDate);
   }
   return undefined;
-}
-
-function extractFlags(wonHasFlags) {
-  let flags = Immutable.List();
-
-  wonHasFlags &&
-    wonHasFlags.map(function(flag) {
-      if (flag instanceof Immutable.Map) {
-        flags = flags.push(flag.get("@id"));
-      } else {
-        flags = flags.push(flag);
-      }
-    });
-
-  return flags;
 }
 
 function extractFacets(wonHasFacets) {

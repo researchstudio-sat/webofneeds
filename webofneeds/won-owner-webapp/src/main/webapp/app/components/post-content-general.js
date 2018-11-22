@@ -89,7 +89,7 @@ function genComponentConf() {
             : null;
 
         const post = this.postUri && state.getIn(["needs", this.postUri]);
-        const flags = post && post.get("flags");
+        const flags = post && post.getIn(["content", "flags"]);
 
         const persona = post
           ? state.getIn(["needs", post.get("heldBy")])

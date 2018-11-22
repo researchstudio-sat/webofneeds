@@ -9,7 +9,9 @@
  */
 export function isWhatsAroundNeed(need) {
   return (
-    need && need.get("flags") && need.get("flags").contains("won:WhatsAround")
+    need &&
+    need.getIn(["content", "flags"]) &&
+    need.getIn(["content", "flags"]).contains("won:WhatsAround")
   );
 }
 
@@ -21,8 +23,8 @@ export function isWhatsAroundNeed(need) {
 export function isDirectResponseNeed(need) {
   return (
     need &&
-    need.get("flags") &&
-    need.get("flags").contains("won:DirectResponse")
+    need.getIn(["content", "flags"]) &&
+    need.getIn(["content", "flags"]).contains("won:DirectResponse")
   );
 }
 
@@ -33,7 +35,9 @@ export function isDirectResponseNeed(need) {
  */
 export function isWhatsNewNeed(need) {
   return (
-    need && need.get("flags") && need.get("flags").contains("won:WhatsNew")
+    need &&
+    need.getIn(["content", "flags"]) &&
+    need.getIn(["content", "flags"]).contains("won:WhatsNew")
   );
 }
 
