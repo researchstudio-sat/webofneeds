@@ -6,12 +6,13 @@ import angular from "angular";
 import ngAnimate from "angular-animate";
 import { actionCreators } from "../actions/actions.js";
 import won from "../won-es6.js";
-import { attach } from "../utils.js";
+import { attach, getIn, toAbsoluteURL } from "../utils.js";
 import {
   getConnectionUriFromRoute,
   getOwnedNeedByConnectionUri,
 } from "../selectors/general-selectors.js";
 import { connect2Redux } from "../won-utils.js";
+import { ownerBaseUrl } from "config";
 
 import "style/_context-dropdown.scss";
 
@@ -56,17 +57,15 @@ function genComponentConf() {
                         ng-click="self.showPetriNetDataField()">
                         Show PetriNet Data
                     </button>
+                    <a class="won-button--outlined thin red"
+                        ng-if="self.adminEmail"
+                        href="mailto:{{ self.adminEmail }}?{{ self.generateReportPostMailParams()}}">
+                        Report Post
+                    </a>
                     <button
-                        ng-if="self.isConnected || self.isSuggested"
                         class="won-button--filled red"
                         ng-click="self.closeConnection()">
-                        Remove Connection
-                    </button>
-                    <button
-                        ng-if="self.isSentRequest"
-                        class="won-button--filled red"
-                        ng-click="self.closeConnection()">
-                        Cancel Request
+                        {{ self.generateCloseConnectionLabel() }}
                     </button>
                 </div>
             </div>
@@ -84,9 +83,21 @@ function genComponentConf() {
         const connection = post && post.getIn(["connections", connectionUri]);
         const connectionState = connection && connection.get("state");
 
+        const remotePostUri = getIn(connection, ["remoteNeedUri"]);
+
+        let linkToPost;
+        if (ownerBaseUrl && remotePostUri) {
+          const path = "#!post/" + `?postUri=${encodeURI(remotePostUri)}`;
+
+          linkToPost = toAbsoluteURL(ownerBaseUrl).toString() + path;
+        }
+
         return {
           connection,
           connectionUri,
+          adminEmail: getIn(state, ["config", "theme", "adminEmail"]),
+          remotePostUri,
+          linkToPost,
           showAgreementData: connection && connection.get("showAgreementData"),
           isConnected: connectionState === won.WON.Connected,
           isSentRequest: connectionState === won.WON.RequestSent,
@@ -119,6 +130,13 @@ function genComponentConf() {
       return !this.connection || this.connection.get("isLoading");
     }
 
+    generateReportPostMailParams() {
+      const subject = `[Report Post] - ${this.remotePostUri}`;
+      const body = `Link to Post: ${this.linkToPost}%0D%0AReason:%0D%0A`; //hint: %0D%0A adds a linebreak
+
+      return `subject=${subject}&body=${body}`;
+    }
+
     closeConnection() {
       this.connections__close(this.connectionUri);
       this.router__stateGoCurrent({
@@ -129,6 +147,18 @@ function genComponentConf() {
 
     goToPost(postUri) {
       this.router__stateGoCurrent({ useCase: undefined, postUri: postUri });
+    }
+
+    generateCloseConnectionLabel() {
+      if (this.isConnected) {
+        return "Close Connection";
+      } else if (this.isSuggested) {
+        return "Remove Connection";
+      } else if (this.isSentRequest) {
+        return "Cancel Request";
+      } else if (this.isReceivedRequest) {
+        return "Deny Request";
+      }
     }
   }
   Controller.$inject = serviceDependencies;
