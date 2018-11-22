@@ -29,6 +29,15 @@ export function isDirectResponseNeed(need) {
 }
 
 /**
+ * Determines if a given need is a Search-Need (see draft in create-search.js)
+ * @param msg
+ * @returns {*|boolean}
+ */
+export function isSearchNeed(need) {
+  return need && need.get("types") && need.get("types").has("won:PureSearch");
+}
+
+/**
  * Determines if a given need is a WhatsNew-Need
  * @param msg
  * @returns {*|boolean}

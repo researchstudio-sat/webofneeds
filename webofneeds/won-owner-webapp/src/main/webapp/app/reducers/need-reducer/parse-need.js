@@ -1,7 +1,11 @@
 import Immutable from "immutable";
 import won from "../../won-es6.js";
 import { getAllDetails } from "../../won-utils.js";
-import { isWhatsNewNeed, isWhatsAroundNeed } from "../../need-utils.js";
+import {
+  isWhatsNewNeed,
+  isWhatsAroundNeed,
+  isSearchNeed,
+} from "../../need-utils.js";
 
 export function parseNeed(jsonldNeed, isOwned) {
   const jsonldNeedImm = Immutable.fromJS(jsonldNeed);
@@ -148,11 +152,11 @@ function getHumanReadableStringFromNeed(need, detailsToParse) {
     const title = needContent && needContent.title;
     const seeksTitle = seeksBranch && seeksBranch.title;
 
-    if (isWhatsNewNeed(Immutable.fromJS(need))) {
-      return "What's New";
-    }
+    const immNeed = Immutable.fromJS(need);
 
-    if (isWhatsAroundNeed(Immutable.fromJS(need))) {
+    if (isWhatsNewNeed(immNeed)) {
+      return "What's New";
+    } else if (isWhatsAroundNeed(immNeed)) {
       let location =
         (needContent && needContent["location"]) ||
         (seeksBranch && seeksBranch["location"]);
@@ -169,6 +173,12 @@ function getHumanReadableStringFromNeed(need, detailsToParse) {
           includeLabel: false,
         })
       );
+    } else if (isSearchNeed(immNeed)) {
+      const searchString = need && need.content && need.content.searchString;
+
+      if (searchString) {
+        return "Search: " + searchString;
+      }
     }
 
     if (title && seeksTitle) {
@@ -177,12 +187,6 @@ function getHumanReadableStringFromNeed(need, detailsToParse) {
       return seeksTitle;
     } else if (title) {
       return title;
-    } else {
-      const searchString = need && need.content && need.content.searchString;
-
-      if (searchString) {
-        return "Search: " + searchString;
-      }
     }
 
     let humanReadableDetails = generateHumanReadableArray(
