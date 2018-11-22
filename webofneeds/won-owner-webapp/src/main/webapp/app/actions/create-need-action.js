@@ -92,7 +92,9 @@ export function createWhatsNew() {
     dispatch({ type: actionTypes.needs.whatsNew });
 
     const whatsNewObject = {
-      content: { whatsNew: true }, //TODO: refactor this and use a won:hasFlags-Detail in the content instead
+      content: {
+        flags: ["won:WhatsNew", "won:NoHintForCounterpart"],
+      },
       seeks: {},
       matchingContext: defaultContext,
     };
@@ -139,7 +141,9 @@ export function createWhatsAround() {
                 dispatch(actionCreators.needs__close(need.get("uri"))); //TODO action creators should not call other action creators, according to Moru
               });
             const whatsAroundObject = {
-              content: { whatsAround: true }, //TODO: refactor this and use a won:hasFlags-Detail in the content instead
+              content: {
+                flags: ["won:WhatsAround", "won:NoHintForCounterpart"],
+              },
               seeks: { location: location },
               matchingContext: defaultContext,
             };
