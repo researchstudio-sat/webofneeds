@@ -159,75 +159,51 @@ import { Generator } from "sparqljs";
 
     const matchingContext = args.matchingContext;
 
-    // TODO: if both is and seeks are present, the seeks content gets ignored here
-    const isDirectResponse = args.content //TODO: refactor this and use a won:hasFlags-Detail in the content instead
-      ? args.content.directResponseNeed
-      : args.seeks
-        ? args.seeks.directResponseNeed
-        : undefined;
-    const isWhatsAround = args.content //TODO: refactor this and use a won:hasFlags-Detail in the content instead
-      ? args.content.whatsAround
-      : args.seeks
-        ? args.seeks.whatsAround
-        : undefined;
-    const isWhatsNew = args.content //TODO: refactor this and use a won:hasFlags-Detail in the content instead
-      ? args.content.whatsNew
-      : args.seeks
-        ? args.seeks.whatsNew
-        : undefined;
-    const noHints = args.content //TODO: refactor this and use a won:hasFlags-Detail in the content instead
-      ? args.content.noHints
-      : args.seeks
-        ? args.seeks.noHints
-        : undefined;
-    const noHintForCounterpart = isWhatsAround //TODO: refactor this and use a won:hasFlags-Detail in the content instead
-      ? true
-      : isWhatsNew
-        ? true
-        : args.useCase === "search" //hack: no hint for counterpart if it's a pure search
-          ? true
-          : false;
-
-    let seeksContentUri;
-    if (isWhatsAround) {
-      seeksContentUri = won.WON.contentNodeBlankUri.whatsAround;
-    } else if (isWhatsNew) {
-      seeksContentUri = won.WON.contentNodeBlankUri.whatsNew;
-    } else {
-      seeksContentUri = args.seeks
-        ? won.WON.contentNodeBlankUri.seeks
-        : undefined;
-    }
+    let seeksContentUri = args.seeks && won.WON.contentNodeBlankUri.seeks;
 
     const useCase = useCases[args.useCase];
 
-    const queryMask = {
-      type: "query",
-      queryType: "SELECT",
-      variables: ["?result"],
-    };
+    /*TODO: instead of the detection if whatsX to generate the query we could just make useCases out of the whatsX instead
+      or define the query as a detail
+    */
+    const flags = args.content && args.content.flags;
+    const isWhatsAroundDraft =
+      flags &&
+      ((is("Array", flags) && flags.indexOf("won:WhatsAround") != -1) ||
+        flags === "won:WhatsAround");
+    const isWhatsNewDraft =
+      flags &&
+      ((is("Array", flags) && flags.indexOf("won:WhatsNew") != -1) ||
+        flags === "won:WhatsNew");
 
-    let query = useCase &&
-      useCase.generateQuery && {
+    let queryString = undefined;
+    if (isWhatsAroundDraft) {
+      const location = args.seeks.location;
+
+      if (location && location.lat && location.lng) {
+        queryString = generateWhatsAroundQuery(location.lat, location.lng);
+      }
+    } else if (isWhatsNewDraft) {
+      queryString = generateWhatsNewQuery();
+    } else if (useCase && useCase.generateQuery) {
+      const queryMask = {
+        type: "query",
+        queryType: "SELECT",
+        variables: ["?result"],
+      };
+
+      let useCaseQuery = {
         ...useCase.generateQuery(args, "?result"),
         ...queryMask,
       };
 
-    if (isWhatsAround) {
-      const location = args.seeks.location;
-
-      if (location && location.lat && location.lng) {
-        query = generateWhatsAroundQuery(location.lat, location.lng);
+      if (useCaseQuery) {
+        const sparqlGenerator = new Generator();
+        queryString = useCaseQuery && sparqlGenerator.stringify(useCaseQuery);
       }
     }
 
-    if (isWhatsNew) {
-      query = generateWhatsNewQuery();
-    }
-
-    const sparqlGenerator = new Generator();
-
-    const seeksContentNode = args.seeks
+    const seeksContentNode = seeksContentUri
       ? buildSeeksContentNode(seeksContentUri, args.seeks)
       : {};
 
@@ -264,27 +240,14 @@ import { Generator } from "sparqljs";
       "won:hasDefaultFacet": args.facet
         ? args.facet
         : { "@id": "#chatFacet", "@type": "won:ChatFacet" },
-      "won:hasFlag": new Set([
-        won.debugmode ? "won:UsedForTesting" : undefined, //TODO: refactor this and use a won:hasFlags-Detail in the content instead
-
-        isWhatsAround ? "won:WhatsAround" : undefined, //TODO: refactor this and use a won:hasFlags-Detail in the content instead
-        isWhatsNew ? "won:WhatsNew" : undefined, //TODO: refactor this and use a won:hasFlags-Detail in the content instead
-        isDirectResponse ? "won:DirectResponse" : undefined, //TODO: refactor this and use a won:hasFlags-Detail in the content instead
-        noHintForCounterpart ? "won:NoHintForCounterpart" : undefined, //TODO: refactor this and use a won:hasFlags-Detail in the content instead
-
-        noHints ? "won:NoHintForMe" : undefined, //TODO: refactor this and use a won:hasFlags-Detail in the content instead
-        noHints ? "won:NoHintForCounterpart" : undefined, //TODO: refactor this and use a won:hasFlags-Detail in the content instead
-      ]), ///.toArray().filter(f => f),
+      "won:hasFlag": won.debugmode
+        ? [{ "@id": "won:UsedForTesting" }]
+        : undefined, //TODO: refactor this and use a won:hasFlags-Detail in the content instead
       "won:doNotMatchAfter": doNotMatchAfter
         ? { "@value": doNotMatchAfter, "@type": "xsd:dateTime" }
         : undefined,
       "won:hasMatchingContext": matchingContext ? matchingContext : undefined,
-      "won:hasQuery":
-        isWhatsAround || isWhatsNew
-          ? query
-          : query
-            ? sparqlGenerator.stringify(query)
-            : undefined,
+      "won:hasQuery": queryString,
     };
 
     if (args.content) {
@@ -310,19 +273,6 @@ import { Generator } from "sparqljs";
         "won:hasCurrency": "xsd:string",
         "won:hasLowerPriceLimit": "xsd:float",
         "won:hasUpperPriceLimit": "xsd:float",
-
-        //'geo:latitude': 'xsd:float',
-        //'geo:longitude':'xsd:float',
-        //'won:hasAddress': 'xsd:string',
-
-        "won:hasFacet": {
-          "@id": won.WON.hasFacet,
-          "@type": "@id",
-        },
-        "won:hasFlag": {
-          "@id": won.WON.hasFlag,
-          "@type": "@id",
-        },
       },
     };
   };
