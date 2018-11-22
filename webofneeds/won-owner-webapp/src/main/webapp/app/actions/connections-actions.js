@@ -312,8 +312,11 @@ function connectAdHoc(theirNeedUri, textMessage, persona, dispatch, getState) {
     const adHocDraft = {
       content: {
         responseToUri: theirNeedUri,
-        directResponseNeed: true,
-        noHints: true,
+        flags: [
+          "won:DirectResponse",
+          "won:NoHintForCounterpart",
+          "won:NoHintForMe",
+        ],
       },
     };
     const nodeUri = getIn(state, ["config", "defaultNodeUri"]);
