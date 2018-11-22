@@ -117,7 +117,9 @@ function genComponentConf() {
       this.scrollContainer().addEventListener("scroll", e => this.onResize(e));
 
       this.draftObject = {
-        content: {},
+        content: {
+          flags: ["won:NoHintForCounterpart"],
+        },
         seeks: {},
         useCase: "search",
         matchingContext: undefined,
