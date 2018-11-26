@@ -1,6 +1,89 @@
-@import "need-tab-bar";
+@import "won-config";
+@import "flex-layout";
+@import "title-bar";
+@import "sizing-utils";
+@import "square-image";
 
 .visitor-title-bar {
-  @include need-tab-bar("vtb");
+  @include title-bar("vtb");
   border-top: none;
+
+  .vtb__titles__type {
+    color: #a7a7a7;
+    font-size: 0.8rem;
+  }
+
+  > .vtb__inner {
+    // vtb isn't using the tri-aligned that it inherits
+    // via the `@include title-bar` as there's no
+    // centered element
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-content: center;
+    align-items: center;
+
+    > .vtb__inner__left {
+      display: flex;
+      flex-direction: row;
+      align-content: center;
+      align-items: center;
+      justify-content: flex-start;
+
+      margin: 1rem 0;
+
+      @media (max-width: $responsivenessBreakPoint) {
+        @include square-image($postIconSize, 0 0.5rem 0 0);
+      }
+      @media (min-width: $responsivenessBreakPoint) {
+        @include square-image(4.7rem, 0 1rem 0 0);
+      }
+    }
+
+    > .vtb__inner__right {
+      //TODO dynamically adapt to number of children(?) or at least pull into a config-variable
+      // or make won-tabs a parametrized mixin?
+      flex-grow: 1;
+      margin-top: 1rem;
+
+      display: flex;
+      flex-direction: column;
+      justify-content: stretch;
+      //align-items: flex-end;
+
+      //padding-top: 1rem;
+
+      > .vtb__inner__right__upper {
+        display: flex;
+        flex-direction: row;
+        align-content: center;
+        align-items: flex-start;
+        justify-content: space-between;
+
+        > .vtb__title {
+          align-self: flex-end;
+        }
+      }
+      > .vtb__inner__right__lower {
+        display: flex;
+        flex-direction: row;
+        align-content: center;
+        align-items: flex-start;
+        justify-content: flex-end;
+
+        > .vtb__titles__type {
+          /*align-self: flex-start;*/
+        }
+
+        > .vtb__tabs {
+          align-self: stretch;
+        }
+      }
+    }
+  }
+
+  > won-post-context-dropdown {
+    margin-top: 1rem;
+    margin-right: 0.5rem;
+  }
 }
