@@ -18,6 +18,7 @@ function genComponentConf() {
     <!-- DETAIL TOGGLES -->
     <div class="cis__detail__items">
       <div class="cis__detail__items__item" ng-repeat="detail in self.detailList"
+          ng-if="detail.component"
           ng-class="{
             'cis__detail__items__item--won-expanded': self.openDetail === detail.identifier,
             'cis__detail__items__item--won-hasvalue': self.details.has(detail.identifier),

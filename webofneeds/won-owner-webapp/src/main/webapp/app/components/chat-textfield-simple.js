@@ -88,6 +88,7 @@ function genComponentConf() {
               ng-if="!self.multiSelectType && self.isConnected"></won-labelled-hr>
             <div class="cts__details__grid__detail"
               ng-repeat="detail in self.allMessageDetails"
+              ng-if="detail.component"
               ng-click="self.pickDetail(detail)">
               <svg class="cts__details__grid__detail__icon" ng-if="detail.icon">
                 <use xlink:href={{detail.icon}} href={{detail.icon}}></use>
@@ -179,6 +180,7 @@ function genComponentConf() {
             </div>
             <div class="cts__details__input__content"
               message-detail-element="{{self.selectedDetailComponent}}"
+              ng-if="self.selectedDetailComponent"
               on-update="::self.updateDetail(identifier, value)"
               initial-value="self.additionalContent.get(self.selectedDetail.identifier)"
               identifier="self.selectedDetail.identifier"

@@ -1,6 +1,8 @@
 import won from "../../app/won-es6.js";
 import { is } from "../../app/utils.js";
 
+import { select } from "../details/abstract.js";
+
 export const title = {
   identifier: "title",
   label: "Title",
@@ -170,5 +172,47 @@ export const responseToUri = {
       return includeLabel ? this.label + ": " + value : value;
     }
     return undefined;
+  },
+};
+
+export const flags = {
+  ...select,
+  identifier: "flags",
+  label: "Flags",
+  icon: "#ico36_detail_title", //TODO: CORRECT ICON
+  viewerComponent: undefined, //this is so we do not display this with a detail-viewer,
+  component: undefined, //this is so we do not display the component as a detail-picker, but are still able to use the parseToRDF, parseFromRDF functions
+  multiSelect: true,
+  options: [
+    { value: "won:WhatsNew", label: "WhatsNew" },
+    { value: "won:WhatsAround", label: "WhatsAround" },
+    { value: "won:NoHintForMe", label: "NoHintForMe" },
+    { value: "won:NoHintForCounterpart", label: "NoHintForCounterpart" },
+    { value: "won:DirectResponse", label: "DirectResponse" },
+    { value: "won:UsedForTesting", label: "UsedForTesting" },
+  ],
+  parseToRDF: function({ value }) {
+    if (!value) {
+      return { "won:hasFlag": undefined };
+    } else if (is("Array", value)) {
+      const idFlags = value.map(item => {
+        return { "@id": item };
+      });
+      return { "won:hasFlag": idFlags };
+    } else {
+      return { "won:hasFlag": [{ "@id": value }] };
+    }
+  },
+  parseFromRDF: function(jsonLDImm) {
+    return won.parseListFrom(jsonLDImm, ["won:hasFlag"], "xsd:ID");
+  },
+  generateHumanReadable: function({ value, includeLabel }) {
+    //TODO: Implement this so that the label shows instead of the value
+    if (value && is("Array", value) && value.length > 0) {
+      const prefix = includeLabel ? this.label + ": " : "";
+      return prefix + value.join(", ");
+    } else {
+      return undefined;
+    }
   },
 };

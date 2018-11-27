@@ -38,6 +38,7 @@ export const details = {
   price: priceDetails.price,
   review: reviewDetails.review,
   responseToUri: basicDetails.responseToUri,
+  flags: basicDetails.flags,
 };
 
 export const messageDetails = {
