@@ -9,6 +9,8 @@ import org.apache.velocity.app.event.implement.EscapeHtmlReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import won.owner.model.EmailVerificationToken;
+import won.owner.model.User;
 import won.owner.service.impl.URIService;
 import won.protocol.util.DefaultNeedModelWrapper;
 import won.protocol.util.linkeddata.LinkedDataSource;
@@ -30,6 +32,8 @@ public class WonOwnerMailSender {
     private static final String OWNER_CONNECTION_LINK = "/#!connections?connectionUri=%s";
     private static final String OWNER_LOCAL_NEED_LINK = "/#!connections?postUri=";
 
+    private static final String OWNER_VERIFICATION_LINK = "/rest/users/confirmRegistration?token=";
+
     private static final String SUBJECT_CONVERSATION_MESSAGE = "New message";
     private static final String SUBJECT_CONNECT = "New conversation request";
     private static final String SUBJECT_MATCH = "New match";
@@ -37,6 +41,7 @@ public class WonOwnerMailSender {
     private static final String SUBJECT_SYSTEM_CLOSE = "Conversation closed by system";
     private static final String SUBJECT_NEED_MESSAGE = "Notification from WoN node";
     private static final String SUBJECT_SYSTEM_DEACTIVATE = "Posting deactivated by system";
+    private static final String SUBJECT_VERIFICATION = "Please Verify your E-Mail Address";
 
     private WonMailSender wonMailSender;
 
@@ -54,10 +59,9 @@ public class WonOwnerMailSender {
     private Template hintNotificationHtmlTemplate;
     private Template needMessageNotificationHtmlTemplate;
     private Template systemDeactivateNotificationHtmlTemplate;
-
+    private Template verificationHtmlTemplate;
 
     public WonOwnerMailSender() {
-
         velocityEngine = new VelocityEngine();
         Properties properties = new Properties();
         properties.setProperty("resource.loader", "file");
@@ -70,6 +74,7 @@ public class WonOwnerMailSender {
         hintNotificationHtmlTemplate = velocityEngine.getTemplate("mail-templates/hint-notification-html.vm");
         needMessageNotificationHtmlTemplate = velocityEngine.getTemplate("mail-templates/needmessage-notification-html.vm");
         systemDeactivateNotificationHtmlTemplate = velocityEngine.getTemplate("mail-templates/system-deactivate-notification-html.vm");
+        verificationHtmlTemplate = velocityEngine.getTemplate("mail-templates/verification-html.vm");
     }
 
     public void setWonMailSender(WonMailSender wonMailSender) {
@@ -117,6 +122,21 @@ public class WonOwnerMailSender {
         if (textMsg != null) {
             velocityContext.put("textMsg", textMsg);
         }
+
+        return velocityContext;
+    }
+
+    private VelocityContext createVerificationContext(EmailVerificationToken verificationToken) {
+        String ownerAppLink = uriService.getOwnerProtocolOwnerURI().toString();
+        VelocityContext velocityContext = new VelocityContext();
+        EventCartridge ec = new EventCartridge();
+        ec.addEventHandler(new EscapeHtmlReference());
+        ec.attachToContext(velocityContext);
+
+        String verificationLinkUrl = ownerAppLink + OWNER_VERIFICATION_LINK + verificationToken.getToken();
+        velocityContext.put("verificationLinkUrl", verificationLinkUrl);
+        velocityContext.put("expirationDate", verificationToken.getExpiryDate());
+        velocityContext.put("gracePeriodInHours", User.GRACEPERIOD_INHOURS);
 
         return velocityContext;
     }
@@ -189,6 +209,14 @@ public class WonOwnerMailSender {
         systemCloseNotificationHtmlTemplate.merge(context, writer);
         logger.debug("sending " + SUBJECT_SYSTEM_CLOSE + " to " + toEmail);
         this.wonMailSender.sendHtmlMessage(toEmail, SUBJECT_SYSTEM_CLOSE, writer.toString());
+    }
+
+    public void sendVerificationHtmlMessage(User user, EmailVerificationToken verificationToken) {
+        StringWriter writer = new StringWriter();
+        VelocityContext context = createVerificationContext(verificationToken);
+        verificationHtmlTemplate.merge(context, writer);
+        logger.debug("sending "+ SUBJECT_VERIFICATION + " to " + user.getEmail());
+        this.wonMailSender.sendHtmlMessage(user.getEmail(), SUBJECT_VERIFICATION, writer.toString());
     }
 
 /*
