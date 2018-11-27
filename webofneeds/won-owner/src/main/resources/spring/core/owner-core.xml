@@ -22,7 +22,7 @@
 		<property name="ownerProtocolOwnerURI" value="${uri.prefix.owner}" />
 	</bean>
 
-	<!-- Model Mapper for RDF -->
+    <!-- Model Mapper for RDF -->
 	<bean id="needModelMapper" class="won.protocol.model.NeedModelMapper" />
 	<bean id="connectionModelMapper" class="won.protocol.model.ConnectionModelMapper" />
 
