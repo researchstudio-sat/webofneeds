@@ -161,7 +161,7 @@ public class SparqlMatcherActor extends UntypedActor {
     private static final Var resultName = Var.alloc("result");
     private static final Var scoreName = Var.alloc("score");
 
-    private static BasicPattern createDetailsQuery(Model model) {
+    private static BasicPattern createDetailsQuery(Model model, Statement parentStatement) {
         BasicPattern pattern = new BasicPattern();
 
         StreamSupport.stream(Spliterators.spliteratorUnknownSize(model.listStatements(), Spliterator.CONCURRENT), true)
@@ -173,6 +173,10 @@ public class SparqlMatcherActor extends UntypedActor {
 
                     Node newObject = triple.getObject();
 
+                    if(triple.getSubject().equals(parentStatement.getObject().asNode())) {
+                        newSubject = resultName.asNode();
+                    }
+
                     if (object.isAnon()) {
                         newObject = Var.alloc(hashFunction(newObject));
                     }
@@ -183,7 +187,7 @@ public class SparqlMatcherActor extends UntypedActor {
         return pattern;
     }
 
-    private static Op createNeedQuery(Model model, Statement parentStatement, Node newPredicate) {
+    private static Op createNeedQuery(Model model, Statement parentStatement) {
         StatementBoundary boundary = new StatementBoundaryBase() {
             public boolean stopAt(Statement s) {
                 return parentStatement.getSubject().equals(s.getSubject());
@@ -191,13 +195,11 @@ public class SparqlMatcherActor extends UntypedActor {
         };
 
         Model subModel = new ModelExtract(boundary).extract(parentStatement.getObject().asResource(), model);
-        BasicPattern pattern = createDetailsQuery(subModel);
+        BasicPattern pattern = createDetailsQuery(subModel, parentStatement);
 
         if(pattern.isEmpty()) {
             return null;
         }
-
-        pattern.add(new Triple(resultName, newPredicate, Var.alloc(hashFunction(parentStatement.getObject()))));
 
         return new OpBGP(pattern);
     }
@@ -340,19 +342,9 @@ public class SparqlMatcherActor extends UntypedActor {
         Statement seeks = model.getProperty(model.createResource(needURI), model.createProperty("http://purl.org/webofneeds/model#seeks"));
 
         if (seeks != null) {
-            //TODO: REMOVE "http://purl.org/webofneeds/model#is"
-            Op seeksQuery = createNeedQuery(model, seeks, NodeFactory.createURI("http://purl.org/webofneeds/model#is"));
+            Op seeksQuery = createNeedQuery(model, seeks);
             if(seeksQuery != null)
                 queries.add(seeksQuery);
-        }
-
-        //TODO: REMOVE "http://purl.org/webofneeds/model#is"
-        Statement is = model.getProperty(model.createResource(needURI), model.createProperty("http://purl.org/webofneeds/model#is"));
-
-        if (is != null) {
-            Op isQuery = createNeedQuery(model, is, NodeFactory.createURI("http://purl.org/webofneeds/model#seeks"));
-            if(isQuery != null)
-                queries.add(isQuery);
         }
 
         Statement search = model.getProperty(model.createResource(needURI), model.createProperty("http://purl.org/webofneeds/model#hasSearchString"));
@@ -416,7 +408,7 @@ public class SparqlMatcherActor extends UntypedActor {
                     executeQuery(hintForCounterpartQuery,  needToCheck)
                     ).collect(Collectors.toList());
         })
-                .orElse(Collections.EMPTY_LIST);
+                .orElse(Collections.emptyList());
 
         return needs;
     }
