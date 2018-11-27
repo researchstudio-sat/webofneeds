@@ -5,10 +5,14 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import won.owner.model.EmailVerificationToken;
 import won.owner.model.KeystoreHolder;
 import won.owner.model.KeystorePasswordHolder;
 import won.owner.model.User;
+import won.owner.repository.EmailVerificationRepository;
 import won.owner.repository.UserRepository;
+
+import java.util.UUID;
 
 /**
  * Created by fsuda on 28.05.2018.
@@ -19,6 +23,8 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private EmailVerificationRepository emailVerificationRepository;
 
     /**
      * Transfers the specific user to a non existant new user with password
@@ -30,8 +36,8 @@ public class UserService {
      * @throws UserAlreadyExistsException                   when the new User already exists
      * @throws won.owner.service.impl.UserNotFoundException when the private User is not found
      */
-    public void transferUser(String newEmail, String newPassword, String privateUsername, String privatePassword) throws UserAlreadyExistsException, UserNotFoundException {
-        transferUser(newEmail, newPassword, privateUsername, privatePassword, null);
+    public User transferUser(String newEmail, String newPassword, String privateUsername, String privatePassword) throws UserAlreadyExistsException, UserNotFoundException {
+        return transferUser(newEmail, newPassword, privateUsername, privatePassword, null);
     }
 
     /**
@@ -45,7 +51,7 @@ public class UserService {
      * @throws UserAlreadyExistsException                   when the new User already exists
      * @throws won.owner.service.impl.UserNotFoundException when the private User is not found
      */
-    public void transferUser(String newEmail, String newPassword, String privateUsername, String privatePassword, String role) throws UserAlreadyExistsException, UserNotFoundException {
+    public User transferUser(String newEmail, String newPassword, String privateUsername, String privatePassword, String role) throws UserAlreadyExistsException, UserNotFoundException {
         User user = getByUsername(newEmail);
         if (user != null) {
             throw new UserAlreadyExistsException();
@@ -62,6 +68,7 @@ public class UserService {
             privateUser.setUsername(newEmail);
             privateUser.setPassword(passwordEncoder.encode(newPassword));
             privateUser.setEmail(newEmail);
+            privateUser.setEmailVerified(false);
             if (role != null) {
                 privateUser.setRole(role);
             }
@@ -80,6 +87,8 @@ public class UserService {
 
             privateUser.setKeystorePasswordHolder(newKeystorePassword);
             save(privateUser);
+
+            return privateUser;
         } catch (DataIntegrityViolationException e) {
             throw new UserAlreadyExistsException();
         }
@@ -93,8 +102,24 @@ public class UserService {
      * @param password
      * @param role
      * @throws UserAlreadyExistsException
+     * @returns the created User
      */
-    public void registerUser(String email, String password, String role) throws UserAlreadyExistsException {
+    public User registerUser(String email, String password, String role) throws UserAlreadyExistsException {
+        return registerUser(email, password, role, false);
+    }
+
+    /**
+     * Registers the specified user with password and an optional role.
+     * Assumes values have already been checked for syntactic validity.
+     *
+     * @param email
+     * @param password
+     * @param role
+     * @param emailVerified
+     * @throws UserAlreadyExistsException
+     * @returns the created User
+     */
+    public User registerUser(String email, String password, String role, boolean emailVerified) throws UserAlreadyExistsException {
         User user = getByUsername(email);
         if (user != null) {
             throw new UserAlreadyExistsException();
@@ -103,6 +128,7 @@ public class UserService {
             PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
             user = new User(email, passwordEncoder.encode(password), role);
             user.setEmail(email);
+            user.setEmailVerified(emailVerified);
             KeystorePasswordHolder keystorePassword = new KeystorePasswordHolder();
             //generate a password for the keystore and save it in the database, encrypted with a symmetric key
             //derived from the user's password
@@ -122,6 +148,8 @@ public class UserService {
             user.setKeystorePasswordHolder(keystorePassword);
             user.setKeystoreHolder(keystoreHolder);
             save(user);
+
+            return user;
         } catch (DataIntegrityViolationException e) {
             // username is already in database
             throw new UserAlreadyExistsException();
@@ -134,6 +162,29 @@ public class UserService {
 
     public User getByUsernameWithKeystorePassword(String username) {
         return userRepository.findByUsernameWithKeystorePassword(username);
+    }
+
+    public EmailVerificationToken getEmailVerificationToken(String verificationToken) {
+        return emailVerificationRepository.findByToken(verificationToken);
+    }
+
+    public EmailVerificationToken getEmailVerificationToken(User user) {
+        return emailVerificationRepository.findByUser(user);
+    }
+
+    public EmailVerificationToken createEmailVerificationToken(User user) {
+        return createEmailVerificationToken(user, UUID.randomUUID().toString());
+    }
+
+    public EmailVerificationToken createEmailVerificationToken(User user, String verificationToken) {
+        EmailVerificationToken token = new EmailVerificationToken(user, verificationToken);
+        emailVerificationRepository.save(token);
+
+        return token;
+    }
+
+    public User getUserByEmailVerificationToken(String verificationToken) {
+        return getEmailVerificationToken(verificationToken).getUser();
     }
 
     public void save(User user) {
