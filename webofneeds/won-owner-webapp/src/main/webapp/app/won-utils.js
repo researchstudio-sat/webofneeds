@@ -167,7 +167,7 @@ export function connect2Redux(
 export function checkLoginStatus() {
   return fetch("rest/users/isSignedIn", { credentials: "include" })
     .then(checkHttpStatus) // will reject if not logged in
-    .then(resp => resp.json());
+    .then(resp => resp.json()); //TODO: SAVE RESPONSE IN STATE to store the serverside flags
 }
 
 /**
@@ -188,7 +188,11 @@ export function registerAccount(credentials) {
       "Content-Type": "application/json",
     },
     credentials: "include",
-    body: JSON.stringify({ username: email, password: password }),
+    body: JSON.stringify({
+      username: email,
+      password: password,
+      privateIdUser: !!credentials.privateId,
+    }),
   };
   return fetch(url, httpOptions).then(checkHttpStatus);
 }
@@ -242,7 +246,9 @@ export function login(credentials) {
     },
     body: params,
     credentials: "include",
-  }).then(checkHttpStatus);
+  })
+    .then(checkHttpStatus)
+    .then(resp => resp.json()); //TODO: SAVE RESPONSE IN STATE to store the serverside flags
 }
 
 export function logout() {

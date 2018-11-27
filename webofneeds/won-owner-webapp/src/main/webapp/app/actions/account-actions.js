@@ -214,6 +214,7 @@ export function accountLogin(credentials, options) {
       .then(() => curriedDispatch({ loginFinished: true }))
       .catch(error => {
         console.error("accountLogin ErrorObject", error);
+        console.error("accountLogin error response: ", error.response);
         return Promise.resolve()
           .then(() => {
             if (wasLoggedIn) {
@@ -224,6 +225,7 @@ export function accountLogin(credentials, options) {
             }
           })
           .then(() => {
+            //TODO: IMPLEMENT EMAIL VERIFICATION EXCEPTION HANDLING
             const loginError = credentials.privateId
               ? "invalid privateId"
               : "unknown username/password combination";
