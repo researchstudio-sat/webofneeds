@@ -327,6 +327,7 @@ createInterface skin draft =
     card
         [ width fill ]
         { skin = skin
+        , onPress = Nothing
         , header =
             column
                 [ width fill
@@ -535,6 +536,7 @@ viewUnsaved { skin, data, url } =
         ]
         -- card in background --
         { skin = skin
+        , onPress = Nothing
         , header =
             row
                 [ spacing 10
@@ -567,15 +569,15 @@ viewPersona :
 viewPersona { skin, open, url, data } =
     card
         [ width fill
-        , Events.onClick
-            (if open then
-                Cancel
-
-             else
-                View url
-            )
         ]
         { skin = skin
+        , onPress =
+            Just <|
+                if open then
+                    Cancel
+
+                else
+                    View url
         , header =
             row
                 [ spacing 15
@@ -679,9 +681,10 @@ card :
         { skin : Skin
         , header : Element msg
         , sections : List (Element msg)
+        , onPress : Maybe msg
         }
     -> Element msg
-card attributes { skin, header, sections } =
+card attributes { skin, header, sections, onPress } =
     let
         baseStyle =
             [ Border.width 1
@@ -694,11 +697,25 @@ card attributes { skin, header, sections } =
         (attributes
             ++ [ spacing -1 ]
         )
-        ([ el
-            (baseStyle
-                ++ [ Background.color skin.lightGray ]
-            )
-            header
+        ([ case onPress of
+            Just msg ->
+                Input.button
+                    (baseStyle
+                        ++ [ Background.color skin.lightGray
+                           , focused
+                                []
+                           ]
+                    )
+                    { onPress = Just msg
+                    , label = header
+                    }
+
+            Nothing ->
+                el
+                    (baseStyle
+                        ++ [ Background.color skin.lightGray ]
+                    )
+                    header
          ]
             ++ List.map
                 (\section ->
