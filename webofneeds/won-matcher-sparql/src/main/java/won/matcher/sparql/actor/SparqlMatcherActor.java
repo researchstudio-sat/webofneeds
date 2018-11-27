@@ -416,7 +416,7 @@ public class SparqlMatcherActor extends UntypedActor {
                     executeQuery(hintForCounterpartQuery,  needToCheck)
                     ).collect(Collectors.toList());
         })
-                .orElse(Collections.EMPTY_LIST);
+                .orElse(Collections.emptyList());
 
         return needs;
     }
