@@ -7,6 +7,7 @@ import { connect2Redux } from "../won-utils.js";
 import { getPostUriFromRoute } from "../selectors/general-selectors.js";
 import { generateNeedTypesLabel } from "../need-utils.js";
 import { actionCreators } from "../actions/actions.js";
+import postContextDropDownModule from "../components/post-context-dropdown.js";
 
 import "style/_visitor-title-bar.scss";
 
@@ -27,6 +28,7 @@ function genComponentConf() {
                     </hgroup>
                 </div>
             </div>
+            <won-post-context-dropdown></won-post-context-dropdown>
         </nav>
     `;
 
@@ -62,5 +64,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.visitorTitleBar", [])
+  .module("won.owner.components.visitorTitleBar", [postContextDropDownModule])
   .directive("wonVisitorTitleBar", genComponentConf).name;
