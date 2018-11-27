@@ -5,26 +5,9 @@
 package won.owner.model;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.OrderBy;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-import javax.persistence.UniqueConstraint;
+import javax.persistence.*;
 
 import org.springframework.data.domain.Persistable;
 import org.springframework.security.core.GrantedAuthority;
@@ -44,6 +27,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 )
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class User implements UserDetails, Persistable<Long> {
+    public static final int GRACEPERIOD_INHOURS = 24 * 3; //Grace Period after registration in which a login is still allowed
+    private static final int GRACEPERIOD = GRACEPERIOD_INHOURS * 60;
 
     @Id
     @GeneratedValue
@@ -56,6 +41,18 @@ public class User implements UserDetails, Persistable<Long> {
     @Column(name = "password")
     private String password;
 
+    @Column(name = "email_verified")
+    private boolean emailVerified;
+
+    /* The creation date of the (as observed by the owner app) */
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column( name = "registrationDate", nullable = false)
+    private Date registrationDate;
+
+    @PrePersist
+    protected void onCreate() {
+        registrationDate = new Date();
+    }
 
     @OneToMany(fetch = FetchType.EAGER)
     @OrderBy("creationDate desc")
@@ -141,7 +138,7 @@ public class User implements UserDetails, Persistable<Long> {
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true;
+        return this.emailVerified || isWithinGracePeriod();
     }
 
     @Override
@@ -232,6 +229,32 @@ public class User implements UserDetails, Persistable<Long> {
     }     */
     public void setDrafts(final Set<URI> draftURIs) {
         this.draftURIs = draftURIs;
+    }
+
+    public boolean isEmailVerified() {
+        return emailVerified;
+    }
+
+    public void setEmailVerified(boolean emailVerified) {
+        this.emailVerified = emailVerified;
+    }
+
+    public Date getRegistrationDate() {
+        return registrationDate;
+    }
+
+    public void setRegistrationDate(Date registrationDate) {
+        this.registrationDate = registrationDate;
+    }
+
+    private boolean isWithinGracePeriod() {
+        Calendar current = Calendar.getInstance();
+
+        Calendar gracePeriodThreshold = Calendar.getInstance();
+        gracePeriodThreshold.setTime(this.getRegistrationDate());
+        gracePeriodThreshold.add(Calendar.HOUR, GRACEPERIOD_INHOURS);
+
+        return gracePeriodThreshold.getTime().getTime() - current.getTime().getTime() >= 0;
     }
 
     @Override
