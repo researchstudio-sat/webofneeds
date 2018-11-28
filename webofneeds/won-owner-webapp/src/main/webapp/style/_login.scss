@@ -42,6 +42,13 @@ won-login-form {
   .wl__errormsg {
     font-size: $smallFontSize;
     color: $won-primary-color;
+
+    &__resend {
+      cursor: pointer;
+      &:hover {
+        text-decoration: underline;
+      }
+    }
   }
 
   .wl__table {
