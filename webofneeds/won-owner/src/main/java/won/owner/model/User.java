@@ -248,6 +248,10 @@ public class User implements UserDetails, Persistable<Long> {
     }
 
     private boolean isWithinGracePeriod() {
+        if(this.getRegistrationDate() == null){
+            return false;
+        }
+
         Calendar current = Calendar.getInstance();
 
         Calendar gracePeriodThreshold = Calendar.getInstance();
