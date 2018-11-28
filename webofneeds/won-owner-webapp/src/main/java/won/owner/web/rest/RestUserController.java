@@ -124,11 +124,7 @@ public class RestUserController {
             User createdUser = userService.registerUser(user.getUsername(), user.getPassword(), null, user.isPrivateIdUser());
 
             if(!createdUser.isEmailVerified()) {
-                try {
-                    eventPublisher.publishEvent(new OnRegistrationCompleteEvent(createdUser, request.getLocale(), request.getContextPath()));
-                } catch (Exception e) {
-                    return new ResponseEntity("\"Cannot send verification email.\"", HttpStatus.BAD_REQUEST); //TODO: FIGURE OUT A BETTER HTTPSTATUS CODE
-                }
+                eventPublisher.publishEvent(new OnRegistrationCompleteEvent(createdUser, request.getLocale(), request.getContextPath()));
             }
         } catch (UserAlreadyExistsException e) {
             // username is already in database
@@ -176,11 +172,7 @@ public class RestUserController {
             User transferUser = userService.transferUser(transferUserPojo.getUsername(), transferUserPojo.getPassword(), transferUserPojo.getPrivateUsername(), transferUserPojo.getPrivatePassword());
 
             if(!transferUser.isEmailVerified()) {
-                try {
-                    eventPublisher.publishEvent(new OnRegistrationCompleteEvent(transferUser, request.getLocale(), request.getContextPath()));
-                } catch (Exception e) {
-                    return new ResponseEntity("\"Cannot send verification email.\"", HttpStatus.BAD_REQUEST); //TODO: FIGURE OUT A BETTER HTTPSTATUS CODE
-                }
+                eventPublisher.publishEvent(new OnRegistrationCompleteEvent(transferUser, request.getLocale(), request.getContextPath()));
             }
         } catch (UserAlreadyExistsException e) {
             // username is already in database
