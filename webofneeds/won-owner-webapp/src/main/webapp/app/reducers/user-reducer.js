@@ -33,10 +33,15 @@ export default function(userData = initialState, action = {}) {
           userData.get("emailVerified") ||
           immutablePayload.get("emailVerified");
 
+        const acceptedTermsOfService =
+          userData.get("acceptedTermsOfService") ||
+          immutablePayload.get("acceptedTermsOfService");
+
         return Immutable.fromJS({
           loggedIn: true,
           email: email || username,
           emailVerified: emailVerified,
+          acceptedTermsOfService: acceptedTermsOfService,
           acceptedDisclaimer: userData.get("acceptedDisclaimer"),
         });
       } else {
