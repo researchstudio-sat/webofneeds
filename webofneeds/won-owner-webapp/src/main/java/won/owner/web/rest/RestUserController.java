@@ -463,6 +463,7 @@ public class RestUserController {
         values.put("authorities", user.getAuthorities());
         values.put("role", user.getRole());
         values.put("emailVerified", user.isEmailVerified());
+        values.put("acceptedTermsOfService", user.isAcceptedTermsOfService());
 
         return new ResponseEntity<Map>(values, HttpStatus.OK);
     }

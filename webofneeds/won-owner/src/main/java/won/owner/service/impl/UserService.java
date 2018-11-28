@@ -69,6 +69,7 @@ public class UserService {
             privateUser.setPassword(passwordEncoder.encode(newPassword));
             privateUser.setEmail(newEmail);
             privateUser.setEmailVerified(false);
+            user.setAcceptedTermsOfService(true); //transfer only available when flag is set therefore we can just set this to true (i think)
             if (role != null) {
                 privateUser.setRole(role);
             }
@@ -129,6 +130,7 @@ public class UserService {
             user = new User(email, passwordEncoder.encode(password), role);
             user.setEmail(email);
             user.setEmailVerified(emailVerified);
+            user.setAcceptedTermsOfService(true); //transfer only available when flag is set therefore we can just set this to true (i think)
             KeystorePasswordHolder keystorePassword = new KeystorePasswordHolder();
             //generate a password for the keystore and save it in the database, encrypted with a symmetric key
             //derived from the user's password
