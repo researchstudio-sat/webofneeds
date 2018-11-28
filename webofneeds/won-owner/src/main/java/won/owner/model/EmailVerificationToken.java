@@ -9,6 +9,7 @@ import java.util.Date;
  * Entity that holds a verificationToken for Users so we enable the EmailVerification Process
  */
 @Entity
+@Table(name = "verificationtoken")
 public class EmailVerificationToken {
     private static final int EXPIRATION = 60 * 24; //Token will expire after a day
 
