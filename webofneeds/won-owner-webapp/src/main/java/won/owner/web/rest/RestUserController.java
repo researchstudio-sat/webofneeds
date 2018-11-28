@@ -365,27 +365,6 @@ public class RestUserController {
     }
 
     @RequestMapping(
-            value = "/isSignedInRole",
-            method = RequestMethod.GET
-    )
-    //TODO: move transactionality annotation into the service layer
-    //public ResponseEntity isSignedIn(@RequestBody User user, HttpServletRequest request, HttpServletResponse response) {
-    public ResponseEntity isSignedInRole() {
-        // Execution will only get here, if the session is still valid, so sending OK here is enough. Spring sends an error
-        // code by itself if the session isn't valid any more
-        SecurityContext context = SecurityContextHolder.getContext();
-        //if(context.getAuthentication() )
-        if (context == null || context.getAuthentication() == null) {
-            return generateStatusResponse(RestStatusResponse.USER_NOT_SIGNED_IN);
-        } else if ("anonymousUser".equals(context.getAuthentication().getPrincipal())) {
-            //FIXME: REMOVE THIS CLAUSE it is not needed any longer
-            return generateStatusResponse(RestStatusResponse.USER_NOT_SIGNED_IN);
-        } else {
-            return new ResponseEntity("\"" + SecurityContextHolder.getContext().getAuthentication().getAuthorities() + "\"", HttpStatus.OK);
-        }
-    }
-
-    @RequestMapping(
             value = "/signout",
             method = RequestMethod.POST
     )

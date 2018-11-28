@@ -50,7 +50,6 @@
         <intercept-url pattern="/rest/users/ping/" access="permitAll()"/>
 		<intercept-url pattern="/rest/users/signout" access="permitAll()"/>
         <intercept-url pattern="/rest/users/isSignedIn" access="permitAll()"/>
-        <intercept-url pattern="/rest/users/isSignedInRole" access="permitAll()"/>
         <intercept-url pattern="/rest/users/signin" access="permitAll()"/>
         <intercept-url pattern="/rest/users/confirmRegistration" access="permitAll()"/>
         <intercept-url pattern="/rest/users/resendVerificationEmail" access="permitAll()"/>
