@@ -187,8 +187,6 @@ public class RestUserController {
             produces = MediaType.APPLICATION_JSON_VALUE,
             method = RequestMethod.GET
     )
-
-    //TODO: move transactionality annotation into the service layer
     public UserSettingsPojo getUserSettings(@RequestParam("uri") String uri) {
 
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -220,7 +218,6 @@ public class RestUserController {
             produces = MediaType.APPLICATION_JSON_VALUE,
             method = RequestMethod.POST
     )
-
     //TODO: move transactionality annotation into the service layer
     @Transactional(propagation = Propagation.SUPPORTS)
     public ResponseEntity setUserSettings(@RequestBody UserSettingsPojo userSettingsPojo) {
@@ -297,12 +294,7 @@ public class RestUserController {
             rememberMeServices.loginSuccess(request, response, auth);
 
             User user = userService.getByUsername(username);
-            Map values = new HashMap<String, String>();
-            values.put("username", user.getUsername());
-            values.put("authorities", user.getAuthorities());
-            values.put("role", user.getRole());
-            values.put("emailVerified", user.isEmailVerified());
-            return new ResponseEntity<Map>(values, HttpStatus.OK);
+            return generateUserResponse(user);
         } catch (BadCredentialsException ex) {
             rememberMeServices.loginFail(request, response);
             return generateStatusResponse(RestStatusResponse.USER_BAD_CREDENTIALS);
@@ -328,7 +320,6 @@ public class RestUserController {
     )
     @Transactional(propagation = Propagation.REQUIRED)
     //TODO: move transactionality annotation into the service layer
-    //public ResponseEntity isSignedIn(@RequestBody User user, HttpServletRequest request, HttpServletResponse response) {
     public ResponseEntity isSignedIn(HttpServletRequest request, HttpServletResponse response) {
         // Execution will only get here, if the session is still valid, so sending OK here is enough. Spring sends an error
         // code by itself if the session isn't valid any more
@@ -349,18 +340,10 @@ public class RestUserController {
         }
         if (authentication == null) {
             return generateStatusResponse(RestStatusResponse.USER_NOT_SIGNED_IN);
-        } else if ("anonymousUser".equals(authentication.getPrincipal())) {
-            //FIXME: REMOVE THIS CLAUSE it is not needed any longer
-            return generateStatusResponse(RestStatusResponse.USER_NOT_SIGNED_IN);
         } else {
-            User user = ((KeystoreEnabledUserDetails) authentication.getPrincipal()).getUser();
-            Map values = new HashMap<String, String>();
-            values.put("username", user.getUsername());
-            values.put("authorities", user.getAuthorities());
-            values.put("role", user.getRole());
-            values.put("emailVerified", user.isEmailVerified());
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            return new ResponseEntity<Map>(values, HttpStatus.OK);
+            User user = ((KeystoreEnabledUserDetails) authentication.getPrincipal()).getUser();
+            return generateUserResponse(user);
         }
     }
 
@@ -368,7 +351,6 @@ public class RestUserController {
             value = "/signout",
             method = RequestMethod.POST
     )
-    //TODO: move transactionality annotation into the service layer
     public ResponseEntity logOut(HttpServletRequest request, HttpServletResponse response) {
         SecurityContext context = SecurityContextHolder.getContext();
         if (context.getAuthentication() == null) {
@@ -472,5 +454,16 @@ public class RestUserController {
         values.put("message", restStatusResponse.getMessage());
 
         return new ResponseEntity(values, restStatusResponse.getHttpStatus());
+    }
+
+    private static ResponseEntity generateUserResponse(User user) {
+        //TODO: Maybe change to return a pojo
+        Map values = new HashMap<String, String>();
+        values.put("username", user.getUsername());
+        values.put("authorities", user.getAuthorities());
+        values.put("role", user.getRole());
+        values.put("emailVerified", user.isEmailVerified());
+
+        return new ResponseEntity<Map>(values, HttpStatus.OK);
     }
 }
