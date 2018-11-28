@@ -246,16 +246,6 @@ export default reduceReducers(
       case actionTypes.messages.hintMessageReceived:
         return deleteChatConnectionsBetweenOwnedNeeds(state);
 
-      case actionTypes.mainViewScrolled:
-        return state.set("mainViewScroll", action.payload);
-      /*
-              * TODO try to resolve a lot of the AC-dispatching so only
-              * high-level actions are left there. avoid actions that
-              * trigger other actions. also, actions shouldn't have a
-              * 1:1 mapping to state.
-              * see: https://github.com/rackt/redux/issues/857#issuecomment-146021839
-              * see: https://github.com/rackt/redux/issues/857#issuecomment-146269384
-              */
       default:
         return state;
     }
