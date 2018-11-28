@@ -167,7 +167,7 @@ export function connect2Redux(
 export function checkLoginStatus() {
   return fetch("rest/users/isSignedIn", { credentials: "include" })
     .then(checkHttpStatus) // will reject if not logged in
-    .then(resp => resp.json()); //TODO: SAVE RESPONSE IN STATE to store the serverside flags
+    .then(resp => resp.json());
 }
 
 /**
@@ -195,6 +195,33 @@ export function registerAccount(credentials) {
     }),
   };
   return fetch(url, httpOptions).then(checkHttpStatus);
+}
+
+/**
+ * Resend the verification mail.
+ *
+ */
+export function resendEmailVerification(email) {
+  const url = urljoin(ownerBaseUrl, "/rest/users/resendVerificationEmail");
+  const httpOptions = {
+    method: "post",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      username: email,
+    }),
+  };
+  return fetch(url, httpOptions)
+    .then(resp => {
+      console.log("resendEmailVerification Response: ", resp.json());
+      return resp.json();
+    })
+    .catch(error => {
+      console.log("resendEmailVerification Error: ", error);
+      return error;
+    });
 }
 
 /**
@@ -248,7 +275,7 @@ export function login(credentials) {
     credentials: "include",
   })
     .then(checkHttpStatus)
-    .then(resp => resp.json()); //TODO: SAVE RESPONSE IN STATE to store the serverside flags
+    .then(resp => resp.json());
 }
 
 export function logout() {
