@@ -280,8 +280,6 @@ const actionHierarchy = {
     connectionFailedToLoad: INJ_DEFAULT,
   },
 
-  mainViewScrolled: INJ_DEFAULT,
-
   toggleRdfDisplay: INJ_DEFAULT,
   toggleClosedNeedsDisplay: INJ_DEFAULT,
   hideClosedNeedsDisplay: INJ_DEFAULT,
