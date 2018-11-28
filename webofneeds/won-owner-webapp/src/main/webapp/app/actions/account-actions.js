@@ -179,38 +179,37 @@ export function accountLogin(credentials, options) {
         }
       })
       .then(() => curriedDispatch({ loginFinished: true }))
-      .catch(error => {
-        console.error("accountLogin ErrorObject", error);
-        console.error("accountLogin error response: ", error.response);
-        return Promise.resolve()
-          .then(() => {
-            if (wasLoggedIn) {
-              return dispatch({
-                type: actionTypes.logout,
-                payload: Immutable.fromJS({ loggedIn: false }),
-              });
-            }
-          })
-          .then(() => {
-            //TODO: IMPLEMENT EMAIL VERIFICATION EXCEPTION HANDLING
-            const loginError = credentials.privateId
-              ? "invalid privateId"
-              : "unknown username/password combination";
+      .catch(error =>
+        error.response.json().then(loginError => {
+          return Promise.resolve()
+            .then(() => {
+              if (wasLoggedIn) {
+                return dispatch({
+                  type: actionTypes.logout,
+                  payload: Immutable.fromJS({ loggedIn: false }),
+                });
+              }
+            })
+            .then(() => {
+              if (credentials.privateId) {
+                loginError = won.PRIVATEID_NOT_FOUND_ERROR;
+              }
 
-            dispatch(
-              actionCreators.loginFailed({
-                loginError,
-                error,
-                credentials,
-              })
+              dispatch(
+                actionCreators.loginFailed({
+                  loginError: Immutable.fromJS(loginError),
+                  error,
+                  credentials,
+                })
+              );
+            })
+            .then(
+              () =>
+                options_.doRedirects &&
+                checkAccessToCurrentRoute(dispatch, getState)
             );
-          })
-          .then(
-            () =>
-              options_.doRedirects &&
-              checkAccessToCurrentRoute(dispatch, getState)
-          );
-      })
+        })
+      )
       .then(() => {
         _loginInProcessFor = undefined;
       })

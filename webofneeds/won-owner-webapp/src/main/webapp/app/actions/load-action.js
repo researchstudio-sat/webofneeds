@@ -3,6 +3,7 @@
  */
 
 import Immutable from "immutable";
+import won from "../won-es6.js";
 import { actionTypes, actionCreators } from "./actions.js";
 import { getPostUriFromRoute } from "../selectors/general-selectors.js";
 
@@ -99,7 +100,7 @@ function loadingWithAnonymousAccount(dispatch, getState, privateId) {
         dispatch({
           type: actionTypes.loginFailed,
           payload: {
-            loginError: "invalid privateId",
+            loginError: Immutable.fromJS(won.PRIVATEID_NOT_FOUND_ERROR),
             credentials: { privateId },
           },
         });
