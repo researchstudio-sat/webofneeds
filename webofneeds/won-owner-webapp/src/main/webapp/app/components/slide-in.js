@@ -50,6 +50,23 @@ function genSlideInConf() {
                 Resend E-Mail
             </button>
         </div>
+        <div class="slide-in" ng-class="{'visible': self.loggedIn && !self.acceptedTermsOfService}">
+            <svg class="si__icon" style="--local-primary:white;">
+                <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
+            </svg>
+            <span class="si__text"> <!-- TODO: INCLUDE LINK TO TOS -->
+                You have not accepted the
+                <a target="_blank"
+                   href="{{ self.absHRef(self.$state, 'about', {'aboutSection': 'aboutTermsOfService'}) }}">
+                   Terms Of Service
+                 </a> yet.
+            </span>
+            <button
+              class="si__button"
+              ng-click="self.acceptTermsOfService()">
+                Accept
+            </button>
+        </div>
         <div class="slide-in" ng-class="{'visible': !self.acceptedDisclaimer}">
             <svg class="si__icon" style="--local-primary:white;">
                 <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_info"></use>
@@ -97,6 +114,10 @@ function genSlideInConf() {
         return {
           acceptedDisclaimer: state.getIn(["user", "acceptedDisclaimer"]),
           emailVerified: state.getIn(["user", "emailVerified"]),
+          acceptedTermsOfService: state.getIn([
+            "user",
+            "acceptedTermsOfService",
+          ]),
           loggedIn: state.getIn(["user", "loggedIn"]),
           email: state.getIn(["user", "email"]),
           connectionHasBeenLost: state.getIn(["messages", "lostConnection"]), // name chosen to avoid name-clash with the action-creator
@@ -114,6 +135,10 @@ function genSlideInConf() {
       delay(2000).then(() => {
         this.clickedResend = false;
       });
+    }
+
+    acceptTermsOfService() {
+      //TODO: IMPL ME
     }
   }
   Controller.$inject = serviceDependencies;
