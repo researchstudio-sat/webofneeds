@@ -27,48 +27,6 @@ import { getIn } from "../utils.js";
 import { getOwnedConnectionUris } from "../selectors/connection-selectors.js";
 import { loadLatestMessagesOfConnection } from "./connections-actions.js";
 
-// import { Observable } from "rxjs";
-
-/**
- * @param privateId
- * @param options see `accountLogin`
- * @returns {*}
- */
-//export function anonAccountLogin(privateId, options) {
-//    const {email, password} = privateId2Credentials(privateId);
-//    return (dispatch, getState) => {
-//        const state = getState();
-//        const options_ = Object.assign(
-//            { // defaults
-//                fetchData: true,
-//                redirectToFeed: false,
-//                relogIfNecessary: true, // if there's a valid session or privateId, log out from that first.
-//                wasLoggedIn: false,
-//            },
-//            options
-//        );
-//
-//        let loggedOutPromise;
-//        if(
-//            options_.relogIfNecessary &&
-//            // v--- do any re-login-actions only after initialPageLoad. The latter should handle any necessary logins itself.
-//            state.get('initialLoadFinished') &&
-//            state.getIn(['router', 'currentParams', 'privateId']) !== privateId
-//        ) {
-//            // privateId has changed, need to relog
-//            options_.wasLoggedIn = true;
-//            loggedOutPromise = logoutAndResetPrivateId(dispatch, getState)
-//        } else {
-//            loggedOutPromise = Promise.resolve();
-//        }
-//        options_.relogIfNecessary = false; // any necessary logout has been handled
-//
-//        return loggedOutPromise.then(() =>
-//            accountLogin(email, password, options_)(dispatch, getState)
-//        );
-//    }
-//}
-
 /**
  * Makes sure user is either logged in
  * or creates a private-ID account as fallback.
@@ -192,6 +150,15 @@ export function accountLogin(credentials, options) {
         }
       })
       .then(() => login(credentials))
+      .then(data =>
+        dispatch({
+          type: actionTypes.login,
+          payload: Immutable.fromJS(data).merge({
+            email: email,
+            loggedIn: true,
+          }),
+        })
+      )
       .then(() => curriedDispatch({ httpSessionUpgraded: true }))
       .then(() => {
         if (!options_.doRedirects) {
