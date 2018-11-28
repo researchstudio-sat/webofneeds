@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
+import won.owner.pojo.UsernamePojo;
 import won.owner.web.WonOwnerMailSender;
 import won.owner.web.events.OnRegistrationCompleteEvent;
 import won.owner.model.EmailVerificationToken;
@@ -454,12 +455,12 @@ public class RestUserController {
 
     @ResponseBody
     @RequestMapping(
-            value = "/resendConfirmation",
-            method = RequestMethod.GET //TODO: CHANGE TO RequestMethod.POST
+            value = "/resendVerificationEmail",
+            method = RequestMethod.POST
     )
     @Transactional(propagation = Propagation.SUPPORTS)
-    public ResponseEntity resendConfirmation(@RequestParam("username") String username) {
-        User user = userService.getByUsername(username);
+    public ResponseEntity resendVerificationEmail(@RequestBody UsernamePojo usernamePojo) {
+        User user = userService.getByUsername(usernamePojo.getUsername());
 
         if(user == null) {
             return new ResponseEntity("\"Could not find the provided user.\"", HttpStatus.NOT_FOUND); //TODO: CHANGE RESPONSE TO REDIRECT FOR FURTHER ACTIONS

@@ -53,7 +53,7 @@
         <intercept-url pattern="/rest/users/isSignedInRole" access="permitAll()"/>
         <intercept-url pattern="/rest/users/signin" access="permitAll()"/>
         <intercept-url pattern="/rest/users/confirmRegistration" access="permitAll()"/>
-        <intercept-url pattern="/rest/users/resendConfirmation" access="permitAll()"/>
+        <intercept-url pattern="/rest/users/resendVerificationEmail" access="permitAll()"/>
         <intercept-url pattern="/rest/users/email" access="isAuthenticated()"/>
         <intercept-url pattern="/rest/users/settings" access="isAuthenticated()"/>
         <intercept-url pattern="/rest/needs/drafts/*" access="hasRole('ROLE_ACCOUNT')"/>
