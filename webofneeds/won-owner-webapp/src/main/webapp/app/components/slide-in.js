@@ -4,9 +4,9 @@
 import angular from "angular";
 import ngAnimate from "angular-animate";
 import dropdownModule from "./covering-dropdown.js";
-import { attach } from "../utils.js";
+import { attach, delay } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
-import { connect2Redux } from "../won-utils.js";
+import { connect2Redux, resendEmailVerification } from "../won-utils.js";
 
 import * as srefUtils from "../sref-utils.js";
 
@@ -32,6 +32,23 @@ function genSlideInConf() {
             <svg class="hspinner" ng-show="self.reconnecting">
                 <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
             </svg>
+        </div>
+        <div class="slide-in" ng-class="{'visible': self.loggedIn && !self.emailVerified}">
+            <svg class="si__icon" style="--local-primary:white;">
+                <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
+            </svg>
+            <span class="si__text" ng-if="!self.clickedResend">
+                E-Mail has not been verified yet, check your Inbox.
+            </span>
+            <span class="si__text" ng-if="self.clickedResend">
+                E-Mail has been resent to {{ self.email }}, check your Inbox.
+            </span>
+            <button
+              class="si__button"
+              ng-disabled="self.clickedResend"
+              ng-click="self.resendEmailVerification()">
+                Resend E-Mail
+            </button>
         </div>
         <div class="slide-in" ng-class="{'visible': !self.acceptedDisclaimer}">
             <svg class="si__icon" style="--local-primary:white;">
@@ -74,16 +91,29 @@ function genSlideInConf() {
     constructor(/* arguments <- serviceDependencies */) {
       attach(this, serviceDependencies, arguments);
       Object.assign(this, srefUtils); // bind srefUtils to scope
+      this.clickedResend = false;
 
       const selectFromState = state => {
         return {
           acceptedDisclaimer: state.getIn(["user", "acceptedDisclaimer"]),
+          emailVerified: state.getIn(["user", "emailVerified"]),
+          loggedIn: state.getIn(["user", "loggedIn"]),
+          email: state.getIn(["user", "email"]),
           connectionHasBeenLost: state.getIn(["messages", "lostConnection"]), // name chosen to avoid name-clash with the action-creator
           reconnecting: state.getIn(["messages", "reconnecting"]),
         };
       };
 
       connect2Redux(selectFromState, actionCreators, [], this);
+    }
+
+    resendEmailVerification() {
+      this.clickedResend = true;
+      resendEmailVerification(this.email); //TODO: Implement error cases and success response
+
+      delay(2000).then(() => {
+        this.clickedResend = false;
+      });
     }
   }
   Controller.$inject = serviceDependencies;
