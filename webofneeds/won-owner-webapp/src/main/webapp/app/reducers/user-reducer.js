@@ -19,12 +19,24 @@ export default function(userData = initialState, action = {}) {
       const immutablePayload = Immutable.fromJS(action.payload);
 
       const loggedIn = immutablePayload.get("loggedIn");
-      const email = immutablePayload.get("email");
 
-      if (loggedIn) {
+      //due to the many reduce calls with different payload we need to check for email and username alike
+      const email = immutablePayload.get("email");
+      const username = immutablePayload.get("username");
+
+      if (loggedIn && (email || username)) {
+        /*due to the fact that we do not always have the parameters below in the payload, we need to check and
+          see if the corresponding state parameter has already been set and therefore will not be overwritten with
+          undefined or false(-> if it was already set to true in another reducer)
+        */
+        const emailVerified =
+          userData.get("emailVerified") ||
+          immutablePayload.get("emailVerified");
+
         return Immutable.fromJS({
           loggedIn: true,
-          email: email,
+          email: email || username,
+          emailVerified: emailVerified,
           acceptedDisclaimer: userData.get("acceptedDisclaimer"),
         });
       } else {
