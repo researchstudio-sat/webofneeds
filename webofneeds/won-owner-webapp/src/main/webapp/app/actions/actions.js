@@ -256,10 +256,10 @@ const actionHierarchy = {
     loginFailed: INJ_DEFAULT,
     logoutStarted: INJ_DEFAULT,
     register: accountRegister,
+    transfer: accountTransfer,
   },
   login: accountLogin, //loginSuccess
   logout: accountLogout,
-  transfer: accountTransfer,
   acceptDisclaimer: accountAcceptDisclaimer,
   acceptDisclaimerSuccess: INJ_DEFAULT,
   typedAtLoginCredentials: INJ_DEFAULT,
