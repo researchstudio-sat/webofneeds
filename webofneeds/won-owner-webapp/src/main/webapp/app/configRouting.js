@@ -212,7 +212,7 @@ export function accessControl({
     default:
       //FOR ALL OTHER ROUTES
       if (state.get("initialLoadFinished")) {
-        if (state.getIn(["user", "loggedIn"])) {
+        if (state.getIn(["account", "loggedIn"])) {
           return; // logged in. continue route-change as intended.
         } else {
           //sure to be logged out

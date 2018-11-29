@@ -33,7 +33,7 @@ import { loadLatestMessagesOfConnection } from "./connections-actions.js";
  */
 export async function ensureLoggedIn(dispatch, getState) {
   const state = getState();
-  if (state.getIn(["user", "loggedIn"])) {
+  if (state.getIn(["account", "loggedIn"])) {
     return;
   }
 
@@ -85,7 +85,7 @@ export function accountLogin(credentials, options) {
       "currentParams",
       "privateId",
     ]);
-    const prevEmail = state.getIn(["user", "email"]);
+    const prevEmail = state.getIn(["account", "email"]);
 
     const wasLoggedIn =
       state.get("initialLoadFinished") && (prevPrivateId || prevEmail);
@@ -362,7 +362,7 @@ export function reconnect() {
       * -- check for new connections (i.e. matches and incoming requests) --
       */
       // await pageLoadAction()(dispatch, getState);
-      // const email = getIn(state, ["user", "email"]);
+      // const email = getIn(state, ["account", "email"]);
       // await fetchOwnedData(email, payload => {
       //   dispatch({
       //     type: actionTypes.initialPageLoad, // TODO make this it's own type

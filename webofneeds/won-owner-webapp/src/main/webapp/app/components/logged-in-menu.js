@@ -53,8 +53,8 @@ function genComponentConf() {
 
       const logout = state => {
         return {
-          loggedIn: state.getIn(["user", "loggedIn"]),
-          email: state.getIn(["user", "email"]),
+          loggedIn: state.getIn(["account", "loggedIn"]),
+          email: state.getIn(["account", "email"]),
           isPrivateIdUser: isPrivateUser(state),
         };
       };

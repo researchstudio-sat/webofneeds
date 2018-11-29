@@ -30,7 +30,7 @@ function genComponentConf($ngRedux) {
       scope.$watch("isValid", newValue => {
         elmApp.ports.publishIn.send({
           isValid: newValue ? true : false,
-          loggedIn: $ngRedux.getState().getIn(["user", "loggedIn"]),
+          loggedIn: $ngRedux.getState().getIn(["account", "loggedIn"]),
           showPersonas: scope.showPersonas ? true : false,
           label: scope.label ? scope.label : "Submit",
         });
@@ -39,7 +39,7 @@ function genComponentConf($ngRedux) {
       scope.$watch("showPersonas", newValue => {
         elmApp.ports.publishIn.send({
           isValid: scope.isValid ? true : false,
-          loggedIn: $ngRedux.getState().getIn(["user", "loggedIn"]),
+          loggedIn: $ngRedux.getState().getIn(["account", "loggedIn"]),
           showPersonas: newValue ? true : false,
           label: scope.label ? scope.label : "Submit",
         });
@@ -47,7 +47,7 @@ function genComponentConf($ngRedux) {
 
       elmApp.ports.publishIn.send({
         isValid: scope.isValid ? true : false,
-        loggedIn: $ngRedux.getState().getIn(["user", "loggedIn"]),
+        loggedIn: $ngRedux.getState().getIn(["account", "loggedIn"]),
         showPersonas: scope.showPersonas ? true : false,
         label: scope.label ? scope.label : "Submit",
       });
@@ -60,7 +60,7 @@ function genComponentConf($ngRedux) {
       const disconnectOptions = $ngRedux.connect(state => {
         return {
           personas: getOwnedPersonas(state),
-          loggedIn: state.getIn(["user", "loggedIn"]),
+          loggedIn: state.getIn(["account", "loggedIn"]),
         };
       })(state => {
         elmApp.ports.publishIn.send({

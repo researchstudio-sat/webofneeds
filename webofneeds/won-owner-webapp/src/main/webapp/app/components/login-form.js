@@ -78,10 +78,10 @@ function genLoginConf() {
       this.clickedResend = false;
 
       const login = state => ({
-        loggedIn: state.getIn(["user", "loggedIn"]),
-        loginError: state.getIn(["user", "loginError"]),
+        loggedIn: state.getIn(["account", "loggedIn"]),
+        loginError: state.getIn(["account", "loginError"]),
         isNotVerified:
-          state.getIn(["user", "loginError", "code"]) ==
+          state.getIn(["account", "loginError", "code"]) ==
           won.RESPONSECODE.USER_NOT_VERIFIED,
       });
 

@@ -350,7 +350,7 @@ function genComponentConf() {
           showAddMessageContent: state.get("showAddMessageContent"),
           selectedDetail,
           selectedDetailComponent: selectedDetail && selectedDetail.component,
-          isLoggedIn: state.getIn(["user", "loggedIn"]),
+          isLoggedIn: state.getIn(["account", "loggedIn"]),
         };
       };
 
