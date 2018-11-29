@@ -7,7 +7,7 @@ import { getIn } from "../utils.js";
 
 const initialState = Immutable.fromJS({
   initialLoadFinished: false,
-  processingCreate: false,
+  processingPublish: false,
   logoutInProcess: false,
   loginInProcess: false,
   loginInProcessFor: undefined,
