@@ -81,16 +81,6 @@ const reducers = {
     (action.type === actionTypes.initialPageLoad &&
       getIn(action, ["payload", "initialLoadFinished"])),
 
-  modalDialog: (modalDialog = undefined, action = {}) => {
-    switch (action.type) {
-      case actionTypes.openModalDialog:
-        return Immutable.fromJS(action.payload);
-      case actionTypes.closeModalDialog:
-      default:
-        return modalDialog;
-    }
-  },
-
   creatingWhatsX: (creatingWhatsX = false, action = {}) => {
     switch (action.type) {
       case actionTypes.needs.whatsNew:

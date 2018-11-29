@@ -12,6 +12,7 @@ const initialState = Immutable.fromJS({
   showAddMessageContent: false,
   selectedAddMessageContent: undefined,
   showModalDialog: false,
+  modalDialog: undefined,
 });
 
 export default function(viewState = initialState, action = {}) {
@@ -65,11 +66,17 @@ export default function(viewState = initialState, action = {}) {
     case actionTypes.showClosedNeedsDisplay:
       return viewState.set("showClosedNeeds", true);
 
-    case actionTypes.openModalDialog:
-      return viewState.set("showModalDialog", true);
+    case actionTypes.openModalDialog: {
+      const modalDialog = Immutable.fromJS(action.payload);
+      return viewState
+        .set("showModalDialog", true)
+        .set("modalDialog", modalDialog);
+    }
 
     case actionTypes.closeModalDialog:
-      return viewState.set("showModalDialog", false);
+      return viewState
+        .set("showModalDialog", false)
+        .set("modalDialog", undefined);
 
     default:
       return viewState;
