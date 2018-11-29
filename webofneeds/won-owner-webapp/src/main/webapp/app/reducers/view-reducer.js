@@ -57,14 +57,14 @@ export default function(viewState = initialState, action = {}) {
     case actionTypes.view.removeAddMessageContent:
       return viewState.set("selectedAddMessageContent", undefined);
 
-    case actionTypes.openModalDialog: {
+    case actionTypes.view.openModalDialog: {
       const modalDialog = Immutable.fromJS(action.payload);
       return viewState
         .set("showModalDialog", true)
         .set("modalDialog", modalDialog);
     }
 
-    case actionTypes.closeModalDialog:
+    case actionTypes.view.closeModalDialog:
       return viewState
         .set("showModalDialog", false)
         .set("modalDialog", undefined);

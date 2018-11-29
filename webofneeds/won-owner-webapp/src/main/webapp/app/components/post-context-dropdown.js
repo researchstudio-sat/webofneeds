@@ -131,18 +131,18 @@ function genComponentConf() {
                   useCase: undefined,
                   postUri: undefined,
                 });
-                this.closeModalDialog();
+                this.view__closeModalDialog();
               },
             },
             {
               caption: "No, Keep It",
               callback: () => {
-                this.closeModalDialog();
+                this.view__closeModalDialog();
               },
             },
           ],
         };
-        this.openModalDialog(payload);
+        this.view__openModalDialog(payload);
       }
     }
 
