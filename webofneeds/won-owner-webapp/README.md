@@ -249,7 +249,7 @@ $ngRedux.getState();
     processingPublish: true|false, //default false, flag that is true if a need(or persona) is currently being created
     processingLogout: true|false, //default false, flag that indicates if a logout is currently in process
     initialLoadFinished: true|false, //flag that indicates if the initialLoad has been finished or not
-    loginInProcess: true|false, //default false flag that indicates if a login is currently in process
+    processingLogin: true|false, //default false flag that indicates if a login is currently in process
     processingLoginForEmail: undefined, //indicates which is user is currently being logged in undefined if nouser is currently being logged in, otherwise the email will be stored
  }
 }
