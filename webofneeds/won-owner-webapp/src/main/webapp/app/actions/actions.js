@@ -252,13 +252,15 @@ const actionHierarchy = {
     waitingForAnswer: INJ_DEFAULT,
   },
   account: {
+    login: accountLogin,
     loginStarted: INJ_DEFAULT,
     loginFailed: INJ_DEFAULT,
+
+    logout: accountLogout,
     logoutStarted: INJ_DEFAULT,
+
     register: accountRegister,
     transfer: accountTransfer,
-    login: accountLogin,
-    logout: accountLogout,
   },
   acceptDisclaimer: accountAcceptDisclaimer,
   acceptDisclaimerSuccess: INJ_DEFAULT,
