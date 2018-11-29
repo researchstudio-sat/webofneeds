@@ -88,7 +88,7 @@ export function accountLogin(credentials, options) {
     const prevEmail = state.getIn(["account", "email"]);
 
     const wasLoggedIn =
-      state.getIn(["process", "initialLoadFinished"]) &&
+      !state.getIn(["process", "processingInitialLoad"]) &&
       (prevPrivateId || prevEmail);
 
     if (
@@ -104,7 +104,7 @@ export function accountLogin(credentials, options) {
     }
 
     if (
-      state.getIn(["process", "initialLoadFinished"]) &&
+      !state.getIn(["process", "processingInitialLoad"]) &&
       ((credentials.privateId && credentials.privateId === prevPrivateId) ||
         (credentials.email && credentials.email === prevEmail))
     ) {
