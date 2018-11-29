@@ -38,12 +38,12 @@ function genComponentConf() {
             <button class="won-button--filled red post-info__footer__button"
                 ng-if="self.showCreateWhatsAround()"
                 ng-click="self.createWhatsAround()"
-                ng-disabled="self.pendingPublishing">
+                ng-disabled="self.processingPublish">
                 <svg class="won-button-icon" style="--local-primary:white;">
                     <use xlink:href="#ico36_location_current" href="#ico36_location_current"></use>
                 </svg>
-                <span ng-if="!self.pendingPublishing">What's in your Area?</span>
-                <span ng-if="self.pendingPublishing">Finding out what's going on&hellip;</span>
+                <span ng-if="!self.processingPublish">What's in your Area?</span>
+                <span ng-if="self.processingPublish">Finding out what's going on&hellip;</span>
             </button>
         </div>
     `;
@@ -51,9 +51,6 @@ function genComponentConf() {
   class Controller {
     constructor() {
       attach(this, serviceDependencies, arguments);
-
-      this.pendingPublishing = false;
-
       window.pi4dbg = this;
 
       const selectFromState = state => {
@@ -61,6 +58,7 @@ function genComponentConf() {
         const post = state.getIn(["needs", postUri]);
 
         return {
+          processingPublish: state.getIn(["process", "processingPublish"]),
           postUri,
           post,
           createdTimestamp: post && post.get("creationDate"),
@@ -85,8 +83,7 @@ function genComponentConf() {
     }
 
     createWhatsAround() {
-      if (!this.pendingPublishing) {
-        this.pendingPublishing = true;
+      if (!this.processingPublish) {
         this.needs__whatsAround();
       }
     }
