@@ -117,7 +117,7 @@ export function accountLogin(credentials, options) {
 
     const curriedDispatch = data =>
       dispatch({
-        type: actionTypes.login,
+        type: actionTypes.account.login,
         payload: Immutable.fromJS(data).merge({ email: email, loggedIn: true }),
       });
 
@@ -152,7 +152,7 @@ export function accountLogin(credentials, options) {
       .then(() => login(credentials))
       .then(data =>
         dispatch({
-          type: actionTypes.login,
+          type: actionTypes.account.login,
           payload: Immutable.fromJS(data).merge({
             email: email,
             loggedIn: true,
