@@ -10,6 +10,7 @@ import reduceReducers from "reduce-reducers";
 import needReducer from "./need-reducer/need-reducer-main.js";
 import accountReducer from "./account-reducer.js";
 import toastReducer from "./toast-reducer.js";
+import viewReducer from "./view-reducer.js";
 import { getIn } from "../utils.js";
 /*
  * this reducer attaches a 'router' object to our state that keeps the routing state.
@@ -36,6 +37,7 @@ const reducers = {
   needs: needReducer,
   messages: messagesReducer,
   toasts: toastReducer,
+  view: viewReducer,
 
   // contains the Date.now() of the last action
   // lastUpdateTime: (state = Date.now(), action = {}) => Date.now(),
@@ -78,27 +80,6 @@ const reducers = {
     state ||
     (action.type === actionTypes.initialPageLoad &&
       getIn(action, ["payload", "initialLoadFinished"])),
-
-  showRdf: (isShowingRdf = false, action = {}) => {
-    switch (action.type) {
-      case actionTypes.toggleRdfDisplay:
-        return !isShowingRdf;
-      default:
-        return isShowingRdf;
-    }
-  },
-  showClosedNeeds: (isShowingClosed = false, action = {}) => {
-    switch (action.type) {
-      case actionTypes.toggleClosedNeedsDisplay:
-        return !isShowingClosed;
-      case actionTypes.hideClosedNeedsDisplay:
-        return false;
-      case actionTypes.showClosedNeedsDisplay:
-        return true;
-      default:
-        return isShowingClosed;
-    }
-  },
 
   showMainMenu: (isShowingMainMenu = false, action = {}) => {
     switch (action.type) {
