@@ -52,7 +52,7 @@ class SignupController {
           rememberMe: this.rememberMe,
         });
       } else {
-        this.register({
+        this.account__register({
           email: this.email,
           password: this.password,
           rememberMe: this.rememberMe,

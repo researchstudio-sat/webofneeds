@@ -255,10 +255,10 @@ const actionHierarchy = {
     loginStarted: INJ_DEFAULT,
     loginFailed: INJ_DEFAULT,
     logoutStarted: INJ_DEFAULT,
+    register: accountRegister,
   },
   login: accountLogin, //loginSuccess
   logout: accountLogout,
-  register: accountRegister,
   transfer: accountTransfer,
   acceptDisclaimer: accountAcceptDisclaimer,
   acceptDisclaimerSuccess: INJ_DEFAULT,
