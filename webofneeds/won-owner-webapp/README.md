@@ -234,17 +234,17 @@ $ngRedux.getState();
      showClosedNeeds: true|false, //flag whether the drawer of the closedNeeds is open or closed (default is false)
      showMainMenu: true|false, //flag whether the mainmenu dropdown is open or closed (default is false)
      showModalDialog: true|false, //flag whether the omnipresent modal dialog is displayed or not (default is false)
- }
- modalDialog: {
-   caption: string, //header caption of the modal dialog
-   text: string,
-   buttons: [ //Array
-     {
-      caption: string //caption of the button
-      callback: callback //action of the button
-     }
-     ...
-   ]
+     modalDialog: {
+        caption: string, //header caption of the modal dialog
+        text: string,
+        buttons: [ //Array
+            {
+            caption: string //caption of the button
+            callback: callback //action of the button
+            }
+            ...
+        ]
+    }
  }
 }
 */

@@ -35,7 +35,7 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
 
       const selectFromState = state => {
-        const modalDialog = state.get("modalDialog");
+        const modalDialog = state.getIn(["view", "modalDialog"]);
         const modalDialogCaption = modalDialog && modalDialog.get("caption");
         const modalDialogText = modalDialog && modalDialog.get("text");
         const modalDialogButtons = modalDialog && modalDialog.get("buttons");
