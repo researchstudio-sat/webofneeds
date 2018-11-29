@@ -62,7 +62,7 @@ export default function(userData = initialState, action = {}) {
         acceptedDisclaimer: userData.get("acceptedDisclaimer"),
       });
 
-    case actionTypes.typedAtLoginCredentials:
+    case actionTypes.account.loginReset:
       if (!userData.get("loggedIn")) {
         return userData.set("loginError", undefined);
       } else {
