@@ -273,7 +273,7 @@ function reactToPrivateIdChanges(
     return Promise.resolve();
   }
 
-  if (state.getIn(["process", "logoutInProcess"])) {
+  if (state.getIn(["process", "processingLogout"])) {
     // already logging out
     return Promise.resolve();
   }
