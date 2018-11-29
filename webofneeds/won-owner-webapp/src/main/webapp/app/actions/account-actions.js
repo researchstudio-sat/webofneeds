@@ -45,7 +45,7 @@ export async function ensureLoggedIn(dispatch, getState) {
       `Creating temporary account (${privateId}) has failed due to `,
       err
     );
-    dispatch(actionCreators.registerFailed({ privateId }));
+    dispatch(actionCreators.account__registerFailed({ privateId }));
   }
 }
 
@@ -315,7 +315,9 @@ export function accountRegister(credentials) {
         const registerError =
           "Registration failed (E-Mail might already be used)";
         console.error(registerError, error);
-        dispatch(actionCreators.registerFailed({ registerError, error }));
+        dispatch(
+          actionCreators.account__registerFailed({ registerError, error })
+        );
       });
 }
 
@@ -338,7 +340,9 @@ export function accountTransfer(credentials) {
         //TODO: PRINT MORE SPECIFIC ERROR MESSAGE, already registered/password to short etc.
         const registerError = "Account Transfer failed";
         console.error(registerError, error);
-        dispatch(actionCreators.registerFailed({ registerError, error }));
+        dispatch(
+          actionCreators.account__registerFailed({ registerError, error })
+        );
       });
 }
 

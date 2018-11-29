@@ -75,7 +75,7 @@ export default function(userData = initialState, action = {}) {
         acceptedDisclaimer: userData.get("acceptedDisclaimer"),
       });
 
-    case actionTypes.registerFailed:
+    case actionTypes.account.registerFailed:
       return Immutable.fromJS({
         registerError: action.payload.registerError,
         acceptedDisclaimer: userData.get("acceptedDisclaimer"),

@@ -261,12 +261,13 @@ const actionHierarchy = {
 
     register: accountRegister,
     transfer: accountTransfer,
+    registerFailed: INJ_DEFAULT,
   },
   acceptDisclaimer: accountAcceptDisclaimer,
   acceptDisclaimerSuccess: INJ_DEFAULT,
   typedAtLoginCredentials: INJ_DEFAULT,
   registerReset: INJ_DEFAULT,
-  registerFailed: INJ_DEFAULT,
+
   geoLocationDenied: INJ_DEFAULT,
   lostConnection: INJ_DEFAULT,
   failedToGetLocation: INJ_DEFAULT,
