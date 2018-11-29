@@ -27,7 +27,7 @@ export default function(allToasts = initialState, action = {}) {
       );
     }
 
-    case actionTypes.registerFailed: {
+    case actionTypes.account.registerFailed: {
       const privateId = getIn(action, ["payload", "privateId"]);
       if (privateId) {
         return pushNewToast(
