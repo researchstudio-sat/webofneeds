@@ -8,6 +8,9 @@ import org.springframework.http.HttpStatus;
 public enum RestStatusResponse {
     USER_CREATED(1200, "User created", HttpStatus.CREATED),
     USER_TRANSFERRED(1201, "User Transfered", HttpStatus.CREATED),
+
+
+
     USER_SIGNED_OUT(1202, "User signed out", HttpStatus.OK),
     USER_NOT_FOUND(1400, "User not found", HttpStatus.NOT_FOUND),
     USER_NOT_SIGNED_IN(1401, "User not signed in", HttpStatus.UNAUTHORIZED),
@@ -28,7 +31,10 @@ public enum RestStatusResponse {
 
     SIGNUP_FAILED(4400, "Registration failed", HttpStatus.BAD_REQUEST),
 
-    SETTINGS_CREATED(5200, "Settings created", HttpStatus.CREATED);
+    SETTINGS_CREATED(5200, "Settings created", HttpStatus.CREATED),
+
+    TOS_ACCEPT_SUCCESS(6200, "Successfully accepted Terms Of Service", HttpStatus.OK),
+    TOS_ALREADY_ACCEPTED(6400, "User already accepted Terms Of Service", HttpStatus.CONFLICT);
 
     private final int code;
     private final String message;
