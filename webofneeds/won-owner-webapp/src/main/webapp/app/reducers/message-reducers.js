@@ -102,7 +102,7 @@ export function messagesReducer(messages = initialState, action = {}) {
       }
     }
 
-    case actionTypes.logout: {
+    case actionTypes.account.logout: {
       const logoutFinished = getIn(action, ["payload", "logoutFinished"]);
       const httpSessionDowngraded =
         !logoutFinished && getIn(action, ["payload", "httpSessionDowngraded"]);
@@ -120,7 +120,7 @@ export function messagesReducer(messages = initialState, action = {}) {
         return messages.set("reconnecting", true);
       } else {
         console.error(
-          "Got unexpected payload for `actionTypes.logout` ",
+          "Got unexpected payload for `actionTypes.account.logout` ",
           action
         );
         return messages;

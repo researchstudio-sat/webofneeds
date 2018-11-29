@@ -66,7 +66,7 @@ const reducers = {
       case actionTypes.account.logoutStarted:
         return true;
 
-      case actionTypes.logout:
+      case actionTypes.account.logout:
         return undefined;
 
       default:
@@ -106,7 +106,7 @@ const reducers = {
       case actionTypes.showMainMenuDisplay:
         return true;
 
-      case actionTypes.logout:
+      case actionTypes.account.logout:
       case actionTypes.toggleRdfDisplay:
       case actionTypes.account.login:
       case actionTypes.hideMainMenuDisplay:

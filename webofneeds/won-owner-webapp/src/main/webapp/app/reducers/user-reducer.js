@@ -49,7 +49,7 @@ export default function(userData = initialState, action = {}) {
       }
     }
 
-    case actionTypes.logout:
+    case actionTypes.account.logout:
       return Immutable.fromJS({
         loggedIn: false,
         acceptedDisclaimer: userData.get("acceptedDisclaimer"),

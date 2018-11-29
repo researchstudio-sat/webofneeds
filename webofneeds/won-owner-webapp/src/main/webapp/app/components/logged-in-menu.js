@@ -30,7 +30,7 @@ function genComponentConf() {
     <button
         class="won-button--filled lighterblue"
         style="width:100%"
-        ng-click="::self.logout()">
+        ng-click="::self.account__logout()">
         <span>Sign out</span>
     </button>
     `;
