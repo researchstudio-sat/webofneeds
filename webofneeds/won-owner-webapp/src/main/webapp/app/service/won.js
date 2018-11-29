@@ -41,7 +41,6 @@ let won = {};
  */
 
 won.debugmode = false; //if you set this to true, the created needs will get flagged as debug needs in order to get matches and requests from the debugbot
-won.showRdf = false; //if you set this to true, the RDF icons/links are visible
 
 won.clearPrivateId = clearPrivateId;
 won.clearReadUris = clearReadUris;
