@@ -34,7 +34,7 @@ class Controller {
         isOwnPost: isOwnPost,
         post,
         won: won.WON,
-        showModalDialog: state.get("showModalDialog"),
+        showModalDialog: state.getIn(["view", "showModalDialog"]),
       };
     };
 
