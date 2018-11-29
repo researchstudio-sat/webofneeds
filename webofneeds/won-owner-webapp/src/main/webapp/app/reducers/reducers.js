@@ -63,7 +63,7 @@ const reducers = {
 
   logoutInProcess: (logoutInProcess = undefined, action = {}) => {
     switch (action.type) {
-      case actionTypes.logoutStarted:
+      case actionTypes.user.logoutStarted:
         return true;
 
       case actionTypes.logout:
