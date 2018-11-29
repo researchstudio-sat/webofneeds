@@ -258,7 +258,6 @@ const actionHierarchy = {
     register: accountRegister,
     transfer: accountTransfer,
     registerFailed: INJ_DEFAULT,
-    registerReset: INJ_DEFAULT, //maybe this should be in the "view"-state (which we dont have yet)
 
     acceptDisclaimer: accountAcceptDisclaimer,
     acceptDisclaimerSuccess: INJ_DEFAULT,
@@ -293,7 +292,8 @@ const actionHierarchy = {
     showModalDialog: INJ_DEFAULT,
     hideModalDialog: INJ_DEFAULT,
 
-    clearLoginError: INJ_DEFAULT, //maybe this should be in the "view"-state (which we dont have yet)
+    clearLoginError: INJ_DEFAULT,
+    clearRegisterError: INJ_DEFAULT,
   },
 
   toasts: {
