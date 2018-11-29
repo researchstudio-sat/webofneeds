@@ -8,7 +8,7 @@ import { getIn } from "../utils.js";
 const initialState = Immutable.fromJS({
   initialLoadFinished: false,
   processingPublish: false,
-  logoutInProcess: false,
+  processingLogout: false,
   loginInProcess: false,
   loginInProcessFor: undefined,
 });
@@ -27,10 +27,10 @@ export default function(processState = initialState, action = {}) {
       return processState.set("processingPublish", false);
 
     case actionTypes.account.logoutStarted:
-      return processState.set("logoutInProcess", true);
+      return processState.set("processingLogout", true);
 
     case actionTypes.account.logout:
-      return processState.set("logoutInProcess", false);
+      return processState.set("processingLogout", false);
 
     case actionTypes.account.loginStarted:
       return processState
