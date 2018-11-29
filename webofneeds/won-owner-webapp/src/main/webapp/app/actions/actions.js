@@ -153,7 +153,6 @@ const actionHierarchy = {
     accessedNonLoadedPost: INJ_DEFAULT, //dispatched in configRouting.js
   },
   posts: {
-    load: INJ_DEFAULT,
     clean: INJ_DEFAULT,
   },
 
