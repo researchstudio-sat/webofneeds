@@ -59,7 +59,7 @@ export default function(allNeedsInState = initialState, action = {}) {
     case actionTypes.needs.clean:
       return initialState;
 
-    case actionTypes.loginStarted:
+    case actionTypes.user.loginStarted:
       // starting a new login process. this could mean switching
       // to a different session. we need to mark any needs
       // that are already loaded as non-owned.
