@@ -69,11 +69,8 @@ export default function(userData = initialState, action = {}) {
         return userData;
       }
 
-    case actionTypes.account.registerReset:
-      return Immutable.fromJS({
-        registerError: undefined,
-        acceptedDisclaimer: userData.get("acceptedDisclaimer"),
-      });
+    case actionTypes.view.clearRegisterError:
+      return userData.set("registerError", undefined);
 
     case actionTypes.account.registerFailed:
       return Immutable.fromJS({
