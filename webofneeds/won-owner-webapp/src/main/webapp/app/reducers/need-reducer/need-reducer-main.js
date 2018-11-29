@@ -80,7 +80,7 @@ export default function(allNeedsInState = initialState, action = {}) {
     }
     case actionTypes.initialPageLoad:
     case actionTypes.needs.fetchUnloadedNeeds:
-    case actionTypes.login: {
+    case actionTypes.account.login: {
       const activeNeedUris = action.payload.get("activeNeedUris");
       const inactiveNeedUris = action.payload.get("inactiveNeedUris");
       const inactiveNeedUrisLoading = action.payload.get(

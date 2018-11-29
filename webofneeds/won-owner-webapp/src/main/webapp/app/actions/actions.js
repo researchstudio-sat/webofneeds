@@ -257,8 +257,8 @@ const actionHierarchy = {
     logoutStarted: INJ_DEFAULT,
     register: accountRegister,
     transfer: accountTransfer,
+    login: accountLogin,
   },
-  login: accountLogin, //loginSuccess
   logout: accountLogout,
   acceptDisclaimer: accountAcceptDisclaimer,
   acceptDisclaimerSuccess: INJ_DEFAULT,

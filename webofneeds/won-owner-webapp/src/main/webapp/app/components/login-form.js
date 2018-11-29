@@ -15,7 +15,7 @@ import * as srefUtils from "../sref-utils.js";
 
 function genLoginConf() {
   let template = `
-        <form ng-submit="::self.login({email: self.email, password: self.password, rememberMe: self.rememberMe}, {redirectToFeed: false})"
+        <form ng-submit="::self.account__login({email: self.email, password: self.password, rememberMe: self.rememberMe}, {redirectToFeed: false})"
             id="loginForm"
             class="loginForm"
         >
@@ -91,7 +91,7 @@ function genLoginConf() {
     formKeyUp(event) {
       this.typedAtLoginCredentials();
       if (event.keyCode == 13) {
-        this.login(
+        this.account__login(
           {
             email: this.email,
             password: this.password,

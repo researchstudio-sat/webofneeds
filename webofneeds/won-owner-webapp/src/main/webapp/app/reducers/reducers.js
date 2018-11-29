@@ -46,7 +46,7 @@ const reducers = {
       case actionTypes.account.loginStarted:
         return getIn(action, ["payload", "email"]);
 
-      case actionTypes.login:
+      case actionTypes.account.login:
         if (getIn(action, ["payload", "loginFinished"])) {
           return undefined;
         } else {
@@ -108,7 +108,7 @@ const reducers = {
 
       case actionTypes.logout:
       case actionTypes.toggleRdfDisplay:
-      case actionTypes.login:
+      case actionTypes.account.login:
       case actionTypes.hideMainMenuDisplay:
         return false;
       default:
@@ -240,7 +240,7 @@ export default reduceReducers(
        * in the state.
        */
       case actionTypes.initialPageLoad:
-      case actionTypes.login:
+      case actionTypes.account.login:
       case actionTypes.messages.connectMessageSent:
       case actionTypes.messages.connectMessageReceived:
       case actionTypes.messages.hintMessageReceived:

@@ -83,7 +83,7 @@ export function messagesReducer(messages = initialState, action = {}) {
         : messages;
     }
 
-    case actionTypes.login: {
+    case actionTypes.account.login: {
       const loginFinished = getIn(action, ["payload", "loginFinished"]);
       const httpSessionUpgraded =
         !loginFinished && getIn(action, ["payload", "httpSessionUpgraded"]);
