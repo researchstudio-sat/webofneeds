@@ -81,22 +81,6 @@ const reducers = {
     (action.type === actionTypes.initialPageLoad &&
       getIn(action, ["payload", "initialLoadFinished"])),
 
-  selectedAddMessageContent: (
-    selectedAddMessageContent = undefined,
-    action = {}
-  ) => {
-    switch (action.type) {
-      case actionTypes.selectAddMessageContent:
-        return getIn(action, ["payload", "selectedDetail"]);
-      case actionTypes.toggleAddMessageContentDisplay:
-      case actionTypes.hideAddMessageContentDisplay:
-      case actionTypes.removeAddMessageContent:
-        return undefined;
-      default:
-        return selectedAddMessageContent;
-    }
-  },
-
   modalDialog: (modalDialog = undefined, action = {}) => {
     switch (action.type) {
       case actionTypes.openModalDialog:

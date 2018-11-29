@@ -326,7 +326,10 @@ function genComponentConf() {
         const hasClaimableMessages =
           claimableMessages && claimableMessages.size > 0;
 
-        const selectedDetailIdentifier = state.get("selectedAddMessageContent");
+        const selectedDetailIdentifier = state.getIn([
+          "view",
+          "selectedAddMessageContent",
+        ]);
         const selectedDetail =
           this.allMessageDetails &&
           selectedDetailIdentifier &&
