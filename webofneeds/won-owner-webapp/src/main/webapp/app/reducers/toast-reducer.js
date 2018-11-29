@@ -42,7 +42,7 @@ export default function(allToasts = initialState, action = {}) {
       }
     }
 
-    case actionTypes.user.loginFailed: {
+    case actionTypes.account.loginFailed: {
       const loginError = getIn(action, ["payload", "loginError"]);
       const errorCode = loginError && loginError.get("code");
       if (errorCode == won.RESPONSECODE.PRIVATEID_NOT_FOUND) {

@@ -55,7 +55,7 @@ export default function(userData = initialState, action = {}) {
         acceptedDisclaimer: userData.get("acceptedDisclaimer"),
       });
 
-    case actionTypes.user.loginFailed:
+    case actionTypes.account.loginFailed:
       return Immutable.fromJS({
         loginError: action.payload.loginError,
         loggedIn: false,

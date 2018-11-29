@@ -43,7 +43,7 @@ const reducers = {
 
   loginInProcessFor: (loginInProcessFor = undefined, action = {}) => {
     switch (action.type) {
-      case actionTypes.user.loginStarted:
+      case actionTypes.account.loginStarted:
         return getIn(action, ["payload", "email"]);
 
       case actionTypes.login:
@@ -53,7 +53,7 @@ const reducers = {
           return loginInProcessFor;
         }
 
-      case actionTypes.user.loginFailed:
+      case actionTypes.account.loginFailed:
         return undefined;
 
       default:
@@ -63,7 +63,7 @@ const reducers = {
 
   logoutInProcess: (logoutInProcess = undefined, action = {}) => {
     switch (action.type) {
-      case actionTypes.user.logoutStarted:
+      case actionTypes.account.logoutStarted:
         return true;
 
       case actionTypes.logout:
@@ -102,7 +102,7 @@ const reducers = {
 
   showMainMenu: (isShowingMainMenu = false, action = {}) => {
     switch (action.type) {
-      case actionTypes.user.loginFailed:
+      case actionTypes.account.loginFailed:
       case actionTypes.showMainMenuDisplay:
         return true;
 

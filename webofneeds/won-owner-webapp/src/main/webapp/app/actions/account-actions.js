@@ -125,7 +125,7 @@ export function accountLogin(credentials, options) {
       .then(() => {
         _loginInProcessFor = email;
         return dispatch({
-          type: actionTypes.user.loginStarted,
+          type: actionTypes.account.loginStarted,
           payload: { email },
         });
       })
@@ -196,7 +196,7 @@ export function accountLogin(credentials, options) {
               }
 
               dispatch(
-                actionCreators.user.loginFailed({
+                actionCreators.account.loginFailed({
                   loginError: Immutable.fromJS(loginError),
                   error,
                   credentials,
@@ -251,7 +251,7 @@ export function accountLogout(options) {
     return Promise.resolve()
       .then(() =>
         dispatch({
-          type: actionTypes.user.logoutStarted,
+          type: actionTypes.account.logoutStarted,
           payload: {},
         })
       )
