@@ -255,6 +255,7 @@ const actionHierarchy = {
     login: accountLogin,
     loginStarted: INJ_DEFAULT,
     loginFailed: INJ_DEFAULT,
+    loginReset: INJ_DEFAULT, //maybe this should be in the "view"-state (which we dont have yet)
 
     logout: accountLogout,
     logoutStarted: INJ_DEFAULT,
@@ -262,11 +263,10 @@ const actionHierarchy = {
     register: accountRegister,
     transfer: accountTransfer,
     registerFailed: INJ_DEFAULT,
-    registerReset: INJ_DEFAULT,
+    registerReset: INJ_DEFAULT, //maybe this should be in the "view"-state (which we dont have yet)
   },
   acceptDisclaimer: accountAcceptDisclaimer,
   acceptDisclaimerSuccess: INJ_DEFAULT,
-  typedAtLoginCredentials: INJ_DEFAULT,
 
   geoLocationDenied: INJ_DEFAULT,
   lostConnection: INJ_DEFAULT,
