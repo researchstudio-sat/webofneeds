@@ -18,7 +18,7 @@ const initialState = Immutable.fromJS({
 export default function(viewState = initialState, action = {}) {
   switch (action.type) {
     case actionTypes.account.loginFailed:
-    case actionTypes.showMainMenuDisplay:
+    case actionTypes.view.showMainMenuDisplay:
       return viewState.set("showMainMenu", true);
 
     case actionTypes.account.login:
