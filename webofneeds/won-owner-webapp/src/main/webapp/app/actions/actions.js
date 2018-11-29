@@ -279,14 +279,15 @@ const actionHierarchy = {
 
   view: {
     toggleRdfDisplay: INJ_DEFAULT,
+
     toggleClosedNeedsDisplay: INJ_DEFAULT,
+
     showMainMenuDisplay: INJ_DEFAULT,
     hideMainMenuDisplay: INJ_DEFAULT,
-  },
 
-  toggleAddMessageContentDisplay: INJ_DEFAULT,
-  showAddMessageContentDisplay: INJ_DEFAULT,
-  hideAddMessageContentDisplay: INJ_DEFAULT,
+    toggleAddMessageContentDisplay: INJ_DEFAULT,
+    hideAddMessageContentDisplay: INJ_DEFAULT,
+  },
 
   selectAddMessageContent: INJ_DEFAULT,
   removeAddMessageContent: INJ_DEFAULT,

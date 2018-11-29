@@ -37,7 +37,7 @@ export default function(viewState = initialState, action = {}) {
         !viewState.get("showClosedNeeds")
       );
 
-    case actionTypes.toggleAddMessageContentDisplay:
+    case actionTypes.view.toggleAddMessageContentDisplay:
       return viewState
         .set("showAddMessageContent", !viewState.get("showAddMessageContent"))
         .set("selectedAddMessageContent", undefined);
@@ -49,10 +49,7 @@ export default function(viewState = initialState, action = {}) {
         .set("showAddMessageContent", true);
     }
 
-    case actionTypes.showAddMessageContentDisplay:
-      return viewState.set("showAddMessageContent", true);
-
-    case actionTypes.hideAddMessageContentDisplay:
+    case actionTypes.view.hideAddMessageContentDisplay:
       return viewState
         .set("showAddMessageContent", false)
         .set("selectedAddMessageContent", undefined);
