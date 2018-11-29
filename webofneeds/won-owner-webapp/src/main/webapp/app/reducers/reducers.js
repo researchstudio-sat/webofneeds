@@ -81,20 +81,6 @@ const reducers = {
     (action.type === actionTypes.initialPageLoad &&
       getIn(action, ["payload", "initialLoadFinished"])),
 
-  showAddMessageContent: (isShowingAddMessageContent = false, action = {}) => {
-    switch (action.type) {
-      case actionTypes.toggleAddMessageContentDisplay:
-        return !isShowingAddMessageContent;
-      case actionTypes.selectAddMessageContent:
-      case actionTypes.showAddMessageContentDisplay:
-        return true;
-      case actionTypes.hideAddMessageContentDisplay:
-        return false;
-      default:
-        return isShowingAddMessageContent;
-    }
-  },
-
   selectedAddMessageContent: (
     selectedAddMessageContent = undefined,
     action = {}

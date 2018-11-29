@@ -347,7 +347,7 @@ function genComponentConf() {
           connectionHasBeenLost:
             state.getIn(["messages", "reconnecting"]) ||
             state.getIn(["messages", "lostConnection"]),
-          showAddMessageContent: state.get("showAddMessageContent"),
+          showAddMessageContent: state.getIn(["view", "showAddMessageContent"]),
           selectedDetail,
           selectedDetailComponent: selectedDetail && selectedDetail.component,
           isLoggedIn: state.getIn(["account", "loggedIn"]),
