@@ -258,9 +258,9 @@ const actionHierarchy = {
   user: {
     loginStarted: INJ_DEFAULT,
     loginFailed: INJ_DEFAULT,
+    logoutStarted: INJ_DEFAULT,
   },
   login: accountLogin, //loginSuccess
-  logoutStarted: INJ_DEFAULT,
   logout: accountLogout,
   register: accountRegister,
   transfer: accountTransfer,

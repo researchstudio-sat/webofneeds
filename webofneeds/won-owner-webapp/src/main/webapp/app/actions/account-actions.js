@@ -251,7 +251,7 @@ export function accountLogout(options) {
     return Promise.resolve()
       .then(() =>
         dispatch({
-          type: actionTypes.logoutStarted,
+          type: actionTypes.user.logoutStarted,
           payload: {},
         })
       )
