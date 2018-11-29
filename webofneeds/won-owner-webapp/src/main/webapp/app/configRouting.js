@@ -262,7 +262,7 @@ function reactToPrivateIdChanges(
   const state = getState();
 
   const { email } = toPrivateId ? privateId2Credentials(toPrivateId) : {};
-  if (state.get("loginInProcessFor")) {
+  if (state.getIn(["process", "loginInProcess"])) {
     console.debug(
       "There's already a login in process with the email " +
         email +

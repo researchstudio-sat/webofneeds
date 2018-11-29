@@ -45,26 +45,6 @@ const reducers = {
   // lastUpdateTime: (state = Date.now(), action = {}) => Date.now(),
   lastUpdateTime: () => Date.now(),
 
-  loginInProcessFor: (loginInProcessFor = undefined, action = {}) => {
-    switch (action.type) {
-      case actionTypes.account.loginStarted:
-        return getIn(action, ["payload", "email"]);
-
-      case actionTypes.account.login:
-        if (getIn(action, ["payload", "loginFinished"])) {
-          return undefined;
-        } else {
-          return loginInProcessFor;
-        }
-
-      case actionTypes.account.loginFailed:
-        return undefined;
-
-      default:
-        return loginInProcessFor;
-    }
-  },
-
   initialLoadFinished: (state = false, action = {}) =>
     state ||
     (action.type === actionTypes.initialPageLoad &&
