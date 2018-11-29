@@ -53,6 +53,12 @@ export default function(viewState = initialState, action = {}) {
     case actionTypes.showClosedNeedsDisplay:
       return viewState.set("showClosedNeeds", true);
 
+    case actionTypes.openModalDialog:
+      return viewState.set("showModalDialog", true);
+
+    case actionTypes.closeModalDialog:
+      return viewState.set("showModalDialog", false);
+
     default:
       return viewState;
   }

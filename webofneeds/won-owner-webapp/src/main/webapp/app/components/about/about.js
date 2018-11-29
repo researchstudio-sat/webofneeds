@@ -217,7 +217,7 @@ class AboutController {
           getIn(state, ["config", "theme", "privacyPolicyTemplate"]),
         peopleGrid: peopleGrid({ themeName }),
         pendingPublishing: state.get("creatingWhatsX"),
-        showModalDialog: state.get("showModalDialog"),
+        showModalDialog: state.getIn(["view", "showModalDialog"]),
       };
     };
     const disconnect = this.$ngRedux.connect(select, actionCreators)(this);
