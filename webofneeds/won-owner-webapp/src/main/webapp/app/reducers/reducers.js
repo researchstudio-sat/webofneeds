@@ -94,7 +94,6 @@ const reducers = {
     }
   },
 
-  //config: createReducer(
   config: (
     config = Immutable.fromJS({ theme: { name: "current" } }),
     action = {}

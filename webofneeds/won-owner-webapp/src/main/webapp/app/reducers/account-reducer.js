@@ -62,7 +62,7 @@ export default function(userData = initialState, action = {}) {
         acceptedDisclaimer: userData.get("acceptedDisclaimer"),
       });
 
-    case actionTypes.account.loginReset:
+    case actionTypes.view.clearLoginError:
       if (!userData.get("loggedIn")) {
         return userData.set("loginError", undefined);
       } else {
