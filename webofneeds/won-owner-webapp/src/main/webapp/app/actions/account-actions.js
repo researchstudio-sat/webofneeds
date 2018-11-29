@@ -125,7 +125,7 @@ export function accountLogin(credentials, options) {
       .then(() => {
         _loginInProcessFor = email;
         return dispatch({
-          type: actionTypes.loginStarted,
+          type: actionTypes.user.loginStarted,
           payload: { email },
         });
       })
@@ -196,7 +196,7 @@ export function accountLogin(credentials, options) {
               }
 
               dispatch(
-                actionCreators.loginFailed({
+                actionCreators.user.loginFailed({
                   loginError: Immutable.fromJS(loginError),
                   error,
                   credentials,

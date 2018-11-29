@@ -255,10 +255,11 @@ const actionHierarchy = {
 
     waitingForAnswer: INJ_DEFAULT,
   },
-  //anonymousLogin: anonAccountLogin,
-  loginStarted: INJ_DEFAULT,
+  user: {
+    loginStarted: INJ_DEFAULT,
+    loginFailed: INJ_DEFAULT,
+  },
   login: accountLogin, //loginSuccess
-  loginFailed: INJ_DEFAULT,
   logoutStarted: INJ_DEFAULT,
   logout: accountLogout,
   register: accountRegister,
