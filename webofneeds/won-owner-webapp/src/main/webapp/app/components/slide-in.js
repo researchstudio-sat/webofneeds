@@ -63,7 +63,7 @@ function genSlideInConf() {
             </span>
             <button
               class="si__button"
-              ng-click="self.acceptTermsOfService()">
+              ng-click="self.account__acceptTermsOfService()">
                 Accept
             </button>
         </div>
@@ -135,10 +135,6 @@ function genSlideInConf() {
       delay(2000).then(() => {
         this.clickedResend = false;
       });
-    }
-
-    acceptTermsOfService() {
-      //TODO: IMPL ME
     }
   }
   Controller.$inject = serviceDependencies;

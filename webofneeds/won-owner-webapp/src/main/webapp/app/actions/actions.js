@@ -73,6 +73,7 @@ import {
   accountRegister,
   accountTransfer,
   accountAcceptDisclaimer,
+  accountAcceptTermsOfService,
   reconnect,
 } from "./account-actions.js";
 
@@ -261,6 +262,10 @@ const actionHierarchy = {
 
     acceptDisclaimer: accountAcceptDisclaimer,
     acceptDisclaimerSuccess: INJ_DEFAULT,
+
+    acceptTermsOfService: accountAcceptTermsOfService,
+    acceptTermsOfServiceSuccess: INJ_DEFAULT,
+    acceptTermsOfServiceFailed: INJ_DEFAULT,
   },
 
   geoLocationDenied: INJ_DEFAULT,

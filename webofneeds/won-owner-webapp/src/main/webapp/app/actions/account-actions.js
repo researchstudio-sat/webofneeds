@@ -354,6 +354,12 @@ export function accountAcceptDisclaimer() {
   };
 }
 
+export function accountAcceptTermsOfService() {
+  return (/*dispatch, getState*/) => {
+    //TODO IMPL
+  };
+}
+
 export function reconnect() {
   return async (dispatch, getState) => {
     dispatch({ type: actionTypes.reconnect.start });
