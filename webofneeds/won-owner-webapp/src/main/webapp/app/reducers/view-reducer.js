@@ -14,8 +14,19 @@ const initialState = Immutable.fromJS({
 
 export default function(viewState = initialState, action = {}) {
   switch (action.type) {
+    case actionTypes.account.loginFailed:
+    case actionTypes.showMainMenuDisplay:
+      return viewState.set("showMainMenu", true);
+
+    case actionTypes.account.login:
+    case actionTypes.account.logout:
+    case actionTypes.hideMainMenuDisplay:
+      return viewState.set("showMainMenu", false);
+
     case actionTypes.toggleRdfDisplay:
-      return viewState.set("showRdf", !viewState.get("showRdf"));
+      return viewState
+        .set("showRdf", !viewState.get("showRdf"))
+        .set("showMainMenu", false);
 
     case actionTypes.toggleClosedNeedsDisplay:
       return viewState.set(

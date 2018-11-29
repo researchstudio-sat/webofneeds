@@ -40,7 +40,7 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
 
       const selectFromState = state => ({
-        showMainMenu: state.get("showMainMenu"),
+        showMainMenu: state.getIn(["view", "showMainMenu"]),
       });
 
       connect2Redux(selectFromState, actionCreators, [], this);
