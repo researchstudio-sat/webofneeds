@@ -277,7 +277,10 @@ const actionHierarchy = {
     connectionFailedToLoad: INJ_DEFAULT,
   },
 
-  toggleRdfDisplay: INJ_DEFAULT,
+  view: {
+    toggleRdfDisplay: INJ_DEFAULT,
+  },
+
   toggleClosedNeedsDisplay: INJ_DEFAULT,
   hideClosedNeedsDisplay: INJ_DEFAULT,
   showClosedNeedsDisplay: INJ_DEFAULT,

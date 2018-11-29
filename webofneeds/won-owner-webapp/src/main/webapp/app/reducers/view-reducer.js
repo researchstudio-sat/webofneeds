@@ -26,7 +26,7 @@ export default function(viewState = initialState, action = {}) {
     case actionTypes.hideMainMenuDisplay:
       return viewState.set("showMainMenu", false);
 
-    case actionTypes.toggleRdfDisplay:
+    case actionTypes.view.toggleRdfDisplay:
       return viewState
         .set("showRdf", !viewState.get("showRdf"))
         .set("showMainMenu", false);
