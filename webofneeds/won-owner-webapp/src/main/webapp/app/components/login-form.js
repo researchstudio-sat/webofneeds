@@ -53,7 +53,7 @@ function genLoginConf() {
         </form>
         <div class="wl__register">
             No account yet?
-            <a href="{{ self.absHRef(self.$state, 'signup') }}" ng-click="self.hideMainMenuDisplay()">
+            <a href="{{ self.absHRef(self.$state, 'signup') }}" ng-click="self.view__hideMainMenuDisplay()">
                 Sign up
             </a>
         </div>`;
