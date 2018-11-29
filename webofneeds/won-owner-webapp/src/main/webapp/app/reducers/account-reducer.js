@@ -81,7 +81,7 @@ export default function(userData = initialState, action = {}) {
         acceptedDisclaimer: userData.get("acceptedDisclaimer"),
       });
 
-    case actionTypes.acceptDisclaimerSuccess:
+    case actionTypes.account.acceptDisclaimerSuccess:
       return userData.set("acceptedDisclaimer", true);
 
     default:

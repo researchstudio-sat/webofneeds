@@ -19,7 +19,7 @@ class StartupTest(unittest.TestCase):
     
     def test_startup(self):
         element = WebDriverWait(self.driver, 30).until(
-            EC.visibility_of_element_located((By.CSS_SELECTOR, "won-topnav button[ng-click=\"self.acceptDisclaimer()\"]"))
+            EC.visibility_of_element_located((By.CSS_SELECTOR, "won-topnav button[ng-click=\"self.account__acceptDisclaimer()\"]"))
         )
         screenshot_folder = os.getenv('SCREENSHOT_PATH', '/tmp')
         self.driver.save_screenshot(screenshot_folder + '/disclaimer.png')

@@ -91,7 +91,7 @@ function genSlideInConf() {
                 </a>
 	  		    </div>
             <button
-                ng-click="self.acceptDisclaimer()"
+                ng-click="self.account__acceptDisclaimer()"
                 class="si__smallbutton">
                     Ok, I'll keep that in mind
             </button>
