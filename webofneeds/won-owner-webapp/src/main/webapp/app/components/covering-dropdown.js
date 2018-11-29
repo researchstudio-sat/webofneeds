@@ -16,7 +16,7 @@ function genComponentConf() {
         ng-transclude="header"
         class="dd__open-button clickable"
         ng-class="{ 'dd--closed' : !self.showMainMenu }"
-        ng-click="self.showMainMenuDisplay()"
+        ng-click="self.view__showMainMenuDisplay()"
       >
       </div>
       <div class="dd__dropdown" ng-show="self.showMainMenu">
