@@ -152,9 +152,6 @@ const actionHierarchy = {
     back: stateBack,
     accessedNonLoadedPost: INJ_DEFAULT, //dispatched in configRouting.js
   },
-  posts: {
-    clean: INJ_DEFAULT,
-  },
 
   /**
    * Server triggered interactions (aka received messages)
