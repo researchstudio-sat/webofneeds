@@ -250,7 +250,7 @@ $ngRedux.getState();
     processingLogout: true|false, //default false, flag that indicates if a logout is currently in process
     initialLoadFinished: true|false, //flag that indicates if the initialLoad has been finished or not
     loginInProcess: true|false, //default false flag that indicates if a login is currently in process
-    loginInProcessFor: undefined, //indicates which is user is currently being logged in undefined if nouser is currently being logged in, otherwise the email will be stored
+    processingLoginForEmail: undefined, //indicates which is user is currently being logged in undefined if nouser is currently being logged in, otherwise the email will be stored
  }
 }
 */

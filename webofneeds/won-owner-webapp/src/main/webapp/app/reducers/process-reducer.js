@@ -10,7 +10,7 @@ const initialState = Immutable.fromJS({
   processingPublish: false,
   processingLogout: false,
   loginInProcess: false,
-  loginInProcessFor: undefined,
+  processingLoginForEmail: undefined,
 });
 
 export default function(processState = initialState, action = {}) {
@@ -35,13 +35,13 @@ export default function(processState = initialState, action = {}) {
     case actionTypes.account.loginStarted:
       return processState
         .set("loginInProcess", true)
-        .set("loginInProcessFor", getIn(action, ["payload", "email"]));
+        .set("processingLoginForEmail", getIn(action, ["payload", "email"]));
 
     case actionTypes.account.login: {
       if (getIn(action, ["payload", "loginFinished"])) {
         return processState
           .set("loginInProcess", false)
-          .set("loginInProcessFor", undefined);
+          .set("processingLoginForEmail", undefined);
       }
       return processState;
     }
@@ -49,7 +49,7 @@ export default function(processState = initialState, action = {}) {
     case actionTypes.account.loginFailed:
       return processState
         .set("loginInProcess", false)
-        .set("loginInProcessFor", undefined);
+        .set("processingLoginForEmail", undefined);
 
     case actionTypes.initialPageLoad: {
       if (processState.get("initialLoadFinished")) {

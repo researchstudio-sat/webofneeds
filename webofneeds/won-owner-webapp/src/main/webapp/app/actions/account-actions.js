@@ -92,7 +92,7 @@ export function accountLogin(credentials, options) {
       (prevPrivateId || prevEmail);
 
     if (
-      state.getIn(["process", "loginInProcessFor"]) === email ||
+      state.getIn(["process", "processingLoginForEmail"]) === email ||
       _loginInProcessFor === email
     ) {
       console.debug(
