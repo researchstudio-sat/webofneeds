@@ -271,7 +271,7 @@ export function accountLogout(options) {
       })
       .then(() =>
         dispatch({
-          type: actionTypes.logout,
+          type: actionTypes.account.logout,
           payload: Immutable.fromJS({
             loggedIn: false,
             httpSessionDowngraded: true,
@@ -290,7 +290,7 @@ export function accountLogout(options) {
       })
       .then(() =>
         dispatch({
-          type: actionTypes.logout,
+          type: actionTypes.account.logout,
           payload: Immutable.fromJS({ loggedIn: false, logoutFinished: true }),
         })
       );
@@ -392,7 +392,7 @@ export function reconnect() {
       );
     } catch (e) {
       if (e.message == "Unauthorized") {
-        dispatch({ type: actionTypes.logout });
+        dispatch({ type: actionTypes.account.logout });
         dispatch({ type: actionTypes.showMainMenuDisplay });
       } else {
         dispatch(actionCreators.lostConnection());
