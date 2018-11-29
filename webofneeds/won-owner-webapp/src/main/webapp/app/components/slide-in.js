@@ -63,9 +63,13 @@ function genSlideInConf() {
             </span>
             <button
               class="si__button"
+              ng-if="!self.processingAcceptTermsOfService"
               ng-click="self.account__acceptTermsOfService()">
                 Accept
             </button>
+            <svg class="hspinner" ng-if="self.processingAcceptTermsOfService">
+                <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
+            </svg>
         </div>
         <div class="slide-in" ng-class="{'visible': !self.acceptedDisclaimer}">
             <svg class="si__icon" style="--local-primary:white;">
@@ -114,6 +118,10 @@ function genSlideInConf() {
         return {
           acceptedDisclaimer: state.getIn(["account", "acceptedDisclaimer"]),
           emailVerified: state.getIn(["account", "emailVerified"]),
+          processingAcceptTermsOfService: state.getIn([
+            "process",
+            "processingAcceptTermsOfService",
+          ]),
           acceptedTermsOfService: state.getIn([
             "account",
             "acceptedTermsOfService",
