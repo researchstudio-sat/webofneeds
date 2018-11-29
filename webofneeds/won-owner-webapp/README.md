@@ -90,7 +90,6 @@ $ngRedux.getState();
    events: {...},
    unreadEventUris: {...},
  },
- initialLoadFinished: true|false,
  lastUpdateTime: timeinmillis,
  messages: {
    enqueued: {...},
@@ -249,6 +248,9 @@ $ngRedux.getState();
  process: {
     creatingWhatsX: true|false, //flag that is true if a whatsX need is currently being created
     logoutInProcess: true|false, //flag that indicates if a logout is currently in process
+    initialLoadFinished: true|false, //flag that indicates if the initialLoad has been finished or not
+    loginInProcess: true|false, //flag that indicates if a login is currently in process
+    loginInProcessFor: undefined, //flag that indicates which is user is currently being logged in
  }
 }
 */

@@ -188,7 +188,7 @@ export function accessControl({
 
     case defaultRoute: //Route the 'default' view at all times
       // if(
-      //     state.get('initialLoadFinished') &&  // no access control while still loading
+      //     state.getIn(["process", "initialLoadFinished"]) &&  // no access control while still loading
       //     getIn(state, ['user', 'loggedIn']))
       // {
       //     //logged in -- re-initiate route-change
@@ -211,7 +211,7 @@ export function accessControl({
 
     default:
       //FOR ALL OTHER ROUTES
-      if (state.get("initialLoadFinished")) {
+      if (state.getIn(["process", "initialLoadFinished"])) {
         if (state.getIn(["account", "loggedIn"])) {
           return; // logged in. continue route-change as intended.
         } else {
@@ -279,7 +279,7 @@ function reactToPrivateIdChanges(
   }
 
   // v--- do any login-actions only when privateId is added after initialPageLoad. The latter should handle any necessary logins itself.
-  if (state.get("initialLoadFinished")) {
+  if (state.getIn(["process", "initialLoadFinished"])) {
     if (fromPrivateId !== toPrivateId) {
       // privateId has changed or was added
       const credentials = { privateId: toPrivateId };
