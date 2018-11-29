@@ -482,7 +482,7 @@ function genComponentConf() {
       if (!value) {
         this.additionalContent.delete(name);
         if (closeOnDelete) {
-          this.view__hideAddMessageContentDisplay();
+          this.view__hideAddMessageContent();
         }
       } else {
         this.additionalContent.set(name, value);
@@ -638,7 +638,7 @@ function genComponentConf() {
 
     toggleAdditionalContentDisplay() {
       this.cancelMultiSelect();
-      this.view__toggleAddMessageContentDisplay();
+      this.view__toggleAddMessageContent();
     }
   }
   Controller.$inject = serviceDependencies;

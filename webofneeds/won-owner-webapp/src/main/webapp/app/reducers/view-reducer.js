@@ -18,26 +18,26 @@ const initialState = Immutable.fromJS({
 export default function(viewState = initialState, action = {}) {
   switch (action.type) {
     case actionTypes.account.loginFailed:
-    case actionTypes.view.showMainMenuDisplay:
+    case actionTypes.view.showMainMenu:
       return viewState.set("showMainMenu", true);
 
     case actionTypes.account.login:
     case actionTypes.account.logout:
-    case actionTypes.view.hideMainMenuDisplay:
+    case actionTypes.view.hideMainMenu:
       return viewState.set("showMainMenu", false);
 
-    case actionTypes.view.toggleRdfDisplay:
+    case actionTypes.view.toggleRdf:
       return viewState
         .set("showRdf", !viewState.get("showRdf"))
         .set("showMainMenu", false);
 
-    case actionTypes.view.toggleClosedNeedsDisplay:
+    case actionTypes.view.toggleClosedNeeds:
       return viewState.set(
         "showClosedNeeds",
         !viewState.get("showClosedNeeds")
       );
 
-    case actionTypes.view.toggleAddMessageContentDisplay:
+    case actionTypes.view.toggleAddMessageContent:
       return viewState
         .set("showAddMessageContent", !viewState.get("showAddMessageContent"))
         .set("selectedAddMessageContent", undefined);
@@ -49,7 +49,7 @@ export default function(viewState = initialState, action = {}) {
         .set("showAddMessageContent", true);
     }
 
-    case actionTypes.view.hideAddMessageContentDisplay:
+    case actionTypes.view.hideAddMessageContent:
       return viewState
         .set("showAddMessageContent", false)
         .set("selectedAddMessageContent", undefined);
@@ -57,14 +57,14 @@ export default function(viewState = initialState, action = {}) {
     case actionTypes.view.removeAddMessageContent:
       return viewState.set("selectedAddMessageContent", undefined);
 
-    case actionTypes.view.openModalDialog: {
+    case actionTypes.view.showModalDialog: {
       const modalDialog = Immutable.fromJS(action.payload);
       return viewState
         .set("showModalDialog", true)
         .set("modalDialog", modalDialog);
     }
 
-    case actionTypes.view.closeModalDialog:
+    case actionTypes.view.hideModalDialog:
       return viewState
         .set("showModalDialog", false)
         .set("modalDialog", undefined);
