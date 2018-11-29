@@ -81,22 +81,6 @@ const reducers = {
     (action.type === actionTypes.initialPageLoad &&
       getIn(action, ["payload", "initialLoadFinished"])),
 
-  showMainMenu: (isShowingMainMenu = false, action = {}) => {
-    switch (action.type) {
-      case actionTypes.account.loginFailed:
-      case actionTypes.showMainMenuDisplay:
-        return true;
-
-      case actionTypes.account.logout:
-      case actionTypes.toggleRdfDisplay:
-      case actionTypes.account.login:
-      case actionTypes.hideMainMenuDisplay:
-        return false;
-      default:
-        return isShowingMainMenu;
-    }
-  },
-
   showAddMessageContent: (isShowingAddMessageContent = false, action = {}) => {
     switch (action.type) {
       case actionTypes.toggleAddMessageContentDisplay:
