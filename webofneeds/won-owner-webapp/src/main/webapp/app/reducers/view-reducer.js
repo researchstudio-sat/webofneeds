@@ -31,7 +31,7 @@ export default function(viewState = initialState, action = {}) {
         .set("showRdf", !viewState.get("showRdf"))
         .set("showMainMenu", false);
 
-    case actionTypes.toggleClosedNeedsDisplay:
+    case actionTypes.view.toggleClosedNeedsDisplay:
       return viewState.set(
         "showClosedNeeds",
         !viewState.get("showClosedNeeds")
@@ -59,12 +59,6 @@ export default function(viewState = initialState, action = {}) {
 
     case actionTypes.removeAddMessageContent:
       return viewState.set("selectedAddMessageContent", undefined);
-
-    case actionTypes.hideClosedNeedsDisplay:
-      return viewState.set("showClosedNeeds", false);
-
-    case actionTypes.showClosedNeedsDisplay:
-      return viewState.set("showClosedNeeds", true);
 
     case actionTypes.openModalDialog: {
       const modalDialog = Immutable.fromJS(action.payload);

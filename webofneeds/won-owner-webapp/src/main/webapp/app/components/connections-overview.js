@@ -338,7 +338,7 @@ function genComponentConf() {
       if (this.unloadedNeedsSize > 0) {
         this.needs__fetchUnloadedNeeds();
       }
-      this.toggleClosedNeedsDisplay();
+      this.view__toggleClosedNeedsDisplay();
     }
 
     isOpen(ownedNeedUri) {
