@@ -42,6 +42,13 @@ export default function(allToasts = initialState, action = {}) {
       }
     }
 
+    case actionTypes.account.acceptTermsOfServiceFailed:
+      return pushNewToast(
+        allToasts,
+        "Failed to accept Terms Of Service",
+        won.WON.errorToast
+      );
+
     case actionTypes.account.loginFailed: {
       const loginError = getIn(action, ["payload", "loginError"]);
       const errorCode = loginError && loginError.get("code");

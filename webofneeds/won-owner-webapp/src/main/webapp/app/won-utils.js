@@ -215,12 +215,31 @@ export function resendEmailVerification(email) {
   };
   return fetch(url, httpOptions)
     .then(resp => {
-      console.log("resendEmailVerification Response: ", resp.json());
       return resp.json();
     })
     .catch(error => {
-      console.log("resendEmailVerification Error: ", error);
       return error;
+    });
+}
+
+/**
+ * Accept the Terms Of Service
+ */
+export function acceptTermsOfService() {
+  const url = urljoin(ownerBaseUrl, "/rest/users/acceptTermsOfService");
+  const httpOptions = {
+    method: "post",
+    headers: {
+      Accept: "application/json",
+    },
+    credentials: "include",
+  };
+  return fetch(url, httpOptions)
+    .then(resp => {
+      return resp.json();
+    })
+    .catch(error => {
+      return error.json();
     });
 }
 

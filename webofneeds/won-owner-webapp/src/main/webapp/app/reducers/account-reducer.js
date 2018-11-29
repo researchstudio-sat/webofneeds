@@ -49,6 +49,11 @@ export default function(userData = initialState, action = {}) {
       }
     }
 
+    case actionTypes.account.acceptTermsOfServiceSuccess:
+      return userData.set("acceptedTermsOfService", true);
+    case actionTypes.account.acceptTermsOfServiceFailed:
+      return userData.set("acceptedTermsOfService", false);
+
     case actionTypes.account.logout:
       return Immutable.fromJS({
         loggedIn: false,

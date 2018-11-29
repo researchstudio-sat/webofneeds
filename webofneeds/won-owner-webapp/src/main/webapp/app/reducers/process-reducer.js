@@ -11,18 +11,19 @@ const initialState = Immutable.fromJS({
   processingLogout: false,
   processingLogin: false,
   processingLoginForEmail: undefined,
+  processingAcceptTermsOfService: false,
 });
 
 export default function(processState = initialState, action = {}) {
   switch (action.type) {
-    case actionTypes.persona.create:
+    case actionTypes.personas.create:
     case actionTypes.needs.create:
     case actionTypes.needs.whatsNew:
     case actionTypes.needs.whatsAround:
       return processState.set("processingPublish", true);
 
     case actionTypes.failedToGetLocation:
-    case actionTypes.persona.createSuccessful:
+    case actionTypes.personas.createSuccessful:
     case actionTypes.needs.createSuccessful:
       return processState.set("processingPublish", false);
 
@@ -36,6 +37,13 @@ export default function(processState = initialState, action = {}) {
       return processState
         .set("processingLogin", true)
         .set("processingLoginForEmail", getIn(action, ["payload", "email"]));
+
+    case actionTypes.account.acceptTermsOfServiceStarted:
+      return processState.set("processingAcceptTermsOfService", true);
+
+    case actionTypes.account.acceptTermsOfServiceSuccess:
+    case actionTypes.account.acceptTermsOfServiceFailed:
+      return processState.set("processingAcceptTermsOfService", false);
 
     case actionTypes.account.login: {
       if (getIn(action, ["payload", "loginFinished"])) {

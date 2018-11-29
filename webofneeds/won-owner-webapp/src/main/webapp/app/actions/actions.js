@@ -264,6 +264,7 @@ const actionHierarchy = {
     acceptDisclaimerSuccess: INJ_DEFAULT,
 
     acceptTermsOfService: accountAcceptTermsOfService,
+    acceptTermsOfServiceStarted: INJ_DEFAULT,
     acceptTermsOfServiceSuccess: INJ_DEFAULT,
     acceptTermsOfServiceFailed: INJ_DEFAULT,
   },

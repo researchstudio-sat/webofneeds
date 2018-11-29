@@ -9,6 +9,7 @@ import { fetchOwnedData } from "../won-message-utils.js";
 import {
   registerAccount,
   transferPrivateAccount,
+  acceptTermsOfService,
   login,
   logout,
   parseCredentials,
@@ -355,8 +356,15 @@ export function accountAcceptDisclaimer() {
 }
 
 export function accountAcceptTermsOfService() {
-  return (/*dispatch, getState*/) => {
-    //TODO IMPL
+  return dispatch => {
+    dispatch({ type: actionTypes.account.acceptTermsOfServiceStarted });
+    acceptTermsOfService()
+      .then(() => {
+        dispatch({ type: actionTypes.account.acceptTermsOfServiceSuccess });
+      })
+      .catch(() => {
+        dispatch({ type: actionTypes.account.acceptTermsOfServiceFailed });
+      });
   };
 }
 
