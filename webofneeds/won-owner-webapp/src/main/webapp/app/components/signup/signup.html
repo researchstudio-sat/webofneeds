@@ -56,7 +56,7 @@
             <span>Keep Postings</span>
         </button>
         <won-labelled-hr label="or" ng-if="self.isPrivateIdUser"></won-labelled-hr>
-        <button id="signup" class="won-button--filled red" ng-disabled="registerForm.$invalid" ng-click="::self.register({email: self.email, password: self.password, rememberMe: self.rememberMe})">
+        <button id="signup" class="won-button--filled red" ng-disabled="registerForm.$invalid" ng-click="::self.account__register({email: self.email, password: self.password, rememberMe: self.rememberMe})">
             <span ng-if="!self.isPrivateIdUser">That’s all we need. Let’s go!</span>
             <span ng-if="self.isPrivateIdUser">Start from Scratch</span>
         </button>
