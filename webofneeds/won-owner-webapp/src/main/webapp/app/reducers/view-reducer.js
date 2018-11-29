@@ -23,7 +23,7 @@ export default function(viewState = initialState, action = {}) {
 
     case actionTypes.account.login:
     case actionTypes.account.logout:
-    case actionTypes.hideMainMenuDisplay:
+    case actionTypes.view.hideMainMenuDisplay:
       return viewState.set("showMainMenu", false);
 
     case actionTypes.view.toggleRdfDisplay:

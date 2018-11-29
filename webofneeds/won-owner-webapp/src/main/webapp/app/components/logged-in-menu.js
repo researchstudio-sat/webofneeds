@@ -17,13 +17,13 @@ function genComponentConf() {
         ng-if="self.isPrivateIdUser"
         href="{{ self.absHRef(self.$state, 'signup') }}"
         class="won-button--outlined thin red show-in-responsive"
-        ng-click="self.hideMainMenuDisplay()">
+        ng-click="self.view__hideMainMenuDisplay()">
         Sign up
     </a>
     <a
         href="{{ self.absHRef(self.$state, 'settings') }}"
         class="won-button--outlined thin red"
-        ng-click="self.hideMainMenuDisplay()">
+        ng-click="self.view__hideMainMenuDisplay()">
         <span>Account Settings</span>
     </a>
     <hr/>
