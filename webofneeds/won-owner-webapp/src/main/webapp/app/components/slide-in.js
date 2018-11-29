@@ -33,7 +33,7 @@ function genSlideInConf() {
                 <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
             </svg>
         </div>
-        <div class="slide-in" ng-class="{'visible': self.loggedIn && !self.emailVerified}">
+        <div class="slide-in" ng-class="{'visible': self.loggedIn && !self.connectionHasBeenLost && !self.emailVerified}">
             <svg class="si__icon" style="--local-primary:white;">
                 <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
             </svg>
@@ -50,7 +50,7 @@ function genSlideInConf() {
                 Resend E-Mail
             </button>
         </div>
-        <div class="slide-in" ng-class="{'visible': self.loggedIn && !self.acceptedTermsOfService}">
+        <div class="slide-in" ng-class="{'visible': self.loggedIn && !self.connectionHasBeenLost && !self.acceptedTermsOfService}">
             <svg class="si__icon" style="--local-primary:white;">
                 <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
             </svg>
@@ -71,7 +71,7 @@ function genSlideInConf() {
                 <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
             </svg>
         </div>
-        <div class="slide-in" ng-class="{'visible': !self.acceptedDisclaimer}">
+        <div class="slide-in" ng-class="{'visible': !self.connectionHasBeenLost && !self.acceptedDisclaimer}">
             <svg class="si__icon" style="--local-primary:white;">
                 <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_info"></use>
             </svg>
