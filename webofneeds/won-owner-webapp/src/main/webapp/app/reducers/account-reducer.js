@@ -69,7 +69,7 @@ export default function(userData = initialState, action = {}) {
         return userData;
       }
 
-    case actionTypes.registerReset:
+    case actionTypes.account.registerReset:
       return Immutable.fromJS({
         registerError: undefined,
         acceptedDisclaimer: userData.get("acceptedDisclaimer"),
