@@ -98,7 +98,7 @@ function genComponentConf() {
           hasSeeksBranch,
           post,
           createdTimestamp: post && post.get("creationDate"),
-          shouldShowRdf: state.get("showRdf"),
+          shouldShowRdf: state.getIn(["view", "showRdf"]),
           fromConnection: !!openConnectionUri,
           openConnectionUri,
         };

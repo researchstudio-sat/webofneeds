@@ -234,7 +234,7 @@ function genComponentConf() {
 
         return {
           allNeeds,
-          showClosedNeeds: state.get("showClosedNeeds"),
+          showClosedNeeds: state.getIn(["view", "showClosedNeeds"]),
           useCase,
           useCaseGroup,
           needUriInRoute,

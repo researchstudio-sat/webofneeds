@@ -92,7 +92,7 @@ function genComponentConf() {
           allConnections,
           multiSelectType: connection && connection.get("multiSelectType"),
           contentGraphTrig: get(message, "contentGraphTrigRaw"),
-          shouldShowRdf: state.get("showRdf"),
+          shouldShowRdf: state.getIn(["view", "showRdf"]),
           hasContent: message && message.get("hasContent"),
           hasNotBeenLoaded: !message,
           hasReferences,

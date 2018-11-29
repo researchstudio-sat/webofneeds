@@ -54,7 +54,7 @@ function genTopnavConf() {
         return {
           themeName: getIn(state, ["config", "theme", "name"]),
           appTitle: getIn(state, ["config", "theme", "title"]),
-          shouldShowRdf: state.get("showRdf"),
+          shouldShowRdf: state.getIn(["view", "showRdf"]),
         };
       };
 

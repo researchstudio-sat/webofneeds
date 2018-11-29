@@ -126,7 +126,7 @@ function genComponentConf() {
             ? getIn(connection, ["messages", this.messageUri])
             : Immutable.Map();
 
-        const shouldShowRdf = state.get("showRdf");
+        const shouldShowRdf = state.getIn(["view", "showRdf"]);
 
         let rdfLinkURL;
         if (shouldShowRdf && ownerBaseUrl && ownedNeed && message) {
