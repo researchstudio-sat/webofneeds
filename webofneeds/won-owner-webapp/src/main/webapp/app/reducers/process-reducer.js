@@ -6,7 +6,7 @@ import Immutable from "immutable";
 import { getIn } from "../utils.js";
 
 const initialState = Immutable.fromJS({
-  initialLoadFinished: false,
+  processingInitialLoad: true,
   processingPublish: false,
   processingLogout: false,
   processingLogin: false,
@@ -52,14 +52,14 @@ export default function(processState = initialState, action = {}) {
         .set("processingLoginForEmail", undefined);
 
     case actionTypes.initialPageLoad: {
-      if (processState.get("initialLoadFinished")) {
+      if (!processState.get("processingInitialLoad")) {
         return processState;
       } else {
         const initialLoadFinished = getIn(action, [
           "payload",
           "initialLoadFinished",
         ]);
-        return processState.set("initialLoadFinished", initialLoadFinished);
+        return processState.set("processingInitialLoad", !initialLoadFinished);
       }
     }
 
