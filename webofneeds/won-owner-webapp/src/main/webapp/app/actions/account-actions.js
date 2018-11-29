@@ -349,7 +349,7 @@ export function accountTransfer(credentials) {
 export function accountAcceptDisclaimer() {
   return dispatch => {
     setDisclaimerAccepted();
-    dispatch({ type: actionTypes.acceptDisclaimerSuccess });
+    dispatch({ type: actionTypes.account.acceptDisclaimerSuccess });
   };
 }
 

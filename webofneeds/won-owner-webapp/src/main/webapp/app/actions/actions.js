@@ -264,9 +264,10 @@ const actionHierarchy = {
     transfer: accountTransfer,
     registerFailed: INJ_DEFAULT,
     registerReset: INJ_DEFAULT, //maybe this should be in the "view"-state (which we dont have yet)
+
+    acceptDisclaimer: accountAcceptDisclaimer,
+    acceptDisclaimerSuccess: INJ_DEFAULT,
   },
-  acceptDisclaimer: accountAcceptDisclaimer,
-  acceptDisclaimerSuccess: INJ_DEFAULT,
 
   geoLocationDenied: INJ_DEFAULT,
   lostConnection: INJ_DEFAULT,
