@@ -91,7 +91,7 @@ export function accountLogin(credentials, options) {
       state.get("initialLoadFinished") && (prevPrivateId || prevEmail);
 
     if (
-      state.get("loginInProcessFor") === email ||
+      state.getIn(["process", "loginInProcessFor"]) === email ||
       _loginInProcessFor === email
     ) {
       console.debug(
