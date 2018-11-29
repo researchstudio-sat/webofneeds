@@ -7,7 +7,7 @@ import { getIn } from "../utils.js";
 
 const initialState = Immutable.fromJS({
   initialLoadFinished: false,
-  creatingWhatsX: false,
+  processingCreate: false,
   logoutInProcess: false,
   loginInProcess: false,
   loginInProcessFor: undefined,
@@ -17,11 +17,11 @@ export default function(processState = initialState, action = {}) {
   switch (action.type) {
     case actionTypes.needs.whatsNew:
     case actionTypes.needs.whatsAround:
-      return processState.set("creatingWhatsX", true);
+      return processState.set("processingPublish", true);
 
     case actionTypes.failedToGetLocation:
     case actionTypes.needs.createSuccessful:
-      return processState.set("creatingWhatsX", false);
+      return processState.set("processingPublish", false);
 
     case actionTypes.account.logoutStarted:
       return processState.set("logoutInProcess", true);

@@ -216,7 +216,7 @@ class AboutController {
           "/" +
           getIn(state, ["config", "theme", "privacyPolicyTemplate"]),
         peopleGrid: peopleGrid({ themeName }),
-        pendingPublishing: state.getIn(["process", "creatingWhatsX"]),
+        pendingPublishing: state.getIn(["process", "processingPublish"]),
         showModalDialog: state.getIn(["view", "showModalDialog"]),
       };
     };
