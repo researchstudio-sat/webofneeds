@@ -28,13 +28,13 @@ function genComponentConf($ngRedux) {
       scope.$watch("isValid", newValue => {
         elmApp.ports.publishIn.send({
           draftValid: newValue ? true : false,
-          loggedIn: $ngRedux.getState().getIn(["user", "loggedIn"]),
+          loggedIn: $ngRedux.getState().getIn(["account", "loggedIn"]),
         });
       });
 
       elmApp.ports.publishIn.send({
         draftValid: scope.isValid ? true : false,
-        loggedIn: $ngRedux.getState().getIn(["user", "loggedIn"]),
+        loggedIn: $ngRedux.getState().getIn(["account", "loggedIn"]),
       });
 
       const personas = getOwnedPersonas($ngRedux.getState());
@@ -45,7 +45,7 @@ function genComponentConf($ngRedux) {
       const disconnectOptions = $ngRedux.connect(state => {
         return {
           personas: getOwnedPersonas(state),
-          loggedIn: state.getIn(["user", "loggedIn"]),
+          loggedIn: state.getIn(["account", "loggedIn"]),
         };
       })(state => {
         elmApp.ports.publishIn.send({

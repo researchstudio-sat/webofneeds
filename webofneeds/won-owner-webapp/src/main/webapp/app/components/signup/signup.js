@@ -30,8 +30,8 @@ class SignupController {
       const privateId = getIn(state, ["router", "currentParams", "privateId"]);
 
       return {
-        loggedIn: state.getIn(["user", "loggedIn"]),
-        registerError: state.getIn(["user", "registerError"]),
+        loggedIn: state.getIn(["account", "loggedIn"]),
+        registerError: state.getIn(["account", "registerError"]),
         isPrivateIdUser: !!privateId,
         privateId,
         showModalDialog: state.get("showModalDialog"),

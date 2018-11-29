@@ -8,7 +8,7 @@ import { messagesReducer } from "./message-reducers.js";
 import { isChatConnection } from "../connection-utils.js";
 import reduceReducers from "reduce-reducers";
 import needReducer from "./need-reducer/need-reducer-main.js";
-import userReducer from "./user-reducer.js";
+import accountReducer from "./account-reducer.js";
 import toastReducer from "./toast-reducer.js";
 import { getIn } from "../utils.js";
 /*
@@ -32,7 +32,7 @@ const reducers = {
     },
     */
 
-  user: userReducer,
+  account: accountReducer,
   needs: needReducer,
   messages: messagesReducer,
   toasts: toastReducer,

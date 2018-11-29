@@ -112,14 +112,14 @@ function genSlideInConf() {
 
       const selectFromState = state => {
         return {
-          acceptedDisclaimer: state.getIn(["user", "acceptedDisclaimer"]),
-          emailVerified: state.getIn(["user", "emailVerified"]),
+          acceptedDisclaimer: state.getIn(["account", "acceptedDisclaimer"]),
+          emailVerified: state.getIn(["account", "emailVerified"]),
           acceptedTermsOfService: state.getIn([
-            "user",
+            "account",
             "acceptedTermsOfService",
           ]),
-          loggedIn: state.getIn(["user", "loggedIn"]),
-          email: state.getIn(["user", "email"]),
+          loggedIn: state.getIn(["account", "loggedIn"]),
+          email: state.getIn(["account", "email"]),
           connectionHasBeenLost: state.getIn(["messages", "lostConnection"]), // name chosen to avoid name-clash with the action-creator
           reconnecting: state.getIn(["messages", "reconnecting"]),
         };
