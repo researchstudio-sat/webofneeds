@@ -240,7 +240,7 @@ export function accountLogout(options) {
   return (dispatch, getState) => {
     const state = getState();
 
-    if (state.get("logoutInProcess") || _logoutInProcess) {
+    if (state.getIn(["process", "logoutInProcess"]) || _logoutInProcess) {
       console.debug(
         "There's already a logout in process. Aborting redundant attempt."
       );

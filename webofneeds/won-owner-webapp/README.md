@@ -245,6 +245,10 @@ $ngRedux.getState();
             ...
         ]
     }
+ },
+ process: {
+    creatingWhatsX: true|false, //flag that is true if a whatsX need is currently being created
+    logoutInProcess: true|false, //flag that indicates if a logout is currently in process
  }
 }
 */

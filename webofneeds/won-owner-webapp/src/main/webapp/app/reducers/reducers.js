@@ -11,6 +11,7 @@ import needReducer from "./need-reducer/need-reducer-main.js";
 import accountReducer from "./account-reducer.js";
 import toastReducer from "./toast-reducer.js";
 import viewReducer from "./view-reducer.js";
+import processReducer from "./process-reducer.js";
 import { getIn } from "../utils.js";
 /*
  * this reducer attaches a 'router' object to our state that keeps the routing state.
@@ -38,6 +39,7 @@ const reducers = {
   messages: messagesReducer,
   toasts: toastReducer,
   view: viewReducer,
+  process: processReducer,
 
   // contains the Date.now() of the last action
   // lastUpdateTime: (state = Date.now(), action = {}) => Date.now(),
@@ -63,36 +65,10 @@ const reducers = {
     }
   },
 
-  logoutInProcess: (logoutInProcess = undefined, action = {}) => {
-    switch (action.type) {
-      case actionTypes.account.logoutStarted:
-        return true;
-
-      case actionTypes.account.logout:
-        return undefined;
-
-      default:
-        return logoutInProcess;
-    }
-  },
-
   initialLoadFinished: (state = false, action = {}) =>
     state ||
     (action.type === actionTypes.initialPageLoad &&
       getIn(action, ["payload", "initialLoadFinished"])),
-
-  creatingWhatsX: (creatingWhatsX = false, action = {}) => {
-    switch (action.type) {
-      case actionTypes.needs.whatsNew:
-      case actionTypes.needs.whatsAround:
-        return true;
-      case actionTypes.failedToGetLocation:
-      case actionTypes.needs.createSuccessful:
-        return false;
-      default:
-        return creatingWhatsX;
-    }
-  },
 
   config: (
     config = Immutable.fromJS({ theme: { name: "current" } }),
