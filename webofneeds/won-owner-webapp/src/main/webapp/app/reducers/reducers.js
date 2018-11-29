@@ -12,7 +12,6 @@ import accountReducer from "./account-reducer.js";
 import toastReducer from "./toast-reducer.js";
 import viewReducer from "./view-reducer.js";
 import processReducer from "./process-reducer.js";
-import { getIn } from "../utils.js";
 /*
  * this reducer attaches a 'router' object to our state that keeps the routing state.
  */
@@ -44,11 +43,6 @@ const reducers = {
   // contains the Date.now() of the last action
   // lastUpdateTime: (state = Date.now(), action = {}) => Date.now(),
   lastUpdateTime: () => Date.now(),
-
-  initialLoadFinished: (state = false, action = {}) =>
-    state ||
-    (action.type === actionTypes.initialPageLoad &&
-      getIn(action, ["payload", "initialLoadFinished"])),
 
   config: (
     config = Immutable.fromJS({ theme: { name: "current" } }),
