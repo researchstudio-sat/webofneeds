@@ -42,7 +42,7 @@ class SignupController {
   }
 
   formKeyup(event) {
-    this.registerReset();
+    this.account__registerReset();
     if (event.keyCode == 13 && this.passwordAgain === this.password) {
       if (this.isPrivateIdUser) {
         this.account__transfer({
