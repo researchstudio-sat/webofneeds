@@ -287,10 +287,10 @@ const actionHierarchy = {
 
     toggleAddMessageContentDisplay: INJ_DEFAULT,
     hideAddMessageContentDisplay: INJ_DEFAULT,
-  },
 
-  selectAddMessageContent: INJ_DEFAULT,
-  removeAddMessageContent: INJ_DEFAULT,
+    selectAddMessageContent: INJ_DEFAULT,
+    removeAddMessageContent: INJ_DEFAULT,
+  },
 
   openModalDialog: INJ_DEFAULT,
   closeModalDialog: INJ_DEFAULT,

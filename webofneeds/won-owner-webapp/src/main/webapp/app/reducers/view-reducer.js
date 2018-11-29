@@ -42,7 +42,7 @@ export default function(viewState = initialState, action = {}) {
         .set("showAddMessageContent", !viewState.get("showAddMessageContent"))
         .set("selectedAddMessageContent", undefined);
 
-    case actionTypes.selectAddMessageContent: {
+    case actionTypes.view.selectAddMessageContent: {
       const selectedDetail = getIn(action, ["payload", "selectedDetail"]);
       return viewState
         .set("selectedAddMessageContent", selectedDetail)
@@ -54,7 +54,7 @@ export default function(viewState = initialState, action = {}) {
         .set("showAddMessageContent", false)
         .set("selectedAddMessageContent", undefined);
 
-    case actionTypes.removeAddMessageContent:
+    case actionTypes.view.removeAddMessageContent:
       return viewState.set("selectedAddMessageContent", undefined);
 
     case actionTypes.openModalDialog: {
