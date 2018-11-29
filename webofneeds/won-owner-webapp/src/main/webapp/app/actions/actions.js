@@ -278,21 +278,21 @@ const actionHierarchy = {
   },
 
   view: {
-    toggleRdfDisplay: INJ_DEFAULT,
+    toggleRdf: INJ_DEFAULT,
 
-    toggleClosedNeedsDisplay: INJ_DEFAULT,
+    toggleClosedNeeds: INJ_DEFAULT,
 
-    showMainMenuDisplay: INJ_DEFAULT,
-    hideMainMenuDisplay: INJ_DEFAULT,
+    showMainMenu: INJ_DEFAULT,
+    hideMainMenu: INJ_DEFAULT,
 
-    toggleAddMessageContentDisplay: INJ_DEFAULT,
-    hideAddMessageContentDisplay: INJ_DEFAULT,
+    toggleAddMessageContent: INJ_DEFAULT,
+    hideAddMessageContent: INJ_DEFAULT,
 
     selectAddMessageContent: INJ_DEFAULT,
     removeAddMessageContent: INJ_DEFAULT,
 
-    openModalDialog: INJ_DEFAULT,
-    closeModalDialog: INJ_DEFAULT,
+    showModalDialog: INJ_DEFAULT,
+    hideModalDialog: INJ_DEFAULT,
   },
 
   toasts: {

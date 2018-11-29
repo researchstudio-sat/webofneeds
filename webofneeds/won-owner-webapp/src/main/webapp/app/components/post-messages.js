@@ -709,7 +709,7 @@ function genComponentConf() {
 
     send(chatMessage, additionalContent, referencedContent, isTTL = false) {
       this.setShowAgreementData(false);
-      this.view__hideAddMessageContentDisplay();
+      this.view__hideAddMessageContent();
 
       const trimmedMsg = chatMessage.trim();
       if (trimmedMsg || additionalContent || referencedContent) {
