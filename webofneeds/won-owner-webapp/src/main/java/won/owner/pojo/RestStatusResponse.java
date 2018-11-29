@@ -33,7 +33,7 @@ public enum RestStatusResponse {
 
     SETTINGS_CREATED(5200, "Settings created", HttpStatus.CREATED),
 
-    TOS_ACCEPT_SUCCESS(6200, "Successfully accepted Terms Of Service", HttpStatus.OK),
+    TOS_ACCEPT_SUCCESS(6200, "Successfully accepted Terms Of Service", HttpStatus.OK);
 
     private final int code;
     private final String message;
