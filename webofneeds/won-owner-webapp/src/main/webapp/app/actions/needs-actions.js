@@ -5,10 +5,12 @@
 import won from "../won-es6.js";
 import Immutable from "immutable";
 
-import { actionTypes } from "./actions.js";
+import { actionTypes, actionCreators } from "./actions.js";
 
 import {
   buildConnectMessage,
+  buildCloseNeedMessage,
+  buildOpenNeedMessage,
   fetchUnloadedData,
   fetchDataForNonOwnedNeedOnly,
 } from "../won-message-utils.js";
@@ -71,6 +73,96 @@ export function needsConnect(
         message: cnctMsg.message,
         ownConnectionUri: ownConnectionUri,
         optimisticEvent: optimisticEvent,
+      },
+    });
+  };
+}
+
+export function needsClose(needUri) {
+  return (dispatch, getState) => {
+    buildCloseNeedMessage(
+      needUri,
+      getState().getIn(["config", "defaultNodeUri"])
+    )
+      .then(data => {
+        dispatch(
+          actionCreators.messages__send({
+            eventUri: data.eventUri,
+            message: data.message,
+          })
+        );
+
+        //Close all the open connections of the need
+        getState()
+          .getIn(["needs", needUri, "connections"])
+          .map(function(con) {
+            if (
+              getState().getIn([
+                "needs",
+                needUri,
+                "connections",
+                con.get("uri"),
+                "state",
+              ]) === won.WON.Connected
+            ) {
+              dispatch(actionCreators.connections__close(con.get("uri")));
+            }
+          });
+      })
+      .then(() =>
+        // assume close went through successfully, update GUI
+        dispatch({
+          type: actionTypes.needs.close,
+          payload: {
+            ownedNeedUri: needUri,
+          },
+        })
+      );
+  };
+}
+
+export function needsOpen(needUri) {
+  return (dispatch, getState) => {
+    buildOpenNeedMessage(
+      needUri,
+      getState().getIn(["config", "defaultNodeUri"])
+    )
+      .then(data => {
+        dispatch(
+          actionCreators.messages__send({
+            eventUri: data.eventUri,
+            message: data.message,
+          })
+        );
+      })
+      .then(() =>
+        // assume close went through successfully, update GUI
+        dispatch({
+          type: actionTypes.needs.reopen,
+          payload: {
+            ownedNeedUri: needUri,
+          },
+        })
+      );
+  };
+}
+
+export function needsClosedBySystem(event) {
+  return (dispatch, getState) => {
+    //first check if we really have the 'own' need in the state - otherwise we'll ignore the message
+    const need = getState().getIn(["needs", event.getReceiverNeed()]);
+    if (!need) {
+      console.debug(
+        "ignoring deactivateMessage for a need that is not ours:",
+        event.getReceiverNeed()
+      );
+    }
+    dispatch({
+      type: actionTypes.needs.closedBySystem,
+      payload: {
+        needUri: event.getReceiverNeed(),
+        humanReadable: need.get("humanReadable"),
+        message: event.getTextMessage(),
       },
     });
   };
