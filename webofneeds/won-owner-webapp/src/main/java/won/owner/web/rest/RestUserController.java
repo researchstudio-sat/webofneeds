@@ -420,7 +420,7 @@ public class RestUserController {
         }
 
         if(user.isAcceptedTermsOfService()){
-            return generateStatusResponse(RestStatusResponse.TOS_ALREADY_ACCEPTED);
+            return generateStatusResponse(RestStatusResponse.TOS_ACCEPT_SUCCESS);
         } else {
             user.setAcceptedTermsOfService(true);
             userService.save(user);

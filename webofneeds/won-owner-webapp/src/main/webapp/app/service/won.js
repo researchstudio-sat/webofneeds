@@ -362,7 +362,6 @@ won.RESPONSECODE = Object.freeze({
   SIGNUP_FAILED: 4400,
   SETTINGS_CREATED: 5200,
   TOS_ACCEPT_SUCCESS: 6200,
-  TOS_ALREADY_ACCEPTED: 6400,
 
   PRIVATEID_NOT_FOUND: 666, //this one is not defined in RestStatusResponse.java
 });
