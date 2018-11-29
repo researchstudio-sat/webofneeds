@@ -246,7 +246,7 @@ $ngRedux.getState();
     }
  },
  process: {
-    creatingWhatsX: true|false, //flag that is true if a whatsX need is currently being created
+    processingPublish: true|false, //flag that is true if a whatsX need is currently being created //TODO: REFACTOR SO IT ALSO WORKS FOR ALL OTHER CREATING THINGS (persona and need)
     logoutInProcess: true|false, //flag that indicates if a logout is currently in process
     initialLoadFinished: true|false, //flag that indicates if the initialLoad has been finished or not
     loginInProcess: true|false, //flag that indicates if a login is currently in process

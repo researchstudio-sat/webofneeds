@@ -143,7 +143,7 @@ function genComponentConf() {
 
         return {
           useCaseGroup,
-          pendingPublishing: state.getIn(["process", "creatingWhatsX"]),
+          pendingPublishing: state.getIn(["process", "processingPublish"]),
           connectionHasBeenLost: !selectIsConnected(state),
         };
       };
