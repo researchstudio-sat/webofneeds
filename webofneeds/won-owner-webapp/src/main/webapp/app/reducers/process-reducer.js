@@ -15,11 +15,14 @@ const initialState = Immutable.fromJS({
 
 export default function(processState = initialState, action = {}) {
   switch (action.type) {
+    case actionTypes.persona.create:
+    case actionTypes.needs.create:
     case actionTypes.needs.whatsNew:
     case actionTypes.needs.whatsAround:
       return processState.set("processingPublish", true);
 
     case actionTypes.failedToGetLocation:
+    case actionTypes.persona.createSuccessful:
     case actionTypes.needs.createSuccessful:
       return processState.set("processingPublish", false);
 

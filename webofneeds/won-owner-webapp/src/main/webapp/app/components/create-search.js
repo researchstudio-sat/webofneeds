@@ -80,10 +80,10 @@ function genComponentConf() {
               <button type="submit" class="won-button--filled red cp__content__publish"
                       ng-disabled="!self.isValid()"
                       ng-click="::self.publish()">
-                  <span ng-show="!self.pendingPublishing">
+                  <span ng-show="!self.processingPublish">
                       Publish
                   </span>
-                  <span ng-show="self.pendingPublishing">
+                  <span ng-show="self.processingPublish">
                       Publishing&nbsp;&hellip;
                   </span>
               </button>
@@ -96,10 +96,10 @@ function genComponentConf() {
             <button type="submit" class="won-button--filled red cp__footer__publish"
                     ng-disabled="!self.isValid()"
                     ng-click="::self.publish()">
-                <span ng-show="!self.pendingPublishing">
+                <span ng-show="!self.processingPublish">
                     Publish
                 </span>
-                <span ng-show="self.pendingPublishing">
+                <span ng-show="self.processingPublish">
                     Publishing&nbsp;&hellip;
                 </span>
             </button>
@@ -125,7 +125,6 @@ function genComponentConf() {
 
       this.showTuningOptions = false;
 
-      this.pendingPublishing = false;
       this.isNew = true;
 
       const selectFromState = state => {
@@ -139,6 +138,7 @@ function genComponentConf() {
           : [];
 
         return {
+          processingPublish: state.getIn(["process", "processingPublish"]),
           connectionHasBeenLost: !selectIsConnected(state),
           defaultMatchingContext: defaultMatchingContext,
         };
@@ -212,9 +212,7 @@ function genComponentConf() {
 
     publish() {
       // Post both needs
-      if (!this.pendingPublishing) {
-        this.pendingPublishing = true;
-
+      if (!this.processingPublish) {
         this.needs__create(
           this.draftObject,
           undefined,

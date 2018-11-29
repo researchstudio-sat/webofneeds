@@ -246,11 +246,11 @@ $ngRedux.getState();
     }
  },
  process: {
-    processingPublish: true|false, //flag that is true if a whatsX need is currently being created //TODO: REFACTOR SO IT ALSO WORKS FOR ALL OTHER CREATING THINGS (persona and need)
-    logoutInProcess: true|false, //flag that indicates if a logout is currently in process
+    processingPublish: true|false, //default false, flag that is true if a need(or persona) is currently being created
+    logoutInProcess: true|false, //default false, flag that indicates if a logout is currently in process
     initialLoadFinished: true|false, //flag that indicates if the initialLoad has been finished or not
-    loginInProcess: true|false, //flag that indicates if a login is currently in process
-    loginInProcessFor: undefined, //flag that indicates which is user is currently being logged in
+    loginInProcess: true|false, //default false flag that indicates if a login is currently in process
+    loginInProcessFor: undefined, //indicates which is user is currently being logged in undefined if nouser is currently being logged in, otherwise the email will be stored
  }
 }
 */

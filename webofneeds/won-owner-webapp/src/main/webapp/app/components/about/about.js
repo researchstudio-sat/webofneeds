@@ -216,7 +216,7 @@ class AboutController {
           "/" +
           getIn(state, ["config", "theme", "privacyPolicyTemplate"]),
         peopleGrid: peopleGrid({ themeName }),
-        pendingPublishing: state.getIn(["process", "processingPublish"]),
+        processingPublish: state.getIn(["process", "processingPublish"]),
         showModalDialog: state.getIn(["view", "showModalDialog"]),
       };
     };
@@ -241,13 +241,13 @@ class AboutController {
   }
 
   createWhatsAround() {
-    if (!this.pendingPublishing) {
+    if (!this.processingPublish) {
       this.needs__whatsAround();
     }
   }
 
   createWhatsNew() {
-    if (!this.pendingPublishing) {
+    if (!this.processingPublish) {
       this.needs__whatsNew();
     }
   }
