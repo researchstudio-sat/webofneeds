@@ -9,7 +9,7 @@ import createPostModule from "../create-post.js";
 import createSearchModule from "../create-search.js";
 import usecasePickerModule from "../usecase-picker.js";
 import usecaseGroupModule from "../usecase-group.js";
-import { attach, getIn /*callBuffer*/ } from "../../utils.js";
+import { attach, getIn } from "../../utils.js";
 import { isWhatsAroundNeed, isWhatsNewNeed } from "../../need-utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import {
@@ -27,12 +27,8 @@ class ConnectionsController {
   constructor() {
     attach(this, serviceDependencies, arguments);
     Object.assign(this, srefUtils);
-    //const self = this;
     this.WON = won.WON;
     this.open = {};
-
-    this.SEARCH = "search";
-    this.POST = "post";
 
     const selectFromState = state => {
       const selectedPostUri = decodeURIComponent(
@@ -48,18 +44,20 @@ class ConnectionsController {
         "useCaseGroup",
       ]);
 
-      const connectionUri = decodeURIComponent(
+      const selectedConnectionUri = decodeURIComponent(
         getIn(state, ["router", "currentParams", "connectionUri"])
       );
       const need =
-        connectionUri && getOwnedNeedByConnectionUri(state, connectionUri);
-      const connection = need && need.getIn(["connections", connectionUri]);
-      const connectionType =
-        need &&
-        connectionUri &&
-        need.getIn(["connections", connectionUri, "state"]);
+        selectedConnectionUri &&
+        getOwnedNeedByConnectionUri(state, selectedConnectionUri);
+      const selectedConnection = getIn(need, [
+        "connections",
+        selectedConnectionUri,
+      ]);
+      const selectedConnectionState = getIn(selectedConnection, ["state"]);
 
       const ownedNeeds = getOwnedNeeds(state).filter(
+        //FIXME: THIS CAN BE REMOVED ONCE WE DELETE INSTEAD OF CLOSE THE WHATSX NEEDS
         post =>
           !(
             (isWhatsAroundNeed(post) || isWhatsNewNeed(post)) &&
@@ -86,15 +84,13 @@ class ConnectionsController {
         appTitle: getIn(state, ["config", "theme", "title"]),
         WON: won.WON,
         selectedPost,
-        connection,
-        connectionType,
+        selectedConnection,
+        selectedConnectionState,
         useCase,
         useCaseGroup,
         hasConnections: connections && connections.size > 0,
         hasOwnedNeeds: ownedNeeds && ownedNeeds.size > 0,
         open,
-        mainViewScroll: state.get("mainViewScroll"),
-        showWelcomePage: !(ownedNeeds && ownedNeeds.size > 0),
         showModalDialog: state.getIn(["view", "showModalDialog"]),
       };
     };
@@ -129,30 +125,18 @@ class ConnectionsController {
     });
   }
 
-  /*
-  isMobileDevice() {
-    let ua = navigator.userAgent.toLowerCase();
-    //let isAndroid = ua.indexOf("android") > -1; //&& ua.indexOf("mobile");
-    let isMobile = ua.indexOf("mobile") > -1;
-    if (isMobile) {
-      return true;
-    }
-    return false;
-  }*/
-
   markAsRead(connectionUri) {
     const need = getOwnedNeedByConnectionUri(
       this.$ngRedux.getState(),
       connectionUri
     );
-    const connections = need && need.get("connections");
-    const connection = connections && connections.get(connectionUri);
 
-    if (
-      connection &&
-      connection.get("unread") &&
-      connection.get("state") !== won.WON.Connected
-    ) {
+    const connUnread = getIn(need, ["connections", connectionUri, "unread"]);
+    const connNotConnected =
+      getIn(need, ["connections", connectionUri, "state"]) !==
+      won.WON.Connected;
+
+    if (connUnread && connNotConnected) {
       const payload = {
         connectionUri: connectionUri,
         needUri: need.get("uri"),

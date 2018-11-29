@@ -4,13 +4,13 @@
 </header>
 <won-toasts></won-toasts>
 <won-slide-in></won-slide-in>
-<aside class="overview__left" ng-class="{'hide-in-responsive': !self.hasOwnedNeeds || self.connection || self.selectedPost || !!self.useCaseGroup || !!self.useCase}">
+<aside class="overview__left" ng-class="{'hide-in-responsive': !self.hasOwnedNeeds || self.selectedConnection || self.selectedPost || !!self.useCaseGroup || !!self.useCase}">
     <won-connections-overview on-selected-connection="self.selectedConnection(connectionUri)" on-selected-need="self.selectedNeed(needUri)"
                               open="self.open">
     </won-connections-overview>
 </aside>
 <!-- RIGHT SIDE -->
-<main class="overview__right" ng-if="!self.selectedPost && (!self.connection || self.connectionType === self.WON.Closed) && !self.useCase && !self.useCaseGroup" ng-class="{'hide-in-responsive' : self.hasOwnedNeeds}">
+<main class="overview__right" ng-if="!self.selectedPost && (!self.selectedConnection || self.selectedConnectionState === self.WON.Closed) && !self.useCase && !self.useCaseGroup" ng-class="{'hide-in-responsive' : self.hasOwnedNeeds}">
     <div class="overview__right__welcome">
         <div class="overview__right__welcome__text" ng-include="self.welcomeTemplate"></div>
         <won-usecase-picker></won-usecase-picker>
@@ -22,13 +22,13 @@
         </div>
     </div>
 </main>
-<main class="overview__right" ng-if="self.useCase || self.useCaseGroup || self.selectedPost || (self.connection && self.connectionType !== self.WON.Closed)">
+<main class="overview__right" ng-if="self.useCase || self.useCaseGroup || self.selectedPost || (self.selectedConnection && self.selectedConnectionState !== self.WON.Closed)">
     <won-usecase-picker ng-if="!self.useCase && (!!self.useCaseGroup) && self.useCaseGroup === 'all' && !self.selectedPost && !self.connection"></won-usecase-picker>
     <won-usecase-group ng-if="!self.useCase && (!!self.useCaseGroup) && self.useCaseGroup !== 'all' && !self.selectedPost && !self.connection"></won-usecase-group>
-    <won-create-post ng-if="(!!self.useCase) && self.useCase !== 'search' && !self.selectedPost && !self.connection"></won-create-post>
-    <won-create-search ng-if="(!!self.useCase) && self.useCase === 'search' && !self.selectedPost && !self.connection"></won-create-search>
-    <won-post-messages ng-if="!self.selectedPost && !self.useCaseGroup && (self.connectionType === self.WON.Connected || self.connectionType === self.WON.RequestReceived || self.connectionType === self.WON.RequestSent || self.connectionType === self.WON.Suggested)"></won-post-messages>
+    <won-create-post ng-if="(!!self.useCase) && self.useCase !== 'search' && !self.selectedPost && !self.selectedConnection"></won-create-post>
+    <won-create-search ng-if="(!!self.useCase) && self.useCase === 'search' && !self.selectedPost && !self.selectedConnection"></won-create-search>
+    <won-post-messages ng-if="!self.selectedPost && !self.useCaseGroup && (self.selectedConnectionState === self.WON.Connected || self.selectedConnectionState === self.WON.RequestReceived || self.selectedConnectionState === self.WON.RequestSent || self.selectedConnectionState === self.WON.Suggested)"></won-post-messages>
     <won-post-info include-header="true" ng-if="self.selectedPost && !self.useCaseGroup"></won-post-info>
 </main>
-<won-footer ng-class="{'hide-in-responsive': self.connection }"> <!-- Connection view does not show the footer in responsive mode as there should not be two scrollable areas imho-->
+<won-footer ng-class="{'hide-in-responsive': self.selectedConnection }"> <!-- Connection view does not show the footer in responsive mode as there should not be two scrollable areas imho-->
 </won-footer>
