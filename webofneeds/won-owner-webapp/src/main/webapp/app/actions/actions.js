@@ -251,7 +251,6 @@ const actionHierarchy = {
     login: accountLogin,
     loginStarted: INJ_DEFAULT,
     loginFailed: INJ_DEFAULT,
-    loginReset: INJ_DEFAULT, //maybe this should be in the "view"-state (which we dont have yet)
 
     logout: accountLogout,
     logoutStarted: INJ_DEFAULT,
@@ -293,6 +292,8 @@ const actionHierarchy = {
 
     showModalDialog: INJ_DEFAULT,
     hideModalDialog: INJ_DEFAULT,
+
+    clearLoginError: INJ_DEFAULT, //maybe this should be in the "view"-state (which we dont have yet)
   },
 
   toasts: {
