@@ -45,7 +45,7 @@ class SignupController {
     this.registerReset();
     if (event.keyCode == 13 && this.passwordAgain === this.password) {
       if (this.isPrivateIdUser) {
-        this.transfer({
+        this.account__transfer({
           email: this.email,
           password: this.password,
           privateId: this.privateId,
