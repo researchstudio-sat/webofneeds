@@ -98,7 +98,7 @@ function loadingWithAnonymousAccount(dispatch, getState, privateId) {
           e
         );
         dispatch({
-          type: actionTypes.user.loginFailed,
+          type: actionTypes.account.loginFailed,
           payload: {
             loginError: Immutable.fromJS(won.PRIVATEID_NOT_FOUND_ERROR),
             credentials: { privateId },
