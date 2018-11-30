@@ -1021,7 +1021,7 @@
         <org.jboss.jandex.version>1.1.0.Final</org.jboss.jandex.version>
         <org.quartz-scheduler.version>2.2.1</org.quartz-scheduler.version>
         <org.springframework.boot.version>1.5.17.RELEASE</org.springframework.boot.version>
-        <org.springframework.version>4.3.20.RELEASE</org.springframework.version>
+        <org.springframework.version>4.3.18.RELEASE</org.springframework.version>
         <org.springframework.security.version>4.2.9.RELEASE</org.springframework.security.version>
         <org.slf4j.version>1.6.6</org.slf4j.version>
         <org.hsqldb.version>2.3.2</org.hsqldb.version>
