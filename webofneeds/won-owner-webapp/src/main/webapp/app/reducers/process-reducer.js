@@ -13,6 +13,7 @@ const initialState = Immutable.fromJS({
   processingLoginForEmail: undefined,
   processingAcceptTermsOfService: false,
   processingVerifyEmailAddress: false,
+  processingResendVerificationEmail: false,
 });
 
 export default function(processState = initialState, action = {}) {
@@ -52,6 +53,13 @@ export default function(processState = initialState, action = {}) {
     case actionTypes.account.acceptTermsOfServiceSuccess:
     case actionTypes.account.acceptTermsOfServiceFailed:
       return processState.set("processingAcceptTermsOfService", false);
+
+    case actionTypes.account.resendVerificationEmailStarted:
+      return processState.set("processingResendVerificationEmail", true);
+
+    case actionTypes.account.resendVerificationEmailSuccess:
+    case actionTypes.account.resendVerificationEmailFailed:
+      return processState.set("processingResendVerificationEmail", false);
 
     case actionTypes.account.login: {
       if (getIn(action, ["payload", "loginFinished"])) {

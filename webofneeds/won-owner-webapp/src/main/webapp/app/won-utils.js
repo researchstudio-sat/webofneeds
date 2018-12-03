@@ -198,31 +198,6 @@ export function registerAccount(credentials) {
 }
 
 /**
- * Resend the verification mail.
- *
- */
-export function resendEmailVerification(email) {
-  const url = urljoin(ownerBaseUrl, "/rest/users/resendVerificationEmail");
-  const httpOptions = {
-    method: "post",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      username: email,
-    }),
-  };
-  return fetch(url, httpOptions)
-    .then(resp => {
-      return resp.json();
-    })
-    .catch(error => {
-      return error;
-    });
-}
-
-/**
  * Accept the Terms Of Service
  */
 export function acceptTermsOfService() {
@@ -269,6 +244,36 @@ export function confirmRegistration(verificationToken) {
         const verificationError = new Error();
         verificationError.jsonResponse = errorMessage;
         throw verificationError;
+      })
+    );
+}
+
+/**
+ * Resend the verification mail.
+ *
+ */
+export function resendEmailVerification(email) {
+  const url = urljoin(ownerBaseUrl, "/rest/users/resendVerificationEmail");
+  const httpOptions = {
+    method: "post",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      username: email,
+    }),
+  };
+  return fetch(url, httpOptions)
+    .then(resp => {
+      return resp.json();
+    })
+    .catch(error =>
+      error.response.json().then(errorMessage => {
+        //FIXME: MOVE THIS ERROR HANDLINNG INTO THE ACTION
+        const resendError = new Error();
+        resendError.jsonResponse = errorMessage;
+        throw resendError;
       })
     );
 }

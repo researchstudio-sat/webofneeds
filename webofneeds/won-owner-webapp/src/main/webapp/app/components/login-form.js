@@ -2,13 +2,9 @@
  * Created by ksinger on 01.09.2017.
  */
 import angular from "angular";
-import { attach, delay } from "../utils.js";
+import { attach, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
-import {
-  connect2Redux,
-  parseRestErrorMessage,
-  resendEmailVerification,
-} from "../won-utils.js";
+import { connect2Redux, parseRestErrorMessage } from "../won-utils.js";
 import won from "../won-es6.js";
 
 import * as srefUtils from "../sref-utils.js";
@@ -30,8 +26,10 @@ function genLoginConf() {
             <span class="wl__errormsg" ng-if="self.loginError">
                 {{self.parseRestErrorMessage(self.loginError)}}
                 <a class="wl__errormsg__resend"
-                 ng-if="!self.clickedResend && self.isNotVerified"
-                 ng-click="self.resendEmailVerification()">(Click to Resend Verification Email)</a>
+                 ng-if="self.isNotVerified && !self.processingResendVerificationEmail"
+                 ng-click="self.account__resendVerificationEmail(self.email)">(Click to Resend Verification Email)</a>
+                <a class="wl__errormsg__resend"
+                 ng-if="self.isNotVerified && self.processingResendVerificationEmail">(Resending...)</a>
             </span>
             <input
                 id="loginPassword"
@@ -75,11 +73,14 @@ function genLoginConf() {
       this.email = "";
       this.password = "";
       this.rememberMe = false;
-      this.clickedResend = false;
 
       const login = state => ({
         loggedIn: state.getIn(["account", "loggedIn"]),
         loginError: state.getIn(["account", "loginError"]),
+        processingResendVerificationEmail: getIn(state, [
+          "process",
+          "processingResendVerificationEmail",
+        ]),
         isNotVerified:
           state.getIn(["account", "loginError", "code"]) ==
           won.RESPONSECODE.USER_NOT_VERIFIED,
@@ -102,15 +103,6 @@ function genLoginConf() {
           }
         );
       }
-    }
-
-    resendEmailVerification() {
-      this.clickedResend = true;
-      resendEmailVerification(this.email); //TODO: Implement error cases and success response
-
-      delay(2000).then(() => {
-        this.clickedResend = false;
-      });
     }
   }
   Controller.$inject = serviceDependencies;

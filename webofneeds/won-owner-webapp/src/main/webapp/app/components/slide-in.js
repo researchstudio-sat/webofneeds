@@ -6,11 +6,7 @@ import ngAnimate from "angular-animate";
 import dropdownModule from "./covering-dropdown.js";
 import { attach, delay, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
-import {
-  connect2Redux,
-  resendEmailVerification,
-  parseRestErrorMessage,
-} from "../won-utils.js";
+import { connect2Redux, parseRestErrorMessage } from "../won-utils.js";
 
 import * as srefUtils from "../sref-utils.js";
 
@@ -52,9 +48,8 @@ function genSlideInConf() {
             </span>
             <button
               class="si__button"
-              ng-disabled="self.clickedResend"
-              ng-if="self.loggedIn && !self.processingVerifyEmailAddress && self.emailVerificationError"
-              ng-click="self.resendEmailVerification()">
+              ng-if="self.loggedIn && !self.processingVerifyEmailAddress && !self.processingResendVerificationEmail && self.emailVerificationError"
+              ng-click="self.account__resendVerificationEmail(self.email)">
                 Resend E-Mail
             </button>
             <svg class="si__close"
@@ -63,7 +58,7 @@ function genSlideInConf() {
                 ng-if="!self.processingVerifyEmailAddress && !self.emailVerificationError">
                 <use xlink:href="#ico36_close" href="#ico36_close"></use>
             </svg>
-            <svg class="hspinner" ng-if="self.processingVerifyEmailAddress">
+            <svg class="hspinner" ng-if="self.processingVerifyEmailAddress || self.processingResendVerificationEmail">
                 <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
             </svg>
         </div>
@@ -71,18 +66,18 @@ function genSlideInConf() {
             <svg class="si__icon" style="--local-primary:white;">
                 <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
             </svg>
-            <span class="si__text" ng-if="!self.clickedResend">
+            <span class="si__text">
                 E-Mail has not been verified yet, check your Inbox.
-            </span>
-            <span class="si__text" ng-if="self.clickedResend">
-                E-Mail has been resent to {{ self.email }}, check your Inbox.
             </span>
             <button
               class="si__button"
-              ng-disabled="self.clickedResend"
-              ng-click="self.resendEmailVerification()">
+              ng-if="!self.processingResendVerificationEmail"
+              ng-click="self.account__resendEmailVerification(self.email)">
                 Resend E-Mail
             </button>
+            <svg class="hspinner" ng-if="self.processingResendVerificationEmail">
+                <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
+            </svg>
         </div>
         <div class="slide-in" ng-class="{'visible': self.loggedIn && !self.connectionHasBeenLost && !self.acceptedTermsOfService}">
             <svg class="si__icon" style="--local-primary:white;">
@@ -146,7 +141,6 @@ function genSlideInConf() {
     constructor(/* arguments <- serviceDependencies */) {
       attach(this, serviceDependencies, arguments);
       Object.assign(this, srefUtils); // bind srefUtils to scope
-      this.clickedResend = false;
       this.parseRestErrorMessage = parseRestErrorMessage;
 
       const selectFromState = state => {
@@ -172,6 +166,10 @@ function genSlideInConf() {
             "process",
             "processingAcceptTermsOfService",
           ]),
+          processingResendVerificationEmail: getIn(state, [
+            "process",
+            "processingResendVerificationEmail",
+          ]),
           acceptedTermsOfService: getIn(state, [
             "account",
             "acceptedTermsOfService",
@@ -188,15 +186,6 @@ function genSlideInConf() {
       this.$scope.$watch("self.verificationToken", verificationToken =>
         this.verifyEmailAddress(verificationToken)
       );
-    }
-
-    resendEmailVerification() {
-      this.clickedResend = true;
-      resendEmailVerification(this.email); //TODO: Implement error cases and success response
-
-      delay(2000).then(() => {
-        this.clickedResend = false;
-      });
     }
 
     verifyEmailAddress(verificationToken) {
