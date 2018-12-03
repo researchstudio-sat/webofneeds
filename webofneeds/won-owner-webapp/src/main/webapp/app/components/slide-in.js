@@ -4,9 +4,13 @@
 import angular from "angular";
 import ngAnimate from "angular-animate";
 import dropdownModule from "./covering-dropdown.js";
-import { attach, delay } from "../utils.js";
+import { attach, delay, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
-import { connect2Redux, resendEmailVerification } from "../won-utils.js";
+import {
+  connect2Redux,
+  resendEmailVerification,
+  getLoginErrorMessage,
+} from "../won-utils.js";
 
 import * as srefUtils from "../sref-utils.js";
 
@@ -33,6 +37,36 @@ function genSlideInConf() {
                 <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
             </svg>
         </div>
+        <div class="slide-in" ng-class="{'visible': !self.connectionHasBeenLost && self.verificationToken}">
+            <svg class="si__icon" style="--local-primary:white;">
+                <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
+            </svg>
+            <span class="si__text" ng-if="self.processingVerifyEmailAddress">
+                Verifying the E-Mail address
+            </span>
+            <span class="si__text" ng-if="!self.processingVerifyEmailAddress && self.emailVerified && !self.emailVerificationError">
+                E-Mail Address verified
+            </span>
+            <span class="si__text" ng-if="!self.processingVerifyEmailAddress && self.emailVerificationError">
+                {{ self.getLoginErrorMessage(self.emailVerificationError) }}
+            </span>
+            <button
+              class="si__button"
+              ng-disabled="self.clickedResend"
+              ng-if="self.loggedIn && !self.processingVerifyEmailAddress && self.emailVerificationError"
+              ng-click="self.resendEmailVerification()">
+                Resend E-Mail
+            </button>
+            <svg class="si__close"
+                style="--local-primary:white;"
+                ng-click="self.router__stateGoCurrent({token: undefined})"
+                ng-if="!self.processingVerifyEmailAddress && !self.emailVerificationError">
+                <use xlink:href="#ico36_close" href="#ico36_close"></use>
+            </svg>
+            <svg class="hspinner" ng-if="self.processingVerifyEmailAddress">
+                <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
+            </svg>
+        </div>
         <div class="slide-in" ng-class="{'visible': self.loggedIn && !self.connectionHasBeenLost && !self.emailVerified}">
             <svg class="si__icon" style="--local-primary:white;">
                 <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
@@ -54,7 +88,7 @@ function genSlideInConf() {
             <svg class="si__icon" style="--local-primary:white;">
                 <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
             </svg>
-            <span class="si__text"> <!-- TODO: INCLUDE LINK TO TOS -->
+            <span class="si__text">
                 You have not accepted the
                 <a target="_blank"
                    href="{{ self.absHRef(self.$state, 'about', {'aboutSection': 'aboutTermsOfService'}) }}">
@@ -113,27 +147,47 @@ function genSlideInConf() {
       attach(this, serviceDependencies, arguments);
       Object.assign(this, srefUtils); // bind srefUtils to scope
       this.clickedResend = false;
+      this.getLoginErrorMessage = getLoginErrorMessage;
 
       const selectFromState = state => {
+        const verificationToken = getIn(state, [
+          "router",
+          "currentParams",
+          "token",
+        ]);
+
         return {
-          acceptedDisclaimer: state.getIn(["account", "acceptedDisclaimer"]),
-          emailVerified: state.getIn(["account", "emailVerified"]),
-          processingAcceptTermsOfService: state.getIn([
+          verificationToken,
+          acceptedDisclaimer: getIn(state, ["account", "acceptedDisclaimer"]),
+          emailVerified: getIn(state, ["account", "emailVerified"]),
+          emailVerificationError: getIn(state, [
+            "account",
+            "emailVerificationError",
+          ]),
+          processingVerifyEmailAddress: getIn(state, [
+            "process",
+            "processingVerifyEmailAddress",
+          ]),
+          processingAcceptTermsOfService: getIn(state, [
             "process",
             "processingAcceptTermsOfService",
           ]),
-          acceptedTermsOfService: state.getIn([
+          acceptedTermsOfService: getIn(state, [
             "account",
             "acceptedTermsOfService",
           ]),
-          loggedIn: state.getIn(["account", "loggedIn"]),
-          email: state.getIn(["account", "email"]),
-          connectionHasBeenLost: state.getIn(["messages", "lostConnection"]), // name chosen to avoid name-clash with the action-creator
-          reconnecting: state.getIn(["messages", "reconnecting"]),
+          loggedIn: getIn(state, ["account", "loggedIn"]),
+          email: getIn(state, ["account", "email"]),
+          connectionHasBeenLost: getIn(state, ["messages", "lostConnection"]), // name chosen to avoid name-clash with the action-creator
+          reconnecting: getIn(state, ["messages", "reconnecting"]),
         };
       };
 
       connect2Redux(selectFromState, actionCreators, [], this);
+
+      this.$scope.$watch("self.verificationToken", verificationToken =>
+        this.verifyEmailAddress(verificationToken)
+      );
     }
 
     resendEmailVerification() {
@@ -142,6 +196,18 @@ function genSlideInConf() {
 
       delay(2000).then(() => {
         this.clickedResend = false;
+      });
+    }
+
+    verifyEmailAddress(verificationToken) {
+      delay(0).then(() => {
+        if (
+          verificationToken &&
+          !this.processingVerifyEmailAddress &&
+          !(this.emailVerified || this.emailVerificationError)
+        ) {
+          this.account__verifyEmailAddress(verificationToken);
+        }
       });
     }
   }
