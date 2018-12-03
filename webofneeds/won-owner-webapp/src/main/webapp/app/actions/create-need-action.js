@@ -26,7 +26,7 @@ export function needCreate(draft, persona, nodeUri) {
 
     let prevParams = getIn(state, ["router", "prevParams"]);
 
-    if (!state.getIn(["user", "loggedIn"]) && prevParams.privateId) {
+    if (!state.getIn(["account", "loggedIn"]) && prevParams.privateId) {
       /*
              * `ensureLoggedIn` will generate a new privateId. should
              * there be a previous privateId, we don't want to change

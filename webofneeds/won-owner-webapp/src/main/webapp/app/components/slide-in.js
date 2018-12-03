@@ -33,7 +33,7 @@ function genSlideInConf() {
                 <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
             </svg>
         </div>
-        <div class="slide-in" ng-class="{'visible': self.loggedIn && !self.emailVerified}">
+        <div class="slide-in" ng-class="{'visible': self.loggedIn && !self.connectionHasBeenLost && !self.emailVerified}">
             <svg class="si__icon" style="--local-primary:white;">
                 <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
             </svg>
@@ -50,7 +50,28 @@ function genSlideInConf() {
                 Resend E-Mail
             </button>
         </div>
-        <div class="slide-in" ng-class="{'visible': !self.acceptedDisclaimer}">
+        <div class="slide-in" ng-class="{'visible': self.loggedIn && !self.connectionHasBeenLost && !self.acceptedTermsOfService}">
+            <svg class="si__icon" style="--local-primary:white;">
+                <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
+            </svg>
+            <span class="si__text"> <!-- TODO: INCLUDE LINK TO TOS -->
+                You have not accepted the
+                <a target="_blank"
+                   href="{{ self.absHRef(self.$state, 'about', {'aboutSection': 'aboutTermsOfService'}) }}">
+                   Terms Of Service
+                 </a> yet.
+            </span>
+            <button
+              class="si__button"
+              ng-if="!self.processingAcceptTermsOfService"
+              ng-click="self.account__acceptTermsOfService()">
+                Accept
+            </button>
+            <svg class="hspinner" ng-if="self.processingAcceptTermsOfService">
+                <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
+            </svg>
+        </div>
+        <div class="slide-in" ng-class="{'visible': !self.connectionHasBeenLost && !self.acceptedDisclaimer}">
             <svg class="si__icon" style="--local-primary:white;">
                 <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_info"></use>
             </svg>
@@ -74,7 +95,7 @@ function genSlideInConf() {
                 </a>
 	  		    </div>
             <button
-                ng-click="self.acceptDisclaimer()"
+                ng-click="self.account__acceptDisclaimer()"
                 class="si__smallbutton">
                     Ok, I'll keep that in mind
             </button>
@@ -95,10 +116,18 @@ function genSlideInConf() {
 
       const selectFromState = state => {
         return {
-          acceptedDisclaimer: state.getIn(["user", "acceptedDisclaimer"]),
-          emailVerified: state.getIn(["user", "emailVerified"]),
-          loggedIn: state.getIn(["user", "loggedIn"]),
-          email: state.getIn(["user", "email"]),
+          acceptedDisclaimer: state.getIn(["account", "acceptedDisclaimer"]),
+          emailVerified: state.getIn(["account", "emailVerified"]),
+          processingAcceptTermsOfService: state.getIn([
+            "process",
+            "processingAcceptTermsOfService",
+          ]),
+          acceptedTermsOfService: state.getIn([
+            "account",
+            "acceptedTermsOfService",
+          ]),
+          loggedIn: state.getIn(["account", "loggedIn"]),
+          email: state.getIn(["account", "email"]),
           connectionHasBeenLost: state.getIn(["messages", "lostConnection"]), // name chosen to avoid name-clash with the action-creator
           reconnecting: state.getIn(["messages", "reconnecting"]),
         };

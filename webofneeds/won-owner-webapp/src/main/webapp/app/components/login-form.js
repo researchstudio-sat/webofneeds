@@ -15,7 +15,7 @@ import * as srefUtils from "../sref-utils.js";
 
 function genLoginConf() {
   let template = `
-        <form ng-submit="::self.login({email: self.email, password: self.password, rememberMe: self.rememberMe}, {redirectToFeed: false})"
+        <form ng-submit="::self.account__login({email: self.email, password: self.password, rememberMe: self.rememberMe}, {redirectToFeed: false})"
             id="loginForm"
             class="loginForm"
         >
@@ -53,7 +53,7 @@ function genLoginConf() {
         </form>
         <div class="wl__register">
             No account yet?
-            <a href="{{ self.absHRef(self.$state, 'signup') }}" ng-click="self.hideMainMenuDisplay()">
+            <a href="{{ self.absHRef(self.$state, 'signup') }}" ng-click="self.view__hideMainMenu()">
                 Sign up
             </a>
         </div>`;
@@ -78,10 +78,10 @@ function genLoginConf() {
       this.clickedResend = false;
 
       const login = state => ({
-        loggedIn: state.getIn(["user", "loggedIn"]),
-        loginError: state.getIn(["user", "loginError"]),
+        loggedIn: state.getIn(["account", "loggedIn"]),
+        loginError: state.getIn(["account", "loginError"]),
         isNotVerified:
-          state.getIn(["user", "loginError", "code"]) ==
+          state.getIn(["account", "loginError", "code"]) ==
           won.RESPONSECODE.USER_NOT_VERIFIED,
       });
 
@@ -89,9 +89,9 @@ function genLoginConf() {
     }
 
     formKeyUp(event) {
-      this.typedAtLoginCredentials();
+      this.view__clearLoginError();
       if (event.keyCode == 13) {
-        this.login(
+        this.account__login(
           {
             email: this.email,
             password: this.password,

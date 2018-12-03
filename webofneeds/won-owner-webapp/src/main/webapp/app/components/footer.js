@@ -32,7 +32,7 @@ function genTopnavConf() {
             <span class="footer__links__divider">|</span>
             <span class="footer__links__link" ng-click="self.toggleDebugMode()">{{ self.getDebugModeLabel() }}</span>
             <span class="footer__links__divider">|</span>
-            <span class="footer__links__link" ng-click="self.toggleRdfDisplay()">{{self.shouldShowRdf? "Hide raw RDF data" : "Show raw RDF data"}}</span>
+            <span class="footer__links__link" ng-click="self.view__toggleRdf()">{{self.shouldShowRdf? "Hide raw RDF data" : "Show raw RDF data"}}</span>
         </div>
       </div>
   `;
@@ -54,7 +54,7 @@ function genTopnavConf() {
         return {
           themeName: getIn(state, ["config", "theme", "name"]),
           appTitle: getIn(state, ["config", "theme", "title"]),
-          shouldShowRdf: state.get("showRdf"),
+          shouldShowRdf: state.getIn(["view", "showRdf"]),
         };
       };
 

@@ -358,7 +358,7 @@ function genComponentConf() {
           isSuggested:
             connection && connection.get("state") === won.WON.Suggested,
           debugmode: won.debugmode,
-          shouldShowRdf: state.get("showRdf"),
+          shouldShowRdf: state.getIn(["view", "showRdf"]),
           // if the connect-message is here, everything else should be as well
           allMessagesLoaded,
           hasAgreementMessages: agreementMessages && agreementMessages.size > 0,
@@ -709,7 +709,7 @@ function genComponentConf() {
 
     send(chatMessage, additionalContent, referencedContent, isTTL = false) {
       this.setShowAgreementData(false);
-      this.hideAddMessageContentDisplay();
+      this.view__hideAddMessageContent();
 
       const trimmedMsg = chatMessage.trim();
       if (trimmedMsg || additionalContent || referencedContent) {

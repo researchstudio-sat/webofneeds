@@ -44,6 +44,9 @@ public class User implements UserDetails, Persistable<Long> {
     @Column(name = "email_verified")
     private boolean emailVerified;
 
+    @Column(name = "accepted_tos")
+    private boolean acceptedTermsOfService;
+
     /* The creation date of the (as observed by the owner app) */
     @Temporal(TemporalType.TIMESTAMP)
     @Column( name = "registrationDate", nullable = false)
@@ -245,6 +248,14 @@ public class User implements UserDetails, Persistable<Long> {
 
     public void setRegistrationDate(Date registrationDate) {
         this.registrationDate = registrationDate;
+    }
+
+    public boolean isAcceptedTermsOfService() {
+        return acceptedTermsOfService;
+    }
+
+    public void setAcceptedTermsOfService(boolean acceptedTermsOfService) {
+        this.acceptedTermsOfService = acceptedTermsOfService;
     }
 
     private boolean isWithinGracePeriod() {

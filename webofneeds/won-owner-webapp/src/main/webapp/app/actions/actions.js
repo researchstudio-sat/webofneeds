@@ -34,17 +34,10 @@
  * As a rule of thumb the lion's share of all processing should happen
  * in the reducers.
  */
-
-import won from "../won-es6.js";
-
 // <utils>
 
-import { tree2constants, entries } from "../utils.js";
+import { tree2constants } from "../utils.js";
 import { hierarchy2Creators } from "./action-utils.js";
-import {
-  buildCloseNeedMessage,
-  buildOpenNeedMessage,
-} from "../won-message-utils.js";
 
 import {
   needCreate,
@@ -56,6 +49,9 @@ import {
   needsConnect,
   fetchUnloadedNeeds,
   fetchSuggested,
+  needsClose,
+  needsOpen,
+  needsClosedBySystem,
 } from "./needs-actions.js";
 
 import {
@@ -77,6 +73,7 @@ import {
   accountRegister,
   accountTransfer,
   accountAcceptDisclaimer,
+  accountAcceptTermsOfService,
   reconnect,
 } from "./account-actions.js";
 
@@ -151,10 +148,6 @@ const actionHierarchy = {
     //stateTransitionTo, // should not be used directly
     back: stateBack,
     accessedNonLoadedPost: INJ_DEFAULT, //dispatched in configRouting.js
-  },
-  posts: {
-    load: INJ_DEFAULT,
-    clean: INJ_DEFAULT,
   },
 
   /**
@@ -255,19 +248,27 @@ const actionHierarchy = {
 
     waitingForAnswer: INJ_DEFAULT,
   },
-  //anonymousLogin: anonAccountLogin,
-  loginStarted: INJ_DEFAULT,
-  login: accountLogin, //loginSuccess
-  loginFailed: INJ_DEFAULT,
-  logoutStarted: INJ_DEFAULT,
-  logout: accountLogout,
-  register: accountRegister,
-  transfer: accountTransfer,
-  acceptDisclaimer: accountAcceptDisclaimer,
-  acceptDisclaimerSuccess: INJ_DEFAULT,
-  typedAtLoginCredentials: INJ_DEFAULT,
-  registerReset: INJ_DEFAULT,
-  registerFailed: INJ_DEFAULT,
+  account: {
+    login: accountLogin,
+    loginStarted: INJ_DEFAULT,
+    loginFailed: INJ_DEFAULT,
+
+    logout: accountLogout,
+    logoutStarted: INJ_DEFAULT,
+
+    register: accountRegister,
+    transfer: accountTransfer,
+    registerFailed: INJ_DEFAULT,
+
+    acceptDisclaimer: accountAcceptDisclaimer,
+    acceptDisclaimerSuccess: INJ_DEFAULT,
+
+    acceptTermsOfService: accountAcceptTermsOfService,
+    acceptTermsOfServiceStarted: INJ_DEFAULT,
+    acceptTermsOfServiceSuccess: INJ_DEFAULT,
+    acceptTermsOfServiceFailed: INJ_DEFAULT,
+  },
+
   geoLocationDenied: INJ_DEFAULT,
   lostConnection: INJ_DEFAULT,
   failedToGetLocation: INJ_DEFAULT,
@@ -280,25 +281,26 @@ const actionHierarchy = {
     connectionFailedToLoad: INJ_DEFAULT,
   },
 
-  mainViewScrolled: INJ_DEFAULT,
+  view: {
+    toggleRdf: INJ_DEFAULT,
 
-  toggleRdfDisplay: INJ_DEFAULT,
-  toggleClosedNeedsDisplay: INJ_DEFAULT,
-  hideClosedNeedsDisplay: INJ_DEFAULT,
-  showClosedNeedsDisplay: INJ_DEFAULT,
+    toggleClosedNeeds: INJ_DEFAULT,
 
-  showMainMenuDisplay: INJ_DEFAULT,
-  hideMainMenuDisplay: INJ_DEFAULT,
+    showMainMenu: INJ_DEFAULT,
+    hideMainMenu: INJ_DEFAULT,
 
-  toggleAddMessageContentDisplay: INJ_DEFAULT,
-  showAddMessageContentDisplay: INJ_DEFAULT,
-  hideAddMessageContentDisplay: INJ_DEFAULT,
+    toggleAddMessageContent: INJ_DEFAULT,
+    hideAddMessageContent: INJ_DEFAULT,
 
-  selectAddMessageContent: INJ_DEFAULT,
-  removeAddMessageContent: INJ_DEFAULT,
+    selectAddMessageContent: INJ_DEFAULT,
+    removeAddMessageContent: INJ_DEFAULT,
 
-  openModalDialog: INJ_DEFAULT,
-  closeModalDialog: INJ_DEFAULT,
+    showModalDialog: INJ_DEFAULT,
+    hideModalDialog: INJ_DEFAULT,
+
+    clearLoginError: INJ_DEFAULT,
+    clearRegisterError: INJ_DEFAULT,
+  },
 
   toasts: {
     delete: INJ_DEFAULT,
@@ -347,161 +349,4 @@ export function startTicking() {
       () => dispatch({ type: actionTypes.tick, payload: Date.now() }),
       60000
     );
-}
-
-/**
- * @param needUri
- * @param remoteNeedUri
- * @param connectionUri
- * @return {*}
- */
-export function getConnectionRelatedData(
-  needUri,
-  remoteNeedUri,
-  connectionUri
-) {
-  const remoteNeedP = won.getNeed(remoteNeedUri);
-  const ownedNeedP = won.getNeed(needUri);
-  const connectionP = won.getConnectionWithEventUris(connectionUri, {
-    requesterWebId: needUri,
-  });
-  const eventsP = won
-    .getEventsOfConnection(connectionUri, { requesterWebId: needUri })
-    .then(eventsLookup => {
-      const eventList = [];
-      for (let [, event] of entries(eventsLookup)) {
-        eventList.push(event);
-      }
-      return eventList;
-    });
-
-  const remotePersonaP = remoteNeedP.then(remoteNeed => {
-    const remoteHeldBy = remoteNeed && remoteNeed["won:heldBy"];
-    const remotePersonaUri = remoteHeldBy && remoteHeldBy["@id"];
-
-    if (remotePersonaUri) {
-      return won.getNeed(remotePersonaUri);
-    } else {
-      return Promise.resolve(undefined);
-    }
-  });
-
-  const ownPersonaP = ownedNeedP.then(ownedNeed => {
-    const ownHeldBy = ownedNeed && ownedNeed["won:heldBy"];
-    const ownPersonaUri = ownHeldBy && ownHeldBy["@id"];
-
-    if (ownPersonaUri) {
-      return won.getNeed(ownPersonaUri);
-    } else {
-      return Promise.resolve(undefined);
-    }
-  });
-
-  return Promise.all([
-    remoteNeedP,
-    ownedNeedP,
-    connectionP,
-    eventsP,
-    remotePersonaP,
-    ownPersonaP,
-  ]).then(results => {
-    return {
-      remoteNeed: results[0],
-      ownedNeed: results[1],
-      connection: results[2],
-      events: results[3],
-      remotePersona: results[4],
-      ownPersona: results[5],
-    };
-  });
-}
-
-export function needsOpen(needUri) {
-  return (dispatch, getState) => {
-    buildOpenNeedMessage(
-      needUri,
-      getState().getIn(["config", "defaultNodeUri"])
-    )
-      .then(data => {
-        dispatch(
-          actionCreators.messages__send({
-            eventUri: data.eventUri,
-            message: data.message,
-          })
-        );
-      })
-      .then(() =>
-        // assume close went through successfully, update GUI
-        dispatch({
-          type: actionTypes.needs.reopen,
-          payload: {
-            ownedNeedUri: needUri,
-          },
-        })
-      );
-  };
-}
-
-export function needsClosedBySystem(event) {
-  return (dispatch, getState) => {
-    //first check if we really have the 'own' need in the state - otherwise we'll ignore the message
-    const need = getState().getIn(["needs", event.getReceiverNeed()]);
-    if (!need) {
-      console.debug(
-        "ignoring deactivateMessage for a need that is not ours:",
-        event.getReceiverNeed()
-      );
-    }
-    dispatch({
-      type: actionTypes.needs.closedBySystem,
-      payload: {
-        needUri: event.getReceiverNeed(),
-        humanReadable: need.get("humanReadable"),
-        message: event.getTextMessage(),
-      },
-    });
-  };
-}
-
-export function needsClose(needUri) {
-  return (dispatch, getState) => {
-    buildCloseNeedMessage(
-      needUri,
-      getState().getIn(["config", "defaultNodeUri"])
-    )
-      .then(data => {
-        dispatch(
-          actionCreators.messages__send({
-            eventUri: data.eventUri,
-            message: data.message,
-          })
-        );
-
-        //Close all the open connections of the need
-        getState()
-          .getIn(["needs", needUri, "connections"])
-          .map(function(con) {
-            if (
-              getState().getIn([
-                "needs",
-                needUri,
-                "connections",
-                con.get("uri"),
-                "state",
-              ]) === won.WON.Connected
-            ) {
-              dispatch(actionCreators.connections__close(con.get("uri")));
-            }
-          });
-      })
-      .then(() =>
-        // assume close went through successfully, update GUI
-        dispatch({
-          type: actionTypes.needs.close,
-          payload: {
-            ownedNeedUri: needUri,
-          },
-        })
-      );
-  };
 }

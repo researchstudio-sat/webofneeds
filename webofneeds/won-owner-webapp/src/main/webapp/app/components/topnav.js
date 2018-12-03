@@ -71,7 +71,7 @@ function genTopnavConf() {
         return {
           themeName: getIn(state, ["config", "theme", "name"]),
           appTitle: getIn(state, ["config", "theme", "title"]),
-          loggedIn: state.getIn(["user", "loggedIn"]),
+          loggedIn: state.getIn(["account", "loggedIn"]),
           isPrivateIdUser: !!privateId,
           isSignUpView: currentRoute === "signup",
         };

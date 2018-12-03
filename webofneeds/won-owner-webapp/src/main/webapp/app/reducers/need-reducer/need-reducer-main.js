@@ -55,11 +55,11 @@ const initialState = Immutable.fromJS({});
 
 export default function(allNeedsInState = initialState, action = {}) {
   switch (action.type) {
-    case actionTypes.logout:
+    case actionTypes.account.logout:
     case actionTypes.needs.clean:
       return initialState;
 
-    case actionTypes.loginStarted:
+    case actionTypes.account.loginStarted:
       // starting a new login process. this could mean switching
       // to a different session. we need to mark any needs
       // that are already loaded as non-owned.
@@ -80,7 +80,7 @@ export default function(allNeedsInState = initialState, action = {}) {
     }
     case actionTypes.initialPageLoad:
     case actionTypes.needs.fetchUnloadedNeeds:
-    case actionTypes.login: {
+    case actionTypes.account.login: {
       const activeNeedUris = action.payload.get("activeNeedUris");
       const inactiveNeedUris = action.payload.get("inactiveNeedUris");
       const inactiveNeedUrisLoading = action.payload.get(

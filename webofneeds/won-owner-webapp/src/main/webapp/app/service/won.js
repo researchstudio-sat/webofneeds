@@ -41,7 +41,6 @@ let won = {};
  */
 
 won.debugmode = false; //if you set this to true, the created needs will get flagged as debug needs in order to get matches and requests from the debugbot
-won.showRdf = false; //if you set this to true, the RDF icons/links are visible
 
 won.clearPrivateId = clearPrivateId;
 won.clearReadUris = clearReadUris;
@@ -362,6 +361,8 @@ won.RESPONSECODE = Object.freeze({
   TOKEN_EXPIRED: 3403,
   SIGNUP_FAILED: 4400,
   SETTINGS_CREATED: 5200,
+  TOS_ACCEPT_SUCCESS: 6200,
+
   PRIVATEID_NOT_FOUND: 666, //this one is not defined in RestStatusResponse.java
 });
 

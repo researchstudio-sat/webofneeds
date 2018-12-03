@@ -8,9 +8,10 @@ import { messagesReducer } from "./message-reducers.js";
 import { isChatConnection } from "../connection-utils.js";
 import reduceReducers from "reduce-reducers";
 import needReducer from "./need-reducer/need-reducer-main.js";
-import userReducer from "./user-reducer.js";
+import accountReducer from "./account-reducer.js";
 import toastReducer from "./toast-reducer.js";
-import { getIn } from "../utils.js";
+import viewReducer from "./view-reducer.js";
+import processReducer from "./process-reducer.js";
 /*
  * this reducer attaches a 'router' object to our state that keeps the routing state.
  */
@@ -32,155 +33,17 @@ const reducers = {
     },
     */
 
-  user: userReducer,
+  account: accountReducer,
   needs: needReducer,
   messages: messagesReducer,
   toasts: toastReducer,
+  view: viewReducer,
+  process: processReducer,
 
   // contains the Date.now() of the last action
   // lastUpdateTime: (state = Date.now(), action = {}) => Date.now(),
   lastUpdateTime: () => Date.now(),
 
-  loginInProcessFor: (loginInProcessFor = undefined, action = {}) => {
-    switch (action.type) {
-      case actionTypes.loginStarted:
-        return getIn(action, ["payload", "email"]);
-
-      case actionTypes.login:
-        if (getIn(action, ["payload", "loginFinished"])) {
-          return undefined;
-        } else {
-          return loginInProcessFor;
-        }
-
-      case actionTypes.loginFailed:
-        return undefined;
-
-      default:
-        return loginInProcessFor;
-    }
-  },
-
-  logoutInProcess: (logoutInProcess = undefined, action = {}) => {
-    switch (action.type) {
-      case actionTypes.logoutStarted:
-        return true;
-
-      case actionTypes.logout:
-        return undefined;
-
-      default:
-        return logoutInProcess;
-    }
-  },
-
-  initialLoadFinished: (state = false, action = {}) =>
-    state ||
-    (action.type === actionTypes.initialPageLoad &&
-      getIn(action, ["payload", "initialLoadFinished"])),
-
-  showRdf: (isShowingRdf = false, action = {}) => {
-    switch (action.type) {
-      case actionTypes.toggleRdfDisplay:
-        return !isShowingRdf;
-      default:
-        return isShowingRdf;
-    }
-  },
-  showClosedNeeds: (isShowingClosed = false, action = {}) => {
-    switch (action.type) {
-      case actionTypes.toggleClosedNeedsDisplay:
-        return !isShowingClosed;
-      case actionTypes.hideClosedNeedsDisplay:
-        return false;
-      case actionTypes.showClosedNeedsDisplay:
-        return true;
-      default:
-        return isShowingClosed;
-    }
-  },
-
-  showMainMenu: (isShowingMainMenu = false, action = {}) => {
-    switch (action.type) {
-      case actionTypes.loginFailed:
-      case actionTypes.showMainMenuDisplay:
-        return true;
-
-      case actionTypes.logout:
-      case actionTypes.toggleRdfDisplay:
-      case actionTypes.login:
-      case actionTypes.hideMainMenuDisplay:
-        return false;
-      default:
-        return isShowingMainMenu;
-    }
-  },
-
-  showAddMessageContent: (isShowingAddMessageContent = false, action = {}) => {
-    switch (action.type) {
-      case actionTypes.toggleAddMessageContentDisplay:
-        return !isShowingAddMessageContent;
-      case actionTypes.selectAddMessageContent:
-      case actionTypes.showAddMessageContentDisplay:
-        return true;
-      case actionTypes.hideAddMessageContentDisplay:
-        return false;
-      default:
-        return isShowingAddMessageContent;
-    }
-  },
-
-  selectedAddMessageContent: (
-    selectedAddMessageContent = undefined,
-    action = {}
-  ) => {
-    switch (action.type) {
-      case actionTypes.selectAddMessageContent:
-        return getIn(action, ["payload", "selectedDetail"]);
-      case actionTypes.toggleAddMessageContentDisplay:
-      case actionTypes.hideAddMessageContentDisplay:
-      case actionTypes.removeAddMessageContent:
-        return undefined;
-      default:
-        return selectedAddMessageContent;
-    }
-  },
-
-  showModalDialog: (isShowingModalDialog = false, action = {}) => {
-    switch (action.type) {
-      case actionTypes.openModalDialog:
-        return true;
-      case actionTypes.closeModalDialog:
-        return false;
-      default:
-        return isShowingModalDialog;
-    }
-  },
-
-  modalDialog: (modalDialog = undefined, action = {}) => {
-    switch (action.type) {
-      case actionTypes.openModalDialog:
-        return Immutable.fromJS(action.payload);
-      case actionTypes.closeModalDialog:
-      default:
-        return modalDialog;
-    }
-  },
-
-  creatingWhatsX: (creatingWhatsX = false, action = {}) => {
-    switch (action.type) {
-      case actionTypes.needs.whatsNew:
-      case actionTypes.needs.whatsAround:
-        return true;
-      case actionTypes.failedToGetLocation:
-      case actionTypes.needs.createSuccessful:
-        return false;
-      default:
-        return creatingWhatsX;
-    }
-  },
-
-  //config: createReducer(
   config: (
     config = Immutable.fromJS({ theme: { name: "current" } }),
     action = {}
@@ -240,22 +103,12 @@ export default reduceReducers(
        * in the state.
        */
       case actionTypes.initialPageLoad:
-      case actionTypes.login:
+      case actionTypes.account.login:
       case actionTypes.messages.connectMessageSent:
       case actionTypes.messages.connectMessageReceived:
       case actionTypes.messages.hintMessageReceived:
         return deleteChatConnectionsBetweenOwnedNeeds(state);
 
-      case actionTypes.mainViewScrolled:
-        return state.set("mainViewScroll", action.payload);
-      /*
-              * TODO try to resolve a lot of the AC-dispatching so only
-              * high-level actions are left there. avoid actions that
-              * trigger other actions. also, actions shouldn't have a
-              * 1:1 mapping to state.
-              * see: https://github.com/rackt/redux/issues/857#issuecomment-146021839
-              * see: https://github.com/rackt/redux/issues/857#issuecomment-146269384
-              */
       default:
         return state;
     }

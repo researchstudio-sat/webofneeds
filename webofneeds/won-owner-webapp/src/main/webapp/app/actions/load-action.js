@@ -36,7 +36,7 @@ export const pageLoadAction = () => (dispatch, getState) => {
     /* handle data, dispatch actions */
     .then(data =>
       dispatch({
-        type: actionTypes.login,
+        type: actionTypes.account.login,
         payload: Immutable.fromJS(data).merge({ loggedIn: true }),
       })
     )
@@ -98,7 +98,7 @@ function loadingWithAnonymousAccount(dispatch, getState, privateId) {
           e
         );
         dispatch({
-          type: actionTypes.loginFailed,
+          type: actionTypes.account.loginFailed,
           payload: {
             loginError: Immutable.fromJS(won.PRIVATEID_NOT_FOUND_ERROR),
             credentials: { privateId },

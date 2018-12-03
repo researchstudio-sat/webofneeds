@@ -216,8 +216,8 @@ class AboutController {
           "/" +
           getIn(state, ["config", "theme", "privacyPolicyTemplate"]),
         peopleGrid: peopleGrid({ themeName }),
-        pendingPublishing: state.get("creatingWhatsX"),
-        showModalDialog: state.get("showModalDialog"),
+        processingPublish: state.getIn(["process", "processingPublish"]),
+        showModalDialog: state.getIn(["view", "showModalDialog"]),
       };
     };
     const disconnect = this.$ngRedux.connect(select, actionCreators)(this);
@@ -241,13 +241,13 @@ class AboutController {
   }
 
   createWhatsAround() {
-    if (!this.pendingPublishing) {
+    if (!this.processingPublish) {
       this.needs__whatsAround();
     }
   }
 
   createWhatsNew() {
-    if (!this.pendingPublishing) {
+    if (!this.processingPublish) {
       this.needs__whatsNew();
     }
   }

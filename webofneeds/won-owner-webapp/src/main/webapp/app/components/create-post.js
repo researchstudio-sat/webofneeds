@@ -118,7 +118,6 @@ function genComponentConf() {
 
       this.showTuningOptions = false;
 
-      this.pendingPublishing = false;
       this.details = { is: [], seeks: [] };
       this.isNew = true;
 
@@ -141,6 +140,7 @@ function genComponentConf() {
           : [];
 
         return {
+          processingPublish: state.getIn(["process", "processingPublish"]),
           connectionHasBeenLost: !selectIsConnected(state),
           useCaseString,
           useCase: selectUseCaseFrom(useCaseString, useCases),
@@ -264,9 +264,7 @@ function genComponentConf() {
     }
 
     publish(persona) {
-      if (!this.pendingPublishing) {
-        this.pendingPublishing = true;
-
+      if (!this.processingPublish) {
         this.draftObject.useCase = get(this.useCase, "identifier");
 
         if (!isBranchContentPresent(this.draftObject.content)) {

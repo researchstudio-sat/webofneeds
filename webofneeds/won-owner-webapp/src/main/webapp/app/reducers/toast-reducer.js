@@ -14,7 +14,7 @@ export default function(allToasts = initialState, action = {}) {
       allToasts = pushNewToast(allToasts, "Info Toast", won.WON.infoToast);
       return allToasts;
 
-    case actionTypes.logout:
+    case actionTypes.account.logout:
       return initialState;
 
     case actionTypes.messages.connect.failure:
@@ -27,7 +27,7 @@ export default function(allToasts = initialState, action = {}) {
       );
     }
 
-    case actionTypes.registerFailed: {
+    case actionTypes.account.registerFailed: {
       const privateId = getIn(action, ["payload", "privateId"]);
       if (privateId) {
         return pushNewToast(
@@ -42,7 +42,14 @@ export default function(allToasts = initialState, action = {}) {
       }
     }
 
-    case actionTypes.loginFailed: {
+    case actionTypes.account.acceptTermsOfServiceFailed:
+      return pushNewToast(
+        allToasts,
+        "Failed to accept Terms Of Service",
+        won.WON.errorToast
+      );
+
+    case actionTypes.account.loginFailed: {
       const loginError = getIn(action, ["payload", "loginError"]);
       const errorCode = loginError && loginError.get("code");
       if (errorCode == won.RESPONSECODE.PRIVATEID_NOT_FOUND) {

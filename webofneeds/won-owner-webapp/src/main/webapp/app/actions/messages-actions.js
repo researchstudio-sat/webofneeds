@@ -3,11 +3,8 @@
  */
 
 import won from "../won-es6.js";
-import {
-  actionTypes,
-  actionCreators,
-  getConnectionRelatedData,
-} from "./actions.js";
+import { actionTypes, actionCreators } from "./actions.js";
+import { entries } from "../utils.js";
 
 import Immutable from "immutable";
 import { getOwnMessageUri } from "../message-utils.js";
@@ -1131,4 +1128,67 @@ export function dispatchActionOnFailureRemote(event) {
       },
     });
   };
+}
+
+/**
+ * @param needUri
+ * @param remoteNeedUri
+ * @param connectionUri
+ * @return {*}
+ */
+function getConnectionRelatedData(needUri, remoteNeedUri, connectionUri) {
+  const remoteNeedP = won.getNeed(remoteNeedUri);
+  const ownedNeedP = won.getNeed(needUri);
+  const connectionP = won.getConnectionWithEventUris(connectionUri, {
+    requesterWebId: needUri,
+  });
+  const eventsP = won
+    .getEventsOfConnection(connectionUri, { requesterWebId: needUri })
+    .then(eventsLookup => {
+      const eventList = [];
+      for (let [, event] of entries(eventsLookup)) {
+        eventList.push(event);
+      }
+      return eventList;
+    });
+
+  const remotePersonaP = remoteNeedP.then(remoteNeed => {
+    const remoteHeldBy = remoteNeed && remoteNeed["won:heldBy"];
+    const remotePersonaUri = remoteHeldBy && remoteHeldBy["@id"];
+
+    if (remotePersonaUri) {
+      return won.getNeed(remotePersonaUri);
+    } else {
+      return Promise.resolve(undefined);
+    }
+  });
+
+  const ownPersonaP = ownedNeedP.then(ownedNeed => {
+    const ownHeldBy = ownedNeed && ownedNeed["won:heldBy"];
+    const ownPersonaUri = ownHeldBy && ownHeldBy["@id"];
+
+    if (ownPersonaUri) {
+      return won.getNeed(ownPersonaUri);
+    } else {
+      return Promise.resolve(undefined);
+    }
+  });
+
+  return Promise.all([
+    remoteNeedP,
+    ownedNeedP,
+    connectionP,
+    eventsP,
+    remotePersonaP,
+    ownPersonaP,
+  ]).then(results => {
+    return {
+      remoteNeed: results[0],
+      ownedNeed: results[1],
+      connection: results[2],
+      events: results[3],
+      remotePersona: results[4],
+      ownPersona: results[5],
+    };
+  });
 }

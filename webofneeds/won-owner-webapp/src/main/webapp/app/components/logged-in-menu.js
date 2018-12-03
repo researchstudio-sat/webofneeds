@@ -17,20 +17,20 @@ function genComponentConf() {
         ng-if="self.isPrivateIdUser"
         href="{{ self.absHRef(self.$state, 'signup') }}"
         class="won-button--outlined thin red show-in-responsive"
-        ng-click="self.hideMainMenuDisplay()">
+        ng-click="self.view__hideMainMenu()">
         Sign up
     </a>
     <a
         href="{{ self.absHRef(self.$state, 'settings') }}"
         class="won-button--outlined thin red"
-        ng-click="self.hideMainMenuDisplay()">
+        ng-click="self.view__hideMainMenu()">
         <span>Account Settings</span>
     </a>
     <hr/>
     <button
         class="won-button--filled lighterblue"
         style="width:100%"
-        ng-click="::self.logout()">
+        ng-click="::self.account__logout()">
         <span>Sign out</span>
     </button>
     `;
@@ -53,8 +53,8 @@ function genComponentConf() {
 
       const logout = state => {
         return {
-          loggedIn: state.getIn(["user", "loggedIn"]),
-          email: state.getIn(["user", "email"]),
+          loggedIn: state.getIn(["account", "loggedIn"]),
+          email: state.getIn(["account", "email"]),
           isPrivateIdUser: isPrivateUser(state),
         };
       };

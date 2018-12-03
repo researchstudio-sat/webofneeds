@@ -9,6 +9,7 @@ import { fetchOwnedData } from "../won-message-utils.js";
 import {
   registerAccount,
   transferPrivateAccount,
+  acceptTermsOfService,
   login,
   logout,
   parseCredentials,
@@ -33,7 +34,7 @@ import { loadLatestMessagesOfConnection } from "./connections-actions.js";
  */
 export async function ensureLoggedIn(dispatch, getState) {
   const state = getState();
-  if (state.getIn(["user", "loggedIn"])) {
+  if (state.getIn(["account", "loggedIn"])) {
     return;
   }
 
@@ -45,7 +46,7 @@ export async function ensureLoggedIn(dispatch, getState) {
       `Creating temporary account (${privateId}) has failed due to `,
       err
     );
-    dispatch(actionCreators.registerFailed({ privateId }));
+    dispatch(actionCreators.account__registerFailed({ privateId }));
   }
 }
 
@@ -85,13 +86,14 @@ export function accountLogin(credentials, options) {
       "currentParams",
       "privateId",
     ]);
-    const prevEmail = state.getIn(["user", "email"]);
+    const prevEmail = state.getIn(["account", "email"]);
 
     const wasLoggedIn =
-      state.get("initialLoadFinished") && (prevPrivateId || prevEmail);
+      !state.getIn(["process", "processingInitialLoad"]) &&
+      (prevPrivateId || prevEmail);
 
     if (
-      state.get("loginInProcessFor") === email ||
+      state.getIn(["process", "processingLoginForEmail"]) === email ||
       _loginInProcessFor === email
     ) {
       console.debug(
@@ -103,7 +105,7 @@ export function accountLogin(credentials, options) {
     }
 
     if (
-      state.get("initialLoadFinished") &&
+      !state.getIn(["process", "processingInitialLoad"]) &&
       ((credentials.privateId && credentials.privateId === prevPrivateId) ||
         (credentials.email && credentials.email === prevEmail))
     ) {
@@ -117,7 +119,7 @@ export function accountLogin(credentials, options) {
 
     const curriedDispatch = data =>
       dispatch({
-        type: actionTypes.login,
+        type: actionTypes.account.login,
         payload: Immutable.fromJS(data).merge({ email: email, loggedIn: true }),
       });
 
@@ -125,7 +127,7 @@ export function accountLogin(credentials, options) {
       .then(() => {
         _loginInProcessFor = email;
         return dispatch({
-          type: actionTypes.loginStarted,
+          type: actionTypes.account.loginStarted,
           payload: { email },
         });
       })
@@ -152,7 +154,7 @@ export function accountLogin(credentials, options) {
       .then(() => login(credentials))
       .then(data =>
         dispatch({
-          type: actionTypes.login,
+          type: actionTypes.account.login,
           payload: Immutable.fromJS(data).merge({
             email: email,
             loggedIn: true,
@@ -196,7 +198,7 @@ export function accountLogin(credentials, options) {
               }
 
               dispatch(
-                actionCreators.loginFailed({
+                actionCreators.account.loginFailed({
                   loginError: Immutable.fromJS(loginError),
                   error,
                   credentials,
@@ -240,7 +242,7 @@ export function accountLogout(options) {
   return (dispatch, getState) => {
     const state = getState();
 
-    if (state.get("logoutInProcess") || _logoutInProcess) {
+    if (state.getIn(["process", "processingLogout"]) || _logoutInProcess) {
       console.debug(
         "There's already a logout in process. Aborting redundant attempt."
       );
@@ -251,7 +253,7 @@ export function accountLogout(options) {
     return Promise.resolve()
       .then(() =>
         dispatch({
-          type: actionTypes.logoutStarted,
+          type: actionTypes.account.logoutStarted,
           payload: {},
         })
       )
@@ -271,7 +273,7 @@ export function accountLogout(options) {
       })
       .then(() =>
         dispatch({
-          type: actionTypes.logout,
+          type: actionTypes.account.logout,
           payload: Immutable.fromJS({
             loggedIn: false,
             httpSessionDowngraded: true,
@@ -290,7 +292,7 @@ export function accountLogout(options) {
       })
       .then(() =>
         dispatch({
-          type: actionTypes.logout,
+          type: actionTypes.account.logout,
           payload: Immutable.fromJS({ loggedIn: false, logoutFinished: true }),
         })
       );
@@ -315,7 +317,9 @@ export function accountRegister(credentials) {
         const registerError =
           "Registration failed (E-Mail might already be used)";
         console.error(registerError, error);
-        dispatch(actionCreators.registerFailed({ registerError, error }));
+        dispatch(
+          actionCreators.account__registerFailed({ registerError, error })
+        );
       });
 }
 
@@ -338,14 +342,29 @@ export function accountTransfer(credentials) {
         //TODO: PRINT MORE SPECIFIC ERROR MESSAGE, already registered/password to short etc.
         const registerError = "Account Transfer failed";
         console.error(registerError, error);
-        dispatch(actionCreators.registerFailed({ registerError, error }));
+        dispatch(
+          actionCreators.account__registerFailed({ registerError, error })
+        );
       });
 }
 
 export function accountAcceptDisclaimer() {
   return dispatch => {
     setDisclaimerAccepted();
-    dispatch({ type: actionTypes.acceptDisclaimerSuccess });
+    dispatch({ type: actionTypes.account.acceptDisclaimerSuccess });
+  };
+}
+
+export function accountAcceptTermsOfService() {
+  return dispatch => {
+    dispatch({ type: actionTypes.account.acceptTermsOfServiceStarted });
+    acceptTermsOfService()
+      .then(() => {
+        dispatch({ type: actionTypes.account.acceptTermsOfServiceSuccess });
+      })
+      .catch(() => {
+        dispatch({ type: actionTypes.account.acceptTermsOfServiceFailed });
+      });
   };
 }
 
@@ -362,7 +381,7 @@ export function reconnect() {
       * -- check for new connections (i.e. matches and incoming requests) --
       */
       // await pageLoadAction()(dispatch, getState);
-      // const email = getIn(state, ["user", "email"]);
+      // const email = getIn(state, ["account", "email"]);
       // await fetchOwnedData(email, payload => {
       //   dispatch({
       //     type: actionTypes.initialPageLoad, // TODO make this it's own type
@@ -392,8 +411,9 @@ export function reconnect() {
       );
     } catch (e) {
       if (e.message == "Unauthorized") {
-        dispatch({ type: actionTypes.logout });
-        dispatch({ type: actionTypes.showMainMenuDisplay });
+        //FIXME: this seems weird and unintentional to me, the actionTypes.account.logout closes the main menu (see view-reducer.js) and the dispatch after opens it again, is this wanted that way?
+        dispatch({ type: actionTypes.account.logout });
+        dispatch({ type: actionTypes.view.showMainMenu });
       } else {
         dispatch(actionCreators.lostConnection());
       }

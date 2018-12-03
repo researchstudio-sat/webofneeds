@@ -16,7 +16,7 @@ function genComponentConf() {
         ng-transclude="header"
         class="dd__open-button clickable"
         ng-class="{ 'dd--closed' : !self.showMainMenu }"
-        ng-click="self.showMainMenuDisplay()"
+        ng-click="self.view__showMainMenu()"
       >
       </div>
       <div class="dd__dropdown" ng-show="self.showMainMenu">
@@ -24,7 +24,7 @@ function genComponentConf() {
           ng-transclude="header"
           class="dd__close-button clickable"
           ng-class="{ 'dd--open' : self.showMainMenu }"
-          ng-click="self.hideMainMenuDisplay()"
+          ng-click="self.view__hideMainMenu()"
         >
         </div>
         <div
@@ -40,7 +40,7 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
 
       const selectFromState = state => ({
-        showMainMenu: state.get("showMainMenu"),
+        showMainMenu: state.getIn(["view", "showMainMenu"]),
       });
 
       connect2Redux(selectFromState, actionCreators, [], this);
@@ -49,7 +49,7 @@ function genComponentConf() {
         const clickedElement = event.target;
         //hide MainMenu if click was outside of the component and menu was open
         if (this.showMainMenu && !this.$element[0].contains(clickedElement)) {
-          this.hideMainMenuDisplay();
+          this.view__hideMainMenu();
         }
       };
 

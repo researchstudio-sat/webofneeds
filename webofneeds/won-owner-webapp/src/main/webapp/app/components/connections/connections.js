@@ -34,16 +34,6 @@ class ConnectionsController {
     this.SEARCH = "search";
     this.POST = "post";
 
-    //const scrollArea = this.$element[0].querySelector(".overview__content");
-
-    /*this.scrollBuffer = callBuffer(scrollPosition => {
-      self.mainViewScrolled(scrollPosition);
-    }, 100);*/
-
-    /*scrollArea.addEventListener("scroll", () => {
-      self.scrollBuffer(scrollArea.scrollTop);
-    });*/
-
     const selectFromState = state => {
       const selectedPostUri = decodeURIComponent(
         getIn(state, ["router", "currentParams", "postUri"])
@@ -105,7 +95,7 @@ class ConnectionsController {
         open,
         mainViewScroll: state.get("mainViewScroll"),
         showWelcomePage: !(ownedNeeds && ownedNeeds.size > 0),
-        showModalDialog: state.get("showModalDialog"),
+        showModalDialog: state.getIn(["view", "showModalDialog"]),
       };
     };
 

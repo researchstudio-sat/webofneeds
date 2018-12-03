@@ -30,11 +30,11 @@ class SignupController {
       const privateId = getIn(state, ["router", "currentParams", "privateId"]);
 
       return {
-        loggedIn: state.getIn(["user", "loggedIn"]),
-        registerError: state.getIn(["user", "registerError"]),
+        loggedIn: state.getIn(["account", "loggedIn"]),
+        registerError: state.getIn(["account", "registerError"]),
         isPrivateIdUser: !!privateId,
         privateId,
-        showModalDialog: state.get("showModalDialog"),
+        showModalDialog: state.getIn(["view", "showModalDialog"]),
       };
     };
     const disconnect = this.$ngRedux.connect(select, actionCreators)(this);
@@ -42,17 +42,17 @@ class SignupController {
   }
 
   formKeyup(event) {
-    this.registerReset();
+    this.view__clearRegisterError();
     if (event.keyCode == 13 && this.passwordAgain === this.password) {
       if (this.isPrivateIdUser) {
-        this.transfer({
+        this.account__transfer({
           email: this.email,
           password: this.password,
           privateId: this.privateId,
           rememberMe: this.rememberMe,
         });
       } else {
-        this.register({
+        this.account__register({
           email: this.email,
           password: this.password,
           rememberMe: this.rememberMe,

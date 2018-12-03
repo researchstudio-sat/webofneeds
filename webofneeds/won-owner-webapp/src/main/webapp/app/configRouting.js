@@ -188,7 +188,7 @@ export function accessControl({
 
     case defaultRoute: //Route the 'default' view at all times
       // if(
-      //     state.get('initialLoadFinished') &&  // no access control while still loading
+      //     !state.getIn(["process", "processingInitialLoad"]) &&  // no access control while still loading
       //     getIn(state, ['user', 'loggedIn']))
       // {
       //     //logged in -- re-initiate route-change
@@ -211,8 +211,8 @@ export function accessControl({
 
     default:
       //FOR ALL OTHER ROUTES
-      if (state.get("initialLoadFinished")) {
-        if (state.getIn(["user", "loggedIn"])) {
+      if (!state.getIn(["process", "processingInitialLoad"])) {
+        if (state.getIn(["account", "loggedIn"])) {
           return; // logged in. continue route-change as intended.
         } else {
           //sure to be logged out
@@ -262,7 +262,7 @@ function reactToPrivateIdChanges(
   const state = getState();
 
   const { email } = toPrivateId ? privateId2Credentials(toPrivateId) : {};
-  if (state.get("loginInProcessFor")) {
+  if (state.getIn(["process", "processingLogin"])) {
     console.debug(
       "There's already a login in process with the email " +
         email +
@@ -273,13 +273,13 @@ function reactToPrivateIdChanges(
     return Promise.resolve();
   }
 
-  if (state.get("logoutInProcess")) {
+  if (state.getIn(["process", "processingLogout"])) {
     // already logging out
     return Promise.resolve();
   }
 
   // v--- do any login-actions only when privateId is added after initialPageLoad. The latter should handle any necessary logins itself.
-  if (state.get("initialLoadFinished")) {
+  if (!state.getIn(["process", "processingInitialLoad"])) {
     if (fromPrivateId !== toPrivateId) {
       // privateId has changed or was added
       const credentials = { privateId: toPrivateId };

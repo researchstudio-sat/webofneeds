@@ -405,6 +405,31 @@ public class RestUserController {
 
     @ResponseBody
     @RequestMapping(
+            value = "/acceptTermsOfService",
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            method = RequestMethod.POST
+    )
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public ResponseEntity acceptTermsOfService() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        // cannot use user object from context since hw doesn't know about created in this session need,
+        // therefore, we have to retrieve the user object from the user repository
+        User user = userService.getByUsername(username);
+        if (user == null) {
+            return generateStatusResponse(RestStatusResponse.USER_NOT_FOUND);
+        }
+
+        if(user.isAcceptedTermsOfService()){
+            return generateStatusResponse(RestStatusResponse.TOS_ACCEPT_SUCCESS);
+        } else {
+            user.setAcceptedTermsOfService(true);
+            userService.save(user);
+            return generateStatusResponse(RestStatusResponse.TOS_ACCEPT_SUCCESS);
+        }
+    }
+
+    @ResponseBody
+    @RequestMapping(
             value = "/resendVerificationEmail",
             method = RequestMethod.POST
     )
@@ -463,6 +488,7 @@ public class RestUserController {
         values.put("authorities", user.getAuthorities());
         values.put("role", user.getRole());
         values.put("emailVerified", user.isEmailVerified());
+        values.put("acceptedTermsOfService", user.isAcceptedTermsOfService());
 
         return new ResponseEntity<Map>(values, HttpStatus.OK);
     }

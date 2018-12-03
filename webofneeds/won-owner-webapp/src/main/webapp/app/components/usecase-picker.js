@@ -41,24 +41,24 @@ function genComponentConf() {
         <!-- WHAT'S AROUND -->
         <div class="ucp__createx">
             <button class="ucp__createx__button--pending won-button--filled red"
-                    ng-if="self.pendingPublishing"
-                    ng-disabled="self.pendingPublishing">
+                    ng-if="self.processingPublish"
+                    ng-disabled="self.processingPublish">
                 <span>Finding out what's going on&hellip;</span>
             </button>
 
             <button class="won-button--filled red ucp__createx__button"
-                    ng-if="!self.pendingPublishing"
+                    ng-if="!self.processingPublish"
                     ng-click="self.createWhatsAround()"
-                    ng-disabled="self.pendingPublishing">
+                    ng-disabled="self.processingPublish">
                 <svg class="won-button-icon" style="--local-primary:white;">
                     <use xlink:href="#ico36_location_current" href="#ico36_location_current"></use>
                 </svg>
                 <span>What's in your Area?</span>
             </button>
             <button class="won-button--filled red ucp__createx__button"
-                    ng-if="!self.pendingPublishing"
+                    ng-if="!self.processingPublish"
                     ng-click="self.createWhatsNew()"
-                    ng-disabled="self.pendingPublishing">
+                    ng-disabled="self.processingPublish">
                 <span>What's new?</span>
             </button>
 
@@ -143,7 +143,7 @@ function genComponentConf() {
 
         return {
           useCaseGroup,
-          pendingPublishing: state.get("creatingWhatsX"),
+          processingPublish: state.getIn(["process", "processingPublish"]),
           connectionHasBeenLost: !selectIsConnected(state),
         };
       };
@@ -155,13 +155,13 @@ function genComponentConf() {
     // redirects start
 
     createWhatsAround() {
-      if (!this.pendingPublishing) {
+      if (!this.processingPublish) {
         this.needs__whatsAround();
       }
     }
 
     createWhatsNew() {
-      if (!this.pendingPublishing) {
+      if (!this.processingPublish) {
         this.needs__whatsNew();
       }
     }

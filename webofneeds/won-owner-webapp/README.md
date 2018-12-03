@@ -90,7 +90,6 @@ $ngRedux.getState();
    events: {...},
    unreadEventUris: {...},
  },
- initialLoadFinished: true|false,
  lastUpdateTime: timeinmillis,
  messages: {
    enqueued: {...},
@@ -225,24 +224,33 @@ $ngRedux.getState();
    prevState: {...}
  },
  toasts: {...},
- user: {
+ account: {
     ...,
     acceptedDisclaimer: true|false, //flag whether the user has accepted the ToS etc. already. (default is false)
  },
- showRdf: true|false, //flag that is true if rawData mode is on (enables rdf view and rdf links) (default is false)
- showClosedNeeds: true|false, //flag whether the drawer of the closedNeeds is open or closed (default is false)
- showMainMenu: true|false, //flag whether the mainmenu dropdown is open or closed (default is false)
- showModalDialog: true|false, //flag whether the omnipresent modal dialog is displayed or not (default is false)
- modalDialog: {
-   caption: string, //header caption of the modal dialog
-   text: string,
-   buttons: [ //Array
-     {
-      caption: string //caption of the button
-      callback: callback //action of the button
-     }
-     ...
-   ]
+ view: {
+     showRdf: true|false, //flag that is true if rawData mode is on (enables rdf view and rdf links) (default is false)
+     showClosedNeeds: true|false, //flag whether the drawer of the closedNeeds is open or closed (default is false)
+     showMainMenu: true|false, //flag whether the mainmenu dropdown is open or closed (default is false)
+     showModalDialog: true|false, //flag whether the omnipresent modal dialog is displayed or not (default is false)
+     modalDialog: {
+        caption: string, //header caption of the modal dialog
+        text: string,
+        buttons: [ //Array
+            {
+            caption: string //caption of the button
+            callback: callback //action of the button
+            }
+            ...
+        ]
+    }
+ },
+ process: {
+    processingPublish: true|false, //default false, flag that is true if a need(or persona) is currently being created
+    processingLogout: true|false, //default false, flag that indicates if a logout is currently in process
+    processingInitialLoad: true|false //flag that indicates if the initialLoad is currently in process
+    processingLogin: true|false, //default false flag that indicates if a login is currently in process
+    processingLoginForEmail: undefined, //indicates which is user is currently being logged in undefined if nouser is currently being logged in, otherwise the email will be stored
  }
 }
 */

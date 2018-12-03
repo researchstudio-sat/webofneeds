@@ -152,7 +152,7 @@ function genComponentConf() {
             ng-if="self.selectedDetail && !self.multiSelectType">
             <div class="cts__details__input__header">
               <svg class="cts__details__input__header__back clickable"
-                ng-click="self.removeAddMessageContent()">
+                ng-click="self.view.removeAddMessageContent()">
                 <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
               </svg>
               <svg class="cts__details__input__header__icon">
@@ -326,7 +326,10 @@ function genComponentConf() {
         const hasClaimableMessages =
           claimableMessages && claimableMessages.size > 0;
 
-        const selectedDetailIdentifier = state.get("selectedAddMessageContent");
+        const selectedDetailIdentifier = state.getIn([
+          "view",
+          "selectedAddMessageContent",
+        ]);
         const selectedDetail =
           this.allMessageDetails &&
           selectedDetailIdentifier &&
@@ -347,10 +350,10 @@ function genComponentConf() {
           connectionHasBeenLost:
             state.getIn(["messages", "reconnecting"]) ||
             state.getIn(["messages", "lostConnection"]),
-          showAddMessageContent: state.get("showAddMessageContent"),
+          showAddMessageContent: state.getIn(["view", "showAddMessageContent"]),
           selectedDetail,
           selectedDetailComponent: selectedDetail && selectedDetail.component,
-          isLoggedIn: state.getIn(["user", "loggedIn"]),
+          isLoggedIn: state.getIn(["account", "loggedIn"]),
         };
       };
 
@@ -472,14 +475,14 @@ function genComponentConf() {
     }
 
     pickDetail(detail) {
-      this.selectAddMessageContent({ selectedDetail: detail.identifier });
+      this.view__selectAddMessageContent({ selectedDetail: detail.identifier });
     }
 
     updateDetail(name, value, closeOnDelete = false) {
       if (!value) {
         this.additionalContent.delete(name);
         if (closeOnDelete) {
-          this.hideAddMessageContentDisplay();
+          this.view__hideAddMessageContent();
         }
       } else {
         this.additionalContent.set(name, value);
@@ -635,7 +638,7 @@ function genComponentConf() {
 
     toggleAdditionalContentDisplay() {
       this.cancelMultiSelect();
-      this.toggleAddMessageContentDisplay();
+      this.view__toggleAddMessageContent();
     }
   }
   Controller.$inject = serviceDependencies;

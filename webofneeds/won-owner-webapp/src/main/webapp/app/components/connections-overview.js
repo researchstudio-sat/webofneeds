@@ -234,7 +234,7 @@ function genComponentConf() {
 
         return {
           allNeeds,
-          showClosedNeeds: state.get("showClosedNeeds"),
+          showClosedNeeds: state.getIn(["view", "showClosedNeeds"]),
           useCase,
           useCaseGroup,
           needUriInRoute,
@@ -338,7 +338,7 @@ function genComponentConf() {
       if (this.unloadedNeedsSize > 0) {
         this.needs__fetchUnloadedNeeds();
       }
-      this.toggleClosedNeedsDisplay();
+      this.view__toggleClosedNeeds();
     }
 
     isOpen(ownedNeedUri) {

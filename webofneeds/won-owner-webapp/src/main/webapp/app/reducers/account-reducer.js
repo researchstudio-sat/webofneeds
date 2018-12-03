@@ -14,7 +14,7 @@ const initialState = Immutable.fromJS({
 export default function(userData = initialState, action = {}) {
   switch (action.type) {
     case actionTypes.initialPageLoad:
-    case actionTypes.login: {
+    case actionTypes.account.login: {
       //because we get payload as immutablejs-map sometimes but not always
       const immutablePayload = Immutable.fromJS(action.payload);
 
@@ -33,10 +33,15 @@ export default function(userData = initialState, action = {}) {
           userData.get("emailVerified") ||
           immutablePayload.get("emailVerified");
 
+        const acceptedTermsOfService =
+          userData.get("acceptedTermsOfService") ||
+          immutablePayload.get("acceptedTermsOfService");
+
         return Immutable.fromJS({
           loggedIn: true,
           email: email || username,
           emailVerified: emailVerified,
+          acceptedTermsOfService: acceptedTermsOfService,
           acceptedDisclaimer: userData.get("acceptedDisclaimer"),
         });
       } else {
@@ -44,39 +49,41 @@ export default function(userData = initialState, action = {}) {
       }
     }
 
-    case actionTypes.logout:
+    case actionTypes.account.acceptTermsOfServiceSuccess:
+      return userData.set("acceptedTermsOfService", true);
+    case actionTypes.account.acceptTermsOfServiceFailed:
+      return userData.set("acceptedTermsOfService", false);
+
+    case actionTypes.account.logout:
       return Immutable.fromJS({
         loggedIn: false,
         acceptedDisclaimer: userData.get("acceptedDisclaimer"),
       });
 
-    case actionTypes.loginFailed:
+    case actionTypes.account.loginFailed:
       return Immutable.fromJS({
         loginError: action.payload.loginError,
         loggedIn: false,
         acceptedDisclaimer: userData.get("acceptedDisclaimer"),
       });
 
-    case actionTypes.typedAtLoginCredentials:
+    case actionTypes.view.clearLoginError:
       if (!userData.get("loggedIn")) {
         return userData.set("loginError", undefined);
       } else {
         return userData;
       }
 
-    case actionTypes.registerReset:
-      return Immutable.fromJS({
-        registerError: undefined,
-        acceptedDisclaimer: userData.get("acceptedDisclaimer"),
-      });
+    case actionTypes.view.clearRegisterError:
+      return userData.set("registerError", undefined);
 
-    case actionTypes.registerFailed:
+    case actionTypes.account.registerFailed:
       return Immutable.fromJS({
         registerError: action.payload.registerError,
         acceptedDisclaimer: userData.get("acceptedDisclaimer"),
       });
 
-    case actionTypes.acceptDisclaimerSuccess:
+    case actionTypes.account.acceptDisclaimerSuccess:
       return userData.set("acceptedDisclaimer", true);
 
     default:
