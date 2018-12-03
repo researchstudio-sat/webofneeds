@@ -199,7 +199,7 @@ export function accountLogin(credentials, options) {
               }
 
               dispatch(
-                actionCreators.account.loginFailed({
+                actionCreators.account__loginFailed({
                   loginError: Immutable.fromJS(loginError),
                   error,
                   credentials,
