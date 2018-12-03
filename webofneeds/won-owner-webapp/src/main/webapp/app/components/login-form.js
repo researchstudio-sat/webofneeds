@@ -6,7 +6,7 @@ import { attach, delay } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import {
   connect2Redux,
-  getLoginErrorMessage,
+  parseRestErrorMessage,
   resendEmailVerification,
 } from "../won-utils.js";
 import won from "../won-es6.js";
@@ -28,7 +28,7 @@ function genLoginConf() {
                 autofocus
                 ng-keyup="self.formKeyUp($event)"/>
             <span class="wl__errormsg" ng-if="self.loginError">
-                {{self.getLoginErrorMessage(self.loginError)}}
+                {{self.parseRestErrorMessage(self.loginError)}}
                 <a class="wl__errormsg__resend"
                  ng-if="!self.clickedResend && self.isNotVerified"
                  ng-click="self.resendEmailVerification()">(Click to Resend Verification Email)</a>
@@ -69,7 +69,7 @@ function genLoginConf() {
     constructor(/* arguments <- serviceDependencies */) {
       attach(this, serviceDependencies, arguments);
       Object.assign(this, srefUtils); // bind srefUtils to scope
-      this.getLoginErrorMessage = getLoginErrorMessage;
+      this.parseRestErrorMessage = parseRestErrorMessage;
       window.lic4dbg = this;
 
       this.email = "";

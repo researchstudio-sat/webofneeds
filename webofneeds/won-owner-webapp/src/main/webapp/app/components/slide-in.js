@@ -9,7 +9,7 @@ import { actionCreators } from "../actions/actions.js";
 import {
   connect2Redux,
   resendEmailVerification,
-  getLoginErrorMessage,
+  parseRestErrorMessage,
 } from "../won-utils.js";
 
 import * as srefUtils from "../sref-utils.js";
@@ -48,7 +48,7 @@ function genSlideInConf() {
                 E-Mail Address verified
             </span>
             <span class="si__text" ng-if="!self.processingVerifyEmailAddress && self.emailVerificationError">
-                {{ self.getLoginErrorMessage(self.emailVerificationError) }}
+                {{ self.parseRestErrorMessage(self.emailVerificationError) }}
             </span>
             <button
               class="si__button"
@@ -147,7 +147,7 @@ function genSlideInConf() {
       attach(this, serviceDependencies, arguments);
       Object.assign(this, srefUtils); // bind srefUtils to scope
       this.clickedResend = false;
-      this.getLoginErrorMessage = getLoginErrorMessage;
+      this.parseRestErrorMessage = parseRestErrorMessage;
 
       const selectFromState = state => {
         const verificationToken = getIn(state, [

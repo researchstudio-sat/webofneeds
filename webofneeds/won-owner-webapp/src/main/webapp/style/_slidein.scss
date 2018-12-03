@@ -28,6 +28,11 @@
     flex-direction: column;
   }
 
+  & > .si__close {
+    cursor: pointer;
+  }
+
+  & > .si__close,
   & > .si__icon {
     @media (max-width: $responsivenessBreakPoint) {
       margin: 0;

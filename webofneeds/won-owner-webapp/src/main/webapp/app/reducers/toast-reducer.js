@@ -2,7 +2,7 @@ import { actionTypes } from "../actions/actions.js";
 import Immutable from "immutable";
 import won from "../won-es6.js";
 import { getIn, generateIdString } from "../utils.js";
-import { getLoginErrorMessage } from "../won-utils.js";
+import { parseRestErrorMessage } from "../won-utils.js";
 
 const initialState = Immutable.fromJS({});
 
@@ -56,7 +56,7 @@ export default function(allToasts = initialState, action = {}) {
         //If there is a privateId Problem we push a toast
         return pushNewToast(
           allToasts,
-          getLoginErrorMessage(loginError),
+          parseRestErrorMessage(loginError),
           won.WON.errorToast
         );
       } else {
