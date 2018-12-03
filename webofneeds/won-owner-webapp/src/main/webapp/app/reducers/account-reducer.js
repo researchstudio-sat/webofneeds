@@ -49,6 +49,16 @@ export default function(userData = initialState, action = {}) {
       }
     }
 
+    case actionTypes.account.verifyEmailAddressFailed:
+      return userData.set(
+        "emailVerificationError",
+        action.payload.emailVerificationError
+      );
+
+    case actionTypes.account.verifyEmailAddressSuccess:
+    case actionTypes.account.verifyEmailAddressStarted:
+      return userData.set("emailVerificationError", undefined);
+
     case actionTypes.account.acceptTermsOfServiceSuccess:
       return userData.set("acceptedTermsOfService", true);
     case actionTypes.account.acceptTermsOfServiceFailed:
