@@ -106,7 +106,7 @@ class ConnectionsController {
     });*/
   }
 
-  selectedNeed(needUri) {
+  selectNeed(needUri) {
     this.router__stateGoCurrent({
       connectionUri: undefined,
       postUri: needUri,
@@ -115,7 +115,7 @@ class ConnectionsController {
     }); //TODO: Maybe leave the connectionUri in the parameters to go back when closing a selected need
   }
 
-  selectedConnection(connectionUri) {
+  selectConnection(connectionUri) {
     this.markAsRead(connectionUri);
     this.router__stateGoCurrent({
       connectionUri,
