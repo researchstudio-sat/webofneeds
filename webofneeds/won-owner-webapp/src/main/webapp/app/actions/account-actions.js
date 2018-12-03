@@ -11,6 +11,7 @@ import {
   transferPrivateAccount,
   acceptTermsOfService,
   confirmRegistration,
+  resendEmailVerification,
   login,
   logout,
   parseCredentials,
@@ -379,6 +380,24 @@ export function accountVerifyEmailAddress(verificationToken) {
       .catch(error =>
         dispatch({
           type: actionTypes.account.verifyEmailAddressFailed,
+          payload: {
+            emailVerificationError: Immutable.fromJS(error.jsonResponse),
+          },
+        })
+      );
+  };
+}
+
+export function accountResendVerificationEmail(email) {
+  return dispatch => {
+    dispatch({ type: actionTypes.account.resendVerificationEmailStarted });
+    resendEmailVerification(email)
+      .then(() => {
+        dispatch({ type: actionTypes.account.resendVerificationEmailSuccess });
+      })
+      .catch(error =>
+        dispatch({
+          type: actionTypes.account.resendVerificationEmailFailed,
           payload: {
             emailVerificationError: Immutable.fromJS(error.jsonResponse),
           },
