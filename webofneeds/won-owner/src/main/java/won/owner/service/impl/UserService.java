@@ -12,6 +12,7 @@ import won.owner.model.User;
 import won.owner.repository.EmailVerificationRepository;
 import won.owner.repository.UserRepository;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -171,7 +172,12 @@ public class UserService {
     }
 
     public EmailVerificationToken getEmailVerificationToken(User user) {
-        return emailVerificationRepository.findByUser(user);
+        List<EmailVerificationToken> tokens = emailVerificationRepository.findByUser(user);
+
+        for(EmailVerificationToken token : tokens) {
+            if(!token.isExpired()) return token;
+        }
+        return null;
     }
 
     public EmailVerificationToken createEmailVerificationToken(User user) {
