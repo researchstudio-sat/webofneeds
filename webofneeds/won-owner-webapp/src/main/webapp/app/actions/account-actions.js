@@ -10,6 +10,7 @@ import {
   registerAccount,
   transferPrivateAccount,
   acceptTermsOfService,
+  confirmRegistration,
   login,
   logout,
   parseCredentials,
@@ -365,6 +366,24 @@ export function accountAcceptTermsOfService() {
       .catch(() => {
         dispatch({ type: actionTypes.account.acceptTermsOfServiceFailed });
       });
+  };
+}
+
+export function accountVerifyEmailAddress(verificationToken) {
+  return dispatch => {
+    dispatch({ type: actionTypes.account.verifyEmailAddressStarted });
+    confirmRegistration(verificationToken)
+      .then(() => {
+        dispatch({ type: actionTypes.account.verifyEmailAddressSuccess });
+      })
+      .catch(error =>
+        dispatch({
+          type: actionTypes.account.verifyEmailAddressFailed,
+          payload: {
+            emailVerificationError: Immutable.fromJS(error.jsonResponse),
+          },
+        })
+      );
   };
 }
 
