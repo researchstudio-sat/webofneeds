@@ -26,7 +26,6 @@ public enum RestStatusResponse {
     TOKEN_RESEND_SUCCESS(3201, "E-Mail Verification resent", HttpStatus.OK),
     TOKEN_NOT_FOUND(3400, "Verification Token not found", HttpStatus.NOT_FOUND),
     TOKEN_CREATION_FAILED(3401, "Could not create VerifyToken", HttpStatus.SERVICE_UNAVAILABLE),
-    TOKEN_ALREADY_VERIFIED(3402, "Email is already verified", HttpStatus.BAD_REQUEST),
     TOKEN_EXPIRED(3403, "Verification Token is expired", HttpStatus.BAD_REQUEST),
 
     SIGNUP_FAILED(4400, "Registration failed", HttpStatus.BAD_REQUEST),

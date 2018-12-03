@@ -386,10 +386,6 @@ public class RestUserController {
         }
 
         User user = verificationToken.getUser();
-        if(user.isEmailVerified()) {
-            return generateStatusResponse(RestStatusResponse.TOKEN_ALREADY_VERIFIED);
-        }
-
         Calendar cal = Calendar.getInstance();
 
         if((verificationToken.getExpiryDate().getTime() - cal.getTime().getTime()) <= 0) {
