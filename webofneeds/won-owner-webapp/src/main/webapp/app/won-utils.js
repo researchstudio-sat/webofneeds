@@ -244,6 +244,36 @@ export function acceptTermsOfService() {
 }
 
 /**
+ * Confirm the Registration with the verificationToken-link provided in the registration-email
+ */
+export function confirmRegistration(verificationToken) {
+  const url = urljoin(ownerBaseUrl, "/rest/users/confirmRegistration");
+  const httpOptions = {
+    method: "post",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      token: verificationToken,
+    }),
+  };
+  return fetch(url, httpOptions)
+    .then(checkHttpStatus)
+    .then(resp => {
+      return resp.json();
+    })
+    .catch(error =>
+      error.response.json().then(errorMessage => {
+        //FIXME: MOVE THIS ERROR HANDLINNG INTO THE ACTION
+        const verificationError = new Error();
+        verificationError.jsonResponse = errorMessage;
+        throw verificationError;
+      })
+    );
+}
+
+/**
  * Transfer an existing privateId User,
  * to a non existing User
  * @param credentials {email, password, privateId}
