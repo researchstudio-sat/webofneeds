@@ -1,0 +1,12 @@
+<div>
+    <p>Hi there,</p>
+    <p>Thank you for registering for our services.</p>
+    <p>Click the Link below to verify your E-Mail Adress:</p>
+    <a href="$verificationLinkUrl">$verificationLinkUrl</a>
+    <p>This Link is valid until $expirationDate.</p>
+    <p>You can already access your Account for $gracePeriodInHours hours before you will have to verify your email address.</p>
+    <br/>
+    <p> <span>Best Wishes,</span> <br/>
+        <span>Owner application team</span>
+    </p>
+</div>

@@ -188,9 +188,40 @@ export function registerAccount(credentials) {
       "Content-Type": "application/json",
     },
     credentials: "include",
-    body: JSON.stringify({ username: email, password: password }),
+    body: JSON.stringify({
+      username: email,
+      password: password,
+      privateIdUser: !!credentials.privateId,
+    }),
   };
   return fetch(url, httpOptions).then(checkHttpStatus);
+}
+
+/**
+ * Resend the verification mail.
+ *
+ */
+export function resendEmailVerification(email) {
+  const url = urljoin(ownerBaseUrl, "/rest/users/resendVerificationEmail");
+  const httpOptions = {
+    method: "post",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      username: email,
+    }),
+  };
+  return fetch(url, httpOptions)
+    .then(resp => {
+      console.log("resendEmailVerification Response: ", resp.json());
+      return resp.json();
+    })
+    .catch(error => {
+      console.log("resendEmailVerification Error: ", error);
+      return error;
+    });
 }
 
 /**
@@ -242,7 +273,9 @@ export function login(credentials) {
     },
     body: params,
     credentials: "include",
-  }).then(checkHttpStatus);
+  })
+    .then(checkHttpStatus)
+    .then(resp => resp.json());
 }
 
 export function logout() {
@@ -695,4 +728,18 @@ export function generatePngQrCode(link) {
 export function generateBase64PngQrCode(link) {
   const pngQrCode = generatePngQrCode(link);
   return pngQrCode && btoa(String.fromCharCode.apply(null, pngQrCode));
+}
+
+export function getLoginErrorMessage(loginError) {
+  if (
+    loginError &&
+    loginError.get("code") === won.RESPONSECODE.PRIVATEID_NOT_FOUND
+  ) {
+    return "Sorry, we couldn't find the private ID (the one in your url-bar). If you copied this address make sure you **copied everything** and try **reloading the page**. If this doesn't work you can try [removing it](#) to start fresh.";
+  } else if (loginError) {
+    //return the message FIXME: once the localization is implemented use the correct localization
+    return loginError.get("message");
+  }
+
+  return loginError;
 }

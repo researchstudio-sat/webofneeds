@@ -1,0 +1,14 @@
+package won.owner.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import won.owner.model.EmailVerificationToken;
+import won.owner.model.User;
+import won.protocol.repository.WonRepository;
+
+/**
+ * Created by fsuda on 27.11.2018.
+ */
+public interface EmailVerificationRepository extends JpaRepository<EmailVerificationToken, Long> {
+    EmailVerificationToken findByToken(String token);
+    EmailVerificationToken findByUser(User user);
+}

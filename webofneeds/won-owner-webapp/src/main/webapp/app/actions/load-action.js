@@ -3,6 +3,7 @@
  */
 
 import Immutable from "immutable";
+import won from "../won-es6.js";
 import { actionTypes, actionCreators } from "./actions.js";
 import { getPostUriFromRoute } from "../selectors/general-selectors.js";
 
@@ -30,36 +31,39 @@ export const pageLoadAction = () => (dispatch, getState) => {
     * initial page-load-speed.
     * TODO fetch config data here as well
     */
-  const privateId =
-    getParameterByName("privateId") || localStorage.getItem("privateId"); // as this is one of the first action-creators to be executed, we need to get the param directly from the url-bar instead of `state.getIn(['router','currentParams','privateId'])`
-  if (privateId) {
-    /*
-         * we don't have a valid session. however the url might contain `privateId`, which means
-         * we're accessing an "accountless"-account and need to sign in with that
-         */
-    return loadingWithAnonymousAccount(dispatch, getState, privateId).catch(
-      () => {
-        loadingWhileSignedOut(dispatch, getState);
-      }
-    );
-  }
 
   checkLoginStatus()
     /* handle data, dispatch actions */
+    .then(data =>
+      dispatch({
+        type: actionTypes.login,
+        payload: Immutable.fromJS(data).merge({ loggedIn: true }),
+      })
+    )
     .then(data => {
-      return loadingWhileSignedIn(dispatch, getState, data.username);
+      return loadingWhileSignedIn(dispatch, getState, data);
     })
     .catch(() => {
-      /*
+      // as this is one of the first action-creators to be executed, we need to get the param directly from the url-bar instead of `state.getIn(['router','currentParams','privateId'])`
+      const privateId =
+        getParameterByName("privateId") || localStorage.getItem("privateId");
+
+      if (privateId) {
+        return loadingWithAnonymousAccount(dispatch, getState, privateId).catch(
+          () => loadingWhileSignedOut(dispatch, getState)
+        );
+      } else {
+        /*
          * ok, we're really not logged in -- thus we need to fetch any publicly visible, required data
          */
-      return loadingWhileSignedOut(dispatch, getState);
+        return loadingWhileSignedOut(dispatch, getState);
+      }
     });
 };
 
-function loadingWhileSignedIn(dispatch, getState, username) {
-  loginSuccess(username, true, dispatch, getState);
-  fetchOwnedData(username, dispatchInitialPageLoad(dispatch)).then(() =>
+function loadingWhileSignedIn(dispatch, getState, data) {
+  loginSuccess(data.username, true, dispatch, getState);
+  fetchOwnedData(data.username, dispatchInitialPageLoad(dispatch)).then(() =>
     dispatch({
       type: actionTypes.initialPageLoad,
       payload: Immutable.fromJS({ initialLoadFinished: true }),
@@ -96,7 +100,7 @@ function loadingWithAnonymousAccount(dispatch, getState, privateId) {
         dispatch({
           type: actionTypes.loginFailed,
           payload: {
-            loginError: "invalid privateId",
+            loginError: Immutable.fromJS(won.PRIVATEID_NOT_FOUND_ERROR),
             credentials: { privateId },
           },
         });

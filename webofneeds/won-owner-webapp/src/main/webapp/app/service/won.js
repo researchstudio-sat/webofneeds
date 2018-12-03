@@ -341,6 +341,36 @@ won.UNREAD.GROUP = {};
 won.UNREAD.GROUP.ALL = "all";
 won.UNREAD.GROUP.BYNEED = "byNeed";
 
+//Code definitions as enum in RestStatusResponse.java
+won.RESPONSECODE = Object.freeze({
+  USER_CREATED: 1200,
+  USER_TRANSFERRED: 1201,
+  USER_SIGNED_OUT: 1202,
+  USER_NOT_FOUND: 1400,
+  USER_NOT_SIGNED_IN: 1401,
+  USER_BAD_CREDENTIALS: 1402,
+  USER_NOT_VERIFIED: 1403,
+  USERNAME_MISMATCH: 1404,
+  USER_ALREADY_EXISTS: 1405,
+  TRANSFERUSER_NOT_FOUND: 2400,
+  TRANSFERUSER_ALREADY_EXISTS: 2401,
+  TOKEN_VERIFICATION_SUCCESS: 3200,
+  TOKEN_RESEND_SUCCESS: 3201,
+  TOKEN_NOT_FOUND: 3400,
+  TOKEN_CREATION_FAILED: 3401,
+  TOKEN_ALREADY_VERIFIED: 3402,
+  TOKEN_EXPIRED: 3403,
+  SIGNUP_FAILED: 4400,
+  SETTINGS_CREATED: 5200,
+  PRIVATEID_NOT_FOUND: 666, //this one is not defined in RestStatusResponse.java
+});
+
+//we need to define this error here because we will not retrieve it from the rest endpoint
+won.PRIVATEID_NOT_FOUND_ERROR = Object.freeze({
+  code: 666,
+  message: "invalid privateId",
+});
+
 /**
  * type of latest message for a connection in a given state.
  */

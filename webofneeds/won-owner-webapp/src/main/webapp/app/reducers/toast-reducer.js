@@ -2,6 +2,7 @@ import { actionTypes } from "../actions/actions.js";
 import Immutable from "immutable";
 import won from "../won-es6.js";
 import { getIn, generateIdString } from "../utils.js";
+import { getLoginErrorMessage } from "../won-utils.js";
 
 const initialState = Immutable.fromJS({});
 
@@ -42,15 +43,13 @@ export default function(allToasts = initialState, action = {}) {
     }
 
     case actionTypes.loginFailed: {
-      if (getIn(action, ["payload", "loginError"]) === "invalid privateId") {
+      const loginError = getIn(action, ["payload", "loginError"]);
+      const errorCode = loginError && loginError.get("code");
+      if (errorCode == won.RESPONSECODE.PRIVATEID_NOT_FOUND) {
+        //If there is a privateId Problem we push a toast
         return pushNewToast(
           allToasts,
-          "Sorry, we couldn't find the private ID (the one in your url-bar). If " +
-            "you copied this address make sure you **copied everything** and try " +
-            "**reloading the page**. " +
-            "If this doesn't work you can try " +
-            "[removing it](#) " +
-            "to start fresh.",
+          getLoginErrorMessage(loginError),
           won.WON.errorToast
         );
       } else {

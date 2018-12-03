@@ -1,16 +1,14 @@
 package won.owner.pojo;
 
 import org.hibernate.validator.constraints.NotEmpty;
+import won.owner.model.User;
 
 /**
  * User: ypanchenko
  * Date: 23.02.2015
  */
-public class UserSettingsPojo
+public class UserSettingsPojo extends UsernamePojo
 {
-
-  @NotEmpty
-  private String username;
   private String email;
   private String needUri;
   private boolean notifyMatches;
@@ -22,16 +20,8 @@ public class UserSettingsPojo
   }
 
   public UserSettingsPojo(String username, String email) {
-    this.username = username;
+    this.setUsername(username);
     this.email = email;
-  }
-
-  public String getUsername() {
-    return username;
-  }
-
-  public void setUsername(final String username) {
-    this.username = username;
   }
 
   public String getEmail() {

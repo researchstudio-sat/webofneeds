@@ -8,13 +8,11 @@ package won.owner.web.rest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,21 +25,23 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.WebRequest;
+import won.owner.pojo.*;
+import won.owner.web.WonOwnerMailSender;
+import won.owner.web.events.OnRegistrationCompleteEvent;
+import won.owner.model.EmailVerificationToken;
 import won.owner.model.User;
 import won.owner.model.UserNeed;
-import won.owner.pojo.TransferUserPojo;
-import won.owner.pojo.UserPojo;
-import won.owner.pojo.UserSettingsPojo;
 import won.owner.repository.UserNeedRepository;
 import won.owner.service.impl.*;
 import won.owner.web.validator.UserRegisterValidator;
-import won.protocol.util.CheapInsecureRandomString;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -70,6 +70,12 @@ public class RestUserController {
     private KeystoreEnabledPersistentRememberMeServices keystoreEnabledPersistentRememberMeServices;
 
     @Autowired
+    private ApplicationEventPublisher eventPublisher;
+
+    @Autowired
+    private WonOwnerMailSender emailSender;
+
+    @Autowired
     ServletContext context;
 
     @Autowired
@@ -96,28 +102,34 @@ public class RestUserController {
     @ResponseBody
     @RequestMapping(
             value = "/",
+            produces = MediaType.APPLICATION_JSON_VALUE,
             method = RequestMethod.POST
     )
     //TODO: move transactionality annotation into the service layer
     @Transactional(propagation = Propagation.SUPPORTS)
-    public ResponseEntity registerUser(@RequestBody UserPojo user, Errors errors) {
+    public ResponseEntity registerUser(@RequestBody UserPojo user, Errors errors, WebRequest request) {
         try {
             userRegisterValidator.validate(user, errors);
             if (errors.hasErrors()) {
                 if (errors.getFieldErrorCount() > 0) {
                     // someone trying to go around js validation
-                    return new ResponseEntity(errors.getAllErrors().get(0).getDefaultMessage(), HttpStatus.BAD_REQUEST);
+                    return generateStatusResponse(RestStatusResponse.SIGNUP_FAILED);
                 } else {
                     // username is already in database
-                    return new ResponseEntity("\"Cannot create user: name is already in use.\"", HttpStatus.CONFLICT);
+                    return generateStatusResponse(RestStatusResponse.USER_ALREADY_EXISTS);
                 }
             }
-            userService.registerUser(user.getUsername(), user.getPassword(), null);
+            User createdUser = userService.registerUser(user.getUsername(), user.getPassword(), null, user.isPrivateIdUser());
+
+            if(!createdUser.isEmailVerified()) {
+                eventPublisher.publishEvent(new OnRegistrationCompleteEvent(createdUser, request.getLocale(), request.getContextPath()));
+            }
         } catch (UserAlreadyExistsException e) {
             // username is already in database
-            return new ResponseEntity("\"Cannot create user: name is already in use.\"", HttpStatus.CONFLICT);
+            return generateStatusResponse(RestStatusResponse.USER_ALREADY_EXISTS);
         }
-        return new ResponseEntity("\"New user was created\"", HttpStatus.CREATED);
+
+        return generateStatusResponse(RestStatusResponse.USER_CREATED);
     }
 
     /**
@@ -130,18 +142,18 @@ public class RestUserController {
     @ResponseBody
     @RequestMapping(
             value = "/transfer",
+            produces = MediaType.APPLICATION_JSON_VALUE,
             method = RequestMethod.POST
     )
     //TODO: move transactionality annotation into the service layer
     @Transactional(propagation = Propagation.SUPPORTS)
-    public ResponseEntity transferUser(@RequestBody TransferUserPojo transferUserPojo, Errors errors) {
+    public ResponseEntity transferUser(@RequestBody TransferUserPojo transferUserPojo, Errors errors, WebRequest request) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         // cannot use user object from context since hw doesn't know about created in this session need,
         // therefore, we have to retrieve the user object from the user repository
         User user = userService.getByUsername(username);
         if (user == null && !transferUserPojo.getPrivateUsername().equals(user.getUsername())) {
-            logger.warn("trying to transfer a user that is not the one that is logged in");
-            return new ResponseEntity("\"user name problem\"", HttpStatus.BAD_REQUEST);
+            return generateStatusResponse(RestStatusResponse.USERNAME_MISMATCH);
         }
 
         try {
@@ -149,20 +161,24 @@ public class RestUserController {
             if (errors.hasErrors()) {
                 if (errors.getFieldErrorCount() > 0) {
                     // someone trying to go around js validation
-                    return new ResponseEntity(errors.getAllErrors().get(0).getDefaultMessage(), HttpStatus.BAD_REQUEST);
+                    return generateStatusResponse(RestStatusResponse.SIGNUP_FAILED);
                 } else {
                     // username is already in database
-                    return new ResponseEntity("\"Cannot create user: name is already in use.\"", HttpStatus.CONFLICT);
+                    return generateStatusResponse(RestStatusResponse.USER_ALREADY_EXISTS);
                 }
             }
-            userService.transferUser(transferUserPojo.getUsername(), transferUserPojo.getPassword(), transferUserPojo.getPrivateUsername(), transferUserPojo.getPrivatePassword());
+            User transferUser = userService.transferUser(transferUserPojo.getUsername(), transferUserPojo.getPassword(), transferUserPojo.getPrivateUsername(), transferUserPojo.getPrivatePassword());
+
+            if(!transferUser.isEmailVerified()) {
+                eventPublisher.publishEvent(new OnRegistrationCompleteEvent(transferUser, request.getLocale(), request.getContextPath()));
+            }
         } catch (UserAlreadyExistsException e) {
             // username is already in database
-            return new ResponseEntity("\"Cannot transfer to new user: name is already in use.\"", HttpStatus.CONFLICT);
+            return generateStatusResponse(RestStatusResponse.USER_ALREADY_EXISTS);
         } catch (UserNotFoundException e) {
-            return new ResponseEntity("\"Cannot transfer to new user: privateUsername not found.\"", HttpStatus.NOT_FOUND);
+            return generateStatusResponse(RestStatusResponse.TRANSFERUSER_NOT_FOUND);
         }
-        return new ResponseEntity("\"User was transfered\"", HttpStatus.CREATED);
+        return generateStatusResponse(RestStatusResponse.USER_TRANSFERRED);
     }
 
     @ResponseBody
@@ -171,8 +187,6 @@ public class RestUserController {
             produces = MediaType.APPLICATION_JSON_VALUE,
             method = RequestMethod.GET
     )
-
-    //TODO: move transactionality annotation into the service layer
     public UserSettingsPojo getUserSettings(@RequestParam("uri") String uri) {
 
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -204,7 +218,6 @@ public class RestUserController {
             produces = MediaType.APPLICATION_JSON_VALUE,
             method = RequestMethod.POST
     )
-
     //TODO: move transactionality annotation into the service layer
     @Transactional(propagation = Propagation.SUPPORTS)
     public ResponseEntity setUserSettings(@RequestBody UserSettingsPojo userSettingsPojo) {
@@ -214,8 +227,7 @@ public class RestUserController {
         // therefore, we have to retrieve the user object from the user repository
         User user = userService.getByUsername(username);
         if (!user.getUsername().equals(userSettingsPojo.getUsername())) {
-            logger.warn("user name wrong");
-            return new ResponseEntity("\"user name problem\"", HttpStatus.BAD_REQUEST);
+            return generateStatusResponse(RestStatusResponse.USERNAME_MISMATCH);
         }
 
         if (user.getEmail() == null) {
@@ -248,45 +260,7 @@ public class RestUserController {
             logger.warn(userSettingsPojo.getNeedUri() + " need uri problem.", e);
             return new ResponseEntity("\"" + userSettingsPojo.getNeedUri() + " need uri problem.\"", HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity("\"Settings created\"", HttpStatus.CREATED);
-    }
-
-    /**
-     * registers user
-     *
-     * @param user   registration data of a user
-     * @param errors
-     * @return ResponseEntity with Http Status Code
-     */
-    @ResponseBody
-    @RequestMapping(
-            value = "/private",
-            method = RequestMethod.POST
-    )
-    //TODO: move transactionality annotation into the service layer
-    @Transactional(propagation = Propagation.SUPPORTS)
-    public ResponseEntity registerPrivateLinkAsUser(@RequestBody UserPojo user, Errors errors) {
-        String privateLink = null;
-        try {
-            privateLink = (new CheapInsecureRandomString()).nextString(32); // TODO more secure random alphanum string
-            user.setUsername(privateLink);
-            userRegisterValidator.validate(user, errors);
-            if (errors.hasErrors()) {
-                if (errors.getFieldErrorCount() > 0) {
-                    // someone trying to go around js validation
-                    return new ResponseEntity("\"" + errors.getAllErrors().get(0).getDefaultMessage() + "\"", HttpStatus.BAD_REQUEST);
-                } else {
-                    // username is already in database
-                    return new ResponseEntity("\"Cannot create user: name is already in use.\"", HttpStatus.CONFLICT);
-                }
-            } else {
-                userService.registerUser(user.getUsername(), user.getPassword(), "ROLE_PRIVATE");
-            }
-        } catch (UserAlreadyExistsException e) {
-            // username is already in database
-            return new ResponseEntity("\"Cannot create user: name is already in use.\"", HttpStatus.CONFLICT);
-        }
-        return new ResponseEntity("\"" + privateLink + "\"", HttpStatus.CREATED);
+        return generateStatusResponse(RestStatusResponse.SETTINGS_CREATED);
     }
 
     /**
@@ -297,8 +271,10 @@ public class RestUserController {
      * @param response
      * @return
      */
+    @ResponseBody
     @RequestMapping(
             value = "/signin",
+            produces = MediaType.APPLICATION_JSON_VALUE,
             method = RequestMethod.POST
     )
     //TODO: move transactionality annotation into the service layer
@@ -316,10 +292,15 @@ public class RestUserController {
             SecurityContextHolder.getContext().setAuthentication(auth);
             securityContextRepository.saveContext(SecurityContextHolder.getContext(), request, response);
             rememberMeServices.loginSuccess(request, response, auth);
-            return new ResponseEntity("\"Signed in.\"", HttpStatus.OK);
+
+            User user = userService.getByUsername(username);
+            return generateUserResponse(user);
         } catch (BadCredentialsException ex) {
             rememberMeServices.loginFail(request, response);
-            return new ResponseEntity("\"No such username/password combination registered.\"", HttpStatus.FORBIDDEN);
+            return generateStatusResponse(RestStatusResponse.USER_BAD_CREDENTIALS);
+        } catch (CredentialsExpiredException ex) {
+            rememberMeServices.loginFail(request, response);
+            return generateStatusResponse(RestStatusResponse.USER_NOT_VERIFIED);
         }
     }
 
@@ -339,7 +320,6 @@ public class RestUserController {
     )
     @Transactional(propagation = Propagation.REQUIRED)
     //TODO: move transactionality annotation into the service layer
-    //public ResponseEntity isSignedIn(@RequestBody User user, HttpServletRequest request, HttpServletResponse response) {
     public ResponseEntity isSignedIn(HttpServletRequest request, HttpServletResponse response) {
         // Execution will only get here, if the session is still valid, so sending OK here is enough. Spring sends an error
         // code by itself if the session isn't valid any more
@@ -358,38 +338,12 @@ public class RestUserController {
                 authentication = anonAuth;
             }
         }
-        if (authentication == null) {
-            return new ResponseEntity("\"User not signed in.\"", HttpStatus.UNAUTHORIZED);
-        } else if ("anonymousUser".equals(authentication.getPrincipal())) {
-            return new ResponseEntity("\"User not signed in.\"", HttpStatus.UNAUTHORIZED);
+        if (authentication == null || "anonymousUser".equals(authentication.getPrincipal())) {
+            return generateStatusResponse(RestStatusResponse.USER_NOT_SIGNED_IN);
         } else {
-            User user = ((KeystoreEnabledUserDetails) authentication.getPrincipal()).getUser();
-            Map values = new HashMap<String, String>();
-            values.put("username", user.getUsername());
-            values.put("authorities", user.getAuthorities());
-            values.put("role", user.getRole());
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            return new ResponseEntity<Map>(values, HttpStatus.OK);
-        }
-    }
-
-    @RequestMapping(
-            value = "/isSignedInRole",
-            method = RequestMethod.GET
-    )
-    //TODO: move transactionality annotation into the service layer
-    //public ResponseEntity isSignedIn(@RequestBody User user, HttpServletRequest request, HttpServletResponse response) {
-    public ResponseEntity isSignedInRole() {
-        // Execution will only get here, if the session is still valid, so sending OK here is enough. Spring sends an error
-        // code by itself if the session isn't valid any more
-        SecurityContext context = SecurityContextHolder.getContext();
-        //if(context.getAuthentication() )
-        if (context == null || context.getAuthentication() == null) {
-            return new ResponseEntity("\"User not signed in.\"", HttpStatus.UNAUTHORIZED);
-        } else if ("anonymousUser".equals(context.getAuthentication().getPrincipal())) {
-            return new ResponseEntity("\"User not signed in.\"", HttpStatus.UNAUTHORIZED);
-        } else {
-            return new ResponseEntity("\"" + SecurityContextHolder.getContext().getAuthentication().getAuthorities() + "\"", HttpStatus.OK);
+            User user = ((KeystoreEnabledUserDetails) authentication.getPrincipal()).getUser();
+            return generateUserResponse(user);
         }
     }
 
@@ -397,7 +351,6 @@ public class RestUserController {
             value = "/signout",
             method = RequestMethod.POST
     )
-    //TODO: move transactionality annotation into the service layer
     public ResponseEntity logOut(HttpServletRequest request, HttpServletResponse response) {
         SecurityContext context = SecurityContextHolder.getContext();
         if (context.getAuthentication() == null) {
@@ -406,7 +359,7 @@ public class RestUserController {
             keystoreEnabledPersistentRememberMeServices.logout(request, response, context.getAuthentication());
             new SecurityContextLogoutHandler().logout(request, response, context.getAuthentication());
         }
-        return new ResponseEntity("\"Signed out\"", HttpStatus.OK);
+        return generateStatusResponse(RestStatusResponse.USER_SIGNED_OUT);
     }
 
 
@@ -417,6 +370,67 @@ public class RestUserController {
     @Transactional(propagation = Propagation.SUPPORTS)
     public ResponseEntity saveAsFavourite() {
         return null;
+    }
+
+    @ResponseBody
+    @RequestMapping(
+            value = "/confirmRegistration",
+            method = RequestMethod.GET
+    )
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public ResponseEntity confirmRegistration(@RequestParam("token") String token) {
+        EmailVerificationToken verificationToken = userService.getEmailVerificationToken(token);
+
+        if(verificationToken == null) {
+            return generateStatusResponse(RestStatusResponse.TOKEN_NOT_FOUND);
+        }
+
+        User user = verificationToken.getUser();
+        if(user.isEmailVerified()) {
+            return generateStatusResponse(RestStatusResponse.TOKEN_ALREADY_VERIFIED);
+        }
+
+        Calendar cal = Calendar.getInstance();
+
+        if((verificationToken.getExpiryDate().getTime() - cal.getTime().getTime()) <= 0) {
+            return generateStatusResponse(RestStatusResponse.TOKEN_EXPIRED);
+        }
+
+        user.setEmailVerified(true);
+        userService.save(user);
+
+        //TODO: AUTHOMATICALLY LOGIN THE USER (WE KNOW THE USERNAME BUT WE DO NOT KNOW THE PASSWORD)
+        return generateStatusResponse(RestStatusResponse.TOKEN_VERIFICATION_SUCCESS);
+    }
+
+    @ResponseBody
+    @RequestMapping(
+            value = "/resendVerificationEmail",
+            method = RequestMethod.POST
+    )
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public ResponseEntity resendVerificationEmail(@RequestBody UsernamePojo usernamePojo) {
+        User user = userService.getByUsername(usernamePojo.getUsername());
+
+        if(user == null) {
+            return generateStatusResponse(RestStatusResponse.USER_NOT_FOUND);
+        }
+
+        if(user.isEmailVerified()) {
+            return generateStatusResponse(RestStatusResponse.TOKEN_ALREADY_VERIFIED);
+        }
+
+        EmailVerificationToken verificationToken = userService.getEmailVerificationToken(user);
+
+        if(verificationToken == null || verificationToken.isExpired()) {
+            verificationToken = userService.createEmailVerificationToken(user);
+        }
+        if(verificationToken == null) {
+            return generateStatusResponse(RestStatusResponse.TOKEN_CREATION_FAILED);
+        }
+
+        emailSender.sendVerificationHtmlMessage(user, verificationToken);
+        return generateStatusResponse(RestStatusResponse.TOKEN_RESEND_SUCCESS);
     }
 
     @RequestMapping(
@@ -433,5 +447,23 @@ public class RestUserController {
         this.rememberMeServices = rememberMeServices;
     }
 
+    private static ResponseEntity generateStatusResponse(RestStatusResponse restStatusResponse) {
+        //TODO: Maybe change to return a pojo
+        Map values = new HashMap<String, String>();
+        values.put("code", restStatusResponse.getCode());
+        values.put("message", restStatusResponse.getMessage());
 
+        return new ResponseEntity(values, restStatusResponse.getHttpStatus());
+    }
+
+    private static ResponseEntity generateUserResponse(User user) {
+        //TODO: Maybe change to return a pojo
+        Map values = new HashMap<String, String>();
+        values.put("username", user.getUsername());
+        values.put("authorities", user.getAuthorities());
+        values.put("role", user.getRole());
+        values.put("emailVerified", user.isEmailVerified());
+
+        return new ResponseEntity<Map>(values, HttpStatus.OK);
+    }
 }
