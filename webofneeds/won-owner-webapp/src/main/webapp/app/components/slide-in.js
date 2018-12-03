@@ -40,7 +40,7 @@ function genSlideInConf() {
             <span class="si__text" ng-if="self.processingVerifyEmailAddress">
                 Verifying the E-Mail address
             </span>
-            <span class="si__text" ng-if="self.loggedIn && !self.processingVerifyEmailAddress && !self.emailVerificationError">
+            <span class="si__text" ng-if="self.loggedIn && !self.processingVerifyEmailAddress && self.emailVerified && !self.emailVerificationError">
                 E-Mail Address verified
             </span>
             <span class="si__text" ng-if="!self.loggedIn && !self.processingVerifyEmailAddress && !self.emailVerificationError">

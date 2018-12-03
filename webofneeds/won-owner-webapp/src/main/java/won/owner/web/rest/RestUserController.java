@@ -395,7 +395,6 @@ public class RestUserController {
         user.setEmailVerified(true);
         userService.save(user);
 
-        //TODO: AUTHOMATICALLY LOGIN THE USER (WE KNOW THE USERNAME BUT WE DO NOT KNOW THE PASSWORD)
         return generateStatusResponse(RestStatusResponse.TOKEN_VERIFICATION_SUCCESS);
     }
 
