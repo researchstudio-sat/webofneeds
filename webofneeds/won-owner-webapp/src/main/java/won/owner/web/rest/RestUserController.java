@@ -338,7 +338,7 @@ public class RestUserController {
                 authentication = anonAuth;
             }
         }
-        if (authentication == null) {
+        if (authentication == null || "anonymousUser".equals(authentication.getPrincipal())) {
             return generateStatusResponse(RestStatusResponse.USER_NOT_SIGNED_IN);
         } else {
             SecurityContextHolder.getContext().setAuthentication(authentication);
