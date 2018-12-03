@@ -375,11 +375,11 @@ public class RestUserController {
     @ResponseBody
     @RequestMapping(
             value = "/confirmRegistration",
-            method = RequestMethod.GET
+            method = RequestMethod.POST
     )
     @Transactional(propagation = Propagation.SUPPORTS)
-    public ResponseEntity confirmRegistration(@RequestParam("token") String token) {
-        EmailVerificationToken verificationToken = userService.getEmailVerificationToken(token);
+    public ResponseEntity confirmRegistration(@RequestBody VerificationTokenPojo token) {
+        EmailVerificationToken verificationToken = userService.getEmailVerificationToken(token.getToken());
 
         if(verificationToken == null) {
             return generateStatusResponse(RestStatusResponse.TOKEN_NOT_FOUND);
