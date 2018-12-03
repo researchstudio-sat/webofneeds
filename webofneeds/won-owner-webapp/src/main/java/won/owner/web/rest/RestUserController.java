@@ -437,10 +437,6 @@ public class RestUserController {
             return generateStatusResponse(RestStatusResponse.USER_NOT_FOUND);
         }
 
-        if(user.isEmailVerified()) {
-            return generateStatusResponse(RestStatusResponse.TOKEN_ALREADY_VERIFIED);
-        }
-
         EmailVerificationToken verificationToken = userService.getEmailVerificationToken(user);
 
         if(verificationToken == null || verificationToken.isExpired()) {
