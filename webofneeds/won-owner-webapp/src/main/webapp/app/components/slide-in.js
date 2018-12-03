@@ -33,53 +33,33 @@ function genSlideInConf() {
                 <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
             </svg>
         </div>
-        <div class="slide-in" ng-class="{'visible': !self.connectionHasBeenLost && self.verificationToken}">
+        <div class="slide-in" ng-class="{'visible': !self.connectionHasBeenLost && (self.verificationToken || (self.loggedIn && !self.emailVerified))}">
             <svg class="si__icon" style="--local-primary:white;">
                 <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
             </svg>
-            <span class="si__text" ng-if="self.processingVerifyEmailAddress">
+            <span class="si__text" ng-if="!self.verificationToken && !self.emailVerified">
+                E-Mail has not been verified yet, check your Inbox.
+            </span>
+            <span class="si__text" ng-if="self.processingVerifyEmailAddress && self.verificationToken">
                 Verifying the E-Mail address
             </span>
-            <span class="si__text" ng-if="self.loggedIn && !self.processingVerifyEmailAddress && self.emailVerified && !self.emailVerificationError">
-                E-Mail Address verified
-            </span>
-            <span class="si__text" ng-if="!self.loggedIn && !self.processingVerifyEmailAddress && !self.emailVerificationError">
-                E-Mail Address verified (Please Login Now)
-            </span>
-            <span class="si__text" ng-if="!self.processingVerifyEmailAddress && self.emailVerificationError">
+            <span class="si__text" ng-if="!self.processingVerifyEmailAddress && self.verificationToken && self.emailVerificationError">
                 {{ self.parseRestErrorMessage(self.emailVerificationError) }}
             </span>
-            <button
-              class="si__button"
-              ng-if="self.loggedIn && !self.processingVerifyEmailAddress && !self.processingResendVerificationEmail && self.emailVerificationError"
-              ng-click="self.account__resendVerificationEmail(self.email)">
-                Resend E-Mail
-            </button>
-            <svg class="si__close"
-                style="--local-primary:white;"
-                ng-click="self.router__stateGoCurrent({token: undefined})"
-                ng-if="!self.processingVerifyEmailAddress && !self.emailVerificationError">
-                <use xlink:href="#ico36_close" href="#ico36_close"></use>
-            </svg>
+            <span class="si__text" ng-if="self.loggedIn && self.verificationToken && !self.processingVerifyEmailAddress && self.emailVerified && !self.emailVerificationError">
+                E-Mail Address verified
+            </span>
+            <span class="si__text" ng-if="!self.loggedIn && self.verificationToken && !self.processingVerifyEmailAddress && !self.emailVerificationError">
+                E-Mail Address verified (Please Login Now)
+            </span>
             <svg class="hspinner" ng-if="self.processingVerifyEmailAddress || self.processingResendVerificationEmail">
                 <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
             </svg>
-        </div>
-        <div class="slide-in" ng-class="{'visible': self.loggedIn && !self.connectionHasBeenLost && !self.emailVerified}">
-            <svg class="si__icon" style="--local-primary:white;">
-                <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
-            </svg>
-            <span class="si__text">
-                E-Mail has not been verified yet, check your Inbox.
-            </span>
-            <button
-              class="si__button"
-              ng-if="!self.processingResendVerificationEmail"
-              ng-click="self.account__resendEmailVerification(self.email)">
-                Resend E-Mail
-            </button>
-            <svg class="hspinner" ng-if="self.processingResendVerificationEmail">
-                <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
+            <svg class="si__close"
+                style="--local-primary:white;"
+                ng-click="self.router__stateGoCurrent({token: undefined})"
+                ng-if="!self.processingVerifyEmailAddress && self.verificationToken && !self.emailVerificationError">
+                <use xlink:href="#ico36_close" href="#ico36_close"></use>
             </svg>
         </div>
         <div class="slide-in" ng-class="{'visible': self.loggedIn && !self.connectionHasBeenLost && !self.acceptedTermsOfService}">
