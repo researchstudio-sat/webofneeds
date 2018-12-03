@@ -74,6 +74,7 @@ import {
   accountTransfer,
   accountAcceptDisclaimer,
   accountAcceptTermsOfService,
+  accountVerifyEmailAddress,
   reconnect,
 } from "./account-actions.js";
 
@@ -267,6 +268,11 @@ const actionHierarchy = {
     acceptTermsOfServiceStarted: INJ_DEFAULT,
     acceptTermsOfServiceSuccess: INJ_DEFAULT,
     acceptTermsOfServiceFailed: INJ_DEFAULT,
+
+    verifyEmailAddress: accountVerifyEmailAddress,
+    verifyEmailAddressStarted: INJ_DEFAULT,
+    verifyEmailAddressSuccess: INJ_DEFAULT,
+    verifyEmailAddressFailed: INJ_DEFAULT,
   },
 
   geoLocationDenied: INJ_DEFAULT,
