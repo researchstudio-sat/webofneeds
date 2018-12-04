@@ -119,12 +119,6 @@ export function accountLogin(credentials, options) {
       return;
     }
 
-    const curriedDispatch = data =>
-      dispatch({
-        type: actionTypes.account.login,
-        payload: Immutable.fromJS(data).merge({ email: email, loggedIn: true }),
-      });
-
     return Promise.resolve()
       .then(() => {
         _loginInProcessFor = email;
@@ -163,7 +157,7 @@ export function accountLogin(credentials, options) {
           }),
         })
       )
-      .then(() => curriedDispatch({ httpSessionUpgraded: true }))
+      .then(() => dispatch({ type: actionTypes.upgradeHttpSession }))
       .then(() => {
         if (!options_.doRedirects) {
           return;
@@ -182,7 +176,7 @@ export function accountLogin(credentials, options) {
           return Immutable.Map(); // only need to fetch data for non-new accounts
         }
       })
-      .then(() => curriedDispatch({ loginFinished: true }))
+      .then(() => dispatch({ type: actionTypes.loginFinished }))
       .catch(error =>
         error.response.json().then(loginError => {
           return Promise.resolve()

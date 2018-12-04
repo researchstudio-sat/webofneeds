@@ -267,6 +267,7 @@ const actionHierarchy = {
   account: {
     login: accountLogin,
     loginStarted: INJ_DEFAULT,
+    loginFinished: INJ_DEFAULT,
     loginFailed: INJ_DEFAULT,
 
     logout: accountLogout,
@@ -298,6 +299,7 @@ const actionHierarchy = {
   geoLocationDenied: INJ_DEFAULT,
   lostConnection: INJ_DEFAULT,
   failedToGetLocation: INJ_DEFAULT,
+  upgradeHttpSession: INJ_DEFAULT,
 
   reconnect: {
     start: reconnect,
