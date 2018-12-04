@@ -14,17 +14,9 @@ import { isConnUriClosed } from "./won-localstorage.js";
 import { actionTypes } from "./actions/actions.js";
 
 export const emptyDataset = Immutable.fromJS({
-  ownedNeeds: {},
   connections: {},
   events: {},
   theirNeeds: {},
-  inactiveNeedUris: [],
-  activeNeedUris: [],
-  inactiveNeedUrisLoading: [],
-  needUriForConnections: {},
-  activeConnectionUrisLoading: [],
-  inactiveConnectionUris: [],
-  theirNeedUrisInLoading: [],
 });
 
 export function wellFormedPayload(payload) {
@@ -522,9 +514,7 @@ export function fetchDataForNonOwnedNeedOnly(needUri) {
   return won
     .getNeed(needUri)
     .then(need =>
-      emptyDataset
-        .setIn(["theirNeeds", needUri], Immutable.fromJS(need))
-        .set("loggedIn", false)
+      emptyDataset.setIn(["needs", needUri], Immutable.fromJS(need))
     );
 }
 
@@ -532,7 +522,7 @@ export function fetchUnloadedData(dispatch) {
   return fetchOwnedInactiveNeedUris().then(needUris => {
     dispatch({
       type: actionTypes.needs.fetchOwnedInactiveUrisLoading,
-      payload: wellFormedPayload({ inactiveNeedUrisLoading: needUris }),
+      payload: wellFormedPayload({ uris: needUris }),
     });
     return fetchDataForOwnedNeeds(needUris, dispatch);
   });
@@ -542,13 +532,13 @@ export function fetchOwnedData(email, dispatch) {
   return fetchOwnedInactiveNeedUris().then(inactiveNeedUris => {
     dispatch({
       type: actionTypes.needs.fetchOwnedInactiveUris,
-      payload: wellFormedPayload({ inactiveNeedUris: inactiveNeedUris }),
+      payload: wellFormedPayload({ uris: inactiveNeedUris }),
     });
 
     return fetchOwnedActiveNeedUris().then(needUris => {
       dispatch({
         type: actionTypes.needs.fetchOwnedActiveUris,
-        payload: wellFormedPayload({ activeNeedUris: needUris }),
+        payload: wellFormedPayload({ uris: needUris }),
       });
 
       return fetchDataForOwnedNeeds(needUris, dispatch);
@@ -557,7 +547,6 @@ export function fetchOwnedData(email, dispatch) {
 }
 
 function fetchOwnedInactiveNeedUris() {
-  console.debug("fetchOwnedInactiveNeedUris");
   return fetch(urljoin(ownerBaseUrl, "/rest/needs?state=INACTIVE"), {
     method: "get",
     headers: {
@@ -702,7 +691,7 @@ export async function fetchDataForOwnedNeeds(ownedNeedUris, dispatch) {
   const theirNeedUris_ = Immutable.Set(theirNeedUris).toArray();
   dispatch({
     type: actionTypes.needs.fetchTheirUrisLoading,
-    payload: wellFormedPayload({ theirNeedUrisInLoading: theirNeedUris_ }),
+    payload: wellFormedPayload({ uris: theirNeedUris_ }),
   });
   const allTheirNeeds = await urisToLookupMap(theirNeedUris_, uri =>
     fetchTheirNeedAndDispatch(uri, dispatch)
@@ -715,6 +704,7 @@ export async function fetchDataForOwnedNeeds(ownedNeedUris, dispatch) {
   ]);
 
   return allDataRawPromise.then(
+    //TODO: ABCD DO STUFF HERE
     ([ownedNeeds, connections, /* events, */ theirNeeds]) => {
       wellFormedPayload({
         ownedNeeds,
@@ -726,16 +716,6 @@ export async function fetchDataForOwnedNeeds(ownedNeedUris, dispatch) {
       });
     }
   );
-
-  /**
-   * const allAccessibleAndRelevantData = { ownedNeeds: { <needUri> : { :*,
-   * connections: [<connectionUri>, <connectionUri>] } <needUri> : { :*,
-   * connections: [<connectionUri>, <connectionUri>] } }, theirNeeds: {
-   * <needUri>: { :*, connections: [<connectionUri>, <connectionUri>] <--? } },
-   * connections: { <connectionUri> : { :*, events: [<eventUri>, <eventUri>] }
-   * <connectionUri> : { :*, events: [<eventUri>, <eventUri>] } } events: {
-   * <eventUri> : { *:* }, <eventUri> : { *:* } } }
-   */
 }
 
 async function fetchConnectionsOfNeedAndDispatch(needUri, dispatch) {
@@ -750,8 +730,8 @@ async function fetchConnectionsOfNeedAndDispatch(needUri, dispatch) {
   dispatch({
     type: actionTypes.connections.fetchActiveUrisLoading,
     payload: wellFormedPayload({
-      needUriForConnections: needUri,
-      activeConnectionUrisLoading: activeConnectionUris,
+      needUri: needUri,
+      connUris: activeConnectionUris,
     }),
   });
 
@@ -767,7 +747,7 @@ function fetchOwnedNeedAndDispatch(needUri, dispatch) {
   needP.then(need =>
     dispatch({
       type: actionTypes.needs.fetchOwned,
-      payload: wellFormedPayload({ ownedNeeds: { [needUri]: need } }),
+      payload: wellFormedPayload({ needs: { [needUri]: need } }),
     })
   );
   return needP;
@@ -793,14 +773,14 @@ function fetchTheirNeedAndDispatch(needUri, dispatch) {
         dispatch({
           type: actionTypes.personas.fetchTheirs,
           payload: wellFormedPayload({
-            theirNeeds: { [personaUri]: personaNeed },
+            needs: { [personaUri]: personaNeed },
           }),
         })
       );
     }
     dispatch({
       type: actionTypes.needs.fetchTheirs,
-      payload: wellFormedPayload({ theirNeeds: { [needUri]: need } }),
+      payload: wellFormedPayload({ needs: { [needUri]: need } }),
     });
   });
   return needP;
