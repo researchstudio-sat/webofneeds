@@ -55,6 +55,12 @@ function genSlideInConf() {
             <svg class="hspinner" ng-if="self.processingVerifyEmailAddress || self.processingResendVerificationEmail">
                 <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
             </svg>
+            <button
+              class="si__button"
+              ng-if="!self.processingVerifyEmailAddress && !self.processingResendVerificationMail && ((self.loggedIn && !self.emailVerified) || (self.verificationToken && self.emailVerificationError))"
+              ng-click="self.account__resendVerificationEmail()">
+                Resend Email
+            </button>
             <svg class="si__close"
                 style="--local-primary:white;"
                 ng-click="self.router__stateGoCurrent({token: undefined})"
