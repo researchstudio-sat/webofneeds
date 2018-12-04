@@ -63,7 +63,11 @@ export const pageLoadAction = () => (dispatch, getState) => {
 
 function loadingWhileSignedIn(dispatch, getState, data) {
   loginSuccess(data.username, true, dispatch, getState);
-  fetchOwnedData(data.username, dispatchInitialPageLoad(dispatch)).then(() =>
+  fetchOwnedData(
+    data.username,
+    dispatchInitialPageLoad(dispatch),
+    dispatch
+  ).then(() =>
     dispatch({
       type: actionTypes.initialPageLoad,
       payload: Immutable.fromJS({ initialLoadFinished: true }),
@@ -83,7 +87,7 @@ function loadingWithAnonymousAccount(dispatch, getState, privateId) {
         loginSuccess(email, true, dispatch, getState);
         return response;
       })
-      .then(() => fetchOwnedData(email, dispatchInitialPageLoad(dispatch)))
+      .then(() => fetchOwnedData(dispatchInitialPageLoad(dispatch), dispatch))
       .then(() => {
         return dispatch({
           type: actionTypes.initialPageLoad,

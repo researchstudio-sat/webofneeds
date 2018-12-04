@@ -78,6 +78,38 @@ export default function(allNeedsInState = initialState, action = {}) {
 
       return stateWithSuggestedPosts;
     }
+
+    case actionTypes.needs.fetchOwnedActiveUris: {
+      const activeNeedUris = action.payload.get("activeNeedUris");
+
+      return addOwnActiveNeedsInLoading(allNeedsInState, activeNeedUris);
+    }
+
+    case actionTypes.needs.fetchOwnedInactiveUris: {
+      const inactiveNeedUris = action.payload.get("inactiveNeedUris");
+
+      return addOwnInactiveNeedsToLoad(allNeedsInState, inactiveNeedUris);
+    }
+
+    case actionTypes.needs.fetchOwnedInactiveUrisLoading: {
+      const inactiveNeedUrisLoading = action.payload.get(
+        "inactiveNeedUrisLoading"
+      );
+
+      return addOwnInactiveNeedsInLoading(
+        allNeedsInState,
+        inactiveNeedUrisLoading
+      );
+    }
+
+    case actionTypes.needs.fetchTheirUrisLoading: {
+      const theirNeedUrisInLoading = action.payload.get(
+        "theirNeedUrisInLoading"
+      );
+
+      return addTheirNeedsInLoading(allNeedsInState, theirNeedUrisInLoading);
+    }
+
     case actionTypes.initialPageLoad:
     case actionTypes.needs.fetchUnloadedNeeds:
     case actionTypes.account.login: {

@@ -11,6 +11,7 @@ import urljoin from "url-join";
 
 import { getRandomWonId, getAllDetails } from "./won-utils.js";
 import { isConnUriClosed } from "./won-localstorage.js";
+import { actionTypes } from "./actions/actions.js";
 
 export const emptyDataset = Immutable.fromJS({
   ownedNeeds: {},
@@ -527,42 +528,33 @@ export function fetchDataForNonOwnedNeedOnly(needUri) {
     );
 }
 
-export function fetchUnloadedData(curriedDispatch) {
+export function fetchUnloadedData(curriedDispatch, dispatch) {
   return fetchOwnedInactiveNeedUris().then(needUris => {
-    curriedDispatch(wellFormedPayload({ inactiveNeedUrisLoading: needUris }));
-    return fetchDataForOwnedNeeds(needUris, curriedDispatch, []);
+    dispatch({
+      type: actionTypes.needs.fetchOwnedInactiveUrisLoading,
+      payload: wellFormedPayload({ inactiveNeedUrisLoading: needUris }),
+    });
+    return fetchDataForOwnedNeeds(needUris, curriedDispatch, dispatch);
   });
 }
 
-export function fetchOwnedData(email, curriedDispatch) {
+export function fetchOwnedData(email, curriedDispatch, dispatch) {
   return fetchOwnedInactiveNeedUris().then(inactiveNeedUris => {
-    curriedDispatch(wellFormedPayload({ inactiveNeedUris: inactiveNeedUris }));
+    dispatch({
+      type: actionTypes.needs.fetchOwnedInactiveUris,
+      payload: wellFormedPayload({ inactiveNeedUris: inactiveNeedUris }),
+    });
 
     return fetchOwnedActiveNeedUris().then(needUris => {
-      curriedDispatch(wellFormedPayload({ activeNeedUris: needUris }));
-      return fetchDataForOwnedNeeds(needUris, curriedDispatch);
+      dispatch({
+        type: actionTypes.needs.fetchOwnedActiveUris,
+        payload: wellFormedPayload({ activeNeedUris: needUris }),
+      });
+
+      return fetchDataForOwnedNeeds(needUris, curriedDispatch, dispatch);
     });
   });
 }
-//export function fetchDataForOwnedNeeds(needUris, curriedDispatch) {
-//    return fetchAllAccessibleAndRelevantData(needUris, curriedDispatch)
-//        .catch(error => {
-//            throw({msg: 'user needlist retrieval failed', error});
-//        });
-//}
-//function fetchOwnedNeedUris() {
-//  console.debug("fetchOwnedNeedUris");
-//  return fetch(urljoin(ownerBaseUrl, "/rest/needs/"), {
-//    method: "get",
-//    headers: {
-//      Accept: "application/json",
-//      "Content-Type": "application/json",
-//    },
-//    credentials: "include",
-//  })
-//    .then(checkHttpStatus)
-//    .then(response => response.json());
-//}
 
 function fetchOwnedInactiveNeedUris() {
   console.debug("fetchOwnedInactiveNeedUris");
@@ -680,16 +672,15 @@ export function fetchMessage(needUri, eventUri) {
     .then(response => response.json());
 }
 
-window.fetchAll4dbg = fetchDataForOwnedNeeds;
 export async function fetchDataForOwnedNeeds(
   ownedNeedUris,
-  curriedDispatch = () => undefined
+  curriedDispatch,
+  dispatch
 ) {
   if (!is("Array", ownedNeedUris) || ownedNeedUris.length === 0) {
     return emptyDataset;
   }
 
-  console.debug("fetchOwnedNeedAndDispatch for: ", ownedNeedUris);
   const allOwnedNeeds = await urisToLookupMap(ownedNeedUris, uri =>
     fetchOwnedNeedAndDispatch(uri, curriedDispatch)
   );
@@ -713,9 +704,10 @@ export async function fetchDataForOwnedNeeds(
   );
 
   const theirNeedUris_ = Immutable.Set(theirNeedUris).toArray();
-  curriedDispatch(
-    wellFormedPayload({ theirNeedUrisInLoading: theirNeedUris_ })
-  );
+  dispatch({
+    type: actionTypes.needs.fetchTheirUrisLoading,
+    payload: wellFormedPayload({ theirNeedUrisInLoading: theirNeedUris_ }),
+  });
   console.debug("fetchTheirNeedAndDispatch for: ", theirNeedUris_);
   const allTheirNeeds = await urisToLookupMap(theirNeedUris_, uri =>
     fetchTheirNeedAndDispatch(uri, curriedDispatch)

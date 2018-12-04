@@ -23,7 +23,7 @@ export function fetchUnloadedNeeds() {
         payload: payload,
       });
     };
-    fetchUnloadedData(curriedDispatch);
+    fetchUnloadedData(curriedDispatch, dispatch);
   };
 }
 

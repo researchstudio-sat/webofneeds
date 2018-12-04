@@ -134,6 +134,11 @@ const actionHierarchy = {
     connect: needsConnect,
     fetchUnloadedNeeds: fetchUnloadedNeeds,
     fetchSuggested: fetchSuggested,
+
+    fetchOwnedInactiveUris: INJ_DEFAULT,
+    fetchOwnedInactiveUrisLoading: INJ_DEFAULT,
+    fetchOwnedActiveUris: INJ_DEFAULT,
+    fetchTheirUrisLoading: INJ_DEFAULT,
   },
   personas: {
     create: createPersona,
