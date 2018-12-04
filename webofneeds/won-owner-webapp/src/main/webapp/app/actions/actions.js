@@ -96,6 +96,7 @@ import { createPersona, reviewPersona } from "./persona-actions.js";
 const INJ_DEFAULT = "INJECT_DEFAULT_ACTION_CREATOR";
 const actionHierarchy = {
   initialPageLoad: pageLoadAction,
+  initialLoadFinished: INJ_DEFAULT,
   connections: {
     open: cnct.connectionsOpen,
     connectAdHoc: cnct.connectionsConnectAdHoc,
