@@ -13,7 +13,6 @@ const initialState = Immutable.fromJS({
 
 export default function(userData = initialState, action = {}) {
   switch (action.type) {
-    case actionTypes.initialPageLoad:
     case actionTypes.account.login: {
       //because we get payload as immutablejs-map sometimes but not always
       const immutablePayload = Immutable.fromJS(action.payload);
