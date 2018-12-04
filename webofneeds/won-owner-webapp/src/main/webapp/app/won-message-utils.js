@@ -517,10 +517,6 @@ export async function buildCreateMessage(needData, wonNodeUri) {
   };
 }
 
-export function isSuccessMessage(event) {
-  return event.hasMessageType === won.WONMSG.successResponseCompacted;
-}
-
 export function fetchDataForNonOwnedNeedOnly(needUri) {
   return won
     .getNeed(needUri)
