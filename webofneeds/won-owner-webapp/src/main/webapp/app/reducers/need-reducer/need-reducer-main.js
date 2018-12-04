@@ -80,56 +80,48 @@ export default function(allNeedsInState = initialState, action = {}) {
     }
 
     case actionTypes.needs.fetchOwnedActiveUris: {
-      const activeNeedUris = action.payload.get("activeNeedUris");
-
-      return addOwnActiveNeedsInLoading(allNeedsInState, activeNeedUris);
+      return addOwnActiveNeedsInLoading(
+        allNeedsInState,
+        action.payload.get("uris")
+      );
     }
 
     case actionTypes.needs.fetchOwnedInactiveUris: {
-      const inactiveNeedUris = action.payload.get("inactiveNeedUris");
-
-      return addOwnInactiveNeedsToLoad(allNeedsInState, inactiveNeedUris);
+      return addOwnInactiveNeedsToLoad(
+        allNeedsInState,
+        action.payload.get("uris")
+      );
     }
 
     case actionTypes.needs.fetchOwnedInactiveUrisLoading: {
-      const inactiveNeedUrisLoading = action.payload.get(
-        "inactiveNeedUrisLoading"
-      );
-
       return addOwnInactiveNeedsInLoading(
         allNeedsInState,
-        inactiveNeedUrisLoading
+        action.payload.get("uris")
       );
     }
 
     case actionTypes.needs.fetchTheirUrisLoading: {
-      const theirNeedUrisInLoading = action.payload.get(
-        "theirNeedUrisInLoading"
+      return addTheirNeedsInLoading(
+        allNeedsInState,
+        action.payload.get("uris")
       );
-
-      return addTheirNeedsInLoading(allNeedsInState, theirNeedUrisInLoading);
     }
 
     case actionTypes.needs.fetchOwned: {
-      let ownedNeeds = action.payload.get("ownedNeeds");
-      ownedNeeds = ownedNeeds ? ownedNeeds : Immutable.Set();
+      let needs = action.payload.get("needs");
+      needs = needs ? needs : Immutable.Set();
 
-      return ownedNeeds.reduce(
-        (updatedState, ownedNeed) => addNeed(updatedState, ownedNeed, true),
+      return needs.reduce(
+        (updatedState, need) => addNeed(updatedState, need, true),
         allNeedsInState
       );
     }
 
     case actionTypes.connections.fetchActiveUrisLoading: {
-      const needUriForConnections = action.payload.get("needUriForConnections");
-      const activeConnectionUrisLoading = action.payload.get(
-        "activeConnectionUrisLoading"
-      );
-
       return addActiveConnectionsToNeedInLoading(
         allNeedsInState,
-        needUriForConnections,
-        activeConnectionUrisLoading
+        action.payload.get("needUri"),
+        action.payload.get("connUris")
       );
     }
 
@@ -142,76 +134,12 @@ export default function(allNeedsInState = initialState, action = {}) {
 
     case actionTypes.needs.fetchTheirs:
     case actionTypes.personas.fetchTheirs: {
-      let theirNeeds = action.payload.get("theirNeeds");
-      theirNeeds = theirNeeds ? theirNeeds : Immutable.Set();
+      let needs = action.payload.get("needs");
+      needs = needs ? needs : Immutable.Set();
 
-      return theirNeeds.reduce(
-        (updatedState, theirNeed) => addNeed(updatedState, theirNeed, false),
+      return needs.reduce(
+        (updatedState, need) => addNeed(updatedState, need, false),
         allNeedsInState
-      );
-    }
-
-    case actionTypes.initialPageLoad:
-    case actionTypes.needs.fetchUnloadedNeeds:
-    case actionTypes.account.login: {
-      const activeNeedUris = action.payload.get("activeNeedUris");
-      const inactiveNeedUris = action.payload.get("inactiveNeedUris");
-      const inactiveNeedUrisLoading = action.payload.get(
-        "inactiveNeedUrisLoading"
-      );
-      const theirNeedUrisInLoading = action.payload.get(
-        "theirNeedUrisInLoading"
-      );
-
-      const needUriForConnections = action.payload.get("needUriForConnections");
-      const activeConnectionUrisLoading = action.payload.get(
-        "activeConnectionUrisLoading"
-      );
-
-      let ownedNeeds = action.payload.get("ownedNeeds");
-      ownedNeeds = ownedNeeds ? ownedNeeds : Immutable.Set();
-      let theirNeeds = action.payload.get("theirNeeds");
-      theirNeeds = theirNeeds ? theirNeeds : Immutable.Set();
-
-      const stateWithOwnInactiveNeedUrisToLoad = addOwnInactiveNeedsToLoad(
-        allNeedsInState,
-        inactiveNeedUris
-      );
-
-      const stateWithOwnInactiveNeedUrisInLoading = addOwnInactiveNeedsInLoading(
-        stateWithOwnInactiveNeedUrisToLoad,
-        inactiveNeedUrisLoading
-      );
-
-      const stateWithOwnedNeedUrisInLoading = addOwnActiveNeedsInLoading(
-        stateWithOwnInactiveNeedUrisInLoading,
-        activeNeedUris
-      );
-
-      const stateWithOwnedNeeds = ownedNeeds.reduce(
-        (updatedState, ownedNeed) => addNeed(updatedState, ownedNeed, true),
-        stateWithOwnedNeedUrisInLoading
-      );
-
-      const stateWithOwnedNeedsAndTheirNeedsInLoading = addTheirNeedsInLoading(
-        stateWithOwnedNeeds,
-        theirNeedUrisInLoading
-      );
-
-      const stateWithOwnAndTheirNeeds = theirNeeds.reduce(
-        (updatedState, theirNeed) => addNeed(updatedState, theirNeed, false),
-        stateWithOwnedNeedsAndTheirNeedsInLoading
-      );
-
-      const stateWithConnectionsToLoad = addActiveConnectionsToNeedInLoading(
-        stateWithOwnAndTheirNeeds,
-        needUriForConnections,
-        activeConnectionUrisLoading
-      );
-
-      return storeConnectionsData(
-        stateWithConnectionsToLoad,
-        action.payload.get("connections")
       );
     }
 
