@@ -333,4 +333,8 @@ public interface MessageEventRepository extends WonRepository<MessageEventPlaceh
     )
     public boolean isReceivedSameInnermostMessageFromSender(
             @Param("messageUri") URI messageUri, @Param("senderNeedUri") URI senderNeedURI);
+    
+    public void deleteByParentURI(URI parentUri);
+    
+    
 }

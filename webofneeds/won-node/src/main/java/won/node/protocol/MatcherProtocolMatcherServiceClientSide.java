@@ -35,4 +35,6 @@ public interface MatcherProtocolMatcherServiceClientSide
   public void needActivated(final URI needURI, final WonMessage wonMessage);
 
   public void needDeactivated(final URI needURI, final WonMessage wonMessage);
+  
+  public void needDeleted(final URI needURI, final WonMessage wonMessage);
 }

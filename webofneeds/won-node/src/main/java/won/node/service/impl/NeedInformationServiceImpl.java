@@ -17,6 +17,7 @@
 package won.node.service.impl;
 
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
@@ -313,7 +314,7 @@ public class NeedInformationServiceImpl implements NeedInformationService
   {
     if (needURI == null) throw new IllegalArgumentException("needURI is not set");
     Need need = DataAccessUtils.loadNeed(needRepository, needURI);
-    return need.getDatatsetHolder().getDataset().getDefaultModel();
+    return need.getState() == NeedState.DELETED? ModelFactory.createDefaultModel() : need.getDatatsetHolder().getDataset().getDefaultModel();
   }
 
   @Override

@@ -28,10 +28,11 @@ public class DataWithEtag<T>
   private String oldEtag;
   //if true indicates that the data was not found (as opposed to  unchanged)
   private boolean notFound = false;
+  private boolean isDeleted = false;
 
 
   public static DataWithEtag dataNotFound(){
-    return new DataWithEtag(null, null, null, false);
+    return new DataWithEtag(null, null, null, false, false);
   }
 
   /**
@@ -53,20 +54,21 @@ public class DataWithEtag<T>
     return new DataWithEtag(null, etag, etag);
   }
 
-  public DataWithEtag(final T data, final String etag, String oldEtag, boolean notFound) {
+  public DataWithEtag(final T data, final String etag, String oldEtag, boolean notFound, boolean isDeleted) {
     this.data = data;
     this.etag = etag;
     this.oldEtag = oldEtag;
     this.notFound = notFound;
+    this.isDeleted = isDeleted;
   }
 
   /**
-   * Construcutor setting notFound to false.
+   * Construcutor setting notFound + isDeleted to false.
    * @param data
    * @param etag
    */
   public DataWithEtag(final T data, final String etag, final String oldEtag) {
-    this(data, etag, oldEtag, false);
+    this(data, etag, oldEtag, false, false);
   }
 
   public T getData() {
@@ -97,6 +99,16 @@ public class DataWithEtag<T>
     //both etags are there: compare them no change if they are equal
     return ! etag.equals(oldEtag);
   }
+  
+  /**
+   * 
+   * This method allows querying if the data is deleted. Only returns true
+   * if isDeleted was explicitly set to true before.
+   * @return
+   */
+  public boolean isDeleted() {
+      return this.isDeleted;
+    }
 
   /**
    *

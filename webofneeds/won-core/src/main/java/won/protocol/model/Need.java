@@ -103,7 +103,9 @@ public class Need implements VersionedEntity {
     @PreUpdate
     public void incrementVersion() {
         this.version++;
-        this.lastUpdate = new Date();
+        if(this.state != NeedState.DELETED) {
+            this.lastUpdate = new Date();
+        }
     }
 
     @Override
@@ -231,6 +233,17 @@ public class Need implements VersionedEntity {
         result = 31 * result + ownerURI.hashCode();
         result = 31 * result + creationDate.hashCode();
         return result;
+    }
+    
+    public void resetAllNeedData() {
+        this.attachmentDatasetHolders = null;
+        this.authorizedApplications = null;
+        this.connectionContainer = null;
+        this.creationDate = new Date(0);
+        this.lastUpdate = new Date(0);
+        //this.eventContainer = null;
+        this.ownerURI = null;
+        //this.wonNodeURI = null;
     }
 
 

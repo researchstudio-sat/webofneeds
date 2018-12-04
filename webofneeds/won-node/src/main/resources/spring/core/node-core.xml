@@ -66,6 +66,8 @@
                   value="${activemq.matcher.outgoing.topicname.need.created}"/>
         <property name="activeMqMatcherProtocolTopicNameNeedDeactivated"
                   value="${activemq.matcher.outgoing.topicname.need.deactivated}"/>
+        <property name="activeMqMatcherProtocolTopicNameNeedDeleted"
+                  value="${activemq.matcher.outgoing.topicname.need.deleted}"/>
         <property name="uriService" ref="uriService" />
     </bean>
 
