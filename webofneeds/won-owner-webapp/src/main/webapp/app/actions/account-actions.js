@@ -189,7 +189,7 @@ export function accountLogin(credentials, options) {
             .then(() => {
               if (wasLoggedIn) {
                 return dispatch({
-                  type: actionTypes.logout,
+                  type: actionTypes.account.logout,
                   payload: Immutable.fromJS({ loggedIn: false }),
                 });
               }
