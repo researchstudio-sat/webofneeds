@@ -90,7 +90,9 @@ function genLoginConf() {
     }
 
     formKeyUp(event) {
-      this.view__clearLoginError();
+      if (this.loginError) {
+        this.view__clearLoginError();
+      }
       if (event.keyCode == 13) {
         this.account__login(
           {

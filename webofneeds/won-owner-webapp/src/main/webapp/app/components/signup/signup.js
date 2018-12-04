@@ -42,7 +42,9 @@ class SignupController {
   }
 
   formKeyup(event) {
-    this.view__clearRegisterError();
+    if (this.registerError) {
+      this.view__clearRegisterError();
+    }
     if (event.keyCode == 13 && this.$scope.registerForm.$valid) {
       if (this.isPrivateIdUser) {
         this.account__transfer({
