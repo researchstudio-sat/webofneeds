@@ -528,17 +528,17 @@ export function fetchDataForNonOwnedNeedOnly(needUri) {
     );
 }
 
-export function fetchUnloadedData(curriedDispatch, dispatch) {
+export function fetchUnloadedData(dispatch) {
   return fetchOwnedInactiveNeedUris().then(needUris => {
     dispatch({
       type: actionTypes.needs.fetchOwnedInactiveUrisLoading,
       payload: wellFormedPayload({ inactiveNeedUrisLoading: needUris }),
     });
-    return fetchDataForOwnedNeeds(needUris, curriedDispatch, dispatch);
+    return fetchDataForOwnedNeeds(needUris, dispatch);
   });
 }
 
-export function fetchOwnedData(email, curriedDispatch, dispatch) {
+export function fetchOwnedData(email, dispatch) {
   return fetchOwnedInactiveNeedUris().then(inactiveNeedUris => {
     dispatch({
       type: actionTypes.needs.fetchOwnedInactiveUris,
@@ -551,7 +551,7 @@ export function fetchOwnedData(email, curriedDispatch, dispatch) {
         payload: wellFormedPayload({ activeNeedUris: needUris }),
       });
 
-      return fetchDataForOwnedNeeds(needUris, curriedDispatch, dispatch);
+      return fetchDataForOwnedNeeds(needUris, dispatch);
     });
   });
 }
@@ -672,24 +672,20 @@ export function fetchMessage(needUri, eventUri) {
     .then(response => response.json());
 }
 
-export async function fetchDataForOwnedNeeds(
-  ownedNeedUris,
-  curriedDispatch,
-  dispatch
-) {
+export async function fetchDataForOwnedNeeds(ownedNeedUris, dispatch) {
   if (!is("Array", ownedNeedUris) || ownedNeedUris.length === 0) {
     return emptyDataset;
   }
 
   const allOwnedNeeds = await urisToLookupMap(ownedNeedUris, uri =>
-    fetchOwnedNeedAndDispatch(uri, curriedDispatch)
+    fetchOwnedNeedAndDispatch(uri, dispatch)
   );
 
   // wait for the own needs to be dispatched then load connections
   //[{ uri -> cnct }]
   const connectionMaps = await Promise.all(
     ownedNeedUris.map(needUri =>
-      fetchConnectionsOfNeedAndDispatch(needUri, curriedDispatch)
+      fetchConnectionsOfNeedAndDispatch(needUri, dispatch)
     )
   );
 
@@ -708,9 +704,8 @@ export async function fetchDataForOwnedNeeds(
     type: actionTypes.needs.fetchTheirUrisLoading,
     payload: wellFormedPayload({ theirNeedUrisInLoading: theirNeedUris_ }),
   });
-  console.debug("fetchTheirNeedAndDispatch for: ", theirNeedUris_);
   const allTheirNeeds = await urisToLookupMap(theirNeedUris_, uri =>
-    fetchTheirNeedAndDispatch(uri, curriedDispatch)
+    fetchTheirNeedAndDispatch(uri, dispatch)
   );
 
   const allDataRawPromise = Promise.all([
@@ -743,10 +738,7 @@ export async function fetchDataForOwnedNeeds(
    */
 }
 
-async function fetchConnectionsOfNeedAndDispatch(
-  needUri,
-  curriedDispatch = () => undefined
-) {
+async function fetchConnectionsOfNeedAndDispatch(needUri, dispatch) {
   const connectionUrisOfNeed = await won.getConnectionUrisOfNeed(
     needUri,
     needUri,
@@ -755,55 +747,61 @@ async function fetchConnectionsOfNeedAndDispatch(
   const activeConnectionUris = connectionUrisOfNeed.filter(
     connUri => !isConnUriClosed(connUri)
   );
-  curriedDispatch(
-    wellFormedPayload({
+  dispatch({
+    type: actionTypes.connections.fetchActiveUrisLoading,
+    payload: wellFormedPayload({
       needUriForConnections: needUri,
       activeConnectionUrisLoading: activeConnectionUris,
-    })
-  );
-  console.debug("fetchConnectionAndDispatch for: ", activeConnectionUris);
+    }),
+  });
+
   return urisToLookupMap(activeConnectionUris, uri =>
-    fetchConnectionAndDispatch(uri, curriedDispatch)
+    fetchActiveConnectionAndDispatch(uri, dispatch)
   );
 }
 
-function fetchOwnedNeedAndDispatch(needUri, curriedDispatch = () => undefined) {
+function fetchOwnedNeedAndDispatch(needUri, dispatch) {
   const needP = won
     .ensureLoaded(needUri, { requesterWebId: needUri }) //ensure loaded does net seem to be necessary as it is called within getNeed also the requesterWebId is not necessary for need requests
     .then(() => won.getNeed(needUri));
   needP.then(need =>
-    curriedDispatch(wellFormedPayload({ ownedNeeds: { [needUri]: need } }))
+    dispatch({
+      type: actionTypes.needs.fetchOwned,
+      payload: wellFormedPayload({ ownedNeeds: { [needUri]: need } }),
+    })
   );
   return needP;
 }
 
-function fetchConnectionAndDispatch(
-  cnctUri,
-  curriedDispatch = () => undefined
-) {
+function fetchActiveConnectionAndDispatch(cnctUri, dispatch) {
   const cnctP = won.getNode(cnctUri);
   cnctP.then(connection =>
-    curriedDispatch(
-      wellFormedPayload({ connections: { [cnctUri]: connection } })
-    )
+    dispatch({
+      type: actionTypes.connections.fetchActive,
+      payload: wellFormedPayload({ connections: { [cnctUri]: connection } }),
+    })
   );
   return cnctP;
 }
 
-function fetchTheirNeedAndDispatch(needUri, curriedDispatch = () => undefined) {
+function fetchTheirNeedAndDispatch(needUri, dispatch) {
   const needP = won.getNeed(needUri);
   needP.then(need => {
     if (need["won:heldBy"] && need["won:heldBy"]["@id"]) {
       const personaUri = need["won:heldBy"]["@id"];
-      won
-        .getNeed(personaUri)
-        .then(personaNeed =>
-          curriedDispatch(
-            wellFormedPayload({ theirNeeds: { [personaUri]: personaNeed } })
-          )
-        );
+      won.getNeed(personaUri).then(personaNeed =>
+        dispatch({
+          type: actionTypes.personas.fetchTheirs,
+          payload: wellFormedPayload({
+            theirNeeds: { [personaUri]: personaNeed },
+          }),
+        })
+      );
     }
-    curriedDispatch(wellFormedPayload({ theirNeeds: { [needUri]: need } }));
+    dispatch({
+      type: actionTypes.needs.fetchTheirs,
+      payload: wellFormedPayload({ theirNeeds: { [needUri]: need } }),
+    });
   });
   return needP;
 }

@@ -110,6 +110,47 @@ export default function(allNeedsInState = initialState, action = {}) {
       return addTheirNeedsInLoading(allNeedsInState, theirNeedUrisInLoading);
     }
 
+    case actionTypes.needs.fetchOwned: {
+      let ownedNeeds = action.payload.get("ownedNeeds");
+      ownedNeeds = ownedNeeds ? ownedNeeds : Immutable.Set();
+
+      return ownedNeeds.reduce(
+        (updatedState, ownedNeed) => addNeed(updatedState, ownedNeed, true),
+        allNeedsInState
+      );
+    }
+
+    case actionTypes.connections.fetchActiveUrisLoading: {
+      const needUriForConnections = action.payload.get("needUriForConnections");
+      const activeConnectionUrisLoading = action.payload.get(
+        "activeConnectionUrisLoading"
+      );
+
+      return addActiveConnectionsToNeedInLoading(
+        allNeedsInState,
+        needUriForConnections,
+        activeConnectionUrisLoading
+      );
+    }
+
+    case actionTypes.connections.fetchActive: {
+      return storeConnectionsData(
+        allNeedsInState,
+        action.payload.get("connections")
+      );
+    }
+
+    case actionTypes.needs.fetchTheirs:
+    case actionTypes.personas.fetchTheirs: {
+      let theirNeeds = action.payload.get("theirNeeds");
+      theirNeeds = theirNeeds ? theirNeeds : Immutable.Set();
+
+      return theirNeeds.reduce(
+        (updatedState, theirNeed) => addNeed(updatedState, theirNeed, false),
+        allNeedsInState
+      );
+    }
+
     case actionTypes.initialPageLoad:
     case actionTypes.needs.fetchUnloadedNeeds:
     case actionTypes.account.login: {

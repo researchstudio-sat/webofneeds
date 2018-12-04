@@ -22,7 +22,6 @@ import { getParameterByName } from "../utils.js";
 import {
   fetchOwnedData,
   fetchDataForNonOwnedNeedOnly,
-  wellFormedPayload,
 } from "../won-message-utils.js";
 
 export const pageLoadAction = () => (dispatch, getState) => {
@@ -63,11 +62,7 @@ export const pageLoadAction = () => (dispatch, getState) => {
 
 function loadingWhileSignedIn(dispatch, getState, data) {
   loginSuccess(data.username, true, dispatch, getState);
-  fetchOwnedData(
-    data.username,
-    dispatchInitialPageLoad(dispatch),
-    dispatch
-  ).then(() =>
+  fetchOwnedData(data.username, dispatch).then(() =>
     dispatch({
       type: actionTypes.initialPageLoad,
       payload: Immutable.fromJS({ initialLoadFinished: true }),
@@ -87,7 +82,7 @@ function loadingWithAnonymousAccount(dispatch, getState, privateId) {
         loginSuccess(email, true, dispatch, getState);
         return response;
       })
-      .then(() => fetchOwnedData(dispatchInitialPageLoad(dispatch), dispatch))
+      .then(() => fetchOwnedData(email, dispatch))
       .then(() => {
         return dispatch({
           type: actionTypes.initialPageLoad,
@@ -125,7 +120,10 @@ function loginSuccess(username, loginStatus, dispatch, getState) {
   /* quickly dispatch log-in status, even before loading data, to
      * allow making correct access-control decisions
      */
-  dispatchInitialPageLoad(dispatch)({ email: username, loggedIn: loginStatus });
+  dispatch({
+    type: actionTypes.account.login,
+    payload: Immutable.fromJS({ email: username, loggedIn: loginStatus }),
+  });
 
   checkAccessToCurrentRoute(dispatch, getState);
 }
@@ -148,14 +146,6 @@ function loadingWhileSignedOut(dispatch, getState) {
       })
     )
     .then(() => checkAccessToCurrentRoute(dispatch, getState));
-}
-
-function dispatchInitialPageLoad(dispatch) {
-  return payload =>
-    dispatch({
-      type: actionTypes.initialPageLoad,
-      payload: wellFormedPayload(payload),
-    });
 }
 
 /////////// THE ACTIONCREATORS BELOW SHOULD BE PART OF PAGELOAD

@@ -118,6 +118,9 @@ const actionHierarchy = {
     setMultiSelectType: INJ_DEFAULT,
     updateAgreementData: INJ_DEFAULT, //cnct.loadAgreementData,
     updatePetriNetData: INJ_DEFAULT,
+
+    fetchActiveUrisLoading: INJ_DEFAULT,
+    fetchActive: INJ_DEFAULT,
   },
   needs: {
     received: INJ_DEFAULT,
@@ -139,11 +142,16 @@ const actionHierarchy = {
     fetchOwnedInactiveUrisLoading: INJ_DEFAULT,
     fetchOwnedActiveUris: INJ_DEFAULT,
     fetchTheirUrisLoading: INJ_DEFAULT,
+
+    fetchOwned: INJ_DEFAULT,
+    fetchTheirs: INJ_DEFAULT,
   },
   personas: {
     create: createPersona,
     createSuccessful: INJ_DEFAULT,
     review: reviewPersona,
+
+    fetchTheirs: INJ_DEFAULT,
   },
   router: {
     stateGo, // only overwrites parameters that are explicitly mentioned, unless called without queryParams object (which also resets "pervasive" parameters, that shouldn't be removed

@@ -17,13 +17,7 @@ import {
 
 export function fetchUnloadedNeeds() {
   return async dispatch => {
-    const curriedDispatch = payload => {
-      dispatch({
-        type: actionTypes.needs.fetchUnloadedNeeds,
-        payload: payload,
-      });
-    };
-    fetchUnloadedData(curriedDispatch, dispatch);
+    fetchUnloadedData(dispatch);
   };
 }
 

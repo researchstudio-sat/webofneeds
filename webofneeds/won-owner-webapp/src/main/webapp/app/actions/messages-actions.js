@@ -55,7 +55,7 @@ export function failedCloseNeed(event) {
         () =>
           // as the need and it's connections have been marked dirty
           // they will be reloaded on this action.
-          fetchDataForOwnedNeeds([needUri], () => undefined, dispatch)
+          fetchDataForOwnedNeeds([needUri], dispatch)
         //fetchAllAccessibleAndRelevantData([needUri])
       )
       .then(allThatData =>

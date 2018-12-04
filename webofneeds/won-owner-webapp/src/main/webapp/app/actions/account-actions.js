@@ -177,7 +177,7 @@ export function accountLogin(credentials, options) {
       })
       .then((/*response*/) => {
         if (options_.fetchData) {
-          return fetchOwnedData(email, curriedDispatch, dispatch);
+          return fetchOwnedData(email, dispatch);
         } else {
           return Immutable.Map(); // only need to fetch data for non-new accounts
         }
