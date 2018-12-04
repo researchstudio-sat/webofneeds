@@ -704,7 +704,7 @@ export async function fetchDataForOwnedNeeds(ownedNeedUris, dispatch) {
   ]);
 
   return allDataRawPromise.then(
-    //TODO: ABCD DO STUFF HERE
+    //FIXME: NOT SURE IF THIS PROMISE IS ACTUALLY USING THE DATA STORED IN IT AT ALL
     ([ownedNeeds, connections, /* events, */ theirNeeds]) => {
       wellFormedPayload({
         ownedNeeds,
