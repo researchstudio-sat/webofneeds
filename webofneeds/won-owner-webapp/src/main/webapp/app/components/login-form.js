@@ -6,6 +6,7 @@ import { attach, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux, parseRestErrorMessage } from "../won-utils.js";
 import won from "../won-es6.js";
+import "angular-marked";
 
 import * as srefUtils from "../sref-utils.js";
 
@@ -23,8 +24,7 @@ function genLoginConf() {
                 required
                 autofocus
                 ng-keyup="self.formKeyUp($event)"/>
-            <span class="wl__errormsg" ng-if="self.loginError">
-                {{self.parseRestErrorMessage(self.loginError)}}
+            <span class="wl__errormsg" ng-if="self.loginError" marked="self.parseRestErrorMessage(self.loginError)">
                 <a class="wl__errormsg__resend"
                  ng-if="self.isNotVerified && !self.processingResendVerificationEmail"
                  ng-click="self.account__resendVerificationEmail(self.email)">(Click to Resend Verification Email)</a>
@@ -118,5 +118,5 @@ function genLoginConf() {
 }
 
 export default angular
-  .module("won.owner.components.loginForm", [])
+  .module("won.owner.components.loginForm", ["hc.marked"])
   .directive("wonLoginForm", genLoginConf).name;
