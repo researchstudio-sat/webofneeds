@@ -43,6 +43,7 @@ export const pageLoadAction = () => (dispatch, getState) => {
       return loadingWhileSignedIn(dispatch, getState, data);
     })
     .catch(() => {
+      //FIXME: I am actually not sure if we need that part here besides the else i feel like the loading of an anonymous account is being done before this already
       // as this is one of the first action-creators to be executed, we need to get the param directly from the url-bar instead of `state.getIn(['router','currentParams','privateId'])`
       const privateId =
         getParameterByName("privateId") || localStorage.getItem("privateId");
@@ -64,8 +65,7 @@ function loadingWhileSignedIn(dispatch, getState, data) {
   loginSuccess(data.username, true, dispatch, getState);
   fetchOwnedData(data.username, dispatch).then(() =>
     dispatch({
-      type: actionTypes.initialPageLoad,
-      payload: Immutable.fromJS({ initialLoadFinished: true }),
+      type: actionTypes.initialLoadFinished,
     })
   );
 }
@@ -85,8 +85,7 @@ function loadingWithAnonymousAccount(dispatch, getState, privateId) {
       .then(() => fetchOwnedData(email, dispatch))
       .then(() => {
         return dispatch({
-          type: actionTypes.initialPageLoad,
-          payload: Immutable.fromJS({ initialLoadFinished: true }),
+          type: actionTypes.initialLoadFinished,
         });
       })
       .catch(e => {
@@ -141,8 +140,13 @@ function loadingWhileSignedOut(dispatch, getState) {
   return dataPromise
     .then(publicData =>
       dispatch({
-        type: actionTypes.initialPageLoad,
-        payload: publicData.merge({ initialLoadFinished: true }),
+        type: actionTypes.needs.fetchTheirs,
+        payload: publicData,
+      })
+    )
+    .then(() =>
+      dispatch({
+        type: actionTypes.initialLoadFinished,
       })
     )
     .then(() => checkAccessToCurrentRoute(dispatch, getState));
