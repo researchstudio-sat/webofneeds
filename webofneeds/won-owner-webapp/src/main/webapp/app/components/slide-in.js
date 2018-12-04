@@ -58,7 +58,7 @@ function genSlideInConf() {
             <button
               class="si__button"
               ng-if="!self.processingVerifyEmailAddress && !self.processingResendVerificationMail && ((self.loggedIn && !self.emailVerified) || (self.verificationToken && self.emailVerificationError))"
-              ng-click="self.account__resendVerificationEmail()">
+              ng-click="self.account__resendVerificationEmail(self.email)">
                 Resend Email
             </button>
             <svg class="si__close"
