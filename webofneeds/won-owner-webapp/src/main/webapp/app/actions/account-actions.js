@@ -176,7 +176,7 @@ export function accountLogin(credentials, options) {
           return Immutable.Map(); // only need to fetch data for non-new accounts
         }
       })
-      .then(() => dispatch({ type: actionTypes.loginFinished }))
+      .then(() => dispatch({ type: actionTypes.account.loginFinished }))
       .catch(error =>
         error.response.json().then(loginError => {
           return Promise.resolve()
