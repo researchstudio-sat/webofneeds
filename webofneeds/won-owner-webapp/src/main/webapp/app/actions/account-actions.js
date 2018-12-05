@@ -177,10 +177,7 @@ export function accountLogin(credentials, options) {
           return Promise.resolve()
             .then(() => {
               if (wasLoggedIn) {
-                return dispatch({
-                  type: actionTypes.account.logout,
-                  payload: Immutable.fromJS({ loggedIn: false }),
-                });
+                return dispatch({ type: actionTypes.account.reset });
               }
             })
             .then(() => {
@@ -252,26 +249,14 @@ export function accountLogout() {
           return stateGoCurrent({ privateId: null })(dispatch, getState);
         }
       })
-      .then(() =>
-        dispatch({
-          type: actionTypes.account.logout,
-          payload: Immutable.fromJS({
-            loggedIn: false,
-            httpSessionDowngraded: true,
-          }),
-        })
-      )
+      .then(() => dispatch({ type: actionTypes.downgradeHttpSession }))
+      .then(() => dispatch({ type: actionTypes.account.reset }))
       .then(() => won.clearStore())
       .then(() => checkAccessToCurrentRoute(dispatch, getState))
       .then(() => {
         _logoutInProcess = false;
       })
-      .then(() =>
-        dispatch({
-          type: actionTypes.account.logout,
-          payload: Immutable.fromJS({ loggedIn: false, logoutFinished: true }),
-        })
-      );
+      .then(() => dispatch({ type: actionTypes.account.logoutFinished }));
   };
 }
 
@@ -422,8 +407,8 @@ export function reconnect() {
       );
     } catch (e) {
       if (e.message == "Unauthorized") {
-        //FIXME: this seems weird and unintentional to me, the actionTypes.account.logout closes the main menu (see view-reducer.js) and the dispatch after opens it again, is this wanted that way?
-        dispatch({ type: actionTypes.account.logout });
+        //FIXME: this seems weird and unintentional to me, the actionTypes.account.reset closes the main menu (see view-reducer.js) and the dispatch after opens it again, is this wanted that way?
+        dispatch({ type: actionTypes.account.reset });
         dispatch({ type: actionTypes.view.showMainMenu });
       } else {
         dispatch(actionCreators.lostConnection());
