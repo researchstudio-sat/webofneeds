@@ -26,8 +26,8 @@ export const pageLoadAction = () => (dispatch, getState) => {
     /* handle data, dispatch actions */
     .then(data =>
       dispatch({
-        type: actionTypes.account.login,
-        payload: Immutable.fromJS(data).merge({ loggedIn: true }),
+        type: actionTypes.account.store,
+        payload: Immutable.fromJS(data),
       })
     )
     .then(data => {
