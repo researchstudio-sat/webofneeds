@@ -220,19 +220,12 @@ export function accountLogin(credentials, options) {
 }
 
 let _logoutInProcess;
+
 /**
- *
- * @param options
- *    * doRedirects(true): whether or not to do any redirects at all (e.g. if an invalid route was accessed)
- *
+ * Processes logout
  * @returns {Function}
  */
-export function accountLogout(options) {
-  const options_ = {
-    doRedirects: true,
-    ...options,
-  };
-
+export function accountLogout() {
   clearPrivateId();
 
   return (dispatch, getState) => {
@@ -260,10 +253,7 @@ export function accountLogout(options) {
       })
       .then(() => {
         // for the case that we've been logged in to an anonymous account, we need to remove the privateId here.
-        if (
-          options_.doRedirects &&
-          getIn(state, ["router", "currentParams", "privateId"])
-        ) {
+        if (getIn(state, ["router", "currentParams", "privateId"])) {
           return stateGoCurrent({ privateId: null })(dispatch, getState);
         }
       })
@@ -279,10 +269,7 @@ export function accountLogout(options) {
       .then(() => {
         won.clearStore();
       })
-      .then(
-        () =>
-          options_.doRedirects && checkAccessToCurrentRoute(dispatch, getState)
-      )
+      .then(() => checkAccessToCurrentRoute(dispatch, getState))
       .then(() => {
         _logoutInProcess = false;
       })
