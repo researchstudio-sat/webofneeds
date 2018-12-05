@@ -2,12 +2,15 @@ package won.utils.mail;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 
 import javax.mail.internet.MimeMessage;
+import java.io.File;
+import java.io.InputStream;
 
 /**
  * User: ypanchenko
@@ -50,6 +53,22 @@ public class WonMailSender
       helper.setSubject(subject);
       helper.setTo(toEmail);
       helper.setText(htmlBody, true);
+      mailSender.send(msg);
+    } catch (Exception ex) {
+      logger.warn(ex.getMessage());
+    }
+  }
+
+  public void sendFileMessage(String toEmail, String subject, String htmlBody, String fileName, File file) {
+
+    MimeMessage msg = mailSender.createMimeMessage();
+    try{
+      MimeMessageHelper helper = new MimeMessageHelper(msg, true);
+      helper.setFrom(this.templateMessage.getFrom());
+      helper.setSubject(subject);
+      helper.setTo(toEmail);
+      helper.setText(htmlBody, true);
+      helper.addAttachment(fileName, file);
       mailSender.send(msg);
     } catch (Exception ex) {
       logger.warn(ex.getMessage());

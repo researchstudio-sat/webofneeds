@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 import won.owner.pojo.*;
 import won.owner.web.WonOwnerMailSender;
+import won.owner.web.events.OnExportUserEvent;
 import won.owner.web.events.OnRegistrationCompleteEvent;
 import won.owner.model.EmailVerificationToken;
 import won.owner.model.User;
@@ -135,7 +136,6 @@ public class RestUserController {
     /**
      * transfers a privateId user to a registered user
      *
-     * @param user   registration data of a user (inlcudes privateUsername and privatePassword)
      * @param errors
      * @return ResponseEntity with Http Status Code
      */
@@ -266,7 +266,6 @@ public class RestUserController {
     /**
      * check authentication and returrn ResponseEntity with HTTP status code
      *
-     * @param user     user object
      * @param request
      * @param response
      * @return
@@ -397,6 +396,30 @@ public class RestUserController {
         userService.save(user);
 
         return generateStatusResponse(RestStatusResponse.TOKEN_VERIFICATION_SUCCESS);
+    }
+
+    @ResponseBody
+    @RequestMapping(
+            value = "/exportAccount",
+            method = RequestMethod.POST
+    )
+    public ResponseEntity exportAccount(@RequestParam(name = "email", required = false) String responseEmail) {
+
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        User authUser = ((KeystoreEnabledUserDetails) securityContext.getAuthentication().getPrincipal()).getUser();
+        User user = userService.getByUsername(authUser.getUsername());
+
+        if(responseEmail == null) {
+            if(user.isPrivateId()) {
+                return generateStatusResponse(RestStatusResponse.EXPORT_IS_ANONYMOUS);
+            } else {
+                responseEmail = user.getEmail();
+            }
+        }
+
+        eventPublisher.publishEvent(new OnExportUserEvent(securityContext.getAuthentication(), user, responseEmail));
+
+        return generateStatusResponse(RestStatusResponse.EXPORT_SUCCESS);
     }
 
     @ResponseBody

@@ -1,5 +1,6 @@
 package won.owner.web;
 
+import java.io.File;
 import java.io.StringWriter;
 import java.net.URI;
 import java.util.Properties;
@@ -37,6 +38,7 @@ public class WonOwnerMailSender {
     private static final String OWNER_VERIFICATION_LINK = "/#!/connections?token=";
 
     private static final String OWNER_ANONYMOUS_LINK = "/#!/connections?privateId=";
+    private static final String EXPORT_FILE_NAME = "export.zip";
 
     private static final String SUBJECT_CONVERSATION_MESSAGE = "New message";
     private static final String SUBJECT_CONNECT = "New conversation request";
@@ -69,6 +71,7 @@ public class WonOwnerMailSender {
     private Template systemDeactivateNotificationTemplate;
     private Template verificationTemplate;
     private Template anonymousTemplate;
+    private Template exportHtmlTemplate;
 
     public WonOwnerMailSender() {
         velocityEngine = new VelocityEngine();
@@ -85,6 +88,7 @@ public class WonOwnerMailSender {
         systemDeactivateNotificationTemplate = velocityEngine.getTemplate("mail-templates/system-deactivate-notification.vm");
         verificationTemplate = velocityEngine.getTemplate("mail-templates/verification.vm");
         anonymousTemplate = velocityEngine.getTemplate("mail-templates/anonymous.vm");
+        exportHtmlTemplate = velocityEngine.getTemplate("mail-templates/export-html.vm");
     }
 
     public void setWonMailSender(WonMailSender wonMailSender) {
@@ -253,7 +257,14 @@ public class WonOwnerMailSender {
         VelocityContext context = createAnonymousLinkContext(privateId);
         anonymousTemplate.merge(context, writer);
         logger.debug("sending " + SUBJECT_ANONYMOUSLINK + " to " + email);
-        this.wonMailSender.sendTextMessage(email, SUBJECT_ANONYMOUSLINK, writer.toString());        
+        this.wonMailSender.sendTextMessage(email, SUBJECT_ANONYMOUSLINK, writer.toString());
+    }
+       
+    public void sendExportMessage(String email, File file) {
+        StringWriter writer = new StringWriter();
+        exportHtmlTemplate.merge(new VelocityContext(), writer);
+        logger.debug("sending "+ SUBJECT_EXPORT + " to " + email);
+        this.wonMailSender.sendFileMessage(email, SUBJECT_EXPORT, writer.toString(), EXPORT_FILE_NAME, file);
     }
 
 /*

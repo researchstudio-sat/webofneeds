@@ -32,7 +32,10 @@ public enum RestStatusResponse {
 
     SETTINGS_CREATED(5200, "Settings created", HttpStatus.CREATED),
 
-    TOS_ACCEPT_SUCCESS(6200, "Successfully accepted Terms Of Service", HttpStatus.OK);
+    TOS_ACCEPT_SUCCESS(6200, "Successfully accepted Terms Of Service", HttpStatus.OK),
+
+    EXPORT_SUCCESS(7200, "Successfully started exporting user", HttpStatus.OK),
+    EXPORT_IS_ANONYMOUS(7403, "To export with an anonymous user you need to provide an email address", HttpStatus.BAD_REQUEST);
 
     private final int code;
     private final String message;
