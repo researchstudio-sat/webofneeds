@@ -12,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import won.owner.model.User;
 import won.owner.service.impl.KeystoreEnabledUserDetails;
+import won.owner.service.impl.UserService;
 import won.owner.web.WonOwnerMailSender;
 import won.owner.web.events.OnExportUserEvent;
 import won.protocol.agreement.AgreementProtocolState;
@@ -23,6 +24,10 @@ import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
 import java.io.*;
 import java.net.URI;
+import java.nio.charset.Charset;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -31,7 +36,7 @@ import java.util.zip.ZipOutputStream;
 
 @Component
 public class ExportListener implements ApplicationListener<OnExportUserEvent> {
-    private static final Logger logger = LoggerFactory.getLogger(AgreementProtocolState.class);
+    private static final Logger logger = LoggerFactory.getLogger(ExportListener.class);
 
 
     @Autowired
@@ -40,12 +45,16 @@ public class ExportListener implements ApplicationListener<OnExportUserEvent> {
     @Autowired
     private WonOwnerMailSender emailSender;
 
+    @Autowired
+    private UserService userService;
+
 
     @Override
     public void onApplicationEvent(OnExportUserEvent onExportUserEvent) {
         Authentication authentication = onExportUserEvent.getAuthentication();
-        User authUser = ((KeystoreEnabledUserDetails) authentication.getPrincipal()).getUser();
-        User user = onExportUserEvent.getUser();
+        KeystoreEnabledUserDetails userDetails = ((KeystoreEnabledUserDetails) authentication.getPrincipal());
+        String password = onExportUserEvent.getKeyStorePassword();
+        User user = userService.getByUsername(userDetails.getUsername());
         String responseMail = onExportUserEvent.getResponseEmail();
 
         File tmpFile = null;
@@ -53,7 +62,7 @@ public class ExportListener implements ApplicationListener<OnExportUserEvent> {
             tmpFile = File.createTempFile("won", null);
             tmpFile.deleteOnExit();
 
-            ZipOutputStream zip = new ZipOutputStream(new FileOutputStream(tmpFile));
+            ZipOutputStream zip = new ZipOutputStream(new FileOutputStream(tmpFile), Charset.forName("UTF-8"));
 
             ZipEntry needsEntry = new ZipEntry("export.nq");
             zip.putNextEntry(needsEntry);
@@ -68,14 +77,23 @@ public class ExportListener implements ApplicationListener<OnExportUserEvent> {
 
             ZipEntry keystoreEntry = new ZipEntry("keystore.jks");
             zip.putNextEntry(keystoreEntry);
-            zip.write(authUser.getKeystoreHolder().getKeystoreBytes());
+            if(password != null && !password.isEmpty()) {
+                ByteArrayOutputStream tmpStream = new ByteArrayOutputStream();
+                userDetails.getKeyStore().store(tmpStream, password.toCharArray());
+                tmpStream.writeTo(zip);
+            } else {
+                zip.write("You need to supply a keyStorePassword to get your keystore for security reasons".getBytes());
+            }
             zip.closeEntry();
 
             zip.close();
             emailSender.sendExportMessage(onExportUserEvent.getResponseEmail(), tmpFile);
-        } catch (LinkedDataFetchingException | IOException e) {
+        } catch (LinkedDataFetchingException e) {
             logger.warn(e.getMessage());
             emailSender.sendExportFailedMessage(responseMail);
+        } catch(KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException e) {
+            emailSender.sendExportFailedMessage(responseMail);
+            throw new RuntimeException(e);
         } catch (Exception e) {
             emailSender.sendExportFailedMessage(responseMail);
             throw e;

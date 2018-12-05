@@ -2,17 +2,16 @@ package won.owner.web.events;
 
 import org.springframework.context.ApplicationEvent;
 import org.springframework.security.core.Authentication;
-import won.owner.model.User;
 
 public class OnExportUserEvent extends ApplicationEvent {
     private final Authentication authentication;
+    private final String keyStorePassword;
     private final String responseEmail;
-    private final User user;
 
-    public OnExportUserEvent(Authentication authentication, User user, String responseEmail) {
+    public OnExportUserEvent(Authentication authentication, String keyStorePassword, String responseEmail) {
         super(authentication);
         this.authentication = authentication;
-        this.user = user;
+        this.keyStorePassword = keyStorePassword;
         this.responseEmail = responseEmail;
     }
 
@@ -24,7 +23,7 @@ public class OnExportUserEvent extends ApplicationEvent {
         return authentication;
     }
 
-    public User getUser() {
-        return user;
+    public String getKeyStorePassword() {
+        return keyStorePassword;
     }
 }

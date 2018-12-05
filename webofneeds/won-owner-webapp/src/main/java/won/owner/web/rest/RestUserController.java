@@ -403,7 +403,7 @@ public class RestUserController {
             value = "/exportAccount",
             method = RequestMethod.POST
     )
-    public ResponseEntity exportAccount(@RequestParam(name = "email", required = false) String responseEmail) {
+    public ResponseEntity exportAccount(@RequestParam(name = "email", required = false) String responseEmail, @RequestParam(name="keyStorePassword", required = false) String keyStorePassword) {
 
         SecurityContext securityContext = SecurityContextHolder.getContext();
         User authUser = ((KeystoreEnabledUserDetails) securityContext.getAuthentication().getPrincipal()).getUser();
@@ -417,7 +417,7 @@ public class RestUserController {
             }
         }
 
-        eventPublisher.publishEvent(new OnExportUserEvent(securityContext.getAuthentication(), user, responseEmail));
+        eventPublisher.publishEvent(new OnExportUserEvent(securityContext.getAuthentication(), keyStorePassword, responseEmail));
 
         return generateStatusResponse(RestStatusResponse.EXPORT_SUCCESS);
     }
