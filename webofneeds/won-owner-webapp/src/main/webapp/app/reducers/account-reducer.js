@@ -25,7 +25,7 @@ export default function(userData = initialState, action = {}) {
 
       return userData
         .set("loggedIn", true)
-        .set("username", username)
+        .set("email", username)
         .set("emailVerified", emailVerified)
         .set("acceptedTermsOfService", acceptedTermsOfService);
     }
