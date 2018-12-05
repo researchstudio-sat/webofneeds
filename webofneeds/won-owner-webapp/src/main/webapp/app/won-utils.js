@@ -787,6 +787,11 @@ export function generateBase64PngQrCode(link) {
 export function parseRestErrorMessage(error) {
   if (error && error.get("code") === won.RESPONSECODE.PRIVATEID_NOT_FOUND) {
     return "Sorry, we couldn't find the private ID (the one in your url-bar). If you copied this address make sure you **copied everything** and try **reloading the page**. If this doesn't work you can try [removing it](#) to start fresh.";
+  } else if (
+    error &&
+    error.get("code") === won.RESPONSECODE.USER_NOT_VERIFIED
+  ) {
+    return "You haven't verified your email addres yet. Please do so now by clicking the link in the email we sent you.";
   } else if (error) {
     //return the message FIXME: once the localization is implemented use the correct localization
     return error.get("message");

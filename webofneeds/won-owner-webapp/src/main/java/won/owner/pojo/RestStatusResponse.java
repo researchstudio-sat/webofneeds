@@ -15,7 +15,7 @@ public enum RestStatusResponse {
     USER_NOT_FOUND(1400, "User not found", HttpStatus.NOT_FOUND),
     USER_NOT_SIGNED_IN(1401, "User not signed in", HttpStatus.UNAUTHORIZED),
     USER_BAD_CREDENTIALS(1402, "No such username/password combination registered", HttpStatus.FORBIDDEN),
-    USER_NOT_VERIFIED(1403, "E-Mail Address of the User has not been verified yet or GracePeriod has expired", HttpStatus.FORBIDDEN),
+    USER_NOT_VERIFIED(1403, "E-mail address of the user has not been verified yet", HttpStatus.FORBIDDEN),
     USERNAME_MISMATCH(1404, "User name problem", HttpStatus.BAD_REQUEST),
     USER_ALREADY_EXISTS(1405, "User already exists", HttpStatus.CONFLICT),
 
