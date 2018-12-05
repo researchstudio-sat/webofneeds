@@ -148,11 +148,8 @@ export function accountLogin(credentials, options) {
       .then(() => login(credentials))
       .then(data =>
         dispatch({
-          type: actionTypes.account.login,
-          payload: Immutable.fromJS(data).merge({
-            email: email,
-            loggedIn: true,
-          }),
+          type: actionTypes.account.store,
+          payload: Immutable.fromJS(data),
         })
       )
       .then(() => dispatch({ type: actionTypes.upgradeHttpSession }))
