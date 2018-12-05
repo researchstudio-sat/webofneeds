@@ -32,7 +32,7 @@ export default function(processState = initialState, action = {}) {
     case actionTypes.account.logoutStarted:
       return processState.set("processingLogout", true);
 
-    case actionTypes.account.logout:
+    case actionTypes.account.logoutFinished:
       return processState.set("processingLogout", false);
 
     case actionTypes.account.loginStarted:

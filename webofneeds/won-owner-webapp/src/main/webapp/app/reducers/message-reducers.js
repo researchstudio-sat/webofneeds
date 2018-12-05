@@ -4,12 +4,7 @@
 
 import { actionTypes } from "../actions/actions.js";
 import Immutable from "immutable";
-import { getIn } from "../utils.js";
 
-/* TODO this fragment is part of an attempt to sketch a different
- * approach to asynchronity (Remove it or the thunk-based
- * solution afterwards)
- */
 const initialState = Immutable.fromJS({
   enqueued: {},
   waitingForAnswer: {},
@@ -90,29 +85,14 @@ export function messagesReducer(messages = initialState, action = {}) {
       return messages.set("reconnecting", true);
     }
 
-    case actionTypes.account.logout: {
-      const logoutFinished = getIn(action, ["payload", "logoutFinished"]);
-      const httpSessionDowngraded =
-        !logoutFinished && getIn(action, ["payload", "httpSessionDowngraded"]);
-      if (logoutFinished) {
-        return initialState
-          .set("lostConnection", false)
-          .set("reconnecting", false);
-      } else if (httpSessionDowngraded) {
-        /*
-         * now that the session has been downgraded, we need to set the flag
-         * that triggers a websocket reset.
-         * This is part of the session-upgrade hack documented in:
-         * https://github.com/researchstudio-sat/webofneeds/issues/381#issuecomment-172569377
-         */
-        return messages.set("reconnecting", true);
-      } else {
-        console.error(
-          "Got unexpected payload for `actionTypes.account.logout` ",
-          action
-        );
-        return messages;
-      }
+    case actionTypes.downgradeHttpSession: {
+      return messages.set("reconnecting", true);
+    }
+
+    case actionTypes.account.logoutFinished: {
+      return initialState
+        .set("lostConnection", false)
+        .set("reconnecting", false);
     }
 
     case actionTypes.reconnect.start:

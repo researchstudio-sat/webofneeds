@@ -14,7 +14,7 @@ export default function(allToasts = initialState, action = {}) {
       allToasts = pushNewToast(allToasts, "Info Toast", won.WON.infoToast);
       return allToasts;
 
-    case actionTypes.account.logout:
+    case actionTypes.account.reset:
       return initialState;
 
     case actionTypes.messages.connect.failure:

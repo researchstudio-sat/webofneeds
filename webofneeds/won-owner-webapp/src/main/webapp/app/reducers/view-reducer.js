@@ -22,7 +22,7 @@ export default function(viewState = initialState, action = {}) {
       return viewState.set("showMainMenu", true);
 
     case actionTypes.account.store:
-    case actionTypes.account.logout:
+    case actionTypes.account.reset:
     case actionTypes.view.hideMainMenu:
       return viewState.set("showMainMenu", false);
 
