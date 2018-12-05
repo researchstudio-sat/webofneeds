@@ -86,8 +86,10 @@ function genLogoutConf() {
     getEmail() {
       if (this.isPrivateIdUser) {
         return "Anonymous";
-      } else {
+      } else if (this.email) {
         return ellipsizeString(this.email, this.maxEmailLength);
+      } else {
+        return "";
       }
     }
   }
