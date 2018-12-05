@@ -49,6 +49,8 @@ public class WonOwnerMailSender {
     private static final String SUBJECT_SYSTEM_DEACTIVATE = "Posting deactivated by system";
     private static final String SUBJECT_VERIFICATION = "Please verify your email address";
     private static final String SUBJECT_ANONYMOUSLINK = "Anonymous login link";
+    private static final String SUBJECT_EXPORT = "Your account export is complete";
+    private static final String SUBJECT_EXPORT_FAILED = "Your account export did not succeed";
 
     private WonMailSender wonMailSender;
     
@@ -72,6 +74,7 @@ public class WonOwnerMailSender {
     private Template verificationTemplate;
     private Template anonymousTemplate;
     private Template exportHtmlTemplate;
+    private Template exportFailedHtmlTemplate;
 
     public WonOwnerMailSender() {
         velocityEngine = new VelocityEngine();
@@ -89,6 +92,7 @@ public class WonOwnerMailSender {
         verificationTemplate = velocityEngine.getTemplate("mail-templates/verification.vm");
         anonymousTemplate = velocityEngine.getTemplate("mail-templates/anonymous.vm");
         exportHtmlTemplate = velocityEngine.getTemplate("mail-templates/export-html.vm");
+        exportFailedHtmlTemplate = velocityEngine.getTemplate("mail-templates/export-failed-html.vm");
     }
 
     public void setWonMailSender(WonMailSender wonMailSender) {
@@ -265,6 +269,13 @@ public class WonOwnerMailSender {
         exportHtmlTemplate.merge(new VelocityContext(), writer);
         logger.debug("sending "+ SUBJECT_EXPORT + " to " + email);
         this.wonMailSender.sendFileMessage(email, SUBJECT_EXPORT, writer.toString(), EXPORT_FILE_NAME, file);
+    }
+
+    public void sendExportFailedMessage(String email) {
+        StringWriter writer = new StringWriter();
+        exportFailedHtmlTemplate.merge(new VelocityContext(), writer);
+        logger.debug("sending "+ SUBJECT_EXPORT_FAILED + " to " + email);
+        this.wonMailSender.sendHtmlMessage(email, SUBJECT_EXPORT_FAILED, writer.toString());
     }
 
 /*

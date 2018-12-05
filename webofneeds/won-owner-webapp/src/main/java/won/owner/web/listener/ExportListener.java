@@ -43,12 +43,14 @@ public class ExportListener implements ApplicationListener<OnExportUserEvent> {
 
     @Override
     public void onApplicationEvent(OnExportUserEvent onExportUserEvent) {
-        try {
-            Authentication authentication = onExportUserEvent.getAuthentication();
-            User authUser = ((KeystoreEnabledUserDetails) authentication.getPrincipal()).getUser();
-            User user = onExportUserEvent.getUser();
+        Authentication authentication = onExportUserEvent.getAuthentication();
+        User authUser = ((KeystoreEnabledUserDetails) authentication.getPrincipal()).getUser();
+        User user = onExportUserEvent.getUser();
+        String responseMail = onExportUserEvent.getResponseEmail();
 
-            File tmpFile = File.createTempFile("won", null);
+        File tmpFile = null;
+        try {
+            tmpFile = File.createTempFile("won", null);
             tmpFile.deleteOnExit();
 
             ZipOutputStream zip = new ZipOutputStream(new FileOutputStream(tmpFile));
@@ -71,9 +73,16 @@ public class ExportListener implements ApplicationListener<OnExportUserEvent> {
 
             zip.close();
             emailSender.sendExportMessage(onExportUserEvent.getResponseEmail(), tmpFile);
-            tmpFile.delete();
-        } catch (IOException e) {
+        } catch (LinkedDataFetchingException | IOException e) {
             logger.warn(e.getMessage());
+            emailSender.sendExportFailedMessage(responseMail);
+        } catch (Exception e) {
+            emailSender.sendExportFailedMessage(responseMail);
+            throw e;
+        } finally {
+            if (tmpFile != null) {
+                tmpFile.delete();
+            }
         }
     }
 
