@@ -10,6 +10,8 @@ const initialState = Immutable.fromJS({
   waitingForAnswer: {},
   claimOnSuccess: {},
   refreshDataOnSuccess: {},
+  lostConnection: false,
+  reconnecting: false,
 });
 export function messagesReducer(messages = initialState, action = {}) {
   switch (action.type) {
@@ -90,9 +92,7 @@ export function messagesReducer(messages = initialState, action = {}) {
     }
 
     case actionTypes.account.logoutFinished: {
-      return initialState
-        .set("lostConnection", false)
-        .set("reconnecting", false);
+      return initialState;
     }
 
     case actionTypes.reconnect.start:
