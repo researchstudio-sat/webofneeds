@@ -342,8 +342,9 @@ public class RestUserController {
             return generateStatusResponse(RestStatusResponse.USER_NOT_SIGNED_IN);
         } else {
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            User user = ((KeystoreEnabledUserDetails) authentication.getPrincipal()).getUser();
-            return generateUserResponse(user);
+            User authUser = ((KeystoreEnabledUserDetails) authentication.getPrincipal()).getUser();
+
+            return generateUserResponse(userService.getByUsername(authUser.getUsername()));
         }
     }
 
