@@ -24,6 +24,7 @@ export default function(userData = initialState, action = {}) {
       );
 
       return userData
+        .set("loggedIn", true)
         .set("username", username)
         .set("emailVerified", emailVerified)
         .set("acceptedTermsOfService", acceptedTermsOfService);
@@ -47,7 +48,7 @@ export default function(userData = initialState, action = {}) {
     case actionTypes.account.acceptTermsOfServiceFailed:
       return userData.set("acceptedTermsOfService", false);
 
-    case actionTypes.account.logout:
+    case actionTypes.account.reset:
       return initialState.set(
         "acceptedDisclaimer",
         userData.get("acceptedDisclaimer")
