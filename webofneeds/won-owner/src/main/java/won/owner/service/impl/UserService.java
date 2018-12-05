@@ -70,7 +70,7 @@ public class UserService {
             privateUser.setPassword(passwordEncoder.encode(newPassword));
             privateUser.setEmail(newEmail);
             privateUser.setEmailVerified(false);
-            user.setAcceptedTermsOfService(true); //transfer only available when flag is set therefore we can just set this to true (i think)
+            privateUser.setAcceptedTermsOfService(true); //transfer only available when flag is set therefore we can just set this to true (i think)
             if (role != null) {
                 privateUser.setRole(role);
             }
