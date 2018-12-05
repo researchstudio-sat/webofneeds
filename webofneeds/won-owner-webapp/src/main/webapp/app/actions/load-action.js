@@ -66,7 +66,7 @@ function loadingWhileSignedOut(dispatch, getState) {
   return dataPromise
     .then(publicData =>
       dispatch({
-        type: actionTypes.needs.fetchTheirs,
+        type: actionTypes.needs.storeTheirs,
         payload: publicData,
       })
     )

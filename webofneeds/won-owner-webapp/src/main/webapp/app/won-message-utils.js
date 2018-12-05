@@ -521,7 +521,7 @@ export function fetchDataForNonOwnedNeedOnly(needUri) {
 export function fetchUnloadedData(dispatch) {
   return fetchOwnedInactiveNeedUris().then(needUris => {
     dispatch({
-      type: actionTypes.needs.fetchOwnedInactiveUrisLoading,
+      type: actionTypes.needs.storeOwnedInactiveUrisLoading,
       payload: wellFormedPayload({ uris: needUris }),
     });
     return fetchDataForOwnedNeeds(needUris, dispatch);
@@ -531,13 +531,13 @@ export function fetchUnloadedData(dispatch) {
 export function fetchOwnedData(email, dispatch) {
   return fetchOwnedInactiveNeedUris().then(inactiveNeedUris => {
     dispatch({
-      type: actionTypes.needs.fetchOwnedInactiveUris,
+      type: actionTypes.needs.storeOwnedInactiveUris,
       payload: wellFormedPayload({ uris: inactiveNeedUris }),
     });
 
     return fetchOwnedActiveNeedUris().then(needUris => {
       dispatch({
-        type: actionTypes.needs.fetchOwnedActiveUris,
+        type: actionTypes.needs.storeOwnedActiveUris,
         payload: wellFormedPayload({ uris: needUris }),
       });
 
@@ -690,7 +690,7 @@ export async function fetchDataForOwnedNeeds(ownedNeedUris, dispatch) {
 
   const theirNeedUris_ = Immutable.Set(theirNeedUris).toArray();
   dispatch({
-    type: actionTypes.needs.fetchTheirUrisLoading,
+    type: actionTypes.needs.storeTheirUrisLoading,
     payload: wellFormedPayload({ uris: theirNeedUris_ }),
   });
   const allTheirNeeds = await urisToLookupMap(theirNeedUris_, uri =>
@@ -746,7 +746,7 @@ function fetchOwnedNeedAndDispatch(needUri, dispatch) {
     .then(() => won.getNeed(needUri));
   needP.then(need =>
     dispatch({
-      type: actionTypes.needs.fetchOwned,
+      type: actionTypes.needs.storeOwned,
       payload: wellFormedPayload({ needs: { [needUri]: need } }),
     })
   );
@@ -771,7 +771,7 @@ function fetchTheirNeedAndDispatch(needUri, dispatch) {
       const personaUri = need["won:heldBy"]["@id"];
       won.getNeed(personaUri).then(personaNeed =>
         dispatch({
-          type: actionTypes.personas.fetchTheirs,
+          type: actionTypes.personas.storeTheirs,
           payload: wellFormedPayload({
             needs: { [personaUri]: personaNeed },
           }),
@@ -779,7 +779,7 @@ function fetchTheirNeedAndDispatch(needUri, dispatch) {
       );
     }
     dispatch({
-      type: actionTypes.needs.fetchTheirs,
+      type: actionTypes.needs.storeTheirs,
       payload: wellFormedPayload({ needs: { [needUri]: need } }),
     });
   });

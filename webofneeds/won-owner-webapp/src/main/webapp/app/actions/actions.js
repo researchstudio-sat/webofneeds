@@ -138,20 +138,20 @@ const actionHierarchy = {
     fetchUnloadedNeeds: fetchUnloadedNeeds,
     fetchSuggested: fetchSuggested,
 
-    fetchOwnedInactiveUris: INJ_DEFAULT,
-    fetchOwnedInactiveUrisLoading: INJ_DEFAULT,
-    fetchOwnedActiveUris: INJ_DEFAULT,
-    fetchTheirUrisLoading: INJ_DEFAULT,
+    storeOwnedInactiveUris: INJ_DEFAULT,
+    storeOwnedInactiveUrisLoading: INJ_DEFAULT,
+    storeOwnedActiveUris: INJ_DEFAULT,
+    storeTheirUrisLoading: INJ_DEFAULT,
 
-    fetchOwned: INJ_DEFAULT,
-    fetchTheirs: INJ_DEFAULT,
+    storeOwned: INJ_DEFAULT,
+    storeTheirs: INJ_DEFAULT,
   },
   personas: {
     create: createPersona,
     createSuccessful: INJ_DEFAULT,
     review: reviewPersona,
 
-    fetchTheirs: INJ_DEFAULT,
+    storeTheirs: INJ_DEFAULT,
   },
   router: {
     stateGo, // only overwrites parameters that are explicitly mentioned, unless called without queryParams object (which also resets "pervasive" parameters, that shouldn't be removed

@@ -79,35 +79,35 @@ export default function(allNeedsInState = initialState, action = {}) {
       return stateWithSuggestedPosts;
     }
 
-    case actionTypes.needs.fetchOwnedActiveUris: {
+    case actionTypes.needs.storeOwnedActiveUris: {
       return addOwnActiveNeedsInLoading(
         allNeedsInState,
         action.payload.get("uris")
       );
     }
 
-    case actionTypes.needs.fetchOwnedInactiveUris: {
+    case actionTypes.needs.storeOwnedInactiveUris: {
       return addOwnInactiveNeedsToLoad(
         allNeedsInState,
         action.payload.get("uris")
       );
     }
 
-    case actionTypes.needs.fetchOwnedInactiveUrisLoading: {
+    case actionTypes.needs.storeOwnedInactiveUrisLoading: {
       return addOwnInactiveNeedsInLoading(
         allNeedsInState,
         action.payload.get("uris")
       );
     }
 
-    case actionTypes.needs.fetchTheirUrisLoading: {
+    case actionTypes.needs.storeTheirUrisLoading: {
       return addTheirNeedsInLoading(
         allNeedsInState,
         action.payload.get("uris")
       );
     }
 
-    case actionTypes.needs.fetchOwned: {
+    case actionTypes.needs.storeOwned: {
       let needs = action.payload.get("needs");
       needs = needs ? needs : Immutable.Set();
 
@@ -132,8 +132,8 @@ export default function(allNeedsInState = initialState, action = {}) {
       );
     }
 
-    case actionTypes.needs.fetchTheirs:
-    case actionTypes.personas.fetchTheirs: {
+    case actionTypes.needs.storeTheirs:
+    case actionTypes.personas.storeTheirs: {
       let needs = action.payload.get("needs");
       needs = needs ? needs : Immutable.Set();
 
