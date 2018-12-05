@@ -303,7 +303,7 @@ export function accountRegister(credentials) {
   return (dispatch, getState) =>
     registerAccount(credentials)
       .then(() =>
-        /*response*/ accountLogin(credentials, {
+        accountLogin(credentials, {
           fetchData: false,
           redirectToFeed: true,
         })(dispatch, getState)
@@ -328,8 +328,7 @@ export function accountTransfer(credentials) {
     transferPrivateAccount(credentials)
       .then(() => {
         credentials.privateId = undefined;
-        /*response*/
-        accountLogin(credentials, {
+        return accountLogin(credentials, {
           fetchData: true,
           redirectToFeed: true,
         })(dispatch, getState);
