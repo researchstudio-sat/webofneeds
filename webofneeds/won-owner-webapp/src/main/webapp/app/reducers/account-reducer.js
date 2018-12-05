@@ -8,44 +8,25 @@ import { isDisclaimerAccepted } from "../won-localstorage.js";
 
 const initialState = Immutable.fromJS({
   loggedIn: false,
+  email: undefined,
+  emailVerified: false,
+  acceptedTermsOfService: false,
   acceptedDisclaimer: isDisclaimerAccepted(),
 });
 
 export default function(userData = initialState, action = {}) {
   switch (action.type) {
-    case actionTypes.account.login: {
-      //because we get payload as immutablejs-map sometimes but not always
-      const immutablePayload = Immutable.fromJS(action.payload);
+    case actionTypes.account.store: {
+      const username = action.payload.get("username");
+      const emailVerified = action.payload.get("emailVerified");
+      const acceptedTermsOfService = action.payload.get(
+        "acceptedTermsOfService"
+      );
 
-      const loggedIn = immutablePayload.get("loggedIn");
-
-      //due to the many reduce calls with different payload we need to check for email and username alike
-      const email = immutablePayload.get("email");
-      const username = immutablePayload.get("username");
-
-      if (loggedIn && (email || username)) {
-        /*due to the fact that we do not always have the parameters below in the payload, we need to check and
-          see if the corresponding state parameter has already been set and therefore will not be overwritten with
-          undefined or false(-> if it was already set to true in another reducer)
-        */
-        const emailVerified =
-          userData.get("emailVerified") ||
-          immutablePayload.get("emailVerified");
-
-        const acceptedTermsOfService =
-          userData.get("acceptedTermsOfService") ||
-          immutablePayload.get("acceptedTermsOfService");
-
-        return Immutable.fromJS({
-          loggedIn: true,
-          email: email || username,
-          emailVerified: emailVerified,
-          acceptedTermsOfService: acceptedTermsOfService,
-          acceptedDisclaimer: userData.get("acceptedDisclaimer"),
-        });
-      } else {
-        return userData;
-      }
+      return userData
+        .set("username", username)
+        .set("emailVerified", emailVerified)
+        .set("acceptedTermsOfService", acceptedTermsOfService);
     }
 
     case actionTypes.account.verifyEmailAddressFailed:
@@ -67,17 +48,15 @@ export default function(userData = initialState, action = {}) {
       return userData.set("acceptedTermsOfService", false);
 
     case actionTypes.account.logout:
-      return Immutable.fromJS({
-        loggedIn: false,
-        acceptedDisclaimer: userData.get("acceptedDisclaimer"),
-      });
+      return initialState.set(
+        "acceptedDisclaimer",
+        userData.get("acceptedDisclaimer")
+      );
 
     case actionTypes.account.loginFailed:
-      return Immutable.fromJS({
-        loginError: action.payload.loginError,
-        loggedIn: false,
-        acceptedDisclaimer: userData.get("acceptedDisclaimer"),
-      });
+      return userData
+        .set("loginError", action.payload.loginError)
+        .set("loggedIn", false);
 
     case actionTypes.view.clearLoginError:
       if (!userData.get("loggedIn")) {
@@ -90,10 +69,9 @@ export default function(userData = initialState, action = {}) {
       return userData.set("registerError", undefined);
 
     case actionTypes.account.registerFailed:
-      return Immutable.fromJS({
-        registerError: action.payload.registerError,
-        acceptedDisclaimer: userData.get("acceptedDisclaimer"),
-      });
+      return userData
+        .set("registerError", action.payload.registerError)
+        .set("loggedIn", false);
 
     case actionTypes.account.acceptDisclaimerSuccess:
       return userData.set("acceptedDisclaimer", true);
