@@ -3,7 +3,6 @@
  */
 import angular from "angular";
 import { attach } from "../utils.js";
-import { ellipsizeString } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
 
@@ -72,7 +71,6 @@ function genLogoutConf() {
 
       this.email = "";
       this.password = "";
-      this.maxEmailLength = 16;
 
       const logout = state => ({
         loggedIn: state.getIn(["account", "loggedIn"]),
@@ -86,11 +84,8 @@ function genLogoutConf() {
     getEmail() {
       if (this.isPrivateIdUser) {
         return "Anonymous";
-      } else if (this.email) {
-        return ellipsizeString(this.email, this.maxEmailLength);
-      } else {
-        return "";
       }
+      return this.email;
     }
   }
   Controller.$inject = serviceDependencies;
