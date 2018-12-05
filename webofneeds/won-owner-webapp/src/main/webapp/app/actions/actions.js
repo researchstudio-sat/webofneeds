@@ -266,9 +266,11 @@ const actionHierarchy = {
   },
   account: {
     login: accountLogin,
-    loginStarted: INJ_DEFAULT,
-    loginFinished: INJ_DEFAULT,
+    loginStarted: INJ_DEFAULT, //will only be dispatched on login not on page reload
+    loginFinished: INJ_DEFAULT, //will be dispatched when data has been loaded on login not on page reload
     loginFailed: INJ_DEFAULT,
+
+    store: INJ_DEFAULT, //stores the retrieved account in the state
 
     logout: accountLogout,
     logoutStarted: INJ_DEFAULT,
