@@ -373,19 +373,6 @@ export function reconnect() {
 
       const state = getState();
 
-      /*
-      * -- check for new connections (i.e. matches and incoming requests) --
-      */
-      // await pageLoadAction()(dispatch, getState);
-      // const email = getIn(state, ["account", "email"]);
-      // await fetchOwnedData(email, payload => {
-      //   dispatch({
-      //     type: actionTypes.initialPageLoad, // TODO make this it's own type
-      //     payload: wellFormedPayload(payload),
-      //   });
-      // });
-      //TODO hard reload
-
       /* 
        * -- loading latest messages for all connections (we might have missed some during the dc) --
        */
