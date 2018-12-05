@@ -232,12 +232,7 @@ export function accountLogout() {
     _logoutInProcess = true;
 
     return Promise.resolve()
-      .then(() =>
-        dispatch({
-          type: actionTypes.account.logoutStarted,
-          payload: {},
-        })
-      )
+      .then(() => dispatch({ type: actionTypes.account.logoutStarted }))
       .then(() => logout())
       .catch(error => {
         //TODO: PRINT ERROR MESSAGE AND CHANGE STATE ACCORDINGLY
