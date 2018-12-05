@@ -24,13 +24,12 @@ function genLoginConf() {
                 required
                 autofocus
                 ng-keyup="self.formKeyUp($event)"/>
-            <span class="wl__errormsg" ng-if="self.loginError" marked="self.parseRestErrorMessage(self.loginError)">
-                <a class="wl__errormsg__resend"
+            <span class="wl__errormsg" ng-if="self.loginError" marked="self.parseRestErrorMessage(self.loginError)"/>
+            <a class="wl__errormsg__resend"
                  ng-if="self.isNotVerified && !self.processingResendVerificationEmail"
                  ng-click="self.account__resendVerificationEmail(self.email)">(Click to Resend Verification Email)</a>
-                <a class="wl__errormsg__resend"
+            <a class="wl__errormsg__resend"
                  ng-if="self.isNotVerified && self.processingResendVerificationEmail">(Resending...)</a>
-            </span>
             <input
                 id="loginPassword"
                 placeholder="Password"
