@@ -62,7 +62,6 @@ let _loginInProcessFor;
  *    signing in is new, there's no need to fetch this and `false` can be passed here
  *    * doRedirects(true): whether or not to do any redirects at all (e.g. if an invalid route was accessed)
  *    * redirectToFeed(false): whether or not to redirect to the feed after signing in (needs `redirects` to be true)
- *    * relogIfNecessary(true):  if there's a valid session or privateId, log out from that first.
  *
  * @param credentials either {email, password} or {privateId}
  * @returns {Function}
@@ -74,7 +73,6 @@ export function accountLogin(credentials, options) {
       fetchData: true,
       doRedirects: true,
       redirectToFeed: false,
-      relogIfNecessary: true, // if there's a valid session or privateId, log out from that first.
     },
     options
   );
@@ -169,7 +167,7 @@ export function accountLogin(credentials, options) {
           return checkAccessToCurrentRoute(dispatch, getState);
         }
       })
-      .then((/*response*/) => {
+      .then(() => {
         if (options_.fetchData) {
           return fetchOwnedData(email, dispatch);
         } else {
@@ -266,9 +264,7 @@ export function accountLogout() {
           }),
         })
       )
-      .then(() => {
-        won.clearStore();
-      })
+      .then(() => won.clearStore())
       .then(() => checkAccessToCurrentRoute(dispatch, getState))
       .then(() => {
         _logoutInProcess = false;
