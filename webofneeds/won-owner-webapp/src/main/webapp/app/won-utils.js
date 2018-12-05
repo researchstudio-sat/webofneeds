@@ -198,6 +198,57 @@ export function registerAccount(credentials) {
 }
 
 /**
+ * Accept the Terms Of Service
+ */
+export function acceptTermsOfService() {
+  const url = urljoin(ownerBaseUrl, "/rest/users/acceptTermsOfService");
+  const httpOptions = {
+    method: "post",
+    headers: {
+      Accept: "application/json",
+    },
+    credentials: "include",
+  };
+  return fetch(url, httpOptions)
+    .then(resp => {
+      return resp.json();
+    })
+    .catch(error => {
+      return error.json();
+    });
+}
+
+/**
+ * Confirm the Registration with the verificationToken-link provided in the registration-email
+ */
+export function confirmRegistration(verificationToken) {
+  const url = urljoin(ownerBaseUrl, "/rest/users/confirmRegistration");
+  const httpOptions = {
+    method: "post",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      token: verificationToken,
+    }),
+  };
+  return fetch(url, httpOptions)
+    .then(checkHttpStatus)
+    .then(resp => {
+      return resp.json();
+    })
+    .catch(error =>
+      error.response.json().then(errorMessage => {
+        //FIXME: MOVE THIS ERROR HANDLINNG INTO THE ACTION
+        const verificationError = new Error();
+        verificationError.jsonResponse = errorMessage;
+        throw verificationError;
+      })
+    );
+}
+
+/**
  * Resend the verification mail.
  *
  */
@@ -217,30 +268,14 @@ export function resendEmailVerification(email) {
     .then(resp => {
       return resp.json();
     })
-    .catch(error => {
-      return error;
-    });
-}
-
-/**
- * Accept the Terms Of Service
- */
-export function acceptTermsOfService() {
-  const url = urljoin(ownerBaseUrl, "/rest/users/acceptTermsOfService");
-  const httpOptions = {
-    method: "post",
-    headers: {
-      Accept: "application/json",
-    },
-    credentials: "include",
-  };
-  return fetch(url, httpOptions)
-    .then(resp => {
-      return resp.json();
-    })
-    .catch(error => {
-      return error.json();
-    });
+    .catch(error =>
+      error.response.json().then(errorMessage => {
+        //FIXME: MOVE THIS ERROR HANDLINNG INTO THE ACTION
+        const resendError = new Error();
+        resendError.jsonResponse = errorMessage;
+        throw resendError;
+      })
+    );
 }
 
 /**
@@ -749,16 +784,13 @@ export function generateBase64PngQrCode(link) {
   return pngQrCode && btoa(String.fromCharCode.apply(null, pngQrCode));
 }
 
-export function getLoginErrorMessage(loginError) {
-  if (
-    loginError &&
-    loginError.get("code") === won.RESPONSECODE.PRIVATEID_NOT_FOUND
-  ) {
+export function parseRestErrorMessage(error) {
+  if (error && error.get("code") === won.RESPONSECODE.PRIVATEID_NOT_FOUND) {
     return "Sorry, we couldn't find the private ID (the one in your url-bar). If you copied this address make sure you **copied everything** and try **reloading the page**. If this doesn't work you can try [removing it](#) to start fresh.";
-  } else if (loginError) {
+  } else if (error) {
     //return the message FIXME: once the localization is implemented use the correct localization
-    return loginError.get("message");
+    return error.get("message");
   }
 
-  return loginError;
+  return error;
 }

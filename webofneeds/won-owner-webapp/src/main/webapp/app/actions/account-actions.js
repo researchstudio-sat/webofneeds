@@ -10,6 +10,8 @@ import {
   registerAccount,
   transferPrivateAccount,
   acceptTermsOfService,
+  confirmRegistration,
+  resendEmailVerification,
   login,
   logout,
   parseCredentials,
@@ -187,7 +189,7 @@ export function accountLogin(credentials, options) {
             .then(() => {
               if (wasLoggedIn) {
                 return dispatch({
-                  type: actionTypes.logout,
+                  type: actionTypes.account.logout,
                   payload: Immutable.fromJS({ loggedIn: false }),
                 });
               }
@@ -198,7 +200,7 @@ export function accountLogin(credentials, options) {
               }
 
               dispatch(
-                actionCreators.account.loginFailed({
+                actionCreators.account__loginFailed({
                   loginError: Immutable.fromJS(loginError),
                   error,
                   credentials,
@@ -365,6 +367,42 @@ export function accountAcceptTermsOfService() {
       .catch(() => {
         dispatch({ type: actionTypes.account.acceptTermsOfServiceFailed });
       });
+  };
+}
+
+export function accountVerifyEmailAddress(verificationToken) {
+  return dispatch => {
+    dispatch({ type: actionTypes.account.verifyEmailAddressStarted });
+    confirmRegistration(verificationToken)
+      .then(() => {
+        dispatch({ type: actionTypes.account.verifyEmailAddressSuccess });
+      })
+      .catch(error =>
+        dispatch({
+          type: actionTypes.account.verifyEmailAddressFailed,
+          payload: {
+            emailVerificationError: Immutable.fromJS(error.jsonResponse),
+          },
+        })
+      );
+  };
+}
+
+export function accountResendVerificationEmail(email) {
+  return dispatch => {
+    dispatch({ type: actionTypes.account.resendVerificationEmailStarted });
+    resendEmailVerification(email)
+      .then(() => {
+        dispatch({ type: actionTypes.account.resendVerificationEmailSuccess });
+      })
+      .catch(error =>
+        dispatch({
+          type: actionTypes.account.resendVerificationEmailFailed,
+          payload: {
+            emailVerificationError: Immutable.fromJS(error.jsonResponse),
+          },
+        })
+      );
   };
 }
 

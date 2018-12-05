@@ -12,6 +12,7 @@ import won.owner.model.User;
 import won.owner.repository.EmailVerificationRepository;
 import won.owner.repository.UserRepository;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -69,7 +70,7 @@ public class UserService {
             privateUser.setPassword(passwordEncoder.encode(newPassword));
             privateUser.setEmail(newEmail);
             privateUser.setEmailVerified(false);
-            user.setAcceptedTermsOfService(true); //transfer only available when flag is set therefore we can just set this to true (i think)
+            privateUser.setAcceptedTermsOfService(true); //transfer only available when flag is set therefore we can just set this to true (i think)
             if (role != null) {
                 privateUser.setRole(role);
             }
@@ -171,7 +172,12 @@ public class UserService {
     }
 
     public EmailVerificationToken getEmailVerificationToken(User user) {
-        return emailVerificationRepository.findByUser(user);
+        List<EmailVerificationToken> tokens = emailVerificationRepository.findByUser(user);
+
+        for(EmailVerificationToken token : tokens) {
+            if(!token.isExpired()) return token;
+        }
+        return null;
     }
 
     public EmailVerificationToken createEmailVerificationToken(User user) {

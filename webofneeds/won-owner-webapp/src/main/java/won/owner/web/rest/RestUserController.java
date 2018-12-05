@@ -342,8 +342,9 @@ public class RestUserController {
             return generateStatusResponse(RestStatusResponse.USER_NOT_SIGNED_IN);
         } else {
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            User user = ((KeystoreEnabledUserDetails) authentication.getPrincipal()).getUser();
-            return generateUserResponse(user);
+            User authUser = ((KeystoreEnabledUserDetails) authentication.getPrincipal()).getUser();
+
+            return generateUserResponse(userService.getByUsername(authUser.getUsername()));
         }
     }
 
@@ -375,21 +376,17 @@ public class RestUserController {
     @ResponseBody
     @RequestMapping(
             value = "/confirmRegistration",
-            method = RequestMethod.GET
+            method = RequestMethod.POST
     )
     @Transactional(propagation = Propagation.SUPPORTS)
-    public ResponseEntity confirmRegistration(@RequestParam("token") String token) {
-        EmailVerificationToken verificationToken = userService.getEmailVerificationToken(token);
+    public ResponseEntity confirmRegistration(@RequestBody VerificationTokenPojo token) {
+        EmailVerificationToken verificationToken = userService.getEmailVerificationToken(token.getToken());
 
         if(verificationToken == null) {
             return generateStatusResponse(RestStatusResponse.TOKEN_NOT_FOUND);
         }
 
         User user = verificationToken.getUser();
-        if(user.isEmailVerified()) {
-            return generateStatusResponse(RestStatusResponse.TOKEN_ALREADY_VERIFIED);
-        }
-
         Calendar cal = Calendar.getInstance();
 
         if((verificationToken.getExpiryDate().getTime() - cal.getTime().getTime()) <= 0) {
@@ -399,7 +396,6 @@ public class RestUserController {
         user.setEmailVerified(true);
         userService.save(user);
 
-        //TODO: AUTHOMATICALLY LOGIN THE USER (WE KNOW THE USERNAME BUT WE DO NOT KNOW THE PASSWORD)
         return generateStatusResponse(RestStatusResponse.TOKEN_VERIFICATION_SUCCESS);
     }
 
@@ -439,10 +435,6 @@ public class RestUserController {
 
         if(user == null) {
             return generateStatusResponse(RestStatusResponse.USER_NOT_FOUND);
-        }
-
-        if(user.isEmailVerified()) {
-            return generateStatusResponse(RestStatusResponse.TOKEN_ALREADY_VERIFIED);
         }
 
         EmailVerificationToken verificationToken = userService.getEmailVerificationToken(user);

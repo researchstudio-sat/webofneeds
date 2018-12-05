@@ -251,6 +251,9 @@ $ngRedux.getState();
     processingInitialLoad: true|false //flag that indicates if the initialLoad is currently in process
     processingLogin: true|false, //default false flag that indicates if a login is currently in process
     processingLoginForEmail: undefined, //indicates which is user is currently being logged in undefined if nouser is currently being logged in, otherwise the email will be stored
+    processingAcceptTermsOfService: false, //indicates if the rest-call to accept the terms of service is currently pending
+    processingVerifyEmailAddress: false, //indicates if the rest-call to verify the email address is currently pending
+    processingResendVerificationEmail: false, //indicates if the rest-call to resend the verification mail is currently pending
  }
 }
 */

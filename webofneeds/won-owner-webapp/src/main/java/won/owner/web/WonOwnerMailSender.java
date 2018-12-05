@@ -32,7 +32,7 @@ public class WonOwnerMailSender {
     private static final String OWNER_CONNECTION_LINK = "/#!connections?connectionUri=%s";
     private static final String OWNER_LOCAL_NEED_LINK = "/#!connections?postUri=";
 
-    private static final String OWNER_VERIFICATION_LINK = "/rest/users/confirmRegistration?token=";
+    private static final String OWNER_VERIFICATION_LINK = "/#!/connections?token=";
 
     private static final String SUBJECT_CONVERSATION_MESSAGE = "New message";
     private static final String SUBJECT_CONNECT = "New conversation request";
