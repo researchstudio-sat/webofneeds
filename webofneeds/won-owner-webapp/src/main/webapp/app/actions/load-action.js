@@ -39,7 +39,7 @@ export const pageLoadAction = () => (dispatch, getState) => {
 };
 
 function loadingWhileSignedIn(dispatch, getState, data) {
-  loginSuccess(data.username, true, dispatch, getState);
+  loginSuccess(dispatch, getState);
   fetchOwnedData(data.username, dispatch).then(() =>
     dispatch({
       type: actionTypes.initialLoadFinished,
@@ -47,18 +47,9 @@ function loadingWhileSignedIn(dispatch, getState, data) {
   );
 }
 
-function loginSuccess(username, loginStatus, dispatch, getState) {
+function loginSuccess(dispatch, getState) {
   // reset websocket to make sure it's using the logged-in session
   dispatch(actionCreators.reconnect__start());
-
-  /* quickly dispatch log-in status, even before loading data, to
-     * allow making correct access-control decisions
-     */
-  dispatch({
-    type: actionTypes.account.login,
-    payload: Immutable.fromJS({ email: username, loggedIn: loginStatus }),
-  });
-
   checkAccessToCurrentRoute(dispatch, getState);
 }
 
