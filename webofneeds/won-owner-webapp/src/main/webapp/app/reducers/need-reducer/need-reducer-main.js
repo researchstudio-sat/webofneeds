@@ -117,7 +117,7 @@ export default function(allNeedsInState = initialState, action = {}) {
       );
     }
 
-    case actionTypes.connections.fetchActiveUrisLoading: {
+    case actionTypes.connections.storeActiveUrisLoading: {
       return addActiveConnectionsToNeedInLoading(
         allNeedsInState,
         action.payload.get("needUri"),
@@ -125,7 +125,7 @@ export default function(allNeedsInState = initialState, action = {}) {
       );
     }
 
-    case actionTypes.connections.fetchActive: {
+    case actionTypes.connections.storeActive: {
       return storeConnectionsData(
         allNeedsInState,
         action.payload.get("connections")

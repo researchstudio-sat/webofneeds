@@ -119,8 +119,8 @@ const actionHierarchy = {
     updateAgreementData: INJ_DEFAULT, //cnct.loadAgreementData,
     updatePetriNetData: INJ_DEFAULT,
 
-    fetchActiveUrisLoading: INJ_DEFAULT,
-    fetchActive: INJ_DEFAULT,
+    storeActiveUrisLoading: INJ_DEFAULT,
+    storeActive: INJ_DEFAULT,
   },
   needs: {
     received: INJ_DEFAULT,

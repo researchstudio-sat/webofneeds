@@ -728,7 +728,7 @@ async function fetchConnectionsOfNeedAndDispatch(needUri, dispatch) {
     connUri => !isConnUriClosed(connUri)
   );
   dispatch({
-    type: actionTypes.connections.fetchActiveUrisLoading,
+    type: actionTypes.connections.storeActiveUrisLoading,
     payload: wellFormedPayload({
       needUri: needUri,
       connUris: activeConnectionUris,
@@ -757,7 +757,7 @@ function fetchActiveConnectionAndDispatch(cnctUri, dispatch) {
   const cnctP = won.getNode(cnctUri);
   cnctP.then(connection =>
     dispatch({
-      type: actionTypes.connections.fetchActive,
+      type: actionTypes.connections.storeActive,
       payload: wellFormedPayload({ connections: { [cnctUri]: connection } }),
     })
   );
