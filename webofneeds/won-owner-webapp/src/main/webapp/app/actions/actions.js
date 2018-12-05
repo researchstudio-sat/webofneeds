@@ -271,9 +271,11 @@ const actionHierarchy = {
     loginFailed: INJ_DEFAULT,
 
     store: INJ_DEFAULT, //stores the retrieved account in the state
+    reset: INJ_DEFAULT, //resets the retrieved account back to the initialState
 
     logout: accountLogout,
     logoutStarted: INJ_DEFAULT,
+    logoutFinished: INJ_DEFAULT,
 
     register: accountRegister,
     transfer: accountTransfer,
@@ -302,6 +304,7 @@ const actionHierarchy = {
   lostConnection: INJ_DEFAULT,
   failedToGetLocation: INJ_DEFAULT,
   upgradeHttpSession: INJ_DEFAULT,
+  downgradeHttpSession: INJ_DEFAULT,
 
   reconnect: {
     start: reconnect,
