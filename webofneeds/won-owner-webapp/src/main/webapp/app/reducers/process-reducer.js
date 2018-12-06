@@ -32,7 +32,7 @@ export default function(processState = initialState, action = {}) {
     case actionTypes.account.logoutStarted:
       return processState.set("processingLogout", true);
 
-    case actionTypes.account.logout:
+    case actionTypes.account.logoutFinished:
       return processState.set("processingLogout", false);
 
     case actionTypes.account.loginStarted:
@@ -61,15 +61,7 @@ export default function(processState = initialState, action = {}) {
     case actionTypes.account.resendVerificationEmailFailed:
       return processState.set("processingResendVerificationEmail", false);
 
-    case actionTypes.account.login: {
-      if (getIn(action, ["payload", "loginFinished"])) {
-        return processState
-          .set("processingLogin", false)
-          .set("processingLoginForEmail", undefined);
-      }
-      return processState;
-    }
-
+    case actionTypes.account.loginFinished:
     case actionTypes.account.loginFailed:
       return processState
         .set("processingLogin", false)

@@ -3,18 +3,16 @@
  */
 
 import { actionTypes } from "../actions/actions.js";
-import Immutable from "immutable";
 import { getIn } from "../utils.js";
+import Immutable from "immutable";
 
-/* TODO this fragment is part of an attempt to sketch a different
- * approach to asynchronity (Remove it or the thunk-based
- * solution afterwards)
- */
 const initialState = Immutable.fromJS({
   enqueued: {},
   waitingForAnswer: {},
   claimOnSuccess: {},
   refreshDataOnSuccess: {},
+  lostConnection: false,
+  reconnecting: false,
 });
 export function messagesReducer(messages = initialState, action = {}) {
   switch (action.type) {
@@ -82,49 +80,20 @@ export function messagesReducer(messages = initialState, action = {}) {
         ? messages.set("lostConnection", false).set("reconnecting", false)
         : messages;
     }
-
-    case actionTypes.account.login: {
-      const loginFinished = getIn(action, ["payload", "loginFinished"]);
-      const httpSessionUpgraded =
-        !loginFinished && getIn(action, ["payload", "httpSessionUpgraded"]);
-      if (loginFinished) {
-        return messages.set("lostConnection", false).set("reconnecting", false);
-      } else if (httpSessionUpgraded) {
-        /*
-         * now that the session has been upgraded, we need to set the flag
-         * that triggers a websocket reset.
-         * This is part of the session-upgrade hack documented in:
-         * https://github.com/researchstudio-sat/webofneeds/issues/381#issuecomment-172569377
-         */
-        return messages.set("reconnecting", true);
-      } else {
-        return messages;
-      }
+    case actionTypes.account.loginFinished: {
+      return messages.set("lostConnection", false).set("reconnecting", false);
     }
 
-    case actionTypes.account.logout: {
-      const logoutFinished = getIn(action, ["payload", "logoutFinished"]);
-      const httpSessionDowngraded =
-        !logoutFinished && getIn(action, ["payload", "httpSessionDowngraded"]);
-      if (logoutFinished) {
-        return initialState
-          .set("lostConnection", false)
-          .set("reconnecting", false);
-      } else if (httpSessionDowngraded) {
-        /*
-         * now that the session has been downgraded, we need to set the flag
-         * that triggers a websocket reset.
-         * This is part of the session-upgrade hack documented in:
-         * https://github.com/researchstudio-sat/webofneeds/issues/381#issuecomment-172569377
-         */
-        return messages.set("reconnecting", true);
-      } else {
-        console.error(
-          "Got unexpected payload for `actionTypes.account.logout` ",
-          action
-        );
-        return messages;
-      }
+    case actionTypes.upgradeHttpSession: {
+      return messages.set("reconnecting", true);
+    }
+
+    case actionTypes.downgradeHttpSession: {
+      return messages.set("reconnecting", true);
+    }
+
+    case actionTypes.account.logoutFinished: {
+      return initialState;
     }
 
     case actionTypes.reconnect.start:

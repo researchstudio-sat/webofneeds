@@ -62,7 +62,6 @@ let _loginInProcessFor;
  *    signing in is new, there's no need to fetch this and `false` can be passed here
  *    * doRedirects(true): whether or not to do any redirects at all (e.g. if an invalid route was accessed)
  *    * redirectToFeed(false): whether or not to redirect to the feed after signing in (needs `redirects` to be true)
- *    * relogIfNecessary(true):  if there's a valid session or privateId, log out from that first.
  *
  * @param credentials either {email, password} or {privateId}
  * @returns {Function}
@@ -74,7 +73,6 @@ export function accountLogin(credentials, options) {
       fetchData: true,
       doRedirects: true,
       redirectToFeed: false,
-      relogIfNecessary: true, // if there's a valid session or privateId, log out from that first.
     },
     options
   );
@@ -119,12 +117,6 @@ export function accountLogin(credentials, options) {
       return;
     }
 
-    const curriedDispatch = data =>
-      dispatch({
-        type: actionTypes.account.login,
-        payload: Immutable.fromJS(data).merge({ email: email, loggedIn: true }),
-      });
-
     return Promise.resolve()
       .then(() => {
         _loginInProcessFor = email;
@@ -156,14 +148,11 @@ export function accountLogin(credentials, options) {
       .then(() => login(credentials))
       .then(data =>
         dispatch({
-          type: actionTypes.account.login,
-          payload: Immutable.fromJS(data).merge({
-            email: email,
-            loggedIn: true,
-          }),
+          type: actionTypes.account.store,
+          payload: Immutable.fromJS(data),
         })
       )
-      .then(() => curriedDispatch({ httpSessionUpgraded: true }))
+      .then(() => dispatch({ type: actionTypes.upgradeHttpSession }))
       .then(() => {
         if (!options_.doRedirects) {
           return;
@@ -175,23 +164,20 @@ export function accountLogin(credentials, options) {
           return checkAccessToCurrentRoute(dispatch, getState);
         }
       })
-      .then((/*response*/) => {
+      .then(() => {
         if (options_.fetchData) {
-          return fetchOwnedData(email, curriedDispatch);
+          return fetchOwnedData(email, dispatch);
         } else {
           return Immutable.Map(); // only need to fetch data for non-new accounts
         }
       })
-      .then(() => curriedDispatch({ loginFinished: true }))
+      .then(() => dispatch({ type: actionTypes.account.loginFinished }))
       .catch(error =>
         error.response.json().then(loginError => {
           return Promise.resolve()
             .then(() => {
               if (wasLoggedIn) {
-                return dispatch({
-                  type: actionTypes.account.logout,
-                  payload: Immutable.fromJS({ loggedIn: false }),
-                });
+                return dispatch({ type: actionTypes.account.reset });
               }
             })
             .then(() => {
@@ -226,19 +212,12 @@ export function accountLogin(credentials, options) {
 }
 
 let _logoutInProcess;
+
 /**
- *
- * @param options
- *    * doRedirects(true): whether or not to do any redirects at all (e.g. if an invalid route was accessed)
- *
+ * Processes logout
  * @returns {Function}
  */
-export function accountLogout(options) {
-  const options_ = {
-    doRedirects: true,
-    ...options,
-  };
-
+export function accountLogout() {
   clearPrivateId();
 
   return (dispatch, getState) => {
@@ -253,12 +232,7 @@ export function accountLogout(options) {
     _logoutInProcess = true;
 
     return Promise.resolve()
-      .then(() =>
-        dispatch({
-          type: actionTypes.account.logoutStarted,
-          payload: {},
-        })
-      )
+      .then(() => dispatch({ type: actionTypes.account.logoutStarted }))
       .then(() => logout())
       .catch(error => {
         //TODO: PRINT ERROR MESSAGE AND CHANGE STATE ACCORDINGLY
@@ -266,38 +240,18 @@ export function accountLogout(options) {
       })
       .then(() => {
         // for the case that we've been logged in to an anonymous account, we need to remove the privateId here.
-        if (
-          options_.doRedirects &&
-          getIn(state, ["router", "currentParams", "privateId"])
-        ) {
+        if (getIn(state, ["router", "currentParams", "privateId"])) {
           return stateGoCurrent({ privateId: null })(dispatch, getState);
         }
       })
-      .then(() =>
-        dispatch({
-          type: actionTypes.account.logout,
-          payload: Immutable.fromJS({
-            loggedIn: false,
-            httpSessionDowngraded: true,
-          }),
-        })
-      )
-      .then(() => {
-        won.clearStore();
-      })
-      .then(
-        () =>
-          options_.doRedirects && checkAccessToCurrentRoute(dispatch, getState)
-      )
+      .then(() => dispatch({ type: actionTypes.downgradeHttpSession }))
+      .then(() => dispatch({ type: actionTypes.account.reset }))
+      .then(() => won.clearStore())
+      .then(() => checkAccessToCurrentRoute(dispatch, getState))
       .then(() => {
         _logoutInProcess = false;
       })
-      .then(() =>
-        dispatch({
-          type: actionTypes.account.logout,
-          payload: Immutable.fromJS({ loggedIn: false, logoutFinished: true }),
-        })
-      );
+      .then(() => dispatch({ type: actionTypes.account.logoutFinished }));
   };
 }
 
@@ -309,7 +263,7 @@ export function accountRegister(credentials) {
   return (dispatch, getState) =>
     registerAccount(credentials)
       .then(() =>
-        /*response*/ accountLogin(credentials, {
+        accountLogin(credentials, {
           fetchData: false,
           redirectToFeed: true,
         })(dispatch, getState)
@@ -334,8 +288,7 @@ export function accountTransfer(credentials) {
     transferPrivateAccount(credentials)
       .then(() => {
         credentials.privateId = undefined;
-        /*response*/
-        accountLogin(credentials, {
+        return accountLogin(credentials, {
           fetchData: true,
           redirectToFeed: true,
         })(dispatch, getState);
@@ -415,19 +368,6 @@ export function reconnect() {
 
       const state = getState();
 
-      /*
-      * -- check for new connections (i.e. matches and incoming requests) --
-      */
-      // await pageLoadAction()(dispatch, getState);
-      // const email = getIn(state, ["account", "email"]);
-      // await fetchOwnedData(email, payload => {
-      //   dispatch({
-      //     type: actionTypes.initialPageLoad, // TODO make this it's own type
-      //     payload: wellFormedPayload(payload),
-      //   });
-      // });
-      //TODO hard reload
-
       /* 
        * -- loading latest messages for all connections (we might have missed some during the dc) --
        */
@@ -449,8 +389,8 @@ export function reconnect() {
       );
     } catch (e) {
       if (e.message == "Unauthorized") {
-        //FIXME: this seems weird and unintentional to me, the actionTypes.account.logout closes the main menu (see view-reducer.js) and the dispatch after opens it again, is this wanted that way?
-        dispatch({ type: actionTypes.account.logout });
+        //FIXME: this seems weird and unintentional to me, the actionTypes.account.reset closes the main menu (see view-reducer.js) and the dispatch after opens it again, is this wanted that way?
+        dispatch({ type: actionTypes.account.reset });
         dispatch({ type: actionTypes.view.showMainMenu });
       } else {
         dispatch(actionCreators.lostConnection());

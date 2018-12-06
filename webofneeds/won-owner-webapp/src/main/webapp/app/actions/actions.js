@@ -96,6 +96,7 @@ import { createPersona, reviewPersona } from "./persona-actions.js";
 const INJ_DEFAULT = "INJECT_DEFAULT_ACTION_CREATOR";
 const actionHierarchy = {
   initialPageLoad: pageLoadAction,
+  initialLoadFinished: INJ_DEFAULT,
   connections: {
     open: cnct.connectionsOpen,
     connectAdHoc: cnct.connectionsConnectAdHoc,
@@ -117,6 +118,9 @@ const actionHierarchy = {
     setMultiSelectType: INJ_DEFAULT,
     updateAgreementData: INJ_DEFAULT, //cnct.loadAgreementData,
     updatePetriNetData: INJ_DEFAULT,
+
+    storeActiveUrisLoading: INJ_DEFAULT,
+    storeActive: INJ_DEFAULT,
   },
   needs: {
     received: INJ_DEFAULT,
@@ -133,11 +137,21 @@ const actionHierarchy = {
     connect: needsConnect,
     fetchUnloadedNeeds: fetchUnloadedNeeds,
     fetchSuggested: fetchSuggested,
+
+    storeOwnedInactiveUris: INJ_DEFAULT,
+    storeOwnedInactiveUrisLoading: INJ_DEFAULT,
+    storeOwnedActiveUris: INJ_DEFAULT,
+    storeTheirUrisLoading: INJ_DEFAULT,
+
+    storeOwned: INJ_DEFAULT,
+    storeTheirs: INJ_DEFAULT,
   },
   personas: {
     create: createPersona,
     createSuccessful: INJ_DEFAULT,
     review: reviewPersona,
+
+    storeTheirs: INJ_DEFAULT,
   },
   router: {
     stateGo, // only overwrites parameters that are explicitly mentioned, unless called without queryParams object (which also resets "pervasive" parameters, that shouldn't be removed
@@ -252,11 +266,16 @@ const actionHierarchy = {
   },
   account: {
     login: accountLogin,
-    loginStarted: INJ_DEFAULT,
+    loginStarted: INJ_DEFAULT, //will only be dispatched on login not on page reload
+    loginFinished: INJ_DEFAULT, //will be dispatched when data has been loaded on login not on page reload
     loginFailed: INJ_DEFAULT,
+
+    store: INJ_DEFAULT, //stores the retrieved account in the state
+    reset: INJ_DEFAULT, //resets the retrieved account back to the initialState
 
     logout: accountLogout,
     logoutStarted: INJ_DEFAULT,
+    logoutFinished: INJ_DEFAULT,
 
     register: accountRegister,
     transfer: accountTransfer,
@@ -284,6 +303,8 @@ const actionHierarchy = {
   geoLocationDenied: INJ_DEFAULT,
   lostConnection: INJ_DEFAULT,
   failedToGetLocation: INJ_DEFAULT,
+  upgradeHttpSession: INJ_DEFAULT,
+  downgradeHttpSession: INJ_DEFAULT,
 
   reconnect: {
     start: reconnect,

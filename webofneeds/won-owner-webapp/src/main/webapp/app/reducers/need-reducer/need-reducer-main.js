@@ -55,7 +55,7 @@ const initialState = Immutable.fromJS({});
 
 export default function(allNeedsInState = initialState, action = {}) {
   switch (action.type) {
-    case actionTypes.account.logout:
+    case actionTypes.account.reset:
     case actionTypes.needs.clean:
       return initialState;
 
@@ -78,67 +78,68 @@ export default function(allNeedsInState = initialState, action = {}) {
 
       return stateWithSuggestedPosts;
     }
-    case actionTypes.initialPageLoad:
-    case actionTypes.needs.fetchUnloadedNeeds:
-    case actionTypes.account.login: {
-      const activeNeedUris = action.payload.get("activeNeedUris");
-      const inactiveNeedUris = action.payload.get("inactiveNeedUris");
-      const inactiveNeedUrisLoading = action.payload.get(
-        "inactiveNeedUrisLoading"
-      );
-      const theirNeedUrisInLoading = action.payload.get(
-        "theirNeedUrisInLoading"
-      );
 
-      const needUriForConnections = action.payload.get("needUriForConnections");
-      const activeConnectionUrisLoading = action.payload.get(
-        "activeConnectionUrisLoading"
-      );
-
-      let ownedNeeds = action.payload.get("ownedNeeds");
-      ownedNeeds = ownedNeeds ? ownedNeeds : Immutable.Set();
-      let theirNeeds = action.payload.get("theirNeeds");
-      theirNeeds = theirNeeds ? theirNeeds : Immutable.Set();
-
-      const stateWithOwnInactiveNeedUrisToLoad = addOwnInactiveNeedsToLoad(
+    case actionTypes.needs.storeOwnedActiveUris: {
+      return addOwnActiveNeedsInLoading(
         allNeedsInState,
-        inactiveNeedUris
+        action.payload.get("uris")
       );
+    }
 
-      const stateWithOwnInactiveNeedUrisInLoading = addOwnInactiveNeedsInLoading(
-        stateWithOwnInactiveNeedUrisToLoad,
-        inactiveNeedUrisLoading
+    case actionTypes.needs.storeOwnedInactiveUris: {
+      return addOwnInactiveNeedsToLoad(
+        allNeedsInState,
+        action.payload.get("uris")
       );
+    }
 
-      const stateWithOwnedNeedUrisInLoading = addOwnActiveNeedsInLoading(
-        stateWithOwnInactiveNeedUrisInLoading,
-        activeNeedUris
+    case actionTypes.needs.storeOwnedInactiveUrisLoading: {
+      return addOwnInactiveNeedsInLoading(
+        allNeedsInState,
+        action.payload.get("uris")
       );
+    }
 
-      const stateWithOwnedNeeds = ownedNeeds.reduce(
-        (updatedState, ownedNeed) => addNeed(updatedState, ownedNeed, true),
-        stateWithOwnedNeedUrisInLoading
+    case actionTypes.needs.storeTheirUrisLoading: {
+      return addTheirNeedsInLoading(
+        allNeedsInState,
+        action.payload.get("uris")
       );
+    }
 
-      const stateWithOwnedNeedsAndTheirNeedsInLoading = addTheirNeedsInLoading(
-        stateWithOwnedNeeds,
-        theirNeedUrisInLoading
+    case actionTypes.needs.storeOwned: {
+      let needs = action.payload.get("needs");
+      needs = needs ? needs : Immutable.Set();
+
+      return needs.reduce(
+        (updatedState, need) => addNeed(updatedState, need, true),
+        allNeedsInState
       );
+    }
 
-      const stateWithOwnAndTheirNeeds = theirNeeds.reduce(
-        (updatedState, theirNeed) => addNeed(updatedState, theirNeed, false),
-        stateWithOwnedNeedsAndTheirNeedsInLoading
+    case actionTypes.connections.storeActiveUrisLoading: {
+      return addActiveConnectionsToNeedInLoading(
+        allNeedsInState,
+        action.payload.get("needUri"),
+        action.payload.get("connUris")
       );
+    }
 
-      const stateWithConnectionsToLoad = addActiveConnectionsToNeedInLoading(
-        stateWithOwnAndTheirNeeds,
-        needUriForConnections,
-        activeConnectionUrisLoading
-      );
-
+    case actionTypes.connections.storeActive: {
       return storeConnectionsData(
-        stateWithConnectionsToLoad,
+        allNeedsInState,
         action.payload.get("connections")
+      );
+    }
+
+    case actionTypes.needs.storeTheirs:
+    case actionTypes.personas.storeTheirs: {
+      let needs = action.payload.get("needs");
+      needs = needs ? needs : Immutable.Set();
+
+      return needs.reduce(
+        (updatedState, need) => addNeed(updatedState, need, false),
+        allNeedsInState
       );
     }
 

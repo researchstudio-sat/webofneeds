@@ -17,20 +17,14 @@ import {
 
 export function fetchUnloadedNeeds() {
   return async dispatch => {
-    const curriedDispatch = payload => {
-      dispatch({
-        type: actionTypes.needs.fetchUnloadedNeeds,
-        payload: payload,
-      });
-    };
-    fetchUnloadedData(curriedDispatch);
+    fetchUnloadedData(dispatch);
   };
 }
 
 export function fetchSuggested(needUri) {
   return async dispatch => {
     fetchDataForNonOwnedNeedOnly(needUri).then(response => {
-      const suggestedPosts = response && response.get("theirNeeds");
+      const suggestedPosts = response && response.get("needs");
 
       if (suggestedPosts && suggestedPosts.size > 0) {
         const payload = Immutable.fromJS({

@@ -265,6 +265,7 @@ export function resendEmailVerification(email) {
     }),
   };
   return fetch(url, httpOptions)
+    .then(checkHttpStatus)
     .then(resp => {
       return resp.json();
     })
