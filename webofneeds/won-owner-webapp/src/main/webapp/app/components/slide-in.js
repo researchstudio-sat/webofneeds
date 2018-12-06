@@ -5,7 +5,7 @@ import won from "../won-es6.js";
 import angular from "angular";
 import ngAnimate from "angular-animate";
 import dropdownModule from "./covering-dropdown.js";
-import { attach, delay, getIn, get } from "../utils.js";
+import { attach, delay, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux, parseRestErrorMessage } from "../won-utils.js";
 
@@ -71,7 +71,7 @@ function genSlideInConf() {
             <svg class="si__close"
                 style="--local-primary:white;"
                 ng-click="self.account__verifyEmailAddressSuccess()"
-                ng-if="!self.processingVerifyEmailAddress && self.isAlreadyVerifiedError()">
+                ng-if="!self.processingVerifyEmailAddress && self.isAlreadyVerifiedError">
                 <use xlink:href="#ico36_close" href="#ico36_close"></use>
             </svg>
         </div>
@@ -174,6 +174,9 @@ function genSlideInConf() {
           email: getIn(state, ["account", "email"]),
           connectionHasBeenLost: getIn(state, ["messages", "lostConnection"]), // name chosen to avoid name-clash with the action-creator
           reconnecting: getIn(state, ["messages", "reconnecting"]),
+          isAlreadyVerifiedError:
+            getIn(state, ["account", "emailVerificationError", "code"]) ==
+            won.RESPONSECODE.TOKEN_RESEND_FAILED_ALREADY_VERIFIED,
         };
       };
 
@@ -181,13 +184,6 @@ function genSlideInConf() {
 
       this.$scope.$watch("self.verificationToken", verificationToken =>
         this.verifyEmailAddress(verificationToken)
-      );
-    }
-
-    isAlreadyVerifiedError() {
-      return (
-        get(this.emailVerificationError, "code") ==
-        won.RESPONSECODE.TOKEN_RESEND_FAILED_ALREADY_VERIFIED
       );
     }
 
