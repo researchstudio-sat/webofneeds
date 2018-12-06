@@ -46,6 +46,7 @@ const mobilityUseCases = {
       const baseFilter = {
         prefixes: {
           won: won.defaultContext["won"],
+          s: "http://schema.org/",
         },
         operations: [
           `${resultName} a won:Need.`,
