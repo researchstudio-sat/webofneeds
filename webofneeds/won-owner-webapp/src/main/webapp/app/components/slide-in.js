@@ -1,10 +1,11 @@
 /**
  * Created by quasarchimaere on 20.11.2018.
  */
+import won from "../won-es6.js";
 import angular from "angular";
 import ngAnimate from "angular-animate";
 import dropdownModule from "./covering-dropdown.js";
-import { attach, delay, getIn } from "../utils.js";
+import { attach, delay, getIn, get } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux, parseRestErrorMessage } from "../won-utils.js";
 
@@ -37,13 +38,13 @@ function genSlideInConf() {
             <svg class="si__icon" style="--local-primary:white;">
                 <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
             </svg>
-            <span class="si__text" ng-if="!self.verificationToken && !self.emailVerified">
+            <span class="si__text" ng-if="!self.verificationToken && !self.emailVerified && !self.emailVerificationError">
                 E-Mail has not been verified yet, check your Inbox.
             </span>
             <span class="si__text" ng-if="self.processingVerifyEmailAddress && self.verificationToken">
                 Verifying the E-Mail address
             </span>
-            <span class="si__text" ng-if="!self.processingVerifyEmailAddress && self.verificationToken && self.emailVerificationError">
+            <span class="si__text" ng-if="!self.processingVerifyEmailAddress && self.emailVerificationError">
                 {{ self.parseRestErrorMessage(self.emailVerificationError) }}
             </span>
             <span class="si__text" ng-if="self.loggedIn && self.verificationToken && !self.processingVerifyEmailAddress && self.emailVerified && !self.emailVerificationError">
@@ -57,7 +58,7 @@ function genSlideInConf() {
             </svg>
             <button
               class="si__button"
-              ng-if="!self.processingVerifyEmailAddress && !self.processingResendVerificationMail && ((self.loggedIn && !self.emailVerified) || (self.verificationToken && self.emailVerificationError))"
+              ng-if="!self.processingVerifyEmailAddress && !self.processingResendVerificationMail && ((self.loggedIn && !self.emailVerified && !self.emailVerificationError) || (self.verificationToken && self.emailVerificationError))"
               ng-click="self.account__resendVerificationEmail(self.email)">
                 Resend Email
             </button>
@@ -65,6 +66,12 @@ function genSlideInConf() {
                 style="--local-primary:white;"
                 ng-click="self.router__stateGoCurrent({token: undefined})"
                 ng-if="!self.processingVerifyEmailAddress && self.verificationToken && !self.emailVerificationError">
+                <use xlink:href="#ico36_close" href="#ico36_close"></use>
+            </svg>
+            <svg class="si__close"
+                style="--local-primary:white;"
+                ng-click="self.account__verifyEmailAddressSuccess()"
+                ng-if="!self.processingVerifyEmailAddress && self.isAlreadyVerifiedError()">
                 <use xlink:href="#ico36_close" href="#ico36_close"></use>
             </svg>
         </div>
@@ -174,6 +181,13 @@ function genSlideInConf() {
 
       this.$scope.$watch("self.verificationToken", verificationToken =>
         this.verifyEmailAddress(verificationToken)
+      );
+    }
+
+    isAlreadyVerifiedError() {
+      return (
+        get(this.emailVerificationError, "code") ==
+        won.RESPONSECODE.TOKEN_RESEND_FAILED_ALREADY_VERIFIED
       );
     }
 

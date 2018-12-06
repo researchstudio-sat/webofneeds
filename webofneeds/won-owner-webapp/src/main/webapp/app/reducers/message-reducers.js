@@ -3,6 +3,7 @@
  */
 
 import { actionTypes } from "../actions/actions.js";
+import { getIn } from "../utils.js";
 import Immutable from "immutable";
 
 const initialState = Immutable.fromJS({

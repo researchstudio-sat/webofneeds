@@ -30,6 +30,7 @@ export default function(userData = initialState, action = {}) {
         .set("acceptedTermsOfService", acceptedTermsOfService);
     }
 
+    case actionTypes.account.resendVerificationEmailFailed:
     case actionTypes.account.verifyEmailAddressFailed:
       return userData.set(
         "emailVerificationError",
