@@ -237,7 +237,6 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
 			WebSocketMessage<String> webSocketMessage = new TextMessage(wonMessageJsonLdString);
 			URI needUri = getOwnedNeedURI(wonMessage);
 			User user = getUserForWonMessage(wonMessage);
-	
 			Set<WebSocketSession> webSocketSessions = findWebSocketSessionsForWonMessage(wonMessage, needUri, user);
 	
 			// check if we can deliver the message. If not, send email.
@@ -273,6 +272,12 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
 
 	private void notifyPerEmail(final User user, final URI needUri, final WonMessage wonMessage) {
 
+	    if (wonMessage.getEnvelopeType() == WonMessageDirection.FROM_OWNER) {
+            //we assume that this message, coming from the server here, can only be an echoed message. don't send by email.
+            logger.debug("not sending email to user: message {} looks like an echo from the server", wonMessage.getMessageURI());
+            return;
+        }
+	    
 		if (user == null) {
 		    logger.info("not sending email to user: user not specified");
 		    return;
@@ -288,6 +293,8 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
 		    logger.debug("not sending email to user: need uri not specified");
 			return;
 		}
+        
+
 
 		String textMsg = WonRdfUtils.MessageUtils.getTextMessage(wonMessage);
 
