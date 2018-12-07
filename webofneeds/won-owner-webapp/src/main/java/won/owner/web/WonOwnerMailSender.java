@@ -146,6 +146,9 @@ public class WonOwnerMailSender {
         velocityContext.put("verificationLinkUrl", verificationLinkUrl);
         velocityContext.put("expirationDate", verificationToken.getExpiryDate());
         velocityContext.put("gracePeriodInHours", User.GRACEPERIOD_INHOURS);
+        if (this.ownerWebappUri != null) {
+            velocityContext.put("serviceName", this.ownerWebappUri);
+        }
 
         return velocityContext;
     }

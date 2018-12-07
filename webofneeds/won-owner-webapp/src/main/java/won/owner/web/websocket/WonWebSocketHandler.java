@@ -242,7 +242,7 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
 	
 			// check if we can deliver the message. If not, send email.
 			if (webSocketSessions.size() == 0) {
-				logger.info("cannot deliver message of type {} for need {}, receiver {}: no websocket session found",
+				logger.debug("cannot deliver message of type {} for need {}, receiver {}: no websocket session found. Trying to send message by email.",
 						new Object[] { wonMessage.getMessageType(), wonMessage.getReceiverNeedURI(),
 								wonMessage.getReceiverURI() });
 				// send per email notifications if it applies:
@@ -259,6 +259,9 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
 			}
 			if (successfullySent == 0) {
 				//we did not manage to send the message via the websocket, send it by email.
+			    logger.debug("cannot deliver message of type {} for need {}, receiver {}: none of the associated websocket sessions worked. Trying to send message by email.",
+                        new Object[] { wonMessage.getMessageType(), wonMessage.getReceiverNeedURI(),
+                                wonMessage.getReceiverURI() });
 				notifyPerEmail(user, needUri, wonMessage);
 			}
 			return wonMessage;
@@ -270,12 +273,19 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
 
 	private void notifyPerEmail(final User user, final URI needUri, final WonMessage wonMessage) {
 
-		if (user == null || ! user.isEmailVerified()) {
+		if (user == null) {
+		    logger.info("not sending email to user: user not specified");
+		    return;
+		}
+		
+		if (!user.isEmailVerified()) {
+		    logger.debug("not sending email to user: email address not yet verified");
 			return;
 		}
 
 		UserNeed userNeed = getNeedOfUser(user, needUri);
 		if (userNeed == null) {
+		    logger.debug("not sending email to user: need uri not specified");
 			return;
 		}
 
