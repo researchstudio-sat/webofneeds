@@ -1,0 +1,15 @@
+Hi there,
+
+We have news regarding your post '$localNeedTitle' on $serviceName:
+
+Your post '$localNeedTitle' was deactivated by the WoN node that hosts it.
+#if ($textMsg)
+Explanation:
+    $textMsg
+#end
+
+View your post: $linkLocalNeed
+
+Best wishes, 
+
+The team at $serviceName

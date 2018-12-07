@@ -450,7 +450,7 @@ public class RestUserController {
             return generateStatusResponse(RestStatusResponse.TOKEN_CREATION_FAILED);
         }
 
-        emailSender.sendVerificationHtmlMessage(user, verificationToken);
+        emailSender.sendVerificationMessage(user, verificationToken);
         return generateStatusResponse(RestStatusResponse.TOKEN_RESEND_SUCCESS);
     }
 
