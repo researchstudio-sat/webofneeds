@@ -1,0 +1,19 @@
+Hi there,
+
+We have news regarding your post '$localNeedTitle' on $serviceName:
+
+The user who posted '$remoteNeedTitle' closed the conversation with your post.
+
+#if ($textMsg)
+    They wrote this message:
+    
+    $textMsg
+#end
+    
+View the conversation: $linkConnection
+View your post: $linkLocalNeed  
+View their post: $linkRemoteNeed
+
+Best wishes, 
+
+The team at $serviceName

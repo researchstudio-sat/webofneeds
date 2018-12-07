@@ -1,5 +1,9 @@
 package won.owner.web;
 
+import java.io.StringWriter;
+import java.net.URI;
+import java.util.Properties;
+
 import org.apache.jena.query.Dataset;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
@@ -9,16 +13,14 @@ import org.apache.velocity.app.event.implement.EscapeHtmlReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+
 import won.owner.model.EmailVerificationToken;
 import won.owner.model.User;
 import won.owner.service.impl.URIService;
 import won.protocol.util.DefaultNeedModelWrapper;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.utils.mail.WonMailSender;
-
-import java.io.StringWriter;
-import java.net.URI;
-import java.util.Properties;
 
 /**
  * User: ypanchenko
@@ -44,6 +46,9 @@ public class WonOwnerMailSender {
     private static final String SUBJECT_VERIFICATION = "Please Verify your E-Mail Address";
 
     private WonMailSender wonMailSender;
+    
+    @Value(value = "${uri.prefix}")
+    private URI ownerWebappUri;
 
     @Autowired
     LinkedDataSource linkedDataSource;
@@ -52,14 +57,14 @@ public class WonOwnerMailSender {
     private URIService uriService;
 
     private VelocityEngine velocityEngine;
-    private Template conversationNotificationHtmlTemplate;
-    private Template connectNotificationHtmlTemplate;
-    private Template closeNotificationHtmlTemplate;
-    private Template systemCloseNotificationHtmlTemplate;
-    private Template hintNotificationHtmlTemplate;
-    private Template needMessageNotificationHtmlTemplate;
-    private Template systemDeactivateNotificationHtmlTemplate;
-    private Template verificationHtmlTemplate;
+    private Template conversationNotificationTemplate;
+    private Template connectNotificationTemplate;
+    private Template closeNotificationTemplate;
+    private Template systemCloseNotificationTemplate;
+    private Template hintNotificationTemplate;
+    private Template needMessageNotificationTemplate;
+    private Template systemDeactivateNotificationTemplate;
+    private Template verificationTemplate;
 
     public WonOwnerMailSender() {
         velocityEngine = new VelocityEngine();
@@ -67,14 +72,14 @@ public class WonOwnerMailSender {
         properties.setProperty("resource.loader", "file");
         properties.setProperty("file.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
         velocityEngine.init(properties);
-        conversationNotificationHtmlTemplate = velocityEngine.getTemplate("mail-templates/conversation-notification-html.vm");
-        connectNotificationHtmlTemplate = velocityEngine.getTemplate("mail-templates/connect-notification-html.vm");
-        closeNotificationHtmlTemplate = velocityEngine.getTemplate("mail-templates/close-notification-html.vm");
-        systemCloseNotificationHtmlTemplate = velocityEngine.getTemplate("mail-templates/systemclose-notification-html.vm");
-        hintNotificationHtmlTemplate = velocityEngine.getTemplate("mail-templates/hint-notification-html.vm");
-        needMessageNotificationHtmlTemplate = velocityEngine.getTemplate("mail-templates/needmessage-notification-html.vm");
-        systemDeactivateNotificationHtmlTemplate = velocityEngine.getTemplate("mail-templates/system-deactivate-notification-html.vm");
-        verificationHtmlTemplate = velocityEngine.getTemplate("mail-templates/verification-html.vm");
+        conversationNotificationTemplate = velocityEngine.getTemplate("mail-templates/conversation-notification.vm");
+        connectNotificationTemplate = velocityEngine.getTemplate("mail-templates/connect-notification.vm");
+        closeNotificationTemplate = velocityEngine.getTemplate("mail-templates/close-notification.vm");
+        systemCloseNotificationTemplate = velocityEngine.getTemplate("mail-templates/systemclose-notification.vm");
+        hintNotificationTemplate = velocityEngine.getTemplate("mail-templates/hint-notification.vm");
+        needMessageNotificationTemplate = velocityEngine.getTemplate("mail-templates/needmessage-notification.vm");
+        systemDeactivateNotificationTemplate = velocityEngine.getTemplate("mail-templates/system-deactivate-notification.vm");
+        verificationTemplate = velocityEngine.getTemplate("mail-templates/verification.vm");
     }
 
     public void setWonMailSender(WonMailSender wonMailSender) {
@@ -122,6 +127,10 @@ public class WonOwnerMailSender {
         if (textMsg != null) {
             velocityContext.put("textMsg", textMsg);
         }
+        
+        if (this.ownerWebappUri != null) {
+            velocityContext.put("serviceName", this.ownerWebappUri);
+        }
 
         return velocityContext;
     }
@@ -137,86 +146,89 @@ public class WonOwnerMailSender {
         velocityContext.put("verificationLinkUrl", verificationLinkUrl);
         velocityContext.put("expirationDate", verificationToken.getExpiryDate());
         velocityContext.put("gracePeriodInHours", User.GRACEPERIOD_INHOURS);
+        if (this.ownerWebappUri != null) {
+            velocityContext.put("serviceName", this.ownerWebappUri);
+        }
 
         return velocityContext;
     }
 
-    public void sendConversationNotificationHtmlMessage(String toEmail, String localNeed, String
+    public void sendConversationNotificationMessage(String toEmail, String localNeed, String
             remoteNeed, String localConnection, String textMsg) {
 
         if (textMsg != null && !textMsg.isEmpty()) {
             StringWriter writer = new StringWriter();
             VelocityContext context = createContext(toEmail, localNeed, remoteNeed, localConnection, textMsg);
-            conversationNotificationHtmlTemplate.merge(context, writer);
+            conversationNotificationTemplate.merge(context, writer);
             logger.debug("sending " + SUBJECT_CONVERSATION_MESSAGE + " to " + toEmail);
-            this.wonMailSender.sendHtmlMessage(toEmail, SUBJECT_CONVERSATION_MESSAGE, writer.toString());
+            this.wonMailSender.sendTextMessage(toEmail, SUBJECT_CONVERSATION_MESSAGE, writer.toString());
         } else {
             logger.warn("do not send notification conversation email to {} with empty message. Connection is: {}",
                     toEmail, localConnection);
         }
     }
 
-    public void sendConnectNotificationHtmlMessage(String toEmail, String localNeed, String
+    public void sendConnectNotificationMessage(String toEmail, String localNeed, String
             remoteNeed, String localConnection, String textMsg) {
 
         StringWriter writer = new StringWriter();
         VelocityContext context = createContext(toEmail, localNeed, remoteNeed, localConnection, textMsg);
-        connectNotificationHtmlTemplate.merge(context, writer);
+        connectNotificationTemplate.merge(context, writer);
         logger.debug("sending " + SUBJECT_CONNECT + " to " + toEmail);
-        this.wonMailSender.sendHtmlMessage(toEmail, SUBJECT_CONNECT, writer.toString());
+        this.wonMailSender.sendTextMessage(toEmail, SUBJECT_CONNECT, writer.toString());
     }
 
-    public void sendCloseNotificationHtmlMessage(String toEmail, String localNeed, String
+    public void sendCloseNotificationMessage(String toEmail, String localNeed, String
             remoteNeed, String localConnection, String textMsg) {
 
         StringWriter writer = new StringWriter();
         VelocityContext context = createContext(toEmail, localNeed, remoteNeed, localConnection, textMsg);
-        closeNotificationHtmlTemplate.merge(context, writer);
+        closeNotificationTemplate.merge(context, writer);
         logger.debug("sending " + SUBJECT_CLOSE + " to " + toEmail);
-        this.wonMailSender.sendHtmlMessage(toEmail, SUBJECT_CLOSE, writer.toString());
+        this.wonMailSender.sendTextMessage(toEmail, SUBJECT_CLOSE, writer.toString());
     }
 
-    public void sendHintNotificationMessageHtml(String toEmail, String localNeed, String remoteNeed, String localConnection) {
+    public void sendHintNotificationMessage(String toEmail, String localNeed, String remoteNeed, String localConnection) {
 
         StringWriter writer = new StringWriter();
         VelocityContext context = createContext(toEmail, localNeed, remoteNeed, localConnection, null);
-        hintNotificationHtmlTemplate.merge(context, writer);
+        hintNotificationTemplate.merge(context, writer);
         logger.debug("sending " + SUBJECT_MATCH + " to " + toEmail);
-        this.wonMailSender.sendHtmlMessage(toEmail, SUBJECT_MATCH, writer.toString());
+        this.wonMailSender.sendTextMessage(toEmail, SUBJECT_MATCH, writer.toString());
     }
 
-    public void sendNeedMessageNotificationHtmlMessage(String toEmail, String localNeed, String textMsg) {
+    public void sendNeedMessageNotificationMessage(String toEmail, String localNeed, String textMsg) {
         StringWriter writer = new StringWriter();
         VelocityContext context = createContext(toEmail, localNeed, null, null, textMsg);
-        needMessageNotificationHtmlTemplate.merge(context, writer);
+        needMessageNotificationTemplate.merge(context, writer);
         logger.debug("sending " + SUBJECT_NEED_MESSAGE + " to " + toEmail);
-        this.wonMailSender.sendHtmlMessage(toEmail, SUBJECT_NEED_MESSAGE, writer.toString());
+        this.wonMailSender.sendTextMessage(toEmail, SUBJECT_NEED_MESSAGE, writer.toString());
     }
 
-    public void sendSystemDeactivateNotificationHtmlMessage(String toEmail, String localNeed, String textMsg) {
+    public void sendSystemDeactivateNotificationMessage(String toEmail, String localNeed, String textMsg) {
         StringWriter writer = new StringWriter();
         VelocityContext context = createContext(toEmail, localNeed, null, null, textMsg);
-        systemDeactivateNotificationHtmlTemplate.merge(context, writer);
+        systemDeactivateNotificationTemplate.merge(context, writer);
         logger.debug("sending " + SUBJECT_SYSTEM_DEACTIVATE + " to " + toEmail);
-        this.wonMailSender.sendHtmlMessage(toEmail, SUBJECT_SYSTEM_DEACTIVATE, writer.toString());
+        this.wonMailSender.sendTextMessage(toEmail, SUBJECT_SYSTEM_DEACTIVATE, writer.toString());
     }
 
-    public void sendSystemCloseNotificationHtmlMessage(String toEmail, String localNeed, String
+    public void sendSystemCloseNotificationMessage(String toEmail, String localNeed, String
             remoteNeed, String localConnection, String textMsg) {
 
         StringWriter writer = new StringWriter();
         VelocityContext context = createContext(toEmail, localNeed, remoteNeed, localConnection, textMsg);
-        systemCloseNotificationHtmlTemplate.merge(context, writer);
+        systemCloseNotificationTemplate.merge(context, writer);
         logger.debug("sending " + SUBJECT_SYSTEM_CLOSE + " to " + toEmail);
-        this.wonMailSender.sendHtmlMessage(toEmail, SUBJECT_SYSTEM_CLOSE, writer.toString());
+        this.wonMailSender.sendTextMessage(toEmail, SUBJECT_SYSTEM_CLOSE, writer.toString());
     }
 
-    public void sendVerificationHtmlMessage(User user, EmailVerificationToken verificationToken) {
+    public void sendVerificationMessage(User user, EmailVerificationToken verificationToken) {
         StringWriter writer = new StringWriter();
         VelocityContext context = createVerificationContext(verificationToken);
-        verificationHtmlTemplate.merge(context, writer);
+        verificationTemplate.merge(context, writer);
         logger.debug("sending "+ SUBJECT_VERIFICATION + " to " + user.getEmail());
-        this.wonMailSender.sendHtmlMessage(user.getEmail(), SUBJECT_VERIFICATION, writer.toString());
+        this.wonMailSender.sendTextMessage(user.getEmail(), SUBJECT_VERIFICATION, writer.toString());
     }
 
 /*
@@ -228,7 +240,7 @@ public class WonOwnerMailSender {
     properties.setProperty("resource.loader", "file");
     properties.setProperty("file.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
     velocityEngine.init(properties);
-    Template template = velocityEngine.getTemplate("mail-templates/conversation-notification-html.vm");
+    Template template = velocityEngine.getTemplate("mail-templates/conversation-notification.vm");
     StringWriter writer = new StringWriter();
     VelocityContext context = new VelocityContext();
     EventCartridge ec = new EventCartridge();

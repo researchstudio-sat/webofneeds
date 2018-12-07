@@ -237,12 +237,11 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
 			WebSocketMessage<String> webSocketMessage = new TextMessage(wonMessageJsonLdString);
 			URI needUri = getOwnedNeedURI(wonMessage);
 			User user = getUserForWonMessage(wonMessage);
-	
 			Set<WebSocketSession> webSocketSessions = findWebSocketSessionsForWonMessage(wonMessage, needUri, user);
 	
 			// check if we can deliver the message. If not, send email.
 			if (webSocketSessions.size() == 0) {
-				logger.info("cannot deliver message of type {} for need {}, receiver {}: no websocket session found",
+				logger.debug("cannot deliver message of type {} for need {}, receiver {}: no websocket session found. Trying to send message by email.",
 						new Object[] { wonMessage.getMessageType(), wonMessage.getReceiverNeedURI(),
 								wonMessage.getReceiverURI() });
 				// send per email notifications if it applies:
@@ -259,6 +258,9 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
 			}
 			if (successfullySent == 0) {
 				//we did not manage to send the message via the websocket, send it by email.
+			    logger.debug("cannot deliver message of type {} for need {}, receiver {}: none of the associated websocket sessions worked. Trying to send message by email.",
+                        new Object[] { wonMessage.getMessageType(), wonMessage.getReceiverNeedURI(),
+                                wonMessage.getReceiverURI() });
 				notifyPerEmail(user, needUri, wonMessage);
 			}
 			return wonMessage;
@@ -270,14 +272,29 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
 
 	private void notifyPerEmail(final User user, final URI needUri, final WonMessage wonMessage) {
 
+	    if (wonMessage.getEnvelopeType() == WonMessageDirection.FROM_OWNER) {
+            //we assume that this message, coming from the server here, can only be an echoed message. don't send by email.
+            logger.debug("not sending email to user: message {} looks like an echo from the server", wonMessage.getMessageURI());
+            return;
+        }
+	    
 		if (user == null) {
+		    logger.info("not sending email to user: user not specified");
+		    return;
+		}
+		
+		if (!user.isEmailVerified()) {
+		    logger.debug("not sending email to user: email address not yet verified");
 			return;
 		}
 
 		UserNeed userNeed = getNeedOfUser(user, needUri);
 		if (userNeed == null) {
+		    logger.debug("not sending email to user: need uri not specified");
 			return;
 		}
+        
+
 
 		String textMsg = WonRdfUtils.MessageUtils.getTextMessage(wonMessage);
 
@@ -285,26 +302,26 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
 			switch (wonMessage.getMessageType()) {
 			case OPEN:
 				if (userNeed.isConversations()) {
-					emailSender.sendConversationNotificationHtmlMessage(user.getEmail(), needUri.toString(),
+					emailSender.sendConversationNotificationMessage(user.getEmail(), needUri.toString(),
 							wonMessage.getSenderNeedURI().toString(), wonMessage.getReceiverURI().toString(), textMsg);
 				}
 				return;
 			case CONNECTION_MESSAGE:
 				if (userNeed.isConversations()) {
-					emailSender.sendConversationNotificationHtmlMessage(user.getEmail(), needUri.toString(),
+					emailSender.sendConversationNotificationMessage(user.getEmail(), needUri.toString(),
 							wonMessage.getSenderNeedURI().toString(), wonMessage.getReceiverURI().toString(), textMsg);
 				}
 				return;
 			case CONNECT:
 				if (userNeed.isRequests()) {
-					emailSender.sendConnectNotificationHtmlMessage(user.getEmail(), needUri.toString(),
+					emailSender.sendConnectNotificationMessage(user.getEmail(), needUri.toString(),
 							wonMessage.getSenderNeedURI().toString(), wonMessage.getReceiverURI().toString(), textMsg);
 				}
 				return;
 			case HINT_MESSAGE:
 				if (userNeed.isMatches()) {
 					String remoteNeedUri = WonRdfUtils.MessageUtils.toMatch(wonMessage).getToNeed().toString();
-					emailSender.sendHintNotificationMessageHtml(user.getEmail(), needUri.toString(), remoteNeedUri,
+					emailSender.sendHintNotificationMessage(user.getEmail(), needUri.toString(), remoteNeedUri,
 							wonMessage.getReceiverURI().toString());
 				}
 				return;
@@ -313,12 +330,12 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
 				return;
 			case DEACTIVATE:
 				// a deactivate message, coming from the WoN node. Always deliverd by email.
-				emailSender.sendSystemDeactivateNotificationHtmlMessage(user.getEmail(), needUri.toString(), textMsg);
+				emailSender.sendSystemDeactivateNotificationMessage(user.getEmail(), needUri.toString(), textMsg);
 
 				return;
 			case NEED_MESSAGE:
 				// a need message, coming from the WoN node. Always deliverd by email.
-				emailSender.sendNeedMessageNotificationHtmlMessage(user.getEmail(), needUri.toString(), textMsg);
+				emailSender.sendNeedMessageNotificationMessage(user.getEmail(), needUri.toString(), textMsg);
 				return;
 			default:
 				return;

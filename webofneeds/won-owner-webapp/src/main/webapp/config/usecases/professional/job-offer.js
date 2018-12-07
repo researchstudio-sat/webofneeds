@@ -73,7 +73,7 @@ export const jobOffer = {
     const skillsSQ = tagOverlapScoreSubQuery({
       resultName: resultName,
       bindScoreAs: "?skills_jaccardIndex",
-      pathToTags: "won:is/s:knowsAbout",
+      pathToTags: "s:knowsAbout",
       prefixesInPath: {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],
@@ -152,7 +152,7 @@ export const jobOffer = {
       subQueries: subQueries,
       where: [
         `${resultName} rdf:type won:Need.`,
-        `${resultName} won:is/rdf:type s:Person.`,
+        `${resultName} rdf:type s:Person.`,
 
         // calculate average of scores; can be weighed if necessary
         `BIND( ( 
