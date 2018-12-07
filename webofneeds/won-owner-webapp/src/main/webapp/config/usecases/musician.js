@@ -71,7 +71,7 @@ export const musicianGroup = {
         const genresSQ = tagOverlapScoreSubQuery({
           resultName: resultName,
           bindScoreAs: "?genres_jaccardIndex",
-          pathToTags: "won:is/won:genres",
+          pathToTags: "won:genres",
           prefixesInPath: {
             s: won.defaultContext["s"],
             won: won.defaultContext["won"],
@@ -94,7 +94,7 @@ export const musicianGroup = {
         const vicinityScoreSQ = vicinityScoreSubQuery({
           resultName: resultName,
           bindScoreAs: "?location_geoScore",
-          pathToGeoCoords: "won:is/s:location/s:geo",
+          pathToGeoCoords: "s:location/s:geo",
           prefixesInPath: {
             s: won.defaultContext["s"],
             won: won.defaultContext["won"],
@@ -121,7 +121,7 @@ export const musicianGroup = {
           subQueries: subQueries,
           where: [
             `${resultName} rdf:type won:Need.`,
-            `${resultName} won:is/rdf:type s:MusicGroup.`,
+            `${resultName} rdf:type s:MusicGroup.`,
 
             // calculate average of scores; can be weighed if necessary
             `BIND( ( 
@@ -185,7 +185,7 @@ export const musicianGroup = {
         const instrumentsSQ = tagOverlapScoreSubQuery({
           resultName: resultName,
           bindScoreAs: "?instruments_jaccardIndex",
-          pathToTags: "won:is/won:instruments",
+          pathToTags: "won:instruments",
           prefixesInPath: {
             s: won.defaultContext["s"],
             won: won.defaultContext["won"],
@@ -222,7 +222,7 @@ export const musicianGroup = {
           subQueries: subQueries,
           where: [
             `${resultName} rdf:type won:Need.`,
-            `${resultName} won:is/rdf:type won:Musician.`,
+            `${resultName} rdf:type won:Musician.`,
 
             // calculate average of scores; can be weighed if necessary
             `BIND( ( 
@@ -381,7 +381,7 @@ export const musicianGroup = {
             operations: [
               `${resultName} a won:Need.`,
               `${resultName} won:seeks ?seeks.`,
-              `${resultName} won:is/rdf:type won:RehearsalRoomRentDemand.`,
+              `${resultName} rdf:type won:RehearsalRoomRentDemand.`,
               location && "?seeks won:hasLocation ?location.",
             ],
           },

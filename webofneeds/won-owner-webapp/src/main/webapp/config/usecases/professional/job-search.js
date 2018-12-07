@@ -93,7 +93,7 @@ export const jobSearch = {
     const organizationNameSQ = tagOverlapScoreSubQuery({
       resultName: resultName,
       bindScoreAs: "?organizationName_jaccardIndex",
-      pathToTags: "won:is/s:hiringOrganization/s:name",
+      pathToTags: "s:hiringOrganization/s:name",
       prefixesInPath: {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],
@@ -105,7 +105,7 @@ export const jobSearch = {
     const employmentTypesSQ = tagOverlapScoreSubQuery({
       resultName: resultName,
       bindScoreAs: "?employmentTypes_jaccardIndex",
-      pathToTags: "won:is/s:employmentType",
+      pathToTags: "s:employmentType",
       prefixesInPath: {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],
@@ -117,7 +117,7 @@ export const jobSearch = {
     const industryScoreSQ = tagOverlapScoreSubQuery({
       resultName: resultName,
       bindScoreAs: "?industry_jaccardIndex",
-      pathToTags: "won:is/s:industry",
+      pathToTags: "s:industry",
       prefixesInPath: {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],
@@ -128,7 +128,7 @@ export const jobSearch = {
     const vicinityScoreSQ = vicinityScoreSubQuery({
       resultName: resultName,
       bindScoreAs: "?jobLocation_geoScore",
-      pathToGeoCoords: "won:is/s:jobLocation/s:geo",
+      pathToGeoCoords: "s:jobLocation/s:geo",
       prefixesInPath: {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],
@@ -160,7 +160,7 @@ export const jobSearch = {
       subQueries: subQueries,
       where: [
         `${resultName} rdf:type won:Need.`,
-        `${resultName} won:is/rdf:type s:JobPosting.`,
+        `${resultName} rdf:type s:JobPosting.`,
 
         // calculate average of scores; can be weighed if necessary
         `BIND( ( 

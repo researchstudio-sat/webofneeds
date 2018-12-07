@@ -7,7 +7,7 @@ $verificationLinkUrl
 
 The link will work until $expirationDate. In case the link does not work any more, you can request another verification email through our service.
 
-You can now use the account for now. In $gracePeriodInHours, access to the account will be blocked unless you activate it by clicking the link above.
+You can now use the account for now. In $gracePeriodInHours hours, access to the account will be blocked unless you activate it by clicking the link above.
 
 Best wishes, 
 
