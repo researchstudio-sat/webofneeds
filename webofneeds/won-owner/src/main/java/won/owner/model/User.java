@@ -68,6 +68,9 @@ public class User implements UserDetails, Persistable<Long> {
     @Column(name = "email")
     private String email;
 
+    @Column(name = "privateId")
+    private String privateId;
+
     @JoinColumn(name = "keystore_id")
     @OneToOne(cascade = CascadeType.ALL,
             fetch = FetchType.LAZY, optional = false)
@@ -256,6 +259,14 @@ public class User implements UserDetails, Persistable<Long> {
 
     public void setAcceptedTermsOfService(boolean acceptedTermsOfService) {
         this.acceptedTermsOfService = acceptedTermsOfService;
+    }
+
+    public String getPrivateId() {
+        return privateId;
+    }
+
+    public void setPrivateId(String privateId) {
+        this.privateId = privateId;
     }
 
     private boolean isWithinGracePeriod() {

@@ -14,7 +14,7 @@ public class UserPojo extends UsernamePojo {
     @NotEmpty
 	private String password;
 
-    private boolean privateIdUser;
+    private String privateId;
 
 	public String getPassword() {
 		return password;
@@ -24,11 +24,11 @@ public class UserPojo extends UsernamePojo {
 		this.password = password;
 	}
 
-    public boolean isPrivateIdUser() {
-        return privateIdUser;
+    public String getPrivateId() {
+        return privateId;
     }
 
-    public void setPrivateIdUser(boolean privateIdUser) {
-        this.privateIdUser = privateIdUser;
+    public void setPrivateId(String privateId) {
+        this.privateId = privateId;
     }
 }

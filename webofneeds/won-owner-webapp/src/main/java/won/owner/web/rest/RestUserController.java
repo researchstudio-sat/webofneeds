@@ -119,7 +119,7 @@ public class RestUserController {
                     return generateStatusResponse(RestStatusResponse.USER_ALREADY_EXISTS);
                 }
             }
-            User createdUser = userService.registerUser(user.getUsername(), user.getPassword(), null, user.isPrivateIdUser());
+            User createdUser = userService.registerUser(user.getUsername(), user.getPassword(), null, user.getPrivateId());
 
             if(!createdUser.isEmailVerified()) {
                 eventPublisher.publishEvent(new OnRegistrationCompleteEvent(createdUser, request.getLocale(), request.getContextPath()));
@@ -496,7 +496,7 @@ public class RestUserController {
         values.put("role", user.getRole());
         values.put("emailVerified", user.isEmailVerified());
         values.put("acceptedTermsOfService", user.isAcceptedTermsOfService());
-        values.put("isAnonymous", user.getUsername().endsWith("@matchat.org")); //FIXME: USE CORRECT ANONYMOUSUSER DISTINCTION REQUIRES AT LEAST PR #2567
+        values.put("privateId", user.getPrivateId());
 
         return new ResponseEntity<Map>(values, HttpStatus.OK);
     }
