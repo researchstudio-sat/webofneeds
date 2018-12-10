@@ -13,7 +13,12 @@ const initialState = Immutable.fromJS({
   selectedAddMessageContent: undefined,
   showModalDialog: false,
   modalDialog: undefined,
-  showAnonymousSlideIn: false,
+  anonymousSlideIn: {
+    visible: false,
+    expanded: false,
+    showEmailInput: false,
+    email: undefined,
+  },
 });
 
 export default function(viewState = initialState, action = {}) {
@@ -69,6 +74,21 @@ export default function(viewState = initialState, action = {}) {
       return viewState
         .set("showModalDialog", false)
         .set("modalDialog", undefined);
+
+    case actionTypes.view.anonymousSlideIn.expand:
+      return viewState
+        .setIn(["anonymousSlideIn", "visible"], true)
+        .setIn(["anonymousSlideIn", "expanded"], true)
+        .setIn(["anonymousSlideIn", "showEmailInput"], false);
+
+    case actionTypes.view.anonymousSlideIn.collapse:
+      return viewState
+        .setIn(["anonymousSlideIn", "visible"], true)
+        .setIn(["anonymousSlideIn", "expanded"], false)
+        .setIn(["anonymousSlideIn", "showEmailInput"], false);
+
+    case actionTypes.view.anonymousSlideIn.showEmailInput:
+      return viewState.setIn(["anonymousSlideIn", "showEmailInput"], true);
 
     default:
       return viewState;

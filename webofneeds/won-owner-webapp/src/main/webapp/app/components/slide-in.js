@@ -125,7 +125,12 @@ function genSlideInConf() {
                     Ok, I'll keep that in mind
             </button>
         </div>
-        <div class="si__privateaccount" ng-class="{'visible': !self.connectionHasBeenLost && self.privateId}">
+        <div class="si__anonymous"
+            ng-class="{
+              'visible': !self.connectionHasBeenLost && self.privateId,
+              'si__anonymous--expanded': self.isAnonymousSlideInExpanded,
+              'si__anonymous--emailInput': self.showAnonymousSlideInEmailInput,
+            }">
             <svg class="si__icon">
                 <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
             </svg>
@@ -133,15 +138,39 @@ function genSlideInConf() {
                 Warning!
             </span>
             <svg class="si__carret"
-                ng-click="self.view__expand"
-                ng-if="true">
+                ng-click="self.view__anonymousSlideIn__expand()"
+                ng-if="!self.isAnonymousSlideInExpanded">
                 <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
             </svg>
             <svg class="si__carret"
-                ng-click="self.router__stateGoCurrent({token: undefined})"
-                ng-if="false">
+                ng-click="self.view__anonymousSlideIn__collapse()"
+                ng-if="self.isAnonymousSlideInExpanded">
                 <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
             </svg>
+            <div class="si__text" ng-if="self.isAnonymousSlideInExpanded">
+              Save this link to keep the session:
+            </div>
+            <button class="si__buttonCopy"
+                ng-if="self.isAnonymousSlideInExpanded"
+                ng-click="self.copyLinkToClipboard()">
+                Copy link to clipboard
+            </button>
+            <button class="si__buttonEmail"
+                ng-if="self.isAnonymousSlideInExpanded"
+                ng-click="self.view__anonymousSlideIn__showEmailInput()">
+                Email me this link
+            </button>
+            <input class="si__emailInput"
+              ng-if="self.isAnonymousSlideInExpanded && self.showAnonymousSlideInEmailInput"
+              type="text"
+              ng-model="self.anonymousEmail"
+              placeholder="Type your email"/>
+            <button class="si__buttonSend"
+                ng-if="self.isAnonymousSlideInExpanded && self.showAnonymousSlideInEmailInput"
+                ng-click="self.account__sendAnonymousLinkEmail(self.anonymousEmail, self.privateId)"
+                ng-disabled="!self.isValidEmail(self.anonymousEmail)">
+                Send link to this email
+            </button>
         </div>
     `;
 
@@ -156,6 +185,8 @@ function genSlideInConf() {
       attach(this, serviceDependencies, arguments);
       Object.assign(this, srefUtils); // bind srefUtils to scope
       this.parseRestErrorMessage = parseRestErrorMessage;
+
+      this.anonymousEmail = undefined;
 
       const selectFromState = state => {
         const verificationToken = getIn(state, [
@@ -202,6 +233,16 @@ function genSlideInConf() {
           isAlreadyVerifiedError:
             getIn(state, ["account", "emailVerificationError", "code"]) ==
             won.RESPONSECODE.TOKEN_RESEND_FAILED_ALREADY_VERIFIED,
+          isAnonymousSlideInExpanded: getIn(state, [
+            "view",
+            "anonymousSlideIn",
+            "expanded",
+          ]),
+          showAnonymousSlideInEmailInput: getIn(state, [
+            "view",
+            "anonymousSlideIn",
+            "showEmailInput",
+          ]),
         };
       };
 
@@ -210,6 +251,13 @@ function genSlideInConf() {
       this.$scope.$watch("self.verificationToken", verificationToken =>
         this.verifyEmailAddress(verificationToken)
       );
+    }
+
+    copyLinkToClipBoard() {}
+
+    isValidEmail(anonymousEmail) {
+      //TODO: IMPL THIS METHOD
+      return anonymousEmail && anonymousEmail.length > 0;
     }
 
     verifyEmailAddress(verificationToken) {
