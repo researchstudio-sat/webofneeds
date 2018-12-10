@@ -48,7 +48,7 @@
         <intercept-url pattern="/rest/users/" access="permitAll()"/>
         <intercept-url pattern="/rest/users/transfer" access="isAuthenticated()"/>
         <intercept-url pattern="/rest/users/ping/" access="permitAll()"/>
-		<intercept-url pattern="/rest/users/signout" access="permitAll()"/>
+        <intercept-url pattern="/rest/users/signout" access="permitAll()"/>
         <intercept-url pattern="/rest/users/isSignedIn" access="permitAll()"/>
         <intercept-url pattern="/rest/users/signin" access="permitAll()"/>
         <intercept-url pattern="/rest/users/confirmRegistration" access="permitAll()"/>
@@ -60,7 +60,7 @@
         <intercept-url pattern="/rest/needs/drafts/*" access="hasRole('ROLE_ACCOUNT')"/>
         <intercept-url pattern="/rest/**" access="isAuthenticated()"/>
         <intercept-url pattern="/**"  requires-channel="https"/>
-		<!--intercept-url pattern="/rest/**" access="isAuthenticated()" /-->
+        <!--intercept-url pattern="/rest/**" access="isAuthenticated()" /-->
         <!--
             added for integrating spring-session, which we added to synchronize
             http sessions with websocket sessions.

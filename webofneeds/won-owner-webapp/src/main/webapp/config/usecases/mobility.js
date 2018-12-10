@@ -46,6 +46,7 @@ const mobilityUseCases = {
       const baseFilter = {
         prefixes: {
           won: won.defaultContext["won"],
+          s: won.defaultContext["s"],
         },
         operations: [
           `${resultName} a won:Need.`,
@@ -88,7 +89,7 @@ const mobilityUseCases = {
                 `${resultName} a <http://dbpedia.org/resource/Ridesharing>. ${resultName} won:travelAction/s:fromLocation ?fromLocation. `,
               fromLocation && fromLocationFilter.operations.join(" "),
               toLocation &&
-                "${resultName} won:travelAction/s:toLocation ?toLocation.",
+                `${resultName} won:travelAction/s:toLocation ?toLocation.`,
               toLocation && toLocationFilter.operations.join(" "),
             ],
             " "

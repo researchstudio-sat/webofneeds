@@ -35,23 +35,23 @@ public class WonOwnerMailSenderTest {
   // uncomment @Test, provide your email address as receiver e-mail address as well as the local and remote need uris
   // to test, then go there and verify manually if the test message was delivered correctly
   //@Test
-  public void sendConversationNotificationHtmlMessageTest() {
-    emailSender.sendConversationNotificationHtmlMessage(email, localNeedUri, remoteNeedUri, localConnectionUri, textMessage);
+  public void sendConversationNotificationMessageTest() {
+    emailSender.sendConversationNotificationMessage(email, localNeedUri, remoteNeedUri, localConnectionUri, textMessage);
   }
 
   //@Test
-  public void sendConnectNotificationHtmlMessageTest() {
-    emailSender.sendConnectNotificationHtmlMessage(email, localNeedUri, remoteNeedUri, localConnectionUri, textMessage);
+  public void sendConnectNotificationMessageTest() {
+    emailSender.sendConnectNotificationMessage(email, localNeedUri, remoteNeedUri, localConnectionUri, textMessage);
   }
 
   //@Test
-  public void sendCloseNotificationHtmlMessageTest() {
-    emailSender.sendCloseNotificationHtmlMessage(email, localNeedUri, remoteNeedUri, localConnectionUri, textMessage);
+  public void sendCloseNotificationMessageTest() {
+    emailSender.sendCloseNotificationMessage(email, localNeedUri, remoteNeedUri, localConnectionUri, textMessage);
   }
 
   //@Test
-  public void sendHintNotificationMessageHtmlTest() {
-    emailSender.sendHintNotificationMessageHtml(email, localNeedUri, remoteNeedUri, localConnectionUri);
+  public void sendHintNotificationMessageTest() {
+    emailSender.sendHintNotificationMessage(email, localNeedUri, remoteNeedUri, localConnectionUri);
   }
 
   // a test fails if mail account data were not specified in the owner.properties

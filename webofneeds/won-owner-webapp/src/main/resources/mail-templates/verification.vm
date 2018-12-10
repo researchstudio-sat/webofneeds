@@ -1,0 +1,14 @@
+Hi there,
+
+You are receiving this email because someone created an account at $serviceName using this email address. If that wasn't you, you can safely ignore this email.
+
+In order to activate the account, please click the Link below now:
+$verificationLinkUrl
+
+The link will work until $expirationDate. In case the link does not work any more, you can request another verification email through our service.
+
+You can now use the account for now. In $gracePeriodInHours hours, access to the account will be blocked unless you activate it by clicking the link above.
+
+Best wishes, 
+
+The team at $serviceName

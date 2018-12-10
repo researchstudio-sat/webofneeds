@@ -206,6 +206,7 @@ export function acceptTermsOfService() {
     method: "post",
     headers: {
       Accept: "application/json",
+      "Content-Type": "application/json",
     },
     credentials: "include",
   };
