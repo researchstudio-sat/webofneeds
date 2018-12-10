@@ -280,6 +280,39 @@ export function resendEmailVerification(email) {
 }
 
 /**
+ * Resend the verification mail.
+ *
+ */
+export function sendAnonymousLinkEmail(email, privateId) {
+  const url = urljoin(ownerBaseUrl, "/rest/users/sendAnonymousLinkEmail");
+  const httpOptions = {
+    method: "post",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify({
+      email: email,
+      privateId: privateId,
+    }),
+  };
+  return fetch(url, httpOptions)
+    .then(checkHttpStatus)
+    .then(resp => {
+      return resp.json();
+    })
+    .catch(error =>
+      error.response.json().then(errorMessage => {
+        //FIXME: MOVE THIS ERROR HANDLINNG INTO THE ACTION
+        const sendError = new Error();
+        sendError.jsonResponse = errorMessage;
+        throw sendError;
+      })
+    );
+}
+
+/**
  * Transfer an existing privateId User,
  * to a non existing User
  * @param credentials {email, password, privateId}

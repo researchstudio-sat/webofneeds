@@ -12,6 +12,7 @@ import {
   acceptTermsOfService,
   confirmRegistration,
   resendEmailVerification,
+  sendAnonymousLinkEmail,
   login,
   logout,
   parseCredentials,
@@ -353,6 +354,24 @@ export function accountResendVerificationEmail(email) {
           type: actionTypes.account.resendVerificationEmailFailed,
           payload: {
             emailVerificationError: Immutable.fromJS(error.jsonResponse),
+          },
+        })
+      );
+  };
+}
+
+export function accountSendAnonymousLinkEmail(email, privateId) {
+  return dispatch => {
+    dispatch({ type: actionTypes.account.sendAnonymousLinkEmailStarted });
+    sendAnonymousLinkEmail(email, privateId)
+      .then(() => {
+        dispatch({ type: actionTypes.account.sendAnonymousLinkEmailSuccess });
+      })
+      .catch(error =>
+        dispatch({
+          type: actionTypes.account.sendAnonymousLinkEmailFailed,
+          payload: {
+            anonymousEmailError: Immutable.fromJS(error.jsonResponse),
           },
         })
       );

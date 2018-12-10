@@ -76,6 +76,7 @@ import {
   accountAcceptTermsOfService,
   accountVerifyEmailAddress,
   accountResendVerificationEmail,
+  accountSendAnonymousLinkEmail,
   reconnect,
 } from "./account-actions.js";
 
@@ -298,6 +299,11 @@ const actionHierarchy = {
     resendVerificationEmailStarted: INJ_DEFAULT,
     resendVerificationEmailSuccess: INJ_DEFAULT,
     resendVerificationEmailFailed: INJ_DEFAULT,
+
+    sendAnonymousLinkEmail: accountSendAnonymousLinkEmail,
+    sendAnonymousLinkEmailStarted: INJ_DEFAULT,
+    sendAnonymousLinkEmailSuccess: INJ_DEFAULT,
+    sendAnonymousLinkEmailFailed: INJ_DEFAULT,
   },
 
   geoLocationDenied: INJ_DEFAULT,
@@ -334,9 +340,13 @@ const actionHierarchy = {
     clearLoginError: INJ_DEFAULT,
     clearRegisterError: INJ_DEFAULT,
 
-    showAnonymousSlideIn: INJ_DEFAULT,
-    hideAnonymousSlideIn: INJ_DEFAULT,
-    expandAnonymousSlideIn: INJ_DEFAULT,
+    anonymousSlideIn: {
+      show: INJ_DEFAULT,
+      hide: INJ_DEFAULT,
+      expand: INJ_DEFAULT,
+      collapse: INJ_DEFAULT,
+      showEmailInput: INJ_DEFAULT,
+    },
   },
 
   toasts: {
