@@ -152,6 +152,7 @@ public class SparqlMatcherUtils {
         if (!topLevelProject.isPresent()) {
             return q;
         }
+        q = Transformer.transform(new TransformCopy(), q);
         return Transformer.transform(new TransformCopy() {
             public Op transform(OpProject op, Op subOp) {
                 if (op == topLevelProject.get()) {
@@ -186,6 +187,7 @@ public class SparqlMatcherUtils {
         if (!topLevelProject.isPresent()) {
             return q;
         }
+        q = Transformer.transform(new TransformCopy(), q);        
         return Transformer.transform(new TransformCopy() {
             public Op transform(OpProject op, Op subOp) {
                 if (op == topLevelProject.get()) {
