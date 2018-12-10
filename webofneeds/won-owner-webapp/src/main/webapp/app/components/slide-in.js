@@ -15,7 +15,7 @@ import "style/_slidein.scss";
 
 function genSlideInConf() {
   let template = `
-        <div class="si__connectionlost visible" ng-class="{'visible': self.connectionHasBeenLost}">
+        <div class="si__connectionlost" ng-class="{'visible': self.connectionHasBeenLost}">
             <svg class="si__icon">
                 <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
             </svg>
@@ -33,7 +33,7 @@ function genSlideInConf() {
                 <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
             </svg>
         </div>
-        <div class="si__emailverification visible" ng-class="{'visible': !self.connectionHasBeenLost && (self.verificationToken || (self.loggedIn && !self.emailVerified))}">
+        <div class="si__emailverification" ng-class="{'visible': !self.connectionHasBeenLost && (self.verificationToken || (self.loggedIn && !self.emailVerified))}">
             <svg class="si__icon">
                 <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
             </svg>
@@ -72,7 +72,7 @@ function genSlideInConf() {
                 <use xlink:href="#ico36_close" href="#ico36_close"></use>
             </svg>
         </div>
-        <div class="si__termsofservice visible" ng-class="{'visible': self.loggedIn && !self.connectionHasBeenLost && !self.acceptedTermsOfService}">
+        <div class="si__termsofservice" ng-class="{'visible': self.loggedIn && !self.connectionHasBeenLost && !self.acceptedTermsOfService}">
             <svg class="si__icon">
                 <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
             </svg>
@@ -93,7 +93,7 @@ function genSlideInConf() {
                 <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
             </svg>
         </div>
-        <div class="si__disclaimer visible" ng-class="{'visible': !self.connectionHasBeenLost && !self.acceptedDisclaimer}">
+        <div class="si__disclaimer" ng-class="{'visible': !self.connectionHasBeenLost && !self.acceptedDisclaimer}">
             <svg class="si__icon">
                 <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_info"></use>
             </svg>
@@ -125,7 +125,7 @@ function genSlideInConf() {
                     Ok, I'll keep that in mind
             </button>
         </div>
-        <div class="si__privateaccount visible" ng-class="{'visible': !self.connectionHasBeenLost && self.privateId}">
+        <div class="si__privateaccount" ng-class="{'visible': !self.connectionHasBeenLost && self.privateId}">
             <svg class="si__icon">
                 <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
             </svg>

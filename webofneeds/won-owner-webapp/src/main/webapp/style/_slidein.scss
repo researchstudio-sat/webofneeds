@@ -70,7 +70,7 @@ won-slide-in {
   grid-template-columns: 1fr minmax(min-content, $maxContentWidth) 1fr;
 
   background: black; //Fallback in case the browser does not support css variables
-  background: $won-secondary-color; //TODO: MAYBE MAKE BG-COLOR/COLOR BASED ON THE slide-in type
+  background: $won-secondary-color;
 
   .si__connectionlost,
   .si__emailverification,
