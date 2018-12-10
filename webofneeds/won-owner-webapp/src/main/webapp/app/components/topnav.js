@@ -31,7 +31,7 @@ function genTopnavConf() {
                 <div class="topnav__inner__center"></div>
                 <div class="topnav__inner__right">
                     <ul class="topnav__list">
-                        <li ng-show="!self.isSignUpView && (self.isPrivateIdUser || !self.loggedIn)">
+                        <li ng-show="!self.isSignUpView && (self.isAnonymous || !self.loggedIn)">
                             <a  ui-sref="{{ self.absSRef('signup') }}"
                                 class="topnav__signupbtn">
                                     Sign up
@@ -62,17 +62,12 @@ function genTopnavConf() {
 
       const selectFromState = state => {
         const currentRoute = getIn(state, ["router", "currentState", "name"]);
-        const privateId = getIn(state, [
-          "router",
-          "currentParams",
-          "privateId",
-        ]);
 
         return {
           themeName: getIn(state, ["config", "theme", "name"]),
           appTitle: getIn(state, ["config", "theme", "title"]),
           loggedIn: state.getIn(["account", "loggedIn"]),
-          isPrivateIdUser: !!privateId,
+          isAnonymous: state.getIn(["account", "isAnonymous"]),
           isSignUpView: currentRoute === "signup",
         };
       };
