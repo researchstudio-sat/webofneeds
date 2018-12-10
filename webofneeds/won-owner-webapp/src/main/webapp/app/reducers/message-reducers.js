@@ -3,7 +3,6 @@
  */
 
 import { actionTypes } from "../actions/actions.js";
-import { getIn } from "../utils.js";
 import Immutable from "immutable";
 
 const initialState = Immutable.fromJS({
@@ -71,15 +70,10 @@ export function messagesReducer(messages = initialState, action = {}) {
     case actionTypes.lostConnection:
       return messages.set("lostConnection", true).set("reconnecting", false);
 
-    case actionTypes.initialPageLoad: {
-      const initialLoadFinished = getIn(action, [
-        "payload",
-        "initialLoadFinished",
-      ]);
-      return initialLoadFinished
-        ? messages.set("lostConnection", false).set("reconnecting", false)
-        : messages;
+    case actionTypes.initialLoadFinished: {
+      return messages.set("lostConnection", false).set("reconnecting", false);
     }
+
     case actionTypes.account.loginFinished: {
       return messages.set("lostConnection", false).set("reconnecting", false);
     }
