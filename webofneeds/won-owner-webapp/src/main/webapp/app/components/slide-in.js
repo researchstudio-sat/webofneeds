@@ -5,9 +5,10 @@ import won from "../won-es6.js";
 import angular from "angular";
 import ngAnimate from "angular-animate";
 import dropdownModule from "./covering-dropdown.js";
-import { attach, delay, getIn } from "../utils.js";
+import { attach, delay, getIn, toAbsoluteURL } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux, parseRestErrorMessage } from "../won-utils.js";
+import { ownerBaseUrl } from "config";
 
 import * as srefUtils from "../sref-utils.js";
 
@@ -15,6 +16,7 @@ import "style/_slidein.scss";
 
 function genSlideInConf() {
   let template = `
+        <input type='text' class="si__anonymousLink" value="{{ self.anonymousLink }}" ng-if="!self.connectionHasBeenLost && self.loggedIn && self.privateId && !self.anonymousLinkSent && !self.anonymousLinkCopied && self.isAnonymousSlideInExpanded"/>
         <div class="si__connectionlost" ng-class="{'visible': self.connectionHasBeenLost}">
             <svg class="si__icon">
                 <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
@@ -127,7 +129,7 @@ function genSlideInConf() {
         </div>
         <div class="si__anonymous"
             ng-class="{
-              'visible': !self.connectionHasBeenLost && self.privateId,
+              'visible': !self.connectionHasBeenLost && self.loggedIn && self.privateId && !self.anonymousLinkSent && !self.anonymousLinkCopied,
               'si__anonymous--expanded': self.isAnonymousSlideInExpanded,
               'si__anonymous--emailInput': self.showAnonymousSlideInEmailInput,
             }">
@@ -166,11 +168,32 @@ function genSlideInConf() {
               ng-model="self.anonymousEmail"
               placeholder="Type your email"/>
             <button class="si__buttonSend"
-                ng-if="self.isAnonymousSlideInExpanded && self.showAnonymousSlideInEmailInput"
+                ng-if="!self.processingSendAnonymousLinkEmail && self.isAnonymousSlideInExpanded && self.showAnonymousSlideInEmailInput"
                 ng-click="self.account__sendAnonymousLinkEmail(self.anonymousEmail, self.privateId)"
                 ng-disabled="!self.isValidEmail(self.anonymousEmail)">
                 Send link to this email
             </button>
+            <svg class="hspinner" ng-if="self.processingSendAnonymousLinkEmail">
+                <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
+            </svg>
+        </div>
+        <div class="si__anonymoussuccess"
+            ng-class="{
+              'visible': !self.connectionHasBeenLost && self.loggedIn && (self.anonymousLinkSent || self.anonymousLinkCopied),
+            }">
+            <svg class="si__icon">
+                <use xlink:href="#ico16_indicator_info" href="#ico16_indicator_info"></use>
+            </svg>
+            <div class="si__title" ng-if="self.anonymousLinkSent">
+                Link sent to {{ self.anonymousEmail }}.
+            </div>
+            <div class="si__title" ng-if="self.anonymousLinkCopied">
+                Link copied to clipboard.
+            </div>
+            <svg class="si__close"
+                ng-click="self.view__anonymousSlideIn__hide()">
+                <use xlink:href="#ico36_close" href="#ico36_close"></use>
+            </svg>
         </div>
     `;
 
@@ -178,6 +201,7 @@ function genSlideInConf() {
     "$ngRedux",
     "$scope",
     "$state" /*injections as strings here*/,
+    "$element",
   ];
 
   class Controller {
@@ -201,6 +225,9 @@ function genSlideInConf() {
           "privateId",
         ]);
 
+        const path = "#!/connections" + `?privateId=${this.privateId}`;
+        const anonymousLink = toAbsoluteURL(ownerBaseUrl).toString() + path;
+
         return {
           privateId,
           verificationToken,
@@ -221,6 +248,10 @@ function genSlideInConf() {
           processingResendVerificationEmail: getIn(state, [
             "process",
             "processingResendVerificationEmail",
+          ]),
+          processingSendAnonymousLinkEmail: getIn(state, [
+            "process",
+            "processingSendAnonymousLinkEmail",
           ]),
           acceptedTermsOfService: getIn(state, [
             "account",
@@ -243,6 +274,17 @@ function genSlideInConf() {
             "anonymousSlideIn",
             "showEmailInput",
           ]),
+          anonymousLinkSent: getIn(state, [
+            "view",
+            "anonymousSlideIn",
+            "linkSent",
+          ]),
+          anonymousLinkCopied: getIn(state, [
+            "view",
+            "anonymousSlideIn",
+            "linkCopied",
+          ]),
+          anonymousLink: anonymousLink,
         };
       };
 
@@ -253,11 +295,33 @@ function genSlideInConf() {
       );
     }
 
-    copyLinkToClipBoard() {}
+    copyLinkToClipboard() {
+      const linkEl = this.getAnonymousLinkField();
+      if (linkEl) {
+        linkEl.focus();
+        linkEl.setSelectionRange(0, linkEl.value.length);
+        if (!document.execCommand("copy")) {
+          window.prompt("Copy to clipboard: Ctrl+C", linkEl.value);
+        } else {
+          linkEl.setSelectionRange(0, 0);
+          linkEl.blur();
+          this.account__copiedAnonymousLinkSuccess();
+        }
+      }
+    }
 
     isValidEmail(anonymousEmail) {
       //TODO: IMPL THIS METHOD
       return anonymousEmail && anonymousEmail.length > 0;
+    }
+
+    getAnonymousLinkField() {
+      if (!this._anonymousLinkField) {
+        this._anonymousLinkField = this.$element[0].querySelector(
+          ".si__anonymousLink"
+        );
+      }
+      return this._anonymousLinkField;
     }
 
     verifyEmailAddress(verificationToken) {

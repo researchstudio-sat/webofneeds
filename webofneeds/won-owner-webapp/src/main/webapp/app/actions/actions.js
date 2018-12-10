@@ -304,6 +304,8 @@ const actionHierarchy = {
     sendAnonymousLinkEmailStarted: INJ_DEFAULT,
     sendAnonymousLinkEmailSuccess: INJ_DEFAULT,
     sendAnonymousLinkEmailFailed: INJ_DEFAULT,
+
+    copiedAnonymousLinkSuccess: INJ_DEFAULT,
   },
 
   geoLocationDenied: INJ_DEFAULT,

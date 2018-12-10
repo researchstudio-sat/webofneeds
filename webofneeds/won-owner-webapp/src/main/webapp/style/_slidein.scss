@@ -66,12 +66,22 @@
 }
 
 won-slide-in {
+  & > input.si__anonymousLink {
+    //So the copy to clipboard function works but the input field is still "hidden"
+    height: 0;
+    max-height: 0;
+    position: absolute;
+    width: 0;
+    z-index: -1;
+  }
+
   display: grid;
   grid-template-columns: 1fr minmax(min-content, $maxContentWidth) 1fr;
 
   background: black; //Fallback in case the browser does not support css variables
   background: $won-secondary-color;
 
+  .si__anonymoussuccess,
   .si__connectionlost,
   .si__emailverification,
   .si__termsofservice {
@@ -145,6 +155,11 @@ won-slide-in {
           "siButtonLeft siButtonLeft siButtonRight siButtonRight"
           "siEmailInput siEmailInput siEmailInput siEmailInput"
           "siButtonSend siButtonSend siButtonSend siButtonSend";
+
+        & > .hspinner {
+          grid-area: siButtonSend;
+          margin: 0 auto;
+        }
 
         & > .si__buttonSend {
           grid-area: siButtonSend;
