@@ -15,11 +15,11 @@ import "style/_slidein.scss";
 
 function genSlideInConf() {
   let template = `
-        <div class="slide-in" ng-class="{'visible': self.connectionHasBeenLost}">
+        <div class="slide-in visible" ng-class="{'visible': self.connectionHasBeenLost}">
             <svg class="si__icon" style="--local-primary:white;">
                 <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
             </svg>
-            <span class="si__text">
+            <span class="si__title">
                 Lost connection &ndash; make sure your internet-connection
                 is working, then click &ldquo;reconnect&rdquo;.
             </span>
@@ -29,28 +29,47 @@ function genSlideInConf() {
                 class="si__button">
                     Reconnect
             </button>
-
             <svg class="hspinner" ng-show="self.reconnecting">
                 <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
             </svg>
         </div>
-        <div class="slide-in" ng-class="{'visible': !self.connectionHasBeenLost && (self.verificationToken || (self.loggedIn && !self.emailVerified))}">
+        <div class="slide-in visible" ng-class="{'visible': !self.connectionHasBeenLost && self.privateId}">
             <svg class="si__icon" style="--local-primary:white;">
                 <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
             </svg>
-            <span class="si__text" ng-if="!self.verificationToken && !self.emailVerified && !self.emailVerificationError">
+            <span class="si__title">
+                Warning!
+            </span>
+            <!-- svg class="si__carret"
+                style="--local-primary:white;"
+                ng-click="self.view__expand"
+                ng-if="true">
+                <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
+            </svg>
+            <svg class="si__carret"
+                style="--local-primary:white;"
+                ng-click="self.router__stateGoCurrent({token: undefined})"
+                ng-if="false">
+                <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
+            </svg -->
+        </div>
+        <div class="slide-in visible" ng-class="{'visible': !self.connectionHasBeenLost && (self.verificationToken || (self.loggedIn && !self.emailVerified))}">
+            <svg class="si__icon" style="--local-primary:white;">
+                <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
+            </svg>
+            <span class="si__title" ng-if="!self.verificationToken && !self.emailVerified && !self.emailVerificationError">
                 E-Mail has not been verified yet, check your Inbox.
             </span>
-            <span class="si__text" ng-if="self.processingVerifyEmailAddress && self.verificationToken">
+            <span class="si__title" ng-if="self.processingVerifyEmailAddress && self.verificationToken">
                 Verifying the E-Mail address
             </span>
-            <span class="si__text" ng-if="!self.processingVerifyEmailAddress && self.emailVerificationError">
+            <span class="si__title" ng-if="!self.processingVerifyEmailAddress && self.emailVerificationError">
                 {{ self.parseRestErrorMessage(self.emailVerificationError) }}
             </span>
-            <span class="si__text" ng-if="self.loggedIn && self.verificationToken && !self.processingVerifyEmailAddress && self.emailVerified && !self.emailVerificationError">
+            <span class="si__title" ng-if="self.loggedIn && self.verificationToken && !self.processingVerifyEmailAddress && self.emailVerified && !self.emailVerificationError">
                 E-Mail Address verified
             </span>
-            <span class="si__text" ng-if="!self.loggedIn && self.verificationToken && !self.processingVerifyEmailAddress && !self.emailVerificationError">
+            <span class="si__title" ng-if="!self.loggedIn && self.verificationToken && !self.processingVerifyEmailAddress && !self.emailVerificationError">
                 E-Mail Address verified (Please Login Now)
             </span>
             <svg class="hspinner" ng-if="self.processingVerifyEmailAddress || self.processingResendVerificationEmail">
@@ -75,11 +94,11 @@ function genSlideInConf() {
                 <use xlink:href="#ico36_close" href="#ico36_close"></use>
             </svg>
         </div>
-        <div class="slide-in" ng-class="{'visible': self.loggedIn && !self.connectionHasBeenLost && !self.acceptedTermsOfService}">
+        <div class="slide-in visible" ng-class="{'visible': self.loggedIn && !self.connectionHasBeenLost && !self.acceptedTermsOfService}">
             <svg class="si__icon" style="--local-primary:white;">
                 <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
             </svg>
-            <span class="si__text">
+            <span class="si__title">
                 You have not accepted the
                 <a target="_blank"
                    href="{{ self.absHRef(self.$state, 'about', {'aboutSection': 'aboutTermsOfService'}) }}">
@@ -96,12 +115,15 @@ function genSlideInConf() {
                 <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
             </svg>
         </div>
-        <div class="slide-in" ng-class="{'visible': !self.connectionHasBeenLost && !self.acceptedDisclaimer}">
+        <div class="slide-in visible" ng-class="{'visible': !self.connectionHasBeenLost && !self.acceptedDisclaimer}">
             <svg class="si__icon" style="--local-primary:white;">
                 <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_info"></use>
             </svg>
-            <div class="si__smalltext">
-                This is the demonstrator of an ongoing research project. Please keep in mind:
+            <div class="si__title">
+                This is the demonstrator of an ongoing research project.
+            </div>
+            <div class="si__text">
+                Please keep in mind:
                 <ul>
                 	<li> Your posts are public. </li>
 					        <li> Your user account is not publicly linked to your posts.</li>
@@ -121,7 +143,7 @@ function genSlideInConf() {
 	  		    </div>
             <button
                 ng-click="self.account__acceptDisclaimer()"
-                class="si__smallbutton">
+                class="si__bottomButton">
                     Ok, I'll keep that in mind
             </button>
         </div>
@@ -146,7 +168,14 @@ function genSlideInConf() {
           "token",
         ]);
 
+        const privateId = getIn(state, [
+          "router",
+          "currentParams",
+          "privateId",
+        ]);
+
         return {
+          privateId,
           verificationToken,
           acceptedDisclaimer: getIn(state, ["account", "acceptedDisclaimer"]),
           emailVerified: getIn(state, ["account", "emailVerified"]),

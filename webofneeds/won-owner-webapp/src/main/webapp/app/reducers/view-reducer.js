@@ -13,6 +13,7 @@ const initialState = Immutable.fromJS({
   selectedAddMessageContent: undefined,
   showModalDialog: false,
   modalDialog: undefined,
+  showAnonymousSlideIn: false,
 });
 
 export default function(viewState = initialState, action = {}) {

@@ -3,97 +3,93 @@
 @import "collapsible";
 @import "responsiveness-utils";
 
-.slide-in {
-  @extend .collapsible;
+won-slide-in {
+  .slide-in {
+    @extend .collapsible;
+    margin-bottom: 0.5rem; //TODO: REMOVE THIS BEFORE COMMIT
 
-  color: white;
+    color: white;
+    background: black; //Fallback in case the browser does not support css variables
+    background: $won-secondary-color; //TODO: MAYBE MAKE BG-COLOR/COLOR BASED ON THE slide-in type
 
-  background: black; //Fallback in case the browser does not support css variables
-  background: $won-secondary-color;
+    padding: 0.5rem;
 
-  padding: 1rem;
+    display: grid;
+    grid-gap: 0.5rem;
 
-  display: flex;
-  justify-content: center;
-  align-items: center;
+    grid-template-areas:
+      "siIcon siTitle siButton"
+      "siText siText siText"//FIXME: Doesnt work since we do not have that in every slide-in, and thus adds a gap on the bottom :-(
+      "siBottomButton siBottomButton siBottomButton"; //FIXME: Doesnt work since we do not have that in every slide-in, and thus adds a gap on the bottom :-(
 
-  box-sizing: border-box;
+    box-sizing: border-box;
 
-  &.visible {
-    max-height: 100%; //Fallback in case the browser does not support vh
-    max-height: 100vh;
-  }
-
-  @media (max-width: $responsivenessBreakPoint) {
-    flex-direction: column;
-  }
-
-  & > .si__close {
-    cursor: pointer;
-  }
-
-  & > .si__close,
-  & > .si__icon {
-    @media (max-width: $responsivenessBreakPoint) {
-      margin: 0;
+    & > .si__icon {
+      grid-area: siIcon;
     }
 
-    @media (min-width: $responsivenessBreakPoint) {
-      margin-left: 1rem;
+    & > .si__close,
+    & > .si__icon {
+      @include fixed-square(1.5rem);
     }
 
-    @include fixed-square(2rem);
+    & > .si__carret,
+    & > .si__close {
+      grid-area: siButton;
+      cursor: pointer;
+    }
   }
+  //OLD
+  .slide-in {
+    justify-content: center;
+    align-items: center;
 
-  & > .si__smalltext,
-  & > .si__text {
+    &.visible {
+      max-height: 100%; //Fallback in case the browser does not support vh
+      max-height: 100vh;
+    }
+
     @media (max-width: $responsivenessBreakPoint) {
-      margin: 0;
+      flex-direction: column;
+    }
+
+    & > .si__title {
+      grid-area: siTitle;
+      font-size: $smallFontSize;
       text-align: center;
+
+      a {
+        color: white;
+        text-decoration: underline;
+      }
     }
 
-    overflow-y: auto;
-
-    @media (min-width: $responsivenessBreakPoint) {
-      margin-left: 0.5rem;
-      margin-right: 1rem;
+    & > .si__text {
+      grid-area: siText;
+      font-size: $smallFontSize;
+      overflow-y: auto;
       text-align: left;
+
+      a {
+        color: white;
+        text-decoration: underline;
+      }
+
+      ul {
+        padding: 0.5rem 1rem;
+      }
     }
 
-    a {
-      color: white;
-      text-decoration: underline;
+    & > .si__button {
+      grid-area: siButton;
+      @include won-button--outlined(white);
+      font-size: $smallFontSize;
     }
 
-    ul {
-      padding: 1rem;
+    & > .si__bottomButton {
+      grid-area: siBottomButton;
+      @include won-button--outlined(white);
+      font-size: $smallFontSize;
     }
-  }
-
-  & > .si__smalltext {
-    font-size: $smallFontSize;
-  }
-
-  & > .si__smallbutton,
-  & > .si__button {
-    @media (max-width: $responsivenessBreakPoint) {
-      margin: 0.5rem 0 0 0;
-    }
-
-    @media (min-width: $responsivenessBreakPoint) {
-      margin-left: 1.3rem;
-      margin-right: 1rem;
-    }
-
-    @include won-button--outlined(white);
-  }
-
-  > img {
-    // height: 2rem;
-    max-height: 2rem;
-  }
-
-  & > .si__smallbutton {
-    font-size: $smallFontSize;
   }
 }

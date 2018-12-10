@@ -333,6 +333,10 @@ const actionHierarchy = {
 
     clearLoginError: INJ_DEFAULT,
     clearRegisterError: INJ_DEFAULT,
+
+    showAnonymousSlideIn: INJ_DEFAULT,
+    hideAnonymousSlideIn: INJ_DEFAULT,
+    expandAnonymousSlideIn: INJ_DEFAULT,
   },
 
   toasts: {
