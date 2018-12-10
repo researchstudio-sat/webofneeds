@@ -285,6 +285,7 @@ export function accountRegister(credentials) {
  * @returns {Function}
  */
 export function accountTransfer(credentials) {
+  //FIXME: accountTransfer only works if we have the full privateId which we might not have anymore after the refactoring
   return (dispatch, getState) =>
     transferPrivateAccount(credentials)
       .then(() => {
