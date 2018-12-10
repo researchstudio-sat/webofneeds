@@ -43,8 +43,10 @@ import org.apache.jena.sparql.algebra.OpAsQuery;
 import org.apache.jena.sparql.algebra.op.OpBGP;
 import org.apache.jena.sparql.algebra.op.OpDistinct;
 import org.apache.jena.sparql.algebra.op.OpFilter;
+import org.apache.jena.sparql.algebra.op.OpJoin;
 import org.apache.jena.sparql.algebra.op.OpPath;
 import org.apache.jena.sparql.algebra.op.OpProject;
+import org.apache.jena.sparql.algebra.op.OpTriple;
 import org.apache.jena.sparql.algebra.op.OpUnion;
 import org.apache.jena.sparql.core.BasicPattern;
 import org.apache.jena.sparql.core.TriplePath;
@@ -65,6 +67,7 @@ import org.apache.jena.sparql.path.P_NegPropSet;
 import org.apache.jena.sparql.path.P_Seq;
 import org.apache.jena.sparql.path.P_ZeroOrOne;
 import org.apache.jena.sparql.path.Path;
+import org.apache.jena.vocabulary.RDF;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -220,6 +223,17 @@ public class SparqlMatcherActor extends UntypedActor {
                 resultName,
                 searchPath,
                 textSearchTarget));
+        
+        Op mainOp = OpJoin.create(
+                new OpTriple(
+                        new Triple(
+                                resultName,
+                                RDF.type.asNode(),
+                                WON.NEED.asNode()
+                        )
+                ),
+                pathOp
+        );
 
         Expr filterExpression = Arrays.stream(searchString.toLowerCase().split(" "))
                 .<Expr>map(searchPart ->
@@ -236,7 +250,7 @@ public class SparqlMatcherActor extends UntypedActor {
                 new ExprList(
                         filterExpression
                 ),
-                pathOp
+                mainOp
         );
     }
 
