@@ -1,7 +1,16 @@
 Hi there,
-as requested, I sent you your privateId-link:
 
+You are receiving this email because someone, maybe you, requested a login link for an anonymous account on $serviceName using this email address. If that wasn't you, you can safely ignore this email.
+
+Here is the login link:
 $anonymousLinkUrl
 
-Best Wishes,
-Owner application team
+Please note:
+Your anonymous account is not connected to this email address in our service. Therefore, we cannot send you email notifications when others want to connect with you. 
+Remember to log back in from time to time using the link above to check if there are news for you. 
+
+You may want to link your anonymous account to your email address, which you can do when you sign up.
+
+Best wishes, 
+
+The team at $serviceName

@@ -45,8 +45,8 @@ public class WonOwnerMailSender {
     private static final String SUBJECT_SYSTEM_CLOSE = "Conversation closed by system";
     private static final String SUBJECT_NEED_MESSAGE = "Notification from WoN node";
     private static final String SUBJECT_SYSTEM_DEACTIVATE = "Posting deactivated by system";
-    private static final String SUBJECT_VERIFICATION = "Please Verify your E-Mail Address";
-    private static final String SUBJECT_ANONYMOUSLINK = "Anonymous Link";
+    private static final String SUBJECT_VERIFICATION = "Please verify your email address";
+    private static final String SUBJECT_ANONYMOUSLINK = "Anonymous login link";
 
     private WonMailSender wonMailSender;
     
@@ -151,9 +151,7 @@ public class WonOwnerMailSender {
         velocityContext.put("verificationLinkUrl", verificationLinkUrl);
         velocityContext.put("expirationDate", verificationToken.getExpiryDate());
         velocityContext.put("gracePeriodInHours", User.GRACEPERIOD_INHOURS);
-        if (this.ownerWebappUri != null) {
-            velocityContext.put("serviceName", this.ownerWebappUri);
-        }
+        velocityContext.put("serviceName", this.ownerWebappUri);
 
         return velocityContext;
     }
@@ -167,7 +165,8 @@ public class WonOwnerMailSender {
 
         String anonymousLinkUrl = ownerAppLink + OWNER_ANONYMOUS_LINK + privateId;
         velocityContext.put("anonymousLinkUrl", anonymousLinkUrl);
-
+        velocityContext.put("serviceName", this.ownerWebappUri);
+        
         return velocityContext;
     }
     
