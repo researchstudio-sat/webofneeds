@@ -33,17 +33,10 @@ export const resetParams = Object.freeze({
   useCase: undefined,
   useCaseGroup: undefined,
   token: undefined,
-  // privateId: undefined,  // global parameter that we don't want to lose. never reset this one.
+  privateId: undefined,
 });
 
 export const resetParamsImm = Immutable.fromJS(resetParams);
-
-/**
- * These should not accidentally be removed from the state. See the `stateGo*`-action creators
- * in `actions.js`
- * @type {string[]}
- */
-export const constantParams = ["privateId"];
 
 /**
  * Default Route
@@ -73,16 +66,16 @@ export const configRouting = [
     });
 
     [
-      { path: "/about?privateId?aboutSection", component: "about" },
-      { path: "/signup?privateId", component: "signup" },
-      { path: "/settings?privateId", component: "settings" },
+      { path: "/about?aboutSection", component: "about" },
+      { path: "/signup", component: "signup" },
+      { path: "/settings", component: "settings" },
       {
         path:
           "/connections?privateId?postUri?connectionUri?useCase?useCaseGroup?token",
         component: "connections",
         as: "connections",
       },
-      { path: "/post/?privateId?postUri", component: "post", as: "post" },
+      { path: "/post/?postUri", component: "post", as: "post" },
     ].forEach(({ path, component, as }) => {
       const cmlComponent = hyphen2Camel(component);
 
@@ -280,7 +273,7 @@ function reactToPrivateIdChanges(
 
   // v--- do any login-actions only when privateId is added after initialPageLoad. The latter should handle any necessary logins itself.
   if (!state.getIn(["process", "processingInitialLoad"])) {
-    if (fromPrivateId !== toPrivateId) {
+    if (toPrivateId && fromPrivateId !== toPrivateId) {
       // privateId has changed or was added
       const credentials = { privateId: toPrivateId };
       const options = { doRedirects: false };
@@ -300,7 +293,7 @@ function reactToPrivateIdChanges(
 export function addConstParams(params, paramsInState) {
   const paramsInStateImm = Immutable.fromJS(paramsInState); // ensure that they're immutable
   const currentConstParams = Immutable.Map(
-    constantParams.map(p => [p, paramsInStateImm.get(p)]) // [ [ paramName, paramValue] ]
+    [].map(p => [p, paramsInStateImm.get(p)]) // [ [ paramName, paramValue] ]
   );
   return currentConstParams.merge(params).toJS();
 }
