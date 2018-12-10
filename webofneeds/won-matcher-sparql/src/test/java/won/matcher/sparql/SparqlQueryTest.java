@@ -4,10 +4,15 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.graph.Triple;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.query.Query;
@@ -21,14 +26,36 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.sparql.algebra.Algebra;
 import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.algebra.OpAsQuery;
+import org.apache.jena.sparql.algebra.op.OpFilter;
+import org.apache.jena.sparql.algebra.op.OpJoin;
+import org.apache.jena.sparql.algebra.op.OpPath;
+import org.apache.jena.sparql.algebra.op.OpTriple;
+import org.apache.jena.sparql.core.TriplePath;
 import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.expr.E_LogicalOr;
+import org.apache.jena.sparql.expr.E_StrContains;
+import org.apache.jena.sparql.expr.E_StrLowerCase;
+import org.apache.jena.sparql.expr.Expr;
+import org.apache.jena.sparql.expr.ExprList;
+import org.apache.jena.sparql.expr.ExprVar;
+import org.apache.jena.sparql.expr.nodevalue.NodeValueBoolean;
+import org.apache.jena.sparql.expr.nodevalue.NodeValueString;
+import org.apache.jena.sparql.path.P_Alt;
+import org.apache.jena.sparql.path.P_Link;
+import org.apache.jena.sparql.path.P_NegPropSet;
+import org.apache.jena.sparql.path.P_Seq;
+import org.apache.jena.sparql.path.P_ZeroOrOne;
+import org.apache.jena.sparql.path.Path;
 import org.apache.jena.tdb.TDB;
+import org.apache.jena.vocabulary.RDF;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.springframework.data.mongodb.core.aggregation.BucketAutoOperation.ExpressionBucketAutoOperationBuilder;
 
 import won.matcher.sparql.actor.SparqlMatcherActor;
 import won.matcher.sparql.actor.SparqlMatcherUtils;
+import won.protocol.vocabulary.WON;
 
 /**
  * Test for experimenting with in-memory datasets and queries.
@@ -56,7 +83,7 @@ public class SparqlQueryTest  {
     }
     
     @Test
-    //@Ignore // useful for trying things out, does not make so much sense as a unit test
+    @Ignore // useful for trying things out, does not make so much sense as a unit test
     public void testQuery() throws Exception {
         Dataset dataset = DatasetFactory.create();
         RDFDataMgr.read(dataset, getResourceAsStream("sparqlquerytest/need2.trig"), Lang.TRIG);
@@ -146,4 +173,42 @@ public class SparqlQueryTest  {
         Op actualOp = SparqlMatcherUtils.removeServiceOp(queryOp, Optional.of("http://example.com/some-other-uri"));
         Assert.assertEquals("Adding graph op to query did not yield expected result", expectedOp, actualOp);
     }
+    
+    /**
+     * Test that reads a query from a file and repeatedly runs noHintForCounterpartQuery and hintForCounterpartQuery from
+     * SparqlMatcherUtils, checking that the desired result is obtained each time, i.e., the methods have no side effects. 
+     */
+    @Test
+    public void testAddRequiredFlag_NoHintForCounterpart_Nosideeffects() throws Exception {
+        String queryString = getResourceAsString("sparqlquerytest/query-searchstring.rq");
+        String queryStringHintForCounterpartExpected = getResourceAsString("sparqlquerytest/query-searchstring-hintForCounterpart-expected.rq");
+        String queryStringNoHintForCounterpartExpected = getResourceAsString("sparqlquerytest/query-searchstring-noHintForCounterpart-expected.rq");
+        
+        Var resultName = Var.alloc("result");
+        
+        Query query = QueryFactory.create(queryString);
+        Op queryOp = Algebra.compile(query);
+        
+        Op actualOp = SparqlMatcherUtils.noHintForCounterpartQuery(queryOp, resultName, 30);
+        Query expected = QueryFactory.create(queryStringNoHintForCounterpartExpected);
+        Op expectedOp = Algebra.compile(expected);
+        Assert.assertEquals(OpAsQuery.asQuery(expectedOp).toString(), OpAsQuery.asQuery(actualOp).toString());
+        
+        actualOp = SparqlMatcherUtils.hintForCounterpartQuery(queryOp, resultName, 30);
+        expected = QueryFactory.create(queryStringHintForCounterpartExpected);
+        expectedOp = Algebra.compile(expected);
+        Assert.assertEquals(OpAsQuery.asQuery(expectedOp).toString(), OpAsQuery.asQuery(actualOp).toString());
+        
+        actualOp = SparqlMatcherUtils.noHintForCounterpartQuery(queryOp, resultName, 30);
+        expected = QueryFactory.create(queryStringNoHintForCounterpartExpected);
+        expectedOp = Algebra.compile(expected);
+        Assert.assertEquals(OpAsQuery.asQuery(expectedOp).toString(), OpAsQuery.asQuery(actualOp).toString());
+        
+        actualOp = SparqlMatcherUtils.hintForCounterpartQuery(queryOp, resultName, 30);
+        expected = QueryFactory.create(queryStringHintForCounterpartExpected);
+        expectedOp = Algebra.compile(expected);
+        Assert.assertEquals(OpAsQuery.asQuery(expectedOp).toString(), OpAsQuery.asQuery(actualOp).toString());
+        
+    }
+  
 }

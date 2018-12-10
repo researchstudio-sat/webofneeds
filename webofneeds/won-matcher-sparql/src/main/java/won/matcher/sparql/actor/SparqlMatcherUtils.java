@@ -52,7 +52,7 @@ public class SparqlMatcherUtils {
     public static Op addGraphOp(Op queryOp, Optional<String> graphVarName) {
         Random rnd = new Random();
         String graphVariable = graphVarName.orElse(new String("graph" + Long.toHexString(rnd.nextLong())));
-        Op queryWithGraphClause = Transformer.transform(new TransformCopy() {
+        Op queryWithGraphClause = Transformer.transform(new TransformCopy(true) {
             @Override
             public Op transform(OpProject opProject, Op subOp) {
                 if (graphVariable.startsWith("?")) {
@@ -80,7 +80,7 @@ public class SparqlMatcherUtils {
         // first, copy the whole op so we don't change the specified one
         // Op queryCopy = Transformer.transform(new TransformCopy(),queryOp);
         // now transform
-        return Transformer.transform(new TransformCopy() {
+        return Transformer.transform(new TransformCopy(true) {
 
             @Override
             public Op transform(OpJoin opJoin, Op left, Op right) {
@@ -152,7 +152,7 @@ public class SparqlMatcherUtils {
         if (!topLevelProject.isPresent()) {
             return q;
         }
-        return Transformer.transform(new TransformCopy() {
+        return Transformer.transform(new TransformCopy(true) {
             public Op transform(OpProject op, Op subOp) {
                 if (op == topLevelProject.get()) {
                     //only transform the toplevel projection
@@ -186,7 +186,7 @@ public class SparqlMatcherUtils {
         if (!topLevelProject.isPresent()) {
             return q;
         }
-        return Transformer.transform(new TransformCopy() {
+        return Transformer.transform(new TransformCopy(true) {
             public Op transform(OpProject op, Op subOp) {
                 if (op == topLevelProject.get()) {
                     //only transform the toplevel projection
