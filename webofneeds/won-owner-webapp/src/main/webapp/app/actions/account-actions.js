@@ -19,11 +19,7 @@ import {
   generatePrivateId,
   checkLoginStatus,
 } from "../won-utils.js";
-import {
-  clearPrivateId,
-  savePrivateId,
-  setDisclaimerAccepted,
-} from "../won-localstorage.js";
+import { setDisclaimerAccepted } from "../won-localstorage.js";
 import { stateGoCurrent } from "./cstm-router-actions.js";
 import { checkAccessToCurrentRoute } from "../configRouting.js";
 
@@ -203,11 +199,6 @@ export function accountLogin(credentials, options) {
       )
       .then(() => {
         _loginInProcessFor = undefined;
-      })
-      .then(() => {
-        if (credentials.privateId) {
-          savePrivateId(credentials.privateId);
-        }
       });
   };
 }
@@ -219,9 +210,7 @@ let _logoutInProcess;
  * @returns {Function}
  */
 export function accountLogout() {
-  clearPrivateId();
-
-  return (dispatch, getState) => {
+  (dispatch, getState) => {
     const state = getState();
 
     if (state.getIn(["process", "processingLogout"]) || _logoutInProcess) {
