@@ -14,6 +14,7 @@ const initialState = Immutable.fromJS({
   processingAcceptTermsOfService: false,
   processingVerifyEmailAddress: false,
   processingResendVerificationEmail: false,
+  processingSendAnonymousLinkEmail: false,
 });
 
 export default function(processState = initialState, action = {}) {
@@ -78,6 +79,13 @@ export default function(processState = initialState, action = {}) {
         return processState.set("processingInitialLoad", !initialLoadFinished);
       }
     }
+
+    case actionTypes.account.sendAnonymousLinkEmailStarted:
+      return processState.set("processingSendAnonymousLinkEmail", true);
+
+    case actionTypes.account.sendAnonymousLinkEmailFailed:
+    case actionTypes.account.sendAnonymousLinkEmailSuccess:
+      return processState.set("processingSendAnonymousLinkEmail", false);
 
     default:
       return processState;

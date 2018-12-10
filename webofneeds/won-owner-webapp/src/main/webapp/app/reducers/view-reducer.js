@@ -13,6 +13,14 @@ const initialState = Immutable.fromJS({
   selectedAddMessageContent: undefined,
   showModalDialog: false,
   modalDialog: undefined,
+  anonymousSlideIn: {
+    visible: false,
+    expanded: false,
+    showEmailInput: false,
+
+    linkSent: false,
+    linkCopied: false,
+  },
 });
 
 export default function(viewState = initialState, action = {}) {
@@ -68,6 +76,39 @@ export default function(viewState = initialState, action = {}) {
       return viewState
         .set("showModalDialog", false)
         .set("modalDialog", undefined);
+
+    case actionTypes.view.anonymousSlideIn.hide:
+      return viewState
+        .setIn(["anonymousSlideIn", "visible"], false)
+        .setIn(["anonymousSlideIn", "expanded"], false)
+        .setIn(["anonymousSlideIn", "linkSent"], false)
+        .setIn(["anonymousSlideIn", "linkCopied"], false)
+        .setIn(["anonymousSlideIn", "showEmailInput"], false);
+
+    case actionTypes.view.anonymousSlideIn.expand:
+      return viewState
+        .setIn(["anonymousSlideIn", "visible"], true)
+        .setIn(["anonymousSlideIn", "expanded"], true)
+        .setIn(["anonymousSlideIn", "showEmailInput"], false);
+
+    case actionTypes.view.anonymousSlideIn.collapse:
+      return viewState
+        .setIn(["anonymousSlideIn", "visible"], true)
+        .setIn(["anonymousSlideIn", "expanded"], false)
+        .setIn(["anonymousSlideIn", "showEmailInput"], false);
+
+    case actionTypes.view.anonymousSlideIn.showEmailInput:
+      return viewState.setIn(["anonymousSlideIn", "showEmailInput"], true);
+
+    case actionTypes.account.sendAnonymousLinkEmailSuccess:
+      return viewState
+        .setIn(["anonymousSlideIn", "linkSent"], true)
+        .setIn(["anonymousSlideIn", "linkCopied"], false);
+
+    case actionTypes.account.copiedAnonymousLinkSuccess:
+      return viewState
+        .setIn(["anonymousSlideIn", "linkCopied"], true)
+        .setIn(["anonymousSlideIn", "linkSent"], false);
 
     default:
       return viewState;

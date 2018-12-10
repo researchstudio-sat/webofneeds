@@ -3,19 +3,20 @@
 @import "collapsible";
 @import "responsiveness-utils";
 
-.slide-in {
+@mixin slide-in() {
+  grid-column: 2;
   @extend .collapsible;
 
-  color: white;
-
-  background: black; //Fallback in case the browser does not support css variables
-  background: $won-secondary-color;
-
-  padding: 1rem;
-
-  display: flex;
   justify-content: center;
   align-items: center;
+
+  color: white;
+  padding: 0.5rem;
+
+  display: grid;
+  grid-gap: 0.5rem;
+
+  grid-template-areas: "siIcon siTitle siButton";
 
   box-sizing: border-box;
 
@@ -24,76 +25,157 @@
     max-height: 100vh;
   }
 
-  @media (max-width: $responsivenessBreakPoint) {
-    flex-direction: column;
+  & > .si__icon {
+    grid-area: siIcon;
   }
 
+  & > .si__carret,
+  & > .si__close,
+  & > .si__icon {
+    @include fixed-square(1.5rem);
+    --local-primary: white;
+  }
+
+  & > .si__carret,
+  & > .si__close,
+  & > .hspinner {
+    grid-area: siButton;
+  }
+
+  & > .si__carret,
   & > .si__close {
     cursor: pointer;
   }
 
-  & > .si__close,
-  & > .si__icon {
-    @media (max-width: $responsivenessBreakPoint) {
-      margin: 0;
-    }
-
-    @media (min-width: $responsivenessBreakPoint) {
-      margin-left: 1rem;
-    }
-
-    @include fixed-square(2rem);
-  }
-
-  & > .si__smalltext,
-  & > .si__text {
-    @media (max-width: $responsivenessBreakPoint) {
-      margin: 0;
-      text-align: center;
-    }
-
-    overflow-y: auto;
-
-    @media (min-width: $responsivenessBreakPoint) {
-      margin-left: 0.5rem;
-      margin-right: 1rem;
-      text-align: left;
-    }
+  & > .si__title {
+    grid-area: siTitle;
+    font-size: $smallFontSize;
+    text-align: center;
 
     a {
       color: white;
       text-decoration: underline;
     }
-
-    ul {
-      padding: 1rem;
-    }
   }
 
-  & > .si__smalltext {
-    font-size: $smallFontSize;
-  }
-
-  & > .si__smallbutton,
   & > .si__button {
-    @media (max-width: $responsivenessBreakPoint) {
-      margin: 0.5rem 0 0 0;
-    }
-
-    @media (min-width: $responsivenessBreakPoint) {
-      margin-left: 1.3rem;
-      margin-right: 1rem;
-    }
-
+    grid-area: siButton;
     @include won-button--outlined(white);
-  }
-
-  > img {
-    // height: 2rem;
-    max-height: 2rem;
-  }
-
-  & > .si__smallbutton {
     font-size: $smallFontSize;
+  }
+}
+
+won-slide-in {
+  & > input.si__anonymousLink {
+    //So the copy to clipboard function works but the input field is still "hidden"
+    height: 0;
+    max-height: 0;
+    position: absolute;
+    width: 0;
+    z-index: -1;
+  }
+
+  display: grid;
+  grid-template-columns: 1fr minmax(min-content, $maxContentWidth) 1fr;
+
+  background: black; //Fallback in case the browser does not support css variables
+  background: $won-secondary-color;
+
+  .si__anonymoussuccess,
+  .si__connectionlost,
+  .si__emailverification,
+  .si__termsofservice {
+    @include slide-in();
+  }
+  .si__disclaimer {
+    @include slide-in();
+
+    grid-template-areas:
+      "siIcon siTitle siButton"
+      "siText siText siText"
+      "siBottomButton siBottomButton siBottomButton";
+
+    & > .si__bottomButton {
+      grid-area: siBottomButton;
+      @include won-button--outlined(white);
+      font-size: $smallFontSize;
+    }
+
+    & > .si__text {
+      grid-area: siText;
+      font-size: $smallFontSize;
+      overflow-y: auto;
+      text-align: left;
+
+      a {
+        color: white;
+        text-decoration: underline;
+      }
+
+      ul {
+        padding: 0.5rem 1rem;
+      }
+    }
+  }
+
+  .si__anonymous {
+    @include slide-in();
+
+    & > .si__title {
+      min-width: 18rem;
+    }
+
+    &--expanded {
+      grid-template-areas:
+        "siIcon siTitle siTitle siButton"
+        "siText siText siText siText"
+        "siButtonLeft siButtonLeft siButtonRight siButtonRight";
+
+      & > .si__buttonCopy,
+      & > .si__buttonEmail {
+        @include won-button--outlined(white);
+        font-size: $smallFontSize;
+      }
+
+      & > .si__buttonCopy {
+        grid-area: siButtonLeft;
+      }
+
+      & > .si__buttonEmail {
+        grid-area: siButtonRight;
+      }
+
+      & > .si__text {
+        grid-area: siText;
+        font-size: $smallFontSize;
+        overflow-y: auto;
+        text-align: center;
+      }
+
+      &.si__anonymous--emailInput {
+        grid-template-areas:
+          "siIcon siTitle siTitle siButton"
+          "siText siText siText siText"
+          "siButtonLeft siButtonLeft siButtonRight siButtonRight"
+          "siEmailInput siEmailInput siEmailInput siEmailInput"
+          "siButtonSend siButtonSend siButtonSend siButtonSend";
+
+        & > .hspinner {
+          grid-area: siButtonSend;
+          margin: 0 auto;
+        }
+
+        & > .si__buttonSend {
+          grid-area: siButtonSend;
+          @include won-button--outlined(white);
+          font-size: $smallFontSize;
+        }
+
+        & > .si__emailInput {
+          grid-area: siEmailInput;
+          font-size: $smallFontSize;
+        }
+      }
+    }
   }
 }

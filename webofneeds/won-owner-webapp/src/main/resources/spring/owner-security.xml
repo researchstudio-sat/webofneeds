@@ -53,6 +53,7 @@
         <intercept-url pattern="/rest/users/signin" access="permitAll()"/>
         <intercept-url pattern="/rest/users/confirmRegistration" access="permitAll()"/>
         <intercept-url pattern="/rest/users/resendVerificationEmail" access="permitAll()"/>
+        <intercept-url pattern="/rest/users/sendAnonymousLinkEmail" access="isAuthenticated()"/>
         <intercept-url pattern="/rest/users/email" access="isAuthenticated()"/>
         <intercept-url pattern="/rest/users/settings" access="isAuthenticated()"/>
         <intercept-url pattern="/rest/users/acceptTermsOfService" access="isAuthenticated()"/>

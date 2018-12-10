@@ -8,10 +8,9 @@ import org.springframework.http.HttpStatus;
 public enum RestStatusResponse {
     USER_CREATED(1200, "User created", HttpStatus.CREATED),
     USER_TRANSFERRED(1201, "User Transfered", HttpStatus.CREATED),
-
-
-
     USER_SIGNED_OUT(1202, "User signed out", HttpStatus.OK),
+    USER_ANONYMOUSLINK_SENT(1203, "Anonymous Link sent successfully", HttpStatus.OK),
+
     USER_NOT_FOUND(1400, "User not found", HttpStatus.NOT_FOUND),
     USER_NOT_SIGNED_IN(1401, "User not signed in", HttpStatus.UNAUTHORIZED),
     USER_BAD_CREDENTIALS(1402, "No such username/password combination registered", HttpStatus.FORBIDDEN),

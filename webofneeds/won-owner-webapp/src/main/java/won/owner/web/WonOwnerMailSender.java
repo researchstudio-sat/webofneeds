@@ -36,6 +36,8 @@ public class WonOwnerMailSender {
 
     private static final String OWNER_VERIFICATION_LINK = "/#!/connections?token=";
 
+    private static final String OWNER_ANONYMOUS_LINK = "/#!/connections?privateId=";
+
     private static final String SUBJECT_CONVERSATION_MESSAGE = "New message";
     private static final String SUBJECT_CONNECT = "New conversation request";
     private static final String SUBJECT_MATCH = "New match";
@@ -43,7 +45,8 @@ public class WonOwnerMailSender {
     private static final String SUBJECT_SYSTEM_CLOSE = "Conversation closed by system";
     private static final String SUBJECT_NEED_MESSAGE = "Notification from WoN node";
     private static final String SUBJECT_SYSTEM_DEACTIVATE = "Posting deactivated by system";
-    private static final String SUBJECT_VERIFICATION = "Please Verify your E-Mail Address";
+    private static final String SUBJECT_VERIFICATION = "Please verify your email address";
+    private static final String SUBJECT_ANONYMOUSLINK = "Anonymous login link";
 
     private WonMailSender wonMailSender;
     
@@ -65,6 +68,7 @@ public class WonOwnerMailSender {
     private Template needMessageNotificationTemplate;
     private Template systemDeactivateNotificationTemplate;
     private Template verificationTemplate;
+    private Template anonymousTemplate;
 
     public WonOwnerMailSender() {
         velocityEngine = new VelocityEngine();
@@ -80,6 +84,7 @@ public class WonOwnerMailSender {
         needMessageNotificationTemplate = velocityEngine.getTemplate("mail-templates/needmessage-notification.vm");
         systemDeactivateNotificationTemplate = velocityEngine.getTemplate("mail-templates/system-deactivate-notification.vm");
         verificationTemplate = velocityEngine.getTemplate("mail-templates/verification.vm");
+        anonymousTemplate = velocityEngine.getTemplate("mail-templates/anonymous.vm");
     }
 
     public void setWonMailSender(WonMailSender wonMailSender) {
@@ -146,13 +151,25 @@ public class WonOwnerMailSender {
         velocityContext.put("verificationLinkUrl", verificationLinkUrl);
         velocityContext.put("expirationDate", verificationToken.getExpiryDate());
         velocityContext.put("gracePeriodInHours", User.GRACEPERIOD_INHOURS);
-        if (this.ownerWebappUri != null) {
-            velocityContext.put("serviceName", this.ownerWebappUri);
-        }
+        velocityContext.put("serviceName", this.ownerWebappUri);
 
         return velocityContext;
     }
 
+    private VelocityContext createAnonymousLinkContext(String privateId) {
+        String ownerAppLink = uriService.getOwnerProtocolOwnerURI().toString();
+        VelocityContext velocityContext = new VelocityContext();
+        EventCartridge ec = new EventCartridge();
+        ec.addEventHandler(new EscapeHtmlReference());
+        ec.attachToContext(velocityContext);
+
+        String anonymousLinkUrl = ownerAppLink + OWNER_ANONYMOUS_LINK + privateId;
+        velocityContext.put("anonymousLinkUrl", anonymousLinkUrl);
+        velocityContext.put("serviceName", this.ownerWebappUri);
+        
+        return velocityContext;
+    }
+    
     public void sendConversationNotificationMessage(String toEmail, String localNeed, String
             remoteNeed, String localConnection, String textMsg) {
 
@@ -229,6 +246,14 @@ public class WonOwnerMailSender {
         verificationTemplate.merge(context, writer);
         logger.debug("sending "+ SUBJECT_VERIFICATION + " to " + user.getEmail());
         this.wonMailSender.sendTextMessage(user.getEmail(), SUBJECT_VERIFICATION, writer.toString());
+    }
+
+    public void sendAnonymousLinkMessage(String email, String privateId) {
+        StringWriter writer = new StringWriter();
+        VelocityContext context = createAnonymousLinkContext(privateId);
+        anonymousTemplate.merge(context, writer);
+        logger.debug("sending " + SUBJECT_ANONYMOUSLINK + " to " + email);
+        this.wonMailSender.sendTextMessage(email, SUBJECT_ANONYMOUSLINK, writer.toString());        
     }
 
 /*

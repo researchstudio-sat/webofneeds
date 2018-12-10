@@ -1,6 +1,6 @@
 Hi there,
 
-You are receiving this email because someone created an account at $serviceName using this email address. If that wasn't you, you can safely ignore this email.
+You are receiving this email because someone, maybe you, created an account at $serviceName using this email address. If that wasn't you, you can safely ignore this email.
 
 In order to activate the account, please click the Link below now:
 $verificationLinkUrl
