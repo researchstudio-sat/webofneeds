@@ -191,7 +191,7 @@ export function registerAccount(credentials) {
     body: JSON.stringify({
       username: email,
       password: password,
-      privateIdUser: !!credentials.privateId,
+      privateId: credentials.privateId,
     }),
   };
   return fetch(url, httpOptions).then(checkHttpStatus);
