@@ -496,6 +496,7 @@ public class RestUserController {
         values.put("role", user.getRole());
         values.put("emailVerified", user.isEmailVerified());
         values.put("acceptedTermsOfService", user.isAcceptedTermsOfService());
+        values.put("isAnonymous", user.getUsername().endsWith("@matchat.org")); //FIXME: USE CORRECT ANONYMOUSUSER DISTINCTION REQUIRES AT LEAST PR #2567
 
         return new ResponseEntity<Map>(values, HttpStatus.OK);
     }
