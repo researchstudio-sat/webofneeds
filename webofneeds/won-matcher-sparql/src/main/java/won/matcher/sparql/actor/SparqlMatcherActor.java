@@ -6,10 +6,10 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.Spliterator;
@@ -59,7 +59,6 @@ import org.apache.jena.sparql.expr.ExprList;
 import org.apache.jena.sparql.expr.ExprVar;
 import org.apache.jena.sparql.expr.nodevalue.NodeValueBoolean;
 import org.apache.jena.sparql.expr.nodevalue.NodeValueString;
-import org.apache.jena.sparql.function.library.min;
 import org.apache.jena.sparql.path.P_Alt;
 import org.apache.jena.sparql.path.P_Link;
 import org.apache.jena.sparql.path.P_NegPropSet;
@@ -244,6 +243,15 @@ public class SparqlMatcherActor extends UntypedActor {
         );
     }
 
+    /**
+     * Produces hints for the need and possibly also 'inverse' hints. Inverse hints are hints sent to the needs 
+     * we find as matches for the original need.
+     * 
+     * The score is calculated as a function of scores provided by the embedded sparql queries: the range of those 
+     * scores is projected on a range of 0-1. For inverse matches, the score is always 100%, because there is 
+     * only one possible match - the original need. Note: this could be improved by remembering reported match scores 
+     * in the matcher and using historic scores for normalization, but that's a lot more work. 
+     */ 
     protected void processActiveNeedEvent(NeedEvent needEvent) throws IOException {
         
         NeedModelWrapper need = new NeedModelWrapper(needEvent.deserializeNeedDataset());
@@ -251,72 +259,92 @@ public class SparqlMatcherActor extends UntypedActor {
         
         List<ScoredNeed> matches = queryNeed(need);
         log.debug("found {} match candidates", matches.size());
-        Dataset needDataset = need.copyDataset();
+        
+        //produce hints after post-filtering the matches we found:
+        Collection<HintEvent> hintEvents = produceHints(need, matches.stream().filter(foundNeed -> postFilter(need, foundNeed.need)).collect(Collectors.toList()));
+        publishHintEvents(hintEvents, need.getNeedUri(), false);
+        //but use the whole list of matches for inverse matching
         
         final boolean noHintForCounterpart = need.hasFlag(WON.NO_HINT_FOR_COUNTERPART);
         
-        Map<NeedModelWrapper, List<ScoredNeed>> filteredNeeds = Stream.concat(
-                Stream.of(new AbstractMap.SimpleEntry<>(need, matches)),
-                //add the reverse match, if no flags forbid it
-                matches.stream().map(matchedNeed -> {
-                    boolean noHintForMe = matchedNeed.need.hasFlag(WON.NO_HINT_FOR_ME);
-                    if (!noHintForCounterpart && !noHintForMe && !need.getNeedUri().equals(matchedNeed.need.getNeedUri())) {
-                        // query for the matched need - but only in the dataset containing the original need. If we have a match, it means
-                        // that the matched need should also get a hint, otherwise it should not.
-                        if (log.isDebugEnabled()) {
-                            log.debug("checking if match {} of {} should get a hint by inverse matching it in need's dataset: \n{}", 
-                                    new Object[] {matchedNeed.need.getNeedUri(), need.getNeedUri(), RdfUtils.toString(needDataset) } );
-                        }
-                        List<ScoredNeed> matchForMatchedNeed = queryNeed(matchedNeed.need, Optional.of(new NeedModelWrapperAndDataset(need, needDataset)));
-                        if (log.isDebugEnabled()) {
-                            log.debug("match {} of {} is also getting a hint: {}", 
-                                    new Object[] {matchedNeed.need.getNeedUri(), need.getNeedUri(), matchForMatchedNeed.size() > 0});
-                        }
-                        return new AbstractMap.SimpleEntry<>(matchedNeed.need, matchForMatchedNeed);
-                    } else {
-                        // the flags in the original or in the matched need forbid a hint. don't add one.
-                        return new AbstractMap.SimpleEntry<>(matchedNeed.need, (List<ScoredNeed>) Collections.EMPTY_LIST);
-                    }
-                    
-                }))
-                .map(entry -> {
-                    List<ScoredNeed> filteredMatches = entry.getValue().stream().filter(f -> postFilter(entry.getKey(), f.need)).collect(Collectors.toList());
-                    return new AbstractMap.SimpleEntry<>(entry.getKey(), filteredMatches);
-                }).collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
-
+        if (!noHintForCounterpart) {
+            //we want do do inverse matching:
+            // 1. check if the inverse match is appropriate
+            // 2. do post-filtering
+            // 3. produce hints
+            // 4. collect all inverse hints and publish in one event
+            Dataset needDataset = need.copyDataset();
+            List<HintEvent> inverseHintEvents = 
+                    matches
+                        .stream()
+                        .filter(matchedNeed -> 
+                                    ! matchedNeed.need.hasFlag(WON.NO_HINT_FOR_ME) 
+                                    && !need.getNeedUri().equals(matchedNeed.need.getNeedUri()))
+                        .map( matchedNeed -> {
+                            // query for the matched need - but only in the dataset containing the original need. If we have a match, it means
+                            // that the matched need should also get a hint, otherwise it should not.
+                            if (log.isDebugEnabled()) {
+                                log.debug("checking if match {} of {} should get a hint by inverse matching it in need's dataset: \n{}", 
+                                        new Object[] {matchedNeed.need.getNeedUri(), need.getNeedUri(), RdfUtils.toString(needDataset) } );
+                            }
+                            List<ScoredNeed> matchesForMatchedNeed = queryNeed(matchedNeed.need, Optional.of(new NeedModelWrapperAndDataset(need, needDataset)));
+                            if (log.isDebugEnabled()) {
+                                log.debug("match {} of {} is also getting a hint: {}", 
+                                        new Object[] {matchedNeed.need.getNeedUri(), need.getNeedUri(), matchesForMatchedNeed.size() > 0});
+                            }
+                            return new AbstractMap.SimpleEntry<>(matchedNeed.need, matchesForMatchedNeed.stream().filter(inverseMatch -> postFilter(matchedNeed.need, inverseMatch.need)).collect(Collectors.toList()));
+                        })
+                        .map(entry -> produceHints(entry.getKey(), entry.getValue()))
+                        .flatMap(hints -> hints.stream())
+                        .collect(Collectors.toList());
+            //now that we've collected all inverse hints, publish them
+            publishHintEvents(inverseHintEvents, need.getNeedUri(), true);
+        }
+        log.debug("finished sparql-based matching for need {}", need.getNeedUri());        
+    }
+    
+    private Collection<HintEvent> produceHints(NeedModelWrapper need, List<ScoredNeed> matches) {
+        //find max score
+        Optional<Double> maxScore = matches.stream().map(n -> n.score).max((x, y) -> (int) Math.signum(x - y));
+        if (!maxScore.isPresent()) {
+            //this should not happen
+            return Collections.EMPTY_LIST;
+        }
+        //find min score
+        Optional<Double> minScore = matches.stream().map(n -> n.score).min((x, y) -> (int) Math.signum(x - y));
+        if (!maxScore.isPresent()) {
+            //this should not happen
+            return Collections.EMPTY_LIST;
+        }
+        double range = (maxScore.get() - minScore.get());
+        return matches
+                    .stream()
+                    .sorted((hint1, hint2) -> (int) Math.signum(hint2.score - hint1.score)) //sort descending
+                    .limit(config.getLimitResults())
+                    .map(hint -> {
+                        double score = range == 0 ? hint.score - minScore.get() : (hint.score - minScore.get()) / range; 
+                        return new HintEvent(
+                            need.getWonNodeUri(), 
+                            need.getNeedUri(), 
+                            hint.need.getWonNodeUri(), 
+                            hint.need.getNeedUri(), 
+                            config.getMatcherUri(), 
+                            score);
+                    })
+                    .collect(Collectors.toList());
+    }
+    
+    /**
+     * publishes the specified hint events.
+     * @param hintEvents the collection of HintEvent to publish 
+     * @param needURI used for logging
+     * @param inverse used for logging
+     */
+    private void publishHintEvents(Collection<HintEvent> hintEvents, String needURI, boolean inverse) {
         BulkHintEvent bulkHintEvent = new BulkHintEvent();
-        
-        Optional<Double> maxScore = filteredNeeds.values().stream().flatMap(value -> value.stream()).map(n -> n.score).max((x, y) -> (int) Math.signum(x - y));
-        if (!maxScore.isPresent()) {
-            //this should not happen
-            return;
-        }
-        Optional<Double> minScore = filteredNeeds.values().stream().flatMap(value -> value.stream()).map(n -> n.score).min((x, y) -> (int) Math.signum(x - y));
-        if (!maxScore.isPresent()) {
-            //this should not happen
-            return;
-        }
-        double range = (maxScore.get() - minScore.get());        
-        filteredNeeds.forEach((hintTarget, hints) -> {
-            hints
-            .stream()
-            .sorted((hint1, hint2) -> (int) Math.signum(hint2.score - hint1.score)) //sort descending
-            .limit(config.getLimitResults())
-            .forEach(hint -> {
-                double score = range == 0 ? hint.score - minScore.get() : (hint.score - minScore.get()) / range; 
-                bulkHintEvent.addHintEvent(
-                        new HintEvent(
-                                hintTarget.getWonNodeUri(), 
-                                hintTarget.getNeedUri(), 
-                                hint.need.getWonNodeUri(), 
-                                hint.need.getNeedUri(), 
-                                config.getMatcherUri(), 
-                                score));
-            });
-        });
-        
+        bulkHintEvent.addHintEvents(hintEvents);
         pubSubMediator.tell(new DistributedPubSubMediator.Publish(bulkHintEvent.getClass().getName(), bulkHintEvent), getSelf());
-        log.debug("finished sparql-based matching for need {} (found {} matches)", need.getNeedUri(), bulkHintEvent.getHintEvents().size());
+        log.debug("sparql-based " + (inverse ? "inverse " : "") + "matching for need {} (found {} matches)", needURI, bulkHintEvent.getHintEvents().size());
     }
 
     private Optional<Op> clientSuppliedQuery(String queryString) {

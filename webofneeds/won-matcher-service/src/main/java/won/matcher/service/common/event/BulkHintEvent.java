@@ -22,6 +22,10 @@ public class BulkHintEvent implements Serializable
   public void addHintEvent(HintEvent hintEvent) {
     hintEvents.add(hintEvent);
   }
+  
+  public void addHintEvents(Collection<HintEvent> hintEvents) {
+    this.hintEvents.addAll(hintEvents);
+  }
 
   public Collection<HintEvent> getHintEvents() {
     return Collections.unmodifiableCollection(hintEvents);
