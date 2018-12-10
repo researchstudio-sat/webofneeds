@@ -137,7 +137,7 @@ function genSlideInConf() {
                 <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
             </svg>
             <span class="si__title">
-                Anonymous-Account Warning!
+                Anonymous Account Warning!
             </span>
             <svg class="si__carret"
                 ng-click="self.view__anonymousSlideIn__expand()"
@@ -150,17 +150,27 @@ function genSlideInConf() {
                 <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
             </svg>
             <div class="si__text" ng-if="self.isAnonymousSlideInExpanded">
-              Save this link to keep the session:
+              You are using an 'anonymous account'. This means:
+              <ul>
+                <li>When <b>others want to connect</b> with you, <b>you don't see them</b> unless you are on this page</li>
+                <li>You will <b>lose your content</b> unless you remember the <b>login link</b></li>
+              </ul>
+              
+              Therefore, please:
+              <ul>
+                <li>Consider <b>signing up</b>! You will be able to keep the content you have already created.</li>
+                <li>Alternatively, save the <b>login link</b> or let us email it to you</li>
+              </ul>
             </div>
             <button class="si__buttonCopy"
                 ng-if="self.isAnonymousSlideInExpanded"
                 ng-click="self.copyLinkToClipboard()">
-                Copy link to clipboard
+                Copy login link to clipboard
             </button>
             <button class="si__buttonEmail"
                 ng-if="self.isAnonymousSlideInExpanded"
                 ng-click="self.view__anonymousSlideIn__showEmailInput()">
-                Email me this link
+                Email login link ...
             </button>
             <input class="si__emailInput"
               ng-if="self.isAnonymousSlideInExpanded && self.showAnonymousSlideInEmailInput"
