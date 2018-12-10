@@ -20,7 +20,6 @@
 "format es6" /* required to force babel to transpile this so the minifier is happy */;
 import { is, prefixOfUri, isArray, clone, createArray } from "../utils.js";
 import {
-  clearPrivateId,
   clearReadUris,
   clearClosedConnUris,
   getClosedConnUris,
@@ -42,7 +41,6 @@ let won = {};
 
 won.debugmode = false; //if you set this to true, the created needs will get flagged as debug needs in order to get matches and requests from the debugbot
 
-won.clearPrivateId = clearPrivateId;
 won.clearReadUris = clearReadUris;
 won.clearClosedConnUris = clearClosedConnUris;
 won.getClosedConnUris = getClosedConnUris;
