@@ -164,13 +164,13 @@ function genSlideInConf() {
             </button>
             <input class="si__emailInput"
               ng-if="self.isAnonymousSlideInExpanded && self.showAnonymousSlideInEmailInput"
-              type="text"
+              type="email"
               ng-model="self.anonymousEmail"
               placeholder="Type your email"/>
             <button class="si__buttonSend"
                 ng-if="!self.processingSendAnonymousLinkEmail && self.isAnonymousSlideInExpanded && self.showAnonymousSlideInEmailInput"
                 ng-click="self.account__sendAnonymousLinkEmail(self.anonymousEmail, self.privateId)"
-                ng-disabled="!self.isValidEmail(self.anonymousEmail)">
+                ng-disabled="!self.isValidEmail()">
                 Send link to this email
             </button>
             <svg class="hspinner" ng-if="self.processingSendAnonymousLinkEmail">
@@ -310,9 +310,12 @@ function genSlideInConf() {
       }
     }
 
-    isValidEmail(anonymousEmail) {
-      //TODO: IMPL THIS METHOD
-      return anonymousEmail && anonymousEmail.length > 0;
+    isValidEmail() {
+      return (
+        this.getEmailField().value &&
+        this.getEmailField().value.length > 0 &&
+        this.getEmailField().validationMessage === ""
+      ); //Simple Email Validation
     }
 
     getAnonymousLinkField() {
@@ -322,6 +325,13 @@ function genSlideInConf() {
         );
       }
       return this._anonymousLinkField;
+    }
+
+    getEmailField() {
+      if (!this._emailField) {
+        this._emailField = this.$element[0].querySelector(".si__emailInput");
+      }
+      return this._emailField;
     }
 
     verifyEmailAddress(verificationToken) {
