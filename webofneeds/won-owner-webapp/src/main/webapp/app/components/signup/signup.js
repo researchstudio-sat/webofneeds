@@ -3,7 +3,7 @@
  */
 import angular from "angular";
 import ngAnimate from "angular-animate";
-import { attach, getIn } from "../../utils.js";
+import { attach } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 
 import signupTitleBarModule from "../signup-title-bar.js";
@@ -27,13 +27,11 @@ class SignupController {
     Object.assign(this, srefUtils); // bind srefUtils to scope
 
     const select = state => {
-      const privateId = getIn(state, ["router", "currentParams", "privateId"]);
-
       return {
         loggedIn: state.getIn(["account", "loggedIn"]),
         registerError: state.getIn(["account", "registerError"]),
-        isPrivateIdUser: !!privateId,
-        privateId,
+        isAnonymous: state.getIn(["account", "isAnonymous"]),
+        privateId: state.getIn(["account", "privateId"]),
         showModalDialog: state.getIn(["view", "showModalDialog"]),
       };
     };
@@ -46,7 +44,7 @@ class SignupController {
       this.view__clearRegisterError();
     }
     if (event.keyCode == 13 && this.$scope.registerForm.$valid) {
-      if (this.isPrivateIdUser) {
+      if (this.isAnonymous) {
         this.account__transfer({
           email: this.email,
           password: this.password,
