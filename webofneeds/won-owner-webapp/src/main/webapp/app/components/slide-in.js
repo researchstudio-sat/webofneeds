@@ -137,7 +137,7 @@ function genSlideInConf() {
                 <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
             </svg>
             <span class="si__title">
-                Warning!
+                Anonymous-Account Warning!
             </span>
             <svg class="si__carret"
                 ng-click="self.view__anonymousSlideIn__expand()"
