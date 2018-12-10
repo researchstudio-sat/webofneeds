@@ -16,7 +16,7 @@ import "style/_slidein.scss";
 
 function genSlideInConf() {
   let template = `
-        <input type='text' class="si__anonymousLink" value="{{ self.anonymousLink }}" ng-if="!self.connectionHasBeenLost && self.loggedIn && self.privateId && !self.anonymousLinkSent && !self.anonymousLinkCopied && self.isAnonymousSlideInExpanded"/>
+        <input type='text' class="si__anonymousLink" value="{{ self.anonymousLink }}" ng-if="!self.connectionHasBeenLost && self.loggedIn && self.isAnonymous && !self.anonymousLinkSent && !self.anonymousLinkCopied && self.isAnonymousSlideInExpanded"/>
         <div class="si__connectionlost" ng-class="{'visible': self.connectionHasBeenLost}">
             <svg class="si__icon">
                 <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
@@ -229,17 +229,12 @@ function genSlideInConf() {
           "token",
         ]);
 
-        const privateId = getIn(state, [
-          "router",
-          "currentParams",
-          "privateId",
-        ]);
+        const privateId = getIn(state, ["account", "privateId"]);
 
-        const path = "#!/connections" + `?privateId=${this.privateId}`;
+        const path = "#!/connections" + `?privateId=${privateId}`;
         const anonymousLink = toAbsoluteURL(ownerBaseUrl).toString() + path;
 
         return {
-          privateId,
           verificationToken,
           acceptedDisclaimer: getIn(state, ["account", "acceptedDisclaimer"]),
           emailVerified: getIn(state, ["account", "emailVerified"]),
@@ -270,6 +265,7 @@ function genSlideInConf() {
           loggedIn: getIn(state, ["account", "loggedIn"]),
           email: getIn(state, ["account", "email"]),
           isAnonymous: getIn(state, ["account", "isAnonymous"]),
+          privateId,
           connectionHasBeenLost: getIn(state, ["messages", "lostConnection"]), // name chosen to avoid name-clash with the action-creator
           reconnecting: getIn(state, ["messages", "reconnecting"]),
           isAlreadyVerifiedError:
