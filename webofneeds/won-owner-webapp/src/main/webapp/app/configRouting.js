@@ -271,14 +271,12 @@ function reactToPrivateIdChanges(
     return Promise.resolve();
   }
 
-  // v--- do any login-actions only when privateId is added after initialPageLoad. The latter should handle any necessary logins itself.
-  if (!state.getIn(["process", "processingInitialLoad"])) {
-    if (toPrivateId && fromPrivateId !== toPrivateId) {
-      // privateId has changed or was added
-      const credentials = { privateId: toPrivateId };
-      const options = { doRedirects: false };
-      return accountLogin(credentials, options)(dispatch, getState);
-    }
+  //If there is a toPrivateId param and it is different than the old one we process a login for that privateId regardless
+  if (toPrivateId && fromPrivateId !== toPrivateId) {
+    // privateId has changed or was added
+    const credentials = { privateId: toPrivateId };
+    const options = { doRedirects: false };
+    return accountLogin(credentials, options)(dispatch, getState);
   }
 }
 
