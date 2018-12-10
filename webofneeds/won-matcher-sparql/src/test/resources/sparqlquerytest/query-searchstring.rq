@@ -1,0 +1,10 @@
+PREFIX won:<http://purl.org/webofneeds/model#> 
+SELECT DISTINCT  *
+WHERE
+  { SELECT  ?result
+    WHERE
+      { ?result a won:Need.
+        ?result ?prop ?textSearchTarget.
+        FILTER contains(lcase(?textSearchTarget), "wtf")
+      }
+  }

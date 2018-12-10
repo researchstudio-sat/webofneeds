@@ -1,0 +1,13 @@
+SELECT DISTINCT  *
+WHERE
+  { SELECT  ?result
+    WHERE
+      { ?result  <http://purl.org/webofneeds/model#hasFlag>  <http://purl.org/webofneeds/model#NoHintForCounterpart>
+        { ?result  a                     <http://purl.org/webofneeds/model#Need> ;
+                   ?prop                 ?textSearchTarget
+          FILTER contains(lcase(?textSearchTarget), "wtf")
+        }
+      }
+    OFFSET  0
+    LIMIT   30
+  }
