@@ -211,11 +211,8 @@ public class SparqlMatcherActor extends UntypedActor {
         negation.add(blankPath);
         P_Alt any = new P_Alt(blankPath, negation);
 
-        //TODO: REMOVE "http://purl.org/webofneeds/model#is"
-        P_Link isPath = new P_Link(NodeFactory.createURI("http://purl.org/webofneeds/model#is"));
-        P_Link seeksPath = new P_Link(NodeFactory.createURI("http://purl.org/webofneeds/model#seeks"));
-
-        Path searchPath = Collections.<Path>nCopies(5, new P_ZeroOrOne(any)).stream().reduce(new P_Alt(isPath, seeksPath), P_Seq::new);
+        //NOTE: removed is and seeks handling here
+        Path searchPath =  Collections.<Path>nCopies(5, new P_ZeroOrOne(any)).stream().reduce(new P_ZeroOrOne(any), P_Seq::new);
 
         Var textSearchTarget = Var.alloc("textSearchTarget");
 
