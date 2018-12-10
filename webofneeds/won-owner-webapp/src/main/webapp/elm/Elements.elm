@@ -1,45 +1,76 @@
-module Elements exposing (ButtonConfig, identicon, mainButton, outlinedButton)
+module Elements exposing (Button, identicon, mainButton, outlinedButton)
 
 import Element exposing (..)
+import Element.Background as Background
+import Element.Border as Border
 import Element.Events as Events
+import Element.Font as Font
+import Element.Input as Input
 import Html exposing (node)
 import Html.Attributes as HA
+import Skin exposing (Skin)
 
 
-type alias ButtonConfig msg =
-    { disabled : Bool
-    , text : String
-    , onClick : msg
+type alias Button msg =
+    { label : Element Never
+    , onPress : Maybe msg
     }
 
 
-mainButton : ButtonConfig msg -> Element msg
-mainButton { disabled, text, onClick } =
-    el [ Events.onClick onClick ] <|
-        html <|
-            Html.button
-                [ HA.classList
-                    [ ( "won-button--filled", True )
-                    , ( "red", True )
-                    ]
-                , HA.disabled disabled
-                ]
-                [ Html.text text ]
+mainButton : Skin -> List (Attribute msg) -> Button msg -> Element msg
+mainButton skin attr { label, onPress } =
+    case onPress of
+        Just handler ->
+            Input.button
+                ([ Background.color skin.primaryColor
+                 , Border.rounded 3
+                 , padding 8
+                 , Font.color Skin.white
+                 ]
+                    ++ attr
+                )
+                { onPress = Just handler
+                , label = Element.map never label
+                }
+
+        Nothing ->
+            Input.button
+                ([ Background.color (Skin.setAlpha 0.5 skin.primaryColor)
+                 , Border.rounded 3
+                 , padding 8
+                 , Font.color Skin.white
+                 ]
+                    ++ attr
+                )
+                { onPress = Nothing
+                , label = Element.map never label
+                }
 
 
-outlinedButton : ButtonConfig msg -> Element msg
-outlinedButton { disabled, text, onClick } =
-    el [ Events.onClick onClick ] <|
-        html <|
-            Html.button
-                [ HA.classList
-                    [ ( "won-button--outlined", True )
-                    , ( "thin", True )
-                    , ( "red", True )
-                    ]
-                , HA.disabled disabled
+outlinedButton : Skin -> Button msg -> Element msg
+outlinedButton skin { label, onPress } =
+    case onPress of
+        Just handler ->
+            Input.button
+                [ Border.color skin.primaryColor
+                , Border.rounded 3
+                , padding 8
+                , Font.color skin.primaryColor
                 ]
-                [ Html.text text ]
+                { onPress = Just handler
+                , label = Element.map never label
+                }
+
+        Nothing ->
+            Input.button
+                [ Border.color (Skin.setAlpha 0.5 skin.primaryColor)
+                , Border.rounded 3
+                , padding 8
+                , Font.color (Skin.setAlpha 0.5 skin.primaryColor)
+                ]
+                { onPress = Nothing
+                , label = Element.map never label
+                }
 
 
 identicon : List (Attribute msg) -> String -> Element msg

@@ -1,4 +1,11 @@
-module Settings.Personas exposing (main)
+module Settings.Personas exposing
+    ( Model
+    , Msg
+    , init
+    , subscriptions
+    , update
+    , view
+    )
 
 import Browser
 import Dict exposing (Dict)
@@ -19,15 +26,6 @@ import String.Extra as String
 import Time
 import Url
 import Validate exposing (Valid, Validator)
-
-
-main =
-    Skin.skinnedElement
-        { init = init
-        , update = update
-        , view = view
-        , subscriptions = subscriptions
-        }
 
 
 
@@ -237,58 +235,57 @@ subscriptions _ =
 ---- VIEW ----
 
 
-view : Skin -> Model -> Html Msg
+view : Skin -> Model -> Element Msg
 view skin { viewState, personas } =
-    layout [] <|
-        el
-            [ padding 20
-            , Font.size 16
-            , width <| maximum 600 fill
-            , centerX
-            ]
-        <|
-            case viewState of
-                Inactive ->
-                    column
-                        [ width fill
-                        , spacing 20
-                        ]
-                        [ createButton skin
-                        , listUnsaved skin personas
-                        , listPersonas
-                            { skin = skin
-                            , viewedUrl = Nothing
-                            , personas = personas
-                            }
-                        ]
+    el
+        [ padding 20
+        , Font.size 16
+        , width <| maximum 600 fill
+        , centerX
+        ]
+    <|
+        case viewState of
+            Inactive ->
+                column
+                    [ width fill
+                    , spacing 20
+                    ]
+                    [ createButton skin
+                    , listUnsaved skin personas
+                    , listPersonas
+                        { skin = skin
+                        , viewedUrl = Nothing
+                        , personas = personas
+                        }
+                    ]
 
-                Viewing url ->
-                    column
-                        [ width fill
-                        , spacing 20
-                        ]
-                        [ createButton skin
-                        , listUnsaved skin personas
-                        , listPersonas
-                            { skin = skin
-                            , viewedUrl = Just url
-                            , personas = personas
-                            }
-                        ]
+            Viewing url ->
+                column
+                    [ width fill
+                    , spacing 20
+                    ]
+                    [ createButton skin
+                    , listUnsaved skin personas
+                    , listPersonas
+                        { skin = skin
+                        , viewedUrl = Just url
+                        , personas = personas
+                        }
+                    ]
 
-                Creating draft ->
-                    column
-                        [ width fill
-                        , spacing 20
-                        ]
-                        [ createInterface skin draft
-                        , listUnsaved skin personas
-                        , listPersonas
-                            { skin = skin
-                            , viewedUrl = Nothing
-                            , personas = personas
-                            }
-                        ]
+            Creating draft ->
+                column
+                    [ width fill
+                    , spacing 20
+                    ]
+                    [ createInterface skin draft
+                    , listUnsaved skin personas
+                    , listPersonas
+                        { skin = skin
+                        , viewedUrl = Nothing
+                        , personas = personas
+                        }
+                    ]
 
 
 createButton : Skin -> Element Msg
@@ -372,14 +369,20 @@ createInterface skin draft =
                 , width fill
                 ]
                 [ Elements.mainButton
-                    { disabled = not isValid || draft == blankDraft
-                    , onClick = Save
-                    , text = "Save"
+                    skin
+                    []
+                    { onPress =
+                        if isValid then
+                            Just Save
+
+                        else
+                            Nothing
+                    , label = text "Save"
                     }
                 , Elements.outlinedButton
-                    { disabled = False
-                    , onClick = Cancel
-                    , text = "Cancel"
+                    skin
+                    { onPress = Just Cancel
+                    , label = text "Cancel"
                     }
                 ]
             ]
