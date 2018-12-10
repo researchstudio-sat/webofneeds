@@ -129,7 +129,7 @@ function genSlideInConf() {
         </div>
         <div class="si__anonymous"
             ng-class="{
-              'visible': !self.connectionHasBeenLost && self.loggedIn && self.privateId && !self.anonymousLinkSent && !self.anonymousLinkCopied,
+              'visible': !self.connectionHasBeenLost && self.isAnonymous && !self.anonymousLinkSent && !self.anonymousLinkCopied,
               'si__anonymous--expanded': self.isAnonymousSlideInExpanded,
               'si__anonymous--emailInput': self.showAnonymousSlideInEmailInput,
             }">
@@ -189,7 +189,7 @@ function genSlideInConf() {
         </div>
         <div class="si__anonymoussuccess"
             ng-class="{
-              'visible': !self.connectionHasBeenLost && self.loggedIn && (self.anonymousLinkSent || self.anonymousLinkCopied),
+              'visible': !self.connectionHasBeenLost && self.isAnonymous && (self.anonymousLinkSent || self.anonymousLinkCopied),
             }">
             <svg class="si__icon">
                 <use xlink:href="#ico16_indicator_info" href="#ico16_indicator_info"></use>
@@ -269,6 +269,7 @@ function genSlideInConf() {
           ]),
           loggedIn: getIn(state, ["account", "loggedIn"]),
           email: getIn(state, ["account", "email"]),
+          isAnonymous: getIn(state, ["account", "isAnonymous"]),
           connectionHasBeenLost: getIn(state, ["messages", "lostConnection"]), // name chosen to avoid name-clash with the action-creator
           reconnecting: getIn(state, ["messages", "reconnecting"]),
           isAlreadyVerifiedError:
