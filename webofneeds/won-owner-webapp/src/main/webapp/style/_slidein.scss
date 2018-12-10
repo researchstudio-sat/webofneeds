@@ -3,65 +3,92 @@
 @import "collapsible";
 @import "responsiveness-utils";
 
+@mixin slide-in() {
+  grid-column: 2;
+  @extend .collapsible;
+
+  justify-content: center;
+  align-items: center;
+
+  color: white;
+  padding: 0.5rem;
+
+  display: grid;
+  grid-gap: 0.5rem;
+
+  grid-template-areas: "siIcon siTitle siButton";
+
+  box-sizing: border-box;
+
+  &.visible {
+    max-height: 100%; //Fallback in case the browser does not support vh
+    max-height: 100vh;
+  }
+
+  & > .si__icon {
+    grid-area: siIcon;
+  }
+
+  & > .si__carret,
+  & > .si__close,
+  & > .si__icon {
+    @include fixed-square(1.5rem);
+    --local-primary: white;
+  }
+
+  & > .si__carret,
+  & > .si__close,
+  & > .hspinner {
+    grid-area: siButton;
+  }
+
+  & > .si__carret,
+  & > .si__close {
+    cursor: pointer;
+  }
+
+  & > .si__title {
+    grid-area: siTitle;
+    font-size: $smallFontSize;
+    text-align: center;
+
+    a {
+      color: white;
+      text-decoration: underline;
+    }
+  }
+
+  & > .si__button {
+    grid-area: siButton;
+    @include won-button--outlined(white);
+    font-size: $smallFontSize;
+  }
+}
+
 won-slide-in {
-  .slide-in {
-    @extend .collapsible;
-    margin-bottom: 0.5rem; //TODO: REMOVE THIS BEFORE COMMIT
+  display: grid;
+  grid-template-columns: 1fr minmax(min-content, $maxContentWidth) 1fr;
 
-    color: white;
-    background: black; //Fallback in case the browser does not support css variables
-    background: $won-secondary-color; //TODO: MAYBE MAKE BG-COLOR/COLOR BASED ON THE slide-in type
+  background: black; //Fallback in case the browser does not support css variables
+  background: $won-secondary-color; //TODO: MAYBE MAKE BG-COLOR/COLOR BASED ON THE slide-in type
 
-    padding: 0.5rem;
-
-    display: grid;
-    grid-gap: 0.5rem;
+  .si__connectionlost,
+  .si__emailverification,
+  .si__termsofservice {
+    @include slide-in();
+  }
+  .si__disclaimer {
+    @include slide-in();
 
     grid-template-areas:
       "siIcon siTitle siButton"
-      "siText siText siText"//FIXME: Doesnt work since we do not have that in every slide-in, and thus adds a gap on the bottom :-(
-      "siBottomButton siBottomButton siBottomButton"; //FIXME: Doesnt work since we do not have that in every slide-in, and thus adds a gap on the bottom :-(
+      "siText siText siText"
+      "siBottomButton siBottomButton siBottomButton";
 
-    box-sizing: border-box;
-
-    & > .si__icon {
-      grid-area: siIcon;
-    }
-
-    & > .si__close,
-    & > .si__icon {
-      @include fixed-square(1.5rem);
-    }
-
-    & > .si__carret,
-    & > .si__close {
-      grid-area: siButton;
-      cursor: pointer;
-    }
-  }
-  //OLD
-  .slide-in {
-    justify-content: center;
-    align-items: center;
-
-    &.visible {
-      max-height: 100%; //Fallback in case the browser does not support vh
-      max-height: 100vh;
-    }
-
-    @media (max-width: $responsivenessBreakPoint) {
-      flex-direction: column;
-    }
-
-    & > .si__title {
-      grid-area: siTitle;
+    & > .si__bottomButton {
+      grid-area: siBottomButton;
+      @include won-button--outlined(white);
       font-size: $smallFontSize;
-      text-align: center;
-
-      a {
-        color: white;
-        text-decoration: underline;
-      }
     }
 
     & > .si__text {
@@ -79,17 +106,9 @@ won-slide-in {
         padding: 0.5rem 1rem;
       }
     }
+  }
 
-    & > .si__button {
-      grid-area: siButton;
-      @include won-button--outlined(white);
-      font-size: $smallFontSize;
-    }
-
-    & > .si__bottomButton {
-      grid-area: siBottomButton;
-      @include won-button--outlined(white);
-      font-size: $smallFontSize;
-    }
+  .si__privateaccount {
+    @include slide-in();
   }
 }
