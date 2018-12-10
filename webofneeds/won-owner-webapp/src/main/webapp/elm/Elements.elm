@@ -24,7 +24,12 @@ mainButton skin attr { label, onPress } =
             Input.button
                 ([ Background.color skin.primaryColor
                  , Border.rounded 3
-                 , padding 8
+                 , paddingEach
+                    { top = 10
+                    , bottom = 10
+                    , left = 15
+                    , right = 15
+                    }
                  , Font.color Skin.white
                  ]
                     ++ attr
@@ -37,7 +42,12 @@ mainButton skin attr { label, onPress } =
             Input.button
                 ([ Background.color (Skin.setAlpha 0.5 skin.primaryColor)
                  , Border.rounded 3
-                 , padding 8
+                 , paddingEach
+                    { top = 10
+                    , bottom = 10
+                    , left = 15
+                    , right = 15
+                    }
                  , Font.color Skin.white
                  ]
                     ++ attr
@@ -54,8 +64,14 @@ outlinedButton skin { label, onPress } =
             Input.button
                 [ Border.color skin.primaryColor
                 , Border.rounded 3
-                , padding 8
+                , paddingEach
+                    { top = 10
+                    , bottom = 10
+                    , left = 15
+                    , right = 15
+                    }
                 , Font.color skin.primaryColor
+                , Border.width 1
                 ]
                 { onPress = Just handler
                 , label = Element.map never label
@@ -65,7 +81,12 @@ outlinedButton skin { label, onPress } =
             Input.button
                 [ Border.color (Skin.setAlpha 0.5 skin.primaryColor)
                 , Border.rounded 3
-                , padding 8
+                , paddingEach
+                    { top = 10
+                    , bottom = 10
+                    , left = 15
+                    , right = 15
+                    }
                 , Font.color (Skin.setAlpha 0.5 skin.primaryColor)
                 ]
                 { onPress = Nothing
