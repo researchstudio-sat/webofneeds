@@ -454,6 +454,17 @@ public class RestUserController {
         return generateStatusResponse(RestStatusResponse.TOKEN_RESEND_SUCCESS);
     }
 
+    @ResponseBody
+    @RequestMapping(
+            value = "/sendAnonymousLinkEmail",
+            method = RequestMethod.POST
+    )
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public ResponseEntity sendAnonymousEmail(@RequestBody AnonymousLinkPojo anonymousLinkPojo) {
+        emailSender.sendAnonymousLinkMessage(anonymousLinkPojo.getEmail(), anonymousLinkPojo.getPrivateId());
+        return generateStatusResponse(RestStatusResponse.USER_ANONYMOUSLINK_SENT);
+    }
+
     @RequestMapping(
             value = "/{userId}/resetPassword",
             method = RequestMethod.POST
