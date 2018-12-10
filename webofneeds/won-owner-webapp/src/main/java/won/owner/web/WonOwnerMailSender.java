@@ -240,7 +240,7 @@ public class WonOwnerMailSender {
     public void sendAnonymousLinkMessage(String email, String privateId) {
         StringWriter writer = new StringWriter();
         VelocityContext context = createAnonymousLinkContext(privateId);
-        verificationHtmlTemplate.merge(context, writer);
+        anonymousTemplate.merge(context, writer);
         logger.debug("sending "+ SUBJECT_ANONYMOUSLINK + " to " + email);
         this.wonMailSender.sendTextMessage(email, SUBJECT_ANONYMOUSLINK, writer.toString());
     }
