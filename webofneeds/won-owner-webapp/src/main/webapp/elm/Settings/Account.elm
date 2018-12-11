@@ -122,81 +122,84 @@ updateExportPassword password model =
 
 view : Skin -> Model -> Element Msg
 view skin model =
-    el
-        [ padding 20
-        , Font.size 16
-        , width <| maximum 600 fill
-        , centerX
-        ]
-    <|
-        case model.exportState of
-            EnteringPassword password ->
-                column
+    case model.exportState of
+        EnteringPassword password ->
+            column
+                [ width fill
+                , spacing 20
+                , Font.size 16
+                ]
+                [ el [ Font.size 24 ] <| text "Account data export"
+                , textColumn
                     [ width fill
                     , spacing 10
                     ]
-                    [ text "Enter a password to encrypt your data"
-                    , text "The data will then be sent to your email address"
-                    , row
-                        [ width fill
-                        , spacing 10
+                    [ paragraph [ width fill ]
+                        [ text "All your account data will be sent to your email address"
                         ]
-                        [ Input.newPassword []
-                            { onChange = ExportPasswordChanged
-                            , text = password
-                            , placeholder = Nothing
-                            , label =
-                                Input.labelLeft
-                                    [ centerY
-                                    , paddingEach
-                                        { left = 0
-                                        , right = 10
-                                        , top = 0
-                                        , bottom = 0
-                                        }
-                                    ]
-                                    (text "Password:")
-                            , show = False
-                            }
-                        , Elements.mainButton skin
-                            [ height fill ]
-                            { onPress =
-                                if String.isEmpty password then
-                                    Nothing
-
-                                else
-                                    Just ExportButtonPressed
-                            , label = text "Export"
-                            }
+                    , paragraph [ width fill ]
+                        [ text "Your private keys will be encrypted."
                         ]
                     ]
-
-            StartingExport ->
-                el
-                    [ width fill
-                    , Background.color skin.primaryColor
-                    , Font.color Skin.white
-                    , padding 20
+                , row
+                    [ spacing 10
                     ]
-                <|
-                    text "Starting Export..."
+                    [ Input.newPassword [ width fill ]
+                        { onChange = ExportPasswordChanged
+                        , text = password
+                        , placeholder = Nothing
+                        , label =
+                            Input.labelLeft
+                                [ centerY
+                                , paddingEach
+                                    { left = 0
+                                    , top = 0
+                                    , bottom = 0
+                                    , right = 10
+                                    }
+                                ]
+                                (text "Data encryption password:")
+                        , show = False
+                        }
+                    , Elements.mainButton skin
+                        [ height fill ]
+                        { onPress =
+                            if String.isEmpty password then
+                                Nothing
 
-            ExportStarted ->
-                el
-                    [ width fill
-                    , Background.color skin.primaryColor
-                    , Font.color Skin.white
-                    , padding 20
+                            else
+                                Just ExportButtonPressed
+                        , label = text "Export"
+                        }
                     ]
-                <|
-                    text "Export Started. You will get an e-mail soon"
+                ]
 
-            ExportFailed ->
-                el
-                    [ width fill
-                    , Background.color skin.primaryColor
-                    , Font.color Skin.white
-                    , padding 20
-                    ]
-                <|
-                    text "Export failed. Please try again later"
+        StartingExport ->
+            el
+                [ width fill
+                , Background.color skin.primaryColor
+                , Font.color Skin.white
+                , padding 20
+                ]
+            <|
+                text "Starting Export..."
+
+        ExportStarted ->
+            el
+                [ width fill
+                , Background.color skin.primaryColor
+                , Font.color Skin.white
+                , padding 20
+                ]
+            <|
+                text "Export Started. You will get an e-mail soon"
+
+        ExportFailed ->
+            el
+                [ width fill
+                , Background.color skin.primaryColor
+                , Font.color Skin.white
+                , padding 20
+                ]
+            <|
+                text "Export failed. Please try again later"

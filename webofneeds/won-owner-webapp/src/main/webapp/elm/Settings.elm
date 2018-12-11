@@ -4,6 +4,7 @@ import Element exposing (..)
 import Element.Background as Background
 import Element.Events as Events
 import Element.Font as Font
+import Element.Input as Input
 import Html exposing (Html)
 import Settings.Account as Account
 import Settings.Personas as Personas
@@ -114,10 +115,14 @@ updateWith toModel toMsg model ( subModel, subCmd ) =
 
 view : Skin -> Model -> Html Msg
 view skin model =
-    layout [] <|
+    layout [ width (minimum 0 shrink) ] <|
         let
             viewPage toMsg viewFunc viewModel =
-                row [ width fill ]
+                row
+                    [ width fill
+                    , spacing 20
+                    , padding 10
+                    ]
                     [ navigation skin (toRoute model)
                     , Element.map toMsg (viewFunc skin viewModel)
                     ]
@@ -142,19 +147,18 @@ navigation skin route =
                     else
                         ( Skin.setAlpha 0 Skin.white, Skin.black )
             in
-            el
+            Input.button
                 [ Background.color bgColor
                 , Font.color textColor
                 , width fill
-                , Events.onClick (ChangeRoute targetRoute)
                 , padding 10
                 ]
-            <|
-                text title
+                { onPress = Just (ChangeRoute targetRoute)
+                , label = text title
+                }
     in
     column
         [ alignTop
-        , padding 20
         ]
         [ navItem AccountR "Account"
         , navItem PersonasR "Personas"

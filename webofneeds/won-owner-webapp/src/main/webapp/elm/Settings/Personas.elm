@@ -237,14 +237,17 @@ subscriptions _ =
 
 view : Skin -> Model -> Element Msg
 view skin { viewState, personas } =
-    el
-        [ padding 20
+    column
+        [ width fill
+        , spacing 10
         , Font.size 16
-        , width <| maximum 600 fill
-        , centerX
         ]
-    <|
-        case viewState of
+        [ el [ Font.size 24 ] <| text "Persona Management"
+        , textColumn [ width fill ]
+            [ paragraph []
+                [ text "Your posts are anonymous by default. You can make them more personalized by attaching a persona." ]
+            ]
+        , case viewState of
             Inactive ->
                 column
                     [ width fill
@@ -286,12 +289,14 @@ view skin { viewState, personas } =
                         , personas = personas
                         }
                     ]
+        ]
 
 
 createButton : Skin -> Element Msg
 createButton skin =
     Input.button
-        [ width fill
+        [ width <| maximum 300 fill
+        , centerX
         , Background.color skin.primaryColor
         , padding 5
         ]
