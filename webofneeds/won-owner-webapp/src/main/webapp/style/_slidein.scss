@@ -149,7 +149,7 @@ won-slide-in {
         grid-area: siText;
         font-size: $smallFontSize;
         overflow-y: auto;
-        text-align: center;
+        text-align: left;
       }
 
       &.si__anonymous--emailInput {
