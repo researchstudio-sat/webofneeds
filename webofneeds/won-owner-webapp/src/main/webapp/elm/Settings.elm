@@ -1,10 +1,12 @@
 module Settings exposing (main)
 
+import Browser.Events exposing (onResize)
 import Element exposing (..)
 import Element.Background as Background
 import Element.Events as Events
 import Element.Font as Font
 import Element.Input as Input
+import Elements
 import Html exposing (Html)
 import Settings.Account as Account
 import Settings.Personas as Personas
@@ -24,7 +26,34 @@ main =
 ---- MODEL ----
 
 
-type Model
+type DeviceClass
+    = Mobile
+    | Desktop
+
+
+classifyDevice : { window | width : Int, height : Int } -> DeviceClass
+classifyDevice { width } =
+    if width > 600 then
+        Desktop
+
+    else
+        Mobile
+
+
+type alias Size =
+    { width : Int
+    , height : Int
+    }
+
+
+type alias Model =
+    { page : Page
+    , menuOpen : Bool
+    , size : Size
+    }
+
+
+type Page
     = Personas Personas.Model
     | Account Account.Model
 
@@ -34,9 +63,9 @@ type Route
     | AccountR
 
 
-toRoute : Model -> Route
-toRoute model =
-    case model of
+toRoute : Page -> Route
+toRoute page =
+    case page of
         Personas _ ->
             PersonasR
 
@@ -44,19 +73,24 @@ toRoute model =
             AccountR
 
 
-init : () -> ( Model, Cmd Msg )
-init () =
+init : { width : Int, height : Int } -> ( Model, Cmd Msg )
+init size =
     let
         ( model, cmd ) =
             Account.init ()
     in
-    ( Account model, Cmd.map AccountMsg cmd )
+    ( { size = size
+      , page = Account model
+      , menuOpen = True
+      }
+    , Cmd.map AccountMsg cmd
+    )
 
 
-subInit : (model -> Model) -> (msg -> Msg) -> ( model, Cmd msg ) -> ( Model, Cmd Msg )
-subInit modelTag msgTag ( model, cmd ) =
-    ( modelTag model
-    , Cmd.map msgTag cmd
+subInit : (model -> Page) -> (msg -> Msg) -> ( model, Cmd msg ) -> ( Page, Cmd Msg )
+subInit toPage toMsg ( subModel, cmd ) =
+    ( toPage subModel
+    , Cmd.map toMsg cmd
     )
 
 
@@ -68,11 +102,13 @@ type Msg
     = PersonasMsg Personas.Msg
     | AccountMsg Account.Msg
     | ChangeRoute Route
+    | Resized Size
+    | Back
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case ( msg, model ) of
+    case ( msg, model.page ) of
         ( PersonasMsg subMsg, Personas subModel ) ->
             Personas.update subMsg subModel
                 |> updateWith Personas PersonasMsg model
@@ -82,29 +118,58 @@ update msg model =
                 |> updateWith Account AccountMsg model
 
         ( ChangeRoute newRoute, _ ) ->
-            if toRoute model == newRoute then
-                ( model, Cmd.none )
+            if toRoute model.page == newRoute then
+                ( { model
+                    | menuOpen = False
+                  }
+                , Cmd.none
+                )
 
             else
-                changeRoute newRoute
+                changeRoute newRoute model
+
+        ( Resized size, _ ) ->
+            ( { model
+                | size = size
+              }
+            , Cmd.none
+            )
+
+        ( Back, _ ) ->
+            ( { model
+                | menuOpen = True
+              }
+            , Cmd.none
+            )
 
         ( _, _ ) ->
             ( model, Cmd.none )
 
 
-changeRoute : Route -> ( Model, Cmd Msg )
-changeRoute route =
-    case route of
-        AccountR ->
-            subInit Account AccountMsg (Account.init ())
+changeRoute : Route -> Model -> ( Model, Cmd Msg )
+changeRoute route model =
+    let
+        ( newPage, cmd ) =
+            case route of
+                AccountR ->
+                    subInit Account AccountMsg (Account.init ())
 
-        PersonasR ->
-            subInit Personas PersonasMsg (Personas.init ())
+                PersonasR ->
+                    subInit Personas PersonasMsg (Personas.init ())
+    in
+    ( { model
+        | page = newPage
+        , menuOpen = False
+      }
+    , cmd
+    )
 
 
-updateWith : (subModel -> Model) -> (subMsg -> Msg) -> Model -> ( subModel, Cmd subMsg ) -> ( Model, Cmd Msg )
+updateWith : (subModel -> Page) -> (subMsg -> Msg) -> Model -> ( subModel, Cmd subMsg ) -> ( Model, Cmd Msg )
 updateWith toModel toMsg model ( subModel, subCmd ) =
-    ( toModel subModel
+    ( { model
+        | page = toModel subModel
+      }
     , Cmd.map toMsg subCmd
     )
 
@@ -117,17 +182,55 @@ view : Skin -> Model -> Html Msg
 view skin model =
     layout [ width (minimum 0 shrink) ] <|
         let
+            deviceClass =
+                classifyDevice model.size
+
             viewPage toMsg viewFunc viewModel =
-                row
-                    [ width fill
-                    , spacing 20
-                    , padding 10
-                    ]
-                    [ navigation skin (toRoute model)
-                    , Element.map toMsg (viewFunc skin viewModel)
-                    ]
+                case deviceClass of
+                    Desktop ->
+                        row
+                            [ width fill
+                            , spacing 20
+                            , padding 10
+                            ]
+                            [ navigation deviceClass skin (toRoute model.page)
+                            , Element.map toMsg (viewFunc skin viewModel)
+                            ]
+
+                    Mobile ->
+                        if model.menuOpen then
+                            navigation deviceClass skin (toRoute model.page)
+
+                        else
+                            column
+                                [ width fill
+                                , spacing 10
+                                ]
+                                [ row
+                                    [ width fill
+                                    , height (px 50)
+                                    , Background.color Skin.white
+                                    ]
+                                    [ Input.button
+                                        [ padding 5
+                                        , width (px 50)
+                                        , height (px 50)
+                                        ]
+                                        { onPress = Just Back
+                                        , label =
+                                            Elements.svgIcon
+                                                []
+                                                { color = skin.primaryColor
+                                                , name = "ico36_backarrow"
+                                                }
+                                        }
+                                    , text (routeLabel <| toRoute model.page)
+                                    ]
+                                , el [ padding 10 ] <|
+                                    Element.map toMsg (viewFunc skin viewModel)
+                                ]
         in
-        case model of
+        case model.page of
             Personas subModel ->
                 viewPage PersonasMsg Personas.view subModel
 
@@ -135,13 +238,26 @@ view skin model =
                 viewPage AccountMsg Account.view subModel
 
 
-navigation : Skin -> Route -> Element Msg
-navigation skin route =
+navigation : DeviceClass -> Skin -> Route -> Element Msg
+navigation deviceClass skin route =
     let
-        navItem targetRoute title =
+        attrs =
+            case deviceClass of
+                Desktop ->
+                    [ alignTop ]
+
+                Mobile ->
+                    [ width fill ]
+
+        navItem targetRoute =
             let
                 ( bgColor, textColor ) =
-                    if targetRoute == route then
+                    if
+                        targetRoute
+                            == route
+                            && deviceClass
+                            == Desktop
+                    then
                         ( skin.primaryColor, Skin.white )
 
                     else
@@ -154,27 +270,50 @@ navigation skin route =
                 , padding 10
                 ]
                 { onPress = Just (ChangeRoute targetRoute)
-                , label = text title
+                , label = text <| routeLabel targetRoute
                 }
     in
     column
-        [ alignTop
+        attrs
+        [ navItem AccountR
+        , navItem PersonasR
         ]
-        [ navItem AccountR "Account"
-        , navItem PersonasR "Personas"
-        ]
+
+
+routeLabel : Route -> String
+routeLabel route =
+    case route of
+        AccountR ->
+            "Account"
+
+        PersonasR ->
+            "Personas"
 
 
 
 ---- SUBSCRIPTIONS ----
 
 
-subscriptions : Model -> Sub Msg
-subscriptions model =
-    case model of
+subSubscriptions : Page -> Sub Msg
+subSubscriptions page =
+    case page of
         Personas subModel ->
             Personas.subscriptions subModel
                 |> Sub.map PersonasMsg
 
         Account _ ->
             Sub.none
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.batch
+        [ subSubscriptions model.page
+        , onResize
+            (\width height ->
+                Resized
+                    { width = width
+                    , height = height
+                    }
+            )
+        ]

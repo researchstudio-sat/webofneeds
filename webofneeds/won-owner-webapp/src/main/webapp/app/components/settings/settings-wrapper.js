@@ -15,7 +15,10 @@ function genComponentConf($ngRedux) {
         node: element[0],
         flags: {
           skin: currentSkin(),
-          flags: null,
+          flags: {
+            width: window.innerWidth,
+            height: window.innerHeight,
+          },
         },
       });
 
