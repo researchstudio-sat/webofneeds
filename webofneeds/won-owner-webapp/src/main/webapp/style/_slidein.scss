@@ -150,6 +150,14 @@ won-slide-in {
         font-size: $smallFontSize;
         overflow-y: auto;
         text-align: left;
+        a {
+          color: white;
+          text-decoration: underline;
+        }
+  
+        ul {
+          padding: 0.5rem 1rem;
+        }
       }
 
       &.si__anonymous--emailInput {

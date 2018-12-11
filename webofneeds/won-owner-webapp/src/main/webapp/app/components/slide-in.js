@@ -137,7 +137,7 @@ function genSlideInConf() {
                 <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
             </svg>
             <span class="si__title">
-                Anonymous Account Warning!
+                Warning: You are using an <b>anonymous account</b>! 
             </span>
             <svg class="si__carret"
                 ng-click="self.view__anonymousSlideIn__expand()"
@@ -150,17 +150,23 @@ function genSlideInConf() {
                 <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
             </svg>
             <div class="si__text" ng-if="self.isAnonymousSlideInExpanded">
-              You are using an 'anonymous account'. This means:
-              <ul>
-                <li>When <b>others want to connect</b> with you, <b>you don't see them</b> unless you are on this page</li>
-                <li>You will <b>lose your content</b> unless you remember the <b>login link</b></li>
-              </ul>
-              
-              Therefore, please:
-              <ul>
-                <li>Consider <b>signing up</b>! You will be able to keep the content you have already created.</li>
-                <li>Alternatively, save the <b>login link</b> or let us email it to you</li>
-              </ul>
+              <h3>This means:</h3>
+              <p>
+                <ul>
+                  <li>We have no way of contacting you</li>
+                  <li>You need the <b>login link</b> to access your account later</li>
+                  <li>When <b>other users want to connect</b>, you have to be logged in to see that</li>
+                  <li>You will <b>lose your content</b> unless you have the <b>login link</b></li>
+                </ul>
+              </p>
+              <br>
+              <h3>Therefore, please:</h3>
+              <p>
+                <ul>
+                  <li>Consider <a href="{{ self.absHRef(self.$state, 'signup') }}">signing up</a>! It will allow us to contact you if there is relevant activity.</li>
+                  <li>Alternatively, save the <b>login link</b> or let us <b>email it to you!</b> We will not associate the email address with your anonymous account.</li>
+                </ul>
+              </p>
             </div>
             <button class="si__buttonCopy"
                 ng-if="self.isAnonymousSlideInExpanded"
