@@ -11,7 +11,6 @@ import loginFormModule from "./login-form.js";
 import loggedInMenuModule from "./logged-in-menu.js";
 
 import * as srefUtils from "../sref-utils.js";
-import { isPrivateUser } from "../selectors/general-selectors.js";
 
 import "style/_login.scss";
 
@@ -29,10 +28,10 @@ function genLogoutConf() {
                     <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
                 </svg>
 
-                <svg class="topnav__button__icon" style="--local-primary:var(--won-primary-color);" ng-if="!self.isPrivateIdUser">
+                <svg class="topnav__button__icon" style="--local-primary:var(--won-primary-color);" ng-if="!self.isAnonymous">
                     <use xlink:href="#ico36_person" href="#ico36_person"></use>
                 </svg>
-                <svg class="topnav__button__icon" style="--local-primary:var(--won-primary-color);" ng-if="self.isPrivateIdUser">
+                <svg class="topnav__button__icon" style="--local-primary:var(--won-primary-color);" ng-if="self.isAnonymous">
                     <use xlink:href="#ico36_person_anon" href="#ico36_person_anon"></use>
                 </svg>
 
@@ -75,14 +74,14 @@ function genLogoutConf() {
       const logout = state => ({
         loggedIn: state.getIn(["account", "loggedIn"]),
         email: state.getIn(["account", "email"]),
-        isPrivateIdUser: isPrivateUser(state),
+        isAnonymous: state.getIn(["account", "isAnonymous"]),
       });
 
       connect2Redux(logout, actionCreators, [], this);
     }
 
     getEmail() {
-      if (this.isPrivateIdUser) {
+      if (this.isAnonymous) {
         return "Anonymous";
       }
       return this.email;
