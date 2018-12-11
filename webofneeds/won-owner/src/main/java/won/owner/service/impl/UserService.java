@@ -133,7 +133,6 @@ public class UserService {
             user.setEmail(email);
 
             if(privateId != null) {
-                user.setEmailVerified(true);
                 user.setPrivateId(privateId);
             }
 

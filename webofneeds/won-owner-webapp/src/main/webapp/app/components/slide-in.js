@@ -35,11 +35,11 @@ function genSlideInConf() {
                 <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
             </svg>
         </div>
-        <div class="si__emailverification" ng-class="{'visible': !self.connectionHasBeenLost && (self.verificationToken || (self.loggedIn && !self.emailVerified))}">
+        <div class="si__emailverification" ng-class="{'visible': !self.connectionHasBeenLost && (self.verificationToken || (self.loggedIn && !self.emailVerified && !self.isAnonymous))}">
             <svg class="si__icon">
                 <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
             </svg>
-            <span class="si__title" ng-if="!self.verificationToken && !self.emailVerified && !self.emailVerificationError">
+            <span class="si__title" ng-if="!self.verificationToken && !self.emailVerified && !self.isAnonymous && !self.emailVerificationError">
                 E-Mail has not been verified yet, check your Inbox.
             </span>
             <span class="si__title" ng-if="self.processingVerifyEmailAddress && self.verificationToken">
@@ -48,7 +48,7 @@ function genSlideInConf() {
             <span class="si__title" ng-if="!self.processingVerifyEmailAddress && self.emailVerificationError">
                 {{ self.parseRestErrorMessage(self.emailVerificationError) }}
             </span>
-            <span class="si__title" ng-if="self.loggedIn && self.verificationToken && !self.processingVerifyEmailAddress && self.emailVerified && !self.emailVerificationError">
+            <span class="si__title" ng-if="self.loggedIn && self.verificationToken && !self.processingVerifyEmailAddress && self.emailVerified && !self.isAnonymous && !self.emailVerificationError">
                 E-Mail Address verified
             </span>
             <span class="si__title" ng-if="!self.loggedIn && self.verificationToken && !self.processingVerifyEmailAddress && !self.emailVerificationError">
@@ -59,7 +59,7 @@ function genSlideInConf() {
             </svg>
             <button
               class="si__button"
-              ng-if="!self.processingVerifyEmailAddress && !self.processingResendVerificationMail && ((self.loggedIn && !self.emailVerified && !self.emailVerificationError) || (self.verificationToken && self.emailVerificationError))"
+              ng-if="!self.processingVerifyEmailAddress && !self.processingResendVerificationMail && ((self.loggedIn && !self.emailVerified && !self.isAnonymous && !self.emailVerificationError) || (self.verificationToken && self.emailVerificationError))"
               ng-click="self.account__resendVerificationEmail(self.email)">
                 Resend Email
             </button>
@@ -348,7 +348,11 @@ function genSlideInConf() {
         if (
           verificationToken &&
           !this.processingVerifyEmailAddress &&
-          !(this.emailVerified || this.emailVerificationError)
+          !(
+            this.emailVerified ||
+            this.emailVerificationError ||
+            this.isAnonymous
+          )
         ) {
           this.account__verifyEmailAddress(verificationToken);
         }

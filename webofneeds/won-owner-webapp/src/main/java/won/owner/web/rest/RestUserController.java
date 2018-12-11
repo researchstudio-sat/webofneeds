@@ -122,7 +122,7 @@ public class RestUserController {
             }
             User createdUser = userService.registerUser(user.getUsername(), user.getPassword(), null, user.getPrivateId());
 
-            if(!createdUser.isEmailVerified()) {
+            if(!createdUser.isAnonymous() && !createdUser.isEmailVerified()) {
                 eventPublisher.publishEvent(new OnRegistrationCompleteEvent(createdUser, request.getLocale(), request.getContextPath()));
             }
         } catch (UserAlreadyExistsException e) {
@@ -295,12 +295,6 @@ public class RestUserController {
 
             User user = userService.getByUsername(username);
 
-            //if a login attempt happens with a privateId parameter then we will save the privateId in our won_user table if it wasnt already set
-            if(privateId != null && user.getPrivateId() == null) {
-                user.setPrivateId(privateId);
-                userService.save(user);
-            }
-
             return generateUserResponse(user);
         } catch (BadCredentialsException ex) {
             rememberMeServices.loginFail(request, response);
@@ -418,7 +412,7 @@ public class RestUserController {
         User user = userService.getByUsername(authUser.getUsername());
 
         if(responseEmail == null) {
-            if(user.isPrivateId()) {
+            if(user.isAnonymous()) {
                 return generateStatusResponse(RestStatusResponse.EXPORT_IS_ANONYMOUS);
             } else {
                 responseEmail = user.getEmail();
@@ -466,6 +460,10 @@ public class RestUserController {
 
         if(user == null) {
             return generateStatusResponse(RestStatusResponse.USER_NOT_FOUND);
+        }
+
+        if(user.isAnonymous()) {
+            return generateStatusResponse(RestStatusResponse.TOKEN_RESEND_FAILED_USER_ANONYMOUS);
         }
 
         if(user.isEmailVerified()) {
@@ -528,6 +526,7 @@ public class RestUserController {
         values.put("emailVerified", user.isEmailVerified());
         values.put("acceptedTermsOfService", user.isAcceptedTermsOfService());
         values.put("privateId", user.getPrivateId());
+        values.put("isAnonymous", user.isAnonymous());
 
         return new ResponseEntity<Map>(values, HttpStatus.OK);
     }
