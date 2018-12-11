@@ -73,8 +73,8 @@ public class WonOwnerMailSender {
     private Template systemDeactivateNotificationTemplate;
     private Template verificationTemplate;
     private Template anonymousTemplate;
-    private Template exportHtmlTemplate;
-    private Template exportFailedHtmlTemplate;
+    private Template exportTemplate;
+    private Template exportFailedTemplate;
 
     public WonOwnerMailSender() {
         velocityEngine = new VelocityEngine();
@@ -91,8 +91,8 @@ public class WonOwnerMailSender {
         systemDeactivateNotificationTemplate = velocityEngine.getTemplate("mail-templates/system-deactivate-notification.vm");
         verificationTemplate = velocityEngine.getTemplate("mail-templates/verification.vm");
         anonymousTemplate = velocityEngine.getTemplate("mail-templates/anonymous.vm");
-        exportHtmlTemplate = velocityEngine.getTemplate("mail-templates/export-html.vm");
-        exportFailedHtmlTemplate = velocityEngine.getTemplate("mail-templates/export-failed-html.vm");
+        exportTemplate = velocityEngine.getTemplate("mail-templates/export.vm");
+        exportFailedTemplate = velocityEngine.getTemplate("mail-templates/export-failed.vm");
     }
 
     public void setWonMailSender(WonMailSender wonMailSender) {
@@ -266,14 +266,14 @@ public class WonOwnerMailSender {
        
     public void sendExportMessage(String email, File file) {
         StringWriter writer = new StringWriter();
-        exportHtmlTemplate.merge(new VelocityContext(), writer);
+        exportTemplate.merge(new VelocityContext(), writer);
         logger.debug("sending "+ SUBJECT_EXPORT + " to " + email);
         this.wonMailSender.sendFileMessage(email, SUBJECT_EXPORT, writer.toString(), EXPORT_FILE_NAME, file);
     }
 
     public void sendExportFailedMessage(String email) {
         StringWriter writer = new StringWriter();
-        exportFailedHtmlTemplate.merge(new VelocityContext(), writer);
+        exportFailedTemplate.merge(new VelocityContext(), writer);
         logger.debug("sending "+ SUBJECT_EXPORT_FAILED + " to " + email);
         this.wonMailSender.sendHtmlMessage(email, SUBJECT_EXPORT_FAILED, writer.toString());
     }

@@ -59,7 +59,7 @@ public class WonMailSender
     }
   }
 
-  public void sendFileMessage(String toEmail, String subject, String htmlBody, String fileName, File file) {
+  public void sendFileMessage(String toEmail, String subject, String body, String fileName, File file) {
 
     MimeMessage msg = mailSender.createMimeMessage();
     try{
@@ -67,7 +67,7 @@ public class WonMailSender
       helper.setFrom(this.templateMessage.getFrom());
       helper.setSubject(subject);
       helper.setTo(toEmail);
-      helper.setText(htmlBody, true);
+      helper.setText(body, false);
       helper.addAttachment(fileName, file);
       mailSender.send(msg);
     } catch (Exception ex) {
