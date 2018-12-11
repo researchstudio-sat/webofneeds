@@ -4,7 +4,6 @@
 const READ_URIS = "wonReadUris";
 const CLOSED_CONN_URIS = "wonClosedConnectionUris";
 const DISCLAIMER_ACCEPTED = "disclaimerAccepted";
-const PRIVATE_ID = "privateId";
 
 let readUrisCache;
 let closedConnUrisCache;
@@ -50,14 +49,6 @@ export function isUriRead(uri) {
 export function clearReadUris() {
   readUrisCache = undefined;
   localStorage.removeItem(READ_URIS);
-}
-
-export function clearPrivateId() {
-  localStorage.removeItem(PRIVATE_ID);
-}
-
-export function savePrivateId(privateId) {
-  localStorage.setItem(PRIVATE_ID, privateId);
 }
 
 export function markConnUriAsClosed(uri) {

@@ -19,11 +19,7 @@ import {
   generatePrivateId,
   checkLoginStatus,
 } from "../won-utils.js";
-import {
-  clearPrivateId,
-  savePrivateId,
-  setDisclaimerAccepted,
-} from "../won-localstorage.js";
+import { setDisclaimerAccepted } from "../won-localstorage.js";
 import { stateGoCurrent } from "./cstm-router-actions.js";
 import { checkAccessToCurrentRoute } from "../configRouting.js";
 
@@ -82,40 +78,31 @@ export function accountLogin(credentials, options) {
 
     const { email } = parseCredentials(credentials);
 
-    const prevPrivateId = getIn(state, [
-      "router",
-      "currentParams",
-      "privateId",
-    ]);
-    const prevEmail = state.getIn(["account", "email"]);
+    const isLoggedIn = getIn(state, ["account", "loggedIn"]);
+    const processingLoginForEmail =
+      getIn(state, ["process", "processingLoginForEmail"]) ||
+      _loginInProcessFor;
 
-    const wasLoggedIn =
-      !state.getIn(["process", "processingInitialLoad"]) &&
-      (prevPrivateId || prevEmail);
-
-    if (
-      state.getIn(["process", "processingLoginForEmail"]) === email ||
-      _loginInProcessFor === email
-    ) {
+    if (processingLoginForEmail) {
       console.debug(
         "Already logging in as ",
-        email,
+        processingLoginForEmail,
         ". Canceling redundant attempt."
       );
       return;
     }
 
-    if (
-      !state.getIn(["process", "processingInitialLoad"]) &&
-      ((credentials.privateId && credentials.privateId === prevPrivateId) ||
-        (credentials.email && credentials.email === prevEmail))
-    ) {
-      console.debug(
-        "Already logged into this account (" +
-          (credentials.privateId || credentials.email) +
-          "). Aborting second login attempt."
-      );
-      return;
+    if (isLoggedIn && !state.getIn(["process", "processingInitialLoad"])) {
+      const loggedInEmail = state.getIn(["account", "email"]);
+
+      if (credentials.email === loggedInEmail) {
+        console.debug(
+          "Already loggedIn with (" +
+            credentials.email +
+            "). Aborting login attempt."
+        );
+        return;
+      }
     }
 
     return Promise.resolve()
@@ -127,13 +114,16 @@ export function accountLogin(credentials, options) {
         });
       })
       .then(() => {
-        if (wasLoggedIn) {
+        if (isLoggedIn) {
           return logout().then(() => {
             if (
               options_.doRedirects &&
-              getIn(state, ["router", "currentParams", "privateId"])
+              getIn(state, ["account", "isAnonymous"])
             ) {
-              return stateGoCurrent({ privateId: "" })(dispatch, getState);
+              return stateGoCurrent({ privateId: undefined })(
+                dispatch,
+                getState
+              );
             }
           });
         }
@@ -177,7 +167,7 @@ export function accountLogin(credentials, options) {
         error.response.json().then(loginError => {
           return Promise.resolve()
             .then(() => {
-              if (wasLoggedIn) {
+              if (isLoggedIn) {
                 return dispatch({ type: actionTypes.account.reset });
               }
             })
@@ -203,11 +193,6 @@ export function accountLogin(credentials, options) {
       )
       .then(() => {
         _loginInProcessFor = undefined;
-      })
-      .then(() => {
-        if (credentials.privateId) {
-          savePrivateId(credentials.privateId);
-        }
       });
   };
 }
@@ -219,15 +204,11 @@ let _logoutInProcess;
  * @returns {Function}
  */
 export function accountLogout() {
-  clearPrivateId();
-
   return (dispatch, getState) => {
     const state = getState();
 
     if (state.getIn(["process", "processingLogout"]) || _logoutInProcess) {
-      console.debug(
-        "There's already a logout in process. Aborting redundant attempt."
-      );
+      console.debug("Logout in process. Aborting redundant attempt.");
       return;
     }
     _logoutInProcess = true;
@@ -285,6 +266,7 @@ export function accountRegister(credentials) {
  * @returns {Function}
  */
 export function accountTransfer(credentials) {
+  //FIXME: accountTransfer only works if we have the full privateId which we might not have anymore after the refactoring
   return (dispatch, getState) =>
     transferPrivateAccount(credentials)
       .then(() => {

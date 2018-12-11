@@ -68,16 +68,8 @@ export default function(processState = initialState, action = {}) {
         .set("processingLogin", false)
         .set("processingLoginForEmail", undefined);
 
-    case actionTypes.initialPageLoad: {
-      if (!processState.get("processingInitialLoad")) {
-        return processState;
-      } else {
-        const initialLoadFinished = getIn(action, [
-          "payload",
-          "initialLoadFinished",
-        ]);
-        return processState.set("processingInitialLoad", !initialLoadFinished);
-      }
+    case actionTypes.initialLoadFinished: {
+      return processState.set("processingInitialLoad", false);
     }
 
     case actionTypes.account.sendAnonymousLinkEmailStarted:

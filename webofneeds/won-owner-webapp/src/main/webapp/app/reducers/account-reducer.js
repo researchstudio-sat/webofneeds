@@ -10,6 +10,7 @@ const initialState = Immutable.fromJS({
   loggedIn: false,
   email: undefined,
   emailVerified: false,
+  isAnonymous: false,
   acceptedTermsOfService: false,
   acceptedDisclaimer: isDisclaimerAccepted(),
 });
@@ -22,12 +23,15 @@ export default function(userData = initialState, action = {}) {
       const acceptedTermsOfService = action.payload.get(
         "acceptedTermsOfService"
       );
+      const privateId = action.payload.get("privateId");
 
       return userData
         .set("loggedIn", true)
         .set("email", username)
         .set("emailVerified", emailVerified)
-        .set("acceptedTermsOfService", acceptedTermsOfService);
+        .set("acceptedTermsOfService", acceptedTermsOfService)
+        .set("isAnonymous", !!privateId)
+        .set("privateId", privateId);
     }
 
     case actionTypes.account.resendVerificationEmailFailed:

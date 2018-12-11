@@ -70,6 +70,7 @@ public class UserService {
             privateUser.setPassword(passwordEncoder.encode(newPassword));
             privateUser.setEmail(newEmail);
             privateUser.setEmailVerified(false);
+            privateUser.setPrivateId(null);
             privateUser.setAcceptedTermsOfService(true); //transfer only available when flag is set therefore we can just set this to true (i think)
             if (role != null) {
                 privateUser.setRole(role);
@@ -107,7 +108,7 @@ public class UserService {
      * @returns the created User
      */
     public User registerUser(String email, String password, String role) throws UserAlreadyExistsException {
-        return registerUser(email, password, role, false);
+        return registerUser(email, password, role, null);
     }
 
     /**
@@ -117,11 +118,11 @@ public class UserService {
      * @param email
      * @param password
      * @param role
-     * @param emailVerified
+     * @param isAnonymousUser
      * @throws UserAlreadyExistsException
      * @returns the created User
      */
-    public User registerUser(String email, String password, String role, boolean emailVerified) throws UserAlreadyExistsException {
+    public User registerUser(String email, String password, String role, String privateId) throws UserAlreadyExistsException {
         User user = getByUsername(email);
         if (user != null) {
             throw new UserAlreadyExistsException();
@@ -130,7 +131,12 @@ public class UserService {
             PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
             user = new User(email, passwordEncoder.encode(password), role);
             user.setEmail(email);
-            user.setEmailVerified(emailVerified);
+
+            if(privateId != null) {
+                user.setEmailVerified(true);
+                user.setPrivateId(privateId);
+            }
+
             user.setAcceptedTermsOfService(true); //transfer only available when flag is set therefore we can just set this to true (i think)
             KeystorePasswordHolder keystorePassword = new KeystorePasswordHolder();
             //generate a password for the keystore and save it in the database, encrypted with a symmetric key

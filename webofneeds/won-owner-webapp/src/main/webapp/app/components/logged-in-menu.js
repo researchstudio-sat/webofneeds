@@ -7,14 +7,13 @@ import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
 
 import * as srefUtils from "../sref-utils.js";
-import { isPrivateUser } from "../selectors/general-selectors.js";
 
 function genComponentConf() {
   let template = `
     <span class="dd__userlabel show-in-responsive" ng-if="self.loggedIn" title="{{ self.getEmail() }}">{{ self.getEmail() }}</span>
     <hr class="show-in-responsive"/>
     <a
-        ng-if="self.isPrivateIdUser"
+        ng-if="self.isAnonymous"
         href="{{ self.absHRef(self.$state, 'signup') }}"
         class="won-button--outlined thin red show-in-responsive"
         ng-click="self.view__hideMainMenu()">
@@ -55,7 +54,7 @@ function genComponentConf() {
         return {
           loggedIn: state.getIn(["account", "loggedIn"]),
           email: state.getIn(["account", "email"]),
-          isPrivateIdUser: isPrivateUser(state),
+          isAnonymous: state.getIn(["account", "isAnonymous"]),
         };
       };
 
@@ -63,7 +62,7 @@ function genComponentConf() {
     }
 
     getEmail() {
-      if (this.isPrivateIdUser) {
+      if (this.isAnonymous) {
         return "Anonymous";
       } else {
         return this.email;

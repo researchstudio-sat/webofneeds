@@ -22,8 +22,6 @@ import {
  *                   the right cursor by default (i.e. it is a regular link)
  */
 export function absSRef(toRouterState, queryParams) {
-  //const currentParams = getParameters();
-  //const paramsWithConst = addConstParams(resetParamsImm.merge(queryParams), currentParams);
   const paramsWithConst = absParams(queryParams);
   const paramsString = JSON.stringify(paramsWithConst);
   const srefString = toRouterState + "(" + paramsString + ")";

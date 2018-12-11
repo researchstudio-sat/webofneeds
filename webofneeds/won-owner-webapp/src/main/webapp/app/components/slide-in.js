@@ -16,7 +16,7 @@ import "style/_slidein.scss";
 
 function genSlideInConf() {
   let template = `
-        <input type='text' class="si__anonymousLink" value="{{ self.anonymousLink }}" ng-if="!self.connectionHasBeenLost && self.loggedIn && self.privateId && !self.anonymousLinkSent && !self.anonymousLinkCopied && self.isAnonymousSlideInExpanded"/>
+        <input type='text' class="si__anonymousLink" value="{{ self.anonymousLink }}" ng-if="!self.connectionHasBeenLost && self.loggedIn && self.isAnonymous && !self.anonymousLinkSent && !self.anonymousLinkCopied && self.isAnonymousSlideInExpanded"/>
         <div class="si__connectionlost" ng-class="{'visible': self.connectionHasBeenLost}">
             <svg class="si__icon">
                 <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
@@ -129,7 +129,7 @@ function genSlideInConf() {
         </div>
         <div class="si__anonymous"
             ng-class="{
-              'visible': !self.connectionHasBeenLost && self.loggedIn && self.privateId && !self.anonymousLinkSent && !self.anonymousLinkCopied,
+              'visible': !self.connectionHasBeenLost && self.isAnonymous && !self.anonymousLinkSent && !self.anonymousLinkCopied,
               'si__anonymous--expanded': self.isAnonymousSlideInExpanded,
               'si__anonymous--emailInput': self.showAnonymousSlideInEmailInput,
             }">
@@ -195,7 +195,7 @@ function genSlideInConf() {
         </div>
         <div class="si__anonymoussuccess"
             ng-class="{
-              'visible': !self.connectionHasBeenLost && self.loggedIn && (self.anonymousLinkSent || self.anonymousLinkCopied),
+              'visible': !self.connectionHasBeenLost && self.isAnonymous && (self.anonymousLinkSent || self.anonymousLinkCopied),
             }">
             <svg class="si__icon">
                 <use xlink:href="#ico16_indicator_info" href="#ico16_indicator_info"></use>
@@ -235,17 +235,12 @@ function genSlideInConf() {
           "token",
         ]);
 
-        const privateId = getIn(state, [
-          "router",
-          "currentParams",
-          "privateId",
-        ]);
+        const privateId = getIn(state, ["account", "privateId"]);
 
-        const path = "#!/connections" + `?privateId=${this.privateId}`;
+        const path = "#!/connections" + `?privateId=${privateId}`;
         const anonymousLink = toAbsoluteURL(ownerBaseUrl).toString() + path;
 
         return {
-          privateId,
           verificationToken,
           acceptedDisclaimer: getIn(state, ["account", "acceptedDisclaimer"]),
           emailVerified: getIn(state, ["account", "emailVerified"]),
@@ -275,6 +270,8 @@ function genSlideInConf() {
           ]),
           loggedIn: getIn(state, ["account", "loggedIn"]),
           email: getIn(state, ["account", "email"]),
+          isAnonymous: getIn(state, ["account", "isAnonymous"]),
+          privateId,
           connectionHasBeenLost: getIn(state, ["messages", "lostConnection"]), // name chosen to avoid name-clash with the action-creator
           reconnecting: getIn(state, ["messages", "reconnecting"]),
           isAlreadyVerifiedError:
@@ -312,18 +309,14 @@ function genSlideInConf() {
     }
 
     copyLinkToClipboard() {
-      const linkEl = this.getAnonymousLinkField();
-      if (linkEl) {
-        linkEl.focus();
-        linkEl.setSelectionRange(0, linkEl.value.length);
-        if (!document.execCommand("copy")) {
-          window.prompt("Copy to clipboard: Ctrl+C", linkEl.value);
-        } else {
-          linkEl.setSelectionRange(0, 0);
-          linkEl.blur();
-          this.account__copiedAnonymousLinkSuccess();
-        }
-      }
+      let tempInput = document.createElement("input");
+      tempInput.style = "position: absolute; left: -1000px; top: -1000px";
+      tempInput.value = this.anonymousLink;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      document.execCommand("copy");
+      document.body.removeChild(tempInput);
+      this.account__copiedAnonymousLinkSuccess();
     }
 
     isValidEmail() {

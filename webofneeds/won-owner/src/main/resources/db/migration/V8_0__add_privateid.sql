@@ -1,0 +1,5 @@
+BEGIN;
+
+ALTER TABLE wonuser ADD COLUMN private_id VARCHAR(255);
+
+COMMIT;

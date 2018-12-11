@@ -191,7 +191,7 @@ export function registerAccount(credentials) {
     body: JSON.stringify({
       username: email,
       password: password,
-      privateIdUser: !!credentials.privateId,
+      privateId: credentials.privateId,
     }),
   };
   return fetch(url, httpOptions).then(checkHttpStatus);
@@ -345,14 +345,17 @@ export function transferPrivateAccount(credentials) {
  * @returns {*}
  */
 export function login(credentials) {
-  const { email, password, rememberMe } = parseCredentials(credentials);
+  const { email, password, rememberMe, privateId } = parseCredentials(
+    credentials
+  );
   const loginUrl = urljoin(ownerBaseUrl, "/rest/users/signin");
   const params =
     "username=" +
     encodeURIComponent(email) +
     "&password=" +
     encodeURIComponent(password) +
-    (rememberMe ? "&remember-me=true" : "");
+    (rememberMe ? "&remember-me=true" : "") +
+    (privateId ? "&privateId=" + privateId : "");
 
   return fetch(loginUrl, {
     method: "post",
@@ -400,6 +403,7 @@ export function privateId2Credentials(privateId) {
   return {
     email,
     password,
+    privateId,
   };
 }
 
