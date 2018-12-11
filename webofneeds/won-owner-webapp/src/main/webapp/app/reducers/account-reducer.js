@@ -24,13 +24,14 @@ export default function(userData = initialState, action = {}) {
         "acceptedTermsOfService"
       );
       const privateId = action.payload.get("privateId");
+      const isAnonymous = action.payload.get("isAnonymous");
 
       return userData
         .set("loggedIn", true)
         .set("email", username)
         .set("emailVerified", emailVerified)
         .set("acceptedTermsOfService", acceptedTermsOfService)
-        .set("isAnonymous", !!privateId)
+        .set("isAnonymous", isAnonymous)
         .set("privateId", privateId);
     }
 
