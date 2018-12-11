@@ -68,7 +68,7 @@ public class User implements UserDetails, Persistable<Long> {
     @Column(name = "email")
     private String email;
 
-    @Column(name = "privateId")
+    @Column(name = "private_id")
     private String privateId;
 
     @JoinColumn(name = "keystore_id")
