@@ -210,7 +210,7 @@ let _logoutInProcess;
  * @returns {Function}
  */
 export function accountLogout() {
-  (dispatch, getState) => {
+  return (dispatch, getState) => {
     const state = getState();
 
     if (state.getIn(["process", "processingLogout"]) || _logoutInProcess) {
