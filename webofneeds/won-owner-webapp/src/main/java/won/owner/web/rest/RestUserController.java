@@ -282,7 +282,7 @@ public class RestUserController {
     public ResponseEntity logIn(
             @RequestParam("username") String username,
             @RequestParam("password") String password,
-            @RequestParam("privateId") String privateId,
+            @RequestParam(name="privateId", required = false) String privateId,
             HttpServletRequest request,
             HttpServletResponse response) {
         SecurityContext context = SecurityContextHolder.getContext();
