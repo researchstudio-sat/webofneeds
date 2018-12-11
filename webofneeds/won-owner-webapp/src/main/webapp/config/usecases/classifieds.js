@@ -14,6 +14,12 @@ import {
   sparqlQuery,
 } from "../../app/sparql-builder-utils.js";
 
+/*
+TODO: send hints to counterparts of searches
+TODO: add prices to search
+TODO: queries for offers
+*/
+
 const classifiedsUseCases = {
   goodsOffer: {
     identifier: "goodsOffer",
@@ -92,21 +98,61 @@ const classifiedsUseCases = {
     },
     generateQuery: (draft, resultName) => {
       let subQueries = [];
-      // TODO: bindScoreAs should be unique, can't contain spaces -> filter tags and add to name
+      let subScores = [];
+
       const tags = getIn(draft, ["seeks", "tags"]);
+      let keywords = [];
+
       if (tags && is("Array", tags) && tags.length > 0) {
-        for (let tag of tags) {
-          let keywordTitleSQ = textSearchSubQuery({
+        keywords = tags
+          .map(s => s.split(/\s+/)) // remove all whitespace
+          .reduce((arrArr, arr) => arrArr.concat(arr), []); // flatten array, .flat() does not work on edge
+
+        // search for all keywords in title, description and tags
+        // this is probably horribly inefficient
+        for (const keyword of keywords) {
+          let titleSQ = textSearchSubQuery({
             resultName: resultName,
-            bindScoreAs: "?keywordsTitle_index",
+            bindScoreAs: "?title_" + keyword + "_index",
             pathToText: "dc:title",
             prefixesInPath: {
               dc: won.defaultContext["dc"],
             },
-            keyword: tag,
+            keyword: keyword,
           });
 
-          subQueries.push(keywordTitleSQ);
+          if (titleSQ) {
+            subQueries.push(titleSQ);
+            subScores.push("?title_" + keyword + "_index"); // dirty hack.
+          }
+
+          let descriptionSQ = textSearchSubQuery({
+            resultName: resultName,
+            bindScoreAs: "?description_" + keyword + "_index",
+            pathToText: "dc:description",
+            prefixesInPath: {
+              dc: won.defaultContext["dc"],
+            },
+            keyword: keyword,
+          });
+
+          if (descriptionSQ) {
+            subQueries.push(descriptionSQ);
+            subScores.push("?description_" + keyword + "_index"); // dirty hack.
+          }
+
+          let tagsSQ = textSearchSubQuery({
+            resultName: resultName,
+            bindScoreAs: "?tags_" + keyword + "_index",
+            pathToText: "won:hasTags",
+            prefixesInPath: {},
+            keyword: keyword,
+          });
+
+          if (tagsSQ) {
+            subQueries.push(tagsSQ);
+            subScores.push("?tags_" + keyword + "_index"); // dirty hack.
+          }
         }
       }
 
@@ -129,6 +175,14 @@ const classifiedsUseCases = {
           optional: true,
         }));
 
+      // dirty hack, part 2
+      const iterator = subScores.values();
+      let subScoreString = ``;
+
+      for (const value of iterator) {
+        subScoreString += `COALESCE(` + value + `, 0) + `;
+      }
+
       const query = sparqlQuery({
         prefixes: {
           won: won.defaultContext["won"],
@@ -142,13 +196,12 @@ const classifiedsUseCases = {
         where: [
           `${resultName} rdf:type won:Need.`,
           `${resultName} rdf:type s:Offer.`,
-
-          `BIND( ( 
-              COALESCE(?keywordsTitle_index, 0) +
-              COALESCE(?location_geoScore, 0) 
-            ) as ?aggregatedScore)`,
+          `BIND( ( ` +
+          subScoreString + // contains all COALESCE statements for text search results
+            `COALESCE(?location_geoScore, 0) 
+            ) as ?score)`, // TODO: map this to a value from 0 to 1
         ],
-        orderBy: [{ order: "DESC", variable: "?aggregatedScore" }],
+        orderBy: [{ order: "DESC", variable: "?score" }],
       });
 
       return query;

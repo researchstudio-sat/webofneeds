@@ -369,9 +369,7 @@ export function textSearchSubQuery({
   prefixesInPath,
   keyword,
 }) {
-  // TODO: rewrite this to fit text search instead of geo search
   // see https://wiki.blazegraph.com/wiki/index.php/FullTextSearch
-  // TODO: what does the result mean?
   if (!keyword || keyword.length <= 0) {
     return undefined;
   }
