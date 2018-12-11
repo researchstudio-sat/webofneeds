@@ -232,7 +232,8 @@ public class LinkedDataServiceImpl implements LinkedDataService
       String newEtag = data.getEtag();
 
     // load the dataset from storage
-    Dataset dataset = need.getState() == NeedState.DELETED? DatasetFactory.createGeneral() : need.getDatatsetHolder().getDataset();
+    boolean isDeleted = !!(need.getState() == NeedState.DELETED);
+    Dataset dataset = isDeleted? DatasetFactory.createGeneral() : need.getDatatsetHolder().getDataset();
     Model metaModel = needModelMapper.toModel(need);
 
     Resource needResource = metaModel.getResource(needUri.toString());
@@ -273,7 +274,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
     dataset.addNamedModel(needMetaInformationURI, metaModel);
     addBaseUriAndDefaultPrefixes(dataset);
 
-    return new DataWithEtag<>(dataset ,newEtag, etag);
+    return new DataWithEtag<>(dataset ,newEtag, etag, isDeleted);
   }
 
 

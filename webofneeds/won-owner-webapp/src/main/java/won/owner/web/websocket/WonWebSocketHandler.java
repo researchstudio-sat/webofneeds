@@ -194,6 +194,24 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
 		try {
 			AuthenticationThreadLocal.setAuthentication((Authentication) session.getPrincipal());
 			ownerApplicationService.sendWonMessage(wonMessage);
+			
+			if (wonMessage.getMessageType() == WonMessageType.DELETE) {
+                // TODO: Set in STATE "inDeletion" and delete after it's deleted in the node 
+                // (receiving success response for delete msg)
+                try {
+                    //Get the need from owner application db
+                    UserNeed userNeed = userNeedRepository.findByNeedUri(needUri);
+                    //Get the user from owner application db
+                    user = userRepository.findOne(user.getId());
+                    //Delete need in users need list and save changes
+                    user.deleteNeedUri(userNeed);
+                    userRepository.save(user);
+                    //Delete need in need repository
+                    userNeedRepository.delete(userNeed.getId());                    
+                } catch (Exception e) {
+                    logger.debug("Could not delete need with  uri {} because of {}", needUri, e);
+                }
+            }
 		} finally {
 			// be sure to remove the principal from the threadlocal
 			AuthenticationThreadLocal.remove();
@@ -462,6 +480,19 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
                     }
                     return true;
                 }
+            } else if (WonMessageType.DELETE == wonMessage.getIsResponseToMessageType()) {
+                try {
+                    deleteNeedUri(wonMessage, session);
+                } catch (Exception e) {
+                    logger.warn("could not deactivate need {}, cannot send message", needUri, e);
+                    if (user != null) {
+                        webSocketSessionService.removeMapping(user, session);
+                    }
+                    if (needUri != null) {
+                        webSocketSessionService.removeMapping(needUri, session);
+                    }
+                    return true;
+                }
             }
 		}
 		try {
@@ -500,6 +531,10 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
 
     private void activateNeedUri(final WonMessage wonMessage, final WebSocketSession session) {
         updateNeedUriState(wonMessage, session, NeedState.ACTIVE);
+    }
+
+    private void deleteNeedUri(final WonMessage wonMessage, final WebSocketSession session) {
+        // TODO: Delete need
     }
 
     private void updateNeedUriState(final WonMessage wonMessage, final WebSocketSession session, NeedState newState) {

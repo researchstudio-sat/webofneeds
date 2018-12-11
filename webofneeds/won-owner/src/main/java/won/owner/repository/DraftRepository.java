@@ -34,8 +34,8 @@ public interface DraftRepository extends WonRepository<Draft> {
 
 	public List<Draft> findById(long id);
 
-  public Draft findOneByDraftURI(URI draftURI);
-
-  public List<Draft> findByDraftURI(URI draftURI);
+	public Draft findOneByDraftURI(URI draftURI);
+  
+    public List<Draft> findByDraftURI(URI draftURI);
 
 }

@@ -124,14 +124,14 @@ function genComponentConf() {
             "Deleting or archiving the Post will close all connections, do you want to proceed?",
           buttons: [
             {
-              caption: "Delete",
+              caption: "Delete (irreversible!)",
               callback: () => {
                 this.needs__delete(this.post.get("uri"));
                 this.router__stateGoCurrent({
                   useCase: undefined,
                   postUri: undefined,
                 });
-                this.closeModalDialog();
+                this.view__hideModalDialog();
               },
             },
             {

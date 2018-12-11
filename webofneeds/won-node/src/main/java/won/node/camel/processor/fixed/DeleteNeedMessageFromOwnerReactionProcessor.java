@@ -18,7 +18,6 @@ package won.node.camel.processor.fixed;
 
 import java.net.URI;
 import java.util.Collection;
-import java.util.List;
 
 import org.apache.camel.Exchange;
 import org.slf4j.Logger;
@@ -34,7 +33,6 @@ import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionState;
-import won.protocol.model.MessageEventPlaceholder;
 import won.protocol.model.Need;
 import won.protocol.util.DataAccessUtils;
 import won.protocol.vocabulary.WONMSG;
@@ -53,7 +51,7 @@ public class DeleteNeedMessageFromOwnerReactionProcessor extends AbstractCamelPr
       URI receiverNeedURI = wonMessage.getReceiverNeedURI();
       logger.debug("DELETING need. needURI:{}", receiverNeedURI);
       if (receiverNeedURI == null) throw new WonMessageProcessingException("receiverNeedURI is not set");
-      Need need = DataAccessUtils.loadNeed(needRepository, receiverNeedURI);
+      Need need = DataAccessUtils.loadNeed(needRepository, receiverNeedURI);      
       matcherProtocolMatcherClient.needDeleted(need.getNeedURI(), wonMessage);
       //close all connections
       //TODO: Set Connection to DELETED

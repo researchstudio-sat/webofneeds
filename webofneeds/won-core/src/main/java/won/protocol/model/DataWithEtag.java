@@ -71,6 +71,16 @@ public class DataWithEtag<T>
     this(data, etag, oldEtag, false, false);
   }
 
+  /**
+   * Construcutor setting notFound false + isDeleted to value.
+   * @param data
+   * @param etag
+   * @param isDeleted
+   */
+  public DataWithEtag(final T data, final String etag, final String oldEtag, final boolean isDeleted) {
+    this(data, etag, oldEtag, false, isDeleted);
+  }
+  
   public T getData() {
     return data;
   }

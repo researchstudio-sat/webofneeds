@@ -306,7 +306,9 @@ public class NeedInformationServiceImpl implements NeedInformationService
             Integer version = Integer.valueOf(etag);
             need = needRepository.findOneByNeedURIAndVersionNot(needURI, version);
         }
-        return new DataWithEtag<>(need, need == null ? etag : Integer.toString(need.getVersion()), etag);
+        boolean isDeleted = !!(need.getState() == NeedState.DELETED);
+        
+        return new DataWithEtag<>(need, need == null ? etag : Integer.toString(need.getVersion()), etag, isDeleted);
     }
 
   @Override

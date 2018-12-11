@@ -106,7 +106,7 @@ export function createWhatsNew() {
           (isWhatsAroundNeed(need) || isWhatsNewNeed(need))
       )
       .map(need => {
-        dispatch(actionCreators.needs__close(need.get("uri")));
+        dispatch(actionCreators.needs__delete(need.get("uri")));
       });
 
     dispatch(actionCreators.needs__create(whatsNewObject, null, nodeUri));
@@ -138,7 +138,7 @@ export function createWhatsAround() {
                   (isWhatsAroundNeed(need) || isWhatsNewNeed(need))
               )
               .map(need => {
-                dispatch(actionCreators.needs__close(need.get("uri"))); //TODO action creators should not call other action creators, according to Moru
+                dispatch(actionCreators.needs__delete(need.get("uri"))); //TODO action creators should not call other action creators, according to Moru
               });
             const whatsAroundObject = {
               content: {
