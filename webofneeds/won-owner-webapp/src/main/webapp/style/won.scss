@@ -82,11 +82,17 @@ body {
     }
 
     > main.signup,
-    > main.about,
-    > main.settings {
+    > main.about {
       grid-area: list;
       @media (min-width: $responsivenessBreakPoint) {
         grid-column: 1 / -1;
+      }
+    }
+
+    > main.settings {
+      grid-area: list;
+      @media (min-width: $responsivenessBreakPoint) {
+        grid-column: 2 / 4;
       }
     }
 

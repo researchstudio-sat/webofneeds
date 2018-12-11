@@ -96,6 +96,29 @@ public class WonLinkedDataUtils
       return getConversationAndNeedsDataset(URI.create(connectionURI), linkedDataSource);
   }
 
+    public static Dataset getFullNeedDataset(URI needURI, LinkedDataSource linkedDataSource) {
+        assert linkedDataSource != null : "linkedDataSource must not be null";
+        int depth = 7;
+        int maxRequests = 1000;
+        List<Path> propertyPaths = new ArrayList<>();
+        PrefixMapping pmap = new PrefixMappingImpl();
+        pmap.withDefaultMappings(PrefixMapping.Standard);
+        pmap.setNsPrefix("won", WON.getURI());
+        pmap.setNsPrefix("msg", WONMSG.getURI());
+        propertyPaths.add(PathParser.parse("won:hasConnections", pmap));
+        propertyPaths.add(PathParser.parse("won:hasConnections/rdfs:member", pmap));
+        propertyPaths.add(PathParser.parse("won:hasConnections/rdfs:member/won:hasEventContainer", pmap));
+        propertyPaths.add(PathParser.parse("won:hasConnections/rdfs:member/won:hasEventContainer/rdfs:member", pmap));
+        propertyPaths.add(PathParser.parse("won:hasConnections/rdfs:member/won:hasEventContainer/rdfs:member/msg:hasCorrespondingRemoteMessage", pmap));
+        propertyPaths.add(PathParser.parse("won:hasConnections/rdfs:member/won:hasEventContainer/rdfs:member/msg:hasPreviousMessage", pmap));
+        propertyPaths.add(PathParser.parse("won:hasConnections/rdfs:member/won:belongsToNeed", pmap));
+        propertyPaths.add(PathParser.parse("won:hasConnections/rdfs:member/won:belongsToNeed/won:hasEventContainer", pmap));
+        propertyPaths.add(PathParser.parse("won:hasConnections/rdfs:member/won:belongsToNeed/won:hasEventContainer/rdfs:member", pmap));
+        propertyPaths.add(PathParser.parse("won:hasConnections/rdfs:member/won:belongsToNeed/won:hasEventContainer/rdfs:member/msg:hasPreviousMessage", pmap));
+
+        return linkedDataSource.getDataForResourceWithPropertyPath(needURI, needURI, propertyPaths, maxRequests, depth);
+    }
+
   public static Dataset getConversationAndNeedsDataset(URI connectionURI, LinkedDataSource linkedDataSource) {
       assert linkedDataSource != null : "linkedDataSource must not be null";
       int depth = 5; 

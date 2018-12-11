@@ -147,6 +147,8 @@ public class User implements UserDetails, Persistable<Long> {
         return this.emailVerified || isWithinGracePeriod();
     }
 
+    public boolean isPrivateId() {return this.email.endsWith("@matchat.org");}
+
     @Override
     public boolean isEnabled() {
         return true;

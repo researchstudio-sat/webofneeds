@@ -361,6 +361,8 @@ won.RESPONSECODE = Object.freeze({
   SIGNUP_FAILED: 4400,
   SETTINGS_CREATED: 5200,
   TOS_ACCEPT_SUCCESS: 6200,
+  EXPORT_SUCCESS: 7200,
+  EXPORT_IS_ANONYMOUS: 7403,
 
   PRIVATEID_NOT_FOUND: 666, //this one is not defined in RestStatusResponse.java
 });
