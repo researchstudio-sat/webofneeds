@@ -303,18 +303,14 @@ function genSlideInConf() {
     }
 
     copyLinkToClipboard() {
-      const linkEl = this.getAnonymousLinkField();
-      if (linkEl) {
-        linkEl.focus();
-        linkEl.setSelectionRange(0, linkEl.value.length);
-        if (!document.execCommand("copy")) {
-          window.prompt("Copy to clipboard: Ctrl+C", linkEl.value);
-        } else {
-          linkEl.setSelectionRange(0, 0);
-          linkEl.blur();
-          this.account__copiedAnonymousLinkSuccess();
-        }
-      }
+      let tempInput = document.createElement("input");
+      tempInput.style = "position: absolute; left: -1000px; top: -1000px";
+      tempInput.value = this.anonymousLink;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      document.execCommand("copy");
+      document.body.removeChild(tempInput);
+      this.account__copiedAnonymousLinkSuccess();
     }
 
     isValidEmail() {
