@@ -144,10 +144,12 @@ public class User implements UserDetails, Persistable<Long> {
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return this.emailVerified || isWithinGracePeriod();
+        return this.isAnonymous() || this.emailVerified || isWithinGracePeriod();
     }
 
-    public boolean isPrivateId() {return this.email.endsWith("@matchat.org");}
+    public boolean isAnonymous() {
+        return this.privateId != null;
+    }
 
     @Override
     public boolean isEnabled() {
