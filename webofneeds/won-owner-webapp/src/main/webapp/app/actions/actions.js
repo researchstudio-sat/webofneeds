@@ -40,12 +40,6 @@ import { tree2constants } from "../utils.js";
 import { hierarchy2Creators } from "./action-utils.js";
 
 import {
-  buildCloseNeedMessage,
-  buildOpenNeedMessage,
-  buildDeleteNeedMessage,
-} from "../won-message-utils.js";
-
-import {
   needCreate,
   createWhatsNew,
   createWhatsAround,
