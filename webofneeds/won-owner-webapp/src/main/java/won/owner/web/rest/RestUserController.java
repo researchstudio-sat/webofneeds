@@ -282,6 +282,7 @@ public class RestUserController {
     public ResponseEntity logIn(
             @RequestParam("username") String username,
             @RequestParam("password") String password,
+            @RequestParam("privateId") String privateId,
             HttpServletRequest request,
             HttpServletResponse response) {
         SecurityContext context = SecurityContextHolder.getContext();
@@ -294,6 +295,13 @@ public class RestUserController {
             rememberMeServices.loginSuccess(request, response, auth);
 
             User user = userService.getByUsername(username);
+
+            //if a login attempt happens with a privateId parameter then we will save the privateId in our won_user table if it wasnt already set
+            if(privateId != null && user.getPrivateId() == null) {
+                user.setPrivateId(privateId);
+                userService.save(user);
+            }
+
             return generateUserResponse(user);
         } catch (BadCredentialsException ex) {
             rememberMeServices.loginFail(request, response);
