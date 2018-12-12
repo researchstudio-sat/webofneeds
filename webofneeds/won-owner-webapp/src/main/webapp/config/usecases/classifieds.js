@@ -10,13 +10,13 @@ import {
   filterInVicinity,
   textSearchSubQuery,
   vicinityScoreSubQuery,
-  //concatenateFilters,
+  filterRentRange,
+  concatenateFilters,
   sparqlQuery,
 } from "../../app/sparql-builder-utils.js";
 
 /*
 TODO: send hints to counterparts of searches
-TODO: add prices to search
 TODO: queries for offers
 */
 
@@ -29,7 +29,6 @@ const classifiedsUseCases = {
     draft: {
       ...emptyDraft,
       content: {
-        title: "I'm offering something!",
         type: "s:Offer",
       },
       seeks: {
@@ -37,7 +36,7 @@ const classifiedsUseCases = {
       },
     },
     details: {
-      title: { ...details.title },
+      title: { ...details.title, mandatory: true },
       description: { ...details.description },
       price: { ...details.price, mandatory: true },
       tags: { ...details.tags },
@@ -84,9 +83,6 @@ const classifiedsUseCases = {
         type: "s:Offer",
       },
     },
-    details: {
-      location: { ...details.location }, // can this picker be displayed below other details?
-    },
     seeksDetails: {
       tags: {
         ...details.tags,
@@ -95,6 +91,7 @@ const classifiedsUseCases = {
       },
       priceRange: { ...details.pricerange },
       description: { ...details.description },
+      location: { ...details.location },
     },
     generateQuery: (draft, resultName) => {
       let subQueries = [];
@@ -103,10 +100,11 @@ const classifiedsUseCases = {
       const tags = getIn(draft, ["seeks", "tags"]);
       let keywords = [];
 
+      // prep tags for searching
       if (tags && is("Array", tags) && tags.length > 0) {
         keywords = tags
           .map(s => s.split(/\s+/)) // remove all whitespace
-          .reduce((arrArr, arr) => arrArr.concat(arr), []); // flatten array, .flat() does not work on edge
+          .reduce((arrArr, arr) => arrArr.concat(arr), []); // flatten array, Array.flat() does not work on edge
 
         // search for all keywords in title, description and tags
         // this is probably horribly inefficient
@@ -138,7 +136,7 @@ const classifiedsUseCases = {
 
           if (descriptionSQ) {
             subQueries.push(descriptionSQ);
-            subScores.push("?description_" + keyword + "_index"); // dirty hack.
+            subScores.push("?description_" + keyword + "_index");
           }
 
           let tagsSQ = textSearchSubQuery({
@@ -151,11 +149,22 @@ const classifiedsUseCases = {
 
           if (tagsSQ) {
             subQueries.push(tagsSQ);
-            subScores.push("?tags_" + keyword + "_index"); // dirty hack.
+            subScores.push("?tags_" + keyword + "_index");
           }
         }
       }
 
+      // dirty hack, part 2
+      // this is done to be able to use the indices generated above
+      // in the sparql query below
+      const iterator = subScores.values();
+      let subScoreString = ``;
+
+      for (const value of iterator) {
+        subScoreString += `COALESCE(` + value + `, 0) + `;
+      }
+
+      // prioritise close results
       const vicinityScoreSQ = vicinityScoreSubQuery({
         resultName: resultName,
         bindScoreAs: "?location_geoScore",
@@ -175,13 +184,34 @@ const classifiedsUseCases = {
           optional: true,
         }));
 
-      // dirty hack, part 2
-      const iterator = subScores.values();
-      let subScoreString = ``;
+      // filter for price range
+      const priceRange = getIn(draft, ["seeks", "pricerange"]);
 
-      for (const value of iterator) {
-        subScoreString += `COALESCE(` + value + `, 0) + `;
-      }
+      const filters = [
+        {
+          prefixes: {
+            won: won.defaultContext["won"],
+          },
+          operations: [
+            `${resultName} rdf:type won:Need.`,
+            `${resultName} rdf:type s:Offer.`,
+            `BIND( ( ` +
+            subScoreString + // contains all COALESCE statements for text search results
+              `COALESCE(?location_geoScore, 0) 
+            ) as ?score)`, // TODO: map this to a value from 0 to 1
+          ],
+        },
+        priceRange &&
+          // no idea why this method isn't called filterPriceRange
+          filterRentRange(
+            `${resultName}`,
+            priceRange.min,
+            priceRange.max,
+            priceRange.currency
+          ),
+      ];
+
+      const concatenatedFilters = concatenateFilters(filters);
 
       const query = sparqlQuery({
         prefixes: {
@@ -193,14 +223,7 @@ const classifiedsUseCases = {
         distinct: true,
         variables: [resultName],
         subQueries: subQueries,
-        where: [
-          `${resultName} rdf:type won:Need.`,
-          `${resultName} rdf:type s:Offer.`,
-          `BIND( ( ` +
-          subScoreString + // contains all COALESCE statements for text search results
-            `COALESCE(?location_geoScore, 0) 
-            ) as ?score)`, // TODO: map this to a value from 0 to 1
-        ],
+        where: concatenatedFilters.operations,
         orderBy: [{ order: "DESC", variable: "?score" }],
       });
 
