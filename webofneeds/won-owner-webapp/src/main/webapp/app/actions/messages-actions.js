@@ -868,15 +868,6 @@ export function processHintMessage(event) {
               payload: data,
             });
           });
-
-          // /add some properties to the eventData so as to make them easily accessible to consumers
-          //of the hint event
-          // below is commented as it seems to cause to hint event data loaded/displayed
-          //if (eventData.matchCounterpartURI != null) {
-          //    //load the data of the need the hint is about, if required
-          //    //linkedDataService.ensureLoaded(eventData.uri);
-          //    linkedDataService.ensureLoaded(eventData.matchCounterpartURI);
-          //}
         });
     }
   };
