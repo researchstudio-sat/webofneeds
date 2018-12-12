@@ -3,11 +3,10 @@
  */
 
 import { details, emptyDraft } from "../detail-definitions.js";
-import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-utils.js";
 import won from "../../app/won-es6.js";
 import { getIn, is } from "../../app/utils.js";
 import {
-  filterInVicinity,
+  // filterInVicinity,
   textSearchSubQuery,
   vicinityScoreSubQuery,
   filterRentRange,
@@ -16,16 +15,15 @@ import {
 } from "../../app/sparql-builder-utils.js";
 
 /*
-TODO: send hints to counterparts of searches
-TODO: queries for offers
+TODO: send hints to counterparts of searches (offers)
+TODO: create use case icons
 */
 
 const classifiedsUseCases = {
   goodsOffer: {
     identifier: "goodsOffer",
     label: "Offer Something",
-    icon: "#ico36_uc_plus",
-    doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
+    icon: "#ico36_plus",
     draft: {
       ...emptyDraft,
       content: {
@@ -44,35 +42,14 @@ const classifiedsUseCases = {
       images: { ...details.images },
     },
     // TODO: what should this match on?
-    generateQuery: (draft, resultName) => {
-      const location = getIn(draft, ["content", "location"]);
-
-      const filters = [
-        {
-          // to select seeks-branch
-          prefixes: {
-            won: won.defaultContext["won"],
-          },
-          operations: [
-            `${resultName} a won:Need.`,
-            `${resultName} won:seeks ?seeks.`,
-            location && "?seeks won:hasLocation/s:location ?location.",
-          ],
-        },
-
-        filterInVicinity("?location", location, /*radius=*/ 5),
-      ];
-
-      // exists only because of compile restrictions
-      if (draft && resultName && filters) {
-        // TODO: delete this
-      }
-    },
+    // generateQuery: (draft, resultName) => {
+    //   // return query
+    // },
   },
   goodsDemand: {
     identifier: "goodsDemand",
     label: "Look for something",
-    icon: "#ico36_uc_plus",
+    icon: "#ico36_plus",
     draft: {
       ...emptyDraft,
       content: {
@@ -84,6 +61,7 @@ const classifiedsUseCases = {
       },
     },
     seeksDetails: {
+      title: { ...details.title },
       tags: {
         ...details.tags,
         label: "Keywords to search for",
@@ -235,27 +213,23 @@ const classifiedsUseCases = {
   servicesOffer: {
     identifier: "servicesOffer",
     label: "Offer a Service",
-    icon: "#ico36_uc_plus",
-    doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
+    icon: "#ico36_plus",
     draft: {
       ...emptyDraft,
       content: {
-        title: "Offer a Service",
         type: "s:Offer",
       },
     },
     details: {
-      title: { ...details.title },
+      title: { ...details.title, mandatory: true },
       description: { ...details.description },
-      fromDatetime: { ...details.fromDatetime },
-      throughDatetime: { ...details.throughDatetime },
+      price: { ...details.price, mandatory: true },
+      tags: { ...details.tags },
       location: { ...details.location },
-      price: { ...details.price },
     },
+    // TODO: what should this match on?
     // generateQuery: (draft, resultName) => {
-    //   if (draft && resultName) {
-    //     // do nothing
-    //   }
+    //   // return query
     // },
   },
   // TODO: servicesDemand: {},
