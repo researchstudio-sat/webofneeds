@@ -129,12 +129,18 @@ won-slide-in {
       grid-template-areas:
         "siIcon siTitle siTitle siButton"
         "siText siText siText siText"
+        "siButtonSingle siButtonSingle siButtonSingle siButtonSingle"
         "siButtonLeft siButtonLeft siButtonRight siButtonRight";
-
+        
+      & > .si__buttonSignup,
       & > .si__buttonCopy,
       & > .si__buttonEmail {
         @include won-button--outlined(white);
         font-size: $smallFontSize;
+      }
+      
+      & > .si__buttonSignup {
+        grid-area: siButtonSingle;
       }
 
       & > .si__buttonCopy {
@@ -164,6 +170,7 @@ won-slide-in {
         grid-template-areas:
           "siIcon siTitle siTitle siButton"
           "siText siText siText siText"
+          "siButtonSingle siButtonSingle siButtonSingle siButtonSingle"
           "siButtonLeft siButtonLeft siButtonRight siButtonRight"
           "siEmailInput siEmailInput siEmailInput siEmailInput"
           "siButtonSend siButtonSend siButtonSend siButtonSend";
