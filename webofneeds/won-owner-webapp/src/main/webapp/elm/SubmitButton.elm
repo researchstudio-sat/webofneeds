@@ -8,7 +8,7 @@ import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
 import Element.Input as Input
-import Elements
+import Elements exposing (svgIcon)
 import Html exposing (Html)
 import Html.Attributes as HA
 import Json.Decode as Decode exposing (Value)
@@ -478,26 +478,3 @@ port publishIn : (Options -> msg) -> Sub msg
 
 
 port publishOut : Maybe String -> Cmd msg
-
-
-
----- ELEMENTS ----
-
-
-svgIcon :
-    List (Attribute msg)
-    ->
-        { color : Color
-        , name : String
-        }
-    -> Element msg
-svgIcon attributes { color, name } =
-    el attributes <|
-        html <|
-            Html.node "won-svg-icon"
-                [ HA.attribute "icon" name
-                , HA.attribute "color" (Skin.cssColor color)
-                , HA.style "width" "100%"
-                , HA.style "height" "100%"
-                ]
-                []

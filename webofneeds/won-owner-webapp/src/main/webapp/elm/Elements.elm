@@ -1,4 +1,10 @@
-module Elements exposing (Button, identicon, mainButton, outlinedButton)
+module Elements exposing
+    ( Button
+    , identicon
+    , mainButton
+    , outlinedButton
+    , svgIcon
+    )
 
 import Element exposing (..)
 import Element.Background as Background
@@ -102,6 +108,25 @@ identicon attributes string =
         html <|
             node "won-identicon"
                 [ HA.attribute "data" string
+                , HA.style "width" "100%"
+                , HA.style "height" "100%"
+                ]
+                []
+
+
+svgIcon :
+    List (Attribute msg)
+    ->
+        { color : Color
+        , name : String
+        }
+    -> Element msg
+svgIcon attributes { color, name } =
+    el attributes <|
+        html <|
+            Html.node "won-svg-icon"
+                [ HA.attribute "icon" name
+                , HA.attribute "color" (Skin.cssColor color)
                 , HA.style "width" "100%"
                 , HA.style "height" "100%"
                 ]
