@@ -728,23 +728,29 @@ function fetchActiveConnectionAndDispatch(cnctUri, dispatch) {
 }
 
 function fetchTheirNeedAndDispatch(needUri, dispatch) {
-  const needP = won.getNeed(needUri);
-  needP.then(need => {
-    if (need["won:heldBy"] && need["won:heldBy"]["@id"]) {
-      const personaUri = need["won:heldBy"]["@id"];
-      won.getNeed(personaUri).then(personaNeed =>
-        dispatch({
-          type: actionTypes.personas.storeTheirs,
-          payload: Immutable.fromJS({
-            needs: { [personaUri]: personaNeed },
-          }),
-        })
-      );
-    }
-    dispatch({
-      type: actionTypes.needs.storeTheirs,
-      payload: Immutable.fromJS({ needs: { [needUri]: need } }),
+  return won
+    .getNeed(needUri)
+    .then(need => {
+      if (need["won:heldBy"] && need["won:heldBy"]["@id"]) {
+        const personaUri = need["won:heldBy"]["@id"];
+        return won.getNeed(personaUri).then(personaNeed => {
+          dispatch({
+            type: actionTypes.personas.storeTheirs,
+            payload: Immutable.fromJS({
+              needs: { [personaUri]: personaNeed },
+            }),
+          });
+          return need;
+        });
+      } else {
+        return need;
+      }
+    })
+    .then(need => {
+      dispatch({
+        type: actionTypes.needs.storeTheirs,
+        payload: Immutable.fromJS({ needs: { [needUri]: need } }),
+      });
+      return need;
     });
-  });
-  return needP;
 }
