@@ -731,27 +731,23 @@ async function fetchConnectionsOfNeedAndDispatch(needUri, dispatch) {
 }
 
 function fetchOwnedNeedAndDispatch(needUri, dispatch) {
-  const needP = won
-    .ensureLoaded(needUri, { requesterWebId: needUri }) //ensure loaded does net seem to be necessary as it is called within getNeed also the requesterWebId is not necessary for need requests
-    .then(() => won.getNeed(needUri));
-  needP.then(need =>
+  return won.getNeed(needUri).then(need => {
     dispatch({
       type: actionTypes.needs.storeOwned,
       payload: Immutable.fromJS({ needs: { [needUri]: need } }),
-    })
-  );
-  return needP;
+    });
+    return need;
+  });
 }
 
 function fetchActiveConnectionAndDispatch(cnctUri, dispatch) {
-  const cnctP = won.getNode(cnctUri);
-  cnctP.then(connection =>
+  return won.getNode(cnctUri).then(connection => {
     dispatch({
       type: actionTypes.connections.storeActive,
       payload: Immutable.fromJS({ connections: { [cnctUri]: connection } }),
-    })
-  );
-  return cnctP;
+    });
+    return connection;
+  });
 }
 
 function fetchTheirNeedAndDispatch(needUri, dispatch) {
