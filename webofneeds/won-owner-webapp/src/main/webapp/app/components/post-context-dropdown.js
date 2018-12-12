@@ -57,6 +57,11 @@ function genComponentConf() {
                         Reopen Post
                     </button>
                     <button class="won-button--filled red"
+                        ng-if="self.isOwnPost && self.isInactive"
+                        ng-click="self.deletePost()">
+                        Delete Post
+                    </button>
+                    <button class="won-button--filled red"
                         ng-if="self.isOwnPost && self.isActive"
                         ng-click="self.closePost()">
                         Remove Post
@@ -124,14 +129,15 @@ function genComponentConf() {
             "Deleting or archiving the Post will close all connections, do you want to proceed?",
           buttons: [
             {
-              caption: "Delete (irreversible!)",
+              caption: "Delete",
               callback: () => {
-                this.needs__delete(this.post.get("uri"));
+                /*this.needs__delete(this.post.get("uri"));
                 this.router__stateGoCurrent({
                   useCase: undefined,
                   postUri: undefined,
                 });
-                this.view__hideModalDialog();
+                this.view__hideModalDialog();*/
+                this.deletePost();
               },
             },
             {
@@ -147,6 +153,35 @@ function genComponentConf() {
             },
             {
               caption: "Cancel",
+              callback: () => {
+                this.view__hideModalDialog();
+              },
+            },
+          ],
+        };
+        this.view__showModalDialog(payload);
+      }
+    }
+
+    deletePost() {
+      if (this.isOwnPost) {
+        const payload = {
+          caption: "Attention!",
+          text: "Deleting the Post is irreversible, do you want to proceed?",
+          buttons: [
+            {
+              caption: "YES",
+              callback: () => {
+                this.needs__delete(this.post.get("uri"));
+                this.router__stateGoCurrent({
+                  useCase: undefined,
+                  postUri: undefined,
+                });
+                this.view__hideModalDialog();
+              },
+            },
+            {
+              caption: "NO",
               callback: () => {
                 this.view__hideModalDialog();
               },
