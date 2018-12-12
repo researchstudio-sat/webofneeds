@@ -10,6 +10,8 @@ import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
+import won.protocol.model.Connection;
+import won.protocol.model.ConnectionState;
 import won.protocol.model.MessageEventPlaceholder;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
@@ -17,10 +19,11 @@ import won.protocol.util.DataAccessUtils;
 import won.protocol.vocabulary.WONMSG;
 
 import java.net.URI;
+import java.util.Collection;
 import java.util.List;
 
 /**
- * User: syim Date: 02.03.2015
+ * User: MS 01.12.2018
  */
 
 public class DeleteNeedMessageProcessor extends AbstractCamelProcessor {
@@ -32,26 +35,31 @@ public class DeleteNeedMessageProcessor extends AbstractCamelProcessor {
         if (wonMessage.getMessageType() == WonMessageType.SUCCESS_RESPONSE
                 && wonMessage.getIsResponseToMessageType() == WonMessageType.DELETE) {
             URI receiverNeedURI = wonMessage.getReceiverNeedURI();
-            logger.debug("DELETING need. needURI:{}", receiverNeedURI);
-            if (receiverNeedURI == null)
+            if (receiverNeedURI == null) {
                 throw new WonMessageProcessingException("receiverNeedURI is not set");
+            }
             Need need = DataAccessUtils.loadNeed(needRepository, receiverNeedURI);
-            //need.getEventContainer().getEvents()
-            //        .add(messageEventRepository.findOneByMessageURIforUpdate(wonMessage.getMessageURI()));
-            need.setState(NeedState.DELETED);
-            // need = needRepository.save(need);
-            // TODO Remove all data from need
 
-            // Remove all events
-            
-            messageEventRepository.deleteByParentURI(need.getNeedURI());
-            
-
-            need.resetAllNeedData();
-
+            if (need.getState() == NeedState.DELETED) {
+                // Delete Need
+                logger.debug("Set need to state DELETED. needURI:{}", receiverNeedURI);
+                Collection<Connection> conns = connectionRepository
+                        .getConnectionsByNeedURIAndNotInStateForUpdate(need.getNeedURI(), ConnectionState.CLOSED);
+                if(conns.size() > 0) {
+                    //Still not closed connections
+                    logger.debug("Still open connections for need. needURI{}", receiverNeedURI);
+                    //TODO: Handle!
+                    
+                }
+                
+                messageEventRepository.deleteByParentURI(need.getNeedURI());
+                need.resetAllNeedData();
+            } else {
+                // First Step: Delete message to set need in DELETED state and start delete process
+                logger.debug("DELETING need. needURI:{}", receiverNeedURI);
+                need.setState(NeedState.DELETED);
+            }
             needRepository.save(need);
         }
-
     }
-
 }

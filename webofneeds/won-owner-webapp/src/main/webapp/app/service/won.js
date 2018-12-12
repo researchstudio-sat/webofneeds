@@ -1514,6 +1514,12 @@ WonMessage.prototype = {
       "http://purl.org/webofneeds/message#DeactivateMessage"
     );
   },
+  isDeleteMessage: function() {
+    return (
+      this.getMessageType() ===
+      "http://purl.org/webofneeds/message#DeleteMessage"
+    );
+  },
   isNeedMessage: function() {
     return (
       this.getMessageType() === "http://purl.org/webofneeds/message#NeedMessage"
@@ -1587,6 +1593,12 @@ WonMessage.prototype = {
     return (
       this.getIsResponseToMessageType() ===
       "http://purl.org/webofneeds/message#DeactivateMessage"
+    );
+  },
+  isResponseToDeleteMessage: function() {
+    return (
+      this.getIsResponseToMessageType() ===
+      "http://purl.org/webofneeds/message#DeleteMessage"
     );
   },
 

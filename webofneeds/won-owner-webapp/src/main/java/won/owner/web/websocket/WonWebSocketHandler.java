@@ -201,13 +201,17 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
                 try {
                     //Get the need from owner application db
                     UserNeed userNeed = userNeedRepository.findByNeedUri(needUri);
+                    userNeed.setState(NeedState.DELETED);
+                    userNeedRepository.save(userNeed);
+                    /*
                     //Get the user from owner application db
                     user = userRepository.findOne(user.getId());
                     //Delete need in users need list and save changes
                     user.deleteNeedUri(userNeed);
                     userRepository.save(user);
                     //Delete need in need repository
-                    userNeedRepository.delete(userNeed.getId());                    
+                    userNeedRepository.delete(userNeed.getId());
+                    */             
                 } catch (Exception e) {
                     logger.debug("Could not delete need with  uri {} because of {}", needUri, e);
                 }
@@ -533,18 +537,32 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
         updateNeedUriState(wonMessage, session, NeedState.ACTIVE);
     }
 
-    private void deleteNeedUri(final WonMessage wonMessage, final WebSocketSession session) {
-        // TODO: Delete need
-    }
-
     private void updateNeedUriState(final WonMessage wonMessage, final WebSocketSession session, NeedState newState) {
-        User user = getUserForSession(session);
         URI needUri = getOwnedNeedURI(wonMessage);
         UserNeed userNeed = userNeedRepository.findByNeedUri(needUri);
         userNeed.setState(newState);
         // reload the user so we can save it
         // (the user object we get from getUserForSession is detached)
         userNeedRepository.save(userNeed);
+    }
+    
+    private void deleteNeedUri(final WonMessage wonMessage, final WebSocketSession session) {
+        User user = getUserForSession(session);
+        URI needUri = getOwnedNeedURI(wonMessage);
+        //Get the need from owner application db
+        UserNeed userNeed = userNeedRepository.findByNeedUri(needUri);
+        
+        if(userNeed.getState() == NeedState.DELETED) {
+            //Get the user from owner application db
+            user = userRepository.findOne(user.getId());
+            //Delete need in users need list and save changes
+            user.deleteNeedUri(userNeed);
+            userRepository.save(user);
+            //Delete need in need repository
+            userNeedRepository.delete(userNeed.getId());
+        } else {
+            throw new IllegalStateException("need not in state deleted");
+        }
     }
 
 	private User getUserForSession(final WebSocketSession session) {
