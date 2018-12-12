@@ -283,6 +283,11 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
 		    return;
 		}
 		
+		if (user.isAnonymous()) {
+		    logger.debug("not sending email to user: user is anonymous");
+		    return;
+		}
+		
 		if (!user.isEmailVerified()) {
 		    logger.debug("not sending email to user: email address not yet verified");
 			return;
