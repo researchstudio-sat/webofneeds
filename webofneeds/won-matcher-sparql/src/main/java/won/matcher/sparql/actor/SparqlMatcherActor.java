@@ -215,7 +215,7 @@ public class SparqlMatcherActor extends UntypedActor {
         P_Alt any = new P_Alt(blankPath, negation);
 
         //NOTE: removed is and seeks handling here
-        Path searchPath =  Collections.<Path>nCopies(5, new P_ZeroOrOne(any)).stream().reduce(new P_ZeroOrOne(any), P_Seq::new);
+        Path searchPath =  Collections.<Path>nCopies(2, new P_ZeroOrOne(any)).stream().reduce(new P_ZeroOrOne(any), P_Seq::new);
 
         Var textSearchTarget = Var.alloc("textSearchTarget");
 
