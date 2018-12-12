@@ -44,7 +44,7 @@ export const pricerange = {
         ],
         "s:priceCurrency": value.currency,
         "s:unitCode": value.unitCode,
-        "s:description": "total rent per month in between min/max",
+        "s:description": "price in between min/max",
       },
     };
   },
@@ -157,7 +157,7 @@ export const price = {
   ],
   messageEnabled: true,
   parseToRDF: function({ value, identifier, contentUri }) {
-    if (!value || !value.amount || !value.currency) {
+    if (!value || value.amount === undefined || !value.currency) {
       return { "s:priceSpecification": undefined };
     }
 
