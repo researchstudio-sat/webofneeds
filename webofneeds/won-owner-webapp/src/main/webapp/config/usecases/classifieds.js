@@ -53,7 +53,6 @@ const classifiedsUseCases = {
     draft: {
       ...emptyDraft,
       content: {
-        title: "I'm looking for something!",
         type: "s:Demand",
       },
       seeks: {
