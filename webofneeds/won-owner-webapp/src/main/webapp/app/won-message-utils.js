@@ -653,81 +653,58 @@ export function fetchMessage(needUri, eventUri) {
 
 export async function fetchDataForOwnedNeeds(ownedNeedUris, dispatch) {
   if (!is("Array", ownedNeedUris) || ownedNeedUris.length === 0) {
-    return Immutable.fromJS({ needs: {} });
+    return;
   }
 
-  const allOwnedNeeds = await urisToLookupMap(ownedNeedUris, uri =>
+  return urisToLookupMap(ownedNeedUris, uri =>
     fetchOwnedNeedAndDispatch(uri, dispatch)
-  );
-
-  // wait for the own needs to be dispatched then load connections
-  //[{ uri -> cnct }]
-  const connectionMaps = await Promise.all(
-    ownedNeedUris.map(needUri =>
-      fetchConnectionsOfNeedAndDispatch(needUri, dispatch)
+  )
+    .then(() =>
+      urisToLookupMap(ownedNeedUris, needUri =>
+        fetchConnectionsOfNeedAndDispatch(needUri, dispatch)
+      )
     )
-  );
+    .then(needConnectionMap => {
+      const theirNeedUris = Immutable.fromJS(needConnectionMap)
+        .filter(connections => connections.size > 0)
+        .flatMap(entry => entry)
+        .map(conn => conn.get("hasRemoteNeed"))
+        .toSet();
 
-  // flatten into one lookup map
-  const allConnections = connectionMaps.reduce(
-    (a, b) => Object.assign(a, b),
-    {}
-  );
+      const theirNeedUrisArray = theirNeedUris.toArray();
 
-  const theirNeedUris = Object.values(allConnections).map(
-    cnct => cnct.hasRemoteNeed
-  );
-
-  const theirNeedUris_ = Immutable.Set(theirNeedUris).toArray();
-  dispatch({
-    type: actionTypes.needs.storeTheirUrisLoading,
-    payload: Immutable.fromJS({ uris: theirNeedUris_ }),
-  });
-  const allTheirNeeds = await urisToLookupMap(theirNeedUris_, uri =>
-    fetchTheirNeedAndDispatch(uri, dispatch)
-  );
-
-  const allDataRawPromise = Promise.all([
-    allOwnedNeeds,
-    allConnections,
-    allTheirNeeds,
-  ]);
-
-  return allDataRawPromise.then(
-    //FIXME: NOT SURE IF THIS PROMISE IS ACTUALLY USING THE DATA STORED IN IT AT ALL
-    ([ownedNeeds, connections, /* events, */ theirNeeds]) => {
-      Immutable.fromJS({
-        ownedNeeds,
-        connections,
-        events: {
-          /* will be loaded later when connection is accessed */
-        },
-        theirNeeds,
+      dispatch({
+        type: actionTypes.needs.storeTheirUrisLoading,
+        payload: Immutable.fromJS({ uris: theirNeedUrisArray }),
       });
-    }
-  );
+      return theirNeedUrisArray;
+    })
+    .then(theirNeedUris =>
+      urisToLookupMap(theirNeedUris, uri =>
+        fetchTheirNeedAndDispatch(uri, dispatch)
+      )
+    );
 }
 
-async function fetchConnectionsOfNeedAndDispatch(needUri, dispatch) {
-  const connectionUrisOfNeed = await won.getConnectionUrisOfNeed(
-    needUri,
-    needUri,
-    true
-  );
-  const activeConnectionUris = connectionUrisOfNeed.filter(
-    connUri => !isConnUriClosed(connUri)
-  );
-  dispatch({
-    type: actionTypes.connections.storeActiveUrisLoading,
-    payload: Immutable.fromJS({
-      needUri: needUri,
-      connUris: activeConnectionUris,
-    }),
-  });
+function fetchConnectionsOfNeedAndDispatch(needUri, dispatch) {
+  return won
+    .getConnectionUrisOfNeed(needUri, needUri, true)
+    .then(connectionUrisOfNeed => {
+      const activeConnectionUris = connectionUrisOfNeed.filter(
+        connUri => !isConnUriClosed(connUri)
+      );
+      dispatch({
+        type: actionTypes.connections.storeActiveUrisLoading,
+        payload: Immutable.fromJS({
+          needUri: needUri,
+          connUris: activeConnectionUris,
+        }),
+      });
 
-  return urisToLookupMap(activeConnectionUris, uri =>
-    fetchActiveConnectionAndDispatch(uri, dispatch)
-  );
+      return urisToLookupMap(activeConnectionUris, uri =>
+        fetchActiveConnectionAndDispatch(uri, dispatch)
+      );
+    });
 }
 
 function fetchOwnedNeedAndDispatch(needUri, dispatch) {
