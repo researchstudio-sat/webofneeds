@@ -30,17 +30,17 @@ export const pageLoadAction = () => (dispatch, getState) => {
         payload: Immutable.fromJS(data),
       })
     )
-    .then(data => {
-      return loadingWhileSignedIn(dispatch, getState, data);
+    .then(() => {
+      return loadingWhileSignedIn(dispatch, getState);
     })
     .catch(() => {
       return loadingWhileSignedOut(dispatch, getState);
     });
 };
 
-function loadingWhileSignedIn(dispatch, getState, data) {
+function loadingWhileSignedIn(dispatch, getState) {
   loginSuccess(dispatch, getState);
-  fetchOwnedData(data.username, dispatch).then(() =>
+  fetchOwnedData(dispatch).then(() =>
     dispatch({
       type: actionTypes.initialLoadFinished,
     })

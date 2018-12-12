@@ -518,7 +518,7 @@ export function fetchUnloadedData(dispatch) {
   });
 }
 
-export function fetchOwnedData(email, dispatch) {
+export function fetchOwnedData(dispatch) {
   return fetchOwnedInactiveNeedUris().then(inactiveNeedUris => {
     dispatch({
       type: actionTypes.needs.storeOwnedInactiveUris,
