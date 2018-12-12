@@ -223,6 +223,7 @@ public class WON {
     public static final String REVIEWS_STRING = BASE_URI + "reviews";
     
     public static final String CHAT_FACET_STRING = BASE_URI + "ChatFacet";
+    public static final String REVIEW_FACET_STRING = BASE_URI + "ReviewFacet";
     
     //unread information
 	public static final Property HAS_UNREAD_SUGGESTED = m.createProperty(BASE_URI + "hasUnreadSuggested");

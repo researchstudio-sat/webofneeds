@@ -38,6 +38,7 @@ public class FacetService {
         addConfig(new HolderFacetConfig());        
         addConfig(new GroupFacetConfig());
         addConfig(new ChatFacetConfig());
+        addConfig(new ReviewFacetConfig());
     }
     
     private void addConfig(FacetConfig config) {
