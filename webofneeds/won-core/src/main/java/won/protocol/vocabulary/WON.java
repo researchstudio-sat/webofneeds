@@ -46,6 +46,7 @@ public class WON {
     public static final Property HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_NEED_CREATED_TOPIC_NAME = m.createProperty(BASE_URI, "hasActiveMQMatcherProtocolOutNeedCreatedTopicName");
     public static final Property HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_NEED_ACTIVATED_TOPIC_NAME = m.createProperty(BASE_URI, "hasActiveMQMatcherProtocolOutNeedActivatedTopicName");
     public static final Property HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_NEED_DEACTIVATED_TOPIC_NAME = m.createProperty(BASE_URI, "hasActiveMQMatcherProtocolOutNeedDeactivatedTopicName");
+    public static final Property HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_NEED_DELETED_TOPIC_NAME = m.createProperty(BASE_URI, "hasActiveMQMatcherProtocolOutNeedDeletedTopicName");
     public static final Property HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_MATCHER_REGISTERED_TOPIC_NAME = m.createProperty
             (BASE_URI, "hasActiveMQMatcherProtocolOutMatcherRegisteredTopicName");
     public static final Property HAS_URI_PATTERN_SPECIFICATION = m.createProperty(BASE_URI, "hasUriPrefixSpecification");
@@ -154,13 +155,15 @@ public class WON {
 
     public static final Resource NEED_STATE_ACTIVE = m.createResource(NeedState.ACTIVE.getURI().toString());
     public static final Resource NEED_STATE_INACTIVE = m.createResource(NeedState.INACTIVE.getURI().toString());
+    public static final Resource NEED_STATE_DELETED = m.createResource(NeedState.DELETED.getURI().toString());
 
     public static final Resource CONNECTION_STATE_SUGGESTED = m.createResource(ConnectionState.SUGGESTED.getURI().toString());
     public static final Resource CONNECTION_STATE_REQUEST_SENT = m.createResource(ConnectionState.REQUEST_SENT.getURI().toString());
     public static final Resource CONNECTION_STATE_REQUEST_RECEIVED = m.createResource(ConnectionState.REQUEST_RECEIVED.getURI().toString());
     public static final Resource CONNECTION_STATE_CONNECTED = m.createResource(ConnectionState.CONNECTED.getURI().toString());
     public static final Resource CONNECTION_STATE_CLOSED = m.createResource(ConnectionState.CLOSED.getURI().toString());
-
+    public static final Resource CONNECTION_STATE_DELETED = m.createResource(ConnectionState.DELETED.getURI().toString());
+    
     public static final Property HAS_SUGGESTED_COUNT = m.createProperty(BASE_URI,
             "hasSuggestedCount");
     public static final Property HAS_REQUEST_RECEIVED_COUNT = m.createProperty(BASE_URI,
@@ -254,6 +257,8 @@ public class WON {
                 return NEED_STATE_ACTIVE;
             case INACTIVE:
                 return NEED_STATE_INACTIVE;
+            case DELETED:
+                return NEED_STATE_DELETED;
             default:
                 throw new IllegalArgumentException("No case specified for " + state.name());
         }

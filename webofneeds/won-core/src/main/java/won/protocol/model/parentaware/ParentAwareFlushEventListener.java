@@ -28,7 +28,6 @@ import org.hibernate.proxy.HibernateProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static antlr.build.ANTLR.root;
 
 
 public class ParentAwareFlushEventListener implements FlushEntityEventListener {
@@ -48,18 +47,6 @@ public class ParentAwareFlushEventListener implements FlushEntityEventListener {
                 if (parent == null) return;
                 if (logger.isDebugEnabled()) {
                     logger.debug("Incrementing {} entity version because a {} child entity has been updated", parent, entity);
-                }
-                if (! (parent instanceof HibernateProxy)) {
-                    //we have to do the increment manually
-                    parent.incrementVersion();
-                }
-                Hibernate.initialize(parent);
-                event.getSession().save(parent);
-            } else if (deleted(event)) {
-                VersionedEntity parent = parentAware.getParent();
-                if (parent == null) return;
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Incrementing {} entity version because a {} child entity has been deleted", root, entity);
                 }
                 if (! (parent instanceof HibernateProxy)) {
                     //we have to do the increment manually

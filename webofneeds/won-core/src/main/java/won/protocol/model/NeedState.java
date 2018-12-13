@@ -30,7 +30,8 @@ import java.net.URI;
 public enum NeedState
 {
   INACTIVE("Inactive"),
-  ACTIVE("Active");
+  ACTIVE("Active"),
+  DELETED("Deleted");
 
   private static final Logger logger = LoggerFactory.getLogger(NeedState.class);
   private String name;

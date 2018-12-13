@@ -130,6 +130,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
   private String activeMqMatcherProtocolTopicNameNeedCreated;
   private String activeMqMatcherProtocolTopicNameNeedActivated;
   private String activeMqMatcherProtocolTopicNameNeedDeactivated;
+  private String activeMqMatcherProtocolTopicNameNeedDeleted;
 
 
   @Transactional
@@ -231,7 +232,8 @@ public class LinkedDataServiceImpl implements LinkedDataService
       String newEtag = data.getEtag();
 
     // load the dataset from storage
-    Dataset dataset = need.getDatatsetHolder().getDataset();
+    boolean isDeleted = !!(need.getState() == NeedState.DELETED);
+    Dataset dataset = isDeleted? DatasetFactory.createGeneral() : need.getDatatsetHolder().getDataset();
     Model metaModel = needModelMapper.toModel(need);
 
     Resource needResource = metaModel.getResource(needUri.toString());
@@ -272,7 +274,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
     dataset.addNamedModel(needMetaInformationURI, metaModel);
     addBaseUriAndDefaultPrefixes(dataset);
 
-    return new DataWithEtag<>(dataset ,newEtag, etag);
+    return new DataWithEtag<>(dataset ,newEtag, etag, isDeleted);
   }
 
 
@@ -375,6 +377,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
               .addProperty(WON.HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_NEED_ACTIVATED_TOPIC_NAME,
                            this.activeMqMatcherProtocolTopicNameNeedActivated,XSDDatatype.XSDstring)
               .addProperty(WON.HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_NEED_DEACTIVATED_TOPIC_NAME,this.activeMqMatcherProtocolTopicNameNeedDeactivated,XSDDatatype.XSDstring)
+              .addProperty(WON.HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_NEED_DELETED_TOPIC_NAME,this.activeMqMatcherProtocolTopicNameNeedDeleted,XSDDatatype.XSDstring)
               .addProperty(WON.HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_NEED_CREATED_TOPIC_NAME,this.activeMqMatcherProtocolTopicNameNeedCreated,XSDDatatype.XSDstring)
       ;
 
@@ -982,4 +985,8 @@ public class LinkedDataServiceImpl implements LinkedDataService
   public void setActiveMqMatcherProtocolTopicNameNeedDeactivated(final String activeMqMatcherProtocolTopicNameNeedDeactivated) {
     this.activeMqMatcherProtocolTopicNameNeedDeactivated = activeMqMatcherProtocolTopicNameNeedDeactivated;
   }
+  
+  public void setActiveMqMatcherProtocolTopicNameNeedDeleted(final String activeMqMatcherProtocolTopicNameNeedDeleted) {
+      this.activeMqMatcherProtocolTopicNameNeedDeleted = activeMqMatcherProtocolTopicNameNeedDeleted;
+    }
 }

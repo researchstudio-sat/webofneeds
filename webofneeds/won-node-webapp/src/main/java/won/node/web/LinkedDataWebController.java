@@ -1360,11 +1360,14 @@ public class LinkedDataWebController {
 			final HttpHeaders headers) {
 
 		if (datasetWithEtag != null) {
-			if (datasetWithEtag.isChanged()) {
+		    if (datasetWithEtag.isDeleted()) {
+                return new ResponseEntity<>(headers, HttpStatus.GONE);
+            } else if (datasetWithEtag.isChanged()) {
 				return new ResponseEntity<>(datasetWithEtag.getData(), headers, HttpStatus.OK);
 			} else {
 				return new ResponseEntity<>(headers, HttpStatus.NOT_MODIFIED);
 			}
+			
 		} else {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}

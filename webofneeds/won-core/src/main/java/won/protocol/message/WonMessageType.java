@@ -17,6 +17,7 @@ public enum WonMessageType
   DEACTIVATE(WONMSG.TYPE_DEACTIVATE),
   ACTIVATE(WONMSG.TYPE_ACTIVATE),
   CLOSE(WONMSG.TYPE_CLOSE),
+  DELETE(WONMSG.TYPE_DELETE),
   OPEN(WONMSG.TYPE_OPEN),
   CONNECTION_MESSAGE(WONMSG.TYPE_CONNECTION_MESSAGE),
   NEED_MESSAGE(WONMSG.TYPE_NEED_MESSAGE),
@@ -83,6 +84,8 @@ public enum WonMessageType
       return OPEN;
     if (WONMSG.TYPE_CLOSE.equals(resource))
       return CLOSE;
+    if (WONMSG.TYPE_DELETE.equals(resource))
+      return DELETE;
     if (WONMSG.TYPE_CONNECTION_MESSAGE.equals(resource))
       return CONNECTION_MESSAGE;
     if (WONMSG.TYPE_NEED_MESSAGE.equals(resource))

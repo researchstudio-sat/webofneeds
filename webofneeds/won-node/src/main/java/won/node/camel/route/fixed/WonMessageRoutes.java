@@ -138,6 +138,12 @@ public class WonMessageRoutes extends RouteBuilder
             .to("bean:referenceAdder")
             .to("bean:signatureAdder")
             .to("bean:persister");
+        
+        from("direct:deleteNeedIfNecessary")
+            .errorHandler(noErrorHandler()) //let the exception bubble up
+            .transacted("PROPAGATION_REQUIRES_NEW")
+            .routeId("direct:deleteNeedIfNecessary")
+            .to("bean:needDeleter");
 
         from("direct:sendToOwner")
                 .transacted("PROPAGATION_REQUIRES_NEW")
@@ -150,6 +156,7 @@ public class WonMessageRoutes extends RouteBuilder
                 .to("bean:parentLocker")
                 //now, we expect the message we want to pass on to the owner in the exchange's in header.
                 .to("bean:toOwnerSender");    //--> seda:OwnerProtocolOut
+
 
         //sends the message to the owner of the connection in the won:hasSender property. 
         //In the case of an outbound message, this is an echo of the message back to the owner, in the
@@ -209,6 +216,8 @@ public class WonMessageRoutes extends RouteBuilder
             .routeId("seda:OwnerProtocolOut")
             .to("bean:ownerProtocolOutgoingMessagesProcessor")
             .recipientList(header("ownerApplicationIDs"));
+            //.to("bean:needDeleter"); // --> check if the outgoing message is a success response to a delete message so we can delete the need data
+        
 
         /**
          * System messages: add timestamp, sign and then process completely
@@ -234,8 +243,9 @@ public class WonMessageRoutes extends RouteBuilder
             //TODO: as soon as messages are signed when they reach this route, perform signature/wellformedness checks here?
             .to("bean:receivedTimestampAdder")
             .to("direct:reference-sign-persist")
+            .to("direct:deleteNeedIfNecessary")
             .to("bean:toOwnerSender");   //--> seda:OwnerProtocolOut
-
+        
           /**
            * Message processing: expects messages from OwnerProtocolIn and SystemMessageIn routes.
            * Messages will be processed, effects executed, and then sent to recipient(s)
