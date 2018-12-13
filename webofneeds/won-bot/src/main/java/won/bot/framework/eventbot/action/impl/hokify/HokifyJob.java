@@ -26,6 +26,7 @@ public class HokifyJob {
     private static final String JOBTYPE = "jobtype";
     private static final String FIELD = "field";
     private static final String STATS = "stats";
+    private static final String PRIORIZE = "priorize";
 
     @JsonProperty(TITLE)
     private String title;
@@ -54,6 +55,8 @@ public class HokifyJob {
     private List field;
     @JsonProperty(STATS)
     private Stats stats;
+    @JsonProperty(PRIORIZE)
+    private String priorize;
 
     public HokifyJob() {
 
@@ -65,12 +68,12 @@ public class HokifyJob {
             return "HokifyJob [title=" + title + ", date=" + date + ", referencenumber=" + referencenumber + ", image="
                     + image + ", url=" + url + ", company=" + company + ", city=" + city + ", country=" + country
                     + ", description=" + description + ", salary=" + salary + ", jobtype=" + jobtype + ", field="
-                    + field + ", stats=" + stats.toString() + "]";
+                    + field + ", stats=" + stats.toString() + ", priorize=" + priorize + "]";
         } else {
             return "HokifyJob [title=" + title + ", date=" + date + ", referencenumber=" + referencenumber + ", image="
                     + image + ", url=" + url + ", company=" + company + ", city=" + city + ", country=" + country
                     + ", description=" + description + ", salary=" + salary + ", jobtype=" + jobtype + ", field="
-                    + field + ", stats=" + 0 + "]";
+                    + field + ", stats=" + 0 + ", priorize=" + priorize + "]";
         }
     }
 
@@ -176,6 +179,14 @@ public class HokifyJob {
 
     public void Stats(Stats stats) {
         this.stats = stats;
+    }
+
+    public String getPriorize() {
+        return priorize;
+    }
+
+    public void setPriorize(String priorize) {
+        this.priorize = priorize;
     }
 
     static class Stats {
