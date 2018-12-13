@@ -100,11 +100,7 @@ export function createWhatsNew() {
     };
 
     getIn(state, ["needs"])
-      .filter(
-        need =>
-          need.get("state") === "won:Active" &&
-          (isWhatsAroundNeed(need) || isWhatsNewNeed(need))
-      )
+      .filter(need => isWhatsAroundNeed(need) || isWhatsNewNeed(need))
       .map(need => {
         dispatch(actionCreators.needs__delete(need.get("uri")));
       });
@@ -132,11 +128,7 @@ export function createWhatsAround() {
             const location = nominatim2draftLocation(searchResult);
 
             getIn(state, ["needs"])
-              .filter(
-                need =>
-                  need.get("state") === "won:Active" &&
-                  (isWhatsAroundNeed(need) || isWhatsNewNeed(need))
-              )
+              .filter(need => isWhatsAroundNeed(need) || isWhatsNewNeed(need))
               .map(need => {
                 dispatch(actionCreators.needs__delete(need.get("uri"))); //TODO action creators should not call other action creators, according to Moru
               });
