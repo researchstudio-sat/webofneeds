@@ -113,6 +113,9 @@ export function accountLogin(credentials, redirectToFeed = false) {
         })
       )
       .then(() => dispatch({ type: actionTypes.upgradeHttpSession }))
+      .then(() => fetchOwnedData(dispatch))
+      .then(() => loadNeedFromRouteParamIfExists(dispatch, getState))
+      .then(() => dispatch({ type: actionTypes.account.loginFinished }))
       .then(() => {
         if (redirectToFeed) {
           return dispatch(
@@ -122,8 +125,6 @@ export function accountLogin(credentials, redirectToFeed = false) {
           return checkAccessToCurrentRoute(dispatch, getState);
         }
       })
-      .then(() => fetchOwnedData(dispatch))
-      .then(() => dispatch({ type: actionTypes.account.loginFinished }))
       .catch(error =>
         error.response.json().then(loginError => {
           return Promise.resolve()
