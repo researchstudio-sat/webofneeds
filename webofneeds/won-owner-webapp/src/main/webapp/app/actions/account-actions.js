@@ -116,15 +116,6 @@ export function accountLogin(credentials, redirectToFeed = false) {
       .then(() => fetchOwnedData(dispatch))
       .then(() => loadNeedFromRouteParamIfExists(dispatch, getState))
       .then(() => dispatch({ type: actionTypes.account.loginFinished }))
-      .then(() => {
-        if (redirectToFeed) {
-          return dispatch(
-            actionCreators.router__stateGoResetParams("connections")
-          );
-        } else {
-          return checkAccessToCurrentRoute(dispatch, getState);
-        }
-      })
       .catch(error =>
         error.response.json().then(loginError => {
           return Promise.resolve()
@@ -138,17 +129,25 @@ export function accountLogin(credentials, redirectToFeed = false) {
                 loginError = won.PRIVATEID_NOT_FOUND_ERROR;
               }
 
-              dispatch(
+              return dispatch(
                 actionCreators.account__loginFailed({
                   loginError: Immutable.fromJS(loginError),
                   error,
                   credentials,
                 })
               );
-            })
-            .then(() => checkAccessToCurrentRoute(dispatch, getState));
+            });
         })
       )
+      .then(() => {
+        if (redirectToFeed) {
+          return dispatch(
+            actionCreators.router__stateGoResetParams("connections")
+          );
+        }
+        return Promise.resolve();
+      })
+      .then(() => checkAccessToCurrentRoute(dispatch, getState))
       .then(() => {
         _loginInProcessFor = undefined;
       });
