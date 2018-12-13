@@ -70,7 +70,6 @@ export function accountLogin(credentials, options) {
   const options_ = Object.assign(
     {
       // defaults
-      fetchData: true,
       doRedirects: true,
       redirectToFeed: false,
     },
@@ -158,13 +157,7 @@ export function accountLogin(credentials, options) {
           return checkAccessToCurrentRoute(dispatch, getState);
         }
       })
-      .then(() => {
-        if (options_.fetchData) {
-          return fetchOwnedData(dispatch);
-        } else {
-          return Immutable.Map(); // only need to fetch data for non-new accounts
-        }
-      })
+      .then(() => fetchOwnedData(dispatch))
       .then(() => dispatch({ type: actionTypes.account.loginFinished }))
       .catch(error =>
         error.response.json().then(loginError => {
@@ -250,7 +243,6 @@ export function accountRegister(credentials) {
     registerAccount(credentials)
       .then(() =>
         accountLogin(credentials, {
-          fetchData: false,
           redirectToFeed: true,
         })(dispatch, getState)
       )
@@ -276,7 +268,6 @@ export function accountTransfer(credentials) {
       .then(() => {
         credentials.privateId = undefined;
         return accountLogin(credentials, {
-          fetchData: true,
           redirectToFeed: true,
         })(dispatch, getState);
       })
