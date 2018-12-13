@@ -10,7 +10,6 @@ import createSearchModule from "../create-search.js";
 import usecasePickerModule from "../usecase-picker.js";
 import usecaseGroupModule from "../usecase-group.js";
 import { attach, getIn } from "../../utils.js";
-import { isWhatsAroundNeed, isWhatsNewNeed } from "../../need-utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import {
   getOwnedNeedByConnectionUri,
@@ -56,14 +55,7 @@ class ConnectionsController {
       ]);
       const selectedConnectionState = getIn(selectedConnection, ["state"]);
 
-      const ownedNeeds = getOwnedNeeds(state).filter(
-        //FIXME: THIS CAN BE REMOVED ONCE WE DELETE INSTEAD OF CLOSE THE WHATSX NEEDS
-        post =>
-          !(
-            (isWhatsAroundNeed(post) || isWhatsNewNeed(post)) &&
-            post.get("state") === won.WON.InactiveCompacted
-          )
-      );
+      const ownedNeeds = getOwnedNeeds(state);
 
       let connections = Immutable.Map();
 
