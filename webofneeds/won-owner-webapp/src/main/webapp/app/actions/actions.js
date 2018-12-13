@@ -153,6 +153,7 @@ const actionHierarchy = {
     review: reviewPersona,
 
     storeTheirs: INJ_DEFAULT,
+    storeTheirUrisLoading: INJ_DEFAULT,
   },
   router: {
     stateGo, // only overwrites parameters that are explicitly mentioned, unless called without queryParams object (which also resets "pervasive" parameters, that shouldn't be removed
@@ -164,7 +165,6 @@ const actionHierarchy = {
     stateReload,
     //stateTransitionTo, // should not be used directly
     back: stateBack,
-    accessedNonLoadedPost: INJ_DEFAULT, //dispatched in configRouting.js
   },
 
   /**
