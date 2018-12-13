@@ -117,25 +117,7 @@ export function accountLogin(credentials, options) {
       })
       .then(() => {
         if (isLoggedIn) {
-          return logout().then(() => {
-            if (
-              options_.doRedirects &&
-              getIn(state, ["account", "isAnonymous"])
-            ) {
-              return stateGoCurrent({ privateId: undefined })(
-                dispatch,
-                getState
-              );
-            }
-          });
-        }
-      })
-      .then(() => {
-        if (options_.doRedirects && credentials.privateId) {
-          return stateGoCurrent({ privateId: credentials.privateId })(
-            dispatch,
-            getState
-          );
+          return logout();
         }
       })
       .then(() => login(credentials))
