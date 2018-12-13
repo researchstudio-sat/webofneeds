@@ -239,8 +239,7 @@ function reactToPrivateIdChanges(
   if (toPrivateId && fromPrivateId !== toPrivateId) {
     // privateId has changed or was added
     const credentials = { privateId: toPrivateId };
-    const options = { doRedirects: false };
-    return accountLogin(credentials, options)(dispatch, getState);
+    return accountLogin(credentials, {})(dispatch, getState);
   }
 }
 
