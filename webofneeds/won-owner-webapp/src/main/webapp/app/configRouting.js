@@ -2,21 +2,13 @@
  * Created by ksinger on 08.10.2015.
  */
 
-import won from "./won-es6.js";
 import Immutable from "immutable";
-import { actionTypes, actionCreators } from "./actions/actions.js";
+import { actionCreators } from "./actions/actions.js";
 import { accountLogin } from "./actions/account-actions.js";
-
+import { getOwnedNeeds } from "./selectors/general-selectors.js";
 import { privateId2Credentials } from "./won-utils.js";
 
-import { getNeeds } from "./selectors/general-selectors.js";
-
-import {
-  decodeUriComponentProperly,
-  getIn,
-  firstToLowerCase,
-  hyphen2Camel,
-} from "./utils.js";
+import { getIn, firstToLowerCase, hyphen2Camel } from "./utils.js";
 
 /**
  * As we have configured our router to keep parameters unchanged,
@@ -94,42 +86,6 @@ export const configRouting = [
   },
 ];
 
-function postViewEnsureLoaded(dispatch, getState, encodedPostUri) {
-  const postUri = decodeUriComponentProperly(encodedPostUri);
-  const state = getState();
-
-  if (postUri && !getNeeds(state).has(postUri)) {
-    /*
-         * got an uri but no post loaded to the state yet ->
-         * assuming that if you're logged in you either did a
-         * page-reload with a valid session or signed in, thus
-         * loading your own needs as part of the `initialPageLoad`
-         * or `login` action-creators. Thus we assume
-         * you loaded the app in some other view,
-         * got a link to a non-owned need and pasted it. Thus
-         * the `initiaPageLoad` didn't load this need yet. Also
-         * we can be sure it's not your need and load it as `theirNeed`.
-         */
-    won
-      .getNeed(postUri)
-      .then(need =>
-        dispatch({
-          type: actionTypes.router.accessedNonLoadedPost,
-          payload: Immutable.fromJS({ theirNeed: need }),
-        })
-      )
-      .catch(error => {
-        console.error(
-          `Failed to load need ${postUri}.`,
-          `Reverting to previous router-state.`,
-          `Error: `,
-          error
-        );
-        dispatch(actionCreators.router__back());
-      });
-  }
-}
-
 export const runAccessControl = [
   "$transitions",
   "$rootScope",
@@ -175,32 +131,40 @@ export function accessControl({
     "\" that won't work" +
     "without logging in. Blocking route-change.";
   switch (toState.name) {
-    case "post": //Route the 'post' no matter if you are logged in or not since it is accessible at all times
-      postViewEnsureLoaded(dispatch, getState, toParams.postUri);
-      break;
+    case defaultRoute:
+    case "connections": {
+      //If we know the user is not loggedIn and there is a postUri in the route, we link to the post-visitor view
+      const postUriFromRoute = toParams["postUri"];
+      if (!getIn(state, ["account", "loggedIn"]) && !!postUriFromRoute) {
+        dispatch(
+          actionCreators.router__stateGoAbs("post", {
+            postUri: postUriFromRoute,
+          })
+        );
+      }
+      return;
+    }
 
-    case defaultRoute: //Route the 'default' view at all times
-      // if(
-      //     !state.getIn(["process", "processingInitialLoad"]) &&  // no access control while still loading
-      //     getIn(state, ['user', 'loggedIn']))
-      // {
-      //     //logged in -- re-initiate route-change
-      //     console.log("Admiral Ackbar mentioned that this would be a trap, so we will link you to the connections");
-      //     if(event) {
-      //         event.preventDefault()
-      //     } else {
-      //         dispatch(
-      //             actionCreators.router__stateGoAbs(defaultRoute)
-      //         )
-      //     }
-      // }
-      // break;
-      return; // default route should be always accessible
+    case "post": {
+      const postUriFromRoute = toParams["postUri"];
+
+      if (!postUriFromRoute) {
+        dispatch(actionCreators.router__stateGoResetParams(defaultRoute));
+      } else if (getIn(state, ["account", "loggedIn"])) {
+        if (getOwnedNeeds(state).get(postUriFromRoute)) {
+          dispatch(
+            actionCreators.router__stateGoAbs("connections", {
+              postUri: postUriFromRoute,
+            })
+          );
+        }
+      }
+      return;
+    }
 
     case "signup":
     case "about":
-    case "connections":
-      return; // can always access this page.
+      return; // can always access these pages.
 
     default:
       //FOR ALL OTHER ROUTES
