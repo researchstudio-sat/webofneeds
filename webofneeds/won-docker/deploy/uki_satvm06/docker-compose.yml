@@ -3,6 +3,7 @@ services:
 
   # owner server self-signed certificate for communication with wonnode
   gencert:
+    restart: always
     build: ../../image/gencert
     environment:
       - "CN=cbi.matchat.org"
@@ -14,6 +15,7 @@ services:
 
   # postgres need databases for wonnode
   postgres_node:
+    restart: always
     build: ../../image/postgres
     environment:
       - "POSTGRES_PASSWORD=$postgres_db_passwd"
@@ -25,6 +27,7 @@ services:
 
   # wonnode with nginx proxy => https://line.uki.or.at/won
   wonnode:
+    restart: always
     build: ../../image/wonnode
     environment:
       - "uri.host=cbi.matchat.org"
@@ -53,6 +56,7 @@ services:
 
   # postgres need databases for owner
   postgres_owner:
+    restart: always
     build: ../../image/postgres
     environment:
       - "POSTGRES_PASSWORD=$postgres_db_passwd"
@@ -65,6 +69,7 @@ services:
   # owner with nginx proxy (https://line.uki.or.at/owner)
   # TODO change the node uri from node.matchat.org/won to the new meicogsci node url once it is there
   owner:
+    restart: always
     build: ../../image/owner
     environment:
       - "node.default.host=cbi.matchat.org"
@@ -96,6 +101,7 @@ services:
 
   # bigdata rdf store for matcher service (this image is not built at deployment, it is downloaded from dockerhub)
   bigdata:
+    restart: always
     build: ../../image/bigdata
     volumes:
       - $base_folder/bigdata/data/:/usr/src/bigdata/data
@@ -104,6 +110,7 @@ services:
 
   # matcher service connect with wonnode on line.uki.or.at and node.matchat.org
   matcher_service:
+    restart: always
     build: ../../image/matcher-service
     environment:
       - "node.host=satvm06.researchstudio.at"
@@ -123,6 +130,7 @@ services:
 
   # solr server as a need index
   solr:
+    restart: always
     build: ../../image/solr
     volumes:
       - $base_folder/solr/won/data:/opt/solr/server/solr/won/data
@@ -132,6 +140,7 @@ services:
 
   # solr matcher and connect to matcher service
   matcher_solr:
+    restart: always
     build: ../../image/matcher-solr
     environment:
       - "node.host=satvm06.researchstudio.at"
@@ -148,6 +157,7 @@ services:
 
   # mongodb for persistent debug bot
   mongodb:
+    restart: always
     image: tutum/mongodb:3.2
     environment:
       - "MONGODB_USER=won"
@@ -161,6 +171,7 @@ services:
 
   # debug bot used to test need communication, connect to wonnodes (proxied: line.uki.or.at)
   debug_bot:
+    restart: always
     build: ../../image/bots
     environment:
       - "uri.prefix.owner=https://cbi.matchat.org/debug_bot"  # set this for the trust store alias
@@ -180,6 +191,7 @@ services:
 
 
   matcher_sparql:
+    restart: always
     build: ../../image/matcher-sparql
     image: webofneeds/matcher_sparql:int
     environment:
