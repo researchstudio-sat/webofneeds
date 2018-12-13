@@ -100,16 +100,16 @@ function postViewEnsureLoaded(dispatch, getState, encodedPostUri) {
 
   if (postUri && !getNeeds(state).has(postUri)) {
     /*
-         * got an uri but no post loaded to the state yet ->
-         * assuming that if you're logged in you either did a
-         * page-reload with a valid session or signed in, thus
-         * loading your own needs as part of the `initialPageLoad`
-         * or `login` action-creators. Thus we assume
-         * you loaded the app in some other view,
-         * got a link to a non-owned need and pasted it. Thus
-         * the `initiaPageLoad` didn't load this need yet. Also
-         * we can be sure it's not your need and load it as `theirNeed`.
-         */
+     * got an uri but no post loaded to the state yet ->
+     * assuming that if you're logged in you either did a
+     * page-reload with a valid session or signed in, thus
+     * loading your own needs as part of the `initialPageLoad`
+     * or `login` action-creators. Thus we assume
+     * you loaded the app in some other view,
+     * got a link to a non-owned need and pasted it. Thus
+     * the `initiaPageLoad` didn't load this need yet. Also
+     * we can be sure it's not your need and load it as `theirNeed`.
+     */
     won
       .getNeed(postUri)
       .then(need =>

@@ -63,36 +63,36 @@ export default reduceReducers(
   //passes on the state from one reducer to another
 
   /* note that `combineReducers` is opinionated as a root reducer for the
-     * sake of convenience and ease of first use. It takes an object
-     * with seperate reducers and applies each to it's seperate part of the
-     * store/model. e.g.: an reducers object `{ drafts: function(state = [], action){...} }`
-     * would result in a store like `{ drafts: [...] }`
-     */
+   * sake of convenience and ease of first use. It takes an object
+   * with seperate reducers and applies each to it's seperate part of the
+   * store/model. e.g.: an reducers object `{ drafts: function(state = [], action){...} }`
+   * would result in a store like `{ drafts: [...] }`
+   */
   combineReducersStable(Immutable.Map(reducers)),
 
   /*--------------------- <cross-cutting-reducer> -------------------
-     *
-     * combineReducers above parcels out the state to individual
-     * reducers that deal with their slice on their own. Sadly not
-     * all updates can work like this. Occasionally there's cross-cutting
-     * concerns between parts of the state. These can be addressed in
-     * this reducer.
-     *
-     * **How to use me:**
-     *
-     * * Try not to create new branches of the state here (this is
-     *   what combineReducers is for)
-     * * Make sure the actual methods updating a respective part
-     *   of the state are in the js-file responsible for that part
-     *   of the state. This is to ensure that all write-accesses
-     *   to the data can be discerned from that one file.
-     *
-     * @dependent state: https://github.com/rackt/redux/issues/749
-     *
-     * also, if you need to resolve the data-dependency just for
-     * a component, you can use [memoized selectors]
-     * (http://rackt.org/redux/docs/recipes/ComputingDerivedData.html)
-     */
+   *
+   * combineReducers above parcels out the state to individual
+   * reducers that deal with their slice on their own. Sadly not
+   * all updates can work like this. Occasionally there's cross-cutting
+   * concerns between parts of the state. These can be addressed in
+   * this reducer.
+   *
+   * **How to use me:**
+   *
+   * * Try not to create new branches of the state here (this is
+   *   what combineReducers is for)
+   * * Make sure the actual methods updating a respective part
+   *   of the state are in the js-file responsible for that part
+   *   of the state. This is to ensure that all write-accesses
+   *   to the data can be discerned from that one file.
+   *
+   * @dependent state: https://github.com/rackt/redux/issues/749
+   *
+   * also, if you need to resolve the data-dependency just for
+   * a component, you can use [memoized selectors]
+   * (http://rackt.org/redux/docs/recipes/ComputingDerivedData.html)
+   */
   (state, action) => {
     switch (action.type) {
       /**

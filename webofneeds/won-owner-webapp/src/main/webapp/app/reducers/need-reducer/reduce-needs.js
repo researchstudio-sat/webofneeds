@@ -203,14 +203,12 @@ export function addNeedInCreation(needs, needInCreation, needUri) {
 }
 
 function setIfNew(state, path, obj) {
-  return state.update(
-    path,
-    val =>
-      val
-        ? // we've seen this need before, no need to overwrite it
-          val
-        : // it's the first time we see this need -> add it
-          Immutable.fromJS(obj)
+  return state.update(path, val =>
+    val
+      ? // we've seen this need before, no need to overwrite it
+        val
+      : // it's the first time we see this need -> add it
+        Immutable.fromJS(obj)
   );
 }
 

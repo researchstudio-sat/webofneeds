@@ -191,9 +191,9 @@ export function watch(subscribe, select, callback) {
   let unsubscribe = null;
 
   /*
-     * creating this function (and instantly executing it)
-     * allows attaching individual previousValue to it
-     */
+   * creating this function (and instantly executing it)
+   * allows attaching individual previousValue to it
+   */
   (function() {
     let previousValue = select();
     unsubscribe = subscribe(() => {
@@ -541,8 +541,8 @@ function fetchJSON(url) {
     headers: { Accept: "application/json" },
   }).then(resp => {
     /*
-             * handle errors and read json-data
-             */
+     * handle errors and read json-data
+     */
     const errorMsg =
       "GET to " +
       url +
@@ -616,10 +616,10 @@ export function get(obj, property) {
     return undefined;
   } else if (obj.get) {
     /* obj is an immutabljs-object
-           * NOTE: the canonical check atm would be `Immutable.Iterable.isIterable(obj)`
-           * but that would require including immutable as dependency her and it'd be better
-           * to keep this library independent of anything.
-           */
+     * NOTE: the canonical check atm would be `Immutable.Iterable.isIterable(obj)`
+     * but that would require including immutable as dependency her and it'd be better
+     * to keep this library independent of anything.
+     */
     return obj.get(property);
   } else {
     /* obj is a vanilla object */
@@ -1073,10 +1073,10 @@ export function findAllFieldOccurancesRecursively(fieldName, obj, _acc = []) {
   }
   if (obj.toJS && obj.get) {
     /* obj is an immutabljs-object
-             * NOTE: the canonical check atm would be `Immutable.Iterable.isIterable(obj)`
-             * but that would require including immutable as dependency her and it'd be better
-             * to keep this library independent of anything.
-             */
+     * NOTE: the canonical check atm would be `Immutable.Iterable.isIterable(obj)`
+     * but that would require including immutable as dependency her and it'd be better
+     * to keep this library independent of anything.
+     */
 
     obj.forEach(val => {
       // iterate and recurse down
@@ -1169,7 +1169,7 @@ export function isValidDate(dateObj) {
  * @param {Date} dateTime
  */
 export function toLocalISODateString(dateTime) {
-  /* ensure two digits, i.e. add 0 before 
+  /* ensure two digits, i.e. add 0 before
    * offsetHours, offsetMins,  date, month, hrs, mins or secs if they are less than 10
    */
   const pad = n => (n + "").padStart(2, "0");
@@ -1178,7 +1178,7 @@ export function toLocalISODateString(dateTime) {
   const offsetHours = pad(parseInt(Math.abs(timezoneOffsetInMins / 60)));
   const offsetMins = pad(Math.abs(timezoneOffsetInMins % 60));
 
-  /* 
+  /*
    * Add an opposite sign to the offset
    * If offset is 0, it means timezone is UTC
    * => timezoneString: Timezone difference in hours and minutes

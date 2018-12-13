@@ -10,9 +10,9 @@ function genDirectiveConf() {
       const maxRows = parseInt(attributes.maxRows) || 999;
       const area = element[0];
 
-      /* 
-         * necessary styling 
-         */
+      /*
+       * necessary styling
+       */
 
       //Height math depends on content box sizing
       area.style.boxSizing = "content-box";
@@ -20,8 +20,8 @@ function genDirectiveConf() {
       area.style.resize = "none";
 
       /*
-         * calculate line-height
-         */
+       * calculate line-height
+       */
       let lineHeight, offsets;
       function updateLineHeightAndOffsets() {
         const style = window.getComputedStyle(area, null);
@@ -38,8 +38,8 @@ function genDirectiveConf() {
       updateLineHeightAndOffsets();
 
       /*
-         * update height
-         */
+       * update height
+       */
 
       function updateHeight() {
         window.requestAnimationFrame(() => {
@@ -70,8 +70,8 @@ function genDirectiveConf() {
       updateHeight();
 
       /*
-         * Listen for changes of input and style
-         */
+       * Listen for changes of input and style
+       */
 
       element.on("input", updateHeight);
       // area.addEventListener('input', updateHeight);

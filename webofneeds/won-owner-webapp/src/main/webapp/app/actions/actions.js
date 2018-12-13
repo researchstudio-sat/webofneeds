@@ -177,9 +177,9 @@ const actionHierarchy = {
     send: INJ_DEFAULT, //TODO this should be part of proper, user-story-level actions (e.g. need.publish or sendCnctMsg)
 
     /*
-         * posting things to the server should be optimistic and assume
-         * success that is rolled back in case of a failure or timeout.
-         */
+     * posting things to the server should be optimistic and assume
+     * success that is rolled back in case of a failure or timeout.
+     */
 
     create: {
       success: messages.successfulCreate,

@@ -817,9 +817,9 @@ export default function(allNeedsInState = initialState, action = {}) {
     case actionTypes.connections.sendChatMessage:
       // ADD SENT TEXT MESSAGE
       /*
-             * payload: { eventUri: optimisticEvent.uri, message,
-             * optimisticEvent, }
-             */
+       * payload: { eventUri: optimisticEvent.uri, message,
+       * optimisticEvent, }
+       */
       return addMessage(allNeedsInState, action.payload.optimisticEvent);
 
     // update timestamp on success response

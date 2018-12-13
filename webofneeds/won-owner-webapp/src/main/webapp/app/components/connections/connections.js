@@ -95,9 +95,10 @@ class ConnectionsController {
       };
     };
 
-    const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(
-      this
-    );
+    const disconnect = this.$ngRedux.connect(
+      selectFromState,
+      actionCreators
+    )(this);
     this.$scope.$on("$destroy", disconnect);
 
     /*this.$scope.$watch("self.mainViewScroll", newValue => {

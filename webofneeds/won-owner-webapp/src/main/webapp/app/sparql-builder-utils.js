@@ -189,7 +189,7 @@ export function filterInVicinity(rootSubject, location, radius = 10) {
   if (!location || !location.lat || !location.lng) {
     return emptyFilter();
   } else {
-    /* "prefix" variable name with root-subject so filter can be used 
+    /* "prefix" variable name with root-subject so filter can be used
      * multiple times for different roots
      * results in e.g. `?location_geo`
      */

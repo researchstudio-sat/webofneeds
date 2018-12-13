@@ -541,12 +541,12 @@ import won from "./won.js";
       return Promise.resolve(uri);
     }
     /*
-         * we also allow unresolvable resources, so as to avoid re-fetching them.
-         * we also allow resources that are currently being fetched.
-         * as containers (lists in rdf) are inherently prone to change and will
-         * usually be accessed using some sort of paging, we skip them here
-         * and thus always reload them.
-         */
+     * we also allow unresolvable resources, so as to avoid re-fetching them.
+     * we also allow resources that are currently being fetched.
+     * as containers (lists in rdf) are inherently prone to change and will
+     * usually be accessed using some sort of paging, we skip them here
+     * and thus always reload them.
+     */
     const partialFetch = fetchesPartialRessource(fetchParams);
 
     // we might not even need to aquire a lock, if another call to ensureLoaded
@@ -583,11 +583,11 @@ import won from "./won.js";
           );
           allLoadedResources.forEach(resourceUri => {
             /*
-                            * only mark root resource as partial.
-                            * the other ressources should
-                            * have been fetched fully during a
-                            * request with the `deep`-flag
-                            */
+             * only mark root resource as partial.
+             * the other ressources should
+             * have been fetched fully during a
+             * request with the `deep`-flag
+             */
             cacheItemInsertOrOverwrite(
               resourceUri,
               partialFetch && resourceUri === uri
@@ -631,9 +631,9 @@ import won from "./won.js";
    */
   function selectLoadedDocumentUrisFromDataset(dataset) {
     /*
-         * create a temporary store to load the dataset into
-         * so we only query over the new triples
-         */
+     * create a temporary store to load the dataset into
+     * so we only query over the new triples
+     */
     const tmpstore = rdfstore.create();
     const storeWithDatasetP = loadIntoRdfStore(
       tmpstore,
@@ -796,25 +796,24 @@ import won from "./won.js";
           );
       })
       .then(dataset => dataset.json())
-      .then(
-        dataset =>
-          //make sure we've got a non-empty dataset
-          Object.keys(dataset).length === 0
-            ? Promise.reject(
-                "failed to load " + uri + ": Object.keys(dataset).length == 0"
-              )
-            : dataset
+      .then(dataset =>
+        //make sure we've got a non-empty dataset
+        Object.keys(dataset).length === 0
+          ? Promise.reject(
+              "failed to load " + uri + ": Object.keys(dataset).length == 0"
+            )
+          : dataset
       )
       .then(dataset =>
         Promise.resolve()
           .then(() => {
             if (!fetchesPartialRessource(params)) {
               /* as paging is only used for containers
-                     * and they don't lose entries, we can
-                     * simply merge on top of the already
-                     * loaded triples below. So we skip removing
-                     * the previously loaded data. For everything
-                     * remove any remaining stale data: */
+               * and they don't lose entries, we can
+               * simply merge on top of the already
+               * loaded triples below. So we skip removing
+               * the previously loaded data. For everything
+               * remove any remaining stale data: */
               // won.deleteNode(uri, removeCacheItem)
               won.deleteDocumentFromStore(uri, removeCacheItem);
             }
@@ -1234,8 +1233,8 @@ import won from "./won.js";
       );
   };
   /*
-     * Loads all URIs of a need's connections.
-     */
+   * Loads all URIs of a need's connections.
+   */
   won.getConnectionUrisOfNeed = (
     needUri,
     requesterWebId,
@@ -1388,10 +1387,10 @@ import won from "./won.js";
         )
         .then(([connection, eventContainer]) => {
           /*
-                 * if there's only a single rdfs:member in the event
-                 * container, getNode will not return an array, so we
-                 * need to make sure it's one from here on out.
-                 */
+           * if there's only a single rdfs:member in the event
+           * container, getNode will not return an array, so we
+           * need to make sure it's one from here on out.
+           */
           connection.hasEvents = is("Array", eventContainer.member)
             ? eventContainer.member
             : [eventContainer.member];
@@ -1583,15 +1582,15 @@ import won from "./won.js";
               });
             } else if (graph.length === 0) {
               /* TODO HACK / WORKAROUND
-                             * try query + manual filter. it's slower but the store
-                             * occasionally has hiccups where neither `store.node(uri)`
-                             * nor `select * where {<uri> ?p ? o}` return triples, but
-                             * `select * where { ?s ?p ?o }` contains the the desired
-                             * triples. I couldn't find out what's the cause of this
-                             * within a feasible time, but hope these issues will go
-                             * away, when we'll get around to update the store to the
-                             * newest version.
-                             */
+               * try query + manual filter. it's slower but the store
+               * occasionally has hiccups where neither `store.node(uri)`
+               * nor `select * where {<uri> ?p ? o}` return triples, but
+               * `select * where { ?s ?p ?o }` contains the the desired
+               * triples. I couldn't find out what's the cause of this
+               * within a feasible time, but hope these issues will go
+               * away, when we'll get around to update the store to the
+               * newest version.
+               */
               privateData.store.graph((success, entireGraph) => {
                 resolve(
                   entireGraph.triples.filter(
@@ -1664,21 +1663,18 @@ import won from "./won.js";
 
           //deletion from subgraphs
           ...Array.from(urisOfContainedGraphs).map(graphUri =>
-            won.deleteTriples(
-              triples,
-              graphUri,
-              success =>
-                success
-                  ? Promise.resolve()
-                  : Promise.reject(
-                      "Failed to delete the following triples from" +
-                        " the graph " +
-                        graphUri +
-                        " contained in document " +
-                        documentUri +
-                        ": " +
-                        JSON.stringify(triples)
-                    )
+            won.deleteTriples(triples, graphUri, success =>
+              success
+                ? Promise.resolve()
+                : Promise.reject(
+                    "Failed to delete the following triples from" +
+                      " the graph " +
+                      graphUri +
+                      " contained in document " +
+                      documentUri +
+                      ": " +
+                      JSON.stringify(triples)
+                  )
             )
           ),
         ]);
@@ -2104,11 +2100,11 @@ function groupByGraphs(jsonldData, addDefaultContext = true) {
       return Promise.reject(msg);
     } else {
       /*
-            * the previous flattening would generate `{ "@id": "foo", "ex:bar": "someval"}` into 
-            * `{ "@id": "foo", "ex:bar": { "@value": "someval"}}`. however, the rdfstore can't handle
-            * nodes with `@value` but without `@type`, so we need to compact here first, to prevent
-            * these from occuring.
-            */
+       * the previous flattening would generate `{ "@id": "foo", "ex:bar": "someval"}` into
+       * `{ "@id": "foo", "ex:bar": { "@value": "someval"}}`. however, the rdfstore can't handle
+       * nodes with `@value` but without `@type`, so we need to compact here first, to prevent
+       * these from occuring.
+       */
       return jsonld.promises
         .compact(graphWithContext, graphWithContext["@context"])
         .then(compactedGraph => {

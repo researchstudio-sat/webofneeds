@@ -28,10 +28,10 @@ export function needCreate(draft, persona, nodeUri) {
 
     if (!state.getIn(["account", "loggedIn"]) && prevParams.privateId) {
       /*
-             * `ensureLoggedIn` will generate a new privateId. should
-             * there be a previous privateId, we don't want to change
-             * back to that later.
-             */
+       * `ensureLoggedIn` will generate a new privateId. should
+       * there be a previous privateId, we don't want to change
+       * back to that later.
+       */
       prevParams = Object.assign({}, prevParams);
       delete prevParams.privateId;
     }

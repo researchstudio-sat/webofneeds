@@ -8,12 +8,12 @@
  */
 
 /*
-* This redux wrapper for the old message-service consists of:
-*
-* * an "agent" that registers with the service, receives messages
-* from it and triggers redux actions.
-* * an "component" that listens to state changes and triggers
-* messages to the server via the service.
+ * This redux wrapper for the old message-service consists of:
+ *
+ * * an "agent" that registers with the service, receives messages
+ * from it and triggers redux actions.
+ * * an "component" that listens to state changes and triggers
+ * messages to the server via the service.
  */
 
 import won from "./won-es6.js";
@@ -149,10 +149,10 @@ export function runMessagingAgent(redux) {
           redux.dispatch(actionCreators.messages__open__failure(message));
 
           /*
-                     * as the failure should hit right after the open went out
-                     * and should be rather rare, we can redirect in the optimistic
-                     * case (see connection-actions.js) and go back if it fails.
-                     */
+           * as the failure should hit right after the open went out
+           * and should be rather rare, we can redirect in the optimistic
+           * case (see connection-actions.js) and go back if it fails.
+           */
           redux.dispatch(
             actionCreators.router__stateGoAbs("connections", {
               postUri: message.getSenderNeed(),
@@ -312,17 +312,17 @@ export function runMessagingAgent(redux) {
   }
 
   /* TODOs
-     * + make it generic?
-     *      + make the url a parameter?
-     *      + extract the watch? / make the path a parameter?
-     *      + registering a processor for the incoming messages (that
-     *        can trigger actions but lets the messaging agent stay generic)
-     *           + pass a callback
-     *           + make this a signal/observable
-     * + framing -> NOPE
-     * + reconnecting
-     * + lazy socket initialisation
-     */
+   * + make it generic?
+   *      + make the url a parameter?
+   *      + extract the watch? / make the path a parameter?
+   *      + registering a processor for the incoming messages (that
+   *        can trigger actions but lets the messaging agent stay generic)
+   *           + pass a callback
+   *           + make this a signal/observable
+   * + framing -> NOPE
+   * + reconnecting
+   * + lazy socket initialisation
+   */
 
   let ws = newSock();
   window.ws4dbg = ws;
@@ -485,10 +485,10 @@ export function runMessagingAgent(redux) {
                 */
     } else {
       /*
-             * first reconnect happens immediately (to facilitate
-             * anonymous posting and the reset-hack necessary for
-             * login atm)
-             */
+       * first reconnect happens immediately (to facilitate
+       * anonymous posting and the reset-hack necessary for
+       * login atm)
+       */
       ws = newSock();
     }
   }

@@ -17,10 +17,10 @@ import {
 
 export const pageLoadAction = () => (dispatch, getState) => {
   /* TODO the data fetched here should be baked into
-    * the send html thus significantly improving the
-    * initial page-load-speed.
-    * TODO fetch config data here as well
-    */
+   * the send html thus significantly improving the
+   * initial page-load-speed.
+   * TODO fetch config data here as well
+   */
 
   checkLoginStatus()
     /* handle data, dispatch actions */

@@ -357,9 +357,10 @@ function genComponentConf() {
         };
       };
 
-      const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(
-        this
-      );
+      const disconnect = this.$ngRedux.connect(
+        selectFromState,
+        actionCreators
+      )(this);
       this.$scope.$on("$destroy", disconnect);
 
       this.textFieldNg().bind("input", () => {
@@ -401,11 +402,11 @@ function genComponentConf() {
       dispatchEvent(this.$element[0], "input", payload);
 
       /* trigger digest so button and counter update
-             * delay is because submit triggers an input-event
-             * and is in a digest-cycle already. opposed to user-
-             * triggered input-events. dunno why the latter doesn't
-             * do that tho.
-             */
+       * delay is because submit triggers an input-event
+       * and is in a digest-cycle already. opposed to user-
+       * triggered input-events. dunno why the latter doesn't
+       * do that tho.
+       */
       delay(0).then(() => this.$scope.$digest());
     }
 
@@ -660,21 +661,21 @@ function genComponentConf() {
       showPersonas: "=", // show a persona drop-up
 
       /*
-             * Usage:
-             *  on-input="::myCallback(value, valid)"
-             */
+       * Usage:
+       *  on-input="::myCallback(value, valid)"
+       */
       onInput: "&",
       /*
-             * Usage:
-             *  on-paste="::myCallback(value, valid)"
-             */
+       * Usage:
+       *  on-paste="::myCallback(value, valid)"
+       */
       onPaste: "&",
 
       submitButtonLabel: "=",
       /*
-             * Usage:
-             *  on-submit="::myCallback(value)"
-             */
+       * Usage:
+       *  on-submit="::myCallback(value)"
+       */
       onSubmit: "&",
     },
     template: template,

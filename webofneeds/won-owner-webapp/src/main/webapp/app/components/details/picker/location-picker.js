@@ -324,9 +324,9 @@ function scrubSearchResults(searchResults) {
   return (
     Immutable.fromJS(searchResults.map(nominatim2draftLocation))
       /*
-         * filter "duplicate" results (e.g. "Wien"
-         *  -> 1x waterway, 1x boundary, 1x place)
-         */
+       * filter "duplicate" results (e.g. "Wien"
+       *  -> 1x waterway, 1x boundary, 1x place)
+       */
       .groupBy(r => r.get("name"))
       .map(sameNamedResults => sameNamedResults.first())
       .toList()

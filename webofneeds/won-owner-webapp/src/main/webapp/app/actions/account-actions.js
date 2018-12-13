@@ -369,7 +369,7 @@ export function reconnect() {
 
       const state = getState();
 
-      /* 
+      /*
        * -- loading latest messages for all connections (we might have missed some during the dc) --
        */
       const connectionUris = getOwnedConnectionUris(state);

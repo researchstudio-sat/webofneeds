@@ -227,8 +227,8 @@ import { Generator } from "sparqljs";
       "@id": args.content
         ? args.content.publishedContentUri
         : args.seeks
-          ? args.seeks.publishedContentUri
-          : undefined,
+        ? args.seeks.publishedContentUri
+        : undefined,
       "@type": ["won:Need"],
       "won:seeks": seeksContentUri ? { "@id": seeksContentUri } : undefined,
       "won:hasFacet": [

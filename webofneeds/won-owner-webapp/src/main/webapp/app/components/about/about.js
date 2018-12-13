@@ -220,7 +220,10 @@ class AboutController {
         showModalDialog: state.getIn(["view", "showModalDialog"]),
       };
     };
-    const disconnect = this.$ngRedux.connect(select, actionCreators)(this);
+    const disconnect = this.$ngRedux.connect(
+      select,
+      actionCreators
+    )(this);
 
     this.$scope.$on("$destroy", disconnect);
 

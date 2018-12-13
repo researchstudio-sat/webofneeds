@@ -19,9 +19,9 @@ function createStore($ngReduxProvider) {
   $ngReduxProvider.createStoreWith(
     reducer,
     [
-      /* middlewares, that wrap the reducer 
-           *(they get the state, can do stuff, apply the reducer, do stuff and return a modified state) 
-           */
+      /* middlewares, that wrap the reducer
+       *(they get the state, can do stuff, apply the reducer, do stuff and return a modified state)
+       */
       "ngUiRouterMiddleware",
       thunk,
       piwikMiddleware,
@@ -29,10 +29,10 @@ function createStore($ngReduxProvider) {
     [
       /* store enhancers (i.e. f::store->store') */
       /*
-            * store enhancer that allows using the redux-devtools
-            * see https://github.com/zalmoxisus/redux-devtools-extension and
-            * https://www.npmjs.com/package/ng-redux#using-devtools for details.
-            */
+       * store enhancer that allows using the redux-devtools
+       * see https://github.com/zalmoxisus/redux-devtools-extension and
+       * https://www.npmjs.com/package/ng-redux#using-devtools for details.
+       */
       devToolsEnhancer(),
       // Specify name here, actionsBlacklist, actionsCreators and other options if needed
     ]

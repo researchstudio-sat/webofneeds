@@ -241,9 +241,9 @@ export function buildChatMessage({
         envelopeData[won.WONMSG.hasSenderNode] + "/event/" + getRandomWonId();
 
       /*
-             * Build the json-ld message that's signed on the owner-server
-             * and then send to the won-node.
-             */
+       * Build the json-ld message that's signed on the owner-server
+       * and then send to the won-node.
+       */
       const wonMessageBuilder = new won.MessageBuilder(
         won.WONMSG.connectionMessage
       )

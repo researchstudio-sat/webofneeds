@@ -72,9 +72,9 @@ function genComponentConf() {
     scope: {
       connectionUri: "=",
       /*
-             * Usage:
-             *  on-selected-connection="myCallback(connectionUri)"
-             */
+       * Usage:
+       *  on-selected-connection="myCallback(connectionUri)"
+       */
       onSelectedConnection: "&",
     },
     template: template,
