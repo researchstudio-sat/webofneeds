@@ -4,7 +4,7 @@
 
 import won from "./won-es6.js";
 import Immutable from "immutable";
-import { checkHttpStatus, urisToLookupMap, is } from "./utils.js";
+import { checkHttpStatus, urisToLookupMap, is, getIn } from "./utils.js";
 
 import { ownerBaseUrl } from "config";
 import urljoin from "url-join";
@@ -12,6 +12,7 @@ import urljoin from "url-join";
 import { getRandomWonId, getAllDetails } from "./won-utils.js";
 import { isConnUriClosed } from "./won-localstorage.js";
 import { actionTypes } from "./actions/actions.js";
+import { getPostUriFromRoute } from "./selectors/general-selectors.js";
 
 /**
  * Checks if a wonMessage contains content/references that make it necessary for us to check which effects
@@ -500,12 +501,12 @@ export async function buildCreateMessage(needData, wonNodeUri) {
   };
 }
 
-export function fetchDataForNonOwnedNeedOnly(needUri) {
-  return won
-    .getNeed(needUri)
-    .then(need =>
-      Immutable.fromJS({ needs: { [needUri]: Immutable.fromJS(need) } })
-    );
+export function fetchDataForNonOwnedNeedOnly(needUri, dispatch) {
+  dispatch({
+    type: actionTypes.needs.storeTheirUrisLoading,
+    payload: Immutable.fromJS({ uris: [needUri] }),
+  });
+  return fetchTheirNeedAndDispatch(needUri, dispatch);
 }
 
 export function fetchUnloadedData(dispatch) {
@@ -651,6 +652,23 @@ export function fetchMessage(needUri, eventUri) {
     .then(response => response.json());
 }
 
+export function loadNeedFromRouteParamIfExists(dispatch, getState) {
+  const postUri = getPostUriFromRoute(getState());
+
+  /*
+   if there is no postUri in the route we dont have to do anything
+
+   if the need is not in the state yet, we add it as a nonOwnedNeed
+   since we can be sure the need would be a non-owned need due to the fact that all Owned needs have been loaded before
+   already if the User is logged in
+   */
+  if (postUri && !getIn(getState(), ["needs", postUri])) {
+    return fetchDataForNonOwnedNeedOnly(postUri, dispatch);
+  } else {
+    return Promise.resolve();
+  }
+}
+
 export async function fetchDataForOwnedNeeds(ownedNeedUris, dispatch) {
   if (!is("Array", ownedNeedUris) || ownedNeedUris.length === 0) {
     return;
@@ -733,6 +751,10 @@ function fetchTheirNeedAndDispatch(needUri, dispatch) {
     .then(need => {
       if (need["won:heldBy"] && need["won:heldBy"]["@id"]) {
         const personaUri = need["won:heldBy"]["@id"];
+        dispatch({
+          type: actionTypes.personas.storeTheirUrisLoading,
+          payload: Immutable.fromJS({ uris: [personaUri] }),
+        });
         return won.getNeed(personaUri).then(personaNeed => {
           dispatch({
             type: actionTypes.personas.storeTheirs,
