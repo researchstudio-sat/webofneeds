@@ -239,7 +239,7 @@ function reactToPrivateIdChanges(
   if (toPrivateId && fromPrivateId !== toPrivateId) {
     // privateId has changed or was added
     const credentials = { privateId: toPrivateId };
-    return accountLogin(credentials, {})(dispatch, getState);
+    return accountLogin(credentials)(dispatch, getState);
   }
 }
 

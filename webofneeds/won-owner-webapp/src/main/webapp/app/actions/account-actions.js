@@ -55,26 +55,11 @@ export async function ensureLoggedIn(dispatch, getState) {
 let _loginInProcessFor;
 /**
  *
- * @param username
- * @param password
- * @param options
- *    * fetchData(true): whether or not to fetch a users owned needs. If the account
- *    signing in is new, there's no need to fetch this and `false` can be passed here
- *    * doRedirects(true): whether or not to do any redirects at all (e.g. if an invalid route was accessed)
- *    * redirectToFeed(false): whether or not to redirect to the feed after signing in (needs `redirects` to be true)
- *
  * @param credentials either {email, password} or {privateId}
+ * @param redirectToFeed def. false, whether or not to redirect to the feed after signing in (needs `redirects` to be true)
  * @returns {Function}
  */
-export function accountLogin(credentials, options) {
-  const options_ = Object.assign(
-    {
-      // defaults
-      doRedirects: true,
-      redirectToFeed: false,
-    },
-    options
-  );
+export function accountLogin(credentials, redirectToFeed = false) {
   return (dispatch, getState) => {
     const state = getState();
 
@@ -129,9 +114,7 @@ export function accountLogin(credentials, options) {
       )
       .then(() => dispatch({ type: actionTypes.upgradeHttpSession }))
       .then(() => {
-        if (!options_.doRedirects) {
-          return;
-        } else if (options_.redirectToFeed) {
+        if (redirectToFeed) {
           return dispatch(
             actionCreators.router__stateGoResetParams("connections")
           );
@@ -162,11 +145,7 @@ export function accountLogin(credentials, options) {
                 })
               );
             })
-            .then(
-              () =>
-                options_.doRedirects &&
-                checkAccessToCurrentRoute(dispatch, getState)
-            );
+            .then(() => checkAccessToCurrentRoute(dispatch, getState));
         })
       )
       .then(() => {
@@ -223,11 +202,7 @@ export function accountLogout() {
 export function accountRegister(credentials) {
   return (dispatch, getState) =>
     registerAccount(credentials)
-      .then(() =>
-        accountLogin(credentials, {
-          redirectToFeed: true,
-        })(dispatch, getState)
-      )
+      .then(() => accountLogin(credentials, true)(dispatch, getState))
       .catch(error => {
         //TODO: PRINT MORE SPECIFIC ERROR MESSAGE, already registered/password to short etc.
         const registerError =
@@ -249,9 +224,7 @@ export function accountTransfer(credentials) {
     transferPrivateAccount(credentials)
       .then(() => {
         credentials.privateId = undefined;
-        return accountLogin(credentials, {
-          redirectToFeed: true,
-        })(dispatch, getState);
+        return accountLogin(credentials, true)(dispatch, getState);
       })
       .catch(error => {
         //TODO: PRINT MORE SPECIFIC ERROR MESSAGE, already registered/password to short etc.
