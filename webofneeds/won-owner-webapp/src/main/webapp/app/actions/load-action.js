@@ -4,7 +4,6 @@
 
 import Immutable from "immutable";
 import { actionTypes, actionCreators } from "./actions.js";
-import { getPostUriFromRoute } from "../selectors/general-selectors.js";
 
 import { checkAccessToCurrentRoute } from "../configRouting.js";
 
@@ -12,16 +11,10 @@ import { checkLoginStatus } from "../won-utils.js";
 
 import {
   fetchOwnedData,
-  fetchDataForNonOwnedNeedOnly,
+  loadNeedFromRouteParamIfExists,
 } from "../won-message-utils.js";
 
 export const pageLoadAction = () => (dispatch, getState) => {
-  /* TODO the data fetched here should be baked into
-    * the send html thus significantly improving the
-    * initial page-load-speed.
-    * TODO fetch config data here as well
-    */
-
   checkLoginStatus()
     /* handle data, dispatch actions */
     .then(data =>
@@ -31,51 +24,24 @@ export const pageLoadAction = () => (dispatch, getState) => {
       })
     )
     .then(() => {
-      return loadingWhileSignedIn(dispatch, getState);
+      return loadingWhileSignedIn(dispatch);
     })
-    .catch(() => {
-      return loadingWhileSignedOut(dispatch, getState);
-    });
+    .catch(() => handleNotLoggedIn()) //do not remove this line
+    .then(() => loadNeedFromRouteParamIfExists(dispatch, getState))
+    .then(() => checkAccessToCurrentRoute(dispatch, getState))
+    .then(() => dispatch({ type: actionTypes.initialLoadFinished }));
 };
 
-function loadingWhileSignedIn(dispatch, getState) {
-  loginSuccess(dispatch, getState);
-  fetchOwnedData(dispatch).then(() =>
-    dispatch({
-      type: actionTypes.initialLoadFinished,
-    })
-  );
-}
-
-function loginSuccess(dispatch, getState) {
+function loadingWhileSignedIn(dispatch) {
   // reset websocket to make sure it's using the logged-in session
   dispatch(actionCreators.reconnect__start());
-  checkAccessToCurrentRoute(dispatch, getState);
+  return fetchOwnedData(dispatch);
 }
 
-function loadingWhileSignedOut(dispatch, getState) {
-  let dataPromise;
-  const state = getState();
-  const postUri = getPostUriFromRoute(state);
-  if (postUri && !state.getIn(["needs", postUri])) {
-    //got an uri but no post loaded yet
-    dataPromise = fetchDataForNonOwnedNeedOnly(postUri);
-  } else {
-    dataPromise = Promise.resolve(Immutable.Map());
-  }
-  return dataPromise
-    .then(publicData =>
-      dispatch({
-        type: actionTypes.needs.storeTheirs,
-        payload: publicData,
-      })
-    )
-    .then(() =>
-      dispatch({
-        type: actionTypes.initialLoadFinished,
-      })
-    )
-    .then(() => checkAccessToCurrentRoute(dispatch, getState));
+/*
+ Simply prints a logline and resolves the promise so we can go on in the chain
+*/
+function handleNotLoggedIn() {
+  console.debug("No User Logged in yet, continuing with the initialLoad");
+  return Promise.resolve();
 }
-
-/////////// THE ACTIONCREATORS BELOW SHOULD BE PART OF PAGELOAD
