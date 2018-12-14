@@ -12,6 +12,7 @@ services:
 
   # portsgres need databases for owner and wonnode 1
   postgres1:
+    restart: always
     image: webofneeds/postgres:int
     build: ../../image/postgres
     environment:
@@ -24,6 +25,7 @@ services:
 
   # wonnode 1 => https://satvm05.researchstudio.at:8888/won
   wonnode1:
+    restart: always
     build: ../../image/wonnode
     image: webofneeds/wonnode:int
     environment:
@@ -55,6 +57,7 @@ services:
 
   # owner 1 => https://satvm05.researchstudio.at:8081/owner
   owner1:
+    restart: always
     build: ../../image/owner
     image: webofneeds/owner:int
     environment:
@@ -90,6 +93,7 @@ services:
 
   # create self-signed server certificate for for owner and wonnode 2
   gencert2:
+    restart: always
     build: ../../image/gencert
     image: webofneeds/gencert:int
     environment:
@@ -100,6 +104,7 @@ services:
 
   # nginx proxy server for owner and wonnode 2
   nginx:
+    restart: always
     image: nginx
     ports:
       - "80:80"
@@ -113,6 +118,7 @@ services:
 
   # portsgres need databases for owner and wonnode 2
   postgres2:
+    restart: always
     image: webofneeds/postgres:int
     build: ../../image/postgres
     environment:
@@ -125,6 +131,7 @@ services:
 
   # wonnode 2 (proxied by nginx) => https://satvm05.researchstudio.at/won
   wonnode2:
+    restart: always
     build: ../../image/wonnode
     image: webofneeds/wonnode:int
     environment:
@@ -159,6 +166,7 @@ services:
 
     # owner 2 (proxied by nginx) => https://satvm05.researchstudio.at/owner
   owner2:
+    restart: always
     build: ../../image/owner
     image: webofneeds/owner:int
     environment:
@@ -197,6 +205,7 @@ services:
 
   # mongodb for persistent debug bot
   mongodb:
+    restart: always
     image: tutum/mongodb:3.2
     environment:
       - "MONGODB_USER=won"
@@ -210,6 +219,7 @@ services:
 
   # debug bot used to test need communication, connect to wonnodes 1 and 2
   debug_bot:
+    restart: always
     build: ../../image/bots
     image: webofneeds/bots:int
     environment:
@@ -229,6 +239,7 @@ services:
       - wonnode2
 
   hokify_bot:
+    restart: always
     build: ../../image/bots
     image: webofneeds/bots:int
     environment:
@@ -255,6 +266,7 @@ services:
       - wonnode2
 
   mail_bot:
+    restart: always
     build: ../../image/bots
     image: webofneeds/bots:int
     environment:
@@ -284,6 +296,7 @@ services:
 
   # bigdata rdf store for matcher service (this image is not built at deployment, it is downloaded from dockerhub)
   bigdata:
+    restart: always
     build: ../../image/bigdata
     volumes:
       - $base_folder/bigdata/data/:/usr/src/bigdata/data
@@ -292,6 +305,7 @@ services:
 
   # matcher service connect with wonnodes 1 and 2
   matcher_service:
+    restart: always
     build: ../../image/matcher-service
     image: webofneeds/matcher_service:int
     environment:
@@ -318,6 +332,7 @@ services:
       - wonnode2
 
   matcher_sparql:
+    restart: always
     build: ../../image/matcher-sparql
     image: webofneeds/matcher_sparql:int
     environment:
@@ -342,6 +357,7 @@ services:
 
   # solr server as a need index
   solr:
+    restart: always
     build: ../../image/solr
     image: webofneeds/solr:int
     volumes:
@@ -352,6 +368,7 @@ services:
 
   # solr matcher and connect to matcher service
   matcher_solr:
+    restart: always
     build: ../../image/matcher-solr
     image: webofneeds/matcher_solr:int
     environment:
@@ -375,6 +392,7 @@ services:
 
   # rescal matcher and connect to matcher service
   matcher_rescal:
+    restart: always
     build: ../../image/matcher-rescal
     image: webofneeds/matcher_rescal:int
     environment:
