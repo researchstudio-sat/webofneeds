@@ -256,6 +256,7 @@ export function vicinityScoreSubQuery({
     variables: [resultName, bindScoreAs],
     where: [
       `${resultName} ${pathToGeoCoords} ?geo`,
+      `{`,
       `SERVICE geo:search {
             ?geo geo:search "inCircle" .
             ?geo geo:searchDatatype geoliteral:lat-lon .
@@ -265,6 +266,7 @@ export function vicinityScoreSubQuery({
             ?geo geo:distanceValue ?geoDistance .
           }`,
       `BIND((${radius} - ?geoDistance) / ${radius} as ?geoScoreRaw)`, // 100 is the spatialCircleRadius / maxDistance in km
+      `}`, //we have to separate the two BIND operators to circumvent a jena Op->Sparql bug 
       `BIND(IF(?geoScoreRaw > 0, ?geoScoreRaw , 0 ) as ${bindScoreAs})`,
     ],
   });
