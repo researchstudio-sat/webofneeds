@@ -433,12 +433,12 @@ public class SparqlMatcherActor extends UntypedActor {
             if (log.isDebugEnabled()) {
                 log.debug("transforming query, adding 'no hint for counterpart' restriction: {}", q);
             }
-            Op noHintForCounterpartQuery = SparqlMatcherUtils.noHintForCounterpartQuery(q, resultName, config.getLimitResults()*5);
+            Op noHintForCounterpartQuery = SparqlMatcherUtils.noHintForCounterpartQuery(q, resultName, scoreName, config.getLimitResults()*5);
             if (log.isDebugEnabled()) {
                 log.debug("transformed query: {}", noHintForCounterpartQuery);
                 log.debug("transforming query, adding 'wihout no hint for counterpart' restriction: {}", q);
             }
-            Op hintForCounterpartQuery = SparqlMatcherUtils.hintForCounterpartQuery(q, resultName, config.getLimitResults() * 5);
+            Op hintForCounterpartQuery = SparqlMatcherUtils.hintForCounterpartQuery(q, resultName, scoreName, config.getLimitResults() * 5);
             if (log.isDebugEnabled()) {
                 log.debug("transformed query: {}", hintForCounterpartQuery);
             }
@@ -482,7 +482,11 @@ public class SparqlMatcherActor extends UntypedActor {
                 ResultSet result = execution.execSelect();
                 while(result.hasNext()) {
                     QuerySolution querySolution = result.next();
-                    String foundNeedURI = querySolution.get(resultName.getName()).toString();
+                    RDFNode needUriNode = querySolution.get(resultName.getName());
+                    if (needUriNode == null || !needUriNode.isURIResource()) {
+                        continue;
+                    }
+                    String foundNeedURI = needUriNode.asResource().getURI();
                     double score = 1.0;
                     if (querySolution.contains(scoreName.getName())) {
                         RDFNode scoreNode = querySolution.get(scoreName.getName());
