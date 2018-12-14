@@ -321,7 +321,7 @@ public class SparqlMatcherActor extends UntypedActor {
             return Optional.empty();
         }
         Op op = Algebra.compile(query);
-        return Optional.of(new OpDistinct(op));
+        return Optional.of(op);
     }
 
     private Optional<Op> defaultQuery(NeedModelWrapper need) {
@@ -386,12 +386,12 @@ public class SparqlMatcherActor extends UntypedActor {
             if (log.isDebugEnabled()) {
                 log.debug("transforming query, adding 'no hint for counterpart' restriction: {}", q);
             }
-            Op noHintForCounterpartQuery = SparqlMatcherUtils.noHintForCounterpartQuery(q, resultName, scoreName, config.getLimitResults()*5);
+            Op noHintForCounterpartQuery = SparqlMatcherUtils.noHintForCounterpartQuery(q, resultName);
             if (log.isDebugEnabled()) {
                 log.debug("transformed query: {}", noHintForCounterpartQuery);
                 log.debug("transforming query, adding 'wihout no hint for counterpart' restriction: {}", q);
             }
-            Op hintForCounterpartQuery = SparqlMatcherUtils.hintForCounterpartQuery(q, resultName, scoreName, config.getLimitResults() * 5);
+            Op hintForCounterpartQuery = SparqlMatcherUtils.hintForCounterpartQuery(q, resultName);
             if (log.isDebugEnabled()) {
                 log.debug("transformed query: {}", hintForCounterpartQuery);
             }
@@ -416,12 +416,22 @@ public class SparqlMatcherActor extends UntypedActor {
     private Stream<ScoredNeed> executeQuery(Op q, Optional<NeedModelWrapperAndDataset> needToCheck) {
             Query compiledQuery = OpAsQuery.asQuery(q);
 
-        // if we were given a needToCheck, restrict the query result to that uri so that
+            // if we were given a needToCheck, restrict the query result to that uri so that
             // we get exactly one result if that uri is found for the need
             if (needToCheck.isPresent()) {
               Binding binding = BindingFactory.binding(resultName, new ResourceImpl(needToCheck.get().needModelWrapper.getNeedUri()).asNode());
               compiledQuery.setValuesDataBlock(Collections.singletonList(resultName),  Collections.singletonList(binding));
             }
+            
+            //make sure we order by score, if present, and we limit the results
+            if (compiledQuery.getProjectVars().contains(scoreName)) {
+                compiledQuery.addOrderBy(resultName, Query.ORDER_DESCENDING);
+            }
+            if (!compiledQuery.hasLimit() || compiledQuery.getLimit() > config.getLimitResults() * 5) {
+                compiledQuery.setLimit(config.getLimitResults() * 5);
+            }
+            compiledQuery.setOffset(0);
+            compiledQuery.setDistinct(true);
             
             if (log.isDebugEnabled()) {
                 log.debug("executeQuery query: {}, needToCheck: {}", new Object[] {compiledQuery, needToCheck});

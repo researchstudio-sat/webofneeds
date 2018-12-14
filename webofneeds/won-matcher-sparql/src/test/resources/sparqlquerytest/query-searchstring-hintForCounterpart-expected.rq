@@ -1,12 +1,10 @@
-SELECT DISTINCT  *
+SELECT  ?result ?score
 WHERE
-  { SELECT  ?result
-    WHERE
-      { ?result  a                     <http://purl.org/webofneeds/model#Need> ;
-                 ?prop                 ?textSearchTarget
-        FILTER contains(lcase(?textSearchTarget), "wtf")
-        FILTER NOT EXISTS { ?result  <http://purl.org/webofneeds/model#hasFlag>  <http://purl.org/webofneeds/model#NoHintForCounterpart> }
-      }
-    OFFSET  0
-    LIMIT   30
+  { { BIND(( ( ( ( ( ( ( year(?created) - 1970 ) * 315360000 ) + ( month(?created) * 26280000 ) ) + ( day(?created) * 86400 ) ) + ( hours(?created) * 3600 ) ) + ( minutes(?created) * 60 ) ) + seconds(?created) ) AS ?score)
+      ?result  a                     <http://purl.org/webofneeds/model#Need> ;
+               <http://purl.org/webofneeds/model#isInState>  <http://purl.org/webofneeds/model#Active> ;
+               <http://purl.org/dc/terms/created>  ?created
+    }
+    FILTER NOT EXISTS { ?result  <http://purl.org/webofneeds/model#hasFlag>  <http://purl.org/webofneeds/model#NoHintForCounterpart> }
   }
+

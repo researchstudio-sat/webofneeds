@@ -1,4 +1,4 @@
-SELECT DISTINCT  ?result ?score
+SELECT  ?result ?score
 WHERE
   { { BIND(( ( ( ( ( ( ( year(?created) - 1970 ) * 315360000 ) + ( month(?created) * 26280000 ) ) + ( day(?created) * 86400 ) ) + ( hours(?created) * 3600 ) ) + ( minutes(?created) * 60 ) ) + seconds(?created) ) AS ?score)
       ?result  a                     <http://purl.org/webofneeds/model#Need> ;
@@ -7,6 +7,4 @@ WHERE
     }
     FILTER NOT EXISTS { ?result  <http://purl.org/webofneeds/model#hasFlag>  <http://purl.org/webofneeds/model#NoHintForCounterpart> }
   }
-ORDER BY DESC(?score)
-OFFSET  0
-LIMIT   30
+
