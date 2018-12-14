@@ -22,7 +22,9 @@ export const complainGroup = {
           title: "WTF?",
           tags: ["wtf"],
         },
-        seeks: {},
+        seeks: {
+          type: "won:HandleComplaint",
+        },
       },
       details: {
         title: { ...details.title },
@@ -43,6 +45,7 @@ export const complainGroup = {
         content: {
           type: "won:HandleComplaint",
           title: "I'll discuss complaints",
+          searchString: "wtf",
         },
         seeks: {
           type: "won:Complaint",
