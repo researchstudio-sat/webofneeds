@@ -206,54 +206,7 @@ public class SparqlMatcherActor extends UntypedActor {
         return new OpBGP(pattern);
     }
 
-    private static Op createSearchQuery(String searchString) {
-
-        Node blank = NodeFactory.createURI("");
-        P_Link blankPath = new P_Link(blank);
-        P_NegPropSet negation = new P_NegPropSet();
-        negation.add(blankPath);
-        P_Alt any = new P_Alt(blankPath, negation);
-
-        //NOTE: removed is and seeks handling here
-        Path searchPath =  Collections.<Path>nCopies(2, new P_ZeroOrOne(any)).stream().reduce(new P_ZeroOrOne(any), P_Seq::new);
-
-        Var textSearchTarget = Var.alloc("textSearchTarget");
-
-        Op pathOp = new OpPath(new TriplePath(
-                resultName,
-                searchPath,
-                textSearchTarget));
-        
-        Op mainOp = OpJoin.create(
-                new OpTriple(
-                        new Triple(
-                                resultName,
-                                RDF.type.asNode(),
-                                WON.NEED.asNode()
-                        )
-                ),
-                pathOp
-        );
-
-        Expr filterExpression = Arrays.stream(searchString.toLowerCase().split(" "))
-                .<Expr>map(searchPart ->
-                        new E_StrContains(
-                                new E_StrLowerCase(new ExprVar(textSearchTarget)),
-                                new NodeValueString(searchPart)
-                        )
-                )
-                .reduce((left, right) -> new E_LogicalOr(left, right))
-                .orElse(new NodeValueBoolean(true));
-
-
-        return OpFilter.filterBy(
-                new ExprList(
-                        filterExpression
-                ),
-                mainOp
-        );
-    }
-
+    
     /**
      * Produces hints for the need and possibly also 'inverse' hints. Inverse hints are hints sent to the needs 
      * we find as matches for the original need.
@@ -390,7 +343,7 @@ public class SparqlMatcherActor extends UntypedActor {
 
         if (search != null) {
             String searchString = search.getString();
-            queries.add(createSearchQuery(searchString));
+            queries.add(SparqlMatcherUtils.createSearchQuery(searchString, resultName, 2, true, true));
         }
 
         return queries.stream()

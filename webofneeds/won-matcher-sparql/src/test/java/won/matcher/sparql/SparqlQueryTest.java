@@ -232,9 +232,24 @@ public class SparqlQueryTest  {
         checkResult(queryString, expectedQueryString, op -> SparqlMatcherUtils.hintForCounterpartQuery(op, resultName, scoreName,30));
     }
 
+    @Test
+    public void testSearchQuery() throws Exception {
+        String expectedQueryString = getResourceAsString("sparqlquerytest/searchstring-query/expected.rq");
+        Var resultName = Var.alloc("result");
+        Var scoreName = Var.alloc("score");
+        Op actualOp = SparqlMatcherUtils.createSearchQuery("The Query String", resultName, 3, false, false);
+        
+        Query expectedQuery = QueryFactory.create(expectedQueryString);
+        Op expectedOp = Algebra.compile(expectedQuery);
+        String actual = OpAsQuery.asQuery(actualOp).toString();
+        String expected = OpAsQuery.asQuery(expectedOp).toString();
+        Assert.assertEquals(expected, actual);
+    }
+    
     private void checkResult(String queryString, String expectedQueryString, Function<Op, Op> transform) {
         Query query = QueryFactory.create(queryString);
         Op queryOp = Algebra.compile(query);
+        
         
         Op actualOp = transform.apply(queryOp);
         Query expectedQuery = QueryFactory.create(expectedQueryString);

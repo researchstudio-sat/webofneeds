@@ -3,6 +3,8 @@ package won.matcher.sparql.actor;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.Random;
+import java.util.function.Function;
+import java.util.stream.IntStream;
 
 import org.apache.jena.graph.Triple;
 import org.apache.jena.query.Query;
@@ -14,6 +16,7 @@ import org.apache.jena.sparql.algebra.OpVisitorByTypeBase;
 import org.apache.jena.sparql.algebra.TransformCopy;
 import org.apache.jena.sparql.algebra.Transformer;
 import org.apache.jena.sparql.algebra.op.Op2;
+import org.apache.jena.sparql.algebra.op.OpBGP;
 import org.apache.jena.sparql.algebra.op.OpConditional;
 import org.apache.jena.sparql.algebra.op.OpDistinct;
 import org.apache.jena.sparql.algebra.op.OpFilter;
@@ -31,9 +34,22 @@ import org.apache.jena.sparql.algebra.op.OpSlice;
 import org.apache.jena.sparql.algebra.op.OpTriple;
 import org.apache.jena.sparql.algebra.op.OpUnion;
 import org.apache.jena.sparql.algebra.walker.Walker;
+import org.apache.jena.sparql.core.BasicPattern;
 import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.expr.E_LogicalAnd;
+import org.apache.jena.sparql.expr.E_LogicalOr;
 import org.apache.jena.sparql.expr.E_NotExists;
+import org.apache.jena.sparql.expr.E_StrContains;
+import org.apache.jena.sparql.expr.E_StrLowerCase;
+import org.apache.jena.sparql.expr.Expr;
+import org.apache.jena.sparql.expr.ExprList;
+import org.apache.jena.sparql.expr.ExprVar;
+import org.apache.jena.sparql.expr.nodevalue.NodeValueBoolean;
+import org.apache.jena.sparql.expr.nodevalue.NodeValueString;
+import org.apache.jena.vocabulary.RDF;
 
+import scala.Function1;
+import scala.collection.immutable.Stream;
 import won.protocol.vocabulary.WON;
 
 public class SparqlMatcherUtils {
@@ -146,6 +162,59 @@ public class SparqlMatcherUtils {
         return Optional.ofNullable(toplevelOpProject[0]);
     }
 
+    private static Op makePathBGPPattern(Var start, Var end, int hops, Function<Op, Op> postprocess) {
+        String tmpPropName="tmpProp";
+        String tmpObjName="tmpObj";
+        Var curSubj = null;
+        Var curPred = null;
+        Var curObj = start;
+        BasicPattern pattern = new BasicPattern();
+        for (int i = 0; i < hops; i++) {
+            curSubj = curObj;
+            curPred = Var.alloc(tmpPropName+"_" + i);
+            curObj = (i == hops - 1) ? end : Var.alloc(tmpObjName+"_" + i);
+            pattern.add( new Triple(curSubj, curPred, curObj));
+        }
+        return postprocess.apply(new OpBGP(pattern));
+    }
+    
+    public static Op createSearchQuery(String searchString, Var resultName, int hops, boolean disjunctive, boolean tokenize) {
+
+        Var textSearchTarget = Var.alloc("textSearchTarget");
+        
+        Optional<Op> union = IntStream.range(1, hops+1).mapToObj(hopCount ->  
+             makePathBGPPattern(
+                            resultName, 
+                            textSearchTarget, 
+                            hopCount, 
+                            op -> {
+                                Expr filterExpression = Arrays.stream( tokenize ? searchString.toLowerCase().split(" ") : new String[] {searchString.toLowerCase()})
+                                        .<Expr>map(searchPart ->
+                                                new E_StrContains(
+                                                        new E_StrLowerCase(new ExprVar(textSearchTarget)),
+                                                        new NodeValueString(searchPart)
+                                                )
+                                        )
+                                        .reduce((left, right) -> disjunctive ? new E_LogicalOr(left, right) : new E_LogicalAnd(left, right))
+                                        .orElse(new NodeValueBoolean(true));
+                                return OpFilter.filterBy(
+                                        new ExprList(filterExpression),
+                                        op);
+                            }))
+        .reduce((op1, op2) -> new OpUnion(op1, op2));
+        
+        Op maintriple = new OpTriple(
+                new Triple(
+                        resultName,
+                        RDF.type.asNode(),
+                        WON.NEED.asNode()
+                )
+        );
+        Op mainOp = union.isPresent() ? OpJoin.create(maintriple , union.get()) : maintriple;
+        return mainOp;
+    }
+
+    
     public static Op hintForCounterpartQuery(Op q, Var resultName, Var scoreName, long limit) {
         InsertionTargetFindingVisitor targetFinder = new InsertionTargetFindingVisitor();
         Walker.walk(q, targetFinder);
@@ -349,4 +418,5 @@ public class SparqlMatcherUtils {
         }
 
     }
+   
 }
