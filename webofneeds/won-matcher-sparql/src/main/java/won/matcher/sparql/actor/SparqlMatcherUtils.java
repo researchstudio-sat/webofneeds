@@ -1,32 +1,31 @@
 package won.matcher.sparql.actor;
 
-import java.util.List;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 import org.apache.jena.graph.Triple;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.SortCondition;
 import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.apache.jena.sparql.algebra.Op;
-import org.apache.jena.sparql.algebra.OpVisitor;
+import org.apache.jena.sparql.algebra.OpVisitorBase;
 import org.apache.jena.sparql.algebra.OpVisitorByTypeBase;
-import org.apache.jena.sparql.algebra.TransformBase;
 import org.apache.jena.sparql.algebra.TransformCopy;
 import org.apache.jena.sparql.algebra.Transformer;
-import org.apache.jena.sparql.algebra.op.Op0;
-import org.apache.jena.sparql.algebra.op.Op1;
 import org.apache.jena.sparql.algebra.op.Op2;
 import org.apache.jena.sparql.algebra.op.OpConditional;
-import org.apache.jena.sparql.algebra.op.OpExt;
+import org.apache.jena.sparql.algebra.op.OpDistinct;
 import org.apache.jena.sparql.algebra.op.OpFilter;
 import org.apache.jena.sparql.algebra.op.OpGraph;
 import org.apache.jena.sparql.algebra.op.OpJoin;
 import org.apache.jena.sparql.algebra.op.OpLeftJoin;
+import org.apache.jena.sparql.algebra.op.OpList;
 import org.apache.jena.sparql.algebra.op.OpMinus;
-import org.apache.jena.sparql.algebra.op.OpN;
-import org.apache.jena.sparql.algebra.op.OpNull;
+import org.apache.jena.sparql.algebra.op.OpModifier;
+import org.apache.jena.sparql.algebra.op.OpOrder;
 import org.apache.jena.sparql.algebra.op.OpProject;
-import org.apache.jena.sparql.algebra.op.OpSequence;
+import org.apache.jena.sparql.algebra.op.OpReduced;
 import org.apache.jena.sparql.algebra.op.OpService;
 import org.apache.jena.sparql.algebra.op.OpSlice;
 import org.apache.jena.sparql.algebra.op.OpTriple;
@@ -124,91 +123,230 @@ public class SparqlMatcherUtils {
 
         }, queryOp);
     }
-    
+
     public static Op removeServiceOp(Op queryOp) {
         return removeServiceOp(queryOp, Optional.empty());
     }
-    
+
     /**
      * Finds the top-level projection of the query.
      */
     public static Optional<Op> findToplevelOpProject(Op op) {
         // use a final array to obtain the result of the visit
-        final Op[] toplevelOpProject = new Op[]{null}; 
+        final Op[] toplevelOpProject = new Op[] { null };
         Walker.walk(op, new OpVisitorByTypeBase() {
             @Override
             public void visit(OpProject opProject) {
-                //the visitor is called after returning from the recursion, so
-                //we have to replace any project op we found deeper in the tree
-                //to end up with the toplevel one in the end
+                // the visitor is called after returning from the recursion, so
+                // we have to replace any project op we found deeper in the tree
+                // to end up with the toplevel one in the end
                 toplevelOpProject[0] = opProject;
             }
         });
         return Optional.ofNullable(toplevelOpProject[0]);
     }
-    
-    public static Op hintForCounterpartQuery(Op q, Var resultName, long limit) {
-        Optional<Op> topLevelProject = findToplevelOpProject(q);
-        if (!topLevelProject.isPresent()) {
-            return q;
-        }
-        return Transformer.transform(new TransformCopy(true) {
-            public Op transform(OpProject op, Op subOp) {
-                if (op == topLevelProject.get()) {
-                    //only transform the toplevel projection
-                    return new OpSlice(
-                            op.copy(
-                                    OpFilter.filter(
-                                            new E_NotExists(
-                                                    new OpTriple(
-                                                            new Triple(
-                                                                    resultName,
-                                                                    WON.HAS_FLAG.asNode(),
-                                                                    WON.NO_HINT_FOR_COUNTERPART.asNode()
-                                                            )
-                                                    )
-                                            ),
-                                            subOp
-                                    )
-                            ),
-                            0,
-                            limit
-                    );
-                } else {
-                    return super.transform(op, subOp);
-                }
-            }
-        }, q);
+
+    public static Op hintForCounterpartQuery(Op q, Var resultName, Var scoreName, long limit) {
+        InsertionTargetFindingVisitor targetFinder = new InsertionTargetFindingVisitor();
+        Walker.walk(q, targetFinder);
+        OpInserter inserter = targetFinder.getInserter();
+        inserter.setNotExistsTriple(
+                new Triple(resultName, WON.HAS_FLAG.asNode(), WON.NO_HINT_FOR_COUNTERPART.asNode()));
+        inserter.setLimit(limit);
+        inserter.setMakeDistinct(true);
+        inserter.setSortByDescVar(scoreName);
+        return Transformer.transform(inserter, q);
     }
 
-    public static Op noHintForCounterpartQuery(Op q, Var resultName, long limit) {
-        Optional<Op> topLevelProject = findToplevelOpProject(q);
-        if (!topLevelProject.isPresent()) {
-            return q;
+    public static Op noHintForCounterpartQuery(Op q, Var resultName, Var scoreName, long limit) {
+        InsertionTargetFindingVisitor targetFinder = new InsertionTargetFindingVisitor();
+        Walker.walk(q, targetFinder);
+        OpInserter inserter = targetFinder.getInserter();
+        inserter.setJoinWithTriple(new Triple(resultName, WON.HAS_FLAG.asNode(), WON.NO_HINT_FOR_COUNTERPART.asNode()));
+        inserter.setLimit(limit);
+        inserter.setMakeDistinct(true);
+        inserter.setSortByDescVar(scoreName);
+        return Transformer.transform(inserter, q);
+    }
+
+    private static class InsertionInfo {
+        private Optional<OpModifier> targetOp = Optional.empty();
+        private Optional<OpProject> projectOp = Optional.empty();
+        private boolean limitPresent = false;
+        private boolean orderPresent = false;
+        private boolean distinctPresent = false;
+    }
+
+    private static class InsertionTargetFindingVisitor extends OpVisitorBase {
+        private Optional<InsertionInfo> highestCompleteInfo = Optional.empty();
+        private InsertionInfo collectingInfo = new InsertionInfo();
+
+        @Override
+        public void visit(OpProject op) {
+            rememberTreePositionIfFirst(op);
+            collectingInfo.projectOp = Optional.of(op);
+            highestCompleteInfo = Optional.of(collectingInfo);
+            collectingInfo = new InsertionInfo();
         }
-        return Transformer.transform(new TransformCopy(true) {
-            public Op transform(OpProject op, Op subOp) {
-                if (op == topLevelProject.get()) {
-                    //only transform the toplevel projection
-                    return new OpSlice(
-                            op.copy(
-                                    OpJoin.create(
-                                            new OpTriple(
-                                                    new Triple(
-                                                            resultName,
-                                                            WON.HAS_FLAG.asNode(),
-                                                            WON.NO_HINT_FOR_COUNTERPART.asNode()
-                                                    )
-                                            ),
-                                            subOp
-                                    )
-                            ),
-                            0,
-                            limit);
-                } else {
-                    return super.transform(op, subOp);
+
+        private void rememberTreePositionIfFirst(OpModifier mod) {
+            if (collectingInfo.targetOp.isPresent())
+                return;
+            collectingInfo.targetOp = Optional.of(mod);
+        }
+
+        @Override
+        public void visit(OpOrder op) {
+            rememberTreePositionIfFirst(op);
+            collectingInfo.orderPresent = true;
+        }
+
+        @Override
+        public void visit(OpDistinct op) {
+            rememberTreePositionIfFirst(op);
+            collectingInfo.distinctPresent = true;
+        }
+
+        @Override
+        public void visit(OpReduced op) {
+            rememberTreePositionIfFirst(op);
+        }
+
+        @Override
+        public void visit(OpList op) {
+            rememberTreePositionIfFirst(op);
+        }
+
+        @Override
+        public void visit(OpSlice op) {
+            rememberTreePositionIfFirst(op);
+            collectingInfo.limitPresent = true;
+        }
+
+        public OpInserter getInserter() {
+            return new OpInserter(highestCompleteInfo);
+        }
+
+    }
+
+    private static class OpInserter extends TransformCopy {
+        public OpInserter(Optional<InsertionInfo> insertionInfo) {
+            super(true);
+            this.insertionInfo = insertionInfo;
+        }
+
+        private Optional<Var> sortByDescVar;
+        private Optional<Long> limit = Optional.empty();
+        private Optional<Triple> joinWithTriple = Optional.empty();
+        private Optional<Triple> notExistsTriple = Optional.empty();
+        private Optional<InsertionInfo> insertionInfo;
+        private boolean makeDistinct = false;
+
+        public void setLimit(long limit) {
+            this.limit = Optional.of(limit);
+        }
+
+        public void setMakeDistinct(boolean makeDistinct) {
+            this.makeDistinct = makeDistinct;
+        }
+
+        public void setSortByDescVar(Var sortByDescVar) {
+            this.sortByDescVar = Optional.of(sortByDescVar);
+        }
+
+        public void setJoinWithTriple(Triple joinWithTriple) {
+            this.joinWithTriple = Optional.of(joinWithTriple);
+        }
+
+        public void setNotExistsTriple(Triple notExistsTriple) {
+            this.notExistsTriple = Optional.of(notExistsTriple);
+        }
+
+        private OpModifier insertSliceAbove(Op subOp, long offset, long limit) {
+            return new OpSlice(subOp, offset, limit);
+        }
+
+        private Op insertJoinWith(Op pattern, Triple triple) {
+            return OpJoin.create(new OpTriple(triple), pattern);
+        }
+
+        private Op insertNotExistsTriple(Op subOp, Triple triple) {
+            return OpFilter.filter(new E_NotExists(new OpTriple(triple)), subOp);
+        }
+
+        private Op insertOrderAbove(Op op, Var var) {
+            return new OpOrder(op, Arrays.asList(new SortCondition(var, Query.ORDER_DESCENDING)));
+        }
+
+        private boolean isTargetOp(Op op) {
+            return insertionInfo.isPresent() && insertionInfo.get().targetOp.isPresent()
+                    && insertionInfo.get().targetOp.get().equals(op);
+        }
+
+        private boolean isTargetProjectOp(Op op) {
+            return insertionInfo.isPresent() && insertionInfo.get().projectOp.isPresent()
+                    && insertionInfo.get().projectOp.get().equals(op);
+        }
+
+        public Op performInsertIfAtTarget(OpModifier op, Op subOp) {
+            if (isTargetOp(op)) {
+                if (joinWithTriple.isPresent()) {
+                    subOp = insertJoinWith(subOp, joinWithTriple.get());
+                }
+                if (notExistsTriple.isPresent()) {
+                    subOp = insertNotExistsTriple(subOp, notExistsTriple.get());
                 }
             }
-        }, q);
+            if (isTargetProjectOp(op)) {
+                // we have to insert the order below the OpProject, distinct and slice above it
+                // below project:
+                if (sortByDescVar.isPresent() && !insertionInfo.get().orderPresent
+                        && insertionInfo.get().projectOp.get().getVars().contains(sortByDescVar.get())) {
+                    subOp = insertOrderAbove(subOp, sortByDescVar.get());
+                }
+                // above project:
+                Op outerOp = op.copy(subOp);
+                if (makeDistinct && !insertionInfo.get().distinctPresent) {
+                    outerOp = new OpDistinct(outerOp);
+                }
+                if (limit.isPresent() && !insertionInfo.get().limitPresent) {
+                    outerOp = insertSliceAbove(outerOp, 0, limit.get());
+                }
+                return outerOp;
+            } else {
+                return op.copy(subOp);
+            }
+        }
+
+        @Override
+        public Op transform(OpOrder op, Op subOp) {
+            return performInsertIfAtTarget(op, subOp);
+        }
+
+        @Override
+        public Op transform(OpDistinct op, Op subOp) {
+            return performInsertIfAtTarget(op, subOp);
+        }
+
+        @Override
+        public Op transform(OpReduced op, Op subOp) {
+            return performInsertIfAtTarget(op, subOp);
+        }
+
+        @Override
+        public Op transform(OpList op, Op subOp) {
+            return performInsertIfAtTarget(op, subOp);
+        }
+
+        @Override
+        public Op transform(OpSlice op, Op subOp) {
+            return performInsertIfAtTarget(op, subOp);
+        }
+
+        @Override
+        public Op transform(OpProject op, Op subOp) {
+            return performInsertIfAtTarget(op, subOp);
+        }
+
     }
 }
