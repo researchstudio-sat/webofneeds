@@ -306,7 +306,7 @@ public class NeedInformationServiceImpl implements NeedInformationService
             Integer version = Integer.valueOf(etag);
             need = needRepository.findOneByNeedURIAndVersionNot(needURI, version);
         }
-        boolean isDeleted = !!(need.getState() == NeedState.DELETED);
+        boolean isDeleted = need != null && (need.getState() == NeedState.DELETED);
         
         return new DataWithEtag<>(need, need == null ? etag : Integer.toString(need.getVersion()), etag, isDeleted);
     }
@@ -316,7 +316,7 @@ public class NeedInformationServiceImpl implements NeedInformationService
   {
     if (needURI == null) throw new IllegalArgumentException("needURI is not set");
     Need need = DataAccessUtils.loadNeed(needRepository, needURI);
-    return need.getState() == NeedState.DELETED? ModelFactory.createDefaultModel() : need.getDatatsetHolder().getDataset().getDefaultModel();
+    return (need == null || need.getState() == NeedState.DELETED) ? ModelFactory.createDefaultModel() : need.getDatatsetHolder().getDataset().getDefaultModel();
   }
 
   @Override

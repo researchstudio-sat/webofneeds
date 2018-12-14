@@ -3,6 +3,8 @@ package won.matcher.sparql.actor;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.Random;
+import java.util.function.Function;
+import java.util.stream.IntStream;
 
 import org.apache.jena.graph.Triple;
 import org.apache.jena.query.Query;
@@ -14,6 +16,7 @@ import org.apache.jena.sparql.algebra.OpVisitorByTypeBase;
 import org.apache.jena.sparql.algebra.TransformCopy;
 import org.apache.jena.sparql.algebra.Transformer;
 import org.apache.jena.sparql.algebra.op.Op2;
+import org.apache.jena.sparql.algebra.op.OpBGP;
 import org.apache.jena.sparql.algebra.op.OpConditional;
 import org.apache.jena.sparql.algebra.op.OpDistinct;
 import org.apache.jena.sparql.algebra.op.OpFilter;
@@ -31,9 +34,22 @@ import org.apache.jena.sparql.algebra.op.OpSlice;
 import org.apache.jena.sparql.algebra.op.OpTriple;
 import org.apache.jena.sparql.algebra.op.OpUnion;
 import org.apache.jena.sparql.algebra.walker.Walker;
+import org.apache.jena.sparql.core.BasicPattern;
 import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.expr.E_LogicalAnd;
+import org.apache.jena.sparql.expr.E_LogicalOr;
 import org.apache.jena.sparql.expr.E_NotExists;
+import org.apache.jena.sparql.expr.E_StrContains;
+import org.apache.jena.sparql.expr.E_StrLowerCase;
+import org.apache.jena.sparql.expr.Expr;
+import org.apache.jena.sparql.expr.ExprList;
+import org.apache.jena.sparql.expr.ExprVar;
+import org.apache.jena.sparql.expr.nodevalue.NodeValueBoolean;
+import org.apache.jena.sparql.expr.nodevalue.NodeValueString;
+import org.apache.jena.vocabulary.RDF;
 
+import scala.Function1;
+import scala.collection.immutable.Stream;
 import won.protocol.vocabulary.WON;
 
 public class SparqlMatcherUtils {
@@ -146,35 +162,78 @@ public class SparqlMatcherUtils {
         return Optional.ofNullable(toplevelOpProject[0]);
     }
 
-    public static Op hintForCounterpartQuery(Op q, Var resultName, Var scoreName, long limit) {
+    private static Op makePathBGPPattern(Var start, Var end, int hops, Function<Op, Op> postprocess) {
+        String tmpPropName="tmpProp";
+        String tmpObjName="tmpObj";
+        Var curSubj = null;
+        Var curPred = null;
+        Var curObj = start;
+        BasicPattern pattern = new BasicPattern();
+        for (int i = 0; i < hops; i++) {
+            curSubj = curObj;
+            curPred = Var.alloc(tmpPropName+"_" + i);
+            curObj = (i == hops - 1) ? end : Var.alloc(tmpObjName+"_" + i);
+            pattern.add( new Triple(curSubj, curPred, curObj));
+        }
+        return postprocess.apply(new OpBGP(pattern));
+    }
+    
+    public static Op createSearchQuery(String searchString, Var resultName, int hops, boolean disjunctive, boolean tokenize) {
+
+        Var textSearchTarget = Var.alloc("textSearchTarget");
+        
+        Optional<Op> union = IntStream.range(1, hops+1).mapToObj(hopCount ->  
+             makePathBGPPattern(
+                            resultName, 
+                            textSearchTarget, 
+                            hopCount, 
+                            op -> {
+                                Expr filterExpression = Arrays.stream( tokenize ? searchString.toLowerCase().split(" ") : new String[] {searchString.toLowerCase()})
+                                        .<Expr>map(searchPart ->
+                                                new E_StrContains(
+                                                        new E_StrLowerCase(new ExprVar(textSearchTarget)),
+                                                        new NodeValueString(searchPart)
+                                                )
+                                        )
+                                        .reduce((left, right) -> disjunctive ? new E_LogicalOr(left, right) : new E_LogicalAnd(left, right))
+                                        .orElse(new NodeValueBoolean(true));
+                                return OpFilter.filterBy(
+                                        new ExprList(filterExpression),
+                                        op);
+                            }))
+        .reduce((op1, op2) -> new OpUnion(op1, op2));
+        
+        Op maintriple = new OpTriple(
+                new Triple(
+                        resultName,
+                        RDF.type.asNode(),
+                        WON.NEED.asNode()
+                )
+        );
+        Op mainOp = union.isPresent() ? OpJoin.create(maintriple , union.get()) : maintriple;
+        return mainOp;
+    }
+
+    
+    public static Op hintForCounterpartQuery(Op q, Var resultName) {
         InsertionTargetFindingVisitor targetFinder = new InsertionTargetFindingVisitor();
         Walker.walk(q, targetFinder);
         OpInserter inserter = targetFinder.getInserter();
         inserter.setNotExistsTriple(
                 new Triple(resultName, WON.HAS_FLAG.asNode(), WON.NO_HINT_FOR_COUNTERPART.asNode()));
-        inserter.setLimit(limit);
-        inserter.setMakeDistinct(true);
-        inserter.setSortByDescVar(scoreName);
         return Transformer.transform(inserter, q);
     }
 
-    public static Op noHintForCounterpartQuery(Op q, Var resultName, Var scoreName, long limit) {
+    public static Op noHintForCounterpartQuery(Op q, Var resultName) {
         InsertionTargetFindingVisitor targetFinder = new InsertionTargetFindingVisitor();
         Walker.walk(q, targetFinder);
         OpInserter inserter = targetFinder.getInserter();
         inserter.setJoinWithTriple(new Triple(resultName, WON.HAS_FLAG.asNode(), WON.NO_HINT_FOR_COUNTERPART.asNode()));
-        inserter.setLimit(limit);
-        inserter.setMakeDistinct(true);
-        inserter.setSortByDescVar(scoreName);
         return Transformer.transform(inserter, q);
     }
 
     private static class InsertionInfo {
         private Optional<OpModifier> targetOp = Optional.empty();
-        private Optional<OpProject> projectOp = Optional.empty();
-        private boolean limitPresent = false;
-        private boolean orderPresent = false;
-        private boolean distinctPresent = false;
     }
 
     private static class InsertionTargetFindingVisitor extends OpVisitorBase {
@@ -184,7 +243,6 @@ public class SparqlMatcherUtils {
         @Override
         public void visit(OpProject op) {
             rememberTreePositionIfFirst(op);
-            collectingInfo.projectOp = Optional.of(op);
             highestCompleteInfo = Optional.of(collectingInfo);
             collectingInfo = new InsertionInfo();
         }
@@ -198,13 +256,11 @@ public class SparqlMatcherUtils {
         @Override
         public void visit(OpOrder op) {
             rememberTreePositionIfFirst(op);
-            collectingInfo.orderPresent = true;
         }
 
         @Override
         public void visit(OpDistinct op) {
             rememberTreePositionIfFirst(op);
-            collectingInfo.distinctPresent = true;
         }
 
         @Override
@@ -220,7 +276,6 @@ public class SparqlMatcherUtils {
         @Override
         public void visit(OpSlice op) {
             rememberTreePositionIfFirst(op);
-            collectingInfo.limitPresent = true;
         }
 
         public OpInserter getInserter() {
@@ -235,24 +290,9 @@ public class SparqlMatcherUtils {
             this.insertionInfo = insertionInfo;
         }
 
-        private Optional<Var> sortByDescVar;
-        private Optional<Long> limit = Optional.empty();
         private Optional<Triple> joinWithTriple = Optional.empty();
         private Optional<Triple> notExistsTriple = Optional.empty();
-        private Optional<InsertionInfo> insertionInfo;
-        private boolean makeDistinct = false;
-
-        public void setLimit(long limit) {
-            this.limit = Optional.of(limit);
-        }
-
-        public void setMakeDistinct(boolean makeDistinct) {
-            this.makeDistinct = makeDistinct;
-        }
-
-        public void setSortByDescVar(Var sortByDescVar) {
-            this.sortByDescVar = Optional.of(sortByDescVar);
-        }
+        private Optional<InsertionInfo> insertionInfo = Optional.empty();
 
         public void setJoinWithTriple(Triple joinWithTriple) {
             this.joinWithTriple = Optional.of(joinWithTriple);
@@ -260,10 +300,6 @@ public class SparqlMatcherUtils {
 
         public void setNotExistsTriple(Triple notExistsTriple) {
             this.notExistsTriple = Optional.of(notExistsTriple);
-        }
-
-        private OpModifier insertSliceAbove(Op subOp, long offset, long limit) {
-            return new OpSlice(subOp, offset, limit);
         }
 
         private Op insertJoinWith(Op pattern, Triple triple) {
@@ -274,18 +310,9 @@ public class SparqlMatcherUtils {
             return OpFilter.filter(new E_NotExists(new OpTriple(triple)), subOp);
         }
 
-        private Op insertOrderAbove(Op op, Var var) {
-            return new OpOrder(op, Arrays.asList(new SortCondition(var, Query.ORDER_DESCENDING)));
-        }
-
         private boolean isTargetOp(Op op) {
             return insertionInfo.isPresent() && insertionInfo.get().targetOp.isPresent()
                     && insertionInfo.get().targetOp.get().equals(op);
-        }
-
-        private boolean isTargetProjectOp(Op op) {
-            return insertionInfo.isPresent() && insertionInfo.get().projectOp.isPresent()
-                    && insertionInfo.get().projectOp.get().equals(op);
         }
 
         public Op performInsertIfAtTarget(OpModifier op, Op subOp) {
@@ -297,25 +324,7 @@ public class SparqlMatcherUtils {
                     subOp = insertNotExistsTriple(subOp, notExistsTriple.get());
                 }
             }
-            if (isTargetProjectOp(op)) {
-                // we have to insert the order below the OpProject, distinct and slice above it
-                // below project:
-                if (sortByDescVar.isPresent() && !insertionInfo.get().orderPresent
-                        && insertionInfo.get().projectOp.get().getVars().contains(sortByDescVar.get())) {
-                    subOp = insertOrderAbove(subOp, sortByDescVar.get());
-                }
-                // above project:
-                Op outerOp = op.copy(subOp);
-                if (makeDistinct && !insertionInfo.get().distinctPresent) {
-                    outerOp = new OpDistinct(outerOp);
-                }
-                if (limit.isPresent() && !insertionInfo.get().limitPresent) {
-                    outerOp = insertSliceAbove(outerOp, 0, limit.get());
-                }
-                return outerOp;
-            } else {
-                return op.copy(subOp);
-            }
+            return op.copy(subOp);
         }
 
         @Override
@@ -347,6 +356,7 @@ public class SparqlMatcherUtils {
         public Op transform(OpProject op, Op subOp) {
             return performInsertIfAtTarget(op, subOp);
         }
-
+        
     }
+   
 }

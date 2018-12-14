@@ -148,7 +148,7 @@ export const jobOffer = {
         s: won.defaultContext["s"],
       },
       distinct: true,
-      variables: [resultName],
+      variables: [resultName, "?score"],
       subQueries: subQueries,
       where: [
         `${resultName} rdf:type won:Need.`,
@@ -161,10 +161,10 @@ export const jobOffer = {
           COALESCE(?organizationName_jaccardIndex, 0) + 
           COALESCE(?employmentTypes_jaccardIndex, 0) + 
           COALESCE(?jobLocation_geoScore, 0) 
-        ) / 5  as ?aggregatedScore)`,
-        // `FILTER(?aggregatedScore > 0)`, // not necessary atm to filter; there are parts of job-postings we can't match yet (e.g. NLP on description). also content's sparse anyway.
+        ) / 5  as ?score)`,
+        // `FILTER(?score > 0)`, // not necessary atm to filter; there are parts of job-postings we can't match yet (e.g. NLP on description). also content's sparse anyway.
       ],
-      orderBy: [{ order: "DESC", variable: "?aggregatedScore" }],
+      orderBy: [{ order: "DESC", variable: "?score" }],
     });
 
     return query;

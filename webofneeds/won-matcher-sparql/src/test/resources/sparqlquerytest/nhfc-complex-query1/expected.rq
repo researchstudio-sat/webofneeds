@@ -1,0 +1,43 @@
+SELECT DISTINCT  ?result ?score
+WHERE
+  { ?result  <http://purl.org/webofneeds/model#hasFlag>  <http://purl.org/webofneeds/model#NoHintForCounterpart>
+    { { { OPTIONAL
+            { { SELECT DISTINCT  ?result ?industry_jaccardIndex
+                WHERE
+                  { { { SELECT  ?result (SUM(?var0) AS ?targetOverlap) (COUNT(?result) AS ?targetTotal)
+                        WHERE
+                          { ?result  <http://schema.org/industry>  ?tag
+                            BIND(if(( str(?tag) = "KarosseriebauerIn" ), 1, 0) AS ?var0)
+                          }
+                        GROUP BY ?result
+                      }
+                      BIND(( ?targetOverlap / ( ( ?targetTotal + 1 ) - ?targetOverlap ) ) AS ?industry_jaccardIndex)
+                    }
+                    FILTER ( ?industry_jaccardIndex > 0 )
+                  }
+              }
+            }
+          OPTIONAL
+            { { SELECT  ?result (if(( ?geoScoreRaw > 0 ), ?geoScoreRaw, 0) AS ?jobLocation_geoScore)
+                WHERE
+                  { ?result <http://schema.org/jobLocation>/<http://schema.org/geo> ?geo
+                    { SERVICE <http://www.bigdata.com/rdf/geospatial#search>
+                        { ?geo  <http://www.bigdata.com/rdf/geospatial#search>  "inCircle" ;
+                                <http://www.bigdata.com/rdf/geospatial#searchDatatype>  <http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon> ;
+                                <http://www.bigdata.com/rdf/geospatial#predicate>  <http://purl.org/webofneeds/model#geoSpatial> ;
+                                <http://www.bigdata.com/rdf/geospatial#spatialCircleCenter>  "48.22350935259615#16.38684868812561" ;
+                                <http://www.bigdata.com/rdf/geospatial#spatialCircleRadius>  "10" ;
+                                <http://www.bigdata.com/rdf/geospatial#distanceValue>  ?geoDistance}
+                      BIND(( ( 10 - ?geoDistance ) / 10 ) AS ?geoScoreRaw)
+                    }
+                  }
+              }
+            }
+        }
+        ?result  a                     <http://purl.org/webofneeds/model#Need> ;
+                 a                     <http://schema.org/JobPosting>
+      }
+      BIND(( ( ( ( ( coalesce(?industry_jaccardIndex, 0) + coalesce(?skills_jaccardIndex, 0) ) + coalesce(?organizationName_jaccardIndex, 0) ) + coalesce(?employmentTypes_jaccardIndex, 0) ) + coalesce(?jobLocation_geoScore, 0) ) / 5 ) AS ?score)
+    }
+  }
+ORDER BY DESC(?score)

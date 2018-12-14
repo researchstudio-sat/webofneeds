@@ -206,54 +206,7 @@ public class SparqlMatcherActor extends UntypedActor {
         return new OpBGP(pattern);
     }
 
-    private static Op createSearchQuery(String searchString) {
-
-        Node blank = NodeFactory.createURI("");
-        P_Link blankPath = new P_Link(blank);
-        P_NegPropSet negation = new P_NegPropSet();
-        negation.add(blankPath);
-        P_Alt any = new P_Alt(blankPath, negation);
-
-        //NOTE: removed is and seeks handling here
-        Path searchPath =  Collections.<Path>nCopies(2, new P_ZeroOrOne(any)).stream().reduce(new P_ZeroOrOne(any), P_Seq::new);
-
-        Var textSearchTarget = Var.alloc("textSearchTarget");
-
-        Op pathOp = new OpPath(new TriplePath(
-                resultName,
-                searchPath,
-                textSearchTarget));
-        
-        Op mainOp = OpJoin.create(
-                new OpTriple(
-                        new Triple(
-                                resultName,
-                                RDF.type.asNode(),
-                                WON.NEED.asNode()
-                        )
-                ),
-                pathOp
-        );
-
-        Expr filterExpression = Arrays.stream(searchString.toLowerCase().split(" "))
-                .<Expr>map(searchPart ->
-                        new E_StrContains(
-                                new E_StrLowerCase(new ExprVar(textSearchTarget)),
-                                new NodeValueString(searchPart)
-                        )
-                )
-                .reduce((left, right) -> new E_LogicalOr(left, right))
-                .orElse(new NodeValueBoolean(true));
-
-
-        return OpFilter.filterBy(
-                new ExprList(
-                        filterExpression
-                ),
-                mainOp
-        );
-    }
-
+    
     /**
      * Produces hints for the need and possibly also 'inverse' hints. Inverse hints are hints sent to the needs 
      * we find as matches for the original need.
@@ -368,7 +321,7 @@ public class SparqlMatcherActor extends UntypedActor {
             return Optional.empty();
         }
         Op op = Algebra.compile(query);
-        return Optional.of(new OpDistinct(op));
+        return Optional.of(op);
     }
 
     private Optional<Op> defaultQuery(NeedModelWrapper need) {
@@ -390,7 +343,7 @@ public class SparqlMatcherActor extends UntypedActor {
 
         if (search != null) {
             String searchString = search.getString();
-            queries.add(createSearchQuery(searchString));
+            queries.add(SparqlMatcherUtils.createSearchQuery(searchString, resultName, 2, true, true));
         }
 
         return queries.stream()
@@ -433,12 +386,12 @@ public class SparqlMatcherActor extends UntypedActor {
             if (log.isDebugEnabled()) {
                 log.debug("transforming query, adding 'no hint for counterpart' restriction: {}", q);
             }
-            Op noHintForCounterpartQuery = SparqlMatcherUtils.noHintForCounterpartQuery(q, resultName, scoreName, config.getLimitResults()*5);
+            Op noHintForCounterpartQuery = SparqlMatcherUtils.noHintForCounterpartQuery(q, resultName);
             if (log.isDebugEnabled()) {
                 log.debug("transformed query: {}", noHintForCounterpartQuery);
                 log.debug("transforming query, adding 'wihout no hint for counterpart' restriction: {}", q);
             }
-            Op hintForCounterpartQuery = SparqlMatcherUtils.hintForCounterpartQuery(q, resultName, scoreName, config.getLimitResults() * 5);
+            Op hintForCounterpartQuery = SparqlMatcherUtils.hintForCounterpartQuery(q, resultName);
             if (log.isDebugEnabled()) {
                 log.debug("transformed query: {}", hintForCounterpartQuery);
             }
@@ -463,12 +416,22 @@ public class SparqlMatcherActor extends UntypedActor {
     private Stream<ScoredNeed> executeQuery(Op q, Optional<NeedModelWrapperAndDataset> needToCheck) {
             Query compiledQuery = OpAsQuery.asQuery(q);
 
-        // if we were given a needToCheck, restrict the query result to that uri so that
+            // if we were given a needToCheck, restrict the query result to that uri so that
             // we get exactly one result if that uri is found for the need
             if (needToCheck.isPresent()) {
               Binding binding = BindingFactory.binding(resultName, new ResourceImpl(needToCheck.get().needModelWrapper.getNeedUri()).asNode());
               compiledQuery.setValuesDataBlock(Collections.singletonList(resultName),  Collections.singletonList(binding));
             }
+            
+            //make sure we order by score, if present, and we limit the results
+            if (compiledQuery.getProjectVars().contains(scoreName)) {
+                compiledQuery.addOrderBy(resultName, Query.ORDER_DESCENDING);
+            }
+            if (!compiledQuery.hasLimit() || compiledQuery.getLimit() > config.getLimitResults() * 5) {
+                compiledQuery.setLimit(config.getLimitResults() * 5);
+            }
+            compiledQuery.setOffset(0);
+            compiledQuery.setDistinct(true);
             
             if (log.isDebugEnabled()) {
                 log.debug("executeQuery query: {}, needToCheck: {}", new Object[] {compiledQuery, needToCheck});

@@ -93,7 +93,7 @@ public class SparqlQueryTest  {
         Query query = QueryFactory.create(queryString);
         Op queryOp = Algebra.compile(query);
         
-        Op transformed = SparqlMatcherUtils.hintForCounterpartQuery(queryOp, Var.alloc("result"), Var.alloc("score"), 10);
+        Op transformed = SparqlMatcherUtils.hintForCounterpartQuery(queryOp, Var.alloc("result"));
         
         
         System.out.println("query algebra: " + queryOp);
@@ -191,22 +191,22 @@ public class SparqlQueryTest  {
         Query query = QueryFactory.create(queryString);
         Op queryOp = Algebra.compile(query);
         
-        Op actualOp = SparqlMatcherUtils.noHintForCounterpartQuery(queryOp, resultName, scoreName, 30);
+        Op actualOp = SparqlMatcherUtils.noHintForCounterpartQuery(queryOp, resultName);
         Query expected = QueryFactory.create(queryStringNoHintForCounterpartExpected);
         Op expectedOp = Algebra.compile(expected);
         Assert.assertEquals(OpAsQuery.asQuery(expectedOp).toString(), OpAsQuery.asQuery(actualOp).toString());
         
-        actualOp = SparqlMatcherUtils.hintForCounterpartQuery(queryOp, resultName, scoreName, 30);
+        actualOp = SparqlMatcherUtils.hintForCounterpartQuery(queryOp, resultName);
         expected = QueryFactory.create(queryStringHintForCounterpartExpected);
         expectedOp = Algebra.compile(expected);
         Assert.assertEquals(OpAsQuery.asQuery(expectedOp).toString(), OpAsQuery.asQuery(actualOp).toString());
         
-        actualOp = SparqlMatcherUtils.noHintForCounterpartQuery(queryOp, resultName, scoreName, 30);
+        actualOp = SparqlMatcherUtils.noHintForCounterpartQuery(queryOp, resultName);
         expected = QueryFactory.create(queryStringNoHintForCounterpartExpected);
         expectedOp = Algebra.compile(expected);
         Assert.assertEquals(OpAsQuery.asQuery(expectedOp).toString(), OpAsQuery.asQuery(actualOp).toString());
         
-        actualOp = SparqlMatcherUtils.hintForCounterpartQuery(queryOp, resultName, scoreName, 30);
+        actualOp = SparqlMatcherUtils.hintForCounterpartQuery(queryOp, resultName);
         expected = QueryFactory.create(queryStringHintForCounterpartExpected);
         expectedOp = Algebra.compile(expected);
         Assert.assertEquals(OpAsQuery.asQuery(expectedOp).toString(), OpAsQuery.asQuery(actualOp).toString());
@@ -220,7 +220,7 @@ public class SparqlQueryTest  {
         String expectedQueryString = getResourceAsString("sparqlquerytest/no-hint-for-counterpart/expected.rq");
         Var resultName = Var.alloc("result");
         Var scoreName = Var.alloc("score");
-        checkResult(queryString, expectedQueryString, op -> SparqlMatcherUtils.noHintForCounterpartQuery(op, resultName, scoreName,30));
+        checkResult(queryString, expectedQueryString, op -> SparqlMatcherUtils.noHintForCounterpartQuery(op, resultName));
     }
     
     @Test
@@ -229,12 +229,36 @@ public class SparqlQueryTest  {
         String expectedQueryString = getResourceAsString("sparqlquerytest/hint-for-counterpart/expected.rq");
         Var resultName = Var.alloc("result");
         Var scoreName = Var.alloc("score");
-        checkResult(queryString, expectedQueryString, op -> SparqlMatcherUtils.hintForCounterpartQuery(op, resultName, scoreName,30));
+        checkResult(queryString, expectedQueryString, op -> SparqlMatcherUtils.hintForCounterpartQuery(op, resultName));
+    }
+    
+    @Test
+    public void testAddRequiredFlag_hintForCounterpart_complex1() throws Exception {
+        String queryString = getResourceAsString("sparqlquerytest/nhfc-complex-query1/input.rq");
+        String expectedQueryString = getResourceAsString("sparqlquerytest/nhfc-complex-query1/expected.rq");
+        Var resultName = Var.alloc("result");
+        Var scoreName = Var.alloc("score");
+        checkResult(queryString, expectedQueryString, op -> SparqlMatcherUtils.noHintForCounterpartQuery(op, resultName));
     }
 
+    @Test
+    public void testSearchQuery() throws Exception {
+        String expectedQueryString = getResourceAsString("sparqlquerytest/searchstring-query/expected.rq");
+        Var resultName = Var.alloc("result");
+        Var scoreName = Var.alloc("score");
+        Op actualOp = SparqlMatcherUtils.createSearchQuery("The Query String", resultName, 3, false, false);
+        
+        Query expectedQuery = QueryFactory.create(expectedQueryString);
+        Op expectedOp = Algebra.compile(expectedQuery);
+        String actual = OpAsQuery.asQuery(actualOp).toString();
+        String expected = OpAsQuery.asQuery(expectedOp).toString();
+        Assert.assertEquals(expected, actual);
+    }
+    
     private void checkResult(String queryString, String expectedQueryString, Function<Op, Op> transform) {
         Query query = QueryFactory.create(queryString);
         Op queryOp = Algebra.compile(query);
+        
         
         Op actualOp = transform.apply(queryOp);
         Query expectedQuery = QueryFactory.create(expectedQueryString);
@@ -242,13 +266,13 @@ public class SparqlQueryTest  {
         String actual = OpAsQuery.asQuery(actualOp).toString();
         
         String expected = OpAsQuery.asQuery(expectedOp).toString();
-       /* System.out.println("expected:");
+        System.out.println("expected:");
         System.out.println(expectedOp);
         System.out.println(expected);
         System.out.println("actual:");
         System.out.println(actualOp);
         System.out.println(actual);
-        */
+        
         Assert.assertEquals(expected, actual);
     }
 }
