@@ -75,9 +75,7 @@ function genComponentConf() {
         const petriNetData = connection && connection.get("petriNetData");
 
         const process =
-          this.processUri &&
-          petriNetData &&
-          petriNetData.getIn(["data", this.processUri]);
+          this.processUri && petriNetData && petriNetData.get(this.processUri);
 
         const isLoading =
           connection &&
@@ -88,7 +86,15 @@ function genComponentConf() {
             "petriNetData",
             "loading",
           ]);
-        const isLoaded = petriNetData && petriNetData.get("isLoaded");
+        const isLoaded =
+          petriNetData &&
+          getIn(state, [
+            "process",
+            "connections",
+            connectionUri,
+            "petriNetData",
+            "loaded",
+          ]);
         const isDirty =
           petriNetData &&
           getIn(state, [

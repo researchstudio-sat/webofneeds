@@ -175,7 +175,8 @@ export default function(processState = initialState, action = {}) {
 
       return processState
         .setIn(["connections", connUri, "petriNetData", "loading"], false)
-        .setIn(["connections", connUri, "petriNetData", "dirty"], false);
+        .setIn(["connections", connUri, "petriNetData", "dirty"], false)
+        .setIn(["connections", connUri, "petriNetData", "loaded"], true);
     }
 
     default:

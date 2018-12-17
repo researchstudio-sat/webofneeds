@@ -355,12 +355,17 @@ function genComponentConf() {
             ),
           agreementData,
           petriNetData,
-          petriNetDataArray:
-            petriNetData &&
-            petriNetData.get("data") &&
-            petriNetData.get("data").toArray(),
+          petriNetDataArray: petriNetData && petriNetData.toArray(),
           agreementDataLoaded: agreementData && agreementData.get("isLoaded"),
-          petriNetDataLoaded: petriNetData && petriNetData.get("isLoaded"),
+          petriNetDataLoaded:
+            petriNetData &&
+            getIn(state, [
+              "process",
+              "connections",
+              connectionUri,
+              "petriNetData",
+              "loaded",
+            ]),
           multiSelectType: connection && connection.get("multiSelectType"),
           lastUpdateTimestamp: connection && connection.get("lastUpdateDate"),
           isSentRequest:
@@ -376,10 +381,7 @@ function genComponentConf() {
           // if the connect-message is here, everything else should be as well
           allMessagesLoaded,
           hasAgreementMessages: agreementMessages && agreementMessages.size > 0,
-          hasPetriNetData:
-            petriNetData &&
-            petriNetData.get("data") &&
-            petriNetData.get("data").size > 0,
+          hasPetriNetData: petriNetData.size > 0,
           agreementMessagesArray:
             agreementMessages && agreementMessages.toArray(),
           hasProposalMessages: proposalMessages && proposalMessages.size > 0,

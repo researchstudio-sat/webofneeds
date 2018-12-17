@@ -252,15 +252,10 @@ export function updatePetriNetStateData(state, connectionUri, petriNetData) {
 
   const needUri = need.get("uri");
 
-  return state
-    .setIn(
-      [needUri, "connections", connectionUri, "petriNetData", "data"],
-      petriNetData
-    )
-    .setIn(
-      [needUri, "connections", connectionUri, "petriNetData", "isLoaded"],
-      true
-    );
+  return state.setIn(
+    [needUri, "connections", connectionUri, "petriNetData"],
+    petriNetData
+  );
 }
 
 export function updateAgreementStateData(state, connectionUri, agreementData) {
