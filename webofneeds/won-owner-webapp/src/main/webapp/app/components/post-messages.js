@@ -10,7 +10,7 @@ import labelledHrModule from "./labelled-hr.js";
 import connectionContextDropdownModule from "./connection-context-dropdown.js";
 import feedbackGridModule from "./feedback-grid.js";
 import { connect2Redux } from "../won-utils.js";
-import { attach, delay } from "../utils.js";
+import { attach, delay, getIn } from "../utils.js";
 import { isWhatsAroundNeed, isWhatsNewNeed } from "../need-utils.js";
 import {
   fetchAgreementProtocolUris,
@@ -100,7 +100,7 @@ function genComponentConf() {
               post-uri="self.nonOwnedNeedUri">
             </won-post-content-message>
             <div class="pm__content__loadspinner"
-                ng-if="self.isLoadingMessages || (self.showAgreementData && self.isLoadingAgreementData) || (self.showPetriNetData && self.isLoadingPetriNetData && !self.hasPetriNetData)">
+                ng-if="self.isProcessingLoadingMessages || (self.showAgreementData && self.isLoadingAgreementData) || (self.showPetriNetData && self.isLoadingPetriNetData && !self.hasPetriNetData)">
                 <svg class="hspinner">
                   <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
                 </svg>
@@ -112,7 +112,7 @@ function genComponentConf() {
               Calculating PetriNet Status
             </div>
             <button class="pm__content__loadbutton won-button--outlined thin red"
-                ng-if="!self.isSuggested && self.showChatData && !self.isLoadingMessages && !self.allMessagesLoaded"
+                ng-if="!self.isSuggested && self.showChatData && !self.isProcessingLoadingMessages && !self.allMessagesLoaded"
                 ng-click="self.loadPreviousMessages()">
                 Load previous messages
             </button>
@@ -326,7 +326,14 @@ function genComponentConf() {
           chatMessages,
           chatMessagesWithUnknownState,
           unreadMessageCount: unreadMessages && unreadMessages.size,
-          isLoadingMessages: connection && connection.get("isLoadingMessages"),
+          isProcessingLoadingMessages:
+            connection &&
+            getIn(state, [
+              "process",
+              "connections",
+              connectionUri,
+              "loadingMessages",
+            ]),
           isLoadingAgreementData:
             connection && connection.get("isLoadingAgreementData"),
           isLoadingPetriNetData:
@@ -418,7 +425,7 @@ function genComponentConf() {
         const INITIAL_MESSAGECOUNT = 15;
         if (
           this.connection &&
-          !this.isLoadingMessages &&
+          !this.isProcessingLoadingMessages &&
           !(this.allMessagesLoaded || this.connection.get("messages").size > 0)
         ) {
           this.connections__showLatestMessages(
@@ -552,7 +559,7 @@ function genComponentConf() {
         if (
           this.isConnected &&
           !this.isLoadingAgreementData &&
-          !this.isLoadingMessages &&
+          !this.isProcessingLoadingMessages &&
           this.agreementDataLoaded &&
           this.chatMessagesWithUnknownState &&
           this.chatMessagesWithUnknownState.size > 0
@@ -650,7 +657,7 @@ function genComponentConf() {
     loadPreviousMessages() {
       delay(0).then(() => {
         const MORE_MESSAGECOUNT = 5;
-        if (this.connection && !this.isLoadingMessages) {
+        if (this.connection && !this.isProcessingLoadingMessages) {
           this.connections__showMoreMessages(
             this.connection.get("uri"),
             MORE_MESSAGECOUNT

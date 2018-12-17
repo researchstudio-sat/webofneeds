@@ -96,6 +96,50 @@ export default function(processState = initialState, action = {}) {
       );
     }
 
+    case actionTypes.connections.setLoadingMessages: {
+      const loadingMessages = action.payload.loadingMessages;
+      const connUri = action.payload.connectionUri;
+
+      return processState.setIn(
+        ["connections", connUri, "loadingMessages"],
+        loadingMessages
+      );
+    }
+
+    case actionTypes.reconnect.startingToLoadConnectionData:
+    case actionTypes.reconnect.receivedConnectionData:
+    case actionTypes.reconnect.connectionFailedToLoad:
+    case actionTypes.connections.showLatestMessages:
+    case actionTypes.connections.showMoreMessages: {
+      const loadingMessages = action.payload.get("loadingMessages");
+      const connUri = action.payload.get("connectionUri");
+
+      if (loadingMessages && connUri) {
+        processState = processState.setIn(
+          ["connections", connUri, "loadingMessages"],
+          true
+        );
+      }
+
+      const loadedMessages = action.payload.get("events");
+      if (loadedMessages) {
+        processState = processState.setIn(
+          ["connections", connUri, "loadingMessages"],
+          false
+        );
+      }
+      const error = action.payload.get("error");
+
+      if (error && connUri) {
+        processState = processState.setIn(
+          ["connections", connUri, "loadingMessages"],
+          false
+        );
+      }
+
+      return processState;
+    }
+
     default:
       return processState;
   }

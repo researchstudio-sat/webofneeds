@@ -57,7 +57,18 @@ export function getChatConnectionsToCrawl(state) {
   const allConnections =
     needs && needs.flatMap(need => need.get("connections"));
   const chatConnections =
-    allConnections && allConnections.filter(conn => isChatConnection(conn));
+    allConnections &&
+    allConnections
+      .filter(conn => isChatConnection(conn))
+      .filter(
+        conn =>
+          !getIn(state, [
+            "process",
+            "connections",
+            conn.get("uri"),
+            "loadingMessages",
+          ])
+      );
 
   const connectionsInStateConnected =
     chatConnections &&

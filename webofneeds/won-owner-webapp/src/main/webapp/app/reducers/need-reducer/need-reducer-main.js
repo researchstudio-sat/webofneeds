@@ -35,7 +35,6 @@ import {
   addConnectionFull,
   addActiveConnectionsToNeedInLoading,
   markConnectionAsRated,
-  setConnectionLoadingMessages,
   setConnectionLoadingAgreementData,
   setConnectionLoadingPetriNetData,
   markConnectionAsRead,
@@ -366,7 +365,6 @@ export default function(allNeedsInState = initialState, action = {}) {
           creationDate: undefined,
           lastUpdateDate: undefined,
           isRated: false,
-          isLoadingMessages: false,
           isLoadingAgreementData: false,
           isLoadingPetriNetData: false,
           isLoading: false,
@@ -771,12 +769,6 @@ export default function(allNeedsInState = initialState, action = {}) {
         allNeedsInState,
         action.payload.connectionUri
       );
-    case actionTypes.connections.setLoadingMessages:
-      return setConnectionLoadingMessages(
-        allNeedsInState,
-        action.payload.connectionUri,
-        action.payload.isLoadingMessages
-      );
     case actionTypes.connections.updatePetriNetData:
       return updatePetriNetStateData(
         allNeedsInState,
@@ -943,34 +935,9 @@ export default function(allNeedsInState = initialState, action = {}) {
     case actionTypes.reconnect.connectionFailedToLoad:
     case actionTypes.connections.showLatestMessages:
     case actionTypes.connections.showMoreMessages: {
-      const isLoadingMessages = action.payload.get("isLoadingMessages");
-      const connectionUri = action.payload.get("connectionUri");
-
-      if (isLoadingMessages && connectionUri) {
-        allNeedsInState = setConnectionLoadingMessages(
-          allNeedsInState,
-          connectionUri,
-          true
-        );
-      }
-
       const loadedMessages = action.payload.get("events");
       if (loadedMessages) {
         allNeedsInState = addExistingMessages(allNeedsInState, loadedMessages);
-        allNeedsInState = setConnectionLoadingMessages(
-          allNeedsInState,
-          connectionUri,
-          false
-        );
-      }
-      const error = action.payload.get("error");
-
-      if (error && connectionUri) {
-        allNeedsInState = setConnectionLoadingMessages(
-          allNeedsInState,
-          connectionUri,
-          false
-        );
       }
 
       return allNeedsInState;

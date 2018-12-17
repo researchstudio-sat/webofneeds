@@ -182,7 +182,6 @@ $ngRedux.getState();
                     isLoaded: true|false //default is false, whether or not the petriNetData has been loaded already
                     isDirty: true|false //default is false, whether or not the currently stored petriNetData is (assumed to be) not correct anymore
                },
-               isLoadingMessages: true|false, //default is false, whether or not this connection is currently loading messages or processing agreements
                isLoadingAgreementData: true|false, //default is false, whether or not the agreementData has been loaded,
                isLoadingPetriNetData: true|false, //default is false, whether or not the petriNetData has been loaded,
                isLoading: true|false, //default is false, whether or not this connection is currently loading itself (similar to the isLoading in the need)
@@ -262,6 +261,7 @@ $ngRedux.getState();
     connections: {
         [connUri]: {
            failedToLoad: true|false, //default is false, whether or not this connection was able to be loaded or not
+           loadingMessages: true|false, //default is false, whether or not this connection is currently loading messages or processing agreements
         }
     }
 

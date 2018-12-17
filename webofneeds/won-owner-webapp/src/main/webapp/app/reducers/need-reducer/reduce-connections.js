@@ -130,33 +130,6 @@ export function markConnectionAsRead(state, connectionUri, needUri) {
   return state;
 }
 
-export function setConnectionLoadingMessages(
-  state,
-  connectionUri,
-  isLoadingMessages
-) {
-  const need =
-    connectionUri && getOwnedNeedByConnectionUri(state, connectionUri);
-  const needUri = need && need.get("uri");
-  const connection = need && need.getIn(["connections", connectionUri]);
-
-  if (!connection) {
-    console.error(
-      "No connection with connectionUri: <",
-      connectionUri,
-      "> found within needUri: <",
-      needUri,
-      ">"
-    );
-    return state;
-  }
-
-  return state.setIn(
-    [needUri, "connections", connectionUri, "isLoadingMessages"],
-    isLoadingMessages
-  );
-}
-
 export function setConnectionLoadingAgreementData(
   state,
   connectionUri,
@@ -505,7 +478,6 @@ export function addActiveConnectionToNeed(state, needUri, connUri) {
       lastUpdateDate: undefined,
       unread: undefined,
       isRated: false,
-      isLoadingMessages: false,
       isLoading: true,
       failedToLoad: false,
       showAgreementData: false,
