@@ -396,7 +396,7 @@ function genComponentConf() {
           // if the connect-message is here, everything else should be as well
           allMessagesLoaded,
           hasAgreementMessages: agreementMessages && agreementMessages.size > 0,
-          hasPetriNetData: petriNetData.size > 0,
+          hasPetriNetData: petriNetData && petriNetData.size > 0,
           agreementMessagesArray:
             agreementMessages && agreementMessages.toArray(),
           hasProposalMessages: proposalMessages && proposalMessages.size > 0,

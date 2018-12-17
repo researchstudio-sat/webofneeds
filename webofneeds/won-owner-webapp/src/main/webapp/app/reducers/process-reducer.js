@@ -84,10 +84,10 @@ export default function(processState = initialState, action = {}) {
 
     case actionTypes.needs.storeUriFailed:
     case actionTypes.personas.storeUriFailed: {
-      return processState.setIn(
-        ["needs", action.payload.get("uri"), "failedToStore"],
-        true
-      );
+      return processState
+        .setIn(["needs", action.payload.get("uri"), "failedToLoad"], true)
+        .setIn(["needs", action.payload.get("uri"), "toLoad"], false)
+        .setIn(["needs", action.payload.get("uri"), "loading"], false);
     }
 
     case actionTypes.connections.storeUriFailed: {
@@ -235,15 +235,41 @@ export default function(processState = initialState, action = {}) {
     }
 
     case actionTypes.messages.reopenNeed.failed:
-    case actionTypes.messages.closeNeed.failed:
-    case actionTypes.connections.storeActive: {
-      const connections = action.payload.connections;
+    case actionTypes.messages.closeNeed.failed: {
+      let connections = action.payload.connections;
 
       connections &&
-        connections.forEach(connection => {
-          const parsedConnection = parsedConnection(connection);
+        connections.keySeq().forEach(connUri => {
           processState = processState.setIn(
-            ["connections", parsedConnection.getIn(["data", "uri"]), "loading"],
+            ["connections", connUri, "loading"],
+            false
+          );
+        });
+      return processState;
+    }
+
+    case actionTypes.connections.storeActive: {
+      let connections = action.payload.get("connections");
+
+      connections &&
+        connections.keySeq().forEach(connUri => {
+          processState = processState.setIn(
+            ["connections", connUri, "loading"],
+            false
+          );
+        });
+      return processState;
+    }
+
+    case actionTypes.needs.storeTheirs:
+    case actionTypes.personas.storeTheirs:
+    case actionTypes.needs.storeOwned: {
+      let needs = action.payload.get("needs");
+
+      needs &&
+        needs.keySeq().forEach(needUri => {
+          processState = processState.setIn(
+            ["needs", needUri, "loading"],
             false
           );
         });

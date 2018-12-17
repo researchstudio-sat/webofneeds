@@ -16,7 +16,7 @@ import extendedConnectionIndicatorsModule from "./extended-connection-indicators
 import connectionSelectionItemModule from "./connection-selection-item.js";
 import createPostItemModule from "./create-post-item.js";
 
-import { attach, delay, sortByDate, get } from "../utils.js";
+import { attach, delay, sortByDate, get, getIn } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { actionCreators } from "../actions/actions.js";
 
@@ -236,7 +236,9 @@ function genComponentConf() {
         const sortedOpenNeeds = sortByDate(openNeeds, "creationDate");
         const sortedClosedNeeds = sortByDate(closedNeeds, "creationDate");
 
-        const unloadedNeeds = closedNeeds.filter(need => need.get("toLoad"));
+        const unloadedNeeds = closedNeeds.filter(need =>
+          getIn(state, ["process", "needs", need.get("uri"), "toLoad"])
+        );
 
         return {
           allNeeds,

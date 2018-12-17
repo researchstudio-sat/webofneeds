@@ -104,19 +104,6 @@ export default function(allNeedsInState = initialState, action = {}) {
       );
     }
 
-    case actionTypes.needs.storeUriFailed:
-    case actionTypes.personas.storeUriFailed: {
-      const needUri = action.payload.get("uri");
-      const oldNeed = allNeedsInState.get(needUri);
-
-      if (oldNeed) {
-        return allNeedsInState
-          .setIn([needUri, "isLoading"], false)
-          .setIn([needUri, "toLoad"], false);
-      }
-      return allNeedsInState;
-    }
-
     case actionTypes.needs.storeOwned: {
       let needs = action.payload.get("needs");
       needs = needs ? needs : Immutable.Set();
@@ -157,12 +144,6 @@ export default function(allNeedsInState = initialState, action = {}) {
       return storeConnectionsData(
         allNeedsInState,
         action.payload.get("connections")
-      );
-
-    case actionTypes.needs.fetch:
-      return action.payload.reduce(
-        (updatedState, ownedNeed) => addNeed(updatedState, ownedNeed, true),
-        allNeedsInState
       );
 
     case actionTypes.messages.reopenNeed.failed:

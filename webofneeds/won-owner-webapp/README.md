@@ -194,7 +194,6 @@ $ngRedux.getState();
        nodeUri: string, //identifier of this need's server
        isOwned: true|false, //whether this need is owned or not
        isBeingCreated: true|false, //whether or not the creation of this need was successfully completed yet
-       toLoad: true|false, //whether or not the need is flagged as toLoad (for future loading purposes)
        flags: Immutable.List //all the flags that are present within the won:hasFlags predicate of a need
        facets: Immutable.Map //all the facets that are present within the won:hasFacets predicate of a need
        state: "won:Active" | "won:Inactive", //state of the need
@@ -248,6 +247,7 @@ $ngRedux.getState();
         [needUri]: {
             failedToLoad: true|false, //whether or not the need has failed to load (due to delete or other)
             loading: true|false, //whether or not the need is currently in the process of being loaded
+            toLoad: true|false, //whether or not the need is flagged as toLoad (for future loading purposes)
         }
     },
     connections: {

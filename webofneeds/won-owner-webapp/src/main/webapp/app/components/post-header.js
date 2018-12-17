@@ -95,6 +95,9 @@ function genComponentConf() {
           postLoading:
             !need ||
             getIn(state, ["process", "needs", need.get("uri"), "loading"]),
+          postToLoad:
+            !need ||
+            getIn(state, ["process", "needs", need.get("uri"), "toLoad"]),
           isDirectResponse: isDirectResponse,
           friendlyTimestamp:
             need &&
@@ -113,11 +116,7 @@ function genComponentConf() {
       );
 
       classOnComponentRoot("won-is-loading", () => this.postLoading, this);
-      classOnComponentRoot("won-is-toload", () => this.isToLoad(), this);
-    }
-
-    isToLoad() {
-      return !this.need || this.need.get("toLoad");
+      classOnComponentRoot("won-is-toload", () => this.postToLoad, this);
     }
 
     hasTitle() {
