@@ -32,7 +32,7 @@ export function addNeed(needs, jsonldNeed, isOwned) {
 
 function addNeedInLoading(needs, needUri, state, isOwned) {
   const oldNeed = needs.get(needUri);
-  if (oldNeed && !oldNeed.get("isLoading")) {
+  if (oldNeed) {
     return needs;
   } else {
     let need = Immutable.fromJS({
