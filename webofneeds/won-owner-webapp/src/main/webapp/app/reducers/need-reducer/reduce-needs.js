@@ -13,42 +13,16 @@ export function addNeed(needs, jsonldNeed, isOwned) {
     const isExistingOwnedNeed = existingNeed && existingNeed.get("isOwned");
 
     if ((isOwned || isExistingOwnedNeed) && existingNeed) {
-      // If need is already present and the
-      // need is claimed as an own need we set
-      // have to set it
-      const isBeingCreated = existingNeed.get("isBeingCreated");
-      const isLoading = existingNeed.get("isLoading");
-      const toLoad = existingNeed.get("toLoad");
-
-      if (isBeingCreated || isLoading || toLoad) {
-        // replace it
-        parsedNeed = parsedNeed
-          .set("connections", existingNeed.get("connections"))
-          .set("isOwned", true);
-        return needs.setIn([parsedNeed.get("uri")], parsedNeed);
-      } else {
-        // just be sure we mark it as own need
-        return needs.setIn([parsedNeed.get("uri"), "isOwned"], true);
-      }
+      parsedNeed = parsedNeed
+        .set("connections", existingNeed.get("connections"))
+        .set("isOwned", true);
     } else if (!isOwned && existingNeed) {
-      // If need is already present and the
-      // need is claimed as a non own need
-      const isLoading = existingNeed.get("isLoading");
-      const toLoad = existingNeed.get("toLoad");
-
-      if (isLoading || toLoad) {
-        // replace it
-        parsedNeed = parsedNeed
-          .set("connections", existingNeed.get("connections"))
-          .set("isOwned", false);
-        return needs.setIn([parsedNeed.get("uri")], parsedNeed);
-      } else {
-        // just be sure we mark it as non own need
-        return needs.setIn([parsedNeed.get("uri"), "isOwned"], false);
-      }
-    } else {
-      return setIfNew(needs, parsedNeed.get("uri"), parsedNeed);
+      parsedNeed = parsedNeed
+        .set("connections", existingNeed.get("connections"))
+        .set("isOwned", false);
     }
+
+    return needs.setIn([parsedNeed.get("uri")], parsedNeed);
   } else {
     console.error("Tried to add invalid need-object: ", jsonldNeedImm.toJS());
     newState = needs;
@@ -186,18 +160,6 @@ export function addNeedInCreation(needs, needInCreation, needUri) {
     newState = needs;
   }
   return newState;
-}
-
-function setIfNew(state, path, obj) {
-  return state.update(
-    path,
-    val =>
-      val
-        ? // we've seen this need before, no need to overwrite it
-          val
-        : // it's the first time we see this need -> add it
-          Immutable.fromJS(obj)
-  );
 }
 
 export function markNeedAsRead(state, needUri) {
