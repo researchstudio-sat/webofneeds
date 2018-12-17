@@ -270,7 +270,7 @@ export default function(processState = initialState, action = {}) {
         needs.keySeq().forEach(needUri => {
           processState = processState
             .setIn(["needs", needUri, "loading"], false)
-            .setIn(["needs", needUri, "toLoad", false]);
+            .setIn(["needs", needUri, "toLoad"], false);
         });
       return processState;
     }
