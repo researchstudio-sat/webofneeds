@@ -357,7 +357,6 @@ export default function(allNeedsInState = initialState, action = {}) {
             retractedMessageUris: Immutable.Set(),
             proposedMessageUris: Immutable.Set(),
             claimedMessageUris: Immutable.Set(),
-            isLoaded: false,
           },
           petriNetData: Immutable.Map(),
           creationDate: undefined,

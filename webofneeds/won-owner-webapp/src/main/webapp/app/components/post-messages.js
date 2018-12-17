@@ -356,7 +356,15 @@ function genComponentConf() {
           agreementData,
           petriNetData,
           petriNetDataArray: petriNetData && petriNetData.toArray(),
-          agreementDataLoaded: agreementData && agreementData.get("isLoaded"),
+          agreementDataLoaded:
+            agreementData &&
+            getIn(state, [
+              "process",
+              "connections",
+              connectionUri,
+              "agreementData",
+              "loaded",
+            ]),
           petriNetDataLoaded:
             petriNetData &&
             getIn(state, [

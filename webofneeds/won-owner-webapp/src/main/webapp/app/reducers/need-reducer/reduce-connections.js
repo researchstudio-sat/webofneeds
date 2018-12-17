@@ -278,10 +278,6 @@ export function updateAgreementStateData(state, connectionUri, agreementData) {
       agreementData
     )
     .setIn(
-      [needUri, "connections", connectionUri, "agreementData", "isLoaded"],
-      true
-    )
-    .setIn(
       [needUri, "connections", connectionUri, "isLoadingAgreementData"],
       false
     );

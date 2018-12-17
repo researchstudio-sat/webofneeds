@@ -25,7 +25,6 @@ export function parseConnection(jsonldConnection) {
         retractedMessageUris: Immutable.Set(),
         proposedMessageUris: Immutable.Set(),
         claimedMessageUris: Immutable.Set(),
-        isLoaded: false,
       },
       petriNetData: Immutable.Map(),
       remoteNeedUri: undefined,

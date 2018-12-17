@@ -179,6 +179,20 @@ export default function(processState = initialState, action = {}) {
         .setIn(["connections", connUri, "petriNetData", "loaded"], true);
     }
 
+    case actionTypes.connections.updateAgreementData: {
+      const agreementData = action.payload.agreementData;
+      const connUri = action.payload.connectionUri;
+
+      if (!connUri || !agreementData) {
+        return processState;
+      }
+
+      return processState.setIn(
+        ["connections", connUri, "agreementData", "loaded"],
+        true
+      );
+    }
+
     default:
       return processState;
   }

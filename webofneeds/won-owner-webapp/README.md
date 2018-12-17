@@ -175,7 +175,7 @@ $ngRedux.getState();
                    claimedMessageUris: Immutable.Set(),
                    rejectedMessageUris: Immutable.Set(),
                    retractedMessageUris: Immutable.Set(),
-                   isLoaded: true|false, //default is false, whether or not the agreementData has been loaded already
+
                },
                petriNetData: Immutable.Map(),
                isLoadingAgreementData: true|false, //default is false, whether or not the agreementData has been loaded,
@@ -261,7 +261,10 @@ $ngRedux.getState();
                 loading: true|false, //default is false, whether or not the petriNetData has been loaded,
                 dirty: true|false //default is false, whether or not the currently stored petriNetData is (assumed to be) not correct anymore
                 loaded: true|false //default is false, whether or not the petriNetData has been loaded already
-           }
+           },
+           agreementData: {
+                loaded: true|false, //default is false, whether or not the agreementData has been loaded already
+           },
         }
     }
 
