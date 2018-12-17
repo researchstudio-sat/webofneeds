@@ -163,9 +163,6 @@ export function addNeedToLoad(needs, needUri, state, isOwned) {
   } else {
     let need = Immutable.fromJS({
       uri: needUri,
-      toLoad: true,
-      isLoading: false,
-      failedToLoad: false,
       isOwned: isOwned,
       state: state,
       connections: Immutable.Map(),

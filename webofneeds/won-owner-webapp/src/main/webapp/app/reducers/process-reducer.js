@@ -276,6 +276,15 @@ export default function(processState = initialState, action = {}) {
       return processState;
     }
 
+    case actionTypes.needs.storeOwnedInactiveUris: {
+      const needUris = action.payload.get("uris");
+      needUris &&
+        needUris.forEach(needUri => {
+          processState = processState.setIn(["needs", needUri, "toLoad"], true);
+        });
+      return processState;
+    }
+
     default:
       return processState;
   }
