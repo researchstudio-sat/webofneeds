@@ -100,7 +100,7 @@ function genComponentConf() {
               post-uri="self.nonOwnedNeedUri">
             </won-post-content-message>
             <div class="pm__content__loadspinner"
-                ng-if="self.isProcessingLoadingMessages || (self.showAgreementData && self.isLoadingAgreementData) || (self.showPetriNetData && self.isLoadingPetriNetData && !self.hasPetriNetData)">
+                ng-if="self.isProcessingLoadingMessages || (self.showAgreementData && self.isLoadingAgreementData) || (self.showPetriNetData && self.isProcessingLoadingPetriNetData && !self.hasPetriNetData)">
                 <svg class="hspinner">
                   <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
                 </svg>
@@ -108,7 +108,7 @@ function genComponentConf() {
             <div class="pm__content__agreement__loadingtext"  ng-if="self.showAgreementData && self.isLoadingAgreementData">
               Calculating Agreement Status
             </div>
-            <div class="pm__content__petrinet__loadingtext"  ng-if="self.showPetriNetData && self.isLoadingPetriNetData && !self.hasPetriNetData">
+            <div class="pm__content__petrinet__loadingtext"  ng-if="self.showPetriNetData && self.isProcessingLoadingPetriNetData && !self.hasPetriNetData">
               Calculating PetriNet Status
             </div>
             <button class="pm__content__loadbutton won-button--outlined thin red"
@@ -164,11 +164,11 @@ function genComponentConf() {
             <!-- AGREEMENTVIEW SPECIFIC CONTENT END-->
 
             <!-- PETRINETVIEW SPECIFIC CONTENT START -->
-            <div class="pm__content__petrinet__emptytext"  ng-if="self.showPetriNetData && !self.isLoadingPetriNetData && !self.hasPetriNetData">
+            <div class="pm__content__petrinet__emptytext"  ng-if="self.showPetriNetData && !self.isProcessingLoadingPetriNetData && !self.hasPetriNetData">
               No PetriNet Data within this Conversation
             </div>
             <div class="pm__content__petrinet__process"
-              ng-if="self.showPetriNetData && (!self.isLoadingPetriNetData || self.hasPetriNetData) && process.get('processURI')"
+              ng-if="self.showPetriNetData && (!self.isProcessingLoadingPetriNetData || self.hasPetriNetData) && process.get('processURI')"
               ng-repeat="process in self.petriNetDataArray">
               <div class="pm__content__petrinet__process__header">
                 ProcessURI: {{ process.get('processURI') }}
@@ -336,8 +336,15 @@ function genComponentConf() {
             ]),
           isLoadingAgreementData:
             connection && connection.get("isLoadingAgreementData"),
-          isLoadingPetriNetData:
-            connection && connection.get("isLoadingPetriNetData"),
+          isProcessingLoadingPetriNetData:
+            connection &&
+            getIn(state, [
+              "process",
+              "connections",
+              connectionUri,
+              "petriNetData",
+              "loading",
+            ]),
           showAgreementData: connection && connection.get("showAgreementData"),
           showPetriNetData: connection && connection.get("showPetriNetData"),
           showChatData:
@@ -441,14 +448,14 @@ function genComponentConf() {
         if (
           forceFetch ||
           (this.isConnected &&
-            !this.isLoadingPetriNetData &&
+            !this.isProcessingLoadingPetriNetData &&
             !this.petriNetDataLoaded)
         ) {
           const connectionUri = this.connection && this.connection.get("uri");
 
           this.connections__setLoadingPetriNetData({
             connectionUri: connectionUri,
-            isLoadingPetriNetData: true,
+            loadingPetriNetData: true,
           });
 
           fetchPetriNetUris(connectionUri)
@@ -472,7 +479,7 @@ function genComponentConf() {
               console.error("Error:", error);
               this.connections__setLoadingPetriNetData({
                 connectionUri: connectionUri,
-                isLoadingPetriNetData: false,
+                loadingPetriNetData: false,
               });
             });
         }

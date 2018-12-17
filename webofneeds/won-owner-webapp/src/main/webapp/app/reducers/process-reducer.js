@@ -140,6 +140,30 @@ export default function(processState = initialState, action = {}) {
       return processState;
     }
 
+    case actionTypes.connections.setLoadingPetriNetData: {
+      const loadingPetriNetData = action.payload.loadingPetriNetData;
+      const connUri = action.payload.connectionUri;
+
+      return processState.setIn(
+        ["connections", connUri, "petriNetData", "loading"],
+        loadingPetriNetData
+      );
+    }
+
+    case actionTypes.connections.updatePetriNetData: {
+      const petriNetData = action.payload.petriNetData;
+      const connUri = action.payload.connectionUri;
+
+      if (!connUri || !petriNetData) {
+        return processState;
+      }
+
+      return processState.setIn(
+        ["connections", connUri, "petriNetData", "loading"],
+        false
+      );
+    }
+
     default:
       return processState;
   }

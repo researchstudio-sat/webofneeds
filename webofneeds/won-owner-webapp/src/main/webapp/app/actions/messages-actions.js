@@ -283,7 +283,7 @@ export function processConnectionMessage(event) {
         type: actionTypes.connections.setLoadingPetriNetData,
         payload: {
           connectionUri: connectionUri,
-          isLoadingPetriNetData: true,
+          loadingPetriNetData: true,
         },
       });
 
@@ -313,7 +313,7 @@ export function processConnectionMessage(event) {
             type: actionTypes.connections.setLoadingPetriNetData,
             payload: {
               connectionUri: connectionUri,
-              isLoadingPetriNetData: false,
+              loadingPetriNetData: false,
             },
           });
         });
@@ -957,7 +957,7 @@ export function dispatchActionOnSuccessRemote(event) {
         type: actionTypes.connections.setLoadingPetriNetData,
         payload: {
           connectionUri: connectionUri,
-          isLoadingPetriNetData: true,
+          loadingPetriNetData: true,
         },
       });
 
@@ -987,7 +987,7 @@ export function dispatchActionOnSuccessRemote(event) {
             type: actionTypes.connections.setLoadingPetriNetData,
             payload: {
               connectionUri: connectionUri,
-              isLoadingPetriNetData: false,
+              loadingPetriNetData: false,
             },
           });
         });

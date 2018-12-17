@@ -6,7 +6,7 @@ import angular from "angular";
 import "ng-redux";
 import { actionCreators } from "../actions/actions.js";
 
-import { attach, generateSimpleTransitionLabel } from "../utils.js";
+import { attach, generateSimpleTransitionLabel, getIn } from "../utils.js";
 import {
   getOwnedNeedByConnectionUri,
   getConnectionUriFromRoute,
@@ -79,7 +79,15 @@ function genComponentConf() {
           petriNetData &&
           petriNetData.getIn(["data", this.processUri]);
 
-        const isLoading = connection && connection.get("isLoadingPetriNetData");
+        const isLoading =
+          connection &&
+          getIn(state, [
+            "process",
+            "connections",
+            connectionUri,
+            "petriNetData",
+            "loading",
+          ]);
         const isLoaded = petriNetData && petriNetData.get("isLoaded");
         const isDirty = petriNetData && petriNetData.get("isDirty");
         const markedPlaces = process && process.get("markedPlaces");

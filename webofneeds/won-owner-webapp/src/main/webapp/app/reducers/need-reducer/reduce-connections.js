@@ -160,7 +160,7 @@ export function setConnectionLoadingAgreementData(
 export function setConnectionLoadingPetriNetData(
   state,
   connectionUri,
-  isLoadingPetriNetData
+  loadingPetriNetData
 ) {
   const need =
     connectionUri && getOwnedNeedByConnectionUri(state, connectionUri);
@@ -178,15 +178,10 @@ export function setConnectionLoadingPetriNetData(
     return state;
   }
 
-  return state
-    .setIn(
-      [needUri, "connections", connectionUri, "petriNetData", "isDirty"],
-      isLoadingPetriNetData //Assuming that there is currently a load of petriNetData in progress we flag it dirty just in case
-    )
-    .setIn(
-      [needUri, "connections", connectionUri, "isLoadingPetriNetData"],
-      isLoadingPetriNetData
-    );
+  return state.setIn(
+    [needUri, "connections", connectionUri, "petriNetData", "isDirty"],
+    loadingPetriNetData //Assuming that there is currently a load of petriNetData in progress we flag it dirty just in case
+  );
 }
 
 export function setPetriNetDataDirty(
@@ -322,10 +317,6 @@ export function updatePetriNetStateData(state, connectionUri, petriNetData) {
     )
     .setIn(
       [needUri, "connections", connectionUri, "petriNetData", "isDirty"],
-      false
-    )
-    .setIn(
-      [needUri, "connections", connectionUri, "isLoadingPetriNetData"],
       false
     );
 }

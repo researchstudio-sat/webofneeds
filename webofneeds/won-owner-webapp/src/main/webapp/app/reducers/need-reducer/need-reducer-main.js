@@ -366,7 +366,6 @@ export default function(allNeedsInState = initialState, action = {}) {
           lastUpdateDate: undefined,
           isRated: false,
           isLoadingAgreementData: false,
-          isLoadingPetriNetData: false,
           isLoading: false,
           failedToLoad: false,
           showAgreementData: false,
@@ -785,7 +784,7 @@ export default function(allNeedsInState = initialState, action = {}) {
       return setConnectionLoadingPetriNetData(
         allNeedsInState,
         action.payload.connectionUri,
-        action.payload.isLoadingPetriNetData
+        action.payload.loadingPetriNetData
       );
     case actionTypes.connections.setLoadingAgreementData:
       return setConnectionLoadingAgreementData(
