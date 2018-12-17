@@ -166,6 +166,9 @@ export default function(allNeedsInState = initialState, action = {}) {
         won.WON.InactiveCompacted
       );
 
+    case actionTypes.needs.delete:
+      return allNeedsInState.delete(action.payload.ownNeedUri);
+
     case actionTypes.personas.create: {
       //TODO: Please let us use the addNeed method as a single entry point to add Needs(even Personas) to the State
       return allNeedsInState.set(

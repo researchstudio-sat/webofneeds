@@ -5,9 +5,31 @@
 package won.owner.model;
 
 import java.net.URI;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.OrderBy;
+import javax.persistence.PrePersist;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
+import javax.persistence.UniqueConstraint;
 
 import org.springframework.data.domain.Persistable;
 import org.springframework.security.core.GrantedAuthority;
@@ -204,6 +226,14 @@ public class User implements UserDetails, Persistable<Long> {
 
     public void addNeedUri(UserNeed userNeed) {
         this.userNeeds.add(userNeed);
+    }
+    
+    public void deleteNeedUri(UserNeed userNeed) {
+        for(int i = 0; i < this.userNeeds.size(); i++) {
+            if(this.userNeeds.get(i).getUri().equals(userNeed.getUri())) {
+                this.userNeeds.remove(i);
+            }
+        }
     }
 
     public List<UserNeed> getUserNeeds() {

@@ -50,6 +50,7 @@ import {
   fetchUnloadedNeeds,
   fetchSuggested,
   needsClose,
+  needsDelete,
   needsOpen,
   needsClosedBySystem,
 } from "./needs-actions.js";
@@ -135,6 +136,7 @@ const actionHierarchy = {
     createSuccessful: INJ_DEFAULT,
     reopen: needsOpen,
     close: needsClose,
+    delete: needsDelete,
     closedBySystem: needsClosedBySystem,
     failed: INJ_DEFAULT,
     connect: needsConnect,

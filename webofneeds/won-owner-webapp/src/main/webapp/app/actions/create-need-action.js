@@ -100,13 +100,9 @@ export function createWhatsNew() {
     };
 
     getIn(state, ["needs"])
-      .filter(
-        need =>
-          need.get("state") === "won:Active" &&
-          (isWhatsAroundNeed(need) || isWhatsNewNeed(need))
-      )
+      .filter(need => isWhatsAroundNeed(need) || isWhatsNewNeed(need))
       .map(need => {
-        dispatch(actionCreators.needs__close(need.get("uri")));
+        dispatch(actionCreators.needs__delete(need.get("uri")));
       });
 
     dispatch(actionCreators.needs__create(whatsNewObject, null, nodeUri));
@@ -132,13 +128,9 @@ export function createWhatsAround() {
             const location = nominatim2draftLocation(searchResult);
 
             getIn(state, ["needs"])
-              .filter(
-                need =>
-                  need.get("state") === "won:Active" &&
-                  (isWhatsAroundNeed(need) || isWhatsNewNeed(need))
-              )
+              .filter(need => isWhatsAroundNeed(need) || isWhatsNewNeed(need))
               .map(need => {
-                dispatch(actionCreators.needs__close(need.get("uri"))); //TODO action creators should not call other action creators, according to Moru
+                dispatch(actionCreators.needs__delete(need.get("uri"))); //TODO action creators should not call other action creators, according to Moru
               });
             const whatsAroundObject = {
               content: {

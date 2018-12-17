@@ -37,6 +37,7 @@ public class ShouldCallFacetImplForMessagePredicate implements Predicate
     switch (messageType){
       case DEACTIVATE: return false;
       case ACTIVATE: return false;
+      case DELETE: return false;
       case CREATE_NEED: return false;
       case SUCCESS_RESPONSE: return false;
       case FAILURE_RESPONSE: return false;

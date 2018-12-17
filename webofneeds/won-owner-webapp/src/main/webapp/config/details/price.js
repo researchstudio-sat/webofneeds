@@ -26,7 +26,11 @@ export const pricerange = {
   viewerComponent: "won-price-viewer",
   messageEnabled: true,
   parseToRDF: function({ value, identifier, contentUri }) {
-    if (!value || !(value.min || value.max) || !value.currency) {
+    if (
+      value === undefined ||
+      (value.min === undefined && value.max === undefined) ||
+      !value.currency
+    ) {
       return { "s:priceSpecification": undefined };
     }
     return {
@@ -44,7 +48,7 @@ export const pricerange = {
         ],
         "s:priceCurrency": value.currency,
         "s:unitCode": value.unitCode,
-        "s:description": "total rent per month in between min/max",
+        "s:description": "price in between min/max",
       },
     };
   },
@@ -70,7 +74,7 @@ export const pricerange = {
       "xsd:string"
     );
 
-    if (!minRent && !maxRent) {
+    if (minRent === undefined && maxRent === undefined) {
       return undefined;
     } else if (!currency) {
       return undefined;
@@ -90,6 +94,7 @@ export const pricerange = {
       const max = value.max;
 
       let amount;
+      // if min or max are 0, they equal to false -> fine here
       if (min && max) {
         amount = min + " - " + max;
       } else if (min) {
@@ -157,7 +162,12 @@ export const price = {
   ],
   messageEnabled: true,
   parseToRDF: function({ value, identifier, contentUri }) {
-    if (!value || !value.amount || !value.currency) {
+    if (
+      !value ||
+      value.amount === undefined ||
+      value.amount < 0 ||
+      !value.currency
+    ) {
       return { "s:priceSpecification": undefined };
     }
 
@@ -193,7 +203,7 @@ export const price = {
       "xsd:string"
     );
 
-    if (!amount || !currency) {
+    if (amount === undefined || !currency) {
       return undefined;
     } else {
       return { amount: amount, currency: currency, unitCode: unitCode };

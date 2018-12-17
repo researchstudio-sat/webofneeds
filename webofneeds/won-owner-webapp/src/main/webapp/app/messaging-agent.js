@@ -238,6 +238,29 @@ export function runMessagingAgent(redux) {
       }
       return false;
     },
+    function(message) {
+      if (message.isDeleteMessage()) {
+        return true;
+      }
+      return false;
+    },
+    function(message) {
+      if (message.isResponseToDeleteMessage()) {
+        if (message.isSuccessResponse()) {
+          redux.dispatch(
+            actionCreators.needs__delete(message.getReceiverNeed())
+          );
+          /*redux.dispatch({
+            type: actionTypes.needs.delete,
+            payload: {
+              ownedNeedUri: message.getReceiverNeed(),
+            },
+          });*/
+          return true;
+        }
+      }
+      return false;
+    },
   ];
 
   // processors that are used for reacting to certain messages after they
