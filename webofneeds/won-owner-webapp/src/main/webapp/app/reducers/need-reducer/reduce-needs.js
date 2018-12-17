@@ -3,8 +3,6 @@ import Immutable from "immutable";
 import won from "../../won-es6.js";
 
 export function addNeed(needs, jsonldNeed, isOwned) {
-  const jsonldNeedImm = Immutable.fromJS(jsonldNeed);
-
   let newState;
   let parsedNeed = parseNeed(jsonldNeed, isOwned);
 
@@ -24,6 +22,7 @@ export function addNeed(needs, jsonldNeed, isOwned) {
 
     return needs.setIn([parsedNeed.get("uri")], parsedNeed);
   } else {
+    const jsonldNeedImm = Immutable.fromJS(jsonldNeed);
     console.error("Tried to add invalid need-object: ", jsonldNeedImm.toJS());
     newState = needs;
   }
