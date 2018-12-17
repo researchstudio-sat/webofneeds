@@ -57,17 +57,13 @@ export function addNeed(needs, jsonldNeed, isOwned) {
   return newState;
 }
 
-export function addNeedInLoading(needs, needUri, state, isOwned) {
-  console.debug("addNeedInLoading: ", needUri);
+function addNeedInLoading(needs, needUri, state, isOwned) {
   const oldNeed = needs.get(needUri);
   if (oldNeed && !oldNeed.get("isLoading")) {
     return needs;
   } else {
     let need = Immutable.fromJS({
       uri: needUri,
-      toLoad: false,
-      isLoading: true,
-      failedToLoad: false,
       isOwned: isOwned,
       state: state,
       connections: Immutable.Map(),
@@ -76,16 +72,13 @@ export function addNeedInLoading(needs, needUri, state, isOwned) {
   }
 }
 
-export function addTheirNeedInLoading(needs, needUri) {
+function addTheirNeedInLoading(needs, needUri) {
   const oldNeed = needs.get(needUri);
-  if (oldNeed && (oldNeed.get("isOwned") || !oldNeed.get("isLoading"))) {
+  if (oldNeed && oldNeed.get("isOwned")) {
     return needs;
   } else {
     let need = Immutable.fromJS({
       uri: needUri,
-      toLoad: false,
-      isLoading: true,
-      failedToLoad: false,
       isOwned: false,
       connections: Immutable.Map(),
     });
@@ -128,9 +121,6 @@ export function addOwnInactiveNeedsInLoading(needs, needUris) {
 }
 
 export function addTheirNeedsInLoading(needs, needUris) {
-  needUris &&
-    needUris.size > 0 &&
-    console.debug("addOwnInactiveNeedsInLoading: ", needUris);
   let newState = needs;
   needUris &&
     needUris.forEach(needUri => {
@@ -140,9 +130,6 @@ export function addTheirNeedsInLoading(needs, needUris) {
 }
 
 export function addOwnInactiveNeedsToLoad(needs, needUris) {
-  needUris &&
-    needUris.size > 0 &&
-    console.debug("addOwnInactiveNeedsToLoad: ", needUris);
   let newState = needs;
   needUris &&
     needUris.forEach(needUri => {
@@ -156,8 +143,7 @@ export function addOwnInactiveNeedsToLoad(needs, needUris) {
   return newState;
 }
 
-export function addNeedToLoad(needs, needUri, state, isOwned) {
-  console.debug("addNeedToLoad: ", needUri);
+function addNeedToLoad(needs, needUri, state, isOwned) {
   if (needs.get(needUri)) {
     return needs;
   } else {
