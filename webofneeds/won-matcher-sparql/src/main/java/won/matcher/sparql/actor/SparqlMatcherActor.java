@@ -149,6 +149,9 @@ public class SparqlMatcherActor extends UntypedActor {
             log.info(String.format("Caught exception when processing %s event %s. More info on loglevel 'debug'",
                     eventTypeForLogging, uriForLogging.orElse("[no uri available]")));
             log.debug("caught exception", e);
+            if(log.isDebugEnabled()){
+                e.printStackTrace();
+            }
         }
     }
 

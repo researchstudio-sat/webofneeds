@@ -7,6 +7,7 @@ import { socialGroup } from "./usecases/social.js";
 import { professionalGroup } from "./usecases/professional/professional.js";
 import { mobilityGroup } from "./usecases/mobility.js";
 import { musicianGroup } from "./usecases/musician.js";
+import { classifiedsGroup } from "./usecases/classifieds.js";
 
 import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../app/won-utils.js";
 
@@ -72,6 +73,7 @@ export const useCaseGroups = {
   musician: musicianGroup,
   social: socialGroup,
   professional: professionalGroup,
+  classifieds: classifiedsGroup,
   other: {
     identifier: "othergroup",
     label: "Something Else",

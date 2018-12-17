@@ -351,6 +351,50 @@ export function tagOverlapScoreSubQuery({
 }
 
 /**
+ * Calculates the jaccard-index (i.e. normalized set-overlap) between own keywords
+ * and a potential match. Full overlap means 1, having none of the keywords means 0.
+ *
+ * @param {String} resultName a variable name that the score judges, e.g. `?need`
+ * @param {String} bindScoreAs the variable name for the score (use the same name for
+ *   sorting/aggregating in the parent query)
+ * @param {String} pathToText the predicates to be traversed to get to the text
+ *   in the RDF-graph.
+ * @param {*} prefixesInPath an object/map of prefix to full base-URL for all prefixes
+ *   used in the `pathToText`
+ * @param {String} keyword a keyword to intersect with potential matches' text
+ * @returns see `sparqlQuery`
+ */
+export function textSearchSubQuery({
+  resultName,
+  bindScoreAs,
+  pathToText,
+  prefixesInPath,
+  keyword,
+}) {
+  // see https://wiki.blazegraph.com/wiki/index.php/FullTextSearch
+  if (!keyword || keyword.length <= 0) {
+    return undefined;
+  }
+
+  return sparqlQuery({
+    prefixes: {
+      ...prefixesInPath,
+      won: won.defaultContext["won"],
+      bds: "http://www.bigdata.com/rdf/search#",
+    },
+    variables: [resultName, bindScoreAs],
+    where: [
+      `${resultName} ${pathToText} ?lit`,
+      `SERVICE bds:search {
+              ?lit bds:search "${keyword}" .
+              ?lit bds:relevance ?score .
+            }`,
+      `BIND(?score as ${bindScoreAs})`,
+    ],
+  });
+}
+
+/**
  * Constructs a filter for which holds:
  *
  * `datetime - 12h <= matchedTime <= datetime + 12h`
