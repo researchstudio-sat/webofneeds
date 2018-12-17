@@ -21,13 +21,13 @@ function genComponentConf() {
   let template = `
 
     <won-square-image
-        ng-if="!self.isLoading()"
+        ng-if="!self.postLoading"
         ng-class="{'bigger' : self.biggerImage, 'inactive' : !self.need.get('isBeingCreated') && self.need.get('state') === self.WON.InactiveCompacted}"
         src="self.need.get('TODO')"
         uri="self.needUri"
         ng-show="!self.hideImage">
     </won-square-image>
-    <div class="ph__right" ng-if="!self.need.get('isBeingCreated') && !self.isLoading()">
+    <div class="ph__right" ng-if="!self.need.get('isBeingCreated') && !self.postLoading">
       <div class="ph__right__topline">
         <div class="ph__right__topline__title" ng-if="self.hasTitle()">
          {{ self.generateTitle() }}
@@ -64,8 +64,8 @@ function genComponentConf() {
         </span>
       </div>
     </div>
-    <div class="ph__icon__skeleton" ng-if="self.isLoading()"></div>
-    <div class="ph__right" ng-if="self.isLoading()">
+    <div class="ph__icon__skeleton" ng-if="self.postLoading"></div>
+    <div class="ph__right" ng-if="self.postLoading">
       <div class="ph__right__topline">
         <div class="ph__right__topline__title"></div>
       </div>
@@ -92,6 +92,9 @@ function genComponentConf() {
         return {
           responseToNeed,
           need,
+          postLoading:
+            !need ||
+            getIn(state, ["process", "needs", need.get("uri"), "loading"]),
           isDirectResponse: isDirectResponse,
           friendlyTimestamp:
             need &&
@@ -109,13 +112,10 @@ function genComponentConf() {
         this
       );
 
-      classOnComponentRoot("won-is-loading", () => this.isLoading(), this);
+      classOnComponentRoot("won-is-loading", () => this.postLoading, this);
       classOnComponentRoot("won-is-toload", () => this.isToLoad(), this);
     }
 
-    isLoading() {
-      return !this.need || this.need.get("isLoading");
-    }
     isToLoad() {
       return !this.need || this.need.get("toLoad");
     }

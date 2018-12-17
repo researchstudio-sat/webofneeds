@@ -410,8 +410,18 @@ function genComponentConf() {
             !connection ||
             !nonOwnedNeed ||
             !ownedNeed ||
-            ownedNeed.get("isLoading") ||
-            nonOwnedNeed.get("isLoading") ||
+            getIn(state, [
+              "process",
+              "needs",
+              ownedNeed.get("uri"),
+              "loading",
+            ]) ||
+            getIn(state, [
+              "process",
+              "needs",
+              nonOwnedNeed.get("uri"),
+              "loading",
+            ]) ||
             getIn(state, ["process", "connections", connectionUri, "loading"]),
         };
       };

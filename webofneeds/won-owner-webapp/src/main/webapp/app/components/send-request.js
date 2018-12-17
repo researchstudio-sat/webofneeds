@@ -19,7 +19,7 @@ const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
         <won-post-content post-uri="self.postUriToConnectTo"></won-post-content>
-        <div class="post-info__footer" ng-if="!self.isLoading()">
+        <div class="post-info__footer" ng-if="!self.postLoading">
             <won-feedback-grid ng-if="self.connection && !self.connection.get('isRated')" connection-uri="self.connectionUri"></won-feedback-grid>
 
             <chat-textfield-simple
@@ -58,15 +58,19 @@ function genComponentConf() {
           ownedNeed,
           displayedPost,
           postUriToConnectTo,
+          postLoading:
+            !displayedPost ||
+            getIn(state, [
+              "process",
+              "needs",
+              displayedPost.get("uri"),
+              "loading",
+            ]),
         };
       };
       connect2Redux(selectFromState, actionCreators, [], this);
 
-      classOnComponentRoot("won-is-loading", () => this.isLoading(), this);
-    }
-
-    isLoading() {
-      return !this.displayedPost || this.displayedPost.get("isLoading");
+      classOnComponentRoot("won-is-loading", () => this.postLoading, this);
     }
 
     sendRequest(message, persona) {

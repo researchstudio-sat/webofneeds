@@ -10,7 +10,7 @@ import { actionCreators } from "../actions/actions.js";
 import { getPosts, getOwnedPosts } from "../selectors/general-selectors.js";
 import { getChatConnectionsByNeedUri } from "../selectors/connection-selectors.js";
 
-import { attach, sortByDate } from "../utils.js";
+import { attach, sortByDate, getIn } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
@@ -21,7 +21,7 @@ function genComponentConf() {
   let template = `
         <a
             class="indicators__item clickable"
-            ng-show="!self.isLoading() && self.latestConnectedUri"
+            ng-show="!self.postLoading && self.latestConnectedUri"
             ng-click="self.setOpen(self.latestConnectedUri)">
                 <svg class="indicators__item__icon"
                     title="Show latest message/request"
@@ -41,7 +41,7 @@ function genComponentConf() {
                     {{ self.getCountLimited(self.unreadConnectedCount)}}
                 </span>
         </a>
-        <div class="indicators__item" ng-show="!self.isLoading() && !self.latestConnectedUri" title="No chats in this post">
+        <div class="indicators__item" ng-show="!self.postLoading && !self.latestConnectedUri" title="No chats in this post">
             <svg class="indicators__item__icon"
                 style="--local-primary:var(--won-disabled-color);">
                     <use xlink:href="#ico36_message" href="#ico36_message"></use>
@@ -50,7 +50,7 @@ function genComponentConf() {
         </div>
         <a
             class="indicators__item clickable"
-            ng-show="!self.isLoading() && self.latestMatchUri"
+            ng-show="!self.postLoading && self.latestMatchUri"
             ng-click="self.setOpen(self.latestMatchUri)">
 
                 <svg class="indicators__item__icon"
@@ -68,23 +68,23 @@ function genComponentConf() {
                     {{ self.getCountLimited(self.unreadMatchesCount) }}
                 </span>
         </a>
-        <div class="indicators__item" ng-show="!self.isLoading() && !self.latestMatchUri" title="No matches for this post">
+        <div class="indicators__item" ng-show="!self.postLoading && !self.latestMatchUri" title="No matches for this post">
             <svg class="indicators__item__icon"
                 style="--local-primary:var(--won-disabled-color);">
                     <use xlink:href="#ico36_match" href="#ico36_match"></use>
             </svg>
             <span class="indicators__item__caption"></span>
         </div>
-        <span class="mobile__indicator" ng-show="!self.isLoading() && self.unreadCountSum">{{ self.getCountLimited(self.unreadCountSum) }}</span>
+        <span class="mobile__indicator" ng-show="!self.postLoading && self.unreadCountSum">{{ self.getCountLimited(self.unreadCountSum) }}</span>
 
-        <div class="indicators__item" ng-if="self.isLoading()">
+        <div class="indicators__item" ng-if="self.postLoading">
             <svg class="indicators__item__icon"
                 style="--local-primary:var(--won-skeleton-color);">
                     <use xlink:href="#ico36_message" href="#ico36_message"></use>
             </svg>
             <span class="indicators__item__caption"></span>
         </div>
-        <div class="indicators__item" ng-if="self.isLoading()">
+        <div class="indicators__item" ng-if="self.postLoading">
             <svg class="indicators__item__icon"
                 style="--local-primary:var(--won-skeleton-color);">
                     <use xlink:href="#ico36_message" href="#ico36_match"></use>
@@ -113,7 +113,7 @@ function genComponentConf() {
               remoteNeedUri &&
               allPosts &&
               allPosts.get(remoteNeedUri) &&
-              (allPosts.getIn([remoteNeedUri, "isLoading"]) ||
+              (getIn(["process", "needs", remoteNeedUri, "loading"]) ||
                 allPosts.getIn([remoteNeedUri, "state"]) ===
                   won.WON.ActiveCompacted);
 
@@ -130,7 +130,7 @@ function genComponentConf() {
               remoteNeedUri &&
               allPosts &&
               allPosts.get(remoteNeedUri) &&
-              (allPosts.getIn([remoteNeedUri, "isLoading"]) ||
+              (getIn(["process", "needs", remoteNeedUri, "loading"]) ||
                 allPosts.getIn([remoteNeedUri, "state"]) ===
                   won.WON.ActiveCompacted);
 
@@ -155,6 +155,9 @@ function genComponentConf() {
         return {
           WON: won.WON,
           ownedPost,
+          postLoading:
+            !ownedPost ||
+            getIn(state, ["process", "needs", ownedPost.get("uri"), "loading"]),
           unreadCountSum: unreadCountSum > 0 ? unreadCountSum : undefined,
           unreadConnectedCount:
             unreadConnectedCount > 0 ? unreadConnectedCount : undefined,
@@ -167,11 +170,7 @@ function genComponentConf() {
 
       connect2Redux(selectFromState, actionCreators, ["self.needUri"], this);
 
-      classOnComponentRoot("won-is-loading", () => this.isLoading(), this);
-    }
-
-    isLoading() {
-      return !this.ownedPost || this.ownedPost.get("isLoading");
+      classOnComponentRoot("won-is-loading", () => this.postLoading, this);
     }
 
     /**

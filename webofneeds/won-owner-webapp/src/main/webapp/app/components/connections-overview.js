@@ -47,7 +47,7 @@ function genComponentConf() {
                         need-uri="need.get('uri')"
                         timestamp="'TODOlatestOfThatType'"
                         ng-click="self.toggleDetails(need.get('uri'))"
-                        ng-class="{ 'clickable' : !self.isLoading(need) }">
+                        ng-class="{ 'clickable' : !self.isNeedLoading(need) }">
                     </won-post-header>
                 </div>
             </div>
@@ -60,7 +60,7 @@ function genComponentConf() {
                         need-uri="need.get('uri')"
                         timestamp="'TODOlatestOfThatType'"
                         ng-click="self.toggleDetails(need.get('uri'))"
-                        ng-class="{ 'clickable' : !self.isLoading(need) }">
+                        ng-class="{ 'clickable' : !self.isNeedLoading(need) }">
                     </won-post-header>
                     <won-connection-indicators
                         on-selected-connection="self.selectConnection(connectionUri)"
@@ -77,7 +77,7 @@ function genComponentConf() {
                         }">
                         Details
                     </button>
-                    <div class="co__item__need__header__carret clickable" ng-click="self.toggleDetails(need.get('uri'))" ng-if="!self.isLoading(need)">
+                    <div class="co__item__need__header__carret clickable" ng-click="self.toggleDetails(need.get('uri'))" ng-if="!self.isNeedLoading(need)">
                         <svg
                             style="--local-primary:var(--won-secondary-color);"
                             class="co__item__need__header__carret__icon"
@@ -91,7 +91,7 @@ function genComponentConf() {
                                 <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
                         </svg>
                     </div>
-                    <div class="co__item__need__header__carret" ng-if="self.isLoading(need)">
+                    <div class="co__item__need__header__carret" ng-if="self.isNeedLoading(need)">
                         <svg
                             style="--local-primary:var(--won-skeleton-color);"
                             class="co__item__need__header__carret__icon"
@@ -146,7 +146,7 @@ function genComponentConf() {
                             need-uri="need.get('uri')"
                             timestamp="'TODOlatestOfThatType'"
                             ng-click="self.toggleDetails(need.get('uri'))"
-                            ng-class="{ 'clickable' : !self.isLoading(need) }">
+                            ng-class="{ 'clickable' : !self.isNeedLoading(need) }">
                         </won-post-header>
                         <button
                             class="co__item__need__header__button red"
@@ -158,7 +158,7 @@ function genComponentConf() {
                             }">
                             Details
                         </button>
-                        <div class="co__item__need__header__carret clickable" ng-click="self.toggleDetails(need.get('uri'))" ng-if="!self.isLoading(need)">
+                        <div class="co__item__need__header__carret clickable" ng-click="self.toggleDetails(need.get('uri'))" ng-if="!self.isNeedLoading(need)">
                             <svg
                                 style="--local-primary:var(--won-secondary-color);"
                                 class="co__item__need__header__carret__icon"
@@ -171,7 +171,7 @@ function genComponentConf() {
                                     <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
                             </svg>
                         </div>
-                        <div class="co__item__need__header__carret" ng-if="self.isLoading(need)">
+                        <div class="co__item__need__header__carret" ng-if="self.isNeedLoading(need)">
                             <svg
                                 style="--local-primary:var(--won-skeleton-color);"
                                 class="co__item__need__header__carret__icon"
@@ -353,8 +353,8 @@ function genComponentConf() {
       return this.isOpenByConnection(ownedNeedUri) || !!this.open[ownedNeedUri];
     }
 
-    isLoading(ownedNeed) {
-      return ownedNeed.get("isLoading");
+    isNeedLoading(need) {
+      return this.process.getIn(["needs", need.get("uri"), "loading"]);
     }
 
     isOpenByConnection(ownedNeedUri) {
@@ -386,7 +386,7 @@ function genComponentConf() {
           if (!remoteNeedPresent) return true; //if the remoteNeed is not present yet we assume its a connection we want
 
           const remoteNeedActiveOrLoading =
-            allNeeds.getIn([remoteNeedUri, "isLoading"]) ||
+            process.getIn(["needs", remoteNeedUri, "loading"]) ||
             allNeeds.getIn([remoteNeedUri, "state"]) ===
               won.WON.ActiveCompacted;
 
@@ -414,7 +414,7 @@ function genComponentConf() {
           if (!remoteNeedPresent) return false;
 
           const remoteNeedActiveOrLoading =
-            allNeeds.getIn([remoteNeedUri, "isLoading"]) ||
+            process.getIn(["needs", remoteNeedUri, "loading"]) ||
             allNeeds.getIn([remoteNeedUri, "state"]) ===
               won.WON.ActiveCompacted;
 
