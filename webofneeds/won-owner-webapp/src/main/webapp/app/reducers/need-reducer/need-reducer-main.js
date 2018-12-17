@@ -10,6 +10,7 @@ import {
   addOwnInactiveNeedsInLoading,
   addOwnInactiveNeedsToLoad,
   addTheirNeedsInLoading,
+  addFailedToStore,
   addNeed,
   addNeedInCreation,
   changeNeedState,
@@ -49,6 +50,7 @@ import {
   setShowPetriNetData,
   setPetriNetDataDirty,
   setMultiSelectType,
+  addFailedToStoreConnection,
 } from "./reduce-connections.js";
 
 const initialState = Immutable.fromJS({});
@@ -108,6 +110,11 @@ export default function(allNeedsInState = initialState, action = {}) {
       );
     }
 
+    case actionTypes.needs.storeUriFailed:
+    case actionTypes.personas.storeUriFailed: {
+      return addFailedToStore(allNeedsInState, action.payload.get("uri"));
+    }
+
     case actionTypes.needs.storeOwned: {
       let needs = action.payload.get("needs");
       needs = needs ? needs : Immutable.Set();
@@ -123,6 +130,13 @@ export default function(allNeedsInState = initialState, action = {}) {
         allNeedsInState,
         action.payload.get("needUri"),
         action.payload.get("connUris")
+      );
+    }
+
+    case actionTypes.connections.storeUriFailed: {
+      return addFailedToStoreConnection(
+        allNeedsInState,
+        action.payload.get("connUri")
       );
     }
 
@@ -342,6 +356,7 @@ export default function(allNeedsInState = initialState, action = {}) {
           isLoadingAgreementData: false,
           isLoadingPetriNetData: false,
           isLoading: false,
+          failedToLoad: false,
           showAgreementData: false,
           showPetriNetData: false,
           multiSelectType: undefined,
