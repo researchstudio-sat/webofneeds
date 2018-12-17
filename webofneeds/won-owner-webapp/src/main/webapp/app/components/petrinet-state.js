@@ -89,7 +89,15 @@ function genComponentConf() {
             "loading",
           ]);
         const isLoaded = petriNetData && petriNetData.get("isLoaded");
-        const isDirty = petriNetData && petriNetData.get("isDirty");
+        const isDirty =
+          petriNetData &&
+          getIn(state, [
+            "process",
+            "connections",
+            connectionUri,
+            "petriNetData",
+            "dirty",
+          ]);
         const markedPlaces = process && process.get("markedPlaces");
         const enabledTransitions = process && process.get("enabledTransitions");
 

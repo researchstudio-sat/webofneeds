@@ -144,9 +144,24 @@ export default function(processState = initialState, action = {}) {
       const loadingPetriNetData = action.payload.loadingPetriNetData;
       const connUri = action.payload.connectionUri;
 
+      return processState
+        .setIn(
+          ["connections", connUri, "petriNetData", "loading"],
+          loadingPetriNetData
+        )
+        .setIn(
+          ["connections", connUri, "petriNetData", "dirty"],
+          loadingPetriNetData
+        );
+    }
+
+    case actionTypes.connections.sendChatMessageClaimOnSuccess:
+    case actionTypes.connections.sendChatMessageRefreshDataOnSuccess: {
+      const connUri = action.payload.optimisticEvent.getSender();
+
       return processState.setIn(
-        ["connections", connUri, "petriNetData", "loading"],
-        loadingPetriNetData
+        ["connections", connUri, "petriNetData", "dirty"],
+        true
       );
     }
 
@@ -158,10 +173,9 @@ export default function(processState = initialState, action = {}) {
         return processState;
       }
 
-      return processState.setIn(
-        ["connections", connUri, "petriNetData", "loading"],
-        false
-      );
+      return processState
+        .setIn(["connections", connUri, "petriNetData", "loading"], false)
+        .setIn(["connections", connUri, "petriNetData", "dirty"], false);
     }
 
     default:

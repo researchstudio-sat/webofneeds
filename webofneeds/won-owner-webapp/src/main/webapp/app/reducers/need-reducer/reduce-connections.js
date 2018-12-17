@@ -157,60 +157,6 @@ export function setConnectionLoadingAgreementData(
   );
 }
 
-export function setConnectionLoadingPetriNetData(
-  state,
-  connectionUri,
-  loadingPetriNetData
-) {
-  const need =
-    connectionUri && getOwnedNeedByConnectionUri(state, connectionUri);
-  const needUri = need && need.get("uri");
-  const connection = need && need.getIn(["connections", connectionUri]);
-
-  if (!connection) {
-    console.error(
-      "No connection with connectionUri: <",
-      connectionUri,
-      "> found within needUri: <",
-      needUri,
-      ">"
-    );
-    return state;
-  }
-
-  return state.setIn(
-    [needUri, "connections", connectionUri, "petriNetData", "isDirty"],
-    loadingPetriNetData //Assuming that there is currently a load of petriNetData in progress we flag it dirty just in case
-  );
-}
-
-export function setPetriNetDataDirty(
-  state,
-  connectionUri,
-  isPetriNetDataDirty
-) {
-  const need =
-    connectionUri && getOwnedNeedByConnectionUri(state, connectionUri);
-  const needUri = need && need.get("uri");
-  const connection = need && need.getIn(["connections", connectionUri]);
-
-  if (!connection) {
-    console.error(
-      "No connection with connectionUri: <",
-      connectionUri,
-      "> found within needUri: <",
-      needUri,
-      ">"
-    );
-    return state;
-  }
-
-  return state.setIn(
-    [needUri, "connections", connectionUri, "petriNetData", "isDirty"],
-    isPetriNetDataDirty
-  );
-}
-
 export function markConnectionAsRated(state, connectionUri) {
   let need = connectionUri && getOwnedNeedByConnectionUri(state, connectionUri);
   let connection = need && need.getIn(["connections", connectionUri]);
@@ -314,10 +260,6 @@ export function updatePetriNetStateData(state, connectionUri, petriNetData) {
     .setIn(
       [needUri, "connections", connectionUri, "petriNetData", "isLoaded"],
       true
-    )
-    .setIn(
-      [needUri, "connections", connectionUri, "petriNetData", "isDirty"],
-      false
     );
 }
 

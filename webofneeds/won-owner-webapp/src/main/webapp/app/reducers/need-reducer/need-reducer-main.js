@@ -36,7 +36,6 @@ import {
   addActiveConnectionsToNeedInLoading,
   markConnectionAsRated,
   setConnectionLoadingAgreementData,
-  setConnectionLoadingPetriNetData,
   markConnectionAsRead,
   getOwnedNeedByConnectionUri,
   changeConnectionState,
@@ -46,7 +45,6 @@ import {
   updatePetriNetStateData,
   setShowAgreementData,
   setShowPetriNetData,
-  setPetriNetDataDirty,
   setMultiSelectType,
 } from "./reduce-connections.js";
 
@@ -780,12 +778,6 @@ export default function(allNeedsInState = initialState, action = {}) {
         action.payload.connectionUri,
         action.payload.agreementData
       );
-    case actionTypes.connections.setLoadingPetriNetData:
-      return setConnectionLoadingPetriNetData(
-        allNeedsInState,
-        action.payload.connectionUri,
-        action.payload.loadingPetriNetData
-      );
     case actionTypes.connections.setLoadingAgreementData:
       return setConnectionLoadingAgreementData(
         allNeedsInState,
@@ -821,15 +813,7 @@ export default function(allNeedsInState = initialState, action = {}) {
 
     case actionTypes.connections.sendChatMessageClaimOnSuccess:
     case actionTypes.connections.sendChatMessageRefreshDataOnSuccess: {
-      const allNeedsInStateWithDirtyPetriNetData = setPetriNetDataDirty(
-        allNeedsInState,
-        action.payload.optimisticEvent.getSender(),
-        true
-      );
-      return addMessage(
-        allNeedsInStateWithDirtyPetriNetData,
-        action.payload.optimisticEvent
-      );
+      return addMessage(allNeedsInState, action.payload.optimisticEvent);
     }
 
     case actionTypes.connections.sendChatMessage:
