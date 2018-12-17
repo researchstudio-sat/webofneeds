@@ -60,9 +60,6 @@ function addTheirNeedInLoading(needs, needUri) {
 }
 
 export function addOwnActiveNeedsInLoading(needs, needUris) {
-  needUris &&
-    needUris.size > 0 &&
-    console.debug("addOwnActiveNeedsInLoading: ", needUris);
   let newState = needs;
   needUris &&
     needUris.forEach(needUri => {
@@ -77,9 +74,6 @@ export function addOwnActiveNeedsInLoading(needs, needUris) {
 }
 
 export function addOwnInactiveNeedsInLoading(needs, needUris) {
-  needUris &&
-    needUris.size > 0 &&
-    console.debug("addOwnInactiveNeedsInLoading: ", needUris);
   let newState = needs;
   needUris &&
     needUris.forEach(needUri => {
@@ -153,7 +147,6 @@ export function addNeedInCreation(needs, needInCreation, needUri) {
     need = need.set("humanReadable", title);
 
     newState = needs.setIn([needUri], need);
-    console.debug("need-reducer create new need: ", need.toJS());
   } else {
     console.error("Tried to add invalid need-object: ", needInCreation);
     newState = needs;
