@@ -90,10 +90,15 @@ export default function(processState = initialState, action = {}) {
     }
 
     case actionTypes.connections.storeUriFailed: {
-      return processState.setIn(
-        ["connections", action.payload.get("connUri"), "failedToStore"],
-        true
-      );
+      return processState
+        .setIn(
+          ["connections", action.payload.get("connUri"), "failedToStore"],
+          true
+        )
+        .setIn(
+          ["connections", action.payload.get("connUri"), "loading"],
+          false
+        );
     }
 
     case actionTypes.connections.setLoadingMessages: {
@@ -200,6 +205,20 @@ export default function(processState = initialState, action = {}) {
         ["connections", connUri, "agreementData", "loading"],
         loadingAgreementData
       );
+    }
+
+    case actionTypes.connections.storeActiveUrisLoading: {
+      const connUris = action.payload.get("connUris");
+
+      let newProcessState = processState;
+      connUris &&
+        connUris.forEach(connUri => {
+          newProcessState = newProcessState.setIn(
+            ["connections", connUri, "loading"],
+            true
+          );
+        });
+      return newProcessState;
     }
 
     default:

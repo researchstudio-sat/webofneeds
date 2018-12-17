@@ -20,12 +20,12 @@ const serviceDependencies = ["$scope", "$ngRedux", "$element"];
 function genComponentConf() {
   let template = `
             <svg class="cdd__icon__small"
-                ng-if="self.isLoading()"
+                ng-if="self.connectionLoading"
                 style="--local-primary:var(--won-skeleton-color);">
                     <use xlink:href="#ico16_contextmenu" href="#ico16_contextmenu"></use>
             </svg>
             <svg class="cdd__icon__small clickable"
-                ng-if="!self.isLoading()"
+                ng-if="!self.connectionLoading"
                 style="--local-primary:var(--won-secondary-color);"
                 ng-click="self.contextMenuOpen = true">
                     <use xlink:href="#ico16_contextmenu" href="#ico16_contextmenu"></use>
@@ -103,6 +103,14 @@ function genComponentConf() {
           isSentRequest: connectionState === won.WON.RequestSent,
           isReceivedRequest: connectionState === won.WON.RequestReceived,
           isSuggested: connectionState === won.WON.Suggested,
+          connectionLoading:
+            !connection ||
+            getIn(state, [
+              "process",
+              "connections",
+              connection.get("uri"),
+              "loading",
+            ]),
         };
       };
       connect2Redux(selectFromState, actionCreators, [], this);
@@ -124,10 +132,6 @@ function genComponentConf() {
       });
 
       window.document.addEventListener("click", callback);
-    }
-
-    isLoading() {
-      return !this.connection || this.connection.get("isLoading");
     }
 
     generateReportPostMailParams() {

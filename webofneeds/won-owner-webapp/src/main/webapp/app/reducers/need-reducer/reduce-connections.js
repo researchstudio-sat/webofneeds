@@ -353,7 +353,7 @@ export function addActiveConnectionsToNeedInLoading(state, needUri, connUris) {
   return newState;
 }
 
-export function addActiveConnectionToNeed(state, needUri, connUri) {
+function addActiveConnectionToNeed(state, needUri, connUri) {
   const storedNeed = state.get(needUri);
   const isConnectionPresent =
     storedNeed && !!storedNeed.getIn(["connections", connUri]);
@@ -370,8 +370,6 @@ export function addActiveConnectionToNeed(state, needUri, connUri) {
       lastUpdateDate: undefined,
       unread: undefined,
       isRated: false,
-      isLoading: true,
-      failedToLoad: false,
       showAgreementData: false,
     });
 

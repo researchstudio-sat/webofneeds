@@ -18,7 +18,7 @@ import "style/_petrinet-state.scss";
 const serviceDependencies = ["$ngRedux", "$scope"];
 function genComponentConf() {
   let template = `
-        <div class="ps__active" ng-if="self.process && (self.isLoaded || !self.isLoading)">
+        <div class="ps__active" ng-if="self.process && (self.petriNetDataLoaded || !self.petriNetDataLoading)">
           <div class="ps__active__header">
             Marked Places
           </div>
@@ -41,7 +41,7 @@ function genComponentConf() {
               </div>
               <!-- The button is labelled 'send' at the moment because we jsut send the transition but not claim it right away -->
               <button class="ps__active__enabledTransition__button won-button--filled thin red"
-                ng-disabled="self.multiSelectType || self.isDirty"
+                ng-disabled="self.multiSelectType || self.petriNetDataDirty"
                 ng-click="self.sendClaim(enabledTransition)">
                   Claim
               </button>
@@ -50,10 +50,10 @@ function genComponentConf() {
             No Enabled Transitions in PetriNet
           </div>
         </div>
-        <div class="ps__inactive" ng-if="!self.process && !self.isLoading && self.isLoaded">
+        <div class="ps__inactive" ng-if="!self.process && !self.petriNetDataLoading && self.petriNetDataLoaded">
             This PetriNet, is not active (yet).
         </div>
-        <div class="ps__loading" ng-if="self.isLoaded && (self.isLoading || self.isDirty)">
+        <div class="ps__loading" ng-if="self.petriNetDataLoaded && (self.petriNetDataLoading || self.petriNetDataDirty)">
             <svg class="ps__loading__spinner">
               <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
             </svg>
@@ -77,7 +77,7 @@ function genComponentConf() {
         const process =
           this.processUri && petriNetData && petriNetData.get(this.processUri);
 
-        const isLoading =
+        const petriNetDataLoading =
           connection &&
           getIn(state, [
             "process",
@@ -86,7 +86,7 @@ function genComponentConf() {
             "petriNetData",
             "loading",
           ]);
-        const isLoaded =
+        const petriNetDataLoaded =
           petriNetData &&
           getIn(state, [
             "process",
@@ -95,7 +95,7 @@ function genComponentConf() {
             "petriNetData",
             "loaded",
           ]);
-        const isDirty =
+        const petriNetDataDirty =
           petriNetData &&
           getIn(state, [
             "process",
@@ -122,9 +122,9 @@ function genComponentConf() {
           enabledTransitionsArray:
             enabledTransitions && enabledTransitions.toArray(),
           markedPlacesArray: markedPlaces && markedPlaces.toArray(),
-          isDirty: isDirty,
-          isLoading: isLoading,
-          isLoaded: isLoaded,
+          petriNetDataDirty: petriNetDataDirty,
+          petriNetDataLoading: petriNetDataLoading,
+          petriNetDataLoaded: petriNetDataLoaded,
         };
       };
 

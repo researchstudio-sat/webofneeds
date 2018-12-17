@@ -8,7 +8,7 @@ import "ng-redux";
 import squareImageModule from "./square-image.js";
 import { actionCreators } from "../actions/actions.js";
 import { labels, relativeTime } from "../won-label-utils.js";
-import { attach } from "../utils.js";
+import { attach, getIn } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { isDirectResponseNeed } from "../need-utils.js";
 import { getHumanReadableStringFromMessage } from "../reducers/need-reducer/parse-message.js";
@@ -27,7 +27,7 @@ import "style/_connection-header.scss";
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
-      <div class="ch__icon" ng-if="!self.isLoading()">
+      <div class="ch__icon" ng-if="!self.connectionOrNeedsLoading">
           <won-square-image
             class="ch__icon__theirneed"
             ng-class="{'bigger' : self.biggerImage, 'inactive' : self.theirNeed.get('state') === self.WON.InactiveCompacted}"
@@ -37,7 +37,7 @@ function genComponentConf() {
             ng-show="!self.hideImage">
           </won-square-image>
       </div>
-      <div class="ch__right" ng-if="!self.isLoading()">
+      <div class="ch__right" ng-if="!self.connectionOrNeedsLoading">
         <div class="ch__right__topline">
           <div class="ch__right__topline__title" ng-if="!self.isDirectResponseFromRemote && self.theirNeed.get('humanReadable')" title="{{ self.theirNeed.get('humanReadable') }}">
             {{ self.theirNeed.get('humanReadable') }}
@@ -73,10 +73,10 @@ function genComponentConf() {
           </div>
         </div>
       </div>
-      <div class="ch__icon" ng-if="self.isLoading()">
+      <div class="ch__icon" ng-if="self.connectionOrNeedsLoading">
           <div class="ch__icon__skeleton"></div>
       </div>
-      <div class="ch__right" ng-if="self.isLoading()">
+      <div class="ch__right" ng-if="self.connectionOrNeedsLoading">
         <div class="ch__right__topline">
           <div class="ch__right__topline__title"></div>
           <div class="ch__right__topline__date"></div>
@@ -147,6 +147,18 @@ function genComponentConf() {
               selectLastUpdateTime(state),
               this.timestamp || theirNeed.get("lastUpdateDate")
             ),
+          connectionOrNeedsLoading:
+            !connection ||
+            !theirNeed ||
+            !ownedNeed ||
+            ownedNeed.get("isLoading") ||
+            theirNeed.get("isLoading") ||
+            getIn(state, [
+              "process",
+              "connections",
+              connection.get("uri"),
+              "loading",
+            ]),
         };
       };
 
@@ -157,17 +169,10 @@ function genComponentConf() {
         this
       );
 
-      classOnComponentRoot("won-is-loading", () => this.isLoading(), this);
-    }
-
-    isLoading() {
-      return (
-        !this.connection ||
-        !this.theirNeed ||
-        !this.ownedNeed ||
-        this.ownedNeed.get("isLoading") ||
-        this.theirNeed.get("isLoading") ||
-        this.connection.get("isLoading")
+      classOnComponentRoot(
+        "won-is-loading",
+        () => this.connectionOrNeedsLoading,
+        this
       );
     }
 

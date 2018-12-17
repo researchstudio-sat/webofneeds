@@ -53,7 +53,7 @@ function genComponentConf() {
             </div>
         </div>
         <div ng-repeat="need in self.sortedOpenNeeds" class="co__item"
-            ng-class="{'co__item--withconn' : self.isOpen(need.get('uri')) && self.hasOpenOrLoadingChatConnections(need, self.allNeeds)}">
+            ng-class="{'co__item--withconn' : self.isOpen(need.get('uri')) && self.hasOpenOrLoadingChatConnections(need, self.allNeeds, self.process)}">
             <div class="co__item__need" ng-class="{'won-unread': need.get('unread'), 'selected' : need.get('uri') === self.needUriInRoute}">
                 <div class="co__item__need__header">
                     <won-post-header
@@ -115,9 +115,9 @@ function genComponentConf() {
                 </div>
             </div>
             <div class="co__item__connections"
-                ng-if="self.isOpen(need.get('uri')) && self.hasOpenOrLoadingChatConnections(need, self.allNeeds)">
+                ng-if="self.isOpen(need.get('uri')) && self.hasOpenOrLoadingChatConnections(need, self.allNeeds, self.process)">
                 <won-connection-selection-item
-                    ng-repeat="conn in self.getOpenChatConnectionsArraySorted(need, self.allNeeds)"
+                    ng-repeat="conn in self.getOpenChatConnectionsArraySorted(need, self.allNeeds, self.process)"
                     on-selected-connection="self.selectConnection(connectionUri)"
                     connection-uri="conn.get('uri')"
                     ng-class="{'won-unread': conn.get('unread')}">
@@ -240,6 +240,7 @@ function genComponentConf() {
 
         return {
           allNeeds,
+          process: state.get("process"),
           showClosedNeeds: state.getIn(["view", "showClosedNeeds"]),
           useCase,
           useCaseGroup,
@@ -367,12 +368,16 @@ function genComponentConf() {
       this.onSelectedNeed({ needUri }); //trigger callback with scope-object
     }
 
-    hasOpenOrLoadingChatConnections(need, allNeeds) {
+    hasOpenOrLoadingChatConnections(need, allNeeds, process) {
       return (
         need.get("state") === won.WON.ActiveCompacted &&
         need.get("connections").filter(conn => {
           if (!isChatConnection(conn)) return false;
-          if (conn.get("isLoading")) return true; //if connection is currently loading we assume its a connection we want to show
+          if (
+            process &&
+            process.getIn(["connections", conn.get("uri"), "loading"])
+          )
+            return true; //if connection is currently loading we assume its a connection we want to show
 
           const remoteNeedUri = conn.get("remoteNeedUri");
           const remoteNeedPresent =
@@ -392,11 +397,15 @@ function genComponentConf() {
       );
     }
 
-    getOpenChatConnectionsArraySorted(need, allNeeds) {
+    getOpenChatConnectionsArraySorted(need, allNeeds, process) {
       return sortByDate(
         need.get("connections").filter(conn => {
           if (!isChatConnection(conn)) return false;
-          if (conn.get("isLoading")) return true; //if connection is currently loading we assume its a connection we want to show
+          if (
+            process &&
+            process.getIn(["connections", conn.get("uri"), "loading"])
+          )
+            return true; //if connection is currently loading we assume its a connection we want to show
 
           const remoteNeedUri = conn.get("remoteNeedUri");
           const remoteNeedPresent =

@@ -135,21 +135,6 @@ export default function(allNeedsInState = initialState, action = {}) {
       );
     }
 
-    case actionTypes.connections.storeUriFailed: {
-      const connUri = action.payload.get("connUri");
-      const needOfConnection = connUri && getOwnedNeedByConnectionUri(connUri);
-
-      if (needOfConnection) {
-        const needUri = needOfConnection.get("uri");
-
-        return allNeedsInState.setIn(
-          [needUri, "connections", connUri, "isLoading"],
-          false
-        );
-      }
-      return allNeedsInState;
-    }
-
     case actionTypes.connections.storeActive: {
       return storeConnectionsData(
         allNeedsInState,
@@ -361,8 +346,6 @@ export default function(allNeedsInState = initialState, action = {}) {
           creationDate: undefined,
           lastUpdateDate: undefined,
           isRated: false,
-          isLoading: false,
-          failedToLoad: false,
           showAgreementData: false,
           showPetriNetData: false,
           multiSelectType: undefined,

@@ -406,6 +406,13 @@ function genComponentConf() {
           cancellationPendingMessagesArray:
             cancellationPendingMessages &&
             cancellationPendingMessages.toArray(),
+          connectionOrNeedsLoading:
+            !connection ||
+            !nonOwnedNeed ||
+            !ownedNeed ||
+            ownedNeed.get("isLoading") ||
+            nonOwnedNeed.get("isLoading") ||
+            getIn(state, ["process", "connections", connectionUri, "loading"]),
         };
       };
 
@@ -429,17 +436,10 @@ function genComponentConf() {
           )
       );
 
-      classOnComponentRoot("won-is-loading", () => this.isLoading(), this);
-    }
-
-    isLoading() {
-      return (
-        !this.connection ||
-        !this.nonOwnedNeed ||
-        !this.ownedNeed ||
-        this.ownedNeed.get("isLoading") ||
-        this.nonOwnedNeed.get("isLoading") ||
-        this.connection.get("isLoading")
+      classOnComponentRoot(
+        "won-is-loading",
+        () => this.connectionOrNeedsLoading,
+        this
       );
     }
 

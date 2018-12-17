@@ -177,7 +177,6 @@ $ngRedux.getState();
                    retractedMessageUris: Immutable.Set(),
                },
                petriNetData: Immutable.Map(),
-               isLoading: true|false, //default is false, whether or not this connection is currently loading itself (similar to the isLoading in the need)
                showAgreementData: true|false // default is false, whether or not the agreementDataPanel is active
                showPetriNetData: true|false // defautl is false, whether or not the petriNetDataPanel is active
                multiSelectType: String // default is undefined, indicates which action is supposed to happen for the multiselect messages
@@ -255,6 +254,7 @@ $ngRedux.getState();
         [connUri]: {
            failedToLoad: true|false, //default is false, whether or not this connection was able to be loaded or not
            loadingMessages: true|false, //default is false, whether or not this connection is currently loading messages or processing agreements
+           loading: true|false, //default is false, whether or not this connection is currently loading itself (similar to the loading in the need)
            petriNetData: {
                 loading: true|false, //default is false, whether or not the petriNetData has been loaded,
                 dirty: true|false //default is false, whether or not the currently stored petriNetData is (assumed to be) not correct anymore
