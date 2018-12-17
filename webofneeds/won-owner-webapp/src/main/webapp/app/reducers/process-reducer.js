@@ -285,6 +285,18 @@ export default function(processState = initialState, action = {}) {
       return processState;
     }
 
+    case actionTypes.personas.storeTheirUrisLoading:
+    case actionTypes.needs.storeTheirUrisLoading: {
+      const needUris = action.payload.get("uris");
+      needUris &&
+        needUris.forEach(needUri => {
+          processState = processState
+            .setIn(["needs", needUri, "toLoad"], false)
+            .setIn(["needs", needUri, "loading"], true);
+        });
+      return processState;
+    }
+
     default:
       return processState;
   }
