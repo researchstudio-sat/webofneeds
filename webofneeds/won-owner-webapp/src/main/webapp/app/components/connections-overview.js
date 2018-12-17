@@ -389,6 +389,7 @@ function genComponentConf() {
 
           const remoteNeedActiveOrLoading =
             process.getIn(["needs", remoteNeedUri, "loading"]) ||
+            process.getIn(["needs", remoteNeedUri, "failedToLoad"]) ||
             allNeeds.getIn([remoteNeedUri, "state"]) ===
               won.WON.ActiveCompacted;
 
@@ -417,6 +418,7 @@ function genComponentConf() {
 
           const remoteNeedActiveOrLoading =
             process.getIn(["needs", remoteNeedUri, "loading"]) ||
+            process.getIn(["needs", remoteNeedUri, "failedToLoad"]) ||
             allNeeds.getIn([remoteNeedUri, "state"]) ===
               won.WON.ActiveCompacted;
 
