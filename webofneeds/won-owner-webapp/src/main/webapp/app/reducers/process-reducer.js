@@ -208,7 +208,7 @@ export default function(processState = initialState, action = {}) {
       );
     }
 
-    case actionTypes.connections.storeActiveUrisLoading: {
+    case actionTypes.connections.storeActiveUrisInLoading: {
       const connUris = action.payload.get("connUris");
 
       connUris &&
@@ -284,8 +284,8 @@ export default function(processState = initialState, action = {}) {
       return processState;
     }
 
-    case actionTypes.personas.storeTheirUrisLoading:
-    case actionTypes.needs.storeTheirUrisLoading: {
+    case actionTypes.personas.storeTheirUrisInLoading:
+    case actionTypes.needs.storeTheirUrisInLoading: {
       const needUris = action.payload.get("uris");
       needUris &&
         needUris.forEach(needUri => {

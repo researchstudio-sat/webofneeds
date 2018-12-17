@@ -120,7 +120,7 @@ const actionHierarchy = {
     updateAgreementData: INJ_DEFAULT, //cnct.loadAgreementData,
     updatePetriNetData: INJ_DEFAULT,
 
-    storeActiveUrisLoading: INJ_DEFAULT,
+    storeActiveUrisInLoading: INJ_DEFAULT,
     storeActive: INJ_DEFAULT,
 
     storeUriFailed: INJ_DEFAULT,
@@ -142,9 +142,9 @@ const actionHierarchy = {
     fetchSuggested: fetchSuggested,
 
     storeOwnedInactiveUris: INJ_DEFAULT,
-    storeOwnedInactiveUrisLoading: INJ_DEFAULT,
+    storeOwnedInactiveUrisInLoading: INJ_DEFAULT,
     storeOwnedActiveUris: INJ_DEFAULT,
-    storeTheirUrisLoading: INJ_DEFAULT,
+    storeTheirUrisInLoading: INJ_DEFAULT,
 
     storeOwned: INJ_DEFAULT,
     storeTheirs: INJ_DEFAULT,
@@ -157,7 +157,7 @@ const actionHierarchy = {
     review: reviewPersona,
 
     storeTheirs: INJ_DEFAULT,
-    storeTheirUrisLoading: INJ_DEFAULT,
+    storeTheirUrisInLoading: INJ_DEFAULT,
 
     storeUriFailed: INJ_DEFAULT,
   },

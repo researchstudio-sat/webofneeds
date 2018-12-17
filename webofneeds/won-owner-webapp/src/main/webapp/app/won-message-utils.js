@@ -503,7 +503,7 @@ export async function buildCreateMessage(needData, wonNodeUri) {
 
 export function fetchDataForNonOwnedNeedOnly(needUri, dispatch) {
   dispatch({
-    type: actionTypes.needs.storeTheirUrisLoading,
+    type: actionTypes.needs.storeTheirUrisInLoading,
     payload: Immutable.fromJS({ uris: [needUri] }),
   });
   return fetchTheirNeedAndDispatch(needUri, dispatch);
@@ -512,7 +512,7 @@ export function fetchDataForNonOwnedNeedOnly(needUri, dispatch) {
 export function fetchUnloadedData(dispatch) {
   return fetchOwnedInactiveNeedUris().then(needUris => {
     dispatch({
-      type: actionTypes.needs.storeOwnedInactiveUrisLoading,
+      type: actionTypes.needs.storeOwnedInactiveUrisInLoading,
       payload: Immutable.fromJS({ uris: needUris }),
     });
     return fetchDataForOwnedNeeds(needUris, dispatch);
@@ -692,7 +692,7 @@ export async function fetchDataForOwnedNeeds(ownedNeedUris, dispatch) {
       const theirNeedUrisArray = theirNeedUris.toArray();
 
       dispatch({
-        type: actionTypes.needs.storeTheirUrisLoading,
+        type: actionTypes.needs.storeTheirUrisInLoading,
         payload: Immutable.fromJS({ uris: theirNeedUrisArray }),
       });
       return theirNeedUrisArray;
@@ -712,7 +712,7 @@ function fetchConnectionsOfNeedAndDispatch(needUri, dispatch) {
         connUri => !isConnUriClosed(connUri)
       );
       dispatch({
-        type: actionTypes.connections.storeActiveUrisLoading,
+        type: actionTypes.connections.storeActiveUrisInLoading,
         payload: Immutable.fromJS({
           needUri: needUri,
           connUris: activeConnectionUris,
@@ -770,7 +770,7 @@ function fetchTheirNeedAndDispatch(needUri, dispatch) {
       if (need["won:heldBy"] && need["won:heldBy"]["@id"]) {
         const personaUri = need["won:heldBy"]["@id"];
         dispatch({
-          type: actionTypes.personas.storeTheirUrisLoading,
+          type: actionTypes.personas.storeTheirUrisInLoading,
           payload: Immutable.fromJS({ uris: [personaUri] }),
         });
         return won

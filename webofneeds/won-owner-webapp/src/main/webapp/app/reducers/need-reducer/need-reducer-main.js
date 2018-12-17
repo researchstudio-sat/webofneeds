@@ -89,15 +89,15 @@ export default function(allNeedsInState = initialState, action = {}) {
       );
     }
 
-    case actionTypes.needs.storeOwnedInactiveUrisLoading: {
+    case actionTypes.needs.storeOwnedInactiveUrisInLoading: {
       return addOwnInactiveNeedsInLoading(
         allNeedsInState,
         action.payload.get("uris")
       );
     }
 
-    case actionTypes.personas.storeTheirUrisLoading:
-    case actionTypes.needs.storeTheirUrisLoading: {
+    case actionTypes.personas.storeTheirUrisInLoading:
+    case actionTypes.needs.storeTheirUrisInLoading: {
       return addTheirNeedsInLoading(
         allNeedsInState,
         action.payload.get("uris")
@@ -114,7 +114,7 @@ export default function(allNeedsInState = initialState, action = {}) {
       );
     }
 
-    case actionTypes.connections.storeActiveUrisLoading: {
+    case actionTypes.connections.storeActiveUrisInLoading: {
       return addActiveConnectionsToNeedInLoading(
         allNeedsInState,
         action.payload.get("needUri"),
