@@ -186,7 +186,6 @@ $ngRedux.getState();
                isLoadingAgreementData: true|false, //default is false, whether or not the agreementData has been loaded,
                isLoadingPetriNetData: true|false, //default is false, whether or not the petriNetData has been loaded,
                isLoading: true|false, //default is false, whether or not this connection is currently loading itself (similar to the isLoading in the need)
-               failedToLoad: true|false, //default is false, whether or not this connection was able to be loaded or not
                showAgreementData: true|false // default is false, whether or not the agreementDataPanel is active
                showPetriNetData: true|false // defautl is false, whether or not the petriNetDataPanel is active
                multiSelectType: String // default is undefined, indicates which action is supposed to happen for the multiselect messages
@@ -205,7 +204,6 @@ $ngRedux.getState();
        isOwned: true|false, //whether this need is owned or not
        isBeingCreated: true|false, //whether or not the creation of this need was successfully completed yet
        isLoading: true|false, //whether or not the need is currently in the process of being loaded
-       failedToLoad: true|false, //whether or not the need has failed to load (due to delete or other)
        toLoad: true|false, //whether or not the need is flagged as toLoad (for future loading purposes)
        flags: Immutable.List //all the flags that are present within the won:hasFlags predicate of a need
        facets: Immutable.Map //all the facets that are present within the won:hasFacets predicate of a need
@@ -256,6 +254,17 @@ $ngRedux.getState();
     processingAcceptTermsOfService: false, //indicates if the rest-call to accept the terms of service is currently pending
     processingVerifyEmailAddress: false, //indicates if the rest-call to verify the email address is currently pending
     processingResendVerificationEmail: false, //indicates if the rest-call to resend the verification mail is currently pending
+    needs: {
+        [needUri]: {
+            failedToLoad: true|false, //whether or not the need has failed to load (due to delete or other)
+        }
+    },
+    connections: {
+        [connUri]: {
+           failedToLoad: true|false, //default is false, whether or not this connection was able to be loaded or not
+        }
+    }
+
  }
 }
 */

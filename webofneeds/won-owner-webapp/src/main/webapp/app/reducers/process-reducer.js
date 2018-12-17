@@ -15,6 +15,8 @@ const initialState = Immutable.fromJS({
   processingVerifyEmailAddress: false,
   processingResendVerificationEmail: false,
   processingSendAnonymousLinkEmail: false,
+  needs: Immutable.Map(),
+  connections: Immutable.Map(),
 });
 
 export default function(processState = initialState, action = {}) {
@@ -78,6 +80,21 @@ export default function(processState = initialState, action = {}) {
     case actionTypes.account.sendAnonymousLinkEmailFailed:
     case actionTypes.account.sendAnonymousLinkEmailSuccess:
       return processState.set("processingSendAnonymousLinkEmail", false);
+
+    case actionTypes.needs.storeUriFailed:
+    case actionTypes.personas.storeUriFailed: {
+      return processState.setIn(
+        ["needs", action.payload.get("uri"), "failedToStore"],
+        true
+      );
+    }
+
+    case actionTypes.connections.storeUriFailed: {
+      return processState.setIn(
+        ["connections", action.payload.get("connUri"), "failedToStore"],
+        true
+      );
+    }
 
     default:
       return processState;

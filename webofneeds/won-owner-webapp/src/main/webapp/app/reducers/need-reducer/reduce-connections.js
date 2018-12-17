@@ -516,16 +516,3 @@ export function addActiveConnectionToNeed(state, needUri, connUri) {
 
   return state;
 }
-
-export function addFailedToStoreConnection(state, connUri) {
-  const needOfConnection = connUri && getOwnedNeedByConnectionUri(connUri);
-
-  if (needOfConnection) {
-    const needUri = needOfConnection.get("uri");
-
-    return state
-      .setIn([needUri, "connections", connUri, "isLoading"], false)
-      .setIn([needUri, "connections", connUri, "failedToLoad"], true);
-  }
-  return state;
-}

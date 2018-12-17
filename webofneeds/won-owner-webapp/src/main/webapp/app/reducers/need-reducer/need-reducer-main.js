@@ -10,7 +10,6 @@ import {
   addOwnInactiveNeedsInLoading,
   addOwnInactiveNeedsToLoad,
   addTheirNeedsInLoading,
-  addFailedToStore,
   addNeed,
   addNeedInCreation,
   changeNeedState,
@@ -50,7 +49,6 @@ import {
   setShowPetriNetData,
   setPetriNetDataDirty,
   setMultiSelectType,
-  addFailedToStoreConnection,
 } from "./reduce-connections.js";
 
 const initialState = Immutable.fromJS({});
@@ -112,7 +110,15 @@ export default function(allNeedsInState = initialState, action = {}) {
 
     case actionTypes.needs.storeUriFailed:
     case actionTypes.personas.storeUriFailed: {
-      return addFailedToStore(allNeedsInState, action.payload.get("uri"));
+      const needUri = action.payload.get("uri");
+      const oldNeed = allNeedsInState.get(needUri);
+
+      if (oldNeed) {
+        return allNeedsInState
+          .setIn([needUri, "isLoading"], false)
+          .setIn([needUri, "toLoad"], false);
+      }
+      return allNeedsInState;
     }
 
     case actionTypes.needs.storeOwned: {
@@ -134,10 +140,18 @@ export default function(allNeedsInState = initialState, action = {}) {
     }
 
     case actionTypes.connections.storeUriFailed: {
-      return addFailedToStoreConnection(
-        allNeedsInState,
-        action.payload.get("connUri")
-      );
+      const connUri = action.payload.get("connUri");
+      const needOfConnection = connUri && getOwnedNeedByConnectionUri(connUri);
+
+      if (needOfConnection) {
+        const needUri = needOfConnection.get("uri");
+
+        return allNeedsInState.setIn(
+          [needUri, "connections", connUri, "isLoading"],
+          false
+        );
+      }
+      return allNeedsInState;
     }
 
     case actionTypes.connections.storeActive: {

@@ -93,17 +93,6 @@ export function addTheirNeedInLoading(needs, needUri) {
   }
 }
 
-export function addFailedToStore(needs, needUri) {
-  const oldNeed = needs.get(needUri);
-  if (oldNeed) {
-    return needs
-      .setIn([needUri, "isLoading"], false)
-      .setIn([needUri, "toLoad"], false)
-      .setIn([needUri, "failedToLoad"], true);
-  }
-  return needs;
-}
-
 export function addOwnActiveNeedsInLoading(needs, needUris) {
   needUris &&
     needUris.size > 0 &&
