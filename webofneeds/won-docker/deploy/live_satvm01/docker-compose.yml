@@ -278,11 +278,13 @@ services:
       - wonnode
       - mongodb
 
-hokify_bot:
+  # job bot connecting hokify to WoN
+  hokify_bot:
     restart: always
     build: ../../image/bots
     image: webofneeds/bots:live
     environment:
+      - "uri.prefix.owner=https://matchat.org/hokify_bot" # set this for the trust store alias
       - "MAIN_BOT=won.bot.app.HokifyJobBotApp"
       - "node.default.host=node.matchat.org"
       - "node.default.http.port=443"
@@ -300,7 +302,6 @@ hokify_bot:
       - "botContext.mongodb.host=satvm01.researchstudio.at"
       - "botContext.mongodb.port=27017"
       - "botContext.mongodb.database=live_bot"
-
     depends_on:
       - mongodb
       - wonnode
