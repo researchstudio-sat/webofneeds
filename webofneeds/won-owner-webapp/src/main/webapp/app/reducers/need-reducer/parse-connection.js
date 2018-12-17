@@ -38,6 +38,7 @@ export function parseConnection(jsonldConnection) {
       isLoadingAgreementData: false,
       isLoadingPetriNetData: false,
       isLoading: false,
+      failedToLoad: false,
       showAgreementData: false,
       showPetriNetData: false,
       multiSelectType: undefined,
