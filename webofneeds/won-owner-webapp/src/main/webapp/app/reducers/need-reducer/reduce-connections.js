@@ -507,11 +507,25 @@ export function addActiveConnectionToNeed(state, needUri, connUri) {
       isRated: false,
       isLoadingMessages: false,
       isLoading: true,
+      failedToLoad: false,
       showAgreementData: false,
     });
 
     return state.mergeDeepIn([needUri, "connections", connUri], connection);
   }
 
+  return state;
+}
+
+export function addFailedToStoreConnection(state, connUri) {
+  const needOfConnection = connUri && getOwnedNeedByConnectionUri(connUri);
+
+  if (needOfConnection) {
+    const needUri = needOfConnection.get("uri");
+
+    return state
+      .setIn([needUri, "connections", connUri, "isLoading"], false)
+      .setIn([needUri, "connections", connUri, "failedToLoad"], true);
+  }
   return state;
 }
