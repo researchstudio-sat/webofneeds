@@ -256,6 +256,7 @@ export function vicinityScoreSubQuery({
     variables: [resultName, bindScoreAs],
     where: [
       `${resultName} ${pathToGeoCoords} ?geo`,
+      `{`,
       `SERVICE geo:search {
             ?geo geo:search "inCircle" .
             ?geo geo:searchDatatype geoliteral:lat-lon .
@@ -265,6 +266,7 @@ export function vicinityScoreSubQuery({
             ?geo geo:distanceValue ?geoDistance .
           }`,
       `BIND((${radius} - ?geoDistance) / ${radius} as ?geoScoreRaw)`, // 100 is the spatialCircleRadius / maxDistance in km
+      `}`, //we have to separate the two BIND operators to circumvent a jena Op->Sparql bug
       `BIND(IF(?geoScoreRaw > 0, ?geoScoreRaw , 0 ) as ${bindScoreAs})`,
     ],
   });
@@ -345,6 +347,50 @@ export function tagOverlapScoreSubQuery({
       `filter(${bindScoreAs} > 0)`, // filter out posts without any common tag-likes
     ],
     subQueries: [{ query: subQuery }],
+  });
+}
+
+/**
+ * Calculates the jaccard-index (i.e. normalized set-overlap) between own keywords
+ * and a potential match. Full overlap means 1, having none of the keywords means 0.
+ *
+ * @param {String} resultName a variable name that the score judges, e.g. `?need`
+ * @param {String} bindScoreAs the variable name for the score (use the same name for
+ *   sorting/aggregating in the parent query)
+ * @param {String} pathToText the predicates to be traversed to get to the text
+ *   in the RDF-graph.
+ * @param {*} prefixesInPath an object/map of prefix to full base-URL for all prefixes
+ *   used in the `pathToText`
+ * @param {String} keyword a keyword to intersect with potential matches' text
+ * @returns see `sparqlQuery`
+ */
+export function textSearchSubQuery({
+  resultName,
+  bindScoreAs,
+  pathToText,
+  prefixesInPath,
+  keyword,
+}) {
+  // see https://wiki.blazegraph.com/wiki/index.php/FullTextSearch
+  if (!keyword || keyword.length <= 0) {
+    return undefined;
+  }
+
+  return sparqlQuery({
+    prefixes: {
+      ...prefixesInPath,
+      won: won.defaultContext["won"],
+      bds: "http://www.bigdata.com/rdf/search#",
+    },
+    variables: [resultName, bindScoreAs],
+    where: [
+      `${resultName} ${pathToText} ?lit`,
+      `SERVICE bds:search {
+              ?lit bds:search "${keyword}" .
+              ?lit bds:relevance ?score .
+            }`,
+      `BIND(?score as ${bindScoreAs})`,
+    ],
   });
 }
 
@@ -602,6 +648,8 @@ export function generateWhatsAroundQuery(latitude, longitude) {
                       ?location_geo geo:distanceValue ?location_geoDistance.
                   }
                   FILTER NOT EXISTS { ?result won:hasFlag won:NoHintForCounterpart }
+                  FILTER NOT EXISTS { ?result won:hasFlag won:WhatsNew }
+                  FILTER NOT EXISTS { ?result won:hasFlag won:WhatsAround }
               }
             }
           UNION {
@@ -624,6 +672,8 @@ export function generateWhatsAroundQuery(latitude, longitude) {
                       ?location_geo geo:distanceValue ?location_geoDistance.
                   }
                   FILTER NOT EXISTS { ?result won:hasFlag won:NoHintForCounterpart }
+                  FILTER NOT EXISTS { ?result won:hasFlag won:WhatsNew }
+                  FILTER NOT EXISTS { ?result won:hasFlag won:WhatsAround }
               }
             }
           }
@@ -635,18 +685,20 @@ export function generateWhatsNewQuery() {
   return `PREFIX won: <http://purl.org/webofneeds/model#>
         PREFIX s: <http://schema.org/>
         PREFIX dct: <http://purl.org/dc/terms/>
-        SELECT DISTINCT ?result ?score WHERE {
-          BIND ((YEAR(?created) - 1970) * 315360000
+        SELECT DISTINCT ?result ((YEAR(?created) - 1970) * 315360000
                + MONTH(?created) * 26280000
                + DAY(?created) * 86400
                + HOURS(?created) * 3600
                + MINUTES(?created) * 60
                + SECONDS(?created)
                 as ?score)
+                WHERE {
           ?result <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> won:Need.
-          ?result won:isInState  won:Active .
+          ?result won:isInState won:Active .
           ?result dct:created ?created.
           FILTER NOT EXISTS { ?result won:hasFlag won:NoHintForCounterpart }
+          FILTER NOT EXISTS { ?result won:hasFlag won:WhatsNew }
+          FILTER NOT EXISTS { ?result won:hasFlag won:WhatsAround }
         }
-        ORDER BY DESC(?score)`;
+        ORDER BY DESC(?created)`;
 }

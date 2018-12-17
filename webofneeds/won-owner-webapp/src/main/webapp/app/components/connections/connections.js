@@ -9,7 +9,6 @@ import createSearchModule from "../create-search.js";
 import usecasePickerModule from "../usecase-picker.js";
 import usecaseGroupModule from "../usecase-group.js";
 import { attach, getIn, get } from "../../utils.js";
-import { isWhatsAroundNeed, isWhatsNewNeed } from "../../need-utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import {
   getOwnedNeedByConnectionUri,
@@ -55,14 +54,7 @@ class ConnectionsController {
       ]);
       const selectedConnectionState = getIn(selectedConnection, ["state"]);
 
-      const ownedNeeds = getOwnedNeeds(state).filter(
-        //FIXME: THIS CAN BE REMOVED ONCE WE DELETE INSTEAD OF CLOSE THE WHATSX NEEDS
-        post =>
-          !(
-            (isWhatsAroundNeed(post) || isWhatsNewNeed(post)) &&
-            post.get("state") === won.WON.InactiveCompacted
-          )
-      );
+      const ownedNeeds = getOwnedNeeds(state);
 
       const hasOwnedNeeds = ownedNeeds && ownedNeeds.size > 0;
 
@@ -169,7 +161,8 @@ class ConnectionsController {
     if (connUnread && connNotConnected) {
       const payload = {
         connectionUri: connectionUri,
-        needUri: need.get("uri"),
+        needUri: need.
+        "uri"),
       };
 
       this.connections__markAsRead(payload);

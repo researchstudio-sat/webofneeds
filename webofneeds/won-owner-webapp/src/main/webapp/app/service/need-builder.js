@@ -189,7 +189,7 @@ import { Generator } from "sparqljs";
       const queryMask = {
         type: "query",
         queryType: "SELECT",
-        variables: ["?result"],
+        variables: ["?result", "?score"],
       };
 
       let useCaseQuery = {

@@ -18,11 +18,13 @@ export const complainGroup = {
       draft: {
         ...emptyDraft,
         content: {
+          type: "won:Complaint",
           title: "WTF?",
           tags: ["wtf"],
-          searchString: "wtf",
         },
-        seeks: {},
+        seeks: {
+          type: "won:HandleComplaint",
+        },
       },
       details: {
         title: { ...details.title },
@@ -41,10 +43,13 @@ export const complainGroup = {
       draft: {
         ...emptyDraft,
         content: {
+          type: "won:HandleComplaint",
           title: "I'll discuss complaints",
           searchString: "wtf",
         },
-        seeks: {},
+        seeks: {
+          type: "won:Complaint",
+        },
       },
       details: {
         title: { ...details.title },

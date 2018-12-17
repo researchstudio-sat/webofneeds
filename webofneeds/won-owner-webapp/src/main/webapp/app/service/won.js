@@ -250,6 +250,11 @@ won.WONMSG.createMessageCompacted = won.WONMSG.prefix + ":CreateMessage";
 won.WONMSG.activateNeedMessage = won.WONMSG.baseUri + "ActivateMessage";
 won.WONMSG.activateNeedMessageCompacted =
   won.WONMSG.prefix + ":ActivateMessage";
+won.WONMSG.deleteNeedMessage = won.WONMSG.baseUri + "DeleteMessage";
+won.WONMSG.deleteNeedMessageCompacted = won.WONMSG.prefix + ":DeleteMessage";
+won.WONMSG.deleteNeedSentMessage = won.WONMSG.baseUri + "DeleteSentMessage";
+won.WONMSG.deleteNeedSentMessageCompacted =
+  won.WONMSG.prefix + ":DeleteSentMessage";
 won.WONMSG.closeNeedMessage = won.WONMSG.baseUri + "DeactivateMessage";
 won.WONMSG.closeNeedMessageCompacted = won.WONMSG.prefix + ":DeactivateMessage";
 won.WONMSG.closeNeedSentMessage = won.WONMSG.baseUri + "DeactivateSentMessage";
@@ -1510,6 +1515,12 @@ WonMessage.prototype = {
       "http://purl.org/webofneeds/message#DeactivateMessage"
     );
   },
+  isDeleteMessage: function() {
+    return (
+      this.getMessageType() ===
+      "http://purl.org/webofneeds/message#DeleteMessage"
+    );
+  },
   isNeedMessage: function() {
     return (
       this.getMessageType() === "http://purl.org/webofneeds/message#NeedMessage"
@@ -1583,6 +1594,12 @@ WonMessage.prototype = {
     return (
       this.getIsResponseToMessageType() ===
       "http://purl.org/webofneeds/message#DeactivateMessage"
+    );
+  },
+  isResponseToDeleteMessage: function() {
+    return (
+      this.getIsResponseToMessageType() ===
+      "http://purl.org/webofneeds/message#DeleteMessage"
     );
   },
 

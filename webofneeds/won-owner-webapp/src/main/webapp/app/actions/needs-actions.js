@@ -10,6 +10,7 @@ import {
   buildConnectMessage,
   buildCloseNeedMessage,
   buildOpenNeedMessage,
+  buildDeleteNeedMessage,
   fetchUnloadedData,
   fetchDataForNonOwnedNeedOnly,
 } from "../won-message-utils.js";
@@ -145,5 +146,31 @@ export function needsClosedBySystem(event) {
         message: event.getTextMessage(),
       },
     });
+  };
+}
+
+export function needsDelete(needUri) {
+  return (dispatch, getState) => {
+    buildDeleteNeedMessage(
+      needUri,
+      getState().getIn(["config", "defaultNodeUri"])
+    )
+      .then(data => {
+        dispatch(
+          actionCreators.messages__send({
+            eventUri: data.eventUri,
+            message: data.message,
+          })
+        );
+      })
+      .then(() =>
+        // assume close went through successfully, update GUI
+        dispatch({
+          type: actionTypes.needs.delete,
+          payload: {
+            ownNeedUri: needUri,
+          },
+        })
+      );
   };
 }

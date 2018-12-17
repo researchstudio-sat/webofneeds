@@ -13,6 +13,7 @@ services:
 
   # portsgres need databases for owner and wonnode
   postgres:
+    restart: always
     #build: ../../image/postgres
     image: webofneeds/postgres:live
     environment:
@@ -24,6 +25,7 @@ services:
 
   # wonnode server => access https://$deploy_host:8889/won
   wonnode:
+    restart: always
     #build: ../../image/wonnode
     image: webofneeds/wonnode:live
     environment:
@@ -47,6 +49,7 @@ services:
 
   # mongodb for persistent debug bot
   mongodb:
+    restart: always
     image: tutum/mongodb:3.2
     environment:
       - "MONGODB_USER=won"
@@ -60,6 +63,7 @@ services:
 
   # debug bot used to test need communication
   debug_bot:
+    restart: always
     #build: ../../image/bots
     image: webofneeds/bots:live
     environment:
@@ -78,6 +82,7 @@ services:
 
   # owner application (frontend) => access https://$deploy_host:8082/owner
   owner:
+    restart: always
     #build: ../../image/owner
     image: webofneeds/owner:live
     environment:
@@ -102,6 +107,7 @@ services:
 
   # bigdata rdf store for matcher service
   bigdata:
+    restart: always
     build: ../../image/bigdata
     #volumes:
     #  - $base_folder/bigdata/data/:/usr/src/bigdata/data
@@ -110,6 +116,7 @@ services:
 
   # matcher service on connect with wonnode
   matcher_service:
+    restart: always
     #build: ../../image/matcher-service
     image: webofneeds/matcher_service:live
     environment:
@@ -126,6 +133,7 @@ services:
 
   # solr server as a need index
   solr:
+    restart: always
     image: webofneeds/solr:live
     #volumes:
     #  - $base_folder/solr/won/data:/opt/solr/server/solr/won/data
@@ -135,6 +143,7 @@ services:
 
   # solr matcher and connect to matcher service
   matcher_solr:
+    restart: always
     #build: ../../image/matcher-solr
     image: webofneeds/matcher_solr:live
     environment:
@@ -150,6 +159,7 @@ services:
 
   # rescal matcher and connect to matcher service
   matcher_rescal:
+    restart: always
     #build: ../../image/matcher-rescal
     image: webofneeds/matcher_rescal:live
     environment:
@@ -169,6 +179,7 @@ services:
 
 
   matcher_sparql:
+    restart: always
     build: ../../image/matcher-sparql
     image: webofneeds/matcher_sparql:int
     environment:

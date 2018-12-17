@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
@@ -92,7 +93,7 @@ public class SparqlQueryTest  {
         Query query = QueryFactory.create(queryString);
         Op queryOp = Algebra.compile(query);
         
-        Op transformed = SparqlMatcherUtils.hintForCounterpartQuery(queryOp, Var.alloc("result"), 10);
+        Op transformed = SparqlMatcherUtils.hintForCounterpartQuery(queryOp, Var.alloc("result"));
         
         
         System.out.println("query algebra: " + queryOp);
@@ -180,35 +181,98 @@ public class SparqlQueryTest  {
      */
     @Test
     public void testAddRequiredFlag_NoHintForCounterpart_Nosideeffects() throws Exception {
-        String queryString = getResourceAsString("sparqlquerytest/query-searchstring.rq");
-        String queryStringHintForCounterpartExpected = getResourceAsString("sparqlquerytest/query-searchstring-hintForCounterpart-expected.rq");
-        String queryStringNoHintForCounterpartExpected = getResourceAsString("sparqlquerytest/query-searchstring-noHintForCounterpart-expected.rq");
+        String queryString = getResourceAsString("sparqlquerytest/no-hint-for-counterpart/input.rq");
+        String queryStringHintForCounterpartExpected = getResourceAsString("sparqlquerytest/hint-for-counterpart/expected.rq");
+        String queryStringNoHintForCounterpartExpected = getResourceAsString("sparqlquerytest/no-hint-for-counterpart/expected.rq");
         
         Var resultName = Var.alloc("result");
+        Var scoreName = Var.alloc("score");
         
         Query query = QueryFactory.create(queryString);
         Op queryOp = Algebra.compile(query);
         
-        Op actualOp = SparqlMatcherUtils.noHintForCounterpartQuery(queryOp, resultName, 30);
+        Op actualOp = SparqlMatcherUtils.noHintForCounterpartQuery(queryOp, resultName);
         Query expected = QueryFactory.create(queryStringNoHintForCounterpartExpected);
         Op expectedOp = Algebra.compile(expected);
         Assert.assertEquals(OpAsQuery.asQuery(expectedOp).toString(), OpAsQuery.asQuery(actualOp).toString());
         
-        actualOp = SparqlMatcherUtils.hintForCounterpartQuery(queryOp, resultName, 30);
+        actualOp = SparqlMatcherUtils.hintForCounterpartQuery(queryOp, resultName);
         expected = QueryFactory.create(queryStringHintForCounterpartExpected);
         expectedOp = Algebra.compile(expected);
         Assert.assertEquals(OpAsQuery.asQuery(expectedOp).toString(), OpAsQuery.asQuery(actualOp).toString());
         
-        actualOp = SparqlMatcherUtils.noHintForCounterpartQuery(queryOp, resultName, 30);
+        actualOp = SparqlMatcherUtils.noHintForCounterpartQuery(queryOp, resultName);
         expected = QueryFactory.create(queryStringNoHintForCounterpartExpected);
         expectedOp = Algebra.compile(expected);
         Assert.assertEquals(OpAsQuery.asQuery(expectedOp).toString(), OpAsQuery.asQuery(actualOp).toString());
         
-        actualOp = SparqlMatcherUtils.hintForCounterpartQuery(queryOp, resultName, 30);
+        actualOp = SparqlMatcherUtils.hintForCounterpartQuery(queryOp, resultName);
         expected = QueryFactory.create(queryStringHintForCounterpartExpected);
         expectedOp = Algebra.compile(expected);
         Assert.assertEquals(OpAsQuery.asQuery(expectedOp).toString(), OpAsQuery.asQuery(actualOp).toString());
         
     }
-  
+ 
+
+    @Test
+    public void testAddRequiredFlag_NoHintForCounterpart() throws Exception {
+        String queryString = getResourceAsString("sparqlquerytest/no-hint-for-counterpart/input.rq");
+        String expectedQueryString = getResourceAsString("sparqlquerytest/no-hint-for-counterpart/expected.rq");
+        Var resultName = Var.alloc("result");
+        Var scoreName = Var.alloc("score");
+        checkResult(queryString, expectedQueryString, op -> SparqlMatcherUtils.noHintForCounterpartQuery(op, resultName));
+    }
+    
+    @Test
+    public void testAddRequiredFlag_hintForCounterpart() throws Exception {
+        String queryString = getResourceAsString("sparqlquerytest/hint-for-counterpart/input.rq");
+        String expectedQueryString = getResourceAsString("sparqlquerytest/hint-for-counterpart/expected.rq");
+        Var resultName = Var.alloc("result");
+        Var scoreName = Var.alloc("score");
+        checkResult(queryString, expectedQueryString, op -> SparqlMatcherUtils.hintForCounterpartQuery(op, resultName));
+    }
+    
+    @Test
+    public void testAddRequiredFlag_hintForCounterpart_complex1() throws Exception {
+        String queryString = getResourceAsString("sparqlquerytest/nhfc-complex-query1/input.rq");
+        String expectedQueryString = getResourceAsString("sparqlquerytest/nhfc-complex-query1/expected.rq");
+        Var resultName = Var.alloc("result");
+        Var scoreName = Var.alloc("score");
+        checkResult(queryString, expectedQueryString, op -> SparqlMatcherUtils.noHintForCounterpartQuery(op, resultName));
+    }
+
+    @Test
+    public void testSearchQuery() throws Exception {
+        String expectedQueryString = getResourceAsString("sparqlquerytest/searchstring-query/expected.rq");
+        Var resultName = Var.alloc("result");
+        Var scoreName = Var.alloc("score");
+        Op actualOp = SparqlMatcherUtils.createSearchQuery("The Query String", resultName, 3, false, false);
+        
+        Query expectedQuery = QueryFactory.create(expectedQueryString);
+        Op expectedOp = Algebra.compile(expectedQuery);
+        String actual = OpAsQuery.asQuery(actualOp).toString();
+        String expected = OpAsQuery.asQuery(expectedOp).toString();
+        Assert.assertEquals(expected, actual);
+    }
+    
+    private void checkResult(String queryString, String expectedQueryString, Function<Op, Op> transform) {
+        Query query = QueryFactory.create(queryString);
+        Op queryOp = Algebra.compile(query);
+        
+        
+        Op actualOp = transform.apply(queryOp);
+        Query expectedQuery = QueryFactory.create(expectedQueryString);
+        Op expectedOp = Algebra.compile(expectedQuery);
+        String actual = OpAsQuery.asQuery(actualOp).toString();
+        
+        String expected = OpAsQuery.asQuery(expectedOp).toString();
+        System.out.println("expected:");
+        System.out.println(expectedOp);
+        System.out.println(expected);
+        System.out.println("actual:");
+        System.out.println(actualOp);
+        System.out.println(actual);
+        
+        Assert.assertEquals(expected, actual);
+    }
 }

@@ -32,7 +32,8 @@ public enum ConnectionState
   REQUEST_SENT("RequestSent"),
   REQUEST_RECEIVED("RequestReceived"),
   CONNECTED("Connected"),
-  CLOSED("Closed");
+  CLOSED("Closed"),
+  DELETED("Deleted");
 
   private static final Logger logger = LoggerFactory.getLogger(ConnectionState.class);
 

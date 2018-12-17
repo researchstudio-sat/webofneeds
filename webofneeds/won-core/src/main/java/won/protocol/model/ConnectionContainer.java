@@ -71,6 +71,10 @@ public class ConnectionContainer implements ParentAware<Need>, VersionedEntity
   public void setNeed(final Need need) {
     this.need = need;
   }
+  
+  public Long getId() {
+      return this.id;
+  }
 
   public ConnectionContainer(final Need need) {
     this.need = need;

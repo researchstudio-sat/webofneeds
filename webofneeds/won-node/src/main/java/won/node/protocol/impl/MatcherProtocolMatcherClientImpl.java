@@ -66,6 +66,11 @@ public class MatcherProtocolMatcherClientImpl implements MatcherProtocolMatcherS
     logger.debug("calling needDeactivated for needURI {}", needURI);
     delegate.needDeactivated(needURI, wonMessage);
   }
+  @Override
+  public void needDeleted(final URI needURI, final WonMessage wonMessage){
+    logger.debug("calling needDeleted for needURI {}", needURI);
+    delegate.needDeleted(needURI, wonMessage);
+  }
 
 
     public void setNeedRepository(NeedRepository needRepository) {

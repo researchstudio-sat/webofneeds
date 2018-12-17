@@ -1,0 +1,19 @@
+SELECT  *
+WHERE
+  { ?result  a                     <http://purl.org/webofneeds/model#Need>
+      {   { ?result  ?tmpProp_0  ?textSearchTarget
+            FILTER contains(lcase(?textSearchTarget), "the query string")
+          }
+        UNION
+          { ?result   ?tmpProp_0  ?tmpObj_0 .
+            ?tmpObj_0  ?tmpProp_1  ?textSearchTarget
+            FILTER contains(lcase(?textSearchTarget), "the query string")
+          }
+      }
+    UNION
+      { ?result   ?tmpProp_0  ?tmpObj_0 .
+        ?tmpObj_0  ?tmpProp_1  ?tmpObj_1 .
+        ?tmpObj_1  ?tmpProp_2  ?textSearchTarget
+        FILTER contains(lcase(?textSearchTarget), "the query string")
+      }
+  }
