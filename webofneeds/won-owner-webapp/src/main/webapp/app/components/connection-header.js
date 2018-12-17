@@ -38,7 +38,7 @@ function genComponentConf() {
           </won-square-image>
       </div>
       <div class="ch__right" ng-if="!self.connectionOrNeedsLoading">
-        <div class="ch__right__topline">
+        <div class="ch__right__topline" ng-if="!self.theirNeedFailedToLoad">
           <div class="ch__right__topline__title" ng-if="!self.isDirectResponseFromRemote && self.theirNeed.get('humanReadable')" title="{{ self.theirNeed.get('humanReadable') }}">
             {{ self.theirNeed.get('humanReadable') }}
           </div>
@@ -49,7 +49,7 @@ function genComponentConf() {
             Direct Response
           </div>
         </div>
-        <div class="ch__right__subtitle">
+        <div class="ch__right__subtitle" ng-if="!self.theirNeedFailedToLoad">
           <span class="ch__right__subtitle__type">
             <won-connection-state 
               connection-uri="self.connection.get('uri')">
@@ -71,6 +71,12 @@ function genComponentConf() {
           <div class="ch__right__subtitle__date">
             {{ self.friendlyTimestamp }}
           </div>
+        </div>
+        <div class="ch__right__topline" ng-if="self.theirNeedFailedToLoad">
+          <div class="ch__right__topline__title">
+            Failed To Load Need (might have been deleted)
+          </div>
+          <!-- TODO: ADD CLOSE CONNECTION ACTION BUTTON -->
         </div>
       </div>
       <div class="ch__icon" ng-if="self.connectionOrNeedsLoading">
@@ -147,6 +153,14 @@ function genComponentConf() {
               selectLastUpdateTime(state),
               this.timestamp || theirNeed.get("lastUpdateDate")
             ),
+          theirNeedFailedToLoad:
+            theirNeed &&
+            getIn(state, [
+              "process",
+              "needs",
+              theirNeed.get("uri"),
+              "failedToLoad",
+            ]),
           connectionOrNeedsLoading:
             !connection ||
             !theirNeed ||
