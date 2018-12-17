@@ -212,17 +212,6 @@ export default function(allNeedsInState = initialState, action = {}) {
     case actionTypes.needs.createSuccessful:
       return addNeed(allNeedsInState, action.payload.need, true);
 
-    case actionTypes.connections.load:
-      return action.payload.reduce(
-        (updatedState, connectionWithRelatedData) =>
-          storeConnectionAndRelatedData(
-            updatedState,
-            connectionWithRelatedData,
-            false
-          ),
-        allNeedsInState
-      );
-
     case actionTypes.messages.openMessageReceived:
     case actionTypes.messages.connectMessageReceived: {
       const ownedNeedFromState = allNeedsInState.get(

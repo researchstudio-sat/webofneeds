@@ -4,6 +4,7 @@
 import { actionTypes } from "../actions/actions.js";
 import Immutable from "immutable";
 import { getIn } from "../utils.js";
+import { parseConnection } from "./need-reducer/parse-connection.js";
 
 const initialState = Immutable.fromJS({
   processingInitialLoad: true,
@@ -210,15 +211,43 @@ export default function(processState = initialState, action = {}) {
     case actionTypes.connections.storeActiveUrisLoading: {
       const connUris = action.payload.get("connUris");
 
-      let newProcessState = processState;
       connUris &&
         connUris.forEach(connUri => {
-          newProcessState = newProcessState.setIn(
+          processState = processState.setIn(
             ["connections", connUri, "loading"],
             true
           );
         });
-      return newProcessState;
+      return processState;
+    }
+
+    case actionTypes.messages.hintMessageReceived:
+    case actionTypes.messages.openMessageSent:
+    case actionTypes.messages.connectMessageSent:
+    case actionTypes.messages.openMessageReceived:
+    case actionTypes.messages.connectMessageReceived: {
+      const parsedConnection = parseConnection(action.payload.connection);
+
+      return processState.setIn(
+        ["connections", parsedConnection.getIn(["data", "uri"]), "loading"],
+        false
+      );
+    }
+
+    case actionTypes.messages.reopenNeed.failed:
+    case actionTypes.messages.closeNeed.failed:
+    case actionTypes.connections.storeActive: {
+      const connections = action.payload.connections;
+
+      connections &&
+        connections.forEach(connection => {
+          const parsedConnection = parsedConnection(connection);
+          processState = processState.setIn(
+            ["connections", parsedConnection.getIn(["data", "uri"]), "loading"],
+            false
+          );
+        });
+      return processState;
     }
 
     default:
