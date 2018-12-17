@@ -100,12 +100,12 @@ function genComponentConf() {
               post-uri="self.nonOwnedNeedUri">
             </won-post-content-message>
             <div class="pm__content__loadspinner"
-                ng-if="self.isProcessingLoadingMessages || (self.showAgreementData && self.isLoadingAgreementData) || (self.showPetriNetData && self.isProcessingLoadingPetriNetData && !self.hasPetriNetData)">
+                ng-if="self.isProcessingLoadingMessages || (self.showAgreementData && self.isProcessingLoadingAgreementData) || (self.showPetriNetData && self.isProcessingLoadingPetriNetData && !self.hasPetriNetData)">
                 <svg class="hspinner">
                   <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
                 </svg>
             </div>
-            <div class="pm__content__agreement__loadingtext"  ng-if="self.showAgreementData && self.isLoadingAgreementData">
+            <div class="pm__content__agreement__loadingtext"  ng-if="self.showAgreementData && self.isProcessingLoadingAgreementData">
               Calculating Agreement Status
             </div>
             <div class="pm__content__petrinet__loadingtext"  ng-if="self.showPetriNetData && self.isProcessingLoadingPetriNetData && !self.hasPetriNetData">
@@ -128,34 +128,34 @@ function genComponentConf() {
             <!-- CHATVIEW SPECIFIC CONTENT END-->
 
             <!-- AGREEMENTVIEW SPECIFIC CONTENT START-->
-            <div class="pm__content__agreement__emptytext"  ng-if="self.showAgreementData && !(self.hasAgreementMessages || self.hasCancellationPendingMessages || self.hasProposalMessages) && !self.isLoadingAgreementData">
+            <div class="pm__content__agreement__emptytext"  ng-if="self.showAgreementData && !(self.hasAgreementMessages || self.hasCancellationPendingMessages || self.hasProposalMessages) && !self.isProcessingLoadingAgreementData">
               No Agreements within this Conversation
             </div>
-            <div class="pm__content__agreement__title" ng-if="self.showAgreementData && self.hasAgreementMessages && !self.isLoadingAgreementData">
+            <div class="pm__content__agreement__title" ng-if="self.showAgreementData && self.hasAgreementMessages && !self.isProcessingLoadingAgreementData">
               Agreements
             </div>
             <won-connection-message
-              ng-if="self.showAgreementData && !self.isLoadingAgreementData"
+              ng-if="self.showAgreementData && !self.isProcessingLoadingAgreementData"
               ng-click="self.multiSelectType && self.selectMessage(agreement)"
               ng-repeat="agreement in self.agreementMessagesArray"
               connection-uri="self.connectionUri"
               message-uri="agreement.get('uri')">
             </won-connection-message>
-            <div class="pm__content__agreement__title" ng-if="self.showAgreementData && self.hasCancellationPendingMessages && !self.isLoadingAgreementData">
+            <div class="pm__content__agreement__title" ng-if="self.showAgreementData && self.hasCancellationPendingMessages && !self.isProcessingLoadingAgreementData">
               Agreements with Pending Cancellation
             </div>
             <won-connection-message
-              ng-if="self.showAgreementData && !self.isLoadingAgreementData"
+              ng-if="self.showAgreementData && !self.isProcessingLoadingAgreementData"
               ng-click="self.multiSelectType && self.selectMessage(proposesToCancel)"
               ng-repeat="proposesToCancel in self.cancellationPendingMessagesArray"
               connection-uri="self.connectionUri"
               message-uri="proposesToCancel.get('uri')">
             </won-connection-message>
-            <div class="pm__content__agreement__title" ng-if="self.showAgreementData && self.hasProposalMessages && !self.isLoadingAgreementData">
+            <div class="pm__content__agreement__title" ng-if="self.showAgreementData && self.hasProposalMessages && !self.isProcessingLoadingAgreementData">
               Open Proposals
             </div>
             <won-connection-message
-              ng-if="self.showAgreementData && !self.isLoadingAgreementData"
+              ng-if="self.showAgreementData && !self.isProcessingLoadingAgreementData"
               ng-click="self.multiSelectType && self.selectMessage(proposal)"
               ng-repeat="proposal in self.proposalMessagesArray"
               connection-uri="self.connectionUri"
@@ -334,8 +334,15 @@ function genComponentConf() {
               connectionUri,
               "loadingMessages",
             ]),
-          isLoadingAgreementData:
-            connection && connection.get("isLoadingAgreementData"),
+          isProcessingLoadingAgreementData:
+            connection &&
+            getIn(state, [
+              "process",
+              "connections",
+              connectionUri,
+              "agreementData",
+              "loading",
+            ]),
           isProcessingLoadingPetriNetData:
             connection &&
             getIn(state, [
@@ -501,12 +508,12 @@ function genComponentConf() {
         if (
           forceFetch ||
           (this.isConnected &&
-            !this.isLoadingAgreementData &&
+            !this.isProcessingLoadingAgreementData &&
             !this.agreementDataLoaded)
         ) {
           this.connections__setLoadingAgreementData({
             connectionUri: this.connectionUri,
-            isLoadingAgreementData: true,
+            loadingAgreementData: true,
           });
           fetchAgreementProtocolUris(this.connection.get("uri"))
             .then(response => {
@@ -564,7 +571,7 @@ function genComponentConf() {
               console.error("Error:", error);
               this.connections__setLoadingAgreementData({
                 connectionUri: this.connectionUri,
-                isLoadingAgreementData: false,
+                loadingAgreementData: false,
               });
             });
         }
@@ -575,7 +582,7 @@ function genComponentConf() {
       delay(0).then(() => {
         if (
           this.isConnected &&
-          !this.isLoadingAgreementData &&
+          !this.isProcessingLoadingAgreementData &&
           !this.isProcessingLoadingMessages &&
           this.agreementDataLoaded &&
           this.chatMessagesWithUnknownState &&

@@ -130,33 +130,6 @@ export function markConnectionAsRead(state, connectionUri, needUri) {
   return state;
 }
 
-export function setConnectionLoadingAgreementData(
-  state,
-  connectionUri,
-  isLoadingAgreementData
-) {
-  const need =
-    connectionUri && getOwnedNeedByConnectionUri(state, connectionUri);
-  const needUri = need && need.get("uri");
-  const connection = need && need.getIn(["connections", connectionUri]);
-
-  if (!connection) {
-    console.error(
-      "No connection with connectionUri: <",
-      connectionUri,
-      "> found within needUri: <",
-      needUri,
-      ">"
-    );
-    return state;
-  }
-
-  return state.setIn(
-    [needUri, "connections", connectionUri, "isLoadingAgreementData"],
-    isLoadingAgreementData
-  );
-}
-
 export function markConnectionAsRated(state, connectionUri) {
   let need = connectionUri && getOwnedNeedByConnectionUri(state, connectionUri);
   let connection = need && need.getIn(["connections", connectionUri]);
@@ -272,15 +245,10 @@ export function updateAgreementStateData(state, connectionUri, agreementData) {
 
   const needUri = need.get("uri");
 
-  return state
-    .setIn(
-      [needUri, "connections", connectionUri, "agreementData"],
-      agreementData
-    )
-    .setIn(
-      [needUri, "connections", connectionUri, "isLoadingAgreementData"],
-      false
-    );
+  return state.setIn(
+    [needUri, "connections", connectionUri, "agreementData"],
+    agreementData
+  );
 }
 
 export function setShowAgreementData(state, connectionUri, showAgreementData) {

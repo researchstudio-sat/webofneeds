@@ -175,10 +175,8 @@ $ngRedux.getState();
                    claimedMessageUris: Immutable.Set(),
                    rejectedMessageUris: Immutable.Set(),
                    retractedMessageUris: Immutable.Set(),
-
                },
                petriNetData: Immutable.Map(),
-               isLoadingAgreementData: true|false, //default is false, whether or not the agreementData has been loaded,
                isLoading: true|false, //default is false, whether or not this connection is currently loading itself (similar to the isLoading in the need)
                showAgreementData: true|false // default is false, whether or not the agreementDataPanel is active
                showPetriNetData: true|false // defautl is false, whether or not the petriNetDataPanel is active
@@ -264,6 +262,7 @@ $ngRedux.getState();
            },
            agreementData: {
                 loaded: true|false, //default is false, whether or not the agreementData has been loaded already
+                loading: true|false, //default is false, whether or not the agreementData has been loaded,
            },
         }
     }

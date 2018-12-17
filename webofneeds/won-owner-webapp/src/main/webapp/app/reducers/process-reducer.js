@@ -187,9 +187,18 @@ export default function(processState = initialState, action = {}) {
         return processState;
       }
 
+      return processState
+        .setIn(["connections", connUri, "agreementData", "loaded"], true)
+        .setIn(["connections", connUri, "agreementData", "loading"], false);
+    }
+
+    case actionTypes.connections.setLoadingAgreementData: {
+      const connUri = action.payload.connectionUri;
+      const loadingAgreementData = action.payload.loadingAgreementData;
+
       return processState.setIn(
-        ["connections", connUri, "agreementData", "loaded"],
-        true
+        ["connections", connUri, "agreementData", "loading"],
+        loadingAgreementData
       );
     }
 

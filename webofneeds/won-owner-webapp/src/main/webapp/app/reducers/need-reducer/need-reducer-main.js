@@ -35,7 +35,6 @@ import {
   addConnectionFull,
   addActiveConnectionsToNeedInLoading,
   markConnectionAsRated,
-  setConnectionLoadingAgreementData,
   markConnectionAsRead,
   getOwnedNeedByConnectionUri,
   changeConnectionState,
@@ -362,7 +361,6 @@ export default function(allNeedsInState = initialState, action = {}) {
           creationDate: undefined,
           lastUpdateDate: undefined,
           isRated: false,
-          isLoadingAgreementData: false,
           isLoading: false,
           failedToLoad: false,
           showAgreementData: false,
@@ -776,12 +774,6 @@ export default function(allNeedsInState = initialState, action = {}) {
         allNeedsInState,
         action.payload.connectionUri,
         action.payload.agreementData
-      );
-    case actionTypes.connections.setLoadingAgreementData:
-      return setConnectionLoadingAgreementData(
-        allNeedsInState,
-        action.payload.connectionUri,
-        action.payload.isLoadingAgreementData
       );
     case actionTypes.connections.showPetriNetData:
       return setShowPetriNetData(
