@@ -155,7 +155,6 @@ const actionHierarchy = {
   },
   personas: {
     create: createPersona,
-    createSuccessful: INJ_DEFAULT,
     review: reviewPersona,
 
     storeTheirs: INJ_DEFAULT,

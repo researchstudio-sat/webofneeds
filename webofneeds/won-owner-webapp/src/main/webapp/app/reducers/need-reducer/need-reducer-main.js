@@ -63,16 +63,17 @@ export default function(allNeedsInState = initialState, action = {}) {
       );
 
     case actionTypes.needs.fetchSuggested: {
-      let suggestedPosts = action.payload.get("suggestedPosts");
-      suggestedPosts = suggestedPosts ? suggestedPosts : Immutable.Set();
+      const suggestedPosts = action.payload.get("suggestedPosts");
 
-      const stateWithSuggestedPosts = suggestedPosts.reduce(
+      if (!suggestedPosts) {
+        return allNeedsInState;
+      }
+
+      return suggestedPosts.reduce(
         (updatedState, suggestedPost) =>
           addNeed(updatedState, suggestedPost, false),
         allNeedsInState
       );
-
-      return stateWithSuggestedPosts;
     }
 
     case actionTypes.needs.storeOwnedActiveUris: {
@@ -191,38 +192,34 @@ export default function(allNeedsInState = initialState, action = {}) {
         action.payload.need,
         action.payload.needUri
       );
+
     case actionTypes.needs.createSuccessful:
       return addNeed(allNeedsInState, action.payload.need, true);
 
     case actionTypes.messages.openMessageReceived:
     case actionTypes.messages.connectMessageReceived: {
+      //FIXME: This does not include the remotePersona yet (receiving connect or open requests from a non known remoteNeed will not load the personas for now
       const ownedNeedFromState = allNeedsInState.get(
         action.payload.ownedNeedUri
       );
       const remoteNeed = action.payload.remoteNeed;
 
-      // let changedState = ownedNeedFromState
-      //   ? allNeedsInState
-      //   : addNeed(allNeedsInState, ownedNeed, true);
-      let changedState;
-
       if (!ownedNeedFromState) {
-        throw new Error(
-          "Would need to call addNeed with ownedNeed, but it is not defined!"
-        );
-      } else {
-        changedState = allNeedsInState;
+        throw new Error("Open or connect received for non owned hint!");
       }
 
       //guarantee that remoteNeed is in state
-      changedState = addNeed(changedState, remoteNeed, false);
-      changedState = addConnectionFull(changedState, action.payload.connection);
+      allNeedsInState = addNeed(allNeedsInState, remoteNeed, false);
+      allNeedsInState = addConnectionFull(
+        allNeedsInState,
+        action.payload.connection
+      );
 
       if (action.payload.message) {
-        changedState = addMessage(changedState, action.payload.message);
+        allNeedsInState = addMessage(allNeedsInState, action.payload.message);
       }
-      changedState = changeConnectionStateByFun(
-        changedState,
+      allNeedsInState = changeConnectionStateByFun(
+        allNeedsInState,
         action.payload.updatedConnection,
         state => {
           if (!state) return won.WON.RequestReceived; //fallback if no state present
@@ -232,7 +229,7 @@ export default function(allNeedsInState = initialState, action = {}) {
           return won.WON.RequestReceived;
         }
       );
-      return changedState;
+      return allNeedsInState;
     }
 
     case actionTypes.messages.hintMessageReceived: {

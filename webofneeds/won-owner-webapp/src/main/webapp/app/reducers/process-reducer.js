@@ -3,8 +3,9 @@
  */
 import { actionTypes } from "../actions/actions.js";
 import Immutable from "immutable";
-import { getIn } from "../utils.js";
+import { getIn, get } from "../utils.js";
 import { parseConnection } from "./need-reducer/parse-connection.js";
+import { parseNeed } from "./need-reducer/parse-need.js";
 
 const initialState = Immutable.fromJS({
   processingInitialLoad: true,
@@ -29,9 +30,37 @@ export default function(processState = initialState, action = {}) {
       return processState.set("processingPublish", true);
 
     case actionTypes.failedToGetLocation:
-    case actionTypes.personas.createSuccessful:
-    case actionTypes.needs.createSuccessful:
       return processState.set("processingPublish", false);
+
+    case actionTypes.needs.createSuccessful: {
+      const createdNeed = parseNeed(action.payload.need);
+      if (createdNeed) {
+        processState = processState
+          .setIn(["needs", createdNeed.get("uri"), "failedToLoad"], false)
+          .setIn(["needs", createdNeed.get("uri"), "toLoad"], false)
+          .setIn(["needs", createdNeed.get("uri"), "loading"], false);
+      }
+      return processState.set("processingPublish", false);
+    }
+
+    case actionTypes.needs.fetchSuggested: {
+      const suggestedPosts = action.payload.get("suggestedPosts");
+
+      if (!suggestedPosts) {
+        return processState;
+      }
+      return suggestedPosts.reduce((updatedState, suggestedPost) => {
+        const parsedPost = parseNeed(suggestedPost);
+        if (parsedPost) {
+          return processState
+            .setIn(["needs", parsedPost.get("uri"), "failedToLoad"], false)
+            .setIn(["needs", parsedPost.get("uri"), "toLoad"], false)
+            .setIn(["needs", parsedPost.get("uri"), "loading"], false);
+        } else {
+          return processState;
+        }
+      }, processState);
+    }
 
     case actionTypes.account.logoutStarted:
       return processState.set("processingLogout", true);
@@ -221,17 +250,88 @@ export default function(processState = initialState, action = {}) {
       return processState;
     }
 
-    case actionTypes.messages.hintMessageReceived:
-    case actionTypes.messages.openMessageSent:
     case actionTypes.messages.connectMessageSent:
-    case actionTypes.messages.openMessageReceived:
-    case actionTypes.messages.connectMessageReceived: {
+    case actionTypes.messages.openMessageSent: {
       const parsedConnection = parseConnection(action.payload.connection);
 
       return processState.setIn(
         ["connections", parsedConnection.getIn(["data", "uri"]), "loading"],
         false
       );
+    }
+
+    case actionTypes.messages.openMessageReceived:
+    case actionTypes.messages.connectMessageReceived: {
+      //FIXME: This does not include the remotePersona yet (receiving connect or open requests from a non known remoteNeed will not load the personas for now
+      const connUri = getIn(parseConnection(action.payload.connection), [
+        "data",
+        "uri",
+      ]);
+      if (!connUri) {
+        return processState;
+      }
+
+      const remoteNeedUri = get(parseNeed(action.payload.remoteNeed), "uri");
+
+      if (remoteNeedUri) {
+        processState = processState
+          .setIn(["needs", remoteNeedUri, "failedToLoad"], false)
+          .setIn(["needs", remoteNeedUri, "toLoad"], false)
+          .setIn(["needs", remoteNeedUri, "loading"], false);
+      }
+
+      return processState.setIn(["connections", connUri, "loading"], false);
+    }
+
+    case actionTypes.messages.hintMessageReceived: {
+      const {
+        ownedNeed,
+        remoteNeed,
+        connection,
+        ownPersona,
+        remotePersona,
+      } = action.payload;
+
+      const connUri = getIn(parseConnection(connection), ["data", "uri"]);
+
+      if (!connUri) {
+        return processState;
+      }
+
+      const ownedNeedUri = get(parseNeed(ownedNeed), "uri");
+      const remoteNeedUri = get(parseNeed(remoteNeed), "uri");
+      const ownPersonaUri = get(parseNeed(ownPersona), "uri");
+      const remotePersonaUri = get(parseNeed(remotePersona), "uri");
+
+      if (ownedNeedUri) {
+        processState = processState
+          .setIn(["needs", ownedNeedUri, "failedToLoad"], false)
+          .setIn(["needs", ownedNeedUri, "toLoad"], false)
+          .setIn(["needs", ownedNeedUri, "loading"], false);
+      }
+
+      if (remoteNeedUri) {
+        processState = processState
+          .setIn(["needs", remoteNeedUri, "failedToLoad"], false)
+          .setIn(["needs", remoteNeedUri, "toLoad"], false)
+          .setIn(["needs", remoteNeedUri, "loading"], false);
+      }
+
+      if (ownPersonaUri) {
+        processState = processState
+          .setIn(["needs", ownPersonaUri, "failedToLoad"], false)
+          .setIn(["needs", ownPersonaUri, "toLoad"], false)
+          .setIn(["needs", ownPersonaUri, "loading"], false);
+      }
+
+      if (remotePersonaUri) {
+        processState = processState
+          .setIn(["needs", remotePersonaUri, "failedToLoad"], false)
+          .setIn(["needs", remotePersonaUri, "toLoad"], false)
+          .setIn(["needs", remotePersonaUri, "loading"], false);
+      }
+
+      return processState.setIn(["connections", connUri, "loading"], false);
     }
 
     case actionTypes.messages.reopenNeed.failed:
@@ -295,6 +395,9 @@ export default function(processState = initialState, action = {}) {
         });
       return processState;
     }
+
+    case actionTypes.needs.delete:
+      return processState.deleteIn(["needs", action.payload.ownNeedUri]);
 
     default:
       return processState;
