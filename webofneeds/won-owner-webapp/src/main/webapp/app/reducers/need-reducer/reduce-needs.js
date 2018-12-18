@@ -10,14 +10,16 @@ export function addNeed(needs, jsonldNeed, isOwned) {
     let existingNeed = needs.get(parsedNeed.get("uri"));
     const isExistingOwnedNeed = existingNeed && existingNeed.get("isOwned");
 
-    if ((isOwned || isExistingOwnedNeed) && existingNeed) {
-      parsedNeed = parsedNeed
-        .set("connections", existingNeed.get("connections"))
-        .set("isOwned", true);
-    } else if (!isOwned && existingNeed) {
-      parsedNeed = parsedNeed
-        .set("connections", existingNeed.get("connections"))
-        .set("isOwned", false);
+    if (existingNeed) {
+      if (isOwned || isExistingOwnedNeed) {
+        parsedNeed = parsedNeed
+          .set("connections", existingNeed.get("connections"))
+          .set("isOwned", true);
+      } else if (!isOwned) {
+        parsedNeed = parsedNeed
+          .set("connections", existingNeed.get("connections"))
+          .set("isOwned", false);
+      }
     }
 
     return needs.set(parsedNeed.get("uri"), parsedNeed);
