@@ -49,4 +49,7 @@ won-connection-selection-item {
       50%
     );
   }
+  & .csi__closebutton.won-button--outlined.red.thin {
+    font-size: $smallFontSize;
+  }
 }

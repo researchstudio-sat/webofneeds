@@ -30,7 +30,7 @@ function genComponentConf() {
       <div class="ch__icon" ng-if="!self.connectionOrNeedsLoading">
           <won-square-image
             class="ch__icon__theirneed"
-            ng-class="{'bigger' : self.biggerImage, 'inactive' : self.theirNeed.get('state') === self.WON.InactiveCompacted}"
+            ng-class="{'bigger' : self.biggerImage, 'inactive' : self.theirNeed.get('state') === self.WON.InactiveCompacted, 'won-failed-to-load': self.theirNeedFailedToLoad}"
             src="self.theirNeed.get('TODO')"
             title="self.theirNeed.get('humanReadable')"
             uri="self.theirNeed.get('uri')"
@@ -73,10 +73,16 @@ function genComponentConf() {
           </div>
         </div>
         <div class="ch__right__topline" ng-if="self.theirNeedFailedToLoad">
-          <div class="ch__right__topline__title">
-            Failed To Load Need (might have been deleted)
+          <div class="ch__right__topline__notitle">
+            Remote Need Loading failed
           </div>
-          <!-- TODO: ADD CLOSE CONNECTION ACTION BUTTON -->
+        </div>
+        <div class="ch__right__subtitle" ng-if="self.theirNeedFailedToLoad">
+          <span class="ch__right__subtitle__type">
+            <span class="ch__right__subtitle__type__state">
+              Need might have been deleted, you might want to close this connection.
+            </span>
+          </span>
         </div>
       </div>
       <div class="ch__icon" ng-if="self.connectionOrNeedsLoading">
