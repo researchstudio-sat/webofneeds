@@ -22,8 +22,7 @@ export function addNeed(needs, jsonldNeed, isOwned) {
 
     return needs.set(parsedNeed.get("uri"), parsedNeed);
   } else {
-    const jsonldNeedImm = Immutable.fromJS(jsonldNeed);
-    console.error("Tried to add invalid need-object: ", jsonldNeedImm.toJS());
+    console.error("Tried to add invalid need-object: ", jsonldNeed);
     newState = needs;
   }
 
