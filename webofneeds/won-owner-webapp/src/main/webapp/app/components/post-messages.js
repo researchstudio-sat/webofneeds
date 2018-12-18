@@ -8,7 +8,6 @@ import petrinetStateModule from "./petrinet-state.js";
 import connectionHeaderModule from "./connection-header.js";
 import labelledHrModule from "./labelled-hr.js";
 import connectionContextDropdownModule from "./connection-context-dropdown.js";
-import feedbackGridModule from "./feedback-grid.js";
 import { connect2Redux } from "../won-utils.js";
 import { attach, delay } from "../utils.js";
 import { isWhatsAroundNeed, isWhatsNewNeed } from "../need-utils.js";
@@ -183,7 +182,7 @@ function genComponentConf() {
             <a class="rdflink clickable"
                ng-if="self.shouldShowRdf"
                target="_blank"
-               href="{{ self.connection.get('uri') }}">
+               href="{{ self.connectionUri }}">
                     <svg class="rdflink__small">
                         <use xlink:href="#rdf_logo_1" href="#rdf_logo_1"></use>
                     </svg>
@@ -223,8 +222,6 @@ function genComponentConf() {
             </button>
         </div>
         <div class="pm__footer" ng-if="!self.showPetriNetData && !self.multiSelectType && self.isSuggested">
-            <won-feedback-grid ng-if="self.connection && !self.connection.get('isRated')" connection-uri="self.connectionUri"></won-feedback-grid>
-
             <chat-textfield-simple
                 placeholder="::'Message (optional)'"
                 on-submit="::self.sendRequest(value, selectedPersona)"
@@ -232,9 +229,12 @@ function genComponentConf() {
                 allow-empty-submit="::true"
                 show-personas="self.isOwnedNeedWhatsX"
                 submit-button-label="::'Ask&#160;to&#160;Chat'"
-                ng-if="!self.connection || self.connection.get('isRated')"
             >
             </chat-textfield-simple>
+            <won-labelled-hr label="::'Or'" class="pm__footer__labelledhr"></won-labelled-hr>
+            <button class="pm__footer__button won-button--filled black" ng-click="self.closeConnection(true)">
+                Bad match - remove!
+            </button>
         </div>
     `;
 
@@ -789,6 +789,7 @@ function genComponentConf() {
 
         //this.router__stateGoCurrent({connectionUri: null, sendAdHocRequest: null});
       } else {
+        this.connections__rate(this.connectionUri, won.WON.binaryRatingGood);
         this.needs__connect(
           this.ownedNeed.get("uri"),
           this.connectionUri,
@@ -799,9 +800,31 @@ function genComponentConf() {
       }
     }
 
-    closeConnection() {
+    closeConnection(rateBad = false) {
+      rateBad &&
+        this.connections__rate(
+          this.connection.get("uri"),
+          won.WON.binaryRatingBad
+        );
       this.connections__close(this.connection.get("uri"));
       this.router__stateGoCurrent({ connectionUri: null });
+    }
+
+    rateMatch(rating) {
+      if (!this.isConnected) {
+        return;
+      }
+      switch (rating) {
+        case won.WON.binaryRatingGood:
+          this.connections__rate(this.connectionUri, won.WON.binaryRatingGood);
+          break;
+
+        case won.WON.binaryRatingBad:
+          this.connections__close(this.connectionUri);
+          this.connections__rate(this.connectionUri, won.WON.binaryRatingBad);
+          this.router__stateGoCurrent({ connectionUri: null });
+          break;
+      }
     }
 
     selectMessage(msg) {
@@ -835,7 +858,6 @@ export default angular
     connectionHeaderModule,
     labelledHrModule,
     connectionContextDropdownModule,
-    feedbackGridModule,
     postContentMessageModule,
     petrinetStateModule,
   ])
