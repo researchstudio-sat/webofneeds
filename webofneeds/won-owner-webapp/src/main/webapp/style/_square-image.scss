@@ -11,6 +11,10 @@
       filter: grayscale(100%);
     }
 
+    &.won-failed-to-load {
+      filter: opacity(30%);
+    }
+
     & .image {
       display: flex;
       align-items: center;
