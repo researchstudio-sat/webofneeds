@@ -86,7 +86,8 @@ export default function(processState = initialState, action = {}) {
       return processState.set("processingPublish", false);
 
     case actionTypes.needs.createSuccessful: {
-      const needUri = get(parseNeed(action.payload.need), "uri");
+      const needUri =
+        action.payload.need && get(parseNeed(action.payload.need), "uri");
 
       processState = updateNeedProcess(processState, needUri, {
         toLoad: false,
@@ -103,7 +104,7 @@ export default function(processState = initialState, action = {}) {
         return processState;
       }
       return suggestedPosts.reduce((updatedState, suggestedPost) => {
-        const needUri = get(parseNeed(suggestedPost), "uri");
+        const needUri = suggestedPost && get(parseNeed(suggestedPost), "uri");
 
         return updateNeedProcess(processState, needUri, {
           toLoad: false,
@@ -305,7 +306,9 @@ export default function(processState = initialState, action = {}) {
         return processState;
       }
 
-      const remoteNeedUri = get(parseNeed(action.payload.remoteNeed), "uri");
+      const remoteNeedUri =
+        action.payload.remoteNeed &&
+        get(parseNeed(action.payload.remoteNeed), "uri");
 
       processState = updateNeedProcess(processState, remoteNeedUri, {
         toLoad: false,
@@ -330,10 +333,11 @@ export default function(processState = initialState, action = {}) {
         return processState;
       }
 
-      const ownedNeedUri = get(parseNeed(ownedNeed), "uri");
-      const remoteNeedUri = get(parseNeed(remoteNeed), "uri");
-      const ownPersonaUri = get(parseNeed(ownPersona), "uri");
-      const remotePersonaUri = get(parseNeed(remotePersona), "uri");
+      const ownedNeedUri = ownedNeed && get(parseNeed(ownedNeed), "uri");
+      const remoteNeedUri = remoteNeed && get(parseNeed(remoteNeed), "uri");
+      const ownPersonaUri = ownPersona && get(parseNeed(ownPersona), "uri");
+      const remotePersonaUri =
+        remotePersona && get(parseNeed(remotePersona), "uri");
 
       processState = updateNeedProcess(processState, ownedNeedUri, {
         toLoad: false,
