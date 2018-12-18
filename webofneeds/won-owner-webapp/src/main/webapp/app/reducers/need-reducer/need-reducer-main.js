@@ -468,43 +468,29 @@ export default function(allNeedsInState = initialState, action = {}) {
       // changeConnectionState
       const wonMessage = action.payload;
       const eventUri = wonMessage.getIsResponseTo();
-      const tmpConnectionUri = "connectionFrom:" + wonMessage.getIsResponseTo();
-      const connectionUri = wonMessage.getReceiver();
-      const needForTmpCnct = getOwnedNeedByConnectionUri(
-        allNeedsInState,
-        tmpConnectionUri
-      );
-      const unsortedAdHocConnection =
-        needForTmpCnct &&
-        needForTmpCnct.getIn(["connections", tmpConnectionUri]);
-      if (unsortedAdHocConnection) {
+      const connUri = wonMessage.getReceiver();
+
+      const tmpConnUri = "connectionFrom:" + wonMessage.getIsResponseTo();
+      const tmpNeed = getOwnedNeedByConnectionUri(allNeedsInState, tmpConnUri);
+      const tmpConnection = getIn(tmpNeed, ["connections", tmpConnUri]);
+
+      if (tmpConnection) {
         // connection was established from scratch without having a
         // connection uri. now that we have the uri, we can store it
         // (see connectAdHoc)
-        const needUri = needForTmpCnct.get("uri");
-        if (!needForTmpCnct.get("isOwned")) {
-          throw new Error(
-            'Trying to add/change connection for need that\'s not an "ownedNeed".'
-          );
+        const needUri = tmpNeed.get("uri");
+        if (!tmpNeed.get("isOwned")) {
+          throw new Error("Need not owned, can't alter connection.");
         }
 
-        const properConnection = unsortedAdHocConnection
+        const properConnection = tmpConnection
           .delete("usingTemporaryUri")
-          .set("uri", connectionUri);
+          .set("uri", connUri);
 
         allNeedsInState = allNeedsInState
-          .deleteIn([needUri, "connections", tmpConnectionUri])
-          .mergeDeepIn(
-            [needUri, "connections", connectionUri],
-            properConnection
-          );
-        const path = [
-          needUri,
-          "connections",
-          connectionUri,
-          "messages",
-          eventUri,
-        ];
+          .deleteIn([needUri, "connections", tmpConnUri])
+          .mergeDeepIn([needUri, "connections", connUri], properConnection);
+        const path = [needUri, "connections", connUri, "messages", eventUri];
         if (allNeedsInState.getIn(path)) {
           allNeedsInState = allNeedsInState.setIn(
             [...path, "isReceivedByOwn"],
@@ -522,14 +508,14 @@ export default function(allNeedsInState = initialState, action = {}) {
       } else {
         const needByConnectionUri = getOwnedNeedByConnectionUri(
           allNeedsInState,
-          connectionUri
+          connUri
         );
 
         if (needByConnectionUri) {
           // connection has been stored as match first
           allNeedsInState = changeConnectionState(
             allNeedsInState,
-            connectionUri,
+            connUri,
             won.WON.RequestSent
           );
 
@@ -537,7 +523,7 @@ export default function(allNeedsInState = initialState, action = {}) {
             allNeedsInState.getIn([
               needByConnectionUri.get("uri"),
               "connections",
-              connectionUri,
+              connUri,
               "messages",
               eventUri,
             ])
@@ -546,7 +532,7 @@ export default function(allNeedsInState = initialState, action = {}) {
               [
                 needByConnectionUri.get("uri"),
                 "connections",
-                connectionUri,
+                connUri,
                 "messages",
                 eventUri,
                 "isReceivedByOwn",
@@ -564,7 +550,7 @@ export default function(allNeedsInState = initialState, action = {}) {
         } else {
           console.warn(
             "Can't add the connection(",
-            connectionUri,
+            connUri,
             ") the need is not stored in the state yet"
           );
         }
