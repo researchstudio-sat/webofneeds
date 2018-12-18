@@ -21,6 +21,59 @@ const initialState = Immutable.fromJS({
   connections: Immutable.Map(),
 });
 
+export const emptyNeedProcess = Immutable.fromJS({
+  loading: false,
+  toLoad: false,
+  failedToLoad: false,
+});
+
+export const emptyConnectionProcess = Immutable.fromJS({
+  loading: false,
+  loadingMessages: false,
+  failedToLoad: false,
+  petriNetData: {
+    loading: false,
+    dirty: false,
+    loaded: false,
+  },
+  agreementData: {
+    loading: false,
+    loaded: false,
+  },
+});
+
+function updateNeedProcess(processState, needUri, payload) {
+  if (!needUri) {
+    return processState;
+  }
+
+  const oldNeedProcess = getIn(processState, ["needs", needUri]);
+  const payloadImm = Immutable.fromJS(payload);
+
+  return processState.setIn(
+    ["needs", needUri],
+    oldNeedProcess
+      ? oldNeedProcess.mergeDeep(payloadImm)
+      : emptyNeedProcess.mergeDeep(payloadImm)
+  );
+}
+
+/*function updateConnectionProcess(processState, connUri, payload) {
+  if (!connUri) {
+    return processState;
+  }
+
+  const oldConnectionProcess = getIn(processState, ["connections", connUri]);
+  const payloadImm = Immutable.fromJS(payload);
+
+  return processState.setIn(
+    ["connections", connUri],
+    oldConnectionProcess
+      ? oldConnectionProcess.mergeDeep(payloadImm)
+      : emptyConnectionProcess.mergeDeep(payloadImm)
+  );
+}*/
+
 export default function(processState = initialState, action = {}) {
   switch (action.type) {
     case actionTypes.personas.create:
@@ -33,13 +86,13 @@ export default function(processState = initialState, action = {}) {
       return processState.set("processingPublish", false);
 
     case actionTypes.needs.createSuccessful: {
-      const createdNeed = parseNeed(action.payload.need);
-      if (createdNeed) {
-        processState = processState
-          .setIn(["needs", createdNeed.get("uri"), "failedToLoad"], false)
-          .setIn(["needs", createdNeed.get("uri"), "toLoad"], false)
-          .setIn(["needs", createdNeed.get("uri"), "loading"], false);
-      }
+      const needUri = get(parseNeed(action.payload.need), "uri");
+
+      processState = updateNeedProcess(processState, needUri, {
+        toLoad: false,
+        failedToLoad: false,
+        loading: false,
+      });
       return processState.set("processingPublish", false);
     }
 
@@ -50,15 +103,13 @@ export default function(processState = initialState, action = {}) {
         return processState;
       }
       return suggestedPosts.reduce((updatedState, suggestedPost) => {
-        const parsedPost = parseNeed(suggestedPost);
-        if (parsedPost) {
-          return processState
-            .setIn(["needs", parsedPost.get("uri"), "failedToLoad"], false)
-            .setIn(["needs", parsedPost.get("uri"), "toLoad"], false)
-            .setIn(["needs", parsedPost.get("uri"), "loading"], false);
-        } else {
-          return processState;
-        }
+        const needUri = get(parseNeed(suggestedPost), "uri");
+
+        return updateNeedProcess(processState, needUri, {
+          toLoad: false,
+          failedToLoad: false,
+          loading: false,
+        });
       }, processState);
     }
 
@@ -113,10 +164,11 @@ export default function(processState = initialState, action = {}) {
 
     case actionTypes.needs.storeUriFailed:
     case actionTypes.personas.storeUriFailed: {
-      return processState
-        .setIn(["needs", action.payload.get("uri"), "failedToLoad"], true)
-        .setIn(["needs", action.payload.get("uri"), "toLoad"], false)
-        .setIn(["needs", action.payload.get("uri"), "loading"], false);
+      return updateNeedProcess(processState, action.payload.get("uri"), {
+        toLoad: false,
+        failedToLoad: true,
+        loading: false,
+      });
     }
 
     case actionTypes.connections.storeUriFailed: {
@@ -273,12 +325,11 @@ export default function(processState = initialState, action = {}) {
 
       const remoteNeedUri = get(parseNeed(action.payload.remoteNeed), "uri");
 
-      if (remoteNeedUri) {
-        processState = processState
-          .setIn(["needs", remoteNeedUri, "failedToLoad"], false)
-          .setIn(["needs", remoteNeedUri, "toLoad"], false)
-          .setIn(["needs", remoteNeedUri, "loading"], false);
-      }
+      processState = updateNeedProcess(processState, remoteNeedUri, {
+        toLoad: false,
+        failedToLoad: false,
+        loading: false,
+      });
 
       return processState.setIn(["connections", connUri, "loading"], false);
     }
@@ -303,33 +354,29 @@ export default function(processState = initialState, action = {}) {
       const ownPersonaUri = get(parseNeed(ownPersona), "uri");
       const remotePersonaUri = get(parseNeed(remotePersona), "uri");
 
-      if (ownedNeedUri) {
-        processState = processState
-          .setIn(["needs", ownedNeedUri, "failedToLoad"], false)
-          .setIn(["needs", ownedNeedUri, "toLoad"], false)
-          .setIn(["needs", ownedNeedUri, "loading"], false);
-      }
+      processState = updateNeedProcess(processState, ownedNeedUri, {
+        toLoad: false,
+        failedToLoad: false,
+        loading: false,
+      });
 
-      if (remoteNeedUri) {
-        processState = processState
-          .setIn(["needs", remoteNeedUri, "failedToLoad"], false)
-          .setIn(["needs", remoteNeedUri, "toLoad"], false)
-          .setIn(["needs", remoteNeedUri, "loading"], false);
-      }
+      processState = updateNeedProcess(processState, remoteNeedUri, {
+        toLoad: false,
+        failedToLoad: false,
+        loading: false,
+      });
 
-      if (ownPersonaUri) {
-        processState = processState
-          .setIn(["needs", ownPersonaUri, "failedToLoad"], false)
-          .setIn(["needs", ownPersonaUri, "toLoad"], false)
-          .setIn(["needs", ownPersonaUri, "loading"], false);
-      }
+      processState = updateNeedProcess(processState, ownPersonaUri, {
+        toLoad: false,
+        failedToLoad: false,
+        loading: false,
+      });
 
-      if (remotePersonaUri) {
-        processState = processState
-          .setIn(["needs", remotePersonaUri, "failedToLoad"], false)
-          .setIn(["needs", remotePersonaUri, "toLoad"], false)
-          .setIn(["needs", remotePersonaUri, "loading"], false);
-      }
+      processState = updateNeedProcess(processState, remotePersonaUri, {
+        toLoad: false,
+        failedToLoad: false,
+        loading: false,
+      });
 
       return processState.setIn(["connections", connUri, "loading"], false);
     }
@@ -368,9 +415,11 @@ export default function(processState = initialState, action = {}) {
 
       needs &&
         needs.keySeq().forEach(needUri => {
-          processState = processState
-            .setIn(["needs", needUri, "loading"], false)
-            .setIn(["needs", needUri, "toLoad"], false);
+          processState = updateNeedProcess(processState, needUri, {
+            toLoad: false,
+            failedToLoad: false,
+            loading: false,
+          });
         });
       return processState;
     }
@@ -379,7 +428,9 @@ export default function(processState = initialState, action = {}) {
       const needUris = action.payload.get("uris");
       needUris &&
         needUris.forEach(needUri => {
-          processState = processState.setIn(["needs", needUri, "toLoad"], true);
+          processState = updateNeedProcess(processState, needUri, {
+            toLoad: true,
+          });
         });
       return processState;
     }
@@ -389,9 +440,10 @@ export default function(processState = initialState, action = {}) {
       const needUris = action.payload.get("uris");
       needUris &&
         needUris.forEach(needUri => {
-          processState = processState
-            .setIn(["needs", needUri, "toLoad"], false)
-            .setIn(["needs", needUri, "loading"], true);
+          processState = updateNeedProcess(processState, needUri, {
+            toLoad: false,
+            loading: true,
+          });
         });
       return processState;
     }
