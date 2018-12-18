@@ -161,8 +161,7 @@ class ConnectionsController {
     if (connUnread && connNotConnected) {
       const payload = {
         connectionUri: connectionUri,
-        needUri: need.
-        "uri"),
+        needUri: need.get("uri"),
       };
 
       this.connections__markAsRead(payload);
