@@ -58,7 +58,7 @@ function updateNeedProcess(processState, needUri, payload) {
   );
 }
 
-/*function updateConnectionProcess(processState, connUri, payload) {
+function updateConnectionProcess(processState, connUri, payload) {
   if (!connUri) {
     return processState;
   }
@@ -72,7 +72,7 @@ function updateNeedProcess(processState, needUri, payload) {
       ? oldConnectionProcess.mergeDeep(payloadImm)
       : emptyConnectionProcess.mergeDeep(payloadImm)
   );
-}*/
+}
 
 export default function(processState = initialState, action = {}) {
   switch (action.type) {
@@ -172,25 +172,20 @@ export default function(processState = initialState, action = {}) {
     }
 
     case actionTypes.connections.storeUriFailed: {
-      return processState
-        .setIn(
-          ["connections", action.payload.get("connUri"), "failedToStore"],
-          true
-        )
-        .setIn(
-          ["connections", action.payload.get("connUri"), "loading"],
-          false
-        );
+      return updateConnectionProcess(
+        processState,
+        action.payload.get("connUri"),
+        { failedToStore: true, loading: false }
+      );
     }
 
     case actionTypes.connections.setLoadingMessages: {
       const loadingMessages = action.payload.loadingMessages;
       const connUri = action.payload.connectionUri;
 
-      return processState.setIn(
-        ["connections", connUri, "loadingMessages"],
-        loadingMessages
-      );
+      return updateConnectionProcess(processState, connUri, {
+        loadingMessages: loadingMessages,
+      });
     }
 
     case actionTypes.reconnect.startingToLoadConnectionData:
@@ -201,27 +196,24 @@ export default function(processState = initialState, action = {}) {
       const loadingMessages = action.payload.get("loadingMessages");
       const connUri = action.payload.get("connectionUri");
 
-      if (loadingMessages && connUri) {
-        processState = processState.setIn(
-          ["connections", connUri, "loadingMessages"],
-          true
-        );
+      if (loadingMessages) {
+        processState = updateConnectionProcess(processState, connUri, {
+          loadingMessages: true,
+        });
       }
 
       const loadedMessages = action.payload.get("events");
       if (loadedMessages) {
-        processState = processState.setIn(
-          ["connections", connUri, "loadingMessages"],
-          false
-        );
+        processState = updateConnectionProcess(processState, connUri, {
+          loadingMessages: false,
+        });
       }
       const error = action.payload.get("error");
 
-      if (error && connUri) {
-        processState = processState.setIn(
-          ["connections", connUri, "loadingMessages"],
-          false
-        );
+      if (error) {
+        processState = updateConnectionProcess(processState, connUri, {
+          loadingMessages: false,
+        });
       }
 
       return processState;
@@ -230,26 +222,21 @@ export default function(processState = initialState, action = {}) {
     case actionTypes.connections.setLoadingPetriNetData: {
       const loadingPetriNetData = action.payload.loadingPetriNetData;
       const connUri = action.payload.connectionUri;
-
-      return processState
-        .setIn(
-          ["connections", connUri, "petriNetData", "loading"],
-          loadingPetriNetData
-        )
-        .setIn(
-          ["connections", connUri, "petriNetData", "dirty"],
-          loadingPetriNetData
-        );
+      return updateConnectionProcess(processState, connUri, {
+        petriNetData: {
+          loading: loadingPetriNetData,
+          dirty: loadingPetriNetData,
+        },
+      });
     }
 
     case actionTypes.connections.sendChatMessageClaimOnSuccess:
     case actionTypes.connections.sendChatMessageRefreshDataOnSuccess: {
       const connUri = action.payload.optimisticEvent.getSender();
 
-      return processState.setIn(
-        ["connections", connUri, "petriNetData", "dirty"],
-        true
-      );
+      return updateConnectionProcess(processState, connUri, {
+        petriNetData: { dirty: true },
+      });
     }
 
     case actionTypes.connections.updatePetriNetData: {
@@ -259,11 +246,9 @@ export default function(processState = initialState, action = {}) {
       if (!connUri || !petriNetData) {
         return processState;
       }
-
-      return processState
-        .setIn(["connections", connUri, "petriNetData", "loading"], false)
-        .setIn(["connections", connUri, "petriNetData", "dirty"], false)
-        .setIn(["connections", connUri, "petriNetData", "loaded"], true);
+      return updateConnectionProcess(processState, connUri, {
+        petriNetData: { loading: false, dirty: false, loaded: true },
+      });
     }
 
     case actionTypes.connections.updateAgreementData: {
@@ -273,20 +258,18 @@ export default function(processState = initialState, action = {}) {
       if (!connUri || !agreementData) {
         return processState;
       }
-
-      return processState
-        .setIn(["connections", connUri, "agreementData", "loaded"], true)
-        .setIn(["connections", connUri, "agreementData", "loading"], false);
+      return updateConnectionProcess(processState, connUri, {
+        agreementData: { loading: false, loaded: true },
+      });
     }
 
     case actionTypes.connections.setLoadingAgreementData: {
       const connUri = action.payload.connectionUri;
       const loadingAgreementData = action.payload.loadingAgreementData;
 
-      return processState.setIn(
-        ["connections", connUri, "agreementData", "loading"],
-        loadingAgreementData
-      );
+      return updateConnectionProcess(processState, connUri, {
+        agreementData: { loading: loadingAgreementData },
+      });
     }
 
     case actionTypes.connections.storeActiveUrisInLoading: {
@@ -294,22 +277,21 @@ export default function(processState = initialState, action = {}) {
 
       connUris &&
         connUris.forEach(connUri => {
-          processState = processState.setIn(
-            ["connections", connUri, "loading"],
-            true
-          );
+          processState = updateConnectionProcess(processState, connUri, {
+            loading: true,
+          });
         });
       return processState;
     }
 
     case actionTypes.messages.connectMessageSent:
     case actionTypes.messages.openMessageSent: {
-      const parsedConnection = parseConnection(action.payload.connection);
+      const connUri = getIn(parseConnection(action.payload.connection), [
+        "data",
+        "uri",
+      ]);
 
-      return processState.setIn(
-        ["connections", parsedConnection.getIn(["data", "uri"]), "loading"],
-        false
-      );
+      return updateConnectionProcess(processState, connUri, { loading: false });
     }
 
     case actionTypes.messages.openMessageReceived:
@@ -330,8 +312,7 @@ export default function(processState = initialState, action = {}) {
         failedToLoad: false,
         loading: false,
       });
-
-      return processState.setIn(["connections", connUri, "loading"], false);
+      return updateConnectionProcess(processState, connUri, { loading: false });
     }
 
     case actionTypes.messages.hintMessageReceived: {
@@ -378,7 +359,7 @@ export default function(processState = initialState, action = {}) {
         loading: false,
       });
 
-      return processState.setIn(["connections", connUri, "loading"], false);
+      return updateConnectionProcess(processState, connUri, { loading: false });
     }
 
     case actionTypes.messages.reopenNeed.failed:
@@ -387,10 +368,9 @@ export default function(processState = initialState, action = {}) {
 
       connections &&
         connections.keySeq().forEach(connUri => {
-          processState = processState.setIn(
-            ["connections", connUri, "loading"],
-            false
-          );
+          processState = updateConnectionProcess(processState, connUri, {
+            loading: false,
+          });
         });
       return processState;
     }
@@ -400,10 +380,9 @@ export default function(processState = initialState, action = {}) {
 
       connections &&
         connections.keySeq().forEach(connUri => {
-          processState = processState.setIn(
-            ["connections", connUri, "loading"],
-            false
-          );
+          processState = updateConnectionProcess(processState, connUri, {
+            loading: false,
+          });
         });
       return processState;
     }
