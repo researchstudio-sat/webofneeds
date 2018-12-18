@@ -164,7 +164,3 @@ export function markNeedAsRead(state, needUri) {
   }
   return state.setIn([needUri, "unread"], false);
 }
-
-export function changeNeedState(state, needUri, newState) {
-  return state.setIn([needUri, "state"], newState);
-}

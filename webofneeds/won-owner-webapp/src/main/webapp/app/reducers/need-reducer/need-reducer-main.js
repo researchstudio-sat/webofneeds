@@ -12,7 +12,6 @@ import {
   addTheirNeedsInLoading,
   addNeed,
   addNeedInCreation,
-  changeNeedState,
 } from "./reduce-needs.js";
 import {
   addMessage,
@@ -154,16 +153,14 @@ export default function(allNeedsInState = initialState, action = {}) {
       );
 
     case actionTypes.needs.reopen:
-      return changeNeedState(
-        allNeedsInState,
-        action.payload.ownedNeedUri,
+      return allNeedsInState.setIn(
+        [action.payload.ownedNeedUri, "state"],
         won.WON.ActiveCompacted
       );
 
     case actionTypes.needs.close:
-      return changeNeedState(
-        allNeedsInState,
-        action.payload.ownedNeedUri,
+      return allNeedsInState.setIn(
+        [action.payload.ownedNeedUri, "state"],
         won.WON.InactiveCompacted
       );
 
