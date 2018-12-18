@@ -1,6 +1,10 @@
 import angular from "angular";
 
-import { attach, generateRgbColorArray } from "../utils.js";
+import won from "../won-es6.js";
+import { attach, generateRgbColorArray, get, getIn } from "../utils.js";
+import { connect2Redux } from "../won-utils.js";
+import { actionCreators } from "../actions/actions.js";
+import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
 import Identicon from "identicon.js";
 window.Identicon4dbg = Identicon;
@@ -8,7 +12,7 @@ window.Identicon4dbg = Identicon;
 import shajs from "sha.js";
 window.shajs4dbg = shajs;
 
-const serviceDependencies = ["$scope"];
+const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
     <img class="image" ng-show="self.src" ng-src="{{self.src}}"/>
@@ -23,10 +27,50 @@ function genComponentConf() {
     constructor(/* arguments = dependency injections */) {
       attach(this, serviceDependencies, arguments);
 
-      const unregister = this.$scope.$watch("self.uri", newVal => {
-        if (newVal) unregister(); // only need to do this once
-        this.updateIdenticon(newVal);
-      });
+      const selectFromState = state => {
+        let identiconSvg;
+
+        if (this.uri) {
+          // quick extra hash here as identicon.js only uses first 15
+          // chars (which aren't very unique for our uris due to the base-url):
+          const hash = new shajs.sha512().update(this.uri).digest("hex");
+          const rgbColorArray = generateRgbColorArray(hash);
+          const idc = new Identicon(hash, {
+            size: 100,
+            foreground: [255, 255, 255, 255], // rgba white
+            background: [...rgbColorArray, 255], // rgba
+            margin: 0.2,
+            format: "svg",
+          });
+          identiconSvg = idc.toString();
+        }
+
+        const need = getIn(state, ["needs", this.uri]);
+
+        return {
+          needInactive:
+            need && get(need, "state") === won.WON.InactiveCompacted,
+          needFailedToLoad:
+            need &&
+            getIn(state, ["process", "needs", this.uri, "failedToLoad"]),
+          identiconSvg,
+        };
+      };
+
+      connect2Redux(
+        selectFromState,
+        actionCreators,
+        ["self.src", "self.title", "self.uri"],
+        this
+      );
+
+      classOnComponentRoot("inactive", () => this.needInactive, this);
+
+      classOnComponentRoot(
+        "won-failed-to-load",
+        () => this.needFailedToLoad,
+        this
+      );
     }
 
     updateIdenticon(input) {
@@ -42,7 +86,7 @@ function genComponentConf() {
         margin: 0.2,
         format: "svg",
       });
-      this.identiconSvg = idc.toString();
+      return idc.toString();
     }
   }
   Controller.$inject = serviceDependencies;
