@@ -100,6 +100,7 @@ export default function(allNeedsInState = initialState, action = {}) {
       );
     }
 
+    case actionTypes.personas.storeTheirUrisLoading:
     case actionTypes.needs.storeTheirUrisLoading: {
       return addTheirNeedsInLoading(
         allNeedsInState,
@@ -148,9 +149,6 @@ export default function(allNeedsInState = initialState, action = {}) {
         allNeedsInState,
         action.payload.get("connections")
       );
-
-    case actionTypes.router.accessedNonLoadedPost:
-      return addNeed(allNeedsInState, action.payload.get("theirNeed"), false);
 
     case actionTypes.needs.fetch:
       return action.payload.reduce(

@@ -12,7 +12,7 @@ import * as srefUtils from "../sref-utils.js";
 
 function genLoginConf() {
   let template = `
-        <form ng-submit="::self.account__login({email: self.email, password: self.password, rememberMe: self.rememberMe}, {redirectToFeed: false})"
+        <form ng-submit="::self.account__login({email: self.email, password: self.password, rememberMe: self.rememberMe})"
             id="loginForm"
             class="loginForm"
         >
@@ -94,16 +94,11 @@ function genLoginConf() {
         this.view__clearLoginError();
       }
       if (event.keyCode == 13) {
-        this.account__login(
-          {
-            email: this.email,
-            password: this.password,
-            rememberMe: this.rememberMe,
-          },
-          {
-            redirectToFeed: false,
-          }
-        );
+        this.account__login({
+          email: this.email,
+          password: this.password,
+          rememberMe: this.rememberMe,
+        });
       }
     }
   }

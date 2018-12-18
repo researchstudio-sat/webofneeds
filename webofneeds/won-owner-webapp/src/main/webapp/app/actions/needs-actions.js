@@ -3,7 +3,6 @@
  */
 
 import won from "../won-es6.js";
-import Immutable from "immutable";
 
 import { actionTypes, actionCreators } from "./actions.js";
 
@@ -24,20 +23,7 @@ export function fetchUnloadedNeeds() {
 
 export function fetchSuggested(needUri) {
   return async dispatch => {
-    fetchDataForNonOwnedNeedOnly(needUri).then(response => {
-      const suggestedPosts = response && response.get("needs");
-
-      if (suggestedPosts && suggestedPosts.size > 0) {
-        const payload = Immutable.fromJS({
-          suggestedPosts: suggestedPosts,
-        });
-
-        dispatch({
-          type: actionTypes.needs.fetchSuggested,
-          payload: payload,
-        });
-      }
-    });
+    fetchDataForNonOwnedNeedOnly(needUri, dispatch);
   };
 }
 

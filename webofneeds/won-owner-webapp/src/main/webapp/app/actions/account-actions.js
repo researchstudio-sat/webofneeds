@@ -5,7 +5,10 @@
 import won from "../won-es6.js";
 import Immutable from "immutable";
 import { actionTypes, actionCreators } from "./actions.js";
-import { fetchOwnedData } from "../won-message-utils.js";
+import {
+  fetchOwnedData,
+  loadNeedFromRouteParamIfExists,
+} from "../won-message-utils.js";
 import {
   registerAccount,
   transferPrivateAccount,
@@ -52,27 +55,11 @@ export async function ensureLoggedIn(dispatch, getState) {
 let _loginInProcessFor;
 /**
  *
- * @param username
- * @param password
- * @param options
- *    * fetchData(true): whether or not to fetch a users owned needs. If the account
- *    signing in is new, there's no need to fetch this and `false` can be passed here
- *    * doRedirects(true): whether or not to do any redirects at all (e.g. if an invalid route was accessed)
- *    * redirectToFeed(false): whether or not to redirect to the feed after signing in (needs `redirects` to be true)
- *
  * @param credentials either {email, password} or {privateId}
+ * @param redirectToFeed def. false, whether or not to redirect to the feed after signing in (needs `redirects` to be true)
  * @returns {Function}
  */
-export function accountLogin(credentials, options) {
-  const options_ = Object.assign(
-    {
-      // defaults
-      fetchData: true,
-      doRedirects: true,
-      redirectToFeed: false,
-    },
-    options
-  );
+export function accountLogin(credentials, redirectToFeed = false) {
   return (dispatch, getState) => {
     const state = getState();
 
@@ -115,25 +102,7 @@ export function accountLogin(credentials, options) {
       })
       .then(() => {
         if (isLoggedIn) {
-          return logout().then(() => {
-            if (
-              options_.doRedirects &&
-              getIn(state, ["account", "isAnonymous"])
-            ) {
-              return stateGoCurrent({ privateId: undefined })(
-                dispatch,
-                getState
-              );
-            }
-          });
-        }
-      })
-      .then(() => {
-        if (options_.doRedirects && credentials.privateId) {
-          return stateGoCurrent({ privateId: credentials.privateId })(
-            dispatch,
-            getState
-          );
+          return logout();
         }
       })
       .then(() => login(credentials))
@@ -144,24 +113,8 @@ export function accountLogin(credentials, options) {
         })
       )
       .then(() => dispatch({ type: actionTypes.upgradeHttpSession }))
-      .then(() => {
-        if (!options_.doRedirects) {
-          return;
-        } else if (options_.redirectToFeed) {
-          return dispatch(
-            actionCreators.router__stateGoResetParams("connections")
-          );
-        } else {
-          return checkAccessToCurrentRoute(dispatch, getState);
-        }
-      })
-      .then(() => {
-        if (options_.fetchData) {
-          return fetchOwnedData(email, dispatch);
-        } else {
-          return Immutable.Map(); // only need to fetch data for non-new accounts
-        }
-      })
+      .then(() => fetchOwnedData(dispatch))
+      .then(() => loadNeedFromRouteParamIfExists(dispatch, getState))
       .then(() => dispatch({ type: actionTypes.account.loginFinished }))
       .catch(error =>
         error.response.json().then(loginError => {
@@ -176,21 +129,25 @@ export function accountLogin(credentials, options) {
                 loginError = won.PRIVATEID_NOT_FOUND_ERROR;
               }
 
-              dispatch(
+              return dispatch(
                 actionCreators.account__loginFailed({
                   loginError: Immutable.fromJS(loginError),
                   error,
                   credentials,
                 })
               );
-            })
-            .then(
-              () =>
-                options_.doRedirects &&
-                checkAccessToCurrentRoute(dispatch, getState)
-            );
+            });
         })
       )
+      .then(() => {
+        if (redirectToFeed) {
+          return dispatch(
+            actionCreators.router__stateGoResetParams("connections")
+          );
+        }
+        return Promise.resolve();
+      })
+      .then(() => checkAccessToCurrentRoute(dispatch, getState))
       .then(() => {
         _loginInProcessFor = undefined;
       });
@@ -229,11 +186,12 @@ export function accountLogout() {
       .then(() => dispatch({ type: actionTypes.downgradeHttpSession }))
       .then(() => dispatch({ type: actionTypes.account.reset }))
       .then(() => won.clearStore())
-      .then(() => checkAccessToCurrentRoute(dispatch, getState))
+      .then(() => loadNeedFromRouteParamIfExists(dispatch, getState))
       .then(() => {
         _logoutInProcess = false;
       })
-      .then(() => dispatch({ type: actionTypes.account.logoutFinished }));
+      .then(() => dispatch({ type: actionTypes.account.logoutFinished }))
+      .then(() => checkAccessToCurrentRoute(dispatch, getState));
   };
 }
 
@@ -244,12 +202,7 @@ export function accountLogout() {
 export function accountRegister(credentials) {
   return (dispatch, getState) =>
     registerAccount(credentials)
-      .then(() =>
-        accountLogin(credentials, {
-          fetchData: false,
-          redirectToFeed: true,
-        })(dispatch, getState)
-      )
+      .then(() => accountLogin(credentials, true)(dispatch, getState))
       .catch(error => {
         //TODO: PRINT MORE SPECIFIC ERROR MESSAGE, already registered/password to short etc.
         const registerError =
@@ -271,10 +224,7 @@ export function accountTransfer(credentials) {
     transferPrivateAccount(credentials)
       .then(() => {
         credentials.privateId = undefined;
-        return accountLogin(credentials, {
-          fetchData: true,
-          redirectToFeed: true,
-        })(dispatch, getState);
+        return accountLogin(credentials, true)(dispatch, getState);
       })
       .catch(error => {
         //TODO: PRINT MORE SPECIFIC ERROR MESSAGE, already registered/password to short etc.

@@ -4,7 +4,7 @@
 
 import won from "./won-es6.js";
 import Immutable from "immutable";
-import { checkHttpStatus, urisToLookupMap, is } from "./utils.js";
+import { checkHttpStatus, urisToLookupMap, is, getIn } from "./utils.js";
 
 import { ownerBaseUrl } from "config";
 import urljoin from "url-join";
@@ -12,6 +12,7 @@ import urljoin from "url-join";
 import { getRandomWonId, getAllDetails } from "./won-utils.js";
 import { isConnUriClosed } from "./won-localstorage.js";
 import { actionTypes } from "./actions/actions.js";
+import { getPostUriFromRoute } from "./selectors/general-selectors.js";
 
 /**
  * Checks if a wonMessage contains content/references that make it necessary for us to check which effects
@@ -523,12 +524,12 @@ export async function buildCreateMessage(needData, wonNodeUri) {
   };
 }
 
-export function fetchDataForNonOwnedNeedOnly(needUri) {
-  return won
-    .getNeed(needUri)
-    .then(need =>
-      Immutable.fromJS({ needs: { [needUri]: Immutable.fromJS(need) } })
-    );
+export function fetchDataForNonOwnedNeedOnly(needUri, dispatch) {
+  dispatch({
+    type: actionTypes.needs.storeTheirUrisLoading,
+    payload: Immutable.fromJS({ uris: [needUri] }),
+  });
+  return fetchTheirNeedAndDispatch(needUri, dispatch);
 }
 
 export function fetchUnloadedData(dispatch) {
@@ -541,7 +542,7 @@ export function fetchUnloadedData(dispatch) {
   });
 }
 
-export function fetchOwnedData(email, dispatch) {
+export function fetchOwnedData(dispatch) {
   return fetchOwnedInactiveNeedUris().then(inactiveNeedUris => {
     dispatch({
       type: actionTypes.needs.storeOwnedInactiveUris,
@@ -674,127 +675,127 @@ export function fetchMessage(needUri, eventUri) {
     .then(response => response.json());
 }
 
-export async function fetchDataForOwnedNeeds(ownedNeedUris, dispatch) {
-  if (!is("Array", ownedNeedUris) || ownedNeedUris.length === 0) {
-    return Immutable.fromJS({ needs: {} });
+export function loadNeedFromRouteParamIfExists(dispatch, getState) {
+  const postUri = getPostUriFromRoute(getState());
+
+  /*
+   if there is no postUri in the route we dont have to do anything
+
+   if the need is not in the state yet, we add it as a nonOwnedNeed
+   since we can be sure the need would be a non-owned need due to the fact that all Owned needs have been loaded before
+   already if the User is logged in
+   */
+  if (postUri && !getIn(getState(), ["needs", postUri])) {
+    return fetchDataForNonOwnedNeedOnly(postUri, dispatch);
+  } else {
+    return Promise.resolve();
   }
-
-  const allOwnedNeeds = await urisToLookupMap(ownedNeedUris, uri =>
-    fetchOwnedNeedAndDispatch(uri, dispatch)
-  );
-
-  // wait for the own needs to be dispatched then load connections
-  //[{ uri -> cnct }]
-  const connectionMaps = await Promise.all(
-    ownedNeedUris.map(needUri =>
-      fetchConnectionsOfNeedAndDispatch(needUri, dispatch)
-    )
-  );
-
-  // flatten into one lookup map
-  const allConnections = connectionMaps.reduce(
-    (a, b) => Object.assign(a, b),
-    {}
-  );
-
-  const theirNeedUris = Object.values(allConnections).map(
-    cnct => cnct.hasRemoteNeed
-  );
-
-  const theirNeedUris_ = Immutable.Set(theirNeedUris).toArray();
-  dispatch({
-    type: actionTypes.needs.storeTheirUrisLoading,
-    payload: Immutable.fromJS({ uris: theirNeedUris_ }),
-  });
-  const allTheirNeeds = await urisToLookupMap(theirNeedUris_, uri =>
-    fetchTheirNeedAndDispatch(uri, dispatch)
-  );
-
-  const allDataRawPromise = Promise.all([
-    allOwnedNeeds,
-    allConnections,
-    allTheirNeeds,
-  ]);
-
-  return allDataRawPromise.then(
-    //FIXME: NOT SURE IF THIS PROMISE IS ACTUALLY USING THE DATA STORED IN IT AT ALL
-    ([ownedNeeds, connections, /* events, */ theirNeeds]) => {
-      Immutable.fromJS({
-        ownedNeeds,
-        connections,
-        events: {
-          /* will be loaded later when connection is accessed */
-        },
-        theirNeeds,
-      });
-    }
-  );
 }
 
-async function fetchConnectionsOfNeedAndDispatch(needUri, dispatch) {
-  const connectionUrisOfNeed = await won.getConnectionUrisOfNeed(
-    needUri,
-    needUri,
-    true
-  );
-  const activeConnectionUris = connectionUrisOfNeed.filter(
-    connUri => !isConnUriClosed(connUri)
-  );
-  dispatch({
-    type: actionTypes.connections.storeActiveUrisLoading,
-    payload: Immutable.fromJS({
-      needUri: needUri,
-      connUris: activeConnectionUris,
-    }),
-  });
+export async function fetchDataForOwnedNeeds(ownedNeedUris, dispatch) {
+  if (!is("Array", ownedNeedUris) || ownedNeedUris.length === 0) {
+    return;
+  }
 
-  return urisToLookupMap(activeConnectionUris, uri =>
-    fetchActiveConnectionAndDispatch(uri, dispatch)
-  );
+  return urisToLookupMap(ownedNeedUris, uri =>
+    fetchOwnedNeedAndDispatch(uri, dispatch)
+  )
+    .then(() =>
+      urisToLookupMap(ownedNeedUris, needUri =>
+        fetchConnectionsOfNeedAndDispatch(needUri, dispatch)
+      )
+    )
+    .then(needConnectionMap => {
+      const theirNeedUris = Immutable.fromJS(needConnectionMap)
+        .filter(connections => connections.size > 0)
+        .flatMap(entry => entry)
+        .map(conn => conn.get("hasRemoteNeed"))
+        .toSet();
+
+      const theirNeedUrisArray = theirNeedUris.toArray();
+
+      dispatch({
+        type: actionTypes.needs.storeTheirUrisLoading,
+        payload: Immutable.fromJS({ uris: theirNeedUrisArray }),
+      });
+      return theirNeedUrisArray;
+    })
+    .then(theirNeedUris =>
+      urisToLookupMap(theirNeedUris, uri =>
+        fetchTheirNeedAndDispatch(uri, dispatch)
+      )
+    );
+}
+
+function fetchConnectionsOfNeedAndDispatch(needUri, dispatch) {
+  return won
+    .getConnectionUrisOfNeed(needUri, needUri, true)
+    .then(connectionUrisOfNeed => {
+      const activeConnectionUris = connectionUrisOfNeed.filter(
+        connUri => !isConnUriClosed(connUri)
+      );
+      dispatch({
+        type: actionTypes.connections.storeActiveUrisLoading,
+        payload: Immutable.fromJS({
+          needUri: needUri,
+          connUris: activeConnectionUris,
+        }),
+      });
+
+      return urisToLookupMap(activeConnectionUris, uri =>
+        fetchActiveConnectionAndDispatch(uri, dispatch)
+      );
+    });
 }
 
 function fetchOwnedNeedAndDispatch(needUri, dispatch) {
-  const needP = won
-    .ensureLoaded(needUri, { requesterWebId: needUri }) //ensure loaded does net seem to be necessary as it is called within getNeed also the requesterWebId is not necessary for need requests
-    .then(() => won.getNeed(needUri));
-  needP.then(need =>
+  return won.getNeed(needUri).then(need => {
     dispatch({
       type: actionTypes.needs.storeOwned,
       payload: Immutable.fromJS({ needs: { [needUri]: need } }),
-    })
-  );
-  return needP;
+    });
+    return need;
+  });
 }
 
 function fetchActiveConnectionAndDispatch(cnctUri, dispatch) {
-  const cnctP = won.getNode(cnctUri);
-  cnctP.then(connection =>
+  return won.getNode(cnctUri).then(connection => {
     dispatch({
       type: actionTypes.connections.storeActive,
       payload: Immutable.fromJS({ connections: { [cnctUri]: connection } }),
-    })
-  );
-  return cnctP;
+    });
+    return connection;
+  });
 }
 
 function fetchTheirNeedAndDispatch(needUri, dispatch) {
-  const needP = won.getNeed(needUri);
-  needP.then(need => {
-    if (need["won:heldBy"] && need["won:heldBy"]["@id"]) {
-      const personaUri = need["won:heldBy"]["@id"];
-      won.getNeed(personaUri).then(personaNeed =>
+  return won
+    .getNeed(needUri)
+    .then(need => {
+      if (need["won:heldBy"] && need["won:heldBy"]["@id"]) {
+        const personaUri = need["won:heldBy"]["@id"];
         dispatch({
-          type: actionTypes.personas.storeTheirs,
-          payload: Immutable.fromJS({
-            needs: { [personaUri]: personaNeed },
-          }),
-        })
-      );
-    }
-    dispatch({
-      type: actionTypes.needs.storeTheirs,
-      payload: Immutable.fromJS({ needs: { [needUri]: need } }),
+          type: actionTypes.personas.storeTheirUrisLoading,
+          payload: Immutable.fromJS({ uris: [personaUri] }),
+        });
+        return won.getNeed(personaUri).then(personaNeed => {
+          dispatch({
+            type: actionTypes.personas.storeTheirs,
+            payload: Immutable.fromJS({
+              needs: { [personaUri]: personaNeed },
+            }),
+          });
+          return need;
+        });
+      } else {
+        return need;
+      }
+    })
+    .then(need => {
+      dispatch({
+        type: actionTypes.needs.storeTheirs,
+        payload: Immutable.fromJS({ needs: { [needUri]: need } }),
+      });
+      return need;
     });
-  });
-  return needP;
 }

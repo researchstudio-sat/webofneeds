@@ -3,7 +3,7 @@
  */
 import angular from "angular";
 import ngAnimate from "angular-animate";
-import { attach } from "../../utils.js";
+import { attach, getIn } from "../../utils.js";
 import won from "../../won-es6.js";
 import { actionCreators } from "../../actions/actions.js";
 import sendRequestModule from "../send-request.js";
@@ -34,7 +34,7 @@ class Controller {
         isOwnPost: isOwnPost,
         post,
         won: won.WON,
-        showModalDialog: state.getIn(["view", "showModalDialog"]),
+        showModalDialog: getIn(state, ["view", "showModalDialog"]),
       };
     };
 
@@ -42,14 +42,6 @@ class Controller {
       this
     );
     this.$scope.$on("$destroy", disconnect);
-  }
-
-  goToOwnPost() {
-    this.router__stateGoAbs("connections", {
-      connectionUri: undefined,
-      postUri: this.postUri,
-    });
-    //TODO: REDIRECT TO THE OVERVIEW INSTEAD OF POST-VIEW (this does not work yet as the postUri is not set yet during the time of the function execution
   }
 }
 

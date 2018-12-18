@@ -1,6 +1,5 @@
 import angular from "angular";
 import won from "../../won-es6.js";
-import Immutable from "immutable";
 import sendRequestModule from "../send-request.js";
 import postMessagesModule from "../post-messages.js";
 import postInfoModule from "../post-info.js";
@@ -9,7 +8,7 @@ import createPostModule from "../create-post.js";
 import createSearchModule from "../create-search.js";
 import usecasePickerModule from "../usecase-picker.js";
 import usecaseGroupModule from "../usecase-group.js";
-import { attach, getIn } from "../../utils.js";
+import { attach, getIn, get } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import {
   getOwnedNeedByConnectionUri,
@@ -34,7 +33,7 @@ class ConnectionsController {
         getIn(state, ["router", "currentParams", "postUri"])
       );
       const selectedPost =
-        selectedPostUri && state.getIn(["needs", selectedPostUri]);
+        selectedPostUri && getIn(state, ["needs", selectedPostUri]);
 
       const useCase = getIn(state, ["router", "currentParams", "useCase"]);
       const useCaseGroup = getIn(state, [
@@ -57,33 +56,69 @@ class ConnectionsController {
 
       const ownedNeeds = getOwnedNeeds(state);
 
-      let connections = Immutable.Map();
+      const hasOwnedNeeds = ownedNeeds && ownedNeeds.size > 0;
 
-      ownedNeeds &&
-        ownedNeeds.map(function(need) {
-          connections = connections.merge(need.get("connections"));
-        });
-
-      const themeName = getIn(state, ["config", "theme", "name"]);
+      const theme = getIn(state, ["config", "theme"]);
+      const themeName = get(theme, "name");
+      const appTitle = get(theme, "title");
+      const welcomeTemplate = get(theme, "welcomeTemplate");
 
       return {
-        themeName,
-        welcomeTemplate:
-          "./skin/" +
-          themeName +
-          "/" +
-          getIn(state, ["config", "theme", "welcomeTemplate"]),
-        appTitle: getIn(state, ["config", "theme", "title"]),
-        WON: won.WON,
-        selectedPost,
-        selectedConnection,
-        selectedConnectionState,
-        useCase,
-        useCaseGroup,
-        hasConnections: connections && connections.size > 0,
-        hasOwnedNeeds: ownedNeeds && ownedNeeds.size > 0,
+        appTitle,
+        welcomeTemplatePath: "./skin/" + themeName + "/" + welcomeTemplate,
+
         open,
-        showModalDialog: state.getIn(["view", "showModalDialog"]),
+        showModalDialog: getIn(state, ["view", "showModalDialog"]),
+        showWelcomeSide:
+          !useCase &&
+          !useCaseGroup &&
+          !selectedPost &&
+          (!selectedConnection || selectedConnectionState === won.WON.Closed),
+        showContentSide:
+          useCase ||
+          useCaseGroup ||
+          selectedPost ||
+          (selectedConnection && selectedConnectionState !== won.WON.Closed),
+
+        showUseCasePicker:
+          !useCase &&
+          !!useCaseGroup &&
+          useCaseGroup === "all" &&
+          !selectedPost &&
+          !selectedConnection,
+        showUseCaseGroups:
+          !useCase &&
+          !!useCaseGroup &&
+          useCaseGroup !== "all" &&
+          !selectedPost &&
+          !selectedConnection,
+        showCreatePost:
+          !!useCase &&
+          useCase !== "search" &&
+          !selectedPost &&
+          !selectedConnection,
+        showCreateSearch:
+          !!useCase &&
+          useCase === "search" &&
+          !selectedPost &&
+          !selectedConnection,
+        showPostMessages:
+          !selectedPost &&
+          !useCaseGroup &&
+          (selectedConnectionState === won.WON.Connected ||
+            selectedConnectionState === won.WON.RequestReceived ||
+            selectedConnectionState === won.WON.RequestSent ||
+            selectedConnectionState === won.WON.Suggested),
+        showPostInfo: selectedPost && !useCaseGroup,
+
+        hideListSideInResponsive:
+          !hasOwnedNeeds ||
+          selectedConnection ||
+          selectedPost ||
+          !!useCaseGroup ||
+          !!useCase,
+        hideWelcomeSideInResponsive: hasOwnedNeeds,
+        hideFooterInResponsive: selectedConnection,
       };
     };
 
@@ -91,11 +126,6 @@ class ConnectionsController {
       this
     );
     this.$scope.$on("$destroy", disconnect);
-
-    /*this.$scope.$watch("self.mainViewScroll", newValue => {
-      if (newValue !== undefined)
-        requestAnimationFrame(() => (scrollArea.scrollTop = newValue));
-    });*/
   }
 
   selectNeed(needUri) {
@@ -104,7 +134,7 @@ class ConnectionsController {
       postUri: needUri,
       useCase: undefined,
       useCaseGroup: undefined,
-    }); //TODO: Maybe leave the connectionUri in the parameters to go back when closing a selected need
+    });
   }
 
   selectConnection(connectionUri) {
