@@ -44,6 +44,8 @@ won-login-form {
     color: $won-primary-color;
 
     &__resend {
+      font-size: $smallFontSize;
+      color: $won-primary-color;
       cursor: pointer;
       &:hover {
         text-decoration: underline;
