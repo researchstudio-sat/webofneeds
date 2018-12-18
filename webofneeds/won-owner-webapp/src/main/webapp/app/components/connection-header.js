@@ -30,7 +30,7 @@ function genComponentConf() {
       <div class="ch__icon" ng-if="!self.connectionOrNeedsLoading">
           <won-square-image
             class="ch__icon__theirneed"
-            ng-class="{'bigger' : self.biggerImage, 'inactive' : self.theirNeed.get('state') === self.WON.InactiveCompacted, 'won-failed-to-load': self.theirNeedFailedToLoad}"
+            ng-class="{'bigger' : self.biggerImage}"
             src="self.theirNeed.get('TODO')"
             title="self.theirNeed.get('humanReadable')"
             uri="self.theirNeed.get('uri')"

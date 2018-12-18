@@ -22,7 +22,7 @@ function genComponentConf() {
 
     <won-square-image
         ng-if="!self.postLoading"
-        ng-class="{'bigger' : self.biggerImage, 'inactive' : !self.need.get('isBeingCreated') && self.need.get('state') === self.WON.InactiveCompacted}"
+        ng-class="{'bigger' : self.biggerImage}"
         src="self.need.get('TODO')"
         uri="self.needUri"
         ng-show="!self.hideImage">
