@@ -62,6 +62,7 @@ export default function(allNeedsInState = initialState, action = {}) {
       return allNeedsInState.map(need =>
         need.set("isOwned", false).set("connections", Immutable.Map())
       );
+
     case actionTypes.needs.fetchSuggested: {
       let suggestedPosts = action.payload.get("suggestedPosts");
       suggestedPosts = suggestedPosts ? suggestedPosts : Immutable.Set();
@@ -170,7 +171,7 @@ export default function(allNeedsInState = initialState, action = {}) {
       return allNeedsInState.delete(action.payload.ownNeedUri);
 
     case actionTypes.personas.create: {
-      //TODO: Please let us use the addNeed method as a single entry point to add Needs(even Personas) to the State
+      //FIXME: Please let us use the addNeed method as a single entry point to add Needs(even Personas) to the State
       return allNeedsInState.set(
         action.payload.needUri,
         Immutable.fromJS({
@@ -236,12 +237,30 @@ export default function(allNeedsInState = initialState, action = {}) {
       );
       return changedState;
     }
-    case actionTypes.messages.hintMessageReceived:
-      return storeConnectionAndRelatedData(
-        allNeedsInState,
-        action.payload,
-        true
-      );
+
+    case actionTypes.messages.hintMessageReceived: {
+      const {
+        ownedNeed,
+        remoteNeed,
+        connection,
+        ownPersona,
+        remotePersona,
+      } = action.payload;
+      // guarantee that ownedNeed is in state:
+      allNeedsInState = addNeed(allNeedsInState, ownedNeed, true);
+
+      // guarantee that  remoteNeed  is  in  state:
+      allNeedsInState = addNeed(allNeedsInState, remoteNeed, false);
+
+      allNeedsInState = remotePersona
+        ? addNeed(allNeedsInState, remotePersona, false)
+        : allNeedsInState;
+      allNeedsInState = ownPersona
+        ? addNeed(allNeedsInState, ownPersona, true)
+        : allNeedsInState;
+
+      return addConnectionFull(allNeedsInState, connection);
+    }
 
     // NEW CONNECTIONS STATE UPDATES
     case actionTypes.connections.close:
@@ -406,43 +425,7 @@ export default function(allNeedsInState = initialState, action = {}) {
         won.WON.RequestReceived
       );
 
-    case actionTypes.messages.open.successRemote: {
-      // use the remote success message to obtain the remote connection
-      // uri (which we may not have known)
-      const wonMessage = action.payload;
-      const connectionUri = wonMessage.getReceiver();
-      const needUri = wonMessage.getReceiverNeed();
-      const remoteConnectionUri = wonMessage.getSender();
-
-      if (allNeedsInState.getIn([needUri, "connections", connectionUri])) {
-        const eventUri = wonMessage.getIsRemoteResponseTo();
-        // we want to use the response date to update the original message
-        // date
-        allNeedsInState = allNeedsInState.setIn(
-          [
-            needUri,
-            "connections",
-            connectionUri,
-            "messages",
-            eventUri,
-            "isReceivedByRemote",
-          ],
-          true
-        );
-
-        return allNeedsInState.setIn(
-          [needUri, "connections", connectionUri, "remoteConnectionUri"],
-          remoteConnectionUri
-        );
-      } else {
-        console.warn(
-          "Open success for a connection that is not stored in the state yet, connUri: ",
-          connectionUri
-        );
-        return allNeedsInState;
-      }
-    }
-
+    case actionTypes.messages.open.successRemote:
     case actionTypes.messages.connect.successRemote: {
       // use the remote success message to obtain the remote connection
       // uri (which we may not have known)
@@ -473,7 +456,7 @@ export default function(allNeedsInState = initialState, action = {}) {
         );
       } else {
         console.warn(
-          "Connect success for a connection that is not stored in the state yet, connUri: ",
+          "Open/Connect success for a connection that is not stored in the state yet, connUri: ",
           connectionUri
         );
         return allNeedsInState;
@@ -876,24 +859,4 @@ export default function(allNeedsInState = initialState, action = {}) {
     default:
       return allNeedsInState;
   }
-}
-
-function storeConnectionAndRelatedData(state, connectionWithRelatedData) {
-  const {
-    ownedNeed,
-    remoteNeed,
-    connection,
-    ownPersona,
-    remotePersona,
-  } = connectionWithRelatedData;
-  // guarantee that ownedNeed is in state:
-  state = addNeed(state, ownedNeed, true);
-
-  // guarantee that  remoteNeed  is  in  state:
-  state = addNeed(state, remoteNeed, false);
-
-  state = remotePersona ? addNeed(state, remotePersona, false) : state;
-  state = ownPersona ? addNeed(state, ownPersona, true) : state;
-
-  return addConnectionFull(state, connection);
 }
