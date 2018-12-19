@@ -65,7 +65,7 @@ function genComponentConf() {
             !post ||
             getIn(state, ["process", "needs", post.get("uri"), "loading"]),
           postFailedToLoad:
-            post ||
+            post &&
             getIn(state, ["process", "needs", post.get("uri"), "failedToLoad"]),
           createdTimestamp: post && post.get("creationDate"),
         };
