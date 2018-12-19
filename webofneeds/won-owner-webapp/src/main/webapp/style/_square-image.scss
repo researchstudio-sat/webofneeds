@@ -5,6 +5,7 @@
     display: block;
     user-select: none;
     margin: $margin;
+    position: relative;
 
     &.inactive {
       -webkit-filter: grayscale(100%);
@@ -19,22 +20,31 @@
       display: flex;
       align-items: center;
       justify-content: center;
-
-      &__noimage {
-        color: white;
-      }
     }
 
-    &.bigger .image {
-      @include fixed-square(1.2 * $size);
-      &__noimage {
-        font-size: 1.2 * $size - 0.5rem;
+    & .personaImage {
+      border-radius: 100%;
+      position: absolute;
+    }
+
+    &.bigger {
+      & .image {
+        @include fixed-square(1.2 * $size);
+      }
+      & .personaImage {
+        @include fixed-square((1.2 * $size)/2);
+        right: (1.2 * $size)/7 * -1;
+        bottom: (1.2 * $size)/7 * -1;
       }
     }
-    &:not(.bigger) .image {
-      @include fixed-square($size);
-      &__noimage {
-        font-size: $size - 0.5rem;
+    &:not(.bigger) {
+      .image {
+        @include fixed-square($size);
+      }
+      & .personaImage {
+        @include fixed-square($size/2);
+        right: $size/7 * -1;
+        bottom: $size/7 * -1;
       }
     }
   }

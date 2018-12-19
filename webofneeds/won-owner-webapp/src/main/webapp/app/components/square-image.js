@@ -21,6 +21,10 @@ function genComponentConf() {
       ng-if="!self.src && self.identiconSvg" 
       alt="Auto-generated title image for {{self.title}}"
       ng-src="data:image/svg+xml;base64,{{self.identiconSvg}}">
+    <!--img class="personaImage"
+      ng-if="self.personaIdenticonSvg"
+      alt="Auto-generated title image for persona that holds the need"
+      ng-src="data:image/svg+xml;base64,{{self.personaIdenticonSvg}}"-->
   `;
 
   class Controller {
@@ -28,32 +32,21 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
 
       const selectFromState = state => {
-        let identiconSvg;
-
-        if (this.uri) {
-          // quick extra hash here as identicon.js only uses first 15
-          // chars (which aren't very unique for our uris due to the base-url):
-          const hash = new shajs.sha512().update(this.uri).digest("hex");
-          const rgbColorArray = generateRgbColorArray(hash);
-          const idc = new Identicon(hash, {
-            size: 100,
-            foreground: [255, 255, 255, 255], // rgba white
-            background: [...rgbColorArray, 255], // rgba
-            margin: 0.2,
-            format: "svg",
-          });
-          identiconSvg = idc.toString();
-        }
+        const identiconSvg = this.parseIdenticon(this.uri);
 
         const need = getIn(state, ["needs", this.uri]);
+        const personaUri = get(need, "heldBy");
+
+        const personaIdenticonSvg = this.parseIdenticon(personaUri);
 
         return {
           needInactive:
             need && get(need, "state") === won.WON.InactiveCompacted,
           needFailedToLoad:
             need &&
-            getIn(state, ["process", "needs", this.uri, "failedToLoad"]),
+            getIn(state, ["process", "needs", need.get("uri"), "failedToLoad"]),
           identiconSvg,
+          personaIdenticonSvg,
         };
       };
 
@@ -73,8 +66,10 @@ function genComponentConf() {
       );
     }
 
-    updateIdenticon(input) {
-      if (!input) return;
+    parseIdenticon(input) {
+      if (!input) {
+        return;
+      }
       // quick extra hash here as identicon.js only uses first 15
       // chars (which aren't very unique for our uris due to the base-url):
       const hash = new shajs.sha512().update(input).digest("hex");
