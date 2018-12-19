@@ -202,14 +202,11 @@ export default function(allNeedsInState = initialState, action = {}) {
       const ownedNeedFromState = allNeedsInState.get(
         action.payload.ownedNeedUri
       );
-      const remoteNeed = action.payload.remoteNeed;
 
       if (!ownedNeedFromState) {
         throw new Error("Open or connect received for non owned hint!");
       }
 
-      //guarantee that remoteNeed is in state
-      allNeedsInState = addNeed(allNeedsInState, remoteNeed, false);
       allNeedsInState = addConnectionFull(
         allNeedsInState,
         action.payload.connection
@@ -220,7 +217,7 @@ export default function(allNeedsInState = initialState, action = {}) {
       }
       allNeedsInState = changeConnectionStateByFun(
         allNeedsInState,
-        action.payload.updatedConnection,
+        action.payload.updatedConnectionUri,
         state => {
           if (!state) return won.WON.RequestReceived; //fallback if no state present
           if (state == won.WON.RequestSent) return won.WON.Connected;
@@ -264,31 +261,6 @@ export default function(allNeedsInState = initialState, action = {}) {
         won.WON.Closed
       );
 
-    case actionTypes.messages.connectMessageSent: {
-      // received a message saying we sent a connect request
-      const senderConnectionUri = action.payload.senderConnectionUri;
-      let stateUpdated;
-
-      if (senderConnectionUri) {
-        stateUpdated = addConnectionFull(
-          allNeedsInState,
-          action.payload.connection
-        );
-        stateUpdated = changeConnectionState(
-          allNeedsInState,
-          senderConnectionUri,
-          won.WON.RequestSent
-        );
-        return addMessage(stateUpdated, action.payload.event);
-      } else {
-        console.warn(
-          "actionTypes.messages.connectMessageSent: senderConnectionUri was undefined for payload: ",
-          action.payload,
-          " -> return unchangedState"
-        );
-      }
-      return allNeedsInState;
-    }
     case actionTypes.needs.connect: {
       // user has sent a connect request
       const optimisticEvent = action.payload.optimisticEvent;
@@ -365,6 +337,31 @@ export default function(allNeedsInState = initialState, action = {}) {
           optimisticConnection
         );
       }
+    }
+    case actionTypes.messages.connectMessageSent: {
+      // received a message saying we sent a connect request
+      const senderConnectionUri = action.payload.senderConnectionUri;
+      let stateUpdated;
+
+      if (senderConnectionUri) {
+        stateUpdated = addConnectionFull(
+          allNeedsInState,
+          action.payload.connection
+        );
+        stateUpdated = changeConnectionState(
+          allNeedsInState,
+          senderConnectionUri,
+          won.WON.RequestSent
+        );
+        return addMessage(stateUpdated, action.payload.event);
+      } else {
+        console.warn(
+          "actionTypes.messages.connectMessageSent: senderConnectionUri was undefined for payload: ",
+          action.payload,
+          " -> return unchangedState"
+        );
+      }
+      return allNeedsInState;
     }
 
     case actionTypes.messages.openMessageSent: {
