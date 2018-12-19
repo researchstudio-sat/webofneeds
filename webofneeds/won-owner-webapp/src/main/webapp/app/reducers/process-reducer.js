@@ -306,15 +306,6 @@ export default function(processState = initialState, action = {}) {
         return processState;
       }
 
-      const remoteNeedUri =
-        action.payload.remoteNeed &&
-        get(parseNeed(action.payload.remoteNeed), "uri");
-
-      processState = updateNeedProcess(processState, remoteNeedUri, {
-        toLoad: false,
-        failedToLoad: false,
-        loading: false,
-      });
       return updateConnectionProcess(processState, connUri, { loading: false });
     }
 
