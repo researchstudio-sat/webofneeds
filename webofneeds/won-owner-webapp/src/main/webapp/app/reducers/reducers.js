@@ -105,9 +105,6 @@ export default reduceReducers(
       case actionTypes.connections.storeActive:
       case actionTypes.account.loginFinished:
       case actionTypes.initialLoadFinished:
-      case actionTypes.messages.connectMessageSent:
-      case actionTypes.messages.connectMessageReceived:
-      case actionTypes.messages.hintMessageReceived:
         return deleteChatConnectionsBetweenOwnedNeeds(state);
 
       default:
