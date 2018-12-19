@@ -102,6 +102,7 @@ export default reduceReducers(
        * that both are owned by the user, remain
        * in the state.
        */
+      case actionTypes.connections.storeActive:
       case actionTypes.account.loginFinished:
       case actionTypes.initialLoadFinished:
       case actionTypes.messages.connectMessageSent:
