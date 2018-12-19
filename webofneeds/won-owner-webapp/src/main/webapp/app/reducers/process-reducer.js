@@ -285,30 +285,6 @@ export default function(processState = initialState, action = {}) {
       return processState;
     }
 
-    case actionTypes.messages.connectMessageSent:
-    case actionTypes.messages.openMessageSent: {
-      const connUri = getIn(parseConnection(action.payload.connection), [
-        "data",
-        "uri",
-      ]);
-
-      return updateConnectionProcess(processState, connUri, { loading: false });
-    }
-
-    case actionTypes.messages.openMessageReceived:
-    case actionTypes.messages.connectMessageReceived: {
-      //FIXME: This does not include the remotePersona yet (receiving connect or open requests from a non known remoteNeed will not load the personas for now
-      const connUri = getIn(parseConnection(action.payload.connection), [
-        "data",
-        "uri",
-      ]);
-      if (!connUri) {
-        return processState;
-      }
-
-      return updateConnectionProcess(processState, connUri, { loading: false });
-    }
-
     case actionTypes.messages.hintMessageReceived: {
       const {
         ownedNeed,
