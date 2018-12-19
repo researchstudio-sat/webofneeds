@@ -767,7 +767,7 @@ function fetchOwnedNeedAndDispatch(needUri, dispatch) {
     });
 }
 
-function fetchActiveConnectionAndDispatch(cnctUri, dispatch) {
+export function fetchActiveConnectionAndDispatch(cnctUri, dispatch) {
   return won
     .getNode(cnctUri)
     .then(connection => {
@@ -786,7 +786,7 @@ function fetchActiveConnectionAndDispatch(cnctUri, dispatch) {
     });
 }
 
-function fetchTheirNeedAndDispatch(needUri, dispatch) {
+export function fetchTheirNeedAndDispatch(needUri, dispatch) {
   return won
     .getNeed(needUri)
     .then(need => {
