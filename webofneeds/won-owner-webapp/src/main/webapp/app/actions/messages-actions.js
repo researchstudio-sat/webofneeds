@@ -4,7 +4,7 @@
 
 import won from "../won-es6.js";
 import { actionTypes, actionCreators } from "./actions.js";
-import { entries } from "../utils.js";
+import { entries, get, getIn } from "../utils.js";
 
 import Immutable from "immutable";
 import { getOwnMessageUri } from "../message-utils.js";
@@ -15,6 +15,8 @@ import {
   fetchPetriNetUris,
   isFetchMessageEffectsNeeded,
   buildChatMessage,
+  fetchTheirNeedAndDispatch,
+  fetchActiveConnectionAndDispatch,
 } from "../won-message-utils.js";
 
 export function successfulCloseNeed(event) {
@@ -142,101 +144,108 @@ export function successfulCreate(event) {
 
 export function processOpenMessage(event) {
   return (dispatch, getState) => {
-    const receiverConnectionUri = event.getReceiver();
     const receiverNeedUri = event.getReceiverNeed();
+    const receiverConnectionUri = event.getReceiver();
 
     const senderNeedUri = event.getSenderNeed();
     const senderConnectionUri = event.getSender();
 
     const currentState = getState();
-    const senderNeed = currentState.getIn(["needs", senderNeedUri]);
-    const receiverNeed = currentState.getIn(["needs", receiverNeedUri]);
-    const isOwnSenderNeed = senderNeed && senderNeed.get("isOwned");
-    const isOwnReceiverNeed = receiverNeed && receiverNeed.get("isOwned");
+    const senderNeed = getIn(currentState, ["needs", senderNeedUri]);
+    const receiverNeed = getIn(currentState, ["needs", receiverNeedUri]);
+
+    const isOwnSenderNeed = get(senderNeed, "isOwned");
+    const isOwnReceiverNeed = get(receiverNeed, "isOwned");
+
+    //check if the two connections are relevant to be stored within the state (if connUri is present, and if Need belongs to self)
+    const isSenderConnectionRelevant = senderConnectionUri && isOwnSenderNeed;
+    const isReceiverConnectionRelevant =
+      receiverConnectionUri && isOwnReceiverNeed;
+
+    let senderNeedP;
+    if (isOwnSenderNeed) {
+      //We know that all own needs are already stored within the state, so we do not have to retrieve it
+      senderNeedP = Promise.resolve(won.invalidateCacheForNeed(senderNeedUri));
+    } else {
+      senderNeedP = fetchTheirNeedAndDispatch(senderNeedUri, dispatch);
+    }
+
+    let receiverNeedP;
+    if (isOwnReceiverNeed) {
+      //We know that all own needs are already stored within the state, so we do not have to retrieve it
+      receiverNeedP = Promise.resolve(
+        won.invalidateCacheForNeed(receiverNeedUri)
+      );
+    } else {
+      receiverNeedP = fetchTheirNeedAndDispatch(receiverNeedUri, dispatch);
+    }
 
     let senderConnectionP;
-    if (!senderConnectionUri || !isOwnSenderNeed) {
+    if (!isSenderConnectionRelevant) {
       console.debug(
-        "senderConnectionUri was null or senderNeed is not ownedNeed, resolve promise with undefined -> ignore the connection"
+        "senderConnection not relevant, resolve promise with undefined -> ignore the connection"
       );
-      senderConnectionP = Promise.resolve(undefined);
-    } else if (
-      senderNeed &&
-      senderNeed.getIn(["connections", senderConnectionUri])
-    ) {
-      // already in state. invalidate the version in the rdf-store.
-      senderConnectionP = Promise.resolve(
-        senderNeed.getIn(["connections", senderConnectionUri])
-      );
-      won.invalidateCacheForNewConnection(senderConnectionUri, senderNeedUri);
-    } else {
-      // need to fetch
+      senderConnectionP = Promise.resolve(false);
+    } else if (getIn(senderNeed, ["connections", senderConnectionUri])) {
       senderConnectionP = won
-        .getConnectionWithEventUris(senderConnectionUri, {
-          requesterWebId: senderNeedUri,
-        })
-        .then(cnct => Immutable.fromJS(cnct));
+        .invalidateCacheForNewConnection(senderConnectionUri, senderNeedUri)
+        .then(() => true);
+    } else {
+      senderConnectionP = fetchActiveConnectionAndDispatch(
+        senderConnectionUri,
+        dispatch
+      ).then(() => true);
     }
 
     let receiverConnectionP;
-    if (!receiverConnectionUri || !isOwnReceiverNeed) {
+    if (!isReceiverConnectionRelevant) {
       console.debug(
-        "receiverConnectionUri was null or receiverNeed is not ownedNeed, resolve promise with undefined -> ignore the connection"
+        "receiverConnection not relevant, resolve promise with undefined -> ignore the connection"
       );
-      receiverConnectionP = Promise.resolve(undefined);
-    } else if (
-      receiverNeed &&
-      receiverNeed.getIn(["connections", receiverConnectionUri])
-    ) {
-      // already in state. invalidate the version in the rdf-store.
-      receiverConnectionP = Promise.resolve(
-        receiverNeed.getIn(["connections", receiverConnectionUri])
-      );
-      won.invalidateCacheForNewConnection(
-        receiverConnectionUri,
-        receiverNeedUri
-      );
-    } else {
-      // need to fetch
+      receiverConnectionP = Promise.resolve(true);
+    } else if (getIn(receiverNeed, ["connections", receiverConnectionUri])) {
       receiverConnectionP = won
-        .getConnectionWithEventUris(receiverConnectionUri, {
-          requesterWebId: receiverNeedUri,
-        })
-        .then(cnct => Immutable.fromJS(cnct));
+        .invalidateCacheForNewConnection(receiverConnectionUri, receiverNeedUri)
+        .then(() => true);
+    } else {
+      receiverConnectionP = fetchActiveConnectionAndDispatch(
+        receiverConnectionUri,
+        dispatch
+      ).then(() => true);
     }
 
     Promise.all([
       senderConnectionP,
       receiverConnectionP,
-      won.getNeed(senderNeedUri), //TODO: PROMISE IF LOADED (WE MIGHT HAVE IT IN THE STATE ALREADY)
-      won.getNeed(receiverNeedUri), //TODO: PROMISE IF LOADED (WE MIGHT HAVE IT IN THE STATE ALREADY)
+      senderNeedP,
+      receiverNeedP,
     ]).then(
-      ([senderConnection, receiverConnection, senderNeed, receiverNeed]) => {
-        if (receiverConnection) {
+      ([
+        senderConnectionRelevant,
+        receiverConnectionRelevant,
+        senderNeed,
+        receiverNeed,
+      ]) => {
+        if (receiverConnectionRelevant) {
+          console.debug("Change ReceiverConnectionState ", receiverNeed);
           dispatch({
             type: actionTypes.messages.openMessageReceived,
             payload: {
-              updatedConnection: receiverConnectionUri,
-              connection: receiverConnection,
+              updatedConnectionUri: receiverConnectionUri,
               ownedNeedUri: receiverNeedUri,
-              ownedNeed: receiverNeed,
-              remoteNeed: senderNeed,
-              receivedEvent: event.getMessageUri(), // the more relevant event. used for unread-counter.
               message: event,
             },
           });
         }
 
-        if (senderConnection) {
+        if (senderConnectionRelevant) {
+          console.debug("Change SenderConnectionState ", senderNeed);
           dispatch({
             type: actionTypes.messages.openMessageSent,
             payload: {
               senderConnectionUri: senderConnectionUri,
               senderNeedUri: senderNeedUri,
-              receiverNeedUri: receiverNeedUri,
-              eventUri: event.getMessageUri(),
               event: event,
-              connection: senderConnection,
             },
           });
         }
@@ -244,6 +253,7 @@ export function processOpenMessage(event) {
     );
   };
 }
+
 export function processAgreementMessage(event) {
   return dispatch => {
     dispatch({
@@ -507,28 +517,43 @@ export function processConnectMessage(event) {
     const isOwnSenderNeed = senderNeed && senderNeed.get("isOwned");
     const isOwnReceiverNeed = receiverNeed && receiverNeed.get("isOwned");
 
+    let senderNeedP;
+    if (isOwnSenderNeed) {
+      //We know that all own needs are already stored within the state, so we do not have to retrieve it
+      senderNeedP = Promise.resolve(won.invalidateCacheForNeed(senderNeedUri));
+    } else {
+      senderNeedP = fetchTheirNeedAndDispatch(senderNeedUri, dispatch);
+    }
+
+    let receiverNeedP;
+    if (isOwnReceiverNeed) {
+      //We know that all own needs are already stored within the state, so we do not have to retrieve it
+      receiverNeedP = Promise.resolve(
+        won.invalidateCacheForNeed(receiverNeedUri)
+      );
+    } else {
+      receiverNeedP = fetchTheirNeedAndDispatch(receiverNeedUri, dispatch);
+    }
+
     let senderCP;
     if (!senderConnectionUri || !isOwnSenderNeed) {
       console.debug(
         "senderConnectionUri was null or senderNeed is not ownedNeed, resolve promise with undefined -> ignore the connection"
       );
-      senderCP = Promise.resolve(undefined);
+      senderCP = Promise.resolve(false);
     } else if (
       senderNeed &&
       senderNeed.getIn(["connections", senderConnectionUri])
     ) {
       // already in state. invalidate the version in the rdf-store.
       senderCP = Promise.resolve(
-        senderNeed.getIn(["connections", senderConnectionUri])
-      );
-      won.invalidateCacheForNewConnection(senderConnectionUri, senderNeedUri);
+        won.invalidateCacheForNewConnection(senderConnectionUri, senderNeedUri)
+      ).then(() => true);
     } else {
-      // need to fetch
-      senderCP = won
-        .getConnectionWithEventUris(senderConnectionUri, {
-          requesterWebId: senderNeedUri,
-        })
-        .then(cnct => Immutable.fromJS(cnct));
+      senderCP = fetchActiveConnectionAndDispatch(
+        senderConnectionUri,
+        dispatch
+      ).then(() => true);
     }
 
     let receiverCP;
@@ -536,68 +561,50 @@ export function processConnectMessage(event) {
       console.debug(
         "receiverConnectionUri was null or receiverNeed is not ownedNeed, resolve promise with undefined -> ignore the connection"
       );
-      receiverCP = Promise.resolve(undefined);
+      receiverCP = Promise.resolve(false);
     } else if (
       receiverNeed &&
       receiverNeed.getIn(["connections", receiverConnectionUri])
     ) {
       // already in state. invalidate the version in the rdf-store.
-      receiverCP = Promise.resolve(
-        receiverNeed.getIn(["connections", receiverConnectionUri])
-      );
-      won.invalidateCacheForNewConnection(
-        receiverConnectionUri,
-        receiverNeedUri
-      );
-    } else {
-      // need to fetch
       receiverCP = won
-        .getConnectionWithEventUris(receiverConnectionUri, {
-          requesterWebId: receiverNeedUri,
-        })
-        .then(cnct => Immutable.fromJS(cnct));
+        .invalidateCacheForNewConnection(receiverConnectionUri, receiverNeedUri)
+        .then(() => true);
+    } else {
+      receiverCP = fetchActiveConnectionAndDispatch(
+        receiverConnectionUri,
+        dispatch
+      ).then(() => true);
     }
 
-    //TODO: A CONNECT MESSAGE TO/FROM A NEED THAT IS NOT KNOWN BUT CONTAINS A PERSONA WILL RESULT IN THE PERSONA BEING NOT VISIBLE
     //we have to retrieve the personas too
-    Promise.all([
-      senderCP,
-      receiverCP,
-      won.getNeed(senderNeedUri), //TODO: PROMISE IF LOADED (WE MIGHT HAVE IT IN THE STATE ALREADY) ALSO WHAT ABOUT PERSONA RETRIEVAL
-      won.getNeed(receiverNeedUri), //TODO: PROMISE IF LOADED (WE MIGHT HAVE IT IN THE STATE ALREADY) ALSO WHAT ABOUT PERSONA RETRIEVAL
-    ]).then(
-      ([senderConnection, receiverConnection, senderNeed, receiverNeed]) => {
-        if (receiverConnection) {
+    Promise.all([senderCP, receiverCP, senderNeedP, receiverNeedP]).then(
+      ([
+        senderConnectionRelevant,
+        receiverConnectionRelevant,
+        senderNeed,
+        receiverNeed,
+      ]) => {
+        if (receiverConnectionRelevant) {
+          console.debug("Change ReceiverConnectionState ", receiverNeed);
           dispatch({
             type: actionTypes.messages.connectMessageReceived,
             payload: {
-              updatedConnection: receiverConnectionUri,
-              connection: receiverConnection.set(
-                "hasConnectionState",
-                won.WON.RequestReceived
-              ),
+              updatedConnectionUri: receiverConnectionUri,
               ownedNeedUri: receiverNeedUri,
-              ownedNeed: receiverNeed,
-              remoteNeed: senderNeed,
-              receivedEvent: event.getMessageUri(), // the more relevant event. used for unread-counter.
               message: event,
             },
           });
         }
 
-        if (senderConnection) {
+        if (senderConnectionRelevant) {
+          console.debug("Change SenderConnectionState ", senderNeed);
           dispatch({
             type: actionTypes.messages.connectMessageSent,
             payload: {
               senderConnectionUri: senderConnectionUri,
               senderNeedUri: senderNeedUri,
-              receiverNeedUri: receiverNeedUri,
-              eventUri: event.getMessageUri(),
               event: event,
-              connection: senderConnection.set(
-                "hasConnectionState",
-                won.WON.RequestSent
-              ),
             },
           });
         }
@@ -861,8 +868,6 @@ export function processHintMessage(event) {
             event.getMatchCounterpart(),
             event.getReceiver()
           ).then(data => {
-            data.receivedEvent = event.getMessageUri();
-            data.updatedConnection = event.getReceiver();
             dispatch({
               type: actionTypes.messages.hintMessageReceived,
               payload: data,
