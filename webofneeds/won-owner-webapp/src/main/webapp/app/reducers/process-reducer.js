@@ -407,6 +407,17 @@ export default function(processState = initialState, action = {}) {
       return processState;
     }
 
+    case actionTypes.needs.storeOwnedActiveUris: {
+      const needUris = action.payload.get("uris");
+      needUris &&
+        needUris.forEach(needUri => {
+          processState = updateNeedProcess(processState, needUri, {
+            loading: true, //FIXME: once we dont actually retrieve the needs right after this dispatch we need to set "toLoad" instead of loading
+          });
+        });
+      return processState;
+    }
+
     case actionTypes.needs.storeOwnedInactiveUris: {
       const needUris = action.payload.get("uris");
       needUris &&
