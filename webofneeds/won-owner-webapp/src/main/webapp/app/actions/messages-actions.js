@@ -835,6 +835,7 @@ export function needMessageReceived(event) {
 }
 
 export function processHintMessage(event) {
+  //TODO: PROCESS HINT MESSAGE IN A SIMILAR WAY AS processConnectMessage and processOpenMessage (BUG: hints currently are removing the persona of an already loaded need in the state)
   return (dispatch, getState) => {
     //first check if we really have the 'own' need in the state - otherwise we'll ignore the hint
     if (!getState().getIn(["needs", event.getReceiverNeed()])) {
