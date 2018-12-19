@@ -198,7 +198,6 @@ export default function(allNeedsInState = initialState, action = {}) {
 
     case actionTypes.messages.openMessageReceived:
     case actionTypes.messages.connectMessageReceived: {
-      //FIXME: This does not include the remotePersona yet (receiving connect or open requests from a non known remoteNeed will not load the personas for now
       const ownedNeedFromState = allNeedsInState.get(
         action.payload.ownedNeedUri
       );
@@ -206,11 +205,6 @@ export default function(allNeedsInState = initialState, action = {}) {
       if (!ownedNeedFromState) {
         throw new Error("Open or connect received for non owned hint!");
       }
-
-      allNeedsInState = addConnectionFull(
-        allNeedsInState,
-        action.payload.connection
-      );
 
       if (action.payload.message) {
         allNeedsInState = addMessage(allNeedsInState, action.payload.message);
@@ -344,10 +338,6 @@ export default function(allNeedsInState = initialState, action = {}) {
       let stateUpdated;
 
       if (senderConnectionUri) {
-        stateUpdated = addConnectionFull(
-          allNeedsInState,
-          action.payload.connection
-        );
         stateUpdated = changeConnectionState(
           allNeedsInState,
           senderConnectionUri,
@@ -382,8 +372,6 @@ export default function(allNeedsInState = initialState, action = {}) {
           );
           //because we have a connection uri, we can add the message
           return addMessage(stateUpdated, action.payload.event);
-        } else {
-          return addConnectionFull(allNeedsInState, action.payload.connection);
         }
       } else {
         console.warn(
