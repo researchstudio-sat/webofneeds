@@ -9,7 +9,7 @@ import { labels } from "../won-label-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { getPosts, getOwnedPosts } from "../selectors/general-selectors.js";
 import { getChatConnectionsByNeedUri } from "../selectors/connection-selectors.js";
-
+import { isChatConnection } from "../connection-utils.js";
 import { attach, sortByDate, getIn } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 
@@ -145,11 +145,15 @@ function genComponentConf() {
             const remoteNeedActive =
               allPosts &&
               allPosts.get(remoteNeedUri) &&
-              (getIn(["process", "needs", remoteNeedUri, "loading"]) ||
+              (getIn(state, ["process", "needs", remoteNeedUri, "loading"]) ||
                 allPosts.getIn([remoteNeedUri, "state"]) ===
                   won.WON.ActiveCompacted);
 
-            return remoteNeedActive && conn.get("state") === won.WON.Suggested;
+            return (
+              remoteNeedActive &&
+              conn.get("state") === won.WON.Suggested &&
+              isChatConnection(conn)
+            );
           });
         const connected =
           chatConnectionsByNeedUri &&
@@ -158,14 +162,16 @@ function genComponentConf() {
             const remoteNeedActiveOrLoading =
               allPosts &&
               allPosts.get(remoteNeedUri) &&
-              (getIn(["process", "needs", remoteNeedUri, "loading"]) ||
+              (getIn(state, ["process", "needs", remoteNeedUri, "loading"]) ||
                 allPosts.getIn([remoteNeedUri, "state"]) ===
                   won.WON.ActiveCompacted);
 
             return (
               remoteNeedActiveOrLoading &&
+              !!conn.get("state") &&
               conn.get("state") !== won.WON.Suggested &&
-              conn.get("state") !== won.WON.Closed
+              conn.get("state") !== won.WON.Closed &&
+              isChatConnection(conn)
             );
           });
 

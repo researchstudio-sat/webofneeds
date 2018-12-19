@@ -13,6 +13,7 @@ import { getChatConnectionsByNeedUri } from "../selectors/connection-selectors.j
 import { attach, sortByDate, getIn } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
+import { isChatConnection } from "../connection-utils.js";
 
 import "style/_connection-indicators.scss";
 
@@ -113,12 +114,13 @@ function genComponentConf() {
               remoteNeedUri &&
               allPosts &&
               allPosts.get(remoteNeedUri) &&
-              (getIn(["process", "needs", remoteNeedUri, "loading"]) ||
+              (getIn(state, ["process", "needs", remoteNeedUri, "loading"]) ||
                 allPosts.getIn([remoteNeedUri, "state"]) ===
                   won.WON.ActiveCompacted);
 
             return (
               remoteNeedActiveOrLoading &&
+              isChatConnection(conn) &&
               conn.get("state") === won.WON.Suggested
             );
           });
@@ -130,12 +132,13 @@ function genComponentConf() {
               remoteNeedUri &&
               allPosts &&
               allPosts.get(remoteNeedUri) &&
-              (getIn(["process", "needs", remoteNeedUri, "loading"]) ||
+              (getIn(state, ["process", "needs", remoteNeedUri, "loading"]) ||
                 allPosts.getIn([remoteNeedUri, "state"]) ===
                   won.WON.ActiveCompacted);
 
             return (
               remoteNeedActiveOrLoading &&
+              isChatConnection(conn) &&
               conn.get("state") !== won.WON.Suggested &&
               conn.get("state") !== won.WON.Closed
             );
