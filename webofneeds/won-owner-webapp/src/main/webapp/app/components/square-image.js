@@ -21,10 +21,10 @@ function genComponentConf() {
       ng-if="!self.src && self.identiconSvg" 
       alt="Auto-generated title image for {{self.title}}"
       ng-src="data:image/svg+xml;base64,{{self.identiconSvg}}">
-    <!--img class="personaImage"
+    <img class="personaImage"
       ng-if="self.personaIdenticonSvg"
       alt="Auto-generated title image for persona that holds the need"
-      ng-src="data:image/svg+xml;base64,{{self.personaIdenticonSvg}}"-->
+      ng-src="data:image/svg+xml;base64,{{self.personaIdenticonSvg}}">
   `;
 
   class Controller {
