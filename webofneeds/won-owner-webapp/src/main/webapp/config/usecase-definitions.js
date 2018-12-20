@@ -1,3 +1,5 @@
+import won from "../app/service/won.js";
+
 import { details, emptyDraft } from "./detail-definitions.js";
 
 import { realEstateGroup } from "./usecases/real-estate.js";
@@ -65,6 +67,19 @@ const allDetailsUseCase = {
   },
 };
 
+const groupChatUsecase = {
+  groupChat: {
+    identifier: "groupChat",
+    label: "New Groupchat Post",
+    draft: {
+      ...emptyDraft,
+      facet: { "@id": "#groupFacet", "@type": won.WON.GroupFacet },
+    },
+    details: details,
+    seeksDetails: details,
+  },
+};
+
 export const useCaseGroups = {
   complain: complainGroup,
   transport: transportGroup,
@@ -78,7 +93,7 @@ export const useCaseGroups = {
     identifier: "othergroup",
     label: "Something Else",
     icon: undefined,
-    useCases: { ...allDetailsUseCase },
+    useCases: { ...allDetailsUseCase, ...groupChatUsecase },
   },
 };
 

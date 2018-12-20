@@ -13,6 +13,7 @@ export function isChatConnection(conn) {
   return (
     conn &&
     conn.get("facet") &&
-    conn.get("facet") === won.WON.ChatFacetCompacted
+    (conn.get("facet") === won.WON.ChatFacetCompacted ||
+      conn.get("facet") === won.WON.GroupFacetCompacted)
   );
 }

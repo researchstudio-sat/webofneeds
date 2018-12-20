@@ -504,6 +504,7 @@ export async function buildCreateMessage(needData, wonNodeUri) {
     matchingContext: needData.matchingContext
       ? needData.matchingContext
       : undefined,
+    facet: needData.facet,
   });
 
   const msgUri = wonNodeUri + "/event/" + getRandomWonId(); //mandatory
