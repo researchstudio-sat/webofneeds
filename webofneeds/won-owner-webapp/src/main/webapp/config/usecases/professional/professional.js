@@ -4,8 +4,8 @@
 import { details, emptyDraft } from "../../detail-definitions.js";
 import { interestsDetail, skillsDetail } from "../../details/person.js";
 import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../../app/won-utils.js";
-import { jobSearch } from "./job-search.js";
-import { jobOffer } from "./job-offer.js";
+import { jobSearch } from "../uc-job-search";
+import { jobOffer } from "../uc-job-offer";
 
 export const professionalGroup = {
   identifier: "professionalgroup",
