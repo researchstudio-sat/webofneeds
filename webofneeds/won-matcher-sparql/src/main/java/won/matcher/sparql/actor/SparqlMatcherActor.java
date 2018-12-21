@@ -428,7 +428,7 @@ public class SparqlMatcherActor extends UntypedActor {
             
             //make sure we order by score, if present, and we limit the results
             if (compiledQuery.getProjectVars().contains(scoreName)) {
-                compiledQuery.addOrderBy(resultName, Query.ORDER_DESCENDING);
+                compiledQuery.addOrderBy(scoreName, Query.ORDER_DESCENDING);
             }
             if (!compiledQuery.hasLimit() || compiledQuery.getLimit() > config.getLimitResults() * 5) {
                 compiledQuery.setLimit(config.getLimitResults() * 5);
