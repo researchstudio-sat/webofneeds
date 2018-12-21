@@ -1,11 +1,11 @@
-import { realEstateGroup } from "./usecases/real-estate.js";
-import { transportGroup } from "./usecases/transport.js";
-import { complainGroup } from "./usecases/complain.js";
-import { socialGroup } from "./usecases/social.js";
-import { professionalGroup } from "./usecases/professional";
-import { mobilityGroup } from "./usecases/mobility.js";
-import { musicianGroup } from "./usecases/musician.js";
-import { classifiedsGroup } from "./usecases/classifieds.js";
+import { realEstateGroup } from "./usecases/group-real-estate";
+import { transportGroup } from "./usecases/group-transport";
+import { complainGroup } from "./usecases/group-work";
+import { socialGroup } from "./usecases/group-social";
+import { professionalGroup } from "./usecases/group-academic";
+import { mobilityGroup } from "./usecases/group-personal-mobility";
+import { musicianGroup } from "./usecases/group-artists";
+import { classifiedsGroup } from "./usecases/group-classifieds";
 import { custom } from "./usecases/uc-custom.js";
 
 /**
