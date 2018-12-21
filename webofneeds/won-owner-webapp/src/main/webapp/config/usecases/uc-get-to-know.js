@@ -7,7 +7,7 @@ import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-u
 
 export const professionalGroup = {
   identifier: "getToKnow",
-  label: "Find people",
+  label: "Meet people",
   icon: "#ico36_uc_find_people",
   doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
