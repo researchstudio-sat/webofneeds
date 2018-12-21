@@ -380,7 +380,7 @@ function genComponentConf() {
 
       connect2Redux(selectFromState, actionCreators, [], this);
 
-      this.snapToBottom();
+      this._snapBottom = true; //Don't snap to bottom immediately, because this scrolls the whole page... somehow?
 
       this.$scope.$watchGroup(["self.connection"], () => {
         this.ensureMessagesAreLoaded();
