@@ -1,9 +1,7 @@
 /**
  * Created by fsuda on 18.09.2018.
  */
-import { jobSearch } from "./uc-job-search";
-import { jobOffer } from "./uc-job-offer";
-import { getToKnow } from "./uc-get-to-know.js";
+
 import { phdOffer } from "./uc-phd-offer.js";
 import { phdSearch } from "./uc-phd-search.js";
 import { postdocOffer } from "./uc-postdoc-offer.js";
@@ -16,9 +14,6 @@ export const professionalGroup = {
   label: "Professional Networking",
   icon: undefined,
   useCases: {
-    jobSearch: jobSearch,
-    jobOffer: jobOffer,
-    getToKnow: getToKnow,
     phdOffer: phdOffer,
     phdSearch: phdSearch,
     postdocOffer: postdocOffer,

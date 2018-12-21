@@ -1,16 +1,14 @@
 import { musicianSearch } from "./uc-musician-search.js";
 import { bandSearch } from "./uc-band-search.js";
-import { rehearsalRoomSearch } from "./uc-rehearsal-room-search.js";
-import { rehearsalRoomOffer } from "./uc-rehearsal-room-offer.js";
+import { serviceOffer } from "./uc-service-offer.js";
 
-export const musicianGroup = {
-  identifier: "musiciangroup",
+export const artistGroup = {
+  identifier: "artistgroup",
   label: "Artists and Bands",
   icon: undefined,
   useCases: {
     bandSearch: bandSearch,
     musicianSearch: musicianSearch,
-    rehearsalRoomSearch: rehearsalRoomSearch,
-    rehearsalRoomOffer: rehearsalRoomOffer,
+    serviceOffer: serviceOffer,
   },
 };

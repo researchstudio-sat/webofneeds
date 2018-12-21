@@ -1,7 +1,3 @@
-/**
- * Created by kweinberger on 06.12.2018.
- */
-
 import { goodsOffer } from "./uc-goods-offer.js";
 import { goodsServiceSearch } from "./uc-goods-service-search.js";
 import { serviceOffer } from "./uc-service-offer.js";

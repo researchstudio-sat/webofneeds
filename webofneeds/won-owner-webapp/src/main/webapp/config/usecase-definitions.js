@@ -1,11 +1,12 @@
+import { classifiedsGroup } from "./usecases/group-classifieds";
+import { socialGroup } from "./usecases/group-social";
+import { workGroup } from "./usecases/group-work";
+import { academicGroup } from "./usecases/group-academic";
+import { artistGroup } from "./usecases/group-artists";
 import { realEstateGroup } from "./usecases/group-real-estate";
 import { transportGroup } from "./usecases/group-transport";
-import { complainGroup } from "./usecases/group-work";
-import { socialGroup } from "./usecases/group-social";
-import { professionalGroup } from "./usecases/group-academic";
-import { mobilityGroup } from "./usecases/group-personal-mobility";
-import { musicianGroup } from "./usecases/group-artists";
-import { classifiedsGroup } from "./usecases/group-classifieds";
+import { otherGroup } from "./usecases/group-other";
+import { personalMobilityGroup } from "./usecases/group-personal-mobility";
 import { custom } from "./usecases/uc-custom.js";
 
 /**
@@ -51,16 +52,17 @@ import { custom } from "./usecases/uc-custom.js";
  */
 
 export const useCaseGroups = {
-  complain: complainGroup,
-  transport: transportGroup,
-  mobility: mobilityGroup,
-  realEstate: realEstateGroup,
-  musician: musicianGroup,
   social: socialGroup,
-  professional: professionalGroup,
   classifieds: classifiedsGroup,
-  other: {
-    identifier: "othergroup",
+  work: workGroup,
+  academic: academicGroup,
+  artists: artistGroup,
+  realEstate: realEstateGroup,
+  transport: transportGroup,
+  personalMobility: personalMobilityGroup,
+  other: otherGroup,
+  customUsecase: {
+    identifier: "custom",
     label: "Something Else",
     icon: undefined,
     useCases: custom,

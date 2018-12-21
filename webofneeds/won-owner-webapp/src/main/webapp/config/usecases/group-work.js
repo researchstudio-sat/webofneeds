@@ -1,12 +1,20 @@
-import { complain } from "./uc-complain";
-import { handleComplaint } from "./uc-handle-complaint";
+import { jobSearch } from "./uc-job-search";
+import { jobOffer } from "./uc-job-offer";
+import { phdOffer } from "./uc-phd-offer.js";
+import { phdSearch } from "./uc-phd-search.js";
+import { postdocOffer } from "./uc-postdoc-offer.js";
+import { postdocSearch } from "./uc-postdoc-search.js";
 
 export const complainGroup = {
   identifier: "complaingroup",
   label: "Complaints",
   icon: undefined,
   useCases: {
-    complain: complain,
-    handleComplaint: handleComplaint,
+    jobSearch: jobSearch,
+    jobOffer: jobOffer,
+    phdOffer: phdOffer,
+    phdSearch: phdSearch,
+    postdocOffer: postdocOffer,
+    postdocSearch: postdocSearch,
   },
 };

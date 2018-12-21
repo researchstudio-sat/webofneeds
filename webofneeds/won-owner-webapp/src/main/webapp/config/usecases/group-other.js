@@ -1,12 +1,14 @@
-import { goodsTransportSearch } from "./uc-goods-transport-search.js";
-import { goodsTransportOffer } from "./uc-goods-transport-offer.js";
+import { complain } from "./uc-complain.js";
+import { handleComplaint } from "./uc-handle-complaint.js";
+import { custom } from "./uc-custom.js";
 
-export const transportGroup = {
-  identifier: "transportgroup",
-  label: "Transport and Delivery",
+export const otherGroup = {
+  identifier: "othergroup",
+  label: "Other Use Cases",
   icon: undefined,
   useCases: {
-    goodsTransportSearch: goodsTransportSearch,
-    goodsTransportOffer: goodsTransportOffer,
+    complain: complain,
+    handleComplaint: handleComplaint,
+    custom: custom,
   },
 };
