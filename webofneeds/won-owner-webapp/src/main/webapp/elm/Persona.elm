@@ -3,6 +3,7 @@ port module Persona exposing
     , PersonaData
     , SaveState(..)
     , data
+    , getNewPersonas
     , savePersona
     , saved
     , subscription
@@ -75,10 +76,18 @@ savePersona data_ =
     personaOut <| encodeData data_
 
 
+getNewPersonas : Cmd msg
+getNewPersonas =
+    updatePersonas ()
+
+
 port personaIn : (Value -> msg) -> Sub msg
 
 
 port personaOut : Value -> Cmd msg
+
+
+port updatePersonas : () -> Cmd msg
 
 
 
