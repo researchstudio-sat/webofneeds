@@ -1,15 +1,12 @@
-import { details, emptyDraft } from "./detail-definitions.js";
-
 import { realEstateGroup } from "./usecases/real-estate.js";
 import { transportGroup } from "./usecases/transport.js";
 import { complainGroup } from "./usecases/complain.js";
 import { socialGroup } from "./usecases/social.js";
-import { professionalGroup } from "./usecases/professional/professional.js";
+import { professionalGroup } from "./usecases/professional";
 import { mobilityGroup } from "./usecases/mobility.js";
 import { musicianGroup } from "./usecases/musician.js";
 import { classifiedsGroup } from "./usecases/classifieds.js";
-
-import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../app/won-utils.js";
+import { custom } from "./usecases/uc-custom.js";
 
 /**
  * USE CASE REQUIREMENTS
@@ -53,18 +50,6 @@ import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../app/won-util
  * This will be automatically enforced by the need builder.
  */
 
-const allDetailsUseCase = {
-  allDetails: {
-    identifier: "allDetails",
-    label: "New custom post",
-    icon: "#ico36_uc_custom",
-    doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
-    draft: { ...emptyDraft },
-    details: details,
-    seeksDetails: details,
-  },
-};
-
 export const useCaseGroups = {
   complain: complainGroup,
   transport: transportGroup,
@@ -78,7 +63,7 @@ export const useCaseGroups = {
     identifier: "othergroup",
     label: "Something Else",
     icon: undefined,
-    useCases: { ...allDetailsUseCase },
+    useCases: custom,
   },
 };
 
