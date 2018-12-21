@@ -7,7 +7,7 @@ import { realEstateGroup } from "./usecases/group-real-estate";
 import { transportGroup } from "./usecases/group-transport";
 import { otherGroup } from "./usecases/group-other";
 import { personalMobilityGroup } from "./usecases/group-personal-mobility";
-import { custom } from "./usecases/uc-custom.js";
+// import { customUseCase } from "./usecases/uc-custom.js";
 
 /**
  * USE CASE REQUIREMENTS
@@ -61,12 +61,13 @@ export const useCaseGroups = {
   transport: transportGroup,
   personalMobility: personalMobilityGroup,
   other: otherGroup,
-  customUsecase: {
-    identifier: "custom",
-    label: "Something Else",
-    icon: undefined,
-    useCases: custom,
-  },
+  // FIXME: currently not shown
+  // customUsecase: {
+  //   identifier: "custom",
+  //   label: "Something Else",
+  //   icon: undefined,
+  //   useCases: { customUseCase },
+  // },
 };
 
 // generate a list of usecases from all use case groups

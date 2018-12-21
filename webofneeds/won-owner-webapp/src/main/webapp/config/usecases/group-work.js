@@ -5,9 +5,9 @@ import { phdSearch } from "./uc-phd-search.js";
 import { postdocOffer } from "./uc-postdoc-offer.js";
 import { postdocSearch } from "./uc-postdoc-search.js";
 
-export const complainGroup = {
-  identifier: "complaingroup",
-  label: "Complaints",
+export const workGroup = {
+  identifier: "workgroup",
+  label: "Find or Offer Work",
   icon: undefined,
   useCases: {
     jobSearch: jobSearch,

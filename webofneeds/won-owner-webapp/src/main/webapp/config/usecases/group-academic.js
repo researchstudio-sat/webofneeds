@@ -9,9 +9,9 @@ import { postdocSearch } from "./uc-postdoc-search.js";
 import { consortiumSearch } from "./uc-consortium-search.js";
 import { consortiumOffer } from "./uc-consortium-offer.js";
 
-export const professionalGroup = {
-  identifier: "professionalgroup",
-  label: "Professional Networking",
+export const academicGroup = {
+  identifier: "academicGroup",
+  label: "Academic Work",
   icon: undefined,
   useCases: {
     phdOffer: phdOffer,

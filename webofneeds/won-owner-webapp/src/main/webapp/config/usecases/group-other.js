@@ -1,6 +1,6 @@
 import { complain } from "./uc-complain.js";
 import { handleComplaint } from "./uc-handle-complaint.js";
-import { custom } from "./uc-custom.js";
+import { customUseCase } from "./uc-custom.js";
 
 export const otherGroup = {
   identifier: "othergroup",
@@ -9,6 +9,6 @@ export const otherGroup = {
   useCases: {
     complain: complain,
     handleComplaint: handleComplaint,
-    custom: custom,
+    customUseCase: customUseCase,
   },
 };

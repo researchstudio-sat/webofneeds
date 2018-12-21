@@ -5,7 +5,7 @@ import { details, emptyDraft } from "../detail-definitions.js";
 import { interestsDetail, skillsDetail } from "../details/person.js";
 import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-utils.js";
 
-export const professionalGroup = {
+export const getToKnow = {
   identifier: "getToKnow",
   label: "Meet people",
   icon: "#ico36_uc_find_people",
