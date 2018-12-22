@@ -289,7 +289,7 @@ public class SparqlMatcherActor extends UntypedActor {
                     .sorted((hint1, hint2) -> (int) Math.signum(hint2.score - hint1.score)) //sort descending
                     .limit(config.getLimitResults())
                     .map(hint -> {
-                        double score = range == 0 ? hint.score - minScore.get() : (hint.score - minScore.get()) / range; 
+                        double score = range == 0 ? 1.0 : (hint.score - minScore.get()) / range; 
                         return new HintEvent(
                             need.getWonNodeUri(), 
                             need.getNeedUri(), 
