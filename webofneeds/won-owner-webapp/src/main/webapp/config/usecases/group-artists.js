@@ -4,7 +4,7 @@ import { serviceOffer } from "./uc-service-offer.js";
 
 export const artistGroup = {
   identifier: "artistgroup",
-  label: "Artists and Bands",
+  label: "Music",
   icon: undefined,
   useCases: {
     bandSearch: bandSearch,

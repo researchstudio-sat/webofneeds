@@ -7,7 +7,7 @@ import { postdocSearch } from "./uc-postdoc-search.js";
 
 export const workGroup = {
   identifier: "workgroup",
-  label: "Find or Offer Work",
+  label: "Jobs",
   icon: undefined,
   useCases: {
     jobSearch: jobSearch,

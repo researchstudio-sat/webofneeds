@@ -10,7 +10,7 @@ TODO: create use case icons
 
 export const classifiedsGroup = {
   identifier: "classifiedsgroup",
-  label: "Classified Ads",
+  label: "Buy & Sell",
   icon: undefined,
   useCases: {
     goodsOffer: goodsOffer,

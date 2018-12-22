@@ -6,7 +6,7 @@ import { goodsTransportOffer } from "./uc-goods-transport-offer.js";
 
 export const transportGroup = {
   identifier: "transportgroup",
-  label: "Transport and Delivery",
+  label: "Transport",
   icon: undefined,
   useCases: {
     personalTransportSearch: personalTransportSearch,
