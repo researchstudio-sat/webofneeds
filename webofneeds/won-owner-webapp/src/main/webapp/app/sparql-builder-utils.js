@@ -626,9 +626,8 @@ export function generateWhatsAroundQuery(latitude, longitude) {
       PREFIX s: <http://schema.org/>
       PREFIX geo: <http://www.bigdata.com/rdf/geospatial#>
       PREFIX geoliteral: <http://www.bigdata.com/rdf/geospatial/literals/v1#>
-      SELECT DISTINCT ?result ?score WHERE {
-        VALUES ?radius { 10 }
-        BIND ((?radius-?location_geoDistance)/?radius as ?score)
+      SELECT DISTINCT ?result ((?radius-?location_geoDistance)/?radius as ?score) WHERE {
+        VALUES ?radius { 10 }        
         ?result <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> won:Need.
         ?result won:isInState  won:Active .
         ?result won:seeks?/(won:hasLocation|s:jobLocation|s:location|s:fromLocation|s:toLocation) ?location.
