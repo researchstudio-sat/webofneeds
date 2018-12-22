@@ -11,7 +11,7 @@ import { consortiumOffer } from "./uc-consortium-offer.js";
 
 export const academicGroup = {
   identifier: "academicGroup",
-  label: "Academic Work",
+  label: "Academia",
   icon: undefined,
   useCases: {
     phdOffer: phdOffer,

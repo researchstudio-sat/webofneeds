@@ -4,7 +4,7 @@ import { customUseCase } from "./uc-custom.js";
 
 export const otherGroup = {
   identifier: "othergroup",
-  label: "Other Use Cases",
+  label: "More...",
   icon: undefined,
   useCases: {
     complain: complain,

@@ -4,7 +4,7 @@ import { personalTransportSearch } from "./uc-personal-transport-search.js";
 
 export const personalMobilityGroup = {
   identifier: "mobilitygroup",
-  label: "Personal Mobility",
+  label: "Mobility",
   icon: undefined,
   useCases: {
     personalTransportSearch: personalTransportSearch,

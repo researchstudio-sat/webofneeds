@@ -8,7 +8,7 @@ import { handleComplaint } from "./uc-handle-complaint";
 
 export const socialGroup = {
   identifier: "socialgroup",
-  label: "Social Activities",
+  label: "Social",
   icon: undefined,
   useCases: {
     getBreakfast: getBreakfast,
