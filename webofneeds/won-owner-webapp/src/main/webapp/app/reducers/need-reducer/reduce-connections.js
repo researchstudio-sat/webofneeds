@@ -22,7 +22,7 @@ export function storeConnectionsData(state, connectionsToStore) {
  * @param newConnection
  * @return {*}
  */
-export function addConnectionFull(state, connection) {
+function addConnectionFull(state, connection) {
   let parsedConnection = parseConnection(connection);
 
   if (parsedConnection) {
