@@ -213,9 +213,10 @@ export default function(allNeedsInState = initialState, action = {}) {
         action.payload.updatedConnectionUri,
         state => {
           if (!state) return won.WON.RequestReceived; //fallback if no state present
-          if (state == won.WON.RequestSent) return won.WON.Connected;
-          if (state == won.WON.Suggested) return won.WON.RequestReceived;
-          if (state == won.WON.Closed) return won.WON.RequestReceived;
+          if (state === won.WON.Connected) return won.WON.Connected; //stay in connected if it was already the case
+          if (state === won.WON.RequestSent) return won.WON.Connected;
+          if (state === won.WON.Suggested) return won.WON.RequestReceived;
+          if (state === won.WON.Closed) return won.WON.RequestReceived;
           return won.WON.RequestReceived;
         }
       );
@@ -365,9 +366,10 @@ export default function(allNeedsInState = initialState, action = {}) {
         action.payload.connectionUri,
         state => {
           if (!state) return won.WON.RequestSent; //fallback if no state present
-          if (state == won.WON.RequestReceived) return won.WON.Connected;
-          if (state == won.WON.Suggested) return won.WON.RequestSent;
-          if (state == won.WON.Closed) return won.WON.RequestSent;
+          if (state === won.WON.Connected) return won.WON.Connected; //stay in connected if it was already the case
+          if (state === won.WON.RequestReceived) return won.WON.Connected;
+          if (state === won.WON.Suggested) return won.WON.RequestSent;
+          if (state === won.WON.Closed) return won.WON.RequestSent;
         }
       );
       return addMessage(cnctStateUpdated, action.payload.optimisticEvent);
