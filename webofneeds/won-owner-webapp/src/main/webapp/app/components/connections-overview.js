@@ -24,6 +24,7 @@ import "style/_connections-overview.scss";
 
 import {
   getRouterParams,
+  getGroupChatPostUriFromRoute,
   getOwnedNeedByConnectionUri,
   getOwnedNeedsInCreation,
   getConnectionUriFromRoute,
@@ -127,6 +128,7 @@ function genComponentConf() {
                 <div class="co__item__connections__group"
                     ng-if="self.hasGroupFacet(need)"
                     ng-click="self.selectGroupChat(need.get('uri'))">
+                    <!-- todo impl and include groupchat header -->
                     <div class="co__item__connections__group__label">
                       Group Chat (click to view)
                     </div>
@@ -238,9 +240,13 @@ function genComponentConf() {
         const useCase = get(routerParams, "useCase");
         const useCaseGroup = get(routerParams, "useCaseGroup");
         const connUriInRoute = getConnectionUriFromRoute(state);
+        const groupChatPostUriInRoute = getGroupChatPostUriFromRoute(state);
         const needUriInRoute = getPostUriFromRoute(state);
         const needImpliedInRoute =
-          connUriInRoute && getOwnedNeedByConnectionUri(state, connUriInRoute);
+          (connUriInRoute &&
+            getOwnedNeedByConnectionUri(state, connUriInRoute)) ||
+          (groupChatPostUriInRoute &&
+            state.getIn(["needs", groupChatPostUriInRoute]));
         const needUriImpliedInRoute =
           needImpliedInRoute && needImpliedInRoute.get("uri");
 
