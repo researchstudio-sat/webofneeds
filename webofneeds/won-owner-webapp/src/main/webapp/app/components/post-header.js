@@ -22,7 +22,6 @@ function genComponentConf() {
 
     <won-square-image
         ng-if="!self.postLoading"
-        ng-class="{'bigger' : self.biggerImage}"
         src="self.need.get('TODO')"
         uri="self.needUri"
         ng-show="!self.hideImage">
@@ -172,12 +171,6 @@ function genComponentConf() {
        * if set, the avatar will be hidden
        */
       hideImage: "=",
-
-      /**
-       * If true, the title image will be a bit bigger. This
-       * can be used to create visual contrast.
-       */
-      biggerImage: "=",
     },
     template: template,
   };
