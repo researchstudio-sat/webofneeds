@@ -67,9 +67,6 @@ function addConnectionFull(state, connection) {
         if (heldByUri) {
           state = state.setIn([needUri, "heldBy"], heldByUri);
         }
-      } else if (realFacet !== won.WON.ChatFacetCompacted) {
-        console.warn("Unknown Facet(", realFacet, ") do not add Connection");
-        return state;
       }
 
       if (parsedConnection.getIn(["data", "unread"])) {

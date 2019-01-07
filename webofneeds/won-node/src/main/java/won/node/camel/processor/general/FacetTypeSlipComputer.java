@@ -16,6 +16,7 @@
 
 package won.node.camel.processor.general;
 
+import net.bytebuddy.pool.TypePool;
 import org.apache.camel.Exchange;
 import org.apache.camel.Expression;
 import org.slf4j.Logger;
@@ -40,6 +41,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * User: syim
@@ -114,59 +116,60 @@ public class FacetTypeSlipComputer implements InitializingBean, ApplicationConte
       }
     }
 
-    try {
-      slip = "bean:"+computeFacetSlip(messageType, facetType, direction) + "?method=" + method;
-    } catch (NoSuchMethodException e) {
-      e.printStackTrace();
-    } catch (InvocationTargetException e) {
-      e.printStackTrace();
-    } catch (IllegalAccessException e) {
-      e.printStackTrace();
-    }
+    slip = "bean:"+computeFacetSlip(messageType, facetType, direction) + "?method=" + method;
     return type.cast(slip);
   }
 
-  private String computeFacetSlip(URI messageType, URI facetType, URI direction)
-    throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-    Iterator iter = facetMessageProcessorsMap.entrySet().iterator();
-    while(iter.hasNext()){
-      Map.Entry pair = (Map.Entry)iter.next();
-      Object facet =  pair.getValue();
-      if (facetType != null) {
-        Annotation annotation = AopUtils.getTargetClass(facet).getAnnotation(FacetMessageProcessor.class);
-        if(matches(annotation, messageType, direction, facetType)){
-          return pair.getKey().toString();
-        }
-      }
-      //either facetType is null or we did not find a FacetMessageProcessor for it
-      // try to find a DefaultFacetMessageProcessor to handle the message
-      Annotation annotation = AopUtils.getTargetClass(facet).getAnnotation(DefaultFacetMessageProcessor
-                                                                                        .class);
-      if(matches(annotation, messageType, direction, null)){
-        return pair.getKey().toString();
+  private String computeFacetSlip(URI messageType, URI facetType, URI direction) {
+
+    if(facetType != null) {
+      Optional<String> processorName = facetMessageProcessorsMap.entrySet().stream()
+              .filter(entry -> {
+                Object facet = entry.getValue();
+                Annotation annotation = AopUtils.getTargetClass(facet).getAnnotation(FacetMessageProcessor.class);
+                return matches(annotation, messageType, direction, facetType);
+              }).findFirst().map(entry -> entry.getKey());
+
+      if (processorName.isPresent()) {
+        return processorName.get();
       }
     }
+
+    Optional<String> processorName = facetMessageProcessorsMap.entrySet().stream()
+            .filter(entry -> {
+              Object facet = entry.getValue();
+              Annotation annotation = AopUtils.getTargetClass(facet).getAnnotation(DefaultFacetMessageProcessor.class);
+              return matches(annotation, messageType, direction, null);
+            }).findFirst().map(entry -> entry.getKey());
+
+    if (processorName.isPresent()) {
+      return processorName.get();
+    }
+
     throw new WonMessageProcessingException(String.format("unexpected combination of messageType %s, " +
       "facetType %s and direction %s encountered", messageType, facetType, direction));
   }
 
-  private boolean matches(Annotation annotation, URI messageType, URI direction, URI facetType)
-    throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+  private boolean matches(Annotation annotation, URI messageType, URI direction, URI facetType) {
     if (annotation == null || messageType==null||direction==null) return false;
-    if (messageType != null){
-      if (!annotationFeatureMatches(annotation, messageType.toString(), "messageType")){
-        return false;
+    try {
+      if (messageType != null) {
+        if (!annotationFeatureMatches(annotation, messageType.toString(), "messageType")) {
+          return false;
+        }
       }
-    }
-    if (direction != null){
-      if (!annotationFeatureMatches(annotation, direction.toString(), "direction")){
-        return false;
+      if (direction != null) {
+        if (!annotationFeatureMatches(annotation, direction.toString(), "direction")) {
+          return false;
+        }
       }
-    }
-    if (facetType != null){
-      if (!annotationFeatureMatches(annotation, facetType.toString(), "facetType")){
-        return false;
+      if (facetType != null) {
+        if (!annotationFeatureMatches(annotation, facetType.toString(), "facetType")) {
+          return false;
+        }
       }
+    } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+      throw new RuntimeException(e);
     }
     return true;
   }

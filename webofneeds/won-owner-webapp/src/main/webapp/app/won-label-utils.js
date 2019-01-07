@@ -34,6 +34,12 @@ export const labels = deepFreeze({
     [won.WON.NoHintForMeCompacted]: "No Hint For Me",
     [won.WON.UsedForTestingCompacted]: "Used For Testing",
   },
+  facets: {
+    [won.WON.GroupFacetCompacted]: "Group Chat enabled",
+    [won.WON.ChatFacetCompacted]: "Chat enabled",
+    [won.WON.HoldableFacetCompacted]: "Holdable",
+    [won.WON.HolderFacetCompacted]: "Holder",
+  },
 });
 
 /**

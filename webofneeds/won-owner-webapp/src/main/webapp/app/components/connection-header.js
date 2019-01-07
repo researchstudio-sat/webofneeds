@@ -21,6 +21,7 @@ import { getUnreadMessagesByConnectionUri } from "../selectors/message-selectors
 import { getMessagesByConnectionUri } from "../selectors/message-selectors.js";
 import connectionStateModule from "./connection-state.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
+import { isGroupChatConnection } from "../connection-utils.js";
 
 import "style/_connection-header.scss";
 
@@ -143,6 +144,7 @@ function genComponentConf() {
 
         return {
           connection,
+          isGroupChat: isGroupChatConnection(connection),
           ownedNeed,
           theirNeed,
           isDirectResponseFromRemote: isDirectResponseNeed(theirNeed),

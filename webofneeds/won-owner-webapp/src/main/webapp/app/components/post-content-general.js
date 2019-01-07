@@ -62,6 +62,16 @@ function genComponentConf() {
             </div>
           </div>
         </div>
+        <div class="pcg__columns__right" ng-if="self.facets && self.facets.size > 0">
+          <div class="pcg__columns__right__item">
+            <div class="pcg__columns__right__item__label">
+              Facets
+            </div>
+            <div class="pcg__columns__right__item__value">
+              <span class="pcg__columns__right__item__value__facet" ng-repeat="facet in self.facets.toArray()">{{ self.labels.facets[facet]? self.labels.facets[facet] : facet }}</span>
+            </div>
+          </div>
+        </div>
       </div>
       <won-post-share-link
         ng-if="!self.preventSharing"
@@ -90,6 +100,7 @@ function genComponentConf() {
 
         const post = this.postUri && state.getIn(["needs", this.postUri]);
         const flags = post && post.getIn(["content", "flags"]);
+        const facets = post && post.get("facets");
 
         const persona = post
           ? state.getIn(["needs", post.get("heldBy")])
@@ -100,6 +111,7 @@ function genComponentConf() {
           WON: won.WON,
           post,
           flags,
+          facets,
           persona:
             personaHolds && personaHolds.includes(post.get("uri"))
               ? persona
