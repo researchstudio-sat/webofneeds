@@ -99,6 +99,18 @@ export const getConnectionUriFromRoute = createSelector(
   }
 );
 
+export const getGroupChatPostUriFromRoute = createSelector(
+  state => state,
+  state => {
+    const encodedPostUri = getIn(state, [
+      "router",
+      "currentParams",
+      "groupChatPostUri",
+    ]);
+    return decodeUriComponentProperly(encodedPostUri);
+  }
+);
+
 export const getPostUriFromRoute = createSelector(
   state => state,
   state => {
