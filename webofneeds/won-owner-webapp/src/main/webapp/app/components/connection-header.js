@@ -30,7 +30,6 @@ function genComponentConf() {
       <div class="ch__icon" ng-if="!self.connectionOrNeedsLoading">
           <won-square-image
             class="ch__icon__theirneed"
-            ng-class="{'bigger' : self.biggerImage}"
             src="self.theirNeed.get('TODO')"
             title="self.theirNeed.get('humanReadable')"
             uri="self.theirNeed.get('uri')"
@@ -240,12 +239,6 @@ function genComponentConf() {
        * if set, the avatar will be hidden
        */
       hideImage: "=",
-
-      /**
-       * If true, the title image will be a bit bigger. This
-       * can be used to create visual contrast.
-       */
-      biggerImage: "=",
     },
     template: template,
   };
