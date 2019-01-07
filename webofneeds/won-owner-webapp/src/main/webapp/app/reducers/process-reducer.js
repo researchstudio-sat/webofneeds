@@ -4,7 +4,6 @@
 import { actionTypes } from "../actions/actions.js";
 import Immutable from "immutable";
 import { getIn, get } from "../utils.js";
-import { parseConnection } from "./need-reducer/parse-connection.js";
 import { parseNeed } from "./need-reducer/parse-need.js";
 
 const initialState = Immutable.fromJS({
@@ -283,54 +282,6 @@ export default function(processState = initialState, action = {}) {
           });
         });
       return processState;
-    }
-
-    case actionTypes.messages.hintMessageReceived: {
-      const {
-        ownedNeed,
-        remoteNeed,
-        connection,
-        ownPersona,
-        remotePersona,
-      } = action.payload;
-
-      const connUri = getIn(parseConnection(connection), ["data", "uri"]);
-
-      if (!connUri) {
-        return processState;
-      }
-
-      const ownedNeedUri = ownedNeed && get(parseNeed(ownedNeed), "uri");
-      const remoteNeedUri = remoteNeed && get(parseNeed(remoteNeed), "uri");
-      const ownPersonaUri = ownPersona && get(parseNeed(ownPersona), "uri");
-      const remotePersonaUri =
-        remotePersona && get(parseNeed(remotePersona), "uri");
-
-      processState = updateNeedProcess(processState, ownedNeedUri, {
-        toLoad: false,
-        failedToLoad: false,
-        loading: false,
-      });
-
-      processState = updateNeedProcess(processState, remoteNeedUri, {
-        toLoad: false,
-        failedToLoad: false,
-        loading: false,
-      });
-
-      processState = updateNeedProcess(processState, ownPersonaUri, {
-        toLoad: false,
-        failedToLoad: false,
-        loading: false,
-      });
-
-      processState = updateNeedProcess(processState, remotePersonaUri, {
-        toLoad: false,
-        failedToLoad: false,
-        loading: false,
-      });
-
-      return updateConnectionProcess(processState, connUri, { loading: false });
     }
 
     case actionTypes.messages.reopenNeed.failed:
