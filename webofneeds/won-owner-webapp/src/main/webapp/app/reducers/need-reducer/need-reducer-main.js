@@ -31,7 +31,6 @@ import {
   markMessageExpandReferences,
 } from "./reduce-messages.js";
 import {
-  addConnectionFull,
   addActiveConnectionsToNeedInLoading,
   markConnectionAsRated,
   markConnectionAsRead,
@@ -221,30 +220,6 @@ export default function(allNeedsInState = initialState, action = {}) {
         }
       );
       return allNeedsInState;
-    }
-
-    case actionTypes.messages.hintMessageReceived: {
-      const {
-        ownedNeed,
-        remoteNeed,
-        connection,
-        ownPersona,
-        remotePersona,
-      } = action.payload;
-      // guarantee that ownedNeed is in state:
-      allNeedsInState = addNeed(allNeedsInState, ownedNeed, true);
-
-      // guarantee that  remoteNeed  is  in  state:
-      allNeedsInState = addNeed(allNeedsInState, remoteNeed, false);
-
-      allNeedsInState = remotePersona
-        ? addNeed(allNeedsInState, remotePersona, false)
-        : allNeedsInState;
-      allNeedsInState = ownPersona
-        ? addNeed(allNeedsInState, ownPersona, true)
-        : allNeedsInState;
-
-      return addConnectionFull(allNeedsInState, connection);
     }
 
     // NEW CONNECTIONS STATE UPDATES

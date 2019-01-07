@@ -622,37 +622,6 @@ export async function loadLatestMessagesOfConnection({
   }
 }
 
-//TODO replace the won.getEventsOfConnection with this version (and make sure it works for all previous uses).
-/**
- * Gets the events and uses the paging-parameters
- * in a meaningful fashion.
- * @param eventContainerUri
- * @param params
- * @return {*}
- */
-/*
- function getEvents(connectionUri, params) {
- const eventP = won
- .getNode(connectionUri, params)
- .then(cnct =>
- won.getNode(cnct.hasEventContainer, params)
- )
- .then(eventContainer => is('Array', eventContainer.member) ?
- eventContainer.member :
- [eventContainer.member]
- )
- .then(eventUris => urisToLookupMap(
- eventUris,
- uri => won.getEvent(
- uri,
- { requesterWebId: params.requesterWebId }
- )
- ));
-
- return eventP;
- }
- */
-
 /**
  * @param connectionUri
  * @param numberOfEvents

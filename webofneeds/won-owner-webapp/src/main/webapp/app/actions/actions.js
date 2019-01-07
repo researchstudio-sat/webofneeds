@@ -247,7 +247,6 @@ const actionHierarchy = {
     connectMessageReceived: INJ_DEFAULT,
     connectMessageSent: INJ_DEFAULT,
     processHintMessage: messages.processHintMessage,
-    hintMessageReceived: INJ_DEFAULT,
     openMessageReceived: INJ_DEFAULT,
     openMessageSent: INJ_DEFAULT,
     processOpenMessage: messages.processOpenMessage,

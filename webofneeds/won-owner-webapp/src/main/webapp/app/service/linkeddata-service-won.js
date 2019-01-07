@@ -1309,35 +1309,6 @@ import won from "./won.js";
 
   /**
    * Returns all events associated with a given connection
-   * in a promise for an object of (eventUri -> eventData)
-   * @deprecated doesn't return all events properly. see won.getEventNode.
-   * @param connectionUri
-   * @param fetchParams See `ensureLoaded`.
-   */
-  won.getEventsOfConnection = function(connectionUri, fetchParams) {
-    return won
-      .getEventUrisOfConnection(connectionUri, fetchParams)
-      .then(eventUris =>
-        urisToLookupMap(eventUris, eventUri =>
-          won.getEventNode(eventUri, fetchParams)
-        )
-      );
-  };
-
-  /**
-   * Returns all events associated with a given connection
-   * in a promise for an object of (eventUri -> rawJsonLdOfEvent)
-   * @param connectionUri
-   * @param fetchParams See `ensureLoaded`.
-   */
-  won.getRawEventsOfConnection = async function(connectionUri, fetchParams) {
-    const eventUris = won.getEventUrisOfConnection(connectionUri, fetchParams);
-    return urisToLookupMap(eventUris, eventUri =>
-      won.getRawEvent(eventUri, fetchParams)
-    );
-  };
-  /**
-   * Returns all events associated with a given connection
    * in a promise for an object of (eventUri -> wonMessageObj)
    * @param connectionUri
    * @param fetchParams See `ensureLoaded`.
@@ -1447,104 +1418,6 @@ import won from "./won.js";
       "@context": clone(won.defaultContext),
     };
   };
-
-  /**
-   * @deprecated this function only works for flat content-graphs
-   *   with the eventUri as '@id'/subject. It doesn't work for the
-   *   arbitrarily deep content-graphs that might occur due to the
-   *   arbitrary rdf-input that we're supporting now. Use
-   *   `won.getRawEvent` instead and handle the jsonld it returns, or
-   *   (the more convenient) `won.getWonMessage`.
-   * @param {*} eventUri
-   * @param {*} fetchParams
-   */
-  won.getEventNode = async (eventUri, fetchParams) => {
-    const event = await won.getNode(eventUri, fetchParams);
-
-    event.rawJsonLd = await won.getRawEvent(eventUri, fetchParams);
-
-    await addContentGraphTrig(event, fetchParams);
-
-    // framing will find multiple timestamps (one from each node and owner) -> only use latest for the client
-    if (is("Array", event.hasReceivedTimestamp)) {
-      const latestFirst = event.hasReceivedTimestamp.sort(
-        (x, y) => new Date(y) - new Date(x)
-      );
-      event.hasReceivedTimestamp = new Date(latestFirst[0]);
-    } else {
-      event.hasReceivedTimestamp = new Date(event.hasReceivedTimestamp);
-    }
-
-    if (!event.hasCorrespondingRemoteMessage) {
-      return event;
-    } else {
-      if (event.isRemoteResponseTo) {
-        //we can't access the remote message of a remote response. just use the event
-        return event;
-      }
-      /*
-       * there's some messages (e.g. incoming connect) where there's
-       * vital information in the correspondingRemoteMessage. So
-       * we fetch it here.
-       */
-      fetchParams.doNotFetch = true;
-      const correspondingEventUri = event.hasCorrespondingRemoteMessage;
-      const correspondingEvent = await won.getNode(
-        correspondingEventUri,
-        fetchParams
-      );
-      await addContentGraphTrig(correspondingEvent, fetchParams);
-      if (correspondingEvent.type) {
-        //if we have at least a type attribute, we add the remote event to the
-        //local event. if not, it is just an URI.
-        event.hasCorrespondingRemoteMessage = correspondingEvent;
-      }
-      return event;
-    }
-  };
-
-  /**
-   * Retrieves the contentgraph for an event from the store. That contentgraph
-   * should be stored as seperate graphs for all events loaded via the store
-   * (see won.addJsonLdData).
-   * @param {*} event
-   * @param {*} fetchParams see won.getGraph/won.ensureLoaded
-   */
-  /*async*/ function addContentGraphTrig(event, fetchParams) {
-    if (!event.hasContent) {
-      return Promise.resolve();
-    }
-    const contentGraphUri = event.hasContent;
-
-    const graphP = won.getGraph(contentGraphUri, event.uri, fetchParams);
-
-    const trigP = graphP.then(contentGraphTriples => {
-      if (!contentGraphTriples) {
-        throw new Error(
-          "Couldn't find the following content-graph in the store: " +
-            contentGraphUri +
-            "\n\n" +
-            contentGraphTriples
-        );
-      }
-      const quads = contentGraphTriples.map(t => ({
-        subject: t.subject.nominalValue,
-        predicate: t.predicate.nominalValue,
-        object: t.object.nominalValue,
-        graph: contentGraphUri,
-      }));
-
-      return won.n3Write(quads, { format: "application/trig" });
-    });
-
-    const trigAddedP = trigP.then(trig => {
-      event.contentGraphTrig = trig;
-    });
-
-    return trigAddedP.catch(e => {
-      event.contentGraphTrigError = JSON.stringify(e);
-    });
-  }
 
   /**
    * Fetches the triples where URI is subject and add objects of those triples to the
@@ -1804,17 +1677,6 @@ import won from "./won.js";
   }
 
   window.rdfStoreGetGraph4dbg = rdfStoreGetGraph;
-
-  /**
-   * @param {*} graphUri the uri of the graph to be retrieved
-   * @param {*} documentUri the uri to the document that contains the graph (to make sure it's already cached)
-   * @param {*} fetchParams params necessary for fetching that document
-   */
-  won.getGraph = async function(graphUri, documentUri, fetchParams) {
-    return won
-      .ensureLoaded(documentUri, fetchParams)
-      .then(() => won.getCachedGraphTriples(graphUri));
-  };
 
   won.getConnectionWithOwnAndRemoteNeed = function(
     ownedNeedUri,
