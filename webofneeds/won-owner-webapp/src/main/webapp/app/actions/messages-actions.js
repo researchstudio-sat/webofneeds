@@ -4,7 +4,7 @@
 
 import won from "../won-es6.js";
 import { actionTypes, actionCreators } from "./actions.js";
-import { entries, get, getIn } from "../utils.js";
+import { get, getIn } from "../utils.js";
 
 import Immutable from "immutable";
 import { getOwnMessageUri } from "../message-utils.js";
@@ -835,46 +835,39 @@ export function needMessageReceived(event) {
 }
 
 export function processHintMessage(event) {
-  //TODO: PROCESS HINT MESSAGE IN A SIMILAR WAY AS processConnectMessage and processOpenMessage (BUG: hints currently are removing the persona of an already loaded need in the state)
   return (dispatch, getState) => {
     //first check if we really have the 'own' need in the state - otherwise we'll ignore the hint
-    if (!getState().getIn(["needs", event.getReceiverNeed()])) {
+    const ownedNeedUri = event.getReceiverNeed();
+    const remoteNeedUri = event.getMatchCounterpart();
+
+    const currentState = getState();
+    const ownedNeed = getIn(currentState, ["needs", ownedNeedUri]);
+    const remoteNeed = getIn(currentState, ["needs", remoteNeedUri]);
+
+    const ownedConnectionUri = event.getReceiver();
+
+    if (!ownedNeed) {
       console.debug(
-        "ignoring hint for a need that is not ours:",
-        event.getReceiverNeed()
+        "ignoring hint for a need that is not yet in the state (could be a remoteNeed, or a non stored ownedNeed):",
+        ownedNeedUri
       );
-    } else if (
-      getState().getIn(["needs", event.getMatchCounterpart(), "state"]) ===
-      won.WON.InactiveCompacted
-    ) {
-      console.debug(
-        "ignoring hint for an inactive  need:",
-        event.getMatchCounterpart()
-      );
+    } else if (get(remoteNeed, "state") === won.WON.InactiveCompacted) {
+      console.debug("ignoring hint for an inactive need:", remoteNeedUri);
+    } else if (get(remoteNeed, "isOwned")) {
+      console.debug("ignoring hint between owned needs:", remoteNeedUri);
     } else {
       won
-        .invalidateCacheForNewConnection(
-          event.getReceiver(),
-          event.getReceiverNeed()
-        )
+        .invalidateCacheForNewConnection(ownedConnectionUri, ownedNeedUri)
         .then(() => {
-          let needUri = event.getReceiverNeed();
-          //TODO: why do add the matchscore and counterpart when we don't use the event?
-
-          event.matchScore = event.getMatchScore();
-          event.matchCounterpartURI = event.getMatchCounterpart();
-
-          getConnectionRelatedData(
-            needUri,
-            event.getMatchCounterpart(),
-            event.getReceiver()
-          ).then(data => {
-            dispatch({
-              type: actionTypes.messages.hintMessageReceived,
-              payload: data,
-            });
-          });
-        });
+          if (remoteNeed) {
+            return Promise.resolve(won.invalidateCacheForNeed(remoteNeedUri));
+          } else {
+            return fetchTheirNeedAndDispatch(remoteNeedUri, dispatch);
+          }
+        })
+        .then(() =>
+          fetchActiveConnectionAndDispatch(ownedConnectionUri, dispatch)
+        );
     }
   };
 }
@@ -1123,67 +1116,4 @@ export function dispatchActionOnFailureRemote(event) {
       },
     });
   };
-}
-
-/**
- * @param needUri
- * @param remoteNeedUri
- * @param connectionUri
- * @return {*}
- */
-function getConnectionRelatedData(needUri, remoteNeedUri, connectionUri) {
-  const remoteNeedP = won.getNeed(remoteNeedUri);
-  const ownedNeedP = won.getNeed(needUri);
-  const connectionP = won.getConnectionWithEventUris(connectionUri, {
-    requesterWebId: needUri,
-  });
-  const eventsP = won
-    .getEventsOfConnection(connectionUri, { requesterWebId: needUri })
-    .then(eventsLookup => {
-      const eventList = [];
-      for (let [, event] of entries(eventsLookup)) {
-        eventList.push(event);
-      }
-      return eventList;
-    });
-
-  const remotePersonaP = remoteNeedP.then(remoteNeed => {
-    const remoteHeldBy = remoteNeed && remoteNeed["won:heldBy"];
-    const remotePersonaUri = remoteHeldBy && remoteHeldBy["@id"];
-
-    if (remotePersonaUri) {
-      return won.getNeed(remotePersonaUri);
-    } else {
-      return Promise.resolve(undefined);
-    }
-  });
-
-  const ownPersonaP = ownedNeedP.then(ownedNeed => {
-    const ownHeldBy = ownedNeed && ownedNeed["won:heldBy"];
-    const ownPersonaUri = ownHeldBy && ownHeldBy["@id"];
-
-    if (ownPersonaUri) {
-      return won.getNeed(ownPersonaUri);
-    } else {
-      return Promise.resolve(undefined);
-    }
-  });
-
-  return Promise.all([
-    remoteNeedP,
-    ownedNeedP,
-    connectionP,
-    eventsP,
-    remotePersonaP,
-    ownPersonaP,
-  ]).then(results => {
-    return {
-      remoteNeed: results[0],
-      ownedNeed: results[1],
-      connection: results[2],
-      events: results[3],
-      remotePersona: results[4],
-      ownPersona: results[5],
-    };
-  });
 }
