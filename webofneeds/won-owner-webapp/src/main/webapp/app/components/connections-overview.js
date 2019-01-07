@@ -34,6 +34,7 @@ import {
 } from "../selectors/general-selectors.js";
 import { getChatConnectionsToCrawl } from "../selectors/connection-selectors.js";
 import { isChatConnection } from "../connection-utils.js";
+import { hasGroupFacet, hasChatFacet } from "../need-utils.js";
 
 const serviceDependencies = ["$ngRedux", "$scope"];
 function genComponentConf() {
@@ -115,13 +116,21 @@ function genComponentConf() {
                 </div>
             </div>
             <div class="co__item__connections"
-                ng-if="self.isOpen(need.get('uri')) && self.hasOpenOrLoadingChatConnections(need, self.allNeeds, self.process)">
+                ng-if="self.isOpen(need.get('uri')) && (self.hasOpenOrLoadingChatConnections(need, self.allNeeds, self.process) || self.hasGroupFacet(need))">
                 <won-connection-selection-item
+                    ng-if="self.hasChatFacet(need)"
                     ng-repeat="conn in self.getOpenChatConnectionsArraySorted(need, self.allNeeds, self.process)"
                     on-selected-connection="self.selectConnection(connectionUri)"
                     connection-uri="conn.get('uri')"
                     ng-class="{'won-unread': conn.get('unread')}">
                 </won-connection-selection-item>
+                <div class="co__item__connections__group"
+                    ng-if="self.hasGroupFacet(need)"
+                    ng-click="self.selectGroupChat(need.get('uri'))">
+                    <div class="co__item__connections__group__label">
+                      Group Chat (click to view)
+                    </div>
+                </div>
             </div>
         </div>
         <div class="co__separator clickable" ng-class="{'co__separator--open' : self.showClosedNeeds}" ng-if="self.hasClosedNeeds()" ng-click="self.toggleClosedNeeds()">
@@ -209,6 +218,8 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
       this.open = open;
       this.WON = won.WON;
+      this.hasGroupFacet = hasGroupFacet;
+      this.hasChatFacet = hasChatFacet;
       //this.labels = labels;
       window.co4dbg = this;
 
@@ -369,6 +380,9 @@ function genComponentConf() {
     selectNeed(needUri) {
       this.onSelectedNeed({ needUri }); //trigger callback with scope-object
     }
+    selectGroupChat(needUri) {
+      this.onSelectedGroupChat({ needUri }); //trigger callback with scope-object
+    }
 
     hasOpenOrLoadingChatConnections(need, allNeeds, process) {
       return (
@@ -444,6 +458,7 @@ function genComponentConf() {
        */
       onSelectedConnection: "&",
       onSelectedNeed: "&",
+      onSelectedGroupChat: "&",
     },
     template: template,
   };

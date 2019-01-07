@@ -2,6 +2,7 @@ import angular from "angular";
 import won from "../../won-es6.js";
 import sendRequestModule from "../send-request.js";
 import postMessagesModule from "../post-messages.js";
+import postGroupMessagesModule from "../post-group-messages.js";
 import postInfoModule from "../post-info.js";
 import connectionsOverviewModule from "../connections-overview.js";
 import createPostModule from "../create-post.js";
@@ -35,6 +36,11 @@ class ConnectionsController {
       const selectedPost =
         selectedPostUri && getIn(state, ["needs", selectedPostUri]);
 
+      const showGroupChat = getIn(state, [
+        "router",
+        "currentParams",
+        "groupChatPostUri",
+      ]);
       const useCase = getIn(state, ["router", "currentParams", "useCase"]);
       const useCaseGroup = getIn(state, [
         "router",
@@ -73,11 +79,13 @@ class ConnectionsController {
           !useCase &&
           !useCaseGroup &&
           !selectedPost &&
+          !showGroupChat &&
           (!selectedConnection || selectedConnectionState === won.WON.Closed),
         showContentSide:
           useCase ||
           useCaseGroup ||
           selectedPost ||
+          showGroupChat ||
           (selectedConnection && selectedConnectionState !== won.WON.Closed),
 
         showUseCasePicker:
@@ -105,11 +113,13 @@ class ConnectionsController {
         showPostMessages:
           !selectedPost &&
           !useCaseGroup &&
+          !showGroupChat &&
           (selectedConnectionState === won.WON.Connected ||
             selectedConnectionState === won.WON.RequestReceived ||
             selectedConnectionState === won.WON.RequestSent ||
             selectedConnectionState === won.WON.Suggested),
-        showPostInfo: selectedPost && !useCaseGroup,
+        showPostInfo: selectedPost && !useCaseGroup && !showGroupChat,
+        showGroupChat: showGroupChat,
 
         hideListSideInResponsive:
           !hasOwnedNeeds ||
@@ -134,16 +144,29 @@ class ConnectionsController {
       postUri: needUri,
       useCase: undefined,
       useCaseGroup: undefined,
+      groupChatPostUri: undefined,
     });
   }
 
   selectConnection(connectionUri) {
     this.markAsRead(connectionUri);
     this.router__stateGoCurrent({
-      connectionUri,
+      connectionUri: connectionUri,
       postUri: undefined,
       useCase: undefined,
       useCaseGroup: undefined,
+      groupChatPostUri: undefined,
+    });
+  }
+
+  selectGroupChat(needUri) {
+    //TODO: Mark all groupconnections as read
+    this.router__stateGoCurrent({
+      connectionUri: undefined,
+      postUri: undefined,
+      useCase: undefined,
+      useCaseGroup: undefined,
+      groupChatPostUri: needUri,
     });
   }
 
@@ -175,6 +198,7 @@ export default angular
   .module("won.owner.components.connections", [
     sendRequestModule,
     postMessagesModule,
+    postGroupMessagesModule,
     postInfoModule,
     usecasePickerModule,
     usecaseGroupModule,
