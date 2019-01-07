@@ -240,6 +240,15 @@ public class SparqlQueryTest  {
         Var scoreName = Var.alloc("score");
         checkResult(queryString, expectedQueryString, op -> SparqlMatcherUtils.noHintForCounterpartQuery(op, resultName));
     }
+    
+    @Test
+    public void testAddExcludedFlag_NoHintForCounterpart_Whatsaround() throws Exception {
+        String queryString = getResourceAsString("sparqlquerytest/whatsaround_excludeflag_NHFC/input.rq");
+        String expectedQueryString = getResourceAsString("sparqlquerytest/whatsaround_excludeflag_NHFC/expected.rq");
+        Var resultName = Var.alloc("result");
+        Var scoreName = Var.alloc("score");
+        checkResult(queryString, expectedQueryString, op -> SparqlMatcherUtils.hintForCounterpartQuery(op, resultName));
+    }
 
     @Test
     public void testSearchQuery() throws Exception {
@@ -266,13 +275,14 @@ public class SparqlQueryTest  {
         String actual = OpAsQuery.asQuery(actualOp).toString();
         
         String expected = OpAsQuery.asQuery(expectedOp).toString();
+        /*
         System.out.println("expected:");
         System.out.println(expectedOp);
         System.out.println(expected);
         System.out.println("actual:");
         System.out.println(actualOp);
         System.out.println(actual);
-        
+        */
         Assert.assertEquals(expected, actual);
     }
 }

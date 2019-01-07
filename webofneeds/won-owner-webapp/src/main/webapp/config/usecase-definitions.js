@@ -1,15 +1,13 @@
-import { details, emptyDraft } from "./detail-definitions.js";
-
-import { realEstateGroup } from "./usecases/real-estate.js";
-import { transportGroup } from "./usecases/transport.js";
-import { complainGroup } from "./usecases/complain.js";
-import { socialGroup } from "./usecases/social.js";
-import { professionalGroup } from "./usecases/professional/professional.js";
-import { mobilityGroup } from "./usecases/mobility.js";
-import { musicianGroup } from "./usecases/musician.js";
-import { classifiedsGroup } from "./usecases/classifieds.js";
-
-import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../app/won-utils.js";
+import { classifiedsGroup } from "./usecases/group-classifieds";
+import { socialGroup } from "./usecases/group-social";
+import { workGroup } from "./usecases/group-work";
+import { academicGroup } from "./usecases/group-academic";
+import { artistGroup } from "./usecases/group-artists";
+import { realEstateGroup } from "./usecases/group-real-estate";
+import { transportGroup } from "./usecases/group-transport";
+import { otherGroup } from "./usecases/group-other";
+import { personalMobilityGroup } from "./usecases/group-personal-mobility";
+// import { customUseCase } from "./usecases/uc-custom.js";
 
 /**
  * USE CASE REQUIREMENTS
@@ -53,33 +51,23 @@ import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../app/won-util
  * This will be automatically enforced by the need builder.
  */
 
-const allDetailsUseCase = {
-  allDetails: {
-    identifier: "allDetails",
-    label: "New custom post",
-    icon: "#ico36_uc_custom",
-    doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
-    draft: { ...emptyDraft },
-    details: details,
-    seeksDetails: details,
-  },
-};
-
 export const useCaseGroups = {
-  complain: complainGroup,
-  transport: transportGroup,
-  mobility: mobilityGroup,
-  realEstate: realEstateGroup,
-  musician: musicianGroup,
   social: socialGroup,
-  professional: professionalGroup,
   classifieds: classifiedsGroup,
-  other: {
-    identifier: "othergroup",
-    label: "Something Else",
-    icon: undefined,
-    useCases: { ...allDetailsUseCase },
-  },
+  work: workGroup,
+  academic: academicGroup,
+  artists: artistGroup,
+  realEstate: realEstateGroup,
+  transport: transportGroup,
+  personalMobility: personalMobilityGroup,
+  other: otherGroup,
+  // FIXME: currently not shown
+  // customUsecase: {
+  //   identifier: "custom",
+  //   label: "Something Else",
+  //   icon: undefined,
+  //   useCases: { customUseCase },
+  // },
 };
 
 // generate a list of usecases from all use case groups

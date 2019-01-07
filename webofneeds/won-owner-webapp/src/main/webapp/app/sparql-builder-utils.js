@@ -622,71 +622,37 @@ function isSparqlVariable(str) {
 //TODO should return a context-def as well
 
 export function generateWhatsAroundQuery(latitude, longitude) {
-  return (
-    `PREFIX won: <http://purl.org/webofneeds/model#>
-          PREFIX s: <http://schema.org/>
-          PREFIX geo: <http://www.bigdata.com/rdf/geospatial#>
-          PREFIX geoliteral: <http://www.bigdata.com/rdf/geospatial/literals/v1#>
-          SELECT DISTINCT ?result ?score WHERE {
-            bind (if(?location_geoDistance = 0, 1, 1/?location_geoDistance) as ?score)
-            {
-              SELECT DISTINCT ?result ?location_geoDistance WHERE {
-                  ?result <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> won:Need.
-                  ?result won:isInState  won:Active .
-                  ?result won:hasLocation ?location.
-                  ?location s:geo ?location_geo.
-                  SERVICE geo:search {
-                      ?location_geo geo:search "inCircle".
-                      ?location_geo geo:searchDatatype geoliteral:lat-lon.
-                      ?location_geo geo:predicate won:geoSpatial.
-                      ?location_geo geo:spatialCircleCenter "` +
-    latitude +
-    `#` +
-    longitude +
-    `".
-                      ?location_geo geo:spatialCircleRadius "10".
-                      ?location_geo geo:distanceValue ?location_geoDistance.
-                  }
-                  FILTER NOT EXISTS { ?result won:hasFlag won:NoHintForCounterpart }
-                  FILTER NOT EXISTS { ?result won:hasFlag won:WhatsNew }
-                  FILTER NOT EXISTS { ?result won:hasFlag won:WhatsAround }
-              }
-            }
-          UNION {
-            SELECT DISTINCT ?result ?location_geoDistance WHERE {
-                  ?result <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> won:Need.
-                  ?result won:isInState  won:Active .                  
-                  ?result won:seeks ?seeks.
-                  ?seeks won:hasLocation ?location.
-                  ?location s:geo ?location_geo.
-                  SERVICE geo:search {
-                      ?location_geo geo:search "inCircle".
-                      ?location_geo geo:searchDatatype geoliteral:lat-lon.
-                      ?location_geo geo:predicate won:geoSpatial.
-                      ?location_geo geo:spatialCircleCenter "` +
-    latitude +
-    `#` +
-    longitude +
-    `".
-                      ?location_geo geo:spatialCircleRadius "10".
-                      ?location_geo geo:distanceValue ?location_geoDistance.
-                  }
-                  FILTER NOT EXISTS { ?result won:hasFlag won:NoHintForCounterpart }
-                  FILTER NOT EXISTS { ?result won:hasFlag won:WhatsNew }
-                  FILTER NOT EXISTS { ?result won:hasFlag won:WhatsAround }
-              }
-            }
-          }
-          ORDER BY desc(?score)`
-  );
+  return `PREFIX won: <http://purl.org/webofneeds/model#>
+      PREFIX s: <http://schema.org/>
+      PREFIX geo: <http://www.bigdata.com/rdf/geospatial#>
+      PREFIX geoliteral: <http://www.bigdata.com/rdf/geospatial/literals/v1#>
+      SELECT DISTINCT ?result ((?radius-?location_geoDistance)/?radius as ?score) WHERE {
+        VALUES ?radius { 10 }        
+        ?result <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> won:Need.
+        ?result won:isInState  won:Active .
+        ?result won:seeks?/(won:hasLocation|s:jobLocation|s:location|s:fromLocation|s:toLocation) ?location.
+        ?location s:geo ?location_geo.
+        SERVICE geo:search {
+          ?location_geo geo:search "inCircle".
+          ?location_geo geo:searchDatatype geoliteral:lat-lon.
+          ?location_geo geo:predicate won:geoSpatial.
+          ?location_geo geo:spatialCircleCenter "${latitude}#${longitude}".
+          ?location_geo geo:spatialCircleRadius ?radius.
+          ?location_geo geo:distanceValue ?location_geoDistance.
+        }
+        FILTER(?location_geoDistance < ?radius)
+        FILTER NOT EXISTS { ?result won:hasFlag won:NoHintForCounterpart }
+        FILTER NOT EXISTS { ?result won:hasFlag won:WhatsNew }
+        FILTER NOT EXISTS { ?result won:hasFlag won:WhatsAround }
+      }`;
 }
 
 export function generateWhatsNewQuery() {
   return `PREFIX won: <http://purl.org/webofneeds/model#>
         PREFIX s: <http://schema.org/>
         PREFIX dct: <http://purl.org/dc/terms/>
-        SELECT DISTINCT ?result ((YEAR(?created) - 1970) * 315360000
-               + MONTH(?created) * 26280000
+        SELECT DISTINCT ?result ((YEAR(?created) - 1970) * 40000000
+               + MONTH(?created) * 3000000
                + DAY(?created) * 86400
                + HOURS(?created) * 3600
                + MINUTES(?created) * 60
@@ -699,6 +665,5 @@ export function generateWhatsNewQuery() {
           FILTER NOT EXISTS { ?result won:hasFlag won:NoHintForCounterpart }
           FILTER NOT EXISTS { ?result won:hasFlag won:WhatsNew }
           FILTER NOT EXISTS { ?result won:hasFlag won:WhatsAround }
-        }
-        ORDER BY DESC(?created)`;
+        }`;
 }

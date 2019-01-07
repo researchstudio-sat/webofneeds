@@ -1,21 +1,21 @@
-import { details, emptyDraft } from "../../detail-definitions.js";
-import { interestsDetail, skillsDetail } from "../../details/person.js";
-import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../../app/won-utils.js";
+import { details, emptyDraft } from "../detail-definitions.js";
+import { interestsDetail, skillsDetail } from "../details/person.js";
+import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-utils.js";
 import {
   industryDetail,
   employmentTypesDetail,
   organizationNamesDetail,
-} from "../../details/jobs.js";
-import { jobLocation } from "../../details/location.js";
+} from "../details/jobs.js";
+import { jobLocation } from "../details/location.js";
 import {
   vicinityScoreSubQuery,
   tagOverlapScoreSubQuery,
   sparqlQuery,
-} from "../../../app/sparql-builder-utils.js";
+} from "../../app/sparql-builder-utils.js";
 
-import won from "../../../app/won-es6.js";
+import won from "../../app/won-es6.js";
 
-import { getIn } from "../../../app/utils.js";
+import { getIn } from "../../app/utils.js";
 
 import { Generator } from "sparqljs";
 window.SparqlGenerator4dbg = Generator;
