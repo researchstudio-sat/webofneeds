@@ -1,3 +1,5 @@
+import won from "./won-es6.js";
+
 /**
  * Created by fsuda on 08.11.2018.
  */
@@ -25,6 +27,22 @@ export function isDirectResponseNeed(need) {
     need &&
     need.getIn(["content", "flags"]) &&
     need.getIn(["content", "flags"]).contains("won:DirectResponse")
+  );
+}
+
+export function hasChatFacet(need) {
+  return (
+    need &&
+    need.get("facets") &&
+    need.get("facets").contains(won.WON.ChatFacetCompacted)
+  );
+}
+
+export function hasGroupFacet(need) {
+  return (
+    need &&
+    need.get("facets") &&
+    need.get("facets").contains(won.WON.GroupFacetCompacted)
   );
 }
 
