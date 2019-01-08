@@ -238,13 +238,13 @@ function genComponentConf() {
         const useCase = get(routerParams, "useCase");
         const useCaseGroup = get(routerParams, "useCaseGroup");
         const connUriInRoute = getConnectionUriFromRoute(state);
-        const groupChatPostUriInRoute = getGroupChatPostUriFromRoute(state);
+        const groupPostAdminUriInRoute = getGroupChatPostUriFromRoute(state);
         const needUriInRoute = getPostUriFromRoute(state);
         const needImpliedInRoute =
           (connUriInRoute &&
             getOwnedNeedByConnectionUri(state, connUriInRoute)) ||
-          (groupChatPostUriInRoute &&
-            state.getIn(["needs", groupChatPostUriInRoute]));
+          (groupPostAdminUriInRoute &&
+            state.getIn(["needs", groupPostAdminUriInRoute]));
         const needUriImpliedInRoute =
           needImpliedInRoute && needImpliedInRoute.get("uri");
 

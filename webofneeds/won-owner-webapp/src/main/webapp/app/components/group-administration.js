@@ -18,14 +18,14 @@ function genComponentConf() {
   let template = `
         <div class="ga__header">
             <a class="ga__header__back clickable"
-               ng-click="self.router__stateGoCurrent({groupChatPostUri : undefined})">
+               ng-click="self.router__stateGoCurrent({groupPostAdminUri : undefined})">
                 <svg style="--local-primary:var(--won-primary-color);"
                      class="ga__header__back__icon clickable">
                     <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
                 </svg>
             </a>
             <won-group-administration-header
-              need-uri="self.groupChatPostUri">
+              need-uri="self.groupPostAdminUri">
             </won-group-administration-header>
             <!-- todo impl and include groupchat context-dropdown -->
         </div>
@@ -49,15 +49,15 @@ function genComponentConf() {
       this.scrollContainer().addEventListener("scroll", e => this.onScroll(e));
 
       const selectFromState = state => {
-        const groupChatPostUri = getGroupChatPostUriFromRoute(state);
-        const groupChatPost = getIn(state, ["needs", groupChatPostUri]);
+        const groupPostAdminUri = getGroupChatPostUriFromRoute(state);
+        const groupChatPost = getIn(state, ["needs", groupPostAdminUri]);
         const groupChatConnections = getGroupChatConnectionsByNeedUri(
           state,
-          groupChatPostUri
+          groupPostAdminUri
         );
 
         return {
-          groupChatPostUri,
+          groupPostAdminUri,
           groupChatPost,
           groupChatConnections,
           hasGroupChatConnections:
@@ -134,7 +134,7 @@ function genComponentConf() {
     sendRequest(connUri, remoteNeedUri, message) {
       this.connections__rate(connUri, won.WON.binaryRatingGood);
       this.needs__connect(
-        this.groupChatPostUri,
+        this.groupPostAdminUri,
         connUri,
         remoteNeedUri,
         message

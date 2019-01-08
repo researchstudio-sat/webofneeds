@@ -105,7 +105,7 @@ export const getGroupChatPostUriFromRoute = createSelector(
     const encodedPostUri = getIn(state, [
       "router",
       "currentParams",
-      "groupChatPostUri",
+      "groupPostAdminUri",
     ]);
     return decodeUriComponentProperly(encodedPostUri);
   }

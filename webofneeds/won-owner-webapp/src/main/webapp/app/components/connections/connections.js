@@ -36,10 +36,10 @@ class ConnectionsController {
       const selectedPost =
         selectedPostUri && getIn(state, ["needs", selectedPostUri]);
 
-      const showGroupChat = getIn(state, [
+      const showGroupPostAdministration = getIn(state, [
         "router",
         "currentParams",
-        "groupChatPostUri",
+        "groupPostAdminUri",
       ]);
       const useCase = getIn(state, ["router", "currentParams", "useCase"]);
       const useCaseGroup = getIn(state, [
@@ -79,13 +79,13 @@ class ConnectionsController {
           !useCase &&
           !useCaseGroup &&
           !selectedPost &&
-          !showGroupChat &&
+          !showGroupPostAdministration &&
           (!selectedConnection || selectedConnectionState === won.WON.Closed),
         showContentSide:
           useCase ||
           useCaseGroup ||
           selectedPost ||
-          showGroupChat ||
+          showGroupPostAdministration ||
           (selectedConnection && selectedConnectionState !== won.WON.Closed),
 
         showUseCasePicker:
@@ -113,13 +113,14 @@ class ConnectionsController {
         showPostMessages:
           !selectedPost &&
           !useCaseGroup &&
-          !showGroupChat &&
+          !showGroupPostAdministration &&
           (selectedConnectionState === won.WON.Connected ||
             selectedConnectionState === won.WON.RequestReceived ||
             selectedConnectionState === won.WON.RequestSent ||
             selectedConnectionState === won.WON.Suggested),
-        showPostInfo: selectedPost && !useCaseGroup && !showGroupChat,
-        showGroupChat: showGroupChat,
+        showPostInfo:
+          selectedPost && !useCaseGroup && !showGroupPostAdministration,
+        showGroupPostAdministration: showGroupPostAdministration,
 
         hideListSideInResponsive:
           !hasOwnedNeeds ||
@@ -144,7 +145,7 @@ class ConnectionsController {
       postUri: needUri,
       useCase: undefined,
       useCaseGroup: undefined,
-      groupChatPostUri: undefined,
+      groupPostAdminUri: undefined,
     });
   }
 
@@ -155,7 +156,7 @@ class ConnectionsController {
       postUri: undefined,
       useCase: undefined,
       useCaseGroup: undefined,
-      groupChatPostUri: undefined,
+      groupPostAdminUri: undefined,
     });
   }
 
@@ -166,7 +167,7 @@ class ConnectionsController {
       postUri: undefined,
       useCase: undefined,
       useCaseGroup: undefined,
-      groupChatPostUri: needUri,
+      groupPostAdminUri: needUri,
     });
   }
 

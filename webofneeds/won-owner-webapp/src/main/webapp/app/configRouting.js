@@ -24,7 +24,7 @@ export const resetParams = Object.freeze({
   postUri: undefined,
   useCase: undefined,
   useCaseGroup: undefined,
-  groupChatPostUri: undefined,
+  groupPostAdminUri: undefined,
   token: undefined,
   privateId: undefined,
 });
@@ -64,7 +64,7 @@ export const configRouting = [
       { path: "/settings", component: "settings" },
       {
         path:
-          "/connections?privateId?postUri?connectionUri?useCase?useCaseGroup?token?groupChatPostUri",
+          "/connections?privateId?postUri?connectionUri?useCase?useCaseGroup?token?groupPostAdminUri",
         component: "connections",
         as: "connections",
       },
