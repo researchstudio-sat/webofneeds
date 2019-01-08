@@ -1,5 +1,5 @@
 /**
- * Created by ksinger on 10.04.2017.
+ * Created by quasarchimaere on 08.01.2019.
  */
 
 import angular from "angular";
