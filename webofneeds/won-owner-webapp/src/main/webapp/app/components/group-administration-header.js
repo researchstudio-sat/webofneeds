@@ -1,6 +1,5 @@
 /**
- * Component for rendering need-title, type and timestamp
- * Created by ksinger on 10.04.2017.
+ * Created by quasarchimaere on 08.01.2019.
  */
 import angular from "angular";
 import won from "../won-es6.js";
@@ -8,47 +7,59 @@ import "ng-redux";
 import squareImageModule from "./square-image.js";
 import { actionCreators } from "../actions/actions.js";
 import { labels, relativeTime } from "../won-label-utils.js";
-import { attach, getIn, get } from "../utils.js";
+import { attach, getIn } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { isDirectResponseNeed } from "../need-utils.js";
 import { getHumanReadableStringFromMessage } from "../reducers/need-reducer/parse-message.js";
 import {
   selectLastUpdateTime,
-  getOwnedNeedByConnectionUri,
-  getNeeds,
+  getNonOwnedNeeds,
 } from "../selectors/general-selectors.js";
 import { getUnreadMessagesByConnectionUri } from "../selectors/message-selectors.js";
 import { getMessagesByConnectionUri } from "../selectors/message-selectors.js";
 import connectionStateModule from "./connection-state.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
-import "style/_connection-header.scss";
+import "style/_group-administration-header.scss";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
-      <div class="ch__icon" ng-if="!self.connectionOrNeedsLoading">
+      <div class="ch__icon">
+      </div>
+      <div class="ch__right">
+        <div class="ch__right__topline">
+          <div class="ch__right__topline__title">
+            Group Chat Administration
+          </div>
+        </div>
+        <div class="ch__right__subtitle">
+          <span class="ch__right__subtitle__type">
+          </span>
+        </div>
+      </div>
+      <!--div class="ch__icon" ng-if="!self.connectionOrNeedsLoading">
           <won-square-image
             class="ch__icon__theirneed"
-            src="self.remoteNeed.get('TODO')"
-            title="self.remoteNeed.get('humanReadable')"
-            uri="self.remoteNeed.get('uri')"
+            src="self.theirNeed.get('TODO')"
+            title="self.theirNeed.get('humanReadable')"
+            uri="self.theirNeed.get('uri')"
             ng-show="!self.hideImage">
           </won-square-image>
       </div>
       <div class="ch__right" ng-if="!self.connectionOrNeedsLoading">
-        <div class="ch__right__topline" ng-if="!self.remoteNeedFailedToLoad">
-          <div class="ch__right__topline__title" ng-if="!self.isDirectResponseFromRemote && self.remoteNeed.get('humanReadable')" title="{{ self.remoteNeed.get('humanReadable') }}">
-            {{ self.remoteNeed.get('humanReadable') }}
+        <div class="ch__right__topline" ng-if="!self.theirNeedFailedToLoad">
+          <div class="ch__right__topline__title" ng-if="!self.isDirectResponseFromRemote && self.theirNeed.get('humanReadable')" title="{{ self.theirNeed.get('humanReadable') }}">
+            {{ self.theirNeed.get('humanReadable') }}
           </div>
-          <div class="ch__right__topline__notitle" ng-if="!self.isDirectResponseFromRemote && !self.remoteNeed.get('humanReadable')" title="no title">
+          <div class="ch__right__topline__notitle" ng-if="!self.isDirectResponseFromRemote && !self.theirNeed.get('humanReadable')" title="no title">
             no title
           </div>
           <div class="ch__right__topline__notitle" ng-if="self.isDirectResponseFromRemote" title="Direct Response">
             Direct Response
           </div>
         </div>
-        <div class="ch__right__subtitle" ng-if="!self.remoteNeedFailedToLoad">
+        <div class="ch__right__subtitle" ng-if="!self.theirNeedFailedToLoad">
           <span class="ch__right__subtitle__type">
             <won-connection-state 
               connection-uri="self.connection.get('uri')">
@@ -71,12 +82,12 @@ function genComponentConf() {
             {{ self.friendlyTimestamp }}
           </div>
         </div>
-        <div class="ch__right__topline" ng-if="self.remoteNeedFailedToLoad">
+        <div class="ch__right__topline" ng-if="self.theirNeedFailedToLoad">
           <div class="ch__right__topline__notitle">
             Remote Need Loading failed
           </div>
         </div>
-        <div class="ch__right__subtitle" ng-if="self.remoteNeedFailedToLoad">
+        <div class="ch__right__subtitle" ng-if="self.theirNeedFailedToLoad">
           <span class="ch__right__subtitle__type">
             <span class="ch__right__subtitle__type__state">
               Need might have been deleted, you might want to close this connection.
@@ -95,7 +106,7 @@ function genComponentConf() {
         <div class="ch__right__subtitle">
           <span class="ch__right__subtitle__type"></span>
         </div>
-      </div>
+      </div-->
     `;
 
   class Controller {
@@ -104,21 +115,17 @@ function genComponentConf() {
       this.labels = labels;
       this.WON = won.WON;
       const selectFromState = state => {
-        const ownedNeed = getOwnedNeedByConnectionUri(
-          state,
-          this.connectionUri
-        );
+        const groupChatNeed = getIn(state, ["needs", this.needUri]);
+        const ownedNeed = undefined;
         const connection =
-          ownedNeed && ownedNeed.getIn(["connections", this.connectionUri]);
-        const remoteNeed =
-          connection && get(getNeeds(state), connection.get("remoteNeedUri"));
-        const allMessages = getMessagesByConnectionUri(
-          state,
-          this.connectionUri
-        );
+          ownedNeed && ownedNeed.getIn(["connections", "FIXME: Remove"]);
+        const theirNeed =
+          connection &&
+          getNonOwnedNeeds(state).get(connection.get("remoteNeedUri"));
+        const allMessages = getMessagesByConnectionUri(state, "FIXME: Remove");
         const unreadMessages = getUnreadMessagesByConnectionUri(
           state,
-          this.connectionUri
+          "FIXME: Remove"
         );
 
         const sortedMessages = allMessages && allMessages.toArray();
@@ -141,10 +148,11 @@ function genComponentConf() {
           latestMessage && latestMessage.get("unread");
 
         return {
+          groupChatNeed,
           connection,
           ownedNeed,
-          remoteNeed,
-          isDirectResponseFromRemote: isDirectResponseNeed(remoteNeed),
+          theirNeed,
+          isDirectResponseFromRemote: isDirectResponseNeed(theirNeed),
           latestMessageHumanReadableString,
           latestMessageUnread,
           unreadMessageCount:
@@ -152,22 +160,22 @@ function genComponentConf() {
               ? unreadMessages.size
               : undefined,
           friendlyTimestamp:
-            remoteNeed &&
+            theirNeed &&
             relativeTime(
               selectLastUpdateTime(state),
-              this.timestamp || remoteNeed.get("lastUpdateDate")
+              theirNeed.get("lastUpdateDate")
             ),
-          remoteNeedFailedToLoad:
-            remoteNeed &&
+          theirNeedFailedToLoad:
+            theirNeed &&
             getIn(state, [
               "process",
               "needs",
-              remoteNeed.get("uri"),
+              theirNeed.get("uri"),
               "failedToLoad",
             ]),
           connectionOrNeedsLoading:
             !connection ||
-            !remoteNeed ||
+            !theirNeed ||
             !ownedNeed ||
             getIn(state, [
               "process",
@@ -178,7 +186,7 @@ function genComponentConf() {
             getIn(state, [
               "process",
               "needs",
-              remoteNeed.get("uri"),
+              theirNeed.get("uri"),
               "loading",
             ]) ||
             getIn(state, [
@@ -190,16 +198,11 @@ function genComponentConf() {
         };
       };
 
-      connect2Redux(
-        selectFromState,
-        actionCreators,
-        ["self.connectionUri", "self.timestamp"],
-        this
-      );
+      connect2Redux(selectFromState, actionCreators, ["self.needUri"], this);
 
       classOnComponentRoot(
         "won-is-loading",
-        () => this.connectionOrNeedsLoading,
+        () => false && this.connectionOrNeedsLoading, //TODO: FIX THE LOADING BEHAVIOUR PROBABLY THERE IS NO LOADING BEHAVIOUR FOR THAT
         this
       );
     }
@@ -219,20 +222,7 @@ function genComponentConf() {
     controllerAs: "self",
     bindToController: true, //scope-bindings -> ctrl
     scope: {
-      connectionUri: "=",
-
-      /**
-       * Will be used instead of the posts creation date if specified.
-       * Use if you e.g. instead want to show the date when a request was made.
-       */
-      timestamp: "=",
-      /**
-       * one of:
-       * - "fullpage" (NOT_YET_IMPLEMENTED) (used in post-info page)
-       * - "medium" (NOT_YET_IMPLEMENTED) (used in incoming/outgoing requests)
-       * - "small" (NOT_YET_IMPLEMENTED) (in matches-list)
-       */
-      //size: '=',
+      needUri: "=",
 
       /**
        * if set, the avatar will be hidden
@@ -244,8 +234,8 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.connectionHeader", [
+  .module("won.owner.components.groupAdministrationHeader", [
     squareImageModule,
     connectionStateModule,
   ])
-  .directive("wonConnectionHeader", genComponentConf).name;
+  .directive("wonGroupAdministrationHeader", genComponentConf).name;

@@ -8,7 +8,10 @@ import {
   getOwnedPosts,
   getNeeds,
 } from "./general-selectors.js";
-import { isChatConnection } from "../connection-utils.js";
+import {
+  isChatConnection,
+  isGroupChatConnection,
+} from "../connection-utils.js";
 import won from "../won-es6.js";
 import { getIn } from "../utils.js";
 
@@ -46,6 +49,14 @@ export function getChatConnectionsByNeedUri(state, needUri) {
   const connections = need && need.get("connections");
 
   return connections && connections.filter(conn => isChatConnection(conn));
+}
+
+export function getGroupChatConnectionsByNeedUri(state, needUri) {
+  const needs = getNeeds(state);
+  const need = needs && needs.get(needUri);
+  const connections = need && need.get("connections");
+
+  return connections && connections.filter(conn => isGroupChatConnection(conn));
 }
 
 /**

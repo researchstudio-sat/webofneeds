@@ -8,25 +8,20 @@ import { connect2Redux } from "../won-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { getGroupChatPostUriFromRoute } from "../selectors/general-selectors.js";
 
-import connectionHeaderModule from "./connection-header.js";
+import groupAdministrationHeaderModule from "./group-administration-header.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
-import "style/_group-chat-selection-item-line.scss";
+import "style/_group-administration-selection-item-line.scss";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
       <!-- todo impl and include groupchat header -->
-      <div class="gcsi__label clickable"
-        ng-click="self.setOpen()">
-        Group Chat (click to view)
-      </div>
-      <!--won-connection-header
-        connection-uri="self.connectionUri"
-        timestamp="self.lastUpdateTimestamp"
+      <won-group-administration-header
+        class="clickable"
         ng-click="self.setOpen()"
-        class="clickable">
-      </won-connection-header-->
+        need-uri="self.needUri">
+      </won-group-administration-header>
     `;
 
   class Controller {
@@ -67,7 +62,7 @@ function genComponentConf() {
   };
 }
 export default angular
-  .module("won.owner.components.groupChatSelectionItem", [
-    connectionHeaderModule,
+  .module("won.owner.components.groupAdministrationSelectionItem", [
+    groupAdministrationHeaderModule,
   ])
-  .directive("wonGroupChatSelectionItem", genComponentConf).name;
+  .directive("wonGroupAdministrationSelectionItem", genComponentConf).name;

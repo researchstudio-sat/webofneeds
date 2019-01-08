@@ -14,7 +14,7 @@ import postHeaderModule from "./post-header.js";
 import connectionIndicatorsModule from "./connection-indicators.js";
 import extendedConnectionIndicatorsModule from "./extended-connection-indicators.js";
 import connectionSelectionItemModule from "./connection-selection-item.js";
-import groupChatSelectionItemModule from "./group-chat-selection-item.js";
+import groupAdministrationSelectionItemModule from "./group-administration-selection-item.js";
 import createPostItemModule from "./create-post-item.js";
 
 import { attach, delay, sortByDate, get, getIn } from "../utils.js";
@@ -126,11 +126,11 @@ function genComponentConf() {
                     connection-uri="conn.get('uri')"
                     ng-class="{'won-unread': conn.get('unread')}">
                 </won-connection-selection-item>
-                <won-group-chat-selection-item
+                <won-group-administration-selection-item
                     ng-if="self.hasGroupFacet(need)"
                     need-uri="need.get('uri')"
                     on-selected="self.selectGroupChat(needUri)">
-                </won-group-chat-selection-item>
+                </won-group-administration-selection-item>
             </div>
         </div>
         <div class="co__separator clickable" ng-class="{'co__separator--open' : self.showClosedNeeds}" ng-if="self.hasClosedNeeds()" ng-click="self.toggleClosedNeeds()">
@@ -472,7 +472,7 @@ export default angular
   .module("won.owner.components.connectionsOverview", [
     squareImageModule,
     connectionSelectionItemModule,
-    groupChatSelectionItemModule,
+    groupAdministrationSelectionItemModule,
     postHeaderModule,
     connectionIndicatorsModule,
     extendedConnectionIndicatorsModule,

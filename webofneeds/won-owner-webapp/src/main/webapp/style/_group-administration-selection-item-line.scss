@@ -5,7 +5,7 @@
 @import "square-image";
 @import "speech-bubble";
 
-won-group-chat-selection-item {
+won-group-administration-selection-item {
   $triangleCutoutSize: $speechBubbleTailSize;
   $padding: 0.5rem;
   display: grid;
@@ -26,10 +26,6 @@ won-group-chat-selection-item {
     50%,
     "before" /* needed so there can be another tail*/
   );
-
-  .gcsi__label {
-    height: 2.5rem;
-  }
 
   $invisibleBorder: $thinBorderWidth solid $won-light-gray;
   border-left: $thinGrayBorder;

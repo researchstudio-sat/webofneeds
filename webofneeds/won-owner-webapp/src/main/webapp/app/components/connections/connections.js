@@ -2,7 +2,7 @@ import angular from "angular";
 import won from "../../won-es6.js";
 import sendRequestModule from "../send-request.js";
 import postMessagesModule from "../post-messages.js";
-import postGroupMessagesModule from "../post-group-messages.js";
+import groupAdministrationModule from "../group-administration.js";
 import postInfoModule from "../post-info.js";
 import connectionsOverviewModule from "../connections-overview.js";
 import createPostModule from "../create-post.js";
@@ -198,7 +198,7 @@ export default angular
   .module("won.owner.components.connections", [
     sendRequestModule,
     postMessagesModule,
-    postGroupMessagesModule,
+    groupAdministrationModule,
     postInfoModule,
     usecasePickerModule,
     usecaseGroupModule,

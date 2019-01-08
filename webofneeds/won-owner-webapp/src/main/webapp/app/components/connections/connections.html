@@ -30,7 +30,7 @@
     <won-create-post ng-if="self.showCreatePost"></won-create-post>
     <won-create-search ng-if="self.showCreateSearch"></won-create-search>
     <won-post-messages ng-if="self.showPostMessages"></won-post-messages>
-    <won-post-group-messages ng-if="self.showGroupChat"></won-post-group-messages>
+    <won-group-administration ng-if="self.showGroupChat"></won-group-administration>
     <won-post-info include-header="true" ng-if="self.showPostInfo"></won-post-info>
 </main>
 <won-footer ng-class="{'hide-in-responsive': self.hideFooterInResponsive }"> <!-- Connection view does not show the footer in responsive mode as there should not be two scrollable areas imho-->
