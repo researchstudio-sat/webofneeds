@@ -95,4 +95,15 @@ won-connections-overview {
   .co__closedNeeds {
     @include slideWithOpacityAnimation(0.5s, linear, 250rem);
   }
+  .co__loading {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    &__label {
+      color: $won-subtitle-gray;
+    }
+    &__spinner {
+    }
+  }
 }

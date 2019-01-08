@@ -6,7 +6,7 @@ import angular from "angular";
 import postHeaderModule from "./post-header.js";
 import postContextDropdownModule from "./post-context-dropdown.js";
 import postContentModule from "./post-content.js";
-import { attach } from "../utils.js";
+import { attach, getIn } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { isWhatsNewNeed } from "../need-utils.js";
 import { getPostUriFromRoute } from "../selectors/general-selectors.js";
@@ -34,7 +34,7 @@ function genComponentConf() {
             <won-post-context-dropdown></won-post-context-dropdown>
         </div>
         <won-post-content post-uri="self.postUri"></won-post-content>
-        <div class="post-info__footer" ng-if="!self.isLoading()">
+        <div class="post-info__footer" ng-if="!self.postLoading && !self.postFailedToLoad">
             <button class="won-button--filled red post-info__footer__button"
                 ng-if="self.showCreateWhatsAround()"
                 ng-click="self.createWhatsAround()"
@@ -61,6 +61,12 @@ function genComponentConf() {
           processingPublish: state.getIn(["process", "processingPublish"]),
           postUri,
           post,
+          postLoading:
+            !post ||
+            getIn(state, ["process", "needs", post.get("uri"), "loading"]),
+          postFailedToLoad:
+            post &&
+            getIn(state, ["process", "needs", post.get("uri"), "failedToLoad"]),
           createdTimestamp: post && post.get("creationDate"),
         };
       };
@@ -71,15 +77,11 @@ function genComponentConf() {
         this
       );
 
-      classOnComponentRoot("won-is-loading", () => this.isLoading(), this);
+      classOnComponentRoot("won-is-loading", () => this.postLoading, this);
     }
 
     showCreateWhatsAround() {
       return this.post && this.post.get("isOwned") && isWhatsNewNeed(this.post);
-    }
-
-    isLoading() {
-      return !this.post || this.post.get("isLoading");
     }
 
     createWhatsAround() {

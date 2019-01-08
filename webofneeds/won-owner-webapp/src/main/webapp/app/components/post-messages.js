@@ -9,7 +9,7 @@ import connectionHeaderModule from "./connection-header.js";
 import labelledHrModule from "./labelled-hr.js";
 import connectionContextDropdownModule from "./connection-context-dropdown.js";
 import { connect2Redux } from "../won-utils.js";
-import { attach, delay } from "../utils.js";
+import { attach, delay, getIn } from "../utils.js";
 import { isWhatsAroundNeed, isWhatsNewNeed } from "../need-utils.js";
 import {
   fetchAgreementProtocolUris,
@@ -99,19 +99,19 @@ function genComponentConf() {
               post-uri="self.nonOwnedNeedUri">
             </won-post-content-message>
             <div class="pm__content__loadspinner"
-                ng-if="self.isLoadingMessages || (self.showAgreementData && self.isLoadingAgreementData) || (self.showPetriNetData && self.isLoadingPetriNetData && !self.hasPetriNetData)">
+                ng-if="self.isProcessingLoadingMessages || (self.showAgreementData && self.isProcessingLoadingAgreementData) || (self.showPetriNetData && self.isProcessingLoadingPetriNetData && !self.hasPetriNetData)">
                 <svg class="hspinner">
                   <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
                 </svg>
             </div>
-            <div class="pm__content__agreement__loadingtext"  ng-if="self.showAgreementData && self.isLoadingAgreementData">
+            <div class="pm__content__agreement__loadingtext"  ng-if="self.showAgreementData && self.isProcessingLoadingAgreementData">
               Calculating Agreement Status
             </div>
-            <div class="pm__content__petrinet__loadingtext"  ng-if="self.showPetriNetData && self.isLoadingPetriNetData && !self.hasPetriNetData">
+            <div class="pm__content__petrinet__loadingtext"  ng-if="self.showPetriNetData && self.isProcessingLoadingPetriNetData && !self.hasPetriNetData">
               Calculating PetriNet Status
             </div>
             <button class="pm__content__loadbutton won-button--outlined thin red"
-                ng-if="!self.isSuggested && self.showChatData && !self.isLoadingMessages && !self.allMessagesLoaded"
+                ng-if="!self.isSuggested && self.showChatData && !self.isProcessingLoadingMessages && !self.allMessagesLoaded"
                 ng-click="self.loadPreviousMessages()">
                 Load previous messages
             </button>
@@ -127,34 +127,34 @@ function genComponentConf() {
             <!-- CHATVIEW SPECIFIC CONTENT END-->
 
             <!-- AGREEMENTVIEW SPECIFIC CONTENT START-->
-            <div class="pm__content__agreement__emptytext"  ng-if="self.showAgreementData && !(self.hasAgreementMessages || self.hasCancellationPendingMessages || self.hasProposalMessages) && !self.isLoadingAgreementData">
+            <div class="pm__content__agreement__emptytext"  ng-if="self.showAgreementData && !(self.hasAgreementMessages || self.hasCancellationPendingMessages || self.hasProposalMessages) && !self.isProcessingLoadingAgreementData">
               No Agreements within this Conversation
             </div>
-            <div class="pm__content__agreement__title" ng-if="self.showAgreementData && self.hasAgreementMessages && !self.isLoadingAgreementData">
+            <div class="pm__content__agreement__title" ng-if="self.showAgreementData && self.hasAgreementMessages && !self.isProcessingLoadingAgreementData">
               Agreements
             </div>
             <won-connection-message
-              ng-if="self.showAgreementData && !self.isLoadingAgreementData"
+              ng-if="self.showAgreementData && !self.isProcessingLoadingAgreementData"
               ng-click="self.multiSelectType && self.selectMessage(agreement)"
               ng-repeat="agreement in self.agreementMessagesArray"
               connection-uri="self.connectionUri"
               message-uri="agreement.get('uri')">
             </won-connection-message>
-            <div class="pm__content__agreement__title" ng-if="self.showAgreementData && self.hasCancellationPendingMessages && !self.isLoadingAgreementData">
+            <div class="pm__content__agreement__title" ng-if="self.showAgreementData && self.hasCancellationPendingMessages && !self.isProcessingLoadingAgreementData">
               Agreements with Pending Cancellation
             </div>
             <won-connection-message
-              ng-if="self.showAgreementData && !self.isLoadingAgreementData"
+              ng-if="self.showAgreementData && !self.isProcessingLoadingAgreementData"
               ng-click="self.multiSelectType && self.selectMessage(proposesToCancel)"
               ng-repeat="proposesToCancel in self.cancellationPendingMessagesArray"
               connection-uri="self.connectionUri"
               message-uri="proposesToCancel.get('uri')">
             </won-connection-message>
-            <div class="pm__content__agreement__title" ng-if="self.showAgreementData && self.hasProposalMessages && !self.isLoadingAgreementData">
+            <div class="pm__content__agreement__title" ng-if="self.showAgreementData && self.hasProposalMessages && !self.isProcessingLoadingAgreementData">
               Open Proposals
             </div>
             <won-connection-message
-              ng-if="self.showAgreementData && !self.isLoadingAgreementData"
+              ng-if="self.showAgreementData && !self.isProcessingLoadingAgreementData"
               ng-click="self.multiSelectType && self.selectMessage(proposal)"
               ng-repeat="proposal in self.proposalMessagesArray"
               connection-uri="self.connectionUri"
@@ -163,11 +163,11 @@ function genComponentConf() {
             <!-- AGREEMENTVIEW SPECIFIC CONTENT END-->
 
             <!-- PETRINETVIEW SPECIFIC CONTENT START -->
-            <div class="pm__content__petrinet__emptytext"  ng-if="self.showPetriNetData && !self.isLoadingPetriNetData && !self.hasPetriNetData">
+            <div class="pm__content__petrinet__emptytext"  ng-if="self.showPetriNetData && !self.isProcessingLoadingPetriNetData && !self.hasPetriNetData">
               No PetriNet Data within this Conversation
             </div>
             <div class="pm__content__petrinet__process"
-              ng-if="self.showPetriNetData && (!self.isLoadingPetriNetData || self.hasPetriNetData) && process.get('processURI')"
+              ng-if="self.showPetriNetData && (!self.isProcessingLoadingPetriNetData || self.hasPetriNetData) && process.get('processURI')"
               ng-repeat="process in self.petriNetDataArray">
               <div class="pm__content__petrinet__process__header">
                 ProcessURI: {{ process.get('processURI') }}
@@ -326,11 +326,32 @@ function genComponentConf() {
           chatMessages,
           chatMessagesWithUnknownState,
           unreadMessageCount: unreadMessages && unreadMessages.size,
-          isLoadingMessages: connection && connection.get("isLoadingMessages"),
-          isLoadingAgreementData:
-            connection && connection.get("isLoadingAgreementData"),
-          isLoadingPetriNetData:
-            connection && connection.get("isLoadingPetriNetData"),
+          isProcessingLoadingMessages:
+            connection &&
+            getIn(state, [
+              "process",
+              "connections",
+              connectionUri,
+              "loadingMessages",
+            ]),
+          isProcessingLoadingAgreementData:
+            connection &&
+            getIn(state, [
+              "process",
+              "connections",
+              connectionUri,
+              "agreementData",
+              "loading",
+            ]),
+          isProcessingLoadingPetriNetData:
+            connection &&
+            getIn(state, [
+              "process",
+              "connections",
+              connectionUri,
+              "petriNetData",
+              "loading",
+            ]),
           showAgreementData: connection && connection.get("showAgreementData"),
           showPetriNetData: connection && connection.get("showPetriNetData"),
           showChatData:
@@ -341,12 +362,25 @@ function genComponentConf() {
             ),
           agreementData,
           petriNetData,
-          petriNetDataArray:
+          petriNetDataArray: petriNetData && petriNetData.toArray(),
+          agreementDataLoaded:
+            agreementData &&
+            getIn(state, [
+              "process",
+              "connections",
+              connectionUri,
+              "agreementData",
+              "loaded",
+            ]),
+          petriNetDataLoaded:
             petriNetData &&
-            petriNetData.get("data") &&
-            petriNetData.get("data").toArray(),
-          agreementDataLoaded: agreementData && agreementData.get("isLoaded"),
-          petriNetDataLoaded: petriNetData && petriNetData.get("isLoaded"),
+            getIn(state, [
+              "process",
+              "connections",
+              connectionUri,
+              "petriNetData",
+              "loaded",
+            ]),
           multiSelectType: connection && connection.get("multiSelectType"),
           lastUpdateTimestamp: connection && connection.get("lastUpdateDate"),
           isSentRequest:
@@ -362,10 +396,7 @@ function genComponentConf() {
           // if the connect-message is here, everything else should be as well
           allMessagesLoaded,
           hasAgreementMessages: agreementMessages && agreementMessages.size > 0,
-          hasPetriNetData:
-            petriNetData &&
-            petriNetData.get("data") &&
-            petriNetData.get("data").size > 0,
+          hasPetriNetData: petriNetData && petriNetData.size > 0,
           agreementMessagesArray:
             agreementMessages && agreementMessages.toArray(),
           hasProposalMessages: proposalMessages && proposalMessages.size > 0,
@@ -375,6 +406,23 @@ function genComponentConf() {
           cancellationPendingMessagesArray:
             cancellationPendingMessages &&
             cancellationPendingMessages.toArray(),
+          connectionOrNeedsLoading:
+            !connection ||
+            !nonOwnedNeed ||
+            !ownedNeed ||
+            getIn(state, [
+              "process",
+              "needs",
+              ownedNeed.get("uri"),
+              "loading",
+            ]) ||
+            getIn(state, [
+              "process",
+              "needs",
+              nonOwnedNeed.get("uri"),
+              "loading",
+            ]) ||
+            getIn(state, ["process", "connections", connectionUri, "loading"]),
         };
       };
 
@@ -398,17 +446,10 @@ function genComponentConf() {
           )
       );
 
-      classOnComponentRoot("won-is-loading", () => this.isLoading(), this);
-    }
-
-    isLoading() {
-      return (
-        !this.connection ||
-        !this.nonOwnedNeed ||
-        !this.ownedNeed ||
-        this.ownedNeed.get("isLoading") ||
-        this.nonOwnedNeed.get("isLoading") ||
-        this.connection.get("isLoading")
+      classOnComponentRoot(
+        "won-is-loading",
+        () => this.connectionOrNeedsLoading,
+        this
       );
     }
 
@@ -418,7 +459,7 @@ function genComponentConf() {
         const INITIAL_MESSAGECOUNT = 15;
         if (
           this.connection &&
-          !this.isLoadingMessages &&
+          !this.isProcessingLoadingMessages &&
           !(this.allMessagesLoaded || this.connection.get("messages").size > 0)
         ) {
           this.connections__showLatestMessages(
@@ -434,14 +475,14 @@ function genComponentConf() {
         if (
           forceFetch ||
           (this.isConnected &&
-            !this.isLoadingPetriNetData &&
+            !this.isProcessingLoadingPetriNetData &&
             !this.petriNetDataLoaded)
         ) {
           const connectionUri = this.connection && this.connection.get("uri");
 
           this.connections__setLoadingPetriNetData({
             connectionUri: connectionUri,
-            isLoadingPetriNetData: true,
+            loadingPetriNetData: true,
           });
 
           fetchPetriNetUris(connectionUri)
@@ -465,7 +506,7 @@ function genComponentConf() {
               console.error("Error:", error);
               this.connections__setLoadingPetriNetData({
                 connectionUri: connectionUri,
-                isLoadingPetriNetData: false,
+                loadingPetriNetData: false,
               });
             });
         }
@@ -477,12 +518,12 @@ function genComponentConf() {
         if (
           forceFetch ||
           (this.isConnected &&
-            !this.isLoadingAgreementData &&
+            !this.isProcessingLoadingAgreementData &&
             !this.agreementDataLoaded)
         ) {
           this.connections__setLoadingAgreementData({
             connectionUri: this.connectionUri,
-            isLoadingAgreementData: true,
+            loadingAgreementData: true,
           });
           fetchAgreementProtocolUris(this.connection.get("uri"))
             .then(response => {
@@ -540,7 +581,7 @@ function genComponentConf() {
               console.error("Error:", error);
               this.connections__setLoadingAgreementData({
                 connectionUri: this.connectionUri,
-                isLoadingAgreementData: false,
+                loadingAgreementData: false,
               });
             });
         }
@@ -551,8 +592,8 @@ function genComponentConf() {
       delay(0).then(() => {
         if (
           this.isConnected &&
-          !this.isLoadingAgreementData &&
-          !this.isLoadingMessages &&
+          !this.isProcessingLoadingAgreementData &&
+          !this.isProcessingLoadingMessages &&
           this.agreementDataLoaded &&
           this.chatMessagesWithUnknownState &&
           this.chatMessagesWithUnknownState.size > 0
@@ -650,7 +691,7 @@ function genComponentConf() {
     loadPreviousMessages() {
       delay(0).then(() => {
         const MORE_MESSAGECOUNT = 5;
-        if (this.connection && !this.isLoadingMessages) {
+        if (this.connection && !this.isProcessingLoadingMessages) {
           this.connections__showMoreMessages(
             this.connection.get("uri"),
             MORE_MESSAGECOUNT

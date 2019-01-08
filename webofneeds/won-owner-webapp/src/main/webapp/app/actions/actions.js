@@ -121,8 +121,10 @@ const actionHierarchy = {
     updateAgreementData: INJ_DEFAULT, //cnct.loadAgreementData,
     updatePetriNetData: INJ_DEFAULT,
 
-    storeActiveUrisLoading: INJ_DEFAULT,
+    storeActiveUrisInLoading: INJ_DEFAULT,
     storeActive: INJ_DEFAULT,
+
+    storeUriFailed: INJ_DEFAULT,
   },
   needs: {
     received: INJ_DEFAULT,
@@ -142,20 +144,23 @@ const actionHierarchy = {
     fetchSuggested: fetchSuggested,
 
     storeOwnedInactiveUris: INJ_DEFAULT,
-    storeOwnedInactiveUrisLoading: INJ_DEFAULT,
+    storeOwnedInactiveUrisInLoading: INJ_DEFAULT,
     storeOwnedActiveUris: INJ_DEFAULT,
-    storeTheirUrisLoading: INJ_DEFAULT,
+    storeTheirUrisInLoading: INJ_DEFAULT,
 
     storeOwned: INJ_DEFAULT,
     storeTheirs: INJ_DEFAULT,
+
+    storeUriFailed: INJ_DEFAULT,
   },
   personas: {
     create: createPersona,
-    createSuccessful: INJ_DEFAULT,
     review: reviewPersona,
 
     storeTheirs: INJ_DEFAULT,
-    storeTheirUrisLoading: INJ_DEFAULT,
+    storeTheirUrisInLoading: INJ_DEFAULT,
+
+    storeUriFailed: INJ_DEFAULT,
   },
   router: {
     stateGo, // only overwrites parameters that are explicitly mentioned, unless called without queryParams object (which also resets "pervasive" parameters, that shouldn't be removed
@@ -242,7 +247,6 @@ const actionHierarchy = {
     connectMessageReceived: INJ_DEFAULT,
     connectMessageSent: INJ_DEFAULT,
     processHintMessage: messages.processHintMessage,
-    hintMessageReceived: INJ_DEFAULT,
     openMessageReceived: INJ_DEFAULT,
     openMessageSent: INJ_DEFAULT,
     processOpenMessage: messages.processOpenMessage,

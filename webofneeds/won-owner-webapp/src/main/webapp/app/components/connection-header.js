@@ -8,7 +8,7 @@ import "ng-redux";
 import squareImageModule from "./square-image.js";
 import { actionCreators } from "../actions/actions.js";
 import { labels, relativeTime } from "../won-label-utils.js";
-import { attach } from "../utils.js";
+import { attach, getIn } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { isDirectResponseNeed } from "../need-utils.js";
 import { getHumanReadableStringFromMessage } from "../reducers/need-reducer/parse-message.js";
@@ -21,24 +21,24 @@ import { getUnreadMessagesByConnectionUri } from "../selectors/message-selectors
 import { getMessagesByConnectionUri } from "../selectors/message-selectors.js";
 import connectionStateModule from "./connection-state.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
+import { isGroupChatConnection } from "../connection-utils.js";
 
 import "style/_connection-header.scss";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
-      <div class="ch__icon" ng-if="!self.isLoading()">
+      <div class="ch__icon" ng-if="!self.connectionOrNeedsLoading">
           <won-square-image
             class="ch__icon__theirneed"
-            ng-class="{'bigger' : self.biggerImage, 'inactive' : self.theirNeed.get('state') === self.WON.InactiveCompacted}"
             src="self.theirNeed.get('TODO')"
             title="self.theirNeed.get('humanReadable')"
             uri="self.theirNeed.get('uri')"
             ng-show="!self.hideImage">
           </won-square-image>
       </div>
-      <div class="ch__right" ng-if="!self.isLoading()">
-        <div class="ch__right__topline">
+      <div class="ch__right" ng-if="!self.connectionOrNeedsLoading">
+        <div class="ch__right__topline" ng-if="!self.theirNeedFailedToLoad">
           <div class="ch__right__topline__title" ng-if="!self.isDirectResponseFromRemote && self.theirNeed.get('humanReadable')" title="{{ self.theirNeed.get('humanReadable') }}">
             {{ self.theirNeed.get('humanReadable') }}
           </div>
@@ -49,7 +49,7 @@ function genComponentConf() {
             Direct Response
           </div>
         </div>
-        <div class="ch__right__subtitle">
+        <div class="ch__right__subtitle" ng-if="!self.theirNeedFailedToLoad">
           <span class="ch__right__subtitle__type">
             <won-connection-state 
               connection-uri="self.connection.get('uri')">
@@ -72,11 +72,23 @@ function genComponentConf() {
             {{ self.friendlyTimestamp }}
           </div>
         </div>
+        <div class="ch__right__topline" ng-if="self.theirNeedFailedToLoad">
+          <div class="ch__right__topline__notitle">
+            Remote Need Loading failed
+          </div>
+        </div>
+        <div class="ch__right__subtitle" ng-if="self.theirNeedFailedToLoad">
+          <span class="ch__right__subtitle__type">
+            <span class="ch__right__subtitle__type__state">
+              Need might have been deleted, you might want to close this connection.
+            </span>
+          </span>
+        </div>
       </div>
-      <div class="ch__icon" ng-if="self.isLoading()">
+      <div class="ch__icon" ng-if="self.connectionOrNeedsLoading">
           <div class="ch__icon__skeleton"></div>
       </div>
-      <div class="ch__right" ng-if="self.isLoading()">
+      <div class="ch__right" ng-if="self.connectionOrNeedsLoading">
         <div class="ch__right__topline">
           <div class="ch__right__topline__title"></div>
           <div class="ch__right__topline__date"></div>
@@ -132,6 +144,7 @@ function genComponentConf() {
 
         return {
           connection,
+          isGroupChat: isGroupChatConnection(connection),
           ownedNeed,
           theirNeed,
           isDirectResponseFromRemote: isDirectResponseNeed(theirNeed),
@@ -147,6 +160,36 @@ function genComponentConf() {
               selectLastUpdateTime(state),
               this.timestamp || theirNeed.get("lastUpdateDate")
             ),
+          theirNeedFailedToLoad:
+            theirNeed &&
+            getIn(state, [
+              "process",
+              "needs",
+              theirNeed.get("uri"),
+              "failedToLoad",
+            ]),
+          connectionOrNeedsLoading:
+            !connection ||
+            !theirNeed ||
+            !ownedNeed ||
+            getIn(state, [
+              "process",
+              "needs",
+              ownedNeed.get("uri"),
+              "loading",
+            ]) ||
+            getIn(state, [
+              "process",
+              "needs",
+              theirNeed.get("uri"),
+              "loading",
+            ]) ||
+            getIn(state, [
+              "process",
+              "connections",
+              connection.get("uri"),
+              "loading",
+            ]),
         };
       };
 
@@ -157,17 +200,10 @@ function genComponentConf() {
         this
       );
 
-      classOnComponentRoot("won-is-loading", () => this.isLoading(), this);
-    }
-
-    isLoading() {
-      return (
-        !this.connection ||
-        !this.theirNeed ||
-        !this.ownedNeed ||
-        this.ownedNeed.get("isLoading") ||
-        this.theirNeed.get("isLoading") ||
-        this.connection.get("isLoading")
+      classOnComponentRoot(
+        "won-is-loading",
+        () => this.connectionOrNeedsLoading,
+        this
       );
     }
 
@@ -205,12 +241,6 @@ function genComponentConf() {
        * if set, the avatar will be hidden
        */
       hideImage: "=",
-
-      /**
-       * If true, the title image will be a bit bigger. This
-       * can be used to create visual contrast.
-       */
-      biggerImage: "=",
     },
     template: template,
   };

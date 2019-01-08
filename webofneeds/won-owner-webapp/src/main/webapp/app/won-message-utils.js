@@ -504,6 +504,7 @@ export async function buildCreateMessage(needData, wonNodeUri) {
     matchingContext: needData.matchingContext
       ? needData.matchingContext
       : undefined,
+    facet: needData.facet,
   });
 
   const msgUri = wonNodeUri + "/event/" + getRandomWonId(); //mandatory
@@ -526,7 +527,7 @@ export async function buildCreateMessage(needData, wonNodeUri) {
 
 export function fetchDataForNonOwnedNeedOnly(needUri, dispatch) {
   dispatch({
-    type: actionTypes.needs.storeTheirUrisLoading,
+    type: actionTypes.needs.storeTheirUrisInLoading,
     payload: Immutable.fromJS({ uris: [needUri] }),
   });
   return fetchTheirNeedAndDispatch(needUri, dispatch);
@@ -535,7 +536,7 @@ export function fetchDataForNonOwnedNeedOnly(needUri, dispatch) {
 export function fetchUnloadedData(dispatch) {
   return fetchOwnedInactiveNeedUris().then(needUris => {
     dispatch({
-      type: actionTypes.needs.storeOwnedInactiveUrisLoading,
+      type: actionTypes.needs.storeOwnedInactiveUrisInLoading,
       payload: Immutable.fromJS({ uris: needUris }),
     });
     return fetchDataForOwnedNeeds(needUris, dispatch);
@@ -543,21 +544,22 @@ export function fetchUnloadedData(dispatch) {
 }
 
 export function fetchOwnedData(dispatch) {
-  return fetchOwnedInactiveNeedUris().then(inactiveNeedUris => {
-    dispatch({
-      type: actionTypes.needs.storeOwnedInactiveUris,
-      payload: Immutable.fromJS({ uris: inactiveNeedUris }),
-    });
-
-    return fetchOwnedActiveNeedUris().then(needUris => {
+  return fetchOwnedInactiveNeedUris()
+    .then(inactiveNeedUris =>
+      dispatch({
+        type: actionTypes.needs.storeOwnedInactiveUris,
+        payload: Immutable.fromJS({ uris: inactiveNeedUris }),
+      })
+    )
+    .then(() => fetchOwnedActiveNeedUris())
+    .then(needUris => {
       dispatch({
         type: actionTypes.needs.storeOwnedActiveUris,
         payload: Immutable.fromJS({ uris: needUris }),
       });
-
-      return fetchDataForOwnedNeeds(needUris, dispatch);
-    });
-  });
+      return needUris;
+    })
+    .then(needUris => fetchDataForOwnedNeeds(needUris, dispatch));
 }
 
 function fetchOwnedInactiveNeedUris() {
@@ -574,7 +576,6 @@ function fetchOwnedInactiveNeedUris() {
 }
 
 function fetchOwnedActiveNeedUris() {
-  console.debug("fetchOwnedActiveNeedUris");
   return fetch(urljoin(ownerBaseUrl, "/rest/needs?state=ACTIVE"), {
     method: "get",
     headers: {
@@ -715,7 +716,7 @@ export async function fetchDataForOwnedNeeds(ownedNeedUris, dispatch) {
       const theirNeedUrisArray = theirNeedUris.toArray();
 
       dispatch({
-        type: actionTypes.needs.storeTheirUrisLoading,
+        type: actionTypes.needs.storeTheirUrisInLoading,
         payload: Immutable.fromJS({ uris: theirNeedUrisArray }),
       });
       return theirNeedUrisArray;
@@ -735,7 +736,7 @@ function fetchConnectionsOfNeedAndDispatch(needUri, dispatch) {
         connUri => !isConnUriClosed(connUri)
       );
       dispatch({
-        type: actionTypes.connections.storeActiveUrisLoading,
+        type: actionTypes.connections.storeActiveUrisInLoading,
         payload: Immutable.fromJS({
           needUri: needUri,
           connUris: activeConnectionUris,
@@ -749,44 +750,71 @@ function fetchConnectionsOfNeedAndDispatch(needUri, dispatch) {
 }
 
 function fetchOwnedNeedAndDispatch(needUri, dispatch) {
-  return won.getNeed(needUri).then(need => {
-    dispatch({
-      type: actionTypes.needs.storeOwned,
-      payload: Immutable.fromJS({ needs: { [needUri]: need } }),
+  return won
+    .getNeed(needUri)
+    .then(need => {
+      dispatch({
+        type: actionTypes.needs.storeOwned,
+        payload: Immutable.fromJS({ needs: { [needUri]: need } }),
+      });
+      return need;
+    })
+    .catch(() => {
+      dispatch({
+        type: actionTypes.needs.storeUriFailed,
+        payload: Immutable.fromJS({ uri: needUri }),
+      });
+      return;
     });
-    return need;
-  });
 }
 
-function fetchActiveConnectionAndDispatch(cnctUri, dispatch) {
-  return won.getNode(cnctUri).then(connection => {
-    dispatch({
-      type: actionTypes.connections.storeActive,
-      payload: Immutable.fromJS({ connections: { [cnctUri]: connection } }),
+export function fetchActiveConnectionAndDispatch(cnctUri, dispatch) {
+  return won
+    .getNode(cnctUri)
+    .then(connection => {
+      dispatch({
+        type: actionTypes.connections.storeActive,
+        payload: Immutable.fromJS({ connections: { [cnctUri]: connection } }),
+      });
+      return connection;
+    })
+    .catch(() => {
+      dispatch({
+        type: actionTypes.connections.storeUriFailed,
+        payload: Immutable.fromJS({ uri: cnctUri }),
+      });
+      return;
     });
-    return connection;
-  });
 }
 
-function fetchTheirNeedAndDispatch(needUri, dispatch) {
+export function fetchTheirNeedAndDispatch(needUri, dispatch) {
   return won
     .getNeed(needUri)
     .then(need => {
       if (need["won:heldBy"] && need["won:heldBy"]["@id"]) {
         const personaUri = need["won:heldBy"]["@id"];
         dispatch({
-          type: actionTypes.personas.storeTheirUrisLoading,
+          type: actionTypes.personas.storeTheirUrisInLoading,
           payload: Immutable.fromJS({ uris: [personaUri] }),
         });
-        return won.getNeed(personaUri).then(personaNeed => {
-          dispatch({
-            type: actionTypes.personas.storeTheirs,
-            payload: Immutable.fromJS({
-              needs: { [personaUri]: personaNeed },
-            }),
+        return won
+          .getNeed(personaUri)
+          .then(personaNeed => {
+            dispatch({
+              type: actionTypes.personas.storeTheirs,
+              payload: Immutable.fromJS({
+                needs: { [personaUri]: personaNeed },
+              }),
+            });
+            return need;
+          })
+          .catch(() => {
+            dispatch({
+              type: actionTypes.personas.storeUriFailed,
+              payload: Immutable.fromJS({ uri: needUri }),
+            });
+            return;
           });
-          return need;
-        });
       } else {
         return need;
       }
@@ -797,5 +825,12 @@ function fetchTheirNeedAndDispatch(needUri, dispatch) {
         payload: Immutable.fromJS({ needs: { [needUri]: need } }),
       });
       return need;
+    })
+    .catch(() => {
+      dispatch({
+        type: actionTypes.needs.storeUriFailed,
+        payload: Immutable.fromJS({ uri: needUri }),
+      });
+      return;
     });
 }

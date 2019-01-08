@@ -7,7 +7,7 @@ import postIsOrSeeksInfoModule from "./post-is-or-seeks-info.js";
 import labelledHrModule from "./labelled-hr.js";
 import postContentGeneral from "./post-content-general.js";
 import trigModule from "./trig.js";
-import { attach } from "../utils.js";
+import { attach, getIn } from "../utils.js";
 import won from "../won-es6.js";
 import { labels } from "../won-label-utils.js";
 import { connect2Redux } from "../won-utils.js";
@@ -21,7 +21,7 @@ import "style/_rdflink.scss";
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
-        <div class="post-skeleton" ng-if="self.isLoading()">
+        <div class="post-skeleton" ng-if="self.postLoading">
             <h2 class="post-skeleton__heading"></h2>
             <p class="post-skeleton__details"></p>
             <h2 class="post-skeleton__heading"></h2>
@@ -35,7 +35,7 @@ function genComponentConf() {
             <h2 class="post-skeleton__heading"></h2>
             <div class="post-skeleton__details"></div>
         </div>
-        <div class="post-content" ng-if="!self.isLoading()">
+        <div class="post-content" ng-if="!self.postLoading">
           <won-post-content-general post-uri="self.post.get('uri')"></won-post-content-general>
 
           <won-gallery ng-if="self.post.get('hasImages')">
@@ -97,6 +97,9 @@ function genComponentConf() {
           hasContent,
           hasSeeksBranch,
           post,
+          postLoading:
+            !post ||
+            getIn(state, ["process", "needs", post.get("uri"), "loading"]),
           createdTimestamp: post && post.get("creationDate"),
           shouldShowRdf: state.getIn(["view", "showRdf"]),
           fromConnection: !!openConnectionUri,
@@ -105,11 +108,7 @@ function genComponentConf() {
       };
       connect2Redux(selectFromState, actionCreators, ["self.postUri"], this);
 
-      classOnComponentRoot("won-is-loading", () => this.isLoading(), this);
-    }
-
-    isLoading() {
-      return !this.post || this.post.get("isLoading");
+      classOnComponentRoot("won-is-loading", () => this.postLoading, this);
     }
   }
 

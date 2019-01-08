@@ -5,7 +5,7 @@ import chatTextFieldSimpleModule from "./chat-textfield-simple.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 import { getPostUriFromRoute } from "../selectors/general-selectors.js";
 import { connect2Redux } from "../won-utils.js";
-import { attach } from "../utils.js";
+import { attach, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
@@ -13,7 +13,7 @@ const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
         <won-post-content post-uri="self.postUriToConnectTo"></won-post-content>
-        <div class="post-info__footer" ng-if="!self.isLoading()">
+        <div class="post-info__footer" ng-if="!self.postLoading">
             <chat-textfield-simple
                 placeholder="::'Message (optional)'"
                 on-submit="::self.sendAdHocRequest(value, selectedPersona)"
@@ -35,15 +35,19 @@ function genComponentConf() {
         return {
           displayedPost,
           postUriToConnectTo,
+          postLoading:
+            !displayedPost ||
+            getIn(state, [
+              "process",
+              "needs",
+              displayedPost.get("uri"),
+              "loading",
+            ]),
         };
       };
       connect2Redux(selectFromState, actionCreators, [], this);
 
-      classOnComponentRoot("won-is-loading", () => this.isLoading(), this);
-    }
-
-    isLoading() {
-      return !this.displayedPost || this.displayedPost.get("isLoading");
+      classOnComponentRoot("won-is-loading", () => this.postLoading, this);
     }
 
     sendAdHocRequest(message, persona) {

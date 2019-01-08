@@ -9,8 +9,8 @@ import { labels } from "../won-label-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { getPosts, getOwnedPosts } from "../selectors/general-selectors.js";
 import { getChatConnectionsByNeedUri } from "../selectors/connection-selectors.js";
-
-import { attach, sortByDate } from "../utils.js";
+import { isChatConnection } from "../connection-utils.js";
+import { attach, sortByDate, getIn } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
@@ -24,7 +24,7 @@ function genComponentConf() {
             class="extendedindicators__item clickable"
             ng-show="self.latestConnectedUri"
             ng-click="self.setOpen(self.latestConnectedUri)"
-            ng-if="!self.isLoading()">
+            ng-if="!self.postLoading">
                 <svg class="extendedindicators__item__icon"
                     title="Show latest message/request"
                     style="--local-primary:var(--won-primary-color-light);"
@@ -45,7 +45,7 @@ function genComponentConf() {
                 </span>
         </a>
         <div class="extendedindicators__item" ng-show="!self.latestConnectedUri"
-            ng-if="!self.isLoading()">
+            ng-if="!self.postLoading">
             <svg class="extendedindicators__item__icon"
                 style="--local-primary:var(--won-disabled-color);">
                     <use xlink:href="#ico36_message" href="#ico36_message"></use>
@@ -55,7 +55,7 @@ function genComponentConf() {
         <a
             class="extendedindicators__item clickable"
             ng-show="self.latestMatchUri"
-            ng-if="!self.isLoading()"
+            ng-if="!self.postLoading"
             ng-click="self.setOpen(self.latestMatchUri)">
 
                 <svg class="extendedindicators__item__icon"
@@ -77,7 +77,7 @@ function genComponentConf() {
                 </span>
         </a>
         <div class="extendedindicators__item" ng-show="!self.latestMatchUri"
-            ng-if="!self.isLoading()">
+            ng-if="!self.postLoading">
             <svg class="extendedindicators__item__icon"
                 style="--local-primary:var(--won-disabled-color);">
                     <use xlink:href="#ico36_match" href="#ico36_match"></use>
@@ -88,7 +88,7 @@ function genComponentConf() {
             class="extendedindicators__item clickable"
             ng-show="self.latestConnectedUri"
             ng-click="self.setOpen(self.latestConnectedUri)"
-            ng-if="self.isLoading()">
+            ng-if="self.postLoading">
                 <svg class="extendedindicators__item__icon"
                     title="Show latest message/request"
                     style="--local-primary:var(--won-primary-color-light);"
@@ -109,7 +109,7 @@ function genComponentConf() {
                 </span>
         </a>
         <div class="extendedindicators__item"
-            ng-if="self.isLoading()">
+            ng-if="self.postLoading">
             <svg class="extendedindicators__item__icon"
                 style="--local-primary:var(--won-skeleton-color);">
                     <use xlink:href="#ico36_message" href="#ico36_message"></use>
@@ -117,7 +117,7 @@ function genComponentConf() {
              <span class="extendedindicators__item__caption"></span>
         </div>
         <div class="extendedindicators__item"
-            ng-if="self.isLoading()">
+            ng-if="self.postLoading">
             <svg class="extendedindicators__item__icon"
                 style="--local-primary:var(--won-skeleton-color);">
                     <use xlink:href="#ico36_match" href="#ico36_match"></use>
@@ -145,11 +145,15 @@ function genComponentConf() {
             const remoteNeedActive =
               allPosts &&
               allPosts.get(remoteNeedUri) &&
-              (allPosts.getIn([remoteNeedUri, "isLoading"]) ||
+              (getIn(state, ["process", "needs", remoteNeedUri, "loading"]) ||
                 allPosts.getIn([remoteNeedUri, "state"]) ===
                   won.WON.ActiveCompacted);
 
-            return remoteNeedActive && conn.get("state") === won.WON.Suggested;
+            return (
+              remoteNeedActive &&
+              conn.get("state") === won.WON.Suggested &&
+              isChatConnection(conn)
+            );
           });
         const connected =
           chatConnectionsByNeedUri &&
@@ -158,14 +162,16 @@ function genComponentConf() {
             const remoteNeedActiveOrLoading =
               allPosts &&
               allPosts.get(remoteNeedUri) &&
-              (allPosts.getIn([remoteNeedUri, "isLoading"]) ||
+              (getIn(state, ["process", "needs", remoteNeedUri, "loading"]) ||
                 allPosts.getIn([remoteNeedUri, "state"]) ===
                   won.WON.ActiveCompacted);
 
             return (
               remoteNeedActiveOrLoading &&
+              !!conn.get("state") &&
               conn.get("state") !== won.WON.Suggested &&
-              conn.get("state") !== won.WON.Closed
+              conn.get("state") !== won.WON.Closed &&
+              isChatConnection(conn)
             );
           });
 
@@ -185,6 +191,9 @@ function genComponentConf() {
         return {
           WON: won.WON,
           ownedPost,
+          postLoading:
+            !ownedPost ||
+            getIn(state, ["process", "needs", ownedPost.get("uri"), "loading"]),
           connectedCount,
           matchesCount,
           unreadConnectedCount,
@@ -196,11 +205,7 @@ function genComponentConf() {
 
       connect2Redux(selectFromState, actionCreators, ["self.needUri"], this);
 
-      classOnComponentRoot("won-is-loading", () => this.isLoading(), this);
-    }
-
-    isLoading() {
-      return !this.ownedPost || this.ownedPost.get("isLoading");
+      classOnComponentRoot("won-is-loading", () => this.postLoading, this);
     }
 
     /**

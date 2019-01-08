@@ -3,7 +3,7 @@
  */
 
 import angular from "angular";
-import { attach } from "../utils.js";
+import { attach, getIn, get } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import {
@@ -25,6 +25,12 @@ function genComponentConf() {
         ng-click="self.setOpen()"
         class="clickable">
       </won-connection-header>
+      <button
+        class="csi__closebutton red won-button--outlined thin"
+        ng-click="self.closeConnection()"
+        ng-if="self.remoteNeedFailedToLoad">
+          Close
+      </button>
     `;
 
   class Controller {
@@ -36,12 +42,17 @@ function genComponentConf() {
           state,
           this.connectionUri
         );
-        const connection =
-          ownedNeed && ownedNeed.getIn(["connections", this.connectionUri]);
-
+        const connection = getIn(ownedNeed, [
+          "connections",
+          this.connectionUri,
+        ]);
+        const remoteNeedUri = get(connection, "remoteNeedUri");
         return {
           openConnectionUri: getConnectionUriFromRoute(state),
-          lastUpdateTimestamp: connection && connection.get("lastUpdateDate"),
+          lastUpdateTimestamp: get(connection, "lastUpdateDate"),
+          remoteNeedFailedToLoad:
+            remoteNeedUri &&
+            getIn(state, ["process", "needs", remoteNeedUri, "failedToLoad"]),
         };
       };
 
@@ -56,6 +67,14 @@ function genComponentConf() {
     }
     isOpen() {
       return this.openConnectionUri === this.connectionUri;
+    }
+
+    closeConnection() {
+      this.connections__close(this.connectionUri);
+      this.router__stateGoCurrent({
+        useCase: undefined,
+        connectionUri: undefined,
+      });
     }
 
     setOpen() {

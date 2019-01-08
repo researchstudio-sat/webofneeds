@@ -12,7 +12,6 @@ import {
   addTheirNeedsInLoading,
   addNeed,
   addNeedInCreation,
-  changeNeedState,
 } from "./reduce-needs.js";
 import {
   addMessage,
@@ -32,12 +31,8 @@ import {
   markMessageExpandReferences,
 } from "./reduce-messages.js";
 import {
-  addConnectionFull,
   addActiveConnectionsToNeedInLoading,
   markConnectionAsRated,
-  setConnectionLoadingMessages,
-  setConnectionLoadingAgreementData,
-  setConnectionLoadingPetriNetData,
   markConnectionAsRead,
   getOwnedNeedByConnectionUri,
   changeConnectionState,
@@ -47,7 +42,6 @@ import {
   updatePetriNetStateData,
   setShowAgreementData,
   setShowPetriNetData,
-  setPetriNetDataDirty,
   setMultiSelectType,
 } from "./reduce-connections.js";
 
@@ -66,17 +60,19 @@ export default function(allNeedsInState = initialState, action = {}) {
       return allNeedsInState.map(need =>
         need.set("isOwned", false).set("connections", Immutable.Map())
       );
-    case actionTypes.needs.fetchSuggested: {
-      let suggestedPosts = action.payload.get("suggestedPosts");
-      suggestedPosts = suggestedPosts ? suggestedPosts : Immutable.Set();
 
-      const stateWithSuggestedPosts = suggestedPosts.reduce(
+    case actionTypes.needs.fetchSuggested: {
+      const suggestedPosts = action.payload.get("suggestedPosts");
+
+      if (!suggestedPosts) {
+        return allNeedsInState;
+      }
+
+      return suggestedPosts.reduce(
         (updatedState, suggestedPost) =>
           addNeed(updatedState, suggestedPost, false),
         allNeedsInState
       );
-
-      return stateWithSuggestedPosts;
     }
 
     case actionTypes.needs.storeOwnedActiveUris: {
@@ -93,15 +89,15 @@ export default function(allNeedsInState = initialState, action = {}) {
       );
     }
 
-    case actionTypes.needs.storeOwnedInactiveUrisLoading: {
+    case actionTypes.needs.storeOwnedInactiveUrisInLoading: {
       return addOwnInactiveNeedsInLoading(
         allNeedsInState,
         action.payload.get("uris")
       );
     }
 
-    case actionTypes.personas.storeTheirUrisLoading:
-    case actionTypes.needs.storeTheirUrisLoading: {
+    case actionTypes.personas.storeTheirUrisInLoading:
+    case actionTypes.needs.storeTheirUrisInLoading: {
       return addTheirNeedsInLoading(
         allNeedsInState,
         action.payload.get("uris")
@@ -118,7 +114,7 @@ export default function(allNeedsInState = initialState, action = {}) {
       );
     }
 
-    case actionTypes.connections.storeActiveUrisLoading: {
+    case actionTypes.connections.storeActiveUrisInLoading: {
       return addActiveConnectionsToNeedInLoading(
         allNeedsInState,
         action.payload.get("needUri"),
@@ -150,12 +146,6 @@ export default function(allNeedsInState = initialState, action = {}) {
         action.payload.get("connections")
       );
 
-    case actionTypes.needs.fetch:
-      return action.payload.reduce(
-        (updatedState, ownedNeed) => addNeed(updatedState, ownedNeed, true),
-        allNeedsInState
-      );
-
     case actionTypes.messages.reopenNeed.failed:
       return storeConnectionsData(
         allNeedsInState,
@@ -163,16 +153,14 @@ export default function(allNeedsInState = initialState, action = {}) {
       );
 
     case actionTypes.needs.reopen:
-      return changeNeedState(
-        allNeedsInState,
-        action.payload.ownedNeedUri,
+      return allNeedsInState.setIn(
+        [action.payload.ownedNeedUri, "state"],
         won.WON.ActiveCompacted
       );
 
     case actionTypes.needs.close:
-      return changeNeedState(
-        allNeedsInState,
-        action.payload.ownedNeedUri,
+      return allNeedsInState.setIn(
+        [action.payload.ownedNeedUri, "state"],
         won.WON.InactiveCompacted
       );
 
@@ -180,7 +168,7 @@ export default function(allNeedsInState = initialState, action = {}) {
       return allNeedsInState.delete(action.payload.ownNeedUri);
 
     case actionTypes.personas.create: {
-      //TODO: Please let us use the addNeed method as a single entry point to add Needs(even Personas) to the State
+      //FIXME: Please let us use the addNeed method as a single entry point to add Needs(even Personas) to the State
       return allNeedsInState.set(
         action.payload.needUri,
         Immutable.fromJS({
@@ -203,66 +191,37 @@ export default function(allNeedsInState = initialState, action = {}) {
         action.payload.need,
         action.payload.needUri
       );
+
     case actionTypes.needs.createSuccessful:
       return addNeed(allNeedsInState, action.payload.need, true);
-
-    case actionTypes.connections.load:
-      return action.payload.reduce(
-        (updatedState, connectionWithRelatedData) =>
-          storeConnectionAndRelatedData(
-            updatedState,
-            connectionWithRelatedData,
-            false
-          ),
-        allNeedsInState
-      );
 
     case actionTypes.messages.openMessageReceived:
     case actionTypes.messages.connectMessageReceived: {
       const ownedNeedFromState = allNeedsInState.get(
         action.payload.ownedNeedUri
       );
-      const remoteNeed = action.payload.remoteNeed;
-
-      // let changedState = ownedNeedFromState
-      //   ? allNeedsInState
-      //   : addNeed(allNeedsInState, ownedNeed, true);
-      let changedState;
 
       if (!ownedNeedFromState) {
-        throw new Error(
-          "Would need to call addNeed with ownedNeed, but it is not defined!"
-        );
-      } else {
-        changedState = allNeedsInState;
+        throw new Error("Open or connect received for non owned hint!");
       }
-
-      //guarantee that remoteNeed is in state
-      changedState = addNeed(changedState, remoteNeed, false);
-      changedState = addConnectionFull(changedState, action.payload.connection);
 
       if (action.payload.message) {
-        changedState = addMessage(changedState, action.payload.message);
+        allNeedsInState = addMessage(allNeedsInState, action.payload.message);
       }
-      changedState = changeConnectionStateByFun(
-        changedState,
-        action.payload.updatedConnection,
+      allNeedsInState = changeConnectionStateByFun(
+        allNeedsInState,
+        action.payload.updatedConnectionUri,
         state => {
           if (!state) return won.WON.RequestReceived; //fallback if no state present
-          if (state == won.WON.RequestSent) return won.WON.Connected;
-          if (state == won.WON.Suggested) return won.WON.RequestReceived;
-          if (state == won.WON.Closed) return won.WON.RequestReceived;
+          if (state === won.WON.Connected) return won.WON.Connected; //stay in connected if it was already the case
+          if (state === won.WON.RequestSent) return won.WON.Connected;
+          if (state === won.WON.Suggested) return won.WON.RequestReceived;
+          if (state === won.WON.Closed) return won.WON.RequestReceived;
           return won.WON.RequestReceived;
         }
       );
-      return changedState;
+      return allNeedsInState;
     }
-    case actionTypes.messages.hintMessageReceived:
-      return storeConnectionAndRelatedData(
-        allNeedsInState,
-        action.payload,
-        true
-      );
 
     // NEW CONNECTIONS STATE UPDATES
     case actionTypes.connections.close:
@@ -272,31 +231,6 @@ export default function(allNeedsInState = initialState, action = {}) {
         won.WON.Closed
       );
 
-    case actionTypes.messages.connectMessageSent: {
-      // received a message saying we sent a connect request
-      const senderConnectionUri = action.payload.senderConnectionUri;
-      let stateUpdated;
-
-      if (senderConnectionUri) {
-        stateUpdated = addConnectionFull(
-          allNeedsInState,
-          action.payload.connection
-        );
-        stateUpdated = changeConnectionState(
-          allNeedsInState,
-          senderConnectionUri,
-          won.WON.RequestSent
-        );
-        return addMessage(stateUpdated, action.payload.event);
-      } else {
-        console.warn(
-          "actionTypes.messages.connectMessageSent: senderConnectionUri was undefined for payload: ",
-          action.payload,
-          " -> return unchangedState"
-        );
-      }
-      return allNeedsInState;
-    }
     case actionTypes.needs.connect: {
       // user has sent a connect request
       const optimisticEvent = action.payload.optimisticEvent;
@@ -335,16 +269,11 @@ export default function(allNeedsInState = initialState, action = {}) {
             retractedMessageUris: Immutable.Set(),
             proposedMessageUris: Immutable.Set(),
             claimedMessageUris: Immutable.Set(),
-            isLoaded: false,
           },
           petriNetData: Immutable.Map(),
           creationDate: undefined,
           lastUpdateDate: undefined,
           isRated: false,
-          isLoadingMessages: false,
-          isLoadingAgreementData: false,
-          isLoadingPetriNetData: false,
-          isLoading: false,
           showAgreementData: false,
           showPetriNetData: false,
           multiSelectType: undefined,
@@ -379,6 +308,27 @@ export default function(allNeedsInState = initialState, action = {}) {
         );
       }
     }
+    case actionTypes.messages.connectMessageSent: {
+      // received a message saying we sent a connect request
+      const senderConnectionUri = action.payload.senderConnectionUri;
+      let stateUpdated;
+
+      if (senderConnectionUri) {
+        stateUpdated = changeConnectionState(
+          allNeedsInState,
+          senderConnectionUri,
+          won.WON.RequestSent
+        );
+        return addMessage(stateUpdated, action.payload.event);
+      } else {
+        console.warn(
+          "actionTypes.messages.connectMessageSent: senderConnectionUri was undefined for payload: ",
+          action.payload,
+          " -> return unchangedState"
+        );
+      }
+      return allNeedsInState;
+    }
 
     case actionTypes.messages.openMessageSent: {
       const senderNeedUri = action.payload.senderNeedUri;
@@ -398,8 +348,6 @@ export default function(allNeedsInState = initialState, action = {}) {
           );
           //because we have a connection uri, we can add the message
           return addMessage(stateUpdated, action.payload.event);
-        } else {
-          return addConnectionFull(allNeedsInState, action.payload.connection);
         }
       } else {
         console.warn(
@@ -418,9 +366,10 @@ export default function(allNeedsInState = initialState, action = {}) {
         action.payload.connectionUri,
         state => {
           if (!state) return won.WON.RequestSent; //fallback if no state present
-          if (state == won.WON.RequestReceived) return won.WON.Connected;
-          if (state == won.WON.Suggested) return won.WON.RequestSent;
-          if (state == won.WON.Closed) return won.WON.RequestSent;
+          if (state === won.WON.Connected) return won.WON.Connected; //stay in connected if it was already the case
+          if (state === won.WON.RequestReceived) return won.WON.Connected;
+          if (state === won.WON.Suggested) return won.WON.RequestSent;
+          if (state === won.WON.Closed) return won.WON.RequestSent;
         }
       );
       return addMessage(cnctStateUpdated, action.payload.optimisticEvent);
@@ -432,43 +381,7 @@ export default function(allNeedsInState = initialState, action = {}) {
         won.WON.RequestReceived
       );
 
-    case actionTypes.messages.open.successRemote: {
-      // use the remote success message to obtain the remote connection
-      // uri (which we may not have known)
-      const wonMessage = action.payload;
-      const connectionUri = wonMessage.getReceiver();
-      const needUri = wonMessage.getReceiverNeed();
-      const remoteConnectionUri = wonMessage.getSender();
-
-      if (allNeedsInState.getIn([needUri, "connections", connectionUri])) {
-        const eventUri = wonMessage.getIsRemoteResponseTo();
-        // we want to use the response date to update the original message
-        // date
-        allNeedsInState = allNeedsInState.setIn(
-          [
-            needUri,
-            "connections",
-            connectionUri,
-            "messages",
-            eventUri,
-            "isReceivedByRemote",
-          ],
-          true
-        );
-
-        return allNeedsInState.setIn(
-          [needUri, "connections", connectionUri, "remoteConnectionUri"],
-          remoteConnectionUri
-        );
-      } else {
-        console.warn(
-          "Open success for a connection that is not stored in the state yet, connUri: ",
-          connectionUri
-        );
-        return allNeedsInState;
-      }
-    }
-
+    case actionTypes.messages.open.successRemote:
     case actionTypes.messages.connect.successRemote: {
       // use the remote success message to obtain the remote connection
       // uri (which we may not have known)
@@ -499,7 +412,7 @@ export default function(allNeedsInState = initialState, action = {}) {
         );
       } else {
         console.warn(
-          "Connect success for a connection that is not stored in the state yet, connUri: ",
+          "Open/Connect success for a connection that is not stored in the state yet, connUri: ",
           connectionUri
         );
         return allNeedsInState;
@@ -511,43 +424,29 @@ export default function(allNeedsInState = initialState, action = {}) {
       // changeConnectionState
       const wonMessage = action.payload;
       const eventUri = wonMessage.getIsResponseTo();
-      const tmpConnectionUri = "connectionFrom:" + wonMessage.getIsResponseTo();
-      const connectionUri = wonMessage.getReceiver();
-      const needForTmpCnct = getOwnedNeedByConnectionUri(
-        allNeedsInState,
-        tmpConnectionUri
-      );
-      const unsortedAdHocConnection =
-        needForTmpCnct &&
-        needForTmpCnct.getIn(["connections", tmpConnectionUri]);
-      if (unsortedAdHocConnection) {
+      const connUri = wonMessage.getReceiver();
+
+      const tmpConnUri = "connectionFrom:" + wonMessage.getIsResponseTo();
+      const tmpNeed = getOwnedNeedByConnectionUri(allNeedsInState, tmpConnUri);
+      const tmpConnection = getIn(tmpNeed, ["connections", tmpConnUri]);
+
+      if (tmpConnection) {
         // connection was established from scratch without having a
         // connection uri. now that we have the uri, we can store it
         // (see connectAdHoc)
-        const needUri = needForTmpCnct.get("uri");
-        if (!needForTmpCnct.get("isOwned")) {
-          throw new Error(
-            'Trying to add/change connection for need that\'s not an "ownedNeed".'
-          );
+        const needUri = tmpNeed.get("uri");
+        if (!tmpNeed.get("isOwned")) {
+          throw new Error("Need not owned, can't alter connection.");
         }
 
-        const properConnection = unsortedAdHocConnection
+        const properConnection = tmpConnection
           .delete("usingTemporaryUri")
-          .set("uri", connectionUri);
+          .set("uri", connUri);
 
         allNeedsInState = allNeedsInState
-          .deleteIn([needUri, "connections", tmpConnectionUri])
-          .mergeDeepIn(
-            [needUri, "connections", connectionUri],
-            properConnection
-          );
-        const path = [
-          needUri,
-          "connections",
-          connectionUri,
-          "messages",
-          eventUri,
-        ];
+          .deleteIn([needUri, "connections", tmpConnUri])
+          .mergeDeepIn([needUri, "connections", connUri], properConnection);
+        const path = [needUri, "connections", connUri, "messages", eventUri];
         if (allNeedsInState.getIn(path)) {
           allNeedsInState = allNeedsInState.setIn(
             [...path, "isReceivedByOwn"],
@@ -565,14 +464,14 @@ export default function(allNeedsInState = initialState, action = {}) {
       } else {
         const needByConnectionUri = getOwnedNeedByConnectionUri(
           allNeedsInState,
-          connectionUri
+          connUri
         );
 
         if (needByConnectionUri) {
           // connection has been stored as match first
           allNeedsInState = changeConnectionState(
             allNeedsInState,
-            connectionUri,
+            connUri,
             won.WON.RequestSent
           );
 
@@ -580,7 +479,7 @@ export default function(allNeedsInState = initialState, action = {}) {
             allNeedsInState.getIn([
               needByConnectionUri.get("uri"),
               "connections",
-              connectionUri,
+              connUri,
               "messages",
               eventUri,
             ])
@@ -589,7 +488,7 @@ export default function(allNeedsInState = initialState, action = {}) {
               [
                 needByConnectionUri.get("uri"),
                 "connections",
-                connectionUri,
+                connUri,
                 "messages",
                 eventUri,
                 "isReceivedByOwn",
@@ -607,7 +506,7 @@ export default function(allNeedsInState = initialState, action = {}) {
         } else {
           console.warn(
             "Can't add the connection(",
-            connectionUri,
+            connUri,
             ") the need is not stored in the state yet"
           );
         }
@@ -745,12 +644,6 @@ export default function(allNeedsInState = initialState, action = {}) {
         allNeedsInState,
         action.payload.connectionUri
       );
-    case actionTypes.connections.setLoadingMessages:
-      return setConnectionLoadingMessages(
-        allNeedsInState,
-        action.payload.connectionUri,
-        action.payload.isLoadingMessages
-      );
     case actionTypes.connections.updatePetriNetData:
       return updatePetriNetStateData(
         allNeedsInState,
@@ -762,18 +655,6 @@ export default function(allNeedsInState = initialState, action = {}) {
         allNeedsInState,
         action.payload.connectionUri,
         action.payload.agreementData
-      );
-    case actionTypes.connections.setLoadingPetriNetData:
-      return setConnectionLoadingPetriNetData(
-        allNeedsInState,
-        action.payload.connectionUri,
-        action.payload.isLoadingPetriNetData
-      );
-    case actionTypes.connections.setLoadingAgreementData:
-      return setConnectionLoadingAgreementData(
-        allNeedsInState,
-        action.payload.connectionUri,
-        action.payload.isLoadingAgreementData
       );
     case actionTypes.connections.showPetriNetData:
       return setShowPetriNetData(
@@ -804,15 +685,7 @@ export default function(allNeedsInState = initialState, action = {}) {
 
     case actionTypes.connections.sendChatMessageClaimOnSuccess:
     case actionTypes.connections.sendChatMessageRefreshDataOnSuccess: {
-      const allNeedsInStateWithDirtyPetriNetData = setPetriNetDataDirty(
-        allNeedsInState,
-        action.payload.optimisticEvent.getSender(),
-        true
-      );
-      return addMessage(
-        allNeedsInStateWithDirtyPetriNetData,
-        action.payload.optimisticEvent
-      );
+      return addMessage(allNeedsInState, action.payload.optimisticEvent);
     }
 
     case actionTypes.connections.sendChatMessage:
@@ -917,34 +790,9 @@ export default function(allNeedsInState = initialState, action = {}) {
     case actionTypes.reconnect.connectionFailedToLoad:
     case actionTypes.connections.showLatestMessages:
     case actionTypes.connections.showMoreMessages: {
-      const isLoadingMessages = action.payload.get("isLoadingMessages");
-      const connectionUri = action.payload.get("connectionUri");
-
-      if (isLoadingMessages && connectionUri) {
-        allNeedsInState = setConnectionLoadingMessages(
-          allNeedsInState,
-          connectionUri,
-          true
-        );
-      }
-
       const loadedMessages = action.payload.get("events");
       if (loadedMessages) {
         allNeedsInState = addExistingMessages(allNeedsInState, loadedMessages);
-        allNeedsInState = setConnectionLoadingMessages(
-          allNeedsInState,
-          connectionUri,
-          false
-        );
-      }
-      const error = action.payload.get("error");
-
-      if (error && connectionUri) {
-        allNeedsInState = setConnectionLoadingMessages(
-          allNeedsInState,
-          connectionUri,
-          false
-        );
       }
 
       return allNeedsInState;
@@ -953,24 +801,4 @@ export default function(allNeedsInState = initialState, action = {}) {
     default:
       return allNeedsInState;
   }
-}
-
-function storeConnectionAndRelatedData(state, connectionWithRelatedData) {
-  const {
-    ownedNeed,
-    remoteNeed,
-    connection,
-    ownPersona,
-    remotePersona,
-  } = connectionWithRelatedData;
-  // guarantee that ownedNeed is in state:
-  state = addNeed(state, ownedNeed, true);
-
-  // guarantee that  remoteNeed  is  in  state:
-  state = addNeed(state, remoteNeed, false);
-
-  state = remotePersona ? addNeed(state, remotePersona, false) : state;
-  state = ownPersona ? addNeed(state, ownPersona, true) : state;
-
-  return addConnectionFull(state, connection);
 }

@@ -131,14 +131,14 @@ won-slide-in {
         "siText siText siText siText"
         "siButtonSingle siButtonSingle siButtonSingle siButtonSingle"
         "siButtonLeft siButtonLeft siButtonRight siButtonRight";
-        
+
       & > .si__buttonSignup,
       & > .si__buttonCopy,
       & > .si__buttonEmail {
         @include won-button--outlined(white);
         font-size: $smallFontSize;
       }
-      
+
       & > .si__buttonSignup {
         grid-area: siButtonSingle;
       }
@@ -160,7 +160,7 @@ won-slide-in {
           color: white;
           text-decoration: underline;
         }
-  
+
         ul {
           padding: 0.5rem 1rem;
         }

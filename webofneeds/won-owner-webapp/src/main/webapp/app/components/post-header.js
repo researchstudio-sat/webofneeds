@@ -21,18 +21,16 @@ function genComponentConf() {
   let template = `
 
     <won-square-image
-        ng-if="!self.isLoading()"
-        ng-class="{'bigger' : self.biggerImage, 'inactive' : !self.need.get('isBeingCreated') && self.need.get('state') === self.WON.InactiveCompacted}"
+        ng-if="!self.postLoading"
         src="self.need.get('TODO')"
         uri="self.needUri"
         ng-show="!self.hideImage">
     </won-square-image>
-    <div class="ph__right" ng-if="!self.need.get('isBeingCreated') && !self.isLoading()">
-      <div class="ph__right__topline">
+    <div class="ph__right" ng-if="!self.need.get('isBeingCreated') && !self.postLoading">
+      <div class="ph__right__topline" ng-if="!self.postFailedToLoad">
         <div class="ph__right__topline__title" ng-if="self.hasTitle()">
          {{ self.generateTitle() }}
         </div>
-
         <div class="ph__right__topline__notitle" ng-if="!self.hasTitle() && self.isDirectResponse">
           RE: no title
         </div>
@@ -40,14 +38,23 @@ function genComponentConf() {
           no title
         </div>
       </div>
-      <div class="ph__right__subtitle">
+      <div class="ph__right__subtitle" ng-if="!self.postFailedToLoad">
         <span class="ph__right__subtitle__type">
-          <!-- TODO: We Do not store a single type anymore but a list of types... adapt accordingly -->
           {{ self.generateNeedTypesLabel(self.need) }}
         </span>
         <div class="ph__right__subtitle__date">
           {{ self.friendlyTimestamp }}
         </div>
+      </div>
+      <div class="ph__right__topline" ng-if="self.postFailedToLoad">
+        <div class="ph__right__topline__notitle">
+          Need Loading failed
+        </div>
+      </div>
+      <div class="ph__right__subtitle" ng-if="self.postFailedToLoad">
+        <span class="ph__right__subtitle__type">
+          Need might have been deleted.
+        </span>
       </div>
     </div>
     
@@ -64,8 +71,8 @@ function genComponentConf() {
         </span>
       </div>
     </div>
-    <div class="ph__icon__skeleton" ng-if="self.isLoading()"></div>
-    <div class="ph__right" ng-if="self.isLoading()">
+    <div class="ph__icon__skeleton" ng-if="self.postLoading"></div>
+    <div class="ph__right" ng-if="self.postLoading">
       <div class="ph__right__topline">
         <div class="ph__right__topline__title"></div>
       </div>
@@ -92,6 +99,15 @@ function genComponentConf() {
         return {
           responseToNeed,
           need,
+          postLoading:
+            !need ||
+            getIn(state, ["process", "needs", need.get("uri"), "loading"]),
+          postToLoad:
+            !need ||
+            getIn(state, ["process", "needs", need.get("uri"), "toLoad"]),
+          postFailedToLoad:
+            need &&
+            getIn(state, ["process", "needs", need.get("uri"), "failedToLoad"]),
           isDirectResponse: isDirectResponse,
           friendlyTimestamp:
             need &&
@@ -109,15 +125,8 @@ function genComponentConf() {
         this
       );
 
-      classOnComponentRoot("won-is-loading", () => this.isLoading(), this);
-      classOnComponentRoot("won-is-toload", () => this.isToLoad(), this);
-    }
-
-    isLoading() {
-      return !this.need || this.need.get("isLoading");
-    }
-    isToLoad() {
-      return !this.need || this.need.get("toLoad");
+      classOnComponentRoot("won-is-loading", () => this.postLoading, this);
+      classOnComponentRoot("won-is-toload", () => this.postToLoad, this);
     }
 
     hasTitle() {
@@ -162,12 +171,6 @@ function genComponentConf() {
        * if set, the avatar will be hidden
        */
       hideImage: "=",
-
-      /**
-       * If true, the title image will be a bit bigger. This
-       * can be used to create visual contrast.
-       */
-      biggerImage: "=",
     },
     template: template,
   };

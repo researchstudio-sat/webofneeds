@@ -61,13 +61,6 @@ export const useCaseGroups = {
   transport: transportGroup,
   personalMobility: personalMobilityGroup,
   other: otherGroup,
-  // FIXME: currently not shown
-  // customUsecase: {
-  //   identifier: "custom",
-  //   label: "Something Else",
-  //   icon: undefined,
-  //   useCases: { customUseCase },
-  // },
 };
 
 // generate a list of usecases from all use case groups

@@ -578,7 +578,7 @@ export async function loadLatestMessagesOfConnection({
   if (
     !connectionUri_ ||
     !connection ||
-    connection.get("isLoadingMessages") // only start loading once.
+    getIn(state, ["process", "connections", connectionUri_, "loadingMessages"]) // only start loading once.
   ) {
     return;
   }
@@ -588,7 +588,7 @@ export async function loadLatestMessagesOfConnection({
       type: actionTypesToDispatch.start,
       payload: Immutable.fromJS({
         connectionUri: connectionUri_,
-        isLoadingMessages: true,
+        loadingMessages: true,
       }),
     });
   }
@@ -622,37 +622,6 @@ export async function loadLatestMessagesOfConnection({
   }
 }
 
-//TODO replace the won.getEventsOfConnection with this version (and make sure it works for all previous uses).
-/**
- * Gets the events and uses the paging-parameters
- * in a meaningful fashion.
- * @param eventContainerUri
- * @param params
- * @return {*}
- */
-/*
- function getEvents(connectionUri, params) {
- const eventP = won
- .getNode(connectionUri, params)
- .then(cnct =>
- won.getNode(cnct.hasEventContainer, params)
- )
- .then(eventContainer => is('Array', eventContainer.member) ?
- eventContainer.member :
- [eventContainer.member]
- )
- .then(eventUris => urisToLookupMap(
- eventUris,
- uri => won.getEvent(
- uri,
- { requesterWebId: params.requesterWebId }
- )
- ));
-
- return eventP;
- }
- */
-
 /**
  * @param connectionUri
  * @param numberOfEvents
@@ -675,7 +644,11 @@ export function showMoreMessages(connectionUriParam, numberOfEvents) {
     const connection = need && need.getIn(["connections", connectionUri]);
     const connectionMessages = connection && connection.get("messages");
 
-    if (!connection || connection.get("isLoadingMessages")) return; // only start loading once, or not if no connection was found
+    if (
+      !connection ||
+      getIn(state, ["process", "connections", connectionUri, "loadingMessages"])
+    )
+      return; // only start loading once, or not if no connection was found
 
     // determine the oldest loaded event
     const sortedConnectionMessages = connectionMessages
@@ -688,7 +661,7 @@ export function showMoreMessages(connectionUriParam, numberOfEvents) {
       oldestMessage.get("uri").replace(/.*\/event\/(.*)/, "$1"); // everything following the `/event/`
     dispatch({
       type: actionTypes.connections.showMoreMessages,
-      payload: Immutable.fromJS({ connectionUri, isLoadingMessages: true }),
+      payload: Immutable.fromJS({ connectionUri, loadingMessages: true }),
     });
 
     won

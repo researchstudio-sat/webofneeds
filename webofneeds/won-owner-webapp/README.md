@@ -175,17 +175,8 @@ $ngRedux.getState();
                    claimedMessageUris: Immutable.Set(),
                    rejectedMessageUris: Immutable.Set(),
                    retractedMessageUris: Immutable.Set(),
-                   isLoaded: true|false, //default is false, whether or not the agreementData has been loaded already
                },
-               petriNetData: {
-                    data: Immutable.Map(),
-                    isLoaded: true|false //default is false, whether or not the petriNetData has been loaded already
-                    isDirty: true|false //default is false, whether or not the currently stored petriNetData is (assumed to be) not correct anymore
-               },
-               isLoadingMessages: true|false, //default is false, whether or not this connection is currently loading messages or processing agreements
-               isLoadingAgreementData: true|false, //default is false, whether or not the agreementData has been loaded,
-               isLoadingPetriNetData: true|false, //default is false, whether or not the petriNetData has been loaded,
-               isLoading: true|false, //default is false, whether or not this connection is currently loading itself (similar to the isLoading in the need)
+               petriNetData: Immutable.Map(),
                showAgreementData: true|false // default is false, whether or not the agreementDataPanel is active
                showPetriNetData: true|false // defautl is false, whether or not the petriNetDataPanel is active
                multiSelectType: String // default is undefined, indicates which action is supposed to happen for the multiselect messages
@@ -203,8 +194,6 @@ $ngRedux.getState();
        nodeUri: string, //identifier of this need's server
        isOwned: true|false, //whether this need is owned or not
        isBeingCreated: true|false, //whether or not the creation of this need was successfully completed yet
-       isLoading: true|false, //whether or not the need is currently in the process of being loaded
-       toLoad: true|false, //whether or not the need is flagged as toLoad (for future loading purposes)
        flags: Immutable.List //all the flags that are present within the won:hasFlags predicate of a need
        facets: Immutable.Map //all the facets that are present within the won:hasFacets predicate of a need
        state: "won:Active" | "won:Inactive", //state of the need
@@ -254,6 +243,30 @@ $ngRedux.getState();
     processingAcceptTermsOfService: false, //indicates if the rest-call to accept the terms of service is currently pending
     processingVerifyEmailAddress: false, //indicates if the rest-call to verify the email address is currently pending
     processingResendVerificationEmail: false, //indicates if the rest-call to resend the verification mail is currently pending
+    needs: {
+        [needUri]: {
+            failedToLoad: true|false, //whether or not the need has failed to load (due to delete or other)
+            loading: true|false, //whether or not the need is currently in the process of being loaded
+            toLoad: true|false, //whether or not the need is flagged as toLoad (for future loading purposes)
+        }
+    },
+    connections: {
+        [connUri]: {
+           failedToLoad: true|false, //default is false, whether or not this connection was able to be loaded or not
+           loadingMessages: true|false, //default is false, whether or not this connection is currently loading messages or processing agreements
+           loading: true|false, //default is false, whether or not this connection is currently loading itself (similar to the loading in the need)
+           petriNetData: {
+                loading: true|false, //default is false, whether or not the petriNetData has been loaded,
+                dirty: true|false //default is false, whether or not the currently stored petriNetData is (assumed to be) not correct anymore
+                loaded: true|false //default is false, whether or not the petriNetData has been loaded already
+           },
+           agreementData: {
+                loaded: true|false, //default is false, whether or not the agreementData has been loaded already
+                loading: true|false, //default is false, whether or not the agreementData has been loaded,
+           },
+        }
+    }
+
  }
 }
 */
@@ -273,11 +286,11 @@ There are also abstractDetails, which are not considered complete Details but pr
 
 To adjust details for individual use cases, the data parsing functions should be overwritten in `usecase-definitions.js`. For parsing, **all details defined in any use case** will be considered. To avoid unexpected behaviour, `detail.identifier` must be unique across all use cases and must not be "search", as this literal is used to recognise full-text searches. Additonally, if two or more use cases use the same `parseToRDF({value, identifier})` function or use the same RDF predicates, information may not be correctly recognised. E.g., if one use case parses a "description" to be saved as `dc:description`, and another use case parses a "biography" to also be saved as `dc:description`, "description" and "biography" can't be told apart while parsing. As a result, which `parseFromRDF(sonLDImm)` is used for parsing the information depends on the order of use case definitions.
 
-Details are represented in the state as part of `is` and `seeks`, for example:
+Details are represented in the state as part of the need or a branch `seeks`, for example:
 
 ```javascript
 /*
-is : { 
+seeks : {
            title: string, //title of the need
            description: string, //description of the need as a string (non mandatory, empty if not present)
            tags: Array of strings, //array of strings (non mandatory, empty if not present)

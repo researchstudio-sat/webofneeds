@@ -32,8 +32,6 @@ export function parseNeed(jsonldNeed, isOwned) {
       unread: false,
       isOwned: !!isOwned,
       isBeingCreated: false,
-      toLoad: false,
-      isLoading: false,
       jsonld: jsonldNeed,
       connections: Immutable.Map(),
     };

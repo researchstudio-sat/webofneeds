@@ -4,7 +4,7 @@ import squareImageModule from "../square-image.js";
 import postContentModule from "../post-content.js";
 
 import { connect2Redux } from "../../won-utils.js";
-import { attach } from "../../utils.js";
+import { attach, getIn } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import { classOnComponentRoot } from "../../cstm-ng-utils.js";
 
@@ -12,13 +12,13 @@ const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 
 function genComponentConf() {
   let template = `
-        <div class="pcm__icon__skeleton" ng-if="self.isLoading()"></div>
+        <div class="pcm__icon__skeleton" ng-if="self.postLoading"></div>
         <won-square-image
             class="clickable"
             title="self.post.get('humanReadable')"
             src="self.post.get('TODOtitleImgSrc')"
             uri="self.postUri"
-            ng-if="!self.isLoading()"
+            ng-if="!self.postLoading"
             ng-click="self.router__stateGoCurrent({postUri: self.postUri})">
         </won-square-image>
         <div class="won-cm__center">
@@ -38,15 +38,14 @@ function genComponentConf() {
 
         return {
           post,
+          postLoading:
+            !post ||
+            getIn(state, ["process", "needs", post.get("uri"), "loading"]),
         };
       };
 
       connect2Redux(selectFromState, actionCreators, ["self.postUri"], this);
-      classOnComponentRoot("won-is-loading", () => this.isLoading(), this);
-    }
-
-    isLoading() {
-      return !this.post || this.post.get("isLoading");
+      classOnComponentRoot("won-is-loading", () => this.postLoading, this);
     }
   }
   Controller.$inject = serviceDependencies;
