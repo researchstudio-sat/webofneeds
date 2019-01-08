@@ -81,6 +81,13 @@ won-post-header {
         text-overflow: ellipsis;
         overflow: hidden;
         white-space: nowrap;
+
+        &__groupchat {
+          border-radius: 0.19rem;
+          background: $won-line-gray;
+          margin: 0.1rem;
+          padding: 0 0.25rem;
+        }
       }
 
       &__date {

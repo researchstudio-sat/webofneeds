@@ -1,8 +1,9 @@
-import won from "./won-es6.js";
-
 /**
  * Created by fsuda on 08.11.2018.
  */
+
+import won from "./won-es6.js";
+import { get, getIn } from "./utils.js";
 
 /**
  * Determines if a given need is a WhatsAround-Need
@@ -11,9 +12,8 @@ import won from "./won-es6.js";
  */
 export function isWhatsAroundNeed(need) {
   return (
-    need &&
-    need.getIn(["content", "flags"]) &&
-    need.getIn(["content", "flags"]).contains("won:WhatsAround")
+    getIn(need, ["content", "flags"]) &&
+    getIn(need, ["content", "flags"]).contains("won:WhatsAround")
   );
 }
 
@@ -24,25 +24,22 @@ export function isWhatsAroundNeed(need) {
  */
 export function isDirectResponseNeed(need) {
   return (
-    need &&
-    need.getIn(["content", "flags"]) &&
-    need.getIn(["content", "flags"]).contains("won:DirectResponse")
+    getIn(need, ["content", "flags"]) &&
+    getIn(need, ["content", "flags"]).contains("won:DirectResponse")
   );
 }
 
 export function hasChatFacet(need) {
   return (
-    need &&
-    need.get("facets") &&
-    need.get("facets").contains(won.WON.ChatFacetCompacted)
+    get(need, "facets") &&
+    get(need, "facets").contains(won.WON.ChatFacetCompacted)
   );
 }
 
 export function hasGroupFacet(need) {
   return (
-    need &&
-    need.get("facets") &&
-    need.get("facets").contains(won.WON.GroupFacetCompacted)
+    get(need, "facets") &&
+    get(need, "facets").contains(won.WON.GroupFacetCompacted)
   );
 }
 
@@ -52,7 +49,7 @@ export function hasGroupFacet(need) {
  * @returns {*|boolean}
  */
 export function isSearchNeed(need) {
-  return need && need.get("types") && need.get("types").has("won:PureSearch");
+  return get(need, "types") && get(need, "types").has("won:PureSearch");
 }
 
 /**
@@ -62,9 +59,8 @@ export function isSearchNeed(need) {
  */
 export function isWhatsNewNeed(need) {
   return (
-    need &&
-    need.getIn(["content", "flags"]) &&
-    need.getIn(["content", "flags"]).contains("won:WhatsNew")
+    getIn(need, ["content", "flags"]) &&
+    getIn(need, ["content", "flags"]).contains("won:WhatsNew")
   );
 }
 
@@ -72,8 +68,8 @@ export function isWhatsNewNeed(need) {
  * Generates a string that can be used as a Types Label for any given need, includes the matchingContexts
  */
 export function generateNeedTypesLabel(needImm) {
-  const matchingContexts = needImm && needImm.get("matchingContexts");
-  const types = needImm && needImm.get("types");
+  const matchingContexts = get(needImm, "matchingContexts");
+  const types = get(needImm, "types");
 
   //TODO: GENERATE CORRECT LABEL
   //self.labels.type[self.need.get('type')]

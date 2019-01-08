@@ -12,7 +12,12 @@ import { connect2Redux } from "../won-utils.js";
 import { selectLastUpdateTime } from "../selectors/general-selectors.js";
 import won from "../won-es6.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
-import { generateNeedTypesLabel, isDirectResponseNeed } from "../need-utils.js";
+import {
+  generateNeedTypesLabel,
+  isDirectResponseNeed,
+  hasGroupFacet,
+  hasChatFacet,
+} from "../need-utils.js";
 
 import "style/_post-header.scss";
 
@@ -29,7 +34,7 @@ function genComponentConf() {
     <div class="ph__right" ng-if="!self.need.get('isBeingCreated') && !self.postLoading">
       <div class="ph__right__topline" ng-if="!self.postFailedToLoad">
         <div class="ph__right__topline__title" ng-if="self.hasTitle()">
-         {{ self.generateTitle() }}
+          {{ self.generateTitle() }}
         </div>
         <div class="ph__right__topline__notitle" ng-if="!self.hasTitle() && self.isDirectResponse">
           RE: no title
@@ -40,6 +45,14 @@ function genComponentConf() {
       </div>
       <div class="ph__right__subtitle" ng-if="!self.postFailedToLoad">
         <span class="ph__right__subtitle__type">
+          <span class="ph__right__subtitle__type__groupchat"
+            ng-if="self.isGroupChatEnabled && !self.isChatEnabled">
+            Group Chat
+          </span>
+          <span class="ph__right__subtitle__type__groupchat"
+            ng-if="self.isGroupChatEnabled && self.isChatEnabled">
+            Group Chat enabled
+          </span>
           {{ self.generateNeedTypesLabel(self.need) }}
         </span>
         <div class="ph__right__subtitle__date">
@@ -66,7 +79,14 @@ function genComponentConf() {
       </div>
       <div class="ph__right__subtitle">
         <span class="ph__right__subtitle__type">
-          <!-- TODO: We Do not store a single type anymore but a list of types... adapt accordingly -->
+          <span class="ph__right__subtitle__type__groupchat"
+            ng-if="self.isGroupChatEnabled && !self.isChatEnabled">
+            Group Chat
+          </span>
+          <span class="ph__right__subtitle__type__groupchat"
+            ng-if="self.isGroupChatEnabled && self.isChatEnabled">
+            Group Chat enabled
+          </span>
           {{ self.generateNeedTypesLabel(self.need) }}
         </span>
       </div>
@@ -109,6 +129,8 @@ function genComponentConf() {
             need &&
             getIn(state, ["process", "needs", need.get("uri"), "failedToLoad"]),
           isDirectResponse: isDirectResponse,
+          isGroupChatEnabled: hasGroupFacet(need),
+          isChatEnabled: hasChatFacet(need),
           friendlyTimestamp:
             need &&
             relativeTime(
