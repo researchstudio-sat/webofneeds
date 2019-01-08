@@ -33,7 +33,7 @@ export const goodsServiceSearch = {
       label: "Keywords to search for",
       mandatory: true,
     },
-    priceRange: { ...details.pricerange },
+    rentRange: { ...details.pricerange },
     description: { ...details.description },
     location: { ...details.location },
   },
