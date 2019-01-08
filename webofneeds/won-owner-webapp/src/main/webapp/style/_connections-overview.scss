@@ -65,48 +65,6 @@ won-connections-overview {
       padding-left: 0.5rem; // intrent connections so it's clear they belong *to* the post
       background: $won-line-gray;
       @include slideWithOpacityAnimationFixedHorizontal(0.5s, linear, 250rem);
-      &__group {
-        padding-left: 0.5rem; // intrent connections so it's clear they belong *to* the post
-        background: $won-line-gray;
-        cursor: pointer;
-        &__label {
-          border-top: $thinGrayBorder;
-          height: 2.5rem;
-          align-items: center;
-          $triangleCutoutSize: $speechBubbleTailSize;
-          $padding: 0.5rem;
-          display: grid;
-          grid-auto-flow: column;
-          position: relative;
-          // to allow positioning the contextmenu in relation to this component-root
-          padding-left: $padding + $triangleCutoutSize;
-          padding-right: $padding;
-          padding-top: $padding;
-          padding-bottom: $padding;
-          background-color: $won-light-gray;
-          @include speech-bubble-left-inward(
-            /* TODO line-gray for a fill? -->*/ $won-line-gray,
-            $won-line-gray,
-            $triangleCutoutSize,
-            $thinBorderWidth,
-            50%,
-            "before" /* needed so there can be another tail*/
-          );
-          &:hover,
-          &.selected {
-            background-color: white;
-          }
-          &.selected {
-            @include speech-bubble-right(
-              white,
-              $won-line-gray,
-              $speechBubbleTailSize,
-              $thinBorderWidth,
-              50%
-            );
-          }
-        }
-      }
     }
   }
   .co__separator {
