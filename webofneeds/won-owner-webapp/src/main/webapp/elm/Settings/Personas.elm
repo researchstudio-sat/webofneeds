@@ -21,6 +21,7 @@ import Html.Attributes as HA
 import Json.Decode as Decode exposing (Value)
 import NonEmpty
 import Persona exposing (Persona, PersonaData, SaveState(..))
+import Regex
 import Skin exposing (Skin)
 import String.Extra as String
 import Time
@@ -41,13 +42,35 @@ type alias Draft =
 
 type ValidationError
     = DisplayNameError String
+    | UrlError String
     | UnknownError String
+
+
+urlRegex : Regex.Regex
+urlRegex =
+    Regex.fromString "^(?:http(s)?:\\/\\/)?[\\w.-]+(?:\\.[\\w\\.-]+)+[\\w\\-\\._~:/?#[\\]@!\\$&'\\(\\)\\*\\+,;=.]+$"
+        |> Maybe.withDefault Regex.never
+
+
+ifInvalidUrl : (subject -> String) -> error -> Validator error subject
+ifInvalidUrl getter error =
+    Validate.ifFalse
+        (\subject ->
+            let
+                url =
+                    getter subject
+            in
+            Regex.contains urlRegex url
+                || String.isEmpty url
+        )
+        error
 
 
 personaValidator : Validator ValidationError Draft
 personaValidator =
     Validate.all
         [ Validate.ifBlank .displayName (DisplayNameError "Please enter a display name.")
+        , ifInvalidUrl .website (UrlError "Entered website url is not valid")
         ]
 
 
@@ -354,6 +377,9 @@ createInterface skin draft =
                         (\error ->
                             case error of
                                 DisplayNameError str ->
+                                    Just str
+
+                                UrlError str ->
                                     Just str
 
                                 _ ->
