@@ -5,7 +5,7 @@
 import { actionTypes } from "../actions/actions.js";
 import Immutable from "immutable";
 import { messagesReducer } from "./message-reducers.js";
-import { isChatConnection } from "../connection-utils.js";
+//import { isChatConnection } from "../connection-utils.js";
 import reduceReducers from "reduce-reducers";
 import needReducer from "./need-reducer/need-reducer-main.js";
 import accountReducer from "./account-reducer.js";
@@ -123,7 +123,8 @@ function deleteChatConnectionsBetweenOwnedNeeds(state) {
     needs = needs.map(function(need) {
       let connections = need.get("connections");
 
-      connections =
+      //TODO: FIXME, use special case handling for this, currently dont strip any connections between needs for debug reasons
+      /*connections =
         connections &&
         connections.filter(function(conn) {
           //Any connection that is not of type chatFacet will be exempt from deletion
@@ -136,7 +137,7 @@ function deleteChatConnectionsBetweenOwnedNeeds(state) {
             ]);
           }
           return true;
-        });
+        });*/
       return need.set("connections", connections);
     });
     return state.set("needs", needs);

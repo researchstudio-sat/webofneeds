@@ -31,12 +31,44 @@ function genComponentConf() {
         </div>
         <div class="ga__content">
             <div class="ga__content__participant"
-              ng-if="self.hasGroupChatConnections"
-              ng-repeat="conn in self.groupChatConnectionsArray">
-              <won-connection-header
-                  connection-uri="conn.get('uri')"
-                  hide-image="::false">
-              </won-connection-header>
+                ng-if="self.hasGroupChatConnections"
+                ng-repeat="conn in self.groupChatConnectionsArray">
+                <won-connection-header
+                    connection-uri="conn.get('uri')"
+                    hide-image="::false">
+                </won-connection-header>
+                <div class="ga__content__participant__actions">
+                    <div
+                      class="ga__content__participant__actions__button red won-button--outlined thin"
+                      ng-click="self.openRequest(conn.get('uri'))"
+                      ng-if="conn.get('state') === self.won.WON.RequestReceived">
+                        Accept
+                    </div>
+                    <div
+                      class="ga__content__participant__actions__button red won-button--outlined thin"
+                      ng-click="self.closeConnection(conn.get('uri'))"
+                      ng-if="conn.get('state') === self.won.WON.RequestReceived">
+                        Reject
+                    </div>
+                    <div
+                      class="ga__content__participant__actions__button red won-button--outlined thin"
+                      ng-click="self.sendRequest(conn.get('uri'), conn.get('remoteNeedUri'))"
+                      ng-if="conn.get('state') === self.won.WON.Suggested">
+                        Request
+                    </div>
+                    <div
+                      class="ga__content__participant__actions__button red won-button--outlined thin"
+                      ng-disabled="true"
+                      ng-if="conn.get('state') === self.won.WON.RequestSent">
+                        Waiting for Accept...
+                    </div>
+                    <div
+                      class="ga__content__participant__actions__button red won-button--outlined thin"
+                      ng-click="self.closeConnection(conn.get('uri'))"
+                      ng-if="conn.get('state') === self.won.WON.Suggested || conn.get('state') === self.won.WON.Connected">
+                        Remove
+                    </div>
+                </div>
             </div>
         </div>
     `;
@@ -45,6 +77,7 @@ function genComponentConf() {
     constructor(/* arguments = dependency injections */) {
       attach(this, serviceDependencies, arguments);
       window.pgm4dbg = this;
+      this.won = won;
 
       this.scrollContainer().addEventListener("scroll", e => this.onScroll(e));
 
