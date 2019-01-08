@@ -27,11 +27,6 @@ won-connection-selection-item {
     "before" /* needed so there can be another tail*/
   );
 
-  .conn__icon {
-    @include fixed-square(1rem);
-    margin-left: 0.5rem;
-  }
-
   $invisibleBorder: $thinBorderWidth solid $won-light-gray;
   border-left: $thinGrayBorder;
   border-top: $thinGrayBorder;
