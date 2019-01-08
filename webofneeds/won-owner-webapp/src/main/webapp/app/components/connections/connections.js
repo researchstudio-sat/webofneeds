@@ -2,6 +2,7 @@ import angular from "angular";
 import won from "../../won-es6.js";
 import sendRequestModule from "../send-request.js";
 import postMessagesModule from "../post-messages.js";
+import groupPostMessagesModule from "../group-post-messages.js";
 import groupAdministrationModule from "../group-administration.js";
 import postInfoModule from "../post-info.js";
 import connectionsOverviewModule from "../connections-overview.js";
@@ -15,6 +16,7 @@ import {
   getOwnedNeedByConnectionUri,
   getOwnedNeeds,
 } from "../../selectors/general-selectors.js";
+import { isChatConnectionToGroup } from "../../connection-utils.js";
 import * as srefUtils from "../../sref-utils.js";
 
 import "style/_connections.scss";
@@ -58,6 +60,8 @@ class ConnectionsController {
         "connections",
         selectedConnectionUri,
       ]);
+      const isGroupChatConnection = isChatConnectionToGroup(selectedConnection);
+
       const selectedConnectionState = getIn(selectedConnection, ["state"]);
 
       const ownedNeeds = getOwnedNeeds(state);
@@ -114,6 +118,16 @@ class ConnectionsController {
           !selectedPost &&
           !useCaseGroup &&
           !showGroupPostAdministration &&
+          !isGroupChatConnection &&
+          (selectedConnectionState === won.WON.Connected ||
+            selectedConnectionState === won.WON.RequestReceived ||
+            selectedConnectionState === won.WON.RequestSent ||
+            selectedConnectionState === won.WON.Suggested),
+        showGroupPostMessages:
+          !selectedPost &&
+          !useCaseGroup &&
+          !showGroupPostAdministration &&
+          isGroupChatConnection &&
           (selectedConnectionState === won.WON.Connected ||
             selectedConnectionState === won.WON.RequestReceived ||
             selectedConnectionState === won.WON.RequestSent ||
@@ -199,6 +213,7 @@ export default angular
   .module("won.owner.components.connections", [
     sendRequestModule,
     postMessagesModule,
+    groupPostMessagesModule,
     groupAdministrationModule,
     postInfoModule,
     usecasePickerModule,

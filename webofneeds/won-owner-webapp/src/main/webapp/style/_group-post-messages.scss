@@ -1,0 +1,99 @@
+@import "sizing-utils";
+@import "won-config";
+@import "animate";
+
+won-group-post-messages {
+  display: grid;
+  grid-template-areas: "header" "main" "footer";
+  grid-template-rows: min-content minmax($minimalGridRows, 1fr) min-content;
+  grid-row-gap: $gridRowGap;
+  box-sizing: border-box;
+  padding: $gridRowGap;
+
+  .gpm__header {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas: "header_back header_title header_context";
+    grid-area: header;
+    font-size: $normalFontSize;
+    text-align: left;
+    min-width: 0;
+    align-items: center;
+
+    &__back {
+      grid-area: header_back;
+      &__icon {
+        @include fixed-square($backIconSize);
+      }
+    }
+
+    &__title,
+    won-connection-header {
+      grid-area: header_title;
+    }
+
+    won-connection-context-dropdown {
+      grid-area: header_context;
+    }
+  }
+
+  .gpm__footer {
+    grid-area: footer;
+
+    &__chattextfield {
+      padding: 0.5rem 0;
+    }
+
+    &__button {
+      width: 100%;
+    }
+  }
+
+  .gpm__content {
+    grid-area: main;
+    padding: 0.5rem;
+    background: white;
+    border: $thinGrayBorder;
+    overflow: auto;
+    flex-grow: 1;
+
+    &__loadbutton, /* just so the button and spinner won't make the chatmessages "jump"*/
+    &__loadspinner {
+      width: 100%;
+      height: 3rem;
+      padding: 0.66em 2em;
+      text-align: center;
+      box-sizing: border-box;
+    }
+
+    &__unreadindicator {
+      height: 3rem;
+      top: 0;
+      position: sticky;
+      z-index: 10;
+      margin-bottom: 0.5rem;
+
+      @include slideWithOpacityAnimationFixedHorizontal(
+        0.5s,
+        linear,
+        3rem,
+        0,
+        0,
+        0,
+        0.5rem
+      );
+
+      &__content {
+        height: 3rem;
+        padding: 0.66em;
+        margin-bottom: 0.5rem;
+        box-sizing: border-box;
+        font-size: $normalFontSize;
+        line-height: $normalFontSize;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+  }
+}

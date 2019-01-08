@@ -56,6 +56,11 @@ export function isRemoteGroupChatConnection(conn) {
   );
 }
 
+/**
+ * Determines if a given connection is a chatConnection connected to a groupFacet on the remoteSide
+ * @param msg
+ * @returns {*|boolean}
+ */
 export function isChatConnectionToGroup(conn) {
   return isChatConnection(conn) && isRemoteGroupChatConnection(conn);
 }
