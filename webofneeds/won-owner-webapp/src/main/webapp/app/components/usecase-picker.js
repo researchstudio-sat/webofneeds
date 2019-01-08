@@ -206,7 +206,7 @@ function genComponentConf() {
     // TODO: group search results by use case groups - only showing groups with results
     updateSearch() {
       const query = this.textfield().value;
-      let results = [];
+      let results = new Map();
 
       if (query && query.trim().length > 1) {
         this.isSearching = true;
@@ -216,7 +216,7 @@ function genComponentConf() {
 
           for (const useCase of group) {
             if (this.searchFunction(useCase, query)) {
-              results.push(useCase);
+              results.set(useCase.identifier, useCase);
             }
           }
         }
@@ -226,7 +226,7 @@ function genComponentConf() {
           this.isSearching = false;
         }
 
-        this.searchResults = results;
+        this.searchResults = Array.from(results.values());
       } else {
         this.searchResults = undefined;
         this.isSearching = false;
@@ -238,7 +238,6 @@ function genComponentConf() {
       if (!this.displayableUseCase(useCase)) {
         return false;
       }
-
       // check for searchString in use case label and draft
       const useCaseLabel = JSON.stringify(useCase.label).toLowerCase();
       const useCaseDraft = JSON.stringify(useCase.draft).toLowerCase();
