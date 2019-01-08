@@ -70,7 +70,7 @@ export function getChatConnectionsToCrawl(state) {
   const chatConnections =
     allConnections &&
     allConnections
-      .filter(conn => isChatConnection(conn))
+      .filter(conn => isChatConnection(conn) || isGroupChatConnection(conn))
       .filter(
         conn =>
           !getIn(state, [

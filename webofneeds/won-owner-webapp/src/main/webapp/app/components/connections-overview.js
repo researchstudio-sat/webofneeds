@@ -35,7 +35,10 @@ import {
   getOwnedOpenPosts,
 } from "../selectors/general-selectors.js";
 import { getChatConnectionsToCrawl } from "../selectors/connection-selectors.js";
-import { isChatConnection } from "../connection-utils.js";
+import {
+  isChatConnection,
+  isGroupChatConnection,
+} from "../connection-utils.js";
 import { hasGroupFacet, hasChatFacet } from "../need-utils.js";
 
 const serviceDependencies = ["$ngRedux", "$scope"];
@@ -392,7 +395,8 @@ function genComponentConf() {
       return (
         need.get("state") === won.WON.ActiveCompacted &&
         need.get("connections").filter(conn => {
-          if (!isChatConnection(conn)) return false;
+          if (!isChatConnection(conn) && !isGroupChatConnection(conn))
+            return false;
           if (
             process &&
             process.getIn(["connections", conn.get("uri"), "loading"])
@@ -421,7 +425,8 @@ function genComponentConf() {
     getOpenChatConnectionsArraySorted(need, allNeeds, process) {
       return sortByDate(
         need.get("connections").filter(conn => {
-          if (!isChatConnection(conn)) return false;
+          if (!isChatConnection(conn) && !isGroupChatConnection(conn))
+            return false;
           if (
             process &&
             process.getIn(["connections", conn.get("uri"), "loading"])

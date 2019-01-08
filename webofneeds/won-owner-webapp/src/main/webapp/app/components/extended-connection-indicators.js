@@ -9,7 +9,10 @@ import { labels } from "../won-label-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { getPosts, getOwnedPosts } from "../selectors/general-selectors.js";
 import { getChatConnectionsByNeedUri } from "../selectors/connection-selectors.js";
-import { isChatConnection } from "../connection-utils.js";
+import {
+  isChatConnection,
+  isGroupChatConnection,
+} from "../connection-utils.js";
 import { attach, sortByDate, getIn } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 
@@ -152,7 +155,7 @@ function genComponentConf() {
             return (
               remoteNeedActive &&
               conn.get("state") === won.WON.Suggested &&
-              isChatConnection(conn)
+              (isChatConnection(conn) || isGroupChatConnection(conn))
             );
           });
         const connected =
@@ -171,7 +174,7 @@ function genComponentConf() {
               !!conn.get("state") &&
               conn.get("state") !== won.WON.Suggested &&
               conn.get("state") !== won.WON.Closed &&
-              isChatConnection(conn)
+              (isChatConnection(conn) || isGroupChatConnection(conn))
             );
           });
 
