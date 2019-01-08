@@ -1,0 +1,51 @@
+@import "won-config";
+@import "sizing-utils";
+@import "fonts";
+@import "flex-layout";
+@import "square-image";
+@import "speech-bubble";
+
+won-group-chat-selection-item {
+  $triangleCutoutSize: $speechBubbleTailSize;
+  $padding: 0.5rem;
+  display: grid;
+  grid-auto-flow: column;
+  position: relative; // to allow positioning the contextmenu in relation to this component-root
+  padding-left: $padding + $triangleCutoutSize;
+  padding-right: $padding;
+  padding-top: $padding;
+  padding-bottom: $padding;
+
+  background-color: $won-light-gray;
+
+  @include speech-bubble-left-inward(
+    /* TODO line-gray for a fill? -->*/ $won-line-gray,
+    $won-line-gray,
+    $triangleCutoutSize,
+    $thinBorderWidth,
+    50%,
+    "before" /* needed so there can be another tail*/
+  );
+
+  .gcsi__label {
+    height: 2.5rem;
+  }
+
+  $invisibleBorder: $thinBorderWidth solid $won-light-gray;
+  border-left: $thinGrayBorder;
+  border-top: $thinGrayBorder;
+
+  &:hover,
+  &.selected {
+    background-color: white;
+  }
+  &.selected {
+    @include speech-bubble-right(
+      white,
+      $won-line-gray,
+      $speechBubbleTailSize,
+      $thinBorderWidth,
+      50%
+    );
+  }
+}
