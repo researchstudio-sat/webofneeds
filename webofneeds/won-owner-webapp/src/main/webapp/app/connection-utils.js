@@ -99,24 +99,8 @@ export function isChatToGroup(needs, needUri, connUri) {
           conn
         );
       }
-      console.log(
-        "needUri",
-        needUri,
-        "connUri:",
-        connUri,
-        "isChatToGroup?",
-        true
-      );
       return true;
     } else {
-      console.log(
-        "needUri",
-        needUri,
-        "connUri:",
-        connUri,
-        "isChatToGroup?",
-        false
-      );
       return false;
     }
   }
