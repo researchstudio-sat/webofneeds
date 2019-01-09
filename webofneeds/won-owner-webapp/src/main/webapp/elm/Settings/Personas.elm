@@ -48,7 +48,11 @@ type ValidationError
 
 urlRegex : Regex.Regex
 urlRegex =
-    Regex.fromString "^(?:http(s)?:\\/\\/)?[\\w.-]+(?:\\.[\\w\\.-]+)+[\\w\\-\\._~:/?#[\\]@!\\$&'\\(\\)\\*\\+,;=.]+$"
+    Regex.fromStringWith
+        { caseInsensitive = True
+        , multiline = False
+        }
+        "^(http[s]?:\\/\\/)?[^\\s([\"<,>]*\\.[^\\s[\",><]*$"
         |> Maybe.withDefault Regex.never
 
 
