@@ -26,6 +26,13 @@ function genComponentConf($ngRedux) {
         $ngRedux.dispatch(actionCreators.personas__create(persona));
       });
 
+      elmApp.ports.updatePersonas.subscribe(() => {
+        const personas = getOwnedPersonas($ngRedux.getState());
+        if (personas) {
+          elmApp.ports.personaIn.send(personas.toJS());
+        }
+      });
+
       const personas = getOwnedPersonas($ngRedux.getState());
       if (personas) {
         elmApp.ports.personaIn.send(personas.toJS());

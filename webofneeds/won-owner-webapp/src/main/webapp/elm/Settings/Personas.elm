@@ -106,7 +106,7 @@ init () =
     ( { viewState = Inactive
       , personas = Dict.empty
       }
-    , Cmd.none
+    , Persona.getNewPersonas
     )
 
 
