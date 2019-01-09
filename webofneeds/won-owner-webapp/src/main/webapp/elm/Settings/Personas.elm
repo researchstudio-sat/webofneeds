@@ -383,9 +383,6 @@ createInterface skin draft =
                                 DisplayNameError str ->
                                     Just str
 
-                                UrlError str ->
-                                    Just str
-
                                 _ ->
                                     Nothing
                         )
@@ -398,7 +395,7 @@ createInterface skin draft =
                     |> Maybe.withDefault none
                 ]
         , sections =
-            [ personaForm draft
+            [ personaForm skin draft
             , row
                 [ spacing 10
                 , width fill
@@ -424,8 +421,20 @@ createInterface skin draft =
         }
 
 
-personaForm : Draft -> Element Msg
-personaForm draft =
+personaForm : Skin -> Draft -> Element Msg
+personaForm skin draft =
+    let
+        validated =
+            Validate.validate personaValidator draft
+
+        ( isValid, errors ) =
+            case validated of
+                Ok _ ->
+                    ( True, [] )
+
+                Err err ->
+                    ( False, err )
+    in
     column
         [ spacing 10
         , width fill
@@ -436,6 +445,23 @@ personaForm draft =
             , placeholder = Nothing
             , label = Input.labelAbove [] (text "Website")
             }
+        , errors
+            |> List.filterMap
+                (\error ->
+                    case error of
+                        UrlError str ->
+                            Just str
+
+                        _ ->
+                            Nothing
+                )
+            |> List.head
+            |> Maybe.map
+                (\str ->
+                    el [ Font.color skin.primaryColor ] <|
+                        text str
+                )
+            |> Maybe.withDefault none
         , Input.multiline []
             { onChange = \str -> DraftUpdated { draft | aboutMe = str }
             , text = draft.aboutMe
