@@ -11,7 +11,7 @@ import referencedMessageContentModule from "./referenced-message-content.js";
 import combinedMessageContentModule from "./combined-message-content.js";
 
 import { connect2Redux } from "../../won-utils.js";
-import { attach, getIn } from "../../utils.js";
+import { attach, getIn, get } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import { getOwnedNeedByConnectionUri } from "../../selectors/general-selectors.js";
 import {
@@ -53,7 +53,15 @@ function genComponentConf() {
             src="self.theirNeed.get('TODOtitleImgSrc')"
             uri="self.theirNeed.get('uri')"
             ng-click="!self.multiSelectType && self.router__stateGoCurrent({postUri: self.theirNeed.get('uri')})"
-            ng-if="!self.isSent">
+            ng-if="!self.isSent && !(self.isGroupChatMessage && self.originatorUri)">
+        </won-square-image>
+        <won-square-image
+            class="clickable"
+            title="self.theirNeed.get('humanReadable')"
+            src="self.theirNeed.get('TODOtitleImgSrc')"
+            uri="self.originatorUri"
+            ng-click="!self.multiSelectType && self.router__stateGoCurrent({postUri: self.originatorUri})"
+            ng-if="self.isReceived && self.isGroupChatMessage && self.originatorUri">
         </won-square-image>
         <won-square-image
             title="System"
@@ -78,7 +86,8 @@ function genComponentConf() {
     			      <won-combined-message-content
     			        ng-if="!self.isCollapsed"
     			        message-uri="self.messageUri"
-                  connection-uri="self.connectionUri">
+                  connection-uri="self.connectionUri"
+                  group-chat-message="self.isGroupChatMessage">
     			      </won-combined-message-content>
     			      <div class="won-cm__center__bubble__collapsed clickable"
     			        ng-if="self.isCollapsed"
@@ -117,32 +126,36 @@ function genComponentConf() {
         const ownedNeed =
           this.connectionUri &&
           getOwnedNeedByConnectionUri(state, this.connectionUri);
-        const connection =
-          ownedNeed && ownedNeed.getIn(["connections", this.connectionUri]);
-        const theirNeed =
-          connection && state.getIn(["needs", connection.get("remoteNeedUri")]);
+        const connection = getIn(ownedNeed, [
+          "connections",
+          this.connectionUri,
+        ]);
+        const theirNeed = getIn(state, [
+          "needs",
+          get(connection, "remoteNeedUri"),
+        ]);
         const message =
           connection && this.messageUri
             ? getIn(connection, ["messages", this.messageUri])
             : Immutable.Map();
 
-        const shouldShowRdf = state.getIn(["view", "showRdf"]);
+        const shouldShowRdf = getIn(state, ["view", "showRdf"]);
 
         let rdfLinkURL;
         if (shouldShowRdf && ownerBaseUrl && ownedNeed && message) {
           rdfLinkURL = urljoin(
             ownerBaseUrl,
             "/rest/linked-data/",
-            `?requester=${this.encodeParam(ownedNeed.get("uri"))}`,
-            `&uri=${this.encodeParam(message.get("uri"))}`,
-            message.get("outgoingMessage") ? "&deep=true" : ""
+            `?requester=${this.encodeParam(get(ownedNeed, "uri"))}`,
+            `&uri=${this.encodeParam(get(message, "uri"))}`,
+            get(message, "outgoingMessage") ? "&deep=true" : ""
           );
         }
-        const isSent = message && message.get("outgoingMessage");
-        const isReceived = message && !message.get("outgoingMessage");
-        const isFailedToSend = message && message.get("failedToSend");
-        const isReceivedByOwn = message && message.get("isReceivedByOwn");
-        const isReceivedByRemote = message && message.get("isReceivedByRemote");
+        const isSent = get(message, "outgoingMessage");
+        const isReceived = !get(message, "outgoingMessage");
+        const isFailedToSend = get(message, "failedToSend");
+        const isReceivedByOwn = get(message, "isReceivedByOwn");
+        const isReceivedByRemote = get(message, "isReceivedByRemote");
 
         // determines if the sent message is not received by any of the servers yet but not failed either
         const isPending =
@@ -155,37 +168,36 @@ function genComponentConf() {
           (!(isReceivedByOwn && isReceivedByRemote) &&
             (isReceivedByOwn || isReceivedByRemote));
 
-        const injectInto = message && message.get("injectInto");
+        const injectInto = get(message, "injectInto");
 
         return {
           ownedNeed,
           theirNeed,
           message,
-          messageSenderUri: message && message.get("senderUri"),
+          messageSenderUri: get(message, "senderUri"),
+          isGroupChatMessage: this.groupChatMessage,
+          originatorUri: get(message, "originatorUri"),
           isConnectionMessage:
-            message &&
-            message.get("messageType") === won.WONMSG.connectionMessage,
-          isSelected: message && message.getIn(["viewState", "isSelected"]),
-          isCollapsed: message && message.getIn(["viewState", "isCollapsed"]),
-          showActions: message && message.getIn(["viewState", "showActions"]),
-          multiSelectType: connection && connection.get("multiSelectType"),
+            get(message, "messageType") === won.WONMSG.connectionMessage,
+          isSelected: getIn(message, ["viewState", "isSelected"]),
+          isCollapsed: getIn(message, ["viewState", "isCollapsed"]),
+          showActions: getIn(message, ["viewState", "showActions"]),
+          multiSelectType: get(connection, "multiSelectType"),
           shouldShowRdf,
           rdfLinkURL,
-          isParsable: message.get("isParsable"),
-          isClaimed: isMessageClaimed(this.message),
-          isProposed: isMessageProposed(this.message),
-          isAccepted: isMessageAccepted(this.message),
-          isRejected: isMessageRejected(this.message),
-          isRetracted: isMessageRetracted(this.message),
-          isCancellationPending: isMessageCancellationPending(this.message),
-          isCancelled: isMessageCancelled(this.message),
+          isParsable: get(message, "isParsable"),
+          isClaimed: isMessageClaimed(message),
+          isProposed: isMessageProposed(message),
+          isAccepted: isMessageAccepted(message),
+          isRejected: isMessageRejected(message),
+          isRetracted: isMessageRetracted(message),
+          isCancellationPending: isMessageCancellationPending(message),
+          isCancelled: isMessageCancelled(message),
           isProposable:
-            connection &&
-            connection.get("state") === won.WON.Connected &&
+            get(connection, "state") === won.WON.Connected &&
             isMessageProposable(message),
           isClaimable:
-            connection &&
-            connection.get("state") === won.WON.Connected &&
+            get(connection, "state") === won.WON.Connected &&
             isMessageClaimable(message),
           isCancelable: isMessageCancelable(message),
           isRetractable: isMessageRetractable(message),
@@ -199,15 +211,15 @@ function genComponentConf() {
           isFailedToSend,
           isPending,
           isPartiallyLoaded,
-          isFromSystem: message && message.get("systemMessage"),
-          hasReferences: message && message.get("hasReferences"),
+          isFromSystem: get(message, "systemMessage"),
+          hasReferences: get(message, "hasReferences"),
         };
       };
 
       connect2Redux(
         selectFromState,
         actionCreators,
-        ["self.connectionUri", "self.messageUri"],
+        ["self.connectionUri", "self.messageUri", "self.groupChatMessage"],
         this
       );
 
@@ -243,9 +255,9 @@ function genComponentConf() {
     expandMessage() {
       if (this.message && !this.multiSelectType) {
         this.messages__viewState__markAsCollapsed({
-          messageUri: this.message.get("uri"),
+          messageUri: get(this.message, "uri"),
           connectionUri: this.connectionUri,
-          needUri: this.ownedNeed.get("uri"),
+          needUri: get(this.ownedNeed, "uri"),
           isCollapsed: false,
         });
       }
@@ -253,9 +265,9 @@ function genComponentConf() {
 
     toggleActions() {
       this.messages__viewState__markShowActions({
-        messageUri: this.message.get("uri"),
+        messageUri: get(this.message, "uri"),
         connectionUri: this.connectionUri,
-        needUri: this.ownedNeed.get("uri"),
+        needUri: get(this.ownedNeed, "uri"),
         showActions: !this.showActions,
       });
     }
@@ -300,11 +312,11 @@ function genComponentConf() {
 
     showActionButtons() {
       return (
-        this.showActions ||
-        hasProposesReferences(this.message) ||
-        hasClaimsReferences(this.message) ||
-        hasProposesToCancelReferences(this.message)
-        //TODO: check if action can even be executed if not do not showActionButtons at all
+        !this.isGroupChatMessage &&
+        (this.showActions ||
+          hasProposesReferences(this.message) ||
+          hasClaimsReferences(this.message) ||
+          hasProposesToCancelReferences(this.message))
       );
     }
 
@@ -313,7 +325,7 @@ function genComponentConf() {
         const payload = {
           messageUri: this.messageUri,
           connectionUri: this.connectionUri,
-          needUri: this.ownedNeed.get("uri"),
+          needUri: get(this.ownedNeed, "uri"),
         };
 
         const tmp_messages__markAsRead = this.messages__markAsRead;
@@ -338,6 +350,7 @@ function genComponentConf() {
     scope: {
       messageUri: "=",
       connectionUri: "=",
+      groupChatMessage: "=",
     },
     template: template,
   };

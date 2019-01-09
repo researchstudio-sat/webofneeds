@@ -72,7 +72,8 @@ function genComponentConf() {
                 ng-click="self.selectMessage(msg)"
                 ng-repeat="msg in self.sortedMessages"
                 connection-uri="self.connectionUri"
-                message-uri="msg.get('uri')">
+                message-uri="msg.get('uri')"
+                group-chat-message="::true">
             </won-connection-message>
             <!-- CHATVIEW SPECIFIC CONTENT END-->
 
