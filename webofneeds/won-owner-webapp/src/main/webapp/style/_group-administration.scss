@@ -4,8 +4,8 @@
 
 won-group-administration {
   display: grid;
-  grid-template-areas: "header" "main" "footer";
-  grid-template-rows: min-content minmax($minimalGridRows, 1fr) min-content;
+  grid-template-areas: "header" "main";
+  grid-template-rows: min-content minmax($minimalGridRows, 1fr);
   grid-row-gap: $gridRowGap;
   box-sizing: border-box;
   padding: $gridRowGap;
