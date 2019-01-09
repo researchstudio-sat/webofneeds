@@ -36,8 +36,6 @@ function genComponentConf() {
             <div class="post-skeleton__details"></div>
         </div>
         <div class="post-content" ng-if="!self.postLoading">
-          <won-post-content-general post-uri="self.post.get('uri')"></won-post-content-general>
-
           <won-gallery ng-if="self.post.get('hasImages')">
           </won-gallery>
 
@@ -45,6 +43,9 @@ function genComponentConf() {
           <won-post-is-or-seeks-info branch="::'content'" ng-if="self.hasContent" post-uri="self.post.get('uri')"></won-post-is-or-seeks-info>
           <won-labelled-hr label="::'Search'" class="cp__labelledhr" ng-show="self.hasContent && self.hasSeeksBranch"></won-labelled-hr>
           <won-post-is-or-seeks-info branch="::'seeks'" ng-if="self.hasSeeksBranch" post-uri="self.post.get('uri')"></won-post-is-or-seeks-info>
+
+          <!-- GENERAL INFORMATION -->
+          <won-post-content-general post-uri="self.post.get('uri')"></won-post-content-general>
           <div class="post-info__content__rdf" ng-if="self.shouldShowRdf">
             <h2 class="post-info__heading">
                 RDF
