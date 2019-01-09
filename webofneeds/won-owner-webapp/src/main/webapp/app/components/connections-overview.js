@@ -303,12 +303,6 @@ function genComponentConf() {
           const messageCount = messages ? messages.size : 0;
 
           if (messageCount == 0) {
-            console.debug(
-              "DISPATCH connections__showLatestMessages for connUri:",
-              conn.get("uri"),
-              " -> NO messages have already been loaded in the connection: ",
-              conn
-            );
             this.connections__showLatestMessages(conn.get("uri"), MESSAGECOUNT);
           } else {
             const receivedMessages = messages.filter(
@@ -318,12 +312,6 @@ function genComponentConf() {
               receivedMessages.filter(msg => !msg.get("unread")).size > 0;
 
             if (!receivedMessagesReadPresent) {
-              console.debug(
-                "DISPATCH connections__showMoreMessages for connUri:",
-                conn.get("uri"),
-                " -> ONLY unread messages are currently present:",
-                conn
-              );
               this.connections__showMoreMessages(conn.get("uri"), MESSAGECOUNT);
             }
           }
