@@ -7,7 +7,7 @@ import connectionHeaderModule from "./connection-header.js";
 import labelledHrModule from "./labelled-hr.js";
 import connectionContextDropdownModule from "./connection-context-dropdown.js";
 import { connect2Redux } from "../won-utils.js";
-import { attach, delay, getIn } from "../utils.js";
+import { attach, delay, getIn, get } from "../utils.js";
 import { isWhatsAroundNeed, isWhatsNewNeed } from "../need-utils.js";
 import { fetchMessage } from "../won-message-utils.js";
 import { actionCreators } from "../actions/actions.js";
@@ -44,7 +44,7 @@ function genComponentConf() {
         <div
           class="gpm__content">
             <div class="gpm__content__unreadindicator"
-              ng-if="self.unreadMessageCount && (!self._snapBottom || !self.showChatView)">
+              ng-if="self.unreadMessageCount && !self._snapBottom">
               <div class="gpm__content__unreadindicator__content won-button--filled red"
                 ng-click="self.goToUnreadMessages()">
                 {{self.unreadMessageCount}} unread Messages
@@ -156,18 +156,12 @@ function genComponentConf() {
       const selectFromState = state => {
         const connectionUri = getConnectionUriFromRoute(state);
         const ownedNeed = getOwnedNeedByConnectionUri(state, connectionUri);
-        const connection =
-          ownedNeed && ownedNeed.getIn(["connections", connectionUri]);
+        const connection = getIn(ownedNeed, ["connections", connectionUri]);
         const isOwnedNeedWhatsX =
-          this.ownedNeed &&
-          (isWhatsAroundNeed(this.ownedNeed) || isWhatsNewNeed(this.ownedNeed));
-        const nonOwnedNeedUri = connection && connection.get("remoteNeedUri");
-        const nonOwnedNeed =
-          nonOwnedNeedUri && state.getIn(["needs", nonOwnedNeedUri]);
-        const chatMessages =
-          connection &&
-          connection.get("messages") &&
-          connection.get("messages").filter(msg => !msg.get("forwardMessage"));
+          isWhatsAroundNeed(this.ownedNeed) || isWhatsNewNeed(this.ownedNeed);
+        const nonOwnedNeedUri = get(connection, "remoteNeedUri");
+        const nonOwnedNeed = getIn(state, ["needs", nonOwnedNeedUri]);
+        const chatMessages = get(connection, "messages");
         const allMessagesLoaded =
           chatMessages &&
           chatMessages.filter(
