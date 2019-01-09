@@ -2,6 +2,8 @@ import { parseMessage } from "./parse-message.js";
 import { markUriAsRead } from "../../won-localstorage.js";
 import { markConnectionAsRead } from "./reduce-connections.js";
 import { getOwnMessageUri } from "../../message-utils.js";
+import { isChatConnectionToGroup } from "../../connection-utils.js";
+import { getIn } from "../../utils.js";
 
 /*
  "alreadyProcessed" flag, which indicates that we do not care about the
@@ -65,6 +67,14 @@ export function addMessage(
       }
 
       if (needUri) {
+        const conn = getIn(state, [needUri, "connections", connectionUri]);
+        console.debug(
+          "Adding Message to connection with connUri: ",
+          connectionUri,
+          " chatToGroupConnection: ",
+          isChatConnectionToGroup(conn)
+        );
+
         if (wonMessage.hasContainedForwardedWonMessages()) {
           const containedForwardedWonMessages = wonMessage.getContainedForwardedWonMessages();
           containedForwardedWonMessages.map(forwardedWonMessage => {
