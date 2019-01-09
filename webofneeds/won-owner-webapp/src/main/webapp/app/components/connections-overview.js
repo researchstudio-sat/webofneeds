@@ -339,6 +339,7 @@ function genComponentConf() {
             useCase: undefined,
             useCaseGroup: undefined,
             connectionUri: undefined,
+            groupPostAdminUri: undefined,
           });
         }
       } else {
