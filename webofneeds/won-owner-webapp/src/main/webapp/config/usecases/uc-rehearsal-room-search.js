@@ -12,7 +12,7 @@ import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-u
 import {
   filterInVicinity,
   filterFloorSizeRange,
-  filterRentRange,
+  filterPriceRange,
   concatenateFilters,
   sparqlQuery,
 } from "../../app/sparql-builder-utils.js";
@@ -42,13 +42,13 @@ export const rehearsalRoomSearch = {
       ...realEstateFeaturesDetail,
       placeholder: "e.g. PA, Drumkit",
     },
-    rentRange: { ...perHourRentRangeDetail },
+    priceRange: { ...perHourRentRangeDetail },
     fromDatetime: { ...details.fromDatetime },
     throughDatetime: { ...details.throughDatetime },
   },
   generateQuery: (draft, resultName) => {
     const seeksBranch = draft && draft.seeks;
-    const rentRange = seeksBranch && seeksBranch.rentRange;
+    const rentRange = seeksBranch && seeksBranch.priceRange;
     const floorSizeRange = seeksBranch && seeksBranch.floorSizeRange;
     const location = seeksBranch && seeksBranch.location;
 
@@ -66,7 +66,7 @@ export const rehearsalRoomSearch = {
         ],
       },
       rentRange &&
-        filterRentRange(
+        filterPriceRange(
           `${resultName}`,
           rentRange.min,
           rentRange.max,

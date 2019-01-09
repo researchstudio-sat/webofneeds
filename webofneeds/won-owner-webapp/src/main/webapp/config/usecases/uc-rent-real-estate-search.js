@@ -14,7 +14,7 @@ import {
   filterInVicinity,
   filterFloorSizeRange,
   filterNumOfRoomsRange,
-  filterRentRange,
+  filterPriceRange,
   concatenateFilters,
   sparqlQuery,
 } from "../../app/sparql-builder-utils.js";
@@ -43,11 +43,11 @@ export const rentRealEstateSearch = {
     floorSizeRange: { ...realEstateFloorSizeRangeDetail },
     numberOfRoomsRange: { ...realEstateNumberOfRoomsRangeDetail },
     features: { ...realEstateFeaturesDetail },
-    rentRange: { ...realEstateRentRangeDetail },
+    priceRange: { ...realEstateRentRangeDetail },
   },
   generateQuery: (draft, resultName) => {
     const seeksBranch = draft && draft.seeks;
-    const rentRange = seeksBranch && seeksBranch.rentRange;
+    const rentRange = seeksBranch && seeksBranch.priceRange;
     const floorSizeRange = seeksBranch && seeksBranch.floorSizeRange;
     const numberOfRoomsRange = seeksBranch && seeksBranch.numberOfRoomsRange;
     const location = seeksBranch && seeksBranch.location;
@@ -64,7 +64,7 @@ export const rentRealEstateSearch = {
         ],
       },
       rentRange &&
-        filterRentRange(
+        filterPriceRange(
           `${resultName}`,
           rentRange.min,
           rentRange.max,
