@@ -66,12 +66,9 @@ export function addMessage(
       }
 
       if (needUri) {
-        console.debug(
-          "Adding Message to connection with connUri: ",
-          connectionUri,
-          " isGroupChat: ",
-          isChatToGroup(state, needUri, connectionUri)
-        );
+        if (isChatToGroup(state, needUri, connectionUri)) {
+          console.log("Adding message to a chatToGroup Connection");
+        }
 
         if (wonMessage.hasContainedForwardedWonMessages()) {
           const containedForwardedWonMessages = wonMessage.getContainedForwardedWonMessages();
