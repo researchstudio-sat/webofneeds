@@ -770,10 +770,9 @@ export default function(allNeedsInState = initialState, action = {}) {
         eventUri,
       ];
       if (allNeedsInState.getIn(path)) {
-        allNeedsInState = allNeedsInState.setIn(
-          [...path, "isReceivedByRemote"],
-          true
-        );
+        allNeedsInState = allNeedsInState
+          .setIn([...path, "isReceivedByRemote"], true)
+          .setIn([...path, "isReceivedByOwn"], true);
       } else {
         console.error(
           "chatMessage.successRemote for message that was not sent(or was not loaded in the state yet, wonMessage: ",
