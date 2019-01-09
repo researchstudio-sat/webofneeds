@@ -10,7 +10,7 @@
 import angular from "angular";
 import "ng-redux";
 import ngAnimate from "angular-animate";
-import { dispatchEvent, attach, delay } from "../utils.js";
+import { dispatchEvent, attach, delay, get } from "../utils.js";
 import won from "../won-es6.js";
 import {
   getConnectionUriFromRoute,
@@ -31,7 +31,7 @@ import autoresizingTextareaModule from "../directives/textarea-autogrow.js";
 import { actionCreators } from "../actions/actions.js";
 import labelledHrModule from "./labelled-hr.js";
 import { getHumanReadableStringFromMessage } from "../reducers/need-reducer/parse-message.js";
-import { isChatConnectionToGroup } from "../connection-utils.js";
+import { isChatToGroup } from "../connection-utils.js";
 import submitButtonModule from "./submit-button.js";
 
 import "style/_chattextfield.scss";
@@ -298,7 +298,11 @@ function genComponentConf() {
         const connection = post && post.getIn(["connections", connectionUri]);
         const connectionState = connection && connection.get("state");
 
-        const isGroupChatConnection = isChatConnectionToGroup(connection);
+        const isGroupChatConnection = isChatToGroup(
+          state.get("needs"),
+          get(post, "uri"),
+          connectionUri
+        );
 
         const messages = getMessagesByConnectionUri(state, connectionUri);
 

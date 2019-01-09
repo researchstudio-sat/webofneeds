@@ -11,7 +11,7 @@ import { labels, relativeTime } from "../won-label-utils.js";
 import { attach, getIn, get } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { isDirectResponseNeed } from "../need-utils.js";
-import { isChatConnectionToGroup } from "../connection-utils.js";
+import { isChatToGroup } from "../connection-utils.js";
 import { getHumanReadableStringFromMessage } from "../reducers/need-reducer/parse-message.js";
 import {
   selectLastUpdateTime,
@@ -28,7 +28,7 @@ import "style/_connection-header.scss";
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
-      <div class="ch__icon" ng-if="!self.connectionOrNeedsLoading && !self.isChatConnectionToGroup">
+      <div class="ch__icon" ng-if="!self.connectionOrNeedsLoading && !self.isConnectionToGroup">
           <won-square-image
             class="ch__icon__theirneed"
             src="self.remoteNeed.get('TODO')"
@@ -37,7 +37,7 @@ function genComponentConf() {
             ng-show="!self.hideImage">
           </won-square-image>
       </div>
-      <div class="ch__groupicons" ng-if="!self.connectionOrNeedsLoading && self.isChatConnectionToGroup">
+      <div class="ch__groupicons" ng-if="!self.connectionOrNeedsLoading && self.isConnectionToGroup">
           <!-- TODO: ADD REAL PARTICIPANTS OF THE GROUPCHAT -->
           <div class="ch__groupicons__icon one">
           </div>
@@ -157,7 +157,11 @@ function genComponentConf() {
           connection,
           ownedNeed,
           remoteNeed,
-          isChatConnectionToGroup: isChatConnectionToGroup(connection),
+          isConnectionToGroup: isChatToGroup(
+            state.get("needs"),
+            get(ownedNeed, "uri"),
+            this.connectionUri
+          ),
           isDirectResponseFromRemote: isDirectResponseNeed(remoteNeed),
           latestMessageHumanReadableString,
           latestMessageUnread,

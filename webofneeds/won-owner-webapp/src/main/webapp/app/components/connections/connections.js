@@ -16,7 +16,7 @@ import {
   getOwnedNeedByConnectionUri,
   getOwnedNeeds,
 } from "../../selectors/general-selectors.js";
-import { isChatConnectionToGroup } from "../../connection-utils.js";
+import { isChatToGroup } from "../../connection-utils.js";
 import * as srefUtils from "../../sref-utils.js";
 
 import "style/_connections.scss";
@@ -60,7 +60,11 @@ class ConnectionsController {
         "connections",
         selectedConnectionUri,
       ]);
-      const isGroupChatConnection = isChatConnectionToGroup(selectedConnection);
+      const isSelectedConnectionGroupChat = isChatToGroup(
+        state.get("needs"),
+        get(need, "uri"),
+        selectedConnectionUri
+      );
 
       const selectedConnectionState = getIn(selectedConnection, ["state"]);
 
@@ -118,7 +122,7 @@ class ConnectionsController {
           !selectedPost &&
           !useCaseGroup &&
           !showGroupPostAdministration &&
-          !isGroupChatConnection &&
+          !isSelectedConnectionGroupChat &&
           (selectedConnectionState === won.WON.Connected ||
             selectedConnectionState === won.WON.RequestReceived ||
             selectedConnectionState === won.WON.RequestSent ||
@@ -127,7 +131,7 @@ class ConnectionsController {
           !selectedPost &&
           !useCaseGroup &&
           !showGroupPostAdministration &&
-          isGroupChatConnection &&
+          isSelectedConnectionGroupChat &&
           (selectedConnectionState === won.WON.Connected ||
             selectedConnectionState === won.WON.RequestReceived ||
             selectedConnectionState === won.WON.RequestSent ||
