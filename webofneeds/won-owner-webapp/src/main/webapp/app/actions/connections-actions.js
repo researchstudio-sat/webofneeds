@@ -546,23 +546,59 @@ export function connectionsRate(connectionUri, rating) {
  * @return {Function}
  */
 export function showLatestMessages(connectionUriParam, numberOfEvents) {
-  return async (dispatch, getState) => {
+  return (dispatch, getState) => {
     const state = getState();
-    await loadLatestMessagesOfConnection({
-      connectionUri: connectionUriParam,
-      numberOfEvents,
-      state,
-      actionTypesToDispatch: {
-        start: actionTypes.connections.showLatestMessages,
-        success: actionTypes.connections.showLatestMessages,
-        failure: actionTypes.connections.showLatestMessages,
-      },
-      dispatch,
+    const connectionUri =
+      connectionUriParam || getConnectionUriFromRoute(state);
+    const need =
+      connectionUri && getOwnedNeedByConnectionUri(state, connectionUri);
+    const needUri = need && need.get("uri");
+    const connection =
+      connectionUri && getOwnedConnectionByUri(state, connectionUri);
+    if (
+      !connectionUri ||
+      !connection ||
+      getIn(state, ["process", "connections", connectionUri, "loadingMessages"]) // only start loading once.
+    ) {
+      return Promise.resolve();
+    }
+
+    dispatch({
+      type: actionTypes.connections.showLatestMessages,
+      payload: Immutable.fromJS({
+        connectionUri: connectionUri,
+        loadingMessages: true,
+      }),
     });
+
+    return won
+      .getWonMessagesOfConnection(connectionUri, {
+        requesterWebId: needUri,
+        pagingSize: numOfEvts2pageSize(numberOfEvents),
+        deep: true,
+      })
+      .then(events => {
+        dispatch({
+          type: actionTypes.connections.showLatestMessages,
+          payload: Immutable.fromJS({
+            connectionUri: connectionUri,
+            events: events,
+          }),
+        });
+      })
+      .catch(error => {
+        dispatch({
+          type: actionTypes.connections.fetchMessagesFailed,
+          payload: Immutable.fromJS({
+            connectionUri: connectionUri,
+            error: error,
+          }),
+        });
+      });
   };
 }
 
-export async function loadLatestMessagesOfConnection({
+export function loadLatestMessagesOfConnection({
   connectionUri,
   numberOfEvents,
   state,
@@ -580,7 +616,7 @@ export async function loadLatestMessagesOfConnection({
     !connection ||
     getIn(state, ["process", "connections", connectionUri_, "loadingMessages"]) // only start loading once.
   ) {
-    return;
+    return Promise.resolve();
   }
 
   if (actionTypesToDispatch.start) {
@@ -593,33 +629,34 @@ export async function loadLatestMessagesOfConnection({
     });
   }
 
-  try {
-    const events = await won.getWonMessagesOfConnection(connectionUri_, {
+  return won
+    .getWonMessagesOfConnection(connectionUri_, {
       requesterWebId: needUri,
       pagingSize: numOfEvts2pageSize(numberOfEvents),
       deep: true,
+    })
+    .then(events => {
+      if (actionTypesToDispatch.success) {
+        dispatch({
+          type: actionTypesToDispatch.success,
+          payload: Immutable.fromJS({
+            connectionUri: connectionUri_,
+            events: events,
+          }),
+        });
+      }
+    })
+    .catch(error => {
+      if (actionTypesToDispatch.failure) {
+        dispatch({
+          type: actionTypesToDispatch.failure,
+          payload: Immutable.fromJS({
+            connectionUri: connectionUri_,
+            error: error,
+          }),
+        });
+      }
     });
-
-    if (actionTypesToDispatch.success) {
-      dispatch({
-        type: actionTypesToDispatch.success,
-        payload: Immutable.fromJS({
-          connectionUri: connectionUri_,
-          events: events,
-        }),
-      });
-    }
-  } catch (error) {
-    if (actionTypesToDispatch.failure) {
-      dispatch({
-        type: actionTypesToDispatch.failure,
-        payload: Immutable.fromJS({
-          connectionUri: connectionUri_,
-          error: error,
-        }),
-      });
-    }
-  }
 }
 
 /**
@@ -681,9 +718,8 @@ export function showMoreMessages(connectionUriParam, numberOfEvents) {
         })
       )
       .catch(error => {
-        console.error("Failed loading more events: ", error);
         dispatch({
-          type: actionTypes.connections.showMoreMessages,
+          type: actionTypes.connections.fetchMessagesFailed,
           payload: Immutable.fromJS({
             connectionUri: connectionUri,
             error: error,
