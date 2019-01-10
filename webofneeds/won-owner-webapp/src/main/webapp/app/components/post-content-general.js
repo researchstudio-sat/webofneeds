@@ -52,7 +52,7 @@ function genComponentConf() {
             </div>
           </div>
         </div>
-        <div class="pcg__columns__right" ng-if="self.flags && self.flags.size > 0">
+        <div class="pcg__columns__right" ng-if="self.shouldShowRdf && self.flags && self.flags.size > 0">
           <div class="pcg__columns__right__item">
             <div class="pcg__columns__right__item__label">
               Flags
@@ -62,7 +62,7 @@ function genComponentConf() {
             </div>
           </div>
         </div>
-        <div class="pcg__columns__right" ng-if="self.facets && self.facets.size > 0">
+        <div class="pcg__columns__right" ng-if="self.shouldShowRdf && self.facets && self.facets.size > 0">
           <div class="pcg__columns__right__item">
             <div class="pcg__columns__right__item__label">
               Facets
@@ -126,6 +126,7 @@ function genComponentConf() {
             post &&
             relativeTime(selectLastUpdateTime(state), post.get("creationDate")),
           ratingConnectionUri: ratingConnectionUri,
+          shouldShowRdf: state.getIn(["view", "showRdf"]),
         };
       };
       connect2Redux(selectFromState, actionCreators, ["self.postUri"], this);

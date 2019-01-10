@@ -38,6 +38,11 @@ function genComponentConf() {
             <div class="post-skeleton__details"></div>
         </div>
         <div class="post-content" ng-if="!self.postLoading">
+
+          <!-- GENERAL INFORMATION -->
+          <won-post-content-general post-uri="self.post.get('uri')"></won-post-content-general>
+
+          <!-- IMAGES -->
           <won-gallery ng-if="self.post.get('hasImages')">
           </won-gallery>
 
@@ -75,6 +80,7 @@ function genComponentConf() {
           <!-- GENERAL INFORMATION -->
           <won-labelled-hr label="::'General Information'" class="cp__labelledhr"></won-labelled-hr>
           <won-post-content-general post-uri="self.post.get('uri')"></won-post-content-general>
+          <!-- RDF REPRESENTATION -->
           <div class="post-info__content__rdf" ng-if="self.shouldShowRdf">
             <h2 class="post-info__heading">
                 RDF
