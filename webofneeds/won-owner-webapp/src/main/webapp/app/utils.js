@@ -356,9 +356,16 @@ export function flattenObj(objOfObj) {
  * key-value-pair will not be contained in the result.
  * @param uris
  * @param asyncLookupFunction
+ * @param excludeUris uris to exclude from lookup
+ * @param abortOnError -> abort the whole crawl by breaking the promisechain instead of ignoring the failures
  * @return {*}
  */
-export function urisToLookupMap(uris, asyncLookupFunction, excludeUris = []) {
+export function urisToLookupMap(
+  uris,
+  asyncLookupFunction,
+  excludeUris = [],
+  abortOnError = false
+) {
   //make sure we have an array and not a single uri.
   const urisAsArray = is("Array", uris) ? uris : [uris];
   const excludeUrisAsArray = is("Array", excludeUris)
@@ -376,18 +383,23 @@ export function urisToLookupMap(uris, asyncLookupFunction, excludeUris = []) {
 
   const asyncLookups = urisAsArrayWithoutExcludes.map(uri =>
     asyncLookupFunction(uri).catch(error => {
-      console.error(
-        `failed lookup for ${uri} in utils.js:urisToLookupMap ` + error.message,
-        "\n\n",
-        error.stack,
-        "\n\n",
-        urisAsArrayWithoutExcludes,
-        "\n\n",
-        uris,
-        "\n\n",
-        error
-      );
-      return undefined;
+      if (abortOnError) {
+        throw new Error(error);
+      } else {
+        console.error(
+          `failed lookup for ${uri} in utils.js:urisToLookupMap ` +
+            error.message,
+          "\n\n",
+          error.stack,
+          "\n\n",
+          urisAsArrayWithoutExcludes,
+          "\n\n",
+          uris,
+          "\n\n",
+          error
+        );
+        return undefined;
+      }
     })
   );
   return Promise.all(asyncLookups).then(dataObjects => {
