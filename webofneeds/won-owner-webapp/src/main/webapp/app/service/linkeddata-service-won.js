@@ -1336,8 +1336,11 @@ import won from "./won.js";
           "]"
         );
 
-        return urisToLookupMap(eventUris, eventUri =>
-          won.getWonMessage(eventUri, fetchParams)
+        return urisToLookupMap(
+          eventUris,
+          eventUri => won.getWonMessage(eventUri, fetchParams),
+          [],
+          true
         );
       });
   };
@@ -1381,16 +1384,16 @@ import won from "./won.js";
   won.getWonMessage = (eventUri, fetchParams) => {
     return won
       .getRawEvent(eventUri, fetchParams)
-      .then(rawEvent => won.wonMessageFromJsonLd(rawEvent))
-      .catch(error => {
+      .then(rawEvent => won.wonMessageFromJsonLd(rawEvent));
+    /*.catch(error => {
         console.error(
           'Error in won.getWonMessage("' + eventUri + '",',
           JSON.stringify(fetchParams),
           ") promiseChain",
           error
         );
-        return undefined;
-      });
+        throw new Error(error);
+      })*/
   };
 
   window.getWonMessage4dbg = won.getWonMessage;
