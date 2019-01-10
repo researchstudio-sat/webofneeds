@@ -95,7 +95,7 @@ function genComponentConf() {
                   {{ self.generateCollapsedLabel() }}
     			      </div>
                 <div class="won-cm__center__bubble__carret clickable"
-                    ng-if="!self.isCollapsed && (self.isProposable || self.isClaimable) && !self.multiSelectType"
+                    ng-if="!self.isGroupChatMessage && !self.isCollapsed && (self.isProposable || self.isClaimable) && !self.multiSelectType"
                     ng-click="self.toggleActions()">
                     <svg ng-show="!self.showActions">
                         <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
