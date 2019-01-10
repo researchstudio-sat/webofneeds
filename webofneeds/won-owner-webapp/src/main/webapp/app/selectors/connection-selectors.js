@@ -78,6 +78,12 @@ export function getChatConnectionsToCrawl(state) {
             "connections",
             conn.get("uri"),
             "loadingMessages",
+          ]) &&
+          !getIn(state, [
+            "process",
+            "connections",
+            conn.get("uri"),
+            "failedToLoad",
           ])
       );
 

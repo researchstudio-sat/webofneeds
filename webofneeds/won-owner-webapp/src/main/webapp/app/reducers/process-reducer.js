@@ -188,6 +188,20 @@ export default function(processState = initialState, action = {}) {
       });
     }
 
+    case actionTypes.connections.fetchMessagesFailed: {
+      const connUri = action.payload.get("connectionUri");
+      const error = action.payload.get("error");
+
+      if (error) {
+        processState = updateConnectionProcess(processState, connUri, {
+          loadingMessages: false,
+          failedToLoad: true,
+        });
+      }
+
+      return processState;
+    }
+
     case actionTypes.reconnect.startingToLoadConnectionData:
     case actionTypes.reconnect.receivedConnectionData:
     case actionTypes.reconnect.connectionFailedToLoad:
@@ -199,6 +213,7 @@ export default function(processState = initialState, action = {}) {
       if (loadingMessages) {
         processState = updateConnectionProcess(processState, connUri, {
           loadingMessages: true,
+          failedToLoad: false,
         });
       }
 
@@ -206,6 +221,7 @@ export default function(processState = initialState, action = {}) {
       if (loadedMessages) {
         processState = updateConnectionProcess(processState, connUri, {
           loadingMessages: false,
+          failedToLoad: false,
         });
       }
       const error = action.payload.get("error");
@@ -213,6 +229,7 @@ export default function(processState = initialState, action = {}) {
       if (error) {
         processState = updateConnectionProcess(processState, connUri, {
           loadingMessages: false,
+          failedToLoad: true,
         });
       }
 

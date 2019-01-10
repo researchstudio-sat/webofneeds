@@ -111,6 +111,7 @@ const actionHierarchy = {
     sendChatMessageFailed: INJ_DEFAULT,
     showLatestMessages: cnct.showLatestMessages,
     showMoreMessages: cnct.showMoreMessages,
+    fetchMessagesFailed: INJ_DEFAULT,
     markAsRead: INJ_DEFAULT,
     setLoadingAgreementData: INJ_DEFAULT,
     setLoadingPetriNetData: INJ_DEFAULT,
