@@ -66,11 +66,9 @@ export function addMessage(
       }
 
       if (needUri) {
-        if (isChatToGroup(state, needUri, connectionUri)) {
-          console.log("Adding message to a chatToGroup Connection");
-        }
+        const hasContainedForwardedWonMessages = wonMessage.hasContainedForwardedWonMessages();
 
-        if (wonMessage.hasContainedForwardedWonMessages()) {
+        if (hasContainedForwardedWonMessages) {
           const containedForwardedWonMessages = wonMessage.getContainedForwardedWonMessages();
           containedForwardedWonMessages.map(forwardedWonMessage => {
             state = addMessage(
@@ -94,10 +92,24 @@ export function addMessage(
           //ignore messages for nonexistant connections
           return state;
         }
-        messages = messages.set(
-          parsedMessage.getIn(["data", "uri"]),
-          parsedMessage.get("data")
-        );
+
+        /*
+        Group Chat messages that are received are in the form of injected/referenced messages
+        But we do not want to display these messages in that manner, therefore we simply ignore
+        the encapsulating message and not store it within our state.
+        */
+        if (
+          !(
+            hasContainedForwardedWonMessages &&
+            isChatToGroup(state, needUri, connectionUri)
+          )
+        ) {
+          messages = messages.set(
+            parsedMessage.getIn(["data", "uri"]),
+            parsedMessage.get("data")
+          );
+        }
+
         return state.setIn(
           [needUri, "connections", connectionUri, "messages"],
           messages
