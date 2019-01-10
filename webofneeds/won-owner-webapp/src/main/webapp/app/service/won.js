@@ -913,6 +913,11 @@ won.DomainObjectFactory.prototype = {
 won.wonMessageFromJsonLd = async function(wonMessageAsJsonLD) {
   const expandedJsonLd = await jsonld.promises.expand(wonMessageAsJsonLD);
   const wonMessage = new WonMessage(expandedJsonLd);
+
+  if (wonMessage.parseErrors && wonMessage.parseErrors.length > 0) {
+    console.warn("wonMessage ParseError: " + wonMessage.parseErrors);
+  }
+
   await wonMessage.frameInPromise();
   await wonMessage.generateContentGraphTrig();
   await wonMessage.generateCompactedFramedMessage();
