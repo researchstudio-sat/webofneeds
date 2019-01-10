@@ -1385,7 +1385,7 @@ import won from "./won.js";
       .catch(error => {
         console.error(
           'Error in won.getWonMessage("' + eventUri + '",',
-          fetchParams,
+          JSON.stringify(fetchParams),
           ") promiseChain",
           error
         );
