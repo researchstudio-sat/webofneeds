@@ -10,7 +10,7 @@ import { labels, relativeTime } from "../won-label-utils.js";
 import { connect2Redux } from "../won-utils.js";
 import {
   generateFullNeedTypesLabel,
-  // generateShortNeedTypesLabel,
+  generateShortNeedTypesLabel,
 } from "../need-utils.js";
 import {
   selectLastUpdateTime,
@@ -27,6 +27,7 @@ const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
       <div class="pcg__columns">
+      <!-- LEFT COLUMN -->
         <div class="pcg__columns__left">
           <!-- PERSONA -->
           <div class="pcg__columns__left__item" ng-if="self.persona">
@@ -47,12 +48,8 @@ function genComponentConf() {
               {{ self.friendlyTimestamp }}
             </div>
           </div>
-        </div>
-
-        <div class="pcg__columns__right" ng-if="self.shouldShowTypes">
-          <!-- TYPES -->
-          <!-- TODO: We Do not store a single type anymore but a list of types... adapt accordingly -->
-          <div class="pcg__columns__left__item">
+          <!-- TYPES - ONLY IF SHOW RDF IS TRUE -->
+          <div class="pcg__columns__left__item" ng-if="self.shouldShowRdf">
             <div class="pcg__columns__left__item__label">
               Types
             </div>
@@ -62,8 +59,20 @@ function genComponentConf() {
           </div>
         </div>
 
+      <!-- RIGHT COLUMN -->
+        <!-- TYPES - ONLY IF SHOW RDF IS FALSE -->
+        <div class="pcg__columns__right" ng-if="!self.shouldShowRdf && self.generateShortNeedTypesLabel(self.post).lenght !== 0">
+          <div class="pcg__columns__left__item">
+            <div class="pcg__columns__left__item__label">
+              Type
+            </div>
+            <div class="pcg__columns__left__item__value">
+              {{ self.generateShortNeedTypesLabel(self.post) }}
+            </div>
+          </div>
+        </div>
+        <!-- FLAGS - ONLY IF SHOW RDF IS TRUE -->
         <div class="pcg__columns__right" ng-if="self.shouldShowRdf && self.flags && self.flags.size > 0">
-          <!-- FLAGS -->
           <div class="pcg__columns__right__item">
             <div class="pcg__columns__right__item__label">
               Flags
@@ -73,8 +82,8 @@ function genComponentConf() {
             </div>
           </div>
         </div>
+        <!-- FACETS - ONLY IF SHOW RDF IS TRUE -->
         <div class="pcg__columns__right" ng-if="self.shouldShowRdf && self.facets && self.facets.size > 0">
-          <!-- FACETS-->
           <div class="pcg__columns__right__item">
             <div class="pcg__columns__right__item__label">
               Facets
@@ -85,6 +94,7 @@ function genComponentConf() {
           </div>
         </div>
       </div>
+
       <won-post-share-link
         ng-if="!self.preventSharing"
         post-uri="self.post.get('uri')">
@@ -97,8 +107,7 @@ function genComponentConf() {
       window.pcg4dbg = this;
       this.labels = labels;
       this.generateFullNeedTypesLabel = generateFullNeedTypesLabel;
-      //  this.generateShortNeedTypesLabel = generateShortNeedTypesLabel;
-      this.shouldShowTypes = false;
+      this.generateShortNeedTypesLabel = generateShortNeedTypesLabel;
 
       const selectFromState = state => {
         const connectionUri = getConnectionUriFromRoute(state);

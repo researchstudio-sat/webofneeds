@@ -96,3 +96,50 @@ export function generateFullNeedTypesLabel(needImm) {
 
   return label;
 }
+
+/**
+ * Generates a string that can be used as a simplified Types Label for non-debug views. Hides information.
+ * @param {*} needImm the need as saved in the state
+ */
+export function generateShortNeedTypesLabel(needImm) {
+  const needTypes = needImm && needImm.get("types");
+  // const matchingContexts = needImm && needImm.get("matchingContexts");
+
+  if (isWhatsAroundNeed(needImm)) {
+    return "";
+  }
+  if (isWhatsNewNeed(needImm)) {
+    return "";
+  }
+  if (isSearchNeed(needImm)) {
+    return "Search";
+  }
+  if (isDirectResponseNeed(needImm)) {
+    return "Direct Response";
+  }
+
+  let label = "";
+
+  if (needTypes && needTypes.size > 0) {
+    let types = new Array();
+    for (let type of Array.from(needTypes)) {
+      // hide won:Need
+      if (type === "won:Need") {
+        continue;
+        // cut off everything before the first :
+      } else {
+        types.push(type.substring(type.indexOf(":") + 1));
+      }
+    }
+    label += types.join(", ");
+  }
+  // hide matching context
+  // if (matchingContexts && matchingContexts.size > 0) {
+  //   if (label.length > 0) {
+  //     label += " ";
+  //   }
+  //   label += "in " + matchingContexts.join(", ");
+  // }
+
+  return label;
+}
