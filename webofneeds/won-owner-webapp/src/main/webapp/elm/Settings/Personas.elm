@@ -52,7 +52,7 @@ urlRegex =
         { caseInsensitive = True
         , multiline = False
         }
-        "^(http[s]?:\\/\\/)?[^\\s([\"<,>]*\\.[^\\s[\",><]*$"
+        "^(?:[a-z][a-z\\d\\-\\+\\.]*:(?:\\/\\/)?)?[\\w\\-.]+(?:\\.|@|:)[\\w\\-.]{2,}\\b(?:[\\w\\-.~:/?#[\\]@!$&'()*+,;=%])*$"
         |> Maybe.withDefault Regex.never
 
 
