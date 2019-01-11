@@ -32,7 +32,7 @@ public class DataWithEtag<T>
 
 
   public static DataWithEtag dataNotFound(){
-    return new DataWithEtag(null, null, null, false, false);
+    return new DataWithEtag(null, null, null, true, false);
   }
 
   /**
