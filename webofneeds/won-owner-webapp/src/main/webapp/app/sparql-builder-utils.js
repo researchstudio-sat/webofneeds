@@ -525,7 +525,7 @@ export function filterNumOfRoomsRange(rootSubject, min, max) {
   return wellFormedFilter({ operations, prefixes });
 }
 
-export function filterRentRange(rootSubject, min, max, currency) {
+export function filterPriceRange(rootSubject, min, max, currency) {
   const prefixes = {
     s: won.defaultContext["s"],
   };
@@ -554,9 +554,9 @@ export function filterRentRange(rootSubject, min, max, currency) {
 }
 
 /**
- * Uses a given rent to find needs that have a matching rentRange. Works like filterNumericProperty (see docs there).
+ * Uses a given rent to find needs that have a matching priceRange. Works like filterNumericProperty (see docs there).
  */
-export function filterRent(rootSubject, rent, currency, sparqlVarPrefix) {
+export function filterPrice(rootSubject, rent, currency, sparqlVarPrefix) {
   const prefixes = {
     s: won.defaultContext["s"],
   };

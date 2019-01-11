@@ -8,7 +8,7 @@ import { getIn, is } from "../../app/utils.js";
 import {
   textSearchSubQuery,
   vicinityScoreSubQuery,
-  filterRentRange,
+  filterPriceRange,
   concatenateFilters,
   sparqlQuery,
 } from "../../app/sparql-builder-utils.js";
@@ -146,8 +146,7 @@ export const goodsServiceSearch = {
         ],
       },
       priceRange &&
-        // no idea why this method isn't called filterPriceRange
-        filterRentRange(
+        filterPriceRange(
           `${resultName}`,
           priceRange.min,
           priceRange.max,

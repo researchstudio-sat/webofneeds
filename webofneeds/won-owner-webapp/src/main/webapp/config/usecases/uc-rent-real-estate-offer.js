@@ -13,7 +13,7 @@ import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-u
 import {
   filterInVicinity,
   filterNumericProperty,
-  filterRent,
+  filterPrice,
   concatenateFilters,
   sparqlQuery,
 } from "../../app/sparql-builder-utils.js";
@@ -79,7 +79,7 @@ export const rentRealEstateOffer = {
           location && "?seeks won:hasLocation ?location.",
         ],
       },
-      rent && filterRent("?seeks", rent.amount, rent.currency, "rent"),
+      rent && filterPrice("?seeks", rent.amount, rent.currency, "rent"),
       floorSize &&
         filterNumericProperty("?seeks", floorSize, "s:floorSize", "size"),
       numberOfRooms &&
