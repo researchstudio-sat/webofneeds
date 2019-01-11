@@ -21,6 +21,7 @@ import Html.Attributes as HA
 import Json.Decode as Decode exposing (Value)
 import NonEmpty
 import Persona exposing (Persona, PersonaData, SaveState(..))
+import Regex
 import Skin exposing (Skin)
 import String.Extra as String
 import Time
@@ -41,13 +42,39 @@ type alias Draft =
 
 type ValidationError
     = DisplayNameError String
+    | UrlError String
     | UnknownError String
+
+
+urlRegex : Regex.Regex
+urlRegex =
+    Regex.fromStringWith
+        { caseInsensitive = True
+        , multiline = False
+        }
+        "^(?:[a-z][a-z\\d\\-\\+\\.]*:(?:\\/\\/)?)?[\\w\\-.]+(?:\\.|@|:)[\\w\\-.]{2,}\\b(?:[\\w\\-.~:/?#[\\]@!$&'()*+,;=%])*$"
+        |> Maybe.withDefault Regex.never
+
+
+ifInvalidUrl : (subject -> String) -> error -> Validator error subject
+ifInvalidUrl getter error =
+    Validate.ifFalse
+        (\subject ->
+            let
+                url =
+                    getter subject
+            in
+            Regex.contains urlRegex url
+                || String.isEmpty url
+        )
+        error
 
 
 personaValidator : Validator ValidationError Draft
 personaValidator =
     Validate.all
         [ Validate.ifBlank .displayName (DisplayNameError "Please enter a display name.")
+        , ifInvalidUrl .website (UrlError "Entered website url is not valid")
         ]
 
 
@@ -368,7 +395,7 @@ createInterface skin draft =
                     |> Maybe.withDefault none
                 ]
         , sections =
-            [ personaForm draft
+            [ personaForm skin draft
             , row
                 [ spacing 10
                 , width fill
@@ -394,8 +421,20 @@ createInterface skin draft =
         }
 
 
-personaForm : Draft -> Element Msg
-personaForm draft =
+personaForm : Skin -> Draft -> Element Msg
+personaForm skin draft =
+    let
+        validated =
+            Validate.validate personaValidator draft
+
+        ( isValid, errors ) =
+            case validated of
+                Ok _ ->
+                    ( True, [] )
+
+                Err err ->
+                    ( False, err )
+    in
     column
         [ spacing 10
         , width fill
@@ -406,6 +445,23 @@ personaForm draft =
             , placeholder = Nothing
             , label = Input.labelAbove [] (text "Website")
             }
+        , errors
+            |> List.filterMap
+                (\error ->
+                    case error of
+                        UrlError str ->
+                            Just str
+
+                        _ ->
+                            Nothing
+                )
+            |> List.head
+            |> Maybe.map
+                (\str ->
+                    el [ Font.color skin.primaryColor ] <|
+                        text str
+                )
+            |> Maybe.withDefault none
         , Input.multiline []
             { onChange = \str -> DraftUpdated { draft | aboutMe = str }
             , text = draft.aboutMe
