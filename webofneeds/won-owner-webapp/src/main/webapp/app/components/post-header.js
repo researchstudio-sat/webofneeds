@@ -13,10 +13,10 @@ import { selectLastUpdateTime } from "../selectors/general-selectors.js";
 import won from "../won-es6.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 import {
-  generateNeedTypesLabel,
   isDirectResponseNeed,
   hasGroupFacet,
   hasChatFacet,
+  generateFullNeedTypesLabel,
 } from "../need-utils.js";
 
 import "style/_post-header.scss";
@@ -53,7 +53,7 @@ function genComponentConf() {
             ng-if="self.isGroupChatEnabled && self.isChatEnabled">
             Group Chat enabled
           </span>
-          {{ self.generateNeedTypesLabel(self.need) }}
+          {{ self.generateFullNeedTypesLabel(self.need) }}
         </span>
         <div class="ph__right__subtitle__date">
           {{ self.friendlyTimestamp }}
@@ -87,7 +87,7 @@ function genComponentConf() {
             ng-if="self.isGroupChatEnabled && self.isChatEnabled">
             Group Chat enabled
           </span>
-          {{ self.generateNeedTypesLabel(self.need) }}
+          {{ self.generateFullNeedTypesLabel(self.need) }}
         </span>
       </div>
     </div>
@@ -106,7 +106,7 @@ function genComponentConf() {
     constructor() {
       attach(this, serviceDependencies, arguments);
       window.ph4dbg = this;
-      this.generateNeedTypesLabel = generateNeedTypesLabel;
+      this.generateFullNeedTypesLabel = generateFullNeedTypesLabel;
       this.WON = won.WON;
       const selectFromState = state => {
         const need = getIn(state, ["needs", this.needUri]);

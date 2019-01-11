@@ -74,9 +74,10 @@ export function isWhatsNewNeed(need) {
 
 /**
  * Generates a string that can be used as a Types Label for any given need, includes the matchingContexts
+ * TODO: We Do not store a single type anymore but a list of types... adapt accordingly
  */
-export function generateNeedTypesLabel(needImm) {
-  const matchingContexts = get(needImm, "matchingContexts");
+export function generateFullNeedTypesLabel(needImm) {
+  const matchingContexts = needImm && needImm.get("matchingContexts");
   const types = get(needImm, "types");
 
   //TODO: GENERATE CORRECT LABEL
