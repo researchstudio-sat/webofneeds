@@ -772,11 +772,6 @@ export function fetchActiveConnectionAndDispatch(connUri, needUri, dispatch) {
   return won
     .getConnectionWithEventUris(connUri, { requesterWebId: needUri })
     .then(connection => {
-      console.log(
-        "fetchActiveConnectionAndDispatch with eventUris: ",
-        connection.hasEvents
-      );
-
       dispatch({
         type: actionTypes.connections.storeActive,
         payload: Immutable.fromJS({ connections: { [connUri]: connection } }),
