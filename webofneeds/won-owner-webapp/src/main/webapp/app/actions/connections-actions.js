@@ -576,15 +576,22 @@ export function showLatestMessages(connectionUriParam, numberOfEvents) {
     return won
       .getConnectionWithEventUris(connectionUri, fetchParams)
       .then(connection => {
+        const messagesToFetch = limitNumberOfEventsToFetchInConnection(
+          state,
+          connection,
+          connectionUri,
+          numberOfEvents
+        );
+
         dispatch({
           type: actionTypes.connections.messageUrisInLoading,
           payload: Immutable.fromJS({
             connectionUri: connectionUri,
-            uris: connection.hasEvents,
+            uris: messagesToFetch,
           }),
         });
 
-        return connection.hasEvents;
+        return messagesToFetch;
       })
       .then(eventUris => {
         return urisToLookupSuccessAndFailedMap(
@@ -655,15 +662,22 @@ export function loadLatestMessagesOfConnection({
   return won
     .getConnectionWithEventUris(connectionUri_, fetchParams)
     .then(connection => {
+      const messagesToFetch = limitNumberOfEventsToFetchInConnection(
+        state,
+        connection,
+        connectionUri,
+        numberOfEvents
+      );
+
       dispatch({
         type: actionTypes.connections.messageUrisInLoading,
         payload: Immutable.fromJS({
           connectionUri: connectionUri_,
-          uris: connection.hasEvents,
+          uris: messagesToFetch,
         }),
       });
 
-      return connection.hasEvents;
+      return messagesToFetch;
     })
     .then(eventUris => {
       return urisToLookupSuccessAndFailedMap(
@@ -749,18 +763,24 @@ export function showMoreMessages(connectionUriParam, numberOfEvents) {
     };
 
     won
-      .getEventUrisOfConnection(connectionUri, needUri)
       .getConnectionWithEventUris(connectionUri, fetchParams)
       .then(connection => {
+        const messagesToFetch = limitNumberOfEventsToFetchInConnection(
+          state,
+          connection,
+          connectionUri,
+          numberOfEvents
+        );
+
         dispatch({
           type: actionTypes.connections.messageUrisInLoading,
           payload: Immutable.fromJS({
             connectionUri: connectionUri,
-            uris: connection.hasEvents,
+            uris: messagesToFetch,
           }),
         });
 
-        return connection.hasEvents;
+        return messagesToFetch;
       })
       .then(eventUris => {
         return urisToLookupSuccessAndFailedMap(
@@ -800,4 +820,46 @@ export function showMoreMessages(connectionUriParam, numberOfEvents) {
 function numOfEvts2pageSize(numberOfEvents) {
   // `*3*` to compensate for the *roughly* 2 additional success events per chat message
   return numberOfEvents * 3;
+}
+
+/**
+ * Helper Method to make sure we only load numberOfEvents messages into the store, seems that the cache is not doing what its supposed to do otherwise
+ * FIXME: remove this once the fetchpaging works again (or at all)
+ * @param state
+ * @param connection
+ * @param numberOfEvents
+ * @returns {Array}
+ */
+function limitNumberOfEventsToFetchInConnection(
+  state,
+  connection,
+  connectionUri,
+  numberOfEvents
+) {
+  const connectionImm = Immutable.fromJS(connection);
+  console.log(
+    "ConnectionFetch with numberOfEvents: ",
+    numberOfEvents,
+    " returned: ",
+    connectionImm.get("hasEvents") && connectionImm.get("hasEvents").size,
+    " events...",
+    connectionImm
+  );
+
+  const allMessagesToLoad = state
+    .getIn(["process", "connections", connectionUri, "messages"])
+    .filter(msg => msg.get("toLoad") && !msg.get("failedToLoad"));
+  let messagesToFetch = [];
+
+  connectionImm &&
+    connectionImm.get("hasEvents").map(eventUri => {
+      if (
+        allMessagesToLoad.has(eventUri) &&
+        messagesToFetch.length < numOfEvts2pageSize(numberOfEvents)
+      ) {
+        messagesToFetch.push(eventUri);
+      }
+    });
+
+  return messagesToFetch;
 }
