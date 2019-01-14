@@ -73,7 +73,6 @@ export function getChatConnectionsToCrawl(state) {
       .filter(conn => isChatConnection(conn) || isGroupChatConnection(conn))
       .filter(
         conn =>
-          false &&
           !getIn(state, [
             "process",
             "connections",
