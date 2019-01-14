@@ -14,7 +14,6 @@ import won.protocol.vocabulary.WONMSG;
  * Date: 12.12.2018
  */
 @Component
-@DefaultFacetMessageProcessor(direction=WONMSG.TYPE_FROM_EXTERNAL_STRING,messageType = WONMSG.TYPE_CONNECT_STRING)
 @FacetMessageProcessor(facetType = WON.REVIEW_FACET_STRING,direction=WONMSG.TYPE_FROM_EXTERNAL_STRING,messageType =
   WONMSG.TYPE_CONNECT_STRING)
 public class ConnectFromNodeReviewFacetImpl extends AbstractCamelProcessor

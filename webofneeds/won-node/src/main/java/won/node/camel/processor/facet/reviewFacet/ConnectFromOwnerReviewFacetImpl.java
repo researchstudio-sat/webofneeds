@@ -12,7 +12,6 @@ import won.protocol.vocabulary.WONMSG;
  * User: MS Date: 12.12.2018
  */
 @Component
-@DefaultFacetMessageProcessor(direction=WONMSG.TYPE_FROM_OWNER_STRING,messageType = WONMSG.TYPE_CONNECT_STRING)
 @FacetMessageProcessor(
         facetType =   WON.REVIEW_FACET_STRING,
         direction=    WONMSG.TYPE_FROM_OWNER_STRING,
