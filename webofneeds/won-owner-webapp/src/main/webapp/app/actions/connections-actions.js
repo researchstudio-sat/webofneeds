@@ -589,7 +589,7 @@ export function showLatestMessages(connectionUriParam, numberOfEvents) {
       .then(eventUris => {
         return urisToLookupSuccessAndFailedMap(
           eventUris,
-          eventUri => won.getWonMessage(eventUri, fetchParams),
+          eventUri => won.getWonMessage(eventUri, { requesterWebId: needUri }),
           []
         );
       })
@@ -668,7 +668,7 @@ export function loadLatestMessagesOfConnection({
     .then(eventUris => {
       return urisToLookupSuccessAndFailedMap(
         eventUris,
-        eventUri => won.getWonMessage(eventUri, fetchParams),
+        eventUri => won.getWonMessage(eventUri, { requesterWebId: needUri }),
         []
       );
     })
@@ -765,7 +765,7 @@ export function showMoreMessages(connectionUriParam, numberOfEvents) {
       .then(eventUris => {
         return urisToLookupSuccessAndFailedMap(
           eventUris,
-          eventUri => won.getWonMessage(eventUri, fetchParams),
+          eventUri => won.getWonMessage(eventUri, { requesterWebId: needUri }),
           []
         );
       })
