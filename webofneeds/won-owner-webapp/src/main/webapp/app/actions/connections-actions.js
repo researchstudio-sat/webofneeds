@@ -837,14 +837,6 @@ function limitNumberOfEventsToFetchInConnection(
   numberOfEvents
 ) {
   const connectionImm = Immutable.fromJS(connection);
-  console.log(
-    "ConnectionFetch with numberOfEvents: ",
-    numberOfEvents,
-    " returned: ",
-    connectionImm.get("hasEvents") && connectionImm.get("hasEvents").size,
-    " events...",
-    connectionImm
-  );
 
   const allMessagesToLoad = state
     .getIn(["process", "connections", connectionUri, "messages"])
