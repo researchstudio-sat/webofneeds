@@ -15,6 +15,7 @@ import {
   getConnectionUriFromRoute,
   getOwnedNeedByConnectionUri,
 } from "../selectors/general-selectors.js";
+import { hasMessagesToLoad } from "../selectors/connection-selectors.js";
 import { getUnreadMessagesByConnectionUri } from "../selectors/message-selectors.js";
 import autoresizingTextareaModule from "../directives/textarea-autogrow.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
@@ -62,7 +63,7 @@ function genComponentConf() {
                 </svg>
             </div>
             <button class="gpm__content__loadbutton won-button--outlined thin red"
-                ng-if="!self.isSuggested && !self.isProcessingLoadingMessages && !self.allMessagesLoaded"
+                ng-if="!self.isSuggested && !self.isProcessingLoadingMessages && self.hasConnectionMessagesToLoad"
                 ng-click="self.loadPreviousMessages()">
                 Load previous messages
             </button>
@@ -163,11 +164,10 @@ function genComponentConf() {
         const nonOwnedNeedUri = get(connection, "remoteNeedUri");
         const nonOwnedNeed = getIn(state, ["needs", nonOwnedNeedUri]);
         const chatMessages = get(connection, "messages");
-        const allMessagesLoaded =
-          chatMessages &&
-          chatMessages.filter(
-            msg => msg.get("messageType") === won.WONMSG.connectMessage
-          ).size > 0;
+        const hasConnectionMessagesToLoad = hasMessagesToLoad(
+          state,
+          connectionUri
+        );
 
         let sortedMessages = chatMessages && chatMessages.toArray();
         sortedMessages &&
@@ -216,7 +216,7 @@ function genComponentConf() {
           debugmode: won.debugmode,
           shouldShowRdf: state.getIn(["view", "showRdf"]),
           // if the connect-message is here, everything else should be as well
-          allMessagesLoaded,
+          hasConnectionMessagesToLoad,
           connectionOrNeedsLoading:
             !connection ||
             !nonOwnedNeed ||
@@ -268,7 +268,7 @@ function genComponentConf() {
         if (
           this.connection &&
           !this.isProcessingLoadingMessages &&
-          !(this.allMessagesLoaded || this.connection.get("messages").size > 0)
+          this.hasConnectionMessagesToLoad
         ) {
           this.connections__showLatestMessages(
             this.connection.get("uri"),

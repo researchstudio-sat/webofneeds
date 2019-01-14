@@ -103,3 +103,19 @@ export function getChatConnectionsToCrawl(state) {
     );
   return connectionsWithoutConnectMessage;
 }
+
+export function hasMessagesToLoad(state, connUri) {
+  const messageProcess = getIn(state, [
+    "process",
+    "connections",
+    connUri,
+    "messages",
+  ]);
+
+  return (
+    messageProcess &&
+    messageProcess.filter(msg => {
+      msg.get("toLoad");
+    }).size > 0
+  );
+}

@@ -21,6 +21,7 @@ import {
   getConnectionUriFromRoute,
   getOwnedNeedByConnectionUri,
 } from "../selectors/general-selectors.js";
+import { hasMessagesToLoad } from "../selectors/connection-selectors.js";
 import {
   getAgreementMessagesByConnectionUri,
   getCancellationPendingMessagesByConnectionUri,
@@ -111,7 +112,7 @@ function genComponentConf() {
               Calculating PetriNet Status
             </div>
             <button class="pm__content__loadbutton won-button--outlined thin red"
-                ng-if="!self.isSuggested && self.showChatData && !self.isProcessingLoadingMessages && !self.allMessagesLoaded"
+                ng-if="!self.isSuggested && self.showChatData && !self.isProcessingLoadingMessages && self.hasConnectionMessagesToLoad"
                 ng-click="self.loadPreviousMessages()">
                 Load previous messages
             </button>
@@ -271,11 +272,10 @@ function genComponentConf() {
           connection &&
           connection.get("messages") &&
           connection.get("messages").filter(msg => !msg.get("forwardMessage"));
-        const allMessagesLoaded =
-          chatMessages &&
-          chatMessages.filter(
-            msg => msg.get("messageType") === won.WONMSG.connectMessage
-          ).size > 0;
+        const hasConnectionMessagesToLoad = hasMessagesToLoad(
+          state,
+          connectionUri
+        );
 
         const agreementData = connection && connection.get("agreementData");
         const petriNetData = connection && connection.get("petriNetData");
@@ -394,7 +394,7 @@ function genComponentConf() {
           debugmode: won.debugmode,
           shouldShowRdf: state.getIn(["view", "showRdf"]),
           // if the connect-message is here, everything else should be as well
-          allMessagesLoaded,
+          hasConnectionMessagesToLoad,
           hasAgreementMessages: agreementMessages && agreementMessages.size > 0,
           hasPetriNetData: petriNetData && petriNetData.size > 0,
           agreementMessagesArray:
@@ -460,7 +460,7 @@ function genComponentConf() {
         if (
           this.connection &&
           !this.isProcessingLoadingMessages &&
-          !(this.allMessagesLoaded || this.connection.get("messages").size > 0)
+          this.hasConnectionMessagesToLoad
         ) {
           this.connections__showLatestMessages(
             this.connection.get("uri"),
