@@ -414,6 +414,9 @@ public class LinkedDataServiceImpl implements LinkedDataService
       return DataWithEtag.dataNotChanged(data);
     }
     connection = data.getData();
+    if(connection == null) {
+      return DataWithEtag.dataNotFound();
+    }
     String newEtag = data.getEtag();
 
     // load the model from storage
