@@ -1385,15 +1385,6 @@ import won from "./won.js";
     return won
       .getRawEvent(eventUri, fetchParams)
       .then(rawEvent => won.wonMessageFromJsonLd(rawEvent));
-    /*.catch(error => {
-        console.error(
-          'Error in won.getWonMessage("' + eventUri + '",',
-          JSON.stringify(fetchParams),
-          ") promiseChain",
-          error
-        );
-        throw new Error(error);
-      })*/
   };
 
   window.getWonMessage4dbg = won.getWonMessage;
