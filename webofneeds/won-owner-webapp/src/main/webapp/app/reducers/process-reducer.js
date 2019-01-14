@@ -208,15 +208,6 @@ export default function(processState = initialState, action = {}) {
       );
     }
 
-    case actionTypes.connections.setLoadingMessages: {
-      const loadingMessages = action.payload.loadingMessages;
-      const connUri = action.payload.connectionUri;
-
-      return updateConnectionProcess(processState, connUri, {
-        loadingMessages: loadingMessages,
-      });
-    }
-
     case actionTypes.connections.fetchMessagesStart: {
       const connUri = action.payload.get("connectionUri");
 
