@@ -60,6 +60,20 @@ function addTheirNeedInLoading(needs, needUri) {
   }
 }
 
+export function addTheirNeedToLoad(needs, needUri) {
+  const oldNeed = needs.get(needUri);
+  if (oldNeed && oldNeed.get("isOwned")) {
+    return needs;
+  } else {
+    let need = Immutable.fromJS({
+      uri: needUri,
+      isOwned: false,
+      connections: Immutable.Map(),
+    });
+    return needs.setIn([needUri], need);
+  }
+}
+
 export function addOwnActiveNeedsInLoading(needs, needUris) {
   let newState = needs;
   needUris &&

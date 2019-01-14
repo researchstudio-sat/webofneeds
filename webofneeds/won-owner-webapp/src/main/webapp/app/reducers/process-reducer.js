@@ -5,6 +5,7 @@ import { actionTypes } from "../actions/actions.js";
 import Immutable from "immutable";
 import { getIn, get } from "../utils.js";
 import { parseNeed } from "./need-reducer/parse-need.js";
+import { parseMessage } from "./need-reducer/parse-message.js";
 
 const initialState = Immutable.fromJS({
   processingInitialLoad: true,
@@ -435,10 +436,103 @@ export default function(processState = initialState, action = {}) {
       return processState;
     }
 
+    //Necessary to flag the originatorUri of a message as need toLoad if the need is not currently in the state yet (e.g new groupmember sends message)
+    case actionTypes.messages.processConnectionMessage:
+      return addOriginatorNeedToLoad(processState, action.payload);
+
     case actionTypes.needs.delete:
       return processState.deleteIn(["needs", action.payload.ownNeedUri]);
 
     default:
       return processState;
   }
+}
+
+/*
+ "alreadyProcessed" flag, which indicates that we do not care about the
+ sent status anymore and assume that it has been successfully sent to each server (incl. the remote)
+ "insertIntoConnUri" and "insertIntoNeedUri" are used for forwardedMessages so that the message is
+ stored within the given connection/need and not in the original need or connection as we might not
+ have these stored in the state
+ */
+export function addOriginatorNeedToLoad(
+  processState,
+  wonMessage,
+  alreadyProcessed = false,
+  insertIntoConnUri = undefined,
+  insertIntoNeedUri = undefined
+) {
+  // we used to exclude messages without content here, using
+  // if (wonMessage.getContentGraphs().length > 0) as the condition
+  // however, after moving the facet info of connect/open messages from
+  // content to envelope and making them optional, connect messages
+  // actually can have no content. This never happened before, and
+  // as one might expect, caused very weird behaviour when it did:
+  // It was processed correctly after a reload, but as an
+  // outgoing message, the success/failure responses coming in
+  // would still cause an entry to be created in the messages array,
+  // but holding only the 'isReceivedByOwn','isReceivedByRemote' etc fields,
+  // throwing off the message rendering.
+  // New solution: parse anything that is not a response, but allow responses with content
+  if (!wonMessage.isResponse() || wonMessage.getContentGraphs().length > 0) {
+    let parsedMessage = parseMessage(
+      wonMessage,
+      alreadyProcessed,
+      insertIntoConnUri && insertIntoNeedUri
+    );
+    if (parsedMessage) {
+      const connectionUri =
+        insertIntoConnUri || parsedMessage.get("belongsToUri");
+
+      let needUri = insertIntoNeedUri;
+      if (!needUri && parsedMessage.getIn(["data", "outgoingMessage"])) {
+        // needUri is the message's hasSenderNeed
+        needUri = wonMessage.getSenderNeed();
+      } else if (!needUri) {
+        // needUri is the remote message's hasReceiverNeed
+        needUri = wonMessage.getReceiverNeed();
+      }
+
+      const originatorUri = parsedMessage.getIn(["data", "originatorUri"]);
+
+      if (originatorUri) {
+        //Message is originally from another need, we might need to add the need as well
+        const needProcess = processState.getIn(["needs", originatorUri]);
+
+        if (
+          !needProcess &&
+          !needProcess.get("toLoad") &&
+          !needProcess.get("loading") &&
+          !needProcess.get("failedToLoad")
+        ) {
+          console.debug(
+            "Originator Need is not in the state yet, we need to add it"
+          );
+          processState = updateNeedProcess(processState, originatorUri, {
+            toLoad: true,
+            loading: false,
+          });
+        }
+      }
+
+      if (needUri) {
+        const hasContainedForwardedWonMessages = wonMessage.hasContainedForwardedWonMessages();
+
+        if (hasContainedForwardedWonMessages) {
+          const containedForwardedWonMessages = wonMessage.getContainedForwardedWonMessages();
+          containedForwardedWonMessages.map(forwardedWonMessage => {
+            processState = addOriginatorNeedToLoad(
+              processState,
+              forwardedWonMessage,
+              true,
+              connectionUri,
+              needUri
+            );
+            //PARSE MESSAGE DIFFERENTLY FOR FORWARDED MESSAGES
+          });
+        }
+      }
+    }
+  }
+  return processState;
 }

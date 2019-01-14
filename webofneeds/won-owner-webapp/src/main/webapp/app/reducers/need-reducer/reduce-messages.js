@@ -1,6 +1,7 @@
 import { parseMessage } from "./parse-message.js";
 import { markUriAsRead } from "../../won-localstorage.js";
 import { markConnectionAsRead } from "./reduce-connections.js";
+import { addTheirNeedToLoad } from "./reduce-needs.js";
 import { getOwnMessageUri } from "../../message-utils.js";
 import { isChatToGroup } from "../../connection-utils.js";
 
@@ -62,6 +63,18 @@ export function addMessage(
             [needUri, "connections", connectionUri, "unread"],
             true
           );
+        }
+      }
+
+      const originatorUri = parsedMessage.getIn(["data", "originatorUri"]);
+
+      if (originatorUri) {
+        //Message is originally from another need, we might need to add the need as well
+        if (!state.has(originatorUri)) {
+          console.debug(
+            "Originator Need is not in the state yet, we need to add it"
+          );
+          state = addTheirNeedToLoad(state, originatorUri);
         }
       }
 
