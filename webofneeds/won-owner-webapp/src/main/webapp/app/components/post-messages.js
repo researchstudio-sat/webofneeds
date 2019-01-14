@@ -460,6 +460,7 @@ function genComponentConf() {
         if (
           this.connection &&
           !this.isProcessingLoadingMessages &&
+          this.connection.get("messages").size < INITIAL_MESSAGECOUNT &&
           this.hasConnectionMessagesToLoad
         ) {
           this.connections__showLatestMessages(
