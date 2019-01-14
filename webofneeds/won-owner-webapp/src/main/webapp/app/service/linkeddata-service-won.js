@@ -1381,43 +1381,6 @@ import won from "./won.js";
     );
   };
 
-  /**
-   * @param connectionUri
-   * @param fetchParams See `ensureLoaded`.
-   * @return {*} the connections predicates along with the uris of associated events
-   */
-  won.getEventUrisOfConnection = function(connectionUri, needUri) {
-    if (!is("String", connectionUri)) {
-      throw new Error(
-        "Tried to request connection infos for sthg that isn't an uri: " +
-          connectionUri
-      );
-    }
-    return (
-      won
-        .getNode(connectionUri, {
-          requesterWebId: needUri,
-        })
-        //add the eventUris
-        .then(connection =>
-          won.getNode(connection.hasEventContainer, {
-            requesterWebId: needUri,
-          })
-        )
-        .then(
-          eventContainer =>
-            /*
-           * if there's only a single rdfs:member in the event
-           * container, getNode will not return an array, so we
-           * need to make sure it's one from here on out.
-           */
-            is("Array", eventContainer.member)
-              ? eventContainer.member
-              : [eventContainer.member]
-        )
-    );
-  };
-
   won.getWonMessage = (eventUri, fetchParams) => {
     return won
       .getRawEvent(eventUri, fetchParams)
