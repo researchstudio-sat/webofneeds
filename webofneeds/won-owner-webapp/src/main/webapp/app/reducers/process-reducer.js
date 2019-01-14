@@ -241,7 +241,6 @@ export default function(processState = initialState, action = {}) {
 
       const loadedMessages = action.payload.get("events");
       if (loadedMessages) {
-        console.log("fetchMessagesSuccess: loadedMessages: ", loadedMessages);
         processState = updateConnectionProcess(processState, connUri, {
           loadingMessages: false,
           failedToLoad: false,
