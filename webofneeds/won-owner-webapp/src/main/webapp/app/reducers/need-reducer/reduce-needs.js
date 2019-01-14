@@ -20,6 +20,24 @@ export function addNeed(needs, jsonldNeed, isOwned) {
           .set("connections", existingNeed.get("connections"))
           .set("isOwned", false);
       }
+
+      const heldNeedUris = parsedNeed.get("holds");
+      if (heldNeedUris.size > 0) {
+        heldNeedUris.map(needUri => {
+          if (!needs.get(needUri) || !needs.getIn([needUri, "isOwned"])) {
+            needs = addTheirNeedToLoad(needs, needUri);
+          }
+        });
+      }
+
+      const groupMemberUris = parsedNeed.get("groupMembers");
+      if (groupMemberUris.size > 0) {
+        groupMemberUris.map(needUri => {
+          if (!needs.get(needUri) || !needs.getIn([needUri, "isOwned"])) {
+            needs = addTheirNeedToLoad(needs, needUri);
+          }
+        });
+      }
     }
 
     return needs.set(parsedNeed.get("uri"), parsedNeed);

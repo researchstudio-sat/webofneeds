@@ -352,10 +352,6 @@ export function setMultiSelectType(
 }
 
 export function addActiveConnectionsToNeedInLoading(state, needUri, connUris) {
-  needUri &&
-    connUris &&
-    connUris.size > 0 &&
-    console.debug("addActiveConnectionsToNeedInLoading: ", connUris);
   let newState = state;
   needUri &&
     connUris &&

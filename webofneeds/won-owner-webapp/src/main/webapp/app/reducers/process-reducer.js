@@ -133,7 +133,30 @@ export default function(processState = initialState, action = {}) {
         return processState;
       }
       return suggestedPosts.reduce((updatedState, suggestedPost) => {
-        const needUri = suggestedPost && get(parseNeed(suggestedPost), "uri");
+        const parsedNeed = suggestedPost && parseNeed(suggestedPost);
+        const needUri = get(parsedNeed, "uri");
+
+        const heldNeedUris = parsedNeed.get("holds");
+        if (heldNeedUris.size > 0) {
+          heldNeedUris.map(heldNeedUri => {
+            if (!processState.getIn(["needs", heldNeedUri])) {
+              processState = updateNeedProcess(processState, heldNeedUri, {
+                toLoad: true,
+              });
+            }
+          });
+        }
+
+        const groupMemberUris = parsedNeed.get("groupMembers");
+        if (groupMemberUris.size > 0) {
+          groupMemberUris.map(groupMemberUri => {
+            if (!processState.getIn(["needs", groupMemberUri])) {
+              processState = updateNeedProcess(processState, groupMemberUri, {
+                toLoad: true,
+              });
+            }
+          });
+        }
 
         return updateNeedProcess(processState, needUri, {
           toLoad: false,
@@ -390,12 +413,39 @@ export default function(processState = initialState, action = {}) {
       let needs = action.payload.get("needs");
 
       needs &&
-        needs.keySeq().forEach(needUri => {
-          processState = updateNeedProcess(processState, needUri, {
-            toLoad: false,
-            failedToLoad: false,
-            loading: false,
-          });
+        needs.map(need => {
+          const parsedNeed = parseNeed(need);
+          processState = updateNeedProcess(
+            processState,
+            parsedNeed.get("uri"),
+            {
+              toLoad: false,
+              failedToLoad: false,
+              loading: false,
+            }
+          );
+
+          const heldNeedUris = parsedNeed.get("holds");
+          if (heldNeedUris.size > 0) {
+            heldNeedUris.map(heldNeedUri => {
+              if (!processState.getIn(["needs", heldNeedUri])) {
+                processState = updateNeedProcess(processState, heldNeedUri, {
+                  toLoad: true,
+                });
+              }
+            });
+          }
+
+          const groupMemberUris = parsedNeed.get("groupMembers");
+          if (groupMemberUris.size > 0) {
+            groupMemberUris.map(groupMemberUri => {
+              if (!processState.getIn(["needs", groupMemberUri])) {
+                processState = updateNeedProcess(processState, groupMemberUri, {
+                  toLoad: true,
+                });
+              }
+            });
+          }
         });
       return processState;
     }
