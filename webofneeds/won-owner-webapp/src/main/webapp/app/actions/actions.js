@@ -111,7 +111,10 @@ const actionHierarchy = {
     sendChatMessageFailed: INJ_DEFAULT,
     showLatestMessages: cnct.showLatestMessages,
     showMoreMessages: cnct.showMoreMessages,
+    fetchMessagesStart: INJ_DEFAULT,
+    messageUrisInLoading: INJ_DEFAULT,
     fetchMessagesFailed: INJ_DEFAULT,
+    fetchMessagesSuccess: INJ_DEFAULT,
     markAsRead: INJ_DEFAULT,
     setLoadingAgreementData: INJ_DEFAULT,
     setLoadingPetriNetData: INJ_DEFAULT,
@@ -324,9 +327,6 @@ const actionHierarchy = {
   reconnect: {
     start: reconnect,
     success: INJ_DEFAULT,
-    startingToLoadConnectionData: INJ_DEFAULT,
-    receivedConnectionData: INJ_DEFAULT,
-    connectionFailedToLoad: INJ_DEFAULT,
   },
 
   view: {

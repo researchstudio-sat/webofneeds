@@ -743,8 +743,8 @@ function fetchConnectionsOfNeedAndDispatch(needUri, dispatch) {
         }),
       });
 
-      return urisToLookupMap(activeConnectionUris, uri =>
-        fetchActiveConnectionAndDispatch(uri, dispatch)
+      return urisToLookupMap(activeConnectionUris, connUri =>
+        fetchActiveConnectionAndDispatch(connUri, needUri, dispatch)
       );
     });
 }
@@ -768,20 +768,25 @@ function fetchOwnedNeedAndDispatch(needUri, dispatch) {
     });
 }
 
-export function fetchActiveConnectionAndDispatch(cnctUri, dispatch) {
+export function fetchActiveConnectionAndDispatch(connUri, needUri, dispatch) {
   return won
-    .getNode(cnctUri)
+    .getConnectionWithEventUris(connUri, { requesterWebId: needUri })
     .then(connection => {
+      console.log(
+        "fetchActiveConnectionAndDispatch with eventUris: ",
+        connection.hasEvents
+      );
+
       dispatch({
         type: actionTypes.connections.storeActive,
-        payload: Immutable.fromJS({ connections: { [cnctUri]: connection } }),
+        payload: Immutable.fromJS({ connections: { [connUri]: connection } }),
       });
       return connection;
     })
     .catch(() => {
       dispatch({
         type: actionTypes.connections.storeUriFailed,
-        payload: Immutable.fromJS({ uri: cnctUri }),
+        payload: Immutable.fromJS({ uri: connUri }),
       });
       return;
     });

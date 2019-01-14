@@ -330,11 +330,6 @@ export function reconnect() {
             numberOfEvents: 10, //TODO magic number :|
             state,
             dispatch,
-            actionTypesToDispatch: {
-              start: actionTypes.reconnect.startingToLoadConnectionData,
-              success: actionTypes.reconnect.receivedConnectionData,
-              failure: actionTypes.reconnect.connectionFailedToLoad,
-            },
           })
         )
       );

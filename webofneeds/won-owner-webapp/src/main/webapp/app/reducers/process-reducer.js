@@ -39,6 +39,13 @@ export const emptyConnectionProcess = Immutable.fromJS({
     loading: false,
     loaded: false,
   },
+  messages: Immutable.Map(),
+});
+
+export const emptyMessagesProcess = Immutable.fromJS({
+  loading: false,
+  toLoad: false,
+  failedToLoad: false,
 });
 
 function updateNeedProcess(processState, needUri, payload) {
@@ -70,6 +77,28 @@ function updateConnectionProcess(processState, connUri, payload) {
     oldConnectionProcess
       ? oldConnectionProcess.mergeDeep(payloadImm)
       : emptyConnectionProcess.mergeDeep(payloadImm)
+  );
+}
+
+function updateMessageProcess(processState, connUri, messageUri, payload) {
+  if (!connUri || !messageUri) {
+    return processState;
+  }
+
+  const payloadImm = Immutable.fromJS(payload);
+
+  const oldMessageProcess = getIn(processState, [
+    "connections",
+    connUri,
+    "messages",
+    messageUri,
+  ]);
+
+  return processState.setIn(
+    ["connections", connUri, "messages", messageUri],
+    oldMessageProcess
+      ? oldMessageProcess.mergeDeep(payloadImm)
+      : emptyMessagesProcess.mergeDeep(payloadImm)
   );
 }
 
@@ -188,48 +217,74 @@ export default function(processState = initialState, action = {}) {
       });
     }
 
-    case actionTypes.connections.fetchMessagesFailed: {
+    case actionTypes.connections.fetchMessagesStart: {
       const connUri = action.payload.get("connectionUri");
-      const error = action.payload.get("error");
 
-      if (error) {
-        processState = updateConnectionProcess(processState, connUri, {
-          loadingMessages: false,
-          failedToLoad: true,
+      return updateConnectionProcess(processState, connUri, {
+        loadingMessages: true,
+        failedToLoad: false,
+      });
+    }
+
+    case actionTypes.connections.messageUrisInLoading: {
+      const connUri = action.payload.get("connectionUri");
+      const messageUris = action.payload.get("uris");
+
+      if (messageUris) {
+        messageUris.map(messageUri => {
+          processState = updateMessageProcess(
+            processState,
+            connUri,
+            messageUri,
+            { toLoad: false, loading: true }
+          );
         });
       }
 
       return processState;
     }
 
-    case actionTypes.reconnect.startingToLoadConnectionData:
-    case actionTypes.reconnect.receivedConnectionData:
-    case actionTypes.reconnect.connectionFailedToLoad:
-    case actionTypes.connections.showLatestMessages:
-    case actionTypes.connections.showMoreMessages: {
-      const loadingMessages = action.payload.get("loadingMessages");
+    case actionTypes.connections.fetchMessagesSuccess: {
       const connUri = action.payload.get("connectionUri");
-
-      if (loadingMessages) {
-        processState = updateConnectionProcess(processState, connUri, {
-          loadingMessages: true,
-          failedToLoad: false,
-        });
-      }
 
       const loadedMessages = action.payload.get("events");
       if (loadedMessages) {
+        console.log("fetchMessagesSuccess: loadedMessages: ", loadedMessages);
         processState = updateConnectionProcess(processState, connUri, {
           loadingMessages: false,
           failedToLoad: false,
         });
-      }
-      const error = action.payload.get("error");
 
-      if (error) {
+        loadedMessages.map((message, messageUri) => {
+          processState = updateMessageProcess(
+            processState,
+            connUri,
+            messageUri,
+            { toLoad: false, loading: false, failedToLoad: false }
+          );
+        });
+      }
+
+      return processState;
+    }
+
+    case actionTypes.connections.fetchMessagesFailed: {
+      const connUri = action.payload.get("connectionUri");
+      const failedMessages = action.payload.get("events");
+
+      if (failedMessages) {
         processState = updateConnectionProcess(processState, connUri, {
           loadingMessages: false,
           failedToLoad: true,
+        });
+
+        failedMessages.map((message, messageUri) => {
+          processState = updateMessageProcess(
+            processState,
+            connUri,
+            messageUri,
+            { toLoad: false, loading: false, failedToLoad: true }
+          );
         });
       }
 
@@ -318,11 +373,23 @@ export default function(processState = initialState, action = {}) {
       let connections = action.payload.get("connections");
 
       connections &&
-        connections.keySeq().forEach(connUri => {
+        connections.map((conn, connUri) => {
           processState = updateConnectionProcess(processState, connUri, {
             loading: false,
           });
+
+          const eventsOfConnection = conn.get("hasEvents");
+          eventsOfConnection &&
+            eventsOfConnection.map(eventUri => {
+              processState = updateMessageProcess(
+                processState,
+                connUri,
+                eventUri,
+                { toLoad: true }
+              );
+            });
         });
+
       return processState;
     }
 

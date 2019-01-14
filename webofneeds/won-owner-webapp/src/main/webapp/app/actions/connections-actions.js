@@ -11,7 +11,7 @@ import {
 } from "../selectors/general-selectors.js";
 import { getOwnedConnectionByUri } from "../selectors/connection-selectors.js";
 
-import { getIn } from "../utils.js";
+import { getIn, urisToLookupSuccessAndFailedMap } from "../utils.js";
 
 import { ensureLoggedIn } from "./account-actions";
 
@@ -564,36 +564,59 @@ export function showLatestMessages(connectionUriParam, numberOfEvents) {
     }
 
     dispatch({
-      type: actionTypes.connections.showLatestMessages,
-      payload: Immutable.fromJS({
-        connectionUri: connectionUri,
-        loadingMessages: true,
-      }),
+      type: actionTypes.connections.fetchMessagesStart,
+      payload: Immutable.fromJS({ connectionUri: connectionUri }),
     });
 
+    const fetchParams = {
+      requesterWebId: needUri,
+      pagingSize: numOfEvts2pageSize(numberOfEvents),
+      deep: true,
+    };
     return won
-      .getWonMessagesOfConnection(connectionUri, {
-        requesterWebId: needUri,
-        pagingSize: numOfEvts2pageSize(numberOfEvents),
-        deep: true,
+      .getConnectionWithEventUris(connectionUri, fetchParams)
+      .then(connection => {
+        dispatch({
+          type: actionTypes.connections.messageUrisInLoading,
+          payload: Immutable.fromJS({
+            connectionUri: connectionUri,
+            uris: connection.hasEvents,
+          }),
+        });
+
+        return connection.hasEvents;
+      })
+      .then(eventUris => {
+        return urisToLookupSuccessAndFailedMap(
+          eventUris,
+          eventUri => won.getWonMessage(eventUri, fetchParams),
+          []
+        );
       })
       .then(events => {
-        dispatch({
-          type: actionTypes.connections.showLatestMessages,
-          payload: Immutable.fromJS({
-            connectionUri: connectionUri,
-            events: events,
-          }),
-        });
-      })
-      .catch(error => {
-        dispatch({
-          type: actionTypes.connections.fetchMessagesFailed,
-          payload: Immutable.fromJS({
-            connectionUri: connectionUri,
-            error: error,
-          }),
-        });
+        if (events) {
+          const eventsImm = Immutable.fromJS(events);
+
+          if (eventsImm.get("success").size > 0) {
+            dispatch({
+              type: actionTypes.connections.fetchMessagesSuccess,
+              payload: Immutable.fromJS({
+                connectionUri: connectionUri,
+                events: eventsImm.get("success"),
+              }),
+            });
+          }
+
+          if (eventsImm.get("failed").size > 0) {
+            dispatch({
+              type: actionTypes.connections.fetchMessagesFailed,
+              payload: Immutable.fromJS({
+                connectionUri: connectionUri,
+                events: eventsImm.get("failed"),
+              }),
+            });
+          }
+        }
       });
   };
 }
@@ -602,7 +625,6 @@ export function loadLatestMessagesOfConnection({
   connectionUri,
   numberOfEvents,
   state,
-  actionTypesToDispatch,
   dispatch,
 }) {
   const connectionUri_ = connectionUri || getConnectionUriFromRoute(state);
@@ -619,42 +641,60 @@ export function loadLatestMessagesOfConnection({
     return Promise.resolve();
   }
 
-  if (actionTypesToDispatch.start) {
-    dispatch({
-      type: actionTypesToDispatch.start,
-      payload: Immutable.fromJS({
-        connectionUri: connectionUri_,
-        loadingMessages: true,
-      }),
-    });
-  }
+  dispatch({
+    type: actionTypes.connections.fetchMessagesStart,
+    payload: Immutable.fromJS({ connectionUri: connectionUri_ }),
+  });
+
+  const fetchParams = {
+    requesterWebId: needUri,
+    pagingSize: numOfEvts2pageSize(numberOfEvents),
+    deep: true,
+  };
 
   return won
-    .getWonMessagesOfConnection(connectionUri_, {
-      requesterWebId: needUri,
-      pagingSize: numOfEvts2pageSize(numberOfEvents),
-      deep: true,
+    .getConnectionWithEventUris(connectionUri_, fetchParams)
+    .then(connection => {
+      dispatch({
+        type: actionTypes.connections.messageUrisInLoading,
+        payload: Immutable.fromJS({
+          connectionUri: connectionUri_,
+          uris: connection.hasEvents,
+        }),
+      });
+
+      return connection.hasEvents;
+    })
+    .then(eventUris => {
+      return urisToLookupSuccessAndFailedMap(
+        eventUris,
+        eventUri => won.getWonMessage(eventUri, fetchParams),
+        []
+      );
     })
     .then(events => {
-      if (actionTypesToDispatch.success) {
-        dispatch({
-          type: actionTypesToDispatch.success,
-          payload: Immutable.fromJS({
-            connectionUri: connectionUri_,
-            events: events,
-          }),
-        });
-      }
-    })
-    .catch(error => {
-      if (actionTypesToDispatch.failure) {
-        dispatch({
-          type: actionTypesToDispatch.failure,
-          payload: Immutable.fromJS({
-            connectionUri: connectionUri_,
-            error: error,
-          }),
-        });
+      if (events) {
+        const eventsImm = Immutable.fromJS(events);
+
+        if (eventsImm.get("success").size > 0) {
+          dispatch({
+            type: actionTypes.connections.fetchMessagesSuccess,
+            payload: Immutable.fromJS({
+              connectionUri: connectionUri_,
+              events: eventsImm.get("success"),
+            }),
+          });
+        }
+
+        if (eventsImm.get("failed").size > 0) {
+          dispatch({
+            type: actionTypes.connections.fetchMessagesFailed,
+            payload: Immutable.fromJS({
+              connectionUri: connectionUri_,
+              events: eventsImm.get("failed"),
+            }),
+          });
+        }
       }
     });
 }
@@ -697,34 +737,62 @@ export function showMoreMessages(connectionUriParam, numberOfEvents) {
       oldestMessage &&
       oldestMessage.get("uri").replace(/.*\/event\/(.*)/, "$1"); // everything following the `/event/`
     dispatch({
-      type: actionTypes.connections.showMoreMessages,
-      payload: Immutable.fromJS({ connectionUri, loadingMessages: true }),
+      type: actionTypes.connections.fetchMessagesStart,
+      payload: Immutable.fromJS({ connectionUri }),
     });
 
+    const fetchParams = {
+      requesterWebId: needUri,
+      pagingSize: numOfEvts2pageSize(numberOfEvents),
+      deep: true,
+      resumebefore: messageHashValue,
+    };
+
     won
-      .getWonMessagesOfConnection(connectionUri, {
-        requesterWebId: needUri,
-        pagingSize: numOfEvts2pageSize(numberOfEvents),
-        deep: true,
-        resumebefore: messageHashValue,
-      })
-      .then(events =>
+      .getEventUrisOfConnection(connectionUri, needUri)
+      .getConnectionWithEventUris(connectionUri, fetchParams)
+      .then(connection => {
         dispatch({
-          type: actionTypes.connections.showMoreMessages,
+          type: actionTypes.connections.messageUrisInLoading,
           payload: Immutable.fromJS({
             connectionUri: connectionUri,
-            events: events,
-          }),
-        })
-      )
-      .catch(error => {
-        dispatch({
-          type: actionTypes.connections.fetchMessagesFailed,
-          payload: Immutable.fromJS({
-            connectionUri: connectionUri,
-            error: error,
+            uris: connection.hasEvents,
           }),
         });
+
+        return connection.hasEvents;
+      })
+      .then(eventUris => {
+        return urisToLookupSuccessAndFailedMap(
+          eventUris,
+          eventUri => won.getWonMessage(eventUri, fetchParams),
+          []
+        );
+      })
+      .then(events => {
+        if (events) {
+          const eventsImm = Immutable.fromJS(events);
+
+          if (eventsImm.get("success").size > 0) {
+            dispatch({
+              type: actionTypes.connections.fetchMessagesSuccess,
+              payload: Immutable.fromJS({
+                connectionUri: connectionUri,
+                events: eventsImm.get("success"),
+              }),
+            });
+          }
+
+          if (eventsImm.get("failed").size > 0) {
+            dispatch({
+              type: actionTypes.connections.fetchMessagesFailed,
+              payload: Immutable.fromJS({
+                connectionUri: connectionUri,
+                events: eventsImm.get("failed"),
+              }),
+            });
+          }
+        }
       });
   };
 }

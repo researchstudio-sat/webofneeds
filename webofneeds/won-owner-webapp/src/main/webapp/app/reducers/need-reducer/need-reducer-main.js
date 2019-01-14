@@ -784,11 +784,7 @@ export default function(allNeedsInState = initialState, action = {}) {
       return allNeedsInState;
     }
 
-    case actionTypes.reconnect.startingToLoadConnectionData:
-    case actionTypes.reconnect.receivedConnectionData:
-    case actionTypes.reconnect.connectionFailedToLoad:
-    case actionTypes.connections.showLatestMessages:
-    case actionTypes.connections.showMoreMessages: {
+    case actionTypes.connections.fetchMessagesSuccess: {
       const loadedMessages = action.payload.get("events");
       if (loadedMessages) {
         allNeedsInState = addExistingMessages(allNeedsInState, loadedMessages);

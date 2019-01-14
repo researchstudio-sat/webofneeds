@@ -193,6 +193,7 @@ export function processOpenMessage(event) {
     } else {
       senderConnectionP = fetchActiveConnectionAndDispatch(
         senderConnectionUri,
+        senderNeedUri,
         dispatch
       ).then(() => true);
     }
@@ -210,6 +211,7 @@ export function processOpenMessage(event) {
     } else {
       receiverConnectionP = fetchActiveConnectionAndDispatch(
         receiverConnectionUri,
+        receiverNeedUri,
         dispatch
       ).then(() => true);
     }
@@ -552,6 +554,7 @@ export function processConnectMessage(event) {
     } else {
       senderCP = fetchActiveConnectionAndDispatch(
         senderConnectionUri,
+        senderNeedUri,
         dispatch
       ).then(() => true);
     }
@@ -573,6 +576,7 @@ export function processConnectMessage(event) {
     } else {
       receiverCP = fetchActiveConnectionAndDispatch(
         receiverConnectionUri,
+        receiverNeedUri,
         dispatch
       ).then(() => true);
     }
@@ -864,7 +868,11 @@ export function processHintMessage(event) {
           }
         })
         .then(() =>
-          fetchActiveConnectionAndDispatch(ownedConnectionUri, dispatch)
+          fetchActiveConnectionAndDispatch(
+            ownedConnectionUri,
+            ownedNeedUri,
+            dispatch
+          )
         );
     }
   };
