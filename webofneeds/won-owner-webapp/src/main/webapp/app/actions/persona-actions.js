@@ -128,7 +128,8 @@ export function reviewPersona(reviewableConnectionUri, review) {
         .get("connections")
         .filter(
           connection =>
-            connection.get("remoteNeedUri") == foreignPersona.get("uri")
+            connection.get("remoteNeedUri") == foreignPersona.get("uri") &&
+            connection.get("facet") == won.WON.ReviewFacet
         )
         .keySeq()
         .first();

@@ -19,6 +19,6 @@ public class ReviewFacetConfig extends HardcodedFacetConfig {
     
     @Override
     public boolean isAutoOpen(URI remoteFacetType) {
-        return false;
+        return true;
     }
 }
