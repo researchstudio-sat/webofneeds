@@ -53,8 +53,8 @@ won-connection-header {
     grid-template-rows: 1fr 1fr;
     align-content: center;
 
-    &__more,
-    &__icon {
+    & .ch__groupicons__icon,
+    & .ch__groupicons__more {
       @include square-image($postIconSize/2);
     }
 

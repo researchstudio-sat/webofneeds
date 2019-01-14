@@ -39,13 +39,15 @@ function genComponentConf() {
       </div>
       <div class="ch__groupicons" ng-if="!self.connectionOrNeedsLoading && self.isConnectionToGroup">
           <!-- TODO: ADD REAL PARTICIPANTS OF THE GROUPCHAT -->
-          <div class="ch__groupicons__icon one">
+          <div class="ch__groupicons__icon"
+              ng-repeat="groupMemberUri in self.groupMembersArray"
+              ng-if="self.groupMembersSize <= 4 || $index < 3"
+              class="ch__groupicons__icon">
+              <won-square-image
+                uri="groupMemberUri">
+              </won-square-image>
           </div>
-          <div class="ch__groupicons__icon two">
-          </div>
-          <div class="ch__groupicons__icon three">
-          </div>
-          <div class="ch__groupicons__more">
+          <div class="ch__groupicons__more" ng-if="self.groupMembersSize > 4">
            +
           </div>
       </div>
@@ -153,8 +155,12 @@ function genComponentConf() {
         const latestMessageUnread =
           latestMessage && latestMessage.get("unread");
 
+        const groupMembers = remoteNeed && remoteNeed.get("groupMembers");
+
         return {
           connection,
+          groupMembersArray: groupMembers && groupMembers.toArray(),
+          groupMembersSize: groupMembers ? groupMembers.size : 0,
           ownedNeed,
           remoteNeed,
           isConnectionToGroup: isChatToGroup(
