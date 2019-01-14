@@ -73,6 +73,7 @@ export function getChatConnectionsToCrawl(state) {
       .filter(conn => isChatConnection(conn) || isGroupChatConnection(conn))
       .filter(
         conn =>
+          false &&
           !getIn(state, [
             "process",
             "connections",
@@ -113,9 +114,6 @@ export function hasMessagesToLoad(state, connUri) {
   ]);
 
   return (
-    messageProcess &&
-    messageProcess.filter(msg => {
-      msg.get("toLoad");
-    }).size > 0
+    messageProcess && messageProcess.filter(msg => msg.get("toLoad")).size > 0
   );
 }
