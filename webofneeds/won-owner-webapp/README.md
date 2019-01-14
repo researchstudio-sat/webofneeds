@@ -255,6 +255,13 @@ $ngRedux.getState();
            failedToLoad: true|false, //default is false, whether or not this connection was able to be loaded or not
            loadingMessages: true|false, //default is false, whether or not this connection is currently loading messages or processing agreements
            loading: true|false, //default is false, whether or not this connection is currently loading itself (similar to the loading in the need)
+           messages: {
+            [messageUri]: {
+                loading: true|false, //if the message is currently being loaded
+                failedToLoad: true|false, //if the message failed to load (fetch failed from the backend)
+                toLoad: true|false, //if the message is to be loaded (to figure out if a connection has messages that have not been loaded yet)
+            }
+           }
            petriNetData: {
                 loading: true|false, //default is false, whether or not the petriNetData has been loaded,
                 dirty: true|false //default is false, whether or not the currently stored petriNetData is (assumed to be) not correct anymore
