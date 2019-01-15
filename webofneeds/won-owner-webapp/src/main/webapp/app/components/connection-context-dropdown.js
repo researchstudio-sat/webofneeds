@@ -6,13 +6,14 @@ import angular from "angular";
 import ngAnimate from "angular-animate";
 import { actionCreators } from "../actions/actions.js";
 import won from "../won-es6.js";
-import { attach, getIn, toAbsoluteURL } from "../utils.js";
+import { attach, get, getIn, toAbsoluteURL } from "../utils.js";
 import {
   getConnectionUriFromRoute,
   getOwnedNeedByConnectionUri,
 } from "../selectors/general-selectors.js";
 import { connect2Redux } from "../won-utils.js";
 import { ownerBaseUrl } from "config";
+import { isChatToGroup } from "../connection-utils.js";
 
 import "style/_context-dropdown.scss";
 
@@ -46,13 +47,13 @@ function genComponentConf() {
                         Show Details
                     </button>
                     <button
-                        ng-if="self.isConnected && !self.showAgreementData"
+                        ng-if="!self.isConnectionToGroup && self.isConnected && !self.showAgreementData"
                         class="won-button--outlined thin red"
                         ng-click="self.showAgreementDataField()">
                         Show Agreement Data
                     </button>
                     <button
-                        ng-if="self.isConnected && !self.showPetriNetData"
+                        ng-if="!self.isConnectionToGroup && self.isConnected && !self.showPetriNetData"
                         class="won-button--outlined thin red"
                         ng-click="self.showPetriNetDataField()">
                         Show PetriNet Data
@@ -98,6 +99,11 @@ function genComponentConf() {
           adminEmail: getIn(state, ["config", "theme", "adminEmail"]),
           remotePostUri,
           linkToPost,
+          isConnectionToGroup: isChatToGroup(
+            state.get("needs"),
+            get(post, "uri"),
+            connectionUri
+          ),
           showAgreementData: connection && connection.get("showAgreementData"),
           isConnected: connectionState === won.WON.Connected,
           isSentRequest: connectionState === won.WON.RequestSent,
