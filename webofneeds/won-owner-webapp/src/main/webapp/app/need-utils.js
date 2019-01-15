@@ -29,6 +29,14 @@ export function isDirectResponseNeed(need) {
   );
 }
 
+export function isPersona(need) {
+  return get(need, "types") && get(need, "types").has("won:Persona");
+}
+
+export function isNeed(need) {
+  return get(need, "types") && get(need, "types").has("won:Need");
+}
+
 export function hasChatFacet(need) {
   return (
     get(need, "facets") &&
