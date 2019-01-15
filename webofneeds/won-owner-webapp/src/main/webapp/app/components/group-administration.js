@@ -71,6 +71,11 @@ function genComponentConf() {
                 </div>
             </div>
         </div>
+        <div class="ga__footer">
+            <button class="ga__footer__button won-button--filled red" ng-click="self.joinGroup()">
+                Join Group
+            </button>
+        </div>
     `;
 
   class Controller {
@@ -177,6 +182,19 @@ function genComponentConf() {
     closeConnection(connUri, rateBad = false) {
       rateBad && this.connections__rate(connUri, won.WON.binaryRatingBad);
       this.connections__close(connUri);
+    }
+
+    joinGroup(persona) {
+      //TODO: FIGURE OUT HOW TO USE won-submit-button instead so we can add a persona if need be
+      if (this.groupPostAdminUri) {
+        this.connections__connectAdHoc(
+          this.groupPostAdminUri,
+          "" /*message cant be undefined for whatever reason*/,
+          persona
+        );
+      }
+
+      //this.router__stateGoCurrent({connectionUri: null, sendAdHocRequest: null});
     }
   }
   Controller.$inject = serviceDependencies;

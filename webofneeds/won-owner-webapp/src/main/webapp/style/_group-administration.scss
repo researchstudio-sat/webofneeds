@@ -4,8 +4,8 @@
 
 won-group-administration {
   display: grid;
-  grid-template-areas: "header" "main";
-  grid-template-rows: min-content minmax($minimalGridRows, 1fr);
+  grid-template-areas: "header" "main" "footer";
+  grid-template-rows: min-content minmax($minimalGridRows, 1fr) min-content;
   grid-row-gap: $gridRowGap;
   box-sizing: border-box;
   padding: $gridRowGap;
@@ -71,6 +71,14 @@ won-group-administration {
           padding: 0.5rem;
         }
       }
+    }
+  }
+
+  .ga__footer {
+    grid-area: footer;
+
+    &__button {
+      width: 100%;
     }
   }
 }
