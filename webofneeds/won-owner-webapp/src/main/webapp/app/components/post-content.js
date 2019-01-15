@@ -12,6 +12,7 @@ import { attach, getIn, get } from "../utils.js";
 import won from "../won-es6.js";
 import { labels } from "../won-label-utils.js";
 import { connect2Redux } from "../won-utils.js";
+import { isPersona } from "../need-utils.js";
 import { getConnectionUriFromRoute } from "../selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
@@ -58,8 +59,21 @@ function genComponentConf() {
             </div>
           </div>
 
+          <!-- OTHER NEEDS -->
+          <won-labelled-hr label="::'Posts of this Persona'" class="cp__labelledhr" ng-if="self.isPersona && self.hasHeldPosts"></won-labelled-hr>
+          <div class="post-content__members" ng-if="self.isPersona && self.hasHeldPosts">
+            <div
+              class="post-content__members__member"
+              ng-repeat="heldPostUri in self.heldPostsArray">
+              <won-post-header
+                need-uri="heldPostUri"
+                hide-image="::false">
+              </won-post-header>
+            </div>
+          </div>
+
           <!-- GENERAL INFORMATION -->
-          <won-labelled-hr label="::'General Information'" class="cp__labelledhr" ng-if="self.hasGroupMembers"></won-labelled-hr>
+          <won-labelled-hr label="::'General Information'" class="cp__labelledhr"></won-labelled-hr>
           <won-post-content-general post-uri="self.post.get('uri')"></won-post-content-general>
           <div class="post-info__content__rdf" ng-if="self.shouldShowRdf">
             <h2 class="post-info__heading">
@@ -110,11 +124,16 @@ function genComponentConf() {
 
         const groupMembers = get(post, "groupMembers");
 
+        const heldPosts = get(post, "holds");
+
         return {
           WON: won.WON,
           hasContent,
           hasSeeksBranch,
           post,
+          isPersona: isPersona(post),
+          hasHeldPosts: isPersona && heldPosts && heldPosts.size > 0,
+          heldPostsArray: isPersona && heldPosts && heldPosts.toArray(),
           hasGroupMembers: groupMembers && groupMembers.size > 0,
           groupMembersArray: groupMembers && groupMembers.toArray(),
           postLoading:
