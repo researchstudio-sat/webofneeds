@@ -6,7 +6,7 @@ import angular from "angular";
 import ngAnimate from "angular-animate";
 import { actionCreators } from "../actions/actions.js";
 import won from "../won-es6.js";
-import { attach, toAbsoluteURL, getIn } from "../utils.js";
+import { attach, toAbsoluteURL, getIn, get } from "../utils.js";
 import {
   connect2Redux,
   createDocumentDefinitionFromPost,
@@ -42,6 +42,12 @@ function genComponentConf() {
                         </svg>
                     </div>
                     <!-- Buttons for post -->
+                    <button
+                        class="won-button--outlined thin red"
+                        ng-if="self.personaUri"
+                        ng-click="self.goToPersona(self.personaUri)">
+                        View Persona
+                    </button>
                     <button class="won-button--outlined thin red"
                         ng-click="self.exportPdf()">
                         Export as PDF
@@ -86,8 +92,11 @@ function genComponentConf() {
           linkToPost = toAbsoluteURL(ownerBaseUrl).toString() + path;
         }
 
+        const personaUri = get(post, "heldBy");
+
         return {
           adminEmail: getIn(state, ["config", "theme", "adminEmail"]),
+          personaUri,
           isOwnPost: post && post.get("isOwned"),
           isActive: postState === won.WON.ActiveCompacted,
           isInactive: postState === won.WON.InactiveCompacted,
@@ -118,6 +127,10 @@ function genComponentConf() {
       });
 
       window.document.addEventListener("click", callback);
+    }
+
+    goToPersona(personaUri) {
+      this.router__stateGoCurrent({ useCase: undefined, postUri: personaUri });
     }
 
     closePost() {
