@@ -157,7 +157,10 @@ function genComponentConf() {
     }
 
     ensureNeedIsLoaded() {
-      if (this.postToLoad && !this.postLoading) {
+      if (
+        this.needUri &&
+        (!this.need || (this.postToLoad && !this.postLoading))
+      ) {
         this.needs__fetchUnloadedNeed(this.needUri);
       }
     }
