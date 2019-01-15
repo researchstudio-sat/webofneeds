@@ -45,40 +45,6 @@ won-connection-header {
     @include square-image($postIconSize);
   }
 
-  .ch__groupicons {
-    grid-area: icon;
-    width: $postIconSize;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
-    align-content: center;
-
-    & .ch__groupicons__icon,
-    & .ch__groupicons__more {
-      @include square-image($postIconSize/2);
-    }
-
-    &__more {
-      font-size: $smallFontSize;
-      text-align: center;
-      line-height: $postIconSize/2;
-      background: $won-line-gray;
-      color: white;
-    }
-
-    &__icon {
-      &.one {
-        background: #fab;
-      }
-      &.two {
-        background: #baf;
-      }
-      &.three {
-        background: #ffc;
-      }
-    }
-  }
-
   .ch__right {
     grid-area: main;
     display: grid;

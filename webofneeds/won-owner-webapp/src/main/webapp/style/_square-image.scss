@@ -30,6 +30,7 @@
       @include fixed-square($size/2);
       right: $size/7 * -1;
       bottom: $size/7 * -1;
+      z-index: 2;
     }
   }
 }

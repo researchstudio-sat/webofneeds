@@ -6,6 +6,7 @@ import angular from "angular";
 import won from "../won-es6.js";
 import "ng-redux";
 import squareImageModule from "./square-image.js";
+import groupImageModule from "./group-image.js";
 import { actionCreators } from "../actions/actions.js";
 import { labels, relativeTime } from "../won-label-utils.js";
 import { attach, getIn, get } from "../utils.js";
@@ -37,20 +38,11 @@ function genComponentConf() {
             ng-show="!self.hideImage">
           </won-square-image>
       </div>
-      <div class="ch__groupicons" ng-if="!self.connectionOrNeedsLoading && self.isConnectionToGroup">
-          <!-- TODO: ADD REAL PARTICIPANTS OF THE GROUPCHAT -->
-          <div class="ch__groupicons__icon"
-              ng-repeat="groupMemberUri in self.groupMembersArray"
-              ng-if="self.groupMembersSize <= 4 || $index < 3"
-              class="ch__groupicons__icon">
-              <won-square-image
-                uri="groupMemberUri">
-              </won-square-image>
-          </div>
-          <div class="ch__groupicons__more" ng-if="self.groupMembersSize > 4">
-           +
-          </div>
-      </div>
+      <won-group-image
+        class="ch__groupicons"
+        ng-if="!self.connectionOrNeedsLoading && self.isConnectionToGroup"
+        connection-uri="self.connectionUri">
+      </won-group-image>
       <div class="ch__right" ng-if="!self.connectionOrNeedsLoading">
         <div class="ch__right__topline" ng-if="!self.remoteNeedFailedToLoad">
           <div class="ch__right__topline__title" ng-if="!self.isDirectResponseFromRemote && self.remoteNeed.get('humanReadable')" title="{{ self.remoteNeed.get('humanReadable') }}">
@@ -65,7 +57,7 @@ function genComponentConf() {
         </div>
         <div class="ch__right__subtitle" ng-if="!self.remoteNeedFailedToLoad">
           <span class="ch__right__subtitle__type">
-            <won-connection-state 
+            <won-connection-state
               connection-uri="self.connection.get('uri')">
             </won-connection-state>
             <span class="ch__right__subtitle__type__state" ng-if="!self.unreadMessageCount && !self.latestMessageHumanReadableString">
@@ -270,6 +262,7 @@ function genComponentConf() {
 export default angular
   .module("won.owner.components.connectionHeader", [
     squareImageModule,
+    groupImageModule,
     connectionStateModule,
   ])
   .directive("wonConnectionHeader", genComponentConf).name;
