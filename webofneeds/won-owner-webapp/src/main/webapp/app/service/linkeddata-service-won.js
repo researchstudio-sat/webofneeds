@@ -956,35 +956,45 @@ import won from "./won.js";
    * with a request for the connection-container
    * to get the connection-uris. Thus it's faster.
    */
-  won.getNeed = async function(needUri) {
-    await won.ensureLoaded(needUri);
-    const needGraph = await new Promise(resolve =>
-      privateData.store.graph(needUri, (a, b) => resolve(b))
-    );
+  won.getNeed = needUri =>
+    won
+      .ensureLoaded(needUri)
+      .then(
+        () =>
+          new Promise(resolve =>
+            privateData.store.graph(needUri, (a, b) => resolve(b))
+          )
+      )
+      .then(needGraph =>
+        triples2framedJson(needUri, needGraph.triples, {
+          /* frame */
+          "@id": needUri, // start the framing from this uri. Otherwise will generate all possible nesting-variants.
+          "@context": won.defaultContext,
+        })
+      )
+      .then(needJsonLd => {
+        // usually the need-data will be in a single object in the '@graph' array.
+        // We can flatten this and still have valid json-ld
+        const flattenedNeedJsonLd = getIn(needJsonLd, ["@graph", 0])
+          ? getIn(needJsonLd, ["@graph", 0])
+          : needJsonLd;
+        flattenedNeedJsonLd["@context"] = needJsonLd["@context"]; // keep context
 
-    const needJsonLd = await triples2framedJson(needUri, needGraph.triples, {
-      /* frame */
-      "@id": needUri, // start the framing from this uri. Otherwise will generate all possible nesting-variants.
-      "@context": won.defaultContext,
-    });
+        if (
+          !flattenedNeedJsonLd ||
+          getIn(flattenedNeedJsonLd, ["@graph", "length"]) === 0
+        ) {
+          console.error(
+            "Received empty graph ",
+            needJsonLd,
+            " for need ",
+            needUri
+          );
+          return { "@context": flattenedNeedJsonLd["@context"] };
+        }
 
-    // usually the need-data will be in a single object in the '@graph' array.
-    // We can flatten this and still have valid json-ld
-    const flattenedNeedJsonLd = getIn(needJsonLd, ["@graph", 0])
-      ? getIn(needJsonLd, ["@graph", 0])
-      : needJsonLd;
-    flattenedNeedJsonLd["@context"] = needJsonLd["@context"]; // keep context
-
-    if (
-      !flattenedNeedJsonLd ||
-      getIn(flattenedNeedJsonLd, ["@graph", "length"]) === 0
-    ) {
-      console.error("Received empty graph ", needJsonLd, " for need ", needUri);
-      return { "@context": flattenedNeedJsonLd["@context"] };
-    }
-
-    return flattenedNeedJsonLd;
-  };
+        return flattenedNeedJsonLd;
+      });
 
   //taken from https://www.w3.org/TR/rdf-interfaces/#triple-filters
   won.tripleFilters = {
@@ -1313,26 +1323,26 @@ import won from "./won.js";
    * @param connectionUri
    * @param fetchParams See `ensureLoaded`.
    */
-  won.getWonMessagesOfConnection = async function(connectionUri, fetchParams) {
-    const eventUris = await won.getEventUrisOfConnection(
-      connectionUri,
-      fetchParams
-    );
-    return urisToLookupMap(eventUris, eventUri =>
-      won.getWonMessage(eventUri, fetchParams)
-    );
-  };
-
-  /**
-   * Returns the uris of all events associated with a given connection
-   * @param connectionUri
-   * @param fetchParams See `ensureLoaded`.
-   * @returns promise for an array strings (the uris)
-   */
-  won.getEventUrisOfConnection = function(connectionUri, fetchParams) {
+  won.getWonMessagesOfConnection = (connectionUri, fetchParams) => {
     return won
       .getConnectionWithEventUris(connectionUri, fetchParams)
-      .then(connection => connection.hasEvents);
+      .then(connection => connection.hasEvents)
+      .then(eventUris => {
+        console.debug(
+          "Trying to get the messages of the connection[",
+          connectionUri,
+          "] messages[",
+          eventUris,
+          "]"
+        );
+
+        return urisToLookupMap(
+          eventUris,
+          eventUri => won.getWonMessage(eventUri, fetchParams),
+          [],
+          true
+        );
+      });
   };
 
   /**
@@ -1371,53 +1381,64 @@ import won from "./won.js";
     );
   };
 
-  won.getWonMessage = async (eventUri, fetchParams) => {
-    const rawEvent = await won.getRawEvent(eventUri, fetchParams);
-    const wonMessage = await won.wonMessageFromJsonLd(rawEvent);
-    return wonMessage;
+  won.getWonMessage = (eventUri, fetchParams) => {
+    return won
+      .getRawEvent(eventUri, fetchParams)
+      .then(rawEvent => won.wonMessageFromJsonLd(rawEvent));
   };
 
-  won.getRawEvent = async (eventUri, fetchParams) => {
-    await won.ensureLoaded(eventUri, fetchParams);
-    const eventGraphs = await Promise.all(
-      Array.from(privateData.documentToGraph[eventUri]).map(async graphUri => {
-        const graphTriples = await won.getCachedGraphTriples(graphUri);
-        const quadString = rdfstoreTriplesToString(graphTriples, graphUri);
-        //graphQuads = graphQuads.map(q => ({ subject: q.subject.nominalValue,  predicate: q.predicate.nominalValue,  object: q.object.nominalValue,  graph: q.graph.nominalValue}))
-        //graphQuads = graphQuads.map(q => toQuadToken(q.subject) + " " + toQuadToken(q.predicate) + " " + toQuadToken(q.object) + " " + toQuadToken(q.graph) + " .").join("\n")
+  window.getWonMessage4dbg = won.getWonMessage;
 
-        let parsedJsonLd = await jsonld.promises.fromRDF(quadString, {
-          format: "application/nquads",
-        });
-        if (parsedJsonLd.length !== 1) {
-          throw new Error(
-            "Got more or less than the expected one graph " +
-              JSON.stringify(parsedJsonLd)
-          );
-        } else {
-          parsedJsonLd = parsedJsonLd[0];
-        }
-        let jsonLdString = JSON.stringify(parsedJsonLd)
-          .replace(NEWLINE_REPLACEMENT_PATTERN, "\\n")
-          .replace(DOUBLEQUOTE_REPLACEMENT_PATTERN, '\\"');
+  won.getRawEvent = (eventUri, fetchParams) => {
+    return won
+      .ensureLoaded(eventUri, fetchParams)
+      .then(() => {
+        return Promise.all(
+          Array.from(privateData.documentToGraph[eventUri]).map(graphUri => {
+            return won
+              .getCachedGraphTriples(graphUri)
+              .then(graphTriples =>
+                jsonld.promises.fromRDF(
+                  rdfstoreTriplesToString(graphTriples, graphUri),
+                  {
+                    format: "application/nquads",
+                  }
+                )
+              )
+              .then(parsedJsonLd => {
+                if (parsedJsonLd.length !== 1) {
+                  throw new Error(
+                    "Got more or less than the expected one graph " +
+                      JSON.stringify(parsedJsonLd)
+                  );
+                } else {
+                  parsedJsonLd = parsedJsonLd[0];
+                }
+                let jsonLdString = JSON.stringify(parsedJsonLd)
+                  .replace(NEWLINE_REPLACEMENT_PATTERN, "\\n")
+                  .replace(DOUBLEQUOTE_REPLACEMENT_PATTERN, '\\"');
 
-        return JSON.parse(jsonLdString); //TODO: REMOVE FUGLY FIX AND JUST RETURN parsedJsonLd ONCE n3.js is not having issues with newlines anymore
+                return JSON.parse(jsonLdString); //TODO: REMOVE FUGLY FIX AND JUST RETURN parsedJsonLd ONCE n3.js is not having issues with newlines anymore
+              });
+          })
+        );
       })
-    );
+      .then(eventGraphs => {
+        if (!is("Array", eventGraphs)) {
+          throw new Error(
+            "event graphs weren't an array. something didn't go as expected: " +
+              JSON.stringify(eventGraphs)
+          );
+        }
 
-    if (!is("Array", eventGraphs)) {
-      throw new Error(
-        "event graphs weren't an array. something " +
-          "didn't go as expected: " +
-          JSON.stringify(eventGraphs)
-      );
-    }
-
-    return {
-      "@graph": eventGraphs,
-      "@context": clone(won.defaultContext),
-    };
+        return {
+          "@graph": eventGraphs,
+          "@context": clone(won.defaultContext),
+        };
+      });
   };
+
+  window.getRawEvent4dbg = won.getRawEvent;
 
   /**
    * Fetches the triples where URI is subject and add objects of those triples to the
@@ -1631,25 +1652,21 @@ import won from "./won.js";
     });
   };
 
-  won.getCachedGraphTriples = async function(
-    graphUri,
-    removeAtGraphTriples = true
-  ) {
-    const graph = await rdfStoreGetGraph(privateData.store, graphUri);
-
-    if (removeAtGraphTriples) {
-      return (
-        graph.triples
-          // `store.graph` in `rdfStoreGetGraph` returns some
-          // triples with `@graph` as predicate and a string
-          // as value, which isn't proper json-ld, so we filter
-          // them out here.
-          .filter(t => getIn(t, ["predicate", "nominalValue"]) !== "@graph")
-      );
-    } else {
-      return graph.triples;
-    }
-  };
+  won.getCachedGraphTriples = (graphUri, removeAtGraphTriples = true) =>
+    rdfStoreGetGraph(privateData.store, graphUri).then(graph => {
+      if (removeAtGraphTriples) {
+        return (
+          graph.triples
+            // `store.graph` in `rdfStoreGetGraph` returns some
+            // triples with `@graph` as predicate and a string
+            // as value, which isn't proper json-ld, so we filter
+            // them out here.
+            .filter(t => getIn(t, ["predicate", "nominalValue"]) !== "@graph")
+        );
+      } else {
+        return graph.triples;
+      }
+    });
 
   /**
    * Thin wrapper around `store.graph` that returns a promise.

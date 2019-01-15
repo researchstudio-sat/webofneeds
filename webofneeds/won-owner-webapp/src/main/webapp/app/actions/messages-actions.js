@@ -193,6 +193,7 @@ export function processOpenMessage(event) {
     } else {
       senderConnectionP = fetchActiveConnectionAndDispatch(
         senderConnectionUri,
+        senderNeedUri,
         dispatch
       ).then(() => true);
     }
@@ -210,6 +211,7 @@ export function processOpenMessage(event) {
     } else {
       receiverConnectionP = fetchActiveConnectionAndDispatch(
         receiverConnectionUri,
+        receiverNeedUri,
         dispatch
       ).then(() => true);
     }
@@ -552,6 +554,7 @@ export function processConnectMessage(event) {
     } else {
       senderCP = fetchActiveConnectionAndDispatch(
         senderConnectionUri,
+        senderNeedUri,
         dispatch
       ).then(() => true);
     }
@@ -573,6 +576,7 @@ export function processConnectMessage(event) {
     } else {
       receiverCP = fetchActiveConnectionAndDispatch(
         receiverConnectionUri,
+        receiverNeedUri,
         dispatch
       ).then(() => true);
     }
@@ -853,8 +857,6 @@ export function processHintMessage(event) {
       );
     } else if (get(remoteNeed, "state") === won.WON.InactiveCompacted) {
       console.debug("ignoring hint for an inactive need:", remoteNeedUri);
-    } else if (get(remoteNeed, "isOwned")) {
-      console.debug("ignoring hint between owned needs:", remoteNeedUri);
     } else {
       won
         .invalidateCacheForNewConnection(ownedConnectionUri, ownedNeedUri)
@@ -866,7 +868,11 @@ export function processHintMessage(event) {
           }
         })
         .then(() =>
-          fetchActiveConnectionAndDispatch(ownedConnectionUri, dispatch)
+          fetchActiveConnectionAndDispatch(
+            ownedConnectionUri,
+            ownedNeedUri,
+            dispatch
+          )
         );
     }
   };

@@ -5,7 +5,9 @@
 <won-toasts></won-toasts>
 <won-slide-in></won-slide-in>
 <aside class="overview__left" ng-class="{'hide-in-responsive': self.hideListSideInResponsive}">
-    <won-connections-overview on-selected-connection="self.selectConnection(connectionUri)" on-selected-need="self.selectNeed(needUri)"
+    <won-connections-overview on-selected-connection="self.selectConnection(connectionUri)"
+                              on-selected-need="self.selectNeed(needUri)"
+                              on-selected-group-chat="self.selectGroupChat(needUri)"
                               open="self.open">
     </won-connections-overview>
 </aside>
@@ -28,6 +30,8 @@
     <won-create-post ng-if="self.showCreatePost"></won-create-post>
     <won-create-search ng-if="self.showCreateSearch"></won-create-search>
     <won-post-messages ng-if="self.showPostMessages"></won-post-messages>
+    <won-group-post-messages ng-if="self.showGroupPostMessages"></won-group-post-messages>
+    <won-group-administration ng-if="self.showGroupPostAdministration"></won-group-administration>
     <won-post-info include-header="true" ng-if="self.showPostInfo"></won-post-info>
 </main>
 <won-footer ng-class="{'hide-in-responsive': self.hideFooterInResponsive }"> <!-- Connection view does not show the footer in responsive mode as there should not be two scrollable areas imho-->

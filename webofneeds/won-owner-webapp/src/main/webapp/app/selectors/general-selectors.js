@@ -6,6 +6,7 @@ import { createSelector } from "reselect";
 
 import won from "../won-es6.js";
 import { decodeUriComponentProperly, getIn } from "../utils.js";
+import { isPersona, isNeed } from "../need-utils.js";
 import Color from "color";
 
 export const selectLastUpdateTime = state => state.get("lastUpdateTime");
@@ -23,9 +24,7 @@ export function getPosts(state) {
   return needs.filter(need => {
     if (!need.get("types")) return true;
 
-    return (
-      need.get("types").has("won:Need") && !need.get("types").has("won:Persona")
-    );
+    return isNeed(need) && !isPersona(need);
   });
 }
 
@@ -99,6 +98,18 @@ export const getConnectionUriFromRoute = createSelector(
   }
 );
 
+export const getGroupChatPostUriFromRoute = createSelector(
+  state => state,
+  state => {
+    const encodedPostUri = getIn(state, [
+      "router",
+      "currentParams",
+      "groupPostAdminUri",
+    ]);
+    return decodeUriComponentProperly(encodedPostUri);
+  }
+);
+
 export const getPostUriFromRoute = createSelector(
   state => state,
   state => {
@@ -116,9 +127,7 @@ export const getAboutSectionFromRoute = createSelector(
 
 export function getOwnedPersonas(state) {
   const needs = getOwnedNeeds(state);
-  const personas = needs
-    .toList()
-    .filter(need => need.get("types") && need.get("types").has("won:Persona"));
+  const personas = needs.toList().filter(need => isPersona(need));
   return personas.map(persona => {
     const graph = persona.get("jsonld");
     return {

@@ -20,6 +20,24 @@ export function addNeed(needs, jsonldNeed, isOwned) {
           .set("connections", existingNeed.get("connections"))
           .set("isOwned", false);
       }
+
+      const heldNeedUris = parsedNeed.get("holds");
+      if (heldNeedUris.size > 0) {
+        heldNeedUris.map(needUri => {
+          if (!needs.get(needUri) || !needs.getIn([needUri, "isOwned"])) {
+            needs = addTheirNeedToLoad(needs, needUri);
+          }
+        });
+      }
+
+      const groupMemberUris = parsedNeed.get("groupMembers");
+      if (groupMemberUris.size > 0) {
+        groupMemberUris.map(needUri => {
+          if (!needs.get(needUri) || !needs.getIn([needUri, "isOwned"])) {
+            needs = addTheirNeedToLoad(needs, needUri);
+          }
+        });
+      }
     }
 
     return needs.set(parsedNeed.get("uri"), parsedNeed);
@@ -47,6 +65,20 @@ function addNeedInLoading(needs, needUri, state, isOwned) {
 }
 
 function addTheirNeedInLoading(needs, needUri) {
+  const oldNeed = needs.get(needUri);
+  if (oldNeed && oldNeed.get("isOwned")) {
+    return needs;
+  } else {
+    let need = Immutable.fromJS({
+      uri: needUri,
+      isOwned: false,
+      connections: Immutable.Map(),
+    });
+    return needs.setIn([needUri], need);
+  }
+}
+
+export function addTheirNeedToLoad(needs, needUri) {
   const oldNeed = needs.get(needUri);
   if (oldNeed && oldNeed.get("isOwned")) {
     return needs;

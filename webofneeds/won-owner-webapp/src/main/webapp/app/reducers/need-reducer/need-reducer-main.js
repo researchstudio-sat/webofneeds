@@ -61,20 +61,6 @@ export default function(allNeedsInState = initialState, action = {}) {
         need.set("isOwned", false).set("connections", Immutable.Map())
       );
 
-    case actionTypes.needs.fetchSuggested: {
-      const suggestedPosts = action.payload.get("suggestedPosts");
-
-      if (!suggestedPosts) {
-        return allNeedsInState;
-      }
-
-      return suggestedPosts.reduce(
-        (updatedState, suggestedPost) =>
-          addNeed(updatedState, suggestedPost, false),
-        allNeedsInState
-      );
-    }
-
     case actionTypes.needs.storeOwnedActiveUris: {
       return addOwnActiveNeedsInLoading(
         allNeedsInState,
@@ -770,10 +756,9 @@ export default function(allNeedsInState = initialState, action = {}) {
         eventUri,
       ];
       if (allNeedsInState.getIn(path)) {
-        allNeedsInState = allNeedsInState.setIn(
-          [...path, "isReceivedByRemote"],
-          true
-        );
+        allNeedsInState = allNeedsInState
+          .setIn([...path, "isReceivedByRemote"], true)
+          .setIn([...path, "isReceivedByOwn"], true);
       } else {
         console.error(
           "chatMessage.successRemote for message that was not sent(or was not loaded in the state yet, wonMessage: ",
@@ -785,11 +770,7 @@ export default function(allNeedsInState = initialState, action = {}) {
       return allNeedsInState;
     }
 
-    case actionTypes.reconnect.startingToLoadConnectionData:
-    case actionTypes.reconnect.receivedConnectionData:
-    case actionTypes.reconnect.connectionFailedToLoad:
-    case actionTypes.connections.showLatestMessages:
-    case actionTypes.connections.showMoreMessages: {
+    case actionTypes.connections.fetchMessagesSuccess: {
       const loadedMessages = action.payload.get("events");
       if (loadedMessages) {
         allNeedsInState = addExistingMessages(allNeedsInState, loadedMessages);

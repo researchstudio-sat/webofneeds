@@ -6,11 +6,13 @@ import angular from "angular";
 import postIsOrSeeksInfoModule from "./post-is-or-seeks-info.js";
 import labelledHrModule from "./labelled-hr.js";
 import postContentGeneral from "./post-content-general.js";
+import postHeaderModule from "./post-header.js";
 import trigModule from "./trig.js";
-import { attach, getIn } from "../utils.js";
+import { attach, getIn, get } from "../utils.js";
 import won from "../won-es6.js";
 import { labels } from "../won-label-utils.js";
 import { connect2Redux } from "../won-utils.js";
+import { isPersona } from "../need-utils.js";
 import { getConnectionUriFromRoute } from "../selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
@@ -36,8 +38,6 @@ function genComponentConf() {
             <div class="post-skeleton__details"></div>
         </div>
         <div class="post-content" ng-if="!self.postLoading">
-          <won-post-content-general post-uri="self.post.get('uri')"></won-post-content-general>
-
           <won-gallery ng-if="self.post.get('hasImages')">
           </won-gallery>
 
@@ -45,6 +45,36 @@ function genComponentConf() {
           <won-post-is-or-seeks-info branch="::'content'" ng-if="self.hasContent" post-uri="self.post.get('uri')"></won-post-is-or-seeks-info>
           <won-labelled-hr label="::'Search'" class="cp__labelledhr" ng-show="self.hasContent && self.hasSeeksBranch"></won-labelled-hr>
           <won-post-is-or-seeks-info branch="::'seeks'" ng-if="self.hasSeeksBranch" post-uri="self.post.get('uri')"></won-post-is-or-seeks-info>
+
+          <!-- PARTICIPANT INFORMATION -->
+          <won-labelled-hr label="::'Group Members'" class="cp__labelledhr" ng-if="self.hasGroupMembers"></won-labelled-hr>
+          <div class="post-content__members" ng-if="self.hasGroupMembers">
+            <div
+              class="post-content__members__member"
+              ng-repeat="memberUri in self.groupMembersArray">
+              <won-post-header
+                need-uri="memberUri"
+                hide-image="::false">
+              </won-post-header>
+            </div>
+          </div>
+
+          <!-- OTHER NEEDS -->
+          <won-labelled-hr label="::'Posts of this Persona'" class="cp__labelledhr" ng-if="self.isPersona && self.hasHeldPosts"></won-labelled-hr>
+          <div class="post-content__members" ng-if="self.isPersona && self.hasHeldPosts">
+            <div
+              class="post-content__members__member"
+              ng-repeat="heldPostUri in self.heldPostsArray">
+              <won-post-header
+                need-uri="heldPostUri"
+                hide-image="::false">
+              </won-post-header>
+            </div>
+          </div>
+
+          <!-- GENERAL INFORMATION -->
+          <won-labelled-hr label="::'General Information'" class="cp__labelledhr"></won-labelled-hr>
+          <won-post-content-general post-uri="self.post.get('uri')"></won-post-content-general>
           <div class="post-info__content__rdf" ng-if="self.shouldShowRdf">
             <h2 class="post-info__heading">
                 RDF
@@ -83,20 +113,29 @@ function genComponentConf() {
 
       const selectFromState = state => {
         const openConnectionUri = getConnectionUriFromRoute(state);
-        const post = state.getIn(["needs", this.postUri]);
+        const post = getIn(state, ["needs", this.postUri]);
         const content = post ? post.get("content") : undefined;
 
         //TODO it will be possible to have more than one seeks
-        const seeks = post && post.get("seeks");
+        const seeks = get(post, "seeks");
 
         const hasContent = content && content.size > 0;
         const hasSeeksBranch = seeks && seeks.size > 0;
+
+        const groupMembers = get(post, "groupMembers");
+
+        const heldPosts = get(post, "holds");
 
         return {
           WON: won.WON,
           hasContent,
           hasSeeksBranch,
           post,
+          isPersona: isPersona(post),
+          hasHeldPosts: isPersona && heldPosts && heldPosts.size > 0,
+          heldPostsArray: isPersona && heldPosts && heldPosts.toArray(),
+          hasGroupMembers: groupMembers && groupMembers.size > 0,
+          groupMembersArray: groupMembers && groupMembers.toArray(),
           postLoading:
             !post ||
             getIn(state, ["process", "needs", post.get("uri"), "loading"]),
@@ -130,6 +169,7 @@ export default angular
     postIsOrSeeksInfoModule,
     labelledHrModule,
     postContentGeneral,
+    postHeaderModule,
     trigModule,
   ])
   .directive("wonPostContent", genComponentConf).name;

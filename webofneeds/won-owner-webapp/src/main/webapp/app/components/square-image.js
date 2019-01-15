@@ -2,6 +2,7 @@ import angular from "angular";
 
 import won from "../won-es6.js";
 import { attach, generateRgbColorArray, get, getIn } from "../utils.js";
+import { isPersona } from "../need-utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
@@ -40,6 +41,7 @@ function genComponentConf() {
         const personaIdenticonSvg = this.parseIdenticon(personaUri);
 
         return {
+          isPersona: isPersona(need),
           needInactive:
             need && get(need, "state") === won.WON.InactiveCompacted,
           needFailedToLoad:
@@ -64,6 +66,8 @@ function genComponentConf() {
         () => this.needFailedToLoad,
         this
       );
+
+      classOnComponentRoot("won-is-persona", () => this.isPersona, this);
     }
 
     parseIdenticon(input) {

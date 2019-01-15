@@ -5,7 +5,7 @@
 @import "square-image";
 @import "speech-bubble";
 
-won-connection-selection-item {
+won-group-administration-selection-item {
   $triangleCutoutSize: $speechBubbleTailSize;
   $padding: 0.5rem;
   display: grid;
@@ -43,8 +43,5 @@ won-connection-selection-item {
       $thinBorderWidth,
       50%
     );
-  }
-  & .csi__closebutton.won-button--outlined.red.thin {
-    font-size: $smallFontSize;
   }
 }

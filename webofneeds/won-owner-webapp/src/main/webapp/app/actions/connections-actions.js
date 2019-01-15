@@ -11,7 +11,7 @@ import {
 } from "../selectors/general-selectors.js";
 import { getOwnedConnectionByUri } from "../selectors/connection-selectors.js";
 
-import { getIn } from "../utils.js";
+import { getIn, urisToLookupSuccessAndFailedMap } from "../utils.js";
 
 import { ensureLoggedIn } from "./account-actions";
 
@@ -546,27 +546,92 @@ export function connectionsRate(connectionUri, rating) {
  * @return {Function}
  */
 export function showLatestMessages(connectionUriParam, numberOfEvents) {
-  return async (dispatch, getState) => {
+  return (dispatch, getState) => {
     const state = getState();
-    await loadLatestMessagesOfConnection({
-      connectionUri: connectionUriParam,
-      numberOfEvents,
-      state,
-      actionTypesToDispatch: {
-        start: actionTypes.connections.showLatestMessages,
-        success: actionTypes.connections.showLatestMessages,
-        failure: actionTypes.connections.showLatestMessages,
-      },
-      dispatch,
+    const connectionUri =
+      connectionUriParam || getConnectionUriFromRoute(state);
+    const need =
+      connectionUri && getOwnedNeedByConnectionUri(state, connectionUri);
+    const needUri = need && need.get("uri");
+    const connection =
+      connectionUri && getOwnedConnectionByUri(state, connectionUri);
+    if (
+      !connectionUri ||
+      !connection ||
+      getIn(state, ["process", "connections", connectionUri, "loadingMessages"]) // only start loading once.
+    ) {
+      return Promise.resolve();
+    }
+
+    dispatch({
+      type: actionTypes.connections.fetchMessagesStart,
+      payload: Immutable.fromJS({ connectionUri: connectionUri }),
     });
+
+    const fetchParams = {
+      requesterWebId: needUri,
+      pagingSize: numOfEvts2pageSize(numberOfEvents),
+      deep: true,
+    };
+    return won
+      .getConnectionWithEventUris(connectionUri, fetchParams)
+      .then(connection => {
+        const messagesToFetch = limitNumberOfEventsToFetchInConnection(
+          state,
+          connection,
+          connectionUri,
+          numberOfEvents
+        );
+
+        dispatch({
+          type: actionTypes.connections.messageUrisInLoading,
+          payload: Immutable.fromJS({
+            connectionUri: connectionUri,
+            uris: messagesToFetch,
+          }),
+        });
+
+        return messagesToFetch;
+      })
+      .then(eventUris => {
+        return urisToLookupSuccessAndFailedMap(
+          eventUris,
+          eventUri => won.getWonMessage(eventUri, { requesterWebId: needUri }),
+          []
+        );
+      })
+      .then(events => {
+        if (events) {
+          const eventsImm = Immutable.fromJS(events);
+
+          if (eventsImm.get("success").size > 0) {
+            dispatch({
+              type: actionTypes.connections.fetchMessagesSuccess,
+              payload: Immutable.fromJS({
+                connectionUri: connectionUri,
+                events: eventsImm.get("success"),
+              }),
+            });
+          }
+
+          if (eventsImm.get("failed").size > 0) {
+            dispatch({
+              type: actionTypes.connections.fetchMessagesFailed,
+              payload: Immutable.fromJS({
+                connectionUri: connectionUri,
+                events: eventsImm.get("failed"),
+              }),
+            });
+          }
+        }
+      });
   };
 }
 
-export async function loadLatestMessagesOfConnection({
+export function loadLatestMessagesOfConnection({
   connectionUri,
   numberOfEvents,
   state,
-  actionTypesToDispatch,
   dispatch,
 }) {
   const connectionUri_ = connectionUri || getConnectionUriFromRoute(state);
@@ -580,46 +645,72 @@ export async function loadLatestMessagesOfConnection({
     !connection ||
     getIn(state, ["process", "connections", connectionUri_, "loadingMessages"]) // only start loading once.
   ) {
-    return;
+    return Promise.resolve();
   }
 
-  if (actionTypesToDispatch.start) {
-    dispatch({
-      type: actionTypesToDispatch.start,
-      payload: Immutable.fromJS({
-        connectionUri: connectionUri_,
-        loadingMessages: true,
-      }),
-    });
-  }
+  dispatch({
+    type: actionTypes.connections.fetchMessagesStart,
+    payload: Immutable.fromJS({ connectionUri: connectionUri_ }),
+  });
 
-  try {
-    const events = await won.getWonMessagesOfConnection(connectionUri_, {
-      requesterWebId: needUri,
-      pagingSize: numOfEvts2pageSize(numberOfEvents),
-      deep: true,
-    });
+  const fetchParams = {
+    requesterWebId: needUri,
+    pagingSize: numOfEvts2pageSize(numberOfEvents),
+    deep: true,
+  };
 
-    if (actionTypesToDispatch.success) {
+  return won
+    .getConnectionWithEventUris(connectionUri_, fetchParams)
+    .then(connection => {
+      const messagesToFetch = limitNumberOfEventsToFetchInConnection(
+        state,
+        connection,
+        connectionUri,
+        numberOfEvents
+      );
+
       dispatch({
-        type: actionTypesToDispatch.success,
+        type: actionTypes.connections.messageUrisInLoading,
         payload: Immutable.fromJS({
           connectionUri: connectionUri_,
-          events: events,
+          uris: messagesToFetch,
         }),
       });
-    }
-  } catch (error) {
-    if (actionTypesToDispatch.failure) {
-      dispatch({
-        type: actionTypesToDispatch.failure,
-        payload: Immutable.fromJS({
-          connectionUri: connectionUri_,
-          error: error,
-        }),
-      });
-    }
-  }
+
+      return messagesToFetch;
+    })
+    .then(eventUris => {
+      return urisToLookupSuccessAndFailedMap(
+        eventUris,
+        eventUri => won.getWonMessage(eventUri, { requesterWebId: needUri }),
+        []
+      );
+    })
+    .then(events => {
+      if (events) {
+        const eventsImm = Immutable.fromJS(events);
+
+        if (eventsImm.get("success").size > 0) {
+          dispatch({
+            type: actionTypes.connections.fetchMessagesSuccess,
+            payload: Immutable.fromJS({
+              connectionUri: connectionUri_,
+              events: eventsImm.get("success"),
+            }),
+          });
+        }
+
+        if (eventsImm.get("failed").size > 0) {
+          dispatch({
+            type: actionTypes.connections.fetchMessagesFailed,
+            payload: Immutable.fromJS({
+              connectionUri: connectionUri_,
+              events: eventsImm.get("failed"),
+            }),
+          });
+        }
+      }
+    });
 }
 
 /**
@@ -660,35 +751,68 @@ export function showMoreMessages(connectionUriParam, numberOfEvents) {
       oldestMessage &&
       oldestMessage.get("uri").replace(/.*\/event\/(.*)/, "$1"); // everything following the `/event/`
     dispatch({
-      type: actionTypes.connections.showMoreMessages,
-      payload: Immutable.fromJS({ connectionUri, loadingMessages: true }),
+      type: actionTypes.connections.fetchMessagesStart,
+      payload: Immutable.fromJS({ connectionUri }),
     });
 
+    const fetchParams = {
+      requesterWebId: needUri,
+      pagingSize: numOfEvts2pageSize(numberOfEvents),
+      deep: true,
+      resumebefore: messageHashValue,
+    };
+
     won
-      .getWonMessagesOfConnection(connectionUri, {
-        requesterWebId: needUri,
-        pagingSize: numOfEvts2pageSize(numberOfEvents),
-        deep: true,
-        resumebefore: messageHashValue,
-      })
-      .then(events =>
+      .getConnectionWithEventUris(connectionUri, fetchParams)
+      .then(connection => {
+        const messagesToFetch = limitNumberOfEventsToFetchInConnection(
+          state,
+          connection,
+          connectionUri,
+          numberOfEvents
+        );
+
         dispatch({
-          type: actionTypes.connections.showMoreMessages,
+          type: actionTypes.connections.messageUrisInLoading,
           payload: Immutable.fromJS({
             connectionUri: connectionUri,
-            events: events,
-          }),
-        })
-      )
-      .catch(error => {
-        console.error("Failed loading more events: ", error);
-        dispatch({
-          type: actionTypes.connections.showMoreMessages,
-          payload: Immutable.fromJS({
-            connectionUri: connectionUri,
-            error: error,
+            uris: messagesToFetch,
           }),
         });
+
+        return messagesToFetch;
+      })
+      .then(eventUris => {
+        return urisToLookupSuccessAndFailedMap(
+          eventUris,
+          eventUri => won.getWonMessage(eventUri, { requesterWebId: needUri }),
+          []
+        );
+      })
+      .then(events => {
+        if (events) {
+          const eventsImm = Immutable.fromJS(events);
+
+          if (eventsImm.get("success").size > 0) {
+            dispatch({
+              type: actionTypes.connections.fetchMessagesSuccess,
+              payload: Immutable.fromJS({
+                connectionUri: connectionUri,
+                events: eventsImm.get("success"),
+              }),
+            });
+          }
+
+          if (eventsImm.get("failed").size > 0) {
+            dispatch({
+              type: actionTypes.connections.fetchMessagesFailed,
+              payload: Immutable.fromJS({
+                connectionUri: connectionUri,
+                events: eventsImm.get("failed"),
+              }),
+            });
+          }
+        }
       });
   };
 }
@@ -696,4 +820,38 @@ export function showMoreMessages(connectionUriParam, numberOfEvents) {
 function numOfEvts2pageSize(numberOfEvents) {
   // `*3*` to compensate for the *roughly* 2 additional success events per chat message
   return numberOfEvents * 3;
+}
+
+/**
+ * Helper Method to make sure we only load numberOfEvents messages into the store, seems that the cache is not doing what its supposed to do otherwise
+ * FIXME: remove this once the fetchpaging works again (or at all)
+ * @param state
+ * @param connection
+ * @param numberOfEvents
+ * @returns {Array}
+ */
+function limitNumberOfEventsToFetchInConnection(
+  state,
+  connection,
+  connectionUri,
+  numberOfEvents
+) {
+  const connectionImm = Immutable.fromJS(connection);
+
+  const allMessagesToLoad = state
+    .getIn(["process", "connections", connectionUri, "messages"])
+    .filter(msg => msg.get("toLoad") && !msg.get("failedToLoad"));
+  let messagesToFetch = [];
+
+  connectionImm &&
+    connectionImm.get("hasEvents").map(eventUri => {
+      if (
+        allMessagesToLoad.has(eventUri) &&
+        messagesToFetch.length < numOfEvts2pageSize(numberOfEvents)
+      ) {
+        messagesToFetch.push(eventUri);
+      }
+    });
+
+  return messagesToFetch;
 }

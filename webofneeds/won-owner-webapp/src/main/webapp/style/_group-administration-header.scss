@@ -1,0 +1,51 @@
+@import "won-config";
+@import "sizing-utils";
+@import "square-image";
+@import "animate";
+
+won-group-administration-header {
+  color: black;
+
+  display: grid;
+  grid-template-areas: "icon main";
+  grid-template-columns: min-content 1fr;
+  grid-column-gap: 0.5rem;
+  min-width: 0;
+
+  & won-group-image.ch__icon {
+    grid-area: icon;
+    width: $postIconSize;
+  }
+  .ch__right {
+    grid-area: main;
+    display: grid;
+    grid-template-areas: "topline" "subtitle";
+    min-width: 0;
+    &__topline {
+      grid-area: topline;
+      min-width: 0;
+
+      &__title {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        font-weight: 400;
+        min-width: 0;
+      }
+    }
+    &__subtitle {
+      grid-area: subtitle;
+      color: $won-subtitle-gray;
+      font-size: $smallFontSize;
+      min-width: 0;
+
+      &__members {
+        display: flex;
+        align-items: center;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+    }
+  }
+}

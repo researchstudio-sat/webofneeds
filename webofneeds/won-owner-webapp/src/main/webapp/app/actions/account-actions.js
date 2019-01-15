@@ -324,19 +324,14 @@ export function reconnect() {
        */
       const connectionUris = getOwnedConnectionUris(state);
       await Promise.all(
-        connectionUris.map(async connectionUri => {
-          await loadLatestMessagesOfConnection({
+        connectionUris.map(connectionUri =>
+          loadLatestMessagesOfConnection({
             connectionUri,
             numberOfEvents: 10, //TODO magic number :|
             state,
             dispatch,
-            actionTypesToDispatch: {
-              start: actionTypes.reconnect.startingToLoadConnectionData,
-              success: actionTypes.reconnect.receivedConnectionData,
-              failure: actionTypes.reconnect.connectionFailedToLoad,
-            },
-          });
-        })
+          })
+        )
       );
     } catch (e) {
       if (e.message == "Unauthorized") {

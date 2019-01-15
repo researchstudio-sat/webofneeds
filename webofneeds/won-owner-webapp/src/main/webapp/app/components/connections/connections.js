@@ -2,6 +2,8 @@ import angular from "angular";
 import won from "../../won-es6.js";
 import sendRequestModule from "../send-request.js";
 import postMessagesModule from "../post-messages.js";
+import groupPostMessagesModule from "../group-post-messages.js";
+import groupAdministrationModule from "../group-administration.js";
 import postInfoModule from "../post-info.js";
 import connectionsOverviewModule from "../connections-overview.js";
 import createPostModule from "../create-post.js";
@@ -14,6 +16,7 @@ import {
   getOwnedNeedByConnectionUri,
   getOwnedNeeds,
 } from "../../selectors/general-selectors.js";
+import { isChatToGroup } from "../../connection-utils.js";
 import * as srefUtils from "../../sref-utils.js";
 
 import "style/_connections.scss";
@@ -35,6 +38,11 @@ class ConnectionsController {
       const selectedPost =
         selectedPostUri && getIn(state, ["needs", selectedPostUri]);
 
+      const showGroupPostAdministration = getIn(state, [
+        "router",
+        "currentParams",
+        "groupPostAdminUri",
+      ]);
       const useCase = getIn(state, ["router", "currentParams", "useCase"]);
       const useCaseGroup = getIn(state, [
         "router",
@@ -52,6 +60,12 @@ class ConnectionsController {
         "connections",
         selectedConnectionUri,
       ]);
+      const isSelectedConnectionGroupChat = isChatToGroup(
+        state.get("needs"),
+        get(need, "uri"),
+        selectedConnectionUri
+      );
+
       const selectedConnectionState = getIn(selectedConnection, ["state"]);
 
       const ownedNeeds = getOwnedNeeds(state);
@@ -73,11 +87,13 @@ class ConnectionsController {
           !useCase &&
           !useCaseGroup &&
           !selectedPost &&
+          !showGroupPostAdministration &&
           (!selectedConnection || selectedConnectionState === won.WON.Closed),
         showContentSide:
           useCase ||
           useCaseGroup ||
           selectedPost ||
+          showGroupPostAdministration ||
           (selectedConnection && selectedConnectionState !== won.WON.Closed),
 
         showUseCasePicker:
@@ -105,11 +121,24 @@ class ConnectionsController {
         showPostMessages:
           !selectedPost &&
           !useCaseGroup &&
+          !showGroupPostAdministration &&
+          !isSelectedConnectionGroupChat &&
           (selectedConnectionState === won.WON.Connected ||
             selectedConnectionState === won.WON.RequestReceived ||
             selectedConnectionState === won.WON.RequestSent ||
             selectedConnectionState === won.WON.Suggested),
-        showPostInfo: selectedPost && !useCaseGroup,
+        showGroupPostMessages:
+          !selectedPost &&
+          !useCaseGroup &&
+          !showGroupPostAdministration &&
+          isSelectedConnectionGroupChat &&
+          (selectedConnectionState === won.WON.Connected ||
+            selectedConnectionState === won.WON.RequestReceived ||
+            selectedConnectionState === won.WON.RequestSent ||
+            selectedConnectionState === won.WON.Suggested),
+        showPostInfo:
+          selectedPost && !useCaseGroup && !showGroupPostAdministration,
+        showGroupPostAdministration: showGroupPostAdministration,
 
         hideListSideInResponsive:
           !hasOwnedNeeds ||
@@ -134,16 +163,29 @@ class ConnectionsController {
       postUri: needUri,
       useCase: undefined,
       useCaseGroup: undefined,
+      groupPostAdminUri: undefined,
     });
   }
 
   selectConnection(connectionUri) {
     this.markAsRead(connectionUri);
     this.router__stateGoCurrent({
-      connectionUri,
+      connectionUri: connectionUri,
       postUri: undefined,
       useCase: undefined,
       useCaseGroup: undefined,
+      groupPostAdminUri: undefined,
+    });
+  }
+
+  selectGroupChat(needUri) {
+    //TODO: Mark all groupconnections as read
+    this.router__stateGoCurrent({
+      connectionUri: undefined,
+      postUri: undefined,
+      useCase: undefined,
+      useCaseGroup: undefined,
+      groupPostAdminUri: needUri,
     });
   }
 
@@ -175,6 +217,8 @@ export default angular
   .module("won.owner.components.connections", [
     sendRequestModule,
     postMessagesModule,
+    groupPostMessagesModule,
+    groupAdministrationModule,
     postInfoModule,
     usecasePickerModule,
     usecaseGroupModule,

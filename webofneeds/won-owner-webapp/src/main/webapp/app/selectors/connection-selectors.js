@@ -2,13 +2,17 @@
  * Created by fsuda on 05.11.2018.
  */
 
+import Immutable from "immutable";
 import {
   getOwnedNeedByConnectionUri,
   getOwnedNeeds,
   getOwnedPosts,
   getNeeds,
 } from "./general-selectors.js";
-import { isChatConnection } from "../connection-utils.js";
+import {
+  isChatConnection,
+  isGroupChatConnection,
+} from "../connection-utils.js";
 import won from "../won-es6.js";
 import { getIn } from "../utils.js";
 
@@ -48,6 +52,16 @@ export function getChatConnectionsByNeedUri(state, needUri) {
   return connections && connections.filter(conn => isChatConnection(conn));
 }
 
+export function getGroupChatConnectionsByNeedUri(state, needUri) {
+  const needs = getNeeds(state);
+  const need = needs && needs.get(needUri);
+  const connections = need && need.get("connections");
+
+  return connections
+    ? connections.filter(conn => isGroupChatConnection(conn))
+    : Immutable.Map();
+}
+
 /**
  * @param state
  * @returns {Immutable.Map|*}
@@ -59,7 +73,7 @@ export function getChatConnectionsToCrawl(state) {
   const chatConnections =
     allConnections &&
     allConnections
-      .filter(conn => isChatConnection(conn))
+      .filter(conn => isChatConnection(conn) || isGroupChatConnection(conn))
       .filter(
         conn =>
           !getIn(state, [
@@ -67,6 +81,12 @@ export function getChatConnectionsToCrawl(state) {
             "connections",
             conn.get("uri"),
             "loadingMessages",
+          ]) &&
+          !getIn(state, [
+            "process",
+            "connections",
+            conn.get("uri"),
+            "failedToLoad",
           ])
       );
 
@@ -85,4 +105,17 @@ export function getChatConnectionsToCrawl(state) {
           .size == 0
     );
   return connectionsWithoutConnectMessage;
+}
+
+export function hasMessagesToLoad(state, connUri) {
+  const messageProcess = getIn(state, [
+    "process",
+    "connections",
+    connUri,
+    "messages",
+  ]);
+
+  return (
+    messageProcess && messageProcess.filter(msg => msg.get("toLoad")).size > 0
+  );
 }

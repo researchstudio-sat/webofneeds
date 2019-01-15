@@ -1,7 +1,9 @@
 import { parseMessage } from "./parse-message.js";
 import { markUriAsRead } from "../../won-localstorage.js";
 import { markConnectionAsRead } from "./reduce-connections.js";
+import { addTheirNeedToLoad } from "./reduce-needs.js";
 import { getOwnMessageUri } from "../../message-utils.js";
+import { isChatToGroup } from "../../connection-utils.js";
 
 /*
  "alreadyProcessed" flag, which indicates that we do not care about the
@@ -38,6 +40,7 @@ export function addMessage(
     if (parsedMessage) {
       const connectionUri =
         insertIntoConnUri || parsedMessage.get("belongsToUri");
+      const hasContainedForwardedWonMessages = wonMessage.hasContainedForwardedWonMessages();
 
       let needUri = insertIntoNeedUri;
       if (!needUri && parsedMessage.getIn(["data", "outgoingMessage"])) {
@@ -46,6 +49,33 @@ export function addMessage(
       } else if (!needUri) {
         // needUri is the remote message's hasReceiverNeed
         needUri = wonMessage.getReceiverNeed();
+        if (
+          parsedMessage.getIn(["data", "unread"]) &&
+          !(
+            hasContainedForwardedWonMessages &&
+            isChatToGroup(state, needUri, connectionUri)
+          )
+        ) {
+          //If there is a new message for the connection we will set the connection to newConnection
+          state = state.setIn(
+            [needUri, "lastUpdateDate"],
+            parsedMessage.getIn(["data", "date"])
+          );
+          state = state.setIn([needUri, "unread"], true);
+          state = state.setIn(
+            [needUri, "connections", connectionUri, "lastUpdateDate"],
+            parsedMessage.getIn(["data", "date"])
+          );
+          state = state.setIn(
+            [needUri, "connections", connectionUri, "unread"],
+            true
+          );
+        }
+      } else if (
+        needUri &&
+        isChatToGroup &&
+        !hasContainedForwardedWonMessages
+      ) {
         if (parsedMessage.getIn(["data", "unread"])) {
           //If there is a new message for the connection we will set the connection to newConnection
           state = state.setIn(
@@ -64,8 +94,20 @@ export function addMessage(
         }
       }
 
+      const originatorUri = parsedMessage.getIn(["data", "originatorUri"]);
+
+      if (originatorUri) {
+        //Message is originally from another need, we might need to add the need as well
+        if (!state.has(originatorUri)) {
+          console.debug(
+            "Originator Need is not in the state yet, we need to add it"
+          );
+          state = addTheirNeedToLoad(state, originatorUri);
+        }
+      }
+
       if (needUri) {
-        if (wonMessage.hasContainedForwardedWonMessages()) {
+        if (hasContainedForwardedWonMessages) {
           const containedForwardedWonMessages = wonMessage.getContainedForwardedWonMessages();
           containedForwardedWonMessages.map(forwardedWonMessage => {
             state = addMessage(
@@ -89,10 +131,24 @@ export function addMessage(
           //ignore messages for nonexistant connections
           return state;
         }
-        messages = messages.set(
-          parsedMessage.getIn(["data", "uri"]),
-          parsedMessage.get("data")
-        );
+
+        /*
+        Group Chat messages that are received are in the form of injected/referenced messages
+        But we do not want to display these messages in that manner, therefore we simply ignore
+        the encapsulating message and not store it within our state.
+        */
+        if (
+          !(
+            hasContainedForwardedWonMessages &&
+            isChatToGroup(state, needUri, connectionUri)
+          )
+        ) {
+          messages = messages.set(
+            parsedMessage.getIn(["data", "uri"]),
+            parsedMessage.get("data")
+          );
+        }
+
         return state.setIn(
           [needUri, "connections", connectionUri, "messages"],
           messages

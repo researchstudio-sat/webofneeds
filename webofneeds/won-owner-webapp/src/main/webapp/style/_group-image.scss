@@ -1,0 +1,36 @@
+@import "won-config";
+@import "sizing-utils";
+@import "square-image";
+@import "animate";
+
+won-group-image {
+  width: $postIconSize;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  align-content: center;
+
+  & .gi__icons__icon,
+  & .gi__icons__more {
+    @include square-image($postIconSize/2);
+
+    &--spanRow {
+      grid-row: auto / span 2;
+    }
+    &--spanCol {
+      grid-column: auto / span 2;
+    }
+  }
+
+  & .gi__icons__more {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-size: $smallFontSize;
+    text-align: center;
+    line-height: $postIconSize/2;
+    background: $won-line-gray;
+    color: white;
+  }
+}

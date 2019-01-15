@@ -9,6 +9,7 @@ export function parseConnection(jsonldConnection) {
   let parsedConnection = {
     belongsToUri: undefined,
     facetUri: jsonldConnectionImm.get("hasFacet"),
+    remoteFacetUri: jsonldConnectionImm.get("hasRemoteFacet"),
     data: {
       uri: undefined,
       state: undefined,
@@ -29,6 +30,7 @@ export function parseConnection(jsonldConnection) {
       petriNetData: Immutable.Map(),
       remoteNeedUri: undefined,
       remoteConnectionUri: undefined,
+      remoteFacet: undefined, //will be determined by the reduce-connections
       creationDate: undefined,
       lastUpdateDate: undefined,
       unread: undefined,

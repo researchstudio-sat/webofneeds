@@ -48,7 +48,7 @@ import {
 import {
   needsConnect,
   fetchUnloadedNeeds,
-  fetchSuggested,
+  fetchUnloadedNeed,
   needsClose,
   needsDelete,
   needsOpen,
@@ -111,10 +111,13 @@ const actionHierarchy = {
     sendChatMessageFailed: INJ_DEFAULT,
     showLatestMessages: cnct.showLatestMessages,
     showMoreMessages: cnct.showMoreMessages,
+    fetchMessagesStart: INJ_DEFAULT,
+    messageUrisInLoading: INJ_DEFAULT,
+    fetchMessagesFailed: INJ_DEFAULT,
+    fetchMessagesSuccess: INJ_DEFAULT,
     markAsRead: INJ_DEFAULT,
     setLoadingAgreementData: INJ_DEFAULT,
     setLoadingPetriNetData: INJ_DEFAULT,
-    setLoadingMessages: INJ_DEFAULT,
     showAgreementData: INJ_DEFAULT,
     showPetriNetData: INJ_DEFAULT,
     setMultiSelectType: INJ_DEFAULT,
@@ -141,7 +144,7 @@ const actionHierarchy = {
     failed: INJ_DEFAULT,
     connect: needsConnect,
     fetchUnloadedNeeds: fetchUnloadedNeeds,
-    fetchSuggested: fetchSuggested,
+    fetchUnloadedNeed: fetchUnloadedNeed,
 
     storeOwnedInactiveUris: INJ_DEFAULT,
     storeOwnedInactiveUrisInLoading: INJ_DEFAULT,
@@ -323,9 +326,6 @@ const actionHierarchy = {
   reconnect: {
     start: reconnect,
     success: INJ_DEFAULT,
-    startingToLoadConnectionData: INJ_DEFAULT,
-    receivedConnectionData: INJ_DEFAULT,
-    connectionFailedToLoad: INJ_DEFAULT,
   },
 
   view: {

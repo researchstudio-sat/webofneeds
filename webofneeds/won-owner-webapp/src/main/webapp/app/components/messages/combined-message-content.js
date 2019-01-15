@@ -23,17 +23,20 @@ function genComponentConf() {
       <div class="msg__header" ng-if="!self.isConnectionMessage && !self.hasNotBeenLoaded">
           <div class="msg__header__type">{{ self.getTypeHeaderLabel() }}</div>
       </div>
+      <div class="msg__header" ng-if="self.personaName && self.isConnectionMessage && !self.hasNotBeenLoaded && !(self.hasClaims || self.hasProposes)">
+          <div class="msg__header__type">{{ self.personaName }}</div>
+      </div>
       <div class="msg__header msg__header--agreement" ng-if="self.isConnectionMessage && (self.hasClaims || self.hasProposes) && !self.hasNotBeenLoaded">
           <div class="msg__header__type">{{ self.getAgreementHeaderLabel() }}</div>
       </div>
-      <div class="msg__header msg__header--forwarded-from" ng-if="self.isConnectionMessage && self.originatorUri && !self.hasNotBeenLoaded">
+      <div class="msg__header msg__header--forwarded-from" ng-if="self.isConnectionMessage && self.originatorUri && !self.hasNotBeenLoaded && !self.isGroupChatMessage">
           <div class="msg__header__type">Forwarded from:</div>
           <won-square-image
             class="msg__header__originator"
             uri="self.originatorUri">
           </won-square-image>
       </div>
-      <div class="msg__header msg__header--inject-into" ng-if="self.isConnectionMessage && self.isInjectIntoMessage && !self.hasNotBeenLoaded">
+      <div class="msg__header msg__header--inject-into" ng-if="self.isConnectionMessage && self.isInjectIntoMessage && !self.hasNotBeenLoaded && !self.isGroupChatMessage">
           <div class="msg__header__type">Forward to:</div>
           <won-square-image
             class="msg__header__inject"
@@ -87,9 +90,26 @@ function genComponentConf() {
         const allConnections = getOwnedConnections(state);
         const allNeeds = getNeeds(state);
 
+        /*Extract persona name from message:
+
+          either within the need of the originatorUri-need (in group-chat-messages)
+          or
+          within the remoteNeedUri-need of the connection (for 1:1 chats)
+        */
+        const relevantNeedUri =
+          !get(message, "outgoingMessage") && this.groupChatMessage
+            ? get(message, "originatorUri")
+            : get(connection, "remoteNeedUri");
+        const relevantPersonaUri =
+          relevantNeedUri && getIn(allNeeds, [relevantNeedUri, "heldBy"]);
+        const personaName =
+          relevantPersonaUri &&
+          getIn(allNeeds, [relevantPersonaUri, "jsonld", "s:name"]);
+
         return {
           allNeeds,
           allConnections,
+          personaName,
           multiSelectType: connection && connection.get("multiSelectType"),
           contentGraphTrig: get(message, "contentGraphTrigRaw"),
           shouldShowRdf: state.getIn(["view", "showRdf"]),
@@ -99,6 +119,7 @@ function genComponentConf() {
           hasClaims: referencesClaims && referencesClaims.size > 0,
           hasProposes: referencesProposes && referencesProposes.size > 0,
           messageStatus: message && message.get("messageStatus"),
+          isGroupChatMessage: this.groupChatMessage,
           isInjectIntoMessage: injectInto && injectInto.size > 0, //contains the remoteConnectionUris
           originatorUri: message && message.get("originatorUri"),
           injectIntoArray: injectInto && Array.from(injectInto.toSet()),
@@ -110,7 +131,7 @@ function genComponentConf() {
       connect2Redux(
         selectFromState,
         actionCreators,
-        ["self.connectionUri", "self.messageUri"],
+        ["self.connectionUri", "self.messageUri", "self.groupChatMessage"],
         this
       );
 
@@ -241,6 +262,7 @@ function genComponentConf() {
     scope: {
       messageUri: "=",
       connectionUri: "=",
+      groupChatMessage: "=",
     },
     template: template,
   };

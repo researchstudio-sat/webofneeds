@@ -21,6 +21,42 @@ won-post-content {
       border: $thinGrayBorder;
       padding: 0.5rem;
     }
+
+    .post-content__members {
+      & .post-content__members__member {
+        padding: 0.5rem;
+        border: $thinGrayBorder;
+        background: white;
+        display: grid;
+        grid-template-areas: "member_info member_actions";
+        grid-template-columns: 1fr min-content;
+        grid-gap: 0.25rem;
+        align-items: center;
+        margin-bottom: 0.5rem;
+
+        won-post-header {
+          grid-area: member_info;
+        }
+      }
+    }
+
+    .post-content__otherneeds {
+      & .post-content__otherneeds__otherneed {
+        padding: 0.5rem;
+        border: $thinGrayBorder;
+        background: white;
+        display: grid;
+        grid-template-areas: "member_info member_actions";
+        grid-template-columns: 1fr min-content;
+        grid-gap: 0.25rem;
+        align-items: center;
+        margin-bottom: 0.5rem;
+
+        won-post-header {
+          grid-area: member_info;
+        }
+      }
+    }
   }
 
   &.won-is-loading {

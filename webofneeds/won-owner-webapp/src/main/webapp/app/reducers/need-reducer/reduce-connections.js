@@ -30,6 +30,7 @@ function addConnectionFull(state, connection) {
     const need = state.get(needUri);
 
     if (need) {
+      const remoteNeedUri = parsedConnection.getIn(["data", "remoteNeedUri"]);
       const connectionUri = parsedConnection.getIn(["data", "uri"]);
 
       const facetUri = parsedConnection.get("facetUri");
@@ -38,7 +39,7 @@ function addConnectionFull(state, connection) {
       parsedConnection = parsedConnection.setIn(["data", "facet"], realFacet);
 
       if (realFacet === won.WON.HolderFacetCompacted) {
-        const holdsUri = parsedConnection.getIn(["data", "remoteNeedUri"]);
+        const holdsUri = remoteNeedUri;
         console.debug(
           "Handling a holderFacet-connection within need: ",
           needUri,
@@ -56,7 +57,7 @@ function addConnectionFull(state, connection) {
         }
       } else if (realFacet === won.WON.HoldableFacetCompacted) {
         //holdableFacet Connection from need to persona -> need to add heldBy remoteNeedUri to the need
-        const heldByUri = parsedConnection.getIn(["data", "remoteNeedUri"]);
+        const heldByUri = remoteNeedUri;
         console.debug(
           "Handling a holdableFacet-connection within need: ",
           needUri,
@@ -66,6 +67,20 @@ function addConnectionFull(state, connection) {
 
         if (heldByUri) {
           state = state.setIn([needUri, "heldBy"], heldByUri);
+        }
+      }
+
+      const remoteNeed = state.get(remoteNeedUri);
+
+      if (remoteNeed) {
+        const remoteFacetUri = parsedConnection.get("remoteFacetUri");
+        const realRemoteFacet = remoteNeed.getIn(["facets", remoteFacetUri]);
+
+        if (realRemoteFacet) {
+          parsedConnection = parsedConnection.setIn(
+            ["data", "remoteFacet"],
+            realRemoteFacet
+          );
         }
       }
 
@@ -337,10 +352,6 @@ export function setMultiSelectType(
 }
 
 export function addActiveConnectionsToNeedInLoading(state, needUri, connUris) {
-  needUri &&
-    connUris &&
-    connUris.size > 0 &&
-    console.debug("addActiveConnectionsToNeedInLoading: ", connUris);
   let newState = state;
   needUri &&
     connUris &&

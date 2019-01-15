@@ -13,7 +13,10 @@ import { getChatConnectionsByNeedUri } from "../selectors/connection-selectors.j
 import { attach, sortByDate, getIn } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
-import { isChatConnection } from "../connection-utils.js";
+import {
+  isChatConnection,
+  isGroupChatConnection,
+} from "../connection-utils.js";
 
 import "style/_connection-indicators.scss";
 
@@ -120,7 +123,7 @@ function genComponentConf() {
 
             return (
               remoteNeedActiveOrLoading &&
-              isChatConnection(conn) &&
+              (isChatConnection(conn) || isGroupChatConnection(conn)) &&
               conn.get("state") === won.WON.Suggested
             );
           });
@@ -138,7 +141,7 @@ function genComponentConf() {
 
             return (
               remoteNeedActiveOrLoading &&
-              isChatConnection(conn) &&
+              (isChatConnection(conn) || isGroupChatConnection(conn)) &&
               conn.get("state") !== won.WON.Suggested &&
               conn.get("state") !== won.WON.Closed
             );

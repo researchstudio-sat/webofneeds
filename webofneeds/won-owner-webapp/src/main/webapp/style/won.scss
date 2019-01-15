@@ -76,6 +76,8 @@ body {
         background: white;
       }
 
+      > won-group-administration,
+      > won-group-post-messages,
       > won-post-messages {
         height: calc(100vh - var(--headerHeight));
       }

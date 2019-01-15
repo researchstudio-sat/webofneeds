@@ -24,6 +24,9 @@ export function parseNeed(jsonldNeed, isOwned) {
       holds:
         won.parseListFrom(jsonldNeedImm, ["won:holds"], "xsd:ID") ||
         Immutable.List(),
+      groupMembers:
+        won.parseListFrom(jsonldNeedImm, ["won:hasGroupMember"], "xsd:ID") ||
+        Immutable.List(),
       content: generateContent(jsonldNeedImm, detailsToParse),
       seeks: generateContent(jsonldNeedImm.get("won:seeks"), detailsToParse),
       creationDate: extractCreationDate(jsonldNeedImm),

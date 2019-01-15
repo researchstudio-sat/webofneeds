@@ -14,6 +14,7 @@ import postHeaderModule from "./post-header.js";
 import connectionIndicatorsModule from "./connection-indicators.js";
 import extendedConnectionIndicatorsModule from "./extended-connection-indicators.js";
 import connectionSelectionItemModule from "./connection-selection-item.js";
+import groupAdministrationSelectionItemModule from "./group-administration-selection-item.js";
 import createPostItemModule from "./create-post-item.js";
 
 import { attach, delay, sortByDate, get, getIn } from "../utils.js";
@@ -24,6 +25,7 @@ import "style/_connections-overview.scss";
 
 import {
   getRouterParams,
+  getGroupChatPostUriFromRoute,
   getOwnedNeedByConnectionUri,
   getOwnedNeedsInCreation,
   getConnectionUriFromRoute,
@@ -33,7 +35,11 @@ import {
   getOwnedOpenPosts,
 } from "../selectors/general-selectors.js";
 import { getChatConnectionsToCrawl } from "../selectors/connection-selectors.js";
-import { isChatConnection } from "../connection-utils.js";
+import {
+  isChatConnection,
+  isGroupChatConnection,
+} from "../connection-utils.js";
+import { hasGroupFacet, hasChatFacet } from "../need-utils.js";
 
 const serviceDependencies = ["$ngRedux", "$scope"];
 function genComponentConf() {
@@ -115,13 +121,19 @@ function genComponentConf() {
                 </div>
             </div>
             <div class="co__item__connections"
-                ng-if="self.isOpen(need.get('uri')) && self.hasOpenOrLoadingChatConnections(need, self.allNeeds, self.process)">
+                ng-if="self.isOpen(need.get('uri')) && (self.hasOpenOrLoadingChatConnections(need, self.allNeeds, self.process) || self.hasGroupFacet(need))">
                 <won-connection-selection-item
+                    ng-if="self.hasChatFacet(need)"
                     ng-repeat="conn in self.getOpenChatConnectionsArraySorted(need, self.allNeeds, self.process)"
                     on-selected-connection="self.selectConnection(connectionUri)"
                     connection-uri="conn.get('uri')"
                     ng-class="{'won-unread': conn.get('unread')}">
                 </won-connection-selection-item>
+                <won-group-administration-selection-item
+                    ng-if="self.hasGroupFacet(need)"
+                    need-uri="need.get('uri')"
+                    on-selected="self.selectGroupChat(needUri)">
+                </won-group-administration-selection-item>
             </div>
         </div>
         <div class="co__separator clickable" ng-class="{'co__separator--open' : self.showClosedNeeds}" ng-if="self.hasClosedNeeds()" ng-click="self.toggleClosedNeeds()">
@@ -209,6 +221,8 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
       this.open = open;
       this.WON = won.WON;
+      this.hasGroupFacet = hasGroupFacet;
+      this.hasChatFacet = hasChatFacet;
       //this.labels = labels;
       window.co4dbg = this;
 
@@ -227,9 +241,13 @@ function genComponentConf() {
         const useCase = get(routerParams, "useCase");
         const useCaseGroup = get(routerParams, "useCaseGroup");
         const connUriInRoute = getConnectionUriFromRoute(state);
+        const groupPostAdminUriInRoute = getGroupChatPostUriFromRoute(state);
         const needUriInRoute = getPostUriFromRoute(state);
         const needImpliedInRoute =
-          connUriInRoute && getOwnedNeedByConnectionUri(state, connUriInRoute);
+          (connUriInRoute &&
+            getOwnedNeedByConnectionUri(state, connUriInRoute)) ||
+          (groupPostAdminUriInRoute &&
+            state.getIn(["needs", groupPostAdminUriInRoute]));
         const needUriImpliedInRoute =
           needImpliedInRoute && needImpliedInRoute.get("uri");
 
@@ -285,12 +303,6 @@ function genComponentConf() {
           const messageCount = messages ? messages.size : 0;
 
           if (messageCount == 0) {
-            console.debug(
-              "DISPATCH connections__showLatestMessages for connUri:",
-              conn.get("uri"),
-              " -> NO messages have already been loaded in the connection: ",
-              conn
-            );
             this.connections__showLatestMessages(conn.get("uri"), MESSAGECOUNT);
           } else {
             const receivedMessages = messages.filter(
@@ -300,12 +312,6 @@ function genComponentConf() {
               receivedMessages.filter(msg => !msg.get("unread")).size > 0;
 
             if (!receivedMessagesReadPresent) {
-              console.debug(
-                "DISPATCH connections__showMoreMessages for connUri:",
-                conn.get("uri"),
-                " -> ONLY unread messages are currently present:",
-                conn
-              );
               this.connections__showMoreMessages(conn.get("uri"), MESSAGECOUNT);
             }
           }
@@ -321,6 +327,7 @@ function genComponentConf() {
             useCase: undefined,
             useCaseGroup: undefined,
             connectionUri: undefined,
+            groupPostAdminUri: undefined,
           });
         }
       } else {
@@ -369,12 +376,16 @@ function genComponentConf() {
     selectNeed(needUri) {
       this.onSelectedNeed({ needUri }); //trigger callback with scope-object
     }
+    selectGroupChat(needUri) {
+      this.onSelectedGroupChat({ needUri }); //trigger callback with scope-object
+    }
 
     hasOpenOrLoadingChatConnections(need, allNeeds, process) {
       return (
         need.get("state") === won.WON.ActiveCompacted &&
         need.get("connections").filter(conn => {
-          if (!isChatConnection(conn)) return false;
+          if (!isChatConnection(conn) && !isGroupChatConnection(conn))
+            return false;
           if (
             process &&
             process.getIn(["connections", conn.get("uri"), "loading"])
@@ -403,7 +414,8 @@ function genComponentConf() {
     getOpenChatConnectionsArraySorted(need, allNeeds, process) {
       return sortByDate(
         need.get("connections").filter(conn => {
-          if (!isChatConnection(conn)) return false;
+          if (!isChatConnection(conn) && !isGroupChatConnection(conn))
+            return false;
           if (
             process &&
             process.getIn(["connections", conn.get("uri"), "loading"])
@@ -444,6 +456,7 @@ function genComponentConf() {
        */
       onSelectedConnection: "&",
       onSelectedNeed: "&",
+      onSelectedGroupChat: "&",
     },
     template: template,
   };
@@ -453,6 +466,7 @@ export default angular
   .module("won.owner.components.connectionsOverview", [
     squareImageModule,
     connectionSelectionItemModule,
+    groupAdministrationSelectionItemModule,
     postHeaderModule,
     connectionIndicatorsModule,
     extendedConnectionIndicatorsModule,

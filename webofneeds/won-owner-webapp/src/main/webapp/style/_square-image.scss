@@ -8,6 +8,10 @@
     position: relative;
     height: $size;
 
+    &.won-is-persona .image {
+      border-radius: 100%;
+    }
+
     &.inactive {
       -webkit-filter: grayscale(100%);
       filter: grayscale(100%);
@@ -30,6 +34,7 @@
       @include fixed-square($size/2);
       right: $size/7 * -1;
       bottom: $size/7 * -1;
+      z-index: 2;
     }
   }
 }

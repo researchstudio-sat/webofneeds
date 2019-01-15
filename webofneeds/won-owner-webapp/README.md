@@ -198,6 +198,8 @@ $ngRedux.getState();
        facets: Immutable.Map //all the facets that are present within the won:hasFacets predicate of a need
        state: "won:Active" | "won:Inactive", //state of the need
        types: Immutable.Set() // of need types e.g. won:Persona, won:Need, and any other types
+       groupMembers: Immutable.List() // needUris of participants of this needs (won:hasGroupMember) -> usually only set for groupChatNeeds
+       holds: Immutable.List() // needUris of the persona that holds these additional needs
        unread: true|false, //whether or not this need has new information that has not been read yet
        uri: string, //unique identifier of this need
        humanReadable: string, //a human Readable String that parses the content from is or seeks and searchString and makes a title out of it based on a certain logic
@@ -255,6 +257,13 @@ $ngRedux.getState();
            failedToLoad: true|false, //default is false, whether or not this connection was able to be loaded or not
            loadingMessages: true|false, //default is false, whether or not this connection is currently loading messages or processing agreements
            loading: true|false, //default is false, whether or not this connection is currently loading itself (similar to the loading in the need)
+           messages: {
+            [messageUri]: {
+                loading: true|false, //if the message is currently being loaded
+                failedToLoad: true|false, //if the message failed to load (fetch failed from the backend)
+                toLoad: true|false, //if the message is to be loaded (to figure out if a connection has messages that have not been loaded yet)
+            }
+           }
            petriNetData: {
                 loading: true|false, //default is false, whether or not the petriNetData has been loaded,
                 dirty: true|false //default is false, whether or not the currently stored petriNetData is (assumed to be) not correct anymore

@@ -35,12 +35,16 @@ won-connection-header {
   grid-column-gap: 0.5rem;
   min-width: 0;
 
+  .ch__groupicons,
   .ch__icon {
     grid-area: icon;
     width: $postIconSize;
+  }
 
+  .ch__icon {
     @include square-image($postIconSize);
   }
+
   .ch__right {
     grid-area: main;
     display: grid;
