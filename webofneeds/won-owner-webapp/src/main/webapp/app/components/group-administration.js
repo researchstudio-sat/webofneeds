@@ -4,7 +4,7 @@ import groupAdministrationHeaderModule from "./group-administration-header.js";
 import postHeaderModule from "./post-header.js";
 import labelledHrModule from "./labelled-hr.js";
 import { connect2Redux } from "../won-utils.js";
-import { attach, getIn, delay } from "../utils.js";
+import { attach, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { getGroupChatPostUriFromRoute } from "../selectors/general-selectors.js";
 import { getGroupChatConnectionsByNeedUri } from "../selectors/connection-selectors.js";
@@ -84,8 +84,6 @@ function genComponentConf() {
       window.pgm4dbg = this;
       this.won = won;
 
-      this.scrollContainer().addEventListener("scroll", e => this.onScroll(e));
-
       const selectFromState = state => {
         const groupPostAdminUri = getGroupChatPostUriFromRoute(state);
         const groupChatPost = getIn(state, ["needs", groupPostAdminUri]);
@@ -102,67 +100,10 @@ function genComponentConf() {
             groupChatConnections && groupChatConnections.size > 0,
           groupChatConnectionsArray:
             groupChatConnections && groupChatConnections.toArray(),
-          /*isSentRequest:
-            connection && connection.get("state") === won.WON.RequestSent,
-          isReceivedRequest:
-            connection && connection.get("state") === won.WON.RequestReceived,
-          isConnected:
-            connection && connection.get("state") === won.WON.Connected,
-          isSuggested:
-            connection && connection.get("state") === won.WON.Suggested,*/
         };
       };
 
       connect2Redux(selectFromState, actionCreators, [], this);
-
-      this._snapBottom = true; //Don't snap to bottom immediately, because this scrolls the whole page... somehow?
-
-      this.$scope.$watch(
-        () => this.groupChatConnections && this.groupChatConnections.size, // trigger if there's messages added (or removed)
-        () =>
-          delay(0).then(() =>
-            // scroll to bottom directly after rendering, if snapped
-            this.updateScrollposition()
-          )
-      );
-    }
-
-    snapToBottom() {
-      this._snapBottom = true;
-      this.scrollToBottom();
-    }
-    unsnapFromBottom() {
-      this._snapBottom = false;
-    }
-    updateScrollposition() {
-      if (this._snapBottom) {
-        this.scrollToBottom();
-      }
-    }
-    scrollToBottom() {
-      this._programmaticallyScrolling = true;
-
-      this.scrollContainer().scrollTop = this.scrollContainer().scrollHeight;
-    }
-    onScroll() {
-      if (!this._programmaticallyScrolling) {
-        //only unsnap if the user scrolled themselves
-        this.unsnapFromBottom();
-      }
-
-      const sc = this.scrollContainer();
-      const isAtBottom = sc.scrollTop + sc.offsetHeight >= sc.scrollHeight;
-      if (isAtBottom) {
-        this.snapToBottom();
-      }
-
-      this._programmaticallyScrolling = false;
-    }
-    scrollContainer() {
-      if (!this._scrollContainer) {
-        this._scrollContainer = this.$element[0].querySelector(".ga__content");
-      }
-      return this._scrollContainer;
     }
 
     openRequest(connUri, message) {
