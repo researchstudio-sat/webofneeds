@@ -38,7 +38,7 @@ function genComponentConf() {
         class="gi__icons__more"
         ng-if="self.groupMembersSize <= 3"
         ng-class="{
-          'gi__icons__more--spanCol': self.groupMembersSize == 2,
+          'gi__icons__more--spanCol': self.groupMembersSize == 2 || self.groupMembersSize == 0,
           'gi__icons__more--spanRow': self.groupMembersSize == 0
         }">
         {{ self.groupMembersSize }}

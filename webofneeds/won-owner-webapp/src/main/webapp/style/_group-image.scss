@@ -23,6 +23,10 @@ won-group-image {
   }
 
   & .gi__icons__more {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
     font-size: $smallFontSize;
     text-align: center;
     line-height: $postIconSize/2;
