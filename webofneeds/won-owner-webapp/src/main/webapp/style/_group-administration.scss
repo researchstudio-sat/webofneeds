@@ -45,26 +45,26 @@ won-group-administration {
     overflow: auto;
     flex-grow: 1;
 
-    .ga__content__participant {
+    .ga__content__member {
       padding: 0.5rem;
       border: $thinGrayBorder;
       background: white;
       display: grid;
-      grid-template-areas: "participant_info participant_actions";
+      grid-template-areas: "member_info member_actions";
       grid-template-columns: 1fr min-content;
       grid-gap: 0.25rem;
       align-items: center;
       margin-bottom: 0.5rem;
 
-      won-connection-header {
-        grid-area: participant_info;
+      won-post-header {
+        grid-area: member_info;
       }
 
       &__actions {
         display: grid;
         grid-auto-flow: column;
         grid-gap: 0.25rem;
-        grid-area: participant_actions;
+        grid-area: member_actions;
 
         &__button.won-button--outlined.red.thin {
           font-size: $smallFontSize;

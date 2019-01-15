@@ -8,7 +8,7 @@ import { actionCreators } from "../actions/actions.js";
 import { attach, getIn } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { getGroupChatConnectionsByNeedUri } from "../selectors/connection-selectors.js";
-import { generateGroupChatParticipantsLabel } from "../connection-utils.js";
+import { generateGroupChatMembersLabel } from "../connection-utils.js";
 
 import "style/_group-administration-header.scss";
 
@@ -26,8 +26,8 @@ function genComponentConf() {
           </div>
         </div>
         <div class="ch__right__subtitle">
-          <span class="ch__right__subtitle__participants">
-            {{ self.participantsLabel }}
+          <span class="ch__right__subtitle__members">
+            {{ self.membersLabel }}
           </span>
         </div>
       </div>
@@ -46,9 +46,7 @@ function genComponentConf() {
 
         return {
           groupChatNeed,
-          participantsLabel: generateGroupChatParticipantsLabel(
-            groupChatConnections
-          ),
+          membersLabel: generateGroupChatMembersLabel(groupChatConnections),
         };
       };
 

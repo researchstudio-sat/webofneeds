@@ -1,7 +1,7 @@
 import won from "../won-es6.js";
 import angular from "angular";
 import groupAdministrationHeaderModule from "./group-administration-header.js";
-import connectionHeaderModule from "./connection-header.js";
+import postHeaderModule from "./post-header.js";
 import labelledHrModule from "./labelled-hr.js";
 import { connect2Redux } from "../won-utils.js";
 import { attach, getIn, delay } from "../utils.js";
@@ -30,40 +30,40 @@ function genComponentConf() {
             <!-- todo impl and include groupchat context-dropdown -->
         </div>
         <div class="ga__content">
-            <div class="ga__content__participant"
+            <div class="ga__content__member"
                 ng-if="self.hasGroupChatConnections"
                 ng-repeat="conn in self.groupChatConnectionsArray">
-                <won-connection-header
-                    connection-uri="conn.get('uri')"
-                    hide-image="::false">
-                </won-connection-header>
-                <div class="ga__content__participant__actions">
+                <won-post-header
+                  need-uri="conn.get('remoteNeedUri')"
+                  hide-image="::false">
+                </won-post-header>
+                <div class="ga__content__member__actions">
                     <div
-                      class="ga__content__participant__actions__button red won-button--outlined thin"
+                      class="ga__content__member__actions__button red won-button--outlined thin"
                       ng-click="self.openRequest(conn.get('uri'))"
                       ng-if="conn.get('state') === self.won.WON.RequestReceived">
                         Accept
                     </div>
                     <div
-                      class="ga__content__participant__actions__button red won-button--outlined thin"
+                      class="ga__content__member__actions__button red won-button--outlined thin"
                       ng-click="self.closeConnection(conn.get('uri'))"
                       ng-if="conn.get('state') === self.won.WON.RequestReceived">
                         Reject
                     </div>
                     <div
-                      class="ga__content__participant__actions__button red won-button--outlined thin"
+                      class="ga__content__member__actions__button red won-button--outlined thin"
                       ng-click="self.sendRequest(conn.get('uri'), conn.get('remoteNeedUri'))"
                       ng-if="conn.get('state') === self.won.WON.Suggested">
                         Request
                     </div>
                     <div
-                      class="ga__content__participant__actions__button red won-button--outlined thin"
+                      class="ga__content__member__actions__button red won-button--outlined thin"
                       ng-disabled="true"
                       ng-if="conn.get('state') === self.won.WON.RequestSent">
                         Waiting for Accept...
                     </div>
                     <div
-                      class="ga__content__participant__actions__button red won-button--outlined thin"
+                      class="ga__content__member__actions__button red won-button--outlined thin"
                       ng-click="self.closeConnection(conn.get('uri'))"
                       ng-if="conn.get('state') === self.won.WON.Suggested || conn.get('state') === self.won.WON.Connected">
                         Remove
@@ -194,7 +194,7 @@ function genComponentConf() {
 export default angular
   .module("won.owner.components.groupAdministration", [
     groupAdministrationHeaderModule,
-    connectionHeaderModule,
+    postHeaderModule,
     labelledHrModule,
   ])
   .directive("wonGroupAdministration", genComponentConf).name;

@@ -110,8 +110,8 @@ export function isChatToGroup(needs, needUri, connUri) {
  * Creates a label of the participants and suggestions/requests/invites of a given set of groupChatConnections
  * @param groupChatConnections
  */
-export function generateGroupChatParticipantsLabel(groupChatConnections) {
-  const participantsSize = groupChatConnections.filter(
+export function generateGroupChatMembersLabel(groupChatConnections) {
+  const groupMembersSize = groupChatConnections.filter(
     conn => conn.get("state") === won.WON.Connected
   ).size;
   const suggestedSize = groupChatConnections.filter(
@@ -135,24 +135,24 @@ export function generateGroupChatParticipantsLabel(groupChatConnections) {
     }
   };
 
-  let participantsLabel = createPartOfLabel(
-    participantsSize,
-    "Participant",
-    "Participants"
+  let groupMembersLabel = createPartOfLabel(
+    groupMembersSize,
+    "Group Member",
+    "Group Members"
   );
 
   if (invitedSize > 0) {
-    if (participantsLabel.length > 0) {
-      participantsLabel += ", ";
+    if (groupMembersLabel.length > 0) {
+      groupMembersLabel += ", ";
     }
-    participantsLabel += createPartOfLabel(invitedSize, "Invited", "Invited");
+    groupMembersLabel += createPartOfLabel(invitedSize, "Invited", "Invited");
   }
 
   if (requestedSize > 0) {
-    if (participantsLabel.length > 0) {
-      participantsLabel += ", ";
+    if (groupMembersLabel.length > 0) {
+      groupMembersLabel += ", ";
     }
-    participantsLabel += createPartOfLabel(
+    groupMembersLabel += createPartOfLabel(
       requestedSize,
       "Request",
       "Requests"
@@ -160,15 +160,15 @@ export function generateGroupChatParticipantsLabel(groupChatConnections) {
   }
 
   if (suggestedSize > 0) {
-    if (participantsLabel.length > 0) {
-      participantsLabel += ", ";
+    if (groupMembersLabel.length > 0) {
+      groupMembersLabel += ", ";
     }
-    participantsLabel += createPartOfLabel(
+    groupMembersLabel += createPartOfLabel(
       suggestedSize,
       "Suggested",
       "Suggested"
     );
   }
 
-  return participantsLabel;
+  return groupMembersLabel;
 }
