@@ -40,6 +40,7 @@ export function addMessage(
     if (parsedMessage) {
       const connectionUri =
         insertIntoConnUri || parsedMessage.get("belongsToUri");
+      const hasContainedForwardedWonMessages = wonMessage.hasContainedForwardedWonMessages();
 
       let needUri = insertIntoNeedUri;
       if (!needUri && parsedMessage.getIn(["data", "outgoingMessage"])) {
@@ -48,6 +49,33 @@ export function addMessage(
       } else if (!needUri) {
         // needUri is the remote message's hasReceiverNeed
         needUri = wonMessage.getReceiverNeed();
+        if (
+          parsedMessage.getIn(["data", "unread"]) &&
+          !(
+            hasContainedForwardedWonMessages &&
+            isChatToGroup(state, needUri, connectionUri)
+          )
+        ) {
+          //If there is a new message for the connection we will set the connection to newConnection
+          state = state.setIn(
+            [needUri, "lastUpdateDate"],
+            parsedMessage.getIn(["data", "date"])
+          );
+          state = state.setIn([needUri, "unread"], true);
+          state = state.setIn(
+            [needUri, "connections", connectionUri, "lastUpdateDate"],
+            parsedMessage.getIn(["data", "date"])
+          );
+          state = state.setIn(
+            [needUri, "connections", connectionUri, "unread"],
+            true
+          );
+        }
+      } else if (
+        needUri &&
+        isChatToGroup &&
+        !hasContainedForwardedWonMessages
+      ) {
         if (parsedMessage.getIn(["data", "unread"])) {
           //If there is a new message for the connection we will set the connection to newConnection
           state = state.setIn(
@@ -79,8 +107,6 @@ export function addMessage(
       }
 
       if (needUri) {
-        const hasContainedForwardedWonMessages = wonMessage.hasContainedForwardedWonMessages();
-
         if (hasContainedForwardedWonMessages) {
           const containedForwardedWonMessages = wonMessage.getContainedForwardedWonMessages();
           containedForwardedWonMessages.map(forwardedWonMessage => {
