@@ -7,6 +7,8 @@ import groupImageModule from "./group-image.js";
 import { actionCreators } from "../actions/actions.js";
 import { attach, getIn } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
+import { getGroupChatConnectionsByNeedUri } from "../selectors/connection-selectors.js";
+import { generateGroupChatParticipantsLabel } from "../connection-utils.js";
 
 import "style/_group-administration-header.scss";
 
@@ -24,8 +26,8 @@ function genComponentConf() {
           </div>
         </div>
         <div class="ch__right__subtitle">
-          <span class="ch__right__subtitle__type">
-            TODO: Add number of (current) participants
+          <span class="ch__right__subtitle__participants">
+            {{ self.participantsLabel }}
           </span>
         </div>
       </div>
@@ -37,9 +39,16 @@ function genComponentConf() {
 
       const selectFromState = state => {
         const groupChatNeed = getIn(state, ["needs", this.needUri]);
+        const groupChatConnections = getGroupChatConnectionsByNeedUri(
+          state,
+          this.needUri
+        );
 
         return {
           groupChatNeed,
+          participantsLabel: generateGroupChatParticipantsLabel(
+            groupChatConnections
+          ),
         };
       };
 

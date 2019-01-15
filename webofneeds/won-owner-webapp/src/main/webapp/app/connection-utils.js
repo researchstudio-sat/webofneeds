@@ -105,3 +105,70 @@ export function isChatToGroup(needs, needUri, connUri) {
     }
   }
 }
+
+/**
+ * Creates a label of the participants and suggestions/requests/invites of a given set of groupChatConnections
+ * @param groupChatConnections
+ */
+export function generateGroupChatParticipantsLabel(groupChatConnections) {
+  const participantsSize = groupChatConnections.filter(
+    conn => conn.get("state") === won.WON.Connected
+  ).size;
+  const suggestedSize = groupChatConnections.filter(
+    conn => conn.get("state") === won.WON.Suggested
+  ).size;
+  const invitedSize = groupChatConnections.filter(
+    conn => conn.get("state") === won.WON.RequestSent
+  ).size;
+  const requestedSize = groupChatConnections.filter(
+    conn => conn.get("state") === won.WON.RequestReceived
+  ).size;
+
+  const createPartOfLabel = (size, entitySingular, entityPlural) => {
+    if (size == 0) {
+      return "No " + entityPlural + " yet";
+    }
+    if (size == 1) {
+      return size + " " + entitySingular;
+    } else if (size > 1) {
+      return size + " " + entityPlural;
+    }
+  };
+
+  let participantsLabel = createPartOfLabel(
+    participantsSize,
+    "Participant",
+    "Participants"
+  );
+
+  if (invitedSize > 0) {
+    if (participantsLabel.length > 0) {
+      participantsLabel += ", ";
+    }
+    participantsLabel += createPartOfLabel(invitedSize, "Invited", "Invited");
+  }
+
+  if (requestedSize > 0) {
+    if (participantsLabel.length > 0) {
+      participantsLabel += ", ";
+    }
+    participantsLabel += createPartOfLabel(
+      requestedSize,
+      "Request",
+      "Requests"
+    );
+  }
+
+  if (suggestedSize > 0) {
+    if (participantsLabel.length > 0) {
+      participantsLabel += ", ";
+    }
+    participantsLabel += createPartOfLabel(
+      suggestedSize,
+      "Suggested",
+      "Suggested"
+    );
+  }
+
+  return participantsLabel;
+}

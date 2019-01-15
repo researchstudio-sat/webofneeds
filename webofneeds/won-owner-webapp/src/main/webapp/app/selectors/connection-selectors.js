@@ -2,6 +2,7 @@
  * Created by fsuda on 05.11.2018.
  */
 
+import Immutable from "immutable";
 import {
   getOwnedNeedByConnectionUri,
   getOwnedNeeds,
@@ -56,7 +57,9 @@ export function getGroupChatConnectionsByNeedUri(state, needUri) {
   const need = needs && needs.get(needUri);
   const connections = need && need.get("connections");
 
-  return connections && connections.filter(conn => isGroupChatConnection(conn));
+  return connections
+    ? connections.filter(conn => isGroupChatConnection(conn))
+    : Immutable.Map();
 }
 
 /**
