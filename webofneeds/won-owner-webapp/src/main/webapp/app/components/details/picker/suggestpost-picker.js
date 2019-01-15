@@ -161,7 +161,7 @@ function genComponentConf() {
       uriToFetch = uriToFetch.trim();
 
       //TODO: ERROR HANDLING IF URL WAS NOT A FETCHABLE URL
-      this.needs__fetchSuggested(uriToFetch);
+      this.needs__fetchUnloadedNeed(uriToFetch);
       //this.update(uriToFetch);
       this.resetPostUriField();
     }

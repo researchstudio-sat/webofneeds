@@ -99,7 +99,7 @@ function genComponentConf() {
     loadPost() {
       if (this.content) {
         //this.content is the suggestedPostUri
-        this.needs__fetchSuggested(this.content);
+        this.needs__fetchUnloadedNeed(this.content);
       }
     }
 

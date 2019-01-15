@@ -7,7 +7,7 @@ import "ng-redux";
 import squareImageModule from "./square-image.js";
 import { actionCreators } from "../actions/actions.js";
 import { relativeTime } from "../won-label-utils.js";
-import { attach, getIn } from "../utils.js";
+import { attach, getIn, delay } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { selectLastUpdateTime } from "../selectors/general-selectors.js";
 import won from "../won-es6.js";
@@ -149,6 +149,17 @@ function genComponentConf() {
 
       classOnComponentRoot("won-is-loading", () => this.postLoading, this);
       classOnComponentRoot("won-is-toload", () => this.postToLoad, this);
+
+      this.$scope.$watch(
+        () => this.needUri,
+        () => delay(0).then(() => this.ensureNeedIsLoaded())
+      );
+    }
+
+    ensureNeedIsLoaded() {
+      if (this.postToLoad && !this.postLoading) {
+        this.needs__fetchUnloadedNeed(this.needUri);
+      }
     }
 
     hasTitle() {

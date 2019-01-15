@@ -48,7 +48,7 @@ import {
 import {
   needsConnect,
   fetchUnloadedNeeds,
-  fetchSuggested,
+  fetchUnloadedNeed,
   needsClose,
   needsDelete,
   needsOpen,
@@ -144,7 +144,7 @@ const actionHierarchy = {
     failed: INJ_DEFAULT,
     connect: needsConnect,
     fetchUnloadedNeeds: fetchUnloadedNeeds,
-    fetchSuggested: fetchSuggested,
+    fetchUnloadedNeed: fetchUnloadedNeed,
 
     storeOwnedInactiveUris: INJ_DEFAULT,
     storeOwnedInactiveUrisInLoading: INJ_DEFAULT,

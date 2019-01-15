@@ -126,46 +126,6 @@ export default function(processState = initialState, action = {}) {
       return processState.set("processingPublish", false);
     }
 
-    case actionTypes.needs.fetchSuggested: {
-      const suggestedPosts = action.payload.get("suggestedPosts");
-
-      if (!suggestedPosts) {
-        return processState;
-      }
-      return suggestedPosts.reduce((updatedState, suggestedPost) => {
-        const parsedNeed = suggestedPost && parseNeed(suggestedPost);
-        const needUri = get(parsedNeed, "uri");
-
-        const heldNeedUris = parsedNeed.get("holds");
-        if (heldNeedUris.size > 0) {
-          heldNeedUris.map(heldNeedUri => {
-            if (!processState.getIn(["needs", heldNeedUri])) {
-              processState = updateNeedProcess(processState, heldNeedUri, {
-                toLoad: true,
-              });
-            }
-          });
-        }
-
-        const groupMemberUris = parsedNeed.get("groupMembers");
-        if (groupMemberUris.size > 0) {
-          groupMemberUris.map(groupMemberUri => {
-            if (!processState.getIn(["needs", groupMemberUri])) {
-              processState = updateNeedProcess(processState, groupMemberUri, {
-                toLoad: true,
-              });
-            }
-          });
-        }
-
-        return updateNeedProcess(processState, needUri, {
-          toLoad: false,
-          failedToLoad: false,
-          loading: false,
-        });
-      }, processState);
-    }
-
     case actionTypes.account.logoutStarted:
       return processState.set("processingLogout", true);
 

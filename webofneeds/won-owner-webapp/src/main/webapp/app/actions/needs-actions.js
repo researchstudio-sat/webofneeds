@@ -21,7 +21,7 @@ export function fetchUnloadedNeeds() {
   };
 }
 
-export function fetchSuggested(needUri) {
+export function fetchUnloadedNeed(needUri) {
   return async dispatch => {
     fetchDataForNonOwnedNeedOnly(needUri, dispatch);
   };

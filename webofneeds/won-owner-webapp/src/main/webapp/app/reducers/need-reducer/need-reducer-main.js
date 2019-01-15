@@ -61,20 +61,6 @@ export default function(allNeedsInState = initialState, action = {}) {
         need.set("isOwned", false).set("connections", Immutable.Map())
       );
 
-    case actionTypes.needs.fetchSuggested: {
-      const suggestedPosts = action.payload.get("suggestedPosts");
-
-      if (!suggestedPosts) {
-        return allNeedsInState;
-      }
-
-      return suggestedPosts.reduce(
-        (updatedState, suggestedPost) =>
-          addNeed(updatedState, suggestedPost, false),
-        allNeedsInState
-      );
-    }
-
     case actionTypes.needs.storeOwnedActiveUris: {
       return addOwnActiveNeedsInLoading(
         allNeedsInState,
