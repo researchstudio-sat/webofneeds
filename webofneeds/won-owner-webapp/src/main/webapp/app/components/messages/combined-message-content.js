@@ -23,6 +23,9 @@ function genComponentConf() {
       <div class="msg__header" ng-if="!self.isConnectionMessage && !self.hasNotBeenLoaded">
           <div class="msg__header__type">{{ self.getTypeHeaderLabel() }}</div>
       </div>
+      <div class="msg__header" ng-if="self.personaName && self.isConnectionMessage && !self.hasNotBeenLoaded && !(self.hasClaims || self.hasProposes)">
+          <div class="msg__header__type">{{ self.personaName }}</div>
+      </div>
       <div class="msg__header msg__header--agreement" ng-if="self.isConnectionMessage && (self.hasClaims || self.hasProposes) && !self.hasNotBeenLoaded">
           <div class="msg__header__type">{{ self.getAgreementHeaderLabel() }}</div>
       </div>
@@ -87,9 +90,26 @@ function genComponentConf() {
         const allConnections = getOwnedConnections(state);
         const allNeeds = getNeeds(state);
 
+        /*Extract persona name from message:
+
+          either within the need of the originatorUri-need (in group-chat-messages)
+          or
+          within the remoteNeedUri-need of the connection (for 1:1 chats)
+        */
+        const relevantNeedUri =
+          !get(message, "outgoingMessage") && this.groupChatMessage
+            ? get(message, "originatorUri")
+            : get(connection, "remoteNeedUri");
+        const relevantPersonaUri =
+          relevantNeedUri && getIn(allNeeds, [relevantNeedUri, "heldBy"]);
+        const personaName =
+          relevantPersonaUri &&
+          getIn(allNeeds, [relevantPersonaUri, "jsonld", "s:name"]);
+
         return {
           allNeeds,
           allConnections,
+          personaName,
           multiSelectType: connection && connection.get("multiSelectType"),
           contentGraphTrig: get(message, "contentGraphTrigRaw"),
           shouldShowRdf: state.getIn(["view", "showRdf"]),
