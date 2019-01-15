@@ -70,7 +70,6 @@ function genComponentConf() {
 
             <!-- CHATVIEW SPECIFIC CONTENT START-->
             <won-connection-message
-                ng-click="self.selectMessage(msg)"
                 ng-repeat="msg in self.sortedMessages"
                 connection-uri="self.connectionUri"
                 message-uri="msg.get('uri')"
@@ -426,17 +425,6 @@ function genComponentConf() {
           this.router__stateGoCurrent({ connectionUri: null });
           break;
       }
-    }
-
-    selectMessage(msg) {
-      const selected = msg.getIn(["viewState", "isSelected"]);
-
-      this.messages__viewState__markAsSelected({
-        messageUri: msg.get("uri"),
-        connectionUri: this.connection.get("uri"),
-        needUri: this.ownedNeed.get("uri"),
-        isSelected: !selected,
-      });
     }
   }
   Controller.$inject = serviceDependencies;
