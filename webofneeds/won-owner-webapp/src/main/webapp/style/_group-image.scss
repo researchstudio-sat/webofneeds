@@ -13,6 +13,13 @@ won-group-image {
   & .gi__icons__icon,
   & .gi__icons__more {
     @include square-image($postIconSize/2);
+
+    &--spanRow {
+      grid-row: auto / span 2;
+    }
+    &--spanCol {
+      grid-column: auto / span 2;
+    }
   }
 
   & .gi__icons__more {

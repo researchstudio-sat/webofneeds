@@ -25,6 +25,7 @@ function genComponentConf() {
   let template = `
       <div class="gi__icons__icon"
         ng-repeat="groupMemberUri in self.groupMembersArray"
+        ng-class="{'gi__icons__icon--spanCol': self.groupMembersSize == 1}"
         ng-if="self.groupMembersSize <= 4 || $index < 3">
         <won-square-image
           uri="groupMemberUri">
@@ -32,6 +33,15 @@ function genComponentConf() {
       </div>
       <div class="gi__icons__more" ng-if="self.groupMembersSize > 4">
          +
+      </div>
+      <div
+        class="gi__icons__more"
+        ng-if="self.groupMembersSize <= 3"
+        ng-class="{
+          'gi__icons__more--spanCol': self.groupMembersSize == 2,
+          'gi__icons__more--spanRow': self.groupMembersSize == 0
+        }">
+        {{ self.groupMembersSize }}
       </div>
     `;
 
