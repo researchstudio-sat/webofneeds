@@ -1,5 +1,8 @@
 /**
  * Component for rendering the icon of a groupChat (renders participants icons)
+ * Can be included with either:
+ *    connection-uri: then the participants of the remoteNeed are shown
+ *    need-uri: then the participants of the need behind the need uri are shown
  * Created by quasarchimaere on 15.01.2019.
  */
 import angular from "angular";
@@ -10,7 +13,6 @@ import { actionCreators } from "../actions/actions.js";
 import { labels } from "../won-label-utils.js";
 import { attach, get } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
-import { isChatToGroup } from "../connection-utils.js";
 import {
   getOwnedNeedByConnectionUri,
   getNeeds,
@@ -39,34 +41,34 @@ function genComponentConf() {
       this.labels = labels;
       this.WON = won.WON;
       const selectFromState = state => {
-        const ownedNeed = getOwnedNeedByConnectionUri(
-          state,
-          this.connectionUri
-        );
-        const connection =
-          ownedNeed && ownedNeed.getIn(["connections", this.connectionUri]);
-        const remoteNeed =
-          connection && get(getNeeds(state), connection.get("remoteNeedUri"));
-        const groupMembers = remoteNeed && remoteNeed.get("groupMembers");
+        let groupMembers;
+
+        if (this.connectionUri) {
+          const ownedNeed = getOwnedNeedByConnectionUri(
+            state,
+            this.connectionUri
+          );
+          const connection =
+            ownedNeed && ownedNeed.getIn(["connections", this.connectionUri]);
+          const remoteNeed =
+            connection && get(getNeeds(state), connection.get("remoteNeedUri"));
+          groupMembers = remoteNeed && remoteNeed.get("groupMembers");
+        } else if (this.needUri) {
+          const need = get(getNeeds(state), this.needUri);
+
+          groupMembers = need && need.get("groupMembers");
+        }
 
         return {
-          connection,
-          groupMembersArray: groupMembers && groupMembers.toArray(),
+          groupMembersArray: groupMembers ? groupMembers.toArray() : [],
           groupMembersSize: groupMembers ? groupMembers.size : 0,
-          ownedNeed,
-          remoteNeed,
-          isConnectionToGroup: isChatToGroup(
-            state.get("needs"),
-            get(ownedNeed, "uri"),
-            this.connectionUri
-          ),
         };
       };
 
       connect2Redux(
         selectFromState,
         actionCreators,
-        ["self.connectionUri"],
+        ["self.connectionUri", "self.needUri"],
         this
       );
     }
@@ -79,6 +81,7 @@ function genComponentConf() {
     bindToController: true, //scope-bindings -> ctrl
     scope: {
       connectionUri: "=",
+      needUri: "=",
     },
     template: template,
   };

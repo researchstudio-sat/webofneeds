@@ -4,30 +4,7 @@
 @import "animate";
 
 won-group-administration-header {
-  &.won-is-loading {
-    @include animateOpacityHeartBeat();
-    pointer-events: none;
-
-    .ch__icon__skeleton {
-      @include fixed-square($postIconSize);
-      background-color: $won-skeleton-color;
-    }
-
-    .ch__right__subtitle__type {
-      height: $smallFontSize;
-      width: 5rem;
-      background-color: $won-skeleton-color;
-    }
-
-    .ch__right__topline__title {
-      height: $normalFontSize;
-      width: 7rem;
-      background-color: $won-skeleton-color;
-    }
-  }
-
   color: black;
-  //padding: 0.5rem;
 
   display: grid;
   grid-template-areas: "icon main";
@@ -35,11 +12,9 @@ won-group-administration-header {
   grid-column-gap: 0.5rem;
   min-width: 0;
 
-  .ch__icon {
+  & won-group-image.ch__icon {
     grid-area: icon;
     width: $postIconSize;
-
-    @include square-image($postIconSize);
   }
   .ch__right {
     grid-area: main;
@@ -50,16 +25,12 @@ won-group-administration-header {
       grid-area: topline;
       min-width: 0;
 
-      &__notitle,
       &__title {
         white-space: nowrap;
         text-overflow: ellipsis;
         overflow: hidden;
         font-weight: 400;
         min-width: 0;
-      }
-      &__notitle {
-        color: $won-subtitle-gray;
       }
     }
     &__subtitle {
@@ -77,15 +48,6 @@ won-group-administration-header {
         overflow: hidden;
         white-space: nowrap;
 
-        won-connection-state {
-          display: inline-block;
-          padding-right: 0.25rem;
-
-          svg {
-            @include fixed-square($smallFontSize);
-          }
-        }
-
         &__message.won-unread,
         &__unreadcount {
           color: $won-primary-color;
@@ -94,14 +56,6 @@ won-group-administration-header {
         &__message {
           font-style: italic;
         }
-      }
-
-      &__date {
-        font-size: $smallFontSize;
-        color: $won-subtitle-gray;
-        white-space: nowrap;
-        padding-left: 0.5rem;
-        min-width: 0;
       }
     }
   }
