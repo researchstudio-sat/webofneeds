@@ -13,7 +13,7 @@ To renew the certificate note the following things:
 - execute `docker exec livesatvm01_letsencrypt_1 bash //usr/local/bin/certificate-request-and-renew.sh` for certificate renewal on host satvm01
 - this script can be changed for testing e.g. by adding parameters like `--dry-run or --test-cert` to the certbot
 - this should renew the letsencrypt certificate in `$base_folder/letsencrypt/certs/live/matchat.org` on the host
-- check if the .pem files and the java key store files (.jks and .pfx) in the same folder have also been updated
+- check if the .pem files and the java key store files (.jks and .pfx) in the same folder have also been updated. These are symlinks into `../../archive/<domainname>/`, you might want to follow those symlinks and check that they are pointing to new files
 - delete all (trust store) files in directory `$base_folder/won-client-certs/` on all hosts (satvm01)
 - redeploy all live containers (with jenkins job)
 - check if everything works (HTTPS, websocket and JMS communication)
