@@ -103,24 +103,18 @@ export function generateFullNeedTypesLabel(needImm) {
  */
 export function generateShortNeedTypesLabel(needImm) {
   const needTypes = needImm && needImm.get("types");
-  // const matchingContexts = needImm && needImm.get("matchingContexts");
-
-  if (isWhatsAroundNeed(needImm)) {
-    return "";
-  }
-  if (isWhatsNewNeed(needImm)) {
-    return "";
-  }
-  if (isSearchNeed(needImm)) {
-    return "Search";
-  }
-  if (isDirectResponseNeed(needImm)) {
-    return "Direct Response";
-  }
+  const matchingContexts = needImm && needImm.get("matchingContexts");
 
   let label = "";
 
-  if (needTypes && needTypes.size > 0) {
+  if (isWhatsAroundNeed(needImm) || isWhatsNewNeed(needImm)) {
+    label = "";
+  } else if (isSearchNeed(needImm)) {
+    label = "Search";
+  } else if (isDirectResponseNeed(needImm)) {
+    label = "Direct Response";
+    // TODO: groupchat label
+  } else if (needTypes && needTypes.size > 0) {
     let types = new Array();
     for (let type of Array.from(needTypes)) {
       // hide won:Need
@@ -133,13 +127,14 @@ export function generateShortNeedTypesLabel(needImm) {
     }
     label += types.join(", ");
   }
-  // hide matching context
-  // if (matchingContexts && matchingContexts.size > 0) {
-  //   if (label.length > 0) {
-  //     label += " ";
-  //   }
-  //   label += "in " + matchingContexts.join(", ");
-  // }
+
+  // add matching contexts
+  if (matchingContexts && matchingContexts.size > 0) {
+    if (label.length === 0) {
+      label += "Posted in " + matchingContexts.join(", ");
+    }
+    label += " in " + matchingContexts.join(", ");
+  }
 
   return label;
 }
