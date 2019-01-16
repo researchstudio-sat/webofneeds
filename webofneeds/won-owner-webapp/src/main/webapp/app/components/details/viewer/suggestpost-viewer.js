@@ -79,33 +79,51 @@ function genComponentConf() {
         const hasConnectionBetweenPosts =
           connectionsBetweenPosts && connectionsBetweenPosts.size > 0;
 
+        const isLoading = state.getIn([
+          "process",
+          "needs",
+          this.content,
+          "loading",
+        ]);
+        const toLoad = state.getIn([
+          "process",
+          "needs",
+          this.content,
+          "toLoad",
+        ]);
+        const failedToLoad = state.getIn([
+          "process",
+          "needs",
+          this.content,
+          "failedToLoad",
+        ]);
+
+        const fetchedSuggestion = !isLoading && !toLoad && !failedToLoad;
+
         return {
           suggestedPost,
           openedOwnPost,
           hasChatFacet: hasChatFacet(suggestedPost),
           hasGroupFacet: hasGroupFacet(suggestedPost),
           showConnectAction:
+            suggestedPost &&
+            fetchedSuggestion &&
             !hasGroupFacet(suggestedPost) &&
             hasChatFacet(suggestedPost) &&
             !hasConnectionBetweenPosts &&
-            suggestedPost &&
             !isOwned(suggestedPost) &&
-            self.openedOwnPost,
+            openedOwnPost,
           showJoinAction:
+            suggestedPost &&
+            fetchedSuggestion &&
             hasGroupFacet(suggestedPost) &&
             !hasChatFacet(suggestedPost) &&
             !hasConnectionBetweenPosts &&
-            suggestedPost &&
             !isOwned(suggestedPost) &&
-            self.openedOwnPost,
-          isLoading: state.getIn(["process", "needs", this.content, "loading"]),
-          toLoad: state.getIn(["process", "needs", this.content, "toLoad"]),
-          failedToLoad: state.getIn([
-            "process",
-            "needs",
-            this.content,
-            "failedToLoad",
-          ]),
+            openedOwnPost,
+          isLoading,
+          toLoad,
+          failedToLoad,
           multiSelectType: connection && connection.get("multiSelectType"),
           hasConnectionBetweenPosts,
         };
