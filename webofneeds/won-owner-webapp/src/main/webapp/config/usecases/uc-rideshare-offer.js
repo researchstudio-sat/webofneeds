@@ -4,7 +4,7 @@
 import { details, emptyDraft } from "../detail-definitions.js";
 import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-utils.js";
 import won from "../../app/won-es6.js";
-import { getIn /*, isValidDate */ } from "../../app/utils.js";
+import { getIn, isValidDate } from "../../app/utils.js";
 import {
   filterInVicinity,
   filterAboutTime,
@@ -50,7 +50,7 @@ export const rideShareOffer = {
         `${resultName} won:seeks ?seeks.`,
         fromLocation && `?seeks won:travelAction/s:fromLocation ?fromLocation.`,
         toLocation && `?seeks won:travelAction/s:toLocation ?toLocation.`,
-        //  isValidDate(fromTime) && `?seeks s:validFrom ?starttime`,
+        isValidDate(fromTime) && `?seeks s:validFrom ?starttime.`,
       ],
     };
 
