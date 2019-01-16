@@ -6,8 +6,26 @@ import won from "./won-es6.js";
 import { get, getIn } from "./utils.js";
 
 /**
+ * Determines if a given need is a Active
+ * @param need
+ * @returns {*|boolean}
+ */
+export function isActive(need) {
+  return get(need, "state") && get(need, "state") === won.WON.ActiveCompacted;
+}
+
+/**
+ * Determines if a given need is a Inactive
+ * @param need
+ * @returns {*|boolean}
+ */
+export function isInactive(need) {
+  return get(need, "state") && get(need, "state") === won.WON.InactiveCompacted;
+}
+
+/**
  * Determines if a given need is a WhatsAround-Need
- * @param msg
+ * @param need
  * @returns {*|boolean}
  */
 export function isWhatsAroundNeed(need) {
@@ -19,7 +37,7 @@ export function isWhatsAroundNeed(need) {
 
 /**
  * Determines if a given need is a DirectResponse-Need
- * @param msg
+ * @param need
  * @returns {*|boolean}
  */
 export function isDirectResponseNeed(need) {
@@ -53,7 +71,7 @@ export function hasGroupFacet(need) {
 
 /**
  * Determines if a given need is a Search-Need (see draft in create-search.js)
- * @param msg
+ * @param need
  * @returns {*|boolean}
  */
 export function isSearchNeed(need) {
@@ -62,7 +80,7 @@ export function isSearchNeed(need) {
 
 /**
  * Determines if a given need is a WhatsNew-Need
- * @param msg
+ * @param need
  * @returns {*|boolean}
  */
 export function isWhatsNewNeed(need) {

@@ -7,11 +7,8 @@ import { connect2Redux } from "../../../won-utils.js";
 import { actionCreators } from "../../../actions/actions.js";
 import postHeaderModule from "../../post-header.js";
 import labelledHrModule from "../../labelled-hr.js";
-import {
-  getConnectionUriFromRoute,
-  getOwnedNeedByConnectionUri,
-  getOpenPosts,
-} from "../../../selectors/general-selectors.js";
+import { getActiveNeeds } from "../../../selectors/general-selectors.js";
+import { isWhatsAroundNeed, isWhatsNewNeed } from "../../../need-utils.js";
 
 import "style/_suggestpostpicker.scss";
 
@@ -20,51 +17,51 @@ function genComponentConf() {
   let template = `
       <div class="suggestpostp__posts" ng-if="self.suggestionsAvailable">
         <div class="suggestpostp__posts__post clickable"
-          ng-class="{'won--selected': self.isSelected(post)}"
-          ng-repeat="post in self.sortedOpenPosts"
-          ng-click="self.selectPost(post)">
+          ng-class="{'won--selected': self.isSelected(need)}"
+          ng-repeat="need in self.sortedActiveNeeds"
+          ng-click="self.selectNeed(need)">
           <won-post-header
-              need-uri="post.get('uri')"
-              timestamp="post.get('creationDate')"
+              need-uri="need.get('uri')"
+              timestamp="need.get('creationDate')"
               hide-image="::false">
           </won-post-header>
         </div>
       </div>
       <div class="suggestpostp__noposts" ng-if="!self.suggestionsAvailable">
-        No Posts available to suggest
+        No Needs available to suggest
       </div>
-      <won-labelled-hr label="::'Not happy with the options? Add a Post-URI below'" class="suggestpostp__labelledhr"></won-labelled-hr>
+      <won-labelled-hr label="::'Not happy with the options? Add a Need-URI below'" class="suggestpostp__labelledhr"></won-labelled-hr>
       <div class="suggestpostp__input">
          <svg class="suggestpostp__input__icon clickable"
             style="--local-primary:var(--won-primary-color);"
-            ng-if="!self.suggestedPostLoading && self.showFetchButton && !self.suggestedPostFailedToLoad"
-            ng-click="self.fetchPost()">
+            ng-if="!self.uriToFetchLoading && self.showFetchButton && !self.uriToFetchFailed && self.fetchNeedUriFieldHasText()"
+            ng-click="self.fetchNeed()">
             <use xlink:href="#ico16_checkmark" href="#ico16_checkmark"></use>
          </svg>
          <svg class="suggestpostp__input__icon clickable"
             style="--local-primary:var(--won-primary-color);"
-            ng-if="!self.suggestedPostLoading && (self.showResetButton || self.suggestedPostFailedToLoad) && self.fetchPostUriFieldHasText()"
-            ng-click="self.resetPostUriField()">
+            ng-if="!self.uriToFetchLoading && (self.showResetButton || self.uriToFetchFailed) && self.fetchNeedUriFieldHasText()"
+            ng-click="self.resetNeedUriField()">
             <use xlink:href="#ico36_close" href="#ico36_close"></use>
          </svg>
          <svg class="suggestpostp__input__icon hspinner"
-            ng-if="self.suggestedPostLoading">
+            ng-if="self.uriToFetchLoading">
             <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
          </svg>
          <input
             type="url"
             placeholder="{{self.detail.placeholder}}"
             class="suggestpostp__input__inner"
-            won-input="::self.updateFetchPostUriField()"/>
+            won-input="::self.updateFetchNeedUriField()"/>
       </div>
-      <div class="suggestpostp__error" ng-if="self.suggestedPostFailedToLoad && self.fetchPostUriFieldHasText()">
-        Failed to Load Post, might not be a valid uri.
+      <div class="suggestpostp__error" ng-if="self.uriToFetchFailedToLoad && self.fetchNeedUriFieldHasText()">
+          Failed to Load Suggestion, might not be a valid uri.
       </div>
-      <div class="suggestpostp__error" ng-if="self.suggestedPostIsOpenedPost && self.fetchPostUriFieldHasText()">
-        Suggestion invalid, you are trying to suggest your own post, they already know about it.
+      <div class="suggestpostp__error" ng-if="self.uriToFetchIsWhatsNew && self.fetchNeedUriFieldHasText()">
+          Suggestion invalid, you are trying to share a What's New Need.
       </div>
-      <div class="suggestpostp__error" ng-if="self.suggestedPostIsTheirPost && self.fetchPostUriFieldHasText()">
-        Suggestion invalid, you are trying to suggest their post, they already know about it.
+      <div class="suggestpostp__error" ng-if="self.uriToFetchIsWhatsAround && self.fetchNeedUriFieldHasText()">
+          Suggestion invalid, you are trying to share a What's Around Need.
       </div>
     `;
 
@@ -81,72 +78,68 @@ function genComponentConf() {
       this.uriToFetch = undefined;
 
       const selectFromState = state => {
-        const openedConnectionUri = getConnectionUriFromRoute(state);
-        const openedOwnPost =
-          openedConnectionUri &&
-          getOwnedNeedByConnectionUri(state, openedConnectionUri);
-        const connection = getIn(openedOwnPost, [
-          "connections",
-          openedConnectionUri,
-        ]);
+        const suggestedNeedUri = this.initialValue;
+        const allActiveNeeds = getActiveNeeds(state);
 
-        const openedOwnPostUri = get(openedOwnPost, "uri");
-        const openedTheirPostUri = get(connection, "remoteNeedUri");
+        const allSuggestableNeeds =
+          allActiveNeeds &&
+          allActiveNeeds.filter(need => this.isSuggestable(need));
 
-        const suggestedPostUri = this.initialValue;
-        const allOpenPosts = getOpenPosts(state);
+        const allForbiddenNeeds =
+          allActiveNeeds &&
+          allActiveNeeds.filter(need => !this.isSuggestable(need));
 
-        const allOpenPostsWithoutCurrent =
-          allOpenPosts &&
-          openedOwnPostUri &&
-          openedTheirPostUri &&
-          allOpenPosts.filter(
-            post =>
-              post.get("uri") != openedOwnPostUri &&
-              post.get("uri") != openedTheirPostUri
-          );
-        const suggestedPost = get(allOpenPostsWithoutCurrent, suggestedPostUri);
-        const sortedOpenPosts =
-          allOpenPostsWithoutCurrent &&
-          sortBy(allOpenPostsWithoutCurrent, elem =>
+        const suggestedNeed = get(allSuggestableNeeds, suggestedNeedUri);
+        const sortedActiveNeeds =
+          allSuggestableNeeds &&
+          sortBy(allSuggestableNeeds, elem =>
             (elem.get("humanReadable") || "").toLowerCase()
           );
 
-        const suggestedPostProcess = getIn(state, [
+        const uriToFetchProcess = getIn(state, [
           "process",
           "needs",
           this.uriToFetch,
         ]);
-        const suggestedPostLoading = !!get(suggestedPostProcess, "loading");
-        const suggestedPostFailedToLoad = !!get(
-          suggestedPostProcess,
-          "failedToLoad"
+        const uriToFetchLoading = !!get(uriToFetchProcess, "loading");
+        const uriToFetchFailedToLoad = !!get(uriToFetchProcess, "failedToLoad");
+        const uriToFetchIsWhatsNew = isWhatsNewNeed(
+          get(allForbiddenNeeds, this.uriToFetch)
         );
-        const suggestedPostIsOpenedPost = this.uriToFetch === openedOwnPostUri;
-        const suggestedPostIsTheirPost = this.uriToFetch === openedTheirPostUri;
+        const uriToFetchIsWhatsAround = isWhatsAroundNeed(
+          get(allForbiddenNeeds, this.uriToFetch)
+        );
 
         return {
-          suggestedPostUri,
-          suggestedPostLoading,
-          suggestedPostFailedToLoad,
-          suggestedPostIsOpenedPost,
-          suggestedPostIsTheirPost,
-          allOpenPostsWithoutCurrent,
+          suggestedNeedUri,
+          uriToFetchLoading,
+          uriToFetchFailedToLoad,
+          uriToFetchIsWhatsNew,
+          uriToFetchIsWhatsAround,
+          allSuggestableNeeds,
+          allForbiddenNeeds,
           suggestionsAvailable:
-            allOpenPostsWithoutCurrent && allOpenPostsWithoutCurrent.size > 0,
-          sortedOpenPosts,
-          suggestedPost,
+            allSuggestableNeeds && allSuggestableNeeds.size > 0,
+          sortedActiveNeeds,
+          suggestedNeed,
           uriToFetchSuccess:
             this.uriToFetch &&
-            !suggestedPostLoading &&
-            !suggestedPostFailedToLoad,
+            !uriToFetchLoading &&
+            !uriToFetchFailedToLoad &&
+            get(allSuggestableNeeds, this.uriToFetch),
+          uriToFetchFailed:
+            this.uriToFetch &&
+            !uriToFetchLoading &&
+            (uriToFetchFailedToLoad ||
+              uriToFetchIsWhatsAround ||
+              uriToFetchIsWhatsNew),
         };
       };
 
       connect2Redux(
         selectFromState,
         actionCreators,
-        ["self.initialValue", "self.detail"],
+        ["self.initialValue", "self.detail", "self.uriToFetch"],
         this
       );
 
@@ -156,17 +149,21 @@ function genComponentConf() {
           delay(0).then(() => {
             if (this.uriToFetchSuccess) {
               this.update(this.uriToFetch);
-              this.resetPostUriField();
+              this.resetNeedUriField();
             }
           })
       );
     }
 
-    isSelected(post) {
+    isSuggestable(need) {
+      return !isWhatsAroundNeed(need) && !isWhatsNewNeed(need);
+    }
+
+    isSelected(need) {
       return (
-        post &&
-        this.suggestedPost &&
-        post.get("uri") === this.suggestedPost.get("uri")
+        need &&
+        this.suggestedNeed &&
+        need.get("uri") === this.suggestedNeed.get("uri")
       );
     }
 
@@ -181,7 +178,7 @@ function genComponentConf() {
       }
     }
 
-    updateFetchPostUriField() {
+    updateFetchNeedUriField() {
       const text = this.fetchUriField().value;
       this.uriToFetch = undefined;
 
@@ -196,26 +193,30 @@ function genComponentConf() {
       }
     }
 
-    fetchPostUriFieldHasText() {
+    fetchNeedUriFieldHasText() {
       const text = this.fetchUriField().value;
       return text && text.length > 0;
     }
 
-    resetPostUriField() {
+    resetNeedUriField() {
       this.fetchUriField().value = "";
       this.showResetButton = false;
       this.showFetchButton = false;
       this.uriToFetch = undefined;
     }
 
-    fetchPost() {
+    fetchNeed() {
       let uriToFetch = this.fetchUriField().value;
       uriToFetch = uriToFetch.trim();
 
-      //TODO: ERROR HANDLING IF URL WAS NOT A FETCHABLE URL
-      if (!getIn(this.allOpenPostsWithoutCurrent, uriToFetch)) {
+      if (
+        !getIn(this.allSuggestableNeeds, uriToFetch) &&
+        !get(this.allForbiddenNeeds, uriToFetch)
+      ) {
         this.uriToFetch = uriToFetch;
         this.needs__fetchUnloadedNeed(uriToFetch);
+      } else if (get(this.allForbiddenNeeds, uriToFetch)) {
+        this.uriToFetch = uriToFetch;
       } else {
         this.update(uriToFetch);
       }
@@ -230,11 +231,11 @@ function genComponentConf() {
       return this._fetchUriInput;
     }
 
-    selectPost(post) {
-      const postUri = post && post.get("uri");
+    selectNeed(need) {
+      const needUri = get(need, "uri");
 
-      if (postUri) {
-        this.update(postUri);
+      if (needUri) {
+        this.update(needUri);
       }
     }
   }
