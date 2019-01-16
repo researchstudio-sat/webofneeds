@@ -1,6 +1,6 @@
 import angular from "angular";
 import "ng-redux";
-import { attach, sortBy } from "../../../utils.js";
+import { attach, sortBy, get, getIn, delay } from "../../../utils.js";
 import { DomCache } from "../../../cstm-ng-utils.js";
 import wonInput from "../../../directives/input.js";
 import { connect2Redux } from "../../../won-utils.js";
@@ -21,7 +21,7 @@ function genComponentConf() {
       <div class="suggestpostp__posts" ng-if="self.suggestionsAvailable">
         <div class="suggestpostp__posts__post clickable"
           ng-class="{'won--selected': self.isSelected(post)}"
-          ng-repeat="post in self.sortedOpenNeeds"
+          ng-repeat="post in self.sortedOpenPosts"
           ng-click="self.selectPost(post)">
           <won-post-header
               need-uri="post.get('uri')"
@@ -37,21 +37,34 @@ function genComponentConf() {
       <div class="suggestpostp__input">
          <svg class="suggestpostp__input__icon clickable"
             style="--local-primary:var(--won-primary-color);"
-            ng-if="self.showFetchButton"
+            ng-if="!self.suggestedPostLoading && self.showFetchButton && !self.suggestedPostFailedToLoad"
             ng-click="self.fetchPost()">
             <use xlink:href="#ico16_checkmark" href="#ico16_checkmark"></use>
          </svg>
          <svg class="suggestpostp__input__icon clickable"
             style="--local-primary:var(--won-primary-color);"
-            ng-if="self.showResetButton"
+            ng-if="!self.suggestedPostLoading && (self.showResetButton || self.suggestedPostFailedToLoad) && self.fetchPostUriFieldHasText()"
             ng-click="self.resetPostUriField()">
             <use xlink:href="#ico36_close" href="#ico36_close"></use>
+         </svg>
+         <svg class="suggestpostp__input__icon hspinner"
+            ng-if="self.suggestedPostLoading">
+            <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
          </svg>
          <input
             type="url"
             placeholder="{{self.detail.placeholder}}"
             class="suggestpostp__input__inner"
             won-input="::self.updateFetchPostUriField()"/>
+      </div>
+      <div class="suggestpostp__error" ng-if="self.suggestedPostFailedToLoad && self.fetchPostUriFieldHasText()">
+        Failed to Load Post, might not be a valid uri.
+      </div>
+      <div class="suggestpostp__error" ng-if="self.suggestedPostIsOpenedPost && self.fetchPostUriFieldHasText()">
+        Suggestion invalid, you are trying to suggest your own post, they already know about it.
+      </div>
+      <div class="suggestpostp__error" ng-if="self.suggestedPostIsTheirPost && self.fetchPostUriFieldHasText()">
+        Suggestion invalid, you are trying to suggest their post, they already know about it.
       </div>
     `;
 
@@ -65,47 +78,68 @@ function genComponentConf() {
       this.showFetchButton = false;
       this.showResetButton = false;
 
+      this.uriToFetch = undefined;
+
       const selectFromState = state => {
         const openedConnectionUri = getConnectionUriFromRoute(state);
         const openedOwnPost =
           openedConnectionUri &&
           getOwnedNeedByConnectionUri(state, openedConnectionUri);
-        const connection =
-          openedOwnPost &&
-          openedOwnPost.getIn(["connections", openedConnectionUri]);
+        const connection = getIn(openedOwnPost, [
+          "connections",
+          openedConnectionUri,
+        ]);
 
-        const openedOwnPostUri = openedOwnPost && openedOwnPost.get("uri");
-        const openedTheirPostUri =
-          connection && connection.get("remoteNeedUri");
+        const openedOwnPostUri = get(openedOwnPost, "uri");
+        const openedTheirPostUri = get(connection, "remoteNeedUri");
 
         const suggestedPostUri = this.initialValue;
-        const allOpenNeeds = getOpenPosts(state);
+        const allOpenPosts = getOpenPosts(state);
 
-        const allOpenNeedsWithoutCurrent =
-          allOpenNeeds &&
+        const allOpenPostsWithoutCurrent =
+          allOpenPosts &&
           openedOwnPostUri &&
-          allOpenNeeds.filter(
+          openedTheirPostUri &&
+          allOpenPosts.filter(
             post =>
               post.get("uri") != openedOwnPostUri &&
               post.get("uri") != openedTheirPostUri
           );
-        const suggestedPost =
-          allOpenNeedsWithoutCurrent &&
-          suggestedPostUri &&
-          allOpenNeedsWithoutCurrent.get(suggestedPostUri);
-
-        const sortedOpenNeeds =
-          allOpenNeedsWithoutCurrent &&
-          sortBy(allOpenNeedsWithoutCurrent, elem =>
+        const suggestedPost = get(allOpenPostsWithoutCurrent, suggestedPostUri);
+        const sortedOpenPosts =
+          allOpenPostsWithoutCurrent &&
+          sortBy(allOpenPostsWithoutCurrent, elem =>
             (elem.get("humanReadable") || "").toLowerCase()
           );
 
+        const suggestedPostProcess = getIn(state, [
+          "process",
+          "needs",
+          this.uriToFetch,
+        ]);
+        const suggestedPostLoading = !!get(suggestedPostProcess, "loading");
+        const suggestedPostFailedToLoad = !!get(
+          suggestedPostProcess,
+          "failedToLoad"
+        );
+        const suggestedPostIsOpenedPost = this.uriToFetch === openedOwnPostUri;
+        const suggestedPostIsTheirPost = this.uriToFetch === openedTheirPostUri;
+
         return {
           suggestedPostUri,
+          suggestedPostLoading,
+          suggestedPostFailedToLoad,
+          suggestedPostIsOpenedPost,
+          suggestedPostIsTheirPost,
+          allOpenPostsWithoutCurrent,
           suggestionsAvailable:
-            allOpenNeedsWithoutCurrent && allOpenNeedsWithoutCurrent.size > 0,
-          sortedOpenNeeds,
+            allOpenPostsWithoutCurrent && allOpenPostsWithoutCurrent.size > 0,
+          sortedOpenPosts,
           suggestedPost,
+          uriToFetchSuccess:
+            this.uriToFetch &&
+            !suggestedPostLoading &&
+            !suggestedPostFailedToLoad,
         };
       };
 
@@ -114,6 +148,17 @@ function genComponentConf() {
         actionCreators,
         ["self.initialValue", "self.detail"],
         this
+      );
+
+      this.$scope.$watch(
+        () => this.uriToFetchSuccess,
+        () =>
+          delay(0).then(() => {
+            if (this.uriToFetchSuccess) {
+              this.update(this.uriToFetch);
+              this.resetPostUriField();
+            }
+          })
       );
     }
 
@@ -138,6 +183,7 @@ function genComponentConf() {
 
     updateFetchPostUriField() {
       const text = this.fetchUriField().value;
+      this.uriToFetch = undefined;
 
       if (text && text.trim().length > 0) {
         if (this.fetchUriField().checkValidity()) {
@@ -150,10 +196,16 @@ function genComponentConf() {
       }
     }
 
+    fetchPostUriFieldHasText() {
+      const text = this.fetchUriField().value;
+      return text && text.length > 0;
+    }
+
     resetPostUriField() {
       this.fetchUriField().value = "";
       this.showResetButton = false;
       this.showFetchButton = false;
+      this.uriToFetch = undefined;
     }
 
     fetchPost() {
@@ -161,9 +213,12 @@ function genComponentConf() {
       uriToFetch = uriToFetch.trim();
 
       //TODO: ERROR HANDLING IF URL WAS NOT A FETCHABLE URL
-      this.needs__fetchUnloadedNeed(uriToFetch);
-      //this.update(uriToFetch);
-      this.resetPostUriField();
+      if (!getIn(this.allOpenPostsWithoutCurrent, uriToFetch)) {
+        this.uriToFetch = uriToFetch;
+        this.needs__fetchUnloadedNeed(uriToFetch);
+      } else {
+        this.update(uriToFetch);
+      }
     }
 
     fetchUriField() {
