@@ -4,7 +4,7 @@
 import { details, emptyDraft } from "../detail-definitions.js";
 import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-utils.js";
 import won from "../../app/won-es6.js";
-import { getIn, isValidDate } from "../../app/utils.js";
+import { getIn /*, isValidDate */ } from "../../app/utils.js";
 import {
   filterInVicinity,
   filterAboutTime,
@@ -32,38 +32,51 @@ export const rideShareOffer = {
     travelAction: { ...details.travelAction },
   },
   generateQuery: (draft, resultName) => {
-    const toLocation = getIn(draft, ["content", "travelAction", "toLocation"]);
     const fromLocation = getIn(draft, [
       "content",
       "travelAction",
       "fromLocation",
     ]);
-
+    const toLocation = getIn(draft, ["content", "travelAction", "toLocation"]);
     const fromTime = getIn(draft, ["content", "fromDatetime"]);
-    const filters = [
-      {
-        // to select seeks-branch
-        prefixes: {
-          won: won.defaultContext["won"],
-        },
-        operations: [
-          `${resultName} a won:Need.`,
-          `${resultName} won:seeks ?seeks.`,
-          fromLocation &&
-            "?seeks won:travelAction/s:fromLocation ?fromLocation.",
-          toLocation && "?seeks won:travelAction/s:toLocation ?toLocation.",
-          isValidDate(fromTime) && "?seeks s:validFrom ?starttime",
-        ],
+
+    const baseFilter = {
+      prefixes: {
+        won: won.defaultContext["won"],
+        s: won.defaultContext["s"],
       },
+      operations: [
+        `${resultName} a won:Need.`,
+        `${resultName} won:seeks ?seeks.`,
+        fromLocation && `?seeks won:travelAction/s:fromLocation ?fromLocation.`,
+        toLocation && `?seeks won:travelAction/s:toLocation ?toLocation.`,
+        //  isValidDate(fromTime) && `?seeks s:validFrom ?starttime`,
+      ],
+    };
 
-      filterInVicinity("?fromLocation", fromLocation, /*radius=*/ 5),
+    const fromLocationFilter = filterInVicinity(
+      "?fromLocation",
+      fromLocation,
+      /*radius=*/ 5
+    );
+    const toLocationFilter = filterInVicinity(
+      "?toLocation",
+      toLocation,
+      /*radius=*/ 5
+    );
 
-      filterInVicinity("?toLocation", toLocation, /*radius=*/ 5),
+    const timeFilter = filterAboutTime(
+      "?starttime",
+      fromTime,
+      12 /* hours before and after*/
+    );
 
-      filterAboutTime("?starttime", fromTime, 12 /* hours before and after*/),
-    ];
-
-    const concatenatedFilter = concatenateFilters(filters);
+    const concatenatedFilter = concatenateFilters([
+      baseFilter,
+      fromLocationFilter,
+      toLocationFilter,
+      timeFilter,
+    ]);
 
     return sparqlQuery({
       prefixes: concatenatedFilter.prefixes,
