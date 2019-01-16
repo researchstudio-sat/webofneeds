@@ -43,6 +43,11 @@ function genComponentConf() {
               ng-click="self.connectWithPost()">
               Join
             </button>
+            <button class="suggestpostv__content__post__action won-button--outlined thin red"
+              ng-if="self.hasConnectionBetweenPosts"
+              ng-click="self.router__stateGoCurrent({connectionUri: self.establishedConnectionUri})">
+              View Chat
+            </button>
             <div class="suggestpostv__content__post__info">
               {{ self.getInfoText() }}
             </div>
@@ -126,6 +131,9 @@ function genComponentConf() {
           failedToLoad,
           multiSelectType: connection && connection.get("multiSelectType"),
           hasConnectionBetweenPosts,
+          establishedConnectionUri:
+            hasConnectionBetweenPosts &&
+            get(connectionsBetweenPosts.first(), "uri"),
         };
       };
 
