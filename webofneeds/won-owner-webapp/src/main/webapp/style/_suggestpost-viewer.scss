@@ -5,22 +5,37 @@ won-suggestpost-viewer {
   @include won-detail-viewer("suggestpostv");
 
   .suggestpostv__content {
-    display: grid;
-    grid-gap: 0.25rem;
-
-    &__post {
-      border: $thinGrayBorder;
+    & .suggestpostv__content__post {
       padding: 0.25rem;
+      border: $thinGrayBorder;
       background: white;
-    }
+      display: grid;
+      grid-row-gap: 0.5rem;
+      grid-template-areas:
+        "suggest_postheader suggest_action"
+        "suggest_info suggest_info";
+      grid-template-columns: 1fr min-content;
+      align-items: center;
 
-    &__notloaded {
-      font-size: $smallFontSize;
-    }
+      won-post-header {
+        grid-area: suggest_postheader;
+      }
 
-    &__action {
-      width: 100%;
-      font-size: $smallFontSize;
+      & .suggestpostv__content__post__action.won-button--outlined.red.thin {
+        grid-area: suggest_action;
+        font-size: $smallFontSize;
+        padding: 0.5rem;
+        height: 100%;
+        margin-left: 0.5rem;
+      }
+
+      & .suggestpostv__content__post__info {
+        grid-area: suggest_info;
+        color: $won-skeleton-color;
+        font-size: $smallFontSize;
+        border-top: $thinGrayBorder;
+        padding-top: 0.25rem;
+      }
     }
   }
 }

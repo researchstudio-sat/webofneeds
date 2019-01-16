@@ -14,6 +14,10 @@ export function isActive(need) {
   return get(need, "state") && get(need, "state") === won.WON.ActiveCompacted;
 }
 
+export function isOwned(need) {
+  return get(need, "isOwned");
+}
+
 /**
  * Determines if a given need is a Inactive
  * @param need
