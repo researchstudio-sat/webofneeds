@@ -6,7 +6,7 @@ import angular from "angular";
 import { attach } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { actionCreators } from "../actions/actions.js";
-import { getGroupChatPostUriFromRoute } from "../selectors/general-selectors.js";
+import { getGroupPostAdminUriFromRoute } from "../selectors/general-selectors.js";
 
 import groupAdministrationHeaderModule from "./group-administration-header.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
@@ -29,7 +29,7 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
 
       const selectFromState = state => {
-        const openGroupChatPostUri = getGroupChatPostUriFromRoute(state);
+        const openGroupChatPostUri = getGroupPostAdminUriFromRoute(state);
 
         return {
           openGroupChatPostUri,

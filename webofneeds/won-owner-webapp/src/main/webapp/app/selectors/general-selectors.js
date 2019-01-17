@@ -138,7 +138,7 @@ export const getConnectionUriFromRoute = createSelector(
   }
 );
 
-export const getGroupChatPostUriFromRoute = createSelector(
+export const getGroupPostAdminUriFromRoute = createSelector(
   state => state,
   state => {
     const encodedPostUri = getIn(state, [
