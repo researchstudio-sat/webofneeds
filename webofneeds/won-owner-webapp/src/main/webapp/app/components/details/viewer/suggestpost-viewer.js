@@ -2,7 +2,13 @@ import angular from "angular";
 import "ng-redux";
 import { actionCreators } from "../../../actions/actions.js";
 import postHeaderModule from "../../post-header.js";
-import { attach } from "../../../utils.js";
+import { attach, getIn, get } from "../../../utils.js";
+import {
+  isOwned,
+  isPersona,
+  hasChatFacet,
+  hasGroupFacet,
+} from "../../../need-utils.js";
 import { connect2Redux } from "../../../won-utils.js";
 import {
   getConnectionUriFromRoute,
@@ -21,29 +27,31 @@ function genComponentConf() {
           <span class="suggestpostv__header__label" ng-if="self.detail.label">{{self.detail.label}}</span>
         </div>
         <div class="suggestpostv__content">
-          <div class="suggestpostv__content__post" ng-if="self.suggestedPost">
+          <div class="suggestpostv__content__post">
             <won-post-header
-               
-                need-uri="self.suggestedPost.get('uri')"
-                timestamp="self.suggestedPost.get('creationDate')"
-             
+                need-uri="self.content"
+                timestamp="self.suggestedPost && self.suggestedPost.get('creationDate')"
                 hide-image="::false">
             </won-post-header>
-          </div>
-          <div class="suggestpostv__content__notloaded" ng-if="!self.suggestedPost">
-              Suggestion not loaded yet. Click the Button below to retrieve the Suggested Post.
-          </div>
-          <button class="suggestpostv__content__action won-button--outlined thin red"
-              ng-if="!self.suggestedPost"
-              ng-click="self.loadPost()">
-              Load Post
-          </button>
-          <button class="suggestpostv__content__action won-button--outlined thin red"
-              ng-if="self.suggestedPost && !self.suggestedPost.get('isOwned') && self.openedOwnPost"
-              ng-disabled="self.hasConnectionBetweenPosts"
+            <button class="suggestpostv__content__post__action won-button--outlined thin red"
+              ng-if="self.showConnectAction"
               ng-click="self.connectWithPost()">
-              {{ self.getConnectButtonLabel() }}
-          </button>
+              Connect
+            </button>
+            <button class="suggestpostv__content__post__action won-button--outlined thin red"
+              ng-if="self.showJoinAction"
+              ng-click="self.connectWithPost()">
+              Join
+            </button>
+            <button class="suggestpostv__content__post__action won-button--outlined thin red"
+              ng-if="self.hasConnectionBetweenPosts"
+              ng-click="self.router__stateGoCurrent({connectionUri: self.establishedConnectionUri})">
+              View Chat
+            </button>
+            <div class="suggestpostv__content__post__info">
+              {{ self.getInfoText() }}
+            </div>
+          </div>
         </div>
     `;
 
@@ -57,15 +65,15 @@ function genComponentConf() {
         const openedOwnPost =
           openedConnectionUri &&
           getOwnedNeedByConnectionUri(state, openedConnectionUri);
-        const connection =
-          openedOwnPost &&
-          openedOwnPost.getIn(["connections", openedConnectionUri]);
+        const connection = getIn(openedOwnPost, [
+          "connections",
+          openedConnectionUri,
+        ]);
 
-        const suggestedPost = state.getIn(["needs", this.content]);
-        const suggestedPostUri = suggestedPost && suggestedPost.get("uri");
+        const suggestedPost = getIn(state, ["needs", this.content]);
+        const suggestedPostUri = get(suggestedPost, "uri");
 
-        const connectionsOfOpenedOwnPost =
-          openedOwnPost && openedOwnPost.get("connections");
+        const connectionsOfOpenedOwnPost = get(openedOwnPost, "connections");
         const connectionsBetweenPosts =
           suggestedPostUri &&
           connectionsOfOpenedOwnPost &&
@@ -73,12 +81,59 @@ function genComponentConf() {
             conn => conn.get("remoteNeedUri") === suggestedPostUri
           );
 
+        const hasConnectionBetweenPosts =
+          connectionsBetweenPosts && connectionsBetweenPosts.size > 0;
+
+        const isLoading = state.getIn([
+          "process",
+          "needs",
+          this.content,
+          "loading",
+        ]);
+        const toLoad = state.getIn([
+          "process",
+          "needs",
+          this.content,
+          "toLoad",
+        ]);
+        const failedToLoad = state.getIn([
+          "process",
+          "needs",
+          this.content,
+          "failedToLoad",
+        ]);
+
+        const fetchedSuggestion = !isLoading && !toLoad && !failedToLoad;
+
         return {
           suggestedPost,
           openedOwnPost,
+          hasChatFacet: hasChatFacet(suggestedPost),
+          hasGroupFacet: hasGroupFacet(suggestedPost),
+          showConnectAction:
+            suggestedPost &&
+            fetchedSuggestion &&
+            !hasGroupFacet(suggestedPost) &&
+            hasChatFacet(suggestedPost) &&
+            !hasConnectionBetweenPosts &&
+            !isOwned(suggestedPost) &&
+            openedOwnPost,
+          showJoinAction:
+            suggestedPost &&
+            fetchedSuggestion &&
+            hasGroupFacet(suggestedPost) &&
+            !hasChatFacet(suggestedPost) &&
+            !hasConnectionBetweenPosts &&
+            !isOwned(suggestedPost) &&
+            openedOwnPost,
+          isLoading,
+          toLoad,
+          failedToLoad,
           multiSelectType: connection && connection.get("multiSelectType"),
-          hasConnectionBetweenPosts:
-            connectionsBetweenPosts && connectionsBetweenPosts.size > 0,
+          hasConnectionBetweenPosts,
+          establishedConnectionUri:
+            hasConnectionBetweenPosts &&
+            get(connectionsBetweenPosts.first(), "uri"),
         };
       };
 
@@ -93,14 +148,33 @@ function genComponentConf() {
     getConnectButtonLabel() {
       return this.hasConnectionBetweenPosts
         ? "Already Connected With Post"
-        : "Connect with Post";
+        : "Request";
     }
 
-    loadPost() {
-      if (this.content) {
-        //this.content is the suggestedPostUri
-        this.needs__fetchUnloadedNeed(this.content);
+    getInfoText() {
+      if (this.isLoading) {
+        return "Loading Suggestion...";
+      } else if (this.toLoad) {
+        return "Suggestion marked toLoad";
+      } else if (this.failedToLoad) {
+        return "Failed to load Suggestion";
       }
+
+      if (isPersona(this.suggestedPost)) {
+        return isOwned(this.suggestedPost)
+          ? "This is one of your Personas"
+          : "This is someone elses Persona";
+      } else if (this.hasConnectionBetweenPosts) {
+        return "Already established a Connection with this Suggestion";
+      } else if (isOwned(this.suggestedPost)) {
+        return "This is one of your own Needs";
+      } else if (this.hasChatFacet && !this.hasGroupFacet) {
+        return "Click 'Request' to connect with this Need";
+      } else if (!this.hasChatFacet && this.hasGroupFacet) {
+        return "Click 'Join' to connect with this Group";
+      }
+
+      return "Click on the Icon to view Details";
     }
 
     connectWithPost() {

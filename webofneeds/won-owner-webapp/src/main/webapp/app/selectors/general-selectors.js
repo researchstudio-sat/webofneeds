@@ -4,9 +4,8 @@
 
 import { createSelector } from "reselect";
 
-import won from "../won-es6.js";
 import { decodeUriComponentProperly, getIn } from "../utils.js";
-import { isPersona, isNeed } from "../need-utils.js";
+import { isPersona, isNeed, isActive, isInactive } from "../need-utils.js";
 import Color from "color";
 
 export const selectLastUpdateTime = state => state.get("lastUpdateTime");
@@ -33,29 +32,23 @@ export const getOwnedPosts = state =>
 
 export function getOwnedOpenPosts(state) {
   const allOwnedNeeds = getOwnedPosts(state);
-  return (
-    allOwnedNeeds &&
-    allOwnedNeeds.filter(post => post.get("state") === won.WON.ActiveCompacted)
-  );
+  return allOwnedNeeds && allOwnedNeeds.filter(post => isActive(post));
 }
 
 export function getOpenPosts(state) {
   const allPosts = getPosts(state);
-  return (
-    allPosts &&
-    allPosts.filter(post => post.get("state") === won.WON.ActiveCompacted)
-  );
+  return allPosts && allPosts.filter(post => isActive(post));
+}
+
+export function getActiveNeeds(state) {
+  const allNeeds = getNeeds(state);
+  return allNeeds && allNeeds.filter(need => isActive(need));
 }
 
 //TODO: METHOD NAME TO ACTUALLY REPRESENT WHAT THE SELECTOR DOES
 export function getOwnedClosedPosts(state) {
   const allOwnedNeeds = getOwnedPosts(state);
-  return (
-    allOwnedNeeds &&
-    allOwnedNeeds.filter(
-      post => post.get("state") === won.WON.InactiveCompacted
-    )
-  );
+  return allOwnedNeeds && allOwnedNeeds.filter(post => isInactive(post));
 }
 
 export function getOwnedNeedsInCreation(state) {
