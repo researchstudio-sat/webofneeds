@@ -49,14 +49,14 @@ public class ConnectFromNodeReviewFacetImpl extends AbstractCamelProcessor {
         Message message = exchange.getIn();
         WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
         URI connectionUri = wonMessage.getReceiverURI();
-        Connection con = connectionRepository.findOneByConnectionURI(connectionUri);
+        //Connection con = connectionRepository.findOneByConnectionURI(connectionUri);
 
         try {
             Map<Property, String> reviewData = WonRdfUtils.MessageUtils.getReviewContent(wonMessage);
-            if (reviewData != null && con.getState() == ConnectionState.CONNECTED) {
+            if (reviewData != null) {
                 addReviewToNeed(reviewData, connectionUri);
             } else {
-                logger.debug("No review data found, or connection not in state CONNECTED");
+                logger.debug("No review data found in message: {}", wonMessage);
             }
         } catch (IllegalArgumentException e) {
             logger.debug("{}: for {}", e, wonMessage);
