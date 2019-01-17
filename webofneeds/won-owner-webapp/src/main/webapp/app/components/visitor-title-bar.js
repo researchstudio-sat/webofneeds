@@ -8,6 +8,7 @@ import { getPostUriFromRoute } from "../selectors/general-selectors.js";
 import {
   generateFullNeedTypesLabel,
   generateShortNeedTypesLabel,
+  generateNeedMatchingContext,
 } from "../need-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import postContextDropDownModule from "../components/post-context-dropdown.js";
@@ -27,8 +28,8 @@ function genComponentConf() {
                     </won-square-image>
                     <hgroup>
                         <h1 class="vtb__title">{{ self.post.get('humanReadable') }}</h1>
-                        <div class="vtb__titles__type" ng-if="!self.shouldShowRdf">{{ self.generateShortNeedTypesLabel(self.post) }}</div>
-                        <div class="vtb__titles__type" ng-if="self.shouldShowRdf">{{ self.generateFullNeedTypesLabel(self.post) }}</div>
+                        <div class="vtb__titles__type" ng-if="!self.shouldShowRdf">{{ self.shortTypesLabel }}{{ self.matchingContext }}</div>
+                        <div class="vtb__titles__type" ng-if="self.shouldShowRdf">{{ self.fullTypesLabel }}</div>
                     </hgroup>
                 </div>
             </div>
@@ -39,15 +40,17 @@ function genComponentConf() {
   class Controller {
     constructor() {
       attach(this, serviceDependencies, arguments);
-      this.generateFullNeedTypesLabel = generateFullNeedTypesLabel;
-      this.generateShortNeedTypesLabel = generateShortNeedTypesLabel;
       window.vtb4dbg = this;
+
       const selectFromState = state => {
         const postUri = getPostUriFromRoute(state);
         const post = state.getIn(["needs", postUri]);
         return {
           postUri,
           post,
+          fullTypesLabel: post && generateFullNeedTypesLabel(post),
+          shortTypesLabel: post && generateShortNeedTypesLabel(post),
+          matchingContext: post && generateNeedMatchingContext(post),
           shouldShowRdf: state.getIn(["view", "showRdf"]),
         };
       };

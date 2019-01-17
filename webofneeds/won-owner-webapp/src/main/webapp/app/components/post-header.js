@@ -18,6 +18,7 @@ import {
   isDirectResponseNeed,
   hasGroupFacet,
   hasChatFacet,
+  generateNeedMatchingContext,
 } from "../need-utils.js";
 
 import "style/_post-header.scss";
@@ -55,10 +56,10 @@ function genComponentConf() {
             Group Chat enabled
           </span>
         <span class="ph__right__subtitle__type" ng-if="!self.shouldShowRdf">
-          {{ self.generateShortNeedTypesLabel(self.need) }}
+          {{ self.shortTypesLabel }}{{ self.matchingContext }}
         </span>
         <span class="ph__right__subtitle__type" ng-if="self.shouldShowRdf">
-          {{ self.generateFullNeedTypesLabel(self.need) }}
+          {{ self.fullTypesLabel }}
         </span>
         <div class="ph__right__subtitle__date">
           {{ self.friendlyTimestamp }}
@@ -92,12 +93,12 @@ function genComponentConf() {
             ng-if="self.isGroupChatEnabled && self.isChatEnabled">
             Group Chat enabled
           </span>
-        <span class="ph__right__subtitle__type" ng-if="!self.shouldShowRdf">
-          {{ self.generateShortNeedTypesLabel(self.need) }}
-        </span>
-        <span class="ph__right__subtitle__type" ng-if="self.shouldShowRdf">
-          {{ self.generateFullNeedTypesLabel(self.need) }}
-        </span>
+          <span class="ph__right__subtitle__type" ng-if="!self.shouldShowRdf">
+            {{ self.shortTypesLabel }}{{ self.matchingContext }}
+          </span>
+          <span class="ph__right__subtitle__type" ng-if="self.shouldShowRdf">
+            {{ self.fullTypesLabel }}
+          </span>
       </div>
     </div>
     <div class="ph__icon__skeleton" ng-if="self.postLoading"></div>
@@ -115,8 +116,7 @@ function genComponentConf() {
     constructor() {
       attach(this, serviceDependencies, arguments);
       window.ph4dbg = this;
-      this.generateFullNeedTypesLabel = generateFullNeedTypesLabel;
-      this.generateShortNeedTypesLabel = generateShortNeedTypesLabel;
+
       this.WON = won.WON;
       const selectFromState = state => {
         const need = getIn(state, ["needs", this.needUri]);
@@ -129,6 +129,9 @@ function genComponentConf() {
         return {
           responseToNeed,
           need,
+          fullTypesLabel: need && generateFullNeedTypesLabel(need),
+          shortTypesLabel: need && generateShortNeedTypesLabel(need),
+          matchingContext: need && generateNeedMatchingContext(need),
           postLoading:
             !need ||
             getIn(state, ["process", "needs", need.get("uri"), "loading"]),
