@@ -66,7 +66,7 @@ function addNeedInLoading(needs, needUri, state, isOwned) {
 
 function addTheirNeedInLoading(needs, needUri) {
   const oldNeed = needs.get(needUri);
-  if (oldNeed && oldNeed.get("isOwned")) {
+  if (oldNeed) {
     return needs;
   } else {
     let need = Immutable.fromJS({
@@ -80,7 +80,7 @@ function addTheirNeedInLoading(needs, needUri) {
 
 export function addTheirNeedToLoad(needs, needUri) {
   const oldNeed = needs.get(needUri);
-  if (oldNeed && oldNeed.get("isOwned")) {
+  if (oldNeed) {
     return needs;
   } else {
     let need = Immutable.fromJS({
