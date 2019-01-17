@@ -1,25 +1,55 @@
 @import "won-config";
 @import "animate";
 
-.won-modal-needview {
-  @include appearAnimation(0.5s);
-  display: flex;
-  width: 100%;
-  height: 100%;
-  z-index: 10000;
+@media (max-width: $responsivenessBreakPoint) {
+  .won-modal-needview {
+    @include appearAnimation(0.5s);
+    display: flex;
+    width: 100%;
+    height: 100%;
+    z-index: 10000;
 
-  align-items: center;
-  justify-content: center;
-  align-content: center;
-  position: fixed;
-  top: 0;
-  left: 0;
-  background: rgba(0, 0, 0, 0.5);
+    align-items: center;
+    justify-content: center;
+    align-content: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.5);
 
-  won-post-info {
-    background: white;
-    display: grid;
-    grid-row-gap: 0.5rem;
-    padding: 0.5rem;
+    > won-post-info {
+      width: 100%;
+      height: 100%;
+      background: white;
+      display: grid;
+      grid-row-gap: 0.5rem;
+      padding: 0.5rem;
+    }
+  }
+}
+@media (min-width: $responsivenessBreakPoint) {
+  .won-modal-needview {
+    @include appearAnimation(0.5s);
+    display: flex;
+    width: 100%;
+    height: 100%;
+    z-index: 10000;
+
+    align-items: center;
+    justify-content: center;
+    align-content: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.5);
+
+    > won-post-info {
+      max-width: $maxContentWidth/2;
+      max-height: 75%;
+      background: white;
+      display: grid;
+      grid-row-gap: 0.5rem;
+      padding: 0.5rem;
+    }
   }
 }
