@@ -29,8 +29,8 @@ npm install -g windows-build-tools
 If your Windows User does not have admin permissions, installing `windows-build-tools` with an admin user will unfortunately install them only for that user. (Further info at https://github.com/researchstudio-sat/webofneeds/pull/1743) The Visual Studio build tools are installed correctly however, so you only need to fix your Python installation:
 
 1. Go to https://www.python.org/downloads/ and download and install Python 2.7 (Python 3 will not work!)
-2. Locate your Python installation (your `python.exe`), we will call this path `$PATH_TO_PYTHON_EXE`
-3. With the same user that will execute the maven build, run `npm config set python $PATH_TO_PYTHON_EXE` to update the python location
+2. Locate your Python installation, e.g., `c:\Python27\python.exe`
+3. With the **same user that will execute the maven build**, run `npm config set python c:\\Python27\\python.exe` (replace with your actual location, of course, and note the double backslashes).
 
 <!--
 ### Building with IntelliJ
