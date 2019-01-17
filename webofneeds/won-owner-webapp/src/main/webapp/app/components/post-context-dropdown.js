@@ -130,7 +130,7 @@ function genComponentConf() {
     }
 
     goToPersona(personaUri) {
-      this.router__stateGoCurrent({ useCase: undefined, postUri: personaUri });
+      this.router__stateGoCurrent({ viewNeedUri: personaUri });
     }
 
     closePost() {
