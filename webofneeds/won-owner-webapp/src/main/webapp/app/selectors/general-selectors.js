@@ -75,6 +75,38 @@ export function getOwnedNeedByConnectionUri(state, connectionUri) {
     .first();
 }
 
+export const getViewNeedUriFromRoute = createSelector(
+  state => state,
+  state => {
+    const encodedNeedUri = getIn(state, [
+      "router",
+      "currentParams",
+      "viewNeedUri",
+    ]);
+    return decodeUriComponentProperly(encodedNeedUri);
+  }
+);
+
+export const getUseCaseFromRoute = createSelector(
+  state => state,
+  state => {
+    const encodedNeedUri = getIn(state, ["router", "currentParams", "useCase"]);
+    return decodeUriComponentProperly(encodedNeedUri);
+  }
+);
+
+export const getUseCaseGroupFromRoute = createSelector(
+  state => state,
+  state => {
+    const encodedNeedUri = getIn(state, [
+      "router",
+      "currentParams",
+      "useCaseGroup",
+    ]);
+    return decodeUriComponentProperly(encodedNeedUri);
+  }
+);
+
 export const getConnectionUriFromRoute = createSelector(
   getRouterParams,
   routerParams => {
