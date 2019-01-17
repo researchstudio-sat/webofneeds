@@ -20,10 +20,19 @@ function genComponentConf() {
   let template = `
         <div class="post-info__header" ng-if="self.includeHeader">
             <a class="post-info__header__back clickable"
-               ng-click="self.router__stateGoCurrent({postUri : null})">
+                ng-if="!self.showOverlayNeed"
+                ng-click="self.router__stateGoCurrent({postUri : null})">
                 <svg style="--local-primary:var(--won-primary-color);"
                      class="post-info__header__back__icon clickable">
                     <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
+                </svg>
+            </a>
+            <a class="post-info__header__back clickable"
+                ng-if="self.showOverlayNeed"
+                ng-click="self.router__back()">
+                <svg style="--local-primary:var(--won-primary-color);"
+                     class="post-info__header__back__icon clickable">
+                    <use xlink:href="#ico36_close" href="#ico36_close"></use>
                 </svg>
             </a>
             <won-post-header
@@ -54,7 +63,13 @@ function genComponentConf() {
       window.pi4dbg = this;
 
       const selectFromState = state => {
-        const postUri = getPostUriFromRoute(state);
+        /*
+          If the post-info component has a need-uri attribute we display this need-uri instead of the postUriFromTheRoute
+          This way we can include a overlay-close button instead of the current back-button handling
+        */
+        const postUri = this.needUri
+          ? this.needUri
+          : getPostUriFromRoute(state);
         const post = state.getIn(["needs", postUri]);
 
         return {
@@ -68,12 +83,13 @@ function genComponentConf() {
             post &&
             getIn(state, ["process", "needs", post.get("uri"), "failedToLoad"]),
           createdTimestamp: post && post.get("creationDate"),
+          showOverlayNeed: !!this.needUri,
         };
       };
       connect2Redux(
         selectFromState,
         actionCreators,
-        ["self.includeHeader"],
+        ["self.includeHeader", "self.needUri"],
         this
       );
 
@@ -100,6 +116,7 @@ function genComponentConf() {
     template: template,
     scope: {
       includeHeader: "=",
+      needUri: "=",
     },
   };
 }
