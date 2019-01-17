@@ -75,6 +75,13 @@ export function getOwnedNeedByConnectionUri(state, connectionUri) {
     .first();
 }
 
+export const getCurrentParamsFromRoute = createSelector(
+  state => state,
+  state => {
+    return getIn(state, ["router", "currentParams"]);
+  }
+);
+
 export const getViewNeedUriFromRoute = createSelector(
   state => state,
   state => {

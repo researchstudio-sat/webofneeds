@@ -29,7 +29,7 @@ import { checkAccessToCurrentRoute } from "../configRouting.js";
 import { getIn } from "../utils.js";
 import { getOwnedConnectionUris } from "../selectors/connection-selectors.js";
 import { loadLatestMessagesOfConnection } from "./connections-actions.js";
-
+import { getPrivateIdFromRoute } from "../selectors/general-selectors.js";
 /**
  * Makes sure user is either logged in
  * or creates a private-ID account as fallback.
@@ -179,7 +179,7 @@ export function accountLogout() {
       })
       .then(() => {
         // for the case that we've been logged in to an anonymous account, we need to remove the privateId here.
-        if (getIn(state, ["router", "currentParams", "privateId"])) {
+        if (getPrivateIdFromRoute(state)) {
           return stateGoCurrent({ privateId: null })(dispatch, getState);
         }
       })

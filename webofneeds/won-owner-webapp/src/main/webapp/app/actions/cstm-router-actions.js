@@ -3,17 +3,15 @@
  */
 
 import Immutable from "immutable";
-
 import { getIn } from "../utils.js";
-
 import { actionCreators } from "./actions.js";
-
 import {
   defaultRoute,
   resetParams,
   resetParamsImm,
   addConstParams,
 } from "../configRouting.js";
+import { getCurrentParamsFromRoute } from "../selectors/general-selectors.js";
 
 /**
  * Action-Creator that goes back in the browser history
@@ -41,7 +39,7 @@ export function stateBack() {
  */
 export function stateGoAbs(state, queryParams) {
   return (dispatch, getState) => {
-    const currentParams = getIn(getState(), ["router", "currentParams"]);
+    const currentParams = getCurrentParamsFromRoute(getState());
     return dispatch(
       actionCreators.router__stateGo(
         state,
@@ -56,7 +54,7 @@ export function stateGoAbs(state, queryParams) {
  */
 export function stateGoResetParams(state) {
   return (dispatch, getState) => {
-    const currentParams = getIn(getState(), ["router", "currentParams"]);
+    const currentParams = getCurrentParamsFromRoute(getState());
     return dispatch(
       actionCreators.router__stateGo(
         state,
@@ -77,7 +75,7 @@ export function stateGoDefault() {
  */
 export function stateGoKeepParams(state, queryParamsList) {
   return (dispatch, getState) => {
-    const currentParams = getIn(getState(), ["router", "currentParams"]);
+    const currentParams = getCurrentParamsFromRoute(getState());
     const params = Immutable.Map(
       // [[k,v]] -> Map
       queryParamsList.map(
@@ -101,7 +99,7 @@ export function stateGoKeepParams(state, queryParamsList) {
 export function stateGoCurrent(queryParams) {
   return (dispatch, getState) => {
     const currentState = getIn(getState(), ["router", "currentState", "name"]);
-    const currentParams = getIn(getState(), ["router", "currentParams"]);
+    const currentParams = getCurrentParamsFromRoute(getState());
     return dispatch(
       actionCreators.router__stateGo(
         currentState,
