@@ -115,6 +115,13 @@ export const getPrivateIdFromRoute = createSelector(
   }
 );
 
+export const getVerificationTokenFromRoute = createSelector(
+  state => state,
+  state => {
+    return getIn(state, ["router", "currentParams", "token"]);
+  }
+);
+
 export const getConnectionUriFromRoute = createSelector(
   getRouterParams,
   routerParams => {

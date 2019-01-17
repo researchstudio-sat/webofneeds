@@ -20,6 +20,7 @@ import {
   getViewNeedUriFromRoute,
   getUseCaseFromRoute,
   getUseCaseGroupFromRoute,
+  getGroupChatPostUriFromRoute,
 } from "../../selectors/general-selectors.js";
 import { isChatToGroup } from "../../connection-utils.js";
 import * as srefUtils from "../../sref-utils.js";
@@ -43,11 +44,7 @@ class ConnectionsController {
       const selectedPost =
         selectedPostUri && getIn(state, ["needs", selectedPostUri]);
 
-      const showGroupPostAdministration = getIn(state, [
-        "router",
-        "currentParams",
-        "groupPostAdminUri",
-      ]);
+      const showGroupPostAdministration = getGroupChatPostUriFromRoute(state);
       const useCase = getUseCaseFromRoute(state);
       const useCaseGroup = getUseCaseGroupFromRoute(state);
 
