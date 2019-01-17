@@ -63,7 +63,7 @@ public class ConnectFromNodeReviewFacetImpl extends AbstractCamelProcessor {
         }
     }
 
-    private void addReviewToNeed(Map<Property, String> reviewData, URI connectionUri) {
+    private void addReviewToNeed(Map<Property, String> reviewData, URI connectionUri) throws IllegalArgumentException {
 
         String aboutNeedURI = reviewData.get(SCHEMA.ABOUT);
         Double rating = Double.parseDouble(reviewData.get(SCHEMA.RATING_VALUE)) > 0.0
@@ -75,17 +75,6 @@ public class ConnectFromNodeReviewFacetImpl extends AbstractCamelProcessor {
         Model derivationModel = needDataset.getNamedModel(aboutNeed.getNeedURI() + "#derivedData");
         Resource aboutNeedResource = derivationModel.getResource(aboutNeedURI);
         Resource conRes = derivationModel.getResource(connectionUri.toString());
-
-        if (derivationModel == null) {
-            derivationModel = ModelFactory.createDefaultModel();
-            needDataset.addNamedModel(aboutNeed.getNeedURI() + "#derivedData", derivationModel);
-        }
-
-        Property reviewsProperty = derivationModel.getProperty(aboutNeedURI);
-        if (reviewsProperty == null) {
-            derivationModel.add(aboutNeedResource, WON.REVIEWS, conRes);
-            reviewsProperty = derivationModel.getProperty(WON.REVIEWS_STRING);
-        }
 
         Statement reviewdConnectionsProperty = derivationModel.getProperty(aboutNeedResource, WON.REVIEWED_CONNECTION);
         if (reviewdConnectionsProperty == null) {
