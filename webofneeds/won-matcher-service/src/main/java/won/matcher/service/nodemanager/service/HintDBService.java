@@ -21,7 +21,7 @@ public class HintDBService
   private BloomFilter savedHints;
 
   public HintDBService() {
-    savedHints = BloomFilter.create(Funnels.stringFunnel(Charsets.UTF_8), 100000, 0.001);
+    savedHints = BloomFilter.create(Funnels.stringFunnel(Charsets.UTF_8), 100000000, 0.001);
   }
 
   public void saveHint(HintEvent hint) {
