@@ -24,6 +24,7 @@ import * as srefUtils from "../../sref-utils.js";
 
 import "style/_connections.scss";
 import "style/_responsiveness-utils.scss";
+import "style/_need-overlay.scss";
 
 const serviceDependencies = ["$element", "$ngRedux", "$scope", "$state"];
 

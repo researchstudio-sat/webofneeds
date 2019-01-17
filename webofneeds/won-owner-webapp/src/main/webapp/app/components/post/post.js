@@ -16,6 +16,7 @@ import {
 import * as srefUtils from "../../sref-utils.js";
 
 import "style/_post-visitor.scss";
+import "style/_need-overlay.scss";
 
 const serviceDependencies = ["$ngRedux", "$scope"];
 class Controller {
