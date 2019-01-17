@@ -6,7 +6,7 @@ import labelledHrModule from "./labelled-hr.js";
 import { connect2Redux } from "../won-utils.js";
 import { attach, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
-import { getGroupChatPostUriFromRoute } from "../selectors/general-selectors.js";
+import { getGroupPostAdminUriFromRoute } from "../selectors/general-selectors.js";
 import { getGroupChatConnectionsByNeedUri } from "../selectors/connection-selectors.js";
 
 import "style/_group-administration.scss";
@@ -34,6 +34,8 @@ function genComponentConf() {
                 ng-if="self.hasGroupChatConnections"
                 ng-repeat="conn in self.groupChatConnectionsArray">
                 <won-post-header
+                  class="clickable"
+                  ng-click="self.router__stateGoCurrent({viewNeedUri: conn.get('remoteNeedUri')}"
                   need-uri="conn.get('remoteNeedUri')"
                   hide-image="::false">
                 </won-post-header>
@@ -85,7 +87,7 @@ function genComponentConf() {
       this.won = won;
 
       const selectFromState = state => {
-        const groupPostAdminUri = getGroupChatPostUriFromRoute(state);
+        const groupPostAdminUri = getGroupPostAdminUriFromRoute(state);
         const groupChatPost = getIn(state, ["needs", groupPostAdminUri]);
         const groupChatConnections = getGroupChatConnectionsByNeedUri(
           state,

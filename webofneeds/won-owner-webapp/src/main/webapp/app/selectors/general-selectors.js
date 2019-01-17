@@ -75,6 +75,53 @@ export function getOwnedNeedByConnectionUri(state, connectionUri) {
     .first();
 }
 
+export const getCurrentParamsFromRoute = createSelector(
+  state => state,
+  state => {
+    return getIn(state, ["router", "currentParams"]);
+  }
+);
+
+export const getViewNeedUriFromRoute = createSelector(
+  state => state,
+  state => {
+    const encodedNeedUri = getIn(state, [
+      "router",
+      "currentParams",
+      "viewNeedUri",
+    ]);
+    return decodeUriComponentProperly(encodedNeedUri);
+  }
+);
+
+export const getUseCaseFromRoute = createSelector(
+  state => state,
+  state => {
+    return getIn(state, ["router", "currentParams", "useCase"]);
+  }
+);
+
+export const getUseCaseGroupFromRoute = createSelector(
+  state => state,
+  state => {
+    return getIn(state, ["router", "currentParams", "useCaseGroup"]);
+  }
+);
+
+export const getPrivateIdFromRoute = createSelector(
+  state => state,
+  state => {
+    return getIn(state, ["router", "currentParams", "privateId"]);
+  }
+);
+
+export const getVerificationTokenFromRoute = createSelector(
+  state => state,
+  state => {
+    return getIn(state, ["router", "currentParams", "token"]);
+  }
+);
+
 export const getConnectionUriFromRoute = createSelector(
   getRouterParams,
   routerParams => {
@@ -91,7 +138,7 @@ export const getConnectionUriFromRoute = createSelector(
   }
 );
 
-export const getGroupChatPostUriFromRoute = createSelector(
+export const getGroupPostAdminUriFromRoute = createSelector(
   state => state,
   state => {
     const encodedPostUri = getIn(state, [

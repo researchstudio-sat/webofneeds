@@ -1,4 +1,7 @@
 <won-modal-dialog ng-if="self.showModalDialog"></won-modal-dialog>
+<div class="won-modal-needview" ng-if="self.showNeedOverlay">
+    <won-post-info include-header="true" need-uri="self.viewNeedUri"></won-post-info>
+</div>
 <header>
     <won-topnav></won-topnav>
 </header>

@@ -12,7 +12,10 @@ import publishButtonModule from "./publish-button.js";
 import { get, getIn, attach, delay } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
-import { selectIsConnected } from "../selectors/general-selectors.js";
+import {
+  selectIsConnected,
+  getUseCaseFromRoute,
+} from "../selectors/general-selectors.js";
 
 import { useCases } from "useCaseDefinitions";
 
@@ -122,11 +125,7 @@ function genComponentConf() {
       this.isNew = true;
 
       const selectFromState = state => {
-        const useCaseString = getIn(state, [
-          "router",
-          "currentParams",
-          "useCase",
-        ]);
+        const useCaseString = getUseCaseFromRoute(state);
 
         // needed to be able to reset matching context to default
         // TODO: is there an easier way to do this?

@@ -9,6 +9,7 @@ import { attach, delay, getIn, toAbsoluteURL } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux, parseRestErrorMessage } from "../won-utils.js";
 import { ownerBaseUrl } from "config";
+import { getVerificationTokenFromRoute } from "../selectors/general-selectors.js";
 
 import * as srefUtils from "../sref-utils.js";
 
@@ -232,11 +233,7 @@ function genSlideInConf() {
       this.anonymousEmail = undefined;
 
       const selectFromState = state => {
-        const verificationToken = getIn(state, [
-          "router",
-          "currentParams",
-          "token",
-        ]);
+        const verificationToken = getVerificationTokenFromRoute(state);
 
         const privateId = getIn(state, ["account", "privateId"]);
 
