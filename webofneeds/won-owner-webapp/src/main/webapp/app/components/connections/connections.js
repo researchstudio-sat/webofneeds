@@ -15,6 +15,9 @@ import { actionCreators } from "../../actions/actions.js";
 import {
   getOwnedNeedByConnectionUri,
   getOwnedNeeds,
+  getConnectionUriFromRoute,
+  getPostUriFromRoute,
+  getViewNeedUriFromRoute,
 } from "../../selectors/general-selectors.js";
 import { isChatToGroup } from "../../connection-utils.js";
 import * as srefUtils from "../../sref-utils.js";
@@ -32,9 +35,8 @@ class ConnectionsController {
     this.open = {};
 
     const selectFromState = state => {
-      const selectedPostUri = decodeURIComponent(
-        getIn(state, ["router", "currentParams", "postUri"])
-      );
+      const viewNeedUri = getViewNeedUriFromRoute(state);
+      const selectedPostUri = getPostUriFromRoute(state);
       const selectedPost =
         selectedPostUri && getIn(state, ["needs", selectedPostUri]);
 
@@ -50,9 +52,8 @@ class ConnectionsController {
         "useCaseGroup",
       ]);
 
-      const selectedConnectionUri = decodeURIComponent(
-        getIn(state, ["router", "currentParams", "connectionUri"])
-      );
+      const selectedConnectionUri = getConnectionUriFromRoute(state);
+
       const need =
         selectedConnectionUri &&
         getOwnedNeedByConnectionUri(state, selectedConnectionUri);
@@ -139,7 +140,8 @@ class ConnectionsController {
         showPostInfo:
           selectedPost && !useCaseGroup && !showGroupPostAdministration,
         showGroupPostAdministration: showGroupPostAdministration,
-
+        showNeedOverlay: !!viewNeedUri,
+        viewNeedUri,
         hideListSideInResponsive:
           !hasOwnedNeeds ||
           selectedConnection ||
