@@ -45,6 +45,7 @@
 
     > won-post-info {
       max-width: $maxContentWidth/2;
+      min-width: $maxContentWidth/2;
       max-height: 75%;
       background: white;
       display: grid;
