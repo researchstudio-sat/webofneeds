@@ -225,6 +225,8 @@ public class WON {
     public static final String CHAT_FACET_STRING = BASE_URI + "ChatFacet";
     public static final String REVIEW_FACET_STRING = BASE_URI + "ReviewFacet";
     
+    public static final Property REVIEWED_CONNECTION = m.createProperty(BASE_URI + "reviewedConnection");
+    
     //unread information
 	public static final Property HAS_UNREAD_SUGGESTED = m.createProperty(BASE_URI + "hasUnreadSuggested");
 	public static final Property HAS_UNREAD_REQUEST_SENT = m.createProperty(BASE_URI + "hasUnreadRequestSent");
