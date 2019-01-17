@@ -18,6 +18,8 @@ import {
   getConnectionUriFromRoute,
   getPostUriFromRoute,
   getViewNeedUriFromRoute,
+  getUseCaseFromRoute,
+  getUseCaseGroupFromRoute,
 } from "../../selectors/general-selectors.js";
 import { isChatToGroup } from "../../connection-utils.js";
 import * as srefUtils from "../../sref-utils.js";
@@ -46,12 +48,8 @@ class ConnectionsController {
         "currentParams",
         "groupPostAdminUri",
       ]);
-      const useCase = getIn(state, ["router", "currentParams", "useCase"]);
-      const useCaseGroup = getIn(state, [
-        "router",
-        "currentParams",
-        "useCaseGroup",
-      ]);
+      const useCase = getUseCaseFromRoute(state);
+      const useCaseGroup = getUseCaseGroupFromRoute(state);
 
       const selectedConnectionUri = getConnectionUriFromRoute(state);
 

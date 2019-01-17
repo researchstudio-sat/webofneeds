@@ -2,9 +2,13 @@ import angular from "angular";
 import ngAnimate from "angular-animate";
 import squareImageModule from "../components/square-image.js";
 import { actionCreators } from "../actions/actions.js";
-import { attach, getIn } from "../utils.js";
+import { attach } from "../utils.js";
 import { useCases } from "useCaseDefinitions";
 import { connect2Redux } from "../won-utils.js";
+import {
+  getUseCaseFromRoute,
+  getUseCaseGroupFromRoute,
+} from "../selectors/general-selectors.js";
 
 import "style/_create-post-item.scss";
 
@@ -98,17 +102,8 @@ function genComponentConf() {
       window.cpitem4dbg = this;
 
       const selectFromState = state => {
-        const useCaseGroup = getIn(state, [
-          "router",
-          "currentParams",
-          "useCaseGroup",
-        ]);
-
-        const useCaseString = getIn(state, [
-          "router",
-          "currentParams",
-          "useCase",
-        ]);
+        const useCaseGroup = getUseCaseGroupFromRoute(state);
+        const useCaseString = getUseCaseFromRoute(state);
 
         const listUseCases = this.getListUseCases();
 
