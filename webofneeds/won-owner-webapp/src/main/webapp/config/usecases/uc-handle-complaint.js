@@ -5,7 +5,7 @@ import { details, emptyDraft } from "../detail-definitions.js";
 import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-utils.js";
 
 export const handleComplaint = {
-  identifier: "handleComplaints",
+  identifier: "handleComplaint",
   label: "Handle complaints",
   icon: "#ico36_uc_wtf_interest",
   timeToLiveMillisDefault: 1000 * 60 * 60 * 24 * 30,

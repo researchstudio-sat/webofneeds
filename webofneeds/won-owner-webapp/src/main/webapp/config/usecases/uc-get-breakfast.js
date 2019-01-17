@@ -6,7 +6,7 @@ import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-u
 import { interestsDetail } from "../details/person.js";
 
 export const getBreakfast = {
-  identifier: "breakfast",
+  identifier: "getBreakfast",
   label: "Get breakfast",
   icon: "#ico36_uc_breakfast",
   doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,

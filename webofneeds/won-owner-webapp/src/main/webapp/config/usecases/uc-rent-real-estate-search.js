@@ -21,7 +21,7 @@ import {
 import won from "../../app/won-es6.js";
 
 export const rentRealEstateSearch = {
-  identifier: "searchRent",
+  identifier: "rentRealEstateSearch",
   label: "Find a place to rent",
   icon: "#ico36_uc_realestate",
   timeToLiveMillisDefault: 1000 * 60 * 60 * 24 * 30 * 3,
