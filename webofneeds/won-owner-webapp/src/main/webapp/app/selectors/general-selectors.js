@@ -90,20 +90,21 @@ export const getViewNeedUriFromRoute = createSelector(
 export const getUseCaseFromRoute = createSelector(
   state => state,
   state => {
-    const encodedNeedUri = getIn(state, ["router", "currentParams", "useCase"]);
-    return decodeUriComponentProperly(encodedNeedUri);
+    return getIn(state, ["router", "currentParams", "useCase"]);
   }
 );
 
 export const getUseCaseGroupFromRoute = createSelector(
   state => state,
   state => {
-    const encodedNeedUri = getIn(state, [
-      "router",
-      "currentParams",
-      "useCaseGroup",
-    ]);
-    return decodeUriComponentProperly(encodedNeedUri);
+    return getIn(state, ["router", "currentParams", "useCaseGroup"]);
+  }
+);
+
+export const getPrivateIdFromRoute = createSelector(
+  state => state,
+  state => {
+    return getIn(state, ["router", "currentParams", "privateId"]);
   }
 );
 
