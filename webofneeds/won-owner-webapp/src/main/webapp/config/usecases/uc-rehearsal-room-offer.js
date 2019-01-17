@@ -19,7 +19,7 @@ import {
 } from "../../app/sparql-builder-utils.js";
 
 export const rehearsalRoomOffer = {
-  identifier: "OfferRehearsalRoom",
+  identifier: "rehearsalRoomOffer",
   label: "Offer Rehearsal Room",
   icon: "#ico36_uc_realestate",
   timeToLiveMillisDefault: 1000 * 60 * 60 * 24 * 30 * 3,

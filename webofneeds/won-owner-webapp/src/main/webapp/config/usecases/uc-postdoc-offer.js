@@ -6,7 +6,7 @@ import { interestsDetail, skillsDetail } from "../details/person.js";
 import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-utils.js";
 
 export const postdocOffer = {
-  identifier: "postDocIs",
+  identifier: "postdocOffer",
   label: "Offer a PostDoc position",
   icon: "#ico36_uc_postdoc",
   doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,

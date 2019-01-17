@@ -14,7 +14,7 @@ import {
 import { getIn } from "../../app/utils.js";
 
 export const musicianSearch = {
-  identifier: "findMusician",
+  identifier: "musicianSearch",
   label: "Find Musician",
   icon: "#ico36_uc_find_musician",
   timeToLiveMillisDefault: 1000 * 60 * 60 * 24 * 30,
