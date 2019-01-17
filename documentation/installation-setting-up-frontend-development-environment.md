@@ -15,7 +15,9 @@ Run
 ```
 mvn install
 ```
-once. It will fail but install node in the won-owner-webapp module. You'll need to modify *that* node installation, but you need Administrator privileges to do so.
+once. It will fail, that's ok.
+
+Now install node in the won-owner-webapp module. You'll need to modify *that* node installation, but you need Administrator privileges to do so.
 
 You'll need to run `npm install -g windows-build-tools` (otherwise building `node-sass` and `rdf-canonize` might fail later with a message about not finding VCBuild.exe. the command will install a python-environment and dotnet)
 
