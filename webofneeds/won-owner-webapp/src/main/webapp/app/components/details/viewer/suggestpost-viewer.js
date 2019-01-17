@@ -29,7 +29,10 @@ function genComponentConf() {
         <div class="suggestpostv__content">
           <div class="suggestpostv__content__post">
             <won-post-header
+                class="clickable"
                 need-uri="self.content"
+                ng-click="self.router__stateGoCurrent({viewNeedUri: self.content})"
+                ng-disabled="!self.fetchedSuggestion"
                 timestamp="self.suggestedPost && self.suggestedPost.get('creationDate')"
                 hide-image="::false">
             </won-post-header>
@@ -169,7 +172,7 @@ function genComponentConf() {
       } else if (isOwned(this.suggestedPost)) {
         return "This is one of your own Needs";
       } else if (this.hasChatFacet && !this.hasGroupFacet) {
-        return "Click 'Request' to connect with this Need";
+        return "Click 'Connect' to connect with this Need";
       } else if (!this.hasChatFacet && this.hasGroupFacet) {
         return "Click 'Join' to connect with this Group";
       }
