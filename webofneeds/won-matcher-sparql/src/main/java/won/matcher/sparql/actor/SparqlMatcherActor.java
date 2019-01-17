@@ -89,6 +89,7 @@ import won.matcher.service.common.event.BulkNeedEvent;
 import won.matcher.service.common.event.HintEvent;
 import won.matcher.service.common.event.NeedEvent;
 import won.matcher.sparql.config.SparqlMatcherConfig;
+import won.protocol.model.NeedState;
 import won.protocol.util.NeedModelWrapper;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
@@ -228,7 +229,10 @@ public class SparqlMatcherActor extends UntypedActor {
         log.debug("found {} match candidates", matches.size());
         
         //produce hints after post-filtering the matches we found:
-        Collection<HintEvent> hintEvents = produceHints(need, matches.stream().filter(foundNeed -> postFilter(need, foundNeed.need)).collect(Collectors.toList()));
+        Collection<HintEvent> hintEvents = produceHints(need, 
+                matches.stream()
+                    .filter(foundNeed -> foundNeed.need.getNeedState() == NeedState.ACTIVE) //we may not have updated our need state in the database. re-check!
+                    .filter(foundNeed -> postFilter(need, foundNeed.need)).collect(Collectors.toList()));
         publishHintEvents(hintEvents, need.getNeedUri(), false);
         //but use the whole list of matches for inverse matching
         
@@ -244,6 +248,7 @@ public class SparqlMatcherActor extends UntypedActor {
             List<HintEvent> inverseHintEvents = 
                     matches
                         .stream()
+                        .filter(n -> n.need.getNeedState() == NeedState.ACTIVE)
                         .filter(matchedNeed -> 
                                     ! matchedNeed.need.hasFlag(WON.NO_HINT_FOR_ME) 
                                     && !need.getNeedUri().equals(matchedNeed.need.getNeedUri()))
@@ -259,7 +264,9 @@ public class SparqlMatcherActor extends UntypedActor {
                                 log.debug("match {} of {} is also getting a hint: {}", 
                                         new Object[] {matchedNeed.need.getNeedUri(), need.getNeedUri(), matchesForMatchedNeed.size() > 0});
                             }
-                            return new AbstractMap.SimpleEntry<>(matchedNeed.need, matchesForMatchedNeed.stream().filter(inverseMatch -> postFilter(matchedNeed.need, inverseMatch.need)).collect(Collectors.toList()));
+                            return new AbstractMap.SimpleEntry<>(matchedNeed.need, matchesForMatchedNeed.stream()
+                                    .filter(n -> n.need.getNeedState() == NeedState.ACTIVE)
+                                    .filter(inverseMatch -> postFilter(matchedNeed.need, inverseMatch.need)).collect(Collectors.toList()));
                         })
                         .map(entry -> produceHints(entry.getKey(), entry.getValue()))
                         .flatMap(hints -> hints.stream())
