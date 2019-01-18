@@ -6,14 +6,14 @@ import { get } from "../../app/utils.js";
 export const paypalPayment = {
   identifier: "paypalPayment",
   label: "PayPal Payment",
-  icon: "#ico36_detail_price", //TODO: ADAPT
+  icon: "#ico36_detail_price", //TODO: create and use better icon
   amountLabel: "Price:",
   amountPlaceholder: "Enter Amount...",
   receiverLabel: "Recipient:",
   receiverPlaceholder: "PayPal Account ID (Email)...",
   secretLabel: "Secret:",
   secretPlaceholder: "Enter Secret...",
-  customerLabel: "Who pays?",
+  customerLabel: "Enter Payer Post URI...", // TODO: use suggestPost feature here
   component: "won-paypal-payment-picker",
   viewerComponent: "won-paypal-payment-viewer",
   currency: [
@@ -24,7 +24,6 @@ export const paypalPayment = {
   ],
   messageEnabled: true,
   parseToRDF: function({ value, identifier, contentUri }) {
-    //TODO: IMPL
     if (
       !value ||
       !value.amount ||
@@ -36,6 +35,7 @@ export const paypalPayment = {
       return { "s:invoice": undefined };
     }
 
+    // TODO: error handling/sanity checking
     const idString =
       contentUri && identifier
         ? contentUri + "/" + identifier + "/" + generateIdString(10)
@@ -55,12 +55,13 @@ export const paypalPayment = {
           "s:price": [{ "@value": value.amount, "@type": "xsd:float" }],
           "s:priceCurrency": value.currency,
         },
-        "s:paymentMethodId": value.secret, //TODO not sure if this would be the correct predicate for our Secret
+        "s:identifier": value.secret,
         "s:accountId": value.receiver,
         "s:customer": {
           "@type": "won:Need",
           "@id": value.customerUri,
         },
+        // TODO: handle optional information
         //"pay:hasFeePayer": "feePayer", //TODO Adapt and include Optional
         //"pay:hasTax": "hasTax", //TODO Adapt and include Optional
         //"pay:hasInvoiceId": "invoiceId", //TODO Adapt and include Optional
@@ -73,7 +74,7 @@ export const paypalPayment = {
     const invoice = get(jsonLDImm, "s:invoice");
     if (!invoice) return undefined;
 
-    //Only Parse PayPal Payments
+    //Only Parse PayPal Payments - other payments should be handled by other details
     const paymentMethod = get(invoice, "s:paymentMethod");
     if (
       !paymentMethod ||
@@ -83,6 +84,7 @@ export const paypalPayment = {
       return undefined;
     }
 
+    // TODO: this should work with personas too?
     const customer = get(invoice, "s:customer");
     if (!customer || customer.get("@type") !== won.WON.NeedCompacted) {
       return undefined;
@@ -99,12 +101,14 @@ export const paypalPayment = {
       ["s:totalPaymentDue", "s:priceCurrency"],
       "xsd:string"
     );
-    const secret = get(invoice, "s:paymentMethodId");
+    const secret = get(invoice, "s:identifier");
     const receiver = get(invoice, "s:accountId");
 
     if (!amount || !currency || !secret || !receiver || !customerUri) {
       return undefined;
     }
+
+    // TODO: handle optional information
 
     return {
       amount: amount,
@@ -133,6 +137,7 @@ export const paypalPayment = {
 
       const amountString = "Amount: " + amount + currencyLabel;
       const receiverString = "Recipient: " + receiver;
+      // TODO: use title or persona name if available
       const customerString = "Customer: <" + customerUri + ">";
       const secretString = "Secret: " + secret;
 
