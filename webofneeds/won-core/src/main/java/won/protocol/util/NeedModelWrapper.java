@@ -147,6 +147,7 @@ public class NeedModelWrapper {
      * @return
      */
     public static boolean isANeed(Dataset ds){
+        if (ds == null || ds.isEmpty()) return false;
         NeedModelWrapper wrapper = new NeedModelWrapper(ds, false);
         return wrapper.getNeedContentNode() != null && wrapper.getNeedNode(NeedGraphType.SYSINFO) != null;
     }
