@@ -147,6 +147,7 @@ public class NeedModelWrapper {
      * @return
      */
     public static boolean isANeed(Dataset ds){
+        if (ds == null || ds.isEmpty()) return false;
         NeedModelWrapper wrapper = new NeedModelWrapper(ds, false);
         return wrapper.getNeedContentNode() != null && wrapper.getNeedNode(NeedGraphType.SYSINFO) != null;
     }
@@ -486,9 +487,12 @@ public class NeedModelWrapper {
         sysInfoModel.leaveCriticalSection();
         if (state.equals(WON.NEED_STATE_ACTIVE)) {
             return NeedState.ACTIVE;
-        } else {
+        } else if (state.equals(WON.NEED_STATE_INACTIVE)) {
             return NeedState.INACTIVE;
-        }
+        } else if (state.equals(WON.NEED_STATE_DELETED)) {
+            return NeedState.DELETED;
+        } 
+        throw new IllegalStateException("Unrecognized need state: " + state);
     }
 
     public ZonedDateTime getCreationDate() {
