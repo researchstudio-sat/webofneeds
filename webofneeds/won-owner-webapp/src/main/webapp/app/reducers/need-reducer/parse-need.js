@@ -135,7 +135,11 @@ function extractRating(needJsonLd) {
     aggregateRating: needJsonLd.get("s:aggregateRating"),
     reviewCount: needJsonLd.get("s:reviewCount"),
   };
-  return rating;
+  if (rating.aggregateRating && rating.reviewCount) {
+    return rating;
+  } else {
+    return undefined;
+  }
 }
 
 function extractFacets(wonHasFacets) {
