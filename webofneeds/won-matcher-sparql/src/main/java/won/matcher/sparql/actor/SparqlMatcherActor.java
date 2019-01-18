@@ -494,7 +494,12 @@ public class SparqlMatcherActor extends UntypedActor {
                         } else {
                             // no needToCheck, which happens when we first look for matches in the graph store: 
                             // download the linked data and return a new NeedModelWrapper
-                            return new ScoredNeed(new NeedModelWrapper(linkedDataSource.getDataForResource(URI.create(foundNeedUri.uri))), foundNeedUri.score);
+                            Dataset ds = linkedDataSource.getDataForResource(URI.create(foundNeedUri.uri));
+                            //make sure we don't accidentally use empty results
+                            if (ds == null || !ds.isEmpty()) {
+                                return null;
+                            }
+                            return new ScoredNeed(new NeedModelWrapper(ds), foundNeedUri.score);
                         }
                     } catch (Exception e) {
                         log.info("caught exception trying to load need URI {} : {} (more on loglevel 'debug')" , foundNeedUri, e.getMessage() );
