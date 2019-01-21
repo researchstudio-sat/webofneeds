@@ -42,6 +42,10 @@ class Controller {
         showModalDialog: getIn(state, ["view", "showModalDialog"]),
         showNeedOverlay: !!viewNeedUri,
         viewNeedUri,
+        postLoading:
+          !post || getIn(state, ["process", "needs", postUri, "loading"]),
+        postFailedToLoad:
+          post && getIn(state, ["process", "needs", postUri, "failedToLoad"]),
       };
     };
 
