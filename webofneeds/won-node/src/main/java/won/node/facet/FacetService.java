@@ -82,6 +82,7 @@ public class FacetService {
                     config.getDerivationProperties().stream().forEach(p -> modelToManipulate.remove(needRes, p, remoteNeedRes));
                 }
             }
+            need.incrementVersion();
             need.getDatatsetHolder().setDataset(needDataset);
             needRepository.save(need);
         }
