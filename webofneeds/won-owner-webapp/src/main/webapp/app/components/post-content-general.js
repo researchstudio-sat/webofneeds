@@ -141,7 +141,10 @@ function genComponentConf() {
       }
       return (sum % 5) + 1;
       */
-      const rating = this.personaRating.get("aggregateRating");
+      const rating = this.personaRating
+        ? this.personaRating.get("aggregateRating")
+        : 0;
+
       return Math.round(rating);
     }
   }
