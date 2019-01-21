@@ -29,6 +29,55 @@ export const title = {
   },
 };
 
+export const personaName = {
+  identifier: "personaName",
+  label: "Name",
+  icon: "#ico36_detail_title",
+  placeholder: "Your Name",
+  component: "won-title-picker",
+  viewerComponent: "won-title-viewer",
+  parseToRDF: function({ value }) {
+    const val = value ? value : undefined;
+    return {
+      "s:name": val,
+    };
+  },
+  parseFromRDF: function(jsonLDImm) {
+    return won.parseFrom(jsonLDImm, ["s:name"], "xsd:string");
+  },
+  generateHumanReadable: function({ value, includeLabel }) {
+    if (value) {
+      return includeLabel ? this.label + ": " + value : value;
+    }
+    return undefined;
+  },
+};
+
+export const website = {
+  //FIXME: Implement URL Picker once the persona-creator also generates url type urls, instead of strings
+  identifier: "website",
+  label: "Website",
+  icon: "#ico36_detail_title",
+  placeholder: "Website",
+  component: "won-title-picker",
+  viewerComponent: "won-title-viewer",
+  parseToRDF: function({ value }) {
+    const val = value ? value : undefined;
+    return {
+      "s:url": val,
+    };
+  },
+  parseFromRDF: function(jsonLDImm) {
+    return won.parseFrom(jsonLDImm, ["s:url"], "xsd:string");
+  },
+  generateHumanReadable: function({ value, includeLabel }) {
+    if (value) {
+      return includeLabel ? this.label + ": " + value : value;
+    }
+    return undefined;
+  },
+};
+
 export const searchString = {
   identifier: "searchString",
   label: "Searching for",

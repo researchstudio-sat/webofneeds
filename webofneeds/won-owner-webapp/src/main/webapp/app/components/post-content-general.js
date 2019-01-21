@@ -30,7 +30,7 @@ function genComponentConf() {
               Author
             </div>
             <div class="pcg__columns__left__item__value">
-              {{ self.persona.getIn(['jsonld', 's:name']) }}
+              {{ self.persona.get('humanReadable') }}
               <won-rating-view rating="self.rating()" rating-connection-uri="self.ratingConnectionUri"></won-rating-view>
             </div>
           </div>

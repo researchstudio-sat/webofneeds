@@ -4,7 +4,7 @@
 
 import { createSelector } from "reselect";
 
-import { decodeUriComponentProperly, getIn } from "../utils.js";
+import { decodeUriComponentProperly, getIn, get } from "../utils.js";
 import { isPersona, isNeed, isActive, isInactive } from "../need-utils.js";
 import Color from "color";
 
@@ -169,14 +169,13 @@ export function getOwnedPersonas(state) {
   const needs = getOwnedNeeds(state);
   const personas = needs.toList().filter(need => isPersona(need));
   return personas.map(persona => {
-    const graph = persona.get("jsonld");
     return {
-      displayName: graph.get("s:name"),
-      website: graph.get("s:url"),
-      aboutMe: graph.get("s:description"),
-      url: persona.get("uri"),
-      saved: !persona.get("isBeingCreated"),
-      timestamp: persona.get("creationDate").toISOString(),
+      displayName: getIn(persona, ["content", "personaName"]),
+      website: getIn(persona, ["content", "website"]),
+      aboutMe: getIn(persona, ["content", "description"]),
+      url: get(persona, "uri"),
+      saved: !get(persona, "isBeingCreated"),
+      timestamp: get(persona, "creationDate").toISOString(),
     };
   });
 }
