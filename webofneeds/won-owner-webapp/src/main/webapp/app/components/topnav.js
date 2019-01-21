@@ -8,6 +8,7 @@ import accountMenuModule from "./account-menu.js";
 import { attach, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
+import { isLoading } from "../selectors/process-selectors.js";
 
 import * as srefUtils from "../sref-utils.js";
 
@@ -31,6 +32,11 @@ function genTopnavConf() {
                 <div class="topnav__inner__center"></div>
                 <div class="topnav__inner__right">
                     <ul class="topnav__list">
+                        <li class="topnav__list__loading" ng-if="self.showLoadingIndicator">
+                          <svg class="topnav__list__loading__spinner hspinner">
+                              <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
+                          </svg>
+                        </li>
                         <li ng-show="!self.isSignUpView && (self.isAnonymous || !self.loggedIn)">
                             <a  ui-sref="{{ self.absSRef('signup') }}"
                                 class="topnav__signupbtn">
@@ -69,6 +75,7 @@ function genTopnavConf() {
           loggedIn: state.getIn(["account", "loggedIn"]),
           isAnonymous: state.getIn(["account", "isAnonymous"]),
           isSignUpView: currentRoute === "signup",
+          showLoadingIndicator: isLoading(state),
         };
       };
 
