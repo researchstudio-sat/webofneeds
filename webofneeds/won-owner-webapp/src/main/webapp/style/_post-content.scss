@@ -59,6 +59,25 @@ won-post-content {
     }
   }
 
+  .post-failedtoload {
+    display: grid;
+    grid-template-areas: "failed_icon failed_label";
+    align-items: center;
+    justify-content: center;
+    padding: 5rem 0;
+    grid-gap: 0.5rem;
+
+    > .post-failedtoload__icon {
+      grid-area: failed_icon;
+      @include fixed-square(5rem);
+      --local-primary: #{$won-primary-color};
+    }
+    > .post-failedtoload__label {
+      grid-area: failed_label;
+      text-align: center;
+    }
+  }
+
   &.won-is-loading {
     @include animateOpacityHeartBeat();
 

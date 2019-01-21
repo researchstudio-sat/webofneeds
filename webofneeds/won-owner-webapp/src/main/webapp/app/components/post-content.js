@@ -37,7 +37,15 @@ function genComponentConf() {
             <h2 class="post-skeleton__heading"></h2>
             <div class="post-skeleton__details"></div>
         </div>
-        <div class="post-content" ng-if="!self.postLoading">
+        <div class="post-failedtoload" ng-if="self.postFailedToLoad">
+          <svg class="post-failedtoload__icon">
+              <use xlink:href="#ico16_indicator_error" href="#ico16_indicator_error"></use>
+          </svg>
+          <span class="post-failedtoload__label">
+              Failed To Load - Need might have been deleted
+          </span>
+        </div>
+        <div class="post-content" ng-if="!self.postLoading && !self.postFailedToLoad">
           <won-gallery ng-if="self.post.get('hasImages')">
           </won-gallery>
 
@@ -143,6 +151,9 @@ function genComponentConf() {
           postLoading:
             !post ||
             getIn(state, ["process", "needs", post.get("uri"), "loading"]),
+          postFailedToLoad:
+            post &&
+            getIn(state, ["process", "needs", post.get("uri"), "failedToLoad"]),
           createdTimestamp: post && post.get("creationDate"),
           shouldShowRdf: state.getIn(["view", "showRdf"]),
           fromConnection: !!openConnectionUri,

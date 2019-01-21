@@ -22,12 +22,12 @@ const serviceDependencies = ["$scope", "$ngRedux", "$element"];
 function genComponentConf() {
   let template = `
             <svg class="cdd__icon__small"
-                ng-if="self.postLoading"
+                ng-if="self.postLoading || self.postFailedToLoad"
                 style="--local-primary:var(--won-skeleton-color);">
                     <use xlink:href="#ico16_contextmenu" href="#ico16_contextmenu"></use>
             </svg>
             <svg class="cdd__icon__small clickable"
-                ng-if="!self.postLoading"
+                ng-if="!self.postLoading && !self.postFailedToLoad"
                 style="--local-primary:var(--won-secondary-color);"
                 ng-click="self.contextMenuOpen = true">
                     <use xlink:href="#ico16_contextmenu" href="#ico16_contextmenu"></use>
@@ -101,6 +101,9 @@ function genComponentConf() {
           postLoading:
             !post ||
             getIn(state, ["process", "needs", post.get("uri"), "loading"]),
+          postFailedToLoad:
+            post &&
+            getIn(state, ["process", "needs", post.get("uri"), "failedToLoad"]),
           linkToPost,
         };
       };
