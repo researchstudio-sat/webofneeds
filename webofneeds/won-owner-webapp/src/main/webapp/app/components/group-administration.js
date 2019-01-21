@@ -1,7 +1,6 @@
 import won from "../won-es6.js";
 import angular from "angular";
 import groupAdministrationHeaderModule from "./group-administration-header.js";
-import chatTextFieldModule from "./chat-textfield.js";
 import postHeaderModule from "./post-header.js";
 import labelledHrModule from "./labelled-hr.js";
 import { connect2Redux } from "../won-utils.js";
@@ -9,6 +8,7 @@ import { attach, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { getGroupPostAdminUriFromRoute } from "../selectors/general-selectors.js";
 import { getGroupChatConnectionsByNeedUri } from "../selectors/connection-selectors.js";
+import submitButtonModule from "./submit-button.js";
 
 import "style/_group-administration.scss";
 import "style/_rdflink.scss";
@@ -75,13 +75,12 @@ function genComponentConf() {
             </div>
         </div>
         <div class="ga__footer">
-            <chat-textfield
-                placeholder="::'Message (optional)'"
-                on-submit="::self.joinGroup(value, selectedPersona)"
-                allow-empty-submit="::true"
-                show-personas="true"
-                submit-button-label="::'Join&#160;Group'">
-            </chat-textfield>
+            <won-submit-button
+                is-valid="::true"
+                on-submit="self.joinGroup(persona)"
+                show-personas="::true"
+                label="self.submitButtonLabel">
+            </won-submit-button>
         </div>
     `;
 
@@ -132,16 +131,14 @@ function genComponentConf() {
       this.connections__close(connUri);
     }
 
-    joinGroup(message, persona) {
+    joinGroup(selectedPersona) {
       if (this.groupPostAdminUri) {
         this.connections__connectAdHoc(
           this.groupPostAdminUri,
-          message,
-          persona
+          "",
+          selectedPersona
         );
       }
-
-      //this.router__stateGoCurrent({connectionUri: null, sendAdHocRequest: null});
     }
   }
   Controller.$inject = serviceDependencies;
@@ -159,8 +156,8 @@ function genComponentConf() {
 export default angular
   .module("won.owner.components.groupAdministration", [
     groupAdministrationHeaderModule,
-    chatTextFieldModule,
     postHeaderModule,
     labelledHrModule,
+    submitButtonModule,
   ])
   .directive("wonGroupAdministration", genComponentConf).name;
