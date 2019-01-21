@@ -86,10 +86,14 @@ public abstract class OwnerCallbackAdapter implements WonMessageProcessor
         adaptee.onCloseFromOtherNeed(makeConnection(message), message);
         break;
       case SUCCESS_RESPONSE:
+        //logger.info("Not handling successResponse for message {}", message);
         adaptee.onSuccessResponse(message.getIsResponseToMessageURI(), message);
         break;
       case FAILURE_RESPONSE:
         adaptee.onFailureResponse(message.getIsResponseToMessageURI(), message);
+        break;
+      case CREATE_NEED:
+        logger.info("Handling CREATE_NEED for message {}", message);
         break;
       default :
         logger.info("could not find callback method for wonMessage of type {}", messageType);

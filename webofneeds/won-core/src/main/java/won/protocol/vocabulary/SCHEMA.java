@@ -47,7 +47,23 @@ public class SCHEMA {
     public static final Property PRICECURRENCY = m.createProperty(BASE_URI + "priceCurrency");
     public static final Property UNITCODE = m.createProperty(BASE_URI + "unitCode");
     public static final Property VALUE = m.createProperty(BASE_URI + "value");
-
+    
+    public static final Property REVIEW = m.createProperty(BASE_URI + "Review");
+    public static final Property RATING = m.createProperty(BASE_URI + "Rating");
+    
+    public static final Property BEST_RATING = m.createProperty(BASE_URI + "bestRating");
+    public static final Property WORST_RATING = m.createProperty(BASE_URI + "worstRating");
+    public static final Property RATING_VALUE = m.createProperty(BASE_URI + "ratingValue");
+    public static final Property ABOUT = m.createProperty(BASE_URI + "about");
+    public static final Property AUTHOR = m.createProperty(BASE_URI + "author");
+    public static final Property REVIEW_RATING = m.createProperty(BASE_URI + "reviewRating");
+    
+    public static final Property AGGREGATE_RATING = m.createProperty(BASE_URI + "aggregateRating");
+    public static final Property REVIEW_COUNT = m.createProperty(BASE_URI + "reviewCount");
+    
+    
+    
+    
     public static final RDFDatatype TEXT = new BaseDatatype(BASE_URI + "Text");
     
     /** returns the URI for this schema

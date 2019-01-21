@@ -9,10 +9,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -39,6 +41,7 @@ import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.rdf.model.impl.PropertyImpl;
 import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.shared.impl.PrefixMappingImpl;
 import org.apache.jena.sparql.algebra.Op;
@@ -68,6 +71,7 @@ import won.protocol.model.Match;
 import won.protocol.model.NeedGraphType;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.service.WonNodeInfoBuilder;
+import won.protocol.vocabulary.SCHEMA;
 import won.protocol.vocabulary.SFSIG;
 import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONAGR;
@@ -683,6 +687,56 @@ public class WonRdfUtils
           return uris;
       }
 
+      
+      /**
+       * Returns the whole review content of a WonMessage
+       * @param wonMessage
+       * @return
+       */
+      public static Map<Property, String> getReviewContent(final WonMessage wonMessage) throws IllegalArgumentException {
+
+          System.out.println("message content: " );          
+          RDFDataMgr.write(System.out, wonMessage.getMessageContent(), Lang.TRIG);
+          System.out.println("whole message: " );
+          RDFDataMgr.write(System.out, wonMessage.getCompleteDataset(), Lang.TRIG);
+          
+          //find the review data in a wonMessage
+          String queryString =
+                  "prefix s: <http://schema.org/>\n" + 
+                  "select * where \n" + 
+                  "  {graph ?g {\n" +
+                  "    ?event s:review ?review .\n" + 
+                  "    ?review s:reviewRating ?rating;\n" + 
+                  "        s:about ?about;\n" + 
+                  "        s:author ?author .\n" + 
+                  "    ?rating a s:Rating;\n" + 
+                  "        s:ratingValue ?ratingValue .\n" + 
+                  "\n" + 
+                  "}}";
+          Query query = QueryFactory.create(queryString);
+
+          try (QueryExecution qexec = QueryExecutionFactory.create(query, wonMessage.getCompleteDataset())) {
+              qexec.getContext().set(TDB.symUnionDefaultGraph, true);
+              ResultSet rs = qexec.execSelect();
+              if (rs.hasNext()) {
+                  QuerySolution qs = rs.nextSolution();
+                  Map<Property, String> reviewData = new HashMap<Property, String>();
+                  reviewData.put(SCHEMA.REVIEW, rdfNodeToString(qs.get("review")));
+                  reviewData.put(SCHEMA.RATING, rdfNodeToString(qs.get("rating")));
+                  reviewData.put(SCHEMA.ABOUT, rdfNodeToString(qs.get("about")));
+                  reviewData.put(SCHEMA.AUTHOR, rdfNodeToString(qs.get("author")));
+                  reviewData.put(SCHEMA.RATING_VALUE, rdfNodeToString(qs.get("ratingValue")));
+                  if (rs.hasNext()) {
+                      //TODO as soon as we have use cases for multiple reviews, we need to refactor this
+                      throw new IllegalArgumentException("wonMessage has more than one review");
+                  }
+                  return reviewData;
+              }
+          }
+          return null;
+      }
+
+      
       private static String rdfNodeToString(RDFNode node) {
           if (node.isLiteral()) {
               return node.asLiteral().getString();
@@ -1193,7 +1247,5 @@ public class WonRdfUtils
         }
         return result;
     }
-    
   }
-  
 }

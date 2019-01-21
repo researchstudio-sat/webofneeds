@@ -47,6 +47,8 @@ public enum FacetType {
         return FacetType.ControlFacet;
        else if(uri.equals(FacetType.GroupFacet.getURI()))
            return FacetType.GroupFacet;
+       else if(uri.equals(FacetType.ReviewFacet.getURI()))
+           return FacetType.ReviewFacet;
        else if(uri.equals(FacetType.ChatFacet.getURI()))
            return FacetType.ChatFacet;
        else if(uri.equals(FacetType.HolderFacet.getURI()))

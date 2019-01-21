@@ -106,7 +106,7 @@ function genComponentConf() {
           ? state.getIn(["needs", post.get("heldBy")])
           : undefined;
         const personaHolds = persona && persona.get("holds");
-
+        const personaRating = persona && persona.get("rating");
         return {
           WON: won.WON,
           post,
@@ -116,6 +116,7 @@ function genComponentConf() {
             personaHolds && personaHolds.includes(post.get("uri"))
               ? persona
               : undefined,
+          personaRating: personaRating,
           preventSharing:
             (post && post.get("state") === won.WON.InactiveCompacted) ||
             (flags &&
@@ -132,11 +133,19 @@ function genComponentConf() {
     }
 
     rating() {
+      // Return actuall rating!
+      /*
       let sum = 0;
       for (const char of this.persona.get("uri")) {
         sum += char.charCodeAt(0);
       }
       return (sum % 5) + 1;
+      */
+      const rating = this.personaRating
+        ? this.personaRating.get("aggregateRating")
+        : 0;
+
+      return Math.round(rating);
     }
   }
 

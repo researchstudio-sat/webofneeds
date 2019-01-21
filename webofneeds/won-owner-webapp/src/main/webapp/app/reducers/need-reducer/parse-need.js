@@ -24,6 +24,7 @@ export function parseNeed(jsonldNeed, isOwned) {
       holds:
         won.parseListFrom(jsonldNeedImm, ["won:holds"], "xsd:ID") ||
         Immutable.List(),
+      rating: extractRating(jsonldNeedImm),
       groupMembers:
         won.parseListFrom(jsonldNeedImm, ["won:hasGroupMember"], "xsd:ID") ||
         Immutable.List(),
@@ -127,6 +128,18 @@ function extractCreationDate(needJsonLd) {
     return new Date(creationDate);
   }
   return undefined;
+}
+
+function extractRating(needJsonLd) {
+  const rating = {
+    aggregateRating: needJsonLd.get("s:aggregateRating"),
+    reviewCount: needJsonLd.get("s:reviewCount"),
+  };
+  if (rating.aggregateRating && rating.reviewCount) {
+    return rating;
+  } else {
+    return undefined;
+  }
 }
 
 function extractFacets(wonHasFacets) {
