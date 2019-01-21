@@ -1,6 +1,7 @@
 import won from "../won-es6.js";
 import angular from "angular";
 import groupAdministrationHeaderModule from "./group-administration-header.js";
+import chatTextFieldModule from "./chat-textfield.js";
 import postHeaderModule from "./post-header.js";
 import labelledHrModule from "./labelled-hr.js";
 import { connect2Redux } from "../won-utils.js";
@@ -74,9 +75,13 @@ function genComponentConf() {
             </div>
         </div>
         <div class="ga__footer">
-            <button class="ga__footer__button won-button--filled red" ng-click="self.joinGroup()">
-                Join Group
-            </button>
+            <chat-textfield
+                placeholder="::'Message (optional)'"
+                on-submit="::self.joinGroup(value, selectedPersona)"
+                allow-empty-submit="::true"
+                show-personas="true"
+                submit-button-label="::'Join&#160;Group'">
+            </chat-textfield>
         </div>
     `;
 
@@ -127,12 +132,11 @@ function genComponentConf() {
       this.connections__close(connUri);
     }
 
-    joinGroup(persona) {
-      //TODO: FIGURE OUT HOW TO USE won-submit-button instead so we can add a persona if need be
+    joinGroup(message, persona) {
       if (this.groupPostAdminUri) {
         this.connections__connectAdHoc(
           this.groupPostAdminUri,
-          "" /*message cant be undefined for whatever reason*/,
+          message,
           persona
         );
       }
@@ -155,6 +159,7 @@ function genComponentConf() {
 export default angular
   .module("won.owner.components.groupAdministration", [
     groupAdministrationHeaderModule,
+    chatTextFieldModule,
     postHeaderModule,
     labelledHrModule,
   ])
