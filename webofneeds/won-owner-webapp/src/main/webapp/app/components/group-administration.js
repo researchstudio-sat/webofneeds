@@ -76,6 +76,7 @@ function genComponentConf() {
         </div>
         <div class="ga__footer">
             <won-submit-button
+                class="ga__footer__button"
                 is-valid="::true"
                 on-submit="self.joinGroup(persona)"
                 show-personas="::true"
