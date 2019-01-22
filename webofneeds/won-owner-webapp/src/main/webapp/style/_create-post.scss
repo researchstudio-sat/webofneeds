@@ -79,15 +79,6 @@ won-create-search {
       }
     }
 
-    .cp__content__tuning {
-      @include appearAnimation(0.5s, linear);
-
-      .cp__content__tuning_matching-context {
-        @include slideWithOpacityAnimation(0.5s, linear, 20rem, 0.5rem);
-        padding: 0.5rem;
-      }
-    }
-
     &__responsivebuttons {
       padding: 0 0.5rem;
 
@@ -123,15 +114,6 @@ won-create-search {
     .cp__content__branchheader {
       padding-left: 0;
       padding-right: 0;
-    }
-
-    .cp__content__tuning {
-      @include appearAnimation(0.5s, linear);
-
-      .cp__content__tuning_matching-context {
-        @include slideWithOpacityAnimation(0.5s, linear, 20rem, 0.5rem 0);
-        padding: 0.5rem 0;
-      }
     }
 
     &__responsivebuttons {
