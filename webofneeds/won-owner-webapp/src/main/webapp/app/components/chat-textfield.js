@@ -12,10 +12,7 @@ import "ng-redux";
 import ngAnimate from "angular-animate";
 import { dispatchEvent, attach, delay, get } from "../utils.js";
 import won from "../won-es6.js";
-import {
-  getConnectionUriFromRoute,
-  getOwnedNeedByConnectionUri,
-} from "../selectors/general-selectors.js";
+import { getOwnedNeedByConnectionUri } from "../selectors/general-selectors.js";
 import { getMessagesByConnectionUri } from "../selectors/message-selectors.js";
 import {
   isMessageProposable,
@@ -26,7 +23,7 @@ import {
   isMessageRejectable,
   isMessageSelected,
 } from "../message-utils.js";
-import { getAllMessageDetails } from "../won-utils.js";
+import { connect2Redux, getAllMessageDetails } from "../won-utils.js";
 import autoresizingTextareaModule from "../directives/textarea-autogrow.js";
 import { actionCreators } from "../actions/actions.js";
 import labelledHrModule from "./labelled-hr.js";
@@ -292,19 +289,20 @@ function genComponentConf() {
       });
 
       const selectFromState = state => {
-        const connectionUri = getConnectionUriFromRoute(state);
         const post =
-          connectionUri && getOwnedNeedByConnectionUri(state, connectionUri);
-        const connection = post && post.getIn(["connections", connectionUri]);
+          this.connectionUri &&
+          getOwnedNeedByConnectionUri(state, this.connectionUri);
+        const connection =
+          post && post.getIn(["connections", this.connectionUri]);
         const connectionState = connection && connection.get("state");
 
         const isGroupChatConnection = isChatToGroup(
           state.get("needs"),
           get(post, "uri"),
-          connectionUri
+          this.connectionUri
         );
 
-        const messages = getMessagesByConnectionUri(state, connectionUri);
+        const messages = getMessagesByConnectionUri(state, this.connectionUri);
 
         const selectedMessages =
           messages && messages.filter(msg => isMessageSelected(msg));
@@ -344,7 +342,6 @@ function genComponentConf() {
           selectedDetailIdentifier &&
           this.allMessageDetails[selectedDetailIdentifier];
         return {
-          connectionUri,
           post,
           multiSelectType: connection && connection.get("multiSelectType"),
           showAgreementData: connection && connection.get("showAgreementData"),
@@ -367,10 +364,12 @@ function genComponentConf() {
         };
       };
 
-      const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(
+      connect2Redux(
+        selectFromState,
+        actionCreators,
+        ["self.connectionUri"],
         this
       );
-      this.$scope.$on("$destroy", disconnect);
 
       this.textFieldNg().bind("input", () => {
         this.input();
@@ -659,6 +658,7 @@ function genComponentConf() {
     controllerAs: "self",
     bindToController: true, //scope-bindings -> ctrl
     scope: {
+      connectionUri: "=",
       placeholder: "=", // NOTE: bound only once
       maxChars: "=",
       helpText: "=",
@@ -692,7 +692,7 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.chatTextfieldSimple", [
+  .module("won.owner.components.chatTextfield", [
     labelledHrModule,
     autoresizingTextareaModule,
     submitButtonModule,
@@ -728,4 +728,4 @@ export default angular
       };
     },
   ])
-  .directive("chatTextfieldSimple", genComponentConf).name;
+  .directive("chatTextfield", genComponentConf).name;

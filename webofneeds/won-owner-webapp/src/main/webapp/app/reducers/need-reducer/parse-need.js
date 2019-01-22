@@ -5,7 +5,9 @@ import {
   isWhatsNewNeed,
   isWhatsAroundNeed,
   isSearchNeed,
+  isPersona,
 } from "../../need-utils.js";
+import { getIn } from "../../utils.js";
 
 export function parseNeed(jsonldNeed, isOwned) {
   const jsonldNeedImm = Immutable.fromJS(jsonldNeed);
@@ -168,7 +170,9 @@ function getHumanReadableStringFromNeed(need, detailsToParse) {
 
     const immNeed = Immutable.fromJS(need);
 
-    if (isWhatsNewNeed(immNeed)) {
+    if (isPersona(need)) {
+      return getIn(need, ["content", "personaName"]);
+    } else if (isWhatsNewNeed(immNeed)) {
       return "What's New";
     } else if (isWhatsAroundNeed(immNeed)) {
       let location =

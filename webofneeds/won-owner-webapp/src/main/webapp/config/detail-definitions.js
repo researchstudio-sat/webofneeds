@@ -18,6 +18,7 @@ export const emptyDraft = {
 
 export const details = {
   title: basicDetails.title,
+  personaName: basicDetails.personaName,
   description: basicDetails.description,
   tags: basicDetails.tags,
   searchString: basicDetails.searchString,
@@ -38,6 +39,7 @@ export const details = {
   price: priceDetails.price,
   review: reviewDetails.review,
   responseToUri: basicDetails.responseToUri,
+  website: basicDetails.website,
   flags: basicDetails.flags,
 };
 

@@ -8,6 +8,7 @@ import { attach, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { getGroupPostAdminUriFromRoute } from "../selectors/general-selectors.js";
 import { getGroupChatConnectionsByNeedUri } from "../selectors/connection-selectors.js";
+import submitButtonModule from "./submit-button.js";
 
 import "style/_group-administration.scss";
 import "style/_rdflink.scss";
@@ -74,9 +75,13 @@ function genComponentConf() {
             </div>
         </div>
         <div class="ga__footer">
-            <button class="ga__footer__button won-button--filled red" ng-click="self.joinGroup()">
-                Join Group
-            </button>
+            <won-submit-button
+                class="ga__footer__button"
+                is-valid="::true"
+                on-submit="self.joinGroup(persona)"
+                show-personas="::true"
+                label="::'Join&#160;Group'">
+            </won-submit-button>
         </div>
     `;
 
@@ -127,17 +132,14 @@ function genComponentConf() {
       this.connections__close(connUri);
     }
 
-    joinGroup(persona) {
-      //TODO: FIGURE OUT HOW TO USE won-submit-button instead so we can add a persona if need be
+    joinGroup(selectedPersona) {
       if (this.groupPostAdminUri) {
         this.connections__connectAdHoc(
           this.groupPostAdminUri,
-          "" /*message cant be undefined for whatever reason*/,
-          persona
+          "",
+          selectedPersona
         );
       }
-
-      //this.router__stateGoCurrent({connectionUri: null, sendAdHocRequest: null});
     }
   }
   Controller.$inject = serviceDependencies;
@@ -157,5 +159,6 @@ export default angular
     groupAdministrationHeaderModule,
     postHeaderModule,
     labelledHrModule,
+    submitButtonModule,
   ])
   .directive("wonGroupAdministration", genComponentConf).name;

@@ -45,6 +45,10 @@ class Controller {
         showSlideIns:
           viewSelectors.hasSlideIns(state) && viewSelectors.showSlideIns(state),
         viewNeedUri,
+        postLoading:
+          !post || getIn(state, ["process", "needs", postUri, "loading"]),
+        postFailedToLoad:
+          post && getIn(state, ["process", "needs", postUri, "failedToLoad"]),
       };
     };
 

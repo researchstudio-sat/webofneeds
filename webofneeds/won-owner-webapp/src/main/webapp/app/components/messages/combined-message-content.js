@@ -105,7 +105,7 @@ function genComponentConf() {
           relevantNeedUri && getIn(allNeeds, [relevantNeedUri, "heldBy"]);
         const personaName =
           relevantPersonaUri &&
-          getIn(allNeeds, [relevantPersonaUri, "jsonld", "s:name"]);
+          getIn(allNeeds, [relevantPersonaUri, "content", "personaName"]);
 
         return {
           allNeeds,
