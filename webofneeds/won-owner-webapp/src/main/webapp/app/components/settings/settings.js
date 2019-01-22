@@ -28,7 +28,8 @@ class SettingsController {
       return {
         appTitle: getIn(state, ["config", "theme", "title"]),
         showModalDialog: state.getIn(["view", "showModalDialog"]),
-        showSlideIns: viewSelectors.showSlideIns(state),
+        showSlideIns:
+          viewSelectors.hasSlideIns(state) && viewSelectors.showSlideIns(state),
       };
     };
     const disconnect = this.$ngRedux.connect(select, actionCreators)(this);

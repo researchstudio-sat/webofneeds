@@ -219,7 +219,8 @@ class AboutController {
         peopleGrid: peopleGrid({ themeName }),
         processingPublish: state.getIn(["process", "processingPublish"]),
         showModalDialog: state.getIn(["view", "showModalDialog"]),
-        showSlideIns: viewSelectors.showSlideIns(state),
+        showSlideIns:
+          viewSelectors.hasSlideIns(state) && viewSelectors.showSlideIns(state),
       };
     };
     const disconnect = this.$ngRedux.connect(select, actionCreators)(this);

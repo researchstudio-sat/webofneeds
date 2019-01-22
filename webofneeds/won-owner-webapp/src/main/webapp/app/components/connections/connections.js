@@ -137,7 +137,8 @@ class ConnectionsController {
         showPostInfo:
           selectedPost && !useCaseGroup && !showGroupPostAdministration,
         showGroupPostAdministration: showGroupPostAdministration,
-        showSlideIns: viewSelectors.showSlideIns(state),
+        showSlideIns:
+          viewSelectors.hasSlideIns(state) && viewSelectors.showSlideIns(state),
         showNeedOverlay: !!viewNeedUri,
         viewNeedUri,
         hideListSideInResponsive:

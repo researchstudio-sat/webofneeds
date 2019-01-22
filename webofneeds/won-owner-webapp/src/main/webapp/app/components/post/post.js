@@ -42,7 +42,8 @@ class Controller {
         won: won.WON,
         showModalDialog: getIn(state, ["view", "showModalDialog"]),
         showNeedOverlay: !!viewNeedUri,
-        showSlideIns: viewSelectors.showSlideIns(state),
+        showSlideIns:
+          viewSelectors.hasSlideIns(state) && viewSelectors.showSlideIns(state),
         viewNeedUri,
       };
     };

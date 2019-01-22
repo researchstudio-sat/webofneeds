@@ -34,7 +34,8 @@ class SignupController {
         isAnonymous: state.getIn(["account", "isAnonymous"]),
         privateId: state.getIn(["account", "privateId"]),
         showModalDialog: state.getIn(["view", "showModalDialog"]),
-        showSlideIns: viewSelectors.showSlideIns(state),
+        showSlideIns:
+          viewSelectors.hasSlideIns(state) && viewSelectors.showSlideIns(state),
       };
     };
     const disconnect = this.$ngRedux.connect(select, actionCreators)(this);
