@@ -22,7 +22,6 @@ import {
  * @returns true if anything is currently loading
  */
 export function isLoading(state) {
-  //TODO: Incl. lookup to determine any other process being in loading
   const process = get(state, "process");
 
   return (
