@@ -76,10 +76,11 @@ function genComponentConf() {
           </svg>
         </div>
       </div>
-      <div class="paypalpaymentp__label">
+      <div class="paypalpaymentp__label" ng-if="self.isValidPayment()">
         {{ self.detail.customerLabel }}
       </div>
       <won-suggestpost-picker
+      ng-if="self.isValidPayment()"
           initial-value="self.initialValue && self.initialValue.customerUri"
           on-update="self.updateCostumerUri(value)"
           detail="self.detail && self.detail.suggestPost"
@@ -92,6 +93,8 @@ function genComponentConf() {
 
       window.paypalpaymentp4dbg = this;
 
+      // initial values are useless here, as this is currently a message-only detail
+      // which means that no values get saved anyway
       this.addedNumber = this.initialValue && this.initialValue.amount;
       this.selectedCurrency = this.initialValue && this.initialValue.currency;
       this.customerUri = this.initialValue && this.initialValue.customerUri;
@@ -133,6 +136,15 @@ function genComponentConf() {
       } else {
         this.onUpdate({ value: undefined });
       }
+    }
+
+    isValidPayment() {
+      return (
+        isValidNumber(this.addedNumber) &&
+        this.currency &&
+        this.secret &&
+        this.receiver
+      );
     }
 
     getDefaultCurrency() {
