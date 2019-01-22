@@ -1,8 +1,9 @@
 /**
  * Created by quasarchimaere on 21.01.2019.
  */
-import { get } from "../utils.js";
+import { get, getIn } from "../utils.js";
 import * as viewUtils from "../view-utils.js";
+import { getVerificationTokenFromRoute } from "./general-selectors.js";
 
 /**
  * Check if showSlideIns is true
@@ -27,4 +28,70 @@ export function isAnonymousSlideInExpanded(state) {
 
 export function showAnonymousSlideInEmailInput(state) {
   return viewUtils.showAnonymousSlideInEmailInput(get(state, "view"));
+}
+
+export function showSlideInAnonymousSuccess(state) {
+  const isAnonymous = getIn(state, ["account", "isAnonymous"]);
+
+  return (
+    !showSlideInConnectionLost(state) &&
+    isAnonymous &&
+    (isAnonymousLinkSent(state) || isAnonymousLinkCopied(state))
+  );
+}
+
+export function showSlideInAnonymous(state) {
+  const isAnonymous = getIn(state, ["account", "isAnonymous"]);
+
+  return (
+    !showSlideInConnectionLost(state) &&
+    isAnonymous &&
+    !isAnonymousLinkSent(state) &&
+    !isAnonymousLinkCopied(state)
+  );
+}
+
+export function showSlideInDisclaimer(state) {
+  const isDisclaimerAccepted = getIn(state, ["account", "acceptedDisclaimer"]);
+
+  return !showSlideInConnectionLost(state) && !isDisclaimerAccepted;
+}
+
+export function showSlideInTermsOfService(state) {
+  const isLoggedIn = getIn(state, ["account", "loggedIn"]);
+  const isTermsOfServiceAccepted = getIn(state, [
+    "account",
+    "acceptedTermsOfService",
+  ]);
+
+  return (
+    isLoggedIn && !showSlideInConnectionLost(state) && !isTermsOfServiceAccepted
+  );
+}
+
+export function showSlideInEmailVerification(state) {
+  const verificationToken = getVerificationTokenFromRoute(state);
+  const isLoggedIn = getIn(state, ["account", "loggedIn"]);
+  const isAnonymous = getIn(state, ["account", "isAnonymous"]);
+  const isEmailVerified = getIn(state, ["account", "emailVerified"]);
+
+  return (
+    !showSlideInConnectionLost(state) &&
+    (verificationToken || (isLoggedIn && !isEmailVerified && !isAnonymous))
+  );
+}
+
+export function showSlideInConnectionLost(state) {
+  return getIn(state, ["messages", "lostConnection"]);
+}
+
+export function hasSlideIns(state) {
+  return (
+    showSlideInAnonymous(state) ||
+    showSlideInAnonymousSuccess(state) ||
+    showSlideInDisclaimer(state) ||
+    showSlideInTermsOfService(state) ||
+    showSlideInEmailVerification(state) ||
+    showSlideInConnectionLost(state)
+  );
 }
