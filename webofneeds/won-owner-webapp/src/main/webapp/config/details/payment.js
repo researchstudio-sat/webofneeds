@@ -13,7 +13,7 @@ export const paypalPayment = {
   receiverPlaceholder: "PayPal Account ID (Email)...",
   secretLabel: "Secret:",
   secretPlaceholder: "Enter Secret...",
-  customerLabel: "Enter Payer Post URI...", // TODO: use suggestPost feature here
+  customerLabel: "Invoice will be sent to...",
   component: "won-paypal-payment-picker",
   viewerComponent: "won-paypal-payment-viewer",
   currency: [
