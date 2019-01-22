@@ -7,9 +7,25 @@
 </header>
 <won-toasts></won-toasts>
 <won-slide-in></won-slide-in>
-<main class="postcontent">
+<main class="postcontent" ng-class="{'postcontent--won-loading': self.postLoading, 'postcontent--won-failed': self.postFailedToLoad}">
     <!-- Post info view when there's no connection-state/-type selected -->
-    <won-visitor-title-bar item="self.post"></won-visitor-title-bar>
-    <won-send-request ng-if="self.post && !self.isOwnPost" class="won-send-request--noheader"></won-send-request>
+    <won-visitor-title-bar ng-if="!(self.postLoading || self.postFailedToLoad)" item="self.post"></won-visitor-title-bar>
+    <won-send-request ng-if="!(self.postLoading || self.postFailedToLoad) && self.post && !self.isOwnPost" class="won-send-request--noheader"></won-send-request>
+    <div class="pc__loading" ng-if="self.postLoading">
+        <svg class="pc__loading__spinner hspinner">
+            <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
+        </svg>
+        <span class="pc__loading__label">
+            Loading...
+        </span>
+    </div>
+    <div class="pc__failed" ng-if="self.postFailedToLoad">
+        <svg class="pc__failed__icon">
+            <use xlink:href="#ico16_indicator_error" href="#ico16_indicator_error"></use>
+        </svg>
+        <span class="pc__failed__label">
+            Failed To Load - Need might have been deleted
+        </span>
+    </div>
 </main>
 <won-footer></won-footer>

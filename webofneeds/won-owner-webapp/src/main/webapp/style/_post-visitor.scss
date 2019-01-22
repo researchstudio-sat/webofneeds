@@ -9,15 +9,53 @@ main.postcontent {
   box-sizing: border-box;
   align-items: stretch;
   max-width: $maxContentWidth;
-  border-left: $thinGrayBorder;
-  border-right: $thinGrayBorder;
-  border-bottom: $thinGrayBorder;
-  background: white;
+
+  &:not(.postcontent--won-failed):not(.postcontent--won-loading) {
+    border-left: $thinGrayBorder;
+    border-right: $thinGrayBorder;
+    border-bottom: $thinGrayBorder;
+    background: white;
+  }
   width: 100%;
   margin: 0 auto;
 
   @media (max-width: $responsivenessBreakPoint) {
     border-left: none;
     border-right: none;
+  }
+
+  & > .pc__loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 5rem 0;
+
+    > .pc__loading__spinner.hspinner {
+      @include fixed-square(5rem);
+    }
+    > .pc__loading__label {
+      color: $won-line-gray;
+      text-align: center;
+    }
+  }
+
+  & > .pc__failed {
+    display: grid;
+    grid-template-areas: "failed_icon failed_label";
+    align-items: center;
+    justify-content: center;
+    padding: 5rem 0;
+    grid-gap: 0.5rem;
+
+    > .pc__failed__icon {
+      grid-area: failed_icon;
+      @include fixed-square(5rem);
+      --local-primary: #{$won-primary-color};
+    }
+    > .pc__failed__label {
+      grid-area: failed_label;
+      text-align: center;
+    }
   }
 }
