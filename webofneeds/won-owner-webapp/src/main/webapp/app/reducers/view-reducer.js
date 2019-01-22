@@ -21,10 +21,14 @@ const initialState = Immutable.fromJS({
     linkSent: false,
     linkCopied: false,
   },
+  showSlideIns: true,
 });
 
 export default function(viewState = initialState, action = {}) {
   switch (action.type) {
+    case actionTypes.view.toggleSlideIns:
+      return viewState.set("showSlideIns", !viewState.get("showSlideIns"));
+
     case actionTypes.account.loginFailed:
     case actionTypes.view.showMainMenu:
       return viewState.set("showMainMenu", true);

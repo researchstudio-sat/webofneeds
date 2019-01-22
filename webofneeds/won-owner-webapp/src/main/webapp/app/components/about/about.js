@@ -8,6 +8,7 @@ import { actionCreators } from "../../actions/actions.js";
 import { ownerBaseUrl } from "config";
 import * as srefUtils from "../../sref-utils.js";
 import { getAboutSectionFromRoute } from "../../selectors/general-selectors.js";
+import * as viewSelectors from "../../selectors/view-selectors.js";
 
 import "style/_about.scss";
 
@@ -218,6 +219,7 @@ class AboutController {
         peopleGrid: peopleGrid({ themeName }),
         processingPublish: state.getIn(["process", "processingPublish"]),
         showModalDialog: state.getIn(["view", "showModalDialog"]),
+        showSlideIns: viewSelectors.showSlideIns(state),
       };
     };
     const disconnect = this.$ngRedux.connect(select, actionCreators)(this);

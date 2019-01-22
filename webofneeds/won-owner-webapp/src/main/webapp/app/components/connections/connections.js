@@ -23,6 +23,7 @@ import {
   getGroupPostAdminUriFromRoute,
 } from "../../selectors/general-selectors.js";
 import { isChatToGroup } from "../../connection-utils.js";
+import * as viewSelectors from "../../selectors/view-selectors.js";
 import * as srefUtils from "../../sref-utils.js";
 
 import "style/_connections.scss";
@@ -136,6 +137,7 @@ class ConnectionsController {
         showPostInfo:
           selectedPost && !useCaseGroup && !showGroupPostAdministration,
         showGroupPostAdministration: showGroupPostAdministration,
+        showSlideIns: viewSelectors.showSlideIns(state),
         showNeedOverlay: !!viewNeedUri,
         viewNeedUri,
         hideListSideInResponsive:

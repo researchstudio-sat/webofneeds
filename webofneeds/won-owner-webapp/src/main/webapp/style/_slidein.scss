@@ -4,7 +4,8 @@
 @import "responsiveness-utils";
 
 @mixin slide-in() {
-  grid-column: 2;
+  grid-column: 3;
+  grid-row: 1;
   @extend .collapsible;
 
   justify-content: center;
@@ -76,10 +77,19 @@ won-slide-in {
   }
 
   display: grid;
-  grid-template-columns: 1fr minmax(min-content, $maxContentWidth) 1fr;
+  grid-template-columns: 1fr min-content minmax(min-content, $maxContentWidth) 1fr;
 
   background: black; //Fallback in case the browser does not support css variables
   background: $won-secondary-color;
+
+  > .si__toggle {
+    grid-column: 2;
+
+    cursor: pointer;
+    @include fixed-square(1.5rem);
+    --local-primary: white;
+    padding: 0.5rem;
+  }
 
   .si__anonymoussuccess,
   .si__connectionlost,
