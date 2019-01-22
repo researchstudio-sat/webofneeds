@@ -20,17 +20,6 @@
 
   box-sizing: border-box;
 
-  overflow-y: hidden;
-  &.visible {
-    max-height: 100%; //Fallback in case the browser does not support vh
-    max-height: 100vh;
-  }
-  &:not(.visible) {
-    padding-top: 0;
-    padding-bottom: 0;
-    max-height: 0;
-  }
-
   & > .si__icon {
     grid-area: siIcon;
   }
@@ -72,7 +61,7 @@
 }
 
 won-slide-in {
-  @include slideAnimationFixedHorizontal(1s, ease-in-out, 100vh);
+  @include slideAnimationFixedHorizontal(0.5s, ease-in-out, 100vh);
 
   & > input.si__anonymousLink {
     //So the copy to clipboard function works but the input field is still "hidden"

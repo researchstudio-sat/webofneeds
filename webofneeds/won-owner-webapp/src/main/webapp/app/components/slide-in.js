@@ -24,7 +24,7 @@ function genSlideInConf() {
             <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
         </svg>
         <input type='text' class="si__anonymousLink" value="{{ self.anonymousLink }}" ng-if="self.inclAnonymousLinkInput"/>
-        <div class="si__connectionlost" ng-class="{'visible': self.showConnectionLost}">
+        <div class="si__connectionlost" ng-if="self.showConnectionLost">
             <svg class="si__icon">
                 <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
             </svg>
@@ -42,7 +42,7 @@ function genSlideInConf() {
                 <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
             </svg>
         </div>
-        <div class="si__emailverification" ng-class="{'visible': self.showEmailVerification}">
+        <div class="si__emailverification" ng-if="self.showEmailVerification">
             <svg class="si__icon">
                 <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
             </svg>
@@ -81,7 +81,7 @@ function genSlideInConf() {
                 <use xlink:href="#ico36_close" href="#ico36_close"></use>
             </svg>
         </div>
-        <div class="si__termsofservice" ng-class="{'visible': self.showTermsOfService}">
+        <div class="si__termsofservice" ng-if="self.showTermsOfService">
             <svg class="si__icon">
                 <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
             </svg>
@@ -102,7 +102,7 @@ function genSlideInConf() {
                 <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
             </svg>
         </div>
-        <div class="si__disclaimer" ng-class="{'visible': self.showDisclaimer}">
+        <div class="si__disclaimer" ng-if="self.showDisclaimer">
             <svg class="si__icon">
                 <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_info"></use>
             </svg>
@@ -135,8 +135,8 @@ function genSlideInConf() {
             </button>
         </div>
         <div class="si__anonymous"
+            ng-if="self.showAnonymous"
             ng-class="{
-              'visible': self.showAnonymous,
               'si__anonymous--expanded': self.isAnonymousSlideInExpanded,
               'si__anonymous--emailInput': self.showAnonymousSlideInEmailInput,
             }">
@@ -204,7 +204,7 @@ function genSlideInConf() {
             </svg>
         </div>
         <div class="si__anonymoussuccess"
-            ng-class="{'visible': self.showAnonymousSuccess}">
+            ng-if="self.showAnonymousSuccess">
             <svg class="si__icon">
                 <use xlink:href="#ico16_indicator_info" href="#ico16_indicator_info"></use>
             </svg>
