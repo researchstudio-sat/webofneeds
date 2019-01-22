@@ -182,9 +182,11 @@ export function isMessageLoading(process, msgUri, connUri = undefined) {
     );
   }
 
-  //TODO: IMPL CASE FOR NO CONNURI PRESENT (CRAWL CONNECTIONS)
-
-  return false;
+  return (
+    get(process, "connections")
+      .flatMap(conn => conn.get("messages"))
+      .filter(msgProcess => msgProcess.get("loading")).size > 0
+  );
 }
 
 /**
@@ -205,7 +207,10 @@ export function isAnyMessageLoading(process, connUri = undefined) {
     );
   }
 
-  //TODO: IMPL CASE FOR NO CONNURI PRESENT (CRAWL CONNECTIONS)
-
-  return false;
+  return (
+    get(process, "connections")
+      .flatMap(conn => conn.get("messages"))
+      .filter((msgProcess, msgUri) => isMessageLoading(process, msgUri)).size >
+    0
+  );
 }
