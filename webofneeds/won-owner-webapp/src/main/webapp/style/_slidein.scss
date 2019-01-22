@@ -73,7 +73,10 @@ won-slide-in {
   }
 
   display: grid;
-  grid-template-columns: 1fr min-content minmax(min-content, $maxContentWidth) 1fr;
+  $togglePadding: 0.5rem;
+  $toggleWidth: 1.5rem;
+  $maxSlideInWidth: $maxContentWidth - $toggleWidth - ($togglePadding * 2);
+  grid-template-columns: 1fr 2.5rem minmax(min-content, $maxSlideInWidth) 1fr;
 
   background: black; //Fallback in case the browser does not support css variables
   background: $won-secondary-color;
@@ -82,9 +85,9 @@ won-slide-in {
     grid-column: 2;
 
     cursor: pointer;
-    @include fixed-square(1.5rem);
+    @include fixed-square($toggleWidth);
     --local-primary: white;
-    padding: 0.5rem;
+    padding: $togglePadding;
   }
 
   .si__anonymoussuccess,
