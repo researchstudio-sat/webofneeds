@@ -6,7 +6,7 @@
  */
 
 //import won from "./won-es6.js";
-import { get } from "./utils.js";
+import { get, getIn } from "./utils.js";
 
 /**
  * Check if showSlideIns is true
@@ -15,4 +15,20 @@ import { get } from "./utils.js";
  */
 export function showSlideIns(viewState) {
   return get(viewState, "showSlideIns");
+}
+
+export function isAnonymousLinkSent(viewState) {
+  return getIn(viewState, ["anonymousSlideIn", "linkSent"]);
+}
+
+export function isAnonymousLinkCopied(viewState) {
+  return getIn(viewState, ["anonymousSlideIn", "linkCopied"]);
+}
+
+export function isAnonymousSlideInExpanded(viewState) {
+  return getIn(viewState, ["anonymousSlideIn", "expanded"]);
+}
+
+export function showAnonymousSlideInEmailInput(viewState) {
+  return getIn(viewState, ["anonymousSlideIn", "showEmailInput"]);
 }

@@ -12,3 +12,19 @@ import * as viewUtils from "../view-utils.js";
 export function showSlideIns(state) {
   return viewUtils.showSlideIns(get(state, "view"));
 }
+
+export function isAnonymousLinkSent(state) {
+  return viewUtils.isAnonymousLinkSent(get(state, "view"));
+}
+
+export function isAnonymousLinkCopied(state) {
+  return viewUtils.isAnonymousLinkCopied(get(state, "view"));
+}
+
+export function isAnonymousSlideInExpanded(state) {
+  return viewUtils.isAnonymousSlideInExpanded(get(state, "view"));
+}
+
+export function showAnonymousSlideInEmailInput(state) {
+  return viewUtils.showAnonymousSlideInEmailInput(get(state, "view"));
+}
