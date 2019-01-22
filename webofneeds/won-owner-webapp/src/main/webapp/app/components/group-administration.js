@@ -80,7 +80,7 @@ function genComponentConf() {
                 is-valid="::true"
                 on-submit="self.joinGroup(persona)"
                 show-personas="::true"
-                label="self.submitButtonLabel">
+                label="::'Join&#160;Group'">
             </won-submit-button>
         </div>
     `;
