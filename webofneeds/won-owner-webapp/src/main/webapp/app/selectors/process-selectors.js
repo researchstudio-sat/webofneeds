@@ -34,7 +34,7 @@ export function isLoading(state) {
     isProcessingResendVerificationEmail(process) ||
     isProcessingSendAnonymousLinkEmail(process) ||
     isAnyNeedLoading(process) ||
-    isAnyConnectionLoading(process) ||
+    isAnyConnectionLoading(process, true) ||
     isAnyMessageLoading(process)
   );
 }
