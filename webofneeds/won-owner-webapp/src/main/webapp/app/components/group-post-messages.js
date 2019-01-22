@@ -1,6 +1,6 @@
 import won from "../won-es6.js";
 import angular from "angular";
-import chatTextFieldSimpleModule from "./chat-textfield-simple.js";
+import chatTextFieldModule from "./chat-textfield.js";
 import connectionMessageModule from "./messages/connection-message.js";
 import postContentMessageModule from "./messages/post-content-message.js";
 import connectionHeaderModule from "./connection-header.js";
@@ -88,8 +88,9 @@ function genComponentConf() {
             </a>
         </div>
         <div class="gpm__footer" ng-if="self.isConnected">
-            <chat-textfield-simple
+            <chat-textfield
                 class="gpm__footer__chattexfield"
+                connection-uri="self.connectionUri"
                 placeholder="self.shouldShowRdf? 'Enter TTL...' : 'Your message...'"
                 submit-button-label="self.shouldShowRdf? 'Send&#160;RDF' : 'Send'"
                 on-submit="self.send(value, additionalContent, referencedContent, self.shouldShowRdf)"
@@ -98,37 +99,39 @@ function genComponentConf() {
                 allow-details="!self.shouldShowRdf"
                 is-code="self.shouldShowRdf? 'true' : ''"
             >
-            </chat-textfield-simple>
+            </chat-textfield>
         </div>
         <div class="gpm__footer" ng-if="self.isSentRequest">
             Waiting for the Group Administrator to accept your request.
         </div>
 
         <div class="gpm__footer" ng-if="self.isReceivedRequest">
-            <chat-textfield-simple
+            <chat-textfield
                 class="gpm__footer__chattexfield"
+                connection-uri="self.connectionUri"
                 placeholder="::'Message (optional)'"
                 on-submit="::self.openRequest(value)"
                 allow-details="::false"
                 allow-empty-submit="::true"
                 submit-button-label="::'Accept&#160;Invite'"
             >
-            </chat-textfield-simple>
+            </chat-textfield>
             <won-labelled-hr label="::'Or'" class="gpm__footer__labelledhr"></won-labelled-hr>
             <button class="gpm__footer__button won-button--filled black" ng-click="self.closeConnection()">
                 Decline
             </button>
         </div>
         <div class="gpm__footer" ng-if="self.isSuggested">
-            <chat-textfield-simple
+            <chat-textfield
                 placeholder="::'Message (optional)'"
+                connection-uri="self.connectionUri"
                 on-submit="::self.sendRequest(value, selectedPersona)"
                 allow-details="::false"
                 allow-empty-submit="::true"
                 show-personas="self.isOwnedNeedWhatsX"
                 submit-button-label="::'Ask&#160;to&#160;Join'"
             >
-            </chat-textfield-simple>
+            </chat-textfield>
             <won-labelled-hr label="::'Or'" class="gpm__footer__labelledhr"></won-labelled-hr>
             <button class="gpm__footer__button won-button--filled black" ng-click="self.closeConnection(true)">
                 Bad match - remove!
@@ -442,7 +445,7 @@ function genComponentConf() {
 export default angular
   .module("won.owner.components.groupPostMessages", [
     autoresizingTextareaModule,
-    chatTextFieldSimpleModule,
+    chatTextFieldModule,
     connectionMessageModule,
     connectionHeaderModule,
     labelledHrModule,
