@@ -87,7 +87,9 @@ function genTopnavConf() {
           isAnonymous: state.getIn(["account", "isAnonymous"]),
           isSignUpView: currentRoute === "signup",
           showLoadingIndicator: isLoading(state),
-          showSlideInIndicator: !viewSelectors.showSlideIns(state),
+          showSlideInIndicator:
+            viewSelectors.hasSlideIns(state) &&
+            !viewSelectors.showSlideIns(state),
         };
       };
 

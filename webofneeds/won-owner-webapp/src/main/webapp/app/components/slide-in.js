@@ -247,10 +247,6 @@ function genSlideInConf() {
         const isLoggedIn = getIn(state, ["account", "loggedIn"]);
         const isAnonymous = getIn(state, ["account", "isAnonymous"]);
         const isEmailVerified = getIn(state, ["account", "emailVerified"]);
-        const isDisclaimerAccepted = getIn(state, [
-          "account",
-          "acceptedDisclaimer",
-        ]);
         const isTermsOfServiceAccepted = getIn(state, [
           "account",
           "acceptedTermsOfService",
@@ -305,23 +301,16 @@ function genSlideInConf() {
           anonymousLinkCopied,
           anonymousLink: anonymousLink,
 
-          showAnonymousSuccess:
-            !connectionHasBeenLost &&
-            isAnonymous &&
-            (anonymousLinkSent || anonymousLinkCopied),
-          showAnonymous:
-            !connectionHasBeenLost &&
-            isAnonymous &&
-            !anonymousLinkSent &&
-            !anonymousLinkCopied,
-          showDisclaimer: !connectionHasBeenLost && !isDisclaimerAccepted,
-          showTermsOfService:
-            isLoggedIn && !connectionHasBeenLost && !isTermsOfServiceAccepted,
-          showEmailVerification:
-            !connectionHasBeenLost &&
-            (verificationToken ||
-              (isLoggedIn && !isEmailVerified && !isAnonymous)),
-          showConnectionLost: connectionHasBeenLost,
+          showAnonymousSuccess: viewSelectors.showSlideInAnonymousSuccess(
+            state
+          ),
+          showAnonymous: viewSelectors.showSlideInAnonymous(state),
+          showDisclaimer: viewSelectors.showSlideInDisclaimer(state),
+          showTermsOfService: viewSelectors.showSlideInTermsOfService(state),
+          showEmailVerification: viewSelectors.showSlideInEmailVerification(
+            state
+          ),
+          showConnectionLost: viewSelectors.showSlideInConnectionLost(state),
           inclAnonymousLinkInput:
             !connectionHasBeenLost &&
             isLoggedIn &&
