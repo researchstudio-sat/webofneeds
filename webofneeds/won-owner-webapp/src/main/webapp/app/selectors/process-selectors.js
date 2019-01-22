@@ -1,12 +1,41 @@
 /**
  * Created by quasarchimaere on 21.01.2019.
  */
-import { getIn } from "../utils.js";
+import { get } from "../utils.js";
+import {
+  isProcessingInitialLoad,
+  isProcessingLogin,
+  isProcessingLogout,
+  isProcessingPublish,
+  isProcessingAcceptTermsOfService,
+  isProcessingVerifyEmailAddress,
+  isProcessingResendVerificationEmail,
+  isProcessingSendAnonymousLinkEmail,
+  isAnyNeedLoading,
+  isAnyConnectionLoading,
+  isAnyMessageLoading,
+} from "../process-utils.js";
 
+/**
+ * Check if anything in the state sub-map of process is currently marked as loading
+ * @param state (full redux-state)
+ * @returns true if anything is currently loading
+ */
 export function isLoading(state) {
   //TODO: Incl. lookup to determine any other process being in loading
+  const process = get(state, "process");
+
   return (
-    getIn(state, ["process", "processingInitialLoad"]) ||
-    getIn(state, ["process", "processingLogin"])
+    isProcessingInitialLoad(process) ||
+    isProcessingLogin(process) ||
+    isProcessingLogout(process) ||
+    isProcessingPublish(process) ||
+    isProcessingAcceptTermsOfService(process) ||
+    isProcessingVerifyEmailAddress(process) ||
+    isProcessingResendVerificationEmail(process) ||
+    isProcessingSendAnonymousLinkEmail(process) ||
+    isAnyNeedLoading(process) ||
+    isAnyConnectionLoading(process) ||
+    isAnyMessageLoading(process)
   );
 }
