@@ -91,7 +91,22 @@ export function isNeedLoading(process, needUri) {
 }
 
 /**
- * Return true if given connUri is currently loading, if includeSubs is true, we also check the petriNetData and agreementData
+ * Return true if any needUri is currently loading
+ * @param process
+ * @returns {boolean}
+ */
+export function isAnyNeedLoading(process) {
+  const needProcess = get(process, "needs");
+
+  return (
+    needProcess.filter((needProcess, needUri) =>
+      isNeedLoading(process, needUri)
+    ).size > 0
+  );
+}
+
+/**
+ * Return true if given connUri is currently loading, if includeSubData is true, we also check the petriNetData and agreementData
  * as well
  * @param process (full process from state)
  * @param connUri
@@ -108,6 +123,22 @@ export function isConnectionLoading(process, connUri, includeSubData = false) {
   }
 
   return getIn(process, ["connections", connUri, "loading"]);
+}
+
+/**
+ * Return true if any connUri is currently loading, if includeSubData is true, we also check the petriNetData and agreementData
+ * @param process
+ * @param includeSubData (default=false, determines if the loading state should be checked for agreementData and petriNetData as well
+ * @returns {boolean}
+ */
+export function isAnyConnectionLoading(process, includeSubData) {
+  const connectionProcess = get(process, "connections");
+
+  return (
+    connectionProcess.filter((needProcess, connUri) =>
+      isConnectionLoading(process, connUri, includeSubData)
+    ).size > 0
+  );
 }
 
 /**
@@ -152,5 +183,29 @@ export function isMessageLoading(process, msgUri, connUri = undefined) {
   }
 
   //TODO: IMPL CASE FOR NO CONNURI PRESENT (CRAWL CONNECTIONS)
+
+  return false;
+}
+
+/**
+ * Return true if the any msgUri is currently loading, if connUri is present just check messages within this connUri-process
+ * @param process
+ * @param msgUri
+ * @param connUri (default=undefined, if present just lookup the msgUri within the connUri, otherwise crawl every connection)
+ * @returns {*}
+ */
+export function isAnyMessageLoading(process, connUri = undefined) {
+  if (connUri) {
+    const msgProcess = getIn(process, ["connections", connUri, "messages"]);
+
+    return (
+      msgProcess.filter((msgProcess, msgUri) =>
+        isMessageLoading(process, msgUri, connUri)
+      ).size > 0
+    );
+  }
+
+  //TODO: IMPL CASE FOR NO CONNURI PRESENT (CRAWL CONNECTIONS)
+
   return false;
 }
