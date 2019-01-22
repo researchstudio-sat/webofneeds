@@ -1768,17 +1768,27 @@ WonMessage.prototype = {
     }
 
     if (innermostEnvelopes.length == 0) {
-      this.parseErrors.push("no innermost envelope found");
+      this.parseErrors.push(
+        "no innermost envelope found. GraphUris: " +
+          JSON.stringify(this.graphUris)
+      );
     }
     if (innermostEnvelopes.length > 1) {
-      this.parseErrors.push("more than one innermost envelope found");
+      this.parseErrors.push(
+        "more than one innermost envelope found. GraphUris: " +
+          JSON.stringify(this.graphUris)
+      );
     }
     if (unreferencedEnvelopes.length == 0) {
-      this.parseErrors.push("no unreferenced (i.e. outermost) envelope found");
+      this.parseErrors.push(
+        "no unreferenced (i.e. outermost) envelope found. GraphUris: " +
+          JSON.stringify(this.graphUris)
+      );
     }
     if (unreferencedEnvelopes.length > 1) {
       this.parseErrors.push(
-        "more than one unreferenced (i.e. outermost) envelope found"
+        "more than one unreferenced (i.e. outermost) envelope found. GraphUris: " +
+          JSON.stringify(this.graphUris)
       );
     }
     this.messageStructure = nodes[unreferencedEnvelopes[0]]; //set the pointer to the outermost envelope
