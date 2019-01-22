@@ -153,17 +153,20 @@ public class MasterCrawlerActor extends UntypedActor {
      */
     @Override
     public void onReceive(final Object message) throws InterruptedException {
-
-        if (message.equals(RECRAWL_TICK)) {
-            askWonNodeInfoForCrawling();
-        } else if (message instanceof WonNodeEvent) {
-            processWonNodeEvent((WonNodeEvent) message);
-        } else if (message instanceof CrawlUriMessage) {
-            CrawlUriMessage uriMsg = (CrawlUriMessage) message;
-            processCrawlUriMessage(uriMsg);
-            log.debug("Number of pending messages: {}", pendingMessages.size());
-        } else {
-            unhandled(message);
+        try {
+            if (message.equals(RECRAWL_TICK)) {
+                askWonNodeInfoForCrawling();
+            } else if (message instanceof WonNodeEvent) {
+                processWonNodeEvent((WonNodeEvent) message);
+            } else if (message instanceof CrawlUriMessage) {
+                CrawlUriMessage uriMsg = (CrawlUriMessage) message;
+                processCrawlUriMessage(uriMsg);
+                log.debug("Number of pending messages: {}", pendingMessages.size());
+            } else {
+                unhandled(message);
+            }
+        } catch (Exception e) {
+            log.debug("caught Exception during processing of message " + message, e);
         }
     }
 
