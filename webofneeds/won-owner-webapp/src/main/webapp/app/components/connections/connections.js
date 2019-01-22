@@ -1,4 +1,5 @@
 import angular from "angular";
+import ngAnimate from "angular-animate";
 import won from "../../won-es6.js";
 import sendRequestModule from "../send-request.js";
 import postMessagesModule from "../post-messages.js";
@@ -216,6 +217,7 @@ ConnectionsController.$inject = [];
 
 export default angular
   .module("won.owner.components.connections", [
+    ngAnimate,
     sendRequestModule,
     postMessagesModule,
     groupPostMessagesModule,

@@ -26,11 +26,11 @@
         cursor: pointer;
         &__icon {
           @include fixed-square(1.5rem);
-          --local-primary: $won-primary-color;
+          --local-primary: #{$won-secondary-color};
         }
         &__carret {
           @include fixed-square(1.5rem);
-          --local-primary: $won-primary-color;
+          --local-primary: #{$won-secondary-color};
         }
       }
     }
