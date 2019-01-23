@@ -142,7 +142,7 @@ function genComponentConf() {
         const post = this.postUri && state.getIn(["needs", this.postUri]);
         // move this down when refactoring preventSharing
         const fullFlags = post && generateFullNeedFlags(post);
-        
+
         const persona = post
           ? state.getIn(["needs", post.get("heldBy")])
           : undefined;

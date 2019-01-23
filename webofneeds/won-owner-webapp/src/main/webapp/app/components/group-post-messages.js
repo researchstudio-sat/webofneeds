@@ -165,7 +165,9 @@ function genComponentConf() {
           isWhatsAroundNeed(this.ownedNeed) || isWhatsNewNeed(this.ownedNeed);
         const nonOwnedNeedUri = get(connection, "remoteNeedUri");
         const nonOwnedNeed = getIn(state, ["needs", nonOwnedNeedUri]);
-        const chatMessages = get(connection, "messages");
+        const chatMessages = get(connection, "messages").filter(
+          msg => !msg.getIn(["references", "forwards"])
+        ); //FILTER OUT ALL FORWARD MESSAGES JUST IN CASE
         const hasConnectionMessagesToLoad = hasMessagesToLoad(
           state,
           connectionUri
