@@ -166,6 +166,7 @@ export default function(allNeedsInState = initialState, action = {}) {
           types: Immutable.Set(["won:Need", "won:Persona"]),
           connections: Immutable.Map(),
           holds: Immutable.List(),
+          rating: { aggregateRating: 0.0, reviewCount: 0 },
           facets: Immutable.Map(),
         })
       );

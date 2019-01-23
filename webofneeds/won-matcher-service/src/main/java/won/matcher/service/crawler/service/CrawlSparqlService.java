@@ -12,6 +12,7 @@ import won.matcher.service.common.event.NeedEvent;
 import won.matcher.service.common.service.sparql.SparqlService;
 import won.matcher.service.crawler.config.CrawlConfig;
 import won.matcher.service.crawler.msg.CrawlUriMessage;
+import won.protocol.util.NeedModelWrapper;
 
 import java.io.StringWriter;
 import java.util.*;
@@ -389,11 +390,13 @@ public class CrawlSparqlService extends SparqlService {
                 long crawlDate = qs.getLiteral("date").getLong();
     
                 Dataset ds = retrieveNeedDataset(needUri);
-                StringWriter sw = new StringWriter();
-                RDFDataMgr.write(sw, ds, RDFFormat.TRIG.getLang());
-                NeedEvent needEvent = new NeedEvent(needUri, wonNodeUri, NeedEvent.TYPE.ACTIVE,
-                        crawlDate, sw.toString(), RDFFormat.TRIG.getLang());
-                bulkNeedEvent.addNeedEvent(needEvent);
+                if (NeedModelWrapper.isANeed(ds)) {
+                    StringWriter sw = new StringWriter();
+                    RDFDataMgr.write(sw, ds, RDFFormat.TRIG.getLang());
+                    NeedEvent needEvent = new NeedEvent(needUri, wonNodeUri, NeedEvent.TYPE.ACTIVE,
+                            crawlDate, sw.toString(), RDFFormat.TRIG.getLang());
+                    bulkNeedEvent.addNeedEvent(needEvent);
+                }
             }
             log.debug("number of need events created: " + bulkNeedEvent.getNeedEvents().size());
             return bulkNeedEvent;

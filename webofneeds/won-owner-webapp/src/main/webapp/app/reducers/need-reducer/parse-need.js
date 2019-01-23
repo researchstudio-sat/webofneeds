@@ -5,7 +5,9 @@ import {
   isWhatsNewNeed,
   isWhatsAroundNeed,
   isSearchNeed,
+  isPersona,
 } from "../../need-utils.js";
+import { getIn } from "../../utils.js";
 
 export function parseNeed(jsonldNeed, isOwned) {
   const jsonldNeedImm = Immutable.fromJS(jsonldNeed);
@@ -24,6 +26,7 @@ export function parseNeed(jsonldNeed, isOwned) {
       holds:
         won.parseListFrom(jsonldNeedImm, ["won:holds"], "xsd:ID") ||
         Immutable.List(),
+      rating: extractRating(jsonldNeedImm),
       groupMembers:
         won.parseListFrom(jsonldNeedImm, ["won:hasGroupMember"], "xsd:ID") ||
         Immutable.List(),
@@ -129,6 +132,18 @@ function extractCreationDate(needJsonLd) {
   return undefined;
 }
 
+function extractRating(needJsonLd) {
+  const rating = {
+    aggregateRating: needJsonLd.get("s:aggregateRating"),
+    reviewCount: needJsonLd.get("s:reviewCount"),
+  };
+  if (rating.aggregateRating && rating.reviewCount) {
+    return rating;
+  } else {
+    return undefined;
+  }
+}
+
 function extractFacets(wonHasFacets) {
   let facets = Immutable.Map();
 
@@ -155,7 +170,9 @@ function getHumanReadableStringFromNeed(need, detailsToParse) {
 
     const immNeed = Immutable.fromJS(need);
 
-    if (isWhatsNewNeed(immNeed)) {
+    if (isPersona(need)) {
+      return getIn(need, ["content", "personaName"]);
+    } else if (isWhatsNewNeed(immNeed)) {
       return "What's New";
     } else if (isWhatsAroundNeed(immNeed)) {
       let location =

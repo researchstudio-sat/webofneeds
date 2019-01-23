@@ -134,7 +134,7 @@
     <bean id="wonMessageCloner"
           class="won.node.camel.processor.general.WonMessageCloner" />
     <bean id="facetExtractor"
-          class="won.protocol.message.processor.camel.FacetExtractingCamelProcessor" />
+          class="won.protocol.message.processor.camel.FacetTypeExtractingCamelProcessor" />
 
 
     <!-- won-specific processors -->

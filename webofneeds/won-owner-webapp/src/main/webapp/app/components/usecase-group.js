@@ -2,10 +2,11 @@ import angular from "angular";
 import ngAnimate from "angular-animate";
 import labelledHrModule from "./labelled-hr.js";
 import "ng-redux";
-import { attach, getIn } from "../utils.js";
+import { attach } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
 import { useCaseGroups } from "useCaseDefinitions";
+import { getUseCaseGroupFromRoute } from "../selectors/general-selectors.js";
 
 import "style/_usecase-group.scss";
 
@@ -66,11 +67,7 @@ function genComponentConf() {
       this.useCaseGroups = useCaseGroups;
 
       const selectFromState = state => {
-        const selectedGroup = getIn(state, [
-          "router",
-          "currentParams",
-          "useCaseGroup",
-        ]);
+        const selectedGroup = getUseCaseGroupFromRoute(state);
         return {
           useCaseGroup: selectUseCaseGroupFrom(selectedGroup, useCaseGroups),
         };

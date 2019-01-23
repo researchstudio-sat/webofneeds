@@ -14,7 +14,7 @@ import {
 } from "../../app/sparql-builder-utils.js";
 
 export const goodsServiceSearch = {
-  identifier: "goodsDemand",
+  identifier: "goodsServiceSearch",
   label: "Look for something",
   icon: "#ico36_plus",
   draft: {

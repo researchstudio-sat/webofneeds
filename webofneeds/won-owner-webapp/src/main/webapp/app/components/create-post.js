@@ -6,13 +6,15 @@ import ngAnimate from "angular-animate";
 
 import "ng-redux";
 import labelledHrModule from "./labelled-hr.js";
-import matchingContextModule from "./details/picker/matching-context-picker.js"; // TODO: should be renamed
 import createIsseeksModule from "./create-isseeks.js";
 import publishButtonModule from "./publish-button.js";
-import { get, getIn, attach, delay } from "../utils.js";
+import { get, attach, delay } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
-import { selectIsConnected } from "../selectors/general-selectors.js";
+import {
+  selectIsConnected,
+  getUseCaseFromRoute,
+} from "../selectors/general-selectors.js";
 
 import { useCases } from "useCaseDefinitions";
 
@@ -74,30 +76,6 @@ function genComponentConf() {
                 on-update="::self.updateDraft(draft, 'seeks')" 
                 on-scroll="::self.scrollIntoView(element)">
             </won-create-isseeks>
-
-            <!-- TUNE MATCHING -->
-            <div class="cp__content__branchheader b detailPicker clickable"
-                ng-if="self.useCase.details || self.useCase.seeksDetails"
-                ng-click="self.toggleTuningOptions()">
-                <span>Tune Matching Behaviour</span>
-                <svg class="cp__content__branchheader__carret" ng-show="!self.showTuningOptions">
-                    <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
-                </svg>
-                <svg class="cp__content__branchheader__carret" ng-show="self.showTuningOptions">
-                    <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
-                </svg>
-            </div>
-            <div class="cp__content__tuning"
-            ng-if="self.useCase.details || self.useCase.seeksDetails">
-                <div class="cp__content__tuning_matching-context">
-                    <won-matching-context-picker
-                      ng-if="self.showTuningOptions"
-                      default-matching-context="::self.defaultMatchingContext"
-                      initial-matching-context="::self.draftObject.matchingContext"
-                      on-matching-context-updated="::self.updateMatchingContext(matchingContext)">
-                    </won-matching-context-picker>
-                </div>
-            </div>
         </div>
         <div class="cp__footer" >
             <won-labelled-hr label="::'done?'" class="cp__footer__labelledhr"></won-labelled-hr>
@@ -116,35 +94,17 @@ function genComponentConf() {
 
       this.draftObject = {};
 
-      this.showTuningOptions = false;
-
       this.details = { is: [], seeks: [] };
       this.isNew = true;
 
       const selectFromState = state => {
-        const useCaseString = getIn(state, [
-          "router",
-          "currentParams",
-          "useCase",
-        ]);
-
-        // needed to be able to reset matching context to default
-        // TODO: is there an easier way to do this?
-        const defaultMatchingContextList = getIn(state, [
-          "config",
-          "theme",
-          "defaultContext",
-        ]);
-        const defaultMatchingContext = defaultMatchingContextList
-          ? defaultMatchingContextList.toJS()
-          : [];
+        const useCaseString = getUseCaseFromRoute(state);
 
         return {
           processingPublish: state.getIn(["process", "processingPublish"]),
           connectionHasBeenLost: !selectIsConnected(state),
           useCaseString,
           useCase: selectUseCaseFrom(useCaseString, useCases),
-          defaultMatchingContext: defaultMatchingContext,
         };
       };
 
@@ -182,9 +142,7 @@ function genComponentConf() {
       return this._scrollContainer;
     }
 
-    toggleTuningOptions() {
-      this.showTuningOptions = !this.showTuningOptions;
-    }
+    toggleTuningOptions() {}
 
     isValid() {
       const draft = this.draftObject;
@@ -219,39 +177,6 @@ function genComponentConf() {
       if (this.useCase && this.useCase.draft) {
         // deep clone of draft
         this.draftObject = JSON.parse(JSON.stringify(this.useCase.draft));
-      }
-
-      // combine preset matching context with default matching context
-      if (this.defaultMatchingContext && this.draftObject.matchingContext) {
-        const combinedContext = [
-          ...this.defaultMatchingContext,
-          ...this.draftObject.matchingContext,
-        ].reduce(function(a, b) {
-          if (a.indexOf(b) < 0) a.push(b);
-          return a;
-        }, []);
-
-        this.draftObject.matchingContext = combinedContext;
-      } else if (this.defaultMatchingContext) {
-        this.draftObject.matchingContext = this.defaultMatchingContext;
-      }
-    }
-
-    updateMatchingContext(matchingContext) {
-      // also accepts []!
-      // if (matchingContext && this.draftObject.matchingContext) {
-      //   const combinedContext = [
-      //     ...matchingContext,
-      //     ...this.draftObject.matchingContext,
-      //   ].reduce(function(a, b) {
-      //     if (a.indexOf(b) < 0) a.push(b);
-      //     return a;
-      //   }, []);
-
-      //   this.draftObject.matchingContext = combinedContext;
-      // } else
-      if (matchingContext) {
-        this.draftObject.matchingContext = matchingContext;
       }
     }
 
@@ -341,7 +266,6 @@ angular
   .module("won.owner.components.createPost", [
     labelledHrModule,
     createIsseeksModule,
-    matchingContextModule,
     ngAnimate,
     publishButtonModule,
   ])

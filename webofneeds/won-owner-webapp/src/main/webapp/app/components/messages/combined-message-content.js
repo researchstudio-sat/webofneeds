@@ -92,19 +92,20 @@ function genComponentConf() {
 
         /*Extract persona name from message:
 
-          either within the need of the originatorUri-need (in group-chat-messages)
-          or
-          within the remoteNeedUri-need of the connection (for 1:1 chats)
-        */
+         either within the need of the originatorUri-need (in group-chat-messages)
+         or
+         within the remoteNeedUri-need of the connection (for 1:1 chats)
+         */
         const relevantNeedUri =
-          !get(message, "outgoingMessage") && this.groupChatMessage
+          !get(message, "outgoingMessage") &&
+          (this.groupChatMessage
             ? get(message, "originatorUri")
-            : get(connection, "remoteNeedUri");
+            : get(connection, "remoteNeedUri"));
         const relevantPersonaUri =
           relevantNeedUri && getIn(allNeeds, [relevantNeedUri, "heldBy"]);
         const personaName =
           relevantPersonaUri &&
-          getIn(allNeeds, [relevantPersonaUri, "jsonld", "s:name"]);
+          getIn(allNeeds, [relevantPersonaUri, "content", "personaName"]);
 
         return {
           allNeeds,

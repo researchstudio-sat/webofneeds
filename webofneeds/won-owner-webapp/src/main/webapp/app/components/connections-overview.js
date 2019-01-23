@@ -25,7 +25,7 @@ import "style/_connections-overview.scss";
 
 import {
   getRouterParams,
-  getGroupChatPostUriFromRoute,
+  getGroupPostAdminUriFromRoute,
   getOwnedNeedByConnectionUri,
   getOwnedNeedsInCreation,
   getConnectionUriFromRoute,
@@ -241,7 +241,7 @@ function genComponentConf() {
         const useCase = get(routerParams, "useCase");
         const useCaseGroup = get(routerParams, "useCaseGroup");
         const connUriInRoute = getConnectionUriFromRoute(state);
-        const groupPostAdminUriInRoute = getGroupChatPostUriFromRoute(state);
+        const groupPostAdminUriInRoute = getGroupPostAdminUriFromRoute(state);
         const needUriInRoute = getPostUriFromRoute(state);
         const needImpliedInRoute =
           (connUriInRoute &&

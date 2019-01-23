@@ -23,6 +23,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import won.matcher.service.crawler.msg.CrawlUriMessage;
 import won.matcher.service.crawler.msg.ResourceCrawlUriMessage;
+import won.protocol.util.NeedModelWrapper;
 import won.protocol.util.linkeddata.LinkedDataSource;
 
 /**
@@ -87,27 +88,27 @@ public class NeedConsumerProtocolActor extends UntypedConsumerActor
           long crawlDate = System.currentTimeMillis();
           
           Dataset ds = linkedDataSource.getDataForResource(URI.create(needUri));
-          
-          if (methodName.equals(MSG_HEADER_METHODNAME_NEEDCREATED)) {
-            event = new NeedEvent(needUri, wonNodeUri, NeedEvent.TYPE.ACTIVE, crawlDate, ds);
-            pubSubMediator.tell(new DistributedPubSubMediator.Publish(event.getClass().getName(), event), getSelf());
-          } else if (methodName.equals(MSG_HEADER_METHODNAME_NEEDACTIVATED)) {
-            event = new NeedEvent(needUri, wonNodeUri, NeedEvent.TYPE.ACTIVE, crawlDate, ds);
-            pubSubMediator.tell(new DistributedPubSubMediator.Publish(event.getClass().getName(), event), getSelf());
-          } else if (methodName.equals(MSG_HEADER_METHODNAME_NEEDDEACTIVATED)) {
-            event = new NeedEvent(needUri, wonNodeUri, NeedEvent.TYPE.INACTIVE, crawlDate, ds);
-            pubSubMediator.tell(new DistributedPubSubMediator.Publish(event.getClass().getName(), event), getSelf());
-          } else {
-            unhandled(message);
+          if (NeedModelWrapper.isANeed(ds)) {
+              if (methodName.equals(MSG_HEADER_METHODNAME_NEEDCREATED)) {
+                event = new NeedEvent(needUri, wonNodeUri, NeedEvent.TYPE.ACTIVE, crawlDate, ds);
+                pubSubMediator.tell(new DistributedPubSubMediator.Publish(event.getClass().getName(), event), getSelf());
+              } else if (methodName.equals(MSG_HEADER_METHODNAME_NEEDACTIVATED)) {
+                event = new NeedEvent(needUri, wonNodeUri, NeedEvent.TYPE.ACTIVE, crawlDate, ds);
+                pubSubMediator.tell(new DistributedPubSubMediator.Publish(event.getClass().getName(), event), getSelf());
+              } else if (methodName.equals(MSG_HEADER_METHODNAME_NEEDDEACTIVATED)) {
+                event = new NeedEvent(needUri, wonNodeUri, NeedEvent.TYPE.INACTIVE, crawlDate, ds);
+                pubSubMediator.tell(new DistributedPubSubMediator.Publish(event.getClass().getName(), event), getSelf());
+              } else {
+                unhandled(message);
+              }
+              // let the crawler save the data of this event too
+              ResourceCrawlUriMessage resMsg = new ResourceCrawlUriMessage(
+                needUri, needUri, wonNodeUri, CrawlUriMessage.STATUS.SAVE, crawlDate, null);
+              resMsg.setSerializedResource(camelMsg.body().toString());
+              resMsg.setSerializationFormat(Lang.TRIG);
+              pubSubMediator.tell(new DistributedPubSubMediator.Publish(resMsg.getClass().getName(), resMsg), getSelf());
+              return;
           }
-
-          // let the crawler save the data of this event too
-          ResourceCrawlUriMessage resMsg = new ResourceCrawlUriMessage(
-            needUri, needUri, wonNodeUri, CrawlUriMessage.STATUS.SAVE, crawlDate, null);
-          resMsg.setSerializedResource(camelMsg.body().toString());
-          resMsg.setSerializationFormat(Lang.TRIG);
-          pubSubMediator.tell(new DistributedPubSubMediator.Publish(resMsg.getClass().getName(), resMsg), getSelf());
-          return;
         } else {
         	log.warning("Message not processed; methodName is null");
         }

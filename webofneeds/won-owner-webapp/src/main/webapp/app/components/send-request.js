@@ -1,7 +1,7 @@
 import angular from "angular";
 import "ng-redux";
 import postContentModule from "./post-content.js";
-import chatTextFieldSimpleModule from "./chat-textfield-simple.js";
+import chatTextFieldModule from "./chat-textfield.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 import { getPostUriFromRoute } from "../selectors/general-selectors.js";
 import { connect2Redux } from "../won-utils.js";
@@ -14,13 +14,13 @@ function genComponentConf() {
   let template = `
         <won-post-content post-uri="self.postUriToConnectTo"></won-post-content>
         <div class="post-info__footer" ng-if="!self.postLoading">
-            <chat-textfield-simple
+            <chat-textfield
                 placeholder="::'Message (optional)'"
                 on-submit="::self.sendAdHocRequest(value, selectedPersona)"
                 allow-empty-submit="::true"
                 show-personas="true"
                 submit-button-label="::'Ask&#160;to&#160;Chat'">
-            </chat-textfield-simple>
+            </chat-textfield>
         </div>
     `;
 
@@ -76,7 +76,7 @@ function genComponentConf() {
 
 export default angular
   .module("won.owner.components.sendRequest", [
-    chatTextFieldSimpleModule,
+    chatTextFieldModule,
     postContentModule,
   ])
   .directive("wonSendRequest", genComponentConf).name;

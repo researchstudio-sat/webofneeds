@@ -4,9 +4,8 @@
 
 import { createSelector } from "reselect";
 
-import won from "../won-es6.js";
-import { decodeUriComponentProperly, getIn } from "../utils.js";
-import { isPersona, isNeed } from "../need-utils.js";
+import { decodeUriComponentProperly, getIn, get } from "../utils.js";
+import { isPersona, isNeed, isActive, isInactive } from "../need-utils.js";
 import Color from "color";
 
 export const selectLastUpdateTime = state => state.get("lastUpdateTime");
@@ -33,29 +32,23 @@ export const getOwnedPosts = state =>
 
 export function getOwnedOpenPosts(state) {
   const allOwnedNeeds = getOwnedPosts(state);
-  return (
-    allOwnedNeeds &&
-    allOwnedNeeds.filter(post => post.get("state") === won.WON.ActiveCompacted)
-  );
+  return allOwnedNeeds && allOwnedNeeds.filter(post => isActive(post));
 }
 
 export function getOpenPosts(state) {
   const allPosts = getPosts(state);
-  return (
-    allPosts &&
-    allPosts.filter(post => post.get("state") === won.WON.ActiveCompacted)
-  );
+  return allPosts && allPosts.filter(post => isActive(post));
+}
+
+export function getActiveNeeds(state) {
+  const allNeeds = getNeeds(state);
+  return allNeeds && allNeeds.filter(need => isActive(need));
 }
 
 //TODO: METHOD NAME TO ACTUALLY REPRESENT WHAT THE SELECTOR DOES
 export function getOwnedClosedPosts(state) {
   const allOwnedNeeds = getOwnedPosts(state);
-  return (
-    allOwnedNeeds &&
-    allOwnedNeeds.filter(
-      post => post.get("state") === won.WON.InactiveCompacted
-    )
-  );
+  return allOwnedNeeds && allOwnedNeeds.filter(post => isInactive(post));
 }
 
 export function getOwnedNeedsInCreation(state) {
@@ -82,6 +75,53 @@ export function getOwnedNeedByConnectionUri(state, connectionUri) {
     .first();
 }
 
+export const getCurrentParamsFromRoute = createSelector(
+  state => state,
+  state => {
+    return getIn(state, ["router", "currentParams"]);
+  }
+);
+
+export const getViewNeedUriFromRoute = createSelector(
+  state => state,
+  state => {
+    const encodedNeedUri = getIn(state, [
+      "router",
+      "currentParams",
+      "viewNeedUri",
+    ]);
+    return decodeUriComponentProperly(encodedNeedUri);
+  }
+);
+
+export const getUseCaseFromRoute = createSelector(
+  state => state,
+  state => {
+    return getIn(state, ["router", "currentParams", "useCase"]);
+  }
+);
+
+export const getUseCaseGroupFromRoute = createSelector(
+  state => state,
+  state => {
+    return getIn(state, ["router", "currentParams", "useCaseGroup"]);
+  }
+);
+
+export const getPrivateIdFromRoute = createSelector(
+  state => state,
+  state => {
+    return getIn(state, ["router", "currentParams", "privateId"]);
+  }
+);
+
+export const getVerificationTokenFromRoute = createSelector(
+  state => state,
+  state => {
+    return getIn(state, ["router", "currentParams", "token"]);
+  }
+);
+
 export const getConnectionUriFromRoute = createSelector(
   getRouterParams,
   routerParams => {
@@ -98,7 +138,7 @@ export const getConnectionUriFromRoute = createSelector(
   }
 );
 
-export const getGroupChatPostUriFromRoute = createSelector(
+export const getGroupPostAdminUriFromRoute = createSelector(
   state => state,
   state => {
     const encodedPostUri = getIn(state, [
@@ -129,14 +169,13 @@ export function getOwnedPersonas(state) {
   const needs = getOwnedNeeds(state);
   const personas = needs.toList().filter(need => isPersona(need));
   return personas.map(persona => {
-    const graph = persona.get("jsonld");
     return {
-      displayName: graph.get("s:name"),
-      website: graph.get("s:url"),
-      aboutMe: graph.get("s:description"),
-      url: persona.get("uri"),
-      saved: !persona.get("isBeingCreated"),
-      timestamp: persona.get("creationDate").toISOString(),
+      displayName: getIn(persona, ["content", "personaName"]),
+      website: getIn(persona, ["content", "website"]),
+      aboutMe: getIn(persona, ["content", "description"]),
+      url: get(persona, "uri"),
+      saved: !get(persona, "isBeingCreated"),
+      timestamp: get(persona, "creationDate").toISOString(),
     };
   });
 }

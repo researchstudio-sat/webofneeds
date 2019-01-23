@@ -4,7 +4,7 @@
 @import "speech-bubble";
 @import "animate";
 
-chat-textfield-simple {
+chat-textfield {
   display: grid;
   grid-template-columns: auto 1fr min-content;
   grid-template-rows: auto auto;

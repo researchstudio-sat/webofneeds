@@ -5,7 +5,10 @@
 import Immutable from "immutable";
 import { actionCreators } from "./actions/actions.js";
 import { accountLogin } from "./actions/account-actions.js";
-import { getOwnedNeeds } from "./selectors/general-selectors.js";
+import {
+  getCurrentParamsFromRoute,
+  getOwnedNeeds,
+} from "./selectors/general-selectors.js";
 import { privateId2Credentials } from "./won-utils.js";
 
 import { getIn, firstToLowerCase, hyphen2Camel } from "./utils.js";
@@ -21,6 +24,7 @@ import { getIn, firstToLowerCase, hyphen2Camel } from "./utils.js";
  */
 export const resetParams = Object.freeze({
   connectionUri: undefined,
+  viewNeedUri: undefined,
   postUri: undefined,
   useCase: undefined,
   useCaseGroup: undefined,
@@ -64,11 +68,11 @@ export const configRouting = [
       { path: "/settings", component: "settings" },
       {
         path:
-          "/connections?privateId?postUri?connectionUri?useCase?useCaseGroup?token?groupPostAdminUri",
+          "/connections?privateId?postUri?connectionUri?useCase?useCaseGroup?token?groupPostAdminUri?viewNeedUri",
         component: "connections",
         as: "connections",
       },
-      { path: "/post/?postUri", component: "post", as: "post" },
+      { path: "/post/?postUri?viewNeedUri", component: "post", as: "post" },
     ].forEach(({ path, component, as }) => {
       const cmlComponent = hyphen2Camel(component);
 
@@ -200,7 +204,7 @@ export function accessControl({
 export function checkAccessToCurrentRoute(dispatch, getState) {
   const appState = getState();
   let routingState = getIn(appState, ["router", "currentState"]);
-  let params = getIn(appState, ["router", "currentParams"]);
+  let params = getCurrentParamsFromRoute(appState);
   return accessControl({
     toState: routingState,
     fromState: routingState,

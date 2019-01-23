@@ -40,7 +40,7 @@ function genComponentConf() {
               Author
             </div>
             <div class="pcg__columns__left__item__value">
-              {{ self.persona.getIn(['jsonld', 's:name']) }}
+              {{ self.persona.get('humanReadable') }}
               <won-rating-view rating="self.rating()" rating-connection-uri="self.ratingConnectionUri"></won-rating-view>
             </div>
           </div>
@@ -140,13 +140,14 @@ function genComponentConf() {
             : null;
 
         const post = this.postUri && state.getIn(["needs", this.postUri]);
+        // move this down when refactoring preventSharing
+        const fullFlags = post && generateFullNeedFlags(post);
+        
         const persona = post
           ? state.getIn(["needs", post.get("heldBy")])
           : undefined;
         const personaHolds = persona && persona.get("holds");
-
-        // move this down when refactoring preventSharing
-        const fullFlags = post && generateFullNeedFlags(post);
+        const personaRating = persona && persona.get("rating");
 
         return {
           WON: won.WON,
@@ -162,6 +163,7 @@ function genComponentConf() {
             personaHolds && personaHolds.includes(post.get("uri"))
               ? persona
               : undefined,
+          personaRating: personaRating,
           // TODO: this probably should not be checked like that - util method?
           preventSharing:
             (post && post.get("state") === won.WON.InactiveCompacted) ||
@@ -178,11 +180,19 @@ function genComponentConf() {
     }
 
     rating() {
+      // Return actuall rating!
+      /*
       let sum = 0;
       for (const char of this.persona.get("uri")) {
         sum += char.charCodeAt(0);
       }
       return (sum % 5) + 1;
+      */
+      const rating = this.personaRating
+        ? this.personaRating.get("aggregateRating")
+        : 0;
+
+      return Math.round(rating);
     }
   }
 

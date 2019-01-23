@@ -12,7 +12,7 @@ import {
 } from "../../app/sparql-builder-utils.js";
 
 export const personalTransportSearch = {
-  identifier: "liftDemand",
+  identifier: "personalTransportSearch",
   label: "Need a Lift",
   icon: "#ico36_uc_route_demand",
   doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
@@ -20,8 +20,7 @@ export const personalTransportSearch = {
     ...emptyDraft,
     content: {
       title: "Need a lift",
-      tags: "search-lift",
-      searchString: "offer-lift",
+      type: "won:PersonalTransportSearch",
     },
   },
   // TODO: amount of people? other details?
@@ -113,12 +112,6 @@ export const personalTransportSearch = {
       distinct: true,
       variables: [resultName],
       where: concatenatedFilter.operations,
-      orderBy: [
-        {
-          order: "ASC",
-          variable: "?location_geoDistance",
-        },
-      ],
     });
   },
 };
