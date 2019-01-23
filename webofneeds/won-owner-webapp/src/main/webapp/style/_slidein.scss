@@ -1,11 +1,10 @@
 @import "won-config";
 @import "button";
-@import "collapsible";
 @import "responsiveness-utils";
+@import "animate";
 
 @mixin slide-in() {
-  grid-column: 2;
-  @extend .collapsible;
+  grid-column: 3;
 
   justify-content: center;
   align-items: center;
@@ -19,11 +18,6 @@
   grid-template-areas: "siIcon siTitle siButton";
 
   box-sizing: border-box;
-
-  &.visible {
-    max-height: 100%; //Fallback in case the browser does not support vh
-    max-height: 100vh;
-  }
 
   & > .si__icon {
     grid-area: siIcon;
@@ -62,10 +56,13 @@
     grid-area: siButton;
     @include won-button--outlined(white);
     font-size: $smallFontSize;
+    padding: 0.5rem;
   }
 }
 
 won-slide-in {
+  @include slideAnimationFixedHorizontal(0.5s, ease-in-out, 100vh);
+
   & > input.si__anonymousLink {
     //So the copy to clipboard function works but the input field is still "hidden"
     height: 0;
@@ -76,10 +73,23 @@ won-slide-in {
   }
 
   display: grid;
-  grid-template-columns: 1fr minmax(min-content, $maxContentWidth) 1fr;
+  $togglePadding: 0.5rem;
+  $toggleWidth: 1.5rem;
+  $maxSlideInWidth: $maxContentWidth - $toggleWidth - ($togglePadding * 2);
+  grid-template-columns: 1fr 2.5rem minmax(min-content, $maxSlideInWidth) 1fr;
+  grid-auto-flow: column;
 
   background: black; //Fallback in case the browser does not support css variables
   background: $won-secondary-color;
+
+  > .si__toggle {
+    grid-column: 2;
+
+    cursor: pointer;
+    @include fixed-square($toggleWidth);
+    --local-primary: white;
+    padding: $togglePadding;
+  }
 
   .si__anonymoussuccess,
   .si__connectionlost,
@@ -98,6 +108,7 @@ won-slide-in {
     & > .si__bottomButton {
       grid-area: siBottomButton;
       @include won-button--outlined(white);
+      padding: 0.5rem;
       font-size: $smallFontSize;
     }
 
@@ -136,6 +147,7 @@ won-slide-in {
       & > .si__buttonCopy,
       & > .si__buttonEmail {
         @include won-button--outlined(white);
+        padding: 0.5rem;
         font-size: $smallFontSize;
       }
 
@@ -184,6 +196,7 @@ won-slide-in {
           grid-area: siButtonSend;
           @include won-button--outlined(white);
           font-size: $smallFontSize;
+          padding: 0.5rem;
         }
 
         & > .si__emailInput {

@@ -10,6 +10,8 @@ import { actionCreators } from "../actions/actions.js";
 import { connect2Redux, parseRestErrorMessage } from "../won-utils.js";
 import { ownerBaseUrl } from "config";
 import { getVerificationTokenFromRoute } from "../selectors/general-selectors.js";
+import * as viewSelectors from "../selectors/view-selectors.js";
+import * as processSelectors from "../selectors/process-selectors.js";
 
 import * as srefUtils from "../sref-utils.js";
 
@@ -17,8 +19,12 @@ import "style/_slidein.scss";
 
 function genSlideInConf() {
   let template = `
-        <input type='text' class="si__anonymousLink" value="{{ self.anonymousLink }}" ng-if="!self.connectionHasBeenLost && self.loggedIn && self.isAnonymous && !self.anonymousLinkSent && !self.anonymousLinkCopied && self.isAnonymousSlideInExpanded"/>
-        <div class="si__connectionlost" ng-class="{'visible': self.connectionHasBeenLost}">
+        <svg class="si__toggle"
+            ng-click="self.view__toggleSlideIns()">
+            <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
+        </svg>
+        <input type='text' class="si__anonymousLink" value="{{ self.anonymousLink }}" ng-if="self.inclAnonymousLinkInput"/>
+        <div class="si__connectionlost" ng-if="self.showConnectionLost">
             <svg class="si__icon">
                 <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
             </svg>
@@ -36,46 +42,46 @@ function genSlideInConf() {
                 <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
             </svg>
         </div>
-        <div class="si__emailverification" ng-class="{'visible': !self.connectionHasBeenLost && (self.verificationToken || (self.loggedIn && !self.emailVerified && !self.isAnonymous))}">
+        <div class="si__emailverification" ng-if="self.showEmailVerification">
             <svg class="si__icon">
                 <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
             </svg>
-            <span class="si__title" ng-if="!self.verificationToken && !self.emailVerified && !self.isAnonymous && !self.emailVerificationError">
+            <span class="si__title" ng-if="!self.verificationToken && !self.isEmailVerified && !self.isAnonymous && !self.emailVerificationError">
                 E-Mail has not been verified yet, check your Inbox.
             </span>
-            <span class="si__title" ng-if="self.processingVerifyEmailAddress && self.verificationToken">
+            <span class="si__title" ng-if="self.isProcessingVerifyEmailAddress && self.verificationToken">
                 Verifying the E-Mail address
             </span>
-            <span class="si__title" ng-if="!self.processingVerifyEmailAddress && self.emailVerificationError">
+            <span class="si__title" ng-if="!self.isProcessingVerifyEmailAddress && self.emailVerificationError">
                 {{ self.parseRestErrorMessage(self.emailVerificationError) }}
             </span>
-            <span class="si__title" ng-if="self.loggedIn && self.verificationToken && !self.processingVerifyEmailAddress && self.emailVerified && !self.isAnonymous && !self.emailVerificationError">
+            <span class="si__title" ng-if="self.isLoggedIn && self.verificationToken && !self.isProcessingVerifyEmailAddress && self.isEmailVerified && !self.isAnonymous && !self.emailVerificationError">
                 E-Mail Address verified
             </span>
-            <span class="si__title" ng-if="!self.loggedIn && self.verificationToken && !self.processingVerifyEmailAddress && !self.emailVerificationError">
+            <span class="si__title" ng-if="!self.isLoggedIn && self.verificationToken && !self.isProcessingVerifyEmailAddress && !self.emailVerificationError">
                 E-Mail Address verified (Please Login Now)
             </span>
-            <svg class="hspinner" ng-if="self.processingVerifyEmailAddress || self.processingResendVerificationEmail">
+            <svg class="hspinner" ng-if="self.isProcessingVerifyEmailAddress || self.isProcessingResendVerificationEmail">
                 <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
             </svg>
             <button
               class="si__button"
-              ng-if="!self.processingVerifyEmailAddress && !self.processingResendVerificationMail && ((self.loggedIn && !self.emailVerified && !self.isAnonymous && !self.emailVerificationError) || (self.verificationToken && self.emailVerificationError))"
+              ng-if="!self.isProcessingVerifyEmailAddress && !self.processingResendVerificationMail && ((self.isLoggedIn && !self.isEmailVerified && !self.isAnonymous && !self.emailVerificationError) || (self.verificationToken && self.emailVerificationError))"
               ng-click="self.account__resendVerificationEmail(self.email)">
                 Resend Email
             </button>
             <svg class="si__close"
                 ng-click="self.router__stateGoCurrent({token: undefined})"
-                ng-if="!self.processingVerifyEmailAddress && self.verificationToken && !self.emailVerificationError">
+                ng-if="!self.isProcessingVerifyEmailAddress && self.verificationToken && !self.emailVerificationError">
                 <use xlink:href="#ico36_close" href="#ico36_close"></use>
             </svg>
             <svg class="si__close"
                 ng-click="self.account__verifyEmailAddressSuccess()"
-                ng-if="!self.processingVerifyEmailAddress && self.isAlreadyVerifiedError">
+                ng-if="!self.isProcessingVerifyEmailAddress && self.isAlreadyVerifiedError">
                 <use xlink:href="#ico36_close" href="#ico36_close"></use>
             </svg>
         </div>
-        <div class="si__termsofservice" ng-class="{'visible': self.loggedIn && !self.connectionHasBeenLost && !self.acceptedTermsOfService}">
+        <div class="si__termsofservice" ng-if="self.showTermsOfService">
             <svg class="si__icon">
                 <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
             </svg>
@@ -88,15 +94,15 @@ function genSlideInConf() {
             </span>
             <button
               class="si__button"
-              ng-if="!self.processingAcceptTermsOfService"
+              ng-if="!self.isProcessingAcceptTermsOfService"
               ng-click="self.account__acceptTermsOfService()">
                 Accept
             </button>
-            <svg class="hspinner" ng-if="self.processingAcceptTermsOfService">
+            <svg class="hspinner" ng-if="self.isProcessingAcceptTermsOfService">
                 <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
             </svg>
         </div>
-        <div class="si__disclaimer" ng-class="{'visible': !self.connectionHasBeenLost && !self.acceptedDisclaimer}">
+        <div class="si__disclaimer" ng-if="self.showDisclaimer">
             <svg class="si__icon">
                 <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_info"></use>
             </svg>
@@ -129,8 +135,8 @@ function genSlideInConf() {
             </button>
         </div>
         <div class="si__anonymous"
+            ng-if="self.showAnonymous"
             ng-class="{
-              'visible': !self.connectionHasBeenLost && self.isAnonymous && !self.anonymousLinkSent && !self.anonymousLinkCopied,
               'si__anonymous--expanded': self.isAnonymousSlideInExpanded,
               'si__anonymous--emailInput': self.showAnonymousSlideInEmailInput,
             }">
@@ -188,19 +194,17 @@ function genSlideInConf() {
               ng-model="self.anonymousEmail"
               placeholder="Type your email"/>
             <button class="si__buttonSend"
-                ng-if="!self.processingSendAnonymousLinkEmail && self.isAnonymousSlideInExpanded && self.showAnonymousSlideInEmailInput"
+                ng-if="!self.isProcessingSendAnonymousLinkEmail && self.isAnonymousSlideInExpanded && self.showAnonymousSlideInEmailInput"
                 ng-click="self.account__sendAnonymousLinkEmail(self.anonymousEmail, self.privateId)"
                 ng-disabled="!self.isValidEmail()">
                 Send link to this email
             </button>
-            <svg class="hspinner" ng-if="self.processingSendAnonymousLinkEmail">
+            <svg class="hspinner" ng-if="self.isProcessingSendAnonymousLinkEmail">
                 <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
             </svg>
         </div>
         <div class="si__anonymoussuccess"
-            ng-class="{
-              'visible': !self.connectionHasBeenLost && self.isAnonymous && (self.anonymousLinkSent || self.anonymousLinkCopied),
-            }">
+            ng-if="self.showAnonymousSuccess">
             <svg class="si__icon">
                 <use xlink:href="#ico16_indicator_info" href="#ico16_indicator_info"></use>
             </svg>
@@ -240,64 +244,80 @@ function genSlideInConf() {
         const path = "#!/connections" + `?privateId=${privateId}`;
         const anonymousLink = toAbsoluteURL(ownerBaseUrl).toString() + path;
 
+        const isLoggedIn = getIn(state, ["account", "loggedIn"]);
+        const isAnonymous = getIn(state, ["account", "isAnonymous"]);
+        const isEmailVerified = getIn(state, ["account", "emailVerified"]);
+        const isTermsOfServiceAccepted = getIn(state, [
+          "account",
+          "acceptedTermsOfService",
+        ]);
+
+        const connectionHasBeenLost = getIn(state, [
+          "messages",
+          "lostConnection",
+        ]);
+
+        const isAnonymousSlideInExpanded = viewSelectors.isAnonymousSlideInExpanded(
+          state
+        );
+        const showAnonymousSlideInEmailInput = viewSelectors.showAnonymousSlideInEmailInput(
+          state
+        );
+        const anonymousLinkSent = viewSelectors.isAnonymousLinkSent(state);
+        const anonymousLinkCopied = viewSelectors.isAnonymousLinkCopied(state);
+
         return {
           verificationToken,
-          acceptedDisclaimer: getIn(state, ["account", "acceptedDisclaimer"]),
-          emailVerified: getIn(state, ["account", "emailVerified"]),
+          isEmailVerified,
           emailVerificationError: getIn(state, [
             "account",
             "emailVerificationError",
           ]),
-          processingVerifyEmailAddress: getIn(state, [
-            "process",
-            "processingVerifyEmailAddress",
-          ]),
-          processingAcceptTermsOfService: getIn(state, [
-            "process",
-            "processingAcceptTermsOfService",
-          ]),
-          processingResendVerificationEmail: getIn(state, [
-            "process",
-            "processingResendVerificationEmail",
-          ]),
-          processingSendAnonymousLinkEmail: getIn(state, [
-            "process",
-            "processingSendAnonymousLinkEmail",
-          ]),
-          acceptedTermsOfService: getIn(state, [
-            "account",
-            "acceptedTermsOfService",
-          ]),
-          loggedIn: getIn(state, ["account", "loggedIn"]),
+          isProcessingVerifyEmailAddress: processSelectors.isProcessingVerifyEmailAddress(
+            state
+          ),
+          isProcessingAcceptTermsOfService: processSelectors.isProcessingAcceptTermsOfService(
+            state
+          ),
+          isProcessingResendVerificationEmail: processSelectors.isProcessingResendVerificationEmail(
+            state
+          ),
+          isProcessingSendAnonymousLinkEmail: processSelectors.isProcessingSendAnonymousLinkEmail(
+            state
+          ),
+          isTermsOfServiceAccepted,
+          isLoggedIn,
           email: getIn(state, ["account", "email"]),
-          isAnonymous: getIn(state, ["account", "isAnonymous"]),
+          isAnonymous,
           privateId,
-          connectionHasBeenLost: getIn(state, ["messages", "lostConnection"]), // name chosen to avoid name-clash with the action-creator
+          connectionHasBeenLost,
           reconnecting: getIn(state, ["messages", "reconnecting"]),
           isAlreadyVerifiedError:
             getIn(state, ["account", "emailVerificationError", "code"]) ==
             won.RESPONSECODE.TOKEN_RESEND_FAILED_ALREADY_VERIFIED,
-          isAnonymousSlideInExpanded: getIn(state, [
-            "view",
-            "anonymousSlideIn",
-            "expanded",
-          ]),
-          showAnonymousSlideInEmailInput: getIn(state, [
-            "view",
-            "anonymousSlideIn",
-            "showEmailInput",
-          ]),
-          anonymousLinkSent: getIn(state, [
-            "view",
-            "anonymousSlideIn",
-            "linkSent",
-          ]),
-          anonymousLinkCopied: getIn(state, [
-            "view",
-            "anonymousSlideIn",
-            "linkCopied",
-          ]),
+          isAnonymousSlideInExpanded,
+          showAnonymousSlideInEmailInput,
+          anonymousLinkSent,
+          anonymousLinkCopied,
           anonymousLink: anonymousLink,
+
+          showAnonymousSuccess: viewSelectors.showSlideInAnonymousSuccess(
+            state
+          ),
+          showAnonymous: viewSelectors.showSlideInAnonymous(state),
+          showDisclaimer: viewSelectors.showSlideInDisclaimer(state),
+          showTermsOfService: viewSelectors.showSlideInTermsOfService(state),
+          showEmailVerification: viewSelectors.showSlideInEmailVerification(
+            state
+          ),
+          showConnectionLost: viewSelectors.showSlideInConnectionLost(state),
+          inclAnonymousLinkInput:
+            !connectionHasBeenLost &&
+            isLoggedIn &&
+            isAnonymous &&
+            !anonymousLinkSent &&
+            !anonymousLinkCopied &&
+            isAnonymousSlideInExpanded,
         };
       };
 
@@ -347,9 +367,9 @@ function genSlideInConf() {
       delay(0).then(() => {
         if (
           verificationToken &&
-          !this.processingVerifyEmailAddress &&
+          !this.isProcessingVerifyEmailAddress &&
           !(
-            this.emailVerified ||
+            this.isEmailVerified ||
             this.emailVerificationError ||
             this.isAnonymous
           )

@@ -21,18 +21,37 @@ const initialState = Immutable.fromJS({
     linkSent: false,
     linkCopied: false,
   },
+  showSlideIns: true,
 });
 
 export default function(viewState = initialState, action = {}) {
   switch (action.type) {
+    case actionTypes.lostConnection:
+      return viewState.set("showSlideIns", true);
+
+    case actionTypes.view.toggleSlideIns:
+      return viewState.set("showSlideIns", !viewState.get("showSlideIns"));
+
     case actionTypes.account.loginFailed:
     case actionTypes.view.showMainMenu:
       return viewState.set("showMainMenu", true);
 
     case actionTypes.account.store:
     case actionTypes.account.reset:
-    case actionTypes.view.hideMainMenu:
+    case actionTypes.view.hideMainMenu: {
+      const emailVerified = action.payload.get("emailVerified");
+      const acceptedTermsOfService = action.payload.get(
+        "acceptedTermsOfService"
+      );
+
+      const isAnonymous = action.payload.get("isAnonymous");
+
+      if (isAnonymous || !emailVerified || !acceptedTermsOfService) {
+        viewState = viewState.set("showSlideIns", true);
+      }
+
       return viewState.set("showMainMenu", false);
+    }
 
     case actionTypes.view.toggleRdf:
       return viewState
@@ -83,7 +102,8 @@ export default function(viewState = initialState, action = {}) {
         .setIn(["anonymousSlideIn", "expanded"], false)
         .setIn(["anonymousSlideIn", "linkSent"], false)
         .setIn(["anonymousSlideIn", "linkCopied"], false)
-        .setIn(["anonymousSlideIn", "showEmailInput"], false);
+        .setIn(["anonymousSlideIn", "showEmailInput"], false)
+        .set("showSlideIns", false);
 
     case actionTypes.view.anonymousSlideIn.expand:
       return viewState

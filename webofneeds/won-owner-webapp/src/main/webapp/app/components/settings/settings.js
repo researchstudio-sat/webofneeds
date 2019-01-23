@@ -6,6 +6,7 @@ import ngAnimate from "angular-animate";
 import { attach, getIn } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import settingsWrapper from "./settings-wrapper.js";
+import * as viewSelectors from "../../selectors/view-selectors.js";
 
 import * as srefUtils from "../../sref-utils.js";
 
@@ -27,6 +28,8 @@ class SettingsController {
       return {
         appTitle: getIn(state, ["config", "theme", "title"]),
         showModalDialog: state.getIn(["view", "showModalDialog"]),
+        showSlideIns:
+          viewSelectors.hasSlideIns(state) && viewSelectors.showSlideIns(state),
       };
     };
     const disconnect = this.$ngRedux.connect(select, actionCreators)(this);

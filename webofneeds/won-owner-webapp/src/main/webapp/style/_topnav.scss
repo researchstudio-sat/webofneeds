@@ -14,9 +14,24 @@
     position: relative; //to allow absolute on *__center
 
     > .topnav__inner__left {
+      display: flex;
+      align-items: center;
+
       margin-right: 1rem;
       .topnav__button__icon {
         margin-right: 0.5rem;
+      }
+
+      .topnav__inner__left__slideintoggle {
+        cursor: pointer;
+        &__icon {
+          @include fixed-square(1.5rem);
+          --local-primary: #{$won-secondary-color};
+        }
+        &__carret {
+          @include fixed-square(1.5rem);
+          --local-primary: #{$won-secondary-color};
+        }
       }
     }
     > .topnav__inner__center {
@@ -80,6 +95,7 @@
 
   .topnav__page-title {
     font-weight: 700;
+    margin-right: 0.5rem;
   }
 
   .topnav__signupbtn {

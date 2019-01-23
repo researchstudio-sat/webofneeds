@@ -208,12 +208,6 @@ function genComponentConf() {
                 </div>
             </div>
         </div>
-        <!-- TODO: REMOVE THIS AGAIN ONLY FOR DEBUGGING NOW
-        <div class="co__loading" ng-if="self.showLoadingIndicator">
-            <svg class="co__loading__spinner hspinner">
-                <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
-            </svg>
-        </div> -->
     `;
 
   class Controller {
@@ -272,8 +266,6 @@ function genComponentConf() {
           connectionsToCrawl: connectionsToCrawl || Immutable.Map(),
           unloadedNeedsSize: unloadedNeeds ? unloadedNeeds.size : 0,
           closedNeedsSize: closedNeeds ? closedNeeds.size : 0,
-
-          //showLoadingIndicator: getIn(state, ["process", "processingInitialLoad"]) || getIn(state, ["process", "processingLogin"]),
         };
       };
       connect2Redux(

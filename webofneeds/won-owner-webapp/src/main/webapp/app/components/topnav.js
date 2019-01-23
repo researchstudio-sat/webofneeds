@@ -8,6 +8,8 @@ import accountMenuModule from "./account-menu.js";
 import { attach, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
+import { isLoading } from "../selectors/process-selectors.js";
+import * as viewSelectors from "../selectors/view-selectors.js";
 
 import * as srefUtils from "../sref-utils.js";
 
@@ -27,10 +29,25 @@ function genTopnavConf() {
                                 {{ self.appTitle }}
                             </span>
                     </a>
+                    <div class="topnav__inner__left__slideintoggle"
+                        ng-if="self.showSlideInIndicator"
+                        ng-click="self.view__toggleSlideIns()">
+                        <svg class="topnav__inner__left__slideintoggle__icon">
+                            <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
+                        </svg>
+                        <svg class="topnav__inner__left__slideintoggle__carret">
+                            <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
+                        </svg>
+                    </div>
                 </div>
                 <div class="topnav__inner__center"></div>
                 <div class="topnav__inner__right">
                     <ul class="topnav__list">
+                        <li class="topnav__list__loading" ng-if="self.showLoadingIndicator">
+                          <svg class="topnav__list__loading__spinner hspinner">
+                              <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
+                          </svg>
+                        </li>
                         <li ng-show="!self.isSignUpView && (self.isAnonymous || !self.loggedIn)">
                             <a  ui-sref="{{ self.absSRef('signup') }}"
                                 class="topnav__signupbtn">
@@ -69,6 +86,10 @@ function genTopnavConf() {
           loggedIn: state.getIn(["account", "loggedIn"]),
           isAnonymous: state.getIn(["account", "isAnonymous"]),
           isSignUpView: currentRoute === "signup",
+          showLoadingIndicator: isLoading(state),
+          showSlideInIndicator:
+            viewSelectors.hasSlideIns(state) &&
+            !viewSelectors.showSlideIns(state),
         };
       };
 

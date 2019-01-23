@@ -12,6 +12,7 @@ import {
   getPostUriFromRoute,
   getViewNeedUriFromRoute,
 } from "../../selectors/general-selectors.js";
+import * as viewSelectors from "../../selectors/view-selectors.js";
 
 import * as srefUtils from "../../sref-utils.js";
 
@@ -41,6 +42,8 @@ class Controller {
         won: won.WON,
         showModalDialog: getIn(state, ["view", "showModalDialog"]),
         showNeedOverlay: !!viewNeedUri,
+        showSlideIns:
+          viewSelectors.hasSlideIns(state) && viewSelectors.showSlideIns(state),
         viewNeedUri,
         postLoading:
           !post || getIn(state, ["process", "needs", postUri, "loading"]),

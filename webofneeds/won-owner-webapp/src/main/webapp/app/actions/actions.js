@@ -355,6 +355,8 @@ const actionHierarchy = {
       collapse: INJ_DEFAULT,
       showEmailInput: INJ_DEFAULT,
     },
+
+    toggleSlideIns: INJ_DEFAULT,
   },
 
   toasts: {

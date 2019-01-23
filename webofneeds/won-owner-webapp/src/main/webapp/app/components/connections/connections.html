@@ -6,7 +6,7 @@
     <won-topnav></won-topnav>
 </header>
 <won-toasts></won-toasts>
-<won-slide-in></won-slide-in>
+<won-slide-in ng-if="self.showSlideIns"></won-slide-in>
 <aside class="overview__left" ng-class="{'hide-in-responsive': self.hideListSideInResponsive}">
     <won-connections-overview on-selected-connection="self.selectConnection(connectionUri)"
                               on-selected-need="self.selectNeed(needUri)"

@@ -10,6 +10,7 @@ import signupTitleBarModule from "../signup-title-bar.js";
 import labelledHrModule from "../labelled-hr.js";
 
 import * as srefUtils from "../../sref-utils.js";
+import * as viewSelectors from "../../selectors/view-selectors.js";
 
 import "style/_signup.scss";
 
@@ -33,6 +34,8 @@ class SignupController {
         isAnonymous: state.getIn(["account", "isAnonymous"]),
         privateId: state.getIn(["account", "privateId"]),
         showModalDialog: state.getIn(["view", "showModalDialog"]),
+        showSlideIns:
+          viewSelectors.hasSlideIns(state) && viewSelectors.showSlideIns(state),
       };
     };
     const disconnect = this.$ngRedux.connect(select, actionCreators)(this);
