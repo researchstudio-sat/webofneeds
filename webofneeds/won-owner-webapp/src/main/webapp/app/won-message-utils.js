@@ -811,7 +811,7 @@ export function fetchTheirNeedAndDispatch(needUri, dispatch) {
           .catch(() => {
             dispatch({
               type: actionTypes.personas.storeUriFailed,
-              payload: Immutable.fromJS({ uri: needUri }),
+              payload: Immutable.fromJS({ uri: personaUri }),
             });
             return;
           });
