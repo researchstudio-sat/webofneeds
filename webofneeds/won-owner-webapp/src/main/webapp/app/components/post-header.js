@@ -55,11 +55,12 @@ function genComponentConf() {
             ng-if="self.isGroupChatEnabled && self.isChatEnabled">
             Group Chat enabled
           </span>
-        <span class="ph__right__subtitle__type" ng-if="!self.shouldShowRdf">
-          {{ self.shortTypesLabel }}{{ self.matchingContext }}
-        </span>
-        <span class="ph__right__subtitle__type" ng-if="self.shouldShowRdf">
-          {{ self.fullTypesLabel }}
+          <span ng-if="!self.shouldShowRdf">
+            {{ self.shortTypesLabel }}{{ self.matchingContext }}
+          </span>
+          <span ng-if="self.shouldShowRdf">
+            {{ self.fullTypesLabel }}
+          </span>
         </span>
         <div class="ph__right__subtitle__date">
           {{ self.friendlyTimestamp }}
