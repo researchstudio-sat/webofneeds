@@ -6,9 +6,17 @@ import angular from "angular";
 import postShareLinkModule from "./post-share-link.js";
 import { attach, get } from "../utils.js";
 import won from "../won-es6.js";
-import { labels, relativeTime } from "../won-label-utils.js";
+import { relativeTime } from "../won-label-utils.js";
 import { connect2Redux } from "../won-utils.js";
-import { generateNeedTypesLabel } from "../need-utils.js";
+import {
+  generateFullNeedTypesLabel,
+  generateShortNeedTypesLabel,
+  generateFullNeedFlags,
+  generateFullNeedFacets,
+  generateShortNeedFlags,
+  generateShortNeedFacets,
+  generateNeedMatchingContext,
+} from "../need-utils.js";
 import {
   selectLastUpdateTime,
   getConnectionUriFromRoute,
@@ -24,7 +32,9 @@ const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
       <div class="pcg__columns">
+      <!-- LEFT COLUMN -->
         <div class="pcg__columns__left">
+          <!-- PERSONA -->
           <div class="pcg__columns__left__item" ng-if="self.persona">
             <div class="pcg__columns__left__item__label">
               Author
@@ -34,6 +44,7 @@ function genComponentConf() {
               <won-rating-view rating="self.rating()" rating-connection-uri="self.ratingConnectionUri"></won-rating-view>
             </div>
           </div>
+          <!-- RATING -->
           <div class="pcg__columns__left__item" ng-if="self.friendlyTimestamp">
             <div class="pcg__columns__left__item__label">
               Created
@@ -42,37 +53,69 @@ function genComponentConf() {
               {{ self.friendlyTimestamp }}
             </div>
           </div>
-          <!-- TODO: We Do not store a single type anymore but a list of types... adapt accordingly -->
-          <div class="pcg__columns__left__item">
+          <!-- TYPES - IF SHOW RDF IS TRUE -->
+          <div class="pcg__columns__left__item" ng-if="self.shouldShowRdf">
             <div class="pcg__columns__left__item__label">
               Types
             </div>
             <div class="pcg__columns__left__item__value">
-              {{ self.generateNeedTypesLabel(self.post) }}
+              {{ self.fullTypesLabel }}
             </div>
           </div>
         </div>
-        <div class="pcg__columns__right" ng-if="self.flags && self.flags.size > 0">
+
+      <!-- RIGHT COLUMN -->
+        <!-- TYPES - IF SHOW RDF IS FALSE -->
+        <div class="pcg__columns__right" ng-if="!self.shouldShowRdf && self.shortTypesLabel.length > 0">
+          <div class="pcg__columns__left__item">
+            <div class="pcg__columns__left__item__label">
+              Type
+            </div>
+            <div class="pcg__columns__left__item__value">
+              {{ self.shortTypesLabel }} {{self.matchingContext}}
+            </div>
+          </div>
+        </div>
+        <div class="pcg__columns__right" ng-if="!self.shouldShowRdf && self.shortTypesLabel.length === 0 && self.matchingContext.length > 0">
+          <div class="pcg__columns__left__item">
+            <div class="pcg__columns__left__item__label">
+              Context
+            </div>
+            <div class="pcg__columns__left__item__value">
+              {{self.matchingContext}}
+            </div>
+          </div>
+        </div>
+        <!-- FLAGS -->
+        <div class="pcg__columns__right" ng-if="self.shouldShowRdf || (self.shortFlags && self.shortFlags.length > 0)">
           <div class="pcg__columns__right__item">
             <div class="pcg__columns__right__item__label">
               Flags
             </div>
-            <div class="pcg__columns__right__item__value">
-              <span class="pcg__columns__right__item__value__flag" ng-repeat="flag in self.flags.toArray()">{{ self.labels.flags[flag]? self.labels.flags[flag] : flag }}</span>
+            <div class="pcg__columns__right__item__value" ng-if="self.shouldShowRdf">
+              <span class="pcg__columns__right__item__value__flag" ng-repeat="flag in self.fullFlags">{{flag}}</span>
+            </div>
+            <div class="pcg__columns__right__item__value" ng-if="!self.shouldShowRdf">
+              <span class="pcg__columns__right__item__value__flag" ng-repeat="flag in self.shortFlags">{{flag}}</span>
             </div>
           </div>
         </div>
-        <div class="pcg__columns__right" ng-if="self.facets && self.facets.size > 0">
+        <!-- FACETS -->
+        <div class="pcg__columns__right" ng-if="self.shouldShowRdf || (self.shortFacets && self.shortFacets.length > 0)">
           <div class="pcg__columns__right__item">
             <div class="pcg__columns__right__item__label">
               Facets
             </div>
-            <div class="pcg__columns__right__item__value">
-              <span class="pcg__columns__right__item__value__facet" ng-repeat="facet in self.facets.toArray()">{{ self.labels.facets[facet]? self.labels.facets[facet] : facet }}</span>
+            <div class="pcg__columns__right__item__value" ng-if="self.shouldShowRdf">
+              <span class="pcg__columns__right__item__value__facet" ng-repeat="facet in self.fullFacets">{{facet}}</span>
+            </div>
+            <div class="pcg__columns__right__item__value" ng-if="!self.shouldShowRdf">
+              <span class="pcg__columns__right__item__value__facet" ng-repeat="facet in self.shortFacets">{{facet}}</span>
             </div>
           </div>
         </div>
       </div>
+
       <won-post-share-link
         ng-if="!self.preventSharing"
         post-uri="self.post.get('uri')">
@@ -83,8 +126,6 @@ function genComponentConf() {
     constructor() {
       attach(this, serviceDependencies, arguments);
       window.pcg4dbg = this;
-      this.labels = labels;
-      this.generateNeedTypesLabel = generateNeedTypesLabel;
 
       const selectFromState = state => {
         const connectionUri = getConnectionUriFromRoute(state);
@@ -99,34 +140,40 @@ function genComponentConf() {
             : null;
 
         const post = this.postUri && state.getIn(["needs", this.postUri]);
-        const flags = post && post.getIn(["content", "flags"]);
-        const facets = post && post.get("facets");
-
+        // move this down when refactoring preventSharing
+        const fullFlags = post && generateFullNeedFlags(post);
+        
         const persona = post
           ? state.getIn(["needs", post.get("heldBy")])
           : undefined;
         const personaHolds = persona && persona.get("holds");
         const personaRating = persona && persona.get("rating");
+
         return {
           WON: won.WON,
           post,
-          flags,
-          facets,
+          fullTypesLabel: post && generateFullNeedTypesLabel(post),
+          shortTypesLabel: post && generateShortNeedTypesLabel(post),
+          matchingContext: post && generateNeedMatchingContext(post),
+          fullFlags,
+          shortFlags: post && generateShortNeedFlags(post),
+          fullFacets: post && generateFullNeedFacets(post),
+          shortFacets: post && generateShortNeedFacets(post),
           persona:
             personaHolds && personaHolds.includes(post.get("uri"))
               ? persona
               : undefined,
           personaRating: personaRating,
+          // TODO: this probably should not be checked like that - util method?
           preventSharing:
             (post && post.get("state") === won.WON.InactiveCompacted) ||
-            (flags &&
-              flags.filter(
-                flag => flag === won.WON.NoHintForCounterpartCompacted
-              ).size > 0),
+            (fullFlags &&
+              fullFlags.filter(flag => flag === "No Hint For Others").size > 0),
           friendlyTimestamp:
             post &&
             relativeTime(selectLastUpdateTime(state), post.get("creationDate")),
           ratingConnectionUri: ratingConnectionUri,
+          shouldShowRdf: state.getIn(["view", "showRdf"]),
         };
       };
       connect2Redux(selectFromState, actionCreators, ["self.postUri"], this);

@@ -13,10 +13,12 @@ import { selectLastUpdateTime } from "../selectors/general-selectors.js";
 import won from "../won-es6.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 import {
-  generateNeedTypesLabel,
+  generateFullNeedTypesLabel,
+  generateShortNeedTypesLabel,
   isDirectResponseNeed,
   hasGroupFacet,
   hasChatFacet,
+  generateNeedMatchingContext,
 } from "../need-utils.js";
 
 import "style/_post-header.scss";
@@ -53,7 +55,12 @@ function genComponentConf() {
             ng-if="self.isGroupChatEnabled && self.isChatEnabled">
             Group Chat enabled
           </span>
-          {{ self.generateNeedTypesLabel(self.need) }}
+          <span ng-if="!self.shouldShowRdf">
+            {{ self.shortTypesLabel }}{{ self.matchingContext }}
+          </span>
+          <span ng-if="self.shouldShowRdf">
+            {{ self.fullTypesLabel }}
+          </span>
         </span>
         <div class="ph__right__subtitle__date">
           {{ self.friendlyTimestamp }}
@@ -87,8 +94,12 @@ function genComponentConf() {
             ng-if="self.isGroupChatEnabled && self.isChatEnabled">
             Group Chat enabled
           </span>
-          {{ self.generateNeedTypesLabel(self.need) }}
-        </span>
+          <span class="ph__right__subtitle__type" ng-if="!self.shouldShowRdf">
+            {{ self.shortTypesLabel }}{{ self.matchingContext }}
+          </span>
+          <span class="ph__right__subtitle__type" ng-if="self.shouldShowRdf">
+            {{ self.fullTypesLabel }}
+          </span>
       </div>
     </div>
     <div class="ph__icon__skeleton" ng-if="self.postLoading"></div>
@@ -106,7 +117,7 @@ function genComponentConf() {
     constructor() {
       attach(this, serviceDependencies, arguments);
       window.ph4dbg = this;
-      this.generateNeedTypesLabel = generateNeedTypesLabel;
+
       this.WON = won.WON;
       const selectFromState = state => {
         const need = getIn(state, ["needs", this.needUri]);
@@ -119,6 +130,9 @@ function genComponentConf() {
         return {
           responseToNeed,
           need,
+          fullTypesLabel: need && generateFullNeedTypesLabel(need),
+          shortTypesLabel: need && generateShortNeedTypesLabel(need),
+          matchingContext: need && generateNeedMatchingContext(need),
           postLoading:
             !need ||
             getIn(state, ["process", "needs", need.get("uri"), "loading"]),
@@ -137,6 +151,7 @@ function genComponentConf() {
               selectLastUpdateTime(state),
               need.get("lastUpdateDate")
             ),
+          shouldShowRdf: state.getIn(["view", "showRdf"]),
         };
       };
 
