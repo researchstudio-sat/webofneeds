@@ -914,14 +914,42 @@ won.wonMessageFromJsonLd = async function(wonMessageAsJsonLD) {
   const expandedJsonLd = await jsonld.promises.expand(wonMessageAsJsonLD);
   const wonMessage = new WonMessage(expandedJsonLd);
 
-  if (wonMessage.parseErrors && wonMessage.parseErrors.length > 0) {
-    console.warn("wonMessage ParseError: " + wonMessage.parseErrors);
-  }
-
   await wonMessage.frameInPromise();
   await wonMessage.generateContentGraphTrig();
   await wonMessage.generateCompactedFramedMessage();
   await wonMessage.generateContainedForwardedWonMessages();
+
+  if (wonMessage.hasParseErrors() && !wonMessage.isResponse()) {
+    console.warn(
+      "wonMessage<",
+      wonMessage.getMessageUri(),
+      "> msgType<",
+      wonMessage.getMessageType(),
+      "> ParseError: {" + wonMessage.parseErrors,
+      "} wonMessage: ",
+      wonMessage
+    );
+  }
+  if (wonMessage.hasContainedForwardedWonMessages()) {
+    console.debug(
+      "wonMessage<",
+      wonMessage.getMessageUri(),
+      "> msgType<",
+      wonMessage.getMessageType(),
+      "> contains forwardedMessages wonMessage: ",
+      wonMessage
+    );
+    wonMessage.getContainedForwardedWonMessages().map(forwardedWonMessage => {
+      console.debug(
+        "-- forwardedMessage<",
+        forwardedWonMessage.getMessageUri(),
+        "> msgType<",
+        forwardedWonMessage.getMessageType(),
+        ">, forwardedWonMessage: ",
+        forwardedWonMessage
+      );
+    });
+  }
 
   return wonMessage;
 };
@@ -1200,9 +1228,8 @@ WonMessage.prototype = {
 
       return Promise.resolve(this.containedForwardedWonMessages);
     } else if (forwardedMessageUris) {
-      console.warn(
-        "WonMessage contains more than one forwardedMessage on the same level: omitting forwardMessages, wonMessage:",
-        this
+      this.parseErrors.push(
+        "WonMessage contains more than one forwardedMessage on the same level: omitting forwardMessages"
       );
       return Promise.resolve(this.containedForwardedWonMessages);
     } else {
@@ -1220,6 +1247,23 @@ WonMessage.prototype = {
         "@type": type,
       })
       .then(result => {
+        const graphs = result["@graph"];
+        if (graphs && graphs.length > 1) {
+          const msgUri = that.getMessageUri();
+          const msgGraphIndex = graphs.findIndex(
+            elem => elem["@id"] === msgUri
+          );
+          if (msgGraphIndex != 0 && msgGraphIndex != -1) {
+            let newGraphs = [];
+            newGraphs.push(graphs[msgGraphIndex]);
+            result["@graph"] = newGraphs.concat(
+              graphs.filter(elem => elem["@id"] === msgUri)
+            );
+
+            that.framedMessage = result;
+            return result;
+          }
+        }
         that.framedMessage = result;
         return result;
       });
@@ -1451,6 +1495,9 @@ WonMessage.prototype = {
       this.containedForwardedWonMessages &&
       this.containedForwardedWonMessages.length > 0
     );
+  },
+  hasParseErrors: function() {
+    return this.parseErrors && this.parseErrors.length > 0;
   },
   getContainedForwardedWonMessages: function() {
     return this.containedForwardedWonMessages;

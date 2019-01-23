@@ -156,6 +156,8 @@ export function parseMessage(
     return Immutable.fromJS(parsedMessage);
   }
 }
+window.parseMessage4dbg = parseMessage;
+
 function hasContent(content) {
   for (let prop in content) {
     if (content[prop] !== undefined && content[prop] != null) {
