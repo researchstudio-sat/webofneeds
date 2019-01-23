@@ -813,7 +813,7 @@ export function fetchTheirNeedAndDispatch(needUri, dispatch) {
               type: actionTypes.personas.storeUriFailed,
               payload: Immutable.fromJS({ uri: personaUri }),
             });
-            return;
+            return need;
           });
       } else {
         return need;
