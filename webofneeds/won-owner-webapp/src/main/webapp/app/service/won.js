@@ -1274,14 +1274,7 @@ WonMessage.prototype = {
   },
 
   getProperty: function(property) {
-    const framedMsgGraphs = this.__getFramedMessage()["@graph"];
-    framedMsgGraphs &&
-      framedMsgGraphs.length > 1 &&
-      console.warn(
-        "framedMessage contains more than one graph!, ",
-        framedMsgGraphs
-      );
-    let val = framedMsgGraphs[0][property];
+    let val = this.__getFramedMessage()["@graph"][0][property];
     if (val) {
       return this.__singleValueOrArray(val);
     }
@@ -1295,17 +1288,9 @@ WonMessage.prototype = {
     }
   },
   getPropertyFromRemoteMessage: function(property) {
-    const framedMsgGraphs = this.__getFramedMessage()["@graph"];
-    framedMsgGraphs &&
-      framedMsgGraphs.length > 1 &&
-      console.warn(
-        "framedMessage contains more than one graph!, ",
-        framedMsgGraphs
-      );
-    const remoteMessage =
-      framedMsgGraphs[0][
-        "http://purl.org/webofneeds/message#hasCorrespondingRemoteMessage"
-      ];
+    const remoteMessage = this.__getFramedMessage()["@graph"][0][
+      "http://purl.org/webofneeds/message#hasCorrespondingRemoteMessage"
+    ];
     if (remoteMessage) {
       let val = remoteMessage[property];
       if (val) {
@@ -1370,37 +1355,6 @@ WonMessage.prototype = {
     return createArray(
       this.getProperty("http://purl.org/webofneeds/message#hasForwardedMessage")
     );
-    /*let uris;
-    let val = this.__getFramedMessage()["@graph"][0]["http://purl.org/webofneeds/message#hasForwardedMessage"];
-    if (val) {
-      uris = this.__singleValueOrArray(val);
-    } else {
-      const remoteMessage = this.__getFramedMessage()["@graph"][0]["http://purl.org/webofneeds/message#hasCorrespondingRemoteMessage"];
-      if (remoteMessage) {
-        val = remoteMessage["http://purl.org/webofneeds/message#hasForwardedMessage"];
-        if (val) {
-          uris = this.__singleValueOrArray(val);
-        }
-      }
-    }
-
-    if(uris) {
-      return createArray(uris);
-    }
-    val = this.__getFramedMessage()["@graph"][1]["http://purl.org/webofneeds/message#hasForwardedMessage"];
-    if (val) {
-      uris = this.__singleValueOrArray(val);
-    } else {
-      const remoteMessage2 = this.__getFramedMessage()["@graph"][1]["http://purl.org/webofneeds/message#hasCorrespondingRemoteMessage"];
-      if (remoteMessage2) {
-        val = remoteMessage2["http://purl.org/webofneeds/message#hasForwardedMessage"];
-        if (val) {
-          uris = this.__singleValueOrArray(val);
-        }
-      }
-    }
-
-    return createArray(uris); */
   },
   getReceivedTimestamp: function() {
     return this.getPropertyFromLocalMessage(
