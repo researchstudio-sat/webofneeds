@@ -102,7 +102,8 @@ export default function(viewState = initialState, action = {}) {
         .setIn(["anonymousSlideIn", "expanded"], false)
         .setIn(["anonymousSlideIn", "linkSent"], false)
         .setIn(["anonymousSlideIn", "linkCopied"], false)
-        .setIn(["anonymousSlideIn", "showEmailInput"], false);
+        .setIn(["anonymousSlideIn", "showEmailInput"], false)
+        .set("showSlideIns", false);
 
     case actionTypes.view.anonymousSlideIn.expand:
       return viewState
