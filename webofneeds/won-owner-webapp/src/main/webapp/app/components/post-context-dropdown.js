@@ -5,13 +5,12 @@
 import angular from "angular";
 import ngAnimate from "angular-animate";
 import { actionCreators } from "../actions/actions.js";
-import won from "../won-es6.js";
 import { attach, toAbsoluteURL, getIn, get } from "../utils.js";
 import {
   connect2Redux,
   createDocumentDefinitionFromPost,
 } from "../won-utils.js";
-import { getPostUriFromRoute } from "../selectors/general-selectors.js";
+import { isActive, isInactive, isOwned } from "../need-utils.js";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 
@@ -23,12 +22,12 @@ const serviceDependencies = ["$scope", "$ngRedux", "$element"];
 function genComponentConf() {
   let template = `
             <svg class="cdd__icon__small"
-                ng-if="self.postLoading"
+                ng-if="self.postLoading || self.postFailedToLoad"
                 style="--local-primary:var(--won-skeleton-color);">
                     <use xlink:href="#ico16_contextmenu" href="#ico16_contextmenu"></use>
             </svg>
             <svg class="cdd__icon__small clickable"
-                ng-if="!self.postLoading"
+                ng-if="!self.postLoading && !self.postFailedToLoad"
                 style="--local-primary:var(--won-secondary-color);"
                 ng-click="self.contextMenuOpen = true">
                     <use xlink:href="#ico16_contextmenu" href="#ico16_contextmenu"></use>
@@ -81,9 +80,7 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
 
       const selectFromState = state => {
-        const postUri = getPostUriFromRoute(state);
-        const post = postUri && state.getIn(["needs", postUri]);
-        const postState = post && post.get("state");
+        const post = this.needUri && state.getIn(["needs", this.needUri]);
 
         let linkToPost;
         if (ownerBaseUrl && post) {
@@ -97,18 +94,20 @@ function genComponentConf() {
         return {
           adminEmail: getIn(state, ["config", "theme", "adminEmail"]),
           personaUri,
-          isOwnPost: post && post.get("isOwned"),
-          isActive: postState === won.WON.ActiveCompacted,
-          isInactive: postState === won.WON.InactiveCompacted,
+          isOwnPost: isOwned(post),
+          isActive: isActive(post),
+          isInactive: isInactive(post),
           post,
           postLoading:
             !post ||
             getIn(state, ["process", "needs", post.get("uri"), "loading"]),
+          postFailedToLoad:
+            post &&
+            getIn(state, ["process", "needs", post.get("uri"), "failedToLoad"]),
           linkToPost,
-          postUri,
         };
       };
-      connect2Redux(selectFromState, actionCreators, [], this);
+      connect2Redux(selectFromState, actionCreators, ["self.needUri"], this);
 
       const callback = event => {
         const clickedElement = event.target;
@@ -130,7 +129,7 @@ function genComponentConf() {
     }
 
     goToPersona(personaUri) {
-      this.router__stateGoCurrent({ useCase: undefined, postUri: personaUri });
+      this.router__stateGoCurrent({ viewNeedUri: personaUri });
     }
 
     closePost() {
@@ -205,7 +204,7 @@ function genComponentConf() {
     }
 
     generateReportPostMailParams() {
-      const subject = `[Report Post] - ${this.postUri}`;
+      const subject = `[Report Post] - ${this.needUri}`;
       const body = `Link to Post: ${this.linkToPost}%0D%0AReason:%0D%0A`; //hint: %0D%0A adds a linebreak
 
       return `subject=${subject}&body=${body}`;
@@ -234,7 +233,9 @@ function genComponentConf() {
     controller: Controller,
     controllerAs: "self",
     bindToController: true, //scope-bindings -> ctrl
-    scope: {},
+    scope: {
+      needUri: "=",
+    },
     template: template,
   };
 }

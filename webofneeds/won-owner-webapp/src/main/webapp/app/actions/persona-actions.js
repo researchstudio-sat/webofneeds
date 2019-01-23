@@ -128,7 +128,8 @@ export function reviewPersona(reviewableConnectionUri, review) {
         .get("connections")
         .filter(
           connection =>
-            connection.get("remoteNeedUri") == foreignPersona.get("uri")
+            connection.get("remoteNeedUri") == foreignPersona.get("uri") &&
+            connection.get("facet") == won.WON.ReviewFacet
         )
         .keySeq()
         .first();
@@ -136,19 +137,37 @@ export function reviewPersona(reviewableConnectionUri, review) {
 
     const ownPersona = getPersona(ownNeed);
     const foreignPersona = getPersona(foreignNeed);
-
+    const identifier = "review";
     const reviewRdf = {
-      "@type": "s:Review",
-      "@id": reviewableConnectionUri + "/" + generateIdString(10),
-      "s:about": reviewableConnectionUri,
-      "s:reviewRating": {
-        "@type": "s:Rating",
-        "@id": reviewableConnectionUri + "/" + generateIdString(10),
-        "s:bestRating": { "@value": 5, "@type": "xsd:int" }, //not necessary but possible
-        "s:ratingValue": { "@value": review.value, "@type": "xsd:int" },
-        "s:worstRating": { "@value": 1, "@type": "xsd:int" }, //not necessary but possible
+      "s:review": {
+        "@type": "s:Review",
+        "@id":
+          reviewableConnectionUri && identifier
+            ? reviewableConnectionUri +
+              "/" +
+              identifier +
+              "/" +
+              generateIdString(10)
+            : undefined,
+
+        "s:about": foreignPersona.get("uri"),
+        "s:author": ownPersona.get("uri"),
+        "s:reviewRating": {
+          "@type": "s:Rating",
+          "@id":
+            reviewableConnectionUri && identifier
+              ? reviewableConnectionUri +
+                "/" +
+                identifier +
+                "/" +
+                generateIdString(10)
+              : undefined,
+          "s:bestRating": { "@value": 5, "@type": "xsd:int" }, //not necessary but possible
+          "s:ratingValue": { "@value": review.value, "@type": "xsd:int" },
+          "s:worstRating": { "@value": 1, "@type": "xsd:int" }, //not necessary but possible
+        },
+        "s:description": review.message,
       },
-      "s:description": review.message,
     };
 
     connectReview(

@@ -9,7 +9,7 @@ import {
 } from "../../app/sparql-builder-utils.js";
 
 export const goodsTransportOffer = {
-  identifier: "transportOffer",
+  identifier: "goodsTransportOffer",
   label: "Offer goods transport",
   icon: "#ico36_uc_transport_offer",
   doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,

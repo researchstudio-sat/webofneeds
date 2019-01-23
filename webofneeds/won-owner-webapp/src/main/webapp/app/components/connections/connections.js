@@ -15,12 +15,19 @@ import { actionCreators } from "../../actions/actions.js";
 import {
   getOwnedNeedByConnectionUri,
   getOwnedNeeds,
+  getConnectionUriFromRoute,
+  getPostUriFromRoute,
+  getViewNeedUriFromRoute,
+  getUseCaseFromRoute,
+  getUseCaseGroupFromRoute,
+  getGroupPostAdminUriFromRoute,
 } from "../../selectors/general-selectors.js";
 import { isChatToGroup } from "../../connection-utils.js";
 import * as srefUtils from "../../sref-utils.js";
 
 import "style/_connections.scss";
 import "style/_responsiveness-utils.scss";
+import "style/_need-overlay.scss";
 
 const serviceDependencies = ["$element", "$ngRedux", "$scope", "$state"];
 
@@ -32,27 +39,17 @@ class ConnectionsController {
     this.open = {};
 
     const selectFromState = state => {
-      const selectedPostUri = decodeURIComponent(
-        getIn(state, ["router", "currentParams", "postUri"])
-      );
+      const viewNeedUri = getViewNeedUriFromRoute(state);
+      const selectedPostUri = getPostUriFromRoute(state);
       const selectedPost =
         selectedPostUri && getIn(state, ["needs", selectedPostUri]);
 
-      const showGroupPostAdministration = getIn(state, [
-        "router",
-        "currentParams",
-        "groupPostAdminUri",
-      ]);
-      const useCase = getIn(state, ["router", "currentParams", "useCase"]);
-      const useCaseGroup = getIn(state, [
-        "router",
-        "currentParams",
-        "useCaseGroup",
-      ]);
+      const showGroupPostAdministration = getGroupPostAdminUriFromRoute(state);
+      const useCase = getUseCaseFromRoute(state);
+      const useCaseGroup = getUseCaseGroupFromRoute(state);
 
-      const selectedConnectionUri = decodeURIComponent(
-        getIn(state, ["router", "currentParams", "connectionUri"])
-      );
+      const selectedConnectionUri = getConnectionUriFromRoute(state);
+
       const need =
         selectedConnectionUri &&
         getOwnedNeedByConnectionUri(state, selectedConnectionUri);
@@ -139,7 +136,8 @@ class ConnectionsController {
         showPostInfo:
           selectedPost && !useCaseGroup && !showGroupPostAdministration,
         showGroupPostAdministration: showGroupPostAdministration,
-
+        showNeedOverlay: !!viewNeedUri,
+        viewNeedUri,
         hideListSideInResponsive:
           !hasOwnedNeeds ||
           selectedConnection ||

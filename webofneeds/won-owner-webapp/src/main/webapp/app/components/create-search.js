@@ -6,8 +6,7 @@ import ngAnimate from "angular-animate";
 
 import "ng-redux";
 import labelledHrModule from "./labelled-hr.js";
-import matchingContextModule from "./details/picker/matching-context-picker.js"; // TODO: should be renamed
-import { getIn, attach, delay } from "../utils.js";
+import { attach } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
 import { selectIsConnected } from "../selectors/general-selectors.js";
@@ -51,29 +50,6 @@ function genComponentConf() {
               initial-value="::self.draftObject.content.searchString">
             </won-title-picker>
             
-
-            <!-- TUNE MATCHING -->
-            <!-- TODO: when should this be shown as an option? -->
-            <div class="cp__content__branchheader b detailPicker clickable"
-                ng-click="self.toggleTuningOptions()">
-                <span>Tune Matching Behaviour</span>
-                <svg class="cp__content__branchheader__carret" ng-show="!self.showTuningOptions">
-                    <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
-                </svg>
-                <svg class="cp__content__branchheader__carret" ng-show="self.showTuningOptions">
-                    <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
-                </svg>
-            </div>
-            <div class="cp__content__tuning">
-                <div class="cp__content__tuning_matching-context">
-                    <won-matching-context-picker
-                      ng-if="self.showTuningOptions"
-                      default-matching-context="::self.defaultMatchingContext"
-                      on-matching-context-updated="::self.updateMatchingContext(matchingContext)">
-                    </won-matching-context-picker>
-                </div>
-            </div>
-
             <!-- PUBLISH BUTTON - RESPONSIVE MODE -->
             <div class="cp__content__responsivebuttons show-in-responsive">
               <won-labelled-hr label="::'done?'" class="cp__content__labelledhr"></won-labelled-hr>
@@ -123,33 +99,16 @@ function genComponentConf() {
         },
         seeks: {},
         useCase: "search",
-        matchingContext: undefined,
       };
-
-      this.showTuningOptions = false;
 
       this.isNew = true;
 
       const selectFromState = state => {
-        const defaultMatchingContextList = getIn(state, [
-          "config",
-          "theme",
-          "defaultContext",
-        ]);
-        const defaultMatchingContext = defaultMatchingContextList
-          ? defaultMatchingContextList.toJS()
-          : [];
-
         return {
           processingPublish: state.getIn(["process", "processingPublish"]),
           connectionHasBeenLost: !selectIsConnected(state),
-          defaultMatchingContext: defaultMatchingContext,
         };
       };
-
-      delay(0).then(() => {
-        this.updateMatchingContext(this.defaultMatchingContext);
-      });
 
       // Using actionCreators like this means that every action defined there is available in the template.
       connect2Redux(selectFromState, actionCreators, [], this);
@@ -186,10 +145,6 @@ function genComponentConf() {
       return this._scrollContainer;
     }
 
-    toggleTuningOptions() {
-      this.showTuningOptions = !this.showTuningOptions;
-    }
-
     isValid() {
       const draft = this.draftObject;
       const hasSearchString =
@@ -198,12 +153,6 @@ function genComponentConf() {
         this.draftObject.content.searchString &&
         this.draftObject.content.searchString.trim().length > 0;
       return !this.connectionHasBeenLost && !!draft && hasSearchString;
-    }
-
-    updateMatchingContext(matchingContext) {
-      if (matchingContext) {
-        this.draftObject.matchingContext = matchingContext;
-      }
     }
 
     updateDetail(value) {
@@ -239,11 +188,6 @@ function genComponentConf() {
   };
 }
 
-export default //.controller('CreateNeedController', [...serviceDependencies, CreateNeedController])
-angular
-  .module("won.owner.components.createSearch", [
-    labelledHrModule,
-    matchingContextModule,
-    ngAnimate,
-  ])
+export default angular
+  .module("won.owner.components.createSearch", [labelledHrModule, ngAnimate])
   .directive("wonCreateSearch", genComponentConf).name;

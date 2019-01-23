@@ -1,7 +1,7 @@
 import won from "../won-es6.js";
 import Immutable from "immutable";
 import angular from "angular";
-import chatTextFieldSimpleModule from "./chat-textfield-simple.js";
+import chatTextFieldModule from "./chat-textfield.js";
 import connectionMessageModule from "./messages/connection-message.js";
 import postContentMessageModule from "./messages/post-content-message.js";
 import petrinetStateModule from "./petrinet-state.js";
@@ -191,8 +191,9 @@ function genComponentConf() {
             </a>
         </div>
         <div class="pm__footer" ng-if="!self.showPetriNetData && self.isConnected">
-            <chat-textfield-simple
+            <chat-textfield
                 class="pm__footer__chattexfield"
+                connection-uri="self.connectionUri"
                 placeholder="self.shouldShowRdf? 'Enter TTL...' : 'Your message...'"
                 submit-button-label="self.shouldShowRdf? 'Send&#160;RDF' : 'Send'"
                 on-submit="self.send(value, additionalContent, referencedContent, self.shouldShowRdf)"
@@ -201,37 +202,39 @@ function genComponentConf() {
                 allow-details="!self.shouldShowRdf"
                 is-code="self.shouldShowRdf? 'true' : ''"
             >
-            </chat-textfield-simple>
+            </chat-textfield>
         </div>
         <div class="pm__footer" ng-if="!self.showPetriNetData && !self.multiSelectType && self.isSentRequest">
             Waiting for them to accept your chat request.
         </div>
 
         <div class="pm__footer" ng-if="!self.showPetriNetData && !self.multiSelectType && self.isReceivedRequest">
-            <chat-textfield-simple
+            <chat-textfield
                 class="pm__footer__chattexfield"
+                connection-uri="self.connectionUri"
                 placeholder="::'Message (optional)'"
                 on-submit="::self.openRequest(value)"
                 allow-details="::false"
                 allow-empty-submit="::true"
                 submit-button-label="::'Accept&#160;Chat'"
             >
-            </chat-textfield-simple>
+            </chat-textfield>
             <won-labelled-hr label="::'Or'" class="pm__footer__labelledhr"></won-labelled-hr>
             <button class="pm__footer__button won-button--filled black" ng-click="self.closeConnection()">
                 Decline
             </button>
         </div>
         <div class="pm__footer" ng-if="!self.showPetriNetData && !self.multiSelectType && self.isSuggested">
-            <chat-textfield-simple
+            <chat-textfield
                 placeholder="::'Message (optional)'"
+                connection-uri="self.connectionUri"
                 on-submit="::self.sendRequest(value, selectedPersona)"
                 allow-details="::false"
                 allow-empty-submit="::true"
                 show-personas="self.isOwnedNeedWhatsX"
                 submit-button-label="::'Ask&#160;to&#160;Chat'"
             >
-            </chat-textfield-simple>
+            </chat-textfield>
             <won-labelled-hr label="::'Or'" class="pm__footer__labelledhr"></won-labelled-hr>
             <button class="pm__footer__button won-button--filled black" ng-click="self.closeConnection(true)">
                 Bad match - remove!
@@ -895,7 +898,7 @@ function genComponentConf() {
 export default angular
   .module("won.owner.components.postMessages", [
     autoresizingTextareaModule,
-    chatTextFieldSimpleModule,
+    chatTextFieldModule,
     connectionMessageModule,
     connectionHeaderModule,
     labelledHrModule,

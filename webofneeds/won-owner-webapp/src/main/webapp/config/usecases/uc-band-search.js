@@ -14,7 +14,7 @@ import {
 import { getIn } from "../../app/utils.js";
 
 export const bandSearch = {
-  identifier: "findBand",
+  identifier: "bandSearch",
   label: "Find Band",
   icon: "#ico36_uc_find_band",
   timeToLiveMillisDefault: 1000 * 60 * 60 * 24 * 30,

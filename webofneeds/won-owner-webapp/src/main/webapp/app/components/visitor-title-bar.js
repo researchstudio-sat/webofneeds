@@ -33,7 +33,7 @@ function genComponentConf() {
                     </hgroup>
                 </div>
             </div>
-            <won-post-context-dropdown></won-post-context-dropdown>
+            <won-post-context-dropdown need-uri="self.post.get('uri')"></won-post-context-dropdown>
         </nav>
     `;
 

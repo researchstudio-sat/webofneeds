@@ -8,11 +8,15 @@ import won from "../../won-es6.js";
 import { actionCreators } from "../../actions/actions.js";
 import sendRequestModule from "../send-request.js";
 import visitorTitleBarModule from "../visitor-title-bar.js";
-import { getPostUriFromRoute } from "../../selectors/general-selectors.js";
+import {
+  getPostUriFromRoute,
+  getViewNeedUriFromRoute,
+} from "../../selectors/general-selectors.js";
 
 import * as srefUtils from "../../sref-utils.js";
 
 import "style/_post-visitor.scss";
+import "style/_need-overlay.scss";
 
 const serviceDependencies = ["$ngRedux", "$scope"];
 class Controller {
@@ -25,6 +29,7 @@ class Controller {
 
     const selectFromState = state => {
       const postUri = getPostUriFromRoute(state);
+      const viewNeedUri = getViewNeedUriFromRoute(state);
       const post = state.getIn(["needs", postUri]);
 
       const isOwnPost = post && post.get("isOwned");
@@ -35,6 +40,12 @@ class Controller {
         post,
         won: won.WON,
         showModalDialog: getIn(state, ["view", "showModalDialog"]),
+        showNeedOverlay: !!viewNeedUri,
+        viewNeedUri,
+        postLoading:
+          !post || getIn(state, ["process", "needs", postUri, "loading"]),
+        postFailedToLoad:
+          post && getIn(state, ["process", "needs", postUri, "failedToLoad"]),
       };
     };
 

@@ -5,7 +5,7 @@
 import { details, emptyDraft } from "../detail-definitions.js";
 
 export const serviceOffer = {
-  identifier: "servicesOffer",
+  identifier: "serviceOffer",
   label: "Offer a Service",
   icon: "#ico36_plus",
   draft: {

@@ -5,9 +5,9 @@ import java.net.URI;
 import won.protocol.model.FacetType;
 import won.protocol.vocabulary.WON;
 
-public class ReviewFacet extends HardcodedFacetConfig {
+public class ReviewFacetConfig extends HardcodedFacetConfig {
 
-    public ReviewFacet() {
+    public ReviewFacetConfig() {
         super(FacetType.ReviewFacet.getURI());
         this.derivationProperties.add(WON.REVIEWS);
     }

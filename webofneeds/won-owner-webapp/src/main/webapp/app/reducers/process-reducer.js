@@ -506,14 +506,7 @@ export function addOriginatorNeedToLoad(
 
       if (originatorUri) {
         //Message is originally from another need, we might need to add the need as well
-        const needProcess = processState.getIn(["needs", originatorUri]);
-
-        if (
-          !needProcess &&
-          !needProcess.get("toLoad") &&
-          !needProcess.get("loading") &&
-          !needProcess.get("failedToLoad")
-        ) {
+        if (!processState.getIn(["needs", originatorUri])) {
           console.debug(
             "Originator Need is not in the state yet, we need to add it"
           );

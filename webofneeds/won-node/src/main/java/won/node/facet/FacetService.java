@@ -38,6 +38,7 @@ public class FacetService {
         addConfig(new HolderFacetConfig());        
         addConfig(new GroupFacetConfig());
         addConfig(new ChatFacetConfig());
+        addConfig(new ReviewFacetConfig());
     }
     
     private void addConfig(FacetConfig config) {
@@ -81,6 +82,7 @@ public class FacetService {
                     config.getDerivationProperties().stream().forEach(p -> modelToManipulate.remove(needRes, p, remoteNeedRes));
                 }
             }
+            need.incrementVersion();
             need.getDatatsetHolder().setDataset(needDataset);
             needRepository.save(need);
         }

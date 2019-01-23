@@ -20,7 +20,7 @@ import {
 import won from "../../app/won-es6.js";
 
 export const rentRealEstateOffer = {
-  identifier: "offerRent",
+  identifier: "rentRealEstateOffer",
   label: "Rent a place out",
   icon: "#ico36_uc_realestate",
   timeToLiveMillisDefault: 1000 * 60 * 60 * 24 * 30 * 3,
