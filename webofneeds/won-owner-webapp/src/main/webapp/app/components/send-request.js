@@ -22,6 +22,7 @@ function genComponentConf() {
                 allow-empty-submit="::true"
                 show-personas="true"
                 submit-button-label="::'Ask&#160;to&#160;Chat'">
+
             </chat-textfield>
             <div
                 class="post-info__footer__infolabel"
@@ -43,7 +44,10 @@ function genComponentConf() {
           displayedPost,
           postUriToConnectTo,
           isInactive: needUtils.isInactive(displayedPost),
-          showRequestField: needUtils.isActive(displayedPost) && (needUtils.hasChatFacet(displayedPost) || needUtils.hasGroupFacet(displayedPost)),
+          showRequestField:
+            needUtils.isActive(displayedPost) &&
+            (needUtils.hasChatFacet(displayedPost) ||
+              needUtils.hasGroupFacet(displayedPost)),
           postLoading:
             !displayedPost ||
             getIn(state, [
