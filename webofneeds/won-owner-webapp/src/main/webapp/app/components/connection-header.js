@@ -11,7 +11,7 @@ import { actionCreators } from "../actions/actions.js";
 import { labels, relativeTime } from "../won-label-utils.js";
 import { attach, getIn, get } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
-import { isDirectResponseNeed } from "../need-utils.js";
+import * as needUtils from "../need-utils.js";
 import { isChatToGroup } from "../connection-utils.js";
 import { getHumanReadableStringFromMessage } from "../reducers/need-reducer/parse-message.js";
 import {
@@ -57,6 +57,18 @@ function genComponentConf() {
         </div>
         <div class="ch__right__subtitle" ng-if="!self.remoteNeedFailedToLoad">
           <span class="ch__right__subtitle__type">
+            <span class="ch__right__subtitle__type__persona"
+              ng-if="self.remotePersonaName && !self.isGroupChatEnabled">
+              {{self.remotePersonaName}}
+            </span>
+            <span class="ch__right__subtitle__type__groupchat"
+              ng-if="self.isGroupChatEnabled && !self.isChatEnabled">
+              Group Chat
+            </span>
+            <span class="ch__right__subtitle__type__groupchat"
+              ng-if="self.isGroupChatEnabled && self.isChatEnabled">
+              Group Chat enabled
+            </span>
             <won-connection-state
               connection-uri="self.connection.get('uri')">
             </won-connection-state>
@@ -149,18 +161,28 @@ function genComponentConf() {
 
         const groupMembers = remoteNeed && remoteNeed.get("groupMembers");
 
+        const remotePersonaUri = get(remoteNeed, "heldBy");
+        const remotePersona =
+          remotePersonaUri && getIn(state, ["needs", remotePersonaUri]);
+        const remotePersonaName = get(remotePersona, "humanReadable");
+
         return {
           connection,
           groupMembersArray: groupMembers && groupMembers.toArray(),
           groupMembersSize: groupMembers ? groupMembers.size : 0,
           ownedNeed,
           remoteNeed,
+          remotePersonaName,
           isConnectionToGroup: isChatToGroup(
             state.get("needs"),
             get(ownedNeed, "uri"),
             this.connectionUri
           ),
-          isDirectResponseFromRemote: isDirectResponseNeed(remoteNeed),
+          isDirectResponseFromRemote: needUtils.isDirectResponseNeed(
+            remoteNeed
+          ),
+          isGroupChatEnabled: needUtils.hasGroupFacet(remoteNeed),
+          isChatEnabled: needUtils.hasChatFacet(remoteNeed),
           latestMessageHumanReadableString,
           latestMessageUnread,
           unreadMessageCount:
