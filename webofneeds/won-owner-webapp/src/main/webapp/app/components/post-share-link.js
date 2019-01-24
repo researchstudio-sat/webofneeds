@@ -23,7 +23,7 @@ function genComponentConf() {
               <div class="psl__tabs__tab clickable" ng-class="{'psl__tabs__tab--selected': !self.showLink}" ng-click="self.showLink = false">QR-Code</div>
             </div>
             <div class="psl__link" ng-if="self.showLink">
-              <div class="psl__link__copyfield" ng-if="self.showLink">
+              <div class="psl__link__copyfield" ng-if="!self.hasWebShareSupport">
                 <input class="psl__link__copyfield__input" value="{{self.linkToPost}}" readonly type="text" ng-focus="self.selectLink()" ng-blur="self.clearSelection()">
                 <button class="red won-button--filled psl__link__copyfield__copy-button" ng-click="self.copyLink()">
                   <svg ng-if="self.copied" class="psl__link__copyfield__copy-button__icon" style="--local-primary:white;">
@@ -32,6 +32,11 @@ function genComponentConf() {
                   <svg ng-if="!self.copied" class="psl__link__copyfield__copy-button__icon" style="--local-primary:white;">
                     <use xlink:href="#ico16_copy_to_clipboard" href="#ico16_copy_to_clipboard"></use>
                   </svg>
+                </button>
+              </div>
+              <div class="psl__link__copyfield" ng-if="self.hasWebShareSupport">
+                <button class="red won-button--filled" ng-click="self.executeWebShare()">
+                  Share
                 </button>
               </div>
             </div>
@@ -59,6 +64,7 @@ function genComponentConf() {
         let svgQrCodeToPost = generateSvgQrCode(linkToPost);
 
         return {
+          hasWebShareSupport: !!navigator.share,
           post,
           linkToPost,
           svgQrCodeToPost,
@@ -74,6 +80,19 @@ function genComponentConf() {
         );
       }
       return this._linkField;
+    }
+
+    executeWebShare() {
+      if (this.hasWebShareSupport && this.post) {
+        navigator
+          .share({
+            title: this.post.get("humanReadable"),
+            text: "Check out this awesome Need i found on matchat — it rocks!",
+            url: this.linkToPost,
+          })
+          .then(() => console.debug("Successful share"))
+          .catch(error => console.debug("Error sharing", error));
+      }
     }
 
     selectLink() {
