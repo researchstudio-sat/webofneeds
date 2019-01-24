@@ -22,7 +22,6 @@ function genComponentConf() {
       <won-connection-header
         connection-uri="self.connectionUri"
         timestamp="self.lastUpdateTimestamp"
-        ng-disabled="self.remoteNeedFailedToLoad"
         ng-click="self.setOpen()"
         class="clickable">
       </won-connection-header>

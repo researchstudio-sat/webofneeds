@@ -3,13 +3,8 @@ import "ng-redux";
 import { actionCreators } from "../../../actions/actions.js";
 import postHeaderModule from "../../post-header.js";
 import { attach, getIn, get } from "../../../utils.js";
-import {
-  isOwned,
-  isPersona,
-  hasChatFacet,
-  hasGroupFacet,
-} from "../../../need-utils.js";
 import { connect2Redux } from "../../../won-utils.js";
+import * as needUtils from "../../../need-utils.js";
 import {
   getConnectionUriFromRoute,
   getOwnedNeedByConnectionUri,
@@ -36,6 +31,11 @@ function genComponentConf() {
                 timestamp="self.suggestedPost && self.suggestedPost.get('creationDate')"
                 hide-image="::false">
             </won-post-header>
+            <button class="suggestpostv__content__post__action won-button--outlined thin red"
+              ng-if="self.failedToLoad"
+              ng-click="self.reloadSuggestion()">
+              Reload
+            </button>
             <button class="suggestpostv__content__post__action won-button--outlined thin red"
               ng-if="self.showConnectAction"
               ng-click="self.connectWithPost()">
@@ -111,23 +111,25 @@ function genComponentConf() {
         return {
           suggestedPost,
           openedOwnPost,
-          hasChatFacet: hasChatFacet(suggestedPost),
-          hasGroupFacet: hasGroupFacet(suggestedPost),
+          hasChatFacet: needUtils.hasChatFacet(suggestedPost),
+          hasGroupFacet: needUtils.hasGroupFacet(suggestedPost),
           showConnectAction:
             suggestedPost &&
             fetchedSuggestion &&
-            !hasGroupFacet(suggestedPost) &&
-            hasChatFacet(suggestedPost) &&
+            needUtils.isActive(suggestedPost) &&
+            !needUtils.hasGroupFacet(suggestedPost) &&
+            needUtils.hasChatFacet(suggestedPost) &&
             !hasConnectionBetweenPosts &&
-            !isOwned(suggestedPost) &&
+            !needUtils.isOwned(suggestedPost) &&
             openedOwnPost,
           showJoinAction:
             suggestedPost &&
             fetchedSuggestion &&
-            hasGroupFacet(suggestedPost) &&
-            !hasChatFacet(suggestedPost) &&
+            needUtils.isActive(suggestedPost) &&
+            needUtils.hasGroupFacet(suggestedPost) &&
+            !needUtils.hasChatFacet(suggestedPost) &&
             !hasConnectionBetweenPosts &&
-            !isOwned(suggestedPost) &&
+            !needUtils.isOwned(suggestedPost) &&
             openedOwnPost,
           isLoading,
           toLoad,
@@ -161,15 +163,17 @@ function genComponentConf() {
         return "Suggestion marked toLoad";
       } else if (this.failedToLoad) {
         return "Failed to load Suggestion";
+      } else if (needUtils.isInactive(this.suggestedPost)) {
+        return "This Suggestion is inactive";
       }
 
-      if (isPersona(this.suggestedPost)) {
-        return isOwned(this.suggestedPost)
+      if (needUtils.isPersona(this.suggestedPost)) {
+        return needUtils.isOwned(this.suggestedPost)
           ? "This is one of your Personas"
           : "This is someone elses Persona";
       } else if (this.hasConnectionBetweenPosts) {
         return "Already established a Connection with this Suggestion";
-      } else if (isOwned(this.suggestedPost)) {
+      } else if (needUtils.isOwned(this.suggestedPost)) {
         return "This is one of your own Needs";
       } else if (this.hasChatFacet && !this.hasGroupFacet) {
         return "Click 'Connect' to connect with this Need";
@@ -197,6 +201,12 @@ function genComponentConf() {
         console.warn(
           "No Connect, either openedOwnPost(Uri) or suggestedPost(Uri) not present"
         );
+      }
+    }
+
+    reloadSuggestion() {
+      if (this.content && this.failedToLoad) {
+        this.needs__fetchUnloadedNeed(this.content);
       }
     }
   }

@@ -15,6 +15,7 @@ import {
 import * as viewSelectors from "../../selectors/view-selectors.js";
 
 import * as srefUtils from "../../sref-utils.js";
+import * as needUtils from "../../need-utils.js";
 
 import "style/_post-visitor.scss";
 import "style/_need-overlay.scss";
@@ -33,11 +34,10 @@ class Controller {
       const viewNeedUri = getViewNeedUriFromRoute(state);
       const post = state.getIn(["needs", postUri]);
 
-      const isOwnPost = post && post.get("isOwned");
-
       return {
         postUri,
-        isOwnPost: isOwnPost,
+        isOwnPost: needUtils.isOwned(post),
+        isActive: needUtils.isActive(post),
         post,
         won: won.WON,
         showModalDialog: getIn(state, ["view", "showModalDialog"]),
@@ -56,6 +56,12 @@ class Controller {
       this
     );
     this.$scope.$on("$destroy", disconnect);
+  }
+
+  tryReload() {
+    if (this.postUri && this.postFailedToLoad) {
+      this.needs__fetchUnloadedNeed(this.postUri);
+    }
   }
 }
 
