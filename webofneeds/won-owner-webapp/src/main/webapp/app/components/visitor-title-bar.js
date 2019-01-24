@@ -2,7 +2,7 @@
  * Created by ksinger on 20.08.2015.
  */
 import angular from "angular";
-import { attach } from "../utils.js";
+import { attach, get, getIn } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { getPostUriFromRoute } from "../selectors/general-selectors.js";
 import {
@@ -12,6 +12,7 @@ import {
 } from "../need-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import postContextDropDownModule from "../components/post-context-dropdown.js";
+import * as needUtils from "../need-utils.js";
 
 import "style/_visitor-title-bar.scss";
 
@@ -28,6 +29,15 @@ function genComponentConf() {
                     </won-square-image>
                     <hgroup>
                         <h1 class="vtb__title">{{ self.post.get('humanReadable') }}</h1>
+                        <span class="vtb__titles__persona" ng-if="self.personaName">{{ self.personaName }}</span>
+                        <span class="vtb__titles__groupchat"
+                          ng-if="self.isGroupChatEnabled && !self.isChatEnabled">
+                          Group Chat
+                        </span>
+                        <span class="vtb__titles__groupchat"
+                          ng-if="self.isGroupChatEnabled && self.isChatEnabled">
+                          Group Chat enabled
+                        </span>
                         <div class="vtb__titles__type" ng-if="!self.shouldShowRdf">{{ self.shortTypesLabel }}{{ self.matchingContext }}</div>
                         <div class="vtb__titles__type" ng-if="self.shouldShowRdf">{{ self.fullTypesLabel }}</div>
                     </hgroup>
@@ -45,9 +55,17 @@ function genComponentConf() {
       const selectFromState = state => {
         const postUri = getPostUriFromRoute(state);
         const post = state.getIn(["needs", postUri]);
+
+        const personaUri = get(post, "heldBy");
+        const persona = personaUri && getIn(state, ["needs", personaUri]);
+        const personaName = get(persona, "humanReadable");
+
         return {
           postUri,
           post,
+          personaName,
+          isGroupChatEnabled: needUtils.hasChatFacet(post),
+          isChatEnabled: needUtils.hasGroupFacet(post),
           fullTypesLabel: post && generateFullNeedTypesLabel(post),
           shortTypesLabel: post && generateShortNeedTypesLabel(post),
           matchingContext: post && generateNeedMatchingContext(post),

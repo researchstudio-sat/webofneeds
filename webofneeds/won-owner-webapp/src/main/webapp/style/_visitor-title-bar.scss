@@ -13,6 +13,22 @@
     font-size: 0.8rem;
   }
 
+  .vtb__titles__persona {
+    border-radius: 0.19rem;
+    background: $won-secondary-color-lighter;
+    color: $won-secondary-text-color;
+    padding: 0 0.25rem;
+    display: inline-block;
+  }
+
+  .vtb__titles__groupchat {
+    border-radius: 0.19rem;
+    background: $won-line-gray;
+    margin: 0.1rem;
+    padding: 0 0.25rem;
+    display: inline-block;
+  }
+
   > .vtb__inner {
     // vtb isn't using the tri-aligned that it inherits
     // via the `@include title-bar` as there's no
