@@ -43,10 +43,7 @@ function genComponentConf() {
           displayedPost,
           postUriToConnectTo,
           isInactive: needUtils.isInactive(displayedPost),
-          showRequestField:
-            needUtils.isActive(displayedPost) &&
-            (needUtils.hasChatFacet(displayedPost) ||
-              needUtils.hasGroupFacet(displayedPost)),
+          showRequestField: needUtils.isActive(displayedPost) && (needUtils.hasChatFacet(displayedPost) || needUtils.hasGroupFacet(displayedPost)),
           postLoading:
             !displayedPost ||
             getIn(state, [
