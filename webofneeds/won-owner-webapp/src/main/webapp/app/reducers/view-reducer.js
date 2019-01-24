@@ -36,18 +36,22 @@ export default function(viewState = initialState, action = {}) {
     case actionTypes.view.showMainMenu:
       return viewState.set("showMainMenu", true);
 
-    case actionTypes.account.store:
     case actionTypes.account.reset:
+      return initialState;
+
+    case actionTypes.account.store:
     case actionTypes.view.hideMainMenu: {
-      const emailVerified = action.payload.get("emailVerified");
-      const acceptedTermsOfService = action.payload.get(
-        "acceptedTermsOfService"
-      );
+      if (action.payload) {
+        const emailVerified = action.payload.get("emailVerified");
+        const acceptedTermsOfService = action.payload.get(
+          "acceptedTermsOfService"
+        );
 
-      const isAnonymous = action.payload.get("isAnonymous");
+        const isAnonymous = action.payload.get("isAnonymous");
 
-      if (isAnonymous || !emailVerified || !acceptedTermsOfService) {
-        viewState = viewState.set("showSlideIns", true);
+        if (isAnonymous || !emailVerified || !acceptedTermsOfService) {
+          viewState = viewState.set("showSlideIns", true);
+        }
       }
 
       return viewState.set("showMainMenu", false);
