@@ -44,6 +44,7 @@ won-login-form {
     color: $won-primary-color;
 
     &__resend {
+      font-weight: bold;
       font-size: $smallFontSize;
       color: $won-primary-color;
       cursor: pointer;
