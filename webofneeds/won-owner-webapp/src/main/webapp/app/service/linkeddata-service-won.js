@@ -19,7 +19,6 @@
  */
 import {
   entries,
-  urisToLookupMap,
   is,
   clone,
   contains,
@@ -163,27 +162,6 @@ import won from "./won.js";
   };
   ReadUpdateLock.prototype = {
     constructor: won.ReadUpdateLock,
-    isLocked: function() {
-      return (
-        this.blockedUpdaters.length > 0 ||
-        this.blockedReaders.length > 0 ||
-        this.activeReaderCount > 0 ||
-        this.activeUpdaterCount > 0
-      );
-    },
-    getLockStatusString: function() {
-      return (
-        "[blockedUpdaters: " +
-        this.blockedUpdaters.length +
-        ", blockedReaders: " +
-        this.blockedReaders.length +
-        ", activeUpdaters:" +
-        this.activeUpdaterCount +
-        ", activeReaders: " +
-        this.activeReaderCount +
-        "]"
-      );
-    },
     acquireReadLock: function() {
       let deferred = {};
       let promise = new Promise((resolve, reject) => {
@@ -278,9 +256,7 @@ import won from "./won.js";
     };
   };
 
-  const cacheItemIsOkOrUnresolvableOrFetching = function cacheItemIsOkOrUnresolvableOrFetching(
-    uri
-  ) {
+  const cacheItemIsOkOrUnresolvableOrFetching = function(uri) {
     const entry = privateData.cacheStatus[uri];
     return (
       entry &&
@@ -303,7 +279,7 @@ import won from "./won.js";
         */
   };
 
-  const cacheItemMarkAccessed = function cacheItemMarkAccessed(uri) {
+  const cacheItemMarkAccessed = function(uri) {
     const entry = privateData.cacheStatus[uri];
     if (typeof entry === "undefined") {
       const message = "Trying to mark unloaded uri " + uri + " as accessed";
@@ -316,7 +292,7 @@ import won from "./won.js";
     privateData.cacheStatus[uri].timestamp = new Date().getTime();
   };
 
-  const cacheItemMarkDirty = function cacheItemMarkDirty(uri) {
+  const cacheItemMarkDirty = function(uri) {
     const entry = privateData.cacheStatus[uri];
     if (typeof entry === "undefined") {
       return;
@@ -324,14 +300,14 @@ import won from "./won.js";
     privateData.cacheStatus[uri].state = CACHE_ITEM_STATE.DIRTY;
   };
 
-  const cacheItemMarkFetching = function cacheItemMarkFetching(uri) {
+  const cacheItemMarkFetching = function(uri) {
     privateData.cacheStatus[uri] = {
       timestamp: new Date().getTime(),
       state: CACHE_ITEM_STATE.FETCHING,
     };
   };
 
-  const cacheItemRemove = function cacheItemRemove(uri) {
+  const cacheItemRemove = function(uri) {
     delete privateData.cacheStatus[uri];
   };
 
@@ -410,7 +386,7 @@ import won from "./won.js";
    * @param locks
    * @returns {Array|*}
    */
-  const acquireReadLocks = function acquireReadLocks(locks) {
+  const acquireReadLocks = function(locks) {
     const acquiredLocks = [];
     locks.map(function(lock) {
       const promise = lock.acquireReadLock();
@@ -815,7 +791,6 @@ import won from "./won.js";
                      * loaded triples below. So we skip removing
                      * the previously loaded data. For everything
                      * remove any remaining stale data: */
-              // won.deleteNode(uri, removeCacheItem)
               won.deleteDocumentFromStore(uri, removeCacheItem);
             }
           })
@@ -995,58 +970,6 @@ import won from "./won.js";
 
         return flattenedNeedJsonLd;
       });
-
-  //taken from https://www.w3.org/TR/rdf-interfaces/#triple-filters
-  won.tripleFilters = {
-    s: function(s) {
-      return function(t) {
-        return t.subject.equals(s);
-      };
-    },
-    p: function(p) {
-      return function(t) {
-        return t.predicate.equals(p);
-      };
-    },
-    o: function(o) {
-      return function(t) {
-        return t.object.equals(o);
-      };
-    },
-    sp: function(s, p) {
-      return function(t) {
-        return t.subject.equals(s) && t.predicate.equals(p);
-      };
-    },
-    so: function(s, o) {
-      return function(t) {
-        return t.subject.equals(s) && t.object.equals(o);
-      };
-    },
-    po: function(p, o) {
-      return function(t) {
-        return t.predicate.equals(p) && t.object.equals(o);
-      };
-    },
-    spo: function(s, p, o) {
-      return function(t) {
-        return (
-          t.subject.equals(s) && t.predicate.equals(p) && t.object.equals(o)
-        );
-      };
-    },
-    describes: function(v) {
-      return function(t) {
-        return t.subject.equals(v) || t.object.equals(v);
-      };
-    },
-    type: function(o) {
-      const type = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
-      return function(t) {
-        return t.predicate.equals(type) && t.object.equals(o);
-      };
-    },
-  };
 
   function triples2framedJson(needUri, triples, frame) {
     const jsonldjsQuads = {
@@ -1230,19 +1153,6 @@ import won from "./won.js";
     return Promise.resolve(ret);
   };
 
-  /**
-   * @param needUri
-   * @return {*} the data of all connection-nodes referenced by that need
-   */
-  won.getConnectionsOfNeed = (needUri, requesterWebId = needUri) => {
-    won
-      .getConnectionUrisOfNeed(needUri, requesterWebId, false)
-      .then(connectionUris =>
-        urisToLookupMap(connectionUris, uri =>
-          won.getConnectionWithEventUris(uri, { requesterWebId })
-        )
-      );
-  };
   /*
      * Loads all URIs of a need's connections.
      */
@@ -1316,34 +1226,6 @@ import won from "./won.js";
       });
     });
   }
-
-  /**
-   * Returns all events associated with a given connection
-   * in a promise for an object of (eventUri -> wonMessageObj)
-   * @param connectionUri
-   * @param fetchParams See `ensureLoaded`.
-   */
-  won.getWonMessagesOfConnection = (connectionUri, fetchParams) => {
-    return won
-      .getConnectionWithEventUris(connectionUri, fetchParams)
-      .then(connection => connection.hasEvents)
-      .then(eventUris => {
-        console.debug(
-          "Trying to get the messages of the connection[",
-          connectionUri,
-          "] messages[",
-          eventUris,
-          "]"
-        );
-
-        return urisToLookupMap(
-          eventUris,
-          eventUri => won.getWonMessage(eventUri, fetchParams),
-          [],
-          true
-        );
-      });
-  };
 
   /**
    * @param connectionUri
@@ -1622,36 +1504,6 @@ import won from "./won.js";
     });
   };
 
-  /**
-   * @deprecated only deletes from default graph and not sub- and documentgraphs.
-   * Deletes all triples where the specified uri is the subect.
-   * May have side effects on concurrent
-   * reads on the rdf store if called without a read lock.
-   */
-  won.deleteNode = function(uri, removeCacheItem = true) {
-    if (typeof uri === "undefined" || uri == null) {
-      throw { message: "deleteNode: uri must not be null" };
-    }
-    const query = "delete where {<" + uri + "> ?anyP ?anyO}";
-    //const query = "select ?anyO where {<"+uri+"> ?anyP ?anyO}";
-    return new Promise((resolve, reject) => {
-      privateData.store.execute(query, function(success, graph) {
-        const rejMsg = buildRejectionMessage(success, graph, {
-          message: "Error deleting node with URI " + uri + ".",
-        });
-        if (rejMsg) {
-          reject(rejMsg);
-        } else {
-          if (removeCacheItem) {
-            // e.g. `ensureLoaded` needs to clear the store but not the cache-status, that it handles itself
-            cacheItemRemove(uri);
-          }
-          resolve();
-        }
-      });
-    });
-  };
-
   won.getCachedGraphTriples = (graphUri, removeAtGraphTriples = true) =>
     rdfStoreGetGraph(privateData.store, graphUri).then(graph => {
       if (removeAtGraphTriples) {
@@ -1694,26 +1546,6 @@ import won from "./won.js";
   }
 
   window.rdfStoreGetGraph4dbg = rdfStoreGetGraph;
-
-  won.getConnectionWithOwnAndRemoteNeed = function(
-    ownedNeedUri,
-    remoteNeedUri
-  ) {
-    return won.getConnectionsOfNeed(ownedNeedUri).then(connections => {
-      for (let connectionUri of Object.keys(connections)) {
-        if (connections[connectionUri].hasRemoteNeed === remoteNeedUri) {
-          return connections[connectionUri];
-        }
-      }
-      throw new Error(
-        "Couldn't find connection between own need <" +
-          ownedNeedUri +
-          "> and remote need <" +
-          remoteNeedUri +
-          ">."
-      );
-    });
-  };
 
   /**
    * Executes the specified crawlableQuery, returns a promise to its results, which may become available
