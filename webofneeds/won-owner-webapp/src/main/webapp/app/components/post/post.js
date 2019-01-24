@@ -57,6 +57,12 @@ class Controller {
     );
     this.$scope.$on("$destroy", disconnect);
   }
+
+  tryReload() {
+    if (this.postUri && this.postFailedToLoad) {
+      this.needs__fetchUnloadedNeed(this.postUri);
+    }
+  }
 }
 
 Controller.$inject = serviceDependencies;
