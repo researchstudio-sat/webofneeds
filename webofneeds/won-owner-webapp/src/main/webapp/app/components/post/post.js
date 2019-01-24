@@ -37,7 +37,6 @@ class Controller {
       return {
         postUri,
         isOwnPost: needUtils.isOwned(post),
-        isActive: needUtils.isActive(post),
         post,
         won: won.WON,
         showModalDialog: getIn(state, ["view", "showModalDialog"]),

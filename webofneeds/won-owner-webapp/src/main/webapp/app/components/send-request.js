@@ -6,6 +6,7 @@ import { classOnComponentRoot } from "../cstm-ng-utils.js";
 import { getPostUriFromRoute } from "../selectors/general-selectors.js";
 import { connect2Redux } from "../won-utils.js";
 import { attach, getIn } from "../utils.js";
+import * as needUtils from "../need-utils.js";
 import { actionCreators } from "../actions/actions.js";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
@@ -15,12 +16,18 @@ function genComponentConf() {
         <won-post-content post-uri="self.postUriToConnectTo"></won-post-content>
         <div class="post-info__footer" ng-if="!self.postLoading">
             <chat-textfield
+                ng-if="self.showRequestField"
                 placeholder="::'Message (optional)'"
                 on-submit="::self.sendAdHocRequest(value, selectedPersona)"
                 allow-empty-submit="::true"
                 show-personas="true"
                 submit-button-label="::'Ask&#160;to&#160;Chat'">
             </chat-textfield>
+            <div
+                class="post-info__footer__infolabel"
+                ng-if="self.isInactive">
+                Need is inactive, no requests allowed
+            </div>
         </div>
     `;
 
@@ -35,6 +42,11 @@ function genComponentConf() {
         return {
           displayedPost,
           postUriToConnectTo,
+          isInactive: needUtils.isInactive(displayedPost),
+          showRequestField:
+            needUtils.isActive(displayedPost) &&
+            (needUtils.hasChatFacet(displayedPost) ||
+              needUtils.hasGroupFacet(displayedPost)),
           postLoading:
             !displayedPost ||
             getIn(state, [
