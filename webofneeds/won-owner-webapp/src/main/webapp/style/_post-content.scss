@@ -61,7 +61,7 @@ won-post-content {
 
   .post-failedtoload {
     display: grid;
-    grid-template-areas: "failed_icon failed_label";
+    grid-template-areas: "failed_icon failed_label" "failed_actions failed_actions";
     align-items: center;
     justify-content: center;
     padding: 5rem 0;
@@ -75,6 +75,15 @@ won-post-content {
     > .post-failedtoload__label {
       grid-area: failed_label;
       text-align: center;
+    }
+
+    > .post-failedtoload__actions {
+      grid-area: failed_actions;
+      display: flex;
+      justify-content: center;
+
+      > .pc__failed__actions__button {
+      }
     }
   }
 

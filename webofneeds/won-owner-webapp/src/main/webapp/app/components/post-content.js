@@ -44,6 +44,12 @@ function genComponentConf() {
           <span class="post-failedtoload__label">
               Failed To Load - Need might have been deleted
           </span>
+          <div class="post-failedtoload__actions">
+            <button class="post-failedtoload__actions__button red won-button--outlined thin"
+                ng-click="self.tryReload()">
+                Try Reload
+            </button>
+        </div>
         </div>
         <div class="post-content" ng-if="!self.postLoading && !self.postFailedToLoad">
           <won-gallery ng-if="self.post.get('hasImages')">
@@ -164,6 +170,12 @@ function genComponentConf() {
       connect2Redux(selectFromState, actionCreators, ["self.postUri"], this);
 
       classOnComponentRoot("won-is-loading", () => this.postLoading, this);
+    }
+
+    tryReload() {
+      if (this.postUri && this.postFailedToLoad) {
+        this.needs__fetchUnloadedNeed(this.postUri);
+      }
     }
   }
 
