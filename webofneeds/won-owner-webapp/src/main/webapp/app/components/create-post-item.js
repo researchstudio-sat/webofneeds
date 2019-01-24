@@ -153,6 +153,7 @@ function genComponentConf() {
           postUri: undefined,
           useCase: encodeURIComponent(selectedUseCaseIdentifier),
           useCaseGroup: undefined,
+          groupPostAdminUri: undefined,
         });
       } else {
         console.error(
@@ -168,6 +169,7 @@ function genComponentConf() {
         postUri: undefined,
         useCase: undefined,
         useCaseGroup: "all",
+        groupPostAdminUri: undefined,
       });
     }
 
@@ -178,6 +180,7 @@ function genComponentConf() {
         postUri: undefined,
         useCase: "search",
         useCaseGroup: undefined,
+        groupPostAdminUri: undefined,
       });
     }
   }
