@@ -144,6 +144,7 @@ class ConnectionsController {
         viewNeedUri,
         hideListSideInResponsive:
           !hasOwnedNeeds ||
+          showGroupPostAdministration ||
           selectedConnection ||
           selectedPost ||
           !!useCaseGroup ||
