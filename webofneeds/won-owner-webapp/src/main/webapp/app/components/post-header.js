@@ -7,7 +7,7 @@ import "ng-redux";
 import squareImageModule from "./square-image.js";
 import { actionCreators } from "../actions/actions.js";
 import { relativeTime } from "../won-label-utils.js";
-import { attach, getIn, delay } from "../utils.js";
+import { attach, getIn, get, delay } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { selectLastUpdateTime } from "../selectors/general-selectors.js";
 import won from "../won-es6.js";
@@ -47,6 +47,10 @@ function genComponentConf() {
       </div>
       <div class="ph__right__subtitle" ng-if="!self.postFailedToLoad">
         <span class="ph__right__subtitle__type">
+          <span class="ph__right__subtitle__type__persona"
+            ng-if="self.personaName">
+            {{self.personaName}}
+          </span>
           <span class="ph__right__subtitle__type__groupchat"
             ng-if="self.isGroupChatEnabled && !self.isChatEnabled">
             Group Chat
@@ -86,6 +90,10 @@ function genComponentConf() {
       </div>
       <div class="ph__right__subtitle">
         <span class="ph__right__subtitle__type">
+          <span class="ph__right__subtitle__type__persona"
+            ng-if="self.personaName">
+            {{self.personaName}}
+          </span>
           <span class="ph__right__subtitle__type__groupchat"
             ng-if="self.isGroupChatEnabled && !self.isChatEnabled">
             Group Chat
@@ -127,12 +135,17 @@ function genComponentConf() {
         const responseToNeed =
           responseToUri && getIn(state, ["needs", responseToUri]);
 
+        const personaUri = get(need, "heldBy");
+        const persona = personaUri && getIn(state, ["needs", personaUri]);
+        const personaName = get(persona, "humanReadable");
+
         return {
           responseToNeed,
           need,
           fullTypesLabel: need && generateFullNeedTypesLabel(need),
           shortTypesLabel: need && generateShortNeedTypesLabel(need),
           matchingContext: need && generateNeedMatchingContext(need),
+          personaName,
           postLoading:
             !need ||
             getIn(state, ["process", "needs", need.get("uri"), "loading"]),
