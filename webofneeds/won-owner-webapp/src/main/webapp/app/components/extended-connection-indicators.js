@@ -25,18 +25,17 @@ function genComponentConf() {
   let template = `
         <a
             class="extendedindicators__item clickable"
-            ng-show="self.latestConnectedUri"
             ng-click="self.setOpen(self.latestConnectedUri)"
-            ng-if="!self.postLoading">
+            ng-if="!self.postLoading && self.latestConnectedUri">
                 <svg class="extendedindicators__item__icon"
                     title="Show latest message/request"
                     style="--local-primary:var(--won-primary-color-light);"
-                    ng-show="!self.unreadConnectedCount">
+                    ng-if="!self.unreadConnectedCount">
                         <use xlink:href="#ico36_message" href="#ico36_message"></use>
                 </svg>
                 <svg style="--local-primary:var(--won-primary-color);"
                      title="Show latest unread message/request"
-                     ng-show="self.unreadConnectedCount"
+                     ng-if="self.unreadConnectedCount"
                      class="extendedindicators__item__icon">
                         <use xlink:href="#ico36_message" href="#ico36_message"></use>
                 </svg>
@@ -47,8 +46,8 @@ function genComponentConf() {
                     {{ self.connectedCount }} Chats
                 </span>
         </a>
-        <div class="extendedindicators__item" ng-show="!self.latestConnectedUri"
-            ng-if="!self.postLoading">
+        <div class="extendedindicators__item"
+            ng-if="!self.postLoading && !self.latestConnectedUri">
             <svg class="extendedindicators__item__icon"
                 style="--local-primary:var(--won-disabled-color);">
                     <use xlink:href="#ico36_message" href="#ico36_message"></use>
@@ -57,18 +56,17 @@ function genComponentConf() {
         </div>
         <a
             class="extendedindicators__item clickable"
-            ng-show="self.latestMatchUri"
-            ng-if="!self.postLoading"
+            ng-if="!self.postLoading && self.latestMatchUri"
             ng-click="self.setOpen(self.latestMatchUri)">
 
                 <svg class="extendedindicators__item__icon"
                     style="--local-primary:var(--won-primary-color-light);"
-                    ng-show="!self.unreadMatchesCount">
+                    ng-if="!self.unreadMatchesCount">
                         <use xlink:href="#ico36_match" href="#ico36_match"></use>
                 </svg>
 
                 <svg style="--local-primary:var(--won-primary-color);"
-                    ng-show="self.unreadMatchesCount"
+                    ng-if="self.unreadMatchesCount"
                     class="extendedindicators__item__icon">
                         <use xlink:href="#ico36_match" href="#ico36_match"></use>
                 </svg>
@@ -79,8 +77,8 @@ function genComponentConf() {
                     {{ self.matchesCount }} Matches
                 </span>
         </a>
-        <div class="extendedindicators__item" ng-show="!self.latestMatchUri"
-            ng-if="!self.postLoading">
+        <div class="extendedindicators__item"
+            ng-if="!self.postLoading && !self.latestMatchUri">
             <svg class="extendedindicators__item__icon"
                 style="--local-primary:var(--won-disabled-color);">
                     <use xlink:href="#ico36_match" href="#ico36_match"></use>
@@ -89,18 +87,17 @@ function genComponentConf() {
         </div>
         <a
             class="extendedindicators__item clickable"
-            ng-show="self.latestConnectedUri"
             ng-click="self.setOpen(self.latestConnectedUri)"
-            ng-if="self.postLoading">
+            ng-if="self.postLoading && self.latestConnectedUri">
                 <svg class="extendedindicators__item__icon"
                     title="Show latest message/request"
                     style="--local-primary:var(--won-primary-color-light);"
-                    ng-show="!self.unreadConnectedCount">
+                    ng-if="!self.unreadConnectedCount">
                         <use xlink:href="#ico36_message" href="#ico36_message"></use>
                 </svg>
                 <svg style="--local-primary:var(--won-primary-color);"
                      title="Show latest unread message/request"
-                     ng-show="self.unreadConnectedCount"
+                     ng-if="self.unreadConnectedCount"
                      class="extendedindicators__item__icon">
                         <use xlink:href="#ico36_message" href="#ico36_message"></use>
                 </svg>

@@ -25,18 +25,18 @@ function genComponentConf() {
   let template = `
         <a
             class="indicators__item clickable"
-            ng-show="!self.postLoading && self.latestConnectedUri"
+            ng-if="!self.postLoading && self.latestConnectedUri"
             ng-click="self.setOpen(self.latestConnectedUri)">
                 <svg class="indicators__item__icon"
                     title="Show latest message/request"
                     style="--local-primary:var(--won-primary-color-light);"
-                    ng-show="!self.unreadConnectedCount">
+                    ng-if="!self.unreadConnectedCount">
                         <use xlink:href="#ico36_message" href="#ico36_message"></use>
                 </svg>
 
                 <svg style="--local-primary:var(--won-primary-color);"
                      title="Show latest unread message/request"
-                     ng-show="self.unreadConnectedCount"
+                     ng-if="self.unreadConnectedCount"
                      class="indicators__item__icon">
                         <use xlink:href="#ico36_message" href="#ico36_message"></use>
                 </svg>
@@ -45,7 +45,7 @@ function genComponentConf() {
                     {{ self.getCountLimited(self.unreadConnectedCount)}}
                 </span>
         </a>
-        <div class="indicators__item" ng-show="!self.postLoading && !self.latestConnectedUri" title="No chats in this post">
+        <div class="indicators__item" ng-if="!self.postLoading && !self.latestConnectedUri" title="No chats in this post">
             <svg class="indicators__item__icon"
                 style="--local-primary:var(--won-disabled-color);">
                     <use xlink:href="#ico36_message" href="#ico36_message"></use>
@@ -54,17 +54,17 @@ function genComponentConf() {
         </div>
         <a
             class="indicators__item clickable"
-            ng-show="!self.postLoading && self.latestMatchUri"
+            ng-if="!self.postLoading && self.latestMatchUri"
             ng-click="self.setOpen(self.latestMatchUri)">
 
                 <svg class="indicators__item__icon"
                     style="--local-primary:var(--won-primary-color-light);"
-                    ng-show="!self.unreadMatchesCount">
+                    ng-if="!self.unreadMatchesCount">
                         <use xlink:href="#ico36_match" href="#ico36_match"></use>
                 </svg>
 
                 <svg style="--local-primary:var(--won-primary-color);"
-                    ng-show="self.unreadMatchesCount"
+                    ng-if="self.unreadMatchesCount"
                     class="indicators__item__icon">
                         <use xlink:href="#ico36_match" href="#ico36_match"></use>
                 </svg>
@@ -72,14 +72,14 @@ function genComponentConf() {
                     {{ self.getCountLimited(self.unreadMatchesCount) }}
                 </span>
         </a>
-        <div class="indicators__item" ng-show="!self.postLoading && !self.latestMatchUri" title="No matches for this post">
+        <div class="indicators__item" ng-if="!self.postLoading && !self.latestMatchUri" title="No matches for this post">
             <svg class="indicators__item__icon"
                 style="--local-primary:var(--won-disabled-color);">
                     <use xlink:href="#ico36_match" href="#ico36_match"></use>
             </svg>
             <span class="indicators__item__caption"></span>
         </div>
-        <span class="mobile__indicator" ng-show="!self.postLoading && self.unreadCountSum">{{ self.getCountLimited(self.unreadCountSum) }}</span>
+        <span class="mobile__indicator" ng-if="!self.postLoading && self.unreadCountSum">{{ self.getCountLimited(self.unreadCountSum) }}</span>
 
         <div class="indicators__item" ng-if="self.postLoading">
             <svg class="indicators__item__icon"
