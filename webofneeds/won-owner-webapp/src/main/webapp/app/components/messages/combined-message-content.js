@@ -33,7 +33,7 @@ function genComponentConf() {
           <div class="msg__header__type">Forwarded from:</div>
           <won-square-image
             class="msg__header__originator"
-            uri="self.originatorUri">
+            uri="::self.originatorUri">
           </won-square-image>
       </div>
       <div class="msg__header msg__header--inject-into" ng-if="self.isConnectionMessage && self.isInjectIntoMessage && !self.hasNotBeenLoaded && !self.isGroupChatMessage">

@@ -29,7 +29,7 @@ function genComponentConf() {
 
     <won-square-image
         ng-if="!self.postLoading"
-        uri="self.needUri"
+        uri="::self.needUri"
         ng-show="!self.hideImage">
     </won-square-image>
     <div class="ph__right" ng-if="!self.need.get('isBeingCreated') && !self.postLoading">
