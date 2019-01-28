@@ -16,29 +16,36 @@ window.shajs4dbg = shajs;
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
-    <img class="image" ng-show="self.src" ng-src="{{self.src}}"/>
-
-    <img class="image" 
-      ng-if="!self.src && self.identiconSvg" 
-      alt="Auto-generated title image for {{self.title}}"
-      ng-src="data:image/svg+xml;base64,{{self.identiconSvg}}">
+    <img class="image"
+      ng-if="::self.identiconSvg"
+      alt="Auto-generated title image"
+      ng-src="data:image/svg+xml;base64,{{::self.identiconSvg}}">
     <img class="personaImage"
-      ng-if="self.personaIdenticonSvg"
+      ng-if="::self.personaIdenticonSvg"
       alt="Auto-generated title image for persona that holds the need"
-      ng-src="data:image/svg+xml;base64,{{self.personaIdenticonSvg}}">
+      ng-src="data:image/svg+xml;base64,{{::self.personaIdenticonSvg}}">
   `;
 
   class Controller {
     constructor(/* arguments = dependency injections */) {
       attach(this, serviceDependencies, arguments);
 
+      this.personaIdenticonCacheSvg;
+      this.needIdenticonCacheSvg;
+
       const selectFromState = state => {
-        const identiconSvg = this.parseIdenticon(this.uri);
+        const identiconSvg = this.parseIdenticon(
+          this.uri,
+          this.needIdenticonCacheSvg
+        );
 
         const need = getIn(state, ["needs", this.uri]);
         const personaUri = get(need, "heldBy");
 
-        const personaIdenticonSvg = this.parseIdenticon(personaUri);
+        const personaIdenticonSvg = this.parseIdenticon(
+          personaUri,
+          this.personaIdenticonCacheSvg
+        );
 
         return {
           isPersona: isPersona(need),
@@ -52,12 +59,7 @@ function genComponentConf() {
         };
       };
 
-      connect2Redux(
-        selectFromState,
-        actionCreators,
-        ["self.src", "self.title", "self.uri"],
-        this
-      );
+      connect2Redux(selectFromState, actionCreators, ["self.uri"], this);
 
       classOnComponentRoot("inactive", () => this.needInactive, this);
 
@@ -70,7 +72,11 @@ function genComponentConf() {
       classOnComponentRoot("won-is-persona", () => this.isPersona, this);
     }
 
-    parseIdenticon(input) {
+    parseIdenticon(input, cache) {
+      if (cache) {
+        return cache;
+      }
+
       if (!input) {
         return;
       }
@@ -85,7 +91,8 @@ function genComponentConf() {
         margin: 0.2,
         format: "svg",
       });
-      return idc.toString();
+      cache = idc.toString();
+      return cache;
     }
   }
   Controller.$inject = serviceDependencies;
@@ -96,8 +103,6 @@ function genComponentConf() {
     controllerAs: "self",
     bindToController: true, //scope-bindings -> ctrl
     scope: {
-      src: "=",
-      title: "=",
       uri: "=", // only read once
     },
     template: template,

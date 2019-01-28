@@ -28,7 +28,7 @@ function genComponentConf() {
         ng-class="{'gi__icons__icon--spanCol': self.groupMembersSize == 1}"
         ng-if="self.groupMembersSize <= 4 || $index < 3">
         <won-square-image
-          uri="groupMemberUri">
+          uri="::groupMemberUri">
         </won-square-image>
       </div>
       <div class="gi__icons__more" ng-if="self.groupMembersSize > 4">

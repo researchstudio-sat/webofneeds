@@ -15,8 +15,6 @@ function genComponentConf() {
         <div class="pcm__icon__skeleton" ng-if="self.postLoading"></div>
         <won-square-image
             class="clickable"
-            title="self.post.get('humanReadable')"
-            src="self.post.get('TODOtitleImgSrc')"
             uri="self.postUri"
             ng-if="!self.postLoading"
             ng-click="self.router__stateGoCurrent({postUri: self.postUri})">

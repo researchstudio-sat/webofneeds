@@ -42,7 +42,6 @@ function genComponentConf() {
             class="msg__header__inject"
             ng-class="{'clickable': self.isInjectIntoConnectionPresent(connUri)}"
             ng-repeat="connUri in self.injectIntoArray"
-            title="self.getInjectIntoNeedTitle(connUri)"
             uri="self.getInjectIntoNeedUri(connUri)"
             ng-click="!self.multiSelectType && self.isInjectIntoConnectionPresent(connUri) && self.router__stateGoCurrent({connectionUri: connUri})">
           </won-square-image>

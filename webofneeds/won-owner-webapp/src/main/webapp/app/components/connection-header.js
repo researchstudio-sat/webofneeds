@@ -32,8 +32,6 @@ function genComponentConf() {
       <div class="ch__icon" ng-if="!self.connectionOrNeedsLoading && !self.isConnectionToGroup">
           <won-square-image
             class="ch__icon__theirneed"
-            src="self.remoteNeed.get('TODO')"
-            title="self.remoteNeed.get('humanReadable')"
             uri="self.remoteNeed.get('uri')"
             ng-show="!self.hideImage">
           </won-square-image>

@@ -29,7 +29,6 @@ function genComponentConf() {
 
     <won-square-image
         ng-if="!self.postLoading"
-        src="self.need.get('TODO')"
         uri="self.needUri"
         ng-show="!self.hideImage">
     </won-square-image>

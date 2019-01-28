@@ -23,8 +23,6 @@ function genComponentConf() {
             <div class="vtb__inner">
                 <div class="vtb__inner__left">
                     <won-square-image
-                        title="self.post.get('humanReadable')"
-                        src="self.post.get('titleImgSrc')"
                         uri="self.post.get('uri')">
                     </won-square-image>
                     <hgroup>
