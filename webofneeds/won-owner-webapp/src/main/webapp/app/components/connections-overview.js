@@ -68,7 +68,7 @@ function genComponentConf() {
                         ng-class="{ 'clickable' : !self.isNeedLoading(needUri) }">
                     </won-post-header>
                     <won-connection-indicators
-                        on-selected-connection="self.selectConnection(connectionUri)"
+                        on-selected-connection="::self.selectConnection(connectionUri)"
                         need-uri="::needUri"
                         ng-if="!self.isOpen(needUri)">
                     </won-connection-indicators>
@@ -114,7 +114,7 @@ function genComponentConf() {
                 <div class="co__item__need__detail" ng-if="self.isOpen(needUri)">
                     <won-extended-connection-indicators
                         class="co__item__need__detail__indicators"
-                        on-selected-connection="self.selectConnection(connectionUri)"
+                        on-selected-connection="::self.selectConnection(connectionUri)"
                         need-uri="::needUri">
                     </won-extended-connection-indicators>
                 </div>
@@ -124,7 +124,7 @@ function genComponentConf() {
                 <won-connection-selection-item
                     ng-if="self.hasChatFacet(needUri)"
                     ng-repeat="connUri in self.getOpenChatConnectionUrisArraySorted(needUri, self.allNeeds, self.process)"
-                    on-selected-connection="self.selectConnection(connectionUri)"
+                    on-selected-connection="::self.selectConnection(connectionUri)"
                     connection-uri="::connUri"
                     ng-class="{'won-unread': self.isConnectionUnread(needUri, connUri)}">
                 </won-connection-selection-item>
@@ -200,7 +200,7 @@ function genComponentConf() {
                     <div class="co__item__need__detail" ng-if="self.isOpen(needUri)">
                         <won-extended-connection-indicators
                             class="co__item__need__detail__indicators"
-                            on-selected-connection="self.selectConnection(connectionUri)"
+                            on-selected-connection="::self.selectConnection(connectionUri)"
                             need-uri="::needUri">
                         </won-extended-connection-indicators>
                     </div>

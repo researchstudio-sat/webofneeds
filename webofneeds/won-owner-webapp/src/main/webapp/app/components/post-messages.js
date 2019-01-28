@@ -196,7 +196,7 @@ function genComponentConf() {
                 connection-uri="self.connectionUri"
                 placeholder="self.shouldShowRdf? 'Enter TTL...' : 'Your message...'"
                 submit-button-label="self.shouldShowRdf? 'Send&#160;RDF' : 'Send'"
-                on-submit="self.send(value, additionalContent, referencedContent, self.shouldShowRdf)"
+                on-submit="::self.send(value, additionalContent, referencedContent, self.shouldShowRdf)"
                 help-text="self.shouldShowRdf? self.rdfTextfieldHelpText : ''"
                 allow-empty-submit="::false"
                 allow-details="!self.shouldShowRdf"
