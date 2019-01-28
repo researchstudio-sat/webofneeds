@@ -20,7 +20,7 @@ const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
       <won-connection-header
-        connection-uri="self.connectionUri"
+        connection-uri="::self.connectionUri"
         timestamp="self.lastUpdateTimestamp"
         ng-click="self.setOpen()"
         class="clickable">

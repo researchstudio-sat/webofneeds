@@ -48,13 +48,13 @@ function genComponentConf() {
       </div>
       <won-message-content
           ng-if="self.hasContent || self.hasNotBeenLoaded"
-          message-uri="self.messageUri"
-          connection-uri="self.connectionUri">
+          message-uri="::self.messageUri"
+          connection-uri="::self.connectionUri">
       </won-message-content>
       <won-referenced-message-content
           ng-if="self.hasReferences"
-          message-uri="self.messageUri"
-          connection-uri="self.connectionUri">
+          message-uri="::self.messageUri"
+          connection-uri="::self.connectionUri">
       </won-referenced-message-content>
       <won-trig
           trig="self.contentGraphTrig"

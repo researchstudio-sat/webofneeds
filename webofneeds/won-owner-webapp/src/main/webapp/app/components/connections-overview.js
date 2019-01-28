@@ -263,7 +263,7 @@ function genComponentConf() {
           sortedOpenNeedUris: sortedOpenNeeds && [
             ...sortedOpenNeeds.flatMap(need => need.get("uri")),
           ],
-          sortedClosedNeeds: sortedClosedNeeds && [
+          sortedClosedNeedUris: sortedClosedNeeds && [
             ...sortedClosedNeeds.flatMap(need => need.get("uri")),
           ],
           connectionsToCrawl: connectionsToCrawl || Immutable.Map(),

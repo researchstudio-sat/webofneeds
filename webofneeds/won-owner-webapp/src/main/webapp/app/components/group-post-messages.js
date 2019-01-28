@@ -70,9 +70,9 @@ function genComponentConf() {
 
             <!-- CHATVIEW SPECIFIC CONTENT START-->
             <won-connection-message
-                ng-repeat="msg in self.sortedMessages"
-                connection-uri="self.connectionUri"
-                message-uri="msg.get('uri')"
+                ng-repeat="msgUri in self.sortedMessageUris"
+                connection-uri="::self.connectionUri"
+                message-uri="::msgUri"
                 group-chat-message="::true">
             </won-connection-message>
             <!-- CHATVIEW SPECIFIC CONTENT END-->
@@ -198,7 +198,9 @@ function genComponentConf() {
           connectionUri,
           connection,
           isOwnedNeedWhatsX,
-          sortedMessages: sortedMessages,
+          sortedMessageUris: sortedMessages && [
+            ...sortedMessages.flatMap(msg => msg.get("uri")),
+          ],
           chatMessages,
           unreadMessageCount: unreadMessages && unreadMessages.size,
           isProcessingLoadingMessages:
@@ -251,7 +253,7 @@ function genComponentConf() {
       });
 
       this.$scope.$watch(
-        () => this.sortedMessages && this.sortedMessages.length, // trigger if there's messages added (or removed)
+        () => this.sortedMessageUris && this.sortedMessageUris.length, // trigger if there's messages added (or removed)
         () =>
           delay(0).then(() =>
             // scroll to bottom directly after rendering, if snapped

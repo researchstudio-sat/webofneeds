@@ -79,7 +79,7 @@ function genComponentConf() {
     			      }">
     			      <won-combined-message-content
     			        ng-if="!self.isCollapsed"
-    			        message-uri="self.messageUri"
+    			        message-uri="::self.messageUri"
                   connection-uri="self.connectionUri"
                   group-chat-message="self.isGroupChatMessage">
     			      </won-combined-message-content>
@@ -98,10 +98,10 @@ function genComponentConf() {
                         <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
                     </svg>
                 </div>
-                <won-connection-message-actions message-uri="self.messageUri" connection-uri="self.connectionUri" ng-if="!self.isCollapsed && self.showActionButtons()">
+                <won-connection-message-actions message-uri="::self.messageUri" connection-uri="self.connectionUri" ng-if="!self.isCollapsed && self.showActionButtons()">
                 </won-connection-message-actions>
             </div>
-            <won-connection-message-status message-uri="self.messageUri" connection-uri="self.connectionUri">
+            <won-connection-message-status message-uri="::self.messageUri" connection-uri="self.connectionUri">
             </won-connection-message-status>
             <a ng-if="self.rdfLinkURL" target="_blank" href="{{self.rdfLinkURL}}">
                 <svg class="rdflink__small clickable">
