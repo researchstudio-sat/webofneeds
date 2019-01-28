@@ -19,6 +19,10 @@ export function isOwned(need) {
   return get(need, "isOwned");
 }
 
+export function getIdenticonSvg(need) {
+  return get(need, "identiconSvg");
+}
+
 /**
  * Determines if a given need is a Inactive
  * @param need
