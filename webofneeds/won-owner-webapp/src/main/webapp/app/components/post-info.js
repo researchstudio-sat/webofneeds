@@ -36,8 +36,7 @@ function genComponentConf() {
                 </svg>
             </a>
             <won-post-header
-                need-uri="self.post.get('uri')"
-                hide-image="::false">
+                need-uri="self.post.get('uri')">
             </won-post-header>
             <won-post-context-dropdown need-uri="self.post.get('uri')"></won-post-context-dropdown>
         </div>

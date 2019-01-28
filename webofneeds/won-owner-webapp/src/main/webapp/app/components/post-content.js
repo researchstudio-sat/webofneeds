@@ -69,8 +69,7 @@ function genComponentConf() {
               <won-post-header
                 class="clickable"
                 ng-click="self.router__stateGoCurrent({viewNeedUri: memberUri})"
-                need-uri="::memberUri"
-                hide-image="::false">
+                need-uri="::memberUri">
               </won-post-header>
             </div>
           </div>
@@ -84,8 +83,7 @@ function genComponentConf() {
               <won-post-header
                 class="clickable"
                 ng-click="self.router__stateGoCurrent({viewNeedUri: heldPostUri})"
-                need-uri="::heldPostUri"
-                hide-image="::false">
+                need-uri="::heldPostUri">
               </won-post-header>
             </div>
           </div>

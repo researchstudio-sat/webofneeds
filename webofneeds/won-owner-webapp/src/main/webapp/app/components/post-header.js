@@ -29,8 +29,7 @@ function genComponentConf() {
 
     <won-square-image
         ng-if="!self.postLoading"
-        uri="::self.needUri"
-        ng-show="!self.hideImage">
+        uri="::self.needUri">
     </won-square-image>
     <div class="ph__right" ng-if="!self.need.get('isBeingCreated') && !self.postLoading">
       <div class="ph__right__topline" ng-if="!self.postFailedToLoad">
@@ -218,11 +217,6 @@ function genComponentConf() {
        * - "small" (NOT_YET_IMPLEMENTED) (in matches-list)
        */
       //size: '=',
-
-      /**
-       * if set, the avatar will be hidden
-       */
-      hideImage: "=",
     },
     template: template,
   };
