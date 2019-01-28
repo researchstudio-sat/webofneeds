@@ -22,7 +22,6 @@ function genComponentConf() {
           ng-click="self.selectNeed(need)">
           <won-post-header
               need-uri="need.get('uri')"
-              timestamp="need.get('creationDate')"
               hide-image="::false">
           </won-post-header>
         </div>

@@ -28,7 +28,6 @@ function genComponentConf() {
                 need-uri="self.content"
                 ng-click="self.router__stateGoCurrent({viewNeedUri: self.content})"
                 ng-disabled="!self.fetchedSuggestion"
-                timestamp="self.suggestedPost && self.suggestedPost.get('creationDate')"
                 hide-image="::false">
             </won-post-header>
             <button class="suggestpostv__content__post__action won-button--outlined thin red"

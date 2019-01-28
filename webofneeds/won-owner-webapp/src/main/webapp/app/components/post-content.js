@@ -65,11 +65,11 @@ function genComponentConf() {
           <div class="post-content__members" ng-if="self.hasGroupMembers">
             <div
               class="post-content__members__member"
-              ng-repeat="memberUri in self.groupMembersArray">
+              ng-repeat="memberUri in self.groupMembersArray track by memberUri">
               <won-post-header
                 class="clickable"
                 ng-click="self.router__stateGoCurrent({viewNeedUri: memberUri})"
-                need-uri="memberUri"
+                need-uri="::memberUri"
                 hide-image="::false">
               </won-post-header>
             </div>
@@ -80,11 +80,11 @@ function genComponentConf() {
           <div class="post-content__members" ng-if="self.isPersona && self.hasHeldPosts">
             <div
               class="post-content__members__member"
-              ng-repeat="heldPostUri in self.heldPostsArray">
+              ng-repeat="heldPostUri in self.heldPostsArray track by heldPostUri">
               <won-post-header
                 class="clickable"
                 ng-click="self.router__stateGoCurrent({viewNeedUri: heldPostUri})"
-                need-uri="heldPostUri"
+                need-uri="::heldPostUri"
                 hide-image="::false">
               </won-post-header>
             </div>

@@ -32,8 +32,7 @@ function genComponentConf() {
       <div class="ch__icon" ng-if="!self.connectionOrNeedsLoading && !self.isConnectionToGroup">
           <won-square-image
             class="ch__icon__theirneed"
-            uri="::self.remoteNeed.get('uri')"
-            ng-show="!self.hideImage">
+            uri="::self.remoteNeed.get('uri')">
           </won-square-image>
       </div>
       <won-group-image
@@ -229,7 +228,7 @@ function genComponentConf() {
       connect2Redux(
         selectFromState,
         actionCreators,
-        ["self.connectionUri", "self.timestamp"],
+        ["self.connectionUri"],
         this
       );
 
@@ -256,12 +255,6 @@ function genComponentConf() {
     bindToController: true, //scope-bindings -> ctrl
     scope: {
       connectionUri: "=",
-
-      /**
-       * Will be used instead of the posts creation date if specified.
-       * Use if you e.g. instead want to show the date when a request was made.
-       */
-      timestamp: "=",
       /**
        * one of:
        * - "fullpage" (NOT_YET_IMPLEMENTED) (used in post-info page)
@@ -269,11 +262,6 @@ function genComponentConf() {
        * - "small" (NOT_YET_IMPLEMENTED) (in matches-list)
        */
       //size: '=',
-
-      /**
-       * if set, the avatar will be hidden
-       */
-      hideImage: "=",
     },
     template: template,
   };

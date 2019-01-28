@@ -45,25 +45,23 @@ const serviceDependencies = ["$ngRedux", "$scope"];
 function genComponentConf() {
   let template = `
         <won-create-post-item ng-class="{'selected' : !!self.useCaseGroup || !!self.useCase}"></won-create-post-item>
-        <div ng-repeat="needUri in self.beingCreatedNeedUris" class="co__item">
+        <div ng-repeat="needUri in self.beingCreatedNeedUris track by needUri" class="co__item">
             <div class="co__item__need" ng-class="{'selected' : needUri === self.needUriInRoute}">
                 <div class="co__item__need__header">
                     <won-post-header
                         need-uri="::needUri"
-                        timestamp="'TODOlatestOfThatType'"
                         ng-click="self.toggleDetails(needUri)"
                         ng-class="{ 'clickable' : !self.isNeedLoading(needUri) }">
                     </won-post-header>
                 </div>
             </div>
         </div>
-        <div ng-repeat="needUri in self.sortedOpenNeedUris" class="co__item"
+        <div ng-repeat="needUri in self.sortedOpenNeedUris track by needUri" class="co__item"
             ng-class="{'co__item--withconn' : self.isOpen(needUri) && self.hasOpenOrLoadingChatConnections(needUri, self.allNeeds, self.process)}">
             <div class="co__item__need" ng-class="{'won-unread': self.isUnread(needUri), 'selected' : needUri === self.needUriInRoute}">
                 <div class="co__item__need__header">
                     <won-post-header
                         need-uri="::needUri"
-                        timestamp="'TODOlatestOfThatType'"
                         ng-click="self.toggleDetails(needUri)"
                         ng-class="{ 'clickable' : !self.isNeedLoading(needUri) }">
                     </won-post-header>
@@ -123,7 +121,7 @@ function genComponentConf() {
                 ng-if="self.isOpen(needUri) && (self.hasGroupFacet(needUri) || self.hasOpenOrLoadingChatConnections(needUri, self.allNeeds, self.process))">
                 <won-connection-selection-item
                     ng-if="self.hasChatFacet(needUri)"
-                    ng-repeat="connUri in self.getOpenChatConnectionUrisArraySorted(needUri, self.allNeeds, self.process)"
+                    ng-repeat="connUri in self.getOpenChatConnectionUrisArraySorted(needUri, self.allNeeds, self.process) track by connUri"
                     on-selected-connection="::self.selectConnection(connectionUri)"
                     connection-uri="::connUri"
                     ng-class="{'won-unread': self.isConnectionUnread(needUri, connUri)}">
@@ -150,12 +148,11 @@ function genComponentConf() {
             </svg>
         </div>
         <div class="co__closedNeeds" ng-if="self.showClosedNeeds && self.closedNeedsSize > 0">
-            <div ng-repeat="needUri in self.sortedClosedNeedUris" class="co__item">
+            <div ng-repeat="needUri in self.sortedClosedNeedUris track by needUri" class="co__item">
                 <div class="co__item__need" ng-class="{'won-unread': self.isUnread(needUri), 'selected' : needUri === self.needUriInRoute}">
                     <div class="co__item__need__header">
                         <won-post-header
                             need-uri="::needUri"
-                            timestamp="'TODOlatestOfThatType'"
                             ng-click="self.toggleDetails(needUri)"
                             ng-class="{ 'clickable' : !self.isNeedLoading(needUri) }">
                         </won-post-header>

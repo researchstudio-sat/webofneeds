@@ -37,7 +37,6 @@ function genComponentConf() {
             </a>
             <won-post-header
                 need-uri="self.post.get('uri')"
-                timestamp="self.createdTimestamp"
                 hide-image="::false">
             </won-post-header>
             <won-post-context-dropdown need-uri="self.post.get('uri')"></won-post-context-dropdown>

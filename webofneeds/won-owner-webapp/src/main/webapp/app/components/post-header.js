@@ -1,5 +1,5 @@
 /**
- * Component for rendering need-title, type and timestamp
+ * Component for rendering need-title
  * Created by ksinger on 10.04.2017.
  */
 import angular from "angular";
@@ -167,12 +167,7 @@ function genComponentConf() {
         };
       };
 
-      connect2Redux(
-        selectFromState,
-        actionCreators,
-        ["self.needUri", "self.timestamp"],
-        this
-      );
+      connect2Redux(selectFromState, actionCreators, ["self.needUri"], this);
 
       classOnComponentRoot("won-is-loading", () => this.postLoading, this);
       classOnComponentRoot("won-is-toload", () => this.postToLoad, this);
@@ -216,12 +211,6 @@ function genComponentConf() {
     bindToController: true, //scope-bindings -> ctrl
     scope: {
       needUri: "=",
-
-      /**
-       * Will be used instead of the posts creation date if specified.
-       * Use if you e.g. instead want to show the date when a request was made.
-       */
-      timestamp: "=",
       /**
        * one of:
        * - "fullpage" (NOT_YET_IMPLEMENTED) (used in post-info page)

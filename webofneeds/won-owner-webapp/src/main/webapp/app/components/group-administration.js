@@ -37,7 +37,7 @@ function genComponentConf() {
                 <won-post-header
                   class="clickable"
                   ng-click="self.router__stateGoCurrent({viewNeedUri: conn.get('remoteNeedUri')})"
-                  need-uri="conn.get('remoteNeedUri')"
+                  need-uri="::conn.get('remoteNeedUri')"
                   hide-image="::false">
                 </won-post-header>
                 <div class="ga__content__member__actions">

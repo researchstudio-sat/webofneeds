@@ -36,9 +36,7 @@ function genComponentConf() {
                 </svg>
             </a>
             <won-connection-header
-                connection-uri="self.connectionUri"
-                timestamp="self.lastUpdateTimestamp"
-                hide-image="::false">
+                connection-uri="self.connectionUri">
             </won-connection-header>
             <won-connection-context-dropdown show-petri-net-data-field="" show-agreement-data-field=""></won-connection-context-dropdown>
         </div>
