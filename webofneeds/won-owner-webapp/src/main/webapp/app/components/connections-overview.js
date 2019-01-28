@@ -39,99 +39,98 @@ import {
   isChatConnection,
   isGroupChatConnection,
 } from "../connection-utils.js";
-import { hasGroupFacet, hasChatFacet } from "../need-utils.js";
+import * as needUtils from "../need-utils.js";
 
 const serviceDependencies = ["$ngRedux", "$scope"];
 function genComponentConf() {
   let template = `
         <won-create-post-item ng-class="{'selected' : !!self.useCaseGroup || !!self.useCase}"></won-create-post-item>
-        <div ng-repeat="need in self.beingCreatedNeeds" class="co__item">
-            <!-- ng-if="self.beingCreatedNeeds.size > 0" -->
-            <div class="co__item__need" ng-class="{'selected' : need.get('uri') === self.needUriInRoute}">
+        <div ng-repeat="needUri in self.beingCreatedNeedUris" class="co__item">
+            <div class="co__item__need" ng-class="{'selected' : needUri === self.needUriInRoute}">
                 <div class="co__item__need__header">
                     <won-post-header
-                        need-uri="need.get('uri')"
+                        need-uri="::needUri"
                         timestamp="'TODOlatestOfThatType'"
-                        ng-click="self.toggleDetails(need.get('uri'))"
-                        ng-class="{ 'clickable' : !self.isNeedLoading(need) }">
+                        ng-click="self.toggleDetails(needUri)"
+                        ng-class="{ 'clickable' : !self.isNeedLoading(needUri) }">
                     </won-post-header>
                 </div>
             </div>
         </div>
-        <div ng-repeat="need in self.sortedOpenNeeds" class="co__item"
-            ng-class="{'co__item--withconn' : self.isOpen(need.get('uri')) && self.hasOpenOrLoadingChatConnections(need, self.allNeeds, self.process)}">
-            <div class="co__item__need" ng-class="{'won-unread': need.get('unread'), 'selected' : need.get('uri') === self.needUriInRoute}">
+        <div ng-repeat="needUri in self.sortedOpenNeedUris" class="co__item"
+            ng-class="{'co__item--withconn' : self.isOpen(needUri) && self.hasOpenOrLoadingChatConnections(needUri, self.allNeeds, self.process)}">
+            <div class="co__item__need" ng-class="{'won-unread': self.isUnread(needUri), 'selected' : needUri === self.needUriInRoute}">
                 <div class="co__item__need__header">
                     <won-post-header
-                        need-uri="need.get('uri')"
+                        need-uri="::needUri"
                         timestamp="'TODOlatestOfThatType'"
-                        ng-click="self.toggleDetails(need.get('uri'))"
-                        ng-class="{ 'clickable' : !self.isNeedLoading(need) }">
+                        ng-click="self.toggleDetails(needUri)"
+                        ng-class="{ 'clickable' : !self.isNeedLoading(needUri) }">
                     </won-post-header>
                     <won-connection-indicators
                         on-selected-connection="self.selectConnection(connectionUri)"
-                        need-uri="need.get('uri')"
-                        ng-if="!self.isOpen(need.get('uri'))">
+                        need-uri="::needUri"
+                        ng-if="!self.isOpen(needUri)">
                     </won-connection-indicators>
                     <button
                         class="co__item__need__header__button red"
-                        ng-if="self.isOpen(need.get('uri'))"
-                        ng-click="need.get('uri') === self.needUriInRoute ? self.selectNeed(undefined) : self.selectNeed(need.get('uri'))"
+                        ng-if="self.isOpen(needUri)"
+                        ng-click="needUri === self.needUriInRoute ? self.selectNeed(undefined) : self.selectNeed(needUri)"
                         ng-class="{
-                          'won-button--filled' : need.get('uri') === self.needUriInRoute,
-                          'won-button--outlined thin': need.get('uri') !== self.needUriInRoute
+                          'won-button--filled' : needUri === self.needUriInRoute,
+                          'won-button--outlined thin': needUri !== self.needUriInRoute
                         }">
                         Details
                     </button>
-                    <div class="co__item__need__header__carret clickable" ng-click="self.toggleDetails(need.get('uri'))" ng-if="!self.isNeedLoading(need)">
+                    <div class="co__item__need__header__carret clickable" ng-click="self.toggleDetails(needUri)" ng-if="!self.isNeedLoading(needUri)">
                         <svg
                             style="--local-primary:var(--won-secondary-color);"
                             class="co__item__need__header__carret__icon"
-                            ng-if="self.isOpen(need.get('uri'))">
+                            ng-if="self.isOpen(needUri)">
                                 <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
                         </svg>
                         <svg
                             style="--local-primary:var(--won-secondary-color);"
                             class="co__item__need__header__carret__icon"
-                            ng-if="!self.isOpen(need.get('uri'))">
+                            ng-if="!self.isOpen(needUri)">
                                 <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
                         </svg>
                     </div>
-                    <div class="co__item__need__header__carret" ng-if="self.isNeedLoading(need)">
+                    <div class="co__item__need__header__carret" ng-if="self.isNeedLoading(needUri)">
                         <svg
                             style="--local-primary:var(--won-skeleton-color);"
                             class="co__item__need__header__carret__icon"
-                            ng-if="self.isOpen(need.get('uri'))">
+                            ng-if="self.isOpen(needUri)">
                                 <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
                         </svg>
                         <svg
                             style="--local-primary:var(--won-skeleton-color);"
                             class="co__item__need__header__carret__icon"
-                            ng-if="!self.isOpen(need.get('uri'))">
+                            ng-if="!self.isOpen(needUri)">
                                 <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
                         </svg>
                     </div>
                 </div>
-                <div class="co__item__need__detail" ng-if="self.isOpen(need.get('uri'))">
+                <div class="co__item__need__detail" ng-if="self.isOpen(needUri)">
                     <won-extended-connection-indicators
                         class="co__item__need__detail__indicators"
                         on-selected-connection="self.selectConnection(connectionUri)"
-                        need-uri="need.get('uri')">
+                        need-uri="::needUri">
                     </won-extended-connection-indicators>
                 </div>
             </div>
             <div class="co__item__connections"
-                ng-if="self.isOpen(need.get('uri')) && (self.hasOpenOrLoadingChatConnections(need, self.allNeeds, self.process) || self.hasGroupFacet(need))">
+                ng-if="self.isOpen(needUri) && (self.hasGroupFacet(needUri) || self.hasOpenOrLoadingChatConnections(needUri, self.allNeeds, self.process))">
                 <won-connection-selection-item
-                    ng-if="self.hasChatFacet(need)"
-                    ng-repeat="conn in self.getOpenChatConnectionsArraySorted(need, self.allNeeds, self.process)"
+                    ng-if="self.hasChatFacet(needUri)"
+                    ng-repeat="connUri in self.getOpenChatConnectionUrisArraySorted(needUri, self.allNeeds, self.process)"
                     on-selected-connection="self.selectConnection(connectionUri)"
-                    connection-uri="conn.get('uri')"
-                    ng-class="{'won-unread': conn.get('unread')}">
+                    connection-uri="::connUri"
+                    ng-class="{'won-unread': self.isConnectionUnread(needUri, connUri)}">
                 </won-connection-selection-item>
                 <won-group-administration-selection-item
-                    ng-if="self.hasGroupFacet(need)"
-                    need-uri="need.get('uri')"
+                    ng-if="self.hasGroupFacet(needUri)"
+                    need-uri="::needUri"
                     on-selected="self.selectGroupChat(needUri)">
                 </won-group-administration-selection-item>
             </div>
@@ -151,58 +150,58 @@ function genComponentConf() {
             </svg>
         </div>
         <div class="co__closedNeeds" ng-if="self.showClosedNeeds && self.closedNeedsSize > 0">
-            <div ng-repeat="need in self.sortedClosedNeeds" class="co__item">
-                <div class="co__item__need" ng-class="{'won-unread': need.get('unread'), 'selected' : need.get('uri') === self.needUriInRoute}">
+            <div ng-repeat="needUri in self.sortedClosedNeedUris" class="co__item">
+                <div class="co__item__need" ng-class="{'won-unread': self.isUnread(needUri), 'selected' : needUri === self.needUriInRoute}">
                     <div class="co__item__need__header">
                         <won-post-header
-                            need-uri="need.get('uri')"
+                            need-uri="::needUri"
                             timestamp="'TODOlatestOfThatType'"
-                            ng-click="self.toggleDetails(need.get('uri'))"
-                            ng-class="{ 'clickable' : !self.isNeedLoading(need) }">
+                            ng-click="self.toggleDetails(needUri)"
+                            ng-class="{ 'clickable' : !self.isNeedLoading(needUri) }">
                         </won-post-header>
                         <button
                             class="co__item__need__header__button red"
-                            ng-if="self.isOpen(need.get('uri'))"
-                            ng-click="need.get('uri') === self.needUriInRoute ? self.selectNeed(undefined) : self.selectNeed(need.get('uri'))"
+                            ng-if="self.isOpen(needUri)"
+                            ng-click="needUri === self.needUriInRoute ? self.selectNeed(undefined) : self.selectNeed(needUri)"
                             ng-class="{
-                              'won-button--filled' : need.get('uri') === self.needUriInRoute,
-                              'won-button--outlined thin': need.get('uri') !== self.needUriInRoute
+                              'won-button--filled' : needUri === self.needUriInRoute,
+                              'won-button--outlined thin': needUri !== self.needUriInRoute
                             }">
                             Details
                         </button>
-                        <div class="co__item__need__header__carret clickable" ng-click="self.toggleDetails(need.get('uri'))" ng-if="!self.isNeedLoading(need)">
+                        <div class="co__item__need__header__carret clickable" ng-click="self.toggleDetails(needUri)" ng-if="!self.isNeedLoading(needUri)">
                             <svg
                                 style="--local-primary:var(--won-secondary-color);"
                                 class="co__item__need__header__carret__icon"
-                                ng-if="self.isOpen(need.get('uri'))">
+                                ng-if="self.isOpen(needUri)">
                                     <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
                             </svg>
                             <svg style="--local-primary:var(--won-secondary-color);"
                                 class="co__item__need__header__carret__icon"
-                                ng-if="!self.isOpen(need.get('uri'))">
+                                ng-if="!self.isOpen(needUri)">
                                     <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
                             </svg>
                         </div>
-                        <div class="co__item__need__header__carret" ng-if="self.isNeedLoading(need)">
+                        <div class="co__item__need__header__carret" ng-if="self.isNeedLoading(needUri)">
                             <svg
                                 style="--local-primary:var(--won-skeleton-color);"
                                 class="co__item__need__header__carret__icon"
-                                ng-if="self.isOpen(need.get('uri'))">
+                                ng-if="self.isOpen(needUri)">
                                     <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
                             </svg>
                             <svg
                                 style="--local-primary:var(--won-skeleton-color);"
                                 class="co__item__need__header__carret__icon"
-                                ng-if="!self.isOpen(need.get('uri'))">
+                                ng-if="!self.isOpen(needUri)">
                                     <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
                             </svg>
                         </div>
                     </div>
-                    <div class="co__item__need__detail" ng-if="self.isOpen(need.get('uri'))">
+                    <div class="co__item__need__detail" ng-if="self.isOpen(needUri)">
                         <won-extended-connection-indicators
                             class="co__item__need__detail__indicators"
                             on-selected-connection="self.selectConnection(connectionUri)"
-                            need-uri="need.get('uri')">
+                            need-uri="::needUri">
                         </won-extended-connection-indicators>
                     </div>
                 </div>
@@ -215,8 +214,6 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
       this.open = open;
       this.WON = won.WON;
-      this.hasGroupFacet = hasGroupFacet;
-      this.hasChatFacet = hasChatFacet;
       //this.labels = labels;
       window.co4dbg = this;
 
@@ -260,9 +257,15 @@ function genComponentConf() {
           useCaseGroup,
           needUriInRoute,
           needUriImpliedInRoute,
-          beingCreatedNeeds: beingCreatedNeeds && beingCreatedNeeds.toArray(),
-          sortedOpenNeeds,
-          sortedClosedNeeds,
+          beingCreatedNeedUris: beingCreatedNeeds && [
+            ...beingCreatedNeeds.keys(),
+          ],
+          sortedOpenNeedUris: sortedOpenNeeds && [
+            ...sortedOpenNeeds.flatMap(need => need.get("uri")),
+          ],
+          sortedClosedNeeds: sortedClosedNeeds && [
+            ...sortedClosedNeeds.flatMap(need => need.get("uri")),
+          ],
           connectionsToCrawl: connectionsToCrawl || Immutable.Map(),
           unloadedNeedsSize: unloadedNeeds ? unloadedNeeds.size : 0,
           closedNeedsSize: closedNeeds ? closedNeeds.size : 0,
@@ -327,6 +330,26 @@ function genComponentConf() {
       }
     }
 
+    hasChatFacet(needUri) {
+      const need = get(this.allNeeds, needUri);
+      return needUtils.hasChatFacet(need);
+    }
+
+    hasGroupFacet(needUri) {
+      const need = get(this.allNeeds, needUri);
+      return needUtils.hasGroupFacet(need);
+    }
+
+    isUnread(needUri) {
+      const need = get(this.allNeeds, needUri);
+      return get(need, "unread");
+    }
+
+    isConnectionUnread(needUri, connUri) {
+      const conn = getIn(this.allNeeds, [needUri, "connections", connUri]);
+      return get(conn, "unread");
+    }
+
     hasClosedNeeds() {
       return this.closedNeedsSize > 0;
     }
@@ -354,8 +377,8 @@ function genComponentConf() {
       return this.isOpenByConnection(ownedNeedUri) || !!this.open[ownedNeedUri];
     }
 
-    isNeedLoading(need) {
-      return this.process.getIn(["needs", need.get("uri"), "loading"]);
+    isNeedLoading(needUri) {
+      return this.process.getIn(["needs", needUri, "loading"]);
     }
 
     isOpenByConnection(ownedNeedUri) {
@@ -372,7 +395,12 @@ function genComponentConf() {
       this.onSelectedGroupChat({ needUri }); //trigger callback with scope-object
     }
 
-    hasOpenOrLoadingChatConnections(need, allNeeds, process) {
+    hasOpenOrLoadingChatConnections(needUri, allNeeds, process) {
+      const need = get(this.allNeeds, needUri);
+
+      if (!need) {
+        return undefined;
+      }
       return (
         need.get("state") === won.WON.ActiveCompacted &&
         need.get("connections").filter(conn => {
@@ -403,8 +431,13 @@ function genComponentConf() {
       );
     }
 
-    getOpenChatConnectionsArraySorted(need, allNeeds, process) {
-      return sortByDate(
+    getOpenChatConnectionUrisArraySorted(needUri, allNeeds, process) {
+      const need = get(this.allNeeds, needUri);
+
+      if (!need) {
+        return undefined;
+      }
+      const sortedConnections = sortByDate(
         need.get("connections").filter(conn => {
           if (!isChatConnection(conn) && !isGroupChatConnection(conn))
             return false;
@@ -431,6 +464,11 @@ function genComponentConf() {
           );
         }),
         "creationDate"
+      );
+      return (
+        sortedConnections && [
+          ...sortedConnections.flatMap(conn => conn.get("uri")),
+        ]
       );
     }
   }
