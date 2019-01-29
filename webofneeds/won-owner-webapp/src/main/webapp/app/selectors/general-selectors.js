@@ -70,9 +70,7 @@ export const selectIsConnected = state =>
  */
 export function getOwnedNeedByConnectionUri(state, connectionUri) {
   let needs = getOwnedNeeds(state); //we only check own needs as these are the only ones who have connections stored
-  return needs
-    .filter(need => need.getIn(["connections", connectionUri]))
-    .first();
+  return needs.find(need => need.getIn(["connections", connectionUri]));
 }
 
 export const getCurrentParamsFromRoute = createSelector(
