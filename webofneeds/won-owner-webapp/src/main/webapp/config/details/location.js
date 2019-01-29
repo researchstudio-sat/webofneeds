@@ -17,14 +17,14 @@ export const location = {
   messageEnabled: true,
   parseToRDF: function({ value, identifier, contentUri }) {
     return {
-      "won:hasLocation": genSPlace({
+      "s:location": genSPlace({
         geoData: value,
         baseUri: genDetailBaseUri(contentUri, identifier),
       }),
     };
   },
   parseFromRDF: function(jsonLDImm) {
-    const jsonldLocation = jsonLDImm && jsonLDImm.get("won:hasLocation");
+    const jsonldLocation = jsonLDImm && jsonLDImm.get("s:location");
     return parseSPlace(jsonldLocation);
   },
   generateHumanReadable: function({ value, includeLabel }) {
@@ -279,7 +279,7 @@ function genBoundingBox({ nwCorner, seCorner, baseUri }) {
 }
 
 function parseSPlace(jsonldLocation) {
-  // const jsonldLocation = jsonLDImm && jsonLDImm.get("won:hasLocation");
+  // const jsonldLocation = jsonLDImm && jsonLDImm.get("s:location");
   if (!jsonldLocation) return undefined; // NO LOCATION PRESENT
 
   const location = parsePlaceLeniently(jsonldLocation);

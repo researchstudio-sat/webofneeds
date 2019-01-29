@@ -311,7 +311,7 @@ export const goodsTransportSearch = {
         filterAndJoin(
           [
             location &&
-              `${resultName} a <http://dbpedia.org/resource/Transport> . ${resultName} won:hasLocation ?location .`,
+              `${resultName} a <http://dbpedia.org/resource/Transport> . ${resultName} s:location ?location .`,
             location && locationFilter.operations.join(" "),
           ],
           " "

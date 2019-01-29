@@ -60,7 +60,7 @@ export const rentRealEstateSearch = {
         },
         operations: [
           `${resultName} a won:Need.`,
-          location && `${resultName} won:hasLocation ?location.`,
+          location && `${resultName} s:location ?location.`,
         ],
       },
       rentRange &&
