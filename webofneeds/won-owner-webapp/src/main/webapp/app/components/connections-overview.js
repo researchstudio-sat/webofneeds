@@ -300,8 +300,9 @@ function genComponentConf() {
             const receivedMessages = messages.filter(
               msg => !msg.get("outgoingMessage")
             );
-            const receivedMessagesReadPresent =
-              receivedMessages.filter(msg => !msg.get("unread")).size > 0;
+            const receivedMessagesReadPresent = receivedMessages.find(
+              msg => !msg.get("unread")
+            );
 
             if (!receivedMessagesReadPresent) {
               this.connections__showMoreMessages(conn.get("uri"), MESSAGECOUNT);
@@ -400,7 +401,7 @@ function genComponentConf() {
       }
       return (
         need.get("state") === won.WON.ActiveCompacted &&
-        need.get("connections").filter(conn => {
+        !!need.get("connections").find(conn => {
           if (!isChatConnection(conn) && !isGroupChatConnection(conn))
             return false;
           if (
@@ -424,7 +425,7 @@ function genComponentConf() {
           return (
             remoteNeedActiveOrLoading && conn.get("state") !== won.WON.Closed
           );
-        }).size > 0
+        })
       );
     }
 

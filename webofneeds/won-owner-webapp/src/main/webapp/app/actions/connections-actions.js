@@ -34,8 +34,7 @@ export function connectionsChatMessageClaimOnSuccess(
   return (dispatch, getState) => {
     const ownedNeed = getState()
       .get("needs")
-      .filter(need => need.getIn(["connections", connectionUri]))
-      .first();
+      .find(need => need.getIn(["connections", connectionUri]));
     const theirNeedUri = getState().getIn([
       "needs",
       ownedNeed.get("uri"),
@@ -101,8 +100,7 @@ export function connectionsChatMessage(
   return (dispatch, getState) => {
     const ownedNeed = getState()
       .get("needs")
-      .filter(need => need.getIn(["connections", connectionUri]))
-      .first();
+      .find(need => need.getIn(["connections", connectionUri]));
     const theirNeedUri = getState().getIn([
       "needs",
       ownedNeed.get("uri"),
@@ -254,8 +252,7 @@ export function connectionsOpen(connectionUri, textMessage) {
   return async (dispatch, getState) => {
     const ownedNeed = getState()
       .get("needs")
-      .filter(need => need.getIn(["connections", connectionUri]))
-      .first();
+      .find(need => need.getIn(["connections", connectionUri]));
     const theirNeedUri = getState().getIn([
       "needs",
       ownedNeed.get("uri"),
@@ -418,8 +415,7 @@ export function connectionsClose(connectionUri) {
   return (dispatch, getState) => {
     const ownedNeed = getState()
       .get("needs")
-      .filter(need => need.getIn(["connections", connectionUri]))
-      .first();
+      .find(need => need.getIn(["connections", connectionUri]));
     const theirNeedUri = getState().getIn([
       "needs",
       ownedNeed.get("uri"),
@@ -487,8 +483,7 @@ export function connectionsRate(connectionUri, rating) {
 
     const ownedNeed = state
       .get("needs")
-      .filter(need => need.getIn(["connections", connectionUri]))
-      .first();
+      .find(need => need.getIn(["connections", connectionUri]));
     const theirNeedUri = state.getIn([
       "needs",
       ownedNeed.get("uri"),

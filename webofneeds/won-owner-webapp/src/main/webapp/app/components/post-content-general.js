@@ -168,7 +168,7 @@ function genComponentConf() {
           preventSharing:
             (post && post.get("state") === won.WON.InactiveCompacted) ||
             (fullFlags &&
-              fullFlags.filter(flag => flag === "No Hint For Others").size > 0),
+              !!fullFlags.find(flag => flag === "No Hint For Others")),
           friendlyTimestamp:
             post &&
             relativeTime(selectLastUpdateTime(state), post.get("creationDate")),

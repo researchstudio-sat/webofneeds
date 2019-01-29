@@ -172,9 +172,9 @@ export function markConnectionAsRated(state, connectionUri) {
  *            to find corresponding need for
  */
 export function getOwnedNeedByConnectionUri(allNeedsInState, connectionUri) {
-  return allNeedsInState
-    .filter(need => need.getIn(["connections", connectionUri]))
-    .first();
+  return allNeedsInState.find(need =>
+    need.getIn(["connections", connectionUri])
+  );
 }
 
 export function changeConnectionState(state, connectionUri, newState) {
