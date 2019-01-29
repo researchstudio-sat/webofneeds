@@ -17,7 +17,7 @@ export const cyclingInterest = {
     ...emptyDraft,
     content: {
       type: "won:Interest",
-      title: "I'm up for cycling!",
+      title: "I am interested in cycling!",
     },
     seeks: {
       sPlanAction: { "@id": "http://dbpedia.org/resource/Cycling" },
@@ -25,10 +25,13 @@ export const cyclingInterest = {
   },
   details: {
     title: { ...details.title },
+    description: { ...details.description },
+    location: {
+      ...details.location,
+      mandatory: true,
+    },
   },
   seeksDetails: {
-    description: { ...details.description },
-    location: { ...details.location },
     sPlanAction: { ...details.sPlanAction },
   },
 
@@ -41,7 +44,7 @@ export const cyclingInterest = {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],
       },
-      geoCoordinates: getIn(draft, ["seeks", "location"]),
+      geoCoordinates: getIn(draft, ["content", "location"]),
     });
 
     const subQueries = [vicinityScoreSQ]

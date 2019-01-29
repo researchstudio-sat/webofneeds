@@ -10,16 +10,16 @@ import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-u
 
 window.SparqlGenerator4dbg = Generator;
 
-export const cyclingPlan = {
-  identifier: "cyclingPlan",
-  label: "Plan a Ride!",
+export const lunchPlan = {
+  identifier: "lunchPlan",
+  label: "Plan Lunch!",
   icon: undefined,
   doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
     ...emptyDraft,
     content: {
-      title: "Let's go for a bike ride!",
-      sPlanAction: { "@id": "http://dbpedia.org/resource/Cycling" },
+      title: "Let's go get lunch!",
+      sPlanAction: { "@id": "http://dbpedia.org/resource/Lunch" },
     },
     seeks: {},
     facet: { "@id": "#groupFacet", "@type": won.WON.GroupFacet },
@@ -65,7 +65,7 @@ export const cyclingPlan = {
         `${resultName} won:seeks ?seeks .`,
         `?seeks rdf:type s:PlanAction.`,
         `?seeks s:object ?planObject.`,
-        `?planObject s:about <http://dbpedia.org/resource/Cycling>`,
+        `?planObject s:about <http://dbpedia.org/resource/Lunch>`,
         `BIND( ( 
           COALESCE(?location_geoScore, 0) 
         ) / 5  as ?score)`,

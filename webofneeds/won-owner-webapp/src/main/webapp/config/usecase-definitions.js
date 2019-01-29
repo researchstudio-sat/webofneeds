@@ -1,3 +1,4 @@
+import { lunchGroup } from "./usecases/group-lunch";
 import { classifiedsGroup } from "./usecases/group-classifieds";
 import { socialGroup } from "./usecases/group-social";
 import { workGroup } from "./usecases/group-work";
@@ -53,6 +54,8 @@ import { cyclingGroup } from "./usecases/group-cycling";
  */
 
 export const useCaseGroups = {
+  lunch: lunchGroup,
+  cycling: cyclingGroup,
   social: socialGroup,
   classifieds: classifiedsGroup,
   work: workGroup,
@@ -61,7 +64,6 @@ export const useCaseGroups = {
   realEstate: realEstateGroup,
   transport: transportGroup,
   personalMobility: personalMobilityGroup,
-  cycling: cyclingGroup,
   other: otherGroup,
 };
 

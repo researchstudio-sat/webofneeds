@@ -3,34 +3,37 @@ import {
   vicinityScoreSubQuery,
   sparqlQuery,
 } from "../../app/sparql-builder-utils.js";
+import won from "../../app/won-es6.js";
 import { getIn } from "../../app/utils.js";
 import { Generator } from "sparqljs";
-import won from "../../app/service/won.js";
-import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-utils.js";
 
 window.SparqlGenerator4dbg = Generator;
 
-export const cyclingPlan = {
-  identifier: "cyclingPlan",
-  label: "Plan a Ride!",
+export const lunchInterest = {
+  identifier: "lunchInterest",
+  label: "Add Lunch Interest",
   icon: undefined,
-  doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
     ...emptyDraft,
     content: {
-      title: "Let's go for a bike ride!",
-      sPlanAction: { "@id": "http://dbpedia.org/resource/Cycling" },
+      type: "won:Interest",
+      title: "I am interested in meeting up for lunch!",
     },
-    seeks: {},
-    facet: { "@id": "#groupFacet", "@type": won.WON.GroupFacet },
+    seeks: {
+      sPlanAction: { "@id": "http://dbpedia.org/resource/Lunch" },
+    },
   },
   details: {
     title: { ...details.title },
     description: { ...details.description },
-    location: { ...details.location, mandatory: true },
-    fromDatetime: { ...details.fromDatetime },
+    location: {
+      ...details.location,
+      mandatory: true,
+    },
   },
-  seeksDetails: {},
+  seeksDetails: {
+    sPlanAction: { ...details.sPlanAction },
+  },
 
   generateQuery: (draft, resultName) => {
     const vicinityScoreSQ = vicinityScoreSubQuery({
@@ -61,11 +64,11 @@ export const cyclingPlan = {
       variables: [resultName, "?score"],
       subQueries: subQueries,
       where: [
-        `${resultName} rdf:type won:Interest.`,
-        `${resultName} won:seeks ?seeks .`,
-        `?seeks rdf:type s:PlanAction.`,
-        `?seeks s:object ?planObject.`,
-        `?planObject s:about <http://dbpedia.org/resource/Cycling>`,
+        `${resultName} rdf:type won:Need.`,
+        `${resultName} rdf:type s:PlanAction.`,
+        `${resultName} s:object ?planObject.`,
+        `?planObject s:about <http://dbpedia.org/resource/Lunch>`,
+        // calculate average of scores; can be weighed if necessary
         `BIND( ( 
           COALESCE(?location_geoScore, 0) 
         ) / 5  as ?score)`,
