@@ -300,8 +300,9 @@ function genComponentConf() {
             const receivedMessages = messages.filter(
               msg => !msg.get("outgoingMessage")
             );
-            const receivedMessagesReadPresent =
-              receivedMessages.filter(msg => !msg.get("unread")).size > 0;
+            const receivedMessagesReadPresent = receivedMessages.find(
+              msg => !msg.get("unread")
+            );
 
             if (!receivedMessagesReadPresent) {
               this.connections__showMoreMessages(conn.get("uri"), MESSAGECOUNT);
