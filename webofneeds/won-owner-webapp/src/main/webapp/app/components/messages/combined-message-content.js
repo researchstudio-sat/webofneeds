@@ -33,7 +33,7 @@ function genComponentConf() {
           <div class="msg__header__type">Forwarded from:</div>
           <won-square-image
             class="msg__header__originator"
-            uri="self.originatorUri">
+            uri="::self.originatorUri">
           </won-square-image>
       </div>
       <div class="msg__header msg__header--inject-into" ng-if="self.isConnectionMessage && self.isInjectIntoMessage && !self.hasNotBeenLoaded && !self.isGroupChatMessage">
@@ -42,20 +42,19 @@ function genComponentConf() {
             class="msg__header__inject"
             ng-class="{'clickable': self.isInjectIntoConnectionPresent(connUri)}"
             ng-repeat="connUri in self.injectIntoArray"
-            title="self.getInjectIntoNeedTitle(connUri)"
             uri="self.getInjectIntoNeedUri(connUri)"
             ng-click="!self.multiSelectType && self.isInjectIntoConnectionPresent(connUri) && self.router__stateGoCurrent({connectionUri: connUri})">
           </won-square-image>
       </div>
       <won-message-content
           ng-if="self.hasContent || self.hasNotBeenLoaded"
-          message-uri="self.messageUri"
-          connection-uri="self.connectionUri">
+          message-uri="::self.messageUri"
+          connection-uri="::self.connectionUri">
       </won-message-content>
       <won-referenced-message-content
           ng-if="self.hasReferences"
-          message-uri="self.messageUri"
-          connection-uri="self.connectionUri">
+          message-uri="::self.messageUri"
+          connection-uri="::self.connectionUri">
       </won-referenced-message-content>
       <won-trig
           trig="self.contentGraphTrig"

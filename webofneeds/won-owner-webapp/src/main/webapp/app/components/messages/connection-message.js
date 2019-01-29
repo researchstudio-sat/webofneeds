@@ -49,24 +49,18 @@ function genComponentConf() {
   let template = `
         <won-square-image
             class="clickable"
-            title="self.theirNeed.get('humanReadable')"
-            src="self.theirNeed.get('TODOtitleImgSrc')"
-            uri="self.theirNeed.get('uri')"
+            uri="::self.theirNeed.get('uri')"
             ng-click="!self.multiSelectType && self.router__stateGoCurrent({postUri: self.theirNeed.get('uri')})"
             ng-if="!self.isSent && !(self.isGroupChatMessage && self.originatorUri)">
         </won-square-image>
         <won-square-image
             class="clickable"
-            title="self.theirNeed.get('humanReadable')"
-            src="self.theirNeed.get('TODOtitleImgSrc')"
-            uri="self.originatorUri"
+            uri="::self.originatorUri"
             ng-click="!self.multiSelectType && self.router__stateGoCurrent({postUri: self.originatorUri})"
             ng-if="self.isReceived && self.isGroupChatMessage && self.originatorUri">
         </won-square-image>
         <won-square-image
-            title="System"
-            src=""
-            uri="self.messageSenderUri"
+            uri="::self.messageSenderUri"
             ng-if="self.isFromSystem">
         </won-square-image>
         <div class="won-cm__center"
@@ -85,7 +79,7 @@ function genComponentConf() {
     			      }">
     			      <won-combined-message-content
     			        ng-if="!self.isCollapsed"
-    			        message-uri="self.messageUri"
+    			        message-uri="::self.messageUri"
                   connection-uri="self.connectionUri"
                   group-chat-message="self.isGroupChatMessage">
     			      </won-combined-message-content>
@@ -104,10 +98,10 @@ function genComponentConf() {
                         <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
                     </svg>
                 </div>
-                <won-connection-message-actions message-uri="self.messageUri" connection-uri="self.connectionUri" ng-if="!self.isCollapsed && self.showActionButtons()">
+                <won-connection-message-actions message-uri="::self.messageUri" connection-uri="self.connectionUri" ng-if="!self.isCollapsed && self.showActionButtons()">
                 </won-connection-message-actions>
             </div>
-            <won-connection-message-status message-uri="self.messageUri" connection-uri="self.connectionUri">
+            <won-connection-message-status message-uri="::self.messageUri" connection-uri="self.connectionUri">
             </won-connection-message-status>
             <a ng-if="self.rdfLinkURL" target="_blank" href="{{self.rdfLinkURL}}">
                 <svg class="rdflink__small clickable">

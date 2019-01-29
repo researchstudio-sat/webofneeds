@@ -7,7 +7,9 @@ import {
   isSearchNeed,
   isPersona,
 } from "../../need-utils.js";
-import { getIn } from "../../utils.js";
+import { generateRgbColorArray, getIn } from "../../utils.js";
+import shajs from "sha.js";
+import Identicon from "identicon.js";
 
 export function parseNeed(jsonldNeed, isOwned) {
   const jsonldNeedImm = Immutable.fromJS(jsonldNeed);
@@ -17,6 +19,7 @@ export function parseNeed(jsonldNeed, isOwned) {
 
     let parsedNeed = {
       uri: jsonldNeedImm.get("@id"),
+      identiconSvg: generateIdenticon(jsonldNeedImm),
       nodeUri: jsonldNeedImm.getIn(["won:hasWonNode", "@id"]),
       types: extractTypes(jsonldNeedImm),
       facets: extractFacets(jsonldNeedImm.get("won:hasFacet")),
@@ -108,6 +111,26 @@ function extractMatchingContext(needJsonLd) {
       ? wonHasMatchingContexts
       : Immutable.List.of(wonHasMatchingContexts)
     : undefined;
+}
+
+function generateIdenticon(needJsonLd) {
+  const needUri = needJsonLd.get("@id");
+
+  if (!needUri) {
+    return;
+  }
+  // quick extra hash here as identicon.js only uses first 15
+  // chars (which aren't very unique for our uris due to the base-url):
+  const hash = new shajs.sha512().update(needUri).digest("hex");
+  const rgbColorArray = generateRgbColorArray(hash);
+  const idc = new Identicon(hash, {
+    size: 100,
+    foreground: [255, 255, 255, 255], // rgba white
+    background: [...rgbColorArray, 255], // rgba
+    margin: 0.2,
+    format: "svg",
+  });
+  return idc.toString();
 }
 
 function extractTypes(needJsonLd) {

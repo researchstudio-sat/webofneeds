@@ -98,10 +98,8 @@ export function isNeedLoading(process, needUri) {
 export function isAnyNeedLoading(process) {
   const needProcess = get(process, "needs");
 
-  return (
-    needProcess.filter((needProcess, needUri) =>
-      isNeedLoading(process, needUri)
-    ).size > 0
+  return !!needProcess.find((needProcess, needUri) =>
+    isNeedLoading(process, needUri)
   );
 }
 
@@ -134,10 +132,8 @@ export function isConnectionLoading(process, connUri, includeSubData = false) {
 export function isAnyConnectionLoading(process, includeSubData) {
   const connectionProcess = get(process, "connections");
 
-  return (
-    connectionProcess.filter((needProcess, connUri) =>
-      isConnectionLoading(process, connUri, includeSubData)
-    ).size > 0
+  return !!connectionProcess.find((needProcess, connUri) =>
+    isConnectionLoading(process, connUri, includeSubData)
   );
 }
 
@@ -182,11 +178,9 @@ export function isMessageLoading(process, msgUri, connUri = undefined) {
     );
   }
 
-  return (
-    get(process, "connections")
-      .flatMap(conn => conn.get("messages"))
-      .filter(msgProcess => msgProcess.get("loading")).size > 0
-  );
+  return !!get(process, "connections")
+    .flatMap(conn => conn.get("messages"))
+    .find(msgProcess => msgProcess.get("loading"));
 }
 
 /**
@@ -200,17 +194,12 @@ export function isAnyMessageLoading(process, connUri = undefined) {
   if (connUri) {
     const msgProcess = getIn(process, ["connections", connUri, "messages"]);
 
-    return (
-      msgProcess.filter((msgProcess, msgUri) =>
-        isMessageLoading(process, msgUri, connUri)
-      ).size > 0
+    return !!msgProcess.find((msgProcess, msgUri) =>
+      isMessageLoading(process, msgUri, connUri)
     );
   }
 
-  return (
-    get(process, "connections")
-      .flatMap(conn => conn.get("messages"))
-      .filter((msgProcess, msgUri) => isMessageLoading(process, msgUri)).size >
-    0
+  return !!get(process, "connections").find((connProcess, connUri) =>
+    isAnyMessageLoading(process, connUri)
   );
 }

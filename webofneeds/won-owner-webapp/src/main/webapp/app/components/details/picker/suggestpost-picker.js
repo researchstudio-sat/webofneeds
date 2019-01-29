@@ -21,9 +21,7 @@ function genComponentConf() {
           ng-repeat="need in self.sortedActiveNeeds"
           ng-click="self.selectNeed(need)">
           <won-post-header
-              need-uri="need.get('uri')"
-              timestamp="need.get('creationDate')"
-              hide-image="::false">
+              need-uri="need.get('uri')">
           </won-post-header>
         </div>
       </div>

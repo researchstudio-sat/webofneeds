@@ -47,9 +47,7 @@ function genComponentConf() {
                 </svg>
             </a>
             <won-connection-header
-                connection-uri="self.connectionUri"
-                timestamp="self.lastUpdateTimestamp"
-                hide-image="::false">
+                connection-uri="self.connectionUri">
             </won-connection-header>
             <won-connection-context-dropdown show-petri-net-data-field="::self.showPetriNetDataField()" show-agreement-data-field="::self.showAgreementDataField()"></won-connection-context-dropdown>
         </div>
@@ -120,10 +118,10 @@ function genComponentConf() {
             <!-- CHATVIEW SPECIFIC CONTENT START-->
             <won-connection-message
                 ng-if="self.showChatData"
-                ng-click="self.multiSelectType && self.selectMessage(msg)"
-                ng-repeat="msg in self.sortedMessages"
+                ng-click="self.multiSelectType && self.selectMessage(msgUri)"
+                ng-repeat="msgUri in self.sortedMessageUris"
                 connection-uri="self.connectionUri"
-                message-uri="msg.get('uri')">
+                message-uri="::msgUri">
             </won-connection-message>
             <!-- CHATVIEW SPECIFIC CONTENT END-->
 
@@ -136,30 +134,30 @@ function genComponentConf() {
             </div>
             <won-connection-message
               ng-if="self.showAgreementData && !self.isProcessingLoadingAgreementData"
-              ng-click="self.multiSelectType && self.selectMessage(agreement)"
-              ng-repeat="agreement in self.agreementMessagesArray"
+              ng-click="self.multiSelectType && self.selectMessage(agreementUri)"
+              ng-repeat="agreementUri in self.agreementMessageUris"
               connection-uri="self.connectionUri"
-              message-uri="agreement.get('uri')">
+              message-uri="::agreementUri">
             </won-connection-message>
             <div class="pm__content__agreement__title" ng-if="self.showAgreementData && self.hasCancellationPendingMessages && !self.isProcessingLoadingAgreementData">
               Agreements with Pending Cancellation
             </div>
             <won-connection-message
               ng-if="self.showAgreementData && !self.isProcessingLoadingAgreementData"
-              ng-click="self.multiSelectType && self.selectMessage(proposesToCancel)"
-              ng-repeat="proposesToCancel in self.cancellationPendingMessagesArray"
+              ng-click="self.multiSelectType && self.selectMessage(proposesToCancelUri)"
+              ng-repeat="proposesToCancelUri in self.cancellationPendingMessageUris"
               connection-uri="self.connectionUri"
-              message-uri="proposesToCancel.get('uri')">
+              message-uri="::proposesToCancelUri">
             </won-connection-message>
             <div class="pm__content__agreement__title" ng-if="self.showAgreementData && self.hasProposalMessages && !self.isProcessingLoadingAgreementData">
               Open Proposals
             </div>
             <won-connection-message
               ng-if="self.showAgreementData && !self.isProcessingLoadingAgreementData"
-              ng-click="self.multiSelectType && self.selectMessage(proposal)"
-              ng-repeat="proposal in self.proposalMessagesArray"
+              ng-click="self.multiSelectType && self.selectMessage(proposalUri)"
+              ng-repeat="proposalUri in self.proposalMessageUris"
               connection-uri="self.connectionUri"
-              message-uri="proposal.get('uri')">
+              message-uri="::proposalUri">
             </won-connection-message>
             <!-- AGREEMENTVIEW SPECIFIC CONTENT END-->
 
@@ -196,7 +194,7 @@ function genComponentConf() {
                 connection-uri="self.connectionUri"
                 placeholder="self.shouldShowRdf? 'Enter TTL...' : 'Your message...'"
                 submit-button-label="self.shouldShowRdf? 'Send&#160;RDF' : 'Send'"
-                on-submit="self.send(value, additionalContent, referencedContent, self.shouldShowRdf)"
+                on-submit="::self.send(value, additionalContent, referencedContent, self.shouldShowRdf)"
                 help-text="self.shouldShowRdf? self.rdfTextfieldHelpText : ''"
                 allow-empty-submit="::false"
                 allow-details="!self.shouldShowRdf"
@@ -325,7 +323,9 @@ function genComponentConf() {
           connection,
           isOwnedNeedWhatsX,
 
-          sortedMessages: sortedMessages,
+          sortedMessageUris: sortedMessages && [
+            ...sortedMessages.flatMap(msg => msg.get("uri")),
+          ],
           chatMessages,
           chatMessagesWithUnknownState,
           unreadMessageCount: unreadMessages && unreadMessages.size,
@@ -400,15 +400,18 @@ function genComponentConf() {
           hasConnectionMessagesToLoad,
           hasAgreementMessages: agreementMessages && agreementMessages.size > 0,
           hasPetriNetData: petriNetData && petriNetData.size > 0,
-          agreementMessagesArray:
-            agreementMessages && agreementMessages.toArray(),
+          agreementMessageUris: agreementMessages && [
+            ...agreementMessages.flatMap(msg => msg.get("uri")),
+          ],
           hasProposalMessages: proposalMessages && proposalMessages.size > 0,
-          proposalMessagesArray: proposalMessages && proposalMessages.toArray(),
+          proposalMessageUris: proposalMessages && [
+            ...proposalMessages.flatMap(msg => msg.get("uri")),
+          ],
           hasCancellationPendingMessages:
             cancellationPendingMessages && cancellationPendingMessages.size > 0,
-          cancellationPendingMessagesArray:
-            cancellationPendingMessages &&
-            cancellationPendingMessages.toArray(),
+          cancellationPendingMessageUris: cancellationPendingMessages && [
+            ...cancellationPendingMessages.flatMap(msg => msg.get("uri")),
+          ],
           connectionOrNeedsLoading:
             !connection ||
             !nonOwnedNeed ||
@@ -441,7 +444,7 @@ function genComponentConf() {
       });
 
       this.$scope.$watch(
-        () => this.sortedMessages && this.sortedMessages.length, // trigger if there's messages added (or removed)
+        () => this.sortedMessageUris && this.sortedMessageUris.length, // trigger if there's messages added (or removed)
         () =>
           delay(0).then(() =>
             // scroll to bottom directly after rendering, if snapped
@@ -872,15 +875,17 @@ function genComponentConf() {
       }
     }
 
-    selectMessage(msg) {
-      const selected = msg.getIn(["viewState", "isSelected"]);
+    selectMessage(msgUri) {
+      const msg = getIn(this.connection, ["messages", msgUri]);
 
-      this.messages__viewState__markAsSelected({
-        messageUri: msg.get("uri"),
-        connectionUri: this.connection.get("uri"),
-        needUri: this.ownedNeed.get("uri"),
-        isSelected: !selected,
-      });
+      if (msg) {
+        this.messages__viewState__markAsSelected({
+          messageUri: msgUri,
+          connectionUri: this.connection.get("uri"),
+          needUri: this.ownedNeed.get("uri"),
+          isSelected: !msg.getIn(["viewState", "isSelected"]),
+        });
+      }
     }
   }
   Controller.$inject = serviceDependencies;

@@ -8,9 +8,9 @@
 <won-toasts></won-toasts>
 <won-slide-in ng-if="self.showSlideIns"></won-slide-in>
 <aside class="overview__left" ng-class="{'hide-in-responsive': self.hideListSideInResponsive}">
-    <won-connections-overview on-selected-connection="self.selectConnection(connectionUri)"
-                              on-selected-need="self.selectNeed(needUri)"
-                              on-selected-group-chat="self.selectGroupChat(needUri)"
+    <won-connections-overview on-selected-connection="::self.selectConnection(connectionUri)"
+                              on-selected-need="::self.selectNeed(needUri)"
+                              on-selected-group-chat="::self.selectGroupChat(needUri)"
                               open="self.open">
     </won-connections-overview>
 </aside>
@@ -21,7 +21,7 @@
         <won-usecase-picker></won-usecase-picker>
         <div class="overview__right__welcome__howto">
             <div  class="overview__right__welcome__howto__label">{{ self.appTitle }} connects people's needs to their solutions</div>
-            <a class="overview__right__welcome__howto__button won-button--filled red" href="{{ self.absHRef(self.$state, 'about', {'aboutSection': 'aboutHowTo'}) }}">
+            <a class="overview__right__welcome__howto__button won-button--filled red" href="{{ ::self.absHRef(self.$state, 'about', {'aboutSection': 'aboutHowTo'}) }}">
                 <span>How {{ self.appTitle }} works?</span>
             </a>
         </div>
@@ -35,7 +35,7 @@
     <won-post-messages ng-if="self.showPostMessages"></won-post-messages>
     <won-group-post-messages ng-if="self.showGroupPostMessages"></won-group-post-messages>
     <won-group-administration ng-if="self.showGroupPostAdministration"></won-group-administration>
-    <won-post-info include-header="true" ng-if="self.showPostInfo"></won-post-info>
+    <won-post-info include-header="::true" ng-if="self.showPostInfo"></won-post-info>
 </main>
 <won-footer ng-class="{'hide-in-responsive': self.hideFooterInResponsive }"> <!-- Connection view does not show the footer in responsive mode as there should not be two scrollable areas imho-->
 </won-footer>
