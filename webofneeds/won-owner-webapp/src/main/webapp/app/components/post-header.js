@@ -172,7 +172,9 @@ function genComponentConf() {
       classOnComponentRoot("won-is-toload", () => this.postToLoad, this);
 
       this.$scope.$watch(
-        () => this.needUri,
+        () =>
+          this.needUri &&
+          (!this.need || (this.postToLoad && !this.postLoading)),
         () => delay(0).then(() => this.ensureNeedIsLoaded())
       );
     }
