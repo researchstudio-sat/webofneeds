@@ -18,7 +18,7 @@ export const cyclingPlan = {
     content: {
       type: "won:Plan",
       title: "Let's go cycling!",
-      sPlanAction: "http://dbpedia.org/resource/Cycling",
+      sPlanAction: { "@id": "http://dbpedia.org/resource/Cycling" },
     },
     seeks: {},
     facet: { "@id": "#groupFacet", "@type": won.WON.GroupFacet },

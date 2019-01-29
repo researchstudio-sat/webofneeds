@@ -20,7 +20,7 @@ export const cyclingInterest = {
       title: "I'm up for cycling!",
     },
     seeks: {
-      sPlanAction: "http://dbpedia.org/resource/Cycling",
+      sPlanAction: { "@id": "http://dbpedia.org/resource/Cycling" },
     },
   },
   details: {
