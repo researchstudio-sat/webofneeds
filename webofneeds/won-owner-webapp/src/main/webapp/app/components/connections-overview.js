@@ -401,7 +401,7 @@ function genComponentConf() {
       }
       return (
         need.get("state") === won.WON.ActiveCompacted &&
-        need.get("connections").filter(conn => {
+        !!need.get("connections").find(conn => {
           if (!isChatConnection(conn) && !isGroupChatConnection(conn))
             return false;
           if (
@@ -425,7 +425,7 @@ function genComponentConf() {
           return (
             remoteNeedActiveOrLoading && conn.get("state") !== won.WON.Closed
           );
-        }).size > 0
+        })
       );
     }
 
