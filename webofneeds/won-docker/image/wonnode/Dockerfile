@@ -34,7 +34,7 @@ RUN unzip /usr/local/tomcat/webapps/won.war -d /usr/local/tomcat/webapps/won
 RUN rm /usr/local/tomcat/webapps/won.war
 
 # add the bouncy castle libraries to the jre as well as to the java.security config (we need them in the jre, only tomcat lib folder doesn't work)
-ADD ./tomcat-libs/* /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/ext/
+ADD ./required-libs/* /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/ext/
 ADD ./jce/* /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/security/
 
 # add the webofneeds configuration files for the application

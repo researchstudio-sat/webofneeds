@@ -94,10 +94,10 @@
                         </goals>
                         <configuration>
                             <overwrite>true</overwrite>
-                            <outputDirectory>${project.basedir}/image/wonnode/tomcat-libs</outputDirectory>
+                            <outputDirectory>${project.basedir}/image/wonnode/required-libs</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${project.parent.basedir}/target/tomcat-libs</directory>
+                                    <directory>${project.parent.basedir}/target/required-libs</directory>
                                 </resource>
                             </resources>
                         </configuration>
@@ -147,10 +147,10 @@
                         </goals>
                         <configuration>
                             <overwrite>true</overwrite>
-                            <outputDirectory>${project.basedir}/image/owner/tomcat-libs</outputDirectory>
+                            <outputDirectory>${project.basedir}/image/owner/required-libs</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${project.parent.basedir}/target/tomcat-libs</directory>
+                                    <directory>${project.parent.basedir}/target/required-libs</directory>
                                 </resource>
                             </resources>
                         </configuration>

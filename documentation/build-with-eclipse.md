@@ -115,6 +115,24 @@
 		*  edit `server.xml` 
 		*  find the xml element `<Host appBase="webapps" ...` and add the xml attribute `startStopThreads="2"` 
 8.  Follow instructions on https://github.com/researchstudio-sat/webofneeds/blob/5dc0db3747c201a87d94621453b8b898a34e7fc4/documentation/installation-cryptographic-keys-and-certificates.md and make sure that you have the `tcnative-1.dll` **in your tomcat's `bin/`-folder!**, and that you correctly point to it with the `-Djava.library.path` variable (Step 7). Otherwise you will get `InvalidKeystoreFormatException`s at server startup and an info message which says `The APR based Apache Tomcat Native library which allows optimal performance in production environments was not found on the java.library.path` => following path where to put the .dll 
-9.  Add the bouncy castle libraries `bcpkix-jdk15on-1.52.jar` and `bcprov-jdk15on-1.52.jar` your tomcat's `lib` folder. The two jars can be found in the `[your m2 repo]/org/bouncycastle` folder. Hint: Do **not** add the bouncycastle libraries to the "Installed JRE".
+9.  Install the bouncycaslte security provider: Locate the JRE you are using with eclipse (`Window -> Preferences -> Java -> Installed JREs`). 
+	* Navigate to the `[JRE]/lib/security` folder
+	* edit the file `java.security`
+	* find the `List of providers and their preference orders`, which looks like this:
+
+	```
+	security.provider.1=sun.security.provider.Sun
+	security.provider.2=sun.security.rsa.SunRsaSign
+	security.provider.3=sun.security.ec.SunEC
+	...
+	```
+
+	* add this line (replace `11` with the last number in the list plus one)
+	
+	```
+	security.provider.11=org.bouncycastle.jce.provider.BouncyCastleProvider
+	```
+
+	* copy `bcpkix-jdk15on-1.52.jar` and `bcprov-jdk15on-1.52.jar` from `[won-checkout-dir]/webofneeds/webofneeds/target/required-libs/` (which will be there after the first build) to the `[JRE]/lib/ext/` folder
 10.  Start server
 11.  Run the gulpfile outside eclipse: `npm run build` in `wepapp`, refresh the `won-owner-webapp` in eclipse (F5), click on the server –> "Publish"
