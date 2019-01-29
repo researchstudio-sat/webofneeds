@@ -300,14 +300,10 @@ function genComponentConf() {
       if (referencedMessage) {
         return referencedMessage;
       } else {
-        const foundMessages =
+        return (
           this.chatMessages &&
-          this.chatMessages.filter(msg => msg.get("remoteUri") === messageUri);
-        if (foundMessages && foundMessages.size > 0) {
-          return foundMessages.first();
-        } else {
-          return undefined;
-        }
+          this.chatMessages.find(msg => msg.get("remoteUri") === messageUri)
+        );
       }
     }
 

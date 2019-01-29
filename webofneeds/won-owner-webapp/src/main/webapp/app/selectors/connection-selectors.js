@@ -115,7 +115,5 @@ export function hasMessagesToLoad(state, connUri) {
     "messages",
   ]);
 
-  return (
-    messageProcess && messageProcess.filter(msg => msg.get("toLoad")).size > 0
-  );
+  return messageProcess && !!messageProcess.find(msg => msg.get("toLoad"));
 }

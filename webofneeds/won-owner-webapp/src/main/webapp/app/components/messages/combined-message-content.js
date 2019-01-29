@@ -211,12 +211,12 @@ function genComponentConf() {
       } else {
         connection =
           this.allConnections &&
-          this.allConnections.filter(
+          this.allConnections.find(
             conn => conn.get("remoteConnectionUri") === connectionUri
           );
 
-        if (connection && connection.size > 0) {
-          return connection.first().get("remoteNeedUri");
+        if (connection) {
+          return connection.get("remoteNeedUri");
         }
       }
       return undefined;
@@ -239,17 +239,13 @@ function genComponentConf() {
       if (connection) {
         return true;
       } else {
-        connection =
+        return (
           this.allConnections &&
-          this.allConnections.filter(
+          !!this.allConnections.find(
             conn => conn.get("remoteConnectionUri") === connectionUri
-          );
-
-        if (connection && connection.size > 0) {
-          return true;
-        }
+          )
+        );
       }
-      return false;
     }
   }
   Controller.$inject = serviceDependencies;
