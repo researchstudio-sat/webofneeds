@@ -49,7 +49,7 @@
 
 10. Depending on your java-setup it might not be able to generate keys of a relevant length. In that case, you need to download and install the [Java Cryptography Extension](http://www.oracle.com/technetwork/java/javase/downloads/jce-7-download-432124.html). There's a readme in the zip detailing its setup. At the time of this writing, this consists of copying the two jars into `$JAVA_HOME/(jre/)lib/security`. If you don't do this or the jars are in the wrong folder, you'll get an exception like `java.security.InvalidKeyException: Illegal key size` when trying to run the app.
 
-11. After building the project, copy the bouncycastle libraries (as of current state, `bcpkix-jdk15on-1.52.jar` and `bcprov-jdk15on-1.52.jar`) from the generated in your project `target/tomcat-libs/` folder into the the tomcat's `lib/` (if you miss this step, you'll see BC exceptions when running the owner/node)
+11. After building the project, copy the bouncycastle libraries (as of current state, `bcpkix-jdk15on-1.52.jar` and `bcprov-jdk15on-1.52.jar`) from the generated in your project `target/required-libs/` folder into the the tomcat's `lib/` (if you miss this step, you'll see BC exceptions when running the owner/node)
 
 **NOTE:** During the steps layed out above, I've also updated to Tomcat 8 and I haven't verified that the app also runs on Tomcat 7.
 
@@ -62,7 +62,7 @@ Deploy sripts for building and running web of needs as docker containsers (see `
 **NOTE:** Inspecting keystores using `keytool`:
 owner/node keystores are saved in bouncycastle's UBER format. Therefore, the bouncycastle libraries need to be present in the `<YOUR_JRE_DIR>/lib/ext` folder. Follow these steps:
 
-1. build the project. the bouncycastle libs are copied to `webofneeds/webofneeds/target/tomcat-libs/`
+1. build the project. the bouncycastle libs are copied to `webofneeds/webofneeds/target/required-libs/`
 2. copy the bouncycastle libs to your JRE's `bin/ext` folder
 3. use keytool to inspect the keystore, naming the `providerclass` as shown below :
 
