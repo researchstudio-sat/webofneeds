@@ -7,6 +7,7 @@ import { realEstateGroup } from "./usecases/group-real-estate";
 import { transportGroup } from "./usecases/group-transport";
 import { otherGroup } from "./usecases/group-other";
 import { personalMobilityGroup } from "./usecases/group-personal-mobility";
+import { cyclingGroup } from "./usecases/group-cycling";
 // import { customUseCase } from "./usecases/uc-custom.js";
 
 /**
@@ -60,6 +61,7 @@ export const useCaseGroups = {
   realEstate: realEstateGroup,
   transport: transportGroup,
   personalMobility: personalMobilityGroup,
+  cycling: cyclingGroup,
   other: otherGroup,
 };
 

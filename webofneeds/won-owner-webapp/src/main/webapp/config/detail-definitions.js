@@ -41,6 +41,7 @@ export const details = {
   responseToUri: basicDetails.responseToUri,
   website: basicDetails.website,
   flags: basicDetails.flags,
+  sPlanAction: basicDetails.sPlanAction,
 };
 
 export const messageDetails = {
