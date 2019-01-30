@@ -239,7 +239,7 @@ public class CreateNeedFromJobAction extends AbstractCreateNeedAction {
         seeksPart.addProperty(WON.SEEKS, SCHEMA.JOBPOSTING);
 
         needModelWrapper.addFacet("#ChatFacet", WON.CHAT_FACET_STRING);
-
+        needModelWrapper.setDefaultFacet("#ChatFacet");
         needModelWrapper.addFlag(WON.NO_HINT_FOR_ME);
         need.addProperty(WON.SEEKS, seeksPart);
 
