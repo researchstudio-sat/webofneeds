@@ -42,24 +42,6 @@ import { Generator } from "sparqljs";
    *    //comma-separated
    *    args.tags = 'Couch, furniture';
    *
-   *    // this is the default
-   *    args.facet = 'won:ChatFacet';
-   *    // the options here are:
-   *    // * won.WON.ChatFacetCompacted
-   *    // * won.WON.GroupFacetCompacted
-   *    // * won.WON.CoordinatorFacetCompacted
-   *    // * won.WON.ParticipantFacetCompacted
-   *    // * won.WON.CommentFacetCompacted
-   *    // * 'won:CommentModeratedFacet'
-   *    // * 'won:CommentUnrestrictedFacet'
-   *    // * 'won:ControlFacet'
-   *    // * 'won:BAPCCordinatorFacet'
-   *    // * 'won:BAPCParticipantFacet'
-   *    // * 'won:BACCCoordinatorFacet'
-   *    // * 'won:BACCParticipantFacet'
-   *    // * 'won:BAAtomicPCCoordinatorFacet'
-   *    // * 'won:BAAtomicCCCoordinatorFacet'
-   *
    *    args.latitude = 12.345678;
    *    args.longitude = 12.345678;
    *
@@ -231,15 +213,15 @@ import { Generator } from "sparqljs";
           : undefined,
       "@type": ["won:Need"],
       "won:seeks": seeksContentUri ? { "@id": seeksContentUri } : undefined,
-      "won:hasFacet": [
-        args.facet
-          ? args.facet
-          : { "@id": "#chatFacet", "@type": "won:ChatFacet" },
-        { "@id": "#holdableFacet", "@type": "won:HoldableFacet" },
-      ],
-      "won:hasDefaultFacet": args.facet
-        ? args.facet
-        : { "@id": "#chatFacet", "@type": "won:ChatFacet" },
+      "won:hasFacet": !(args.content && args.content.facets)
+        ? [
+            { "@id": "#chatFacet", "@type": "won:ChatFacet" },
+            { "@id": "#holdableFacet", "@type": "won:HoldableFacet" },
+          ]
+        : undefined,
+      "won:hasDefaultFacet": !(args.content && args.content.defaultFacet)
+        ? [{ "@id": "#chatFacet", "@type": "won:ChatFacet" }]
+        : undefined,
       "won:hasFlag": won.debugmode
         ? [{ "@id": "won:UsedForTesting" }]
         : undefined, //TODO: refactor this and use a won:hasFlags-Detail in the content instead
