@@ -1,5 +1,5 @@
 import won from "../../app/won-es6.js";
-import { is } from "../../app/utils.js";
+import { is, get } from "../../app/utils.js";
 import { select } from "../details/abstract.js";
 import Immutable from "immutable";
 
@@ -262,6 +262,107 @@ export const flags = {
       return prefix + value.join(", ");
     } else {
       return undefined;
+    }
+  },
+};
+
+export const facets = {
+  ...select,
+  identifier: "facets",
+  label: "Facets",
+  icon: "#ico36_detail_title", //TODO: CORRECT ICON
+  viewerComponent: undefined,
+  component: undefined,
+  multiSelect: true,
+  options: [
+    {
+      value: { "@id": "#chatFacet", "@type": "won:ChatFacet" },
+      label: "ChatFacet",
+    },
+    {
+      value: { "@id": "#groupFacet", "@type": "won:GroupFacet" },
+      label: "GroupFacet",
+    },
+    {
+      value: { "@id": "#holderFacet", "@type": "won:HolderFacet" },
+      label: "HolderFacet",
+    },
+    {
+      value: { "@id": "#holdableFacet", "@type": "won:HoldableFacet" },
+      label: "HoldableFacet",
+    },
+    {
+      value: { "@id": "#reviewFacet", "@type": "won:ReviewFacet" },
+      label: "ReviewFacet",
+    },
+  ],
+  parseToRDF: function({ value }) {
+    //TODO: PARSE TO RDF ONLY WHEN VALUE IS CONTAINING ONLY POSSIBLE ONES
+    if (value) {
+      console.debug("Facets value for parseToRDF:", value);
+      return {
+        "won:hasFacet": value,
+      };
+    }
+
+    return undefined;
+  },
+  parseFromRDF: function(jsonLDImm) {
+    const wonHasFacets = get(jsonLDImm, "won:hasFacet");
+    let facets = Immutable.Map();
+
+    if (wonHasFacets) {
+      if (Immutable.List.isList(wonHasFacets)) {
+        wonHasFacets.map(facet => {
+          facets = facets.set(get(facet, "@id"), get(facet, "@type"));
+        });
+        return facets;
+      } else {
+        return facets.set(get(wonHasFacets, "@id"), get(wonHasFacets, "@type"));
+      }
+    }
+    return facets;
+  },
+  generateHumanReadable: function({ value, includeLabel }) {
+    //TODO: Implement this so that the label shows instead of the value
+    if (value && is("Array", value) && value.length > 0) {
+      const prefix = includeLabel ? this.label + ": " : "";
+      return prefix + value.join(", ");
+    } else {
+      return undefined;
+    }
+  },
+};
+
+export const defaultFacet = {
+  ...facets,
+  identifier: "defaultFacet",
+  label: "Default Facet",
+  icon: "#ico36_detail_title", //TODO: CORRECT ICON
+  viewerComponent: undefined,
+  component: undefined,
+  multiSelect: false,
+  parseToRDF: function({ value }) {
+    if (value) {
+      //TODO: PARSE TO RDF ONLY WHEN VALUE IS ONE OF THE POSSIBLE ONES
+      console.debug("DefaultFacet value for parseToRDF:", value);
+      return {
+        "won:hasDefaultFacet": value,
+      };
+    }
+  },
+  parseFromRDF: function(jsonLDImm) {
+    const wonHasDefaultFacet = get(jsonLDImm, "won:hasDefaultFacet");
+
+    if (wonHasDefaultFacet && !Immutable.List.isList(wonHasDefaultFacet)) {
+      return wonHasDefaultFacet;
+    }
+    return undefined;
+  },
+  generateHumanReadable: function({ value, includeLabel }) {
+    //TODO: Implement this so that the label shows instead of the value
+    if (value) {
+      return includeLabel ? this.label + ": " + value : value;
     }
   },
 };
