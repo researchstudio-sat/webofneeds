@@ -73,7 +73,7 @@ async function connectReview(
 ) {
   const getFacet = persona => {
     const reviewFacet = persona
-      .get("facets")
+      .getIn(["content", "facets"])
       .filter(facetType => facetType == "won:ReviewFacet")
       .keySeq()
       .first();

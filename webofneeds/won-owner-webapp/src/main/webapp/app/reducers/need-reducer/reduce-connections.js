@@ -34,7 +34,7 @@ function addConnectionFull(state, connection) {
       const connectionUri = parsedConnection.getIn(["data", "uri"]);
 
       const facetUri = parsedConnection.get("facetUri");
-      const realFacet = need.getIn(["facets", facetUri]);
+      const realFacet = need.getIn(["content", "facets", facetUri]);
 
       parsedConnection = parsedConnection.setIn(["data", "facet"], realFacet);
 
@@ -74,7 +74,11 @@ function addConnectionFull(state, connection) {
 
       if (remoteNeed) {
         const remoteFacetUri = parsedConnection.get("remoteFacetUri");
-        const realRemoteFacet = remoteNeed.getIn(["facets", remoteFacetUri]);
+        const realRemoteFacet = remoteNeed.getIn([
+          "content",
+          "facets",
+          remoteFacetUri,
+        ]);
 
         if (realRemoteFacet) {
           parsedConnection = parsedConnection.setIn(

@@ -66,15 +66,15 @@ export function isNeed(need) {
 
 export function hasChatFacet(need) {
   return (
-    get(need, "facets") &&
-    get(need, "facets").contains(won.WON.ChatFacetCompacted)
+    getIn(need, ["content", "facets"]) &&
+    getIn(need, ["content", "facets"]).contains(won.WON.ChatFacetCompacted)
   );
 }
 
 export function hasGroupFacet(need) {
   return (
-    get(need, "facets") &&
-    get(need, "facets").contains(won.WON.GroupFacetCompacted)
+    getIn(need, ["content", "facets"]) &&
+    getIn(need, ["content", "facets"]).contains(won.WON.GroupFacetCompacted)
   );
 }
 
@@ -148,7 +148,7 @@ export function generateFullNeedFlags(needImm) {
  * Generates an array that contains all need facets, using a human readable label if available.
  */
 export function generateFullNeedFacets(needImm) {
-  const facets = needImm && needImm.get("facets");
+  const facets = needImm && needImm.getIn(["content", "facets"]);
   const facetsArray =
     facets &&
     facets
@@ -195,7 +195,7 @@ export function generateShortNeedTypesLabel(needImm) {
  * Generates an array that contains some need facets, using a human readable label if possible.
  */
 export function generateShortNeedFacets(needImm) {
-  const facets = needImm && needImm.get("facets");
+  const facets = needImm && needImm.get(["content", "facets"]);
   const facetsArray =
     facets &&
     facets

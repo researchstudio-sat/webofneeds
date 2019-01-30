@@ -22,7 +22,6 @@ export function parseNeed(jsonldNeed, isOwned) {
       identiconSvg: generateIdenticon(jsonldNeedImm),
       nodeUri: jsonldNeedImm.getIn(["won:hasWonNode", "@id"]),
       types: extractTypes(jsonldNeedImm),
-      facets: extractFacets(jsonldNeedImm.get("won:hasFacet")),
       state: extractState(jsonldNeedImm),
       matchingContexts: extractMatchingContext(jsonldNeedImm),
       heldBy: won.parseFrom(jsonldNeedImm, ["won:heldBy"], "xsd:ID"),
@@ -165,22 +164,6 @@ function extractRating(needJsonLd) {
   } else {
     return undefined;
   }
-}
-
-function extractFacets(wonHasFacets) {
-  let facets = Immutable.Map();
-
-  if (wonHasFacets) {
-    if (Immutable.List.isList(wonHasFacets)) {
-      wonHasFacets.map(facet => {
-        facets = facets.set(facet.get("@id"), facet.get("@type"));
-      });
-      return facets;
-    } else {
-      return facets.set(wonHasFacets.get("@id"), wonHasFacets.get("@type"));
-    }
-  }
-  return facets;
 }
 
 function getHumanReadableStringFromNeed(need, detailsToParse) {
