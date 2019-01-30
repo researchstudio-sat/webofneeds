@@ -24,7 +24,7 @@ const emptyDraftImm = Immutable.fromJS({
 });
 
 export function mergeInEmptyDraft(contentToMerge) {
-  if (!contentToMerge) return mergedDraftImm.toJS();
+  if (!contentToMerge) return emptyDraftImm.toJS();
   const contentToMergeImm = Immutable.fromJS(contentToMerge);
 
   const mergedDraftImm = emptyDraftImm.mergeDeep(contentToMergeImm);
