@@ -25,6 +25,7 @@ public class SCHEMA {
     public static final Property ORGANIZATION = m.createProperty(BASE_URI + "Organization");
     public static final Property JOBPOSTING = m.createProperty(BASE_URI + "JobPosting");
     public static final Property JOBLOCATION = m.createProperty(BASE_URI + "jobLocation");
+    public static final Property LOCATION = m.createProperty(BASE_URI + "location");
     public static final Property PLACE = m.createProperty(BASE_URI + "Place");
     public static final Property BASESALARY = m.createProperty(BASE_URI + "baseSalary");
     public static final Property EMPLYOMENTTYPE = m.createProperty(BASE_URI + "employmentType");
