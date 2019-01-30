@@ -34,7 +34,7 @@
             a             won:Need ;
             won:hasFacet  won:ChatFacet ;
             won:seeks     [ dc:title         "Taxi" ;
-                            won:hasLocation  [ a                   s:Place ;
+                            s:location  [ a                   s:Place ;
                                                won:hasBoundingBox  [
                                                                     won:hasNorthWestCorner  [ a            s:GeoCoordinates ;
                                                                                                s:latitude   "48.218727" ;

@@ -76,7 +76,7 @@ export const rentRealEstateOffer = {
         operations: [
           `${resultName} a won:Need.`,
           `${resultName} won:seeks ?seeks.`,
-          location && "?seeks s:location ?location.",
+          location && "?seeks (s:location|won:hasLocation) ?location.",
         ],
       },
       rent && filterPrice("?seeks", rent.amount, rent.currency, "rent"),

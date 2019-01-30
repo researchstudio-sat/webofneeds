@@ -131,6 +131,12 @@ public class WON {
     public static final Property HAS_UPPER_PRICE_LIMIT = m.createProperty(BASE_URI, "hasUpperPriceLimit");
     public static final Property HAS_CURRENCY = m.createProperty(BASE_URI, "hasCurrency");
 
+
+    /**
+     * RDF-Property for location
+     *
+     * @deprecated  Only use this to parse from existing content, create new content by using {@link won.protocol.vocabulary.SCHEMA#LOCATION} instead
+     */
     public static final Property HAS_LOCATION = m.createProperty(BASE_URI, "hasLocation");
     public static final Property HAS_BOUNDING_BOX = m.createProperty(BASE_URI, "hasBoundingBox");
     public static final Property HAS_NORTH_WEST_CORNER = m.createProperty(BASE_URI, "hasNorthWestCorner");

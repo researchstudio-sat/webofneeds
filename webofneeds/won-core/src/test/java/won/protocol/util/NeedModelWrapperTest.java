@@ -73,7 +73,7 @@ public class NeedModelWrapperTest {
         Assert.assertEquals(3, needModelWrapper.getContentPropertyStringValues(WON.HAS_TAG, null).size());
         Assert.assertEquals(2, needModelWrapper.getSeeksPropertyStringValues(WON.HAS_TAG, null).size());
         Assert.assertEquals(5, needModelWrapper.getAllContentPropertyStringValues(WON.HAS_TAG, null).size());
-        Assert.assertEquals("16.358398", needModelWrapper.getContentPropertyStringValue("won:hasLocation/s:geo/s:longitude"));
+        Assert.assertEquals("16.358398", needModelWrapper.getContentPropertyStringValue("s:location/s:geo/s:longitude"));
 
         // query the goals
         Assert.assertEquals(2, needModelWrapper.getGoals().size());
