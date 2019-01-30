@@ -16,6 +16,7 @@ export function createPersona(persona, nodeUri) {
     const publishedContentUri = nodeUri + "/need/" + getRandomWonId();
     const msgUri = nodeUri + "/event/" + getRandomWonId();
 
+    //FIXME: THIS SHOULD NOT USE ANY OF THE CODE BELOW BUT EXECUTE OUR ALREADY PRESENT NEED-CREATION WITH A GIVEN DRAFT INSTEAD
     const graph = {
       "@id": publishedContentUri,
       "@type": ["won:Need", "won:Persona"],
