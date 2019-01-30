@@ -9,12 +9,27 @@ import * as reviewDetails from "./details/review.js";
 
 import * as abstractDetails_ from "./details/abstract.js";
 export const abstractDetails = abstractDetails_; // reexport
+import Immutable from "immutable";
 
-export const emptyDraft = {
-  content: {},
+const emptyDraftImm = Immutable.fromJS({
+  content: {
+    facets: [
+      { "@id": "#chatFacet", "@type": "won:ChatFacet" },
+      { "@id": "#holdableFacet", "@type": "won:HoldableFacet" },
+    ],
+    defaultFacet: { "@id": "#chatFacet", "@type": "won:ChatFacet" },
+  },
   seeks: {},
   matchingContext: undefined,
-};
+});
+
+export function mergeInEmptyDraft(contentToMerge) {
+  if (!contentToMerge) return mergedDraftImm.toJS();
+  const contentToMergeImm = Immutable.fromJS(contentToMerge);
+
+  const mergedDraftImm = emptyDraftImm.mergeDeep(contentToMergeImm);
+  return mergedDraftImm.toJS();
+}
 
 export const details = {
   title: basicDetails.title,
@@ -42,6 +57,8 @@ export const details = {
   website: basicDetails.website,
   flags: basicDetails.flags,
   sPlanAction: basicDetails.sPlanAction,
+  facets: basicDetails.facets,
+  defaultFacet: basicDetails.defaultFacet,
 };
 
 export const messageDetails = {
