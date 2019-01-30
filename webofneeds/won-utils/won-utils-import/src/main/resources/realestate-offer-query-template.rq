@@ -58,7 +58,7 @@ SELECT DISTINCT ?result WHERE {
   
   # if we make the location query optional, it
   # just takes too long
-  ?seeks won:hasLocation ?location.
+  ?seeks (won:hasLocation|s:location) ?location.
   ?location s:geo ?location_geo.
   SERVICE geo:search {
     ?location_geo geo:search "inCircle".

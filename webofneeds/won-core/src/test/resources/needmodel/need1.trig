@@ -23,7 +23,7 @@
             dc:title                "Offering tennis lessons";
             won:hasTag              "tennis" , "lesson", "offer" ;
             dc:description  "tennis lessons for kids and adults of all levels";
-            won:hasLocation  [ a                   s:Place ;
+            s:location  [ a                   s:Place ;
                                 won:hasBoundingBox  [ won:hasNorthWestCorner  [ a              <s:GeoCoordinates> ;
                                                                                 s:latitude   "48.213814" ;
                                                                                 s:longitude  "16.340870"

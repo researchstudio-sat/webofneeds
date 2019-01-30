@@ -58,7 +58,7 @@
             won:hasFlag   won:UsedForTesting ;
             won:seeks     [ dc:description   "next 10 minutes" ;
                             dc:title         "taxi in Vienna" ;
-                            won:hasLocation  [ a                   s:Place ;
+                            s:location  [ a                   s:Place ;
                                                won:hasBoundingBox  [ won:hasNorthWestCorner  [ a            s:GeoCoordinates ;
                                                                                                s:latitude   "48.218727" ;
                                                                                                s:longitude  "16.360141"

@@ -34,7 +34,7 @@
         dc:title "Taxi in Vienna"@en ;
         dc:description "Offering taxi services in Vienna and around"@en ;
         won:hasTag "Taxi", "PersonenTransport"@de, "People transport"@en ;
-        won:hasLocation  [ a                   s:Place ;
+        s:location  [ a                   s:Place ;
                            won:hasBoundingBox  [ won:hasNorthWestCorner  [ a            s:GeoCoordinates ;
                                                                            s:latitude   "48.199528" ;
                                                                            s:longitude  "16.355209"
@@ -54,7 +54,7 @@
 		won:seeks [
             won:seeks [
                 dc:title "Taxi";
-                won:hasLocation [
+                s:location [
                     s:geo [
                       a s:GeoCoordinates ;
                       s:latitude   "48.209269" ;
@@ -67,7 +67,7 @@
 		won:seeks [
             won:seeks [
               dc:description "Taxi";
-              won:hasLocation [
+              s:location [
                 s:geo [
                   a s:GeoCoordinates ;
                   s:latitude   "48.209269" ;
@@ -80,7 +80,7 @@
 		won:seeks [
             won:seeks [
                 won:hasTag "Taxi";
-                won:hasLocation [
+                s:location [
                 s:geo [
                   a s:GeoCoordinates ;
                   s:latitude   "48.209269" ;

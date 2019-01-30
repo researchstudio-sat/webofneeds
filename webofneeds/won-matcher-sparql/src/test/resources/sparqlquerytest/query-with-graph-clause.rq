@@ -14,7 +14,7 @@ WHERE
                       <http://schema.org/longitude>  "16.821063" .
             ?80cc5cfe  <http://schema.org/numberOfRooms>  "3"^^<http://www.w3.org/2001/XMLSchema#float> ;
                       <http://purl.org/dc/elements/1.1/title>  "Sample Real Estate Need 532" ;
-                      <http://purl.org/webofneeds/model#hasLocation>  ?dc9b3dfc ;
+                      <http://schema.org/location>  ?dc9b3dfc ;
                       <http://purl.org/dc/elements/1.1/description>  "This is a sample offer that was automatically generated." ;
                       <http://schema.org/amenityFeature>  ?2a6ba3e6 ;
                       <http://purl.org/webofneeds/model#hasTag>  "RentOutRealEstate" ;
