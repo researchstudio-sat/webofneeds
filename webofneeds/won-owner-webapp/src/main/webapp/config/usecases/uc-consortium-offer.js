@@ -1,7 +1,7 @@
 /**
  * Created by fsuda on 18.09.2018.
  */
-import { details, emptyDraft } from "../detail-definitions.js";
+import { details, mergeInEmptyDraft } from "../detail-definitions.js";
 import { interestsDetail, skillsDetail } from "../details/person.js";
 import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-utils.js";
 
@@ -11,12 +11,13 @@ export const consortiumOffer = {
   icon: "#ico36_uc_consortium-offer",
   doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
-    ...emptyDraft,
-    content: {
-      title: "Offering a slot in a project consortium",
-      tags: ["offer-consortium"],
-      searchString: "search-consortium",
-    },
+    ...mergeInEmptyDraft({
+      content: {
+        title: "Offering a slot in a project consortium",
+        tags: ["offer-consortium"],
+        searchString: "search-consortium",
+      },
+    }),
   },
   details: {
     title: { ...details.title },

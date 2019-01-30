@@ -1,4 +1,4 @@
-import { details, emptyDraft } from "../detail-definitions.js";
+import { details, mergeInEmptyDraft } from "../detail-definitions.js";
 import {
   vicinityScoreSubQuery,
   sparqlQuery,
@@ -16,13 +16,18 @@ export const lunchPlan = {
   icon: undefined,
   doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
-    ...emptyDraft,
-    content: {
-      title: "Let's go get lunch!",
-      sPlanAction: { "@id": "http://dbpedia.org/resource/Lunch" },
-    },
-    seeks: {},
-    facet: { "@id": "#groupFacet", "@type": won.WON.GroupFacet },
+    ...mergeInEmptyDraft({
+      content: {
+        title: "Let's go get lunch!",
+        sPlanAction: { "@id": "http://dbpedia.org/resource/Lunch" },
+        facets: [
+          { "@id": "#groupFacet", "@type": won.WON.GroupFacet },
+          { "@id": "#holdableFacet", "@type": won.WON.HoldableFacet },
+        ],
+        defaultFacet: { "@id": "#groupFacet", "@type": won.WON.GroupFacet },
+      },
+      seeks: {},
+    }),
   },
   details: {
     title: { ...details.title },

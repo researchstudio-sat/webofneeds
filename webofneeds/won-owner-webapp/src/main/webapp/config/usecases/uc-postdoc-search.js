@@ -1,7 +1,7 @@
 /**
  * Created by fsuda on 18.09.2018.
  */
-import { details, emptyDraft } from "../detail-definitions.js";
+import { details, mergeInEmptyDraft } from "../detail-definitions.js";
 import { interestsDetail, skillsDetail } from "../details/person.js";
 import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-utils.js";
 
@@ -11,12 +11,13 @@ export const postdocSearch = {
   icon: "#ico36_uc_postdoc",
   doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
-    ...emptyDraft,
-    content: {
-      title: "I'm looking for a PostDoc position!",
-      tags: ["search-postdoc"],
-      searchString: "offer-postdoc",
-    },
+    ...mergeInEmptyDraft({
+      content: {
+        title: "I'm looking for a PostDoc position!",
+        tags: ["search-postdoc"],
+        searchString: "offer-postdoc",
+      },
+    }),
   },
   details: {
     title: { ...details.title },

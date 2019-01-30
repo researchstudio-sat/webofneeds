@@ -1,7 +1,7 @@
 /**
  * Created by fsuda on 18.09.2018.
  */
-import { details, emptyDraft } from "../detail-definitions.js";
+import { details, mergeInEmptyDraft } from "../detail-definitions.js";
 import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-utils.js";
 
 export const complain = {
@@ -11,15 +11,16 @@ export const complain = {
   timeToLiveMillisDefault: 1000 * 60 * 60 * 24 * 30,
   doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
-    ...emptyDraft,
-    content: {
-      type: "won:Complaint",
-      title: "WTF?",
-      tags: ["wtf"],
-    },
-    seeks: {
-      type: "won:HandleComplaint",
-    },
+    ...mergeInEmptyDraft({
+      content: {
+        type: "won:Complaint",
+        title: "WTF?",
+        tags: ["wtf"],
+      },
+      seeks: {
+        type: "won:HandleComplaint",
+      },
+    }),
   },
   details: {
     title: { ...details.title },

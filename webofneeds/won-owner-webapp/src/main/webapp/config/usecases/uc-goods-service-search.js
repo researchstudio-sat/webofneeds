@@ -2,7 +2,7 @@
  * Created by kweinberger on 06.12.2018.
  */
 
-import { details, emptyDraft } from "../detail-definitions.js";
+import { details, mergeInEmptyDraft } from "../detail-definitions.js";
 import won from "../../app/won-es6.js";
 import { getIn, is } from "../../app/utils.js";
 import {
@@ -18,13 +18,14 @@ export const goodsServiceSearch = {
   label: "Look for something",
   icon: "#ico36_plus",
   draft: {
-    ...emptyDraft,
-    content: {
-      type: "s:Demand",
-    },
-    seeks: {
-      type: "s:Offer",
-    },
+    ...mergeInEmptyDraft({
+      content: {
+        type: "s:Demand",
+      },
+      seeks: {
+        type: "s:Offer",
+      },
+    }),
   },
   seeksDetails: {
     title: { ...details.title },

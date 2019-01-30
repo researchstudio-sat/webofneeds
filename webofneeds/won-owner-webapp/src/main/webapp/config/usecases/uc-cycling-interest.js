@@ -1,4 +1,4 @@
-import { details, emptyDraft } from "../detail-definitions.js";
+import { details, mergeInEmptyDraft } from "../detail-definitions.js";
 import {
   vicinityScoreSubQuery,
   sparqlQuery,
@@ -14,14 +14,15 @@ export const cyclingInterest = {
   label: "Add Cycling Interest",
   icon: undefined,
   draft: {
-    ...emptyDraft,
-    content: {
-      type: "won:Interest",
-      title: "I am interested in cycling!",
-    },
-    seeks: {
-      sPlanAction: { "@id": "http://dbpedia.org/resource/Cycling" },
-    },
+    ...mergeInEmptyDraft({
+      content: {
+        type: "won:Interest",
+        title: "I am interested in cycling!",
+      },
+      seeks: {
+        sPlanAction: { "@id": "http://dbpedia.org/resource/Cycling" },
+      },
+    }),
   },
   details: {
     title: { ...details.title },

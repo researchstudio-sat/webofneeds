@@ -1,4 +1,4 @@
-import { details, emptyDraft } from "../detail-definitions.js";
+import { details, mergeInEmptyDraft } from "../detail-definitions.js";
 import {
   vicinityScoreSubQuery,
   sparqlQuery,
@@ -16,13 +16,21 @@ export const cyclingPlan = {
   icon: undefined,
   doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
-    ...emptyDraft,
-    content: {
-      title: "Let's go for a bike ride!",
-      sPlanAction: { "@id": "http://dbpedia.org/resource/Cycling" },
-    },
-    seeks: {},
-    facet: { "@id": "#groupFacet", "@type": won.WON.GroupFacet },
+    ...mergeInEmptyDraft({
+      content: {
+        title: "Let's go for a bike ride!",
+        sPlanAction: { "@id": "http://dbpedia.org/resource/Cycling" },
+        facets: [
+          { "@id": "#groupFacet", "@type": won.WON.GroupFacet },
+          {
+            "@id": "#holdableFacet",
+            "@type": won.WON.HoldableFacet,
+          },
+        ],
+        defaultFacet: { "@id": "#groupFacet", "@type": won.WON.GroupFacet },
+      },
+      seeks: {},
+    }),
   },
   details: {
     title: { ...details.title },
