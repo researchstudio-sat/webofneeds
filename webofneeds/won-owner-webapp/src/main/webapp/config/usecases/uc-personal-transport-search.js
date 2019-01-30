@@ -94,7 +94,7 @@ export const personalTransportSearch = {
         filterAndJoin(
           [
             location &&
-              `${resultName} a s:TaxiService . ${resultName} s:location ?location .`,
+              `${resultName} a s:TaxiService . ${resultName} (s:location|won:hasLocation) ?location .`,
             location && locationFilter.operations.join(" "),
           ],
           " "

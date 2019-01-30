@@ -24,7 +24,10 @@ export const location = {
     };
   },
   parseFromRDF: function(jsonLDImm) {
-    const jsonldLocation = jsonLDImm && jsonLDImm.get("s:location");
+    const jsonldLocation =
+      jsonLDImm &&
+      jsonLDImm.get("s:location") &&
+      jsonLDImm.get("won:hasLocation");
     return parseSPlace(jsonldLocation);
   },
   generateHumanReadable: function({ value, includeLabel }) {
@@ -279,7 +282,6 @@ function genBoundingBox({ nwCorner, seCorner, baseUri }) {
 }
 
 function parseSPlace(jsonldLocation) {
-  // const jsonldLocation = jsonLDImm && jsonLDImm.get("s:location");
   if (!jsonldLocation) return undefined; // NO LOCATION PRESENT
 
   const location = parsePlaceLeniently(jsonldLocation);

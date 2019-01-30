@@ -62,7 +62,7 @@ export const rehearsalRoomSearch = {
         operations: [
           `${resultName} a won:Need.`,
           `${resultName} rdf:type won:RehearsalRoomRentOffer.`,
-          location && `${resultName} s:location ?location.`,
+          location && `${resultName} (won:hasLocation|s:location) ?location.`,
         ],
       },
       rentRange &&
