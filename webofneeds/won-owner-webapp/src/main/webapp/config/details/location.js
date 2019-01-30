@@ -26,8 +26,7 @@ export const location = {
   parseFromRDF: function(jsonLDImm) {
     const jsonldLocation =
       jsonLDImm &&
-      jsonLDImm.get("s:location") &&
-      jsonLDImm.get("won:hasLocation");
+      (jsonLDImm.get("s:location") || jsonLDImm.get("won:hasLocation"));
     return parseSPlace(jsonldLocation);
   },
   generateHumanReadable: function({ value, includeLabel }) {
