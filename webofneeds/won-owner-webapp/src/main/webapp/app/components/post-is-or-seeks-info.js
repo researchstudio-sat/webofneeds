@@ -72,10 +72,10 @@ function genComponentConf() {
     }
 
     getDetailContent(key) {
-      if (key != title.identifier) {
-        return key && this.details && this.details.get(key);
-      } else {
+      if (this.branch == "content" && key == title.identifier) {
         return undefined;
+      } else {
+        return key && this.details && this.details.get(key);
       }
     }
   }
