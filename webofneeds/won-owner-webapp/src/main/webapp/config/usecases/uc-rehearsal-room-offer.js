@@ -80,7 +80,7 @@ export const rehearsalRoomOffer = {
           `${resultName} a won:Need.`,
           `${resultName} won:seeks ?seeks.`,
           `${resultName} rdf:type won:RehearsalRoomRentDemand.`,
-          location && "?seeks won:hasLocation ?location.",
+          location && "?seeks (won:hasLocation|s:location) ?location.",
         ],
       },
       rent && filterPrice("?seeks", rent.amount, rent.currency, "rent"),

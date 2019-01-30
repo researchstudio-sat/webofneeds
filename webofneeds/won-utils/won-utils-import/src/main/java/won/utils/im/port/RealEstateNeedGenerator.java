@@ -159,7 +159,7 @@ public class RealEstateNeedGenerator {
         Resource schema_Place = model.createResource("http://schema.org/Place");
         Resource schema_GeoCoordinates = model.createResource("http://schema.org/GeoCoordinates");
 
-        resource.addProperty(WON.HAS_LOCATION, locationResource);
+        resource.addProperty(SCHEMA.LOCATION, locationResource);
         locationResource.addProperty(RDF.type, schema_Place);
         locationResource.addProperty(SCHEMA.NAME, name);
         locationResource.addProperty(SCHEMA.GEO, geoResource);

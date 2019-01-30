@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
+import won.protocol.vocabulary.WONMSG;
 
 
 
@@ -55,6 +56,6 @@ public class WonMessageTest {
         Assert.assertEquals(URI.create("https://satvm05.researchstudio.at/won/resource/connection/zy478j5k7roa38f2ao9l"), msg.getSenderURI());
         Assert.assertEquals(URI.create("https://satvm05.researchstudio.at/won/resource/connection/nz3dg71sop2v5f82j3lm"), msg.getReceiverURI());
         Assert.assertEquals(URI.create("https://satvm05.researchstudio.at/won/resource/event/e5syo59w9t3if0y428r8"), msg.getForwardedMessageURI());
-        
+        Assert.assertEquals(WonMessageDirection.FROM_EXTERNAL, msg.getEnvelopeType());
     }
 }

@@ -1,7 +1,7 @@
 import won from "../../app/won-es6.js";
 import { is } from "../../app/utils.js";
-
 import { select } from "../details/abstract.js";
+import Immutable from "immutable";
 
 export const title = {
   identifier: "title",
@@ -263,5 +263,57 @@ export const flags = {
     } else {
       return undefined;
     }
+  },
+};
+
+export const sPlanAction = {
+  identifier: "sPlanAction",
+  label: "Plan",
+  icon: "#ico36_detail_title",
+  placeholder: "What? (Short title shown in lists)",
+  parseToRDF: function({ value }) {
+    const val = value ? value : undefined;
+    if (!val) {
+      return;
+    }
+    return {
+      "@type": "s:PlanAction",
+      "s:object": {
+        "@type": "s:Event",
+        "s:about": value,
+      },
+    };
+  },
+  parseFromRDF: function(jsonLDImm) {
+    const types = jsonLDImm.getIn(["@type"]);
+    if (
+      (Immutable.List.isList(types) && types.includes("s:PlanAction")) ||
+      types === "s:PlanAction"
+    ) {
+      const planObjs = jsonLDImm.getIn(jsonLDImm, ["s:object"]);
+      let plns = [];
+
+      if (Immutable.List.isList(planObjs)) {
+        planObjs &&
+          planObjs.forEach(planObj => {
+            plns.push(won.parseFrom(planObj, ["s:about"], "xsd:ID"));
+          });
+      } else {
+        let pln = won.parseFrom(planObjs, ["s:about"], "xsd:ID");
+        if (pln) {
+          return Immutable.fromJS([pln]);
+        }
+      }
+      if (plns.length > 0) {
+        return Immutable.fromJS(plns);
+      }
+      return undefined;
+    }
+  },
+  generateHumanReadable: function({ value, includeLabel }) {
+    if (value) {
+      return includeLabel ? this.label + ": " + value : value;
+    }
+    return undefined;
   },
 };

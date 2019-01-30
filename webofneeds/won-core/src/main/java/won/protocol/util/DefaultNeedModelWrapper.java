@@ -9,6 +9,7 @@ import org.apache.jena.vocabulary.DC;
 import won.protocol.model.Coordinate;
 import won.protocol.model.NeedGraphType;
 import won.protocol.vocabulary.WON;
+import won.protocol.vocabulary.SCHEMA;
 
 import java.net.URI;
 import java.util.Collection;
@@ -121,7 +122,10 @@ public class DefaultNeedModelWrapper extends NeedModelWrapper {
         Property longitudeProperty = needModel.createProperty("http://schema.org/", "longitude");
         Property latitudeProperty = needModel.createProperty("http://schema.org/", "latitude");
 
-        RDFNode locationNode = RdfUtils.findOnePropertyFromResource(needModel, contentNode, WON.HAS_LOCATION);
+        RDFNode locationNode = RdfUtils.findOnePropertyFromResource(needModel, contentNode, SCHEMA.LOCATION);
+        if(locationNode == null) {
+            locationNode = RdfUtils.findOnePropertyFromResource(needModel, contentNode, WON.HAS_LOCATION);
+        }
         RDFNode geoNode = (locationNode != null && locationNode.isResource()) ? RdfUtils.findOnePropertyFromResource(needModel, locationNode.asResource(), geoProperty) : null;
         RDFNode lat = (geoNode != null && geoNode.isResource()) ? RdfUtils.findOnePropertyFromResource(needModel, geoNode.asResource(), latitudeProperty) : null;
         RDFNode lon = (geoNode != null && geoNode.isResource()) ? RdfUtils.findOnePropertyFromResource(needModel, geoNode.asResource(), longitudeProperty) : null;
