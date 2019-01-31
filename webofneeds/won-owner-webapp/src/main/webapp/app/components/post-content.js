@@ -134,8 +134,8 @@ function genComponentConf() {
         //TODO it will be possible to have more than one seeks
         const seeks = get(post, "seeks");
 
-        const hasContent = content && content.size > 0;
-        const hasSeeksBranch = seeks && seeks.size > 0;
+        const hasContent = this.hasVisibleDetails(content);
+        const hasSeeksBranch = this.hasVisibleDetails(seeks);
 
         const groupMembers = get(post, "groupMembers");
 
@@ -182,6 +182,21 @@ function genComponentConf() {
 
     toggleShowGeneral() {
       this.needs__toggleGeneralInfo(this.postUri);
+    }
+
+    /**
+     * This function checks if there is at least one detail present that is displayable
+     */
+    hasVisibleDetails(contentBranchImm) {
+      return (
+        contentBranchImm &&
+        contentBranchImm.find(
+          (detailValue, detailKey) =>
+            detailKey != "type" &&
+            detailKey != "facets" &&
+            detailKey != "defaultFacet"
+        )
+      );
     }
   }
 
