@@ -21,7 +21,6 @@ export function parseNeed(jsonldNeed, isOwned) {
       uri: jsonldNeedImm.get("@id"),
       identiconSvg: generateIdenticon(jsonldNeedImm),
       nodeUri: jsonldNeedImm.getIn(["won:hasWonNode", "@id"]),
-      types: extractTypes(jsonldNeedImm),
       state: extractState(jsonldNeedImm),
       matchingContexts: extractMatchingContext(jsonldNeedImm),
       heldBy: won.parseFrom(jsonldNeedImm, ["won:heldBy"], "xsd:ID"),
@@ -130,18 +129,6 @@ function generateIdenticon(needJsonLd) {
     format: "svg",
   });
   return idc.toString();
-}
-
-function extractTypes(needJsonLd) {
-  const types = (rawTypes => {
-    if (Immutable.List.isList(rawTypes)) {
-      return Immutable.Set(rawTypes);
-    } else {
-      return Immutable.Set([rawTypes]);
-    }
-  })(needJsonLd.get("@type"));
-
-  return types;
 }
 
 function extractCreationDate(needJsonLd) {
