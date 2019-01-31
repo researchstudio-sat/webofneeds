@@ -11,6 +11,7 @@ import { connect2Redux } from "../won-utils.js";
 import { actionCreators } from "../actions/actions.js";
 
 import "style/_post-is-or-seeks-info.scss";
+import { title } from "../../config/details/basic.js";
 
 //TODO can't inject $scope with the angular2-router, preventing redux-cleanup
 const serviceDependencies = [
@@ -71,7 +72,11 @@ function genComponentConf() {
     }
 
     getDetailContent(key) {
-      return key && this.details && this.details.get(key);
+      if (this.branch == "content" && key == title.identifier) {
+        return undefined;
+      } else {
+        return key && this.details && this.details.get(key);
+      }
     }
   }
   Controller.$inject = serviceDependencies;
