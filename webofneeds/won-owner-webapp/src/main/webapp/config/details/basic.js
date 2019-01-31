@@ -266,6 +266,43 @@ export const flags = {
   },
 };
 
+export const type = {
+  ...select,
+  identifier: "type",
+  label: "Types",
+  icon: "#ico36_detail_title", //TODO: CORRECT ICON
+  viewerComponent: undefined, //this is so we do not display this with a detail-viewer,
+  component: undefined, //this is so we do not display the component as a detail-picker, but are still able to use the parseToRDF, parseFromRDF functions
+  multiSelect: true,
+  options: [
+    //TODO: Implement options
+  ],
+  parseToRDF: function({ value }) {
+    if (!value) {
+      return;
+    } else if (is("Array", value)) {
+      const idFlags = value.map(item => {
+        return item;
+      });
+      return { "@type": idFlags };
+    } else {
+      return { "@type": value };
+    }
+  },
+  parseFromRDF: function(jsonLDImm) {
+    return won.parseListFrom(jsonLDImm, ["@type"]);
+  },
+  generateHumanReadable: function({ value, includeLabel }) {
+    //TODO: Implement this so that the label shows instead of the value
+    if (value && is("Array", value) && value.length > 0) {
+      const prefix = includeLabel ? this.label + ": " : "";
+      return prefix + value.join(", ");
+    } else {
+      return undefined;
+    }
+  },
+};
+
 export const facets = {
   ...select,
   identifier: "facets",
