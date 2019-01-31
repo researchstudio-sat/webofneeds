@@ -81,6 +81,7 @@ export const details = {
   sPlanAction: basicDetails.sPlanAction,
   facets: basicDetails.facets,
   defaultFacet: basicDetails.defaultFacet,
+  type: basicDetails.type,
 };
 
 export const messageDetails = {
