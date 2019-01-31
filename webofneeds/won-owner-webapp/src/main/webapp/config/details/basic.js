@@ -290,7 +290,15 @@ export const type = {
     }
   },
   parseFromRDF: function(jsonLDImm) {
-    return won.parseListFrom(jsonLDImm, ["@type"]);
+    const types = (rawTypes => {
+      if (Immutable.List.isList(rawTypes)) {
+        return Immutable.Set(rawTypes);
+      } else {
+        return Immutable.Set([rawTypes]);
+      }
+    })(jsonLDImm.get("@type"));
+
+    return types;
   },
   generateHumanReadable: function({ value, includeLabel }) {
     //TODO: Implement this so that the label shows instead of the value
