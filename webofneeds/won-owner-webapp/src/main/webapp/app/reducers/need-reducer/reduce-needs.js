@@ -178,7 +178,7 @@ export function addNeedInCreation(needs, needInCreation, needUri) {
     }
 
     need = need.set("humanReadable", title);
-
+    need = need.set("content", Immutable.Map());
     newState = needs.setIn([needUri], need);
   } else {
     console.error("Tried to add invalid need-object: ", needInCreation);
