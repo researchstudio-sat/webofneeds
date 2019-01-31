@@ -321,6 +321,8 @@ function genComponentConf() {
             useCaseGroup: undefined,
             connectionUri: undefined,
             groupPostAdminUri: undefined,
+            fromNeedUri: undefined,
+            mode: undefined,
           });
         }
       } else {
