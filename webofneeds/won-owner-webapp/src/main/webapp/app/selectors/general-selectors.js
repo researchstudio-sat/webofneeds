@@ -21,7 +21,7 @@ export const getNonOwnedNeeds = state =>
 export function getPosts(state) {
   const needs = getNeeds(state);
   return needs.filter(need => {
-    if (!need.get("types")) return true;
+    if (!need.getIn(["content", "type"])) return true;
 
     return isNeed(need) && !isPersona(need);
   });

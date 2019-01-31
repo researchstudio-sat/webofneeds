@@ -163,11 +163,13 @@ export default function(allNeedsInState = initialState, action = {}) {
           isBeingCreated: true,
           uri: action.payload.needUri,
           creationDate: new Date(),
-          types: Immutable.Set(["won:Need", "won:Persona"]),
+          content: {
+            type: Immutable.Set(["won:Need", "won:Persona"]),
+            facets: Immutable.Map(),
+          },
           connections: Immutable.Map(),
           holds: Immutable.List(),
           rating: { aggregateRating: 0.0, reviewCount: 0 },
-          facets: Immutable.Map(),
         })
       );
     }
