@@ -12,7 +12,9 @@ won-post-content {
     overflow: auto;
     word-wrap: break-word;
 
-    won-labelled-hr span {
+    won-labelled-hr .wlh__label,
+    won-labelled-hr .wlh__label__text,
+    won-labelled-hr .wlh__label__carret {
       background-color: white;
     }
 
