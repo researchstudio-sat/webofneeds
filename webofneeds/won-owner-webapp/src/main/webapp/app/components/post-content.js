@@ -16,6 +16,7 @@ import { isPersona } from "../need-utils.js";
 import { getConnectionUriFromRoute } from "../selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
+import ngAnimate from "angular-animate";
 
 import "style/_post-content.scss";
 import "style/_rdflink.scss";
@@ -52,9 +53,6 @@ function genComponentConf() {
         </div>
         </div>
         <div class="post-content" ng-if="!self.postLoading && !self.postFailedToLoad">
-          <won-gallery ng-if="self.post.get('hasImages')">
-          </won-gallery>
-
           <!-- DETAIL INFORMATION -->
           <won-post-is-or-seeks-info branch="::'content'" ng-if="self.hasContent" post-uri="self.post.get('uri')"></won-post-is-or-seeks-info>
           <won-labelled-hr label="::'Search'" class="cp__labelledhr" ng-show="self.hasContent && self.hasSeeksBranch"></won-labelled-hr>
@@ -89,8 +87,8 @@ function genComponentConf() {
           </div>
 
           <!-- GENERAL INFORMATION -->
-          <won-labelled-hr label="::'General Information'" class="cp__labelledhr"></won-labelled-hr>
-          <won-post-content-general post-uri="self.post.get('uri')"></won-post-content-general>
+          <won-labelled-hr ng-click="self.toggleShowGeneral()" arrow="self.showGeneral ? 'up' : 'down'" label="::'General Information'" class="cp__labelledhr"></won-labelled-hr>
+          <won-post-content-general class="post-collapsible-general" ng-if="self.showGeneral" post-uri="self.post.get('uri')"></won-post-content-general>
           <!-- RDF REPRESENTATION -->
           <div class="post-info__content__rdf" ng-if="self.shouldShowRdf">
             <h2 class="post-info__heading">
@@ -163,6 +161,12 @@ function genComponentConf() {
           shouldShowRdf: state.getIn(["view", "showRdf"]),
           fromConnection: !!openConnectionUri,
           openConnectionUri,
+          showGeneral: state.getIn([
+            "view",
+            "needs",
+            this.postUri,
+            "showGeneralInfo",
+          ]),
         };
       };
       connect2Redux(selectFromState, actionCreators, ["self.postUri"], this);
@@ -174,6 +178,10 @@ function genComponentConf() {
       if (this.postUri && this.postFailedToLoad) {
         this.needs__fetchUnloadedNeed(this.postUri);
       }
+    }
+
+    toggleShowGeneral() {
+      this.needs__toggleGeneralInfo(this.postUri);
     }
   }
 
@@ -192,6 +200,7 @@ function genComponentConf() {
 
 export default angular
   .module("won.owner.components.postContent", [
+    ngAnimate,
     postIsOrSeeksInfoModule,
     labelledHrModule,
     postContentGeneral,

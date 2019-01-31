@@ -12,9 +12,6 @@ const serviceDependencies = ["$scope", "$ngRedux", "$element"];
 function genComponentConf() {
   let template = `
         <div class="psl__content">
-            <p class="psl__text" ng-if="self.post.get('connections').size == 0 && self.post.get('isOwned')">
-                Your posting has no connections yet. Consider sharing the link below in social media, or wait for matchers to connect you with others.
-            </p>
             <p class="psl__text" ng-if="(self.post.get('connections').size != 0 && self.post.get('isOwned')) || !self.post.get('isOwned')">
                 Know someone who might also be interested in this posting? Consider sharing the link below in social media.
             </p>
