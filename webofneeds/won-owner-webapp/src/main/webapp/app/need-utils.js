@@ -246,3 +246,59 @@ export function generateShortNeedFlags(needImm) {
       .filter(flag => flag.length > 0);
   return flagsArray;
 }
+
+export function getFacetsWithKeysReset(needImm) {
+  const facets = getIn(needImm, ["content", "facet"]);
+
+  if (facets) {
+    return getFacetKeysReset(facets);
+  }
+  return undefined;
+}
+
+export function getDefaultFacetWithKeyReset(needImm) {
+  const defaultFacet = getIn(needImm, ["content", "defaultFacet"]);
+
+  if (defaultFacet) {
+    return getFacetKeysReset(defaultFacet);
+  }
+  return undefined;
+}
+
+export function getSeeksFacetsWithKeysReset(needImm) {
+  const facets = getIn(needImm, ["seeks", "facet"]);
+
+  if (facets) {
+    return getFacetKeysReset(facets);
+  }
+  return undefined;
+}
+
+export function getSeeksDefaultFacetWithKeyReset(needImm) {
+  const defaultFacet = getIn(needImm, ["seeks", "defaultFacet"]);
+
+  if (defaultFacet) {
+    return getFacetKeysReset(defaultFacet);
+  }
+  return undefined;
+}
+
+function getFacetKeysReset(facetsImm) {
+  return facetsImm.mapKeys((key, value) => {
+    if (value === "won:ChatFacet") {
+      return "#chatFacet";
+    }
+    if (value === "won:GroupFacet") {
+      return "#groupFacet";
+    }
+    if (value === "won:HolderFacet") {
+      return "#holderFacet";
+    }
+    if (value === "won:HoldableFacet") {
+      return "#holdableFacet";
+    }
+    if (value === "won:ReviewFacet") {
+      return "#reviewFacet";
+    }
+  });
+}
