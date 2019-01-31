@@ -22,6 +22,11 @@ const initialState = Immutable.fromJS({
     linkCopied: false,
   },
   showSlideIns: true,
+  needs: new Immutable.Map(),
+});
+
+const initialNeedState = Immutable.fromJS({
+  showGeneralInfo: false,
 });
 
 export default function(viewState = initialState, action = {}) {
@@ -133,6 +138,13 @@ export default function(viewState = initialState, action = {}) {
       return viewState
         .setIn(["anonymousSlideIn", "linkCopied"], true)
         .setIn(["anonymousSlideIn", "linkSent"], false);
+
+    case actionTypes.needs.toggleGeneralInfo:
+      return viewState.updateIn(
+        ["needs", action.payload],
+        initialNeedState,
+        needState => needState.update("showGeneralInfo", show => !show)
+      );
 
     default:
       return viewState;
