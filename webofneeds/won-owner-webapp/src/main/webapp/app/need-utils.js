@@ -57,11 +57,17 @@ export function isDirectResponseNeed(need) {
 }
 
 export function isPersona(need) {
-  return get(need, "types") && get(need, "types").has("won:Persona");
+  return (
+    getIn(need, ["content", "type"]) &&
+    getIn(need, ["content", "type"]).has("won:Persona")
+  );
 }
 
 export function isNeed(need) {
-  return get(need, "types") && get(need, "types").has("won:Need");
+  return (
+    getIn(need, ["content", "type"]) &&
+    getIn(need, ["content", "type"]).has("won:Need")
+  );
 }
 
 export function hasChatFacet(need) {
@@ -84,7 +90,10 @@ export function hasGroupFacet(need) {
  * @returns {*|boolean}
  */
 export function isSearchNeed(need) {
-  return get(need, "types") && get(need, "types").has("won:PureSearch");
+  return (
+    getIn(need, ["content", "type"]) &&
+    getIn(need, ["content", "type"]).has("won:PureSearch")
+  );
 }
 
 /**
@@ -116,10 +125,10 @@ export function generateNeedMatchingContext(needImm) {
  * TODO: We Do not store a single type anymore but a list of types... adapt accordingly
  */
 export function generateFullNeedTypesLabel(needImm) {
-  const types = get(needImm, "types");
+  const types = getIn(needImm, ["content", "type"]);
 
   //TODO: GENERATE CORRECT LABEL
-  //self.labels.type[self.need.get('type')]
+  //self.labels.type[self.need.getIn(['content','type'])]
   let label = "";
 
   if (types && types.size > 0) {
@@ -164,7 +173,7 @@ export function generateFullNeedFacets(needImm) {
  * @param {*} needImm the need as saved in the state
  */
 export function generateShortNeedTypesLabel(needImm) {
-  const needTypes = needImm && needImm.get("types");
+  const needTypes = needImm && needImm.getIn(["content", "type"]);
 
   let label = "";
 
