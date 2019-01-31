@@ -20,14 +20,11 @@ export const cyclingPlan = {
       content: {
         title: "Let's go for a bike ride!",
         sPlanAction: { "@id": "http://dbpedia.org/resource/Cycling" },
-        facets: [
-          { "@id": "#groupFacet", "@type": won.WON.GroupFacet },
-          {
-            "@id": "#holdableFacet",
-            "@type": won.WON.HoldableFacet,
-          },
-        ],
-        defaultFacet: { "@id": "#groupFacet", "@type": won.WON.GroupFacet },
+        facets: {
+          "#groupFacet": won.WON.GroupFacet,
+          "#holdableFacet": won.WON.HoldableFacet,
+        },
+        defaultFacet: { "#groupFacet": won.WON.GroupFacet },
       },
       seeks: {},
     }),
