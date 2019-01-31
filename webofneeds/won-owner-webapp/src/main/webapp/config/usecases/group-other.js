@@ -20,11 +20,11 @@ export const otherGroup = {
       draft: {
         ...mergeInEmptyDraft({
           content: {
-            facets: [
-              { "@id": "#groupFacet", "@type": won.WON.GroupFacet },
-              { "@id": "#holdableFacet", "@type": won.WON.HoldableFacet },
-            ],
-            defaultFacet: { "@id": "#groupFacet", "@type": won.WON.GroupFacet },
+            facets: {
+              "#groupFacet": won.WON.GroupFacet,
+              "#holdableFacet": won.WON.HoldableFacet,
+            },
+            defaultFacet: { "#groupFacet": won.WON.GroupFacet },
           },
         }),
       },
