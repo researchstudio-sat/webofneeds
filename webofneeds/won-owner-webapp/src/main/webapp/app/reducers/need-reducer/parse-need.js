@@ -231,21 +231,23 @@ function generateHumanReadableArray(presentDetails, detailsToParse) {
   let humanReadableArray = [];
   if (presentDetails) {
     for (const key in presentDetails) {
-      const detailToParse = detailsToParse[key];
-      if (detailToParse) {
-        const detailValue = presentDetails[key];
-        const detailValueJS =
-          detailValue && Immutable.Iterable.isIterable(detailValue)
-            ? detailValue.toJS()
-            : detailValue;
+      if (!(key === "facets" || key === "type" || key === "defaultFacet")) {
+        const detailToParse = detailsToParse[key];
+        if (detailToParse) {
+          const detailValue = presentDetails[key];
+          const detailValueJS =
+            detailValue && Immutable.Iterable.isIterable(detailValue)
+              ? detailValue.toJS()
+              : detailValue;
 
-        if (detailValueJS) {
-          humanReadableArray.push(
-            detailToParse.generateHumanReadable({
-              value: detailValueJS,
-              includeLabel: true,
-            })
-          );
+          if (detailValueJS) {
+            humanReadableArray.push(
+              detailToParse.generateHumanReadable({
+                value: detailValueJS,
+                includeLabel: true,
+              })
+            );
+          }
         }
       }
     }
