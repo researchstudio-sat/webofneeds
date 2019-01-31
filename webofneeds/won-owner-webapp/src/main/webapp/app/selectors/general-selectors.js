@@ -148,6 +148,33 @@ export const getGroupPostAdminUriFromRoute = createSelector(
   }
 );
 
+export const getFromNeedUriFromRoute = createSelector(
+  state => state,
+  state => {
+    const encodedNeedUri = getIn(state, [
+      "router",
+      "currentParams",
+      "fromNeedUri",
+    ]);
+    return decodeUriComponentProperly(encodedNeedUri);
+  }
+);
+
+export const getModeFromRoute = createSelector(
+  state => state,
+  state => {
+    const mode = getIn(state, ["router", "currentParams", "mode"]);
+
+    if (mode) {
+      if (mode === "EDIT") {
+        return "EDIT";
+      }
+      return "DUPLICATE";
+    }
+    return undefined;
+  }
+);
+
 export const getPostUriFromRoute = createSelector(
   state => state,
   state => {
