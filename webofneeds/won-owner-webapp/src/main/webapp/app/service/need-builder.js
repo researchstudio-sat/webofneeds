@@ -109,21 +109,6 @@ import { Generator } from "sparqljs";
           }
         }
       }
-      if (contentNode["@type"]) {
-        if (contentData["@type"]) {
-          contentNode["@type"] = contentNode["@type"].concat(
-            contentData["@type"]
-          );
-        } else if (contentData.type) {
-          contentNode["@type"] = contentNode["@type"].concat(contentData.type);
-        }
-      } else {
-        if (contentData["@type"]) {
-          contentNode["@type"] = contentData["@type"];
-        } else if (contentData.type) {
-          contentNode["@type"] = contentData.type;
-        }
-      }
 
       return contentNode;
     };
