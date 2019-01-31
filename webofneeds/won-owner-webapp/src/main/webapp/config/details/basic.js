@@ -276,33 +276,39 @@ export const facets = {
   multiSelect: true,
   options: [
     {
-      value: { "@id": "#chatFacet", "@type": "won:ChatFacet" },
+      value: { "#chatFacet": "won:ChatFacet" },
       label: "ChatFacet",
     },
     {
-      value: { "@id": "#groupFacet", "@type": "won:GroupFacet" },
+      value: { "#groupFacet": "won:GroupFacet" },
       label: "GroupFacet",
     },
     {
-      value: { "@id": "#holderFacet", "@type": "won:HolderFacet" },
+      value: { "#holderFacet": "won:HolderFacet" },
       label: "HolderFacet",
     },
     {
-      value: { "@id": "#holdableFacet", "@type": "won:HoldableFacet" },
+      value: { "#holdableFacet": "won:HoldableFacet" },
       label: "HoldableFacet",
     },
     {
-      value: { "@id": "#reviewFacet", "@type": "won:ReviewFacet" },
+      value: { "#reviewFacet": "won:ReviewFacet" },
       label: "ReviewFacet",
     },
   ],
   parseToRDF: function({ value }) {
     //TODO: PARSE TO RDF ONLY WHEN VALUE IS CONTAINING ONLY POSSIBLE ONES
     if (value) {
-      console.debug("Facets value for parseToRDF:", value);
-      return {
-        "won:hasFacet": value,
-      };
+      let facets = [];
+      Immutable.fromJS(value).map((facet, key) => {
+        facets.push({ "@id": key, "@type": facet });
+      });
+
+      if (facets.length > 0) {
+        return {
+          "won:hasFacet": facets,
+        };
+      }
     }
 
     return undefined;
@@ -316,12 +322,14 @@ export const facets = {
         wonHasFacets.map(facet => {
           facets = facets.set(get(facet, "@id"), get(facet, "@type"));
         });
-        return facets;
+        if (facets.size > 0) {
+          return facets;
+        }
       } else {
         return facets.set(get(wonHasFacets, "@id"), get(wonHasFacets, "@type"));
       }
     }
-    return facets;
+    return undefined;
   },
   generateHumanReadable: function({ value, includeLabel }) {
     //TODO: Implement this so that the label shows instead of the value
@@ -343,13 +351,21 @@ export const defaultFacet = {
   component: undefined,
   multiSelect: false,
   parseToRDF: function({ value }) {
+    //TODO: PARSE TO RDF ONLY WHEN VALUE IS ONE OF THE POSSIBLE ONES
     if (value) {
-      //TODO: PARSE TO RDF ONLY WHEN VALUE IS ONE OF THE POSSIBLE ONES
-      console.debug("DefaultFacet value for parseToRDF:", value);
-      return {
-        "won:hasDefaultFacet": value,
-      };
+      let facets = [];
+      Immutable.fromJS(value).map((facet, key) => {
+        facets.push({ "@id": key, "@type": facet });
+      });
+
+      if (facets.length == 1) {
+        return {
+          "won:hasDefaultFacet": facets,
+        };
+      }
     }
+
+    return undefined;
   },
   parseFromRDF: function(jsonLDImm) {
     const wonHasDefaultFacet = get(jsonLDImm, "won:hasDefaultFacet");
