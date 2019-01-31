@@ -271,7 +271,7 @@ export function generateShortNeedFlags(needImm) {
 }
 
 export function getFacetsWithKeysReset(needImm) {
-  const facets = getIn(needImm, ["content", "facet"]);
+  const facets = getIn(needImm, ["content", "facets"]);
 
   if (facets) {
     return getFacetKeysReset(facets);
@@ -289,7 +289,7 @@ export function getDefaultFacetWithKeyReset(needImm) {
 }
 
 export function getSeeksFacetsWithKeysReset(needImm) {
-  const facets = getIn(needImm, ["seeks", "facet"]);
+  const facets = getIn(needImm, ["seeks", "facets"]);
 
   if (facets) {
     return getFacetKeysReset(facets);
