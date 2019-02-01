@@ -1,7 +1,7 @@
 /**
  * Created by fsuda on 18.09.2018.
  */
-import { details, emptyDraft } from "../detail-definitions.js";
+import { details, mergeInEmptyDraft } from "../detail-definitions.js";
 import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-utils.js";
 import won from "../../app/won-es6.js";
 import { getIn } from "../../app/utils.js";
@@ -17,8 +17,9 @@ export const taxiOffer = {
   icon: "#ico36_uc_taxi_offer",
   doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
-    ...emptyDraft,
-    content: { title: "Taxi", type: "s:TaxiService" },
+    ...mergeInEmptyDraft({
+      content: { title: "Taxi", type: "s:TaxiService" },
+    }),
   },
   details: {
     title: { ...details.title },

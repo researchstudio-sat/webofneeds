@@ -1,4 +1,4 @@
-import { details, emptyDraft } from "../detail-definitions.js";
+import { details, mergeInEmptyDraft } from "../detail-definitions.js";
 import {
   vicinityScoreSubQuery,
   sparqlQuery,
@@ -14,14 +14,15 @@ export const lunchInterest = {
   label: "Add Lunch Interest",
   icon: undefined,
   draft: {
-    ...emptyDraft,
-    content: {
-      type: "won:Interest",
-      title: "I am interested in meeting up for lunch!",
-    },
-    seeks: {
-      sPlanAction: { "@id": "http://dbpedia.org/resource/Lunch" },
-    },
+    ...mergeInEmptyDraft({
+      content: {
+        type: "won:Interest",
+        title: "I am interested in meeting up for lunch!",
+      },
+      seeks: {
+        sPlanAction: { "@id": "http://dbpedia.org/resource/Lunch" },
+      },
+    }),
   },
   details: {
     title: { ...details.title },

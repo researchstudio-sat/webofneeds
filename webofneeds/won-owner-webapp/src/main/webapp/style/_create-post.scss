@@ -64,6 +64,49 @@ won-create-search {
     align-items: stretch;
     overflow: auto;
 
+    & > .cp__content__loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 5rem 0;
+
+      > .cp__content__loading__spinner.hspinner {
+        @include fixed-square(5rem);
+      }
+      > .cp__content__loading__label {
+        color: $won-line-gray;
+        text-align: center;
+      }
+    }
+
+    & > .cp__content__failed {
+      display: grid;
+      grid-template-areas: "failed_icon failed_label" "failed_actions failed_actions";
+      align-items: center;
+      justify-content: center;
+      padding: 5rem 0.5rem;
+      grid-gap: 0.5rem;
+
+      > .cp__content__failed__icon {
+        grid-area: failed_icon;
+        @include fixed-square(5rem);
+        --local-primary: #{$won-primary-color};
+      }
+      > .cp__content__failed__label {
+        grid-area: failed_label;
+        text-align: center;
+      }
+      > .cp__content__failed__actions {
+        grid-area: failed_actions;
+        display: flex;
+        justify-content: center;
+
+        > .cp__content__failed__actions__button {
+        }
+      }
+    }
+
     .cp__content__branchheader {
       font-weight: 400;
       font-size: $normalFontSize + 0.25rem;

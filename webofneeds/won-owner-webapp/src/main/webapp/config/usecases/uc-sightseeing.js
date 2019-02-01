@@ -1,7 +1,7 @@
 /**
  * Created by fsuda on 18.09.2018.
  */
-import { details, emptyDraft } from "../detail-definitions.js";
+import { details, mergeInEmptyDraft } from "../detail-definitions.js";
 import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-utils.js";
 import { interestsDetail } from "../details/person.js";
 
@@ -11,8 +11,9 @@ export const sightseeing = {
   icon: "#ico36_uc_sightseeing",
   doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
-    ...emptyDraft,
-    content: { tags: ["sightseeing"], searchString: "sightseeing" },
+    ...mergeInEmptyDraft({
+      content: { tags: ["sightseeing"], searchString: "sightseeing" },
+    }),
   },
   details: {
     title: { ...details.title },

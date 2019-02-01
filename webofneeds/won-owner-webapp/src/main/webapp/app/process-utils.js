@@ -91,6 +91,26 @@ export function isNeedLoading(process, needUri) {
 }
 
 /**
+ * Return true if given needUri is set toLoad
+ * @param process (full process from state)
+ * @param needUri
+ * @returns {*}
+ */
+export function isNeedToLoad(process, needUri) {
+  return needUri && getIn(process, ["needs", needUri, "toLoad"]);
+}
+
+/**
+ * Return true if given needUri has failedToLoad
+ * @param process (full process from state)
+ * @param needUri
+ * @returns {*}
+ */
+export function hasNeedFailedToLoad(process, needUri) {
+  return needUri && getIn(process, ["needs", needUri, "failedToLoad"]);
+}
+
+/**
  * Return true if any needUri is currently loading
  * @param process
  * @returns {boolean}

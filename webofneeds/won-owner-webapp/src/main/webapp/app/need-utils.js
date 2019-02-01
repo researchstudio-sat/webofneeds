@@ -45,6 +45,29 @@ export function isWhatsAroundNeed(need) {
 }
 
 /**
+ * This checks if the need is allowed to be used as a template,
+ * it is only allowed if the need exists, and if it is not one of the following:
+ * - DirectResponseNeed
+ * - WhatsAroundNeed
+ * - WhatsNewNeed
+ * - SearchNeed
+ * @param need
+ * @returns {*|boolean}
+ */
+export function isUsableAsTemplate(need) {
+  return (
+    need &&
+    !(
+      isOwned(need) ||
+      isDirectResponseNeed(need) ||
+      isWhatsAroundNeed(need) ||
+      isWhatsNewNeed(need) ||
+      isSearchNeed(need)
+    )
+  );
+}
+
+/**
  * Determines if a given need is a DirectResponse-Need
  * @param need
  * @returns {*|boolean}
@@ -57,24 +80,30 @@ export function isDirectResponseNeed(need) {
 }
 
 export function isPersona(need) {
-  return get(need, "types") && get(need, "types").has("won:Persona");
+  return (
+    getIn(need, ["content", "type"]) &&
+    getIn(need, ["content", "type"]).has("won:Persona")
+  );
 }
 
 export function isNeed(need) {
-  return get(need, "types") && get(need, "types").has("won:Need");
+  return (
+    getIn(need, ["content", "type"]) &&
+    getIn(need, ["content", "type"]).has("won:Need")
+  );
 }
 
 export function hasChatFacet(need) {
   return (
-    get(need, "facets") &&
-    get(need, "facets").contains(won.WON.ChatFacetCompacted)
+    getIn(need, ["content", "facets"]) &&
+    getIn(need, ["content", "facets"]).contains(won.WON.ChatFacetCompacted)
   );
 }
 
 export function hasGroupFacet(need) {
   return (
-    get(need, "facets") &&
-    get(need, "facets").contains(won.WON.GroupFacetCompacted)
+    getIn(need, ["content", "facets"]) &&
+    getIn(need, ["content", "facets"]).contains(won.WON.GroupFacetCompacted)
   );
 }
 
@@ -84,7 +113,10 @@ export function hasGroupFacet(need) {
  * @returns {*|boolean}
  */
 export function isSearchNeed(need) {
-  return get(need, "types") && get(need, "types").has("won:PureSearch");
+  return (
+    getIn(need, ["content", "type"]) &&
+    getIn(need, ["content", "type"]).has("won:PureSearch")
+  );
 }
 
 /**
@@ -116,10 +148,10 @@ export function generateNeedMatchingContext(needImm) {
  * TODO: We Do not store a single type anymore but a list of types... adapt accordingly
  */
 export function generateFullNeedTypesLabel(needImm) {
-  const types = get(needImm, "types");
+  const types = getIn(needImm, ["content", "type"]);
 
   //TODO: GENERATE CORRECT LABEL
-  //self.labels.type[self.need.get('type')]
+  //self.labels.type[self.need.getIn(['content','type'])]
   let label = "";
 
   if (types && types.size > 0) {
@@ -148,7 +180,7 @@ export function generateFullNeedFlags(needImm) {
  * Generates an array that contains all need facets, using a human readable label if available.
  */
 export function generateFullNeedFacets(needImm) {
-  const facets = needImm && needImm.get("facets");
+  const facets = needImm && needImm.getIn(["content", "facets"]);
   const facetsArray =
     facets &&
     facets
@@ -164,7 +196,7 @@ export function generateFullNeedFacets(needImm) {
  * @param {*} needImm the need as saved in the state
  */
 export function generateShortNeedTypesLabel(needImm) {
-  const needTypes = needImm && needImm.get("types");
+  const needTypes = needImm && needImm.getIn(["content", "type"]);
 
   let label = "";
 
@@ -195,7 +227,7 @@ export function generateShortNeedTypesLabel(needImm) {
  * Generates an array that contains some need facets, using a human readable label if possible.
  */
 export function generateShortNeedFacets(needImm) {
-  const facets = needImm && needImm.get("facets");
+  const facets = needImm && needImm.get(["content", "facets"]);
   const facetsArray =
     facets &&
     facets
@@ -236,4 +268,60 @@ export function generateShortNeedFlags(needImm) {
       })
       .filter(flag => flag.length > 0);
   return flagsArray;
+}
+
+export function getFacetsWithKeysReset(needImm) {
+  const facets = getIn(needImm, ["content", "facets"]);
+
+  if (facets) {
+    return getFacetKeysReset(facets);
+  }
+  return undefined;
+}
+
+export function getDefaultFacetWithKeyReset(needImm) {
+  const defaultFacet = getIn(needImm, ["content", "defaultFacet"]);
+
+  if (defaultFacet) {
+    return getFacetKeysReset(defaultFacet);
+  }
+  return undefined;
+}
+
+export function getSeeksFacetsWithKeysReset(needImm) {
+  const facets = getIn(needImm, ["seeks", "facets"]);
+
+  if (facets) {
+    return getFacetKeysReset(facets);
+  }
+  return undefined;
+}
+
+export function getSeeksDefaultFacetWithKeyReset(needImm) {
+  const defaultFacet = getIn(needImm, ["seeks", "defaultFacet"]);
+
+  if (defaultFacet) {
+    return getFacetKeysReset(defaultFacet);
+  }
+  return undefined;
+}
+
+function getFacetKeysReset(facetsImm) {
+  return facetsImm.mapKeys((key, value) => {
+    if (value === "won:ChatFacet") {
+      return "#chatFacet";
+    }
+    if (value === "won:GroupFacet") {
+      return "#groupFacet";
+    }
+    if (value === "won:HolderFacet") {
+      return "#holderFacet";
+    }
+    if (value === "won:HoldableFacet") {
+      return "#holdableFacet";
+    }
+    if (value === "won:ReviewFacet") {
+      return "#reviewFacet";
+    }
+  });
 }

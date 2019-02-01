@@ -31,6 +31,8 @@ export const resetParams = Object.freeze({
   groupPostAdminUri: undefined,
   token: undefined,
   privateId: undefined,
+  fromNeedUri: undefined,
+  mode: undefined,
 });
 
 export const resetParamsImm = Immutable.fromJS(resetParams);
@@ -68,7 +70,7 @@ export const configRouting = [
       { path: "/settings", component: "settings" },
       {
         path:
-          "/connections?privateId?postUri?connectionUri?useCase?useCaseGroup?token?groupPostAdminUri?viewNeedUri",
+          "/connections?privateId?postUri?connectionUri?useCase?useCaseGroup?token?groupPostAdminUri?viewNeedUri?fromNeedUri?mode",
         component: "connections",
         as: "connections",
       },

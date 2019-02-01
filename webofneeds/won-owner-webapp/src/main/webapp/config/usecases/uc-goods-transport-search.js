@@ -1,4 +1,8 @@
-import { details, abstractDetails, emptyDraft } from "../detail-definitions.js";
+import {
+  details,
+  abstractDetails,
+  mergeInEmptyDraft,
+} from "../detail-definitions.js";
 import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-utils.js";
 import {
   filterInVicinity,
@@ -15,11 +19,12 @@ export const goodsTransportSearch = {
   icon: "#ico36_uc_transport_demand",
   doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
-    ...emptyDraft,
-    content: {
-      title: "Want to send something",
-      type: "http://dbpedia.org/resource/Cargo",
-    },
+    ...mergeInEmptyDraft({
+      content: {
+        title: "Want to send something",
+        type: "http://dbpedia.org/resource/Cargo",
+      },
+    }),
   },
   details: {
     title: { ...details.title },

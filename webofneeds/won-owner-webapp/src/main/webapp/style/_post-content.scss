@@ -12,7 +12,9 @@ won-post-content {
     overflow: auto;
     word-wrap: break-word;
 
-    won-labelled-hr span {
+    won-labelled-hr .wlh__label,
+    won-labelled-hr .wlh__label__text,
+    won-labelled-hr .wlh__label__carret {
       background-color: white;
     }
 
@@ -20,6 +22,11 @@ won-post-content {
       background-color: $won-light-gray;
       border: $thinGrayBorder;
       padding: 0.5rem;
+    }
+
+    .post-content__button__template.won-button--outlined.thin.red {
+      font-size: $smallFontSize;
+      margin-top: 0.5rem;
     }
 
     .post-content__members {

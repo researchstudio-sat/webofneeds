@@ -21,8 +21,6 @@ export function parseNeed(jsonldNeed, isOwned) {
       uri: jsonldNeedImm.get("@id"),
       identiconSvg: generateIdenticon(jsonldNeedImm),
       nodeUri: jsonldNeedImm.getIn(["won:hasWonNode", "@id"]),
-      types: extractTypes(jsonldNeedImm),
-      facets: extractFacets(jsonldNeedImm.get("won:hasFacet")),
       state: extractState(jsonldNeedImm),
       matchingContexts: extractMatchingContext(jsonldNeedImm),
       heldBy: won.parseFrom(jsonldNeedImm, ["won:heldBy"], "xsd:ID"),
@@ -133,18 +131,6 @@ function generateIdenticon(needJsonLd) {
   return idc.toString();
 }
 
-function extractTypes(needJsonLd) {
-  const types = (rawTypes => {
-    if (Immutable.List.isList(rawTypes)) {
-      return Immutable.Set(rawTypes);
-    } else {
-      return Immutable.Set([rawTypes]);
-    }
-  })(needJsonLd.get("@type"));
-
-  return types;
-}
-
 function extractCreationDate(needJsonLd) {
   const creationDate =
     needJsonLd.get("dct:created") ||
@@ -165,22 +151,6 @@ function extractRating(needJsonLd) {
   } else {
     return undefined;
   }
-}
-
-function extractFacets(wonHasFacets) {
-  let facets = Immutable.Map();
-
-  if (wonHasFacets) {
-    if (Immutable.List.isList(wonHasFacets)) {
-      wonHasFacets.map(facet => {
-        facets = facets.set(facet.get("@id"), facet.get("@type"));
-      });
-      return facets;
-    } else {
-      return facets.set(wonHasFacets.get("@id"), wonHasFacets.get("@type"));
-    }
-  }
-  return facets;
 }
 
 function getHumanReadableStringFromNeed(need, detailsToParse) {
@@ -261,21 +231,23 @@ function generateHumanReadableArray(presentDetails, detailsToParse) {
   let humanReadableArray = [];
   if (presentDetails) {
     for (const key in presentDetails) {
-      const detailToParse = detailsToParse[key];
-      if (detailToParse) {
-        const detailValue = presentDetails[key];
-        const detailValueJS =
-          detailValue && Immutable.Iterable.isIterable(detailValue)
-            ? detailValue.toJS()
-            : detailValue;
+      if (!(key === "facets" || key === "type" || key === "defaultFacet")) {
+        const detailToParse = detailsToParse[key];
+        if (detailToParse) {
+          const detailValue = presentDetails[key];
+          const detailValueJS =
+            detailValue && Immutable.Iterable.isIterable(detailValue)
+              ? detailValue.toJS()
+              : detailValue;
 
-        if (detailValueJS) {
-          humanReadableArray.push(
-            detailToParse.generateHumanReadable({
-              value: detailValueJS,
-              includeLabel: true,
-            })
-          );
+          if (detailValueJS) {
+            humanReadableArray.push(
+              detailToParse.generateHumanReadable({
+                value: detailValueJS,
+                includeLabel: true,
+              })
+            );
+          }
         }
       }
     }

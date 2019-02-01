@@ -4,7 +4,7 @@ import { complain } from "./uc-complain.js";
 import { handleComplaint } from "./uc-handle-complaint.js";
 import { customUseCase } from "./uc-custom.js";
 
-import { details, emptyDraft } from "../detail-definitions.js";
+import { details, mergeInEmptyDraft } from "../detail-definitions.js";
 
 export const otherGroup = {
   identifier: "othergroup",
@@ -18,8 +18,15 @@ export const otherGroup = {
       identifier: "groupChat",
       label: "New Groupchat Post",
       draft: {
-        ...emptyDraft,
-        facet: { "@id": "#groupFacet", "@type": won.WON.GroupFacet },
+        ...mergeInEmptyDraft({
+          content: {
+            facets: {
+              "#groupFacet": won.WON.GroupFacet,
+              "#holdableFacet": won.WON.HoldableFacet,
+            },
+            defaultFacet: { "#groupFacet": won.WON.GroupFacet },
+          },
+        }),
       },
       details: details,
       seeksDetails: details,

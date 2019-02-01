@@ -1,7 +1,7 @@
 /**
  * Created by fsuda on 18.09.2018.
  */
-import { details, emptyDraft } from "../detail-definitions.js";
+import { details, mergeInEmptyDraft } from "../detail-definitions.js";
 import won from "../../app/won-es6.js";
 import { genresDetail, instrumentsDetail } from "../details/musician.js";
 import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-utils.js";
@@ -20,14 +20,15 @@ export const musicianSearch = {
   timeToLiveMillisDefault: 1000 * 60 * 60 * 24 * 30,
   doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
-    ...emptyDraft,
-    content: {
-      title: "Looking for a Musician!",
-      type: "s:MusicGroup",
-    },
-    seeks: {
-      type: "won:Musician",
-    },
+    ...mergeInEmptyDraft({
+      content: {
+        title: "Looking for a Musician!",
+        type: "s:MusicGroup",
+      },
+      seeks: {
+        type: "won:Musician",
+      },
+    }),
   },
   details: {
     title: { ...details.title },

@@ -1,7 +1,7 @@
 /**
  * Created by fsuda on 18.09.2018.
  */
-import { details, emptyDraft } from "../detail-definitions.js";
+import { details, mergeInEmptyDraft } from "../detail-definitions.js";
 import {
   realEstateRentDetail,
   realEstateFloorSizeDetail,
@@ -26,16 +26,17 @@ export const rentRealEstateOffer = {
   timeToLiveMillisDefault: 1000 * 60 * 60 * 24 * 30 * 3,
   doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
-    ...emptyDraft,
-    content: {
-      type: "won:RealEstateRentOffer",
-      title: "For Rent",
-      tags: ["RentOutRealEstate"],
-    },
-    seeks: {
-      type: "won:RealEstateRentDemand",
-      tags: ["SearchRealEstateToRent"],
-    },
+    ...mergeInEmptyDraft({
+      content: {
+        type: "won:RealEstateRentOffer",
+        title: "For Rent",
+        tags: ["RentOutRealEstate"],
+      },
+      seeks: {
+        type: "won:RealEstateRentDemand",
+        tags: ["SearchRealEstateToRent"],
+      },
+    }),
   },
   details: {
     title: { ...details.title },

@@ -335,7 +335,7 @@ function connectAdHoc(theirNeedUri, textMessage, persona, dispatch, getState) {
           {
             pending: false,
             //facet: `${persona}#holderFacet`,
-            facet: getIn(state, ["needs", persona, "facets"]).keyOf(
+            facet: getIn(state, ["needs", persona, "content", "facets"]).keyOf(
               "won:HolderFacet"
             ),
           },
@@ -343,7 +343,7 @@ function connectAdHoc(theirNeedUri, textMessage, persona, dispatch, getState) {
             pending: true,
             facet: `${needUri}#holdableFacet`,
             // FIXME: does not work as new need is not in state yet
-            //facet: getIn(state, ["needs", needUri, "facets"]).keyOf(
+            //facet: getIn(state, ["needs", needUri, "content", "facets"]).keyOf(
             //  "won:HoldableFacet"
             //),
           },

@@ -1,7 +1,7 @@
 /**
  * Created by quasarchimaere on 21.01.2019.
  */
-import { get } from "../utils.js";
+import { get, getIn } from "../utils.js";
 import * as processUtils from "../process-utils.js";
 
 /**
@@ -43,4 +43,19 @@ export function isProcessingResendVerificationEmail(state) {
 
 export function isProcessingSendAnonymousLinkEmail(state) {
   return processUtils.isProcessingSendAnonymousLinkEmail(get(state, "process"));
+}
+
+export function isNeedLoading(state, needUri) {
+  return processUtils.isNeedLoading(get(state, "process"), needUri);
+}
+
+export function isNeedToLoad(state, needUri) {
+  return (
+    !getIn(state, ["needs", needUri]) ||
+    processUtils.isNeedToLoad(get(state, "process"), needUri)
+  );
+}
+
+export function hasNeedFailedToLoad(state, needUri) {
+  return processUtils.hasNeedFailedToLoad(get(state, "process"), needUri);
 }

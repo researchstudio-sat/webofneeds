@@ -13,16 +13,7 @@ import usecasePickerModule from "../usecase-picker.js";
 import usecaseGroupModule from "../usecase-group.js";
 import { attach, getIn, get } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
-import {
-  getOwnedNeedByConnectionUri,
-  getOwnedNeeds,
-  getConnectionUriFromRoute,
-  getPostUriFromRoute,
-  getViewNeedUriFromRoute,
-  getUseCaseFromRoute,
-  getUseCaseGroupFromRoute,
-  getGroupPostAdminUriFromRoute,
-} from "../../selectors/general-selectors.js";
+import * as generalSelectors from "../../selectors/general-selectors.js";
 import { isChatToGroup } from "../../connection-utils.js";
 import * as viewSelectors from "../../selectors/view-selectors.js";
 import * as srefUtils from "../../sref-utils.js";
@@ -41,20 +32,29 @@ class ConnectionsController {
     this.open = {};
 
     const selectFromState = state => {
-      const viewNeedUri = getViewNeedUriFromRoute(state);
-      const selectedPostUri = getPostUriFromRoute(state);
+      const viewNeedUri = generalSelectors.getViewNeedUriFromRoute(state);
+      const selectedPostUri = generalSelectors.getPostUriFromRoute(state);
       const selectedPost =
         selectedPostUri && getIn(state, ["needs", selectedPostUri]);
 
-      const showGroupPostAdministration = getGroupPostAdminUriFromRoute(state);
-      const useCase = getUseCaseFromRoute(state);
-      const useCaseGroup = getUseCaseGroupFromRoute(state);
+      const showGroupPostAdministration = !!generalSelectors.getGroupPostAdminUriFromRoute(
+        state
+      );
+      const useCase = generalSelectors.getUseCaseFromRoute(state);
+      const useCaseGroup = generalSelectors.getUseCaseGroupFromRoute(state);
 
-      const selectedConnectionUri = getConnectionUriFromRoute(state);
+      const selectedConnectionUri = generalSelectors.getConnectionUriFromRoute(
+        state
+      );
+      const fromNeedUri = generalSelectors.getFromNeedUriFromRoute(state);
+      const mode = generalSelectors.getModeFromRoute(state);
 
       const need =
         selectedConnectionUri &&
-        getOwnedNeedByConnectionUri(state, selectedConnectionUri);
+        generalSelectors.getOwnedNeedByConnectionUri(
+          state,
+          selectedConnectionUri
+        );
       const selectedConnection = getIn(need, [
         "connections",
         selectedConnectionUri,
@@ -67,7 +67,7 @@ class ConnectionsController {
 
       const selectedConnectionState = getIn(selectedConnection, ["state"]);
 
-      const ownedNeeds = getOwnedNeeds(state);
+      const ownedNeeds = generalSelectors.getOwnedNeeds(state);
 
       const hasOwnedNeeds = ownedNeeds && ownedNeeds.size > 0;
 
@@ -76,6 +76,8 @@ class ConnectionsController {
       const appTitle = get(theme, "title");
       const welcomeTemplate = get(theme, "welcomeTemplate");
 
+      const showCreateFromPost = !!(fromNeedUri && mode);
+
       return {
         appTitle,
         welcomeTemplatePath: "./skin/" + themeName + "/" + welcomeTemplate,
@@ -83,12 +85,14 @@ class ConnectionsController {
         open,
         showModalDialog: getIn(state, ["view", "showModalDialog"]),
         showWelcomeSide:
+          !showCreateFromPost &&
           !useCase &&
           !useCaseGroup &&
           !selectedPost &&
           !showGroupPostAdministration &&
           (!selectedConnection || selectedConnectionState === won.WON.Closed),
         showContentSide:
+          showCreateFromPost ||
           useCase ||
           useCaseGroup ||
           selectedPost ||
@@ -108,10 +112,11 @@ class ConnectionsController {
           !selectedPost &&
           !selectedConnection,
         showCreatePost:
-          !!useCase &&
-          useCase !== "search" &&
-          !selectedPost &&
-          !selectedConnection,
+          showCreateFromPost ||
+          (!!useCase &&
+            useCase !== "search" &&
+            !selectedPost &&
+            !selectedConnection),
         showCreateSearch:
           !!useCase &&
           useCase === "search" &&
@@ -167,6 +172,8 @@ class ConnectionsController {
       useCase: undefined,
       useCaseGroup: undefined,
       groupPostAdminUri: undefined,
+      fromNeedUri: undefined,
+      mode: undefined,
     });
   }
 
@@ -178,6 +185,8 @@ class ConnectionsController {
       useCase: undefined,
       useCaseGroup: undefined,
       groupPostAdminUri: undefined,
+      fromNeedUri: undefined,
+      mode: undefined,
     });
   }
 
@@ -189,11 +198,13 @@ class ConnectionsController {
       useCase: undefined,
       useCaseGroup: undefined,
       groupPostAdminUri: needUri,
+      fromNeedUri: undefined,
+      mode: undefined,
     });
   }
 
   markAsRead(connectionUri) {
-    const need = getOwnedNeedByConnectionUri(
+    const need = generalSelectors.getOwnedNeedByConnectionUri(
       this.$ngRedux.getState(),
       connectionUri
     );

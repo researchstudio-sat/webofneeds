@@ -1,7 +1,7 @@
 /**
  * Created by fsuda on 18.09.2018.
  */
-import { details, emptyDraft } from "../detail-definitions.js";
+import { details, mergeInEmptyDraft } from "../detail-definitions.js";
 import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-utils.js";
 import { interestsDetail } from "../details/person.js";
 
@@ -11,12 +11,13 @@ export const afterparty = {
   icon: "#ico36_uc_drinks",
   doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
-    ...emptyDraft,
-    content: {
-      title: "I'm up for partying! Any plans?",
-      tags: ["afterparty"],
-      searchString: "afterparty",
-    },
+    ...mergeInEmptyDraft({
+      content: {
+        title: "I'm up for partying! Any plans?",
+        tags: ["afterparty"],
+        searchString: "afterparty",
+      },
+    }),
   },
   details: {
     title: { ...details.title },

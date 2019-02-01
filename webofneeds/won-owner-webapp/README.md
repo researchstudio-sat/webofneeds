@@ -194,10 +194,7 @@ $ngRedux.getState();
        nodeUri: string, //identifier of this need's server
        isOwned: true|false, //whether this need is owned or not
        isBeingCreated: true|false, //whether or not the creation of this need was successfully completed yet
-       flags: Immutable.List //all the flags that are present within the won:hasFlags predicate of a need
-       facets: Immutable.Map //all the facets that are present within the won:hasFacets predicate of a need
        state: "won:Active" | "won:Inactive", //state of the need
-       types: Immutable.Set() // of need types e.g. won:Persona, won:Need, and any other types
        groupMembers: Immutable.List() // needUris of participants of this needs (won:hasGroupMember) -> usually only set for groupChatNeeds
        holds: Immutable.List() // needUris of the persona that holds these additional needs
        unread: true|false, //whether or not this need has new information that has not been read yet

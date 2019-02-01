@@ -1,4 +1,4 @@
-import { details, emptyDraft } from "../detail-definitions.js";
+import { details, mergeInEmptyDraft } from "../detail-definitions.js";
 import { interestsDetail, skillsDetail } from "../details/person.js";
 import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-utils.js";
 import {
@@ -22,13 +22,14 @@ export const jobOffer = {
   icon: "#ico36_uc_consortium-offer", //TODO proper icon
   doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
-    ...emptyDraft,
-    content: {
-      type: "s:JobPosting",
-    },
-    seeks: {
-      type: "s:Person",
-    },
+    ...mergeInEmptyDraft({
+      content: {
+        type: "s:JobPosting",
+      },
+      seeks: {
+        type: "s:Person",
+      },
+    }),
   },
   details: {
     title: { ...details.title },

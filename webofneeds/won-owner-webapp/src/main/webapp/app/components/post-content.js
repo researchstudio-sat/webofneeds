@@ -12,7 +12,7 @@ import { attach, getIn, get } from "../utils.js";
 import won from "../won-es6.js";
 import { labels } from "../won-label-utils.js";
 import { connect2Redux } from "../won-utils.js";
-import { isPersona } from "../need-utils.js";
+import * as needUtils from "../need-utils.js";
 import { getConnectionUriFromRoute } from "../selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
@@ -85,10 +85,15 @@ function genComponentConf() {
               </won-post-header>
             </div>
           </div>
-
           <!-- GENERAL INFORMATION -->
           <won-labelled-hr ng-click="self.toggleShowGeneral()" arrow="self.showGeneral ? 'up' : 'down'" label="::'General Information'" class="cp__labelledhr"></won-labelled-hr>
           <won-post-content-general class="post-collapsible-general" ng-if="self.showGeneral" post-uri="self.post.get('uri')"></won-post-content-general>
+          <button
+              class="won-button--outlined thin red post-content__button__template"
+              ng-if="self.isUsableAsTemplate"
+              ng-click="self.router__stateGoAbs('connections', {fromNeedUri: self.postUri, mode: 'DUPLICATE'})">
+              Post this too!
+          </button>
           <!-- RDF REPRESENTATION -->
           <div class="post-info__content__rdf" ng-if="self.shouldShowRdf">
             <h2 class="post-info__heading">
@@ -134,21 +139,25 @@ function genComponentConf() {
         //TODO it will be possible to have more than one seeks
         const seeks = get(post, "seeks");
 
-        const hasContent = content && content.size > 0;
-        const hasSeeksBranch = seeks && seeks.size > 0;
+        const hasContent = this.hasVisibleDetails(content);
+        const hasSeeksBranch = this.hasVisibleDetails(seeks);
 
         const groupMembers = get(post, "groupMembers");
 
         const heldPosts = get(post, "holds");
+
+        const isUsableAsTemplate = needUtils.isUsableAsTemplate(post);
 
         return {
           WON: won.WON,
           hasContent,
           hasSeeksBranch,
           post,
-          isPersona: isPersona(post),
-          hasHeldPosts: isPersona && heldPosts && heldPosts.size > 0,
-          heldPostsArray: isPersona && heldPosts && heldPosts.toArray(),
+          isUsableAsTemplate,
+          isPersona: needUtils.isPersona(post),
+          hasHeldPosts: needUtils.isPersona && heldPosts && heldPosts.size > 0,
+          heldPostsArray:
+            needUtils.isPersona && heldPosts && heldPosts.toArray(),
           hasGroupMembers: groupMembers && groupMembers.size > 0,
           groupMembersArray: groupMembers && groupMembers.toArray(),
           postLoading:
@@ -182,6 +191,21 @@ function genComponentConf() {
 
     toggleShowGeneral() {
       this.needs__toggleGeneralInfo(this.postUri);
+    }
+
+    /**
+     * This function checks if there is at least one detail present that is displayable
+     */
+    hasVisibleDetails(contentBranchImm) {
+      return (
+        contentBranchImm &&
+        contentBranchImm.find(
+          (detailValue, detailKey) =>
+            detailKey != "type" &&
+            detailKey != "facets" &&
+            detailKey != "defaultFacet"
+        )
+      );
     }
   }
 
