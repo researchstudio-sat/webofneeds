@@ -23,8 +23,8 @@ won-post-info {
 
   .post-info__header {
     display: grid;
-    grid-template-columns: auto 1fr auto;
-    grid-template-areas: "header_back header_title header_context";
+    grid-template-columns: auto 1fr auto auto;
+    grid-template-areas: "header_back header_title header_share header_context";
     grid-area: header;
     font-size: $normalFontSize;
     text-align: left;
@@ -46,6 +46,11 @@ won-post-info {
     won-post-context-dropdown,
     won-connection-context-dropdown {
       grid-area: header_context;
+    }
+
+    won-share-dropdown {
+      grid-area: header_share;
+      margin-right: 1em;
     }
   }
 

@@ -3,7 +3,6 @@
  */
 
 import angular from "angular";
-import postShareLinkModule from "./post-share-link.js";
 import { attach, get } from "../utils.js";
 import won from "../won-es6.js";
 import { relativeTime } from "../won-label-utils.js";
@@ -115,11 +114,6 @@ function genComponentConf() {
           </div>
         </div>
       </div>
-
-      <won-post-share-link
-        ng-if="!self.preventSharing"
-        post-uri="self.post.get('uri')">
-      </won-post-share-link>
     `;
 
   class Controller {
@@ -210,8 +204,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.postContentGeneral", [
-    postShareLinkModule,
-    ratingView,
-  ])
+  .module("won.owner.components.postContentGeneral", [ratingView])
   .directive("wonPostContentGeneral", genComponentConf).name;
