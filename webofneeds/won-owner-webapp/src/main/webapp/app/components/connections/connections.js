@@ -148,6 +148,7 @@ class ConnectionsController {
         showNeedOverlay: !!viewNeedUri,
         viewNeedUri,
         hideListSideInResponsive:
+          !showCreateFromPost ||
           !hasOwnedNeeds ||
           showGroupPostAdministration ||
           selectedConnection ||
