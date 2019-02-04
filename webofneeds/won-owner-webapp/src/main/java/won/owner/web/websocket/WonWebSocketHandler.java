@@ -234,7 +234,7 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
 		String sessionId = (String) session.getAttributes().get(WonHandshakeInterceptor.SESSION_ATTR);
 		if (sessionId != null) {
 			Session activeSession = sessionRepository.getSession(sessionId);
-			if (session != null) {
+			if (activeSession != null) {
 				sessionRepository.save(activeSession);
 			}
 		}
