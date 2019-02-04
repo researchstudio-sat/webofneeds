@@ -402,18 +402,15 @@ function genComponentConf() {
           hasConnectionMessagesToLoad,
           hasAgreementMessages: agreementMessages && agreementMessages.size > 0,
           hasPetriNetData: petriNetData && petriNetData.size > 0,
-          agreementMessageUris: agreementMessages && [
-            ...agreementMessages.flatMap(msg => msg.get("uri")),
-          ],
+          agreementMessageUris:
+            agreementMessages && agreementMessages.toArray(),
           hasProposalMessages: proposalMessages && proposalMessages.size > 0,
-          proposalMessageUris: proposalMessages && [
-            ...proposalMessages.flatMap(msg => msg.get("uri")),
-          ],
+          proposalMessageUris: proposalMessages && proposalMessages.toArray(),
           hasCancellationPendingMessages:
             cancellationPendingMessages && cancellationPendingMessages.size > 0,
-          cancellationPendingMessageUris: cancellationPendingMessages && [
-            ...cancellationPendingMessages.flatMap(msg => msg.get("uri")),
-          ],
+          cancellationPendingMessageUris:
+            cancellationPendingMessages &&
+            cancellationPendingMessages.toArray(),
           connectionOrNeedsLoading:
             !connection ||
             !nonOwnedNeed ||
