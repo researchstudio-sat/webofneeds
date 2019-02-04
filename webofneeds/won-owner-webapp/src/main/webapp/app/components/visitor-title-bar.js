@@ -12,6 +12,7 @@ import {
 } from "../need-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import postContextDropDownModule from "../components/post-context-dropdown.js";
+import shareDropdownModule from "../components/share-dropdown.js";
 import * as needUtils from "../need-utils.js";
 
 import "style/_visitor-title-bar.scss";
@@ -41,6 +42,7 @@ function genComponentConf() {
                     </hgroup>
                 </div>
             </div>
+            <won-share-dropdown need-uri="self.post.get('uri')"></won-share-dropdown>
             <won-post-context-dropdown need-uri="self.post.get('uri')"></won-post-context-dropdown>
         </nav>
     `;
@@ -89,5 +91,8 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.visitorTitleBar", [postContextDropDownModule])
+  .module("won.owner.components.visitorTitleBar", [
+    postContextDropDownModule,
+    shareDropdownModule,
+  ])
   .directive("wonVisitorTitleBar", genComponentConf).name;

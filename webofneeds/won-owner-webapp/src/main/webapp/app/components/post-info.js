@@ -6,6 +6,7 @@ import angular from "angular";
 import postHeaderModule from "./post-header.js";
 import postContextDropdownModule from "./post-context-dropdown.js";
 import postContentModule from "./post-content.js";
+import shareDropdownModule from "./share-dropdown.js";
 import { attach, getIn } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { isWhatsNewNeed } from "../need-utils.js";
@@ -38,6 +39,7 @@ function genComponentConf() {
             <won-post-header
                 need-uri="self.post.get('uri')">
             </won-post-header>
+            <won-share-dropdown need-uri="self.post.get('uri')"></won-share-dropdown>
             <won-post-context-dropdown need-uri="self.post.get('uri')"></won-post-context-dropdown>
         </div>
         <won-post-content post-uri="self.postUri"></won-post-content>
@@ -124,5 +126,6 @@ export default angular
     postHeaderModule,
     postContextDropdownModule,
     postContentModule,
+    shareDropdownModule,
   ])
   .directive("wonPostInfo", genComponentConf).name;

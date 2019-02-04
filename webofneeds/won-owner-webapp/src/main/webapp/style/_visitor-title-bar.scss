@@ -98,8 +98,13 @@
     }
   }
 
-  > won-post-context-dropdown {
+  > won-post-context-dropdown,
+  > won-share-dropdown {
     margin-top: 1rem;
     margin-right: 0.5rem;
+  }
+
+  > won-share-dropdown {
+    margin-right: 1rem;
   }
 }

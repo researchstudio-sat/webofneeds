@@ -49,6 +49,7 @@ function genComponentConf() {
             <won-connection-header
                 connection-uri="self.connectionUri">
             </won-connection-header>
+            <won-share-dropdown need-uri="self.nonOwnedNeed.get('uri')"></won-share-dropdown>
             <won-connection-context-dropdown show-petri-net-data-field="::self.showPetriNetDataField()" show-agreement-data-field="::self.showAgreementDataField()"></won-connection-context-dropdown>
         </div>
         <div class="pm__header" ng-if="self.showAgreementData">
