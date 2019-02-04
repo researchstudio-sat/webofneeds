@@ -12,6 +12,7 @@ function genComponentConf($ngRedux) {
     scope: {
       isValid: "=",
       onPublish: "&",
+      showPersonas: "=",
     },
     link: (scope, element) => {
       const elmApp = Elm.PublishButton.init({
@@ -25,17 +26,19 @@ function genComponentConf($ngRedux) {
         },
       });
 
-      scope.$watch("isValid", newValue => {
+      const sendNewValues = () => {
         elmApp.ports.publishIn.send({
-          draftValid: newValue ? true : false,
+          draftValid: scope.isValid ? true : false,
+          showPersonas: scope.showPersonas ? true : false,
           loggedIn: $ngRedux.getState().getIn(["account", "loggedIn"]),
         });
-      });
+      };
 
-      elmApp.ports.publishIn.send({
-        draftValid: scope.isValid ? true : false,
-        loggedIn: $ngRedux.getState().getIn(["account", "loggedIn"]),
-      });
+      scope.$watch("isValid", sendNewValues);
+
+      scope.$watch("showPersonas", sendNewValues);
+
+      sendNewValues();
 
       const personas = getOwnedPersonas($ngRedux.getState());
       if (personas) {
@@ -48,10 +51,7 @@ function genComponentConf($ngRedux) {
           loggedIn: state.getIn(["account", "loggedIn"]),
         };
       })(state => {
-        elmApp.ports.publishIn.send({
-          draftValid: scope.isValid ? true : false,
-          loggedIn: state.loggedIn,
-        });
+        sendNewValues();
         if (!state.personas) {
           return;
         }
