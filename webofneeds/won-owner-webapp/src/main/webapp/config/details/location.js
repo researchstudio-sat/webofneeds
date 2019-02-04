@@ -230,6 +230,9 @@ function genSPlace({ geoData, baseUri }) {
   if (!geoData) {
     return undefined;
   }
+  if (!geoData.lat || !geoData.lng || !geoData.name) {
+    return undefined;
+  }
 
   return {
     "@id": baseUri,
