@@ -1,0 +1,45 @@
+@import "won-config";
+@import "sizing-utils";
+
+won-paypal-payment-viewer {
+  @include won-detail-viewer("paypalpaymentv");
+
+  .paypalpaymentv__content {
+    display: grid;
+    grid-template-columns: min-content 1fr;
+    grid-gap: 0.5rem;
+
+    &__customer {
+      grid-column: 1 / span 2;
+      border: $thinGrayBorder;
+      padding: 0.25rem;
+      background: white;
+    }
+
+    &__label {
+      &.span-column {
+        grid-column: 1 / span 2;
+      }
+      white-space: nowrap;
+      color: $won-subtitle-gray;
+    }
+
+    &__secret {
+      //TODO: Style
+    }
+    &__receiver {
+      //TODO: Style
+    }
+    &__price {
+      //TODO: Style
+    }
+
+    &__action {
+      &.span-column {
+        grid-column: 1 / span 2;
+      }
+      width: 100%;
+      font-size: $smallFontSize;
+    }
+  }
+}

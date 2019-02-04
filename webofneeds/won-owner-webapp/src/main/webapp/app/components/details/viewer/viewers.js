@@ -16,6 +16,7 @@ import petrinetViewerModule from "./petrinet-viewer.js";
 import petrinettransitionViewerModule from "./petrinettransition-viewer.js";
 import reviewViewerModule from "./review-viewer.js";
 import suggestPostViewerModule from "./suggestpost-viewer.js";
+import paypalPaymentViewerModule from "./paypal-payment-viewer.js";
 
 /**
  * module names for angular's module system
@@ -39,4 +40,5 @@ export default [
   petrinettransitionViewerModule,
   reviewViewerModule,
   suggestPostViewerModule,
+  paypalPaymentViewerModule,
 ];
