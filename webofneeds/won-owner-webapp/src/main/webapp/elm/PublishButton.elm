@@ -50,6 +50,7 @@ type alias Size =
 type alias Options =
     { draftValid : Bool
     , loggedIn : Bool
+    , showPersonas : Bool
     }
 
 
@@ -71,6 +72,7 @@ init { width, height } =
       , options =
             { draftValid = False
             , loggedIn = False
+            , showPersonas = False
             }
       , size =
             { width = width
@@ -111,7 +113,7 @@ view skin model =
         , Font.size 16
         ]
     <|
-        if not model.options.loggedIn then
+        if not model.options.loggedIn || not model.options.showPersonas then
             Input.button
                 [ width fill
                 , height (px 43)

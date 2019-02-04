@@ -19,6 +19,7 @@ import { useCases } from "useCaseDefinitions";
 
 import "style/_create-post.scss";
 import "style/_responsiveness-utils.scss";
+import { values } from "min-dash";
 
 const serviceDependencies = [
   "$ngRedux",
@@ -100,7 +101,7 @@ function genComponentConf() {
         </div>
         <div class="cp__footer" >
             <won-labelled-hr label="::'done?'" class="cp__footer__labelledhr"></won-labelled-hr>
-            <won-publish-button on-publish="self.publish(persona)" is-valid="self.isValid()" ng-if="self.showCreateInput"></won-publish-button>
+            <won-publish-button on-publish="self.publish(persona)" is-valid="self.isValid()" show-personas="self.isHoldable" ng-if="self.showCreateInput"></won-publish-button>
         </div>
     `;
 
@@ -205,6 +206,12 @@ function genComponentConf() {
           isCreateFromNeed,
           isFromNeedLoading,
           isFromNeedToLoad,
+          isHoldable:
+            useCase &&
+            useCase.draft &&
+            useCase.draft.content &&
+            useCase.draft.content.facets &&
+            values(useCase.draft.content.facets).includes("won:HoldableFacet"),
           hasFromNeedFailedToLoad,
           showCreateInput:
             useCase &&
