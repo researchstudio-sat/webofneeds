@@ -6,6 +6,7 @@ won-share-dropdown {
   .sdd__icon__small {
     @include fixed-square($postIconSizeMobile);
     padding-left: 0.5rem;
+    padding-right: 0.25rem;
   }
 
   .topline {
@@ -16,7 +17,7 @@ won-share-dropdown {
     @include fixed-square($postIconSizeMobile);
     //padding-left: 0.5rem;
     position: relative;
-    right: -0.6rem;
+    right: -0.35rem;
     /*the correct right value would be "calc(-0.5rem - #{$thinBorderWidth});"
     however, it is not displayed correct so we assume the right value with -0.6rem*/
     float: right;
