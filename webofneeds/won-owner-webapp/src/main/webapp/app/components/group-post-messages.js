@@ -4,6 +4,7 @@ import chatTextFieldModule from "./chat-textfield.js";
 import connectionMessageModule from "./messages/connection-message.js";
 import postContentMessageModule from "./messages/post-content-message.js";
 import connectionHeaderModule from "./connection-header.js";
+import shareDropdownModule from "./share-dropdown.js";
 import labelledHrModule from "./labelled-hr.js";
 import connectionContextDropdownModule from "./connection-context-dropdown.js";
 import { connect2Redux } from "../won-utils.js";
@@ -38,6 +39,7 @@ function genComponentConf() {
             <won-connection-header
                 connection-uri="self.connectionUri">
             </won-connection-header>
+            <won-share-dropdown need-uri="self.nonOwnedNeedUri"></won-share-dropdown>
             <won-connection-context-dropdown show-petri-net-data-field="" show-agreement-data-field=""></won-connection-context-dropdown>
         </div>
         <div
@@ -454,5 +456,6 @@ export default angular
     labelledHrModule,
     connectionContextDropdownModule,
     postContentMessageModule,
+    shareDropdownModule,
   ])
   .directive("wonGroupPostMessages", genComponentConf).name;

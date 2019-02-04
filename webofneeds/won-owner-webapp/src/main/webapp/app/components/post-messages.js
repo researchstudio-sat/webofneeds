@@ -6,6 +6,7 @@ import connectionMessageModule from "./messages/connection-message.js";
 import postContentMessageModule from "./messages/post-content-message.js";
 import petrinetStateModule from "./petrinet-state.js";
 import connectionHeaderModule from "./connection-header.js";
+import shareDropdownModule from "./share-dropdown.js";
 import labelledHrModule from "./labelled-hr.js";
 import connectionContextDropdownModule from "./connection-context-dropdown.js";
 import { connect2Redux } from "../won-utils.js";
@@ -49,7 +50,7 @@ function genComponentConf() {
             <won-connection-header
                 connection-uri="self.connectionUri">
             </won-connection-header>
-            <won-share-dropdown need-uri="self.nonOwnedNeed.get('uri')"></won-share-dropdown>
+            <won-share-dropdown need-uri="self.nonOwnedNeedUri"></won-share-dropdown>
             <won-connection-context-dropdown show-petri-net-data-field="::self.showPetriNetDataField()" show-agreement-data-field="::self.showAgreementDataField()"></won-connection-context-dropdown>
         </div>
         <div class="pm__header" ng-if="self.showAgreementData">
@@ -911,5 +912,6 @@ export default angular
     connectionContextDropdownModule,
     postContentMessageModule,
     petrinetStateModule,
+    shareDropdownModule,
   ])
   .directive("wonPostMessages", genComponentConf).name;
