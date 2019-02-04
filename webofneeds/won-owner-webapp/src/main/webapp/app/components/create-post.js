@@ -345,6 +345,7 @@ function selectUseCaseFrom(useCaseString, useCases) {
   }
   return undefined;
 }
+
 // returns true if the branch has any content present
 function isBranchContentPresent(isOrSeeks) {
   if (isOrSeeks) {
