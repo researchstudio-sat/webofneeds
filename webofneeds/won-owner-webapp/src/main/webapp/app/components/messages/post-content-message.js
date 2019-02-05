@@ -42,7 +42,12 @@ function genComponentConf() {
         };
       };
 
-      connect2Redux(selectFromState, actionCreators, ["self.postUri"], this);
+      connect2Redux(
+        selectFromState,
+        actionCreators,
+        ["self.postUri", "self.connectionUri"],
+        this
+      );
       classOnComponentRoot("won-is-loading", () => this.postLoading, this);
     }
   }
@@ -55,6 +60,7 @@ function genComponentConf() {
     bindToController: true, //scope-bindings -> ctrl
     scope: {
       postUri: "=",
+      connectionUri: "=",
     },
     template: template,
   };

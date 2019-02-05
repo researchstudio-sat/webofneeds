@@ -106,7 +106,9 @@ export function parseMessage(
       contentGraphTrigError: wonMessage.contentGraphTrigError,
       //Receive Status Flags
       unread:
-        !wonMessage.isFromOwner() && !isUriRead(wonMessage.getMessageUri()),
+        !wonMessage.isFromOwner() &&
+        !wonMessage.isHintMessage() &&
+        !isUriRead(wonMessage.getMessageUri()),
       //Send Status Flags
       isReceivedByOwn: alreadyProcessed || !wonMessage.isFromOwner(), //if the message is not from the owner we know it has been received anyway
       isReceivedByRemote: alreadyProcessed || !wonMessage.isFromOwner(), //if the message is not from the owner we know it has been received anyway
