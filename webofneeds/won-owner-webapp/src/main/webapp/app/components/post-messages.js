@@ -10,8 +10,10 @@ import shareDropdownModule from "./share-dropdown.js";
 import labelledHrModule from "./labelled-hr.js";
 import connectionContextDropdownModule from "./connection-context-dropdown.js";
 import { connect2Redux } from "../won-utils.js";
-import { attach, delay, getIn } from "../utils.js";
-import { isWhatsAroundNeed, isWhatsNewNeed } from "../need-utils.js";
+import { attach, delay, getIn, get } from "../utils.js";
+import * as needUtils from "../need-utils.js";
+import * as processUtils from "../process-utils.js";
+import * as connectionUtils from "../connection-utils.js";
 import {
   fetchAgreementProtocolUris,
   fetchPetriNetUris,
@@ -50,7 +52,7 @@ function genComponentConf() {
             <won-connection-header
                 connection-uri="self.connectionUri">
             </won-connection-header>
-            <won-share-dropdown need-uri="self.nonOwnedNeedUri"></won-share-dropdown>
+            <won-share-dropdown need-uri="self.remoteNeedUri"></won-share-dropdown>
             <won-connection-context-dropdown show-petri-net-data-field="::self.showPetriNetDataField()" show-agreement-data-field="::self.showAgreementDataField()"></won-connection-context-dropdown>
         </div>
         <div class="pm__header" ng-if="self.showAgreementData">
@@ -96,8 +98,8 @@ function genComponentConf() {
             </div>
             <won-post-content-message
               class="won-cm--left"
-              ng-if="self.showChatData && !self.multiSelectType && self.nonOwnedNeedUri"
-              post-uri="self.nonOwnedNeedUri">
+              ng-if="self.showPostContentMessage"
+              post-uri="self.remoteNeedUri">
             </won-post-content-message>
             <div class="pm__content__loadspinner"
                 ng-if="self.isProcessingLoadingMessages || (self.showAgreementData && self.isProcessingLoadingAgreementData) || (self.showPetriNetData && self.isProcessingLoadingPetriNetData && !self.hasPetriNetData)">
@@ -267,10 +269,11 @@ function genComponentConf() {
           ownedNeed && ownedNeed.getIn(["connections", connectionUri]);
         const isOwnedNeedWhatsX =
           this.ownedNeed &&
-          (isWhatsAroundNeed(this.ownedNeed) || isWhatsNewNeed(this.ownedNeed));
-        const nonOwnedNeedUri = connection && connection.get("remoteNeedUri");
-        const nonOwnedNeed =
-          nonOwnedNeedUri && state.getIn(["needs", nonOwnedNeedUri]);
+          (needUtils.isWhatsAroundNeed(this.ownedNeed) ||
+            needUtils.isWhatsNewNeed(this.ownedNeed));
+        const remoteNeedUri = connection && connection.get("remoteNeedUri");
+        const remoteNeed =
+          remoteNeedUri && state.getIn(["needs", remoteNeedUri]);
         const chatMessages =
           connection &&
           connection.get("messages") &&
@@ -317,10 +320,21 @@ function genComponentConf() {
           chatMessages &&
           chatMessages.filter(msg => !msg.get("isMessageStatusUpToDate"));
 
+        const showChatData =
+          connection &&
+          !(
+            connection.get("showAgreementData") ||
+            connection.get("showPetriNetData")
+          );
+
+        const multiSelectType = connection && connection.get("multiSelectType");
+
+        const process = get(state, "process");
+
         return {
           ownedNeed,
-          nonOwnedNeed,
-          nonOwnedNeedUri,
+          remoteNeed,
+          remoteNeedUri,
           connectionUri,
           connection,
           isOwnedNeedWhatsX,
@@ -333,72 +347,42 @@ function genComponentConf() {
           unreadMessageCount: unreadMessages && unreadMessages.size,
           isProcessingLoadingMessages:
             connection &&
-            getIn(state, [
-              "process",
-              "connections",
-              connectionUri,
-              "loadingMessages",
-            ]),
+            processUtils.isConnectionLoadingMessages(process, connectionUri),
           isProcessingLoadingAgreementData:
             connection &&
-            getIn(state, [
-              "process",
-              "connections",
-              connectionUri,
-              "agreementData",
-              "loading",
-            ]),
+            processUtils.isConnectionAgreementDataLoading(
+              process,
+              connectionUri
+            ),
           isProcessingLoadingPetriNetData:
             connection &&
-            getIn(state, [
-              "process",
-              "connections",
-              connectionUri,
-              "petriNetData",
-              "loading",
-            ]),
+            processUtils.isConnectionPetriNetDataLoading(
+              process,
+              connectionUri
+            ),
           showAgreementData: connection && connection.get("showAgreementData"),
           showPetriNetData: connection && connection.get("showPetriNetData"),
-          showChatData:
-            connection &&
-            !(
-              connection.get("showAgreementData") ||
-              connection.get("showPetriNetData")
-            ),
+          showChatData,
           agreementData,
           petriNetData,
           petriNetDataArray: petriNetData && petriNetData.toArray(),
           agreementDataLoaded:
             agreementData &&
-            getIn(state, [
-              "process",
-              "connections",
-              connectionUri,
-              "agreementData",
-              "loaded",
-            ]),
+            processUtils.isConnectionAgreementDataLoaded(
+              process,
+              connectionUri
+            ),
           petriNetDataLoaded:
             petriNetData &&
-            getIn(state, [
-              "process",
-              "connections",
-              connectionUri,
-              "petriNetData",
-              "loaded",
-            ]),
-          multiSelectType: connection && connection.get("multiSelectType"),
+            processUtils.isConnectionPetriNetDataLoaded(process, connectionUri),
+          multiSelectType,
           lastUpdateTimestamp: connection && connection.get("lastUpdateDate"),
-          isSentRequest:
-            connection && connection.get("state") === won.WON.RequestSent,
-          isReceivedRequest:
-            connection && connection.get("state") === won.WON.RequestReceived,
-          isConnected:
-            connection && connection.get("state") === won.WON.Connected,
-          isSuggested:
-            connection && connection.get("state") === won.WON.Suggested,
+          isSentRequest: connectionUtils.isRequestSent(connection),
+          isReceivedRequest: connectionUtils.isRequestReceived(connection),
+          isConnected: connectionUtils.isConnected(connection),
+          isSuggested: connectionUtils.isSuggested(connection),
           debugmode: won.debugmode,
           shouldShowRdf: state.getIn(["view", "showRdf"]),
-          // if the connect-message is here, everything else should be as well
           hasConnectionMessagesToLoad,
           hasAgreementMessages: agreementMessages && agreementMessages.size > 0,
           hasPetriNetData: petriNetData && petriNetData.size > 0,
@@ -413,21 +397,16 @@ function genComponentConf() {
             cancellationPendingMessages.toArray(),
           connectionOrNeedsLoading:
             !connection ||
-            !nonOwnedNeed ||
+            !remoteNeed ||
             !ownedNeed ||
-            getIn(state, [
-              "process",
-              "needs",
-              ownedNeed.get("uri"),
-              "loading",
-            ]) ||
-            getIn(state, [
-              "process",
-              "needs",
-              nonOwnedNeed.get("uri"),
-              "loading",
-            ]) ||
-            getIn(state, ["process", "connections", connectionUri, "loading"]),
+            processUtils.isNeedLoading(process, ownedNeed.get("uri")) ||
+            processUtils.isNeedLoading(process, remoteNeed.get("uri")) ||
+            processUtils.isConnectionLoading(process, connectionUri),
+          showPostContentMessage:
+            showChatData &&
+            !multiSelectType &&
+            remoteNeedUri &&
+            !needUtils.isDirectResponseNeed(remoteNeed),
         };
       };
 
@@ -826,12 +805,8 @@ function genComponentConf() {
           this.connections__close(this.connectionUri);
         }
 
-        if (this.nonOwnedNeedUri) {
-          this.connections__connectAdHoc(
-            this.nonOwnedNeedUri,
-            message,
-            persona
-          );
+        if (this.remoteNeedUri) {
+          this.connections__connectAdHoc(this.remoteNeedUri, message, persona);
         }
 
         //this.router__stateGoCurrent({connectionUri: null, sendAdHocRequest: null});
@@ -840,7 +815,7 @@ function genComponentConf() {
         this.needs__connect(
           this.ownedNeed.get("uri"),
           this.connectionUri,
-          this.nonOwnedNeedUri,
+          this.remoteNeedUri,
           message
         );
         this.router__stateGoCurrent({ connectionUri: this.connectionUri });

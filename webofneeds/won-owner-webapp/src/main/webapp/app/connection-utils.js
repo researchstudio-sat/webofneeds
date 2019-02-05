@@ -106,22 +106,40 @@ export function isChatToGroup(needs, needUri, connUri) {
   }
 }
 
+export function isRequestSent(connection) {
+  return get(connection, "state") === won.WON.RequestSent;
+}
+
+export function isRequestReceived(connection) {
+  return get(connection, "state") === won.WON.RequestReceived;
+}
+
+export function isSuggested(connection) {
+  return get(connection, "state") === won.WON.Suggested;
+}
+
+export function isConnected(connection) {
+  return get(connection, "state") === won.WON.Connected;
+}
+
+export function isClosed(connection) {
+  return get(connection, "state") === won.WON.Closed;
+}
+
 /**
  * Creates a label of the participants and suggestions/requests/invites of a given set of groupChatConnections
  * @param groupChatConnections
  */
 export function generateGroupChatMembersLabel(groupChatConnections) {
-  const groupMembersSize = groupChatConnections.filter(
-    conn => conn.get("state") === won.WON.Connected
+  const groupMembersSize = groupChatConnections.filter(conn =>
+    isConnected(conn)
   ).size;
-  const suggestedSize = groupChatConnections.filter(
-    conn => conn.get("state") === won.WON.Suggested
-  ).size;
-  const invitedSize = groupChatConnections.filter(
-    conn => conn.get("state") === won.WON.RequestSent
-  ).size;
-  const requestedSize = groupChatConnections.filter(
-    conn => conn.get("state") === won.WON.RequestReceived
+  const suggestedSize = groupChatConnections.filter(conn => isSuggested(conn))
+    .size;
+  const invitedSize = groupChatConnections.filter(conn => isRequestSent(conn))
+    .size;
+  const requestedSize = groupChatConnections.filter(conn =>
+    isRequestReceived(conn)
   ).size;
 
   const createPartOfLabel = (size, entitySingular, entityPlural) => {
