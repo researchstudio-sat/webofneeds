@@ -171,6 +171,19 @@ export function isConnectionPetriNetDataLoading(process, connUri) {
 }
 
 /**
+ * Return true if the petriNet-Data for the given connUri has been loaded
+ * @param process
+ * @param connUri
+ * @returns {*}
+ */
+export function isConnectionPetriNetDataLoaded(process, connUri) {
+  return (
+    connUri &&
+    getIn(process, ["connections", connUri, "petriNetData", "loaded"])
+  );
+}
+
+/**
  * Return true if the agreement-Data for the given connUri is currently loading
  * @param process
  * @param connUri
@@ -181,6 +194,23 @@ export function isConnectionAgreementDataLoading(process, connUri) {
     connUri &&
     getIn(process, ["connections", connUri, "agreementData", "loading"])
   );
+}
+
+/**
+ * Return true if the agreement-Data for the given connUri has been loaded
+ * @param process
+ * @param connUri
+ * @returns {*}
+ */
+export function isConnectionAgreementDataLoaded(process, connUri) {
+  return (
+    connUri &&
+    getIn(process, ["connections", connUri, "agreementData", "loaded"])
+  );
+}
+
+export function isConnectionLoadingMessages(process, connUri) {
+  return connUri && getIn(process, ["connections", connUri, "loadingMessages"]);
 }
 
 /**
