@@ -9,7 +9,10 @@ import labelledHrModule from "./labelled-hr.js";
 import connectionContextDropdownModule from "./connection-context-dropdown.js";
 import { connect2Redux } from "../won-utils.js";
 import { attach, delay, getIn, get } from "../utils.js";
-import { isWhatsAroundNeed, isWhatsNewNeed } from "../need-utils.js";
+import * as needUtils from "../need-utils.js";
+import * as messageUtils from "../message-utils.js";
+import * as connectionUtils from "../connection-utils.js";
+import * as processUtils from "../process-utils.js";
 import { fetchMessage } from "../won-message-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import {
@@ -39,7 +42,7 @@ function genComponentConf() {
             <won-connection-header
                 connection-uri="self.connectionUri">
             </won-connection-header>
-            <won-share-dropdown need-uri="self.nonOwnedNeedUri"></won-share-dropdown>
+            <won-share-dropdown need-uri="self.remoteNeedUri"></won-share-dropdown>
             <won-connection-context-dropdown show-petri-net-data-field="" show-agreement-data-field=""></won-connection-context-dropdown>
         </div>
         <div
@@ -53,8 +56,9 @@ function genComponentConf() {
             </div>
             <won-post-content-message
               class="won-cm--left"
-              ng-if="self.nonOwnedNeedUri"
-              post-uri="self.nonOwnedNeedUri">
+              ng-if="self.remoteNeedUri"
+              post-uri="self.remoteNeedUri"
+              connection-uri="self.connectionUri">
             </won-post-content-message>
             <div class="gpm__content__loadspinner"
                 ng-if="self.isProcessingLoadingMessages">
@@ -162,13 +166,16 @@ function genComponentConf() {
         const ownedNeed = getOwnedNeedByConnectionUri(state, connectionUri);
         const connection = getIn(ownedNeed, ["connections", connectionUri]);
         const isOwnedNeedWhatsX =
-          isWhatsAroundNeed(this.ownedNeed) || isWhatsNewNeed(this.ownedNeed);
-        const nonOwnedNeedUri = get(connection, "remoteNeedUri");
-        const nonOwnedNeed = getIn(state, ["needs", nonOwnedNeedUri]);
+          needUtils.isWhatsAroundNeed(this.ownedNeed) ||
+          needUtils.isWhatsNewNeed(this.ownedNeed);
+        const remoteNeedUri = get(connection, "remoteNeedUri");
+        const remoteNeed = getIn(state, ["needs", remoteNeedUri]);
         const allChatMessages = get(connection, "messages");
         const chatMessages =
           allChatMessages &&
-          allChatMessages.filter(msg => !msg.getIn(["references", "forwards"])); //FILTER OUT ALL FORWARD MESSAGES JUST IN CASE
+          allChatMessages
+            .filter(msg => !msg.getIn(["references", "forwards"])) //FILTER OUT ALL FORWARD MESSAGE ENVELOPES JUST IN CASE
+            .filter(msg => !messageUtils.isHintMessage(msg)); //FILTER OUT ALL HINT MESSAGES
         const hasConnectionMessagesToLoad = hasMessagesToLoad(
           state,
           connectionUri
@@ -191,10 +198,12 @@ function genComponentConf() {
           connectionUri
         );
 
+        const process = get(state, "process");
+
         return {
           ownedNeed,
-          nonOwnedNeed,
-          nonOwnedNeedUri,
+          remoteNeed,
+          remoteNeedUri,
           connectionUri,
           connection,
           isOwnedNeedWhatsX,
@@ -205,42 +214,25 @@ function genComponentConf() {
           unreadMessageCount: unreadMessages && unreadMessages.size,
           isProcessingLoadingMessages:
             connection &&
-            getIn(state, [
-              "process",
-              "connections",
-              connectionUri,
-              "loadingMessages",
-            ]),
+            processUtils.isConnectionLoadingMessages(process, connectionUri),
           lastUpdateTimestamp: connection && connection.get("lastUpdateDate"),
           isSentRequest:
-            connection && connection.get("state") === won.WON.RequestSent,
+            connection && connectionUtils.isRequestSent(connection),
           isReceivedRequest:
-            connection && connection.get("state") === won.WON.RequestReceived,
-          isConnected:
-            connection && connection.get("state") === won.WON.Connected,
-          isSuggested:
-            connection && connection.get("state") === won.WON.Suggested,
+            connection && connectionUtils.isRequestReceived(connection),
+          isConnected: connection && connectionUtils.isConnected(connection),
+          isSuggested: connection && connectionUtils.isSuggested(connection),
           debugmode: won.debugmode,
           shouldShowRdf: state.getIn(["view", "showRdf"]),
           // if the connect-message is here, everything else should be as well
           hasConnectionMessagesToLoad,
           connectionOrNeedsLoading:
             !connection ||
-            !nonOwnedNeed ||
+            !remoteNeed ||
             !ownedNeed ||
-            getIn(state, [
-              "process",
-              "needs",
-              ownedNeed.get("uri"),
-              "loading",
-            ]) ||
-            getIn(state, [
-              "process",
-              "needs",
-              nonOwnedNeed.get("uri"),
-              "loading",
-            ]) ||
-            getIn(state, ["process", "connections", connectionUri, "loading"]),
+            processUtils.isNeedLoading(process, ownedNeed.get("uri")) ||
+            processUtils.isNeedLoading(process, remoteNeedUri) ||
+            processUtils.isConnectionLoading(process, connectionUri),
         };
       };
 
@@ -387,12 +379,8 @@ function genComponentConf() {
           this.connections__close(this.connectionUri);
         }
 
-        if (this.nonOwnedNeedUri) {
-          this.connections__connectAdHoc(
-            this.nonOwnedNeedUri,
-            message,
-            persona
-          );
+        if (this.remoteNeedUri) {
+          this.connections__connectAdHoc(this.remoteNeedUri, message, persona);
         }
 
         //this.router__stateGoCurrent({connectionUri: null, sendAdHocRequest: null});
@@ -401,7 +389,7 @@ function genComponentConf() {
         this.needs__connect(
           this.ownedNeed.get("uri"),
           this.connectionUri,
-          this.nonOwnedNeedUri,
+          this.remoteNeedUri,
           message
         );
         this.router__stateGoCurrent({ connectionUri: this.connectionUri });

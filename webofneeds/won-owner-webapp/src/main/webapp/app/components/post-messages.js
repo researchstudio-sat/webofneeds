@@ -14,6 +14,7 @@ import { attach, delay, getIn, get } from "../utils.js";
 import * as needUtils from "../need-utils.js";
 import * as processUtils from "../process-utils.js";
 import * as connectionUtils from "../connection-utils.js";
+import * as messageUtils from "../message-utils.js";
 import {
   fetchAgreementProtocolUris,
   fetchPetriNetUris,
@@ -99,7 +100,8 @@ function genComponentConf() {
             <won-post-content-message
               class="won-cm--left"
               ng-if="self.showPostContentMessage"
-              post-uri="self.remoteNeedUri">
+              post-uri="self.remoteNeedUri"
+              connection-uri="self.connectionUri">
             </won-post-content-message>
             <div class="pm__content__loadspinner"
                 ng-if="self.isProcessingLoadingMessages || (self.showAgreementData && self.isProcessingLoadingAgreementData) || (self.showPetriNetData && self.isProcessingLoadingPetriNetData && !self.hasPetriNetData)">
@@ -277,7 +279,10 @@ function genComponentConf() {
         const chatMessages =
           connection &&
           connection.get("messages") &&
-          connection.get("messages").filter(msg => !msg.get("forwardMessage"));
+          connection
+            .get("messages")
+            .filter(msg => !msg.get("forwardMessage"))
+            .filter(msg => !messageUtils.isHintMessage(msg));
         const hasConnectionMessagesToLoad = hasMessagesToLoad(
           state,
           connectionUri
@@ -400,7 +405,7 @@ function genComponentConf() {
             !remoteNeed ||
             !ownedNeed ||
             processUtils.isNeedLoading(process, ownedNeed.get("uri")) ||
-            processUtils.isNeedLoading(process, remoteNeed.get("uri")) ||
+            processUtils.isNeedLoading(process, remoteNeedUri) ||
             processUtils.isConnectionLoading(process, connectionUri),
           showPostContentMessage:
             showChatData &&
