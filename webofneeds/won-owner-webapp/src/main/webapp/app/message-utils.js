@@ -3,6 +3,7 @@
  */
 
 import won from "./won-es6.js";
+import { get } from "./utils.js";
 
 /**
  * Determines if a given message can be Proposed
@@ -279,6 +280,10 @@ export function isMessageClaim(msg) {
  */
 export function isMessageAgreement(msg) {
   return isMessageAccepted(msg) && !isMessageCancellationPending(msg);
+}
+
+export function isHintMessage(msg) {
+  return get(msg, "messageType") === won.WONMSG.hintMessage;
 }
 
 /**
