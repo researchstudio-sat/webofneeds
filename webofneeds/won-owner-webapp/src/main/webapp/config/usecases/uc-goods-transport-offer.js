@@ -40,8 +40,8 @@ export const goodsTransportOffer = {
         },
         operations: [
           `${resultName} a won:Need.`,
-          `${resultName} won:seeks ?seeks.`,
           `${resultName} a <http://dbpedia.org/resource/Cargo>.`,
+          `${resultName} won:seeks ?seeks.`,
           "?seeks won:travelAction/s:fromLocation ?fromLocation.",
           "?seeks won:travelAction/s:toLocation ?toLocation.",
           "?fromLocation s:geo ?fromLocation_geo.",
@@ -77,7 +77,6 @@ export const goodsTransportOffer = {
         },
         operations: [
           `${resultName} a won:Need.`,
-          `${resultName} won:seeks ?seeks.`,
           `${resultName} a <http://dbpedia.org/resource/Cargo>.`,
         ],
       };

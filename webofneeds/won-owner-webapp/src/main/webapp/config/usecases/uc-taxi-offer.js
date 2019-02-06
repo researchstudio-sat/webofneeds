@@ -5,11 +5,7 @@ import { details, mergeInEmptyDraft } from "../detail-definitions.js";
 import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-utils.js";
 import won from "../../app/won-es6.js";
 import { getIn } from "../../app/utils.js";
-import {
-  filterInVicinity,
-  concatenateFilters,
-  sparqlQuery,
-} from "../../app/sparql-builder-utils.js";
+import { sparqlQuery } from "../../app/sparql-builder-utils.js";
 
 export const taxiOffer = {
   identifier: "taxiOffer",
@@ -28,35 +24,71 @@ export const taxiOffer = {
   },
   generateQuery: (draft, resultName) => {
     const location = getIn(draft, ["content", "location"]);
-    const filters = [
-      {
+
+    let filter;
+    if (location && location.lat && location.lng) {
+      filter = {
         // to select seeks-branch
         prefixes: {
           won: won.defaultContext["won"],
         },
         operations: [
           `${resultName} a won:Need.`,
+          `${resultName} a won:PersonalTransportSearch.`,
           `${resultName} won:seeks ?seeks.`,
-          location && "?seeks won:travelAction/s:fromLocation ?location.",
+          "?seeks won:travelAction/s:fromLocation ?fromLocation.",
+          "?seeks won:travelAction/s:toLocation ?toLocation.",
+          "?fromLocation s:geo ?fromLocation_geo.",
+          "?fromLocation_geo s:latitude ?fromLocation_lat;",
+          "s:longitude ?fromLocation_lon;",
+          `bind (abs(xsd:decimal(?fromLocation_lat) - ${
+            location.lat
+          }) as ?fromLatDiffRaw)`,
+          `bind (abs(xsd:decimal(?fromLocation_lon) - ${
+            location.lng
+          }) as ?fromLonDiff)`,
+          "bind (if ( ?fromLatDiffRaw > 180, 360 - ?fromLatDiffRaw, ?fromLatDiffRaw ) as ?fromLatDiff)",
+          "bind ( ?fromLatDiff * ?fromLatDiff + ?fromLonDiff * ?fromLonDiff as ?fromLocation_geoDistanceScore)",
+          "?toLocation s:geo ?toLocation_geo.",
+          "?toLocation_geo s:latitude ?toLocation_lat;",
+          "s:longitude ?toLocation_lon;",
+          `bind (abs(xsd:decimal(?toLocation_lat) - ${
+            location.lat
+          }) as ?toLatDiffRaw)`,
+          `bind (abs(xsd:decimal(?toLocation_lon) - ${
+            location.lng
+          }) as ?toLonDiff)`,
+          "bind (if ( ?toLatDiffRaw > 180, 360 - ?toLatDiffRaw, ?toLatDiffRaw ) as ?toLatDiff)",
+          "bind ( ?toLatDiff * ?toLatDiff + ?toLonDiff * ?toLonDiff as ?toLocation_geoDistanceScore)",
+          "bind (?toLocation_geoDistanceScore + ?fromLocation_geoDistanceScore as ?distScore)",
         ],
-      },
+      };
+    } else {
+      filter = {
+        // to select seeks-branch
+        prefixes: {
+          won: won.defaultContext["won"],
+        },
+        operations: [
+          `${resultName} a won:Need.`,
+          `${resultName} a won:PersonalTransportSearch.`,
+        ],
+      };
+    }
 
-      filterInVicinity("?location", location, /*radius=*/ 100),
-    ];
-
-    const concatenatedFilter = concatenateFilters(filters);
-
-    return sparqlQuery({
-      prefixes: concatenatedFilter.prefixes,
+    const generatedQuery = sparqlQuery({
+      prefixes: filter.prefixes,
       distinct: true,
       variables: [resultName],
-      where: concatenatedFilter.operations,
+      where: filter.operations,
       orderBy: [
         {
           order: "ASC",
-          variable: "?location_geoDistance",
+          variable: "?distScore",
         },
       ],
     });
+
+    return generatedQuery;
   },
 };
