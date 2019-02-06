@@ -31,6 +31,7 @@ export const taxiOffer = {
         // to select seeks-branch
         prefixes: {
           won: won.defaultContext["won"],
+          s: won.defaultContext["s"],
         },
         operations: [
           `${resultName} a won:Need.`,
