@@ -108,6 +108,39 @@ async function connectReview(
   });
 }
 
+export function connectPersona(needUri, personaUri) {
+  return async dispatch => {
+    const response = await fetch("rest/action/connect", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify([
+        {
+          pending: false,
+          facet: `${personaUri}#holderFacet`,
+        },
+        {
+          pending: false,
+          facet: `${needUri}#holdableFacet`,
+        },
+      ]),
+      credentials: "include",
+    });
+    if (!response.ok) {
+      const errorMsg = await response.text();
+      throw new Error(`Could not connect identity: ${errorMsg}`);
+    }
+    dispatch({
+      type: actionTypes.personas.connect,
+      payload: {
+        needUri: needUri,
+        personaUri: personaUri,
+      },
+    });
+  };
+}
+
 export function reviewPersona(reviewableConnectionUri, review) {
   return (dispatch, getState) => {
     const state = getState();
