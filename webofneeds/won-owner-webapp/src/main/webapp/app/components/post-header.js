@@ -10,16 +10,11 @@ import { relativeTime } from "../won-label-utils.js";
 import { attach, getIn, get, delay } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { selectLastUpdateTime } from "../selectors/general-selectors.js";
+import * as viewSelectors from "../selectors/view-selectors.js";
 import won from "../won-es6.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
-import {
-  generateFullNeedTypesLabel,
-  generateShortNeedTypesLabel,
-  isDirectResponseNeed,
-  hasGroupFacet,
-  hasChatFacet,
-  generateNeedMatchingContext,
-} from "../need-utils.js";
+import * as needUtils from "../need-utils.js";
+import * as processUtils from "../../process-utils.js";
 
 import "style/_post-header.scss";
 
@@ -28,11 +23,11 @@ function genComponentConf() {
   let template = `
 
     <won-square-image
-        ng-if="!self.postLoading"
+        ng-if="!self.needLoading"
         uri="::self.needUri">
     </won-square-image>
-    <div class="ph__right" ng-if="!self.need.get('isBeingCreated') && !self.postLoading">
-      <div class="ph__right__topline" ng-if="!self.postFailedToLoad">
+    <div class="ph__right" ng-if="!self.need.get('isBeingCreated') && !self.needLoading">
+      <div class="ph__right__topline" ng-if="!self.needFailedToLoad">
         <div class="ph__right__topline__title" ng-if="self.hasTitle()">
           {{ self.generateTitle() }}
         </div>
@@ -43,7 +38,7 @@ function genComponentConf() {
           no title
         </div>
       </div>
-      <div class="ph__right__subtitle" ng-if="!self.postFailedToLoad">
+      <div class="ph__right__subtitle" ng-if="!self.needFailedToLoad">
         <span class="ph__right__subtitle__type">
           <span class="ph__right__subtitle__type__persona"
             ng-if="self.personaName">
@@ -68,12 +63,12 @@ function genComponentConf() {
           {{ self.friendlyTimestamp }}
         </div>
       </div>
-      <div class="ph__right__topline" ng-if="self.postFailedToLoad">
+      <div class="ph__right__topline" ng-if="self.needFailedToLoad">
         <div class="ph__right__topline__notitle">
           Need Loading failed
         </div>
       </div>
-      <div class="ph__right__subtitle" ng-if="self.postFailedToLoad">
+      <div class="ph__right__subtitle" ng-if="self.needFailedToLoad">
         <span class="ph__right__subtitle__type">
           Need might have been deleted.
         </span>
@@ -108,8 +103,8 @@ function genComponentConf() {
           </span>
       </div>
     </div>
-    <div class="ph__icon__skeleton" ng-if="self.postLoading"></div>
-    <div class="ph__right" ng-if="self.postLoading">
+    <div class="ph__icon__skeleton" ng-if="self.needLoading"></div>
+    <div class="ph__right" ng-if="self.needLoading">
       <div class="ph__right__topline">
         <div class="ph__right__topline__title"></div>
       </div>
@@ -127,7 +122,7 @@ function genComponentConf() {
       this.WON = won.WON;
       const selectFromState = state => {
         const need = getIn(state, ["needs", this.needUri]);
-        const isDirectResponse = isDirectResponseNeed(need);
+        const isDirectResponse = needUtils.isDirectResponseNeed(need);
         const responseToUri =
           isDirectResponse && getIn(need, ["content", "responseToUri"]);
         const responseToNeed =
@@ -137,44 +132,42 @@ function genComponentConf() {
         const persona = personaUri && getIn(state, ["needs", personaUri]);
         const personaName = get(persona, "humanReadable");
 
+        const process = get(state, "process");
+
         return {
           responseToNeed,
           need,
-          fullTypesLabel: need && generateFullNeedTypesLabel(need),
-          shortTypesLabel: need && generateShortNeedTypesLabel(need),
-          matchingContext: need && generateNeedMatchingContext(need),
+          fullTypesLabel: need && needUtils.generateFullNeedTypesLabel(need),
+          shortTypesLabel: need && needUtils.generateShortNeedTypesLabel(need),
+          matchingContext: need && needUtils.generateNeedMatchingContext(need),
           personaName,
-          postLoading:
-            !need ||
-            getIn(state, ["process", "needs", need.get("uri"), "loading"]),
-          postToLoad:
-            !need ||
-            getIn(state, ["process", "needs", need.get("uri"), "toLoad"]),
-          postFailedToLoad:
-            need &&
-            getIn(state, ["process", "needs", need.get("uri"), "failedToLoad"]),
+          needLoading:
+            !need || processUtils.isNeedLoading(process, this.needUri),
+          needToLoad: !need || processUtils.isNeedToLoad(process, this.needUri),
+          needFailedToLoad:
+            need && processUtils.hasNeedFailedToLoad(process, this.needUri),
           isDirectResponse: isDirectResponse,
-          isGroupChatEnabled: hasGroupFacet(need),
-          isChatEnabled: hasChatFacet(need),
+          isGroupChatEnabled: needUtils.hasGroupFacet(need),
+          isChatEnabled: needUtils.hasChatFacet(need),
           friendlyTimestamp:
             need &&
             relativeTime(
               selectLastUpdateTime(state),
-              need.get("lastUpdateDate")
+              get(need, "lastUpdateDate")
             ),
-          shouldShowRdf: state.getIn(["view", "showRdf"]),
+          shouldShowRdf: viewSelectors.showRdf(state),
         };
       };
 
       connect2Redux(selectFromState, actionCreators, ["self.needUri"], this);
 
-      classOnComponentRoot("won-is-loading", () => this.postLoading, this);
-      classOnComponentRoot("won-is-toload", () => this.postToLoad, this);
+      classOnComponentRoot("won-is-loading", () => this.needLoading, this);
+      classOnComponentRoot("won-is-toload", () => this.needToLoad, this);
 
       this.$scope.$watch(
         () =>
           this.needUri &&
-          (!this.need || (this.postToLoad && !this.postLoading)),
+          (!this.need || (this.needToLoad && !this.needLoading)),
         () => delay(0).then(() => this.ensureNeedIsLoaded())
       );
     }
@@ -182,7 +175,7 @@ function genComponentConf() {
     ensureNeedIsLoaded() {
       if (
         this.needUri &&
-        (!this.need || (this.postToLoad && !this.postLoading))
+        (!this.need || (this.needToLoad && !this.needLoading))
       ) {
         this.needs__fetchUnloadedNeed(this.needUri);
       }
@@ -212,13 +205,6 @@ function genComponentConf() {
     bindToController: true, //scope-bindings -> ctrl
     scope: {
       needUri: "=",
-      /**
-       * one of:
-       * - "fullpage" (NOT_YET_IMPLEMENTED) (used in post-info page)
-       * - "medium" (NOT_YET_IMPLEMENTED) (used in incoming/outgoing requests)
-       * - "small" (NOT_YET_IMPLEMENTED) (in matches-list)
-       */
-      //size: '=',
     },
     template: template,
   };

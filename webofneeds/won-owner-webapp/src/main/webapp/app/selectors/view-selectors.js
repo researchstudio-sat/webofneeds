@@ -14,6 +14,14 @@ export function showSlideIns(state) {
   return viewUtils.showSlideIns(get(state, "view"));
 }
 
+export function showModalDialog(state) {
+  return viewUtils.showModalDialog(get(state, "view"));
+}
+
+export function showRdf(state) {
+  return viewUtils.showRdf(get(state, "view"));
+}
+
 export function isAnonymousLinkSent(state) {
   return viewUtils.isAnonymousLinkSent(get(state, "view"));
 }
