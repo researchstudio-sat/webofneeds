@@ -20,7 +20,7 @@ export const personalTransportSearch = {
     ...mergeInEmptyDraft({
       content: {
         title: "Need a lift",
-        type: "won:PersonalTransportSearch",
+        type: ["won:PersonalTransportSearch"],
       },
     }),
   },

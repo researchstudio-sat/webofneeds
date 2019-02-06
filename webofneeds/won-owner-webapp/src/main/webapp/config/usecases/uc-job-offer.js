@@ -24,10 +24,10 @@ export const jobOffer = {
   draft: {
     ...mergeInEmptyDraft({
       content: {
-        type: "s:JobPosting",
+        type: ["s:JobPosting"],
       },
       seeks: {
-        type: "s:Person",
+        type: ["s:Person"],
       },
     }),
   },

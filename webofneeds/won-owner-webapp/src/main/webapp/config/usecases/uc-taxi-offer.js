@@ -18,7 +18,7 @@ export const taxiOffer = {
   doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
     ...mergeInEmptyDraft({
-      content: { title: "Taxi", type: "s:TaxiService" },
+      content: { title: "Taxi", type: ["s:TaxiService"] },
     }),
   },
   details: {

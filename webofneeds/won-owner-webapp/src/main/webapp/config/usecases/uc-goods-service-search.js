@@ -20,10 +20,10 @@ export const goodsServiceSearch = {
   draft: {
     ...mergeInEmptyDraft({
       content: {
-        type: "s:Demand",
+        type: ["s:Demand"],
       },
       seeks: {
-        type: "s:Offer",
+        type: ["s:Offer"],
       },
     }),
   },

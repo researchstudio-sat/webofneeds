@@ -29,11 +29,11 @@ export const rentRealEstateSearch = {
   draft: {
     ...mergeInEmptyDraft({
       seeks: {
-        type: "won:RealEstateRentOffer",
+        type: ["won:RealEstateRentOffer"],
         tags: ["RentOutRealEstate"],
       },
       content: {
-        type: "won:RealEstateRentDemand",
+        type: ["won:RealEstateRentDemand"],
         tags: ["SearchRealEstateToRent"],
       },
     }),

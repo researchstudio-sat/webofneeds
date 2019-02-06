@@ -11,10 +11,10 @@ export const goodsOffer = {
   draft: {
     ...mergeInEmptyDraft({
       content: {
-        type: "s:Offer",
+        type: ["s:Offer"],
       },
       seeks: {
-        type: "s:Demand",
+        type: ["s:Demand"],
       },
     }),
   },

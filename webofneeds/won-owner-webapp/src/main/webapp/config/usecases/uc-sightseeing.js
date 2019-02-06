@@ -12,7 +12,11 @@ export const sightseeing = {
   doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
     ...mergeInEmptyDraft({
-      content: { tags: ["sightseeing"], searchString: "sightseeing" },
+      content: {
+        type: ["won:SightSeeing"],
+        tags: ["sightseeing"],
+        searchString: "sightseeing",
+      },
     }),
   },
   details: {

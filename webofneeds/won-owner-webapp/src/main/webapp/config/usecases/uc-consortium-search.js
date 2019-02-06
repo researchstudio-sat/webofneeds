@@ -13,6 +13,7 @@ export const consortiumSearch = {
   draft: {
     ...mergeInEmptyDraft({
       content: {
+        type: ["won:ConsortiumSearch"],
         title: "Looking for a slot in a project consortium",
         tags: ["search-consortium"],
         searchString: "offer-consortium",

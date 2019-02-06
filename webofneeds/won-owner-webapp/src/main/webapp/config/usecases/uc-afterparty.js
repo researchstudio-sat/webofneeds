@@ -13,6 +13,7 @@ export const afterparty = {
   draft: {
     ...mergeInEmptyDraft({
       content: {
+        type: ["won:AfterParty"],
         title: "I'm up for partying! Any plans?",
         tags: ["afterparty"],
         searchString: "afterparty",

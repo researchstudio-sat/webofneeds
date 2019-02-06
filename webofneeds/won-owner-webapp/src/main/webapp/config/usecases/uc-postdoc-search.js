@@ -13,9 +13,13 @@ export const postdocSearch = {
   draft: {
     ...mergeInEmptyDraft({
       content: {
+        type: ["won:PostDocSearch"],
         title: "I'm looking for a PostDoc position!",
         tags: ["search-postdoc"],
         searchString: "offer-postdoc",
+      },
+      seeks: {
+        type: ["won:PostDocPosition"],
       },
     }),
   },

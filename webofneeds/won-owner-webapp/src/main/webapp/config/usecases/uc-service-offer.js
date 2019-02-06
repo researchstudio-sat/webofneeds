@@ -11,7 +11,7 @@ export const serviceOffer = {
   draft: {
     ...mergeInEmptyDraft({
       content: {
-        type: "s:Offer",
+        type: ["s:Offer"],
       },
     }),
   },
