@@ -3,7 +3,8 @@
  */
 import angular from "angular";
 import ngAnimate from "angular-animate";
-import { attach, getIn, get } from "../../utils.js";
+import { attach, getIn, get, delay } from "../../utils.js";
+import { connect2Redux } from "../../won-utils.js";
 import won from "../../won-es6.js";
 import { actionCreators } from "../../actions/actions.js";
 import sendRequestModule from "../send-request.js";
@@ -50,10 +51,13 @@ class Controller {
       };
     };
 
-    const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(
-      this
+    connect2Redux(selectFromState, actionCreators, [], this);
+
+    this.$scope.$watch(
+      () =>
+        this.needUri && (!this.need || (this.needToLoad && !this.needLoading)),
+      () => delay(0).then(() => this.ensureNeedIsLoaded())
     );
-    this.$scope.$on("$destroy", disconnect);
   }
 
   ensureNeedIsLoaded() {
