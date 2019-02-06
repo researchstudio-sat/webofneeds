@@ -5,10 +5,7 @@
 import Immutable from "immutable";
 import { actionCreators } from "./actions/actions.js";
 import { accountLogin } from "./actions/account-actions.js";
-import {
-  getCurrentParamsFromRoute,
-  getOwnedNeeds,
-} from "./selectors/general-selectors.js";
+import { getCurrentParamsFromRoute } from "./selectors/general-selectors.js";
 import { privateId2Credentials } from "./won-utils.js";
 
 import { getIn, firstToLowerCase, hyphen2Camel } from "./utils.js";
@@ -143,11 +140,7 @@ export function accessControl({
       //If we know the user is not loggedIn and there is a postUri in the route, we link to the post-visitor view
       const postUriFromRoute = toParams["postUri"];
       if (!getIn(state, ["account", "loggedIn"]) && !!postUriFromRoute) {
-        dispatch(
-          actionCreators.router__stateGoAbs("post", {
-            postUri: postUriFromRoute,
-          })
-        );
+        dispatch(actionCreators.router__stateGoResetParams(defaultRoute));
       }
       return;
     }
@@ -157,14 +150,6 @@ export function accessControl({
 
       if (!postUriFromRoute) {
         dispatch(actionCreators.router__stateGoResetParams(defaultRoute));
-      } else if (getIn(state, ["account", "loggedIn"])) {
-        if (getOwnedNeeds(state).get(postUriFromRoute)) {
-          dispatch(
-            actionCreators.router__stateGoAbs("connections", {
-              postUri: postUriFromRoute,
-            })
-          );
-        }
       }
       return;
     }
