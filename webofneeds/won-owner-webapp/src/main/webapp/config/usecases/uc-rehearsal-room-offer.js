@@ -86,7 +86,7 @@ export const rehearsalRoomOffer = {
             `${resultName} a won:Need.`,
             `${resultName} won:seeks ?seeks.`,
             `${resultName} rdf:type won:RehearsalRoomRentDemand.`,
-            "?seeks (won:hasLocation|s:location ?location.",
+            "?seeks (won:hasLocation|s:location) ?location.",
             "?location s:geo ?location_geo.",
             "?location_geo s:latitude ?location_lat;",
             "s:longitude ?location_lon;",
