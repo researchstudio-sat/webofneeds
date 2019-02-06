@@ -14,7 +14,7 @@ import * as viewSelectors from "../selectors/view-selectors.js";
 import won from "../won-es6.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 import * as needUtils from "../need-utils.js";
-import * as processUtils from "../../process-utils.js";
+import * as processUtils from "../process-utils.js";
 
 import "style/_post-header.scss";
 
