@@ -268,7 +268,6 @@ export const goodsTransportSearch = {
       toLocation.lat &&
       toLocation.lng
     ) {
-      //TODO: IMPL
       filter = {
         prefixes: {
           won: won.defaultContext["won"],
@@ -366,7 +365,7 @@ export const goodsTransportSearch = {
       };
     }
 
-    return sparqlQuery({
+    const generatedQuery = sparqlQuery({
       prefixes: filter.prefixes,
       distinct: true,
       variables: [resultName],
@@ -378,5 +377,7 @@ export const goodsTransportSearch = {
         },
       ],
     });
+
+    return generatedQuery;
   },
 };
