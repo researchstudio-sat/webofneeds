@@ -7,8 +7,6 @@ import java.util.function.Function;
 import java.util.stream.IntStream;
 
 import org.apache.jena.graph.Triple;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.SortCondition;
 import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.algebra.OpVisitorBase;
@@ -48,8 +46,6 @@ import org.apache.jena.sparql.expr.nodevalue.NodeValueBoolean;
 import org.apache.jena.sparql.expr.nodevalue.NodeValueString;
 import org.apache.jena.vocabulary.RDF;
 
-import scala.Function1;
-import scala.collection.immutable.Stream;
 import won.protocol.vocabulary.WON;
 
 public class SparqlMatcherUtils {
@@ -221,6 +217,15 @@ public class SparqlMatcherUtils {
         OpInserter inserter = targetFinder.getInserter();
         inserter.setNotExistsTriple(
                 new Triple(resultName, WON.HAS_FLAG.asNode(), WON.NO_HINT_FOR_COUNTERPART.asNode()));
+        return Transformer.transform(inserter, q);
+    }
+    
+    public static Op needStateActiveQuery(Op q, Var resultName) {
+        InsertionTargetFindingVisitor targetFinder = new InsertionTargetFindingVisitor();
+        Walker.walk(q, targetFinder);
+        OpInserter inserter = targetFinder.getInserter();
+        inserter.setJoinWithTriple(
+                new Triple(resultName, WON.IS_IN_STATE.asNode(), WON.NEED_STATE_ACTIVE.asNode()));
         return Transformer.transform(inserter, q);
     }
 

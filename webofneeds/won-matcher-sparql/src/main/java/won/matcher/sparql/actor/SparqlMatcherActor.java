@@ -396,6 +396,7 @@ public class SparqlMatcherActor extends UntypedActor {
             if (log.isDebugEnabled()) {
                 log.debug("transforming query, adding 'no hint for counterpart' restriction: {}", q);
             }
+            q = SparqlMatcherUtils.needStateActiveQuery(q, resultName);
             Op noHintForCounterpartQuery = SparqlMatcherUtils.noHintForCounterpartQuery(q, resultName);
             if (log.isDebugEnabled()) {
                 log.debug("transformed query: {}", noHintForCounterpartQuery);
