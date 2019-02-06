@@ -4,11 +4,7 @@ import {
   mergeInEmptyDraft,
 } from "../detail-definitions.js";
 import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-utils.js";
-import {
-  filterInVicinity,
-  concatenateFilters,
-  sparqlQuery,
-} from "../../app/sparql-builder-utils.js";
+import { sparqlQuery } from "../../app/sparql-builder-utils.js";
 import won from "../../app/won-es6.js";
 
 import { isValidNumber, get, getIn, getInFromJsonLd } from "../../app/utils.js";
@@ -263,81 +259,122 @@ export const goodsTransportSearch = {
     ]);
     const toLocation = getIn(draft, ["seeks", "travelAction", "toLocation"]);
 
-    const baseFilter = {
-      prefixes: {
-        won: won.defaultContext["won"],
-      },
-      operations: [
-        `${resultName} a won:Need.`,
-        `${resultName} won:isInState won:Active. ${resultName} a <http://dbpedia.org/resource/Transport>. `,
-      ],
-    };
-
-    const locationFilter = filterInVicinity(
-      "?location",
-      fromLocation,
-      /*radius=*/ 100
-    );
-    const fromLocationFilter = filterInVicinity(
-      "?fromLocation",
-      fromLocation,
-      /*radius=*/ 5
-    );
-    const toLocationFilter = filterInVicinity(
-      "?toLocation",
-      toLocation,
-      /*radius=*/ 5
-    );
-
-    const union = operations => {
-      if (!operations || operations.length === 0) {
-        return "";
-      } else {
-        return "{" + operations.join("} UNION {") + "}";
-      }
-    };
-    const filterAndJoin = (arrayOfStrings, seperator) =>
-      arrayOfStrings.filter(str => str).join(seperator);
-
-    const locationFilters = {
-      prefixes: locationFilter.prefixes,
-      operations: union([
-        filterAndJoin(
-          [
-            fromLocation &&
-              `${resultName} a <http://dbpedia.org/resource/Transport>. ${resultName} won:travelAction/s:fromLocation ?fromLocation. `,
-            fromLocation && fromLocationFilter.operations.join(" "),
-            toLocation &&
-              `${resultName} won:travelAction/s:toLocation ?toLocation.`,
-            toLocation && toLocationFilter.operations.join(" "),
-          ],
-          " "
-        ),
-        filterAndJoin(
-          [
-            location &&
-              `${resultName} a <http://dbpedia.org/resource/Transport> . ${resultName} (s:location|won:hasLocation) ?location .`,
-            location && locationFilter.operations.join(" "),
-          ],
-          " "
-        ),
-      ]),
-    };
-
-    const concatenatedFilter = concatenateFilters([
-      baseFilter,
-      locationFilters,
-    ]);
+    let filter;
+    if (
+      fromLocation &&
+      fromLocation.lat &&
+      fromLocation.lng &&
+      toLocation &&
+      toLocation.lat &&
+      toLocation.lng
+    ) {
+      //TODO: IMPL
+      filter = {
+        prefixes: {
+          won: won.defaultContext["won"],
+          s: won.defaultContext["s"],
+          geo: "http://www.bigdata.com/rdf/geospatial#",
+          xsd: "http://www.w3.org/2001/XMLSchema#",
+        },
+        operations: [
+          `${resultName} a won:Need.`,
+          `${resultName} a <http://dbpedia.org/resource/Transport>. `,
+          `${resultName} (won:hasLocation|s:location) ?location.`,
+          "?location s:geo ?location_geo.",
+          "?location_geo s:latitude ?location_lat;",
+          "s:longitude ?location_lon;",
+          `bind (abs(xsd:decimal(?location_lat) - ${
+            fromLocation.lat
+          }) as ?fromLatDiffRaw)`,
+          `bind (abs(xsd:decimal(?location_lon) - ${
+            fromLocation.lng
+          }) as ?fromLonDiff)`,
+          "bind (if ( ?fromLatDiffRaw > 180, 360 - ?fromLatDiffRaw, ?fromLatDiffRaw ) as ?fromLatDiff)",
+          "bind ( ?fromLatDiff * ?fromLatDiff + ?fromLonDiff * ?fromLonDiff as ?fromLocation_geoDistanceScore)",
+          `bind (abs(xsd:decimal(?location_lat) - ${
+            toLocation.lat
+          }) as ?latDiffRaw)`,
+          `bind (abs(xsd:decimal(?location_lon) - ${
+            toLocation.lng
+          }) as ?toLonDiff)`,
+          "bind (if ( ?toLatDiffRaw > 180, 360 - ?toLatDiffRaw, ?toLatDiffRaw ) as ?toLatDiff)",
+          "bind ( ?toLatDiff * ?toLatDiff + ?toLonDiff * ?toLonDiff as ?toLocation_geoDistanceScore)",
+          "bind (?fromLocation_geoDistanceScore + ?toLocation_geoDistanceScore as ?distScore)",
+        ],
+      };
+    } else if (fromLocation && fromLocation.lat && fromLocation.lng) {
+      filter = {
+        prefixes: {
+          won: won.defaultContext["won"],
+          s: won.defaultContext["s"],
+          geo: "http://www.bigdata.com/rdf/geospatial#",
+          xsd: "http://www.w3.org/2001/XMLSchema#",
+        },
+        operations: [
+          `${resultName} a won:Need.`,
+          `${resultName} a <http://dbpedia.org/resource/Transport>.`,
+          `${resultName} (won:hasLocation|s:location) ?location.`,
+          "?location s:geo ?location_geo.",
+          "?location_geo s:latitude ?location_lat;",
+          "s:longitude ?location_lon;",
+          `bind (abs(xsd:decimal(?location_lat) - ${
+            fromLocation.lat
+          }) as ?latDiffRaw)`,
+          `bind (abs(xsd:decimal(?location_lon) - ${
+            fromLocation.lng
+          }) as ?lonDiff)`,
+          "bind (if ( ?latDiffRaw > 180, 360 - ?latDiffRaw, ?latDiffRaw ) as ?latDiff)",
+          "bind ( ?latDiff * ?latDiff + ?lonDiff * ?lonDiff as ?location_geoDistanceScore)",
+          "bind (?location_geoDistanceScore as ?distScore)",
+        ],
+      };
+    } else if (toLocation && toLocation.lat && toLocation.lng) {
+      filter = {
+        prefixes: {
+          won: won.defaultContext["won"],
+          s: won.defaultContext["s"],
+          geo: "http://www.bigdata.com/rdf/geospatial#",
+          xsd: "http://www.w3.org/2001/XMLSchema#",
+        },
+        operations: [
+          `${resultName} a won:Need.`,
+          `${resultName} a <http://dbpedia.org/resource/Transport>.`,
+          `${resultName} (won:hasLocation|s:location) ?location.`,
+          "?location s:geo ?location_geo.",
+          "?location_geo s:latitude ?location_lat;",
+          "s:longitude ?location_lon;",
+          `bind (abs(xsd:decimal(?location_lat) - ${
+            toLocation.lat
+          }) as ?latDiffRaw)`,
+          `bind (abs(xsd:decimal(?location_lon) - ${
+            toLocation.lng
+          }) as ?lonDiff)`,
+          "bind (if ( ?latDiffRaw > 180, 360 - ?latDiffRaw, ?latDiffRaw ) as ?latDiff)",
+          "bind ( ?latDiff * ?latDiff + ?lonDiff * ?lonDiff as ?location_geoDistanceScore)",
+          "bind (?location_geoDistanceScore as ?distScore)",
+        ],
+      };
+    } else {
+      filter = {
+        prefixes: {
+          won: won.defaultContext["won"],
+        },
+        operations: [
+          `${resultName} a won:Need.`,
+          `${resultName} a <http://dbpedia.org/resource/Transport>. `,
+        ],
+      };
+    }
 
     return sparqlQuery({
-      prefixes: concatenatedFilter.prefixes,
+      prefixes: filter.prefixes,
       distinct: true,
       variables: [resultName],
-      where: concatenatedFilter.operations,
+      where: filter.operations,
       orderBy: [
         {
           order: "ASC",
-          variable: "?location_geoDistance",
+          variable: "?distScore",
         },
       ],
     });
