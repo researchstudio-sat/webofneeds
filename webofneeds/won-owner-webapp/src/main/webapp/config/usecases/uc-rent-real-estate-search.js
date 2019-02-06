@@ -11,7 +11,6 @@ import {
 
 import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-utils.js";
 import {
-  filterInVicinity,
   filterFloorSizeRange,
   filterNumOfRoomsRange,
   filterPriceRange,
@@ -53,55 +52,107 @@ export const rentRealEstateSearch = {
     const numberOfRoomsRange = seeksBranch && seeksBranch.numberOfRoomsRange;
     const location = seeksBranch && seeksBranch.location;
 
-    const filters = [
-      {
-        // to select is-branch
-        prefixes: {
-          won: won.defaultContext["won"],
+    let filter;
+    if (location && location.lat && location.lng) {
+      const filters = [
+        {
+          // to select is-branch
+          prefixes: {
+            won: won.defaultContext["won"],
+          },
+          operations: [
+            `${resultName} a won:Need.`,
+            `${resultName} a won:RealEstateRentOffer.`,
+            `${resultName} (won:hasLocation|s:location) ?location.`,
+            "?location s:geo ?location_geo.",
+            "?location_geo s:latitude ?location_lat;",
+            "s:longitude ?location_lon;",
+            `bind (abs(xsd:decimal(?location_lat) - ${
+              location.lat
+            }) as ?latDiffRaw)`,
+            `bind (abs(xsd:decimal(?location_lon) - ${
+              location.lng
+            }) as ?lonDiff)`,
+            "bind (if ( ?latDiffRaw > 180, 360 - ?latDiffRaw, ?latDiffRaw ) as ?latDiff)",
+            "bind ( ?latDiff * ?latDiff + ?lonDiff * ?lonDiff as ?location_geoDistanceScore)",
+            "bind (?location_geoDistanceScore as ?distScore)",
+          ],
         },
-        operations: [
-          `${resultName} a won:Need.`,
-          location && `${resultName} (won:hasLocation|s:location) ?location.`,
-        ],
-      },
-      rentRange &&
-        filterPriceRange(
-          `${resultName}`,
-          rentRange.min,
-          rentRange.max,
-          rentRange.currency
-        ),
+        rentRange &&
+          filterPriceRange(
+            `${resultName}`,
+            rentRange.min,
+            rentRange.max,
+            rentRange.currency
+          ),
 
-      floorSizeRange &&
-        filterFloorSizeRange(
-          `${resultName}`,
-          floorSizeRange.min,
-          floorSizeRange.max
-        ),
+        floorSizeRange &&
+          filterFloorSizeRange(
+            `${resultName}`,
+            floorSizeRange.min,
+            floorSizeRange.max
+          ),
 
-      numberOfRoomsRange &&
-        filterNumOfRoomsRange(
-          `${resultName}`,
-          numberOfRoomsRange.min,
-          numberOfRoomsRange.max
-        ),
+        numberOfRoomsRange &&
+          filterNumOfRoomsRange(
+            `${resultName}`,
+            numberOfRoomsRange.min,
+            numberOfRoomsRange.max
+          ),
+      ];
 
-      filterInVicinity("?location", location),
-    ];
+      filter = concatenateFilters(filters);
+    } else {
+      const filters = [
+        {
+          // to select is-branch
+          prefixes: {
+            won: won.defaultContext["won"],
+          },
+          operations: [
+            `${resultName} a won:Need.`,
+            `${resultName} a won:RealEstateRentOffer.`,
+          ],
+        },
+        rentRange &&
+          filterPriceRange(
+            `${resultName}`,
+            rentRange.min,
+            rentRange.max,
+            rentRange.currency
+          ),
 
-    const concatenatedFilter = concatenateFilters(filters);
+        floorSizeRange &&
+          filterFloorSizeRange(
+            `${resultName}`,
+            floorSizeRange.min,
+            floorSizeRange.max
+          ),
 
-    return sparqlQuery({
-      prefixes: concatenatedFilter.prefixes,
+        numberOfRoomsRange &&
+          filterNumOfRoomsRange(
+            `${resultName}`,
+            numberOfRoomsRange.min,
+            numberOfRoomsRange.max
+          ),
+      ];
+
+      filter = concatenateFilters(filters);
+    }
+
+    const generatedQuery = sparqlQuery({
+      prefixes: filter.prefixes,
       distinct: true,
       variables: [resultName],
-      where: concatenatedFilter.operations,
+      where: filter.operations,
       orderBy: [
         {
           order: "ASC",
-          variable: "?location_geoDistance",
+          variable: "?distScore",
         },
       ],
     });
+
+    return generatedQuery;
   },
 };
