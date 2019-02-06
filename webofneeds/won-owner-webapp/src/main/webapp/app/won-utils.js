@@ -448,6 +448,53 @@ export function getAllDetails() {
 }
 
 /**
+ * Returns the corresponding UseCase to a given need,
+ * return undefined if no useCase is found,
+ * @param needImm
+ */
+export function findUseCaseByNeed(needImm) {
+  //FIXME: IMPLEMENT CORRECTLY
+  console.debug("Trying to find a useCase that corresponds with:", needImm);
+
+  const seeksTypes =
+    getIn(needImm, ["seeks", "type"]) &&
+    getIn(needImm, ["seeks", "type"]).remove("won:Need");
+  const contentTypes =
+    getIn(needImm, ["content", "type"]) &&
+    getIn(needImm, ["content", "type"]).remove("won:Need");
+
+  if (
+    ((seeksTypes && seeksTypes.size > 0) ||
+      (contentTypes && contentTypes.size > 0)) &&
+    hasSubElements(useCases)
+  ) {
+    const useCasesImm = Immutable.fromJS(useCases);
+
+    if (useCasesImm && useCasesImm.size > 0) {
+      useCasesImm.map(useCase => {
+        const useCaseContentTypes = getIn(useCase, [
+          "draft",
+          "content",
+          "type",
+        ]);
+        const useCaseSeeksTypes = getIn(useCase, ["draft", "seeks", "type"]);
+        if (
+          (!useCaseContentTypes ||
+            useCaseContentTypes.contains(contentTypes)) &&
+          (!useCaseSeeksTypes || useCaseSeeksTypes.contains(seeksTypes))
+        ) {
+          console.debug("FOUND Matching UseCase!!!", useCase.toJS());
+          return true;
+        }
+      });
+    }
+  }
+
+  return undefined;
+}
+
+window.findUseCaseByNeed4Dbg = findUseCaseByNeed;
+/**
  * Returns all the details that are defined in any useCase in the useCaseDefinitions
  * and has the messageEnabled Flag set to true
  *
