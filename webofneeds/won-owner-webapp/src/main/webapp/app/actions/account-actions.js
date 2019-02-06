@@ -5,10 +5,7 @@
 import won from "../won-es6.js";
 import Immutable from "immutable";
 import { actionTypes, actionCreators } from "./actions.js";
-import {
-  fetchOwnedData,
-  loadNeedFromRouteParamIfExists,
-} from "../won-message-utils.js";
+import { fetchOwnedData } from "../won-message-utils.js";
 import {
   registerAccount,
   transferPrivateAccount,
@@ -114,7 +111,6 @@ export function accountLogin(credentials, redirectToFeed = false) {
       )
       .then(() => dispatch({ type: actionTypes.upgradeHttpSession }))
       .then(() => fetchOwnedData(dispatch))
-      .then(() => loadNeedFromRouteParamIfExists(dispatch, getState))
       .then(() => dispatch({ type: actionTypes.account.loginFinished }))
       .catch(error =>
         error.response.json().then(loginError => {
@@ -186,7 +182,6 @@ export function accountLogout() {
       .then(() => dispatch({ type: actionTypes.downgradeHttpSession }))
       .then(() => dispatch({ type: actionTypes.account.reset }))
       .then(() => won.clearStore())
-      .then(() => loadNeedFromRouteParamIfExists(dispatch, getState))
       .then(() => {
         _logoutInProcess = false;
       })
