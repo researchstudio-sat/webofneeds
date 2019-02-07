@@ -453,8 +453,6 @@ export function getAllDetails() {
  * @param needImm
  */
 export function findUseCaseByNeed(needImm) {
-  console.debug("Trying to find a useCase that corresponds with:", needImm);
-
   const seeksTypes =
     getIn(needImm, ["seeks", "type"]) &&
     getIn(needImm, ["seeks", "type"]).remove("won:Need");
@@ -485,7 +483,7 @@ export function findUseCaseByNeed(needImm) {
         hasExactMatchingTypes(useCase, contentTypes, "content")
       );
 
-      if (matchingUseCases.size > 1) {
+      if (matchingUseCases && matchingUseCases.size > 1) {
         //If there are multiple matched found based on the content type(s) alone we refine based on the seeks type as well
         matchingUseCases = matchingUseCases.filter(useCase =>
           hasExactMatchingTypes(useCase, seeksTypes, "seeks")
