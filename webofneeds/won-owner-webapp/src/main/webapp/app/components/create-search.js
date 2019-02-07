@@ -94,7 +94,7 @@ function genComponentConf() {
 
       this.draftObject = {
         content: {
-          type: "won:PureSearch",
+          type: ["won:PureSearch"],
           flags: ["won:NoHintForCounterpart"],
         },
         seeks: {},

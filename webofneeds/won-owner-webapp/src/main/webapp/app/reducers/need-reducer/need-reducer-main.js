@@ -158,8 +158,13 @@ export default function(allNeedsInState = initialState, action = {}) {
           } else return need;
         };
         const removeHeld = need => {
-          return need.updateIn(["holds"], heldItems =>
-            heldItems.filter(heldItem => heldItem != action.payload.ownNeedUri)
+          return need.updateIn(
+            ["holds"],
+            heldItems =>
+              heldItems &&
+              heldItems.filter(
+                heldItem => heldItem != action.payload.ownNeedUri
+              )
           );
         };
         return removeHeld(removeHolder(need));

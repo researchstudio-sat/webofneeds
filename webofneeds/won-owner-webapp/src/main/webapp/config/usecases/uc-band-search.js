@@ -23,10 +23,10 @@ export const bandSearch = {
     ...mergeInEmptyDraft({
       content: {
         title: "I'm looking for a band!",
-        type: "won:Musician",
+        type: ["won:Musician"],
       },
       seeks: {
-        type: "s:MusicGroup",
+        type: ["s:MusicGroup"],
       },
     }),
   },

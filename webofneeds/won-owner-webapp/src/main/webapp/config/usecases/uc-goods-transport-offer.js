@@ -13,7 +13,7 @@ export const goodsTransportOffer = {
     ...mergeInEmptyDraft({
       content: {
         title: "Transportation offer",
-        type: "http://dbpedia.org/resource/Transport",
+        type: ["http://dbpedia.org/resource/Transport"],
       },
     }),
   },

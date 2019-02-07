@@ -18,6 +18,7 @@ export const cyclingPlan = {
   draft: {
     ...mergeInEmptyDraft({
       content: {
+        type: ["won:CyclingPlan"],
         title: "Let's go for a bike ride!",
         sPlanAction: { "@id": "http://dbpedia.org/resource/Cycling" },
         facets: {

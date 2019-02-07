@@ -18,6 +18,7 @@ export const lunchPlan = {
   draft: {
     ...mergeInEmptyDraft({
       content: {
+        type: ["won:LunchPlan"],
         title: "Let's go get lunch!",
         sPlanAction: { "@id": "http://dbpedia.org/resource/Lunch" },
         facets: {

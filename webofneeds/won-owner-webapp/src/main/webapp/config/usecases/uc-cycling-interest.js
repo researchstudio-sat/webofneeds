@@ -16,7 +16,7 @@ export const cyclingInterest = {
   draft: {
     ...mergeInEmptyDraft({
       content: {
-        type: "won:Interest",
+        type: ["won:Interest"],
         title: "I am interested in cycling!",
       },
       seeks: {

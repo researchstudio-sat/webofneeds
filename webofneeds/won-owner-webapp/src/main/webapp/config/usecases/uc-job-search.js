@@ -28,11 +28,11 @@ export const jobSearch = {
   draft: {
     ...mergeInEmptyDraft({
       content: {
-        type: "s:Person",
+        type: ["s:Person"],
         tags: ["search-job"],
       },
       seeks: {
-        type: "s:JobPosting",
+        type: ["s:JobPosting"],
       },
     }),
   },

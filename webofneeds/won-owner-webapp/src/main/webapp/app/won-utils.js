@@ -448,6 +448,87 @@ export function getAllDetails() {
 }
 
 /**
+ * Returns the corresponding UseCase to a given need,
+ * return undefined if no useCase is found,
+ * @param needImm
+ */
+export function findUseCaseByNeed(needImm) {
+  const seeksTypes =
+    getIn(needImm, ["seeks", "type"]) &&
+    getIn(needImm, ["seeks", "type"])
+      .toSet()
+      .remove("won:Need");
+
+  const contentTypes =
+    getIn(needImm, ["content", "type"]) &&
+    getIn(needImm, ["content", "type"])
+      .toSet()
+      .remove("won:Need");
+
+  if (hasSubElements(useCases)) {
+    const useCasesImm = Immutable.fromJS(useCases);
+
+    if (useCasesImm && useCasesImm.size > 0) {
+      const hasExactMatchingTypes = (useCase, types, branch) => {
+        const typesSize = types ? types.size : 0;
+        const ucTypes =
+          useCase.getIn(["draft", branch, "type"]) &&
+          useCase
+            .getIn(["draft", branch, "type"])
+            .toSet()
+            .remove("won:Need");
+
+        const ucTypesSize = ucTypes ? ucTypes.size : 0;
+
+        if (typesSize != ucTypesSize) {
+          return false;
+        }
+
+        const hasTypes = typesSize > 0;
+
+        return !hasTypes || (ucTypes && ucTypes.isSubset(types));
+      };
+
+      let matchingUseCases = useCasesImm.filter(useCase =>
+        hasExactMatchingTypes(useCase, contentTypes, "content")
+      );
+
+      if (matchingUseCases && matchingUseCases.size > 1) {
+        //If there are multiple matched found based on the content type(s) alone we refine based on the seeks type as well
+        matchingUseCases = matchingUseCases.filter(useCase =>
+          hasExactMatchingTypes(useCase, seeksTypes, "seeks")
+        );
+      }
+
+      if (matchingUseCases && matchingUseCases.size > 1) {
+        console.warn(
+          "Found multiple matching UseCases for: ",
+          needImm,
+          " matching UseCases: ",
+          matchingUseCases,
+          " -> returning undefined"
+        );
+        return undefined;
+      } else if (matchingUseCases && matchingUseCases.size == 1) {
+        return matchingUseCases.first().toJS();
+      } else {
+        console.warn(
+          "Found no matching UseCase for:",
+          needImm,
+          " within, ",
+          useCases,
+          " -> returning undefined"
+        );
+        return undefined;
+      }
+    }
+  }
+
+  return undefined;
+}
+
+window.findUseCaseByNeed4Dbg = findUseCaseByNeed;
+/**
  * Returns all the details that are defined in any useCase in the useCaseDefinitions
  * and has the messageEnabled Flag set to true
  *

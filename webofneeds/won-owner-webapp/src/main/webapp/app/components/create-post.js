@@ -134,27 +134,27 @@ function genComponentConf() {
         let hasFromNeedFailedToLoad = false;
 
         if (isCreateFromNeed) {
-          (isFromNeedLoading = processSelectors.isNeedLoading(
+          isFromNeedLoading = processSelectors.isNeedLoading(
             state,
             fromNeedUri
-          )),
-            (isFromNeedToLoad = processSelectors.isNeedToLoad(
-              state,
-              fromNeedUri
-            )),
-            (hasFromNeedFailedToLoad = processSelectors.hasNeedFailedToLoad(
-              state,
-              fromNeedUri
-            )),
-            (fromNeed =
-              !isFromNeedLoading &&
-              !isFromNeedToLoad &&
-              !hasFromNeedFailedToLoad &&
-              getIn(state, ["needs", fromNeedUri]));
+          );
+          isFromNeedToLoad = processSelectors.isNeedToLoad(state, fromNeedUri);
+          hasFromNeedFailedToLoad = processSelectors.hasNeedFailedToLoad(
+            state,
+            fromNeedUri
+          );
+          fromNeed =
+            !isFromNeedLoading &&
+            !isFromNeedToLoad &&
+            !hasFromNeedFailedToLoad &&
+            getIn(state, ["needs", fromNeedUri]);
 
           if (fromNeed) {
-            //TODO: DETERMINE THE CORRECT USECASE
-            useCaseString = "customUseCase";
+            const matchedUseCaseIdentifier = needUtils.getMatchedUseCaseIdentifier(
+              fromNeed
+            );
+
+            useCaseString = matchedUseCaseIdentifier || "customUseCase";
             useCase = selectUseCaseFrom(useCaseString, useCases);
 
             const fromNeedContent = get(fromNeed, "content");
@@ -297,6 +297,7 @@ function genComponentConf() {
       if (this.showCreateInput && this.useCase.draft) {
         // deep clone of draft
         this.draftObject = JSON.parse(JSON.stringify(this.useCase.draft));
+        delay(0).then(() => this.$scope.$digest());
       }
     }
 
@@ -312,10 +313,10 @@ function genComponentConf() {
       if (!this.processingPublish) {
         this.draftObject.useCase = get(this.useCase, "identifier");
 
-        if (!isBranchContentPresent(this.draftObject.content)) {
+        if (!isBranchContentPresent(this.draftObject.content, true)) {
           delete this.draftObject.content;
         }
-        if (!isBranchContentPresent(this.draftObject.seeks)) {
+        if (!isBranchContentPresent(this.draftObject.seeks, true)) {
           delete this.draftObject.seeks;
         }
 
@@ -354,11 +355,11 @@ function selectUseCaseFrom(useCaseString, useCases) {
 }
 
 // returns true if the branch has any content present
-function isBranchContentPresent(isOrSeeks) {
+function isBranchContentPresent(isOrSeeks, includeType = false) {
   if (isOrSeeks) {
     const details = Object.keys(isOrSeeks);
     for (let d of details) {
-      if (isOrSeeks[d] && d !== "type") {
+      if (isOrSeeks[d] && (includeType || d !== "type")) {
         return true;
       }
     }

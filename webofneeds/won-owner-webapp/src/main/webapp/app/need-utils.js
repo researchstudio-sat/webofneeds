@@ -23,6 +23,18 @@ export function getIdenticonSvg(need) {
   return get(need, "identiconSvg");
 }
 
+export function getMatchedUseCaseIcon(need) {
+  return getIn(need, ["matchedUseCase", "icon"]);
+}
+
+export function getMatchedUseCaseIconBackground(need) {
+  return getIn(need, ["matchedUseCase", "iconBackground"]);
+}
+
+export function getMatchedUseCaseIdentifier(need) {
+  return getIn(need, ["matchedUseCase", "identifier"]);
+}
+
 /**
  * Determines if a given need is a Inactive
  * @param need

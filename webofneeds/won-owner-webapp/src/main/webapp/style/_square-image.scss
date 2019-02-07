@@ -26,6 +26,15 @@
       align-items: center;
       justify-content: center;
       @include fixed-square($size);
+
+      &.usecaseimage {
+        box-sizing: border-box;
+        padding: 0.25rem;
+
+        & .si__usecaseicon {
+          --local-primary: #{$won-secondary-text-color};
+        }
+      }
     }
 
     & .personaImage {

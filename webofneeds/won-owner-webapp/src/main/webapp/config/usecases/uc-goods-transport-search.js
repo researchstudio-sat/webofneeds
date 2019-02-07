@@ -18,7 +18,7 @@ export const goodsTransportSearch = {
     ...mergeInEmptyDraft({
       content: {
         title: "Want to send something",
-        type: "http://dbpedia.org/resource/Cargo",
+        type: ["http://dbpedia.org/resource/Cargo"],
       },
     }),
   },

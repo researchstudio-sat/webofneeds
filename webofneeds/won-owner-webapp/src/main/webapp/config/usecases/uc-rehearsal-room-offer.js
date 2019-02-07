@@ -26,11 +26,11 @@ export const rehearsalRoomOffer = {
   draft: {
     ...mergeInEmptyDraft({
       content: {
-        type: "won:RehearsalRoomRentOffer",
+        type: ["won:RehearsalRoomRentOffer"],
         title: "Offer Rehearsal Room!",
       },
       seeks: {
-        type: "won:RehearsalRoomRentDemand",
+        type: ["won:RehearsalRoomRentDemand"],
       },
     }),
   },

@@ -16,7 +16,7 @@ export const lunchInterest = {
   draft: {
     ...mergeInEmptyDraft({
       content: {
-        type: "won:Interest",
+        type: ["won:Interest"],
         title: "I am interested in meeting up for lunch!",
       },
       seeks: {
