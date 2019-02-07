@@ -13,7 +13,7 @@ won-group-post-messages {
   .gpm__header {
     display: grid;
     grid-template-columns: auto 1fr auto auto;
-    grid-template-areas: "header_back header_title header-share header_context";
+    grid-template-areas: "header_back header_title header_share header_context";
     grid-area: header;
     font-size: $normalFontSize;
     text-align: left;
