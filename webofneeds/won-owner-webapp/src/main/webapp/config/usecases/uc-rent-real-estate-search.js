@@ -58,7 +58,9 @@ export const rentRealEstateSearch = {
         {
           // to select is-branch
           prefixes: {
+            s: won.defaultContext["s"],
             won: won.defaultContext["won"],
+            xsd: won.defaultContext["xsd"],
           },
           operations: [
             `${resultName} a won:Need.`,
@@ -108,6 +110,7 @@ export const rentRealEstateSearch = {
           // to select is-branch
           prefixes: {
             won: won.defaultContext["won"],
+            s: won.defaultContext["s"],
           },
           operations: [
             `${resultName} a won:Need.`,

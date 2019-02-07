@@ -63,7 +63,7 @@ export const rehearsalRoomSearch = {
             sh: won.defaultContext["sh"], //needed for the filterNumericProperty calls
             s: won.defaultContext["s"],
             geo: "http://www.bigdata.com/rdf/geospatial#",
-            xsd: "http://www.w3.org/2001/XMLSchema#",
+            xsd: won.defaultContext["xsd"],
           },
           operations: [
             `${resultName} a won:Need.`,

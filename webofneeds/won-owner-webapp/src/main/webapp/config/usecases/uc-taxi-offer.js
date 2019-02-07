@@ -32,6 +32,7 @@ export const taxiOffer = {
         prefixes: {
           won: won.defaultContext["won"],
           s: won.defaultContext["s"],
+          xsd: won.defaultContext["xsd"],
         },
         operations: [
           `${resultName} a won:Need.`,
