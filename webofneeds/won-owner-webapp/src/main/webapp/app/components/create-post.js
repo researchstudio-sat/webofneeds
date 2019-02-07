@@ -10,7 +10,7 @@ import createIsseeksModule from "./create-isseeks.js";
 import publishButtonModule from "./publish-button.js";
 import { get, attach, delay, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
-import { connect2Redux, findUseCaseByNeed } from "../won-utils.js";
+import { connect2Redux } from "../won-utils.js";
 import * as generalSelectors from "../selectors/general-selectors.js";
 import * as needUtils from "../need-utils.js";
 import * as processSelectors from "../selectors/process-selectors.js";
@@ -150,14 +150,12 @@ function genComponentConf() {
             getIn(state, ["needs", fromNeedUri]);
 
           if (fromNeed) {
-            const matchingUseCase = findUseCaseByNeed(fromNeed);
+            const matchedUseCaseIdentifier = needUtils.getMatchedUseCaseIdentifier(
+              fromNeed
+            );
 
-            useCaseString = matchingUseCase
-              ? matchingUseCase["identifier"]
-              : "customUseCase";
-            useCase = matchingUseCase
-              ? matchingUseCase
-              : selectUseCaseFrom(useCaseString, useCases);
+            useCaseString = matchedUseCaseIdentifier || "customUseCase";
+            useCase = selectUseCaseFrom(useCaseString, useCases);
 
             const fromNeedContent = get(fromNeed, "content");
             const fromNeedSeeks = get(fromNeed, "seeks");
