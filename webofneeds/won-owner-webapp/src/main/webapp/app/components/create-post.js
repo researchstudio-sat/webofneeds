@@ -313,7 +313,7 @@ function genComponentConf() {
       if (!this.processingPublish) {
         this.draftObject.useCase = get(this.useCase, "identifier");
 
-        if (!isBranchContentPresent(this.draftObject.content)) {
+        if (!isBranchContentPresent(this.draftObject.content, true)) {
           delete this.draftObject.content;
         }
         if (!isBranchContentPresent(this.draftObject.seeks, true)) {

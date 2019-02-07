@@ -455,11 +455,15 @@ export function getAllDetails() {
 export function findUseCaseByNeed(needImm) {
   const seeksTypes =
     getIn(needImm, ["seeks", "type"]) &&
-    getIn(needImm, ["seeks", "type"]).remove("won:Need");
+    getIn(needImm, ["seeks", "type"])
+      .toSet()
+      .remove("won:Need");
 
   const contentTypes =
     getIn(needImm, ["content", "type"]) &&
-    getIn(needImm, ["content", "type"]).remove("won:Need");
+    getIn(needImm, ["content", "type"])
+      .toSet()
+      .remove("won:Need");
 
   if (hasSubElements(useCases)) {
     const useCasesImm = Immutable.fromJS(useCases);
@@ -467,7 +471,13 @@ export function findUseCaseByNeed(needImm) {
     if (useCasesImm && useCasesImm.size > 0) {
       const hasExactMatchingTypes = (useCase, types, branch) => {
         const typesSize = types ? types.size : 0;
-        const ucTypes = useCase.getIn(["draft", branch, "type"]);
+        const ucTypes =
+          useCase.getIn(["draft", branch, "type"]) &&
+          useCase
+            .getIn(["draft", branch, "type"])
+            .toSet()
+            .remove("won:Need");
+
         const ucTypesSize = ucTypes ? ucTypes.size : 0;
 
         if (typesSize != ucTypesSize) {
