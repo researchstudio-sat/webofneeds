@@ -39,7 +39,7 @@ export function parseNeed(jsonldNeed, isOwned) {
       matchedUseCase: {
         identifier: undefined,
         icon: undefined,
-        iconBackground: generateUseCaseIconBackground(jsonldNeedImm),
+        iconBackground: undefined,
       },
       unread: false,
       isOwned: !!isOwned,
@@ -63,12 +63,18 @@ export function parseNeed(jsonldNeed, isOwned) {
 
     let parsedNeedImm = Immutable.fromJS(parsedNeed);
 
-    const matchingUseCase = findUseCaseByNeed(parsedNeedImm);
+    if (!isPersona(parsedNeedImm)) {
+      const matchingUseCase = findUseCaseByNeed(parsedNeedImm);
 
-    if (matchingUseCase) {
-      parsedNeedImm = parsedNeedImm
-        .setIn(["matchedUseCase", "icon"], matchingUseCase.icon)
-        .setIn(["matchedUseCase", "identifier"], matchingUseCase.identifier);
+      if (matchingUseCase) {
+        parsedNeedImm = parsedNeedImm
+          .setIn(["matchedUseCase", "identifier"], matchingUseCase.identifier)
+          .setIn(["matchedUseCase", "icon"], matchingUseCase.icon)
+          .setIn(
+            ["matchedUseCase", "iconBackground"],
+            generateUseCaseIconBackground(jsonldNeedImm)
+          );
+      }
     }
 
     return parsedNeedImm;
