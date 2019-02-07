@@ -8,8 +8,8 @@ export const realEstateGroup = {
   label: "Homes",
   icon: undefined,
   useCases: {
-    searchRent: rentRealEstateSearch,
-    offerRent: rentRealEstateOffer,
+    rentRealEstateSearch: rentRealEstateSearch,
+    rentRealEstateOffer: rentRealEstateOffer,
     rehearsalRoomSearch: rehearsalRoomSearch,
     rehearsalRoomOffer: rehearsalRoomOffer,
   },

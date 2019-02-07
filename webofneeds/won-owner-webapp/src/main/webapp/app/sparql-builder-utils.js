@@ -177,46 +177,6 @@ export function optionalFilters(filters) {
 }
 
 /**
- * @param {String} rootSubject: a variable name via which the location is connected
- *  to the rest of the graph-patterns . e.g. `"?location"`. Needs to start with a
- *  variable indicator (i.e. `?`) as other variable names will be derived by
- *  suffixing it.
- * @param {*} location: an object containing `lat` and `lng`
- * @param {Number} radius: distance in km that matches can be away from the location
- * @returns see wellFormedFilter
- */
-export function filterInVicinity(rootSubject, location, radius = 10) {
-  if (!location || !location.lat || !location.lng) {
-    return emptyFilter();
-  } else {
-    /* "prefix" variable name with root-subject so filter can be used 
-     * multiple times for different roots
-     * results in e.g. `?location_geo`
-     */
-    const geoVar = `${rootSubject}_geo`;
-    return wellFormedFilter({
-      prefixes: {
-        s: won.defaultContext["s"],
-        won: won.defaultContext["won"],
-        geo: "http://www.bigdata.com/rdf/geospatial#",
-        geoliteral: "http://www.bigdata.com/rdf/geospatial/literals/v1#",
-      },
-      operations: [
-        `${rootSubject} s:geo ${geoVar}.`,
-        `SERVICE geo:search {
-  ${geoVar} geo:search "inCircle" .
-  ${geoVar} geo:searchDatatype geoliteral:lat-lon .
-  ${geoVar} geo:predicate won:geoSpatial .
-  ${geoVar} geo:spatialCircleCenter "${location.lat}#${location.lng}" .
-  ${geoVar} geo:spatialCircleRadius "${radius}" .
-  ${geoVar} geo:distanceValue ${rootSubject}_geoDistance .
-}`,
-      ],
-    });
-  }
-}
-
-/**
  * Subquery that generates a score [1,0] (1 for exact location matches, 0 for anything
  * further away than the `radius`, linearly degrading inbetween)
  *
@@ -240,7 +200,6 @@ export function vicinityScoreSubQuery({
   geoCoordinates,
   radius = 10,
 }) {
-  // const locationFilter = filterInVicinity("?jobLocation", jobLocation);
   if (!geoCoordinates || !geoCoordinates.lat || !geoCoordinates.lng) {
     return undefined;
   }

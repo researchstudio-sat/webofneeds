@@ -11,7 +11,6 @@ import won from "../../app/won-es6.js";
 import { perHourRentDetail } from "../details/musician.js";
 import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-utils.js";
 import {
-  filterInVicinity,
   filterNumericProperty,
   filterPrice,
   concatenateFilters,
@@ -69,40 +68,81 @@ export const rehearsalRoomOffer = {
     const rent = draftContent && draftContent.rent;
     const floorSize = draftContent && draftContent.floorSize;
 
-    const filters = [
-      {
-        // to select is-branch
-        prefixes: {
-          won: won.defaultContext["won"],
-          rdf: won.defaultContext["rdf"],
-          sh: won.defaultContext["sh"], //needed for the filterNumericProperty calls
+    let filter;
+
+    if (location && location.lat && location.lng) {
+      const filters = [
+        {
+          // to select is-branch
+          prefixes: {
+            won: won.defaultContext["won"],
+            rdf: won.defaultContext["rdf"],
+            sh: won.defaultContext["sh"], //needed for the filterNumericProperty calls
+            s: won.defaultContext["s"],
+            geo: "http://www.bigdata.com/rdf/geospatial#",
+            xsd: "http://www.w3.org/2001/XMLSchema#",
+          },
+          operations: [
+            `${resultName} a won:Need.`,
+            `${resultName} won:seeks ?seeks.`,
+            `${resultName} rdf:type won:RehearsalRoomRentDemand.`,
+            "?seeks (won:hasLocation|s:location) ?location.",
+            "?location s:geo ?location_geo.",
+            "?location_geo s:latitude ?location_lat;",
+            "s:longitude ?location_lon;",
+            `bind (abs(xsd:decimal(?location_lat) - ${
+              location.lat
+            }) as ?latDiffRaw)`,
+            `bind (abs(xsd:decimal(?location_lon) - ${
+              location.lng
+            }) as ?lonDiff)`,
+            "bind (if ( ?latDiffRaw > 180, 360 - ?latDiffRaw, ?latDiffRaw ) as ?latDiff)",
+            "bind ( ?latDiff * ?latDiff + ?lonDiff * ?lonDiff as ?location_geoDistanceScore)",
+            "bind (?location_geoDistanceScore as ?distScore)",
+          ],
         },
-        operations: [
-          `${resultName} a won:Need.`,
-          `${resultName} won:seeks ?seeks.`,
-          `${resultName} rdf:type won:RehearsalRoomRentDemand.`,
-          location && "?seeks (won:hasLocation|s:location) ?location.",
-        ],
-      },
-      rent && filterPrice("?seeks", rent.amount, rent.currency, "rent"),
-      floorSize &&
-        filterNumericProperty("?seeks", floorSize, "s:floorSize", "size"),
-      filterInVicinity("?location", location),
-    ];
+        rent && filterPrice("?seeks", rent.amount, rent.currency, "rent"),
+        floorSize &&
+          filterNumericProperty("?seeks", floorSize, "s:floorSize", "size"),
+      ];
 
-    const concatenatedFilter = concatenateFilters(filters);
+      filter = concatenateFilters(filters);
+    } else {
+      const filters = [
+        {
+          // to select is-branch
+          prefixes: {
+            won: won.defaultContext["won"],
+            rdf: won.defaultContext["rdf"],
+            sh: won.defaultContext["sh"], //needed for the filterNumericProperty calls
+          },
+          operations: [
+            `${resultName} a won:Need.`,
+            `${resultName} won:seeks ?seeks.`,
+            `${resultName} rdf:type won:RehearsalRoomRentDemand.`,
+          ],
+        },
+        rent && filterPrice("?seeks", rent.amount, rent.currency, "rent"),
+        floorSize &&
+          filterNumericProperty("?seeks", floorSize, "s:floorSize", "size"),
+      ];
 
-    return sparqlQuery({
-      prefixes: concatenatedFilter.prefixes,
+      filter = concatenateFilters(filters);
+    }
+
+    const generatedQuery = sparqlQuery({
+      prefixes: filter.prefixes,
       distinct: true,
       variables: [resultName],
-      where: concatenatedFilter.operations,
+      where: filter.operations,
       orderBy: [
         {
           order: "ASC",
-          variable: "?location_geoDistance",
+          variable: "?distScore",
         },
       ],
     });
+
+    return generatedQuery;
   },
 };

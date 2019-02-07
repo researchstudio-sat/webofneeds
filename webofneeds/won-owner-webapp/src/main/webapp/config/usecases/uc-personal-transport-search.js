@@ -5,11 +5,7 @@ import { details, mergeInEmptyDraft } from "../detail-definitions.js";
 import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-utils.js";
 import won from "../../app/won-es6.js";
 import { getIn } from "../../app/utils.js";
-import {
-  filterInVicinity,
-  concatenateFilters,
-  sparqlQuery,
-} from "../../app/sparql-builder-utils.js";
+import { sparqlQuery } from "../../app/sparql-builder-utils.js";
 
 export const personalTransportSearch = {
   identifier: "personalTransportSearch",
@@ -41,78 +37,187 @@ export const personalTransportSearch = {
     ]);
     const toLocation = getIn(draft, ["seeks", "travelAction", "toLocation"]);
 
-    const baseFilter = {
-      prefixes: {
-        won: won.defaultContext["won"],
-        s: won.defaultContext["s"],
-      },
-      operations: [
-        `${resultName} a won:Need.`,
-        `${resultName} won:isInState won:Active. { { ${resultName} a <http://dbpedia.org/resource/Ridesharing>.  } union { ${resultName} a s:TaxiService} }`,
-      ],
-    };
+    let filter;
+    if (
+      fromLocation &&
+      fromLocation.lat &&
+      fromLocation.lng &&
+      toLocation &&
+      toLocation.lat &&
+      toLocation.lng
+    ) {
+      filter = {
+        prefixes: {
+          won: won.defaultContext["won"],
+          s: won.defaultContext["s"],
+          geo: "http://www.bigdata.com/rdf/geospatial#",
+          xsd: "http://www.w3.org/2001/XMLSchema#",
+        },
+        operations: [
+          `
+            ${resultName} <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> won:Need.
+            {
+              { 
+                ${resultName} <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbpedia.org/resource/Ridesharing>.
+                OPTIONAL { 
+                  ${resultName} (won:travelAction/s:fromLocation) ?fromLocation.
+                  ?fromLocation s:geo ?fromLocation_geo.
+                  ?fromLocation_geo 
+                    s:latitude ?fromLocation_lat;
+                    s:longitude ?fromLocation_lon.
+                  BIND(ABS((xsd:decimal(?fromLocation_lat)) - ${
+                    fromLocation.lat
+                  }) AS ?fromLatDiffRaw)
+                  BIND(ABS((xsd:decimal(?fromLocation_lon)) - ${
+                    fromLocation.lng
+                  }) AS ?fromLonDiff)
+                  BIND(IF(?fromLatDiffRaw > 180 , 360  - ?fromLatDiffRaw, ?fromLatDiffRaw) AS ?fromLatDiff)
+                  BIND((?fromLatDiff * ?fromLatDiff) + (?fromLonDiff * ?fromLonDiff) AS ?fromLocation_geoDistanceScore)
+                }
+                OPTIONAL {
+                  ${resultName} (won:travelAction/s:toLocation) ?toLocation.
+                  ?toLocation s:geo ?toLocation_geo.
+                  ?toLocation_geo 
+                    s:latitude ?toLocation_lat;
+                    s:longitude ?toLocation_lon.
+                  BIND(ABS((xsd:decimal(?toLocation_lat)) - ${
+                    toLocation.lat
+                  }) AS ?toLatDiffRaw)
+                  BIND(ABS((xsd:decimal(?toLocation_lon)) - ${
+                    toLocation.lng
+                  }) AS ?toLonDiff)
+                  BIND(IF(?toLatDiffRaw > 180 , 360  - ?toLatDiffRaw, ?toLatDiffRaw) AS ?toLatDiff)
+                  BIND((?toLatDiff * ?toLatDiff) + (?toLonDiff * ?toLonDiff) AS ?toLocation_geoDistanceScore)
+                }
+                FILTER ( bound(?fromLocation_geoDistanceScore) && bound (?toLocation_geoDistanceScore))
+                BIND(if ( bound(?fromLocation_geoDistanceScore), ?fromLocation_geoDistanceScore, ?toLocation_geoDistanceScore) as ?fromScore )
+                BIND(if ( bound(?toLocation_geoDistanceScore), ?toLocation_geoDistanceScore, ?fromLocation_geoDistanceScore) as ?toScore )
+                BIND((?toScore + ?fromScore ) / 2 AS ?score)
+              }
+              UNION
+              { 
+                ${resultName} <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> s:TaxiService. 
+                ${resultName} (won:hasLocation|s:location) ?location.
+                ?location s:geo ?location_geo.
+                ?location_geo 
+                  s:latitude ?location_lat;
+                  s:longitude ?location_lon.
+                BIND(ABS((xsd:decimal(?location_lat)) - ${
+                  fromLocation.lat
+                }) AS ?fromLatDiffRaw)
+                BIND(ABS((xsd:decimal(?location_lon)) - ${
+                  fromLocation.lng
+                }) AS ?fromLonDiff)
+                BIND(IF(?fromLatDiffRaw > 180 , 360  - ?fromLatDiffRaw, ?fromLatDiffRaw) AS ?fromLatDiff)
+                BIND((?fromLatDiff * ?fromLatDiff) + (?fromLonDiff * ?fromLonDiff) AS ?fromLocation_geoDistanceScore)
+                BIND(ABS((xsd:decimal(?location_lat)) - ${
+                  toLocation.lat
+                }) AS ?toLatDiffRaw)
+                BIND(ABS((xsd:decimal(?location_lon)) - ${
+                  toLocation.lng
+                }) AS ?toLonDiff)
+                BIND(IF(?toLatDiffRaw > 180 , 360  - ?toLatDiffRaw, ?toLatDiffRaw) AS ?toLatDiff)
+                BIND((?toLatDiff * ?toLatDiff) + (?toLonDiff * ?toLonDiff) AS ?toLocation_geoDistanceScore)
+                BIND((?fromLocation_geoDistanceScore + ?toLocation_geoDistanceScore ) / 2 AS ?score)
+              }
+            }`,
+        ],
+      };
+    } else if (fromLocation && fromLocation.lat && fromLocation.lng) {
+      filter = {
+        prefixes: {
+          won: won.defaultContext["won"],
+          s: won.defaultContext["s"],
+          geo: "http://www.bigdata.com/rdf/geospatial#",
+          xsd: "http://www.w3.org/2001/XMLSchema#",
+        },
+        operations: [
+          `${resultName} a won:Need.
+          {
+            {
+              ${resultName} a <http://dbpedia.org/resource/Ridesharing> ;
+                            (won:travelAction/s:fromLocation) ?location.
+            } 
+            union 
+            {
+              ${resultName} a s:TaxiService ; 
+                            s:location ?location.
+            }
+          }`,
+          "?location s:geo ?location_geo.",
+          "?location_geo s:latitude ?location_lat;",
+          "s:longitude ?location_lon;",
+          `bind (abs(xsd:decimal(?location_lat) - ${
+            fromLocation.lat
+          }) as ?latDiffRaw)`,
+          `bind (abs(xsd:decimal(?location_lon) - ${
+            fromLocation.lng
+          }) as ?lonDiff)`,
+          "bind (if ( ?latDiffRaw > 180, 360 - ?latDiffRaw, ?latDiffRaw ) as ?latDiff)",
+          "bind ( ?latDiff * ?latDiff + ?lonDiff * ?lonDiff as ?location_geoDistanceScore)",
+          "bind (?location_geoDistanceScore as ?score)",
+        ],
+      };
+    } else if (toLocation && toLocation.lat && toLocation.lng) {
+      filter = {
+        prefixes: {
+          won: won.defaultContext["won"],
+          s: won.defaultContext["s"],
+          geo: "http://www.bigdata.com/rdf/geospatial#",
+          xsd: "http://www.w3.org/2001/XMLSchema#",
+        },
+        operations: [
+          `${resultName} a won:Need.
+          {
+            {
+              ${resultName} a <http://dbpedia.org/resource/Ridesharing> ;
+                            (won:travelAction/s:toLocation) ?location.
+            } 
+            union 
+            {
+              ${resultName} a s:TaxiService ; 
+                            s:location ?location.
+            }
+          }`,
+          "?location s:geo ?location_geo.",
+          "?location_geo s:latitude ?location_lat;",
+          "s:longitude ?location_lon;",
+          `bind (abs(xsd:decimal(?location_lat) - ${
+            toLocation.lat
+          }) as ?latDiffRaw)`,
+          `bind (abs(xsd:decimal(?location_lon) - ${
+            toLocation.lng
+          }) as ?lonDiff)`,
+          "bind (if ( ?latDiffRaw > 180, 360 - ?latDiffRaw, ?latDiffRaw ) as ?latDiff)",
+          "bind ( ?latDiff * ?latDiff + ?lonDiff * ?lonDiff as ?location_geoDistanceScore)",
+          "bind (?location_geoDistanceScore as ?score)",
+        ],
+      };
+    } else {
+      filter = {
+        prefixes: {
+          won: won.defaultContext["won"],
+        },
+        operations: [
+          `${resultName} a won:Need.`,
+          `{{${resultName} a <http://dbpedia.org/resource/Ridesharing>} union {${resultName} a s:TaxiService}}`,
+        ],
+      };
+    }
 
-    const locationFilter = filterInVicinity(
-      "?location",
-      fromLocation,
-      /*radius=*/ 100
-    );
-    const fromLocationFilter = filterInVicinity(
-      "?fromLocation",
-      fromLocation,
-      /*radius=*/ 5
-    );
-    const toLocationFilter = filterInVicinity(
-      "?toLocation",
-      toLocation,
-      /*radius=*/ 5
-    );
-
-    const union = operations => {
-      if (!operations || operations.length === 0) {
-        return "";
-      } else {
-        return "{" + operations.join("} UNION {") + "}";
-      }
-    };
-    const filterAndJoin = (arrayOfStrings, seperator) =>
-      arrayOfStrings.filter(str => str).join(seperator);
-
-    const locationFilters = {
-      prefixes: locationFilter.prefixes,
-      operations: union([
-        filterAndJoin(
-          [
-            fromLocation &&
-              `${resultName} a <http://dbpedia.org/resource/Ridesharing>. ${resultName} won:travelAction/s:fromLocation ?fromLocation. `,
-            fromLocation && fromLocationFilter.operations.join(" "),
-            toLocation &&
-              `${resultName} won:travelAction/s:toLocation ?toLocation.`,
-            toLocation && toLocationFilter.operations.join(" "),
-          ],
-          " "
-        ),
-        filterAndJoin(
-          [
-            location &&
-              `${resultName} a s:TaxiService . ${resultName} (s:location|won:hasLocation) ?location .`,
-            location && locationFilter.operations.join(" "),
-          ],
-          " "
-        ),
-      ]),
-    };
-
-    const concatenatedFilter = concatenateFilters([
-      baseFilter,
-      locationFilters,
-    ]);
-
-    return sparqlQuery({
-      prefixes: concatenatedFilter.prefixes,
+    const generatedQuery = sparqlQuery({
+      prefixes: filter.prefixes,
       distinct: true,
-      variables: [resultName],
-      where: concatenatedFilter.operations,
+      variables: [resultName, "?score"],
+      where: filter.operations,
+      orderBy: [
+        {
+          order: "ASC",
+          variable: "?distScore",
+        },
+      ],
     });
+
+    return generatedQuery;
   },
 };
