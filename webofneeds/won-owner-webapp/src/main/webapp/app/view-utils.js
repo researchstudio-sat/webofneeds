@@ -17,6 +17,14 @@ export function showSlideIns(viewState) {
   return get(viewState, "showSlideIns");
 }
 
+export function showModalDialog(viewState) {
+  return get(viewState, "showModalDialog");
+}
+
+export function showRdf(viewState) {
+  return get(viewState, "showRdf");
+}
+
 export function isAnonymousLinkSent(viewState) {
   return getIn(viewState, ["anonymousSlideIn", "linkSent"]);
 }

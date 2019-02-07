@@ -3,19 +3,17 @@
  */
 import angular from "angular";
 import ngAnimate from "angular-animate";
-import { attach, getIn } from "../../utils.js";
+import { attach, getIn, get, delay } from "../../utils.js";
+import { connect2Redux } from "../../won-utils.js";
 import won from "../../won-es6.js";
 import { actionCreators } from "../../actions/actions.js";
 import sendRequestModule from "../send-request.js";
 import visitorTitleBarModule from "../visitor-title-bar.js";
-import {
-  getPostUriFromRoute,
-  getViewNeedUriFromRoute,
-} from "../../selectors/general-selectors.js";
+import * as generalSelectors from "../../selectors/general-selectors.js";
 import * as viewSelectors from "../../selectors/view-selectors.js";
-
-import * as srefUtils from "../../sref-utils.js";
 import * as needUtils from "../../need-utils.js";
+import * as processUtils from "../../process-utils.js";
+import * as srefUtils from "../../sref-utils.js";
 
 import "style/_post-visitor.scss";
 import "style/_need-overlay.scss";
@@ -30,36 +28,50 @@ class Controller {
     Object.assign(this, srefUtils); // bind srefUtils to scope
 
     const selectFromState = state => {
-      const postUri = getPostUriFromRoute(state);
-      const viewNeedUri = getViewNeedUriFromRoute(state);
-      const post = state.getIn(["needs", postUri]);
+      const needUri = generalSelectors.getPostUriFromRoute(state);
+      const viewNeedUri = generalSelectors.getViewNeedUriFromRoute(state);
+      const need = getIn(state, ["needs", needUri]);
+
+      const process = get(state, "process");
 
       return {
-        postUri,
-        isOwnPost: needUtils.isOwned(post),
-        post,
+        needUri,
+        isOwnedNeed: needUtils.isOwned(need),
+        need,
         won: won.WON,
-        showModalDialog: getIn(state, ["view", "showModalDialog"]),
-        showNeedOverlay: !!viewNeedUri,
         showSlideIns:
           viewSelectors.hasSlideIns(state) && viewSelectors.showSlideIns(state),
+        showModalDialog: viewSelectors.showModalDialog(state),
+        showNeedOverlay: !!viewNeedUri,
         viewNeedUri,
-        postLoading:
-          !post || getIn(state, ["process", "needs", postUri, "loading"]),
-        postFailedToLoad:
-          post && getIn(state, ["process", "needs", postUri, "failedToLoad"]),
+        needLoading: !need || processUtils.isNeedLoading(process, needUri),
+        needToLoad: !need || processUtils.isNeedToLoad(process, needUri),
+        needFailedToLoad:
+          need && processUtils.hasNeedFailedToLoad(process, needUri),
       };
     };
 
-    const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(
-      this
+    connect2Redux(selectFromState, actionCreators, [], this);
+
+    this.$scope.$watch(
+      () =>
+        this.needUri && (!this.need || (this.needToLoad && !this.needLoading)),
+      () => delay(0).then(() => this.ensureNeedIsLoaded())
     );
-    this.$scope.$on("$destroy", disconnect);
+  }
+
+  ensureNeedIsLoaded() {
+    if (
+      this.needUri &&
+      (!this.need || (this.needToLoad && !this.needLoading))
+    ) {
+      this.needs__fetchUnloadedNeed(this.needUri);
+    }
   }
 
   tryReload() {
-    if (this.postUri && this.postFailedToLoad) {
-      this.needs__fetchUnloadedNeed(this.postUri);
+    if (this.needUri && this.needFailedToLoad) {
+      this.needs__fetchUnloadedNeed(this.needUri);
     }
   }
 }

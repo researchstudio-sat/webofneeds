@@ -9,10 +9,7 @@ import { checkAccessToCurrentRoute } from "../configRouting.js";
 
 import { checkLoginStatus } from "../won-utils.js";
 
-import {
-  fetchOwnedData,
-  loadNeedFromRouteParamIfExists,
-} from "../won-message-utils.js";
+import { fetchOwnedData } from "../won-message-utils.js";
 
 export const pageLoadAction = () => (dispatch, getState) => {
   checkLoginStatus()
@@ -27,7 +24,6 @@ export const pageLoadAction = () => (dispatch, getState) => {
       return loadingWhileSignedIn(dispatch);
     })
     .catch(() => handleNotLoggedIn()) //do not remove this line
-    .then(() => loadNeedFromRouteParamIfExists(dispatch, getState))
     .then(() => checkAccessToCurrentRoute(dispatch, getState))
     .then(() => dispatch({ type: actionTypes.initialLoadFinished }));
 };

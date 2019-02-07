@@ -7,11 +7,11 @@
 </header>
 <won-toasts></won-toasts>
 <won-slide-in ng-if="self.showSlideIns"></won-slide-in>
-<main class="postcontent" ng-class="{'postcontent--won-loading': self.postLoading, 'postcontent--won-failed': self.postFailedToLoad}">
+<main class="postcontent" ng-class="{'postcontent--won-loading': self.needLoading, 'postcontent--won-failed': self.needFailedToLoad}">
     <!-- Post info view when there's no connection-state/-type selected -->
-    <won-visitor-title-bar ng-if="!(self.postLoading || self.postFailedToLoad)" item="self.post"></won-visitor-title-bar>
-    <won-send-request ng-if="!(self.postLoading || self.postFailedToLoad) && self.post && !self.isOwnPost" class="won-send-request--noheader"></won-send-request>
-    <div class="pc__loading" ng-if="self.postLoading">
+    <won-visitor-title-bar ng-if="!(self.needLoading || self.needFailedToLoad)" item="self.need"></won-visitor-title-bar>
+    <won-send-request ng-if="!(self.needLoading || self.needFailedToLoad) && self.need && !self.isOwnedNeed" class="won-send-request--noheader"></won-send-request>
+    <div class="pc__loading" ng-if="self.needLoading">
         <svg class="pc__loading__spinner hspinner">
             <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
         </svg>
@@ -19,7 +19,7 @@
             Loading...
         </span>
     </div>
-    <div class="pc__failed" ng-if="self.postFailedToLoad">
+    <div class="pc__failed" ng-if="self.needFailedToLoad">
         <svg class="pc__failed__icon">
             <use xlink:href="#ico16_indicator_error" href="#ico16_indicator_error"></use>
         </svg>
