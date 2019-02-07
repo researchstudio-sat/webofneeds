@@ -299,6 +299,7 @@ function genComponentConf() {
       if (this.showCreateInput && this.useCase.draft) {
         // deep clone of draft
         this.draftObject = JSON.parse(JSON.stringify(this.useCase.draft));
+        this.$scope.$digest();
       }
     }
 
