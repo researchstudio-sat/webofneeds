@@ -10,7 +10,7 @@ import createIsseeksModule from "./create-isseeks.js";
 import publishButtonModule from "./publish-button.js";
 import { get, attach, delay, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
-import { connect2Redux } from "../won-utils.js";
+import { connect2Redux, findUseCaseByNeed } from "../won-utils.js";
 import * as generalSelectors from "../selectors/general-selectors.js";
 import * as needUtils from "../need-utils.js";
 import * as processSelectors from "../selectors/process-selectors.js";
@@ -134,28 +134,30 @@ function genComponentConf() {
         let hasFromNeedFailedToLoad = false;
 
         if (isCreateFromNeed) {
-          (isFromNeedLoading = processSelectors.isNeedLoading(
+          isFromNeedLoading = processSelectors.isNeedLoading(
             state,
             fromNeedUri
-          )),
-            (isFromNeedToLoad = processSelectors.isNeedToLoad(
-              state,
-              fromNeedUri
-            )),
-            (hasFromNeedFailedToLoad = processSelectors.hasNeedFailedToLoad(
-              state,
-              fromNeedUri
-            )),
-            (fromNeed =
-              !isFromNeedLoading &&
-              !isFromNeedToLoad &&
-              !hasFromNeedFailedToLoad &&
-              getIn(state, ["needs", fromNeedUri]));
+          );
+          isFromNeedToLoad = processSelectors.isNeedToLoad(state, fromNeedUri);
+          hasFromNeedFailedToLoad = processSelectors.hasNeedFailedToLoad(
+            state,
+            fromNeedUri
+          );
+          fromNeed =
+            !isFromNeedLoading &&
+            !isFromNeedToLoad &&
+            !hasFromNeedFailedToLoad &&
+            getIn(state, ["needs", fromNeedUri]);
 
           if (fromNeed) {
-            //TODO: DETERMINE THE CORRECT USECASE
-            useCaseString = "customUseCase";
-            useCase = selectUseCaseFrom(useCaseString, useCases);
+            const matchingUseCase = findUseCaseByNeed(fromNeed);
+
+            useCaseString = matchingUseCase
+              ? matchingUseCase["identifier"]
+              : "customUseCase";
+            useCase = matchingUseCase
+              ? matchingUseCase
+              : selectUseCaseFrom(useCaseString, useCases);
 
             const fromNeedContent = get(fromNeed, "content");
             const fromNeedSeeks = get(fromNeed, "seeks");
@@ -315,7 +317,7 @@ function genComponentConf() {
         if (!isBranchContentPresent(this.draftObject.content)) {
           delete this.draftObject.content;
         }
-        if (!isBranchContentPresent(this.draftObject.seeks)) {
+        if (!isBranchContentPresent(this.draftObject.seeks, true)) {
           delete this.draftObject.seeks;
         }
 
@@ -354,11 +356,11 @@ function selectUseCaseFrom(useCaseString, useCases) {
 }
 
 // returns true if the branch has any content present
-function isBranchContentPresent(isOrSeeks) {
+function isBranchContentPresent(isOrSeeks, includeType = false) {
   if (isOrSeeks) {
     const details = Object.keys(isOrSeeks);
     for (let d of details) {
-      if (isOrSeeks[d] && d !== "type") {
+      if (isOrSeeks[d] && (includeType || d !== "type")) {
         return true;
       }
     }
