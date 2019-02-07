@@ -1,13 +1,13 @@
 import Immutable from "immutable";
 import won from "../../won-es6.js";
-import { getAllDetails } from "../../won-utils.js";
+import { getAllDetails, findUseCaseByNeed } from "../../won-utils.js";
 import {
   isWhatsNewNeed,
   isWhatsAroundNeed,
   isSearchNeed,
   isPersona,
 } from "../../need-utils.js";
-import { generateRgbColorArray, getIn } from "../../utils.js";
+import { generateHexColor, generateRgbColorArray, getIn } from "../../utils.js";
 import shajs from "sha.js";
 import Identicon from "identicon.js";
 
@@ -36,6 +36,11 @@ export function parseNeed(jsonldNeed, isOwned) {
       creationDate: extractCreationDate(jsonldNeedImm),
       lastUpdateDate: extractCreationDate(jsonldNeedImm),
       humanReadable: undefined, //can only be determined after we generated The Content
+      matchedUseCase: {
+        identifier: undefined,
+        icon: undefined,
+        iconBackground: generateUseCaseIconBackground(jsonldNeedImm),
+      },
       unread: false,
       isOwned: !!isOwned,
       isBeingCreated: false,
@@ -56,7 +61,17 @@ export function parseNeed(jsonldNeed, isOwned) {
       detailsToParse
     );
 
-    return Immutable.fromJS(parsedNeed);
+    let parsedNeedImm = Immutable.fromJS(parsedNeed);
+
+    const matchingUseCase = findUseCaseByNeed(parsedNeedImm);
+
+    if (matchingUseCase) {
+      parsedNeedImm = parsedNeedImm
+        .setIn(["matchedUseCase", "icon"], matchingUseCase.icon)
+        .setIn(["matchedUseCase", "identifier"], matchingUseCase.identifier);
+    }
+
+    return parsedNeedImm;
   } else {
     console.error(
       "Cant parse need, data is an invalid need-object: ",
@@ -129,6 +144,17 @@ function generateIdenticon(needJsonLd) {
     format: "svg",
   });
   return idc.toString();
+}
+
+function generateUseCaseIconBackground(needJsonLd) {
+  const needUri = needJsonLd.get("@id");
+
+  if (!needUri) {
+    return;
+  }
+
+  const hash = new shajs.sha512().update(needUri).digest("hex");
+  return generateHexColor(hash);
 }
 
 function extractCreationDate(needJsonLd) {
