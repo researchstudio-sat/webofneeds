@@ -5,6 +5,6 @@ export const activitiesGroup = {
   label: "Activities",
   icon: undefined,
   useCaseGroups: {
-    cycling: cyclingGroup,
+    cyclingGroup: cyclingGroup,
   },
 };

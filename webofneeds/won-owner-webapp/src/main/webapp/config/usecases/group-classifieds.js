@@ -14,7 +14,7 @@ export const classifiedsGroup = {
   icon: undefined,
   useCases: {
     goodsOffer: goodsOffer,
-    goodsSearch: goodsServiceSearch,
+    goodsServiceSearch: goodsServiceSearch,
     serviceOffer: serviceOffer,
     // TODO: serviceSearch: serviceSearch,
     goodsTransportSearch: goodsTransportSearch,
