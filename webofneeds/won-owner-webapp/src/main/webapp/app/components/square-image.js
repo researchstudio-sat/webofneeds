@@ -1,8 +1,8 @@
 import angular from "angular";
 
-import won from "../won-es6.js";
 import { attach, get, getIn } from "../utils.js";
 import * as needUtils from "../need-utils.js";
+import * as processUtils from "../process-utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
@@ -10,6 +10,12 @@ import { classOnComponentRoot } from "../cstm-ng-utils.js";
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
+    <div class="image usecaseimage" style="background-color: {{::self.useCaseIconBackground}}"
+      ng-if="::self.useCaseIcon">
+      <svg class="si__usecaseicon">
+        <use xlink:href="{{ ::self.useCaseIcon }}" href="{{ ::self.useCaseIcon }}"></use>
+      </svg>
+    </div>
     <img class="image"
       ng-if="::self.identiconSvg"
       alt="Auto-generated title image"
@@ -26,19 +32,30 @@ function genComponentConf() {
 
       const selectFromState = state => {
         const need = getIn(state, ["needs", this.uri]);
-        const identiconSvg = needUtils.getIdenticonSvg(need);
-
         const personaUri = get(need, "heldBy");
         const persona = getIn(state, ["needs", personaUri]);
         const personaIdenticonSvg = needUtils.getIdenticonSvg(persona);
 
+        const isPersona = needUtils.isPersona(need);
+
+        const useCaseIcon = !isPersona
+          ? needUtils.getMatchedUseCaseIcon(need)
+          : undefined;
+        const useCaseIconBackground = !isPersona
+          ? needUtils.getMatchedUseCaseIconBackground(need)
+          : undefined;
+
+        const identiconSvg = !useCaseIcon
+          ? needUtils.getIdenticonSvg(need)
+          : undefined;
+        const process = get(state, "process");
         return {
-          isPersona: needUtils.isPersona(need),
-          needInactive:
-            need && get(need, "state") === won.WON.InactiveCompacted,
+          isPersona,
+          needInactive: needUtils.isInactive(need),
           needFailedToLoad:
-            need &&
-            getIn(state, ["process", "needs", need.get("uri"), "failedToLoad"]),
+            need && processUtils.hasNeedFailedToLoad(process, this.uri),
+          useCaseIcon,
+          useCaseIconBackground,
           identiconSvg,
           personaIdenticonSvg,
         };
