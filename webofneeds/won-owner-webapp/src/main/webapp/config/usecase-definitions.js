@@ -7,7 +7,7 @@ import { realEstateGroup } from "./usecases/group-real-estate";
 import { transportGroup } from "./usecases/group-transport";
 import { otherGroup } from "./usecases/group-other";
 import { personalMobilityGroup } from "./usecases/group-personal-mobility";
-import { interestGroup } from "./usecases/group-interest";
+import { activitiesGroup } from "./usecases/group-activities";
 // import { customUseCase } from "./usecases/uc-custom.js";
 
 /**
@@ -53,7 +53,7 @@ import { interestGroup } from "./usecases/group-interest";
  */
 
 export const useCaseGroups = {
-  interest: interestGroup,
+  activities: activitiesGroup,
   social: socialGroup,
   classifieds: classifiedsGroup,
   work: workGroup,
@@ -83,24 +83,33 @@ for (let key in useCaseGroups) {
   }
 }
 
-export const useCases = tempUseCases;
+const useCases = tempUseCases;
+
+export function getUseCaseGroups() {
+  return JSON.parse(JSON.stringify(useCaseGroups));
+}
+
+export function getUseCases() {
+  return JSON.parse(JSON.stringify(useCases));
+}
 
 export function getUseCaseGroupByIdentifier(groupIdentifier) {
-  //TODO: IMPLEMENT SUBGROUP CHECK
   if (groupIdentifier) {
     for (const groupName in useCaseGroups) {
-      if (groupIdentifier === useCaseGroups[groupName]["identifier"]) {
-        return useCaseGroups[groupName];
-      } /*else {
-        const subElements = useCaseGroups[groupName].useCases;
-        if (subElements) {
-          for (const subGroupKey in subElements) { //FIXME: DOES NOT WORK FOR SUBSUB GROUPS
-            if(subElements[subGroupKey].useCases && (groupIdentifier === subElements[subGroupKey]["identifier"])) {
-              return subElements[subGroupKey];
-            }
+      const element = useCaseGroups[groupName];
+
+      if (groupIdentifier === element["identifier"]) {
+        return element;
+      } else if (isUseCaseGroup(element)) {
+        for (const subGroupName in element.useCases) {
+          // FIXME: DOES NOT WORK FOR SUBSUB GROUPS
+          if (
+            groupIdentifier === element.useCases[subGroupName]["identifier"]
+          ) {
+            return element.useCases[subGroupName];
           }
         }
-      }*/
+      }
     }
   }
   return undefined;
