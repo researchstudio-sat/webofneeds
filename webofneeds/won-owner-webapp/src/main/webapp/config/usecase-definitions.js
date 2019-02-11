@@ -84,6 +84,8 @@ function addUseCasesToTemp(elements) {
 
 const useCases = tempUseCases;
 
+window.useCases4dbg = useCases;
+
 export function getUseCaseGroups() {
   return useCaseGroups;
 }
