@@ -83,8 +83,22 @@ function addUseCasesToTemp(elements) {
 }
 
 const useCases = tempUseCases;
-
 window.useCases4dbg = useCases;
+
+function addUseCaseGroupToTemp(tempGroups, groups) {
+  if (hasSubElements(groups)) {
+    for (let identifier in groups) {
+      if (groups[identifier] && groups[identifier].subItems) {
+        tempGroups[identifier] = groups[identifier];
+        addUseCaseGroupToTemp(tempGroups, groups[identifier].subItems);
+      }
+    }
+  }
+}
+
+let tempUseCaseGroups = {};
+addUseCaseGroupToTemp(tempUseCaseGroups, useCaseGroups);
+const allUseCaseGroups = tempUseCaseGroups;
 
 export function getUseCaseGroups() {
   return useCaseGroups;
@@ -92,4 +106,12 @@ export function getUseCaseGroups() {
 
 export function getAllUseCases() {
   return useCases;
+}
+
+export function getAllUseCaseGroups() {
+  return allUseCaseGroups;
+}
+
+function hasSubElements(obj) {
+  return obj && obj !== {} && Object.keys(obj).length > 0;
 }
