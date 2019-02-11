@@ -1,4 +1,3 @@
-import { lunchGroup } from "./usecases/group-lunch";
 import { classifiedsGroup } from "./usecases/group-classifieds";
 import { socialGroup } from "./usecases/group-social";
 import { workGroup } from "./usecases/group-work";
@@ -8,7 +7,7 @@ import { realEstateGroup } from "./usecases/group-real-estate";
 import { transportGroup } from "./usecases/group-transport";
 import { otherGroup } from "./usecases/group-other";
 import { personalMobilityGroup } from "./usecases/group-personal-mobility";
-import { cyclingGroup } from "./usecases/group-cycling";
+import { interestGroup } from "./usecases/group-interest";
 // import { customUseCase } from "./usecases/uc-custom.js";
 
 /**
@@ -54,8 +53,7 @@ import { cyclingGroup } from "./usecases/group-cycling";
  */
 
 export const useCaseGroups = {
-  lunch: lunchGroup,
-  cycling: cyclingGroup,
+  interest: interestGroup,
   social: socialGroup,
   classifieds: classifiedsGroup,
   work: workGroup,
@@ -73,8 +71,55 @@ let tempUseCases = {};
 for (let key in useCaseGroups) {
   const useCases = useCaseGroups[key].useCases;
   for (let identifier in useCases) {
-    tempUseCases[identifier] = useCases[identifier];
+    if (useCases[identifier].useCases) {
+      //ADD ONE MORE CASCADE (FIXME: CURRENTLY DOESNT WORK WITH SUBSUB GROUPS)
+      for (let subIdentifier in useCases[identifier].useCases) {
+        tempUseCases[subIdentifier] =
+          useCases[identifier]["useCases"][subIdentifier];
+      }
+    } else {
+      tempUseCases[identifier] = useCases[identifier];
+    }
   }
 }
 
 export const useCases = tempUseCases;
+
+export function getUseCaseGroupByIdentifier(groupIdentifier) {
+  //TODO: IMPLEMENT SUBGROUP CHECK
+  if (groupIdentifier) {
+    for (const groupName in useCaseGroups) {
+      if (groupIdentifier === useCaseGroups[groupName]["identifier"]) {
+        return useCaseGroups[groupName];
+      } /*else {
+        const subElements = useCaseGroups[groupName].useCases;
+        if (subElements) {
+          for (const subGroupKey in subElements) { //FIXME: DOES NOT WORK FOR SUBSUB GROUPS
+            if(subElements[subGroupKey].useCases && (groupIdentifier === subElements[subGroupKey]["identifier"])) {
+              return subElements[subGroupKey];
+            }
+          }
+        }
+      }*/
+    }
+  }
+  return undefined;
+}
+
+/**
+ * return if the given useCase is displayable or not
+ * @param useCase
+ * @returns {*}
+ */
+export function isDisplayableUseCase(useCase) {
+  return useCase && useCase.identifier && (useCase.label || useCase.icon);
+}
+
+/**
+ * return if the given element is a useCaseGroup or not
+ * @param element
+ * @returns {*}
+ */
+export function isUseCaseGroup(element) {
+  return element.useCases;
+}
