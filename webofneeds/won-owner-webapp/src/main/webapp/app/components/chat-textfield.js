@@ -23,7 +23,8 @@ import {
   isMessageRejectable,
   isMessageSelected,
 } from "../message-utils.js";
-import { connect2Redux, getAllMessageDetails } from "../won-utils.js";
+import { connect2Redux } from "../won-utils.js";
+import * as useCaseUtils from "../usecase-utils.js";
 import autoresizingTextareaModule from "../directives/textarea-autogrow.js";
 import { actionCreators } from "../actions/actions.js";
 import labelledHrModule from "./labelled-hr.js";
@@ -276,7 +277,7 @@ function genComponentConf() {
     constructor(/* arguments <- serviceDependencies */) {
       attach(this, serviceDependencies, arguments);
       window.ctfs4dbg = this;
-      this.allMessageDetails = getAllMessageDetails();
+      this.allMessageDetails = useCaseUtils.getAllMessageDetails();
 
       this.draftObject = {};
       this.additionalContent = new Map(); //Stores the additional Detail content of a message

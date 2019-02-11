@@ -1,6 +1,6 @@
 import Immutable from "immutable";
 import won from "../../won-es6.js";
-import { getAllDetails, findUseCaseByNeed } from "../../won-utils.js";
+import * as useCaseUtils from "../../usecase-utils.js";
 import {
   isWhatsNewNeed,
   isWhatsAroundNeed,
@@ -15,7 +15,7 @@ export function parseNeed(jsonldNeed, isOwned) {
   const jsonldNeedImm = Immutable.fromJS(jsonldNeed);
 
   if (jsonldNeedImm && jsonldNeedImm.get("@id")) {
-    const detailsToParse = getAllDetails();
+    const detailsToParse = useCaseUtils.getAllDetails();
 
     let parsedNeed = {
       uri: jsonldNeedImm.get("@id"),
@@ -64,7 +64,7 @@ export function parseNeed(jsonldNeed, isOwned) {
     let parsedNeedImm = Immutable.fromJS(parsedNeed);
 
     if (!isPersona(parsedNeedImm)) {
-      const matchingUseCase = findUseCaseByNeed(parsedNeedImm);
+      const matchingUseCase = useCaseUtils.findUseCaseByNeed(parsedNeedImm);
 
       if (matchingUseCase) {
         parsedNeedImm = parsedNeedImm

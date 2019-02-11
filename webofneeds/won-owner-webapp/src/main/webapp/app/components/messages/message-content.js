@@ -2,7 +2,7 @@ import angular from "angular";
 
 import won from "../../won-es6.js";
 import { connect2Redux } from "../../won-utils.js";
-import { getAllDetails } from "../../won-utils.js";
+import * as useCaseUtils from "../../usecase-utils.js";
 import { attach, getIn, get } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import { getOwnedNeedByConnectionUri } from "../../selectors/general-selectors.js";
@@ -38,7 +38,7 @@ function genComponentConf() {
         'Click on the "Show raw RDF data"-button in ' +
         'the main-menu on the right side of the navigationbar to see the "raw" message-data.»';
 
-      this.allDetails = getAllDetails();
+      this.allDetails = useCaseUtils.getAllDetails();
 
       const selectFromState = state => {
         const ownedNeed =
