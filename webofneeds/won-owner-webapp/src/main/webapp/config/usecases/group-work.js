@@ -9,7 +9,7 @@ export const workGroup = {
   identifier: "workgroup",
   label: "Jobs",
   icon: undefined,
-  useCases: {
+  subItems: {
     jobSearch: jobSearch,
     jobOffer: jobOffer,
     phdOffer: phdOffer,

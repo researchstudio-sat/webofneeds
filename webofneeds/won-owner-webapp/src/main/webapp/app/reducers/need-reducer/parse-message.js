@@ -5,7 +5,7 @@ import {
   isValidNumber,
 } from "../../utils.js";
 import { isUriRead } from "../../won-localstorage.js";
-import { getAllDetails } from "../../won-utils.js";
+import * as useCaseUtils from "../../usecase-utils.js";
 
 /*
   "alreadyProcessed" flag sets the sentOwn/Remote flags to true
@@ -35,7 +35,7 @@ export function parseMessage(
 
   const matchScoreFloat = parseFloat(wonMessage.getMatchScore());
 
-  const detailsToParse = getAllDetails();
+  const detailsToParse = useCaseUtils.getAllDetails();
 
   let parsedMessage = {
     belongsToUri: undefined,

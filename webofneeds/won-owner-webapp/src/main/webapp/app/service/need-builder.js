@@ -6,10 +6,8 @@
 //TODO switch to requirejs for dependency mngmt (so this lib isn't angular-bound)
 //TODO replace calls to `won` object to `require('util')`
 import won from "./won.js";
-// import { useCases } from "useCaseDefinitions";
-import { getAllDetails } from "../won-utils";
+import * as useCaseUtils from "../usecase-utils";
 import { is } from "../utils";
-import { useCases } from "../../config/usecase-definitions.js";
 import {
   generateWhatsAroundQuery,
   generateWhatsNewQuery,
@@ -84,7 +82,7 @@ import { Generator } from "sparqljs";
 
     const addContent = (contentNode, contentData) => {
       //TODO: CANT HANDLE "@id" details yet (see won-message-utils.js buildChatMessage(..) additionalContent part
-      const detailList = getAllDetails();
+      const detailList = useCaseUtils.getAllDetails();
 
       for (const detail of Object.values(detailList)) {
         // const detail = detailList[detailName];
@@ -128,7 +126,7 @@ import { Generator } from "sparqljs";
 
     let seeksContentUri = args.seeks && won.WON.contentNodeBlankUri.seeks;
 
-    const useCase = useCases[args.useCase];
+    const useCase = useCaseUtils.getUseCase(args.useCase);
 
     /*TODO: instead of the detection if whatsX to generate the query we could just make useCases out of the whatsX instead
       or define the query as a detail

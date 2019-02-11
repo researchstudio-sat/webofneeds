@@ -5,7 +5,7 @@ import "ng-redux";
 import { attach } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
-import { useCaseGroups } from "useCaseDefinitions";
+import * as useCaseUtils from "../usecase-utils.js";
 import { getUseCaseGroupFromRoute } from "../selectors/general-selectors.js";
 
 import "style/_usecase-group.scss";
@@ -21,7 +21,7 @@ function genComponentConf() {
       <!-- HEADER -->
       <div class="ucg__header">
           <a class="cp__header__back clickable"
-              ng-click="self.router__stateGoCurrent({useCaseGroup: 'all'})">
+              ng-click="self.router__back()">
               <svg style="--local-primary:var(--won-primary-color);"
                   class="ucg__header__back__icon show-in-responsive">
                   <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
@@ -44,16 +44,16 @@ function genComponentConf() {
       <!-- USE CASES -->
       <div class="ucg__main">
         <div class="ucg__main__usecase clickable"
-          ng-repeat="useCase in self.useCaseGroup.useCases"
-          ng-if="self.displayableUseCase(useCase)"
-          ng-click="self.startFrom(useCase)">
+          ng-repeat="subItem in self.useCaseGroup.subItems"
+          ng-if="self.useCaseUtils.isDisplayableItem(subItem)"
+          ng-click="self.startFrom(subItem)">
           <svg class="ucg__main__usecase__icon"
-            ng-if="!!useCase.icon">
-            <use xlink:href="{{ useCase.icon }}" href="{{ useCase.icon }}"></use>
+            ng-if="!!subItem.icon">
+            <use xlink:href="{{ subItem.icon }}" href="{{ subItem.icon }}"></use>
           </svg>
           <div class="ucg__main__usecase__label"
-            ng-if="!!useCase.label">
-              {{ useCase.label }}
+            ng-if="!!subItem.label">
+              {{ subItem.label }}
           </div>
         </div>
       </div>
@@ -64,12 +64,12 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
 
       window.ucg4dbg = this;
-      this.useCaseGroups = useCaseGroups;
+      this.useCaseUtils = useCaseUtils;
 
       const selectFromState = state => {
         const selectedGroup = getUseCaseGroupFromRoute(state);
         return {
-          useCaseGroup: selectUseCaseGroupFrom(selectedGroup, useCaseGroups),
+          useCaseGroup: useCaseUtils.getUseCaseGroupByIdentifier(selectedGroup),
         };
       };
 
@@ -77,51 +77,21 @@ function genComponentConf() {
       connect2Redux(selectFromState, actionCreators, [], this);
     }
 
-    /**
-     * return if the given useCaseGroup is displayable or not
-     * needs to have at least one displayable UseCase
-     * @param useCase
-     * @returns {*}
-     */
-    displayableUseCaseGroup(useCaseGroup) {
-      const useCaseGroupValid =
-        useCaseGroup &&
-        (useCaseGroup.label || useCaseGroup.icon) &&
-        useCaseGroup.useCases;
+    startFrom(subItem) {
+      const subItemIdentifier = subItem && subItem.identifier;
 
-      if (useCaseGroupValid) {
-        for (const key in useCaseGroup.useCases) {
-          if (this.displayableUseCase(useCaseGroup.useCases[key])) {
-            return true;
-          }
+      if (subItemIdentifier) {
+        if (useCaseUtils.isUseCaseGroup(subItem)) {
+          this.router__stateGoCurrent({
+            useCaseGroup: encodeURIComponent(subItemIdentifier),
+          });
+        } else {
+          this.router__stateGoCurrent({
+            useCase: encodeURIComponent(subItemIdentifier),
+          });
         }
-      }
-      return false;
-      // TODO: error handling: no group found/group empty
-    }
-
-    /**
-     * return if the given useCase is displayable or not
-     * @param useCase
-     * @returns {*}
-     */
-    displayableUseCase(useCase) {
-      return useCase && useCase.identifier && (useCase.label || useCase.icon);
-    }
-
-    startFrom(selectedUseCase) {
-      const selectedUseCaseIdentifier =
-        selectedUseCase && selectedUseCase.identifier;
-
-      if (selectedUseCaseIdentifier) {
-        this.router__stateGoCurrent({
-          useCase: encodeURIComponent(selectedUseCaseIdentifier),
-        });
       } else {
-        console.warn(
-          "No usecase identifier found for given usecase, ",
-          selectedUseCase
-        );
+        console.warn("No identifier found for given usecase, ", subItem);
       }
     }
   }
@@ -138,17 +108,6 @@ function genComponentConf() {
     },
     template: template,
   };
-}
-
-function selectUseCaseGroupFrom(selectedGroup, useCaseGroups) {
-  if (selectedGroup) {
-    for (const groupName in useCaseGroups) {
-      if (selectedGroup === useCaseGroups[groupName]["identifier"]) {
-        return useCaseGroups[groupName];
-      }
-    }
-  }
-  return undefined;
 }
 
 export default //.controller('CreateNeedController', [...serviceDependencies, CreateNeedController])

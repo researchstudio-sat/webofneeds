@@ -12,7 +12,7 @@ export const classifiedsGroup = {
   identifier: "classifiedsgroup",
   label: "Buy & Sell",
   icon: undefined,
-  useCases: {
+  subItems: {
     goodsOffer: goodsOffer,
     goodsServiceSearch: goodsServiceSearch,
     serviceOffer: serviceOffer,

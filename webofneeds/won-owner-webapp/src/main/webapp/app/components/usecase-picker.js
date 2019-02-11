@@ -13,7 +13,7 @@ import {
   selectIsConnected,
   getUseCaseGroupFromRoute,
 } from "../selectors/general-selectors.js";
-import { useCases, useCaseGroups } from "useCaseDefinitions";
+import * as useCaseUtils from "../usecase-utils.js";
 
 import "style/_usecase-picker.scss";
 
@@ -26,7 +26,7 @@ const serviceDependencies = [
 function genComponentConf() {
   const template = `
         <!-- HEADER -->
-        <div class="ucp__header" ng-if="self.useCaseGroup === 'all'">
+        <div class="ucp__header" ng-if="self.showAll">
             <a class="ucp__header__back clickable"
                 ng-click="self.router__stateGoCurrent({useCase: undefined, useCaseGroup: undefined})">
                 <svg style="--local-primary:var(--won-primary-color);"
@@ -94,23 +94,23 @@ function genComponentConf() {
 
         <!-- USE CASE GROUPS --> 
         <div class="ucp__main__usecase-group clickable"
-          ng-repeat="useCaseGroup in self.useCaseGroups"
-          ng-if="!self.isSearching && self.displayableUseCaseGroup(useCaseGroup)
-                 && self.countDisplayableUseCasesInGroup(useCaseGroup) > self.showGroupsThreshold"
-          ng-click="self.viewUseCaseGroup(useCaseGroup)">
+          ng-repeat="ucg in self.useCaseGroups"
+          ng-if="!self.isSearching && self.useCaseUtils.isDisplayableUseCaseGroup(ucg)
+                 && self.useCaseUtils.countDisplayableItemsInGroup(ucg) > self.showGroupsThreshold"
+          ng-click="self.viewUseCaseGroup(ucg)">
               <svg class="ucp__main__usecase-group__icon"
-                ng-if="!!useCaseGroup.icon">
-                <use xlink:href="{{ useCaseGroup.icon }}" href="{{ useCaseGroup.icon }}"></use>
+                ng-if="!!ucg.icon">
+                <use xlink:href="{{ ucg.icon }}" href="{{ ucg.icon }}"></use>
               </svg>
               <div class="ucp__main__usecase-group__label"
-                ng-if="!!useCaseGroup.label">
-                  {{ useCaseGroup.label }}
+                ng-if="!!ucg.label">
+                  {{ ucg.label }}
               </div>
         </div>
         <!-- USE CASES WITHOUT GROUPS --> 
         <div class="ucp__main__usecase-group clickable"
           ng-repeat="useCase in self.ungroupedUseCases"
-          ng-if="!self.isSearching && self.displayableUseCase(useCase)"
+          ng-if="!self.isSearching && self.useCaseUtils.isDisplayableUseCase(useCase)"
           ng-click="self.startFrom(useCase)">
               <svg class="ucp__main__usecase-group__icon"
                 ng-if="!!useCase.icon">
@@ -130,20 +130,21 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
       window.ucp4dbg = this;
 
-      this.useCases = useCases;
-      this.useCaseGroups = useCaseGroups;
-      this.showGroupsThreshold = 1; // only show groups with more than 1 use case(s) as groups
-      this.ungroupedUseCases = this.getUngroupedUseCases(this.useCases);
-
+      this.useCaseUtils = useCaseUtils;
       this.searchResults = undefined;
 
       const selectFromState = state => {
-        const useCaseGroup = getUseCaseGroupFromRoute(state);
+        const showGroupsThreshold = 1; // only show groups with more than 1 use case(s) as groups
 
         return {
-          useCaseGroup,
+          showAll: getUseCaseGroupFromRoute(state) === "all",
           processingPublish: state.getIn(["process", "processingPublish"]),
           connectionHasBeenLost: !selectIsConnected(state),
+          useCaseGroups: useCaseUtils.getUseCaseGroups(),
+          showGroupsThreshold,
+          ungroupedUseCases: useCaseUtils.getUnGroupedUseCases(
+            showGroupsThreshold
+          ),
         };
       };
 
@@ -205,130 +206,25 @@ function genComponentConf() {
     // TODO: group search results by use case groups - only showing groups with results
     updateSearch() {
       const query = this.textfield().value;
-      let results = new Map();
 
       if (query && query.trim().length > 1) {
         this.isSearching = true;
 
-        for (const key in this.useCaseGroups) {
-          const group = Object.values(this.useCaseGroups[key].useCases);
+        const results = useCaseUtils.filterUseCasesBySearchQuery(query);
 
-          for (const useCase of group) {
-            if (this.searchFunction(useCase, query)) {
-              results.set(useCase.identifier, useCase);
-            }
-          }
-        }
-
-        if (results.size === 0) {
+        if (!results) {
           this.searchResults = undefined;
           this.isSearching = false;
         }
 
-        this.searchResults = Array.from(results.values());
+        this.searchResults = results;
       } else {
         this.searchResults = undefined;
         this.isSearching = false;
       }
     }
 
-    searchFunction(useCase, searchString) {
-      // don't treat use cases that can't be displayed as results
-      if (!this.displayableUseCase(useCase)) {
-        return false;
-      }
-      // check for searchString in use case label and draft
-      const useCaseLabel = JSON.stringify(useCase.label).toLowerCase();
-      const useCaseDraft = JSON.stringify(useCase.draft).toLowerCase();
-
-      const useCaseString = useCaseLabel.concat(useCaseDraft);
-      const queries = searchString.toLowerCase().split(" ");
-
-      for (let query of queries) {
-        if (useCaseString.includes(query)) {
-          return true;
-        }
-      }
-
-      return false;
-    }
-
     // search end
-
-    /**
-     * return the amount of displayable useCases in a useCaseGroup
-     * @param useCaseGroup
-     * @return {*}
-     */
-    countDisplayableUseCasesInGroup(useCaseGroup) {
-      let countUseCases = 0;
-
-      for (const key in useCaseGroup.useCases) {
-        if (this.displayableUseCase(useCaseGroup.useCases[key])) {
-          countUseCases++;
-        }
-      }
-      return countUseCases;
-    }
-
-    /**
-     * return if the given useCaseGroup is displayable or not
-     * needs to have at least one displayable UseCase
-     * @param useCase
-     * @returns {*}
-     */
-    displayableUseCaseGroup(useCaseGroup) {
-      const useCaseGroupValid =
-        useCaseGroup &&
-        (useCaseGroup.label || useCaseGroup.icon) &&
-        useCaseGroup.useCases;
-
-      if (useCaseGroupValid) {
-        for (const key in useCaseGroup.useCases) {
-          if (this.displayableUseCase(useCaseGroup.useCases[key])) {
-            return true;
-          }
-        }
-      }
-      return false;
-    }
-
-    /**
-     * return if the given useCase is displayable or not
-     * @param useCase
-     * @returns {*}
-     */
-    displayableUseCase(useCase) {
-      return useCase && useCase.identifier && (useCase.label || useCase.icon);
-    }
-
-    /**
-     * returns an object containing all use cases that were
-     * not found in a useCaseGroup or in a group that's too
-     * small to be displayed as a group
-     * @param allUseCases
-     * @returns {*}
-     */
-    getUngroupedUseCases(allUseCases) {
-      let ungroupedUseCases = JSON.parse(JSON.stringify(allUseCases));
-      for (const identifier in this.useCaseGroups) {
-        const group = this.useCaseGroups[identifier];
-        // show use cases from groups that can't be displayed
-        // show use cases from groups that have no more than threshold use cases
-        if (
-          !this.displayableUseCaseGroup(group) ||
-          this.countDisplayableUseCasesInGroup(group) <=
-            this.showGroupsThreshold
-        ) {
-          continue;
-        }
-        // don't show usecases in groups as single use cases
-        for (const useCase in group.useCases) {
-          delete ungroupedUseCases[useCase];
-        }
-      }
-      return ungroupedUseCases;
-    }
 
     textfieldNg() {
       return angular.element(this.textfield());

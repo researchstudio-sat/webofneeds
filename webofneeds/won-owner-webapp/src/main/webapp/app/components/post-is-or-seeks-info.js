@@ -6,7 +6,7 @@ import angular from "angular";
 import "ng-redux";
 
 import { attach } from "../utils.js";
-import { getAllDetails } from "../won-utils.js";
+import * as useCaseUtils from "../usecase-utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { actionCreators } from "../actions/actions.js";
 
@@ -39,7 +39,7 @@ function genComponentConf() {
       //TODO debug; deleteme
       window.isis4dbg = this;
 
-      this.allDetails = getAllDetails();
+      this.allDetails = useCaseUtils.getAllDetails();
 
       const selectFromState = state => {
         const post = this.postUri && state.getIn(["needs", this.postUri]);
