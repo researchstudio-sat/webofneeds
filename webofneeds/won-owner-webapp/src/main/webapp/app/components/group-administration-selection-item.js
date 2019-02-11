@@ -16,7 +16,6 @@ import "style/_group-administration-selection-item-line.scss";
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
-      <!-- todo impl and include groupchat header -->
       <won-group-administration-header
         class="clickable"
         ng-click="self.setOpen()"

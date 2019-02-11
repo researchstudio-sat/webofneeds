@@ -313,6 +313,12 @@ function genComponentConf() {
     }
 
     toggleDetails(ownedNeedUri) {
+      for (let key in this.open) {
+        if (key !== ownedNeedUri) {
+          this.open[key] = false;
+        }
+      }
+
       if (this.isOpen(ownedNeedUri)) {
         this.open[ownedNeedUri] = false;
         if (this.isOpenByConnection(ownedNeedUri)) {
