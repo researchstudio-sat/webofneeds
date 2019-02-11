@@ -6,7 +6,6 @@
 //TODO switch to requirejs for dependency mngmt (so this lib isn't angular-bound)
 //TODO replace calls to `won` object to `require('util')`
 import won from "./won.js";
-// import { useCases } from "useCaseDefinitions";
 import { getAllDetails } from "../won-utils";
 import { is } from "../utils";
 import { useCases } from "../../config/usecase-definitions.js";
