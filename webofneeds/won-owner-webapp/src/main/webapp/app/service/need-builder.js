@@ -8,7 +8,6 @@
 import won from "./won.js";
 import * as useCaseUtils from "../usecase-utils";
 import { is } from "../utils";
-import { useCases } from "../../config/usecase-definitions.js";
 import {
   generateWhatsAroundQuery,
   generateWhatsNewQuery,
@@ -127,7 +126,7 @@ import { Generator } from "sparqljs";
 
     let seeksContentUri = args.seeks && won.WON.contentNodeBlankUri.seeks;
 
-    const useCase = useCases[args.useCase];
+    const useCase = useCaseUtils.getUseCase(args.useCase);
 
     /*TODO: instead of the detection if whatsX to generate the query we could just make useCases out of the whatsX instead
       or define the query as a detail
