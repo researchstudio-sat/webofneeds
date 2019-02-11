@@ -93,6 +93,42 @@ export function getUseCases() {
   return useCases;
 }
 
+/**
+ * returns an object containing all use cases that were
+ * not found in a useCaseGroup or in a group that's too
+ * small to be displayed as a group
+ * @param threshold => defines size that is deemed too small to display group
+ * @returns {*}
+ */
+export function getUnGroupedUseCases(threshold = 0) {
+  const useCaseGroups = getUseCaseGroups();
+  let ungroupedUseCases = JSON.parse(JSON.stringify(getUseCases()));
+
+  for (const identifier in useCaseGroups) {
+    const group = useCaseGroups[identifier];
+    // show use cases from groups that can't be displayed
+    // show use cases from groups that have no more than threshold use cases
+    if (
+      !isDisplayableUseCaseGroup(group) ||
+      countDisplayableUseCasesInGroup(group) <= threshold
+    ) {
+      continue;
+    }
+    // don't show usecases in groups as sinle use cases
+    for (const useCase in group.useCases) {
+      if (group.useCases[useCase].useCases) {
+        for (const subUseCase in group.useCases[useCase].useCases) {
+          //FIXME: SUBSUB GROUPS ARE NOT SUPPORTED YET
+          delete ungroupedUseCases[subUseCase];
+        }
+      } else {
+        delete ungroupedUseCases[useCase];
+      }
+    }
+  }
+  return ungroupedUseCases;
+}
+
 export function getUseCase(useCaseString) {
   if (useCaseString) {
     const useCases = getUseCases();
@@ -153,6 +189,44 @@ export function getUseCaseGroupByIdentifier(groupIdentifier) {
  */
 export function isDisplayableUseCase(useCase) {
   return useCase && useCase.identifier && (useCase.label || useCase.icon);
+}
+
+/**
+ * return if the given useCaseGroup is displayable or not
+ * needs to have at least one displayable UseCase
+ * @param useCase
+ * @returns {*}
+ */
+export function isDisplayableUseCaseGroup(useCaseGroup) {
+  const useCaseGroupValid =
+    useCaseGroup &&
+    (useCaseGroup.label || useCaseGroup.icon) &&
+    useCaseGroup.useCases;
+
+  if (useCaseGroupValid) {
+    for (const key in useCaseGroup.useCases) {
+      if (isDisplayableUseCase(useCaseGroup.useCases[key])) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+/**
+ * return the amount of displayable useCases in a useCaseGroup
+ * @param useCaseGroup
+ * @return {*}
+ */
+export function countDisplayableUseCasesInGroup(useCaseGroup) {
+  let countUseCases = 0;
+
+  for (const key in useCaseGroup.useCases) {
+    if (isDisplayableUseCase(useCaseGroup.useCases[key])) {
+      countUseCases++;
+    }
+  }
+  return countUseCases;
 }
 
 /**
