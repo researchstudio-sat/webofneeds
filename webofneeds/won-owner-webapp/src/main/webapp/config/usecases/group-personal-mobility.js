@@ -6,7 +6,7 @@ export const personalMobilityGroup = {
   identifier: "mobilitygroup",
   label: "Mobility",
   icon: undefined,
-  useCases: {
+  subItems: {
     personalTransportSearch: personalTransportSearch,
     taxiOffer: taxiOffer,
     rideShareOffer: rideShareOffer,

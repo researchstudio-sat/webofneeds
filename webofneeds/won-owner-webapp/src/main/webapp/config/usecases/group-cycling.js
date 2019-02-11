@@ -5,7 +5,7 @@ export const cyclingGroup = {
   identifier: "cyclingGroup",
   label: "Cycling",
   icon: undefined,
-  useCases: {
+  subItems: {
     cyclingInterest: cyclingInterest,
     cyclingPlan: cyclingPlan,
   },

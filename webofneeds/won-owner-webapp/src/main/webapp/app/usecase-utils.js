@@ -174,9 +174,9 @@ export function getUnGroupedUseCases(threshold = 0) {
       continue;
     }
     // don't show usecases in groups as sinle use cases
-    for (const useCase in group.useCases) {
-      if (group.useCases[useCase].useCases) {
-        for (const subUseCase in group.useCases[useCase].useCases) {
+    for (const useCase in group.subItems) {
+      if (group.subItems[useCase].subItems) {
+        for (const subUseCase in group.subItems[useCase].subItems) {
           //FIXME: SUBSUB GROUPS ARE NOT SUPPORTED YET
           delete ungroupedUseCases[subUseCase];
         }
@@ -228,12 +228,12 @@ export function getUseCaseGroupByIdentifier(groupIdentifier) {
       if (groupIdentifier === element["identifier"]) {
         return element;
       } else if (isUseCaseGroup(element)) {
-        for (const subGroupName in element.useCases) {
+        for (const subGroupName in element.subItems) {
           // FIXME: DOES NOT WORK FOR SUBSUB GROUPS
           if (
-            groupIdentifier === element.useCases[subGroupName]["identifier"]
+            groupIdentifier === element.subItems[subGroupName]["identifier"]
           ) {
-            return element.useCases[subGroupName];
+            return element.subItems[subGroupName];
           }
         }
       }
@@ -261,11 +261,11 @@ export function isDisplayableUseCaseGroup(useCaseGroup) {
   const useCaseGroupValid =
     useCaseGroup &&
     (useCaseGroup.label || useCaseGroup.icon) &&
-    useCaseGroup.useCases;
+    useCaseGroup.subItems;
 
   if (useCaseGroupValid) {
-    for (const key in useCaseGroup.useCases) {
-      if (isDisplayableUseCase(useCaseGroup.useCases[key])) {
+    for (const key in useCaseGroup.subItems) {
+      if (isDisplayableUseCase(useCaseGroup.subItems[key])) {
         return true;
       }
     }
@@ -281,8 +281,8 @@ export function isDisplayableUseCaseGroup(useCaseGroup) {
 export function countDisplayableUseCasesInGroup(useCaseGroup) {
   let countUseCases = 0;
 
-  for (const key in useCaseGroup.useCases) {
-    if (isDisplayableUseCase(useCaseGroup.useCases[key])) {
+  for (const key in useCaseGroup.subItems) {
+    if (isDisplayableUseCase(useCaseGroup.subItems[key])) {
       countUseCases++;
     }
   }
@@ -295,7 +295,53 @@ export function countDisplayableUseCasesInGroup(useCaseGroup) {
  * @returns {*}
  */
 export function isUseCaseGroup(element) {
-  return element.useCases;
+  return element.subItems;
+}
+
+export function filterUseCasesBySearchQuery(queryString) {
+  let results = new Map();
+  const useCaseGroups = getUseCaseGroups();
+  for (const key in useCaseGroups) {
+    const group = Object.values(useCaseGroups[key].subItems);
+
+    for (const useCase of group) {
+      //TODO: SUBGROUP HANDLING
+      if (!isUseCaseGroup(useCase) && searchFunction(useCase, queryString)) {
+        results.set(useCase.identifier, useCase);
+      }
+    }
+  }
+
+  if (results.size === 0) {
+    return undefined;
+  }
+
+  return Array.from(results.values());
+}
+
+function searchFunction(useCase, searchString) {
+  // don't treat use cases that can't be displayed as results
+  if (!isDisplayableUseCase(useCase)) {
+    return false;
+  }
+  // check for searchString in use case label and draft
+  const useCaseLabel = useCase.label
+    ? JSON.stringify(useCase.label).toLowerCase()
+    : "";
+  const useCaseDraft = useCase.draft
+    ? JSON.stringify(useCase.draft).toLowerCase()
+    : "";
+
+  const useCaseString = useCaseLabel.concat(useCaseDraft);
+  const queries = searchString.toLowerCase().split(" ");
+
+  for (let query of queries) {
+    if (useCaseString.includes(query)) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 function hasSubElements(obj) {

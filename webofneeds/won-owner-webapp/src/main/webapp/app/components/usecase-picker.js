@@ -131,10 +131,11 @@ function genComponentConf() {
       window.ucp4dbg = this;
 
       this.useCaseUtils = useCaseUtils;
-      const showGroupsThreshold = 1; // only show groups with more than 1 use case(s) as groups
       this.searchResults = undefined;
 
       const selectFromState = state => {
+        const showGroupsThreshold = 1; // only show groups with more than 1 use case(s) as groups
+
         return {
           showAll: getUseCaseGroupFromRoute(state) === "all",
           processingPublish: state.getIn(["process", "processingPublish"]),
@@ -205,56 +206,22 @@ function genComponentConf() {
     // TODO: group search results by use case groups - only showing groups with results
     updateSearch() {
       const query = this.textfield().value;
-      let results = new Map();
 
       if (query && query.trim().length > 1) {
         this.isSearching = true;
 
-        for (const key in this.useCaseGroups) {
-          const group = Object.values(this.useCaseGroups[key].useCases);
+        const results = useCaseUtils.filterUseCasesBySearchQuery(query);
 
-          for (const useCase of group) {
-            if (this.searchFunction(useCase, query)) {
-              results.set(useCase.identifier, useCase);
-            }
-          }
-        }
-
-        if (results.size === 0) {
+        if (!results) {
           this.searchResults = undefined;
           this.isSearching = false;
         }
 
-        this.searchResults = Array.from(results.values());
+        this.searchResults = results;
       } else {
         this.searchResults = undefined;
         this.isSearching = false;
       }
-    }
-
-    searchFunction(useCase, searchString) {
-      // don't treat use cases that can't be displayed as results
-      if (!useCaseUtils.isDisplayableUseCase(useCase)) {
-        return false;
-      }
-      // check for searchString in use case label and draft
-      const useCaseLabel = useCase.label
-        ? JSON.stringify(useCase.label).toLowerCase()
-        : "";
-      const useCaseDraft = useCase.draft
-        ? JSON.stringify(useCase.draft).toLowerCase()
-        : "";
-
-      const useCaseString = useCaseLabel.concat(useCaseDraft);
-      const queries = searchString.toLowerCase().split(" ");
-
-      for (let query of queries) {
-        if (useCaseString.includes(query)) {
-          return true;
-        }
-      }
-
-      return false;
     }
 
     // search end

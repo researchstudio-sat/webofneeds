@@ -44,16 +44,16 @@ function genComponentConf() {
       <!-- USE CASES -->
       <div class="ucg__main">
         <div class="ucg__main__usecase clickable"
-          ng-repeat="element in self.useCaseGroup.useCases"
-          ng-if="self.useCaseUtils.isDisplayableUseCase(element)"
-          ng-click="self.startFrom(element)">
+          ng-repeat="subItem in self.useCaseGroup.subItems"
+          ng-if="self.useCaseUtils.isDisplayableUseCase(subItem)"
+          ng-click="self.startFrom(subItem)">
           <svg class="ucg__main__usecase__icon"
-            ng-if="!!element.icon">
-            <use xlink:href="{{ element.icon }}" href="{{ element.icon }}"></use>
+            ng-if="!!subItem.icon">
+            <use xlink:href="{{ subItem.icon }}" href="{{ subItem.icon }}"></use>
           </svg>
           <div class="ucg__main__usecase__label"
-            ng-if="!!element.label">
-              {{ element.label }}
+            ng-if="!!subItem.label">
+              {{ subItem.label }}
           </div>
         </div>
       </div>
@@ -77,21 +77,21 @@ function genComponentConf() {
       connect2Redux(selectFromState, actionCreators, [], this);
     }
 
-    startFrom(element) {
-      const elementIdentifier = element && element.identifier;
+    startFrom(subItem) {
+      const subItemIdentifier = subItem && subItem.identifier;
 
-      if (elementIdentifier) {
-        if (useCaseUtils.isUseCaseGroup(element)) {
+      if (subItemIdentifier) {
+        if (useCaseUtils.isUseCaseGroup(subItem)) {
           this.router__stateGoCurrent({
-            useCaseGroup: encodeURIComponent(elementIdentifier),
+            useCaseGroup: encodeURIComponent(subItemIdentifier),
           });
         } else {
           this.router__stateGoCurrent({
-            useCase: encodeURIComponent(elementIdentifier),
+            useCase: encodeURIComponent(subItemIdentifier),
           });
         }
       } else {
-        console.warn("No identifier found for given usecase, ", element);
+        console.warn("No identifier found for given usecase, ", subItem);
       }
     }
   }

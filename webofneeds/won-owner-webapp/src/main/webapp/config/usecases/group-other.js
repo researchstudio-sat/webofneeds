@@ -10,7 +10,7 @@ export const otherGroup = {
   identifier: "othergroup",
   label: "More...",
   icon: undefined,
-  useCases: {
+  subItems: {
     complain: complain,
     handleComplaint: handleComplaint,
     customUseCase: customUseCase,

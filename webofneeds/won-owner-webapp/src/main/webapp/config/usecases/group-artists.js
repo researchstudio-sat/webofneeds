@@ -6,7 +6,7 @@ export const artistGroup = {
   identifier: "artistgroup",
   label: "Music",
   icon: undefined,
-  useCases: {
+  subItems: {
     bandSearch: bandSearch,
     musicianSearch: musicianSearch,
     serviceOffer: serviceOffer,

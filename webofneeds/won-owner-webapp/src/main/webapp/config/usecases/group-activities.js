@@ -5,7 +5,7 @@ export const activitiesGroup = {
   identifier: "activitiesgroup",
   label: "Activities",
   icon: undefined,
-  useCases: {
+  subItems: {
     lunchGroup: lunchGroup,
     cyclingGroup: cyclingGroup,
   },

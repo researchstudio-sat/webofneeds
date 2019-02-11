@@ -66,19 +66,18 @@ const useCaseGroups = {
 };
 
 // generate a list of usecases from all use case groups
-// TODO: find a good way to handle potential ungrouped use cases
 let tempUseCases = {};
 for (let key in useCaseGroups) {
-  const useCases = useCaseGroups[key].useCases;
-  for (let identifier in useCases) {
-    if (useCases[identifier].useCases) {
-      //ADD ONE MORE CASCADE (FIXME: CURRENTLY DOESNT WORK WITH SUBSUB GROUPS)
-      for (let subIdentifier in useCases[identifier].useCases) {
-        tempUseCases[subIdentifier] =
-          useCases[identifier]["useCases"][subIdentifier];
-      }
+  const elements = useCaseGroups[key].subItems;
+  addUseCasesToTemp(elements);
+}
+
+function addUseCasesToTemp(elements) {
+  for (let identifier in elements) {
+    if (elements[identifier].subItems) {
+      addUseCasesToTemp(elements[identifier].subItems);
     } else {
-      tempUseCases[identifier] = useCases[identifier];
+      tempUseCases[identifier] = elements[identifier];
     }
   }
 }

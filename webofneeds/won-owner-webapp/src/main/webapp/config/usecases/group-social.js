@@ -10,7 +10,7 @@ export const socialGroup = {
   identifier: "socialgroup",
   label: "Social",
   icon: undefined,
-  useCases: {
+  subItems: {
     getBreakfast: getBreakfast,
     getLunch: getLunch,
     afterparty: afterparty,
