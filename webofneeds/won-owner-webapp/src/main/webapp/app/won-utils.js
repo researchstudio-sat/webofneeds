@@ -19,7 +19,7 @@ import {
 
 import { ownerBaseUrl } from "config";
 import urljoin from "url-join";
-import { useCases } from "useCaseDefinitions";
+import * as useCaseDefinitions from "useCaseDefinitions";
 import { messageDetails } from "detailDefinitions";
 import qr from "qr-image";
 import jsonld from "jsonld";
@@ -432,6 +432,7 @@ export function getRandomWonId() {
  */
 export function getAllDetails() {
   let allDetails = {};
+  const useCases = useCaseDefinitions.getUseCases();
 
   if (hasSubElements(useCases)) {
     for (const useCaseKey in useCases) {
@@ -464,6 +465,7 @@ export function findUseCaseByNeed(needImm) {
     getIn(needImm, ["content", "type"])
       .toSet()
       .remove("won:Need");
+  const useCases = useCaseDefinitions.getUseCases();
 
   if (hasSubElements(useCases)) {
     const useCasesImm = Immutable.fromJS(useCases);
@@ -540,6 +542,7 @@ window.findUseCaseByNeed4Dbg = findUseCaseByNeed;
  */
 export function getAllMessageDetails() {
   let allDetails = {};
+  const useCases = useCaseDefinitions.getUseCases();
 
   if (hasSubElements(useCases)) {
     for (const useCaseKey in useCases) {
