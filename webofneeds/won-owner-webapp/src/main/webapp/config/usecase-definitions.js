@@ -90,6 +90,6 @@ export function getUseCaseGroups() {
   return useCaseGroups;
 }
 
-export function getUseCases() {
+export function getAllUseCases() {
   return useCases;
 }

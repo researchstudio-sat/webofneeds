@@ -1,5 +1,5 @@
 /**
- * Created by ksinger on 11.08.2016.
+ * Created by quasarchimaere on 11.02.2019.
  */
 
 import * as useCaseDefinitions from "useCaseDefinitions";
@@ -14,7 +14,7 @@ import Immutable from "immutable";
  */
 export function getAllDetails() {
   let allDetails = {};
-  const useCases = useCaseDefinitions.getUseCases();
+  const useCases = useCaseDefinitions.getAllUseCases();
 
   if (hasSubElements(useCases)) {
     for (const useCaseKey in useCases) {
@@ -47,7 +47,7 @@ export function findUseCaseByNeed(needImm) {
     getIn(needImm, ["content", "type"])
       .toSet()
       .remove("won:Need");
-  const useCases = useCaseDefinitions.getUseCases();
+  const useCases = useCaseDefinitions.getAllUseCases();
 
   if (hasSubElements(useCases)) {
     const useCasesImm = Immutable.fromJS(useCases);
@@ -124,7 +124,7 @@ window.findUseCaseByNeed4Dbg = findUseCaseByNeed;
  */
 export function getAllMessageDetails() {
   let allDetails = {};
-  const useCases = useCaseDefinitions.getUseCases();
+  const useCases = useCaseDefinitions.getAllUseCases();
 
   if (hasSubElements(useCases)) {
     for (const useCaseKey in useCases) {
@@ -161,7 +161,9 @@ export function getAllMessageDetails() {
  */
 export function getUnGroupedUseCases(threshold = 0) {
   const useCaseGroups = getUseCaseGroups();
-  let ungroupedUseCases = JSON.parse(JSON.stringify(getUseCases()));
+  let ungroupedUseCases = JSON.parse(
+    JSON.stringify(useCaseDefinitions.getAllUseCases())
+  );
 
   for (const identifier in useCaseGroups) {
     const group = useCaseGroups[identifier];
@@ -190,7 +192,7 @@ export function getUnGroupedUseCases(threshold = 0) {
 
 export function getUseCase(useCaseString) {
   if (useCaseString) {
-    const useCases = getUseCases();
+    const useCases = useCaseDefinitions.getAllUseCases();
 
     for (const useCaseName in useCases) {
       if (useCaseString === useCases[useCaseName]["identifier"]) {
@@ -209,7 +211,7 @@ export function getUseCase(useCaseString) {
  */
 export function getListUseCases() {
   let listUseCases = {};
-  const useCases = getUseCases();
+  const useCases = useCaseDefinitions.getAllUseCases();
 
   for (const useCaseKey in useCases) {
     if (useCases[useCaseKey]["showInList"]) {
@@ -350,8 +352,4 @@ function hasSubElements(obj) {
 
 export function getUseCaseGroups() {
   return useCaseDefinitions.getUseCaseGroups();
-}
-
-export function getUseCases() {
-  return useCaseDefinitions.getUseCases();
 }
