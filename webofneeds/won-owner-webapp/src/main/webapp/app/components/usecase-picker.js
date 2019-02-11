@@ -13,7 +13,7 @@ import {
   selectIsConnected,
   getUseCaseGroupFromRoute,
 } from "../selectors/general-selectors.js";
-import * as useCaseDefinitions from "useCaseDefinitions";
+import * as useCaseUtils from "../usecase-utils.js";
 
 import "style/_usecase-picker.scss";
 
@@ -95,8 +95,8 @@ function genComponentConf() {
         <!-- USE CASE GROUPS --> 
         <div class="ucp__main__usecase-group clickable"
           ng-repeat="ucg in self.useCaseGroups"
-          ng-if="!self.isSearching && self.useCaseDefinitions.isDisplayableUseCaseGroup(ucg)
-                 && self.useCaseDefinitions.countDisplayableUseCasesInGroup(ucg) > self.showGroupsThreshold"
+          ng-if="!self.isSearching && self.useCaseUtils.isDisplayableUseCaseGroup(ucg)
+                 && self.useCaseUtils.countDisplayableUseCasesInGroup(ucg) > self.showGroupsThreshold"
           ng-click="self.viewUseCaseGroup(ucg)">
               <svg class="ucp__main__usecase-group__icon"
                 ng-if="!!ucg.icon">
@@ -110,7 +110,7 @@ function genComponentConf() {
         <!-- USE CASES WITHOUT GROUPS --> 
         <div class="ucp__main__usecase-group clickable"
           ng-repeat="useCase in self.ungroupedUseCases"
-          ng-if="!self.isSearching && self.useCaseDefinitions.isDisplayableUseCase(useCase)"
+          ng-if="!self.isSearching && self.useCaseUtils.isDisplayableUseCase(useCase)"
           ng-click="self.startFrom(useCase)">
               <svg class="ucp__main__usecase-group__icon"
                 ng-if="!!useCase.icon">
@@ -130,7 +130,7 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
       window.ucp4dbg = this;
 
-      this.useCaseDefinitions = useCaseDefinitions;
+      this.useCaseUtils = useCaseUtils;
       const showGroupsThreshold = 1; // only show groups with more than 1 use case(s) as groups
       this.searchResults = undefined;
 
@@ -139,9 +139,9 @@ function genComponentConf() {
           showAll: getUseCaseGroupFromRoute(state) === "all",
           processingPublish: state.getIn(["process", "processingPublish"]),
           connectionHasBeenLost: !selectIsConnected(state),
-          useCaseGroups: useCaseDefinitions.getUseCaseGroups(),
+          useCaseGroups: useCaseUtils.getUseCaseGroups(),
           showGroupsThreshold,
-          ungroupedUseCases: useCaseDefinitions.getUnGroupedUseCases(
+          ungroupedUseCases: useCaseUtils.getUnGroupedUseCases(
             showGroupsThreshold
           ),
         };
@@ -234,7 +234,7 @@ function genComponentConf() {
 
     searchFunction(useCase, searchString) {
       // don't treat use cases that can't be displayed as results
-      if (!useCaseDefinitions.isDisplayableUseCase(useCase)) {
+      if (!useCaseUtils.isDisplayableUseCase(useCase)) {
         return false;
       }
       // check for searchString in use case label and draft

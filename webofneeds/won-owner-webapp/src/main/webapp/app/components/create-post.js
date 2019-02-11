@@ -14,7 +14,7 @@ import { connect2Redux } from "../won-utils.js";
 import * as generalSelectors from "../selectors/general-selectors.js";
 import * as needUtils from "../need-utils.js";
 import * as processSelectors from "../selectors/process-selectors.js";
-import * as useCaseDefinitions from "useCaseDefinitions";
+import * as useCaseUtils from "../usecase-utils.js";
 
 import "style/_create-post.scss";
 import "style/_responsiveness-utils.scss";
@@ -154,7 +154,7 @@ function genComponentConf() {
             );
 
             useCaseString = matchedUseCaseIdentifier || "customUseCase";
-            useCase = useCaseDefinitions.getUseCase(useCaseString);
+            useCase = useCaseUtils.getUseCase(useCaseString);
 
             const fromNeedContent = get(fromNeed, "content");
             const fromNeedSeeks = get(fromNeed, "seeks");
@@ -192,7 +192,7 @@ function genComponentConf() {
           }
         } else {
           useCaseString = generalSelectors.getUseCaseFromRoute(state);
-          useCase = useCaseDefinitions.getUseCase(useCaseString);
+          useCase = useCaseUtils.getUseCase(useCaseString);
         }
 
         return {

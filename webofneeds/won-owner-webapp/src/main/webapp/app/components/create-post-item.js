@@ -3,7 +3,7 @@ import ngAnimate from "angular-animate";
 import squareImageModule from "../components/square-image.js";
 import { actionCreators } from "../actions/actions.js";
 import { attach } from "../utils.js";
-import * as useCaseDefinitions from "useCaseDefinitions";
+import * as useCaseUtils from "../usecase-utils.js";
 import { connect2Redux } from "../won-utils.js";
 import {
   getUseCaseFromRoute,
@@ -104,8 +104,8 @@ function genComponentConf() {
         const useCaseGroup = getUseCaseGroupFromRoute(state);
         const useCaseString = getUseCaseFromRoute(state);
 
-        const listUseCases = useCaseDefinitions.getListUseCases();
-        const useCase = useCaseDefinitions.getUseCase(useCaseString);
+        const listUseCases = useCaseUtils.getListUseCases();
+        const useCase = useCaseUtils.getUseCase(useCaseString);
 
         return {
           listUseCases,

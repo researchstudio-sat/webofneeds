@@ -5,7 +5,7 @@ import "ng-redux";
 import { attach } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
-import * as useCaseDefinitions from "useCaseDefinitions";
+import * as useCaseUtils from "../usecase-utils.js";
 import { getUseCaseGroupFromRoute } from "../selectors/general-selectors.js";
 
 import "style/_usecase-group.scss";
@@ -45,7 +45,7 @@ function genComponentConf() {
       <div class="ucg__main">
         <div class="ucg__main__usecase clickable"
           ng-repeat="element in self.useCaseGroup.useCases"
-          ng-if="self.useCaseDefinitions.isDisplayableUseCase(element)"
+          ng-if="self.useCaseUtils.isDisplayableUseCase(element)"
           ng-click="self.startFrom(element)">
           <svg class="ucg__main__usecase__icon"
             ng-if="!!element.icon">
@@ -64,14 +64,12 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
 
       window.ucg4dbg = this;
-      this.useCaseDefinitions = useCaseDefinitions;
+      this.useCaseUtils = useCaseUtils;
 
       const selectFromState = state => {
         const selectedGroup = getUseCaseGroupFromRoute(state);
         return {
-          useCaseGroup: useCaseDefinitions.getUseCaseGroupByIdentifier(
-            selectedGroup
-          ),
+          useCaseGroup: useCaseUtils.getUseCaseGroupByIdentifier(selectedGroup),
         };
       };
 
@@ -83,7 +81,7 @@ function genComponentConf() {
       const elementIdentifier = element && element.identifier;
 
       if (elementIdentifier) {
-        if (useCaseDefinitions.isUseCaseGroup(element)) {
+        if (useCaseUtils.isUseCaseGroup(element)) {
           this.router__stateGoCurrent({
             useCaseGroup: encodeURIComponent(elementIdentifier),
           });
