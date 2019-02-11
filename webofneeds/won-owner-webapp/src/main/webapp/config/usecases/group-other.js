@@ -21,10 +21,10 @@ export const otherGroup = {
         ...mergeInEmptyDraft({
           content: {
             facets: {
-              "#groupFacet": won.WON.GroupFacet,
-              "#holdableFacet": won.WON.HoldableFacet,
+              "#groupFacet": won.WON.GroupFacetCompacted,
+              "#holdableFacet": won.WON.HoldableFacetCompacted,
             },
-            defaultFacet: { "#groupFacet": won.WON.GroupFacet },
+            defaultFacet: { "#groupFacet": won.WON.GroupFacetCompacted },
           },
         }),
       },

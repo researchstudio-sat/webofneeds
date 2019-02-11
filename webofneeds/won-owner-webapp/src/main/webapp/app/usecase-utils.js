@@ -5,6 +5,8 @@
 import * as useCaseDefinitions from "useCaseDefinitions";
 import { messageDetails } from "detailDefinitions";
 import { getIn } from "./utils.js";
+import { values } from "min-dash";
+import won from "./won-es6.js";
 
 import Immutable from "immutable";
 
@@ -347,4 +349,16 @@ function hasSubElements(obj) {
 
 export function getUseCaseGroups() {
   return useCaseDefinitions.getUseCaseGroups();
+}
+
+export function isHoldable(useCase) {
+  return (
+    useCase &&
+    useCase.draft &&
+    useCase.draft.content &&
+    useCase.draft.content.facets &&
+    values(useCase.draft.content.facets).includes(
+      won.WON.HoldableFacetCompacted
+    )
+  );
 }

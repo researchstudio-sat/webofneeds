@@ -18,7 +18,6 @@ import * as useCaseUtils from "../usecase-utils.js";
 
 import "style/_create-post.scss";
 import "style/_responsiveness-utils.scss";
-import { values } from "min-dash";
 
 const serviceDependencies = [
   "$ngRedux",
@@ -205,12 +204,7 @@ function genComponentConf() {
           isCreateFromNeed,
           isFromNeedLoading,
           isFromNeedToLoad,
-          isHoldable:
-            useCase &&
-            useCase.draft &&
-            useCase.draft.content &&
-            useCase.draft.content.facets &&
-            values(useCase.draft.content.facets).includes("won:HoldableFacet"),
+          isHoldable: useCaseUtils.isHoldable(useCase),
           hasFromNeedFailedToLoad,
           showCreateInput:
             useCase &&
