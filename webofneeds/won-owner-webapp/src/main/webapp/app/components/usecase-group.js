@@ -45,7 +45,7 @@ function genComponentConf() {
       <div class="ucg__main">
         <div class="ucg__main__usecase clickable"
           ng-repeat="subItem in self.useCaseGroup.subItems"
-          ng-if="self.useCaseUtils.isDisplayableUseCase(subItem)"
+          ng-if="self.useCaseUtils.isDisplayableItem(subItem)"
           ng-click="self.startFrom(subItem)">
           <svg class="ucg__main__usecase__icon"
             ng-if="!!subItem.icon">

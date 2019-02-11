@@ -96,7 +96,7 @@ function genComponentConf() {
         <div class="ucp__main__usecase-group clickable"
           ng-repeat="ucg in self.useCaseGroups"
           ng-if="!self.isSearching && self.useCaseUtils.isDisplayableUseCaseGroup(ucg)
-                 && self.useCaseUtils.countDisplayableUseCasesInGroup(ucg) > self.showGroupsThreshold"
+                 && self.useCaseUtils.countDisplayableItemsInGroup(ucg) > self.showGroupsThreshold"
           ng-click="self.viewUseCaseGroup(ucg)">
               <svg class="ucp__main__usecase-group__icon"
                 ng-if="!!ucg.icon">

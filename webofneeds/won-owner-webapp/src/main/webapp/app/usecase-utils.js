@@ -160,7 +160,7 @@ export function getAllMessageDetails() {
  * @returns {*}
  */
 export function getUnGroupedUseCases(threshold = 0) {
-  const useCaseGroups = getUseCaseGroups();
+  const useCaseGroups = useCaseDefinitions.getAllUseCaseGroups();
   let ungroupedUseCases = JSON.parse(
     JSON.stringify(useCaseDefinitions.getAllUseCases())
   );
@@ -171,18 +171,13 @@ export function getUnGroupedUseCases(threshold = 0) {
     // show use cases from groups that have no more than threshold use cases
     if (
       !isDisplayableUseCaseGroup(group) ||
-      countDisplayableUseCasesInGroup(group) <= threshold
+      countDisplayableItemsInGroup(group) <= threshold
     ) {
       continue;
     }
     // don't show usecases in groups as sinle use cases
     for (const useCase in group.subItems) {
-      if (group.subItems[useCase].subItems) {
-        for (const subUseCase in group.subItems[useCase].subItems) {
-          //FIXME: SUBSUB GROUPS ARE NOT SUPPORTED YET
-          delete ungroupedUseCases[subUseCase];
-        }
-      } else {
+      if (!group.subItems[useCase].subItems) {
         delete ungroupedUseCases[useCase];
       }
     }
@@ -223,21 +218,12 @@ export function getListUseCases() {
 
 export function getUseCaseGroupByIdentifier(groupIdentifier) {
   if (groupIdentifier) {
-    const useCaseGroups = getUseCaseGroups();
+    const useCaseGroups = useCaseDefinitions.getAllUseCaseGroups();
     for (const groupName in useCaseGroups) {
       const element = useCaseGroups[groupName];
 
       if (groupIdentifier === element["identifier"]) {
         return element;
-      } else if (isUseCaseGroup(element)) {
-        for (const subGroupName in element.subItems) {
-          // FIXME: DOES NOT WORK FOR SUBSUB GROUPS
-          if (
-            groupIdentifier === element.subItems[subGroupName]["identifier"]
-          ) {
-            return element.subItems[subGroupName];
-          }
-        }
       }
     }
   }
@@ -250,7 +236,21 @@ export function getUseCaseGroupByIdentifier(groupIdentifier) {
  * @returns {*}
  */
 export function isDisplayableUseCase(useCase) {
-  return useCase && useCase.identifier && (useCase.label || useCase.icon);
+  return (
+    useCase &&
+    useCase.identifier &&
+    (useCase.label || useCase.icon) &&
+    !useCase.subItems
+  );
+}
+
+/**
+ * return if the given useCase is displayable or not
+ * @param useCase
+ * @returns {*}
+ */
+export function isDisplayableItem(item) {
+  return isDisplayableUseCase(item) || isDisplayableUseCaseGroup(item);
 }
 
 /**
@@ -267,7 +267,7 @@ export function isDisplayableUseCaseGroup(useCaseGroup) {
 
   if (useCaseGroupValid) {
     for (const key in useCaseGroup.subItems) {
-      if (isDisplayableUseCase(useCaseGroup.subItems[key])) {
+      if (isDisplayableItem(useCaseGroup.subItems[key])) {
         return true;
       }
     }
@@ -276,19 +276,19 @@ export function isDisplayableUseCaseGroup(useCaseGroup) {
 }
 
 /**
- * return the amount of displayable useCases in a useCaseGroup
+ * return the amount of displayable items in a useCaseGroup
  * @param useCaseGroup
  * @return {*}
  */
-export function countDisplayableUseCasesInGroup(useCaseGroup) {
-  let countUseCases = 0;
+export function countDisplayableItemsInGroup(useCaseGroup) {
+  let countItems = 0;
 
   for (const key in useCaseGroup.subItems) {
-    if (isDisplayableUseCase(useCaseGroup.subItems[key])) {
-      countUseCases++;
+    if (isDisplayableItem(useCaseGroup.subItems[key])) {
+      countItems++;
     }
   }
-  return countUseCases;
+  return countItems;
 }
 
 /**
@@ -302,15 +302,10 @@ export function isUseCaseGroup(element) {
 
 export function filterUseCasesBySearchQuery(queryString) {
   let results = new Map();
-  const useCaseGroups = getUseCaseGroups();
-  for (const key in useCaseGroups) {
-    const group = Object.values(useCaseGroups[key].subItems);
-
-    for (const useCase of group) {
-      //TODO: SUBGROUP HANDLING
-      if (!isUseCaseGroup(useCase) && searchFunction(useCase, queryString)) {
-        results.set(useCase.identifier, useCase);
-      }
+  const useCases = useCaseDefinitions.getAllUseCases();
+  for (const useCaseKey in useCases) {
+    if (searchFunction(useCases[useCaseKey], queryString)) {
+      results.set(useCases[useCaseKey].identifier, useCases[useCaseKey]);
     }
   }
 
