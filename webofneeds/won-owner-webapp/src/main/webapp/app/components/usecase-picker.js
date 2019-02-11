@@ -138,11 +138,8 @@ function genComponentConf() {
       this.searchResults = undefined;
 
       const selectFromState = state => {
-        const displayedUseCaseGroup = getUseCaseGroupFromRoute(state);
-
         return {
-          showAll: displayedUseCaseGroup && displayedUseCaseGroup === "all",
-          displayedUseCaseGroup,
+          showAll: getUseCaseGroupFromRoute(state) === "all",
           processingPublish: state.getIn(["process", "processingPublish"]),
           connectionHasBeenLost: !selectIsConnected(state),
           useCaseGroups: useCaseDefinitions.getUseCaseGroups(),
