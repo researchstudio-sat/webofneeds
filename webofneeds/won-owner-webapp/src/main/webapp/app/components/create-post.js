@@ -14,8 +14,7 @@ import { connect2Redux } from "../won-utils.js";
 import * as generalSelectors from "../selectors/general-selectors.js";
 import * as needUtils from "../need-utils.js";
 import * as processSelectors from "../selectors/process-selectors.js";
-
-import { useCases } from "useCaseDefinitions";
+import * as useCaseDefinitions from "useCaseDefinitions";
 
 import "style/_create-post.scss";
 import "style/_responsiveness-utils.scss";
@@ -155,7 +154,7 @@ function genComponentConf() {
             );
 
             useCaseString = matchedUseCaseIdentifier || "customUseCase";
-            useCase = selectUseCaseFrom(useCaseString, useCases);
+            useCase = useCaseDefinitions.getUseCase(useCaseString);
 
             const fromNeedContent = get(fromNeed, "content");
             const fromNeedSeeks = get(fromNeed, "seeks");
@@ -193,7 +192,7 @@ function genComponentConf() {
           }
         } else {
           useCaseString = generalSelectors.getUseCaseFromRoute(state);
-          useCase = selectUseCaseFrom(useCaseString, useCases);
+          useCase = useCaseDefinitions.getUseCase(useCaseString);
         }
 
         return {
@@ -341,17 +340,6 @@ function genComponentConf() {
     },
     template: template,
   };
-}
-
-function selectUseCaseFrom(useCaseString, useCases) {
-  if (useCaseString) {
-    for (const useCaseName in useCases) {
-      if (useCaseString === useCases[useCaseName]["identifier"]) {
-        return useCases[useCaseName];
-      }
-    }
-  }
-  return undefined;
 }
 
 // returns true if the branch has any content present

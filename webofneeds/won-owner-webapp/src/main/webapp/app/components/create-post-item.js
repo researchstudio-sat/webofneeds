@@ -3,7 +3,7 @@ import ngAnimate from "angular-animate";
 import squareImageModule from "../components/square-image.js";
 import { actionCreators } from "../actions/actions.js";
 import { attach } from "../utils.js";
-import { useCases } from "useCaseDefinitions";
+import * as useCaseDefinitions from "useCaseDefinitions";
 import { connect2Redux } from "../won-utils.js";
 import {
   getUseCaseFromRoute,
@@ -98,49 +98,24 @@ function genComponentConf() {
     constructor() {
       attach(this, serviceDependencies, arguments);
 
-      this.useCases = useCases;
       window.cpitem4dbg = this;
 
       const selectFromState = state => {
         const useCaseGroup = getUseCaseGroupFromRoute(state);
         const useCaseString = getUseCaseFromRoute(state);
 
-        const listUseCases = this.getListUseCases();
+        const listUseCases = useCaseDefinitions.getListUseCases();
+        const useCase = useCaseDefinitions.getUseCase(useCaseString);
 
         return {
           listUseCases,
           evenUseCaseListSize:
             listUseCases && Object.keys(listUseCases).length % 2 == 0,
           useCaseGroup,
-          useCase: useCaseString && this.getUseCase(useCaseString),
+          useCase: useCaseString !== "search" ? useCase : "search",
         };
       };
       connect2Redux(selectFromState, actionCreators, [], this);
-    }
-
-    getUseCase(useCaseString) {
-      if (useCaseString) {
-        for (const useCaseName in useCases) {
-          if (useCaseString === useCases[useCaseName]["identifier"]) {
-            return useCases[useCaseName];
-          }
-        }
-        if (useCaseString === "search") {
-          return useCaseString;
-        }
-      }
-      return undefined;
-    }
-
-    getListUseCases() {
-      let listUseCases = {};
-
-      for (const useCaseKey in this.useCases) {
-        if (this.useCases[useCaseKey]["showInList"]) {
-          listUseCases[useCaseKey] = this.useCases[useCaseKey];
-        }
-      }
-      return listUseCases;
     }
 
     startFrom(selectedUseCase) {

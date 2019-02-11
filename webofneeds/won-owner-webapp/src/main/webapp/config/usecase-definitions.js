@@ -86,11 +86,42 @@ for (let key in useCaseGroups) {
 const useCases = tempUseCases;
 
 export function getUseCaseGroups() {
-  return JSON.parse(JSON.stringify(useCaseGroups));
+  return useCaseGroups;
 }
 
 export function getUseCases() {
-  return JSON.parse(JSON.stringify(useCases));
+  return useCases;
+}
+
+export function getUseCase(useCaseString) {
+  if (useCaseString) {
+    const useCases = getUseCases();
+
+    for (const useCaseName in useCases) {
+      if (useCaseString === useCases[useCaseName]["identifier"]) {
+        return useCases[useCaseName];
+      }
+    }
+  }
+  return undefined;
+}
+
+/**
+ * This fucntion returns all UseCases that are defined with "showInList = true", this is so we can define useCases
+ * that show up within our connection-overview "quick item"-buttons, e.g. if we want to define a usecase that is
+ * always available from this list
+ * @returns {{}}
+ */
+export function getListUseCases() {
+  let listUseCases = {};
+  const useCases = getUseCases();
+
+  for (const useCaseKey in useCases) {
+    if (useCases[useCaseKey]["showInList"]) {
+      listUseCases[useCaseKey] = useCases[useCaseKey];
+    }
+  }
+  return listUseCases;
 }
 
 export function getUseCaseGroupByIdentifier(groupIdentifier) {

@@ -13,7 +13,7 @@ import {
   selectIsConnected,
   getUseCaseGroupFromRoute,
 } from "../selectors/general-selectors.js";
-import { useCases, useCaseGroups } from "useCaseDefinitions";
+import * as useCaseDefinitions from "useCaseDefinitions";
 
 import "style/_usecase-picker.scss";
 
@@ -26,7 +26,7 @@ const serviceDependencies = [
 function genComponentConf() {
   const template = `
         <!-- HEADER -->
-        <div class="ucp__header" ng-if="self.useCaseGroup === 'all'">
+        <div class="ucp__header" ng-if="self.showAll">
             <a class="ucp__header__back clickable"
                 ng-click="self.router__stateGoCurrent({useCase: undefined, useCaseGroup: undefined})">
                 <svg style="--local-primary:var(--won-primary-color);"
@@ -94,17 +94,17 @@ function genComponentConf() {
 
         <!-- USE CASE GROUPS --> 
         <div class="ucp__main__usecase-group clickable"
-          ng-repeat="useCaseGroup in self.useCaseGroups"
-          ng-if="!self.isSearching && self.displayableUseCaseGroup(useCaseGroup)
-                 && self.countDisplayableUseCasesInGroup(useCaseGroup) > self.showGroupsThreshold"
-          ng-click="self.viewUseCaseGroup(useCaseGroup)">
+          ng-repeat="ucg in self.useCaseGroups"
+          ng-if="!self.isSearching && self.displayableUseCaseGroup(ucg)
+                 && self.countDisplayableUseCasesInGroup(ucg) > self.showGroupsThreshold"
+          ng-click="self.viewUseCaseGroup(ucg)">
               <svg class="ucp__main__usecase-group__icon"
-                ng-if="!!useCaseGroup.icon">
-                <use xlink:href="{{ useCaseGroup.icon }}" href="{{ useCaseGroup.icon }}"></use>
+                ng-if="!!ucg.icon">
+                <use xlink:href="{{ ucg.icon }}" href="{{ ucg.icon }}"></use>
               </svg>
               <div class="ucp__main__usecase-group__label"
-                ng-if="!!useCaseGroup.label">
-                  {{ useCaseGroup.label }}
+                ng-if="!!ucg.label">
+                  {{ ucg.label }}
               </div>
         </div>
         <!-- USE CASES WITHOUT GROUPS --> 
@@ -130,20 +130,22 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
       window.ucp4dbg = this;
 
-      this.useCases = useCases;
-      this.useCaseGroups = useCaseGroups;
       this.showGroupsThreshold = 1; // only show groups with more than 1 use case(s) as groups
-      this.ungroupedUseCases = this.getUngroupedUseCases(this.useCases);
+      this.ungroupedUseCases = this.getUngroupedUseCases(
+        useCaseDefinitions.getUseCases()
+      );
 
       this.searchResults = undefined;
 
       const selectFromState = state => {
-        const useCaseGroup = getUseCaseGroupFromRoute(state);
+        const displayedUseCaseGroup = getUseCaseGroupFromRoute(state);
 
         return {
-          useCaseGroup,
+          showAll: displayedUseCaseGroup && displayedUseCaseGroup === "all",
+          displayedUseCaseGroup,
           processingPublish: state.getIn(["process", "processingPublish"]),
           connectionHasBeenLost: !selectIsConnected(state),
+          useCaseGroups: useCaseDefinitions.getUseCaseGroups(),
         };
       };
 
@@ -238,8 +240,12 @@ function genComponentConf() {
         return false;
       }
       // check for searchString in use case label and draft
-      const useCaseLabel = JSON.stringify(useCase.label).toLowerCase();
-      const useCaseDraft = JSON.stringify(useCase.draft).toLowerCase();
+      const useCaseLabel = useCase.label
+        ? JSON.stringify(useCase.label).toLowerCase()
+        : "";
+      const useCaseDraft = useCase.draft
+        ? JSON.stringify(useCase.draft).toLowerCase()
+        : "";
 
       const useCaseString = useCaseLabel.concat(useCaseDraft);
       const queries = searchString.toLowerCase().split(" ");
@@ -322,9 +328,16 @@ function genComponentConf() {
         ) {
           continue;
         }
-        // don't show usecases in groups as single use cases
+        // don't show usecases in groups as sinle use cases
         for (const useCase in group.useCases) {
-          delete ungroupedUseCases[useCase];
+          if (group.useCases[useCase].useCases) {
+            for (const subUseCase in group.useCases[useCase].useCases) {
+              //FIXME: SUBSUB GROUPS ARE NOT SUPPORTED YET
+              delete ungroupedUseCases[subUseCase];
+            }
+          } else {
+            delete ungroupedUseCases[useCase];
+          }
         }
       }
       return ungroupedUseCases;
