@@ -58,7 +58,7 @@ function genComponentConf() {
         </div>
         <div ng-repeat="needUri in self.sortedOpenNeedUris track by needUri" class="co__item"
             ng-class="{'co__item--withconn' : self.isOpen(needUri) && self.hasOpenOrLoadingChatConnections(needUri, self.allNeeds, self.process)}">
-            <div class="co__item__need" ng-class="{'won-unread': self.isUnread(needUri), 'selected' : needUri === self.needUriInRoute}">
+            <div class="co__item__need" ng-class="{'won-unread': self.isUnread(needUri), 'selected' : needUri === self.needUriInRoute, 'open': self.isOpen(needUri)}">
                 <div class="co__item__need__header">
                     <won-post-header
                         need-uri="::needUri"

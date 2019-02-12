@@ -20,6 +20,14 @@ won-connections-overview {
       grid-row-gap: 0.5rem;
       padding: 0.5rem;
 
+      &.open {
+        position: sticky;
+        top: var(--headerHeight);
+        z-index: 500;
+        background-color: $won-light-gray;
+        border-bottom: $thinGrayBorder;
+      }
+
       &__header {
         display: grid;
         grid-template-columns: 1fr auto auto;
@@ -46,7 +54,7 @@ won-connections-overview {
       }
 
       &__detail {
-        @include slideWithOpacityAnimation(0.25s, linear, 4rem, 0);
+        @include slideAnimationFixedHorizontal(0.25s, ease-in-out, 4rem, 0);
       }
 
       @media (min-width: $responsivenessBreakPoint) {
@@ -64,7 +72,7 @@ won-connections-overview {
     &__connections {
       padding-left: 0.5rem; // intrent connections so it's clear they belong *to* the post
       background: $won-line-gray;
-      @include slideWithOpacityAnimationFixedHorizontal(0.5s, linear, 250rem);
+      @include slideAnimationFixedHorizontal(0.5s, ease-in-out, 100vh);
     }
   }
   .co__separator {
