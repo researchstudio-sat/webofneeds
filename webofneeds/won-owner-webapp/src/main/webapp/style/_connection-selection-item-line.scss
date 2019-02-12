@@ -30,10 +30,10 @@ won-connection-selection-item {
 
   $invisibleBorder: $thinBorderWidth solid $won-light-gray;
   border-left: $thinGrayBorder;
-  border-top: $thinGrayBorder;
+  border-bottom: $thinGrayBorder;
 
-  &:first-of-type {
-    border-top: 0;
+  &:last-of-type {
+    border-bottom: 0;
   }
 
   &:hover,
@@ -48,6 +48,9 @@ won-connection-selection-item {
       $thinBorderWidth,
       50%
     );
+    position: sticky;
+    top: calc(var(--headerHeight) + var(--won-overview-open-need-height));
+    z-index: 500;
   }
   & .csi__closebutton.won-button--outlined.red.thin {
     font-size: $smallFontSize;

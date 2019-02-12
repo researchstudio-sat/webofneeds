@@ -6,6 +6,8 @@ won-connections-overview {
   display: block;
   margin: 0;
 
+  --won-overview-open-need-height: 6rem;
+
   .co__item {
     background-color: $won-light-gray;
     border-left: $thinGrayBorder;
@@ -26,6 +28,8 @@ won-connections-overview {
         z-index: 500;
         background-color: $won-light-gray;
         border-bottom: $thinGrayBorder;
+        height: var(--won-overview-open-need-height);
+        box-sizing: border-box;
       }
 
       &__header {
@@ -83,6 +87,9 @@ won-connections-overview {
             $thinBorderWidth,
             50%
           );
+          &.open {
+            position: sticky;
+          }
         }
       }
     }
