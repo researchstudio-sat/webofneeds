@@ -44,6 +44,14 @@ won-connections-overview {
               var(--transition-duration),
             visibility 0s linear var(--transition-duration);
         }
+
+        & > .co__item__need__header > won-connection-indicators {
+          //TODO: STYLE AND TRANSITION FOR OPENEDNEED INDICATORS
+        }
+
+        & > .co__item__need__header > .co__item__need__header__button {
+          //TODO: STYLE AND TRANSITION FOR OPENEDNEED BUTTON
+        }
       }
 
       &:not(.open) {
@@ -60,11 +68,19 @@ won-connections-overview {
           transition: opacity var(--transition-duration) linear,
             visibility 0s linear var(--transition-duration);
         }
+
+        & > .co__item__need__header > won-connection-indicators {
+          //TODO: STYLE AND TRANSITION FOR NOT OPENEDNEED INDICATORS
+        }
+
+        & > .co__item__need__header > .co__item__need__header__button {
+          //TODO: STYLE AND TRANSITION FOR NOT OPENEDNEED BUTTON
+        }
       }
 
       &__header {
         display: grid;
-        grid-template-columns: 1fr auto auto;
+        grid-template-columns: 1fr auto auto auto;
         min-width: 0;
         grid-column-gap: 1rem;
 

@@ -67,12 +67,10 @@ function genComponentConf() {
                     </won-post-header>
                     <won-connection-indicators
                         on-selected-connection="::self.selectConnection(connectionUri)"
-                        need-uri="::needUri"
-                        ng-if="!self.isOpen(needUri)">
+                        need-uri="::needUri">
                     </won-connection-indicators>
                     <button
                         class="co__item__need__header__button red"
-                        ng-if="self.isOpen(needUri)"
                         ng-click="needUri === self.needUriInRoute ? self.selectNeed(undefined) : self.selectNeed(needUri)"
                         ng-class="{
                           'won-button--filled' : needUri === self.needUriInRoute,
@@ -139,7 +137,6 @@ function genComponentConf() {
                         </won-post-header>
                         <button
                             class="co__item__need__header__button red"
-                            ng-if="self.isOpen(needUri)"
                             ng-click="needUri === self.needUriInRoute ? self.selectNeed(undefined) : self.selectNeed(needUri)"
                             ng-class="{
                               'won-button--filled' : needUri === self.needUriInRoute,
