@@ -1,0 +1,46 @@
+@import "won-config";
+@import "sizing-utils";
+@import "fonts";
+@import "flex-layout";
+@import "animate";
+
+won-extended-connection-indicators {
+  &.won-is-loading {
+    @include animateOpacityHeartBeat();
+    pointer-events: none;
+
+    .extendedindicators__item__caption {
+      background-color: $won-skeleton-color;
+      height: $smallFontSize;
+      width: 3rem;
+    }
+  }
+
+  display: flex;
+  flex-direction: row;
+
+  .extendedindicators__item {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    padding-right: 0.75em;
+    min-width: 0;
+
+    &:last-of-type {
+      padding-right: 0;
+    }
+
+    &__icon {
+      @include fixed-square($iconSize);
+    }
+
+    &__caption {
+      font-size: $smallFontSize;
+      line-height: $iconSize;
+      margin-left: 0.25em;
+      margin-right: 0.25em;
+      color: black;
+      white-space: nowrap;
+    }
+  }
+}
