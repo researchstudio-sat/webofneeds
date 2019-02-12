@@ -46,11 +46,12 @@
     > won-post-info {
       max-width: $maxContentWidth/2;
       min-width: $maxContentWidth/2;
-      max-height: 75%;
       background: white;
       display: grid;
       grid-row-gap: 0.5rem;
       padding: 0.5rem;
+      min-height: 75vh;
+      max-height: 75vh;
     }
   }
 }
