@@ -32,8 +32,12 @@ function genComponentConf() {
                 ng-if="self.showOverlayNeed"
                 ng-click="self.router__back()">
                 <svg style="--local-primary:var(--won-primary-color);"
-                     class="post-info__header__back__icon clickable">
+                     class="post-info__header__back__icon clickable hide-in-responsive">
                     <use xlink:href="#ico36_close" href="#ico36_close"></use>
+                </svg>
+                <svg style="--local-primary:var(--won-primary-color);"
+                     class="post-info__header__back__icon clickable show-in-responsive">
+                    <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
                 </svg>
             </a>
             <won-post-header

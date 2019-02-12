@@ -50,13 +50,13 @@ function genComponentConf() {
         <won-square-image
             class="clickable"
             uri="::self.theirNeed.get('uri')"
-            ng-click="!self.multiSelectType && self.router__stateGoCurrent({postUri: self.theirNeed.get('uri')})"
+            ng-click="!self.multiSelectType && self.router__stateGoCurrent({viewNeedUri: self.theirNeed.get('uri')})"
             ng-if="!self.isSent && !(self.isGroupChatMessage && self.originatorUri)">
         </won-square-image>
         <won-square-image
             class="clickable"
             uri="::self.originatorUri"
-            ng-click="!self.multiSelectType && self.router__stateGoCurrent({postUri: self.originatorUri})"
+            ng-click="!self.multiSelectType && self.router__stateGoCurrent({viewNeedUri: self.originatorUri})"
             ng-if="self.isReceived && self.isGroupChatMessage && self.originatorUri">
         </won-square-image>
         <won-square-image

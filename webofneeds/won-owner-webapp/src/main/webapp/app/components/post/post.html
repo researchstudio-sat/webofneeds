@@ -10,7 +10,7 @@
 <main class="postcontent" ng-class="{'postcontent--won-loading': self.needLoading, 'postcontent--won-failed': self.needFailedToLoad}">
     <!-- Post info view when there's no connection-state/-type selected -->
     <won-visitor-title-bar ng-if="!(self.needLoading || self.needFailedToLoad)" item="self.need"></won-visitor-title-bar>
-    <won-send-request ng-if="!(self.needLoading || self.needFailedToLoad) && self.need && !self.isOwnedNeed" class="won-send-request--noheader"></won-send-request>
+    <won-send-request ng-if="!(self.needLoading || self.needFailedToLoad) && self.need" class="won-send-request--noheader"></won-send-request>
     <div class="pc__loading" ng-if="self.needLoading">
         <svg class="pc__loading__spinner hspinner">
             <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
