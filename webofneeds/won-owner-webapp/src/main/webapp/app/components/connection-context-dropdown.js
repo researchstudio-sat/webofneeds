@@ -5,7 +5,6 @@
 import angular from "angular";
 import ngAnimate from "angular-animate";
 import { actionCreators } from "../actions/actions.js";
-import won from "../won-es6.js";
 import { attach, get, getIn, toAbsoluteURL } from "../utils.js";
 import {
   getConnectionUriFromRoute,
@@ -13,7 +12,9 @@ import {
 } from "../selectors/general-selectors.js";
 import { connect2Redux } from "../won-utils.js";
 import { ownerBaseUrl } from "config";
-import { isChatToGroup } from "../connection-utils.js";
+import * as connectionUtils from "../connection-utils.js";
+import * as needUtils from "../need-utils.js";
+import * as processUtils from "../process-utils.js";
 
 import "style/_context-dropdown.scss";
 
@@ -58,6 +59,12 @@ function genComponentConf() {
                         ng-click="self.showPetriNetDataField()">
                         Show PetriNet Data
                     </button>
+                    <button
+                        class="won-button--outlined thin red"
+                        ng-if="self.isRemoteNeedUsableAsTemplate"
+                        ng-click="self.router__stateGoAbs('connections', {fromNeedUri: self.remoteNeedUri, mode: 'DUPLICATE'})">
+                        Post this too!
+                    </button>
                     <a class="won-button--outlined thin red"
                         ng-if="self.adminEmail"
                         href="mailto:{{ self.adminEmail }}?{{ self.generateReportPostMailParams()}}">
@@ -82,41 +89,40 @@ function genComponentConf() {
         const post =
           connectionUri && getOwnedNeedByConnectionUri(state, connectionUri);
         const connection = post && post.getIn(["connections", connectionUri]);
-        const connectionState = connection && connection.get("state");
 
-        const remotePostUri = getIn(connection, ["remoteNeedUri"]);
+        const remoteNeedUri = getIn(connection, ["remoteNeedUri"]);
+        const remoteNeed = getIn(state, ["needs", remoteNeedUri]);
 
         let linkToPost;
-        if (ownerBaseUrl && remotePostUri) {
-          const path = "#!post/" + `?postUri=${encodeURI(remotePostUri)}`;
+        if (ownerBaseUrl && remoteNeedUri) {
+          const path = "#!post/" + `?postUri=${encodeURI(remoteNeedUri)}`;
 
           linkToPost = toAbsoluteURL(ownerBaseUrl).toString() + path;
         }
+        const process = get(state, "process");
 
         return {
           connection,
           connectionUri,
           adminEmail: getIn(state, ["config", "theme", "adminEmail"]),
-          remotePostUri,
+          remoteNeedUri,
           linkToPost,
-          isConnectionToGroup: isChatToGroup(
+          isConnectionToGroup: connectionUtils.isChatToGroup(
             state.get("needs"),
             get(post, "uri"),
             connectionUri
           ),
           showAgreementData: connection && connection.get("showAgreementData"),
-          isConnected: connectionState === won.WON.Connected,
-          isSentRequest: connectionState === won.WON.RequestSent,
-          isReceivedRequest: connectionState === won.WON.RequestReceived,
-          isSuggested: connectionState === won.WON.Suggested,
+          isConnected: connectionUtils.isConnected(connection),
+          isSentRequest: connectionUtils.isRequestSent(connection),
+          isReceivedRequest: connectionUtils.isRequestReceived(connection),
+          isSuggested: connectionUtils.isSuggested(connection),
+          isRemoteNeedUsableAsTemplate: needUtils.isUsableAsTemplate(
+            remoteNeed
+          ),
           connectionLoading:
             !connection ||
-            getIn(state, [
-              "process",
-              "connections",
-              connection.get("uri"),
-              "loading",
-            ]),
+            processUtils.isConnectionLoading(process, connectionUri),
         };
       };
       connect2Redux(selectFromState, actionCreators, [], this);
@@ -141,7 +147,7 @@ function genComponentConf() {
     }
 
     generateReportPostMailParams() {
-      const subject = `[Report Post] - ${this.remotePostUri}`;
+      const subject = `[Report Post] - ${this.remoteNeedUri}`;
       const body = `Link to Post: ${this.linkToPost}%0D%0AReason:%0D%0A`; //hint: %0D%0A adds a linebreak
 
       return `subject=${subject}&body=${body}`;

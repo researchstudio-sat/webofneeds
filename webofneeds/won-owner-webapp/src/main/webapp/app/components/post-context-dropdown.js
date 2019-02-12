@@ -10,7 +10,8 @@ import {
   connect2Redux,
   createDocumentDefinitionFromPost,
 } from "../won-utils.js";
-import { isActive, isInactive, isOwned } from "../need-utils.js";
+import * as needUtils from "../need-utils.js";
+import * as processUtils from "../process-utils.js";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 
@@ -51,6 +52,12 @@ function genComponentConf() {
                         ng-click="self.exportPdf()">
                         Export as PDF
                     </button>
+                    <button
+                        class="won-button--outlined thin red"
+                        ng-if="self.isUsableAsTemplate"
+                        ng-click="self.router__stateGoAbs('connections', {fromNeedUri: self.needUri, mode: 'DUPLICATE'})">
+                        Post this too!
+                    </button>
                     <a class="won-button--outlined thin red"
                         ng-if="self.adminEmail"
                         href="mailto:{{ self.adminEmail }}?{{ self.generateReportPostMailParams()}}">
@@ -90,20 +97,20 @@ function genComponentConf() {
         }
 
         const personaUri = get(post, "heldBy");
+        const process = get(state, "process");
 
         return {
           adminEmail: getIn(state, ["config", "theme", "adminEmail"]),
           personaUri,
-          isOwnPost: isOwned(post),
-          isActive: isActive(post),
-          isInactive: isInactive(post),
+          isOwnPost: needUtils.isOwned(post),
+          isActive: needUtils.isActive(post),
+          isInactive: needUtils.isInactive(post),
+          isUsableAsTemplate: needUtils.isUsableAsTemplate(post),
           post,
           postLoading:
-            !post ||
-            getIn(state, ["process", "needs", post.get("uri"), "loading"]),
+            !post || processUtils.isNeedLoading(process, post.get("uri")),
           postFailedToLoad:
-            post &&
-            getIn(state, ["process", "needs", post.get("uri"), "failedToLoad"]),
+            post && processUtils.hasNeedFailedToLoad(process, post.get("uri")),
           linkToPost,
         };
       };
