@@ -22,7 +22,7 @@ function genComponentConf() {
         <div class="post-info__header" ng-if="self.includeHeader">
             <a class="post-info__header__back clickable"
                 ng-if="!self.showOverlayNeed"
-                ng-click="self.router__stateGoCurrent({postUri : null})">
+                ng-click="self.router__back()">
                 <svg style="--local-primary:var(--won-primary-color);"
                      class="post-info__header__back__icon clickable">
                     <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>

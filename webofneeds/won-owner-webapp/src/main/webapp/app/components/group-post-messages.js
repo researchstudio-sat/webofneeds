@@ -33,7 +33,7 @@ function genComponentConf() {
   let template = `
         <div class="gpm__header">
             <a class="gpm__header__back clickable"
-               ng-click="self.router__stateGoCurrent({connectionUri : undefined})">
+               ng-click="self.router__back()">
                 <svg style="--local-primary:var(--won-primary-color);"
                      class="gpm__header__back__icon clickable">
                     <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>

@@ -44,7 +44,7 @@ function genComponentConf() {
   let template = `
         <div class="pm__header" ng-if="self.showChatData">
             <a class="pm__header__back clickable"
-               ng-click="self.router__stateGoCurrent({connectionUri : undefined})">
+               ng-click="self.router__back()">
                 <svg style="--local-primary:var(--won-primary-color);"
                      class="pm__header__back__icon clickable">
                     <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
