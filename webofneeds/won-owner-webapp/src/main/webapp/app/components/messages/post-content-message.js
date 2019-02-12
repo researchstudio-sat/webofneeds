@@ -17,7 +17,7 @@ function genComponentConf() {
             class="clickable"
             uri="::self.postUri"
             ng-if="!self.postLoading"
-            ng-click="self.router__stateGoCurrent({postUri: self.postUri})">
+            ng-click="self.router__stateGoCurrent({viewNeedUri: self.postUri})">
         </won-square-image>
         <div class="won-cm__center">
             <div class="won-cm__center__bubble">

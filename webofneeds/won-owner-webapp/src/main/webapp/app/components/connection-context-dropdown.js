@@ -162,7 +162,7 @@ function genComponentConf() {
     }
 
     goToPost(postUri) {
-      this.router__stateGoCurrent({ useCase: undefined, postUri: postUri });
+      this.router__stateGoCurrent({ useCase: undefined, viewNeedUri: postUri });
     }
 
     generateCloseConnectionLabel() {
