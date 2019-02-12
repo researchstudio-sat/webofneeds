@@ -11,7 +11,6 @@ won-connections-overview {
   .co__item {
     background-color: $won-light-gray;
     border-left: $thinGrayBorder;
-    border-bottom: $thinGrayBorder;
 
     @media (max-width: $responsivenessBreakPoint) {
       border-left: none;
@@ -21,15 +20,46 @@ won-connections-overview {
       display: grid;
       grid-row-gap: 0.5rem;
       padding: 0.5rem;
+      border-bottom: $thinGrayBorder;
+      box-sizing: border-box;
+      overflow: hidden;
+
+      --transition-duration: 0.25s;
 
       &.open {
         position: sticky;
         top: var(--headerHeight);
         z-index: 500;
         background-color: $won-light-gray;
-        border-bottom: $thinGrayBorder;
         height: var(--won-overview-open-need-height);
-        box-sizing: border-box;
+        max-height: var(--won-overview-open-need-height);
+
+        transition: height var(--transition-duration) linear,
+          max-height var(--transition-duration) linear;
+
+        & > .co__item__need__detail {
+          visibility: visible;
+          opacity: 1;
+          transition: opacity var(--transition-duration) linear
+              var(--transition-duration),
+            visibility 0s linear var(--transition-duration);
+        }
+      }
+
+      &:not(.open) {
+        height: 3.5rem;
+        max-height: 3.5rem;
+        transition: height var(--transition-duration) linear
+            var(--transition-duration),
+          max-height var(--transition-duration) linear
+            var(--transition-duration);
+
+        & > .co__item__need__detail {
+          visibility: hidden;
+          opacity: 0;
+          transition: opacity var(--transition-duration) linear,
+            visibility 0s linear var(--transition-duration);
+        }
       }
 
       &__header {
@@ -68,14 +98,10 @@ won-connections-overview {
 
             &.won-icon-expanded {
               transform: rotate(-180deg);
-              transition: 0.25s linear;
+              transition: transform 0.25s linear;
             }
           }
         }
-      }
-
-      &__detail {
-        @include slideAnimationFixedHorizontal(0.25s, ease-in-out, 4rem, 0);
       }
 
       @media (min-width: $responsivenessBreakPoint) {
@@ -124,7 +150,7 @@ won-connections-overview {
     }
   }
   .co__closedNeeds {
-    @include slideWithOpacityAnimation(0.5s, linear, 250rem);
+    @include slideWithOpacityAnimation(0.5s, ease-in-out, 100vh);
   }
   .co__loading {
     display: flex;

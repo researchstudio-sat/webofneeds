@@ -90,7 +90,7 @@ function genComponentConf() {
                         </svg>
                     </div>
                 </div>
-                <div class="co__item__need__detail" ng-if="self.isOpen(needUri)">
+                <div class="co__item__need__detail">
                     <won-extended-connection-indicators
                         class="co__item__need__detail__indicators"
                         on-selected-connection="::self.selectConnection(connectionUri)"
@@ -157,7 +157,7 @@ function genComponentConf() {
                           </svg>
                         </div>
                     </div>
-                    <div class="co__item__need__detail" ng-if="self.isOpen(needUri)">
+                    <div class="co__item__need__detail">
                         <won-extended-connection-indicators
                             class="co__item__need__detail__indicators"
                             on-selected-connection="::self.selectConnection(connectionUri)"

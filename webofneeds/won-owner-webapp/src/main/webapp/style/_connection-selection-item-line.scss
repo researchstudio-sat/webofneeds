@@ -32,10 +32,6 @@ won-connection-selection-item {
   border-left: $thinGrayBorder;
   border-bottom: $thinGrayBorder;
 
-  &:last-of-type {
-    border-bottom: 0;
-  }
-
   &:hover,
   &.selected {
     background-color: white;
