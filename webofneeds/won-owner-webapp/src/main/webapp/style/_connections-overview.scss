@@ -49,6 +49,23 @@ won-connections-overview {
 
           &__icon {
             @include carretSized;
+
+            &.won-icon-disabled {
+              --local-primary: #{$won-skeleton-color};
+            }
+
+            &:not(.won-icon-disabled) {
+              --local-primary: #{$won-secondary-color};
+            }
+
+            &:not(.won-icon-expanded) {
+              transition: 0.25s linear;
+            }
+
+            &.won-icon-expanded {
+              transform: rotate(-180deg);
+              transition: 0.25s linear;
+            }
           }
         }
       }
