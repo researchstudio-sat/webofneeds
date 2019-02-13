@@ -32,6 +32,10 @@ won-connection-selection-item {
   border-left: $thinGrayBorder;
   border-bottom: $thinGrayBorder;
 
+  &.won-unread {
+    background-color: $won-unread;
+  }
+
   &:hover,
   &.selected {
     background-color: white;

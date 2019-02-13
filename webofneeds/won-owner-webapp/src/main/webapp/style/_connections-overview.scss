@@ -26,6 +26,10 @@ won-connections-overview {
 
       --transition-duration: 0.25s;
 
+      &.won-unread {
+        background-color: $won-unread;
+      }
+
       &.open {
         position: sticky;
         top: var(--headerHeight);
