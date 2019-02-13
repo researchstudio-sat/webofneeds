@@ -17,10 +17,29 @@ won-connection-indicators {
     display: flex;
     align-items: center;
     flex-direction: row;
-    padding-right: 0.5em;
+    padding-right: 0.25rem;
 
     &:last-of-type {
       padding-right: 0;
+    }
+
+    &--unreads {
+      cursor: pointer;
+      --local-primary: #{$won-primary-color};
+    }
+
+    &--reads {
+      cursor: pointer;
+      --local-primary: #{$won-primary-color-light};
+    }
+
+    &--disabled {
+      cursor: default;
+      --local-primary: #{$won-disabled-color};
+    }
+    &--skeleton {
+      cursor: default;
+      --local-primary: #{$won-skeleton-color};
     }
 
     &__icon {
@@ -31,7 +50,7 @@ won-connection-indicators {
       line-height: $iconSize;
       font-size: $smallFontSize;
       padding-left: 0.25em;
-      min-width: 1.5rem;
+      min-width: 1.35rem;
       color: black;
     }
   }
