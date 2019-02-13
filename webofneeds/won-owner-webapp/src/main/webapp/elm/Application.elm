@@ -1,0 +1,432 @@
+port module Application exposing (State, element)
+
+import AssocList as Dict exposing (Dict)
+import Browser
+import Element.Styled as Element exposing (Element)
+import Html exposing (Html)
+import Json.Decode as Decode exposing (Decoder, Value)
+import Json.Decode.Extra as Decode
+import Json.Decode.Pipeline as DP
+import Json.Encode as Encode
+import NonEmpty
+import Persona exposing (PersonaData)
+import Result.Extra as Result
+import Set exposing (Set)
+import Skin exposing (Skin, SkinFlags)
+import Time
+import Url exposing (Url)
+
+
+port outPort : Value -> Cmd msg
+
+
+port inPort :
+    (Value -> msg)
+    -> Sub msg
+
+
+port errorPort : String -> Cmd msg
+
+
+type NeedStorage
+    = LoadingNeed
+    | OwnedNeed (NeedData Owned)
+    | NotOwnedNeed (NeedData NotOwned)
+
+
+type Owned
+    = OwnedFlag Never
+
+
+type NotOwned
+    = NotOwnedFlag Never
+
+
+type alias NeedData owned =
+    { need : Need owned
+    , created : Time.Posix
+    }
+
+
+type Need owned
+    = Persona Persona.PersonaData
+    | Other
+
+
+type alias State =
+    { needs : Dict Url NeedStorage
+    }
+
+
+type UpdateType attributes
+    = SkinUpdate Skin
+    | StateUpdate State
+    | AttrUpdate attributes
+    | SkinState Skin State
+    | SkinAttr Skin attributes
+    | AttrState attributes State
+    | SkinAttrState Skin attributes State
+    | ParsingError String
+
+
+type Msg attributes subMsg
+    = SubMsg subMsg
+    | ExternalUpdate (UpdateType attributes)
+
+
+type Model attributes subModel
+    = ParsingFailed String
+    | Model
+        { state : State
+        , subModel : subModel
+        , attributes : attributes
+        , skin : Skin
+        }
+
+
+jsonldSet : Decoder comparable -> Decoder (Set comparable)
+jsonldSet decoder =
+    Decode.oneOf
+        [ Decode.map Set.singleton decoder
+        , Decode.set decoder
+        ]
+
+
+types : Decoder (Set String)
+types =
+    Decode.field "@type" <| jsonldSet Decode.string
+
+
+personaDecoder : Decoder PersonaData
+personaDecoder =
+    Decode.succeed PersonaData
+        |> DP.required "s:name" NonEmpty.stringDecoder
+        |> DP.optional "s:description" (Decode.map Just NonEmpty.stringDecoder) Nothing
+        |> DP.optional "s:url" (Decode.map Just NonEmpty.stringDecoder) Nothing
+
+
+dateDecoder : Decoder Time.Posix
+dateDecoder =
+    Decode.value
+        |> Decode.andThen
+            (Encode.encode 0
+                >> Decode.decodeString Decode.datetime
+                >> Result.mapError Decode.errorToString
+                >> Decode.fromResult
+            )
+
+
+needDecoder : Decoder (NeedData owned)
+needDecoder =
+    Decode.succeed NeedData
+        |> DP.required "jsonld"
+            (Decode.oneOf
+                [ Decode.when types (Set.member "won:Persona") personaDecoder
+                    |> Decode.map Persona
+                , Decode.succeed Other
+                ]
+            )
+        |> DP.required "creationDate" dateDecoder
+
+
+guard : String -> Decoder a -> Decoder a
+guard field decoder =
+    Decode.when (Decode.field field Decode.bool) identity decoder
+
+
+needStorageDecoder : Decoder (Maybe NeedStorage)
+needStorageDecoder =
+    Decode.oneOf
+        [ Decode.succeed (Just <| LoadingNeed)
+            |> guard "isLoading"
+        , Decode.succeed Nothing
+            |> guard "isBeingCreated"
+        , needDecoder
+            |> guard "isOwned"
+            |> Decode.map (Just << OwnedNeed)
+        , needDecoder
+            |> Decode.map (Just << NotOwnedNeed)
+        ]
+
+
+keyValueDecoder :
+    (String -> Decoder key)
+    -> Decoder value
+    -> Decoder (List ( key, value ))
+keyValueDecoder keyDecoder valDecoder =
+    let
+        decodePair ( maybeKey, val ) =
+            keyDecoder maybeKey
+                |> Decode.map (\key -> ( key, val ))
+    in
+    Decode.keyValuePairs valDecoder
+        |> Decode.andThen
+            (List.map decodePair
+                >> Decode.combine
+            )
+
+
+needsDecoder : Decoder (Dict Url NeedStorage)
+needsDecoder =
+    let
+        needFilter ( key, maybeVal ) =
+            Maybe.map (\val -> ( key, val )) maybeVal
+    in
+    keyValueDecoder
+        (\url ->
+            Url.fromString url
+                |> Result.fromMaybe (url ++ " is not a valid url")
+                |> Decode.fromResult
+        )
+        needStorageDecoder
+        |> Decode.map (List.filterMap needFilter)
+        |> Decode.map Dict.fromList
+
+
+stateDecoder : Decoder State
+stateDecoder =
+    Decode.succeed State
+        |> DP.required "needs" needsDecoder
+
+
+updateSkin : Skin -> { a | skin : Skin } -> { a | skin : Skin }
+updateSkin skin model =
+    { model
+        | skin = skin
+    }
+
+
+updateAttrs : attributes -> { a | attributes : attributes } -> { a | attributes : attributes }
+updateAttrs attrs model =
+    { model
+        | attributes = attrs
+    }
+
+
+updateState : State -> { a | state : State } -> { a | state : State }
+updateState state model =
+    { model
+        | state = state
+    }
+
+
+updateExternal :
+    UpdateType attributes
+    -> Model attributes subModel
+    -> Model attributes subModel
+updateExternal external model =
+    case model of
+        ParsingFailed _ ->
+            model
+
+        Model realModel ->
+            case external of
+                StateUpdate state ->
+                    updateState state
+                        realModel
+                        |> Model
+
+                AttrUpdate attrs ->
+                    realModel
+                        |> updateAttrs attrs
+                        |> Model
+
+                SkinUpdate skin ->
+                    realModel
+                        |> updateSkin skin
+                        |> Model
+
+                SkinState skin state ->
+                    realModel
+                        |> updateSkin skin
+                        |> updateState state
+                        |> Model
+
+                SkinAttr skin attrs ->
+                    realModel
+                        |> updateSkin skin
+                        |> updateAttrs attrs
+                        |> Model
+
+                AttrState attrs state ->
+                    realModel
+                        |> updateAttrs attrs
+                        |> updateState state
+                        |> Model
+
+                SkinAttrState skin attrs state ->
+                    realModel
+                        |> updateSkin skin
+                        |> updateAttrs attrs
+                        |> updateState state
+                        |> Model
+
+                ParsingError message ->
+                    ParsingFailed message
+
+
+element :
+    { view : attributes -> State -> subModel -> Element subMsg
+    , update :
+        attributes
+        -> State
+        -> subMsg
+        -> subModel
+        -> ( subModel, Cmd subMsg )
+    , init : attributes -> State -> ( subModel, Cmd subMsg )
+    , subscriptions : attributes -> State -> subModel -> Sub subMsg
+    , attributeParser : Decoder attributes
+    }
+    ->
+        Program
+            { attributes : Value
+            , skin : SkinFlags
+            , state : Value
+            }
+            (Model attributes subModel)
+            (Msg attributes subMsg)
+element options =
+    let
+        -- VIEW
+        view model =
+            case model of
+                ParsingFailed _ ->
+                    Html.text "Parsing the arguments failed, please look at the log for errors"
+
+                Model { attributes, state, skin, subModel } ->
+                    Html.map SubMsg <|
+                        Element.layout
+                            skin
+                            []
+                            (options.view attributes state subModel)
+
+        -- UPDATE
+        update msg model =
+            case model of
+                ParsingFailed _ ->
+                    ( model, Cmd.none )
+
+                Model ({ attributes, state, subModel, skin } as realModel) ->
+                    case msg of
+                        SubMsg subMsg ->
+                            let
+                                ( newModel, cmd ) =
+                                    options.update attributes state subMsg subModel
+                            in
+                            ( Model
+                                { realModel
+                                    | subModel = newModel
+                                }
+                            , Cmd.map SubMsg cmd
+                            )
+
+                        ExternalUpdate extUpdate ->
+                            ( updateExternal extUpdate model
+                            , case extUpdate of
+                                ParsingError message ->
+                                    errorPort <| "Error on update:\n" ++ message
+
+                                _ ->
+                                    Cmd.none
+                            )
+
+        -- SUBSCRIPTIONS
+        subscriptions model =
+            case model of
+                ParsingFailed _ ->
+                    Sub.none
+
+                Model { attributes, state, subModel } ->
+                    Sub.batch
+                        [ options.subscriptions attributes state subModel
+                            |> Sub.map SubMsg
+                        , inPort
+                            (\val ->
+                                let
+                                    resultHandler newState newSkin newAttributes =
+                                        case
+                                            ( newState
+                                            , newSkin
+                                            , newAttributes
+                                            )
+                                        of
+                                            ( Just st, Nothing, Nothing ) ->
+                                                StateUpdate st
+
+                                            ( Nothing, Just sk, Nothing ) ->
+                                                SkinUpdate sk
+
+                                            ( Nothing, Nothing, Just attr ) ->
+                                                AttrUpdate attr
+
+                                            ( Just st, Just sk, Nothing ) ->
+                                                SkinState sk st
+
+                                            ( Just st, Nothing, Just attr ) ->
+                                                AttrState attr st
+
+                                            ( Nothing, Just sk, Just attr ) ->
+                                                SkinAttr sk attr
+
+                                            ( Just st, Just sk, Just attr ) ->
+                                                SkinAttrState sk attr st
+
+                                            ( Nothing, Nothing, Nothing ) ->
+                                                ParsingError "No valid input found"
+
+                                    optional field dec =
+                                        DP.optional field (Decode.map Just dec) Nothing
+
+                                    decoder =
+                                        Decode.succeed resultHandler
+                                            |> optional "newState" stateDecoder
+                                            |> optional "newSkin" Skin.decoder
+                                            |> optional "newAttributes" options.attributeParser
+                                in
+                                Decode.decodeValue decoder val
+                                    |> Result.extract
+                                        (Decode.errorToString
+                                            >> ParsingError
+                                        )
+                            )
+                            |> Sub.map ExternalUpdate
+                        ]
+
+        -- INIT
+        init { attributes, skin, state } =
+            Result.map3
+                (\sk attr st ->
+                    let
+                        ( subModel, subCmd ) =
+                            options.init attr st
+                    in
+                    ( Model
+                        { state = st
+                        , attributes = attr
+                        , skin = sk
+                        , subModel = subModel
+                        }
+                    , Cmd.map SubMsg subCmd
+                    )
+                )
+                (Ok <| Skin.fromFlags skin)
+                (Decode.decodeValue options.attributeParser attributes)
+                (Decode.decodeValue stateDecoder state)
+                |> Result.extract
+                    (\e ->
+                        let
+                            message =
+                                "Error on init:\n"
+                                    ++ Decode.errorToString e
+                        in
+                        ( ParsingFailed message
+                        , errorPort message
+                        )
+                    )
+    in
+    Browser.element
+        { view = view
+        , update = update
+        , subscriptions = subscriptions
+        , init = init
+        }
