@@ -10,11 +10,6 @@ won-connections-overview {
 
   .co__item {
     background-color: $won-light-gray;
-    border-left: $thinGrayBorder;
-
-    @media (max-width: $responsivenessBreakPoint) {
-      border-left: none;
-    }
 
     &__need {
       display: grid;
@@ -23,6 +18,11 @@ won-connections-overview {
       border-bottom: $thinGrayBorder;
       box-sizing: border-box;
       overflow: hidden;
+      border-left: $thinGrayBorder;
+
+      @media (max-width: $responsivenessBreakPoint) {
+        border-left: none;
+      }
 
       --transition-duration: 0.25s;
 
@@ -175,8 +175,24 @@ won-connections-overview {
       }
     }
     &__connections {
-      padding-left: 0.5rem; // intrent connections so it's clear they belong *to* the post
-      background: $won-line-gray;
+      &__item {
+        padding-left: 0.5rem;
+        // intrent connections so it's clear they belong *to* the post
+        &:not(.won-unread) {
+          background: $won-line-gray;
+          border-left: $thinGrayBorder;
+          @media (max-width: $responsivenessBreakPoint) {
+            border-left: none;
+          }
+        }
+        &.won-unread {
+          background: $won-primary-color;
+          border-left: $thinBorderWidth solid $won-primary-color;
+          @media (max-width: $responsivenessBreakPoint) {
+            border-left: none;
+          }
+        }
+      }
       @include slideAnimationFixedHorizontal(0.5s, ease-in-out, 100vh);
     }
   }

@@ -19,22 +19,31 @@ won-connection-selection-item {
 
   background-color: $won-light-gray;
 
-  @include speech-bubble-left-inward(
-    /* TODO line-gray for a fill? -->*/ $won-line-gray,
-    $won-line-gray,
-    $triangleCutoutSize,
-    $thinBorderWidth,
-    50%,
-    "before" /* needed so there can be another tail*/
-  );
+  &:not(.won-unread) {
+    @include speech-bubble-left-inward(
+      $won-line-gray,
+      $won-line-gray,
+      $triangleCutoutSize,
+      $thinBorderWidth,
+      50%,
+      "before" /* needed so there can be another tail*/
+    );
+    border-left: $thinGrayBorder;
+  }
+  &.won-unread {
+    @include speech-bubble-left-inward(
+      $won-primary-color,
+      $won-primary-color,
+      $triangleCutoutSize,
+      $thinBorderWidth,
+      50%,
+      "before" /* needed so there can be another tail*/
+    );
+    border-left: $thinBorderWidth solid $won-primary-color;
+  }
 
   $invisibleBorder: $thinBorderWidth solid $won-light-gray;
-  border-left: $thinGrayBorder;
   border-bottom: $thinGrayBorder;
-
-  &.won-unread {
-    background-color: $won-unread;
-  }
 
   &:hover,
   &.selected {

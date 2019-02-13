@@ -98,18 +98,22 @@ function genComponentConf() {
             </div>
             <div class="co__item__connections"
                 ng-if="self.isOpen(needUri) && (self.hasGroupFacet(needUri) || self.hasOpenOrLoadingChatConnections(needUri, self.allNeeds, self.process))">
-                <won-connection-selection-item
-                    ng-if="self.hasChatFacet(needUri)"
-                    ng-repeat="connUri in self.getOpenChatConnectionUrisArraySorted(needUri, self.allNeeds, self.process) track by connUri"
-                    on-selected-connection="::self.selectConnection(connectionUri)"
-                    connection-uri="::connUri"
-                    ng-class="{'won-unread': self.isConnectionUnread(needUri, connUri)}">
-                </won-connection-selection-item>
-                <won-group-administration-selection-item
-                    ng-if="self.hasGroupFacet(needUri)"
-                    need-uri="::needUri"
-                    on-selected="self.selectGroupChat(needUri)">
-                </won-group-administration-selection-item>
+                <div class="co__item__connections__item"
+                  ng-if="self.hasChatFacet(needUri)"
+                  ng-repeat="connUri in self.getOpenChatConnectionUrisArraySorted(needUri, self.allNeeds, self.process) track by connUri"
+                  ng-class="{'won-unread': self.isConnectionUnread(needUri, connUri)}">
+                  <won-connection-selection-item
+                      on-selected-connection="::self.selectConnection(connectionUri)"
+                      connection-uri="::connUri"
+                      ng-class="{'won-unread': self.isConnectionUnread(needUri, connUri)}">
+                  </won-connection-selection-item>
+                </div>
+                <div class="co__item__connections__item" ng-if="self.hasGroupFacet(needUri)">
+                  <won-group-administration-selection-item
+                      need-uri="::needUri"
+                      on-selected="self.selectGroupChat(needUri)">
+                  </won-group-administration-selection-item>
+                </div>
             </div>
         </div>
         <div class="co__separator clickable" ng-class="{'co__separator--open' : self.showClosedNeeds}" ng-if="self.hasClosedNeeds()" ng-click="self.toggleClosedNeeds()">
