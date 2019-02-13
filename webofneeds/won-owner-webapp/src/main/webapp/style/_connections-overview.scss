@@ -47,10 +47,21 @@ won-connections-overview {
 
         & > .co__item__need__header > won-connection-indicators {
           //TODO: STYLE AND TRANSITION FOR OPENEDNEED INDICATORS
+          overflow: hidden;
+          width: 0;
+          box-sizing: border-box;
+          transition: width 0.25s linear;
         }
 
         & > .co__item__need__header > .co__item__need__header__button {
-          //TODO: STYLE AND TRANSITION FOR OPENEDNEED BUTTON
+          width: 7rem;
+          padding-left: 0;
+          padding-right: 0;
+          white-space: nowrap;
+          margin-right: 0.5rem;
+          box-sizing: border-box;
+          transition: width 0.25s linear, border-left-width 0s linear 0.05s,
+            border-right-width 0s linear 0.05s;
         }
       }
 
@@ -71,10 +82,24 @@ won-connections-overview {
 
         & > .co__item__need__header > won-connection-indicators {
           //TODO: STYLE AND TRANSITION FOR NOT OPENEDNEED INDICATORS
+          width: 7rem;
+          margin-right: 0.5rem;
+          overflow: hidden;
+          box-sizing: border-box;
+          transition: width 0.25s linear;
         }
 
         & > .co__item__need__header > .co__item__need__header__button {
-          //TODO: STYLE AND TRANSITION FOR NOT OPENEDNEED BUTTON
+          width: 0;
+          padding-left: 0;
+          padding-right: 0;
+          border-left-width: 0;
+          border-right-width: 0;
+          white-space: nowrap;
+          overflow: hidden;
+          box-sizing: border-box;
+          transition: width 0.25s linear, border-left-width 0s linear 0.25s,
+            border-right-width 0s linear 0.25s;
         }
       }
 
@@ -82,10 +107,20 @@ won-connections-overview {
         display: grid;
         grid-template-columns: 1fr auto auto auto;
         min-width: 0;
-        grid-column-gap: 1rem;
 
-        &__button {
+        & > .co__item__need__header__button,
+        & > won-connection-indicators,
+        & > won-post-header {
+          max-height: 2.5rem;
+        }
+
+        & > won-post-header {
+          padding-right: 0.5rem;
+        }
+
+        & > .co__item__need__header__button {
           font-size: $smallFontSize;
+          max-height: 2.5rem;
         }
 
         &__carret {
