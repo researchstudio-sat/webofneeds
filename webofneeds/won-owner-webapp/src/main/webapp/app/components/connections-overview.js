@@ -91,7 +91,7 @@ function genComponentConf() {
             </div>
             <div class="co__item__connections"
                 ng-if="self.isOpen(needUri) && (self.hasGroupFacet(needUri) || self.hasOpenOrLoadingChatConnections(needUri, self.allNeeds, self.process))">
-                <div class="co__item__connections__item" ng-if="self.hasSuggestedConnections(needUri)"
+                <div class="co__item__connections__item nonsticky" ng-if="self.hasSuggestedConnections(needUri)"
                   ng-class="{
                     'won-unread': self.hasUnreadSuggestedConnections(needUri),
                     'selected': self.isShowingSuggestions(needUri),
@@ -114,7 +114,7 @@ function genComponentConf() {
                       ng-class="{'won-unread': self.isConnectionUnread(needUri, connUri)}">
                   </won-connection-selection-item>
                 </div>
-                <div class="co__item__connections__item" ng-if="self.hasGroupFacet(needUri)">
+                <div class="co__item__connections__item nonsticky" ng-if="self.hasGroupFacet(needUri)">
                   <won-group-administration-selection-item
                       need-uri="::needUri"
                       on-selected="self.selectGroupChat(needUri)">
@@ -287,6 +287,7 @@ function genComponentConf() {
         this.open[ownedNeedUri] = false;
         if (this.isOpenByConnection(ownedNeedUri)) {
           this.router__stateGoCurrent({
+            postUri: undefined,
             useCase: undefined,
             useCaseGroup: undefined,
             connectionUri: undefined,

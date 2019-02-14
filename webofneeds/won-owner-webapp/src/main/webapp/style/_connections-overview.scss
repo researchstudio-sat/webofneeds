@@ -155,7 +155,7 @@ won-connections-overview {
     &__connections {
       &__item {
         padding-left: 0.5rem;
-        &.selected {
+        &.selected:not(.nonsticky) {
           position: sticky;
           top: calc(var(--headerHeight) + var(--won-overview-need-height));
           z-index: 500;
