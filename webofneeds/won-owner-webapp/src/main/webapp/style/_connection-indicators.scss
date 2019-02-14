@@ -17,27 +17,36 @@ won-connection-indicators {
     display: flex;
     align-items: center;
     flex-direction: row;
-    padding-right: 0.25rem;
 
-    &:last-of-type {
-      padding-right: 0;
+    @media (max-width: $responsivenessBreakPoint) {
+      .indicators__item--reads,
+      .indicators__item--unreads {
+        pointer-events: none;
+        cursor: default;
+      }
+    }
+    @media (min-width: $responsivenessBreakPoint) {
+      .indicators__item--reads,
+      .indicators__item--unreads {
+        cursor: pointer;
+      }
     }
 
     &--unreads {
-      cursor: pointer;
       --local-primary: #{$won-primary-color};
     }
 
     &--reads {
-      cursor: pointer;
       --local-primary: #{$won-primary-color-light};
     }
 
     &--disabled {
+      pointer-events: none;
       cursor: default;
       --local-primary: #{$won-disabled-color};
     }
     &--skeleton {
+      pointer-events: none;
       cursor: default;
       --local-primary: #{$won-skeleton-color};
     }
@@ -52,25 +61,6 @@ won-connection-indicators {
       padding-left: 0.25em;
       min-width: 1.35rem;
       color: black;
-    }
-  }
-  .mobile__indicator {
-    line-height: $iconSize;
-    font-size: $smallFontSize;
-    padding-left: 0.5em;
-    min-width: 0.5rem;
-    color: black;
-  }
-
-  @media (max-width: $responsivenessBreakPoint) {
-    :not(.mobile__indicator) {
-      /*Hide the connection indicators in the mobile view to reduce problems regarding last element selection */
-      display: none;
-    }
-  }
-  @media (min-width: $responsivenessBreakPoint) {
-    .mobile__indicator {
-      display: none;
     }
   }
 }
