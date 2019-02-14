@@ -372,7 +372,7 @@ function genComponentConf() {
 
     isShowingSuggestions(ownedNeedUri) {
       //FIXME: Currently just checks if need need-details are open
-      return !!this.open[ownedNeedUri];
+      return !!this.open[ownedNeedUri] && ownedNeedUri === this.needUriInRoute;
     }
 
     isNeedLoading(needUri) {
@@ -461,7 +461,9 @@ function genComponentConf() {
               won.WON.ActiveCompacted;
 
           return (
-            remoteNeedActiveOrLoading && conn.get("state") !== won.WON.Closed
+            remoteNeedActiveOrLoading &&
+            conn.get("state") !== won.WON.Closed &&
+            conn.get("state") !== won.WON.Suggested
           );
         }),
         "creationDate"

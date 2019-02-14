@@ -9,7 +9,7 @@ import { connect2Redux } from "../won-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import {
   getPosts,
-  getGroupPostAdminUriFromRoute,
+  getPostUriFromRoute,
 } from "../selectors/general-selectors.js";
 import { getChatConnectionsByNeedUri } from "../selectors/connection-selectors.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
@@ -70,13 +70,13 @@ function genComponentConf() {
 
         const matchesCount = matches ? matches.size : 0;
 
-        const openGroupChatPostUri = getGroupPostAdminUriFromRoute(state);
+        const openPostUri = getPostUriFromRoute(state);
 
         return {
           matchesCount,
           unreadMatchesCount,
           hasUnreadMatches: unreadMatchesCount > 0,
-          openGroupChatPostUri,
+          openPostUri,
         };
       };
 
@@ -86,7 +86,8 @@ function genComponentConf() {
       classOnComponentRoot("won-unread", () => this.hasUnreadMatches, this);
     }
     isOpen() {
-      return this.openGroupChatPostUri === this.needUri;
+      //FIXME: Currently just checks if need need-details are open
+      return this.openPostUri === this.needUri;
     }
 
     setOpen() {
