@@ -32,14 +32,15 @@ won-connection-selection-item {
   }
   &.won-unread {
     @include speech-bubble-left-inward(
-      $won-primary-color,
-      $won-primary-color,
+      $won-unread-attention,
+      $won-unread-attention,
       $triangleCutoutSize,
       $thinBorderWidth,
       50%,
       "before" /* needed so there can be another tail*/
     );
-    border-left: $thinBorderWidth solid $won-primary-color;
+    border-left: $thinBorderWidth solid $won-unread-attention;
+    background: $won-unread; /*Decide if that is too much or not - we already have the attention indicator set anyway*/
   }
 
   $invisibleBorder: $thinBorderWidth solid $won-light-gray;

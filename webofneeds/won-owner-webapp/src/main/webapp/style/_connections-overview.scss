@@ -186,8 +186,8 @@ won-connections-overview {
           }
         }
         &.won-unread {
-          background: $won-primary-color;
-          border-left: $thinBorderWidth solid $won-primary-color;
+          background: $won-unread-attention;
+          border-left: $thinBorderWidth solid $won-unread-attention;
           @media (max-width: $responsivenessBreakPoint) {
             border-left: none;
           }
