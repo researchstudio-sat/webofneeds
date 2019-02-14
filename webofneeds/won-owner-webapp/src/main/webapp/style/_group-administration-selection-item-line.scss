@@ -19,7 +19,7 @@ won-group-administration-selection-item {
   background-color: $won-light-gray;
 
   @include speech-bubble-left-inward(
-    /* TODO line-gray for a fill? -->*/ $won-line-gray,
+    $won-line-gray,
     $won-line-gray,
     $triangleCutoutSize,
     $thinBorderWidth,
@@ -29,7 +29,7 @@ won-group-administration-selection-item {
 
   $invisibleBorder: $thinBorderWidth solid $won-light-gray;
   border-left: $thinGrayBorder;
-  border-top: $thinGrayBorder;
+  border-bottom: $thinGrayBorder;
 
   &:hover,
   &.selected {
