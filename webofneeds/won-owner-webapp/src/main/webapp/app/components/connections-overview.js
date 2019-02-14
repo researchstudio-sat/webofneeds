@@ -12,9 +12,9 @@ import ngAnimate from "angular-animate";
 import squareImageModule from "./square-image.js";
 import postHeaderModule from "./post-header.js";
 import connectionIndicatorsModule from "./connection-indicators.js";
-import extendedConnectionIndicatorsModule from "./extended-connection-indicators.js";
 import connectionSelectionItemModule from "./connection-selection-item.js";
 import groupAdministrationSelectionItemModule from "./group-administration-selection-item.js";
+import suggestionSelectionItemModule from "./suggestion-selection-item.js";
 import createPostItemModule from "./create-post-item.js";
 
 import { attach, delay, sortByDate, get, getIn } from "../utils.js";
@@ -88,16 +88,19 @@ function genComponentConf() {
                         </svg>
                     </div>
                 </div>
-                <div class="co__item__need__detail">
-                    <won-extended-connection-indicators
-                        class="co__item__need__detail__indicators"
-                        on-selected-connection="::self.selectConnection(connectionUri)"
-                        need-uri="::needUri">
-                    </won-extended-connection-indicators>
-                </div>
             </div>
             <div class="co__item__connections"
                 ng-if="self.isOpen(needUri) && (self.hasGroupFacet(needUri) || self.hasOpenOrLoadingChatConnections(needUri, self.allNeeds, self.process))">
+                <div class="co__item__connections__item" ng-if="self.hasSuggestedConnections(needUri)"
+                  ng-class="{
+                    'won-unread': self.hasUnreadSuggestedConnections(needUri),
+                    'selected': false,
+                  }">
+                  <won-suggestion-selection-item
+                      need-uri="::needUri"
+                      on-selected="self.selectSuggested(needUri)">
+                  </won-suggestion-selection-item>
+                </div>
                 <div class="co__item__connections__item"
                   ng-if="self.hasChatFacet(needUri)"
                   ng-repeat="connUri in self.getOpenChatConnectionUrisArraySorted(needUri, self.allNeeds, self.process) track by connUri"
@@ -160,13 +163,6 @@ function genComponentConf() {
                               <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
                           </svg>
                         </div>
-                    </div>
-                    <div class="co__item__need__detail">
-                        <won-extended-connection-indicators
-                            class="co__item__need__detail__indicators"
-                            on-selected-connection="::self.selectConnection(connectionUri)"
-                            need-uri="::needUri">
-                        </won-extended-connection-indicators>
                     </div>
                 </div>
             </div>
@@ -314,6 +310,16 @@ function genComponentConf() {
       return needUtils.hasGroupFacet(need);
     }
 
+    hasSuggestedConnections(needUri) {
+      const need = get(this.allNeeds, needUri);
+      return needUtils.hasSuggestedConnections(need);
+    }
+
+    hasUnreadSuggestedConnections(needUri) {
+      const need = get(this.allNeeds, needUri);
+      return needUtils.hasUnreadSuggestedConnections(need);
+    }
+
     isUnread(needUri) {
       const need = get(this.allNeeds, needUri);
       return get(need, "unread");
@@ -367,6 +373,9 @@ function genComponentConf() {
     }
     selectGroupChat(needUri) {
       this.onSelectedGroupChat({ needUri }); //trigger callback with scope-object
+    }
+    selectSuggested(needUri) {
+      console.debug("stuff should happen now IMPL ME for: ", needUri);
     }
 
     hasOpenOrLoadingChatConnections(needUri, allNeeds, process) {
@@ -471,9 +480,9 @@ export default angular
     squareImageModule,
     connectionSelectionItemModule,
     groupAdministrationSelectionItemModule,
+    suggestionSelectionItemModule,
     postHeaderModule,
     connectionIndicatorsModule,
-    extendedConnectionIndicatorsModule,
     ngAnimate,
     createPostItemModule,
   ])

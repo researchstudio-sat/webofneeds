@@ -127,6 +127,15 @@ export function hasSuggestedConnections(need) {
   );
 }
 
+export function hasUnreadSuggestedConnections(need) {
+  return (
+    get(need, "connections") &&
+    !!get(need, "connections").find(
+      conn => connectionUtils.isSuggested(conn) && get(conn, "unread")
+    )
+  );
+}
+
 /**
  * Determines if a given need is a Search-Need (see draft in create-search.js)
  * @param need

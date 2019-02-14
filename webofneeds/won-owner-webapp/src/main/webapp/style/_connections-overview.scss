@@ -6,7 +6,7 @@ won-connections-overview {
   display: block;
   margin: 0;
 
-  --won-overview-open-need-height: 6rem;
+  --won-overview-need-height: 3.5rem;
 
   .co__item {
     background-color: $won-light-gray;
@@ -35,19 +35,8 @@ won-connections-overview {
         top: var(--headerHeight);
         z-index: 500;
         background-color: $won-light-gray;
-        height: var(--won-overview-open-need-height);
-        max-height: var(--won-overview-open-need-height);
-
-        transition: height var(--transition-duration) linear,
-          max-height var(--transition-duration) linear;
-
-        & > .co__item__need__detail {
-          visibility: visible;
-          opacity: 1;
-          transition: opacity var(--transition-duration) linear
-              var(--transition-duration),
-            visibility 0s linear var(--transition-duration);
-        }
+        height: var(--won-overview-need-height);
+        max-height: var(--won-overview-need-height);
 
         & > .co__item__need__header > won-connection-indicators {
           //TODO: STYLE AND TRANSITION FOR OPENEDNEED INDICATORS
@@ -70,19 +59,8 @@ won-connections-overview {
       }
 
       &:not(.open) {
-        height: 3.5rem;
-        max-height: 3.5rem;
-        transition: height var(--transition-duration) linear
-            var(--transition-duration),
-          max-height var(--transition-duration) linear
-            var(--transition-duration);
-
-        & > .co__item__need__detail {
-          visibility: hidden;
-          opacity: 0;
-          transition: opacity var(--transition-duration) linear,
-            visibility 0s linear var(--transition-duration);
-        }
+        height: var(--won-overview-need-height);
+        max-height: var(--won-overview-need-height);
 
         & > .co__item__need__header > won-connection-indicators {
           //TODO: STYLE AND TRANSITION FOR NOT OPENEDNEED INDICATORS
@@ -179,7 +157,7 @@ won-connections-overview {
         padding-left: 0.5rem;
         &.selected {
           position: sticky;
-          top: calc(var(--headerHeight) + var(--won-overview-open-need-height));
+          top: calc(var(--headerHeight) + var(--won-overview-need-height));
           z-index: 500;
         }
         // intrent connections so it's clear they belong *to* the post
