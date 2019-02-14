@@ -63,6 +63,8 @@ won-suggestion-selection-item {
     );
   }
   .ssi__icon {
+    box-sizing: border-box;
+    padding: 0.25rem;
     @include fixed-square($postIconSize);
     &--unreads {
       --local-primary: #{$won-primary-color};
