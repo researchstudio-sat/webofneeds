@@ -58,9 +58,6 @@ won-connection-selection-item {
       $thinBorderWidth,
       50%
     );
-    position: sticky;
-    top: calc(var(--headerHeight) + var(--won-overview-open-need-height));
-    z-index: 500;
   }
   & .csi__closebutton.won-button--outlined.red.thin {
     font-size: $smallFontSize;

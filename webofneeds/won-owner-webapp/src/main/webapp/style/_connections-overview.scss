@@ -177,6 +177,11 @@ won-connections-overview {
     &__connections {
       &__item {
         padding-left: 0.5rem;
+        &.selected {
+          position: sticky;
+          top: calc(var(--headerHeight) + var(--won-overview-open-need-height));
+          z-index: 500;
+        }
         // intrent connections so it's clear they belong *to* the post
         &:not(.won-unread) {
           background: $won-line-gray;

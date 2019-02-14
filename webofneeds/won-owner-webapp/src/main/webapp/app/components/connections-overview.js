@@ -101,7 +101,10 @@ function genComponentConf() {
                 <div class="co__item__connections__item"
                   ng-if="self.hasChatFacet(needUri)"
                   ng-repeat="connUri in self.getOpenChatConnectionUrisArraySorted(needUri, self.allNeeds, self.process) track by connUri"
-                  ng-class="{'won-unread': self.isConnectionUnread(needUri, connUri)}">
+                  ng-class="{
+                    'won-unread': self.isConnectionUnread(needUri, connUri),
+                    'selected': connUri === self.connUriInRoute
+                  }">
                   <won-connection-selection-item
                       on-selected-connection="::self.selectConnection(connectionUri)"
                       connection-uri="::connUri"
@@ -218,6 +221,7 @@ function genComponentConf() {
           useCaseGroup,
           needUriInRoute,
           needUriImpliedInRoute,
+          connUriInRoute,
           beingCreatedNeedUris: beingCreatedNeeds && [
             ...beingCreatedNeeds.keys(),
           ],
