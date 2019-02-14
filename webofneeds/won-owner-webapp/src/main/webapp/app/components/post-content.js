@@ -221,13 +221,9 @@ function genComponentConf() {
     }
 
     sendRequest(connUri, remoteNeedUri, message) {
+      //TODO: IMPLEMENT POSSIBILITY OF ADHOC REQUEST
       this.connections__rate(connUri, won.WON.binaryRatingGood);
-      this.needs__connect(
-        this.groupPostAdminUri,
-        connUri,
-        remoteNeedUri,
-        message
-      );
+      this.needs__connect(this.postUri, connUri, remoteNeedUri, message);
     }
 
     toggleShowGeneral() {
