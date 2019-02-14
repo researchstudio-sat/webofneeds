@@ -94,11 +94,11 @@ function genComponentConf() {
                 <div class="co__item__connections__item" ng-if="self.hasSuggestedConnections(needUri)"
                   ng-class="{
                     'won-unread': self.hasUnreadSuggestedConnections(needUri),
-                    'selected': false,
+                    'selected': self.isShowingSuggestions(needUri),
                   }">
                   <won-suggestion-selection-item
                       need-uri="::needUri"
-                      on-selected="self.selectSuggested(needUri)">
+                      on-selected="self.showSuggestions(needUri)">
                   </won-suggestion-selection-item>
                 </div>
                 <div class="co__item__connections__item"
@@ -300,6 +300,19 @@ function genComponentConf() {
       }
     }
 
+    showSuggestions(ownedNeedUri) {
+      //FIXME: Currently just opens need-details
+      this.router__stateGoCurrent({
+        postUri: ownedNeedUri,
+        useCase: undefined,
+        useCaseGroup: undefined,
+        connectionUri: undefined,
+        groupPostAdminUri: undefined,
+        fromNeedUri: undefined,
+        mode: undefined,
+      });
+    }
+
     hasChatFacet(needUri) {
       const need = get(this.allNeeds, needUri);
       return needUtils.hasChatFacet(need);
@@ -355,6 +368,11 @@ function genComponentConf() {
 
     isOpen(ownedNeedUri) {
       return this.isOpenByConnection(ownedNeedUri) || !!this.open[ownedNeedUri];
+    }
+
+    isShowingSuggestions(ownedNeedUri) {
+      //FIXME: Currently just checks if need need-details are open
+      return !!this.open[ownedNeedUri];
     }
 
     isNeedLoading(needUri) {

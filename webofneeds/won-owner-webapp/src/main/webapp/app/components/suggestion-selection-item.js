@@ -24,13 +24,14 @@ const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
       <svg class="ssi__icon"
+          ng-click="self.setOpen()"
           ng-class="{
             'ssi__icon--reads': !self.hasUnreadMatches,
             'ssi__icon--unreads': self.hasUnreadMatches
           }">
           <use xlink:href="#ico36_match" href="#ico36_match"></use>
       </svg>
-      <div class="ssi__label">
+      <div class="ssi__label" ng-click="self.setOpen()">
         <span>{{ self.matchesCount }} Suggestions</span>
         <span ng-if="self.hasUnreadMatches">, {{ self.unreadMatchesCount }} new</span
       </div>

@@ -9,10 +9,7 @@ import {
   getOwnedPosts,
   getNeeds,
 } from "./general-selectors.js";
-import {
-  isChatConnection,
-  isGroupChatConnection,
-} from "../connection-utils.js";
+import * as connectionUtils from "../connection-utils.js";
 import won from "../won-es6.js";
 import { getIn } from "../utils.js";
 
@@ -49,7 +46,10 @@ export function getChatConnectionsByNeedUri(state, needUri) {
   const need = needs && needs.get(needUri);
   const connections = need && need.get("connections");
 
-  return connections && connections.filter(conn => isChatConnection(conn));
+  return (
+    connections &&
+    connections.filter(conn => connectionUtils.isChatConnection(conn))
+  );
 }
 
 export function getGroupChatConnectionsByNeedUri(state, needUri) {
@@ -58,7 +58,23 @@ export function getGroupChatConnectionsByNeedUri(state, needUri) {
   const connections = need && need.get("connections");
 
   return connections
-    ? connections.filter(conn => isGroupChatConnection(conn))
+    ? connections.filter(conn => connectionUtils.isGroupChatConnection(conn))
+    : Immutable.Map();
+}
+
+export function getSuggestedConnectionsByNeedUri(state, needUri) {
+  const needs = getNeeds(state);
+  const need = needs && needs.get(needUri);
+  const connections = need && need.get("connections");
+
+  return connections
+    ? connections
+        .filter(conn => connectionUtils.isSuggested(conn))
+        .filter(
+          conn =>
+            connectionUtils.isChatConnection(conn) ||
+            connectionUtils.isGroupChatConnection(conn)
+        )
     : Immutable.Map();
 }
 
@@ -73,7 +89,11 @@ export function getChatConnectionsToCrawl(state) {
   const chatConnections =
     allConnections &&
     allConnections
-      .filter(conn => isChatConnection(conn) || isGroupChatConnection(conn))
+      .filter(
+        conn =>
+          connectionUtils.isChatConnection(conn) ||
+          connectionUtils.isGroupChatConnection(conn)
+      )
       .filter(
         conn =>
           !getIn(state, [

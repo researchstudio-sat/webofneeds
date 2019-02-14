@@ -13,6 +13,7 @@ import won from "../won-es6.js";
 import { labels } from "../won-label-utils.js";
 import { connect2Redux } from "../won-utils.js";
 import * as needUtils from "../need-utils.js";
+import * as connectionSelectors from "../selectors/connection-selectors.js";
 import { getConnectionUriFromRoute } from "../selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
@@ -69,6 +70,32 @@ function genComponentConf() {
                 ng-click="self.router__stateGoCurrent({viewNeedUri: memberUri})"
                 need-uri="::memberUri">
               </won-post-header>
+            </div>
+          </div>
+          <!-- SUGGESTIONS -->
+          <won-labelled-hr label="::'Suggestions'" class="cp__labelledhr" ng-if="self.hasSuggestions"></won-labelled-hr>
+          <div class="post-content__suggestions" ng-if="self.hasSuggestions">
+            <div
+              class="post-content__suggestions__suggestion"
+              ng-repeat="conn in self.suggestionsArray"
+              ng-class="{'won-unread': conn.get('unread')}">
+                <won-post-header
+                  class="clickable"
+                  ng-click="self.connections__markAsRead({connectionUri: conn.get('uri'), needUri: self.post.get('uri')}) && self.router__stateGoCurrent({viewNeedUri: conn.get('remoteNeedUri')})"
+                  need-uri="::conn.get('remoteNeedUri')">
+                </won-post-header>
+                <div class="post-content__suggestions__suggestion__actions">
+                    <div
+                      class="post-content__suggestions__suggestion__actions__button red won-button--outlined thin"
+                      ng-click="self.sendRequest(conn.get('uri'), conn.get('remoteNeedUri'))">
+                        Request
+                    </div>
+                    <div
+                      class="post-content__suggestions__suggestion__actions__button red won-button--outlined thin"
+                      ng-click="self.closeConnection(conn.get('uri'))">
+                        Remove
+                    </div>
+                </div>
             </div>
           </div>
 
@@ -128,6 +155,8 @@ function genComponentConf() {
       const selectFromState = state => {
         const openConnectionUri = getConnectionUriFromRoute(state);
         const post = getIn(state, ["needs", this.postUri]);
+        const isPersona = needUtils.isPersona(post);
+        const isOwned = needUtils.isOwned(post);
         const content = post ? post.get("content") : undefined;
 
         //TODO it will be possible to have more than one seeks
@@ -140,17 +169,23 @@ function genComponentConf() {
 
         const heldPosts = get(post, "holds");
 
+        const suggestions = connectionSelectors.getSuggestedConnectionsByNeedUri(
+          state,
+          this.postUri
+        );
+
         return {
           WON: won.WON,
           hasContent,
           hasSeeksBranch,
           post,
-          isPersona: needUtils.isPersona(post),
-          hasHeldPosts: needUtils.isPersona && heldPosts && heldPosts.size > 0,
-          heldPostsArray:
-            needUtils.isPersona && heldPosts && heldPosts.toArray(),
+          isPersona,
+          hasHeldPosts: isPersona && heldPosts && heldPosts.size > 0,
+          heldPostsArray: isPersona && heldPosts && heldPosts.toArray(),
           hasGroupMembers: groupMembers && groupMembers.size > 0,
           groupMembersArray: groupMembers && groupMembers.toArray(),
+          hasSuggestions: isOwned && suggestions && suggestions.size > 0,
+          suggestionsArray: isOwned && suggestions && suggestions.toArray(),
           postLoading:
             !post ||
             getIn(state, ["process", "needs", post.get("uri"), "loading"]),
@@ -178,6 +213,21 @@ function genComponentConf() {
       if (this.postUri && this.postFailedToLoad) {
         this.needs__fetchUnloadedNeed(this.postUri);
       }
+    }
+
+    closeConnection(connUri, rateBad = false) {
+      rateBad && this.connections__rate(connUri, won.WON.binaryRatingBad);
+      this.connections__close(connUri);
+    }
+
+    sendRequest(connUri, remoteNeedUri, message) {
+      this.connections__rate(connUri, won.WON.binaryRatingGood);
+      this.needs__connect(
+        this.groupPostAdminUri,
+        connUri,
+        remoteNeedUri,
+        message
+      );
     }
 
     toggleShowGeneral() {
