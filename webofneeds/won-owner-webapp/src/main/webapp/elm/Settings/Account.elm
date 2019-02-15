@@ -12,7 +12,7 @@ import Element.Font as Font
 import Element.Input as Input
 import Elements
 import Http
-import Skin exposing (Skin)
+import Old.Skin as Skin exposing (Skin)
 
 
 type alias Model =

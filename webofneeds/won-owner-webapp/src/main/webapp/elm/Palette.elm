@@ -3,12 +3,12 @@ module Palette exposing
     , dropdownButton
     )
 
+import Color
 import Element.Background.Styled as Background
 import Element.Border.Styled as Border
 import Element.Font.Styled as Font
 import Element.Input.Styled as Input
 import Element.Styled exposing (..)
-import Skin
 
 
 type DropdownDirection
@@ -66,8 +66,8 @@ rawButton { left, right } { role, enabled, onPress, label } =
             else
                 color
     in
-    withSkin <|
-        \skin ->
+    withStyle <|
+        \style ->
             Debug.todo ""
 
 
@@ -104,12 +104,12 @@ dropdownButton { direction, menu, label, open, toggleMsg, onPress } =
                         []
                    )
     in
-    withSkin
+    withStyle
         (\skin ->
             row
                 attrs
                 [ Input.button
-                    [ Background.color skin.primaryColor
+                    [ Background.color skin.primary
                     , Border.roundEach
                         { topLeft = 5
                         , bottomLeft = 5
@@ -125,7 +125,7 @@ dropdownButton { direction, menu, label, open, toggleMsg, onPress } =
                             , Font.size <|
                                 round <|
                                     scaled 1
-                            , Font.color Skin.white
+                            , Font.color Color.white
                             , Font.center
                             ]
                         <|
@@ -133,7 +133,7 @@ dropdownButton { direction, menu, label, open, toggleMsg, onPress } =
                     , onPress = onPress
                     }
                 , Input.button
-                    [ Background.color skin.primaryColor
+                    [ Background.color skin.primary
                     , Border.roundEach
                         { topLeft = 0
                         , bottomLeft = 0

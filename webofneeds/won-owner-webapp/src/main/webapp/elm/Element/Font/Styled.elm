@@ -4,6 +4,8 @@ module Element.Font.Styled exposing
     , size
     )
 
+import Color exposing (Color)
+import Element
 import Element.Font as Font
 import Element.Styled exposing (..)
 
@@ -15,7 +17,11 @@ size len =
 
 color : Color -> Attr decorative msg
 color col =
-    pureAttr <| Font.color col
+    let
+        elmUiColors =
+            Color.toRgba col |> Element.fromRgb
+    in
+    pureAttr <| Font.color elmUiColors
 
 
 center : Attribute msg

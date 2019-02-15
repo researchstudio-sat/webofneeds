@@ -8,9 +8,9 @@ import Element.Font as Font
 import Element.Input as Input
 import Elements
 import Html exposing (Html)
+import Old.Skin as Skin exposing (Skin)
 import Settings.Account as Account
 import Settings.Personas as Personas
-import Skin exposing (Skin)
 
 
 main =

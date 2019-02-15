@@ -1,8 +1,8 @@
 module Element.Styled exposing
     ( Attr
     , Attribute
-    , Color
     , Element
+    , Style
     , above
     , below
     , column
@@ -20,18 +20,41 @@ module Element.Styled exposing
     , px
     , row
     , spacing
+    , styleDecoder
     , text
     , width
-    , withSkin
+    , withStyle
     )
 
+import Color exposing (Color)
 import Element
 import Html exposing (Html)
-import Skin exposing (Skin)
+import Json.Decode as Decode exposing (Decoder)
+
+
+type alias Style =
+    { primary : Color
+    , secondary : Color
+    }
+
+
+colorDecoder : Decoder Color
+colorDecoder =
+    Decode.map3 Color.rgb255
+        (Decode.field "r" Decode.int)
+        (Decode.field "g" Decode.int)
+        (Decode.field "b" Decode.int)
+
+
+styleDecoder : Decoder Style
+styleDecoder =
+    Decode.map2 Style
+        (Decode.field "primaryColor" colorDecoder)
+        (Decode.field "secondaryColor" colorDecoder)
 
 
 type Element msg
-    = Element (Skin -> Element.Element msg)
+    = Element (Style -> Element.Element msg)
 
 
 type alias Attribute msg =
@@ -39,11 +62,7 @@ type alias Attribute msg =
 
 
 type Attr decorative msg
-    = Attr (Skin -> Element.Attr decorative msg)
-
-
-type alias Color =
-    Element.Color
+    = Attr (Style -> Element.Attr decorative msg)
 
 
 type alias Length =
@@ -86,12 +105,12 @@ text str =
         \_ -> Element.text str
 
 
-applyAttr skin (Attr fn) =
-    fn skin
+applyAttr style (Attr fn) =
+    fn style
 
 
-applyEl skin (Element fn) =
-    fn skin
+applyEl style (Element fn) =
+    fn style
 
 
 modular : Float -> Float -> Int -> Float
@@ -99,70 +118,70 @@ modular =
     Element.modular
 
 
-layout : Skin -> List (Attribute msg) -> Element msg -> Html msg
-layout skin attrs elem =
+layout : Style -> List (Attribute msg) -> Element msg -> Html msg
+layout style attrs elem =
     Element.layout
         (List.map
-            (applyAttr skin)
+            (applyAttr style)
             attrs
         )
-        (applyEl skin elem)
+        (applyEl style elem)
 
 
-withSkin : (Skin -> Element msg) -> Element msg
-withSkin elemFn =
+withStyle : (Style -> Element msg) -> Element msg
+withStyle elemFn =
     Element <|
-        \skin ->
+        \style ->
             let
                 (Element fn) =
-                    elemFn skin
+                    elemFn style
             in
-            fn skin
+            fn style
 
 
 row : List (Attribute msg) -> List (Element msg) -> Element msg
 row attrs elements =
     Element <|
-        \skin ->
+        \style ->
             Element.row
-                (List.map (applyAttr skin) attrs)
-                (List.map (applyEl skin) elements)
+                (List.map (applyAttr style) attrs)
+                (List.map (applyEl style) elements)
 
 
 column : List (Attribute msg) -> List (Element msg) -> Element msg
 column attrs elements =
     Element <|
-        \skin ->
+        \style ->
             Element.column
-                (List.map (applyAttr skin) attrs)
-                (List.map (applyEl skin) elements)
+                (List.map (applyAttr style) attrs)
+                (List.map (applyEl style) elements)
 
 
 above : Element msg -> Attribute msg
 above elem =
     Attr
-        (\skin ->
+        (\style ->
             Element.above <|
-                applyEl skin elem
+                applyEl style elem
         )
 
 
 below : Element msg -> Attribute msg
 below elem =
     Attr
-        (\skin ->
+        (\style ->
             Element.below <|
-                applyEl skin elem
+                applyEl style elem
         )
 
 
 el : List (Attribute msg) -> Element msg -> Element msg
 el attrs elem =
     Element <|
-        \skin ->
+        \style ->
             Element.el
-                (List.map (applyAttr skin) attrs)
-                (applyEl skin elem)
+                (List.map (applyAttr style) attrs)
+                (applyEl style elem)
 
 
 pureAttr : Element.Attr decorative msg -> Attr decorative msg
@@ -170,27 +189,27 @@ pureAttr attr =
     Attr (\_ -> attr)
 
 
-element : (Skin -> Element.Element msg) -> Element msg
+element : (Style -> Element.Element msg) -> Element msg
 element fn =
     Element fn
 
 
 getElement :
     Element msg
-    -> (Skin -> Element.Element msg -> b)
-    -> Skin
+    -> (Style -> Element.Element msg -> b)
+    -> Style
     -> b
-getElement elem fn skin =
-    fn skin (applyEl skin elem)
+getElement elem fn style =
+    fn style (applyEl style elem)
 
 
 getAttrList :
     List (Attr decorative msg)
-    -> (Skin -> List (Element.Attr decorative msg) -> b)
-    -> Skin
+    -> (Style -> List (Element.Attr decorative msg) -> b)
+    -> Style
     -> b
-getAttrList attrs fn skin =
-    fn skin (List.map (applyAttr skin) attrs)
+getAttrList attrs fn style =
+    fn style (List.map (applyAttr style) attrs)
 
 
 none : Element msg

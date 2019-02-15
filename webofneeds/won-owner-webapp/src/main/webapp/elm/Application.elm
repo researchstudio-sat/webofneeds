@@ -2,17 +2,16 @@ port module Application exposing (State, element)
 
 import AssocList as Dict exposing (Dict)
 import Browser
-import Element.Styled as Element exposing (Element)
+import Element.Styled as Element exposing (Element, Style)
 import Html exposing (Html)
 import Json.Decode as Decode exposing (Decoder, Value)
 import Json.Decode.Extra as Decode
 import Json.Decode.Pipeline as DP
 import Json.Encode as Encode
-import NonEmpty
-import Persona exposing (PersonaData)
+import NonEmpty exposing (NonEmpty)
+import Palette
 import Result.Extra as Result
 import Set exposing (Set)
-import Skin exposing (Skin, SkinFlags)
 import Time
 import Url exposing (Url)
 
@@ -49,7 +48,7 @@ type alias NeedData owned =
 
 
 type Need owned
-    = Persona Persona.PersonaData
+    = PersonaNeed Persona
     | Other
 
 
@@ -59,13 +58,13 @@ type alias State =
 
 
 type UpdateType attributes
-    = SkinUpdate Skin
+    = StyleUpdate Style
     | StateUpdate State
     | AttrUpdate attributes
-    | SkinState Skin State
-    | SkinAttr Skin attributes
+    | StyleState Style State
+    | StyleAttr Style attributes
     | AttrState attributes State
-    | SkinAttrState Skin attributes State
+    | StyleAttrState Style attributes State
     | ParsingError String
 
 
@@ -80,7 +79,7 @@ type Model attributes subModel
         { state : State
         , subModel : subModel
         , attributes : attributes
-        , skin : Skin
+        , style : Style
         }
 
 
@@ -97,9 +96,16 @@ types =
     Decode.field "@type" <| jsonldSet Decode.string
 
 
-personaDecoder : Decoder PersonaData
+type alias Persona =
+    { name : NonEmpty String
+    , description : Maybe (NonEmpty String)
+    , url : Maybe (NonEmpty String)
+    }
+
+
+personaDecoder : Decoder Persona
 personaDecoder =
-    Decode.succeed PersonaData
+    Decode.succeed Persona
         |> DP.required "s:name" NonEmpty.stringDecoder
         |> DP.optional "s:description" (Decode.map Just NonEmpty.stringDecoder) Nothing
         |> DP.optional "s:url" (Decode.map Just NonEmpty.stringDecoder) Nothing
@@ -122,7 +128,7 @@ needDecoder =
         |> DP.required "jsonld"
             (Decode.oneOf
                 [ Decode.when types (Set.member "won:Persona") personaDecoder
-                    |> Decode.map Persona
+                    |> Decode.map PersonaNeed
                 , Decode.succeed Other
                 ]
             )
@@ -189,10 +195,10 @@ stateDecoder =
         |> DP.required "needs" needsDecoder
 
 
-updateSkin : Skin -> { a | skin : Skin } -> { a | skin : Skin }
-updateSkin skin model =
+updateStyle : Style -> { a | style : Style } -> { a | style : Style }
+updateStyle style model =
     { model
-        | skin = skin
+        | style = style
     }
 
 
@@ -231,20 +237,20 @@ updateExternal external model =
                         |> updateAttrs attrs
                         |> Model
 
-                SkinUpdate skin ->
+                StyleUpdate style ->
                     realModel
-                        |> updateSkin skin
+                        |> updateStyle style
                         |> Model
 
-                SkinState skin state ->
+                StyleState style state ->
                     realModel
-                        |> updateSkin skin
+                        |> updateStyle style
                         |> updateState state
                         |> Model
 
-                SkinAttr skin attrs ->
+                StyleAttr style attrs ->
                     realModel
-                        |> updateSkin skin
+                        |> updateStyle style
                         |> updateAttrs attrs
                         |> Model
 
@@ -254,9 +260,9 @@ updateExternal external model =
                         |> updateState state
                         |> Model
 
-                SkinAttrState skin attrs state ->
+                StyleAttrState style attrs state ->
                     realModel
-                        |> updateSkin skin
+                        |> updateStyle style
                         |> updateAttrs attrs
                         |> updateState state
                         |> Model
@@ -280,7 +286,7 @@ element :
     ->
         Program
             { attributes : Value
-            , skin : SkinFlags
+            , style : Value
             , state : Value
             }
             (Model attributes subModel)
@@ -293,10 +299,10 @@ element options =
                 ParsingFailed _ ->
                     Html.text "Parsing the arguments failed, please look at the log for errors"
 
-                Model { attributes, state, skin, subModel } ->
+                Model { attributes, state, style, subModel } ->
                     Html.map SubMsg <|
                         Element.layout
-                            skin
+                            style
                             []
                             (options.view attributes state subModel)
 
@@ -306,7 +312,7 @@ element options =
                 ParsingFailed _ ->
                     ( model, Cmd.none )
 
-                Model ({ attributes, state, subModel, skin } as realModel) ->
+                Model ({ attributes, state, subModel, style } as realModel) ->
                     case msg of
                         SubMsg subMsg ->
                             let
@@ -353,23 +359,23 @@ element options =
                                             ( Just st, Nothing, Nothing ) ->
                                                 StateUpdate st
 
-                                            ( Nothing, Just sk, Nothing ) ->
-                                                SkinUpdate sk
+                                            ( Nothing, Just sty, Nothing ) ->
+                                                StyleUpdate sty
 
                                             ( Nothing, Nothing, Just attr ) ->
                                                 AttrUpdate attr
 
-                                            ( Just st, Just sk, Nothing ) ->
-                                                SkinState sk st
+                                            ( Just st, Just sty, Nothing ) ->
+                                                StyleState sty st
 
                                             ( Just st, Nothing, Just attr ) ->
                                                 AttrState attr st
 
-                                            ( Nothing, Just sk, Just attr ) ->
-                                                SkinAttr sk attr
+                                            ( Nothing, Just sty, Just attr ) ->
+                                                StyleAttr sty attr
 
-                                            ( Just st, Just sk, Just attr ) ->
-                                                SkinAttrState sk attr st
+                                            ( Just st, Just sty, Just attr ) ->
+                                                StyleAttrState sty attr st
 
                                             ( Nothing, Nothing, Nothing ) ->
                                                 ParsingError "No valid input found"
@@ -380,7 +386,7 @@ element options =
                                     decoder =
                                         Decode.succeed resultHandler
                                             |> optional "newState" stateDecoder
-                                            |> optional "newSkin" Skin.decoder
+                                            |> optional "newSkin" Element.styleDecoder
                                             |> optional "newAttributes" options.attributeParser
                                 in
                                 Decode.decodeValue decoder val
@@ -393,9 +399,9 @@ element options =
                         ]
 
         -- INIT
-        init { attributes, skin, state } =
+        init { attributes, style, state } =
             Result.map3
-                (\sk attr st ->
+                (\sty attr st ->
                     let
                         ( subModel, subCmd ) =
                             options.init attr st
@@ -403,13 +409,13 @@ element options =
                     ( Model
                         { state = st
                         , attributes = attr
-                        , skin = sk
+                        , style = sty
                         , subModel = subModel
                         }
                     , Cmd.map SubMsg subCmd
                     )
                 )
-                (Ok <| Skin.fromFlags skin)
+                (Decode.decodeValue Element.styleDecoder style)
                 (Decode.decodeValue options.attributeParser attributes)
                 (Decode.decodeValue stateDecoder state)
                 |> Result.extract

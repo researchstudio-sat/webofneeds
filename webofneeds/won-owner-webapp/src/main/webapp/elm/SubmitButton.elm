@@ -13,8 +13,8 @@ import Html exposing (Html)
 import Html.Attributes as HA
 import Json.Decode as Decode exposing (Value)
 import NonEmpty
-import Persona exposing (Persona, PersonaData, SaveState(..))
-import Skin exposing (Skin)
+import Old.Persona as Persona exposing (Persona, PersonaData, SaveState(..))
+import Old.Skin as Skin exposing (Skin)
 import Time exposing (Posix)
 import Url exposing (Url)
 
