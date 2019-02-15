@@ -1,23 +1,43 @@
-import { details, mergeInEmptyDraft } from "../detail-definitions.js";
+import { mergeInEmptyDraft } from "../detail-definitions.js";
 import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-utils.js";
+import { sparqlQuery } from "../../app/sparql-builder-utils.js";
+import won from "../../app/service/won.js";
 
 export const contactPaymentBot = {
   identifier: "contactPaymentBot",
   label: "Contact Payment Bot",
   icon: "#ico36_uc_custom",
   doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
+  // TODO: check if this can work like whatsX -> one click for need creation, because nothing can be changed
   draft: {
     ...mergeInEmptyDraft({
+      content: {
+        title: "Payment Service Contact Request",
+        type: ["won:ServiceContactRequest", "won:PaymentServiceRequest"],
+      },
+      // TODO: hardcoded title & description for user
       seeks: {
-        title: "Contacting Payment Bot",
-        description: "Contacting the Paypal Payment Bot...",
-        tags: ["Paypal"],
+        // should only look for type
+        // future extension possibility: add payment type dropdown
+        // alternatively: extend for other bots (might require more extensive RDF stuff)
+        type: ["won:ServiceBot"],
       },
     }),
   },
-  seeksDetails: {
-    title: { ...details.title },
-    description: { ...details.description },
-    tags: { ...details.tags },
+  generateQuery: (draft, resultName) => {
+    if (draft) {
+      // do nothing, draft is not needed here
+    }
+    const query = sparqlQuery({
+      prefixes: {
+        won: won.defaultContext["won"],
+        rdf: won.defaultContext["rdf"],
+      },
+      distinct: true,
+      variables: [resultName, "?score"],
+      where: [`${resultName} rdf:type won:ServiceBot`, `BIND(1 as ?score)`],
+    });
+
+    return query;
   },
 };
