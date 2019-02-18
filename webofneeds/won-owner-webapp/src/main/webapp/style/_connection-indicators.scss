@@ -13,24 +13,24 @@ won-connection-indicators {
   display: flex;
   flex-direction: row;
 
+  @media (max-width: $responsivenessBreakPoint) {
+    .indicators__item.indicators__item--reads,
+    .indicators__item.indicators__item--unreads {
+      pointer-events: none;
+      cursor: default;
+    }
+  }
+  @media (min-width: $responsivenessBreakPoint) {
+    .indicators__item.indicators__item--reads,
+    .indicators__item.indicators__item--unreads {
+      cursor: pointer;
+    }
+  }
+
   .indicators__item {
     display: flex;
     align-items: center;
     flex-direction: row;
-
-    @media (max-width: $responsivenessBreakPoint) {
-      .indicators__item--reads,
-      .indicators__item--unreads {
-        pointer-events: none;
-        cursor: default;
-      }
-    }
-    @media (min-width: $responsivenessBreakPoint) {
-      .indicators__item--reads,
-      .indicators__item--unreads {
-        cursor: pointer;
-      }
-    }
 
     &--unreads {
       --local-primary: #{$won-primary-color};
@@ -53,14 +53,6 @@ won-connection-indicators {
 
     &__icon {
       @include fixed-square($iconSize);
-    }
-
-    &__caption {
-      line-height: $iconSize;
-      font-size: $smallFontSize;
-      padding-left: 0.25em;
-      min-width: 1.35rem;
-      color: black;
     }
   }
 }

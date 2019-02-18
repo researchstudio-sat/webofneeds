@@ -27,16 +27,13 @@ function genComponentConf() {
             ng-if="!self.postLoading"
             ng-click="self.latestConnectedUri && self.setOpen(self.latestConnectedUri)"
             ng-class="{
-              'indicators__item--reads': !self.unreadConnectedCount && self.latestConnectedUri,
-              'indicators__item--unreads': self.unreadConnectedCount && self.latestConnectedUri,
+              'indicators__item--reads': !self.hasUnreadConnected && self.latestConnectedUri,
+              'indicators__item--unreads': self.hasUnreadConnected && self.latestConnectedUri,
               'indicators__item--disabled': !self.latestConnectedUri,
             }">
                 <svg class="indicators__item__icon" title="Show latest message/request">
                     <use xlink:href="#ico36_message" href="#ico36_message"></use>
                 </svg>
-                <span class="indicators__item__caption" title="Number of chats with unread messages/requests">
-                    {{ self.getCountLimited(self.unreadConnectedCount)}}
-                </span>
         </a>
         <div class="indicators__item indicators__item--skeleton" ng-if="self.postLoading">
             <svg class="indicators__item__icon">
@@ -78,11 +75,8 @@ function genComponentConf() {
             );
           });
 
-        const unreadConversations =
-          connected && connected.filter(conn => conn.get("unread"));
-
-        const unreadConnectedCount =
-          unreadConversations && unreadConversations.size;
+        const hasUnreadConnected =
+          connected && !!connected.find(conn => conn.get("unread"));
 
         return {
           WON: won.WON,
@@ -90,8 +84,7 @@ function genComponentConf() {
           postLoading:
             !ownedPost ||
             getIn(state, ["process", "needs", ownedPost.get("uri"), "loading"]),
-          unreadConnectedCount:
-            unreadConnectedCount > 0 ? unreadConnectedCount : undefined,
+          hasUnreadConnected,
           latestConnectedUri: this.retrieveLatestUri(connected),
         };
       };
@@ -128,13 +121,6 @@ function genComponentConf() {
 
     setOpen(connectionUri) {
       this.onSelectedConnection({ connectionUri: connectionUri }); //trigger callback with scope-object
-    }
-
-    getCountLimited(count, threshold = 100) {
-      if (!!count && threshold < count) {
-        return threshold - 1 + "+";
-      }
-      return count;
     }
   }
   Controller.$inject = serviceDependencies;
