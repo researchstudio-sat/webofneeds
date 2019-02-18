@@ -17,6 +17,7 @@ import * as srefUtils from "../../sref-utils.js";
 
 import "style/_post-visitor.scss";
 import "style/_need-overlay.scss";
+import "style/_connection-overlay.scss";
 
 const serviceDependencies = ["$ngRedux", "$scope"];
 class Controller {
@@ -30,6 +31,7 @@ class Controller {
     const selectFromState = state => {
       const needUri = generalSelectors.getPostUriFromRoute(state);
       const viewNeedUri = generalSelectors.getViewNeedUriFromRoute(state);
+      const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
       const need = getIn(state, ["needs", needUri]);
 
       const process = get(state, "process");
@@ -43,7 +45,9 @@ class Controller {
           viewSelectors.hasSlideIns(state) && viewSelectors.showSlideIns(state),
         showModalDialog: viewSelectors.showModalDialog(state),
         showNeedOverlay: !!viewNeedUri,
+        showConnectionOverlay: !!viewConnUri,
         viewNeedUri,
+        viewConnUri,
         needLoading: !need || processUtils.isNeedLoading(process, needUri),
         needToLoad: !need || processUtils.isNeedToLoad(process, needUri),
         needFailedToLoad:
