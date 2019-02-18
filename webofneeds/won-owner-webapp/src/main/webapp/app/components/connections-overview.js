@@ -114,7 +114,7 @@ function genComponentConf() {
                       on-selected="self.selectGroupChat(needUri)">
                   </won-group-administration-selection-item>
                 </div>
-                <div class="co__item__connections__item nonsticky" ng-if="self.hasSuggestedConnections(needUri)"
+                <div class="co__item__connections__item nonsticky" ng-if="self.hasChatFacet(needUri) && self.hasSuggestedConnections(needUri)"
                   ng-class="{
                     'won-unread': self.hasUnreadSuggestedConnections(needUri),
                     'selected': self.isShowingSuggestions(needUri),
