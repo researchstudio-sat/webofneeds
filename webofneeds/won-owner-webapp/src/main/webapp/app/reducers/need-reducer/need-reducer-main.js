@@ -262,7 +262,7 @@ export default function(allNeedsInState = initialState, action = {}) {
           state: won.WON.RequestSent,
           remoteNeedUri: theirNeedUri,
           remoteConnectionUri: undefined,
-          unread: true,
+          unread: false,
           facet: won.WON.ChatFacetCompacted, //TODO: INSERT CORRECT FACET FROM NEEDS
           agreementData: {
             agreementUris: Immutable.Set(),
@@ -294,7 +294,7 @@ export default function(allNeedsInState = initialState, action = {}) {
               hasReferences: false,
               date: msStringToDate(optimisticEvent.getSentTimestamp()),
               outgoingMessage: true,
-              unread: true,
+              unread: false,
               messageType: won.WONMSG.connectMessage,
               messageStatus: {
                 isProposed: false,

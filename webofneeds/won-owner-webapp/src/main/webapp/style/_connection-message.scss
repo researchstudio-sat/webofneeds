@@ -3,7 +3,6 @@
 @import "square-image";
 @import "animate";
 
-won-post-content-message,
 won-connection-message {
   &.won-is-multiSelect {
     padding-left: 3rem;
@@ -136,13 +135,7 @@ won-connection-message {
         }
       }
 
-      > won-post-content {
-        padding: 0.5rem;
-        background: white;
-      }
-
-      > won-connection-message-actions,
-      > won-post-content {
+      > won-connection-message-actions {
         grid-column: 1 / span 2;
       }
 
@@ -186,10 +179,6 @@ won-connection-message {
       }
     }
   }
-}
-
-won-post-content-message {
-  grid-template-columns: min-content 1fr;
 }
 
 won-connection-message {

@@ -20,6 +20,11 @@ won-create-post-item {
       );
     }
   }
+  @media (max-width: $responsivenessBreakPoint) {
+    .cpi__item:first-of-type {
+      border-left: 0;
+    }
+  }
   .cpi__item {
     flex: 1;
     display: flex;

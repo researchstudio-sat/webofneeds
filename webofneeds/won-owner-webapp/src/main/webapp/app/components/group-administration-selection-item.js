@@ -7,6 +7,7 @@ import { attach } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { getGroupPostAdminUriFromRoute } from "../selectors/general-selectors.js";
+import { getGroupChatConnectionsByNeedUri } from "../selectors/connection-selectors.js";
 
 import groupAdministrationHeaderModule from "./group-administration-header.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
@@ -16,7 +17,6 @@ import "style/_group-administration-selection-item-line.scss";
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
-      <!-- todo impl and include groupchat header -->
       <won-group-administration-header
         class="clickable"
         ng-click="self.setOpen()"
@@ -30,15 +30,29 @@ function genComponentConf() {
 
       const selectFromState = state => {
         const openGroupChatPostUri = getGroupPostAdminUriFromRoute(state);
+        const groupChatConnections = getGroupChatConnectionsByNeedUri(
+          state,
+          this.needUri
+        );
+
+        const hasUnreadGroupConnections = groupChatConnections
+          ? !!groupChatConnections.find(conn => conn.get("unread"))
+          : false;
 
         return {
           openGroupChatPostUri,
+          hasUnreadGroupConnections,
         };
       };
 
       connect2Redux(selectFromState, actionCreators, ["self.needUri"], this);
 
       classOnComponentRoot("selected", () => this.isOpen(), this);
+      classOnComponentRoot(
+        "won-unread",
+        () => this.hasUnreadGroupConnections,
+        this
+      );
     }
     isOpen() {
       return this.openGroupChatPostUri === this.needUri;

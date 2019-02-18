@@ -9,7 +9,8 @@ import { checkHttpStatus, urisToLookupMap, is } from "./utils.js";
 import { ownerBaseUrl } from "config";
 import urljoin from "url-join";
 
-import { getRandomWonId, getAllDetails } from "./won-utils.js";
+import { getRandomWonId } from "./won-utils.js";
+import * as useCaseUtils from "./usecase-utils.js";
 import { isConnUriClosed } from "./won-localstorage.js";
 import { actionTypes } from "./actions/actions.js";
 
@@ -291,7 +292,7 @@ export function buildChatMessage({
         if (additionalContent) {
           const contentNode = wonMessageBuilder.getContentGraphNode();
           const contentNodes = wonMessageBuilder.getContentGraphNodes();
-          const detailList = getAllDetails();
+          const detailList = useCaseUtils.getAllDetails();
           additionalContent.forEach((value, key) => {
             const detail = detailList[key];
             const detailRDF =

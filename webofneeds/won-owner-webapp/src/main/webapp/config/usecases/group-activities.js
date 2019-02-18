@@ -1,10 +1,12 @@
-import { cyclingGroup } from "./group-cycling";
+import { cyclingGroup } from "./group-cycling.js";
+import { lunchGroup } from "./group-lunch.js";
 
 export const activitiesGroup = {
-  identifier: "activitiesGroup",
+  identifier: "activitiesgroup",
   label: "Activities",
   icon: undefined,
-  useCaseGroups: {
+  subItems: {
+    lunchGroup: lunchGroup,
     cyclingGroup: cyclingGroup,
   },
 };

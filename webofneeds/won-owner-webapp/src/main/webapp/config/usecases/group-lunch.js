@@ -5,7 +5,7 @@ export const lunchGroup = {
   identifier: "lunchGroup",
   label: "Lunch",
   icon: "#ico36_uc_meal-half",
-  useCases: {
+  subItems: {
     lunchInterest: lunchInterest,
     lunchPlan: lunchPlan,
   },

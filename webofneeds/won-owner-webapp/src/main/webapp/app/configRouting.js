@@ -22,6 +22,7 @@ import { getIn, firstToLowerCase, hyphen2Camel } from "./utils.js";
 export const resetParams = Object.freeze({
   connectionUri: undefined,
   viewNeedUri: undefined,
+  viewConnUri: undefined,
   postUri: undefined,
   useCase: undefined,
   useCaseGroup: undefined,
@@ -67,11 +68,15 @@ export const configRouting = [
       { path: "/settings", component: "settings" },
       {
         path:
-          "/connections?privateId?postUri?connectionUri?useCase?useCaseGroup?token?groupPostAdminUri?viewNeedUri?fromNeedUri?mode",
+          "/connections?privateId?postUri?connectionUri?useCase?useCaseGroup?token?groupPostAdminUri?viewNeedUri?viewConnUri?fromNeedUri?mode",
         component: "connections",
         as: "connections",
       },
-      { path: "/post/?postUri?viewNeedUri", component: "post", as: "post" },
+      {
+        path: "/post/?postUri?viewNeedUri?viewConnUri",
+        component: "post",
+        as: "post",
+      },
     ].forEach(({ path, component, as }) => {
       const cmlComponent = hyphen2Camel(component);
 

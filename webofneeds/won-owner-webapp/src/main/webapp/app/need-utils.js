@@ -5,6 +5,7 @@
 import won from "./won-es6.js";
 import { get, getIn } from "./utils.js";
 import { labels } from "./won-label-utils.js";
+import * as connectionUtils from "./connection-utils.js";
 
 /**
  * Determines if a given need is a Active
@@ -116,6 +117,22 @@ export function hasGroupFacet(need) {
   return (
     getIn(need, ["content", "facets"]) &&
     getIn(need, ["content", "facets"]).contains(won.WON.GroupFacetCompacted)
+  );
+}
+
+export function hasSuggestedConnections(need) {
+  return (
+    get(need, "connections") &&
+    !!get(need, "connections").find(conn => connectionUtils.isSuggested(conn))
+  );
+}
+
+export function hasUnreadSuggestedConnections(need) {
+  return (
+    get(need, "connections") &&
+    !!get(need, "connections").find(
+      conn => connectionUtils.isSuggested(conn) && get(conn, "unread")
+    )
   );
 }
 

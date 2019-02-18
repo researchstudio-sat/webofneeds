@@ -13,7 +13,7 @@ export const academicGroup = {
   identifier: "academicGroup",
   label: "Academia",
   icon: undefined,
-  useCases: {
+  subItems: {
     phdOffer: phdOffer,
     phdSearch: phdSearch,
     postdocOffer: postdocOffer,

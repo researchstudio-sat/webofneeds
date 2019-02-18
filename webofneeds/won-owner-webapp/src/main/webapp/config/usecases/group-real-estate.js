@@ -7,7 +7,7 @@ export const realEstateGroup = {
   identifier: "realestategroup",
   label: "Homes",
   icon: undefined,
-  useCases: {
+  subItems: {
     rentRealEstateSearch: rentRealEstateSearch,
     rentRealEstateOffer: rentRealEstateOffer,
     rehearsalRoomSearch: rehearsalRoomSearch,

@@ -8,6 +8,8 @@ import { connect2Redux } from "../../won-utils.js";
 import won from "../../won-es6.js";
 import { actionCreators } from "../../actions/actions.js";
 import sendRequestModule from "../send-request.js";
+import postMessagesModule from "../post-messages.js";
+import groupPostMessagesModule from "../group-post-messages.js";
 import visitorTitleBarModule from "../visitor-title-bar.js";
 import * as generalSelectors from "../../selectors/general-selectors.js";
 import * as viewSelectors from "../../selectors/view-selectors.js";
@@ -17,6 +19,7 @@ import * as srefUtils from "../../sref-utils.js";
 
 import "style/_post-visitor.scss";
 import "style/_need-overlay.scss";
+import "style/_connection-overlay.scss";
 
 const serviceDependencies = ["$ngRedux", "$scope"];
 class Controller {
@@ -30,6 +33,7 @@ class Controller {
     const selectFromState = state => {
       const needUri = generalSelectors.getPostUriFromRoute(state);
       const viewNeedUri = generalSelectors.getViewNeedUriFromRoute(state);
+      const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
       const need = getIn(state, ["needs", needUri]);
 
       const process = get(state, "process");
@@ -43,7 +47,9 @@ class Controller {
           viewSelectors.hasSlideIns(state) && viewSelectors.showSlideIns(state),
         showModalDialog: viewSelectors.showModalDialog(state),
         showNeedOverlay: !!viewNeedUri,
+        showConnectionOverlay: !!viewConnUri,
         viewNeedUri,
+        viewConnUri,
         needLoading: !need || processUtils.isNeedLoading(process, needUri),
         needToLoad: !need || processUtils.isNeedToLoad(process, needUri),
         needFailedToLoad:
@@ -83,5 +89,7 @@ export default angular
     sendRequestModule,
     ngAnimate,
     visitorTitleBarModule,
+    postMessagesModule,
+    groupPostMessagesModule,
   ])
   .controller("PostController", Controller).name;

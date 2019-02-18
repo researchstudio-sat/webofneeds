@@ -11,6 +11,10 @@
   --won-line-gray: #cbd2d1; /*use for lines*/
   --won-subtitle-gray: #808080;
   --won-helpbox-yellow: #fffce5;
+
+  --won-unread: #ccdff5; /*If you want to indicate the unread status with a background (maybe in addition to a marker), use this slightly less in your face color*/
+  --won-unread-attention: #56db9b; /*Bold color used for markers that indicate an unread status of an element*/
+
   --won-dark-purple: #00db6b;
   --won-dark-gray: #303a43;
   --won-primary-text-color: #000000;

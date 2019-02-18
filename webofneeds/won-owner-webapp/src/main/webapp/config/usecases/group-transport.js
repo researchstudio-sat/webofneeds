@@ -8,7 +8,7 @@ export const transportGroup = {
   identifier: "transportgroup",
   label: "Transport",
   icon: undefined,
-  useCases: {
+  subItems: {
     personalTransportSearch: personalTransportSearch,
     taxiOffer: taxiOffer,
     rideShareOffer: rideShareOffer,

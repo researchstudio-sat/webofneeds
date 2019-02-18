@@ -1,4 +1,3 @@
-import { lunchGroup } from "./usecases/group-lunch";
 import { classifiedsGroup } from "./usecases/group-classifieds";
 import { socialGroup } from "./usecases/group-social";
 import { workGroup } from "./usecases/group-work";
@@ -8,7 +7,7 @@ import { realEstateGroup } from "./usecases/group-real-estate";
 import { transportGroup } from "./usecases/group-transport";
 import { otherGroup } from "./usecases/group-other";
 import { personalMobilityGroup } from "./usecases/group-personal-mobility";
-import { cyclingGroup } from "./usecases/group-cycling";
+import { activitiesGroup } from "./usecases/group-activities";
 // import { customUseCase } from "./usecases/uc-custom.js";
 
 /**
@@ -53,9 +52,8 @@ import { cyclingGroup } from "./usecases/group-cycling";
  * This will be automatically enforced by the need builder.
  */
 
-export const useCaseGroups = {
-  lunch: lunchGroup,
-  cycling: cyclingGroup,
+const useCaseGroups = {
+  activities: activitiesGroup,
   social: socialGroup,
   classifieds: classifiedsGroup,
   work: workGroup,
@@ -68,13 +66,52 @@ export const useCaseGroups = {
 };
 
 // generate a list of usecases from all use case groups
-// TODO: find a good way to handle potential ungrouped use cases
 let tempUseCases = {};
 for (let key in useCaseGroups) {
-  const useCases = useCaseGroups[key].useCases;
-  for (let identifier in useCases) {
-    tempUseCases[identifier] = useCases[identifier];
+  const elements = useCaseGroups[key].subItems;
+  addUseCasesToTemp(elements);
+}
+
+function addUseCasesToTemp(elements) {
+  for (let identifier in elements) {
+    if (elements[identifier].subItems) {
+      addUseCasesToTemp(elements[identifier].subItems);
+    } else {
+      tempUseCases[identifier] = elements[identifier];
+    }
   }
 }
 
-export const useCases = tempUseCases;
+const useCases = tempUseCases;
+window.useCases4dbg = useCases;
+
+function addUseCaseGroupToTemp(tempGroups, groups) {
+  if (hasSubElements(groups)) {
+    for (let identifier in groups) {
+      if (groups[identifier] && groups[identifier].subItems) {
+        tempGroups[identifier] = groups[identifier];
+        addUseCaseGroupToTemp(tempGroups, groups[identifier].subItems);
+      }
+    }
+  }
+}
+
+let tempUseCaseGroups = {};
+addUseCaseGroupToTemp(tempUseCaseGroups, useCaseGroups);
+const allUseCaseGroups = tempUseCaseGroups;
+
+export function getUseCaseGroups() {
+  return useCaseGroups;
+}
+
+export function getAllUseCases() {
+  return useCases;
+}
+
+export function getAllUseCaseGroups() {
+  return allUseCaseGroups;
+}
+
+function hasSubElements(obj) {
+  return obj && obj !== {} && Object.keys(obj).length > 0;
+}

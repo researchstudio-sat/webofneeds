@@ -14,12 +14,10 @@ import { connect2Redux } from "../won-utils.js";
 import * as generalSelectors from "../selectors/general-selectors.js";
 import * as needUtils from "../need-utils.js";
 import * as processSelectors from "../selectors/process-selectors.js";
-
-import { useCases } from "useCaseDefinitions";
+import * as useCaseUtils from "../usecase-utils.js";
 
 import "style/_create-post.scss";
 import "style/_responsiveness-utils.scss";
-import { values } from "min-dash";
 
 const serviceDependencies = [
   "$ngRedux",
@@ -155,7 +153,7 @@ function genComponentConf() {
             );
 
             useCaseString = matchedUseCaseIdentifier || "customUseCase";
-            useCase = selectUseCaseFrom(useCaseString, useCases);
+            useCase = useCaseUtils.getUseCase(useCaseString);
 
             const fromNeedContent = get(fromNeed, "content");
             const fromNeedSeeks = get(fromNeed, "seeks");
@@ -193,7 +191,7 @@ function genComponentConf() {
           }
         } else {
           useCaseString = generalSelectors.getUseCaseFromRoute(state);
-          useCase = selectUseCaseFrom(useCaseString, useCases);
+          useCase = useCaseUtils.getUseCase(useCaseString);
         }
 
         return {
@@ -206,12 +204,7 @@ function genComponentConf() {
           isCreateFromNeed,
           isFromNeedLoading,
           isFromNeedToLoad,
-          isHoldable:
-            useCase &&
-            useCase.draft &&
-            useCase.draft.content &&
-            useCase.draft.content.facets &&
-            values(useCase.draft.content.facets).includes("won:HoldableFacet"),
+          isHoldable: useCaseUtils.isHoldable(useCase),
           hasFromNeedFailedToLoad,
           showCreateInput:
             useCase &&
@@ -341,17 +334,6 @@ function genComponentConf() {
     },
     template: template,
   };
-}
-
-function selectUseCaseFrom(useCaseString, useCases) {
-  if (useCaseString) {
-    for (const useCaseName in useCases) {
-      if (useCaseString === useCases[useCaseName]["identifier"]) {
-        return useCases[useCaseName];
-      }
-    }
-  }
-  return undefined;
 }
 
 // returns true if the branch has any content present

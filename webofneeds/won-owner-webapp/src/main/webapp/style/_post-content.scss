@@ -24,22 +24,21 @@ won-post-content {
       padding: 0.5rem;
     }
 
-    .post-content__button__template.won-button--outlined.thin.red {
-      font-size: $smallFontSize;
-      margin-top: 0.5rem;
-    }
-
     .post-content__members {
       & .post-content__members__member {
         padding: 0.5rem;
         border: $thinGrayBorder;
-        background: white;
+        background: $won-light-gray;
         display: grid;
         grid-template-areas: "member_info member_actions";
         grid-template-columns: 1fr min-content;
         grid-gap: 0.25rem;
         align-items: center;
         margin-bottom: 0.5rem;
+
+        &:hover {
+          background: white;
+        }
 
         won-post-header {
           grid-area: member_info;
@@ -51,7 +50,7 @@ won-post-content {
       & .post-content__otherneeds__otherneed {
         padding: 0.5rem;
         border: $thinGrayBorder;
-        background: white;
+        background: $won-light-gray;
         display: grid;
         grid-template-areas: "member_info member_actions";
         grid-template-columns: 1fr min-content;
@@ -59,8 +58,46 @@ won-post-content {
         align-items: center;
         margin-bottom: 0.5rem;
 
+        &:hover {
+          background: white;
+        }
+
         won-post-header {
           grid-area: member_info;
+        }
+      }
+    }
+
+    .post-content__suggestions {
+      & .post-content__suggestions__suggestion {
+        padding: 0.5rem;
+        border: $thinGrayBorder;
+        background: $won-light-gray;
+        display: grid;
+        grid-template-areas: "member_info member_actions";
+        grid-template-columns: 1fr min-content;
+        grid-gap: 0.25rem;
+        align-items: center;
+        margin-bottom: 0.5rem;
+
+        &.won-unread {
+          background: $won-unread;
+        }
+
+        won-post-header {
+          grid-area: member_info;
+        }
+
+        &__actions {
+          display: grid;
+          grid-auto-flow: column;
+          grid-gap: 0.25rem;
+          grid-area: member_actions;
+
+          &__button.won-button--outlined.red.thin {
+            font-size: $smallFontSize;
+            padding: 0.5rem;
+          }
         }
       }
     }
