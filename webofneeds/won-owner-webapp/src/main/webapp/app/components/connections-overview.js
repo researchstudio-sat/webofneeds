@@ -83,7 +83,7 @@ function genComponentConf() {
                         <svg class="co__item__need__header__carret__icon"
                             ng-class="{
                               'won-icon-expanded': self.isOpen(needUri),
-                              'won-icon-disabled': self.isNeedLoading(needUri),
+                              'won-icon-disabled': !self.hasOpenOrLoadingChatConnections(needUri, self.allNeeds, self.process) || self.isNeedLoading(needUri),
                             }">
                             <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
                         </svg>
@@ -439,7 +439,7 @@ function genComponentConf() {
       const need = get(this.allNeeds, needUri);
 
       if (!need) {
-        return undefined;
+        return false;
       }
       return (
         need.get("state") === won.WON.ActiveCompacted &&
