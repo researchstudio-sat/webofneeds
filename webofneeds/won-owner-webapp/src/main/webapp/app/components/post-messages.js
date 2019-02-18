@@ -294,9 +294,9 @@ function genComponentConf() {
         const connection =
           ownedNeed && ownedNeed.getIn(["connections", selectedConnectionUri]);
         const isOwnedNeedWhatsX =
-          this.ownedNeed &&
-          (needUtils.isWhatsAroundNeed(this.ownedNeed) ||
-            needUtils.isWhatsNewNeed(this.ownedNeed));
+          ownedNeed &&
+          (needUtils.isWhatsAroundNeed(ownedNeed) ||
+            needUtils.isWhatsNewNeed(ownedNeed));
         const remoteNeedUri = connection && connection.get("remoteNeedUri");
         const remoteNeed =
           remoteNeedUri && state.getIn(["needs", remoteNeedUri]);
@@ -862,9 +862,13 @@ function genComponentConf() {
           this.remoteNeedUri,
           message
         );
-        this.router__stateGoCurrent({
-          connectionUri: this.selectedConnectionUri,
-        });
+        if (this.showOverlayConnection) {
+          this.router__back();
+        } else {
+          this.router__stateGoCurrent({
+            connectionUri: this.selectedConnectionUri,
+          });
+        }
       }
     }
 

@@ -119,11 +119,11 @@ function genComponentConf() {
       connect2Redux(selectFromState, actionCreators, [], this);
     }
 
-    openRequest(connUri, message) {
+    openRequest(connUri, message = "") {
       this.connections__open(connUri, message);
     }
 
-    sendRequest(connUri, remoteNeedUri, message) {
+    sendRequest(connUri, remoteNeedUri, message = "") {
       this.connections__rate(connUri, won.WON.binaryRatingGood);
       this.needs__connect(
         this.groupPostAdminUri,

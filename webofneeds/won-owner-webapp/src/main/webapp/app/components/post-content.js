@@ -87,7 +87,7 @@ function genComponentConf() {
                 <div class="post-content__suggestions__suggestion__actions">
                     <div
                       class="post-content__suggestions__suggestion__actions__button red won-button--outlined thin"
-                      ng-click="self.sendRequest(conn.get('uri'), conn.get('remoteNeedUri'))">
+                      ng-click="self.sendRequest(conn)">
                         Request
                     </div>
                     <div
@@ -174,11 +174,16 @@ function genComponentConf() {
           this.postUri
         );
 
+        const isOwnedNeedWhatsX =
+          isOwned &&
+          (needUtils.isWhatsAroundNeed(post) || needUtils.isWhatsNewNeed(post));
+
         return {
           WON: won.WON,
           hasContent,
           hasSeeksBranch,
           post,
+          isOwnedNeedWhatsX,
           isPersona,
           hasHeldPosts: isPersona && heldPosts && heldPosts.size > 0,
           heldPostsArray: isPersona && heldPosts && heldPosts.toArray(),
@@ -220,10 +225,30 @@ function genComponentConf() {
       this.connections__close(connUri);
     }
 
-    sendRequest(connUri, remoteNeedUri, message) {
-      //TODO: IMPLEMENT POSSIBILITY OF ADHOC REQUEST
-      this.connections__rate(connUri, won.WON.binaryRatingGood);
-      this.needs__connect(this.postUri, connUri, remoteNeedUri, message);
+    sendRequest(conn, message = "") {
+      if (!conn) {
+        return;
+      }
+
+      const connUri = get(conn, "uri");
+      const remoteNeedUri = get(conn, "remoteNeedUri");
+
+      if (this.isOwnedNeedWhatsX) {
+        this.connections__close(connUri);
+
+        if (remoteNeedUri) {
+          this.connections__connectAdHoc(remoteNeedUri, message);
+        }
+        //this.router__back();
+      } else {
+        this.connections__rate(connUri, won.WON.binaryRatingGood);
+        this.needs__connect(
+          this.post.get("uri"),
+          connUri,
+          remoteNeedUri,
+          message
+        );
+      }
     }
 
     toggleShowGeneral() {
