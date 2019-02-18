@@ -40,6 +40,7 @@ import {
   isGroupChatConnection,
 } from "../connection-utils.js";
 import * as needUtils from "../need-utils.js";
+import * as viewUtils from "../view-utils.js";
 
 const serviceDependencies = ["$ngRedux", "$scope"];
 function genComponentConf() {
@@ -213,10 +214,13 @@ function genComponentConf() {
           getIn(state, ["process", "needs", need.get("uri"), "toLoad"])
         );
 
+        const viewState = get(state, "view");
+
         return {
           allNeeds,
           process: state.get("process"),
-          showClosedNeeds: state.getIn(["view", "showClosedNeeds"]),
+          viewState,
+          showClosedNeeds: get(viewState, "showClosedNeeds"),
           useCase,
           useCaseGroup,
           needUriInRoute,
@@ -291,6 +295,9 @@ function genComponentConf() {
       if (this.isOpen(ownedNeedUri)) {
         this.open[ownedNeedUri] = false;
         if (this.isOpenByConnection(ownedNeedUri)) {
+          this.needs__selectTab(
+            Immutable.fromJS({ needUri: ownedNeedUri, selectTab: "DETAIL" })
+          );
           this.router__stateGoCurrent({
             postUri: undefined,
             useCase: undefined,
@@ -307,7 +314,9 @@ function genComponentConf() {
     }
 
     showSuggestions(ownedNeedUri) {
-      //FIXME: Currently just opens need-details
+      this.needs__selectTab(
+        Immutable.fromJS({ needUri: ownedNeedUri, selectTab: "SUGGESTIONS" })
+      );
       this.router__stateGoCurrent({
         postUri: ownedNeedUri,
         useCase: undefined,
@@ -387,8 +396,15 @@ function genComponentConf() {
     }
 
     isShowingSuggestions(ownedNeedUri) {
-      //FIXME: Currently just checks if need need-details are open
-      return !!this.open[ownedNeedUri] && ownedNeedUri === this.needUriInRoute;
+      const visibleTab = viewUtils.getVisibleTabByNeedUri(
+        this.viewState,
+        ownedNeedUri
+      );
+      return (
+        !!this.open[ownedNeedUri] &&
+        ownedNeedUri === this.needUriInRoute &&
+        visibleTab === "SUGGESTIONS"
+      );
     }
 
     isShowingGroupAdministration(ownedNeedUri) {
