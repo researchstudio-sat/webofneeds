@@ -104,7 +104,11 @@ function genComponentConf() {
                       ng-class="{'won-unread': self.isConnectionUnread(needUri, connUri)}">
                   </won-connection-selection-item>
                 </div>
-                <div class="co__item__connections__item nonsticky" ng-if="self.hasGroupFacet(needUri)">
+                <div class="co__item__connections__item nonsticky" ng-if="self.hasGroupFacet(needUri)"
+                  ng-class="{
+                    'won-unread': self.hasUnreadGroupConnections(needUri),
+                    'selected': self.isShowingGroupAdministration(needUri),
+                  }">
                   <won-group-administration-selection-item
                       need-uri="::needUri"
                       on-selected="self.selectGroupChat(needUri)">
@@ -218,6 +222,7 @@ function genComponentConf() {
           needUriInRoute,
           needUriImpliedInRoute,
           connUriInRoute,
+          groupPostAdminUriInRoute,
           beingCreatedNeedUris: beingCreatedNeeds && [
             ...beingCreatedNeeds.keys(),
           ],
@@ -334,6 +339,16 @@ function genComponentConf() {
       return needUtils.hasUnreadSuggestedConnections(need);
     }
 
+    hasUnreadGroupConnections(needUri) {
+      const need = get(this.allNeeds, needUri);
+      const connections = get(need, "connections");
+      return connections
+        ? connections.find(
+            conn => isGroupChatConnection(conn) && get(conn, "unread")
+          )
+        : false;
+    }
+
     isUnread(needUri) {
       const need = get(this.allNeeds, needUri);
       return get(need, "unread");
@@ -374,6 +389,13 @@ function genComponentConf() {
     isShowingSuggestions(ownedNeedUri) {
       //FIXME: Currently just checks if need need-details are open
       return !!this.open[ownedNeedUri] && ownedNeedUri === this.needUriInRoute;
+    }
+
+    isShowingGroupAdministration(ownedNeedUri) {
+      return (
+        !!this.open[ownedNeedUri] &&
+        ownedNeedUri === this.groupPostAdminUriInRoute
+      );
     }
 
     isNeedLoading(needUri) {

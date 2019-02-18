@@ -18,14 +18,29 @@ won-group-administration-selection-item {
 
   background-color: $won-light-gray;
 
-  @include speech-bubble-left-inward(
-    $won-line-gray,
-    $won-line-gray,
-    $triangleCutoutSize,
-    $thinBorderWidth,
-    50%,
-    "before" /* needed so there can be another tail*/
-  );
+  &:not(.won-unread) {
+    @include speech-bubble-left-inward(
+      $won-line-gray,
+      $won-line-gray,
+      $triangleCutoutSize,
+      $thinBorderWidth,
+      50%,
+      "before" /* needed so there can be another tail*/
+    );
+    border-left: $thinGrayBorder;
+  }
+  &.won-unread {
+    @include speech-bubble-left-inward(
+      $won-unread-attention,
+      $won-unread-attention,
+      $triangleCutoutSize,
+      $thinBorderWidth,
+      50%,
+      "before" /* needed so there can be another tail*/
+    );
+    border-left: $thinBorderWidth solid $won-unread-attention;
+    background: $won-unread; /*Decide if that is too much or not - we already have the attention indicator set anyway*/
+  }
 
   $invisibleBorder: $thinBorderWidth solid $won-light-gray;
   border-left: $thinGrayBorder;
