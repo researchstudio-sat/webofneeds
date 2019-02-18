@@ -73,7 +73,34 @@ won-suggestion-selection-item {
       --local-primary: #{$won-primary-color-light};
     }
   }
-  .ssi__label {
+  .ssi__right {
+    display: grid;
+    grid-template-areas: "topline" "subtitle";
     padding-left: 0.5rem;
+    min-width: 0;
+    &__topline {
+      grid-area: topline;
+      min-width: 0;
+      &__title {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        font-weight: 400;
+        min-width: 0;
+      }
+    }
+    &__subtitle {
+      grid-area: subtitle;
+      color: $won-subtitle-gray;
+      font-size: $smallFontSize;
+      min-width: 0;
+      &__label {
+        display: flex;
+        align-items: center;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+    }
   }
 }

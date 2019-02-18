@@ -31,9 +31,18 @@ function genComponentConf() {
           }">
           <use xlink:href="#ico36_match" href="#ico36_match"></use>
       </svg>
-      <div class="ssi__label" ng-click="self.setOpen()">
-        <span>{{ self.matchesCount }} Suggestions</span>
-        <span ng-if="self.hasUnreadMatches">, {{ self.unreadMatchesCount }} new</span
+      <div class="ssi__right" ng-click="self.setOpen()">
+        <div class="ssi__right__topline">
+          <div class="ssi__right__topline__title">
+            Suggestions
+          </div>
+        </div>
+        <div class="ssi__right__subtitle">
+          <div class="ssi__right__subtitle__label">
+            <span>{{ self.matchesCount }} Suggestions</span>
+            <span ng-if="self.hasUnreadMatches">, {{ self.unreadMatchesCount }} new</span
+          </div>
+        </div>
       </div>
     `;
 

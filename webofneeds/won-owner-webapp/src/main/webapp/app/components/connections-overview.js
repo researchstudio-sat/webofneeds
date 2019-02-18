@@ -91,16 +91,6 @@ function genComponentConf() {
             </div>
             <div class="co__item__connections"
                 ng-if="self.isOpen(needUri) && (self.hasGroupFacet(needUri) || self.hasOpenOrLoadingChatConnections(needUri, self.allNeeds, self.process))">
-                <div class="co__item__connections__item nonsticky" ng-if="self.hasSuggestedConnections(needUri)"
-                  ng-class="{
-                    'won-unread': self.hasUnreadSuggestedConnections(needUri),
-                    'selected': self.isShowingSuggestions(needUri),
-                  }">
-                  <won-suggestion-selection-item
-                      need-uri="::needUri"
-                      on-selected="self.showSuggestions(needUri)">
-                  </won-suggestion-selection-item>
-                </div>
                 <div class="co__item__connections__item"
                   ng-if="self.hasChatFacet(needUri)"
                   ng-repeat="connUri in self.getOpenChatConnectionUrisArraySorted(needUri, self.allNeeds, self.process) track by connUri"
@@ -119,6 +109,16 @@ function genComponentConf() {
                       need-uri="::needUri"
                       on-selected="self.selectGroupChat(needUri)">
                   </won-group-administration-selection-item>
+                </div>
+                <div class="co__item__connections__item nonsticky" ng-if="self.hasSuggestedConnections(needUri)"
+                  ng-class="{
+                    'won-unread': self.hasUnreadSuggestedConnections(needUri),
+                    'selected': self.isShowingSuggestions(needUri),
+                  }">
+                  <won-suggestion-selection-item
+                      need-uri="::needUri"
+                      on-selected="self.showSuggestions(needUri)">
+                  </won-suggestion-selection-item>
                 </div>
             </div>
         </div>
