@@ -20,26 +20,32 @@ const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
         <div class="post-info__header" ng-if="self.includeHeader">
-            <a class="post-info__header__back clickable"
-                ng-if="!self.showOverlayNeed"
-                ng-click="self.router__back()">
-                <svg style="--local-primary:var(--won-primary-color);"
-                     class="post-info__header__back__icon clickable">
-                    <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
-                </svg>
-            </a>
-            <a class="post-info__header__back clickable"
-                ng-if="self.showOverlayNeed"
-                ng-click="self.router__back()">
-                <svg style="--local-primary:var(--won-primary-color);"
-                     class="post-info__header__back__icon clickable hide-in-responsive">
-                    <use xlink:href="#ico36_close" href="#ico36_close"></use>
-                </svg>
-                <svg style="--local-primary:var(--won-primary-color);"
-                     class="post-info__header__back__icon clickable show-in-responsive">
-                    <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
-                </svg>
-            </a>
+            <div class="post-info__header__back">
+              <a class="post-info__header__back__button clickable show-in-responsive"
+                 ng-if="!self.showOverlayNeed"
+                 ng-click="self.router__back()"> <!-- TODO: Clicking on the back button in non-mobile view might lead to some confusing changes -->
+                  <svg class="post-info__header__back__button__icon">
+                      <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
+                  </svg>
+              </a>
+              <a class="post-info__header__back__button clickable hide-in-responsive"
+                  ng-if="!self.showOverlayNeed"
+                  ng-click=" self.router__stateGoCurrent({connectionUri : undefined})">
+                  <svg class="post-info__header__back__button__icon">
+                      <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
+                  </svg>
+              </a>
+              <a class="post-info__header__back__button clickable"
+                  ng-if="self.showOverlayNeed"
+                  ng-click="self.router__back()">
+                  <svg class="post-info__header__back__button__icon clickable hide-in-responsive">
+                      <use xlink:href="#ico36_close" href="#ico36_close"></use>
+                  </svg>
+                  <svg class="post-info__header__back__button__icon clickable show-in-responsive">
+                      <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
+                  </svg>
+                </a>
+            </div>
             <won-post-header
                 need-uri="self.post.get('uri')">
             </won-post-header>

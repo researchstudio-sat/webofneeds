@@ -44,7 +44,7 @@ function genComponentConf() {
   let template = `
         <div class="pm__header" ng-if="self.showChatData">
             <div class="pm__header__back">
-              <a class="pm__header__back__button clickable show-in-responsive" self.router__stateGoCurrent({connectionUri : undefined})
+              <a class="pm__header__back__button clickable show-in-responsive"
                  ng-click="self.router__back()"> <!-- TODO: Clicking on the back button in non-mobile view might lead to some confusing changes -->
                   <svg class="pm__header__back__button__icon">
                       <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
