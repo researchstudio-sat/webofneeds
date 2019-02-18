@@ -117,7 +117,6 @@ function genComponentConf() {
               </div>
             </div>
             <won-post-content-message
-              class="won-cm--left"
               ng-if="self.showPostContentMessage"
               post-uri="self.remoteNeedUri"
               connection-uri="self.selectedConnectionUri">

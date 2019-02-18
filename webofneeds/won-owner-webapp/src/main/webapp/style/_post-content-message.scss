@@ -1,0 +1,45 @@
+@import "won-config";
+@import "speech-bubble";
+@import "square-image";
+@import "animate";
+
+won-post-content-message {
+  &.won-is-loading {
+    @include animateOpacityHeartBeat();
+  }
+
+  padding: 0.5rem 0;
+  @include square-image($postIconSize, 0 0.5rem 0 0);
+  display: grid;
+  grid-template-areas: "content";
+  grid-template-columns: 1fr;
+
+  .won-cm__center {
+    grid-area: content;
+    font-size: $smallFontSize;
+    max-width: 100%;
+
+    .won-cm__center__bubble {
+      display: grid;
+      grid-template-columns: 1fr;
+      border: $thinGrayBorder;
+      word-break: break-word;
+      box-sizing: border-box; // background: $won-light-gray;
+      background-color: white; // like the error toast-notifications
+      color: black;
+
+      @include speech-bubble-top(
+        white,
+        $won-line-gray,
+        $speechBubbleTailSize / 2,
+        $thinBorderWidth,
+        2.9rem
+      );
+
+      > won-post-content {
+        padding: 0.5rem;
+        background: white;
+      }
+    }
+  }
+}
