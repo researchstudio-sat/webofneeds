@@ -30,7 +30,7 @@ function genComponentConf() {
               </a>
               <a class="post-info__header__back__button clickable hide-in-responsive"
                   ng-if="!self.showOverlayNeed"
-                  ng-click=" self.router__stateGoCurrent({connectionUri : undefined})">
+                  ng-click=" self.router__stateGoCurrent({postUri : undefined})">
                   <svg class="post-info__header__back__button__icon">
                       <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
                   </svg>
