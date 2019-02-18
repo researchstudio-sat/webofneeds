@@ -18,6 +18,31 @@ won-post-content {
       background-color: white;
     }
 
+    .post-content__menu {
+      display: flex;
+      border-bottom: $thinPrimaryBorder;
+
+      & > .post-content__menu__item {
+        cursor: pointer;
+        padding: 0.25rem 0.5rem;
+
+        &.post-content__menu__item--inactive {
+          color: $won-line-gray;
+        }
+
+        &.post-content__menu__item--selected {
+          color: $won-primary-color;
+          border-bottom: 0.2rem solid $won-primary-color;
+          cursor: default;
+          pointer-events: none;
+        }
+
+        & > .post-content__menu__item__label {
+          font-size: $normalFontSize;
+        }
+      }
+    }
+
     won-trig {
       background-color: $won-light-gray;
       border: $thinGrayBorder;
@@ -25,6 +50,12 @@ won-post-content {
     }
 
     .post-content__members {
+      &__empty {
+        color: $won-line-gray;
+        padding: 0.5rem;
+        text-align: center;
+      }
+
       & .post-content__members__member {
         padding: 0.5rem;
         border: $thinGrayBorder;
@@ -34,7 +65,7 @@ won-post-content {
         grid-template-columns: 1fr min-content;
         grid-gap: 0.25rem;
         align-items: center;
-        margin-bottom: 0.5rem;
+        margin-top: 0.5rem;
 
         &:hover {
           background: white;
@@ -47,6 +78,12 @@ won-post-content {
     }
 
     .post-content__otherneeds {
+      &__empty {
+        color: $won-line-gray;
+        padding: 0.5rem;
+        text-align: center;
+      }
+
       & .post-content__otherneeds__otherneed {
         padding: 0.5rem;
         border: $thinGrayBorder;
@@ -56,7 +93,7 @@ won-post-content {
         grid-template-columns: 1fr min-content;
         grid-gap: 0.25rem;
         align-items: center;
-        margin-bottom: 0.5rem;
+        margin-top: 0.5rem;
 
         &:hover {
           background: white;
@@ -69,6 +106,12 @@ won-post-content {
     }
 
     .post-content__suggestions {
+      &__empty {
+        color: $won-line-gray;
+        padding: 0.5rem;
+        text-align: center;
+      }
+
       & .post-content__suggestions__suggestion {
         padding: 0.5rem;
         border: $thinGrayBorder;
@@ -78,7 +121,7 @@ won-post-content {
         grid-template-columns: 1fr min-content;
         grid-gap: 0.25rem;
         align-items: center;
-        margin-bottom: 0.5rem;
+        margin-top: 0.5rem;
 
         &.won-unread {
           background: $won-unread;
