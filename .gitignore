@@ -20,7 +20,8 @@ nbproject
 **/.springBeans
 
 # VSCode
-.vscode/
+**/.vscode/*
+!**/.vscode/extensions.json
 
 # Buildtools
 build.properties
