@@ -32,13 +32,20 @@ const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
         <div class="gpm__header">
-            <a class="gpm__header__back clickable"
-               ng-click="self.router__back()">
-                <svg style="--local-primary:var(--won-primary-color);"
-                     class="gpm__header__back__icon clickable">
-                    <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
-                </svg>
-            </a>
+            <div class="gpm__header__back">
+                <a class="gpm__header__back__button clickable show-in-responsive"
+                   ng-click="self.router__back()"> <!-- TODO: Clicking on the back button in non-mobile view might lead to some confusing changes -->
+                    <svg class="gpm__header__back__button__icon">
+                        <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
+                    </svg>
+                </a>
+                <a class="gpm__header__back__button clickable hide-in-responsive"
+                   ng-click="self.router__stateGoCurrent({connectionUri : undefined})">
+                    <svg class="gpm__header__back__button__icon">
+                        <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
+                    </svg>
+                </a>
+            </div>
             <won-connection-header
                 connection-uri="self.connectionUri">
             </won-connection-header>
