@@ -67,7 +67,7 @@ function genComponentConf() {
               ng-repeat="memberUri in self.groupMembersArray track by memberUri">
               <won-post-header
                 class="clickable"
-                ng-click="self.router__stateGoCurrent({viewNeedUri: memberUri})"
+                ng-click="self.router__stateGoCurrent({viewNeedUri: memberUri, viewConnUri: undefined})"
                 need-uri="::memberUri">
               </won-post-header>
             </div>
@@ -81,7 +81,7 @@ function genComponentConf() {
               ng-class="{'won-unread': conn.get('unread')}">
                 <won-post-header
                   class="clickable"
-                  ng-click="self.connections__markAsRead({connectionUri: conn.get('uri'), needUri: self.post.get('uri')}) && self.router__stateGoCurrent({viewNeedUri: conn.get('remoteNeedUri')})"
+                  ng-click="self.connections__markAsRead({connectionUri: conn.get('uri'), needUri: self.post.get('uri')}) && self.router__stateGoCurrent({viewConnUri: conn.get('uri'), viewNeedUri: undefined})"
                   need-uri="::conn.get('remoteNeedUri')">
                 </won-post-header>
                 <div class="post-content__suggestions__suggestion__actions">
@@ -107,7 +107,7 @@ function genComponentConf() {
               ng-repeat="heldPostUri in self.heldPostsArray track by heldPostUri">
               <won-post-header
                 class="clickable"
-                ng-click="self.router__stateGoCurrent({viewNeedUri: heldPostUri})"
+                ng-click="self.router__stateGoCurrent({viewNeedUri: heldPostUri, viewConnUri: undefined})"
                 need-uri="::heldPostUri">
               </won-post-header>
             </div>
