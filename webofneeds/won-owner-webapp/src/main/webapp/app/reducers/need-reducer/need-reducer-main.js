@@ -255,7 +255,7 @@ export default function(allNeedsInState = initialState, action = {}) {
         return addMessage(stateUpdated, action.payload.optimisticEvent);
       } else {
         const tmpConnectionUri = "connectionFrom:" + eventUri;
-        //need to wait for success-response to sett hat
+        //need to wait for success-response to set that
         const optimisticConnection = Immutable.fromJS({
           uri: tmpConnectionUri,
           usingTemporaryUri: true,

@@ -122,15 +122,10 @@ function genComponentConf() {
     openRequest(connUri, message = "") {
       this.connections__open(connUri, message);
     }
-
-    sendRequest(connUri, remoteNeedUri, message = "") {
+    
+    sendRequest(connUri, remoteNeedUri) {
       this.connections__rate(connUri, won.WON.binaryRatingGood);
-      this.needs__connect(
-        this.groupPostAdminUri,
-        connUri,
-        remoteNeedUri,
-        message
-      );
+      this.needs__connect(this.groupPostAdminUri, connUri, remoteNeedUri);
     }
 
     closeConnection(connUri, rateBad = false) {
