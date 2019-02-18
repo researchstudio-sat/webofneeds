@@ -18,13 +18,20 @@ const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
         <div class="ga__header">
-            <a class="ga__header__back clickable"
-               ng-click="self.router__stateGoCurrent({groupPostAdminUri : undefined})">
-                <svg style="--local-primary:var(--won-primary-color);"
-                     class="ga__header__back__icon clickable">
-                    <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
-                </svg>
-            </a>
+            <div class="ga__header__back">
+              <a class="ga__header__back__button clickable show-in-responsive"
+                 ng-click="self.router__back()"> <!-- TODO: Clicking on the back button in non-mobile view might lead to some confusing changes -->
+                  <svg class="ga__header__back__button__icon">
+                      <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
+                  </svg>
+              </a>
+              <a class="ga__header__back__button clickable hide-in-responsive"
+                 ng-click="self.router__stateGoCurrent({groupPostAdminUri : undefined})">
+                  <svg class="ga__header__back__button__icon">
+                      <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
+                  </svg>
+              </a>
+            </div>
             <won-group-administration-header
               need-uri="self.groupPostAdminUri">
             </won-group-administration-header>
