@@ -40,3 +40,24 @@ export function isAnonymousSlideInExpanded(viewState) {
 export function showAnonymousSlideInEmailInput(viewState) {
   return getIn(viewState, ["anonymousSlideIn", "showEmailInput"]);
 }
+
+/**
+ * Return the visible Tab of a certain need, and if there was no tab stored in the state, return
+ * the notFoundTab, which defaults to DETAIL
+ * @param viewState
+ * @param needUri
+ * @param notFoundTab
+ * @returns {*|string}
+ */
+export function getVisibleTabByNeedUri(
+  viewState,
+  needUri,
+  notFoundTab = "DETAIL"
+) {
+  const tab = getIn(viewState, ["needs", needUri, "visibleTab"]);
+  return tab || notFoundTab;
+}
+
+export function isShowingGeneralInfoByNeedUri(viewState, needUri) {
+  return getIn(viewState, ["needs", needUri, "showGeneralInfo"]);
+}
