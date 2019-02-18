@@ -27,6 +27,7 @@ const initialState = Immutable.fromJS({
 
 const initialNeedState = Immutable.fromJS({
   showGeneralInfo: false,
+  visibleTab: "DETAIL",
 });
 
 export default function(viewState = initialState, action = {}) {
@@ -145,6 +146,17 @@ export default function(viewState = initialState, action = {}) {
         initialNeedState,
         needState => needState.update("showGeneralInfo", show => !show)
       );
+
+    case actionTypes.needs.selectTab: {
+      const needUri = action.payload.get("needUri");
+      const selectTab = action.payload.get("selectTab");
+
+      return viewState.updateIn(
+        ["needs", needUri],
+        initialNeedState,
+        needState => needState.update("visibleTab", () => selectTab)
+      );
+    }
 
     default:
       return viewState;
