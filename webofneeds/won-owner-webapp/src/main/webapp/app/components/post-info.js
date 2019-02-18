@@ -56,7 +56,7 @@ function genComponentConf() {
         <won-post-content post-uri="self.postUri"></won-post-content>
         <div class="post-info__footer" ng-if="self.showFooter">
             <button class="won-button--filled red post-info__footer__button"
-                ng-if="self.showCreateWhatsAround()"
+                ng-if="self.showCreateWhatsAround"
                 ng-click="self.createWhatsAround()"
                 ng-disabled="self.processingPublish">
                 <svg class="won-button-icon" style="--local-primary:white;">
