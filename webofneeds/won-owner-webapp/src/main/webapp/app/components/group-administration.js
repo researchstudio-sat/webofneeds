@@ -43,7 +43,7 @@ function genComponentConf() {
                 ng-repeat="conn in self.groupChatConnectionsArray">
                 <won-post-header
                   class="clickable"
-                  ng-click="self.router__stateGoCurrent({viewNeedUri: conn.get('remoteNeedUri')})"
+                  ng-click="self.router__stateGoCurrent({viewNeedUri: conn.get('remoteNeedUri'), viewConnUri: undefined})"
                   need-uri="::conn.get('remoteNeedUri')">
                 </won-post-header>
                 <div class="ga__content__member__actions">
