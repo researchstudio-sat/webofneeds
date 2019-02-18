@@ -2,6 +2,9 @@
 <div class="won-modal-needview" ng-if="self.showNeedOverlay">
     <won-post-info include-header="true" need-uri="self.viewNeedUri"></won-post-info>
 </div>
+<div class="won-modal-connectionview" ng-if="self.showConnectionOverlay">
+    <won-post-messages connection-uri="self.viewConnUri"></won-post-messages>
+</div>
 <header>
     <won-topnav></won-topnav>
 </header>

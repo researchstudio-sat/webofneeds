@@ -8,6 +8,8 @@ import { connect2Redux } from "../../won-utils.js";
 import won from "../../won-es6.js";
 import { actionCreators } from "../../actions/actions.js";
 import sendRequestModule from "../send-request.js";
+import postMessagesModule from "../post-messages.js";
+import groupPostMessagesModule from "../group-post-messages.js";
 import visitorTitleBarModule from "../visitor-title-bar.js";
 import * as generalSelectors from "../../selectors/general-selectors.js";
 import * as viewSelectors from "../../selectors/view-selectors.js";
@@ -87,5 +89,7 @@ export default angular
     sendRequestModule,
     ngAnimate,
     visitorTitleBarModule,
+    postMessagesModule,
+    groupPostMessagesModule,
   ])
   .controller("PostController", Controller).name;

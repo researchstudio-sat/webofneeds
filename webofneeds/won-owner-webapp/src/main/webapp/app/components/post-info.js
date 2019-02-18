@@ -44,7 +44,7 @@ function genComponentConf() {
                   <svg class="post-info__header__back__button__icon clickable show-in-responsive">
                       <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
                   </svg>
-                </a>
+              </a>
             </div>
             <won-post-header
                 need-uri="self.post.get('uri')">

@@ -45,20 +45,32 @@ function genComponentConf() {
         <div class="pm__header" ng-if="self.showChatData">
             <div class="pm__header__back">
               <a class="pm__header__back__button clickable show-in-responsive"
+                 ng-if="!self.showOverlayConnection"
                  ng-click="self.router__back()"> <!-- TODO: Clicking on the back button in non-mobile view might lead to some confusing changes -->
                   <svg class="pm__header__back__button__icon">
                       <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
                   </svg>
               </a>
               <a class="pm__header__back__button clickable hide-in-responsive"
+                 ng-if="!self.showOverlayConnection"
                  ng-click="self.router__stateGoCurrent({connectionUri : undefined})">
                   <svg class="pm__header__back__button__icon">
                       <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
                   </svg>
               </a>
+              <a class="pm__header__back__button clickable"
+                  ng-if="self.showOverlayConnection"
+                  ng-click="self.router__back()">
+                  <svg class="pm__header__back__button__icon clickable hide-in-responsive">
+                      <use xlink:href="#ico36_close" href="#ico36_close"></use>
+                  </svg>
+                  <svg class="pm__header__back__button__icon clickable show-in-responsive">
+                      <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
+                  </svg>
+              </a>
             </div>
             <won-connection-header
-                connection-uri="self.connectionUri">
+                connection-uri="self.selectedConnectionUri">
             </won-connection-header>
             <won-share-dropdown need-uri="self.remoteNeedUri"></won-share-dropdown>
             <won-connection-context-dropdown show-petri-net-data-field="::self.showPetriNetDataField()" show-agreement-data-field="::self.showAgreementDataField()"></won-connection-context-dropdown>
@@ -108,7 +120,7 @@ function genComponentConf() {
               class="won-cm--left"
               ng-if="self.showPostContentMessage"
               post-uri="self.remoteNeedUri"
-              connection-uri="self.connectionUri">
+              connection-uri="self.selectedConnectionUri">
             </won-post-content-message>
             <div class="pm__content__loadspinner"
                 ng-if="self.isProcessingLoadingMessages || (self.showAgreementData && self.isProcessingLoadingAgreementData) || (self.showPetriNetData && self.isProcessingLoadingPetriNetData && !self.hasPetriNetData)">
@@ -133,7 +145,7 @@ function genComponentConf() {
                 ng-if="self.showChatData"
                 ng-click="self.multiSelectType && self.selectMessage(msgUri)"
                 ng-repeat="msgUri in self.sortedMessageUris"
-                connection-uri="self.connectionUri"
+                connection-uri="self.selectedConnectionUri"
                 message-uri="::msgUri">
             </won-connection-message>
             <!-- CHATVIEW SPECIFIC CONTENT END-->
@@ -149,7 +161,7 @@ function genComponentConf() {
               ng-if="self.showAgreementData && !self.isProcessingLoadingAgreementData"
               ng-click="self.multiSelectType && self.selectMessage(agreementUri)"
               ng-repeat="agreementUri in self.agreementMessageUris"
-              connection-uri="self.connectionUri"
+              connection-uri="self.selectedConnectionUri"
               message-uri="::agreementUri">
             </won-connection-message>
             <div class="pm__content__agreement__title" ng-if="self.showAgreementData && self.hasCancellationPendingMessages && !self.isProcessingLoadingAgreementData">
@@ -159,7 +171,7 @@ function genComponentConf() {
               ng-if="self.showAgreementData && !self.isProcessingLoadingAgreementData"
               ng-click="self.multiSelectType && self.selectMessage(proposesToCancelUri)"
               ng-repeat="proposesToCancelUri in self.cancellationPendingMessageUris"
-              connection-uri="self.connectionUri"
+              connection-uri="self.selectedConnectionUri"
               message-uri="::proposesToCancelUri">
             </won-connection-message>
             <div class="pm__content__agreement__title" ng-if="self.showAgreementData && self.hasProposalMessages && !self.isProcessingLoadingAgreementData">
@@ -169,7 +181,7 @@ function genComponentConf() {
               ng-if="self.showAgreementData && !self.isProcessingLoadingAgreementData"
               ng-click="self.multiSelectType && self.selectMessage(proposalUri)"
               ng-repeat="proposalUri in self.proposalMessageUris"
-              connection-uri="self.connectionUri"
+              connection-uri="self.selectedConnectionUri"
               message-uri="::proposalUri">
             </won-connection-message>
             <!-- AGREEMENTVIEW SPECIFIC CONTENT END-->
@@ -194,7 +206,7 @@ function genComponentConf() {
             <a class="rdflink clickable"
                ng-if="self.shouldShowRdf"
                target="_blank"
-               href="{{ self.connectionUri }}">
+               href="{{ self.selectedConnectionUri }}">
                     <svg class="rdflink__small">
                         <use xlink:href="#rdf_logo_1" href="#rdf_logo_1"></use>
                     </svg>
@@ -204,7 +216,7 @@ function genComponentConf() {
         <div class="pm__footer" ng-if="!self.showPetriNetData && self.isConnected">
             <chat-textfield
                 class="pm__footer__chattexfield"
-                connection-uri="self.connectionUri"
+                connection-uri="self.selectedConnectionUri"
                 placeholder="self.shouldShowRdf? 'Enter TTL...' : 'Your message...'"
                 submit-button-label="self.shouldShowRdf? 'Send&#160;RDF' : 'Send'"
                 on-submit="::self.send(value, additionalContent, referencedContent, self.shouldShowRdf)"
@@ -222,7 +234,7 @@ function genComponentConf() {
         <div class="pm__footer" ng-if="!self.showPetriNetData && !self.multiSelectType && self.isReceivedRequest">
             <chat-textfield
                 class="pm__footer__chattexfield"
-                connection-uri="self.connectionUri"
+                connection-uri="self.selectedConnectionUri"
                 placeholder="::'Message (optional)'"
                 on-submit="::self.openRequest(value)"
                 allow-details="::false"
@@ -238,7 +250,7 @@ function genComponentConf() {
         <div class="pm__footer" ng-if="!self.showPetriNetData && !self.multiSelectType && self.isSuggested">
             <chat-textfield
                 placeholder="::'Message (optional)'"
-                connection-uri="self.connectionUri"
+                connection-uri="self.selectedConnectionUri"
                 on-submit="::self.sendRequest(value, selectedPersona)"
                 allow-details="::false"
                 allow-empty-submit="::true"
@@ -272,10 +284,15 @@ function genComponentConf() {
       this.scrollContainer().addEventListener("scroll", e => this.onScroll(e));
 
       const selectFromState = state => {
-        const connectionUri = getConnectionUriFromRoute(state);
-        const ownedNeed = getOwnedNeedByConnectionUri(state, connectionUri);
+        const selectedConnectionUri = this.connectionUri
+          ? this.connectionUri
+          : getConnectionUriFromRoute(state);
+        const ownedNeed = getOwnedNeedByConnectionUri(
+          state,
+          selectedConnectionUri
+        );
         const connection =
-          ownedNeed && ownedNeed.getIn(["connections", connectionUri]);
+          ownedNeed && ownedNeed.getIn(["connections", selectedConnectionUri]);
         const isOwnedNeedWhatsX =
           this.ownedNeed &&
           (needUtils.isWhatsAroundNeed(this.ownedNeed) ||
@@ -292,7 +309,7 @@ function genComponentConf() {
             .filter(msg => !messageUtils.isHintMessage(msg));
         const hasConnectionMessagesToLoad = hasMessagesToLoad(
           state,
-          connectionUri
+          selectedConnectionUri
         );
 
         const agreementData = connection && connection.get("agreementData");
@@ -300,15 +317,15 @@ function genComponentConf() {
 
         const agreementMessages = getAgreementMessagesByConnectionUri(
           state,
-          connectionUri
+          selectedConnectionUri
         );
         const cancellationPendingMessages = getCancellationPendingMessagesByConnectionUri(
           state,
-          connectionUri
+          selectedConnectionUri
         );
         const proposalMessages = getProposalMessagesByConnectionUri(
           state,
-          connectionUri
+          selectedConnectionUri
         );
 
         let sortedMessages = chatMessages && chatMessages.toArray();
@@ -325,7 +342,7 @@ function genComponentConf() {
 
         const unreadMessages = getUnreadMessagesByConnectionUri(
           state,
-          connectionUri
+          selectedConnectionUri
         );
 
         const chatMessagesWithUnknownState =
@@ -347,7 +364,7 @@ function genComponentConf() {
           ownedNeed,
           remoteNeed,
           remoteNeedUri,
-          connectionUri,
+          selectedConnectionUri,
           connection,
           isOwnedNeedWhatsX,
 
@@ -359,18 +376,21 @@ function genComponentConf() {
           unreadMessageCount: unreadMessages && unreadMessages.size,
           isProcessingLoadingMessages:
             connection &&
-            processUtils.isConnectionLoadingMessages(process, connectionUri),
+            processUtils.isConnectionLoadingMessages(
+              process,
+              selectedConnectionUri
+            ),
           isProcessingLoadingAgreementData:
             connection &&
             processUtils.isConnectionAgreementDataLoading(
               process,
-              connectionUri
+              selectedConnectionUri
             ),
           isProcessingLoadingPetriNetData:
             connection &&
             processUtils.isConnectionPetriNetDataLoading(
               process,
-              connectionUri
+              selectedConnectionUri
             ),
           showAgreementData: connection && connection.get("showAgreementData"),
           showPetriNetData: connection && connection.get("showPetriNetData"),
@@ -382,11 +402,14 @@ function genComponentConf() {
             agreementData &&
             processUtils.isConnectionAgreementDataLoaded(
               process,
-              connectionUri
+              selectedConnectionUri
             ),
           petriNetDataLoaded:
             petriNetData &&
-            processUtils.isConnectionPetriNetDataLoaded(process, connectionUri),
+            processUtils.isConnectionPetriNetDataLoaded(
+              process,
+              selectedConnectionUri
+            ),
           multiSelectType,
           lastUpdateTimestamp: connection && connection.get("lastUpdateDate"),
           isSentRequest: connectionUtils.isRequestSent(connection),
@@ -413,16 +436,22 @@ function genComponentConf() {
             !ownedNeed ||
             processUtils.isNeedLoading(process, ownedNeed.get("uri")) ||
             processUtils.isNeedLoading(process, remoteNeedUri) ||
-            processUtils.isConnectionLoading(process, connectionUri),
+            processUtils.isConnectionLoading(process, selectedConnectionUri),
           showPostContentMessage:
             showChatData &&
             !multiSelectType &&
             remoteNeedUri &&
             !needUtils.isDirectResponseNeed(remoteNeed),
+          showOverlayConnection: !!this.connectionUri,
         };
       };
 
-      connect2Redux(selectFromState, actionCreators, [], this);
+      connect2Redux(
+        selectFromState,
+        actionCreators,
+        ["self.connectionUri"],
+        this
+      );
 
       this._snapBottom = true; //Don't snap to bottom immediately, because this scrolls the whole page... somehow?
 
@@ -519,7 +548,7 @@ function genComponentConf() {
             !this.agreementDataLoaded)
         ) {
           this.connections__setLoadingAgreementData({
-            connectionUri: this.connectionUri,
+            connectionUri: this.selectedConnectionUri,
             loadingAgreementData: true,
           });
           fetchAgreementProtocolUris(this.connection.get("uri"))
@@ -565,7 +594,7 @@ function genComponentConf() {
               });
 
               this.connections__updateAgreementData({
-                connectionUri: this.connectionUri,
+                connectionUri: this.selectedConnectionUri,
                 agreementData: agreementData,
               });
 
@@ -577,7 +606,7 @@ function genComponentConf() {
             .catch(error => {
               console.error("Error:", error);
               this.connections__setLoadingAgreementData({
-                connectionUri: this.connectionUri,
+                connectionUri: this.selectedConnectionUri,
                 loadingAgreementData: false,
               });
             });
@@ -676,7 +705,7 @@ function genComponentConf() {
 
             this.messages__updateMessageStatus({
               messageUri: msgUri,
-              connectionUri: this.connectionUri,
+              connectionUri: this.selectedConnectionUri,
               needUri: this.ownedNeed.get("uri"),
               messageStatus: messageStatus,
             });
@@ -773,14 +802,14 @@ function genComponentConf() {
 
     setShowAgreementData(value) {
       this.connections__showAgreementData({
-        connectionUri: this.connectionUri,
+        connectionUri: this.selectedConnectionUri,
         showAgreementData: value,
       });
     }
 
     setShowPetriNetData(value) {
       this.connections__showPetriNetData({
-        connectionUri: this.connectionUri,
+        connectionUri: this.selectedConnectionUri,
         showPetriNetData: value,
       });
     }
@@ -805,7 +834,7 @@ function genComponentConf() {
     }
 
     openRequest(message) {
-      this.connections__open(this.connectionUri, message);
+      this.connections__open(this.selectedConnectionUri, message);
     }
 
     sendRequest(message, persona) {
@@ -814,7 +843,7 @@ function genComponentConf() {
 
         if (this.isOwnedNeedWhatsX) {
           //Close the connection if there was a present connection for a whatsaround need
-          this.connections__close(this.connectionUri);
+          this.connections__close(this.selectedConnectionUri);
         }
 
         if (this.remoteNeedUri) {
@@ -823,14 +852,19 @@ function genComponentConf() {
 
         //this.router__stateGoCurrent({connectionUri: null, sendAdHocRequest: null});
       } else {
-        this.connections__rate(this.connectionUri, won.WON.binaryRatingGood);
+        this.connections__rate(
+          this.selectedConnectionUri,
+          won.WON.binaryRatingGood
+        );
         this.needs__connect(
           this.ownedNeed.get("uri"),
-          this.connectionUri,
+          this.selectedConnectionUri,
           this.remoteNeedUri,
           message
         );
-        this.router__stateGoCurrent({ connectionUri: this.connectionUri });
+        this.router__stateGoCurrent({
+          connectionUri: this.selectedConnectionUri,
+        });
       }
     }
 
@@ -841,23 +875,11 @@ function genComponentConf() {
           won.WON.binaryRatingBad
         );
       this.connections__close(this.connection.get("uri"));
-      this.router__stateGoCurrent({ connectionUri: null });
-    }
 
-    rateMatch(rating) {
-      if (!this.isConnected) {
-        return;
-      }
-      switch (rating) {
-        case won.WON.binaryRatingGood:
-          this.connections__rate(this.connectionUri, won.WON.binaryRatingGood);
-          break;
-
-        case won.WON.binaryRatingBad:
-          this.connections__close(this.connectionUri);
-          this.connections__rate(this.connectionUri, won.WON.binaryRatingBad);
-          this.router__stateGoCurrent({ connectionUri: null });
-          break;
+      if (this.showOverlayConnection) {
+        this.router__back();
+      } else {
+        this.router__stateGoCurrent({ connectionUri: null });
       }
     }
 
@@ -881,7 +903,9 @@ function genComponentConf() {
     controller: Controller,
     controllerAs: "self",
     bindToController: true, //scope-bindings -> ctrl
-    scope: {},
+    scope: {
+      connectionUri: "=",
+    },
     template: template,
   };
 }
