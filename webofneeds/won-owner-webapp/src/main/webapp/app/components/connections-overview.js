@@ -12,9 +12,9 @@ import ngAnimate from "angular-animate";
 import squareImageModule from "./square-image.js";
 import postHeaderModule from "./post-header.js";
 import connectionIndicatorsModule from "./connection-indicators.js";
-import extendedConnectionIndicatorsModule from "./extended-connection-indicators.js";
 import connectionSelectionItemModule from "./connection-selection-item.js";
 import groupAdministrationSelectionItemModule from "./group-administration-selection-item.js";
+import suggestionSelectionItemModule from "./suggestion-selection-item.js";
 import createPostItemModule from "./create-post-item.js";
 
 import { attach, delay, sortByDate, get, getIn } from "../utils.js";
@@ -58,7 +58,7 @@ function genComponentConf() {
         </div>
         <div ng-repeat="needUri in self.sortedOpenNeedUris track by needUri" class="co__item"
             ng-class="{'co__item--withconn' : self.isOpen(needUri) && self.hasOpenOrLoadingChatConnections(needUri, self.allNeeds, self.process)}">
-            <div class="co__item__need" ng-class="{'won-unread': self.isUnread(needUri), 'selected' : needUri === self.needUriInRoute}">
+            <div class="co__item__need" ng-class="{'won-unread': self.isUnread(needUri), 'selected' : needUri === self.needUriInRoute, 'open': self.isOpen(needUri)}">
                 <div class="co__item__need__header">
                     <won-post-header
                         need-uri="::needUri"
@@ -67,12 +67,10 @@ function genComponentConf() {
                     </won-post-header>
                     <won-connection-indicators
                         on-selected-connection="::self.selectConnection(connectionUri)"
-                        need-uri="::needUri"
-                        ng-if="!self.isOpen(needUri)">
+                        need-uri="::needUri">
                     </won-connection-indicators>
                     <button
                         class="co__item__need__header__button red"
-                        ng-if="self.isOpen(needUri)"
                         ng-click="needUri === self.needUriInRoute ? self.selectNeed(undefined) : self.selectNeed(needUri)"
                         ng-class="{
                           'won-button--filled' : needUri === self.needUriInRoute,
@@ -80,57 +78,52 @@ function genComponentConf() {
                         }">
                         Details
                     </button>
-                    <div class="co__item__need__header__carret clickable" ng-click="self.toggleDetails(needUri)" ng-if="!self.isNeedLoading(needUri)">
-                        <svg
-                            style="--local-primary:var(--won-secondary-color);"
-                            class="co__item__need__header__carret__icon"
-                            ng-if="self.isOpen(needUri)">
-                                <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
-                        </svg>
-                        <svg
-                            style="--local-primary:var(--won-secondary-color);"
-                            class="co__item__need__header__carret__icon"
-                            ng-if="!self.isOpen(needUri)">
-                                <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
+                    <div class="co__item__need__header__carret clickable" ng-click="!self.isNeedLoading(needUri) && self.toggleDetails(needUri)">
+                        <svg class="co__item__need__header__carret__icon"
+                            ng-class="{
+                              'won-icon-expanded': self.isOpen(needUri),
+                              'won-icon-disabled': self.isNeedLoading(needUri),
+                            }">
+                            <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
                         </svg>
                     </div>
-                    <div class="co__item__need__header__carret" ng-if="self.isNeedLoading(needUri)">
-                        <svg
-                            style="--local-primary:var(--won-skeleton-color);"
-                            class="co__item__need__header__carret__icon"
-                            ng-if="self.isOpen(needUri)">
-                                <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
-                        </svg>
-                        <svg
-                            style="--local-primary:var(--won-skeleton-color);"
-                            class="co__item__need__header__carret__icon"
-                            ng-if="!self.isOpen(needUri)">
-                                <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
-                        </svg>
-                    </div>
-                </div>
-                <div class="co__item__need__detail" ng-if="self.isOpen(needUri)">
-                    <won-extended-connection-indicators
-                        class="co__item__need__detail__indicators"
-                        on-selected-connection="::self.selectConnection(connectionUri)"
-                        need-uri="::needUri">
-                    </won-extended-connection-indicators>
                 </div>
             </div>
             <div class="co__item__connections"
                 ng-if="self.isOpen(needUri) && (self.hasGroupFacet(needUri) || self.hasOpenOrLoadingChatConnections(needUri, self.allNeeds, self.process))">
-                <won-connection-selection-item
-                    ng-if="self.hasChatFacet(needUri)"
-                    ng-repeat="connUri in self.getOpenChatConnectionUrisArraySorted(needUri, self.allNeeds, self.process) track by connUri"
-                    on-selected-connection="::self.selectConnection(connectionUri)"
-                    connection-uri="::connUri"
-                    ng-class="{'won-unread': self.isConnectionUnread(needUri, connUri)}">
-                </won-connection-selection-item>
-                <won-group-administration-selection-item
-                    ng-if="self.hasGroupFacet(needUri)"
-                    need-uri="::needUri"
-                    on-selected="self.selectGroupChat(needUri)">
-                </won-group-administration-selection-item>
+                <div class="co__item__connections__item"
+                  ng-if="self.hasChatFacet(needUri)"
+                  ng-repeat="connUri in self.getOpenChatConnectionUrisArraySorted(needUri, self.allNeeds, self.process) track by connUri"
+                  ng-class="{
+                    'won-unread': self.isConnectionUnread(needUri, connUri),
+                    'selected': connUri === self.connUriInRoute
+                  }">
+                  <won-connection-selection-item
+                      on-selected-connection="::self.selectConnection(connectionUri)"
+                      connection-uri="::connUri"
+                      ng-class="{'won-unread': self.isConnectionUnread(needUri, connUri)}">
+                  </won-connection-selection-item>
+                </div>
+                <div class="co__item__connections__item nonsticky" ng-if="self.hasGroupFacet(needUri)"
+                  ng-class="{
+                    'won-unread': self.hasUnreadGroupConnections(needUri),
+                    'selected': self.isShowingGroupAdministration(needUri),
+                  }">
+                  <won-group-administration-selection-item
+                      need-uri="::needUri"
+                      on-selected="self.selectGroupChat(needUri)">
+                  </won-group-administration-selection-item>
+                </div>
+                <div class="co__item__connections__item nonsticky" ng-if="self.hasChatFacet(needUri) && self.hasSuggestedConnections(needUri)"
+                  ng-class="{
+                    'won-unread': self.hasUnreadSuggestedConnections(needUri),
+                    'selected': self.isShowingSuggestions(needUri),
+                  }">
+                  <won-suggestion-selection-item
+                      need-uri="::needUri"
+                      on-selected="self.showSuggestions(needUri)">
+                  </won-suggestion-selection-item>
+                </div>
             </div>
         </div>
         <div class="co__separator clickable" ng-class="{'co__separator--open' : self.showClosedNeeds}" ng-if="self.hasClosedNeeds()" ng-click="self.toggleClosedNeeds()">
@@ -158,7 +151,6 @@ function genComponentConf() {
                         </won-post-header>
                         <button
                             class="co__item__need__header__button red"
-                            ng-if="self.isOpen(needUri)"
                             ng-click="needUri === self.needUriInRoute ? self.selectNeed(undefined) : self.selectNeed(needUri)"
                             ng-class="{
                               'won-button--filled' : needUri === self.needUriInRoute,
@@ -166,40 +158,15 @@ function genComponentConf() {
                             }">
                             Details
                         </button>
-                        <div class="co__item__need__header__carret clickable" ng-click="self.toggleDetails(needUri)" ng-if="!self.isNeedLoading(needUri)">
-                            <svg
-                                style="--local-primary:var(--won-secondary-color);"
-                                class="co__item__need__header__carret__icon"
-                                ng-if="self.isOpen(needUri)">
-                                    <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
-                            </svg>
-                            <svg style="--local-primary:var(--won-secondary-color);"
-                                class="co__item__need__header__carret__icon"
-                                ng-if="!self.isOpen(needUri)">
-                                    <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
-                            </svg>
+                        <div class="co__item__need__header__carret clickable" ng-click="!self.isNeedLoading(needUri) && self.toggleDetails(needUri)">
+                          <svg class="co__item__need__header__carret__icon"
+                              ng-class="{
+                                'won-icon-expanded': self.isOpen(needUri),
+                                'won-icon-disabled': self.isNeedLoading(needUri),
+                              }">
+                              <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
+                          </svg>
                         </div>
-                        <div class="co__item__need__header__carret" ng-if="self.isNeedLoading(needUri)">
-                            <svg
-                                style="--local-primary:var(--won-skeleton-color);"
-                                class="co__item__need__header__carret__icon"
-                                ng-if="self.isOpen(needUri)">
-                                    <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
-                            </svg>
-                            <svg
-                                style="--local-primary:var(--won-skeleton-color);"
-                                class="co__item__need__header__carret__icon"
-                                ng-if="!self.isOpen(needUri)">
-                                    <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="co__item__need__detail" ng-if="self.isOpen(needUri)">
-                        <won-extended-connection-indicators
-                            class="co__item__need__detail__indicators"
-                            on-selected-connection="::self.selectConnection(connectionUri)"
-                            need-uri="::needUri">
-                        </won-extended-connection-indicators>
                     </div>
                 </div>
             </div>
@@ -254,6 +221,8 @@ function genComponentConf() {
           useCaseGroup,
           needUriInRoute,
           needUriImpliedInRoute,
+          connUriInRoute,
+          groupPostAdminUriInRoute,
           beingCreatedNeedUris: beingCreatedNeeds && [
             ...beingCreatedNeeds.keys(),
           ],
@@ -323,6 +292,7 @@ function genComponentConf() {
         this.open[ownedNeedUri] = false;
         if (this.isOpenByConnection(ownedNeedUri)) {
           this.router__stateGoCurrent({
+            postUri: undefined,
             useCase: undefined,
             useCaseGroup: undefined,
             connectionUri: undefined,
@@ -336,6 +306,19 @@ function genComponentConf() {
       }
     }
 
+    showSuggestions(ownedNeedUri) {
+      //FIXME: Currently just opens need-details
+      this.router__stateGoCurrent({
+        postUri: ownedNeedUri,
+        useCase: undefined,
+        useCaseGroup: undefined,
+        connectionUri: undefined,
+        groupPostAdminUri: undefined,
+        fromNeedUri: undefined,
+        mode: undefined,
+      });
+    }
+
     hasChatFacet(needUri) {
       const need = get(this.allNeeds, needUri);
       return needUtils.hasChatFacet(need);
@@ -344,6 +327,26 @@ function genComponentConf() {
     hasGroupFacet(needUri) {
       const need = get(this.allNeeds, needUri);
       return needUtils.hasGroupFacet(need);
+    }
+
+    hasSuggestedConnections(needUri) {
+      const need = get(this.allNeeds, needUri);
+      return needUtils.hasSuggestedConnections(need);
+    }
+
+    hasUnreadSuggestedConnections(needUri) {
+      const need = get(this.allNeeds, needUri);
+      return needUtils.hasUnreadSuggestedConnections(need);
+    }
+
+    hasUnreadGroupConnections(needUri) {
+      const need = get(this.allNeeds, needUri);
+      const connections = get(need, "connections");
+      return connections
+        ? connections.find(
+            conn => isGroupChatConnection(conn) && get(conn, "unread")
+          )
+        : false;
     }
 
     isUnread(needUri) {
@@ -383,6 +386,18 @@ function genComponentConf() {
       return this.isOpenByConnection(ownedNeedUri) || !!this.open[ownedNeedUri];
     }
 
+    isShowingSuggestions(ownedNeedUri) {
+      //FIXME: Currently just checks if need need-details are open
+      return !!this.open[ownedNeedUri] && ownedNeedUri === this.needUriInRoute;
+    }
+
+    isShowingGroupAdministration(ownedNeedUri) {
+      return (
+        !!this.open[ownedNeedUri] &&
+        ownedNeedUri === this.groupPostAdminUriInRoute
+      );
+    }
+
     isNeedLoading(needUri) {
       return this.process.getIn(["needs", needUri, "loading"]);
     }
@@ -399,6 +414,9 @@ function genComponentConf() {
     }
     selectGroupChat(needUri) {
       this.onSelectedGroupChat({ needUri }); //trigger callback with scope-object
+    }
+    selectSuggested(needUri) {
+      console.debug("stuff should happen now IMPL ME for: ", needUri);
     }
 
     hasOpenOrLoadingChatConnections(needUri, allNeeds, process) {
@@ -466,7 +484,9 @@ function genComponentConf() {
               won.WON.ActiveCompacted;
 
           return (
-            remoteNeedActiveOrLoading && conn.get("state") !== won.WON.Closed
+            remoteNeedActiveOrLoading &&
+            conn.get("state") !== won.WON.Closed &&
+            conn.get("state") !== won.WON.Suggested
           );
         }),
         "creationDate"
@@ -503,9 +523,9 @@ export default angular
     squareImageModule,
     connectionSelectionItemModule,
     groupAdministrationSelectionItemModule,
+    suggestionSelectionItemModule,
     postHeaderModule,
     connectionIndicatorsModule,
-    extendedConnectionIndicatorsModule,
     ngAnimate,
     createPostItemModule,
   ])

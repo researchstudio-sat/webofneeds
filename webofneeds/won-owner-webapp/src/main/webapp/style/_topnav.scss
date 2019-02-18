@@ -4,7 +4,6 @@
 
 .topnav {
   //TODO split into single-purpose-classes
-  background-color: white;
   @include max-content-width($maxContentWidth, $minContentPadding, "topnav");
 
   > .topnav__inner {

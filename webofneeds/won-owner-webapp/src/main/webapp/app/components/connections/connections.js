@@ -21,6 +21,7 @@ import * as srefUtils from "../../sref-utils.js";
 import "style/_connections.scss";
 import "style/_responsiveness-utils.scss";
 import "style/_need-overlay.scss";
+import "style/_connection-overlay.scss";
 
 const serviceDependencies = ["$element", "$ngRedux", "$scope", "$state"];
 
@@ -32,6 +33,7 @@ class ConnectionsController {
     this.open = {};
 
     const selectFromState = state => {
+      const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
       const viewNeedUri = generalSelectors.getViewNeedUriFromRoute(state);
       const selectedPostUri = generalSelectors.getPostUriFromRoute(state);
       const selectedPost =
@@ -146,7 +148,9 @@ class ConnectionsController {
         showSlideIns:
           viewSelectors.hasSlideIns(state) && viewSelectors.showSlideIns(state),
         showNeedOverlay: !!viewNeedUri,
+        showConnectionOverlay: !!viewConnUri,
         viewNeedUri,
+        viewConnUri,
         hideListSideInResponsive:
           showCreateFromPost ||
           !hasOwnedNeeds ||

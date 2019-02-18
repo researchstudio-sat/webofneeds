@@ -10,15 +10,10 @@ import { classOnComponentRoot } from "../../cstm-ng-utils.js";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 
+import "style/_post-content-message.scss";
+
 function genComponentConf() {
   let template = `
-        <div class="pcm__icon__skeleton" ng-if="self.postLoading"></div>
-        <won-square-image
-            class="clickable"
-            uri="::self.postUri"
-            ng-if="!self.postLoading"
-            ng-click="self.router__stateGoCurrent({viewNeedUri: self.postUri})">
-        </won-square-image>
         <div class="won-cm__center">
             <div class="won-cm__center__bubble">
                 <won-post-content post-uri="self.postUri">

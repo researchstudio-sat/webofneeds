@@ -22,7 +22,13 @@ won-group-administration {
 
     &__back {
       grid-area: header_back;
-      &__icon {
+
+      &:hover {
+        filter: brightness(85%);
+      }
+
+      &__button__icon {
+        --local-primary: #{$won-primary-color};
         @include fixed-square($backIconSize);
       }
     }

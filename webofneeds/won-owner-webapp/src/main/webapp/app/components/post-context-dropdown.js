@@ -136,7 +136,10 @@ function genComponentConf() {
     }
 
     goToPersona(personaUri) {
-      this.router__stateGoCurrent({ viewNeedUri: personaUri });
+      this.router__stateGoCurrent({
+        viewNeedUri: personaUri,
+        viewConnUri: undefined,
+      });
     }
 
     closePost() {

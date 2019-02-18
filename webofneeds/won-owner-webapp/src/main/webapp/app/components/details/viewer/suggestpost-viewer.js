@@ -26,7 +26,7 @@ function genComponentConf() {
             <won-post-header
                 class="clickable"
                 need-uri="self.content"
-                ng-click="self.router__stateGoCurrent({viewNeedUri: self.content})"
+                ng-click="self.router__stateGoCurrent({viewNeedUri: self.content, viewConnUri: undefined})"
                 ng-disabled="!self.fetchedSuggestion">
             </won-post-header>
             <button class="suggestpostv__content__post__action won-button--outlined thin red"
