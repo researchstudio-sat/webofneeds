@@ -261,6 +261,19 @@ export function runMessagingAgent(redux) {
       }
       return false;
     },
+    function(message) {
+      if (message.isResponseToHintFeedbackMessage()) {
+        if (message.isSuccessResponse()) {
+          //Rating successful
+          //TODO?
+          return true;
+        } else {
+          //Failed Rating
+          //TODO?
+          return false;
+        }
+      }
+    },
   ];
 
   // processors that are used for reacting to certain messages after they

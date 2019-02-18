@@ -221,9 +221,9 @@ export function buildConnectMessage({
   messageBuilder.eventURI(eventUri);
   messageBuilder.forEnvelopeData(envelopeData);
   //do not set facets: connect the default facets with each other
-  if (typeof connectMessage === "string") {
+  if (connectMessage && typeof connectMessage === "string") {
     messageBuilder.hasTextMessage(connectMessage);
-  } else {
+  } else if (connectMessage) {
     messageBuilder.mergeIntoContentGraph(connectMessage);
   }
   messageBuilder.hasOwnerDirection();
