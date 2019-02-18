@@ -92,6 +92,18 @@ export const getViewNeedUriFromRoute = createSelector(
   }
 );
 
+export const getViewConnectionUriFromRoute = createSelector(
+  state => state,
+  state => {
+    const encodedConnUri = getIn(state, [
+      "router",
+      "currentParams",
+      "viewConnUri",
+    ]);
+    return decodeUriComponentProperly(encodedConnUri);
+  }
+);
+
 export const getUseCaseFromRoute = createSelector(
   state => state,
   state => {
