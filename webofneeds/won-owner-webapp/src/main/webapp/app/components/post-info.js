@@ -89,7 +89,7 @@ function genComponentConf() {
         const postFailedToLoad =
           post && processUtils.hasNeedFailedToLoad(process, postUri);
         const showCreateWhatsAround =
-          post && needUtils.isOwned(post) && needUtils.isWhatsNew(post);
+          post && needUtils.isOwned(post) && needUtils.isWhatsNewNeed(post);
 
         return {
           processingPublish: state.getIn(["process", "processingPublish"]),
