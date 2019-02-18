@@ -17,6 +17,7 @@ function genComponentConf() {
         <div class="won-cm__center">
             <div class="won-cm__center__bubble">
                 <won-post-content post-uri="self.postUri">
+                </won-post-content>
             </div>
         </div>
     `;
