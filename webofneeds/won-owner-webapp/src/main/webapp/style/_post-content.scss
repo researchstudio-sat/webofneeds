@@ -18,31 +18,6 @@ won-post-content {
       background-color: white;
     }
 
-    .post-content__menu {
-      display: flex;
-      border-bottom: $thinPrimaryBorder;
-
-      & > .post-content__menu__item {
-        cursor: pointer;
-        padding: 0.25rem 0.5rem;
-
-        &.post-content__menu__item--inactive {
-          color: $won-line-gray;
-        }
-
-        &.post-content__menu__item--selected {
-          color: $won-primary-color;
-          border-bottom: 0.2rem solid $won-primary-color;
-          cursor: default;
-          pointer-events: none;
-        }
-
-        & > .post-content__menu__item__label {
-          font-size: $normalFontSize;
-        }
-      }
-    }
-
     won-trig {
       background-color: $won-light-gray;
       border: $thinGrayBorder;

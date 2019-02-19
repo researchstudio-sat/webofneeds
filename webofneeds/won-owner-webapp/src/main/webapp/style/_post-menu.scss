@@ -1,0 +1,105 @@
+@import "won-config";
+@import "sizing-utils";
+@import "animate";
+
+won-post-menu {
+  display: flex;
+  border-bottom: $thinPrimaryBorder;
+
+  &.won-failed-to-load,
+  &.won-is-loading {
+    & > .post-menu__item {
+      color: $won-line-gray;
+
+      &.post-menu__item--inactive {
+        color: $won-line-gray;
+        cursor: default;
+        pointer-events: none;
+      }
+
+      &.post-menu__item--selected {
+        color: $won-line-gray;
+        border-bottom: 0.2rem solid $won-line-gray;
+      }
+    }
+  }
+
+  & > .post-menu__item {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    border-bottom: 0.2rem solid white;
+
+    &.post-menu__item--inactive {
+      color: $won-line-gray;
+      border-bottom: 0.2rem solid $won-line-gray;
+
+      & > .post-menu__item__count {
+        max-width: 0;
+        height: 0;
+        opacity: 0;
+        margin-left: 0;
+        overflow: hidden;
+        transition: max-width 0.25s ease-in-out, opacity 0.25s ease-in-out,
+          margin-left 0.25s ease-in-out;
+      }
+    }
+
+    &.post-menu__item--unread {
+      & > .post-menu__item__count,
+      & > .post-menu__item__label {
+        color: $won-unread-attention;
+      }
+      & > .post-menu__item__unread {
+        display: inline-block;
+        background-color: $won-unread-attention;
+        border-radius: 100%;
+        opacity: 1;
+        @include fixed-square(0.5rem);
+        margin-right: 0.25rem;
+        transition: max-width 0.25s ease-in-out, opacity 0.25s ease-in-out,
+          margin-right 0.25s ease-in-out;
+      }
+    }
+
+    &:not(.post-menu__item--unread) {
+      & > .post-menu__item__unread {
+        display: inline-block;
+        max-width: 0;
+        height: 0;
+        opacity: 0;
+        overflow: hidden;
+        margin-right: 0;
+        transition: max-width 0.25s ease-in-out, opacity 0.25s ease-in-out,
+          margin-right 0.25s ease-in-out;
+      }
+    }
+
+    &.post-menu__item--selected {
+      color: $won-primary-color;
+      border-bottom: 0.2rem solid $won-primary-color;
+      cursor: default;
+      pointer-events: none;
+    }
+
+    &:hover {
+      color: $won-primary-color-light;
+      border-bottom: 0.2rem solid $won-primary-color-light;
+    }
+
+    & > .post-menu__item__label {
+      font-size: $normalFontSize;
+    }
+
+    & > .post-menu__item__count {
+      display: inline-block;
+      max-width: 3rem;
+      margin-left: 0.25rem;
+      overflow: hidden;
+      opacity: 1;
+      transition: max-width 0.25s ease-in-out, opacity 0.25s ease-in-out,
+        margin-left 0.25s ease-in-out;
+    }
+  }
+}

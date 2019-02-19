@@ -3,8 +3,8 @@
  */
 
 import angular from "angular";
-import Immutable from "immutable";
 import postIsOrSeeksInfoModule from "./post-is-or-seeks-info.js";
+import postMenuModule from "./post-menu.js";
 import labelledHrModule from "./labelled-hr.js";
 import postContentGeneral from "./post-content-general.js";
 import postHeaderModule from "./post-header.js";
@@ -57,59 +57,16 @@ function genComponentConf() {
         </div>
         </div>
         <div class="post-content" ng-if="!self.postLoading && !self.postFailedToLoad">
-          <div class="post-content__menu">
-            <div class="post-content__menu__item"
-              ng-click="self.selectTab('DETAIL')"
-              ng-class="{
-                'post-content__menu__item--selected': self.isSelectedTab('DETAIL'),
-              }">
-              <span class="post-content__menu__item__label post-content__menu__item--selected">Detail</span>
-            </div>
-            <div class="post-content__menu__item"
-              ng-if="self.hasGroupFacet"
-              ng-click="self.selectTab('PARTICIPANTS')"
-              ng-class="{
-                'post-content__menu__item--selected': self.isSelectedTab('PARTICIPANTS'),
-                'post-content__menu__item--inactive': !self.hasGroupMembers,
-              }">
-              <span class="post-content__menu__item__label">Group Members</span>
-            </div>
-            <div class="post-content__menu__item"
-              ng-if="self.isOwned && self.hasChatFacet"
-              ng-click="self.selectTab('SUGGESTIONS')"
-              ng-class="{
-                'post-content__menu__item--selected': self.isSelectedTab('SUGGESTIONS'),
-                'post-content__menu__item--inactive': !self.hasSuggestions
-              }">
-              <span class="post-content__menu__item__label">Suggestions</span>
-            </div>
-            <div class="post-content__menu__item"
-              ng-if="self.isPersona"
-              ng-click="self.selectTab('OTHER_NEEDS')"
-              ng-class="{
-                'post-content__menu__item--selected': self.isSelectedTab('OTHER_NEEDS'),
-                'post-content__menu__item--inactive': !self.hasHeldPosts
-              }">
-              <span class="post-content__menu__item__label">Posts of this Persona</span>
-            </div>
-            <div class="post-content__menu__item"
-              ng-if="self.shouldShowRdf"
-              ng-click="self.selectTab('RDF')"
-              ng-class="{
-                'post-content__menu__item--selected': self.isSelectedTab('RDF'),
-              }">
-              <span class="post-content__menu__item__label">RDF</span>
-            </div>
-          </div>
+          <won-post-menu post-uri="self.postUri"></won-post-menu>
 
           <!-- DETAIL INFORMATION -->
-          <won-post-is-or-seeks-info branch="::'content'" ng-if="self.isSelectedTab('DETAIL') && self.hasContent" post-uri="self.post.get('uri')"></won-post-is-or-seeks-info>
+          <won-post-is-or-seeks-info branch="::'content'" ng-if="self.isSelectedTab('DETAIL') && self.hasContent" post-uri="self.postUri"></won-post-is-or-seeks-info>
           <won-labelled-hr label="::'Search'" class="cp__labelledhr" ng-show="self.isSelectedTab('DETAIL') && self.hasContent && self.hasSeeksBranch"></won-labelled-hr>
-          <won-post-is-or-seeks-info branch="::'seeks'" ng-if="self.isSelectedTab('DETAIL') && self.hasSeeksBranch" post-uri="self.post.get('uri')"></won-post-is-or-seeks-info>
+          <won-post-is-or-seeks-info branch="::'seeks'" ng-if="self.isSelectedTab('DETAIL') && self.hasSeeksBranch" post-uri="self.postUri"></won-post-is-or-seeks-info>
 
           <!-- GENERAL INFORMATION -->
           <won-labelled-hr ng-if="self.isSelectedTab('DETAIL')" ng-click="self.toggleShowGeneral()" arrow="self.showGeneral ? 'up' : 'down'" label="::'General Information'" class="cp__labelledhr"></won-labelled-hr>
-          <won-post-content-general class="post-collapsible-general" ng-if="self.isSelectedTab('DETAIL') && self.showGeneral" post-uri="self.post.get('uri')"></won-post-content-general>
+          <won-post-content-general class="post-collapsible-general" ng-if="self.isSelectedTab('DETAIL') && self.showGeneral" post-uri="self.postUri"></won-post-content-general>
 
           <!-- PARTICIPANT INFORMATION -->
           <div class="post-content__members" ng-if="self.isSelectedTab('PARTICIPANTS')">
@@ -138,7 +95,7 @@ function genComponentConf() {
               ng-class="{'won-unread': conn.get('unread')}">
                 <won-post-header
                   class="clickable"
-                  ng-click="self.connections__markAsRead({connectionUri: conn.get('uri'), needUri: self.post.get('uri')}) && self.router__stateGoCurrent({viewConnUri: conn.get('uri'), viewNeedUri: undefined})"
+                  ng-click="self.connections__markAsRead({connectionUri: conn.get('uri'), needUri: self.postUri}) && self.router__stateGoCurrent({viewConnUri: conn.get('uri'), viewNeedUri: undefined})"
                   need-uri="::conn.get('remoteNeedUri')">
                 </won-post-header>
                 <div class="post-content__suggestions__suggestion__actions">
@@ -182,7 +139,7 @@ function genComponentConf() {
           <div class="post-info__content__rdf" ng-if="self.isSelectedTab('RDF')">
             <a class="rdflink clickable"
               target="_blank"
-              href="{{self.post.get('uri')}}">
+              href="{{self.postUri}}">
                   <svg class="rdflink__small">
                       <use xlink:href="#rdf_logo_1" href="#rdf_logo_1"></use>
                   </svg>
@@ -217,7 +174,7 @@ function genComponentConf() {
         const post = getIn(state, ["needs", this.postUri]);
         const isPersona = needUtils.isPersona(post);
         const isOwned = needUtils.isOwned(post);
-        const content = post ? post.get("content") : undefined;
+        const content = get(post, "content");
 
         //TODO it will be possible to have more than one seeks
         const seeks = get(post, "seeks");
@@ -242,7 +199,6 @@ function genComponentConf() {
         const process = get(state, "process");
 
         return {
-          WON: won.WON,
           hasContent,
           hasSeeksBranch,
           post,
@@ -322,12 +278,6 @@ function genComponentConf() {
       return tabName === this.visibleTab;
     }
 
-    selectTab(tabName) {
-      this.needs__selectTab(
-        Immutable.fromJS({ needUri: get(this.post, "uri"), selectTab: tabName })
-      );
-    }
-
     /**
      * This function checks if there is at least one detail present that is displayable
      */
@@ -364,6 +314,7 @@ export default angular
     labelledHrModule,
     postContentGeneral,
     postHeaderModule,
+    postMenuModule,
     trigModule,
   ])
   .directive("wonPostContent", genComponentConf).name;
