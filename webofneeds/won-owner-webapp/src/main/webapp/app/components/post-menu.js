@@ -13,7 +13,6 @@ import * as processUtils from "../process-utils.js";
 import * as connectionSelectors from "../selectors/connection-selectors.js";
 import { actionCreators } from "../actions/actions.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
-import ngAnimate from "angular-animate";
 
 import "style/_post-menu.scss";
 
@@ -156,5 +155,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.postMenu", [ngAnimate])
+  .module("won.owner.components.postMenu", [])
   .directive("wonPostMenu", genComponentConf).name;

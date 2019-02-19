@@ -4,7 +4,9 @@
 
 won-post-menu {
   display: flex;
-  border-bottom: $thinPrimaryBorder;
+  background-color: $won-lighter-gray;
+  border-bottom: $thinGrayBorder;
+  padding: 0.5rem 0.5rem 0 0.5rem;
 
   &.won-failed-to-load,
   &.won-is-loading {
@@ -29,20 +31,20 @@ won-post-menu {
     align-items: center;
     cursor: pointer;
     padding: 0.25rem 0.5rem;
-    border-bottom: 0.2rem solid white;
+    border-bottom: 0.2rem solid $won-lighter-gray;
 
     &.post-menu__item--inactive {
       color: $won-line-gray;
-      border-bottom: 0.2rem solid $won-line-gray;
+      &.post-menu__item--selected {
+        border-bottom-color: 0.2rem solid $won-line-gray;
+      }
 
       & > .post-menu__item__count {
-        max-width: 0;
         height: 0;
         opacity: 0;
         margin-left: 0;
         overflow: hidden;
-        transition: max-width 0.25s ease-in-out, opacity 0.25s ease-in-out,
-          margin-left 0.25s ease-in-out;
+        transition: opacity 0.25s ease-in-out, margin-left 0.25s ease-in-out;
       }
     }
 
@@ -94,12 +96,10 @@ won-post-menu {
 
     & > .post-menu__item__count {
       display: inline-block;
-      max-width: 3rem;
       margin-left: 0.25rem;
       overflow: hidden;
       opacity: 1;
-      transition: max-width 0.25s ease-in-out, opacity 0.25s ease-in-out,
-        margin-left 0.25s ease-in-out;
+      transition: opacity 0.25s ease-in-out, margin-left 0.25s ease-in-out;
     }
   }
 }
