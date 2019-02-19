@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y python-numpy python-scipy
 
 # add webofneeds default config env variables
 ENV WON_CONFIG_DIR=/usr/src/matcher-rescal/conf
-ENV LOGBACK_CONFIG=logback_info.xml
+ENV LOGBACK_CONFIG=logback.xml
 
 # add the jar and the conf directory
 ADD ./won-matcher-rescal.jar /usr/src/matcher-rescal/
