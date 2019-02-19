@@ -90,6 +90,7 @@ function genComponentConf() {
               ng-repeat="conn in self.suggestionsArray"
               ng-if="self.hasSuggestions"
               ng-class="{'won-unread': conn.get('unread')}">
+                <div class="post-content__suggestions__suggestion__indicator"></div>
                 <won-post-header
                   class="clickable"
                   ng-click="self.connections__markAsRead({connectionUri: conn.get('uri'), needUri: self.postUri}) && self.router__stateGoCurrent({viewConnUri: conn.get('uri'), viewNeedUri: undefined})"
