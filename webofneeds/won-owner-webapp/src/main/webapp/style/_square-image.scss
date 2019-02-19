@@ -31,6 +31,10 @@
         box-sizing: border-box;
         padding: 0.25rem;
 
+        > svg {
+          @include fixed-square(calc(#{$size}-0.5rem));
+        }
+
         & .si__usecaseicon {
           --local-primary: #{$won-secondary-text-color};
         }

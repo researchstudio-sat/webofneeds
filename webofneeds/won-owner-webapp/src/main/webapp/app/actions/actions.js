@@ -157,6 +157,7 @@ const actionHierarchy = {
     storeUriFailed: INJ_DEFAULT,
 
     toggleGeneralInfo: INJ_DEFAULT,
+    selectTab: INJ_DEFAULT,
   },
   personas: {
     create: createPersona,

@@ -24,10 +24,12 @@ function genComponentConf() {
             <div class="vtb__inner">
                 <div class="vtb__inner__left">
                     <won-square-image
-                        uri="self.post.get('uri')">
+                        uri="self.postUri">
                     </won-square-image>
                     <hgroup>
-                        <h1 class="vtb__title">{{ self.post.get('humanReadable') }}</h1>
+                        <h1 class="vtb__title" ng-if="self.hasTitle()">{{ self.generateTitle() }}</h1>
+                        <h1 class="vtb__title vtb__title--notitle" ng-if="!self.hasTitle() && self.isDirectResponse">RE: no title</h1>
+                        <h1 class="vtb__title vtb__title--notitle" ng-if="!self.hasTitle() && !self.isDirectResponse">no title</h1>
                         <span class="vtb__titles__persona" ng-if="self.personaName">{{ self.personaName }}</span>
                         <span class="vtb__titles__groupchat"
                           ng-if="self.isGroupChatEnabled && !self.isChatEnabled">
@@ -42,8 +44,8 @@ function genComponentConf() {
                     </hgroup>
                 </div>
             </div>
-            <won-share-dropdown need-uri="self.post.get('uri')"></won-share-dropdown>
-            <won-post-context-dropdown need-uri="self.post.get('uri')"></won-post-context-dropdown>
+            <won-share-dropdown need-uri="self.postUri"></won-share-dropdown>
+            <won-post-context-dropdown need-uri="self.postUri"></won-post-context-dropdown>
         </nav>
     `;
 
@@ -59,11 +61,18 @@ function genComponentConf() {
         const personaUri = get(post, "heldBy");
         const persona = personaUri && getIn(state, ["needs", personaUri]);
         const personaName = get(persona, "humanReadable");
+        const isDirectResponse = needUtils.isDirectResponseNeed(post);
+        const responseToUri =
+          isDirectResponse && getIn(post, ["content", "responseToUri"]);
+        const responseToNeed =
+          responseToUri && getIn(state, ["needs", responseToUri]);
 
         return {
           postUri,
           post,
           personaName,
+          isDirectResponse,
+          responseToNeed,
           isGroupChatEnabled: needUtils.hasGroupFacet(post),
           isChatEnabled: needUtils.hasChatFacet(post),
           fullTypesLabel: post && generateFullNeedTypesLabel(post),
@@ -74,8 +83,21 @@ function genComponentConf() {
       };
       connect2Redux(selectFromState, actionCreators, [], this);
     }
-    back() {
-      window.history.back();
+
+    hasTitle() {
+      if (this.isDirectResponse && this.responseToNeed) {
+        return !!this.responseToNeed.get("humanReadable");
+      } else {
+        return !!this.post.get("humanReadable");
+      }
+    }
+
+    generateTitle() {
+      if (this.isDirectResponse && this.responseToNeed) {
+        return "Re: " + this.responseToNeed.get("humanReadable");
+      } else {
+        return this.post.get("humanReadable");
+      }
     }
   }
   Controller.$inject = serviceDependencies;

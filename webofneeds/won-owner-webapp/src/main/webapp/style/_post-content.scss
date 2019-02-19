@@ -25,6 +25,12 @@ won-post-content {
     }
 
     .post-content__members {
+      &__empty {
+        color: $won-line-gray;
+        padding: 0.5rem;
+        text-align: center;
+      }
+
       & .post-content__members__member {
         padding: 0.5rem;
         border: $thinGrayBorder;
@@ -34,7 +40,7 @@ won-post-content {
         grid-template-columns: 1fr min-content;
         grid-gap: 0.25rem;
         align-items: center;
-        margin-bottom: 0.5rem;
+        margin-top: 0.5rem;
 
         &:hover {
           background: white;
@@ -47,6 +53,12 @@ won-post-content {
     }
 
     .post-content__otherneeds {
+      &__empty {
+        color: $won-line-gray;
+        padding: 0.5rem;
+        text-align: center;
+      }
+
       & .post-content__otherneeds__otherneed {
         padding: 0.5rem;
         border: $thinGrayBorder;
@@ -56,7 +68,7 @@ won-post-content {
         grid-template-columns: 1fr min-content;
         grid-gap: 0.25rem;
         align-items: center;
-        margin-bottom: 0.5rem;
+        margin-top: 0.5rem;
 
         &:hover {
           background: white;
@@ -69,26 +81,45 @@ won-post-content {
     }
 
     .post-content__suggestions {
-      & .post-content__suggestions__suggestion {
+      &__empty {
+        color: $won-line-gray;
         padding: 0.5rem;
+        text-align: center;
+      }
+
+      & .post-content__suggestions__suggestion {
         border: $thinGrayBorder;
+        border-left: 0;
         background: $won-light-gray;
         display: grid;
-        grid-template-areas: "member_info member_actions";
-        grid-template-columns: 1fr min-content;
-        grid-gap: 0.25rem;
+        grid-template-areas: "member_indicator member_info member_actions";
+        grid-template-columns: min-content 1fr min-content;
         align-items: center;
-        margin-bottom: 0.5rem;
+        margin-top: 0.5rem;
 
-        &.won-unread {
-          background: $won-unread;
+        & > .post-content__suggestions__suggestion__indicator {
+          grid-area: member_indicator;
+          box-sizing: border-box;
+          width: 0.25rem;
+          height: 100%;
+        }
+
+        &.won-unread > .post-content__suggestions__suggestion__indicator {
+          border-left: 0.25rem solid $won-unread-attention;
+        }
+
+        &:not(.won-unread) > .post-content__suggestions__suggestion__indicator {
+          border-left: $thinGrayBorder;
         }
 
         won-post-header {
+          padding: 0.5rem 0.25rem;
           grid-area: member_info;
         }
 
         &__actions {
+          border-right: $thinGrayBorder;
+          padding-right: 0.5rem;
           display: grid;
           grid-auto-flow: column;
           grid-gap: 0.25rem;

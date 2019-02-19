@@ -14,7 +14,7 @@
   --won-unread: #dcf1ff;
 
   --won-unread: #ccdff5; /*If you want to indicate the unread status with a background (maybe in addition to a marker), use this slightly less in your face color*/
-  --won-unread-attention: #4b4c7a; /*Bold color used for markers that indicate an unread status of an element*/
+  --won-unread-attention: #006da6; /*Bold color used for markers that indicate an unread status of an element*/
 
   --won-dark-purple: #673a68;
   --won-dark-gray: #303a43;

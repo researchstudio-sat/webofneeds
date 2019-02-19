@@ -1,6 +1,7 @@
 import angular from "angular";
 import "ng-redux";
 import postContentModule from "./post-content.js";
+import postMenuModule from "./post-menu.js";
 import chatTextFieldModule from "./chat-textfield.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 import { getPostUriFromRoute } from "../selectors/general-selectors.js";
@@ -13,6 +14,7 @@ const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 
 function genComponentConf() {
   let template = `
+        <won-post-menu post-uri="self.postUriToConnectTo"></won-post-menu>
         <won-post-content post-uri="self.postUriToConnectTo"></won-post-content>
         <div class="post-info__footer" ng-if="!self.postLoading">
             <chat-textfield
@@ -90,6 +92,7 @@ function genComponentConf() {
 export default angular
   .module("won.owner.components.sendRequest", [
     chatTextFieldModule,
+    postMenuModule,
     postContentModule,
   ])
   .directive("wonSendRequest", genComponentConf).name;

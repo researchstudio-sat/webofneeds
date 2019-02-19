@@ -40,6 +40,7 @@ import {
   isGroupChatConnection,
 } from "../connection-utils.js";
 import * as needUtils from "../need-utils.js";
+import * as viewUtils from "../view-utils.js";
 
 const serviceDependencies = ["$ngRedux", "$scope"];
 function genComponentConf() {
@@ -47,6 +48,7 @@ function genComponentConf() {
         <won-create-post-item ng-class="{'selected' : !!self.useCaseGroup || !!self.useCase}"></won-create-post-item>
         <div ng-repeat="needUri in self.beingCreatedNeedUris track by needUri" class="co__item">
             <div class="co__item__need" ng-class="{'selected' : needUri === self.needUriInRoute}">
+                <div class="co__item__need__indicator"></div>
                 <div class="co__item__need__header">
                     <won-post-header
                         need-uri="::needUri"
@@ -59,6 +61,7 @@ function genComponentConf() {
         <div ng-repeat="needUri in self.sortedOpenNeedUris track by needUri" class="co__item"
             ng-class="{'co__item--withconn' : self.isOpen(needUri) && self.hasOpenOrLoadingChatConnections(needUri, self.allNeeds, self.process)}">
             <div class="co__item__need" ng-class="{'won-unread': self.isUnread(needUri), 'selected' : needUri === self.needUriInRoute, 'open': self.isOpen(needUri)}">
+                <div class="co__item__need__indicator"></div>
                 <div class="co__item__need__header">
                     <won-post-header
                         need-uri="::needUri"
@@ -82,7 +85,7 @@ function genComponentConf() {
                         <svg class="co__item__need__header__carret__icon"
                             ng-class="{
                               'won-icon-expanded': self.isOpen(needUri),
-                              'won-icon-disabled': self.isNeedLoading(needUri),
+                              'won-icon-disabled': !self.hasOpenOrLoadingChatConnections(needUri, self.allNeeds, self.process) || self.isNeedLoading(needUri),
                             }">
                             <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
                         </svg>
@@ -142,7 +145,7 @@ function genComponentConf() {
         </div>
         <div class="co__closedNeeds" ng-if="self.showClosedNeeds && self.closedNeedsSize > 0">
             <div ng-repeat="needUri in self.sortedClosedNeedUris track by needUri" class="co__item">
-                <div class="co__item__need" ng-class="{'won-unread': self.isUnread(needUri), 'selected' : needUri === self.needUriInRoute}">
+                <div class="co__item__need" ng-class="{'won-unread': self.isUnread(needUri), 'selected' : needUri === self.needUriInRoute, 'open': self.isOpen(needUri)}">
                     <div class="co__item__need__header">
                         <won-post-header
                             need-uri="::needUri"
@@ -213,10 +216,13 @@ function genComponentConf() {
           getIn(state, ["process", "needs", need.get("uri"), "toLoad"])
         );
 
+        const viewState = get(state, "view");
+
         return {
           allNeeds,
           process: state.get("process"),
-          showClosedNeeds: state.getIn(["view", "showClosedNeeds"]),
+          viewState,
+          showClosedNeeds: get(viewState, "showClosedNeeds"),
           useCase,
           useCaseGroup,
           needUriInRoute,
@@ -291,6 +297,9 @@ function genComponentConf() {
       if (this.isOpen(ownedNeedUri)) {
         this.open[ownedNeedUri] = false;
         if (this.isOpenByConnection(ownedNeedUri)) {
+          this.needs__selectTab(
+            Immutable.fromJS({ needUri: ownedNeedUri, selectTab: "DETAIL" })
+          );
           this.router__stateGoCurrent({
             postUri: undefined,
             useCase: undefined,
@@ -307,7 +316,9 @@ function genComponentConf() {
     }
 
     showSuggestions(ownedNeedUri) {
-      //FIXME: Currently just opens need-details
+      this.needs__selectTab(
+        Immutable.fromJS({ needUri: ownedNeedUri, selectTab: "SUGGESTIONS" })
+      );
       this.router__stateGoCurrent({
         postUri: ownedNeedUri,
         useCase: undefined,
@@ -387,8 +398,15 @@ function genComponentConf() {
     }
 
     isShowingSuggestions(ownedNeedUri) {
-      //FIXME: Currently just checks if need need-details are open
-      return !!this.open[ownedNeedUri] && ownedNeedUri === this.needUriInRoute;
+      const visibleTab = viewUtils.getVisibleTabByNeedUri(
+        this.viewState,
+        ownedNeedUri
+      );
+      return (
+        !!this.open[ownedNeedUri] &&
+        ownedNeedUri === this.needUriInRoute &&
+        visibleTab === "SUGGESTIONS"
+      );
     }
 
     isShowingGroupAdministration(ownedNeedUri) {
@@ -423,7 +441,7 @@ function genComponentConf() {
       const need = get(this.allNeeds, needUri);
 
       if (!need) {
-        return undefined;
+        return false;
       }
       return (
         need.get("state") === won.WON.ActiveCompacted &&

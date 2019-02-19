@@ -13,6 +13,8 @@ import won from "../won-es6.js";
 import { labels } from "../won-label-utils.js";
 import { connect2Redux } from "../won-utils.js";
 import * as needUtils from "../need-utils.js";
+import * as viewUtils from "../view-utils.js";
+import * as processUtils from "../process-utils.js";
 import * as connectionSelectors from "../selectors/connection-selectors.js";
 import { getConnectionUriFromRoute } from "../selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";
@@ -55,33 +57,43 @@ function genComponentConf() {
         </div>
         <div class="post-content" ng-if="!self.postLoading && !self.postFailedToLoad">
           <!-- DETAIL INFORMATION -->
-          <won-post-is-or-seeks-info branch="::'content'" ng-if="self.hasContent" post-uri="self.post.get('uri')"></won-post-is-or-seeks-info>
-          <won-labelled-hr label="::'Search'" class="cp__labelledhr" ng-show="self.hasContent && self.hasSeeksBranch"></won-labelled-hr>
-          <won-post-is-or-seeks-info branch="::'seeks'" ng-if="self.hasSeeksBranch" post-uri="self.post.get('uri')"></won-post-is-or-seeks-info>
+          <won-post-is-or-seeks-info branch="::'content'" ng-if="self.isSelectedTab('DETAIL') && self.hasContent" post-uri="self.postUri"></won-post-is-or-seeks-info>
+          <won-labelled-hr label="::'Search'" class="cp__labelledhr" ng-show="self.isSelectedTab('DETAIL') && self.hasContent && self.hasSeeksBranch"></won-labelled-hr>
+          <won-post-is-or-seeks-info branch="::'seeks'" ng-if="self.isSelectedTab('DETAIL') && self.hasSeeksBranch" post-uri="self.postUri"></won-post-is-or-seeks-info>
+
+          <!-- GENERAL INFORMATION -->
+          <won-labelled-hr ng-if="self.isSelectedTab('DETAIL')" ng-click="self.toggleShowGeneral()" arrow="self.showGeneral ? 'up' : 'down'" label="::'General Information'" class="cp__labelledhr"></won-labelled-hr>
+          <won-post-content-general class="post-collapsible-general" ng-if="self.isSelectedTab('DETAIL') && self.showGeneral" post-uri="self.postUri"></won-post-content-general>
 
           <!-- PARTICIPANT INFORMATION -->
-          <won-labelled-hr label="::'Group Members'" class="cp__labelledhr" ng-if="self.hasGroupMembers"></won-labelled-hr>
-          <div class="post-content__members" ng-if="self.hasGroupMembers">
+          <div class="post-content__members" ng-if="self.isSelectedTab('PARTICIPANTS')">
             <div
-              class="post-content__members__member"
-              ng-repeat="memberUri in self.groupMembersArray track by memberUri">
-              <won-post-header
-                class="clickable"
-                ng-click="self.router__stateGoCurrent({viewNeedUri: memberUri, viewConnUri: undefined})"
-                need-uri="::memberUri">
-              </won-post-header>
+                class="post-content__members__member"
+                ng-if="self.hasGroupMembers"
+                ng-repeat="memberUri in self.groupMembersArray track by memberUri">
+                <won-post-header
+                  class="clickable"
+                  ng-click="self.router__stateGoCurrent({viewNeedUri: memberUri, viewConnUri: undefined})"
+                  need-uri="::memberUri">
+                </won-post-header>
+            </div>
+            <div class="post-content__members__empty"
+                ng-if="!self.hasGroupMembers">
+                No Groupmembers present.
             </div>
           </div>
+
           <!-- SUGGESTIONS -->
-          <won-labelled-hr label="::'Suggestions'" class="cp__labelledhr" ng-if="self.hasSuggestions"></won-labelled-hr>
-          <div class="post-content__suggestions" ng-if="self.hasSuggestions">
+          <div class="post-content__suggestions" ng-if="self.isSelectedTab('SUGGESTIONS')">
             <div
               class="post-content__suggestions__suggestion"
               ng-repeat="conn in self.suggestionsArray"
+              ng-if="self.hasSuggestions"
               ng-class="{'won-unread': conn.get('unread')}">
+                <div class="post-content__suggestions__suggestion__indicator"></div>
                 <won-post-header
                   class="clickable"
-                  ng-click="self.connections__markAsRead({connectionUri: conn.get('uri'), needUri: self.post.get('uri')}) && self.router__stateGoCurrent({viewConnUri: conn.get('uri'), viewNeedUri: undefined})"
+                  ng-click="self.connections__markAsRead({connectionUri: conn.get('uri'), needUri: self.postUri}) && self.router__stateGoCurrent({viewConnUri: conn.get('uri'), viewNeedUri: undefined})"
                   need-uri="::conn.get('remoteNeedUri')">
                 </won-post-header>
                 <div class="post-content__suggestions__suggestion__actions">
@@ -97,13 +109,17 @@ function genComponentConf() {
                     </div>
                 </div>
             </div>
+            <div class="post-content__suggestions__empty"
+                ng-if="!self.hasSuggestions">
+                No Suggestions for this Need.
+            </div>
           </div>
 
           <!-- OTHER NEEDS -->
-          <won-labelled-hr label="::'Posts of this Persona'" class="cp__labelledhr" ng-if="self.isPersona && self.hasHeldPosts"></won-labelled-hr>
-          <div class="post-content__members" ng-if="self.isPersona && self.hasHeldPosts">
+          <div class="post-content__members" ng-if="self.isSelectedTab('OTHER_NEEDS')">
             <div
               class="post-content__members__member"
+              ng-if="self.hasHeldPosts"
               ng-repeat="heldPostUri in self.heldPostsArray track by heldPostUri">
               <won-post-header
                 class="clickable"
@@ -111,18 +127,17 @@ function genComponentConf() {
                 need-uri="::heldPostUri">
               </won-post-header>
             </div>
+            <div class="post-content__members__empty"
+                ng-if="!self.hasHeldPosts">
+                This Persona does not have any Needs.
+            </div>
           </div>
-          <!-- GENERAL INFORMATION -->
-          <won-labelled-hr ng-click="self.toggleShowGeneral()" arrow="self.showGeneral ? 'up' : 'down'" label="::'General Information'" class="cp__labelledhr"></won-labelled-hr>
-          <won-post-content-general class="post-collapsible-general" ng-if="self.showGeneral" post-uri="self.post.get('uri')"></won-post-content-general>
+
           <!-- RDF REPRESENTATION -->
-          <div class="post-info__content__rdf" ng-if="self.shouldShowRdf">
-            <h2 class="post-info__heading">
-                RDF
-            </h2>
+          <div class="post-info__content__rdf" ng-if="self.isSelectedTab('RDF')">
             <a class="rdflink clickable"
               target="_blank"
-              href="{{self.post.get('uri')}}">
+              href="{{self.postUri}}">
                   <svg class="rdflink__small">
                       <use xlink:href="#rdf_logo_1" href="#rdf_logo_1"></use>
                   </svg>
@@ -157,7 +172,7 @@ function genComponentConf() {
         const post = getIn(state, ["needs", this.postUri]);
         const isPersona = needUtils.isPersona(post);
         const isOwned = needUtils.isOwned(post);
-        const content = post ? post.get("content") : undefined;
+        const content = get(post, "content");
 
         //TODO it will be possible to have more than one seeks
         const seeks = get(post, "seeks");
@@ -178,35 +193,37 @@ function genComponentConf() {
           isOwned &&
           (needUtils.isWhatsAroundNeed(post) || needUtils.isWhatsNewNeed(post));
 
+        const viewState = get(state, "view");
+        const process = get(state, "process");
+
         return {
-          WON: won.WON,
           hasContent,
           hasSeeksBranch,
           post,
           isOwnedNeedWhatsX,
           isPersona,
+          isOwned,
           hasHeldPosts: isPersona && heldPosts && heldPosts.size > 0,
           heldPostsArray: isPersona && heldPosts && heldPosts.toArray(),
+          hasGroupFacet: needUtils.hasGroupFacet(post),
+          hasChatFacet: needUtils.hasChatFacet(post),
           hasGroupMembers: groupMembers && groupMembers.size > 0,
           groupMembersArray: groupMembers && groupMembers.toArray(),
           hasSuggestions: isOwned && suggestions && suggestions.size > 0,
           suggestionsArray: isOwned && suggestions && suggestions.toArray(),
           postLoading:
-            !post ||
-            getIn(state, ["process", "needs", post.get("uri"), "loading"]),
+            !post || processUtils.isNeedLoading(process, this.postUri),
           postFailedToLoad:
-            post &&
-            getIn(state, ["process", "needs", post.get("uri"), "failedToLoad"]),
+            post && processUtils.hasNeedFailedToLoad(process, this.postUri),
           createdTimestamp: post && post.get("creationDate"),
-          shouldShowRdf: state.getIn(["view", "showRdf"]),
+          shouldShowRdf: viewUtils.showRdf(viewState),
           fromConnection: !!openConnectionUri,
           openConnectionUri,
-          showGeneral: state.getIn([
-            "view",
-            "needs",
-            this.postUri,
-            "showGeneralInfo",
-          ]),
+          showGeneral: viewUtils.isShowingGeneralInfoByNeedUri(
+            viewState,
+            this.postUri
+          ),
+          visibleTab: viewUtils.getVisibleTabByNeedUri(viewState, this.postUri),
         };
       };
       connect2Redux(selectFromState, actionCreators, ["self.postUri"], this);
@@ -253,6 +270,10 @@ function genComponentConf() {
 
     toggleShowGeneral() {
       this.needs__toggleGeneralInfo(this.postUri);
+    }
+
+    isSelectedTab(tabName) {
+      return tabName === this.visibleTab;
     }
 
     /**

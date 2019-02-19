@@ -6,10 +6,12 @@ import angular from "angular";
 import postHeaderModule from "./post-header.js";
 import postContextDropdownModule from "./post-context-dropdown.js";
 import postContentModule from "./post-content.js";
+import postMenuModule from "./post-menu.js";
 import shareDropdownModule from "./share-dropdown.js";
-import { attach, getIn } from "../utils.js";
+import { attach, get } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
-import { isWhatsNewNeed } from "../need-utils.js";
+import * as processUtils from "../process-utils.js";
+import * as needUtils from "../need-utils.js";
 import { getPostUriFromRoute } from "../selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
@@ -52,10 +54,11 @@ function genComponentConf() {
             <won-share-dropdown need-uri="self.post.get('uri')"></won-share-dropdown>
             <won-post-context-dropdown need-uri="self.post.get('uri')"></won-post-context-dropdown>
         </div>
+        <won-post-menu post-uri="self.postUri"></won-post-menu>
         <won-post-content post-uri="self.postUri"></won-post-content>
-        <div class="post-info__footer" ng-if="!self.postLoading && !self.postFailedToLoad && self.showCreateWhatsAround()">
+        <div class="post-info__footer" ng-if="self.showFooter">
             <button class="won-button--filled red post-info__footer__button"
-                ng-if="self.showCreateWhatsAround()"
+                ng-if="self.showCreateWhatsAround"
                 ng-click="self.createWhatsAround()"
                 ng-disabled="self.processingPublish">
                 <svg class="won-button-icon" style="--local-primary:white;">
@@ -81,19 +84,26 @@ function genComponentConf() {
           ? this.needUri
           : getPostUriFromRoute(state);
         const post = state.getIn(["needs", postUri]);
+        const process = get(state, "process");
+
+        const postLoading =
+          !post || processUtils.isNeedLoading(process, postUri);
+        const postFailedToLoad =
+          post && processUtils.hasNeedFailedToLoad(process, postUri);
+        const showCreateWhatsAround =
+          post && needUtils.isOwned(post) && needUtils.isWhatsNewNeed(post);
 
         return {
           processingPublish: state.getIn(["process", "processingPublish"]),
           postUri,
           post,
-          postLoading:
-            !post ||
-            getIn(state, ["process", "needs", post.get("uri"), "loading"]),
-          postFailedToLoad:
-            post &&
-            getIn(state, ["process", "needs", post.get("uri"), "failedToLoad"]),
+          postLoading,
+          postFailedToLoad,
           createdTimestamp: post && post.get("creationDate"),
           showOverlayNeed: !!this.needUri,
+          showCreateWhatsAround,
+          showFooter:
+            !postLoading && !postFailedToLoad && showCreateWhatsAround,
         };
       };
       connect2Redux(
@@ -104,10 +114,6 @@ function genComponentConf() {
       );
 
       classOnComponentRoot("won-is-loading", () => this.postLoading, this);
-    }
-
-    showCreateWhatsAround() {
-      return this.post && this.post.get("isOwned") && isWhatsNewNeed(this.post);
     }
 
     createWhatsAround() {
@@ -134,6 +140,7 @@ function genComponentConf() {
 export default angular
   .module("won.owner.components.postInfo", [
     postHeaderModule,
+    postMenuModule,
     postContextDropdownModule,
     postContentModule,
     shareDropdownModule,

@@ -12,7 +12,7 @@ won-create-isseeks {
     grid-auto-flow: row;
 
     &__item {
-      $item-indicator-width: 0.2rem;
+      $item-indicator-width: 0.25rem;
       $item-padding: 0.5rem;
       padding: $item-padding;
       display: grid;
@@ -36,7 +36,7 @@ won-create-isseeks {
 
       &--won-hasvalue,
       &--won-hasvalue:hover {
-        border-left: $item-indicator-width solid $won-primary-color;
+        border-left: $item-indicator-width solid $won-unread-attention;
         padding-left: $item-padding;
       }
 
