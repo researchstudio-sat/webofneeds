@@ -39,7 +39,6 @@ won-group-administration-selection-item {
       "before" /* needed so there can be another tail*/
     );
     border-left: $thinBorderWidth solid $won-unread-attention;
-    background: $won-unread; /*Decide if that is too much or not - we already have the attention indicator set anyway*/
   }
 
   $invisibleBorder: $thinBorderWidth solid $won-light-gray;
