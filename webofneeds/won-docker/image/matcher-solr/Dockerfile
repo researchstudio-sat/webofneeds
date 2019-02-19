@@ -7,7 +7,7 @@ FROM openjdk:8u121-jdk
 
 # add webofneeds default config env variables
 ENV WON_CONFIG_DIR=/usr/src/matcher-solr/conf
-ENV LOGBACK_CONFIG=logback_info.xml
+ENV LOGBACK_CONFIG=logback.xml
 
 # add the default monitoring output directory
 RUN mkdir -p /usr/src/matcher-solr/monitoring/logs
