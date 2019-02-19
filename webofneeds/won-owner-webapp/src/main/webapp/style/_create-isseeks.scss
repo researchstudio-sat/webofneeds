@@ -36,7 +36,7 @@ won-create-isseeks {
 
       &--won-hasvalue,
       &--won-hasvalue:hover {
-        border-left: $item-indicator-width solid $won-primary-color;
+        border-left: $item-indicator-width solid $won-unread-attention;
         padding-left: $item-padding;
       }
 
