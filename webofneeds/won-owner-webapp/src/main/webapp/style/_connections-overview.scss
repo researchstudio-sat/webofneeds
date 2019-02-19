@@ -13,21 +13,31 @@ won-connections-overview {
 
     &__need {
       display: grid;
-      grid-row-gap: 0.5rem;
-      padding: 0.5rem;
+      grid-auto-flow: column;
+      grid-template-columns: min-content 1fr;
+
       border-bottom: $thinGrayBorder;
       box-sizing: border-box;
       overflow: hidden;
-      border-left: $thinGrayBorder;
-
-      @media (max-width: $responsivenessBreakPoint) {
-        border-left: none;
-      }
-
       --transition-duration: 0.25s;
 
-      &.won-unread {
-        background-color: $won-unread;
+      @media (max-width: $responsivenessBreakPoint) {
+        &:not(.won-unread) > .co__item__need__indicator {
+          border-left: none;
+        }
+      }
+
+      & > .co__item__need__indicator {
+        box-sizing: border-box;
+        width: 0.25rem;
+      }
+
+      &.won-unread > .co__item__need__indicator {
+        border-left: 0.25rem solid $won-unread-attention;
+      }
+
+      &:not(.won-unread) > .co__item__need__indicator {
+        border-left: $thinGrayBorder;
       }
 
       &.open {
@@ -86,6 +96,7 @@ won-connections-overview {
       }
 
       &__header {
+        padding: 0.5rem;
         display: grid;
         grid-template-columns: 1fr auto auto auto;
         min-width: 0;
@@ -162,14 +173,14 @@ won-connections-overview {
         }
         // intrent connections so it's clear they belong *to* the post
         &:not(.won-unread) {
-          background: $won-line-gray;
+          background-color: $won-line-gray;
           border-left: $thinGrayBorder;
           @media (max-width: $responsivenessBreakPoint) {
             border-left: none;
           }
         }
         &.won-unread {
-          background: $won-unread-attention;
+          background-color: $won-unread-attention;
           border-left: $thinBorderWidth solid $won-unread-attention;
           @media (max-width: $responsivenessBreakPoint) {
             border-left: none;
