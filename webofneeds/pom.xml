@@ -27,9 +27,9 @@
             <email>kristina.weinberger@researchstudio.at</email>
         </developer>
         <developer>
-            <id>ksinger</id>
-            <name>Kevin Singer</name>
-            <email>kevin.singer@researchstudio.at</email>
+            <id>rsinger</id>
+            <name>Renée Singer</name>
+            <email>renee.singer@researchstudio.at</email>
         </developer>
         <developer>
             <id>gpickl</id>
@@ -40,11 +40,6 @@
             <id>fkleedorfer</id>
             <name>Florian Kleedorfer</name>
             <email>florian.fleedorfer@researchstudio.at</email>
-        </developer>
-        <developer>
-            <id>soheilhuman</id>
-            <name>Soheil Human</name>
-            <email>soheil.human@researchstudio.at</email>
         </developer>
         <developer>
             <id>fsuda</id>
