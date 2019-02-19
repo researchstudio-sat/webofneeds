@@ -24,7 +24,7 @@ function genComponentConf() {
             <div class="vtb__inner">
                 <div class="vtb__inner__left">
                     <won-square-image
-                        uri="self.post.get('uri')">
+                        uri="self.postUri">
                     </won-square-image>
                     <hgroup>
                         <h1 class="vtb__title">{{ self.post.get('humanReadable') }}</h1>
@@ -42,8 +42,8 @@ function genComponentConf() {
                     </hgroup>
                 </div>
             </div>
-            <won-share-dropdown need-uri="self.post.get('uri')"></won-share-dropdown>
-            <won-post-context-dropdown need-uri="self.post.get('uri')"></won-post-context-dropdown>
+            <won-share-dropdown need-uri="self.postUri"></won-share-dropdown>
+            <won-post-context-dropdown need-uri="self.postUri"></won-post-context-dropdown>
         </nav>
     `;
 

@@ -4,6 +4,7 @@
 
 won-post-menu {
   display: flex;
+  align-items: flex-end;
   background-color: $won-lighter-gray;
   border-bottom: $thinGrayBorder;
   padding: 0.5rem 0.5rem 0 0.5rem;
@@ -41,6 +42,7 @@ won-post-menu {
 
       & > .post-menu__item__count {
         height: 0;
+        width: 0;
         opacity: 0;
         margin-left: 0;
         overflow: hidden;
