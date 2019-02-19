@@ -48,6 +48,7 @@ function genComponentConf() {
         <won-create-post-item ng-class="{'selected' : !!self.useCaseGroup || !!self.useCase}"></won-create-post-item>
         <div ng-repeat="needUri in self.beingCreatedNeedUris track by needUri" class="co__item">
             <div class="co__item__need" ng-class="{'selected' : needUri === self.needUriInRoute}">
+                <div class="co__item__need__indicator"></div>
                 <div class="co__item__need__header">
                     <won-post-header
                         need-uri="::needUri"
