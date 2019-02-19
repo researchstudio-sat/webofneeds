@@ -78,6 +78,10 @@
 
         > .vtb__title {
           align-self: flex-end;
+
+          &--notitle {
+            color: $won-subtitle-gray;
+          }
         }
       }
       > .vtb__inner__right__lower {
