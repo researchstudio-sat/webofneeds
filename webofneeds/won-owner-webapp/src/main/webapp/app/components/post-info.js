@@ -6,6 +6,7 @@ import angular from "angular";
 import postHeaderModule from "./post-header.js";
 import postContextDropdownModule from "./post-context-dropdown.js";
 import postContentModule from "./post-content.js";
+import postMenuModule from "./post-menu.js";
 import shareDropdownModule from "./share-dropdown.js";
 import { attach, get } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
@@ -53,6 +54,7 @@ function genComponentConf() {
             <won-share-dropdown need-uri="self.post.get('uri')"></won-share-dropdown>
             <won-post-context-dropdown need-uri="self.post.get('uri')"></won-post-context-dropdown>
         </div>
+        <won-post-menu post-uri="self.postUri"></won-post-menu>
         <won-post-content post-uri="self.postUri"></won-post-content>
         <div class="post-info__footer" ng-if="self.showFooter">
             <button class="won-button--filled red post-info__footer__button"
@@ -138,6 +140,7 @@ function genComponentConf() {
 export default angular
   .module("won.owner.components.postInfo", [
     postHeaderModule,
+    postMenuModule,
     postContextDropdownModule,
     postContentModule,
     shareDropdownModule,

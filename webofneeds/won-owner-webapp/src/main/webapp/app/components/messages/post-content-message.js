@@ -2,6 +2,7 @@ import angular from "angular";
 
 import squareImageModule from "../square-image.js";
 import postContentModule from "../post-content.js";
+import postMenuModule from "../post-menu.js";
 
 import { connect2Redux } from "../../won-utils.js";
 import { attach, getIn } from "../../utils.js";
@@ -16,8 +17,8 @@ function genComponentConf() {
   let template = `
         <div class="won-cm__center">
             <div class="won-cm__center__bubble">
-                <won-post-content post-uri="self.postUri">
-                </won-post-content>
+                <won-post-menu post-uri="self.postUri"></won-post-menu>
+                <won-post-content post-uri="self.postUri"></won-post-content>
             </div>
         </div>
     `;
@@ -65,6 +66,7 @@ function genComponentConf() {
 export default angular
   .module("won.owner.components.postContentMessage", [
     squareImageModule,
+    postMenuModule,
     postContentModule,
   ])
   .directive("wonPostContentMessage", genComponentConf).name;

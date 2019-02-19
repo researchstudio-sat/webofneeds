@@ -4,7 +4,6 @@
 
 import angular from "angular";
 import postIsOrSeeksInfoModule from "./post-is-or-seeks-info.js";
-import postMenuModule from "./post-menu.js";
 import labelledHrModule from "./labelled-hr.js";
 import postContentGeneral from "./post-content-general.js";
 import postHeaderModule from "./post-header.js";
@@ -57,8 +56,6 @@ function genComponentConf() {
         </div>
         </div>
         <div class="post-content" ng-if="!self.postLoading && !self.postFailedToLoad">
-          <won-post-menu post-uri="self.postUri"></won-post-menu>
-
           <!-- DETAIL INFORMATION -->
           <won-post-is-or-seeks-info branch="::'content'" ng-if="self.isSelectedTab('DETAIL') && self.hasContent" post-uri="self.postUri"></won-post-is-or-seeks-info>
           <won-labelled-hr label="::'Search'" class="cp__labelledhr" ng-show="self.isSelectedTab('DETAIL') && self.hasContent && self.hasSeeksBranch"></won-labelled-hr>
@@ -314,7 +311,6 @@ export default angular
     labelledHrModule,
     postContentGeneral,
     postHeaderModule,
-    postMenuModule,
     trigModule,
   ])
   .directive("wonPostContent", genComponentConf).name;

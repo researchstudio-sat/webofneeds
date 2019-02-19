@@ -21,6 +21,8 @@ won-post-content-message {
 
     .won-cm__center__bubble {
       display: grid;
+      grid-template-areas: "postmenu" "postcontent";
+      grid-template-rows: min-content min-content;
       grid-template-columns: 1fr;
       border: $thinGrayBorder;
       word-break: break-word;
@@ -29,14 +31,19 @@ won-post-content-message {
       color: black;
 
       @include speech-bubble-top(
-        white,
+        $won-lighter-gray,
         $won-line-gray,
         $speechBubbleTailSize / 2,
         $thinBorderWidth,
         2.9rem
       );
 
+      > won-post-menu {
+        grid-area: postmenu;
+      }
+
       > won-post-content {
+        grid-area: postcontent;
         padding: 0.5rem;
         background: white;
       }

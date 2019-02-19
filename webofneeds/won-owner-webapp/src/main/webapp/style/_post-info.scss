@@ -5,24 +5,21 @@
 won-send-request,
 won-post-info {
   display: grid;
-  grid-template-areas: "header" "main" "footer";
-  grid-template-rows: min-content minmax($minimalGridRows, 1fr) min-content;
-  grid-row-gap: $gridRowGap;
+  grid-template-areas: "header" "menu" "main" "footer";
+  grid-template-rows: min-content min-content minmax($minimalGridRows, 1fr) min-content;
   box-sizing: border-box;
-  padding: $gridRowGap;
 
   &.won-post-info--noheader,
   &.won-send-request--noheader {
-    grid-template-areas: "main" "footer";
-    grid-template-rows: minmax($minimalGridRows, 1fr) min-content;
-
-    won-post-content {
-      border-top: none;
-    }
+    grid-template-areas: "menu" "main" "footer";
+    grid-template-rows: min-content minmax($minimalGridRows, 1fr) min-content;
   }
 
   .post-info__header {
+    padding: 0.5rem;
+    box-sizing: border-box;
     display: grid;
+    border-bottom: $thinGrayBorder;
     grid-template-columns: auto 1fr auto auto;
     grid-template-areas: "header_back header_title header_share header_context";
     grid-area: header;
@@ -58,14 +55,20 @@ won-post-info {
       grid-area: header_share;
     }
   }
+  won-post-menu {
+    grid-area: menu;
+  }
 
   won-post-content {
+    padding: 0.5rem;
+    box-sizing: border-box;
     grid-area: main;
-    border-top: $thinGrayBorder;
     display: grid;
   }
 
   .post-info__footer {
+    padding: 0 0.5rem 0.5rem 0.5rem;
+    box-sizing: border-box;
     grid-area: footer;
     border-top: $thinGrayBorder;
     padding-top: 0.5rem;
