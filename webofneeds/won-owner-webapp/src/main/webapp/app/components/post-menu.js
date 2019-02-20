@@ -24,7 +24,15 @@ function genComponentConf() {
               ng-class="{
                 'post-menu__item--selected': self.isSelectedTab('DETAIL'),
               }">
-              <span class="post-menu__item__label post-menu__item--selected">Detail</span>
+              <span class="post-menu__item__label">Detail</span>
+            </div>
+            <div class="post-menu__item"
+              ng-if="self.hasHeldBy"
+              ng-click="self.selectTab('HELDBY')"
+              ng-class="{
+                'post-menu__item--selected': self.isSelectedTab('HELDBY'),
+              }">
+              <span class="post-menu__item__label">Author</span>
             </div>
             <div class="post-menu__item"
               ng-if="self.hasGroupFacet"
@@ -82,6 +90,8 @@ function genComponentConf() {
 
         const groupMembers = get(post, "groupMembers");
         const heldPosts = isPersona && get(post, "holds");
+        const hasHeldBy = //aka Author/Persona that holds this post
+          needUtils.hasHoldableFacet(post) && !!get(post, "heldBy");
         const suggestions =
           isOwned &&
           connectionSelectors.getSuggestedConnectionsByNeedUri(
@@ -100,6 +110,7 @@ function genComponentConf() {
           post,
           isPersona,
           isOwned,
+          hasHeldBy,
           hasHeldPosts: heldPostsSize > 0,
           heldPostsSize,
           hasGroupFacet: needUtils.hasGroupFacet(post),
