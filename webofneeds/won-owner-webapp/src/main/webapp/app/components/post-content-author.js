@@ -36,7 +36,9 @@ function genComponentConf() {
           <a class="pca__websitelink" target="_blank" href="{{self.personaWebsite}}" ng-if="self.personaWebsite">{{ self.personaWebsite }}</a>
       </div>
       <div class="pca__rating">
-        <won-rating-view rating="self.rating()" rating-connection-uri="self.ratingConnectionUri"></won-rating-view>
+        <won-rating-view rating="self.aggregateRatingRounded" rating-connection-uri="self.ratingConnectionUri"></won-rating-view>
+        <div class="pca__rating__aggregate" ng-if="self.aggregateRating">({{self.aggregateRating}})</div>
+        <div class="pca__rating__reviewcount" ng-if="self.reviewCount">({{self.reviewCount}})</div>
       </div>
       <won-description-viewer detail="::self.descriptionDetail" content="self.personaDescription" ng-if="self.descriptionDetail && self.personaDescription"></won-description-viewer>
     `;
@@ -44,7 +46,7 @@ function genComponentConf() {
   class Controller {
     constructor() {
       attach(this, serviceDependencies, arguments);
-      window.pcg4dbg = this;
+      window.pca4dbg = this;
 
       const selectFromState = state => {
         const connectionUri = getConnectionUriFromRoute(state);
@@ -57,16 +59,15 @@ function genComponentConf() {
             ? connectionUri
             : null;
 
-        const post = this.holdsUri && state.getIn(["needs", this.holdsUri]);
+        const post = this.holdsUri && getIn(state, ["needs", this.holdsUri]);
         const personaUri = get(post, "heldBy");
-        const persona = post
-          ? state.getIn(["needs", post.get("heldBy")])
-          : undefined;
-        const personaHolds = persona && persona.get("holds");
-        const personaRating = persona && persona.get("rating");
+        const persona = post ? getIn(state, ["needs", personaUri]) : undefined;
+        const personaHolds = get(persona, "holds");
+        const aggregateRating = getIn(persona, ["rating", "aggregateRating"]);
+        const reviewCount = getIn(persona, ["rating", "reviewCount"]);
 
         const process = get(state, "process");
-
+        //TODO: CHECK IF PERSONA HAS REVIEWFACET
         return {
           post,
           personaUri,
@@ -78,21 +79,16 @@ function genComponentConf() {
           personaDescription: getIn(persona, ["content", "description"]),
           personaWebsite: getIn(persona, ["content", "website"]),
           personaVerified: personaHolds && personaHolds.includes(this.holdsUri),
-          persona,
-          personaRating: personaRating,
+          reviewCount,
+          aggregateRating,
+          aggregateRatingRounded: aggregateRating
+            ? Math.round(aggregateRating)
+            : 0,
           ratingConnectionUri: ratingConnectionUri,
           descriptionDetail: details.description,
         };
       };
       connect2Redux(selectFromState, actionCreators, ["self.holdsUri"], this);
-    }
-
-    rating() {
-      const rating = this.personaRating
-        ? this.personaRating.get("aggregateRating")
-        : 0;
-
-      return Math.round(rating);
     }
   }
 
