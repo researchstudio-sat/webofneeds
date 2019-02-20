@@ -60,21 +60,14 @@ won-post-messages {
   }
 
   .pm__content {
+  }
+  .pm__content {
     grid-area: main;
-    padding: 0.5rem;
+    padding: 0.5rem 0.5rem 0.5rem 0;
     background: white;
     border: $thinGrayBorder;
     overflow: auto;
     flex-grow: 1;
-
-    &__loadbutton, /* just so the button and spinner won't make the chatmessages "jump"*/
-    &__loadspinner {
-      width: 100%;
-      height: 3rem;
-      padding: 0.66em 2em;
-      text-align: center;
-      box-sizing: border-box;
-    }
 
     &__unreadindicator {
       height: 3rem;
@@ -82,6 +75,7 @@ won-post-messages {
       position: sticky;
       z-index: 10;
       margin-bottom: 0.5rem;
+      margin-left: 0.5rem;
 
       @include slideWithOpacityAnimationFixedHorizontal(
         0.5s,
@@ -105,19 +99,12 @@ won-post-messages {
         white-space: nowrap;
       }
     }
-  }
-  .pm__content {
-    grid-area: main;
-    padding: 0.5rem;
-    background: white;
-    border: $thinGrayBorder;
-    overflow: auto;
-    flex-grow: 1;
     &__loadbutton, /* just so the button and spinner won't make the chatmessages "jump"*/
     &__loadspinner {
-      width: 100%;
+      width: calc(100% - 0.5rem);
       height: 3rem;
       padding: 0.66em 2em;
+      margin-left: 0.5rem;
       text-align: center;
       box-sizing: border-box;
     }
@@ -127,12 +114,16 @@ won-post-messages {
     }
     &__petrinet__loadingtext,
     &__agreement__loadingtext {
+      padding-left: 0.5rem;
+      box-sizing: border-box;
       font-size: $smallFontSize;
       color: $won-subtitle-gray;
       text-align: center;
     }
     &__petrinet__emptytext,
     &__agreement__emptytext {
+      padding-left: 0.5rem;
+      box-sizing: border-box;
       text-align: center;
       font-size: $normalFontSize;
       color: $won-subtitle-gray;
@@ -158,15 +149,8 @@ won-post-messages {
       font-size: $normalFontSize;
       border-bottom: $thinGrayBorder;
       padding-bottom: 0.25rem;
+      padding-left: 0.5rem;
       margin-bottom: 0.25rem;
-    }
-    &__loadbutton, /* just so the button and spinner won't make the chatmessages "jump"*/
-    &__loadspinner {
-      width: 100%;
-      height: 3rem;
-      padding: 0.66em 2em;
-      text-align: center;
-      box-sizing: border-box;
     }
   }
 }
