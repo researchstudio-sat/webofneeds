@@ -327,7 +327,7 @@ function genComponentConf() {
         });
       }
 
-      self.router__stateGoCurrent({
+      this.router__stateGoCurrent({
         viewConnUri: connUri,
         viewNeedUri: undefined,
       });
