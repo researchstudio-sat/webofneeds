@@ -1,0 +1,60 @@
+@import "won-config";
+@import "sizing-utils";
+@import "square-image";
+
+won-post-content-author {
+  display: grid;
+  grid-gap: 0.5rem;
+
+  .pca__header {
+    display: grid;
+    grid-template-areas:
+      "p_icon p_name p_name"
+      "p_icon p_websitelabel p_websitelink";
+    grid-template-columns: $postIconSize min-content 1fr;
+    grid-column-gap: 0.5rem;
+    padding: 0.5rem;
+    border-bottom: $thinGrayBorder;
+
+    @include square-image($postIconSize);
+    won-square-image {
+      grid-area: p_icon;
+    }
+
+    &__name {
+      grid-area: p_name;
+      display: flex;
+      align-items: center;
+
+      &__label {
+        font-size: $normalFontSize;
+      }
+
+      &__verification {
+        font-size: $smallFontSize;
+        margin-left: 0.25rem;
+
+        &--verified {
+          color: $won-line-gray;
+        }
+        &--unverified {
+          color: $won-unread-attention;
+        }
+      }
+    }
+
+    .pca__websitelabel {
+      font-size: $smallFontSize;
+      grid-area: p_websitelabel;
+    }
+    .pca__websitelink {
+      font-size: $smallFontSize;
+      grid-area: p_websitelink;
+    }
+  }
+
+  .pca__rating {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+}
