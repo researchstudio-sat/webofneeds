@@ -46,7 +46,7 @@ function genComponentConf() {
             <div class="pm__header__back">
               <a class="pm__header__back__button clickable show-in-responsive"
                  ng-if="!self.showOverlayConnection"
-                 ng-click="self.router__back()"> <!-- TODO: Clicking on the back button in non-mobile view might lead to some confusing changes -->
+                 ng-click="self.router__back()">
                   <svg class="pm__header__back__button__icon">
                       <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
                   </svg>
@@ -76,13 +76,14 @@ function genComponentConf() {
             <won-connection-context-dropdown show-petri-net-data-field="::self.showPetriNetDataField()" show-agreement-data-field="::self.showAgreementDataField()"></won-connection-context-dropdown>
         </div>
         <div class="pm__header" ng-if="self.showAgreementData">
-            <a class="pm__header__back clickable"
-                ng-click="self.setShowAgreementData(false)">
-                <svg style="--local-primary:var(--won-primary-color);"
-                     class="pm__header__back__icon clickable">
-                    <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
-                </svg>
-            </a>
+            <div class="pm__header__back">
+              <a class="pm__header__back__button clickable"
+                  ng-click="self.setShowAgreementData(false)">
+                  <svg class="pm__header__back__button__icon clickable">
+                      <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
+                  </svg>
+              </a>
+            </div>
             <div class="pm__header__title clickable"
                 ng-click="self.setShowAgreementData(false)">
               Showing Agreement Data
@@ -90,13 +91,14 @@ function genComponentConf() {
             <won-connection-context-dropdown show-petri-net-data-field="::self.showPetriNetDataField()" show-agreement-data-field="::self.showAgreementDataField()"></won-connection-context-dropdown>
         </div>
         <div class="pm__header" ng-if="self.showPetriNetData">
-            <a class="pm__header__back clickable"
-                ng-click="self.setShowPetriNetData(false)">
-                <svg style="--local-primary:var(--won-primary-color);"
-                     class="pm__header__back__icon clickable">
-                    <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
-                </svg>
-            </a>
+            <div class="pm__header__back">
+              <a class="pm__header__back__button clickable"
+                  ng-click="self.setShowPetriNetData(false)">
+                  <svg class="pm__header__back__button__icon clickable">
+                      <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
+                  </svg>
+              </a>
+            </div>
             <div class="pm__header__title clickable"
                 ng-click="self.setShowAgreementData(false)">
               Showing PetriNet Data
