@@ -42,12 +42,6 @@ function genComponentConf() {
                         </svg>
                     </div>
                     <!-- Buttons for post -->
-                    <button
-                        class="won-button--outlined thin red"
-                        ng-if="self.personaUri"
-                        ng-click="self.goToPersona(self.personaUri)">
-                        View Persona
-                    </button>
                     <button class="won-button--outlined thin red"
                         ng-click="self.exportPdf()">
                         Export as PDF
@@ -96,12 +90,10 @@ function genComponentConf() {
           linkToPost = toAbsoluteURL(ownerBaseUrl).toString() + path;
         }
 
-        const personaUri = get(post, "heldBy");
         const process = get(state, "process");
 
         return {
           adminEmail: getIn(state, ["config", "theme", "adminEmail"]),
-          personaUri,
           isOwnPost: needUtils.isOwned(post),
           isActive: needUtils.isActive(post),
           isInactive: needUtils.isInactive(post),
@@ -133,13 +125,6 @@ function genComponentConf() {
       });
 
       window.document.addEventListener("click", callback);
-    }
-
-    goToPersona(personaUri) {
-      this.router__stateGoCurrent({
-        viewNeedUri: personaUri,
-        viewConnUri: undefined,
-      });
     }
 
     closePost() {
