@@ -124,7 +124,7 @@ function genComponentConf() {
           </div>
 
           <!-- OTHER NEEDS -->
-          <div class="post-content__members" ng-if="self.isSelectedTab('OTHER_NEEDS')">
+          <div class="post-content__members" ng-if="self.isSelectedTab('HOLDS')">
             <div
               class="post-content__members__member"
               ng-if="self.hasHeldPosts"
