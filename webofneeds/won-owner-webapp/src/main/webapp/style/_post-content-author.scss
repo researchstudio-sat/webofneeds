@@ -11,7 +11,7 @@ won-post-content-author {
     grid-template-areas:
       "p_icon p_name p_name"
       "p_icon p_websitelabel p_websitelink";
-    grid-template-columns: $postIconSize min-content 1fr;
+    grid-template-columns: $postIconSize max-content 1fr;
     grid-column-gap: 0.5rem;
     padding: 0.5rem;
     border-bottom: $thinGrayBorder;
