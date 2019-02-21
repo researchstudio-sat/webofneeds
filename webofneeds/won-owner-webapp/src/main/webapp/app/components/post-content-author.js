@@ -3,12 +3,14 @@
  */
 
 import angular from "angular";
+import Immutable from "immutable";
 import { attach, get, getIn } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import {
   getConnectionUriFromRoute,
   getOwnedNeedByConnectionUri,
 } from "../selectors/general-selectors.js";
+import * as needUtils from "../need-utils.js";
 import * as processUtils from "../process-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import ratingView from "./rating-view.js";
@@ -35,10 +37,15 @@ function genComponentConf() {
           <div class="pca__websitelabel" ng-if="self.personaWebsite">Website:</div>
           <a class="pca__websitelink" target="_blank" href="{{self.personaWebsite}}" ng-if="self.personaWebsite">{{ self.personaWebsite }}</a>
       </div>
-      <div class="pca__rating">
+      <div class="pca__rating" ng-if="self.personaHasReviewFacet">
         <won-rating-view rating="self.aggregateRatingRounded" rating-connection-uri="self.ratingConnectionUri"></won-rating-view>
-        <div class="pca__rating__aggregate" ng-if="self.aggregateRating">({{self.aggregateRating}})</div>
-        <div class="pca__rating__reviewcount" ng-if="self.reviewCount">({{self.reviewCount}})</div>
+        <div class="pca__rating__aggregate" ng-if="self.aggregateRatingString">Aggregate Rating: ({{self.aggregateRatingString}})</div>
+        <div class="pca__rating__reviewcount" ng-if="self.reviewCount">Reviews: ({{self.reviewCount}})</div>
+        <button class="pca__holds__view won-button--filled red" ng-click="self.viewPersonaReviews()">View</button>
+      </div>
+      <div class="pca__holds" ng-if="self.personaHasHolderFacet">
+        <div class="pca__holds__label">Author of {{ self.personaHoldsSize }} Post(s)</div>
+        <button class="pca__holds__view won-button--filled red" ng-click="self.viewPersonaPosts()">View</button>
       </div>
       <won-description-viewer detail="::self.descriptionDetail" content="self.personaDescription" ng-if="self.descriptionDetail && self.personaDescription"></won-description-viewer>
     `;
@@ -62,9 +69,16 @@ function genComponentConf() {
         const post = this.holdsUri && getIn(state, ["needs", this.holdsUri]);
         const personaUri = get(post, "heldBy");
         const persona = post ? getIn(state, ["needs", personaUri]) : undefined;
-        const personaHolds = get(persona, "holds");
-        const aggregateRating = getIn(persona, ["rating", "aggregateRating"]);
-        const reviewCount = getIn(persona, ["rating", "reviewCount"]);
+
+        const personaHasHolderFacet = needUtils.hasHolderFacet(persona);
+        const personaHolds = personaHasHolderFacet && get(persona, "holds");
+        const personaVerified =
+          personaHolds && personaHolds.includes(this.holdsUri);
+
+        const personaHasReviewFacet = needUtils.hasReviewFacet(persona);
+        const aggregateRating =
+          personaHasReviewFacet &&
+          getIn(persona, ["rating", "aggregateRating"]);
 
         const process = get(state, "process");
         //TODO: CHECK IF PERSONA HAS REVIEWFACET
@@ -78,9 +92,13 @@ function genComponentConf() {
           personaName: getIn(persona, ["content", "personaName"]),
           personaDescription: getIn(persona, ["content", "description"]),
           personaWebsite: getIn(persona, ["content", "website"]),
-          personaVerified: personaHolds && personaHolds.includes(this.holdsUri),
-          reviewCount,
-          aggregateRating,
+          personaVerified,
+          personaHoldsSize: personaHolds ? personaHolds.size : 0,
+          personaHasReviewFacet,
+          personaHasHolderFacet,
+          reviewCount:
+            personaHasReviewFacet && getIn(persona, ["rating", "reviewCount"]),
+          aggregateRatingString: aggregateRating && aggregateRating.toFixed(1),
           aggregateRatingRounded: aggregateRating
             ? Math.round(aggregateRating)
             : 0,
@@ -89,6 +107,22 @@ function genComponentConf() {
         };
       };
       connect2Redux(selectFromState, actionCreators, ["self.holdsUri"], this);
+    }
+
+    viewPersonaPosts() {
+      console.debug("IMPL ME");
+      this.needs__selectTab(
+        Immutable.fromJS({ needUri: this.personaUri, selectTab: "HOLDS" })
+      );
+      this.router__stateGoCurrent({ viewNeedUri: this.personaUri });
+    }
+
+    viewPersonaReviews() {
+      console.debug("IMPL ME");
+      this.needs__selectTab(
+        Immutable.fromJS({ needUri: this.personaUri, selectTab: "REVIEWS" })
+      );
+      this.router__stateGoCurrent({ viewNeedUri: this.personaUri });
     }
   }
 

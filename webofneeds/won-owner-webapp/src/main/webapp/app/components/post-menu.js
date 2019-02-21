@@ -57,10 +57,10 @@ function genComponentConf() {
               <span class="post-menu__item__count">({{self.suggestionsSize}})</span>
             </div>
             <div class="post-menu__item"
-              ng-if="self.isPersona"
-              ng-click="self.selectTab('OTHER_NEEDS')"
+              ng-if="self.hasHolderFacet"
+              ng-click="self.selectTab('HOLDS')"
               ng-class="{
-                'post-menu__item--selected': self.isSelectedTab('OTHER_NEEDS'),
+                'post-menu__item--selected': self.isSelectedTab('HOLDS'),
                 'post-menu__item--inactive': !self.hasHeldPosts
               }">
               <span class="post-menu__item__label">Posts of this Persona</span>
@@ -88,8 +88,11 @@ function genComponentConf() {
         const isPersona = needUtils.isPersona(post);
         const isOwned = needUtils.isOwned(post);
 
-        const groupMembers = get(post, "groupMembers");
-        const heldPosts = isPersona && get(post, "holds");
+        const hasHolderFacet = needUtils.hasHolderFacet(post);
+        const hasGroupFacet = needUtils.hasGroupFacet(post);
+
+        const groupMembers = hasGroupFacet && get(post, "groupMembers");
+        const heldPosts = hasHolderFacet && get(post, "holds");
         const hasHeldBy = //aka Author/Persona that holds this post
           needUtils.hasHoldableFacet(post) && !!get(post, "heldBy");
         const suggestions =
@@ -113,7 +116,8 @@ function genComponentConf() {
           hasHeldBy,
           hasHeldPosts: heldPostsSize > 0,
           heldPostsSize,
-          hasGroupFacet: needUtils.hasGroupFacet(post),
+          hasHolderFacet,
+          hasGroupFacet,
           hasChatFacet: needUtils.hasChatFacet(post),
           hasGroupMembers: groupMembersSize > 0,
           groupMembersSize,
