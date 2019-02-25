@@ -2,6 +2,8 @@ import angular from "angular";
 import { currentSkin } from "../selectors/general-selectors";
 import { actionCreators } from "../actions/actions";
 
+import "../../style/_elm-ui-shim.scss";
+
 function genComponentConf($ngRedux) {
   return {
     restrict: "E",
@@ -18,7 +20,7 @@ function genComponentConf($ngRedux) {
         flags: {
           state: $ngRedux.getState().toJS(),
           attributes: scope.attributes,
-          skin: currentSkin(),
+          style: currentSkin(),
         },
       });
 
@@ -27,7 +29,7 @@ function genComponentConf($ngRedux) {
           window.requestAnimationFrame(() => {
             elmApp.ports.inPort.send({
               newState: state.toJS(),
-              newSkin: currentSkin(),
+              newStyle: currentSkin(),
             });
           })
       );
@@ -41,7 +43,7 @@ function genComponentConf($ngRedux) {
       if (elmApp.ports.outPort) {
         elmApp.ports.outPort.subscribe(({ action, payload }) => {
           if (actionCreators[action]) {
-            $ngRedux.dispatch(actionCreators[action](payload));
+            $ngRedux.dispatch(actionCreators[action](...payload));
           } else {
             scope.onAction({ action, payload });
           }

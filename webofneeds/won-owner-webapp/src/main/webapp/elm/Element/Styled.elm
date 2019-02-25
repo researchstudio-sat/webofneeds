@@ -2,23 +2,34 @@ module Element.Styled exposing
     ( Attr
     , Attribute
     , Element
+    , Length
     , Style
     , above
+    , alignRight
     , below
+    , centerX
     , column
     , el
     , element
     , fill
+    , focused
     , getAttrList
     , getElement
     , height
+    , html
     , layout
+    , layoutWith
     , modular
+    , mouseOver
+    , moveDown
+    , moveUp
+    , noStaticStyleSheet
     , none
     , padding
     , pureAttr
     , px
     , row
+    , shrink
     , spacing
     , styleDecoder
     , text
@@ -34,8 +45,11 @@ import Json.Decode as Decode exposing (Decoder)
 
 type alias Style =
     { primary : Color
-    , secondary : Color
     }
+
+
+type alias Option =
+    Element.Option
 
 
 colorDecoder : Decoder Color
@@ -48,9 +62,8 @@ colorDecoder =
 
 styleDecoder : Decoder Style
 styleDecoder =
-    Decode.map2 Style
+    Decode.map Style
         (Decode.field "primaryColor" colorDecoder)
-        (Decode.field "secondaryColor" colorDecoder)
 
 
 type Element msg
@@ -65,6 +78,16 @@ type Attr decorative msg
     = Attr (Style -> Element.Attr decorative msg)
 
 
+centerX : Attribute msg
+centerX =
+    pureAttr Element.centerX
+
+
+alignRight : Attribute msg
+alignRight =
+    pureAttr Element.alignRight
+
+
 type alias Length =
     Element.Length
 
@@ -72,6 +95,11 @@ type alias Length =
 fill : Length
 fill =
     Element.fill
+
+
+shrink : Length
+shrink =
+    Element.shrink
 
 
 px : Int -> Length
@@ -128,6 +156,27 @@ layout style attrs elem =
         (applyEl style elem)
 
 
+layoutWith :
+    { options : List Option }
+    -> Style
+    -> List (Attribute msg)
+    -> Element msg
+    -> Html msg
+layoutWith opts style attrs elem =
+    Element.layoutWith
+        opts
+        (List.map
+            (applyAttr style)
+            attrs
+        )
+        (applyEl style elem)
+
+
+noStaticStyleSheet : Option
+noStaticStyleSheet =
+    Element.noStaticStyleSheet
+
+
 withStyle : (Style -> Element msg) -> Element msg
 withStyle elemFn =
     Element <|
@@ -137,6 +186,26 @@ withStyle elemFn =
                     elemFn style
             in
             fn style
+
+
+type alias Decoration =
+    Attr Never Never
+
+
+focused : List Decoration -> Attribute msg
+focused attrs =
+    Attr <|
+        \style ->
+            Element.focused
+                (List.map (applyAttr style) attrs)
+
+
+mouseOver : List Decoration -> Attribute msg
+mouseOver attrs =
+    Attr <|
+        \style ->
+            Element.mouseOver
+                (List.map (applyAttr style) attrs)
 
 
 row : List (Attribute msg) -> List (Element msg) -> Element msg
@@ -215,3 +284,18 @@ getAttrList attrs fn style =
 none : Element msg
 none =
     Element (\_ -> Element.none)
+
+
+html : Html msg -> Element msg
+html elem =
+    Element <| \_ -> Element.html elem
+
+
+moveDown : Float -> Attribute msg
+moveDown len =
+    pureAttr <| Element.moveDown len
+
+
+moveUp : Float -> Attribute msg
+moveUp len =
+    pureAttr <| Element.moveUp len

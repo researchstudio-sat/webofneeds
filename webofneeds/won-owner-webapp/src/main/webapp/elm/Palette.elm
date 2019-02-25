@@ -1,14 +1,73 @@
 module Palette exposing
     ( DropdownDirection(..)
-    , dropdownButton
+    , button
+    , dropdown
     )
 
 import Color
+import Color.Manipulate as Color
 import Element.Background.Styled as Background
 import Element.Border.Styled as Border
 import Element.Font.Styled as Font
 import Element.Input.Styled as Input
-import Element.Styled exposing (..)
+import Element.Styled as Element exposing (..)
+import Icons
+
+
+scaled =
+    modular 16 1.25
+
+
+borderRadius =
+    3
+
+
+borderColor =
+    Color.gray
+
+
+hoverColor color =
+    Color.weightedMix Color.black color 0.1
+
+
+activeColor =
+    Color.fadeOut 0.8
+
+
+button :
+    { label : String
+    , onPress : Maybe msg
+    }
+    -> Element msg
+button { label, onPress } =
+    withStyle <|
+        \style ->
+            Input.button
+                [ width fill
+                , Background.color style.primary
+                , Border.rounded borderRadius
+                , focused
+                    [ Border.shadow
+                        { offset = ( 0, 0 )
+                        , size = 2
+                        , blur = 0
+                        , color = activeColor style.primary
+                        }
+                    ]
+                ]
+                { label =
+                    el
+                        [ centerX
+                        , Font.color Color.white
+                        , Font.size <|
+                            round <|
+                                scaled 1
+                        , padding <| round <| scaled 1 / 2
+                        ]
+                    <|
+                        text label
+                , onPress = onPress
+                }
 
 
 type DropdownDirection
@@ -16,133 +75,117 @@ type DropdownDirection
     | DropUp
 
 
-scaled =
-    modular 16 1.25
-
-
-buttonRadius =
-    3
-
-
-type ButtonRole
-    = Primary
-    | Secondary
-
-
-type alias Button msg =
-    { role : ButtonRole
-    , enabled : Bool
-    , onPress : msg
-    , label : Element msg
+dropdown :
+    { direction : DropdownDirection
+    , menu : Maybe (Element msg)
+    , label : String
+    , onToggle : Maybe msg
     }
-
-
-rawButton :
-    { left : Bool
-    , right : Bool
-    }
-    -> Button msg
     -> Element msg
-rawButton { left, right } { role, enabled, onPress, label } =
-    let
-        enabledRadius hasRadius =
-            if hasRadius then
-                buttonRadius
-
-            else
-                0
-
-        radius =
-            { topLeft = enabledRadius left
-            , bottomLeft = enabledRadius left
-            , topRight = enabledRadius right
-            , bottomRight = enabledRadius right
-            }
-
-        col color =
-            if enabled then
-                color
-
-            else
-                color
-    in
+dropdown { direction, menu, label, onToggle } =
     withStyle <|
         \style ->
-            Debug.todo ""
+            let
+                dropattr =
+                    case direction of
+                        DropDown ->
+                            below
 
+                        DropUp ->
+                            above
 
-dropdownButton :
-    { direction : DropdownDirection
-    , menu : Element msg
-    , label : String
-    , open : Bool
-    , onPress : Maybe msg
-    , toggleMsg : msg
-    }
-    -> Element msg
-dropdownButton { direction, menu, label, open, toggleMsg, onPress } =
-    let
-        dropattr =
-            case direction of
-                DropDown ->
-                    below
+                ( openArrow, closeArrow ) =
+                    case direction of
+                        DropDown ->
+                            ( Icons.arrowDown, Icons.arrowUp )
 
-                DropUp ->
-                    above
+                        DropUp ->
+                            ( Icons.arrowUp, Icons.arrowDown )
 
-        defaultAttrs =
-            [ width fill
-            , spacing 3
-            ]
+                dropdownMenu subMenu =
+                    el
+                        [ case direction of
+                            DropDown ->
+                                moveDown 3
 
-        attrs =
-            defaultAttrs
-                ++ (if open then
-                        [ dropattr menu ]
+                            DropUp ->
+                                moveUp 3
+                        , Element.width fill
+                        , Background.color Color.white
+                        , Border.color borderColor
+                        , Border.width 1
+                        ]
+                        subMenu
+
+                ( attrs, open ) =
+                    case menu of
+                        Just menu_ ->
+                            ( [ dropattr <| dropdownMenu menu_ ], True )
+
+                        Nothing ->
+                            ( [], False )
+
+                enabled =
+                    case onToggle of
+                        Just _ ->
+                            True
+
+                        Nothing ->
+                            False
+
+                mainColor =
+                    if enabled then
+                        style.primary
 
                     else
-                        []
-                   )
-    in
-    withStyle
-        (\skin ->
-            row
-                attrs
-                [ Input.button
-                    [ Background.color skin.primary
-                    , Border.roundEach
-                        { topLeft = 5
-                        , bottomLeft = 5
-                        , topRight = 0
-                        , bottomRight = 0
-                        }
-                    , width fill
+                        Color.gray
+            in
+            el
+                ([ Element.width fill
+                 ]
+                    ++ attrs
+                )
+            <|
+                Input.button
+                    [ Background.color mainColor
+                    , Border.rounded borderRadius
+                    , Element.width fill
+                    , mouseOver <|
+                        if enabled then
+                            [ Background.color <| hoverColor mainColor ]
+
+                        else
+                            []
+                    , focused
+                        [ Border.shadow
+                            { offset = ( 0, 0 )
+                            , size = 2
+                            , blur = 0
+                            , color = activeColor mainColor
+                            }
+                        ]
                     ]
                     { label =
-                        el
+                        row
                             [ padding <| round <| scaled 1 / 2
-                            , width fill
                             , Font.size <|
                                 round <|
                                     scaled 1
+                            , Element.width fill
                             , Font.color Color.white
-                            , Font.center
                             ]
-                        <|
-                            text label
-                    , onPress = onPress
+                            [ el [ centerX ] <| text label
+                            , el
+                                [ alignRight
+                                , Element.width <| px (round <| scaled 1)
+                                , height <| px (round <| scaled 1)
+                                ]
+                              <|
+                                if open then
+                                    closeArrow Color.white
+
+                                else
+                                    openArrow Color.white
+                            ]
+                    , onPress = onToggle
                     }
-                , Input.button
-                    [ Background.color skin.primary
-                    , Border.roundEach
-                        { topLeft = 0
-                        , bottomLeft = 0
-                        , topRight = 5
-                        , bottomRight = 5
-                        }
-                    ]
-                    { label = none
-                    , onPress = Just toggleMsg
-                    }
-                ]
-        )

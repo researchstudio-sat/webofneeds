@@ -1,8 +1,18 @@
-port module Application exposing (State, element)
+port module Application exposing
+    ( Need(..)
+    , NeedData
+    , NeedStorage(..)
+    , Persona
+    , State
+    , element
+    , ownedNeeds
+    , urlDecoder
+    )
 
 import AssocList as Dict exposing (Dict)
 import Browser
 import Element.Styled as Element exposing (Element, Style)
+import EverySet exposing (EverySet)
 import Html exposing (Html)
 import Json.Decode as Decode exposing (Decoder, Value)
 import Json.Decode.Extra as Decode
@@ -28,33 +38,44 @@ port errorPort : String -> Cmd msg
 
 
 type NeedStorage
-    = LoadingNeed
-    | OwnedNeed (NeedData Owned)
-    | NotOwnedNeed (NeedData NotOwned)
+    = ToLoad
+    | Loading
+    | Loaded NeedData
+    | FailedToLoad
 
 
-type Owned
-    = OwnedFlag Never
-
-
-type NotOwned
-    = NotOwnedFlag Never
-
-
-type alias NeedData owned =
-    { need : Need owned
+type alias NeedData =
+    { need : Need
     , created : Time.Posix
     }
 
 
-type Need owned
+type Need
     = PersonaNeed Persona
     | Other
+        { holder : Maybe Url
+        }
 
 
 type alias State =
     { needs : Dict Url NeedStorage
+    , owned : EverySet Url
     }
+
+
+ownedNeeds : State -> Dict Url NeedStorage
+ownedNeeds state =
+    let
+        selectNeed url =
+            Dict.get url state.needs
+                |> Maybe.map
+                    (\needStorage ->
+                        ( url, needStorage )
+                    )
+    in
+    EverySet.toList state.owned
+        |> List.filterMap selectNeed
+        |> Dict.fromList
 
 
 type UpdateType attributes
@@ -122,14 +143,38 @@ dateDecoder =
             )
 
 
-needDecoder : Decoder (NeedData owned)
+urlDecoder : Decoder Url
+urlDecoder =
+    Decode.string
+        |> Decode.andThen
+            (Url.fromString
+                >> Result.fromMaybe "Not a valid Url"
+                >> Decode.fromResult
+            )
+
+
+otherDecoder :
+    Decoder
+        { holder : Maybe Url
+        }
+otherDecoder =
+    Decode.succeed
+        (\holder ->
+            { holder = holder
+            }
+        )
+        |> DP.optionalAt [ "won:heldBy", "@id" ] (Decode.map Just urlDecoder) Nothing
+
+
+needDecoder : Decoder NeedData
 needDecoder =
     Decode.succeed NeedData
         |> DP.required "jsonld"
             (Decode.oneOf
                 [ Decode.when types (Set.member "won:Persona") personaDecoder
                     |> Decode.map PersonaNeed
-                , Decode.succeed Other
+                , otherDecoder
+                    |> Decode.map Other
                 ]
             )
         |> DP.required "creationDate" dateDecoder
@@ -143,15 +188,13 @@ guard field decoder =
 needStorageDecoder : Decoder (Maybe NeedStorage)
 needStorageDecoder =
     Decode.oneOf
-        [ Decode.succeed (Just <| LoadingNeed)
+        [ Decode.succeed (Just <| Loading)
             |> guard "isLoading"
         , Decode.succeed Nothing
             |> guard "isBeingCreated"
         , needDecoder
-            |> guard "isOwned"
-            |> Decode.map (Just << OwnedNeed)
-        , needDecoder
-            |> Decode.map (Just << NotOwnedNeed)
+            |> Decode.map (Just << Loaded)
+        , Decode.succeed (Just FailedToLoad)
         ]
 
 
@@ -189,10 +232,41 @@ needsDecoder =
         |> Decode.map Dict.fromList
 
 
+ownedDecoder : Decoder (EverySet Url)
+ownedDecoder =
+    let
+        decodeUrl url =
+            Url.fromString url
+                |> Result.fromMaybe (url ++ " is not a valid url")
+                |> Decode.fromResult
+
+        decodeIsOwned =
+            Decode.maybe <|
+                Decode.field "isOwned" (Decode.succeed ())
+
+        convertToUrls ( url, isOwned ) =
+            case isOwned of
+                Just () ->
+                    Just url
+
+                Nothing ->
+                    Nothing
+    in
+    keyValueDecoder
+        decodeUrl
+        decodeIsOwned
+        |> Decode.map
+            (\list ->
+                List.filterMap convertToUrls list
+                    |> EverySet.fromList
+            )
+
+
 stateDecoder : Decoder State
 stateDecoder =
     Decode.succeed State
         |> DP.required "needs" needsDecoder
+        |> DP.required "needs" ownedDecoder
 
 
 updateStyle : Style -> { a | style : Style } -> { a | style : Style }
@@ -301,7 +375,8 @@ element options =
 
                 Model { attributes, state, style, subModel } ->
                     Html.map SubMsg <|
-                        Element.layout
+                        Element.layoutWith
+                            { options = [ Element.noStaticStyleSheet ] }
                             style
                             []
                             (options.view attributes state subModel)
@@ -349,10 +424,10 @@ element options =
                         , inPort
                             (\val ->
                                 let
-                                    resultHandler newState newSkin newAttributes =
+                                    resultHandler newState newStyle newAttributes =
                                         case
                                             ( newState
-                                            , newSkin
+                                            , newStyle
                                             , newAttributes
                                             )
                                         of
@@ -386,7 +461,7 @@ element options =
                                     decoder =
                                         Decode.succeed resultHandler
                                             |> optional "newState" stateDecoder
-                                            |> optional "newSkin" Element.styleDecoder
+                                            |> optional "newStyle" Element.styleDecoder
                                             |> optional "newAttributes" options.attributeParser
                                 in
                                 Decode.decodeValue decoder val
