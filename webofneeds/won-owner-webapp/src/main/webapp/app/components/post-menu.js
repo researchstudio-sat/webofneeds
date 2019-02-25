@@ -32,8 +32,18 @@ function genComponentConf() {
               ng-class="{
                 'post-menu__item--selected': self.isSelectedTab('HELDBY'),
               }">
-              <span class="post-menu__item__label">Author</span>
+              <span class="post-menu__item__label">Persona</span>
               <span class="post-menu__item__rating" ng-if="self.personaAggregateRatingString">(★ {{ self.personaAggregateRatingString }})</span>
+            </div>
+            <div class="post-menu__item"
+              ng-if="self.hasReviewFacet"
+              ng-click="self.selectTab('REVIEWS')"
+              ng-class="{
+                'post-menu__item--selected': self.isSelectedTab('REVIEWS'),
+                'post-menu__item--inactive': !self.hasReviews,
+              }">
+              <span class="post-menu__item__label">Reviews</span>
+              <span class="post-menu__item__rating" ng-if="self.hasReviews">({{ self.reviewCount}})</span>
             </div>
             <div class="post-menu__item"
               ng-if="self.hasGroupFacet"
@@ -91,6 +101,9 @@ function genComponentConf() {
 
         const hasHolderFacet = needUtils.hasHolderFacet(post);
         const hasGroupFacet = needUtils.hasGroupFacet(post);
+        const hasReviewFacet = needUtils.hasReviewFacet(post);
+        const reviewCount =
+          hasReviewFacet && getIn(post, ["rating", "reviewCount"]);
 
         const groupMembers = hasGroupFacet && get(post, "groupMembers");
         const heldPosts = hasHolderFacet && get(post, "holds");
@@ -129,6 +142,9 @@ function genComponentConf() {
           heldPostsSize,
           hasHolderFacet,
           hasGroupFacet,
+          hasReviewFacet,
+          hasReviews: reviewCount > 0,
+          reviewCount,
           hasChatFacet: needUtils.hasChatFacet(post),
           hasGroupMembers: groupMembersSize > 0,
           groupMembersSize,

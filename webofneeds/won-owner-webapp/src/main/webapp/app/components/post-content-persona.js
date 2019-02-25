@@ -47,7 +47,7 @@ function genComponentConf() {
         <button class="pcp__rating__view won-button--filled red" ng-if="self.reviewCount" ng-click="self.viewPersonaReviews()">View</button>
       </div>
       <div class="pcp__holds" ng-if="self.personaHasHolderFacet">
-        <div class="pcp__holds__label">Author of {{ self.personaHoldsSize }} Post(s)</div>
+        <div class="pcp__holds__label">Holder of {{ self.personaHoldsSize }} Post(s)</div>
         <button class="pcp__holds__view won-button--filled red" ng-click="self.viewPersonaPosts()">View</button>
       </div>
       <won-description-viewer detail="::self.descriptionDetail" content="self.personaDescription" ng-if="self.descriptionDetail && self.personaDescription"></won-description-viewer>

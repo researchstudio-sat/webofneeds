@@ -90,6 +90,13 @@ function genComponentConf() {
             </div>
           </div>
 
+          <!-- REVIEW INFORMATION -->
+          <div class="post-content__reviews" ng-if="self.isSelectedTab('REVIEWS')">
+            <div class="post-content__reviews__empty">
+                No Reviews to display.
+            </div>
+          </div>
+
           <!-- SUGGESTIONS -->
           <div class="post-content__suggestions" ng-if="self.isSelectedTab('SUGGESTIONS')">
             <div
