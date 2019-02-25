@@ -116,14 +116,20 @@ function genComponentConf() {
       this.needs__selectTab(
         Immutable.fromJS({ needUri: this.personaUri, selectTab: "HOLDS" })
       );
-      this.router__stateGoCurrent({ viewNeedUri: this.personaUri });
+      this.router__stateGoCurrent({
+        viewNeedUri: this.personaUri,
+        viewConnUri: undefined,
+      });
     }
 
     viewPersonaReviews() {
       this.needs__selectTab(
         Immutable.fromJS({ needUri: this.personaUri, selectTab: "REVIEWS" })
       );
-      this.router__stateGoCurrent({ viewNeedUri: this.personaUri });
+      this.router__stateGoCurrent({
+        viewNeedUri: this.personaUri,
+        viewConnUri: undefined,
+      });
     }
   }
 
