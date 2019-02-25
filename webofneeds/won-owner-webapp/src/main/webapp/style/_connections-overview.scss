@@ -15,7 +15,7 @@ won-connections-overview {
       display: grid;
       grid-auto-flow: column;
       grid-template-columns: min-content 1fr;
-
+      align-items: center;
       border-bottom: $thinGrayBorder;
       box-sizing: border-box;
       overflow: hidden;
@@ -30,6 +30,7 @@ won-connections-overview {
       & > .co__item__need__indicator {
         box-sizing: border-box;
         width: 0.25rem;
+        height: 100%;
       }
 
       &.won-unread > .co__item__need__indicator {
