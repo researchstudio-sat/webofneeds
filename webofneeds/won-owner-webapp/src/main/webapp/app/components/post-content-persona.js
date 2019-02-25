@@ -38,10 +38,13 @@ function genComponentConf() {
           <a class="pcp__websitelink" target="_blank" href="{{self.personaWebsite}}" ng-if="self.personaWebsite">{{ self.personaWebsite }}</a>
       </div>
       <div class="pcp__rating" ng-if="self.personaHasReviewFacet">
+        <div class="pcp__rating__label">
+          <span class="pcp__rating__label__title">Rating</span>
+          <span class="pcp__rating__label__aggregate" ng-if="self.aggregateRatingString">(★ {{self.aggregateRatingString}})</span>
+        </div>
         <won-rating-view rating="self.aggregateRatingRounded" rating-connection-uri="self.ratingConnectionUri"></won-rating-view>
-        <div class="pcp__rating__aggregate" ng-if="self.aggregateRatingString">Aggregate Rating: ({{self.aggregateRatingString}})</div>
-        <div class="pcp__rating__reviewcount" ng-if="self.reviewCount">Reviews: ({{self.reviewCount}})</div>
-        <button class="pcp__holds__view won-button--filled red" ng-click="self.viewPersonaReviews()">View</button>
+        <div class="pcp__rating__reviewcount" ng-if="self.reviewCount">{{ self.reviewCount }} Reviews</div>
+        <button class="pcp__rating__view won-button--filled red" ng-if="self.reviewCount" ng-click="self.viewPersonaReviews()">View</button>
       </div>
       <div class="pcp__holds" ng-if="self.personaHasHolderFacet">
         <div class="pcp__holds__label">Author of {{ self.personaHoldsSize }} Post(s)</div>

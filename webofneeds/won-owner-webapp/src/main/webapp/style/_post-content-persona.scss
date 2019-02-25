@@ -53,8 +53,40 @@ won-post-content-persona {
     }
   }
 
+  .pcp__holds {
+    display: grid;
+    grid-template-columns: 1fr min-content;
+    align-items: center;
+
+    &__label {
+      font-weight: bold;
+    }
+  }
+
   .pcp__rating {
+    display: grid;
+    grid-template-areas: "r_header r_header" "r_reviewcount r_button" "r_rate r_rate";
     white-space: nowrap;
     text-overflow: ellipsis;
+
+    grid-template-columns: 1fr min-content;
+    align-items: center;
+
+    &__label {
+      grid-area: r_header;
+      font-weight: bold;
+    }
+
+    &__reviewcount {
+      grid-area: r_reviewcount;
+    }
+
+    &__view {
+      grid-area: r_button;
+    }
+
+    won-rating-view {
+      grid-area: r_rate;
+    }
   }
 }
