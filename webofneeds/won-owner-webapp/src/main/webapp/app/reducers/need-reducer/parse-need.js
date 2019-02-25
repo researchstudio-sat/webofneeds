@@ -178,8 +178,12 @@ function extractRating(needJsonLd) {
   const reviewedConnection = needJsonLd.get("won:reviewedConnection");
 
   const rating = {
-    aggregateRating: needJsonLd.get("s:aggregateRating"),
-    reviewCount: needJsonLd.get("s:reviewCount"),
+    aggregateRating:
+      needJsonLd.get("s:aggregateRating") &&
+      parseFloat(needJsonLd.get("s:aggregateRating")),
+    reviewCount:
+      needJsonLd.get("s:reviewCount") &&
+      parseInt(needJsonLd.get("s:reviewCount")),
     reviews: reviews
       ? Immutable.List.isList(reviews)
         ? reviews
