@@ -3,6 +3,7 @@
  */
 
 import angular from "angular";
+import inviewModule from "angular-inview";
 import postIsOrSeeksInfoModule from "./post-is-or-seeks-info.js";
 import labelledHrModule from "./labelled-hr.js";
 import postContentGeneral from "./post-content-general.js";
@@ -23,6 +24,8 @@ import ngAnimate from "angular-animate";
 
 import "style/_post-content.scss";
 import "style/_rdflink.scss";
+
+const CONNECTION_READ_TIMEOUT = 1500;
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
@@ -89,11 +92,12 @@ function genComponentConf() {
               class="post-content__suggestions__suggestion"
               ng-repeat="conn in self.suggestionsArray"
               ng-if="self.hasSuggestions"
+              in-view="conn.get('unread') && $inview && self.markAsRead(conn)"
               ng-class="{'won-unread': conn.get('unread')}">
                 <div class="post-content__suggestions__suggestion__indicator"></div>
                 <won-post-header
                   class="clickable"
-                  ng-click="self.connections__markAsRead({connectionUri: conn.get('uri'), needUri: self.postUri}) && self.router__stateGoCurrent({viewConnUri: conn.get('uri'), viewNeedUri: undefined})"
+                  ng-click="self.viewSuggestion(conn)"
                   need-uri="::conn.get('remoteNeedUri')">
                 </won-post-header>
                 <div class="post-content__suggestions__suggestion__actions">
@@ -104,7 +108,7 @@ function genComponentConf() {
                     </div>
                     <div
                       class="post-content__suggestions__suggestion__actions__button red won-button--outlined thin"
-                      ng-click="self.closeConnection(conn.get('uri'))">
+                      ng-click="self.closeConnection(conn)">
                         Remove
                     </div>
                 </div>
@@ -237,8 +241,24 @@ function genComponentConf() {
       }
     }
 
-    closeConnection(connUri, rateBad = false) {
-      rateBad && this.connections__rate(connUri, won.WON.binaryRatingBad);
+    closeConnection(conn, rateBad = false) {
+      if (!conn) {
+        return;
+      }
+
+      const connUri = conn.get("uri");
+
+      if (rateBad) {
+        this.connections__rate(connUri, won.WON.binaryRatingBad);
+      }
+
+      if (conn.get("unread")) {
+        this.connections__markAsRead({
+          connectionUri: connUri,
+          needUri: this.postUri,
+        });
+      }
+
       this.connections__close(connUri);
     }
 
@@ -250,6 +270,13 @@ function genComponentConf() {
       const connUri = get(conn, "uri");
       const remoteNeedUri = get(conn, "remoteNeedUri");
 
+      if (conn.get("unread")) {
+        this.connections__markAsRead({
+          connectionUri: connUri,
+          needUri: this.postUri,
+        });
+      }
+
       if (this.isOwnedNeedWhatsX) {
         this.connections__close(connUri);
 
@@ -259,12 +286,7 @@ function genComponentConf() {
         //this.router__back();
       } else {
         this.connections__rate(connUri, won.WON.binaryRatingGood);
-        this.needs__connect(
-          this.post.get("uri"),
-          connUri,
-          remoteNeedUri,
-          message
-        );
+        this.needs__connect(this.postUri, connUri, remoteNeedUri, message);
       }
     }
 
@@ -274,6 +296,41 @@ function genComponentConf() {
 
     isSelectedTab(tabName) {
       return tabName === this.visibleTab;
+    }
+
+    markAsRead(conn) {
+      if (conn && conn.get("unread")) {
+        const payload = {
+          connectionUri: conn.get("uri"),
+          needUri: this.postUri,
+        };
+
+        const tmp_connections__markAsRead = this.connections__markAsRead;
+
+        setTimeout(function() {
+          tmp_connections__markAsRead(payload);
+        }, CONNECTION_READ_TIMEOUT);
+      }
+    }
+
+    viewSuggestion(conn) {
+      if (!conn) {
+        return;
+      }
+
+      const connUri = conn.get("uri");
+
+      if (conn.get("unread")) {
+        this.connections__markAsRead({
+          connectionUri: connUri,
+          needUri: this.postUri,
+        });
+      }
+
+      this.router__stateGoCurrent({
+        viewConnUri: connUri,
+        viewNeedUri: undefined,
+      });
     }
 
     /**
@@ -313,5 +370,6 @@ export default angular
     postContentGeneral,
     postHeaderModule,
     trigModule,
+    inviewModule.name,
   ])
   .directive("wonPostContent", genComponentConf).name;

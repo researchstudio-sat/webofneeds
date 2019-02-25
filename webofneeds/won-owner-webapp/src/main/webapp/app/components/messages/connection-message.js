@@ -69,7 +69,7 @@ function genComponentConf() {
                   'won-cm__center--system': self.isFromSystem,
                   'won-cm__center--inject-into': self.isInjectIntoMessage
                 }"
-                in-view="$inview && self.markAsRead()">
+                in-view="self.isUnread && $inview && self.markAsRead()">
             <div class="won-cm__center__bubble"
                 ng-class="{
     			        'references' : 	self.hasReferences,

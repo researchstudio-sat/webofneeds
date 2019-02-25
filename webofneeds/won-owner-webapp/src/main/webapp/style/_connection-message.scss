@@ -4,6 +4,13 @@
 @import "animate";
 
 won-connection-message {
+  grid-template-columns: min-content minmax(min-content, max-content);
+  box-sizing: border-box;
+  padding: 0.5rem 0 0.5rem 0.5rem;
+  @include square-image($postIconSize, 0 0.5rem 0 0);
+  display: grid;
+  grid-template-areas: "icon content";
+
   &.won-is-multiSelect {
     padding-left: 3rem;
     cursor: pointer;
@@ -23,7 +30,8 @@ won-connection-message {
   }
 
   &.won-unread {
-    background-color: $won-unread;
+    border-left: 0.25rem solid $won-unread-attention;
+    padding-left: 0.25rem;
   }
 
   &.won-is-collapsed {
@@ -41,11 +49,6 @@ won-connection-message {
       margin: 0 0.5rem 0 0;
     }
   }
-
-  padding: 0.5rem 0;
-  @include square-image($postIconSize, 0 0.5rem 0 0);
-  display: grid;
-  grid-template-areas: "icon content";
 
   won-square-image {
     grid-area: icon;
@@ -179,8 +182,4 @@ won-connection-message {
       }
     }
   }
-}
-
-won-connection-message {
-  grid-template-columns: min-content minmax(min-content, max-content);
 }
