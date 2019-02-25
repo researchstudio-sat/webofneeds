@@ -55,22 +55,22 @@ function genComponentConf() {
                     <a class="won-button--outlined thin red"
                         ng-if="self.adminEmail"
                         href="mailto:{{ self.adminEmail }}?{{ self.generateReportPostMailParams()}}">
-                        Report Post
+                        Report
                     </a>
                     <button class="won-button--filled red"
                         ng-if="self.isOwnPost && self.isInactive"
                         ng-click="self.reOpenPost()">
-                        Reopen Post
+                        Reopen
                     </button>
                     <button class="won-button--filled red"
                         ng-if="self.isOwnPost && self.isInactive"
                         ng-click="self.deletePost()">
-                        Delete Post
+                        Delete
                     </button>
                     <button class="won-button--filled red"
                         ng-if="self.isOwnPost && self.isActive"
                         ng-click="self.closePost()">
-                        Remove Post
+                        Remove
                     </button>
                 </div>
             </div>
