@@ -113,7 +113,6 @@ function genComponentConf() {
     }
 
     viewPersonaPosts() {
-      console.debug("IMPL ME");
       this.needs__selectTab(
         Immutable.fromJS({ needUri: this.personaUri, selectTab: "HOLDS" })
       );
@@ -121,7 +120,6 @@ function genComponentConf() {
     }
 
     viewPersonaReviews() {
-      console.debug("IMPL ME");
       this.needs__selectTab(
         Immutable.fromJS({ needUri: this.personaUri, selectTab: "REVIEWS" })
       );
