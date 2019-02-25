@@ -36,16 +36,6 @@ function genComponentConf() {
               <span class="post-menu__item__rating" ng-if="self.personaAggregateRatingString">(★ {{ self.personaAggregateRatingString }})</span>
             </div>
             <div class="post-menu__item"
-              ng-if="self.hasReviewFacet"
-              ng-click="self.selectTab('REVIEWS')"
-              ng-class="{
-                'post-menu__item--selected': self.isSelectedTab('REVIEWS'),
-                'post-menu__item--inactive': !self.hasReviews,
-              }">
-              <span class="post-menu__item__label">Reviews</span>
-              <span class="post-menu__item__rating" ng-if="self.hasReviews">({{ self.reviewCount}})</span>
-            </div>
-            <div class="post-menu__item"
               ng-if="self.hasGroupFacet"
               ng-click="self.selectTab('PARTICIPANTS')"
               ng-class="{
@@ -76,6 +66,16 @@ function genComponentConf() {
               }">
               <span class="post-menu__item__label">Posts of this Persona</span>
               <span class="post-menu__item__count">({{self.heldPostsSize}})</span>
+            </div>
+            <div class="post-menu__item"
+              ng-if="self.hasReviewFacet"
+              ng-click="self.selectTab('REVIEWS')"
+              ng-class="{
+                'post-menu__item--selected': self.isSelectedTab('REVIEWS'),
+                'post-menu__item--inactive': !self.hasReviews,
+              }">
+              <span class="post-menu__item__label">Reviews</span>
+              <span class="post-menu__item__rating" ng-if="self.hasReviews">({{ self.reviewCount}})</span>
             </div>
             <div class="post-menu__item"
               ng-if="self.shouldShowRdf"
