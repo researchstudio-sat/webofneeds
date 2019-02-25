@@ -3,16 +3,17 @@ module EditNeed exposing (main)
 import Actions
 import Application
     exposing
-        ( Need(..)
+        ( Id
+        , Need(..)
         , NeedData
         , NeedStorage(..)
         , Persona
         , State
         , ownedNeeds
         )
-import AssocList as Dict exposing (Dict)
-import AssocList.Extra as Dict
 import Browser
+import Dict exposing (Dict)
+import Dict.Extra as Dict
 import Element.Input.Styled as Input
 import Element.Styled as Element exposing (Element, fill, none)
 import Json.Decode as JD exposing (Value)
@@ -22,7 +23,7 @@ import Url exposing (Url)
 
 
 type alias ActiveUrl =
-    Url
+    Id
 
 
 type alias Model =
@@ -32,11 +33,11 @@ type alias Model =
 
 type Msg
     = ToggleDropdown
-    | SelectPersona Url
+    | SelectPersona Id
     | RemovePersona
 
 
-getNeed : State -> Url -> Maybe Need
+getNeed : State -> Id -> Maybe Need
 getNeed state url =
     case Dict.get url state.needs of
         Just (Loaded needData) ->
@@ -66,7 +67,7 @@ hasPersona state activeNeed =
         |> Maybe.withDefault False
 
 
-getOwnedPersonas : State -> Dict Url Persona
+getOwnedPersonas : State -> Dict Id Persona
 getOwnedPersonas state =
     let
         filter url needStorage =

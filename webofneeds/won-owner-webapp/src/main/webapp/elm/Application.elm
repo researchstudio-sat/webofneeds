@@ -1,5 +1,6 @@
 port module Application exposing
-    ( Need(..)
+    ( Id
+    , Need(..)
     , NeedData
     , NeedStorage(..)
     , Persona
@@ -9,10 +10,9 @@ port module Application exposing
     , urlDecoder
     )
 
-import AssocList as Dict exposing (Dict)
 import Browser
+import Dict exposing (Dict)
 import Element.Styled as Element exposing (Element, Style)
-import EverySet exposing (EverySet)
 import Html exposing (Html)
 import Json.Decode as Decode exposing (Decoder, Value)
 import Json.Decode.Extra as Decode
@@ -34,6 +34,10 @@ port inPort :
     -> Sub msg
 
 
+type alias Id =
+    String
+
+
 port errorPort : String -> Cmd msg
 
 
@@ -53,17 +57,17 @@ type alias NeedData =
 type Need
     = PersonaNeed Persona
     | Other
-        { holder : Maybe Url
+        { holder : Maybe Id
         }
 
 
 type alias State =
-    { needs : Dict Url NeedStorage
-    , owned : EverySet Url
+    { needs : Dict Id NeedStorage
+    , owned : Set Id
     }
 
 
-ownedNeeds : State -> Dict Url NeedStorage
+ownedNeeds : State -> Dict Id NeedStorage
 ownedNeeds state =
     let
         selectNeed url =
@@ -73,7 +77,7 @@ ownedNeeds state =
                         ( url, needStorage )
                     )
     in
-    EverySet.toList state.owned
+    Set.toList state.owned
         |> List.filterMap selectNeed
         |> Dict.fromList
 
@@ -143,11 +147,12 @@ dateDecoder =
             )
 
 
-urlDecoder : Decoder Url
+urlDecoder : Decoder Id
 urlDecoder =
     Decode.string
         |> Decode.andThen
             (Url.fromString
+                >> Maybe.map Url.toString
                 >> Result.fromMaybe "Not a valid Url"
                 >> Decode.fromResult
             )
@@ -155,7 +160,7 @@ urlDecoder =
 
 otherDecoder :
     Decoder
-        { holder : Maybe Url
+        { holder : Maybe Id
         }
 otherDecoder =
     Decode.succeed
@@ -215,7 +220,7 @@ keyValueDecoder keyDecoder valDecoder =
             )
 
 
-needsDecoder : Decoder (Dict Url NeedStorage)
+needsDecoder : Decoder (Dict Id NeedStorage)
 needsDecoder =
     let
         needFilter ( key, maybeVal ) =
@@ -224,6 +229,7 @@ needsDecoder =
     keyValueDecoder
         (\url ->
             Url.fromString url
+                |> Maybe.map Url.toString
                 |> Result.fromMaybe (url ++ " is not a valid url")
                 |> Decode.fromResult
         )
@@ -232,11 +238,12 @@ needsDecoder =
         |> Decode.map Dict.fromList
 
 
-ownedDecoder : Decoder (EverySet Url)
+ownedDecoder : Decoder (Set Id)
 ownedDecoder =
     let
         decodeUrl url =
             Url.fromString url
+                |> Maybe.map Url.toString
                 |> Result.fromMaybe (url ++ " is not a valid url")
                 |> Decode.fromResult
 
@@ -258,7 +265,7 @@ ownedDecoder =
         |> Decode.map
             (\list ->
                 List.filterMap convertToUrls list
-                    |> EverySet.fromList
+                    |> Set.fromList
             )
 
 

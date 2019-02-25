@@ -1,15 +1,15 @@
 port module Actions exposing (connectPersona)
 
+import Application exposing (Id)
 import Json.Encode as Encode exposing (Value)
-import Url exposing (Url)
 
 
 port outPort : { action : String, payload : Value } -> Cmd msg
 
 
 connectPersona :
-    { personaUrl : Url
-    , needUrl : Url
+    { personaUrl : Id
+    , needUrl : Id
     }
     -> Cmd msg
 connectPersona { personaUrl, needUrl } =
@@ -17,7 +17,7 @@ connectPersona { personaUrl, needUrl } =
         { action = "personas__connect"
         , payload =
             Encode.list Encode.string
-                [ Url.toString needUrl
-                , Url.toString personaUrl
+                [ needUrl
+                , personaUrl
                 ]
         }
