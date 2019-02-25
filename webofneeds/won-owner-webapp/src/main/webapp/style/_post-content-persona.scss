@@ -2,11 +2,11 @@
 @import "sizing-utils";
 @import "square-image";
 
-won-post-content-author {
+won-post-content-persona {
   display: grid;
   grid-gap: 0.5rem;
 
-  .pca__header {
+  .pcp__header {
     display: grid;
     grid-template-areas:
       "p_icon p_name p_name"
@@ -43,17 +43,17 @@ won-post-content-author {
       }
     }
 
-    .pca__websitelabel {
+    .pcp__websitelabel {
       font-size: $smallFontSize;
       grid-area: p_websitelabel;
     }
-    .pca__websitelink {
+    .pcp__websitelink {
       font-size: $smallFontSize;
       grid-area: p_websitelink;
     }
   }
 
-  .pca__rating {
+  .pcp__rating {
     white-space: nowrap;
     text-overflow: ellipsis;
   }

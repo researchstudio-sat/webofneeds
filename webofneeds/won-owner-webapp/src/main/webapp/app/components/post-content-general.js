@@ -37,7 +37,7 @@ function genComponentConf() {
           <!-- PERSONA -->
           <div class="pcg__columns__left__item" ng-if="self.persona">
             <div class="pcg__columns__left__item__label">
-              Author
+              Persona
             </div>
             <div class="pcg__columns__left__item__value">
               {{ self.persona.get('humanReadable') }}

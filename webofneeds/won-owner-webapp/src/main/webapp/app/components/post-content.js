@@ -7,7 +7,7 @@ import inviewModule from "angular-inview";
 import postIsOrSeeksInfoModule from "./post-is-or-seeks-info.js";
 import labelledHrModule from "./labelled-hr.js";
 import postContentGeneral from "./post-content-general.js";
-import postContentAuthor from "./post-content-author.js";
+import postContentPersona from "./post-content-persona.js";
 import postHeaderModule from "./post-header.js";
 import trigModule from "./trig.js";
 import { attach, getIn, get } from "../utils.js";
@@ -69,8 +69,8 @@ function genComponentConf() {
           <won-labelled-hr ng-if="self.isSelectedTab('DETAIL')" ng-click="self.toggleShowGeneral()" arrow="self.showGeneral ? 'up' : 'down'" label="::'General Information'" class="cp__labelledhr"></won-labelled-hr>
           <won-post-content-general class="post-collapsible-general" ng-if="self.isSelectedTab('DETAIL') && self.showGeneral" post-uri="self.postUri"></won-post-content-general>
 
-          <!-- AUTHOR INFORMATION -->
-          <won-post-content-author ng-if="self.isSelectedTab('HELDBY')" holds-uri="self.postUri"></won-post-content-author>
+          <!-- PERSONA INFORMATION -->
+          <won-post-content-persona ng-if="self.isSelectedTab('HELDBY')" holds-uri="self.postUri"></won-post-content-persona>
 
           <!-- PARTICIPANT INFORMATION -->
           <div class="post-content__members" ng-if="self.isSelectedTab('PARTICIPANTS')">
@@ -372,7 +372,7 @@ export default angular
     postIsOrSeeksInfoModule,
     labelledHrModule,
     postContentGeneral,
-    postContentAuthor,
+    postContentPersona,
     postHeaderModule,
     trigModule,
     inviewModule.name,

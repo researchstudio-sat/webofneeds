@@ -33,6 +33,7 @@ function genComponentConf() {
                 'post-menu__item--selected': self.isSelectedTab('HELDBY'),
               }">
               <span class="post-menu__item__label">Author</span>
+              <span class="post-menu__item__rating">(★ 4.3)</span>
             </div>
             <div class="post-menu__item"
               ng-if="self.hasGroupFacet"
@@ -93,7 +94,7 @@ function genComponentConf() {
 
         const groupMembers = hasGroupFacet && get(post, "groupMembers");
         const heldPosts = hasHolderFacet && get(post, "holds");
-        const hasHeldBy = //aka Author/Persona that holds this post
+        const hasHeldBy = //aka Persona that holds this post
           needUtils.hasHoldableFacet(post) && !!get(post, "heldBy");
         const suggestions =
           isOwned &&

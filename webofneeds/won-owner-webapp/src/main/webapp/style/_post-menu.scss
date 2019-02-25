@@ -40,6 +40,7 @@ won-post-menu {
         border-bottom-color: 0.2rem solid $won-line-gray;
       }
 
+      & > .post-menu__item__rating,
       & > .post-menu__item__count {
         height: 0;
         width: 0;
@@ -51,6 +52,7 @@ won-post-menu {
     }
 
     &.post-menu__item--unread {
+      & > .post-menu__item__rating,
       & > .post-menu__item__count,
       & > .post-menu__item__label {
         color: $won-unread-attention;
@@ -96,6 +98,7 @@ won-post-menu {
       font-size: $normalFontSize;
     }
 
+    & > .post-menu__item__rating,
     & > .post-menu__item__count {
       display: inline-block;
       margin-left: 0.25rem;

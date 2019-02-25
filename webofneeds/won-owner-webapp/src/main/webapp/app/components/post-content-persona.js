@@ -18,34 +18,34 @@ import squareImageModule from "./square-image.js";
 import descriptionDetailViewerModule from "./details/viewer/description-viewer.js";
 import { details } from "../../config/detail-definitions.js";
 
-import "style/_post-content-author.scss";
+import "style/_post-content-persona.scss";
 import { getOwnedConnectionByUri } from "../selectors/connection-selectors.js";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
-      <div class="pca__header">
+      <div class="pcp__header">
           <won-square-image ng-if="!self.personaLoading"
               uri="::self.personaUri">
           </won-square-image>
-          <div class="pca__header__name"
+          <div class="pcp__header__name"
               ng-if="self.personaName">
-              <span class="pca__header__name__label">{{ self.personaName }}</span>
-              <span class="pca__header__name__verification pca__header__name__verification--verified" ng-if="self.personaVerified" title="The Authorship of this Post is verified by the Persona">Verified</span>
-              <span class="pca__header__name__verification pca__header__name__verification--unverified" ng-if="!self.personaVerified" title="The Authorship of this Post is NOT verified by the Persona">Unverified!</span>
+              <span class="pcp__header__name__label">{{ self.personaName }}</span>
+              <span class="pcp__header__name__verification pcp__header__name__verification--verified" ng-if="self.personaVerified" title="The Persona-Relation of this Post is verified by the Persona">Verified</span>
+              <span class="pcp__header__name__verification pcp__header__name__verification--unverified" ng-if="!self.personaVerified" title="The Persona-Relation of this Post is NOT verified by the Persona">Unverified!</span>
           </div>
-          <div class="pca__websitelabel" ng-if="self.personaWebsite">Website:</div>
-          <a class="pca__websitelink" target="_blank" href="{{self.personaWebsite}}" ng-if="self.personaWebsite">{{ self.personaWebsite }}</a>
+          <div class="pcp__websitelabel" ng-if="self.personaWebsite">Website:</div>
+          <a class="pcp__websitelink" target="_blank" href="{{self.personaWebsite}}" ng-if="self.personaWebsite">{{ self.personaWebsite }}</a>
       </div>
-      <div class="pca__rating" ng-if="self.personaHasReviewFacet">
+      <div class="pcp__rating" ng-if="self.personaHasReviewFacet">
         <won-rating-view rating="self.aggregateRatingRounded" rating-connection-uri="self.ratingConnectionUri"></won-rating-view>
-        <div class="pca__rating__aggregate" ng-if="self.aggregateRatingString">Aggregate Rating: ({{self.aggregateRatingString}})</div>
-        <div class="pca__rating__reviewcount" ng-if="self.reviewCount">Reviews: ({{self.reviewCount}})</div>
-        <button class="pca__holds__view won-button--filled red" ng-click="self.viewPersonaReviews()">View</button>
+        <div class="pcp__rating__aggregate" ng-if="self.aggregateRatingString">Aggregate Rating: ({{self.aggregateRatingString}})</div>
+        <div class="pcp__rating__reviewcount" ng-if="self.reviewCount">Reviews: ({{self.reviewCount}})</div>
+        <button class="pcp__holds__view won-button--filled red" ng-click="self.viewPersonaReviews()">View</button>
       </div>
-      <div class="pca__holds" ng-if="self.personaHasHolderFacet">
-        <div class="pca__holds__label">Author of {{ self.personaHoldsSize }} Post(s)</div>
-        <button class="pca__holds__view won-button--filled red" ng-click="self.viewPersonaPosts()">View</button>
+      <div class="pcp__holds" ng-if="self.personaHasHolderFacet">
+        <div class="pcp__holds__label">Author of {{ self.personaHoldsSize }} Post(s)</div>
+        <button class="pcp__holds__view won-button--filled red" ng-click="self.viewPersonaPosts()">View</button>
       </div>
       <won-description-viewer detail="::self.descriptionDetail" content="self.personaDescription" ng-if="self.descriptionDetail && self.personaDescription"></won-description-viewer>
     `;
@@ -53,7 +53,7 @@ function genComponentConf() {
   class Controller {
     constructor() {
       attach(this, serviceDependencies, arguments);
-      window.pca4dbg = this;
+      window.pcp4dbg = this;
 
       const selectFromState = state => {
         const connectionUri = getConnectionUriFromRoute(state);
@@ -140,9 +140,9 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.postContentAuthor", [
+  .module("won.owner.components.postContentPersona", [
     ratingView,
     squareImageModule,
     descriptionDetailViewerModule,
   ])
-  .directive("wonPostContentAuthor", genComponentConf).name;
+  .directive("wonPostContentPersona", genComponentConf).name;
