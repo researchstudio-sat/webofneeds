@@ -488,7 +488,6 @@ function genComponentConf() {
        */
       onSelectedConnection: "&",
       onSelectedNeed: "&",
-      onSelectedGroupChat: "&",
     },
     template: template,
   };

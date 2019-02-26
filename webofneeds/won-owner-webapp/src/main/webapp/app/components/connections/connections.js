@@ -184,19 +184,6 @@ class ConnectionsController {
     });
   }
 
-  selectGroupChat(needUri) {
-    //TODO: Mark all groupconnections as read
-    this.router__stateGoCurrent({
-      connectionUri: undefined,
-      postUri: undefined,
-      useCase: undefined,
-      useCaseGroup: undefined,
-      groupPostAdminUri: needUri,
-      fromNeedUri: undefined,
-      mode: undefined,
-    });
-  }
-
   markAsRead(connectionUri) {
     const need = generalSelectors.getOwnedNeedByConnectionUri(
       this.$ngRedux.getState(),
