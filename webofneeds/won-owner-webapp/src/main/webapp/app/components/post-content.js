@@ -237,13 +237,18 @@ function genComponentConf() {
         const hasContent = this.hasVisibleDetails(content);
         const hasSeeksBranch = this.hasVisibleDetails(seeks);
 
-        const groupMembers = get(post, "groupMembers");
-        const groupChatConnections = connectionSelectors.getGroupChatConnectionsByNeedUri(
-          state,
-          this.postUri
-        );
+        const hasGroupFacet = needUtils.hasGroupFacet(post);
 
-        const heldPosts = get(post, "holds");
+        const groupMembers = hasGroupFacet && get(post, "groupMembers");
+        const groupChatConnections =
+          isOwned &&
+          hasGroupFacet &&
+          connectionSelectors.getGroupChatConnectionsByNeedUri(
+            state,
+            this.postUri
+          );
+
+        const heldPosts = isPersona && get(post, "holds");
 
         const suggestions = connectionSelectors.getSuggestedConnectionsByNeedUri(
           state,
@@ -266,7 +271,7 @@ function genComponentConf() {
           isOwned,
           hasHeldPosts: isPersona && heldPosts && heldPosts.size > 0,
           heldPostsArray: isPersona && heldPosts && heldPosts.toArray(),
-          hasGroupFacet: needUtils.hasGroupFacet(post),
+          hasGroupFacet,
           hasChatFacet: needUtils.hasChatFacet(post),
           hasGroupMembers: groupMembers && groupMembers.size > 0,
           hasGroupChatConnections:
