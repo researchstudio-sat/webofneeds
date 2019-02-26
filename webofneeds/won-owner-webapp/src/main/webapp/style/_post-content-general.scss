@@ -6,8 +6,8 @@ won-post-content-general {
   display: grid;
   grid-auto-flow: row;
   font-size: $smallFontSize;
-  margin: 0.25rem 0 0 0;
   background: var(--won-lighter-gray);
+  border: $thinGrayBorder;
   padding: 0.5rem;
   grid-gap: 0.25rem;
 

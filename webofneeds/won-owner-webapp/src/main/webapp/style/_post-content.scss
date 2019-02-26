@@ -188,13 +188,4 @@ won-post-content {
       font-weight: 700;
     }
   }
-
-  .post-collapsible-general {
-    @include slideWithOpacityAnimationFixedHorizontal(
-      0.25s,
-      linear,
-      10rem,
-      0.5rem
-    );
-  }
 }

@@ -60,14 +60,14 @@ function genComponentConf() {
         </div>
         </div>
         <div class="post-content" ng-if="!self.postLoading && !self.postFailedToLoad">
+          <!-- GENERAL INFORMATION -->
+          <won-post-content-general ng-if="self.isSelectedTab('DETAIL')" post-uri="self.postUri"></won-post-content-general>
           <!-- DETAIL INFORMATION -->
           <won-post-is-or-seeks-info branch="::'content'" ng-if="self.isSelectedTab('DETAIL') && self.hasContent" post-uri="self.postUri"></won-post-is-or-seeks-info>
           <won-labelled-hr label="::'Search'" class="cp__labelledhr" ng-show="self.isSelectedTab('DETAIL') && self.hasContent && self.hasSeeksBranch"></won-labelled-hr>
           <won-post-is-or-seeks-info branch="::'seeks'" ng-if="self.isSelectedTab('DETAIL') && self.hasSeeksBranch" post-uri="self.postUri"></won-post-is-or-seeks-info>
 
-          <!-- GENERAL INFORMATION -->
-          <won-labelled-hr ng-if="self.isSelectedTab('DETAIL')" ng-click="self.toggleShowGeneral()" arrow="self.showGeneral ? 'up' : 'down'" label="::'General Information'" class="cp__labelledhr"></won-labelled-hr>
-          <won-post-content-general class="post-collapsible-general" ng-if="self.isSelectedTab('DETAIL') && self.showGeneral" post-uri="self.postUri"></won-post-content-general>
+
 
           <!-- PERSONA INFORMATION -->
           <won-post-content-persona ng-if="self.isSelectedTab('HELDBY')" holds-uri="self.postUri"></won-post-content-persona>
@@ -234,10 +234,6 @@ function genComponentConf() {
           shouldShowRdf: viewUtils.showRdf(viewState),
           fromConnection: !!openConnectionUri,
           openConnectionUri,
-          showGeneral: viewUtils.isShowingGeneralInfoByNeedUri(
-            viewState,
-            this.postUri
-          ),
           visibleTab: viewUtils.getVisibleTabByNeedUri(viewState, this.postUri),
         };
       };
@@ -299,10 +295,6 @@ function genComponentConf() {
         this.connections__rate(connUri, won.WON.binaryRatingGood);
         this.needs__connect(this.postUri, connUri, remoteNeedUri, message);
       }
-    }
-
-    toggleShowGeneral() {
-      this.needs__toggleGeneralInfo(this.postUri);
     }
 
     isSelectedTab(tabName) {
