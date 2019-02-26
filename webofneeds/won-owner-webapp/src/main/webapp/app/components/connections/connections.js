@@ -4,7 +4,6 @@ import won from "../../won-es6.js";
 import sendRequestModule from "../send-request.js";
 import postMessagesModule from "../post-messages.js";
 import groupPostMessagesModule from "../group-post-messages.js";
-import groupAdministrationModule from "../group-administration.js";
 import postInfoModule from "../post-info.js";
 import connectionsOverviewModule from "../connections-overview.js";
 import createPostModule from "../create-post.js";
@@ -39,9 +38,6 @@ class ConnectionsController {
       const selectedPost =
         selectedPostUri && getIn(state, ["needs", selectedPostUri]);
 
-      const showGroupPostAdministration = !!generalSelectors.getGroupPostAdminUriFromRoute(
-        state
-      );
       const useCase = generalSelectors.getUseCaseFromRoute(state);
       const useCaseGroup = generalSelectors.getUseCaseGroupFromRoute(state);
 
@@ -91,14 +87,12 @@ class ConnectionsController {
           !useCase &&
           !useCaseGroup &&
           !selectedPost &&
-          !showGroupPostAdministration &&
           (!selectedConnection || selectedConnectionState === won.WON.Closed),
         showContentSide:
           showCreateFromPost ||
           useCase ||
           useCaseGroup ||
           selectedPost ||
-          showGroupPostAdministration ||
           (selectedConnection && selectedConnectionState !== won.WON.Closed),
 
         showUseCasePicker:
@@ -127,7 +121,6 @@ class ConnectionsController {
         showPostMessages:
           !selectedPost &&
           !useCaseGroup &&
-          !showGroupPostAdministration &&
           !isSelectedConnectionGroupChat &&
           (selectedConnectionState === won.WON.Connected ||
             selectedConnectionState === won.WON.RequestReceived ||
@@ -136,15 +129,12 @@ class ConnectionsController {
         showGroupPostMessages:
           !selectedPost &&
           !useCaseGroup &&
-          !showGroupPostAdministration &&
           isSelectedConnectionGroupChat &&
           (selectedConnectionState === won.WON.Connected ||
             selectedConnectionState === won.WON.RequestReceived ||
             selectedConnectionState === won.WON.RequestSent ||
             selectedConnectionState === won.WON.Suggested),
-        showPostInfo:
-          selectedPost && !useCaseGroup && !showGroupPostAdministration,
-        showGroupPostAdministration: showGroupPostAdministration,
+        showPostInfo: selectedPost && !useCaseGroup,
         showSlideIns:
           viewSelectors.hasSlideIns(state) && viewSelectors.showSlideIns(state),
         showNeedOverlay: !!viewNeedUri,
@@ -154,7 +144,6 @@ class ConnectionsController {
         hideListSideInResponsive:
           showCreateFromPost ||
           !hasOwnedNeeds ||
-          showGroupPostAdministration ||
           selectedConnection ||
           selectedPost ||
           !!useCaseGroup ||
@@ -238,7 +227,6 @@ export default angular
     sendRequestModule,
     postMessagesModule,
     groupPostMessagesModule,
-    groupAdministrationModule,
     postInfoModule,
     usecasePickerModule,
     usecaseGroupModule,
