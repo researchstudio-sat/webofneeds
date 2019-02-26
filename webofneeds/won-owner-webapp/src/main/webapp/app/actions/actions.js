@@ -91,6 +91,7 @@ import {
   createPersona,
   reviewPersona,
   connectPersona,
+  disconnectPersona,
 } from "./persona-actions.js";
 
 // </action-creators>
@@ -167,6 +168,7 @@ const actionHierarchy = {
     create: createPersona,
     review: reviewPersona,
     connect: connectPersona,
+    disconnect: disconnectPersona,
 
     storeTheirs: INJ_DEFAULT,
     storeTheirUrisInLoading: INJ_DEFAULT,

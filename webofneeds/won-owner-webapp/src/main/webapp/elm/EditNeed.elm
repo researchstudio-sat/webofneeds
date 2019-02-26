@@ -47,24 +47,34 @@ getNeed state url =
             Nothing
 
 
-hasPersona : State -> ActiveUrl -> Bool
-hasPersona state activeNeed =
+getHolder : State -> ActiveUrl -> Maybe Id
+getHolder state activeNeed =
     getNeed state activeNeed
         |> Maybe.map
             (\need ->
-                case Debug.log "need" need of
+                case need of
                     Other { holder } ->
                         case holder of
-                            Just _ ->
-                                True
+                            Just id ->
+                                Just id
 
                             Nothing ->
-                                False
+                                Nothing
 
                     _ ->
-                        False
+                        Nothing
             )
-        |> Maybe.withDefault False
+        |> Maybe.withDefault Nothing
+
+
+hasPersona : State -> ActiveUrl -> Bool
+hasPersona state activeNeed =
+    case getHolder state activeNeed of
+        Just _ ->
+            True
+
+        Nothing ->
+            False
 
 
 getOwnedPersonas : State -> Dict Id Persona
@@ -120,7 +130,17 @@ update activeUrl state msg model =
             )
 
         RemovePersona ->
-            ( model, Cmd.none )
+            case getHolder state activeUrl of
+                Just personaUrl ->
+                    ( model
+                    , Actions.disconnectPersona
+                        { personaUrl = personaUrl
+                        , needUrl = activeUrl
+                        }
+                    )
+
+                Nothing ->
+                    ( model, Cmd.none )
 
 
 view : ActiveUrl -> State -> Model -> Element Msg

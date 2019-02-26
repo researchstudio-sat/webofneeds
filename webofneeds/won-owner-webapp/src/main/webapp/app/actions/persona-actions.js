@@ -4,7 +4,7 @@ import { getRandomWonId } from "../won-utils";
 import { actionTypes } from "./actions";
 import { getOwnedNeedByConnectionUri } from "../selectors/general-selectors";
 import { getOwnedConnectionByUri } from "../selectors/connection-selectors";
-import { buildConnectMessage } from "../won-message-utils";
+import { buildConnectMessage, buildCloseMessage } from "../won-message-utils";
 
 export function createPersona(persona, nodeUri) {
   return (dispatch, getState) => {
@@ -137,6 +137,44 @@ export function connectPersona(needUri, personaUri) {
         needUri: needUri,
         personaUri: personaUri,
       },
+    });
+  };
+}
+
+export function disconnectPersona(needUri, personaUri) {
+  return (dispatch, getState) => {
+    const state = getState();
+    const persona = state.getIn(["needs", personaUri]);
+    const need = state.getIn(["needs", needUri]);
+
+    const connectionUri = persona
+      .get("connections")
+      .filter(
+        connection =>
+          connection.get("remoteNeedUri") == need.get("uri") &&
+          connection.get("facet") == won.WON.HolderFacetCompacted
+      )
+      .keySeq()
+      .first();
+
+    const connection = getOwnedConnectionByUri(state, connectionUri);
+
+    buildCloseMessage(
+      connectionUri,
+      personaUri,
+      needUri,
+      persona.get("nodeUri"),
+      need.get("nodeUri"),
+      connection.get("remoteConnectionUri")
+    ).then(({ eventUri, message }) => {
+      dispatch({
+        type: actionTypes.connections.close,
+        payload: {
+          connectionUri,
+          eventUri,
+          message,
+        },
+      });
     });
   };
 }
