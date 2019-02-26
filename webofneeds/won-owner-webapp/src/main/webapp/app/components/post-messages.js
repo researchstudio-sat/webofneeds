@@ -439,10 +439,7 @@ function genComponentConf() {
             processUtils.isNeedLoading(process, remoteNeedUri) ||
             processUtils.isConnectionLoading(process, selectedConnectionUri),
           showPostContentMessage:
-            showChatData &&
-            !multiSelectType &&
-            remoteNeedUri &&
-            !needUtils.isDirectResponseNeed(remoteNeed),
+            showChatData && !multiSelectType && remoteNeedUri,
           showOverlayConnection: !!this.connectionUri,
         };
       };
