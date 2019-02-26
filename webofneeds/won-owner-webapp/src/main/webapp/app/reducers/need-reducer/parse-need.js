@@ -174,9 +174,26 @@ function extractCreationDate(needJsonLd) {
 }
 
 function extractRating(needJsonLd) {
+  const reviews = needJsonLd.get("won:reviews");
+  const reviewedConnection = needJsonLd.get("won:reviewedConnection");
+
   const rating = {
-    aggregateRating: needJsonLd.get("s:aggregateRating"),
-    reviewCount: needJsonLd.get("s:reviewCount"),
+    aggregateRating:
+      needJsonLd.get("s:aggregateRating") &&
+      parseFloat(needJsonLd.get("s:aggregateRating")),
+    reviewCount:
+      needJsonLd.get("s:reviewCount") &&
+      parseInt(needJsonLd.get("s:reviewCount")),
+    reviews: reviews
+      ? Immutable.List.isList(reviews)
+        ? reviews
+        : Immutable.List.of(reviews)
+      : undefined,
+    reviewedConnection: reviewedConnection
+      ? Immutable.List.isList(reviewedConnection)
+        ? reviewedConnection
+        : Immutable.List.of(reviewedConnection)
+      : undefined,
   };
   if (rating.aggregateRating && rating.reviewCount) {
     return rating;

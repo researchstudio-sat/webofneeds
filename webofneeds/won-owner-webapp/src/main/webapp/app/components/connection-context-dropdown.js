@@ -68,7 +68,7 @@ function genComponentConf() {
                     <a class="won-button--outlined thin red"
                         ng-if="self.adminEmail"
                         href="mailto:{{ self.adminEmail }}?{{ self.generateReportPostMailParams()}}">
-                        Report Post
+                        Report
                     </a>
                     <button
                         class="won-button--filled red"

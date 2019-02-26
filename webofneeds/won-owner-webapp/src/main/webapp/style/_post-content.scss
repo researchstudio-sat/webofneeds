@@ -52,6 +52,14 @@ won-post-content {
       }
     }
 
+    .post-content__reviews {
+      &__empty {
+        color: $won-line-gray;
+        padding: 0.5rem;
+        text-align: center;
+      }
+    }
+
     .post-content__otherneeds {
       &__empty {
         color: $won-line-gray;

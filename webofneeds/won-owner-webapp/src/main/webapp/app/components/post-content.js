@@ -7,6 +7,7 @@ import inviewModule from "angular-inview";
 import postIsOrSeeksInfoModule from "./post-is-or-seeks-info.js";
 import labelledHrModule from "./labelled-hr.js";
 import postContentGeneral from "./post-content-general.js";
+import postContentPersona from "./post-content-persona.js";
 import postHeaderModule from "./post-header.js";
 import trigModule from "./trig.js";
 import { attach, getIn, get } from "../utils.js";
@@ -68,6 +69,9 @@ function genComponentConf() {
           <won-labelled-hr ng-if="self.isSelectedTab('DETAIL')" ng-click="self.toggleShowGeneral()" arrow="self.showGeneral ? 'up' : 'down'" label="::'General Information'" class="cp__labelledhr"></won-labelled-hr>
           <won-post-content-general class="post-collapsible-general" ng-if="self.isSelectedTab('DETAIL') && self.showGeneral" post-uri="self.postUri"></won-post-content-general>
 
+          <!-- PERSONA INFORMATION -->
+          <won-post-content-persona ng-if="self.isSelectedTab('HELDBY')" holds-uri="self.postUri"></won-post-content-persona>
+
           <!-- PARTICIPANT INFORMATION -->
           <div class="post-content__members" ng-if="self.isSelectedTab('PARTICIPANTS')">
             <div
@@ -83,6 +87,13 @@ function genComponentConf() {
             <div class="post-content__members__empty"
                 ng-if="!self.hasGroupMembers">
                 No Groupmembers present.
+            </div>
+          </div>
+
+          <!-- REVIEW INFORMATION -->
+          <div class="post-content__reviews" ng-if="self.isSelectedTab('REVIEWS')">
+            <div class="post-content__reviews__empty">
+                No Reviews to display.
             </div>
           </div>
 
@@ -120,7 +131,7 @@ function genComponentConf() {
           </div>
 
           <!-- OTHER NEEDS -->
-          <div class="post-content__members" ng-if="self.isSelectedTab('OTHER_NEEDS')">
+          <div class="post-content__members" ng-if="self.isSelectedTab('HOLDS')">
             <div
               class="post-content__members__member"
               ng-if="self.hasHeldPosts"
@@ -368,6 +379,7 @@ export default angular
     postIsOrSeeksInfoModule,
     labelledHrModule,
     postContentGeneral,
+    postContentPersona,
     postHeaderModule,
     trigModule,
     inviewModule.name,

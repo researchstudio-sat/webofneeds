@@ -120,6 +120,27 @@ export function hasGroupFacet(need) {
   );
 }
 
+export function hasHoldableFacet(need) {
+  return (
+    getIn(need, ["content", "facets"]) &&
+    getIn(need, ["content", "facets"]).contains(won.WON.HoldableFacetCompacted)
+  );
+}
+
+export function hasHolderFacet(need) {
+  return (
+    getIn(need, ["content", "facets"]) &&
+    getIn(need, ["content", "facets"]).contains(won.WON.HolderFacetCompacted)
+  );
+}
+
+export function hasReviewFacet(need) {
+  return (
+    getIn(need, ["content", "facets"]) &&
+    getIn(need, ["content", "facets"]).contains(won.WON.ReviewFacetCompacted)
+  );
+}
+
 export function hasSuggestedConnections(need) {
   return (
     get(need, "connections") &&

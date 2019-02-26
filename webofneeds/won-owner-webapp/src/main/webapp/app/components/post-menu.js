@@ -24,7 +24,16 @@ function genComponentConf() {
               ng-class="{
                 'post-menu__item--selected': self.isSelectedTab('DETAIL'),
               }">
-              <span class="post-menu__item__label post-menu__item--selected">Detail</span>
+              <span class="post-menu__item__label">Detail</span>
+            </div>
+            <div class="post-menu__item"
+              ng-if="self.hasHeldBy"
+              ng-click="self.selectTab('HELDBY')"
+              ng-class="{
+                'post-menu__item--selected': self.isSelectedTab('HELDBY'),
+              }">
+              <span class="post-menu__item__label">Persona</span>
+              <span class="post-menu__item__rating" ng-if="self.personaAggregateRatingString">(★ {{ self.personaAggregateRatingString }})</span>
             </div>
             <div class="post-menu__item"
               ng-if="self.hasGroupFacet"
@@ -49,14 +58,24 @@ function genComponentConf() {
               <span class="post-menu__item__count">({{self.suggestionsSize}})</span>
             </div>
             <div class="post-menu__item"
-              ng-if="self.isPersona"
-              ng-click="self.selectTab('OTHER_NEEDS')"
+              ng-if="self.hasHolderFacet"
+              ng-click="self.selectTab('HOLDS')"
               ng-class="{
-                'post-menu__item--selected': self.isSelectedTab('OTHER_NEEDS'),
+                'post-menu__item--selected': self.isSelectedTab('HOLDS'),
                 'post-menu__item--inactive': !self.hasHeldPosts
               }">
               <span class="post-menu__item__label">Posts of this Persona</span>
               <span class="post-menu__item__count">({{self.heldPostsSize}})</span>
+            </div>
+            <div class="post-menu__item"
+              ng-if="self.hasReviewFacet"
+              ng-click="self.selectTab('REVIEWS')"
+              ng-class="{
+                'post-menu__item--selected': self.isSelectedTab('REVIEWS'),
+                'post-menu__item--inactive': !self.hasReviews,
+              }">
+              <span class="post-menu__item__label">Reviews</span>
+              <span class="post-menu__item__rating" ng-if="self.hasReviews">({{ self.reviewCount}})</span>
             </div>
             <div class="post-menu__item"
               ng-if="self.shouldShowRdf"
@@ -80,8 +99,23 @@ function genComponentConf() {
         const isPersona = needUtils.isPersona(post);
         const isOwned = needUtils.isOwned(post);
 
-        const groupMembers = get(post, "groupMembers");
-        const heldPosts = isPersona && get(post, "holds");
+        const hasHolderFacet = needUtils.hasHolderFacet(post);
+        const hasGroupFacet = needUtils.hasGroupFacet(post);
+        const hasReviewFacet = needUtils.hasReviewFacet(post);
+        const reviewCount =
+          hasReviewFacet && getIn(post, ["rating", "reviewCount"]);
+
+        const groupMembers = hasGroupFacet && get(post, "groupMembers");
+        const heldPosts = hasHolderFacet && get(post, "holds");
+        const heldByUri =
+          needUtils.hasHoldableFacet(post) && get(post, "heldBy");
+        const hasHeldBy = !!heldByUri; //aka Persona that holds this post
+        const persona = hasHeldBy && getIn(state, ["needs", heldByUri]);
+        const personaHasReviewFacet = needUtils.hasReviewFacet(persona);
+        const personaAggregateRating =
+          personaHasReviewFacet &&
+          getIn(persona, ["rating", "aggregateRating"]);
+
         const suggestions =
           isOwned &&
           connectionSelectors.getSuggestedConnectionsByNeedUri(
@@ -100,9 +134,17 @@ function genComponentConf() {
           post,
           isPersona,
           isOwned,
+          hasHeldBy,
+          personaHasReviewFacet,
+          personaAggregateRatingString:
+            personaAggregateRating && personaAggregateRating.toFixed(1),
           hasHeldPosts: heldPostsSize > 0,
           heldPostsSize,
-          hasGroupFacet: needUtils.hasGroupFacet(post),
+          hasHolderFacet,
+          hasGroupFacet,
+          hasReviewFacet,
+          hasReviews: reviewCount > 0,
+          reviewCount,
           hasChatFacet: needUtils.hasChatFacet(post),
           hasGroupMembers: groupMembersSize > 0,
           groupMembersSize,

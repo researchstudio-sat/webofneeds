@@ -3,7 +3,7 @@
  */
 
 import angular from "angular";
-import { attach, get } from "../utils.js";
+import { attach, get, getIn } from "../utils.js";
 import won from "../won-es6.js";
 import { relativeTime } from "../won-label-utils.js";
 import { connect2Redux } from "../won-utils.js";
@@ -16,6 +16,7 @@ import {
   generateShortNeedFacets,
   generateNeedMatchingContext,
 } from "../need-utils.js";
+import * as viewUtils from "../view-utils.js";
 import {
   selectLastUpdateTime,
   getConnectionUriFromRoute,
@@ -36,7 +37,7 @@ function genComponentConf() {
           <!-- PERSONA -->
           <div class="pcg__columns__left__item" ng-if="self.persona">
             <div class="pcg__columns__left__item__label">
-              Author
+              Persona
             </div>
             <div class="pcg__columns__left__item__value">
               {{ self.persona.get('humanReadable') }}
@@ -133,15 +134,12 @@ function genComponentConf() {
             ? connectionUri
             : null;
 
-        const post = this.postUri && state.getIn(["needs", this.postUri]);
-        // move this down when refactoring preventSharing
-        const fullFlags = post && generateFullNeedFlags(post);
+        const post = this.postUri && getIn(state, ["needs", this.postUri]);
+        const persona = post && getIn(state, ["needs", get(post, "heldBy")]);
+        const personaHolds = get(persona, "holds");
+        const personaRating = get(persona, "rating");
 
-        const persona = post
-          ? state.getIn(["needs", post.get("heldBy")])
-          : undefined;
-        const personaHolds = persona && persona.get("holds");
-        const personaRating = persona && persona.get("rating");
+        const viewState = get(state, "view");
 
         return {
           WON: won.WON,
@@ -149,7 +147,7 @@ function genComponentConf() {
           fullTypesLabel: post && generateFullNeedTypesLabel(post),
           shortTypesLabel: post && generateShortNeedTypesLabel(post),
           matchingContext: post && generateNeedMatchingContext(post),
-          fullFlags,
+          fullFlags: post && generateFullNeedFlags(post),
           shortFlags: post && generateShortNeedFlags(post),
           fullFacets: post && generateFullNeedFacets(post),
           shortFacets: post && generateShortNeedFacets(post),
@@ -158,16 +156,14 @@ function genComponentConf() {
               ? persona
               : undefined,
           personaRating: personaRating,
-          // TODO: this probably should not be checked like that - util method?
-          preventSharing:
-            (post && post.get("state") === won.WON.InactiveCompacted) ||
-            (fullFlags &&
-              !!fullFlags.find(flag => flag === "No Hint For Others")),
           friendlyTimestamp:
             post &&
-            relativeTime(selectLastUpdateTime(state), post.get("creationDate")),
+            relativeTime(
+              selectLastUpdateTime(state),
+              get(post, "creationDate")
+            ),
           ratingConnectionUri: ratingConnectionUri,
-          shouldShowRdf: state.getIn(["view", "showRdf"]),
+          shouldShowRdf: viewUtils.showRdf(viewState),
         };
       };
       connect2Redux(selectFromState, actionCreators, ["self.postUri"], this);
