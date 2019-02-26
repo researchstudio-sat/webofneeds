@@ -40,6 +40,7 @@ export function parseNeed(jsonldNeed, isOwned) {
         identifier: undefined,
         icon: undefined,
         iconBackground: undefined,
+        followUpOwner: undefined,
       },
       unread: false,
       isOwned: !!isOwned,
@@ -73,6 +74,12 @@ export function parseNeed(jsonldNeed, isOwned) {
           .setIn(
             ["matchedUseCase", "iconBackground"],
             generateUseCaseIconBackground(jsonldNeedImm)
+          )
+          .setIn(
+            ["matchedUseCase", "followUpOwner"],
+            matchingUseCase.followUpOwner
+              ? Immutable.fromJS(matchingUseCase.followUpOwner)
+              : Immutable.List()
           );
       }
     }

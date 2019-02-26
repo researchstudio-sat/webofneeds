@@ -8,13 +8,15 @@ import postContextDropdownModule from "./post-context-dropdown.js";
 import postContentModule from "./post-content.js";
 import postMenuModule from "./post-menu.js";
 import shareDropdownModule from "./share-dropdown.js";
-import { attach, get } from "../utils.js";
+import { attach, get, getIn } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import * as processUtils from "../process-utils.js";
 import * as needUtils from "../need-utils.js";
 import { getPostUriFromRoute } from "../selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
+
+import * as useCaseUtils from "../usecase-utils.js";
 
 import "style/_post-info.scss";
 
@@ -58,6 +60,15 @@ function genComponentConf() {
         <won-post-content post-uri="self.postUri"></won-post-content>
         <div class="post-info__footer" ng-if="self.showFooter">
             <button class="won-button--filled red post-info__footer__button"
+                ng-if="self.hasFollowUpOwner"
+                ng-repeat="ucIdentifier in self.followUpOwnerArray"
+                ng-click="self.router__stateGoCurrent({useCase: ucIdentifier, useCaseGroup: undefined, postUri: undefined, fromNeedUri: self.postUri, mode: 'CONNECT'})">
+                <svg class="won-button-icon" style="--local-primary:white;" ng-if="self.getUseCaseIcon(ucIdentifier)">
+                    <use xlink:href="{{ self.getUseCaseIcon(ucIdentifier) }}" href="{{ self.getUseCaseIcon(ucIdentifier) }}"></use>
+                </svg>
+                <span>{{ self.getUseCaseLabel(ucIdentifier) }}</span>
+            </button>
+            <button class="won-button--filled red post-info__footer__button"
                 ng-if="self.showCreateWhatsAround"
                 ng-click="self.createWhatsAround()"
                 ng-disabled="self.processingPublish">
@@ -93,17 +104,27 @@ function genComponentConf() {
         const showCreateWhatsAround =
           post && needUtils.isOwned(post) && needUtils.isWhatsNewNeed(post);
 
+        const followUpOwner =
+          post &&
+          needUtils.isOwned(post) &&
+          getIn(post, ["matchedUseCase", "followUpOwner"]);
+        const hasFollowUpOwner = followUpOwner && followUpOwner.size > 0;
+
         return {
           processingPublish: state.getIn(["process", "processingPublish"]),
           postUri,
           post,
           postLoading,
           postFailedToLoad,
+          hasFollowUpOwner,
+          followUpOwnerArray: followUpOwner && followUpOwner.toArray(),
           createdTimestamp: post && post.get("creationDate"),
           showOverlayNeed: !!this.needUri,
           showCreateWhatsAround,
           showFooter:
-            !postLoading && !postFailedToLoad && showCreateWhatsAround,
+            !postLoading &&
+            !postFailedToLoad &&
+            (showCreateWhatsAround || hasFollowUpOwner),
         };
       };
       connect2Redux(
@@ -114,6 +135,18 @@ function genComponentConf() {
       );
 
       classOnComponentRoot("won-is-loading", () => this.postLoading, this);
+    }
+
+    getUseCaseIcon(identifier) {
+      const useCase = useCaseUtils.getUseCase(identifier);
+
+      return useCase.icon;
+    }
+
+    getUseCaseLabel(identifier) {
+      const useCase = useCaseUtils.getUseCase(identifier);
+
+      return useCase.label;
     }
 
     createWhatsAround() {
