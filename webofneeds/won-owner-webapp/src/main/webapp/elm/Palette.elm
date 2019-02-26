@@ -2,6 +2,7 @@ module Palette exposing
     ( DropdownDirection(..)
     , button
     , dropdown
+    , identicon
     )
 
 import Color
@@ -11,6 +12,8 @@ import Element.Border.Styled as Border
 import Element.Font.Styled as Font
 import Element.Input.Styled as Input
 import Element.Styled as Element exposing (..)
+import Html
+import Html.Attributes as HA
 import Icons
 
 
@@ -189,3 +192,19 @@ dropdown { direction, menu, label, onToggle } =
                             ]
                     , onPress = onToggle
                     }
+
+
+identicon : Int -> String -> Element msg
+identicon size string =
+    el
+        [ width <| px <| round <| scaled size
+        , height <| px <| round <| scaled size
+        ]
+    <|
+        html <|
+            Html.node "won-identicon"
+                [ HA.attribute "data" string
+                , HA.style "width" "100%"
+                , HA.style "height" "100%"
+                ]
+                []

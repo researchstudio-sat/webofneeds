@@ -248,8 +248,17 @@ ownedDecoder =
                 |> Decode.fromResult
 
         decodeIsOwned =
-            Decode.maybe <|
-                Decode.field "isOwned" (Decode.succeed ())
+            Decode.field "isOwned" Decode.bool
+                |> Decode.maybe
+                |> Decode.map
+                    (\isOwned ->
+                        case isOwned of
+                            Just True ->
+                                Just ()
+
+                            _ ->
+                                Nothing
+                    )
 
         convertToUrls ( url, isOwned ) =
             case isOwned of

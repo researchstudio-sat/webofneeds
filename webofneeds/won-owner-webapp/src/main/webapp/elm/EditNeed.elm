@@ -168,7 +168,11 @@ view activeUrl state model =
                                     (\url persona ->
                                         Input.button [ Element.width fill ]
                                             { onPress = Just (SelectPersona url)
-                                            , label = Element.text <| NonEmpty.get persona.name
+                                            , label =
+                                                Element.row [ Element.spacing 3 ]
+                                                    [ identicon 3 url
+                                                    , Element.text <| NonEmpty.get persona.name
+                                                    ]
                                             }
                                     )
                                 |> Dict.values
