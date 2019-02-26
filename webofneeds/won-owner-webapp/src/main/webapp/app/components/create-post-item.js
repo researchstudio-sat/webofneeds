@@ -128,7 +128,6 @@ function genComponentConf() {
           postUri: undefined,
           useCase: encodeURIComponent(selectedUseCaseIdentifier),
           useCaseGroup: undefined,
-          groupPostAdminUri: undefined,
           fromNeedUri: undefined,
           mode: undefined,
         });
@@ -146,7 +145,6 @@ function genComponentConf() {
         postUri: undefined,
         useCase: undefined,
         useCaseGroup: "all",
-        groupPostAdminUri: undefined,
         fromNeedUri: undefined,
         mode: undefined,
       });
@@ -159,7 +157,6 @@ function genComponentConf() {
         postUri: undefined,
         useCase: "search",
         useCaseGroup: undefined,
-        groupPostAdminUri: undefined,
         fromNeedUri: undefined,
         mode: undefined,
       });

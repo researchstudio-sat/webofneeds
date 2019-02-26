@@ -165,7 +165,6 @@ class ConnectionsController {
       postUri: needUri,
       useCase: undefined,
       useCaseGroup: undefined,
-      groupPostAdminUri: undefined,
       fromNeedUri: undefined,
       mode: undefined,
     });
@@ -178,7 +177,6 @@ class ConnectionsController {
       postUri: undefined,
       useCase: undefined,
       useCaseGroup: undefined,
-      groupPostAdminUri: undefined,
       fromNeedUri: undefined,
       mode: undefined,
     });

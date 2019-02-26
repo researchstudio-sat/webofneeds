@@ -288,7 +288,6 @@ function genComponentConf() {
             useCase: undefined,
             useCaseGroup: undefined,
             connectionUri: undefined,
-            groupPostAdminUri: undefined,
             fromNeedUri: undefined,
             mode: undefined,
           });
@@ -307,7 +306,6 @@ function genComponentConf() {
         useCase: undefined,
         useCaseGroup: undefined,
         connectionUri: undefined,
-        groupPostAdminUri: undefined,
         fromNeedUri: undefined,
         mode: undefined,
       });
