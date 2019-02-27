@@ -22,9 +22,11 @@ import { getConnectionUriFromRoute } from "../selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 import ngAnimate from "angular-animate";
+import { Elm } from "../../elm/EditNeed.elm";
 
 import "style/_post-content.scss";
 import "style/_rdflink.scss";
+import elmModule from "./elm.js";
 
 const CONNECTION_READ_TIMEOUT = 1500;
 
@@ -147,7 +149,7 @@ function genComponentConf() {
                 This Persona does not have any Needs.
             </div>
           </div>
-
+          <won-elm module="self.editNeedModule" attributes="self.post.get('uri')"></won-elm>
           <!-- RDF REPRESENTATION -->
           <div class="post-info__content__rdf" ng-if="self.isSelectedTab('RDF')">
             <a class="rdflink clickable"
@@ -181,6 +183,8 @@ function genComponentConf() {
       this.labels = labels;
 
       window.postcontent4dbg = this;
+
+      this.editNeedModule = Elm.EditNeed;
 
       const selectFromState = state => {
         const openConnectionUri = getConnectionUriFromRoute(state);
@@ -297,6 +301,18 @@ function genComponentConf() {
       }
     }
 
+    addPersona(persona) {
+      this.personas__connect(this.postUri, persona);
+    }
+
+    canAttachPersona() {
+      return this.post.get("isOwned") && !this.post.get("heldBy");
+    }
+
+    toggleShowGeneral() {
+      this.needs__toggleGeneralInfo(this.postUri);
+    }
+
     isSelectedTab(tabName) {
       return tabName === this.visibleTab;
     }
@@ -375,5 +391,6 @@ export default angular
     postHeaderModule,
     trigModule,
     inviewModule.name,
+    elmModule,
   ])
   .directive("wonPostContent", genComponentConf).name;
