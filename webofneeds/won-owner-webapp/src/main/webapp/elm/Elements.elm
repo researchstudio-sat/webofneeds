@@ -14,7 +14,7 @@ import Element.Font as Font
 import Element.Input as Input
 import Html exposing (node)
 import Html.Attributes as HA
-import Skin exposing (Skin)
+import Old.Skin as Skin exposing (Skin)
 
 
 type alias Button msg =

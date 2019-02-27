@@ -87,7 +87,12 @@ import * as configActions from "./config-actions.js";
 
 import { pageLoadAction } from "./load-action.js";
 import { stateGo, stateReload } from "redux-ui-router";
-import { createPersona, reviewPersona } from "./persona-actions.js";
+import {
+  createPersona,
+  reviewPersona,
+  connectPersona,
+  disconnectPersona,
+} from "./persona-actions.js";
 
 // </action-creators>
 
@@ -162,6 +167,8 @@ const actionHierarchy = {
   personas: {
     create: createPersona,
     review: reviewPersona,
+    connect: connectPersona,
+    disconnect: disconnectPersona,
 
     storeTheirs: INJ_DEFAULT,
     storeTheirUrisInLoading: INJ_DEFAULT,
