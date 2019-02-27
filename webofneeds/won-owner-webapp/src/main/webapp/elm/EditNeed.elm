@@ -107,10 +107,6 @@ init attrs state =
 
 update : ActiveUrl -> State -> Msg -> Model -> ( Model, Cmd Msg )
 update activeUrl state msg model =
-    let
-        dbg =
-            Debug.log "state" state
-    in
     case msg of
         ToggleDropdown ->
             ( { model
@@ -145,10 +141,6 @@ update activeUrl state msg model =
 
 view : ActiveUrl -> State -> Model -> Element Msg
 view activeUrl state model =
-    let
-        dbg =
-            Debug.log "viewstate" state
-    in
     if hasPersona state activeUrl then
         button
             { label = "Remove Persona"
