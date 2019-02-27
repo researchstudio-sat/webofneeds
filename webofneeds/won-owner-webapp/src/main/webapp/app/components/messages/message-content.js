@@ -9,6 +9,7 @@ import { getOwnedNeedByConnectionUri } from "../../selectors/general-selectors.j
 import "angular-marked";
 
 import "style/_message-content.scss";
+import "style/_won-markdown.scss";
 
 const serviceDependencies = ["$ngRedux", "$scope"];
 
@@ -23,7 +24,7 @@ function genComponentConf() {
         content="self.getDetailContent(detail.identifier)">
       </div>
       <div class="msg__matchScore" ng-if="self.message && self.matchScore">MatchScore: {{self.matchScorePercentage }}%</div>
-      <div class="msg__text" ng-if="self.message && !self.isConnectMessage() && !self.isOpenMessage() && !self.message.get('isParsable')">{{ self.noParsableContentPlaceholder }}</div>
+      <div class="msg__text markdown" ng-if="self.message && !self.isConnectMessage() && !self.isOpenMessage() && !self.message.get('isParsable')">{{ self.noParsableContentPlaceholder }}</div>
       <div class="msg__text hide-in-responsive clickable" ng-if="!self.message">«Message not (yet) loaded. Click to Load»</div>
       <div class="msg__text show-in-responsive clickable" ng-if="!self.message">«Message not (yet) loaded. Tap to Load»</div>
     `;

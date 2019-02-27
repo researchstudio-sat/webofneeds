@@ -1,14 +1,9 @@
 @import "won-config";
 @import "sizing-utils";
-@import "won-markdown";
 
 won-message-content {
   padding: 0 0.5rem;
 
   display: grid;
   grid-gap: 0.25rem;
-
-  .msg__text {
-    @include won-markdown();
-  }
 }
