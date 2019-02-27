@@ -4,6 +4,7 @@ import { parseConnection } from "./parse-connection.js";
 import { markUriAsRead, markConnUriAsClosed } from "../../won-localstorage.js";
 
 import { markNeedAsRead } from "./reduce-needs.js";
+import { getIn } from "../../utils.js";
 
 export function storeConnectionsData(state, connectionsToStore) {
   if (connectionsToStore && connectionsToStore.size > 0) {
@@ -197,6 +198,23 @@ export function changeConnectionState(state, connectionUri, newState) {
 
   if (newState === won.WON.Closed) {
     markConnUriAsClosed(connectionUri);
+  }
+
+  const connection = getIn(need, ["connections", connectionUri]);
+  if (
+    newState === won.WON.Closed &&
+    connection.get("facet") == won.WON.HolderFacetCompacted
+  ) {
+    state = state.updateIn([needUri, "holds"], holds =>
+      holds.delete(connection.get("remoteNeedUri"))
+    );
+  }
+
+  if (
+    newState === won.WON.Closed &&
+    connection.get("facet") == won.WON.HoldableFacetCompacted
+  ) {
+    state = state.deleteIn([needUri, "heldBy"]);
   }
 
   return state

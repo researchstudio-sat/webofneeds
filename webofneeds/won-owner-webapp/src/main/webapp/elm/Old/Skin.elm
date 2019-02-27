@@ -1,9 +1,11 @@
-port module Skin exposing
+port module Old.Skin exposing
     ( Skin
+    , SkinFlags
     , black
     , cssColor
     , decoder
     , default
+    , fromFlags
     , setAlpha
     , skinnedElement
     , white
@@ -79,16 +81,10 @@ setAlpha alpha color =
 
 colorDecoder : Decoder Color
 colorDecoder =
-    Decode.list Decode.int
-        |> Decode.andThen
-            (\channels ->
-                case channels of
-                    [ r, g, b ] ->
-                        Decode.succeed <| rgb255 r g b
-
-                    _ ->
-                        Decode.fail "Expected [r, g, b]"
-            )
+    Decode.map3 rgb255
+        (Decode.field "r" Decode.int)
+        (Decode.field "g" Decode.int)
+        (Decode.field "b" Decode.int)
 
 
 decoder : Decoder Skin
