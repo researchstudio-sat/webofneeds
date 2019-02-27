@@ -11,6 +11,7 @@ import "angular-marked";
 
 import "style/_responsiveness-utils.scss";
 import "style/_toasts.scss";
+import "style/_won-markdown.scss";
 
 function genToastConf() {
   let template = `
@@ -41,7 +42,7 @@ function genToastConf() {
                 </svg>
 
                 <div class="topnav__toasts__element__text">
-                    <div marked="toast.get('msg')"></div>
+                    <div class="markdown" marked="toast.get('msg')"></div>
                     <p ng-show="toast.get('type') === self.WON.errorToast">
                         If the problem persists please contact
                         <a href="mailto:{{self.adminEmail}}">

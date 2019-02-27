@@ -2,6 +2,7 @@ import angular from "angular";
 import "angular-marked";
 
 import "style/_accordion.scss";
+import "style/_won-markdown.scss";
 
 function genComponentConf() {
   let template = `
@@ -18,7 +19,7 @@ function genComponentConf() {
                     ng-show="$index === self.selectedIdx">
                         <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
                 </svg>
-                <div class="detail" ng-show="$index === self.selectedIdx" marked="item.detail"></div>
+                <div class="detail markdown" ng-show="$index === self.selectedIdx" marked="item.detail"></div>
             </div>
     `;
 

@@ -5,6 +5,7 @@ import wonInput from "../../../directives/input.js";
 import "angular-marked";
 
 import "style/_descriptionpicker.scss";
+import "style/_won-markdown.scss";
 
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
@@ -23,7 +24,7 @@ function genComponentConf() {
           placeholder="{{self.detail.placeholder}}"></textarea>
       </div>
       <div class="dp__preview__header">Preview</div>
-      <div ng-if="self.addedDescription" class="dp__preview__content" marked="self.addedDescription"></div>
+      <div ng-if="self.addedDescription" class="dp__preview__content markdown" marked="self.addedDescription"></div>
       <div ng-if="!self.addedDescription" class="dp__preview__content--empty>Add Content to see instant preview</div>
     `;
 

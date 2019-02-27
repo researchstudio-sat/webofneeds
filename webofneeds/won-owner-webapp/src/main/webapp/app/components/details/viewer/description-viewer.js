@@ -3,6 +3,7 @@ import { attach } from "../../../utils.js";
 import "angular-marked";
 
 import "style/_description-viewer.scss";
+import "style/_won-markdown.scss";
 
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
@@ -13,7 +14,7 @@ function genComponentConf() {
           </svg>
           <span class="dv__header__label" ng-if="self.detail.label">{{self.detail.label}}</span>
         </div>
-        <div class="dv__content" marked="self.content"></div>
+        <div class="markdown" marked="self.content"></div>
     `;
 
   class Controller {

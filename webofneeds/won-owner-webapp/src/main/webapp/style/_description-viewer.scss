@@ -1,11 +1,6 @@
 @import "won-config";
 @import "sizing-utils";
-@import "won-markdown";
 
 won-description-viewer {
   @include won-detail-viewer("dv");
-
-  .dv__content {
-    @include won-markdown();
-  }
 }

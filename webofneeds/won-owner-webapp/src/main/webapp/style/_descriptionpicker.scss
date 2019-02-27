@@ -1,7 +1,6 @@
 @import "won-config";
 @import "textfield";
 @import "sizing-utils";
-@import "won-markdown";
 
 won-description-picker {
   display: grid;
@@ -57,8 +56,6 @@ won-description-picker {
   }
 
   .dp__preview__content {
-    @include won-markdown();
-
     &--empty {
       color: $won-line-gray;
     }

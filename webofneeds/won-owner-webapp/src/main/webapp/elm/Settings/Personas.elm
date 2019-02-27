@@ -19,6 +19,7 @@ import Elements
 import Html exposing (Html, node)
 import Html.Attributes as HA
 import Json.Decode as Decode exposing (Value)
+import Markdown
 import NonEmpty
 import Old.Persona as Persona exposing (Persona, PersonaData, SaveState(..))
 import Old.Skin as Skin exposing (Skin)
@@ -672,7 +673,7 @@ viewPersona { skin, open, url, data } =
                         data.website
                     , Maybe.map
                         (\aboutMe ->
-                            Block
+                            Markdown
                                 { title = "About Me"
                                 , value = NonEmpty.get aboutMe
                                 }
@@ -691,7 +692,7 @@ type Detail
         { title : String
         , value : String
         }
-    | Block
+    | Markdown
         { title : String
         , value : String
         }
@@ -711,10 +712,34 @@ details skin d =
                                     , text value
                                     ]
 
-                            Block { title, value } ->
-                                column [ spacing 10 ]
+                            Markdown { title, value } ->
+                                column
+                                    [ spacing 10
+                                    , width fill
+                                    ]
                                     [ el [ Font.bold ] <| text (title ++ ":")
-                                    , paragraph [] [ text value ]
+                                    , el
+                                        [ Border.widthEach
+                                            { top = 1
+                                            , bottom = 0
+                                            , left = 0
+                                            , right = 0
+                                            }
+                                        , Border.color skin.lineGray
+                                        , width fill
+                                        ]
+                                        none
+                                    , el
+                                        [ width fill
+                                        , padding 5
+                                        ]
+                                      <|
+                                        html <|
+                                            Markdown.toHtml
+                                                [ HA.class "markdown"
+                                                , HA.style "white-space" "normal"
+                                                ]
+                                                value
                                     ]
                     )
                 )
@@ -732,7 +757,11 @@ details skin d =
             text "No Details"
 
     else
-        column [ spacing 10 ] detailList
+        column
+            [ spacing 10
+            , width fill
+            ]
+            detailList
 
 
 
