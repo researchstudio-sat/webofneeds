@@ -28,10 +28,6 @@
 
     <context:property-placeholder location="file:${WON_CONFIG_DIR}/bot.properties"
                                   ignore-unresolvable="true"/> <!-- was in botRunner.xml and needCreatorBot.xml-->
-    <context:property-placeholder location="file:${WON_CONFIG_DIR}/mail-dir-bot.properties"
-                                  ignore-unresolvable="true"/> <!-- was in needproducer-mixed.xml within needCreatorBot.xml -->
-    <context:property-placeholder location="file:${WON_CONFIG_DIR}/need-dir-bot.properties"
-                                  ignore-unresolvable="true"/> <!-- was in needproducer-mixed.xml within needCreatorBot.xml -->
     <context:property-placeholder location="file:${WON_CONFIG_DIR}/node-uri-source.properties"
                                   ignore-unresolvable="true"/> <!-- was in nodeurisource-random.xml within needCreatorBot.xml  and in ownerCallback.xml and noderurisource-roundrobin.xml and matcherProtocolMatcherServiceHandler.xml within botRunner.xml-->
     <context:property-placeholder location="file:${WON_CONFIG_DIR}/matcher.properties"

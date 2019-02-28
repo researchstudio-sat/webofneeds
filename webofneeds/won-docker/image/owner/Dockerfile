@@ -15,7 +15,7 @@ RUN cd /usr/local/tomcat/bin/$(ls /usr/local/tomcat/bin/ | grep tomcat-native-)/
 
 # add webofneeds default config env variables
 ENV WON_CONFIG_DIR=/usr/local/tomcat/won/conf
-ENV LOGBACK_CONFIG=logback_info.xml
+ENV LOGBACK_CONFIG=logback.xml
 ENV CERTIFICATE_PASSWORD=changeit
 
 # configure tomcat
