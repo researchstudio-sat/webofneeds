@@ -24,6 +24,7 @@ export const cyclingInterest = {
       },
     }),
   },
+  followUpOwner: ["cyclingPlan"],
   details: {
     title: { ...details.title },
     description: { ...details.description },
