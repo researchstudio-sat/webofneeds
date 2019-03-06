@@ -57,7 +57,3 @@ export function getVisibleTabByNeedUri(
   const tab = getIn(viewState, ["needs", needUri, "visibleTab"]);
   return tab || notFoundTab;
 }
-
-export function isShowingGeneralInfoByNeedUri(viewState, needUri) {
-  return getIn(viewState, ["needs", needUri, "showGeneralInfo"]);
-}

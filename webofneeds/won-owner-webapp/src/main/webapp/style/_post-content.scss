@@ -42,6 +42,10 @@ won-post-content {
         align-items: center;
         margin-top: 0.5rem;
 
+        &:first-of-type {
+          margin-top: 0;
+        }
+
         &:hover {
           background: white;
         }
@@ -78,6 +82,10 @@ won-post-content {
         align-items: center;
         margin-top: 0.5rem;
 
+        &:first-of-type {
+          margin-top: 0;
+        }
+
         &:hover {
           background: white;
         }
@@ -104,6 +112,10 @@ won-post-content {
         grid-template-columns: min-content 1fr min-content;
         align-items: center;
         margin-top: 0.5rem;
+
+        &:first-of-type {
+          margin-top: 0;
+        }
 
         & > .post-content__suggestions__suggestion__indicator {
           grid-area: member_indicator;
@@ -187,14 +199,5 @@ won-post-content {
       font-size: $normalFontSize;
       font-weight: 700;
     }
-  }
-
-  .post-collapsible-general {
-    @include slideWithOpacityAnimationFixedHorizontal(
-      0.25s,
-      linear,
-      10rem,
-      0.5rem
-    );
   }
 }
