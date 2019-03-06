@@ -1,13 +1,17 @@
 package won.utils.goals;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.Set;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.apache.jena.util.ResourceUtils;
-
-import java.util.*;
 
 /**
  * Iterator class that iterates over all possible models that could be a valid result from blending two input models.

@@ -1,5 +1,9 @@
 package won.utils.goals;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
+
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
 import org.apache.jena.query.Query;
@@ -11,11 +15,8 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.shared.NotFoundException;
 import org.topbraid.shacl.validation.ValidationUtil;
-import won.utils.shacl.ShaclReportWrapper;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
+import won.utils.shacl.ShaclReportWrapper;
 
 /**
  * Utils class for handling goals related actions like graph blending and data extraction of goals instantiation.

@@ -1,12 +1,15 @@
 package won.utils.shacl;
 
-import org.apache.jena.rdf.model.*;
-import org.apache.jena.vocabulary.RDF;
-import org.topbraid.shacl.vocabulary.SH;
-import won.protocol.util.RdfUtils;
-
 import java.util.Collection;
 import java.util.LinkedList;
+
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.vocabulary.RDF;
+import org.topbraid.shacl.vocabulary.SH;
+
+import won.protocol.util.RdfUtils;
 
 public class ShaclReportWrapper {
 

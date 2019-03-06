@@ -1,16 +1,15 @@
 package won.utils.mail;
 
+import java.io.File;
+
+import javax.mail.internet.MimeMessage;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
-
-import javax.mail.internet.MimeMessage;
-import java.io.File;
-import java.io.InputStream;
 
 /**
  * User: ypanchenko
