@@ -16,12 +16,12 @@
 
 package won.node.springsecurity;
 
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 /**
  * Created by fkleedorfer on 24.11.2016.

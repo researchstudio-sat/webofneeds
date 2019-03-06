@@ -19,6 +19,7 @@ package won.node.camel.predicate;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Predicate;
+
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageType;

@@ -1,38 +1,22 @@
 package won.node.camel.processor.facet.reviewFacet;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Map;
-import java.util.Optional;
-import java.util.Random;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
 import org.springframework.stereotype.Component;
 
 import won.node.camel.processor.AbstractCamelProcessor;
-import won.node.camel.processor.annotation.DefaultFacetMessageProcessor;
 import won.node.camel.processor.annotation.FacetMessageProcessor;
-import won.node.facet.ConnectionStateChange;
-import won.node.facet.FacetConfig;
-import won.protocol.exception.NoSuchNeedException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
-import won.protocol.message.processor.exception.MissingMessagePropertyException;
-import won.protocol.model.Connection;
-import won.protocol.model.ConnectionState;
-import won.protocol.model.FacetType;
 import won.protocol.model.Need;
-import won.protocol.util.DataAccessUtils;
-import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.SCHEMA;
 import won.protocol.vocabulary.WON;

@@ -16,9 +16,9 @@
 
 package won.node.camel.processor.general;
 
-import won.protocol.message.processor.WonMessageProcessor;
-
 import java.net.URI;
+
+import won.protocol.message.processor.WonMessageProcessor;
 
 /**
  * WonMessageProcessor that can be used exactly once to generate an outbound message based on a

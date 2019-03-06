@@ -16,10 +16,11 @@
 
 package won.node.web;
 
-import org.springframework.http.HttpHeaders;
-import won.protocol.model.DataWithEtag;
-
 import java.net.URI;
+
+import org.springframework.http.HttpHeaders;
+
+import won.protocol.model.DataWithEtag;
 
 /**
  * Created by fkleedorfer on 01.12.2016.

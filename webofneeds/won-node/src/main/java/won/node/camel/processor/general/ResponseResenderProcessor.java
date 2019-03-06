@@ -1,14 +1,15 @@
 package won.node.camel.processor.general;
 
+import java.net.URI;
+
 import org.apache.camel.Exchange;
 import org.apache.jena.query.Dataset;
+
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.MessageEventPlaceholder;
-
-import java.net.URI;
 
 /**
  * User: ypanchenko

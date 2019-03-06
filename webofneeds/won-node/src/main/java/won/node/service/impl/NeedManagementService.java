@@ -16,10 +16,15 @@
 
 package won.node.service.impl;
 
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
 import won.protocol.jms.MessagingService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
@@ -27,10 +32,6 @@ import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Need;
 import won.protocol.repository.NeedRepository;
 import won.protocol.service.WonNodeInformationService;
-
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Manipulates needs from the system side by generating msg:FromSystem messages.

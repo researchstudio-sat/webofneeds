@@ -16,7 +16,12 @@
 
 package won.node.camel.processor.general;
 
-import net.bytebuddy.pool.TypePool;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Optional;
+
 import org.apache.camel.Exchange;
 import org.apache.camel.Expression;
 import org.slf4j.Logger;
@@ -25,6 +30,7 @@ import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+
 import won.node.camel.processor.annotation.DefaultFacetMessageProcessor;
 import won.node.camel.processor.annotation.FacetMessageProcessor;
 import won.protocol.message.WonMessage;
@@ -34,14 +40,6 @@ import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.message.processor.exception.MissingMessagePropertyException;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
 import won.protocol.vocabulary.WONMSG;
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Optional;
 
 /**
  * User: syim

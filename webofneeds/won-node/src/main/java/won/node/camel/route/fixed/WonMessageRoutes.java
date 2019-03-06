@@ -1,5 +1,10 @@
 package won.node.camel.route.fixed;
 
+import static org.apache.camel.builder.PredicateBuilder.isNotEqualTo;
+import static org.apache.camel.builder.PredicateBuilder.not;
+
+import java.net.URI;
+
 import org.apache.camel.Exchange;
 import org.apache.camel.Expression;
 import org.apache.camel.LoggingLevel;
@@ -10,17 +15,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.orm.jpa.JpaSystemException;
+
 import won.node.camel.predicate.IsResponseMessagePredicate;
-import won.node.camel.predicate.ShouldEchoToOwnerPredicate;
 import won.node.camel.predicate.ShouldCallFacetImplForMessagePredicate;
+import won.node.camel.predicate.ShouldEchoToOwnerPredicate;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.vocabulary.WONMSG;
-
-import java.net.URI;
-
-import static org.apache.camel.builder.PredicateBuilder.isNotEqualTo;
-import static org.apache.camel.builder.PredicateBuilder.not;
 
 /**
   * User: syim

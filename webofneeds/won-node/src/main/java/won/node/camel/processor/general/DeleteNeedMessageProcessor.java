@@ -1,26 +1,22 @@
 package won.node.camel.processor.general;
 
+import java.net.URI;
+import java.util.Collection;
+
 import org.apache.camel.Exchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
+
 import won.node.camel.processor.AbstractCamelProcessor;
-import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionState;
-import won.protocol.model.MessageEventPlaceholder;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
 import won.protocol.util.DataAccessUtils;
-import won.protocol.vocabulary.WONMSG;
-
-import java.net.URI;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * User: MS 01.12.2018

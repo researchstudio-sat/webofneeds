@@ -1,8 +1,12 @@
 package won.node.camel.processor.fixed;
 
+import java.net.URI;
+import java.util.Optional;
+
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.springframework.stereotype.Component;
+
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.protocol.message.WonMessage;
@@ -13,9 +17,6 @@ import won.protocol.model.ConnectionState;
 import won.protocol.model.Facet;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WONMSG;
-
-import java.net.URI;
-import java.util.Optional;
 
 /**
  * User: syim

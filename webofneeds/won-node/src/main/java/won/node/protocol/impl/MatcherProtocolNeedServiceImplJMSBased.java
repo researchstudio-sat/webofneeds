@@ -16,16 +16,17 @@
 
 package won.node.protocol.impl;
 
+import java.net.URI;
+
 import org.apache.camel.Header;
 import org.apache.jena.riot.Lang;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
 import won.protocol.matcher.MatcherProtocolNeedService;
 import won.protocol.message.WonMessageDecoder;
 import won.protocol.util.RdfUtils;
-
-import java.net.URI;
 
 /**
  * User: fkleedorfer

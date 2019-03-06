@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 
-import org.apache.activemq.transport.udp.UdpTransportFactory;
 import org.apache.camel.Processor;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +38,6 @@ import won.protocol.exception.IncompatibleFacetTypesException;
 import won.protocol.jms.MessagingService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
-import won.protocol.model.Facet;
 import won.protocol.model.Need;
 import won.protocol.model.OwnerApplication;
 import won.protocol.repository.ConnectionContainerRepository;

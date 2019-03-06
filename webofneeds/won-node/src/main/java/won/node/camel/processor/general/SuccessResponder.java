@@ -16,7 +16,10 @@
 
 package won.node.camel.processor.general;
 
+import java.net.URI;
+
 import org.apache.camel.Exchange;
+
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
@@ -24,8 +27,6 @@ import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
-
-import java.net.URI;
 
 /**
  * Sends a success response message back to the sender of the original message, if that message was sent on

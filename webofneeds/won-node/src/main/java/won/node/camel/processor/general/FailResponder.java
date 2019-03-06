@@ -16,10 +16,14 @@
 
 package won.node.camel.processor.general;
 
+import java.io.StringWriter;
+import java.net.URI;
+
 import org.apache.camel.Exchange;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
+
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
@@ -28,9 +32,6 @@ import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
-
-import java.io.StringWriter;
-import java.net.URI;
 
 /**
  * Sends a error response message back to the sender of the original message, if that message was sent on

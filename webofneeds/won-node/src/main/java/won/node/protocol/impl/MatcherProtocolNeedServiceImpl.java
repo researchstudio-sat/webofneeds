@@ -16,16 +16,18 @@
 
 package won.node.protocol.impl;
 
+import java.net.URI;
+
+import javax.jws.WebMethod;
+
 import org.apache.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
 import won.protocol.matcher.MatcherProtocolNeedService;
 import won.protocol.message.WonMessage;
 import won.protocol.service.MatcherFacingNeedCommunicationService;
-
-import javax.jws.WebMethod;
-import java.net.URI;
 
 /**
  * User: fkleedorfer
