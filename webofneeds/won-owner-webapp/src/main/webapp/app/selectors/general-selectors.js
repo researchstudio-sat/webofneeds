@@ -148,18 +148,6 @@ export const getConnectionUriFromRoute = createSelector(
   }
 );
 
-export const getGroupPostAdminUriFromRoute = createSelector(
-  state => state,
-  state => {
-    const encodedPostUri = getIn(state, [
-      "router",
-      "currentParams",
-      "groupPostAdminUri",
-    ]);
-    return decodeUriComponentProperly(encodedPostUri);
-  }
-);
-
 export const getFromNeedUriFromRoute = createSelector(
   state => state,
   state => {

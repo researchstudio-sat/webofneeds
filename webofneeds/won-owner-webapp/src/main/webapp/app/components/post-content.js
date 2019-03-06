@@ -12,7 +12,6 @@ import postHeaderModule from "./post-header.js";
 import trigModule from "./trig.js";
 import { attach, getIn, get } from "../utils.js";
 import won from "../won-es6.js";
-import { labels } from "../won-label-utils.js";
 import { connect2Redux } from "../won-utils.js";
 import * as needUtils from "../need-utils.js";
 import * as viewUtils from "../view-utils.js";
@@ -69,8 +68,6 @@ function genComponentConf() {
           <won-labelled-hr label="::'Search'" class="cp__labelledhr" ng-show="self.isSelectedTab('DETAIL') && self.hasContent && self.hasSeeksBranch"></won-labelled-hr>
           <won-post-is-or-seeks-info branch="::'seeks'" ng-if="self.isSelectedTab('DETAIL') && self.hasSeeksBranch" post-uri="self.postUri"></won-post-is-or-seeks-info>
 
-
-
           <!-- PERSONA INFORMATION -->
           <won-post-content-persona ng-if="self.isSelectedTab('HELDBY')" holds-uri="self.postUri"></won-post-content-persona>
 
@@ -78,16 +75,62 @@ function genComponentConf() {
           <div class="post-content__members" ng-if="self.isSelectedTab('PARTICIPANTS')">
             <div
                 class="post-content__members__member"
-                ng-if="self.hasGroupMembers"
+                ng-if="!self.isOwned && self.hasGroupMembers"
                 ng-repeat="memberUri in self.groupMembersArray track by memberUri">
+                <div class="post-content__members__member__indicator"></div>
                 <won-post-header
                   class="clickable"
                   ng-click="self.router__stateGoCurrent({viewNeedUri: memberUri, viewConnUri: undefined})"
                   need-uri="::memberUri">
                 </won-post-header>
+                <div class="post-content__members__member__actions"></div>
+            </div>
+            <div class="post-content__members__member"
+                ng-if="self.isOwned && self.hasGroupChatConnections && conn.get('state') !== self.won.WON.Closed"
+                ng-repeat="conn in self.groupChatConnectionsArray"
+                in-view="conn.get('unread') && $inview && self.markAsRead(conn)"
+                ng-class="{'won-unread': conn.get('unread')}">
+                <div class="post-content__members__member__indicator"></div>
+                <won-post-header
+                  class="clickable"
+                  ng-click="self.router__stateGoCurrent({viewNeedUri: conn.get('remoteNeedUri'), viewConnUri: undefined})"
+                  need-uri="::conn.get('remoteNeedUri')">
+                </won-post-header>
+                <div class="post-content__members__member__actions">
+                    <div
+                      class="post-content__members__member__actions__button red won-button--outlined thin"
+                      ng-click="self.openRequest(conn)"
+                      ng-if="conn.get('state') === self.won.WON.RequestReceived">
+                        Accept
+                    </div>
+                    <div
+                      class="post-content__members__member__actions__button red won-button--outlined thin"
+                      ng-click="self.closeConnection(conn)"
+                      ng-if="conn.get('state') === self.won.WON.RequestReceived">
+                        Reject
+                    </div>
+                    <div
+                      class="post-content__members__member__actions__button red won-button--outlined thin"
+                      ng-click="self.sendRequest(conn)"
+                      ng-if="conn.get('state') === self.won.WON.Suggested">
+                        Request
+                    </div>
+                    <div
+                      class="post-content__members__member__actions__button red won-button--outlined thin"
+                      ng-disabled="true"
+                      ng-if="conn.get('state') === self.won.WON.RequestSent">
+                        Waiting for Accept...
+                    </div>
+                    <div
+                      class="post-content__members__member__actions__button red won-button--outlined thin"
+                      ng-click="self.closeConnection(conn)"
+                      ng-if="conn.get('state') === self.won.WON.Suggested || conn.get('state') === self.won.WON.Connected">
+                        Remove
+                    </div>
+                </div>
             </div>
             <div class="post-content__members__empty"
-                ng-if="!self.hasGroupMembers">
+                ng-if="(!self.isOwned && !self.hasGroupMembers) || (self.isOwned && !self.hasGroupChatConnections)">
                 No Groupmembers present.
             </div>
           </div>
@@ -180,8 +223,7 @@ function genComponentConf() {
   class Controller {
     constructor() {
       attach(this, serviceDependencies, arguments);
-      this.labels = labels;
-
+      this.won = won;
       window.postcontent4dbg = this;
 
       this.editNeedModule = Elm.EditNeed;
@@ -199,9 +241,18 @@ function genComponentConf() {
         const hasContent = this.hasVisibleDetails(content);
         const hasSeeksBranch = this.hasVisibleDetails(seeks);
 
-        const groupMembers = get(post, "groupMembers");
+        const hasGroupFacet = needUtils.hasGroupFacet(post);
 
-        const heldPosts = get(post, "holds");
+        const groupMembers = hasGroupFacet && get(post, "groupMembers");
+        const groupChatConnections =
+          isOwned &&
+          hasGroupFacet &&
+          connectionSelectors.getGroupChatConnectionsByNeedUri(
+            state,
+            this.postUri
+          );
+
+        const heldPosts = isPersona && get(post, "holds");
 
         const suggestions = connectionSelectors.getSuggestedConnectionsByNeedUri(
           state,
@@ -224,9 +275,13 @@ function genComponentConf() {
           isOwned,
           hasHeldPosts: isPersona && heldPosts && heldPosts.size > 0,
           heldPostsArray: isPersona && heldPosts && heldPosts.toArray(),
-          hasGroupFacet: needUtils.hasGroupFacet(post),
+          hasGroupFacet,
           hasChatFacet: needUtils.hasChatFacet(post),
           hasGroupMembers: groupMembers && groupMembers.size > 0,
+          hasGroupChatConnections:
+            groupChatConnections && groupChatConnections.size > 0,
+          groupChatConnectionsArray:
+            groupChatConnections && groupChatConnections.toArray(),
           groupMembersArray: groupMembers && groupMembers.toArray(),
           hasSuggestions: isOwned && suggestions && suggestions.size > 0,
           suggestionsArray: isOwned && suggestions && suggestions.toArray(),
@@ -271,6 +326,23 @@ function genComponentConf() {
       }
 
       this.connections__close(connUri);
+    }
+
+    openRequest(conn, message = "") {
+      if (!conn || this.isOwnedNeedWhatsX) {
+        return;
+      }
+
+      const connUri = get(conn, "uri");
+
+      if (conn.get("unread")) {
+        this.connections__markAsRead({
+          connectionUri: connUri,
+          needUri: this.postUri,
+        });
+      }
+
+      this.connections__open(connUri, message);
     }
 
     sendRequest(conn, message = "") {
