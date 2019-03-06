@@ -1,9 +1,6 @@
 package won.owner.web.rest;
 
 import java.net.URI;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.apache.jena.query.Dataset;
@@ -20,14 +17,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import won.protocol.agreement.AgreementProtocolState;
 import won.protocol.agreement.AgreementProtocolUris;
-import won.protocol.agreement.IncompleteConversationDataException;
 import won.protocol.agreement.effect.MessageEffect;
-import won.protocol.rest.LinkedDataFetchingException;
 import won.protocol.util.AuthenticationThreadLocal;
 import won.protocol.util.WonConversationUtils;
-import won.protocol.util.linkeddata.CachingLinkedDataSource;
 import won.protocol.util.linkeddata.LinkedDataSource;
-import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
 @Controller
 @RequestMapping("/rest/agreement")

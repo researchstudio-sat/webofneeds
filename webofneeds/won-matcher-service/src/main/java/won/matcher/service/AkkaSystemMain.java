@@ -1,13 +1,14 @@
 package won.matcher.service;
 
+import java.io.IOException;
+
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import won.matcher.service.common.spring.MatcherServiceAppConfiguration;
 import won.matcher.service.common.spring.SpringExtension;
 import won.matcher.service.nodemanager.actor.WonNodeControllerActor;
-
-import java.io.IOException;
 
 /**
  * User: hfriedrich

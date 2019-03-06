@@ -1,9 +1,10 @@
 package won.owner.web.events;
 
-import org.springframework.context.ApplicationEvent;
-import won.owner.model.User;
-
 import java.util.Locale;
+
+import org.springframework.context.ApplicationEvent;
+
+import won.owner.model.User;
 
 /**
  * Created by fsuda on 27.11.2018.

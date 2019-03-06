@@ -1,16 +1,28 @@
 package won.matcher.service.nodemanager.actor;
 
-import akka.actor.*;
-import akka.cluster.pubsub.DistributedPubSub;
-import akka.cluster.pubsub.DistributedPubSubMediator;
-import akka.event.Logging;
-import akka.event.LoggingAdapter;
-import akka.japi.Function;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.jena.query.Dataset;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import akka.actor.ActorRef;
+import akka.actor.OneForOneStrategy;
+import akka.actor.SupervisorStrategy;
+import akka.actor.Terminated;
+import akka.actor.UntypedActor;
+import akka.cluster.pubsub.DistributedPubSub;
+import akka.cluster.pubsub.DistributedPubSubMediator;
+import akka.event.Logging;
+import akka.event.LoggingAdapter;
+import akka.japi.Function;
 import scala.concurrent.duration.Duration;
 import won.cryptography.service.RegistrationClient;
 import won.cryptography.ssl.MessagingContext;
@@ -27,9 +39,6 @@ import won.matcher.service.nodemanager.service.WonNodeSparqlService;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.linkeddata.LinkedDataSource;
-
-import java.net.URI;
-import java.util.*;
 
 
 /**

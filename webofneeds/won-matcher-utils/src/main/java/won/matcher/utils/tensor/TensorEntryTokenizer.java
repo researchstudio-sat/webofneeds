@@ -1,10 +1,10 @@
 package won.matcher.utils.tensor;
 
-import won.matcher.utils.preprocessing.OpenNlpTokenExtraction;
-
 import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
+
+import won.matcher.utils.preprocessing.OpenNlpTokenExtraction;
 
 /**
  * Used for tokenization of {@link TensorEntry} objects.

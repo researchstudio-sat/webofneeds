@@ -1,10 +1,10 @@
 package won.matcher.service.common.config;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
-
-import java.util.List;
 
 /**
  * Basic cluster configuration of a component in the akka matcher service

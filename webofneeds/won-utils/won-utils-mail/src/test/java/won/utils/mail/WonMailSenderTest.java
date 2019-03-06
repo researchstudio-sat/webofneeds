@@ -1,8 +1,8 @@
 package won.utils.mail;
 
-import com.icegreen.greenmail.util.GreenMail;
-import com.icegreen.greenmail.util.GreenMailUtil;
-import com.icegreen.greenmail.util.ServerSetupTest;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -14,8 +14,9 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import javax.mail.Message;
-import javax.mail.MessagingException;
+import com.icegreen.greenmail.util.GreenMail;
+import com.icegreen.greenmail.util.GreenMailUtil;
+import com.icegreen.greenmail.util.ServerSetupTest;
 
 /**
  * User: ypanchenko

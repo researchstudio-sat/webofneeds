@@ -1,13 +1,14 @@
 package won.protocol.message;
 
+import java.io.IOException;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.Query;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.Assert;
-import won.protocol.validation.WonSparqlValidator;
 
-import java.io.IOException;
+import won.protocol.validation.WonSparqlValidator;
 
 /**
  * User: ypanchenko

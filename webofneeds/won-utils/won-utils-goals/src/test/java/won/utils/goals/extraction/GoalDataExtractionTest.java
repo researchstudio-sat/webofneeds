@@ -1,5 +1,8 @@
 package won.utils.goals.extraction;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
@@ -15,9 +18,6 @@ import org.slf4j.LoggerFactory;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import won.utils.goals.GoalUtils;
-
-import java.io.IOException;
-import java.io.InputStream;
 
 public class GoalDataExtractionTest {
 

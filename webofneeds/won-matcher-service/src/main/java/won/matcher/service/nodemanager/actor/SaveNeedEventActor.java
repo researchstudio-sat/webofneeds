@@ -1,5 +1,10 @@
 package won.matcher.service.nodemanager.actor;
 
+import org.apache.jena.query.Dataset;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
 import akka.actor.ActorRef;
 import akka.actor.OneForOneStrategy;
 import akka.actor.SupervisorStrategy;
@@ -9,13 +14,9 @@ import akka.cluster.pubsub.DistributedPubSubMediator;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.japi.Function;
-import org.apache.jena.query.Dataset;
 import scala.concurrent.duration.Duration;
 import won.matcher.service.common.event.NeedEvent;
 import won.matcher.service.common.service.sparql.SparqlService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * Actor that listens to the publish subscribe topic and saves the body (rdf graphs) of a need event to the defined

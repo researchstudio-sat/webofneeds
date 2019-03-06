@@ -1,9 +1,9 @@
 package won.matcher.solr.utils;
 
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-
 import java.util.LinkedList;
 import java.util.List;
+
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 /**
  * Created by hfriedrich on 19.07.2016.

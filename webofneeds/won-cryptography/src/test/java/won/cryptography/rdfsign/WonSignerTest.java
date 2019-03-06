@@ -1,16 +1,17 @@
 package won.cryptography.rdfsign;
 
+import java.util.List;
+
 import org.apache.jena.query.Dataset;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+
 import won.cryptography.utils.TestSigningUtils;
 import won.cryptography.utils.TestingKeys;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.SFSIG;
-
-import java.util.List;
 
 /**
  * User: ypanchenko

@@ -1,16 +1,17 @@
 package won.matcher.solr.query.factory;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import won.matcher.solr.utils.MatcherNeedContentPropertyType;
 import won.protocol.model.Coordinate;
 import won.protocol.util.DefaultNeedModelWrapper;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by hfriedrich on 01.08.2016.

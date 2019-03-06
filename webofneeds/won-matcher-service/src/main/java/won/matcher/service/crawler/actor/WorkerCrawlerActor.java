@@ -1,11 +1,10 @@
 package won.matcher.service.crawler.actor;
 
-import akka.actor.ActorRef;
-import akka.actor.UntypedActor;
-import akka.cluster.pubsub.DistributedPubSub;
-import akka.cluster.pubsub.DistributedPubSubMediator;
-import akka.event.Logging;
-import akka.event.LoggingAdapter;
+import java.net.URI;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.shared.Lock;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +13,13 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestClientException;
+
+import akka.actor.ActorRef;
+import akka.actor.UntypedActor;
+import akka.cluster.pubsub.DistributedPubSub;
+import akka.cluster.pubsub.DistributedPubSubMediator;
+import akka.event.Logging;
+import akka.event.LoggingAdapter;
 import won.matcher.service.common.event.NeedEvent;
 import won.matcher.service.common.service.sparql.SparqlService;
 import won.matcher.service.crawler.config.CrawlConfig;
@@ -28,11 +34,6 @@ import won.protocol.util.NeedModelWrapper;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSourceBase;
 import won.protocol.vocabulary.WON;
-
-import java.net.URI;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Actor requests linked data URI using HTTP and saves it to a triple store using SPARQL UPDATE query.

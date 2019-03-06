@@ -14,12 +14,12 @@ package won.matcher.utils.tensor;/*
  *    limitations under the License.
  */
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * User: hfriedrich

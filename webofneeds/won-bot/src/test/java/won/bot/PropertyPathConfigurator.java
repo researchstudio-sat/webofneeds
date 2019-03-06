@@ -16,13 +16,14 @@
 
 package won.bot;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.sparql.path.Path;
 import org.apache.jena.sparql.path.PathParser;
-import won.protocol.vocabulary.WON;
 
-import java.util.ArrayList;
-import java.util.List;
+import won.protocol.vocabulary.WON;
 
 /**
  * User: syim

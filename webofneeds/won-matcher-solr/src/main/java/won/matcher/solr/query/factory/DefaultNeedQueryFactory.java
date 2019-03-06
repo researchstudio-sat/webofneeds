@@ -1,10 +1,11 @@
 package won.matcher.solr.query.factory;
 
+import java.util.Collection;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Resource;
-import won.matcher.solr.utils.MatcherNeedContentPropertyType;
 
-import java.util.Collection;
+import won.matcher.solr.utils.MatcherNeedContentPropertyType;
 
 /**
  * Created by hfriedrich on 03.08.2016.

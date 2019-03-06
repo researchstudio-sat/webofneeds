@@ -1,5 +1,17 @@
 package won.matcher.sparql.actor;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.concurrent.TimeUnit;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
 import akka.actor.ActorRef;
 import akka.actor.Cancellable;
 import akka.actor.OneForOneStrategy;
@@ -11,23 +23,15 @@ import akka.cluster.pubsub.DistributedPubSubMediator;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.japi.Function;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 import scala.Option;
 import scala.concurrent.duration.Duration;
-import won.matcher.service.common.event.*;
+import won.matcher.service.common.event.BulkHintEvent;
+import won.matcher.service.common.event.BulkNeedEvent;
+import won.matcher.service.common.event.HintEvent;
+import won.matcher.service.common.event.LoadNeedEvent;
+import won.matcher.service.common.event.NeedEvent;
 import won.matcher.service.common.spring.SpringExtension;
 import won.matcher.sparql.config.SparqlMatcherConfig;
-
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by hfriedrich on 30.09.2015.

@@ -16,17 +16,21 @@
 
 package won.matcher.utils.tensor;
 
-import org.la4j.Matrices;
-import org.la4j.matrix.sparse.CCSMatrix;
-import org.la4j.vector.functor.VectorProcedure;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+
+import org.la4j.Matrices;
+import org.la4j.matrix.sparse.CCSMatrix;
+import org.la4j.vector.functor.VectorProcedure;
 
 /**
  * Sparse third order tensor based on la4j implementation of sparse matrices.

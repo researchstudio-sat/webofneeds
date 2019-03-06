@@ -1,20 +1,26 @@
 package won.matcher.service.nodemanager.service;
 
-import org.apache.jena.query.*;
+import java.net.URI;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.ParameterizedSparqlString;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
-import won.matcher.service.common.service.sparql.SparqlService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import won.matcher.service.common.service.sparql.SparqlService;
 import won.protocol.exception.DataIntegrityException;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WON;
-
-import java.net.URI;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Sparql service extended with methods for won node controller

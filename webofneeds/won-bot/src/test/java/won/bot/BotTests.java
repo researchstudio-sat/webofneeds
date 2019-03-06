@@ -16,14 +16,18 @@
 
 package won.bot;
 
-import org.junit.Assert;
-import org.junit.Test;
-import won.bot.framework.bot.Bot;
-import won.bot.impl.DebugBot;
-
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
+
+import org.junit.Assert;
+import org.junit.Test;
+
+import won.bot.framework.bot.Bot;
+import won.bot.impl.DebugBot;
 
 /**
  * User: fkleedorfer

@@ -16,15 +16,16 @@
 
 package won.owner.pojo;
 
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
-import won.protocol.vocabulary.WON;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
+import won.protocol.vocabulary.WON;
 
 /**
  * User: LEIH-NB
