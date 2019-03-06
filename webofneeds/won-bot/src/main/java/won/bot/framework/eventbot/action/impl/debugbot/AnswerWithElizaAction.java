@@ -16,8 +16,9 @@
 
 package won.bot.framework.eventbot.action.impl.debugbot;
 
-import codeanticode.eliza.Eliza;
 import org.apache.jena.rdf.model.Model;
+
+import codeanticode.eliza.Eliza;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;

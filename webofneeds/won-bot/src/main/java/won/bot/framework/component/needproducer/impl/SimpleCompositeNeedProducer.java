@@ -17,9 +17,9 @@
 package won.bot.framework.component.needproducer.impl;
 
 
-import won.bot.framework.component.needproducer.NeedProducer;
-
 import java.util.Set;
+
+import won.bot.framework.component.needproducer.NeedProducer;
 
 public class SimpleCompositeNeedProducer extends AbstractCompositeNeedProducer
 {

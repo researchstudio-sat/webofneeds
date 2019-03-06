@@ -1,10 +1,13 @@
 package won.bot.framework.eventbot.action.impl.mail.receive;
 
-import won.bot.framework.bot.context.BotContext;
+import java.io.IOException;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+
 import won.bot.framework.bot.context.MailBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
-import won.bot.framework.eventbot.action.EventBotActionUtils;
 import won.bot.framework.eventbot.action.impl.mail.model.SubscribeStatus;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.Event;
@@ -13,10 +16,6 @@ import won.bot.framework.eventbot.event.impl.mail.MailCommandEvent;
 import won.bot.framework.eventbot.event.impl.mail.MailReceivedEvent;
 import won.bot.framework.eventbot.event.impl.mail.WelcomeMailEvent;
 import won.bot.framework.eventbot.listener.EventListener;
-
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-import java.io.IOException;
 
 /**
  * Created by fsuda on 30.09.2016.

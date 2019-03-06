@@ -2,8 +2,6 @@ package won.bot.framework.eventbot.action.impl.hokify;
 
 import java.util.List;
 
-import org.json.JSONObject;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**

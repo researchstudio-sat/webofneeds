@@ -16,12 +16,12 @@
 
 package won.bot.framework.eventbot.event.impl.command.base;
 
+import java.net.URI;
+
 import won.bot.framework.eventbot.event.BaseNeedAndConnectionSpecificEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandResultEvent;
 import won.protocol.model.Connection;
-
-import java.net.URI;
 
 /**
  * Base class for command results (failure and successes).

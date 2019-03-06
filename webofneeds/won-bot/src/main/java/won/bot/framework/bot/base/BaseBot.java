@@ -16,21 +16,20 @@
 
 package won.bot.framework.bot.base;
 
+import java.net.URI;
+
 import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
+
 import won.bot.framework.bot.Bot;
 import won.bot.framework.bot.BotLifecyclePhase;
-import won.bot.framework.bot.context.BotContext;
 import won.bot.framework.bot.context.BotContextWrapper;
 import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.Match;
-
-import java.net.URI;
 
 /**
  * Basic Bot implementation intended to be extended. Does nothing.

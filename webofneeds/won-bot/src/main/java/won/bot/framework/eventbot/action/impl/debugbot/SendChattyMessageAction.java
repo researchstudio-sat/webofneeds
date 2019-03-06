@@ -16,8 +16,15 @@
 
 package won.bot.framework.eventbot.action.impl.debugbot;
 
+import java.net.URI;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
+
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
@@ -27,12 +34,6 @@ import won.protocol.model.Connection;
 import won.protocol.model.ConnectionModelMapper;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
-
-import java.net.URI;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
 
 /**
  * Action to perform when the debug bot is set to be 'chatty' - that is,

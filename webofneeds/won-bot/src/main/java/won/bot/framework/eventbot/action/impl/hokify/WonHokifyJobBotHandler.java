@@ -1,23 +1,19 @@
 package won.bot.framework.eventbot.action.impl.hokify;
 
+import java.util.Collection;
+import java.util.Map;
+import java.util.function.BiConsumer;
+
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Message;
-import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.AbsSender;
-import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.bots.commands.BotCommand;
 import org.telegram.telegrambots.bots.commands.CommandRegistry;
 import org.telegram.telegrambots.bots.commands.ICommandRegistry;
 
 import won.bot.framework.eventbot.action.impl.hokify.util.HokifyMessageGenerator;
-import won.bot.framework.eventbot.action.impl.telegram.Commands.*;
-import won.bot.framework.eventbot.action.impl.telegram.util.TelegramMessageGenerator;
+import won.bot.framework.eventbot.action.impl.telegram.Commands.HelpBotCommand;
 import won.bot.framework.eventbot.bus.EventBus;
-import won.bot.framework.eventbot.event.impl.telegram.TelegramMessageReceivedEvent;
-
-import java.util.Collection;
-import java.util.Map;
-import java.util.function.BiConsumer;
 
 /**
  * 

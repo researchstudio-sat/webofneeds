@@ -16,9 +16,9 @@
 
 package won.bot.framework.eventbot.event.impl.command.create;
 
-import won.bot.framework.eventbot.event.impl.command.MessageCommandResultEvent;
-
 import java.net.URI;
+
+import won.bot.framework.eventbot.event.impl.command.MessageCommandResultEvent;
 
 /**
  * Tags a result event of a CreateNeedCommand.

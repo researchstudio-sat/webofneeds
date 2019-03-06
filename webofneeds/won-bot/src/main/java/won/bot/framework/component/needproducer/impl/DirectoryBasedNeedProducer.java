@@ -16,20 +16,20 @@
 
 package won.bot.framework.component.needproducer.impl;
 
-import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
-import org.apache.commons.io.filefilter.RegexFileFilter;
-import org.apache.commons.io.filefilter.TrueFileFilter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import won.bot.framework.component.needproducer.FileBasedNeedProducer;
-import won.bot.framework.component.needproducer.NeedProducer;
-import won.protocol.exception.DataIntegrityException;
-
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import org.apache.commons.io.filefilter.RegexFileFilter;
+import org.apache.commons.io.filefilter.TrueFileFilter;
+import org.apache.jena.query.Dataset;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import won.bot.framework.component.needproducer.FileBasedNeedProducer;
+import won.bot.framework.component.needproducer.NeedProducer;
+import won.protocol.exception.DataIntegrityException;
 
 /**
  * NeedProducer that is configured to read needs from a directory.

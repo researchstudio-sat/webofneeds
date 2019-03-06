@@ -16,6 +16,12 @@
 
 package won.bot.framework.component.needproducer.impl;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+
+import javax.mail.internet.MimeMessage;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.mail.util.MimeMessageParser;
 import org.apache.jena.query.Dataset;
@@ -23,13 +29,9 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import won.bot.framework.component.needproducer.FileBasedNeedProducer;
 import won.protocol.util.DefaultNeedModelWrapper;
-
-import javax.mail.internet.MimeMessage;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 
 /**
  * User: fkleedorfer

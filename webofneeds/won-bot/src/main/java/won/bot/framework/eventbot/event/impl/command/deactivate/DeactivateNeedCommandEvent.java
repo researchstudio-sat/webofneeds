@@ -16,12 +16,10 @@
 
 package won.bot.framework.eventbot.event.impl.command.deactivate;
 
-import won.bot.framework.eventbot.event.BaseNeedSpecificEvent;
-import won.bot.framework.eventbot.event.NeedSpecificEvent;
+import java.net.URI;
+
 import won.bot.framework.eventbot.event.impl.command.MessageCommandEvent;
 import won.protocol.message.WonMessageType;
-
-import java.net.URI;
 
 /**
  * Instructs the bot to deactivate a need.

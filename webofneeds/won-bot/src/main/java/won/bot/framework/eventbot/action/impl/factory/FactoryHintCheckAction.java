@@ -16,6 +16,8 @@
 
 package won.bot.framework.eventbot.action.impl.factory;
 
+import java.net.URI;
+
 import won.bot.framework.bot.context.FactoryBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
@@ -25,8 +27,6 @@ import won.bot.framework.eventbot.event.impl.factory.FactoryHintEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.HintFromMatcherEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.model.Match;
-
-import java.net.URI;
 
 /**
  * Checks if the received hint is for a factoryURI

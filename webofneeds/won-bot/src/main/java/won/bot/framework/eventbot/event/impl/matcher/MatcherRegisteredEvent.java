@@ -16,9 +16,9 @@
 
 package won.bot.framework.eventbot.event.impl.matcher;
 
-import won.bot.framework.eventbot.event.BaseNodeSpecificEvent;
-
 import java.net.URI;
+
+import won.bot.framework.eventbot.event.BaseNodeSpecificEvent;
 
 /**
  *

@@ -16,10 +16,11 @@
 
 package won.bot.framework.eventbot.event.impl.matcher;
 
-import org.apache.jena.query.Dataset;
-import won.bot.framework.eventbot.event.BaseNeedSpecificEvent;
-
 import java.net.URI;
+
+import org.apache.jena.query.Dataset;
+
+import won.bot.framework.eventbot.event.BaseNeedSpecificEvent;
 
 /**
  *

@@ -16,11 +16,11 @@
 
 package won.bot.framework.bot;
 
-import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
-import won.owner.protocol.message.OwnerCallback;
-
 import java.net.URI;
+
+import org.apache.jena.query.Dataset;
+
+import won.owner.protocol.message.OwnerCallback;
 
 /**
  * A bot that manipulates needs.

@@ -35,8 +35,6 @@ import won.protocol.message.WonMessage;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 
-import java.net.URI;
-
 /**
  * Action executing a MessageCommandEvent and publishing MessageCommandSuccess and MessageCommandFailure
  * events indicating how well sending that message worked.

@@ -1,11 +1,11 @@
 package won.bot.framework.eventbot.behaviour;
 
+import java.util.Optional;
+
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.impl.factory.FactoryHintCheckAction;
 import won.bot.framework.eventbot.event.impl.wonmessage.HintFromMatcherEvent;
 import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
-
-import java.util.Optional;
 
 /**
  * FactoryBotHintBehaviour

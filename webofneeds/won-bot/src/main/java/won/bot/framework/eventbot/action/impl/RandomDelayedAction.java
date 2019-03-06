@@ -16,10 +16,10 @@
 
 package won.bot.framework.eventbot.action.impl;
 
+import java.util.Random;
+
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.EventBotAction;
-
-import java.util.Random;
 
 /**
  * Action that delegates to another action after a delay that is chosen at random between a specified minimum and

@@ -16,10 +16,10 @@
 
 package won.bot.framework.eventbot.action.impl.debugbot;
 
-import won.bot.framework.eventbot.EventListenerContext;
-
 import java.net.URI;
 import java.util.Date;
+
+import won.bot.framework.eventbot.EventListenerContext;
 
 /**
  * Created by fkleedorfer on 10.06.2016.

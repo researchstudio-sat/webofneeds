@@ -19,7 +19,6 @@ package won.bot;
 import org.junit.Assert;
 import org.junit.Test;
 import won.bot.framework.bot.Bot;
-import won.bot.framework.bot.base.BaseBot;
 import won.bot.impl.DebugBot;
 
 import java.util.*;

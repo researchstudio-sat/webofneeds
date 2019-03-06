@@ -16,13 +16,14 @@
 
 package won.bot.framework.eventbot.filter.impl;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import won.bot.framework.eventbot.EventListenerContext;
-import won.bot.framework.eventbot.event.Event;
-
 import java.net.URI;
 import java.util.Collection;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import won.bot.framework.eventbot.EventListenerContext;
+import won.bot.framework.eventbot.event.Event;
 
 /**
  * Event filter that accepts need specific events the URI of which is found in the specified named URI list.

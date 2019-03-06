@@ -1,11 +1,11 @@
 package won.bot.framework.eventbot.listener.baStateBots.baCCMessagingBots.coordinationMessageAsUriBots;
-import won.bot.framework.eventbot.listener.baStateBots.BATestBotScript;
-import won.bot.framework.eventbot.listener.baStateBots.BATestScriptAction;
-import won.node.facet.impl.WON_TX;
-
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+
+import won.bot.framework.eventbot.listener.baStateBots.BATestBotScript;
+import won.bot.framework.eventbot.listener.baStateBots.BATestScriptAction;
+import won.node.facet.impl.WON_TX;
 
 /**
  * Created with IntelliJ IDEA.

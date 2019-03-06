@@ -16,6 +16,9 @@
 
 package won.bot.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import won.bot.framework.bot.base.EventBot;
 import won.bot.framework.bot.context.GroupBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
@@ -35,7 +38,11 @@ import won.bot.framework.eventbot.event.impl.wonmessage.CloseFromOtherNeedEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.ConnectFromOtherNeedEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.MessageFromOtherNeedEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.OpenFromOtherNeedEvent;
-import won.bot.framework.eventbot.filter.impl.*;
+import won.bot.framework.eventbot.filter.impl.AcceptOnceFilter;
+import won.bot.framework.eventbot.filter.impl.FinishedEventFilter;
+import won.bot.framework.eventbot.filter.impl.NeedUriEventFilter;
+import won.bot.framework.eventbot.filter.impl.NeedUriInNamedListFilter;
+import won.bot.framework.eventbot.filter.impl.OrFilter;
 import won.bot.framework.eventbot.listener.BaseEventListener;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
@@ -44,9 +51,6 @@ import won.bot.framework.eventbot.listener.impl.AutomaticMessageResponderListene
 import won.bot.framework.eventbot.listener.impl.WaitForNEventsListener;
 import won.protocol.model.FacetType;
 import won.protocol.util.WonRdfUtils;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *

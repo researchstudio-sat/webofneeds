@@ -24,7 +24,6 @@ import won.bot.framework.eventbot.event.BaseNeedSpecificEvent;
 import won.bot.framework.eventbot.event.RemoteNeedSpecificEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandEvent;
 import won.protocol.message.WonMessageType;
-import won.protocol.model.FacetType;
 
 /**
  * Instructs the bot to connect to the specified remoteNeed on behalf of the need.

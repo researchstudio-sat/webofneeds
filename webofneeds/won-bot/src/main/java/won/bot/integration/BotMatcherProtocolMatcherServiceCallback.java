@@ -16,17 +16,18 @@
 
 package won.bot.integration;
 
+import java.net.URI;
+import java.util.Date;
+import java.util.List;
+
 import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.TaskScheduler;
+
 import won.bot.framework.bot.Bot;
 import won.bot.framework.manager.BotManager;
 import won.matcher.protocol.MatcherProtocolMatcherServiceCallback;
-
-import java.net.URI;
-import java.util.Date;
-import java.util.List;
 
 /**
  * OwnerProtocolOwnerServiceCallback that dispatches the calls to the bots.
