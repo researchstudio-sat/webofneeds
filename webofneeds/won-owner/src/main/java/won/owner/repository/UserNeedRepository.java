@@ -16,11 +16,12 @@
 
 package won.owner.repository;
 
+import java.net.URI;
+
 import org.springframework.data.jpa.repository.Query;
+
 import won.owner.model.UserNeed;
 import won.protocol.repository.WonRepository;
-
-import java.net.URI;
 
 /**
  * User: fkleedorfer
