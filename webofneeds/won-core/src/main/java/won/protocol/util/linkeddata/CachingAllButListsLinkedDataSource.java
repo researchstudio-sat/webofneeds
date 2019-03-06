@@ -1,12 +1,12 @@
 package won.protocol.util.linkeddata;
 
-import org.apache.jena.query.Dataset;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.net.URI;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.jena.query.Dataset;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * User: ypanchenko

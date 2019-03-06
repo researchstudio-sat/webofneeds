@@ -16,10 +16,11 @@
 
 package won.protocol.service;
 
-import org.apache.jena.rdf.model.Model;
-import won.protocol.message.WonMessage;
-
 import java.net.URI;
+
+import org.apache.jena.rdf.model.Model;
+
+import won.protocol.message.WonMessage;
 
 /**
  * Interface defining methods for need communication.

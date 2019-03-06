@@ -16,23 +16,6 @@
 
 package won.protocol.message.processor.impl;
 
-import org.apache.jena.query.Dataset;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import com.github.andrewoma.dexx.collection.Sets;
-
-import won.cryptography.rdfsign.SignatureVerificationState;
-import won.cryptography.rdfsign.WonKeysReaderWriter;
-import won.protocol.message.WonMessage;
-import won.protocol.message.processor.WonMessageProcessor;
-import won.protocol.message.processor.exception.WonMessageProcessingException;
-import won.protocol.util.RdfUtils;
-import won.protocol.util.linkeddata.LinkedDataSource;
-
 import java.net.URI;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -42,6 +25,20 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.jena.query.Dataset;
+import org.apache.jena.riot.Lang;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import won.cryptography.rdfsign.SignatureVerificationState;
+import won.cryptography.rdfsign.WonKeysReaderWriter;
+import won.protocol.message.WonMessage;
+import won.protocol.message.processor.WonMessageProcessor;
+import won.protocol.message.processor.exception.WonMessageProcessingException;
+import won.protocol.util.RdfUtils;
+import won.protocol.util.linkeddata.LinkedDataSource;
 
 /**
  * Checks all signatures found in a WonMessage. It is assumed that the message is well-formed.

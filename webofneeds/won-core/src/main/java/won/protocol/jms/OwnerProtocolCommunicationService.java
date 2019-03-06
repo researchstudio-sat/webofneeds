@@ -16,9 +16,9 @@
 
 package won.protocol.jms;
 
-import won.protocol.exception.NoSuchConnectionException;
-
 import java.net.URI;
+
+import won.protocol.exception.NoSuchConnectionException;
 
 /**
  * User: LEIH-NB

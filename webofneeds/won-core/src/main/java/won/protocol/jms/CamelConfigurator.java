@@ -1,11 +1,11 @@
 package won.protocol.jms;
 
+import java.net.URI;
+
 import org.apache.camel.CamelContext;
 import org.apache.camel.CamelContextAware;
-import won.protocol.exception.CamelConfigurationFailedException;
 
-import java.net.URI;
-import java.util.List;
+import won.protocol.exception.CamelConfigurationFailedException;
 
 /**
  * User: LEIH-NB

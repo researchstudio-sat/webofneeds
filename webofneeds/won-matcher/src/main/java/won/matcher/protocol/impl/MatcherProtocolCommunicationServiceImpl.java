@@ -1,15 +1,22 @@
 package won.matcher.protocol.impl;
 
+import java.net.URI;
+import java.util.Set;
+
 import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import won.cryptography.service.RegistrationRestClientHttps;
 import won.protocol.exception.CamelConfigurationFailedException;
 import won.protocol.exception.NoSuchConnectionException;
-import won.protocol.jms.*;
-
-import java.net.URI;
-import java.util.Set;
+import won.protocol.jms.ActiveMQService;
+import won.protocol.jms.CamelConfiguration;
+import won.protocol.jms.CamelConfigurator;
+import won.protocol.jms.MatcherActiveMQService;
+import won.protocol.jms.MatcherProtocolCamelConfigurator;
+import won.protocol.jms.MatcherProtocolCommunicationService;
+import won.protocol.jms.NeedProtocolCamelConfigurator;
 
 /**
  * User: ypanchenko

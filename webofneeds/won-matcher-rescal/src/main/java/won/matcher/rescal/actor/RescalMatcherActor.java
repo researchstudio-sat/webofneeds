@@ -1,28 +1,29 @@
 package won.matcher.rescal.actor;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Collection;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
 import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
 import akka.cluster.pubsub.DistributedPubSub;
 import akka.cluster.pubsub.DistributedPubSubMediator;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 import scala.concurrent.duration.FiniteDuration;
 import won.matcher.rescal.config.RescalMatcherConfig;
 import won.matcher.rescal.service.HintReader;
-import won.matcher.utils.tensor.TensorEntryAllGenerator;
-import won.matcher.utils.tensor.TensorEntryTokenizer;
 import won.matcher.service.common.event.BulkHintEvent;
 import won.matcher.service.common.event.HintEvent;
 import won.matcher.utils.tensor.TensorEntry;
+import won.matcher.utils.tensor.TensorEntryAllGenerator;
+import won.matcher.utils.tensor.TensorEntryTokenizer;
 import won.matcher.utils.tensor.TensorMatchingData;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.Collection;
 
 /**
  * Main actor that controls the rescal matching process. It loads the needs and connection data from the rdf

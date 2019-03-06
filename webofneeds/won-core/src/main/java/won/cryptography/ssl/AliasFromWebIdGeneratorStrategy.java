@@ -1,11 +1,11 @@
 package won.cryptography.ssl;
 
-import won.cryptography.service.CertificateService;
-
 import java.net.URI;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.List;
+
+import won.cryptography.service.CertificateService;
 
 /**
  * User: ypanchenko

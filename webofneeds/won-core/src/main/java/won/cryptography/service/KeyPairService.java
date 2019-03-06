@@ -1,15 +1,16 @@
 package won.cryptography.service;
 
-import org.bouncycastle.jcajce.provider.asymmetric.ec.KeyPairGeneratorSpi;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import won.cryptography.key.KeyInformationExtractor;
-
 import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.SecureRandom;
 import java.security.spec.ECGenParameterSpec;
+
+import org.bouncycastle.jcajce.provider.asymmetric.ec.KeyPairGeneratorSpi;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import won.cryptography.key.KeyInformationExtractor;
 
 /**
  * Service responsible for generating key pairs.

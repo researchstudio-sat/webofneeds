@@ -16,10 +16,10 @@
 
 package won.protocol.jms;
 
-import won.protocol.exception.CamelConfigurationFailedException;
-
 import java.net.URI;
 import java.util.Set;
+
+import won.protocol.exception.CamelConfigurationFailedException;
 
 /**
  * User: LEIH-NB

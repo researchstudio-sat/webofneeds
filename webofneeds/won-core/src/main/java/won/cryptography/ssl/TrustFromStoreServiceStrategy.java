@@ -1,10 +1,11 @@
 package won.cryptography.ssl;
 
-import org.apache.http.ssl.TrustStrategy;
-import won.cryptography.service.TrustStoreService;
-
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+
+import org.apache.http.ssl.TrustStrategy;
+
+import won.cryptography.service.TrustStoreService;
 
 /**
  * User: ypanchenko

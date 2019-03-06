@@ -1,15 +1,20 @@
 package won.protocol.model;
 
-import org.apache.jena.rdf.model.*;
+import java.net.URI;
+import java.util.Date;
+
+import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.RDF;
+
 import won.protocol.util.DateTimeUtils;
 import won.protocol.util.ModelMapper;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WON;
-
-import java.net.URI;
-import java.util.Date;
 
 /**
  * User: gabriel

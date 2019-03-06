@@ -1,12 +1,11 @@
 package won.protocol.repository;
 
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.jpa.repository.Query;
-import won.protocol.model.BAState;
-import won.protocol.model.Facet;
-
 import java.net.URI;
 import java.util.List;
+
+import org.springframework.data.jpa.repository.Query;
+
+import won.protocol.model.BAState;
 
 /**
  * User: Danijel

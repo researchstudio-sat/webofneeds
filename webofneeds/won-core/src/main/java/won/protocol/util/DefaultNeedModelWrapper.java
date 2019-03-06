@@ -1,18 +1,19 @@
 package won.protocol.util;
 
+import java.net.URI;
+import java.util.Collection;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.DC;
+
 import won.protocol.model.Coordinate;
 import won.protocol.model.NeedGraphType;
-import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.SCHEMA;
-
-import java.net.URI;
-import java.util.Collection;
+import won.protocol.vocabulary.WON;
 
 /**
  * Extends {@link NeedModelWrapper} to add matchat specific methods to access content fields like title, description, tags, etc.

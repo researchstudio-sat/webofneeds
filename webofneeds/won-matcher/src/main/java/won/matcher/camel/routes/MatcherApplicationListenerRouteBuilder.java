@@ -16,14 +16,14 @@
 
 package won.matcher.camel.routes;
 
-import org.apache.camel.CamelContext;
-import org.apache.camel.builder.RouteBuilder;
-
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
 
 //TODO: This route builder should not be loaded on startup, but it's being loaded..
 

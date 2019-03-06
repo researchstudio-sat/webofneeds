@@ -1,12 +1,12 @@
 package won.cryptography.ssl;
 
+import java.net.Socket;
+import java.util.Map;
+
 import org.apache.http.ssl.PrivateKeyDetails;
 import org.apache.http.ssl.PrivateKeyStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.net.Socket;
-import java.util.Map;
 
 /**
  * When the server requests a certificate, and if it does not specify which one it wants (e.g. if server has trusted

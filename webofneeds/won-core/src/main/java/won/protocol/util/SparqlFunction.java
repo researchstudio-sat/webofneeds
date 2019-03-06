@@ -7,8 +7,6 @@ import java.util.function.Function;
 
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
 
 public abstract class SparqlFunction<T,R> implements Function<T,R> {
 

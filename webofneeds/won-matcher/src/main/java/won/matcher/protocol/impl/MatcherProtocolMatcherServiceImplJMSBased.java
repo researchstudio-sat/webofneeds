@@ -16,20 +16,21 @@
 
 package won.matcher.protocol.impl;
 
+import java.net.URI;
+import java.util.Iterator;
+import java.util.Set;
+
 import org.apache.camel.Body;
 import org.apache.camel.Header;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import won.matcher.component.MatcherNodeURISource;
 import won.matcher.protocol.MatcherProtocolMatcherService;
 import won.protocol.exception.CamelConfigurationFailedException;
 import won.protocol.jms.MatcherProtocolCommunicationService;
 import won.protocol.util.RdfUtils;
-
-import java.net.URI;
-import java.util.Iterator;
-import java.util.Set;
 
 
 /**

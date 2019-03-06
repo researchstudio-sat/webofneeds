@@ -17,12 +17,12 @@
 package won.protocol.rest;
 
 
+import java.util.List;
+
 import org.hibernate.annotations.common.util.impl.LoggerFactory;
 import org.jboss.logging.Logger;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-
-import java.util.List;
 
 /**
  * Utils for our very specific way of creating/parsing etags.

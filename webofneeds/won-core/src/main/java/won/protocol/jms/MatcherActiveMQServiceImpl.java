@@ -16,6 +16,12 @@
 
 package won.protocol.jms;
 
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.sparql.path.Path;
 import org.apache.jena.sparql.path.PathParser;
@@ -23,15 +29,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
+
 import won.protocol.model.ProtocolType;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WON;
-
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * User: sbyim

@@ -16,8 +16,14 @@
 
 package won.protocol.model;
 
-import javax.persistence.*;
 import java.net.URI;
+
+import javax.persistence.Column;
+import javax.persistence.Convert;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 /**
  * User: sbyim

@@ -1,10 +1,10 @@
 package won.cryptography.ssl;
 
-import sun.security.x509.X500Name;
-
 import java.io.IOException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+
+import sun.security.x509.X500Name;
 
 /**
  * User: ypanchenko

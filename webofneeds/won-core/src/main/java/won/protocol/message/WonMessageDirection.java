@@ -1,9 +1,10 @@
 package won.protocol.message;
 
-import org.apache.jena.rdf.model.Resource;
-import won.protocol.vocabulary.WONMSG;
-
 import java.net.URI;
+
+import org.apache.jena.rdf.model.Resource;
+
+import won.protocol.vocabulary.WONMSG;
 
 /**
  * User: syim

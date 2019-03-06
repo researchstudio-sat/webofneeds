@@ -16,11 +16,15 @@
 
 package won.protocol.validation;
 
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.jena.query.Dataset;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-
-import java.io.IOException;
-import java.util.*;
 
 /**
  * Base class for validators. Provides the validate methods.

@@ -1,9 +1,10 @@
 package won.cryptography.service;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Ehcache;
-import net.sf.ehcache.Element;
+import java.security.KeyStore;
+
+import javax.crypto.Cipher;
+import javax.net.ssl.SSLContext;
+
 import org.apache.http.client.HttpClient;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.HttpClients;
@@ -13,11 +14,12 @@ import org.apache.http.ssl.SSLContexts;
 import org.apache.http.ssl.TrustStrategy;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
-import won.cryptography.ssl.PredefinedAliasPrivateKeyStrategy;
 
-import javax.crypto.Cipher;
-import javax.net.ssl.SSLContext;
-import java.security.KeyStore;
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Ehcache;
+import net.sf.ehcache.Element;
+import won.cryptography.ssl.PredefinedAliasPrivateKeyStrategy;
 
 /**
  * User: fsalcher

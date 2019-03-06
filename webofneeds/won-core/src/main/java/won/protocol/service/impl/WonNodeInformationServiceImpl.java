@@ -1,16 +1,17 @@
 package won.protocol.service.impl;
 
+import java.net.URI;
+
 import org.apache.jena.query.Dataset;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+
 import won.cryptography.service.RandomNumberService;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
-
-import java.net.URI;
 
 /**
  * User: fsalcher
