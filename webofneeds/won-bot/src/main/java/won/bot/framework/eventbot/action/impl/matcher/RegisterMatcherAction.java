@@ -16,17 +16,17 @@
 
 package won.bot.framework.eventbot.action.impl.matcher;
 
+import java.net.URI;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.matcher.MatcherRegisterFailedEvent;
 import won.bot.framework.eventbot.listener.EventListener;
-
-import java.net.URI;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
 * User: fkleedorfer

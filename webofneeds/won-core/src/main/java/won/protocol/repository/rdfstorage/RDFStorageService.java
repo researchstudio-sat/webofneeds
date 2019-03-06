@@ -1,10 +1,11 @@
 package won.protocol.repository.rdfstorage;
 
+import java.net.URI;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
-import won.protocol.model.DataWithEtag;
 
-import java.net.URI;
+import won.protocol.model.DataWithEtag;
 
 /**
  * Created with IntelliJ IDEA.

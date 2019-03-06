@@ -1,12 +1,22 @@
 package won.bot.impl;
 
-import won.bot.framework.eventbot.listener.baStateBots.BATestBotScript;
-import won.bot.framework.eventbot.listener.baStateBots.baPCMessagingBots.atomicBots.coordinationMessageAsTextBot.*;
-import won.bot.framework.eventbot.listener.baStateBots.baPCMessagingBots.atomicBots.coordinationMessageAsUriBot.*;
-import won.protocol.model.FacetType;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import won.bot.framework.eventbot.listener.baStateBots.BATestBotScript;
+import won.bot.framework.eventbot.listener.baStateBots.baPCMessagingBots.atomicBots.coordinationMessageAsTextBot.ActiveFPBot;
+import won.bot.framework.eventbot.listener.baStateBots.baPCMessagingBots.atomicBots.coordinationMessageAsTextBot.ActiveFailVoteSPBot;
+import won.bot.framework.eventbot.listener.baStateBots.baPCMessagingBots.atomicBots.coordinationMessageAsTextBot.ActiveSPCancelingBot;
+import won.bot.framework.eventbot.listener.baStateBots.baPCMessagingBots.atomicBots.coordinationMessageAsTextBot.ActiveSPCancelingFailingBot;
+import won.bot.framework.eventbot.listener.baStateBots.baPCMessagingBots.atomicBots.coordinationMessageAsTextBot.CompletedFPBot;
+import won.bot.framework.eventbot.listener.baStateBots.baPCMessagingBots.atomicBots.coordinationMessageAsTextBot.CompletedSPCompensatingBot;
+import won.bot.framework.eventbot.listener.baStateBots.baPCMessagingBots.atomicBots.coordinationMessageAsTextBot.CompletedSPCompensatingFailingBot;
+import won.bot.framework.eventbot.listener.baStateBots.baPCMessagingBots.atomicBots.coordinationMessageAsUriBot.ActiveFPUriBot;
+import won.bot.framework.eventbot.listener.baStateBots.baPCMessagingBots.atomicBots.coordinationMessageAsUriBot.ActiveSPCancelingFailingUriBot;
+import won.bot.framework.eventbot.listener.baStateBots.baPCMessagingBots.atomicBots.coordinationMessageAsUriBot.ActiveSPCancelingUriBot;
+import won.bot.framework.eventbot.listener.baStateBots.baPCMessagingBots.atomicBots.coordinationMessageAsUriBot.CompletedFPUriBot;
+import won.bot.framework.eventbot.listener.baStateBots.baPCMessagingBots.atomicBots.coordinationMessageAsUriBot.CompletedSPCompensatingFailingUriBot;
+import won.protocol.model.FacetType;
 
 /**
  * User: Danijel

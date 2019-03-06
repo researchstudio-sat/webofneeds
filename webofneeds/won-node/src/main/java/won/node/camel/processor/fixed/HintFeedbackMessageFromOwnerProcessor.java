@@ -16,12 +16,15 @@
 
 package won.node.camel.processor.fixed;
 
+import java.net.URI;
+
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.springframework.stereotype.Component;
+
 import won.node.camel.processor.AbstractFromOwnerCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.protocol.message.WonMessage;
@@ -30,8 +33,6 @@ import won.protocol.model.Connection;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
-
-import java.net.URI;
 
 /**
  * User: syim

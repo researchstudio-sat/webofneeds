@@ -10,7 +10,6 @@ import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.Optional;
 
 import javax.annotation.PostConstruct;
@@ -18,7 +17,6 @@ import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 
 import won.cryptography.service.keystore.FileBasedKeyStoreService;
 import won.cryptography.service.keystore.KeyStoreService;

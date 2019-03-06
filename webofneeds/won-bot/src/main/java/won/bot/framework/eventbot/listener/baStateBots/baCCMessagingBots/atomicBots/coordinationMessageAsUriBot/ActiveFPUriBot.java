@@ -1,11 +1,11 @@
 package won.bot.framework.eventbot.listener.baStateBots.baCCMessagingBots.atomicBots.coordinationMessageAsUriBot;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import won.bot.framework.eventbot.listener.baStateBots.BATestBotScript;
 import won.bot.framework.eventbot.listener.baStateBots.BATestScriptAction;
 import won.bot.framework.eventbot.listener.baStateBots.NopAction;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * User: Danijel

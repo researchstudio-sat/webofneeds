@@ -1,25 +1,26 @@
 package won.cryptography.rdfsign;
 
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdf.model.StmtIterator;
-import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.GraphCollection;
-import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.NamedGraph;
-import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.Prefix;
-import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.Triple;
-import de.uni_koblenz.aggrimm.icp.crypto.sign.trigplus.TriGPlusWriter;
-import org.apache.jena.riot.RDFDataMgr;
-import org.apache.jena.riot.RDFFormat;
-
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStreamWriter;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.RDFFormat;
+
+import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.GraphCollection;
+import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.NamedGraph;
+import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.Prefix;
+import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.Triple;
+import de.uni_koblenz.aggrimm.icp.crypto.sign.trigplus.TriGPlusWriter;
 
 /**
  * Created by ypanchenko on 09.07.2014.

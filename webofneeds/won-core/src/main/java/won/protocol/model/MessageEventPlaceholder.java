@@ -1,13 +1,30 @@
 package won.protocol.model;
 
+import java.net.URI;
+import java.util.Date;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Convert;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Index;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
+import javax.xml.bind.annotation.XmlTransient;
+
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageType;
 import won.protocol.model.parentaware.ParentAware;
-
-import javax.persistence.*;
-import javax.xml.bind.annotation.XmlTransient;
-import java.net.URI;
-import java.util.Date;
 
 @Entity
 @Table(name = "message_event", indexes = {

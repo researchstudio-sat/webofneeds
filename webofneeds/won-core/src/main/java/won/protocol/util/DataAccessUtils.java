@@ -16,6 +16,10 @@
 
 package won.protocol.util;
 
+import java.net.URI;
+import java.text.MessageFormat;
+import java.util.List;
+
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.exception.NoSuchOwnerApplicationException;
@@ -27,10 +31,6 @@ import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.repository.OwnerApplicationRepository;
 import won.protocol.repository.WonNodeRepository;
-
-import java.net.URI;
-import java.text.MessageFormat;
-import java.util.List;
 
 /**
  * User: fkleedorfer

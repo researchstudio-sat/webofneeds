@@ -16,11 +16,14 @@
 
 package won.bot.framework.bot.base;
 
+import java.net.URI;
+import java.util.concurrent.Executor;
+
 import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
 import org.springframework.scheduling.TaskScheduler;
-import won.bot.framework.bot.context.BotContext;
+
 import won.bot.framework.bot.BotLifecyclePhase;
+import won.bot.framework.bot.context.BotContext;
 import won.bot.framework.bot.context.BotContextWrapper;
 import won.bot.framework.component.needproducer.NeedProducer;
 import won.bot.framework.component.nodeurisource.NodeURISource;
@@ -28,13 +31,24 @@ import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.bus.impl.AsyncEventBusImpl;
 import won.bot.framework.eventbot.event.Event;
-import won.bot.framework.eventbot.event.impl.lifecycle.*;
+import won.bot.framework.eventbot.event.impl.lifecycle.ActEvent;
+import won.bot.framework.eventbot.event.impl.lifecycle.ErrorEvent;
+import won.bot.framework.eventbot.event.impl.lifecycle.InitializeEvent;
+import won.bot.framework.eventbot.event.impl.lifecycle.ShutdownEvent;
 import won.bot.framework.eventbot.event.impl.matcher.MatcherRegisteredEvent;
 import won.bot.framework.eventbot.event.impl.matcher.NeedActivatedEventForMatcher;
 import won.bot.framework.eventbot.event.impl.matcher.NeedCreatedEventForMatcher;
 import won.bot.framework.eventbot.event.impl.matcher.NeedDeactivatedEventForMatcher;
 import won.bot.framework.eventbot.event.impl.needlifecycle.NeedCreatedEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.*;
+import won.bot.framework.eventbot.event.impl.wonmessage.CloseFromOtherNeedEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.ConnectFromOtherNeedEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.HintFromMatcherEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.MessageFromOtherNeedEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.OpenFromOtherNeedEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.SuccessResponseEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.WonMessageSentEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.WonMessageSentOnConnectionEvent;
 import won.bot.framework.eventbot.listener.BaseEventListener;
 import won.matcher.component.MatcherNodeURISource;
 import won.matcher.protocol.impl.MatcherProtocolMatcherServiceImplJMSBased;
@@ -48,9 +62,6 @@ import won.protocol.model.FacetType;
 import won.protocol.model.Match;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.linkeddata.LinkedDataSource;
-
-import java.net.URI;
-import java.util.concurrent.Executor;
 
 /**
  * Base class for bots that define their behaviour through event listeners.

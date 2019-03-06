@@ -16,11 +16,11 @@
 
 package won.bot.framework.eventbot.filter.impl;
 
+import java.util.List;
+
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.filter.AbstractCompositeFilter;
 import won.bot.framework.eventbot.filter.EventFilter;
-
-import java.util.List;
 
 /**
  * Filter that accepts if all filters it has accept.

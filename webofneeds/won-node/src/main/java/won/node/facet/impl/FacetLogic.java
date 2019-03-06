@@ -16,13 +16,18 @@
 
 package won.node.facet.impl;
 
+import java.net.URI;
+
 import org.apache.jena.rdf.model.Model;
-import won.protocol.exception.*;
+
+import won.protocol.exception.ConnectionAlreadyExistsException;
+import won.protocol.exception.IllegalMessageForConnectionStateException;
+import won.protocol.exception.IllegalMessageForNeedStateException;
+import won.protocol.exception.NoSuchConnectionException;
+import won.protocol.exception.NoSuchNeedException;
 import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.FacetType;
-
-import java.net.URI;
 
 /**
  * User: fkleedorfer

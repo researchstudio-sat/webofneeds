@@ -16,6 +16,10 @@
 
 package won.bot.impl;
 
+import java.net.URI;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
+
 import won.bot.framework.bot.base.EventBot;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
@@ -32,13 +36,8 @@ import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
-import won.protocol.model.FacetType;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
-
-import java.net.URI;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Bot that connects the two last seen needs using a hint.

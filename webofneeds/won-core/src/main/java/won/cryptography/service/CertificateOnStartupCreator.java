@@ -1,10 +1,10 @@
 package won.cryptography.service;
 
+import java.io.IOException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
-
-import java.io.IOException;
 
 /**
  * Checks if the node certificate is already present in the specified keystore and creates it if this is not the case.

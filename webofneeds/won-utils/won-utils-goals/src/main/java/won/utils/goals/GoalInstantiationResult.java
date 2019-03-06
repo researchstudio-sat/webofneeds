@@ -1,11 +1,12 @@
 package won.utils.goals;
 
+import java.io.StringWriter;
+
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.topbraid.shacl.validation.ValidationUtil;
-import won.utils.shacl.ShaclReportWrapper;
 
-import java.io.StringWriter;
+import won.utils.shacl.ShaclReportWrapper;
 
 /**
  * Class describes the outcome of a goal instantiation attempt.

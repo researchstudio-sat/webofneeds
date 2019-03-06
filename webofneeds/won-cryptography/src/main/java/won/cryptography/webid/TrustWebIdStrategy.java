@@ -1,17 +1,18 @@
 package won.cryptography.webid;
 
-import org.apache.http.ssl.TrustStrategy;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import won.cryptography.service.CertificateService;
-import won.protocol.util.linkeddata.LinkedDataSource;
-
 import java.net.URI;
 import java.security.PublicKey;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 import java.util.List;
+
+import org.apache.http.ssl.TrustStrategy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import won.cryptography.service.CertificateService;
+import won.protocol.util.linkeddata.LinkedDataSource;
 
 /**
  * Trust all the certificates that contains at least one verified webID in certificate's subject alternative names.

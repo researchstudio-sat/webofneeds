@@ -16,6 +16,12 @@
 
 package won.protocol.jms;
 
+import java.net.URI;
+
+import javax.jms.ConnectionFactory;
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.TrustManager;
+
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.ActiveMQSslConnectionFactory;
 import org.apache.activemq.camel.component.ActiveMQComponent;
@@ -23,13 +29,9 @@ import org.apache.camel.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jms.connection.CachingConnectionFactory;
+
 import won.cryptography.ssl.MessagingContext;
 import won.protocol.model.MessagingType;
-
-import javax.jms.ConnectionFactory;
-import javax.net.ssl.KeyManager;
-import javax.net.ssl.TrustManager;
-import java.net.URI;
 
 /**
  * Adds a camel component that is used to contact a remote ActiveMQ broker and configures its connectionFactory

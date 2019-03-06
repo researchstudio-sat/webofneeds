@@ -16,9 +16,18 @@
 
 package won.bot.framework.eventbot.behaviour;
 
+import java.util.Optional;
+
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.EventBotAction;
-import won.bot.framework.eventbot.action.impl.wonmessage.execCommand.*;
+import won.bot.framework.eventbot.action.impl.wonmessage.execCommand.ExecuteCloseCommandAction;
+import won.bot.framework.eventbot.action.impl.wonmessage.execCommand.ExecuteConnectCommandAction;
+import won.bot.framework.eventbot.action.impl.wonmessage.execCommand.ExecuteConnectionMessageCommandAction;
+import won.bot.framework.eventbot.action.impl.wonmessage.execCommand.ExecuteCreateNeedCommandAction;
+import won.bot.framework.eventbot.action.impl.wonmessage.execCommand.ExecuteDeactivateNeedCommandAction;
+import won.bot.framework.eventbot.action.impl.wonmessage.execCommand.ExecuteFeedbackCommandAction;
+import won.bot.framework.eventbot.action.impl.wonmessage.execCommand.ExecuteOpenCommandAction;
+import won.bot.framework.eventbot.action.impl.wonmessage.execCommand.LogMessageCommandFailureAction;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandFailureEvent;
 import won.bot.framework.eventbot.event.impl.command.close.CloseCommandEvent;
@@ -29,8 +38,6 @@ import won.bot.framework.eventbot.event.impl.command.deactivate.DeactivateNeedCo
 import won.bot.framework.eventbot.event.impl.command.feedback.FeedbackCommandEvent;
 import won.bot.framework.eventbot.event.impl.command.open.OpenCommandEvent;
 import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
-
-import java.util.Optional;
 
 /**
  * Behaviour that causes all WonMessageCommand events to be executed.

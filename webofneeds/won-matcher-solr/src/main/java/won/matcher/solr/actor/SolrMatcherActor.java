@@ -1,20 +1,27 @@
 package won.matcher.solr.actor;
 
-import akka.actor.OneForOneStrategy;
-import akka.actor.SupervisorStrategy;
-import akka.actor.UntypedActor;
-import akka.event.Logging;
-import akka.event.LoggingAdapter;
-import akka.japi.Function;
-import com.github.jsonldjava.core.JsonLdError;
+import java.io.IOException;
+import java.time.temporal.ChronoUnit;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+
 import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Statement;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocumentList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import com.github.jsonldjava.core.JsonLdError;
+
+import akka.actor.OneForOneStrategy;
+import akka.actor.SupervisorStrategy;
+import akka.actor.UntypedActor;
+import akka.event.Logging;
+import akka.event.LoggingAdapter;
+import akka.japi.Function;
 import scala.concurrent.duration.Duration;
 import won.matcher.service.common.event.BulkHintEvent;
 import won.matcher.service.common.event.BulkNeedEvent;
@@ -25,15 +32,16 @@ import won.matcher.solr.index.NeedIndexer;
 import won.matcher.solr.query.DefaultMatcherQueryExecuter;
 import won.matcher.solr.query.SolrMatcherQueryExecutor;
 import won.matcher.solr.query.TestMatcherQueryExecutor;
-import won.matcher.solr.query.factory.*;
+import won.matcher.solr.query.factory.BooleanQueryFactory;
+import won.matcher.solr.query.factory.CreationDateQueryFactory;
+import won.matcher.solr.query.factory.DefaultNeedQueryFactory;
+import won.matcher.solr.query.factory.HasFlagQueryFactory;
+import won.matcher.solr.query.factory.MatchingContextQueryFactory;
+import won.matcher.solr.query.factory.NeedStateQueryFactory;
+import won.matcher.solr.query.factory.WhatsAroundQueryFactory;
+import won.matcher.solr.query.factory.WhatsNewQueryFactory;
 import won.protocol.util.NeedModelWrapper;
 import won.protocol.vocabulary.WON;
-
-import java.io.IOException;
-import java.time.temporal.ChronoUnit;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
 
 /**
  * Siren/Solr based abstract matcher with all implementations for querying as well as indexing needs.

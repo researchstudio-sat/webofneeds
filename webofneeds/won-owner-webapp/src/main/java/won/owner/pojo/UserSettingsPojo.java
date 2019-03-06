@@ -1,8 +1,5 @@
 package won.owner.pojo;
 
-import org.hibernate.validator.constraints.NotEmpty;
-import won.owner.model.User;
-
 /**
  * User: ypanchenko
  * Date: 23.02.2015

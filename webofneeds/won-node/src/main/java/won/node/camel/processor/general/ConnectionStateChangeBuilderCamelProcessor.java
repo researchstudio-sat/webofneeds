@@ -17,7 +17,6 @@
 package won.node.camel.processor.general;
 
 import java.net.URI;
-import java.util.Objects;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -26,12 +25,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.processor.camel.WonCamelConstants;
-import won.protocol.message.processor.exception.MissingMessagePropertyException;
-import won.protocol.message.processor.exception.WonMessageProcessingException;
 import won.protocol.model.Connection;
 import won.protocol.repository.ConnectionRepository;
-import won.protocol.util.WonRdfUtils;
-import won.protocol.vocabulary.WONMSG;
 
 /**
  * Extracts the connection state and creates a ConnectionStateChangeBuilder. The

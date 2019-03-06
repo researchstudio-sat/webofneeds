@@ -1,9 +1,8 @@
 package won.bot.framework.bot.context;
 
-import won.bot.framework.eventbot.EventListenerContext;
-import won.bot.framework.eventbot.action.impl.mail.model.WonURI;
-
 import java.net.URI;
+
+import won.bot.framework.eventbot.action.impl.mail.model.WonURI;
 
 /**
  * Created by fsuda on 14.04.2017.

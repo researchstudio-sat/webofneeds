@@ -16,20 +16,19 @@
 
 package won.protocol.service;
 
+import java.net.URI;
+import java.util.Collection;
+import java.util.Date;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.springframework.context.NoSuchMessageException;
-import org.springframework.transaction.annotation.Transactional;
 
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.message.WonMessageType;
 import won.protocol.model.DataWithEtag;
 import won.protocol.model.NeedState;
-
-import java.net.URI;
-import java.util.Collection;
-import java.util.Date;
 
 /**
  * User: fkleedorfer Date: 26.11.12

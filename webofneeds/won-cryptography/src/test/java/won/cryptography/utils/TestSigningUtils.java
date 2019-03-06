@@ -1,8 +1,28 @@
 package won.cryptography.utils;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.math.BigInteger;
+import java.security.KeyPair;
+import java.security.Security;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
-import org.apache.jena.rdf.model.*;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.NodeIterator;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 import org.bouncycastle.cert.X509CertificateHolder;
@@ -12,20 +32,11 @@ import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.PEMWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import won.cryptography.service.CertificateService;
 import won.cryptography.service.KeyPairService;
 import won.cryptography.service.keystore.FileBasedKeyStoreService;
 import won.cryptography.service.keystore.KeyStoreService;
-
-import java.io.*;
-import java.math.BigInteger;
-import java.security.KeyPair;
-import java.security.Security;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * User: ypanchenko

@@ -1,6 +1,11 @@
 package won.bot.framework.eventbot.listener.impl;
 
+import java.net.URI;
+import java.util.Date;
+import java.util.List;
+
 import org.apache.jena.rdf.model.Model;
+
 import won.bot.framework.bot.context.ParticipantCoordinatorBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.event.Event;
@@ -10,15 +15,10 @@ import won.bot.framework.eventbot.listener.BaseEventListener;
 import won.bot.framework.eventbot.listener.baStateBots.BATestBotScript;
 import won.bot.framework.eventbot.listener.baStateBots.BATestScriptAction;
 import won.bot.framework.eventbot.listener.baStateBots.SimpleScriptManager;
-import won.bot.impl.BACCBot;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionState;
 import won.protocol.model.FacetType;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
-
-import java.net.URI;
-import java.util.Date;
-import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.

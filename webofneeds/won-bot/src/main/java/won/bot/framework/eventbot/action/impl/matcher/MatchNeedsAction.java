@@ -16,6 +16,11 @@
 
 package won.bot.framework.eventbot.action.impl.matcher;
 
+import java.net.URI;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Optional;
+
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
@@ -23,14 +28,8 @@ import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
-import won.protocol.model.FacetType;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
-
-import java.net.URI;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Optional;
 
 /**
  * BaseEventBotAction that sends a hint message to the first need in the context to the second.

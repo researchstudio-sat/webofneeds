@@ -1,5 +1,9 @@
 package won.bot.framework.eventbot.action.impl.hokify.util;
 
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
@@ -7,14 +11,11 @@ import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+
 import won.bot.framework.eventbot.EventListenerContext;
 import won.protocol.message.WonMessage;
 import won.protocol.util.DefaultNeedModelWrapper;
 import won.protocol.util.WonRdfUtils;
-
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by MS on 17.09.2018.

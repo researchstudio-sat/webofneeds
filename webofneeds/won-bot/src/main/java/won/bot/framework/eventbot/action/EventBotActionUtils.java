@@ -16,13 +16,12 @@
 
 package won.bot.framework.eventbot.action;
 
+import java.net.URI;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.bot.framework.bot.context.BotContext;
+
 import won.bot.framework.eventbot.EventListenerContext;
-import won.bot.framework.eventbot.action.impl.mail.model.SubscribeStatus;
-import won.bot.framework.eventbot.action.impl.mail.model.WonURI;
-import won.bot.framework.eventbot.action.impl.mail.receive.MailContentExtractor;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.SuccessResponseEvent;
@@ -31,18 +30,6 @@ import won.bot.framework.eventbot.filter.impl.OriginalMessageUriResponseEventFil
 import won.bot.framework.eventbot.listener.EventListener;
 import won.bot.framework.eventbot.listener.impl.ActionOnFirstEventListener;
 import won.protocol.message.WonMessage;
-
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.net.URI;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
 
 /**
  * User: fkleedorfer

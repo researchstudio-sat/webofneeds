@@ -16,10 +16,9 @@
 
 package won.protocol.service;
 
-import org.apache.camel.Exchange;
-import won.protocol.model.OwnerApplication;
-
 import java.util.List;
+
+import won.protocol.model.OwnerApplication;
 
 /**
  * User: sbyim

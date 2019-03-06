@@ -1,10 +1,10 @@
 package won.protocol.message;
 
+import java.io.StringWriter;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
-
-import java.io.StringWriter;
 
 /**
  * User: ypanchenko

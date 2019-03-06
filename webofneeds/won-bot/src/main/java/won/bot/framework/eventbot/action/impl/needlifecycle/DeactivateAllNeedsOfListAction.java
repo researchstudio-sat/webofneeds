@@ -16,6 +16,9 @@
 
 package won.bot.framework.eventbot.action.impl.needlifecycle;
 
+import java.net.URI;
+import java.util.Collection;
+
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
@@ -26,9 +29,6 @@ import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
-
-import java.net.URI;
-import java.util.Collection;
 
 /**
 * User: fkleedorfer

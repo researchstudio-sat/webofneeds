@@ -1,10 +1,11 @@
 package won.node.facet.businessactivity.participantcompletion;
 
+import java.net.URI;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.node.facet.impl.WON_TX;
 
-import java.net.URI;
+import won.node.facet.impl.WON_TX;
 
 /**
  * Created with IntelliJ IDEA.

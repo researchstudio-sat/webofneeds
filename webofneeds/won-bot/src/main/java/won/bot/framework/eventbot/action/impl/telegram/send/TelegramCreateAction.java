@@ -1,9 +1,15 @@
 package won.bot.framework.eventbot.action.impl.telegram.send;
 
+import java.net.URI;
+import java.security.InvalidParameterException;
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.query.Dataset;
 import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
+
 import won.bot.framework.bot.context.TelegramBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
@@ -22,11 +28,6 @@ import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.DefaultNeedModelWrapper;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
-
-import java.net.URI;
-import java.security.InvalidParameterException;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * Created by fsuda on 15.12.2016.

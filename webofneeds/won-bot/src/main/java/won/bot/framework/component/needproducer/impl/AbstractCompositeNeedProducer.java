@@ -16,13 +16,14 @@
 
 package won.bot.framework.component.needproducer.impl;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.bot.framework.component.needproducer.NeedProducer;
 
-import java.util.HashSet;
-import java.util.Set;
+import won.bot.framework.component.needproducer.NeedProducer;
 
 /**
  * NeedProducer that needFactories to a list of need factories. Order of delegate request is not guaranteed.

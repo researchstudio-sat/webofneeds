@@ -16,9 +16,9 @@
 
 package won.bot.framework.eventbot.event.impl.needlifecycle;
 
-import won.bot.framework.eventbot.event.BaseNeedSpecificEvent;
-
 import java.net.URI;
+
+import won.bot.framework.eventbot.event.BaseNeedSpecificEvent;
 
 /**
  *

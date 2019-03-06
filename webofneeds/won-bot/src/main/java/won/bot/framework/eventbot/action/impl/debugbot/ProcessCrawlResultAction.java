@@ -1,23 +1,11 @@
 package won.bot.framework.eventbot.action.impl.debugbot;
 
-import java.net.URI;
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
-
-import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
-
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
-import won.bot.framework.eventbot.event.impl.command.connectionmessage.ConnectionMessageCommandEvent;
 import won.bot.framework.eventbot.event.impl.crawlconnection.CrawlConnectionCommandFailureEvent;
 import won.bot.framework.eventbot.event.impl.crawlconnection.CrawlConnectionCommandSuccessEvent;
 import won.bot.framework.eventbot.listener.EventListener;
-import won.protocol.util.WonConversationUtils;
-import won.protocol.util.WonRdfUtils;
 
 public class ProcessCrawlResultAction extends BaseEventBotAction {
 

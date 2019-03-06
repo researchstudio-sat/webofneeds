@@ -16,11 +16,11 @@
 
 package won.bot.framework.component.needproducer.impl;
 
-import won.bot.framework.component.needproducer.NeedProducer;
-
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+
+import won.bot.framework.component.needproducer.NeedProducer;
 
 /**
  * Composite Needproducer that will cycle through needFactories, returning a different one each time.

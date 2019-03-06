@@ -16,10 +16,11 @@
 
 package won.protocol.jms;
 
-import org.apache.camel.CamelContext;
-import won.cryptography.ssl.MessagingContext;
-
 import java.net.URI;
+
+import org.apache.camel.CamelContext;
+
+import won.cryptography.ssl.MessagingContext;
 
 /**
  * User: LEIH-NB

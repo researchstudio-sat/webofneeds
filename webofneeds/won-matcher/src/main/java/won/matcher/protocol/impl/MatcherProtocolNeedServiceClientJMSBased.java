@@ -16,10 +16,15 @@
 
 package won.matcher.protocol.impl;
 
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.Lang;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import won.protocol.jms.CamelConfiguration;
 import won.protocol.jms.MatcherProtocolCommunicationService;
 import won.protocol.jms.MessagingService;
@@ -27,10 +32,6 @@ import won.protocol.matcher.MatcherProtocolNeedServiceClientSide;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageEncoder;
 import won.protocol.util.RdfUtils;
-
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * User: gabriel

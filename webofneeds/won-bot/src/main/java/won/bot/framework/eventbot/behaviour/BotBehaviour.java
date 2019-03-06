@@ -16,14 +16,19 @@
 
 package won.bot.framework.eventbot.behaviour;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.listener.EventListener;
-
-import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class BotBehaviour {
     protected final Logger logger = LoggerFactory.getLogger(getClass());

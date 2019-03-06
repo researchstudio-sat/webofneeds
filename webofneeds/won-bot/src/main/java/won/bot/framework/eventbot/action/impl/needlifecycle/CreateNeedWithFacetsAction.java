@@ -16,10 +16,12 @@
 
 package won.bot.framework.eventbot.action.impl.needlifecycle;
 
+import java.net.URI;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
+
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
 import won.bot.framework.eventbot.event.Event;
@@ -33,8 +35,6 @@ import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.NeedModelWrapper;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
-
-import java.net.URI;
 
 /**
  * Creates a need with the specified facets.

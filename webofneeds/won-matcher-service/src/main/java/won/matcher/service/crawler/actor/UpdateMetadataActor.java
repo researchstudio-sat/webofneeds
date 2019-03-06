@@ -1,5 +1,12 @@
 package won.matcher.service.crawler.actor;
 
+import java.util.Collection;
+import java.util.LinkedList;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
 import akka.actor.OneForOneStrategy;
 import akka.actor.SupervisorStrategy;
 import akka.actor.UntypedActor;
@@ -10,12 +17,6 @@ import scala.concurrent.duration.Duration;
 import won.matcher.service.crawler.config.CrawlConfig;
 import won.matcher.service.crawler.msg.CrawlUriMessage;
 import won.matcher.service.crawler.service.CrawlSparqlService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
-import java.util.Collection;
-import java.util.LinkedList;
 
 /**
  * Actor that updates the meta data of the crawling of URIs (baseUri, date, status) in a Sparql endpoint.

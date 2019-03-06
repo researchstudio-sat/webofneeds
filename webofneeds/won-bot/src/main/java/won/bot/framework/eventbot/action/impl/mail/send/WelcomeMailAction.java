@@ -2,6 +2,7 @@ package won.bot.framework.eventbot.action.impl.mail.send;
 
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.support.GenericMessage;
+
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.mail.WelcomeMailEvent;

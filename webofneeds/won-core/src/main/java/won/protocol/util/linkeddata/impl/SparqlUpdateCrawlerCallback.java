@@ -16,21 +16,22 @@
 
 package won.protocol.util.linkeddata.impl;
 
+import java.io.StringWriter;
+import java.net.URI;
+import java.util.Iterator;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.sparql.modify.UpdateProcessRemote;
 import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateRequest;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.protocol.util.linkeddata.CrawlerCallback;
 
-import java.io.StringWriter;
-import java.net.URI;
-import java.util.Iterator;
+import won.protocol.util.linkeddata.CrawlerCallback;
 
 /**
  * Crawler callback implementation that writes crawled data to a predefined sparql endpoint.

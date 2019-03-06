@@ -1,12 +1,13 @@
 package won.matcher.rescal;
 
-import won.matcher.rescal.actor.RescalMatcherActor;
-import akka.actor.ActorSystem;
+import java.io.IOException;
+
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import akka.actor.ActorSystem;
+import won.matcher.rescal.actor.RescalMatcherActor;
 import won.matcher.rescal.spring.MatcherRescalAppConfiguration;
 import won.matcher.service.common.spring.SpringExtension;
-
-import java.io.IOException;
 
 /**
  * Created by hfriedrich on 15.09.2015.

@@ -16,12 +16,13 @@
 
 package won.bot.framework.eventbot.event.impl.crawl;
 
-import org.apache.jena.sparql.path.Path;
-import won.bot.framework.eventbot.event.BaseNeedSpecificEvent;
-import won.bot.framework.eventbot.event.impl.cmd.CommandEvent;
-
 import java.net.URI;
 import java.util.List;
+
+import org.apache.jena.sparql.path.Path;
+
+import won.bot.framework.eventbot.event.BaseNeedSpecificEvent;
+import won.bot.framework.eventbot.event.impl.cmd.CommandEvent;
 
 /**
  * Initiates the crawling of linked data. The WebID of the specified need is used.

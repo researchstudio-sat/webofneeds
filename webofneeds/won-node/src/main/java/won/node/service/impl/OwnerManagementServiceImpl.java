@@ -1,13 +1,14 @@
 package won.node.service.impl;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import won.protocol.model.OwnerApplication;
 import won.protocol.repository.OwnerApplicationRepository;
 import won.protocol.service.ApplicationManagementService;
-
-import java.util.List;
 
 /**
  * User: sbyim

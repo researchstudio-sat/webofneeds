@@ -1,8 +1,13 @@
 package won.matcher.service.common.spring;
 
-import akka.actor.*;
-import akka.routing.FromConfig;
 import org.springframework.context.ApplicationContext;
+
+import akka.actor.AbstractExtensionId;
+import akka.actor.Actor;
+import akka.actor.ExtendedActorSystem;
+import akka.actor.Extension;
+import akka.actor.Props;
+import akka.routing.FromConfig;
 
 /**
  * An Akka Extension to provide access to Spring managed Actor Beans.

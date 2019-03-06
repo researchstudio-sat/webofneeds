@@ -16,15 +16,35 @@
 
 package won.bot.framework.eventbot.listener.baStateBots;
 
-import org.apache.jena.query.*;
+import java.net.URI;
+import java.text.MessageFormat;
+import java.util.Date;
+
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.QuerySolutionMap;
+import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.impl.ResourceImpl;
+
 import won.bot.framework.eventbot.EventListenerContext;
-import won.bot.framework.eventbot.event.*;
+import won.bot.framework.eventbot.event.ConnectionSpecificEvent;
+import won.bot.framework.eventbot.event.Event;
+import won.bot.framework.eventbot.event.MessageEvent;
+import won.bot.framework.eventbot.event.NeedSpecificEvent;
+import won.bot.framework.eventbot.event.RemoteNeedSpecificEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.ConnectFromOtherNeedEvent;
 import won.bot.framework.eventbot.filter.EventFilter;
-import won.bot.framework.eventbot.filter.impl.*;
+import won.bot.framework.eventbot.filter.impl.AndFilter;
+import won.bot.framework.eventbot.filter.impl.ConnectionUriEventFilter;
+import won.bot.framework.eventbot.filter.impl.NeedUriEventFilter;
+import won.bot.framework.eventbot.filter.impl.NotFilter;
+import won.bot.framework.eventbot.filter.impl.OrFilter;
 import won.bot.framework.eventbot.listener.AbstractFinishingListener;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
@@ -35,10 +55,6 @@ import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.CachingLinkedDataSource;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
-
-import java.net.URI;
-import java.text.MessageFormat;
-import java.util.Date;
 
 /**
  * Listener used to execute a business activity test script. It knows the URIs of one participant and one

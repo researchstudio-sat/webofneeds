@@ -16,12 +16,12 @@
 
 package won.bot.framework.eventbot.filter.impl;
 
+import java.net.URI;
+
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.ResponseEvent;
 import won.bot.framework.eventbot.filter.EventFilter;
 import won.protocol.message.WonMessage;
-
-import java.net.URI;
 
 /**
  * Accepts only ResponseEvents with the specified originalMessageURI.

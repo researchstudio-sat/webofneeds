@@ -1,5 +1,7 @@
 package won.bot.framework.eventbot.behaviour;
 
+import java.util.Optional;
+
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.EventBotAction;
@@ -7,8 +9,6 @@ import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.filter.EventFilter;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
-
-import java.util.Optional;
 
 /**
  * Combines two behaviours. Deactivates automatically after execution.

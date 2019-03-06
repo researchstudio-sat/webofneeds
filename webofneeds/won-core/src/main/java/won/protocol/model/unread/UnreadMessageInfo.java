@@ -1,6 +1,5 @@
 package won.protocol.model.unread;
 
-import java.net.URI;
 import java.util.Date;
 
 public class UnreadMessageInfo {

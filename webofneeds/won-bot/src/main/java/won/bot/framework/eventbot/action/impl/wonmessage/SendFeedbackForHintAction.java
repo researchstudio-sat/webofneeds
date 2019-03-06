@@ -16,7 +16,11 @@
 
 package won.bot.framework.eventbot.action.impl.wonmessage;
 
+import java.net.URI;
+import java.util.Random;
+
 import org.apache.jena.query.Dataset;
+
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
@@ -27,9 +31,6 @@ import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
-
-import java.net.URI;
-import java.util.Random;
 
 /**
  * User: fkleedorfer

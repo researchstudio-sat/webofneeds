@@ -1,10 +1,10 @@
 package won.node.facet.businessactivity.coordinatorcompletion;
 
-import won.node.facet.impl.WON_TX;
-
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import won.node.facet.impl.WON_TX;
 
 /**
  * Created with IntelliJ IDEA.

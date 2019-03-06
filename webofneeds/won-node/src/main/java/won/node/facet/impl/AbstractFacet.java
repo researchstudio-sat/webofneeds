@@ -1,5 +1,9 @@
 package won.node.facet.impl;
 
+import java.io.StringWriter;
+import java.net.URI;
+import java.util.concurrent.ExecutorService;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -10,8 +14,14 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import won.node.service.DataAccessService;
-import won.protocol.exception.*;
+import won.protocol.exception.ConnectionAlreadyExistsException;
+import won.protocol.exception.IllegalMessageForConnectionStateException;
+import won.protocol.exception.IllegalMessageForNeedStateException;
+import won.protocol.exception.NoSuchConnectionException;
+import won.protocol.exception.NoSuchNeedException;
+import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.Need;
@@ -21,10 +31,6 @@ import won.protocol.repository.NeedRepository;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.vocabulary.WON;
-
-import java.io.StringWriter;
-import java.net.URI;
-import java.util.concurrent.ExecutorService;
 
 /**
  * Created with IntelliJ IDEA.

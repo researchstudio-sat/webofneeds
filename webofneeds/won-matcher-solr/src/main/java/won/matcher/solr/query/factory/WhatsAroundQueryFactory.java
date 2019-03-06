@@ -2,6 +2,7 @@ package won.matcher.solr.query.factory;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Resource;
+
 import won.matcher.solr.utils.MatcherNeedContentPropertyType;
 
 /**

@@ -1,10 +1,12 @@
 package won.protocol.message.processor.impl;
 
+import java.security.PublicKey;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StopWatch;
+
 import won.cryptography.keymanagement.KeyPairAliasDerivationStrategy;
 import won.cryptography.rdfsign.WonKeysReaderWriter;
 import won.cryptography.service.CryptographyService;
@@ -13,8 +15,6 @@ import won.protocol.message.WonMessageEncoder;
 import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
-
-import java.security.PublicKey;
 
 /**
  *  This processor is intended for use in owners (bot or webapp).

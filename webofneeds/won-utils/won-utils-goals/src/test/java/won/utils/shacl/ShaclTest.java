@@ -1,5 +1,8 @@
 package won.utils.shacl;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
@@ -12,9 +15,6 @@ import org.junit.Test;
 import org.topbraid.shacl.util.ModelPrinter;
 import org.topbraid.shacl.validation.ValidationUtil;
 import org.topbraid.shacl.vocabulary.SH;
-
-import java.io.IOException;
-import java.io.InputStream;
 
 public class ShaclTest {
 

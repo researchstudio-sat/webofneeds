@@ -1,24 +1,24 @@
 package won.matcher.cli;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+
 import won.matcher.protocol.impl.MatcherProtocolNeedServiceClient;
 import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.exception.WonMessageBuilderException;
-import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
-import won.protocol.model.FacetType;
+import won.protocol.message.WonMessageDirection;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Optional;
 
 /**
  * User: gabriel

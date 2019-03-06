@@ -17,11 +17,12 @@
 package won.owner.web.websocket;
 
 
-import org.springframework.web.socket.WebSocketSession;
-import won.owner.model.User;
-
 import java.net.URI;
 import java.util.Set;
+
+import org.springframework.web.socket.WebSocketSession;
+
+import won.owner.model.User;
 
 public class WebSocketSessionService
 {

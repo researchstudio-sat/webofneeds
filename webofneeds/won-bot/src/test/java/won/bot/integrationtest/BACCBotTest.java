@@ -1,6 +1,21 @@
 package won.bot.integrationtest;
 
-import org.apache.jena.query.*;
+import static junit.framework.TestCase.assertTrue;
+
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.vocabulary.RDFS;
 import org.junit.AfterClass;
@@ -16,6 +31,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.support.PeriodicTrigger;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
 import won.bot.PropertyPathConfigurator;
 import won.bot.framework.bot.context.ParticipantCoordinatorBotContextWrapper;
 import won.bot.framework.eventbot.event.impl.lifecycle.WorkDoneEvent;
@@ -26,15 +42,6 @@ import won.protocol.util.RdfUtils;
 import won.protocol.util.linkeddata.CachingLinkedDataSource;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.vocabulary.WON;
-
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.TimeUnit;
-
-import static junit.framework.TestCase.assertTrue;
 
 /**
  * Created with IntelliJ IDEA.

@@ -16,6 +16,9 @@
 
 package won.bot.integrationtest;
 
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.TimeUnit;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,13 +31,11 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.support.PeriodicTrigger;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
 import won.bot.framework.eventbot.event.impl.lifecycle.WorkDoneEvent;
 import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
 import won.bot.framework.manager.impl.SpringAwareBotManagerImpl;
 import won.bot.impl.MatcherProtocolTestBot;
-
-import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Integration test.

@@ -16,10 +16,10 @@
 
 package won.protocol.exception;
 
-import won.protocol.model.ConnectionState;
-
 import java.net.URI;
 import java.text.MessageFormat;
+
+import won.protocol.model.ConnectionState;
 
 /**
  * User: fkleedorfer

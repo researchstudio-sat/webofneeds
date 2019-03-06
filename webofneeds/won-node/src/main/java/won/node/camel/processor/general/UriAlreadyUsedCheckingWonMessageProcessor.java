@@ -16,12 +16,15 @@
 
 package won.node.camel.processor.general;
 
+import java.net.URI;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.sparql.util.IsoMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.WonMessageProcessor;
@@ -33,8 +36,6 @@ import won.protocol.repository.MessageEventRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
-
-import java.net.URI;
 
 /**
  * Checks whether the event or need URI is already used.

@@ -20,12 +20,13 @@ import org.apache.jena.query.Dataset;
 import org.apache.jena.riot.Lang;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import won.protocol.message.WonMessage;
-import won.protocol.validation.WonMessageValidator;
 import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.message.processor.exception.WonMessageNotWellFormedException;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
 import won.protocol.util.RdfUtils;
+import won.protocol.validation.WonMessageValidator;
 
 /**
  * Checks WonMessages for integrity. The following steps are performed:

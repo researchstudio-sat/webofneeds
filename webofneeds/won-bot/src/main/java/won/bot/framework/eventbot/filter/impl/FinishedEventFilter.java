@@ -17,9 +17,9 @@
 package won.bot.framework.eventbot.filter.impl;
 
 import won.bot.framework.eventbot.event.Event;
-import won.bot.framework.eventbot.listener.EventListener;
 import won.bot.framework.eventbot.event.impl.listener.FinishedEvent;
 import won.bot.framework.eventbot.filter.EventFilter;
+import won.bot.framework.eventbot.listener.EventListener;
 
 /**
  * Filter that only accepts a FinishedEvent for a specific listener.

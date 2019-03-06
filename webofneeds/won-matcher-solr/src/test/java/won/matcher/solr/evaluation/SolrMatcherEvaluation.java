@@ -1,6 +1,15 @@
 package won.matcher.solr.evaluation;
 
-import com.github.jsonldjava.core.JsonLdError;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.PostConstruct;
+
 import org.apache.commons.io.FilenameUtils;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
@@ -9,6 +18,9 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import com.github.jsonldjava.core.JsonLdError;
+
 import won.matcher.solr.hints.HintBuilder;
 import won.matcher.solr.index.NeedIndexer;
 import won.matcher.solr.query.TestMatcherQueryExecutor;
@@ -17,15 +29,6 @@ import won.matcher.solr.query.factory.TestNeedQueryFactory;
 import won.matcher.utils.tensor.TensorMatchingData;
 import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.util.DefaultNeedModelWrapper;
-
-import javax.annotation.PostConstruct;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by hfriedrich on 05.08.2016.

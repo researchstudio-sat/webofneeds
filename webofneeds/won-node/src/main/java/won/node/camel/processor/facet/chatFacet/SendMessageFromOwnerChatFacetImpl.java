@@ -2,6 +2,7 @@ package won.node.camel.processor.facet.chatFacet;
 
 import org.apache.camel.Exchange;
 import org.springframework.stereotype.Component;
+
 import won.node.camel.processor.AbstractFromOwnerCamelProcessor;
 import won.node.camel.processor.annotation.DefaultFacetMessageProcessor;
 import won.node.camel.processor.annotation.FacetMessageProcessor;

@@ -16,9 +16,12 @@
 
 package won.node.camel.processor.general;
 
+import java.net.URI;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import won.node.service.DataAccessService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageEncoder;
@@ -26,13 +29,15 @@ import won.protocol.message.WonMessageType;
 import won.protocol.message.WonMessageUtils;
 import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
-import won.protocol.model.*;
+import won.protocol.model.ConnectionEventContainer;
+import won.protocol.model.DatasetHolder;
+import won.protocol.model.EventContainer;
+import won.protocol.model.MessageEventPlaceholder;
+import won.protocol.model.NeedEventContainer;
 import won.protocol.repository.ConnectionEventContainerRepository;
 import won.protocol.repository.DatasetHolderRepository;
 import won.protocol.repository.MessageEventRepository;
 import won.protocol.repository.NeedEventContainerRepository;
-
-import java.net.URI;
 
 /**
  * Persists the specified WonMessage.

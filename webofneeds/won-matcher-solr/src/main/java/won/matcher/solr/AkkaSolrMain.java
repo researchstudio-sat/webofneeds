@@ -1,13 +1,14 @@
 package won.matcher.solr;
 
+import java.io.IOException;
+
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import won.matcher.service.common.spring.SpringExtension;
 import won.matcher.solr.actor.MatcherPubSubActor;
 import won.matcher.solr.spring.MatcherSolrAppConfiguration;
-
-import java.io.IOException;
 
 /**
  * Created by hfriedrich on 24.08.2015.

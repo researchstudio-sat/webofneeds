@@ -16,17 +16,18 @@
 
 package won.node.protocol.impl;
 
+import java.net.URI;
+
 import org.apache.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import won.node.protocol.MatcherProtocolMatcherServiceClientSide;
 import won.protocol.jms.MessagingService;
 import won.protocol.message.WonMessage;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.NeedRepository;
-
-import java.net.URI;
 
 public class MatcherProtocolMatcherClientImpl implements MatcherProtocolMatcherServiceClientSide
 {

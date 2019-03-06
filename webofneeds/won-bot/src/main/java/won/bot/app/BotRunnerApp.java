@@ -16,15 +16,16 @@
 
 package won.bot.app;
 
+import java.util.concurrent.TimeUnit;
+
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.scheduling.support.PeriodicTrigger;
+
 import won.bot.framework.bot.Bot;
 import won.bot.framework.bot.base.TriggeredBot;
 import won.bot.framework.manager.BotManager;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * Runs any bot by class name.

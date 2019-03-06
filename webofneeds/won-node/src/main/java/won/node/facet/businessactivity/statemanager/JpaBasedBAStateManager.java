@@ -1,16 +1,17 @@
 package won.node.facet.businessactivity.statemanager;
 
+import java.net.URI;
+import java.util.Iterator;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
 import won.node.facet.impl.WON_TX;
 import won.protocol.model.BAState;
 import won.protocol.repository.BAStateRepository;
-
-import java.net.URI;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * User: Danijel

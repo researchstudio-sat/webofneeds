@@ -2,8 +2,8 @@ package won.node.camel.processor.facet.reviewFacet;
 
 import org.apache.camel.Exchange;
 import org.springframework.stereotype.Component;
+
 import won.node.camel.processor.AbstractFromOwnerCamelProcessor;
-import won.node.camel.processor.annotation.DefaultFacetMessageProcessor;
 import won.node.camel.processor.annotation.FacetMessageProcessor;
 import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;

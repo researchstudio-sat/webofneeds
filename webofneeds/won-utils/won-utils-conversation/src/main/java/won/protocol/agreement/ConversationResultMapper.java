@@ -1,13 +1,14 @@
 package won.protocol.agreement;
 
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.rdf.model.RDFNode;
-import won.protocol.message.WonMessageDirection;
-import won.protocol.message.WonMessageType;
-
 import java.net.URI;
 import java.util.Map;
 import java.util.function.Function;
+
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.rdf.model.RDFNode;
+
+import won.protocol.message.WonMessageDirection;
+import won.protocol.message.WonMessageType;
 
 public class ConversationResultMapper implements Function<QuerySolution, ConversationMessage>{
 	

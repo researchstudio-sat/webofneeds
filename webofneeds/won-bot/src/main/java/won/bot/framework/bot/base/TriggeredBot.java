@@ -16,9 +16,9 @@
 
 package won.bot.framework.bot.base;
 
-import org.springframework.scheduling.Trigger;
-
 import java.util.concurrent.ScheduledFuture;
+
+import org.springframework.scheduling.Trigger;
 
 /**
  * Bot base class that expects a trigger to be injected that will cause the act() method to be called according to the trigger's specification.

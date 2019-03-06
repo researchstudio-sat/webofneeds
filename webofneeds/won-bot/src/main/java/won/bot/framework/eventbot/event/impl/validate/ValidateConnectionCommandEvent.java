@@ -16,10 +16,10 @@
 
 package won.bot.framework.eventbot.event.impl.validate;
 
+import java.net.URI;
+
 import won.bot.framework.eventbot.event.BaseNeedSpecificEvent;
 import won.bot.framework.eventbot.event.impl.cmd.CommandEvent;
-
-import java.net.URI;
 
 /**
  * Initiates the validation of the data of a given connection.

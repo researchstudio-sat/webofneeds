@@ -1,10 +1,14 @@
 package won.matcher.solr.index;
 
-import com.github.jsonldjava.core.JsonLdError;
-import com.github.jsonldjava.core.JsonLdOptions;
-import com.github.jsonldjava.core.JsonLdProcessor;
-import com.github.jsonldjava.utils.JsonUtils;
-import org.apache.jena.query.*;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.Map;
+
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.riot.Lang;
@@ -16,16 +20,17 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 
+import com.github.jsonldjava.core.JsonLdError;
+import com.github.jsonldjava.core.JsonLdOptions;
+import com.github.jsonldjava.core.JsonLdProcessor;
+import com.github.jsonldjava.utils.JsonUtils;
+
 import won.matcher.service.common.service.http.HttpService;
 import won.matcher.solr.config.SolrMatcherConfig;
 import won.protocol.model.Coordinate;
 import won.protocol.util.DefaultNeedModelWrapper;
 import won.protocol.util.NeedModelWrapper;
 import won.protocol.vocabulary.WON;
-
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.Map;
 
 /**
  * Created by hfriedrich on 03.08.2016.

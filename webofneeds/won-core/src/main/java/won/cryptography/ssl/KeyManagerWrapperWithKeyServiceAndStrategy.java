@@ -1,21 +1,22 @@
 package won.cryptography.ssl;
 
-import org.apache.http.ssl.PrivateKeyDetails;
-import org.apache.http.ssl.PrivateKeyStrategy;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import won.cryptography.service.keystore.KeyStoreService;
-
-import javax.net.ssl.KeyManager;
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.X509KeyManager;
 import java.net.Socket;
 import java.security.Principal;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.X509KeyManager;
+
+import org.apache.http.ssl.PrivateKeyDetails;
+import org.apache.http.ssl.PrivateKeyStrategy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import won.cryptography.service.keystore.KeyStoreService;
 
 /**
  * User: ypanchenko

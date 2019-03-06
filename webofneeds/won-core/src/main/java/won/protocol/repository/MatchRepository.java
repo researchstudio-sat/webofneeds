@@ -16,11 +16,12 @@
 
 package won.protocol.repository;
 
-import org.springframework.data.domain.Sort;
-import won.protocol.model.Match;
-
 import java.net.URI;
 import java.util.List;
+
+import org.springframework.data.domain.Sort;
+
+import won.protocol.model.Match;
 
 /**
  * User: fkleedorfer

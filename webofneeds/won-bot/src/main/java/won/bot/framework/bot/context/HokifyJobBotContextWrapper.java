@@ -2,8 +2,6 @@ package won.bot.framework.bot.context;
 
 import java.net.URI;
 
-import won.bot.framework.eventbot.action.impl.mail.model.WonURI;
-
 /**
  * Created by MS on 24.09.2018.
  */

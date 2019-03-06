@@ -16,13 +16,13 @@
 
 package won.bot.framework.eventbot.listener.impl;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
+import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.filter.EventFilter;
 import won.bot.framework.eventbot.listener.BaseEventListener;
-import won.bot.framework.eventbot.EventListenerContext;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 /**
  * EventListener that counts the events it is subscribed for and after having

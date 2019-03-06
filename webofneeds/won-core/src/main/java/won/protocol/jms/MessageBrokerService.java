@@ -15,7 +15,6 @@
  */
 
 package won.protocol.jms;
-import org.apache.camel.builder.RouteBuilder;
 import java.net.URI;
 
 /**

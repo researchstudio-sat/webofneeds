@@ -1,9 +1,15 @@
 package won.protocol.message.processor.impl;
 
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
+
 import won.cryptography.rdfsign.SignatureVerificationState;
 import won.cryptography.rdfsign.SigningStage;
 import won.cryptography.rdfsign.WonSigner;
@@ -12,11 +18,6 @@ import won.protocol.message.WonMessage;
 import won.protocol.message.WonSignatureData;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WONMSG;
-
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.util.List;
-import java.util.Map;
 
 /**
  * User: ypanchenko

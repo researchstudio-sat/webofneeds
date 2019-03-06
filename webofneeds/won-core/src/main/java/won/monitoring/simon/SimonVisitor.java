@@ -16,9 +16,9 @@
 
 package won.monitoring.simon;
 
-import org.javasimon.Simon;
-
 import java.io.IOException;
+
+import org.javasimon.Simon;
 
 /**
  * Visitor for simons.

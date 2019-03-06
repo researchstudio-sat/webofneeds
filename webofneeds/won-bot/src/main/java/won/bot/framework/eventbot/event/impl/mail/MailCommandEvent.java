@@ -1,8 +1,8 @@
 package won.bot.framework.eventbot.event.impl.mail;
 
-import won.bot.framework.eventbot.event.BaseEvent;
-
 import javax.mail.internet.MimeMessage;
+
+import won.bot.framework.eventbot.event.BaseEvent;
 
 /**
  * Created by fsuda on 18.10.2016.

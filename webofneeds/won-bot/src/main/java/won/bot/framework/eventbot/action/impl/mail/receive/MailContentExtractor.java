@@ -1,7 +1,10 @@
 package won.bot.framework.eventbot.action.impl.mail.receive;
 
-import won.bot.framework.eventbot.action.impl.mail.model.ActionType;
-import won.bot.framework.eventbot.action.impl.mail.model.MailPropertyType;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.mail.Address;
 import javax.mail.BodyPart;
@@ -9,11 +12,9 @@ import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import won.bot.framework.eventbot.action.impl.mail.model.ActionType;
+import won.bot.framework.eventbot.action.impl.mail.model.MailPropertyType;
 
 /**
  * Extracts need properties like title, description, need type, etc from mails. Configurable via regular expression

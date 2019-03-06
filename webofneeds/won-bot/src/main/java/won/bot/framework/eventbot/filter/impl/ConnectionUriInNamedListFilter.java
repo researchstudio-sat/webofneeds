@@ -16,12 +16,12 @@
 
 package won.bot.framework.eventbot.filter.impl;
 
-import won.bot.framework.eventbot.event.Event;
-import won.bot.framework.eventbot.event.ConnectionSpecificEvent;
-import won.bot.framework.eventbot.event.NeedSpecificEvent;
-import won.bot.framework.eventbot.EventListenerContext;
-
 import java.net.URI;
+
+import won.bot.framework.eventbot.EventListenerContext;
+import won.bot.framework.eventbot.event.ConnectionSpecificEvent;
+import won.bot.framework.eventbot.event.Event;
+import won.bot.framework.eventbot.event.NeedSpecificEvent;
 
 /**
  * Filter that accepts ConnectionSpecificEvents if their needURI is in the specified named list.

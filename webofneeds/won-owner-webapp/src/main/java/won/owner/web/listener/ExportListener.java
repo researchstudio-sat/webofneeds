@@ -1,28 +1,9 @@
 package won.owner.web.listener;
 
-import org.apache.jena.query.Dataset;
-import org.apache.jena.riot.RDFDataMgr;
-import org.apache.jena.riot.RDFFormat;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationListener;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
-import won.owner.model.User;
-import won.owner.service.impl.KeystoreEnabledUserDetails;
-import won.owner.service.impl.UserService;
-import won.owner.web.WonOwnerMailSender;
-import won.owner.web.events.OnExportUserEvent;
-import won.protocol.agreement.AgreementProtocolState;
-import won.protocol.rest.LinkedDataFetchingException;
-import won.protocol.util.AuthenticationThreadLocal;
-import won.protocol.util.linkeddata.CachingLinkedDataSource;
-import won.protocol.util.linkeddata.LinkedDataSource;
-import won.protocol.util.linkeddata.WonLinkedDataUtils;
-
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.security.KeyStoreException;
@@ -33,6 +14,27 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+
+import org.apache.jena.query.Dataset;
+import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.RDFFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationListener;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Component;
+
+import won.owner.model.User;
+import won.owner.service.impl.KeystoreEnabledUserDetails;
+import won.owner.service.impl.UserService;
+import won.owner.web.WonOwnerMailSender;
+import won.owner.web.events.OnExportUserEvent;
+import won.protocol.rest.LinkedDataFetchingException;
+import won.protocol.util.AuthenticationThreadLocal;
+import won.protocol.util.linkeddata.CachingLinkedDataSource;
+import won.protocol.util.linkeddata.LinkedDataSource;
+import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
 @Component
 public class ExportListener implements ApplicationListener<OnExportUserEvent> {

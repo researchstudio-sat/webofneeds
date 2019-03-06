@@ -1,11 +1,11 @@
 package won.bot.framework.eventbot.listener.baStateBots.baCCMessagingBots.atomicBots;
 
+import java.net.URI;
+
 import won.bot.framework.eventbot.event.BaseEvent;
 import won.bot.framework.eventbot.event.ConnectionSpecificEvent;
 import won.bot.framework.eventbot.event.NeedSpecificEvent;
 import won.bot.framework.eventbot.event.RemoteNeedSpecificEvent;
-
-import java.net.URI;
 
 /**
  * Event for signalling that the second phase in the Business Activity with atomic outcome has started.

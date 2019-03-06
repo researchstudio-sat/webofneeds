@@ -1,5 +1,12 @@
 package won.node.camel.processor.general;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 import org.apache.camel.Exchange;
 import org.apache.camel.Expression;
 import org.apache.camel.Processor;
@@ -9,6 +16,7 @@ import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageType;
@@ -16,13 +24,6 @@ import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.message.processor.exception.MissingMessagePropertyException;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
 import won.protocol.vocabulary.WONMSG;
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 /**
  * Computes a message slip for message processors that are annotated with appropriate marker annotations.

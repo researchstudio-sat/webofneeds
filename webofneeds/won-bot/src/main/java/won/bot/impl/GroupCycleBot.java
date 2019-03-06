@@ -16,14 +16,24 @@
 
 package won.bot.impl;
 
+import java.net.URI;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
 import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.vocabulary.DC;
+
 import won.bot.framework.bot.base.EventBot;
 import won.bot.framework.bot.context.GroupBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
-import won.bot.framework.eventbot.action.impl.counter.*;
+import won.bot.framework.eventbot.action.impl.counter.CountEvent;
+import won.bot.framework.eventbot.action.impl.counter.CounterImpl;
+import won.bot.framework.eventbot.action.impl.counter.EventPublishingCounter;
+import won.bot.framework.eventbot.action.impl.counter.IncrementCounterAction;
+import won.bot.framework.eventbot.action.impl.counter.TargetCountReachedEvent;
+import won.bot.framework.eventbot.action.impl.counter.TargetCounterDecorator;
 import won.bot.framework.eventbot.behaviour.BehaviourBarrier;
 import won.bot.framework.eventbot.behaviour.BotBehaviour;
 import won.bot.framework.eventbot.behaviour.ExecuteWonMessageCommandBehaviour;
@@ -52,12 +62,6 @@ import won.protocol.model.Connection;
 import won.protocol.model.FacetType;
 import won.protocol.util.DefaultNeedModelWrapper;
 import won.protocol.util.WonRdfUtils;
-
-import java.net.URI;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 
 /**
  * Bot that creates NUMBER_OF_GROUPS groupchats, adds NUMBER_OF_GROUPMEMBERS members to each,

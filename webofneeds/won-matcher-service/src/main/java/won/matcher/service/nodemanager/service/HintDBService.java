@@ -1,10 +1,12 @@
 package won.matcher.service.nodemanager.service;
 
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
 import com.google.common.base.Charsets;
 import com.google.common.hash.BloomFilter;
 import com.google.common.hash.Funnels;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+
 import won.matcher.service.common.event.HintEvent;
 
 /**

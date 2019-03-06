@@ -1,19 +1,19 @@
 package won.protocol.repository;
 
+import java.net.URI;
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.LockModeType;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.jpa.repository.Temporal;
 import org.springframework.data.repository.query.Param;
+
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
-
-import javax.persistence.LockModeType;
-import javax.persistence.TemporalType;
-import java.net.URI;
-import java.util.Date;
-import java.util.List;
 
 
 /**

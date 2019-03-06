@@ -1,16 +1,22 @@
 package won.matcher.service.nodemanager.config;
 
-import akka.actor.ActorRef;
-import akka.actor.Props;
-import akka.actor.UntypedActorContext;
-import akka.camel.Camel;
-import akka.camel.CamelExtension;
+import java.util.UUID;
+
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.TrustManager;
+
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.ActiveMQSslConnectionFactory;
 import org.apache.camel.FailedToCreateConsumerException;
 import org.apache.camel.component.jms.JmsComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import akka.actor.ActorRef;
+import akka.actor.Props;
+import akka.actor.UntypedActorContext;
+import akka.camel.Camel;
+import akka.camel.CamelExtension;
 import won.cryptography.ssl.MessagingContext;
 import won.matcher.service.common.spring.SpringExtension;
 import won.matcher.service.nodemanager.actor.HintProducerProtocolActor;
@@ -18,10 +24,6 @@ import won.matcher.service.nodemanager.actor.NeedConsumerProtocolActor;
 import won.matcher.service.nodemanager.pojo.WonNodeConnection;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.vocabulary.WON;
-
-import javax.net.ssl.KeyManager;
-import javax.net.ssl.TrustManager;
-import java.util.UUID;
 
 /**
  * Factory for creating a {@link won.matcher.service.nodemanager.pojo.WonNodeConnection} with ActiveMq endpoint of a won node

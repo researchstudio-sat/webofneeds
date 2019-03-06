@@ -16,10 +16,10 @@
 
 package won.protocol.message;
 
-import java.net.URI;
-
 import static won.protocol.message.WonMessageType.FAILURE_RESPONSE;
 import static won.protocol.message.WonMessageType.SUCCESS_RESPONSE;
+
+import java.net.URI;
 
 /**
  * Utilities for working with wonMessage objects.

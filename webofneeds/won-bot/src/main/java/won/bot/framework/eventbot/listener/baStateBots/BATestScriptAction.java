@@ -1,11 +1,12 @@
 package won.bot.framework.eventbot.listener.baStateBots;
 
+import java.net.URI;
+
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.impl.ResourceImpl;
+
 import won.node.facet.impl.WON_TX;
 import won.protocol.util.WonRdfUtils;
-
-import java.net.URI;
 
 /**
  * Created with IntelliJ IDEA.

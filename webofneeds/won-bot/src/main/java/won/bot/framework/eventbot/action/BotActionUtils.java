@@ -16,15 +16,16 @@
 
 package won.bot.framework.eventbot.action;
 
+import java.net.URI;
+
 import org.apache.jena.query.Dataset;
+
 import won.bot.framework.eventbot.EventListenerContext;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
-
-import java.net.URI;
 
 /**
  * Created by fkleedorfer on 10.06.2016.

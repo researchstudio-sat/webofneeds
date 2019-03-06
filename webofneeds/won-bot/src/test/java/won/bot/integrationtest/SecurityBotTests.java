@@ -16,6 +16,9 @@
 
 package won.bot.integrationtest;
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,6 +31,7 @@ import org.springframework.scheduling.support.PeriodicTrigger;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.concurrent.SettableListenableFuture;
+
 import won.bot.IntegrationtestBot;
 import won.bot.framework.bot.base.TriggeredBot;
 import won.bot.framework.eventbot.EventListenerContext;
@@ -45,9 +49,6 @@ import won.bot.integrationtest.security.DelayedDuplicateMessageSendingConversati
 import won.bot.integrationtest.security.DuplicateMessageSendingConversationBot;
 import won.bot.integrationtest.security.DuplicateMessageURIFailureBot;
 import won.bot.integrationtest.security.DuplicateNeedURIFailureBot;
-
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Integration test.

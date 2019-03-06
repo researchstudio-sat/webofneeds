@@ -16,12 +16,12 @@
 
 package won.bot.framework.eventbot.event.impl.wonmessage;
 
+import java.net.URI;
+
 import won.bot.framework.eventbot.event.ConnectionSpecificEvent;
 import won.bot.framework.eventbot.event.NeedSpecificEvent;
 import won.bot.framework.eventbot.event.RemoteNeedSpecificEvent;
 import won.protocol.message.WonMessage;
-
-import java.net.URI;
 
 /**
  * Created by fkleedorfer on 14.06.2016.

@@ -1,23 +1,5 @@
 package won.bot.framework.eventbot.action.impl.mail.send;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.jena.query.*;
-import org.apache.jena.tdb.TDB;
-import org.apache.velocity.Template;
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.VelocityEngine;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import won.bot.framework.eventbot.EventListenerContext;
-import won.bot.framework.eventbot.action.impl.mail.receive.MailContentExtractor;
-import won.protocol.util.DefaultNeedModelWrapper;
-import won.protocol.util.RdfUtils;
-import won.protocol.vocabulary.sparql.WonQueries;
-
-import javax.mail.MessagingException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
@@ -27,6 +9,34 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QueryParseException;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.QuerySolutionMap;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.tdb.TDB;
+import org.apache.velocity.Template;
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.VelocityEngine;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import won.bot.framework.eventbot.EventListenerContext;
+import won.bot.framework.eventbot.action.impl.mail.receive.MailContentExtractor;
+import won.protocol.util.DefaultNeedModelWrapper;
+import won.protocol.util.RdfUtils;
+import won.protocol.vocabulary.sparql.WonQueries;
 
 /**
  * This Class is used to generate all Mails that are going to be sent via the Mail2WonBot

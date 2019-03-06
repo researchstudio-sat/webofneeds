@@ -16,12 +16,12 @@
 
 package won.bot.framework.eventbot.event.impl.command.feedback;
 
+import java.net.URI;
+
 import won.bot.framework.eventbot.event.impl.command.MessageCommandEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandSuccessEvent;
 import won.bot.framework.eventbot.event.impl.command.base.AbstractMessageCommandResultEvent;
 import won.protocol.model.Connection;
-
-import java.net.URI;
 
 
 /**

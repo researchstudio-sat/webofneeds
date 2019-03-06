@@ -5,7 +5,6 @@ import java.util.Optional;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
-import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.stereotype.Component;
 
 import won.node.camel.processor.AbstractCamelProcessor;
@@ -19,7 +18,6 @@ import won.protocol.model.ConnectionEventType;
 import won.protocol.model.ConnectionState;
 import won.protocol.model.Facet;
 import won.protocol.util.WonRdfUtils;
-import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
 
 

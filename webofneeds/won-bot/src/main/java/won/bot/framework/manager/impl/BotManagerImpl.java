@@ -1,12 +1,18 @@
 package won.bot.framework.manager.impl;
 
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import won.bot.framework.bot.Bot;
 import won.bot.framework.manager.BotManager;
-
-import java.net.URI;
-import java.util.*;
 
 /**
  * BotManager, simple in-memory implementation.

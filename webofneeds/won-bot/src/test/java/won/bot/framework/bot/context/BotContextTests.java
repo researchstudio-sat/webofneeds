@@ -1,5 +1,24 @@
 package won.bot.framework.bot.context;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.URI;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.TreeMap;
+
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.internet.MimeMessage;
+
 import org.apache.xbean.spring.context.ClassPathXmlApplicationContext;
 import org.junit.Assert;
 import org.junit.Before;
@@ -8,14 +27,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.TestContextManager;
-
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
-import java.io.*;
-import java.net.URI;
-import java.util.*;
 
 /**
  * Tests for bot context.

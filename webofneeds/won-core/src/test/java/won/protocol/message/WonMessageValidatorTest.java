@@ -1,24 +1,25 @@
 package won.protocol.message;
 
+import java.io.IOException;
+
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
-import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.riot.Lang;
+import org.apache.jena.vocabulary.RDF;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.validation.WonMessageValidator;
 import won.protocol.vocabulary.SFSIG;
 import won.protocol.vocabulary.WONMSG;
-
-import java.io.IOException;
 
 /**
  * User: ypanchenko

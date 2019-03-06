@@ -1,6 +1,7 @@
 package won.bot.framework.eventbot.event.impl.telegram;
 
 import org.telegram.telegrambots.api.objects.Update;
+
 import won.bot.framework.eventbot.event.BaseEvent;
 
 public class TelegramMessageReceivedEvent extends BaseEvent {

@@ -2,7 +2,9 @@ package won.bot.framework.bot.context;
 
 import java.io.Serializable;
 import java.net.URI;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Used by a bot to remember which needs and nodes and it knows. Additionally generic Java objects can be saved and

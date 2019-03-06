@@ -1,8 +1,9 @@
 package won.cryptography.key;
 
-import won.cryptography.exception.KeyNotSupportedException;
 import java.security.Key;
 import java.security.PublicKey;
+
+import won.cryptography.exception.KeyNotSupportedException;
 
 /**
  * Helper interface for extracting information out of a (public key).

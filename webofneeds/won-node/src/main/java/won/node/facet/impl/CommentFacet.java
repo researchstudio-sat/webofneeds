@@ -1,11 +1,16 @@
 package won.node.facet.impl;
 
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.shared.PrefixMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.message.WonMessage;
@@ -14,10 +19,6 @@ import won.protocol.model.FacetType;
 import won.protocol.model.Need;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.SIOC;
-
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * User: gabriel

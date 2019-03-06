@@ -1,9 +1,9 @@
 package won.protocol.repository;
 
-import won.protocol.model.Facet;
-
 import java.net.URI;
 import java.util.List;
+
+import won.protocol.model.Facet;
 
 /**
  * Created with IntelliJ IDEA.

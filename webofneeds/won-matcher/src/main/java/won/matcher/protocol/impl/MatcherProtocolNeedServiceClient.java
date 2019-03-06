@@ -1,7 +1,6 @@
 package won.matcher.protocol.impl;
 
 import java.net.URI;
-import java.util.Optional;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -10,7 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import won.protocol.matcher.MatcherProtocolNeedServiceClientSide;
 import won.protocol.message.WonMessage;
-import won.protocol.util.WonRdfUtils;
 
 /**
  * User: gabriel
