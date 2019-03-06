@@ -1,6 +1,6 @@
 @import "won-config";
 
-@mixin won-markdown() {
+.markdown {
   h1,
   h2,
   h3,
@@ -15,6 +15,6 @@
 
   ul,
   ol {
-    margin-left: 1rem;
+    list-style-position: inside;
   }
 }

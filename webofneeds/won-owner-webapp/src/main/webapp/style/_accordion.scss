@@ -1,5 +1,4 @@
 @import "won-config";
-@import "won-markdown";
 
 won-accordion {
   display: block;
@@ -20,7 +19,6 @@ won-accordion {
 
     .detail {
       display: table-row;
-      @include won-markdown();
     }
 
     .arrow {

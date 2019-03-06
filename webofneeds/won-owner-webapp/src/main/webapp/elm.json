@@ -18,6 +18,7 @@
       "elm-community/json-extra": "4.0.0",
       "elm-community/result-extra": "2.2.1",
       "elm-community/string-extra": "3.0.0",
+      "elm-explorations/markdown": "1.0.0",
       "mdgriffith/elm-ui": "1.1.0",
       "noahzgordon/elm-color-extra": "1.0.1",
       "rtfeldman/elm-validate": "4.0.1"

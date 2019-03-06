@@ -28,6 +28,7 @@
     <logger name="org.apache.camel.component.jms.reply.TemporaryQueueReplyManager" level="ERROR"/>
     <logger name="org.springframework.jms.connection.CachingConnectionFactory" level="ERROR"/>
 
+    <!-- available log-levels: DEBUG, INFO, WARN, ERROR -->
     <root level="INFO">
         <appender-ref ref="STDOUT"/>
     </root>
