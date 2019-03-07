@@ -1,10 +1,14 @@
 package won.matcher.solr;
 
-import com.github.jsonldjava.core.JsonLdError;
+import java.io.IOException;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import com.github.jsonldjava.core.JsonLdError;
+
 import won.bot.framework.component.needproducer.NeedProducer;
 import won.bot.framework.component.needproducer.impl.RoundRobinCompositeNeedProducer;
 import won.matcher.solr.evaluation.SolrMatcherEvaluation;
@@ -12,8 +16,6 @@ import won.matcher.solr.index.NeedIndexer;
 import won.matcher.solr.spring.SolrTestAppConfiguration;
 import won.protocol.model.NeedGraphType;
 import won.protocol.util.NeedModelWrapper;
-
-import java.io.IOException;
 
 /**
  * Created by hfriedrich on 11.09.2015.

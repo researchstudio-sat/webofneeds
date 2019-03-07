@@ -1,8 +1,8 @@
 package won.bot.framework.eventbot.action.impl.telegram.util;
 
-import won.bot.framework.eventbot.action.impl.telegram.send.MessagePropertyType;
-
 import java.util.regex.Pattern;
+
+import won.bot.framework.eventbot.action.impl.telegram.send.MessagePropertyType;
 
 public class TelegramContentExtractor {
     private Pattern demandTypePattern;

@@ -1,8 +1,8 @@
 package won.utils.im.port;
 
-import org.apache.jena.rdf.model.Model;
-
 import java.io.IOException;
+
+import org.apache.jena.rdf.model.Model;
 
 /**
  * User: ypanchenko

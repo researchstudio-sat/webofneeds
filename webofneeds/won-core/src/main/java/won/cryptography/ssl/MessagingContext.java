@@ -1,14 +1,14 @@
 package won.cryptography.ssl;
 
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509KeyManager;
+import javax.net.ssl.X509TrustManager;
+
 import org.apache.http.ssl.PrivateKeyStrategy;
 import org.apache.http.ssl.TrustStrategy;
 
 import won.cryptography.service.TrustStoreService;
 import won.cryptography.service.keystore.KeyStoreService;
-
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-import javax.net.ssl.X509KeyManager;
 
 /**
  * User: ypanchenko

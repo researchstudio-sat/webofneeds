@@ -16,12 +16,12 @@
 
 package won.node.camel.processor.general;
 
+import java.util.Date;
+
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
 import won.protocol.vocabulary.WONMSG;
-
-import java.util.Date;
 
 /**
  * Wraps the wonMessage, adding the direction property.

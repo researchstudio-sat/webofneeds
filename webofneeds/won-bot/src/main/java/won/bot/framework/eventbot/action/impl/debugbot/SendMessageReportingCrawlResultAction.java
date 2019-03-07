@@ -1,22 +1,16 @@
 package won.bot.framework.eventbot.action.impl.debugbot;
 
-import java.net.URI;
 import java.text.DecimalFormat;
 import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
 import org.springframework.util.StopWatch;
 
 import won.bot.framework.eventbot.EventListenerContext;
-import won.bot.framework.eventbot.event.impl.command.connectionmessage.ConnectionMessageCommandEvent;
 import won.bot.framework.eventbot.event.impl.crawlconnection.CrawlConnectionCommandFailureEvent;
 import won.bot.framework.eventbot.event.impl.crawlconnection.CrawlConnectionCommandSuccessEvent;
 import won.protocol.model.Connection;
-import won.protocol.util.WonConversationUtils;
 import won.protocol.util.WonRdfUtils;
 
 public class SendMessageReportingCrawlResultAction extends SendMessageOnCrawlResultAction {

@@ -16,6 +16,10 @@
 
 package won.node.service.impl;
 
+import java.net.URI;
+import java.util.Collection;
+import java.util.Date;
+
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,19 +27,20 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
+
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.message.WonMessageType;
-import won.protocol.model.*;
+import won.protocol.model.Connection;
+import won.protocol.model.DataWithEtag;
+import won.protocol.model.MessageEventPlaceholder;
+import won.protocol.model.Need;
+import won.protocol.model.NeedState;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.MessageEventRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.service.NeedInformationService;
 import won.protocol.util.DataAccessUtils;
-
-import java.net.URI;
-import java.util.Collection;
-import java.util.Date;
 
 /**
  * User: fkleedorfer

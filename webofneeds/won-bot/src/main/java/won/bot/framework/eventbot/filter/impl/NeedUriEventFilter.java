@@ -16,11 +16,11 @@
 
 package won.bot.framework.eventbot.filter.impl;
 
+import java.net.URI;
+
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.NeedSpecificEvent;
 import won.bot.framework.eventbot.filter.EventFilter;
-
-import java.net.URI;
 
 /**
  * Abstract base class for filters that will only accept events (need specific or connection specific) with the specified need URI.

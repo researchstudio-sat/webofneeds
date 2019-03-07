@@ -1,20 +1,37 @@
 package won.bot.impl;
 
+import javax.mail.internet.MimeMessage;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.MessageChannel;
+
 import won.bot.framework.bot.base.EventBot;
 import won.bot.framework.eventbot.EventListenerContext;
-import won.bot.framework.eventbot.action.impl.mail.receive.*;
-import won.bot.framework.eventbot.action.impl.mail.send.*;
-import won.bot.framework.eventbot.behaviour.*;
+import won.bot.framework.eventbot.action.impl.mail.receive.CreateNeedFromMailAction;
+import won.bot.framework.eventbot.action.impl.mail.receive.MailCommandAction;
+import won.bot.framework.eventbot.action.impl.mail.receive.MailContentExtractor;
+import won.bot.framework.eventbot.action.impl.mail.receive.MailParserAction;
+import won.bot.framework.eventbot.action.impl.mail.receive.SubscribeUnsubscribeAction;
+import won.bot.framework.eventbot.action.impl.mail.send.Connect2MailParserAction;
+import won.bot.framework.eventbot.action.impl.mail.send.Hint2MailParserAction;
+import won.bot.framework.eventbot.action.impl.mail.send.Message2MailAction;
+import won.bot.framework.eventbot.action.impl.mail.send.WelcomeMailAction;
+import won.bot.framework.eventbot.action.impl.mail.send.WonMimeMessageGenerator;
+import won.bot.framework.eventbot.behaviour.BotBehaviour;
+import won.bot.framework.eventbot.behaviour.CloseBevahiour;
+import won.bot.framework.eventbot.behaviour.ConnectBehaviour;
+import won.bot.framework.eventbot.behaviour.ConnectionMessageBehaviour;
+import won.bot.framework.eventbot.behaviour.DeactivateNeedBehaviour;
 import won.bot.framework.eventbot.bus.EventBus;
-import won.bot.framework.eventbot.event.impl.mail.*;
+import won.bot.framework.eventbot.event.impl.mail.CreateNeedFromMailEvent;
+import won.bot.framework.eventbot.event.impl.mail.MailCommandEvent;
+import won.bot.framework.eventbot.event.impl.mail.MailReceivedEvent;
+import won.bot.framework.eventbot.event.impl.mail.SubscribeUnsubscribeEvent;
+import won.bot.framework.eventbot.event.impl.mail.WelcomeMailEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.ConnectFromOtherNeedEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.HintFromMatcherEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.MessageFromOtherNeedEvent;
 import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
-
-import javax.mail.internet.MimeMessage;
 
 /**
  * This Bot checks the E-Mails from a given set of configured E-Mail Adresses and creates Needs that represent these E-Mails

@@ -16,24 +16,23 @@
 
 package won.bot.framework.eventbot.action.impl.needlifecycle;
 
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
+
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.model.FacetType;
-import won.protocol.model.NeedGraphType;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.NeedModelWrapper;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WON;
-
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Base class for actions that create needs.

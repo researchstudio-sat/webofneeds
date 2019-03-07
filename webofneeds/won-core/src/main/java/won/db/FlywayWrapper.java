@@ -1,13 +1,11 @@
 package won.db;
 
+import javax.sql.DataSource;
+
 import org.flywaydb.core.Flyway;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
-
-import javax.sql.DataSource;
-
-import static jdk.nashorn.internal.runtime.regexp.joni.Config.log;
 
 /**
  * This Bean is used to determine whether or not an update/validation of the ddl is done via flywaydb.

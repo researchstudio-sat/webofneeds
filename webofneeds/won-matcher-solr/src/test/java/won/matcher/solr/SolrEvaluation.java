@@ -1,12 +1,14 @@
 package won.matcher.solr;
 
-import com.github.jsonldjava.core.JsonLdError;
+import java.io.IOException;
+
 import org.apache.solr.client.solrj.SolrServerException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import com.github.jsonldjava.core.JsonLdError;
+
 import won.matcher.solr.evaluation.SolrMatcherEvaluation;
 import won.matcher.solr.spring.SolrTestAppConfiguration;
-
-import java.io.IOException;
 
 /**
  * Created by hfriedrich on 08.08.2016.

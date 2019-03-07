@@ -1,5 +1,7 @@
 package won.bot.framework.eventbot.action.impl.telegram.receive;
 
+import java.net.URI;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.telegram.telegrambots.api.methods.AnswerCallbackQuery;
@@ -7,6 +9,7 @@ import org.telegram.telegrambots.api.methods.updatingmessages.EditMessageReplyMa
 import org.telegram.telegrambots.api.objects.CallbackQuery;
 import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.Update;
+
 import won.bot.framework.bot.context.TelegramBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
@@ -24,8 +27,6 @@ import won.protocol.model.Connection;
 import won.protocol.model.ConnectionModelMapper;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
-
-import java.net.URI;
 
 public class TelegramMessageReceivedAction extends BaseEventBotAction {
     private TelegramContentExtractor telegramContentExtractor;

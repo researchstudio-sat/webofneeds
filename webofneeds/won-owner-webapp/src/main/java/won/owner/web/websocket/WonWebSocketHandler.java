@@ -16,6 +16,14 @@
 
 package won.owner.web.websocket;
 
+import java.io.IOException;
+import java.net.URI;
+import java.security.Principal;
+import java.text.MessageFormat;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -32,6 +40,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
+
 import won.owner.model.User;
 import won.owner.model.UserNeed;
 import won.owner.repository.UserNeedRepository;
@@ -49,14 +58,6 @@ import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.model.NeedState;
 import won.protocol.util.AuthenticationThreadLocal;
 import won.protocol.util.WonRdfUtils;
-
-import java.io.IOException;
-import java.net.URI;
-import java.security.Principal;
-import java.text.MessageFormat;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
 
 /**
  * User: syim Date: 06.08.14

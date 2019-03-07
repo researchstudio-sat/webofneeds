@@ -1,5 +1,13 @@
 package won.matcher.solr.hints;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -7,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
 import won.matcher.service.common.event.BulkHintEvent;
 import won.matcher.service.common.event.HintEvent;
 import won.matcher.service.common.event.NeedEvent;
@@ -15,9 +24,6 @@ import won.matcher.solr.query.factory.MatchingContextQueryFactory;
 import won.matcher.solr.utils.Kneedle;
 import won.protocol.util.NeedModelWrapper;
 import won.protocol.vocabulary.WON;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 
 /**

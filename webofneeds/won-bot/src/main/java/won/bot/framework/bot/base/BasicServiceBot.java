@@ -16,8 +16,11 @@
 
 package won.bot.framework.bot.base;
 
+import java.net.URI;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+
 import won.bot.framework.component.needproducer.NeedProducer;
 import won.bot.framework.component.nodeurisource.NodeURISource;
 import won.matcher.component.MatcherNodeURISource;
@@ -26,8 +29,6 @@ import won.protocol.matcher.MatcherProtocolNeedServiceClientSide;
 import won.protocol.message.sender.WonMessageSender;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.linkeddata.LinkedDataSource;
-
-import java.net.URI;
 
 /**
  * Base class for bots containing basic services.

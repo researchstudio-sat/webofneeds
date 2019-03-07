@@ -7,7 +7,6 @@ import org.apache.jena.rdf.model.Model;
 import won.bot.framework.bot.context.HokifyJobBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
-import won.bot.framework.eventbot.action.impl.hokify.WonHokifyJobBotHandler;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.command.connectionmessage.ConnectionMessageCommandEvent;
 import won.bot.framework.eventbot.event.impl.command.open.OpenCommandEvent;

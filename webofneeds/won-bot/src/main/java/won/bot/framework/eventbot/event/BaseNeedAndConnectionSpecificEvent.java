@@ -16,9 +16,9 @@
 
 package won.bot.framework.eventbot.event;
 
-import won.protocol.model.Connection;
-
 import java.net.URI;
+
+import won.protocol.model.Connection;
 
 /**
  *

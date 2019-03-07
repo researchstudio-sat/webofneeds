@@ -1,6 +1,7 @@
 package won.matcher.solr.query.factory;
 
 import org.apache.jena.query.Dataset;
+
 import won.protocol.vocabulary.WON;
 
 /**

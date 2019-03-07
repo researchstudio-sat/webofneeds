@@ -20,7 +20,6 @@ import java.net.URI;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.LoggingLevel;
-import org.apache.camel.builder.PredicateBuilder;
 import org.apache.camel.builder.RouteBuilder;
 
 import won.protocol.message.processor.camel.WonCamelConstants;

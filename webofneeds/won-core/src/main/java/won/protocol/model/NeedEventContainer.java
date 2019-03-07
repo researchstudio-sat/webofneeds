@@ -16,10 +16,14 @@
 
 package won.protocol.model;
 
-import won.protocol.model.parentaware.ParentAware;
-
-import javax.persistence.*;
 import java.net.URI;
+
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.OneToOne;
+
+import won.protocol.model.parentaware.ParentAware;
 
 @Entity
 @DiscriminatorValue("Need")

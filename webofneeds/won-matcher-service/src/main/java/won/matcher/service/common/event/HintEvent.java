@@ -1,9 +1,9 @@
 package won.matcher.service.common.event;
 
-import org.apache.jena.rdf.model.Model;
-
 import java.io.Serializable;
 import java.net.URI;
+
+import org.apache.jena.rdf.model.Model;
 
 /**
  * Event is used to generate hints inside the matcher-service

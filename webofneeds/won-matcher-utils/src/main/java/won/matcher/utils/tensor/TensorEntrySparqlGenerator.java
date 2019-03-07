@@ -1,10 +1,20 @@
 package won.matcher.utils.tensor;
 
-import org.apache.jena.query.*;
-import org.apache.jena.rdf.model.RDFNode;
-import won.protocol.exception.DataIntegrityException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 
-import java.util.*;
+import org.apache.jena.query.ParameterizedSparqlString;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.rdf.model.RDFNode;
+
+import won.protocol.exception.DataIntegrityException;
 
 /**
  * Executes a sparql query on a sparql endpoint and returns the data as {@link TensorEntry} objects.

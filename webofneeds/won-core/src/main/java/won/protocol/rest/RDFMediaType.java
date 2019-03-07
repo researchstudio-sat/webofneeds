@@ -16,13 +16,12 @@
 
 package won.protocol.rest;
 
-import org.springframework.http.MediaType;
-
-import javax.print.attribute.standard.Media;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.springframework.http.MediaType;
 
 /**
  * User: fkleedorfer

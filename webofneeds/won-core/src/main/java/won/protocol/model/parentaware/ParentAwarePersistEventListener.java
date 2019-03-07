@@ -16,6 +16,8 @@
 
 package won.protocol.model.parentaware;
 
+import java.util.Map;
+
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.event.spi.PersistEvent;
@@ -23,8 +25,6 @@ import org.hibernate.event.spi.PersistEventListener;
 import org.hibernate.proxy.HibernateProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Map;
 
 
 public class ParentAwarePersistEventListener implements PersistEventListener

@@ -4,16 +4,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
-import org.apache.jena.graph.Node;
-import org.apache.jena.graph.NodeFactory;
-import org.apache.jena.graph.Triple;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.query.Query;
@@ -27,36 +22,13 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.sparql.algebra.Algebra;
 import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.algebra.OpAsQuery;
-import org.apache.jena.sparql.algebra.op.OpFilter;
-import org.apache.jena.sparql.algebra.op.OpJoin;
-import org.apache.jena.sparql.algebra.op.OpPath;
-import org.apache.jena.sparql.algebra.op.OpTriple;
-import org.apache.jena.sparql.core.TriplePath;
 import org.apache.jena.sparql.core.Var;
-import org.apache.jena.sparql.expr.E_LogicalOr;
-import org.apache.jena.sparql.expr.E_StrContains;
-import org.apache.jena.sparql.expr.E_StrLowerCase;
-import org.apache.jena.sparql.expr.Expr;
-import org.apache.jena.sparql.expr.ExprList;
-import org.apache.jena.sparql.expr.ExprVar;
-import org.apache.jena.sparql.expr.nodevalue.NodeValueBoolean;
-import org.apache.jena.sparql.expr.nodevalue.NodeValueString;
-import org.apache.jena.sparql.path.P_Alt;
-import org.apache.jena.sparql.path.P_Link;
-import org.apache.jena.sparql.path.P_NegPropSet;
-import org.apache.jena.sparql.path.P_Seq;
-import org.apache.jena.sparql.path.P_ZeroOrOne;
-import org.apache.jena.sparql.path.Path;
 import org.apache.jena.tdb.TDB;
-import org.apache.jena.vocabulary.RDF;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.springframework.data.mongodb.core.aggregation.BucketAutoOperation.ExpressionBucketAutoOperationBuilder;
 
-import won.matcher.sparql.actor.SparqlMatcherActor;
 import won.matcher.sparql.actor.SparqlMatcherUtils;
-import won.protocol.vocabulary.WON;
 
 /**
  * Test for experimenting with in-memory datasets and queries.

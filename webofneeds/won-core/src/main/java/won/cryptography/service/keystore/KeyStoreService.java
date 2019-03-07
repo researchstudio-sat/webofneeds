@@ -1,7 +1,6 @@
 package won.cryptography.service.keystore;
 
 import java.io.IOException;
-import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.PublicKey;

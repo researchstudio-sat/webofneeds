@@ -1,8 +1,8 @@
 package won.bot.framework.eventbot.event.impl.factory;
 
-import won.bot.framework.eventbot.event.BaseEvent;
-
 import java.net.URI;
+
+import won.bot.framework.eventbot.event.BaseEvent;
 
 /**
  * Event used when a hintevent is called on a factory need

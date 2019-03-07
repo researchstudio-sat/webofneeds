@@ -12,9 +12,12 @@ import java.util.Random;
 
 import org.apache.jena.datatypes.BaseDatatype;
 import org.apache.jena.datatypes.RDFDatatype;
-import org.apache.jena.rdf.model.*;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.DC;
 import org.apache.jena.vocabulary.RDF;
+
 import won.protocol.vocabulary.SCHEMA;
 import won.protocol.vocabulary.WON;
 

@@ -16,9 +16,9 @@
 
 package won.protocol.util.linkeddata;
 
-import org.apache.jena.query.Dataset;
-
 import java.net.URI;
+
+import org.apache.jena.query.Dataset;
 
 /**
  * Callback that is informed of each Dataset downloaded.

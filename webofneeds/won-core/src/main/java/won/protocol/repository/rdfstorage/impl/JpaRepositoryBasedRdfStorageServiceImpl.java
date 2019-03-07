@@ -16,16 +16,17 @@
 
 package won.protocol.repository.rdfstorage.impl;
 
+import java.net.URI;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import won.protocol.model.DataWithEtag;
 import won.protocol.model.DatasetHolder;
 import won.protocol.repository.DatasetHolderRepository;
 import won.protocol.repository.rdfstorage.RDFStorageService;
-
-import java.net.URI;
 
 /**
  * Rdf Storage service that delegates to a JPA repository

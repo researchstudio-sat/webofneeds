@@ -16,7 +16,11 @@
 
 package won.bot.framework.eventbot.listener.impl;
 
+import java.net.URI;
+import java.util.Date;
+
 import org.apache.jena.query.Dataset;
+
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.event.ConnectionSpecificEvent;
 import won.bot.framework.eventbot.event.Event;
@@ -28,9 +32,6 @@ import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
-
-import java.net.URI;
-import java.util.Date;
 
 /**
  * Listener that responds to open and message events with automatic messages.

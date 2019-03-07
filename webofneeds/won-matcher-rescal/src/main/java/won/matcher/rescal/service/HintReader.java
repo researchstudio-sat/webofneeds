@@ -1,22 +1,23 @@
 package won.matcher.rescal.service;
 
-import org.la4j.matrix.SparseMatrix;
-import org.la4j.matrix.functor.MatrixProcedure;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import won.matcher.rescal.config.RescalMatcherConfig;
-import won.matcher.service.common.event.BulkHintEvent;
-import won.matcher.service.common.event.HintEvent;
-import won.matcher.utils.tensor.TensorMatchingData;
-
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.la4j.matrix.SparseMatrix;
+import org.la4j.matrix.functor.MatrixProcedure;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import won.matcher.rescal.config.RescalMatcherConfig;
+import won.matcher.service.common.event.BulkHintEvent;
+import won.matcher.service.common.event.HintEvent;
+import won.matcher.utils.tensor.TensorMatchingData;
 
 /**
  * Used to read a hint matrix mtx file and create (bulk) hint event objects from it.

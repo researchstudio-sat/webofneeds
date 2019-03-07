@@ -16,10 +16,10 @@
 
 package won.bot.framework.bot.base;
 
-import org.springframework.scheduling.TaskScheduler;
-
 import java.util.Date;
 import java.util.concurrent.Executor;
+
+import org.springframework.scheduling.TaskScheduler;
 
 /**
  * Bot that has access to a scheduler for performing recurring or deferred work

@@ -1,7 +1,6 @@
 package won.node.camel.processor.general;
 
 import java.net.URI;
-import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.camel.Exchange;

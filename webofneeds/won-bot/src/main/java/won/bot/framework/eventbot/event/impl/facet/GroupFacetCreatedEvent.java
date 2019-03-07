@@ -16,11 +16,12 @@
 
 package won.bot.framework.eventbot.event.impl.facet;
 
+import java.net.URI;
+
 import org.apache.jena.rdf.model.Model;
+
 import won.bot.framework.eventbot.event.BaseEvent;
 import won.protocol.model.FacetType;
-
-import java.net.URI;
 
 /**
  * User: LEIH-NB

@@ -1,15 +1,20 @@
 package won.cryptography.rdfsign;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
-import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.*;
+
+import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.GraphCollection;
+import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.NamedGraph;
+import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.Prefix;
+import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.SignatureData;
+import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.Triple;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.ontology.Ontology;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WONMSG;
-
-import java.util.ArrayList;
-import java.util.LinkedList;
 
 /**
  * Created by ypanchenko on 08.07.2014.

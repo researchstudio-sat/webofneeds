@@ -1,8 +1,8 @@
 package won.matcher.service.common.event;
 
-import won.protocol.service.WonNodeInfo;
-
 import java.io.Serializable;
+
+import won.protocol.service.WonNodeInfo;
 
 /**
  * This event is used in the matching service to indicate status about won nodes.

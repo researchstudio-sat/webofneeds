@@ -16,13 +16,15 @@
 
 package won.protocol.repository;
 
+import java.net.URI;
+
+import javax.persistence.LockModeType;
+
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import won.protocol.model.NeedEventContainer;
 
-import javax.persistence.LockModeType;
-import java.net.URI;
+import won.protocol.model.NeedEventContainer;
 
 /**
  * Created by fkleedorfer on 05.12.2016.

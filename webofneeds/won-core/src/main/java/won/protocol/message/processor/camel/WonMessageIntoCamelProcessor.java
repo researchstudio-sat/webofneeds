@@ -16,17 +16,18 @@
 
 package won.protocol.message.processor.camel;
 
+import java.net.URI;
+import java.util.Map;
+
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.jena.riot.Lang;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDecoder;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
-
-import java.net.URI;
-import java.util.Map;
 
 /**
  * First processor for incoming messages. It expects a serialized WonMessage

@@ -16,9 +16,9 @@
 
 package won.matcher.protocol;
 
-import org.apache.jena.query.Dataset;
-
 import java.net.URI;
+
+import org.apache.jena.query.Dataset;
 
 /**
  * Handler implementation that does nothing. Useful for extending as well as pull-only cases

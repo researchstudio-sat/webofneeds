@@ -16,9 +16,9 @@
 
 package won.bot.framework.eventbot.event.impl.wonmessage;
 
-import won.protocol.message.WonMessage;
-
 import java.net.URI;
+
+import won.protocol.message.WonMessage;
 
 /**
  * Event published whenever a WonMessage is received that indicates the failure of a previous message.

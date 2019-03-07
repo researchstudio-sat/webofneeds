@@ -16,11 +16,11 @@
 
 package won.bot.integrationtest.failsim;
 
+import java.net.URI;
+
 import won.bot.framework.eventbot.EventListenerContext;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.service.impl.WonNodeInformationServiceDecorator;
-
-import java.net.URI;
 
 /**
  * Decorates the EventListenerContext such that event URIs generated through the WonNodeInformationService

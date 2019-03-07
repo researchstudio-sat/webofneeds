@@ -1,19 +1,18 @@
 package won.bot.framework.eventbot.action.impl.mail.receive;
 
-import won.bot.framework.bot.context.BotContext;
+import java.util.Collection;
+
+import javax.mail.internet.MimeMessage;
+
 import won.bot.framework.bot.context.MailBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
-import won.bot.framework.eventbot.action.EventBotActionUtils;
 import won.bot.framework.eventbot.action.impl.mail.model.SubscribeStatus;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.mail.CreateNeedFromMailEvent;
 import won.bot.framework.eventbot.event.impl.mail.SubscribeUnsubscribeEvent;
 import won.bot.framework.eventbot.listener.EventListener;
-
-import javax.mail.internet.MimeMessage;
-import java.util.Collection;
 
 /**
  * Created by hfriedrich on 16.11.2016.

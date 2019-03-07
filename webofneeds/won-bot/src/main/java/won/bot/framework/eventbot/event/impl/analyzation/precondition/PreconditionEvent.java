@@ -4,8 +4,6 @@ import won.bot.framework.eventbot.event.BaseNeedAndConnectionSpecificEvent;
 import won.protocol.model.Connection;
 import won.utils.goals.GoalInstantiationResult;
 
-import java.net.URI;
-
 /**
  * Created by fsuda on 27.11.2017.
  */

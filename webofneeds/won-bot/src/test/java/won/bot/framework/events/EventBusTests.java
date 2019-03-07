@@ -16,17 +16,18 @@
 
 package won.bot.framework.events;
 
+import java.util.concurrent.CountDownLatch;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+
 import won.bot.framework.eventbot.bus.impl.AsyncEventBusImpl;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.listener.EventListener;
-
-import java.util.concurrent.CountDownLatch;
 
 /**
  * User: fkleedorfer

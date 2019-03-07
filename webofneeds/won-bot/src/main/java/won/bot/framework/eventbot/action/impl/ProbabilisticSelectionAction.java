@@ -16,13 +16,13 @@
 
 package won.bot.framework.eventbot.action.impl;
 
+import java.util.Random;
+
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.EventBotAction;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.listener.EventListener;
-
-import java.util.Random;
 
 /**
  * Action that delegates to delegateA with probabilityA or to delegateB with probability 1-probabilityA.

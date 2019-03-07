@@ -16,11 +16,23 @@
 
 package won.protocol.model;
 
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.MapsId;
+import javax.persistence.OneToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
 import won.protocol.model.parentaware.ParentAware;
 import won.protocol.model.parentaware.VersionedEntity;
-
-import javax.persistence.*;
-import java.util.Date;
 
 @Entity
 @Table(name="connection_container")

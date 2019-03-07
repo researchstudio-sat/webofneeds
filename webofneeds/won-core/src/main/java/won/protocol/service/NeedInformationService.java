@@ -16,16 +16,21 @@
 
 package won.protocol.service;
 
-import org.apache.jena.rdf.model.Model;
-import org.springframework.data.domain.Slice;
-import won.protocol.exception.NoSuchConnectionException;
-import won.protocol.exception.NoSuchNeedException;
-import won.protocol.message.WonMessageType;
-import won.protocol.model.*;
-
 import java.net.URI;
 import java.util.Collection;
 import java.util.Date;
+
+import org.apache.jena.rdf.model.Model;
+import org.springframework.data.domain.Slice;
+
+import won.protocol.exception.NoSuchConnectionException;
+import won.protocol.exception.NoSuchNeedException;
+import won.protocol.message.WonMessageType;
+import won.protocol.model.Connection;
+import won.protocol.model.DataWithEtag;
+import won.protocol.model.MessageEventPlaceholder;
+import won.protocol.model.Need;
+import won.protocol.model.NeedState;
 
 /**
  * Service for obtaining information about needs and connections in the system in RDF.

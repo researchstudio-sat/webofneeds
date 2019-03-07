@@ -16,11 +16,12 @@
 
 package won.bot.framework.eventbot.event.impl.needlifecycle;
 
+import java.net.URI;
+
 import org.apache.jena.query.Dataset;
+
 import won.bot.framework.eventbot.event.BaseNeedSpecificEvent;
 import won.protocol.model.FacetType;
-
-import java.net.URI;
 
 /**
  *

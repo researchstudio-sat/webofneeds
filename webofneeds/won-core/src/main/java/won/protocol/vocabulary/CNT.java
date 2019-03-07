@@ -3,7 +3,6 @@ package won.protocol.vocabulary;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.Resource;
 
 /**
  * WGS84 Geo Positioning vocabulary.

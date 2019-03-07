@@ -1,8 +1,11 @@
 package won.protocol.message.processor.impl;
 
+import java.net.URI;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageType;
@@ -12,8 +15,6 @@ import won.protocol.message.processor.exception.UriNodePathException;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
-
-import java.net.URI;
 
 /**
  * Check if the event, graph or need uri is well-formed according the node's

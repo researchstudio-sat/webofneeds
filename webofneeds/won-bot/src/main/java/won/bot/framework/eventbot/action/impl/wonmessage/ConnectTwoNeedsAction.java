@@ -16,7 +16,13 @@
 
 package won.bot.framework.eventbot.action.impl.wonmessage;
 
+import java.net.URI;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Optional;
+
 import org.apache.jena.query.Dataset;
+
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
@@ -27,11 +33,6 @@ import won.protocol.message.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
-
-import java.net.URI;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Optional;
 
 /**
  * BaseEventBotAction connecting two needs on the specified facets. The need's URIs are obtained from

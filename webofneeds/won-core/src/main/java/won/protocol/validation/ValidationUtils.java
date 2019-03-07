@@ -16,16 +16,16 @@
 
 package won.protocol.validation;
 
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryFactory;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryFactory;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 /**
  * Groups utility functions for validating WoN RDF structures.

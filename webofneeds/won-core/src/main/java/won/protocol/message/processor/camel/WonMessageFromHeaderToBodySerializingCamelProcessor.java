@@ -16,17 +16,18 @@
 
 package won.protocol.message.processor.camel;
 
+import java.io.StringWriter;
+import java.util.Map;
+
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
-
-import java.io.StringWriter;
-import java.util.Map;
 
 /**
  * Last processor for outgoing messages. It expects a WonMessage object in the exchange's in, in the header 'wonMessgage'.

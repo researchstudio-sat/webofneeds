@@ -1,5 +1,9 @@
 package won.bot.framework.manager.impl;
 
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,11 +16,8 @@ import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.Trigger;
-import won.bot.framework.bot.Bot;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import won.bot.framework.bot.Bot;
 
 /**
  * Spring context aware bot registry that adds all beans of type Bot defined in the application context.

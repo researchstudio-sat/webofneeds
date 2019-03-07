@@ -1,28 +1,33 @@
 package won.cryptography.rdfsign;
 
-import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.vocabulary.RDF;
-import de.uni_koblenz.aggrimm.icp.crypto.sign.algorithm.SignatureAlgorithmInterface;
-import de.uni_koblenz.aggrimm.icp.crypto.sign.algorithm.algorithm.SignatureAlgorithmFisteus2010;
-import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.GraphCollection;
-import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.SignatureData;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import won.protocol.message.WonSignatureData;
-import won.protocol.vocabulary.SFSIG;
-
 import java.io.StringWriter;
-import java.security.*;
+import java.security.MessageDigest;
+import java.security.PrivateKey;
+import java.security.Provider;
+import java.security.PublicKey;
+import java.security.Signature;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.List;
+
+import org.apache.jena.query.Dataset;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.vocabulary.RDF;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import de.uni_koblenz.aggrimm.icp.crypto.sign.algorithm.SignatureAlgorithmInterface;
+import de.uni_koblenz.aggrimm.icp.crypto.sign.algorithm.algorithm.SignatureAlgorithmFisteus2010;
+import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.GraphCollection;
+import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.SignatureData;
+import won.protocol.message.WonSignatureData;
+import won.protocol.vocabulary.SFSIG;
 
 /**
  * Created by ypanchenko on 12.06.2014.

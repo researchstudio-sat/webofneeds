@@ -1,5 +1,7 @@
 package won.protocol.model;
 
+import java.net.URI;
+
 /**
  * Created with IntelliJ IDEA.
  * User: gabriel
@@ -7,10 +9,13 @@ package won.protocol.model;
  * Time: 16:03
  * To change this template use File | Settings | File Templates.
  */
-
-
-import javax.persistence.*;
-import java.net.URI;
+import javax.persistence.Column;
+import javax.persistence.Convert;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Index;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "facet", indexes = { @Index(name = "IDX_UNIQUE_FACET", columnList = "facetURI")})

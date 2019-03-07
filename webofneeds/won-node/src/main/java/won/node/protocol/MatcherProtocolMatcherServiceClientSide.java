@@ -16,10 +16,11 @@
 
 package won.node.protocol;
 
-import org.apache.jena.rdf.model.Model;
-import won.protocol.message.WonMessage;
-
 import java.net.URI;
+
+import org.apache.jena.rdf.model.Model;
+
+import won.protocol.message.WonMessage;
 
 /**
  * User: LEIH-NB

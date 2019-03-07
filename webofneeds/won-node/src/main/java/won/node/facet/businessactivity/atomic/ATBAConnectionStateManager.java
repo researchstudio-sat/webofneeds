@@ -1,8 +1,8 @@
 package won.node.facet.businessactivity.atomic;
 
-import won.protocol.model.Connection;
-
 import java.net.URI;
+
+import won.protocol.model.Connection;
 
 /**
  * User: Danijel

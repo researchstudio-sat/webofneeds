@@ -33,7 +33,6 @@ import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.model.ConnectionState;
-import won.protocol.model.FacetType;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;

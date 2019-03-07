@@ -22,7 +22,16 @@ import org.apache.jena.vocabulary.DC;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.XSD;
-import won.protocol.vocabulary.*;
+
+import won.protocol.vocabulary.CERT;
+import won.protocol.vocabulary.GEO;
+import won.protocol.vocabulary.LDP;
+import won.protocol.vocabulary.SCHEMA;
+import won.protocol.vocabulary.SFSIG;
+import won.protocol.vocabulary.SIOC;
+import won.protocol.vocabulary.WON;
+import won.protocol.vocabulary.WONCRYPT;
+import won.protocol.vocabulary.WONMSG;
 
 /**
  * User: fkleedorfer

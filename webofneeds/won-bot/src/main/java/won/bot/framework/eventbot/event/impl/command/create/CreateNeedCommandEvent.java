@@ -16,16 +16,16 @@
 
 package won.bot.framework.eventbot.event.impl.command.create;
 
+import java.net.URI;
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
+
 import won.bot.framework.bot.context.BotContext;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandEvent;
 import won.protocol.message.WonMessageType;
 import won.protocol.model.FacetType;
-
-import java.net.URI;
-import java.util.Arrays;
-import java.util.List;
 
 
 /**

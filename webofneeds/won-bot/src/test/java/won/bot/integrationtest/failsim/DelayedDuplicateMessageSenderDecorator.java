@@ -18,6 +18,7 @@ package won.bot.integrationtest.failsim;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import won.bot.framework.eventbot.EventListenerContext;
 import won.protocol.message.WonMessage;
 import won.protocol.message.sender.WonMessageSender;

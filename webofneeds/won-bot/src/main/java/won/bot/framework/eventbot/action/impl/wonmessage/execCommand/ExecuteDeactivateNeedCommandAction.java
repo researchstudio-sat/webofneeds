@@ -1,5 +1,9 @@
 package won.bot.framework.eventbot.action.impl.wonmessage.execCommand;
 
+import java.net.URI;
+
+import org.apache.jena.query.Dataset;
+
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
@@ -15,10 +19,6 @@ import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
-
-import java.net.URI;
-
-import org.apache.jena.query.Dataset;
 
 /**
  * Created by fsuda on 17.05.2017.

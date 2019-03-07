@@ -1,10 +1,21 @@
 package won.utils.goals.instantiation;
 
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.util.Collection;
+import java.util.LinkedList;
+
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
-import org.apache.jena.query.*;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.riot.RDFDataMgr;
@@ -21,12 +32,6 @@ import won.protocol.model.Coordinate;
 import won.protocol.util.NeedModelWrapper;
 import won.utils.goals.GoalInstantiationProducer;
 import won.utils.goals.GoalInstantiationResult;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.util.Collection;
-import java.util.LinkedList;
 
 public class GoalInstantiationTest {
 

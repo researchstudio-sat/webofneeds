@@ -16,6 +16,12 @@
 
 package won.node.springsecurity;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.security.cert.Certificate;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,13 +33,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.util.StopWatch;
-import won.cryptography.webid.WebIDVerificationAgent;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.security.cert.Certificate;
-import java.util.ArrayList;
-import java.util.List;
+import won.cryptography.webid.WebIDVerificationAgent;
 
 /**
  * Assumes that the provided username is a linked data URI that contains WebID information.

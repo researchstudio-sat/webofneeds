@@ -16,12 +16,22 @@
 
 package won.owner.model;
 
-import won.protocol.model.NeedState;
-import won.protocol.model.URIConverter;
-
-import javax.persistence.*;
 import java.net.URI;
 import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Convert;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.PrePersist;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import won.protocol.model.NeedState;
+import won.protocol.model.URIConverter;
 
 /**
  * Entity wrapping a uri identifying a user's need.

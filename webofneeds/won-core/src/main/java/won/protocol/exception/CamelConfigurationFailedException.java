@@ -16,9 +16,6 @@
 
 package won.protocol.exception;
 
-import java.net.URI;
-import java.text.MessageFormat;
-
 /**
  * User: LEIH-NB
  * Date: 13.12.13

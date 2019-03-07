@@ -16,11 +16,15 @@
 
 package won.protocol.model;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.URI;
+
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.time.StopWatch;
-
-import java.io.*;
-import java.net.URI;
 
 /**
  * Created by fkleedorfer on 24.08.2016.

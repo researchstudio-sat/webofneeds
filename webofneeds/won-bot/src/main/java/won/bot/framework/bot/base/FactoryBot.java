@@ -1,13 +1,13 @@
 package won.bot.framework.bot.base;
 
+import java.util.Optional;
+
 import won.bot.framework.bot.context.FactoryBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.behaviour.BotBehaviour;
 import won.bot.framework.eventbot.behaviour.ExecuteWonMessageCommandBehaviour;
 import won.bot.framework.eventbot.behaviour.FactoryBotHintBehaviour;
 import won.bot.framework.eventbot.behaviour.FactoryBotInitBehaviour;
-
-import java.util.Optional;
 
 public abstract class FactoryBot extends EventBot {
     @Override

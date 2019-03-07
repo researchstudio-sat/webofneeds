@@ -1,11 +1,14 @@
 package won.bot.impl;
 
-import won.bot.framework.eventbot.listener.baStateBots.BATestBotScript;
-import won.bot.framework.eventbot.listener.baStateBots.baPCMessagingBots.atomicBots.coordinationMessageAsTextBot.*;
-import won.protocol.model.FacetType;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import won.bot.framework.eventbot.listener.baStateBots.BATestBotScript;
+import won.bot.framework.eventbot.listener.baStateBots.baPCMessagingBots.atomicBots.coordinationMessageAsTextBot.ActiveBlockingSPBot;
+import won.bot.framework.eventbot.listener.baStateBots.baPCMessagingBots.atomicBots.coordinationMessageAsTextBot.CompletedBlockedFPBot;
+import won.bot.framework.eventbot.listener.baStateBots.baPCMessagingBots.atomicBots.coordinationMessageAsTextBot.CompletedBlockedSPBot;
+import won.bot.framework.eventbot.listener.baStateBots.baPCMessagingBots.atomicBots.coordinationMessageAsTextBot.CompletedFPBot;
+import won.protocol.model.FacetType;
 
 /**
  * User: Danijel

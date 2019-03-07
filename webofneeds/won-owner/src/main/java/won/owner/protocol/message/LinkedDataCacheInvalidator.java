@@ -1,8 +1,11 @@
 package won.owner.protocol.message;
 
+import java.net.URI;
+
 import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.WonMessageProcessor;
@@ -10,8 +13,6 @@ import won.protocol.message.processor.exception.WonMessageProcessingException;
 import won.protocol.util.NeedModelWrapper;
 import won.protocol.util.linkeddata.CachingLinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
-
-import java.net.URI;
 
 /**
  * Removes elements from the linked data cache when certain messages are seen. 

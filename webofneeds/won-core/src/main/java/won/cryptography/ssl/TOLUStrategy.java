@@ -1,12 +1,13 @@
 package won.cryptography.ssl;
 
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+
 import org.apache.http.ssl.TrustStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.cryptography.service.TrustStoreService;
 
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
+import won.cryptography.service.TrustStoreService;
 
 /**
  * Can be useful for development: a certificate will become trusted after application of this strategy, while if

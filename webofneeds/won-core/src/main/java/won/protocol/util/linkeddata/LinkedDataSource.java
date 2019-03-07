@@ -16,11 +16,11 @@
 
 package won.protocol.util.linkeddata;
 
-import org.apache.jena.query.Dataset;
-import org.apache.jena.sparql.path.Path;
-
 import java.net.URI;
 import java.util.List;
+
+import org.apache.jena.query.Dataset;
+import org.apache.jena.sparql.path.Path;
 
 /**
  * Interface for fetching linked data as a jena Model.

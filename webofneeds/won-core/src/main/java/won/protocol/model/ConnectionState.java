@@ -16,11 +16,12 @@
 
 package won.protocol.model;
 
+import java.net.URI;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.protocol.vocabulary.WON;
 
-import java.net.URI;
+import won.protocol.vocabulary.WON;
 
 /**
  * User: fkleedorfer

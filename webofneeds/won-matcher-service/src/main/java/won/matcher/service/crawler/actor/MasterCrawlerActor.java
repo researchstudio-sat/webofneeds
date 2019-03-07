@@ -1,5 +1,15 @@
 package won.matcher.service.crawler.actor;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
 import akka.actor.ActorRef;
 import akka.actor.OneForOneStrategy;
 import akka.actor.SupervisorStrategy;
@@ -9,6 +19,8 @@ import akka.cluster.pubsub.DistributedPubSubMediator;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.japi.Function;
+import scala.concurrent.duration.Duration;
+import scala.concurrent.duration.FiniteDuration;
 import won.matcher.service.common.event.WonNodeEvent;
 import won.matcher.service.common.spring.SpringExtension;
 import won.matcher.service.crawler.config.CrawlConfig;
@@ -16,18 +28,7 @@ import won.matcher.service.crawler.exception.CrawlWrapperException;
 import won.matcher.service.crawler.msg.CrawlUriMessage;
 import won.matcher.service.crawler.msg.ResourceCrawlUriMessage;
 import won.matcher.service.crawler.service.CrawlSparqlService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-import scala.concurrent.duration.Duration;
-import scala.concurrent.duration.FiniteDuration;
 import won.protocol.service.WonNodeInfo;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Coordinates recursive crawling of linked data resources by assigning {@link CrawlUriMessage}

@@ -1,14 +1,15 @@
 package won.node.facet.impl;
 
+import java.net.URI;
+import java.util.HashMap;
+
 import org.springframework.beans.factory.annotation.Autowired;
+
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.model.Connection;
 import won.protocol.model.FacetType;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.util.DataAccessUtils;
-
-import java.net.URI;
-import java.util.HashMap;
 
 /**
  * Created with IntelliJ IDEA.

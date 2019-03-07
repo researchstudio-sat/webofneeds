@@ -16,12 +16,12 @@
 
 package won.bot.framework.eventbot.event.impl.debugbot;
 
+import java.net.URI;
+
 import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
+
 import won.bot.framework.eventbot.event.BaseNeedSpecificEvent;
 import won.protocol.model.FacetType;
-
-import java.net.URI;
 
 /**
  *

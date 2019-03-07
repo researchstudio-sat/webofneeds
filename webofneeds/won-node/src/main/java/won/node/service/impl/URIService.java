@@ -16,14 +16,14 @@
 
 package won.node.service.impl;
 
-import won.protocol.model.Connection;
-import won.protocol.model.Need;
-
 import java.net.URI;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.InitializingBean;
+
+import won.protocol.model.Connection;
+import won.protocol.model.Need;
 
 /**
  * User: fkleedorfer

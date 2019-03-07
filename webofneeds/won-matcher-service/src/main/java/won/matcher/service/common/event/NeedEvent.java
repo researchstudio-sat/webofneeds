@@ -1,16 +1,17 @@
 package won.matcher.service.common.event;
 
 
+import java.io.IOException;
+import java.io.Serializable;
+import java.io.StringWriter;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.LangBuilder;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
-import won.matcher.service.common.service.sparql.SparqlService;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.io.StringWriter;
+import won.matcher.service.common.service.sparql.SparqlService;
 
 /**
  * This event is used in the matching service to indicate that a new need has been found.

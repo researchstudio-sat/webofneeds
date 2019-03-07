@@ -1,5 +1,8 @@
 package won.matcher.service.common.service.monitoring;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.javasimon.SimonManager;
 import org.javasimon.Split;
 import org.javasimon.Stopwatch;
@@ -8,9 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by hfriedrich on 09.10.2015.

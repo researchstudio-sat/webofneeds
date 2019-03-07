@@ -16,6 +16,13 @@
 
 package won.protocol.model;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.SequenceInputStream;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.riot.Lang;
@@ -23,13 +30,6 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StopWatch;
-
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.SequenceInputStream;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * Aggregates the datasets wrapped by a number of dataset holders. As soon as the aggregate() function is called,

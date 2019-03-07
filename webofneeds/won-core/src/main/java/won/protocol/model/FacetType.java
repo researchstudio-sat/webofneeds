@@ -1,9 +1,9 @@
 
 package won.protocol.model;
 
-import won.protocol.vocabulary.WON;
-
 import java.net.URI;
+
+import won.protocol.vocabulary.WON;
 
 /**
  * Created with IntelliJ IDEA.

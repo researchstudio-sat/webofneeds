@@ -16,11 +16,11 @@
 
 package won.bot.framework.eventbot.event.impl.command.create;
 
+import java.net.URI;
+
 import won.bot.framework.eventbot.event.BaseNeedSpecificEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandSuccessEvent;
-
-import java.net.URI;
 
 /**
  * Indicates that creating a need succeeded.

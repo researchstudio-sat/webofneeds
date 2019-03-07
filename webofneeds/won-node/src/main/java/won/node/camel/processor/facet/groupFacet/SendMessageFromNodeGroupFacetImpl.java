@@ -1,10 +1,14 @@
 package won.node.camel.processor.facet.groupFacet;
 
+import java.net.URI;
+import java.util.List;
+
 import org.apache.camel.Exchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
 import won.node.camel.processor.AbstractFromOwnerCamelProcessor;
 import won.node.camel.processor.annotation.FacetMessageProcessor;
 import won.protocol.message.WonMessage;
@@ -18,9 +22,6 @@ import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
-
-import java.net.URI;
-import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.

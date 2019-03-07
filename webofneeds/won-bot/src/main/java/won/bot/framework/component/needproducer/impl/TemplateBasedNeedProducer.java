@@ -16,19 +16,19 @@
 
 package won.bot.framework.component.needproducer.impl;
 
+import java.io.IOException;
+
 import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFLanguages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
+
 import won.protocol.model.NeedGraphType;
 import won.protocol.util.NeedModelWrapper;
 import won.protocol.util.RdfUtils;
-
-import java.io.IOException;
 
 /**
  * NeedProducer that reads a need model at startup time and overlays it

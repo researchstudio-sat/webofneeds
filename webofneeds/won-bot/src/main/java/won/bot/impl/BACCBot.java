@@ -1,12 +1,36 @@
 package won.bot.impl;
 
-import won.bot.framework.eventbot.listener.baStateBots.BATestBotScript;
-import won.bot.framework.eventbot.listener.baStateBots.baCCMessagingBots.coordinationMessageAsTextBots.*;
-import won.bot.framework.eventbot.listener.baStateBots.baCCMessagingBots.coordinationMessageAsUriBots.*;
-import won.protocol.model.FacetType;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import won.bot.framework.eventbot.listener.baStateBots.BATestBotScript;
+import won.bot.framework.eventbot.listener.baStateBots.baCCMessagingBots.coordinationMessageAsTextBots.BACCStateActiveCancelBot;
+import won.bot.framework.eventbot.listener.baStateBots.baCCMessagingBots.coordinationMessageAsTextBots.BACCStateActiveCancelFailBot;
+import won.bot.framework.eventbot.listener.baStateBots.baCCMessagingBots.coordinationMessageAsTextBots.BACCStateActiveCannotCompleteBot;
+import won.bot.framework.eventbot.listener.baStateBots.baCCMessagingBots.coordinationMessageAsTextBots.BACCStateActiveFailBot;
+import won.bot.framework.eventbot.listener.baStateBots.baCCMessagingBots.coordinationMessageAsTextBots.BACCStateCompensateBot;
+import won.bot.framework.eventbot.listener.baStateBots.baCCMessagingBots.coordinationMessageAsTextBots.BACCStateCompensateFailBot;
+import won.bot.framework.eventbot.listener.baStateBots.baCCMessagingBots.coordinationMessageAsTextBots.BACCStateCompleteBot;
+import won.bot.framework.eventbot.listener.baStateBots.baCCMessagingBots.coordinationMessageAsTextBots.BACCStateCompleteCancelBot;
+import won.bot.framework.eventbot.listener.baStateBots.baCCMessagingBots.coordinationMessageAsTextBots.BACCStateCompleteCancelFailBot;
+import won.bot.framework.eventbot.listener.baStateBots.baCCMessagingBots.coordinationMessageAsTextBots.BACCStateCompleteCannotCompleteBot;
+import won.bot.framework.eventbot.listener.baStateBots.baCCMessagingBots.coordinationMessageAsTextBots.BACCStateCompleteExitBot;
+import won.bot.framework.eventbot.listener.baStateBots.baCCMessagingBots.coordinationMessageAsTextBots.BACCStateCompleteFailBot;
+import won.bot.framework.eventbot.listener.baStateBots.baCCMessagingBots.coordinationMessageAsTextBots.BACCStateExitBot;
+import won.bot.framework.eventbot.listener.baStateBots.baCCMessagingBots.coordinationMessageAsUriBots.BACCStateActiveCancelFailUriBot;
+import won.bot.framework.eventbot.listener.baStateBots.baCCMessagingBots.coordinationMessageAsUriBots.BACCStateActiveCancelUriBot;
+import won.bot.framework.eventbot.listener.baStateBots.baCCMessagingBots.coordinationMessageAsUriBots.BACCStateActiveCannotCompleteUriBot;
+import won.bot.framework.eventbot.listener.baStateBots.baCCMessagingBots.coordinationMessageAsUriBots.BACCStateActiveFailUriBot;
+import won.bot.framework.eventbot.listener.baStateBots.baCCMessagingBots.coordinationMessageAsUriBots.BACCStateCompensateFailUriBot;
+import won.bot.framework.eventbot.listener.baStateBots.baCCMessagingBots.coordinationMessageAsUriBots.BACCStateCompensateUriBot;
+import won.bot.framework.eventbot.listener.baStateBots.baCCMessagingBots.coordinationMessageAsUriBots.BACCStateCompleteCancelFailUriBot;
+import won.bot.framework.eventbot.listener.baStateBots.baCCMessagingBots.coordinationMessageAsUriBots.BACCStateCompleteCancelUriBot;
+import won.bot.framework.eventbot.listener.baStateBots.baCCMessagingBots.coordinationMessageAsUriBots.BACCStateCompleteCannotCompleteUriBot;
+import won.bot.framework.eventbot.listener.baStateBots.baCCMessagingBots.coordinationMessageAsUriBots.BACCStateCompleteExitUriBot;
+import won.bot.framework.eventbot.listener.baStateBots.baCCMessagingBots.coordinationMessageAsUriBots.BACCStateCompleteFailUriBot;
+import won.bot.framework.eventbot.listener.baStateBots.baCCMessagingBots.coordinationMessageAsUriBots.BACCStateCompleteUriBot;
+import won.bot.framework.eventbot.listener.baStateBots.baCCMessagingBots.coordinationMessageAsUriBots.BACCStateExitUriBot;
+import won.protocol.model.FacetType;
 
 /**
  * Created with IntelliJ IDEA.

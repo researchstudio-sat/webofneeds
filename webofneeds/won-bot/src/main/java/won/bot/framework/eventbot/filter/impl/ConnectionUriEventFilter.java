@@ -16,11 +16,11 @@
 
 package won.bot.framework.eventbot.filter.impl;
 
-import won.bot.framework.eventbot.event.Event;
-import won.bot.framework.eventbot.event.ConnectionSpecificEvent;
-import won.bot.framework.eventbot.filter.EventFilter;
-
 import java.net.URI;
+
+import won.bot.framework.eventbot.event.ConnectionSpecificEvent;
+import won.bot.framework.eventbot.event.Event;
+import won.bot.framework.eventbot.filter.EventFilter;
 
 /**
  * Abstract base class for filters that will only accept events (connection specific or connection specific) with the specified connection URI.

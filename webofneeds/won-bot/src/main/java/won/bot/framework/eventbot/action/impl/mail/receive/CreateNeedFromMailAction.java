@@ -1,8 +1,15 @@
 package won.bot.framework.eventbot.action.impl.mail.receive;
 
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
+
 import won.bot.framework.bot.context.MailBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
@@ -20,12 +27,6 @@ import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.DefaultNeedModelWrapper;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
-
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * Created by fsuda on 30.09.2016.

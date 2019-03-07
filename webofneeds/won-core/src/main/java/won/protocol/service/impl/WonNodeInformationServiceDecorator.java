@@ -16,10 +16,10 @@
 
 package won.protocol.service.impl;
 
+import java.net.URI;
+
 import won.protocol.service.WonNodeInfo;
 import won.protocol.service.WonNodeInformationService;
-
-import java.net.URI;
 
 /**
  * Base class for decorators of the WonNodeInformationService..

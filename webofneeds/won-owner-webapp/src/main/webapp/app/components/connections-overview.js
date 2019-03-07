@@ -13,7 +13,6 @@ import squareImageModule from "./square-image.js";
 import postHeaderModule from "./post-header.js";
 import connectionIndicatorsModule from "./connection-indicators.js";
 import connectionSelectionItemModule from "./connection-selection-item.js";
-import groupAdministrationSelectionItemModule from "./group-administration-selection-item.js";
 import suggestionSelectionItemModule from "./suggestion-selection-item.js";
 import createPostItemModule from "./create-post-item.js";
 
@@ -25,7 +24,6 @@ import "style/_connections-overview.scss";
 
 import {
   getRouterParams,
-  getGroupPostAdminUriFromRoute,
   getOwnedNeedByConnectionUri,
   getOwnedNeedsInCreation,
   getConnectionUriFromRoute,
@@ -92,7 +90,7 @@ function genComponentConf() {
                 </div>
             </div>
             <div class="co__item__connections"
-                ng-if="self.isOpen(needUri) && (self.hasGroupFacet(needUri) || self.hasOpenOrLoadingChatConnections(needUri, self.allNeeds, self.process))">
+                ng-if="self.isOpen(needUri) && self.hasOpenOrLoadingChatConnections(needUri, self.allNeeds, self.process)">
                 <div class="co__item__connections__item"
                   ng-if="self.hasChatFacet(needUri)"
                   ng-repeat="connUri in self.getOpenChatConnectionUrisArraySorted(needUri, self.allNeeds, self.process) track by connUri"
@@ -105,16 +103,6 @@ function genComponentConf() {
                       connection-uri="::connUri"
                       ng-class="{'won-unread': self.isConnectionUnread(needUri, connUri)}">
                   </won-connection-selection-item>
-                </div>
-                <div class="co__item__connections__item nonsticky" ng-if="self.hasGroupFacet(needUri)"
-                  ng-class="{
-                    'won-unread': self.hasUnreadGroupConnections(needUri),
-                    'selected': self.isShowingGroupAdministration(needUri),
-                  }">
-                  <won-group-administration-selection-item
-                      need-uri="::needUri"
-                      on-selected="self.selectGroupChat(needUri)">
-                  </won-group-administration-selection-item>
                 </div>
                 <div class="co__item__connections__item nonsticky" ng-if="self.hasChatFacet(needUri) && self.hasSuggestedConnections(needUri)"
                   ng-class="{
@@ -199,13 +187,9 @@ function genComponentConf() {
         const useCase = get(routerParams, "useCase");
         const useCaseGroup = get(routerParams, "useCaseGroup");
         const connUriInRoute = getConnectionUriFromRoute(state);
-        const groupPostAdminUriInRoute = getGroupPostAdminUriFromRoute(state);
         const needUriInRoute = getPostUriFromRoute(state);
         const needImpliedInRoute =
-          (connUriInRoute &&
-            getOwnedNeedByConnectionUri(state, connUriInRoute)) ||
-          (groupPostAdminUriInRoute &&
-            state.getIn(["needs", groupPostAdminUriInRoute]));
+          connUriInRoute && getOwnedNeedByConnectionUri(state, connUriInRoute);
         const needUriImpliedInRoute =
           needImpliedInRoute && needImpliedInRoute.get("uri");
 
@@ -228,7 +212,6 @@ function genComponentConf() {
           needUriInRoute,
           needUriImpliedInRoute,
           connUriInRoute,
-          groupPostAdminUriInRoute,
           beingCreatedNeedUris: beingCreatedNeeds && [
             ...beingCreatedNeeds.keys(),
           ],
@@ -305,7 +288,6 @@ function genComponentConf() {
             useCase: undefined,
             useCaseGroup: undefined,
             connectionUri: undefined,
-            groupPostAdminUri: undefined,
             fromNeedUri: undefined,
             mode: undefined,
           });
@@ -324,7 +306,6 @@ function genComponentConf() {
         useCase: undefined,
         useCaseGroup: undefined,
         connectionUri: undefined,
-        groupPostAdminUri: undefined,
         fromNeedUri: undefined,
         mode: undefined,
       });
@@ -335,11 +316,6 @@ function genComponentConf() {
       return needUtils.hasChatFacet(need);
     }
 
-    hasGroupFacet(needUri) {
-      const need = get(this.allNeeds, needUri);
-      return needUtils.hasGroupFacet(need);
-    }
-
     hasSuggestedConnections(needUri) {
       const need = get(this.allNeeds, needUri);
       return needUtils.hasSuggestedConnections(need);
@@ -348,16 +324,6 @@ function genComponentConf() {
     hasUnreadSuggestedConnections(needUri) {
       const need = get(this.allNeeds, needUri);
       return needUtils.hasUnreadSuggestedConnections(need);
-    }
-
-    hasUnreadGroupConnections(needUri) {
-      const need = get(this.allNeeds, needUri);
-      const connections = get(need, "connections");
-      return connections
-        ? connections.find(
-            conn => isGroupChatConnection(conn) && get(conn, "unread")
-          )
-        : false;
     }
 
     isUnread(needUri) {
@@ -409,13 +375,6 @@ function genComponentConf() {
       );
     }
 
-    isShowingGroupAdministration(ownedNeedUri) {
-      return (
-        !!this.open[ownedNeedUri] &&
-        ownedNeedUri === this.groupPostAdminUriInRoute
-      );
-    }
-
     isNeedLoading(needUri) {
       return this.process.getIn(["needs", needUri, "loading"]);
     }
@@ -429,9 +388,6 @@ function genComponentConf() {
     }
     selectNeed(needUri) {
       this.onSelectedNeed({ needUri }); //trigger callback with scope-object
-    }
-    selectGroupChat(needUri) {
-      this.onSelectedGroupChat({ needUri }); //trigger callback with scope-object
     }
     selectSuggested(needUri) {
       console.debug("stuff should happen now IMPL ME for: ", needUri);
@@ -530,7 +486,6 @@ function genComponentConf() {
        */
       onSelectedConnection: "&",
       onSelectedNeed: "&",
-      onSelectedGroupChat: "&",
     },
     template: template,
   };
@@ -540,7 +495,6 @@ export default angular
   .module("won.owner.components.connectionsOverview", [
     squareImageModule,
     connectionSelectionItemModule,
-    groupAdministrationSelectionItemModule,
     suggestionSelectionItemModule,
     postHeaderModule,
     connectionIndicatorsModule,

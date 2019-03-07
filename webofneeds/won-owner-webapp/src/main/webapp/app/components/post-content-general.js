@@ -23,7 +23,6 @@ import {
   getOwnedNeedByConnectionUri,
 } from "../selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";
-import ratingView from "./rating-view.js";
 
 import "style/_post-content-general.scss";
 import { getOwnedConnectionByUri } from "../selectors/connection-selectors.js";
@@ -34,17 +33,6 @@ function genComponentConf() {
       <div class="pcg__columns">
       <!-- LEFT COLUMN -->
         <div class="pcg__columns__left">
-          <!-- PERSONA -->
-          <div class="pcg__columns__left__item" ng-if="self.persona">
-            <div class="pcg__columns__left__item__label">
-              Persona
-            </div>
-            <div class="pcg__columns__left__item__value">
-              {{ self.persona.get('humanReadable') }}
-              <won-rating-view rating="self.rating()" rating-connection-uri="self.ratingConnectionUri"></won-rating-view>
-            </div>
-          </div>
-          <!-- RATING -->
           <div class="pcg__columns__left__item" ng-if="self.friendlyTimestamp">
             <div class="pcg__columns__left__item__label">
               Created
@@ -135,15 +123,10 @@ function genComponentConf() {
             : null;
 
         const post = this.postUri && getIn(state, ["needs", this.postUri]);
-        const persona = post && getIn(state, ["needs", get(post, "heldBy")]);
-        const personaHolds = get(persona, "holds");
-        const personaRating = get(persona, "rating");
-
         const viewState = get(state, "view");
 
         return {
           WON: won.WON,
-          post,
           fullTypesLabel: post && generateFullNeedTypesLabel(post),
           shortTypesLabel: post && generateShortNeedTypesLabel(post),
           matchingContext: post && generateNeedMatchingContext(post),
@@ -151,11 +134,6 @@ function genComponentConf() {
           shortFlags: post && generateShortNeedFlags(post),
           fullFacets: post && generateFullNeedFacets(post),
           shortFacets: post && generateShortNeedFacets(post),
-          persona:
-            personaHolds && personaHolds.includes(post.get("uri"))
-              ? persona
-              : undefined,
-          personaRating: personaRating,
           friendlyTimestamp:
             post &&
             relativeTime(
@@ -167,22 +145,6 @@ function genComponentConf() {
         };
       };
       connect2Redux(selectFromState, actionCreators, ["self.postUri"], this);
-    }
-
-    rating() {
-      // Return actuall rating!
-      /*
-      let sum = 0;
-      for (const char of this.persona.get("uri")) {
-        sum += char.charCodeAt(0);
-      }
-      return (sum % 5) + 1;
-      */
-      const rating = this.personaRating
-        ? this.personaRating.get("aggregateRating")
-        : 0;
-
-      return Math.round(rating);
     }
   }
 
@@ -200,5 +162,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.postContentGeneral", [ratingView])
+  .module("won.owner.components.postContentGeneral", [])
   .directive("wonPostContentGeneral", genComponentConf).name;

@@ -16,24 +16,33 @@
 
 package won.node.camel.processor.general;
 
-import org.apache.jena.query.Dataset;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import won.cryptography.rdfsign.SigningStage;
-import won.protocol.message.*;
-import won.protocol.message.processor.exception.WonMessageProcessingException;
-import won.protocol.message.processor.impl.WonMessageSignerVerifier;
-import won.protocol.model.DatasetHolder;
-import won.protocol.model.MessageEventPlaceholder;
-import won.protocol.repository.*;
-import won.protocol.vocabulary.WONMSG;
-
 import java.net.URI;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.apache.jena.query.Dataset;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import won.cryptography.rdfsign.SigningStage;
+import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageType;
+import won.protocol.message.WonMessageUtils;
+import won.protocol.message.WonSignatureData;
+import won.protocol.message.processor.exception.WonMessageProcessingException;
+import won.protocol.message.processor.impl.WonMessageSignerVerifier;
+import won.protocol.model.DatasetHolder;
+import won.protocol.model.MessageEventPlaceholder;
+import won.protocol.repository.ConnectionEventContainerRepository;
+import won.protocol.repository.ConnectionRepository;
+import won.protocol.repository.DatasetHolderRepository;
+import won.protocol.repository.MessageEventRepository;
+import won.protocol.repository.NeedEventContainerRepository;
+import won.protocol.repository.NeedRepository;
+import won.protocol.vocabulary.WONMSG;
 
 /**
  * Utility class containing code needed at multiple points for adding references to previous messages to a message.

@@ -1,14 +1,15 @@
 package won.matcher.protocol.impl;
 
+import java.net.URI;
+
 import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import won.matcher.protocol.MatcherProtocolMatcherService;
 import won.matcher.protocol.MatcherProtocolMatcherServiceCallback;
 import won.matcher.protocol.NopMatcherProtocolMatcherServiceCallback;
-
-import java.net.URI;
 
 /**
  * Created with IntelliJ IDEA.

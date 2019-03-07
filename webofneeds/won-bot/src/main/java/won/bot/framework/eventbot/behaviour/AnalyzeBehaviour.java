@@ -1,11 +1,23 @@
 package won.bot.framework.eventbot.behaviour;
 
+import java.io.StringWriter;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
+
 import won.bot.framework.bot.context.BotContext;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
@@ -13,13 +25,16 @@ import won.bot.framework.eventbot.action.impl.factory.model.Precondition;
 import won.bot.framework.eventbot.action.impl.factory.model.Proposal;
 import won.bot.framework.eventbot.action.impl.factory.model.ProposalState;
 import won.bot.framework.eventbot.bus.EventBus;
-import won.bot.framework.eventbot.event.*;
+import won.bot.framework.eventbot.event.ConnectionSpecificEvent;
+import won.bot.framework.eventbot.event.Event;
+import won.bot.framework.eventbot.event.MessageEvent;
+import won.bot.framework.eventbot.event.NeedSpecificEvent;
+import won.bot.framework.eventbot.event.RemoteNeedSpecificEvent;
 import won.bot.framework.eventbot.event.impl.analyzation.agreement.AgreementCancellationAcceptedEvent;
 import won.bot.framework.eventbot.event.impl.analyzation.agreement.ProposalAcceptedEvent;
 import won.bot.framework.eventbot.event.impl.analyzation.precondition.PreconditionMetEvent;
 import won.bot.framework.eventbot.event.impl.analyzation.precondition.PreconditionUnmetEvent;
 import won.bot.framework.eventbot.event.impl.analyzation.proposal.ProposalReceivedEvent;
-import won.bot.framework.eventbot.event.impl.command.connectionmessage.ConnectionMessageCommandEvent;
 import won.bot.framework.eventbot.event.impl.command.connectionmessage.ConnectionMessageCommandSuccessEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.MessageFromOtherNeedEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.OpenFromOtherNeedEvent;
@@ -31,19 +46,11 @@ import won.protocol.agreement.effect.MessageEffect;
 import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.util.NeedModelWrapper;
-import won.protocol.util.WonConversationUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 import won.utils.goals.GoalInstantiationProducer;
 import won.utils.goals.GoalInstantiationResult;
-
-import java.io.StringWriter;
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.*;
 
 public class AnalyzeBehaviour extends BotBehaviour {
     private final BotContext botContext;

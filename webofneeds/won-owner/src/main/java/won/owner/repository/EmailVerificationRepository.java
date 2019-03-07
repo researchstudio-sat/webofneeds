@@ -1,11 +1,11 @@
 package won.owner.repository;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
+
 import won.owner.model.EmailVerificationToken;
 import won.owner.model.User;
-import won.protocol.repository.WonRepository;
-
-import java.util.List;
 
 /**
  * Created by fsuda on 27.11.2018.

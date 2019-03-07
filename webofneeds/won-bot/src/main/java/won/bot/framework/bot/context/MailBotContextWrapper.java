@@ -1,12 +1,5 @@
 package won.bot.framework.bot.context;
 
-import won.bot.framework.eventbot.action.impl.mail.model.SubscribeStatus;
-import won.bot.framework.eventbot.action.impl.mail.model.WonURI;
-import won.bot.framework.eventbot.action.impl.mail.receive.MailContentExtractor;
-
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -15,6 +8,14 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
+
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.internet.MimeMessage;
+
+import won.bot.framework.eventbot.action.impl.mail.model.SubscribeStatus;
+import won.bot.framework.eventbot.action.impl.mail.model.WonURI;
+import won.bot.framework.eventbot.action.impl.mail.receive.MailContentExtractor;
 
 /**
  * Created by fsuda on 14.04.2017.

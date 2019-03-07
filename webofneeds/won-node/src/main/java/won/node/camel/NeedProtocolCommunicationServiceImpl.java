@@ -16,16 +16,21 @@
 
 package won.node.camel;
 
+import java.net.URI;
+
 import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import won.cryptography.service.RegistrationClient;
 import won.cryptography.service.RegistrationRestClientHttps;
 import won.protocol.exception.NoSuchConnectionException;
-import won.protocol.jms.*;
-
-import java.net.URI;
+import won.protocol.jms.ActiveMQService;
+import won.protocol.jms.CamelConfiguration;
+import won.protocol.jms.CamelConfigurator;
+import won.protocol.jms.NeedProtocolCamelConfigurator;
+import won.protocol.jms.NeedProtocolCommunicationService;
 
 /**
  * User: syim

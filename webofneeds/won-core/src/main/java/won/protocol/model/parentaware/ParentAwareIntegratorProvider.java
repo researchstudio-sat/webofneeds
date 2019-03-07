@@ -16,12 +16,12 @@
 
 package won.protocol.model.parentaware;
 
-import org.hibernate.integrator.spi.Integrator;
-import org.hibernate.jpa.boot.spi.IntegratorProvider;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import org.hibernate.integrator.spi.Integrator;
+import org.hibernate.jpa.boot.spi.IntegratorProvider;
 
 /**
  * Integrator provider preconfigured to return the ParentAwareEventListenerIntegrator.

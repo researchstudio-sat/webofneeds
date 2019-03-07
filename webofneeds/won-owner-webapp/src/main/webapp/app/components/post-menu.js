@@ -11,6 +11,7 @@ import * as needUtils from "../need-utils.js";
 import * as viewUtils from "../view-utils.js";
 import * as processUtils from "../process-utils.js";
 import * as connectionSelectors from "../selectors/connection-selectors.js";
+import * as connectionUtils from "../connection-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
@@ -36,7 +37,7 @@ function genComponentConf() {
               <span class="post-menu__item__rating" ng-if="self.personaAggregateRatingString">(★ {{ self.personaAggregateRatingString }})</span>
             </div>
             <div class="post-menu__item"
-              ng-if="self.hasGroupFacet"
+              ng-if="self.hasGroupFacet && !self.isOwned"
               ng-click="self.selectTab('PARTICIPANTS')"
               ng-class="{
                 'post-menu__item--selected': self.isSelectedTab('PARTICIPANTS'),
@@ -44,6 +45,17 @@ function genComponentConf() {
               }">
               <span class="post-menu__item__label">Group Members</span>
               <span class="post-menu__item__count">({{self.groupMembersSize}})</span>
+            </div>
+            <div class="post-menu__item"
+              ng-if="self.hasGroupFacet && self.isOwned"
+              ng-click="self.selectTab('PARTICIPANTS')"
+              ng-class="{
+                'post-menu__item--unread': self.hasUnreadGroupChatRequests,
+                'post-menu__item--selected': self.isSelectedTab('PARTICIPANTS'),
+              }">
+              <span class="post-menu__item__unread"></span>
+              <span class="post-menu__item__label">Group Members</span>
+              <span class="post-menu__item__count" ng-if="self.connectedGroupChatConnectionsSize">({{self.connectedGroupChatConnectionsSize}})</span>
             </div>
             <div class="post-menu__item"
               ng-if="self.isOwned && self.hasChatFacet"
@@ -106,6 +118,30 @@ function genComponentConf() {
           hasReviewFacet && getIn(post, ["rating", "reviewCount"]);
 
         const groupMembers = hasGroupFacet && get(post, "groupMembers");
+        const groupChatConnections =
+          isOwned &&
+          hasGroupFacet &&
+          connectionSelectors.getGroupChatConnectionsByNeedUri(
+            state,
+            this.postUri
+          );
+        const connectedGroupChatConnections =
+          groupChatConnections &&
+          groupChatConnections.filter(conn =>
+            connectionUtils.isConnected(conn)
+          );
+        const nonClosedNonConnectedGroupChatConnections =
+          groupChatConnections &&
+          groupChatConnections.filter(
+            conn =>
+              !(
+                connectionUtils.isConnected(conn) ||
+                connectionUtils.isClosed(conn)
+              )
+          );
+
+        //TODO: BLARGH GROUPCHATCONN FILTER
+
         const heldPosts = hasHolderFacet && get(post, "holds");
         const heldByUri =
           needUtils.hasHoldableFacet(post) && get(post, "heldBy");
@@ -148,6 +184,13 @@ function genComponentConf() {
           hasChatFacet: needUtils.hasChatFacet(post),
           hasGroupMembers: groupMembersSize > 0,
           groupMembersSize,
+          connectedGroupChatConnectionsSize:
+            connectedGroupChatConnections && connectedGroupChatConnections.size,
+          hasUnreadGroupChatRequests: nonClosedNonConnectedGroupChatConnections
+            ? nonClosedNonConnectedGroupChatConnections.filter(conn =>
+                get(conn, "unread")
+              ).size > 0
+            : false,
           hasSuggestions: suggestionsSize > 0,
           hasUnreadSuggestions:
             suggestionsSize > 0

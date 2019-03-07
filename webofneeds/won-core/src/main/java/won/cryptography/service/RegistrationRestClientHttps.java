@@ -1,18 +1,22 @@
 package won.cryptography.service;
 
+import java.io.IOException;
+import java.util.Arrays;
+
+import javax.annotation.PostConstruct;
+
 import org.apache.http.ssl.PrivateKeyStrategy;
 import org.apache.http.ssl.TrustStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.DependsOn;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 import won.cryptography.service.keystore.KeyStoreService;
-
-import javax.annotation.PostConstruct;
-import java.io.IOException;
-import java.util.Arrays;
 
 /**
  * User: ypanchenko

@@ -16,13 +16,17 @@
 
 package won.bot.framework.eventbot.action.impl.wonmessage.execCommand;
 
+import java.net.URI;
+
 import org.apache.jena.query.Dataset;
+
 import won.bot.framework.eventbot.EventListenerContext;
-import won.bot.framework.eventbot.event.impl.command.*;
+import won.bot.framework.eventbot.event.impl.command.MessageCommandFailureEvent;
+import won.bot.framework.eventbot.event.impl.command.MessageCommandNotSentEvent;
+import won.bot.framework.eventbot.event.impl.command.MessageCommandSuccessEvent;
 import won.bot.framework.eventbot.event.impl.command.connect.ConnectCommandEvent;
 import won.bot.framework.eventbot.event.impl.command.connect.ConnectCommandFailureEvent;
 import won.bot.framework.eventbot.event.impl.command.connect.ConnectCommandSuccessEvent;
-import won.bot.framework.eventbot.event.impl.command.connectionmessage.ConnectionMessageCommandFailureEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.SuccessResponseEvent;
 import won.protocol.exception.WonMessageBuilderException;
@@ -30,8 +34,6 @@ import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
-
-import java.net.URI;
 
 /**
  * Action executing a ConnectCommandEvent, connecting to the remoteNeed on behalf of the need.

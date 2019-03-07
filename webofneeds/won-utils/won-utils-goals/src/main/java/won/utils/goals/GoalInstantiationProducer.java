@@ -1,24 +1,24 @@
 package won.utils.goals;
 
-import org.apache.jena.query.*;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.function.Function;
+
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
 import org.topbraid.shacl.validation.ValidationUtil;
+
 import won.protocol.model.NeedGraphType;
 import won.protocol.util.NeedModelWrapper;
 import won.protocol.util.RdfUtils;
 import won.utils.shacl.ShaclReportWrapper;
-
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.function.Function;
 
 /**
  * Class supports in producing goal instantiations that can be used to create proposals for instance.

@@ -16,11 +16,11 @@
 
 package won.bot.framework.eventbot.listener.impl;
 
-import won.bot.framework.eventbot.event.Event;
+import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.EventBotAction;
+import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.filter.EventFilter;
 import won.bot.framework.eventbot.listener.AbstractHandleFirstNEventsListener;
-import won.bot.framework.eventbot.EventListenerContext;
 
 /**
  * User: fkleedorfer

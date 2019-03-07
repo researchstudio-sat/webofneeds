@@ -1,19 +1,20 @@
 package won.cryptography.webid;
 
-import org.apache.jena.query.Dataset;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.security.authentication.InternalAuthenticationServiceException;
-import org.springframework.security.core.AuthenticationException;
-import won.cryptography.rdfsign.WonKeysReaderWriter;
-import won.protocol.util.linkeddata.LinkedDataSource;
-
 import java.net.URI;
 import java.security.PublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
+import org.apache.jena.query.Dataset;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
+import org.springframework.security.core.AuthenticationException;
+
+import won.cryptography.rdfsign.WonKeysReaderWriter;
+import won.protocol.util.linkeddata.LinkedDataSource;
 
 /**
  * User: ypanchenko

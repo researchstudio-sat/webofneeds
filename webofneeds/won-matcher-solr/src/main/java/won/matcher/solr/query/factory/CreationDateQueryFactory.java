@@ -1,11 +1,12 @@
 package won.matcher.solr.query.factory;
 
-import org.apache.jena.query.Dataset;
-import won.protocol.util.NeedModelWrapper;
-
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalUnit;
+
+import org.apache.jena.query.Dataset;
+
+import won.protocol.util.NeedModelWrapper;
 
 /**
  * Created by hfriedrich on 18.08.2016.

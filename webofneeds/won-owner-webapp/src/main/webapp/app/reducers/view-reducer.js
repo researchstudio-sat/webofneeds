@@ -140,13 +140,6 @@ export default function(viewState = initialState, action = {}) {
         .setIn(["anonymousSlideIn", "linkCopied"], true)
         .setIn(["anonymousSlideIn", "linkSent"], false);
 
-    case actionTypes.needs.toggleGeneralInfo:
-      return viewState.updateIn(
-        ["needs", action.payload],
-        initialNeedState,
-        needState => needState.update("showGeneralInfo", show => !show)
-      );
-
     case actionTypes.needs.selectTab: {
       const needUri = action.payload.get("needUri");
       const selectTab = action.payload.get("selectTab");

@@ -16,10 +16,11 @@
 
 package won.monitoring.simon;
 
-import won.monitoring.AbstractRecorder;
 import org.javasimon.Simon;
 import org.javasimon.SimonManager;
 import org.javasimon.utils.SimonUtils;
+
+import won.monitoring.AbstractRecorder;
 
 /**
  * MonitoringStatisticsRecorder that prints the statistics via the logger with loglevel 'debug'.

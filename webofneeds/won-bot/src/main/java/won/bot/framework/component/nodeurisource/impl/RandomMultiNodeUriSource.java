@@ -16,15 +16,16 @@
 
 package won.bot.framework.component.nodeurisource.impl;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import won.bot.framework.component.nodeurisource.NodeURISource;
-
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import won.bot.framework.component.nodeurisource.NodeURISource;
 
 /**
  * User: fkleedorfer

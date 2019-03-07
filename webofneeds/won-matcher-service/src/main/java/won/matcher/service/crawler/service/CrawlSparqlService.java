@@ -1,21 +1,31 @@
 package won.matcher.service.crawler.service;
 
-import org.apache.jena.query.*;
+import java.io.StringWriter;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.ParameterizedSparqlString;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+
 import won.matcher.service.common.event.BulkNeedEvent;
 import won.matcher.service.common.event.NeedEvent;
 import won.matcher.service.common.service.sparql.SparqlService;
 import won.matcher.service.crawler.config.CrawlConfig;
 import won.matcher.service.crawler.msg.CrawlUriMessage;
 import won.protocol.util.NeedModelWrapper;
-
-import java.io.StringWriter;
-import java.util.*;
 
 /**
  * Sparql service extended with methods for crawling

@@ -1,8 +1,8 @@
 package won.matcher.service.crawler.msg;
 
-import org.apache.jena.riot.Lang;
-
 import java.util.Collection;
+
+import org.apache.jena.riot.Lang;
 
 /**
  * Created by hfriedrich on 14.10.2016.

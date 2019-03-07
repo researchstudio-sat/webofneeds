@@ -1,5 +1,15 @@
 package won.matcher.service.nodemanager.actor;
 
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
+import org.apache.jena.riot.Lang;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
 import akka.actor.ActorRef;
 import akka.actor.OneForOneStrategy;
 import akka.actor.SupervisorStrategy;
@@ -12,21 +22,11 @@ import akka.japi.Function;
 import scala.concurrent.duration.Duration;
 import won.matcher.service.common.event.HintEvent;
 import won.matcher.service.common.service.monitoring.MonitoringService;
-import org.apache.jena.riot.Lang;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageEncoder;
-import won.protocol.model.FacetType;
-
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 
 /**
  * Akka camel actor used to send out hints to won nodes
