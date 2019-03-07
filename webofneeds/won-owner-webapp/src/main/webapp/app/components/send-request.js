@@ -9,6 +9,7 @@ import { connect2Redux } from "../won-utils.js";
 import { attach, getIn } from "../utils.js";
 import * as needUtils from "../need-utils.js";
 import { actionCreators } from "../actions/actions.js";
+import { getUseCaseLabel, getUseCaseIcon } from "../usecase-utils.js";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 
@@ -31,6 +32,17 @@ function genComponentConf() {
                 ng-if="self.isInactive">
                 Need is inactive, no requests allowed
             </div>
+            <!-- Reaction Use Cases -->
+            <won-labelled-hr label="::'Or'" class="pm__footer__labelledhr"  ng-if="self.hasReactionUseCases"></won-labelled-hr>
+            <button class="won-button--filled red post-info__footer__button"
+                    ng-if="self.hasReactionUseCases"
+                    ng-repeat="ucIdentifier in self.reactionUseCasesArray"
+                    ng-click="self.selectReactionUseCase(ucIdentifier)">
+                    <svg class="won-button-icon" style="--local-primary:white;" ng-if="self.getUseCaseIcon(ucIdentifier)">
+                        <use xlink:href="{{ self.getUseCaseIcon(ucIdentifier) }}" href="{{ self.getUseCaseIcon(ucIdentifier) }}"></use>
+                    </svg>
+                    <span>{{ self.getUseCaseLabel(ucIdentifier) }}</span>
+            </button>
         </div>
     `;
 
@@ -42,10 +54,20 @@ function genComponentConf() {
         const postUriToConnectTo = getPostUriFromRoute(state);
         const displayedPost = state.getIn(["needs", postUriToConnectTo]);
 
+        const post = state.getIn(["needs", postUriToConnectTo]);
+        const reactionUseCases =
+          post &&
+          !needUtils.isOwned(post) &&
+          getIn(post, ["matchedUseCase", "reactionUseCases"]);
+        const hasReactionUseCases =
+          reactionUseCases && reactionUseCases.size > 0;
+
         return {
           displayedPost,
           postUriToConnectTo,
           isInactive: needUtils.isInactive(displayedPost),
+          hasReactionUseCases,
+          reactionUseCasesArray: reactionUseCases && reactionUseCases.toArray(),
           showRequestField:
             needUtils.isActive(displayedPost) &&
             (needUtils.hasChatFacet(displayedPost) ||
@@ -65,6 +87,18 @@ function genComponentConf() {
       classOnComponentRoot("won-is-loading", () => this.postLoading, this);
     }
 
+    selectReactionUseCase(ucIdentifier) {
+      this.router__stateGo("connections", {
+        useCase: ucIdentifier,
+        useCaseGroup: undefined,
+        postUri: undefined,
+        fromNeedUri: this.postUriToConnectTo,
+        viewNeedUri: undefined,
+        viewConnUri: undefined,
+        mode: "CONNECT",
+      });
+    }
+
     sendAdHocRequest(message, persona) {
       this.router__stateGoResetParams("connections");
 
@@ -75,6 +109,14 @@ function genComponentConf() {
           persona
         );
       }
+    }
+
+    getUseCaseIcon(ucIdentifier) {
+      return getUseCaseIcon(ucIdentifier);
+    }
+
+    getUseCaseLabel(ucIdentifier) {
+      return getUseCaseLabel(ucIdentifier);
     }
   }
   Controller.$inject = serviceDependencies;

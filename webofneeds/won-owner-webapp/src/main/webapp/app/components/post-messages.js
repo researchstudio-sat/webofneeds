@@ -15,6 +15,7 @@ import * as needUtils from "../need-utils.js";
 import * as processUtils from "../process-utils.js";
 import * as connectionUtils from "../connection-utils.js";
 import * as messageUtils from "../message-utils.js";
+import { getUseCaseIcon, getUseCaseLabel } from "../usecase-utils.js";
 import {
   fetchAgreementProtocolUris,
   fetchPetriNetUris,
@@ -34,7 +35,6 @@ import {
 } from "../selectors/message-selectors.js";
 import autoresizingTextareaModule from "../directives/textarea-autogrow.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
-
 import "style/_post-messages.scss";
 import "style/_rdflink.scss";
 
@@ -263,6 +263,17 @@ function genComponentConf() {
             <button class="pm__footer__button won-button--filled black" ng-click="self.closeConnection(true)">
                 Bad match - remove!
             </button>
+            <won-labelled-hr label="::'Or'" class="pm__footer__labelledhr"  ng-if="self.hasReactionUseCases"></won-labelled-hr>
+            <!-- Reaction Use Cases -->
+            <button class="pm__footer__button won-button--filled red"
+                    ng-if="self.hasReactionUseCases"
+                    ng-repeat="ucIdentifier in self.reactionUseCasesArray"
+                    ng-click="self.selectReactionUseCase(ucIdentifier)">
+                    <svg class="won-button-icon" style="--local-primary:white;" ng-if="self.getUseCaseIcon(ucIdentifier)">
+                        <use xlink:href="{{ self.getUseCaseIcon(ucIdentifier) }}" href="{{ self.getUseCaseIcon(ucIdentifier) }}"></use>
+                    </svg>
+                    <span>{{ self.getUseCaseLabel(ucIdentifier) }}</span>
+            </button>
         </div>
     `;
 
@@ -361,6 +372,12 @@ function genComponentConf() {
 
         const process = get(state, "process");
 
+        const reactionUseCases =
+          remoteNeed &&
+          getIn(remoteNeed, ["matchedUseCase", "reactionUseCases"]);
+        const hasReactionUseCases =
+          reactionUseCases && reactionUseCases.size > 0;
+
         return {
           ownedNeed,
           remoteNeed,
@@ -368,7 +385,8 @@ function genComponentConf() {
           selectedConnectionUri,
           connection,
           isOwnedNeedWhatsX,
-
+          hasReactionUseCases,
+          reactionUseCasesArray: reactionUseCases && reactionUseCases.toArray(),
           sortedMessageUris: sortedMessages && [
             ...sortedMessages.flatMap(msg => msg.get("uri")),
           ],
@@ -474,6 +492,14 @@ function genComponentConf() {
         () => this.connectionOrNeedsLoading,
         this
       );
+    }
+
+    getUseCaseIcon(ucIdentifier) {
+      return getUseCaseIcon(ucIdentifier);
+    }
+
+    getUseCaseLabel(ucIdentifier) {
+      return getUseCaseLabel(ucIdentifier);
     }
 
     ensureMessagesAreLoaded() {
@@ -883,6 +909,18 @@ function genComponentConf() {
       } else {
         this.router__stateGoCurrent({ connectionUri: null });
       }
+    }
+
+    selectReactionUseCase(ucIdentifier) {
+      this.router__stateGoCurrent({
+        useCase: ucIdentifier,
+        useCaseGroup: undefined,
+        postUri: undefined,
+        fromNeedUri: this.remoteNeedUri,
+        viewNeedUri: undefined,
+        viewConnUri: undefined,
+        mode: "CONNECT",
+      });
     }
 
     selectMessage(msgUri) {

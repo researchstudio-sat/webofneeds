@@ -70,7 +70,7 @@ function genComponentConf() {
 
           <!-- PERSONA INFORMATION -->
           <won-post-content-persona ng-if="self.isSelectedTab('HELDBY')" holds-uri="self.postUri"></won-post-content-persona>
-
+          
           <!-- PARTICIPANT INFORMATION -->
           <div class="post-content__members" ng-if="self.isSelectedTab('PARTICIPANTS')">
             <div

@@ -307,15 +307,22 @@ function genComponentConf() {
 
     publish(persona) {
       if (this.connectToNeedUri) {
-        console.debug(
+        console.log(
           "CONNECT TO ",
           this.connectToNeedUri,
-          " after Creation of this need"
+          " after Creation of this need - FU"
         );
         //TODO: IMPL CONNECT TO THIS NEED
-      }
-
-      if (!this.processingPublish) {
+        this.connections__connectReactionNeed(
+          this.connectToNeedUri,
+          this.draftObject,
+          persona
+        );
+        this.router__stateGoCurrent({
+          useCase: undefined,
+          connectionUri: undefined,
+        });
+      } else if (!this.processingPublish) {
         this.draftObject.useCase = get(this.useCase, "identifier");
 
         if (!isBranchContentPresent(this.draftObject.content, true)) {

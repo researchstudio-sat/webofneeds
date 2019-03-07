@@ -40,7 +40,8 @@ export function parseNeed(jsonldNeed, isOwned) {
         identifier: undefined,
         icon: undefined,
         iconBackground: undefined,
-        followUpOwner: undefined,
+        enabledUseCases: undefined,
+        reactionUseCases: undefined,
       },
       unread: false,
       isOwned: !!isOwned,
@@ -76,9 +77,15 @@ export function parseNeed(jsonldNeed, isOwned) {
             generateUseCaseIconBackground(jsonldNeedImm)
           )
           .setIn(
-            ["matchedUseCase", "followUpOwner"],
-            matchingUseCase.followUpOwner
-              ? Immutable.fromJS(matchingUseCase.followUpOwner)
+            ["matchedUseCase", "enabledUseCases"],
+            matchingUseCase.enabledUseCases
+              ? Immutable.fromJS(matchingUseCase.enabledUseCases)
+              : Immutable.List()
+          )
+          .setIn(
+            ["matchedUseCase", "reactionUseCases"],
+            matchingUseCase.reactionUseCases
+              ? Immutable.fromJS(matchingUseCase.reactionUseCases)
               : Immutable.List()
           );
       }
