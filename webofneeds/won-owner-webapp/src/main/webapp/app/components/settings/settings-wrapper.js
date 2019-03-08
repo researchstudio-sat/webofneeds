@@ -42,7 +42,7 @@ function genComponentConf($ngRedux) {
       const disconnect = $ngRedux.connect(state => {
         return {
           personas: getOwnedPersonas(state),
-          isVerified: getIn(state, ["account", "emailVerified"] || false),
+          isVerified: getIn(state, ["account", "emailVerified"]) || false,
         };
       })(state => {
         if (!state.personas) {
