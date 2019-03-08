@@ -131,6 +131,8 @@ function genComponentConf() {
         let isFromNeedToLoad = false;
         let hasFromNeedFailedToLoad = false;
 
+        const connectToNeedUri = mode === "CONNECT" && fromNeedUri;
+
         if (isCreateFromNeed) {
           isFromNeedLoading = processSelectors.isNeedLoading(
             state,
@@ -195,6 +197,7 @@ function genComponentConf() {
         }
 
         return {
+          connectToNeedUri,
           processingPublish: state.getIn(["process", "processingPublish"]),
           connectionHasBeenLost: !generalSelectors.selectIsConnected(state),
           useCaseString,
@@ -303,7 +306,23 @@ function genComponentConf() {
     }
 
     publish(persona) {
-      if (!this.processingPublish) {
+      if (this.connectToNeedUri) {
+        console.log(
+          "CONNECT TO ",
+          this.connectToNeedUri,
+          " after Creation of this need - FU"
+        );
+        //TODO: IMPL CONNECT TO THIS NEED
+        this.connections__connectReactionNeed(
+          this.connectToNeedUri,
+          this.draftObject,
+          persona
+        );
+        this.router__stateGoCurrent({
+          useCase: undefined,
+          connectionUri: undefined,
+        });
+      } else if (!this.processingPublish) {
         this.draftObject.useCase = get(this.useCase, "identifier");
 
         if (!isBranchContentPresent(this.draftObject.content, true)) {

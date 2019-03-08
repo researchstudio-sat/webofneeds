@@ -107,6 +107,7 @@ const actionHierarchy = {
   connections: {
     open: cnct.connectionsOpen,
     connectAdHoc: cnct.connectionsConnectAdHoc,
+    connectReactionNeed: cnct.connectionsConnectReactionNeed,
     close: cnct.connectionsClose,
     closeRemote: cnct.connectionsCloseRemote,
     rate: cnct.connectionsRate,

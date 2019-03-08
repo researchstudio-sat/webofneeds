@@ -22,6 +22,8 @@ export const goodsTransportSearch = {
       },
     }),
   },
+  enabledUseCases: undefined,
+  reactionUseCases: ["goodsTransportOffer"],
   details: {
     title: { ...details.title },
     content: {

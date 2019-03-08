@@ -24,6 +24,8 @@ export const cyclingInterest = {
       },
     }),
   },
+  enabledUseCases: ["cyclingPlan"],
+  reactionUseCases: ["cyclingPlan"],
   details: {
     title: { ...details.title },
     description: { ...details.description },

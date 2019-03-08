@@ -166,7 +166,9 @@ export const getModeFromRoute = createSelector(
     const mode = getIn(state, ["router", "currentParams", "mode"]);
 
     if (mode) {
-      if (mode === "EDIT") {
+      if (mode === "CONNECT") {
+        return "CONNECT";
+      } else if (mode === "EDIT") {
         return "EDIT";
       }
       return "DUPLICATE";

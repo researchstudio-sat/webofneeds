@@ -362,3 +362,13 @@ export function isHoldable(useCase) {
     )
   );
 }
+
+export function getUseCaseLabel(identifier) {
+  const useCase = getUseCase(identifier);
+  return useCase.label;
+}
+
+export function getUseCaseIcon(identifier) {
+  const useCase = getUseCase(identifier);
+  return useCase.icon;
+}

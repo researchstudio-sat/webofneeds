@@ -24,6 +24,8 @@ export const rideShareOffer = {
       },
     }),
   },
+  enabledUseCases: undefined,
+  reactionUseCases: ["personalTransportSearch"],
   details: {
     title: { ...details.title },
     description: { ...details.description },

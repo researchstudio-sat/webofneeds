@@ -20,6 +20,8 @@ export const personalTransportSearch = {
       },
     }),
   },
+  enabledUseCases: undefined,
+  reactionUseCases: ["taxiOffer", "rideShareOffer"],
   // TODO: amount of people? other details?
   details: {
     title: { ...details.title },
@@ -197,6 +199,7 @@ export const personalTransportSearch = {
       filter = {
         prefixes: {
           won: won.defaultContext["won"],
+          s: won.defaultContext["s"],
         },
         operations: [
           `${resultName} a won:Need.`,

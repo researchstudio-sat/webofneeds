@@ -8,13 +8,15 @@ import postContextDropdownModule from "./post-context-dropdown.js";
 import postContentModule from "./post-content.js";
 import postMenuModule from "./post-menu.js";
 import shareDropdownModule from "./share-dropdown.js";
-import { attach, get } from "../utils.js";
+import { attach, get, getIn } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import * as processUtils from "../process-utils.js";
 import * as needUtils from "../need-utils.js";
 import { getPostUriFromRoute } from "../selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
+
+import { getUseCaseLabel, getUseCaseIcon } from "../usecase-utils.js";
 
 import "style/_post-info.scss";
 
@@ -58,6 +60,25 @@ function genComponentConf() {
         <won-post-content post-uri="self.postUri"></won-post-content>
         <div class="post-info__footer" ng-if="self.showFooter">
             <button class="won-button--filled red post-info__footer__button"
+                ng-if="self.hasReactionUseCases"
+                ng-repeat="ucIdentifier in self.reactionUseCasesArray"
+                ng-click="self.router__stateGoCurrent({useCase: ucIdentifier, useCaseGroup: undefined, postUri: undefined, fromNeedUri: self.postUri, mode: 'CONNECT'})">
+                <svg class="won-button-icon" style="--local-primary:white;" ng-if="self.getUseCaseIcon(ucIdentifier)">
+                    <use xlink:href="{{ self.getUseCaseIcon(ucIdentifier) }}" href="{{ self.getUseCaseIcon(ucIdentifier) }}"></use>
+                </svg>
+                <span>{{ self.getUseCaseLabel(ucIdentifier) }}</span>
+            </button>
+            <won-labelled-hr label="::'Or'" class="pm__footer__labelledhr"  ng-if="self.hasEnabledUseCases"></won-labelled-hr>
+            <button class="won-button--filled red post-info__footer__button" style="margin: 0rem 0rem .3rem 0rem;
+                    ng-if="self.hasEnabledUseCases"
+                    ng-repeat="ucIdentifier in self.enabledUseCasesArray"
+                    ng-click="self.router__stateGoCurrent({useCase: ucIdentifier, useCaseGroup: undefined, postUri: undefined, fromNeedUri: self.postUri, mode: 'CONNECT'})">
+                    <svg class="won-button-icon" style="--local-primary:white;" ng-if="self.getUseCaseIcon(ucIdentifier)">
+                        <use xlink:href="{{ self.getUseCaseIcon(ucIdentifier) }}" href="{{ self.getUseCaseIcon(ucIdentifier) }}"></use>
+                    </svg>
+                    <span>{{ self.getUseCaseLabel(ucIdentifier) }}</span>
+            </button>
+            <button class="won-button--filled red post-info__footer__button" style="margin: 0rem 0rem .3rem 0rem;
                 ng-if="self.showCreateWhatsAround"
                 ng-click="self.createWhatsAround()"
                 ng-disabled="self.processingPublish">
@@ -93,17 +114,35 @@ function genComponentConf() {
         const showCreateWhatsAround =
           post && needUtils.isOwned(post) && needUtils.isWhatsNewNeed(post);
 
+        const reactionUseCases =
+          post &&
+          !needUtils.isOwned(post) &&
+          getIn(post, ["matchedUseCase", "reactionUseCases"]);
+        const hasReactionUseCases =
+          reactionUseCases && reactionUseCases.size > 0;
+
+        const enabledUseCases =
+          post &&
+          needUtils.isOwned(post) &&
+          getIn(post, ["matchedUseCase", "enabledUseCases"]);
+        const hasEnabledUseCases = enabledUseCases && enabledUseCases.size > 0;
         return {
           processingPublish: state.getIn(["process", "processingPublish"]),
           postUri,
           post,
           postLoading,
           postFailedToLoad,
+          hasReactionUseCases,
+          reactionUseCasesArray: reactionUseCases && reactionUseCases.toArray(),
+          hasEnabledUseCases,
+          enabledUseCasesArray: enabledUseCases && enabledUseCases.toArray(),
           createdTimestamp: post && post.get("creationDate"),
           showOverlayNeed: !!this.needUri,
           showCreateWhatsAround,
           showFooter:
-            !postLoading && !postFailedToLoad && showCreateWhatsAround,
+            !postLoading &&
+            !postFailedToLoad &&
+            (showCreateWhatsAround || hasReactionUseCases),
         };
       };
       connect2Redux(
@@ -120,6 +159,14 @@ function genComponentConf() {
       if (!this.processingPublish) {
         this.needs__whatsAround();
       }
+    }
+
+    getUseCaseIcon(ucIdentifier) {
+      return getUseCaseIcon(ucIdentifier);
+    }
+
+    getUseCaseLabel(ucIdentifier) {
+      return getUseCaseLabel(ucIdentifier);
     }
   }
 

@@ -298,6 +298,134 @@ export function connectionsOpen(connectionUri, textMessage) {
   };
 }
 
+export function connectionsConnectReactionNeed(
+  connectToNeedUri,
+  needDraft,
+  persona
+) {
+  return (dispatch, getState) =>
+    connectReactionNeed(
+      connectToNeedUri,
+      needDraft,
+      persona,
+      dispatch,
+      getState
+    ); // moved to separate function to make transpilation work properly
+}
+function connectReactionNeed(
+  connectToNeedUri,
+  needDraft,
+  persona,
+  dispatch,
+  getState
+) {
+  ensureLoggedIn(dispatch, getState).then(async () => {
+    const state = getState();
+    const connectoToNeed = getIn(state, ["needs", connectToNeedUri]);
+    const nodeUri = getIn(state, ["config", "defaultNodeUri"]);
+
+    //add flags
+    needDraft.content.flags
+      ? needDraft.content.flags.push(
+          "won:NoHintForCounterpart",
+          "won:NoHintForMe"
+        )
+      : (needDraft.content.flags = [
+          "won:NoHintForCounterpart",
+          "won:NoHintForMe",
+        ]);
+
+    // create new need
+    const { message, eventUri, needUri } = await buildCreateMessage(
+      needDraft,
+      nodeUri
+    );
+
+    // add persona
+    if (persona) {
+      const response = await fetch("rest/action/connect", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify([
+          {
+            pending: false,
+            //facet: `${persona}#holderFacet`,
+            facet: getIn(state, ["needs", persona, "content", "facets"]).keyOf(
+              "won:HolderFacet"
+            ),
+          },
+          {
+            pending: true,
+            facet: `${needUri}#holdableFacet`,
+            // FIXME: does not work as new need is not in state yet
+            //facet: getIn(state, ["needs", needUri, "content", "facets"]).keyOf(
+            //  "won:HoldableFacet"
+            //),
+          },
+        ]),
+        credentials: "include",
+      });
+      if (!response.ok) {
+        const errorMsg = await response.text();
+        throw new Error(`Could not connect identity: ${errorMsg}`);
+      }
+    }
+
+    // establish connection
+    const cnctMsg = buildConnectMessage({
+      ownedNeedUri: needUri,
+      theirNeedUri: connectToNeedUri,
+      ownNodeUri: nodeUri,
+      theirNodeUri: connectoToNeed.get("nodeUri"),
+      connectMessage: "",
+    });
+
+    won.wonMessageFromJsonLd(cnctMsg.message).then(optimisticEvent => {
+      // connect action to be dispatched when the
+      // ad hoc need has been created:
+      const connectAction = {
+        type: actionTypes.needs.connect,
+        payload: {
+          eventUri: cnctMsg.eventUri,
+          message: cnctMsg.message,
+          optimisticEvent: optimisticEvent,
+        },
+      };
+
+      // register the connect action to be dispatched when
+      // need creation is successful
+      dispatch({
+        type: actionTypes.messages.dispatchActionOn.registerSuccessOwn,
+        payload: {
+          eventUri: eventUri,
+          actionToDispatch: connectAction,
+        },
+      });
+
+      // create the new need
+      dispatch({
+        type: actionTypes.needs.create, // TODO custom action
+        payload: { eventUri, message, needUri, need: needDraft },
+      });
+
+      dispatch(
+        actionCreators.router__stateGo("connections", {
+          useCase: undefined,
+          useCaseGroup: undefined,
+          postUri: needUri,
+          needUri: undefined,
+          fromNeedUri: undefined,
+          viewNeedUri: undefined,
+          viewConnUri: undefined,
+          mode: undefined,
+        })
+      );
+    });
+  });
+}
+
 export function connectionsConnectAdHoc(theirNeedUri, textMessage, persona) {
   return (dispatch, getState) =>
     connectAdHoc(theirNeedUri, textMessage, persona, dispatch, getState); // moved to separate function to make transpilation work properly
