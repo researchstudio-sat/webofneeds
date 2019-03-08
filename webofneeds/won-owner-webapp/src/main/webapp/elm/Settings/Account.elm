@@ -1,7 +1,8 @@
-module Settings.Account exposing
+port module Settings.Account exposing
     ( Model
     , Msg
     , init
+    , subscriptions
     , update
     , view
     )
@@ -17,6 +18,7 @@ import Old.Skin as Skin exposing (Skin)
 
 type alias Model =
     { exportState : ExportState
+    , isVerified : Bool
     }
 
 
@@ -37,7 +39,11 @@ type ExportState
 
 init : () -> ( Model, Cmd Msg )
 init () =
-    ( { exportState = EnteringPassword "" }, Cmd.none )
+    ( { exportState = EnteringPassword ""
+      , isVerified = False
+      }
+    , Cmd.none
+    )
 
 
 
@@ -48,6 +54,7 @@ type Msg
     = ExportPasswordChanged String
     | ExportButtonPressed
     | ExportRequestReturned (Result Http.Error ())
+    | VerificationStatusChanged Bool
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -74,6 +81,13 @@ update msg model =
                       }
                     , Cmd.none
                     )
+
+        VerificationStatusChanged newStatus ->
+            ( { model
+                | isVerified = newStatus
+              }
+            , Cmd.none
+            )
 
 
 startExport : Model -> ( Model, Cmd Msg )
@@ -120,8 +134,8 @@ updateExportPassword password model =
 ---- VIEW ----
 
 
-view : Skin -> Model -> Element Msg
-view skin model =
+exportView : Skin -> Model -> Element Msg
+exportView skin model =
     case model.exportState of
         EnteringPassword password ->
             column
@@ -129,8 +143,7 @@ view skin model =
                 , spacing 20
                 , Font.size 16
                 ]
-                [ el [ Font.size 24 ] <| text "Account data export"
-                , textColumn
+                [ textColumn
                     [ width fill
                     , spacing 10
                     ]
@@ -203,3 +216,32 @@ view skin model =
                 ]
             <|
                 text "Export failed. Please try again later"
+
+
+view : Skin -> Model -> Element Msg
+view skin model =
+    column
+        [ width fill
+        , spacing 20
+        , Font.size 16
+        ]
+        [ el [ Font.size 24 ] <| text "Account data export"
+        , if model.isVerified then
+            exportView skin model
+
+          else
+            paragraph [ width fill ]
+                [ text "You need an account with a verified email address to export your data" ]
+        ]
+
+
+
+-- SUBSCRIPTIONS
+
+
+port isVerified : (Bool -> msg) -> Sub msg
+
+
+subscriptions : Sub Msg
+subscriptions =
+    isVerified VerificationStatusChanged

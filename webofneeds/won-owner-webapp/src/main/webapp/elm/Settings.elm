@@ -302,7 +302,8 @@ subSubscriptions page =
                 |> Sub.map PersonasMsg
 
         Account _ ->
-            Sub.none
+            Account.subscriptions
+                |> Sub.map AccountMsg
 
 
 subscriptions : Model -> Sub Msg
