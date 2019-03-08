@@ -118,7 +118,7 @@ jsonldSet decoder =
 
 types : Decoder (Set String)
 types =
-    Decode.field "@type" <| jsonldSet Decode.string
+    Decode.at [ "jsonld", "@type" ] <| jsonldSet Decode.string
 
 
 type alias Persona =
@@ -130,10 +130,14 @@ type alias Persona =
 
 personaDecoder : Decoder Persona
 personaDecoder =
-    Decode.succeed Persona
-        |> DP.required "s:name" NonEmpty.stringDecoder
-        |> DP.optional "s:description" (Decode.map Just NonEmpty.stringDecoder) Nothing
-        |> DP.optional "s:url" (Decode.map Just NonEmpty.stringDecoder) Nothing
+    let
+        internalDecoder =
+            Decode.succeed Persona
+                |> DP.required "s:name" NonEmpty.stringDecoder
+                |> DP.optional "s:description" (Decode.map Just NonEmpty.stringDecoder) Nothing
+                |> DP.optional "s:url" (Decode.map Just NonEmpty.stringDecoder) Nothing
+    in
+    Decode.field "jsonld" internalDecoder
 
 
 dateDecoder : Decoder Time.Posix
@@ -168,13 +172,13 @@ otherDecoder =
             { holder = holder
             }
         )
-        |> DP.optionalAt [ "won:heldBy", "@id" ] (Decode.map Just urlDecoder) Nothing
+        |> DP.optional "heldBy" (Decode.map Just urlDecoder) Nothing
 
 
 needDecoder : Decoder NeedData
 needDecoder =
     Decode.succeed NeedData
-        |> DP.required "jsonld"
+        |> DP.custom
             (Decode.oneOf
                 [ Decode.when types (Set.member "won:Persona") personaDecoder
                     |> Decode.map PersonaNeed
