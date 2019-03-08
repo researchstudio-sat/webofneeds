@@ -265,10 +265,20 @@ function genComponentConf() {
             </button>
             <won-labelled-hr label="::'Or'" class="pm__footer__labelledhr"  ng-if="self.hasReactionUseCases"></won-labelled-hr>
             <!-- Reaction Use Cases -->
-            <button class="pm__footer__button won-button--filled red"
+            <button class="pm__footer__button won-button--filled red" style="margin: 0rem 0rem .3rem 0rem;
                     ng-if="self.hasReactionUseCases"
                     ng-repeat="ucIdentifier in self.reactionUseCasesArray"
-                    ng-click="self.selectReactionUseCase(ucIdentifier)">
+                    ng-click="self.selectUseCase(ucIdentifier)">
+                    <svg class="won-button-icon" style="--local-primary:white;" ng-if="self.getUseCaseIcon(ucIdentifier)">
+                        <use xlink:href="{{ self.getUseCaseIcon(ucIdentifier) }}" href="{{ self.getUseCaseIcon(ucIdentifier) }}"></use>
+                    </svg>
+                    <span>{{ self.getUseCaseLabel(ucIdentifier) }}</span>
+            </button>
+            <won-labelled-hr label="::'Or'" class="pm__footer__labelledhr"  ng-if="self.hasEnabledUseCases"></won-labelled-hr>
+            <button class="pm__footer__button won-button--filled red" style="margin: 0rem 0rem .3rem 0rem;
+                    ng-if="self.hasEnabledUseCases"
+                    ng-repeat="ucIdentifier in self.enabledUseCasesArray"
+                    ng-click="self.selectUseCase(ucIdentifier)">
                     <svg class="won-button-icon" style="--local-primary:white;" ng-if="self.getUseCaseIcon(ucIdentifier)">
                         <use xlink:href="{{ self.getUseCaseIcon(ucIdentifier) }}" href="{{ self.getUseCaseIcon(ucIdentifier) }}"></use>
                     </svg>
@@ -374,9 +384,16 @@ function genComponentConf() {
 
         const reactionUseCases =
           remoteNeed &&
+          !needUtils.isOwned(remoteNeed) &&
           getIn(remoteNeed, ["matchedUseCase", "reactionUseCases"]);
         const hasReactionUseCases =
           reactionUseCases && reactionUseCases.size > 0;
+
+        const enabledUseCases =
+          remoteNeed &&
+          needUtils.isOwned(remoteNeed) &&
+          getIn(remoteNeed, ["matchedUseCase", "enabledUseCases"]);
+        const hasEnabledUseCases = enabledUseCases && enabledUseCases.size > 0;
 
         return {
           ownedNeed,
@@ -387,6 +404,8 @@ function genComponentConf() {
           isOwnedNeedWhatsX,
           hasReactionUseCases,
           reactionUseCasesArray: reactionUseCases && reactionUseCases.toArray(),
+          hasEnabledUseCases,
+          enabledUseCasesArray: enabledUseCases && enabledUseCases.toArray(),
           sortedMessageUris: sortedMessages && [
             ...sortedMessages.flatMap(msg => msg.get("uri")),
           ],
@@ -911,7 +930,7 @@ function genComponentConf() {
       }
     }
 
-    selectReactionUseCase(ucIdentifier) {
+    selectUseCase(ucIdentifier) {
       this.router__stateGoCurrent({
         useCase: ucIdentifier,
         useCaseGroup: undefined,

@@ -34,10 +34,21 @@ function genComponentConf() {
             </div>
             <!-- Reaction Use Cases -->
             <won-labelled-hr label="::'Or'" class="pm__footer__labelledhr"  ng-if="self.hasReactionUseCases"></won-labelled-hr>
-            <button class="won-button--filled red post-info__footer__button"
+            <button class="won-button--filled red post-info__footer__button" style="margin: 0rem 0rem .3rem 0rem;
                     ng-if="self.hasReactionUseCases"
                     ng-repeat="ucIdentifier in self.reactionUseCasesArray"
-                    ng-click="self.selectReactionUseCase(ucIdentifier)">
+                    ng-click="self.selectUseCase(ucIdentifier)">
+                    <svg class="won-button-icon" style="--local-primary:white;" ng-if="self.getUseCaseIcon(ucIdentifier)">
+                        <use xlink:href="{{ self.getUseCaseIcon(ucIdentifier) }}" href="{{ self.getUseCaseIcon(ucIdentifier) }}"></use>
+                    </svg>
+                    <span>{{ self.getUseCaseLabel(ucIdentifier) }}</span>
+            </button>
+            <!-- Enabled Use Cases -->
+            <won-labelled-hr label="::'Or'" class="pm__footer__labelledhr"  ng-if="self.hasEnabledUseCases"></won-labelled-hr>
+            <button class="won-button--filled red post-info__footer__button" style="margin: 0rem 0rem .3rem 0rem;"
+                    ng-if="self.hasEnabledUseCases"
+                    ng-repeat="ucIdentifier in self.enabledUseCasesArray"
+                    ng-click="self.selectUseCase(ucIdentifier)">
                     <svg class="won-button-icon" style="--local-primary:white;" ng-if="self.getUseCaseIcon(ucIdentifier)">
                         <use xlink:href="{{ self.getUseCaseIcon(ucIdentifier) }}" href="{{ self.getUseCaseIcon(ucIdentifier) }}"></use>
                     </svg>
@@ -62,12 +73,20 @@ function genComponentConf() {
         const hasReactionUseCases =
           reactionUseCases && reactionUseCases.size > 0;
 
+        const enabledUseCases =
+          post &&
+          needUtils.isOwned(post) &&
+          getIn(post, ["matchedUseCase", "enabledUseCases"]);
+        const hasEnabledUseCases = enabledUseCases && enabledUseCases.size > 0;
+
         return {
           displayedPost,
           postUriToConnectTo,
           isInactive: needUtils.isInactive(displayedPost),
           hasReactionUseCases,
           reactionUseCasesArray: reactionUseCases && reactionUseCases.toArray(),
+          hasEnabledUseCases,
+          enabledUseCasesArray: enabledUseCases && enabledUseCases.toArray(),
           showRequestField:
             needUtils.isActive(displayedPost) &&
             (needUtils.hasChatFacet(displayedPost) ||
@@ -87,7 +106,7 @@ function genComponentConf() {
       classOnComponentRoot("won-is-loading", () => this.postLoading, this);
     }
 
-    selectReactionUseCase(ucIdentifier) {
+    selectUseCase(ucIdentifier) {
       this.router__stateGo("connections", {
         useCase: ucIdentifier,
         useCaseGroup: undefined,

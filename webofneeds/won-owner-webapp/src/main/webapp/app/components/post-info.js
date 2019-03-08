@@ -68,7 +68,17 @@ function genComponentConf() {
                 </svg>
                 <span>{{ self.getUseCaseLabel(ucIdentifier) }}</span>
             </button>
-            <button class="won-button--filled red post-info__footer__button"
+            <won-labelled-hr label="::'Or'" class="pm__footer__labelledhr"  ng-if="self.hasEnabledUseCases"></won-labelled-hr>
+            <button class="won-button--filled red post-info__footer__button" style="margin: 0rem 0rem .3rem 0rem;
+                    ng-if="self.hasEnabledUseCases"
+                    ng-repeat="ucIdentifier in self.enabledUseCasesArray"
+                    ng-click="self.router__stateGoCurrent({useCase: ucIdentifier, useCaseGroup: undefined, postUri: undefined, fromNeedUri: self.postUri, mode: 'CONNECT'})">
+                    <svg class="won-button-icon" style="--local-primary:white;" ng-if="self.getUseCaseIcon(ucIdentifier)">
+                        <use xlink:href="{{ self.getUseCaseIcon(ucIdentifier) }}" href="{{ self.getUseCaseIcon(ucIdentifier) }}"></use>
+                    </svg>
+                    <span>{{ self.getUseCaseLabel(ucIdentifier) }}</span>
+            </button>
+            <button class="won-button--filled red post-info__footer__button" style="margin: 0rem 0rem .3rem 0rem;
                 ng-if="self.showCreateWhatsAround"
                 ng-click="self.createWhatsAround()"
                 ng-disabled="self.processingPublish">
@@ -105,10 +115,17 @@ function genComponentConf() {
           post && needUtils.isOwned(post) && needUtils.isWhatsNewNeed(post);
 
         const reactionUseCases =
-          post && getIn(post, ["matchedUseCase", "reactionUseCases"]);
+          post &&
+          !needUtils.isOwned(post) &&
+          getIn(post, ["matchedUseCase", "reactionUseCases"]);
         const hasReactionUseCases =
           reactionUseCases && reactionUseCases.size > 0;
 
+        const enabledUseCases =
+          post &&
+          needUtils.isOwned(post) &&
+          getIn(post, ["matchedUseCase", "enabledUseCases"]);
+        const hasEnabledUseCases = enabledUseCases && enabledUseCases.size > 0;
         return {
           processingPublish: state.getIn(["process", "processingPublish"]),
           postUri,
@@ -117,6 +134,8 @@ function genComponentConf() {
           postFailedToLoad,
           hasReactionUseCases,
           reactionUseCasesArray: reactionUseCases && reactionUseCases.toArray(),
+          hasEnabledUseCases,
+          enabledUseCasesArray: enabledUseCases && enabledUseCases.toArray(),
           createdTimestamp: post && post.get("creationDate"),
           showOverlayNeed: !!this.needUri,
           showCreateWhatsAround,

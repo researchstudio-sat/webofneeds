@@ -17,7 +17,7 @@ export const taxiOffer = {
       content: { title: "Taxi", type: ["s:TaxiService"] },
     }),
   },
-  enabledUseCases: ["personalTransportSearch"],
+  enabledUseCases: undefined,
   reactionUseCases: ["personalTransportSearch"],
   details: {
     title: { ...details.title },

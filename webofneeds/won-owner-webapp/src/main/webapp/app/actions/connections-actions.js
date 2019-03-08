@@ -324,6 +324,17 @@ function connectReactionNeed(
     const connectoToNeed = getIn(state, ["needs", connectToNeedUri]);
     const nodeUri = getIn(state, ["config", "defaultNodeUri"]);
 
+    //add flags
+    needDraft.content.flags
+      ? needDraft.content.flags.push(
+          "won:NoHintForCounterpart",
+          "won:NoHintForMe"
+        )
+      : (needDraft.content.flags = [
+          "won:NoHintForCounterpart",
+          "won:NoHintForMe",
+        ]);
+
     // create new need
     const { message, eventUri, needUri } = await buildCreateMessage(
       needDraft,
