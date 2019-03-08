@@ -17,6 +17,8 @@ import ratingView from "./rating-view.js";
 import squareImageModule from "./square-image.js";
 import descriptionDetailViewerModule from "./details/viewer/description-viewer.js";
 import { details } from "../../config/detail-definitions.js";
+import { Elm } from "../../elm/EditNeed.elm";
+import elmModule from "./elm.js";
 
 import "style/_post-content-persona.scss";
 import { getOwnedConnectionByUri } from "../selectors/connection-selectors.js";
@@ -51,12 +53,15 @@ function genComponentConf() {
         <button class="pcp__holds__view won-button--filled red" ng-click="self.viewPersonaPosts()">View</button>
       </div>
       <won-description-viewer detail="::self.descriptionDetail" content="self.personaDescription" ng-if="self.descriptionDetail && self.personaDescription"></won-description-viewer>
+      <won-elm module="self.editNeedModule" ng-if="self.postIsOwned" attributes="self.post.get('uri')"></won-elm>
     `;
 
   class Controller {
     constructor() {
       attach(this, serviceDependencies, arguments);
       window.pcp4dbg = this;
+
+      this.editNeedModule = Elm.EditNeed;
 
       const selectFromState = state => {
         const connectionUri = getConnectionUriFromRoute(state);
@@ -88,6 +93,7 @@ function genComponentConf() {
         return {
           post,
           personaUri,
+          postIsOwned: needUtils.isOwned(post),
           personaLoading:
             !persona || processUtils.isNeedLoading(process, personaUri),
           personaFailedToLoad:
@@ -151,5 +157,6 @@ export default angular
     ratingView,
     squareImageModule,
     descriptionDetailViewerModule,
+    elmModule,
   ])
   .directive("wonPostContentPersona", genComponentConf).name;
