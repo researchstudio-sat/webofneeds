@@ -923,25 +923,19 @@ public class LinkedDataWebController {
 				// filtering for clients that do
 				// not support paging
 				rdfDataset = linkedDataService.listConnectionEventURIs(connectionUri, deep);
-			} else if (page == null && beforeId == null && afterId == null) {
-				// client supports paging but didn't specify which page to return - return page
-				// with latest events
+			} else if (beforeId == null && afterId == null) {
+				//if page == null -> return page with latest events
 				NeedInformationService.PagedResource<Dataset, URI> resource = linkedDataService
-						.listConnectionEventURIs(connectionUri, 1, preferedSize, msgType, deep); // TODO: does not
+						.listConnectionEventURIs(connectionUri, page != null? page : 1, preferedSize, msgType, deep); // TODO: does not
 																									// respect
 																									// preferredSize if
 																									// deep is used
 				rdfDataset = resource.getContent();
-				addPagedResourceInSequenceHeader(headers, connectionEventsURI, resource, passableMap);
-
-			} else if (page != null) {
-				// a page having particular page number is requested
-
-				NeedInformationService.PagedResource<Dataset, URI> resource = linkedDataService
-						.listConnectionEventURIs(connectionUri, page, preferedSize, msgType, deep);
-				rdfDataset = resource.getContent();
-				addPagedResourceInSequenceHeader(headers, connectionEventsURI, resource, page, passableMap);
-
+                if (page == null) {
+                    addPagedResourceInSequenceHeader(headers, connectionEventsURI, resource, passableMap);
+                } else {
+                    addPagedResourceInSequenceHeader(headers, connectionEventsURI, resource, page, passableMap);
+                }
 			} else if (beforeId != null) {
 				// a page that precedes the item identified by the beforeId is requested
 
