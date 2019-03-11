@@ -152,6 +152,16 @@ public interface NeedInformationService {
     public Collection<URI> listConnectionURIs(URI needURI) throws NoSuchNeedException;
 
     /**
+     * Retrieves all connections (regardless of state) for the specified local need URI.
+     *
+     * @param needURI the URI of the need
+     * @return a collection of connections.
+     * @throws won.protocol.exception.NoSuchNeedException
+     *          if needURI is not a known need URI
+     */
+    public Collection<Connection> listConnections(URI needURI) throws NoSuchNeedException;
+
+    /**
      * Retrieves slice of the list of connection URIs for the specified local need URI.
      *
      * @param needURI the URI of the need
