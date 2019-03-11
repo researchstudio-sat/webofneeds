@@ -500,15 +500,15 @@ public class LinkedDataServiceImpl implements LinkedDataService {
         URI connectionsUri = this.uriService.createConnectionsURIForNeed(needURI);
         NeedInformationService.PagedResource<Dataset, URI> containerPage = toContainerPage(connectionsUri.toString(), new
                 SliceImpl<URI>(uris));
-        // TODO: IMPL THIS: NeedInformationService.PagedResource<Dataset, Connection> containerPage = toContainerPage(connectionsUri.toString(), new
-        // SliceImpl<Connection>(connections));
+        NeedInformationService.PagedResource<Dataset, Connection> connectionsContainerPage = toConnectionsContainerPage(connectionsUri.toString(), new
+                SliceImpl<Connection>(connections));
         if (deep) {
-            addDeepConnectionData(containerPage.getContent(), uris);
+            addDeepConnectionData(connectionsContainerPage.getContent(), uris);
         }
         if (addMetadata) {
-            addConnectionMetadata(containerPage.getContent(), needURI, connectionsUri);
+            addConnectionMetadata(connectionsContainerPage.getContent(), needURI, connectionsUri);
         }
-        return containerPage.getContent();
+        return connectionsContainerPage.getContent();
     }
 
     @Override
@@ -824,6 +824,41 @@ public class LinkedDataServiceImpl implements LinkedDataService {
         addBaseUriAndDefaultPrefixes(dataset);
         NeedInformationService.PagedResource<Dataset, URI> containerPage = new NeedInformationService.PagedResource
                 (dataset, resumeBefore, resumeAfter);
+        return containerPage;
+    }
+
+    private NeedInformationService.PagedResource<Dataset, Connection> toConnectionsContainerPage(String containerUri, Slice<Connection> slice) {
+
+        List<Connection> connections = slice.getContent();
+        Connection resumeBefore = null;
+        Connection resumeAfter = null;
+        if (slice.getSort() != null && !connections.isEmpty()) {
+            Iterator<Sort.Order> sortOrders = slice.getSort().iterator();
+            if (sortOrders.hasNext()) {
+                Sort.Order sortOrder = sortOrders.next();
+                if (sortOrder.getDirection() == Sort.Direction.ASC) {
+                    resumeBefore = connections.get(0);
+                    resumeAfter = connections.get(connections.size() - 1);
+                } else {
+                    resumeBefore = connections.get(connections.size() - 1);
+                    resumeAfter = connections.get(0);
+                }
+            }
+        }
+
+        Model model = ModelFactory.createDefaultModel();
+        setNsPrefixes(model);
+        Resource needListPageResource = null;
+
+        needListPageResource = model.createResource(containerUri);
+
+        for (Connection conn : connections) {
+            model.add(model.createStatement(needListPageResource, RDFS.member, model.createResource(conn.getConnectionURI().toString())));
+            model.add(connectionModelMapper.toModel(conn));
+        }
+        Dataset dataset = newDatasetWithNamedModel(createDataGraphUriFromResource(needListPageResource), model);
+        addBaseUriAndDefaultPrefixes(dataset);
+        NeedInformationService.PagedResource<Dataset, Connection> containerPage = new NeedInformationService.PagedResource(dataset, resumeBefore, resumeAfter);
         return containerPage;
     }
 
