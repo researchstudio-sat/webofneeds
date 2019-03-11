@@ -600,6 +600,18 @@ public class LinkedDataServiceImpl implements LinkedDataService
       }
       containerResource.addProperty(countProperty, Integer.toString(count.intValue()), XSDDatatype.XSDint);
     }
+
+    List<Object[]> connectionUrisWithState = needRepository.getConnectionUrisAndState(needURI);
+    for (Object[] connUriWithState : connectionUrisWithState) {
+        ConnectionState stateName = (ConnectionState) connUriWithState[0];
+        URI connectionUri = (URI) connUriWithState[1];
+        Property stateUrisProperty = getRdfPropertyForStateUris(stateName);
+        if (stateUrisProperty == null) {
+            logger.warn("did not recognize connection state " + stateName);
+            continue;
+        }
+        containerResource.addProperty(stateUrisProperty, connectionUri.toString(), XSDDatatype.XSDID);
+    }
   }
 
   private Property getRdfPropertyForState(ConnectionState state) {
@@ -609,6 +621,19 @@ public class LinkedDataServiceImpl implements LinkedDataService
       case REQUEST_SENT: return WON.HAS_REQUEST_SENT_COUNT;
       case CONNECTED: return WON.HAS_CONNECTED_COUNT;
       case CLOSED: return WON.HAS_CLOSED_COUNT;
+      case DELETED: return WON.HAS_DELETED_COUNT;
+    }
+    return null;
+  }
+
+  private Property getRdfPropertyForStateUris(ConnectionState state) {
+    switch (state){
+      case SUGGESTED: return WON.SUGGESTED;
+      case REQUEST_RECEIVED: return WON.REQUEST_RECEIVED;
+      case REQUEST_SENT: return WON.REQUEST_SENT;
+      case CONNECTED: return WON.CONNECTED;
+      case CLOSED: return WON.CLOSED;
+      case DELETED: return WON.DELETED;
     }
     return null;
   }
