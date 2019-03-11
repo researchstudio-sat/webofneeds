@@ -184,13 +184,6 @@ public class WON {
     public static final Property HAS_DELETED_COUNT = m.createProperty(BASE_URI,
             "hasDeletedCount");
 
-    public static final Property SUGGESTED = m.createProperty(BASE_URI, "suggested");
-    public static final Property REQUEST_RECEIVED = m.createProperty(BASE_URI, "requestReceived");
-    public static final Property REQUEST_SENT = m.createProperty(BASE_URI, "requestSent");
-    public static final Property CONNECTED = m.createProperty(BASE_URI, "connected");
-    public static final Property CLOSED = m.createProperty(BASE_URI, "closed");
-    public static final Property DELETED = m.createProperty(BASE_URI, "deleted");
-    
     //adds a flag to a need
     public static final Property HAS_FLAG = m.createProperty(BASE_URI + "hasFlag");
 
