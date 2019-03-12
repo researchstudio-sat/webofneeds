@@ -425,18 +425,16 @@ public class RestUserController {
             value = "/exportAccount",
             method = RequestMethod.POST
     )
-    public ResponseEntity exportAccount(@RequestParam(name = "email", required = false) String responseEmail, @RequestParam(name="keyStorePassword", required = false) String keyStorePassword) {
+    public ResponseEntity exportAccount(@RequestParam(name="keyStorePassword", required = false) String keyStorePassword) {
 
         SecurityContext securityContext = SecurityContextHolder.getContext();
         User authUser = ((KeystoreEnabledUserDetails) securityContext.getAuthentication().getPrincipal()).getUser();
         User user = userService.getByUsername(authUser.getUsername());
-
-        if(responseEmail == null) {
-            if(user.isAnonymous()) {
-                return generateStatusResponse(RestStatusResponse.EXPORT_IS_ANONYMOUS);
-            } else {
-                responseEmail = user.getEmail();
-            }
+        String responseEmail = null;
+        if(user.isEmailVerified()) {
+            responseEmail = user.getEmail();
+        } else {
+            return generateStatusResponse(RestStatusResponse.EXPORT_NOT_VERIFIED);
         }
 
         eventPublisher.publishEvent(new OnExportUserEvent(securityContext.getAuthentication(), keyStorePassword, responseEmail));

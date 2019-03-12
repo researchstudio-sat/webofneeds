@@ -6,6 +6,7 @@ import {
   getOwnedPersonas,
   currentSkin,
 } from "../../selectors/general-selectors.js";
+import { getIn } from "../../utils";
 
 function genComponentConf($ngRedux) {
   return {
@@ -33,18 +34,27 @@ function genComponentConf($ngRedux) {
         }
       });
 
+      elmApp.ports.getVerified.subscribe(() => {
+        const isVerified =
+          getIn($ngRedux.getState(), ["account", "emailVerified"]) || false;
+        elmApp.ports.isVerified.send(isVerified);
+      });
+
       const personas = getOwnedPersonas($ngRedux.getState());
       if (personas) {
         elmApp.ports.personaIn.send(personas.toJS());
       }
 
       const disconnect = $ngRedux.connect(state => {
-        return { personas: getOwnedPersonas(state) };
+        return {
+          personas: getOwnedPersonas(state),
+          isVerified: getIn(state, ["account", "emailVerified"]) || false,
+        };
       })(state => {
-        if (!state.personas) {
-          return;
+        if (state.personas) {
+          elmApp.ports.personaIn.send(state.personas.toJS());
         }
-        elmApp.ports.personaIn.send(state.personas.toJS());
+        elmApp.ports.isVerified.send(state.isVerified);
       });
 
       const disconnectSkin = $ngRedux.connect(state => {
@@ -57,6 +67,7 @@ function genComponentConf($ngRedux) {
 
       scope.$on("$destroy", () => {
         elmApp.ports.personaOut.unsubscribe();
+        elmApp.ports.getVerified.unsubscribe();
         disconnectSkin();
         disconnect();
       });

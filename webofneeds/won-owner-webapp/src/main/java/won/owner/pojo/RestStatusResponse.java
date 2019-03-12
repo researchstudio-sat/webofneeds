@@ -36,7 +36,7 @@ public enum RestStatusResponse {
     TOS_ACCEPT_SUCCESS(6200, "Successfully accepted Terms Of Service", HttpStatus.OK),
 
     EXPORT_SUCCESS(7200, "Successfully started exporting user", HttpStatus.OK),
-    EXPORT_IS_ANONYMOUS(7403, "To export with an anonymous user you need to provide an email address", HttpStatus.BAD_REQUEST);
+    EXPORT_NOT_VERIFIED(7403, "You need a verified account to export your data", HttpStatus.BAD_REQUEST);
 
     private final int code;
     private final String message;
