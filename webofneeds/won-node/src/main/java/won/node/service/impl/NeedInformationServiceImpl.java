@@ -235,7 +235,6 @@ public class NeedInformationServiceImpl implements NeedInformationService {
     }
 
     @Override
-    @Deprecated
     public Slice<Connection> listConnections(final URI needURI, int page, Integer preferedPageSize, WonMessageType
             messageType, Date timeSpot) {
         Slice<Connection> slice = null;
@@ -286,6 +285,29 @@ public class NeedInformationServiceImpl implements NeedInformationService {
     }
 
     @Override
+    public Slice<Connection> listConnectionsBefore(final URI needURI, final URI resumeConnURI, final Integer preferredPageSize,
+                                          WonMessageType messageType, final Date timeSpot) {
+        Date resume;
+        int pageSize = getPageSize(preferredPageSize);
+        Slice<Connection> slice;
+        if (messageType == null) {
+            resume = messageEventRepository.findMaxActivityDateOfParentAtTime(resumeConnURI, timeSpot);
+
+            // use 'min(msg.creationDate)' to keep a constant connection order over requests
+            slice = connectionRepository.getConnectionsBeforeByActivityDate(
+                    needURI, resume, timeSpot, new PageRequest(0, pageSize, Sort.Direction.DESC, "min(msg.creationDate)"));
+        } else {
+            resume = messageEventRepository.findMaxActivityDateOfParentAtTime(resumeConnURI, messageType, timeSpot);
+
+            // use 'min(msg.creationDate)' to keep a constant connection order over requests
+            slice = connectionRepository.getConnectionsBeforeByActivityDate(
+                    needURI, resume, messageType, timeSpot, new PageRequest(
+                            0, pageSize, Sort.Direction.DESC, "min(msg.creationDate)"));
+        }
+        return slice;
+    }
+
+    @Override
     @Deprecated
     public Slice listConnectionURIsAfter(final URI needURI, final URI resumeConnURI, final Integer preferredPageSize,
                                          final WonMessageType messageType, final Date timeSpot) {
@@ -304,6 +326,29 @@ public class NeedInformationServiceImpl implements NeedInformationService {
 
             // use 'min(msg.creationDate)' to keep a constant connection order over requests
             slice = connectionRepository.getConnectionURIsAfterByActivityDate(
+                    needURI, resume, messageType, timeSpot, new PageRequest(
+                            0, pageSize, Sort.Direction.ASC, "min(msg.creationDate)"));
+        }
+        return slice;
+    }
+
+    @Override
+    public Slice<Connection> listConnectionsAfter(final URI needURI, final URI resumeConnURI, final Integer preferredPageSize,
+                                         final WonMessageType messageType, final Date timeSpot) {
+        Date resume;
+        int pageSize = getPageSize(preferredPageSize);
+        Slice<Connection> slice;
+        if (messageType == null) {
+            resume = messageEventRepository.findMaxActivityDateOfParentAtTime(resumeConnURI, timeSpot);
+
+            // use 'min(msg.creationDate)' to keep a constant connection order over requests
+            slice = connectionRepository.getConnectionsAfterByActivityDate(
+                    needURI, resume, timeSpot, new PageRequest(0, pageSize, Sort.Direction.ASC, "min(msg.creationDate)"));
+        } else {
+            resume = messageEventRepository.findMaxActivityDateOfParentAtTime(resumeConnURI, messageType, timeSpot);
+
+            // use 'min(msg.creationDate)' to keep a constant connection order over requests
+            slice = connectionRepository.getConnectionsAfterByActivityDate(
                     needURI, resume, messageType, timeSpot, new PageRequest(
                             0, pageSize, Sort.Direction.ASC, "min(msg.creationDate)"));
         }

@@ -209,6 +209,21 @@ public interface NeedInformationService {
       URI needURI, URI resumeConnURI, Integer preferredPageSize, WonMessageType messageType, Date timeSpot);
 
     /**
+     * Retrieves slice of the connections  for the specified local need URI that precede the given connection URI
+     * from the point of view of their latest events.
+     *
+     * @param resumeConnURI the returned slice connections precede (in time of their latest events) this connection uri
+     * @param preferredPageSize preferred number of members per page or null; null => use default
+     * @param messageType event type that should be used for defining connection latest activity; null => all event
+     *                    types
+     * @param timeSpot time at which we want the list state to be fixed, cannot be null
+     *
+     * @return a slice of connection URIs.
+     */
+    public Slice listConnectionsBefore(
+            URI needURI, URI resumeConnURI, Integer preferredPageSize, WonMessageType messageType, Date timeSpot);
+
+    /**
      * Retrieves slice of the connection URIs that follows the given connection URI from the point of view of their
      * latest events.
      *
@@ -220,8 +235,23 @@ public interface NeedInformationService {
      *
      * @return a slice of connection URIs.
      */
-    public Slice  listConnectionURIsAfter(
+    public Slice listConnectionURIsAfter(
       URI needURI, URI resumeConnURI, Integer preferredPageSize, WonMessageType messageType, Date timeSpot);
+
+    /**
+     * Retrieves slice of the connections that follows the given connection URI from the point of view of their
+     * latest events.
+     *
+     * @param resumeConnURI the returned slice connections follow (in time of their latest events) this connection uri
+     * @param preferredPageSize preferred number of members per page or null; null => use default
+     * @param messageType event type that should be used for defining connection latest activity; null => all event
+     *                    types
+     * @param timeSpot time at which we want the list state to be fixed, cannot be null
+     *
+     * @return a slice of connection URIs.
+     */
+    public Slice  listConnectionsAfter(
+            URI needURI, URI resumeConnURI, Integer preferredPageSize, WonMessageType messageType, Date timeSpot);
 
     /**
      * Read general information about the need.
