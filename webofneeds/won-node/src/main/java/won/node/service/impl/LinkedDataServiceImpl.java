@@ -421,19 +421,6 @@ public class LinkedDataServiceImpl implements LinkedDataService {
 
     @Override
     @Transactional
-    public Dataset listConnectionURIs(final boolean deep) throws NoSuchConnectionException {
-        List<URI> uris = new ArrayList<>(needInformationService.listConnectionURIs());
-        NeedInformationService.PagedResource<Dataset, URI> containerPage = toContainerPage(
-                this.connectionResourceURIPrefix + "/", new SliceImpl<>(uris));
-        if (deep) {
-            addDeepConnectionData(containerPage.getContent(), uris);
-        }
-
-        return containerPage.getContent();
-    }
-
-    @Override
-    @Transactional
     public NeedInformationService.PagedResource<Dataset, Connection> listConnections(final boolean deep) throws NoSuchConnectionException {
         List<Connection> connections = new ArrayList<>(needInformationService.listConnections());
         NeedInformationService.PagedResource<Dataset, Connection> connectionsContainerPage = toConnectionsContainerPage(
@@ -451,19 +438,6 @@ public class LinkedDataServiceImpl implements LinkedDataService {
 
     @Override
     @Transactional
-    public Dataset listModifiedConnectionURIsAfter(Date modifiedAfter, boolean deep) throws NoSuchConnectionException {
-        List<URI> uris = new ArrayList<>(needInformationService.listModifiedConnectionURIsAfter(modifiedAfter));
-        NeedInformationService.PagedResource<Dataset, URI> containerPage = toContainerPage(
-                this.connectionResourceURIPrefix + "/", new SliceImpl<>(uris));
-        if (deep) {
-            addDeepConnectionData(containerPage.getContent(), uris);
-        }
-
-        return containerPage.getContent();
-    }
-
-    @Override
-    @Transactional
     public NeedInformationService.PagedResource<Dataset, Connection> listModifiedConnectionsAfter(Date modifiedAfter, boolean deep) throws NoSuchConnectionException {
         List<Connection> connections = new ArrayList<>(needInformationService.listModifiedConnectionsAfter(modifiedAfter));
         NeedInformationService.PagedResource<Dataset, Connection> connectionsContainerPage = toConnectionsContainerPage(
@@ -477,19 +451,6 @@ public class LinkedDataServiceImpl implements LinkedDataService {
         }
 
         return connectionsContainerPage;
-    }
-
-    @Override
-    @Transactional
-    public NeedInformationService.PagedResource<Dataset, URI> listConnectionURIs(final int page, final Integer
-            preferredSize, Date timeSpot, final boolean deep) throws NoSuchConnectionException {
-        Slice<URI> slice = needInformationService.listConnectionURIs(page, preferredSize, timeSpot);
-        NeedInformationService.PagedResource<Dataset, URI> containerPage = toContainerPage(
-                this.connectionResourceURIPrefix + "/", slice);
-        if (deep) {
-            addDeepConnectionData(containerPage.getContent(), slice.getContent());
-        }
-        return containerPage;
     }
 
     @Override
@@ -512,18 +473,6 @@ public class LinkedDataServiceImpl implements LinkedDataService {
 
     @Override
     @Transactional
-    public NeedInformationService.PagedResource<Dataset, URI> listConnectionURIsBefore(
-            URI beforeConnURI, final Integer preferredSize, Date timeSpot, boolean deep) throws NoSuchConnectionException {
-        Slice<URI> slice = needInformationService.listConnectionURIsBefore(beforeConnURI, preferredSize, timeSpot);
-        NeedInformationService.PagedResource<Dataset, URI> containerPage = toContainerPage(this.connectionResourceURIPrefix + "/", slice);
-        if (deep) {
-            addDeepConnectionData(containerPage.getContent(), slice.getContent());
-        }
-        return containerPage;
-    }
-
-    @Override
-    @Transactional
     public NeedInformationService.PagedResource<Dataset, Connection> listConnectionsBefore(
             URI beforeConnURI, final Integer preferredSize, Date timeSpot, boolean deep) throws NoSuchConnectionException {
         Slice<Connection> slice = needInformationService.listConnectionsBefore(beforeConnURI, preferredSize, timeSpot);
@@ -537,19 +486,6 @@ public class LinkedDataServiceImpl implements LinkedDataService {
             addDeepConnectionData(connectionsContainerPage.getContent(), uris);
         }
         return connectionsContainerPage;
-    }
-
-    @Override
-    @Transactional
-    public NeedInformationService.PagedResource<Dataset, URI> listConnectionURIsAfter(
-            URI afterConnURI, final Integer preferredSize, Date timeSpot, boolean deep) throws NoSuchConnectionException {
-        Slice<URI> slice = needInformationService.listConnectionURIsAfter(afterConnURI, preferredSize, timeSpot);
-        NeedInformationService.PagedResource<Dataset, URI> containerPage = toContainerPage(
-                this.connectionResourceURIPrefix + "/", slice);
-        if (deep) {
-            addDeepConnectionData(containerPage.getContent(), slice.getContent());
-        }
-        return containerPage;
     }
 
     @Override
@@ -618,44 +554,6 @@ public class LinkedDataServiceImpl implements LinkedDataService {
 
     @Override
     @Transactional
-    public NeedInformationService.PagedResource<Dataset, URI> listConnectionURIs(
-            final int page, final URI needURI, final Integer preferredSize, final WonMessageType messageType, final Date
-            timeSpot, boolean deep, boolean addMetadata)
-            throws NoSuchNeedException, NoSuchConnectionException {
-        Slice<URI> slice = needInformationService.listConnectionURIs(needURI, page, preferredSize, messageType, timeSpot);
-        URI connectionsUri = this.uriService.createConnectionsURIForNeed(needURI);
-        NeedInformationService.PagedResource<Dataset, URI> containerPage = toContainerPage(connectionsUri.toString(), slice);
-
-        if (deep) {
-            addDeepConnectionData(containerPage.getContent(), slice.getContent());
-        }
-        if (addMetadata) {
-            addConnectionMetadata(containerPage.getContent(), needURI, connectionsUri);
-        }
-        return containerPage;
-    }
-
-    @Override
-    @Transactional
-    public NeedInformationService.PagedResource<Dataset, URI> listConnectionURIsBefore(final URI needURI, URI
-            beforeEventURI, final Integer preferredSize, final WonMessageType messageType, final Date timeSpot, boolean deep,
-                                                                                       boolean addMetadata)
-            throws NoSuchNeedException, NoSuchConnectionException {
-        Slice<URI> slice = needInformationService.listConnectionURIsBefore(
-                needURI, beforeEventURI, preferredSize, messageType, timeSpot);
-        URI connectionsUri = this.uriService.createConnectionsURIForNeed(needURI);
-        NeedInformationService.PagedResource<Dataset, URI> containerPage = toContainerPage(connectionsUri.toString(), slice);
-        if (deep) {
-            addDeepConnectionData(containerPage.getContent(), slice.getContent());
-        }
-        if (addMetadata) {
-            addConnectionMetadata(containerPage.getContent(), needURI, connectionsUri);
-        }
-        return containerPage;
-    }
-
-    @Override
-    @Transactional
     public NeedInformationService.PagedResource<Dataset, Connection> listConnectionsBefore(final URI needURI, URI
             beforeEventURI, final Integer preferredSize, final WonMessageType messageType, final Date timeSpot, boolean deep,
                                                                                        boolean addMetadata)
@@ -676,26 +574,6 @@ public class LinkedDataServiceImpl implements LinkedDataService {
             addConnectionMetadata(connectionsContainerPage.getContent(), needURI, connectionsUri);
         }
         return connectionsContainerPage;
-    }
-
-    @Override
-    @Transactional
-    public NeedInformationService.PagedResource<Dataset, URI> listConnectionURIsAfter(final URI needURI, URI
-            resumeConnURI, final Integer preferredSize, final WonMessageType messageType, final Date timeSpot, boolean deep,
-                                                                                      boolean addMetadata)
-            throws NoSuchNeedException, NoSuchConnectionException {
-        Slice<URI> slice = needInformationService.listConnectionURIsAfter(
-                needURI, resumeConnURI, preferredSize, messageType, timeSpot);
-        URI connectionsUri = this.uriService.createConnectionsURIForNeed(needURI);
-        NeedInformationService.PagedResource<Dataset, URI> containerPage = toContainerPage(
-                connectionsUri.toString(), slice);
-        if (deep) {
-            addDeepConnectionData(containerPage.getContent(), slice.getContent());
-        }
-        if (addMetadata) {
-            addConnectionMetadata(containerPage.getContent(), needURI, connectionsUri);
-        }
-        return containerPage;
     }
 
     @Override
@@ -755,13 +633,6 @@ public class LinkedDataServiceImpl implements LinkedDataService {
                 return WON.HAS_DELETED_COUNT;
         }
         return null;
-    }
-
-    @Override
-    @Transactional
-    public Dataset listConnectionEventURIs(final URI connectionUri) throws
-            NoSuchConnectionException {
-        return listConnectionEventURIs(connectionUri, false);
     }
 
     @Override
