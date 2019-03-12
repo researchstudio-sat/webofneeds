@@ -17,6 +17,7 @@ module Element.Styled exposing
     , getElement
     , height
     , html
+    , htmlAttribute
     , layout
     , layoutWith
     , modular
@@ -289,6 +290,11 @@ none =
 html : Html msg -> Element msg
 html elem =
     Element <| \_ -> Element.html elem
+
+
+htmlAttribute : Html.Attribute msg -> Attribute msg
+htmlAttribute attr =
+    pureAttr <| Element.htmlAttribute attr
 
 
 moveDown : Float -> Attribute msg
