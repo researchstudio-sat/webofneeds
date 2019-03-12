@@ -424,16 +424,14 @@ public class LinkedDataWebController {
                         .listConnections(page, needURI, null, eventsType, dateParam.getDate(), deep, true)
                         .getContent();
             } else if (beforeId != null) {
-                //TODO: Change to include ConnectionData
                 URI connURI = uriService.createConnectionURIForId(beforeId);
                 rdfDataset = linkedDataService
-                        .listConnectionURIsBefore(needURI, connURI, null, eventsType, dateParam.getDate(), deep, true)
+                        .listConnectionsBefore(needURI, connURI, null, eventsType, dateParam.getDate(), deep, true)
                         .getContent();
             } else if (afterId != null) {
-                //TODO: Change to include ConnectionData
                 URI connURI = uriService.createConnectionURIForId(afterId);
                 rdfDataset = linkedDataService
-                        .listConnectionURIsAfter(needURI, connURI, null, eventsType, dateParam.getDate(), deep, true)
+                        .listConnectionsAfter(needURI, connURI, null, eventsType, dateParam.getDate(), deep, true)
                         .getContent();
             } else {
                 // all the connections of the need; does not support type and date filtering for
@@ -444,10 +442,8 @@ public class LinkedDataWebController {
                         .getContent();
             }
             model.addAttribute("rdfDataset", rdfDataset);
-            model.addAttribute("resourceURI",
-                    uriService.toResourceURIIfPossible(URI.create(request.getRequestURI())).toString());
-            model.addAttribute("dataURI",
-                    uriService.toDataURIIfPossible(URI.create(request.getRequestURI())).toString());
+            model.addAttribute("resourceURI", uriService.toResourceURIIfPossible(URI.create(request.getRequestURI())).toString());
+            model.addAttribute("dataURI", uriService.toDataURIIfPossible(URI.create(request.getRequestURI())).toString());
             return "rdfDatasetView";
         } catch (ParseException e) {
             model.addAttribute("error", "could not parse timestamp parameter");
@@ -811,8 +807,8 @@ public class LinkedDataWebController {
     public ResponseEntity<org.apache.jena.rdf.model.Model> readUnreadInformationGet(
             @PathVariable(value = "identifier") String identifier,
             @RequestParam(value = "lastSeenMessageUris", required = false) List<URI> lastSeenMessageUris) {
-		/*
-		 * information we want: need-level: unread count, date of first unread, date of
+        /*
+         * information we want: need-level: unread count, date of first unread, date of
 		 * last unread per connection: connection uri, unread count, date of first
 		 * unread, date of last unread
 		 */
@@ -1127,39 +1123,35 @@ public class LinkedDataWebController {
                         .getContent();
                 // if no page or resume parameter is specified, display the latest connections:
             } else if (page == null && beforeId == null && afterId == null) {
-                //TODO: Change to include ConnectionData
-                NeedInformationService.PagedResource<Dataset, URI> resource = linkedDataService.listConnectionURIs(1,
+                NeedInformationService.PagedResource<Dataset, Connection> resource = linkedDataService.listConnections(1,
                         needUri, preferedSize, eventsType, dateParam.getDate(), deep, true);
                 rdfDataset = resource.getContent();
-                addPagedResourceInSequenceHeader(headers, connectionsURI, resource, passableQuery);
+                addPagedConnectionResourceInSequenceHeader(headers, connectionsURI, resource, passableQuery);
             } else if (page != null) {
-                //TODO: Change to include ConnectionData
-                NeedInformationService.PagedResource<Dataset, URI> resource = linkedDataService.listConnectionURIs(page,
+                NeedInformationService.PagedResource<Dataset, Connection> resource = linkedDataService.listConnections(page,
                         needUri, preferedSize, eventsType, dateParam.getDate(), deep, true);
                 rdfDataset = resource.getContent();
-                addPagedResourceInSequenceHeader(headers, connectionsURI, resource, page, passableQuery);
+                addPagedConnectionResourceInSequenceHeader(headers, connectionsURI, resource, page, passableQuery);
             } else {
                 // resume before parameter specified - display the connections with activities
                 // before the specified event id:
                 if (beforeId != null) {
-                    //TODO: Change to include ConnectionData
                     URI resumeConnURI = uriService.createConnectionURIForId(beforeId);
-                    NeedInformationService.PagedResource<Dataset, URI> resource = linkedDataService
-                            .listConnectionURIsBefore(needUri, resumeConnURI, preferedSize, eventsType,
+                    NeedInformationService.PagedResource<Dataset, Connection> resource = linkedDataService
+                            .listConnectionsBefore(needUri, resumeConnURI, preferedSize, eventsType,
                                     dateParam.getDate(), deep, true);
                     rdfDataset = resource.getContent();
-                    addPagedResourceInSequenceHeader(headers, connectionsURI, resource, passableQuery);
+                    addPagedConnectionResourceInSequenceHeader(headers, connectionsURI, resource, passableQuery);
 
                     // resume after parameter specified - display the connections with activities
                     // after the specified event id:
                 } else { // if (afterId != null)
-                    //TODO: Change to include ConnectionData
                     URI resumeConnURI = uriService.createConnectionURIForId(afterId);
-                    NeedInformationService.PagedResource<Dataset, URI> resource = linkedDataService
-                            .listConnectionURIsAfter(needUri, resumeConnURI, preferedSize, eventsType,
+                    NeedInformationService.PagedResource<Dataset, Connection> resource = linkedDataService
+                            .listConnectionsAfter(needUri, resumeConnURI, preferedSize, eventsType,
                                     dateParam.getDate(), deep, true);
                     rdfDataset = resource.getContent();
-                    addPagedResourceInSequenceHeader(headers, connectionsURI, resource, passableQuery);
+                    addPagedConnectionResourceInSequenceHeader(headers, connectionsURI, resource, passableQuery);
                 }
             }
 
@@ -1247,6 +1239,58 @@ public class LinkedDataWebController {
         }
         if (resource.hasPrevious()) {
             String id = extractResourceLocalId(resource.getResumeBefore());
+            headers.add("Link", "<" + canonicalURI.toString() + "?resumebefore=" + id + queryPart + ">; rel=\"prev\"");
+        }
+        headers.add("Link", "<" + canonicalURI.toString() + ">; rel=\"canonical\"");
+
+    }
+
+    /**
+     * Adds headers describing the paged resource according to
+     * https://www.w3.org/TR/ldp-paging/ (here implemented version is
+     * http://www.w3.org/TR/2015/NOTE-ldp-paging-20150630/) that inform the client
+     * about the following properties of the pages resource:
+     * <p>
+     * Link: <uri>; rel="canonical"; etag="tag" - which resource it is a page of,
+     * and current tag of the resource Link: <http://www.w3.org/ns/ldp#Page>;
+     * rel="type" - that this is one in-sequence page resource Link:
+     * <http://www.w3.org/ns/ldp#Resource>; rel="type" - that this is a LDP Resource
+     * (should be Container in our case?) Link: <uri?p=x>; rel="next" - that the
+     * next in-sequence page resource exists and is retrievable at the given uri
+     *
+     * @param headers      headers to which paged resource headers should be added
+     * @param canonicalURI uri of the LDP Resource
+     * @param page         page of the Paged LDP Resource
+     * @return the headers map with added header values
+     */
+    private void addPagedConnectionResourceInSequenceHeader(final HttpHeaders headers, final URI canonicalURI,
+                                                  final NeedInformationService.PagedResource<Dataset, Connection> resource, final int page, String queryPart) {
+
+        headers.add("Link",
+                "<http://www.w3.org/ns/ldp#Resource>; rel=\"type\", <http://www.w3.org/ns/ldp#Page>; rel=\"type\"");
+        // Link: <http://example.org/customer-relations?p=2>; rel="next"
+        if (resource.hasNext()) {
+            int nextPage = page + 1;
+            headers.add("Link", "<" + canonicalURI.toString() + "?p=" + nextPage + queryPart + ">; rel=\"next\"");
+        }
+        if (resource.hasPrevious() && page > 1) {
+            int prevPage = page - 1;
+            headers.add("Link", "<" + canonicalURI.toString() + "?p=" + prevPage + queryPart + ">; rel=\"prev\"");
+        }
+        headers.add("Link", "<" + canonicalURI.toString() + ">; rel=\"canonical\"");
+    }
+
+    private void addPagedConnectionResourceInSequenceHeader(final HttpHeaders headers, final URI canonicalURI,
+                                                  final NeedInformationService.PagedResource<Dataset, Connection> resource, String queryPart) {
+
+        headers.add("Link",
+                "<http://www.w3.org/ns/ldp#Resource>; rel=\"type\", <http://www.w3.org/ns/ldp#Page>; rel=\"type\"");
+        if (resource.hasNext()) {
+            String id = extractResourceLocalId(resource.getResumeAfter().getConnectionURI());
+            headers.add("Link", "<" + canonicalURI.toString() + "?resumeafter=" + id + queryPart + ">; rel=\"next\"");
+        }
+        if (resource.hasPrevious()) {
+            String id = extractResourceLocalId(resource.getResumeBefore().getConnectionURI());
             headers.add("Link", "<" + canonicalURI.toString() + "?resumebefore=" + id + queryPart + ">; rel=\"prev\"");
         }
         headers.add("Link", "<" + canonicalURI.toString() + ">; rel=\"canonical\"");
