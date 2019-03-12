@@ -22,6 +22,7 @@ svgIcon name color =
     el
         [ width fill
         , height fill
+        , htmlAttribute <| HA.style "height" "100%"
         ]
     <|
         html <|
