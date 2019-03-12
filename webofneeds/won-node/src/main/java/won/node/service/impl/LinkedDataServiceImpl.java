@@ -212,7 +212,7 @@ public class LinkedDataServiceImpl implements LinkedDataService {
         String newEtag = data.getEtag();
 
         // load the dataset from storage
-        boolean isDeleted = !!(need.getState() == NeedState.DELETED);
+        boolean isDeleted = (need.getState() == NeedState.DELETED);
         Dataset dataset = isDeleted ? DatasetFactory.createGeneral() : need.getDatatsetHolder().getDataset();
         Model metaModel = needModelMapper.toModel(need);
 
@@ -791,9 +791,7 @@ public class LinkedDataServiceImpl implements LinkedDataService {
             NoSuchConnectionException {
         Slice<MessageEventPlaceholder> slice = needInformationService.listConnectionEvents(connectionUri, pageNum,
                 preferedSize, msgType);
-        NeedInformationService.PagedResource<Dataset, URI> containerPage = eventsToContainerPage(
-                this.uriService.createEventsURIForConnection(connectionUri).toString(), slice, deep);
-        return containerPage;
+        return eventsToContainerPage(this.uriService.createEventsURIForConnection(connectionUri).toString(), slice, deep);
     }
 
 
@@ -804,11 +802,7 @@ public class LinkedDataServiceImpl implements LinkedDataService {
             NoSuchConnectionException {
         Slice<MessageEventPlaceholder> slice = needInformationService.listConnectionEventsAfter(
                 connectionUri, msgURI, preferedSize, msgType);
-        NeedInformationService.PagedResource<Dataset, URI> containerPage = eventsToContainerPage(this.uriService
-                        .createEventsURIForConnection
-                                (connectionUri).toString(),
-                slice, deep);
-        return containerPage;
+        return eventsToContainerPage(this.uriService.createEventsURIForConnection(connectionUri).toString(), slice, deep);
     }
 
     @Override
@@ -819,9 +813,7 @@ public class LinkedDataServiceImpl implements LinkedDataService {
 
         Slice<MessageEventPlaceholder> slice = needInformationService.listConnectionEventsBefore(
                 connectionUri, msgURI, preferedSize, msgType);
-        NeedInformationService.PagedResource<Dataset, URI> containerPage = eventsToContainerPage(this.uriService.createEventsURIForConnection
-                (connectionUri).toString(), slice, deep);
-        return containerPage;
+        return eventsToContainerPage(this.uriService.createEventsURIForConnection(connectionUri).toString(), slice, deep);
     }
 
     private Dataset setDefaults(Dataset dataset) {
@@ -969,9 +961,7 @@ public class LinkedDataServiceImpl implements LinkedDataService {
         }
         Dataset dataset = newDatasetWithNamedModel(createDataGraphUriFromResource(needListPageResource), model);
         addBaseUriAndDefaultPrefixes(dataset);
-        NeedInformationService.PagedResource<Dataset, URI> containerPage = new NeedInformationService.PagedResource
-                (dataset, resumeBefore, resumeAfter);
-        return containerPage;
+        return new NeedInformationService.PagedResource(dataset, resumeBefore, resumeAfter);
     }
 
     private NeedInformationService.PagedResource<Dataset, Connection> toConnectionsContainerPage(String containerUri, Slice<Connection> slice) {
@@ -1005,8 +995,7 @@ public class LinkedDataServiceImpl implements LinkedDataService {
         }
         Dataset dataset = newDatasetWithNamedModel(createDataGraphUriFromResource(needListPageResource), model);
         addBaseUriAndDefaultPrefixes(dataset);
-        NeedInformationService.PagedResource<Dataset, Connection> containerPage = new NeedInformationService.PagedResource(dataset, resumeBefore, resumeAfter);
-        return containerPage;
+        return new NeedInformationService.PagedResource(dataset, resumeBefore, resumeAfter);
     }
 
     /**
@@ -1055,9 +1044,7 @@ public class LinkedDataServiceImpl implements LinkedDataService {
         Dataset dataset = aggregator.aggregate();
         dataset.addNamedModel(createDataGraphUriFromResource(needListPageResource), model);
         addBaseUriAndDefaultPrefixes(dataset);
-        NeedInformationService.PagedResource<Dataset, URI> containerPage = new NeedInformationService.PagedResource
-                (dataset, resumeBefore, resumeAfter);
-        return containerPage;
+        return new NeedInformationService.PagedResource(dataset, resumeBefore, resumeAfter);
     }
 
     public void addDeepConnectionData(Dataset dataset, List<URI> connectionURIs) throws NoSuchConnectionException {
