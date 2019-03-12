@@ -56,6 +56,7 @@ import won.protocol.vocabulary.WON;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Creates rdf models from the relational database.
@@ -493,22 +494,24 @@ public class LinkedDataServiceImpl implements LinkedDataService {
 
     @Override
     @Transactional
-    public Dataset listConnectionURIs(final URI needURI, boolean deep, boolean addMetadata)
+    public NeedInformationService.PagedResource<Dataset, Connection> listConnectionURIs(final URI needURI, boolean deep, boolean addMetadata)
             throws NoSuchNeedException, NoSuchConnectionException {
         List<Connection> connections = new ArrayList<Connection>(needInformationService.listConnections(needURI));
-        List<URI> uris = new ArrayList<URI>(needInformationService.listConnectionURIs(needURI));
         URI connectionsUri = this.uriService.createConnectionsURIForNeed(needURI);
-        NeedInformationService.PagedResource<Dataset, URI> containerPage = toContainerPage(connectionsUri.toString(), new
-                SliceImpl<URI>(uris));
         NeedInformationService.PagedResource<Dataset, Connection> connectionsContainerPage = toConnectionsContainerPage(connectionsUri.toString(), new
                 SliceImpl<Connection>(connections));
         if (deep) {
+            List<URI> uris = connections
+                    .stream()
+                    .map(conn -> conn.getConnectionURI())
+                    .collect(Collectors.toList());
+
             addDeepConnectionData(connectionsContainerPage.getContent(), uris);
         }
         if (addMetadata) {
             addConnectionMetadata(connectionsContainerPage.getContent(), needURI, connectionsUri);
         }
-        return connectionsContainerPage.getContent();
+        return connectionsContainerPage;
     }
 
     @Override
@@ -520,6 +523,7 @@ public class LinkedDataServiceImpl implements LinkedDataService {
         Slice<URI> slice = needInformationService.listConnectionURIs(needURI, page, preferredSize, messageType, timeSpot);
         URI connectionsUri = this.uriService.createConnectionsURIForNeed(needURI);
         NeedInformationService.PagedResource<Dataset, URI> containerPage = toContainerPage(connectionsUri.toString(), slice);
+
         if (deep) {
             addDeepConnectionData(containerPage.getContent(), slice.getContent());
         }

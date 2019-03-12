@@ -439,7 +439,9 @@ public class LinkedDataWebController {
                 // all the connections of the need; does not support type and date filtering for
                 // clients that do not support
                 // paging
-                rdfDataset = linkedDataService.listConnectionURIs(needURI, deep, true);
+                rdfDataset = linkedDataService
+                        .listConnectionURIs(needURI, deep, true)
+                        .getContent();
             }
             model.addAttribute("rdfDataset", rdfDataset);
             model.addAttribute("resourceURI",
@@ -793,7 +795,7 @@ public class LinkedDataWebController {
             @PathVariable(value = "identifier") String identifier,
             @RequestParam(value = "lastSeenMessageUris", required = false) List<URI> lastSeenMessageUris) {
         /*
-		 * information we want: need-level: unread count, date of first unread, date of
+         * information we want: need-level: unread count, date of first unread, date of
 		 * last unread per connection: connection uri, unread count, date of first
 		 * unread, date of last unread
 		 */
@@ -1123,7 +1125,9 @@ public class LinkedDataWebController {
             if (preferedSize == null) {
                 // does not support date and type filtering for clients that do not support
                 // paging
-                rdfDataset = linkedDataService.listConnectionURIs(needUri, deep, true);
+                rdfDataset = linkedDataService
+                        .listConnectionURIs(needUri, deep, true)
+                        .getContent();
                 // if no page or resume parameter is specified, display the latest connections:
             } else if (page == null && beforeId == null && afterId == null) {
                 //TODO: Change to include ConnectionData
