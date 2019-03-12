@@ -236,6 +236,32 @@ public class NeedInformationServiceImpl implements NeedInformationService {
 
     @Override
     @Deprecated
+    public Slice<Connection> listConnections(final URI needURI, int page, Integer preferedPageSize, WonMessageType
+            messageType, Date timeSpot) {
+        Slice<Connection> slice = null;
+        int pageSize = getPageSize(preferedPageSize);
+        int pageNum = page - 1;
+
+        // use 'min(msg.creationDate)' to keep a constant connection order over requests
+        PageRequest pageRequest = new PageRequest(pageNum, pageSize, Sort.Direction.DESC, "min(msg.creationDate)");
+        if (messageType == null) {
+            if (timeSpot == null) {
+                slice = connectionRepository.getConnectionsByActivityDate(needURI, pageRequest);
+            } else {
+                slice = connectionRepository.getConnectionsByActivityDate(needURI, timeSpot, pageRequest);
+            }
+        } else {
+            if (timeSpot == null) {
+                slice = connectionRepository.getConnectionsByActivityDate(needURI, messageType, pageRequest);
+            } else {
+                slice = connectionRepository.getConnectionsByActivityDate(needURI, messageType, timeSpot, pageRequest);
+            }
+        }
+        return slice;
+    }
+
+    @Override
+    @Deprecated
     public Slice listConnectionURIsBefore(final URI needURI, final URI resumeConnURI, final Integer preferredPageSize,
                                           WonMessageType messageType, final Date timeSpot) {
 

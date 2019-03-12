@@ -178,6 +178,22 @@ public interface NeedInformationService {
       URI needURI, int page, Integer preferredSize, WonMessageType messageType, Date timeSpot);
 
     /**
+     * Retrieves slice of the list of connections for the specified local need URI.
+     *
+     * @param needURI the URI of the need
+     * @param page the page number
+     * @param preferredSize preferred number of members per page or null; null => use default
+     * @param messageType event type that should be used for defining connection latest activity; null => all event
+     *                    types
+     * @param timeSpot time at which we want the list state to be fixed, if null - current state
+     * @return a collection of connections.
+     * @throws won.protocol.exception.NoSuchNeedException
+     *          if needURI is not a known need URI
+     */
+    public Slice<Connection> listConnections(
+            URI needURI, int page, Integer preferredSize, WonMessageType messageType, Date timeSpot);
+
+    /**
      * Retrieves slice of the connection URIs  for the specified local need URI that precede the given connection URI
      * from the point of view of their latest events.
      *
