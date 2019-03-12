@@ -125,6 +125,18 @@ public interface LinkedDataService {
     public Dataset listConnectionURIs(final boolean deep) throws NoSuchConnectionException;
 
     /**
+     * Returns container dataset containing all connections. If deep is true,
+     * the resource data of those connection uris is also part of the returned
+     * resource.
+     *
+     * @param deep
+     * @return
+     * @throws NoSuchConnectionException only in case deep is set to true and connection data for a member
+     *                                   connection uri cannot be retrieved.
+     */
+    public NeedInformationService.PagedResource<Dataset, Connection> listConnections(final boolean deep) throws NoSuchConnectionException;
+
+    /**
      * Returns container dataset containing all connection URIs that where modified
      * after a certain date.
      *
@@ -151,6 +163,22 @@ public interface LinkedDataService {
      */
     public NeedInformationService.PagedResource<Dataset, URI> listConnectionURIs(final int page,
                                                                                  final Integer preferredSize, Date timeSpot, final boolean deep) throws NoSuchConnectionException;
+
+    /**
+     * Returns a resource containing connections at given page. If deep is true,
+     * the resource data of those connection uris is also part of the returned
+     * resource. If page >0, paging is used and the respective page is returned.
+     *
+     * @param page
+     * @param preferredSize preferred number of connection uris per page (null means use
+     *                      default)
+     * @param deep
+     * @return
+     * @throws NoSuchNeedException
+     * @throws NoSuchConnectionException
+     */
+    public NeedInformationService.PagedResource<Dataset, Connection> listConnections(final int page,
+                                                                                     final Integer preferredSize, Date timeSpot, final boolean deep) throws NoSuchConnectionException;
 
     /**
      * Returns a resource containing connection uris that precede (by time of their

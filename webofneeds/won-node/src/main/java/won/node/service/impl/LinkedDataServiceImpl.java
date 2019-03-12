@@ -443,6 +443,23 @@ public class LinkedDataServiceImpl implements LinkedDataService {
 
     @Override
     @Transactional
+    public NeedInformationService.PagedResource<Dataset, Connection> listConnections(final boolean deep) throws NoSuchConnectionException {
+        List<Connection> connections = new ArrayList<Connection>(needInformationService.listConnections());
+        NeedInformationService.PagedResource<Dataset, Connection> connectionsContainerPage = toConnectionsContainerPage(
+                this.connectionResourceURIPrefix + "/", new SliceImpl<Connection>(connections));
+        if (deep) {
+            List<URI> uris = connections
+                    .stream()
+                    .map(conn -> conn.getConnectionURI())
+                    .collect(Collectors.toList());
+            addDeepConnectionData(connectionsContainerPage.getContent(), uris);
+        }
+
+        return connectionsContainerPage;
+    }
+
+    @Override
+    @Transactional
     public Dataset listModifiedConnectionURIsAfter(Date modifiedAfter, boolean deep) throws NoSuchConnectionException {
         List<URI> uris = new ArrayList<URI>(needInformationService.listModifiedConnectionURIsAfter(modifiedAfter));
         NeedInformationService.PagedResource<Dataset, URI> containerPage = toContainerPage(
@@ -465,6 +482,24 @@ public class LinkedDataServiceImpl implements LinkedDataService {
             addDeepConnectionData(containerPage.getContent(), slice.getContent());
         }
         return containerPage;
+    }
+
+    @Override
+    @Transactional
+    public NeedInformationService.PagedResource<Dataset, Connection> listConnections(final int page, final Integer
+            preferredSize, Date timeSpot, final boolean deep) throws NoSuchConnectionException {
+        Slice<Connection> slice = needInformationService.listConnections(page, preferredSize, timeSpot);
+        NeedInformationService.PagedResource<Dataset, Connection> connectionsContainerPage = toConnectionsContainerPage(
+                this.connectionResourceURIPrefix + "/", slice);
+        if (deep) {
+            List<URI> uris = slice
+                    .getContent()
+                    .stream()
+                    .map(conn -> conn.getConnectionURI())
+                    .collect(Collectors.toList());
+            addDeepConnectionData(connectionsContainerPage.getContent(), uris);
+        }
+        return connectionsContainerPage;
     }
 
     @Override
