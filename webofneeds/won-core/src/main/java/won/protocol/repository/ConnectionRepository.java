@@ -229,6 +229,16 @@ public interface ConnectionRepository extends WonRepository<Connection>
     @Param("referenceDate") Date referenceDate,
     Pageable pageable);
 
+  @Query("select conn from Connection conn where conn.connectionURI in (select msg.parentURI from MessageEventPlaceholder msg " +
+    "where (((msg.senderNeedURI = :need and msg.senderURI = msg.parentURI) " +
+    "   or (msg.receiverNeedURI = :need and msg.receiverURI = msg.parentURI)) and (msg.creationDate < :referenceDate))" +
+    "group by msg.parentURI having max(msg.creationDate) < :resumeDate)")
+  Slice<Connection> getConnectionsBeforeByActivityDate(
+    @Param("need") URI needURI,
+    @Param("resumeDate") Date resumeEventDate,
+    @Param("referenceDate") Date referenceDate,
+    Pageable pageable);
+
   @Query("select msg.parentURI from MessageEventPlaceholder msg " +
     "where (((msg.senderNeedURI = :need and msg.senderURI = msg.parentURI) or (msg.receiverNeedURI = :need and msg.receiverURI = msg.parentURI)) " +
     "   and (msg.creationDate < :referenceDate) and (msg.messageType = :messageType))" +
@@ -240,6 +250,16 @@ public interface ConnectionRepository extends WonRepository<Connection>
     @Param("referenceDate") Date referenceDate,
     Pageable pageable);
 
+  @Query("select conn from Connection conn where conn.connectionURI in (select msg.parentURI from MessageEventPlaceholder msg " +
+    "where (((msg.senderNeedURI = :need and msg.senderURI = msg.parentURI) or (msg.receiverNeedURI = :need and msg.receiverURI = msg.parentURI)) " +
+    "   and (msg.creationDate < :referenceDate) and (msg.messageType = :messageType))" +
+    "group by msg.parentURI having max(msg.creationDate) < :resumeDate)")
+  Slice<Connection> getConnectionsBeforeByActivityDate(
+    @Param("need") URI needURI,
+    @Param("resumeDate") Date resumeEventDate,
+    @Param("messageType") WonMessageType messageType,
+    @Param("referenceDate") Date referenceDate,
+    Pageable pageable);
 
 
   @Query("select msg.parentURI from MessageEventPlaceholder msg " +
@@ -252,11 +272,33 @@ public interface ConnectionRepository extends WonRepository<Connection>
     @Param("referenceDate") Date referenceDate,
     Pageable pageable);
 
+  @Query("select conn from Connection conn where conn.connectionURI in (select msg.parentURI from MessageEventPlaceholder msg " +
+    "where (((msg.senderNeedURI = :need and msg.senderURI = msg.parentURI) " +
+    "   or (msg.receiverNeedURI = :need and msg.receiverURI = msg.parentURI)) and (msg.creationDate < :referenceDate))" +
+    "group by msg.parentURI having max(msg.creationDate) > :resumeDate)")
+  Slice<Connection> getConnectionsAfterByActivityDate(
+    @Param("need") URI needURI,
+    @Param("resumeDate") Date resumeEventDate,
+    @Param("referenceDate") Date referenceDate,
+    Pageable pageable);
+
+
   @Query("select msg.parentURI from MessageEventPlaceholder msg " +
     "where (((msg.senderNeedURI = :need and msg.senderURI = msg.parentURI) or (msg.receiverNeedURI = :need and msg.receiverURI = msg.parentURI)) " +
     "   and (msg.creationDate < :referenceDate) and (msg.messageType = :messageType))" +
     "group by msg.parentURI having max(msg.creationDate) > :resumeDate")
   Slice<URI> getConnectionURIsAfterByActivityDate(
+    @Param("need") URI needURI,
+    @Param("resumeDate") Date resumeEventDate,
+    @Param("messageType") WonMessageType messageType,
+    @Param("referenceDate") Date referenceDate,
+    Pageable pageable);
+
+  @Query("select conn from Connection conn where conn.connectionURI in (select msg.parentURI from MessageEventPlaceholder msg " +
+    "where (((msg.senderNeedURI = :need and msg.senderURI = msg.parentURI) or (msg.receiverNeedURI = :need and msg.receiverURI = msg.parentURI)) " +
+    "   and (msg.creationDate < :referenceDate) and (msg.messageType = :messageType))" +
+    "group by msg.parentURI having max(msg.creationDate) > :resumeDate)")
+  Slice<Connection> getConnectionsAfterByActivityDate(
     @Param("need") URI needURI,
     @Param("resumeDate") Date resumeEventDate,
     @Param("messageType") WonMessageType messageType,
