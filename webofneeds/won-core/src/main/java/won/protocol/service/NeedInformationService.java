@@ -171,6 +171,18 @@ public interface NeedInformationService {
     public Slice<URI> listConnectionURIsAfter(
       final URI resumeConnURI, final Integer preferredPageSize, final Date timeSpot);
 
+    /**
+     * Retrieves slice of the connections that follows the given connection URI from the point of view of their
+     * latest events.
+     *
+     * @param resumeConnURI the returned slice connections follow (in time of their latest events) this connection uri
+     * @param preferredPageSize preferred number of members per page or null; null => use default
+     * @param timeSpot time at which we want the list state to be fixed, cannot be null
+     *
+     * @return a slice of connection URIs.
+     */
+    public Slice<Connection> listConnectionsAfter(
+            final URI resumeConnURI, final Integer preferredPageSize, final Date timeSpot);
 
     /**
      * Retrieves all connection URIs (regardless of state) for the specified local need URI.

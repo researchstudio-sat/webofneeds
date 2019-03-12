@@ -236,6 +236,20 @@ public class NeedInformationServiceImpl implements NeedInformationService {
     }
 
     @Override
+    public Slice<Connection> listConnectionsAfter(
+            final URI resumeConnURI, final Integer preferredPageSize, final Date timeSpot) {
+
+        Date resume = messageEventRepository.findMaxActivityDateOfParentAtTime(resumeConnURI, timeSpot);
+        int pageSize = getPageSize(preferredPageSize);
+        Slice<Connection> slice;
+
+        // use 'min(msg.creationDate)' to keep a constant connection order over requests
+        slice = connectionRepository.getConnectionsAfterByActivityDate(
+                resume, timeSpot, new PageRequest(0, pageSize, Sort.Direction.ASC, "min(msg.creationDate)"));
+        return slice;
+    }
+
+    @Override
     @Deprecated
     public Collection<URI> listConnectionURIs(final URI needURI) throws NoSuchNeedException {
         return connectionRepository.getAllConnectionURIsForNeedURI(needURI);
