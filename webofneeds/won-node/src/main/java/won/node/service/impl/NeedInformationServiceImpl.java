@@ -146,11 +146,6 @@ public class NeedInformationServiceImpl implements NeedInformationService {
     }
 
     @Override
-    public Collection<URI> listModifiedConnectionURIsAfter(Date modifiedAfter) {
-        return connectionRepository.findModifiedConnectionURIsAfter(modifiedAfter);
-    }
-
-    @Override
     public Collection<Connection> listModifiedConnectionsAfter(Date modifiedAfter) {
         return connectionRepository.findModifiedConnectionsAfter(modifiedAfter);
     }
@@ -197,21 +192,6 @@ public class NeedInformationServiceImpl implements NeedInformationService {
     }
 
     @Override
-    @Deprecated
-    public Slice<URI> listConnectionURIsBefore(
-            final URI resumeConnURI, final Integer preferredPageSize, final Date timeSpot) {
-
-        Date resume = messageEventRepository.findMaxActivityDateOfParentAtTime(resumeConnURI, timeSpot);
-        int pageSize = getPageSize(preferredPageSize);
-        Slice<URI> slice = null;
-
-        // use 'min(msg.creationDate)' to keep a constant connection order over requests
-        slice = connectionRepository.getConnectionURIsBeforeByActivityDate(
-                resume, timeSpot, new PageRequest(0, pageSize, Sort.Direction.DESC, "min(msg.creationDate)"));
-        return slice;
-    }
-
-    @Override
     public Slice<Connection> listConnectionsBefore(
             final URI resumeConnURI, final Integer preferredPageSize, final Date timeSpot) {
 
@@ -222,21 +202,6 @@ public class NeedInformationServiceImpl implements NeedInformationService {
         // use 'min(msg.creationDate)' to keep a constant connection order over requests
         slice = connectionRepository.getConnectionsBeforeByActivityDate(
                 resume, timeSpot, new PageRequest(0, pageSize, Sort.Direction.DESC, "min(msg.creationDate)"));
-        return slice;
-    }
-
-    @Override
-    @Deprecated
-    public Slice<URI> listConnectionURIsAfter(
-            final URI resumeConnURI, final Integer preferredPageSize, final Date timeSpot) {
-
-        Date resume = messageEventRepository.findMaxActivityDateOfParentAtTime(resumeConnURI, timeSpot);
-        int pageSize = getPageSize(preferredPageSize);
-        Slice<URI> slice = null;
-
-        // use 'min(msg.creationDate)' to keep a constant connection order over requests
-        slice = connectionRepository.getConnectionURIsAfterByActivityDate(
-                resume, timeSpot, new PageRequest(0, pageSize, Sort.Direction.ASC, "min(msg.creationDate)"));
         return slice;
     }
 
@@ -318,31 +283,6 @@ public class NeedInformationServiceImpl implements NeedInformationService {
     }
 
     @Override
-    @Deprecated
-    public Slice listConnectionURIsBefore(final URI needURI, final URI resumeConnURI, final Integer preferredPageSize,
-                                          WonMessageType messageType, final Date timeSpot) {
-
-        Date resume = null;
-        int pageSize = getPageSize(preferredPageSize);
-        Slice<URI> slice = null;
-        if (messageType == null) {
-            resume = messageEventRepository.findMaxActivityDateOfParentAtTime(resumeConnURI, timeSpot);
-
-            // use 'min(msg.creationDate)' to keep a constant connection order over requests
-            slice = connectionRepository.getConnectionURIsBeforeByActivityDate(
-                    needURI, resume, timeSpot, new PageRequest(0, pageSize, Sort.Direction.DESC, "min(msg.creationDate)"));
-        } else {
-            resume = messageEventRepository.findMaxActivityDateOfParentAtTime(resumeConnURI, messageType, timeSpot);
-
-            // use 'min(msg.creationDate)' to keep a constant connection order over requests
-            slice = connectionRepository.getConnectionURIsBeforeByActivityDate(
-                    needURI, resume, messageType, timeSpot, new PageRequest(
-                            0, pageSize, Sort.Direction.DESC, "min(msg.creationDate)"));
-        }
-        return slice;
-    }
-
-    @Override
     public Slice<Connection> listConnectionsBefore(final URI needURI, final URI resumeConnURI, final Integer preferredPageSize,
                                           WonMessageType messageType, final Date timeSpot) {
         Date resume;
@@ -361,31 +301,6 @@ public class NeedInformationServiceImpl implements NeedInformationService {
             slice = connectionRepository.getConnectionsBeforeByActivityDate(
                     needURI, resume, messageType, timeSpot, new PageRequest(
                             0, pageSize, Sort.Direction.DESC, "min(msg.creationDate)"));
-        }
-        return slice;
-    }
-
-    @Override
-    @Deprecated
-    public Slice listConnectionURIsAfter(final URI needURI, final URI resumeConnURI, final Integer preferredPageSize,
-                                         final WonMessageType messageType, final Date timeSpot) {
-
-        Date resume = null;
-        int pageSize = getPageSize(preferredPageSize);
-        Slice<URI> slice = null;
-        if (messageType == null) {
-            resume = messageEventRepository.findMaxActivityDateOfParentAtTime(resumeConnURI, timeSpot);
-
-            // use 'min(msg.creationDate)' to keep a constant connection order over requests
-            slice = connectionRepository.getConnectionURIsAfterByActivityDate(
-                    needURI, resume, timeSpot, new PageRequest(0, pageSize, Sort.Direction.ASC, "min(msg.creationDate)"));
-        } else {
-            resume = messageEventRepository.findMaxActivityDateOfParentAtTime(resumeConnURI, messageType, timeSpot);
-
-            // use 'min(msg.creationDate)' to keep a constant connection order over requests
-            slice = connectionRepository.getConnectionURIsAfterByActivityDate(
-                    needURI, resume, messageType, timeSpot, new PageRequest(
-                            0, pageSize, Sort.Direction.ASC, "min(msg.creationDate)"));
         }
         return slice;
     }
@@ -486,24 +401,6 @@ public class NeedInformationServiceImpl implements NeedInformationService {
     }
 
     @Override
-    @Deprecated
-    public Slice<URI> listConnectionEventURIsAfter(URI connectionUri, URI msgURI, Integer preferredPageSize,
-                                                   WonMessageType msgType) {
-        MessageEventPlaceholder referenceMsg = messageEventRepository.findOneByMessageURI(msgURI);
-        Date referenceDate = referenceMsg.getCreationDate();
-        int pageSize = getPageSize(preferredPageSize);
-        Slice<URI> slice = null;
-        if (msgType == null) {
-            slice = messageEventRepository.getMessageURIsByParentURIAfter(
-                    connectionUri, referenceDate, new PageRequest(0, pageSize, Sort.Direction.ASC, "creationDate"));
-        } else {
-            slice = messageEventRepository.getMessageURIsByParentURIAfter(
-                    connectionUri, referenceDate, msgType, new PageRequest(0, pageSize, Sort.Direction.ASC, "creationDate"));
-        }
-        return slice;
-    }
-
-    @Override
     public Slice<MessageEventPlaceholder> listConnectionEventsAfter(URI connectionUri, URI msgURI, Integer preferredPageSize,
                                                                     WonMessageType msgType) {
         MessageEventPlaceholder referenceMsg = messageEventRepository.findOneByMessageURI(msgURI);
@@ -516,24 +413,6 @@ public class NeedInformationServiceImpl implements NeedInformationService {
         } else {
             slice = messageEventRepository.findByParentURIAndTypeAfter(
                     connectionUri, referenceDate, msgType, new PageRequest(0, pageSize, Sort.Direction.ASC, "creationDate"));
-        }
-        return slice;
-    }
-
-    @Override
-    @Deprecated
-    public Slice<URI> listConnectionEventURIsBefore(final URI connectionUri, final URI msgURI, final Integer
-            preferredPageSize, final WonMessageType msgType) {
-        MessageEventPlaceholder referenceMsg = messageEventRepository.findOneByMessageURI(msgURI);
-        Date referenceDate = referenceMsg.getCreationDate();
-        int pageSize = getPageSize(preferredPageSize);
-        Slice<URI> slice = null;
-        if (msgType == null) {
-            slice = messageEventRepository.getMessageURIsByParentURIBefore(
-                    connectionUri, referenceDate, new PageRequest(0, pageSize, Sort.Direction.DESC, "creationDate"));
-        } else {
-            slice = messageEventRepository.getMessageURIsByParentURIBefore(
-                    connectionUri, referenceDate, msgType, new PageRequest(0, pageSize, Sort.Direction.DESC, "creationDate"));
         }
         return slice;
     }
