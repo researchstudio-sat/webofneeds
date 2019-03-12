@@ -1047,7 +1047,7 @@ public class LinkedDataServiceImpl implements LinkedDataService {
         return new NeedInformationService.PagedResource(dataset, resumeBefore, resumeAfter);
     }
 
-    public void addDeepConnectionData(Dataset dataset, List<URI> connectionURIs) throws NoSuchConnectionException {
+    private void addDeepConnectionData(Dataset dataset, List<URI> connectionURIs) {
         //add the connection model for each connection URI
         for (URI connectionURI : connectionURIs) {
             DataWithEtag<Dataset> connectionDataset =
