@@ -374,19 +374,19 @@ public class LinkedDataWebController {
             DateParameter dateParam = new DateParameter(timestamp);
             Dataset rdfDataset;
             if (page != null) {
-                rdfDataset = linkedDataService.listConnectionURIs(page, null, dateParam.getDate(), deep).getContent();
+                rdfDataset = linkedDataService.listConnections(page, null, dateParam.getDate(), deep).getContent();
             } else if (beforeId != null) {
                 URI connURI = uriService.createConnectionURIForId(beforeId);
-                rdfDataset = linkedDataService.listConnectionURIsBefore(connURI, null, dateParam.getDate(), deep)
+                rdfDataset = linkedDataService.listConnectionsBefore(connURI, null, dateParam.getDate(), deep)
                         .getContent();
             } else if (afterId != null) {
                 URI connURI = uriService.createConnectionURIForId(afterId);
-                rdfDataset = linkedDataService.listConnectionURIsAfter(connURI, null, dateParam.getDate(), deep)
+                rdfDataset = linkedDataService.listConnectionsAfter(connURI, null, dateParam.getDate(), deep)
                         .getContent();
             } else {
                 // all the connections; does not support date filtering for clients that do not
                 // support paging
-                rdfDataset = linkedDataService.listConnectionURIs(deep);
+                rdfDataset = linkedDataService.listConnections(deep).getContent();
             }
             model.addAttribute("rdfDataset", rdfDataset);
             model.addAttribute("resourceURI",
@@ -680,8 +680,6 @@ public class LinkedDataWebController {
                                                       @RequestParam(value = "timeof", required = false) String timestamp,
                                                       @RequestParam(value = "modifiedafter", required = false) String modifiedAfter,
                                                       @RequestParam(value = "deep", defaultValue = "false") boolean deep) {
-
-        logger.debug("listConnectionURIs() called");
         Dataset rdfDataset;
         HttpHeaders headers = new HttpHeaders();
         Integer preferedSize = getPreferredSize(request);
@@ -699,27 +697,27 @@ public class LinkedDataWebController {
             if (preferedSize == null && modifiedAfter == null) {
                 // all connections; does not support date filtering for clients that do not
                 // support paging
-                rdfDataset = linkedDataService.listConnectionURIs(deep);
+                rdfDataset = linkedDataService.listConnections(deep).getContent();
             } else if (modifiedAfter != null) {
                 // paging is not implemented for modified connections for now!
                 rdfDataset = linkedDataService
                         .listModifiedConnectionURIsAfter(new DateParameter(modifiedAfter).getDate(), deep);
             } else if (page != null) {
                 // return latest by the given timestamp
-                NeedInformationService.PagedResource<Dataset, URI> resource = linkedDataService.listConnectionURIs(page,
+                NeedInformationService.PagedResource<Dataset, Connection> resource = linkedDataService.listConnections(page,
                         preferedSize, dateParam.getDate(), deep);
                 rdfDataset = resource.getContent();
-                addPagedResourceInSequenceHeader(headers, URI.create(this.connectionResourceURIPrefix), resource, page,
+                addPagedConnectionResourceInSequenceHeader(headers, URI.create(this.connectionResourceURIPrefix), resource, page,
                         passableMap);
 
                 // resume before parameter specified - display the connections with activities
                 // before the specified event id
             } else if (beforeId == null && afterId == null) {
                 // return latest by the given timestamp
-                NeedInformationService.PagedResource<Dataset, URI> resource = linkedDataService.listConnectionURIs(1,
+                NeedInformationService.PagedResource<Dataset, Connection> resource = linkedDataService.listConnections(1,
                         preferedSize, dateParam.getDate(), deep);
                 rdfDataset = resource.getContent();
-                addPagedResourceInSequenceHeader(headers, URI.create(this.connectionResourceURIPrefix), resource,
+                addPagedConnectionResourceInSequenceHeader(headers, URI.create(this.connectionResourceURIPrefix), resource,
                         passableMap);
 
                 // resume before parameter specified - display the connections with activities
@@ -727,20 +725,20 @@ public class LinkedDataWebController {
             } else {
                 if (beforeId != null) {
                     URI resumeConnURI = uriService.createConnectionURIForId(beforeId);
-                    NeedInformationService.PagedResource<Dataset, URI> resource = linkedDataService
-                            .listConnectionURIsBefore(resumeConnURI, preferedSize, dateParam.getDate(), deep);
+                    NeedInformationService.PagedResource<Dataset, Connection> resource = linkedDataService
+                            .listConnectionsBefore(resumeConnURI, preferedSize, dateParam.getDate(), deep);
                     rdfDataset = resource.getContent();
-                    addPagedResourceInSequenceHeader(headers, URI.create(this.connectionResourceURIPrefix), resource,
+                    addPagedConnectionResourceInSequenceHeader(headers, URI.create(this.connectionResourceURIPrefix), resource,
                             passableMap);
 
                     // resume after parameter specified - display the connections with activities
                     // after the specified event id:
                 } else { // if (afterId != null)
                     URI resumeConnURI = uriService.createConnectionURIForId(afterId);
-                    NeedInformationService.PagedResource<Dataset, URI> resource = linkedDataService
-                            .listConnectionURIsAfter(resumeConnURI, preferedSize, dateParam.getDate(), deep);
+                    NeedInformationService.PagedResource<Dataset, Connection> resource = linkedDataService
+                            .listConnectionsAfter(resumeConnURI, preferedSize, dateParam.getDate(), deep);
                     rdfDataset = resource.getContent();
-                    addPagedResourceInSequenceHeader(headers, URI.create(this.connectionResourceURIPrefix), resource,
+                    addPagedConnectionResourceInSequenceHeader(headers, URI.create(this.connectionResourceURIPrefix), resource,
                             passableMap);
 
                 }
