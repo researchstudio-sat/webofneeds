@@ -407,41 +407,6 @@ public interface NeedInformationService {
     URI connectionUri, URI msgURI, Integer preferredPageSize, WonMessageType msgType);
 
 
-  @Deprecated
-  public static class Page<T>{
-    private Collection<T> content;
-    private boolean hasNext;
-    private T resumeBefore = null;
-    private T resumeAfter = null;
-
-    public Page(final Collection<T> content, final T resumeBefore, final T resumeAfter) {
-      this.content = content;
-      this.resumeBefore = resumeBefore;
-      this.resumeAfter = resumeAfter;
-    }
-
-    public Collection<T> getContent() {
-      return content;
-    }
-
-    public boolean hasNext() {
-      return resumeAfter != null;
-    }
-
-    public T getResumeAfter() {
-      return this.resumeAfter;
-    }
-
-    public boolean hasPrevious() {
-      return resumeBefore != null;
-    }
-
-    public T getResumeBefore() {
-      return resumeBefore;
-    }
-  }
-
-
   public static class PagedResource<T,E>{
     private T content;
     private E resumeBefore = null;

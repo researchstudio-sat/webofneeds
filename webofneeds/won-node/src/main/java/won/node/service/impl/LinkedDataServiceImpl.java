@@ -756,29 +756,6 @@ public class LinkedDataServiceImpl implements LinkedDataService {
         return uri + "?page=" + page;
     }
 
-    /**
-     * @deprecated the method returns the paged resource description according to Linked Data Platform Draft 2013
-     * https://www.w3.org/TR/2013/WD-ldp-20130730/. As of state Feb 2016 (https://www.w3.org/TR/2015/REC-ldp-20150226/)
-     * the paged resource should not contain any paging information as part of resource description, this information
-     * is conveyed vie HEADERs. Therefore, this method should no longer be used.
-     */
-    @Deprecated
-    private Resource createPage(final Model model, final String containerURI, final int pageNum, NeedInformationService.Page page) {
-        String containerPageURI = addPageQueryString(containerURI, pageNum);
-        Resource containerPageResource = model.createResource(containerPageURI);
-        Resource containerResource = model.createResource(containerURI);
-        model.add(model.createStatement(containerPageResource, RDF.type, LDP.PAGE));
-        model.add(model.createStatement(containerPageResource, LDP.PAGE_OF, containerResource));
-        model.add(model.createStatement(containerPageResource, RDF.type, LDP.CONTAINER));
-        //assume last page if we didn't fetch pageSize uris
-        if (page.hasNext()) {
-            Resource containerNextPageResource = model.createResource(addPageQueryString(containerURI, pageNum + 1));
-            model.add(model.createStatement(containerPageResource, LDP.NEXT_PAGE, containerNextPageResource));
-        }
-
-        return containerPageResource;
-    }
-
     private void setNsPrefixes(final Model model) {
         DefaultPrefixUtils.setDefaultPrefixes(model);
     }
