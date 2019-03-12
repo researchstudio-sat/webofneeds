@@ -63,7 +63,7 @@ import java.util.stream.Collectors;
  * TODO: conform to: https://dvcs.w3.org/hg/ldpwg/raw-file/default/ldp-paging.html, especially for sorting
  */
 public class LinkedDataServiceImpl implements LinkedDataService {
-    final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     //prefix of a need resource
     private String needResourceURIPrefix;
