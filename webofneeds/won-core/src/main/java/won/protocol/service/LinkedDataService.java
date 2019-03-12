@@ -281,6 +281,32 @@ public interface LinkedDataService {
             throws NoSuchNeedException, NoSuchConnectionException;
 
     /**
+     * Returns paged resource containing all connections belonging to the
+     * specified need that precede the given connection URI from the point of view
+     * of their latest events.
+     *
+     * @param needURI       local need the connections of which are retrieved
+     * @param resumeConnURI the returned slice connections precede (in time of their latest
+     *                      events) this connection uri
+     * @param preferredSize preferred number of connection uris per page (null means use
+     *                      default)
+     * @param messageType   the event type that should be used for defining connection latest
+     *                      activity; null => all event types
+     * @param timeSpot      time at which we want the list state to be fixed
+     * @param deep          if true, the resource data of those connection uris is also part
+     *                      of the resource
+     * @param addMetadata   - if true, a metadata graph is added to the dataset containing
+     *                      counts by connection state
+     * @return
+     * @throws NoSuchNeedException       when specified need is not found
+     * @throws NoSuchConnectionException only in case deep is set to true and connection data for a member
+     *                                   connection uri cannot be retrieved.
+     */
+    public NeedInformationService.PagedResource<Dataset, Connection> listConnectionsBefore(URI needURI, URI resumeConnURI,
+                                                                                       Integer preferredSize, WonMessageType messageType, Date timeSpot, boolean deep, boolean addMetadata)
+            throws NoSuchNeedException, NoSuchConnectionException;
+
+    /**
      * Returns paged resource containing all connection uris belonging to the
      * specified need that follows the given connection URI from the point of view
      * of their latest events.
@@ -303,6 +329,32 @@ public interface LinkedDataService {
      *                                   connection uri cannot be retrieved.
      */
     public NeedInformationService.PagedResource<Dataset, URI> listConnectionURIsAfter(URI needURI, URI resumeConnURI,
+                                                                                      Integer preferredSize, WonMessageType messageType, Date timeSpot, boolean deep, boolean addMetadata)
+            throws NoSuchNeedException, NoSuchConnectionException;
+
+    /**
+     * Returns paged resource containing all connections belonging to the
+     * specified need that follows the given connection URI from the point of view
+     * of their latest events.
+     *
+     * @param needURI       local need the connections of which are retrieved
+     * @param resumeConnURI the returned slice connections follow (in time of their latest
+     *                      events) this connection uri
+     * @param preferredSize preferred number of connection uris per page (null means use
+     *                      default)
+     * @param messageType   the event type that should be used for defining connection latest
+     *                      activity; null => all event types
+     * @param timeSpot      time at which we want the list state to be fixed
+     * @param deep          if true, the resource data of those connection uris is also part
+     *                      of the resource
+     * @param addMetadata   - if true, a metadata graph is added to the dataset containing
+     *                      counts by connection state
+     * @return
+     * @throws NoSuchNeedException       when specified need is not found
+     * @throws NoSuchConnectionException only in case deep is set to true and connection data for a member
+     *                                   connection uri cannot be retrieved.
+     */
+    public NeedInformationService.PagedResource<Dataset, Connection> listConnectionsAfter(URI needURI, URI resumeConnURI,
                                                                                       Integer preferredSize, WonMessageType messageType, Date timeSpot, boolean deep, boolean addMetadata)
             throws NoSuchNeedException, NoSuchConnectionException;
 

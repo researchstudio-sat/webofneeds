@@ -373,7 +373,7 @@ public class LinkedDataServiceImpl implements LinkedDataService {
      *
      * @param connectionUri
      * @param includeEventContainer
-     * @param includeLatestEvent
+     * @param includeEventContainer
      * @param etag
      * @return
      */
@@ -578,6 +578,30 @@ public class LinkedDataServiceImpl implements LinkedDataService {
 
     @Override
     @Transactional
+    public NeedInformationService.PagedResource<Dataset, Connection> listConnectionsBefore(final URI needURI, URI
+            beforeEventURI, final Integer preferredSize, final WonMessageType messageType, final Date timeSpot, boolean deep,
+                                                                                       boolean addMetadata)
+            throws NoSuchNeedException, NoSuchConnectionException {
+        Slice<Connection> slice = needInformationService.listConnectionsBefore(
+                needURI, beforeEventURI, preferredSize, messageType, timeSpot);
+        URI connectionsUri = this.uriService.createConnectionsURIForNeed(needURI);
+        NeedInformationService.PagedResource<Dataset, Connection> connectionsContainerPage = toConnectionsContainerPage(connectionsUri.toString(), slice);
+        if (deep) {
+            List<URI> uris = slice
+                    .getContent()
+                    .stream()
+                    .map(conn -> conn.getConnectionURI())
+                    .collect(Collectors.toList());
+            addDeepConnectionData(connectionsContainerPage.getContent(), uris);
+        }
+        if (addMetadata) {
+            addConnectionMetadata(connectionsContainerPage.getContent(), needURI, connectionsUri);
+        }
+        return connectionsContainerPage;
+    }
+
+    @Override
+    @Transactional
     public NeedInformationService.PagedResource<Dataset, URI> listConnectionURIsAfter(final URI needURI, URI
             resumeConnURI, final Integer preferredSize, final WonMessageType messageType, final Date timeSpot, boolean deep,
                                                                                       boolean addMetadata)
@@ -594,6 +618,31 @@ public class LinkedDataServiceImpl implements LinkedDataService {
             addConnectionMetadata(containerPage.getContent(), needURI, connectionsUri);
         }
         return containerPage;
+    }
+
+    @Override
+    @Transactional
+    public NeedInformationService.PagedResource<Dataset, Connection> listConnectionsAfter(final URI needURI, URI
+            resumeConnURI, final Integer preferredSize, final WonMessageType messageType, final Date timeSpot, boolean deep,
+                                                                                      boolean addMetadata)
+            throws NoSuchNeedException, NoSuchConnectionException {
+        Slice<Connection> slice = needInformationService.listConnectionsAfter(
+                needURI, resumeConnURI, preferredSize, messageType, timeSpot);
+        URI connectionsUri = this.uriService.createConnectionsURIForNeed(needURI);
+        NeedInformationService.PagedResource<Dataset, Connection> connectionsContainerPage = toConnectionsContainerPage(
+                connectionsUri.toString(), slice);
+        if (deep) {
+            List<URI> uris = slice
+                    .getContent()
+                    .stream()
+                    .map(conn -> conn.getConnectionURI())
+                    .collect(Collectors.toList());
+            addDeepConnectionData(connectionsContainerPage.getContent(), uris);
+        }
+        if (addMetadata) {
+            addConnectionMetadata(connectionsContainerPage.getContent(), needURI, connectionsUri);
+        }
+        return connectionsContainerPage;
     }
 
     private void addConnectionMetadata(final Dataset content, URI needURI, URI containerURI) {
