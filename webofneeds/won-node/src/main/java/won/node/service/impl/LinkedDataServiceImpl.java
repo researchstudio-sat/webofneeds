@@ -494,7 +494,7 @@ public class LinkedDataServiceImpl implements LinkedDataService {
 
     @Override
     @Transactional
-    public NeedInformationService.PagedResource<Dataset, Connection> listConnectionURIs(final URI needURI, boolean deep, boolean addMetadata)
+    public NeedInformationService.PagedResource<Dataset, Connection> listConnections(final URI needURI, boolean deep, boolean addMetadata)
             throws NoSuchNeedException, NoSuchConnectionException {
         List<Connection> connections = new ArrayList<Connection>(needInformationService.listConnections(needURI));
         URI connectionsUri = this.uriService.createConnectionsURIForNeed(needURI);
@@ -506,6 +506,30 @@ public class LinkedDataServiceImpl implements LinkedDataService {
                     .map(conn -> conn.getConnectionURI())
                     .collect(Collectors.toList());
 
+            addDeepConnectionData(connectionsContainerPage.getContent(), uris);
+        }
+        if (addMetadata) {
+            addConnectionMetadata(connectionsContainerPage.getContent(), needURI, connectionsUri);
+        }
+        return connectionsContainerPage;
+    }
+
+    @Override
+    @Transactional
+    public NeedInformationService.PagedResource<Dataset, Connection> listConnections(
+            final int page, final URI needURI, final Integer preferredSize, final WonMessageType messageType, final Date
+            timeSpot, boolean deep, boolean addMetadata)
+            throws NoSuchNeedException, NoSuchConnectionException {
+        Slice<Connection> slice = needInformationService.listConnections(needURI, page, preferredSize, messageType, timeSpot);
+        URI connectionsUri = this.uriService.createConnectionsURIForNeed(needURI);
+        NeedInformationService.PagedResource<Dataset, Connection> connectionsContainerPage = toConnectionsContainerPage(connectionsUri.toString(), slice);
+
+        if (deep) {
+            List<URI> uris = slice
+                    .getContent()
+                    .stream()
+                    .map(conn -> conn.getConnectionURI())
+                    .collect(Collectors.toList());
             addDeepConnectionData(connectionsContainerPage.getContent(), uris);
         }
         if (addMetadata) {
