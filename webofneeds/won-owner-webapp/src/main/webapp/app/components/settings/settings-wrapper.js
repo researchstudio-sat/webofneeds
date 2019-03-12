@@ -34,6 +34,12 @@ function genComponentConf($ngRedux) {
         }
       });
 
+      elmApp.ports.getVerified.subscribe(() => {
+        const isVerified =
+          getIn($ngRedux.getState(), ["account", "emailVerified"]) || false;
+        elmApp.ports.isVerified.send(isVerified);
+      });
+
       const personas = getOwnedPersonas($ngRedux.getState());
       if (personas) {
         elmApp.ports.personaIn.send(personas.toJS());
@@ -45,10 +51,9 @@ function genComponentConf($ngRedux) {
           isVerified: getIn(state, ["account", "emailVerified"]) || false,
         };
       })(state => {
-        if (!state.personas) {
-          return;
+        if (state.personas) {
+          elmApp.ports.personaIn.send(state.personas.toJS());
         }
-        elmApp.ports.personaIn.send(state.personas.toJS());
         elmApp.ports.isVerified.send(state.isVerified);
       });
 
@@ -62,6 +67,7 @@ function genComponentConf($ngRedux) {
 
       scope.$on("$destroy", () => {
         elmApp.ports.personaOut.unsubscribe();
+        elmApp.ports.getVerified.unsubscribe();
         disconnectSkin();
         disconnect();
       });

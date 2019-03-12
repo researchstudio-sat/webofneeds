@@ -42,7 +42,7 @@ init () =
     ( { exportState = EnteringPassword ""
       , isVerified = False
       }
-    , Cmd.none
+    , getVerified ()
     )
 
 
@@ -240,6 +240,9 @@ view skin model =
 
 
 port isVerified : (Bool -> msg) -> Sub msg
+
+
+port getVerified : () -> Cmd msg
 
 
 subscriptions : Sub Msg
