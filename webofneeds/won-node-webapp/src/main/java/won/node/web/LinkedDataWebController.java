@@ -47,6 +47,7 @@ import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.exception.WonProtocolException;
 import won.protocol.message.WonMessageType;
+import won.protocol.model.Connection;
 import won.protocol.model.DataWithEtag;
 import won.protocol.model.NeedState;
 import won.protocol.rest.WonEtagHelper;
@@ -419,9 +420,8 @@ public class LinkedDataWebController {
             WonMessageType eventsType = getMessageType(type);
             Dataset rdfDataset;
             if (page != null) {
-                //TODO: Change to include ConnectionData
                 rdfDataset = linkedDataService
-                        .listConnectionURIs(page, needURI, null, eventsType, dateParam.getDate(), deep, true)
+                        .listConnections(page, needURI, null, eventsType, dateParam.getDate(), deep, true)
                         .getContent();
             } else if (beforeId != null) {
                 //TODO: Change to include ConnectionData
@@ -440,7 +440,7 @@ public class LinkedDataWebController {
                 // clients that do not support
                 // paging
                 rdfDataset = linkedDataService
-                        .listConnectionURIs(needURI, deep, true)
+                        .listConnections(needURI, deep, true)
                         .getContent();
             }
             model.addAttribute("rdfDataset", rdfDataset);
@@ -1126,7 +1126,7 @@ public class LinkedDataWebController {
                 // does not support date and type filtering for clients that do not support
                 // paging
                 rdfDataset = linkedDataService
-                        .listConnectionURIs(needUri, deep, true)
+                        .listConnections(needUri, deep, true)
                         .getContent();
                 // if no page or resume parameter is specified, display the latest connections:
             } else if (page == null && beforeId == null && afterId == null) {
