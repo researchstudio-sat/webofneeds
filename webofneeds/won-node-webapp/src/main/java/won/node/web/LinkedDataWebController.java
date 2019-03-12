@@ -690,7 +690,7 @@ public class LinkedDataWebController {
             } else if (modifiedAfter != null) {
                 // paging is not implemented for modified connections for now!
                 rdfDataset = linkedDataService
-                        .listModifiedConnectionURIsAfter(new DateParameter(modifiedAfter).getDate(), deep);
+                        .listModifiedConnectionsAfter(new DateParameter(modifiedAfter).getDate(), deep).getContent();
             } else if (page != null) {
                 // return latest by the given timestamp
                 NeedInformationService.PagedResource<Dataset, Connection> resource = linkedDataService.listConnections(page,

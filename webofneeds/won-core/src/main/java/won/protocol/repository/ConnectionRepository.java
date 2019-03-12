@@ -100,6 +100,9 @@ public interface ConnectionRepository extends WonRepository<Connection>
   @Query("select connectionURI from Connection where lastUpdate > :modifiedAfter")
   List<URI> findModifiedConnectionURIsAfter(@Param("modifiedAfter") Date modifiedAfter);
 
+  @Query("select conn from Connection conn where lastUpdate > :modifiedAfter")
+  List<Connection> findModifiedConnectionsAfter(@Param("modifiedAfter") Date modifiedAfter);
+
   /**
    * Obtains connectionURIs grouped by the connectionURI itself and with message properties attached. The paging
    * request therefore can use criteria based on aggregated messages properties of the connection,

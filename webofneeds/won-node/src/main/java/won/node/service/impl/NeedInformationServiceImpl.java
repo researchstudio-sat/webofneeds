@@ -151,6 +151,11 @@ public class NeedInformationServiceImpl implements NeedInformationService {
     }
 
     @Override
+    public Collection<Connection> listModifiedConnectionsAfter(Date modifiedAfter) {
+        return connectionRepository.findModifiedConnectionsAfter(modifiedAfter);
+    }
+
+    @Override
     @Deprecated
     public Slice<URI> listConnectionURIs(int page, Integer preferedPageSize, Date timeSpot) {
         int pageSize = getPageSize(preferedPageSize);

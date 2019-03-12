@@ -111,6 +111,14 @@ public interface NeedInformationService {
     public Collection<URI> listModifiedConnectionURIsAfter(Date modifiedAfter);
 
     /**
+     * Retrieves all connections that were modified (by adding events) after a certain date
+     *
+     * @param modifiedAfter modification date
+     * @return
+     */
+    public Collection<Connection> listModifiedConnectionsAfter(Date modifiedAfter);
+
+    /**
      * Retrieves slice of the connection URIs list for a given page number
      *
      * @param page the page number

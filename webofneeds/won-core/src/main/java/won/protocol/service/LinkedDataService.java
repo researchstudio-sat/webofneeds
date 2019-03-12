@@ -149,6 +149,18 @@ public interface LinkedDataService {
     public Dataset listModifiedConnectionURIsAfter(Date modifiedAfter, boolean deep) throws NoSuchConnectionException;
 
     /**
+     * Returns container dataset containing all connection URIs that where modified
+     * after a certain date.
+     *
+     * @param modifiedAfter modification date
+     * @param deep          If deep is true, the resource data of those connection uris is
+     *                      also part of the returned resource.
+     * @return
+     * @throws NoSuchConnectionException
+     */
+    public NeedInformationService.PagedResource<Dataset, Connection> listModifiedConnectionsAfter(Date modifiedAfter, boolean deep) throws NoSuchConnectionException;
+
+    /**
      * Returns a resource containing connection uris at given page. If deep is true,
      * the resource data of those connection uris is also part of the returned
      * resource. If page >0, paging is used and the respective page is returned.
