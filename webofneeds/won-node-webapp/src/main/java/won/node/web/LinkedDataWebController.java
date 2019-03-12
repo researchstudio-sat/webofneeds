@@ -508,17 +508,6 @@ public class LinkedDataWebController {
         return requestUri;
     }
 
-    private String getRequestUriWithAddedQuery(final HttpServletRequest request, String query) {
-        String requestUri = request.getRequestURI();
-        String queryString = request.getQueryString();
-        if (queryString == null || queryString.length() <= 2) {
-            requestUri += "?" + query;
-        } else {
-            requestUri += "?" + queryString + "&" + query;
-        }
-        return requestUri;
-    }
-
     /**
      * If the HTTP 'Accept' header is 'text/html' (as listed in the 'produces' value
      * of the RequestMapping annotation), a redirect to a page uri is sent.
