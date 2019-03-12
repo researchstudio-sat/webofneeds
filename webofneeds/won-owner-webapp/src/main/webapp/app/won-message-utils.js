@@ -11,7 +11,6 @@ import urljoin from "url-join";
 
 import { getRandomWonId } from "./won-utils.js";
 import * as useCaseUtils from "./usecase-utils.js";
-import { isConnUriClosed } from "./won-localstorage.js";
 import { actionTypes } from "./actions/actions.js";
 
 /**
@@ -712,11 +711,12 @@ export async function fetchDataForOwnedNeeds(ownedNeedUris, dispatch) {
 
 function fetchConnectionsOfNeedAndDispatch(needUri, dispatch) {
   return won
-    .getConnectionUrisOfNeed(needUri, needUri, true)
-    .then(connectionUrisOfNeed => {
-      const activeConnectionUris = connectionUrisOfNeed.filter(
-        connUri => !isConnUriClosed(connUri)
-      );
+    .getConnectionUrisWithStateOfNeed(needUri, needUri, true)
+    .then(connectionsWithStateOfNeed => {
+      const activeConnectionUris = connectionsWithStateOfNeed
+        .filter(conn => conn.connectionState !== won.WON.Closed)
+        .map(conn => conn.connectionUri);
+
       dispatch({
         type: actionTypes.connections.storeActiveUrisInLoading,
         payload: Immutable.fromJS({
