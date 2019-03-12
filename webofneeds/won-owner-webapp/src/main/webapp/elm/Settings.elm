@@ -9,7 +9,7 @@ import Element.Input as Input
 import Elements
 import Html exposing (Html)
 import Old.Skin as Skin exposing (Skin)
-import Settings.Account as Account
+import Settings.Export as Export
 import Settings.Personas as Personas
 
 
@@ -55,12 +55,12 @@ type alias Model =
 
 type Page
     = Personas Personas.Model
-    | Account Account.Model
+    | Export Export.Model
 
 
 type Route
     = PersonasR
-    | AccountR
+    | ExportR
 
 
 toRoute : Page -> Route
@@ -69,8 +69,8 @@ toRoute page =
         Personas _ ->
             PersonasR
 
-        Account _ ->
-            AccountR
+        Export _ ->
+            ExportR
 
 
 init : { width : Int, height : Int } -> ( Model, Cmd Msg )
@@ -100,7 +100,7 @@ subInit toPage toMsg ( subModel, cmd ) =
 
 type Msg
     = PersonasMsg Personas.Msg
-    | AccountMsg Account.Msg
+    | ExportMsg Export.Msg
     | ChangeRoute Route
     | Resized Size
     | Back
@@ -113,9 +113,9 @@ update msg model =
             Personas.update subMsg subModel
                 |> updateWith Personas PersonasMsg model
 
-        ( AccountMsg subMsg, Account subModel ) ->
-            Account.update subMsg subModel
-                |> updateWith Account AccountMsg model
+        ( ExportMsg subMsg, Export subModel ) ->
+            Export.update subMsg subModel
+                |> updateWith Export ExportMsg model
 
         ( ChangeRoute newRoute, _ ) ->
             if toRoute model.page == newRoute then
@@ -151,8 +151,8 @@ changeRoute route model =
     let
         ( newPage, cmd ) =
             case route of
-                AccountR ->
-                    subInit Account AccountMsg (Account.init ())
+                ExportR ->
+                    subInit Export ExportMsg (Export.init ())
 
                 PersonasR ->
                     subInit Personas PersonasMsg (Personas.init ())
@@ -234,8 +234,8 @@ view skin model =
             Personas subModel ->
                 viewPage PersonasMsg Personas.view subModel
 
-            Account subModel ->
-                viewPage AccountMsg Account.view subModel
+            Export subModel ->
+                viewPage ExportMsg Export.view subModel
 
 
 navigation : DeviceClass -> Skin -> Route -> Element Msg
@@ -275,16 +275,16 @@ navigation deviceClass skin route =
     in
     column
         attrs
-        [ navItem AccountR
-        , navItem PersonasR
+        [ navItem PersonasR
+        , navItem ExportR
         ]
 
 
 routeLabel : Route -> String
 routeLabel route =
     case route of
-        AccountR ->
-            "Account"
+        ExportR ->
+            "Export"
 
         PersonasR ->
             "Personas"
@@ -301,9 +301,9 @@ subSubscriptions page =
             Personas.subscriptions subModel
                 |> Sub.map PersonasMsg
 
-        Account _ ->
-            Account.subscriptions
-                |> Sub.map AccountMsg
+        Export _ ->
+            Export.subscriptions
+                |> Sub.map ExportMsg
 
 
 subscriptions : Model -> Sub Msg

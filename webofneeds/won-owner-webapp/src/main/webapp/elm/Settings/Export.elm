@@ -1,4 +1,4 @@
-port module Settings.Account exposing
+port module Settings.Export exposing
     ( Model
     , Msg
     , init
@@ -148,10 +148,10 @@ exportView skin model =
                     , spacing 10
                     ]
                     [ paragraph [ width fill ]
-                        [ text "All your account data will be sent to your email address"
+                        [ text "All your account data will be sent to your email address."
                         ]
                     , paragraph [ width fill ]
-                        [ text "Your private keys will be encrypted."
+                        [ text "You can type in any password you like below and your keys will be encrypted using that password."
                         ]
                     ]
                 , row
@@ -226,6 +226,9 @@ view skin model =
         , Font.size 16
         ]
         [ el [ Font.size 24 ] <| text "Account data export"
+        , paragraph [ width fill ]
+            [ text "Here you can export the data associated with your account, including posts, connections and the keys that prove you are the owner of your posts."
+            ]
         , if model.isVerified then
             exportView skin model
 
