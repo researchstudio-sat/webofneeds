@@ -141,6 +141,11 @@ public class NeedInformationServiceImpl implements NeedInformationService {
     }
 
     @Override
+    public Collection<Connection> listConnections() {
+        return connectionRepository.getAllConnections();
+    }
+
+    @Override
     public Collection<URI> listModifiedConnectionURIsAfter(Date modifiedAfter) {
         return connectionRepository.findModifiedConnectionURIsAfter(modifiedAfter);
     }
@@ -160,6 +165,26 @@ public class NeedInformationServiceImpl implements NeedInformationService {
 
             // use 'min(msg.creationDate)' to keep a constant connection order over requests
             slice = connectionRepository.getConnectionURIByActivityDate(
+                    timeSpot,
+                    new PageRequest(pageNum, pageSize, Sort.Direction.DESC, "min(msg.creationDate)"));
+        }
+        return slice;
+    }
+
+    @Override
+    public Slice<Connection> listConnections(int page, Integer preferedPageSize, Date timeSpot) {
+        int pageSize = getPageSize(preferedPageSize);
+        int pageNum = page - 1;
+        Slice<Connection> slice;
+        if (timeSpot == null) {
+
+            // use 'min(msg.creationDate)' to keep a constant connection order over requests
+            slice = connectionRepository.getConnectionsByActivityDate(
+                    new PageRequest(pageNum, pageSize, Sort.Direction.DESC, "min(msg.creationDate)"));
+        } else {
+
+            // use 'min(msg.creationDate)' to keep a constant connection order over requests
+            slice = connectionRepository.getConnectionsByActivityDate(
                     timeSpot,
                     new PageRequest(pageNum, pageSize, Sort.Direction.DESC, "min(msg.creationDate)"));
         }

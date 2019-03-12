@@ -96,6 +96,13 @@ public interface NeedInformationService {
     public Collection<URI> listConnectionURIs();
 
     /**
+     * Retrieves all connections (regardless of state).
+     *
+     * @return a collection of connections.
+     */
+    public Collection<Connection> listConnections();
+
+    /**
      * Retrieves all connection URIs that were modified (by adding events) after a certain date
      *
      * @param modifiedAfter modification date
@@ -113,6 +120,17 @@ public interface NeedInformationService {
      * @return a slice connection URIs.
      */
     public Slice<URI> listConnectionURIs(int page, Integer preferredSize, Date timeSpot);
+
+    /**
+     * Retrieves slice of the connection URIs list for a given page number
+     *
+     * @param page the page number
+     * @param preferredSize preferred number of members per page or null; null => use default
+     * @param timeSpot time at which we want the list state to be fixed, if null - current state
+     *
+     * @return a slice connection URIs.
+     */
+    public Slice<Connection> listConnections(int page, Integer preferredSize, Date timeSpot);
 
     /**
      * Retrieves slice of the connection URIs that precede the given connection URI from the point of view of their
