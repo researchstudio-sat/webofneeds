@@ -248,6 +248,20 @@ export function generateFullNeedFacets(needImm) {
 export function generateShortNeedTypesLabel(needImm) {
   const needTypes = needImm && needImm.getIn(["content", "type"]);
 
+  const getNeedLabel = type => {
+    switch (type) {
+      //Insert specific overrides here
+      default: {
+        const match = /[^:/]+$/.exec(type);
+        if (match) {
+          return match[0];
+        } else {
+          return "Unknown";
+        }
+      }
+    }
+  };
+
   let label = "";
 
   if (isWhatsAroundNeed(needImm) || isWhatsNewNeed(needImm)) {
@@ -265,7 +279,7 @@ export function generateShortNeedTypesLabel(needImm) {
         continue;
         // cut off everything before the first :
       } else {
-        types.push(type.substring(type.indexOf(":") + 1));
+        types.push(getNeedLabel(type));
       }
     }
     label += types.join(", ");
