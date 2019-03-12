@@ -202,6 +202,27 @@ public interface LinkedDataService {
                                                                                        final Integer preferredSize, Date timeSpot, final boolean deep) throws NoSuchConnectionException;
 
     /**
+     * Returns a resource containing connection uris that precede (by time of their
+     * latest event activities) the given connection as of state that was at the
+     * specified time.
+     *
+     * @param beforeConnURI a connection the preceding connections of which we are interested
+     *                      in
+     * @param preferredSize preferred number of connection uris per page (null means use
+     *                      default)
+     * @param timeSpot      date and time that specifies the connections and events state of
+     *                      interest
+     * @param deep          if true, the resource data of those connection uris is also part
+     *                      of the resource
+     * @return
+     * @throws NoSuchNeedException
+     * @throws NoSuchConnectionException only in case deep is set to true and connection data for a member
+     *                                   connection uri cannot be retrieved.
+     */
+    public NeedInformationService.PagedResource<Dataset, Connection> listConnectionsBefore(URI beforeConnURI,
+                                                                                       final Integer preferredSize, Date timeSpot, final boolean deep) throws NoSuchConnectionException;
+
+    /**
      * Returns a resource containing connection uris that follow (by time of their
      * latest event activities) the given connection as of state that was at the
      * specified time.

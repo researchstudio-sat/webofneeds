@@ -516,6 +516,23 @@ public class LinkedDataServiceImpl implements LinkedDataService {
 
     @Override
     @Transactional
+    public NeedInformationService.PagedResource<Dataset, Connection> listConnectionsBefore(
+            URI beforeConnURI, final Integer preferredSize, Date timeSpot, boolean deep) throws NoSuchConnectionException {
+        Slice<Connection> slice = needInformationService.listConnectionsBefore(beforeConnURI, preferredSize, timeSpot);
+        NeedInformationService.PagedResource<Dataset, Connection> connectionsContainerPage = toConnectionsContainerPage(this.connectionResourceURIPrefix + "/", slice);
+        if (deep) {
+            List<URI> uris = slice
+                    .getContent()
+                    .stream()
+                    .map(conn -> conn.getConnectionURI())
+                    .collect(Collectors.toList());
+            addDeepConnectionData(connectionsContainerPage.getContent(), uris);
+        }
+        return connectionsContainerPage;
+    }
+
+    @Override
+    @Transactional
     public NeedInformationService.PagedResource<Dataset, URI> listConnectionURIsAfter(
             URI afterConnURI, final Integer preferredSize, Date timeSpot, boolean deep) throws NoSuchConnectionException {
         Slice<URI> slice = needInformationService.listConnectionURIsAfter(afterConnURI, preferredSize, timeSpot);

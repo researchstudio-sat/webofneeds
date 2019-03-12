@@ -146,6 +146,13 @@ public interface ConnectionRepository extends WonRepository<Connection>
     @Param("referenceDate") Date referenceDate,
     Pageable pageable);
 
+  @Query("select conn from Connection conn where conn.connectionURI in (select msg.parentURI from MessageEventPlaceholder msg " +
+    "where ((msg.senderURI = msg.parentURI or msg.receiverURI = msg.parentURI) and (msg.creationDate < :referenceDate))" +
+    "group by msg.parentURI having max(msg.creationDate) < :resumeDate)")
+  Slice<Connection> getConnectionsBeforeByActivityDate(
+    @Param("resumeDate") Date resumeEventDate,
+    @Param("referenceDate") Date referenceDate,
+    Pageable pageable);
 
   @Query("select msg.parentURI from MessageEventPlaceholder msg " +
     "where ((msg.senderURI = msg.parentURI or msg.receiverURI = msg.parentURI) and (msg.creationDate < :referenceDate))" +
