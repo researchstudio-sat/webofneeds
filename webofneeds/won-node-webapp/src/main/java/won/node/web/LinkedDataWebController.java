@@ -921,10 +921,7 @@ public class LinkedDataWebController {
             } else if (beforeId == null && afterId == null) {
                 //if page == null -> return page with latest events
                 NeedInformationService.PagedResource<Dataset, URI> resource = linkedDataService
-                        .listConnectionEventURIs(connectionUri, page != null ? page : 1, preferedSize, msgType, deep); // TODO: does not
-                // respect
-                // preferredSize if
-                // deep is used
+                        .listConnectionEventURIs(connectionUri, page != null ? page : 1, preferedSize, msgType, deep); //FIXME: does not respect preferredSize if deep is used
                 rdfDataset = resource.getContent();
                 if (page == null) {
                     addPagedResourceInSequenceHeader(headers, connectionEventsURI, resource, passableMap);
