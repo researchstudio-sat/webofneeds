@@ -114,6 +114,10 @@ input[type="email"] {
   border-radius: 0.19rem;
   border: $thinGrayBorder;
   font-size: 16px;
+
+  &:focus {
+    outline-color: $won-secondary-color;
+  }
 }
 
 .clickable {
