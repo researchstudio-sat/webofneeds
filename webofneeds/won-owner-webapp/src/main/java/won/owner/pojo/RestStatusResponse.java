@@ -21,6 +21,12 @@ public enum RestStatusResponse {
     TRANSFERUSER_NOT_FOUND(2400, "Cannot transfer to new user: privateUsername not found", HttpStatus.NOT_FOUND),
     TRANSFERUSER_ALREADY_EXISTS(2401, "Cannot transfer to new user: name is already in use", HttpStatus.CONFLICT),
 
+    PASSWORDCHANGE_USER_NOT_FOUND(8400, "Cannot change password: username not found", HttpStatus.NOT_FOUND),
+    PASSWORDCHANGE_BAD_PASSWORD(8401, "Cannot change password: new password is bad", HttpStatus.FORBIDDEN),
+    PASSWORDCHANGE_KEYSTORE_PROBLEM(8402, "Cannot change password: error reading/writing keys", HttpStatus.FORBIDDEN),
+    PASSWORDCHANGE_WRONG_OLD_PASSWORD(8403, "Cannot change password: old password is wrong", HttpStatus.FORBIDDEN),
+
+    
     TOKEN_VERIFICATION_SUCCESS(3200, "E-Mail verification successful", HttpStatus.OK),
     TOKEN_RESEND_SUCCESS(3201, "E-Mail Verification resent", HttpStatus.OK),
     TOKEN_NOT_FOUND(3400, "Verification Token not found", HttpStatus.NOT_FOUND),

@@ -340,6 +340,31 @@ export function transferPrivateAccount(credentials) {
 }
 
 /**
+ * Change the password of the user currently logged in.
+ * @param credentials { email, oldPassword, newPassword }
+ * @returns {*}
+ */
+export function changePassword(credentials) {
+  const { email, oldPassword, newPassword } = credentials;
+
+  return fetch("/owner/rest/users/changePassword", {
+    method: "post",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify({
+      username: email,
+      oldPassword: oldPassword,
+      newPassword: newPassword,
+    }),
+  }).then(checkHttpStatus);
+}
+
+window.changePassword4dbg = changePassword;
+
+/**
  * @param credentials either {email, password} or {privateId}
  * @returns {*}
  */

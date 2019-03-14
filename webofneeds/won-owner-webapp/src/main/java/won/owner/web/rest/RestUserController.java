@@ -10,6 +10,7 @@ import java.net.URISyntaxException;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -46,9 +47,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.WebRequest;
 
 import won.owner.model.EmailVerificationToken;
+import won.owner.model.KeyStoreIOException;
 import won.owner.model.User;
 import won.owner.model.UserNeed;
 import won.owner.pojo.AnonymousLinkPojo;
+import won.owner.pojo.ChangePasswordPojo;
 import won.owner.pojo.RestStatusResponse;
 import won.owner.pojo.TransferUserPojo;
 import won.owner.pojo.UserPojo;
@@ -61,9 +64,12 @@ import won.owner.service.impl.KeystoreEnabledUserDetails;
 import won.owner.service.impl.UserAlreadyExistsException;
 import won.owner.service.impl.UserNotFoundException;
 import won.owner.service.impl.UserService;
+import won.owner.service.impl.WrongOldPasswordException;
 import won.owner.web.WonOwnerMailSender;
 import won.owner.web.events.OnExportUserEvent;
+import won.owner.web.events.OnPasswordChangedEvent;
 import won.owner.web.events.OnRegistrationCompleteEvent;
+import won.owner.web.validator.PasswordChangeValidator;
 import won.owner.web.validator.UserRegisterValidator;
 
 /**
@@ -81,6 +87,8 @@ public class RestUserController {
     private SecurityContextRepository securityContextRepository;
 
     private UserRegisterValidator userRegisterValidator;
+    
+    private PasswordChangeValidator passwordChangeValidator;
 
     private UserNeedRepository userNeedRepository;
 
@@ -106,10 +114,12 @@ public class RestUserController {
     public RestUserController(final AuthenticationManager authenticationManager,
                               final SecurityContextRepository securityContextRepository,
                               final UserRegisterValidator userRegisterValidator,
+                              final PasswordChangeValidator passwordChangeValidator,
                               final UserNeedRepository userNeedRepository) {
         this.authenticationManager = authenticationManager;
         this.securityContextRepository = securityContextRepository;
         this.userRegisterValidator = userRegisterValidator;
+        this.passwordChangeValidator = passwordChangeValidator;
         this.userNeedRepository = userNeedRepository;
     }
 
@@ -153,6 +163,51 @@ public class RestUserController {
         return generateStatusResponse(RestStatusResponse.USER_CREATED);
     }
 
+    /**
+     * Changes the user's password
+     *
+     * @param changePasswordPojo    password changing data
+     * @param errors
+     * @return ResponseEntity with Http Status Code
+     */
+    @ResponseBody
+    @RequestMapping(
+            value = "/changePassword",
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            method = RequestMethod.POST
+    )
+    //TODO: move transactionality annotation into the service layer
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public ResponseEntity changePassword(@RequestBody ChangePasswordPojo changePasswordPojo, Errors errors, HttpServletRequest request, HttpServletResponse response) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (username == null) {
+            return generateStatusResponse(RestStatusResponse.USER_NOT_SIGNED_IN);
+        }
+        if (!username.equals(changePasswordPojo.getUsername())) {
+            return generateStatusResponse(RestStatusResponse.USERNAME_MISMATCH);
+        }
+        try {
+            passwordChangeValidator.validate(changePasswordPojo, errors);
+            if (errors.hasErrors()) {
+                if (errors.getFieldErrorCount() > 0) {
+                    return generateStatusResponse(RestStatusResponse.PASSWORDCHANGE_BAD_PASSWORD);
+                } else {
+                    // username is not found
+                    return generateStatusResponse(RestStatusResponse.PASSWORDCHANGE_USER_NOT_FOUND);
+                }
+            }
+            User user = userService.changePassword(changePasswordPojo.getUsername(), changePasswordPojo.getNewPassword(), changePasswordPojo.getOldPassword());
+            eventPublisher.publishEvent(new OnPasswordChangedEvent(user, request.getLocale(), request.getContextPath()));
+            return generateUserResponse(user);
+        } catch (WrongOldPasswordException e) {
+            return generateStatusResponse(RestStatusResponse.PASSWORDCHANGE_WRONG_OLD_PASSWORD);
+        } catch (UserNotFoundException e) {
+            return generateStatusResponse(RestStatusResponse.USER_NOT_FOUND);
+        } catch (KeyStoreIOException e) {
+            return generateStatusResponse(RestStatusResponse.PASSWORDCHANGE_KEYSTORE_PROBLEM);
+        } 
+    }
+    
     /**
      * transfers a privateId user to a registered user
      *
@@ -304,18 +359,9 @@ public class RestUserController {
             @RequestParam(name="privateId", required = false) String privateId,
             HttpServletRequest request,
             HttpServletResponse response) {
-        SecurityContext context = SecurityContextHolder.getContext();
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username,
-                password);
+        Optional<User> user = Optional.empty();
         try {
-            Authentication auth = authenticationManager.authenticate(token);
-            SecurityContextHolder.getContext().setAuthentication(auth);
-            securityContextRepository.saveContext(SecurityContextHolder.getContext(), request, response);
-            rememberMeServices.loginSuccess(request, response, auth);
-
-            User user = userService.getByUsername(username);
-
-            return generateUserResponse(user);
+            user = Optional.of(performLoginForUser(username, password, request, response));
         } catch (BadCredentialsException ex) {
             rememberMeServices.loginFail(request, response);
             return generateStatusResponse(RestStatusResponse.USER_BAD_CREDENTIALS);
@@ -323,6 +369,22 @@ public class RestUserController {
             rememberMeServices.loginFail(request, response);
             return generateStatusResponse(RestStatusResponse.USER_NOT_VERIFIED);
         }
+        if (user.isPresent()) {
+            return generateUserResponse(user.get());
+        } 
+        return generateStatusResponse(RestStatusResponse.USER_NOT_SIGNED_IN);
+    }
+
+    private User performLoginForUser(String username, String password, HttpServletRequest request,
+            HttpServletResponse response) throws BadCredentialsException, CredentialsExpiredException {
+        SecurityContext context = SecurityContextHolder.getContext();
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username,
+            password);
+        Authentication auth = authenticationManager.authenticate(token);
+        SecurityContextHolder.getContext().setAuthentication(auth);
+        securityContextRepository.saveContext(SecurityContextHolder.getContext(), request, response);
+        rememberMeServices.loginSuccess(request, response, auth);
+        return userService.getByUsername(username);
     }
 
     /**
