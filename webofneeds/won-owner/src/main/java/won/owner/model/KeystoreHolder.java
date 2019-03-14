@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
+import java.security.cert.CertificateException;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -67,7 +68,7 @@ public class KeystoreHolder {
      * @param dataset
      * @throws IOException 
      */
-    public synchronized void setKeystore(KeyStore store, String password) throws IOException {
+    public synchronized void setKeystore(KeyStore store, String password) throws KeyStoreIOException {
         synchronized (this) {
         	ByteArrayOutputStream outputStream = new ByteArrayOutputStream(DEFAULT_BYTE_ARRAY_SIZE);
     		if (outputStream != null) {
@@ -76,30 +77,34 @@ public class KeystoreHolder {
     				this.keystoreBytes = outputStream.toByteArray();
     			} catch (Exception e) {
     				logger.error("Could not save key store "  + getId(), e);
-    				throw new IOException(e);
+    				throw new KeyStoreIOException("Could not save keystore " + getId(), e);
     			} finally {
     				try {
     					outputStream.close();
     				} catch (Exception e) {
     					logger.error("Error closing stream of keystore "  + getId(), e);
-    					throw e;
+    					throw new KeyStoreIOException("Error closing stream of keystore " + getId(), e);
     				}
     			}
     		}
         }
     }
 
-    public synchronized KeyStore getKeystore(String password) throws Exception {
+    public synchronized KeyStore getKeystore(String password) throws KeyStoreIOException {
     	KeyStore store = null;
     	InputStream inputStream = null;
     	byte[] keystoreData = getKeystoreBytes();
     	if (keystoreData == null || keystoreData.length == 0) {
     		//return a new, empty key store if there is no key store yet.
-			store = java.security.KeyStore.getInstance(KEY_STORE_TYPE, PROVIDER_BC);
-			store.load(null, password.toCharArray());
-			//also set this key store so we can save it to db. (hence the synchronized methods)
-			setKeystore(store, password);
-			return store;
+    	    try {
+    			store = java.security.KeyStore.getInstance(KEY_STORE_TYPE, PROVIDER_BC);
+    			store.load(null, password.toCharArray());
+    			//also set this key store so we can save it to db. (hence the synchronized methods)
+    			setKeystore(store, password);
+    			return store;
+    	    } catch (Exception e) {
+    	        throw new KeyStoreIOException("Could not load keystore " + getId(), e);    
+    	    }
     	}
     	inputStream = new ByteArrayInputStream(getKeystoreBytes());
 		try {
@@ -107,13 +112,13 @@ public class KeystoreHolder {
 			store.load(inputStream, password.toCharArray());
 		} catch (Exception e) {
 			logger.error("Could not load key store "  + getId(), e);
-			throw e;
+			throw new KeyStoreIOException("Could not load keystore " + getId(), e);
 		} finally {
 			try {
 				inputStream.close();
 			} catch (Exception e) {
 				logger.error("Error closing stream of keystore " + getId(), e);
-				throw e;
+				throw new KeyStoreIOException("Error closing stream of keystore " + getId(), e);
 			}
 
 		}
