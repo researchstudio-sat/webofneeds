@@ -16,7 +16,6 @@ public class KeystorePasswordUtils {
 	public static final String CURRENT_VERSION = "v1";
 	public static final int KEYSTORE_PASSWORD_BYTES = 32;
 
-
 	public static String encryptPassword(String password, String key) {
 		try {
 			int iterations = 1000;
