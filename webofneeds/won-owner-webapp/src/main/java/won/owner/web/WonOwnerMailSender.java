@@ -48,6 +48,7 @@ public class WonOwnerMailSender {
     private static final String SUBJECT_NEED_MESSAGE = "Notification from WoN node";
     private static final String SUBJECT_SYSTEM_DEACTIVATE = "Posting deactivated by system";
     private static final String SUBJECT_VERIFICATION = "Please verify your email address";
+    private static final String SUBJECT_PASSWORD_CHANGED = "Password changed";
     private static final String SUBJECT_ANONYMOUSLINK = "Anonymous login link";
     private static final String SUBJECT_EXPORT = "Your account export is complete";
     private static final String SUBJECT_EXPORT_FAILED = "Your account export did not succeed";
@@ -75,6 +76,7 @@ public class WonOwnerMailSender {
     private Template anonymousTemplate;
     private Template exportTemplate;
     private Template exportFailedTemplate;
+    private Template passwordChangedTemplate;
 
     public WonOwnerMailSender() {
         velocityEngine = new VelocityEngine();
@@ -93,6 +95,7 @@ public class WonOwnerMailSender {
         anonymousTemplate = velocityEngine.getTemplate("mail-templates/anonymous.vm");
         exportTemplate = velocityEngine.getTemplate("mail-templates/export.vm");
         exportFailedTemplate = velocityEngine.getTemplate("mail-templates/export-failed.vm");
+        passwordChangedTemplate = velocityEngine.getTemplate("mail-templates/password-changed.vm");
     }
 
     public void setWonMailSender(WonMailSender wonMailSender) {
@@ -161,6 +164,16 @@ public class WonOwnerMailSender {
         velocityContext.put("gracePeriodInHours", User.GRACEPERIOD_INHOURS);
         velocityContext.put("serviceName", this.ownerWebappUri);
 
+        return velocityContext;
+    }
+    
+    private VelocityContext createServiceNameOnlyContext() {
+        String ownerAppLink = uriService.getOwnerProtocolOwnerURI().toString();
+        VelocityContext velocityContext = new VelocityContext();
+        EventCartridge ec = new EventCartridge();
+        ec.addEventHandler(new EscapeHtmlReference());
+        ec.attachToContext(velocityContext);
+        velocityContext.put("serviceName", this.ownerWebappUri);
         return velocityContext;
     }
 
@@ -254,6 +267,14 @@ public class WonOwnerMailSender {
         verificationTemplate.merge(context, writer);
         logger.debug("sending "+ SUBJECT_VERIFICATION + " to " + user.getEmail());
         this.wonMailSender.sendTextMessage(user.getEmail(), SUBJECT_VERIFICATION, writer.toString());
+    }
+    
+    public void sendPasswordChangedMessage(User user) {
+        StringWriter writer = new StringWriter();
+        VelocityContext context = createServiceNameOnlyContext();
+        passwordChangedTemplate.merge(context, writer);
+        logger.debug("sending "+ SUBJECT_PASSWORD_CHANGED + " to " + user.getEmail());
+        this.wonMailSender.sendTextMessage(user.getEmail(), SUBJECT_PASSWORD_CHANGED, writer.toString());
     }
 
     public void sendAnonymousLinkMessage(String email, String privateId) {
