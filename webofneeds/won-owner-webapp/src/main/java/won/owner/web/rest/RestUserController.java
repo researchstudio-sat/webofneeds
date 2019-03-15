@@ -48,6 +48,7 @@ import org.springframework.web.context.request.WebRequest;
 
 import won.owner.model.EmailVerificationToken;
 import won.owner.model.KeyStoreIOException;
+import won.owner.model.TokenPurpose;
 import won.owner.model.User;
 import won.owner.model.UserNeed;
 import won.owner.pojo.AnonymousLinkPojo;
@@ -64,7 +65,7 @@ import won.owner.service.impl.KeystoreEnabledUserDetails;
 import won.owner.service.impl.UserAlreadyExistsException;
 import won.owner.service.impl.UserNotFoundException;
 import won.owner.service.impl.UserService;
-import won.owner.service.impl.WrongOldPasswordException;
+import won.owner.service.impl.IncorrectPasswordException;
 import won.owner.web.WonOwnerMailSender;
 import won.owner.web.events.OnExportUserEvent;
 import won.owner.web.events.OnPasswordChangedEvent;
@@ -199,7 +200,7 @@ public class RestUserController {
             User user = userService.changePassword(changePasswordPojo.getUsername(), changePasswordPojo.getNewPassword(), changePasswordPojo.getOldPassword());
             eventPublisher.publishEvent(new OnPasswordChangedEvent(user, request.getLocale(), request.getContextPath()));
             return generateUserResponse(user);
-        } catch (WrongOldPasswordException e) {
+        } catch (IncorrectPasswordException e) {
             return generateStatusResponse(RestStatusResponse.PASSWORDCHANGE_WRONG_OLD_PASSWORD);
         } catch (UserNotFoundException e) {
             return generateStatusResponse(RestStatusResponse.USER_NOT_FOUND);
@@ -464,9 +465,13 @@ public class RestUserController {
     @Transactional(propagation = Propagation.SUPPORTS)
     public ResponseEntity confirmRegistration(@RequestBody VerificationTokenPojo token) {
         EmailVerificationToken verificationToken = userService.getEmailVerificationToken(token.getToken());
-
+        
         if(verificationToken == null) {
             return generateStatusResponse(RestStatusResponse.TOKEN_NOT_FOUND);
+        }
+        
+        if (verificationToken.getPurpose() != TokenPurpose.INITIAL_EMAIL_VERIFICATION) {
+            return generateStatusResponse(RestStatusResponse.TOKEN_PURPOSE_MISMATCH);
         }
 
         User user = verificationToken.getUser();

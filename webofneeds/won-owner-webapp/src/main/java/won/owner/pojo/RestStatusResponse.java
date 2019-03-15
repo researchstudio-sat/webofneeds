@@ -34,7 +34,8 @@ public enum RestStatusResponse {
     TOKEN_EXPIRED(3403, "Verification Token is expired", HttpStatus.BAD_REQUEST),
     TOKEN_RESEND_FAILED_ALREADY_VERIFIED(3404, "User is already verified, E-Mail will not be sent", HttpStatus.CONFLICT),
     TOKEN_RESEND_FAILED_USER_ANONYMOUS(3405, "User is not verifiable, E-Mail will not be sent", HttpStatus.FORBIDDEN),
-
+    TOKEN_PURPOSE_MISMATCH(3406, "Token was issued for another purpose", HttpStatus.BAD_REQUEST),
+    
     SIGNUP_FAILED(4400, "Registration failed", HttpStatus.BAD_REQUEST),
 
     SETTINGS_CREATED(5200, "Settings created", HttpStatus.CREATED),
