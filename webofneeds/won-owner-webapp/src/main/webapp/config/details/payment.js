@@ -3,6 +3,7 @@ import { generateIdString } from "../../app/utils.js";
 import won from "../../app/won-es6.js";
 import { get } from "../../app/utils.js";
 
+// TODO: don't demand customer info
 export const paypalPayment = {
   identifier: "paypalPayment",
   label: "PayPal Payment",
@@ -11,9 +12,9 @@ export const paypalPayment = {
   amountPlaceholder: "Enter Amount...",
   receiverLabel: "Recipient:",
   receiverPlaceholder: "PayPal Account ID (Email)...",
-  secretLabel: "Secret:",
-  secretPlaceholder: "Enter Secret...",
-  customerLabel: "Invoice will be sent to...",
+  // secretLabel: "Secret:",
+  // secretPlaceholder: "Enter Secret...",
+  //customerLabel: "Invoice will be sent to...",
   component: "won-paypal-payment-picker",
   viewerComponent: "won-paypal-payment-viewer",
   currency: [
@@ -28,9 +29,9 @@ export const paypalPayment = {
       !value ||
       !value.amount ||
       !value.currency ||
-      !value.secret ||
-      !value.receiver ||
-      !value.customerUri
+      // !value.secret ||
+      !value.receiver //||
+      // !value.customerUri
     ) {
       return { "s:invoice": undefined };
     }
@@ -55,12 +56,12 @@ export const paypalPayment = {
           "s:price": [{ "@value": value.amount, "@type": "xsd:float" }],
           "s:priceCurrency": value.currency,
         },
-        "s:identifier": value.secret,
+        // "s:identifier": value.secret,
         "s:accountId": value.receiver,
-        "s:customer": {
-          "@type": "won:Need",
-          "@id": value.customerUri,
-        },
+        // "s:customer": {
+        //   "@type": "won:Need",
+        //   "@id": value.customerUri,
+        // },
         // TODO: handle optional information
         //"pay:hasFeePayer": "feePayer", //TODO Adapt and include Optional
         //"pay:hasTax": "hasTax", //TODO Adapt and include Optional
@@ -85,12 +86,12 @@ export const paypalPayment = {
     }
 
     // TODO: this should work with personas too?
-    const customer = get(invoice, "s:customer");
-    if (!customer || customer.get("@type") !== won.WON.NeedCompacted) {
-      return undefined;
-    }
+    // const customer = get(invoice, "s:customer");
+    // if (!customer || customer.get("@type") !== won.WON.NeedCompacted) {
+    //   return undefined;
+    // }
 
-    const customerUri = get(customer, "@id");
+    // const customerUri = get(customer, "@id");
     const amount = won.parseFrom(
       invoice,
       ["s:totalPaymentDue", "s:price"],
@@ -101,10 +102,10 @@ export const paypalPayment = {
       ["s:totalPaymentDue", "s:priceCurrency"],
       "xsd:string"
     );
-    const secret = get(invoice, "s:identifier");
+    // const secret = get(invoice, "s:identifier");
     const receiver = get(invoice, "s:accountId");
 
-    if (!amount || !currency || !secret || !receiver || !customerUri) {
+    if (!amount || !currency || !receiver) {
       return undefined;
     }
 
@@ -113,17 +114,17 @@ export const paypalPayment = {
     return {
       amount: amount,
       currency: currency,
-      secret: secret,
+      // secret: secret,
       receiver: receiver,
-      customerUri: customerUri,
+      // customerUri: customerUri,
     };
   },
   generateHumanReadable: function({ value, includeLabel }) {
     if (value) {
       const amount = value.amount;
-      const secret = value.secret;
+      // const secret = value.secret;
       const receiver = value.receiver;
-      const customerUri = value.customerUri;
+      //const customerUri = value.customerUri;
 
       let currencyLabel = undefined;
 
@@ -138,17 +139,10 @@ export const paypalPayment = {
       const amountString = "Amount: " + amount + currencyLabel;
       const receiverString = "Recipient: " + receiver;
       // TODO: use title or persona name if available
-      const customerString = "Customer: <" + customerUri + ">";
-      const secretString = "Secret: " + secret;
+      //const customerString = "Customer: <" + customerUri + ">";
+      // const secretString = "Secret: " + secret;
 
-      const fullHumanReadable =
-        amountString +
-        " " +
-        receiverString +
-        " " +
-        customerString +
-        " " +
-        secretString;
+      const fullHumanReadable = amountString + " " + receiverString;
 
       return includeLabel
         ? this.label + ": " + fullHumanReadable
