@@ -36,6 +36,9 @@ public enum RestStatusResponse {
     TOKEN_RESEND_FAILED_USER_ANONYMOUS(3405, "User is not verifiable, E-Mail will not be sent", HttpStatus.FORBIDDEN),
     TOKEN_PURPOSE_MISMATCH(3406, "Token was issued for another purpose", HttpStatus.BAD_REQUEST),
     
+    RECOVERY_KEYGEN_USER_NOT_FOUND(8100, "Could not generate recovery key: user not found", HttpStatus.BAD_REQUEST),
+    RECOVERY_KEYGEN_WRONG_PASSWORD(8100, "Could not generate recovery key: wrong password", HttpStatus.BAD_REQUEST),
+    
     SIGNUP_FAILED(4400, "Registration failed", HttpStatus.BAD_REQUEST),
 
     SETTINGS_CREATED(5200, "Settings created", HttpStatus.CREATED),

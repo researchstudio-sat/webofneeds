@@ -365,6 +365,31 @@ export function changePassword(credentials) {
 window.changePassword4dbg = changePassword;
 
 /**
+ * Change the password of the user currently logged in.
+ * @param credentials { email, oldPassword, newPassword }
+ * @returns {*}
+ */
+export function resetPassword(credentials) {
+  const { email, recoveryKey, newPassword } = credentials;
+
+  return fetch("/owner/rest/users/resetPassword", {
+    method: "post",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify({
+      username: email,
+      recoveryKey: recoveryKey,
+      newPassword: newPassword,
+      verificationToken: "",
+    }),
+  }).then(checkHttpStatus);
+}
+window.resetPassword4dbg = resetPassword;
+
+/**
  * @param credentials either {email, password} or {privateId}
  * @returns {*}
  */

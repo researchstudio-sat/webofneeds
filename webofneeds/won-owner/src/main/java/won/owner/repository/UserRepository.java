@@ -23,6 +23,6 @@ public interface UserRepository extends WonRepository<User> {
   @Query(value = "SELECT u from User u JOIN u.userNeeds n where n.uri = ?1")
   public User findByNeedUri(URI needUri);
 
-  @Query(value = "SELECT u from User u JOIN FETCH u.keystorePasswordHolder where u.username = ?1")
+  @Query(value = "SELECT u from User u JOIN FETCH u.keystorePasswordHolder LEFT JOIN FETCH u.recoverableKeystorePasswordHolder where u.username = ?1 ")
   public User findByUsernameWithKeystorePassword(String username);
 }

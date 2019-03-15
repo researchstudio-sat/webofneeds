@@ -13,7 +13,7 @@ import won.owner.web.events.OnRegistrationCompleteEvent;
 
 
 @Component
-public class PasswordChangeListener implements ApplicationListener<OnPasswordChangedEvent> {
+public class PasswordChangeEMailListener implements ApplicationListener<OnPasswordChangedEvent> {
     @Autowired
     private UserService userService;
 

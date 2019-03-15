@@ -52,6 +52,7 @@ public class WonOwnerMailSender {
     private static final String SUBJECT_ANONYMOUSLINK = "Anonymous login link";
     private static final String SUBJECT_EXPORT = "Your account export is complete";
     private static final String SUBJECT_EXPORT_FAILED = "Your account export did not succeed";
+    private static final String SUBJECT_RECOVERY_KEY_GENERATED = "Your new recovery key";
 
     private WonMailSender wonMailSender;
     
@@ -77,6 +78,7 @@ public class WonOwnerMailSender {
     private Template exportTemplate;
     private Template exportFailedTemplate;
     private Template passwordChangedTemplate;
+    private Template recoveryKeyGeneratedTemplate;
 
     public WonOwnerMailSender() {
         velocityEngine = new VelocityEngine();
@@ -96,6 +98,7 @@ public class WonOwnerMailSender {
         exportTemplate = velocityEngine.getTemplate("mail-templates/export.vm");
         exportFailedTemplate = velocityEngine.getTemplate("mail-templates/export-failed.vm");
         passwordChangedTemplate = velocityEngine.getTemplate("mail-templates/password-changed.vm");
+        recoveryKeyGeneratedTemplate= velocityEngine.getTemplate("mail-templates/recovery-key-generated.vm");
     }
 
     public void setWonMailSender(WonMailSender wonMailSender) {
@@ -177,6 +180,19 @@ public class WonOwnerMailSender {
         return velocityContext;
     }
 
+    private VelocityContext createRecoveryKeyContext(String recoveryKey) {
+        String ownerAppLink = uriService.getOwnerProtocolOwnerURI().toString();
+        VelocityContext velocityContext = new VelocityContext();
+        EventCartridge ec = new EventCartridge();
+        ec.addEventHandler(new EscapeHtmlReference());
+        ec.attachToContext(velocityContext);
+
+        velocityContext.put("recoveryKey", recoveryKey);
+        velocityContext.put("serviceName", this.ownerWebappUri);
+
+        return velocityContext;
+    }
+    
     private VelocityContext createAnonymousLinkContext(String privateId) {
         String ownerAppLink = uriService.getOwnerProtocolOwnerURI().toString();
         VelocityContext velocityContext = new VelocityContext();
@@ -297,6 +313,14 @@ public class WonOwnerMailSender {
         exportFailedTemplate.merge(new VelocityContext(), writer);
         logger.debug("sending "+ SUBJECT_EXPORT_FAILED + " to " + email);
         this.wonMailSender.sendHtmlMessage(email, SUBJECT_EXPORT_FAILED, writer.toString());
+    }
+
+    public void sendRecoveryKeyGeneratedMessage(User user, String recoveryKey) {
+        StringWriter writer = new StringWriter();
+        VelocityContext context = createRecoveryKeyContext(recoveryKey);
+        recoveryKeyGeneratedTemplate.merge(context, writer);
+        logger.debug("sending "+ SUBJECT_RECOVERY_KEY_GENERATED+ " to " + user.getEmail());
+        this.wonMailSender.sendTextMessage(user.getEmail(), SUBJECT_RECOVERY_KEY_GENERATED, writer.toString());
     }
 
 /*

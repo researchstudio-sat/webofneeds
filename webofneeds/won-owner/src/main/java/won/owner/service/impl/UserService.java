@@ -26,8 +26,10 @@ import won.owner.model.KeystoreHolder;
 import won.owner.model.KeystorePasswordHolder;
 import won.owner.model.User;
 import won.owner.repository.EmailVerificationRepository;
+import won.owner.repository.KeystorePasswordRepository;
 import won.owner.repository.PersistentLoginRepository;
 import won.owner.repository.UserRepository;
+import won.protocol.util.ExpensiveSecureRandomString;
 
 /**
  * Created by fsuda on 28.05.2018.
@@ -45,7 +47,12 @@ public class UserService {
     
     @Autowired
     private PersistentLoginRepository persistentLoginRepository;
+    
+    @Autowired
+    private KeystorePasswordRepository keystorePasswordRepository;
 
+    private ExpensiveSecureRandomString randomStringGenerator = new ExpensiveSecureRandomString();
+    
     /**
      * Transfers the specific user to a non existant new user with password
      *
@@ -108,6 +115,9 @@ public class UserService {
                     newPassword);
 
             privateUser.setKeystorePasswordHolder(newKeystorePassword);
+            
+            // we delete the recoverable keystore key as it will no longer work
+            privateUser.setRecoverableKeystorePasswordHolder(null);
             save(privateUser);
 
             return privateUser;
@@ -125,27 +135,125 @@ public class UserService {
      * 
      * @throws UserNotFoundException when the private User is not found
      * @throws KeyStoreIOException if something goes wrong loading or saving the keystore
-     * @throws WrongOldPasswordException if the old password is not the actual old password of the user 
+     * @throws IncorrectPasswordException if the old password is not the actual old password of the user 
      */
     @Transactional(propagation = Propagation.REQUIRED)
-    public User changePassword(String username, String newPassword, String oldPassword) throws UserNotFoundException, KeyStoreIOException, WrongOldPasswordException {
+    public User changePassword(String username, String newPassword, String oldPassword) throws UserNotFoundException, KeyStoreIOException, IncorrectPasswordException {
         logger.debug("changing password for user {}", username);
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         User user = getByUsernameWithKeystorePassword(username);
         if (user == null) {
-            throw new UserNotFoundException();
+            throw new UserNotFoundException("cannot change password: user not found");
         }
         if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
-            throw new WrongOldPasswordException();
+            throw new IncorrectPasswordException("cannot change password: old password is incorrect");
+        }
+        KeystorePasswordHolder keystorePasswordHolder = user.getKeystorePasswordHolder();
+        String oldKeystorePassword = keystorePasswordHolder.getPassword(oldPassword);
+        logger.debug("re-encrypting keystore for user {} with new keystore password", username);
+        
+        String newKeystorePassword = changeKeystorePassword(user, oldKeystorePassword);
+        
+        // everything has worked so far, now make the changes
+        user.setPassword(passwordEncoder.encode(newPassword));
+        keystorePasswordHolder.setPassword(newKeystorePassword, newPassword);
+        user.setKeystorePasswordHolder(keystorePasswordHolder);
+
+        // we delete the recoverable keystore key as it will no longer work
+        user.setRecoverableKeystorePasswordHolder(null);
+        
+        save(user);
+        logger.debug("password changed for user {}", username);
+        // persistent logins won't work any more as we changed the keystore password, so let's delete them
+        persistentLoginRepository.deleteByUsername(username);
+        return user;
+    }
+
+
+    /**
+     * Generates a new recovery key for the user 
+     * 
+     **/
+    @Transactional(propagation=Propagation.REQUIRED)
+    public String generateRecoveryKey(String email, String password) throws UserNotFoundException, IncorrectPasswordException {
+        logger.debug("changing password for user {}", email);
+        User user = getByUsernameWithKeystorePassword(email);
+        if (user == null) {
+            throw new UserNotFoundException("cannot generate recovery key: user not found");
+        }
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new IncorrectPasswordException("cannot generate recovery key: incorrect password");
         }
         KeystorePasswordHolder keystorePasswordHolder = user.getKeystorePasswordHolder();
         KeystoreHolder keystoreHolder = user.getKeystoreHolder();
-        String oldKeystorePassword = keystorePasswordHolder.getPassword(oldPassword);
+        String keystorePassword = keystorePasswordHolder.getPassword(password);
+        
+        
+        StringBuilder sb = new StringBuilder();
+        sb
+            .append("MY__")
+            .append(randomStringGenerator.nextString(4))
+            .append("_")
+            .append(randomStringGenerator.nextString(4))
+            .append("_")
+            .append(randomStringGenerator.nextString(4))
+            .append("_")
+            .append(randomStringGenerator.nextString(4))
+            .append("__KEY");
+        String recoveryKey = sb.toString();
+        KeystorePasswordHolder recoverableKeystorePasswordHolder = new KeystorePasswordHolder();
+        recoverableKeystorePasswordHolder.setPassword(keystorePassword, recoveryKey);
+        keystorePasswordRepository.save(recoverableKeystorePasswordHolder);
+        user.setRecoverableKeystorePasswordHolder(recoverableKeystorePasswordHolder);
+        userRepository.save(user);
+        return recoveryKey;
+    }
+    
+    /**
+     * Uses the recoveryKey to unlock the keystore password, then generates a new keystore password and if that all works, changes the user's password and deletes the recovery key.
+     *  
+     **/
+    @Transactional(propagation=Propagation.REQUIRED)
+    public User useRecoveryKey(String username, String newPassword, String recoveryKey) throws UserNotFoundException, KeyStoreIOException, IncorrectPasswordException {
+        logger.debug("using recoery key to reset password for user {}", username);
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        User user = getByUsernameWithKeystorePassword(username);
+        if (user == null) {
+            throw new UserNotFoundException("cannot change password: user not found");
+        }
+        
+        KeystorePasswordHolder keystorePasswordHolder = user.getRecoverableKeystorePasswordHolder();
+
+        String oldKeystorePassword = keystorePasswordHolder.getPassword(recoveryKey);
+        logger.debug("re-encrypting keystore for user {} with new keystore password", username);
+        String newKeystorePassword = changeKeystorePassword(user, oldKeystorePassword);
+        
+        
+        user.setKeystorePasswordHolder(keystorePasswordHolder);
+        user.getKeystorePasswordHolder().setPassword(newKeystorePassword, newPassword);
+        // everything has worked so far, now we can also change the user's password
+        user.setPassword(passwordEncoder.encode(newPassword));
+
+        // we delete the recoverable keystore key as it will no longer work
+        user.setRecoverableKeystorePasswordHolder(null);
+        save(user);
+        logger.debug("password changed for user {}", username);
+        // persistent logins won't work any more as we changed the keystore password, so let's delete them
+        persistentLoginRepository.deleteByUsername(username);
+        return user;
+    }
+
+    /**
+     * Changes the keystore password, re-encrypting the private keys with the new password. 
+     * @return the new keystore password
+     */
+    private String changeKeystorePassword(User user, String oldKeystorePassword)
+            throws KeyStoreIOException {
         String newKeystorePassword = KeystorePasswordUtils.generatePassword(KeystorePasswordUtils.KEYSTORE_PASSWORD_BYTES);
-        KeyStore keyStore = keystoreHolder.getKeystore(oldKeystorePassword);
+        KeyStore keyStore = user.getKeystoreHolder().getKeystore(oldKeystorePassword);
         //re-encrypt all private keys with the new password
         try {
-            logger.debug("re-encrypting keystore for user {} with new keystore password", username);
             Enumeration aliases = keyStore.aliases();
             try {
                 while(aliases.hasMoreElements()) {
@@ -167,19 +275,10 @@ public class UserService {
         } catch (KeyStoreException e) {
             throw new KeyStoreIOException("could not re-encrypt key", e);
         }
-        // everything has worked so far, now make the changes
-        user.setPassword(passwordEncoder.encode(newPassword));
-        keystoreHolder.setKeystore(keyStore, newKeystorePassword);
-        keystorePasswordHolder.setPassword(newKeystorePassword, newPassword);
-        user.setKeystorePasswordHolder(keystorePasswordHolder);
-        user.setKeystoreHolder(keystoreHolder);
-        save(user);
-        logger.debug("password changed for user {}", username);
-        // persistent logins won't work any more as we changed the keystore password, so let's delete them
-        persistentLoginRepository.deleteByUsername(username);
-        return user;
+        user.getKeystoreHolder().setKeystore(keyStore, newKeystorePassword);
+        return newKeystorePassword;
     }
-
+    
     
     /**
      * Registers the specified user with password and an optional role.
