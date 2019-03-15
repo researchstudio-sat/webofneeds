@@ -153,7 +153,7 @@ function genComponentConf() {
             ng-if="self.selectedDetail && !self.multiSelectType">
             <div class="cts__details__input__header">
               <svg class="cts__details__input__header__back clickable"
-                ng-click="self.view.removeAddMessageContent()">
+                ng-click="self.view__removeAddMessageContent()">
                 <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
               </svg>
               <svg class="cts__details__input__header__icon">
