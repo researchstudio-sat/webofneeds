@@ -29,12 +29,15 @@ function genComponentConf() {
           <div class="paypalpaymentv__content__receiver">
             {{ self.content.get("receiver") }}
           </div>
+          <!-- Not in use: secret
           <div class="paypalpaymentv__content__label">
             {{ self.detail.secretLabel }}
           </div>
           <div class="paypalpaymentv__content__secret">
             {{ self.content.get("secret") }}
           </div>
+          -->
+          <!-- Not in use: Customer information
           <div class="paypalpaymentv__content__label span-column">
             {{ self.detail.customerLabel }}
           </div>
@@ -50,6 +53,7 @@ function genComponentConf() {
               ng-click="self.loadPost()">
               Click to Load Customer Post
           </button>
+          -->
         </div>
     `;
 
@@ -94,11 +98,11 @@ function genComponentConf() {
       return undefined;
     }
 
-    loadPost() {
-      if (this.customerUri) {
-        this.needs__fetchSuggested(this.customerUri);
-      }
-    }
+    // loadPost() {
+    //   if (this.customerUri) {
+    //     this.needs__fetchSuggested(this.customerUri);
+    //   }
+    // }
   }
   Controller.$inject = serviceDependencies;
 
