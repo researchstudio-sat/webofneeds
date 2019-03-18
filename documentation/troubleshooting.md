@@ -11,6 +11,10 @@ and the apache tomcat native libarary needs to be installed. On Windows, this me
 
 for more information, see http://tomcat.apache.org/native-doc/
 
+## maven build fails with NoClassDefFoundException: java/sql/SQLException
+Turns out that you need to have a JDK installed. Download a recent JDK and tell eclipse to use that one by default: 
+`Window >> Preferences >> Java >> Installed JREs`. For me, Jdk11 did not work, but Jdk8u202 did.
+
 ## maven dies saying 'github rate limit reached'
 * for building on the *command line*, follow these [instructions](http://stackoverflow.com/questions/30995040/jspm-saying-github-rate-limit-reached-how-to-fix)
 * for an *automated build*, like via jenkins, or inside an IDE, follow the [documentation of jspm-cli](https://github.com/jspm/jspm-cli/blob/master/docs/registries.md): set the environment variable `JSPM_GITHUB_AUTH_TOKEN` to `[github-username]:[github-personal-access-token]`.
