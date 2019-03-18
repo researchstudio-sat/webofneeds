@@ -39,6 +39,7 @@ import {
 } from "../connection-utils.js";
 import * as needUtils from "../need-utils.js";
 import * as viewUtils from "../view-utils.js";
+import * as processUtils from "../process-utils.js";
 
 const serviceDependencies = ["$ngRedux", "$scope"];
 function genComponentConf() {
@@ -376,7 +377,7 @@ function genComponentConf() {
     }
 
     isNeedLoading(needUri) {
-      return this.process.getIn(["needs", needUri, "loading"]);
+      return processUtils.isNeedLoading(this.process, needUri);
     }
 
     isOpenByConnection(ownedNeedUri) {
@@ -404,10 +405,7 @@ function genComponentConf() {
         !!need.get("connections").find(conn => {
           if (!isChatConnection(conn) && !isGroupChatConnection(conn))
             return false;
-          if (
-            process &&
-            process.getIn(["connections", conn.get("uri"), "loading"])
-          )
+          if (processUtils.isConnectionLoading(process, conn.get("uri")))
             return true; //if connection is currently loading we assume its a connection we want to show
 
           const remoteNeedUri = conn.get("remoteNeedUri");
@@ -439,10 +437,7 @@ function genComponentConf() {
         need.get("connections").filter(conn => {
           if (!isChatConnection(conn) && !isGroupChatConnection(conn))
             return false;
-          if (
-            process &&
-            process.getIn(["connections", conn.get("uri"), "loading"])
-          )
+          if (processUtils.isConnectionLoading(process, conn.get("uri")))
             return true; //if connection is currently loading we assume its a connection we want to show
 
           const remoteNeedUri = conn.get("remoteNeedUri");
