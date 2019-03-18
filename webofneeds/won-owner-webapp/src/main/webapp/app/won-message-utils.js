@@ -711,9 +711,17 @@ export async function fetchDataForOwnedNeeds(ownedNeedUris, dispatch) {
 
 function fetchConnectionsOfNeedAndDispatch(needUri, dispatch) {
   return won
-    .getConnectionUrisWithStateOfNeed(needUri, needUri, true)
-    .then(connectionsWithStateOfNeed => {
-      const activeConnectionUris = connectionsWithStateOfNeed
+    .getConnectionUrisWithStateByNeedUri(needUri, needUri)
+    .then(connectionsWithStateAndFacet => {
+      dispatch({
+        type: actionTypes.connections.storeUrisToLoad,
+        payload: Immutable.fromJS({
+          needUri: needUri,
+          connections: connectionsWithStateAndFacet,
+        }),
+      });
+
+      const activeConnectionUris = connectionsWithStateAndFacet
         .filter(conn => conn.connectionState !== won.WON.Closed)
         .map(conn => conn.connectionUri);
 

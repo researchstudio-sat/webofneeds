@@ -31,7 +31,7 @@ import {
   markMessageExpandReferences,
 } from "./reduce-messages.js";
 import {
-  addActiveConnectionsToNeedInLoading,
+  addConnectionsToLoad,
   markConnectionAsRated,
   markConnectionAsRead,
   getOwnedNeedByConnectionUri,
@@ -100,11 +100,11 @@ export default function(allNeedsInState = initialState, action = {}) {
       );
     }
 
-    case actionTypes.connections.storeActiveUrisInLoading: {
-      return addActiveConnectionsToNeedInLoading(
+    case actionTypes.connections.storeUrisToLoad: {
+      return addConnectionsToLoad(
         allNeedsInState,
         action.payload.get("needUri"),
-        action.payload.get("connUris")
+        action.payload.get("connections")
       );
     }
 
