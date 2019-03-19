@@ -1,4 +1,5 @@
 import angular from "angular";
+import Immutable from "immutable";
 import "ng-redux";
 import postContentModule from "./post-content.js";
 import postMenuModule from "./post-menu.js";
@@ -134,35 +135,25 @@ function genComponentConf() {
           );
         }
       } else {
-        const payload = {
-          caption: "FIXME#2537: Attention!",
-          text:
-            "You are about to create an anonymous Account, if you proceed you accept the Terms of Service.",
-          buttons: [
-            {
-              caption: "Accept",
-              callback: () => {
-                this.view__hideModalDialog();
-                this.router__stateGoResetParams("connections");
+        this.view__showTermsDialog(
+          Immutable.fromJS({
+            acceptCallback: () => {
+              this.view__hideModalDialog();
+              this.router__stateGoResetParams("connections");
 
-                if (tempPostUriToConnectTo) {
-                  this.connections__connectAdHoc(
-                    tempPostUriToConnectTo,
-                    message,
-                    persona
-                  );
-                }
-              },
+              if (tempPostUriToConnectTo) {
+                this.connections__connectAdHoc(
+                  tempPostUriToConnectTo,
+                  message,
+                  persona
+                );
+              }
             },
-            {
-              caption: "Cancel",
-              callback: () => {
-                this.view__hideModalDialog();
-              },
+            cancelCallback: () => {
+              this.view__hideModalDialog();
             },
-          ],
-        };
-        this.view__showModalDialog(payload);
+          })
+        );
       }
     }
 
