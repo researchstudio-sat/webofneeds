@@ -36,6 +36,14 @@ export function getMatchedUseCaseIdentifier(need) {
   return getIn(need, ["matchedUseCase", "identifier"]);
 }
 
+export function getReactionUseCases(need) {
+  return getIn(need, ["matchedUseCase", "reactionUseCases"]);
+}
+
+export function getEnabledUseCases(need) {
+  return getIn(need, ["matchedUseCase", "enabledUseCases"]);
+}
+
 /**
  * Determines if a given need is a Inactive
  * @param need
