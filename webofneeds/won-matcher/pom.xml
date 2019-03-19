@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -17,12 +19,8 @@
     </properties>
 
     <dependencies>
-        <!--
-
-                  Warning! Only to be used in connection with the
-                  <dependencyManagement> section in the parent pom!
-
-         -->
+        <!-- Warning! Only to be used in connection with the <dependencyManagement> 
+            section in the parent pom! -->
         <dependency>
             <groupId>at.researchstudio.sat</groupId>
             <artifactId>won-core</artifactId>
@@ -59,6 +57,12 @@
                 <directory>src/test/resources</directory>
             </testResource>
         </testResources>
+        <plugins>
+            <plugin>
+                <groupId>net.revelc.code.formatter</groupId>
+                <artifactId>formatter-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
     </build>
 
 </project>
