@@ -83,7 +83,7 @@ export function showSlideInEmailVerification(state) {
   const accountState = get(state, "account");
   const isLoggedIn = accountUtils.isLoggedIn(accountState);
   const isAnonymous = accountUtils.isAnonymous(accountState);
-  const isEmailVerified = getIn(state, ["account", "emailVerified"]);
+  const isEmailVerified = accountUtils.isEmailVerified(accountState);
 
   return (
     !showSlideInConnectionLost(state) &&

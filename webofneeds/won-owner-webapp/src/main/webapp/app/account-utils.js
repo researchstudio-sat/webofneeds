@@ -10,7 +10,7 @@ import { get } from "./utils.js";
  * @returns {*|boolean}
  */
 export function isLoggedIn(accountState) {
-  return get(accountState, "loggedIn");
+  return !!get(accountState, "loggedIn");
 }
 
 /**
@@ -19,7 +19,16 @@ export function isLoggedIn(accountState) {
  * @returns {*|boolean}
  */
 export function isAnonymous(accountState) {
-  return get(accountState, "isAnonymous");
+  return !!get(accountState, "isAnonymous");
+}
+
+/**
+ * Determines if the email address of the currently logged in user is verified
+ * @param accountState
+ * @returns {*|boolean}
+ */
+export function isEmailVerified(accountState) {
+  return !!get(accountState, "emailVerified");
 }
 
 /**

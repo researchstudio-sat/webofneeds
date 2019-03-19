@@ -6,7 +6,8 @@ import {
   getOwnedPersonas,
   currentSkin,
 } from "../../selectors/general-selectors.js";
-import { getIn } from "../../utils";
+import { get } from "../../utils";
+import * as accountUtils from "../../account-utils.js";
 
 function genComponentConf($ngRedux) {
   return {
@@ -35,8 +36,9 @@ function genComponentConf($ngRedux) {
       });
 
       elmApp.ports.getVerified.subscribe(() => {
-        const isVerified =
-          getIn($ngRedux.getState(), ["account", "emailVerified"]) || false;
+        const isVerified = accountUtils.isEmailVerified(
+          get($ngRedux.getState(), "account")
+        );
         elmApp.ports.isVerified.send(isVerified);
       });
 
@@ -48,7 +50,7 @@ function genComponentConf($ngRedux) {
       const disconnect = $ngRedux.connect(state => {
         return {
           personas: getOwnedPersonas(state),
-          isVerified: getIn(state, ["account", "emailVerified"]) || false,
+          isVerified: accountUtils.isEmailVerified(get(state, "account")),
         };
       })(state => {
         if (state.personas) {
