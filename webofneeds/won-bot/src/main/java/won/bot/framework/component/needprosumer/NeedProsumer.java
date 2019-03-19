@@ -20,36 +20,31 @@ import won.bot.framework.component.needconsumer.NeedConsumer;
 import won.bot.framework.component.needproducer.NeedProducer;
 
 /**
- * User: fkleedorfer
- * Date: 18.12.13
+ * User: fkleedorfer Date: 18.12.13
  */
-public class NeedProsumer
-{
-  private NeedProducer needProducer;
-  private NeedConsumer needConsumer;
-  public void consumeAll(){
-    while (!needProducer.isExhausted() && ! needConsumer.isExhausted()){
-      needConsumer.consume(needProducer.create());
+public class NeedProsumer {
+    private NeedProducer needProducer;
+    private NeedConsumer needConsumer;
+
+    public void consumeAll() {
+        while (!needProducer.isExhausted() && !needConsumer.isExhausted()) {
+            needConsumer.consume(needProducer.create());
+        }
     }
-  }
 
-  public NeedProducer getNeedProducer()
-  {
-    return needProducer;
-  }
+    public NeedProducer getNeedProducer() {
+        return needProducer;
+    }
 
-  public void setNeedProducer(final NeedProducer needProducer)
-  {
-    this.needProducer = needProducer;
-  }
+    public void setNeedProducer(final NeedProducer needProducer) {
+        this.needProducer = needProducer;
+    }
 
-  public NeedConsumer getNeedConsumer()
-  {
-    return needConsumer;
-  }
+    public NeedConsumer getNeedConsumer() {
+        return needConsumer;
+    }
 
-  public void setNeedConsumer(final NeedConsumer needConsumer)
-  {
-    this.needConsumer = needConsumer;
-  }
+    public void setNeedConsumer(final NeedConsumer needConsumer) {
+        this.needConsumer = needConsumer;
+    }
 }

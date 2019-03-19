@@ -29,12 +29,12 @@ import won.protocol.model.Connection;
 public class CloseCommandEvent extends BaseNeedAndConnectionSpecificEvent implements MessageCommandEvent {
     private String closeMessage;
 
-    public CloseCommandEvent(Connection con, String closeMessage){
+    public CloseCommandEvent(Connection con, String closeMessage) {
         super(con);
         this.closeMessage = closeMessage;
     }
 
-    public CloseCommandEvent(Connection con){
+    public CloseCommandEvent(Connection con) {
         this(con, "Hello!");
     }
 

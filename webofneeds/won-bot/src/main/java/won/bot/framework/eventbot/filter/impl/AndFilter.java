@@ -25,8 +25,7 @@ import won.bot.framework.eventbot.filter.EventFilter;
 /**
  * Filter that accepts if all filters it has accept.
  */
-public class AndFilter extends AbstractCompositeFilter
-{
+public class AndFilter extends AbstractCompositeFilter {
 
     public AndFilter() {
     }
@@ -40,12 +39,12 @@ public class AndFilter extends AbstractCompositeFilter
     }
 
     @Override
-  public synchronized boolean accept(final Event event)
-  {
-    for (EventFilter filter: getFilters()){
-      if (!filter.accept(event)) return false;
+    public synchronized boolean accept(final Event event) {
+        for (EventFilter filter : getFilters()) {
+            if (!filter.accept(event))
+                return false;
+        }
+        return true;
     }
-    return true;
-  }
 
 }

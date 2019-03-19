@@ -14,7 +14,9 @@ public class BotContextWrapper {
         this.botName = botName;
     }
 
-    public String getBotName() { return botName; }
+    public String getBotName() {
+        return botName;
+    }
 
     public String getNeedCreateListName() {
         return needCreateListName;
@@ -24,17 +26,17 @@ public class BotContextWrapper {
         return botContext;
     }
 
-    public URI getUriAssociation(URI uri){
+    public URI getUriAssociation(URI uri) {
         return (URI) getBotContext().loadFromObjectMap(KEY_NEED_REMOTE_NEED_ASSOCIATION, uri.toString());
     }
 
-    public void addUriAssociation(URI uri, URI uri2){
+    public void addUriAssociation(URI uri, URI uri2) {
         // save the mapping between the original and the reaction in to the context.
         getBotContext().saveToObjectMap(KEY_NEED_REMOTE_NEED_ASSOCIATION, uri.toString(), uri2);
         getBotContext().saveToObjectMap(KEY_NEED_REMOTE_NEED_ASSOCIATION, uri2.toString(), uri);
     }
 
-    public List<URI> getNeedCreateList(){
+    public List<URI> getNeedCreateList() {
         return getBotContext().getNamedNeedUriList(needCreateListName);
     }
 }

@@ -22,23 +22,21 @@ import won.bot.framework.eventbot.event.BaseEvent;
 import won.protocol.message.WonMessage;
 
 /**
- * User: ypanchenko
- * Date: 04.03.2016
+ * User: ypanchenko Date: 04.03.2016
  */
-public abstract class MessageSpecificEvent extends BaseEvent
-{
+public abstract class MessageSpecificEvent extends BaseEvent {
 
-  private WonMessage message;
+    private WonMessage message;
 
-  public MessageSpecificEvent(final WonMessage message) {
-    this.message = message;
-  }
+    public MessageSpecificEvent(final WonMessage message) {
+        this.message = message;
+    }
 
-  public URI getMessageURI() {
-    return message.getMessageURI();
-  }
+    public URI getMessageURI() {
+        return message.getMessageURI();
+    }
 
-  public URI getNeedURI() {
-    return message.getSenderNeedURI();
-  }
+    public URI getNeedURI() {
+        return message.getSenderNeedURI();
+    }
 }

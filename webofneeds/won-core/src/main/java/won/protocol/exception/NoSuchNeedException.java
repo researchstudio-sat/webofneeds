@@ -20,24 +20,18 @@ import java.net.URI;
 import java.text.MessageFormat;
 
 /**
- * User: fkleedorfer
- * Date: 02.11.12
+ * User: fkleedorfer Date: 02.11.12
  */
-public class NoSuchNeedException extends WonProtocolException
-{
-  private URI unknownNeedURI;
+public class NoSuchNeedException extends WonProtocolException {
+    private URI unknownNeedURI;
 
+    public URI getUnknownNeedURI() {
+        return unknownNeedURI;
+    }
 
-  public URI getUnknownNeedURI()
-  {
-    return unknownNeedURI;
-  }
-
-  public NoSuchNeedException(final URI unknownNeedURI)
-  {
-    super(MessageFormat.format("No need with the URI {0} is known on this server.", unknownNeedURI));
-    this.unknownNeedURI = unknownNeedURI;
-  }
-
+    public NoSuchNeedException(final URI unknownNeedURI) {
+        super(MessageFormat.format("No need with the URI {0} is known on this server.", unknownNeedURI));
+        this.unknownNeedURI = unknownNeedURI;
+    }
 
 }

@@ -18,34 +18,30 @@ import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WONMSG;
 
 /**
- * User: syim
- * Date: 02.03.2015
+ * User: syim Date: 02.03.2015
  */
 @Component
-@FixedMessageProcessor(direction= WONMSG.TYPE_FROM_EXTERNAL_STRING,messageType = WONMSG.TYPE_CONNECTION_MESSAGE_STRING)
-public class SendMessageFromNodeProcessor extends AbstractCamelProcessor
-{
+@FixedMessageProcessor(direction = WONMSG.TYPE_FROM_EXTERNAL_STRING, messageType = WONMSG.TYPE_CONNECTION_MESSAGE_STRING)
+public class SendMessageFromNodeProcessor extends AbstractCamelProcessor {
 
-    
-    
-  public void process(final Exchange exchange) throws Exception {
-    Message message = exchange.getIn();
-    WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
-    URI connectionUri = wonMessage.getReceiverURI();
-    if (connectionUri == null){
-      throw new MissingMessagePropertyException(URI.create(WONMSG.RECEIVER_PROPERTY.toString()));
-    }
-    Connection con = connectionRepository.findOneByConnectionURIForUpdate(connectionUri).get();
-    if (con.getState() != ConnectionState.CONNECTED) {
-      throw new IllegalMessageForConnectionStateException(connectionUri, "CONNECTION_MESSAGE", con.getState());
-    }
-    if (logger.isDebugEnabled()) {
-        logger.debug("received this ConnectioMessage FromExternal:\n{}", RdfUtils.toString(wonMessage.getCompleteDataset()));
-        if (wonMessage.getForwardedMessageURI() != null) {
-            logger.debug("This message contains the forwarded message {}", wonMessage.getForwardedMessageURI());
+    public void process(final Exchange exchange) throws Exception {
+        Message message = exchange.getIn();
+        WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
+        URI connectionUri = wonMessage.getReceiverURI();
+        if (connectionUri == null) {
+            throw new MissingMessagePropertyException(URI.create(WONMSG.RECEIVER_PROPERTY.toString()));
+        }
+        Connection con = connectionRepository.findOneByConnectionURIForUpdate(connectionUri).get();
+        if (con.getState() != ConnectionState.CONNECTED) {
+            throw new IllegalMessageForConnectionStateException(connectionUri, "CONNECTION_MESSAGE", con.getState());
+        }
+        if (logger.isDebugEnabled()) {
+            logger.debug("received this ConnectioMessage FromExternal:\n{}",
+                    RdfUtils.toString(wonMessage.getCompleteDataset()));
+            if (wonMessage.getForwardedMessageURI() != null) {
+                logger.debug("This message contains the forwarded message {}", wonMessage.getForwardedMessageURI());
+            }
         }
     }
-  }
-
 
 }

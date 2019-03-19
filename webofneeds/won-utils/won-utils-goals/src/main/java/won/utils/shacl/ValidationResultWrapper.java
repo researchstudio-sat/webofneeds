@@ -30,7 +30,7 @@ public class ValidationResultWrapper {
     }
 
     public Resource getResultPath() {
-       return validationResult.getPropertyResourceValue(SH.resultPath);
+        return validationResult.getPropertyResourceValue(SH.resultPath);
     }
 
     public String getResultMessage() {

@@ -17,15 +17,13 @@
 package won.protocol.exception;
 
 /**
- * Created with IntelliJ IDEA.
- * User: gabriel
- * Date: 15.02.13
- * Time: 15:40
- * To change this template use File | Settings | File Templates.
+ * Created with IntelliJ IDEA. User: gabriel Date: 15.02.13 Time: 15:40 To change this template use File | Settings |
+ * File Templates.
  */
 public class RDFStorageException extends RuntimeException {
     private boolean enableSuppression = false;
     private boolean writeableStacktrace;
+
     public RDFStorageException() {
     }
 
@@ -41,9 +39,10 @@ public class RDFStorageException extends RuntimeException {
         super(cause);
     }
 
-    public RDFStorageException(String message, Throwable cause, boolean enableSuppression, boolean writeableStackTrace) {
+    public RDFStorageException(String message, Throwable cause, boolean enableSuppression,
+            boolean writeableStackTrace) {
         super(message, cause);
-      this.enableSuppression = enableSuppression;
-      this.writeableStacktrace = writeableStackTrace;
+        this.enableSuppression = enableSuppression;
+        this.writeableStacktrace = writeableStackTrace;
     }
 }

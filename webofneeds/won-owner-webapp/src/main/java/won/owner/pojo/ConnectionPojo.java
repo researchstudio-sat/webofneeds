@@ -28,133 +28,132 @@ import org.apache.jena.rdf.model.StmtIterator;
 import won.protocol.vocabulary.WON;
 
 /**
- * User: LEIH-NB
- * Date: 23.07.14
+ * User: LEIH-NB Date: 23.07.14
  */
-public class ConnectionPojo
-{
+public class ConnectionPojo {
 
+    private long connectionId = -1;
+    private String connectionURI;
+    private String remoteConnectionURI;
+    private String needURI;
+    private String remoteNeedURI;
 
-  private long connectionId = -1;
-  private String connectionURI;
-  private String remoteConnectionURI;
-  private String needURI;
-  private String remoteNeedURI;
+    private String connectionState;
+    private String[] facetURIs;
+    private String[] remoteFacetURIs;
+    private String wonNodeURI;
 
-  private String connectionState;
-  private String[] facetURIs;
-  private String[] remoteFacetURIs;
-  private String wonNodeURI;
+    public ConnectionPojo(URI connectionURI, final Model model) {
+        this.connectionURI = connectionURI.toString();
+        Resource connection = model.getResource(connectionURI.toString());
 
-  public ConnectionPojo(URI connectionURI, final Model model){
-    this.connectionURI = connectionURI.toString();
-    Resource connection = model.getResource(connectionURI.toString());
+        Statement remoteConnectionStatement = connection.getProperty(WON.HAS_REMOTE_CONNECTION);
+        if (remoteConnectionStatement != null) {
+            remoteConnectionURI = remoteConnectionStatement.getString();
+        }
 
-    Statement remoteConnectionStatement = connection.getProperty(WON.HAS_REMOTE_CONNECTION);
-    if (remoteConnectionStatement!=null){
-      remoteConnectionURI = remoteConnectionStatement.getString();
+        Statement needURIStatement = connection.getProperty(WON.BELONGS_TO_NEED);
+        if (needURIStatement != null) {
+            needURI = needURIStatement.getString();
+        }
+
+        Statement connectionStateStatement = connection.getProperty(WON.HAS_CONNECTION_STATE);
+        if (connectionStateStatement != null) {
+            connectionState = connectionStateStatement.getString();
+        }
+
+        StmtIterator facetIter = connection.listProperties(WON.HAS_FACET);
+        List<String> facets = new ArrayList<String>(10);
+        while (facetIter.hasNext()) {
+            Statement stmt = facetIter.nextStatement();
+            facets.add(stmt.getObject().toString());
+        }
+        this.facetURIs = facets.toArray(new String[facets.size()]);
+
+        StmtIterator remoteFacetIter = connection.listProperties(WON.HAS_REMOTE_FACET);
+        List<String> remoteFacets = new ArrayList<String>(10);
+        while (remoteFacetIter.hasNext()) {
+            Statement stmt = remoteFacetIter.nextStatement();
+            remoteFacets.add(stmt.getObject().toString());
+        }
+        this.remoteFacetURIs = remoteFacets.toArray(new String[remoteFacets.size()]);
+
+        Statement wonNodeStatement = connection.getProperty(WON.HAS_WON_NODE);
+        if (wonNodeStatement != null) {
+            wonNodeURI = wonNodeStatement.getString();
+        }
     }
 
-    Statement needURIStatement = connection.getProperty(WON.BELONGS_TO_NEED);
-    if (needURIStatement != null){
-      needURI = needURIStatement.getString();
+    public String getRemoteConnectionURI() {
+        return remoteConnectionURI;
     }
 
-    Statement connectionStateStatement = connection.getProperty(WON.HAS_CONNECTION_STATE);
-    if (connectionStateStatement != null){
-      connectionState = connectionStateStatement.getString();
+    public void setRemoteConnectionURI(final String remoteConnectionURI) {
+        this.remoteConnectionURI = remoteConnectionURI;
     }
 
-    StmtIterator facetIter = connection.listProperties(WON.HAS_FACET);
-    List<String> facets = new ArrayList<String>(10);
-    while(facetIter.hasNext()) {
-      Statement stmt = facetIter.nextStatement();
-      facets.add(stmt.getObject().toString());
+    public String getConnectionURI() {
+        return connectionURI;
     }
-    this.facetURIs = facets.toArray(new String[facets.size()]);
 
-    StmtIterator remoteFacetIter = connection.listProperties(WON.HAS_REMOTE_FACET);
-    List<String> remoteFacets = new ArrayList<String>(10);
-    while(remoteFacetIter.hasNext()) {
-      Statement stmt = remoteFacetIter.nextStatement();
-      remoteFacets.add(stmt.getObject().toString());
+    public void setConnectionURI(final String connectionURI) {
+        this.connectionURI = connectionURI;
     }
-    this.remoteFacetURIs = remoteFacets.toArray(new String[remoteFacets.size()]);
 
-    Statement wonNodeStatement = connection.getProperty(WON.HAS_WON_NODE);
-    if (wonNodeStatement!=null){
-      wonNodeURI = wonNodeStatement.getString();
+    public String getNeedURI() {
+        return needURI;
     }
-  }
 
-  public String getRemoteConnectionURI() {
-    return remoteConnectionURI;
-  }
+    public void setNeedURI(final String needURI) {
+        this.needURI = needURI;
+    }
 
-  public void setRemoteConnectionURI(final String remoteConnectionURI) {
-    this.remoteConnectionURI = remoteConnectionURI;
-  }
-  public String getConnectionURI() {
-    return connectionURI;
-  }
+    public String getConnectionState() {
+        return connectionState;
+    }
 
-  public void setConnectionURI(final String connectionURI) {
-    this.connectionURI = connectionURI;
-  }
+    public void setConnectionState(final String connectionState) {
+        this.connectionState = connectionState;
+    }
 
-  public String getNeedURI() {
-    return needURI;
-  }
+    public String[] getFacetURIs() {
+        return facetURIs;
+    }
 
-  public void setNeedURI(final String needURI) {
-    this.needURI = needURI;
-  }
+    public void setFacetURIs(final String[] facetURIs) {
+        this.facetURIs = facetURIs;
+    }
 
-  public String getConnectionState() {
-    return connectionState;
-  }
+    public String[] getRemoteFacetURIs() {
+        return remoteFacetURIs;
+    }
 
-  public void setConnectionState(final String connectionState) {
-    this.connectionState = connectionState;
-  }
+    public void setRemoteFacetURIs(final String[] remoteFacetURIs) {
+        this.remoteFacetURIs = remoteFacetURIs;
+    }
 
-  public String[] getFacetURIs() {
-    return facetURIs;
-  }
+    public String getWonNodeURI() {
+        return wonNodeURI;
+    }
 
-  public void setFacetURIs(final String[] facetURIs) {
-    this.facetURIs = facetURIs;
-  }
+    public void setWonNodeURI(final String wonNodeURI) {
+        this.wonNodeURI = wonNodeURI;
+    }
 
-  public String[] getRemoteFacetURIs() {
-    return remoteFacetURIs;
-  }
+    public String getRemoteNeedURI() {
+        return remoteNeedURI;
+    }
 
-  public void setRemoteFacetURIs(final String[] remoteFacetURIs) {
-    this.remoteFacetURIs = remoteFacetURIs;
-  }
+    public void setRemoteNeedURI(final String remoteNeedURI) {
+        this.remoteNeedURI = remoteNeedURI;
+    }
 
-  public String getWonNodeURI() {
-    return wonNodeURI;
-  }
+    public long getConnectionId() {
+        return connectionId;
+    }
 
-  public void setWonNodeURI(final String wonNodeURI) {
-    this.wonNodeURI = wonNodeURI;
-  }
-
-  public String getRemoteNeedURI() {
-    return remoteNeedURI;
-  }
-
-  public void setRemoteNeedURI(final String remoteNeedURI) {
-    this.remoteNeedURI = remoteNeedURI;
-  }
-  public long getConnectionId() {
-    return connectionId;
-  }
-
-  public void setConnectionId(final long connectionId) {
-    this.connectionId = connectionId;
-  }
+    public void setConnectionId(final long connectionId) {
+        this.connectionId = connectionId;
+    }
 
 }

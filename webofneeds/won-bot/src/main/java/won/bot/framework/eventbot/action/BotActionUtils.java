@@ -30,36 +30,25 @@ import won.protocol.util.WonRdfUtils;
 /**
  * Created by fkleedorfer on 10.06.2016.
  */
-public class BotActionUtils
-{
+public class BotActionUtils {
 
-  public static WonMessage createWonMessage(final EventListenerContext context, final URI connectionURI, final String
-    message) throws
-    WonMessageBuilderException {
+    public static WonMessage createWonMessage(final EventListenerContext context, final URI connectionURI,
+            final String message) throws WonMessageBuilderException {
 
-    WonNodeInformationService wonNodeInformationService =
-      context.getWonNodeInformationService();
+        WonNodeInformationService wonNodeInformationService = context.getWonNodeInformationService();
 
-    Dataset connectionRDF =
-      context.getLinkedDataSource().getDataForResource(connectionURI);
-    URI remoteNeed = WonRdfUtils.ConnectionUtils.getRemoteNeedURIFromConnection(connectionRDF, connectionURI);
-    URI localNeed = WonRdfUtils.ConnectionUtils.getLocalNeedURIFromConnection(connectionRDF, connectionURI);
-    URI wonNode = WonRdfUtils.ConnectionUtils.getWonNodeURIFromConnection(connectionRDF, connectionURI);
-    Dataset remoteNeedRDF =
-      context.getLinkedDataSource().getDataForResource(remoteNeed);
+        Dataset connectionRDF = context.getLinkedDataSource().getDataForResource(connectionURI);
+        URI remoteNeed = WonRdfUtils.ConnectionUtils.getRemoteNeedURIFromConnection(connectionRDF, connectionURI);
+        URI localNeed = WonRdfUtils.ConnectionUtils.getLocalNeedURIFromConnection(connectionRDF, connectionURI);
+        URI wonNode = WonRdfUtils.ConnectionUtils.getWonNodeURIFromConnection(connectionRDF, connectionURI);
+        Dataset remoteNeedRDF = context.getLinkedDataSource().getDataForResource(remoteNeed);
 
-    URI messageURI = wonNodeInformationService.generateEventURI(wonNode);
+        URI messageURI = wonNodeInformationService.generateEventURI(wonNode);
 
-    return WonMessageBuilder
-      .setMessagePropertiesForConnectionMessage(
-        messageURI,
-        connectionURI,
-        localNeed,
-        wonNode,
-        WonRdfUtils.ConnectionUtils.getRemoteConnectionURIFromConnection(connectionRDF, connectionURI),
-        remoteNeed,
-        WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, remoteNeed),
-        message)
-      .build();
-  }
+        return WonMessageBuilder
+                .setMessagePropertiesForConnectionMessage(messageURI, connectionURI, localNeed, wonNode,
+                        WonRdfUtils.ConnectionUtils.getRemoteConnectionURIFromConnection(connectionRDF, connectionURI),
+                        remoteNeed, WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, remoteNeed), message)
+                .build();
+    }
 }

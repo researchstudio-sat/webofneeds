@@ -22,19 +22,16 @@ import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 /**
- * Created with IntelliJ IDEA.
- * User: Gabriel
- * Date: 04.11.12
- * Time: 17:05
- * To change this template use File | Settings | File Templates.
+ * Created with IntelliJ IDEA. User: Gabriel Date: 04.11.12 Time: 17:05 To change this template use File | Settings |
+ * File Templates.
  */
 @NoRepositoryBean
 public interface WonRepository<M> extends PagingAndSortingRepository<M, Long> {
     List<M> findById(Long id);
 
-    //Removed the annotation as it interferes with CGLIB autoproxying aop.
-    //@Transactional(propagation = Propagation.REQUIRES_NEW)
-    //if needed, the business level services must be annotated.
+    // Removed the annotation as it interferes with CGLIB autoproxying aop.
+    // @Transactional(propagation = Propagation.REQUIRES_NEW)
+    // if needed, the business level services must be annotated.
     // see https://stackoverflow.com/questions/13977093/how-to-use-jparepositories-with-proxy-target-class-true
     M saveAndFlush(M obj);
 

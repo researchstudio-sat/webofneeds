@@ -18,30 +18,30 @@ import javax.persistence.Index;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "facet", indexes = { @Index(name = "IDX_UNIQUE_FACET", columnList = "facetURI")})
+@Table(name = "facet", indexes = { @Index(name = "IDX_UNIQUE_FACET", columnList = "facetURI") })
 public class Facet {
     @Id
     @GeneratedValue
-    @Column( name = "id" )
+    @Column(name = "id")
     private Long id;
 
     /* The uri of the facet's need object */
-    @Column( name = "needURI")
-    @Convert( converter = URIConverter.class)
+    @Column(name = "needURI")
+    @Convert(converter = URIConverter.class)
     private URI needURI;
 
     /* The uri of the facet's type */
-    @Column( name = "typeURI")
-    @Convert( converter = URIConverter.class)
+    @Column(name = "typeURI")
+    @Convert(converter = URIConverter.class)
     private URI typeURI;
-    
+
     /* The uri of the facet - must be defined in the need's content */
-    @Column( name = "facetURI")
-    @Convert( converter = URIConverter.class)
+    @Column(name = "facetURI")
+    @Convert(converter = URIConverter.class)
     private URI facetURI;
-    
-    @Column( name = "defaultFacet")
-    @Convert( converter = BooleanTFConverter.class)
+
+    @Column(name = "defaultFacet")
+    @Convert(converter = BooleanTFConverter.class)
     private boolean isDefaultFacet = false;
 
     public Long getId() {
@@ -54,8 +54,9 @@ public class Facet {
 
     /**
      * Not safe to use unless we know the typeURI is a known facet type. Use getTypeURI instead.
+     * 
      * @Deprecated
-     * */
+     */
     public FacetType getFacetType() {
         return FacetType.getFacetType(typeURI);
     }
@@ -90,14 +91,19 @@ public class Facet {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
 
         Facet facet = (Facet) o;
 
-        if (id != null ? !id.equals(facet.id) : facet.id != null) return false;
-        if (needURI != null ? !needURI.equals(facet.needURI) : facet.needURI != null) return false;
-        if (typeURI != null ? !typeURI.equals(facet.typeURI) : facet.typeURI != null) return false;
+        if (id != null ? !id.equals(facet.id) : facet.id != null)
+            return false;
+        if (needURI != null ? !needURI.equals(facet.needURI) : facet.needURI != null)
+            return false;
+        if (typeURI != null ? !typeURI.equals(facet.typeURI) : facet.typeURI != null)
+            return false;
 
         return true;
     }

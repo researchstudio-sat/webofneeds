@@ -10,22 +10,20 @@ import won.bot.framework.eventbot.listener.baStateBots.NopAction;
 import won.node.facet.impl.WON_TX;
 
 /**
- * User: Danijel
- * Date: 17.4.14.
+ * User: Danijel Date: 17.4.14.
  */
-public class ActiveCannotCompleteVoteFPUriBot extends BATestBotScript
-{
+public class ActiveCannotCompleteVoteFPUriBot extends BATestBotScript {
 
-  @Override
-  protected List<BATestScriptAction> setupActions() {
-    List<BATestScriptAction> actions = new ArrayList();
+    @Override
+    protected List<BATestScriptAction> setupActions() {
+        List<BATestScriptAction> actions = new ArrayList();
 
-    actions.add(new NopAction());
-    actions.add(new NopAction());
-    actions.add(new BATestScriptAction(true, URI.create(WON_TX
-      .MESSAGE_CANNOTCOMPLETE.getURI()), URI.create(WON_TX.STATE_ACTIVE.getURI())));
-    //no vote!
+        actions.add(new NopAction());
+        actions.add(new NopAction());
+        actions.add(new BATestScriptAction(true, URI.create(WON_TX.MESSAGE_CANNOTCOMPLETE.getURI()),
+                URI.create(WON_TX.STATE_ACTIVE.getURI())));
+        // no vote!
 
-    return actions;
-  }
+        return actions;
+    }
 }

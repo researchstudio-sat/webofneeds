@@ -10,7 +10,7 @@ public class TelegramContentExtractor {
     private Pattern doTogetherTypePattern;
     private Pattern critiqueTypePattern;
 
-    //Spring setter
+    // Spring setter
 
     public void setDemandTypePattern(final Pattern demandTypePattern) {
         this.demandTypePattern = demandTypePattern;
@@ -28,7 +28,7 @@ public class TelegramContentExtractor {
         this.critiqueTypePattern = critiqueTypePattern;
     }
 
-    public MessagePropertyType getMessageContentType(String subject){
+    public MessagePropertyType getMessageContentType(String subject) {
         if (demandTypePattern.matcher(subject).matches()) {
             return MessagePropertyType.DEMAND;
         } else if (supplyTypePattern.matcher(subject).matches()) {

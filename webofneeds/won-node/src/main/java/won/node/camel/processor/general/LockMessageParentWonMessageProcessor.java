@@ -36,7 +36,7 @@ import won.protocol.repository.NeedRepository;
 /**
  * Acquires a pessimistic read lock on the message's parent.
  */
-public class LockMessageParentWonMessageProcessor implements WonMessageProcessor{
+public class LockMessageParentWonMessageProcessor implements WonMessageProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -48,7 +48,7 @@ public class LockMessageParentWonMessageProcessor implements WonMessageProcessor
     ConnectionEventContainerRepository connectionEventContainerRepository;
     @Autowired
     NeedEventContainerRepository needEventContainerRepository;
-            
+
     @Override
     public WonMessage process(WonMessage message) throws WonMessageProcessingException {
         try {
@@ -67,9 +67,9 @@ public class LockMessageParentWonMessageProcessor implements WonMessageProcessor
     }
 
     private void lockParent(WonMessage message) {
-        //get the parent's URI (either a connection or a need
+        // get the parent's URI (either a connection or a need
         URI parentURI = WonMessageUtils.getParentEntityUri(message);
-        //try a connection:
+        // try a connection:
         Optional<Connection> con = connectionRepository.findOneByConnectionURIForUpdate(parentURI);
         if (con.isPresent()) {
             connectionEventContainerRepository.findOneByParentUriForUpdate(parentURI);

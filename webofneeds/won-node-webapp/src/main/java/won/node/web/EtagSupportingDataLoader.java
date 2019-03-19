@@ -25,11 +25,10 @@ import won.protocol.model.DataWithEtag;
 /**
  * Created by fkleedorfer on 01.12.2016.
  */
-public interface EtagSupportingDataLoader<T>
-{
-  public URI createUriForIdentifier(String identifier);
+public interface EtagSupportingDataLoader<T> {
+    public URI createUriForIdentifier(String identifier);
 
-  public DataWithEtag<T> loadDataWithEtag(URI uri, String etag);
+    public DataWithEtag<T> loadDataWithEtag(URI uri, String etag);
 
-  public void addHeaders(HttpHeaders headers);
+    public void addHeaders(HttpHeaders headers);
 }

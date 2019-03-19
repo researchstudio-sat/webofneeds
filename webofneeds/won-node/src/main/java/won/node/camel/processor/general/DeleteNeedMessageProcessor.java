@@ -41,13 +41,13 @@ public class DeleteNeedMessageProcessor extends AbstractCamelProcessor {
                 logger.debug("Set need to state DELETED. needURI:{}", receiverNeedURI);
                 Collection<Connection> conns = connectionRepository
                         .getConnectionsByNeedURIAndNotInStateForUpdate(need.getNeedURI(), ConnectionState.CLOSED);
-                if(conns.size() > 0) {
-                    //Still not closed connections
+                if (conns.size() > 0) {
+                    // Still not closed connections
                     logger.debug("Still open connections for need. needURI{}", receiverNeedURI);
-                    //TODO: Handle!
-                    
+                    // TODO: Handle!
+
                 }
-                
+
                 messageEventRepository.deleteByParentURI(need.getNeedURI());
                 need.resetAllNeedData();
             } else {

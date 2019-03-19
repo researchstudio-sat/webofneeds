@@ -19,51 +19,53 @@ import won.protocol.util.linkeddata.LinkedDataSource;
 
 public class EagerlyCachePopulatingMessageProcessor implements WonMessageProcessor {
 
-private final Logger logger = LoggerFactory.getLogger(getClass());
-	
-	@Autowired
-	private LinkedDataSource linkedDataSourceOnBehalfOfNeed;
-	
-	@Autowired
-	private ThreadPoolExecutor parallelRequestsThreadpool;
-	
-	@Override
-	public WonMessage process(WonMessage message) throws WonMessageProcessingException {
-		if (this.linkedDataSourceOnBehalfOfNeed != null && this.linkedDataSourceOnBehalfOfNeed instanceof CachingLinkedDataSource) {
-			logger.debug("eagerly fetching delivery chain for mesasge {} into cache", message.getMessageURI());
-			URI requester = message.getReceiverNeedURI();
-			((CachingLinkedDataSource) linkedDataSourceOnBehalfOfNeed).addToCache(message.getCompleteDataset(),
-					message.getMessageURI(), requester);
-			//load the original message(s) into cache, too
-			Set<URI> toLoad = new HashSet<URI>();
-			addIfNotNull(toLoad, message.getIsRemoteResponseToMessageURI());
-			addIfNotNull(toLoad, message.getIsResponseToMessageURI());
-			addIfNotNull(toLoad, message.getCorrespondingRemoteMessageURI());
-			List<URI> previous = WonRdfUtils.MessageUtils.getPreviousMessageUrisIncludingRemote(message);
-			addIfNotNull(toLoad, previous);
-			parallelRequestsThreadpool.submit(() -> toLoad.parallelStream().forEach(uri -> linkedDataSourceOnBehalfOfNeed.getDataForResource(uri, requester)));
-		}
-		return message;
-	}
-	
-	public void setLinkedDataSourceOnBehalfOfNeed(LinkedDataSource linkedDataSourceOnBehalfOfNeed) {
-		this.linkedDataSourceOnBehalfOfNeed = linkedDataSourceOnBehalfOfNeed;
-	}
-	
-	public void setThreadPoolExecutor(ThreadPoolExecutor threadPoolExecutor) {
-		this.parallelRequestsThreadpool = threadPoolExecutor;
-	}
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
-	private void addIfNotNull(Set<URI> uris, URI uri) {
-		if (uri != null) {
-			uris.add(uri);
-		}
-	}
-	
-	private void addIfNotNull(Set<URI> uris, List<URI> urisToAdd) {
-		if (urisToAdd != null) {
-			uris.addAll(urisToAdd);
-		}
-	}
+    @Autowired
+    private LinkedDataSource linkedDataSourceOnBehalfOfNeed;
+
+    @Autowired
+    private ThreadPoolExecutor parallelRequestsThreadpool;
+
+    @Override
+    public WonMessage process(WonMessage message) throws WonMessageProcessingException {
+        if (this.linkedDataSourceOnBehalfOfNeed != null
+                && this.linkedDataSourceOnBehalfOfNeed instanceof CachingLinkedDataSource) {
+            logger.debug("eagerly fetching delivery chain for mesasge {} into cache", message.getMessageURI());
+            URI requester = message.getReceiverNeedURI();
+            ((CachingLinkedDataSource) linkedDataSourceOnBehalfOfNeed).addToCache(message.getCompleteDataset(),
+                    message.getMessageURI(), requester);
+            // load the original message(s) into cache, too
+            Set<URI> toLoad = new HashSet<URI>();
+            addIfNotNull(toLoad, message.getIsRemoteResponseToMessageURI());
+            addIfNotNull(toLoad, message.getIsResponseToMessageURI());
+            addIfNotNull(toLoad, message.getCorrespondingRemoteMessageURI());
+            List<URI> previous = WonRdfUtils.MessageUtils.getPreviousMessageUrisIncludingRemote(message);
+            addIfNotNull(toLoad, previous);
+            parallelRequestsThreadpool.submit(() -> toLoad.parallelStream()
+                    .forEach(uri -> linkedDataSourceOnBehalfOfNeed.getDataForResource(uri, requester)));
+        }
+        return message;
+    }
+
+    public void setLinkedDataSourceOnBehalfOfNeed(LinkedDataSource linkedDataSourceOnBehalfOfNeed) {
+        this.linkedDataSourceOnBehalfOfNeed = linkedDataSourceOnBehalfOfNeed;
+    }
+
+    public void setThreadPoolExecutor(ThreadPoolExecutor threadPoolExecutor) {
+        this.parallelRequestsThreadpool = threadPoolExecutor;
+    }
+
+    private void addIfNotNull(Set<URI> uris, URI uri) {
+        if (uri != null) {
+            uris.add(uri);
+        }
+    }
+
+    private void addIfNotNull(Set<URI> uris, List<URI> urisToAdd) {
+        if (urisToAdd != null) {
+            uris.addAll(urisToAdd);
+        }
+    }
 
 }

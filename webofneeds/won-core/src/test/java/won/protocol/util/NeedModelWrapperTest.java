@@ -37,8 +37,10 @@ public class NeedModelWrapperTest {
         Model needModel = needModelWrapper.copyNeedModel(NeedGraphType.NEED);
         Model sysInfoModel = needModelWrapper.copyNeedModel(NeedGraphType.SYSINFO);
         NeedModelWrapper needModelWrapperNew = new NeedModelWrapper(needModel, sysInfoModel);
-        Assert.assertTrue(needModelWrapperNew.copyNeedModel(NeedGraphType.NEED).isIsomorphicWith(needModelWrapper.copyNeedModel(NeedGraphType.NEED)));
-        Assert.assertTrue(needModelWrapperNew.copyNeedModel(NeedGraphType.SYSINFO).isIsomorphicWith(needModelWrapper.copyNeedModel(NeedGraphType.SYSINFO)));
+        Assert.assertTrue(needModelWrapperNew.copyNeedModel(NeedGraphType.NEED)
+                .isIsomorphicWith(needModelWrapper.copyNeedModel(NeedGraphType.NEED)));
+        Assert.assertTrue(needModelWrapperNew.copyNeedModel(NeedGraphType.SYSINFO)
+                .isIsomorphicWith(needModelWrapper.copyNeedModel(NeedGraphType.SYSINFO)));
 
         // load only the need model, the other one is created
         needModelWrapperNew = new NeedModelWrapper(needModel, null);
@@ -55,12 +57,14 @@ public class NeedModelWrapperTest {
         ZonedDateTime date = ZonedDateTime.parse("2017-02-07T08:46:32.917Z", DateTimeFormatter.ISO_DATE_TIME);
         Assert.assertEquals(date, needModelWrapper.getCreationDate());
         Assert.assertEquals("https://node.matchat.org/won/resource", needModelWrapper.getWonNodeUri());
-        Assert.assertEquals("https://node.matchat.org/won/resource/need/3030440624813201400/connections", needModelWrapper.getConnectionContainerUri());
+        Assert.assertEquals("https://node.matchat.org/won/resource/need/3030440624813201400/connections",
+                needModelWrapper.getConnectionContainerUri());
 
         // query the need model values
         Assert.assertTrue(needModelWrapper.hasFlag(WON.USED_FOR_TESTING));
         Assert.assertEquals(1, needModelWrapper.getFacetUris().size());
-        Assert.assertEquals("http://purl.org/webofneeds/model#ChatFacet", needModelWrapper.getFacetUris().iterator().next());
+        Assert.assertEquals("http://purl.org/webofneeds/model#ChatFacet",
+                needModelWrapper.getFacetUris().iterator().next());
         Assert.assertTrue(needModelWrapper.hasFlag(WON.NO_HINT_FOR_ME));
 
         // query the content nodes
@@ -73,13 +77,16 @@ public class NeedModelWrapperTest {
         Assert.assertEquals(3, needModelWrapper.getContentPropertyStringValues(WON.HAS_TAG, null).size());
         Assert.assertEquals(2, needModelWrapper.getSeeksPropertyStringValues(WON.HAS_TAG, null).size());
         Assert.assertEquals(5, needModelWrapper.getAllContentPropertyStringValues(WON.HAS_TAG, null).size());
-        Assert.assertEquals("16.358398", needModelWrapper.getContentPropertyStringValue("s:location/s:geo/s:longitude"));
+        Assert.assertEquals("16.358398",
+                needModelWrapper.getContentPropertyStringValue("s:location/s:geo/s:longitude"));
 
         // query the goals
         Assert.assertEquals(2, needModelWrapper.getGoals().size());
         Assert.assertNotNull(needModelWrapper.getGoal("http://purl.org/webofneeds/model#NamedGoal"));
-        Assert.assertTrue(needModelWrapper.getShapesGraph(needModelWrapper.getGoal("http://purl.org/webofneeds/model#NamedGoal")).isEmpty());
-        Assert.assertTrue(needModelWrapper.getDataGraph(needModelWrapper.getGoal("http://purl.org/webofneeds/model#NamedGoal")).isEmpty());
+        Assert.assertTrue(needModelWrapper
+                .getShapesGraph(needModelWrapper.getGoal("http://purl.org/webofneeds/model#NamedGoal")).isEmpty());
+        Assert.assertTrue(needModelWrapper
+                .getDataGraph(needModelWrapper.getGoal("http://purl.org/webofneeds/model#NamedGoal")).isEmpty());
         Collection<Resource> goals = needModelWrapper.getGoals();
         Resource blank = null;
         for (Resource goal : goals) {
@@ -89,8 +96,8 @@ public class NeedModelWrapperTest {
         }
         Assert.assertFalse(needModelWrapper.getShapesGraph(blank).isEmpty());
         Assert.assertFalse(needModelWrapper.getDataGraph(blank).isEmpty());
-        
-        //make sure we don't find a matching context:
+
+        // make sure we don't find a matching context:
         Assert.assertTrue("did not expect to find matching contexts", needModelWrapper.getMatchingContexts().isEmpty());
     }
 
@@ -107,13 +114,12 @@ public class NeedModelWrapperTest {
         Assert.assertEquals(2, needModelWrapper.getSeeksPropertyStringValues(DC.title, null).size());
         Assert.assertEquals(3, needModelWrapper.getAllContentPropertyStringValues(DC.title, null).size());
 
-        //make sure we don't find a matching context:
+        // make sure we don't find a matching context:
         Assert.assertTrue("did not expect to find matching contexts", needModelWrapper.getMatchingContexts().isEmpty());
     }
 
-    
     @Test
-    public void createNeedWithShapesModel() throws IOException{
+    public void createNeedWithShapesModel() throws IOException {
         Dataset ds = Utils.createTestDataset("/needmodel/needwithshapes.trig");
         NeedModelWrapper needModelWrapper = new NeedModelWrapper(ds, false);
         Assert.assertNotNull(needModelWrapper);
@@ -163,7 +169,6 @@ public class NeedModelWrapperTest {
         Model originalModel = needModelWrapper.copyNeedModel(NeedGraphType.NEED);
         Model normalizedModel = needModelWrapper.normalizeNeedModel();
         Assert.assertTrue(originalModel.isIsomorphicWith(normalizedModel));
-
 
     }
 
@@ -227,22 +232,25 @@ public class NeedModelWrapperTest {
         Model normalizedModel = needModelWrapper.normalizeNeedModel();
         NeedModelWrapper normalizedWrapper = new NeedModelWrapper(normalizedModel, null);
     }
-    
+
     @Test
-    public void testMultipleMatchingContexts() throws IOException{
-    	Dataset ds = Utils.createTestDataset("/needmodel/need7.trig");
-    	NeedModelWrapper needModelWrapper = new NeedModelWrapper(ds);
+    public void testMultipleMatchingContexts() throws IOException {
+        Dataset ds = Utils.createTestDataset("/needmodel/need7.trig");
+        NeedModelWrapper needModelWrapper = new NeedModelWrapper(ds);
         Assert.assertEquals(3, needModelWrapper.getMatchingContexts().size());
-        Assert.assertTrue("expected matching context 'TU_Wien'", needModelWrapper.getMatchingContexts().contains("TU_Wien"));
-        Assert.assertTrue("expected matching context 'Vienna'", needModelWrapper.getMatchingContexts().contains("Vienna"));
+        Assert.assertTrue("expected matching context 'TU_Wien'",
+                needModelWrapper.getMatchingContexts().contains("TU_Wien"));
+        Assert.assertTrue("expected matching context 'Vienna'",
+                needModelWrapper.getMatchingContexts().contains("Vienna"));
         Assert.assertTrue("expected matching context 'Ball'", needModelWrapper.getMatchingContexts().contains("Ball"));
     }
-    
+
     @Test
-    public void testSingleMatchingContext() throws IOException{
-    	Dataset ds = Utils.createTestDataset("/needmodel/need8.trig");
-    	NeedModelWrapper needModelWrapper = new NeedModelWrapper(ds);
+    public void testSingleMatchingContext() throws IOException {
+        Dataset ds = Utils.createTestDataset("/needmodel/need8.trig");
+        NeedModelWrapper needModelWrapper = new NeedModelWrapper(ds);
         Assert.assertEquals(1, needModelWrapper.getMatchingContexts().size());
-        Assert.assertTrue("expected matching context 'TU_Wien'", needModelWrapper.getMatchingContexts().contains("TU_Wien"));
-   }
+        Assert.assertTrue("expected matching context 'TU_Wien'",
+                needModelWrapper.getMatchingContexts().contains("TU_Wien"));
+    }
 }

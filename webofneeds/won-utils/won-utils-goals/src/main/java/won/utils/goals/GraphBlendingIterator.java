@@ -15,10 +15,10 @@ import org.apache.jena.util.ResourceUtils;
 
 /**
  * Iterator class that iterates over all possible models that could be a valid result from blending two input models.
- * Blending of two subject resource URIs is defined to be valid if there exists at least one statement in each
- * input model with the same objects and predicates for these subjects.
- * Resource URIs of the input models are only considered for blending if they are part of a "variable uri name space"
- * which is passed in the constructor of this class together with the two input models for blending.
+ * Blending of two subject resource URIs is defined to be valid if there exists at least one statement in each input
+ * model with the same objects and predicates for these subjects. Resource URIs of the input models are only considered
+ * for blending if they are part of a "variable uri name space" which is passed in the constructor of this class
+ * together with the two input models for blending.
  */
 public class GraphBlendingIterator implements Iterator<Model> {
 
@@ -34,12 +34,17 @@ public class GraphBlendingIterator implements Iterator<Model> {
     /**
      * Initialize the blending iterator
      *
-     * @param dataModel1 first input model for blending
-     * @param dataModel2 second input model for blending
-     * @param variableUriPrefix uri prefix defines which resource URIs are considered for blending
-     * @param blendingUriPrefix uri prefix that is used to generate the result URIs of blended resources
+     * @param dataModel1
+     *            first input model for blending
+     * @param dataModel2
+     *            second input model for blending
+     * @param variableUriPrefix
+     *            uri prefix defines which resource URIs are considered for blending
+     * @param blendingUriPrefix
+     *            uri prefix that is used to generate the result URIs of blended resources
      */
-    public GraphBlendingIterator(Model dataModel1, Model dataModel2, String variableUriPrefix, String blendingUriPrefix) {
+    public GraphBlendingIterator(Model dataModel1, Model dataModel2, String variableUriPrefix,
+            String blendingUriPrefix) {
 
         this.dataGraph1 = ModelFactory.createDefaultModel();
         this.dataGraph1.add(dataModel1);
@@ -82,8 +87,8 @@ public class GraphBlendingIterator implements Iterator<Model> {
     }
 
     /**
-     * Return the next valid power set index of a set of resource URI pairs.
-     * Not all power set indices are valid since resource URIs may only occur at most once in pair sets.
+     * Return the next valid power set index of a set of resource URI pairs. Not all power set indices are valid since
+     * resource URIs may only occur at most once in pair sets.
      *
      * @return next valid power set index or an index >= power set size if no next valid index exists anymore
      */
@@ -98,7 +103,8 @@ public class GraphBlendingIterator implements Iterator<Model> {
             // resource URI may only occur at most once in pair sets
             // e.g. {(A,X),(B,X)} is not allowed since X occurs twice, so a lot of combinations are filtered out here
             // if the same resource URI occurs in both graphs it should also only occur once in a valid set, either
-            // as left or right side of a pair. Therefore we can test for valid combinations using a set or list structure
+            // as left or right side of a pair. Therefore we can test for valid combinations using a set or list
+            // structure
             // by inserting both left and right side pair entries and check for duplicate keys
             isValidPowerSet = true;
             Set<String> resourceSet = new HashSet<>();
@@ -106,8 +112,8 @@ public class GraphBlendingIterator implements Iterator<Model> {
                 // check which bits are set in the current setIndex
                 if ((validPowerSetIndex & (1 << i)) > 0) {
                     Pair<String, String> currentPair = blendingResourceUriPairs.get(i);
-                    if (resourceSet.contains(currentPair.getLeft()) || resourceSet.contains(currentPair.getRight()) ||
-                            currentPair.getLeft().equals(currentPair.getRight())) {
+                    if (resourceSet.contains(currentPair.getLeft()) || resourceSet.contains(currentPair.getRight())
+                            || currentPair.getLeft().equals(currentPair.getRight())) {
                         isValidPowerSet = false;
                         break;
                     } else {
@@ -120,7 +126,7 @@ public class GraphBlendingIterator implements Iterator<Model> {
 
         // if we found the next valid power set index return it
         if (isValidPowerSet) {
-           return validPowerSetIndex;
+            return validPowerSetIndex;
         }
 
         // this shows that no next valid power set index exists anymore

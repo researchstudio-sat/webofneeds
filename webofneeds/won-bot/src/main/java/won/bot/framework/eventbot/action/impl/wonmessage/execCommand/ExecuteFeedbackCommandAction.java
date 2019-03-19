@@ -45,51 +45,48 @@ public class ExecuteFeedbackCommandAction extends ExecuteSendMessageCommandActio
         super(eventListenerContext, false);
     }
 
-
     @Override
-    protected MessageCommandFailureEvent createRemoteNodeFailureEvent(FeedbackCommandEvent originalCommand, WonMessage messageSent, FailureResponseEvent failureResponseEvent) {
+    protected MessageCommandFailureEvent createRemoteNodeFailureEvent(FeedbackCommandEvent originalCommand,
+            WonMessage messageSent, FailureResponseEvent failureResponseEvent) {
         return null;
     }
 
     @Override
-    protected MessageCommandSuccessEvent createRemoteNodeSuccessEvent(FeedbackCommandEvent originalCommand, WonMessage messageSent, SuccessResponseEvent successResponseEvent) {
+    protected MessageCommandSuccessEvent createRemoteNodeSuccessEvent(FeedbackCommandEvent originalCommand,
+            WonMessage messageSent, SuccessResponseEvent successResponseEvent) {
         return null;
     }
 
     @Override
-    protected MessageCommandFailureEvent createLocalNodeFailureEvent(FeedbackCommandEvent originalCommand, WonMessage messageSent, FailureResponseEvent failureResponseEvent) {
-        return new FeedbackCommandFailureEvent(originalCommand, failureResponseEvent.getNeedURI(), failureResponseEvent.getRemoteNeedURI(), failureResponseEvent.getConnectionURI());
+    protected MessageCommandFailureEvent createLocalNodeFailureEvent(FeedbackCommandEvent originalCommand,
+            WonMessage messageSent, FailureResponseEvent failureResponseEvent) {
+        return new FeedbackCommandFailureEvent(originalCommand, failureResponseEvent.getNeedURI(),
+                failureResponseEvent.getRemoteNeedURI(), failureResponseEvent.getConnectionURI());
     }
 
     @Override
-    protected MessageCommandSuccessEvent createLocalNodeSuccessEvent(FeedbackCommandEvent originalCommand, WonMessage messageSent, SuccessResponseEvent successResponseEvent) {
+    protected MessageCommandSuccessEvent createLocalNodeSuccessEvent(FeedbackCommandEvent originalCommand,
+            WonMessage messageSent, SuccessResponseEvent successResponseEvent) {
         return new FeedbackCommandSuccessEvent(originalCommand, originalCommand.getCon());
     }
 
     @Override
-    protected MessageCommandNotSentEvent createMessageNotSentEvent(FeedbackCommandEvent originalCommand, String message) {
+    protected MessageCommandNotSentEvent createMessageNotSentEvent(FeedbackCommandEvent originalCommand,
+            String message) {
         return new MessageCommandNotSentEvent<FeedbackCommandEvent>(message, originalCommand);
     }
 
-    protected WonMessage createWonMessage(FeedbackCommandEvent feedbackCommandEvent)
-            throws WonMessageBuilderException {
+    protected WonMessage createWonMessage(FeedbackCommandEvent feedbackCommandEvent) throws WonMessageBuilderException {
         URI connectionURI = feedbackCommandEvent.getConnectionURI();
-        WonNodeInformationService wonNodeInformationService =
-                getEventListenerContext().getWonNodeInformationService();
+        WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
 
-        Dataset connectionRDF =
-                getEventListenerContext().getLinkedDataSource().getDataForResource(connectionURI);
+        Dataset connectionRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(connectionURI);
         URI localNeed = WonRdfUtils.ConnectionUtils.getLocalNeedURIFromConnection(connectionRDF, connectionURI);
         URI wonNode = WonRdfUtils.ConnectionUtils.getWonNodeURIFromConnection(connectionRDF, connectionURI);
-        //TODO: make more generic by using the URIs specified in the command.
+        // TODO: make more generic by using the URIs specified in the command.
         return WonMessageBuilder
-                .setMessagePropertiesForHintFeedback(
-                        wonNodeInformationService.generateEventURI(
-                                wonNode),
-                        connectionURI,
-                        localNeed,
-                        wonNode, URI.create(WON.GOOD.getURI()).equals(feedbackCommandEvent.getValue())
-                )
+                .setMessagePropertiesForHintFeedback(wonNodeInformationService.generateEventURI(wonNode), connectionURI,
+                        localNeed, wonNode, URI.create(WON.GOOD.getURI()).equals(feedbackCommandEvent.getValue()))
                 .build();
     }
 

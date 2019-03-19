@@ -39,8 +39,8 @@ public class DefaultMatcherQueryExecuter implements SolrMatcherQueryExecutor {
     }
 
     @Override
-    public SolrDocumentList executeNeedQuery(String queryString, int maxHints, SolrParams params, String... filterQueries)
-            throws IOException, SolrServerException {
+    public SolrDocumentList executeNeedQuery(String queryString, int maxHints, SolrParams params,
+            String... filterQueries) throws IOException, SolrServerException {
 
         if (queryString == null) {
             log.debug("query string is null, do execute any query!");
@@ -50,7 +50,8 @@ public class DefaultMatcherQueryExecuter implements SolrMatcherQueryExecutor {
         SolrQuery query = new SolrQuery();
         log.debug("use query: {} with filters {}", queryString, filterQueries);
         query.setQuery(queryString);
-        query.setFields("id", "score", HintBuilder.WON_NODE_SOLR_FIELD, HintBuilder.HAS_FLAG_SOLR_FIELD, MatchingContextQueryFactory.MATCHING_CONTEXT_SOLR_FIELD);
+        query.setFields("id", "score", HintBuilder.WON_NODE_SOLR_FIELD, HintBuilder.HAS_FLAG_SOLR_FIELD,
+                MatchingContextQueryFactory.MATCHING_CONTEXT_SOLR_FIELD);
         query.setRows(maxHints);
 
         if (filterQueries != null) {
@@ -64,17 +65,18 @@ public class DefaultMatcherQueryExecuter implements SolrMatcherQueryExecutor {
         try {
             QueryResponse response = solrClient.query(query);
             SolrDocumentList results = response.getResults();
-            //handle special case: if all results have the same score, the rows parameter does not properly restrict the size
-            //in order to enforce the restriction, we are doing it here.
+            // handle special case: if all results have the same score, the rows parameter does not properly restrict
+            // the size
+            // in order to enforce the restriction, we are doing it here.
             if (results.size() > maxHints) {
-              SolrDocumentList cappedResults = new SolrDocumentList();
-              for (int i = 0; i < maxHints; i++) {
-                cappedResults.add(results.get(i));
-              }
-              cappedResults.setMaxScore(results.getMaxScore());
-              cappedResults.setNumFound(results.getNumFound());
-              cappedResults.setStart(results.getStart());
-              return cappedResults;
+                SolrDocumentList cappedResults = new SolrDocumentList();
+                for (int i = 0; i < maxHints; i++) {
+                    cappedResults.add(results.get(i));
+                }
+                cappedResults.setMaxScore(results.getMaxScore());
+                cappedResults.setNumFound(results.getNumFound());
+                cappedResults.setStart(results.getStart());
+                return cappedResults;
             }
             return results;
         } catch (SolrException e) {

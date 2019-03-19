@@ -46,9 +46,8 @@ public class NeedIndexer {
     public static final String SOLR_SEEKS_SEEKS_LOCATION_COORDINATES_FIELD = "seeksSeeks_need_location";
 
     // SPARQL query to contruct a need object out of the dataset, use all graphs that reference "won:Need"
-    private static final String NEED_INDEX_QUERY =
-            "prefix won: <http://purl.org/webofneeds/model#> construct { ?a ?b ?c .} where { " +
-                    "GRAPH ?graph { ?need a won:Need. ?a ?b ?c. } }";
+    private static final String NEED_INDEX_QUERY = "prefix won: <http://purl.org/webofneeds/model#> construct { ?a ?b ?c .} where { "
+            + "GRAPH ?graph { ?need a won:Need. ?a ?b ?c. } }";
 
     @Autowired
     private SolrMatcherConfig config;
@@ -62,12 +61,12 @@ public class NeedIndexer {
         Query query = QueryFactory.create(NEED_INDEX_QUERY);
         try (QueryExecution qexec = QueryExecutionFactory.create(query, dataset)) {
             Model needModel = qexec.execConstruct();
-    
+
             // normalize the need model for solr indexing
             NeedModelWrapper needModelWrapper = new NeedModelWrapper(needModel, null);
             String needUri = needModelWrapper.getNeedUri();
             needModel = needModelWrapper.normalizeNeedModel();
-    
+
             // check if test index should be used for need
             boolean usedForTesting = needModelWrapper.hasFlag(WON.USED_FOR_TESTING);
             indexNeedModel(needModel, needUri, usedForTesting);
@@ -94,20 +93,23 @@ public class NeedIndexer {
         Resource needContentNode = needModelWrapper.getNeedContentNode();
         Coordinate needCoordinate = needModelWrapper.getLocationCoordinate(needContentNode);
         if (needCoordinate != null) {
-            framed.put(SOLR_IS_LOCATION_COORDINATES_FIELD, String.valueOf(needCoordinate.getLatitude()) + "," + String.valueOf(needCoordinate.getLongitude()));
+            framed.put(SOLR_IS_LOCATION_COORDINATES_FIELD,
+                    String.valueOf(needCoordinate.getLatitude()) + "," + String.valueOf(needCoordinate.getLongitude()));
         }
 
         for (Resource contentNode : needModelWrapper.getSeeksNodes()) {
             Coordinate coordinate = needModelWrapper.getLocationCoordinate(contentNode);
             if (coordinate != null) {
-                framed.put(SOLR_SEEKS_LOCATION_COORDINATES_FIELD, String.valueOf(coordinate.getLatitude()) + "," + String.valueOf(coordinate.getLongitude()));
+                framed.put(SOLR_SEEKS_LOCATION_COORDINATES_FIELD,
+                        String.valueOf(coordinate.getLatitude()) + "," + String.valueOf(coordinate.getLongitude()));
             }
         }
 
         for (Resource contentNode : needModelWrapper.getSeeksSeeksNodes()) {
             Coordinate coordinate = needModelWrapper.getLocationCoordinate(contentNode);
             if (coordinate != null) {
-                framed.put(SOLR_SEEKS_SEEKS_LOCATION_COORDINATES_FIELD, String.valueOf(coordinate.getLatitude()) + "," + String.valueOf(coordinate.getLongitude()));
+                framed.put(SOLR_SEEKS_SEEKS_LOCATION_COORDINATES_FIELD,
+                        String.valueOf(coordinate.getLatitude()) + "," + String.valueOf(coordinate.getLongitude()));
             }
         }
 
@@ -124,9 +126,9 @@ public class NeedIndexer {
         }
         log.debug("Post need to solr index. \n Solr URI: {} \n Need (JSON): {}", indexUri, needJson);
         try {
-          httpService.postJsonRequest(indexUri, needJson);
+            httpService.postJsonRequest(indexUri, needJson);
         } catch (HttpClientErrorException e) {
-          log.info("Error indexing need with solr. \n Solr URI: {} \n Need (JSON): {}", indexUri, needJson);
+            log.info("Error indexing need with solr. \n Solr URI: {} \n Need (JSON): {}", indexUri, needJson);
         }
     }
 }

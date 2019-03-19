@@ -25,44 +25,40 @@ import java.util.List;
 /**
  * Composite filter.
  */
-public abstract class AbstractCompositeFilter implements CompositeFilter
-{
-  private List<EventFilter> filters;
+public abstract class AbstractCompositeFilter implements CompositeFilter {
+    private List<EventFilter> filters;
 
-  public AbstractCompositeFilter()
-  {
-    this(new LinkedList<EventFilter>());
-  }
+    public AbstractCompositeFilter() {
+        this(new LinkedList<EventFilter>());
+    }
 
-  public AbstractCompositeFilter(final List<EventFilter> filters)
-  {
-    this.filters = Collections.synchronizedList(filters);
-  }
+    public AbstractCompositeFilter(final List<EventFilter> filters) {
+        this.filters = Collections.synchronizedList(filters);
+    }
 
-  public AbstractCompositeFilter(final EventFilter... filters) {
-      this.filters = Collections.synchronizedList(Arrays.asList(filters));
-  }
+    public AbstractCompositeFilter(final EventFilter... filters) {
+        this.filters = Collections.synchronizedList(Arrays.asList(filters));
+    }
 
-  @Override
-  public synchronized void addFilter(EventFilter filter) {
-    this.filters.add(filter);
-  }
+    @Override
+    public synchronized void addFilter(EventFilter filter) {
+        this.filters.add(filter);
+    }
 
-  /**
-   * Returns a shallow copy of the filters.
-   */
-  public synchronized List<EventFilter> getFilters()
-  {
-    ArrayList<EventFilter> copy = new ArrayList<>(filters.size());
-    copy.addAll(filters);
-    return copy;
-  }
+    /**
+     * Returns a shallow copy of the filters.
+     */
+    public synchronized List<EventFilter> getFilters() {
+        ArrayList<EventFilter> copy = new ArrayList<>(filters.size());
+        copy.addAll(filters);
+        return copy;
+    }
 
-  @Override
-  /**
-   * Replaces the filters by the specified ones, wrapping them in a synchronized list.
-   */
-  public synchronized void setFilters(final List<EventFilter> filters) {
-    this.filters = Collections.synchronizedList(filters);
-  }
+    @Override
+    /**
+     * Replaces the filters by the specified ones, wrapping them in a synchronized list.
+     */
+    public synchronized void setFilters(final List<EventFilter> filters) {
+        this.filters = Collections.synchronizedList(filters);
+    }
 }

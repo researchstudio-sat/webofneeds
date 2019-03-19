@@ -13,51 +13,49 @@ import org.springframework.context.annotation.PropertySource;
  */
 @Configuration
 @PropertySource("file:${WON_CONFIG_DIR}/cluster-node.properties")
-public class ClusterConfig
-{
-  @Value("${node.host}")
-  private String nodeHost;
+public class ClusterConfig {
+    @Value("${node.host}")
+    private String nodeHost;
 
-  @Value("${cluster.name}")
-  private String name;
+    @Value("${cluster.name}")
+    private String name;
 
-  @Value("${cluster.local.port}")
-  private int localPort;
+    @Value("${cluster.local.port}")
+    private int localPort;
 
-  @Value("#{'${cluster.seedNodes}'.split(',')}")
-  private List<String> seedNodes;
+    @Value("#{'${cluster.seedNodes}'.split(',')}")
+    private List<String> seedNodes;
 
+    public String getNodeHost() {
+        return nodeHost;
+    }
 
-  public String getNodeHost() {
-    return nodeHost;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public String getName() {
-    return name;
-  }
+    public int getLocalPort() {
+        return localPort;
+    }
 
-  public int getLocalPort() {
-    return localPort;
-  }
+    public void setNodeHost(final String nodeHost) {
+        this.nodeHost = nodeHost;
+    }
 
-  public void setNodeHost(final String nodeHost) {
-    this.nodeHost = nodeHost;
-  }
+    public void setName(final String name) {
+        this.name = name;
+    }
 
-  public void setName(final String name) {
-    this.name = name;
-  }
+    public void setLocalPort(final int localPort) {
+        this.localPort = localPort;
+    }
 
-  public void setLocalPort(final int localPort) {
-    this.localPort = localPort;
-  }
+    public List<String> getSeedNodes() {
+        return seedNodes;
+    }
 
-  public List<String> getSeedNodes() {
-    return seedNodes;
-  }
-
-  public void setSeedNodes(final List<String> seedNodes) {
-    this.seedNodes = seedNodes;
-  }
+    public void setSeedNodes(final List<String> seedNodes) {
+        this.seedNodes = seedNodes;
+    }
 
 }

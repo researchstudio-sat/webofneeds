@@ -19,11 +19,9 @@ import won.protocol.util.DefaultNeedModelWrapper;
 public class BasicNeedQueryFactory extends NeedDatasetQueryFactory {
 
     public static final Map<MatcherNeedContentPropertyType, String> titleFieldMap;
-    static
-    {
+    static {
         titleFieldMap = new HashMap<>();
-        titleFieldMap.put(MatcherNeedContentPropertyType.IS,
-                "_graph.http___purl.org_dc_elements_1.1_title");
+        titleFieldMap.put(MatcherNeedContentPropertyType.IS, "_graph.http___purl.org_dc_elements_1.1_title");
         titleFieldMap.put(MatcherNeedContentPropertyType.SEEKS,
                 "_graph.http___purl.org_webofneeds_model_seeks.http___purl.org_dc_elements_1.1_title");
         titleFieldMap.put(MatcherNeedContentPropertyType.SEEKS_SEEKS,
@@ -31,8 +29,7 @@ public class BasicNeedQueryFactory extends NeedDatasetQueryFactory {
     }
 
     public static final Map<MatcherNeedContentPropertyType, String> descriptionFieldMap;
-    static
-    {
+    static {
         descriptionFieldMap = new HashMap<>();
         descriptionFieldMap.put(MatcherNeedContentPropertyType.IS,
                 "_graph.http___purl.org_dc_elements_1.1_description");
@@ -43,11 +40,9 @@ public class BasicNeedQueryFactory extends NeedDatasetQueryFactory {
     }
 
     public static final Map<MatcherNeedContentPropertyType, String> tagFieldMap;
-    static
-    {
+    static {
         tagFieldMap = new HashMap<>();
-        tagFieldMap.put(MatcherNeedContentPropertyType.IS,
-                "_graph.http___purl.org_webofneeds_model_hasTag");
+        tagFieldMap.put(MatcherNeedContentPropertyType.IS, "_graph.http___purl.org_webofneeds_model_hasTag");
         tagFieldMap.put(MatcherNeedContentPropertyType.SEEKS,
                 "_graph.http___purl.org_webofneeds_model_seeks.http___purl.org_webofneeds_model_hasTag");
         tagFieldMap.put(MatcherNeedContentPropertyType.SEEKS_SEEKS,
@@ -55,8 +50,7 @@ public class BasicNeedQueryFactory extends NeedDatasetQueryFactory {
     }
 
     public static final Map<MatcherNeedContentPropertyType, String> locationFieldMap;
-    static
-    {
+    static {
         locationFieldMap = new HashMap<>();
         locationFieldMap.put(MatcherNeedContentPropertyType.IS, "is_need_location");
         locationFieldMap.put(MatcherNeedContentPropertyType.SEEKS, "seeks_need_location");
@@ -112,7 +106,8 @@ public class BasicNeedQueryFactory extends NeedDatasetQueryFactory {
 
         Coordinate coordinate = needModelWrapper.getLocationCoordinate(contentNode);
         if (coordinate != null) {
-            locationFactories.add(new GeoDistBoostQueryFactory(locationFieldMap.get(fieldType), coordinate.getLatitude(), coordinate.getLongitude()));
+            locationFactories.add(new GeoDistBoostQueryFactory(locationFieldMap.get(fieldType),
+                    coordinate.getLatitude(), coordinate.getLongitude()));
         }
     }
 

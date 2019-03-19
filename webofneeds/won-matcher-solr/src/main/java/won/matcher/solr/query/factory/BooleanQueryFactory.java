@@ -8,9 +8,7 @@ public class BooleanQueryFactory extends SolrQueryFactory {
     private BooleanOperator operator;
 
     public enum BooleanOperator {
-        AND,
-        OR,
-        NOT
+        AND, OR, NOT
     }
 
     public BooleanQueryFactory(BooleanOperator op, SolrQueryFactory... factories) {

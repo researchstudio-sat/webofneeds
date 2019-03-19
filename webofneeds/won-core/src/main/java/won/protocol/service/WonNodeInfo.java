@@ -21,70 +21,68 @@ import java.util.Map;
 import java.util.Set;
 
 /**
-* User: fkleedorfer
-* Date: 27.10.2014
-*/
-public class WonNodeInfo
-{
-  private String wonNodeURI;
-  private String eventURIPrefix;
-  private String connectionURIPrefix;
-  private String needURIPrefix;
-  private String needListURI;
-  private Map<String, Map <String, String>> supportedProtocolImpl;
+ * User: fkleedorfer Date: 27.10.2014
+ */
+public class WonNodeInfo {
+    private String wonNodeURI;
+    private String eventURIPrefix;
+    private String connectionURIPrefix;
+    private String needURIPrefix;
+    private String needListURI;
+    private Map<String, Map<String, String>> supportedProtocolImpl;
 
-  protected WonNodeInfo(String wonNodeURI, String eventURIPrefix, String connectionURIPattern, String needURIPattern,
-                     String needListURI, Map<String, Map <String, String>> supportedProtocolImpl ) {
+    protected WonNodeInfo(String wonNodeURI, String eventURIPrefix, String connectionURIPattern, String needURIPattern,
+            String needListURI, Map<String, Map<String, String>> supportedProtocolImpl) {
 
-    this.wonNodeURI = wonNodeURI;
-    this.eventURIPrefix = eventURIPrefix;
-    this.connectionURIPrefix = connectionURIPattern;
-    this.needURIPrefix = needURIPattern;
-    this.needListURI = needListURI;
-    this.supportedProtocolImpl = supportedProtocolImpl;
-  }
-
-  public String getWonNodeURI() {
-    return wonNodeURI;
-  }
-
-  public String getNeedListURI() {
-    return needListURI;
-  }
-
-  public String getSupportedProtocolImplParamValue(String protocol, String paramName) {
-    Map<String,String> protocolMap = supportedProtocolImpl.get(protocol);
-    if (protocolMap != null) {
-      return protocolMap.get(paramName);
+        this.wonNodeURI = wonNodeURI;
+        this.eventURIPrefix = eventURIPrefix;
+        this.connectionURIPrefix = connectionURIPattern;
+        this.needURIPrefix = needURIPattern;
+        this.needListURI = needListURI;
+        this.supportedProtocolImpl = supportedProtocolImpl;
     }
-    return null;
-  }
 
-  public Set<String> getSupportedProtocolImpls() {
-    Set<String> protocols = new HashSet<>();
-    protocols.addAll(supportedProtocolImpl.keySet());
-    return protocols;
-  }
-
-  public Set<String> getSupportedProtocolImplParams(String protocol) {
-
-    Set<String> protocols = new HashSet<>();
-    Map<String,String> protocolMap = supportedProtocolImpl.get(protocol);
-    if (protocolMap != null) {
-      protocols.addAll(protocolMap.keySet());
+    public String getWonNodeURI() {
+        return wonNodeURI;
     }
-    return protocolMap.keySet();
-  }
 
-  public String getEventURIPrefix() {
-    return eventURIPrefix;
-  }
+    public String getNeedListURI() {
+        return needListURI;
+    }
 
-  public String getConnectionURIPrefix() {
-    return connectionURIPrefix;
-  }
+    public String getSupportedProtocolImplParamValue(String protocol, String paramName) {
+        Map<String, String> protocolMap = supportedProtocolImpl.get(protocol);
+        if (protocolMap != null) {
+            return protocolMap.get(paramName);
+        }
+        return null;
+    }
 
-  public String getNeedURIPrefix() {
-    return needURIPrefix;
-  }
+    public Set<String> getSupportedProtocolImpls() {
+        Set<String> protocols = new HashSet<>();
+        protocols.addAll(supportedProtocolImpl.keySet());
+        return protocols;
+    }
+
+    public Set<String> getSupportedProtocolImplParams(String protocol) {
+
+        Set<String> protocols = new HashSet<>();
+        Map<String, String> protocolMap = supportedProtocolImpl.get(protocol);
+        if (protocolMap != null) {
+            protocols.addAll(protocolMap.keySet());
+        }
+        return protocolMap.keySet();
+    }
+
+    public String getEventURIPrefix() {
+        return eventURIPrefix;
+    }
+
+    public String getConnectionURIPrefix() {
+        return connectionURIPrefix;
+    }
+
+    public String getNeedURIPrefix() {
+        return needURIPrefix;
+    }
 }

@@ -17,8 +17,8 @@ import org.apache.jena.rdf.model.RDFNode;
 import won.protocol.exception.DataIntegrityException;
 
 /**
- * Executes a sparql query on a sparql endpoint and returns the data as {@link TensorEntry} objects.
- * Expects that the sparql query returns the variables ?slice, ?need and ?value.
+ * Executes a sparql query on a sparql endpoint and returns the data as {@link TensorEntry} objects. Expects that the
+ * sparql query returns the variables ?slice, ?need and ?value.
  *
  * Created by hfriedrich on 21.04.2017.
  */
@@ -28,7 +28,7 @@ public class TensorEntrySparqlGenerator implements TensorEntryGenerator {
     private String query;
     private Map<String, Object> parameterBindings;
 
-    private static String[] variableNames = {"slice", "need", "value"};
+    private static String[] variableNames = { "slice", "need", "value" };
 
     public TensorEntrySparqlGenerator(String sparqlEndpoint, String sparqlQuery) {
 
@@ -63,12 +63,12 @@ public class TensorEntrySparqlGenerator implements TensorEntryGenerator {
         Query q = pss.asQuery();
         try (QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, q)) {
             ResultSet results = qexec.execSelect();
-    
+
             // check that the query returns the right variables
             if (!results.getResultVars().containsAll(Arrays.asList(variableNames))) {
                 throw new DataIntegrityException("sparql query is expected to return variables: " + variableNames);
             }
-    
+
             while (results.hasNext()) {
                 TensorEntry entry = new TensorEntry();
                 QuerySolution qs = results.next();

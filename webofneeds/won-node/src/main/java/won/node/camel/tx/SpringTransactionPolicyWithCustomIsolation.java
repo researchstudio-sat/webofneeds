@@ -45,7 +45,7 @@ public class SpringTransactionPolicyWithCustomIsolation extends SpringTransactio
     @Override
     public TransactionTemplate getTransactionTemplate() {
         TransactionTemplate answer = super.getTransactionTemplate();
-        if (this.isolationLevelName != null){
+        if (this.isolationLevelName != null) {
             answer.setIsolationLevelName(this.isolationLevelName);
         }
         return answer;

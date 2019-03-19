@@ -68,26 +68,29 @@ public class WonMimeMessageGenerator {
     /**
      * Creates Response Message that is sent when a need tries to connect with another need
      */
-    public WonMimeMessage createConnectMail(MimeMessage msgToRespondTo, URI remoteNeedUri) throws MessagingException, IOException {
+    public WonMimeMessage createConnectMail(MimeMessage msgToRespondTo, URI remoteNeedUri)
+            throws MessagingException, IOException {
 
         VelocityContext velocityContext = putDefaultContent(msgToRespondTo, remoteNeedUri);
         return generateWonMimeMessage(msgToRespondTo, velocityEngine.getTemplate("mail-templates/connect-mail.vm"),
-                                      velocityContext, remoteNeedUri);
+                velocityContext, remoteNeedUri);
     }
 
-    public WonMimeMessage createHintMail(MimeMessage msgToRespondTo, URI remoteNeedUri) throws MessagingException, IOException {
+    public WonMimeMessage createHintMail(MimeMessage msgToRespondTo, URI remoteNeedUri)
+            throws MessagingException, IOException {
 
         VelocityContext velocityContext = putDefaultContent(msgToRespondTo, remoteNeedUri);
         return generateWonMimeMessage(msgToRespondTo, velocityEngine.getTemplate("mail-templates/hint-mail.vm"),
-                                      velocityContext, remoteNeedUri);
+                velocityContext, remoteNeedUri);
     }
 
-    public WonMimeMessage createMessageMail(MimeMessage msgToRespondTo, URI requesterId, URI remoteNeedUri, URI connectionUri) throws MessagingException, IOException {
+    public WonMimeMessage createMessageMail(MimeMessage msgToRespondTo, URI requesterId, URI remoteNeedUri,
+            URI connectionUri) throws MessagingException, IOException {
 
         VelocityContext velocityContext = putDefaultContent(msgToRespondTo, remoteNeedUri);
         putMessages(velocityContext, connectionUri, requesterId);
         return generateWonMimeMessage(msgToRespondTo, velocityEngine.getTemplate("mail-templates/message-mail.vm"),
-                                      velocityContext, remoteNeedUri);
+                velocityContext, remoteNeedUri);
     }
 
     public WonMimeMessage createWelcomeMail(MimeMessage msgToRespondTo) throws IOException, MessagingException {
@@ -109,14 +112,19 @@ public class WonMimeMessageGenerator {
     }
 
     /**
-     * Creates the DefaultContext and fills in all relevant Infos which are used in every Mail, in our Case this is the NeedInfo and the quoted Original Message
-     * @param msgToRespondTo Message that the new Mail is in ResponseTo (to extract the mailtext)
-     * @param remoteNeedUri To extract the corresponding Need Data
+     * Creates the DefaultContext and fills in all relevant Infos which are used in every Mail, in our Case this is the
+     * NeedInfo and the quoted Original Message
+     * 
+     * @param msgToRespondTo
+     *            Message that the new Mail is in ResponseTo (to extract the mailtext)
+     * @param remoteNeedUri
+     *            To extract the corresponding Need Data
      * @return VelocityContext that has prefilled all the necessary Data
      * @throws IOException
      * @throws MessagingException
      */
-    private VelocityContext putDefaultContent(MimeMessage msgToRespondTo, URI remoteNeedUri) throws IOException, MessagingException {
+    private VelocityContext putDefaultContent(MimeMessage msgToRespondTo, URI remoteNeedUri)
+            throws IOException, MessagingException {
         VelocityContext velocityContext = new VelocityContext();
 
         putRemoteNeedInfo(velocityContext, remoteNeedUri);
@@ -125,9 +133,9 @@ public class WonMimeMessageGenerator {
         return velocityContext;
     }
 
-    private WonMimeMessage generateWonMimeMessage(
-      MimeMessage msgToRespondTo, Template template, VelocityContext velocityContext, URI remoteNeedUri)
-      throws MessagingException, UnsupportedEncodingException {
+    private WonMimeMessage generateWonMimeMessage(MimeMessage msgToRespondTo, Template template,
+            VelocityContext velocityContext, URI remoteNeedUri)
+            throws MessagingException, UnsupportedEncodingException {
 
         Dataset remoteNeedRDF = eventListenerContext.getLinkedDataSource().getDataForResource(remoteNeedUri);
         DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(remoteNeedRDF);
@@ -135,9 +143,11 @@ public class WonMimeMessageGenerator {
         MimeMessage answerMessage = (MimeMessage) msgToRespondTo.reply(false);
         answerMessage.setFrom(new InternetAddress(sentFrom, sentFromName));
         answerMessage.setText("");
-        answerMessage.setSubject(answerMessage.getSubject() + " <-> " + StringUtils.trim(needModelWrapper.getSomeTitleFromIsOrAll("en","de")));
+        answerMessage.setSubject(answerMessage.getSubject() + " <-> "
+                + StringUtils.trim(needModelWrapper.getSomeTitleFromIsOrAll("en", "de")));
 
-        //We need to create an instance of our own MimeMessage Implementation in order to have the Unique Message Id set before sending
+        // We need to create an instance of our own MimeMessage Implementation in order to have the Unique Message Id
+        // set before sending
         WonMimeMessage wonAnswerMessage = new WonMimeMessage(answerMessage);
         wonAnswerMessage.updateMessageID();
         String messageId = wonAnswerMessage.getMessageID();
@@ -157,17 +167,20 @@ public class WonMimeMessageGenerator {
 
     /**
      * Responsible for filling inc/remote-need-info.vm template
-     * @param velocityContext context to put template-vars in
-     * @param remoteNeedUri uri for the remote need
+     * 
+     * @param velocityContext
+     *            context to put template-vars in
+     * @param remoteNeedUri
+     *            uri for the remote need
      */
     private void putRemoteNeedInfo(VelocityContext velocityContext, URI remoteNeedUri) {
         Dataset remoteNeedRDF = eventListenerContext.getLinkedDataSource().getDataForResource(remoteNeedUri);
         DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(remoteNeedRDF);
 
-        velocityContext.put("remoteNeedTitle", StringUtils.trim(needModelWrapper.getSomeTitleFromIsOrAll("en","de")).replaceAll(
-          "\\n", "\n" + QUOTE_CHAR));
-        velocityContext.put("remoteNeedDescription", StringUtils.trim(needModelWrapper.getSomeDescription(
-                "en","de")).replaceAll("\\n", "\n" + QUOTE_CHAR));
+        velocityContext.put("remoteNeedTitle", StringUtils.trim(needModelWrapper.getSomeTitleFromIsOrAll("en", "de"))
+                .replaceAll("\\n", "\n" + QUOTE_CHAR));
+        velocityContext.put("remoteNeedDescription",
+                StringUtils.trim(needModelWrapper.getSomeDescription("en", "de")).replaceAll("\\n", "\n" + QUOTE_CHAR));
 
         Collection<String> tags = needModelWrapper.getAllTags();
         velocityContext.put("remoteNeedTags", tags.size() > 0 ? tags : null);
@@ -182,7 +195,7 @@ public class WonMimeMessageGenerator {
      * @throws MessagingException
      */
     private void putCommandFooter(VelocityContext velocityContext, WonMimeMessage message)
-      throws MessagingException, UnsupportedEncodingException {
+            throws MessagingException, UnsupportedEncodingException {
 
         velocityContext.put("mailbotEmailAddress", sentFrom);
         velocityContext.put("mailbotName", sentFromName);
@@ -191,8 +204,11 @@ public class WonMimeMessageGenerator {
 
     /**
      * Responsible for filling inc/quoted-mail.vm template
-     * @param velocityContext context to put template-vars in
-     * @param msgToRespondTo message to repspond to
+     * 
+     * @param velocityContext
+     *            context to put template-vars in
+     * @param msgToRespondTo
+     *            message to repspond to
      * @throws MessagingException
      * @throws IOException
      */
@@ -211,15 +227,20 @@ public class WonMimeMessageGenerator {
 
     /**
      * Responsible for filling inc/previous-messages.vm
-     * @param velocityContext context to put template-vars in
-     * @param connectionUri connectionUri to retrieve events from
-     * @param requesterUri determines your need uri (to know which messages are from you)
+     * 
+     * @param velocityContext
+     *            context to put template-vars in
+     * @param connectionUri
+     *            connectionUri to retrieve events from
+     * @param requesterUri
+     *            determines your need uri (to know which messages are from you)
      */
     private void putMessages(VelocityContext velocityContext, URI connectionUri, URI requesterUri) {
         logger.debug("getting the messages for connectionuri: {}", connectionUri);
 
         Dataset baseDataSet = eventListenerContext.getLinkedDataSource().getDataForResource(connectionUri);
-        Dataset eventDataSet = eventListenerContext.getLinkedDataSource().getDataForResource(URI.create(connectionUri.toString()+"/events?deep=true"), requesterUri);
+        Dataset eventDataSet = eventListenerContext.getLinkedDataSource()
+                .getDataForResource(URI.create(connectionUri.toString() + "/events?deep=true"), requesterUri);
 
         RdfUtils.addDatasetToDataset(baseDataSet, eventDataSet);
 
@@ -228,39 +249,43 @@ public class WonMimeMessageGenerator {
             try (QueryExecution qExec = QueryExecutionFactory.create(query, baseDataSet, new QuerySolutionMap())) {
                 qExec.getContext().set(TDB.symUnionDefaultGraph, true);
                 ResultSet results = qExec.execSelect();
-    
-                Boolean lastSource = null; //must be undefined since we do not know who the source of the last retrieved message is
+
+                Boolean lastSource = null; // must be undefined since we do not know who the source of the last
+                                           // retrieved message is
                 String quote = "";
-    
+
                 List<String> messages = new ArrayList<>();
                 List<String> messageBlock = new ArrayList<>();
-    
+
                 while (results.hasNext()) {
                     QuerySolution soln = results.nextSolution();
-                    boolean msgSource = isYourMessage(soln, requesterUri); //Determine the source of this message
-    
-                    if(lastSource != null && msgSource != lastSource && messageBlock.size() > 0){
+                    boolean msgSource = isYourMessage(soln, requesterUri); // Determine the source of this message
+
+                    if (lastSource != null && msgSource != lastSource && messageBlock.size() > 0) {
                         messages.add(getMsgSourceString(quote, lastSource));
                         Collections.reverse(messageBlock);
                         messages.addAll(messageBlock);
-                        messages.add(quote); //ADD EMPTY LINE TO MAKE THIS MORE READABLE
+                        messages.add(quote); // ADD EMPTY LINE TO MAKE THIS MORE READABLE
                         messageBlock.clear();
                         quote += QUOTE_CHAR;
                     }
-    
-                    if (MAX_CONVERSATION_DEPTH != -1 && quote.length() > MAX_CONVERSATION_DEPTH) { //+1 so you always retrieve the newest messages anyway
+
+                    if (MAX_CONVERSATION_DEPTH != -1 && quote.length() > MAX_CONVERSATION_DEPTH) { // +1 so you always
+                                                                                                   // retrieve the
+                                                                                                   // newest messages
+                                                                                                   // anyway
                         messages.add(getMsgSourceString(quote, msgSource));
-                        messages.add(quote+"[...]");
+                        messages.add(quote + "[...]");
                         break;
                     }
-    
+
                     String messageLine = buildMessageLine(soln, quote);
                     messageBlock.add(messageLine);
-    
+
                     lastSource = msgSource;
                 }
                 velocityContext.put("messages", messages);
-            } 
+            }
         } catch (QueryParseException e) {
             logger.error("query parse exception {}", e);
         }
@@ -268,8 +293,11 @@ public class WonMimeMessageGenerator {
 
     /**
      * Builds a valid messageLine
-     * @param soln To extract the msg text
-     * @param quote String to indicate the quotationhierachy
+     * 
+     * @param soln
+     *            To extract the msg text
+     * @param quote
+     *            String to indicate the quotationhierachy
      * @return returns a human readable message line
      */
     private static String buildMessageLine(QuerySolution soln, String quote) {
@@ -282,13 +310,16 @@ public class WonMimeMessageGenerator {
     }
 
     private static String getMsgSourceString(String quote, boolean msgSource) {
-        return quote + (msgSource? YOUR_MESSAGE : THEIR_MESSAGE );
+        return quote + (msgSource ? YOUR_MESSAGE : THEIR_MESSAGE);
     }
 
     /**
      * Determines the Source of the Message
-     * @param soln to retrieve the needUri
-     * @param requesterUri determines your need uri (to know which messages are from you)
+     * 
+     * @param soln
+     *            to retrieve the needUri
+     * @param requesterUri
+     *            determines your need uri (to know which messages are from you)
      * @return true if the message came from you, false if the message did not come from you
      */
     private static boolean isYourMessage(QuerySolution soln, URI requesterUri) {

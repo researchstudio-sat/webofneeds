@@ -10,7 +10,8 @@ public class GeoDistFilterQueryFactory extends SolrQueryFactory {
     private String solrLocationField;
     private double distance;
 
-    public GeoDistFilterQueryFactory(String solrLocationField, float latitude, float longitude, double distanceInKilometers) {
+    public GeoDistFilterQueryFactory(String solrLocationField, float latitude, float longitude,
+            double distanceInKilometers) {
 
         this.solrLocationField = solrLocationField;
         this.latitude = latitude;
@@ -23,8 +24,8 @@ public class GeoDistFilterQueryFactory extends SolrQueryFactory {
 
         // create a geographical distance filter with radius "distance" (in kilometers)
         StringBuilder sb = new StringBuilder();
-        sb.append("{!geofilt sfield=").append(solrLocationField).append(" pt=")
-                .append(latitude).append(",").append(longitude).append(" d=").append(distance).append("}");
+        sb.append("{!geofilt sfield=").append(solrLocationField).append(" pt=").append(latitude).append(",")
+                .append(longitude).append(" d=").append(distance).append("}");
         return sb.toString();
     }
 

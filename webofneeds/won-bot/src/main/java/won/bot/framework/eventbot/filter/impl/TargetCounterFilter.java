@@ -26,13 +26,15 @@ import won.bot.framework.eventbot.filter.EventFilter;
  */
 public class TargetCounterFilter implements EventFilter {
     private TargetCounterDecorator targetCounterDecorator;
+
     public TargetCounterFilter(TargetCounterDecorator targetCounterDecorator) {
         this.targetCounterDecorator = targetCounterDecorator;
     }
 
     @Override
     public boolean accept(Event event) {
-        if (! (event instanceof TargetCountReachedEvent)) return false;
-        return ((TargetCountReachedEvent)event).getCounter() == targetCounterDecorator;
+        if (!(event instanceof TargetCountReachedEvent))
+            return false;
+        return ((TargetCountReachedEvent) event).getCounter() == targetCounterDecorator;
     }
 }

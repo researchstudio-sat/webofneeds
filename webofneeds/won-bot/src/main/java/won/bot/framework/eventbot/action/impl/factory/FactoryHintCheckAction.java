@@ -38,22 +38,25 @@ public class FactoryHintCheckAction extends BaseEventBotAction {
 
     @Override
     protected void doRun(Event event, EventListener executingListener) throws Exception {
-        if(!(event instanceof HintFromMatcherEvent) || !(getEventListenerContext().getBotContextWrapper() instanceof FactoryBotContextWrapper)) {
+        if (!(event instanceof HintFromMatcherEvent)
+                || !(getEventListenerContext().getBotContextWrapper() instanceof FactoryBotContextWrapper)) {
             logger.error("FactoryHintCheckAction can only handle HintFromMatcherEvent with FactoryBotContextWrapper");
             return;
         }
-        FactoryBotContextWrapper botContextWrapper = (FactoryBotContextWrapper) getEventListenerContext().getBotContextWrapper();
+        FactoryBotContextWrapper botContextWrapper = (FactoryBotContextWrapper) getEventListenerContext()
+                .getBotContextWrapper();
         Match match = ((HintFromMatcherEvent) event).getMatch();
 
         URI ownUri = match.getFromNeed();
         URI requesterUri = match.getToNeed();
 
-        if(botContextWrapper.isFactoryNeed(ownUri)) {
-            logger.debug("FactoryHint for factoryURI: " + ownUri + " from the requesterUri: "+requesterUri);
+        if (botContextWrapper.isFactoryNeed(ownUri)) {
+            logger.debug("FactoryHint for factoryURI: " + ownUri + " from the requesterUri: " + requesterUri);
             EventBus bus = getEventListenerContext().getEventBus();
             bus.publish(new FactoryHintEvent(requesterUri, ownUri));
-        }else{
-            logger.warn("NON FactoryHint for URI: " + ownUri + " from the requesterUri: "+requesterUri+" ignore the hint");
+        } else {
+            logger.warn("NON FactoryHint for URI: " + ownUri + " from the requesterUri: " + requesterUri
+                    + " ignore the hint");
         }
     }
 }

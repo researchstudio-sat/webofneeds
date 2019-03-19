@@ -23,14 +23,13 @@ import org.apache.camel.CamelContext;
 import won.cryptography.ssl.MessagingContext;
 
 /**
- * User: LEIH-NB
- * Date: 24.02.14
+ * User: LEIH-NB Date: 24.02.14
  */
 public interface NeedProtocolCamelConfigurator extends CamelConfigurator {
 
     String configureCamelEndpointForNeedUri(URI wonNodeUri, URI brokerUri, String needProtocolQueueName);
 
-    void addCamelComponentForWonNodeBroker(URI brokerUri,String brokerComponentName);
+    void addCamelComponentForWonNodeBroker(URI brokerUri, String brokerComponentName);
 
     void setCamelContext(CamelContext camelContext);
 

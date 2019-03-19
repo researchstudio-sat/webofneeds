@@ -26,27 +26,26 @@ import org.springframework.stereotype.Component;
  * Exports an MBean that makes hibernate statistics accessible.
  */
 @Component
-public class HibernateStatisticsFactoryBean implements FactoryBean<Statistics>
-{
-  @Autowired
-  private SessionFactory sessionFactory;
+public class HibernateStatisticsFactoryBean implements FactoryBean<Statistics> {
+    @Autowired
+    private SessionFactory sessionFactory;
 
-  @Override
-  public Statistics getObject() throws Exception {
-    return this.sessionFactory.getStatistics();
-  }
+    @Override
+    public Statistics getObject() throws Exception {
+        return this.sessionFactory.getStatistics();
+    }
 
-  @Override
-  public Class<?> getObjectType() {
-    return Statistics.class;
-  }
+    @Override
+    public Class<?> getObjectType() {
+        return Statistics.class;
+    }
 
-  @Override
-  public boolean isSingleton() {
-    return true;
-  }
+    @Override
+    public boolean isSingleton() {
+        return true;
+    }
 
-  public void setSessionFactory(final SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
-  }
+    public void setSessionFactory(final SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
+    }
 }

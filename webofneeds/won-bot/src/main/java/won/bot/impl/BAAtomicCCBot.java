@@ -11,45 +11,42 @@ import won.bot.framework.eventbot.listener.baStateBots.baCCMessagingBots.atomicB
 import won.protocol.model.FacetType;
 
 /**
- * User: Danijel
- * Date: 24.4.14.
+ * User: Danijel Date: 24.4.14.
  */
-public class BAAtomicCCBot extends BAAtomicBaseBot
-{
-  @Override
-  protected FacetType getParticipantFacetType() {
-    return FacetType.BACCParticipantFacet;
-  }
+public class BAAtomicCCBot extends BAAtomicBaseBot {
+    @Override
+    protected FacetType getParticipantFacetType() {
+        return FacetType.BACCParticipantFacet;
+    }
 
-  @Override
-  protected FacetType getCoordinatorFacetType() {
-    return FacetType.BAAtomicCCCoordinatorFacet;
-  }
+    @Override
+    protected FacetType getCoordinatorFacetType() {
+        return FacetType.BAAtomicCCCoordinatorFacet;
+    }
 
-  protected List<BATestBotScript> getFirstPhaseScripts() {
+    protected List<BATestBotScript> getFirstPhaseScripts() {
 
-    List<BATestBotScript> scripts = new ArrayList<BATestBotScript>(2);
+        List<BATestBotScript> scripts = new ArrayList<BATestBotScript>(2);
 
-    //Coordination message is sent as TEXT
-    scripts.add(new CompletingBlockingFPBot());
-    scripts.add(new CompletedBlockedFPBot());
+        // Coordination message is sent as TEXT
+        scripts.add(new CompletingBlockingFPBot());
+        scripts.add(new CompletedBlockedFPBot());
 
-   //Coordination message is sent as MODEL
-    //scripts.add(new CompletedBlockedFPUriBot());
+        // Coordination message is sent as MODEL
+        // scripts.add(new CompletedBlockedFPUriBot());
 
-    return scripts;
-  }
+        return scripts;
+    }
 
-  protected List<BATestBotScript> getSecondPhaseScripts() {
-    List<BATestBotScript> scripts = new ArrayList<BATestBotScript>(2);
+    protected List<BATestBotScript> getSecondPhaseScripts() {
+        List<BATestBotScript> scripts = new ArrayList<BATestBotScript>(2);
 
-    scripts.add(new CompletingBlockingSPBot());
-    scripts.add(new CompletedBlockedSPBot());
+        scripts.add(new CompletingBlockingSPBot());
+        scripts.add(new CompletedBlockedSPBot());
 
+        // Coordination message is sent as MODEL
+        // scripts.add(new CompletedBlockedSPUriBot());
 
-    //Coordination message is sent as MODEL
-   // scripts.add(new CompletedBlockedSPUriBot());
-
-    return scripts;
-  }
+        return scripts;
+    }
 }

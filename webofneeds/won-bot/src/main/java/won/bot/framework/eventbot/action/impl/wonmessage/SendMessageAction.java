@@ -28,38 +28,35 @@ import won.bot.framework.eventbot.listener.EventListener;
 /**
  * Action that sends a generic message.
  */
-public class SendMessageAction extends BaseEventBotAction
-{
+public class SendMessageAction extends BaseEventBotAction {
 
-  private String message = "Hello World";
+    private String message = "Hello World";
 
-  public SendMessageAction(final EventListenerContext eventListenerContext) {
-    super(eventListenerContext);
-  }
-
-  public SendMessageAction(final EventListenerContext eventListenerContext, final String message) {
-    super(eventListenerContext);
-    this.message = message;
-  }
-
-  @Override
-  protected void doRun(final Event event, EventListener executingListener) throws Exception {
-    if (event instanceof ConnectionSpecificEvent) {
-      sendMessage((ConnectionSpecificEvent) event, message);
+    public SendMessageAction(final EventListenerContext eventListenerContext) {
+        super(eventListenerContext);
     }
-  }
 
-  protected void sendMessage(final ConnectionSpecificEvent messageEvent, String message) {
-    URI connectionUri = messageEvent.getConnectionURI();
-    logger.debug("sending message ");
-    try {
-      getEventListenerContext().getWonMessageSender().sendWonMessage(BotActionUtils.createWonMessage
-        (getEventListenerContext(), connectionUri, message));
-    } catch (Exception e) {
-      logger.warn("could not send message via connection {}", connectionUri, e);
+    public SendMessageAction(final EventListenerContext eventListenerContext, final String message) {
+        super(eventListenerContext);
+        this.message = message;
     }
-  }
 
+    @Override
+    protected void doRun(final Event event, EventListener executingListener) throws Exception {
+        if (event instanceof ConnectionSpecificEvent) {
+            sendMessage((ConnectionSpecificEvent) event, message);
+        }
+    }
 
+    protected void sendMessage(final ConnectionSpecificEvent messageEvent, String message) {
+        URI connectionUri = messageEvent.getConnectionURI();
+        logger.debug("sending message ");
+        try {
+            getEventListenerContext().getWonMessageSender()
+                    .sendWonMessage(BotActionUtils.createWonMessage(getEventListenerContext(), connectionUri, message));
+        } catch (Exception e) {
+            logger.warn("could not send message via connection {}", connectionUri, e);
+        }
+    }
 
 }

@@ -38,10 +38,6 @@ public class ConnectionMessageBehaviour extends BotBehaviour {
     @Override
     protected void onActivate(Optional<Object> message) {
         this.subscribeWithAutoCleanup(ConnectionMessageCommandEvent.class,
-            new ActionOnEventListener(
-                context,
-                new ExecuteConnectionMessageCommandAction(context)
-            )
-        );
+                new ActionOnEventListener(context, new ExecuteConnectionMessageCommandAction(context)));
     }
 }

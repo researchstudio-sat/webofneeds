@@ -42,270 +42,236 @@ import won.protocol.util.linkeddata.CachingLinkedDataSource;
 import won.protocol.util.linkeddata.LinkedDataSource;
 
 /**
- * User: Danijel
- * Date: 16.4.14.
+ * User: Danijel Date: 16.4.14.
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:/spring/app/baAtomicCCActiveFailingTest.xml"})
+@ContextConfiguration(locations = { "classpath:/spring/app/baAtomicCCActiveFailingTest.xml" })
 
-public class BAAtomicCCActiveFailingBotTest
-{
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-  private static final int RUN_ONCE = 1;
-  private static final long ACT_LOOP_TIMEOUT_MILLIS = 100;
-  private static final long ACT_LOOP_INITIAL_DELAY_MILLIS = 100;
+public class BAAtomicCCActiveFailingBotTest {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final int RUN_ONCE = 1;
+    private static final long ACT_LOOP_TIMEOUT_MILLIS = 100;
+    private static final long ACT_LOOP_INITIAL_DELAY_MILLIS = 100;
 
-  private static MyBot bot;
+    private static MyBot bot;
 
-  @Autowired
-  ApplicationContext applicationContext;
+    @Autowired
+    ApplicationContext applicationContext;
 
-  @Autowired
-  SpringAwareBotManagerImpl botManager;
+    @Autowired
+    SpringAwareBotManagerImpl botManager;
 
-  private static SpringAwareBotManagerImpl staticBotManager;
+    private static SpringAwareBotManagerImpl staticBotManager;
 
+    private static boolean run = false;
 
-  private static boolean run = false;
-
-  @Before
-  public void before(){
-    if (!run)
-    {
-      //create a bot instance and auto-wire it
-      AutowireCapableBeanFactory beanFactory = applicationContext.getAutowireCapableBeanFactory();
-      bot = (MyBot) beanFactory.autowire(MyBot.class, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
-      Object botBean = beanFactory.initializeBean(bot, "mybot");
-      bot = (MyBot) botBean;
-      //the bot also needs a trigger so its act() method is called regularly.
-      // (there is no trigger bean in the context)
-      PeriodicTrigger trigger = new PeriodicTrigger(ACT_LOOP_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
-      trigger.setInitialDelay(ACT_LOOP_INITIAL_DELAY_MILLIS);
-      bot.setTrigger(trigger);
-      logger.info("starting test case testBAAtomicCCActiveFailingBot");
-      //adding the bot to the bot manager will cause it to be initialized.
-      //at that point, the trigger starts.
-      botManager.setShutdownApplicationContextIfWorkDone(false);
-      botManager.addBot(bot);
-      staticBotManager = botManager;
-      //the bot should now be running. We have to wait for it to finish before we
-      //can check the results:
-      //Together with the barrier.await() in the bot's listener, this trips the barrier
-      //and both threads continue.
-      try {
-        bot.getBarrier().await();
-      } catch (InterruptedException e) {
-        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-      } catch (BrokenBarrierException e) {
-        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-      }
-      run = true;
-    }
-  }
-
-  @AfterClass
-  public static void shutdown(){
-    //staticBotManager.setShutdownApplicationContextIfWorkDone(true);
-  }
-
-  /**
-   * The main test method.
-   * @throws Exception
-   */
-  @Test
-  public void testBAAtomicCCActiveFailingBot() throws Exception
-  {
-    //now check the results!
-    logger.info("start test case testBAAtomicCCActiveFailingBot");
-    bot.executeAsserts();
-    logger.info("finishing test case testBAAtomicCCActiveFailingBot");
-  }
-
-  @Test
-  public void testBAAtomicCCActiveFailingRDF(){
-    logger.info("starting test case testBAAtomicCCActiveFailingRDF");
-    bot.executeRDFValidationAssert();
-    logger.info("finishing test case testBAAtomicCCActiveFailingRDF");
-  }
-
-
-  @Test
-  public void testBAAtomicCCActiveFailingBAStateRDF(){
-    logger.info("starting test case testBAAtomicCCActiveFailingBAStateRDF");
-    bot.executeBAStateRDFValidationAssert();
-    logger.info("finishing test case testBAAtomicCCActiveFailingBAStateRDF");
-  }
-
-
-  /**
-   * We create a subclass of the bot we want to test here so that we can
-   * add a listener to its internal event bus and to access its listeners, which
-   * record information during the run that we later check with asserts.
-   */
-  public static class MyBot extends BAAtomicCCActiveFailingBot
-  {
-    /**
-     * Used for synchronization with the @TestD method: it should wait at the
-     * barrier until our bot is done, then execute the asserts.
-     */
-    CyclicBarrier barrier = new CyclicBarrier(2);
-
-    private static final String sparqlPrefix =
-      "PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>"+
-        "PREFIX geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#>"+
-        "PREFIX xsd:   <http://www.w3.org/2001/XMLSchema#>"+
-        "PREFIX rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>"+
-        "PREFIX won:   <http://purl.org/webofneeds/model#>"+
-        "PREFIX wontx:   <http://purl.org/webofneeds/tx/model#>"+
-        "PREFIX gr:    <http://purl.org/goodrelations/v1#>"+
-        "PREFIX sioc:  <http://rdfs.org/sioc/ns#>"+
-        "PREFIX ldp:   <http://www.w3.org/ns/ldp#>";
-
-    /**
-     * Default constructor is required for instantiation through Spring.
-     */
-    public MyBot(){
+    @Before
+    public void before() {
+        if (!run) {
+            // create a bot instance and auto-wire it
+            AutowireCapableBeanFactory beanFactory = applicationContext.getAutowireCapableBeanFactory();
+            bot = (MyBot) beanFactory.autowire(MyBot.class, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
+            Object botBean = beanFactory.initializeBean(bot, "mybot");
+            bot = (MyBot) botBean;
+            // the bot also needs a trigger so its act() method is called regularly.
+            // (there is no trigger bean in the context)
+            PeriodicTrigger trigger = new PeriodicTrigger(ACT_LOOP_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
+            trigger.setInitialDelay(ACT_LOOP_INITIAL_DELAY_MILLIS);
+            bot.setTrigger(trigger);
+            logger.info("starting test case testBAAtomicCCActiveFailingBot");
+            // adding the bot to the bot manager will cause it to be initialized.
+            // at that point, the trigger starts.
+            botManager.setShutdownApplicationContextIfWorkDone(false);
+            botManager.addBot(bot);
+            staticBotManager = botManager;
+            // the bot should now be running. We have to wait for it to finish before we
+            // can check the results:
+            // Together with the barrier.await() in the bot's listener, this trips the barrier
+            // and both threads continue.
+            try {
+                bot.getBarrier().await();
+            } catch (InterruptedException e) {
+                e.printStackTrace(); // To change body of catch statement use File | Settings | File Templates.
+            } catch (BrokenBarrierException e) {
+                e.printStackTrace(); // To change body of catch statement use File | Settings | File Templates.
+            }
+            run = true;
+        }
     }
 
-    @Override
-    protected void initializeEventListeners()
-    {
-      //of course, let the real bot implementation initialize itself
-      super.initializeEventListeners();
-      //now, add a listener to the WorkDoneEvent.
-      //its only purpose is to trip the CyclicBarrier instance that
-      // the test method is waiting on
-      getEventBus().subscribe(WorkDoneEvent.class,
-        new ActionOnEventListener(
-          getEventListenerContext(),
-          new TripBarrierAction(getEventListenerContext(), barrier)));
-    }
-
-    public CyclicBarrier getBarrier()
-    {
-      return barrier;
+    @AfterClass
+    public static void shutdown() {
+        // staticBotManager.setShutdownApplicationContextIfWorkDone(true);
     }
 
     /**
-     * Here we check the results of the bot's execution.
+     * The main test method.
+     * 
+     * @throws Exception
      */
-    public void executeAsserts()
-    {
-      //Coordinator creator
-      Assert.assertEquals(1, this.coordinatorNeedCreator.getEventCount());
-      Assert.assertEquals(0, this.coordinatorNeedCreator.getExceptionCount());
-      //28 Participants creator
-      Assert.assertEquals(noOfNeeds-1, this.participantNeedCreator.getEventCount());
-      Assert.assertEquals(0, this.participantNeedCreator.getExceptionCount());
-      //Coordinator - Participants connector
-      Assert.assertEquals(noOfNeeds, this.needConnector.getEventCount());
-      Assert.assertEquals(0, this.needConnector.getExceptionCount());
-
-      Assert.assertEquals(noOfNeeds-1, this.scriptsDoneListener.getEventCount());
-      Assert.assertEquals(0, this.scriptsDoneListener.getExceptionCount());
-
-      //29 needs deactivated
-      Assert.assertEquals(noOfNeeds-1, this.workDoneSignaller.getEventCount());
-      Assert.assertEquals(0, this.workDoneSignaller.getExceptionCount());
-
-      //TODO: there is more to check:
-      //* what does the RDF look like?
-      // --> pull it from the needURI/ConnectionURI and check contents
-      //* what does the database look like?
-
+    @Test
+    public void testBAAtomicCCActiveFailingBot() throws Exception {
+        // now check the results!
+        logger.info("start test case testBAAtomicCCActiveFailingBot");
+        bot.executeAsserts();
+        logger.info("finishing test case testBAAtomicCCActiveFailingBot");
     }
 
-    public void  executeRDFValidationAssert(){
-
-      List<URI> needs = ((ParticipantCoordinatorBotContextWrapper) getBotContextWrapper()).getCoordinators();
-
-      LinkedDataSource linkedDataSource = getEventListenerContext().getLinkedDataSource();
-
-      if (linkedDataSource instanceof CachingLinkedDataSource) {
-        ((CachingLinkedDataSource)linkedDataSource).clear();
-      }
-
-      Dataset dataModel = linkedDataSource.getDataForResourceWithPropertyPath(needs.get(0),
-        PropertyPathConfigurator.configurePropertyPaths
-          (), 300, 4, true);
-      logger.debug("crawled dataset: {}", RdfUtils.toString(dataModel));
-
-      String queryString = sparqlPrefix +
-        "SELECT ?need ?connection ?need2 WHERE {" +
-        "?need won:hasConnections ?connections."+
-        "?connections rdfs:member ?connection."+
-        "?connection won:hasFacet won:BAAtomicCCCoordinatorFacet."+
-        "?connection won:hasRemoteFacet won:BACCParticipantFacet."+
-        "?connection won:hasRemoteConnection ?connection2."+
-        "?connection2 won:belongsToNeed ?need2."+
-        "?connection2 won:hasFacet won:BACCParticipantFacet. "+
-        "}";
-
-      Query query = QueryFactory.create(queryString);
-      QueryExecution qExec = QueryExecutionFactory.create(query, dataModel);
-      ResultSet results = qExec.execSelect();
-
-      List<String> actualList = new ArrayList<>();
-      for (; results.hasNext(); ) {
-        QuerySolution soln = results.nextSolution();
-        actualList.add(soln.toString());
-        RDFNode node = soln.get("?connection");
-      }
-      assertTrue("wrong number of results", actualList.size() >= 1);
-      Assert.assertEquals(noOfNeeds - 1, actualList.size());
-      qExec.close();
+    @Test
+    public void testBAAtomicCCActiveFailingRDF() {
+        logger.info("starting test case testBAAtomicCCActiveFailingRDF");
+        bot.executeRDFValidationAssert();
+        logger.info("finishing test case testBAAtomicCCActiveFailingRDF");
     }
 
-    public void  executeBAStateRDFValidationAssert(){
-
-      List<URI> needs = ((ParticipantCoordinatorBotContextWrapper) getBotContextWrapper()).getCoordinators();
-
-      LinkedDataSource linkedDataSource = getEventListenerContext().getLinkedDataSource();
-
-      if (linkedDataSource instanceof CachingLinkedDataSource) {
-        ((CachingLinkedDataSource)linkedDataSource).clear();
-      }
-
-
-      Dataset dataModel = linkedDataSource.getDataForResourceWithPropertyPath(needs.get(0),
-        PropertyPathConfigurator.configurePropertyPaths
-          (), 300, 4, true);
-
-      logger.debug("crawled dataset: {}", RdfUtils.toString(dataModel));
-
-      String queryString = sparqlPrefix +
-        "SELECT ?need ?connection ?need2 WHERE {" +
-        "?need won:hasConnections ?connections."+
-        "?connections rdfs:member ?connection."+
-        "?connection won:hasFacet won:BAAtomicCCCoordinatorFacet."+
-        "?connection  wontx:hasBAState wontx:Ended."+
-        "?connection won:hasRemoteConnection ?connection2."+
-        "?connection2 won:belongsToNeed ?need2."+
-        "?connection2 won:hasFacet won:BACCParticipantFacet. "+
-        "?connection2  wontx:hasBAState wontx:Ended."+
-        "}";
-
-      Query query = QueryFactory.create(queryString);
-      QueryExecution qExec = QueryExecutionFactory.create(query, dataModel);
-      ResultSet results = qExec.execSelect();
-
-      List<String> actualList = new ArrayList<>();
-      for (; results.hasNext(); ) {
-        QuerySolution soln = results.nextSolution();
-        actualList.add(soln.toString());
-        RDFNode node = soln.get("?connection");
-      }
-      assertTrue("wrong number of results", actualList.size() >= 1);
-      Assert.assertEquals(noOfNeeds-1, actualList.size());
-      qExec.close();
+    @Test
+    public void testBAAtomicCCActiveFailingBAStateRDF() {
+        logger.info("starting test case testBAAtomicCCActiveFailingBAStateRDF");
+        bot.executeBAStateRDFValidationAssert();
+        logger.info("finishing test case testBAAtomicCCActiveFailingBAStateRDF");
     }
-  }
+
+    /**
+     * We create a subclass of the bot we want to test here so that we can add a listener to its internal event bus and
+     * to access its listeners, which record information during the run that we later check with asserts.
+     */
+    public static class MyBot extends BAAtomicCCActiveFailingBot {
+        /**
+         * Used for synchronization with the @TestD method: it should wait at the barrier until our bot is done, then
+         * execute the asserts.
+         */
+        CyclicBarrier barrier = new CyclicBarrier(2);
+
+        private static final String sparqlPrefix = "PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>"
+                + "PREFIX geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#>"
+                + "PREFIX xsd:   <http://www.w3.org/2001/XMLSchema#>"
+                + "PREFIX rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
+                + "PREFIX won:   <http://purl.org/webofneeds/model#>"
+                + "PREFIX wontx:   <http://purl.org/webofneeds/tx/model#>"
+                + "PREFIX gr:    <http://purl.org/goodrelations/v1#>" + "PREFIX sioc:  <http://rdfs.org/sioc/ns#>"
+                + "PREFIX ldp:   <http://www.w3.org/ns/ldp#>";
+
+        /**
+         * Default constructor is required for instantiation through Spring.
+         */
+        public MyBot() {
+        }
+
+        @Override
+        protected void initializeEventListeners() {
+            // of course, let the real bot implementation initialize itself
+            super.initializeEventListeners();
+            // now, add a listener to the WorkDoneEvent.
+            // its only purpose is to trip the CyclicBarrier instance that
+            // the test method is waiting on
+            getEventBus().subscribe(WorkDoneEvent.class, new ActionOnEventListener(getEventListenerContext(),
+                    new TripBarrierAction(getEventListenerContext(), barrier)));
+        }
+
+        public CyclicBarrier getBarrier() {
+            return barrier;
+        }
+
+        /**
+         * Here we check the results of the bot's execution.
+         */
+        public void executeAsserts() {
+            // Coordinator creator
+            Assert.assertEquals(1, this.coordinatorNeedCreator.getEventCount());
+            Assert.assertEquals(0, this.coordinatorNeedCreator.getExceptionCount());
+            // 28 Participants creator
+            Assert.assertEquals(noOfNeeds - 1, this.participantNeedCreator.getEventCount());
+            Assert.assertEquals(0, this.participantNeedCreator.getExceptionCount());
+            // Coordinator - Participants connector
+            Assert.assertEquals(noOfNeeds, this.needConnector.getEventCount());
+            Assert.assertEquals(0, this.needConnector.getExceptionCount());
+
+            Assert.assertEquals(noOfNeeds - 1, this.scriptsDoneListener.getEventCount());
+            Assert.assertEquals(0, this.scriptsDoneListener.getExceptionCount());
+
+            // 29 needs deactivated
+            Assert.assertEquals(noOfNeeds - 1, this.workDoneSignaller.getEventCount());
+            Assert.assertEquals(0, this.workDoneSignaller.getExceptionCount());
+
+            // TODO: there is more to check:
+            // * what does the RDF look like?
+            // --> pull it from the needURI/ConnectionURI and check contents
+            // * what does the database look like?
+
+        }
+
+        public void executeRDFValidationAssert() {
+
+            List<URI> needs = ((ParticipantCoordinatorBotContextWrapper) getBotContextWrapper()).getCoordinators();
+
+            LinkedDataSource linkedDataSource = getEventListenerContext().getLinkedDataSource();
+
+            if (linkedDataSource instanceof CachingLinkedDataSource) {
+                ((CachingLinkedDataSource) linkedDataSource).clear();
+            }
+
+            Dataset dataModel = linkedDataSource.getDataForResourceWithPropertyPath(needs.get(0),
+                    PropertyPathConfigurator.configurePropertyPaths(), 300, 4, true);
+            logger.debug("crawled dataset: {}", RdfUtils.toString(dataModel));
+
+            String queryString = sparqlPrefix + "SELECT ?need ?connection ?need2 WHERE {"
+                    + "?need won:hasConnections ?connections." + "?connections rdfs:member ?connection."
+                    + "?connection won:hasFacet won:BAAtomicCCCoordinatorFacet."
+                    + "?connection won:hasRemoteFacet won:BACCParticipantFacet."
+                    + "?connection won:hasRemoteConnection ?connection2." + "?connection2 won:belongsToNeed ?need2."
+                    + "?connection2 won:hasFacet won:BACCParticipantFacet. " + "}";
+
+            Query query = QueryFactory.create(queryString);
+            QueryExecution qExec = QueryExecutionFactory.create(query, dataModel);
+            ResultSet results = qExec.execSelect();
+
+            List<String> actualList = new ArrayList<>();
+            for (; results.hasNext();) {
+                QuerySolution soln = results.nextSolution();
+                actualList.add(soln.toString());
+                RDFNode node = soln.get("?connection");
+            }
+            assertTrue("wrong number of results", actualList.size() >= 1);
+            Assert.assertEquals(noOfNeeds - 1, actualList.size());
+            qExec.close();
+        }
+
+        public void executeBAStateRDFValidationAssert() {
+
+            List<URI> needs = ((ParticipantCoordinatorBotContextWrapper) getBotContextWrapper()).getCoordinators();
+
+            LinkedDataSource linkedDataSource = getEventListenerContext().getLinkedDataSource();
+
+            if (linkedDataSource instanceof CachingLinkedDataSource) {
+                ((CachingLinkedDataSource) linkedDataSource).clear();
+            }
+
+            Dataset dataModel = linkedDataSource.getDataForResourceWithPropertyPath(needs.get(0),
+                    PropertyPathConfigurator.configurePropertyPaths(), 300, 4, true);
+
+            logger.debug("crawled dataset: {}", RdfUtils.toString(dataModel));
+
+            String queryString = sparqlPrefix + "SELECT ?need ?connection ?need2 WHERE {"
+                    + "?need won:hasConnections ?connections." + "?connections rdfs:member ?connection."
+                    + "?connection won:hasFacet won:BAAtomicCCCoordinatorFacet."
+                    + "?connection  wontx:hasBAState wontx:Ended." + "?connection won:hasRemoteConnection ?connection2."
+                    + "?connection2 won:belongsToNeed ?need2." + "?connection2 won:hasFacet won:BACCParticipantFacet. "
+                    + "?connection2  wontx:hasBAState wontx:Ended." + "}";
+
+            Query query = QueryFactory.create(queryString);
+            QueryExecution qExec = QueryExecutionFactory.create(query, dataModel);
+            ResultSet results = qExec.execSelect();
+
+            List<String> actualList = new ArrayList<>();
+            for (; results.hasNext();) {
+                QuerySolution soln = results.nextSolution();
+                actualList.add(soln.toString());
+                RDFNode node = soln.get("?connection");
+            }
+            assertTrue("wrong number of results", actualList.size() >= 1);
+            Assert.assertEquals(noOfNeeds - 1, actualList.size());
+            qExec.close();
+        }
+    }
 }
-
-
-
-
-
-
-

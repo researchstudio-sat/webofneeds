@@ -46,18 +46,18 @@ import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WON;
 
 /**
- * Creates a need with the specified facets.
- * If no facet is specified, the chatFacet will be used.
+ * Creates a need with the specified facets. If no facet is specified, the chatFacet will be used.
  */
-public class CreateDebugNeedWithFacetsAction extends AbstractCreateNeedAction
-{
+public class CreateDebugNeedWithFacetsAction extends AbstractCreateNeedAction {
     private Counter counter = new CounterImpl("DebugNeedsCounter");
 
     private boolean isInitialForHint;
     private boolean isInitialForConnect;
 
-    public CreateDebugNeedWithFacetsAction(final EventListenerContext eventListenerContext, final boolean usedForTesting, final boolean doNotMatch, final URI... facets) {
-        super(eventListenerContext, eventListenerContext.getBotContextWrapper().getNeedCreateListName(), usedForTesting, doNotMatch, facets);
+    public CreateDebugNeedWithFacetsAction(final EventListenerContext eventListenerContext,
+            final boolean usedForTesting, final boolean doNotMatch, final URI... facets) {
+        super(eventListenerContext, eventListenerContext.getBotContextWrapper().getNeedCreateListName(), usedForTesting,
+                doNotMatch, facets);
     }
 
     @Override
@@ -89,13 +89,15 @@ public class CreateDebugNeedWithFacetsAction extends AbstractCreateNeedAction
         if (needDataset != null) {
 
             DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(needDataset);
-            titleString = needModelWrapper.getSomeTitleFromIsOrAll("en","de");
-            createNeed = needModelWrapper.hasFlag(WON.USED_FOR_TESTING) && !needModelWrapper.hasFlag(WON.NO_HINT_FOR_ME);
+            titleString = needModelWrapper.getSomeTitleFromIsOrAll("en", "de");
+            createNeed = needModelWrapper.hasFlag(WON.USED_FOR_TESTING)
+                    && !needModelWrapper.hasFlag(WON.NO_HINT_FOR_ME);
         }
 
-        if (!createNeed) return; //if create need is false do not continue the debug need creation
+        if (!createNeed)
+            return; // if create need is false do not continue the debug need creation
 
-        if (titleString != null){
+        if (titleString != null) {
             if (isInitialForConnect) {
                 replyText = "Debugging with initial connect: " + titleString;
             } else if (isInitialForHint) {
@@ -118,7 +120,7 @@ public class CreateDebugNeedWithFacetsAction extends AbstractCreateNeedAction
         needModelWrapper.setDescription("This is a need automatically created by the DebugBot.");
         needModelWrapper.setSeeksTitle(replyText);
         needModelWrapper.setSeeksDescription("This is a need automatically created by the DebugBot.");
-        
+
         int i = 1;
         for (URI facet : facets) {
             needModelWrapper.addFacet(needURI + "#facet" + i, facet.toString());
@@ -127,14 +129,15 @@ public class CreateDebugNeedWithFacetsAction extends AbstractCreateNeedAction
         final Dataset debugNeedDataset = needModelWrapper.copyDataset();
         final Event origEvent = event;
 
-        logger.debug("creating need on won node {} with content {} ", wonNodeUri, StringUtils.abbreviate(RdfUtils.toString(debugNeedDataset), 150));
+        logger.debug("creating need on won node {} with content {} ", wonNodeUri,
+                StringUtils.abbreviate(RdfUtils.toString(debugNeedDataset), 150));
 
-        WonMessage createNeedMessage = createWonMessage(wonNodeInformationService, needURI, wonNodeUri, debugNeedDataset);
-        //remember the need URI so we can react to success/failure responses
+        WonMessage createNeedMessage = createWonMessage(wonNodeInformationService, needURI, wonNodeUri,
+                debugNeedDataset);
+        // remember the need URI so we can react to success/failure responses
         EventBotActionUtils.rememberInList(ctx, needURI, uriListName);
 
-        EventListener successCallback = new EventListener()
-        {
+        EventListener successCallback = new EventListener() {
             @Override
             public void onEvent(Event event) throws Exception {
                 logger.debug("need creation successful, new need URI is {}", needURI);
@@ -152,24 +155,23 @@ public class CreateDebugNeedWithFacetsAction extends AbstractCreateNeedAction
             }
         };
 
-        EventListener failureCallback = new EventListener()
-        {
+        EventListener failureCallback = new EventListener() {
             @Override
             public void onEvent(Event event) throws Exception {
-                String textMessage = WonRdfUtils.MessageUtils.getTextMessage(((FailureResponseEvent) event).getFailureMessage());
-                logger.debug("need creation failed for need URI {}, original message URI {}: {}", new Object[]{needURI, ((FailureResponseEvent) event).getOriginalMessageURI(), textMessage});
+                String textMessage = WonRdfUtils.MessageUtils
+                        .getTextMessage(((FailureResponseEvent) event).getFailureMessage());
+                logger.debug("need creation failed for need URI {}, original message URI {}: {}",
+                        new Object[] { needURI, ((FailureResponseEvent) event).getOriginalMessageURI(), textMessage });
                 EventBotActionUtils.removeFromList(ctx, needURI, uriListName);
                 bus.publish(new NeedCreationFailedEvent(wonNodeUri));
             }
         };
-        EventBotActionUtils.makeAndSubscribeResponseListener(
-                createNeedMessage, successCallback, failureCallback, ctx);
+        EventBotActionUtils.makeAndSubscribeResponseListener(createNeedMessage, successCallback, failureCallback, ctx);
 
         logger.debug("registered listeners for response to message URI {}", createNeedMessage.getMessageURI());
         ctx.getWonMessageSender().sendWonMessage(createNeedMessage);
         logger.debug("need creation message sent with message URI {}", createNeedMessage.getMessageURI());
     }
-
 
     public void setIsInitialForHint(final boolean isInitialForHint) {
         this.isInitialForHint = isInitialForHint;

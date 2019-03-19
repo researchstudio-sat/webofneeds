@@ -21,23 +21,20 @@ import java.net.URI;
 /**
  *
  */
-public abstract class BaseNodeSpecificEvent extends BaseEvent implements NodeSpecificEvent
-{
-  private final URI nodeURI;
+public abstract class BaseNodeSpecificEvent extends BaseEvent implements NodeSpecificEvent {
+    private final URI nodeURI;
 
-  protected BaseNodeSpecificEvent(final URI nodeURI) {
-    this.nodeURI = nodeURI;
-  }
+    protected BaseNodeSpecificEvent(final URI nodeURI) {
+        this.nodeURI = nodeURI;
+    }
 
-  @Override
-  public URI getNodeURI() {
-    return nodeURI;
-  }
+    @Override
+    public URI getNodeURI() {
+        return nodeURI;
+    }
 
-  @Override
-  public String toString() {
-    return getClass().getSimpleName()+ "{" +
-      "nodeURI=" + getNodeURI() +
-      '}';
-  }
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "{" + "nodeURI=" + getNodeURI() + '}';
+    }
 }

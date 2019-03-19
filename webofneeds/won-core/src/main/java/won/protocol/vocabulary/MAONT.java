@@ -24,29 +24,28 @@ import org.apache.jena.rdf.model.Resource;
 /**
  * LDP vocabulary.
  *
- * User: fkleedorfer
- * Date: 25.02.13
+ * User: fkleedorfer Date: 25.02.13
  */
-public class MAONT
-{
-  public static final String BASE_URI = "http://www.w3.org/ns/ma-ont#";
-  public static final String DEFAULT_PREFIX= "ma";
+public class MAONT {
+    public static final String BASE_URI = "http://www.w3.org/ns/ma-ont#";
+    public static final String DEFAULT_PREFIX = "ma";
 
-  private static Model m = ModelFactory.createDefaultModel();
+    private static Model m = ModelFactory.createDefaultModel();
 
-  public static final Property LOCATOR = m.createProperty(BASE_URI + "locator");
-  public static final Property TITLE = m.createProperty(BASE_URI + "title");
-  public static final Property DESCRIPTION = m.createProperty(BASE_URI + "description");
-  public static final Resource WIDTH = m.createResource(BASE_URI + "width");
-  public static final Resource HEIGHT = m.createResource(BASE_URI + "height");
+    public static final Property LOCATOR = m.createProperty(BASE_URI + "locator");
+    public static final Property TITLE = m.createProperty(BASE_URI + "title");
+    public static final Property DESCRIPTION = m.createProperty(BASE_URI + "description");
+    public static final Resource WIDTH = m.createResource(BASE_URI + "width");
+    public static final Resource HEIGHT = m.createResource(BASE_URI + "height");
 
-  public static final Resource IMAGE = m.createResource(BASE_URI + "Image");
+    public static final Resource IMAGE = m.createResource(BASE_URI + "Image");
 
-
-  /** returns the URI for this schema
-   * @return the URI for this schema
-   */
-  public static String getURI() {
-      return BASE_URI;
-  }
+    /**
+     * returns the URI for this schema
+     * 
+     * @return the URI for this schema
+     */
+    public static String getURI() {
+        return BASE_URI;
+    }
 }

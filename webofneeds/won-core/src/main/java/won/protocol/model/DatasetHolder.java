@@ -48,7 +48,7 @@ import org.slf4j.LoggerFactory;
 public class DatasetHolder {
     private static final int DEFAULT_BYTE_ARRAY_SIZE = 500;
 
-    //the URI of the dataset
+    // the URI of the dataset
     @Id
     @GeneratedValue
     @Column(name = "id")
@@ -64,12 +64,12 @@ public class DatasetHolder {
     @Convert(converter = URIConverter.class)
     private URI uri;
 
-    //the model as a byte array
+    // the model as a byte array
     @Lob
     @Column(name = "dataset", nullable = false, length = 10000000)
     private byte[] datasetBytes;
 
-    //for multiple accesses to model, cache it.
+    // for multiple accesses to model, cache it.
     @Transient
     private Dataset cachedDataset;
 
@@ -148,25 +148,25 @@ public class DatasetHolder {
     public Dataset getDataset() {
         assert this.uri != null : "uri must not be null";
         assert this.datasetBytes != null : "model must not be null";
-        if (this.cachedDataset != null) return cachedDataset;
+        if (this.cachedDataset != null)
+            return cachedDataset;
         synchronized (this) {
-            if (this.cachedDataset != null) return cachedDataset;
+            if (this.cachedDataset != null)
+                return cachedDataset;
             Dataset dataset = DatasetFactory.createGeneral();
             InputStream is = new ByteArrayInputStream(this.datasetBytes);
             try {
                 try {
                     RDFDataMgr.read(dataset, is, this.uri.toString(), Lang.NQUADS);
                 } catch (RiotException ex) {
-                    //assume that the data is stored in TRIG old format, try that.
+                    // assume that the data is stored in TRIG old format, try that.
                     is = new ByteArrayInputStream(this.datasetBytes);
                     RDFDataMgr.read(dataset, is, Lang.TRIG);
                 }
             } catch (Exception e) {
                 logger.warn("could not read dataset {} from byte array. Byte array is null: {}, has length {}",
-                        new Object[]{this.uri,
-                                this.datasetBytes == null,
-                                this.datasetBytes == null ? -1 : this.datasetBytes.length}
-                );
+                        new Object[] { this.uri, this.datasetBytes == null,
+                                this.datasetBytes == null ? -1 : this.datasetBytes.length });
                 logger.warn("caught exception while reading dataset", e);
             }
             this.cachedDataset = dataset;

@@ -26,8 +26,8 @@ public class PetriNetState {
     }
 
     /**
-     * Returns the set of URIs associatied with all marked places. Nothing is
-     * reported for places that are not associatied with a URI.
+     * Returns the set of URIs associatied with all marked places. Nothing is reported for places that are not
+     * associatied with a URI.
      */
     public Set<URI> getMarkedPlaces() {
         return petriNet.getPlaces().stream().filter(place -> place.getNumberOfTokensStored() > 0)
@@ -35,19 +35,17 @@ public class PetriNetState {
     }
 
     /**
-     * Returns the set of URIs associatied with all enabled transitions. Nothing is
-     * reported for transitions that are not associatied with a URI.
+     * Returns the set of URIs associatied with all enabled transitions. Nothing is reported for transitions that are
+     * not associatied with a URI.
      */
     public Set<URI> getEnabledTransitions() {
         return petriNetAnimator.getEnabledTransitions().stream().map(t -> URI.create(t.getId()))
                 .collect(Collectors.toSet());
     }
-    
+
     public void fireTransition(URI transitionURI) {
-        petriNetAnimator.getEnabledTransitions()
-             .stream()
-             .filter(t -> transitionURI.toString().equals(t.getId()))
-             .forEach(petriNetAnimator::fireTransition);
+        petriNetAnimator.getEnabledTransitions().stream().filter(t -> transitionURI.toString().equals(t.getId()))
+                .forEach(petriNetAnimator::fireTransition);
     }
 
     public Set<URI> getPlaces() {
@@ -57,7 +55,7 @@ public class PetriNetState {
     public Set<URI> getTransitions() {
         return petriNet.getTransitions().stream().map(p -> URI.create(p.getId())).collect(Collectors.toSet());
     }
-    
+
     public URI getPetriNetURI() {
         return petriNetURI;
     }

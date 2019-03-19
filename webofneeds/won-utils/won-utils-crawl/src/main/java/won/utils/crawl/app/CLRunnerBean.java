@@ -47,17 +47,19 @@ public class CLRunnerBean implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        if(args == null && args.length == 0){
+        if (args == null && args.length == 0) {
             logger.warn("arguments: [space-separated list of uris to crawl]");
             return;
         }
 
         Dataset needDataset = CachingLinkedDataSource.makeDataset();
 
-        for(String arg : args) {
+        for (String arg : args) {
             URI uri = URI.create(arg);
             logger.info("Getting Data from uri: " + uri);
-            RdfUtils.addDatasetToDataset(needDataset, linkedDataSource.getDataForResourceWithPropertyPath(uri, configurePropertyPaths(), 10000, 5, false), true);
+            RdfUtils.addDatasetToDataset(needDataset,
+                    linkedDataSource.getDataForResourceWithPropertyPath(uri, configurePropertyPaths(), 10000, 5, false),
+                    true);
         }
 
         logger.info("PRINTING DATASET");
@@ -66,20 +68,20 @@ public class CLRunnerBean implements CommandLineRunner {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         String line;
-        while(true){
+        while (true) {
             System.out.print("ENTER SPARQL-QUERY> ");
             line = br.readLine();
 
-            if("exit".equals(line)){
+            if ("exit".equals(line)) {
                 break;
-            }else if("help".equals(line)){
+            } else if ("help".equals(line)) {
                 printHelp();
-            }else if(line.startsWith("%listgraphs")) {
+            } else if (line.startsWith("%listgraphs")) {
                 try {
                     Query query = QueryFactory.create(WonQueries.SPARQL_ALL_GRAPHS);
                     QuerySolutionMap initialBinding = new QuerySolutionMap();
                     // InitialBindings are used to set filters on the resultset
-                    //initialBinding.add("need", needDataset.getDefaultModel().createResource(uri.toString()));
+                    // initialBinding.add("need", needDataset.getDefaultModel().createResource(uri.toString()));
 
                     try (QueryExecution qExec = QueryExecutionFactory.create(query, needDataset, initialBinding)) {
                         qExec.getContext().set(TDB.symUnionDefaultGraph, true);
@@ -91,12 +93,12 @@ public class CLRunnerBean implements CommandLineRunner {
                     System.out.println("INVALID SPARQL-QUERY: " + e.getMessage());
                     printHelp();
                 }
-            }else if(line.startsWith("%listall")) {
+            } else if (line.startsWith("%listall")) {
                 try {
                     Query query = QueryFactory.create(WonQueries.SPARQL_ALL_NEEDS);
                     QuerySolutionMap initialBinding = new QuerySolutionMap();
                     // InitialBindings are used to set filters on the resultset
-                    //initialBinding.add("need", needDataset.getDefaultModel().createResource(uri.toString()));
+                    // initialBinding.add("need", needDataset.getDefaultModel().createResource(uri.toString()));
 
                     try (QueryExecution qExec = QueryExecutionFactory.create(query, needDataset, initialBinding)) {
                         qExec.getContext().set(TDB.symUnionDefaultGraph, true);
@@ -108,7 +110,7 @@ public class CLRunnerBean implements CommandLineRunner {
                     System.out.println("INVALID SPARQL-QUERY: " + e.getMessage());
                     printHelp();
                 }
-            }else if(line.startsWith("#")) {
+            } else if (line.startsWith("#")) {
                 try {
                     String updateString = WonQueries.SPARQL_PREFIX + line.substring(1);
 
@@ -119,13 +121,13 @@ public class CLRunnerBean implements CommandLineRunner {
                     System.out.println("INVALID SPARQL-QUERY: " + e.getMessage());
                     printHelp();
                 }
-            }else {
+            } else {
                 String queryString = WonQueries.SPARQL_PREFIX + line;
                 try {
                     Query query = QueryFactory.create(queryString);
                     QuerySolutionMap initialBinding = new QuerySolutionMap();
                     // InitialBindings are used to set filters on the resultset
-                    //initialBinding.add("need", needDataset.getDefaultModel().createResource(uri.toString()));
+                    // initialBinding.add("need", needDataset.getDefaultModel().createResource(uri.toString()));
 
                     try (QueryExecution qExec = QueryExecutionFactory.create(query, needDataset, initialBinding)) {
                         qExec.getContext().set(TDB.symUnionDefaultGraph, true);
@@ -139,11 +141,11 @@ public class CLRunnerBean implements CommandLineRunner {
                 }
             }
 
-//            System.out.println(RdfUtils.setSparqlVars(WonQueries.SPARQL_CONNECTIONS_FILTERED_BY_NEED_URI,"need",URI.create("http://rsa021.researchstudio.at:8080/won/resource/need/4871438545203495000")));
+            // System.out.println(RdfUtils.setSparqlVars(WonQueries.SPARQL_CONNECTIONS_FILTERED_BY_NEED_URI,"need",URI.create("http://rsa021.researchstudio.at:8080/won/resource/need/4871438545203495000")));
         }
     }
 
-    private void printResults(ResultSet results){
+    private void printResults(ResultSet results) {
         System.out.println("---------------------------RESULTS-----------------------------------");
         while (results.hasNext()) {
             QuerySolution soln = results.nextSolution();
@@ -151,7 +153,7 @@ public class CLRunnerBean implements CommandLineRunner {
             StringBuilder sb = new StringBuilder();
             Iterator<String> it = soln.varNames();
 
-            while(it.hasNext()){
+            while (it.hasNext()) {
                 String var = it.next();
                 sb.append(var).append(": ").append(soln.get(var)).append(" ");
             }
@@ -160,7 +162,7 @@ public class CLRunnerBean implements CommandLineRunner {
         System.out.println("---------------------------------------------------------------------");
     }
 
-    private void printHelp(){
+    private void printHelp() {
         System.out.println("Enter SPARQL Query (Prefix not needed), or type \"exit\" to exit");
         System.out.println("List all loaded Graphs: \"SELECT DISTINCT ?g WHERE {graph ?g {?s ?p ?o }.}\"");
         System.out.println("Commands > [QUERY]     - executes the given query");
@@ -173,24 +175,30 @@ public class CLRunnerBean implements CommandLineRunner {
     /***
      * Build the property paths needed for crawling need data
      */
-    private static List<Path> configurePropertyPaths(){
+    private static List<Path> configurePropertyPaths() {
         List<Path> propertyPaths = new ArrayList<Path>();
         addPropertyPath(propertyPaths, "<" + WON.HAS_CONNECTIONS + ">");
         addPropertyPath(propertyPaths, "<" + WON.HAS_CONNECTIONS + ">" + "/" + "rdfs:member");
-        addPropertyPath(propertyPaths, "<" + WON.HAS_CONNECTIONS + ">" + "/" + "rdfs:member" + "/<" + WON.HAS_REMOTE_CONNECTION + ">");
-        addPropertyPath(propertyPaths, "<" + WON.HAS_CONNECTIONS + ">" + "/" + "rdfs:member" + "/<" + WON.HAS_EVENT_CONTAINER + ">/rdfs:member");
-        addPropertyPath(propertyPaths, "<" + WON.HAS_CONNECTIONS + ">" + "/" + "rdfs:member" + "/<" + WON.HAS_REMOTE_CONNECTION + ">/<" +WON.BELONGS_TO_NEED + ">");
+        addPropertyPath(propertyPaths,
+                "<" + WON.HAS_CONNECTIONS + ">" + "/" + "rdfs:member" + "/<" + WON.HAS_REMOTE_CONNECTION + ">");
+        addPropertyPath(propertyPaths, "<" + WON.HAS_CONNECTIONS + ">" + "/" + "rdfs:member" + "/<"
+                + WON.HAS_EVENT_CONTAINER + ">/rdfs:member");
+        addPropertyPath(propertyPaths, "<" + WON.HAS_CONNECTIONS + ">" + "/" + "rdfs:member" + "/<"
+                + WON.HAS_REMOTE_CONNECTION + ">/<" + WON.BELONGS_TO_NEED + ">");
         return propertyPaths;
     }
 
-    private static List<Path> configurePropertyPathAll(){
+    private static List<Path> configurePropertyPathAll() {
         List<Path> propertyPaths = new ArrayList<Path>();
         addPropertyPath(propertyPaths, "rdfs:member");
         addPropertyPath(propertyPaths, "rdfs:member/" + "<" + WON.HAS_CONNECTIONS + ">");
         addPropertyPath(propertyPaths, "rdfs:member/" + "<" + WON.HAS_CONNECTIONS + ">" + "/" + "rdfs:member");
-        addPropertyPath(propertyPaths, "rdfs:member/" + "<" + WON.HAS_CONNECTIONS + ">" + "/" + "rdfs:member" + "/<" + WON.HAS_REMOTE_CONNECTION + ">");
-        addPropertyPath(propertyPaths, "rdfs:member/" + "<" + WON.HAS_CONNECTIONS + ">" + "/" + "rdfs:member" + "/<" + WON.HAS_EVENT_CONTAINER + ">/rdfs:member");
-        addPropertyPath(propertyPaths, "rdfs:member/" + "<" + WON.HAS_CONNECTIONS + ">" + "/" + "rdfs:member" + "/<" + WON.HAS_REMOTE_CONNECTION + ">/<" +WON.BELONGS_TO_NEED + ">");
+        addPropertyPath(propertyPaths, "rdfs:member/" + "<" + WON.HAS_CONNECTIONS + ">" + "/" + "rdfs:member" + "/<"
+                + WON.HAS_REMOTE_CONNECTION + ">");
+        addPropertyPath(propertyPaths, "rdfs:member/" + "<" + WON.HAS_CONNECTIONS + ">" + "/" + "rdfs:member" + "/<"
+                + WON.HAS_EVENT_CONTAINER + ">/rdfs:member");
+        addPropertyPath(propertyPaths, "rdfs:member/" + "<" + WON.HAS_CONNECTIONS + ">" + "/" + "rdfs:member" + "/<"
+                + WON.HAS_REMOTE_CONNECTION + ">/<" + WON.BELONGS_TO_NEED + ">");
         return propertyPaths;
     }
 
@@ -200,6 +208,7 @@ public class CLRunnerBean implements CommandLineRunner {
     }
 
     @Autowired
-    public void setLinkedDataSource(final LinkedDataSource linkedDataSource) { this.linkedDataSource = linkedDataSource; }
+    public void setLinkedDataSource(final LinkedDataSource linkedDataSource) {
+        this.linkedDataSource = linkedDataSource;
+    }
 }
-

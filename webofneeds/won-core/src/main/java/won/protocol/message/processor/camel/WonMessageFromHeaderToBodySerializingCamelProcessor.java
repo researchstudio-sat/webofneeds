@@ -30,27 +30,26 @@ import won.protocol.message.WonMessage;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
 
 /**
- * Last processor for outgoing messages. It expects a WonMessage object in the exchange's in, in the header 'wonMessgage'.
- * The message is serialized as TRIG and put in the in's body.
+ * Last processor for outgoing messages. It expects a WonMessage object in the exchange's in, in the header
+ * 'wonMessgage'. The message is serialized as TRIG and put in the in's body.
  */
-public class WonMessageFromHeaderToBodySerializingCamelProcessor implements Processor
-{
-  Logger logger = LoggerFactory.getLogger(this.getClass());
+public class WonMessageFromHeaderToBodySerializingCamelProcessor implements Processor {
+    Logger logger = LoggerFactory.getLogger(this.getClass());
 
-  @Override
-  public void process(final Exchange exchange) throws Exception {
-    logger.debug("processing won message");
-    Map headers = exchange.getIn().getHeaders();
-    //if the wonMessage header is there, don't change it - that way we can re-route internal messages
-    WonMessage wonMessage = (WonMessage) headers.get(WonCamelConstants.MESSAGE_HEADER);
-    if (wonMessage == null) {
-      throw new WonMessageProcessingException("No WonMessage found in header '" +
-                                                WonCamelConstants.MESSAGE_HEADER+"'");
+    @Override
+    public void process(final Exchange exchange) throws Exception {
+        logger.debug("processing won message");
+        Map headers = exchange.getIn().getHeaders();
+        // if the wonMessage header is there, don't change it - that way we can re-route internal messages
+        WonMessage wonMessage = (WonMessage) headers.get(WonCamelConstants.MESSAGE_HEADER);
+        if (wonMessage == null) {
+            throw new WonMessageProcessingException(
+                    "No WonMessage found in header '" + WonCamelConstants.MESSAGE_HEADER + "'");
+        }
+        StringWriter writer = new StringWriter();
+        RDFDataMgr.write(writer, wonMessage.getCompleteDataset(), Lang.TRIG);
+        exchange.getIn().setBody(writer.toString());
+        logger.debug("wrote serialized wonMessage to message body");
     }
-    StringWriter writer = new StringWriter();
-    RDFDataMgr.write(writer, wonMessage.getCompleteDataset(), Lang.TRIG);
-    exchange.getIn().setBody(writer.toString());
-    logger.debug("wrote serialized wonMessage to message body");
-  }
 
 }

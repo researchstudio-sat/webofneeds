@@ -19,33 +19,32 @@ package won.protocol.util;
 import java.util.Random;
 
 /**
- * Generates a random string of specified length cheaply, but not securely.
- * Taken from: http://stackoverflow.com/questions/41107/how-to-generate-a-random-alpha-numeric-string
+ * Generates a random string of specified length cheaply, but not securely. Taken from:
+ * http://stackoverflow.com/questions/41107/how-to-generate-a-random-alpha-numeric-string
  */
 public class CheapInsecureRandomString {
 
-  private static final char[] symbols;
+    private static final char[] symbols;
 
-  static {
-    StringBuilder tmp = new StringBuilder();
-    for (char ch = '0'; ch <= '9'; ++ch)
-      tmp.append(ch);
-    for (char ch = 'a'; ch <= 'z'; ++ch)
-      tmp.append(ch);
-    symbols = tmp.toString().toCharArray();
-  }
+    static {
+        StringBuilder tmp = new StringBuilder();
+        for (char ch = '0'; ch <= '9'; ++ch)
+            tmp.append(ch);
+        for (char ch = 'a'; ch <= 'z'; ++ch)
+            tmp.append(ch);
+        symbols = tmp.toString().toCharArray();
+    }
 
-  private final Random random = new Random(System.currentTimeMillis());
+    private final Random random = new Random(System.currentTimeMillis());
 
+    public CheapInsecureRandomString() {
 
-  public CheapInsecureRandomString() {
+    }
 
-  }
-
-  public String nextString(int length) {
-    StringBuilder sb = new StringBuilder();
-    for (int idx = 0; idx < length; ++idx)
-      sb.append(symbols[random.nextInt(symbols.length)]);
-    return sb.toString();
-  }
+    public String nextString(int length) {
+        StringBuilder sb = new StringBuilder();
+        for (int idx = 0; idx < length; ++idx)
+            sb.append(symbols[random.nextInt(symbols.length)]);
+        return sb.toString();
+    }
 }

@@ -23,20 +23,22 @@ import won.bot.framework.eventbot.event.impl.command.MessageCommandFailureEvent;
 import won.bot.framework.eventbot.event.impl.command.base.AbstractMessageCommandResultEvent;
 import won.protocol.model.Connection;
 
-
 /**
  * Indicates that the bot has successfully sent a connect message, thereby creating a connection.
  */
-public class ConnectCommandFailureEvent extends AbstractMessageCommandResultEvent implements MessageCommandFailureEvent, ConnectCommandResultEvent {
+public class ConnectCommandFailureEvent extends AbstractMessageCommandResultEvent
+        implements MessageCommandFailureEvent, ConnectCommandResultEvent {
     public ConnectCommandFailureEvent(MessageCommandEvent originalCommandEvent, Connection con) {
         super(originalCommandEvent, con);
     }
 
-    public ConnectCommandFailureEvent(MessageCommandEvent originalCommandEvent, URI needURI, URI remoteNeedURI, URI connectionURI) {
+    public ConnectCommandFailureEvent(MessageCommandEvent originalCommandEvent, URI needURI, URI remoteNeedURI,
+            URI connectionURI) {
         super(originalCommandEvent, needURI, remoteNeedURI, connectionURI);
     }
 
-    public ConnectCommandFailureEvent(MessageCommandEvent originalCommandEvent, URI needURI, URI remoteNeedURI, URI connectionURI, String message) {
+    public ConnectCommandFailureEvent(MessageCommandEvent originalCommandEvent, URI needURI, URI remoteNeedURI,
+            URI connectionURI, String message) {
         super(originalCommandEvent, needURI, remoteNeedURI, connectionURI, message);
     }
 

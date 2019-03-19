@@ -14,30 +14,30 @@
  *    limitations under the License.
  */
 
-
 package won.matcher.camel.routes;
+
 import java.util.List;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
 
 /**
- * User: LEIH-NB
- * Date: 10.10.13
+ * User: LEIH-NB Date: 10.10.13
  */
 
-public class Matcher2NodeDynamicRoutes extends RouteBuilder{
-  private List<String> endpoints;
-  private String routeID;
-  private String from;
+public class Matcher2NodeDynamicRoutes extends RouteBuilder {
+    private List<String> endpoints;
+    private String routeID;
+    private String from;
 
-  public Matcher2NodeDynamicRoutes(CamelContext camelContext, String from){
-    super(camelContext);
-    this.from = from;
+    public Matcher2NodeDynamicRoutes(CamelContext camelContext, String from) {
+        super(camelContext);
+        this.from = from;
 
-  }
+    }
+
     @Override
-    public void configure(){
+    public void configure() {
         from("seda:MatcherProtocol.Out.Hint?concurrentConsumers=2").routeId("Matcher2NodeRoute")
                 .recipientList(header("remoteBrokerEndpoint"));
 

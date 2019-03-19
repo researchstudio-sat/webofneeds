@@ -29,37 +29,34 @@ import won.bot.framework.eventbot.event.impl.matcher.MatcherRegisterFailedEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 
 /**
-* User: fkleedorfer
-* Date: 28.03.14
-*/
-public class RegisterMatcherAction extends BaseEventBotAction
-{
-  private List<URI> registeredNodes = new LinkedList<>();
+ * User: fkleedorfer Date: 28.03.14
+ */
+public class RegisterMatcherAction extends BaseEventBotAction {
+    private List<URI> registeredNodes = new LinkedList<>();
 
-  public RegisterMatcherAction(final EventListenerContext eventListenerContext)
-  {
-    super(eventListenerContext);
-  }
-
-  @Override
-  protected void doRun(Event event, EventListener executingListener) throws Exception
-  {
-    final Iterator wonNodeUriIterator = getEventListenerContext().getMatcherNodeURISource().getNodeURIIterator();
-    while (wonNodeUriIterator.hasNext()){
-      URI wonNodeUri = (URI)wonNodeUriIterator.next();
-      try {
-        if (!registeredNodes.contains(wonNodeUri)) {
-          logger.debug("registering matcher on won node {}", wonNodeUri);
-          EventBotActionUtils.rememberInNodeListIfNamePresent(getEventListenerContext(), wonNodeUri);
-          getEventListenerContext().getMatcherProtocolMatcherService().register(wonNodeUri);
-          registeredNodes.add(wonNodeUri);
-          logger.info("matcher registered on won node {}", wonNodeUri);
-        }
-      } catch (Exception e) {
-        logger.warn("Error registering matcher at won node {}. Try again later ... Exception was {}", wonNodeUri, e);
-        getEventListenerContext().getEventBus().publish(new MatcherRegisterFailedEvent(wonNodeUri));
-      }
+    public RegisterMatcherAction(final EventListenerContext eventListenerContext) {
+        super(eventListenerContext);
     }
-  }
+
+    @Override
+    protected void doRun(Event event, EventListener executingListener) throws Exception {
+        final Iterator wonNodeUriIterator = getEventListenerContext().getMatcherNodeURISource().getNodeURIIterator();
+        while (wonNodeUriIterator.hasNext()) {
+            URI wonNodeUri = (URI) wonNodeUriIterator.next();
+            try {
+                if (!registeredNodes.contains(wonNodeUri)) {
+                    logger.debug("registering matcher on won node {}", wonNodeUri);
+                    EventBotActionUtils.rememberInNodeListIfNamePresent(getEventListenerContext(), wonNodeUri);
+                    getEventListenerContext().getMatcherProtocolMatcherService().register(wonNodeUri);
+                    registeredNodes.add(wonNodeUri);
+                    logger.info("matcher registered on won node {}", wonNodeUri);
+                }
+            } catch (Exception e) {
+                logger.warn("Error registering matcher at won node {}. Try again later ... Exception was {}",
+                        wonNodeUri, e);
+                getEventListenerContext().getEventBus().publish(new MatcherRegisterFailedEvent(wonNodeUri));
+            }
+        }
+    }
 
 }

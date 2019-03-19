@@ -36,7 +36,8 @@ public class MongoBotContext implements BotContext {
     public Set<URI> retrieveAllNeedUris() {
 
         Set<URI> uris = new HashSet<>();
-        List<MongoContextObjectList> contextObjects = template.findAll(MongoContextObjectList.class, NEED_URI_COLLECTION);
+        List<MongoContextObjectList> contextObjects = template.findAll(MongoContextObjectList.class,
+                NEED_URI_COLLECTION);
 
         for (MongoContextObjectList mco : contextObjects) {
             List<Object> objectList = mco.getList();
@@ -107,10 +108,10 @@ public class MongoBotContext implements BotContext {
      */
     private void checkValidCollectionName(String collectionName) {
 
-        if (collectionName == null || collectionName.equals(NEED_URI_COLLECTION) || collectionName.equals
-                (NODE_URI_COLLECTION) || collectionName.trim().isEmpty()) {
-            throw new IllegalArgumentException("Generic collection name must be valid and not one of the following:" +
-                    " " + NODE_URI_COLLECTION + ", " + NEED_URI_COLLECTION);
+        if (collectionName == null || collectionName.equals(NEED_URI_COLLECTION)
+                || collectionName.equals(NODE_URI_COLLECTION) || collectionName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Generic collection name must be valid and not one of the following:"
+                    + " " + NODE_URI_COLLECTION + ", " + NEED_URI_COLLECTION);
         }
     }
 
@@ -208,7 +209,7 @@ public class MongoBotContext implements BotContext {
     public void removeLeavesFromListMap(String collectionName, final Serializable... values) {
         checkValidCollectionName(collectionName);
 
-        for(String key : loadListMap(collectionName).keySet()){
+        for (String key : loadListMap(collectionName).keySet()) {
             removeFromListMap(collectionName, key, values);
         }
     }

@@ -26,15 +26,15 @@ import won.bot.framework.eventbot.listener.EventListener;
  */
 public class PublishEventAction extends BaseEventBotAction {
 
-  private Event event;
+    private Event event;
 
-  public PublishEventAction(EventListenerContext eventListenerContext, Event event) {
-    super(eventListenerContext);
-    this.event = event;
-  }
+    public PublishEventAction(EventListenerContext eventListenerContext, Event event) {
+        super(eventListenerContext);
+        this.event = event;
+    }
 
-  @Override
-  protected void doRun(Event e, EventListener executingListener) throws Exception {
-    getEventListenerContext().getEventBus().publish(event);
-  }
+    @Override
+    protected void doRun(Event e, EventListener executingListener) throws Exception {
+        getEventListenerContext().getEventBus().publish(event);
+    }
 }

@@ -27,32 +27,31 @@ import won.protocol.model.parentaware.ParentAware;
 
 @Entity
 @DiscriminatorValue("Connection")
-public class ConnectionEventContainer extends EventContainer implements ParentAware<Connection>
-{
-  @OneToOne(fetch = FetchType.LAZY, mappedBy = "eventContainer", optional = false)
-  private Connection connection;
+public class ConnectionEventContainer extends EventContainer implements ParentAware<Connection> {
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "eventContainer", optional = false)
+    private Connection connection;
 
-  public ConnectionEventContainer() {
-  }
-
-  public ConnectionEventContainer(final Connection connection, URI parentUri) {
-    super(parentUri);
-    this.connection = connection;
-    if (connection != null) {
-      connection.setEventContainer(this);
+    public ConnectionEventContainer() {
     }
-  }
 
-  public Connection getConnection() {
-    return connection;
-  }
+    public ConnectionEventContainer(final Connection connection, URI parentUri) {
+        super(parentUri);
+        this.connection = connection;
+        if (connection != null) {
+            connection.setEventContainer(this);
+        }
+    }
 
-  @Override
-  public Connection getParent() {
-    return getConnection();
-  }
+    public Connection getConnection() {
+        return connection;
+    }
 
-  protected void setConnection(final Connection connection) {
-    this.connection = connection;
-  }
+    @Override
+    public Connection getParent() {
+        return getConnection();
+    }
+
+    protected void setConnection(final Connection connection) {
+        this.connection = connection;
+    }
 }

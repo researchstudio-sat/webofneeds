@@ -11,23 +11,22 @@ import won.bot.framework.eventbot.listener.EventListener;
 /**
  * Created by hfriedrich on 16.11.2016.
  */
-public class WelcomeMailAction extends BaseEventBotAction
-{
-  private MessageChannel sendChannel;
-  private WonMimeMessageGenerator mailGenerator;
+public class WelcomeMailAction extends BaseEventBotAction {
+    private MessageChannel sendChannel;
+    private WonMimeMessageGenerator mailGenerator;
 
-  public WelcomeMailAction(WonMimeMessageGenerator mailGenerator, MessageChannel sendChannel) {
+    public WelcomeMailAction(WonMimeMessageGenerator mailGenerator, MessageChannel sendChannel) {
 
-    super(mailGenerator.getEventListenerContext());
-    this.sendChannel = sendChannel;
-    this.mailGenerator = mailGenerator;
-  }
-
-  @Override
-  protected void doRun(final Event event, EventListener executingListener) throws Exception {
-    if(event instanceof WelcomeMailEvent){
-      WonMimeMessage welcomeMessage = mailGenerator.createWelcomeMail(((WelcomeMailEvent) event).getMessage());
-      sendChannel.send(new GenericMessage<>(welcomeMessage));
+        super(mailGenerator.getEventListenerContext());
+        this.sendChannel = sendChannel;
+        this.mailGenerator = mailGenerator;
     }
-  }
+
+    @Override
+    protected void doRun(final Event event, EventListener executingListener) throws Exception {
+        if (event instanceof WelcomeMailEvent) {
+            WonMimeMessage welcomeMessage = mailGenerator.createWelcomeMail(((WelcomeMailEvent) event).getMessage());
+            sendChannel.send(new GenericMessage<>(welcomeMessage));
+        }
+    }
 }

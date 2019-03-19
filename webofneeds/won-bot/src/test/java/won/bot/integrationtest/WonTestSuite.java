@@ -19,31 +19,16 @@ package won.bot.integrationtest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
-
 /**
  * Integration test.
  */
 @RunWith(Suite.class)
-@Suite.SuiteClasses(
-        {ConversationBotTest.class,
-         GroupingBotTest.class,
-         CommentBotTest.class,
-         MatcherBotTest.class,
-         BAAtomicCCActiveExitingBotTest.class,
-         BAAtomicCCActiveFailingBotTest.class,
-         BAAtomicCCActiveNotCompletingBotTest.class,
-         BAAtomicCCBotTest.class,
-         BAAtomicCCCompletingFailingBotTest.class,
-         BAAtomicCCCompletingNotCompletingBotTest.class,
-         StandardTwoPhaseCommitBotTest.class,
-         BAAtomicPCActiveExitingBotTest.class,
-         BAAtomicPCActiveFailingBotTest.class,
-         BAAtomicPCActiveNotCompletingBotTest.class,
-         BAAtomicPCBotTest.class,
-         BACCBotTest.class,
-         BAPCBotTest.class
-        })
-public class WonTestSuite
-{
+@Suite.SuiteClasses({ ConversationBotTest.class, GroupingBotTest.class, CommentBotTest.class, MatcherBotTest.class,
+        BAAtomicCCActiveExitingBotTest.class, BAAtomicCCActiveFailingBotTest.class,
+        BAAtomicCCActiveNotCompletingBotTest.class, BAAtomicCCBotTest.class, BAAtomicCCCompletingFailingBotTest.class,
+        BAAtomicCCCompletingNotCompletingBotTest.class, StandardTwoPhaseCommitBotTest.class,
+        BAAtomicPCActiveExitingBotTest.class, BAAtomicPCActiveFailingBotTest.class,
+        BAAtomicPCActiveNotCompletingBotTest.class, BAAtomicPCBotTest.class, BACCBotTest.class, BAPCBotTest.class })
+public class WonTestSuite {
 
 }

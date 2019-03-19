@@ -31,8 +31,7 @@ import won.protocol.repository.OwnerApplicationRepository;
 import won.protocol.service.QueueManagementService;
 
 /**
- * User: sbyim
- * Date: 13.11.13
+ * User: sbyim Date: 13.11.13
  */
 public class OwnerProtocolOutgoingMessagesProcessor implements Processor {
     private final org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
@@ -46,20 +45,23 @@ public class OwnerProtocolOutgoingMessagesProcessor implements Processor {
         logger.debug("processing messages for dynamic recipients generation");
         Map headers = exchange.getIn().getHeaders();
         Map properties = exchange.getProperties();
-        List<String> ownerApplications = (List<String>)headers.get(WonCamelConstants.OWNER_APPLICATIONS);
- //       String methodName =headers.get("methodName").toString();
-        logger.debug("number of registered owner applications: {}", ownerApplications == null ? 0 : ownerApplications.size());
-        List<String> queueNames = convertToQueueName(ownerApplications,"wonMessage",exchange);
-        exchange.getIn().setHeader("ownerApplicationIDs",queueNames);
+        List<String> ownerApplications = (List<String>) headers.get(WonCamelConstants.OWNER_APPLICATIONS);
+        // String methodName =headers.get("methodName").toString();
+        logger.debug("number of registered owner applications: {}",
+                ownerApplications == null ? 0 : ownerApplications.size());
+        List<String> queueNames = convertToQueueName(ownerApplications, "wonMessage", exchange);
+        exchange.getIn().setHeader("ownerApplicationIDs", queueNames);
     }
-    private List<String> convertToQueueName(List<String> ownerApplications,String methodName,Exchange
-      exchange){
+
+    private List<String> convertToQueueName(List<String> ownerApplications, String methodName, Exchange exchange) {
         List<String> ownerApplicationQueueNames = new ArrayList<>();
 
-        for (int i =0;i<ownerApplications.size();i++){
-             OwnerApplication ownerApplication = ownerApplicationRepository.findByOwnerApplicationId(ownerApplications.get(i)).get(i);
-             logger.debug("ownerApplicationID: "+ownerApplications.get(i));
-             ownerApplicationQueueNames.add(i, queueManagementService.getEndpointForMessage(methodName,ownerApplication.getOwnerApplicationId()));
+        for (int i = 0; i < ownerApplications.size(); i++) {
+            OwnerApplication ownerApplication = ownerApplicationRepository
+                    .findByOwnerApplicationId(ownerApplications.get(i)).get(i);
+            logger.debug("ownerApplicationID: " + ownerApplications.get(i));
+            ownerApplicationQueueNames.add(i,
+                    queueManagementService.getEndpointForMessage(methodName, ownerApplication.getOwnerApplicationId()));
 
         }
         return ownerApplicationQueueNames;

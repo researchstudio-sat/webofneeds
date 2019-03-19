@@ -23,7 +23,8 @@ public abstract class BaseCommandSuccessEvent<C extends CommandEvent> implements
     private String message;
     private C originalCommandEvent;
 
-    private BaseCommandSuccessEvent(){}
+    private BaseCommandSuccessEvent() {
+    }
 
     public BaseCommandSuccessEvent(String message, C originalCommandEvent) {
         this.message = message;

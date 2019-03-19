@@ -20,14 +20,13 @@ import java.net.URI;
 import java.text.MessageFormat;
 
 /**
- * User: LEIH-NB
- * Date: 13.12.13
+ * User: LEIH-NB Date: 13.12.13
  */
 public class EndpointConfigurationFailedException extends WonProtocolException {
     private URI needURI;
-    public EndpointConfigurationFailedException(final URI needURI)
-    {
-        super(MessageFormat.format("setting up endpoint for need URI {0} failed",needURI.toString()));
+
+    public EndpointConfigurationFailedException(final URI needURI) {
+        super(MessageFormat.format("setting up endpoint for need URI {0} failed", needURI.toString()));
         this.needURI = needURI;
     }
 }

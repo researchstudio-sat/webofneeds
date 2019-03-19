@@ -28,11 +28,10 @@ import won.protocol.vocabulary.WONMSG;
  */
 public class ReceivedTimestampAddingWonMessageProcessor implements WonMessageProcessor {
 
-
-  @Override
-  public WonMessage process(WonMessage message) throws WonMessageProcessingException {
-    message.addMessageProperty(WONMSG.HAS_RECEIVED_TIMESTAMP, new Date().getTime());
-    return message;
-  }
+    @Override
+    public WonMessage process(WonMessage message) throws WonMessageProcessingException {
+        message.addMessageProperty(WONMSG.HAS_RECEIVED_TIMESTAMP, new Date().getTime());
+        return message;
+    }
 
 }

@@ -38,8 +38,8 @@ public class HokifyBotsApi {
 
     public ArrayList<HokifyJob> fetchHokifyData() {
         ArrayList<HokifyJob> jobsList = new ArrayList<HokifyJob>();
-        CloseableHttpResponse  response = null;
-        try(CloseableHttpClient httpClient = HttpClients.createDefault()) {
+        CloseableHttpResponse response = null;
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpGet getRequest = new HttpGet(jsonURL);
             getRequest.addHeader("accept", "application/json");
 
@@ -98,12 +98,11 @@ public class HokifyBotsApi {
 
         String searchString = geoURL + "?city=" + cityString + "&country=" + countrySting + "&format=json";
 
-        
         HttpGet getRequest = new HttpGet(searchString);
         getRequest.addHeader("accept", "application/json");
 
         CloseableHttpResponse response = null;
-        try(CloseableHttpClient httpClient = HttpClients.createDefault()) {
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             response = httpClient.execute(getRequest);
 
             if (response.getStatusLine().getStatusCode() != 200) {
@@ -118,7 +117,7 @@ public class HokifyBotsApi {
                 sb.append(line);
             }
 
-             JSONArray jsonArray = new JSONArray(sb.toString());
+            JSONArray jsonArray = new JSONArray(sb.toString());
 
             if (jsonArray.length() > 0) {
                 JSONObject obj = jsonArray.getJSONObject(0);

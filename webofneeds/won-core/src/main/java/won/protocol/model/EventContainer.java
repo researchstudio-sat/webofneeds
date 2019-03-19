@@ -40,78 +40,77 @@ import won.protocol.model.parentaware.VersionedEntity;
 
 @Entity
 @Inheritance
-@DiscriminatorColumn(name="parent_type")
-@Table(name="event_container")
-public abstract class EventContainer implements VersionedEntity
-{
-  @Id
-  @GeneratedValue
-  @Column( name = "id" )
-  protected Long id;
+@DiscriminatorColumn(name = "parent_type")
+@Table(name = "event_container")
+public abstract class EventContainer implements VersionedEntity {
+    @Id
+    @GeneratedValue
+    @Column(name = "id")
+    protected Long id;
 
-  @Column(name = "parent_uri", nullable = false, unique = true, updatable = false)
-  @Convert( converter = URIConverter.class)
-  private URI parentUri;
+    @Column(name = "parent_uri", nullable = false, unique = true, updatable = false)
+    @Convert(converter = URIConverter.class)
+    private URI parentUri;
 
-  @OneToMany(fetch = FetchType.LAZY, mappedBy = "eventContainer")
-  private Collection<MessageEventPlaceholder> events = new ArrayList<>(1);
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "eventContainer")
+    private Collection<MessageEventPlaceholder> events = new ArrayList<>(1);
 
-  @Column(name="version", columnDefinition = "integer DEFAULT 0", nullable = false)
-  private int version = 0;
+    @Column(name = "version", columnDefinition = "integer DEFAULT 0", nullable = false)
+    private int version = 0;
 
-  @Temporal(TemporalType.TIMESTAMP)
-  @Column(name="last_update", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-  private Date lastUpdate = new Date();
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "last_update", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    private Date lastUpdate = new Date();
 
-  public EventContainer() {
-  }
+    public EventContainer() {
+    }
 
-  public EventContainer(final URI parentUri) {
-    this.parentUri = parentUri;
-  }
+    public EventContainer(final URI parentUri) {
+        this.parentUri = parentUri;
+    }
 
-  @Override
-  @PrePersist
-  @PreUpdate
-  public void incrementVersion() {
-    this.version++;
-    this.lastUpdate = new Date();
-  }
+    @Override
+    @PrePersist
+    @PreUpdate
+    public void incrementVersion() {
+        this.version++;
+        this.lastUpdate = new Date();
+    }
 
-  @Override
-  public Date getLastUpdate() {
-    return lastUpdate;
-  }
+    @Override
+    public Date getLastUpdate() {
+        return lastUpdate;
+    }
 
-  public Long getId() {
-    return id;
-  }
+    public Long getId() {
+        return id;
+    }
 
-  public void setId(final Long id) {
-    this.id = id;
-  }
+    public void setId(final Long id) {
+        this.id = id;
+    }
 
-  public Collection<MessageEventPlaceholder> getEvents() {
-    return events;
-  }
+    public Collection<MessageEventPlaceholder> getEvents() {
+        return events;
+    }
 
-  public void setEvents(final Collection<MessageEventPlaceholder> events) {
-    this.events = events;
-  }
+    public void setEvents(final Collection<MessageEventPlaceholder> events) {
+        this.events = events;
+    }
 
-  public int getVersion() {
-    return version;
-  }
+    public int getVersion() {
+        return version;
+    }
 
-  public void setVersion(final int version) {
-    this.version = version;
-  }
+    public void setVersion(final int version) {
+        this.version = version;
+    }
 
-  public URI getParentUri() {
-    return parentUri;
-  }
+    public URI getParentUri() {
+        return parentUri;
+    }
 
-  public void setParentUri(final URI parentUri) {
-    this.parentUri = parentUri;
-  }
+    public void setParentUri(final URI parentUri) {
+        this.parentUri = parentUri;
+    }
 }

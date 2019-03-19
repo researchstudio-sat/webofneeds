@@ -41,8 +41,9 @@ public class ValidationUtils {
                 Query constraint = QueryFactory.create(queryString);
                 WonSparqlValidator validator = new WonSparqlValidator(constraint, resource.getFilename());
                 validators.add(validator);
-            } catch (Exception e){
-                throw new IllegalStateException("Error loading query from resource " + resource.toString()  + ": " + e.getMessage(), e);
+            } catch (Exception e) {
+                throw new IllegalStateException(
+                        "Error loading query from resource " + resource.toString() + ": " + e.getMessage(), e);
             }
         }
         return validators;
@@ -53,8 +54,7 @@ public class ValidationUtils {
         StringBuilder sb = new StringBuilder();
         String line;
         try {
-            reader = new BufferedReader(new InputStreamReader(resource.getInputStream(),
-                    "UTF-8"));
+            reader = new BufferedReader(new InputStreamReader(resource.getInputStream(), "UTF-8"));
             while ((line = reader.readLine()) != null) {
                 sb.append(line);
                 sb.append("\n");

@@ -22,11 +22,9 @@ import won.bot.framework.eventbot.filter.EventFilter;
 /**
  * Event filter that accepts all events.
  */
-public class AcceptAllEventsFilter implements EventFilter
-{
-  @Override
-  public boolean accept(final Event event)
-  {
-    return true;
-  }
+public class AcceptAllEventsFilter implements EventFilter {
+    @Override
+    public boolean accept(final Event event) {
+        return true;
+    }
 }

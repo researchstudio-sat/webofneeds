@@ -26,7 +26,8 @@ import won.bot.framework.eventbot.event.impl.cmd.BaseCommandSuccessEvent;
 public class CrawlConnectionCommandSuccessEvent extends BaseCommandSuccessEvent<CrawlConnectionCommandEvent> {
     private Dataset crawledData;
 
-    public CrawlConnectionCommandSuccessEvent(CrawlConnectionCommandEvent originalCommandEvent, Dataset crawledData, String message) {
+    public CrawlConnectionCommandSuccessEvent(CrawlConnectionCommandEvent originalCommandEvent, Dataset crawledData,
+            String message) {
         super(message, originalCommandEvent);
         this.crawledData = crawledData;
     }

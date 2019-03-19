@@ -22,12 +22,12 @@ import won.cryptography.ssl.MessagingContext;
 import won.protocol.exception.CamelConfigurationFailedException;
 
 /**
- * User: LEIH-NB
- * Date: 24.02.14
+ * User: LEIH-NB Date: 24.02.14
  */
-//TODO maybe can extend needconfigurator...
+// TODO maybe can extend needconfigurator...
 public interface OwnerProtocolCamelConfigurator extends CamelConfigurator {
-    String configureCamelEndpointForNodeURI(URI wonNodeURI, URI brokerURI, String ownerProtocolQueueName) throws CamelConfigurationFailedException;
+    String configureCamelEndpointForNodeURI(URI wonNodeURI, URI brokerURI, String ownerProtocolQueueName)
+            throws CamelConfigurationFailedException;
 
     void addRemoteQueueListener(String endpoint, URI remoteEndpoint) throws CamelConfigurationFailedException;
 

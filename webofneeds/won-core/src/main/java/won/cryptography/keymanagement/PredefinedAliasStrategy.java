@@ -19,7 +19,7 @@ package won.cryptography.keymanagement;
 /**
  * Always uses the predefined alias
  */
-public class PredefinedAliasStrategy implements KeyPairAliasDerivationStrategy{
+public class PredefinedAliasStrategy implements KeyPairAliasDerivationStrategy {
     private String predefinedAlias = null;
 
     public PredefinedAliasStrategy(String predefinedAlias) {

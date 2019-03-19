@@ -80,7 +80,6 @@ public class MemoryBotContext implements BotContext {
         return nodeUris.contains(wonNodeURI);
     }
 
-
     @Override
     public synchronized void rememberNodeUri(final URI uri) {
         nodeUris.add(uri);
@@ -158,7 +157,7 @@ public class MemoryBotContext implements BotContext {
 
     @Override
     public void removeLeavesFromListMap(String collectionName, final Serializable... values) {
-        for(String key : getListMap(collectionName).keySet()){
+        for (String key : getListMap(collectionName).keySet()) {
             removeFromListMap(collectionName, key, values);
         }
     }

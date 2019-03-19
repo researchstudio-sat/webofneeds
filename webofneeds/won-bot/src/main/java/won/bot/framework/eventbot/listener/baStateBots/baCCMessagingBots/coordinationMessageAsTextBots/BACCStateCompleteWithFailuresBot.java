@@ -9,8 +9,7 @@ import won.bot.framework.eventbot.listener.baStateBots.BATestScriptAction;
 import won.node.facet.impl.WON_TX;
 
 /**
- * User: Danijel
- * Date: 19.3.14.
+ * User: Danijel Date: 19.3.14.
  */
 public class BACCStateCompleteWithFailuresBot extends BATestBotScript {
 

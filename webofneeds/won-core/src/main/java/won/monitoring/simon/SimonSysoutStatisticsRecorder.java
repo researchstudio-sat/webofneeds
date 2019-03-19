@@ -25,16 +25,14 @@ import won.monitoring.AbstractRecorder;
 /**
  * MonitoringStatisticsRecorder that prints the statistics via the logger with loglevel 'debug'.
  */
-public class SimonSysoutStatisticsRecorder extends AbstractRecorder
-{
+public class SimonSysoutStatisticsRecorder extends AbstractRecorder {
 
-  @Override
-  public void recordMonitoringStatistics()
-  {
-    Simon rootSimon = SimonManager.getRootSimon();
-    if (logger.isDebugEnabled()){
-      logger.debug("Monitoring statistics: \n" + SimonUtils.simonTreeString(rootSimon));
+    @Override
+    public void recordMonitoringStatistics() {
+        Simon rootSimon = SimonManager.getRootSimon();
+        if (logger.isDebugEnabled()) {
+            logger.debug("Monitoring statistics: \n" + SimonUtils.simonTreeString(rootSimon));
+        }
     }
-  }
 
 }

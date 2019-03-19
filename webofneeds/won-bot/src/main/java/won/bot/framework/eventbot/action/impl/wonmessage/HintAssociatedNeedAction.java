@@ -34,82 +34,70 @@ import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
 /**
  * BaseEventBotAction connecting two needs on the specified facets, or on their default facets if none are specified.
- * Requires a NeedSpecificEvent to run and expeects the needURI from the event
- * to be associated with another need URI via the botContext.saveToObjectMap method.
+ * Requires a NeedSpecificEvent to run and expeects the needURI from the event to be associated with another need URI
+ * via the botContext.saveToObjectMap method.
  */
-public class HintAssociatedNeedAction extends BaseEventBotAction
-{
-  private Optional<URI> remoteFacetType = Optional.empty();
-  private Optional<URI> localFacetType = Optional.empty();
-  private URI matcherURI;
+public class HintAssociatedNeedAction extends BaseEventBotAction {
+    private Optional<URI> remoteFacetType = Optional.empty();
+    private Optional<URI> localFacetType = Optional.empty();
+    private URI matcherURI;
 
-  public HintAssociatedNeedAction(final EventListenerContext eventListenerContext, final URI remoteFacetType, final URI
-    localFacetType, final URI matcherURI)
-  {
-    super(eventListenerContext);
-    this.remoteFacetType = Optional.of(remoteFacetType);
-    this.localFacetType = Optional.of(localFacetType);
-    this.matcherURI = matcherURI;
-  }
-  
-  
-  /**
-   * 
-   * @param eventListenerContext
-   * @param matcherURI
-   */
-  public HintAssociatedNeedAction(EventListenerContext eventListenerContext, URI matcherURI) {
-    super(eventListenerContext);
-    this.matcherURI = matcherURI;
-}
-
-
-
-@Override
-  public void doRun(Event event, EventListener executingListener)
-  {
-    if (! (event instanceof NeedSpecificEvent)){
-      logger.error("HintAssociatedNeedAction can only handle NeedSpecificEvents");
-      return;
+    public HintAssociatedNeedAction(final EventListenerContext eventListenerContext, final URI remoteFacetType,
+            final URI localFacetType, final URI matcherURI) {
+        super(eventListenerContext);
+        this.remoteFacetType = Optional.of(remoteFacetType);
+        this.localFacetType = Optional.of(localFacetType);
+        this.matcherURI = matcherURI;
     }
-    final URI myNeedUri = ((NeedSpecificEvent) event).getNeedURI();
-    final URI remoteNeedUri = getEventListenerContext().getBotContextWrapper().getUriAssociation(myNeedUri);
 
-    try {
-      logger.info("Sending hint for {} and {}", myNeedUri, remoteNeedUri);
-
-      getEventListenerContext().getMatcherProtocolNeedServiceClient().hint(
-        remoteNeedUri, myNeedUri, 0.9, matcherURI, null, createWonMessage(
-          remoteNeedUri, myNeedUri, 0.9, matcherURI));
-
-    } catch (Exception e) {
-      logger.warn("could not send hint for " +myNeedUri+ " to " + remoteNeedUri, e);
+    /**
+     * 
+     * @param eventListenerContext
+     * @param matcherURI
+     */
+    public HintAssociatedNeedAction(EventListenerContext eventListenerContext, URI matcherURI) {
+        super(eventListenerContext);
+        this.matcherURI = matcherURI;
     }
-  }
 
-  private WonMessage createWonMessage(URI needURI, URI otherNeedURI, double score, URI originator)
-    throws WonMessageBuilderException {
+    @Override
+    public void doRun(Event event, EventListener executingListener) {
+        if (!(event instanceof NeedSpecificEvent)) {
+            logger.error("HintAssociatedNeedAction can only handle NeedSpecificEvents");
+            return;
+        }
+        final URI myNeedUri = ((NeedSpecificEvent) event).getNeedURI();
+        final URI remoteNeedUri = getEventListenerContext().getBotContextWrapper().getUriAssociation(myNeedUri);
 
-    LinkedDataSource linkedDataSource = getEventListenerContext().getLinkedDataSource();
+        try {
+            logger.info("Sending hint for {} and {}", myNeedUri, remoteNeedUri);
 
-    WonNodeInformationService wonNodeInformationService =
-      getEventListenerContext().getWonNodeInformationService();
+            getEventListenerContext().getMatcherProtocolNeedServiceClient().hint(remoteNeedUri, myNeedUri, 0.9,
+                    matcherURI, null, createWonMessage(remoteNeedUri, myNeedUri, 0.9, matcherURI));
 
-    URI localWonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(
-            linkedDataSource.getDataForResource(needURI), needURI);
+        } catch (Exception e) {
+            logger.warn("could not send hint for " + myNeedUri + " to " + remoteNeedUri, e);
+        }
+    }
 
-    return WonMessageBuilder
-      .setMessagePropertiesForHint(
-        wonNodeInformationService.generateEventURI(
-          localWonNode),
-        needURI,
-        localFacetType.map(facetType -> WonLinkedDataUtils.getFacetsOfType(needURI, facetType, linkedDataSource).stream().findFirst().orElse(null)),
-        localWonNode,
-        otherNeedURI,
-        remoteFacetType.map(facetType -> WonLinkedDataUtils.getFacetsOfType(otherNeedURI, facetType, linkedDataSource).stream().findFirst().orElse(null)),
-        originator,
-        score)
-      .build();
-  }
+    private WonMessage createWonMessage(URI needURI, URI otherNeedURI, double score, URI originator)
+            throws WonMessageBuilderException {
+
+        LinkedDataSource linkedDataSource = getEventListenerContext().getLinkedDataSource();
+
+        WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
+
+        URI localWonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(linkedDataSource.getDataForResource(needURI),
+                needURI);
+
+        return WonMessageBuilder.setMessagePropertiesForHint(wonNodeInformationService.generateEventURI(localWonNode),
+                needURI,
+                localFacetType.map(facetType -> WonLinkedDataUtils
+                        .getFacetsOfType(needURI, facetType, linkedDataSource).stream().findFirst().orElse(null)),
+                localWonNode, otherNeedURI,
+                remoteFacetType.map(facetType -> WonLinkedDataUtils
+                        .getFacetsOfType(otherNeedURI, facetType, linkedDataSource).stream().findFirst().orElse(null)),
+                originator, score).build();
+    }
 
 }

@@ -21,26 +21,25 @@ import java.net.URI;
 /**
  * Event indicating that the attempt to create a need on the specified won node failed.
  */
-public class NeedCreationFailedEvent extends BaseEvent
-{
-  //the URI the need had before a new need uri was created
-  private URI needUriBeforeCreation;
-  private URI wonNodeURI;
+public class NeedCreationFailedEvent extends BaseEvent {
+    // the URI the need had before a new need uri was created
+    private URI needUriBeforeCreation;
+    private URI wonNodeURI;
 
-  public NeedCreationFailedEvent(final URI wonNodeUri) {
-    this(wonNodeUri, null);
-  }
+    public NeedCreationFailedEvent(final URI wonNodeUri) {
+        this(wonNodeUri, null);
+    }
 
-  public NeedCreationFailedEvent(URI needUriBeforeCreation, URI wonNodeURI) {
-    this.needUriBeforeCreation = needUriBeforeCreation;
-    this.wonNodeURI = wonNodeURI;
-  }
+    public NeedCreationFailedEvent(URI needUriBeforeCreation, URI wonNodeURI) {
+        this.needUriBeforeCreation = needUriBeforeCreation;
+        this.wonNodeURI = wonNodeURI;
+    }
 
-  public URI getWonNodeURI() {
-    return wonNodeURI;
-  }
+    public URI getWonNodeURI() {
+        return wonNodeURI;
+    }
 
-  public URI getNeedUriBeforeCreation() {
-    return needUriBeforeCreation;
-  }
+    public URI getNeedUriBeforeCreation() {
+        return needUriBeforeCreation;
+    }
 }

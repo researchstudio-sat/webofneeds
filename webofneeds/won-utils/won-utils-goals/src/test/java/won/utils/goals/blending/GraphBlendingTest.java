@@ -25,13 +25,12 @@ public class GraphBlendingTest {
 
     private static final String baseFolder = "/won/utils/goals/blending/";
 
-
     @BeforeClass
     public static void setLogLevel() {
-        Logger root = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
-        root.setLevel(Level.INFO);  
+        Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+        root.setLevel(Level.INFO);
     }
-    
+
     @Test
     public void blendSameTriples() throws IOException {
         Dataset ds = loadDataset(baseFolder + "same.trig");
@@ -56,12 +55,12 @@ public class GraphBlendingTest {
         test(ds);
     }
 
-// Recursive blending is not implemented yet
-//    @Test
-//    public void blendRecursive() throws IOException {
-//        Dataset ds = loadDataset(baseFolder + "recursive.trig");
-//        test(ds);
-//    }
+    // Recursive blending is not implemented yet
+    // @Test
+    // public void blendRecursive() throws IOException {
+    // Dataset ds = loadDataset(baseFolder + "recursive.trig");
+    // test(ds);
+    // }
 
     @Test
     public void blendDifferentLiterals() throws IOException {
@@ -71,7 +70,7 @@ public class GraphBlendingTest {
 
     @Test
     public void blendDifferentURIs() throws IOException {
-        Dataset ds = loadDataset(baseFolder +  "differentUris.trig");
+        Dataset ds = loadDataset(baseFolder + "differentUris.trig");
         test(ds);
     }
 
@@ -85,7 +84,7 @@ public class GraphBlendingTest {
     public void blendEmpty() throws IOException {
 
         GraphBlendingIterator blendingIterator = new GraphBlendingIterator(ModelFactory.createDefaultModel(),
-                ModelFactory.createDefaultModel(),"http://example.org/test", "http://example.org/test/blended");
+                ModelFactory.createDefaultModel(), "http://example.org/test", "http://example.org/test/blended");
 
         Assert.assertTrue(blendingIterator.hasNext());
         Assert.assertTrue(ModelFactory.createDefaultModel().isIsomorphicWith(blendingIterator.next()));
@@ -171,7 +170,6 @@ public class GraphBlendingTest {
 
         return dataset;
     }
-
 
     /**
      * Model wrapper class for easier comparison of expected and actual blending models.

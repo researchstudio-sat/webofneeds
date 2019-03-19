@@ -23,14 +23,14 @@ import won.bot.framework.eventbot.event.BaseEvent;
  * Base class for TestPassedEvent and TestFailedEvent.
  */
 public abstract class TestFinishedEvent extends BaseEvent {
-  protected Bot bot;
+    protected Bot bot;
 
-  public TestFinishedEvent(Bot bot) {
-    this.bot = bot;
-  }
+    public TestFinishedEvent(Bot bot) {
+        this.bot = bot;
+    }
 
-  public Bot getBot() {
-    return bot;
-  }
+    public Bot getBot() {
+        return bot;
+    }
 
 }

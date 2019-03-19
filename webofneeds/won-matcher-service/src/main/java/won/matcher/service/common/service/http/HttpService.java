@@ -20,8 +20,7 @@ import org.springframework.web.client.RestTemplate;
 /**
  * Service to use HTTP to request resources
  * <p/>
- * User: hfriedrich
- * Date: 04.05.2015
+ * User: hfriedrich Date: 04.05.2015
  */
 @Component
 @Scope("prototype")

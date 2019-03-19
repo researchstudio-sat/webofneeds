@@ -11,44 +11,41 @@ import won.bot.framework.eventbot.listener.baStateBots.baPCMessagingBots.atomicB
 import won.protocol.model.FacetType;
 
 /**
- * User: Danijel
- * Date: 24.4.14.
+ * User: Danijel Date: 24.4.14.
  */
-public class BAAtomicPCBot extends BAAtomicBaseBot
-{
-  @Override
-  protected FacetType getParticipantFacetType() {
-    return FacetType.BAPCParticipantFacet;
-  }
+public class BAAtomicPCBot extends BAAtomicBaseBot {
+    @Override
+    protected FacetType getParticipantFacetType() {
+        return FacetType.BAPCParticipantFacet;
+    }
 
-  @Override
-  protected FacetType getCoordinatorFacetType() {
-    return FacetType.BAAtomicPCCoordinatorFacet;
-  }
+    @Override
+    protected FacetType getCoordinatorFacetType() {
+        return FacetType.BAAtomicPCCoordinatorFacet;
+    }
 
-  protected List<BATestBotScript> getFirstPhaseScripts() {
+    protected List<BATestBotScript> getFirstPhaseScripts() {
 
-    List<BATestBotScript> scripts = new ArrayList<BATestBotScript>(2);
+        List<BATestBotScript> scripts = new ArrayList<BATestBotScript>(2);
 
-    //Coordination message is sent as TEXT
-    scripts.add(new CompletedFPBot());
-    scripts.add(new CompletedBlockedFPBot());
+        // Coordination message is sent as TEXT
+        scripts.add(new CompletedFPBot());
+        scripts.add(new CompletedBlockedFPBot());
 
-    //Coordination message is sent as MODEL
+        // Coordination message is sent as MODEL
 
+        return scripts;
+    }
 
-    return scripts;
-  }
+    protected List<BATestBotScript> getSecondPhaseScripts() {
+        List<BATestBotScript> scripts = new ArrayList<BATestBotScript>(2);
 
-  protected List<BATestBotScript> getSecondPhaseScripts() {
-    List<BATestBotScript> scripts = new ArrayList<BATestBotScript>(2);
+        // Coordination message is sent as TEXT
+        scripts.add(new ActiveBlockingSPBot());
+        scripts.add(new CompletedBlockedSPBot());
 
-    //Coordination message is sent as TEXT
-    scripts.add(new ActiveBlockingSPBot());
-    scripts.add(new CompletedBlockedSPBot());
+        // Coordination message is sent as MODEL
 
-    //Coordination message is sent as MODEL
-
-    return scripts;
-  }
+        return scripts;
+    }
 }

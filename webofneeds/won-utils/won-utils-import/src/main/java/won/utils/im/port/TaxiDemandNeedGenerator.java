@@ -28,17 +28,17 @@ public class TaxiDemandNeedGenerator {
 
     private static void generateNeeds() {
         final int N = 100;
-        Random random = new Random();        
+        Random random = new Random();
         for (int i = 0; i < N; i++) {
             String rnd = Long.toHexString(random.nextLong());
-            String needURI = "https://localhost:8443/won/resource/event/" + "taxi_demand_need_" + rnd ;
+            String needURI = "https://localhost:8443/won/resource/event/" + "taxi_demand_need_" + rnd;
 
             model = ModelFactory.createDefaultModel();
 
             setPrefixes();
 
             Resource need = model.createResource(needURI);
-            //Resource isPart = model.createResource();
+            // Resource isPart = model.createResource();
             Resource seeksPart = model.createResource();
             Resource won_Need = model.createResource("http://purl.org/webofneeds/model#Need");
 

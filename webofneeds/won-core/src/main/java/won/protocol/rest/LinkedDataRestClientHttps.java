@@ -36,8 +36,7 @@ import won.cryptography.service.keystore.KeyStoreService;
 import won.cryptography.ssl.PredefinedAliasPrivateKeyStrategy;
 
 /**
- * User: ypanchenko
- * Date: 07.10.15
+ * User: ypanchenko Date: 07.10.15
  */
 public class LinkedDataRestClientHttps extends LinkedDataRestClient {
 
@@ -54,10 +53,10 @@ public class LinkedDataRestClientHttps extends LinkedDataRestClient {
     private TrustStrategy trustStrategy;
     private KeyPairAliasDerivationStrategy keyPairAliasDerivationStrategy = new NeedUriAsAliasStrategy();
 
-
-    public LinkedDataRestClientHttps(KeyStoreService keyStoreService, TrustStoreService trustStoreService, TrustStrategy trustStrategy, KeyPairAliasDerivationStrategy keyPairAliasDerivationStrategy) {
+    public LinkedDataRestClientHttps(KeyStoreService keyStoreService, TrustStoreService trustStoreService,
+            TrustStrategy trustStrategy, KeyPairAliasDerivationStrategy keyPairAliasDerivationStrategy) {
         this.readTimeout = 5000;
-        this.connectionTimeout = 5000; //DEF. TIMEOUT IS 5 sec
+        this.connectionTimeout = 5000; // DEF. TIMEOUT IS 5 sec
         this.keyStoreService = keyStoreService;
         this.trustStoreService = trustStoreService;
         this.trustStrategy = trustStrategy;
@@ -74,13 +73,11 @@ public class LinkedDataRestClientHttps extends LinkedDataRestClient {
     private RestTemplate createRestTemplateForReadingLinkedData(String webID) {
         RestTemplate template = null;
         try {
-            template = CryptographyUtils.createSslRestTemplate(
-                    this.keyStoreService.getUnderlyingKeyStore(),
+            template = CryptographyUtils.createSslRestTemplate(this.keyStoreService.getUnderlyingKeyStore(),
                     this.keyStoreService.getPassword(),
                     new PredefinedAliasPrivateKeyStrategy(keyPairAliasDerivationStrategy.getAliasForNeedUri(webID)),
-                    this.trustStoreService.getUnderlyingKeyStore(),
-                    this.trustStrategy,
-                    readTimeout, connectionTimeout, true);
+                    this.trustStoreService.getUnderlyingKeyStore(), this.trustStrategy, readTimeout, connectionTimeout,
+                    true);
         } catch (Exception e) {
             throw new RuntimeException("Failed to create rest template for webID '" + webID + "'", e);
         }
@@ -94,12 +91,14 @@ public class LinkedDataRestClientHttps extends LinkedDataRestClient {
     }
 
     @Override
-    public DatasetResponseWithStatusCodeAndHeaders readResourceDataWithHeaders(URI resourceURI, final URI requesterWebID) {
+    public DatasetResponseWithStatusCodeAndHeaders readResourceDataWithHeaders(URI resourceURI,
+            final URI requesterWebID) {
 
         HttpMessageConverter datasetConverter = new RdfDatasetConverter();
         RestTemplate restTemplate;
         try {
-            restTemplate = getRestTemplateForReadingLinkedData(requesterWebID == null ? null : requesterWebID.toString());
+            restTemplate = getRestTemplateForReadingLinkedData(
+                    requesterWebID == null ? null : requesterWebID.toString());
         } catch (Exception e) {
             logger.error("Failed to create ssl tofu rest template", e);
             throw new RuntimeException(e);
@@ -111,21 +110,22 @@ public class LinkedDataRestClientHttps extends LinkedDataRestClient {
     }
 
     @Override
-    public DatasetResponseWithStatusCodeAndHeaders readResourceDataWithHeaders(
-            final URI resourceURI, final URI requesterWebID, final HttpHeaders requestHeaders) {
+    public DatasetResponseWithStatusCodeAndHeaders readResourceDataWithHeaders(final URI resourceURI,
+            final URI requesterWebID, final HttpHeaders requestHeaders) {
         requestHeaders.add(HttpHeaders.ACCEPT, this.acceptHeaderValue);
-        return super.readResourceData(resourceURI, getRestTemplateForReadingLinkedData(requesterWebID == null ? null : requesterWebID.toString()),
+        return super.readResourceData(resourceURI,
+                getRestTemplateForReadingLinkedData(requesterWebID == null ? null : requesterWebID.toString()),
                 requestHeaders);
     }
-
 
     private RestTemplate getRestTemplateForReadingLinkedData(String webID) {
         return createRestTemplateForReadingLinkedData(webID);
     }
 
     @Override
-    public DatasetResponseWithStatusCodeAndHeaders readResourceDataWithHeaders(final URI resourceURI, HttpHeaders requestHeaders) {
-    	return readResourceDataWithHeaders(resourceURI, null, requestHeaders);
+    public DatasetResponseWithStatusCodeAndHeaders readResourceDataWithHeaders(final URI resourceURI,
+            HttpHeaders requestHeaders) {
+        return readResourceDataWithHeaders(resourceURI, null, requestHeaders);
     }
 
     public void setReadTimeout(final Integer readTimeout) {

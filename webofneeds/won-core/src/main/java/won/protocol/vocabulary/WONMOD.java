@@ -5,10 +5,10 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
 
 public class WONMOD {
-	 public static final String BASE_URI = "http://purl.org/webofneeds/modification#";
+    public static final String BASE_URI = "http://purl.org/webofneeds/modification#";
 
-	 private static Model m = ModelFactory.createDefaultModel();
+    private static Model m = ModelFactory.createDefaultModel();
 
-	 public static Property RETRACTS = m.createProperty(BASE_URI+"retracts");
-	    
+    public static Property RETRACTS = m.createProperty(BASE_URI + "retracts");
+
 }

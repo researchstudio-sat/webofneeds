@@ -30,7 +30,7 @@ import won.bot.framework.eventbot.event.impl.cmd.CommandEvent;
 public class CrawlCommandEvent extends BaseNeedSpecificEvent implements CommandEvent {
     private List<Path> propertyPaths;
     private URI startURI;
-    private int getMaxRequest=1000;
+    private int getMaxRequest = 1000;
     private int maxDepth = 5;
 
     public CrawlCommandEvent(URI needURI, URI startURI, List<Path> propertyPaths, int getMaxRequest, int maxDepth) {

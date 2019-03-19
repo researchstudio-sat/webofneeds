@@ -9,20 +9,15 @@ import won.bot.framework.eventbot.listener.baStateBots.BATestScriptAction;
 import won.node.facet.impl.WON_TX;
 
 /**
- * User: Danijel
- * Date: 30.4.14.
+ * User: Danijel Date: 30.4.14.
  */
-public class CompletedBlockedFPBot extends BATestBotScript
-{
+public class CompletedBlockedFPBot extends BATestBotScript {
 
-  @Override
-  protected List<BATestScriptAction> setupActions() {
-    List<BATestScriptAction> actions = new ArrayList();
-    actions.add(new BATestScriptAction(false, "MESSAGE_COMPLETE", URI.create(WON_TX.STATE_ACTIVE.getURI())));
-    actions.add(new BATestScriptAction(true, "MESSAGE_COMPLETED", URI.create(WON_TX.STATE_COMPLETING.getURI())));
-    return actions;
-  }
+    @Override
+    protected List<BATestScriptAction> setupActions() {
+        List<BATestScriptAction> actions = new ArrayList();
+        actions.add(new BATestScriptAction(false, "MESSAGE_COMPLETE", URI.create(WON_TX.STATE_ACTIVE.getURI())));
+        actions.add(new BATestScriptAction(true, "MESSAGE_COMPLETED", URI.create(WON_TX.STATE_COMPLETING.getURI())));
+        return actions;
+    }
 }
-
-
-

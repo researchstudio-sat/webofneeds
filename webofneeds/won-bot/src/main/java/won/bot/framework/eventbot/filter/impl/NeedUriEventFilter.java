@@ -23,46 +23,45 @@ import won.bot.framework.eventbot.event.NeedSpecificEvent;
 import won.bot.framework.eventbot.filter.EventFilter;
 
 /**
- * Abstract base class for filters that will only accept events (need specific or connection specific) with the specified need URI.
+ * Abstract base class for filters that will only accept events (need specific or connection specific) with the
+ * specified need URI.
  */
-public class NeedUriEventFilter implements EventFilter
-{
-  private URI needURI;
+public class NeedUriEventFilter implements EventFilter {
+    private URI needURI;
 
-  public NeedUriEventFilter(final URI needURI)
-  {
-    this.needURI = needURI;
-  }
-
-  /**
-   * Factory method for creating a filter from an event by using its need URI.
-   * @param event
-   * @return the filter or null if no need URI could be obtained from the event.
-   */
-  public static NeedUriEventFilter forEvent(Event event){
-    URI needUri = getNeedUriFromEvent(event);
-    if (needUri == null) return null;
-    return new NeedUriEventFilter(needUri);
-  }
-
-  @Override
-  public boolean accept(final Event event)
-  {
-    URI needUriOfEvent = getNeedUriFromEvent(event);
-    if (needUriOfEvent == null) return false;
-    return needUriOfEvent.equals(this.needURI);
-  }
-
-  public URI getNeedURI()
-  {
-    return needURI;
-  }
-
-  private static URI getNeedUriFromEvent(final Event event)
-  {
-    if (event instanceof NeedSpecificEvent){
-      return ((NeedSpecificEvent)event).getNeedURI();
+    public NeedUriEventFilter(final URI needURI) {
+        this.needURI = needURI;
     }
-    return null;
-  }
+
+    /**
+     * Factory method for creating a filter from an event by using its need URI.
+     * 
+     * @param event
+     * @return the filter or null if no need URI could be obtained from the event.
+     */
+    public static NeedUriEventFilter forEvent(Event event) {
+        URI needUri = getNeedUriFromEvent(event);
+        if (needUri == null)
+            return null;
+        return new NeedUriEventFilter(needUri);
+    }
+
+    @Override
+    public boolean accept(final Event event) {
+        URI needUriOfEvent = getNeedUriFromEvent(event);
+        if (needUriOfEvent == null)
+            return false;
+        return needUriOfEvent.equals(this.needURI);
+    }
+
+    public URI getNeedURI() {
+        return needURI;
+    }
+
+    private static URI getNeedUriFromEvent(final Event event) {
+        if (event instanceof NeedSpecificEvent) {
+            return ((NeedSpecificEvent) event).getNeedURI();
+        }
+        return null;
+    }
 }

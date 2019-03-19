@@ -12,7 +12,6 @@ public class NopNeedProducer implements NeedProducer {
     public NopNeedProducer() {
     }
 
-
     @Override
     public Dataset create() {
         throw new UnsupportedOperationException("This NeedProducer implementation does not expect to be used");

@@ -27,23 +27,22 @@ import won.bot.framework.eventbot.listener.EventListener;
 /**
  * Base action with capabilities for delegating to another action
  */
-public abstract class AbstractDelegatingAction extends BaseEventBotAction
-{
+public abstract class AbstractDelegatingAction extends BaseEventBotAction {
 
-  private EventBotAction delegate;
+    private EventBotAction delegate;
 
-  public AbstractDelegatingAction(final EventListenerContext eventListenerContext, final EventBotAction delegate) {
-    super(eventListenerContext);
-    this.delegate = delegate;
-    assert delegate != null : "delegate must not be null";
-  }
+    public AbstractDelegatingAction(final EventListenerContext eventListenerContext, final EventBotAction delegate) {
+        super(eventListenerContext);
+        this.delegate = delegate;
+        assert delegate != null : "delegate must not be null";
+    }
 
-  protected void delegateImmediately(final Event event, EventListener executingListener) {
-    getEventListenerContext().getExecutor().execute(delegate.getActionTask(event, executingListener));
-  }
+    protected void delegateImmediately(final Event event, EventListener executingListener) {
+        getEventListenerContext().getExecutor().execute(delegate.getActionTask(event, executingListener));
+    }
 
-  protected void delegateDelayed(final Event event, long delayMillis, EventListener executingListener) {
-    Date when = new Date(System.currentTimeMillis() + delayMillis);
-    getEventListenerContext().getTaskScheduler().schedule(delegate.getActionTask(event, executingListener), when);
-  }
+    protected void delegateDelayed(final Event event, long delayMillis, EventListener executingListener) {
+        Date when = new Date(System.currentTimeMillis() + delayMillis);
+        getEventListenerContext().getTaskScheduler().schedule(delegate.getActionTask(event, executingListener), when);
+    }
 }

@@ -14,8 +14,7 @@ import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
 /**
- * User: fsalcher
- * Date: 17.09.2014
+ * User: fsalcher Date: 17.09.2014
  */
 public class WonNodeInformationServiceImpl implements WonNodeInformationService {
 
@@ -34,7 +33,8 @@ public class WonNodeInformationServiceImpl implements WonNodeInformationService 
         assert wonNodeURI != null;
         Dataset nodeDataset = linkedDataSource.getDataForResource(wonNodeURI);
         WonNodeInfo info = WonRdfUtils.WonNodeUtils.getWonNodeInfo(wonNodeURI, nodeDataset);
-        if (info == null) throw new IllegalStateException("Could not obtain WonNodeInformation for URI " + wonNodeURI);
+        if (info == null)
+            throw new IllegalStateException("Could not obtain WonNodeInformation for URI " + wonNodeURI);
         return info;
     }
 
@@ -46,8 +46,7 @@ public class WonNodeInformationServiceImpl implements WonNodeInformationService 
     @Override
     public URI generateEventURI(URI wonNodeURI) {
         WonNodeInfo wonNodeInformation = getWonNodeInformation(wonNodeURI);
-        return URI.create(wonNodeInformation.getEventURIPrefix() + "/" +
-                generateRandomID());
+        return URI.create(wonNodeInformation.getEventURIPrefix() + "/" + generateRandomID());
     }
 
     @Override
@@ -91,8 +90,7 @@ public class WonNodeInformationServiceImpl implements WonNodeInformationService 
     @Override
     public URI generateNeedURI(URI wonNodeURI) {
         WonNodeInfo wonNodeInformation = getWonNodeInformation(wonNodeURI);
-        return URI.create(wonNodeInformation.getNeedURIPrefix() + "/" +
-                generateRandomID());
+        return URI.create(wonNodeInformation.getNeedURIPrefix() + "/" + generateRandomID());
     }
 
     @Override
@@ -106,7 +104,6 @@ public class WonNodeInformationServiceImpl implements WonNodeInformationService 
         return isValidURI(needURI, wonNodeInformation.getNeedURIPrefix());
     }
 
-
     private boolean isValidURI(URI uri, String prefix) {
         return uri != null && uri.toString().startsWith(prefix);
     }
@@ -114,8 +111,8 @@ public class WonNodeInformationServiceImpl implements WonNodeInformationService 
     @Override
     public URI getWonNodeUri(final URI resourceURI) {
         URI wonNodeURI = WonLinkedDataUtils.getWonNodeURIForNeedOrConnectionURI(resourceURI, linkedDataSource);
-        if (wonNodeURI == null) throw new
-                IllegalStateException("Could not obtain WoN node URI for resource " + resourceURI);
+        if (wonNodeURI == null)
+            throw new IllegalStateException("Could not obtain WoN node URI for resource " + resourceURI);
         return wonNodeURI;
 
     }
@@ -138,13 +135,12 @@ public class WonNodeInformationServiceImpl implements WonNodeInformationService 
     }
 
     /**
-     * Returns a random string that does not start with a number.
-     * We do this so that we generate URIs for which prefixing will always work with N3.js
-     * https://github.com/RubenVerborgh/N3.js/issues/121
+     * Returns a random string that does not start with a number. We do this so that we generate URIs for which
+     * prefixing will always work with N3.js https://github.com/RubenVerborgh/N3.js/issues/121
      * 
      * @return
      */
     private String generateRandomID() {
-    	return randomNumberService.generateRandomString(RANDOM_ID_STRING_LENGTH);
+        return randomNumberService.generateRandomString(RANDOM_ID_STRING_LENGTH);
     }
 }

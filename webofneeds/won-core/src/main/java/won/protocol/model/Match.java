@@ -16,7 +16,6 @@
 
 package won.protocol.model;
 
-
 import java.net.URI;
 
 import javax.persistence.Column;
@@ -28,47 +27,37 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "match",
-    uniqueConstraints=@UniqueConstraint(columnNames={"fromNeed", "toNeed","originator"})
-)
-public class Match
-{
+@Table(name = "match", uniqueConstraints = @UniqueConstraint(columnNames = { "fromNeed", "toNeed", "originator" }))
+public class Match {
     /* This is the event ID to the corresponding match */
     @Id
     @GeneratedValue
-    @Column( name = "id")
+    @Column(name = "id")
     private long id;
 
-    @Column( name = "fromNeed")
-    @Convert( converter = URIConverter.class)
+    @Column(name = "fromNeed")
+    @Convert(converter = URIConverter.class)
     private URI fromNeed;
 
-    @Column( name = "toNeed")
-    @Convert( converter = URIConverter.class)
+    @Column(name = "toNeed")
+    @Convert(converter = URIConverter.class)
     private URI toNeed;
 
-    @Column( name = "score")
+    @Column(name = "score")
     private double score;
 
-    @Column( name = "originator")
-    @Convert( converter = URIConverter.class)
+    @Column(name = "originator")
+    @Convert(converter = URIConverter.class)
     private URI originator;
 
-    @Column( name = "eventId")
+    @Column(name = "eventId")
     private long eventId;
 
-  @Override
-  public String toString()
-  {
-    return "Match{" +
-        ", id=" + id +
-        ", fromNeed=" + fromNeed +
-        ", toNeed=" + toNeed +
-        ", score=" + score +
-        ", originator=" + originator +
-        ", eventId=" + eventId +
-        '}';
-  }
+    @Override
+    public String toString() {
+        return "Match{" + ", id=" + id + ", fromNeed=" + fromNeed + ", toNeed=" + toNeed + ", score=" + score
+                + ", originator=" + originator + ", eventId=" + eventId + '}';
+    }
 
     public long getId() {
         return id;

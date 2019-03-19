@@ -24,17 +24,11 @@ import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
 
 /**
- * Created with IntelliJ IDEA.
- * User: gabriel
- * Date: 16.09.13
- * Time: 18:42
- * To change this template use File | Settings | File Templates.
+ * Created with IntelliJ IDEA. User: gabriel Date: 16.09.13 Time: 18:42 To change this template use File | Settings |
+ * File Templates.
  */
 @Component
-@FacetMessageProcessor(
-        facetType = WON.GROUP_FACET_STRING,
-        direction = WONMSG.TYPE_FROM_EXTERNAL_STRING,
-        messageType = WONMSG.TYPE_CONNECTION_MESSAGE_STRING)
+@FacetMessageProcessor(facetType = WON.GROUP_FACET_STRING, direction = WONMSG.TYPE_FROM_EXTERNAL_STRING, messageType = WONMSG.TYPE_CONNECTION_MESSAGE_STRING)
 public class SendMessageFromNodeGroupFacetImpl extends AbstractFromOwnerCamelProcessor {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -54,52 +48,66 @@ public class SendMessageFromNodeGroupFacetImpl extends AbstractFromOwnerCamelPro
         // we check it by comparing the innermost message uri to that of any
         // message we have processed so far.
 
-        //now check if we processed the message earlier
+        // now check if we processed the message earlier
 
-        if (messageEventRepository.existEarlierMessageWithSameInnermostMessageURIAndReceiverNeedURI(wonMessage.getMessageURI())) {
+        if (messageEventRepository
+                .existEarlierMessageWithSameInnermostMessageURIAndReceiverNeedURI(wonMessage.getMessageURI())) {
             if (logger.isDebugEnabled()) {
                 URI innermostMessageURI = wonMessage.getInnermostMessageURI();
                 URI groupUri = wonMessage.getReceiverNeedURI();
-                logger.debug("suppressing message {} " +
-                                "as its innermost message is {} which has already " +
-                                "been processed by group {}",
-                        new Object[]{wonMessage.getMessageURI(), innermostMessageURI, groupUri});
+                logger.debug(
+                        "suppressing message {} " + "as its innermost message is {} which has already "
+                                + "been processed by group {}",
+                        new Object[] { wonMessage.getMessageURI(), innermostMessageURI, groupUri });
             }
             return;
         }
 
-        final Connection conOfIncomingMessage = connectionRepository.findByConnectionURI(wonMessage.getReceiverURI()).get(0);
+        final Connection conOfIncomingMessage = connectionRepository.findByConnectionURI(wonMessage.getReceiverURI())
+                .get(0);
 
-        final List<Connection> consInGroup = connectionRepository.findByFacetURIAndState(conOfIncomingMessage.getFacetURI(),
-                ConnectionState.CONNECTED);
+        final List<Connection> consInGroup = connectionRepository
+                .findByFacetURIAndState(conOfIncomingMessage.getFacetURI(), ConnectionState.CONNECTED);
 
-        if (consInGroup == null || consInGroup.size() < 2) return;
+        if (consInGroup == null || consInGroup.size() < 2)
+            return;
         if (logger.isDebugEnabled()) {
-            logger.debug("processing message {} received from need {} in group {} - preparing to send it to {} group members (text message: '{}'}", new Object[]{wonMessage.getMessageURI(), wonMessage.getSenderNeedURI(), wonMessage.getReceiverNeedURI(), consInGroup.size() - 1, WonRdfUtils.MessageUtils.getTextMessage(wonMessage)});
+            logger.debug(
+                    "processing message {} received from need {} in group {} - preparing to send it to {} group members (text message: '{}'}",
+                    new Object[] { wonMessage.getMessageURI(), wonMessage.getSenderNeedURI(),
+                            wonMessage.getReceiverNeedURI(), consInGroup.size() - 1,
+                            WonRdfUtils.MessageUtils.getTextMessage(wonMessage) });
         }
         for (final Connection conToSendTo : consInGroup) {
             try {
                 if (!conToSendTo.equals(conOfIncomingMessage)) {
-                    if (messageEventRepository.isReceivedSameInnermostMessageFromSender(wonMessage.getMessageURI(), conToSendTo.getRemoteNeedURI())){
+                    if (messageEventRepository.isReceivedSameInnermostMessageFromSender(wonMessage.getMessageURI(),
+                            conToSendTo.getRemoteNeedURI())) {
                         if (logger.isDebugEnabled()) {
                             URI innermostMessageURI = wonMessage.getInnermostMessageURI();
                             URI groupUri = wonMessage.getReceiverNeedURI();
-                            logger.debug("suppressing forward of message {} to {} in group {}" +
-                                            "as its innermost message is {} which has already " +
-                                            "been received from that need",
-                                    new Object[]{wonMessage.getMessageURI(), conToSendTo.getRemoteNeedURI(), groupUri, innermostMessageURI});
+                            logger.debug(
+                                    "suppressing forward of message {} to {} in group {}"
+                                            + "as its innermost message is {} which has already "
+                                            + "been received from that need",
+                                    new Object[] { wonMessage.getMessageURI(), conToSendTo.getRemoteNeedURI(), groupUri,
+                                            innermostMessageURI });
                         }
                         continue;
                     }
                     if (logger.isDebugEnabled()) {
-                        logger.debug("forwarding message {} received from need {} in group {} to group member {}", new Object[]{wonMessage.getMessageURI(), wonMessage.getSenderNeedURI(), wonMessage.getReceiverNeedURI(),  conToSendTo.getRemoteNeedURI()});
+                        logger.debug("forwarding message {} received from need {} in group {} to group member {}",
+                                new Object[] { wonMessage.getMessageURI(), wonMessage.getSenderNeedURI(),
+                                        wonMessage.getReceiverNeedURI(), conToSendTo.getRemoteNeedURI() });
                     }
-                    URI forwardedMessageURI = wonNodeInformationService.generateEventURI(wonMessage.getReceiverNodeURI());
-                    URI remoteWonNodeUri = WonLinkedDataUtils.getWonNodeURIForNeedOrConnectionURI(conToSendTo.getRemoteConnectionURI(),linkedDataSource);
+                    URI forwardedMessageURI = wonNodeInformationService
+                            .generateEventURI(wonMessage.getReceiverNodeURI());
+                    URI remoteWonNodeUri = WonLinkedDataUtils.getWonNodeURIForNeedOrConnectionURI(
+                            conToSendTo.getRemoteConnectionURI(), linkedDataSource);
                     WonMessage newWonMessage = WonMessageBuilder.forwardReceivedNodeToNodeMessageAsNodeToNodeMessage(
-                            forwardedMessageURI, wonMessage,
-                            conToSendTo.getConnectionURI(), conToSendTo.getNeedURI(), wonMessage.getReceiverNodeURI(),
-                            conToSendTo.getRemoteConnectionURI(), conToSendTo.getRemoteNeedURI(), remoteWonNodeUri);
+                            forwardedMessageURI, wonMessage, conToSendTo.getConnectionURI(), conToSendTo.getNeedURI(),
+                            wonMessage.getReceiverNodeURI(), conToSendTo.getRemoteConnectionURI(),
+                            conToSendTo.getRemoteNeedURI(), remoteWonNodeUri);
                     sendSystemMessage(newWonMessage);
                 }
             } catch (Exception e) {

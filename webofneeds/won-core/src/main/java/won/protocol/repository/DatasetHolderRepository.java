@@ -30,13 +30,12 @@ import won.protocol.model.DatasetHolder;
 /**
  * Repository for jena datasets (wrapped in DatasetHolders)
  */
-public interface DatasetHolderRepository extends CrudRepository<DatasetHolder, URI>
-{
-  public DatasetHolder findOneByUriAndVersionNot(URI uri, Integer version);
+public interface DatasetHolderRepository extends CrudRepository<DatasetHolder, URI> {
+    public DatasetHolder findOneByUriAndVersionNot(URI uri, Integer version);
 
-  public DatasetHolder findOneByUri(URI uri);
+    public DatasetHolder findOneByUri(URI uri);
 
-  @Lock(LockModeType.PESSIMISTIC_WRITE)
-  @Query("select d from DatasetHolder d where d.uri = :uri")
-  public DatasetHolder findOneByUriForUpdate(@Param("uri") URI uri);
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select d from DatasetHolder d where d.uri = :uri")
+    public DatasetHolder findOneByUriForUpdate(@Param("uri") URI uri);
 }

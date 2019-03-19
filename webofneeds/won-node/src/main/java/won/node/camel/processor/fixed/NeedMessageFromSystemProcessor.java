@@ -42,20 +42,22 @@ public class NeedMessageFromSystemProcessor extends AbstractCamelProcessor {
         WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
         URI receiverNeedURI = wonMessage.getReceiverNeedURI();
         URI senderNeedURI = wonMessage.getSenderNeedURI();
-        if (receiverNeedURI== null){
+        if (receiverNeedURI == null) {
             throw new MissingMessagePropertyException(URI.create(WONMSG.RECEIVER_NEED_PROPERTY.toString()));
         }
-        if (senderNeedURI == null){
+        if (senderNeedURI == null) {
             throw new MissingMessagePropertyException(URI.create(WONMSG.SENDER_NEED_PROPERTY.toString()));
         }
         if (!receiverNeedURI.equals(senderNeedURI)) {
-            throw new IllegalArgumentException("sender need uri " + senderNeedURI +" does not equal receiver need uri " + receiverNeedURI);
+            throw new IllegalArgumentException(
+                    "sender need uri " + senderNeedURI + " does not equal receiver need uri " + receiverNeedURI);
         }
         Need need = needRepository.findOneByNeedURI(senderNeedURI);
-        if (need == null){
+        if (need == null) {
             throw new IllegalArgumentException("need not found - cannot send need message to: " + senderNeedURI);
         }
-        need.getEventContainer().getEvents().add(messageEventRepository.findOneByMessageURIforUpdate(wonMessage.getMessageURI()));
+        need.getEventContainer().getEvents()
+                .add(messageEventRepository.findOneByMessageURIforUpdate(wonMessage.getMessageURI()));
         need = needRepository.save(need);
     }
 }

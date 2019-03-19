@@ -19,8 +19,8 @@ package won.bot.framework.eventbot.filter;
 /**
  * Interface for delegating filters.
  */
-public interface DelegatingFilter extends EventFilter
-{
-  public void setDelegate(EventFilter delegate);
-  public EventFilter getDelegate();
+public interface DelegatingFilter extends EventFilter {
+    public void setDelegate(EventFilter delegate);
+
+    public EventFilter getDelegate();
 }

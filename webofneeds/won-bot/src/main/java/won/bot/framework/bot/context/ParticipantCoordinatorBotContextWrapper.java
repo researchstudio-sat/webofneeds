@@ -27,11 +27,11 @@ public class ParticipantCoordinatorBotContextWrapper extends BotContextWrapper {
         throw new UnsupportedOperationException("This List is not available for this BotContextWrapper");
     }
 
-    public List<URI> getParticipants(){
+    public List<URI> getParticipants() {
         return getBotContext().getNamedNeedUriList(participantListName);
     }
 
-    public List<URI> getCoordinators(){
+    public List<URI> getCoordinators() {
         return getBotContext().getNamedNeedUriList(coordinatorListName);
     }
 }

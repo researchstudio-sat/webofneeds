@@ -9,13 +9,9 @@ import won.bot.framework.eventbot.listener.baStateBots.BATestScriptAction;
 import won.node.facet.impl.WON_TX;
 
 /**
- * Created with IntelliJ IDEA.
- * User: Danijel
- * Date: 26.2.14.
- * Time: 11.55
- * To change this template use File | Settings | File Templates.
+ * Created with IntelliJ IDEA. User: Danijel Date: 26.2.14. Time: 11.55 To change this template use File | Settings |
+ * File Templates.
  */
-
 
 public class BACCStateCompensateBot extends BATestBotScript {
 
@@ -25,9 +21,8 @@ public class BACCStateCompensateBot extends BATestBotScript {
         actions.add(new BATestScriptAction(false, "MESSAGE_COMPLETE", URI.create(WON_TX.STATE_ACTIVE.getURI())));
         actions.add(new BATestScriptAction(true, "MESSAGE_COMPLETED", URI.create(WON_TX.STATE_COMPLETING.getURI())));
         actions.add(new BATestScriptAction(false, "MESSAGE_COMPENSATE", URI.create(WON_TX.STATE_COMPLETED.getURI())));
-        actions.add(new BATestScriptAction(true, "MESSAGE_COMPENSATED", URI.create(WON_TX.STATE_COMPENSATING.getURI())));
+        actions.add(
+                new BATestScriptAction(true, "MESSAGE_COMPENSATED", URI.create(WON_TX.STATE_COMPENSATING.getURI())));
         return actions;
     }
 }
-
-

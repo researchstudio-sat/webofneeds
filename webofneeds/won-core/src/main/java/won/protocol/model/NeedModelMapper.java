@@ -19,9 +19,7 @@ import won.protocol.util.ModelMapper;
 import won.protocol.vocabulary.WON;
 
 /**
- * User: gabriel
- * Date: 09.04.13
- * Time: 15:36
+ * User: gabriel Date: 09.04.13 Time: 15:36
  */
 public class NeedModelMapper implements ModelMapper<Need> {
     final Logger logger = LoggerFactory.getLogger(getClass());
@@ -56,7 +54,8 @@ public class NeedModelMapper implements ModelMapper<Need> {
         Need need = new Need();
 
         ResIterator needIt = model.listSubjectsWithProperty(RDF.type, WON.NEED);
-        if (!needIt.hasNext()) throw new IllegalArgumentException("at least one RDF node must be of type won:Need");
+        if (!needIt.hasNext())
+            throw new IllegalArgumentException("at least one RDF node must be of type won:Need");
 
         Resource needRes = needIt.next();
         logger.debug("processing need resource {}", needRes.getURI());

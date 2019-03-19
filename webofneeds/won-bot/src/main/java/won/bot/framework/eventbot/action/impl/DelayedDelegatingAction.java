@@ -24,19 +24,18 @@ import won.bot.framework.eventbot.listener.EventListener;
 /**
  * Action that delegates to the specified action after a specified fixed delay.
  */
-public abstract class DelayedDelegatingAction extends AbstractDelegatingAction
-{
+public abstract class DelayedDelegatingAction extends AbstractDelegatingAction {
 
-  public DelayedDelegatingAction(final EventListenerContext eventListenerContext, final EventBotAction delegate) {
-    super(eventListenerContext, delegate);
-  }
+    public DelayedDelegatingAction(final EventListenerContext eventListenerContext, final EventBotAction delegate) {
+        super(eventListenerContext, delegate);
+    }
 
-  protected abstract long getDelay();
+    protected abstract long getDelay();
 
-  @Override
-  protected void doRun(final Event event, EventListener executingListener) throws Exception {
-    long delay = getDelay();
-    assert delay >= 0 : "delay must not be negative";
-    delegateDelayed(event, delay, executingListener);
-  }
+    @Override
+    protected void doRun(final Event event, EventListener executingListener) throws Exception {
+        long delay = getDelay();
+        assert delay >= 0 : "delay must not be negative";
+        delegateDelayed(event, delay, executingListener);
+    }
 }

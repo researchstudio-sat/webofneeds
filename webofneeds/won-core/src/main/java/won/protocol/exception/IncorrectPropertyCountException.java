@@ -21,45 +21,47 @@ import java.text.MessageFormat;
 /**
  * Exception indicating that an entity does not have the required number of properties.
  */
-public class IncorrectPropertyCountException extends DataIntegrityException
-{
-  private int expectedCount;
-  private int actualCount;
+public class IncorrectPropertyCountException extends DataIntegrityException {
+    private int expectedCount;
+    private int actualCount;
 
-  public IncorrectPropertyCountException(final int expectedCount, final int actualCount) {
-    this(MessageFormat.format("Incorrect property count, expected: {0}, actual: {1} (at least)", expectedCount,
-      actualCount), expectedCount, actualCount);
-  }
+    public IncorrectPropertyCountException(final int expectedCount, final int actualCount) {
+        this(MessageFormat.format("Incorrect property count, expected: {0}, actual: {1} (at least)", expectedCount,
+                actualCount), expectedCount, actualCount);
+    }
 
-  public IncorrectPropertyCountException(final String message, final int expectedCount, final int actualCount) {
-    super(message + ", expected: " + expectedCount + ", actual: " + actualCount);
-    this.expectedCount = expectedCount;
-    this.actualCount = actualCount;
-  }
+    public IncorrectPropertyCountException(final String message, final int expectedCount, final int actualCount) {
+        super(message + ", expected: " + expectedCount + ", actual: " + actualCount);
+        this.expectedCount = expectedCount;
+        this.actualCount = actualCount;
+    }
 
-  public IncorrectPropertyCountException(final String message, final Throwable cause, final int expectedCount, final int actualCount) {
-    super(message + ", expected: " + expectedCount + ", actual: " + actualCount, cause);
-    this.expectedCount = expectedCount;
-    this.actualCount = actualCount;
-  }
+    public IncorrectPropertyCountException(final String message, final Throwable cause, final int expectedCount,
+            final int actualCount) {
+        super(message + ", expected: " + expectedCount + ", actual: " + actualCount, cause);
+        this.expectedCount = expectedCount;
+        this.actualCount = actualCount;
+    }
 
-  public IncorrectPropertyCountException(final Throwable cause, final int expectedCount, final int actualCount) {
-    super(cause);
-    this.expectedCount = expectedCount;
-    this.actualCount = actualCount;
-  }
+    public IncorrectPropertyCountException(final Throwable cause, final int expectedCount, final int actualCount) {
+        super(cause);
+        this.expectedCount = expectedCount;
+        this.actualCount = actualCount;
+    }
 
-  public IncorrectPropertyCountException(final String message, final Throwable cause, final boolean enableSuppression, final boolean writableStackTrace, final int expectedCount, final int actualCount) {
-    super(message + ", expected: " + expectedCount + ", actual: " + actualCount, cause, enableSuppression, writableStackTrace);
-    this.expectedCount = expectedCount;
-    this.actualCount = actualCount;
-  }
+    public IncorrectPropertyCountException(final String message, final Throwable cause, final boolean enableSuppression,
+            final boolean writableStackTrace, final int expectedCount, final int actualCount) {
+        super(message + ", expected: " + expectedCount + ", actual: " + actualCount, cause, enableSuppression,
+                writableStackTrace);
+        this.expectedCount = expectedCount;
+        this.actualCount = actualCount;
+    }
 
-  public int getExpectedCount() {
-    return expectedCount;
-  }
+    public int getExpectedCount() {
+        return expectedCount;
+    }
 
-  public int getActualCount() {
-    return actualCount;
-  }
+    public int getActualCount() {
+        return actualCount;
+    }
 }

@@ -26,9 +26,9 @@ import won.protocol.message.processor.exception.WonMessageProcessingException;
  */
 public class EnvelopeAddingWonMessageProcessor implements WonMessageProcessor {
 
-  @Override
-  public WonMessage process(WonMessage message) throws WonMessageProcessingException {
-    return WonMessageBuilder.wrap(message).build();
-  }
+    @Override
+    public WonMessage process(WonMessage message) throws WonMessageProcessingException {
+        return WonMessageBuilder.wrap(message).build();
+    }
 
 }

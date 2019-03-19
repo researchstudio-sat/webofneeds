@@ -12,33 +12,24 @@ import won.protocol.model.Connection;
 import won.protocol.model.FacetType;
 
 /**
- * Created with IntelliJ IDEA.
- * User: gabriel
- * Date: 16.09.13
- * Time: 18:42
- * To change this template use File | Settings | File Templates.
+ * Created with IntelliJ IDEA. User: gabriel Date: 16.09.13 Time: 18:42 To change this template use File | Settings |
+ * File Templates.
  */
-public class ChatFacetImpl extends AbstractFacet
-{
+public class ChatFacetImpl extends AbstractFacet {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Override
-  public FacetType getFacetType() {
-      return FacetType.ChatFacet;
-  }
+    @Override
+    public FacetType getFacetType() {
+        return FacetType.ChatFacet;
+    }
 
-  @Override
-  public void connectFromNeed(final Connection con, final Model content, final WonMessage wonMessage)
-          throws NoSuchNeedException,
-    IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
+    @Override
+    public void connectFromNeed(final Connection con, final Model content, final WonMessage wonMessage)
+            throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
 
-    super.connectFromNeed(con, content, wonMessage);
-    /* when connected change linked data*/
+        super.connectFromNeed(con, content, wonMessage);
+        /* when connected change linked data */
 
-
-
-
-  }
-
+    }
 
 }

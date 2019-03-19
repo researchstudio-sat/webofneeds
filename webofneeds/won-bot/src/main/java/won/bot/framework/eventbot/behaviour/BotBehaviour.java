@@ -83,9 +83,10 @@ public abstract class BotBehaviour {
     /**
      * Activates the behaviour without passing a message object.
      */
-    public final void activate(){
+    public final void activate() {
         activate(Optional.empty());
     }
+
     /**
      * Activates the behaviour by registering listeners. If the onActivate method of the subclass throws an Exception,
      * the deactivate method is called. The specified optional message is passed to subclasses.
@@ -112,12 +113,14 @@ public abstract class BotBehaviour {
     /**
      * Deactivates the behaviour without passing a message.
      */
-    public final void deactivate(){
+    public final void deactivate() {
         deactivate(Optional.empty());
     }
+
     /**
-     * Deactivates the behaviour. Automatically unsubscribes every EventListener Instance that has been created.
-     * No traces of it must be left in the Event Bus after this method has finished. The specified optional message is passed to subclasses.
+     * Deactivates the behaviour. Automatically unsubscribes every EventListener Instance that has been created. No
+     * traces of it must be left in the Event Bus after this method has finished. The specified optional message is
+     * passed to subclasses.
      */
     public final synchronized void deactivate(Optional<Object> message) {
         try {
@@ -147,8 +150,8 @@ public abstract class BotBehaviour {
     }
 
     /**
-     * Deactivates the behaviour. No traces of it must be left in the Event Bus after this method has finished.
-     * No Implementation required if EventListeners are added with the subscribeWithAutoCleanup method.
+     * Deactivates the behaviour. No traces of it must be left in the Event Bus after this method has finished. No
+     * Implementation required if EventListeners are added with the subscribeWithAutoCleanup method.
      */
     protected void onCleanup() {
 
@@ -157,8 +160,8 @@ public abstract class BotBehaviour {
     ;
 
     /**
-     * Activates the behaviour by registering listeners, if you addListeners with the subscribeWithAutoCleanup method, you
-     * do not have to clean them within the onCleanup method.
+     * Activates the behaviour by registering listeners, if you addListeners with the subscribeWithAutoCleanup method,
+     * you do not have to clean them within the onCleanup method.
      */
     protected abstract void onActivate(Optional<Object> message);
 

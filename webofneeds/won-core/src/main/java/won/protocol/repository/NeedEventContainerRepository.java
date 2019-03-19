@@ -43,14 +43,11 @@ public interface NeedEventContainerRepository extends WonRepository<NeedEventCon
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select c from NeedEventContainer c join MessageEventPlaceholder msg on msg.parentURI = c.parentUri where msg.messageURI = :messageUri")
     public NeedEventContainer findOneByContainedMessageUriForUpdate(@Param("messageUri") URI messageUri);
-    
-    @Query("select case when (count(n) > 0) then true else false end " +
-            "from Need n left outer join Connection con on (n.needURI = con.needURI) "+
-            " where n.needURI = :needUri and "
-            + "( " +
-            "   n.needURI = :webId or " +
-            "   con.remoteNeedURI = :webId " +
-            ")")
+
+    @Query("select case when (count(n) > 0) then true else false end "
+            + "from Need n left outer join Connection con on (n.needURI = con.needURI) "
+            + " where n.needURI = :needUri and " + "( " + "   n.needURI = :webId or " + "   con.remoteNeedURI = :webId "
+            + ")")
     public boolean isReadPermittedForWebID(@Param("needUri") URI connectionUri, @Param("webId") URI webId);
 
 }

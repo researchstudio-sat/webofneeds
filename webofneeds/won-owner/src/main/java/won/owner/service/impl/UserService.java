@@ -35,10 +35,13 @@ public class UserService {
      * @param newPassword
      * @param privateUsername
      * @param privatePassword
-     * @throws UserAlreadyExistsException                   when the new User already exists
-     * @throws won.owner.service.impl.UserNotFoundException when the private User is not found
+     * @throws UserAlreadyExistsException
+     *             when the new User already exists
+     * @throws won.owner.service.impl.UserNotFoundException
+     *             when the private User is not found
      */
-    public User transferUser(String newEmail, String newPassword, String privateUsername, String privatePassword) throws UserAlreadyExistsException, UserNotFoundException {
+    public User transferUser(String newEmail, String newPassword, String privateUsername, String privatePassword)
+            throws UserAlreadyExistsException, UserNotFoundException {
         return transferUser(newEmail, newPassword, privateUsername, privatePassword, null);
     }
 
@@ -50,10 +53,13 @@ public class UserService {
      * @param privateUsername
      * @param privatePassword
      * @param role
-     * @throws UserAlreadyExistsException                   when the new User already exists
-     * @throws won.owner.service.impl.UserNotFoundException when the private User is not found
+     * @throws UserAlreadyExistsException
+     *             when the new User already exists
+     * @throws won.owner.service.impl.UserNotFoundException
+     *             when the private User is not found
      */
-    public User transferUser(String newEmail, String newPassword, String privateUsername, String privatePassword, String role) throws UserAlreadyExistsException, UserNotFoundException {
+    public User transferUser(String newEmail, String newPassword, String privateUsername, String privatePassword,
+            String role) throws UserAlreadyExistsException, UserNotFoundException {
         User user = getByUsername(newEmail);
         if (user != null) {
             throw new UserAlreadyExistsException();
@@ -66,13 +72,14 @@ public class UserService {
                 throw new UserNotFoundException();
             }
 
-            //change the username/email and keystorpw holder
+            // change the username/email and keystorpw holder
             privateUser.setUsername(newEmail);
             privateUser.setPassword(passwordEncoder.encode(newPassword));
             privateUser.setEmail(newEmail);
             privateUser.setEmailVerified(false);
             privateUser.setPrivateId(null);
-            privateUser.setAcceptedTermsOfService(true); //transfer only available when flag is set therefore we can just set this to true (i think)
+            privateUser.setAcceptedTermsOfService(true); // transfer only available when flag is set therefore we can
+                                                         // just set this to true (i think)
             if (role != null) {
                 privateUser.setRole(role);
             }
@@ -81,13 +88,11 @@ public class UserService {
 
             String keystorePassword = privateKeystorePassword.getPassword(privatePassword);
 
-            //************************************************
+            // ************************************************
             KeystorePasswordHolder newKeystorePassword = new KeystorePasswordHolder();
-            //generate a newPassword for the keystore and save it in the database, encrypted with a symmetric key
-            //derived from the user's new password
-            newKeystorePassword.setPassword(
-                    keystorePassword,
-                    newPassword);
+            // generate a newPassword for the keystore and save it in the database, encrypted with a symmetric key
+            // derived from the user's new password
+            newKeystorePassword.setPassword(keystorePassword, newPassword);
 
             privateUser.setKeystorePasswordHolder(newKeystorePassword);
             save(privateUser);
@@ -99,8 +104,8 @@ public class UserService {
     }
 
     /**
-     * Registers the specified user with password and an optional role.
-     * Assumes values have already been checked for syntactic validity.
+     * Registers the specified user with password and an optional role. Assumes values have already been checked for
+     * syntactic validity.
      *
      * @param email
      * @param password
@@ -113,8 +118,8 @@ public class UserService {
     }
 
     /**
-     * Registers the specified user with password and an optional role.
-     * Assumes values have already been checked for syntactic validity.
+     * Registers the specified user with password and an optional role. Assumes values have already been checked for
+     * syntactic validity.
      *
      * @param email
      * @param password
@@ -123,7 +128,8 @@ public class UserService {
      * @throws UserAlreadyExistsException
      * @returns the created User
      */
-    public User registerUser(String email, String password, String role, String privateId) throws UserAlreadyExistsException {
+    public User registerUser(String email, String password, String role, String privateId)
+            throws UserAlreadyExistsException {
         User user = getByUsername(email);
         if (user != null) {
             throw new UserAlreadyExistsException();
@@ -133,19 +139,19 @@ public class UserService {
             user = new User(email, passwordEncoder.encode(password), role);
             user.setEmail(email);
 
-            if(privateId != null) {
+            if (privateId != null) {
                 user.setPrivateId(privateId);
             }
 
-            user.setAcceptedTermsOfService(true); //transfer only available when flag is set therefore we can just set this to true (i think)
+            user.setAcceptedTermsOfService(true); // transfer only available when flag is set therefore we can just set
+                                                  // this to true (i think)
             KeystorePasswordHolder keystorePassword = new KeystorePasswordHolder();
-            //generate a password for the keystore and save it in the database, encrypted with a symmetric key
-            //derived from the user's password
+            // generate a password for the keystore and save it in the database, encrypted with a symmetric key
+            // derived from the user's password
             keystorePassword.setPassword(
-                    KeystorePasswordUtils.generatePassword(KeystorePasswordUtils.KEYSTORE_PASSWORD_BYTES),
-                    password);
-            //keystorePassword = keystorePasswordRepository.save(keystorePassword);
-            //generate the keystore for the user
+                    KeystorePasswordUtils.generatePassword(KeystorePasswordUtils.KEYSTORE_PASSWORD_BYTES), password);
+            // keystorePassword = keystorePasswordRepository.save(keystorePassword);
+            // generate the keystore for the user
             KeystoreHolder keystoreHolder = new KeystoreHolder();
             try {
                 // create the keystore if it doesnt exist yet
@@ -153,7 +159,7 @@ public class UserService {
             } catch (Exception e) {
                 throw new IllegalStateException("could not create keystore for user " + email);
             }
-            //keystoreHolder = keystoreHolderRepository.save(keystoreHolder);
+            // keystoreHolder = keystoreHolderRepository.save(keystoreHolder);
             user.setKeystorePasswordHolder(keystorePassword);
             user.setKeystoreHolder(keystoreHolder);
             save(user);
@@ -180,8 +186,9 @@ public class UserService {
     public EmailVerificationToken getEmailVerificationToken(User user) {
         List<EmailVerificationToken> tokens = emailVerificationRepository.findByUser(user);
 
-        for(EmailVerificationToken token : tokens) {
-            if(!token.isExpired()) return token;
+        for (EmailVerificationToken token : tokens) {
+            if (!token.isExpired())
+                return token;
         }
         return null;
     }

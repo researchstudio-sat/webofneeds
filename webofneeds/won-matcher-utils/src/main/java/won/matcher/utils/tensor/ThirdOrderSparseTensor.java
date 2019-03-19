@@ -35,12 +35,11 @@ import org.la4j.vector.functor.VectorProcedure;
 /**
  * Sparse third order tensor based on la4j implementation of sparse matrices.
  * <p/>
- * User: hfriedrich
- * Date: 09.07.2014
+ * User: hfriedrich Date: 09.07.2014
  */
 public class ThirdOrderSparseTensor {
 
-    //private CCSMatrix[] slices;
+    // private CCSMatrix[] slices;
 
     private ArrayList<CCSMatrix> slices;
     private int[] dims;
@@ -59,7 +58,7 @@ public class ThirdOrderSparseTensor {
                 slices.set(x3, slices.get(x3).copyOfShape(dimX1, dimX2).to(Matrices.CCS));
             }
         }
-        dims = new int[]{dimX1, dimX2, slices.size()};
+        dims = new int[] { dimX1, dimX2, slices.size() };
     }
 
     public void setEntry(double value, int x1, int x2, int x3) {
@@ -68,7 +67,7 @@ public class ThirdOrderSparseTensor {
             for (int i = slices.size(); i <= x3; i++) {
                 slices.add(i, CCSMatrix.zero(dims[0], dims[1]));
             }
-            dims = new int[]{dims[0], dims[1], slices.size()};
+            dims = new int[] { dims[0], dims[1], slices.size() };
         }
         slices.get(x3).set(x1, x2, value);
     }

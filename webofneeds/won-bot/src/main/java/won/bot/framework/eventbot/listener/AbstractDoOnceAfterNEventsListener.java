@@ -21,93 +21,81 @@ import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.filter.EventFilter;
 
 /**
- * Counts how often it is called, offers to call a callback when a certain number is reached.
- * After the target count of events is reached, a FinishedEvent is published. This allows for chaining listeners.
+ * Counts how often it is called, offers to call a callback when a certain number is reached. After the target count of
+ * events is reached, a FinishedEvent is published. This allows for chaining listeners.
  */
-public abstract class AbstractDoOnceAfterNEventsListener extends BaseEventListener implements CountingListener
-{
-  private int targetCount;
-  private int count = 0;
-  private Object monitor = new Object();
-  private boolean finished = false;
+public abstract class AbstractDoOnceAfterNEventsListener extends BaseEventListener implements CountingListener {
+    private int targetCount;
+    private int count = 0;
+    private Object monitor = new Object();
+    private boolean finished = false;
 
-  public AbstractDoOnceAfterNEventsListener(final EventListenerContext context, int targetCount)
-  {
-    super(context);
-    this.targetCount = targetCount;
-  }
-
-  protected AbstractDoOnceAfterNEventsListener(final EventListenerContext context, final EventFilter eventFilter, final int targetCount)
-  {
-    super(context, eventFilter);
-    this.targetCount = targetCount;
-  }
-
-  protected AbstractDoOnceAfterNEventsListener(final EventListenerContext context, final String name, final int targetCount)
-  {
-    super(context, name);
-    this.targetCount = targetCount;
-  }
-
-  protected AbstractDoOnceAfterNEventsListener(final EventListenerContext context, final String name, final EventFilter eventFilter, final int targetCount)
-  {
-    super(context, name, eventFilter);
-    this.targetCount = targetCount;
-  }
-
-  @Override
-  public void doOnEvent(final Event event) throws Exception
-  {
-    boolean doRun = false;
-    synchronized (monitor){
-      if (finished){
-        return;
-      }
-      count++;
-      logger.debug("processing event {} of {} (event: {})", new Object[]{count, targetCount, event});
-      if (count >= targetCount) {
-        logger.debug("calling doOnce");
-        doRun = true;
-      }
+    public AbstractDoOnceAfterNEventsListener(final EventListenerContext context, int targetCount) {
+        super(context);
+        this.targetCount = targetCount;
     }
-    if (doRun) {
-      doOnce(event);
-      logger.debug("unsubscribing from event");
-      unsubscribe();
-      publishFinishedEvent();
-      finished = true;
+
+    protected AbstractDoOnceAfterNEventsListener(final EventListenerContext context, final EventFilter eventFilter,
+            final int targetCount) {
+        super(context, eventFilter);
+        this.targetCount = targetCount;
     }
-  }
 
-  protected abstract void unsubscribe();
+    protected AbstractDoOnceAfterNEventsListener(final EventListenerContext context, final String name,
+            final int targetCount) {
+        super(context, name);
+        this.targetCount = targetCount;
+    }
 
-  protected abstract void doOnce(final Event event) throws Exception;
+    protected AbstractDoOnceAfterNEventsListener(final EventListenerContext context, final String name,
+            final EventFilter eventFilter, final int targetCount) {
+        super(context, name, eventFilter);
+        this.targetCount = targetCount;
+    }
 
+    @Override
+    public void doOnEvent(final Event event) throws Exception {
+        boolean doRun = false;
+        synchronized (monitor) {
+            if (finished) {
+                return;
+            }
+            count++;
+            logger.debug("processing event {} of {} (event: {})", new Object[] { count, targetCount, event });
+            if (count >= targetCount) {
+                logger.debug("calling doOnce");
+                doRun = true;
+            }
+        }
+        if (doRun) {
+            doOnce(event);
+            logger.debug("unsubscribing from event");
+            unsubscribe();
+            publishFinishedEvent();
+            finished = true;
+        }
+    }
 
-  public int getTargetCount()
-  {
-    return targetCount;
-  }
+    protected abstract void unsubscribe();
 
-  public int getCount()
-  {
-    return count;
-  }
+    protected abstract void doOnce(final Event event) throws Exception;
 
-  @Override
-  public boolean isFinished()
-  {
-    return finished;
-  }
+    public int getTargetCount() {
+        return targetCount;
+    }
 
-  @Override
-  public String toString()
-  {
-    return getClass().getSimpleName() +
-        "{name='" + name +
-        ", count=" + count +
-        ",targetCount=" + targetCount +
-        ", finished=" + finished +
-        '}';
-  }
+    public int getCount() {
+        return count;
+    }
+
+    @Override
+    public boolean isFinished() {
+        return finished;
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "{name='" + name + ", count=" + count + ",targetCount=" + targetCount
+                + ", finished=" + finished + '}';
+    }
 }

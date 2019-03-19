@@ -16,13 +16,11 @@
 
 package won.bot.framework.eventbot.listener;
 
-
 import won.bot.framework.eventbot.event.Event;
 
 /**
  * Event listener interface.
  */
-public interface EventListener
-{
-  public void onEvent(Event event) throws Exception;
+public interface EventListener {
+    public void onEvent(Event event) throws Exception;
 }

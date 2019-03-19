@@ -21,10 +21,8 @@ import won.bot.framework.eventbot.filter.EventFilter;
 /**
  * Delegating filter that only accepts once.
  */
-public class AcceptOnceFilter extends AcceptNTimesFilter
-{
-  public AcceptOnceFilter(final EventFilter delegate)
-  {
-    super(delegate, 1);
-  }
+public class AcceptOnceFilter extends AcceptNTimesFilter {
+    public AcceptOnceFilter(final EventFilter delegate) {
+        super(delegate, 1);
+    }
 }

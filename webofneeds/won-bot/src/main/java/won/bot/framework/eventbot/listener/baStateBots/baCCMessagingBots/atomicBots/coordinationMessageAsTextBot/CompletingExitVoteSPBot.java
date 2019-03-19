@@ -9,20 +9,18 @@ import won.bot.framework.eventbot.listener.baStateBots.BATestScriptAction;
 import won.node.facet.impl.WON_TX;
 
 /**
- * User: Danijel
- * Date: 24.4.14.
+ * User: Danijel Date: 24.4.14.
  */
-public class CompletingExitVoteSPBot extends BATestBotScript
-{
+public class CompletingExitVoteSPBot extends BATestBotScript {
 
-  @Override
-  protected List<BATestScriptAction> setupActions() {
-    List<BATestScriptAction> actions = new ArrayList();
+    @Override
+    protected List<BATestScriptAction> setupActions() {
+        List<BATestScriptAction> actions = new ArrayList();
 
-    actions.add(new BATestScriptAction(true, "MESSAGE_EXIT", URI.create(WON_TX.STATE_COMPLETING.getURI())));
-    //no vote!
-    actions.add(new BATestScriptAction(false, "MESSAGE_EXITED", URI.create(WON_TX.STATE_EXITING.getURI())));
+        actions.add(new BATestScriptAction(true, "MESSAGE_EXIT", URI.create(WON_TX.STATE_COMPLETING.getURI())));
+        // no vote!
+        actions.add(new BATestScriptAction(false, "MESSAGE_EXITED", URI.create(WON_TX.STATE_EXITING.getURI())));
 
-    return actions;
-  }
+        return actions;
+    }
 }

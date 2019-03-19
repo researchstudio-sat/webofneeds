@@ -18,7 +18,6 @@ package won.bot.framework.eventbot.bus.impl;
 
 import java.util.Map;
 
-
 /**
  * Created by fkleedorfer on 30.03.2017.
  */
@@ -37,7 +36,6 @@ public class EventBusStatistics {
     }
 
     public EventBusStatistics() {
-
 
     }
 

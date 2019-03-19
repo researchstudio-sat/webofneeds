@@ -24,21 +24,19 @@ import won.bot.framework.eventbot.listener.EventListener;
 /**
  * Filter that only accepts a FinishedEvent for a specific listener.
  */
-public class FinishedEventFilter implements EventFilter
-{
-  EventListener listener;
+public class FinishedEventFilter implements EventFilter {
+    EventListener listener;
 
-  public FinishedEventFilter(final EventListener listener)
-  {
-    this.listener = listener;
-  }
-
-  @Override
-  public boolean accept(final Event event)
-  {
-    if (event instanceof FinishedEvent){
-      if ( ((FinishedEvent)event).getListener() == listener) return true;
+    public FinishedEventFilter(final EventListener listener) {
+        this.listener = listener;
     }
-    return false;
-  }
+
+    @Override
+    public boolean accept(final Event event) {
+        if (event instanceof FinishedEvent) {
+            if (((FinishedEvent) event).getListener() == listener)
+                return true;
+        }
+        return false;
+    }
 }

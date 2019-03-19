@@ -25,17 +25,14 @@ import won.bot.framework.component.needconsumer.NeedConsumer;
 /**
  * Prints needs to sysout.
  */
-public class SysoutNeedConsumer implements NeedConsumer
-{
-  @Override
-  public void consume(final Dataset need)
-  {
-    RDFDataMgr.write(System.out, need, Lang.TTL);
-  }
+public class SysoutNeedConsumer implements NeedConsumer {
+    @Override
+    public void consume(final Dataset need) {
+        RDFDataMgr.write(System.out, need, Lang.TTL);
+    }
 
-  @Override
-  public boolean isExhausted()
-  {
-    return true;
-  }
+    @Override
+    public boolean isExhausted() {
+        return true;
+    }
 }

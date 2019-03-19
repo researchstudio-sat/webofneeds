@@ -26,56 +26,53 @@ import won.matcher.service.common.service.sparql.SparqlService;
  */
 @Component
 @Scope("prototype")
-public class SaveNeedEventActor extends UntypedActor
-{
-  private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
-  private ActorRef pubSubMediator;
+public class SaveNeedEventActor extends UntypedActor {
+    private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
+    private ActorRef pubSubMediator;
 
-  @Autowired
-  private SparqlService sparqlService;
+    @Autowired
+    private SparqlService sparqlService;
 
-  @Override
-  public void preStart() {
+    @Override
+    public void preStart() {
 
-    // Subscribe for need events
-    pubSubMediator = DistributedPubSub.get(getContext().system()).mediator();
-    pubSubMediator.tell(new DistributedPubSubMediator.Subscribe(NeedEvent.class.getName(), getSelf()), getSelf());
-  }
-
-  @Override
-  public void onReceive(final Object o) throws Exception {
-
-    if (o instanceof NeedEvent) {
-      NeedEvent needEvent = (NeedEvent) o;
-
-      // save the need
-      log.debug("Save need event {} to sparql endpoint {}", needEvent, sparqlService.getSparqlEndpoint());
-      Dataset ds = needEvent.deserializeNeedDataset();
-      sparqlService.updateNamedGraphsOfDataset(ds);
-
-    } else {
-      unhandled(o);
+        // Subscribe for need events
+        pubSubMediator = DistributedPubSub.get(getContext().system()).mediator();
+        pubSubMediator.tell(new DistributedPubSubMediator.Subscribe(NeedEvent.class.getName(), getSelf()), getSelf());
     }
-  }
 
+    @Override
+    public void onReceive(final Object o) throws Exception {
 
-  @Override
-  public SupervisorStrategy supervisorStrategy() {
+        if (o instanceof NeedEvent) {
+            NeedEvent needEvent = (NeedEvent) o;
 
-    SupervisorStrategy supervisorStrategy = new OneForOneStrategy(
-      0, Duration.Zero(), new Function<Throwable, SupervisorStrategy.Directive>()
-    {
+            // save the need
+            log.debug("Save need event {} to sparql endpoint {}", needEvent, sparqlService.getSparqlEndpoint());
+            Dataset ds = needEvent.deserializeNeedDataset();
+            sparqlService.updateNamedGraphsOfDataset(ds);
 
-      @Override
-      public SupervisorStrategy.Directive apply(Throwable t) throws Exception {
+        } else {
+            unhandled(o);
+        }
+    }
 
-        log.warning("Actor encountered error: {}", t);
-        // default behaviour
-        return SupervisorStrategy.escalate();
-      }
-    });
+    @Override
+    public SupervisorStrategy supervisorStrategy() {
 
-    return supervisorStrategy;
-  }
+        SupervisorStrategy supervisorStrategy = new OneForOneStrategy(0, Duration.Zero(),
+                new Function<Throwable, SupervisorStrategy.Directive>() {
+
+                    @Override
+                    public SupervisorStrategy.Directive apply(Throwable t) throws Exception {
+
+                        log.warning("Actor encountered error: {}", t);
+                        // default behaviour
+                        return SupervisorStrategy.escalate();
+                    }
+                });
+
+        return supervisorStrategy;
+    }
 
 }

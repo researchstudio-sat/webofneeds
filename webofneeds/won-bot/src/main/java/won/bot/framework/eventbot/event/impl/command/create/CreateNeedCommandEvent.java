@@ -27,23 +27,23 @@ import won.bot.framework.eventbot.event.impl.command.MessageCommandEvent;
 import won.protocol.message.WonMessageType;
 import won.protocol.model.FacetType;
 
-
 /**
  * Instructs the bot to create a need.
  */
 public class CreateNeedCommandEvent implements MessageCommandEvent {
-    //the model of the need's content
+    // the model of the need's content
     private Dataset needDataset;
-    //the facets the new need should have
+    // the facets the new need should have
     private List<URI> facets;
-    //the name of the need uri list to save the need uri to
+    // the name of the need uri list to save the need uri to
     private String uriListName = BotContext.DEFAULT_NEED_LIST_NAME;
-    //sets the UsedForTesting flag
+    // sets the UsedForTesting flag
     private boolean usedForTesting = false;
-    //sets the do not match flag
+    // sets the do not match flag
     private boolean doNotMatch = false;
 
-    public CreateNeedCommandEvent(Dataset needDataset, String uriListName, boolean usedForTesting, boolean doNotMatch, URI... facets) {
+    public CreateNeedCommandEvent(Dataset needDataset, String uriListName, boolean usedForTesting, boolean doNotMatch,
+            URI... facets) {
         this.needDataset = needDataset;
         if (this.uriListName != null) {
             this.uriListName = uriListName;
@@ -51,11 +51,12 @@ public class CreateNeedCommandEvent implements MessageCommandEvent {
         if (facets != null && facets.length > 0) {
             this.facets = Arrays.asList(facets);
         } else {
-            this.facets = Arrays.asList(new URI[]{FacetType.ChatFacet.getURI()});
+            this.facets = Arrays.asList(new URI[] { FacetType.ChatFacet.getURI() });
         }
         this.usedForTesting = usedForTesting;
         this.doNotMatch = doNotMatch;
     }
+
     public CreateNeedCommandEvent(Dataset needDataset, String uriListName, URI... facets) {
         this(needDataset, uriListName, false, false, facets);
     }
@@ -76,8 +77,6 @@ public class CreateNeedCommandEvent implements MessageCommandEvent {
     public WonMessageType getWonMessageType() {
         return WonMessageType.CREATE_NEED;
     }
-
-
 
     public Dataset getNeedDataset() {
         return needDataset;

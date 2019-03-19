@@ -36,10 +36,10 @@ public class SendMessageFromNodeReactionProcessor extends AbstractCamelProcessor
         Objects.nonNull(message);
         WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
         Objects.nonNull(wonMessage);
-        logger.debug("reacting to ConnectionMessage {}", wonMessage.getMessageURI());        
+        logger.debug("reacting to ConnectionMessage {}", wonMessage.getMessageURI());
         List<URI> injectTargets = wonMessage.getInjectIntoConnectionURIs();
         if (injectTargets.isEmpty()) {
-            logger.debug("no injection attempted - nothing to do for us here");            
+            logger.debug("no injection attempted - nothing to do for us here");
             return;
         }
         injectTargets.forEach(target -> {
@@ -69,8 +69,8 @@ public class SendMessageFromNodeReactionProcessor extends AbstractCamelProcessor
             return;
         }
         if (logger.isDebugEnabled()) {
-            logger.debug("injecting message {} received from need {} to connection {}",
-                    new Object[] { wonMessage.getMessageURI(), wonMessage.getSenderNeedURI(), conToSendTo.getConnectionURI() });
+            logger.debug("injecting message {} received from need {} to connection {}", new Object[] {
+                    wonMessage.getMessageURI(), wonMessage.getSenderNeedURI(), conToSendTo.getConnectionURI() });
         }
         URI injectedMessageURI = wonNodeInformationService.generateEventURI(wonMessage.getReceiverNodeURI());
         URI remoteWonNodeUri = WonLinkedDataUtils

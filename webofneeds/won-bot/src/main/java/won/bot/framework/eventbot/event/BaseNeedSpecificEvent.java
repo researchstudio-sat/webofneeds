@@ -21,23 +21,20 @@ import java.net.URI;
 /**
  *
  */
-public abstract class BaseNeedSpecificEvent extends BaseEvent implements NeedSpecificEvent
-{
-  private final URI needURI;
+public abstract class BaseNeedSpecificEvent extends BaseEvent implements NeedSpecificEvent {
+    private final URI needURI;
 
-  protected BaseNeedSpecificEvent(final URI needURI) {
-    this.needURI = needURI;
-  }
+    protected BaseNeedSpecificEvent(final URI needURI) {
+        this.needURI = needURI;
+    }
 
-  @Override
-  public URI getNeedURI() {
-    return needURI;
-  }
+    @Override
+    public URI getNeedURI() {
+        return needURI;
+    }
 
-  @Override
-  public String toString() {
-    return getClass().getSimpleName()+ "{" +
-      "needURI=" + getNeedURI() +
-      '}';
-  }
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "{" + "needURI=" + getNeedURI() + '}';
+    }
 }

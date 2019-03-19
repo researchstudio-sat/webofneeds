@@ -29,50 +29,50 @@ import won.protocol.message.WonMessage;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.NeedRepository;
 
-public class MatcherProtocolMatcherClientImpl implements MatcherProtocolMatcherServiceClientSide
-{
-  final Logger logger = LoggerFactory.getLogger(getClass());
+public class MatcherProtocolMatcherClientImpl implements MatcherProtocolMatcherServiceClientSide {
+    final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Autowired
-  private MessagingService messagingService;
+    @Autowired
+    private MessagingService messagingService;
 
-  @Autowired
-  private NeedRepository needRepository;
+    @Autowired
+    private NeedRepository needRepository;
 
-  @Autowired
-  private ConnectionRepository connectionRepository;
+    @Autowired
+    private ConnectionRepository connectionRepository;
 
-  private MatcherProtocolMatcherServiceClientSide delegate;
+    private MatcherProtocolMatcherServiceClientSide delegate;
 
-  @Override
-  public void matcherRegistered(final URI wonNodeURI, final WonMessage wonMessage) {
-    logger.debug("calling matcherRegistered");
-    delegate.matcherRegistered(wonNodeURI, wonMessage);
-  }
+    @Override
+    public void matcherRegistered(final URI wonNodeURI, final WonMessage wonMessage) {
+        logger.debug("calling matcherRegistered");
+        delegate.matcherRegistered(wonNodeURI, wonMessage);
+    }
 
-  @Override
-  public void needCreated(final URI needURI, final Model content, final WonMessage wonMessage)
-  {
-    logger.debug("calling needCreated for needURI {}", needURI);
-    delegate.needCreated(needURI, content, wonMessage);
+    @Override
+    public void needCreated(final URI needURI, final Model content, final WonMessage wonMessage) {
+        logger.debug("calling needCreated for needURI {}", needURI);
+        delegate.needCreated(needURI, content, wonMessage);
 
-  }
-  @Override
-  public void needActivated(final URI needURI, final WonMessage wonMessage){
-    logger.debug("calling needActivated for needURI {}", needURI);
-    delegate.needActivated(needURI, wonMessage);
-  }
-  @Override
-  public void needDeactivated(final URI needURI, final WonMessage wonMessage){
-    logger.debug("calling needDeactivated for needURI {}", needURI);
-    delegate.needDeactivated(needURI, wonMessage);
-  }
-  @Override
-  public void needDeleted(final URI needURI, final WonMessage wonMessage){
-    logger.debug("calling needDeleted for needURI {}", needURI);
-    delegate.needDeleted(needURI, wonMessage);
-  }
+    }
 
+    @Override
+    public void needActivated(final URI needURI, final WonMessage wonMessage) {
+        logger.debug("calling needActivated for needURI {}", needURI);
+        delegate.needActivated(needURI, wonMessage);
+    }
+
+    @Override
+    public void needDeactivated(final URI needURI, final WonMessage wonMessage) {
+        logger.debug("calling needDeactivated for needURI {}", needURI);
+        delegate.needDeactivated(needURI, wonMessage);
+    }
+
+    @Override
+    public void needDeleted(final URI needURI, final WonMessage wonMessage) {
+        logger.debug("calling needDeleted for needURI {}", needURI);
+        delegate.needDeleted(needURI, wonMessage);
+    }
 
     public void setNeedRepository(NeedRepository needRepository) {
         this.needRepository = needRepository;

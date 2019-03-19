@@ -23,29 +23,32 @@ import won.protocol.service.WonNodeInformationService;
 import won.protocol.service.impl.WonNodeInformationServiceDecorator;
 
 /**
- * Decorates the EventListenerContext such that NeedURIs generated through the WonNodeInformationService
- * are always the same.
+ * Decorates the EventListenerContext such that NeedURIs generated through the WonNodeInformationService are always the
+ * same.
  */
 public class ConstantNewNeedURIDecorator extends BaseEventListenerContextDecorator {
-  public ConstantNewNeedURIDecorator(EventListenerContext delegate, String needURISuffix) {
-    super(delegate);
-    this.needURISuffix = needURISuffix;
-  }
-  private String needURISuffix;
+    public ConstantNewNeedURIDecorator(EventListenerContext delegate, String needURISuffix) {
+        super(delegate);
+        this.needURISuffix = needURISuffix;
+    }
 
-  @Override
-  public WonNodeInformationService getWonNodeInformationService() {
-    WonNodeInformationService delegate = super.getWonNodeInformationService();
-    return new WonNodeInformationServiceDecorator(delegate) {
-      @Override
-      public URI generateNeedURI() {
-        return URI.create(getDelegate().getWonNodeInformation(getDefaultWonNodeURI()).getNeedURIPrefix()  +"/"+ needURISuffix);
-      }
+    private String needURISuffix;
 
-      @Override
-      public URI generateNeedURI(URI wonNodeURI) {
-        return URI.create(getDelegate().getWonNodeInformation(wonNodeURI).getNeedURIPrefix()  +"/"+ needURISuffix);
-      }
-    };
-  }
+    @Override
+    public WonNodeInformationService getWonNodeInformationService() {
+        WonNodeInformationService delegate = super.getWonNodeInformationService();
+        return new WonNodeInformationServiceDecorator(delegate) {
+            @Override
+            public URI generateNeedURI() {
+                return URI.create(getDelegate().getWonNodeInformation(getDefaultWonNodeURI()).getNeedURIPrefix() + "/"
+                        + needURISuffix);
+            }
+
+            @Override
+            public URI generateNeedURI(URI wonNodeURI) {
+                return URI.create(
+                        getDelegate().getWonNodeInformation(wonNodeURI).getNeedURIPrefix() + "/" + needURISuffix);
+            }
+        };
+    }
 }

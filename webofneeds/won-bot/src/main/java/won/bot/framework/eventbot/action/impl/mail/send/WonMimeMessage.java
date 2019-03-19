@@ -32,7 +32,7 @@ public class WonMimeMessage extends MimeMessage {
 
     @Override
     public void updateMessageID() throws MessagingException {
-        if(getHeader("Message-Id") == null) {
+        if (getHeader("Message-Id") == null) {
             super.updateMessageID();
         }
     }

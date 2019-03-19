@@ -22,9 +22,8 @@ import won.bot.framework.bot.Bot;
  * Indicates that an integration test succeeded.
  */
 public class TestPassedEvent extends TestFinishedEvent {
-  public TestPassedEvent(Bot bot) {
-    super(bot);
-  }
+    public TestPassedEvent(Bot bot) {
+        super(bot);
+    }
 
 }
-

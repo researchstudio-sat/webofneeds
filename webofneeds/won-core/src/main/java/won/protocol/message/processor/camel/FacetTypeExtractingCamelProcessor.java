@@ -30,8 +30,7 @@ import won.protocol.repository.ConnectionRepository;
 import won.protocol.vocabulary.WONMSG;
 
 /**
- * Extracts the facet looking into the 'wonConnectionURI' header and looking up
- * the connection in the db
+ * Extracts the facet looking into the 'wonConnectionURI' header and looking up the connection in the db
  */
 public class FacetTypeExtractingCamelProcessor implements Processor {
     @Autowired

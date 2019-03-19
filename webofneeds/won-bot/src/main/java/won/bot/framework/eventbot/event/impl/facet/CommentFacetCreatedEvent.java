@@ -24,11 +24,9 @@ import won.bot.framework.eventbot.event.BaseEvent;
 import won.protocol.model.FacetType;
 
 /**
- * User: LEIH-NB
- * Date: 05.02.14
+ * User: LEIH-NB Date: 05.02.14
  */
-public class CommentFacetCreatedEvent extends BaseEvent
-{
+public class CommentFacetCreatedEvent extends BaseEvent {
     private URI commentFacetURI;
     private URI wonNodeURI;
     private Model model;
@@ -53,7 +51,4 @@ public class CommentFacetCreatedEvent extends BaseEvent
         return model;
     }
 
-
 }
-
-

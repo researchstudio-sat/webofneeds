@@ -31,9 +31,8 @@ import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 
 /**
-* User: fkleedorfer
-* Date: 28.03.14
-*/
+ * User: fkleedorfer Date: 28.03.14
+ */
 public class DeactivateAllNeedsOfListAction extends BaseEventBotAction {
     private String uriListName;
 
@@ -47,7 +46,7 @@ public class DeactivateAllNeedsOfListAction extends BaseEventBotAction {
         EventListenerContext ctx = getEventListenerContext();
 
         Collection<URI> toDeactivate = ctx.getBotContext().getNamedNeedUriList(uriListName);
-        for (URI uri: toDeactivate){
+        for (URI uri : toDeactivate) {
             ctx.getWonMessageSender().sendWonMessage(createWonMessage(uri));
             ctx.getEventBus().publish(new NeedDeactivatedEvent(uri));
         }
@@ -56,13 +55,10 @@ public class DeactivateAllNeedsOfListAction extends BaseEventBotAction {
     private WonMessage createWonMessage(URI needURI) throws WonMessageBuilderException {
         WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
 
-        URI localWonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(getEventListenerContext().getLinkedDataSource().getDataForResource(needURI), needURI);
-
+        URI localWonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(
+                getEventListenerContext().getLinkedDataSource().getDataForResource(needURI), needURI);
 
         return WonMessageBuilder.setMessagePropertiesForDeactivateFromOwner(
-                  wonNodeInformationService.generateEventURI(localWonNode),
-                  needURI,
-                  localWonNode)
-                  .build();
+                wonNodeInformationService.generateEventURI(localWonNode), needURI, localWonNode).build();
     }
 }

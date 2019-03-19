@@ -29,35 +29,32 @@ import won.bot.framework.component.nodeurisource.NodeURISource;
 /**
  * NodeUriSource that is given a list of URIs and returns each element in a round robin fashion.
  */
-public class RoundRobinMultiNodeUriSource implements NodeURISource
-{
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-  private List<URI> nodeURIs = null;
-  private int lastIndex = -1;
+public class RoundRobinMultiNodeUriSource implements NodeURISource {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private List<URI> nodeURIs = null;
+    private int lastIndex = -1;
 
-
-  @Override
-  public URI getNodeURI()
-  {
-    if (this.nodeURIs == null || this.nodeURIs.isEmpty()) return null;
-    int index = lastIndex + 1;
-    if (index >= this.nodeURIs.size()){
-      index = 0;
+    @Override
+    public URI getNodeURI() {
+        if (this.nodeURIs == null || this.nodeURIs.isEmpty())
+            return null;
+        int index = lastIndex + 1;
+        if (index >= this.nodeURIs.size()) {
+            index = 0;
+        }
+        URI nodeUri = this.nodeURIs.get(index);
+        this.lastIndex = index;
+        logger.debug("using node URI '{}'", nodeUri);
+        return nodeUri;
     }
-    URI nodeUri =  this.nodeURIs.get(index);
-    this.lastIndex = index;
-    logger.debug("using node URI '{}'", nodeUri);
-    return nodeUri;
-  }
 
-  public void setNodeURIs(final Collection<URI> nodeURIs)
-  {
-    if (nodeURIs == null){
-      this.nodeURIs = new ArrayList<URI>();
-    } else {
-      this.nodeURIs = new ArrayList<URI>(nodeURIs.size());
-      this.nodeURIs.addAll(nodeURIs);
+    public void setNodeURIs(final Collection<URI> nodeURIs) {
+        if (nodeURIs == null) {
+            this.nodeURIs = new ArrayList<URI>();
+        } else {
+            this.nodeURIs = new ArrayList<URI>(nodeURIs.size());
+            this.nodeURIs.addAll(nodeURIs);
+        }
     }
-  }
 
 }

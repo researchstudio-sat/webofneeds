@@ -32,49 +32,42 @@ import won.bot.framework.eventbot.listener.EventListener;
 /**
  *
  */
-public abstract class BaseEventBotAction implements won.bot.framework.eventbot.action.EventBotAction
-{
-  protected final Logger logger = LoggerFactory.getLogger(getClass());
-  private EventListenerContext eventListenerContext;
-  private static final String EXCEPTION_TAG = "failed";
-  private final String stopwatchName = getClass().getName();
+public abstract class BaseEventBotAction implements won.bot.framework.eventbot.action.EventBotAction {
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
+    private EventListenerContext eventListenerContext;
+    private static final String EXCEPTION_TAG = "failed";
+    private final String stopwatchName = getClass().getName();
 
-  protected BaseEventBotAction(final EventListenerContext eventListenerContext)
-  {
-    Objects.requireNonNull(eventListenerContext);
-    this.eventListenerContext = eventListenerContext;
-  }
+    protected BaseEventBotAction(final EventListenerContext eventListenerContext) {
+        Objects.requireNonNull(eventListenerContext);
+        this.eventListenerContext = eventListenerContext;
+    }
 
-  @Override
-  public Runnable getActionTask(final Event event, final EventListener eventListener) {
-    return new Runnable(){
-      public void run()
-      {
-        Stopwatch stopwatch = SimonManager.getStopwatch(stopwatchName);
-        Split split = stopwatch.start();
-        try {
-          doRun(event, eventListener);
-          split.stop();
-        } catch (Exception e) {
-          eventListenerContext.getEventBus().publish(new ErrorEvent(e));
-          split.stop(EXCEPTION_TAG);
-        } catch (Throwable t) {
-          logger.warn("could not run action {}", stopwatchName, t);
-          split.stop(EXCEPTION_TAG);
-          throw t;
-        }
-      }
-    };
-  }
+    @Override
+    public Runnable getActionTask(final Event event, final EventListener eventListener) {
+        return new Runnable() {
+            public void run() {
+                Stopwatch stopwatch = SimonManager.getStopwatch(stopwatchName);
+                Split split = stopwatch.start();
+                try {
+                    doRun(event, eventListener);
+                    split.stop();
+                } catch (Exception e) {
+                    eventListenerContext.getEventBus().publish(new ErrorEvent(e));
+                    split.stop(EXCEPTION_TAG);
+                } catch (Throwable t) {
+                    logger.warn("could not run action {}", stopwatchName, t);
+                    split.stop(EXCEPTION_TAG);
+                    throw t;
+                }
+            }
+        };
+    }
 
+    protected EventListenerContext getEventListenerContext() {
+        return eventListenerContext;
+    }
 
-
-  protected EventListenerContext getEventListenerContext()
-  {
-    return eventListenerContext;
-  }
-
-  protected abstract void doRun(Event event, EventListener executingListener) throws Exception;
-
+    protected abstract void doRun(Event event, EventListener executingListener) throws Exception;
 
 }

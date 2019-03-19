@@ -34,48 +34,45 @@ import won.bot.framework.component.needproducer.FileBasedNeedProducer;
 import won.protocol.util.DefaultNeedModelWrapper;
 
 /**
- * User: fkleedorfer
- * Date: 17.12.13
+ * User: fkleedorfer Date: 17.12.13
  */
-public class MailFileNeedProducer implements FileBasedNeedProducer
-{
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+public class MailFileNeedProducer implements FileBasedNeedProducer {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Override
-  public  synchronized Dataset readNeedFromFile(final File file) throws IOException
-  {
-    logger.debug("processing as mail file: {} ", file);
-    FileInputStream fis = new FileInputStream(file);
-    DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper("no:uri");
-    try {
-      MimeMessage emailMessage = new MimeMessage(null, fis);
-      MimeMessageParser parser = new MimeMessageParser(emailMessage);
-      parser.parse();
-      needModelWrapper.setTitle(parser.getSubject());
-      String content = null;
-      if (parser.hasPlainContent()){
-        content = parser.getPlainContent();
-      } else if (parser.hasHtmlContent()){
-        Document doc = Jsoup.parse(parser.getHtmlContent());
-        content = doc.text();
-      }
-      if (content != null) {
-        needModelWrapper.setDescription(content);
-      }
-      logger.debug("mail subject          : {}", parser.getSubject());
-      logger.debug("mail has plain content: {}", parser.hasPlainContent());
-      logger.debug("mail has html content : {}", parser.hasHtmlContent());
-      logger.debug("mail has attachments  : {}", parser.hasAttachments());
-      logger.debug("mail plain content    : {}", StringUtils.abbreviate(parser.getPlainContent(), 200));
-      logger.debug("mail html content     : {}", StringUtils.abbreviate(parser.getHtmlContent(), 200));
-      return needModelWrapper.copyDataset();
-    } catch (Exception e) {
-      logger.error("could not parse email from file {} ", file, e);
-    } finally {
-      if (fis != null) fis.close();
+    @Override
+    public synchronized Dataset readNeedFromFile(final File file) throws IOException {
+        logger.debug("processing as mail file: {} ", file);
+        FileInputStream fis = new FileInputStream(file);
+        DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper("no:uri");
+        try {
+            MimeMessage emailMessage = new MimeMessage(null, fis);
+            MimeMessageParser parser = new MimeMessageParser(emailMessage);
+            parser.parse();
+            needModelWrapper.setTitle(parser.getSubject());
+            String content = null;
+            if (parser.hasPlainContent()) {
+                content = parser.getPlainContent();
+            } else if (parser.hasHtmlContent()) {
+                Document doc = Jsoup.parse(parser.getHtmlContent());
+                content = doc.text();
+            }
+            if (content != null) {
+                needModelWrapper.setDescription(content);
+            }
+            logger.debug("mail subject          : {}", parser.getSubject());
+            logger.debug("mail has plain content: {}", parser.hasPlainContent());
+            logger.debug("mail has html content : {}", parser.hasHtmlContent());
+            logger.debug("mail has attachments  : {}", parser.hasAttachments());
+            logger.debug("mail plain content    : {}", StringUtils.abbreviate(parser.getPlainContent(), 200));
+            logger.debug("mail html content     : {}", StringUtils.abbreviate(parser.getHtmlContent(), 200));
+            return needModelWrapper.copyDataset();
+        } catch (Exception e) {
+            logger.error("could not parse email from file {} ", file, e);
+        } finally {
+            if (fis != null)
+                fis.close();
+        }
+        return null;
     }
-    return null;
-  }
-
 
 }

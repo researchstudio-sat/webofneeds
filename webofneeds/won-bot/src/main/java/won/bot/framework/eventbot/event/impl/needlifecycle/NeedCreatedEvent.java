@@ -26,39 +26,39 @@ import won.protocol.model.FacetType;
 /**
  *
  */
-public class NeedCreatedEvent extends BaseNeedSpecificEvent
-{
-  private final URI needUriBeforeCreation;
-  private final URI wonNodeUri;
-  private final Dataset needDataset;
-  private final FacetType facetType;
+public class NeedCreatedEvent extends BaseNeedSpecificEvent {
+    private final URI needUriBeforeCreation;
+    private final URI wonNodeUri;
+    private final Dataset needDataset;
+    private final FacetType facetType;
 
-  public NeedCreatedEvent(final URI needURI, final URI wonNodeUri, final Dataset needDataset, final FacetType facetType, final URI needUriBeforeCreation) {
-    super(needURI);
-    this.wonNodeUri = wonNodeUri;
-    this.needDataset = needDataset;
-    this.facetType = facetType;
-    this.needUriBeforeCreation = needUriBeforeCreation;
-  }
+    public NeedCreatedEvent(final URI needURI, final URI wonNodeUri, final Dataset needDataset,
+            final FacetType facetType, final URI needUriBeforeCreation) {
+        super(needURI);
+        this.wonNodeUri = wonNodeUri;
+        this.needDataset = needDataset;
+        this.facetType = facetType;
+        this.needUriBeforeCreation = needUriBeforeCreation;
+    }
 
-  public NeedCreatedEvent(final URI needURI, final URI wonNodeUri, final Dataset needDataset, final FacetType facetType) {
-    this(needURI, wonNodeUri, needDataset, facetType, null);
-  }
+    public NeedCreatedEvent(final URI needURI, final URI wonNodeUri, final Dataset needDataset,
+            final FacetType facetType) {
+        this(needURI, wonNodeUri, needDataset, facetType, null);
+    }
 
-  public URI getWonNodeUri()
-  {
-    return wonNodeUri;
-  }
+    public URI getWonNodeUri() {
+        return wonNodeUri;
+    }
 
-  public Dataset getNeedDataset() {
-    return needDataset;
-  }
+    public Dataset getNeedDataset() {
+        return needDataset;
+    }
 
-  public URI getNeedUriBeforeCreation() {
-    return needUriBeforeCreation;
-  }
+    public URI getNeedUriBeforeCreation() {
+        return needUriBeforeCreation;
+    }
 
-  public FacetType getFacetType() {
-    return facetType;
-  }
+    public FacetType getFacetType() {
+        return facetType;
+    }
 }

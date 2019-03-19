@@ -21,7 +21,7 @@ import won.bot.framework.eventbot.event.BaseEvent;
 /**
  * Indicates that a counter changed its count.
  */
-public class CountEvent extends BaseEvent{
+public class CountEvent extends BaseEvent {
     private final EventPublishingCounter counter;
     private final int count;
 

@@ -24,29 +24,26 @@ import won.bot.framework.eventbot.event.ConnectionSpecificEvent;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.listener.EventListener;
 
-
 /**
  *
  */
-public class RecordMessageSentTimeAction extends BaseEventBotAction
-{
-  private MessageTimingManager timingManager ;
+public class RecordMessageSentTimeAction extends BaseEventBotAction {
+    private MessageTimingManager timingManager;
 
-  public RecordMessageSentTimeAction(final EventListenerContext eventListenerContext, MessageTimingManager
-    timingManager) {
-    super(eventListenerContext);
-    this.timingManager = timingManager;
-  }
-
-  @Override
-  protected void doRun(final Event event, EventListener executingListener) throws Exception {
-    if (event instanceof ConnectionSpecificEvent){
-      URI connectionUri = ((ConnectionSpecificEvent)event).getConnectionURI();
-      if (connectionUri != null) {
-        timingManager.updateMessageTimeForMessageSent(((ConnectionSpecificEvent) event).getConnectionURI());
-      }
+    public RecordMessageSentTimeAction(final EventListenerContext eventListenerContext,
+            MessageTimingManager timingManager) {
+        super(eventListenerContext);
+        this.timingManager = timingManager;
     }
-  }
 
+    @Override
+    protected void doRun(final Event event, EventListener executingListener) throws Exception {
+        if (event instanceof ConnectionSpecificEvent) {
+            URI connectionUri = ((ConnectionSpecificEvent) event).getConnectionURI();
+            if (connectionUri != null) {
+                timingManager.updateMessageTimeForMessageSent(((ConnectionSpecificEvent) event).getConnectionURI());
+            }
+        }
+    }
 
 }

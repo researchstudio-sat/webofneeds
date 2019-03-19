@@ -36,12 +36,11 @@ import won.utils.goals.GoalInstantiationResult;
 public class GoalInstantiationTest {
 
     private static final String baseFolder = "/won/utils/goals/instantiation/";
-    
 
     @BeforeClass
     public static void setLogLevel() {
-        Logger root = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
-        root.setLevel(Level.INFO);  
+        Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+        root.setLevel(Level.INFO);
     }
 
     @Test
@@ -51,7 +50,8 @@ public class GoalInstantiationTest {
         Dataset need2 = loadDataset(baseFolder + "ex1_need_debug.trig");
         Dataset conversation = loadDataset(baseFolder + "ex1_conversation.trig");
 
-        GoalInstantiationProducer goalInstantiation = new GoalInstantiationProducer(need1, need2, conversation, "http://example.org/", "http://example.org/blended/");
+        GoalInstantiationProducer goalInstantiation = new GoalInstantiationProducer(need1, need2, conversation,
+                "http://example.org/", "http://example.org/blended/");
         Collection<GoalInstantiationResult> results = goalInstantiation.createAllGoalCombinationInstantiationResults();
 
         // instantiation of combined goals must be conform
@@ -65,7 +65,8 @@ public class GoalInstantiationTest {
         GoalInstantiationResult result = goalInstantiation.findInstantiationForGoal(goal);
         System.out.println(result.toString());
         Assert.assertFalse(result.isConform());
-        Assert.assertEquals("hasDriver", result.getShaclReportWrapper().getValidationResults().iterator().next().getResultPath().getLocalName());
+        Assert.assertEquals("hasDriver",
+                result.getShaclReportWrapper().getValidationResults().iterator().next().getResultPath().getLocalName());
 
         // instantiation of goal of need2 fails cause 3 attributes are missing: location, time, client
         NeedModelWrapper needWrapper2 = new NeedModelWrapper(need2);
@@ -85,14 +86,16 @@ public class GoalInstantiationTest {
         Dataset conversationWithPickupTime = loadDataset(baseFolder + "ex2_conversation.trig");
 
         // this conversation doas not contain the missing pickup time info so the goals cannot be fulfilled
-        GoalInstantiationProducer goalInstantiation = new GoalInstantiationProducer(need1, need2, conversationWithoutPickupTime, "http://example.org/", "http://example.org/blended/");
+        GoalInstantiationProducer goalInstantiation = new GoalInstantiationProducer(need1, need2,
+                conversationWithoutPickupTime, "http://example.org/", "http://example.org/blended/");
         Collection<GoalInstantiationResult> results = goalInstantiation.createAllGoalCombinationInstantiationResults();
         Assert.assertEquals(1, results.size());
         System.out.println(results.iterator().next().toString());
         Assert.assertFalse(results.iterator().next().isConform());
 
         // this conversation contains the missing pickup info so the goals can be fulfilled
-        goalInstantiation = new GoalInstantiationProducer(need1, need2, conversationWithPickupTime, "http://example.org/", "http://example.org/blended/");
+        goalInstantiation = new GoalInstantiationProducer(need1, need2, conversationWithPickupTime,
+                "http://example.org/", "http://example.org/blended/");
         results = goalInstantiation.createAllGoalCombinationInstantiationResults();
         Assert.assertEquals(1, results.size());
         System.out.println(results.iterator().next().toString());
@@ -104,7 +107,8 @@ public class GoalInstantiationTest {
         GoalInstantiationResult result = goalInstantiation.findInstantiationForGoal(goal);
         System.out.println(result.toString());
         Assert.assertFalse(result.isConform());
-        Assert.assertEquals("hasDriver", result.getShaclReportWrapper().getValidationResults().iterator().next().getResultPath().getLocalName());
+        Assert.assertEquals("hasDriver",
+                result.getShaclReportWrapper().getValidationResults().iterator().next().getResultPath().getLocalName());
 
         // instantiation of goal of need2 fails cause 3 attributes are missing: location, time, client
         NeedModelWrapper needWrapper2 = new NeedModelWrapper(need2);
@@ -122,7 +126,8 @@ public class GoalInstantiationTest {
         Dataset need2 = loadDataset(baseFolder + "ex3_need_debug.trig");
         Dataset conversation = loadDataset(baseFolder + "ex3_conversation.trig");
 
-        GoalInstantiationProducer goalInstantiation = new GoalInstantiationProducer(need1, need2, conversation, "http://example.org/", "http://example.org/blended/");
+        GoalInstantiationProducer goalInstantiation = new GoalInstantiationProducer(need1, need2, conversation,
+                "http://example.org/", "http://example.org/blended/");
         Collection<GoalInstantiationResult> results = goalInstantiation.createAllGoalCombinationInstantiationResults();
 
         // We have 4 and 2 goals so we expected 8 results
@@ -149,7 +154,8 @@ public class GoalInstantiationTest {
         Dataset need2 = loadDataset(baseFolder + "ex4_need_debug.trig");
         Dataset conversation = loadDataset(baseFolder + "ex4_conversation.trig");
 
-        GoalInstantiationProducer goalInstantiation = new GoalInstantiationProducer(need1, need2, conversation, "http://example.org/", "http://example.org/blended/");
+        GoalInstantiationProducer goalInstantiation = new GoalInstantiationProducer(need1, need2, conversation,
+                "http://example.org/", "http://example.org/blended/");
         Collection<GoalInstantiationResult> results = goalInstantiation.createAllGoalCombinationInstantiationResults();
 
         // We have only one goal on each side so we expect only one result
@@ -176,7 +182,8 @@ public class GoalInstantiationTest {
         Dataset need2 = loadDataset(baseFolder + "ex5_need_debug.trig");
         Dataset conversation = loadDataset(baseFolder + "ex5_conversation.trig");
 
-        GoalInstantiationProducer goalInstantiation = new GoalInstantiationProducer(need1, need2, conversation, "http://example.org/", "http://example.org/blended/");
+        GoalInstantiationProducer goalInstantiation = new GoalInstantiationProducer(need1, need2, conversation,
+                "http://example.org/", "http://example.org/blended/");
         Collection<GoalInstantiationResult> results = goalInstantiation.createAllGoalCombinationInstantiationResults();
 
         NeedModelWrapper needWrapper1 = new NeedModelWrapper(need1);
@@ -192,9 +199,9 @@ public class GoalInstantiationTest {
 
     private static QuerySolution executeQuery(String queryString, Model payload) {
         Query query = QueryFactory.create(queryString);
-        try(QueryExecution qexec = QueryExecutionFactory.create(query, payload)){
+        try (QueryExecution qexec = QueryExecutionFactory.create(query, payload)) {
             ResultSet resultSet = qexec.execSelect();
-            if (resultSet.hasNext()){
+            if (resultSet.hasNext()) {
                 QuerySolution solution = resultSet.nextSolution();
                 return solution;
             }
@@ -207,21 +214,29 @@ public class GoalInstantiationTest {
         Dataset taxiOffer = loadDataset(baseFolder + "exCorrect_taxioffer.trig");
         Dataset taxiDemand = loadDataset(baseFolder + "exCorrect_taxi.trig");
 
-        GoalInstantiationProducer goalInstantiation = new GoalInstantiationProducer(taxiOffer, taxiDemand, null, "http://example.org/", "http://example.org/blended/");
+        GoalInstantiationProducer goalInstantiation = new GoalInstantiationProducer(taxiOffer, taxiDemand, null,
+                "http://example.org/", "http://example.org/blended/");
         Collection<GoalInstantiationResult> results = goalInstantiation.createGoalInstantiationResultsForNeed1();
 
-        for(GoalInstantiationResult res : results) {
-            System.out.println("Result::::::::::::::::::::::::::::::"+res.isConform());
+        for (GoalInstantiationResult res : results) {
+            System.out.println("Result::::::::::::::::::::::::::::::" + res.isConform());
             System.out.println(res.toString());
-            if(res.isConform()) {
-                Coordinate departureAddress = getAddress(loadSparqlQuery("/won/utils/goals/extraction/address/fromLocationQuery.rq"), res.getInstanceModel());
-                String departureName = getName(loadSparqlQuery("/won/utils/goals/extraction/address/fromLocationQuery.rq"), res.getInstanceModel());
-                Coordinate destinationAddress = getAddress(loadSparqlQuery("/won/utils/goals/extraction/address/toLocationQuery.rq"), res.getInstanceModel());
-                String destinationName = getName(loadSparqlQuery("/won/utils/goals/extraction/address/toLocationQuery.rq"), res.getInstanceModel());
+            if (res.isConform()) {
+                Coordinate departureAddress = getAddress(
+                        loadSparqlQuery("/won/utils/goals/extraction/address/fromLocationQuery.rq"),
+                        res.getInstanceModel());
+                String departureName = getName(
+                        loadSparqlQuery("/won/utils/goals/extraction/address/fromLocationQuery.rq"),
+                        res.getInstanceModel());
+                Coordinate destinationAddress = getAddress(
+                        loadSparqlQuery("/won/utils/goals/extraction/address/toLocationQuery.rq"),
+                        res.getInstanceModel());
+                String destinationName = getName(
+                        loadSparqlQuery("/won/utils/goals/extraction/address/toLocationQuery.rq"),
+                        res.getInstanceModel());
 
-
-                //Assert.assertEquals(departureAddress, new Coordinate(10.0f, 11.0f));
-                //Assert.assertEquals(destinationAddress, new Coordinate(12.0f, 13.0f));
+                // Assert.assertEquals(departureAddress, new Coordinate(10.0f, 11.0f));
+                // Assert.assertEquals(destinationAddress, new Coordinate(12.0f, 13.0f));
             }
         }
 
@@ -230,7 +245,8 @@ public class GoalInstantiationTest {
         GoalInstantiationResult result = goalInstantiation.findInstantiationForGoal(goal);
         Assert.assertTrue(result.isConform());
 
-        GoalInstantiationResult recheckResultModel = GoalInstantiationProducer.findInstantiationForGoalInDataset(taxiOffer, goal, result.getInstanceModel());
+        GoalInstantiationResult recheckResultModel = GoalInstantiationProducer
+                .findInstantiationForGoalInDataset(taxiOffer, goal, result.getInstanceModel());
         Assert.assertTrue(recheckResultModel.isConform());
     }
 
@@ -241,15 +257,20 @@ public class GoalInstantiationTest {
         Dataset taxiDemandNoLoc = loadDataset(baseFolder + "ex6_taxi_noloc.trig");
         Dataset taxiDemandTwoLoc = loadDataset(baseFolder + "ex6_taxi_twoloc.trig");
 
-        GoalInstantiationProducer goalInstantiation = new GoalInstantiationProducer(taxiOffer, taxiDemand, null, "http://example.org/", "http://example.org/blended/");
+        GoalInstantiationProducer goalInstantiation = new GoalInstantiationProducer(taxiOffer, taxiDemand, null,
+                "http://example.org/", "http://example.org/blended/");
         Collection<GoalInstantiationResult> results = goalInstantiation.createGoalInstantiationResultsForNeed1();
 
-        for(GoalInstantiationResult res : results) {
-            System.out.println("Result::::::::::::::::::::::::::::::"+res.isConform());
+        for (GoalInstantiationResult res : results) {
+            System.out.println("Result::::::::::::::::::::::::::::::" + res.isConform());
             System.out.println(res.toString());
-            if(res.isConform()) {
-                Coordinate departureAddress = getAddress(loadSparqlQuery("/won/utils/goals/extraction/address/fromLocationQuery.rq"), res.getInstanceModel());
-                Coordinate destinationAddress = getAddress(loadSparqlQuery("/won/utils/goals/extraction/address/toLocationQuery.rq"), res.getInstanceModel());
+            if (res.isConform()) {
+                Coordinate departureAddress = getAddress(
+                        loadSparqlQuery("/won/utils/goals/extraction/address/fromLocationQuery.rq"),
+                        res.getInstanceModel());
+                Coordinate destinationAddress = getAddress(
+                        loadSparqlQuery("/won/utils/goals/extraction/address/toLocationQuery.rq"),
+                        res.getInstanceModel());
 
                 Assert.assertEquals(new Coordinate(10.0f, 11.0f), departureAddress);
                 Assert.assertEquals(new Coordinate(12.0f, 13.0f), destinationAddress);
@@ -261,20 +282,23 @@ public class GoalInstantiationTest {
         GoalInstantiationResult result = goalInstantiation.findInstantiationForGoal(goal);
         Assert.assertTrue(result.isConform());
 
-        GoalInstantiationResult recheckResultModel = GoalInstantiationProducer.findInstantiationForGoalInDataset(taxiOffer, goal, result.getInstanceModel());
+        GoalInstantiationResult recheckResultModel = GoalInstantiationProducer
+                .findInstantiationForGoalInDataset(taxiOffer, goal, result.getInstanceModel());
         Assert.assertTrue(recheckResultModel.isConform());
 
-        goalInstantiation = new GoalInstantiationProducer(taxiOffer, taxiDemandNoLoc, null, "http://example.org/", "http://example.org/blended/");
+        goalInstantiation = new GoalInstantiationProducer(taxiOffer, taxiDemandNoLoc, null, "http://example.org/",
+                "http://example.org/blended/");
         results = goalInstantiation.createGoalInstantiationResultsForNeed1();
 
-        for(GoalInstantiationResult res : results) {
+        for (GoalInstantiationResult res : results) {
             Assert.assertFalse(res.isConform());
         }
 
-        goalInstantiation = new GoalInstantiationProducer(taxiOffer, taxiDemandTwoLoc, null, "http://example.org/", "http://example.org/blended/");
+        goalInstantiation = new GoalInstantiationProducer(taxiOffer, taxiDemandTwoLoc, null, "http://example.org/",
+                "http://example.org/blended/");
         results = goalInstantiation.createGoalInstantiationResultsForNeed1();
 
-        for(GoalInstantiationResult res : results) {
+        for (GoalInstantiationResult res : results) {
             Assert.assertFalse(res.isConform());
         }
     }
@@ -284,15 +308,20 @@ public class GoalInstantiationTest {
         Dataset taxiOffer = loadDataset(baseFolder + "ex7_taxioffer.trig");
         Dataset taxiDemand = loadDataset(baseFolder + "ex7_taxi.trig");
 
-        GoalInstantiationProducer goalInstantiation = new GoalInstantiationProducer(taxiOffer, taxiDemand, null, "http://example.org/", "http://example.org/blended/");
+        GoalInstantiationProducer goalInstantiation = new GoalInstantiationProducer(taxiOffer, taxiDemand, null,
+                "http://example.org/", "http://example.org/blended/");
         Collection<GoalInstantiationResult> results = goalInstantiation.createGoalInstantiationResultsForNeed1();
 
-        for(GoalInstantiationResult res : results) {
+        for (GoalInstantiationResult res : results) {
             res.getInstanceModel().write(System.out, "TRIG");
             Assert.assertTrue(res.isConform());
 
-            Coordinate departureAddress = getAddress(loadSparqlQuery("/won/utils/goals/extraction/address/northWestCornerQuery.rq"), res.getInstanceModel());
-            Coordinate destinationAddress = getAddress(loadSparqlQuery("/won/utils/goals/extraction/address/southEastCornerQuery.rq"), res.getInstanceModel());
+            Coordinate departureAddress = getAddress(
+                    loadSparqlQuery("/won/utils/goals/extraction/address/northWestCornerQuery.rq"),
+                    res.getInstanceModel());
+            Coordinate destinationAddress = getAddress(
+                    loadSparqlQuery("/won/utils/goals/extraction/address/southEastCornerQuery.rq"),
+                    res.getInstanceModel());
 
             Assert.assertEquals(departureAddress, new Coordinate(48.218727f, 16.360141f));
             Assert.assertEquals(destinationAddress, new Coordinate(48.218828f, 16.360241f));
@@ -303,7 +332,8 @@ public class GoalInstantiationTest {
         GoalInstantiationResult result = goalInstantiation.findInstantiationForGoal(goal);
         Assert.assertTrue(result.isConform());
 
-        GoalInstantiationResult recheckResultModel = GoalInstantiationProducer.findInstantiationForGoalInDataset(taxiOffer, goal, result.getInstanceModel());
+        GoalInstantiationResult recheckResultModel = GoalInstantiationProducer
+                .findInstantiationForGoalInDataset(taxiOffer, goal, result.getInstanceModel());
         Assert.assertTrue(recheckResultModel.isConform());
     }
 
@@ -325,7 +355,7 @@ public class GoalInstantiationTest {
     }
 
     private static String loadSparqlQuery(String filePath) {
-        InputStream is  = GoalInstantiationTest.class.getResourceAsStream(filePath);
+        InputStream is = GoalInstantiationTest.class.getResourceAsStream(filePath);
         StringWriter writer = new StringWriter();
         try {
             IOUtils.copy(is, writer, Charsets.UTF_8);
@@ -340,14 +370,14 @@ public class GoalInstantiationTest {
         return writer.toString();
     }
 
-    private static Coordinate getAddress(String query, Model payload){
+    private static Coordinate getAddress(String query, Model payload) {
         QuerySolution solution = executeQuery(query, payload);
 
-        if(solution != null){
+        if (solution != null) {
             float lat = solution.getLiteral("lat").getFloat();
             float lon = solution.getLiteral("lon").getFloat();
             return new Coordinate(lat, lon);
-        }else{
+        } else {
             return null;
         }
     }
@@ -355,9 +385,9 @@ public class GoalInstantiationTest {
     private static String getName(String query, Model payload) {
         QuerySolution solution = executeQuery(query, payload);
 
-        if(solution != null){
+        if (solution != null) {
             return solution.getLiteral("name").getString();
-        }else{
+        } else {
             return null;
         }
     }

@@ -31,7 +31,8 @@ public class ExecuteDeactivateNeedCommandAction extends BaseEventBotAction {
 
     @Override
     protected void doRun(Event event, EventListener executingListener) throws Exception {
-        if (!(event instanceof DeactivateNeedCommandEvent)) return;
+        if (!(event instanceof DeactivateNeedCommandEvent))
+            return;
         DeactivateNeedCommandEvent deactivateNeedCommandEvent = (DeactivateNeedCommandEvent) event;
 
         EventListenerContext ctx = getEventListenerContext();
@@ -46,7 +47,7 @@ public class ExecuteDeactivateNeedCommandAction extends BaseEventBotAction {
             @Override
             public void onEvent(Event event) throws Exception {
                 logger.debug("need creation successful, new need URI is {}", needUri);
-                bus.publish(new DeactivateNeedCommandSuccessEvent(needUri,deactivateNeedCommandEvent));
+                bus.publish(new DeactivateNeedCommandSuccessEvent(needUri, deactivateNeedCommandEvent));
 
             }
         };
@@ -54,24 +55,24 @@ public class ExecuteDeactivateNeedCommandAction extends BaseEventBotAction {
         EventListener failureCallback = new EventListener() {
             @Override
             public void onEvent(Event event) throws Exception {
-                String textMessage = WonRdfUtils.MessageUtils.getTextMessage(((FailureResponseEvent) event).getFailureMessage());
-                logger.debug("need creation failed for need URI {}, original message URI {}: {}", new Object[]{needUri, ((FailureResponseEvent) event).getOriginalMessageURI(), textMessage});
+                String textMessage = WonRdfUtils.MessageUtils
+                        .getTextMessage(((FailureResponseEvent) event).getFailureMessage());
+                logger.debug("need creation failed for need URI {}, original message URI {}: {}",
+                        new Object[] { needUri, ((FailureResponseEvent) event).getOriginalMessageURI(), textMessage });
                 bus.publish(new DeactivateNeedCommandFailureEvent(needUri, deactivateNeedCommandEvent, textMessage));
             }
         };
-        EventBotActionUtils.makeAndSubscribeResponseListener(deactivateNeedMessage, successCallback, failureCallback, ctx);
+        EventBotActionUtils.makeAndSubscribeResponseListener(deactivateNeedMessage, successCallback, failureCallback,
+                ctx);
 
         logger.debug("registered listeners for response to message URI {}", deactivateNeedMessage.getMessageURI());
         ctx.getWonMessageSender().sendWonMessage(deactivateNeedMessage);
         logger.debug("need creation message sent with message URI {}", deactivateNeedMessage.getMessageURI());
     }
 
-    private WonMessage createWonMessage(WonNodeInformationService wonNodeInformationService, URI needURI, URI wonNodeURI) throws WonMessageBuilderException {
-        return WonMessageBuilder
-                .setMessagePropertiesForDeactivateFromOwner(
-                        wonNodeInformationService.generateEventURI(wonNodeURI),
-                        needURI,
-                        wonNodeURI)
-                .build();
+    private WonMessage createWonMessage(WonNodeInformationService wonNodeInformationService, URI needURI,
+            URI wonNodeURI) throws WonMessageBuilderException {
+        return WonMessageBuilder.setMessagePropertiesForDeactivateFromOwner(
+                wonNodeInformationService.generateEventURI(wonNodeURI), needURI, wonNodeURI).build();
     }
 }

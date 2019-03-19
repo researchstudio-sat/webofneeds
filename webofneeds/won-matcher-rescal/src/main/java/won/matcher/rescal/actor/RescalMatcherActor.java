@@ -26,10 +26,9 @@ import won.matcher.utils.tensor.TensorEntryTokenizer;
 import won.matcher.utils.tensor.TensorMatchingData;
 
 /**
- * Main actor that controls the rescal matching process. It loads the needs and connection data from the rdf
- * store, preprocess the data and save it to file system for the actual rescal processing in python.
- * After the rescal algorithm finished execution the generated hints are loaded and send back for saving and further
- * processing.
+ * Main actor that controls the rescal matching process. It loads the needs and connection data from the rdf store,
+ * preprocess the data and save it to file system for the actual rescal processing in python. After the rescal algorithm
+ * finished execution the generated hints are loaded and send back for saving and further processing.
  * <p>
  * Created by hfriedrich on 02.07.2015.
  */
@@ -48,7 +47,6 @@ public class RescalMatcherActor extends UntypedActor {
     @Autowired
     private RescalMatcherConfig config;
 
-
     @Override
     public void preStart() throws IOException {
 
@@ -56,8 +54,8 @@ public class RescalMatcherActor extends UntypedActor {
         pubSubMediator = DistributedPubSub.get(getContext().system()).mediator();
 
         // Execute the rescal algorithm regularly
-        getContext().system().scheduler().schedule(
-                FiniteDuration.Zero(), config.getExecutionDuration(), getSelf(), TICK, getContext().dispatcher(), null);
+        getContext().system().scheduler().schedule(FiniteDuration.Zero(), config.getExecutionDuration(), getSelf(),
+                TICK, getContext().dispatcher(), null);
     }
 
     @Override
@@ -71,9 +69,9 @@ public class RescalMatcherActor extends UntypedActor {
     }
 
     /**
-     * Load the need and connection data from the sparql endpoint, preprocess the data and write it to some directory
-     * to be processed by the rescal python algorithm that produces hints. The hints are then loaded and send to
-     * the event bus.
+     * Load the need and connection data from the sparql endpoint, preprocess the data and write it to some directory to
+     * be processed by the rescal python algorithm that produces hints. The hints are then loaded and send to the event
+     * bus.
      *
      * @throws IOException
      * @throws InterruptedException
@@ -83,11 +81,12 @@ public class RescalMatcherActor extends UntypedActor {
         // load the needs and connections from the rdf store
         log.info("start processing (every {} minutes) ...", config.getExecutionDuration());
         long queryDate = System.currentTimeMillis();
-        log.info("query needs and connections from rdf store '{}' from date '{}' to date '{}'", config.getSparqlEndpoint(),
-                lastQueryDate, queryDate);
+        log.info("query needs and connections from rdf store '{}' from date '{}' to date '{}'",
+                config.getSparqlEndpoint(), lastQueryDate, queryDate);
 
         // add the attributes of the needs to the rescal tensor
-        TensorEntryAllGenerator tensorEntryAllGenerator = new TensorEntryAllGenerator("queries/attribute", config.getSparqlEndpoint(), lastQueryDate, queryDate);
+        TensorEntryAllGenerator tensorEntryAllGenerator = new TensorEntryAllGenerator("queries/attribute",
+                config.getSparqlEndpoint(), lastQueryDate, queryDate);
         TensorEntryTokenizer tokenizer = new TensorEntryTokenizer(tensorEntryAllGenerator.generateTensorEntries());
         Collection<TensorEntry> tensorEntries = tokenizer.generateTensorEntries();
         for (TensorEntry entry : tensorEntries) {
@@ -95,7 +94,8 @@ public class RescalMatcherActor extends UntypedActor {
         }
 
         // add the connections between the needs to the rescal tensor
-        tensorEntryAllGenerator = new TensorEntryAllGenerator("queries/connection", config.getSparqlEndpoint(), lastQueryDate, queryDate);
+        tensorEntryAllGenerator = new TensorEntryAllGenerator("queries/connection", config.getSparqlEndpoint(),
+                lastQueryDate, queryDate);
         tensorEntries = tensorEntryAllGenerator.generateTensorEntries();
         for (TensorEntry entry : tensorEntries) {
             rescalInputData.addNeedConnection(entry.getNeedUri(), entry.getValue(), true);
@@ -116,16 +116,15 @@ public class RescalMatcherActor extends UntypedActor {
 
         int tensorSize = cleanedTensorData.getTensorDimensions()[0];
         if (rescalInputData.getNeeds().size() + rescalInputData.getAttributes().size() < config.getRescalRank()) {
-            log.info("Do not start rescal algorithm since tensor size (number of needs + number of attributes) = {} is " +
-                    "smaller than rank parameter {}.", tensorSize, config.getRescalRank());
+            log.info("Do not start rescal algorithm since tensor size (number of needs + number of attributes) = {} is "
+                    + "smaller than rank parameter {}.", tensorSize, config.getRescalRank());
             return;
         }
 
         // execute the rescal algorithm in python
-        String pythonCall = "python " + config.getPythonScriptDirectory() +
-                "/rescal-matcher.py -inputfolder " + config.getExecutionDirectory() +
-                " -outputfolder " + config.getExecutionDirectory() + "/output" +
-                " -rank " + config.getRescalRank() + " -threshold " + config.getRescalThreshold();
+        String pythonCall = "python " + config.getPythonScriptDirectory() + "/rescal-matcher.py -inputfolder "
+                + config.getExecutionDirectory() + " -outputfolder " + config.getExecutionDirectory() + "/output"
+                + " -rank " + config.getRescalRank() + " -threshold " + config.getRescalThreshold();
         log.info("execute python script: " + pythonCall);
         Process pythonProcess = Runtime.getRuntime().exec(pythonCall);
 
@@ -151,7 +150,8 @@ public class RescalMatcherActor extends UntypedActor {
         // load the predicted hints and send the to the event bus of the matching service
         BulkHintEvent hintsEvent = hintReader.readHints(rescalInputData);
 
-        int numHints = (hintsEvent == null || hintsEvent.getHintEvents() == null) ? 0 : hintsEvent.getHintEvents().size();
+        int numHints = (hintsEvent == null || hintsEvent.getHintEvents() == null) ? 0
+                : hintsEvent.getHintEvents().size();
         log.info("loaded {} hints into bulk hint event and publish", numHints);
 
         if (numHints > 0) {
@@ -160,7 +160,8 @@ public class RescalMatcherActor extends UntypedActor {
                 builder.append("\n- " + hint);
             }
             log.info(builder.toString());
-            pubSubMediator.tell(new DistributedPubSubMediator.Publish(hintsEvent.getClass().getName(), hintsEvent), getSelf());
+            pubSubMediator.tell(new DistributedPubSubMediator.Publish(hintsEvent.getClass().getName(), hintsEvent),
+                    getSelf());
         }
 
         lastQueryDate = queryDate;

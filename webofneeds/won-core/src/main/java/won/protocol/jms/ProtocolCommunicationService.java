@@ -21,13 +21,13 @@ import java.net.URI;
 import won.protocol.exception.NoSuchConnectionException;
 
 /**
- * User: LEIH-NB
- * Date: 25.02.14
+ * User: LEIH-NB Date: 25.02.14
  */
 public interface ProtocolCommunicationService {
     /**
      *
-     * @param resourceUri is either wonNodeUri or needUri
+     * @param resourceUri
+     *            is either wonNodeUri or needUri
      * @return
      * @throws NoSuchConnectionException
      */

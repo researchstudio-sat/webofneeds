@@ -19,10 +19,9 @@ package won.bot.framework.eventbot.event;
 /**
  * Base class for events.
  */
-public abstract class BaseEvent implements Event
-{
-  public String toString(){
-    return this.getClass().getSimpleName() + "@" + Integer.toHexString(hashCode());
-  }
+public abstract class BaseEvent implements Event {
+    public String toString() {
+        return this.getClass().getSimpleName() + "@" + Integer.toHexString(hashCode());
+    }
 
 }

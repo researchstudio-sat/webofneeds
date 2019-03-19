@@ -20,8 +20,8 @@ public class GeoDistBoostQueryFactory extends SolrQueryFactory {
 
         // calculate the inverse of the distance as a distance measure
         StringBuilder sb = new StringBuilder();
-        sb.append("recip(geodist(").append(solrLocationField).append(",").append(latitude)
-                .append(",").append(longitude).append("),5,100,100)");
+        sb.append("recip(geodist(").append(solrLocationField).append(",").append(latitude).append(",").append(longitude)
+                .append("),5,100,100)");
 
         return sb.toString();
     }

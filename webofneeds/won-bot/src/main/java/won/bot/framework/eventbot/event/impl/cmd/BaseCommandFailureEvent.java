@@ -23,7 +23,8 @@ public abstract class BaseCommandFailureEvent<C extends CommandEvent> implements
     private String message;
     private C originalCommandEvent;
 
-    private BaseCommandFailureEvent(){}
+    private BaseCommandFailureEvent() {
+    }
 
     public BaseCommandFailureEvent(String message, C originalCommandEvent) {
         this.message = message;

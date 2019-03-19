@@ -19,24 +19,24 @@ package won.protocol.message.sender.exception;
 /**
  * Base class for exceptions occurring during sending of messages.
  */
-public abstract class WonMessageSenderException extends RuntimeException
-{
-  public WonMessageSenderException() {
-  }
+public abstract class WonMessageSenderException extends RuntimeException {
+    public WonMessageSenderException() {
+    }
 
-  public WonMessageSenderException(final String message) {
-    super(message);
-  }
+    public WonMessageSenderException(final String message) {
+        super(message);
+    }
 
-  public WonMessageSenderException(final String message, final Throwable cause) {
-    super(message, cause);
-  }
+    public WonMessageSenderException(final String message, final Throwable cause) {
+        super(message, cause);
+    }
 
-  public WonMessageSenderException(final Throwable cause) {
-    super(cause);
-  }
+    public WonMessageSenderException(final Throwable cause) {
+        super(cause);
+    }
 
-  public WonMessageSenderException(final String message, final Throwable cause, final boolean enableSuppression, final boolean writableStackTrace) {
-    super(message, cause, enableSuppression, writableStackTrace);
-  }
+    public WonMessageSenderException(final String message, final Throwable cause, final boolean enableSuppression,
+            final boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
 }

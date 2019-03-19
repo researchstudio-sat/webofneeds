@@ -33,54 +33,44 @@ import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 
 /**
- * User: fkleedorfer
- * Date: 30.01.14
+ * User: fkleedorfer Date: 30.01.14
  */
-public class SendFeedbackForHintAction extends BaseEventBotAction
-{
-  //random number generator needed for random feedback value
-  Random random = new Random(System.currentTimeMillis());
+public class SendFeedbackForHintAction extends BaseEventBotAction {
+    // random number generator needed for random feedback value
+    Random random = new Random(System.currentTimeMillis());
 
-  public SendFeedbackForHintAction(final EventListenerContext context)
-  {
-    super(context);
-  }
-
-  @Override
-  public void doRun(final Event event, EventListener executingListener) throws Exception {
-    if (event instanceof HintFromMatcherEvent) {
-      //TODO: the hint with a match object is not really suitable here. Would be better to
-      // use connection object instead
-      HintFromMatcherEvent hintEvent = (HintFromMatcherEvent) event;
-      hintEvent.getWonMessage().getReceiverURI();
-      boolean feedbackValue = random.nextBoolean();
-      WonMessage message = createFeedbackMessage(hintEvent.getWonMessage().getReceiverURI(), feedbackValue);
-      logger.debug("sending {} feedback for hint {} in message {}",new Object[]{
-                   (feedbackValue ? "positive":"negative"), event, message.getMessageURI()});
-      getEventListenerContext().getWonMessageSender().sendWonMessage(message);
+    public SendFeedbackForHintAction(final EventListenerContext context) {
+        super(context);
     }
-  }
 
-  private WonMessage createFeedbackMessage(URI connectionURI,boolean booleanFeedbackValue) throws
-    WonMessageBuilderException {
+    @Override
+    public void doRun(final Event event, EventListener executingListener) throws Exception {
+        if (event instanceof HintFromMatcherEvent) {
+            // TODO: the hint with a match object is not really suitable here. Would be better to
+            // use connection object instead
+            HintFromMatcherEvent hintEvent = (HintFromMatcherEvent) event;
+            hintEvent.getWonMessage().getReceiverURI();
+            boolean feedbackValue = random.nextBoolean();
+            WonMessage message = createFeedbackMessage(hintEvent.getWonMessage().getReceiverURI(), feedbackValue);
+            logger.debug("sending {} feedback for hint {} in message {}",
+                    new Object[] { (feedbackValue ? "positive" : "negative"), event, message.getMessageURI() });
+            getEventListenerContext().getWonMessageSender().sendWonMessage(message);
+        }
+    }
 
-    WonNodeInformationService wonNodeInformationService =
-      getEventListenerContext().getWonNodeInformationService();
+    private WonMessage createFeedbackMessage(URI connectionURI, boolean booleanFeedbackValue)
+            throws WonMessageBuilderException {
 
-    Dataset connectionRDF =
-      getEventListenerContext().getLinkedDataSource().getDataForResource(connectionURI);
-    URI localNeed = WonRdfUtils.ConnectionUtils.getLocalNeedURIFromConnection(connectionRDF, connectionURI);
-    URI wonNode = WonRdfUtils.ConnectionUtils.getWonNodeURIFromConnection(connectionRDF, connectionURI);
+        WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
 
-    return WonMessageBuilder
-      .setMessagePropertiesForHintFeedback(
-        wonNodeInformationService.generateEventURI(
-          wonNode),
-        connectionURI,
-        localNeed,
-        wonNode, booleanFeedbackValue
-      )
-      .build();
-  }
+        Dataset connectionRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(connectionURI);
+        URI localNeed = WonRdfUtils.ConnectionUtils.getLocalNeedURIFromConnection(connectionRDF, connectionURI);
+        URI wonNode = WonRdfUtils.ConnectionUtils.getWonNodeURIFromConnection(connectionRDF, connectionURI);
+
+        return WonMessageBuilder
+                .setMessagePropertiesForHintFeedback(wonNodeInformationService.generateEventURI(wonNode), connectionURI,
+                        localNeed, wonNode, booleanFeedbackValue)
+                .build();
+    }
 
 }

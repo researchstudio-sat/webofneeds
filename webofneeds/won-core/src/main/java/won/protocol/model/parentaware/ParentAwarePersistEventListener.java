@@ -26,36 +26,34 @@ import org.hibernate.proxy.HibernateProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+public class ParentAwarePersistEventListener implements PersistEventListener {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+    public static final ParentAwarePersistEventListener INSTANCE = new ParentAwarePersistEventListener();
 
-public class ParentAwarePersistEventListener implements PersistEventListener
-{
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-  public static final ParentAwarePersistEventListener INSTANCE = new ParentAwarePersistEventListener();
+    @Override
+    public void onPersist(final PersistEvent event) throws HibernateException {
+        final Object entity = event.getObject();
 
-  @Override
-  public void onPersist(final PersistEvent event) throws HibernateException {
-    final Object entity = event.getObject();
-
-    if(entity instanceof ParentAware) {
-      ParentAware rootAware = (ParentAware) entity;
-      VersionedEntity parent = rootAware.getParent();
-      if (parent == null) return;
-      if (! (parent instanceof HibernateProxy)) {
-        //we have to do the increment manually
-        parent.incrementVersion();
-      }
-      Hibernate.initialize(parent);
-      event.getSession().save(parent);
-      if (logger.isDebugEnabled()) {
-        logger.debug("Incrementing {} entity version because a {} child entity has been inserted", parent, entity);
-      }
+        if (entity instanceof ParentAware) {
+            ParentAware rootAware = (ParentAware) entity;
+            VersionedEntity parent = rootAware.getParent();
+            if (parent == null)
+                return;
+            if (!(parent instanceof HibernateProxy)) {
+                // we have to do the increment manually
+                parent.incrementVersion();
+            }
+            Hibernate.initialize(parent);
+            event.getSession().save(parent);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Incrementing {} entity version because a {} child entity has been inserted", parent,
+                        entity);
+            }
+        }
     }
-  }
 
-
-
-  @Override
-  public void onPersist(final PersistEvent event, final Map createdAlready) throws HibernateException {
-    onPersist(event);
-  }
+    @Override
+    public void onPersist(final PersistEvent event, final Map createdAlready) throws HibernateException {
+        onPersist(event);
+    }
 }

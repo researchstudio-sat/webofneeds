@@ -55,14 +55,14 @@ public class EventPublishingCounter extends CounterImpl {
         return count;
     }
 
-    public EventFilter makeEventFilter(){
+    public EventFilter makeEventFilter() {
         return new EventFilter() {
             @Override
             public boolean accept(Event event) {
-                if (! (event instanceof CountEvent)) {
+                if (!(event instanceof CountEvent)) {
                     return false;
                 }
-                return ((CountEvent)event).getCounter() == EventPublishingCounter.this;
+                return ((CountEvent) event).getCounter() == EventPublishingCounter.this;
             }
         };
     }

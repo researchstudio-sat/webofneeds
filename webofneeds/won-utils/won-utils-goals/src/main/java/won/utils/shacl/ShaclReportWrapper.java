@@ -37,7 +37,7 @@ public class ShaclReportWrapper {
 
     public Collection<ValidationResultWrapper> getValidationResults() {
         Collection<ValidationResultWrapper> validationResults = new LinkedList<>();
-        for(Statement statement : reportResource.listProperties(SH.result).toList()) {
+        for (Statement statement : reportResource.listProperties(SH.result).toList()) {
             if (statement.getResource().getPropertyResourceValue(RDF.type).equals(SH.ValidationResult)) {
                 validationResults.add(new ValidationResultWrapper(statement.getResource()));
             }

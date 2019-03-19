@@ -24,12 +24,11 @@ public class SolrTest {
     public static void main(String[] args) throws IOException, InterruptedException {
 
         // init basic Akka
-        AnnotationConfigApplicationContext ctx =
-                new AnnotationConfigApplicationContext(MatcherSolrAppConfiguration.class);
+        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(
+                MatcherSolrAppConfiguration.class);
         ActorSystem system = ctx.getBean(ActorSystem.class);
         ActorRef solrMatcherActor = system.actorOf(
                 SpringExtension.SpringExtProvider.get(system).props(SolrMatcherActor.class), "SolrMatcherActor");
-
 
         NeedEvent ne1 = createNeedEvent("/needmodel/need1.trig");
         NeedEvent ne2 = createNeedEvent("/needmodel/need2.trig");

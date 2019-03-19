@@ -31,8 +31,7 @@ import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
 import won.bot.framework.eventbot.listener.impl.ActionOnFirstEventListener;
 
 /**
- * This Bot checks the Hokify jobs and creates and publishes them as needs
- * created by MS on 17.09.2018
+ * This Bot checks the Hokify jobs and creates and publishes them as needs created by MS on 17.09.2018
  */
 public class HokifyJobBot extends EventBot {
     private String botName;
@@ -56,10 +55,9 @@ public class HokifyJobBot extends EventBot {
         this.hokifyMessageGenerator.setEventListenerContext(ctx);
         bus = getEventBus();
 
-        
         HokifyBotsApi hokifyBotsApi = new HokifyBotsApi(this.jsonURL, this.geoURL);
         hokifyJobsList = hokifyBotsApi.fetchHokifyData();
-        
+
         logger.info("Register JobBot with update time {}", updateTime);
         try {
             bus = getEventBus();
@@ -79,13 +77,12 @@ public class HokifyJobBot extends EventBot {
                     new ActionOnTriggerEventListener(ctx, createHokifyJobBotTrigger, new BaseEventBotAction(ctx) {
                         @Override
                         protected void doRun(Event event, EventListener executingListener) throws Exception {
-                            
+
                             bus.publish(new CreateNeedFromJobEvent(hokifyJobsList, hokifyBotsApi));
                         }
                     }));
 
-            
-            //Get Hokify data
+            // Get Hokify data
             BotTrigger fetchHokifyJobDataTrigger = new BotTrigger(ctx, Duration.ofMinutes(updateTime));
             fetchHokifyJobDataTrigger.activate();
             bus.subscribe(FetchHokifyJobDataEvent.class, new ActionOnFirstEventListener(ctx,
@@ -96,14 +93,14 @@ public class HokifyJobBot extends EventBot {
                         protected void doRun(Event event, EventListener executingListener) throws Exception {
                             logger.info("Update Hokify Job Data");
                             hokifyJobsList = hokifyBotsApi.fetchHokifyData();
-                            
+
                         }
                     }));
             // WON initiated Events
 
             /*
-             * bus.subscribe(HintFromMatcherEvent.class, new ActionOnEventListener(ctx,
-             * "HintReceived", new Hint2HokifyAction(ctx)));
+             * bus.subscribe(HintFromMatcherEvent.class, new ActionOnEventListener(ctx, "HintReceived", new
+             * Hint2HokifyAction(ctx)));
              */
             bus.subscribe(ConnectFromOtherNeedEvent.class,
                     new ActionOnEventListener(ctx, "ConnectReceived", new Connect2HokifyAction(ctx)));

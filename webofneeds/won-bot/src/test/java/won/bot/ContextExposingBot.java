@@ -22,5 +22,5 @@ import won.bot.framework.eventbot.EventListenerContext;
  *
  */
 public interface ContextExposingBot {
-  public EventListenerContext getExposedEventListenerContext();
+    public EventListenerContext getExposedEventListenerContext();
 }

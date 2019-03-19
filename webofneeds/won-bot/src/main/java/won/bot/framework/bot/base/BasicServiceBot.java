@@ -33,109 +33,105 @@ import won.protocol.util.linkeddata.LinkedDataSource;
 /**
  * Base class for bots containing basic services.
  */
-public abstract class BasicServiceBot extends BaseBot
-{
-  private NodeURISource nodeURISource;
-  private MatcherNodeURISource matcherNodeURISource;
-  private URI solrServerURI;
-  private NeedProducer needProducer;
-  private WonMessageSender wonMessageSender;
-  private MatcherProtocolNeedServiceClientSide matcherProtocolNeedServiceClient;
-  private MatcherProtocolMatcherServiceImplJMSBased matcherProtocolMatcherService;
+public abstract class BasicServiceBot extends BaseBot {
+    private NodeURISource nodeURISource;
+    private MatcherNodeURISource matcherNodeURISource;
+    private URI solrServerURI;
+    private NeedProducer needProducer;
+    private WonMessageSender wonMessageSender;
+    private MatcherProtocolNeedServiceClientSide matcherProtocolNeedServiceClient;
+    private MatcherProtocolMatcherServiceImplJMSBased matcherProtocolMatcherService;
 
+    private LinkedDataSource linkedDataSource;
+    private WonNodeInformationService wonNodeInformationService;
 
+    protected NodeURISource getNodeURISource() {
+        return nodeURISource;
+    }
 
-  private LinkedDataSource linkedDataSource;
-  private WonNodeInformationService wonNodeInformationService;
+    protected MatcherNodeURISource getMatcheNodeURISource() {
+        return matcherNodeURISource;
+    }
 
-  protected NodeURISource getNodeURISource()
-  {
-    return nodeURISource;
-  }
+    @Qualifier("default")
+    @Autowired(required = true)
+    public void setMatcherNodeURISource(final MatcherNodeURISource matcherNodeURISource) {
+        this.matcherNodeURISource = matcherNodeURISource;
+    }
 
-  protected MatcherNodeURISource getMatcheNodeURISource(){
-    return matcherNodeURISource;
-  }
+    @Qualifier("default")
+    @Autowired(required = true)
+    public void setNodeURISource(final NodeURISource nodeURISource) {
+        this.nodeURISource = nodeURISource;
+    }
 
-  @Qualifier("default")
-  @Autowired(required = true)
-  public void setMatcherNodeURISource(final MatcherNodeURISource matcherNodeURISource) {
-    this.matcherNodeURISource = matcherNodeURISource;
-  }
+    protected WonMessageSender getWonMessageSender() {
+        return wonMessageSender;
+    }
 
-  @Qualifier("default")
-  @Autowired(required = true)
-  public void setNodeURISource(final NodeURISource nodeURISource)
-  {
-    this.nodeURISource = nodeURISource;
-  }
+    protected MatcherProtocolNeedServiceClientSide getMatcherProtocolNeedServiceClient() {
+        return matcherProtocolNeedServiceClient;
+    }
 
-  protected WonMessageSender getWonMessageSender()
-  {
-    return wonMessageSender;
-  }
+    protected MatcherProtocolMatcherServiceImplJMSBased getMatcherProtocolMatcherService() {
+        return matcherProtocolMatcherService;
+    }
 
-  protected MatcherProtocolNeedServiceClientSide getMatcherProtocolNeedServiceClient(){
-      return matcherProtocolNeedServiceClient;
-  }
+    public URI getSolrServerURI() {
+        return solrServerURI;
+    }
 
-  protected MatcherProtocolMatcherServiceImplJMSBased getMatcherProtocolMatcherService(){
-    return matcherProtocolMatcherService;
-  }
-  public URI getSolrServerURI() {
-    return solrServerURI;
-  }
+    public void setSolrServerURI(final URI solrServerURI) {
+        this.solrServerURI = solrServerURI;
+    }
 
-  public void setSolrServerURI(final URI solrServerURI) {
-    this.solrServerURI = solrServerURI;
-  }
+    @Qualifier("default")
+    @Autowired(required = true)
+    public void setWonMessageSender(final WonMessageSender wonMessageSender) {
+        this.wonMessageSender = wonMessageSender;
+    }
 
+    @Qualifier("default")
+    @Autowired(required = true)
+    public void setMatcherProtocolNeedServiceClient(
+            final MatcherProtocolNeedServiceClientSide matcherProtocolNeedServiceClient) {
+        this.matcherProtocolNeedServiceClient = matcherProtocolNeedServiceClient;
+    }
 
-  @Qualifier("default")
-  @Autowired(required = true)
-  public void setWonMessageSender(final WonMessageSender wonMessageSender)
-  {
-    this.wonMessageSender = wonMessageSender;
-  }
+    @Qualifier("default")
+    @Autowired(required = true)
+    public void setMatcherProtocolMatcherService(
+            final MatcherProtocolMatcherServiceImplJMSBased matcherProtocolMatcherService) {
+        this.matcherProtocolMatcherService = matcherProtocolMatcherService;
+    }
 
-  @Qualifier("default")
-  @Autowired(required = true)
-  public void setMatcherProtocolNeedServiceClient(final MatcherProtocolNeedServiceClientSide matcherProtocolNeedServiceClient){
-      this.matcherProtocolNeedServiceClient = matcherProtocolNeedServiceClient;
-  }
+    protected NeedProducer getNeedProducer() {
+        return needProducer;
+    }
 
-  @Qualifier("default")
-  @Autowired(required = true)
-  public void setMatcherProtocolMatcherService(final MatcherProtocolMatcherServiceImplJMSBased
-                                                 matcherProtocolMatcherService){
-    this.matcherProtocolMatcherService = matcherProtocolMatcherService;
-  }
+    @Qualifier("default")
+    @Autowired(required = true)
+    public void setNeedProducer(final NeedProducer needProducer) {
+        this.needProducer = needProducer;
+    }
 
-  protected NeedProducer getNeedProducer()
-  {
-    return needProducer;
-  }
+    public LinkedDataSource getLinkedDataSource() {
+        return linkedDataSource;
+    }
 
-  @Qualifier("default")
-  @Autowired(required = true)
-  public void setNeedProducer(final NeedProducer needProducer)
-  {
-    this.needProducer = needProducer;
-  }
+    @Qualifier("default")
+    @Autowired(required = true)
+    public void setLinkedDataSource(final LinkedDataSource linkedDataSource) {
+        this.linkedDataSource = linkedDataSource;
+    }
 
-  public LinkedDataSource getLinkedDataSource() { return linkedDataSource; }
+    public WonNodeInformationService getWonNodeInformationService() {
+        return wonNodeInformationService;
+    }
 
-  @Qualifier("default")
-  @Autowired(required = true)
-  public void setLinkedDataSource(final LinkedDataSource linkedDataSource) { this.linkedDataSource = linkedDataSource; }
-
-  public WonNodeInformationService getWonNodeInformationService() {
-    return wonNodeInformationService;
-  }
-
-  @Autowired(required = true)
-  public void setWonNodeInformationService(final WonNodeInformationService wonNodeInformationService) {
-    this.wonNodeInformationService = wonNodeInformationService;
-  }
+    @Autowired(required = true)
+    public void setWonNodeInformationService(final WonNodeInformationService wonNodeInformationService) {
+        this.wonNodeInformationService = wonNodeInformationService;
+    }
 
 }

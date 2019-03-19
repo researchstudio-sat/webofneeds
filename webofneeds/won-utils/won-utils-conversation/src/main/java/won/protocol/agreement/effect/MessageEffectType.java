@@ -1,5 +1,5 @@
 package won.protocol.agreement.effect;
 
 public enum MessageEffectType {
-	PROPOSES, ACCEPTS, REJECTS, RETRACTS, CLAIMS;
+    PROPOSES, ACCEPTS, REJECTS, RETRACTS, CLAIMS;
 }

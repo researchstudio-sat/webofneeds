@@ -31,36 +31,36 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
  */
 public abstract class BaseValidator {
 
-    protected Map<String,List<WonSparqlValidator>> dirToValidator = new LinkedHashMap<>();
+    protected Map<String, List<WonSparqlValidator>> dirToValidator = new LinkedHashMap<>();
 
     public final boolean validate(Dataset input) {
 
-      for (String dir : dirToValidator.keySet()) {
-        List<WonSparqlValidator> validators = dirToValidator.get(dir);
-        for (WonSparqlValidator validator : validators) {
-          if (!validator.validate(input).isValid()) {
-            return false;
-          }
+        for (String dir : dirToValidator.keySet()) {
+            List<WonSparqlValidator> validators = dirToValidator.get(dir);
+            for (WonSparqlValidator validator : validators) {
+                if (!validator.validate(input).isValid()) {
+                    return false;
+                }
+            }
         }
-      }
-      return true;
+        return true;
     }
 
     public final boolean validate(Dataset input, StringBuilder causePlaceholder) {
 
-      for (String dir : dirToValidator.keySet()) {
-        List<WonSparqlValidator> validators = dirToValidator.get(dir);
-        for (WonSparqlValidator validator : validators) {
-          WonSparqlValidator.ValidationResult result = validator.validate(input);
-          if (!result.isValid()) {
-            causePlaceholder.append(dir);
-            causePlaceholder.append(validator.getName());
-            causePlaceholder.append(": ").append(result.getErrorMessage());
-            return false;
-          }
+        for (String dir : dirToValidator.keySet()) {
+            List<WonSparqlValidator> validators = dirToValidator.get(dir);
+            for (WonSparqlValidator validator : validators) {
+                WonSparqlValidator.ValidationResult result = validator.validate(input);
+                if (!result.isValid()) {
+                    causePlaceholder.append(dir);
+                    causePlaceholder.append(validator.getName());
+                    causePlaceholder.append(": ").append(result.getErrorMessage());
+                    return false;
+                }
+            }
         }
-      }
-      return true;
+        return true;
     }
 
     protected void loadSparqlValidatorsFromDirectories(String[] dirs) {
@@ -74,6 +74,6 @@ public abstract class BaseValidator {
                 throw new RuntimeException(e);
             }
         }
-        this.dirToValidator =  Collections.unmodifiableMap(validatorsPerDir);
+        this.dirToValidator = Collections.unmodifiableMap(validatorsPerDir);
     }
 }

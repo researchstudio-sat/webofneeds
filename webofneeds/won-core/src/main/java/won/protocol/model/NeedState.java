@@ -24,56 +24,49 @@ import org.slf4j.LoggerFactory;
 import won.protocol.vocabulary.WON;
 
 /**
- * User: fsalcher
- * Date: 10.10.12
- * Time: 14:13
+ * User: fsalcher Date: 10.10.12 Time: 14:13
  */
-public enum NeedState
-{
-  INACTIVE("Inactive"),
-  ACTIVE("Active"),
-  DELETED("Deleted");
+public enum NeedState {
+    INACTIVE("Inactive"), ACTIVE("Active"), DELETED("Deleted");
 
-  private static final Logger logger = LoggerFactory.getLogger(NeedState.class);
-  private String name;
+    private static final Logger logger = LoggerFactory.getLogger(NeedState.class);
+    private String name;
 
-  private NeedState(String name)
-  {
-    this.name = name;
-  }
+    private NeedState(String name) {
+        this.name = name;
+    }
 
-  public URI getURI()
-  {
-    return URI.create(WON.BASE_URI + name);
-  }
+    public URI getURI() {
+        return URI.create(WON.BASE_URI + name);
+    }
 
-  /**
-   * Tries to match the given string against all enum values.
-   *
-   * @param fragment string to match
-   * @return matched enum, null otherwise
-   */
-  public static NeedState parseString(final String fragment)
-  {
-    for(NeedState state : values())
-      if(state.name.equals(fragment))
-        return state;
+    /**
+     * Tries to match the given string against all enum values.
+     *
+     * @param fragment
+     *            string to match
+     * @return matched enum, null otherwise
+     */
+    public static NeedState parseString(final String fragment) {
+        for (NeedState state : values())
+            if (state.name.equals(fragment))
+                return state;
 
-    logger.warn("No enum could be matched for: {}", fragment);
-    return null;
-  }
+        logger.warn("No enum could be matched for: {}", fragment);
+        return null;
+    }
 
-  /**
-   * Tries to match the given URI against all enum values.
-   *
-   * @param uri URI to match
-   * @return matched enum, null otherwise
-   */
-  public static NeedState fromURI(final URI uri)
-  {
-    for (NeedState state : values())
-      if (state.getURI().equals(uri))
-        return state;
-    return null;
-  }
+    /**
+     * Tries to match the given URI against all enum values.
+     *
+     * @param uri
+     *            URI to match
+     * @return matched enum, null otherwise
+     */
+    public static NeedState fromURI(final URI uri) {
+        for (NeedState state : values())
+            if (state.getURI().equals(uri))
+                return state;
+        return null;
+    }
 }

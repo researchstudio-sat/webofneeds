@@ -26,52 +26,48 @@ import won.protocol.model.Match;
 import won.protocol.util.WonRdfUtils;
 
 /**
- * Simple implementation of the WonMessageHandlerAdapter that extracts the
- * information needed to create the Connection and Match objects directly
- * from the available message without using additional storage. This means
- * that the Connection's state and type properties are never available, as they
- * are not part of messages.
- * Use with care.
+ * Simple implementation of the WonMessageHandlerAdapter that extracts the information needed to create the Connection
+ * and Match objects directly from the available message without using additional storage. This means that the
+ * Connection's state and type properties are never available, as they are not part of messages. Use with care.
  */
-public class MessageExtractingOwnerCallbackAdapter extends OwnerCallbackAdapter
-{
+public class MessageExtractingOwnerCallbackAdapter extends OwnerCallbackAdapter {
 
-  public MessageExtractingOwnerCallbackAdapter(OwnerCallback adaptee) {
-    super(adaptee);
-  }
+    public MessageExtractingOwnerCallbackAdapter(OwnerCallback adaptee) {
+        super(adaptee);
+    }
 
-  public MessageExtractingOwnerCallbackAdapter() {
-  }
+    public MessageExtractingOwnerCallbackAdapter() {
+    }
 
-  @Override
-  protected Connection makeConnection(WonMessage wonMessage) {
-    return toConnection(wonMessage);
-  }
+    @Override
+    protected Connection makeConnection(WonMessage wonMessage) {
+        return toConnection(wonMessage);
+    }
 
-  @Override
-  protected Match makeMatch(WonMessage wonMessage) {
-    return WonRdfUtils.MessageUtils.toMatch(wonMessage);
-  }
+    @Override
+    protected Match makeMatch(WonMessage wonMessage) {
+        return WonRdfUtils.MessageUtils.toMatch(wonMessage);
+    }
 
-  /**
-   * Creates a connection object representing the connection
-   * that the wonMessage is addressed at, if any.
-   * The resulting Connection object will not have a state or type property set.
-   * @param wonMessage or null if the message is not directed at
-   *                   a connection
-   */
-  private Connection toConnection(WonMessage wonMessage) {
-    Connection con = new Connection();
-    con.setConnectionURI(wonMessage.getReceiverURI());
-    con.setRemoteConnectionURI(wonMessage.getSenderURI());
-    con.setNeedURI(wonMessage.getReceiverNeedURI());
-    con.setRemoteNeedURI(wonMessage.getSenderNeedURI());
-    return con;
-  }
+    /**
+     * Creates a connection object representing the connection that the wonMessage is addressed at, if any. The
+     * resulting Connection object will not have a state or type property set.
+     * 
+     * @param wonMessage
+     *            or null if the message is not directed at a connection
+     */
+    private Connection toConnection(WonMessage wonMessage) {
+        Connection con = new Connection();
+        con.setConnectionURI(wonMessage.getReceiverURI());
+        con.setRemoteConnectionURI(wonMessage.getSenderURI());
+        con.setNeedURI(wonMessage.getReceiverNeedURI());
+        con.setRemoteNeedURI(wonMessage.getSenderNeedURI());
+        return con;
+    }
 
-  @Autowired(required = false)
-  @Qualifier("default")
-  public void setAdaptee(OwnerCallback adaptee) {
-    super.setAdaptee(adaptee);
-  }
+    @Autowired(required = false)
+    @Qualifier("default")
+    public void setAdaptee(OwnerCallback adaptee) {
+        super.setAdaptee(adaptee);
+    }
 }

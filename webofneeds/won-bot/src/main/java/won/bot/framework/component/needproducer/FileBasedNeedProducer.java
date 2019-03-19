@@ -22,10 +22,8 @@ import java.io.IOException;
 import org.apache.jena.query.Dataset;
 
 /**
- * User: fkleedorfer
- * Date: 17.12.13
+ * User: fkleedorfer Date: 17.12.13
  */
-public interface FileBasedNeedProducer
-{
-  public Dataset readNeedFromFile(File file) throws IOException;
+public interface FileBasedNeedProducer {
+    public Dataset readNeedFromFile(File file) throws IOException;
 }

@@ -33,7 +33,7 @@ public class ConnectFromNodeReviewFacetImpl extends AbstractCamelProcessor {
         Message message = exchange.getIn();
         WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
         URI connectionUri = wonMessage.getReceiverURI();
-        //Connection con = connectionRepository.findOneByConnectionURI(connectionUri);
+        // Connection con = connectionRepository.findOneByConnectionURI(connectionUri);
 
         try {
             Map<Property, String> reviewData = WonRdfUtils.MessageUtils.getReviewContent(wonMessage);
@@ -51,8 +51,7 @@ public class ConnectFromNodeReviewFacetImpl extends AbstractCamelProcessor {
 
         String aboutNeedURI = reviewData.get(SCHEMA.ABOUT);
         Double rating = Double.parseDouble(reviewData.get(SCHEMA.RATING_VALUE)) > 0.0
-                ? Double.parseDouble(reviewData.get(SCHEMA.RATING_VALUE))
-                : 0.0;
+                ? Double.parseDouble(reviewData.get(SCHEMA.RATING_VALUE)) : 0.0;
 
         Need aboutNeed = needRepository.findOneByNeedURI(URI.create(aboutNeedURI));
         Dataset needDataset = aboutNeed.getDatatsetHolder().getDataset();

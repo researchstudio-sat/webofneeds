@@ -25,21 +25,22 @@ import org.apache.jena.rdf.model.Resource;
  * Vocabulary for named graphs, see http://www.w3.org/2004/03/trix/
  *
  */
-public class RDFG
-{
-  public static final String BASE_URI = "http://www.w3.org/2004/03/trix/rdfg-1/";
-  public static final String DEFAULT_PREFIX= "rdfg";
+public class RDFG {
+    public static final String BASE_URI = "http://www.w3.org/2004/03/trix/rdfg-1/";
+    public static final String DEFAULT_PREFIX = "rdfg";
 
-  private static Model m = ModelFactory.createDefaultModel();
+    private static Model m = ModelFactory.createDefaultModel();
 
-  public static final Resource GRAPH = m.createProperty(BASE_URI + "Graph");
-  public static final Property SUBGRAPH_OF = m.createProperty(BASE_URI + "subGraphOf");
-  public static final Property EQUIVALENT_GRAPH = m.createProperty(BASE_URI + "equivalentGraph");
+    public static final Resource GRAPH = m.createProperty(BASE_URI + "Graph");
+    public static final Property SUBGRAPH_OF = m.createProperty(BASE_URI + "subGraphOf");
+    public static final Property EQUIVALENT_GRAPH = m.createProperty(BASE_URI + "equivalentGraph");
 
-  /** returns the URI for this schema
-   * @return the URI for this schema
-   */
-  public static String getURI() {
-    return BASE_URI;
-  }
+    /**
+     * returns the URI for this schema
+     * 
+     * @return the URI for this schema
+     */
+    public static String getURI() {
+        return BASE_URI;
+    }
 }

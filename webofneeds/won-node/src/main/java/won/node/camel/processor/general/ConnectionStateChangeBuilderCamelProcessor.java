@@ -29,12 +29,12 @@ import won.protocol.model.Connection;
 import won.protocol.repository.ConnectionRepository;
 
 /**
- * Extracts the connection state and creates a ConnectionStateChangeBuilder. The
- * connection state builder is set as a header in the in message. 
+ * Extracts the connection state and creates a ConnectionStateChangeBuilder. The connection state builder is set as a
+ * header in the in message.
  * 
  */
 public class ConnectionStateChangeBuilderCamelProcessor implements Processor {
-    
+
     @Autowired
     ConnectionRepository connectionRepository;
 
@@ -59,8 +59,8 @@ public class ConnectionStateChangeBuilderCamelProcessor implements Processor {
         } else {
             // found no connection. don't modify the builder
         }
-        
-        //put the state change builder in the header
+
+        // put the state change builder in the header
         exchange.getIn().setHeader(WonCamelConstants.CONNECTION_STATE_CHANGE_BUILDER_HEADER, stateChangeBuilder);
     }
 }

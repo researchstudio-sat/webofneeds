@@ -29,18 +29,16 @@ import won.protocol.service.WonNodeInformationService;
 
 @Controller
 @RequestMapping("/appConfig")
-public class AppConfigController
-{
-  @Autowired
-  private WonNodeInformationService wonNodeInformationService;
+public class AppConfigController {
+    @Autowired
+    private WonNodeInformationService wonNodeInformationService;
 
-  @RequestMapping(value = "/getDefaultWonNodeUri", method = RequestMethod.GET)
-  public ResponseEntity<URI> getDefaultWonNodeUri(){
-      return new ResponseEntity(this.wonNodeInformationService.getDefaultWonNodeURI().toString(), HttpStatus.OK);
-  }
+    @RequestMapping(value = "/getDefaultWonNodeUri", method = RequestMethod.GET)
+    public ResponseEntity<URI> getDefaultWonNodeUri() {
+        return new ResponseEntity(this.wonNodeInformationService.getDefaultWonNodeURI().toString(), HttpStatus.OK);
+    }
 
-
-  public void setWonNodeInformationService(final WonNodeInformationService wonNodeInformationService) {
-    this.wonNodeInformationService = wonNodeInformationService;
-  }
+    public void setWonNodeInformationService(final WonNodeInformationService wonNodeInformationService) {
+        this.wonNodeInformationService = wonNodeInformationService;
+    }
 }

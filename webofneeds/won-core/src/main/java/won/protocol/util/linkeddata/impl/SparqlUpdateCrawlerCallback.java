@@ -36,43 +36,38 @@ import won.protocol.util.linkeddata.CrawlerCallback;
 /**
  * Crawler callback implementation that writes crawled data to a predefined sparql endpoint.
  */
-public class SparqlUpdateCrawlerCallback implements CrawlerCallback
-{
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-  String sparqlEndpoint = null;
+public class SparqlUpdateCrawlerCallback implements CrawlerCallback {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+    String sparqlEndpoint = null;
 
-  public void setSparqlEndpoint(final String sparqlEndpoint) {
-    this.sparqlEndpoint = sparqlEndpoint;
-  }
-
-  @Override
-  public void onDatasetCrawled(final URI uri, final Dataset dataset) {
-
-    if (null == sparqlEndpoint) {
-      logger.warn("no SPARQL endpoint defined");
-      return;
+    public void setSparqlEndpoint(final String sparqlEndpoint) {
+        this.sparqlEndpoint = sparqlEndpoint;
     }
 
-    Iterator<String> graphNames = dataset.listNames();
-    while (graphNames.hasNext()) {
+    @Override
+    public void onDatasetCrawled(final URI uri, final Dataset dataset) {
 
-      StringBuilder quadpatterns = new StringBuilder();
-      String graphName = graphNames.next();
-      Model model = dataset.getNamedModel(graphName);
-      StringWriter sw = new StringWriter();
-      RDFDataMgr.write(sw, model, Lang.NTRIPLES);
-      quadpatterns.append("\nINSERT DATA { GRAPH <")
-                  .append(graphName)
-                  .append("> { ")
-                  .append(sw)
-                  .append("}};\n");
+        if (null == sparqlEndpoint) {
+            logger.warn("no SPARQL endpoint defined");
+            return;
+        }
 
-      logger.info(quadpatterns.toString());
-      UpdateRequest update = UpdateFactory.create(quadpatterns.toString());
-      UpdateProcessRemote riStore = (UpdateProcessRemote)
-        UpdateExecutionFactory.createRemote(update, sparqlEndpoint);
-      riStore.execute();
+        Iterator<String> graphNames = dataset.listNames();
+        while (graphNames.hasNext()) {
 
+            StringBuilder quadpatterns = new StringBuilder();
+            String graphName = graphNames.next();
+            Model model = dataset.getNamedModel(graphName);
+            StringWriter sw = new StringWriter();
+            RDFDataMgr.write(sw, model, Lang.NTRIPLES);
+            quadpatterns.append("\nINSERT DATA { GRAPH <").append(graphName).append("> { ").append(sw).append("}};\n");
+
+            logger.info(quadpatterns.toString());
+            UpdateRequest update = UpdateFactory.create(quadpatterns.toString());
+            UpdateProcessRemote riStore = (UpdateProcessRemote) UpdateExecutionFactory.createRemote(update,
+                    sparqlEndpoint);
+            riStore.execute();
+
+        }
     }
-  }
 }

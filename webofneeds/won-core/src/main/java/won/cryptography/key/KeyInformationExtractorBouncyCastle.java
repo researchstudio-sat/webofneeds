@@ -13,8 +13,7 @@ import org.slf4j.LoggerFactory;
 import won.cryptography.exception.KeyNotSupportedException;
 
 /**
- * User: fsalcher
- * Date: 24.07.2014
+ * User: fsalcher Date: 24.07.2014
  */
 public class KeyInformationExtractorBouncyCastle implements KeyInformationExtractor {
     private static final Logger logger = LoggerFactory.getLogger(KeyInformationExtractorBouncyCastle.class);

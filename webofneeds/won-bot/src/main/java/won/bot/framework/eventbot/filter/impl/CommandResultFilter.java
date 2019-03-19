@@ -33,7 +33,8 @@ public class CommandResultFilter implements EventFilter {
 
     @Override
     public boolean accept(Event event) {
-        if (!(event instanceof CommandResultEvent)) return false;
-        return ((CommandResultEvent)event).getOriginalCommandEvent() == orginalCommand;
+        if (!(event instanceof CommandResultEvent))
+            return false;
+        return ((CommandResultEvent) event).getOriginalCommandEvent() == orginalCommand;
     }
 }

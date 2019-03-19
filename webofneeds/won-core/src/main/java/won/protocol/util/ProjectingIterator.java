@@ -21,21 +21,20 @@ import java.util.Iterator;
 /**
  * Iterator that converts from type F (from) to type T (to).
  */
-public abstract class ProjectingIterator<F, T> implements Iterator<T>
-{
-  protected Iterator<F> baseIterator;
+public abstract class ProjectingIterator<F, T> implements Iterator<T> {
+    protected Iterator<F> baseIterator;
 
-  protected ProjectingIterator(final Iterator<F> baseIterator) {
-    this.baseIterator = baseIterator;
-  }
+    protected ProjectingIterator(final Iterator<F> baseIterator) {
+        this.baseIterator = baseIterator;
+    }
 
-  @Override
-  public boolean hasNext() {
-    return baseIterator.hasNext();
-  }
+    @Override
+    public boolean hasNext() {
+        return baseIterator.hasNext();
+    }
 
-  @Override
-  public void remove() {
-    baseIterator.remove();
-  }
+    @Override
+    public void remove() {
+        baseIterator.remove();
+    }
 }

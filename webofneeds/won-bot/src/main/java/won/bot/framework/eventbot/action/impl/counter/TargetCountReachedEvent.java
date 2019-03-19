@@ -21,19 +21,18 @@ import won.bot.framework.eventbot.event.BaseEvent;
 /**
  * Event indicating that a Counter reached its target count.
  */
-public class TargetCountReachedEvent extends BaseEvent
-{
-  private TargetCounterDecorator counter;
+public class TargetCountReachedEvent extends BaseEvent {
+    private TargetCounterDecorator counter;
 
-  public TargetCountReachedEvent(final TargetCounterDecorator counter) {
-    this.counter = counter;
-  }
+    public TargetCountReachedEvent(final TargetCounterDecorator counter) {
+        this.counter = counter;
+    }
 
-  public Counter getCounter() {
-    return counter;
-  }
+    public Counter getCounter() {
+        return counter;
+    }
 
-  public int getCount(){
-      return this.getCounter().getCount();
-  }
+    public int getCount() {
+        return this.getCounter().getCount();
+    }
 }

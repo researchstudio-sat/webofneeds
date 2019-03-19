@@ -36,8 +36,8 @@ import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 
 /**
- * Action to perform when the debug bot is set to be 'chatty' - that is,
- * sends messages via its connections spontaneously.
+ * Action to perform when the debug bot is set to be 'chatty' - that is, sends messages via its connections
+ * spontaneously.
  */
 public class SendChattyMessageAction extends BaseEventBotAction {
     private double probabilityOfSendingMessage = 0.1;
@@ -47,10 +47,9 @@ public class SendChattyMessageAction extends BaseEventBotAction {
     MessageTimingManager messageTimingManager;
     private String[] messagesForLongInactivity;
 
-
-    public SendChattyMessageAction(final EventListenerContext eventListenerContext, final double
-            probabilityOfSendingMessage, MessageTimingManager messageTimingManager, final String[]
-                                           messagesForShortInactivity, final String[] messagesForLongInactivity) {
+    public SendChattyMessageAction(final EventListenerContext eventListenerContext,
+            final double probabilityOfSendingMessage, MessageTimingManager messageTimingManager,
+            final String[] messagesForShortInactivity, final String[] messagesForLongInactivity) {
         super(eventListenerContext);
         this.probabilityOfSendingMessage = probabilityOfSendingMessage;
         this.messagesForShortInactivity = messagesForShortInactivity;
@@ -62,53 +61,55 @@ public class SendChattyMessageAction extends BaseEventBotAction {
     @Override
     protected void doRun(final Event event, EventListener executingListener) throws Exception {
         Set<URI> toRemove = null;
-        Collection<Object> chattyConnections = getEventListenerContext().getBotContext().loadObjectMap(
-                KEY_CHATTY_CONNECTIONS).values();
+        Collection<Object> chattyConnections = getEventListenerContext().getBotContext()
+                .loadObjectMap(KEY_CHATTY_CONNECTIONS).values();
 
-        if (chattyConnections == null) return;
-        theloop:
-        for (Object o : chattyConnections) {
+        if (chattyConnections == null)
+            return;
+        theloop: for (Object o : chattyConnections) {
             URI conURI = (URI) o;
             if (random.nextDouble() > probabilityOfSendingMessage) {
                 continue;
             }
-            //determine which kind of message to send depending on inactivity of partner.
+            // determine which kind of message to send depending on inactivity of partner.
             MessageTimingManager.InactivityPeriod inactivityPeriod = messageTimingManager
                     .getInactivityPeriodOfPartner(conURI);
 
-            //don't send a chatty message when we just sent one
+            // don't send a chatty message when we just sent one
             if (!this.messageTimingManager.isWaitedLongEnough(conURI)) {
                 continue;
             }
 
-
             String message = null;
             switch (inactivityPeriod) {
-                case ACTIVE:
-                    //do not send a message
-                    continue theloop;
-                case SHORT:
-                    message = getRandomMessage(this.messagesForShortInactivity);
-                    break;
-                case LONG:
-                    message = getRandomMessage(this.messagesForLongInactivity);
-                    break;
-                case TOO_LONG:
-                    if (toRemove == null) toRemove = new HashSet<URI>();
-                    toRemove.add(conURI);
-                    message = "Ok, you've been absent for a while now. I will stop bugging you. If you want me to resume " +
-                            "doing that, say 'chatty on'. For more information, say 'usage'";
-                    break;
+            case ACTIVE:
+                // do not send a message
+                continue theloop;
+            case SHORT:
+                message = getRandomMessage(this.messagesForShortInactivity);
+                break;
+            case LONG:
+                message = getRandomMessage(this.messagesForLongInactivity);
+                break;
+            case TOO_LONG:
+                if (toRemove == null)
+                    toRemove = new HashSet<URI>();
+                toRemove.add(conURI);
+                message = "Ok, you've been absent for a while now. I will stop bugging you. If you want me to resume "
+                        + "doing that, say 'chatty on'. For more information, say 'usage'";
+                break;
             }
 
-            //publish an event that causes the message to be sent
+            // publish an event that causes the message to be sent
             Dataset connectionRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(conURI);
             Connection con = RdfUtils.findFirst(connectionRDF, x -> new ConnectionModelMapper().fromModel(x));
             if (con != null) {
                 Model messageModel = WonRdfUtils.MessageUtils.textMessage(message);
                 getEventListenerContext().getEventBus().publish(new ConnectionMessageCommandEvent(con, messageModel));
             } else {
-                logger.warn("could not send chatty message on connection {} - failed to generate Connection object from RDF", conURI);
+                logger.warn(
+                        "could not send chatty message on connection {} - failed to generate Connection object from RDF",
+                        conURI);
             }
         }
         if (toRemove != null) {

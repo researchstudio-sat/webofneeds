@@ -19,40 +19,39 @@ package won.owner.pojo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
- * User: LEIH-NB
- * Date: 09.10.2014
+ * User: LEIH-NB Date: 09.10.2014
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CreateDraftPojo
-{
-  private String draftURI;
-  private String draft;
+public class CreateDraftPojo {
+    private String draftURI;
+    private String draft;
 
-  public CreateDraftPojo(){
+    public CreateDraftPojo() {
 
-  }
-  public CreateDraftPojo(String draftURI, String draft){
-    this.draftURI = draftURI;
-    this.draft = draft;
-  }
-  /*public DraftPojo(URI draftURI, Model content, Draft draftState ){
-    super(draftURI, content);
-    this.setCurrentStep(draftState.getCurrentStep());
-    this.setUserName(draftState.getUserName());
-  }      */
-  public String getDraftURI() {
-    return draftURI;
-  }
+    }
 
-  public void setDraftURI(final String draftURI) {
-    this.draftURI = draftURI;
-  }
+    public CreateDraftPojo(String draftURI, String draft) {
+        this.draftURI = draftURI;
+        this.draft = draft;
+    }
 
-  public String getDraft() {
-    return draft;
-  }
+    /*
+     * public DraftPojo(URI draftURI, Model content, Draft draftState ){ super(draftURI, content);
+     * this.setCurrentStep(draftState.getCurrentStep()); this.setUserName(draftState.getUserName()); }
+     */
+    public String getDraftURI() {
+        return draftURI;
+    }
 
-  public void setDraft(final String draft) {
-    this.draft = draft;
-  }
+    public void setDraftURI(final String draftURI) {
+        this.draftURI = draftURI;
+    }
+
+    public String getDraft() {
+        return draft;
+    }
+
+    public void setDraft(final String draft) {
+        this.draft = draft;
+    }
 }

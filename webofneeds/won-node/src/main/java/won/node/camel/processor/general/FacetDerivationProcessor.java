@@ -18,21 +18,20 @@ import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.NeedRepository;
 
 /**
- * Compares the connection state found in the header of the 'in' message with
- * the state the connection is in now and triggers the data derivation.
+ * Compares the connection state found in the header of the 'in' message with the state the connection is in now and
+ * triggers the data derivation.
  * 
  */
 public class FacetDerivationProcessor implements Processor {
 
     @Autowired
     ConnectionRepository connectionRepository;
-    
+
     @Autowired
     NeedRepository needRepository;
 
     @Autowired
     FacetService derivationService;
-
 
     public FacetDerivationProcessor() {
     }
@@ -61,7 +60,7 @@ public class FacetDerivationProcessor implements Processor {
         } else {
             // found no connection. don't modify the builder
         }
-        
+
         // only if there is enough data to make a connectionStateChange object, make it and pass it to the data
         // derivation service.
         if (stateChangeBuilder.canBuild()) {

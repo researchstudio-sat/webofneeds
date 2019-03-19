@@ -56,21 +56,17 @@ public class ExecuteWonMessageCommandBehaviour extends BotBehaviour {
         linkEventToActionWithAutoCleanup(CreateNeedCommandEvent.class, new ExecuteCreateNeedCommandAction(context));
         linkEventToActionWithAutoCleanup(ConnectCommandEvent.class, new ExecuteConnectCommandAction(context));
         linkEventToActionWithAutoCleanup(OpenCommandEvent.class, new ExecuteOpenCommandAction(context));
-        linkEventToActionWithAutoCleanup(ConnectionMessageCommandEvent.class, new ExecuteConnectionMessageCommandAction(context));
+        linkEventToActionWithAutoCleanup(ConnectionMessageCommandEvent.class,
+                new ExecuteConnectionMessageCommandAction(context));
         linkEventToActionWithAutoCleanup(CloseCommandEvent.class, new ExecuteCloseCommandAction(context));
-        linkEventToActionWithAutoCleanup(DeactivateNeedCommandEvent.class, new ExecuteDeactivateNeedCommandAction(context));
+        linkEventToActionWithAutoCleanup(DeactivateNeedCommandEvent.class,
+                new ExecuteDeactivateNeedCommandAction(context));
         linkEventToActionWithAutoCleanup(FeedbackCommandEvent.class, new ExecuteFeedbackCommandAction(context));
-        //if we receive a message command failure, log it
+        // if we receive a message command failure, log it
         linkEventToActionWithAutoCleanup(MessageCommandFailureEvent.class, new LogMessageCommandFailureAction(context));
     }
 
     private void linkEventToActionWithAutoCleanup(Class<? extends Event> clazz, EventBotAction action) {
-        this.subscribeWithAutoCleanup(clazz,
-                new ActionOnEventListener(
-                        context,
-                        action
-                )
-        );
+        this.subscribeWithAutoCleanup(clazz, new ActionOnEventListener(context, action));
     }
 }
-

@@ -22,11 +22,13 @@ import java.net.URI;
  * Indicates that need creation was aborted before sending a message to a WoN node.
  */
 public class NeedCreationAbortedEvent extends CreateNeedCommandFailureEvent {
-    public NeedCreationAbortedEvent(URI needURI, URI needUriBeforeCreation, CreateNeedCommandEvent createNeedCommandEvent, String message) {
+    public NeedCreationAbortedEvent(URI needURI, URI needUriBeforeCreation,
+            CreateNeedCommandEvent createNeedCommandEvent, String message) {
         super(needURI, needUriBeforeCreation, createNeedCommandEvent, message);
     }
 
-    public NeedCreationAbortedEvent(URI needURI, URI needUriBeforeCreation, CreateNeedCommandEvent createNeedCommandEvent) {
+    public NeedCreationAbortedEvent(URI needURI, URI needUriBeforeCreation,
+            CreateNeedCommandEvent createNeedCommandEvent) {
         super(needURI, needUriBeforeCreation, createNeedCommandEvent);
     }
 }

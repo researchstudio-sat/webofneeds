@@ -8,9 +8,7 @@ import org.apache.jena.rdf.model.Resource;
 /**
  * WGS84 Geo Positioning vocabulary.
  *
- * User: Alan Tus
- * Date: 21.04.13.
- * Time: 22:13
+ * User: Alan Tus Date: 21.04.13. Time: 22:13
  */
 public class GEO {
 
@@ -21,7 +19,9 @@ public class GEO {
     public static final Property LONGITUDE = m.createProperty(BASE_URI, "longitude");
     public static final Property LATITUDE = m.createProperty(BASE_URI, "latitude");
 
-    /** returns the URI for this schema
+    /**
+     * returns the URI for this schema
+     * 
      * @return the URI for this schema
      */
     public static String getURI() {

@@ -27,49 +27,53 @@ import won.owner.protocol.message.OwnerCallback;
  *
  * Note: Methods may throw runtime exceptions, which will be handled by the execution framework.
  */
-public interface Bot extends OwnerCallback
-{
-  public boolean knowsNeedURI(URI needURI);
+public interface Bot extends OwnerCallback {
+    public boolean knowsNeedURI(URI needURI);
 
-  public boolean knowsNodeURI(URI wonNodeURI);
+    public boolean knowsNodeURI(URI wonNodeURI);
 
+    public void onNewNeedCreated(final URI needUri, final URI wonNodeUri, final Dataset needModel) throws Exception;
 
-  public void onNewNeedCreated(final URI needUri, final URI wonNodeUri, final Dataset needModel) throws Exception;
+    public void onMatcherRegistered(URI wonNodeUri);
 
-  public void onMatcherRegistered(URI wonNodeUri);
-  public void onNewNeedCreatedNotificationForMatcher(final URI wonNodeURI, final URI needURI, final Dataset needModel);
-  public void onNeedActivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI);
-  public void onNeedDeactivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI);
+    public void onNewNeedCreatedNotificationForMatcher(final URI wonNodeURI, final URI needURI,
+            final Dataset needModel);
 
-  /**
-   * Init method, called exactly once by the framework before any other method is invoked.
-   * The callee must make sure this call is thread-safe, e.g. by explicit synchronizing.
-   */
-  public void initialize() throws Exception;
-  /**
-   * Called by the framework to execute non-reactive tasks.
-   * The callee must make sure this call is thread-safe, but explicit synchronization is strongly discouraged.
-   */
-  public void act() throws Exception;
+    public void onNeedActivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI);
 
-  /**
-   * Shutdown method called exactly once by the framework to allow the bot to free resources.
-   * The callee must make sure this call is thread-safe, e.g. by explicit synchronizing.
-   */
-  public void shutdown() throws Exception;
+    public void onNeedDeactivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI);
 
-  /**
-   * The lifecycle phase the bot is currently in.
-   * @return
-   */
-  public BotLifecyclePhase getLifecyclePhase();
+    /**
+     * Init method, called exactly once by the framework before any other method is invoked. The callee must make sure
+     * this call is thread-safe, e.g. by explicit synchronizing.
+     */
+    public void initialize() throws Exception;
 
-  /**
-   * Indicates whether the bot considers its work done. If true, the bot is ok with not receiving
-   * incoming messages and not having its act() method called.
-   *
-   * @return
-   */
-  public boolean isWorkDone();
+    /**
+     * Called by the framework to execute non-reactive tasks. The callee must make sure this call is thread-safe, but
+     * explicit synchronization is strongly discouraged.
+     */
+    public void act() throws Exception;
+
+    /**
+     * Shutdown method called exactly once by the framework to allow the bot to free resources. The callee must make
+     * sure this call is thread-safe, e.g. by explicit synchronizing.
+     */
+    public void shutdown() throws Exception;
+
+    /**
+     * The lifecycle phase the bot is currently in.
+     * 
+     * @return
+     */
+    public BotLifecyclePhase getLifecyclePhase();
+
+    /**
+     * Indicates whether the bot considers its work done. If true, the bot is ok with not receiving incoming messages
+     * and not having its act() method called.
+     *
+     * @return
+     */
+    public boolean isWorkDone();
 
 }

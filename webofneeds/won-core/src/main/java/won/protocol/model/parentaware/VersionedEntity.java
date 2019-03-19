@@ -23,6 +23,8 @@ import java.util.Date;
  */
 public interface VersionedEntity {
     public int getVersion();
+
     public void incrementVersion();
+
     public Date getLastUpdate();
 }

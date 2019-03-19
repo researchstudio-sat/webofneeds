@@ -30,27 +30,26 @@ import won.protocol.message.WonMessage;
 import won.protocol.service.MatcherFacingNeedCommunicationService;
 
 /**
- * User: fkleedorfer
- * Date: 02.11.12
+ * User: fkleedorfer Date: 02.11.12
  */
 @Service
-public class MatcherProtocolNeedServiceImpl implements MatcherProtocolNeedService
-{
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-  private MatcherFacingNeedCommunicationService matcherFacingNeedCommunicationService;
+public class MatcherProtocolNeedServiceImpl implements MatcherProtocolNeedService {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private MatcherFacingNeedCommunicationService matcherFacingNeedCommunicationService;
 
-  @Override
-  public void hint(final URI needURI, final URI otherNeed,
-                   final double score, final URI originator,
-                   Model content, WonMessage wonMessage) throws Exception {
-    logger.debug("need from matcher: HINT received for need {} referring to need {} with score {} from originator {} and content {}", new Object[]{needURI, otherNeed, score, originator, content});
-    matcherFacingNeedCommunicationService.hint(needURI, otherNeed, score, originator, content, wonMessage);
-  }
+    @Override
+    public void hint(final URI needURI, final URI otherNeed, final double score, final URI originator, Model content,
+            WonMessage wonMessage) throws Exception {
+        logger.debug(
+                "need from matcher: HINT received for need {} referring to need {} with score {} from originator {} and content {}",
+                new Object[] { needURI, otherNeed, score, originator, content });
+        matcherFacingNeedCommunicationService.hint(needURI, otherNeed, score, originator, content, wonMessage);
+    }
 
-  @WebMethod(exclude = true)
-  public void setMatcherFacingNeedCommunicationService(final MatcherFacingNeedCommunicationService matcherFacingNeedCommunicationService)
-  {
-    this.matcherFacingNeedCommunicationService = matcherFacingNeedCommunicationService;
-  }
+    @WebMethod(exclude = true)
+    public void setMatcherFacingNeedCommunicationService(
+            final MatcherFacingNeedCommunicationService matcherFacingNeedCommunicationService) {
+        this.matcherFacingNeedCommunicationService = matcherFacingNeedCommunicationService;
+    }
 
 }

@@ -20,18 +20,18 @@ import won.bot.framework.eventbot.action.impl.mail.receive.MailContentExtractor;
 /**
  * Created by fsuda on 14.04.2017.
  */
-public class MailBotContextWrapper extends BotContextWrapper{
+public class MailBotContextWrapper extends BotContextWrapper {
     private String userSubscribeStatusName = getBotName() + ":subscribeStatus";
-    private String userCachedMailsName= getBotName() + ":userCachedMails";
-    private String uriMimeMessageName= getBotName() + ":uriMimeMessage";
-    private String mailIdUriName= getBotName() + ":mailIdUri";
+    private String userCachedMailsName = getBotName() + ":userCachedMails";
+    private String uriMimeMessageName = getBotName() + ":uriMimeMessage";
+    private String mailIdUriName = getBotName() + ":mailIdUri";
     private String mailAddressUriName = getBotName() + ":mailAddressUri";
 
     public MailBotContextWrapper(BotContext botContext, String botName) {
         super(botContext, botName);
     }
 
-    //Util Methods to Get/Remove/Add Uri -> MimeMessage Relation
+    // Util Methods to Get/Remove/Add Uri -> MimeMessage Relation
     public void removeUriMimeMessageRelation(URI needURI) {
         getBotContext().removeFromObjectMap(uriMimeMessageName, needURI.toString());
     }
@@ -43,15 +43,14 @@ public class MailBotContextWrapper extends BotContextWrapper{
         return new MimeMessage(Session.getDefaultInstance(new Properties(), null), is);
     }
 
-    public void addUriMimeMessageRelation(URI needURI, MimeMessage mimeMessage)
-            throws IOException, MessagingException {
+    public void addUriMimeMessageRelation(URI needURI, MimeMessage mimeMessage) throws IOException, MessagingException {
 
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         mimeMessage.writeTo(os);
         getBotContext().saveToObjectMap(uriMimeMessageName, needURI.toString(), os.toByteArray());
     }
 
-    //Util Methods to Get/Remove/Add MailId -> URI Relation
+    // Util Methods to Get/Remove/Add MailId -> URI Relation
     public void removeMailIdWonURIRelation(String mailId) {
         getBotContext().removeFromObjectMap(mailIdUriName, mailId);
     }
@@ -64,12 +63,12 @@ public class MailBotContextWrapper extends BotContextWrapper{
         getBotContext().saveToObjectMap(mailIdUriName, mailId, uri);
     }
 
-    //Util Methods to Get/Remove/Add MailId -> URI Relation
+    // Util Methods to Get/Remove/Add MailId -> URI Relation
     public List<WonURI> getWonURIsForMailAddress(String mailAddress) {
         List<WonURI> uriList = new LinkedList<>();
         List<Object> objectList = getBotContext().loadFromListMap(mailAddressUriName, mailAddress);
 
-        for(Object o : objectList){
+        for (Object o : objectList) {
             uriList.add((WonURI) o);
         }
 
@@ -83,7 +82,8 @@ public class MailBotContextWrapper extends BotContextWrapper{
     public void addCachedMailsForMailAddress(MimeMessage mimeMessage) throws IOException, MessagingException {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         mimeMessage.writeTo(os);
-        getBotContext().addToListMap(userCachedMailsName, MailContentExtractor.getMailSender(mimeMessage), os.toByteArray());
+        getBotContext().addToListMap(userCachedMailsName, MailContentExtractor.getMailSender(mimeMessage),
+                os.toByteArray());
     }
 
     public Collection<MimeMessage> loadCachedMailsForMailAddress(String mailAddress) throws MessagingException {
@@ -109,7 +109,8 @@ public class MailBotContextWrapper extends BotContextWrapper{
     }
 
     public SubscribeStatus getSubscribeStatusForMailAddress(String mailAddress) {
-        SubscribeStatus status = (SubscribeStatus) getBotContext().loadFromObjectMap(userSubscribeStatusName, mailAddress);
+        SubscribeStatus status = (SubscribeStatus) getBotContext().loadFromObjectMap(userSubscribeStatusName,
+                mailAddress);
         return (status != null) ? SubscribeStatus.valueOf(status.name()) : SubscribeStatus.NO_RESPONSE;
     }
 }

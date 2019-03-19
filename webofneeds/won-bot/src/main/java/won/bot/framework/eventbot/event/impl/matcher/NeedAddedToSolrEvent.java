@@ -23,10 +23,9 @@ import won.bot.framework.eventbot.event.BaseNeedSpecificEvent;
 /**
  *
  */
-public class NeedAddedToSolrEvent extends BaseNeedSpecificEvent
-{
-   public NeedAddedToSolrEvent(final URI needURI) {
-    super(needURI);
-  }
+public class NeedAddedToSolrEvent extends BaseNeedSpecificEvent {
+    public NeedAddedToSolrEvent(final URI needURI) {
+        super(needURI);
+    }
 
 }

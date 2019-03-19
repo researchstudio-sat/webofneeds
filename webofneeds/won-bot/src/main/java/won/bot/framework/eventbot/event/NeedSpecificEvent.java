@@ -21,7 +21,6 @@ import java.net.URI;
 /**
  * Interface for events that are need-specific.
  */
-public interface NeedSpecificEvent
-{
-  public URI getNeedURI();
+public interface NeedSpecificEvent {
+    public URI getNeedURI();
 }

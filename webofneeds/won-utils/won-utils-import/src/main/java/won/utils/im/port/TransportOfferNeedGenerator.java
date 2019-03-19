@@ -25,8 +25,9 @@ public class TransportOfferNeedGenerator {
 
     static Model model = ModelFactory.createDefaultModel();
 
-    static RDFDatatype bigdata_geoSpatialDatatype = new BaseDatatype("http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon");
-    
+    static RDFDatatype bigdata_geoSpatialDatatype = new BaseDatatype(
+            "http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon");
+
     static HashMap<String, String>[] locations = new HashMap[10];
     static String[] tags = { "quick", "<10kg", "long-distance", "cooled", "pets", "furniture", "short-distance",
             "small", "non-living", "produce", "time-sensitive" };
@@ -41,7 +42,7 @@ public class TransportOfferNeedGenerator {
         Random random = new Random();
         for (int i = 0; i < N; i++) {
             String rnd = Long.toHexString(random.nextLong());
-            String needURI = "https://localhost:8443/won/resource/event/" + "transport_offer_need_" + rnd ;
+            String needURI = "https://localhost:8443/won/resource/event/" + "transport_offer_need_" + rnd;
 
             model = ModelFactory.createDefaultModel();
 
@@ -94,22 +95,21 @@ public class TransportOfferNeedGenerator {
             return resource;
         }
 
-     // pick a location and change it by a random amount so that the locations are scattered around a point
+        // pick a location and change it by a random amount so that the locations are scattered around a point
         int locNr = (int) (Math.random() * 10);
-        double rndlat = 0.05 * Math.random(); 
-        double rndlng = 0.05 * Math.random();                
+        double rndlat = 0.05 * Math.random();
+        double rndlng = 0.05 * Math.random();
         DecimalFormat df = new DecimalFormat("##.######");
         df.setRoundingMode(RoundingMode.HALF_UP);
         df.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
-        
-        String nwlat =  df.format(Double.parseDouble(locations[locNr].get("nwlat")) + rndlat);
+
+        String nwlat = df.format(Double.parseDouble(locations[locNr].get("nwlat")) + rndlat);
         String nwlng = df.format(Double.parseDouble(locations[locNr].get("nwlng")) + rndlng);
         String selat = df.format(Double.parseDouble(locations[locNr].get("selat")) + rndlat);
         String selng = df.format(Double.parseDouble(locations[locNr].get("selng")) + rndlng);
         String lat = df.format(Double.parseDouble(locations[locNr].get("lat")) + rndlat);
         String lng = df.format(Double.parseDouble(locations[locNr].get("lng")) + rndlng);
         String name = locations[locNr].get("name");
-
 
         Resource locationResource = model.createResource();
         Resource boundingBoxResource = model.createResource();
@@ -126,8 +126,9 @@ public class TransportOfferNeedGenerator {
         geoResource.addProperty(RDF.type, schema_GeoCoordinates);
         geoResource.addProperty(SCHEMA.LATITUDE, lat);
         geoResource.addProperty(SCHEMA.LONGITUDE, lng);
-        // add bigdata specific value: "<subj> won:geoSpatial  "48.225073#16.358398"^^<http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon>" 
-        geoResource.addProperty(WON.GEO_SPATIAL, lat+"#"+lng, bigdata_geoSpatialDatatype);
+        // add bigdata specific value: "<subj> won:geoSpatial
+        // "48.225073#16.358398"^^<http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon>"
+        geoResource.addProperty(WON.GEO_SPATIAL, lat + "#" + lng, bigdata_geoSpatialDatatype);
         locationResource.addProperty(WON.HAS_BOUNDING_BOX, boundingBoxResource);
         boundingBoxResource.addProperty(WON.HAS_NORTH_WEST_CORNER, nwCornerResource);
         nwCornerResource.addProperty(RDF.type, schema_GeoCoordinates);

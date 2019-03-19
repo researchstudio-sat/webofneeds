@@ -19,34 +19,28 @@ package won.owner.service.impl;
 import java.net.URI;
 
 /**
- * User: fkleedorfer
- * Date: 12.02.13
+ * User: fkleedorfer Date: 12.02.13
  */
-public class URIService
-{
-  private URI ownerProtocolOwnerServiceEndpointURI;
-  private URI defaultOwnerProtocolNeedServiceEndpointURI;
-  private URI ownerProtocolOwnerURI;
+public class URIService {
+    private URI ownerProtocolOwnerServiceEndpointURI;
+    private URI defaultOwnerProtocolNeedServiceEndpointURI;
+    private URI ownerProtocolOwnerURI;
 
-  public URI getOwnerProtocolOwnerServiceEndpointURI()
-  {
-    return ownerProtocolOwnerServiceEndpointURI;
-  }
+    public URI getOwnerProtocolOwnerServiceEndpointURI() {
+        return ownerProtocolOwnerServiceEndpointURI;
+    }
 
-  public void setOwnerProtocolOwnerServiceEndpointURI(final URI ownerProtocolOwnerServiceEndpointURI)
-  {
-    this.ownerProtocolOwnerServiceEndpointURI = ownerProtocolOwnerServiceEndpointURI;
-  }
+    public void setOwnerProtocolOwnerServiceEndpointURI(final URI ownerProtocolOwnerServiceEndpointURI) {
+        this.ownerProtocolOwnerServiceEndpointURI = ownerProtocolOwnerServiceEndpointURI;
+    }
 
-  public URI getDefaultOwnerProtocolNeedServiceEndpointURI()
-  {
-    return defaultOwnerProtocolNeedServiceEndpointURI;
-  }
+    public URI getDefaultOwnerProtocolNeedServiceEndpointURI() {
+        return defaultOwnerProtocolNeedServiceEndpointURI;
+    }
 
-  public void setDefaultOwnerProtocolNeedServiceEndpointURI(final URI defaultOwnerProtocolNeedServiceEndpointURI)
-  {
-    this.defaultOwnerProtocolNeedServiceEndpointURI = defaultOwnerProtocolNeedServiceEndpointURI;
-  }
+    public void setDefaultOwnerProtocolNeedServiceEndpointURI(final URI defaultOwnerProtocolNeedServiceEndpointURI) {
+        this.defaultOwnerProtocolNeedServiceEndpointURI = defaultOwnerProtocolNeedServiceEndpointURI;
+    }
 
     public URI getOwnerProtocolOwnerURI() {
         return ownerProtocolOwnerURI;

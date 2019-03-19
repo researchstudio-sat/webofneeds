@@ -11,36 +11,36 @@ import won.owner.service.impl.KeystorePasswordUtils;
 @Entity
 @Table(name = "keystore_password")
 public class KeystorePasswordHolder {
-	@Id
-	@GeneratedValue
-	@Column(name = "id")
-	private Long id;
-	
-	@Column(name= "encrypted_password")
-	private String encryptedPassword;
+    @Id
+    @GeneratedValue
+    @Column(name = "id")
+    private Long id;
 
-	public Long getId() {
-		return id;
-	}
+    @Column(name = "encrypted_password")
+    private String encryptedPassword;
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public String getEncryptedPassword() {
-		return encryptedPassword;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public void setEncryptedPassword(String encryptedPassword) {
-		this.encryptedPassword = encryptedPassword;
-	}
-	
-	public String getPassword(String key) {
-		return KeystorePasswordUtils.decryptPassword(encryptedPassword, key);
-	}
-	
-	public void setPassword(String cleartextPassword, String key) {
-		this.encryptedPassword = KeystorePasswordUtils.encryptPassword(cleartextPassword, key);
-	}
-	
+    public String getEncryptedPassword() {
+        return encryptedPassword;
+    }
+
+    public void setEncryptedPassword(String encryptedPassword) {
+        this.encryptedPassword = encryptedPassword;
+    }
+
+    public String getPassword(String key) {
+        return KeystorePasswordUtils.decryptPassword(encryptedPassword, key);
+    }
+
+    public void setPassword(String cleartextPassword, String key) {
+        this.encryptedPassword = KeystorePasswordUtils.encryptPassword(cleartextPassword, key);
+    }
+
 }

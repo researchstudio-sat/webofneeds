@@ -20,18 +20,14 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
 /**
- * User: LEIH-NB
- * Date: 20.03.14
+ * User: LEIH-NB Date: 20.03.14
  */
-public class SimpleMatcherTestApp
-{
+public class SimpleMatcherTestApp {
     public static void main(String[] args) throws Exception {
-        SpringApplication app = new SpringApplication(
-                new Object[]{"classpath:/spring/app/simpleMatcherTest.xml"}
-        );
+        SpringApplication app = new SpringApplication(new Object[] { "classpath:/spring/app/simpleMatcherTest.xml" });
         app.setWebEnvironment(false);
-        ConfigurableApplicationContext applicationContext =  app.run(args);
-        Thread.sleep(5*60*1000);
+        ConfigurableApplicationContext applicationContext = app.run(args);
+        Thread.sleep(5 * 60 * 1000);
         app.exit(applicationContext);
     }
 

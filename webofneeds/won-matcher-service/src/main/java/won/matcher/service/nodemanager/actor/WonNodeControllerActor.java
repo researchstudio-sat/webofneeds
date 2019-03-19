@@ -40,15 +40,12 @@ import won.protocol.service.WonNodeInfo;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.linkeddata.LinkedDataSource;
 
-
 /**
  * Actor that knows all won nodes the matching service is communicating with. It gets informed about new won nodes over
  * the event stream (e.g. by he crawler) and decides which won nodes to crawl and to register with for receiving need
- * events.
- * There should only exist a single instance of this actor that has the global view of all connected won nodes.
+ * events. There should only exist a single instance of this actor that has the global view of all connected won nodes.
  * <p>
- * User: hfriedrich
- * Date: 27.04.2015
+ * User: hfriedrich Date: 27.04.2015
  */
 @Component
 @Scope("prototype")
@@ -83,7 +80,6 @@ public class WonNodeControllerActor extends UntypedActor {
     @Autowired
     private HintDBService hintDatabase;
 
-
     @Override
     public void preStart() {
 
@@ -93,11 +89,13 @@ public class WonNodeControllerActor extends UntypedActor {
 
         // Subscribe for won node events
         pubSubMediator = DistributedPubSub.get(getContext().system()).mediator();
-        pubSubMediator.tell(new DistributedPubSubMediator.Subscribe(WonNodeEvent.class.getName(), getSelf()), getSelf());
+        pubSubMediator.tell(new DistributedPubSubMediator.Subscribe(WonNodeEvent.class.getName(), getSelf()),
+                getSelf());
 
         // Subscribe for hint events
         pubSubMediator.tell(new DistributedPubSubMediator.Subscribe(HintEvent.class.getName(), getSelf()), getSelf());
-        pubSubMediator.tell(new DistributedPubSubMediator.Subscribe(BulkHintEvent.class.getName(), getSelf()), getSelf());
+        pubSubMediator.tell(new DistributedPubSubMediator.Subscribe(BulkHintEvent.class.getName(), getSelf()),
+                getSelf());
 
         // set won nodes to skip by configuration
         skipWonNodeUris.addAll(config.getSkipWonNodes());
@@ -117,7 +115,8 @@ public class WonNodeControllerActor extends UntypedActor {
         // Treat the known won nodes as newly discovered won nodes to register them again at startup of matcher service
         for (WonNodeInfo nodeInfo : wonNodeInfo) {
             if (!config.getCrawlWonNodes().contains(nodeInfo.getWonNodeURI())) {
-                WonNodeEvent e = new WonNodeEvent(nodeInfo.getWonNodeURI(), WonNodeEvent.STATUS.NEW_WON_NODE_DISCOVERED);
+                WonNodeEvent e = new WonNodeEvent(nodeInfo.getWonNodeURI(),
+                        WonNodeEvent.STATUS.NEW_WON_NODE_DISCOVERED);
                 pubSubMediator.tell(new DistributedPubSubMediator.Publish(e.getClass().getName(), e), getSelf());
             }
         }
@@ -133,17 +132,18 @@ public class WonNodeControllerActor extends UntypedActor {
         }
 
         // initialize the crawler
-        crawler = getContext().actorOf(SpringExtension.SpringExtProvider.get(
-                getContext().system()).props(MasterCrawlerActor.class), "MasterCrawlerActor");
+        crawler = getContext().actorOf(
+                SpringExtension.SpringExtProvider.get(getContext().system()).props(MasterCrawlerActor.class),
+                "MasterCrawlerActor");
 
         // initialize the need event save actor
-        saveNeedActor = getContext().actorOf(SpringExtension.SpringExtProvider.get(
-                getContext().system()).props(SaveNeedEventActor.class), "SaveNeedEventActor");
+        saveNeedActor = getContext().actorOf(
+                SpringExtension.SpringExtProvider.get(getContext().system()).props(SaveNeedEventActor.class),
+                "SaveNeedEventActor");
     }
 
     /**
-     * Receive messages about newly discovered won node and decide to crawl or skip
-     * processing these won nodes.
+     * Receive messages about newly discovered won node and decide to crawl or skip processing these won nodes.
      *
      * @param message
      * @throws Exception
@@ -166,17 +166,19 @@ public class WonNodeControllerActor extends UntypedActor {
         if (message instanceof WonNodeEvent) {
             WonNodeEvent event = (WonNodeEvent) message;
 
-            if (event.getStatus().equals(WonNodeEvent.STATUS.NEW_WON_NODE_DISCOVERED) ||
-                    event.getStatus().equals(WonNodeEvent.STATUS.GET_WON_NODE_INFO_FOR_CRAWLING) ||
-                    event.getStatus().equals(WonNodeEvent.STATUS.RETRY_REGISTER_FAILED_WON_NODE)) {
+            if (event.getStatus().equals(WonNodeEvent.STATUS.NEW_WON_NODE_DISCOVERED)
+                    || event.getStatus().equals(WonNodeEvent.STATUS.GET_WON_NODE_INFO_FOR_CRAWLING)
+                    || event.getStatus().equals(WonNodeEvent.STATUS.RETRY_REGISTER_FAILED_WON_NODE)) {
 
                 // won node has already been discovered and connected
                 if (crawlWonNodes.containsKey(event.getWonNodeUri())) {
                     log.debug("Won node uri '{}' already discovered", event.getWonNodeUri());
                     if (event.getStatus().equals(WonNodeEvent.STATUS.GET_WON_NODE_INFO_FOR_CRAWLING)) {
                         WonNodeInfo wonNodeInfo = crawlWonNodes.get(event.getWonNodeUri()).getWonNodeInfo();
-                        WonNodeEvent e = new WonNodeEvent(event.getWonNodeUri(), WonNodeEvent.STATUS.CONNECTED_TO_WON_NODE, wonNodeInfo);
-                        pubSubMediator.tell(new DistributedPubSubMediator.Publish(e.getClass().getName(), e), getSelf());
+                        WonNodeEvent e = new WonNodeEvent(event.getWonNodeUri(),
+                                WonNodeEvent.STATUS.CONNECTED_TO_WON_NODE, wonNodeInfo);
+                        pubSubMediator.tell(new DistributedPubSubMediator.Publish(e.getClass().getName(), e),
+                                getSelf());
                     }
                     return;
                 }
@@ -191,17 +193,22 @@ public class WonNodeControllerActor extends UntypedActor {
 
                 // shall we try to connect to the won node or has it failed already ?
                 if (failedWonNodeUris.contains(event.getWonNodeUri())) {
-                    log.debug("Suppress connection to already failed won node with uri {} , will try to connect later ...", event.getWonNodeUri());
+                    log.debug(
+                            "Suppress connection to already failed won node with uri {} , will try to connect later ...",
+                            event.getWonNodeUri());
                     return;
                 }
 
                 // try the connect to won node
-                boolean logRegisterWarningForWonNode = event.getStatus().equals(WonNodeEvent.STATUS.RETRY_REGISTER_FAILED_WON_NODE);
-                WonNodeConnection wonNodeConnection = addWonNodeForCrawling(event.getWonNodeUri(), logRegisterWarningForWonNode);
+                boolean logRegisterWarningForWonNode = event.getStatus()
+                        .equals(WonNodeEvent.STATUS.RETRY_REGISTER_FAILED_WON_NODE);
+                WonNodeConnection wonNodeConnection = addWonNodeForCrawling(event.getWonNodeUri(),
+                        logRegisterWarningForWonNode);
 
                 // connection failed ?
                 if (failedWonNodeUris.contains(event.getWonNodeUri())) {
-                    log.debug("Still could not connect to won node with uri: {}, will retry later ...", event.getWonNodeUri());
+                    log.debug("Still could not connect to won node with uri: {}, will retry later ...",
+                            event.getWonNodeUri());
                     return;
                 }
 
@@ -211,7 +218,8 @@ public class WonNodeControllerActor extends UntypedActor {
                     return;
                 }
 
-                WonNodeEvent e = new WonNodeEvent(event.getWonNodeUri(), WonNodeEvent.STATUS.CONNECTED_TO_WON_NODE, wonNodeConnection.getWonNodeInfo());
+                WonNodeEvent e = new WonNodeEvent(event.getWonNodeUri(), WonNodeEvent.STATUS.CONNECTED_TO_WON_NODE,
+                        wonNodeConnection.getWonNodeInfo());
                 pubSubMediator.tell(new DistributedPubSubMediator.Publish(e.getClass().getName(), e), getSelf());
                 return;
             }
@@ -270,8 +278,10 @@ public class WonNodeControllerActor extends UntypedActor {
     /**
      * Try to register at won nodes and add them for crawling
      *
-     * @param wonNodeUri URI of the won node meta data resource
-     * @param logWonNodeRegisterWarning if true then log the failed register attempts as warning, otherwise as debug level
+     * @param wonNodeUri
+     *            URI of the won node meta data resource
+     * @param logWonNodeRegisterWarning
+     *            if true then log the failed register attempts as warning, otherwise as debug level
      * @return won node connection if successfully connected, otherwise null
      */
     private WonNodeConnection addWonNodeForCrawling(String wonNodeUri, boolean logWonNodeRegisterWarning) {
@@ -364,7 +374,8 @@ public class WonNodeControllerActor extends UntypedActor {
     /**
      * Handles connections errors that occur when the need consumer actors are terminated.
      *
-     * @param t messages that holds a reference to consumer actor that was terminated
+     * @param t
+     *            messages that holds a reference to consumer actor that was terminated
      */
     private void handleConnectionErrors(Terminated t) {
         for (String uri : crawlWonNodes.keySet()) {
@@ -387,24 +398,21 @@ public class WonNodeControllerActor extends UntypedActor {
         }
     }
 
-
     @Override
     public SupervisorStrategy supervisorStrategy() {
 
-        SupervisorStrategy supervisorStrategy = new OneForOneStrategy(
-                0, Duration.Zero(), new Function<Throwable, SupervisorStrategy.Directive>() {
+        SupervisorStrategy supervisorStrategy = new OneForOneStrategy(0, Duration.Zero(),
+                new Function<Throwable, SupervisorStrategy.Directive>() {
 
-            @Override
-            public SupervisorStrategy.Directive apply(Throwable t) throws Exception {
+                    @Override
+                    public SupervisorStrategy.Directive apply(Throwable t) throws Exception {
 
-                log.warning("Actor encountered error: {}", t);
-                // default behaviour
-                return SupervisorStrategy.escalate();
-            }
-        });
+                        log.warning("Actor encountered error: {}", t);
+                        // default behaviour
+                        return SupervisorStrategy.escalate();
+                    }
+                });
 
         return supervisorStrategy;
     }
 }
-
-

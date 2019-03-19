@@ -24,9 +24,12 @@ import won.bot.framework.eventbot.event.Event;
 public interface CommandResultEvent<C extends CommandEvent> extends Event {
     /**
      * An optional message for diagnostic purposes.
+     * 
      * @return the message or null;
      */
     String getMessage();
+
     C getOriginalCommandEvent();
+
     boolean isSuccess();
 }

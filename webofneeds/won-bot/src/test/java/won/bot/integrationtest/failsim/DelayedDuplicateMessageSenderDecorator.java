@@ -28,31 +28,32 @@ import won.protocol.message.sender.exception.WonMessageSenderException;
  * Decorates the EventListenerContext such that the bot sends each message twice.
  */
 public class DelayedDuplicateMessageSenderDecorator extends BaseEventListenerContextDecorator {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-  private long delay = 100;
-  public DelayedDuplicateMessageSenderDecorator(EventListenerContext delegate) {
-    super(delegate);
-  }
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private long delay = 100;
 
-  public DelayedDuplicateMessageSenderDecorator(EventListenerContext delegate, long delay) {
-    super(delegate);
-    this.delay = delay;
-  }
+    public DelayedDuplicateMessageSenderDecorator(EventListenerContext delegate) {
+        super(delegate);
+    }
 
-  @Override
-  public WonMessageSender getWonMessageSender() {
-    final WonMessageSender delegate = super.getWonMessageSender();
-    return new WonMessageSender() {
-      @Override
-      public void sendWonMessage(WonMessage message) throws WonMessageSenderException {
-        delegate.sendWonMessage(message);
-        try {
-          Thread.sleep(delay);
-        } catch (InterruptedException e) {
-          logger.warn("caught while waiting the delay time before sending duplicate message",e);
-        }
-        delegate.sendWonMessage(message);
-      }
-    };
-  }
+    public DelayedDuplicateMessageSenderDecorator(EventListenerContext delegate, long delay) {
+        super(delegate);
+        this.delay = delay;
+    }
+
+    @Override
+    public WonMessageSender getWonMessageSender() {
+        final WonMessageSender delegate = super.getWonMessageSender();
+        return new WonMessageSender() {
+            @Override
+            public void sendWonMessage(WonMessage message) throws WonMessageSenderException {
+                delegate.sendWonMessage(message);
+                try {
+                    Thread.sleep(delay);
+                } catch (InterruptedException e) {
+                    logger.warn("caught while waiting the delay time before sending duplicate message", e);
+                }
+                delegate.sendWonMessage(message);
+            }
+        };
+    }
 }

@@ -22,23 +22,19 @@ import org.slf4j.LoggerFactory;
 /**
  * Simple base class for recorders.
  */
-public abstract class AbstractRecorder implements MonitoringStatisticsRecorder
-{
-  protected final Logger logger = LoggerFactory.getLogger(getClass());
-  private String recorderName;
+public abstract class AbstractRecorder implements MonitoringStatisticsRecorder {
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
+    private String recorderName;
 
-  protected AbstractRecorder()
-  {
-    this.recorderName = getClass().getName() + "@" + Integer.toHexString(hashCode());
-  }
+    protected AbstractRecorder() {
+        this.recorderName = getClass().getName() + "@" + Integer.toHexString(hashCode());
+    }
 
-  public void setRecorderName(final String recorderName)
-  {
-    this.recorderName = recorderName;
-  }
+    public void setRecorderName(final String recorderName) {
+        this.recorderName = recorderName;
+    }
 
-  public String getRecorderName()
-  {
-    return recorderName;
-  }
+    public String getRecorderName() {
+        return recorderName;
+    }
 }

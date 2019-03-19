@@ -25,29 +25,29 @@ import won.bot.framework.eventbot.action.EventBotAction;
  * Action that delegates to another action after a delay that is chosen at random between a specified minimum and
  * maximum.
  */
-public class RandomDelayedAction extends DelayedDelegatingAction
-{
-  private long minDelay;
-  private long maxDelay;
-  private long intervalLength;
-  private long salt;
-  private Random random;
+public class RandomDelayedAction extends DelayedDelegatingAction {
+    private long minDelay;
+    private long maxDelay;
+    private long intervalLength;
+    private long salt;
+    private Random random;
 
-  public RandomDelayedAction(final EventListenerContext eventListenerContext, final long minDelay, final long maxDelay, final long salt, final EventBotAction delegate) {
-    super(eventListenerContext, delegate);
-    this.minDelay = minDelay;
-    this.maxDelay = maxDelay;
-    this.salt = salt;
-    assert minDelay >= 0 : "minDelay must be >= 0";
-    assert maxDelay >= 0 : "maxDelay must be >= 0";
-    assert minDelay <= maxDelay : "minDelay must be <= maxDelay";
-    this.random = new Random(System.currentTimeMillis() + salt);
-    this.intervalLength = maxDelay - minDelay;
-  }
+    public RandomDelayedAction(final EventListenerContext eventListenerContext, final long minDelay,
+            final long maxDelay, final long salt, final EventBotAction delegate) {
+        super(eventListenerContext, delegate);
+        this.minDelay = minDelay;
+        this.maxDelay = maxDelay;
+        this.salt = salt;
+        assert minDelay >= 0 : "minDelay must be >= 0";
+        assert maxDelay >= 0 : "maxDelay must be >= 0";
+        assert minDelay <= maxDelay : "minDelay must be <= maxDelay";
+        this.random = new Random(System.currentTimeMillis() + salt);
+        this.intervalLength = maxDelay - minDelay;
+    }
 
-  @Override
-  protected long getDelay() {
-    double outcome = random.nextDouble();
-    return minDelay + ((long) ((double)intervalLength * outcome));
-  }
+    @Override
+    protected long getDelay() {
+        double outcome = random.nextDouble();
+        return minDelay + ((long) ((double) intervalLength * outcome));
+    }
 }

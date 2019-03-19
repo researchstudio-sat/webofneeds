@@ -34,93 +34,83 @@ import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 
 /**
- * Listener that responds to open and message events with automatic messages.
- * Can be configured to apply a timeout (non-blocking) before sending messages.
+ * Listener that responds to open and message events with automatic messages. Can be configured to apply a timeout
+ * (non-blocking) before sending messages.
  */
-public class RespondWithEchoToMessageAction extends BaseEventBotAction
-{
-  private long millisTimeoutBeforeReply = 0;
+public class RespondWithEchoToMessageAction extends BaseEventBotAction {
+    private long millisTimeoutBeforeReply = 0;
 
-  public RespondWithEchoToMessageAction(EventListenerContext eventListenerContext) {
-    super(eventListenerContext);
-  }
-
-  public RespondWithEchoToMessageAction(final EventListenerContext eventListenerContext, final long millisTimeoutBeforeReply) {
-    super(eventListenerContext);
-    this.millisTimeoutBeforeReply = millisTimeoutBeforeReply;
-  }
-
-  @Override
-  protected void doRun(final Event event, EventListener executingListener) throws Exception
-  {
-    if (event instanceof ConnectionSpecificEvent){
-      handleMessageEvent((ConnectionSpecificEvent) event);
+    public RespondWithEchoToMessageAction(EventListenerContext eventListenerContext) {
+        super(eventListenerContext);
     }
-  }
 
-  private void handleMessageEvent(final ConnectionSpecificEvent messageEvent){
-    getEventListenerContext().getTaskScheduler().schedule(new Runnable()
-    {
-      @Override
-      public void run()
-      {
-        String message = null;
-        if (messageEvent instanceof  MessageEvent) {
-          message = createMessage(extractTextMessageFromWonMessage(((MessageEvent)messageEvent).getWonMessage()));
+    public RespondWithEchoToMessageAction(final EventListenerContext eventListenerContext,
+            final long millisTimeoutBeforeReply) {
+        super(eventListenerContext);
+        this.millisTimeoutBeforeReply = millisTimeoutBeforeReply;
+    }
+
+    @Override
+    protected void doRun(final Event event, EventListener executingListener) throws Exception {
+        if (event instanceof ConnectionSpecificEvent) {
+            handleMessageEvent((ConnectionSpecificEvent) event);
+        }
+    }
+
+    private void handleMessageEvent(final ConnectionSpecificEvent messageEvent) {
+        getEventListenerContext().getTaskScheduler().schedule(new Runnable() {
+            @Override
+            public void run() {
+                String message = null;
+                if (messageEvent instanceof MessageEvent) {
+                    message = createMessage(
+                            extractTextMessageFromWonMessage(((MessageEvent) messageEvent).getWonMessage()));
+                } else {
+                    message = createMessage(null);
+                }
+                URI connectionUri = messageEvent.getConnectionURI();
+                logger.debug("sending message " + message);
+                try {
+                    getEventListenerContext().getWonMessageSender()
+                            .sendWonMessage(createWonMessage(connectionUri, message));
+                } catch (Exception e) {
+                    logger.warn("could not send message via connection {}", connectionUri, e);
+                }
+            }
+        }, new Date(System.currentTimeMillis() + this.millisTimeoutBeforeReply));
+    }
+
+    private String extractTextMessageFromWonMessage(WonMessage wonMessage) {
+        if (wonMessage == null)
+            return null;
+        return WonRdfUtils.MessageUtils.getTextMessage(wonMessage);
+    }
+
+    private String createMessage(String toEcho) {
+        if (toEcho == null) {
+            return "auto reply (delay: " + millisTimeoutBeforeReply + " millis)";
         } else {
-          message = createMessage(null);
+            return "You said: '" + toEcho + "' (delay: " + millisTimeoutBeforeReply + " millis)";
         }
-        URI connectionUri = messageEvent.getConnectionURI();
-        logger.debug("sending message " + message);
-        try {
-          getEventListenerContext().getWonMessageSender().sendWonMessage(createWonMessage(connectionUri, message));
-        } catch (Exception e) {
-          logger.warn("could not send message via connection {}", connectionUri, e);
-        }
-      }
-    }, new Date(System.currentTimeMillis() + this.millisTimeoutBeforeReply));
-  }
-
-  private String extractTextMessageFromWonMessage(WonMessage wonMessage){
-    if (wonMessage == null) return null;
-    return WonRdfUtils.MessageUtils.getTextMessage(wonMessage);
-  }
-
-  private String createMessage(String toEcho)
-  {
-    if (toEcho == null) {
-      return "auto reply (delay: "+ millisTimeoutBeforeReply + " millis)";
-    } else {
-      return "You said: '" + toEcho + "' (delay: "+ millisTimeoutBeforeReply + " millis)";
     }
-  }
 
-  private WonMessage createWonMessage(URI connectionURI, String textMessage) throws WonMessageBuilderException {
+    private WonMessage createWonMessage(URI connectionURI, String textMessage) throws WonMessageBuilderException {
 
-    WonNodeInformationService wonNodeInformationService =
-      getEventListenerContext().getWonNodeInformationService();
+        WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
 
-    Dataset connectionRDF =
-      getEventListenerContext().getLinkedDataSource().getDataForResource(connectionURI);
-    URI remoteNeed = WonRdfUtils.ConnectionUtils.getRemoteNeedURIFromConnection(connectionRDF, connectionURI);
-    URI localNeed = WonRdfUtils.ConnectionUtils.getLocalNeedURIFromConnection(connectionRDF, connectionURI);
-    URI wonNode = WonRdfUtils.ConnectionUtils.getWonNodeURIFromConnection(connectionRDF, connectionURI);
-    Dataset remoteNeedRDF =
-      getEventListenerContext().getLinkedDataSource().getDataForResource(remoteNeed);
+        Dataset connectionRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(connectionURI);
+        URI remoteNeed = WonRdfUtils.ConnectionUtils.getRemoteNeedURIFromConnection(connectionRDF, connectionURI);
+        URI localNeed = WonRdfUtils.ConnectionUtils.getLocalNeedURIFromConnection(connectionRDF, connectionURI);
+        URI wonNode = WonRdfUtils.ConnectionUtils.getWonNodeURIFromConnection(connectionRDF, connectionURI);
+        Dataset remoteNeedRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(remoteNeed);
 
-    URI messageURI = wonNodeInformationService.generateEventURI(wonNode);
+        URI messageURI = wonNodeInformationService.generateEventURI(wonNode);
 
-    return WonMessageBuilder
-      .setMessagePropertiesForConnectionMessage(
-        messageURI,
-        connectionURI,
-        localNeed,
-        wonNode,
-        WonRdfUtils.ConnectionUtils.getRemoteConnectionURIFromConnection(connectionRDF, connectionURI),
-        remoteNeed,
-        WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, remoteNeed),
-        textMessage)
-      .build();
-  }
+        return WonMessageBuilder
+                .setMessagePropertiesForConnectionMessage(messageURI, connectionURI, localNeed, wonNode,
+                        WonRdfUtils.ConnectionUtils.getRemoteConnectionURIFromConnection(connectionRDF, connectionURI),
+                        remoteNeed, WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, remoteNeed), textMessage)
+                .build();
+    }
 
 }

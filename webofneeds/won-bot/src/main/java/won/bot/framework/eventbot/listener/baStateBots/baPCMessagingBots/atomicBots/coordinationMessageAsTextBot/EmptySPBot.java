@@ -7,16 +7,14 @@ import won.bot.framework.eventbot.listener.baStateBots.BATestBotScript;
 import won.bot.framework.eventbot.listener.baStateBots.BATestScriptAction;
 
 /**
- * User: Danijel
- * Date: 24.6.14.
+ * User: Danijel Date: 24.6.14.
  */
-public class EmptySPBot extends BATestBotScript
-{
+public class EmptySPBot extends BATestBotScript {
 
-  @Override
-  protected List<BATestScriptAction> setupActions() {
-    List<BATestScriptAction> actions = new ArrayList();
+    @Override
+    protected List<BATestScriptAction> setupActions() {
+        List<BATestScriptAction> actions = new ArrayList();
 
-    return actions;
-  }
+        return actions;
+    }
 }

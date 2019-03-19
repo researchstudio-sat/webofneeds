@@ -24,8 +24,7 @@ import won.protocol.util.linkeddata.LinkedDataSource;
 import won.utils.mail.WonMailSender;
 
 /**
- * User: ypanchenko
- * Date: 23.02.2015
+ * User: ypanchenko Date: 23.02.2015
  */
 public class WonOwnerMailSender {
 
@@ -53,7 +52,7 @@ public class WonOwnerMailSender {
     private static final String SUBJECT_EXPORT_FAILED = "Your account export did not succeed";
 
     private WonMailSender wonMailSender;
-    
+
     @Value(value = "${uri.prefix}")
     private URI ownerWebappUri;
 
@@ -80,7 +79,8 @@ public class WonOwnerMailSender {
         velocityEngine = new VelocityEngine();
         Properties properties = new Properties();
         properties.setProperty("resource.loader", "file");
-        properties.setProperty("file.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
+        properties.setProperty("file.resource.loader.class",
+                "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
         velocityEngine.init(properties);
         conversationNotificationTemplate = velocityEngine.getTemplate("mail-templates/conversation-notification.vm");
         connectNotificationTemplate = velocityEngine.getTemplate("mail-templates/connect-notification.vm");
@@ -88,7 +88,8 @@ public class WonOwnerMailSender {
         systemCloseNotificationTemplate = velocityEngine.getTemplate("mail-templates/systemclose-notification.vm");
         hintNotificationTemplate = velocityEngine.getTemplate("mail-templates/hint-notification.vm");
         needMessageNotificationTemplate = velocityEngine.getTemplate("mail-templates/needmessage-notification.vm");
-        systemDeactivateNotificationTemplate = velocityEngine.getTemplate("mail-templates/system-deactivate-notification.vm");
+        systemDeactivateNotificationTemplate = velocityEngine
+                .getTemplate("mail-templates/system-deactivate-notification.vm");
         verificationTemplate = velocityEngine.getTemplate("mail-templates/verification.vm");
         anonymousTemplate = velocityEngine.getTemplate("mail-templates/anonymous.vm");
         exportTemplate = velocityEngine.getTemplate("mail-templates/export.vm");
@@ -103,8 +104,8 @@ public class WonOwnerMailSender {
         return value != null ? value : defaultValue;
     }
 
-    private VelocityContext createContext(String toEmail, String localNeed, String remoteNeed,
-                                          String localConnection, String textMsg) {
+    private VelocityContext createContext(String toEmail, String localNeed, String remoteNeed, String localConnection,
+            String textMsg) {
 
         String ownerAppLink = uriService.getOwnerProtocolOwnerURI().toString();
         VelocityContext velocityContext = new VelocityContext();
@@ -140,7 +141,7 @@ public class WonOwnerMailSender {
         if (textMsg != null) {
             velocityContext.put("textMsg", textMsg);
         }
-        
+
         if (this.ownerWebappUri != null) {
             velocityContext.put("serviceName", this.ownerWebappUri);
         }
@@ -174,12 +175,12 @@ public class WonOwnerMailSender {
         String anonymousLinkUrl = ownerAppLink + OWNER_ANONYMOUS_LINK + privateId;
         velocityContext.put("anonymousLinkUrl", anonymousLinkUrl);
         velocityContext.put("serviceName", this.ownerWebappUri);
-        
+
         return velocityContext;
     }
-    
-    public void sendConversationNotificationMessage(String toEmail, String localNeed, String
-            remoteNeed, String localConnection, String textMsg) {
+
+    public void sendConversationNotificationMessage(String toEmail, String localNeed, String remoteNeed,
+            String localConnection, String textMsg) {
 
         if (textMsg != null && !textMsg.isEmpty()) {
             StringWriter writer = new StringWriter();
@@ -193,8 +194,8 @@ public class WonOwnerMailSender {
         }
     }
 
-    public void sendConnectNotificationMessage(String toEmail, String localNeed, String
-            remoteNeed, String localConnection, String textMsg) {
+    public void sendConnectNotificationMessage(String toEmail, String localNeed, String remoteNeed,
+            String localConnection, String textMsg) {
 
         StringWriter writer = new StringWriter();
         VelocityContext context = createContext(toEmail, localNeed, remoteNeed, localConnection, textMsg);
@@ -203,8 +204,8 @@ public class WonOwnerMailSender {
         this.wonMailSender.sendTextMessage(toEmail, SUBJECT_CONNECT, writer.toString());
     }
 
-    public void sendCloseNotificationMessage(String toEmail, String localNeed, String
-            remoteNeed, String localConnection, String textMsg) {
+    public void sendCloseNotificationMessage(String toEmail, String localNeed, String remoteNeed,
+            String localConnection, String textMsg) {
 
         StringWriter writer = new StringWriter();
         VelocityContext context = createContext(toEmail, localNeed, remoteNeed, localConnection, textMsg);
@@ -213,7 +214,8 @@ public class WonOwnerMailSender {
         this.wonMailSender.sendTextMessage(toEmail, SUBJECT_CLOSE, writer.toString());
     }
 
-    public void sendHintNotificationMessage(String toEmail, String localNeed, String remoteNeed, String localConnection) {
+    public void sendHintNotificationMessage(String toEmail, String localNeed, String remoteNeed,
+            String localConnection) {
 
         StringWriter writer = new StringWriter();
         VelocityContext context = createContext(toEmail, localNeed, remoteNeed, localConnection, null);
@@ -238,8 +240,8 @@ public class WonOwnerMailSender {
         this.wonMailSender.sendTextMessage(toEmail, SUBJECT_SYSTEM_DEACTIVATE, writer.toString());
     }
 
-    public void sendSystemCloseNotificationMessage(String toEmail, String localNeed, String
-            remoteNeed, String localConnection, String textMsg) {
+    public void sendSystemCloseNotificationMessage(String toEmail, String localNeed, String remoteNeed,
+            String localConnection, String textMsg) {
 
         StringWriter writer = new StringWriter();
         VelocityContext context = createContext(toEmail, localNeed, remoteNeed, localConnection, textMsg);
@@ -252,7 +254,7 @@ public class WonOwnerMailSender {
         StringWriter writer = new StringWriter();
         VelocityContext context = createVerificationContext(verificationToken);
         verificationTemplate.merge(context, writer);
-        logger.debug("sending "+ SUBJECT_VERIFICATION + " to " + user.getEmail());
+        logger.debug("sending " + SUBJECT_VERIFICATION + " to " + user.getEmail());
         this.wonMailSender.sendTextMessage(user.getEmail(), SUBJECT_VERIFICATION, writer.toString());
     }
 
@@ -263,45 +265,39 @@ public class WonOwnerMailSender {
         logger.debug("sending " + SUBJECT_ANONYMOUSLINK + " to " + email);
         this.wonMailSender.sendTextMessage(email, SUBJECT_ANONYMOUSLINK, writer.toString());
     }
-       
+
     public void sendExportMessage(String email, File file) {
         StringWriter writer = new StringWriter();
         exportTemplate.merge(new VelocityContext(), writer);
-        logger.debug("sending "+ SUBJECT_EXPORT + " to " + email);
+        logger.debug("sending " + SUBJECT_EXPORT + " to " + email);
         this.wonMailSender.sendFileMessage(email, SUBJECT_EXPORT, writer.toString(), EXPORT_FILE_NAME, file);
     }
 
     public void sendExportFailedMessage(String email) {
         StringWriter writer = new StringWriter();
         exportFailedTemplate.merge(new VelocityContext(), writer);
-        logger.debug("sending "+ SUBJECT_EXPORT_FAILED + " to " + email);
+        logger.debug("sending " + SUBJECT_EXPORT_FAILED + " to " + email);
         this.wonMailSender.sendHtmlMessage(email, SUBJECT_EXPORT_FAILED, writer.toString());
     }
 
-/*
-  Dead main method code. Useful for trying out velocity stuff when needed.
-
-  public static void main(String... args){
-    VelocityEngine velocityEngine = new VelocityEngine();
-    Properties properties = new Properties();
-    properties.setProperty("resource.loader", "file");
-    properties.setProperty("file.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
-    velocityEngine.init(properties);
-    Template template = velocityEngine.getTemplate("mail-templates/conversation-notification.vm");
-    StringWriter writer = new StringWriter();
-    VelocityContext context = new VelocityContext();
-    EventCartridge ec = new EventCartridge();
-    ec.addEventHandler(new EscapeHtmlReference());
-    ec.attachToContext( context );
-
-    context.put("linkRemoteNeed", "https://satvm02.researchstudio.at/owner/#!/post/?postUri=https:%2F%2Fsatvm02.researchstudio.at%2Fwon%2Fresource%2Fneed%2F8772930375045372000");
-    context.put("remoteNeedTitle", "höhöhö");
-    context.put("linkLocalNeed", "https://satvm02.researchstudio.at/owner/#!/post/?postUri=https:%2F%2Fsatvm02.researchstudio.at%2Fwon%2Fresource%2Fneed%2F8772930375045372000");
-    context.put("localNeedTitle", "Ich & ich");
-    context.put("linkConnection", "https://satvm02.researchstudio.at/owner/#!/post/?postUri=https:%2F%2Fsatvm02.researchstudio.at%2Fwon%2Fresource%2Fneed%2F8772930375045372000");
-    context.put("textMsg", "Hä? & was soll das jetzt? <script language=\"JavaScript\"> alert('hi') </script>");
-    template.merge(context, writer);
-    System.out.println(writer.toString());
-  }
-  */
+    /*
+     * Dead main method code. Useful for trying out velocity stuff when needed.
+     * 
+     * public static void main(String... args){ VelocityEngine velocityEngine = new VelocityEngine(); Properties
+     * properties = new Properties(); properties.setProperty("resource.loader", "file");
+     * properties.setProperty("file.resource.loader.class",
+     * "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader"); velocityEngine.init(properties); Template
+     * template = velocityEngine.getTemplate("mail-templates/conversation-notification.vm"); StringWriter writer = new
+     * StringWriter(); VelocityContext context = new VelocityContext(); EventCartridge ec = new EventCartridge();
+     * ec.addEventHandler(new EscapeHtmlReference()); ec.attachToContext( context );
+     * 
+     * context.put("linkRemoteNeed",
+     * "https://satvm02.researchstudio.at/owner/#!/post/?postUri=https:%2F%2Fsatvm02.researchstudio.at%2Fwon%2Fresource%2Fneed%2F8772930375045372000"
+     * ); context.put("remoteNeedTitle", "höhöhö"); context.put("linkLocalNeed",
+     * "https://satvm02.researchstudio.at/owner/#!/post/?postUri=https:%2F%2Fsatvm02.researchstudio.at%2Fwon%2Fresource%2Fneed%2F8772930375045372000"
+     * ); context.put("localNeedTitle", "Ich & ich"); context.put("linkConnection",
+     * "https://satvm02.researchstudio.at/owner/#!/post/?postUri=https:%2F%2Fsatvm02.researchstudio.at%2Fwon%2Fresource%2Fneed%2F8772930375045372000"
+     * ); context.put("textMsg", "Hä? & was soll das jetzt? <script language=\"JavaScript\"> alert('hi') </script>");
+     * template.merge(context, writer); System.out.println(writer.toString()); }
+     */
 }

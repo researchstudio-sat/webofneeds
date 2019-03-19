@@ -25,8 +25,7 @@ import won.protocol.util.NeedModelWrapper;
 public class SolrNeedIndexer {
     public static void main(String[] args) throws IOException, InterruptedException, JsonLdError {
 
-        AnnotationConfigApplicationContext ctx =
-                new AnnotationConfigApplicationContext(SolrTestAppConfiguration.class);
+        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(SolrTestAppConfiguration.class);
 
         NeedIndexer indexer = ctx.getBean(NeedIndexer.class);
 
@@ -36,7 +35,7 @@ public class SolrNeedIndexer {
 
         int needs = 0;
         while (!needProducer.isExhausted()) {
-            //indexer.indexNeedModel(needModel, UUID.randomUUID().toString(), true);
+            // indexer.indexNeedModel(needModel, UUID.randomUUID().toString(), true);
             Dataset ds = DatasetFactory.createTxnMem();
             ds.addNamedModel("https://node.matchat.org/won/resource/need/test#need", needModel);
 

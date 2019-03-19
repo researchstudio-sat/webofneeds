@@ -24,12 +24,9 @@ import org.apache.jena.rdf.model.Resource;
 /**
  * WGS84 Geo Positioning vocabulary.
  *
- * User: Alan Tus
- * Date: 21.04.13.
- * Time: 22:13
+ * User: Alan Tus Date: 21.04.13. Time: 22:13
  */
-public class SIOC
-{
+public class SIOC {
 
     public static final String BASE_URI = "http://rdfs.org/sioc/ns#";
     private static Model m = ModelFactory.createDefaultModel();
@@ -37,7 +34,9 @@ public class SIOC
     public static final Resource POST = m.createResource(BASE_URI + "Post");
     public static final Property HAS_REPLY = m.createProperty(BASE_URI, "hasReply");
 
-    /** returns the URI for this schema
+    /**
+     * returns the URI for this schema
+     * 
      * @return the URI for this schema
      */
     public static String getURI() {

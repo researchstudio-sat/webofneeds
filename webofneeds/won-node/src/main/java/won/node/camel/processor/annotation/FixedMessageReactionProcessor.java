@@ -27,8 +27,8 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface FixedMessageReactionProcessor
-{
-  String direction();
-  String messageType();
+public @interface FixedMessageReactionProcessor {
+    String direction();
+
+    String messageType();
 }

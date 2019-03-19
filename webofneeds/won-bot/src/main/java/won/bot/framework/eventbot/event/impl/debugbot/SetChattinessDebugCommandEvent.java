@@ -21,16 +21,15 @@ import won.protocol.model.Connection;
 /**
  * Event to toggle chattiness.
  */
-public class SetChattinessDebugCommandEvent extends DebugCommandEvent
-{
-  private boolean isChatty;
+public class SetChattinessDebugCommandEvent extends DebugCommandEvent {
+    private boolean isChatty;
 
-  public SetChattinessDebugCommandEvent(final Connection con, final boolean isChatty) {
-    super(con);
-    this.isChatty = isChatty;
-  }
+    public SetChattinessDebugCommandEvent(final Connection con, final boolean isChatty) {
+        super(con);
+        this.isChatty = isChatty;
+    }
 
-  public boolean isChatty() {
-    return isChatty;
-  }
+    public boolean isChatty() {
+        return isChatty;
+    }
 }

@@ -36,7 +36,8 @@ public class ActionOnFirstEventListener extends ActionOnceAfterNEventsListener {
         super(context, name, 1, task);
     }
 
-    public ActionOnFirstEventListener(EventListenerContext context, String name, EventFilter eventFilter, EventBotAction task) {
+    public ActionOnFirstEventListener(EventListenerContext context, String name, EventFilter eventFilter,
+            EventBotAction task) {
         super(context, name, eventFilter, 1, task);
     }
 }

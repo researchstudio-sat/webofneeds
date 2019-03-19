@@ -21,44 +21,44 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Counter that is intended to be shared between actions and listeners.
  */
-public class CounterImpl implements Counter
-{
-  private AtomicInteger count;
-  private String name;
+public class CounterImpl implements Counter {
+    private AtomicInteger count;
+    private String name;
 
-  public CounterImpl(String name, final int initialCount) {
-    this.count = new AtomicInteger(initialCount);
-    this.name = name;
-  }
+    public CounterImpl(String name, final int initialCount) {
+        this.count = new AtomicInteger(initialCount);
+        this.name = name;
+    }
 
-  public CounterImpl(String name) {
-    this(name, 0);
-  }
+    public CounterImpl(String name) {
+        this(name, 0);
+    }
 
-  @Override
-  public int getCount(){
-    return count.get();
-  }
+    @Override
+    public int getCount() {
+        return count.get();
+    }
 
-  @Override
-  public int increment(){
-    return count.incrementAndGet();
-  }
+    @Override
+    public int increment() {
+        return count.incrementAndGet();
+    }
 
-  @Override
-  public int decrement(){
-    return count.decrementAndGet();
-  }
+    @Override
+    public int decrement() {
+        return count.decrementAndGet();
+    }
 
-  public String getName() {
-    return name;
-  }
-  
-  /**
-   * Resets the counter to 0.
-   * @return the counter's value obtained when resetting it.
-   */
-  public int reset() {
-    return count.getAndSet(0);
-  }
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Resets the counter to 0.
+     * 
+     * @return the counter's value obtained when resetting it.
+     */
+    public int reset() {
+        return count.getAndSet(0);
+    }
 }

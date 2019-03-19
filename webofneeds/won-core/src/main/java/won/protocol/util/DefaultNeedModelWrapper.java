@@ -16,7 +16,8 @@ import won.protocol.vocabulary.SCHEMA;
 import won.protocol.vocabulary.WON;
 
 /**
- * Extends {@link NeedModelWrapper} to add matchat specific methods to access content fields like title, description, tags, etc.
+ * Extends {@link NeedModelWrapper} to add matchat specific methods to access content fields like title, description,
+ * tags, etc.
  * <p>
  * Created by hfriedrich on 16.03.2017.
  */
@@ -35,7 +36,7 @@ public class DefaultNeedModelWrapper extends NeedModelWrapper {
     }
 
     private void createSeeksNodeIfNonExist() {
-        if(getSeeksNodes().size() == 0) {
+        if (getSeeksNodes().size() == 0) {
             createSeeksNode(null);
         }
     }
@@ -65,14 +66,21 @@ public class DefaultNeedModelWrapper extends NeedModelWrapper {
 
     public String getSomeTitleFromIsOrAll(String... preferredLanguages) {
         String title = getNeedContentPropertyStringValue(DC.title, preferredLanguages);
-        if (title != null) return title;
+        if (title != null)
+            return title;
         title = getSomeContentPropertyStringValue(DC.title, preferredLanguages);
-        if (title != null) return title;
+        if (title != null)
+            return title;
         return null;
     }
 
-    public Collection<String> getTitles(Resource contentNode){ return getTitles(contentNode, null);}
-    Collection<String> getTitles(Resource contentNode, String language) { return getContentPropertyStringValues(contentNode, DC.title, language);}
+    public Collection<String> getTitles(Resource contentNode) {
+        return getTitles(contentNode, null);
+    }
+
+    Collection<String> getTitles(Resource contentNode, String language) {
+        return getContentPropertyStringValues(contentNode, DC.title, language);
+    }
 
     public void setSeeksDescription(String description) {
         createSeeksNodeIfNonExist();
@@ -89,9 +97,12 @@ public class DefaultNeedModelWrapper extends NeedModelWrapper {
         return getSomeContentPropertyStringValue(DC.description, preferredLanguages);
     }
 
-    public Collection<String> getDescriptions(Resource contentNode) { return getDescriptions(contentNode, null); }
+    public Collection<String> getDescriptions(Resource contentNode) {
+        return getDescriptions(contentNode, null);
+    }
+
     Collection<String> getDescriptions(Resource contentNode, String language) {
-        return getContentPropertyStringValues(contentNode,DC.description, language);
+        return getContentPropertyStringValues(contentNode, DC.description, language);
     }
 
     public void addTag(String tag) {
@@ -124,12 +135,15 @@ public class DefaultNeedModelWrapper extends NeedModelWrapper {
         Property latitudeProperty = needModel.createProperty("http://schema.org/", "latitude");
 
         RDFNode locationNode = RdfUtils.findOnePropertyFromResource(needModel, contentNode, SCHEMA.LOCATION);
-        if(locationNode == null) {
+        if (locationNode == null) {
             locationNode = RdfUtils.findOnePropertyFromResource(needModel, contentNode, WON.HAS_LOCATION);
         }
-        RDFNode geoNode = (locationNode != null && locationNode.isResource()) ? RdfUtils.findOnePropertyFromResource(needModel, locationNode.asResource(), geoProperty) : null;
-        RDFNode lat = (geoNode != null && geoNode.isResource()) ? RdfUtils.findOnePropertyFromResource(needModel, geoNode.asResource(), latitudeProperty) : null;
-        RDFNode lon = (geoNode != null && geoNode.isResource()) ? RdfUtils.findOnePropertyFromResource(needModel, geoNode.asResource(), longitudeProperty) : null;
+        RDFNode geoNode = (locationNode != null && locationNode.isResource())
+                ? RdfUtils.findOnePropertyFromResource(needModel, locationNode.asResource(), geoProperty) : null;
+        RDFNode lat = (geoNode != null && geoNode.isResource())
+                ? RdfUtils.findOnePropertyFromResource(needModel, geoNode.asResource(), latitudeProperty) : null;
+        RDFNode lon = (geoNode != null && geoNode.isResource())
+                ? RdfUtils.findOnePropertyFromResource(needModel, geoNode.asResource(), longitudeProperty) : null;
         if (lat == null || lon == null) {
             return null;
         }

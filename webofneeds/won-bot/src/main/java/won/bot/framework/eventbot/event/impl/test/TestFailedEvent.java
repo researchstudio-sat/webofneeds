@@ -22,14 +22,14 @@ import won.bot.framework.bot.Bot;
  * Indicates the failure of an integration test.
  */
 public class TestFailedEvent extends TestFinishedEvent {
-  private String message;
+    private String message;
 
-  public TestFailedEvent(Bot bot, String message) {
-    super(bot);
-    this.message = message;
-  }
+    public TestFailedEvent(Bot bot, String message) {
+        super(bot);
+        this.message = message;
+    }
 
-  public String getMessage() {
-    return message;
-  }
+    public String getMessage() {
+        return message;
+    }
 }

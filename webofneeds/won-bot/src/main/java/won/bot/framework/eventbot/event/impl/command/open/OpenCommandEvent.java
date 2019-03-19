@@ -29,12 +29,12 @@ import won.protocol.model.Connection;
 public class OpenCommandEvent extends BaseNeedAndConnectionSpecificEvent implements MessageCommandEvent {
     private String welcomeMessage;
 
-    public OpenCommandEvent(Connection con, String welcomeMessage){
+    public OpenCommandEvent(Connection con, String welcomeMessage) {
         super(con);
         this.welcomeMessage = welcomeMessage;
     }
 
-    public OpenCommandEvent(Connection con){
+    public OpenCommandEvent(Connection con) {
         this(con, "Hello!");
     }
 

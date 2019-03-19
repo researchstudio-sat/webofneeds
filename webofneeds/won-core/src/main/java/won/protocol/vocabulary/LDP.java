@@ -24,25 +24,25 @@ import org.apache.jena.rdf.model.Resource;
 /**
  * LDP vocabulary.
  *
- * User: fkleedorfer
- * Date: 25.02.13
+ * User: fkleedorfer Date: 25.02.13
  */
-public class LDP
-{
-  public static final String BASE_URI = "http://www.w3.org/ns/ldp#";
-  public static final String DEFAULT_PREFIX= "ldp";
+public class LDP {
+    public static final String BASE_URI = "http://www.w3.org/ns/ldp#";
+    public static final String DEFAULT_PREFIX = "ldp";
 
-  private static Model m = ModelFactory.createDefaultModel();
+    private static Model m = ModelFactory.createDefaultModel();
 
-  public static final Property CONTAINER = m.createProperty(BASE_URI + "Container");
-  public static final Property PAGE_OF = m.createProperty(BASE_URI + "pageOf");
-  public static final Property NEXT_PAGE = m.createProperty(BASE_URI + "nextPage");
-  public static final Resource PAGE = m.createResource(BASE_URI + "Page");
+    public static final Property CONTAINER = m.createProperty(BASE_URI + "Container");
+    public static final Property PAGE_OF = m.createProperty(BASE_URI + "pageOf");
+    public static final Property NEXT_PAGE = m.createProperty(BASE_URI + "nextPage");
+    public static final Resource PAGE = m.createResource(BASE_URI + "Page");
 
-  /** returns the URI for this schema
-   * @return the URI for this schema
-   */
-  public static String getURI() {
-      return BASE_URI;
-  }
+    /**
+     * returns the URI for this schema
+     * 
+     * @return the URI for this schema
+     */
+    public static String getURI() {
+        return BASE_URI;
+    }
 }

@@ -24,9 +24,9 @@ public class Hint2HokifyAction extends BaseEventBotAction {
 
     @Override
     protected void doRun(Event event, EventListener executingListener) throws Exception {
-        
+
         logger.info("HintEvent received");
-        
+
         EventListenerContext ctx = getEventListenerContext();
 
         if (event instanceof HintFromMatcherEvent && ctx.getBotContextWrapper() instanceof HokifyJobBotContextWrapper) {
@@ -38,15 +38,18 @@ public class Hint2HokifyAction extends BaseEventBotAction {
             URI remoteNeedUri = match.getToNeed();
 
             String jobURL = botContextWrapper.getJobURLForURI(yourNeedUri);
-            if(jobURL == null) {
+            if (jobURL == null) {
                 logger.error("No JobURL found for the specified needUri");
                 return;
             }
 
-            try{
-                //Message message = wonHokifyJobBotHandler.sendMessage(wonHokifyJobBotHandler.getHokifyMessageGenerator().getHintMessage(remoteNeedUri, yourNeedUri));
-                //botContextWrapper.addMessageIdWonURIRelation(wonMessage.getMessageURI(), new WonURI(wonMessage.getReceiverURI(), UriType.CONNECTION));
-            }catch (Exception te){
+            try {
+                // Message message =
+                // wonHokifyJobBotHandler.sendMessage(wonHokifyJobBotHandler.getHokifyMessageGenerator().getHintMessage(remoteNeedUri,
+                // yourNeedUri));
+                // botContextWrapper.addMessageIdWonURIRelation(wonMessage.getMessageURI(), new
+                // WonURI(wonMessage.getReceiverURI(), UriType.CONNECTION));
+            } catch (Exception te) {
                 logger.error("HERE is the Hint Exception" + te.getMessage());
             }
         }

@@ -17,108 +17,106 @@
 package won.owner.pojo;
 
 /**
- * User: fkleedorfer
- * Date: 30.07.2014
+ * User: fkleedorfer Date: 30.07.2014
  */
-public class MatchPojo
-{
-  private double score;
-  private String originator;
-  private String needURI;
-  private String connectionURI;
-  private String remoteNeedURI;
-  private String facetURI;
-  private String remoteFacetURI;
-  private String title;
-  private String description;
-  private String imageURI;
-  private String[] tags;
+public class MatchPojo {
+    private double score;
+    private String originator;
+    private String needURI;
+    private String connectionURI;
+    private String remoteNeedURI;
+    private String facetURI;
+    private String remoteFacetURI;
+    private String title;
+    private String description;
+    private String imageURI;
+    private String[] tags;
 
-  public double getScore() {
-    return score;
-  }
+    public double getScore() {
+        return score;
+    }
 
-  public void setScore(final double score) {
-    this.score = score;
-  }
+    public void setScore(final double score) {
+        this.score = score;
+    }
 
-  public String getOriginator() {
-    return originator;
-  }
+    public String getOriginator() {
+        return originator;
+    }
 
-  public void setOriginator(final String originator) {
-    this.originator = originator;
-  }
+    public void setOriginator(final String originator) {
+        this.originator = originator;
+    }
 
-  public String getNeedURI() {
-    return needURI;
-  }
+    public String getNeedURI() {
+        return needURI;
+    }
 
-  public void setNeedURI(final String needURI) {
-    this.needURI = needURI;
-  }
+    public void setNeedURI(final String needURI) {
+        this.needURI = needURI;
+    }
 
-  public String getConnectionURI() {
-    return connectionURI;
-  }
+    public String getConnectionURI() {
+        return connectionURI;
+    }
 
-  public void setConnectionURI(final String connectionURI) {
-    this.connectionURI = connectionURI;
-  }
+    public void setConnectionURI(final String connectionURI) {
+        this.connectionURI = connectionURI;
+    }
 
-  public String getRemoteNeedURI() {
-    return remoteNeedURI;
-  }
+    public String getRemoteNeedURI() {
+        return remoteNeedURI;
+    }
 
-  public void setRemoteNeedURI(final String remoteNeedURI) {
-    this.remoteNeedURI = remoteNeedURI;
-  }
+    public void setRemoteNeedURI(final String remoteNeedURI) {
+        this.remoteNeedURI = remoteNeedURI;
+    }
 
-  public String getFacetURI() {
-    return facetURI;
-  }
+    public String getFacetURI() {
+        return facetURI;
+    }
 
-  public void setFacetURI(final String facetURI) {
-    this.facetURI = facetURI;
-  }
+    public void setFacetURI(final String facetURI) {
+        this.facetURI = facetURI;
+    }
 
-  public String getRemoteFacetURI() {
-    return remoteFacetURI;
-  }
+    public String getRemoteFacetURI() {
+        return remoteFacetURI;
+    }
 
-  public void setRemoteFacetURI(final String remoteFacetURI) {
-    this.remoteFacetURI = remoteFacetURI;
-  }
+    public void setRemoteFacetURI(final String remoteFacetURI) {
+        this.remoteFacetURI = remoteFacetURI;
+    }
 
-  public String getTitle() {
-    return title;
-  }
+    public String getTitle() {
+        return title;
+    }
 
-  public void setTitle(final String title) {
-    this.title = title;
-  }
+    public void setTitle(final String title) {
+        this.title = title;
+    }
 
-  public String getDescription() {
-    return description;
-  }
+    public String getDescription() {
+        return description;
+    }
 
-  public void setDescription(final String description) {
-    this.description = description;
-  }
+    public void setDescription(final String description) {
+        this.description = description;
+    }
 
-  public String getImageURI() {
-    return imageURI;
-  }
+    public String getImageURI() {
+        return imageURI;
+    }
 
-  public void setImageURI(final String imageURI) {
-    this.imageURI = imageURI;
-  }
+    public void setImageURI(final String imageURI) {
+        this.imageURI = imageURI;
+    }
 
-  public String[] getTags() {
-    return tags;
-  }
+    public String[] getTags() {
+        return tags;
+    }
 
-  public void setTags(final String[] tags) {
-    this.tags = tags;
-  }
+    public void setTags(final String[] tags) {
+        this.tags = tags;
+    }
 }

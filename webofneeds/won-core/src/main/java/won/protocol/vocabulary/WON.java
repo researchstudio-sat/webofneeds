@@ -32,25 +32,33 @@ public class WON {
 
     private static Model m = ModelFactory.createDefaultModel();
 
-
     public static final Resource NEED = m.createResource(BASE_URI + "Need");
     public static final Property HAS_WON_NODE = m.createProperty(BASE_URI, "hasWonNode");
     public static final Property HAS_DEFAULT_GRAPH_SIGNING_METHOD = m.createProperty(BASE_URI,
             "hasDefaultGraphSigningMethod");
     public static final Property HAS_NEED_PROTOCOL_ENDPOINT = m.createProperty(BASE_URI, "hasNeedProtocolEndpoint");
-    public static final Property HAS_MATCHER_PROTOCOL_ENDPOINT = m.createProperty(BASE_URI, "hasMatcherProtocolEndpoint");
+    public static final Property HAS_MATCHER_PROTOCOL_ENDPOINT = m.createProperty(BASE_URI,
+            "hasMatcherProtocolEndpoint");
     public static final Property HAS_OWNER_PROTOCOL_ENDPOINT = m.createProperty(BASE_URI, "hasOwnerProtocolEndpoint");
 
-    public static final Property HAS_ACTIVEMQ_NEED_PROTOCOL_QUEUE_NAME = m.createProperty(BASE_URI, "hasActiveMQNeedProtocolQueueName");
-    public static final Property HAS_ACTIVEMQ_OWNER_PROTOCOL_QUEUE_NAME = m.createProperty(BASE_URI, "hasActiveMQOwnerProtocolQueueName");
-    public static final Property HAS_ACTIVEMQ_MATCHER_PROTOCOL_QUEUE_NAME = m.createProperty(BASE_URI, "hasActiveMQMatcherProtocolQueueName");
-    public static final Property HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_NEED_CREATED_TOPIC_NAME = m.createProperty(BASE_URI, "hasActiveMQMatcherProtocolOutNeedCreatedTopicName");
-    public static final Property HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_NEED_ACTIVATED_TOPIC_NAME = m.createProperty(BASE_URI, "hasActiveMQMatcherProtocolOutNeedActivatedTopicName");
-    public static final Property HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_NEED_DEACTIVATED_TOPIC_NAME = m.createProperty(BASE_URI, "hasActiveMQMatcherProtocolOutNeedDeactivatedTopicName");
-    public static final Property HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_NEED_DELETED_TOPIC_NAME = m.createProperty(BASE_URI, "hasActiveMQMatcherProtocolOutNeedDeletedTopicName");
-    public static final Property HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_MATCHER_REGISTERED_TOPIC_NAME = m.createProperty
-            (BASE_URI, "hasActiveMQMatcherProtocolOutMatcherRegisteredTopicName");
-    public static final Property HAS_URI_PATTERN_SPECIFICATION = m.createProperty(BASE_URI, "hasUriPrefixSpecification");
+    public static final Property HAS_ACTIVEMQ_NEED_PROTOCOL_QUEUE_NAME = m.createProperty(BASE_URI,
+            "hasActiveMQNeedProtocolQueueName");
+    public static final Property HAS_ACTIVEMQ_OWNER_PROTOCOL_QUEUE_NAME = m.createProperty(BASE_URI,
+            "hasActiveMQOwnerProtocolQueueName");
+    public static final Property HAS_ACTIVEMQ_MATCHER_PROTOCOL_QUEUE_NAME = m.createProperty(BASE_URI,
+            "hasActiveMQMatcherProtocolQueueName");
+    public static final Property HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_NEED_CREATED_TOPIC_NAME = m.createProperty(BASE_URI,
+            "hasActiveMQMatcherProtocolOutNeedCreatedTopicName");
+    public static final Property HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_NEED_ACTIVATED_TOPIC_NAME = m
+            .createProperty(BASE_URI, "hasActiveMQMatcherProtocolOutNeedActivatedTopicName");
+    public static final Property HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_NEED_DEACTIVATED_TOPIC_NAME = m
+            .createProperty(BASE_URI, "hasActiveMQMatcherProtocolOutNeedDeactivatedTopicName");
+    public static final Property HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_NEED_DELETED_TOPIC_NAME = m.createProperty(BASE_URI,
+            "hasActiveMQMatcherProtocolOutNeedDeletedTopicName");
+    public static final Property HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_MATCHER_REGISTERED_TOPIC_NAME = m
+            .createProperty(BASE_URI, "hasActiveMQMatcherProtocolOutMatcherRegisteredTopicName");
+    public static final Property HAS_URI_PATTERN_SPECIFICATION = m.createProperty(BASE_URI,
+            "hasUriPrefixSpecification");
     public static final Property HAS_NEED_URI_PREFIX = m.createProperty(BASE_URI, "hasNeedUriPrefix");
     public static final Property HAS_CONNECTION_URI_PREFIX = m.createProperty(BASE_URI, "hasConnectionUriPrefix");
     public static final Property HAS_EVENT_URI_PREFIX = m.createProperty(BASE_URI, "hasEventUriPrefix");
@@ -73,7 +81,7 @@ public class WON {
     public static final Resource MESSAGE = m.createResource(BASE_URI + "Message");
     public static final Property HAS_FEEDBACK = m.createProperty(BASE_URI, "hasFeedback");
     public static final Property HAS_FEEDBACK_EVENT = m.createProperty(BASE_URI, "hasFeedbackEvent");
-    //used to express which URI the feedback relates to
+    // used to express which URI the feedback relates to
     public static final Property FOR_RESOURCE = m.createProperty(BASE_URI, "forResource");
     public static final Property HAS_BINARY_RATING = m.createProperty(BASE_URI, "hasBinaryRating");
     public static final Resource GOOD = m.createResource(BASE_URI + "Good");
@@ -92,8 +100,8 @@ public class WON {
     public static final Property HAS_FACET = m.createProperty(BASE_URI, "hasFacet");
     public static final Property HAS_DEFAULT_FACET = m.createProperty(BASE_URI, "hasDefaultFacet");
     public static final Resource FACET = m.createResource(BASE_URI + "Facet");
-    //This property is used in the rdf-model part of connect (from owner) and hint
-    //to specify a facet to which a connection is created
+    // This property is used in the rdf-model part of connect (from owner) and hint
+    // to specify a facet to which a connection is created
     public static final Property HAS_REMOTE_FACET = m.createProperty(BASE_URI + "hasRemoteFacet");
 
     public static final Property HAS_CONNECTIONS = m.createProperty(BASE_URI, "hasConnections");
@@ -132,11 +140,11 @@ public class WON {
     public static final Property HAS_UPPER_PRICE_LIMIT = m.createProperty(BASE_URI, "hasUpperPriceLimit");
     public static final Property HAS_CURRENCY = m.createProperty(BASE_URI, "hasCurrency");
 
-
     /**
      * RDF-Property for location
      *
-     * @deprecated  Only use this to parse from existing content, create new content by using {@link won.protocol.vocabulary.SCHEMA#LOCATION} instead
+     * @deprecated Only use this to parse from existing content, create new content by using
+     *             {@link won.protocol.vocabulary.SCHEMA#LOCATION} instead
      */
     public static final Property HAS_LOCATION = m.createProperty(BASE_URI, "hasLocation");
     public static final Property HAS_BOUNDING_BOX = m.createProperty(BASE_URI, "hasBoundingBox");
@@ -164,48 +172,46 @@ public class WON {
     public static final Resource NEED_STATE_INACTIVE = m.createResource(NeedState.INACTIVE.getURI().toString());
     public static final Resource NEED_STATE_DELETED = m.createResource(NeedState.DELETED.getURI().toString());
 
-    public static final Resource CONNECTION_STATE_SUGGESTED = m.createResource(ConnectionState.SUGGESTED.getURI().toString());
-    public static final Resource CONNECTION_STATE_REQUEST_SENT = m.createResource(ConnectionState.REQUEST_SENT.getURI().toString());
-    public static final Resource CONNECTION_STATE_REQUEST_RECEIVED = m.createResource(ConnectionState.REQUEST_RECEIVED.getURI().toString());
-    public static final Resource CONNECTION_STATE_CONNECTED = m.createResource(ConnectionState.CONNECTED.getURI().toString());
+    public static final Resource CONNECTION_STATE_SUGGESTED = m
+            .createResource(ConnectionState.SUGGESTED.getURI().toString());
+    public static final Resource CONNECTION_STATE_REQUEST_SENT = m
+            .createResource(ConnectionState.REQUEST_SENT.getURI().toString());
+    public static final Resource CONNECTION_STATE_REQUEST_RECEIVED = m
+            .createResource(ConnectionState.REQUEST_RECEIVED.getURI().toString());
+    public static final Resource CONNECTION_STATE_CONNECTED = m
+            .createResource(ConnectionState.CONNECTED.getURI().toString());
     public static final Resource CONNECTION_STATE_CLOSED = m.createResource(ConnectionState.CLOSED.getURI().toString());
-    public static final Resource CONNECTION_STATE_DELETED = m.createResource(ConnectionState.DELETED.getURI().toString());
-    
-    public static final Property HAS_SUGGESTED_COUNT = m.createProperty(BASE_URI,
-            "hasSuggestedCount");
-    public static final Property HAS_REQUEST_RECEIVED_COUNT = m.createProperty(BASE_URI,
-            "hasRequestReceivedCount");
-    public static final Property HAS_REQUEST_SENT_COUNT = m.createProperty(BASE_URI,
-            "hasRequestSentCount");
-    public static final Property HAS_CONNECTED_COUNT = m.createProperty(BASE_URI,
-            "hasConnectedCount");
-    public static final Property HAS_CLOSED_COUNT = m.createProperty(BASE_URI,
-            "hasClosedCount");
-    
-    //adds a flag to a need
+    public static final Resource CONNECTION_STATE_DELETED = m
+            .createResource(ConnectionState.DELETED.getURI().toString());
+
+    public static final Property HAS_SUGGESTED_COUNT = m.createProperty(BASE_URI, "hasSuggestedCount");
+    public static final Property HAS_REQUEST_RECEIVED_COUNT = m.createProperty(BASE_URI, "hasRequestReceivedCount");
+    public static final Property HAS_REQUEST_SENT_COUNT = m.createProperty(BASE_URI, "hasRequestSentCount");
+    public static final Property HAS_CONNECTED_COUNT = m.createProperty(BASE_URI, "hasConnectedCount");
+    public static final Property HAS_CLOSED_COUNT = m.createProperty(BASE_URI, "hasClosedCount");
+
+    // adds a flag to a need
     public static final Property HAS_FLAG = m.createProperty(BASE_URI + "hasFlag");
 
     public static final Property DO_NOT_MATCH_BEFORE = m.createProperty(BASE_URI + "doNotMatchBefore");
     public static final Property DO_NOT_MATCH_AFTER = m.createProperty(BASE_URI + "doNotMatchAfter");
 
-    //the usedForTesting flag: need is not a real need, only match with other needs flagged with usedForTesting
+    // the usedForTesting flag: need is not a real need, only match with other needs flagged with usedForTesting
     public static final Resource USED_FOR_TESTING = m.createResource(BASE_URI + "UsedForTesting");
 
     public static final Resource WHATS_AROUND = m.createResource(BASE_URI + "WhatsAround");
 
     public static final Resource WHATS_NEW = m.createResource(BASE_URI + "WhatsNew");
-    
+
     // hint behaviour
     public static final Resource NO_HINT_FOR_COUNTERPART = m.createResource(BASE_URI + "NoHintForCounterpart");
     public static final Resource NO_HINT_FOR_ME = m.createResource(BASE_URI + "NoHintForMe");
     public static final Property HAS_MATCHING_CONTEXT = m.createProperty(BASE_URI + "hasMatchingContext");
     public static final Property HAS_QUERY = m.createProperty(BASE_URI + "hasQuery");
 
-    
     public static final Property HAS_GRAPH = m.createProperty(BASE_URI, "hasGraph");
 
-
-    //search result model
+    // search result model
     public static final Resource Match = m.createResource(BASE_URI + "Match");
     public static final Property SEARCH_RESULT_URI = m.createProperty(BASE_URI, "uri");
     public static final Property SEARCH_RESULT_PREVIEW = m.createProperty(BASE_URI, "preview");
@@ -213,7 +219,7 @@ public class WON {
     public static final String PRIVATE_DATA_GRAPH_URI = BASE_URI + "privateDataGraph";
 
     public static final String GROUP_FACET_STRING = BASE_URI + "GroupFacet";
-    
+
     public static final String HAS_GROUP_MEMBER_String = BASE_URI + "hasGroupMember";
     public static final Property HAS_GROUP_MEMBER = m.createProperty(BASE_URI, "hasGroupMember");
     public static final String OWNED_BY_STRING = BASE_URI + "ownedBy";
@@ -228,23 +234,21 @@ public class WON {
     public static final Property CONNECTED_WITH = m.createProperty(BASE_URI + "connectedWith");
     public static final Property REVIEWS = m.createProperty(BASE_URI + "reviews");
     public static final String REVIEWS_STRING = BASE_URI + "reviews";
-    
+
     public static final String CHAT_FACET_STRING = BASE_URI + "ChatFacet";
     public static final String REVIEW_FACET_STRING = BASE_URI + "ReviewFacet";
-    
+
     public static final Property REVIEWED_CONNECTION = m.createProperty(BASE_URI + "reviewedConnection");
-    
-    //unread information
-	public static final Property HAS_UNREAD_SUGGESTED = m.createProperty(BASE_URI + "hasUnreadSuggested");
-	public static final Property HAS_UNREAD_REQUEST_SENT = m.createProperty(BASE_URI + "hasUnreadRequestSent");
-	public static final Property HAS_UNREAD_REQUEST_RECEIVED = m.createProperty(BASE_URI + "hasUnreadRequestReceived");
-	public static final Property HAS_UNREAD_CONNECTED = m.createProperty(BASE_URI + "hasUnreadConnected");
-	public static final Property HAS_UNREAD_CLOSED = m.createProperty(BASE_URI + "hasUnreadClosed");
-	public static final Property HAS_UNREAD_OLDEST_TIMESTAMP = m.createProperty(BASE_URI + "hasUnreadOldestTimestamp");
-	public static final Property HAS_UNREAD_NEWEST_TIMESTAMP = m.createProperty(BASE_URI + "hasUnreadNewestTimestamp");
-	public static final Property HAS_UNREAD_COUNT = m.createProperty(BASE_URI + "hasUnreadCount");
-	
-	
+
+    // unread information
+    public static final Property HAS_UNREAD_SUGGESTED = m.createProperty(BASE_URI + "hasUnreadSuggested");
+    public static final Property HAS_UNREAD_REQUEST_SENT = m.createProperty(BASE_URI + "hasUnreadRequestSent");
+    public static final Property HAS_UNREAD_REQUEST_RECEIVED = m.createProperty(BASE_URI + "hasUnreadRequestReceived");
+    public static final Property HAS_UNREAD_CONNECTED = m.createProperty(BASE_URI + "hasUnreadConnected");
+    public static final Property HAS_UNREAD_CLOSED = m.createProperty(BASE_URI + "hasUnreadClosed");
+    public static final Property HAS_UNREAD_OLDEST_TIMESTAMP = m.createProperty(BASE_URI + "hasUnreadOldestTimestamp");
+    public static final Property HAS_UNREAD_NEWEST_TIMESTAMP = m.createProperty(BASE_URI + "hasUnreadNewestTimestamp");
+    public static final Property HAS_UNREAD_COUNT = m.createProperty(BASE_URI + "hasUnreadCount");
 
     /**
      * Returns the base URI for this schema.
@@ -263,14 +267,14 @@ public class WON {
      */
     public static Resource toResource(NeedState state) {
         switch (state) {
-            case ACTIVE:
-                return NEED_STATE_ACTIVE;
-            case INACTIVE:
-                return NEED_STATE_INACTIVE;
-            case DELETED:
-                return NEED_STATE_DELETED;
-            default:
-                throw new IllegalArgumentException("No case specified for " + state.name());
+        case ACTIVE:
+            return NEED_STATE_ACTIVE;
+        case INACTIVE:
+            return NEED_STATE_INACTIVE;
+        case DELETED:
+            return NEED_STATE_DELETED;
+        default:
+            throw new IllegalArgumentException("No case specified for " + state.name());
         }
     }
 
@@ -282,20 +286,19 @@ public class WON {
      */
     public static Resource toResource(ConnectionState type) {
         switch (type) {
-            case SUGGESTED:
-                return CONNECTION_STATE_SUGGESTED;
-            case REQUEST_SENT:
-                return CONNECTION_STATE_REQUEST_SENT;
-            case REQUEST_RECEIVED:
-                return CONNECTION_STATE_REQUEST_RECEIVED;
-            case CONNECTED:
-                return CONNECTION_STATE_CONNECTED;
-            case CLOSED:
-                return CONNECTION_STATE_CLOSED;
-            default:
-                throw new IllegalArgumentException("No such case specified for " + type.name());
+        case SUGGESTED:
+            return CONNECTION_STATE_SUGGESTED;
+        case REQUEST_SENT:
+            return CONNECTION_STATE_REQUEST_SENT;
+        case REQUEST_RECEIVED:
+            return CONNECTION_STATE_REQUEST_RECEIVED;
+        case CONNECTED:
+            return CONNECTION_STATE_CONNECTED;
+        case CLOSED:
+            return CONNECTION_STATE_CLOSED;
+        default:
+            throw new IllegalArgumentException("No such case specified for " + type.name());
         }
     }
-
 
 }

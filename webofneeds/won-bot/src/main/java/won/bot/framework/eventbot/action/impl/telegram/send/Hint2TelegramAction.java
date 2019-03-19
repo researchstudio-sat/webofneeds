@@ -41,15 +41,17 @@ public class Hint2TelegramAction extends BaseEventBotAction {
             URI remoteNeedUri = match.getToNeed();
 
             Long chatId = botContextWrapper.getChatIdForURI(yourNeedUri);
-            if(chatId == null) {
+            if (chatId == null) {
                 logger.error("No chatId found for the specified needUri");
                 return;
             }
 
-            try{
-                Message message = wonTelegramBotHandler.sendMessage(wonTelegramBotHandler.getTelegramMessageGenerator().getHintMessage(chatId, remoteNeedUri, yourNeedUri));
-                botContextWrapper.addMessageIdWonURIRelation(message.getMessageId(), new WonURI(wonMessage.getReceiverURI(), UriType.CONNECTION));
-            }catch (TelegramApiException te){
+            try {
+                Message message = wonTelegramBotHandler.sendMessage(wonTelegramBotHandler.getTelegramMessageGenerator()
+                        .getHintMessage(chatId, remoteNeedUri, yourNeedUri));
+                botContextWrapper.addMessageIdWonURIRelation(message.getMessageId(),
+                        new WonURI(wonMessage.getReceiverURI(), UriType.CONNECTION));
+            } catch (TelegramApiException te) {
                 logger.error(te.getMessage());
             }
         }

@@ -22,17 +22,14 @@ import won.bot.framework.eventbot.filter.EventFilter;
 /**
  * Abstract base class for filters that need the event listener context for making their decision.
  */
-public abstract class EventListenerContextAwareFilter implements EventFilter
-{
-  private EventListenerContext context;
+public abstract class EventListenerContextAwareFilter implements EventFilter {
+    private EventListenerContext context;
 
-  protected EventListenerContextAwareFilter(final EventListenerContext context)
-  {
-    this.context = context;
-  }
+    protected EventListenerContextAwareFilter(final EventListenerContext context) {
+        this.context = context;
+    }
 
-  protected EventListenerContext getContext()
-  {
-    return context;
-  }
+    protected EventListenerContext getContext() {
+        return context;
+    }
 }

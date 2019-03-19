@@ -20,14 +20,13 @@ import java.net.URI;
 import java.text.MessageFormat;
 
 /**
- * User: LEIH-NB
- * Date: 13.12.13
+ * User: LEIH-NB Date: 13.12.13
  */
 public class BrokerConfigurationFailedException extends WonProtocolException {
     private URI wonNodeURI;
-    public BrokerConfigurationFailedException(final URI wonNodeURI)
-    {
-        super(MessageFormat.format("setting up broker for won node URI {0} failed",wonNodeURI.toString()));
+
+    public BrokerConfigurationFailedException(final URI wonNodeURI) {
+        super(MessageFormat.format("setting up broker for won node URI {0} failed", wonNodeURI.toString()));
         this.wonNodeURI = wonNodeURI;
     }
 }

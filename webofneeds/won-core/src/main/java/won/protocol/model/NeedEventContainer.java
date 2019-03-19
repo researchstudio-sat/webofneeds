@@ -27,33 +27,32 @@ import won.protocol.model.parentaware.ParentAware;
 
 @Entity
 @DiscriminatorValue("Need")
-public class NeedEventContainer extends EventContainer implements ParentAware<Need>
-{
-  @OneToOne(fetch = FetchType.LAZY, mappedBy = "eventContainer", optional = false)
-  private Need need;
+public class NeedEventContainer extends EventContainer implements ParentAware<Need> {
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "eventContainer", optional = false)
+    private Need need;
 
-  public NeedEventContainer() {
-  }
-
-  public NeedEventContainer(final Need need, URI parentUri) {
-    super(parentUri);
-    this.need = need;
-    if (need != null) {
-      need.setEventContainer(this);
+    public NeedEventContainer() {
     }
-  }
 
-  public Need getNeed() {
-    return need;
-  }
+    public NeedEventContainer(final Need need, URI parentUri) {
+        super(parentUri);
+        this.need = need;
+        if (need != null) {
+            need.setEventContainer(this);
+        }
+    }
 
-  @Override
-  public Need getParent() {
-    return getNeed();
-  }
+    public Need getNeed() {
+        return need;
+    }
 
-  protected void setNeed(final Need need) {
-    this.need = need;
-  }
+    @Override
+    public Need getParent() {
+        return getNeed();
+    }
+
+    protected void setNeed(final Need need) {
+        this.need = need;
+    }
 
 }

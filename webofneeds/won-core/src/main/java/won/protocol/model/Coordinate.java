@@ -23,13 +23,17 @@ public class Coordinate {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
 
         Coordinate that = (Coordinate) o;
 
-        if (Float.compare(that.latitude, latitude) != 0) return false;
-        if (Float.compare(that.longitude, longitude) != 0) return false;
+        if (Float.compare(that.latitude, latitude) != 0)
+            return false;
+        if (Float.compare(that.longitude, longitude) != 0)
+            return false;
 
         return true;
     }

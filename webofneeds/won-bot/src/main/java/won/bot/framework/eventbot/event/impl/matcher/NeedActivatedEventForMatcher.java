@@ -23,15 +23,11 @@ import won.bot.framework.eventbot.event.BaseNeedSpecificEvent;
 /**
  *
  */
-public class NeedActivatedEventForMatcher extends BaseNeedSpecificEvent
-{
+public class NeedActivatedEventForMatcher extends BaseNeedSpecificEvent {
 
+    public NeedActivatedEventForMatcher(final URI needURI) {
+        super(needURI);
 
-  public NeedActivatedEventForMatcher(final URI needURI) {
-    super(needURI);
-
-  }
-
-
+    }
 
 }

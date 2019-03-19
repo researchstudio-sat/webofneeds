@@ -26,8 +26,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 /**
- * User: sbyim
- * Date: 12.11.13
+ * User: sbyim Date: 12.11.13
  */
 @Entity
 @Table(name = "wonNode")
@@ -35,15 +34,15 @@ public class WonNode {
 
     @Id
     @GeneratedValue
-    @Column(name="id")
+    @Column(name = "id")
     private Long id;
 
-    @Column( name = "wonNodeURI", unique = true )
-    @Convert( converter = URIConverter.class)
+    @Column(name = "wonNodeURI", unique = true)
+    @Convert(converter = URIConverter.class)
     private URI wonNodeURI;
 
-    @Column( name = "brokerURI")
-    @Convert( converter = URIConverter.class)
+    @Column(name = "brokerURI")
+    @Convert(converter = URIConverter.class)
     private URI brokerURI;
 
     @Column(name = "ownerProtocolEndpoint")
@@ -72,7 +71,6 @@ public class WonNode {
     public void setWonNodeURI(URI wonNodeURI) {
         this.wonNodeURI = wonNodeURI;
     }
-
 
     public String getOwnerApplicationID() {
         return ownerApplicationID;
@@ -106,7 +104,3 @@ public class WonNode {
         this.brokerComponent = brokerComponent;
     }
 }
-
-
-
-

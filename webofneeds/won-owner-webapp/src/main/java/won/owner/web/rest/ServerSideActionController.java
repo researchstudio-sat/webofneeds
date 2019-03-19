@@ -33,16 +33,12 @@ public class ServerSideActionController {
 
     @Autowired
     private UserService userService;
-    
-    @Autowired 
+
+    @Autowired
     private ServerSideActionService serverSideActionService;
 
-    
-    //rsponses: 204 (no content) or 409 (conflict)
-    @RequestMapping(
-            value = "/connect",
-            method = RequestMethod.POST
-    )
+    // rsponses: 204 (no content) or 409 (conflict)
+    @RequestMapping(value = "/connect", method = RequestMethod.POST)
     public ResponseEntity connectFacets(@RequestBody(required = true) FacetToConnect[] connectAction) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         // cannot use user object from context since hw doesn't know about created in this session need,
@@ -53,39 +49,42 @@ public class ServerSideActionController {
         }
         List<FacetToConnect> facets = Arrays.asList(connectAction);
         if (facets == null || facets.isEmpty()) {
-            return new ResponseEntity("Cannot process connect action: no facets specified to be connected.", HttpStatus.CONFLICT);
+            return new ResponseEntity("Cannot process connect action: no facets specified to be connected.",
+                    HttpStatus.CONFLICT);
         }
         if (facets.size() > 2) {
-            return new ResponseEntity("Cannot process connect action: too many facets specified to be connected.", HttpStatus.CONFLICT);
+            return new ResponseEntity("Cannot process connect action: too many facets specified to be connected.",
+                    HttpStatus.CONFLICT);
         }
         List<UserNeed> needs = user.getUserNeeds();
-        //keep facets we can't process:
-        
-        Optional<FacetToConnect> problematicFacet = facets.stream().filter( facet -> {
-            //return false (not problematic) if the facet is pending (i.e., the need it belongs to is expected to be created shortly)
+        // keep facets we can't process:
+
+        Optional<FacetToConnect> problematicFacet = facets.stream().filter(facet -> {
+            // return false (not problematic) if the facet is pending (i.e., the need it belongs to is expected to be
+            // created shortly)
             if (facet.isPending()) {
                 return false;
             }
-            //return true (=problematic) if we don't find a need the facet belongs to
-            return !needs.stream().anyMatch( need -> facet.getFacet().startsWith(need.getUri().toString()));  
+            // return true (=problematic) if we don't find a need the facet belongs to
+            return !needs.stream().anyMatch(need -> facet.getFacet().startsWith(need.getUri().toString()));
         }).findFirst();
         if (problematicFacet.isPresent()) {
-            return new ResponseEntity("Cannot process connect action: facet " + problematicFacet.get().getFacet() + " does not belong to any of the user's needs.", HttpStatus.CONFLICT);
+            return new ResponseEntity("Cannot process connect action: facet " + problematicFacet.get().getFacet()
+                    + " does not belong to any of the user's needs.", HttpStatus.CONFLICT);
         }
         serverSideActionService.connect(facets, SecurityContextHolder.getContext().getAuthentication());
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
-    
+
     public void setServerSideActionService(ServerSideActionService serverSideActionService) {
         this.serverSideActionService = serverSideActionService;
     }
-    
+
     public void setUserNeedRepository(UserNeedRepository userNeedRepository) {
         this.userNeedRepository = userNeedRepository;
     }
-    
+
     public void setUserService(UserService userService) {
         this.userService = userService;
     }
 }
-

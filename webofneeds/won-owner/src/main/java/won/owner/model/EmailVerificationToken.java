@@ -18,7 +18,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "verificationtoken")
 public class EmailVerificationToken {
-    private static final int EXPIRATION = 60 * 24; //Token will expire after a day
+    private static final int EXPIRATION = 60 * 24; // Token will expire after a day
 
     @Id
     @GeneratedValue
@@ -27,7 +27,7 @@ public class EmailVerificationToken {
     private String token;
 
     @OneToOne(targetEntity = User.class, fetch = FetchType.EAGER)
-    @JoinColumn(nullable = false, name="user_id")
+    @JoinColumn(nullable = false, name = "user_id")
     private User user;
 
     private Date expiryDate;
@@ -54,7 +54,7 @@ public class EmailVerificationToken {
         return new Date(cal.getTime().getTime());
     }
 
-    //Getter & Setter
+    // Getter & Setter
     public Long getId() {
         return id;
     }
@@ -89,6 +89,7 @@ public class EmailVerificationToken {
 
     /**
      * Method that checks if the token is expired based on the current datetime
+     * 
      * @return true if the token is expired, false if it is still valid
      */
     public boolean isExpired() {
@@ -97,7 +98,9 @@ public class EmailVerificationToken {
 
     /**
      * Method that checks if the token is expired based on the given datetime
-     * @param cal date to check the expiryDate with
+     * 
+     * @param cal
+     *            date to check the expiryDate with
      * @return true if the token is expired, false if it is still valid
      */
     public boolean isExpired(Calendar cal) {

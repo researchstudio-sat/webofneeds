@@ -7,9 +7,8 @@ import org.springframework.context.ApplicationEvent;
  *
  * Event signals the need to connect to the default won node.
  */
-public class WonNodeRegistrationEvent extends ApplicationEvent
-{
-  public WonNodeRegistrationEvent(final Object source) {
-    super(source);
-  }
+public class WonNodeRegistrationEvent extends ApplicationEvent {
+    public WonNodeRegistrationEvent(final Object source) {
+        super(source);
+    }
 }

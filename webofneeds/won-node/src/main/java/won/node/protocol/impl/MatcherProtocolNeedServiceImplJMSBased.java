@@ -29,28 +29,21 @@ import won.protocol.message.WonMessageDecoder;
 import won.protocol.util.RdfUtils;
 
 /**
- * User: fkleedorfer
- * Date: 02.11.12
+ * User: fkleedorfer Date: 02.11.12
  */
 @Service
 public class MatcherProtocolNeedServiceImplJMSBased// implements MatcherProtocolNeedService
 {
-  private Logger logger = LoggerFactory.getLogger(this.getClass());
-  private MatcherProtocolNeedService delegate;
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private MatcherProtocolNeedService delegate;
 
-  public void hint(
-          @Header("needURI")final String needURI,
-          @Header("otherNeedURI") final String  otherNeedURI,
-          @Header("score")final String score,
-          @Header("originator")final String originator,
-          @Header("content") final String content,
-          @Header("wonMessage") final String wonMessage)
-        throws Exception {
+    public void hint(@Header("needURI") final String needURI, @Header("otherNeedURI") final String otherNeedURI,
+            @Header("score") final String score, @Header("originator") final String originator,
+            @Header("content") final String content, @Header("wonMessage") final String wonMessage) throws Exception {
 
-    delegate.hint(URI.create(needURI), URI.create(otherNeedURI),
-            Double.valueOf(score), URI.create(originator),
-            RdfUtils.toModel(content), WonMessageDecoder.decode(Lang.TRIG, wonMessage));
-  }
+        delegate.hint(URI.create(needURI), URI.create(otherNeedURI), Double.valueOf(score), URI.create(originator),
+                RdfUtils.toModel(content), WonMessageDecoder.decode(Lang.TRIG, wonMessage));
+    }
 
     public void setDelegate(MatcherProtocolNeedService delegate) {
         this.delegate = delegate;

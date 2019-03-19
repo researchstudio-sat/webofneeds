@@ -34,15 +34,15 @@ public class EventTriggeredActionContainer<E> {
     }
 
     /**
-     * Executes the action once with an empty even and adds the resulting actions to
-     * the container.
+     * Executes the action once with an empty even and adds the resulting actions to the container.
      */
     public synchronized void addAction(EventTriggeredAction<E> action) {
         try {
             this.actionsToAdd.addAll(action.executeFor(Optional.empty()));
         } catch (Exception e) {
-            logger.info(String.format("Error running server side action '%s' for empty event: %s, more on loglevel 'debug'",
-                    action.getName(), e.getMessage()));
+            logger.info(
+                    String.format("Error running server side action '%s' for empty event: %s, more on loglevel 'debug'",
+                            action.getName(), e.getMessage()));
             logger.debug("Error running server side action for empty event", e);
 
         }

@@ -106,8 +106,7 @@ public class SolrMatcherActor extends UntypedActor {
         needIndexer.index(needEvent.deserializeNeedDataset());
     }
 
-    protected void processActiveNeedEvent(NeedEvent needEvent)
-            throws IOException, SolrServerException, JsonLdError {
+    protected void processActiveNeedEvent(NeedEvent needEvent) throws IOException, SolrServerException, JsonLdError {
 
         log.info("Start processing active need event {}", needEvent);
 
@@ -115,15 +114,16 @@ public class SolrMatcherActor extends UntypedActor {
         Dataset dataset = needEvent.deserializeNeedDataset();
         NeedModelWrapper needModelWrapper = new NeedModelWrapper(dataset);
         if (needModelWrapper.hasFlag(WON.NO_HINT_FOR_ME) && needModelWrapper.hasFlag(WON.NO_HINT_FOR_COUNTERPART)) {
-            log.info("Discarding received need due to flags won:NoHintForMe and won:NoHintForCounterpart: {}", needEvent);
+            log.info("Discarding received need due to flags won:NoHintForMe and won:NoHintForCounterpart: {}",
+                    needEvent);
             return;
         }
-        
+
         // check if need has a sparql query attached
         if (needModelWrapper.hasQuery()) {
             log.debug("Need {} has a sparql query, omitting this need in Solr matcher", needModelWrapper.getNeedUri());
             return;
-        }        
+        }
 
         // check if need is usedForTesting only
         boolean usedForTesting = needModelWrapper.hasFlag(WON.USED_FOR_TESTING);
@@ -135,10 +135,10 @@ public class SolrMatcherActor extends UntypedActor {
             // WhatsAround doesnt match on terms only other needs in close location are boosted
             WhatsAroundQueryFactory qf = new WhatsAroundQueryFactory(dataset);
             queryString = qf.createQuery();
-        } else if(needModelWrapper.hasFlag(WON.WHATS_NEW)){
+        } else if (needModelWrapper.hasFlag(WON.WHATS_NEW)) {
             WhatsNewQueryFactory qf = new WhatsNewQueryFactory(dataset);
             queryString = qf.createQuery();
-        }else {
+        } else {
             // default query matches content terms (of fields title, description and tags) with different weights
             // and gives an additional multiplicative boost for geographically closer needs
             DefaultNeedQueryFactory qf = new DefaultNeedQueryFactory(dataset);
@@ -152,81 +152,105 @@ public class SolrMatcherActor extends UntypedActor {
 
         // now create three slightly different queries for different lists of needs:
         // 1) needs without NoHintForCounterpart => hints for current need
-        // 2) needs without NoHintForSelf, excluding WhatsAround needs => hints for needs in index that are not WhatsAround
-        // 3) needs without NoHintForSelf that are only WhatsAround needs => hints for needs in index that are WhatsAround
+        // 2) needs without NoHintForSelf, excluding WhatsAround needs => hints for needs in index that are not
+        // WhatsAround
+        // 3) needs without NoHintForSelf that are only WhatsAround needs => hints for needs in index that are
+        // WhatsAround
         // to achieve this use a different filters for these queries
 
         // case 1) needs without NoHintForCounterpart => hints for current need
         List<String> filterQueries = new LinkedList<>();
         filterQueries.add(new NeedStateQueryFactory(dataset).createQuery());
         filterQueries.add(new CreationDateQueryFactory(dataset, 1, ChronoUnit.MONTHS).createQuery());
-        filterQueries.add(new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.NOT, new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.NO_HINT_FOR_COUNTERPART)).createQuery());
+        filterQueries.add(new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.NOT,
+                new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.NO_HINT_FOR_COUNTERPART)).createQuery());
         if (needModelWrapper.getMatchingContexts() != null && needModelWrapper.getMatchingContexts().size() > 0) {
             filterQueries.add(new MatchingContextQueryFactory(needModelWrapper.getMatchingContexts()).createQuery());
         }
         if (!needModelWrapper.hasFlag(WON.NO_HINT_FOR_ME)) {
 
             // execute the query
-            log.info("query Solr endpoint {} for need {} and need list 1 (without NoHintForCounterpart)", config.getSolrEndpointUri(usedForTesting), needEvent.getUri());
-            SolrDocumentList docs = queryExecutor.executeNeedQuery(queryString, config.getMaxHints(),null, filterQueries.toArray(new String[filterQueries.size()]));
+            log.info("query Solr endpoint {} for need {} and need list 1 (without NoHintForCounterpart)",
+                    config.getSolrEndpointUri(usedForTesting), needEvent.getUri());
+            SolrDocumentList docs = queryExecutor.executeNeedQuery(queryString, config.getMaxHints(), null,
+                    filterQueries.toArray(new String[filterQueries.size()]));
             if (docs != null) {
 
                 // perform knee detection depending on current need is WhatsAround/WhatsNew or not)
-                boolean kneeDetection = needModelWrapper.hasFlag(WON.WHATS_NEW) || needModelWrapper.hasFlag(WON.WHATS_AROUND) ? false : true;
+                boolean kneeDetection = needModelWrapper.hasFlag(WON.WHATS_NEW)
+                        || needModelWrapper.hasFlag(WON.WHATS_AROUND) ? false : true;
 
-                // generate hints for current need (only generate hints for current need, suppress hints for matched needs,
-                BulkHintEvent events = hintBuilder.generateHintsFromSearchResult(docs, needEvent, needModelWrapper, false, true, kneeDetection);
+                // generate hints for current need (only generate hints for current need, suppress hints for matched
+                // needs,
+                BulkHintEvent events = hintBuilder.generateHintsFromSearchResult(docs, needEvent, needModelWrapper,
+                        false, true, kneeDetection);
 
-                log.info("Create {} hints for need {} and need list 1 (without NoHintForCounterpart)", events.getHintEvents().size(), needEvent);
+                log.info("Create {} hints for need {} and need list 1 (without NoHintForCounterpart)",
+                        events.getHintEvents().size(), needEvent);
 
                 // publish hints to current need
                 if (events.getHintEvents().size() != 0) {
                     getSender().tell(events, getSelf());
                 }
             } else {
-                log.warning("No results found for need list 1 (without NoHintForCounterpart) query of need ", needEvent);
+                log.warning("No results found for need list 1 (without NoHintForCounterpart) query of need ",
+                        needEvent);
             }
         }
 
-        // case 2) needs without NoHintForSelf, excluding WhatsAround needs => hints for needs in index that are not WhatsAround
+        // case 2) needs without NoHintForSelf, excluding WhatsAround needs => hints for needs in index that are not
+        // WhatsAround
         filterQueries = new LinkedList<>();
         filterQueries.add(new NeedStateQueryFactory(dataset).createQuery());
         filterQueries.add(new CreationDateQueryFactory(dataset, 1, ChronoUnit.MONTHS).createQuery());
-        filterQueries.add(new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.NOT, new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.NO_HINT_FOR_ME)).createQuery());
-        filterQueries.add(new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.NOT, new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.WHATS_AROUND)).createQuery());
-        filterQueries.add(new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.NOT, new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.WHATS_NEW)).createQuery());
+        filterQueries.add(new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.NOT,
+                new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.NO_HINT_FOR_ME)).createQuery());
+        filterQueries.add(new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.NOT,
+                new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.WHATS_AROUND)).createQuery());
+        filterQueries.add(new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.NOT,
+                new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.WHATS_NEW)).createQuery());
         if (needModelWrapper.getMatchingContexts() != null && needModelWrapper.getMatchingContexts().size() > 0) {
             filterQueries.add(new MatchingContextQueryFactory(needModelWrapper.getMatchingContexts()).createQuery());
         }
         if (!needModelWrapper.hasFlag(WON.NO_HINT_FOR_COUNTERPART)) {
 
             // execute the query
-            log.info("query Solr endpoint {} for need {} and need list 2 (without NoHintForSelf, excluding WhatsAround needs)", config.getSolrEndpointUri(usedForTesting), needEvent.getUri());
-            SolrDocumentList docs = queryExecutor.executeNeedQuery(queryString, config.getMaxHintsForCounterparts(), null, filterQueries.toArray(new String[filterQueries.size()]));
+            log.info(
+                    "query Solr endpoint {} for need {} and need list 2 (without NoHintForSelf, excluding WhatsAround needs)",
+                    config.getSolrEndpointUri(usedForTesting), needEvent.getUri());
+            SolrDocumentList docs = queryExecutor.executeNeedQuery(queryString, config.getMaxHintsForCounterparts(),
+                    null, filterQueries.toArray(new String[filterQueries.size()]));
             if (docs != null) {
 
-                // generate hints for matched needs (suppress hints for current need, only generate hints for matched needs, perform knee detection)
-                BulkHintEvent events = hintBuilder.generateHintsFromSearchResult(docs, needEvent, needModelWrapper, true, false, true);
-                log.info("Create {} hints for need {} and need list 2 (without NoHintForSelf, excluding WhatsAround needs)", events.getHintEvents().size(), needEvent);
+                // generate hints for matched needs (suppress hints for current need, only generate hints for matched
+                // needs, perform knee detection)
+                BulkHintEvent events = hintBuilder.generateHintsFromSearchResult(docs, needEvent, needModelWrapper,
+                        true, false, true);
+                log.info(
+                        "Create {} hints for need {} and need list 2 (without NoHintForSelf, excluding WhatsAround needs)",
+                        events.getHintEvents().size(), needEvent);
 
                 // publish hints to current need
                 if (events.getHintEvents().size() != 0) {
                     getSender().tell(events, getSelf());
                 }
             } else {
-                log.warning("No results found for need list 2 (without NoHintForSelf, excluding WhatsAround needs) query of need ", needEvent);
+                log.warning(
+                        "No results found for need list 2 (without NoHintForSelf, excluding WhatsAround needs) query of need ",
+                        needEvent);
             }
         }
 
-        // case 3) needs without NoHintForSelf that are only WhatsAround needs => hints for needs in index that are WhatsAround
+        // case 3) needs without NoHintForSelf that are only WhatsAround needs => hints for needs in index that are
+        // WhatsAround
         filterQueries = new LinkedList<>();
         filterQueries.add(new NeedStateQueryFactory(dataset).createQuery());
         filterQueries.add(new CreationDateQueryFactory(dataset, 1, ChronoUnit.MONTHS).createQuery());
-        filterQueries.add(new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.NOT, new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.NO_HINT_FOR_ME)).createQuery());
-        filterQueries.add(
-        		new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.OR, 
-        				new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.WHATS_AROUND),
-        				new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.WHATS_NEW)).createQuery());
+        filterQueries.add(new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.NOT,
+                new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.NO_HINT_FOR_ME)).createQuery());
+        filterQueries.add(new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.OR,
+                new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.WHATS_AROUND),
+                new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.WHATS_NEW)).createQuery());
         if (needModelWrapper.getMatchingContexts() != null && needModelWrapper.getMatchingContexts().size() > 0) {
             filterQueries.add(new MatchingContextQueryFactory(needModelWrapper.getMatchingContexts()).createQuery());
         }
@@ -234,24 +258,34 @@ public class SolrMatcherActor extends UntypedActor {
 
             // hints for WhatsAround Needs should not have the keywords from title, description, tags etc.
             // this can prevent to actually find WhatsAround needs.
-            // Instead create a WhatsAround query (query without keywords, just location) to find other WhatsAround needs
+            // Instead create a WhatsAround query (query without keywords, just location) to find other WhatsAround
+            // needs
             queryString = (new WhatsAroundQueryFactory(dataset)).createQuery();
 
             // execute the query
-            log.info("query Solr endpoint {} for need {} and need list 3 (without NoHintForSelf that are only WhatsAround needs)", config.getSolrEndpointUri(usedForTesting), needEvent.getUri());
-            SolrDocumentList docs = queryExecutor.executeNeedQuery(queryString, config.getMaxHintsForCounterparts(), null, filterQueries.toArray(new String[filterQueries.size()]));
+            log.info(
+                    "query Solr endpoint {} for need {} and need list 3 (without NoHintForSelf that are only WhatsAround needs)",
+                    config.getSolrEndpointUri(usedForTesting), needEvent.getUri());
+            SolrDocumentList docs = queryExecutor.executeNeedQuery(queryString, config.getMaxHintsForCounterparts(),
+                    null, filterQueries.toArray(new String[filterQueries.size()]));
             if (docs != null) {
 
-                // generate hints for matched needs (suppress hints for current need, only generate hints for matched needs, do not perform knee detection)
-                BulkHintEvent events = hintBuilder.generateHintsFromSearchResult(docs, needEvent, needModelWrapper, true, false, false);
-                log.info("Create {} hints for need {} and need list 3 (without NoHintForSelf that are only WhatsAround needs)", events.getHintEvents().size(), needEvent);
+                // generate hints for matched needs (suppress hints for current need, only generate hints for matched
+                // needs, do not perform knee detection)
+                BulkHintEvent events = hintBuilder.generateHintsFromSearchResult(docs, needEvent, needModelWrapper,
+                        true, false, false);
+                log.info(
+                        "Create {} hints for need {} and need list 3 (without NoHintForSelf that are only WhatsAround needs)",
+                        events.getHintEvents().size(), needEvent);
 
                 // publish hints to current need
                 if (events.getHintEvents().size() != 0) {
                     getSender().tell(events, getSelf());
                 }
             } else {
-                log.warning("No results found for need list 3 (without NoHintForSelf that are only WhatsAround needs) query of need ", needEvent);
+                log.warning(
+                        "No results found for need list 3 (without NoHintForSelf that are only WhatsAround needs) query of need ",
+                        needEvent);
             }
         }
 
@@ -263,17 +297,17 @@ public class SolrMatcherActor extends UntypedActor {
     @Override
     public SupervisorStrategy supervisorStrategy() {
 
-        SupervisorStrategy supervisorStrategy = new OneForOneStrategy(
-                0, Duration.Zero(), new Function<Throwable, SupervisorStrategy.Directive>() {
+        SupervisorStrategy supervisorStrategy = new OneForOneStrategy(0, Duration.Zero(),
+                new Function<Throwable, SupervisorStrategy.Directive>() {
 
-            @Override
-            public SupervisorStrategy.Directive apply(Throwable t) throws Exception {
+                    @Override
+                    public SupervisorStrategy.Directive apply(Throwable t) throws Exception {
 
-                log.warning("Actor encountered error: {}", t);
-                // default behaviour
-                return SupervisorStrategy.escalate();
-            }
-        });
+                        log.warning("Actor encountered error: {}", t);
+                        // default behaviour
+                        return SupervisorStrategy.escalate();
+                    }
+                });
 
         return supervisorStrategy;
     }

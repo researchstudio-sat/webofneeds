@@ -26,20 +26,19 @@ import org.hibernate.jpa.boot.spi.IntegratorProvider;
 /**
  * Integrator provider preconfigured to return the ParentAwareEventListenerIntegrator.
  */
-public class ParentAwareIntegratorProvider implements IntegratorProvider
-{
-  private List integrators = new ArrayList<Integrator>(1);
+public class ParentAwareIntegratorProvider implements IntegratorProvider {
+    private List integrators = new ArrayList<Integrator>(1);
 
-  public ParentAwareIntegratorProvider(final List integrators) {
-    this.integrators = integrators;
-  }
+    public ParentAwareIntegratorProvider(final List integrators) {
+        this.integrators = integrators;
+    }
 
-  public ParentAwareIntegratorProvider() {
-    integrators.add(new ParentAwareEventListenerIntegrator());
-  }
+    public ParentAwareIntegratorProvider() {
+        integrators.add(new ParentAwareEventListenerIntegrator());
+    }
 
-  @Override
-  public List<Integrator> getIntegrators() {
-    return Collections.unmodifiableList(integrators);
-  }
+    @Override
+    public List<Integrator> getIntegrators() {
+        return Collections.unmodifiableList(integrators);
+    }
 }

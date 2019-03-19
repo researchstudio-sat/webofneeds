@@ -22,13 +22,14 @@ import java.util.Set;
 import won.protocol.exception.CamelConfigurationFailedException;
 
 /**
- * User: LEIH-NB
- * Date: 25.02.14
+ * User: LEIH-NB Date: 25.02.14
  */
 public interface MatcherProtocolCommunicationService extends ProtocolCommunicationService {
-    public CamelConfiguration configureCamelEndpoint(URI needUri,String startingEndpoint) throws Exception;
+    public CamelConfiguration configureCamelEndpoint(URI needUri, String startingEndpoint) throws Exception;
+
     public Set<String> getMatcherProtocolOutTopics(URI wonNodeURI);
+
     public void addRemoteTopicListeners(final Set<String> endpoints, final URI remoteEndpoint)
-      throws CamelConfigurationFailedException;
+            throws CamelConfigurationFailedException;
 
 }

@@ -9,11 +9,8 @@ import won.node.facet.impl.WON_TX;
 import won.protocol.util.WonRdfUtils;
 
 /**
- * Created with IntelliJ IDEA.
- * User: Danijel
- * Date: 5.3.14.
- * Time: 12.39
- * To change this template use File | Settings | File Templates.
+ * Created with IntelliJ IDEA. User: Danijel Date: 5.3.14. Time: 12.39 To change this template use File | Settings |
+ * File Templates.
  */
 public class BATestScriptAction {
     private boolean senderIsParticipant;
@@ -22,6 +19,7 @@ public class BATestScriptAction {
 
     /**
      * Constructor that will cause the script to send text messages.
+     * 
      * @param senderIsParticipant
      * @param messageToBeSent
      * @param stateOfSenderBeforeSending
@@ -34,22 +32,25 @@ public class BATestScriptAction {
 
     /**
      * Constructor that will cause the script to send won:coordinationMessage with the given URI as object.
+     * 
      * @param senderIsParticipant
      * @param coordinationMessageUriToBeSent
      * @param stateOfSenderBeforeSending
      */
-    public BATestScriptAction(boolean senderIsParticipant, URI coordinationMessageUriToBeSent,URI stateOfSenderBeforeSending) {
+    public BATestScriptAction(boolean senderIsParticipant, URI coordinationMessageUriToBeSent,
+            URI stateOfSenderBeforeSending) {
         this.senderIsParticipant = senderIsParticipant;
         this.stateOfSenderBeforeSending = stateOfSenderBeforeSending;
-        this.messageToBeSent = WonRdfUtils.MessageUtils.genericMessage(WON_TX.COORDINATION_MESSAGE, new ResourceImpl(coordinationMessageUriToBeSent.toString()));
+        this.messageToBeSent = WonRdfUtils.MessageUtils.genericMessage(WON_TX.COORDINATION_MESSAGE,
+                new ResourceImpl(coordinationMessageUriToBeSent.toString()));
     }
 
     public boolean isSenderIsParticipant() {
         return senderIsParticipant;
     }
 
-    public boolean isSenderIsCoordinator(){
-        return ! isSenderIsParticipant();
+    public boolean isSenderIsCoordinator() {
+        return !isSenderIsParticipant();
     }
 
     public Model getMessageToBeSent() {
@@ -60,16 +61,13 @@ public class BATestScriptAction {
         return stateOfSenderBeforeSending;
     }
 
-    public boolean isNopAction(){
-      return false;
+    public boolean isNopAction() {
+        return false;
     }
 
-  @Override
-  public String toString() {
-    return "BATestScriptAction{" +
-      "senderIsParticipant=" + senderIsParticipant +
-      ", messageToBeSent=" + messageToBeSent +
-      ", stateOfSenderBeforeSending=" + stateOfSenderBeforeSending +
-      '}';
-  }
+    @Override
+    public String toString() {
+        return "BATestScriptAction{" + "senderIsParticipant=" + senderIsParticipant + ", messageToBeSent="
+                + messageToBeSent + ", stateOfSenderBeforeSending=" + stateOfSenderBeforeSending + '}';
+    }
 }

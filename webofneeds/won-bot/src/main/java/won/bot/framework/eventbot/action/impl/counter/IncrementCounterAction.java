@@ -23,14 +23,13 @@ import won.bot.framework.eventbot.listener.EventListener;
 /**
  * Action that increments the specified counter.
  */
-public class IncrementCounterAction extends BaseCounterAction
-{
-  public IncrementCounterAction(final EventListenerContext eventListenerContext, final Counter counter) {
-    super(eventListenerContext, counter);
-  }
+public class IncrementCounterAction extends BaseCounterAction {
+    public IncrementCounterAction(final EventListenerContext eventListenerContext, final Counter counter) {
+        super(eventListenerContext, counter);
+    }
 
-  @Override
-  protected void doRun(final Event event, EventListener executingListener) throws Exception {
-    getCounter().increment();
-  }
+    @Override
+    protected void doRun(final Event event, EventListener executingListener) throws Exception {
+        getCounter().increment();
+    }
 }

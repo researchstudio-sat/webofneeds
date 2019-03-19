@@ -28,16 +28,16 @@ import won.protocol.message.processor.exception.WonMessageProcessingException;
  */
 public class DirectionAddingWonMessageProcessor implements WonMessageProcessor {
 
-  WonMessageDirection direction;
+    WonMessageDirection direction;
 
-  public DirectionAddingWonMessageProcessor(WonMessageDirection direction) {
-    this.direction = direction;
-  }
+    public DirectionAddingWonMessageProcessor(WonMessageDirection direction) {
+        this.direction = direction;
+    }
 
-  @Override
-  public WonMessage process(WonMessage message) throws WonMessageProcessingException {
-    message.addMessageProperty(RDF.type, direction.getResource());
-    return message;
-  }
+    @Override
+    public WonMessage process(WonMessage message) throws WonMessageProcessingException {
+        message.addMessageProperty(RDF.type, direction.getResource());
+        return message;
+    }
 
 }

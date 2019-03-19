@@ -24,24 +24,21 @@ import won.bot.framework.eventbot.listener.EventListener;
 /**
  * Outputs a message via the configured logging system.
  */
-public class LogAction extends BaseEventBotAction
-{
-  protected String message;
+public class LogAction extends BaseEventBotAction {
+    protected String message;
 
-  public LogAction(final EventListenerContext eventListenerContext)
-  {
-    this(eventListenerContext, "Log action executed.");
-  }
+    public LogAction(final EventListenerContext eventListenerContext) {
+        this(eventListenerContext, "Log action executed.");
+    }
 
-  public LogAction(final EventListenerContext eventListenerContext, final String message) {
-    super(eventListenerContext);
-    this.message = message;
-  }
+    public LogAction(final EventListenerContext eventListenerContext, final String message) {
+        super(eventListenerContext);
+        this.message = message;
+    }
 
-  @Override
-  protected void doRun(Event event, EventListener executingListener) throws Exception
-  {
-    logger.info(message);
-  }
+    @Override
+    protected void doRun(Event event, EventListener executingListener) throws Exception {
+        logger.info(message);
+    }
 
 }

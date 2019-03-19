@@ -17,54 +17,53 @@ import scala.concurrent.duration.FiniteDuration;
  */
 @Configuration
 @PropertySource("file:${WON_CONFIG_DIR}/matcher-service.properties")
-public class CrawlConfig
-{
-  @Value("#{'${crawler.propertyPaths.base}'.split(',')}")
-  private List<String> crawlBasePropertyPaths;
+public class CrawlConfig {
+    @Value("#{'${crawler.propertyPaths.base}'.split(',')}")
+    private List<String> crawlBasePropertyPaths;
 
-  @Value("#{'${crawler.propertyPaths.nonBase}'.split(',')}")
-  private List<String> crawlNonBasePropertyPaths;
+    @Value("#{'${crawler.propertyPaths.nonBase}'.split(',')}")
+    private List<String> crawlNonBasePropertyPaths;
 
-  @Value("${crawler.http.timeout.connection}")
-  private long httpConnectionTimeout;
+    @Value("${crawler.http.timeout.connection}")
+    private long httpConnectionTimeout;
 
-  @Value("${crawler.http.timeout.read}")
-  private long httpReadTimeout;
+    @Value("${crawler.http.timeout.read}")
+    private long httpReadTimeout;
 
-  @Value("${crawler.metaDataUpdate.maxDuration}")
-  private long metaDataUpdateMaxDuration;
+    @Value("${crawler.metaDataUpdate.maxDuration}")
+    private long metaDataUpdateMaxDuration;
 
-  @Value("${crawler.metaDataUpdate.maxBulkSize}")
-  private long metaDataUpdateMaxBulkSize;
+    @Value("${crawler.metaDataUpdate.maxBulkSize}")
+    private long metaDataUpdateMaxBulkSize;
 
-  @Value("${crawler.recrawl.interval.minutes}")
-  private long recrawlIntervalMinutes;
+    @Value("${crawler.recrawl.interval.minutes}")
+    private long recrawlIntervalMinutes;
 
-  public List<String> getCrawlBasePropertyPaths() {
-    return crawlBasePropertyPaths;
-  }
+    public List<String> getCrawlBasePropertyPaths() {
+        return crawlBasePropertyPaths;
+    }
 
-  public List<String> getCrawlNonBasePropertyPaths() {
-    return crawlNonBasePropertyPaths;
-  }
+    public List<String> getCrawlNonBasePropertyPaths() {
+        return crawlNonBasePropertyPaths;
+    }
 
-  public long getHttpConnectionTimeout() {
-    return httpConnectionTimeout;
-  }
+    public long getHttpConnectionTimeout() {
+        return httpConnectionTimeout;
+    }
 
-  public long getHttpReadTimeout() {
-    return httpReadTimeout;
-  }
+    public long getHttpReadTimeout() {
+        return httpReadTimeout;
+    }
 
-  public FiniteDuration getRecrawlIntervalDuration() {
-    return Duration.create(recrawlIntervalMinutes, TimeUnit.MINUTES);
-  }
+    public FiniteDuration getRecrawlIntervalDuration() {
+        return Duration.create(recrawlIntervalMinutes, TimeUnit.MINUTES);
+    }
 
-  public FiniteDuration getMetaDataUpdateMaxDuration() {
-    return Duration.create(metaDataUpdateMaxDuration, TimeUnit.MILLISECONDS);
-  }
+    public FiniteDuration getMetaDataUpdateMaxDuration() {
+        return Duration.create(metaDataUpdateMaxDuration, TimeUnit.MILLISECONDS);
+    }
 
-  public long getMetaDataUpdateMaxBulkSize() {
-    return metaDataUpdateMaxBulkSize;
-  }
+    public long getMetaDataUpdateMaxBulkSize() {
+        return metaDataUpdateMaxBulkSize;
+    }
 }

@@ -22,7 +22,7 @@ import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageType;
 import won.protocol.model.Match;
 
-public class HintFromMatcherEvent extends BaseEvent  implements MessageEvent {
+public class HintFromMatcherEvent extends BaseEvent implements MessageEvent {
     private final Match match;
     final WonMessage wonMessage;
 
@@ -32,7 +32,7 @@ public class HintFromMatcherEvent extends BaseEvent  implements MessageEvent {
     }
 
     public Match getMatch() {
-      return match;
+        return match;
     }
 
     public WonMessage getWonMessage() {

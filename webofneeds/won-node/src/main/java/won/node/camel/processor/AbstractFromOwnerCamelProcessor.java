@@ -21,25 +21,26 @@ import org.apache.camel.Exchange;
 /**
  * Base class for processors handling messages coming from a remote node.
  */
-public abstract class AbstractFromOwnerCamelProcessor extends AbstractCamelProcessor implements
-  FromOwnerCamelProcessor
-{
-  /**
-   * Default implementation in case implementors don't need to react to success. Does nothing.
-   * @param exchange
-   * @throws Exception
-   */
-  public void onSuccessResponse(Exchange exchange) throws Exception {
-    logger.debug("received success response");
-  };
+public abstract class AbstractFromOwnerCamelProcessor extends AbstractCamelProcessor
+        implements FromOwnerCamelProcessor {
+    /**
+     * Default implementation in case implementors don't need to react to success. Does nothing.
+     * 
+     * @param exchange
+     * @throws Exception
+     */
+    public void onSuccessResponse(Exchange exchange) throws Exception {
+        logger.debug("received success response");
+    };
 
-  /**
-   * Default implementation in case implementors don't need to react to failure. Does nothing.
-   * @param exchange
-   * @throws Exception
-   */
-  public void onFailureResponse(Exchange exchange) throws Exception {
-    logger.debug("processing failure response");
-  };
+    /**
+     * Default implementation in case implementors don't need to react to failure. Does nothing.
+     * 
+     * @param exchange
+     * @throws Exception
+     */
+    public void onFailureResponse(Exchange exchange) throws Exception {
+        logger.debug("processing failure response");
+    };
 
 }

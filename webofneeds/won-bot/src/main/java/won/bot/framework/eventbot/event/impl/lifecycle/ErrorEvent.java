@@ -21,19 +21,18 @@ import won.bot.framework.eventbot.event.BaseEvent;
 /**
  * Event to be published when an error occurs.
  */
-public class ErrorEvent extends BaseEvent
-{
-  private Throwable throwable;
+public class ErrorEvent extends BaseEvent {
+    private Throwable throwable;
 
-  public ErrorEvent(final Throwable throwable) {
-    this.throwable = throwable;
-  }
+    public ErrorEvent(final Throwable throwable) {
+        this.throwable = throwable;
+    }
 
-  public Throwable getThrowable() {
-    return throwable;
-  }
+    public Throwable getThrowable() {
+        return throwable;
+    }
 
-  public void setThrowable(final Throwable throwable) {
-    this.throwable = throwable;
-  }
+    public void setThrowable(final Throwable throwable) {
+        this.throwable = throwable;
+    }
 }

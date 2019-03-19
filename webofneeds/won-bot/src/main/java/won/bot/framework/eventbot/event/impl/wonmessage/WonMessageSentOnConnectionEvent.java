@@ -26,25 +26,24 @@ import won.protocol.message.WonMessage;
 /**
  * Created by fkleedorfer on 14.06.2016.
  */
-public class WonMessageSentOnConnectionEvent extends WonMessageSentEvent implements ConnectionSpecificEvent,
-  NeedSpecificEvent, RemoteNeedSpecificEvent
-{
-  public WonMessageSentOnConnectionEvent(final WonMessage message) {
-    super(message);
-  }
+public class WonMessageSentOnConnectionEvent extends WonMessageSentEvent
+        implements ConnectionSpecificEvent, NeedSpecificEvent, RemoteNeedSpecificEvent {
+    public WonMessageSentOnConnectionEvent(final WonMessage message) {
+        super(message);
+    }
 
-  @Override
-  public URI getConnectionURI() {
-    return getWonMessage().getSenderURI();
-  }
+    @Override
+    public URI getConnectionURI() {
+        return getWonMessage().getSenderURI();
+    }
 
-  @Override
-  public URI getNeedURI() {
-    return getWonMessage().getSenderNeedURI();
-  }
+    @Override
+    public URI getNeedURI() {
+        return getWonMessage().getSenderNeedURI();
+    }
 
-  @Override
-  public URI getRemoteNeedURI() {
-    return getWonMessage().getReceiverNeedURI();
-  }
+    @Override
+    public URI getRemoteNeedURI() {
+        return getWonMessage().getReceiverNeedURI();
+    }
 }

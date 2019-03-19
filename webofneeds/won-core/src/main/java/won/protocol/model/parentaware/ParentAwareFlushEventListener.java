@@ -28,8 +28,6 @@ import org.hibernate.proxy.HibernateProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-
 public class ParentAwareFlushEventListener implements FlushEntityEventListener {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -44,12 +42,14 @@ public class ParentAwareFlushEventListener implements FlushEntityEventListener {
             ParentAware parentAware = (ParentAware) entity;
             if (updated(event)) {
                 VersionedEntity parent = parentAware.getParent();
-                if (parent == null) return;
+                if (parent == null)
+                    return;
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Incrementing {} entity version because a {} child entity has been updated", parent, entity);
+                    logger.debug("Incrementing {} entity version because a {} child entity has been updated", parent,
+                            entity);
                 }
-                if (! (parent instanceof HibernateProxy)) {
-                    //we have to do the increment manually
+                if (!(parent instanceof HibernateProxy)) {
+                    // we have to do the increment manually
                     parent.incrementVersion();
                 }
                 Hibernate.initialize(parent);
@@ -57,7 +57,6 @@ public class ParentAwareFlushEventListener implements FlushEntityEventListener {
             }
         }
     }
-
 
     private boolean deleted(FlushEntityEvent event) {
         return event.getEntityEntry().getStatus() == Status.DELETED;
@@ -73,17 +72,11 @@ public class ParentAwareFlushEventListener implements FlushEntityEventListener {
         SessionImplementor session = event.getSession();
 
         if (event.hasDatabaseSnapshot()) {
-            dirtyProperties = persister.findModified(
-                    event.getDatabaseSnapshot(), values, entity, session
-            );
+            dirtyProperties = persister.findModified(event.getDatabaseSnapshot(), values, entity, session);
         } else {
-            dirtyProperties = persister.findDirty(
-                    values, entry.getLoadedState(), entity, session
-            );
+            dirtyProperties = persister.findDirty(values, entry.getLoadedState(), entity, session);
         }
 
         return dirtyProperties != null;
     }
 }
-
-

@@ -17,8 +17,7 @@
 package won.protocol.exception;
 
 /**
- * User: LEIH-NB
- * Date: 13.12.13
+ * User: LEIH-NB Date: 13.12.13
  */
 public class CamelConfigurationFailedException extends WonProtocolException {
     public CamelConfigurationFailedException() {

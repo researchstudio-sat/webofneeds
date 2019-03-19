@@ -26,28 +26,25 @@ import won.protocol.model.FacetType;
 /**
  *
  */
-public class NeedCreatedEventForDebugConnect extends BaseNeedSpecificEvent
-{
-  private final URI wonNodeUri;
-  private final Dataset needDataset;
-  private final FacetType facetType;
+public class NeedCreatedEventForDebugConnect extends BaseNeedSpecificEvent {
+    private final URI wonNodeUri;
+    private final Dataset needDataset;
+    private final FacetType facetType;
 
-  public NeedCreatedEventForDebugConnect(final URI needURI, final URI wonNodeUri, final Dataset needDataset, final FacetType facetType) {
-    super(needURI);
-    this.wonNodeUri = wonNodeUri;
-    this.needDataset = needDataset;
-    this.facetType = facetType;
-  }
+    public NeedCreatedEventForDebugConnect(final URI needURI, final URI wonNodeUri, final Dataset needDataset,
+            final FacetType facetType) {
+        super(needURI);
+        this.wonNodeUri = wonNodeUri;
+        this.needDataset = needDataset;
+        this.facetType = facetType;
+    }
 
-  public URI getWonNodeUri()
-  {
-    return wonNodeUri;
-  }
+    public URI getWonNodeUri() {
+        return wonNodeUri;
+    }
 
-  public Dataset getNeedDataset()
-  {
-    return needDataset;
-  }
-
+    public Dataset getNeedDataset() {
+        return needDataset;
+    }
 
 }

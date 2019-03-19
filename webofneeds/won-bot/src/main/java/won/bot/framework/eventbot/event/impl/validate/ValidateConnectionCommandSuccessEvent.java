@@ -24,7 +24,8 @@ import won.bot.framework.eventbot.event.impl.cmd.BaseCommandSuccessEvent;
 public class ValidateConnectionCommandSuccessEvent extends BaseCommandSuccessEvent<ValidateConnectionCommandEvent> {
     private boolean valid;
 
-    public ValidateConnectionCommandSuccessEvent(ValidateConnectionCommandEvent originalCommandEvent, boolean valid, String message) {
+    public ValidateConnectionCommandSuccessEvent(ValidateConnectionCommandEvent originalCommandEvent, boolean valid,
+            String message) {
         super(message, originalCommandEvent);
         this.valid = valid;
     }

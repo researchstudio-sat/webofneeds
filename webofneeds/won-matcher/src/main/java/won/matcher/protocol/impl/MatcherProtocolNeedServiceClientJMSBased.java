@@ -34,50 +34,47 @@ import won.protocol.message.WonMessageEncoder;
 import won.protocol.util.RdfUtils;
 
 /**
- * User: gabriel
- * Date: 12.02.13
- * Time: 17:26
+ * User: gabriel Date: 12.02.13 Time: 17:26
  */
-public class MatcherProtocolNeedServiceClientJMSBased implements MatcherProtocolNeedServiceClientSide
-{
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+public class MatcherProtocolNeedServiceClientJMSBased implements MatcherProtocolNeedServiceClientSide {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private MessagingService messagingService;
     private MatcherProtocolCommunicationService matcherProtocolCommunicationService;
     private String startingEndpoint;
 
-  @Override
-  public void hint(URI needURI, URI otherNeed, double score, URI originator, Model content, WonMessage wonMessage)
-          throws Exception {
-        logger.info("need-facing: HINT called for needURI {} and otherNeed {} " +
-                "with score {} from originator {}.", new Object[]{needURI, otherNeed, score, originator});
+    @Override
+    public void hint(URI needURI, URI otherNeed, double score, URI originator, Model content, WonMessage wonMessage)
+            throws Exception {
+        logger.info("need-facing: HINT called for needURI {} and otherNeed {} " + "with score {} from originator {}.",
+                new Object[] { needURI, otherNeed, score, originator });
 
-
-        CamelConfiguration camelConfiguration = matcherProtocolCommunicationService.configureCamelEndpoint(wonMessage
-                                                                                                             .getReceiverNodeURI(),
-                                                                                                           startingEndpoint);
+        CamelConfiguration camelConfiguration = matcherProtocolCommunicationService
+                .configureCamelEndpoint(wonMessage.getReceiverNodeURI(), startingEndpoint);
         String endpoint = camelConfiguration.getEndpoint();
 
         Map<String, String> headerMap = new HashMap<>();
-        headerMap.put("needURI",needURI.toString());
+        headerMap.put("needURI", needURI.toString());
         headerMap.put("otherNeedURI", otherNeed.toString());
-        headerMap.put("score",String.valueOf(score));
-        headerMap.put("originator",originator.toString());
-        headerMap.put("content",RdfUtils.toString(content));
+        headerMap.put("score", String.valueOf(score));
+        headerMap.put("originator", originator.toString());
+        headerMap.put("content", RdfUtils.toString(content));
 
         headerMap.put("remoteBrokerEndpoint", endpoint);
-        headerMap.put("methodName","hint");
-        messagingService.sendInOnlyMessage(null, headerMap, WonMessageEncoder.encode(wonMessage, Lang.TRIG),startingEndpoint );
-  }
+        headerMap.put("methodName", "hint");
+        messagingService.sendInOnlyMessage(null, headerMap, WonMessageEncoder.encode(wonMessage, Lang.TRIG),
+                startingEndpoint);
+    }
 
     @Override
     public void initializeDefault() {
-       // matcherProtocolCommunicationService =
+        // matcherProtocolCommunicationService =
     }
 
     public void setStartingEndpoint(String startingEndpoint) {
         this.startingEndpoint = startingEndpoint;
     }
+
     public MessagingService getMessagingService() {
         return messagingService;
     }
@@ -86,12 +83,12 @@ public class MatcherProtocolNeedServiceClientJMSBased implements MatcherProtocol
         this.messagingService = messagingService;
     }
 
-
     public MatcherProtocolCommunicationService getMatcherProtocolCommunicationService() {
         return matcherProtocolCommunicationService;
     }
 
-    public void setMatcherProtocolCommunicationService(MatcherProtocolCommunicationService matcherProtocolCommunicationService) {
+    public void setMatcherProtocolCommunicationService(
+            MatcherProtocolCommunicationService matcherProtocolCommunicationService) {
         this.matcherProtocolCommunicationService = matcherProtocolCommunicationService;
     }
 }

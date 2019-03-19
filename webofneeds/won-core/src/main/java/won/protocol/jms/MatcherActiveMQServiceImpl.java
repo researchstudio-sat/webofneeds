@@ -35,54 +35,51 @@ import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WON;
 
 /**
- * User: sbyim
- * Date: 28.11.13
+ * User: sbyim Date: 28.11.13
  */
 public class MatcherActiveMQServiceImpl extends ActiveMQServiceImpl implements MatcherActiveMQService {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private List<String> matcherProtocolTopicList;
     private String pathInformation;
-  private static final String PATH_MATCHER_PROTOCOL_OUT_NEED_CREATED = "<"+WON.SUPPORTS_WON_PROTOCOL_IMPL + ">/<" + WON.HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_NEED_CREATED_TOPIC_NAME+">";
-  private static final String PATH_MATCHER_PROTOCOL_OUT_NEED_ACTIVATED = "<"+WON.SUPPORTS_WON_PROTOCOL_IMPL + ">/<" + WON.HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_NEED_ACTIVATED_TOPIC_NAME+">";
-  private static final String PATH_MATCHER_PROTOCOL_OUT_NEED_DEACTIVATED = "<"+WON.SUPPORTS_WON_PROTOCOL_IMPL + ">/<" + WON.HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_NEED_DEACTIVATED_TOPIC_NAME+">";
-  private static final String PATH_MATCHER_PROTOCOL_OUT_MATCHER_REGISTERED = "<"+WON.SUPPORTS_WON_PROTOCOL_IMPL + ">/<"
-    + WON
-    .HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_MATCHER_REGISTERED_TOPIC_NAME+">";
-  private static final String PATH_MATCHER_PROTOCOL_QUEUE_NAME = "<" + WON.SUPPORTS_WON_PROTOCOL_IMPL + ">/<" + WON.HAS_ACTIVEMQ_MATCHER_PROTOCOL_QUEUE_NAME + ">";
-
+    private static final String PATH_MATCHER_PROTOCOL_OUT_NEED_CREATED = "<" + WON.SUPPORTS_WON_PROTOCOL_IMPL + ">/<"
+            + WON.HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_NEED_CREATED_TOPIC_NAME + ">";
+    private static final String PATH_MATCHER_PROTOCOL_OUT_NEED_ACTIVATED = "<" + WON.SUPPORTS_WON_PROTOCOL_IMPL + ">/<"
+            + WON.HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_NEED_ACTIVATED_TOPIC_NAME + ">";
+    private static final String PATH_MATCHER_PROTOCOL_OUT_NEED_DEACTIVATED = "<" + WON.SUPPORTS_WON_PROTOCOL_IMPL
+            + ">/<" + WON.HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_NEED_DEACTIVATED_TOPIC_NAME + ">";
+    private static final String PATH_MATCHER_PROTOCOL_OUT_MATCHER_REGISTERED = "<" + WON.SUPPORTS_WON_PROTOCOL_IMPL
+            + ">/<" + WON.HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_MATCHER_REGISTERED_TOPIC_NAME + ">";
+    private static final String PATH_MATCHER_PROTOCOL_QUEUE_NAME = "<" + WON.SUPPORTS_WON_PROTOCOL_IMPL + ">/<"
+            + WON.HAS_ACTIVEMQ_MATCHER_PROTOCOL_QUEUE_NAME + ">";
 
     public MatcherActiveMQServiceImpl(ProtocolType type) {
-      super(type);
-      queueNamePath = PATH_MATCHER_PROTOCOL_QUEUE_NAME;
-      //pathInformation = "/resource";
-      matcherProtocolTopicList = new ArrayList<>();
-      matcherProtocolTopicList.add(PATH_MATCHER_PROTOCOL_OUT_NEED_ACTIVATED);
-      matcherProtocolTopicList.add(PATH_MATCHER_PROTOCOL_OUT_NEED_CREATED);
-      matcherProtocolTopicList.add(PATH_MATCHER_PROTOCOL_OUT_NEED_DEACTIVATED);
+        super(type);
+        queueNamePath = PATH_MATCHER_PROTOCOL_QUEUE_NAME;
+        // pathInformation = "/resource";
+        matcherProtocolTopicList = new ArrayList<>();
+        matcherProtocolTopicList.add(PATH_MATCHER_PROTOCOL_OUT_NEED_ACTIVATED);
+        matcherProtocolTopicList.add(PATH_MATCHER_PROTOCOL_OUT_NEED_CREATED);
+        matcherProtocolTopicList.add(PATH_MATCHER_PROTOCOL_OUT_NEED_DEACTIVATED);
 
     }
 
-    public final Set<String> getMatcherProtocolTopicNamesWithResource(URI resourceURI){
+    public final Set<String> getMatcherProtocolTopicNamesWithResource(URI resourceURI) {
         Set<String> activeMQMatcherProtocolTopicNames = new HashSet<>();
-        for (int i = 0; i< matcherProtocolTopicList.size();i++){
-            try{
-                Path path = PathParser.parse(matcherProtocolTopicList.get(i),PrefixMapping.Standard);
+        for (int i = 0; i < matcherProtocolTopicList.size(); i++) {
+            try {
+                Path path = PathParser.parse(matcherProtocolTopicList.get(i), PrefixMapping.Standard);
                 activeMQMatcherProtocolTopicNames.add(RdfUtils.getStringPropertyForPropertyPath(
-                        linkedDataSource.getDataForResource(resourceURI),
-                        resourceURI,
-                        path
-                ));
-            }catch (HttpClientErrorException e){
-                if (e.getStatusCode() == HttpStatus.NOT_FOUND){
+                        linkedDataSource.getDataForResource(resourceURI), resourceURI, path));
+            } catch (HttpClientErrorException e) {
+                if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
                     return null;
-                }
-                else throw e;
+                } else
+                    throw e;
             }
 
         }
         return activeMQMatcherProtocolTopicNames;
     }
-
 
 }

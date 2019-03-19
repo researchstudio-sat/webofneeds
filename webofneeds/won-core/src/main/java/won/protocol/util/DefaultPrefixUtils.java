@@ -34,8 +34,7 @@ import won.protocol.vocabulary.WONCRYPT;
 import won.protocol.vocabulary.WONMSG;
 
 /**
- * User: fkleedorfer
- * Date: 27.09.13
+ * User: fkleedorfer Date: 27.09.13
  */
 public class DefaultPrefixUtils {
     /**

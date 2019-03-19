@@ -35,66 +35,65 @@ import won.protocol.model.parentaware.ParentAware;
 import won.protocol.model.parentaware.VersionedEntity;
 
 @Entity
-@Table(name="connection_container")
-public class ConnectionContainer implements ParentAware<Need>, VersionedEntity
-{
-  @Id
-  @Column( name = "id" )
-  protected Long id;
+@Table(name = "connection_container")
+public class ConnectionContainer implements ParentAware<Need>, VersionedEntity {
+    @Id
+    @Column(name = "id")
+    protected Long id;
 
-  @Column(name="version", columnDefinition = "integer DEFAULT 0", nullable = false)
-  private int version = 0;
+    @Column(name = "version", columnDefinition = "integer DEFAULT 0", nullable = false)
+    private int version = 0;
 
-  @Temporal(TemporalType.TIMESTAMP)
-  @Column(name="last_update", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-  private Date lastUpdate = new Date();
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "last_update", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    private Date lastUpdate = new Date();
 
-  @OneToOne (fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "need_id")
-  @MapsId
-  private Need need;
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "need_id")
+    @MapsId
+    private Need need;
 
-  @Override
-  @PrePersist
-  @PreUpdate
-  public void incrementVersion() {
-    this.version++;
-    this.lastUpdate = new Date();
-  }
-
-  @Override
-  public Date getLastUpdate() {
-    return lastUpdate;
-  }
-
-  public int getVersion() {
-    return version;
-  }
-
-  public Need getNeed() {
-    return need;
-  }
-
-  @Override
-  public Need getParent() {
-    return getNeed();
-  }
-
-  public void setNeed(final Need need) {
-    this.need = need;
-  }
-  
-  public Long getId() {
-      return this.id;
-  }
-
-  public ConnectionContainer(final Need need) {
-    this.need = need;
-    if (need != null) {
-      need.setConnectionContainer(this);
+    @Override
+    @PrePersist
+    @PreUpdate
+    public void incrementVersion() {
+        this.version++;
+        this.lastUpdate = new Date();
     }
-  }
 
-  public ConnectionContainer() {
-  }
+    @Override
+    public Date getLastUpdate() {
+        return lastUpdate;
+    }
+
+    public int getVersion() {
+        return version;
+    }
+
+    public Need getNeed() {
+        return need;
+    }
+
+    @Override
+    public Need getParent() {
+        return getNeed();
+    }
+
+    public void setNeed(final Need need) {
+        this.need = need;
+    }
+
+    public Long getId() {
+        return this.id;
+    }
+
+    public ConnectionContainer(final Need need) {
+        this.need = need;
+        if (need != null) {
+            need.setConnectionContainer(this);
+        }
+    }
+
+    public ConnectionContainer() {
+    }
 }

@@ -19,32 +19,32 @@ package won.protocol.message.processor.exception;
 import java.net.URI;
 
 /**
- * User: fkleedorfer
- * Date: 27.03.15
+ * User: fkleedorfer Date: 27.03.15
  */
 public class IllegalWonMessagePropertyValue extends WonMessageNotWellFormedException {
-  private URI property;
-  private String value;
+    private URI property;
+    private String value;
 
-  private static String createExceptionMessage(URI property, String value){
-    return String.format("Illegal value: %s for property %s", value, property.toString());
-  }
+    private static String createExceptionMessage(URI property, String value) {
+        return String.format("Illegal value: %s for property %s", value, property.toString());
+    }
 
-  public IllegalWonMessagePropertyValue(URI property, String value) {
-    super(createExceptionMessage(property,value));
-    this.property = property;
-    this.value = value;
-  }
+    public IllegalWonMessagePropertyValue(URI property, String value) {
+        super(createExceptionMessage(property, value));
+        this.property = property;
+        this.value = value;
+    }
 
-  public IllegalWonMessagePropertyValue(Throwable cause, URI property, String value) {
-    super(createExceptionMessage(property,value),cause);
-    this.property = property;
-    this.value = value;
-  }
+    public IllegalWonMessagePropertyValue(Throwable cause, URI property, String value) {
+        super(createExceptionMessage(property, value), cause);
+        this.property = property;
+        this.value = value;
+    }
 
-  public IllegalWonMessagePropertyValue(Throwable cause, boolean enableSuppression, boolean writableStackTrace, URI property, String value) {
-    super(createExceptionMessage(property,value), cause, enableSuppression, writableStackTrace);
-    this.property = property;
-    this.value = value;
-  }
+    public IllegalWonMessagePropertyValue(Throwable cause, boolean enableSuppression, boolean writableStackTrace,
+            URI property, String value) {
+        super(createExceptionMessage(property, value), cause, enableSuppression, writableStackTrace);
+        this.property = property;
+        this.value = value;
+    }
 }

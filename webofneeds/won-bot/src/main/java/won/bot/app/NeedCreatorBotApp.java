@@ -21,20 +21,16 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.stereotype.Component;
 
 @Component
-public class NeedCreatorBotApp implements CommandLineRunner
-{
+public class NeedCreatorBotApp implements CommandLineRunner {
 
-  public static void main(String[] args) {
-    SpringApplication app = new SpringApplication(
-        new Object[]{"classpath:/spring/app/needCreatorBotApp.xml"}
-    );
-    app.setWebEnvironment(false);
-    app.run(args);
-  }
+    public static void main(String[] args) {
+        SpringApplication app = new SpringApplication(new Object[] { "classpath:/spring/app/needCreatorBotApp.xml" });
+        app.setWebEnvironment(false);
+        app.run(args);
+    }
 
-  @Override
-  public void run(final String... strings) throws Exception
-  {
+    @Override
+    public void run(final String... strings) throws Exception {
 
-  }
+    }
 }

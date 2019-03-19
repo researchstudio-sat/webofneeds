@@ -37,7 +37,6 @@ public class PetriNetController {
         return new ResponseEntity<Set<PetriNetUris>>(
                 PetriNetStates.of(getAgreementProtocolState(connectionUri)).getPetriNetUris(), HttpStatus.OK);
     }
-    
 
     private AgreementProtocolState getAgreementProtocolState(URI connectionUri) {
         try {

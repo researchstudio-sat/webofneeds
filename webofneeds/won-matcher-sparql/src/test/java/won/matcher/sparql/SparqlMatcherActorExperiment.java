@@ -24,12 +24,11 @@ public class SparqlMatcherActorExperiment {
     public static void main(String[] args) throws IOException, InterruptedException {
 
         // init basic Akka
-        AnnotationConfigApplicationContext ctx =
-                new AnnotationConfigApplicationContext(MatcherSparqlAppConfiguration.class);
+        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(
+                MatcherSparqlAppConfiguration.class);
         ActorSystem system = ctx.getBean(ActorSystem.class);
         ActorRef solrMatcherActor = system.actorOf(
                 SpringExtension.SpringExtProvider.get(system).props(SparqlMatcherActor.class), "SolrMatcherActor");
-
 
         NeedEvent ne1 = createNeedEvent("/needmodel/need1.trig");
         NeedEvent ne2 = createNeedEvent("/needmodel/need2.trig");
@@ -61,6 +60,5 @@ public class SparqlMatcherActorExperiment {
         String needUri = WonRdfUtils.NeedUtils.getNeedURI(dataset).toString();
         return new NeedEvent(needUri, "no_uri", NeedEvent.TYPE.ACTIVE, System.currentTimeMillis(), dataset);
     }
-    
-    
+
 }

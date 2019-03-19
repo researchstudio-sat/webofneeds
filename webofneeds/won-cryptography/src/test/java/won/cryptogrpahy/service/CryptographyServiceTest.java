@@ -15,20 +15,17 @@ import won.cryptography.key.KeyInformationExtractorBouncyCastle;
 import won.cryptography.service.KeyPairService;
 
 /**
- * User: fsalcher
- * Date: 17.07.2014
+ * User: fsalcher Date: 17.07.2014
  */
 public class CryptographyServiceTest {
 
     private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
-
     private ApplicationContext context;
 
     @Before
     public void init() {
-        context = new ClassPathXmlApplicationContext(
-                new String[]{"spring/component/cryptographyServices.xml"});
+        context = new ClassPathXmlApplicationContext(new String[] { "spring/component/cryptographyServices.xml" });
     }
 
     @Test

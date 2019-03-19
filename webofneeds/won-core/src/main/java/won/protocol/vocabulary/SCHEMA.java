@@ -6,17 +6,15 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
 
-
 /**
  * SCHEMA vocabulary.
  * 
- * USER: MS
- * Date: 01.10.2018
+ * USER: MS Date: 01.10.2018
  */
 public class SCHEMA {
 
     public static final String BASE_URI = "http://schema.org/";
-    public static final String DEFAULT_PREFIX= "s";
+    public static final String DEFAULT_PREFIX = "s";
 
     private static Model m = ModelFactory.createDefaultModel();
 
@@ -35,7 +33,7 @@ public class SCHEMA {
     public static final Property DATEPOSTED = m.createProperty(BASE_URI + "datePosted");
     public static final Property IMAGE = m.createProperty(BASE_URI + "image");
     public static final Property GEOCOORDINATES = m.createProperty(BASE_URI + "GeoCoordinates");
-    
+
     public static final Property AMENITYFEATURE = m.createProperty(BASE_URI + "amenityFeature");
     public static final Property FLOORSIZE = m.createProperty(BASE_URI + "floorSize");
     public static final Property NUMBEROFROOMS = m.createProperty(BASE_URI + "numberOfRooms");
@@ -48,26 +46,25 @@ public class SCHEMA {
     public static final Property PRICECURRENCY = m.createProperty(BASE_URI + "priceCurrency");
     public static final Property UNITCODE = m.createProperty(BASE_URI + "unitCode");
     public static final Property VALUE = m.createProperty(BASE_URI + "value");
-    
+
     public static final Property REVIEW = m.createProperty(BASE_URI + "Review");
     public static final Property RATING = m.createProperty(BASE_URI + "Rating");
-    
+
     public static final Property BEST_RATING = m.createProperty(BASE_URI + "bestRating");
     public static final Property WORST_RATING = m.createProperty(BASE_URI + "worstRating");
     public static final Property RATING_VALUE = m.createProperty(BASE_URI + "ratingValue");
     public static final Property ABOUT = m.createProperty(BASE_URI + "about");
     public static final Property AUTHOR = m.createProperty(BASE_URI + "author");
     public static final Property REVIEW_RATING = m.createProperty(BASE_URI + "reviewRating");
-    
+
     public static final Property AGGREGATE_RATING = m.createProperty(BASE_URI + "aggregateRating");
     public static final Property REVIEW_COUNT = m.createProperty(BASE_URI + "reviewCount");
-    
-    
-    
-    
+
     public static final RDFDatatype TEXT = new BaseDatatype(BASE_URI + "Text");
-    
-    /** returns the URI for this schema
+
+    /**
+     * returns the URI for this schema
+     * 
      * @return the URI for this schema
      */
     public static String getURI() {

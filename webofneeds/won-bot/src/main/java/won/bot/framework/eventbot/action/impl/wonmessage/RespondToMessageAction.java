@@ -27,72 +27,68 @@ import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.listener.EventListener;
 
 /**
- * Listener that responds to a message with automatic messages.
- * Can be configured to apply a timeout (non-blocking) before sending messages.
+ * Listener that responds to a message with automatic messages. Can be configured to apply a timeout (non-blocking)
+ * before sending messages.
  */
-public class RespondToMessageAction extends BaseEventBotAction
-{
-  private long millisTimeoutBeforeReply = 0;
-  private String message = null;
+public class RespondToMessageAction extends BaseEventBotAction {
+    private long millisTimeoutBeforeReply = 0;
+    private String message = null;
 
-  public RespondToMessageAction(EventListenerContext eventListenerContext) {
-    super(eventListenerContext);
-  }
-
-  public RespondToMessageAction(final EventListenerContext eventListenerContext, final long millisTimeoutBeforeReply) {
-    super(eventListenerContext);
-    this.millisTimeoutBeforeReply = millisTimeoutBeforeReply;
-  }
-
-  public RespondToMessageAction(final EventListenerContext eventListenerContext, final long millisTimeoutBeforeReply, final String message) {
-    super(eventListenerContext);
-    this.millisTimeoutBeforeReply = millisTimeoutBeforeReply;
-    this.message = message;
-  }
-
-  public RespondToMessageAction(final EventListenerContext eventListenerContext, final String message) {
-    super(eventListenerContext);
-    this.message = message;
-  }
-
-  @Override
-  protected void doRun(final Event event, EventListener executingListener) throws Exception
-  {
-    if (event instanceof ConnectionSpecificEvent){
-      handleMessageEvent((ConnectionSpecificEvent) event);
+    public RespondToMessageAction(EventListenerContext eventListenerContext) {
+        super(eventListenerContext);
     }
-  }
 
-  private void handleMessageEvent(final ConnectionSpecificEvent messageEvent){
-    getEventListenerContext().getTaskScheduler().schedule(new Runnable()
-    {
-      @Override
-      public void run()
-      {
-        String message = createMessage();
-        URI connectionUri = messageEvent.getConnectionURI();
-        if (logger.isDebugEnabled()){
-          logger.debug("connection {}: received message: {}", connectionUri, messageEvent.getClass().getSimpleName());
-          logger.debug("connection {}: sending  message: {}", connectionUri, message);
+    public RespondToMessageAction(final EventListenerContext eventListenerContext,
+            final long millisTimeoutBeforeReply) {
+        super(eventListenerContext);
+        this.millisTimeoutBeforeReply = millisTimeoutBeforeReply;
+    }
+
+    public RespondToMessageAction(final EventListenerContext eventListenerContext, final long millisTimeoutBeforeReply,
+            final String message) {
+        super(eventListenerContext);
+        this.millisTimeoutBeforeReply = millisTimeoutBeforeReply;
+        this.message = message;
+    }
+
+    public RespondToMessageAction(final EventListenerContext eventListenerContext, final String message) {
+        super(eventListenerContext);
+        this.message = message;
+    }
+
+    @Override
+    protected void doRun(final Event event, EventListener executingListener) throws Exception {
+        if (event instanceof ConnectionSpecificEvent) {
+            handleMessageEvent((ConnectionSpecificEvent) event);
         }
+    }
 
-        try {
-          getEventListenerContext().getWonMessageSender().sendWonMessage(
-            BotActionUtils.createWonMessage(
-              getEventListenerContext(),connectionUri, message));
-        } catch (Exception e) {
-          logger.warn("could not send message via connection {}", connectionUri, e);
-        }
-      }
-    }, new Date(System.currentTimeMillis() + this.millisTimeoutBeforeReply));
-  }
+    private void handleMessageEvent(final ConnectionSpecificEvent messageEvent) {
+        getEventListenerContext().getTaskScheduler().schedule(new Runnable() {
+            @Override
+            public void run() {
+                String message = createMessage();
+                URI connectionUri = messageEvent.getConnectionURI();
+                if (logger.isDebugEnabled()) {
+                    logger.debug("connection {}: received message: {}", connectionUri,
+                            messageEvent.getClass().getSimpleName());
+                    logger.debug("connection {}: sending  message: {}", connectionUri, message);
+                }
 
-  private String createMessage()
-  {
-    if (message != null) return message;
-    return "auto reply (delay: "+ millisTimeoutBeforeReply + " millis)";
-  }
+                try {
+                    getEventListenerContext().getWonMessageSender().sendWonMessage(
+                            BotActionUtils.createWonMessage(getEventListenerContext(), connectionUri, message));
+                } catch (Exception e) {
+                    logger.warn("could not send message via connection {}", connectionUri, e);
+                }
+            }
+        }, new Date(System.currentTimeMillis() + this.millisTimeoutBeforeReply));
+    }
 
-
+    private String createMessage() {
+        if (message != null)
+            return message;
+        return "auto reply (delay: " + millisTimeoutBeforeReply + " millis)";
+    }
 
 }

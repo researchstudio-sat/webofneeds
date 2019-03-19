@@ -23,9 +23,8 @@ import won.bot.framework.eventbot.event.BaseNodeSpecificEvent;
 /**
  *
  */
-public class MatcherRegisteredEvent extends BaseNodeSpecificEvent
-{
-  public MatcherRegisteredEvent(final URI wonNodeURI) {
-    super(wonNodeURI);
-  }
+public class MatcherRegisteredEvent extends BaseNodeSpecificEvent {
+    public MatcherRegisteredEvent(final URI wonNodeURI) {
+        super(wonNodeURI);
+    }
 }

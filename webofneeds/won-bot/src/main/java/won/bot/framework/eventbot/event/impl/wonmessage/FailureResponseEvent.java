@@ -23,14 +23,13 @@ import won.protocol.message.WonMessage;
 /**
  * Event published whenever a WonMessage is received that indicates the failure of a previous message.
  */
-public class FailureResponseEvent extends DeliveryResponseEvent
-{
+public class FailureResponseEvent extends DeliveryResponseEvent {
 
-  public FailureResponseEvent(URI originalMessageURI, WonMessage failureMessage) {
-    super(originalMessageURI, failureMessage);
-  }
+    public FailureResponseEvent(URI originalMessageURI, WonMessage failureMessage) {
+        super(originalMessageURI, failureMessage);
+    }
 
-  public WonMessage getFailureMessage() {
-    return getMessage();
-  }
+    public WonMessage getFailureMessage() {
+        return getMessage();
+    }
 }

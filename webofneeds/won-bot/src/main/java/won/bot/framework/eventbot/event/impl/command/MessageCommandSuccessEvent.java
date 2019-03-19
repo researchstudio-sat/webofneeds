@@ -19,5 +19,5 @@ package won.bot.framework.eventbot.event.impl.command;
 /**
  * Created by fkleedorfer on 24.03.2017.
  */
-public interface MessageCommandSuccessEvent extends MessageCommandResultEvent{
+public interface MessageCommandSuccessEvent extends MessageCommandResultEvent {
 }

@@ -26,7 +26,8 @@ import won.protocol.model.Connection;
 /**
  * Base class for command results (failure and successes).
  */
-public abstract class AbstractMessageCommandResultEvent extends BaseNeedAndConnectionSpecificEvent implements MessageCommandResultEvent {
+public abstract class AbstractMessageCommandResultEvent extends BaseNeedAndConnectionSpecificEvent
+        implements MessageCommandResultEvent {
 
     private MessageCommandEvent originalCommandEvent;
     private String message = null;
@@ -35,11 +36,13 @@ public abstract class AbstractMessageCommandResultEvent extends BaseNeedAndConne
         this(originalCommandEvent, con, null);
     }
 
-    public AbstractMessageCommandResultEvent(MessageCommandEvent originalCommandEvent, URI needURI, URI remoteNeedURI, URI connectionURI){
+    public AbstractMessageCommandResultEvent(MessageCommandEvent originalCommandEvent, URI needURI, URI remoteNeedURI,
+            URI connectionURI) {
         this(originalCommandEvent, makeConnection(needURI, remoteNeedURI, connectionURI));
     }
 
-    public AbstractMessageCommandResultEvent(MessageCommandEvent originalCommandEvent, URI needURI, URI remoteNeedURI, URI connectionURI, String message){
+    public AbstractMessageCommandResultEvent(MessageCommandEvent originalCommandEvent, URI needURI, URI remoteNeedURI,
+            URI connectionURI, String message) {
         this(originalCommandEvent, makeConnection(needURI, remoteNeedURI, connectionURI), message);
     }
 
@@ -59,7 +62,7 @@ public abstract class AbstractMessageCommandResultEvent extends BaseNeedAndConne
         return null;
     }
 
-    protected static Connection makeConnection(URI needURI, URI remoteNeedURI, URI connectionURI){
+    protected static Connection makeConnection(URI needURI, URI remoteNeedURI, URI connectionURI) {
         Connection con = new Connection();
         con.setConnectionURI(connectionURI);
         con.setNeedURI(needURI);

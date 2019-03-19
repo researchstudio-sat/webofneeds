@@ -26,24 +26,24 @@ import won.protocol.message.WonMessage;
 /**
  * Accepts only ResponseEvents with the specified originalMessageURI.
  */
-public class OriginalMessageUriRemoteResponseEventFilter implements EventFilter
-{
-  private URI originalMessageURI;
+public class OriginalMessageUriRemoteResponseEventFilter implements EventFilter {
+    private URI originalMessageURI;
 
-  public OriginalMessageUriRemoteResponseEventFilter(final URI originalMessageURI) {
-    this.originalMessageURI = originalMessageURI;
-  }
-
-  public static OriginalMessageUriRemoteResponseEventFilter forWonMessage(WonMessage wonMessage){
-    return new OriginalMessageUriRemoteResponseEventFilter(wonMessage.getMessageURI());
-  }
-
-  @Override
-  public boolean accept(final Event event) {
-    if (event instanceof ResponseEvent){
-      URI messageURI = ((ResponseEvent)event).getRemoteResponseToMessageURI();
-      if (this.originalMessageURI.equals(messageURI)) return true;
+    public OriginalMessageUriRemoteResponseEventFilter(final URI originalMessageURI) {
+        this.originalMessageURI = originalMessageURI;
     }
-    return false;
-  }
+
+    public static OriginalMessageUriRemoteResponseEventFilter forWonMessage(WonMessage wonMessage) {
+        return new OriginalMessageUriRemoteResponseEventFilter(wonMessage.getMessageURI());
+    }
+
+    @Override
+    public boolean accept(final Event event) {
+        if (event instanceof ResponseEvent) {
+            URI messageURI = ((ResponseEvent) event).getRemoteResponseToMessageURI();
+            if (this.originalMessageURI.equals(messageURI))
+                return true;
+        }
+        return false;
+    }
 }

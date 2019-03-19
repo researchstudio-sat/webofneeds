@@ -20,36 +20,31 @@ import java.net.URI;
 import java.text.MessageFormat;
 
 /**
- * User: fkleedorfer
- * Date: 02.11.12
+ * User: fkleedorfer Date: 02.11.12
  */
-public class ConnectionAlreadyExistsException extends WonProtocolException
-{
-  private URI connectionURI;
-  private URI fromNeedURI;
-  private URI toNeedURI;
+public class ConnectionAlreadyExistsException extends WonProtocolException {
+    private URI connectionURI;
+    private URI fromNeedURI;
+    private URI toNeedURI;
 
+    public ConnectionAlreadyExistsException(final URI connectionURI, final URI fromNeedURI, final URI toNeedURI) {
+        super(MessageFormat.format(
+                "The connection between needs {0} and {1} that you wanted to connect already exists with this URI: {2}",
+                fromNeedURI.toString(), toNeedURI, connectionURI));
+        this.connectionURI = connectionURI;
+        this.fromNeedURI = fromNeedURI;
+        this.toNeedURI = toNeedURI;
+    }
 
-  public ConnectionAlreadyExistsException(final URI connectionURI, final URI fromNeedURI, final URI toNeedURI)
-  {
-    super(MessageFormat.format("The connection between needs {0} and {1} that you wanted to connect already exists with this URI: {2}", fromNeedURI.toString(), toNeedURI, connectionURI));
-    this.connectionURI = connectionURI;
-    this.fromNeedURI = fromNeedURI;
-    this.toNeedURI = toNeedURI;
-  }
+    public URI getFromNeedURI() {
+        return fromNeedURI;
+    }
 
-  public URI getFromNeedURI()
-  {
-    return fromNeedURI;
-  }
+    public URI getToNeedURI() {
+        return toNeedURI;
+    }
 
-  public URI getToNeedURI()
-  {
-    return toNeedURI;
-  }
-
-  public URI getConnectionURI()
-  {
-    return connectionURI;
-  }
+    public URI getConnectionURI() {
+        return connectionURI;
+    }
 }

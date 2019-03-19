@@ -11,17 +11,16 @@ import won.matcher.service.common.spring.SpringExtension;
 import won.matcher.service.nodemanager.actor.WonNodeControllerActor;
 
 /**
- * User: hfriedrich
- * Date: 27.03.2015
+ * User: hfriedrich Date: 27.03.2015
  */
-public class AkkaSystemMain
-{
-  public static void main(String[] args) throws IOException {
+public class AkkaSystemMain {
+    public static void main(String[] args) throws IOException {
 
-    AnnotationConfigApplicationContext ctx =
-      new AnnotationConfigApplicationContext(MatcherServiceAppConfiguration.class);
-    ActorSystem system = ctx.getBean(ActorSystem.class);
-    ActorRef wonNodeControllerActor = system.actorOf(
-      SpringExtension.SpringExtProvider.get(system).props(WonNodeControllerActor.class), "WonNodeControllerActor");
-  }
+        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(
+                MatcherServiceAppConfiguration.class);
+        ActorSystem system = ctx.getBean(ActorSystem.class);
+        ActorRef wonNodeControllerActor = system.actorOf(
+                SpringExtension.SpringExtProvider.get(system).props(WonNodeControllerActor.class),
+                "WonNodeControllerActor");
+    }
 }

@@ -26,23 +26,22 @@ import won.bot.framework.eventbot.listener.EventListener;
 /**
  * Action that trips the specified barrier. Used to synchronize test execution with bot execution.
  */
-public class TripBarrierAction extends BaseEventBotAction
-{
-  private CyclicBarrier barrier;
+public class TripBarrierAction extends BaseEventBotAction {
+    private CyclicBarrier barrier;
 
-  public TripBarrierAction(final EventListenerContext eventListenerContext, final CyclicBarrier barrier) {
-    super(eventListenerContext);
-    this.barrier = barrier;
-  }
-
-  @Override
-  protected void doRun(final Event event, EventListener executingListener) throws Exception {
-    try {
-      //together with the barrier.await() in the @TestD method, this trips the barrier
-      //and both threads continue.
-      barrier.await();
-    } catch (Exception e) {
-      logger.warn("caught exception while waiting on barrier", e);
+    public TripBarrierAction(final EventListenerContext eventListenerContext, final CyclicBarrier barrier) {
+        super(eventListenerContext);
+        this.barrier = barrier;
     }
-  }
+
+    @Override
+    protected void doRun(final Event event, EventListener executingListener) throws Exception {
+        try {
+            // together with the barrier.await() in the @TestD method, this trips the barrier
+            // and both threads continue.
+            barrier.await();
+        } catch (Exception e) {
+            logger.warn("caught exception while waiting on barrier", e);
+        }
+    }
 }

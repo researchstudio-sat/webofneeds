@@ -25,60 +25,60 @@ import won.protocol.service.WonNodeInformationService;
  * Base class for decorators of the WonNodeInformationService..
  */
 public class WonNodeInformationServiceDecorator implements WonNodeInformationService {
-  private WonNodeInformationService delegate;
+    private WonNodeInformationService delegate;
 
-  public WonNodeInformationServiceDecorator(WonNodeInformationService delegate) {
-    this.delegate = delegate;
-  }
+    public WonNodeInformationServiceDecorator(WonNodeInformationService delegate) {
+        this.delegate = delegate;
+    }
 
-  public WonNodeInformationService getDelegate() {
-    return delegate;
-  }
+    public WonNodeInformationService getDelegate() {
+        return delegate;
+    }
 
-  @Override
-  public WonNodeInfo getWonNodeInformation(URI wonNodeURI) {
-    return delegate.getWonNodeInformation(wonNodeURI);
-  }
+    @Override
+    public WonNodeInfo getWonNodeInformation(URI wonNodeURI) {
+        return delegate.getWonNodeInformation(wonNodeURI);
+    }
 
-  @Override
-  public URI generateEventURI() {
-    return delegate.generateEventURI();
-  }
+    @Override
+    public URI generateEventURI() {
+        return delegate.generateEventURI();
+    }
 
-  @Override
-  public URI generateEventURI(URI wonNodeURI) {
-    return delegate.generateEventURI(wonNodeURI);
-  }
+    @Override
+    public URI generateEventURI(URI wonNodeURI) {
+        return delegate.generateEventURI(wonNodeURI);
+    }
 
-  @Override
-  public URI generateConnectionURI() {
-    return delegate.generateConnectionURI();
-  }
+    @Override
+    public URI generateConnectionURI() {
+        return delegate.generateConnectionURI();
+    }
 
-  @Override
-  public URI generateConnectionURI(URI wonNodeURI) {
-    return delegate.generateConnectionURI(wonNodeURI);
-  }
+    @Override
+    public URI generateConnectionURI(URI wonNodeURI) {
+        return delegate.generateConnectionURI(wonNodeURI);
+    }
 
-  @Override
-  public URI generateNeedURI() {
-    return delegate.generateNeedURI();
-  }
+    @Override
+    public URI generateNeedURI() {
+        return delegate.generateNeedURI();
+    }
 
-  @Override
-  public URI generateNeedURI(URI wonNodeURI) {
-    return delegate.generateNeedURI(wonNodeURI);
-  }
+    @Override
+    public URI generateNeedURI(URI wonNodeURI) {
+        return delegate.generateNeedURI(wonNodeURI);
+    }
 
-  @Override
-  public URI getDefaultWonNodeURI() {
-    return delegate.getDefaultWonNodeURI();
-  }
+    @Override
+    public URI getDefaultWonNodeURI() {
+        return delegate.getDefaultWonNodeURI();
+    }
 
-  @Override
-  public URI getWonNodeUri(URI resourceURI) {
-    return delegate.getWonNodeUri(resourceURI);
-  }
+    @Override
+    public URI getWonNodeUri(URI resourceURI) {
+        return delegate.getWonNodeUri(resourceURI);
+    }
 
     @Override
     public boolean isValidEventURI(URI eventURI) {

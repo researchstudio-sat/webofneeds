@@ -29,8 +29,7 @@ import won.bot.framework.eventbot.listener.EventListener;
 import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
 
 /**
- * User: fkleedorfer
- * Date: 29.08.2017
+ * User: fkleedorfer Date: 29.08.2017
  */
 public class BehaviourBarrier extends BotBehaviour {
     private Set<BotBehaviour> behavioursToWaitFor = Collections.synchronizedSet(new HashSet<>());
@@ -44,11 +43,11 @@ public class BehaviourBarrier extends BotBehaviour {
         super(context, name);
     }
 
-    public void waitFor(BotBehaviour botBehaviour){
+    public void waitFor(BotBehaviour botBehaviour) {
         this.behavioursToWaitFor.add(botBehaviour);
     }
 
-    public void thenStart(BotBehaviour botBehaviour){
+    public void thenStart(BotBehaviour botBehaviour) {
         this.behavioursToStart.add(botBehaviour);
     }
 
@@ -59,7 +58,8 @@ public class BehaviourBarrier extends BotBehaviour {
                 new ActionOnEventListener(context, new EventFilter() {
                     @Override
                     public boolean accept(Event event) {
-                        if (!(event instanceof BotBehaviourDeactivatedEvent)) return false;
+                        if (!(event instanceof BotBehaviourDeactivatedEvent))
+                            return false;
                         return behavioursToWaitFor.contains(((BotBehaviourDeactivatedEvent) event).getBehaviour());
                     }
                 }, new BaseEventBotAction(context) {

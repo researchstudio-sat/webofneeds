@@ -28,30 +28,28 @@ import won.bot.framework.eventbot.event.Event;
 /**
  * Event filter that accepts need specific events the URI of which is found in the specified named URI list.
  */
-public abstract class AbstractNamedUriListFilter extends EventListenerContextAwareFilter
-{
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+public abstract class AbstractNamedUriListFilter extends EventListenerContextAwareFilter {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  private String listname;
+    private String listname;
 
-  public AbstractNamedUriListFilter(final EventListenerContext context, final String listname)
-  {
-    super(context);
-    this.listname = listname;
-  }
-
-  @Override
-  public boolean accept(final Event event)
-  {
-    URI uri = getURIFromEvent(event);
-    if (uri == null) return false;
-    Collection<URI> uris = getContext().getBotContext().getNamedNeedUriList(listname);
-    if (uris == null) {
-      logger.debug("filtering by named need uri list, but no list found with name '{}'", listname );
-      return false;
+    public AbstractNamedUriListFilter(final EventListenerContext context, final String listname) {
+        super(context);
+        this.listname = listname;
     }
-    return uris.contains(uri);
-  }
 
-  protected abstract URI getURIFromEvent(final Event event);
+    @Override
+    public boolean accept(final Event event) {
+        URI uri = getURIFromEvent(event);
+        if (uri == null)
+            return false;
+        Collection<URI> uris = getContext().getBotContext().getNamedNeedUriList(listname);
+        if (uris == null) {
+            logger.debug("filtering by named need uri list, but no list found with name '{}'", listname);
+            return false;
+        }
+        return uris.contains(uri);
+    }
+
+    protected abstract URI getURIFromEvent(final Event event);
 }

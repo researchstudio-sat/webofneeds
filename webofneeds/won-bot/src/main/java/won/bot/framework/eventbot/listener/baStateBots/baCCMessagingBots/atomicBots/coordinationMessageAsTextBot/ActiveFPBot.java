@@ -8,19 +8,16 @@ import won.bot.framework.eventbot.listener.baStateBots.BATestScriptAction;
 import won.bot.framework.eventbot.listener.baStateBots.NopAction;
 
 /**
- * User: Danijel
- * Date: 17.4.14.
+ * User: Danijel Date: 17.4.14.
  */
-public class ActiveFPBot extends BATestBotScript
-{
+public class ActiveFPBot extends BATestBotScript {
 
-  @Override
-  protected List<BATestScriptAction> setupActions() {
-    List<BATestScriptAction> actions = new ArrayList();
+    @Override
+    protected List<BATestScriptAction> setupActions() {
+        List<BATestScriptAction> actions = new ArrayList();
 
-    actions.add(new NopAction());
+        actions.add(new NopAction());
 
-
-    return actions;
-  }
+        return actions;
+    }
 }

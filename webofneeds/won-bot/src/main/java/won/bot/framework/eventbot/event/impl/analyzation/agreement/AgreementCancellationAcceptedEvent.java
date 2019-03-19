@@ -8,7 +8,7 @@ import won.protocol.model.Connection;
  * Created by fsuda on 27.11.2017.
  */
 public class AgreementCancellationAcceptedEvent extends AgreementEvent {
-    public AgreementCancellationAcceptedEvent(Connection con, URI agreementUri){
+    public AgreementCancellationAcceptedEvent(Connection con, URI agreementUri) {
         super(con, agreementUri);
     }
 

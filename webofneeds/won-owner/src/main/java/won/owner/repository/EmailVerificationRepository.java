@@ -12,5 +12,6 @@ import won.owner.model.User;
  */
 public interface EmailVerificationRepository extends JpaRepository<EmailVerificationToken, Long> {
     EmailVerificationToken findByToken(String token);
+
     List<EmailVerificationToken> findByUser(User user);
 }

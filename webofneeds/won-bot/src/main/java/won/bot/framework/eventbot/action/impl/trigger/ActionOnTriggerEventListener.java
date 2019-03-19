@@ -28,15 +28,18 @@ public class ActionOnTriggerEventListener extends ActionOnEventListener {
         super(context, new BotTriggerFilter(botTrigger), task);
     }
 
-    public ActionOnTriggerEventListener(EventListenerContext context, String name, BotTrigger botTrigger, EventBotAction task) {
+    public ActionOnTriggerEventListener(EventListenerContext context, String name, BotTrigger botTrigger,
+            EventBotAction task) {
         super(context, name, new BotTriggerFilter(botTrigger), task);
     }
 
-    public ActionOnTriggerEventListener(EventListenerContext context, BotTrigger botTrigger, EventBotAction task, int timesToRun) {
+    public ActionOnTriggerEventListener(EventListenerContext context, BotTrigger botTrigger, EventBotAction task,
+            int timesToRun) {
         super(context, new BotTriggerFilter(botTrigger), task, timesToRun);
     }
 
-    public ActionOnTriggerEventListener(EventListenerContext context, String name, BotTrigger botTrigger, EventBotAction task, int timesToRun) {
+    public ActionOnTriggerEventListener(EventListenerContext context, String name, BotTrigger botTrigger,
+            EventBotAction task, int timesToRun) {
         super(context, name, new BotTriggerFilter(botTrigger), task, timesToRun);
     }
 }

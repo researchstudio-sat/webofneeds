@@ -23,11 +23,9 @@ import won.bot.framework.eventbot.filter.AbstractCompositeFilter;
 import won.bot.framework.eventbot.filter.EventFilter;
 
 /**
- * User: fkleedorfer
- * Date: 25.03.14
+ * User: fkleedorfer Date: 25.03.14
  */
-public class OrFilter extends AbstractCompositeFilter
-{
+public class OrFilter extends AbstractCompositeFilter {
 
     public OrFilter() {
     }
@@ -41,12 +39,12 @@ public class OrFilter extends AbstractCompositeFilter
     }
 
     @Override
-  public synchronized boolean accept(final Event event)
-  {
-    for (EventFilter filter: getFilters()){
-      if (filter.accept(event)) return true;
+    public synchronized boolean accept(final Event event) {
+        for (EventFilter filter : getFilters()) {
+            if (filter.accept(event))
+                return true;
+        }
+        return false;
     }
-    return false;
-  }
 
 }

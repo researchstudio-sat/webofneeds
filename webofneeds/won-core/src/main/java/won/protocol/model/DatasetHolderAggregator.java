@@ -32,63 +32,64 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.StopWatch;
 
 /**
- * Aggregates the datasets wrapped by a number of dataset holders. As soon as the aggregate() function is called,
- * all datasetHolders added so far are read (via their getDatasetBytes() method) and an aggregated dataset is created.
- * All subsequent calls to aggregate just yield the already aggregated dataset.
+ * Aggregates the datasets wrapped by a number of dataset holders. As soon as the aggregate() function is called, all
+ * datasetHolders added so far are read (via their getDatasetBytes() method) and an aggregated dataset is created. All
+ * subsequent calls to aggregate just yield the already aggregated dataset.
  */
-public class DatasetHolderAggregator
-{
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-  private List<InputStream> inputStreams = null;
-  private Lang rdfLanguage = null;
-  private static final Lang DEFAULT_RDF_LANGUAGE = Lang.NQUADS;
-  private Dataset aggregatedDataset = null;
+public class DatasetHolderAggregator {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private List<InputStream> inputStreams = null;
+    private Lang rdfLanguage = null;
+    private static final Lang DEFAULT_RDF_LANGUAGE = Lang.NQUADS;
+    private Dataset aggregatedDataset = null;
 
-  public DatasetHolderAggregator() {
-    this(null, null);
-  }
-
-  public DatasetHolderAggregator(final List<InputStream> inputStreams, final Lang rdfLanguage) {
-    this.inputStreams = inputStreams == null ?  new LinkedList<>() : inputStreams;
-    this.rdfLanguage = rdfLanguage == null ? DEFAULT_RDF_LANGUAGE : rdfLanguage;
-  }
-
-  public DatasetHolderAggregator(final Lang rdfLanguage) {
-    this(null, rdfLanguage);
-  }
-
-  public DatasetHolderAggregator(final List<InputStream> inputStreams) {
-    this(inputStreams, null);
-  }
-
-  public void appendDataset(DatasetHolder datasetHolder){
-    if (this.aggregatedDataset != null) throw new IllegalStateException("Cannot append a dataset after the aggregate" +
-                                                                          "() function was called");
-    this.inputStreams.add(new ByteArrayInputStream(datasetHolder.getDatasetBytes()));
-  }
-
-  public Dataset aggregate(){
-    if (this.aggregatedDataset != null){
-      return this.aggregatedDataset;
+    public DatasetHolderAggregator() {
+        this(null, null);
     }
-    synchronized (this) {
-      if (this.aggregatedDataset != null) return this.aggregatedDataset;
-      StopWatch stopWatch = new StopWatch();
-      stopWatch.start();
-      Dataset result = DatasetFactory.createGeneral();
-      stopWatch.stop();
-      logger.debug("init dataset: " + stopWatch.getLastTaskTimeMillis());
-      stopWatch.start();
-      this.aggregatedDataset = result;
-      if (this.inputStreams == null || this.inputStreams.size() == 0) {
-        return this.aggregatedDataset;
-      }
-      RDFDataMgr.read(result, new SequenceInputStream(Collections.enumeration(Collections.unmodifiableCollection(this
-                                                                                                                   .inputStreams))),
-                      this.rdfLanguage);
-      stopWatch.stop();
-      logger.debug("read dataset: " + stopWatch.getLastTaskTimeMillis());
-      return this.aggregatedDataset;
+
+    public DatasetHolderAggregator(final List<InputStream> inputStreams, final Lang rdfLanguage) {
+        this.inputStreams = inputStreams == null ? new LinkedList<>() : inputStreams;
+        this.rdfLanguage = rdfLanguage == null ? DEFAULT_RDF_LANGUAGE : rdfLanguage;
     }
-  }
+
+    public DatasetHolderAggregator(final Lang rdfLanguage) {
+        this(null, rdfLanguage);
+    }
+
+    public DatasetHolderAggregator(final List<InputStream> inputStreams) {
+        this(inputStreams, null);
+    }
+
+    public void appendDataset(DatasetHolder datasetHolder) {
+        if (this.aggregatedDataset != null)
+            throw new IllegalStateException("Cannot append a dataset after the aggregate" + "() function was called");
+        this.inputStreams.add(new ByteArrayInputStream(datasetHolder.getDatasetBytes()));
+    }
+
+    public Dataset aggregate() {
+        if (this.aggregatedDataset != null) {
+            return this.aggregatedDataset;
+        }
+        synchronized (this) {
+            if (this.aggregatedDataset != null)
+                return this.aggregatedDataset;
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
+            Dataset result = DatasetFactory.createGeneral();
+            stopWatch.stop();
+            logger.debug("init dataset: " + stopWatch.getLastTaskTimeMillis());
+            stopWatch.start();
+            this.aggregatedDataset = result;
+            if (this.inputStreams == null || this.inputStreams.size() == 0) {
+                return this.aggregatedDataset;
+            }
+            RDFDataMgr.read(result,
+                    new SequenceInputStream(
+                            Collections.enumeration(Collections.unmodifiableCollection(this.inputStreams))),
+                    this.rdfLanguage);
+            stopWatch.stop();
+            logger.debug("read dataset: " + stopWatch.getLastTaskTimeMillis());
+            return this.aggregatedDataset;
+        }
+    }
 }

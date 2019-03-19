@@ -22,25 +22,25 @@ import org.apache.jena.riot.Lang;
  * Constants used for camel.
  */
 public class WonCamelConstants {
-  public static final String MESSAGE_HEADER = "wonMessage";
-  public static final String DIRECTION_HEADER = "wonDirection";
-  public static final String FACET_TYPE_HEADER = "wonFacetType";
-  public static final String MESSAGE_TYPE_HEADER = "wonMessageType";
+    public static final String MESSAGE_HEADER = "wonMessage";
+    public static final String DIRECTION_HEADER = "wonDirection";
+    public static final String FACET_TYPE_HEADER = "wonFacetType";
+    public static final String MESSAGE_TYPE_HEADER = "wonMessageType";
 
-  public static final Lang RDF_LANGUAGE_FOR_MESSAGE = Lang.TRIG;
-  public static final String ORIGINAL_MESSAGE_HEADER = "wonOriginalMessage";
-  public static final String OUTBOUND_MESSAGE_HEADER = "wonOutboundMessage";
-  public static final String CONNECTION_URI_HEADER = "wonConnectionURI";
-  public static final String CONNECTION_STATE_CHANGE_BUILDER_HEADER = "connectionStateChangeBuilder";
-  
-  public static final String OUTBOUND_MESSAGE_FACTORY_HEADER = "wonOutboundMessageFactory";
+    public static final Lang RDF_LANGUAGE_FOR_MESSAGE = Lang.TRIG;
+    public static final String ORIGINAL_MESSAGE_HEADER = "wonOriginalMessage";
+    public static final String OUTBOUND_MESSAGE_HEADER = "wonOutboundMessage";
+    public static final String CONNECTION_URI_HEADER = "wonConnectionURI";
+    public static final String CONNECTION_STATE_CHANGE_BUILDER_HEADER = "connectionStateChangeBuilder";
 
-  public static final String OWNER_APPLICATION_ID = "ownerApplicationId";
-  public static final String OWNER_APPLICATIONS = "ownerApplications";
+    public static final String OUTBOUND_MESSAGE_FACTORY_HEADER = "wonOutboundMessageFactory";
 
-  public static final String SUPPRESS_MESSAGE_TO_OWNER = "suppressMessageToOwner";
-  public static final String SUPPRESS_MESSAGE_REACTION = "suppressMessageReaction";
-  
-  public static final String IGNORE_HINT = "ignoreHint";
+    public static final String OWNER_APPLICATION_ID = "ownerApplicationId";
+    public static final String OWNER_APPLICATIONS = "ownerApplications";
+
+    public static final String SUPPRESS_MESSAGE_TO_OWNER = "suppressMessageToOwner";
+    public static final String SUPPRESS_MESSAGE_REACTION = "suppressMessageReaction";
+
+    public static final String IGNORE_HINT = "ignoreHint";
 
 }

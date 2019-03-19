@@ -36,8 +36,7 @@ import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 
 /**
- * Creates a need with the specified facets.
- * If no facet is specified, the chatFacet will be used.
+ * Creates a need with the specified facets. If no facet is specified, the chatFacet will be used.
  */
 public class CreateEchoNeedWithFacetsAction extends AbstractCreateNeedAction {
     public CreateEchoNeedWithFacetsAction(EventListenerContext eventListenerContext, URI... facets) {
@@ -57,7 +56,7 @@ public class CreateEchoNeedWithFacetsAction extends AbstractCreateNeedAction {
         final Dataset needDataset = ((NeedCreatedEventForMatcher) event).getNeedData();
         DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(needDataset);
 
-        String titleString = needModelWrapper.getSomeTitleFromIsOrAll("en","de");
+        String titleString = needModelWrapper.getSomeTitleFromIsOrAll("en", "de");
         if (titleString != null) {
             replyText = titleString;
         } else {
@@ -76,16 +75,18 @@ public class CreateEchoNeedWithFacetsAction extends AbstractCreateNeedAction {
         needModelWrapper.setSeeksDescription("This is a need automatically created by the EchoBot.");
         int i = 1;
         for (URI facet : facets) {
-            needModelWrapper.addFacet(needURI.toString()+"#facet"+i, facet.toString());
+            needModelWrapper.addFacet(needURI.toString() + "#facet" + i, facet.toString());
             i++;
         }
 
         final Dataset echoNeedDataset = needModelWrapper.copyDataset();
 
-        logger.debug("creating need on won node {} with content {} ", wonNodeUri, StringUtils.abbreviate(RdfUtils.toString(echoNeedDataset), 150));
+        logger.debug("creating need on won node {} with content {} ", wonNodeUri,
+                StringUtils.abbreviate(RdfUtils.toString(echoNeedDataset), 150));
 
-        WonMessage createNeedMessage = createWonMessage(wonNodeInformationService, needURI, wonNodeUri, echoNeedDataset);
-        //remember the need URI so we can react to success/failure responses
+        WonMessage createNeedMessage = createWonMessage(wonNodeInformationService, needURI, wonNodeUri,
+                echoNeedDataset);
+        // remember the need URI so we can react to success/failure responses
         EventBotActionUtils.rememberInList(ctx, needURI, uriListName);
 
         EventListener successCallback = new EventListener() {
@@ -102,8 +103,10 @@ public class CreateEchoNeedWithFacetsAction extends AbstractCreateNeedAction {
         EventListener failureCallback = new EventListener() {
             @Override
             public void onEvent(Event event) throws Exception {
-                String textMessage = WonRdfUtils.MessageUtils.getTextMessage(((FailureResponseEvent) event).getFailureMessage());
-                logger.debug("need creation failed for need URI {}, original message URI {}: {}", new Object[]{needURI, ((FailureResponseEvent) event).getOriginalMessageURI(), textMessage});
+                String textMessage = WonRdfUtils.MessageUtils
+                        .getTextMessage(((FailureResponseEvent) event).getFailureMessage());
+                logger.debug("need creation failed for need URI {}, original message URI {}: {}",
+                        new Object[] { needURI, ((FailureResponseEvent) event).getOriginalMessageURI(), textMessage });
                 EventBotActionUtils.removeFromList(ctx, needURI, uriListName);
                 ctx.getEventBus().publish(new NeedCreationFailedEvent(wonNodeUri));
             }
@@ -114,6 +117,5 @@ public class CreateEchoNeedWithFacetsAction extends AbstractCreateNeedAction {
         getEventListenerContext().getWonMessageSender().sendWonMessage(createNeedMessage);
         logger.debug("need creation message sent with message URI {}", createNeedMessage.getMessageURI());
     }
-
 
 }

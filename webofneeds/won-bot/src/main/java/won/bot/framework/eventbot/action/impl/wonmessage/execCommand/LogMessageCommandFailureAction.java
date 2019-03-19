@@ -25,11 +25,10 @@ import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandFailureEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 
-
 /**
  * Logs type and optional message of a MessageCommandFailureEvent.
  */
-public class LogMessageCommandFailureAction extends BaseEventBotAction{
+public class LogMessageCommandFailureAction extends BaseEventBotAction {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public LogMessageCommandFailureAction(EventListenerContext eventListenerContext) {

@@ -19,10 +19,9 @@ package won.monitoring;
 /**
  * Interface for classes that reset the monitoring statistics so a new period can be monitored.
  */
-public interface MonitoringResetter
-{
-  /**
-   * Resets the monitoring statistics.
-   */
-  public void resetMonitoringStatistics();
+public interface MonitoringResetter {
+    /**
+     * Resets the monitoring statistics.
+     */
+    public void resetMonitoringStatistics();
 }

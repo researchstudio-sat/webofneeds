@@ -20,26 +20,21 @@ import java.net.URI;
 import java.text.MessageFormat;
 
 /**
- * User: fkleedorfer
- * Date: 02.11.12
+ * User: fkleedorfer Date: 02.11.12
  */
-public class NoSuchConnectionException extends WonProtocolException
-{
-  private URI unknownConnectionURI;
+public class NoSuchConnectionException extends WonProtocolException {
+    private URI unknownConnectionURI;
 
+    public URI getUnknownConnectionURI() {
+        return unknownConnectionURI;
+    }
 
-  public URI getUnknownConnectionURI()
-  {
-    return unknownConnectionURI;
-  }
+    public NoSuchConnectionException(final URI unknownConnectionURI) {
+        super(MessageFormat.format("No connection with the URI {0} is known on this server.", unknownConnectionURI));
+        this.unknownConnectionURI = unknownConnectionURI;
+    }
 
-  public NoSuchConnectionException(final URI unknownConnectionURI)
-  {
-    super(MessageFormat.format("No connection with the URI {0} is known on this server.", unknownConnectionURI));
-    this.unknownConnectionURI = unknownConnectionURI;
-  }
-    public NoSuchConnectionException(final Long unknownConnectionID)
-    {
+    public NoSuchConnectionException(final Long unknownConnectionID) {
         super(MessageFormat.format("No connection with the URI {0} is known on this server.", unknownConnectionID));
         this.unknownConnectionURI = unknownConnectionURI;
     }

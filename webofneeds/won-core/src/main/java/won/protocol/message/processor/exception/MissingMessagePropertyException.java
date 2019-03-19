@@ -22,24 +22,25 @@ import java.net.URI;
  * Exception indicating a missing message property.
  */
 public class MissingMessagePropertyException extends WonMessageNotWellFormedException {
-  private URI missingProperty;
+    private URI missingProperty;
 
-  private static String createExceptionMessage(URI missingProperty){
-    return String.format("Missing message property: %s", missingProperty);
-  }
+    private static String createExceptionMessage(URI missingProperty) {
+        return String.format("Missing message property: %s", missingProperty);
+    }
 
-  public MissingMessagePropertyException(URI missingProperty) {
-    super(createExceptionMessage(missingProperty));
-    this.missingProperty = missingProperty;
-  }
+    public MissingMessagePropertyException(URI missingProperty) {
+        super(createExceptionMessage(missingProperty));
+        this.missingProperty = missingProperty;
+    }
 
-  public MissingMessagePropertyException(Throwable cause, URI missingProperty) {
-    super(cause);
-    this.missingProperty = missingProperty;
-  }
+    public MissingMessagePropertyException(Throwable cause, URI missingProperty) {
+        super(cause);
+        this.missingProperty = missingProperty;
+    }
 
-  public MissingMessagePropertyException(Throwable cause, boolean enableSuppression, boolean writableStackTrace, URI missingProperty) {
-    super(createExceptionMessage(missingProperty), cause, enableSuppression, writableStackTrace);
-    this.missingProperty = missingProperty;
-  }
+    public MissingMessagePropertyException(Throwable cause, boolean enableSuppression, boolean writableStackTrace,
+            URI missingProperty) {
+        super(createExceptionMessage(missingProperty), cause, enableSuppression, writableStackTrace);
+        this.missingProperty = missingProperty;
+    }
 }

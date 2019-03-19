@@ -27,11 +27,11 @@ public class GroupBotContextWrapper extends BotContextWrapper {
         return groupMembersListName;
     }
 
-    public List<URI> getGroupNeedUris(){
+    public List<URI> getGroupNeedUris() {
         return getBotContext().getNamedNeedUriList(getGroupListName());
     }
 
-    public List<URI> getGroupMemberNeedUris(){
+    public List<URI> getGroupMemberNeedUris() {
         return getBotContext().getNamedNeedUriList(getGroupMembersListName());
     }
 }

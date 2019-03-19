@@ -25,19 +25,22 @@ import won.bot.framework.eventbot.event.impl.command.MessageCommandSuccessEvent;
 /**
  * Indicates that creating a need succeeded.
  */
-public class CreateNeedCommandSuccessEvent extends BaseNeedSpecificEvent implements MessageCommandSuccessEvent,  CreateNeedCommandResultEvent {
+public class CreateNeedCommandSuccessEvent extends BaseNeedSpecificEvent
+        implements MessageCommandSuccessEvent, CreateNeedCommandResultEvent {
     private final URI needUriBeforeCreation;
     private CreateNeedCommandEvent createNeedCommandEvent;
     private String message;
 
-    public CreateNeedCommandSuccessEvent(URI needURI, URI needUriBeforeCreation, CreateNeedCommandEvent createNeedCommandEvent, String message) {
+    public CreateNeedCommandSuccessEvent(URI needURI, URI needUriBeforeCreation,
+            CreateNeedCommandEvent createNeedCommandEvent, String message) {
         super(needURI);
         this.needUriBeforeCreation = needUriBeforeCreation;
         this.createNeedCommandEvent = createNeedCommandEvent;
         this.message = message;
     }
 
-    public CreateNeedCommandSuccessEvent(URI needURI, URI needUriBeforeCreation, CreateNeedCommandEvent createNeedCommandEvent) {
+    public CreateNeedCommandSuccessEvent(URI needURI, URI needUriBeforeCreation,
+            CreateNeedCommandEvent createNeedCommandEvent) {
         super(needURI);
         this.needUriBeforeCreation = needUriBeforeCreation;
         this.createNeedCommandEvent = createNeedCommandEvent;

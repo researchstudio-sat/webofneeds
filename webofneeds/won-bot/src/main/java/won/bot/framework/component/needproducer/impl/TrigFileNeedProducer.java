@@ -31,15 +31,13 @@ import won.bot.framework.component.needproducer.FileBasedNeedProducer;
 import won.protocol.util.NeedModelWrapper;
 
 /**
- * User: fkleedorfer
- * Date: 17.12.13
+ * User: fkleedorfer Date: 17.12.13
  */
-public class TrigFileNeedProducer implements FileBasedNeedProducer
-{
+public class TrigFileNeedProducer implements FileBasedNeedProducer {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
-    public  synchronized Dataset readNeedFromFile(final File file) throws IOException {
+    public synchronized Dataset readNeedFromFile(final File file) throws IOException {
         logger.debug("processing as turtle file: {} ", file);
         try (FileInputStream fis = new FileInputStream(file)) {
             Dataset dataset = DatasetFactory.createGeneral();
@@ -52,6 +50,5 @@ public class TrigFileNeedProducer implements FileBasedNeedProducer
             throw e;
         }
     }
-
 
 }

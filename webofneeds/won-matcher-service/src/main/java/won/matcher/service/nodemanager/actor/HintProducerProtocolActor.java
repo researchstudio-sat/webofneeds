@@ -35,100 +35,90 @@ import won.protocol.message.WonMessageEncoder;
  */
 @Component
 @Scope("prototype")
-public class HintProducerProtocolActor extends UntypedProducerActor
-{
-  @Autowired
-  private MonitoringService monitoringService;
+public class HintProducerProtocolActor extends UntypedProducerActor {
+    @Autowired
+    private MonitoringService monitoringService;
 
-  private String endpoint;
-  private String localBrokerUri;
-  private ActorRef pubSubMediator;
-  private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
+    private String endpoint;
+    private String localBrokerUri;
+    private ActorRef pubSubMediator;
+    private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
 
-  public HintProducerProtocolActor(String endpoint, String localBrokerUri) {
-    this.endpoint = endpoint;
-    this.localBrokerUri = localBrokerUri;
-    pubSubMediator = DistributedPubSub.get(getContext().system()).mediator();
-  }
+    public HintProducerProtocolActor(String endpoint, String localBrokerUri) {
+        this.endpoint = endpoint;
+        this.localBrokerUri = localBrokerUri;
+        pubSubMediator = DistributedPubSub.get(getContext().system()).mediator();
+    }
 
-  @Override
-  public String getEndpointUri() {
-    return endpoint;
-  }
+    @Override
+    public String getEndpointUri() {
+        return endpoint;
+    }
 
-  /**
-   * transform hint events to camel messages that can be sent to the won node
-   *
-   * @param message supposed to be a {@link HintEvent}
-   * @return
-   */
-  @Override
-  public Object onTransformOutgoingMessage(Object message) {
+    /**
+     * transform hint events to camel messages that can be sent to the won node
+     *
+     * @param message
+     *            supposed to be a {@link HintEvent}
+     * @return
+     */
+    @Override
+    public Object onTransformOutgoingMessage(Object message) {
 
-    HintEvent hint = (HintEvent) message;
-    Map<String, Object> headers = new HashMap<>();
-    headers.put("needURI", hint.getFromNeedUri());
-    headers.put("otherNeedURI", hint.getToNeedUri());
-    headers.put("score", String.valueOf(hint.getScore()));
-    headers.put("originator", hint.getMatcherUri());
-    //headers.put("content", RdfUtils.toString(hint.deserializeExplanationModel()));
-    //headers.put("remoteBrokerEndpoint", localBrokerUri);
-    headers.put("methodName", "hint");
+        HintEvent hint = (HintEvent) message;
+        Map<String, Object> headers = new HashMap<>();
+        headers.put("needURI", hint.getFromNeedUri());
+        headers.put("otherNeedURI", hint.getToNeedUri());
+        headers.put("score", String.valueOf(hint.getScore()));
+        headers.put("originator", hint.getMatcherUri());
+        // headers.put("content", RdfUtils.toString(hint.deserializeExplanationModel()));
+        // headers.put("remoteBrokerEndpoint", localBrokerUri);
+        headers.put("methodName", "hint");
 
-    WonMessage wonMessage = createHintWonMessage(hint);
-    Object body = WonMessageEncoder.encode(wonMessage, Lang.TRIG);
-    CamelMessage camelMsg = new CamelMessage(body, headers);
+        WonMessage wonMessage = createHintWonMessage(hint);
+        Object body = WonMessageEncoder.encode(wonMessage, Lang.TRIG);
+        CamelMessage camelMsg = new CamelMessage(body, headers);
 
-    // monitoring code
-    monitoringService.stopClock(MonitoringService.NEED_HINT_STOPWATCH, hint.getFromNeedUri());
+        // monitoring code
+        monitoringService.stopClock(MonitoringService.NEED_HINT_STOPWATCH, hint.getFromNeedUri());
 
-    log.debug("Send hint camel message {}", hint.getFromNeedUri());
-    return camelMsg;
-  }
+        log.debug("Send hint camel message {}", hint.getFromNeedUri());
+        return camelMsg;
+    }
 
-  /**
-   * create a won message out of an hint event
-   *
-   * @param hint
-   * @return
-   * @throws WonMessageBuilderException
-   */
-  private WonMessage createHintWonMessage(HintEvent hint)
-    throws WonMessageBuilderException {
+    /**
+     * create a won message out of an hint event
+     *
+     * @param hint
+     * @return
+     * @throws WonMessageBuilderException
+     */
+    private WonMessage createHintWonMessage(HintEvent hint) throws WonMessageBuilderException {
 
-    URI wonNode = URI.create(hint.getFromWonNodeUri());
-    return WonMessageBuilder
-      .setMessagePropertiesForHint(
-        hint.getGeneratedEventUri(),
-        URI.create(hint.getFromNeedUri()),
-        Optional.empty(),
-        wonNode,
-        URI.create(hint.getToNeedUri()),
-        Optional.empty(),        
-        URI.create(hint.getMatcherUri()),
-        hint.getScore())
-      .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL)
-      .build();
-  }
+        URI wonNode = URI.create(hint.getFromWonNodeUri());
+        return WonMessageBuilder
+                .setMessagePropertiesForHint(hint.getGeneratedEventUri(), URI.create(hint.getFromNeedUri()),
+                        Optional.empty(), wonNode, URI.create(hint.getToNeedUri()), Optional.empty(),
+                        URI.create(hint.getMatcherUri()), hint.getScore())
+                .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL).build();
+    }
 
+    @Override
+    public SupervisorStrategy supervisorStrategy() {
 
-  @Override
-  public SupervisorStrategy supervisorStrategy() {
+        SupervisorStrategy supervisorStrategy = new OneForOneStrategy(0, Duration.Zero(),
+                new Function<Throwable, SupervisorStrategy.Directive>() {
 
-    SupervisorStrategy supervisorStrategy = new OneForOneStrategy(
-      0, Duration.Zero(), new Function<Throwable, SupervisorStrategy.Directive>()
-    {
+                    @Override
+                    public SupervisorStrategy.Directive apply(Throwable t) throws Exception {
 
-      @Override
-      public SupervisorStrategy.Directive apply(Throwable t) throws Exception {
+                        log.warning("Actor encountered error: {}", t);
+                        // default behaviour
+                        return SupervisorStrategy.escalate();
+                    }
+                });
 
-        log.warning("Actor encountered error: {}", t);
-        // default behaviour
-        return SupervisorStrategy.escalate();
-      }
-    });
-
-    return supervisorStrategy;
-  }
+        return supervisorStrategy;
+    }
 
 }

@@ -38,63 +38,52 @@ import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 
 /**
- * User: Danijel
- * Date: 21.5.14.
+ * User: Danijel Date: 21.5.14.
  */
-public class TwoPhaseCommitNoVoteDeactivateAllNeedsAction extends BaseEventBotAction
-{
-  public TwoPhaseCommitNoVoteDeactivateAllNeedsAction(EventListenerContext eventListenerContext) {
-    super(eventListenerContext);
-  }
-
-  @Override
-  protected void doRun(Event event, EventListener executingListener) throws Exception {
-
-    //check the global COORDINATION_MESSAGE (must be ABORT)
-    if(event instanceof CloseFromOtherNeedEvent)
-    {
-      WonMessage wonMessage = ((CloseFromOtherNeedEvent) event).getWonMessage();
-      NodeIterator ni = RdfUtils.visitFlattenedToNodeIterator(
-        wonMessage.getMessageContent(),
-        new RdfUtils.ModelVisitor<NodeIterator>()
-        {
-          @Override
-          public NodeIterator visit(final Model model) {
-            return model.listObjectsOfProperty(model.createProperty(WON_TX.COORDINATION_MESSAGE.getURI()));
-          }
-        });
-      if(ni.hasNext())
-      {
-        String coordinationMessageUri = ni.toList().get(0).asResource().getURI().toString();
-        if(coordinationMessageUri.equals(WON_TX.COORDINATION_MESSAGE_ABORT.getURI().toString()))
-          logger.debug("Sent COORDINATION_MESSAGE: {}", coordinationMessageUri);
-        else
-          logger.error("Content of the COORDINATION_MESSAGE must be: {}. Currently it is: {}",
-            WON_TX.COORDINATION_MESSAGE_ABORT.getURI(), coordinationMessageUri);
-      }
+public class TwoPhaseCommitNoVoteDeactivateAllNeedsAction extends BaseEventBotAction {
+    public TwoPhaseCommitNoVoteDeactivateAllNeedsAction(EventListenerContext eventListenerContext) {
+        super(eventListenerContext);
     }
-    Collection<URI> toDeactivate = getEventListenerContext().getBotContext().retrieveAllNeedUris();
-    for (URI uri: toDeactivate){
-      getEventListenerContext().getWonMessageSender().sendWonMessage(createWonMessage(uri));
-      getEventListenerContext().getEventBus().publish(new NeedDeactivatedEvent(uri));
+
+    @Override
+    protected void doRun(Event event, EventListener executingListener) throws Exception {
+
+        // check the global COORDINATION_MESSAGE (must be ABORT)
+        if (event instanceof CloseFromOtherNeedEvent) {
+            WonMessage wonMessage = ((CloseFromOtherNeedEvent) event).getWonMessage();
+            NodeIterator ni = RdfUtils.visitFlattenedToNodeIterator(wonMessage.getMessageContent(),
+                    new RdfUtils.ModelVisitor<NodeIterator>() {
+                        @Override
+                        public NodeIterator visit(final Model model) {
+                            return model
+                                    .listObjectsOfProperty(model.createProperty(WON_TX.COORDINATION_MESSAGE.getURI()));
+                        }
+                    });
+            if (ni.hasNext()) {
+                String coordinationMessageUri = ni.toList().get(0).asResource().getURI().toString();
+                if (coordinationMessageUri.equals(WON_TX.COORDINATION_MESSAGE_ABORT.getURI().toString()))
+                    logger.debug("Sent COORDINATION_MESSAGE: {}", coordinationMessageUri);
+                else
+                    logger.error("Content of the COORDINATION_MESSAGE must be: {}. Currently it is: {}",
+                            WON_TX.COORDINATION_MESSAGE_ABORT.getURI(), coordinationMessageUri);
+            }
+        }
+        Collection<URI> toDeactivate = getEventListenerContext().getBotContext().retrieveAllNeedUris();
+        for (URI uri : toDeactivate) {
+            getEventListenerContext().getWonMessageSender().sendWonMessage(createWonMessage(uri));
+            getEventListenerContext().getEventBus().publish(new NeedDeactivatedEvent(uri));
+        }
     }
-  }
 
-  private WonMessage createWonMessage(URI needURI) throws WonMessageBuilderException {
+    private WonMessage createWonMessage(URI needURI) throws WonMessageBuilderException {
 
-    WonNodeInformationService wonNodeInformationService =
-      getEventListenerContext().getWonNodeInformationService();
+        WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
 
-    Dataset ds = getEventListenerContext().getLinkedDataSource().getDataForResource(needURI);
-    URI localWonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(ds, needURI);
+        Dataset ds = getEventListenerContext().getLinkedDataSource().getDataForResource(needURI);
+        URI localWonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(ds, needURI);
 
-    return WonMessageBuilder
-      .setMessagePropertiesForDeactivateFromOwner(
-        wonNodeInformationService.generateEventURI(
-          localWonNode),
-        needURI,
-        localWonNode)
-      .build();
-  }
+        return WonMessageBuilder.setMessagePropertiesForDeactivateFromOwner(
+                wonNodeInformationService.generateEventURI(localWonNode), needURI, localWonNode).build();
+    }
 
 }

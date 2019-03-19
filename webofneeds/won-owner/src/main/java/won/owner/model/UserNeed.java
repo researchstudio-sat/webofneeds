@@ -37,101 +37,100 @@ import won.protocol.model.URIConverter;
  * Entity wrapping a uri identifying a user's need.
  */
 @Entity
-public class UserNeed
-{
-  @Id
-  @GeneratedValue
-  @Column(name = "id")
-  private Long id;
+public class UserNeed {
+    @Id
+    @GeneratedValue
+    @Column(name = "id")
+    private Long id;
 
-  @Column( name = "uri", unique = true)
-  @Convert( converter = URIConverter.class)
-  private URI uri;
+    @Column(name = "uri", unique = true)
+    @Convert(converter = URIConverter.class)
+    private URI uri;
 
-  @Column( name = "matches")
-  private boolean matches;
+    @Column(name = "matches")
+    private boolean matches;
 
-  @Column( name = "requests")
-  private boolean requests = true;
+    @Column(name = "requests")
+    private boolean requests = true;
 
-  @Column( name = "conversations")
-  private boolean conversations = true;
+    @Column(name = "conversations")
+    private boolean conversations = true;
 
-  /* The creation date of the (as observed by the owner app) */
-  @Temporal(TemporalType.TIMESTAMP)
-  @Column( name = "creationDate", nullable = false)
-  private Date creationDate;
+    /* The creation date of the (as observed by the owner app) */
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "creationDate", nullable = false)
+    private Date creationDate;
 
-  @Enumerated(EnumType.STRING)
-  @Column( name = "state" )
-  private NeedState state;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "state")
+    private NeedState state;
 
-  public UserNeed() {
-  }
+    public UserNeed() {
+    }
 
-  @PrePersist
-  protected void onCreate() {
-      creationDate = new Date();
-      state = NeedState.ACTIVE;
-  }
+    @PrePersist
+    protected void onCreate() {
+        creationDate = new Date();
+        state = NeedState.ACTIVE;
+    }
 
-  public UserNeed(URI uri) {
-    this.uri = uri;
-  }
+    public UserNeed(URI uri) {
+        this.uri = uri;
+    }
 
-  public Long getId() {
-    return id;
-  }
+    public Long getId() {
+        return id;
+    }
 
-  public void setId(final Long id) {
-    this.id = id;
-  }
+    public void setId(final Long id) {
+        this.id = id;
+    }
 
-  public URI getUri() {
-    return uri;
-  }
+    public URI getUri() {
+        return uri;
+    }
 
-  public void setUri(final URI uri) {
-    this.uri = uri;
-  }
+    public void setUri(final URI uri) {
+        this.uri = uri;
+    }
 
-  public boolean isMatches() {
-    return matches;
-  }
+    public boolean isMatches() {
+        return matches;
+    }
 
-  public void setMatches(final boolean matches) {
-    this.matches = matches;
-  }
+    public void setMatches(final boolean matches) {
+        this.matches = matches;
+    }
 
-  public boolean isRequests() {
-    return requests;
-  }
+    public boolean isRequests() {
+        return requests;
+    }
 
-  public void setRequests(final boolean requests) {
-    this.requests = requests;
-  }
+    public void setRequests(final boolean requests) {
+        this.requests = requests;
+    }
 
-  public boolean isConversations() {
-    return conversations;
-  }
+    public boolean isConversations() {
+        return conversations;
+    }
 
-  public void setConversations(final boolean conversations) {
-    this.conversations = conversations;
-  }
+    public void setConversations(final boolean conversations) {
+        this.conversations = conversations;
+    }
 
-  public Date getCreationDate() {
-    return creationDate;
-  }
+    public Date getCreationDate() {
+        return creationDate;
+    }
 
-  public void setCreationDate(final Date creationDate) {
-    this.creationDate = creationDate;
-  }
+    public void setCreationDate(final Date creationDate) {
+        this.creationDate = creationDate;
+    }
 
-  public NeedState getState() {
-    return state;
-  }
+    public NeedState getState() {
+        return state;
+    }
 
-  public void setState(NeedState state) {
-    this.state = state;
-  }
+    public void setState(NeedState state) {
+        this.state = state;
+    }
 }

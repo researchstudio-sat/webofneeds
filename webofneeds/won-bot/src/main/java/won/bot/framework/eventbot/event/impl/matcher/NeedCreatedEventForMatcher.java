@@ -25,21 +25,18 @@ import won.bot.framework.eventbot.event.BaseNeedSpecificEvent;
 /**
  *
  */
-public class NeedCreatedEventForMatcher extends BaseNeedSpecificEvent
-{
+public class NeedCreatedEventForMatcher extends BaseNeedSpecificEvent {
 
-  private final Dataset needData;
+    private final Dataset needData;
 
-  public NeedCreatedEventForMatcher(final URI needURI, final Dataset needData) {
-    super(needURI);
-    this.needData = needData;
+    public NeedCreatedEventForMatcher(final URI needURI, final Dataset needData) {
+        super(needURI);
+        this.needData = needData;
 
-  }
+    }
 
-  public Dataset getNeedData()
-  {
-    return needData;
-  }
-
+    public Dataset getNeedData() {
+        return needData;
+    }
 
 }

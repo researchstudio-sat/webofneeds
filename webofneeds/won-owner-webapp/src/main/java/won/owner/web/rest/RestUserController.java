@@ -67,8 +67,7 @@ import won.owner.web.events.OnRegistrationCompleteEvent;
 import won.owner.web.validator.UserRegisterValidator;
 
 /**
- * User: t.kozel
- * Date: 11/12/13
+ * User: t.kozel Date: 11/12/13
  */
 @Controller
 @RequestMapping("/rest/users")
@@ -104,9 +103,8 @@ public class RestUserController {
 
     @Autowired
     public RestUserController(final AuthenticationManager authenticationManager,
-                              final SecurityContextRepository securityContextRepository,
-                              final UserRegisterValidator userRegisterValidator,
-                              final UserNeedRepository userNeedRepository) {
+            final SecurityContextRepository securityContextRepository,
+            final UserRegisterValidator userRegisterValidator, final UserNeedRepository userNeedRepository) {
         this.authenticationManager = authenticationManager;
         this.securityContextRepository = securityContextRepository;
         this.userRegisterValidator = userRegisterValidator;
@@ -116,17 +114,14 @@ public class RestUserController {
     /**
      * registers user
      *
-     * @param user   registration data of a user
+     * @param user
+     *            registration data of a user
      * @param errors
      * @return ResponseEntity with Http Status Code
      */
     @ResponseBody
-    @RequestMapping(
-            value = "/",
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            method = RequestMethod.POST
-    )
-    //TODO: move transactionality annotation into the service layer
+    @RequestMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+    // TODO: move transactionality annotation into the service layer
     @Transactional(propagation = Propagation.SUPPORTS)
     public ResponseEntity registerUser(@RequestBody UserPojo user, Errors errors, WebRequest request) {
         try {
@@ -140,10 +135,12 @@ public class RestUserController {
                     return generateStatusResponse(RestStatusResponse.USER_ALREADY_EXISTS);
                 }
             }
-            User createdUser = userService.registerUser(user.getUsername(), user.getPassword(), null, user.getPrivateId());
+            User createdUser = userService.registerUser(user.getUsername(), user.getPassword(), null,
+                    user.getPrivateId());
 
-            if(!createdUser.isAnonymous() && !createdUser.isEmailVerified()) {
-                eventPublisher.publishEvent(new OnRegistrationCompleteEvent(createdUser, request.getLocale(), request.getContextPath()));
+            if (!createdUser.isAnonymous() && !createdUser.isEmailVerified()) {
+                eventPublisher.publishEvent(
+                        new OnRegistrationCompleteEvent(createdUser, request.getLocale(), request.getContextPath()));
             }
         } catch (UserAlreadyExistsException e) {
             // username is already in database
@@ -160,14 +157,11 @@ public class RestUserController {
      * @return ResponseEntity with Http Status Code
      */
     @ResponseBody
-    @RequestMapping(
-            value = "/transfer",
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            method = RequestMethod.POST
-    )
-    //TODO: move transactionality annotation into the service layer
+    @RequestMapping(value = "/transfer", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+    // TODO: move transactionality annotation into the service layer
     @Transactional(propagation = Propagation.SUPPORTS)
-    public ResponseEntity transferUser(@RequestBody TransferUserPojo transferUserPojo, Errors errors, WebRequest request) {
+    public ResponseEntity transferUser(@RequestBody TransferUserPojo transferUserPojo, Errors errors,
+            WebRequest request) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         // cannot use user object from context since hw doesn't know about created in this session need,
         // therefore, we have to retrieve the user object from the user repository
@@ -187,10 +181,12 @@ public class RestUserController {
                     return generateStatusResponse(RestStatusResponse.USER_ALREADY_EXISTS);
                 }
             }
-            User transferUser = userService.transferUser(transferUserPojo.getUsername(), transferUserPojo.getPassword(), transferUserPojo.getPrivateUsername(), transferUserPojo.getPrivatePassword());
+            User transferUser = userService.transferUser(transferUserPojo.getUsername(), transferUserPojo.getPassword(),
+                    transferUserPojo.getPrivateUsername(), transferUserPojo.getPrivatePassword());
 
-            if(!transferUser.isEmailVerified()) {
-                eventPublisher.publishEvent(new OnRegistrationCompleteEvent(transferUser, request.getLocale(), request.getContextPath()));
+            if (!transferUser.isEmailVerified()) {
+                eventPublisher.publishEvent(
+                        new OnRegistrationCompleteEvent(transferUser, request.getLocale(), request.getContextPath()));
             }
         } catch (UserAlreadyExistsException e) {
             // username is already in database
@@ -202,11 +198,7 @@ public class RestUserController {
     }
 
     @ResponseBody
-    @RequestMapping(
-            value = "/settings",
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            method = RequestMethod.GET
-    )
+    @RequestMapping(value = "/settings", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
     public UserSettingsPojo getUserSettings(@RequestParam("uri") String uri) {
 
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -221,7 +213,7 @@ public class RestUserController {
             for (UserNeed userNeed : user.getUserNeeds()) {
                 if (userNeed.getUri().equals(needUri)) {
                     userSettingsPojo.setNotify(userNeed.isMatches(), userNeed.isRequests(), userNeed.isConversations());
-                    //userSettingsPojo.setEmail(user.getEmail());
+                    // userSettingsPojo.setEmail(user.getEmail());
                     break;
                 }
             }
@@ -233,12 +225,8 @@ public class RestUserController {
     }
 
     @ResponseBody
-    @RequestMapping(
-            value = "/settings",
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            method = RequestMethod.POST
-    )
-    //TODO: move transactionality annotation into the service layer
+    @RequestMapping(value = "/settings", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+    // TODO: move transactionality annotation into the service layer
     @Transactional(propagation = Propagation.SUPPORTS)
     public ResponseEntity setUserSettings(@RequestBody UserSettingsPojo userSettingsPojo) {
 
@@ -251,12 +239,12 @@ public class RestUserController {
         }
 
         if (user.getEmail() == null) {
-            //TODO validate email server-side?
+            // TODO validate email server-side?
             // set email:
             user.setEmail(userSettingsPojo.getEmail());
             userService.save(user);
         } else if (!user.getEmail().equals(userSettingsPojo.getEmail())) {
-            //TODO validate email server-side?
+            // TODO validate email server-side?
             // change email:
             user.setEmail(userSettingsPojo.getEmail());
             userService.save(user);
@@ -278,7 +266,8 @@ public class RestUserController {
             }
         } catch (URISyntaxException e) {
             logger.warn(userSettingsPojo.getNeedUri() + " need uri problem.", e);
-            return new ResponseEntity("\"" + userSettingsPojo.getNeedUri() + " need uri problem.\"", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity("\"" + userSettingsPojo.getNeedUri() + " need uri problem.\"",
+                    HttpStatus.BAD_REQUEST);
         }
         return generateStatusResponse(RestStatusResponse.SETTINGS_CREATED);
     }
@@ -291,22 +280,14 @@ public class RestUserController {
      * @return
      */
     @ResponseBody
-    @RequestMapping(
-            value = "/signin",
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            method = RequestMethod.POST
-    )
-    //TODO: move transactionality annotation into the service layer
+    @RequestMapping(value = "/signin", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+    // TODO: move transactionality annotation into the service layer
     @Transactional(propagation = Propagation.SUPPORTS)
-    public ResponseEntity logIn(
-            @RequestParam("username") String username,
-            @RequestParam("password") String password,
-            @RequestParam(name="privateId", required = false) String privateId,
-            HttpServletRequest request,
+    public ResponseEntity logIn(@RequestParam("username") String username, @RequestParam("password") String password,
+            @RequestParam(name = "privateId", required = false) String privateId, HttpServletRequest request,
             HttpServletResponse response) {
         SecurityContext context = SecurityContextHolder.getContext();
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username,
-                password);
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, password);
         try {
             Authentication auth = authenticationManager.authenticate(token);
             SecurityContextHolder.getContext().setAuthentication(auth);
@@ -326,23 +307,21 @@ public class RestUserController {
     }
 
     /**
-     * Method only accessible if the user's still signed in / the session's still valid -> Use it to check the session cookie.
+     * Method only accessible if the user's still signed in / the session's still valid -> Use it to check the session
+     * cookie.
      */
-    //* @param user user object
-    //* @param request
-    //* @param response
-    //* @return
+    // * @param user user object
+    // * @param request
+    // * @param response
+    // * @return
     //
     @ResponseBody
-    @RequestMapping(
-            value = "/isSignedIn",
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            method = RequestMethod.GET
-    )
+    @RequestMapping(value = "/isSignedIn", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
     @Transactional(propagation = Propagation.REQUIRED)
-    //TODO: move transactionality annotation into the service layer
+    // TODO: move transactionality annotation into the service layer
     public ResponseEntity isSignedIn(HttpServletRequest request, HttpServletResponse response) {
-        // Execution will only get here, if the session is still valid, so sending OK here is enough. Spring sends an error
+        // Execution will only get here, if the session is still valid, so sending OK here is enough. Spring sends an
+        // error
         // code by itself if the session isn't valid any more
         SecurityContext context = SecurityContextHolder.getContext();
         Authentication authentication = null;
@@ -352,7 +331,7 @@ public class RestUserController {
         if (authentication == null) {
             authentication = rememberMeServices.autoLogin(request, response);
         } else if (authentication instanceof AnonymousAuthenticationToken) {
-            //if we're anonymous, try to see if we can reactivate a remember-me session
+            // if we're anonymous, try to see if we can reactivate a remember-me session
             Authentication anonAuth = authentication;
             authentication = rememberMeServices.autoLogin(request, response);
             if (authentication == null) {
@@ -369,10 +348,7 @@ public class RestUserController {
         }
     }
 
-    @RequestMapping(
-            value = "/signout",
-            method = RequestMethod.POST
-    )
+    @RequestMapping(value = "/signout", method = RequestMethod.POST)
     public ResponseEntity logOut(HttpServletRequest request, HttpServletResponse response) {
         SecurityContext context = SecurityContextHolder.getContext();
         if (context.getAuthentication() == null) {
@@ -384,33 +360,26 @@ public class RestUserController {
         return generateStatusResponse(RestStatusResponse.USER_SIGNED_OUT);
     }
 
-
-    @RequestMapping(
-            value = "/{userId}/favourites",
-            method = RequestMethod.POST
-    )
+    @RequestMapping(value = "/{userId}/favourites", method = RequestMethod.POST)
     @Transactional(propagation = Propagation.SUPPORTS)
     public ResponseEntity saveAsFavourite() {
         return null;
     }
 
     @ResponseBody
-    @RequestMapping(
-            value = "/confirmRegistration",
-            method = RequestMethod.POST
-    )
+    @RequestMapping(value = "/confirmRegistration", method = RequestMethod.POST)
     @Transactional(propagation = Propagation.SUPPORTS)
     public ResponseEntity confirmRegistration(@RequestBody VerificationTokenPojo token) {
         EmailVerificationToken verificationToken = userService.getEmailVerificationToken(token.getToken());
 
-        if(verificationToken == null) {
+        if (verificationToken == null) {
             return generateStatusResponse(RestStatusResponse.TOKEN_NOT_FOUND);
         }
 
         User user = verificationToken.getUser();
         Calendar cal = Calendar.getInstance();
 
-        if((verificationToken.getExpiryDate().getTime() - cal.getTime().getTime()) <= 0) {
+        if ((verificationToken.getExpiryDate().getTime() - cal.getTime().getTime()) <= 0) {
             return generateStatusResponse(RestStatusResponse.TOKEN_EXPIRED);
         }
 
@@ -421,33 +390,28 @@ public class RestUserController {
     }
 
     @ResponseBody
-    @RequestMapping(
-            value = "/exportAccount",
-            method = RequestMethod.POST
-    )
-    public ResponseEntity exportAccount(@RequestParam(name="keyStorePassword", required = false) String keyStorePassword) {
+    @RequestMapping(value = "/exportAccount", method = RequestMethod.POST)
+    public ResponseEntity exportAccount(
+            @RequestParam(name = "keyStorePassword", required = false) String keyStorePassword) {
 
         SecurityContext securityContext = SecurityContextHolder.getContext();
         User authUser = ((KeystoreEnabledUserDetails) securityContext.getAuthentication().getPrincipal()).getUser();
         User user = userService.getByUsername(authUser.getUsername());
         String responseEmail = null;
-        if(user.isEmailVerified()) {
+        if (user.isEmailVerified()) {
             responseEmail = user.getEmail();
         } else {
             return generateStatusResponse(RestStatusResponse.EXPORT_NOT_VERIFIED);
         }
 
-        eventPublisher.publishEvent(new OnExportUserEvent(securityContext.getAuthentication(), keyStorePassword, responseEmail));
+        eventPublisher.publishEvent(
+                new OnExportUserEvent(securityContext.getAuthentication(), keyStorePassword, responseEmail));
 
         return generateStatusResponse(RestStatusResponse.EXPORT_SUCCESS);
     }
 
     @ResponseBody
-    @RequestMapping(
-            value = "/acceptTermsOfService",
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            method = RequestMethod.POST
-    )
+    @RequestMapping(value = "/acceptTermsOfService", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
     @Transactional(propagation = Propagation.SUPPORTS)
     public ResponseEntity acceptTermsOfService() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -458,7 +422,7 @@ public class RestUserController {
             return generateStatusResponse(RestStatusResponse.USER_NOT_FOUND);
         }
 
-        if(user.isAcceptedTermsOfService()){
+        if (user.isAcceptedTermsOfService()) {
             return generateStatusResponse(RestStatusResponse.TOS_ACCEPT_SUCCESS);
         } else {
             user.setAcceptedTermsOfService(true);
@@ -468,32 +432,29 @@ public class RestUserController {
     }
 
     @ResponseBody
-    @RequestMapping(
-            value = "/resendVerificationEmail",
-            method = RequestMethod.POST
-    )
+    @RequestMapping(value = "/resendVerificationEmail", method = RequestMethod.POST)
     @Transactional(propagation = Propagation.SUPPORTS)
     public ResponseEntity resendVerificationEmail(@RequestBody UsernamePojo usernamePojo) {
         User user = userService.getByUsername(usernamePojo.getUsername());
 
-        if(user == null) {
+        if (user == null) {
             return generateStatusResponse(RestStatusResponse.USER_NOT_FOUND);
         }
 
-        if(user.isAnonymous()) {
+        if (user.isAnonymous()) {
             return generateStatusResponse(RestStatusResponse.TOKEN_RESEND_FAILED_USER_ANONYMOUS);
         }
 
-        if(user.isEmailVerified()) {
+        if (user.isEmailVerified()) {
             return generateStatusResponse(RestStatusResponse.TOKEN_RESEND_FAILED_ALREADY_VERIFIED);
         }
 
         EmailVerificationToken verificationToken = userService.getEmailVerificationToken(user);
 
-        if(verificationToken == null || verificationToken.isExpired()) {
+        if (verificationToken == null || verificationToken.isExpired()) {
             verificationToken = userService.createEmailVerificationToken(user);
         }
-        if(verificationToken == null) {
+        if (verificationToken == null) {
             return generateStatusResponse(RestStatusResponse.TOKEN_CREATION_FAILED);
         }
 
@@ -502,32 +463,25 @@ public class RestUserController {
     }
 
     @ResponseBody
-    @RequestMapping(
-            value = "/sendAnonymousLinkEmail",
-            method = RequestMethod.POST
-    )
+    @RequestMapping(value = "/sendAnonymousLinkEmail", method = RequestMethod.POST)
     @Transactional(propagation = Propagation.SUPPORTS)
     public ResponseEntity sendAnonymousEmail(@RequestBody AnonymousLinkPojo anonymousLinkPojo) {
         emailSender.sendAnonymousLinkMessage(anonymousLinkPojo.getEmail(), anonymousLinkPojo.getPrivateId());
         return generateStatusResponse(RestStatusResponse.USER_ANONYMOUSLINK_SENT);
     }
 
-    @RequestMapping(
-            value = "/{userId}/resetPassword",
-            method = RequestMethod.POST
-    )
+    @RequestMapping(value = "/{userId}/resetPassword", method = RequestMethod.POST)
     @Transactional(propagation = Propagation.SUPPORTS)
     public ResponseEntity resetPassword(@RequestBody String password) {
         return null;
     }
-
 
     public void setRememberMeServices(RememberMeServices rememberMeServices) {
         this.rememberMeServices = rememberMeServices;
     }
 
     private static ResponseEntity generateStatusResponse(RestStatusResponse restStatusResponse) {
-        //TODO: Maybe change to return a pojo
+        // TODO: Maybe change to return a pojo
         Map values = new HashMap<String, String>();
         values.put("code", restStatusResponse.getCode());
         values.put("message", restStatusResponse.getMessage());
@@ -536,7 +490,7 @@ public class RestUserController {
     }
 
     private static ResponseEntity generateUserResponse(User user) {
-        //TODO: Maybe change to return a pojo
+        // TODO: Maybe change to return a pojo
         Map values = new HashMap<String, String>();
         values.put("username", user.getUsername());
         values.put("authorities", user.getAuthorities());

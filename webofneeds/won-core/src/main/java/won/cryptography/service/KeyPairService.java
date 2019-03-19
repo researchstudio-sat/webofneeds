@@ -23,8 +23,7 @@ public class KeyPairService {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private KeyPairGenerator keyPairGeneratorBrainpoolp384r1 = new KeyPairGeneratorSpi.ECDSA();
-    private org.bouncycastle.jcajce.provider.asymmetric.ec.KeyPairGeneratorSpi keyPairGeneratorSecp384r1 = new org.bouncycastle
-      .jcajce.provider.asymmetric.ec.KeyPairGeneratorSpi.ECDSA();
+    private org.bouncycastle.jcajce.provider.asymmetric.ec.KeyPairGeneratorSpi keyPairGeneratorSecp384r1 = new org.bouncycastle.jcajce.provider.asymmetric.ec.KeyPairGeneratorSpi.ECDSA();
 
     public KeyPairService(KeyInformationExtractor keyInformationExtractor) {
         this();
@@ -53,13 +52,11 @@ public class KeyPairService {
         }
     }
 
-
-    //TODO make better api for curve support, and ideally also add RSA support...
+    // TODO make better api for curve support, and ideally also add RSA support...
     public KeyPair generateNewKeyPairInSecp384r1() {
-        KeyPair pair =  keyPairGeneratorSecp384r1.generateKeyPair();
+        KeyPair pair = keyPairGeneratorSecp384r1.generateKeyPair();
         return pair;
     }
-
 
     public KeyPair generateNewKeyPairInBrainpoolp384r1() {
         KeyPair pair = keyPairGeneratorBrainpoolp384r1.generateKeyPair();

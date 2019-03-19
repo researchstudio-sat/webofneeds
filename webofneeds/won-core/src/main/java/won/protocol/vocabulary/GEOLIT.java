@@ -13,8 +13,9 @@ public class GEOLIT {
 
     public static final Property LAT_LON = m.createProperty(BASE_URI, "lat-lon");
 
-
-    /** returns the URI for this schema
+    /**
+     * returns the URI for this schema
+     * 
      * @return the URI for this schema
      */
     public static String getURI() {

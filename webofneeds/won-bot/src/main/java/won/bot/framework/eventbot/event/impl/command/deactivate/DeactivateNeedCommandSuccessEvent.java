@@ -9,11 +9,13 @@ import won.bot.framework.eventbot.event.impl.command.MessageCommandSuccessEvent;
 /**
  * Indicates that deactivating a need succeeded.
  */
-public class DeactivateNeedCommandSuccessEvent extends BaseNeedSpecificEvent implements MessageCommandSuccessEvent, DeactivateNeedCommandResultEvent {
+public class DeactivateNeedCommandSuccessEvent extends BaseNeedSpecificEvent
+        implements MessageCommandSuccessEvent, DeactivateNeedCommandResultEvent {
     private DeactivateNeedCommandEvent deactivateNeedCommandEvent;
     private String message;
 
-    public DeactivateNeedCommandSuccessEvent(URI needURI, DeactivateNeedCommandEvent deactivateNeedCommandEvent, String message) {
+    public DeactivateNeedCommandSuccessEvent(URI needURI, DeactivateNeedCommandEvent deactivateNeedCommandEvent,
+            String message) {
         super(needURI);
         this.deactivateNeedCommandEvent = deactivateNeedCommandEvent;
         this.message = message;

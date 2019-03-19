@@ -18,7 +18,7 @@ package won.bot.framework.bot.context;
 
 import java.net.URI;
 
-public class FactoryBotContextWrapper extends BotContextWrapper{
+public class FactoryBotContextWrapper extends BotContextWrapper {
     private final String factoryListName = getBotName() + ":factoryList";
     private final String factoryInternalIdName = getBotName() + ":factoryInternalId";
     private final String factoryOfferToFactoryNeedMapName = getBotName() + ":factoryOfferToFactoryNeedMap";
@@ -39,7 +39,7 @@ public class FactoryBotContextWrapper extends BotContextWrapper{
         return (URI) getBotContext().loadFromObjectMap(factoryInternalIdName, uri.toString());
     }
 
-    public void addInternalIdToUriReference(URI internalUri, URI uri){
+    public void addInternalIdToUriReference(URI internalUri, URI uri) {
         getBotContext().saveToObjectMap(factoryInternalIdName, internalUri.toString(), uri);
     }
 
@@ -47,11 +47,8 @@ public class FactoryBotContextWrapper extends BotContextWrapper{
         return (URI) getBotContext().loadFromObjectMap(factoryOfferToFactoryNeedMapName, offerURI.toString());
     }
 
-    public void addFactoryNeedURIOfferRelation(URI offerURI, URI factoryNeedURI){
+    public void addFactoryNeedURIOfferRelation(URI offerURI, URI factoryNeedURI) {
         getBotContext().saveToObjectMap(factoryOfferToFactoryNeedMapName, offerURI.toString(), factoryNeedURI);
     }
-
-
-
 
 }

@@ -35,92 +35,93 @@ import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.linkeddata.LinkedDataSource;
 
 /**
- * Delegates calls to another EventListenerContext, allowing to
- * set proxies for some of the services offered by the ELC.
+ * Delegates calls to another EventListenerContext, allowing to set proxies for some of the services offered by the ELC.
  */
-public abstract class BaseEventListenerContextDecorator implements EventListenerContext{
-  protected EventListenerContext delegate;
+public abstract class BaseEventListenerContextDecorator implements EventListenerContext {
+    protected EventListenerContext delegate;
 
-  public BaseEventListenerContextDecorator(EventListenerContext delegate) {
-    this.delegate = delegate;
-  }
+    public BaseEventListenerContextDecorator(EventListenerContext delegate) {
+        this.delegate = delegate;
+    }
 
-  @Override
-  public TaskScheduler getTaskScheduler() {
-    return delegate.getTaskScheduler();
-  }
+    @Override
+    public TaskScheduler getTaskScheduler() {
+        return delegate.getTaskScheduler();
+    }
 
-  @Override
-  public URI getSolrServerURI() {
-    return delegate.getSolrServerURI();
-  }
+    @Override
+    public URI getSolrServerURI() {
+        return delegate.getSolrServerURI();
+    }
 
-  @Override
-  public NodeURISource getNodeURISource() {
-    return delegate.getNodeURISource();
-  }
+    @Override
+    public NodeURISource getNodeURISource() {
+        return delegate.getNodeURISource();
+    }
 
-  @Override
-  public MatcherNodeURISource getMatcherNodeURISource() {
-    return delegate.getMatcherNodeURISource();
-  }
+    @Override
+    public MatcherNodeURISource getMatcherNodeURISource() {
+        return delegate.getMatcherNodeURISource();
+    }
 
-  @Override
-  public WonMessageSender getWonMessageSender() {
-    return delegate.getWonMessageSender();
-  }
+    @Override
+    public WonMessageSender getWonMessageSender() {
+        return delegate.getWonMessageSender();
+    }
 
-  @Override
-  public MatcherProtocolNeedServiceClientSide getMatcherProtocolNeedServiceClient() {
-    return delegate.getMatcherProtocolNeedServiceClient();
-  }
+    @Override
+    public MatcherProtocolNeedServiceClientSide getMatcherProtocolNeedServiceClient() {
+        return delegate.getMatcherProtocolNeedServiceClient();
+    }
 
-  @Override
-  public MatcherProtocolMatcherServiceImplJMSBased getMatcherProtocolMatcherService() {
-    return delegate.getMatcherProtocolMatcherService();
-  }
+    @Override
+    public MatcherProtocolMatcherServiceImplJMSBased getMatcherProtocolMatcherService() {
+        return delegate.getMatcherProtocolMatcherService();
+    }
 
-  @Override
-  public NeedProducer getNeedProducer() {
-    return delegate.getNeedProducer();
-  }
+    @Override
+    public NeedProducer getNeedProducer() {
+        return delegate.getNeedProducer();
+    }
 
-  @Override
-  public void cancelTrigger() {
-    delegate.cancelTrigger();
-  }
+    @Override
+    public void cancelTrigger() {
+        delegate.cancelTrigger();
+    }
 
-  @Override
-  public void workIsDone() {
-    delegate.workIsDone();
-  }
+    @Override
+    public void workIsDone() {
+        delegate.workIsDone();
+    }
 
-  @Override
-  public EventBus getEventBus() {
-    return delegate.getEventBus();
-  }
+    @Override
+    public EventBus getEventBus() {
+        return delegate.getEventBus();
+    }
 
-  @Override
-  public BotContext getBotContext() {
-    return delegate.getBotContext();
-  }
+    @Override
+    public BotContext getBotContext() {
+        return delegate.getBotContext();
+    }
 
-  @Override
-  public BotContextWrapper getBotContextWrapper() {return delegate.getBotContextWrapper(); }
+    @Override
+    public BotContextWrapper getBotContextWrapper() {
+        return delegate.getBotContextWrapper();
+    }
 
-  @Override
-  public Executor getExecutor() {
-    return delegate.getExecutor();
-  }
+    @Override
+    public Executor getExecutor() {
+        return delegate.getExecutor();
+    }
 
-  @Override
-  public LinkedDataSource getLinkedDataSource() {
-    return delegate.getLinkedDataSource();
-  }
+    @Override
+    public LinkedDataSource getLinkedDataSource() {
+        return delegate.getLinkedDataSource();
+    }
 
-  @Override
-  public WonNodeInformationService getWonNodeInformationService() {
-    return delegate.getWonNodeInformationService();
-  }
+    @Override
+    public WonNodeInformationService getWonNodeInformationService() {
+        return delegate.getWonNodeInformationService();
+    }
 
 }

@@ -32,60 +32,56 @@ import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor;
 
 /**
- * User: LEIH-NB
- * Date: 09.10.2014
+ * User: LEIH-NB Date: 09.10.2014
  */
-public class WonHandshakeInterceptor  extends HttpSessionHandshakeInterceptor
-{
+public class WonHandshakeInterceptor extends HttpSessionHandshakeInterceptor {
 
-	private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  public static final String SESSION_ATTR = "HTTP.SESSION.ID";
-  public static final String USERNAME_ATTR = "username";
+    public static final String SESSION_ATTR = "HTTP.SESSION.ID";
+    public static final String USERNAME_ATTR = "username";
 
-  private static final List<String> ATTRIBUTE_NAMES = new ArrayList<>(2);
-  static {
-    ATTRIBUTE_NAMES.add(SESSION_ATTR);
-    ATTRIBUTE_NAMES.add(USERNAME_ATTR);
-  }
-
-  public WonHandshakeInterceptor() {
-    super(ATTRIBUTE_NAMES);
-  }
-
-  @Override
-  public boolean beforeHandshake(ServerHttpRequest request,
-                                 ServerHttpResponse response, WebSocketHandler wsHandler,
-                                 Map<String, Object> attributes) throws Exception{
-
-    addSessionIdAttribute(request, attributes);
-    attributes.put(USERNAME_ATTR, SecurityContextHolder.getContext().getAuthentication().getName());
-    logger.debug("adding session attribute {}:{}", USERNAME_ATTR, SecurityContextHolder.getContext().getAuthentication().getName());
-    return super.beforeHandshake(request, response, wsHandler, attributes);
-  }
-
-  /* added for integrating spring-session, which we added to synchronize
-    http sessions with websocket sessions.
-    see: http://spring.io/blog/2014/09/16/preview-spring-security-websocket-support-sessions
-    */
-  private void addSessionIdAttribute(final ServerHttpRequest request, final Map<String, Object> attributes) {
-    if (request instanceof ServletServerHttpRequest) {
-      ServletServerHttpRequest servletRequest = (ServletServerHttpRequest) request;
-      HttpSession session = servletRequest.getServletRequest().getSession(false);
-      if (session != null) {
-        attributes.put(SESSION_ATTR, session.getId());
-        logger.debug("adding session attribute {}:{}", SESSION_ATTR, session.getId());
-      } else {
-    	  logger.warn("no http session found, cannot pass attributes from session");
-      }
+    private static final List<String> ATTRIBUTE_NAMES = new ArrayList<>(2);
+    static {
+        ATTRIBUTE_NAMES.add(SESSION_ATTR);
+        ATTRIBUTE_NAMES.add(USERNAME_ATTR);
     }
-  }
 
-  @Override
-  public void afterHandshake(ServerHttpRequest request,
-                             ServerHttpResponse response, WebSocketHandler wsHandler,
-                             Exception ex){
-    super.afterHandshake(request, response,wsHandler, ex);
-  }
+    public WonHandshakeInterceptor() {
+        super(ATTRIBUTE_NAMES);
+    }
+
+    @Override
+    public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler,
+            Map<String, Object> attributes) throws Exception {
+
+        addSessionIdAttribute(request, attributes);
+        attributes.put(USERNAME_ATTR, SecurityContextHolder.getContext().getAuthentication().getName());
+        logger.debug("adding session attribute {}:{}", USERNAME_ATTR,
+                SecurityContextHolder.getContext().getAuthentication().getName());
+        return super.beforeHandshake(request, response, wsHandler, attributes);
+    }
+
+    /*
+     * added for integrating spring-session, which we added to synchronize http sessions with websocket sessions. see:
+     * http://spring.io/blog/2014/09/16/preview-spring-security-websocket-support-sessions
+     */
+    private void addSessionIdAttribute(final ServerHttpRequest request, final Map<String, Object> attributes) {
+        if (request instanceof ServletServerHttpRequest) {
+            ServletServerHttpRequest servletRequest = (ServletServerHttpRequest) request;
+            HttpSession session = servletRequest.getServletRequest().getSession(false);
+            if (session != null) {
+                attributes.put(SESSION_ATTR, session.getId());
+                logger.debug("adding session attribute {}:{}", SESSION_ATTR, session.getId());
+            } else {
+                logger.warn("no http session found, cannot pass attributes from session");
+            }
+        }
+    }
+
+    @Override
+    public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler,
+            Exception ex) {
+        super.afterHandshake(request, response, wsHandler, ex);
+    }
 }
-

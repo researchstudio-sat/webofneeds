@@ -22,8 +22,7 @@ import won.matcher.utils.tensor.TensorMatchingData;
 /**
  * Used to read a hint matrix mtx file and create (bulk) hint event objects from it.
  * <p>
- * User: hfriedrich
- * Date: 23.06.2015
+ * User: hfriedrich Date: 23.06.2015
  */
 @Component
 public class HintReader {
@@ -32,12 +31,12 @@ public class HintReader {
     @Autowired
     private RescalMatcherConfig config;
 
-    public BulkHintEvent readHints(TensorMatchingData matchingData) throws
-            IOException {
+    public BulkHintEvent readHints(TensorMatchingData matchingData) throws IOException {
 
         // read the header file
         ArrayList<String> needHeaders = new ArrayList<>();
-        FileInputStream fis = new FileInputStream(config.getExecutionDirectory() + "/" + TensorMatchingData.HEADERS_FILE);
+        FileInputStream fis = new FileInputStream(
+                config.getExecutionDirectory() + "/" + TensorMatchingData.HEADERS_FILE);
         BufferedReader br = new BufferedReader(new InputStreamReader(fis, "UTF-8"));
         String line = null;
         int i = 0;
@@ -69,7 +68,8 @@ public class HintReader {
         try {
             hintMatrix = SparseMatrix.fromMatrixMarket(hintMatrixString);
         } catch (Exception e) {
-            // IllegalArgumentException can occur here if we have no needs and thus now hints, catch this case and return
+            // IllegalArgumentException can occur here if we have no needs and thus now hints, catch this case and
+            // return
             // null to indicate no hints were found
             log.warn("Cannot load hint matrix file. This can happen if no hints were created");
             log.debug("Exception was: ", e);
@@ -101,16 +101,18 @@ public class HintReader {
 
             List<String> matchingDataNeeds = matchingData.getNeeds();
 
-            if (needUri1 != null && needUri2 != null && matchingDataNeeds.contains(needUri1) && matchingDataNeeds.contains(needUri2)) {
+            if (needUri1 != null && needUri2 != null && matchingDataNeeds.contains(needUri1)
+                    && matchingDataNeeds.contains(needUri2)) {
 
                 // wonNodeUri must have been set as attribute before to be able to read it here
                 String fromWonNodeUri = matchingData.getFirstAttributeOfNeed(needUri1, "wonNodeUri");
                 String toWonNodeUri = matchingData.getFirstAttributeOfNeed(needUri2, "wonNodeUri");
-                HintEvent hint = new HintEvent(fromWonNodeUri, needUri1, toWonNodeUri,
-                        needUri2, config.getPublicMatcherUri(), value);
+                HintEvent hint = new HintEvent(fromWonNodeUri, needUri1, toWonNodeUri, needUri2,
+                        config.getPublicMatcherUri(), value);
                 hints.addHintEvent(hint);
             } else {
-                throw new IllegalStateException("MatchingData does not contain needs with URI " + needUri1 + " or " + needUri2);
+                throw new IllegalStateException(
+                        "MatchingData does not contain needs with URI " + needUri1 + " or " + needUri2);
             }
         }
 

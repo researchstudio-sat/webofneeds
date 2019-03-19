@@ -48,12 +48,12 @@ public class RealEstateNeedGenerator {
         parentFolder.mkdirs();
         Arrays.stream(parentFolder.listFiles()).forEach(f -> f.delete());
         final int N = 10000;
-        int outputSteps = N/10/10*10;
+        int outputSteps = N / 10 / 10 * 10;
         Random random = new Random();
         for (int i = 0; i < N; i++) {
             String rnd = Long.toHexString(random.nextLong());
             String needURI = "https://localhost:8443/won/resource/event/" + "real_estate_sample_" + rnd;
-                    
+
             model = ModelFactory.createDefaultModel();
 
             setPrefixes();
@@ -75,18 +75,19 @@ public class RealEstateNeedGenerator {
             seeksPart.addProperty(WON.HAS_TAG, "SearchRealEstateToRent");
 
             need.addProperty(RDF.type, WON.NEED);
-            
-            /* no facets - they are added by the bot
-            Resource won_ChatFacet = model.createResource("http://purl.org/webofneeds/model#ChatFacet");
-            Resource holdableFacet = need.getModel().getResource(needURI + "#holdableFacet");
-            holdableFacet.addProperty(RDF.type, holdableFacet.getModel().getResource(FacetType.HoldableFacet.getURI().toString()));
-            need.addProperty(won_hasFacet, holdableFacet);
 
-            Resource chatFacet = need.getModel().getResource(needURI + "#chatFacet");
-            chatFacet.addProperty(RDF.type, chatFacet.getModel().getResource(FacetType.ChatFacet.getURI().toString()));
-            need.addProperty(won_hasFacet, chatFacet);
-            */
-            
+            /*
+             * no facets - they are added by the bot Resource won_ChatFacet =
+             * model.createResource("http://purl.org/webofneeds/model#ChatFacet"); Resource holdableFacet =
+             * need.getModel().getResource(needURI + "#holdableFacet"); holdableFacet.addProperty(RDF.type,
+             * holdableFacet.getModel().getResource(FacetType.HoldableFacet.getURI().toString()));
+             * need.addProperty(won_hasFacet, holdableFacet);
+             * 
+             * Resource chatFacet = need.getModel().getResource(needURI + "#chatFacet"); chatFacet.addProperty(RDF.type,
+             * chatFacet.getModel().getResource(FacetType.ChatFacet.getURI().toString()));
+             * need.addProperty(won_hasFacet, chatFacet);
+             */
+
             need.addProperty(WON.SEEKS, seeksPart);
 
             try {

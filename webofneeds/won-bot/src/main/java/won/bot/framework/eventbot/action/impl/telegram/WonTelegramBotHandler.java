@@ -30,7 +30,8 @@ public class WonTelegramBotHandler extends TelegramLongPollingBot implements ICo
 
     private TelegramMessageGenerator telegramMessageGenerator;
 
-    public WonTelegramBotHandler(EventBus bus, TelegramMessageGenerator telegramMessageGenerator, String botName, String token) {
+    public WonTelegramBotHandler(EventBus bus, TelegramMessageGenerator telegramMessageGenerator, String botName,
+            String token) {
         this.bus = bus;
         this.token = token;
         this.botName = botName;
@@ -43,7 +44,8 @@ public class WonTelegramBotHandler extends TelegramLongPollingBot implements ICo
         BotCommand critiqueBotCommand = new CritiqueBotCommand("critique", "create a critique need", bus);
         BotCommand togetherBotCommand = new TogetherBotCommand("together", "create a together need", bus);
         BotCommand helpBotCommand = new HelpBotCommand("help", "list help", bus);
-        commandRegistry.registerAll(helpBotCommand, offerBotCommand, demandBotCommand, critiqueBotCommand, togetherBotCommand);
+        commandRegistry.registerAll(helpBotCommand, offerBotCommand, demandBotCommand, critiqueBotCommand,
+                togetherBotCommand);
     }
 
     @Override

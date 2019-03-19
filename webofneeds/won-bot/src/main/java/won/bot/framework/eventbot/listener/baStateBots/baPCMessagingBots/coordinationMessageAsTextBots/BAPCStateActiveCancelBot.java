@@ -9,11 +9,8 @@ import won.bot.framework.eventbot.listener.baStateBots.BATestScriptAction;
 import won.node.facet.impl.WON_TX;
 
 /**
- * Created with IntelliJ IDEA.
- * User: Danijel
- * Date: 6.3.14.
- * Time: 16.27
- * To change this template use File | Settings | File Templates.
+ * Created with IntelliJ IDEA. User: Danijel Date: 6.3.14. Time: 16.27 To change this template use File | Settings |
+ * File Templates.
  */
 public class BAPCStateActiveCancelBot extends BATestBotScript {
 

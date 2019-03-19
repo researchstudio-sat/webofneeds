@@ -28,15 +28,15 @@ public class TelegramMessageGenerator {
         Dataset remoteNeedRDF = eventListenerContext.getLinkedDataSource().getDataForResource(remoteNeedUri);
 
         DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(remoteNeedRDF);
-        String title = needModelWrapper.getSomeTitleFromIsOrAll("en","de");
-        String description = needModelWrapper.getSomeDescription("en","de");
+        String title = needModelWrapper.getSomeTitleFromIsOrAll("en", "de");
+        String description = needModelWrapper.getSomeDescription("en", "de");
 
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
-        String text = "<b>We found a Match for you!\n\n</b><a href='"+remoteNeedUri+"'>"+title+"\n\n</a>";
+        String text = "<b>We found a Match for you!\n\n</b><a href='" + remoteNeedUri + "'>" + title + "\n\n</a>";
 
-        if(description != null){
-            text = text+"<em>"+description+"</em>";
+        if (description != null) {
+            text = text + "<em>" + description + "</em>";
         }
         sendMessage.setText(text);
         sendMessage.setReplyMarkup(getConnectionActionKeyboard("Request", "Close"));
@@ -49,16 +49,17 @@ public class TelegramMessageGenerator {
         Dataset remoteNeedRDF = eventListenerContext.getLinkedDataSource().getDataForResource(remoteNeedUri);
 
         DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(remoteNeedRDF);
-        String title = needModelWrapper.getSomeTitleFromIsOrAll("en","de");
-        String description = needModelWrapper.getSomeDescription("en","de");
+        String title = needModelWrapper.getSomeTitleFromIsOrAll("en", "de");
+        String description = needModelWrapper.getSomeDescription("en", "de");
 
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
 
-        String text = "<b>Someone wants to connect with you!\n\n</b><a href='"+remoteNeedUri+"'>"+title+"\n\n</a>";
+        String text = "<b>Someone wants to connect with you!\n\n</b><a href='" + remoteNeedUri + "'>" + title
+                + "\n\n</a>";
 
-        if(description != null){
-            text = text+"<em>"+description+"</em>";
+        if (description != null) {
+            text = text + "<em>" + description + "</em>";
         }
         sendMessage.setText(text);
         sendMessage.setReplyMarkup(getConnectionActionKeyboard("Accept", "Deny"));
@@ -71,7 +72,7 @@ public class TelegramMessageGenerator {
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
 
-        sendMessage.setText("<a href='" + remoteNeedUri + "'>URI</a>: "+ extractTextMessageFromWonMessage(message));
+        sendMessage.setText("<a href='" + remoteNeedUri + "'>URI</a>: " + extractTextMessageFromWonMessage(message));
         sendMessage.enableHtml(true);
 
         return sendMessage;
@@ -81,15 +82,15 @@ public class TelegramMessageGenerator {
         Dataset createdNeedRDF = eventListenerContext.getLinkedDataSource().getDataForResource(needURI);
 
         DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(createdNeedRDF);
-        String title = needModelWrapper.getSomeTitleFromIsOrAll("en","de");
-        String description = needModelWrapper.getSomeDescription("en","de");
+        String title = needModelWrapper.getSomeTitleFromIsOrAll("en", "de");
+        String description = needModelWrapper.getSomeDescription("en", "de");
 
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
-        String text = "<b>We created a Need for you!\n\n</b><a href='"+needURI+"'>"+title+"\n\n</a>";
+        String text = "<b>We created a Need for you!\n\n</b><a href='" + needURI + "'>" + title + "\n\n</a>";
 
-        if(description != null){
-            text = text+"<em>"+description+"</em>";
+        if (description != null) {
+            text = text + "<em>" + description + "</em>";
         }
         sendMessage.setText(text);
         sendMessage.enableHtml(true);
@@ -105,8 +106,9 @@ public class TelegramMessageGenerator {
         return sendMessage;
     }
 
-    private static String extractTextMessageFromWonMessage(WonMessage wonMessage){
-        if (wonMessage == null) return null;
+    private static String extractTextMessageFromWonMessage(WonMessage wonMessage) {
+        if (wonMessage == null)
+            return null;
         String message = WonRdfUtils.MessageUtils.getTextMessage(wonMessage);
         return StringUtils.trim(message);
     }

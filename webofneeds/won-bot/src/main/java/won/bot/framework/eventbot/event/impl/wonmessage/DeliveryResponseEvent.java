@@ -25,48 +25,47 @@ import won.protocol.message.WonMessage;
 /**
  * Event published whenever a WonMessage is received that indicates the failure of a previous message.
  */
-public class DeliveryResponseEvent extends BaseEvent implements ResponseEvent
-{
-  private URI originalMessageURI;
-  private WonMessage message;
-  private URI remoteResponseToMessageURI;
+public class DeliveryResponseEvent extends BaseEvent implements ResponseEvent {
+    private URI originalMessageURI;
+    private WonMessage message;
+    private URI remoteResponseToMessageURI;
 
-  public DeliveryResponseEvent(URI originalMessageURI, WonMessage message) {
-    assert originalMessageURI != null : "originalMessageURI must not be null!";
-    assert message != null : "responseMessage must not be null!";
-    this.originalMessageURI = originalMessageURI;
-    this.message = message;
-    this.remoteResponseToMessageURI = message.getIsRemoteResponseToMessageURI();
-  }
+    public DeliveryResponseEvent(URI originalMessageURI, WonMessage message) {
+        assert originalMessageURI != null : "originalMessageURI must not be null!";
+        assert message != null : "responseMessage must not be null!";
+        this.originalMessageURI = originalMessageURI;
+        this.message = message;
+        this.remoteResponseToMessageURI = message.getIsRemoteResponseToMessageURI();
+    }
 
-  public URI getOriginalMessageURI() {
-    return originalMessageURI;
-  }
+    public URI getOriginalMessageURI() {
+        return originalMessageURI;
+    }
 
-  public URI getRemoteResponseToMessageURI() {
-    return remoteResponseToMessageURI;
-  }
+    public URI getRemoteResponseToMessageURI() {
+        return remoteResponseToMessageURI;
+    }
 
-  public WonMessage getMessage() {
-    return message;
-  }
+    public WonMessage getMessage() {
+        return message;
+    }
 
-  public boolean isRemoteResponse() {
-    return remoteResponseToMessageURI != null;
-  }
+    public boolean isRemoteResponse() {
+        return remoteResponseToMessageURI != null;
+    }
 
-  @Override
-  public URI getConnectionURI() {
-    return message.getReceiverURI();
-  }
+    @Override
+    public URI getConnectionURI() {
+        return message.getReceiverURI();
+    }
 
-  @Override
-  public URI getRemoteNeedURI() {
-    return message.getSenderNeedURI();
-  }
+    @Override
+    public URI getRemoteNeedURI() {
+        return message.getSenderNeedURI();
+    }
 
-  @Override
-  public URI getNeedURI() {
-    return message.getReceiverNeedURI();
-  }
+    @Override
+    public URI getNeedURI() {
+        return message.getReceiverNeedURI();
+    }
 }

@@ -17,19 +17,18 @@
 package won.monitoring;
 
 /**
- * Interface for classes that take a snapshot of current monitoring statistics
- * and store them in some way.
+ * Interface for classes that take a snapshot of current monitoring statistics and store them in some way.
  */
-public interface MonitoringStatisticsRecorder
-{
-  /**
-   * Name of the recorder used in logging statements.
-   * @return
-   */
-  public String getRecorderName();
+public interface MonitoringStatisticsRecorder {
+    /**
+     * Name of the recorder used in logging statements.
+     * 
+     * @return
+     */
+    public String getRecorderName();
 
-  /**
-   * Records the current snapshost of the monitoring statistics.
-   */
-  public void recordMonitoringStatistics();
+    /**
+     * Records the current snapshost of the monitoring statistics.
+     */
+    public void recordMonitoringStatistics();
 }

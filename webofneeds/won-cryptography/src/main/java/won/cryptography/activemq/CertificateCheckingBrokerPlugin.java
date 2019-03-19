@@ -22,16 +22,15 @@ import org.apache.activemq.broker.BrokerPlugin;
 /**
  * Broker plugin for checking consumer's certificates against queue names.
  */
-public class CertificateCheckingBrokerPlugin implements BrokerPlugin
-{
-  private String queueNamePrefixToCheck = "OwnerProtocol.Out.";
+public class CertificateCheckingBrokerPlugin implements BrokerPlugin {
+    private String queueNamePrefixToCheck = "OwnerProtocol.Out.";
 
-  @Override
-  public Broker installPlugin(final Broker broker) throws Exception {
-    return new CertificateCheckingBrokerFilter(broker, this.queueNamePrefixToCheck);
-  }
+    @Override
+    public Broker installPlugin(final Broker broker) throws Exception {
+        return new CertificateCheckingBrokerFilter(broker, this.queueNamePrefixToCheck);
+    }
 
-  public void setQueueNamePrefixToCheck(final String queueNamePrefixToCheck) {
-    this.queueNamePrefixToCheck = queueNamePrefixToCheck;
-  }
+    public void setQueueNamePrefixToCheck(final String queueNamePrefixToCheck) {
+        this.queueNamePrefixToCheck = queueNamePrefixToCheck;
+    }
 }

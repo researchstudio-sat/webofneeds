@@ -18,24 +18,24 @@ import won.protocol.util.DataAccessUtils;
 import won.protocol.vocabulary.WONMSG;
 
 /**
- * User: syim
- * Date: 02.03.2015
+ * User: syim Date: 02.03.2015
  */
 @Component
-@FixedMessageProcessor(direction= WONMSG.TYPE_FROM_OWNER_STRING,messageType = WONMSG.TYPE_DEACTIVATE_STRING)
-public class DeactivateNeedMessageProcessor extends AbstractCamelProcessor
-{
-  Logger logger = LoggerFactory.getLogger(this.getClass());
+@FixedMessageProcessor(direction = WONMSG.TYPE_FROM_OWNER_STRING, messageType = WONMSG.TYPE_DEACTIVATE_STRING)
+public class DeactivateNeedMessageProcessor extends AbstractCamelProcessor {
+    Logger logger = LoggerFactory.getLogger(this.getClass());
 
-  public void process(final Exchange exchange) throws Exception {
-    WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
-    URI receiverNeedURI = wonMessage.getReceiverNeedURI();
-    logger.debug("DEACTIVATING need. needURI:{}", receiverNeedURI);
-    if (receiverNeedURI == null) throw new WonMessageProcessingException("receiverNeedURI is not set");
-    Need need = DataAccessUtils.loadNeed(needRepository, receiverNeedURI);
-    need.getEventContainer().getEvents().add(messageEventRepository.findOneByMessageURIforUpdate(wonMessage.getMessageURI()));
-    need.setState(NeedState.INACTIVE);
-    need = needRepository.save(need);
-  }
+    public void process(final Exchange exchange) throws Exception {
+        WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
+        URI receiverNeedURI = wonMessage.getReceiverNeedURI();
+        logger.debug("DEACTIVATING need. needURI:{}", receiverNeedURI);
+        if (receiverNeedURI == null)
+            throw new WonMessageProcessingException("receiverNeedURI is not set");
+        Need need = DataAccessUtils.loadNeed(needRepository, receiverNeedURI);
+        need.getEventContainer().getEvents()
+                .add(messageEventRepository.findOneByMessageURIforUpdate(wonMessage.getMessageURI()));
+        need.setState(NeedState.INACTIVE);
+        need = needRepository.save(need);
+    }
 
 }

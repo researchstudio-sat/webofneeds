@@ -21,5 +21,5 @@ import won.bot.framework.eventbot.event.impl.command.MessageCommandResultEvent;
 /**
  * Tags a result event of an OpenCommand.
  */
-public interface OpenCommandResultEvent extends MessageCommandResultEvent{
+public interface OpenCommandResultEvent extends MessageCommandResultEvent {
 }

@@ -21,6 +21,5 @@ import won.bot.framework.eventbot.event.BaseEvent;
 /**
  * Informs listeners that the bot was asked to shut down.
  */
-public class ShutdownEvent extends BaseEvent
-{
+public class ShutdownEvent extends BaseEvent {
 }

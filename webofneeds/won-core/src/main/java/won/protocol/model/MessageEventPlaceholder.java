@@ -28,19 +28,15 @@ import won.protocol.model.parentaware.ParentAware;
 
 @Entity
 @Table(name = "message_event", indexes = {
-        //indices for this class have the name prefix "IDX_ME"
+        // indices for this class have the name prefix "IDX_ME"
         @Index(name = "IDX_ME_PARENT_URI", columnList = "parentURI"),
         @Index(name = "IDX_ME_PARENT_URI_MESSAGE_TYPE", columnList = "parentURI, messageType"),
         @Index(name = "IDX_ME_PARENT_URI_REFERENCED_BY_OTHER_MESSAGE", columnList = "parentURI, referencedByOtherMessage"),
-        @Index(name = "IDX_ME_INNERMOST_MESSAGE_URI_RECEIVER_NEED_URI", columnList = "messageURI, receiverNeedURI, innermostMessageURI, correspondingRemoteMessageURI")
-}, uniqueConstraints = {
-        @UniqueConstraint(name = "IDX_ME_UNIQUE_MESSAGE_URI", columnNames = "messageURI"),
-        @UniqueConstraint(name = "IDX_ME_UNIQUE_CORREXPONDING_REMOTE_MESSAGE_URI", columnNames = "correspondingRemoteMessageURI"),
-        @UniqueConstraint(name = "IDX_ME_UNIQUE_DATASETHOLDER_ID", columnNames = "datasetholder_id")
-}
-)
+        @Index(name = "IDX_ME_INNERMOST_MESSAGE_URI_RECEIVER_NEED_URI", columnList = "messageURI, receiverNeedURI, innermostMessageURI, correspondingRemoteMessageURI") }, uniqueConstraints = {
+                @UniqueConstraint(name = "IDX_ME_UNIQUE_MESSAGE_URI", columnNames = "messageURI"),
+                @UniqueConstraint(name = "IDX_ME_UNIQUE_CORREXPONDING_REMOTE_MESSAGE_URI", columnNames = "correspondingRemoteMessageURI"),
+                @UniqueConstraint(name = "IDX_ME_UNIQUE_DATASETHOLDER_ID", columnNames = "datasetholder_id") })
 public class MessageEventPlaceholder implements ParentAware<EventContainer> {
-
 
     public MessageEventPlaceholder() {
     }
@@ -284,16 +280,22 @@ public class MessageEventPlaceholder implements ParentAware<EventContainer> {
 
     @Override
     public boolean equals(final Object o) {
-        if (this == o) return true;
-        if (!(o instanceof MessageEventPlaceholder)) return false;
+        if (this == o)
+            return true;
+        if (!(o instanceof MessageEventPlaceholder))
+            return false;
 
         final MessageEventPlaceholder that = (MessageEventPlaceholder) o;
 
-        if (messageType != null ? !messageType.equals(that.messageType) : that.messageType != null) return false;
-        if (messageURI != null ? !messageURI.equals(that.messageURI) : that.messageURI != null) return false;
-        if (receiverURI != null ? !receiverURI.equals(that.receiverURI) : that.receiverURI != null) return false;
-        if (senderURI != null ? !senderURI.equals(that.senderURI) : that.senderURI != null) return false;
-//    if (signatures != null ? !signatures.equals(that.signatures) : that.signatures != null) return false;
+        if (messageType != null ? !messageType.equals(that.messageType) : that.messageType != null)
+            return false;
+        if (messageURI != null ? !messageURI.equals(that.messageURI) : that.messageURI != null)
+            return false;
+        if (receiverURI != null ? !receiverURI.equals(that.receiverURI) : that.receiverURI != null)
+            return false;
+        if (senderURI != null ? !senderURI.equals(that.senderURI) : that.senderURI != null)
+            return false;
+        // if (signatures != null ? !signatures.equals(that.signatures) : that.signatures != null) return false;
 
         return true;
     }
@@ -306,6 +308,5 @@ public class MessageEventPlaceholder implements ParentAware<EventContainer> {
         result = 31 * result + (receiverURI != null ? receiverURI.hashCode() : 0);
         return result;
     }
-
 
 }
