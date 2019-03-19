@@ -171,37 +171,35 @@ function genComponentConf() {
     publish() {
       // Post both needs
       if (!this.processingPublish) {
-        if (self.loggedIn) {
-          this.needs__create(
-            this.draftObject,
-            undefined,
-            this.$ngRedux.getState().getIn(["config", "defaultNodeUri"])
-          );
+        const tempDraft = this.draftObject;
+        const tempDefaultNodeUri = this.$ngRedux
+          .getState()
+          .getIn(["config", "defaultNodeUri"]);
+
+        if (this.loggedIn) {
+          this.needs__create(tempDraft, undefined, tempDefaultNodeUri);
         } else {
-          /*TODO: IMPLEMENT MODALDIALOG const payload = {
-           caption: "Attention!",
-           text: "Deleting the Post is irreversible, do you want to proceed?",
-           buttons: [
-           {
-           caption: "YES",
-           callback: () => {
-           this.needs__delete(this.post.get("uri"));
-           this.router__stateGoCurrent({
-           useCase: undefined,
-           postUri: undefined,
-           });
-           this.view__hideModalDialog();
-           },
-           },
-           {
-           caption: "NO",
-           callback: () => {
-           this.view__hideModalDialog();
-           },
-           },
-           ],
-           };
-           this.view__showModalDialog(payload); */
+          const payload = {
+            caption: "FIXME#2537: Attention!",
+            text:
+              "You are about to create an anonymous Account, if you proceed you accept the Terms of Service.",
+            buttons: [
+              {
+                caption: "Accept",
+                callback: () => {
+                  this.view__hideModalDialog();
+                  this.needs__create(tempDraft, undefined, tempDefaultNodeUri);
+                },
+              },
+              {
+                caption: "Cancel",
+                callback: () => {
+                  this.view__hideModalDialog();
+                },
+              },
+            ],
+          };
+          this.view__showModalDialog(payload);
         }
       }
     }
