@@ -3,12 +3,9 @@
 ### Eclipse:
 
 1.  Download **Eclipse Oxygen: Java EE**:
-    * either get the portable version here: https://www.eclipse.org/downloads/eclipse-packages/ » Eclipse IDE **for Java EE Developers** » 64bit. 
+    * either get the portable version here: https://www.eclipse.org/downloads/eclipse-packages/ » Eclipse IDE **for Enterprise Java Developers ** » 64bit. 
     * or use this direct link to the currently latest zip: https://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/oxygen/1a/eclipse-jee-oxygen-1a-win32-x86_64.zip
 2.  Install/unzip eclipse to a folder (e.g. `C:\DATA\DEV\...`)
-3.  Start Eclipse
-4.  Install Spring: Help >> Eclipse Marketplace >> Search and install `Spring Tool Suite` - or at least [WTP](https://download.eclipse.org/webtools/downloads/) to get the Tomcat integration
-5.  Restart Eclipse
 6.  Add `-clean -Xms512m -Xmx1024m` to the `.exe` shortcut
 7.  Clone project with git (e.g. to `C:\DATA\DEV\workspace`). It’s easier not to do this in eclipse, but with the git bash or gui)
 8.  Import project in eclipse: File >> Import >> Existing Maven Project >> point to `pom.xml`
