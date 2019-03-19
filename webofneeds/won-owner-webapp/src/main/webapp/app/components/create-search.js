@@ -6,10 +6,13 @@ import ngAnimate from "angular-animate";
 
 import "ng-redux";
 import labelledHrModule from "./labelled-hr.js";
-import { attach } from "../utils.js";
+import { attach, get } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
 import { selectIsConnected } from "../selectors/general-selectors.js";
+
+import * as accountUtils from "../account-utils.js";
+import * as processUtils from "../process-utils.js";
 
 //TODO can't inject $scope with the angular2-router, preventing redux-cleanup
 const serviceDependencies = [
@@ -105,7 +108,10 @@ function genComponentConf() {
 
       const selectFromState = state => {
         return {
-          processingPublish: state.getIn(["process", "processingPublish"]),
+          loggedIn: accountUtils.isLoggedIn(get(state, "account")),
+          processingPublish: processUtils.isProcessingPublish(
+            get(state, "process")
+          ),
           connectionHasBeenLost: !selectIsConnected(state),
         };
       };
@@ -165,11 +171,38 @@ function genComponentConf() {
     publish() {
       // Post both needs
       if (!this.processingPublish) {
-        this.needs__create(
-          this.draftObject,
-          undefined,
-          this.$ngRedux.getState().getIn(["config", "defaultNodeUri"])
-        );
+        if (self.loggedIn) {
+          this.needs__create(
+            this.draftObject,
+            undefined,
+            this.$ngRedux.getState().getIn(["config", "defaultNodeUri"])
+          );
+        } else {
+          /*TODO: IMPLEMENT MODALDIALOG const payload = {
+           caption: "Attention!",
+           text: "Deleting the Post is irreversible, do you want to proceed?",
+           buttons: [
+           {
+           caption: "YES",
+           callback: () => {
+           this.needs__delete(this.post.get("uri"));
+           this.router__stateGoCurrent({
+           useCase: undefined,
+           postUri: undefined,
+           });
+           this.view__hideModalDialog();
+           },
+           },
+           {
+           caption: "NO",
+           callback: () => {
+           this.view__hideModalDialog();
+           },
+           },
+           ],
+           };
+           this.view__showModalDialog(payload); */
+        }
       }
     }
   }
