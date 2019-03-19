@@ -245,8 +245,9 @@ function genSlideInConf() {
         const path = "#!/connections" + `?privateId=${privateId}`;
         const anonymousLink = toAbsoluteURL(ownerBaseUrl).toString() + path;
 
-        const isLoggedIn = accountUtils.isLoggedIn(get(state, "account"));
-        const isAnonymous = getIn(state, ["account", "isAnonymous"]);
+        const accountState = get(state, "account");
+        const isLoggedIn = accountUtils.isLoggedIn(accountState);
+        const isAnonymous = accountUtils.isAnonymous(accountState);
         const isEmailVerified = getIn(state, ["account", "emailVerified"]);
         const isTermsOfServiceAccepted = getIn(state, [
           "account",
@@ -288,7 +289,7 @@ function genSlideInConf() {
           ),
           isTermsOfServiceAccepted,
           isLoggedIn,
-          email: getIn(state, ["account", "email"]),
+          email: accountUtils.getEmail(accountState),
           isAnonymous,
           privateId,
           connectionHasBeenLost,

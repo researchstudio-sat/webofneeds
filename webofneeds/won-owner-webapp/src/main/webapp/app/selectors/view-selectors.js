@@ -40,7 +40,7 @@ export function showAnonymousSlideInEmailInput(state) {
 }
 
 export function showSlideInAnonymousSuccess(state) {
-  const isAnonymous = getIn(state, ["account", "isAnonymous"]);
+  const isAnonymous = accountUtils.isAnonymous(get(state, "account"));
 
   return (
     !showSlideInConnectionLost(state) &&
@@ -50,7 +50,7 @@ export function showSlideInAnonymousSuccess(state) {
 }
 
 export function showSlideInAnonymous(state) {
-  const isAnonymous = getIn(state, ["account", "isAnonymous"]);
+  const isAnonymous = accountUtils.isAnonymous(get(state, "account"));
 
   return (
     !showSlideInConnectionLost(state) &&
@@ -80,8 +80,9 @@ export function showSlideInTermsOfService(state) {
 
 export function showSlideInEmailVerification(state) {
   const verificationToken = getVerificationTokenFromRoute(state);
-  const isLoggedIn = accountUtils.isLoggedIn(get(state, "account"));
-  const isAnonymous = getIn(state, ["account", "isAnonymous"]);
+  const accountState = get(state, "account");
+  const isLoggedIn = accountUtils.isLoggedIn(accountState);
+  const isAnonymous = accountUtils.isAnonymous(accountState);
   const isEmailVerified = getIn(state, ["account", "emailVerified"]);
 
   return (

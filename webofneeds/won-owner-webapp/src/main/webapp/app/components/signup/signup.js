@@ -29,10 +29,11 @@ class SignupController {
     Object.assign(this, srefUtils); // bind srefUtils to scope
 
     const select = state => {
+      const accountState = get(state, "account");
       return {
-        loggedIn: accountUtils.isLoggedIn(get(state, "account")),
+        loggedIn: accountUtils.isLoggedIn(accountState),
         registerError: state.getIn(["account", "registerError"]),
-        isAnonymous: state.getIn(["account", "isAnonymous"]),
+        isAnonymous: accountUtils.isAnonymous(accountState),
         privateId: state.getIn(["account", "privateId"]),
         showModalDialog: state.getIn(["view", "showModalDialog"]),
         showSlideIns:

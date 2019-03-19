@@ -80,12 +80,13 @@ function genTopnavConf() {
 
       const selectFromState = state => {
         const currentRoute = getIn(state, ["router", "currentState", "name"]);
+        const accountState = get(state, "account");
 
         return {
           themeName: getIn(state, ["config", "theme", "name"]),
           appTitle: getIn(state, ["config", "theme", "title"]),
-          loggedIn: accountUtils.isLoggedIn(get(state, "account")),
-          isAnonymous: state.getIn(["account", "isAnonymous"]),
+          loggedIn: accountUtils.isLoggedIn(accountState),
+          isAnonymous: accountUtils.isAnonymous(accountState),
           isSignUpView: currentRoute === "signup",
           showLoadingIndicator: isLoading(state),
           showSlideInIndicator:

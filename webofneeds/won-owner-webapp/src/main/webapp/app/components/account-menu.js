@@ -73,11 +73,15 @@ function genLogoutConf() {
       this.email = "";
       this.password = "";
 
-      const logout = state => ({
-        loggedIn: accountUtils.isLoggedIn(get(state, "account")),
-        email: state.getIn(["account", "email"]),
-        isAnonymous: state.getIn(["account", "isAnonymous"]),
-      });
+      const logout = state => {
+        const accountState = get(state, "account");
+
+        return {
+          loggedIn: accountUtils.isLoggedIn(accountState),
+          email: accountUtils.getEmail(accountState),
+          isAnonymous: accountUtils.isLoggedIn(accountState),
+        };
+      };
 
       connect2Redux(logout, actionCreators, [], this);
     }

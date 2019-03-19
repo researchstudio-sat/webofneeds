@@ -52,10 +52,12 @@ function genComponentConf() {
       this.password = "";
 
       const logout = state => {
+        const accountState = get(state, "account");
+
         return {
-          loggedIn: accountUtils.isLoggedIn(get(state, "account")),
-          email: state.getIn(["account", "email"]),
-          isAnonymous: state.getIn(["account", "isAnonymous"]),
+          loggedIn: accountUtils.isLoggedIn(accountState),
+          email: accountUtils.getEmail(accountState),
+          isAnonymous: accountUtils.isAnonymous(accountState),
         };
       };
 

@@ -66,7 +66,8 @@ export function accountLogin(credentials, redirectToFeed = false) {
 
     const { email } = parseCredentials(credentials);
 
-    const isLoggedIn = accountUtils.isLoggedIn(get(state, "account"));
+    const accountState = get(state, "account");
+    const isLoggedIn = accountUtils.isLoggedIn(accountState);
     const processingLoginForEmail =
       processUtils.isProcessingLoginForEmail(get(state, "process")) ||
       _loginInProcessFor;
@@ -84,7 +85,7 @@ export function accountLogin(credentials, redirectToFeed = false) {
       isLoggedIn &&
       !processUtils.isProcessingInitialLoad(get(state, "process"))
     ) {
-      const loggedInEmail = state.getIn(["account", "email"]);
+      const loggedInEmail = accountUtils.getEmail(accountState);
 
       if (credentials.email === loggedInEmail) {
         console.debug(
