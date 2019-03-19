@@ -61,7 +61,9 @@ export function showSlideInAnonymous(state) {
 }
 
 export function showSlideInDisclaimer(state) {
-  const isDisclaimerAccepted = getIn(state, ["account", "acceptedDisclaimer"]);
+  const isDisclaimerAccepted = accountUtils.isDisclaimerAccepted(
+    get(state, "account")
+  );
 
   return !showSlideInConnectionLost(state) && !isDisclaimerAccepted;
 }

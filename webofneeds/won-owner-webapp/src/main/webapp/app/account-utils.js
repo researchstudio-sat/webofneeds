@@ -50,3 +50,42 @@ export function getEmail(accountState) {
 export function getPrivateId(accountState) {
   return get(accountState, "privateId");
 }
+
+/**
+ * Returns the loginError if present
+ *
+ * @param accountState
+ * @returns {*}
+ */
+export function getLoginError(accountState) {
+  return get(accountState, "loginError");
+}
+
+/**
+ * Returns the registerError if present
+ *
+ * @param accountState
+ * @returns {*}
+ */
+export function getRegisterError(accountState) {
+  return get(accountState, "registerError");
+}
+
+/**
+ * Returns the emailVerificationError if present
+ *
+ * @param accountState
+ * @returns {*}
+ */
+export function getEmailVerificationError(accountState) {
+  return get(accountState, "emailVerificationError");
+}
+
+/**
+ * Return true if the disclaimer is already accepted
+ * @param accountState
+ * @returns {boolean}
+ */
+export function isDisclaimerAccepted(accountState) {
+  return !!get(accountState, "acceptedDisclaimer");
+}

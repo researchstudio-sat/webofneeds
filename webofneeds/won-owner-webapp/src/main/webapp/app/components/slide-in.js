@@ -249,6 +249,9 @@ function genSlideInConf() {
         const isLoggedIn = accountUtils.isLoggedIn(accountState);
         const isAnonymous = accountUtils.isAnonymous(accountState);
         const isEmailVerified = accountUtils.isEmailVerified(accountState);
+        const emailVerificationError = accountUtils.getEmailVerificationError(
+          accountState
+        );
         const isTermsOfServiceAccepted = getIn(state, [
           "account",
           "acceptedTermsOfService",
@@ -271,10 +274,10 @@ function genSlideInConf() {
         return {
           verificationToken,
           isEmailVerified,
-          emailVerificationError: getIn(state, [
-            "account",
-            "emailVerificationError",
-          ]),
+          emailVerificationError,
+          isAlreadyVerifiedError:
+            get(emailVerificationError, "code") ===
+            won.RESPONSECODE.TOKEN_RESEND_FAILED_ALREADY_VERIFIED,
           isProcessingVerifyEmailAddress: processSelectors.isProcessingVerifyEmailAddress(
             state
           ),
@@ -294,9 +297,6 @@ function genSlideInConf() {
           privateId,
           connectionHasBeenLost,
           reconnecting: getIn(state, ["messages", "reconnecting"]),
-          isAlreadyVerifiedError:
-            getIn(state, ["account", "emailVerificationError", "code"]) ==
-            won.RESPONSECODE.TOKEN_RESEND_FAILED_ALREADY_VERIFIED,
           isAnonymousSlideInExpanded,
           showAnonymousSlideInEmailInput,
           anonymousLinkSent,

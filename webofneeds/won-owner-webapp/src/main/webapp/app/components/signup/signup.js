@@ -32,7 +32,7 @@ class SignupController {
       const accountState = get(state, "account");
       return {
         loggedIn: accountUtils.isLoggedIn(accountState),
-        registerError: state.getIn(["account", "registerError"]),
+        registerError: accountUtils.getRegisterError(accountState),
         isAnonymous: accountUtils.isAnonymous(accountState),
         privateId: accountUtils.getPrivateId(accountState),
         showModalDialog: state.getIn(["view", "showModalDialog"]),

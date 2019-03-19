@@ -75,17 +75,22 @@ function genLoginConf() {
       this.password = "";
       this.rememberMe = false;
 
-      const login = state => ({
-        loggedIn: accountUtils.isLoggedIn(get(state, "account")),
-        loginError: state.getIn(["account", "loginError"]),
-        processingResendVerificationEmail: getIn(state, [
-          "process",
-          "processingResendVerificationEmail",
-        ]),
-        isNotVerified:
-          state.getIn(["account", "loginError", "code"]) ==
-          won.RESPONSECODE.USER_NOT_VERIFIED,
-      });
+      const login = state => {
+        const accountState = get(state, "account");
+        const loginError = accountUtils.getLoginError(accountState);
+        const isNotVerified =
+          get(loginError, "code") === won.RESPONSECODE.USER_NOT_VERIFIED;
+
+        return {
+          loggedIn: accountUtils.isLoggedIn(accountState),
+          loginError,
+          processingResendVerificationEmail: getIn(state, [
+            "process",
+            "processingResendVerificationEmail",
+          ]),
+          isNotVerified,
+        };
+      };
 
       connect2Redux(login, actionCreators, [], this);
     }
