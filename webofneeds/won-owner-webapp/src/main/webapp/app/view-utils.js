@@ -25,6 +25,10 @@ export function showRdf(viewState) {
   return get(viewState, "showRdf");
 }
 
+export function showClosedNeeds(viewState) {
+  return get(viewState, "showClosedNeeds");
+}
+
 export function isAnonymousLinkSent(viewState) {
   return getIn(viewState, ["anonymousSlideIn", "linkSent"]);
 }
