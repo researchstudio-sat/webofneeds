@@ -22,21 +22,9 @@ import { actionCreators } from "../actions/actions.js";
 
 import "style/_connections-overview.scss";
 
-import {
-  getRouterParams,
-  getOwnedNeedByConnectionUri,
-  getOwnedNeedsInCreation,
-  getConnectionUriFromRoute,
-  getPostUriFromRoute,
-  getPosts,
-  getOwnedClosedPosts,
-  getOwnedOpenPosts,
-} from "../selectors/general-selectors.js";
-import { getChatConnectionsToCrawl } from "../selectors/connection-selectors.js";
-import {
-  isChatConnection,
-  isGroupChatConnection,
-} from "../connection-utils.js";
+import * as generalSelectors from "../selectors/general-selectors.js";
+import * as connectionSelectors from "../selectors/connection-selectors.js";
+import * as connectionUtils from "../connection-utils.js";
 import * as needUtils from "../need-utils.js";
 import * as viewUtils from "../view-utils.js";
 import * as processUtils from "../process-utils.js";
@@ -175,39 +163,46 @@ function genComponentConf() {
 
       const self = this;
       const selectFromState = state => {
-        const allNeeds = getPosts(state);
-        const openNeeds = getOwnedOpenPosts(state);
-        const closedNeeds = getOwnedClosedPosts(state);
+        const allNeeds = generalSelectors.getPosts(state);
+        const openNeeds = generalSelectors.getOwnedOpenPosts(state);
+        const closedNeeds = generalSelectors.getOwnedClosedPosts(state);
 
         // needs that have been created but are not confirmed by the server yet
-        const beingCreatedNeeds = getOwnedNeedsInCreation(state);
+        const beingCreatedNeeds = generalSelectors.getOwnedNeedsInCreation(
+          state
+        );
 
-        const connectionsToCrawl = getChatConnectionsToCrawl(state);
+        const connectionsToCrawl = connectionSelectors.getChatConnectionsToCrawl(
+          state
+        );
 
-        const routerParams = getRouterParams(state);
-        const useCase = get(routerParams, "useCase");
-        const useCaseGroup = get(routerParams, "useCaseGroup");
-        const connUriInRoute = getConnectionUriFromRoute(state);
-        const needUriInRoute = getPostUriFromRoute(state);
+        const useCase = generalSelectors.getUseCaseFromRoute(state);
+        const useCaseGroup = generalSelectors.getUseCaseGroupFromRoute(state);
+        const connUriInRoute = generalSelectors.getConnectionUriFromRoute(
+          state
+        );
+        const needUriInRoute = generalSelectors.getPostUriFromRoute(state);
         const needImpliedInRoute =
-          connUriInRoute && getOwnedNeedByConnectionUri(state, connUriInRoute);
+          connUriInRoute &&
+          generalSelectors.getOwnedNeedByConnectionUri(state, connUriInRoute);
         const needUriImpliedInRoute =
           needImpliedInRoute && needImpliedInRoute.get("uri");
 
         const sortedOpenNeeds = sortByDate(openNeeds, "creationDate");
         const sortedClosedNeeds = sortByDate(closedNeeds, "creationDate");
 
+        const process = get(state, "process");
         const unloadedNeeds = closedNeeds.filter(need =>
-          getIn(state, ["process", "needs", need.get("uri"), "toLoad"])
+          processUtils.isNeedToLoad(process, need.get("uri"))
         );
 
         const viewState = get(state, "view");
 
         return {
           allNeeds,
-          process: state.get("process"),
+          process,
           viewState,
-          showClosedNeeds: get(viewState, "showClosedNeeds"),
+          showClosedNeeds: viewUtils.showClosedNeeds(viewState),
           useCase,
           useCaseGroup,
           needUriInRoute,
@@ -403,7 +398,10 @@ function genComponentConf() {
       return (
         need.get("state") === won.WON.ActiveCompacted &&
         !!need.get("connections").find(conn => {
-          if (!isChatConnection(conn) && !isGroupChatConnection(conn))
+          if (
+            !connectionUtils.isChatConnection(conn) &&
+            !connectionUtils.isGroupChatConnection(conn)
+          )
             return false;
           if (processUtils.isConnectionLoading(process, conn.get("uri")))
             return true; //if connection is currently loading we assume its a connection we want to show
@@ -435,7 +433,10 @@ function genComponentConf() {
       }
       const sortedConnections = sortByDate(
         need.get("connections").filter(conn => {
-          if (!isChatConnection(conn) && !isGroupChatConnection(conn))
+          if (
+            !connectionUtils.isChatConnection(conn) &&
+            !connectionUtils.isGroupChatConnection(conn)
+          )
             return false;
           if (processUtils.isConnectionLoading(process, conn.get("uri")))
             return true; //if connection is currently loading we assume its a connection we want to show
