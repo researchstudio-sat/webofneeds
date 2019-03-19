@@ -101,15 +101,14 @@ export default function(viewState = initialState, action = {}) {
       const cancelCallback = get(payload, "cancelCallback");
 
       const termsDialog = Immutable.fromJS({
-        caption: "FIXME#2537: Attention!",
         showTerms: true,
         buttons: [
           {
-            caption: "Accept",
+            caption: "Yes",
             callback: acceptCallback,
           },
           {
-            caption: "Cancel",
+            caption: "No",
             callback: cancelCallback,
           },
         ],
