@@ -385,14 +385,14 @@ function genComponentConf() {
         const reactionUseCases =
           remoteNeed &&
           !needUtils.isOwned(remoteNeed) &&
-          getIn(remoteNeed, ["matchedUseCase", "reactionUseCases"]);
+          needUtils.getReactionUseCases(remoteNeed);
         const hasReactionUseCases =
           reactionUseCases && reactionUseCases.size > 0;
 
         const enabledUseCases =
           remoteNeed &&
           needUtils.isOwned(remoteNeed) &&
-          getIn(remoteNeed, ["matchedUseCase", "enabledUseCases"]);
+          needUtils.getEnabledUseCases(remoteNeed);
         const hasEnabledUseCases = enabledUseCases && enabledUseCases.size > 0;
 
         return {
