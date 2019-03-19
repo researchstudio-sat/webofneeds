@@ -9,12 +9,14 @@ import { actionCreators, actionTypes } from "./actions.js";
 import { ensureLoggedIn } from "./account-actions.js";
 
 import {
+  get,
   getIn,
   reverseSearchNominatim,
   nominatim2draftLocation,
 } from "../utils.js";
 
 import { isWhatsAroundNeed, isWhatsNewNeed } from "../need-utils.js";
+import * as accountUtils from "../account-utils.js";
 
 export function needCreate(draft, persona, nodeUri) {
   return (dispatch, getState) => {
@@ -26,7 +28,10 @@ export function needCreate(draft, persona, nodeUri) {
 
     let prevParams = getIn(state, ["router", "prevParams"]);
 
-    if (!state.getIn(["account", "loggedIn"]) && prevParams.privateId) {
+    if (
+      !accountUtils.isLoggedIn(get(state, "account")) &&
+      prevParams.privateId
+    ) {
       /*
              * `ensureLoggedIn` will generate a new privateId. should
              * there be a previous privateId, we don't want to change

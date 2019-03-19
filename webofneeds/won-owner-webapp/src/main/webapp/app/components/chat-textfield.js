@@ -31,6 +31,7 @@ import labelledHrModule from "./labelled-hr.js";
 import { getHumanReadableStringFromMessage } from "../reducers/need-reducer/parse-message.js";
 import { isChatToGroup } from "../connection-utils.js";
 import submitButtonModule from "./submit-button.js";
+import * as accountUtils from "../account-utils.js";
 
 import "style/_chattextfield.scss";
 import "style/_textfield.scss";
@@ -361,7 +362,7 @@ function genComponentConf() {
           showAddMessageContent: state.getIn(["view", "showAddMessageContent"]),
           selectedDetail,
           selectedDetailComponent: selectedDetail && selectedDetail.component,
-          isLoggedIn: state.getIn(["account", "loggedIn"]),
+          isLoggedIn: accountUtils.isLoggedIn(get(state, "account")),
         };
       };
 

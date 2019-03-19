@@ -3,13 +3,14 @@
  */
 import angular from "angular";
 import ngAnimate from "angular-animate";
-import { attach } from "../../utils.js";
+import { attach, get } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 
 import signupTitleBarModule from "../signup-title-bar.js";
 import labelledHrModule from "../labelled-hr.js";
 
 import * as srefUtils from "../../sref-utils.js";
+import * as accountUtils from "../../account-utils.js";
 import * as viewSelectors from "../../selectors/view-selectors.js";
 
 import "style/_signup.scss";
@@ -29,7 +30,7 @@ class SignupController {
 
     const select = state => {
       return {
-        loggedIn: state.getIn(["account", "loggedIn"]),
+        loggedIn: accountUtils.isLoggedIn(get(state, "account")),
         registerError: state.getIn(["account", "registerError"]),
         isAnonymous: state.getIn(["account", "isAnonymous"]),
         privateId: state.getIn(["account", "privateId"]),

@@ -4,8 +4,8 @@
 
 import { get } from "./utils.js";
 /**
- * Determines if a given connection is a chatConnection
- * @param conn
+ * Determines if a there is currently a user logged in or not
+ * @param accountState
  * @returns {*|boolean}
  */
 export function isLoggedIn(accountState) {

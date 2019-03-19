@@ -3,6 +3,7 @@
  */
 import { get, getIn } from "../utils.js";
 import * as viewUtils from "../view-utils.js";
+import * as accountUtils from "../account-utils.js";
 import { getVerificationTokenFromRoute } from "./general-selectors.js";
 
 /**
@@ -66,7 +67,7 @@ export function showSlideInDisclaimer(state) {
 }
 
 export function showSlideInTermsOfService(state) {
-  const isLoggedIn = getIn(state, ["account", "loggedIn"]);
+  const isLoggedIn = accountUtils.isLoggedIn(get(state, "account"));
   const isTermsOfServiceAccepted = getIn(state, [
     "account",
     "acceptedTermsOfService",
@@ -79,7 +80,7 @@ export function showSlideInTermsOfService(state) {
 
 export function showSlideInEmailVerification(state) {
   const verificationToken = getVerificationTokenFromRoute(state);
-  const isLoggedIn = getIn(state, ["account", "loggedIn"]);
+  const isLoggedIn = accountUtils.isLoggedIn(get(state, "account"));
   const isAnonymous = getIn(state, ["account", "isAnonymous"]);
   const isEmailVerified = getIn(state, ["account", "emailVerified"]);
 

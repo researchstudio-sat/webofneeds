@@ -23,17 +23,21 @@ import { setDisclaimerAccepted } from "../won-localstorage.js";
 import { stateGoCurrent } from "./cstm-router-actions.js";
 import { checkAccessToCurrentRoute } from "../configRouting.js";
 
-import { getIn } from "../utils.js";
+import { get } from "../utils.js";
 import { getOwnedConnectionUris } from "../selectors/connection-selectors.js";
 import { loadLatestMessagesOfConnection } from "./connections-actions.js";
 import { getPrivateIdFromRoute } from "../selectors/general-selectors.js";
+
+import * as accountUtils from "../account-utils.js";
+import * as processUtils from "../process-utils.js";
+
 /**
  * Makes sure user is either logged in
  * or creates a private-ID account as fallback.
  */
 export async function ensureLoggedIn(dispatch, getState) {
   const state = getState();
-  if (state.getIn(["account", "loggedIn"])) {
+  if (accountUtils.isLoggedIn(get(state, "account"))) {
     return;
   }
 
@@ -62,9 +66,9 @@ export function accountLogin(credentials, redirectToFeed = false) {
 
     const { email } = parseCredentials(credentials);
 
-    const isLoggedIn = getIn(state, ["account", "loggedIn"]);
+    const isLoggedIn = accountUtils.isLoggedIn(get(state, "account"));
     const processingLoginForEmail =
-      getIn(state, ["process", "processingLoginForEmail"]) ||
+      processUtils.isProcessingLoginForEmail(get(state, "process")) ||
       _loginInProcessFor;
 
     if (processingLoginForEmail) {
@@ -76,7 +80,10 @@ export function accountLogin(credentials, redirectToFeed = false) {
       return;
     }
 
-    if (isLoggedIn && !state.getIn(["process", "processingInitialLoad"])) {
+    if (
+      isLoggedIn &&
+      !processUtils.isProcessingInitialLoad(get(state, "process"))
+    ) {
       const loggedInEmail = state.getIn(["account", "email"]);
 
       if (credentials.email === loggedInEmail) {
@@ -160,7 +167,10 @@ export function accountLogout() {
   return (dispatch, getState) => {
     const state = getState();
 
-    if (state.getIn(["process", "processingLogout"]) || _logoutInProcess) {
+    if (
+      processUtils.isProcessingLogout(get(state, "process")) ||
+      _logoutInProcess
+    ) {
       console.debug("Logout in process. Aborting redundant attempt.");
       return;
     }

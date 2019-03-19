@@ -5,13 +5,14 @@ import angular from "angular";
 import ngAnimate from "angular-animate";
 import dropdownModule from "./covering-dropdown.js";
 import accountMenuModule from "./account-menu.js";
-import { attach, getIn } from "../utils.js";
+import { attach, get, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
 import { isLoading } from "../selectors/process-selectors.js";
 import * as viewSelectors from "../selectors/view-selectors.js";
 
 import * as srefUtils from "../sref-utils.js";
+import * as accountUtils from "../account-utils.js";
 
 import "style/_responsiveness-utils.scss";
 import "style/_topnav.scss";
@@ -83,7 +84,7 @@ function genTopnavConf() {
         return {
           themeName: getIn(state, ["config", "theme", "name"]),
           appTitle: getIn(state, ["config", "theme", "title"]),
-          loggedIn: state.getIn(["account", "loggedIn"]),
+          loggedIn: accountUtils.isLoggedIn(get(state, "account")),
           isAnonymous: state.getIn(["account", "isAnonymous"]),
           isSignUpView: currentRoute === "signup",
           showLoadingIndicator: isLoading(state),

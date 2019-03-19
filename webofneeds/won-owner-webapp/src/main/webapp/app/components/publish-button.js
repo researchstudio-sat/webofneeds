@@ -5,6 +5,8 @@ import {
   getOwnedPersonas,
   currentSkin,
 } from "../selectors/general-selectors.js";
+import * as accountUtils from "../account-utils.js";
+import { get } from "../utils.js";
 
 function genComponentConf($ngRedux) {
   return {
@@ -30,7 +32,9 @@ function genComponentConf($ngRedux) {
         elmApp.ports.publishIn.send({
           draftValid: scope.isValid ? true : false,
           showPersonas: scope.showPersonas ? true : false,
-          loggedIn: $ngRedux.getState().getIn(["account", "loggedIn"]),
+          loggedIn: accountUtils.isLoggedIn(
+            get($ngRedux.getState(), "account")
+          ),
         });
       };
 
@@ -48,7 +52,7 @@ function genComponentConf($ngRedux) {
       const disconnectOptions = $ngRedux.connect(state => {
         return {
           personas: getOwnedPersonas(state),
-          loggedIn: state.getIn(["account", "loggedIn"]),
+          loggedIn: accountUtils.isLoggedIn(get(state, "account")),
         };
       })(state => {
         sendNewValues();

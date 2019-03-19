@@ -5,7 +5,7 @@ import won from "../won-es6.js";
 import angular from "angular";
 import ngAnimate from "angular-animate";
 import dropdownModule from "./covering-dropdown.js";
-import { attach, delay, getIn, toAbsoluteURL } from "../utils.js";
+import { attach, delay, get, getIn, toAbsoluteURL } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux, parseRestErrorMessage } from "../won-utils.js";
 import { ownerBaseUrl } from "config";
@@ -14,6 +14,7 @@ import * as viewSelectors from "../selectors/view-selectors.js";
 import * as processSelectors from "../selectors/process-selectors.js";
 
 import * as srefUtils from "../sref-utils.js";
+import * as accountUtils from "../account-utils.js";
 
 import "style/_slidein.scss";
 
@@ -244,7 +245,7 @@ function genSlideInConf() {
         const path = "#!/connections" + `?privateId=${privateId}`;
         const anonymousLink = toAbsoluteURL(ownerBaseUrl).toString() + path;
 
-        const isLoggedIn = getIn(state, ["account", "loggedIn"]);
+        const isLoggedIn = accountUtils.isLoggedIn(get(state, "account"));
         const isAnonymous = getIn(state, ["account", "isAnonymous"]);
         const isEmailVerified = getIn(state, ["account", "emailVerified"]);
         const isTermsOfServiceAccepted = getIn(state, [

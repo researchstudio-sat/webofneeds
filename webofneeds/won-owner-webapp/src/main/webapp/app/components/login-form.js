@@ -2,13 +2,14 @@
  * Created by ksinger on 01.09.2017.
  */
 import angular from "angular";
-import { attach, getIn } from "../utils.js";
+import { attach, get, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux, parseRestErrorMessage } from "../won-utils.js";
 import won from "../won-es6.js";
 import "angular-marked";
 
 import * as srefUtils from "../sref-utils.js";
+import * as accountUtils from "../account-utils.js";
 
 function genLoginConf() {
   let template = `
@@ -75,7 +76,7 @@ function genLoginConf() {
       this.rememberMe = false;
 
       const login = state => ({
-        loggedIn: state.getIn(["account", "loggedIn"]),
+        loggedIn: accountUtils.isLoggedIn(get(state, "account")),
         loginError: state.getIn(["account", "loginError"]),
         processingResendVerificationEmail: getIn(state, [
           "process",
