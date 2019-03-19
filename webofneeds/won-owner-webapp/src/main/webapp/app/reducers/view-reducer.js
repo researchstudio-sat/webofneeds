@@ -102,8 +102,7 @@ export default function(viewState = initialState, action = {}) {
 
       const termsDialog = Immutable.fromJS({
         caption: "FIXME#2537: Attention!",
-        text:
-          "You are about to create an anonymous Account, if you proceed you accept the Terms of Service.",
+        showTerms: true,
         buttons: [
           {
             caption: "Accept",

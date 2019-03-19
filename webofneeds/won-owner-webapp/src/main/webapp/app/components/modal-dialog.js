@@ -4,7 +4,7 @@
 
 import angular from "angular";
 import { actionCreators } from "../actions/actions.js";
-import { attach } from "../utils.js";
+import { attach, getIn } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 
 import "style/_modal-dialog.scss";
@@ -17,7 +17,9 @@ function genComponentConf() {
              <span class="md__dialog__header__caption">{{self.modalDialogCaption}}</span>
           </div>
           <div class="md__dialog__content">
-             <span class="md__dialog__content__text">{{self.modalDialogText}}</span>
+             <span class="md__dialog__content__text" ng-if="!self.showTerms">{{self.modalDialogText}}</span>
+             <div class="md__dialog__content__terms" ng-if="self.showTerms" ng-include="self.tosTemplate"></div>
+             <div class="md__dialog__content__privacy" ng-if="self.showTerms" ng-include="self.privacyPolicyTemplate"></div>
           </div>
           <div class="md__dialog__footer">
              <button
@@ -40,9 +42,24 @@ function genComponentConf() {
         const modalDialogText = modalDialog && modalDialog.get("text");
         const modalDialogButtons = modalDialog && modalDialog.get("buttons");
 
+        const showTerms = modalDialog && modalDialog.get("showTerms");
+        const themeName =
+          showTerms && getIn(state, ["config", "theme", "name"]);
         return {
           modalDialogCaption,
           modalDialogText,
+          showTerms,
+          tosTemplate:
+            themeName &&
+            "./skin/" +
+              themeName +
+              "/" +
+              getIn(state, ["config", "theme", "tosTemplate"]),
+          privacyPolicyTemplate:
+            "./skin/" +
+            themeName +
+            "/" +
+            getIn(state, ["config", "theme", "privacyPolicyTemplate"]),
           modalDialogButtons:
             modalDialogButtons && modalDialogButtons.toArray(),
         };
