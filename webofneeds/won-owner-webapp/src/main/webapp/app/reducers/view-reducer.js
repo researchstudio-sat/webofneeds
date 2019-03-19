@@ -3,7 +3,7 @@
  */
 import { actionTypes } from "../actions/actions.js";
 import Immutable from "immutable";
-import { getIn } from "../utils.js";
+import { get, getIn } from "../utils.js";
 
 const initialState = Immutable.fromJS({
   showRdf: false,
@@ -93,6 +93,32 @@ export default function(viewState = initialState, action = {}) {
 
     case actionTypes.view.removeAddMessageContent:
       return viewState.set("selectedAddMessageContent", undefined);
+
+    case actionTypes.view.showTermsDialog: {
+      const payload = Immutable.fromJS(action.payload);
+
+      const acceptCallback = get(payload, "acceptCallback");
+      const cancelCallback = get(payload, "cancelCallback");
+
+      const termsDialog = Immutable.fromJS({
+        caption: "FIXME#2537: Attention!",
+        text:
+          "You are about to create an anonymous Account, if you proceed you accept the Terms of Service.",
+        buttons: [
+          {
+            caption: "Accept",
+            callback: acceptCallback,
+          },
+          {
+            caption: "Cancel",
+            callback: cancelCallback,
+          },
+        ],
+      });
+      return viewState
+        .set("showModalDialog", true)
+        .set("modalDialog", termsDialog);
+    }
 
     case actionTypes.view.showModalDialog: {
       const modalDialog = Immutable.fromJS(action.payload);

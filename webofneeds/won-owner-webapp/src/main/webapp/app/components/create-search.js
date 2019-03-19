@@ -2,6 +2,7 @@
  * Created by ksinger on 24.08.2015.
  */
 import angular from "angular";
+import Immutable from "immutable";
 import ngAnimate from "angular-animate";
 
 import "ng-redux";
@@ -179,27 +180,17 @@ function genComponentConf() {
         if (this.loggedIn) {
           this.needs__create(tempDraft, undefined, tempDefaultNodeUri);
         } else {
-          const payload = {
-            caption: "FIXME#2537: Attention!",
-            text:
-              "You are about to create an anonymous Account, if you proceed you accept the Terms of Service.",
-            buttons: [
-              {
-                caption: "Accept",
-                callback: () => {
-                  this.view__hideModalDialog();
-                  this.needs__create(tempDraft, undefined, tempDefaultNodeUri);
-                },
+          this.view__showTermsDialog(
+            Immutable.fromJS({
+              acceptCallback: () => {
+                this.view__hideModalDialog();
+                this.needs__create(tempDraft, undefined, tempDefaultNodeUri);
               },
-              {
-                caption: "Cancel",
-                callback: () => {
-                  this.view__hideModalDialog();
-                },
+              cancelCallback: () => {
+                this.view__hideModalDialog();
               },
-            ],
-          };
-          this.view__showModalDialog(payload);
+            })
+          );
         }
       }
     }
