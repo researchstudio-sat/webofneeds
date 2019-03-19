@@ -69,14 +69,12 @@ function genComponentConf() {
         const reactionUseCases =
           post &&
           !needUtils.isOwned(post) &&
-          getIn(post, ["matchedUseCase", "reactionUseCases"]);
+          needUtils.getReactionUseCases(post);
         const hasReactionUseCases =
           reactionUseCases && reactionUseCases.size > 0;
 
         const enabledUseCases =
-          post &&
-          needUtils.isOwned(post) &&
-          getIn(post, ["matchedUseCase", "enabledUseCases"]);
+          post && needUtils.isOwned(post) && needUtils.getEnabledUseCases(post);
         const hasEnabledUseCases = enabledUseCases && enabledUseCases.size > 0;
 
         return {
