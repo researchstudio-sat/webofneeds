@@ -252,10 +252,9 @@ function genSlideInConf() {
         const emailVerificationError = accountUtils.getEmailVerificationError(
           accountState
         );
-        const isTermsOfServiceAccepted = getIn(state, [
-          "account",
-          "acceptedTermsOfService",
-        ]);
+        const isTermsOfServiceAccepted = accountUtils.isTermsOfServiceAccepted(
+          accountState
+        );
 
         const connectionHasBeenLost = getIn(state, [
           "messages",

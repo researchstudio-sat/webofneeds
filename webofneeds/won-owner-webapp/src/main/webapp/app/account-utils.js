@@ -89,3 +89,12 @@ export function getEmailVerificationError(accountState) {
 export function isDisclaimerAccepted(accountState) {
   return !!get(accountState, "acceptedDisclaimer");
 }
+
+/**
+ * Return true if the TermsOfService are already accepted
+ * @param accountState
+ * @returns {boolean}
+ */
+export function isTermsOfServiceAccepted(accountState) {
+  return !!get(accountState, "acceptedTermsOfService");
+}

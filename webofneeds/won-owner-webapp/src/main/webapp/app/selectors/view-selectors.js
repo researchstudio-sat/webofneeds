@@ -69,11 +69,11 @@ export function showSlideInDisclaimer(state) {
 }
 
 export function showSlideInTermsOfService(state) {
-  const isLoggedIn = accountUtils.isLoggedIn(get(state, "account"));
-  const isTermsOfServiceAccepted = getIn(state, [
-    "account",
-    "acceptedTermsOfService",
-  ]);
+  const accountState = get(state, "account");
+  const isLoggedIn = accountUtils.isLoggedIn(accountState);
+  const isTermsOfServiceAccepted = accountUtils.isTermsOfServiceAccepted(
+    accountState
+  );
 
   return (
     isLoggedIn && !showSlideInConnectionLost(state) && !isTermsOfServiceAccepted
