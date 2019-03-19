@@ -6,7 +6,7 @@ import ngAnimate from "angular-animate";
 import labelledHrModule from "./labelled-hr.js";
 
 import "ng-redux";
-import { attach } from "../utils.js";
+import { attach, get } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
 import {
@@ -14,6 +14,7 @@ import {
   getUseCaseGroupFromRoute,
 } from "../selectors/general-selectors.js";
 import * as useCaseUtils from "../usecase-utils.js";
+import * as accountUtils from "../account-utils.js";
 
 import "style/_usecase-picker.scss";
 
@@ -137,6 +138,7 @@ function genComponentConf() {
         const showGroupsThreshold = 1; // only show groups with more than 1 use case(s) as groups
 
         return {
+          loggedIn: accountUtils.isLoggedIn(get(state, "account")),
           showAll: getUseCaseGroupFromRoute(state) === "all",
           processingPublish: state.getIn(["process", "processingPublish"]),
           connectionHasBeenLost: !selectIsConnected(state),
@@ -155,14 +157,68 @@ function genComponentConf() {
     // redirects start
 
     createWhatsAround() {
-      if (!this.processingPublish) {
+      if (this.processingPublish) {
+        console.debug("publish in process, do not take any action");
+        return;
+      }
+
+      if (this.loggedIn) {
         this.needs__whatsAround();
+      } else {
+        const payload = {
+          caption: "FIXME#2537: Attention!",
+          text:
+            "You are about to create an anonymous Account, if you proceed you accept the Terms of Service.",
+          buttons: [
+            {
+              caption: "Accept",
+              callback: () => {
+                this.view__hideModalDialog();
+                this.needs__whatsAround();
+              },
+            },
+            {
+              caption: "Cancel",
+              callback: () => {
+                this.view__hideModalDialog();
+              },
+            },
+          ],
+        };
+        this.view__showModalDialog(payload);
       }
     }
 
     createWhatsNew() {
-      if (!this.processingPublish) {
+      if (this.processingPublish) {
+        console.debug("publish in process, do not take any action");
+        return;
+      }
+
+      if (this.loggedIn) {
         this.needs__whatsNew();
+      } else {
+        const payload = {
+          caption: "FIXME#2537: Attention!",
+          text:
+            "You are about to create an anonymous Account, if you proceed you accept the Terms of Service.",
+          buttons: [
+            {
+              caption: "Accept",
+              callback: () => {
+                this.view__hideModalDialog();
+                this.needs__whatsNew();
+              },
+            },
+            {
+              caption: "Cancel",
+              callback: () => {
+                this.view__hideModalDialog();
+              },
+            },
+          ],
+        };
+        this.view__showModalDialog(payload);
       }
     }
 

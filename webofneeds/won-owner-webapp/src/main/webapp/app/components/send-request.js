@@ -6,10 +6,11 @@ import chatTextFieldModule from "./chat-textfield.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 import { getPostUriFromRoute } from "../selectors/general-selectors.js";
 import { connect2Redux } from "../won-utils.js";
-import { attach, getIn } from "../utils.js";
+import { attach, get, getIn } from "../utils.js";
 import * as needUtils from "../need-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { getUseCaseLabel, getUseCaseIcon } from "../usecase-utils.js";
+import * as accountUtils from "../account-utils.js";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 
@@ -80,6 +81,7 @@ function genComponentConf() {
         const hasEnabledUseCases = enabledUseCases && enabledUseCases.size > 0;
 
         return {
+          loggedIn: accountUtils.isLoggedIn(get(state, "account")),
           displayedPost,
           postUriToConnectTo,
           isInactive: needUtils.isInactive(displayedPost),
@@ -119,14 +121,48 @@ function genComponentConf() {
     }
 
     sendAdHocRequest(message, persona) {
-      this.router__stateGoResetParams("connections");
+      const tempPostUriToConnectTo = this.postUriToConnectTo;
 
-      if (this.postUriToConnectTo) {
-        this.connections__connectAdHoc(
-          this.postUriToConnectTo,
-          message,
-          persona
-        );
+      if (this.loggedIn) {
+        this.router__stateGoResetParams("connections");
+
+        if (tempPostUriToConnectTo) {
+          this.connections__connectAdHoc(
+            tempPostUriToConnectTo,
+            message,
+            persona
+          );
+        }
+      } else {
+        const payload = {
+          caption: "FIXME#2537: Attention!",
+          text:
+            "You are about to create an anonymous Account, if you proceed you accept the Terms of Service.",
+          buttons: [
+            {
+              caption: "Accept",
+              callback: () => {
+                this.view__hideModalDialog();
+                this.router__stateGoResetParams("connections");
+
+                if (tempPostUriToConnectTo) {
+                  this.connections__connectAdHoc(
+                    tempPostUriToConnectTo,
+                    message,
+                    persona
+                  );
+                }
+              },
+            },
+            {
+              caption: "Cancel",
+              callback: () => {
+                this.view__hideModalDialog();
+              },
+            },
+          ],
+        };
+        this.view__showModalDialog(payload);
       }
     }
 
