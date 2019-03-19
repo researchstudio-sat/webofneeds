@@ -26,6 +26,14 @@
     <version>0.4-SNAPSHOT</version>
     <name>Core</name>
 
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>net.revelc.code.formatter</groupId>
+				<artifactId>formatter-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
     <dependencies>
         <!--
 

@@ -79,6 +79,10 @@
 
     <build>
         <plugins>
+			<plugin>
+				<groupId>net.revelc.code.formatter</groupId>
+				<artifactId>formatter-maven-plugin</artifactId>
+			</plugin>
             <plugin>
                 <groupId>com.github.ekryd.echo-maven-plugin</groupId>
                 <artifactId>echo-maven-plugin</artifactId>

@@ -6,17 +6,24 @@
     <version>0.4-SNAPSHOT</version>
 </parent>
 <modelVersion>4.0.0</modelVersion>
-<groupId>at.researchstudio.sat</groupId>
-<name>Utilities</name>
-<artifactId>won-utils</artifactId>
-<version>0.4-SNAPSHOT</version>
-<modules>
-    <module>won-utils-import</module>
-    <module>won-utils-mail</module>
-    <module>won-utils-crawl</module>   
-    <module>won-utils-goals</module> 
-    <module>won-utils-conversation</module>
-</modules>
-<packaging>pom</packaging>
-
+	<groupId>at.researchstudio.sat</groupId>
+	<name>Utilities</name>
+	<artifactId>won-utils</artifactId>
+	<version>0.4-SNAPSHOT</version>
+	<modules>
+	    <module>won-utils-import</module>
+	    <module>won-utils-mail</module>
+	    <module>won-utils-crawl</module>   
+	    <module>won-utils-goals</module> 
+	    <module>won-utils-conversation</module>
+	</modules>
+	<packaging>pom</packaging>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>net.revelc.code.formatter</groupId>
+				<artifactId>formatter-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
 </project>
