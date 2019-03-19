@@ -240,12 +240,12 @@ function genSlideInConf() {
       const selectFromState = state => {
         const verificationToken = getVerificationTokenFromRoute(state);
 
-        const privateId = getIn(state, ["account", "privateId"]);
-
-        const path = "#!/connections" + `?privateId=${privateId}`;
-        const anonymousLink = toAbsoluteURL(ownerBaseUrl).toString() + path;
-
         const accountState = get(state, "account");
+
+        const privateId = accountUtils.getPrivateId(accountState);
+        const path = "#!/connections" + `?privateId=${privateId}`;
+
+        const anonymousLink = toAbsoluteURL(ownerBaseUrl).toString() + path;
         const isLoggedIn = accountUtils.isLoggedIn(accountState);
         const isAnonymous = accountUtils.isAnonymous(accountState);
         const isEmailVerified = accountUtils.isEmailVerified(accountState);

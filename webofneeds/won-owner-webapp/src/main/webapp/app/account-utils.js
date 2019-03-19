@@ -32,11 +32,21 @@ export function isEmailVerified(accountState) {
 }
 
 /**
- * Returns the email of the currentyl logged in user
+ * Returns the email of the currently logged in user
  *
  * @param accountState
  * @returns {*}
  */
 export function getEmail(accountState) {
   return get(accountState, "email");
+}
+
+/**
+ * Returns the privateId of the currently logged in user
+ *
+ * @param accountState
+ * @returns {*}
+ */
+export function getPrivateId(accountState) {
+  return get(accountState, "privateId");
 }

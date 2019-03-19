@@ -34,7 +34,7 @@ class SignupController {
         loggedIn: accountUtils.isLoggedIn(accountState),
         registerError: state.getIn(["account", "registerError"]),
         isAnonymous: accountUtils.isAnonymous(accountState),
-        privateId: state.getIn(["account", "privateId"]),
+        privateId: accountUtils.getPrivateId(accountState),
         showModalDialog: state.getIn(["view", "showModalDialog"]),
         showSlideIns:
           viewSelectors.hasSlideIns(state) && viewSelectors.showSlideIns(state),
