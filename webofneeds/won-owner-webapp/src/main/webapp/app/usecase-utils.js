@@ -79,7 +79,11 @@ export function findUseCaseByNeed(needImm) {
         hasExactMatchingTypes(useCase, contentTypes, "content")
       );
 
-      if (matchingUseCases.size > 1 && contentTypes.includes("s:PlanAction")) {
+      if (
+        matchingUseCases.size > 1 &&
+        contentTypes &&
+        contentTypes.includes("s:PlanAction")
+      ) {
         matchingUseCases = matchingUseCases.filter(useCase =>
           getIn(needImm, ["content", "eventObject"]).includes(
             getIn(useCase, ["draft", "content", "eventObject"])
@@ -94,7 +98,11 @@ export function findUseCaseByNeed(needImm) {
         );
       }
 
-      if (matchingUseCases.size > 1 && seeksTypes.includes("s:PlanAction")) {
+      if (
+        matchingUseCases.size > 1 &&
+        seeksTypes &&
+        seeksTypes.includes("s:PlanAction")
+      ) {
         matchingUseCases = matchingUseCases.filter(useCase =>
           getIn(needImm, ["seeks", "eventObject"]).includes(
             getIn(useCase, ["draft", "seeks", "eventObject"])
