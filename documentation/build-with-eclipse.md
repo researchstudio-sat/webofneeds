@@ -111,7 +111,8 @@
 		*  In the eclipse navigator view, open Servers >> Tomcat 8.0 *(your server config)* 
 		*  edit `server.xml` 
 		*  find the xml element `<Host appBase="webapps" ...` and add the xml attribute `startStopThreads="2"` 
-8.  Follow instructions on https://github.com/researchstudio-sat/webofneeds/blob/5dc0db3747c201a87d94621453b8b898a34e7fc4/documentation/installation-cryptographic-keys-and-certificates.md and make sure that you have the `tcnative-1.dll` **in your tomcat's `bin/`-folder!**, and that you correctly point to it with the `-Djava.library.path` variable (Step 7). Otherwise you will get `InvalidKeystoreFormatException`s at server startup and an info message which says `The APR based Apache Tomcat Native library which allows optimal performance in production environments was not found on the java.library.path` => following path where to put the .dll 
+8.  Follow the [instructions for generating your keys](https://github.com/researchstudio-sat/webofneeds/blob/master/documentation/installation-cryptographic-keys-and-certificates.md)
+       and make sure that you have the `tcnative-1.dll` **in your tomcat's `bin/`-folder!**, and that you correctly point to it with the `-Djava.library.path` variable (Step 7). Otherwise you will get `InvalidKeystoreFormatException`s at server startup and an info message which says `The APR based Apache Tomcat Native library which allows optimal performance in production environments was not found on the java.library.path` => following path where to put the .dll 
 9.  Install the bouncycaslte security provider: Locate the JRE you are using with eclipse (`Window -> Preferences -> Java -> Installed JREs`). 
 	* Navigate to the `[JRE]/lib/security` folder
 	* edit the file `java.security`
