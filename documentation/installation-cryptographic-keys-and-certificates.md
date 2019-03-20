@@ -32,6 +32,10 @@
     ```
 8. In the console navigate to the folder for the keystore created in previous steps (e.g. `C:/WoN/Keystore/`), adapt and run the following lines:
 
+**NOTE:** the openssl commands can be executed in windows using cygwin or the git bash
+
+**NOTE:** If you're getting the error message `Subject does not start with '/'.`, change last parameter to `-subj "//CN=myhost.mydomain.com"`
+
     ```sh
     openssl req -x509 -newkey rsa:2048 -keyout t-key.pem -out t-cert.pem  -passout pass:changeit -days 365 -subj "/CN=myhost.mydomain.com"
 
@@ -41,9 +45,6 @@
 
     rm sometmpfile_deletme
     ```
-**NOTE:** the openssl commands can be executed in windows using cygwin or the git bash
-**NOTE:** If you're getting the error message `Subject does not start with '/'.`, change last parameter to `-subj "//CN=myhost.mydomain.com"`
-
 
 9. The other key stores, and the trust stores are created and filled in automatically when the application is run (in the locations defined in step 4 with the passwords defined in step 5).
 
