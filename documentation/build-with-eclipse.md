@@ -23,9 +23,9 @@
 13. If you develop on Windows you will need to setup `node`s `windows-build-tools` (see [this guide](./installation-setting-up-frontend-development-environment.md#installing-windows-build-tools-on-windows))
 
 ### Tomcat integration:
-
-1.  Create Server: File >> New >> Other >> Server
-2.  Choose Tomcat, then press "next" (not "finish")
+0.  Download/Install the latest Tomcat 8.5 server
+1.  Create Server in Eclipse: File >> New >> Other >> Server
+2.  Choose Tomcat 8.5, then press "next" (not "finish")
 3.  Make sure you use a Java 8 JDK or JRE, not java 9, or tomcat will not start up and throw a JAXB-related exception.
 4.  Add node and owner and click finish 
       1. If you do not have the options to add the owner and node application to the tomcat (also accessible via Server >> [your tomcat server] >> Add and Remove), something went wrong.
@@ -36,46 +36,32 @@
 ```xml
         <Service name="Catalina">
         ...
+		
+		
         <Connector 
-                SSLCertificateFile="<PATH TO SERVER CERTS>/won-server-certs/t-cert.pem" 
-                SSLCertificateKeyFile="<PATH TO SERVER CERTS>/won-server-certs/t-key.pem" 
-                SSLEnabled="true" 
-                SSLPassword="changeit" 
-                SSLVerifyClient="optionalNoCA" 
-                SSLVerifyDepth="2" 
-                acceptCount="100" 
-                clientAuth="false" 
-                compressableMimeType="                                      
-                                        text/html,                                                               
-                                        text/xml,                                      
-                                        text/plain,                                      
-                                        text/css,                                      
-                                        text/javascript,                                      
-                                        application/javascript,                                                                                                                 
-                                        application/x-font-ttf,                                      
-                                        image/svg+xml,                                                                           
-                                        text/turtle,                                                                           
-                                        application/rdf+xml,                                                                           
-                                        application/x-turtle,                                                                           
-                                        text/rdf+n3,                                                                           
-                                        application/json,                                                                            
-                                        application/trig,                                                                            
-                                        application/ld+json,                                                                            
-                                        application/n-quads" 
-                compression="on" 
-                disableUploadTimeout="true" 
-                enableLookups="true" 
-                keystoreFile="<PATH TO CLIENT CERTS>\client-certs\owner-keys.jks" 
-                keystorePass="temp" 
-                maxPostSize="5242880000" 
-                maxSpareThreads="75" 
-                maxThreads="200" 
-                minSpareThreads="5" 
-                port="8443" 
-                scheme="https" 
-                secure="true" 
-                sslProtocol="TLS"
-                />
+		port="8443"
+		protocol="org.apache.coyote.http11.Http11AprProtocol"
+		SSLEnabled="true"
+		maxThreads="200"
+		compressibleMimeType="text/html, text/xml, text/plain, text/css, text/javascript, application/javascript, application/x-font-ttf, image/svg+xml, text/turtle, application/rdf+xml, application/x-turtle, text/rdf+n3, application/json, application/trig, application/ld+json, application/n-quads"
+		compression="on" 
+		disableUploadTimeout="true" 
+		enableLookups="true"
+		maxPostSize="5242880000" 
+		maxSpareThreads="75"
+		minSpareThreads="5"  
+		scheme="https"
+		secure="true">
+		<SSLHostConfig 
+			certificateVerification="optionalNoCA"
+            certificateVerificationDepth="2"
+            protocols="all">
+            <Certificate certificateKeyFile="<PATH_TO_SERVER_CERTS>/t-key.pem"
+                         certificateFile="<PATH_TO_SERVER_CERTS>/t-cert.pem"
+                         certificateKeyPassword="changeit"/>
+        </SSLHostConfig>	
+        <UpgradeProtocol className="org.apache.coyote.http2.Http2Protocol" /> 	
+	</Connector>
         ...
         </Service>
   ```
