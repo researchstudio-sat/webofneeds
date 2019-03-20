@@ -53,7 +53,7 @@ function genComponentConf() {
         <button class="pcp__holds__view won-button--filled red" ng-click="self.viewPersonaPosts()">View</button>
       </div>
       <won-description-viewer detail="::self.descriptionDetail" content="self.personaDescription" ng-if="self.descriptionDetail && self.personaDescription"></won-description-viewer>
-      <won-elm module="self.editNeedModule" ng-if="self.postIsOwned" attributes="self.post.get('uri')"></won-elm>
+      <won-elm module="self.editNeedModule" ng-if="self.postIsOwned && self.postHasHoldableFacet" attributes="self.post.get('uri')"></won-elm>
     `;
 
   class Controller {
@@ -94,6 +94,7 @@ function genComponentConf() {
           post,
           personaUri,
           postIsOwned: needUtils.isOwned(post),
+          postHasHoldableFacet: needUtils.hasHoldableFacet(post),
           personaLoading:
             !persona || processUtils.isNeedLoading(process, personaUri),
           personaFailedToLoad:
