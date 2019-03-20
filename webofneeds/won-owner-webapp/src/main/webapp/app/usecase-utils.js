@@ -79,14 +79,30 @@ export function findUseCaseByNeed(needImm) {
         hasExactMatchingTypes(useCase, contentTypes, "content")
       );
 
-      if (matchingUseCases && matchingUseCases.size > 1) {
+      if (matchingUseCases.size > 1 && contentTypes.includes("s:PlanAction")) {
+        matchingUseCases = matchingUseCases.filter(useCase =>
+          getIn(needImm, ["content", "eventObject"]).includes(
+            getIn(useCase, ["draft", "content", "eventObject"])
+          )
+        );
+      }
+
+      if (matchingUseCases.size > 1) {
         //If there are multiple matched found based on the content type(s) alone we refine based on the seeks type as well
         matchingUseCases = matchingUseCases.filter(useCase =>
           hasExactMatchingTypes(useCase, seeksTypes, "seeks")
         );
       }
 
-      if (matchingUseCases && matchingUseCases.size > 1) {
+      if (matchingUseCases.size > 1 && seeksTypes.includes("s:PlanAction")) {
+        matchingUseCases = matchingUseCases.filter(useCase =>
+          getIn(needImm, ["seeks", "eventObject"]).includes(
+            getIn(useCase, ["draft", "seeks", "eventObject"])
+          )
+        );
+      }
+
+      if (matchingUseCases.size > 1) {
         console.warn(
           "Found multiple matching UseCases for: ",
           needImm,
@@ -95,7 +111,7 @@ export function findUseCaseByNeed(needImm) {
           " -> returning undefined"
         );
         return undefined;
-      } else if (matchingUseCases && matchingUseCases.size == 1) {
+      } else if (matchingUseCases.size == 1) {
         return matchingUseCases.first().toJS();
       } else {
         console.warn(
