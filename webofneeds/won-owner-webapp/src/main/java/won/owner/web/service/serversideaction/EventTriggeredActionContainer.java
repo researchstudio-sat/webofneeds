@@ -16,6 +16,8 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import won.protocol.util.LoggingUtils;
+
 public class EventTriggeredActionContainer<E> {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -41,10 +43,7 @@ public class EventTriggeredActionContainer<E> {
         try {
             this.actionsToAdd.addAll(action.executeFor(Optional.empty()));
         } catch (Exception e) {
-            logger.info(String.format("Error running server side action '%s' for empty event: %s, more on loglevel 'debug'",
-                    action.getName(), e.getMessage()));
-            logger.debug("Error running server side action for empty event", e);
-
+          LoggingUtils.logMessageAsInfoAndStacktraceAsDebug(logger, e, "Error running server side action {} for empty event",action.getName());
         }
     }
 
@@ -77,9 +76,7 @@ public class EventTriggeredActionContainer<E> {
                                         return Arrays.asList(action);
                                     }
                                 } catch (Exception e) {
-                                    logger.info(String.format("Error running action '%s': %s, more on loglevel 'debug'",
-                                            action.getName(), e.getMessage()));
-                                    logger.debug("Error running action {}", action.getName(), e);
+                                  LoggingUtils.logMessageAsInfoAndStacktraceAsDebug(logger, e, "Error running server side action {}",action.getName());
                                 }
                                 // something went wrong: remove action
                                 return Collections.emptyList();
@@ -87,10 +84,7 @@ public class EventTriggeredActionContainer<E> {
                 }
             });
         } catch (Exception e) {
-            logger.info(String.format("Error running server side actions for event '%s': %s, more on loglevel 'debug'",
-                    event, e.getMessage()));
-            logger.debug("Error running server side action for event", e);
-
+          LoggingUtils.logMessageAsInfoAndStacktraceAsDebug(logger, e, "Error running server side actions for event {}", event);  
         }
     }
 }

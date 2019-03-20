@@ -36,6 +36,7 @@ import won.protocol.message.sender.WonMessageSender;
 import won.protocol.model.WonNode;
 import won.protocol.repository.WonNodeRepository;
 import won.protocol.util.RdfUtils;
+import won.protocol.util.LoggingUtils;
 
 /**
  * User: LEIH-NB
@@ -154,17 +155,13 @@ public class OwnerWonMessageSenderJMSBased implements ApplicationListener<WonNod
               isDefaultWonNodeRegistered = true;
 
             } catch (Exception e) {
-              logger.warn("Could not register with default won node {}. Try again later ... (reason is logged at " +
-                            "loglevel 'DEBUG')",
-                          defaultNodeURI);
-              logger.debug("Exceptions is: ", e);
+              LoggingUtils.logMessageAsInfoAndStacktraceAsDebug(logger, e, "Could not register with default won node {}. Try again later.", defaultNodeURI);
             }
           }
         }.start();
 
       } catch (Exception e) {
-        logger.warn("Could not register with default won node {}. Try again later ...", defaultNodeURI);
-        logger.debug("Exceptions is: ", e);
+        LoggingUtils.logMessageAsInfoAndStacktraceAsDebug(logger, e, "Could not register with default won node {}. Try again later.", defaultNodeURI);
       }
     }
   }

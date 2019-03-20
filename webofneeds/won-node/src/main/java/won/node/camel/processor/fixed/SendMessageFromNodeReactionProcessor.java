@@ -17,6 +17,7 @@ import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionState;
+import won.protocol.util.LoggingUtils;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 import won.protocol.vocabulary.WONMSG;
@@ -55,11 +56,7 @@ public class SendMessageFromNodeReactionProcessor extends AbstractCamelProcessor
                     forward(wonMessage, con);
                 }
             } catch (Exception e) {
-                logger.info("could not forward message {}: {} (more info on loglevel 'debug'",
-                        wonMessage.getMessageURI(), e.getMessage());
-                if (logger.isDebugEnabled()) {
-                    logger.debug("caught exception", e);
-                }
+              LoggingUtils.logMessageAsInfoAndStacktraceAsDebug(logger, e, "Could not forward message {}", wonMessage.getMessageURI());
             }
         });
     }
