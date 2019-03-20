@@ -86,35 +86,30 @@
                maxThreads="150" SSLEnabled="true" scheme="https" secure="true"
                clientAuth="false" sslProtocol="TLS" />
     -->
-	<Connector
-    compression="on"
-    compressableMimeType="
-                   text/html,
-                   text/xml,
-                   text/plain,
-                   text/css,
-                   text/javascript,
-                   application/javascript,
-                   application/x-font-ttf,
-                   image/svg+xml,
-                   text/turtle,
-                   application/rdf+xml,
-                   application/x-turtle,
-                   text/rdf+n3,
-                   application/json,
-                   application/trig,
-                   application/ld+json,
-                   application/n-quads"
-    clientAuth="wanted" port="8443" minSpareThreads="5" maxSpareThreads="75"
-    enableLookups="true" disableUploadTimeout="true"
-    acceptCount="100" maxThreads="200"
-    scheme="https" secure="true" SSLEnabled="true"
-    SSLCertificateFile="/usr/local/tomcat/conf/ssl/t-cert.pem"
-    SSLCertificateKeyFile="/usr/local/tomcat/conf/ssl/t-key.pem"
-    SSLPassword="${CERTIFICATE_PASSWORD}"
-    SSLVerifyClient="optionalNoCA" 
-    SSLVerifyDepth="2" 
-    sslProtocol="TLS"/>
+	    	<Connector 
+		port="8443"
+		protocol="org.apache.coyote.http11.Http11AprProtocol"
+		SSLEnabled="true"
+		maxThreads="200"
+		compressibleMimeType="text/html, text/xml, text/plain, text/css, text/javascript, application/javascript, application/x-font-ttf, image/svg+xml, text/turtle, application/rdf+xml, application/x-turtle, text/rdf+n3, application/json, application/trig, application/ld+json, application/n-quads"
+		compression="on" 
+		disableUploadTimeout="true" 
+		enableLookups="true"
+		maxPostSize="5242880000" 
+		maxSpareThreads="75"
+		minSpareThreads="5"  
+		scheme="https"
+		secure="true">
+		<SSLHostConfig 
+			certificateVerification="optionalNoCA"
+            certificateVerificationDepth="2"
+            protocols="all">
+            <Certificate certificateKeyFile="/usr/local/tomcat/conf/ssl/t-key.pem"
+                         certificateFile="/usr/local/tomcat/conf/ssl/t-cert.pem"
+                         certificateKeyPassword="${CERTIFICATE_PASSWORD}"/>
+        </SSLHostConfig>	
+        <UpgradeProtocol className="org.apache.coyote.http2.Http2Protocol" /> 	
+	</Connector>
 
     <!-- Define an AJP 1.3 Connector on port 8009 -->
     <Connector port="8009" protocol="AJP/1.3" redirectPort="8443" />
