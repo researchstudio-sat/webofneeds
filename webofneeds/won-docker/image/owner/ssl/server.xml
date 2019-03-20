@@ -108,7 +108,6 @@
                          certificateFile="/usr/local/tomcat/conf/ssl/t-cert.pem"
                          certificateKeyPassword="${CERTIFICATE_PASSWORD}"/>
         </SSLHostConfig>	
-        <UpgradeProtocol className="org.apache.coyote.http2.Http2Protocol" /> 	
 	</Connector>
 
     <!-- Define an AJP 1.3 Connector on port 8009 -->
