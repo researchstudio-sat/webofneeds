@@ -69,7 +69,7 @@ function genComponentConf() {
                 <span>{{ self.getUseCaseLabel(ucIdentifier) }}</span>
             </button>
             <won-labelled-hr label="::'Or'" class="pm__footer__labelledhr"  ng-if="self.hasEnabledUseCases"></won-labelled-hr>
-            <button class="won-button--filled red post-info__footer__button" style="margin: 0rem 0rem .3rem 0rem;
+            <button class="won-button--filled red post-info__footer__button" style="margin: 0rem 0rem .3rem 0rem;"
                     ng-if="self.hasEnabledUseCases"
                     ng-repeat="ucIdentifier in self.enabledUseCasesArray"
                     ng-click="self.router__stateGoCurrent({useCase: ucIdentifier, useCaseGroup: undefined, postUri: undefined, fromNeedUri: self.postUri, mode: 'CONNECT'})">
@@ -78,7 +78,7 @@ function genComponentConf() {
                     </svg>
                     <span>{{ self.getUseCaseLabel(ucIdentifier) }}</span>
             </button>
-            <button class="won-button--filled red post-info__footer__button" style="margin: 0rem 0rem .3rem 0rem;
+            <button class="won-button--filled red post-info__footer__button" style="margin: 0rem 0rem .3rem 0rem;"
                 ng-if="self.showCreateWhatsAround"
                 ng-click="self.createWhatsAround()"
                 ng-disabled="self.processingPublish">
@@ -142,7 +142,9 @@ function genComponentConf() {
           showFooter:
             !postLoading &&
             !postFailedToLoad &&
-            (showCreateWhatsAround || hasReactionUseCases),
+            (showCreateWhatsAround ||
+              hasReactionUseCases ||
+              hasEnabledUseCases),
         };
       };
       connect2Redux(
