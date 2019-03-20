@@ -47,6 +47,7 @@ import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.repository.WonNodeRepository;
 import won.protocol.util.DataAccessUtils;
+import won.protocol.util.LoggingUtils;
 
 /**
  * User: syim
@@ -121,8 +122,7 @@ public class OwnerProtocolCommunicationServiceImpl implements OwnerProtocolCommu
           logger.debug("connected with WoN node: " + wonNodeURI);
           return;
         } catch (Exception e){
-          logger.info("connecting to {} failed. Trying to re-register. Full reason logged on loglevel 'DEBUG'", wonNodeURI);
-          logger.debug("We thought we were already registerd, but connecting failed With an exception. We'll try to re-register", e);
+          LoggingUtils.logMessageAsInfoAndStacktraceAsDebug(logger, e, "We thought we were already registerd, but connecting to {} failed With an exception. Trying to re-register. ", wonNodeURI);
         }
       //we'll try to re-register now, see below. This is necessary if the WoN node forgets about us for whatever
       //reason.
