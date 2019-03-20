@@ -133,4 +133,4 @@
 
 	* copy `bcpkix-jdk15on-1.52.jar` and `bcprov-jdk15on-1.52.jar` from `[won-checkout-dir]/webofneeds/webofneeds/target/required-libs/` (which will be there after the first build) to the `[JRE]/lib/ext/` folder
 10.  Start server
-11.  Run the gulpfile outside eclipse: `npm run build` in `wepapp`, refresh the `won-owner-webapp` in eclipse (F5), click on the server –> "Publish"
+11.  Run the gulpfile outside eclipse: `npm run build` in `webofneeds/won-owner-webapp/src/main/webapp`, refresh the `won-owner-webapp` in eclipse (F5), click on the server –> "Publish"
