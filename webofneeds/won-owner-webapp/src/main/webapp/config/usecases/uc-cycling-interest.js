@@ -20,7 +20,8 @@ export const cyclingInterest = {
         title: "I am interested in cycling!",
       },
       seeks: {
-        sPlanAction: { "@id": "http://dbpedia.org/resource/Cycling" },
+        type: ["s:PlanAction"],
+        eventObject: "http://dbpedia.org/resource/Cycling",
       },
     }),
   },
@@ -34,9 +35,7 @@ export const cyclingInterest = {
       mandatory: true,
     },
   },
-  seeksDetails: {
-    sPlanAction: { ...details.sPlanAction },
-  },
+  seeksDetails: {},
 
   generateQuery: (draft, resultName) => {
     const vicinityScoreSQ = vicinityScoreSubQuery({
