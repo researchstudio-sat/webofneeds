@@ -79,7 +79,7 @@ export const details = {
   responseToUri: basicDetails.responseToUri,
   website: basicDetails.website,
   flags: basicDetails.flags,
-  sPlanAction: basicDetails.sPlanAction,
+  eventObject: basicDetails.eventObject,
   facets: basicDetails.facets,
   defaultFacet: basicDetails.defaultFacet,
   type: basicDetails.type,
