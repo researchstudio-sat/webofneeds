@@ -2,10 +2,12 @@ package won.protocol.message.processor.exception;
 
 /**
  * Indicates that the uri (of event or need) is already in use.
- * <p>
- * User: ypanchenko Date: 24.04.2015
+ *
+ * User: ypanchenko
+ * Date: 24.04.2015
  */
-public class UriAlreadyInUseException extends WonMessageProcessingException {
+public class UriAlreadyInUseException extends WonMessageProcessingException
+{
   public UriAlreadyInUseException() {
   }
 
@@ -22,7 +24,7 @@ public class UriAlreadyInUseException extends WonMessageProcessingException {
   }
 
   public UriAlreadyInUseException(final String uri, final Throwable cause, final boolean enableSuppression,
-      final boolean writableStackTrace) {
+                              final boolean writableStackTrace) {
     super(uri, cause, enableSuppression, writableStackTrace);
   }
 }

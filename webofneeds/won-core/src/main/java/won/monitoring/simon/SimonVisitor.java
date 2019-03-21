@@ -16,13 +16,14 @@
 
 package won.monitoring.simon;
 
-import org.javasimon.Simon;
-
 import java.io.IOException;
+
+import org.javasimon.Simon;
 
 /**
  * Visitor for simons.
  */
-public interface SimonVisitor {
+public interface SimonVisitor
+{
   public void visit(Simon simon) throws IOException;
 }

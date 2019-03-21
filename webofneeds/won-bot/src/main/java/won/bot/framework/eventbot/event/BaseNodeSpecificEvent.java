@@ -21,7 +21,8 @@ import java.net.URI;
 /**
  *
  */
-public abstract class BaseNodeSpecificEvent extends BaseEvent implements NodeSpecificEvent {
+public abstract class BaseNodeSpecificEvent extends BaseEvent implements NodeSpecificEvent
+{
   private final URI nodeURI;
 
   protected BaseNodeSpecificEvent(final URI nodeURI) {
@@ -35,6 +36,8 @@ public abstract class BaseNodeSpecificEvent extends BaseEvent implements NodeSpe
 
   @Override
   public String toString() {
-    return getClass().getSimpleName() + "{" + "nodeURI=" + getNodeURI() + '}';
+    return getClass().getSimpleName()+ "{" +
+      "nodeURI=" + getNodeURI() +
+      '}';
   }
 }

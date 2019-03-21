@@ -21,6 +21,7 @@ import java.net.URI;
 /**
  * Created by fkleedorfer on 13.06.2016.
  */
-public interface RemoteNeedSpecificEvent {
+public interface RemoteNeedSpecificEvent 
+{
   URI getRemoteNeedURI();
 }

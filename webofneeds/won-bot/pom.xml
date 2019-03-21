@@ -17,10 +17,6 @@
     <build>
         <plugins>
             <plugin>
-				<groupId>net.revelc.code.formatter</groupId>
-				<artifactId>formatter-maven-plugin</artifactId>
-			</plugin>
-            <plugin>
                 <!-- don't run the integration tests in a regular build -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>

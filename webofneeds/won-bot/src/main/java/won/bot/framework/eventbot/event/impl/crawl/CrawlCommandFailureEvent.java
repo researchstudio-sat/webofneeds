@@ -21,12 +21,12 @@ import won.bot.framework.eventbot.event.impl.cmd.BaseCommandFailureEvent;
 /**
  * Indicates that the CrawlCommandEvent failed.
  */
-public class CrawlCommandFailureEvent extends BaseCommandFailureEvent<CrawlCommandEvent> {
-  public CrawlCommandFailureEvent(CrawlCommandEvent originalCommandEvent, String message) {
-    super(message, originalCommandEvent);
-  }
+public class CrawlCommandFailureEvent extends BaseCommandFailureEvent<CrawlCommandEvent>{
+    public CrawlCommandFailureEvent(CrawlCommandEvent originalCommandEvent, String message) {
+        super(message, originalCommandEvent);
+    }
 
-  public CrawlCommandFailureEvent(CrawlCommandEvent originalCommandEvent) {
-    super(originalCommandEvent);
-  }
+    public CrawlCommandFailureEvent(CrawlCommandEvent originalCommandEvent) {
+        super(originalCommandEvent);
+    }
 }

@@ -21,26 +21,27 @@ import won.bot.framework.eventbot.filter.AbstractDelegatingFilter;
 import won.bot.framework.eventbot.filter.EventFilter;
 
 /**
- * Delegating filter that counts how many times its delegate has accepted. Will
- * only accept a given number of times.
+ * Delegating filter that counts how many times its delegate has accepted. Will only accept a given number of times.
  */
-public class AcceptNTimesFilter extends AbstractDelegatingFilter {
+public class AcceptNTimesFilter extends AbstractDelegatingFilter
+{
   private int count = 0;
   private int targetCount = 0;
 
-  public AcceptNTimesFilter(final EventFilter delegate, final int targetCount) {
+  public AcceptNTimesFilter(final EventFilter delegate, final int targetCount)
+  {
     super(delegate);
     this.targetCount = targetCount;
   }
 
   @Override
-  public boolean accept(final Event event) {
+  public boolean accept(final Event event)
+  {
     boolean delegateAccepts = getDelegate().accept(event);
-    if (!delegateAccepts)
-      return false;
+    if (!delegateAccepts) return false;
     synchronized (this) {
       if (count < targetCount) {
-        count++;
+        count ++;
         return true;
       }
     }

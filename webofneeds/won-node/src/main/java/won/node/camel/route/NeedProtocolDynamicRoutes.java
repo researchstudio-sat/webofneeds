@@ -22,23 +22,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * User: LEIH-NB Date: 25.11.13
+ * User: LEIH-NB
+ * Date: 25.11.13
  */
 
-public class NeedProtocolDynamicRoutes extends RouteBuilder {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+public class NeedProtocolDynamicRoutes extends RouteBuilder
+{
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  private String from;
+    private String from;
 
-  public NeedProtocolDynamicRoutes(CamelContext camelContext, String from) {
-    super(camelContext);
-    this.from = from;
+    public NeedProtocolDynamicRoutes(CamelContext camelContext, String from){
+        super(camelContext);
+        this.from = from;
 
-  }
-
-  @Override
-  public void configure() throws Exception {
-    logger.info("adding dynamic route from({}) to the recipient found in the header 'remoteBrokerEndpoint'", from);
-    from(from).routeId(from).recipientList(header("remoteBrokerEndpoint"));
-  }
+    }
+    @Override
+    public void configure() throws Exception {
+        logger.info("adding dynamic route from({}) to the recipient found in the header 'remoteBrokerEndpoint'", from);
+        from(from).routeId(from)
+                .recipientList(header("remoteBrokerEndpoint"));
+    }
 }

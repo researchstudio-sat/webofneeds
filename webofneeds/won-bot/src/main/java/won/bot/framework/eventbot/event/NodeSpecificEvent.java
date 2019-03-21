@@ -21,6 +21,7 @@ import java.net.URI;
 /**
  * Interface for events that are need-specific.
  */
-public interface NodeSpecificEvent {
+public interface NodeSpecificEvent
+{
   public URI getNodeURI();
 }

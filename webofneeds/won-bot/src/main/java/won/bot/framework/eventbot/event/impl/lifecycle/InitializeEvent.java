@@ -21,5 +21,6 @@ import won.bot.framework.eventbot.event.BaseEvent;
 /**
  * The InitializeEvent informs listeners that the bot was asked to initialize.
  */
-public class InitializeEvent extends BaseEvent {
+public class InitializeEvent extends BaseEvent
+{
 }

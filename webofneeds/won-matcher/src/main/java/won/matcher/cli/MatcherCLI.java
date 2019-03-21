@@ -1,9 +1,14 @@
 package won.matcher.cli;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+
 import won.matcher.protocol.impl.MatcherProtocolNeedServiceClient;
 import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.exception.NoSuchNeedException;
@@ -15,14 +20,13 @@ import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Optional;
-
 /**
- * User: gabriel Date: 14.02.13 Time: 15:00
+ * User: gabriel
+ * Date: 14.02.13
+ * Time: 15:00
  */
-public class MatcherCLI implements CommandLineRunner {
+public class MatcherCLI implements CommandLineRunner
+{
 
   private static final Logger logger = LoggerFactory.getLogger(MatcherCLI.class);
 
@@ -32,6 +36,7 @@ public class MatcherCLI implements CommandLineRunner {
   private WonNodeInformationService wonNodeInformationService;
   @Autowired
   private LinkedDataSource linkedDataSource;
+
 
   @Override
   public void run(String... args) throws Exception {
@@ -55,10 +60,11 @@ public class MatcherCLI implements CommandLineRunner {
       }
     }
 
+
     try {
-      // TODO: Add rdf content
+      //TODO: Add rdf content
       client.hint(new URI(need1), new URI(need2), score, new URI(org), null,
-          createWonMessage(URI.create(need1), URI.create(need2), score, URI.create(org)));
+        createWonMessage(URI.create(need1), URI.create(need2), score, URI.create(org)));
     } catch (URISyntaxException e) {
       logger.error("Exception caught:", e);
     } catch (IllegalMessageForNeedStateException e) {
@@ -66,7 +72,7 @@ public class MatcherCLI implements CommandLineRunner {
     } catch (NoSuchNeedException e) {
       logger.error("Exception caught:", e);
     } catch (Exception e) {
-      e.printStackTrace(); // To change body of catch statement use File | Settings | File Templates.
+      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
     }
   }
 
@@ -75,13 +81,22 @@ public class MatcherCLI implements CommandLineRunner {
   }
 
   private WonMessage createWonMessage(URI needURI, URI otherNeedURI, double score, URI originator)
-      throws WonMessageBuilderException {
-    URI wonNode = WonLinkedDataUtils.getWonNodeURIForNeedOrConnection(needURI,
-        linkedDataSource.getDataForResource(needURI));
+    throws WonMessageBuilderException {
+    URI wonNode = WonLinkedDataUtils
+      .getWonNodeURIForNeedOrConnection(needURI, linkedDataSource.getDataForResource(needURI));
 
     return WonMessageBuilder
-        .setMessagePropertiesForHint(wonNodeInformationService.generateEventURI(wonNode), needURI, Optional.empty(),
-            wonNode, otherNeedURI, Optional.empty(), originator, score)
-        .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL).build();
+      .setMessagePropertiesForHint(
+        wonNodeInformationService.generateEventURI(
+          wonNode),
+        needURI,
+        Optional.empty(),
+        wonNode,
+        otherNeedURI,
+        Optional.empty(),
+        originator,
+        score)
+      .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL)
+      .build();
   }
 }

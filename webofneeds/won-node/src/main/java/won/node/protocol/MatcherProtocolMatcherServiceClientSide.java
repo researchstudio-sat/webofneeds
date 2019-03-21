@@ -16,15 +16,18 @@
 
 package won.node.protocol;
 
-import org.apache.jena.rdf.model.Model;
-import won.protocol.message.WonMessage;
-
 import java.net.URI;
 
+import org.apache.jena.rdf.model.Model;
+
+import won.protocol.message.WonMessage;
+
 /**
- * User: LEIH-NB Date: 10.04.14
+ * User: LEIH-NB
+ * Date: 10.04.14
  */
-public interface MatcherProtocolMatcherServiceClientSide {
+public interface MatcherProtocolMatcherServiceClientSide
+{
 
   public void matcherRegistered(final URI wonNodeURI, final WonMessage wonMessage);
 
@@ -33,6 +36,6 @@ public interface MatcherProtocolMatcherServiceClientSide {
   public void needActivated(final URI needURI, final WonMessage wonMessage);
 
   public void needDeactivated(final URI needURI, final WonMessage wonMessage);
-
+  
   public void needDeleted(final URI needURI, final WonMessage wonMessage);
 }

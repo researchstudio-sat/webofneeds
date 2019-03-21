@@ -16,52 +16,51 @@
 
 package won.bot.framework.eventbot.event.impl.command.create;
 
+import java.net.URI;
+
 import won.bot.framework.eventbot.event.BaseNeedSpecificEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandFailureEvent;
 
-import java.net.URI;
-
 /**
  * Indicates that need creation failed.
  */
-public class CreateNeedCommandFailureEvent extends BaseNeedSpecificEvent
-    implements MessageCommandFailureEvent, CreateNeedCommandResultEvent {
-  private final URI needUriBeforeCreation;
-  private CreateNeedCommandEvent createNeedCommandEvent;
-  private String message;
+public class CreateNeedCommandFailureEvent extends BaseNeedSpecificEvent implements MessageCommandFailureEvent, CreateNeedCommandResultEvent{
+    private final URI needUriBeforeCreation;
+    private CreateNeedCommandEvent createNeedCommandEvent;
+    private String message;
 
-  public CreateNeedCommandFailureEvent(URI needURI, URI needUriBeforeCreation,
-      CreateNeedCommandEvent createNeedCommandEvent, String message) {
-    super(needURI);
-    this.needUriBeforeCreation = needUriBeforeCreation;
-    this.createNeedCommandEvent = createNeedCommandEvent;
-    this.message = message;
-  }
+    public CreateNeedCommandFailureEvent(URI needURI, URI needUriBeforeCreation, CreateNeedCommandEvent createNeedCommandEvent, String message) {
+        super(needURI);
+        this.needUriBeforeCreation = needUriBeforeCreation;
+        this.createNeedCommandEvent = createNeedCommandEvent;
+        this.message = message;
+    }
 
-  public CreateNeedCommandFailureEvent(URI needURI, URI needUriBeforeCreation,
-      CreateNeedCommandEvent createNeedCommandEvent) {
-    super(needURI);
-    this.needUriBeforeCreation = needUriBeforeCreation;
-    this.createNeedCommandEvent = createNeedCommandEvent;
-  }
+    public CreateNeedCommandFailureEvent(URI needURI, URI needUriBeforeCreation, CreateNeedCommandEvent createNeedCommandEvent) {
+        super(needURI);
+        this.needUriBeforeCreation = needUriBeforeCreation;
+        this.createNeedCommandEvent = createNeedCommandEvent;
+    }
 
-  @Override
-  public MessageCommandEvent getOriginalCommandEvent() {
-    return createNeedCommandEvent;
-  }
 
-  public URI getNeedUriBeforeCreation() {
-    return needUriBeforeCreation;
-  }
 
-  @Override
-  public String getMessage() {
-    return message;
-  }
+    @Override
+    public MessageCommandEvent getOriginalCommandEvent() {
+        return createNeedCommandEvent;
+    }
 
-  @Override
-  public boolean isSuccess() {
-    return false;
-  }
+    public URI getNeedUriBeforeCreation() {
+        return needUriBeforeCreation;
+    }
+
+    @Override
+    public String getMessage() {
+        return message;
+    }
+
+    @Override
+    public boolean isSuccess() {
+        return false;
+    }
 }

@@ -23,5 +23,5 @@ import won.bot.framework.eventbot.event.impl.cmd.CommandResultEvent;
  */
 public interface MessageCommandResultEvent extends CommandResultEvent<MessageCommandEvent> {
 
-  public MessageCommandEvent getOriginalCommandEvent();
+    public MessageCommandEvent getOriginalCommandEvent();
 }

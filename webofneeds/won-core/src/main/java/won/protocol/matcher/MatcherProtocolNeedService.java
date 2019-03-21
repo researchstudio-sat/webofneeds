@@ -19,7 +19,9 @@ package won.protocol.matcher;
 import won.protocol.service.MatcherFacingNeedCommunicationService;
 
 /**
- * User: fkleedorfer Date: 31.10.12
+ * User: fkleedorfer
+ * Date: 31.10.12
  */
-public interface MatcherProtocolNeedService extends MatcherFacingNeedCommunicationService {
+public interface MatcherProtocolNeedService extends MatcherFacingNeedCommunicationService
+{
 }

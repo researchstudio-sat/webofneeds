@@ -17,21 +17,22 @@
 package won.protocol.exception;
 
 /**
- * User: LEIH-NB Date: 13.12.13
+ * User: LEIH-NB
+ * Date: 13.12.13
  */
 public class CamelConfigurationFailedException extends WonProtocolException {
-  public CamelConfigurationFailedException() {
-  }
+    public CamelConfigurationFailedException() {
+    }
 
-  public CamelConfigurationFailedException(String message) {
-    super(message);
-  }
+    public CamelConfigurationFailedException(String message) {
+        super(message);
+    }
 
-  public CamelConfigurationFailedException(String message, Throwable cause) {
-    super(message, cause);
-  }
+    public CamelConfigurationFailedException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-  public CamelConfigurationFailedException(Throwable cause) {
-    super(cause);
-  }
+    public CamelConfigurationFailedException(Throwable cause) {
+        super(cause);
+    }
 }

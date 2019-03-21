@@ -16,27 +16,40 @@
 
 package won.protocol.model;
 
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.MapsId;
+import javax.persistence.OneToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
 import won.protocol.model.parentaware.ParentAware;
 import won.protocol.model.parentaware.VersionedEntity;
 
-import javax.persistence.*;
-import java.util.Date;
-
 @Entity
-@Table(name = "connection_container")
-public class ConnectionContainer implements ParentAware<Need>, VersionedEntity {
+@Table(name="connection_container")
+public class ConnectionContainer implements ParentAware<Need>, VersionedEntity
+{
   @Id
-  @Column(name = "id")
+  @Column( name = "id" )
   protected Long id;
 
-  @Column(name = "version", columnDefinition = "integer DEFAULT 0", nullable = false)
+  @Column(name="version", columnDefinition = "integer DEFAULT 0", nullable = false)
   private int version = 0;
 
   @Temporal(TemporalType.TIMESTAMP)
-  @Column(name = "last_update", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+  @Column(name="last_update", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
   private Date lastUpdate = new Date();
 
-  @OneToOne(fetch = FetchType.LAZY, optional = false)
+  @OneToOne (fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "need_id")
   @MapsId
   private Need need;
@@ -70,9 +83,9 @@ public class ConnectionContainer implements ParentAware<Need>, VersionedEntity {
   public void setNeed(final Need need) {
     this.need = need;
   }
-
+  
   public Long getId() {
-    return this.id;
+      return this.id;
   }
 
   public ConnectionContainer(final Need need) {

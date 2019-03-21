@@ -16,16 +16,18 @@
 
 package won.node.camel;
 
+import java.net.URI;
+
 import org.apache.camel.RoutesBuilder;
+
 import won.node.camel.route.NeedProtocolDynamicRoutes;
 import won.protocol.jms.NeedBasedCamelConfiguratorImpl;
-
-import java.net.URI;
 
 //import won.node.camel.routes.NeedProtocolDynamicRoutes;
 
 /**
- * User: LEIH-NB Date: 26.02.14
+ * User: LEIH-NB
+ * Date: 26.02.14
  */
 public class NeedProtocolCamelConfiguratorImpl extends NeedBasedCamelConfiguratorImpl {
 

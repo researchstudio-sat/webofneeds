@@ -18,14 +18,15 @@ package won.protocol.util;
 
 import java.util.Date;
 
-public class Interval {
+public class Interval
+{
   final Date from;
   final Date to;
 
-  public Interval(final Date from, final Date to) {
+  public Interval(final Date from, final Date to)
+  {
     if (from == null) {
-      if (to == null)
-        throw new IllegalArgumentException("At least one date must be specified!");
+      if (to == null) throw new IllegalArgumentException("At least one date must be specified!");
       this.from = new Date(0);
       this.to = to;
     } else if (to == null) {
@@ -39,7 +40,6 @@ public class Interval {
       this.from = from;
     }
   }
-
   public Date getFrom() {
     return from;
   }

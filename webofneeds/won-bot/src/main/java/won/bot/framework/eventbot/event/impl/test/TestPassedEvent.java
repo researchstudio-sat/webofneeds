@@ -27,3 +27,4 @@ public class TestPassedEvent extends TestFinishedEvent {
   }
 
 }
+

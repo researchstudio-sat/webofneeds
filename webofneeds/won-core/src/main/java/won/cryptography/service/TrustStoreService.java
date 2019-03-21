@@ -1,18 +1,21 @@
 package won.cryptography.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import won.cryptography.service.keystore.FileBasedKeyStoreService;
-
 import java.io.File;
 import java.io.IOException;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import won.cryptography.service.keystore.FileBasedKeyStoreService;
+
 /**
- * User: ypanchenko Date: 05.08.2015
+ * User: ypanchenko
+ * Date: 05.08.2015
  */
-public class TrustStoreService {
+public class TrustStoreService
+{
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -36,18 +39,18 @@ public class TrustStoreService {
   }
 
   public boolean isCertKnown(Certificate cert) {
-    boolean isKnown = serviceImpl.getCertificateAlias(cert) != null;
-    logger.debug("Presented certificate is known: {}", isKnown);
+    boolean isKnown =  serviceImpl.getCertificateAlias(cert) != null;
+    logger.debug("Presented certificate is known: {}", isKnown );
     return isKnown;
   }
 
-  // public boolean isAliasKnown(String alias) {
-  // return serviceImpl.getCertificate(alias) != null;
-  // }
-  //
-  // public String getCertificateAlias(Certificate cert) {
-  // return serviceImpl.getCertificateAlias(cert);
-  // }
+//  public boolean isAliasKnown(String alias) {
+//    return serviceImpl.getCertificate(alias) != null;
+//  }
+//
+//  public String getCertificateAlias(Certificate cert) {
+//    return serviceImpl.getCertificateAlias(cert);
+//  }
 
   public void addCertificate(String alias, Certificate cert, boolean replace) throws IOException {
     logger.debug("adding certificate for alias {}, replace: {}", alias, replace);

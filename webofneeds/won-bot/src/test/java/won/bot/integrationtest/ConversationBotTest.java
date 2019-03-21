@@ -16,6 +16,9 @@
 
 package won.bot.integrationtest;
 
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.TimeUnit;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,20 +31,19 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.support.PeriodicTrigger;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
 import won.bot.framework.eventbot.event.impl.lifecycle.WorkDoneEvent;
 import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
 import won.bot.framework.manager.impl.SpringAwareBotManagerImpl;
 import won.bot.impl.ConversationBot;
 
-import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.TimeUnit;
-
 /**
  * Integration test.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "classpath:/spring/app/simple2NeedConversationTest.xml" })
-public class ConversationBotTest {
+@ContextConfiguration(locations = {"classpath:/spring/app/simple2NeedConversationTest.xml"})
+public class ConversationBotTest
+{
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -61,13 +63,13 @@ public class ConversationBotTest {
    * This is run before each @TestD method.
    */
   @Before
-  public void before() {
-    // create a bot instance and auto-wire it
+  public void before(){
+    //create a bot instance and auto-wire it
     AutowireCapableBeanFactory beanFactory = applicationContext.getAutowireCapableBeanFactory();
     this.bot = (MyBot) beanFactory.autowire(MyBot.class, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
     Object botBean = beanFactory.initializeBean(this.bot, "mybot");
     this.bot = (MyBot) botBean;
-    // the bot also needs a trigger so its act() method is called regularly.
+    //the bot also needs a trigger so its act() method is called regularly.
     // (there is no trigger bean in the context)
     PeriodicTrigger trigger = new PeriodicTrigger(ACT_LOOP_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
     trigger.setInitialDelay(ACT_LOOP_INITIAL_DELAY_MILLIS);
@@ -76,32 +78,33 @@ public class ConversationBotTest {
 
   /**
    * The main test method.
-   *
    * @throws Exception
    */
   @Test
-  public void testConversationBot() throws Exception {
+  public void testConversationBot() throws Exception
+  {
     logger.info("starting test case testCreate2NeedsShortConversationBot");
-    // adding the bot to the bot manager will cause it to be initialized.
-    // at that point, the trigger starts.
+    //adding the bot to the bot manager will cause it to be initialized.
+    //at that point, the trigger starts.
     botManager.addBot(this.bot);
-    // the bot should now be running. We have to wait for it to finish before we
-    // can check the results:
-    // Together with the barrier.await() in the bot's listener, this trips the
-    // barrier
-    // and both threads continue.
+    //the bot should now be running. We have to wait for it to finish before we
+    //can check the results:
+    //Together with the barrier.await() in the bot's listener, this trips the barrier
+    //and both threads continue.
     this.bot.getBarrier().await();
-    // now check the results!
+    //now check the results!
     this.bot.executeAsserts();
     logger.info("finishing test case testCreate2NeedsShortConversationBot");
   }
 
+
   /**
-   * We create a subclass of the bot we want to test here so that we can add a
-   * listener to its internal event bus and to access its listeners, which record
-   * information during the run that we later check with asserts.
+   * We create a subclass of the bot we want to test here so that we can
+   * add a listener to its internal event bus and to access its listeners, which
+   * record information during the run that we later check with asserts.
    */
-  public static class MyBot extends ConversationBot {
+  public static class MyBot extends ConversationBot
+  {
     /**
      * Used for synchronization with the @TestD method: it should wait at the
      * barrier until our bot is done, then execute the asserts.
@@ -111,55 +114,60 @@ public class ConversationBotTest {
     /**
      * Default constructor is required for instantiation through Spring.
      */
-    public MyBot() {
+    public MyBot(){
     }
 
     @Override
-    protected void initializeEventListeners() {
-      // of course, let the real bot implementation initialize itself
+    protected void initializeEventListeners()
+    {
+      //of course, let the real bot implementation initialize itself
       super.initializeEventListeners();
-      // now, add a listener to the WorkDoneEvent.
-      // its only purpose is to trip the CyclicBarrier instance that
+      //now, add a listener to the WorkDoneEvent.
+      //its only purpose is to trip the CyclicBarrier instance that
       // the test method is waiting on
-      getEventBus().subscribe(WorkDoneEvent.class, new ActionOnEventListener(getEventListenerContext(),
+      getEventBus().subscribe(WorkDoneEvent.class,
+        new ActionOnEventListener(
+          getEventListenerContext(),
           new TripBarrierAction(getEventListenerContext(), barrier)));
     }
 
-    public CyclicBarrier getBarrier() {
+    public CyclicBarrier getBarrier()
+    {
       return barrier;
     }
 
     /**
      * Here we check the results of the bot's execution.
      */
-    public void executeAsserts() {
-      // 2 act events
+    public void executeAsserts()
+    {
+      //2 act events
       Assert.assertEquals(2, this.needCreator.getEventCount());
       Assert.assertEquals(0, this.needCreator.getExceptionCount());
-      // 2 create need events
+      //2 create need events
 
       Assert.assertEquals(2, this.needConnector.getEventCount());
       Assert.assertEquals(0, this.needConnector.getExceptionCount());
       // TODO: should here be 1 or 2? Before was 2: 1 connect, 1 open
       Assert.assertEquals(1, this.autoOpener.getEventCount());
       Assert.assertEquals(0, this.autoOpener.getExceptionCount());
-      // 10 messages
+      //10 messages
       Assert.assertEquals(10, this.autoResponder.getEventCount());
       Assert.assertEquals(0, this.autoResponder.getExceptionCount());
-      // 10 messages
+      //10 messages
       Assert.assertEquals(10, this.connectionCloser.getEventCount());
       Assert.assertEquals(0, this.connectionCloser.getExceptionCount());
-      // 1 close (one sent, one received - but for sending we create no event)
+      //1 close (one sent, one received - but for sending we create no event)
       Assert.assertEquals(1, this.needDeactivator.getEventCount());
       Assert.assertEquals(0, this.needDeactivator.getExceptionCount());
-      // 2 needs deactivated
+      //2 needs deactivated
       Assert.assertEquals(2, this.workDoneSignaller.getEventCount());
       Assert.assertEquals(0, this.workDoneSignaller.getExceptionCount());
 
-      // TODO: there is more to check:
-      // * what does the RDF look like?
+      //TODO: there is more to check:
+      //* what does the RDF look like?
       // --> pull it from the needURI/ConnectionURI and check contents
-      // * what does the database look like?
+      //* what does the database look like?
     }
 
   }

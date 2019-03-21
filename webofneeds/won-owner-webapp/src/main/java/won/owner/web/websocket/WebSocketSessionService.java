@@ -16,13 +16,16 @@
 
 package won.owner.web.websocket;
 
-import org.springframework.web.socket.WebSocketSession;
-import won.owner.model.User;
 
 import java.net.URI;
 import java.util.Set;
 
-public class WebSocketSessionService {
+import org.springframework.web.socket.WebSocketSession;
+
+import won.owner.model.User;
+
+public class WebSocketSessionService
+{
   private WebSocketSessionMapping<Long> userIdToSession = new WebSocketSessionMapping<Long>();
   private WebSocketSessionMapping<URI> needUriToSession = new WebSocketSessionMapping<URI>();
 
@@ -49,5 +52,7 @@ public class WebSocketSessionService {
   public Set<WebSocketSession> getWebSocketSessions(URI needUri) {
     return this.needUriToSession.getWebSocketSessions(needUri);
   }
+
+
 
 }

@@ -48,11 +48,11 @@ public class MatcherProtocolTestBot extends EventBot {
 
   private static final int NO_OF_NEEDS = 2;
 
-  // we use protected members so we can extend the class and
-  // access the listeners for unit test assertions and stats
+  //we use protected members so we can extend the class and
+  //access the listeners for unit test assertions and stats
   //
-  // we use BaseEventListener as their types so we can access the generic
-  // functionality offered by that class
+  //we use BaseEventListener as their types so we can access the generic
+  //functionality offered by that class
   protected BaseEventListener matcherRegistrator;
   protected BaseEventListener needCreator;
   protected BaseEventListener matcher;
@@ -66,45 +66,56 @@ public class MatcherProtocolTestBot extends EventBot {
   }
 
   @Override
-  protected void initializeEventListeners() {
+  protected void initializeEventListeners()
+  {
     EventListenerContext ctx = getEventListenerContext();
     EventBus bus = getEventBus();
 
-    // subscribe this bot with the WoN nodes' 'new need' topic
+    //subscribe this bot with the WoN nodes' 'new need' topic
     RegisterMatcherAction registerMatcherAction = new RegisterMatcherAction(ctx);
     this.matcherRegistrator = new ActionOnEventListener(ctx, registerMatcherAction, 1);
     bus.subscribe(ActEvent.class, this.matcherRegistrator);
-    RandomDelayedAction delayedRegistration = new RandomDelayedAction(ctx, registrationMatcherRetryInterval,
-        registrationMatcherRetryInterval, 0, registerMatcherAction);
+    RandomDelayedAction delayedRegistration = new RandomDelayedAction(
+      ctx, registrationMatcherRetryInterval, registrationMatcherRetryInterval, 0, registerMatcherAction);
     ActionOnEventListener matcherRetryRegistrator = new ActionOnEventListener(ctx, delayedRegistration);
     bus.subscribe(MatcherRegisterFailedEvent.class, matcherRetryRegistrator);
 
-    // create needs every trigger execution until 2 needs are created
-    this.needCreator = new ActionOnEventListener(ctx,
-        new CreateNeedWithFacetsAction(ctx, getBotContextWrapper().getNeedCreateListName()), NO_OF_NEEDS);
+    //create needs every trigger execution until 2 needs are created
+    this.needCreator = new ActionOnEventListener(
+        ctx,
+        new CreateNeedWithFacetsAction(ctx, getBotContextWrapper().getNeedCreateListName()),
+        NO_OF_NEEDS
+    );
 
-    bus.subscribe(MatcherRegisteredEvent.class, new ActionOnEventListener(ctx, new BaseEventBotAction(ctx) {
+    bus.subscribe(MatcherRegisteredEvent.class, new ActionOnEventListener(ctx, new BaseEventBotAction(ctx)
+    {
       @Override
       protected void doRun(final Event event, EventListener executingListener) throws Exception {
         getEventListenerContext().getEventBus().subscribe(ActEvent.class, needCreator);
       }
     }, 1));
 
-    this.matcherNotifier = new ActionOnceAfterNEventsListener(ctx, 4,
-        new LogAction(ctx, "Received all events for newly created needs."));
+    this.matcherNotifier = new ActionOnceAfterNEventsListener(ctx,4,new LogAction(ctx,
+      "Received all events for newly created needs."));
     bus.subscribe(NeedCreatedEventForMatcher.class, matcherNotifier);
     bus.subscribe(NeedCreatedEvent.class, matcherNotifier);
 
-    this.matcher = new ActionOnceAfterNEventsListener(ctx, NO_OF_NEEDS, new MatchNeedsAction(ctx));
-    // count until 1 need is created, then create a comment facet
+    this.matcher = new ActionOnceAfterNEventsListener(
+            ctx,
+        NO_OF_NEEDS, new MatchNeedsAction(ctx)
+    );
+    //count until 1 need is created, then create a comment facet
     bus.subscribe(NeedCreatedEvent.class, this.matcher);
 
-    this.allNeedsDeactivator = new ActionOnEventListener(ctx, new DeactivateAllNeedsAction(ctx), 1);
-    bus.subscribe(HintFromMatcherEvent.class, this.allNeedsDeactivator);
+   this.allNeedsDeactivator = new ActionOnEventListener(ctx, new DeactivateAllNeedsAction(ctx), 1);
+   bus.subscribe(HintFromMatcherEvent.class, this.allNeedsDeactivator);
 
-    this.workDoneSignaller = new ActionOnceAfterNEventsListener(ctx, 4, new SignalWorkDoneAction(ctx));
-    bus.subscribe(NeedDeactivatedEvent.class, this.workDoneSignaller);
-    bus.subscribe(NeedDeactivatedEventForMatcher.class, this.workDoneSignaller);
+  this.workDoneSignaller = new ActionOnceAfterNEventsListener(
+          ctx,
+      4, new SignalWorkDoneAction(ctx)
+  );
+  bus.subscribe(NeedDeactivatedEvent.class, this.workDoneSignaller);
+  bus.subscribe(NeedDeactivatedEventForMatcher.class, this.workDoneSignaller);
 
   }
 

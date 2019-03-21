@@ -16,6 +16,10 @@
 
 package won.protocol.util.linkeddata.impl;
 
+import java.io.StringWriter;
+import java.net.URI;
+import java.util.Iterator;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.Lang;
@@ -26,17 +30,14 @@ import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import won.protocol.util.linkeddata.CrawlerCallback;
 
-import java.io.StringWriter;
-import java.net.URI;
-import java.util.Iterator;
-
 /**
- * Crawler callback implementation that writes crawled data to a predefined
- * sparql endpoint.
+ * Crawler callback implementation that writes crawled data to a predefined sparql endpoint.
  */
-public class SparqlUpdateCrawlerCallback implements CrawlerCallback {
+public class SparqlUpdateCrawlerCallback implements CrawlerCallback
+{
   private final Logger logger = LoggerFactory.getLogger(getClass());
   String sparqlEndpoint = null;
 
@@ -60,11 +61,16 @@ public class SparqlUpdateCrawlerCallback implements CrawlerCallback {
       Model model = dataset.getNamedModel(graphName);
       StringWriter sw = new StringWriter();
       RDFDataMgr.write(sw, model, Lang.NTRIPLES);
-      quadpatterns.append("\nINSERT DATA { GRAPH <").append(graphName).append("> { ").append(sw).append("}};\n");
+      quadpatterns.append("\nINSERT DATA { GRAPH <")
+                  .append(graphName)
+                  .append("> { ")
+                  .append(sw)
+                  .append("}};\n");
 
       logger.info(quadpatterns.toString());
       UpdateRequest update = UpdateFactory.create(quadpatterns.toString());
-      UpdateProcessRemote riStore = (UpdateProcessRemote) UpdateExecutionFactory.createRemote(update, sparqlEndpoint);
+      UpdateProcessRemote riStore = (UpdateProcessRemote)
+        UpdateExecutionFactory.createRemote(update, sparqlEndpoint);
       riStore.execute();
 
     }

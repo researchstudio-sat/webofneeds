@@ -28,54 +28,62 @@ import org.hibernate.proxy.HibernateProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
+
 public class ParentAwareFlushEventListener implements FlushEntityEventListener {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  public static final ParentAwareFlushEventListener INSTANCE = new ParentAwareFlushEventListener();
+    public static final ParentAwareFlushEventListener INSTANCE = new ParentAwareFlushEventListener();
 
-  @Override
-  public void onFlushEntity(final FlushEntityEvent event) throws HibernateException {
-    final EntityEntry entry = event.getEntityEntry();
-    final Object entity = event.getEntity();
-    final boolean mightBeDirty = entry.requiresDirtyCheck(entity);
-    if (mightBeDirty && entity instanceof ParentAware) {
-      ParentAware parentAware = (ParentAware) entity;
-      if (updated(event)) {
-        VersionedEntity parent = parentAware.getParent();
-        if (parent == null)
-          return;
-        if (logger.isDebugEnabled()) {
-          logger.debug("Incrementing {} entity version because a {} child entity has been updated", parent, entity);
+    @Override
+    public void onFlushEntity(final FlushEntityEvent event) throws HibernateException {
+        final EntityEntry entry = event.getEntityEntry();
+        final Object entity = event.getEntity();
+        final boolean mightBeDirty = entry.requiresDirtyCheck(entity);
+        if (mightBeDirty && entity instanceof ParentAware) {
+            ParentAware parentAware = (ParentAware) entity;
+            if (updated(event)) {
+                VersionedEntity parent = parentAware.getParent();
+                if (parent == null) return;
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Incrementing {} entity version because a {} child entity has been updated", parent, entity);
+                }
+                if (! (parent instanceof HibernateProxy)) {
+                    //we have to do the increment manually
+                    parent.incrementVersion();
+                }
+                Hibernate.initialize(parent);
+                event.getSession().save(parent);
+            }
         }
-        if (!(parent instanceof HibernateProxy)) {
-          // we have to do the increment manually
-          parent.incrementVersion();
-        }
-        Hibernate.initialize(parent);
-        event.getSession().save(parent);
-      }
-    }
-  }
-
-  private boolean deleted(FlushEntityEvent event) {
-    return event.getEntityEntry().getStatus() == Status.DELETED;
-  }
-
-  private boolean updated(FlushEntityEvent event) {
-    final EntityEntry entry = event.getEntityEntry();
-    final Object entity = event.getEntity();
-
-    int[] dirtyProperties;
-    EntityPersister persister = entry.getPersister();
-    final Object[] values = event.getPropertyValues();
-    SessionImplementor session = event.getSession();
-
-    if (event.hasDatabaseSnapshot()) {
-      dirtyProperties = persister.findModified(event.getDatabaseSnapshot(), values, entity, session);
-    } else {
-      dirtyProperties = persister.findDirty(values, entry.getLoadedState(), entity, session);
     }
 
-    return dirtyProperties != null;
-  }
+
+    private boolean deleted(FlushEntityEvent event) {
+        return event.getEntityEntry().getStatus() == Status.DELETED;
+    }
+
+    private boolean updated(FlushEntityEvent event) {
+        final EntityEntry entry = event.getEntityEntry();
+        final Object entity = event.getEntity();
+
+        int[] dirtyProperties;
+        EntityPersister persister = entry.getPersister();
+        final Object[] values = event.getPropertyValues();
+        SessionImplementor session = event.getSession();
+
+        if (event.hasDatabaseSnapshot()) {
+            dirtyProperties = persister.findModified(
+                    event.getDatabaseSnapshot(), values, entity, session
+            );
+        } else {
+            dirtyProperties = persister.findDirty(
+                    values, entry.getLoadedState(), entity, session
+            );
+        }
+
+        return dirtyProperties != null;
+    }
 }
+
+

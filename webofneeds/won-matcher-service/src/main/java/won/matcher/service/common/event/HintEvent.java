@@ -1,16 +1,18 @@
 package won.matcher.service.common.event;
 
-import org.apache.jena.rdf.model.Model;
-
 import java.io.Serializable;
 import java.net.URI;
 
+import org.apache.jena.rdf.model.Model;
+
 /**
  * Event is used to generate hints inside the matcher-service
- * <p>
- * User: hfriedrich Date: 23.06.2015
+ *
+ * User: hfriedrich
+ * Date: 23.06.2015
  */
-public class HintEvent implements Serializable {
+public class HintEvent implements Serializable
+{
   private String fromNeedUri;
   private String fromWonNodeUri;
   private String toNeedUri;
@@ -25,8 +27,8 @@ public class HintEvent implements Serializable {
   private String serializationLangName;
   private String serializationLangContentType;
 
-  public HintEvent(String fromWonNodeUri, String fromNeedUri, String toWonNodeUri, String toNeedUri, String matcherUri,
-      double score) {
+  public HintEvent(String fromWonNodeUri, String fromNeedUri, String toWonNodeUri,
+                   String toNeedUri, String matcherUri, double score) {
 
     this.fromWonNodeUri = fromWonNodeUri;
     this.fromNeedUri = fromNeedUri;
@@ -60,9 +62,7 @@ public class HintEvent implements Serializable {
     return score;
   }
 
-  public Model deserializeExplanationModel() {
-    throw new UnsupportedOperationException();
-  }
+  public Model deserializeExplanationModel() { throw new UnsupportedOperationException(); }
 
   public URI getGeneratedEventUri() {
     return generatedEventUri;
@@ -96,7 +96,7 @@ public class HintEvent implements Serializable {
 
   @Override
   public String toString() {
-    return "HintEvent: (" + getFromWonNodeUri() + ", " + getFromNeedUri() + ", " + getToWonNodeUri() + ", "
-        + getToNeedUri() + ", " + getMatcherUri() + ", " + getScore() + ")";
+    return "HintEvent: (" + getFromWonNodeUri() + ", " + getFromNeedUri() + ", " + getToWonNodeUri() + ", "+
+      getToNeedUri() + ", " + getMatcherUri() + ", " + getScore() + ")";
   }
 }

@@ -7,10 +7,12 @@ import java.util.LinkedList;
 
 /**
  * Event can hold multiple {@link HintEvent} objects
- * <p>
- * User: hfriedrich Date: 23.06.2015
+ *
+ * User: hfriedrich
+ * Date: 23.06.2015
  */
-public class BulkHintEvent implements Serializable {
+public class BulkHintEvent implements Serializable
+{
   private Collection<HintEvent> hintEvents;
 
   public BulkHintEvent() {
@@ -20,7 +22,7 @@ public class BulkHintEvent implements Serializable {
   public void addHintEvent(HintEvent hintEvent) {
     hintEvents.add(hintEvent);
   }
-
+  
   public void addHintEvents(Collection<HintEvent> hintEvents) {
     this.hintEvents.addAll(hintEvents);
   }

@@ -17,15 +17,17 @@
 package won.node.camel.processor.general;
 
 import org.apache.camel.Exchange;
+
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
 
 /**
- * Sends the WonMessage found in the exchange's in (in the 'wonMessage' header)
- * to the respective remote WoN node or delivers it locally.
+ * Sends the WonMessage found in the exchange's in (in the 'wonMessage' header) to
+ * the respective remote WoN node or delivers it locally.
  */
-public class ToNodeSender extends AbstractCamelProcessor {
+public class ToNodeSender extends AbstractCamelProcessor
+{
   @Override
   public void process(final Exchange exchange) throws Exception {
     WonMessage message = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);

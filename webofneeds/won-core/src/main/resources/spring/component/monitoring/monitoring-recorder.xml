@@ -24,24 +24,24 @@
 
     <!-- expects a bean 'taskScheduler', a spring task scheduler -->
     <task:scheduled-tasks scheduler="taskScheduler">
-        <task:scheduled ref="monitoringStatsRecorderTask" method="run" trigger="monitoringStatsRecorderTrigger"/>
+        <task:scheduled ref="monitoringStatsRecorderTask" method="run" trigger="monitoringStatsRecorderTrigger" />
     </task:scheduled-tasks>
 
     <bean id="monitoringStatsRecorderTrigger" class="org.springframework.scheduling.support.PeriodicTrigger">
-        <constructor-arg name="period" value="${monitoring.interval.seconds}"/>
-        <constructor-arg name="timeUnit" value="SECONDS"/>
+        <constructor-arg name="period" value="${monitoring.interval.seconds}" />
+        <constructor-arg name="timeUnit" value="SECONDS" />
     </bean>
 
     <bean id="monitoringStatsRecorderTask" class="won.monitoring.MonitoringStatisticsRecorderTask">
         <property name="resetMonitorAfterRecording" value="${monitoring.reset.after.output}"/>
         <property name="monitoringResetter">
-            <bean class="won.monitoring.simon.SimonResetter"/>
+            <bean class="won.monitoring.simon.SimonResetter" />
         </property>
         <property name="monitoringStatisticsRecorders">
             <list>
-                <bean class="won.monitoring.simon.SimonSysoutStatisticsRecorder"/>
+                <bean class="won.monitoring.simon.SimonSysoutStatisticsRecorder" />
                 <bean class="won.monitoring.simon.SimonCsvStatisticsRecorder">
-                    <property name="outputDirectory" value="${monitoring.output.dir}"/>
+                    <property name="outputDirectory" value="${monitoring.output.dir}" />
                 </bean>
             </list>
         </property>

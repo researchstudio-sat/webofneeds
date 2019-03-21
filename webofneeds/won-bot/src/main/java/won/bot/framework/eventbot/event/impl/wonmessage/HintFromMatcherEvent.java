@@ -22,25 +22,25 @@ import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageType;
 import won.protocol.model.Match;
 
-public class HintFromMatcherEvent extends BaseEvent implements MessageEvent {
-  private final Match match;
-  final WonMessage wonMessage;
+public class HintFromMatcherEvent extends BaseEvent  implements MessageEvent {
+    private final Match match;
+    final WonMessage wonMessage;
 
-  public HintFromMatcherEvent(final Match match, final WonMessage wonMessage) {
-    this.match = match;
-    this.wonMessage = wonMessage;
-  }
+    public HintFromMatcherEvent(final Match match, final WonMessage wonMessage) {
+        this.match = match;
+        this.wonMessage = wonMessage;
+    }
 
-  public Match getMatch() {
-    return match;
-  }
+    public Match getMatch() {
+      return match;
+    }
 
-  public WonMessage getWonMessage() {
-    return wonMessage;
-  }
+    public WonMessage getWonMessage() {
+        return wonMessage;
+    }
 
-  @Override
-  public WonMessageType getWonMessageType() {
-    return this.wonMessage.getMessageType();
-  }
+    @Override
+    public WonMessageType getWonMessageType() {
+        return this.wonMessage.getMessageType();
+    }
 }

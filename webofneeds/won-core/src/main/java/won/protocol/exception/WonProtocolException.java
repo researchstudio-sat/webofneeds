@@ -17,26 +17,32 @@
 package won.protocol.exception;
 
 /**
- * User: fkleedorfer Date: 02.11.12
+ * User: fkleedorfer
+ * Date: 02.11.12
  */
-public class WonProtocolException extends Exception {
-  public WonProtocolException() {
+public class WonProtocolException extends Exception
+{
+  public WonProtocolException()
+  {
     super();
   }
 
-  public WonProtocolException(final String message) {
+  public WonProtocolException(final String message)
+  {
     super(message);
   }
 
-  public WonProtocolException(final String message, final Throwable cause) {
+  public WonProtocolException(final String message, final Throwable cause)
+  {
     super(message, cause);
   }
 
-  public WonProtocolException(final Throwable cause) {
+  public WonProtocolException(final Throwable cause)
+  {
     super(cause);
   }
 
-  protected static String safeToString(Object o) {
+  protected static String safeToString(Object o){
     return o == null ? "null" : o.toString();
   }
 }

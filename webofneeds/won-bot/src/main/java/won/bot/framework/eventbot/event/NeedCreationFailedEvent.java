@@ -19,11 +19,11 @@ package won.bot.framework.eventbot.event;
 import java.net.URI;
 
 /**
- * Event indicating that the attempt to create a need on the specified won node
- * failed.
+ * Event indicating that the attempt to create a need on the specified won node failed.
  */
-public class NeedCreationFailedEvent extends BaseEvent {
-  // the URI the need had before a new need uri was created
+public class NeedCreationFailedEvent extends BaseEvent
+{
+  //the URI the need had before a new need uri was created
   private URI needUriBeforeCreation;
   private URI wonNodeURI;
 

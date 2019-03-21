@@ -7,16 +7,15 @@ import org.springframework.context.event.SimpleApplicationEventMulticaster;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
 /**
- * This is necessary so we make the published ApplicationEvents to be handled
- * asynchronously
+ * This is necessary so we make the published ApplicationEvents to be handled asynchronously
  */
 @Configuration
 public class AsynchronousSpringEventsConfig {
-  @Bean(name = "applicationEventMulticaster")
-  public ApplicationEventMulticaster simpleApplicationEventMulticaster() {
-    SimpleApplicationEventMulticaster eventMulticaster = new SimpleApplicationEventMulticaster();
+    @Bean(name = "applicationEventMulticaster")
+    public ApplicationEventMulticaster simpleApplicationEventMulticaster() {
+        SimpleApplicationEventMulticaster eventMulticaster = new SimpleApplicationEventMulticaster();
 
-    eventMulticaster.setTaskExecutor(new SimpleAsyncTaskExecutor());
-    return eventMulticaster;
-  }
+        eventMulticaster.setTaskExecutor(new SimpleAsyncTaskExecutor());
+        return eventMulticaster;
+    }
 }

@@ -7,23 +7,33 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+
 import won.cryptography.utils.TestSigningUtils;
 import won.cryptography.utils.TestingKeys;
 
 /**
- * User: ypanchenko Date: 14.07.2014
+ * User: ypanchenko
+ * Date: 14.07.2014
  */
 @Ignore
-public class WonVerifierTest {
+public class WonVerifierTest
+{
 
   private static final String RESOURCE_FILE = "/won-signed-messages/create-need-msg.trig";
 
-  private static final String NEED_CORE_DATA_URI = "http://localhost:8080/won/resource/need/3144709509622353000/core/#data";
-  private static final String NEED_CORE_DATA_SIG_URI = "http://localhost:8080/won/resource/need/3144709509622353000/core/#data-sig";
-  private static final String EVENT_ENV1_URI = "http://localhost:8080/won/resource/event/7719577021233193000#data";
-  private static final String EVENT_ENV1_SIG_URI = "http://localhost:8080/won/resource/event/7719577021233193000#data-sig";
-  private static final String EVENT_ENV2_URI = "http://localhost:8080/won/resource/event/7719577021233193000#envelope-s7gl";
-  private static final String EVENT_ENV2_SIG_URI = "http://localhost:8080/won/resource/event/7719577021233193000#envelope-s7gl-sig";
+  private static final String NEED_CORE_DATA_URI =
+    "http://localhost:8080/won/resource/need/3144709509622353000/core/#data";
+  private static final String NEED_CORE_DATA_SIG_URI =
+    "http://localhost:8080/won/resource/need/3144709509622353000/core/#data-sig";
+  private static final String EVENT_ENV1_URI =
+    "http://localhost:8080/won/resource/event/7719577021233193000#data";
+  private static final String EVENT_ENV1_SIG_URI =
+    "http://localhost:8080/won/resource/event/7719577021233193000#data-sig";
+  private static final String EVENT_ENV2_URI =
+    "http://localhost:8080/won/resource/event/7719577021233193000#envelope-s7gl";
+  private static final String EVENT_ENV2_SIG_URI =
+    "http://localhost:8080/won/resource/event/7719577021233193000#envelope-s7gl-sig";
+
 
   TestingKeys keys;
 
@@ -33,12 +43,14 @@ public class WonVerifierTest {
     keys = new TestingKeys(TestSigningUtils.KEYS_FILE);
   }
 
+
   @Test
   public void testVerifyCreateNeedData() throws Exception {
 
     // create dataset that contains need core data graph and its signature graph
-    Dataset testDataset = TestSigningUtils.prepareTestDatasetFromNamedGraphs(RESOURCE_FILE,
-        new String[] { NEED_CORE_DATA_URI, NEED_CORE_DATA_SIG_URI });
+    Dataset testDataset = TestSigningUtils.prepareTestDatasetFromNamedGraphs(
+      RESOURCE_FILE, new String[]{NEED_CORE_DATA_URI, NEED_CORE_DATA_SIG_URI});
+
 
     // verify
     WonVerifier verifier = new WonVerifier(testDataset);
@@ -77,8 +89,11 @@ public class WonVerifierTest {
 
     // create dataset that contains need core data graph and its signature graph,
     // envelope created by owner and the envelope's signature
-    Dataset testDataset = TestSigningUtils.prepareTestDatasetFromNamedGraphs(RESOURCE_FILE,
-        new String[] { NEED_CORE_DATA_URI, NEED_CORE_DATA_SIG_URI, EVENT_ENV1_URI, EVENT_ENV1_SIG_URI });
+    Dataset testDataset = TestSigningUtils.prepareTestDatasetFromNamedGraphs(
+      RESOURCE_FILE, new String[]{
+        NEED_CORE_DATA_URI, NEED_CORE_DATA_SIG_URI,
+        EVENT_ENV1_URI, EVENT_ENV1_SIG_URI
+      });
     // verify
     WonVerifier verifier = new WonVerifier(testDataset);
     // TODO load public keys from certificate referenced from signatures
@@ -92,15 +107,19 @@ public class WonVerifierTest {
 
   }
 
+
   @Test
   public void testVerifyCreatedNeedNodeEvent() throws Exception {
 
     // create dataset that contains need core data graph and its signature graph,
     // envelope created by owner and the envelope's signature, envelope created
     // by node and its signature
-    Dataset testDataset = TestSigningUtils.prepareTestDatasetFromNamedGraphs(RESOURCE_FILE,
-        new String[] { NEED_CORE_DATA_URI, NEED_CORE_DATA_SIG_URI, EVENT_ENV1_URI, EVENT_ENV1_SIG_URI, EVENT_ENV2_URI,
-            EVENT_ENV2_SIG_URI });
+    Dataset testDataset = TestSigningUtils.prepareTestDatasetFromNamedGraphs(
+      RESOURCE_FILE, new String[]{
+        NEED_CORE_DATA_URI, NEED_CORE_DATA_SIG_URI,
+        EVENT_ENV1_URI, EVENT_ENV1_SIG_URI,
+        EVENT_ENV2_URI, EVENT_ENV2_SIG_URI
+      });
     // verify
     WonVerifier verifier = new WonVerifier(testDataset);
     boolean verified = verifier.verify(keys.getPublicKeys());
@@ -114,7 +133,8 @@ public class WonVerifierTest {
 
   }
 
-  // TODO test more versions of not valid signatures, e.g. signatures missing,
-  // graphs missing,
+  // TODO test more versions of not valid signatures, e.g. signatures missing, graphs missing,
   // wrong signature value, references signature values are wrong, etc.
 }
+
+

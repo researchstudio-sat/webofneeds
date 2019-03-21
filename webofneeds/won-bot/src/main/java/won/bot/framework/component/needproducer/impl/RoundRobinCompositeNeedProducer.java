@@ -16,23 +16,23 @@
 
 package won.bot.framework.component.needproducer.impl;
 
-import won.bot.framework.component.needproducer.NeedProducer;
-
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-/**
- * Composite Needproducer that will cycle through needFactories, returning a
- * different one each time. The order of the factories returned may change
- * (implemented based on a Set not a List).
- */
-public class RoundRobinCompositeNeedProducer extends AbstractCompositeNeedProducer {
-  private NeedProducer lastFactory = null;
+import won.bot.framework.component.needproducer.NeedProducer;
 
+/**
+ * Composite Needproducer that will cycle through needFactories, returning a different one each time.
+ * The order of the factories returned may change (implemented based on a Set not a List).
+ */
+public class RoundRobinCompositeNeedProducer extends AbstractCompositeNeedProducer
+{
+  private NeedProducer lastFactory = null;
   @Override
-  protected synchronized NeedProducer selectActiveNeedFactory() {
-    // work on a copy of the set to avoid concurrency problems
+  protected synchronized NeedProducer selectActiveNeedFactory()
+  {
+    //work on a copy of the set to avoid concurrency problems
     Set<NeedProducer> factories = new HashSet<NeedProducer>();
     factories.addAll(getNeedFactories());
     Iterator<NeedProducer> factoryIterator = factories.iterator();
@@ -43,17 +43,15 @@ public class RoundRobinCompositeNeedProducer extends AbstractCompositeNeedProduc
       lastFactory = factoryIterator.next();
       return lastFactory;
     } else {
-      // iterate until we reach the last used factory
-      while (factoryIterator.hasNext() && factoryIterator.next() != lastFactory) {
-      }
-      // then, if the iterator has more factories
-      if (factoryIterator.hasNext()) {
-        // choose the next one after the one we returned last
+      //iterate until we reach the last used factory
+      while (factoryIterator.hasNext() && factoryIterator.next() != lastFactory){}
+      //then, if the iterator has more factories
+      if (factoryIterator.hasNext()){
+        //choose the next one after the one we returned last
         this.lastFactory = factoryIterator.next();
         return lastFactory;
       } else {
-        // else choose take the first factory returned by the iteraor (we were at the
-        // end of the iterators)
+        // else choose take the first factory returned by the iteraor (we were at the end of the iterators)
         this.lastFactory = factories.iterator().next();
         return this.lastFactory;
       }

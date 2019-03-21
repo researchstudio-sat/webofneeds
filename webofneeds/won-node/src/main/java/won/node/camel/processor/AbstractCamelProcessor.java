@@ -16,9 +16,20 @@
 
 package won.node.camel.processor;
 
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+
 import org.apache.camel.Processor;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import won.cryptography.service.RandomNumberService;
 import won.node.facet.FacetService;
 import won.node.protocol.MatcherProtocolMatcherServiceClientSide;
@@ -29,23 +40,30 @@ import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Need;
 import won.protocol.model.OwnerApplication;
-import won.protocol.repository.*;
+import won.protocol.repository.ConnectionContainerRepository;
+import won.protocol.repository.ConnectionEventContainerRepository;
+import won.protocol.repository.ConnectionRepository;
+import won.protocol.repository.DatasetHolderRepository;
+import won.protocol.repository.FacetRepository;
+import won.protocol.repository.MessageEventRepository;
+import won.protocol.repository.NeedEventContainerRepository;
+import won.protocol.repository.NeedRepository;
+import won.protocol.repository.OwnerApplicationRepository;
 import won.protocol.service.LinkedDataService;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
-import java.net.URI;
-import java.util.*;
-import java.util.concurrent.ExecutorService;
-
 /**
- * User: syim Date: 02.03.2015
+ * User: syim
+ * Date: 02.03.2015
  */
-public abstract class AbstractCamelProcessor implements Processor {
+public abstract class AbstractCamelProcessor implements Processor
+{
 
   protected Logger logger = org.slf4j.LoggerFactory.getLogger(this.getClass());
+
 
   @Autowired
   protected MessagingService messagingService;
@@ -84,61 +102,62 @@ public abstract class AbstractCamelProcessor implements Processor {
   @Autowired
   protected FacetService facetService;
 
-  protected void sendMessageToOwner(WonMessage message, URI needURI, String fallbackOwnerApplicationId) {
+
+
+
+
+  protected void sendMessageToOwner(WonMessage message, URI needURI, String fallbackOwnerApplicationId){
     Need need = needRepository.findOneByNeedURI(needURI);
     List<OwnerApplication> ownerApplications = need != null ? need.getAuthorizedApplications() : Collections.EMPTY_LIST;
     List<String> ownerApplicationIds = toStringIds(ownerApplications);
-    // if no owner application ids are authorized, we use the fallback specified (if
-    // any)
+    //if no owner application ids are authorized, we use the fallback specified (if any)
     if (ownerApplicationIds.isEmpty() && fallbackOwnerApplicationId != null) {
       ownerApplicationIds.add(fallbackOwnerApplicationId);
     }
     Map headerMap = new HashMap<String, Object>();
     headerMap.put(WonCamelConstants.OWNER_APPLICATIONS, ownerApplicationIds);
-    messagingService.sendInOnlyMessage(null, headerMap,
-        RdfUtils.writeDatasetToString(message.getCompleteDataset(), WonCamelConstants.RDF_LANGUAGE_FOR_MESSAGE),
-        "seda:OwnerProtocolOut");
+    messagingService.sendInOnlyMessage(null, headerMap, RdfUtils.writeDatasetToString(message.getCompleteDataset(),
+        WonCamelConstants.RDF_LANGUAGE_FOR_MESSAGE),
+                                       "seda:OwnerProtocolOut");
   }
 
-  protected void sendMessageToOwner(WonMessage message, List<String> ownerApplicationIds) {
+  protected void sendMessageToOwner(WonMessage message, List<String> ownerApplicationIds){
     Map headerMap = new HashMap<String, Object>();
-    headerMap.put("protocol", "OwnerProtocol");
+    headerMap.put("protocol","OwnerProtocol");
     headerMap.put(WonCamelConstants.OWNER_APPLICATIONS, ownerApplicationIds);
-    messagingService.sendInOnlyMessage(null, headerMap,
-        RdfUtils.writeDatasetToString(message.getCompleteDataset(), WonCamelConstants.RDF_LANGUAGE_FOR_MESSAGE),
-        "seda:OwnerProtocolOut");
+    messagingService.sendInOnlyMessage(null, headerMap, RdfUtils.writeDatasetToString(message.getCompleteDataset(),
+        WonCamelConstants.RDF_LANGUAGE_FOR_MESSAGE),
+                                       "seda:OwnerProtocolOut");
   }
 
-  protected void sendMessageToOwner(WonMessage message, String... ownerApplicationIds) {
+  protected void sendMessageToOwner(WonMessage message, String... ownerApplicationIds){
     Map headerMap = new HashMap<String, Object>();
     headerMap.put(WonCamelConstants.OWNER_APPLICATIONS, Arrays.asList(ownerApplicationIds));
-    messagingService.sendInOnlyMessage(null, headerMap,
-        RdfUtils.writeDatasetToString(message.getCompleteDataset(), WonCamelConstants.RDF_LANGUAGE_FOR_MESSAGE),
-        "seda:OwnerProtocolOut");
+    messagingService.sendInOnlyMessage(null, headerMap, RdfUtils.writeDatasetToString(message.getCompleteDataset(),WonCamelConstants.RDF_LANGUAGE_FOR_MESSAGE),
+                                       "seda:OwnerProtocolOut");
   }
 
-  protected void sendMessageToNode(WonMessage message) {
+  protected void sendMessageToNode(WonMessage message){
     Map headerMap = new HashMap<String, Object>();
     headerMap.put(WonCamelConstants.MESSAGE_HEADER, message);
-    messagingService.sendInOnlyMessage(null, headerMap, null, "seda:NeedProtocolOut");
+    messagingService.sendInOnlyMessage(null, headerMap, null,
+                                       "seda:NeedProtocolOut");
   }
 
   /**
-   * Processes the system message (allowing facet implementations) and delivers
-   * it, depending on its receiver settings.
+   * Processes the system message (allowing facet implementations) and delivers it, depending on its receiver settings.
    *
    * @param message
    */
-  protected void sendSystemMessage(WonMessage message) {
+  protected void sendSystemMessage(WonMessage message){
     Map headerMap = new HashMap<String, Object>();
     headerMap.put(WonCamelConstants.MESSAGE_HEADER, message);
-    messagingService.sendInOnlyMessage(null, headerMap, null, "seda:SystemMessageIn");
+    messagingService.sendInOnlyMessage(null, headerMap, null,
+      "seda:SystemMessageIn");
   }
 
   /**
-   * Sends a system message to the owner without facet processing. Useful for
-   * Response messages.
-   *
+   * Sends a system message to the owner without facet processing. Useful for Response messages.
    * @param message
    */
   protected void sendSystemMessageToOwner(WonMessage message) {
@@ -146,53 +165,52 @@ public abstract class AbstractCamelProcessor implements Processor {
   }
 
   /**
-   * Sends a system message to the owner without facet processing. Useful for
-   * Response messages.
-   * <p>
-   * Allows for adding the ownerApplicationId to the exchange used during creation
-   * and sending of the system message. This is useful for cases in which the
-   * owner application cannot determined otherwise, which can happen when need
-   * creation fails.
-   * <p>
-   * If that value is non-null, it is set as the 'ownerApplicationId' header,
-   * which is used in AbstractCamelProcessor#sendMessageToOwner(..) as a fallback
-   * to determine the recipients of the message to be sent.
+   * Sends a system message to the owner without facet processing. Useful for Response messages.
+   *
+   * Allows for adding the ownerApplicationId to the exchange used during creation and
+   * sending of the system message. This is useful for cases in which the owner application
+   * cannot determined otherwise, which can happen when need creation fails.
+   *
+   * If that value is non-null, it is set as the 'ownerApplicationId' header, which is used in
+   * AbstractCamelProcessor#sendMessageToOwner(..) as a fallback to determine the recipients of
+   * the message to be sent.
    *
    * @param message
    * @param ownerApplicationId
    */
-  protected void sendSystemMessageToOwner(WonMessage message, String ownerApplicationId) {
+  protected void sendSystemMessageToOwner(WonMessage message, String ownerApplicationId){
     Map headerMap = new HashMap<String, Object>();
     headerMap.put(WonCamelConstants.MESSAGE_HEADER, message);
-    if (ownerApplicationId != null) {
+    if (ownerApplicationId != null){
       headerMap.put(WonCamelConstants.OWNER_APPLICATION_ID, ownerApplicationId);
     }
-    messagingService.sendInOnlyMessage(null, headerMap, null, "seda:SystemMessageToOwner");
+    messagingService.sendInOnlyMessage(null, headerMap, null,
+            "seda:SystemMessageToOwner");
   }
 
   protected List<String> toStringIds(final List<OwnerApplication> ownerApplications) {
     List<String> ownerApplicationIds = new ArrayList<String>(ownerApplications.size());
-    for (OwnerApplication app : ownerApplications) {
+    for(OwnerApplication app: ownerApplications){
       ownerApplicationIds.add(app.getOwnerApplicationId());
     }
     return ownerApplicationIds;
   }
 
-  protected void failForIncompatibleFacets(URI facetURI, URI facetTypeURI, URI remoteFacetURI)
-      throws IncompatibleFacetTypesException {
-    Optional<URI> remoteFacetType = WonLinkedDataUtils.getTypeOfFacet(remoteFacetURI, linkedDataSource);
-    if (!remoteFacetType.isPresent()) {
-      throw new IllegalStateException("Could not determine type of remote facet " + remoteFacetURI);
+    protected void failForIncompatibleFacets(URI facetURI, URI facetTypeURI, URI remoteFacetURI)
+            throws IncompatibleFacetTypesException {
+        Optional<URI> remoteFacetType = WonLinkedDataUtils.getTypeOfFacet(remoteFacetURI, linkedDataSource);
+        if (!remoteFacetType.isPresent()) {
+            throw new IllegalStateException("Could not determine type of remote facet " + remoteFacetURI);
+        }
+        if (!facetService.isConnectionAllowedToType(facetTypeURI, remoteFacetType.get())) {
+            throw new IncompatibleFacetTypesException(facetURI, facetTypeURI, remoteFacetURI, remoteFacetType.get());
+        }
     }
-    if (!facetService.isConnectionAllowedToType(facetTypeURI, remoteFacetType.get())) {
-      throw new IncompatibleFacetTypesException(facetURI, facetTypeURI, remoteFacetURI, remoteFacetType.get());
-    }
-  }
 
-  protected void failIfIsNotFacetOfNeed(Optional<URI> facetURI, Optional<URI> needURI) {
-    if (facetURI.isPresent() && needURI.isPresent()
-        && !facetURI.get().toString().startsWith(needURI.get().toString())) {
-      throw new IllegalArgumentException("User-defined facet " + facetURI + " is not a facet of need " + needURI);
+    
+    protected void failIfIsNotFacetOfNeed(Optional<URI> facetURI, Optional<URI> needURI) {
+        if (facetURI.isPresent() && needURI.isPresent() && !facetURI.get().toString().startsWith(needURI.get().toString())){
+            throw new IllegalArgumentException("User-defined facet "+ facetURI +" is not a facet of need " + needURI);
+        }
     }
-  }
 }

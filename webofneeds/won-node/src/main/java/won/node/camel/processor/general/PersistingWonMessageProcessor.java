@@ -16,9 +16,12 @@
 
 package won.node.camel.processor.general;
 
+import java.net.URI;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import won.node.service.DataAccessService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageEncoder;
@@ -26,13 +29,15 @@ import won.protocol.message.WonMessageType;
 import won.protocol.message.WonMessageUtils;
 import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
-import won.protocol.model.*;
+import won.protocol.model.ConnectionEventContainer;
+import won.protocol.model.DatasetHolder;
+import won.protocol.model.EventContainer;
+import won.protocol.model.MessageEventPlaceholder;
+import won.protocol.model.NeedEventContainer;
 import won.protocol.repository.ConnectionEventContainerRepository;
 import won.protocol.repository.DatasetHolderRepository;
 import won.protocol.repository.MessageEventRepository;
 import won.protocol.repository.NeedEventContainerRepository;
-
-import java.net.URI;
 
 /**
  * Persists the specified WonMessage.
@@ -52,8 +57,7 @@ public class PersistingWonMessageProcessor implements WonMessageProcessor {
   DataAccessService dataAccessService;
 
   @Override
-  // we use READ_COMMITTED because we want to wait for an exclusive lock will
-  // accept data written by a concurrent transaction that commits before we read
+  //we use READ_COMMITTED because we want to wait for an exclusive lock will accept data written by a concurrent transaction that commits before we read
   public WonMessage process(WonMessage message) throws WonMessageProcessingException {
     URI parentURI = WonMessageUtils.getParentEntityUri(message);
     updateResponseInfo(message);
@@ -64,7 +68,6 @@ public class PersistingWonMessageProcessor implements WonMessageProcessor {
   /**
    * If we are saving response message, update original massage with the
    * information about response message uri
-   *
    * @param message response message
    */
   private void updateResponseInfo(final WonMessage message) {
@@ -75,11 +78,9 @@ public class PersistingWonMessageProcessor implements WonMessageProcessor {
       messageEventRepository.lockConnectionAndEventContainerByContainedMessageForUpdate(originalMessageURI);
       messageEventRepository.lockNeedAndEventContainerByContainedMessageForUpdate(originalMessageURI);
       MessageEventPlaceholder event = messageEventRepository.findOneByMessageURIforUpdate(originalMessageURI);
-      if (event != null) {
-        // we may not have saved the event yet if the current message is a
-        // FailureResponse
-        // and the error causing the response happened before saving the original
-        // message.
+      if (event != null){
+        //we may not have saved the event yet if the current message is a FailureResponse
+        //and the error causing the response happened before saving the original message.
         event.setResponseMessageURI(message.getMessageURI());
         messageEventRepository.save(event);
       }
@@ -89,9 +90,10 @@ public class PersistingWonMessageProcessor implements WonMessageProcessor {
   private void saveMessage(final WonMessage wonMessage, URI parent) {
     logger.debug("STORING message with uri {} and parent uri", wonMessage.getMessageURI(), parent);
     EventContainer container = loadOrCreateEventContainer(wonMessage, parent);
-    DatasetHolder datasetHolder = new DatasetHolder(wonMessage.getMessageURI(),
-        WonMessageEncoder.encodeAsDataset(wonMessage));
-    MessageEventPlaceholder event = new MessageEventPlaceholder(parent, wonMessage, container);
+    DatasetHolder datasetHolder = new DatasetHolder(wonMessage.getMessageURI(), WonMessageEncoder.encodeAsDataset
+      (wonMessage));
+    MessageEventPlaceholder event = new MessageEventPlaceholder(parent,
+                                wonMessage, container);
     event.setDatasetHolder(datasetHolder);
     messageEventRepository.save(event);
   }
@@ -99,35 +101,32 @@ public class PersistingWonMessageProcessor implements WonMessageProcessor {
   private EventContainer loadOrCreateEventContainer(final WonMessage wonMessage, final URI parent) {
     WonMessageType type = wonMessage.getMessageType();
     if (WonMessageType.CREATE_NEED.equals(type)) {
-      // create a need event container with null parent (because it will only be
-      // persisted at a later point in time)
+      //create a need event container with null parent (because it will only be persisted at a later point in time)
       EventContainer container = needEventContainerRepository.findOneByParentUriForUpdate(parent);
-      if (container != null)
-        return container;
-      NeedEventContainer nec = new NeedEventContainer(null, parent);
+      if (container != null) return container;
+      NeedEventContainer nec = new NeedEventContainer (null, parent);
       needEventContainerRepository.saveAndFlush(nec);
       return nec;
     } else if (WonMessageType.CONNECT.equals(type) || WonMessageType.HINT_MESSAGE.equals(type)) {
-      // create a connection event container witn null parent (because it will only be
-      // persisted at a later point in
+      //create a connection event container witn null parent (because it will only be persisted at a later point in
       // time)
       EventContainer container = connectionEventContainerRepository.findOneByParentUriForUpdate(parent);
-      if (container != null)
-        return container;
+      if (container != null) return container;
       ConnectionEventContainer cec = new ConnectionEventContainer(null, parent);
       connectionEventContainerRepository.saveAndFlush(cec);
       return cec;
     }
     EventContainer container = needEventContainerRepository.findOneByParentUriForUpdate(parent);
-    if (container != null)
-      return container;
+    if (container != null) return container;
     container = connectionEventContainerRepository.findOneByParentUriForUpdate(parent);
-    if (container != null)
-      return container;
-    // let's see if we can find the event conta
-    throw new IllegalArgumentException("Cannot store '" + type + "' event '" + wonMessage.getMessageURI()
-        + "': unable to find " + "event container with parent URI '" + parent + "'");
+    if (container != null) return container;
+    //let's see if we can find the event conta
+    throw new IllegalArgumentException(
+          "Cannot store '" + type + "' event '" + wonMessage.getMessageURI() + "': unable to find " +
+            "event container with parent URI '" + parent + "'");
 
   }
+
+
 
 }

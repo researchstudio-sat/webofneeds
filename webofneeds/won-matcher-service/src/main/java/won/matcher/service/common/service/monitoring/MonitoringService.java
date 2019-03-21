@@ -1,5 +1,8 @@
 package won.matcher.service.common.service.monitoring;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.javasimon.SimonManager;
 import org.javasimon.Split;
 import org.javasimon.Stopwatch;
@@ -9,15 +12,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Created by hfriedrich on 09.10.2015.
  */
 @Component
 @Scope("singleton")
-public class MonitoringService {
+public class MonitoringService
+{
   private final Logger log = LoggerFactory.getLogger(getClass());
 
   public static final String NEED_HINT_STOPWATCH = "NeedReceivedUntilFirstHintSent";
@@ -67,7 +68,7 @@ public class MonitoringService {
       }
 
       split.stop();
-      // splits.remove(monitoringEvent.getSplitName());
+      //splits.remove(monitoringEvent.getSplitName());
     }
   }
 }

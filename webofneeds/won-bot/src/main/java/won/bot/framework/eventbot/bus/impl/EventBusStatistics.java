@@ -18,48 +18,50 @@ package won.bot.framework.eventbot.bus.impl;
 
 import java.util.Map;
 
+
 /**
  * Created by fkleedorfer on 30.03.2017.
  */
 public class EventBusStatistics {
-  private long listenerCount;
-  private Map<Class<?>, Long> listenerCountPerEvent;
-  private Map<Class<?>, Long> listenerCountPerListenerClass;
-  private Map<Class<?>, Long> actionCountPerActionClass;
+    private long listenerCount;
+    private Map<Class<?>, Long> listenerCountPerEvent;
+    private Map<Class<?>, Long> listenerCountPerListenerClass;
+    private Map<Class<?>, Long> actionCountPerActionClass;
 
-  public Map<Class<?>, Long> getActionCountPerActionClass() {
-    return actionCountPerActionClass;
-  }
+    public Map<Class<?>, Long> getActionCountPerActionClass() {
+        return actionCountPerActionClass;
+    }
 
-  public void setActionCountPerActionClass(Map<Class<?>, Long> actionCountPerActionClass) {
-    this.actionCountPerActionClass = actionCountPerActionClass;
-  }
+    public void setActionCountPerActionClass(Map<Class<?>, Long> actionCountPerActionClass) {
+        this.actionCountPerActionClass = actionCountPerActionClass;
+    }
 
-  public EventBusStatistics() {
+    public EventBusStatistics() {
 
-  }
 
-  public long getListenerCount() {
-    return listenerCount;
-  }
+    }
 
-  public void setListenerCount(long listenerCount) {
-    this.listenerCount = listenerCount;
-  }
+    public long getListenerCount() {
+        return listenerCount;
+    }
 
-  public Map<Class<?>, Long> getListenerCountPerEvent() {
-    return listenerCountPerEvent;
-  }
+    public void setListenerCount(long listenerCount) {
+        this.listenerCount = listenerCount;
+    }
 
-  public void setListenerCountPerEvent(Map<Class<?>, Long> listenersCountPerEvent) {
-    this.listenerCountPerEvent = listenersCountPerEvent;
-  }
+    public Map<Class<?>, Long> getListenerCountPerEvent() {
+        return listenerCountPerEvent;
+    }
 
-  public Map<Class<?>, Long> getListenerCountPerListenerClass() {
-    return listenerCountPerListenerClass;
-  }
+    public void setListenerCountPerEvent(Map<Class<?>, Long> listenersCountPerEvent) {
+        this.listenerCountPerEvent = listenersCountPerEvent;
+    }
 
-  public void setListenerCountPerListenerClass(Map<Class<?>, Long> listenerCountPerListenerClass) {
-    this.listenerCountPerListenerClass = listenerCountPerListenerClass;
-  }
+    public Map<Class<?>, Long> getListenerCountPerListenerClass() {
+        return listenerCountPerListenerClass;
+    }
+
+    public void setListenerCountPerListenerClass(Map<Class<?>, Long> listenerCountPerListenerClass) {
+        this.listenerCountPerListenerClass = listenerCountPerListenerClass;
+    }
 }

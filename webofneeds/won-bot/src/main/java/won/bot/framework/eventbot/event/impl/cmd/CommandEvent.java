@@ -19,10 +19,9 @@ package won.bot.framework.eventbot.event.impl.cmd;
 import won.bot.framework.eventbot.event.Event;
 
 /**
- * Base interface for CommandEvents. Command events are events that, when
- * published on the bus, are meant to trigger a specific action and yield a
- * result - either success or failure, which is expected by the issuer of the
- * CommandEvent to be communicated through a CommandResultEvent.
+ * Base interface for CommandEvents. Command events are events that, when published on the bus, are meant to trigger
+ * a specific action and yield a result - either success or failure, which is expected by the issuer of the CommandEvent
+ * to be communicated through a CommandResultEvent.
  */
 public interface CommandEvent extends Event {
 }

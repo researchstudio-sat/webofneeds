@@ -16,63 +16,62 @@
 
 package won.bot.framework.eventbot.event.impl.command.connect;
 
+import java.net.URI;
+import java.util.Objects;
+import java.util.Optional;
+
 import won.bot.framework.eventbot.event.BaseNeedSpecificEvent;
 import won.bot.framework.eventbot.event.RemoteNeedSpecificEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandEvent;
 import won.protocol.message.WonMessageType;
 
-import java.net.URI;
-import java.util.Objects;
-import java.util.Optional;
-
 /**
- * Instructs the bot to connect to the specified remoteNeed on behalf of the
- * need.
+ * Instructs the bot to connect to the specified remoteNeed on behalf of the need.
  */
 public class ConnectCommandEvent extends BaseNeedSpecificEvent implements MessageCommandEvent, RemoteNeedSpecificEvent {
-  private URI remoteNeedURI;
-  private Optional<URI> localFacet = Optional.empty();
-  private Optional<URI> remoteFacet = Optional.empty();
-  private String welcomeMessage;
+    private URI remoteNeedURI;
+    private Optional<URI> localFacet = Optional.empty();
+    private Optional<URI> remoteFacet = Optional.empty();
+    private String welcomeMessage;
 
-  public ConnectCommandEvent(URI needURI, URI remoteNeedURI, URI localFacet, URI remoteFacet, String welcomeMessage) {
-    super(needURI);
-    Objects.requireNonNull(localFacet);
-    Objects.requireNonNull(remoteFacet);
-    this.remoteNeedURI = remoteNeedURI;
-    this.localFacet = Optional.of(localFacet);
-    this.remoteFacet = Optional.of(remoteFacet);
-    this.welcomeMessage = welcomeMessage;
-  }
+    public ConnectCommandEvent(URI needURI, URI remoteNeedURI, URI localFacet, URI remoteFacet, String welcomeMessage) {
+        super(needURI);
+        Objects.requireNonNull(localFacet);
+        Objects.requireNonNull(remoteFacet);
+        this.remoteNeedURI = remoteNeedURI;
+        this.localFacet = Optional.of(localFacet);
+        this.remoteFacet = Optional.of(remoteFacet);
+        this.welcomeMessage = welcomeMessage;
+    }
 
-  public ConnectCommandEvent(URI needURI, URI remoteNeedURI, String welcomeMessage) {
-    super(needURI);
-    this.remoteNeedURI = remoteNeedURI;
-    this.welcomeMessage = welcomeMessage;
-  }
+    public ConnectCommandEvent(URI needURI, URI remoteNeedURI, String welcomeMessage) {
+        super(needURI);
+        this.remoteNeedURI = remoteNeedURI;
+        this.welcomeMessage = welcomeMessage;
+    }
 
-  public ConnectCommandEvent(URI needURI, URI remoteNeedURI) {
-    this(needURI, remoteNeedURI, "Hello!");
-  }
+    public ConnectCommandEvent(URI needURI, URI remoteNeedURI) {
+        this(needURI, remoteNeedURI, "Hello!");
+    }
 
-  @Override
-  public WonMessageType getWonMessageType() {
-    return WonMessageType.CONNECT;
-  }
+    @Override
+    public WonMessageType getWonMessageType() {
+        return WonMessageType.CONNECT;
+    }
 
-  public URI getRemoteNeedURI() {
-    return remoteNeedURI;
-  }
+    public URI getRemoteNeedURI() {
+        return remoteNeedURI;
+    }
 
-  public Optional<URI> getLocalFacet() {
-    return localFacet;
-  }
+    public Optional<URI> getLocalFacet() {
+        return localFacet;
+    }
 
-  public Optional<URI> getRemoteFacet() {
-    return remoteFacet;
-  }
+    public Optional<URI> getRemoteFacet() {
+        return remoteFacet;
+    }
 
-  public String getWelcomeMessage() {
-    return welcomeMessage;
-  }
+    public String getWelcomeMessage() {
+        return welcomeMessage;
+    }
 }

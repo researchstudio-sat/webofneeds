@@ -21,12 +21,18 @@ package won.protocol.validation;
  */
 public class WonConnectionValidator extends BaseValidator {
 
-  private static final String resourceDir = "validation/connection/";
 
-  public WonConnectionValidator() {
+    private static final String resourceDir = "validation/connection/";
 
-    String[] dirs = { resourceDir + "01_message-structure", resourceDir + "02_message-references" };
-    this.loadSparqlValidatorsFromDirectories(dirs);
-  }
+
+    public WonConnectionValidator() {
+        
+        String[] dirs = {
+                resourceDir + "01_message-structure",
+                resourceDir + "02_message-references"
+        };
+        this.loadSparqlValidatorsFromDirectories(dirs);
+    }
+
 
 }

@@ -16,39 +16,36 @@
 
 package won.bot.framework.eventbot.event.impl.command.close;
 
+import java.net.URI;
+
 import won.bot.framework.eventbot.event.impl.command.MessageCommandEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandSuccessEvent;
 import won.bot.framework.eventbot.event.impl.command.base.AbstractMessageCommandResultEvent;
 import won.protocol.model.Connection;
 
-import java.net.URI;
 
 /**
- * Indicates that the bot has successfully sent a close message, thereby closing
- * a connection.
+ * Indicates that the bot has successfully sent a close message, thereby closing a connection.
  */
-public class CloseCommandSuccessEvent extends AbstractMessageCommandResultEvent
-    implements MessageCommandSuccessEvent, CloseCommandResultEvent {
-  public CloseCommandSuccessEvent(MessageCommandEvent originalCommandEvent, Connection con) {
-    super(originalCommandEvent, con);
-  }
+public class CloseCommandSuccessEvent extends AbstractMessageCommandResultEvent implements MessageCommandSuccessEvent, CloseCommandResultEvent {
+    public CloseCommandSuccessEvent(MessageCommandEvent originalCommandEvent, Connection con) {
+        super(originalCommandEvent, con);
+    }
 
-  public CloseCommandSuccessEvent(MessageCommandEvent originalCommandEvent, URI needURI, URI remoteNeedURI,
-      URI connectionURI) {
-    super(originalCommandEvent, needURI, remoteNeedURI, connectionURI);
-  }
+    public CloseCommandSuccessEvent(MessageCommandEvent originalCommandEvent, URI needURI, URI remoteNeedURI, URI connectionURI) {
+        super(originalCommandEvent, needURI, remoteNeedURI, connectionURI);
+    }
 
-  public CloseCommandSuccessEvent(MessageCommandEvent originalCommandEvent, URI needURI, URI remoteNeedURI,
-      URI connectionURI, String message) {
-    super(originalCommandEvent, needURI, remoteNeedURI, connectionURI, message);
-  }
+    public CloseCommandSuccessEvent(MessageCommandEvent originalCommandEvent, URI needURI, URI remoteNeedURI, URI connectionURI, String message) {
+        super(originalCommandEvent, needURI, remoteNeedURI, connectionURI, message);
+    }
 
-  public CloseCommandSuccessEvent(MessageCommandEvent originalCommandEvent, Connection con, String message) {
-    super(originalCommandEvent, con, message);
-  }
+    public CloseCommandSuccessEvent(MessageCommandEvent originalCommandEvent, Connection con, String message) {
+        super(originalCommandEvent, con, message);
+    }
 
-  @Override
-  public boolean isSuccess() {
-    return true;
-  }
+    @Override
+    public boolean isSuccess() {
+        return true;
+    }
 }

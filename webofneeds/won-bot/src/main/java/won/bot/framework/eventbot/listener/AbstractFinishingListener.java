@@ -21,11 +21,11 @@ import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.filter.EventFilter;
 
 /**
- * Base class for listeners that eventually stop listening. When the decision is
- * made to finish, a FinishedEvent is published and the listener is unsubscribed
- * from all further events.
+ * Base class for listeners that eventually stop listening. When the decision is made to finish,
+ * a FinishedEvent is published and the listener is unsubscribed from all further events.
  */
-public abstract class AbstractFinishingListener extends BaseEventListener implements FinishingListener {
+public abstract class AbstractFinishingListener extends BaseEventListener implements FinishingListener
+{
   private Object monitor = new Object();
   private boolean finished = false;
 
@@ -41,21 +41,21 @@ public abstract class AbstractFinishingListener extends BaseEventListener implem
     super(context, name);
   }
 
-  protected AbstractFinishingListener(final EventListenerContext context, final String name,
-      final EventFilter eventFilter) {
+  protected AbstractFinishingListener(final EventListenerContext context, final String name, final EventFilter eventFilter) {
     super(context, name, eventFilter);
   }
 
   @Override
-  public void doOnEvent(final Event event) throws Exception {
+  public void doOnEvent(final Event event) throws Exception
+  {
     boolean doRun = true;
-    synchronized (monitor) {
-      if (finished) {
-        logger.debug("not executing handleEvent() as listener is finished: {}", this);
+    synchronized (monitor){
+      if (finished){
+        logger.debug("not executing handleEvent() as listener is finished: {}",this);
         return;
       }
       if (isFinished()) {
-        logger.debug("not executing handleEvent() as listener's finishing condition is met: {}", this);
+        logger.debug("not executing handleEvent() as listener's finishing condition is met: {}",this);
         doRun = false;
       }
     }
@@ -63,7 +63,7 @@ public abstract class AbstractFinishingListener extends BaseEventListener implem
       handleEvent(event);
     }
     if (isFinished()) {
-      logger.debug("performing finishing actions for listener: {}", this);
+      logger.debug("performing finishing actions for listener: {}",this);
       performFinish();
     }
   }
@@ -72,9 +72,8 @@ public abstract class AbstractFinishingListener extends BaseEventListener implem
    * Performs all finishing actions and sets the finished flag
    */
   protected void performFinish() {
-    synchronized (monitor) {
-      if (finished)
-        return;
+    synchronized (monitor){
+      if (finished) return;
       unsubscribe();
       publishFinishedEvent();
       finished = true;
@@ -89,7 +88,11 @@ public abstract class AbstractFinishingListener extends BaseEventListener implem
   public abstract boolean isFinished();
 
   @Override
-  public String toString() {
-    return getClass().getSimpleName() + "{name='" + name + ", finished=" + finished + '}';
+  public String toString()
+  {
+    return getClass().getSimpleName() +
+        "{name='" + name +
+        ", finished=" + finished +
+        '}';
   }
 }

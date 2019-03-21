@@ -6,35 +6,36 @@ import java.util.Set;
 
 public class PetriNetUris {
 
-  // The URI chosen by one of the participants for this petri net
-  private URI processURI;
+    // The URI chosen by one of the participants for this petri net
+    private URI processURI;
+    
+    private Set<URI> enabledTransitions = new HashSet<>();
+    
+    private Set<URI> markedPlaces = new HashSet<>();
 
-  private Set<URI> enabledTransitions = new HashSet<>();
+    public URI getProcessURI() {
+        return processURI;
+    }
 
-  private Set<URI> markedPlaces = new HashSet<>();
+    public void setPetriNetURI(URI processURI) {
+        this.processURI = processURI;
+    }
 
-  public URI getProcessURI() {
-    return processURI;
-  }
+    public Set<URI> getEnabledTransitions() {
+        return enabledTransitions;
+    }
 
-  public void setPetriNetURI(URI processURI) {
-    this.processURI = processURI;
-  }
+    public void setEnabledTransitions(Set<URI> enabledTransitions) {
+        this.enabledTransitions = enabledTransitions;
+    }
 
-  public Set<URI> getEnabledTransitions() {
-    return enabledTransitions;
-  }
+    public Set<URI> getMarkedPlaces() {
+        return markedPlaces;
+    }
 
-  public void setEnabledTransitions(Set<URI> enabledTransitions) {
-    this.enabledTransitions = enabledTransitions;
-  }
+    public void setMarkedPlaces(Set<URI> markedPlaces) {
+        this.markedPlaces = markedPlaces;
+    }
 
-  public Set<URI> getMarkedPlaces() {
-    return markedPlaces;
-  }
-
-  public void setMarkedPlaces(Set<URI> markedPlaces) {
-    this.markedPlaces = markedPlaces;
-  }
-
+    
 }

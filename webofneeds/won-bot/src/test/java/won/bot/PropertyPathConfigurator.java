@@ -16,26 +16,30 @@
 
 package won.bot;
 
-import org.apache.jena.shared.PrefixMapping;
-import org.apache.jena.sparql.path.Path;
-import org.apache.jena.sparql.path.PathParser;
-import won.protocol.vocabulary.WON;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.jena.shared.PrefixMapping;
+import org.apache.jena.sparql.path.Path;
+import org.apache.jena.sparql.path.PathParser;
+
+import won.protocol.vocabulary.WON;
+
 /**
- * User: syim Date: 11.07.14
+ * User: syim
+ * Date: 11.07.14
  */
-public class PropertyPathConfigurator {
-  public static List<Path> configurePropertyPaths() {
+public class PropertyPathConfigurator
+{
+  public static List<Path> configurePropertyPaths(){
     List<Path> propertyPaths = new ArrayList<>();
-    addPropertyPath(propertyPaths, "<" + WON.HAS_CONNECTIONS + ">");
-    addPropertyPath(propertyPaths, "<" + WON.HAS_CONNECTIONS + ">" + "/" + "rdfs:member");
-    addPropertyPath(propertyPaths,
-        "<" + WON.HAS_CONNECTIONS + ">" + "/" + "rdfs:member" + "/<" + WON.HAS_REMOTE_CONNECTION + ">");
-    addPropertyPath(propertyPaths, "<" + WON.HAS_CONNECTIONS + ">" + "/" + "rdfs:member" + "/<"
-        + WON.HAS_REMOTE_CONNECTION + ">/<" + WON.BELONGS_TO_NEED + ">");
+    addPropertyPath(propertyPaths, "<" + WON.HAS_CONNECTIONS +">");
+    addPropertyPath(propertyPaths, "<"+WON.HAS_CONNECTIONS+">"+"/"+"rdfs:member");
+    addPropertyPath(propertyPaths, "<"+WON.HAS_CONNECTIONS+">"+"/"+"rdfs:member"+"/<"+WON
+      .HAS_REMOTE_CONNECTION+">");
+    addPropertyPath(propertyPaths, "<"+WON.HAS_CONNECTIONS+">"+"/"+"rdfs:member"+"/<"+WON
+      .HAS_REMOTE_CONNECTION+">/<"+WON
+      .BELONGS_TO_NEED+">");
     return propertyPaths;
   }
 

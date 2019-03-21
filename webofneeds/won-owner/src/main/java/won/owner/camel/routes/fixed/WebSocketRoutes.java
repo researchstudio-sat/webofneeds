@@ -17,13 +17,16 @@
 package won.owner.camel.routes.fixed;
 
 /**
- * User: LEIH-NB Date: 27.11.13
+ * User: LEIH-NB
+ * Date: 27.11.13
  */
 /*
- * public class WebSocketRoutes extends RouteBuilder {
- * 
- * @Override public void configure() throws Exception {
- * from("websocket://owner")
- * .wireTap("bean:messagingService?method=inspectMessage") .log("${body}")
- * .to("websocket://owner"); } }
- */
+public class WebSocketRoutes extends RouteBuilder {
+    @Override
+    public void configure() throws Exception {
+      from("websocket://owner")
+        .wireTap("bean:messagingService?method=inspectMessage")
+        .log("${body}")
+        .to("websocket://owner");
+    }
+}         */

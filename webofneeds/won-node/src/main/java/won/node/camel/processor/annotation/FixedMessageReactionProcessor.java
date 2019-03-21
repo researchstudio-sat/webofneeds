@@ -22,13 +22,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Identifies the annotated class as a message processor used to react to
- * messages by sending new ones *after* the original message has been processed.
+ * Identifies the annotated class as a message processor used to react to messages by sending new ones *after* the
+ * original message has been processed.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface FixedMessageReactionProcessor {
+public @interface FixedMessageReactionProcessor
+{
   String direction();
-
   String messageType();
 }

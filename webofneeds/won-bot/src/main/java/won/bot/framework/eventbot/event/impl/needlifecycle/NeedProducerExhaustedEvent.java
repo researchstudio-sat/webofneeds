@@ -21,7 +21,8 @@ import won.bot.framework.eventbot.event.BaseEvent;
 /**
  * Event indicating that the bot's need producer is exhausted.
  */
-public class NeedProducerExhaustedEvent extends BaseEvent {
+public class NeedProducerExhaustedEvent extends BaseEvent
+{
   public NeedProducerExhaustedEvent() {
   }
 }

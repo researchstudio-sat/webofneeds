@@ -16,107 +16,118 @@
 
 package won.protocol.model;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import won.protocol.vocabulary.WON;
-
 import java.net.URI;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import won.protocol.vocabulary.WON;
+
 /**
- * User: fkleedorfer Date: 30.10.12
+ * User: fkleedorfer
+ * Date: 30.10.12
  */
-public enum ConnectionState {
-  SUGGESTED("Suggested"), REQUEST_SENT("RequestSent"), REQUEST_RECEIVED("RequestReceived"), CONNECTED("Connected"),
-  CLOSED("Closed"), DELETED("Deleted");
+public enum ConnectionState
+{
+  SUGGESTED("Suggested"),
+  REQUEST_SENT("RequestSent"),
+  REQUEST_RECEIVED("RequestReceived"),
+  CONNECTED("Connected"),
+  CLOSED("Closed"),
+  DELETED("Deleted");
 
   private static final Logger logger = LoggerFactory.getLogger(ConnectionState.class);
 
   private String name;
 
-  private ConnectionState(String name) {
+  private ConnectionState(String name)
+  {
     this.name = name;
   }
 
-  public static ConnectionState create(ConnectionEventType msg) {
+  public static ConnectionState create(ConnectionEventType msg)
+  {
     switch (msg) {
-    case MATCHER_HINT:
-      return SUGGESTED;
-    case OWNER_OPEN:
-      return REQUEST_SENT;
-    case PARTNER_OPEN:
-      return REQUEST_RECEIVED;
-    }
-    throw new IllegalArgumentException("Connection creation failed: Wrong ConnectionEventType");
-  }
-
-  public ConnectionState transit(ConnectionEventType msg) {
-    switch (this) {
-    case SUGGESTED:
-      switch (msg) {
+      case MATCHER_HINT:
+        return SUGGESTED;
       case OWNER_OPEN:
         return REQUEST_SENT;
       case PARTNER_OPEN:
         return REQUEST_RECEIVED;
-      case OWNER_CLOSE:
-        return CLOSED;
-      case PARTNER_CLOSE:
-        return CLOSED;
+    }
+    throw new IllegalArgumentException("Connection creation failed: Wrong ConnectionEventType");
+  }
+
+  public ConnectionState transit(ConnectionEventType msg)
+  {
+    switch (this) {
+      case SUGGESTED:
+        switch (msg) {
+          case OWNER_OPEN:
+                return REQUEST_SENT;
+          case PARTNER_OPEN:
+            return REQUEST_RECEIVED;
+          case OWNER_CLOSE:
+            return CLOSED;
+          case PARTNER_CLOSE:
+            return CLOSED;
+          default:
+            return this;
+        }
+      case REQUEST_SENT: //the owner has initiated the connection, the request was sent to the remote need
+        switch (msg) {
+          case PARTNER_OPEN:
+            return CONNECTED;  //the partner accepted
+          case OWNER_CLOSE:
+            return CLOSED;
+          case PARTNER_CLOSE:
+            return CLOSED;
+          default:
+            return this;
+        }
+      case REQUEST_RECEIVED: //a remote need has requested a connection
+        switch (msg) {
+          case OWNER_OPEN:
+            return CONNECTED;
+          case OWNER_CLOSE:
+            return CLOSED;
+          case PARTNER_CLOSE:
+            return CLOSED;
+          default:
+            return this;
+        }
+      case CONNECTED: //the connection is established
+        switch (msg) {
+          case PARTNER_CLOSE:
+            return CLOSED;
+          case OWNER_CLOSE:
+            return CLOSED;
+          default:
+            return this;
+        }
+      case CLOSED:
+        switch (msg) {
+          case OWNER_OPEN:
+            return REQUEST_SENT; //reopen connection
+          case PARTNER_OPEN:
+            return REQUEST_RECEIVED;
+          default:
+            return this;
+        }
       default:
         return this;
-      }
-    case REQUEST_SENT: // the owner has initiated the connection, the request was sent to the remote
-                       // need
-      switch (msg) {
-      case PARTNER_OPEN:
-        return CONNECTED; // the partner accepted
-      case OWNER_CLOSE:
-        return CLOSED;
-      case PARTNER_CLOSE:
-        return CLOSED;
-      default:
-        return this;
-      }
-    case REQUEST_RECEIVED: // a remote need has requested a connection
-      switch (msg) {
-      case OWNER_OPEN:
-        return CONNECTED;
-      case OWNER_CLOSE:
-        return CLOSED;
-      case PARTNER_CLOSE:
-        return CLOSED;
-      default:
-        return this;
-      }
-    case CONNECTED: // the connection is established
-      switch (msg) {
-      case PARTNER_CLOSE:
-        return CLOSED;
-      case OWNER_CLOSE:
-        return CLOSED;
-      default:
-        return this;
-      }
-    case CLOSED:
-      switch (msg) {
-      case OWNER_OPEN:
-        return REQUEST_SENT; // reopen connection
-      case PARTNER_OPEN:
-        return REQUEST_RECEIVED;
-      default:
-        return this;
-      }
-    default:
-      return this;
     }
   }
 
-  public static boolean closeOnNeedDeactivate(ConnectionState state) {
+  public static boolean closeOnNeedDeactivate(ConnectionState state){
     return state == CONNECTED || state == REQUEST_RECEIVED || state == REQUEST_SENT;
   }
 
-  public URI getURI() {
+  public URI getURI()
+  {
     return URI.create(WON.BASE_URI + name);
   }
+
 
   /**
    * Tries to match the given string against all enum values.
@@ -124,7 +135,8 @@ public enum ConnectionState {
    * @param fragment string to match
    * @return matched enum, null otherwise
    */
-  public static ConnectionState parseString(final String fragment) {
+  public static ConnectionState parseString(final String fragment)
+  {
     for (ConnectionState state : values())
       if (state.name.equals(fragment))
         return state;
@@ -133,16 +145,17 @@ public enum ConnectionState {
     return null;
   }
 
-  /**
-   * Tries to match the given URI against all enum values.
-   *
-   * @param uri URI to match
-   * @return matched enum, null otherwise
-   */
-  public static ConnectionState fromURI(final URI uri) {
-    for (ConnectionState state : values())
-      if (state.getURI().equals(uri))
-        return state;
-    return null;
-  }
+    /**
+     * Tries to match the given URI against all enum values.
+     *
+     * @param uri URI to match
+     * @return matched enum, null otherwise
+     */
+    public static ConnectionState fromURI(final URI uri)
+    {
+        for (ConnectionState state : values())
+            if (state.getURI().equals(uri))
+                return state;
+        return null;
+    }
 }

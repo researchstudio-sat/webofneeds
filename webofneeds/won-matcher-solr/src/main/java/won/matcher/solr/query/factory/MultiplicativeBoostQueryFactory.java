@@ -3,7 +3,8 @@ package won.matcher.solr.query.factory;
 /**
  * Created by hfriedrich on 22.08.2016.
  */
-public class MultiplicativeBoostQueryFactory extends SolrQueryFactory {
+public class MultiplicativeBoostQueryFactory extends SolrQueryFactory
+{
   private String boostQuery;
 
   public MultiplicativeBoostQueryFactory(String boostQuery) {

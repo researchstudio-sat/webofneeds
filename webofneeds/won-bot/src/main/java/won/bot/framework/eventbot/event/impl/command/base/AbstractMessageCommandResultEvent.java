@@ -16,57 +16,54 @@
 
 package won.bot.framework.eventbot.event.impl.command.base;
 
+import java.net.URI;
+
 import won.bot.framework.eventbot.event.BaseNeedAndConnectionSpecificEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandResultEvent;
 import won.protocol.model.Connection;
 
-import java.net.URI;
-
 /**
  * Base class for command results (failure and successes).
  */
-public abstract class AbstractMessageCommandResultEvent extends BaseNeedAndConnectionSpecificEvent
-    implements MessageCommandResultEvent {
+public abstract class AbstractMessageCommandResultEvent extends BaseNeedAndConnectionSpecificEvent implements MessageCommandResultEvent {
 
-  private MessageCommandEvent originalCommandEvent;
-  private String message = null;
+    private MessageCommandEvent originalCommandEvent;
+    private String message = null;
 
-  public AbstractMessageCommandResultEvent(MessageCommandEvent originalCommandEvent, Connection con) {
-    this(originalCommandEvent, con, null);
-  }
+    public AbstractMessageCommandResultEvent(MessageCommandEvent originalCommandEvent, Connection con) {
+        this(originalCommandEvent, con, null);
+    }
 
-  public AbstractMessageCommandResultEvent(MessageCommandEvent originalCommandEvent, URI needURI, URI remoteNeedURI,
-      URI connectionURI) {
-    this(originalCommandEvent, makeConnection(needURI, remoteNeedURI, connectionURI));
-  }
+    public AbstractMessageCommandResultEvent(MessageCommandEvent originalCommandEvent, URI needURI, URI remoteNeedURI, URI connectionURI){
+        this(originalCommandEvent, makeConnection(needURI, remoteNeedURI, connectionURI));
+    }
 
-  public AbstractMessageCommandResultEvent(MessageCommandEvent originalCommandEvent, URI needURI, URI remoteNeedURI,
-      URI connectionURI, String message) {
-    this(originalCommandEvent, makeConnection(needURI, remoteNeedURI, connectionURI), message);
-  }
+    public AbstractMessageCommandResultEvent(MessageCommandEvent originalCommandEvent, URI needURI, URI remoteNeedURI, URI connectionURI, String message){
+        this(originalCommandEvent, makeConnection(needURI, remoteNeedURI, connectionURI), message);
+    }
 
-  public AbstractMessageCommandResultEvent(MessageCommandEvent originalCommandEvent, Connection con, String message) {
-    super(con);
-    this.originalCommandEvent = originalCommandEvent;
-    this.message = message;
-  }
+    public AbstractMessageCommandResultEvent(MessageCommandEvent originalCommandEvent, Connection con, String message) {
+        super(con);
+        this.originalCommandEvent = originalCommandEvent;
+        this.message = message;
+    }
 
-  @Override
-  public MessageCommandEvent getOriginalCommandEvent() {
-    return originalCommandEvent;
-  }
+    @Override
+    public MessageCommandEvent getOriginalCommandEvent() {
+        return originalCommandEvent;
+    }
 
-  @Override
-  public String getMessage() {
-    return null;
-  }
+    @Override
+    public String getMessage() {
+        return null;
+    }
 
-  protected static Connection makeConnection(URI needURI, URI remoteNeedURI, URI connectionURI) {
-    Connection con = new Connection();
-    con.setConnectionURI(connectionURI);
-    con.setNeedURI(needURI);
-    con.setRemoteNeedURI(remoteNeedURI);
-    return con;
-  }
+    protected static Connection makeConnection(URI needURI, URI remoteNeedURI, URI connectionURI){
+        Connection con = new Connection();
+        con.setConnectionURI(connectionURI);
+        con.setNeedURI(needURI);
+        con.setRemoteNeedURI(remoteNeedURI);
+        return con;
+    }
 }

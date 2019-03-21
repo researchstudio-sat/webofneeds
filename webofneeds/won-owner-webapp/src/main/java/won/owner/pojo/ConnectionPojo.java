@@ -16,20 +16,24 @@
 
 package won.owner.pojo;
 
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdf.model.StmtIterator;
-import won.protocol.vocabulary.WON;
-
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
+
+import won.protocol.vocabulary.WON;
+
 /**
- * User: LEIH-NB Date: 23.07.14
+ * User: LEIH-NB
+ * Date: 23.07.14
  */
-public class ConnectionPojo {
+public class ConnectionPojo
+{
+
 
   private long connectionId = -1;
   private String connectionURI;
@@ -42,28 +46,28 @@ public class ConnectionPojo {
   private String[] remoteFacetURIs;
   private String wonNodeURI;
 
-  public ConnectionPojo(URI connectionURI, final Model model) {
+  public ConnectionPojo(URI connectionURI, final Model model){
     this.connectionURI = connectionURI.toString();
     Resource connection = model.getResource(connectionURI.toString());
 
     Statement remoteConnectionStatement = connection.getProperty(WON.HAS_REMOTE_CONNECTION);
-    if (remoteConnectionStatement != null) {
+    if (remoteConnectionStatement!=null){
       remoteConnectionURI = remoteConnectionStatement.getString();
     }
 
     Statement needURIStatement = connection.getProperty(WON.BELONGS_TO_NEED);
-    if (needURIStatement != null) {
+    if (needURIStatement != null){
       needURI = needURIStatement.getString();
     }
 
     Statement connectionStateStatement = connection.getProperty(WON.HAS_CONNECTION_STATE);
-    if (connectionStateStatement != null) {
+    if (connectionStateStatement != null){
       connectionState = connectionStateStatement.getString();
     }
 
     StmtIterator facetIter = connection.listProperties(WON.HAS_FACET);
     List<String> facets = new ArrayList<String>(10);
-    while (facetIter.hasNext()) {
+    while(facetIter.hasNext()) {
       Statement stmt = facetIter.nextStatement();
       facets.add(stmt.getObject().toString());
     }
@@ -71,14 +75,14 @@ public class ConnectionPojo {
 
     StmtIterator remoteFacetIter = connection.listProperties(WON.HAS_REMOTE_FACET);
     List<String> remoteFacets = new ArrayList<String>(10);
-    while (remoteFacetIter.hasNext()) {
+    while(remoteFacetIter.hasNext()) {
       Statement stmt = remoteFacetIter.nextStatement();
       remoteFacets.add(stmt.getObject().toString());
     }
     this.remoteFacetURIs = remoteFacets.toArray(new String[remoteFacets.size()]);
 
     Statement wonNodeStatement = connection.getProperty(WON.HAS_WON_NODE);
-    if (wonNodeStatement != null) {
+    if (wonNodeStatement!=null){
       wonNodeURI = wonNodeStatement.getString();
     }
   }
@@ -90,7 +94,6 @@ public class ConnectionPojo {
   public void setRemoteConnectionURI(final String remoteConnectionURI) {
     this.remoteConnectionURI = remoteConnectionURI;
   }
-
   public String getConnectionURI() {
     return connectionURI;
   }
@@ -146,7 +149,6 @@ public class ConnectionPojo {
   public void setRemoteNeedURI(final String remoteNeedURI) {
     this.remoteNeedURI = remoteNeedURI;
   }
-
   public long getConnectionId() {
     return connectionId;
   }

@@ -1,175 +1,197 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>at.researchstudio.sat</groupId>
-		<artifactId>webofneeds</artifactId>
-		<version>0.4-SNAPSHOT</version>
-	</parent>
+    <parent>
+        <groupId>at.researchstudio.sat</groupId>
+        <artifactId>webofneeds</artifactId>
+        <version>0.4-SNAPSHOT</version>
+    </parent>
 
-	<groupId>at.researchstudio.sat</groupId>
-	<artifactId>won-node</artifactId>
-	<version>0.4-SNAPSHOT</version>
-	<name>Node</name>
-	<url>http://maven.apache.org</url>
+    <groupId>at.researchstudio.sat</groupId>
+    <artifactId>won-node</artifactId>
+    <version>0.4-SNAPSHOT</version>
+    <name>Node</name>
+    <url>http://maven.apache.org</url>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	</properties>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
-	<dependencies>
-		<!-- Warning! Only to be used in connection with the <dependencyManagement> 
-			section in the parent pom! -->
-		<dependency>
-			<groupId>at.researchstudio.sat</groupId>
-			<artifactId>won-facets-tx</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+    <dependencies>
+        <!--
 
-		<dependency>
-			<groupId>at.researchstudio.sat</groupId>
-			<artifactId>won-core</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+                 Warning! Only to be used in connection with the
+                 <dependencyManagement> section in the parent pom!
 
-		<dependency>
-			<groupId>at.researchstudio.sat</groupId>
-			<artifactId>won-cryptography</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+        -->
+        <dependency>
+            <groupId>at.researchstudio.sat</groupId>
+            <artifactId>won-facets-tx</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-		<!-- spring stuff -->
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-webmvc</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>at.researchstudio.sat</groupId>
+            <artifactId>won-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-		<!-- rdf -->
-		<dependency>
-			<groupId>org.apache.jena</groupId>
-			<artifactId>jena-tdb</artifactId>
-		</dependency>
-		<!-- messaging -->
-		<dependency>
-			<groupId>org.apache.camel</groupId>
-			<artifactId>camel-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.camel</groupId>
-			<artifactId>camel-jms</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.camel</groupId>
-			<artifactId>camel-spring</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.activemq</groupId>
-			<artifactId>activemq-camel</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.activemq</groupId>
-			<artifactId>activemq-pool</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.camel</groupId>
-			<artifactId>camel-amqp</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.activemq</groupId>
-			<artifactId>activemq-kahadb-store</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.activemq</groupId>
-			<artifactId>activemq-amqp</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.activemq</groupId>
-			<artifactId>activemq-broker</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-jms</artifactId>
-		</dependency>
-		<!-- servlet stuff -->
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>at.researchstudio.sat</groupId>
+            <artifactId>won-cryptography</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>jstl</artifactId>
-		</dependency>
+        <!-- spring stuff -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+        </dependency>
 
-		<dependency>
-			<groupId>cglib</groupId>
-			<artifactId>cglib</artifactId>
-			<scope>test</scope>
-		</dependency>
+        <!-- rdf -->
+        <dependency>
+            <groupId>org.apache.jena</groupId>
+            <artifactId>jena-tdb</artifactId>
+        </dependency>
+        <!-- messaging -->
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-jms</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-spring</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-camel</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-pool</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-amqp</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-kahadb-store</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-amqp</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-broker</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jms</artifactId>
+        </dependency>
+        <!-- servlet stuff -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+        </dependency>
 
-		<!-- TESTING -->
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-test</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>jstl</artifactId>
+        </dependency>
 
-		<!-- HSQL STUFF -->
-		<dependency>
-			<groupId>org.hsqldb</groupId>
-			<artifactId>hsqldb</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>cglib</groupId>
+            <artifactId>cglib</artifactId>
+            <scope>test</scope>
+        </dependency>
 
-		<!-- UTILS -->
-		<dependency>
-			<groupId>org.aspectj</groupId>
-			<artifactId>aspectjweaver</artifactId>
-		</dependency>
+        <!-- TESTING -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
 
-		<!-- MONITORING -->
-		<dependency>
-			<groupId>org.javasimon</groupId>
-			<artifactId>javasimon-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.javasimon</groupId>
-			<artifactId>javasimon-spring</artifactId>
-		</dependency>
-	</dependencies>
+        <!-- HSQL STUFF -->
+        <dependency>
+            <groupId>org.hsqldb</groupId>
+            <artifactId>hsqldb</artifactId>
+        </dependency>
 
-	<build>
-		<resources>
-			<resource>
-				<directory>src/main/resources</directory>
-			</resource>
-		</resources>
-		<testResources>
-			<testResource>
-				<directory>src/test/resources</directory>
-			</testResource>
-		</testResources>
-		<plugins>
-			<plugin>
-				<groupId>net.revelc.code.formatter</groupId>
-				<artifactId>formatter-maven-plugin</artifactId>
-			</plugin>
-		</plugins>
-		<!--plugins> <plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>jaxws-maven-plugin</artifactId> 
-			<version>1.9</version> <executions> <!- -execution> <id>generate-wsdl</id> 
-			<phase>process-classes</phase> <goals> <goal>wsgen</goal> </goals> <configuration> 
-			<sei>won.protocol.ws.NeedProtocolNeedWebServiceEndpoint</sei> <genWsdl>true</genWsdl> 
-			<verbose>true</verbose> <protocol>soap1.1</protocol> </configuration> </execution- 
-			-> <execution> <id>generate-stubs</id> <phase>process-classes</phase> <goals> 
-			<goal>wsimport</goal> </goals> <configuration> <wsdlDirectory>target/jaxws/wsgen/wsdl</wsdlDirectory> 
-			<wsdlFiles> <wsdlFile>NeedProtocolNeedWebServiceEndpointService.wsdl</wsdlFile> 
-			</wsdlFiles> <! - - *** you need the next line to set the wsdlLocation in 
-			the generated stubs *** - -> <wsdlLocation>http://localhost:8080/won/needProtocol/?wsdl 
-			</wsdlLocation> </configuration> </execution> </executions> </plugin> </plugins -->
-	</build>
+        <!-- UTILS -->
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+        </dependency>
+
+        <!-- MONITORING -->
+        <dependency>
+            <groupId>org.javasimon</groupId>
+            <artifactId>javasimon-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.javasimon</groupId>
+            <artifactId>javasimon-spring</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+            </testResource>
+        </testResources>
+        <!--plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jaxws-maven-plugin</artifactId>
+                <version>1.9</version>
+                <executions>
+                    <!- -execution>
+                        <id>generate-wsdl</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>wsgen</goal>
+                        </goals>
+                        <configuration>
+                            <sei>won.protocol.ws.NeedProtocolNeedWebServiceEndpoint</sei>
+                            <genWsdl>true</genWsdl>
+                            <verbose>true</verbose>
+                            <protocol>soap1.1</protocol>
+                        </configuration>
+                    </execution- ->
+                    <execution>
+                        <id>generate-stubs</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>wsimport</goal>
+                        </goals>
+                        <configuration>
+                            <wsdlDirectory>target/jaxws/wsgen/wsdl</wsdlDirectory>
+                            <wsdlFiles>
+                                <wsdlFile>NeedProtocolNeedWebServiceEndpointService.wsdl</wsdlFile>
+                            </wsdlFiles>
+                            <! - - *** you need the next line to set the wsdlLocation in the generated stubs *** - ->
+                                <wsdlLocation>http://localhost:8080/won/needProtocol/?wsdl </wsdlLocation>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins-->
+    </build>
 </project>

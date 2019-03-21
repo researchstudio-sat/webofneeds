@@ -23,16 +23,15 @@ import won.bot.framework.eventbot.filter.EventFilter;
  * Filter that accepts only events for the specified BotTrigger.
  */
 public class BotTriggerFilter implements EventFilter {
-  BotTrigger botTrigger;
+    BotTrigger botTrigger;
 
-  public BotTriggerFilter(BotTrigger botTrigger) {
-    this.botTrigger = botTrigger;
-  }
+    public BotTriggerFilter(BotTrigger botTrigger) {
+        this.botTrigger = botTrigger;
+    }
 
-  @Override
-  public boolean accept(Event event) {
-    if (!(BaseBotTriggerEvent.class.isAssignableFrom(event.getClass())))
-      return false;
-    return ((BaseBotTriggerEvent) event).getBotTrigger() == this.botTrigger;
-  }
+    @Override
+    public boolean accept(Event event) {
+        if (! (BaseBotTriggerEvent.class.isAssignableFrom(event.getClass()))) return false;
+        return ((BaseBotTriggerEvent)event).getBotTrigger() == this.botTrigger;
+    }
 }

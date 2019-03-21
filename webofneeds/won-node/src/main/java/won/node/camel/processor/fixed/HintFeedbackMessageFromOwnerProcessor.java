@@ -16,12 +16,15 @@
 
 package won.node.camel.processor.fixed;
 
+import java.net.URI;
+
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.springframework.stereotype.Component;
+
 import won.node.camel.processor.AbstractFromOwnerCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.protocol.message.WonMessage;
@@ -31,14 +34,14 @@ import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
 
-import java.net.URI;
-
 /**
- * User: syim Date: 02.03.2015
+ * User: syim
+ * Date: 02.03.2015
  */
 @Component
-@FixedMessageProcessor(direction = WONMSG.TYPE_FROM_OWNER_STRING, messageType = WONMSG.TYPE_HINT_FEEDBACK_STRING)
-public class HintFeedbackMessageFromOwnerProcessor extends AbstractFromOwnerCamelProcessor {
+@FixedMessageProcessor(direction = WONMSG.TYPE_FROM_OWNER_STRING,messageType = WONMSG.TYPE_HINT_FEEDBACK_STRING)
+public class HintFeedbackMessageFromOwnerProcessor extends AbstractFromOwnerCamelProcessor
+{
 
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
@@ -48,7 +51,11 @@ public class HintFeedbackMessageFromOwnerProcessor extends AbstractFromOwnerCame
     processFeedbackMessage(con, wonMessage);
   }
 
+
+
+
   /////// TODO: move code below to the implementation of a FEEDBACK message
+
 
   /**
    * Finds feedback in the message, processes it and removes it from the message.
@@ -61,12 +68,13 @@ public class HintFeedbackMessageFromOwnerProcessor extends AbstractFromOwnerCame
     assert con != null : "connection must not be null";
     assert message != null : "message must not be null";
     final URI messageURI = message.getMessageURI();
-    RdfUtils.visit(message.getMessageContent(), new RdfUtils.ModelVisitor<Object>() {
+    RdfUtils.visit(message.getMessageContent(), new RdfUtils.ModelVisitor<Object>()
+    {
       @Override
       public Model visit(final Model model) {
         Resource baseResource = model.getResource(messageURI.toString());
-        if (baseResource.hasProperty(WON.HAS_FEEDBACK)) {
-          // add the base resource as a feedback event to the connection
+        if (baseResource.hasProperty(WON.HAS_FEEDBACK)){
+          //add the base resource as a feedback event to the connection
           processFeedback(con, baseResource);
         }
         return null;
@@ -74,7 +82,8 @@ public class HintFeedbackMessageFromOwnerProcessor extends AbstractFromOwnerCame
     });
   }
 
-  private void processFeedback(Connection connection, final RDFNode feedbackNode) {
+  private void processFeedback(Connection connection,
+                               final RDFNode feedbackNode) {
 
     if (!feedbackNode.isResource()) {
       logger.warn("feedback node is not a resource, cannot process feedback for {}", connection.getConnectionURI());

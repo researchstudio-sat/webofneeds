@@ -6,16 +6,19 @@ import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 
 /**
- * User: ypanchenko Date: 27.03.2015
+ * User: ypanchenko
+ * Date: 27.03.2015
  */
-public class WONCRYPT {
+public class WONCRYPT
+{
 
   public static final String BASE_URI = "http://purl.org/webofneeds/woncrypt#";
   public static final String DEFAULT_PREFIX = "woncrypt";
 
   private static Model m = ModelFactory.createDefaultModel();
 
-  public static String getURI() {
+  public static String getURI()
+  {
     return BASE_URI;
   }
 

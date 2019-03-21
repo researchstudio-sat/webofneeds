@@ -17,25 +17,26 @@
 package won.bot.framework.eventbot.event.impl.crawl;
 
 import org.apache.jena.query.Dataset;
+
 import won.bot.framework.eventbot.event.impl.cmd.BaseCommandSuccessEvent;
 
 /**
  * Indicates a successful crawl and contains the crawled dataset.
  */
 public class CrawlCommandSuccessEvent extends BaseCommandSuccessEvent<CrawlCommandEvent> {
-  private Dataset crawledData;
+    private Dataset crawledData;
 
-  public CrawlCommandSuccessEvent(CrawlCommandEvent originalCommandEvent, Dataset crawledData, String message) {
-    super(message, originalCommandEvent);
-    this.crawledData = crawledData;
-  }
+    public CrawlCommandSuccessEvent(CrawlCommandEvent originalCommandEvent, Dataset crawledData, String message) {
+        super(message, originalCommandEvent);
+        this.crawledData = crawledData;
+    }
 
-  public CrawlCommandSuccessEvent(CrawlCommandEvent originalCommandEvent, Dataset crawledData) {
-    super(originalCommandEvent);
-    this.crawledData = crawledData;
-  }
+    public CrawlCommandSuccessEvent(CrawlCommandEvent originalCommandEvent, Dataset crawledData) {
+        super(originalCommandEvent);
+        this.crawledData = crawledData;
+    }
 
-  public Dataset getCrawledData() {
-    return crawledData;
-  }
+    public Dataset getCrawledData() {
+        return crawledData;
+    }
 }

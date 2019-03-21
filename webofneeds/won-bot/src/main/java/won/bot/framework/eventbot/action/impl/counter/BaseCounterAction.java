@@ -20,9 +20,11 @@ import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 
 /**
- * User: fkleedorfer Date: 30.04.14
+ * User: fkleedorfer
+ * Date: 30.04.14
  */
-public abstract class BaseCounterAction extends BaseEventBotAction {
+public abstract class BaseCounterAction extends BaseEventBotAction
+{
   private Counter counter;
 
   public BaseCounterAction(final EventListenerContext eventListenerContext, final Counter counter) {
@@ -30,7 +32,7 @@ public abstract class BaseCounterAction extends BaseEventBotAction {
     this.counter = counter;
   }
 
-  protected Counter getCounter() {
+  protected Counter getCounter(){
     return counter;
   }
 }

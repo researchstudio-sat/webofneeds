@@ -19,7 +19,8 @@ package won.protocol.message.sender.exception;
 /**
  * Base class for exceptions occurring during sending of messages.
  */
-public abstract class WonMessageSenderException extends RuntimeException {
+public abstract class WonMessageSenderException extends RuntimeException
+{
   public WonMessageSenderException() {
   }
 
@@ -35,8 +36,7 @@ public abstract class WonMessageSenderException extends RuntimeException {
     super(cause);
   }
 
-  public WonMessageSenderException(final String message, final Throwable cause, final boolean enableSuppression,
-      final boolean writableStackTrace) {
+  public WonMessageSenderException(final String message, final Throwable cause, final boolean enableSuppression, final boolean writableStackTrace) {
     super(message, cause, enableSuppression, writableStackTrace);
   }
 }

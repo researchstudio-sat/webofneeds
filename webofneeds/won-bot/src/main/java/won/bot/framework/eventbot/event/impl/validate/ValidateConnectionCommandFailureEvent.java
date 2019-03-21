@@ -22,11 +22,11 @@ import won.bot.framework.eventbot.event.impl.cmd.BaseCommandFailureEvent;
  * Indicates that a ValidateConnectionCommandEvent failed.
  */
 public class ValidateConnectionCommandFailureEvent extends BaseCommandFailureEvent<ValidateConnectionCommandEvent> {
-  public ValidateConnectionCommandFailureEvent(String message, ValidateConnectionCommandEvent originalCommandEvent) {
-    super(message, originalCommandEvent);
-  }
+    public ValidateConnectionCommandFailureEvent(String message, ValidateConnectionCommandEvent originalCommandEvent) {
+        super(message, originalCommandEvent);
+    }
 
-  public ValidateConnectionCommandFailureEvent(ValidateConnectionCommandEvent originalCommandEvent) {
-    super(originalCommandEvent);
-  }
+    public ValidateConnectionCommandFailureEvent(ValidateConnectionCommandEvent originalCommandEvent) {
+        super(originalCommandEvent);
+    }
 }

@@ -16,40 +16,43 @@
 
 package won.bot.framework.component.nodeurisource.impl;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import won.bot.framework.component.nodeurisource.NodeURISource;
-
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import won.bot.framework.component.nodeurisource.NodeURISource;
+
 /**
- * NodeUriSource that is given a list of URIs and returns each element in a
- * round robin fashion.
+ * NodeUriSource that is given a list of URIs and returns each element in a round robin fashion.
  */
-public class RoundRobinMultiNodeUriSource implements NodeURISource {
+public class RoundRobinMultiNodeUriSource implements NodeURISource
+{
   private final Logger logger = LoggerFactory.getLogger(getClass());
   private List<URI> nodeURIs = null;
   private int lastIndex = -1;
 
+
   @Override
-  public URI getNodeURI() {
-    if (this.nodeURIs == null || this.nodeURIs.isEmpty())
-      return null;
+  public URI getNodeURI()
+  {
+    if (this.nodeURIs == null || this.nodeURIs.isEmpty()) return null;
     int index = lastIndex + 1;
-    if (index >= this.nodeURIs.size()) {
+    if (index >= this.nodeURIs.size()){
       index = 0;
     }
-    URI nodeUri = this.nodeURIs.get(index);
+    URI nodeUri =  this.nodeURIs.get(index);
     this.lastIndex = index;
     logger.debug("using node URI '{}'", nodeUri);
     return nodeUri;
   }
 
-  public void setNodeURIs(final Collection<URI> nodeURIs) {
-    if (nodeURIs == null) {
+  public void setNodeURIs(final Collection<URI> nodeURIs)
+  {
+    if (nodeURIs == null){
       this.nodeURIs = new ArrayList<URI>();
     } else {
       this.nodeURIs = new ArrayList<URI>(nodeURIs.size());

@@ -22,12 +22,15 @@ import won.bot.framework.eventbot.filter.EventFilter;
 /**
  * Default listener for simple use in anonymous classes.
  */
-public abstract class DefaultEventListener extends BaseEventListener {
-  public DefaultEventListener(final EventListenerContext context) {
+public abstract class DefaultEventListener extends BaseEventListener
+{
+  public DefaultEventListener(final EventListenerContext context)
+  {
     super(context);
   }
 
-  protected DefaultEventListener(final EventListenerContext context, final EventFilter eventFilter) {
+  protected DefaultEventListener(final EventListenerContext context, final EventFilter eventFilter)
+  {
     super(context, eventFilter);
   }
 }
