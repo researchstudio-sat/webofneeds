@@ -49,7 +49,7 @@
             </div>
             <div>
                 <input id="acceptToS" ng-model="self.acceptToS" type="checkbox" required/>
-                <label for="acceptToS">I accept the <a href="{{ self.absHRef(self.$state, 'about', {'#': 'aboutTermsOfService'}) }}">Terms Of Service</a></label>
+                <label for="acceptToS">I accept the <a href="{{ self.absHRef(self.$state, 'about', {'aboutSection': 'aboutTermsOfService'}) }}">Terms Of Service</a></label>
             </div>
         </div>
         <button id="signup" class="won-button--filled red" ng-if="self.isAnonymous" ng-disabled="registerForm.$invalid" ng-click="::self.account__transfer({email: self.email, password: self.password, privateId: self.privateId, rememberMe: self.rememberMe})">

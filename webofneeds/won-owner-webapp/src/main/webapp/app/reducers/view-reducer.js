@@ -3,7 +3,7 @@
  */
 import { actionTypes } from "../actions/actions.js";
 import Immutable from "immutable";
-import { getIn } from "../utils.js";
+import { get, getIn } from "../utils.js";
 
 const initialState = Immutable.fromJS({
   showRdf: false,
@@ -93,6 +93,30 @@ export default function(viewState = initialState, action = {}) {
 
     case actionTypes.view.removeAddMessageContent:
       return viewState.set("selectedAddMessageContent", undefined);
+
+    case actionTypes.view.showTermsDialog: {
+      const payload = Immutable.fromJS(action.payload);
+
+      const acceptCallback = get(payload, "acceptCallback");
+      const cancelCallback = get(payload, "cancelCallback");
+
+      const termsDialog = Immutable.fromJS({
+        showTerms: true,
+        buttons: [
+          {
+            caption: "Yes, I accept ToS",
+            callback: acceptCallback,
+          },
+          {
+            caption: "No, cancel",
+            callback: cancelCallback,
+          },
+        ],
+      });
+      return viewState
+        .set("showModalDialog", true)
+        .set("modalDialog", termsDialog);
+    }
 
     case actionTypes.view.showModalDialog: {
       const modalDialog = Immutable.fromJS(action.payload);

@@ -5,7 +5,7 @@ import won from "../won-es6.js";
 import angular from "angular";
 import ngAnimate from "angular-animate";
 import dropdownModule from "./covering-dropdown.js";
-import { attach, delay, getIn, toAbsoluteURL } from "../utils.js";
+import { attach, delay, get, getIn, toAbsoluteURL } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux, parseRestErrorMessage } from "../won-utils.js";
 import { ownerBaseUrl } from "config";
@@ -14,6 +14,7 @@ import * as viewSelectors from "../selectors/view-selectors.js";
 import * as processSelectors from "../selectors/process-selectors.js";
 
 import * as srefUtils from "../sref-utils.js";
+import * as accountUtils from "../account-utils.js";
 
 import "style/_slidein.scss";
 
@@ -239,18 +240,21 @@ function genSlideInConf() {
       const selectFromState = state => {
         const verificationToken = getVerificationTokenFromRoute(state);
 
-        const privateId = getIn(state, ["account", "privateId"]);
+        const accountState = get(state, "account");
 
+        const privateId = accountUtils.getPrivateId(accountState);
         const path = "#!/connections" + `?privateId=${privateId}`;
-        const anonymousLink = toAbsoluteURL(ownerBaseUrl).toString() + path;
 
-        const isLoggedIn = getIn(state, ["account", "loggedIn"]);
-        const isAnonymous = getIn(state, ["account", "isAnonymous"]);
-        const isEmailVerified = getIn(state, ["account", "emailVerified"]);
-        const isTermsOfServiceAccepted = getIn(state, [
-          "account",
-          "acceptedTermsOfService",
-        ]);
+        const anonymousLink = toAbsoluteURL(ownerBaseUrl).toString() + path;
+        const isLoggedIn = accountUtils.isLoggedIn(accountState);
+        const isAnonymous = accountUtils.isAnonymous(accountState);
+        const isEmailVerified = accountUtils.isEmailVerified(accountState);
+        const emailVerificationError = accountUtils.getEmailVerificationError(
+          accountState
+        );
+        const isTermsOfServiceAccepted = accountUtils.isTermsOfServiceAccepted(
+          accountState
+        );
 
         const connectionHasBeenLost = getIn(state, [
           "messages",
@@ -269,10 +273,10 @@ function genSlideInConf() {
         return {
           verificationToken,
           isEmailVerified,
-          emailVerificationError: getIn(state, [
-            "account",
-            "emailVerificationError",
-          ]),
+          emailVerificationError,
+          isAlreadyVerifiedError:
+            get(emailVerificationError, "code") ===
+            won.RESPONSECODE.TOKEN_RESEND_FAILED_ALREADY_VERIFIED,
           isProcessingVerifyEmailAddress: processSelectors.isProcessingVerifyEmailAddress(
             state
           ),
@@ -287,14 +291,11 @@ function genSlideInConf() {
           ),
           isTermsOfServiceAccepted,
           isLoggedIn,
-          email: getIn(state, ["account", "email"]),
+          email: accountUtils.getEmail(accountState),
           isAnonymous,
           privateId,
           connectionHasBeenLost,
           reconnecting: getIn(state, ["messages", "reconnecting"]),
-          isAlreadyVerifiedError:
-            getIn(state, ["account", "emailVerificationError", "code"]) ==
-            won.RESPONSECODE.TOKEN_RESEND_FAILED_ALREADY_VERIFIED,
           isAnonymousSlideInExpanded,
           showAnonymousSlideInEmailInput,
           anonymousLinkSent,

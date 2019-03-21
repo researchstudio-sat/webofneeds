@@ -1,4 +1,5 @@
 import angular from "angular";
+import Immutable from "immutable";
 import "ng-redux";
 import postContentModule from "./post-content.js";
 import postMenuModule from "./post-menu.js";
@@ -6,10 +7,11 @@ import chatTextFieldModule from "./chat-textfield.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 import { getPostUriFromRoute } from "../selectors/general-selectors.js";
 import { connect2Redux } from "../won-utils.js";
-import { attach, getIn } from "../utils.js";
+import { attach, get, getIn } from "../utils.js";
 import * as needUtils from "../need-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { getUseCaseLabel, getUseCaseIcon } from "../usecase-utils.js";
+import * as accountUtils from "../account-utils.js";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 
@@ -78,6 +80,7 @@ function genComponentConf() {
         const hasEnabledUseCases = enabledUseCases && enabledUseCases.size > 0;
 
         return {
+          loggedIn: accountUtils.isLoggedIn(get(state, "account")),
           displayedPost,
           postUriToConnectTo,
           isInactive: needUtils.isInactive(displayedPost),
@@ -117,13 +120,37 @@ function genComponentConf() {
     }
 
     sendAdHocRequest(message, persona) {
-      this.router__stateGoResetParams("connections");
+      const tempPostUriToConnectTo = this.postUriToConnectTo;
 
-      if (this.postUriToConnectTo) {
-        this.connections__connectAdHoc(
-          this.postUriToConnectTo,
-          message,
-          persona
+      if (this.loggedIn) {
+        this.router__stateGoResetParams("connections");
+
+        if (tempPostUriToConnectTo) {
+          this.connections__connectAdHoc(
+            tempPostUriToConnectTo,
+            message,
+            persona
+          );
+        }
+      } else {
+        this.view__showTermsDialog(
+          Immutable.fromJS({
+            acceptCallback: () => {
+              this.view__hideModalDialog();
+              this.router__stateGoResetParams("connections");
+
+              if (tempPostUriToConnectTo) {
+                this.connections__connectAdHoc(
+                  tempPostUriToConnectTo,
+                  message,
+                  persona
+                );
+              }
+            },
+            cancelCallback: () => {
+              this.view__hideModalDialog();
+            },
+          })
         );
       }
     }

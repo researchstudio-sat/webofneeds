@@ -2,11 +2,12 @@
  * Created by quasarchimaere on 03.07.2018.
  */
 import angular from "angular";
+import Immutable from "immutable";
 import ngAnimate from "angular-animate";
 import labelledHrModule from "./labelled-hr.js";
 
 import "ng-redux";
-import { attach } from "../utils.js";
+import { attach, get } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
 import {
@@ -14,6 +15,7 @@ import {
   getUseCaseGroupFromRoute,
 } from "../selectors/general-selectors.js";
 import * as useCaseUtils from "../usecase-utils.js";
+import * as accountUtils from "../account-utils.js";
 
 import "style/_usecase-picker.scss";
 
@@ -137,6 +139,7 @@ function genComponentConf() {
         const showGroupsThreshold = 1; // only show groups with more than 1 use case(s) as groups
 
         return {
+          loggedIn: accountUtils.isLoggedIn(get(state, "account")),
           showAll: getUseCaseGroupFromRoute(state) === "all",
           processingPublish: state.getIn(["process", "processingPublish"]),
           connectionHasBeenLost: !selectIsConnected(state),
@@ -155,14 +158,48 @@ function genComponentConf() {
     // redirects start
 
     createWhatsAround() {
-      if (!this.processingPublish) {
+      if (this.processingPublish) {
+        console.debug("publish in process, do not take any action");
+        return;
+      }
+
+      if (this.loggedIn) {
         this.needs__whatsAround();
+      } else {
+        this.view__showTermsDialog(
+          Immutable.fromJS({
+            acceptCallback: () => {
+              this.view__hideModalDialog();
+              this.needs__whatsAround();
+            },
+            cancelCallback: () => {
+              this.view__hideModalDialog();
+            },
+          })
+        );
       }
     }
 
     createWhatsNew() {
-      if (!this.processingPublish) {
+      if (this.processingPublish) {
+        console.debug("publish in process, do not take any action");
+        return;
+      }
+
+      if (this.loggedIn) {
         this.needs__whatsNew();
+      } else {
+        this.view__showTermsDialog(
+          Immutable.fromJS({
+            acceptCallback: () => {
+              this.view__hideModalDialog();
+              this.needs__whatsNew();
+            },
+            cancelCallback: () => {
+              this.view__hideModalDialog();
+            },
+          })
+        );
       }
     }
 

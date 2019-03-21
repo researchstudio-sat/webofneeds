@@ -8,7 +8,10 @@ import { accountLogin } from "./actions/account-actions.js";
 import { getCurrentParamsFromRoute } from "./selectors/general-selectors.js";
 import { privateId2Credentials } from "./won-utils.js";
 
-import { getIn, firstToLowerCase, hyphen2Camel } from "./utils.js";
+import { get, getIn, firstToLowerCase, hyphen2Camel } from "./utils.js";
+
+import * as accountUtils from "./account-utils.js";
+import * as processUtils from "./process-utils.js";
 
 /**
  * As we have configured our router to keep parameters unchanged,
@@ -143,7 +146,10 @@ export function accessControl({
     case "connections": {
       //If we know the user is not loggedIn and there is a postUri in the route, we link to the post-visitor view
       const postUriFromRoute = toParams["postUri"];
-      if (!getIn(state, ["account", "loggedIn"]) && !!postUriFromRoute) {
+      if (
+        !accountUtils.isLoggedIn(get(state, "account")) &&
+        !!postUriFromRoute
+      ) {
         dispatch(actionCreators.router__stateGoResetParams(defaultRoute));
       }
       return;
@@ -164,8 +170,8 @@ export function accessControl({
 
     default:
       //FOR ALL OTHER ROUTES
-      if (!state.getIn(["process", "processingInitialLoad"])) {
-        if (state.getIn(["account", "loggedIn"])) {
+      if (!processUtils.isProcessingInitialLoad(get(state, "process"))) {
+        if (accountUtils.isLoggedIn(get(state, "account"))) {
           return; // logged in. continue route-change as intended.
         } else {
           //sure to be logged out
@@ -215,7 +221,7 @@ function reactToPrivateIdChanges(
   const state = getState();
 
   const { email } = toPrivateId ? privateId2Credentials(toPrivateId) : {};
-  if (state.getIn(["process", "processingLogin"])) {
+  if (processUtils.isProcessingLogin(get(state, "process"))) {
     console.debug(
       "There's already a login in process with the email " +
         email +
@@ -226,7 +232,7 @@ function reactToPrivateIdChanges(
     return Promise.resolve();
   }
 
-  if (state.getIn(["process", "processingLogout"])) {
+  if (processUtils.isProcessingLogout(get(state, "process"))) {
     // already logging out
     return Promise.resolve();
   }

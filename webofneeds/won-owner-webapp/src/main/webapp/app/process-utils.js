@@ -27,6 +27,15 @@ export function isProcessingLogin(process) {
 }
 
 /**
+ * Return true if processingLoginForEmail is currently active
+ * @param process (full process from state)
+ * @returns {*}
+ */
+export function isProcessingLoginForEmail(process) {
+  return get(process, "processingLoginForEmail");
+}
+
+/**
  * Return true if processingLogout is currently active
  * @param process (full process from state)
  * @returns {*}

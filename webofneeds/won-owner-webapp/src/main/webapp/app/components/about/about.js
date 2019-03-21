@@ -1,14 +1,16 @@
 import angular from "angular";
+import Immutable from "immutable";
 import ngAnimate from "angular-animate";
 import compareToModule from "../../directives/compareTo.js";
 import accordionModule from "../accordion.js";
 import flexGridModule from "../flexgrid.js";
-import { attach, getIn, toAbsoluteURL } from "../../utils.js";
+import { attach, get, getIn, toAbsoluteURL } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import { ownerBaseUrl } from "config";
 import * as srefUtils from "../../sref-utils.js";
 import { getAboutSectionFromRoute } from "../../selectors/general-selectors.js";
 import * as viewSelectors from "../../selectors/view-selectors.js";
+import * as accountUtils from "../../account-utils.js";
 
 import "style/_about.scss";
 
@@ -198,6 +200,7 @@ class AboutController {
       const visibleSection = getAboutSectionFromRoute(state);
       const themeName = getIn(state, ["config", "theme", "name"]);
       return {
+        loggedIn: accountUtils.isLoggedIn(get(state, "account")),
         themeName,
         visibleSection,
         appTitle: getIn(state, ["config", "theme", "title"]),
@@ -244,14 +247,48 @@ class AboutController {
   }
 
   createWhatsAround() {
-    if (!this.processingPublish) {
+    if (this.processingPublish) {
+      console.debug("publish in process, do not take any action");
+      return;
+    }
+
+    if (this.loggedIn) {
       this.needs__whatsAround();
+    } else {
+      this.view__showTermsDialog(
+        Immutable.fromJS({
+          acceptCallback: () => {
+            this.view__hideModalDialog();
+            this.needs__whatsAround();
+          },
+          cancelCallback: () => {
+            this.view__hideModalDialog();
+          },
+        })
+      );
     }
   }
 
   createWhatsNew() {
-    if (!this.processingPublish) {
+    if (this.processingPublish) {
+      console.debug("publish in process, do not take any action");
+      return;
+    }
+
+    if (this.loggedIn) {
       this.needs__whatsNew();
+    } else {
+      this.view__showTermsDialog(
+        Immutable.fromJS({
+          acceptCallback: () => {
+            this.view__hideModalDialog();
+            this.needs__whatsNew();
+          },
+          cancelCallback: () => {
+            this.view__hideModalDialog();
+          },
+        })
+      );
     }
   }
 

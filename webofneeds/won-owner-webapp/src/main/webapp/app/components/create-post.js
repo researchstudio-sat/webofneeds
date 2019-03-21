@@ -2,6 +2,7 @@
  * Created by ksinger on 24.08.2015.
  */
 import angular from "angular";
+import Immutable from "immutable";
 import ngAnimate from "angular-animate";
 
 import "ng-redux";
@@ -15,6 +16,7 @@ import * as generalSelectors from "../selectors/general-selectors.js";
 import * as needUtils from "../need-utils.js";
 import * as processSelectors from "../selectors/process-selectors.js";
 import * as useCaseUtils from "../usecase-utils.js";
+import * as accountUtils from "../account-utils.js";
 
 import "style/_create-post.scss";
 import "style/_responsiveness-utils.scss";
@@ -197,6 +199,7 @@ function genComponentConf() {
         }
 
         return {
+          loggedIn: accountUtils.isLoggedIn(get(state, "account")),
           connectToNeedUri,
           processingPublish: state.getIn(["process", "processingPublish"]),
           connectionHasBeenLost: !generalSelectors.selectIsConnected(state),
@@ -306,23 +309,47 @@ function genComponentConf() {
     }
 
     publish(persona) {
+      if (this.processingPublish) {
+        console.debug("publish in process, do not take any action");
+        return;
+      }
+
       if (this.connectToNeedUri) {
-        console.log(
-          "CONNECT TO ",
-          this.connectToNeedUri,
-          " after Creation of this need - FU"
-        );
-        //TODO: IMPL CONNECT TO THIS NEED
-        this.connections__connectReactionNeed(
-          this.connectToNeedUri,
-          this.draftObject,
-          persona
-        );
-        this.router__stateGoCurrent({
-          useCase: undefined,
-          connectionUri: undefined,
-        });
-      } else if (!this.processingPublish) {
+        const tempConnectToNeedUri = this.connectToNeedUri;
+        const tempDraft = this.draftObject;
+
+        if (this.loggedIn) {
+          this.connections__connectReactionNeed(
+            tempConnectToNeedUri,
+            tempDraft,
+            persona
+          );
+          this.router__stateGoCurrent({
+            useCase: undefined,
+            connectionUri: undefined,
+          });
+        } else {
+          this.view__showTermsDialog(
+            Immutable.fromJS({
+              acceptCallback: () => {
+                this.view__hideModalDialog();
+                this.connections__connectReactionNeed(
+                  tempConnectToNeedUri,
+                  tempDraft,
+                  persona
+                );
+                this.router__stateGoCurrent({
+                  useCase: undefined,
+                  connectionUri: undefined,
+                });
+              },
+              cancelCallback: () => {
+                this.view__hideModalDialog();
+              },
+            })
+          );
+        }
+      } else {
         this.draftObject.useCase = get(this.useCase, "identifier");
 
         if (!isBranchContentPresent(this.draftObject.content, true)) {
@@ -332,11 +359,26 @@ function genComponentConf() {
           delete this.draftObject.seeks;
         }
 
-        this.needs__create(
-          this.draftObject,
-          persona,
-          this.$ngRedux.getState().getIn(["config", "defaultNodeUri"])
-        );
+        const tempDraft = this.draftObject;
+        const tempDefaultNodeUri = this.$ngRedux
+          .getState()
+          .getIn(["config", "defaultNodeUri"]);
+
+        if (this.loggedIn) {
+          this.needs__create(tempDraft, persona, tempDefaultNodeUri);
+        } else {
+          this.view__showTermsDialog(
+            Immutable.fromJS({
+              acceptCallback: () => {
+                this.view__hideModalDialog();
+                this.needs__create(tempDraft, persona, tempDefaultNodeUri);
+              },
+              cancelCallback: () => {
+                this.view__hideModalDialog();
+              },
+            })
+          );
+        }
       }
     }
   }

@@ -2,7 +2,7 @@
  * Created by ksinger on 01.09.2017.
  */
 import angular from "angular";
-import { attach } from "../utils.js";
+import { attach, get } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
 
@@ -11,6 +11,8 @@ import loginFormModule from "./login-form.js";
 import loggedInMenuModule from "./logged-in-menu.js";
 
 import * as srefUtils from "../sref-utils.js";
+
+import * as accountUtils from "../account-utils.js";
 
 import "style/_login.scss";
 
@@ -71,11 +73,15 @@ function genLogoutConf() {
       this.email = "";
       this.password = "";
 
-      const logout = state => ({
-        loggedIn: state.getIn(["account", "loggedIn"]),
-        email: state.getIn(["account", "email"]),
-        isAnonymous: state.getIn(["account", "isAnonymous"]),
-      });
+      const logout = state => {
+        const accountState = get(state, "account");
+
+        return {
+          loggedIn: accountUtils.isLoggedIn(accountState),
+          email: accountUtils.getEmail(accountState),
+          isAnonymous: accountUtils.isLoggedIn(accountState),
+        };
+      };
 
       connect2Redux(logout, actionCreators, [], this);
     }
