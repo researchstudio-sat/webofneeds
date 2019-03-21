@@ -23,6 +23,7 @@ function genComponentConf() {
              <span class="md__dialog__content__text" ng-if="self.showTerms">
                 This action requires an account. If you want to proceed, we will create an anonymous account for you.
                 <br/>
+                <br/>
                 By clicking 'Yes', you accept the <a target="_blank" href="{{ self.absHRef(self.$state, 'about', {'aboutSection': 'aboutTermsOfService'}) }}">Terms Of Service(ToS)</a> and anonymous account will be created. Clicking 'No' will just cancel the action.
               </span>
           </div>
