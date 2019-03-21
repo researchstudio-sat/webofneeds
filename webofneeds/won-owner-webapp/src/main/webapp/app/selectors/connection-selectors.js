@@ -11,7 +11,8 @@ import {
 } from "./general-selectors.js";
 import * as connectionUtils from "../connection-utils.js";
 import won from "../won-es6.js";
-import { getIn } from "../utils.js";
+import { get, getIn } from "../utils.js";
+import * as processUtils from "../process-utils.js";
 
 /**
  * Get the connection for a given connectionUri
@@ -94,21 +95,16 @@ export function getChatConnectionsToCrawl(state) {
           connectionUtils.isChatConnection(conn) ||
           connectionUtils.isGroupChatConnection(conn)
       )
-      .filter(
-        conn =>
-          !getIn(state, [
-            "process",
-            "connections",
-            conn.get("uri"),
-            "loadingMessages",
-          ]) &&
-          !getIn(state, [
-            "process",
-            "connections",
-            conn.get("uri"),
-            "failedToLoad",
-          ])
-      );
+      .filter(conn => {
+        const connUri = get(conn, "uri");
+        const process = get(state, "process");
+
+        return (
+          !processUtils.isConnectionLoading(process, connUri) &&
+          !processUtils.isConnectionLoadingMessages(process, connUri) &&
+          !processUtils.hasConnectionFailedToLoad(process, connUri)
+        );
+      });
 
   const connectionsInStateConnected =
     chatConnections &&
