@@ -48,9 +48,11 @@ public class WonOwnerMailSender {
     private static final String SUBJECT_NEED_MESSAGE = "Notification from WoN node";
     private static final String SUBJECT_SYSTEM_DEACTIVATE = "Posting deactivated by system";
     private static final String SUBJECT_VERIFICATION = "Please verify your email address";
+    private static final String SUBJECT_PASSWORD_CHANGED = "Password changed";
     private static final String SUBJECT_ANONYMOUSLINK = "Anonymous login link";
     private static final String SUBJECT_EXPORT = "Your account export is complete";
     private static final String SUBJECT_EXPORT_FAILED = "Your account export did not succeed";
+    private static final String SUBJECT_RECOVERY_KEY_GENERATED = "Your new recovery key";
 
     private WonMailSender wonMailSender;
     
@@ -75,6 +77,8 @@ public class WonOwnerMailSender {
     private Template anonymousTemplate;
     private Template exportTemplate;
     private Template exportFailedTemplate;
+    private Template passwordChangedTemplate;
+    private Template recoveryKeyGeneratedTemplate;
 
     public WonOwnerMailSender() {
         velocityEngine = new VelocityEngine();
@@ -93,6 +97,8 @@ public class WonOwnerMailSender {
         anonymousTemplate = velocityEngine.getTemplate("mail-templates/anonymous.vm");
         exportTemplate = velocityEngine.getTemplate("mail-templates/export.vm");
         exportFailedTemplate = velocityEngine.getTemplate("mail-templates/export-failed.vm");
+        passwordChangedTemplate = velocityEngine.getTemplate("mail-templates/password-changed.vm");
+        recoveryKeyGeneratedTemplate= velocityEngine.getTemplate("mail-templates/recovery-key-generated.vm");
     }
 
     public void setWonMailSender(WonMailSender wonMailSender) {
@@ -163,7 +169,30 @@ public class WonOwnerMailSender {
 
         return velocityContext;
     }
+    
+    private VelocityContext createServiceNameOnlyContext() {
+        String ownerAppLink = uriService.getOwnerProtocolOwnerURI().toString();
+        VelocityContext velocityContext = new VelocityContext();
+        EventCartridge ec = new EventCartridge();
+        ec.addEventHandler(new EscapeHtmlReference());
+        ec.attachToContext(velocityContext);
+        velocityContext.put("serviceName", this.ownerWebappUri);
+        return velocityContext;
+    }
 
+    private VelocityContext createRecoveryKeyContext(String recoveryKey) {
+        String ownerAppLink = uriService.getOwnerProtocolOwnerURI().toString();
+        VelocityContext velocityContext = new VelocityContext();
+        EventCartridge ec = new EventCartridge();
+        ec.addEventHandler(new EscapeHtmlReference());
+        ec.attachToContext(velocityContext);
+
+        velocityContext.put("recoveryKey", recoveryKey);
+        velocityContext.put("serviceName", this.ownerWebappUri);
+
+        return velocityContext;
+    }
+    
     private VelocityContext createAnonymousLinkContext(String privateId) {
         String ownerAppLink = uriService.getOwnerProtocolOwnerURI().toString();
         VelocityContext velocityContext = new VelocityContext();
@@ -255,6 +284,14 @@ public class WonOwnerMailSender {
         logger.debug("sending "+ SUBJECT_VERIFICATION + " to " + user.getEmail());
         this.wonMailSender.sendTextMessage(user.getEmail(), SUBJECT_VERIFICATION, writer.toString());
     }
+    
+    public void sendPasswordChangedMessage(User user) {
+        StringWriter writer = new StringWriter();
+        VelocityContext context = createServiceNameOnlyContext();
+        passwordChangedTemplate.merge(context, writer);
+        logger.debug("sending "+ SUBJECT_PASSWORD_CHANGED + " to " + user.getEmail());
+        this.wonMailSender.sendTextMessage(user.getEmail(), SUBJECT_PASSWORD_CHANGED, writer.toString());
+    }
 
     public void sendAnonymousLinkMessage(String email, String privateId) {
         StringWriter writer = new StringWriter();
@@ -276,6 +313,14 @@ public class WonOwnerMailSender {
         exportFailedTemplate.merge(new VelocityContext(), writer);
         logger.debug("sending "+ SUBJECT_EXPORT_FAILED + " to " + email);
         this.wonMailSender.sendHtmlMessage(email, SUBJECT_EXPORT_FAILED, writer.toString());
+    }
+
+    public void sendRecoveryKeyGeneratedMessage(User user, String recoveryKey) {
+        StringWriter writer = new StringWriter();
+        VelocityContext context = createRecoveryKeyContext(recoveryKey);
+        recoveryKeyGeneratedTemplate.merge(context, writer);
+        logger.debug("sending "+ SUBJECT_RECOVERY_KEY_GENERATED+ " to " + user.getEmail());
+        this.wonMailSender.sendTextMessage(user.getEmail(), SUBJECT_RECOVERY_KEY_GENERATED, writer.toString());
     }
 
 /*

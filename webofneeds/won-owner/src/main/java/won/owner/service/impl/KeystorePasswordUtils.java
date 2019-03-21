@@ -16,26 +16,6 @@ public class KeystorePasswordUtils {
 	public static final String CURRENT_VERSION = "v1";
 	public static final int KEYSTORE_PASSWORD_BYTES = 32;
 
-	/*
-	public static void main(String... args) {
-		String password = "supersecretpassword";
-		String key = "mykey";
-		StopWatch sw = new StopWatch();
-		sw.start();
-		System.out.println("encrypting...");
-		String encrypted = encryptPassword(password, key);
-		sw.stop();
-		System.out.println("took " + sw.getLastTaskTimeMillis());
-		sw.start();
-		System.out.println("encrypting " + password + " with key " + key + " to: " + encrypted);
-		String decrypted = decryptPassword(encrypted, key);
-		System.out.println("decrypting again yields: " + decrypted);
-		sw.stop();
-		System.out.println("took " + sw.getLastTaskTimeMillis());
-
-		System.out.println("generating password: " + generatePassword("abebu", 256, null));
-	}*/
-
 	public static String encryptPassword(String password, String key) {
 		try {
 			int iterations = 1000;

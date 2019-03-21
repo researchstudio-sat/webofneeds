@@ -21,6 +21,12 @@ public enum RestStatusResponse {
     TRANSFERUSER_NOT_FOUND(2400, "Cannot transfer to new user: privateUsername not found", HttpStatus.NOT_FOUND),
     TRANSFERUSER_ALREADY_EXISTS(2401, "Cannot transfer to new user: name is already in use", HttpStatus.CONFLICT),
 
+    PASSWORDCHANGE_USER_NOT_FOUND(8400, "Cannot change password: username not found", HttpStatus.NOT_FOUND),
+    PASSWORDCHANGE_BAD_PASSWORD(8401, "Cannot change password: new password is bad", HttpStatus.FORBIDDEN),
+    PASSWORDCHANGE_KEYSTORE_PROBLEM(8402, "Cannot change password: error reading/writing keys", HttpStatus.FORBIDDEN),
+    PASSWORDCHANGE_WRONG_OLD_PASSWORD(8403, "Cannot change password: old password is wrong", HttpStatus.FORBIDDEN),
+
+    
     TOKEN_VERIFICATION_SUCCESS(3200, "E-Mail verification successful", HttpStatus.OK),
     TOKEN_RESEND_SUCCESS(3201, "E-Mail Verification resent", HttpStatus.OK),
     TOKEN_NOT_FOUND(3400, "Verification Token not found", HttpStatus.NOT_FOUND),
@@ -28,7 +34,11 @@ public enum RestStatusResponse {
     TOKEN_EXPIRED(3403, "Verification Token is expired", HttpStatus.BAD_REQUEST),
     TOKEN_RESEND_FAILED_ALREADY_VERIFIED(3404, "User is already verified, E-Mail will not be sent", HttpStatus.CONFLICT),
     TOKEN_RESEND_FAILED_USER_ANONYMOUS(3405, "User is not verifiable, E-Mail will not be sent", HttpStatus.FORBIDDEN),
-
+    TOKEN_PURPOSE_MISMATCH(3406, "Token was issued for another purpose", HttpStatus.BAD_REQUEST),
+    
+    RECOVERY_KEYGEN_USER_NOT_FOUND(8100, "Could not generate recovery key: user not found", HttpStatus.BAD_REQUEST),
+    RECOVERY_KEYGEN_WRONG_PASSWORD(8100, "Could not generate recovery key: wrong password", HttpStatus.BAD_REQUEST),
+    
     SIGNUP_FAILED(4400, "Registration failed", HttpStatus.BAD_REQUEST),
 
     SETTINGS_CREATED(5200, "Settings created", HttpStatus.CREATED),

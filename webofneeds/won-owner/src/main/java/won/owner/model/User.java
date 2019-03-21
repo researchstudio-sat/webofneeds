@@ -102,6 +102,11 @@ public class User implements UserDetails, Persistable<Long> {
     @OneToOne(cascade = CascadeType.ALL,
             fetch = FetchType.LAZY, optional = false)
     private KeystorePasswordHolder keystorePasswordHolder;
+    
+    @JoinColumn(name = "recoverable_keystore_password_id")
+    @OneToOne(cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY, optional = true)
+    private KeystorePasswordHolder recoverableKeystorePasswordHolder;
 
     //TODO: eager is dangerous here, but we need it as the User object is kept in the http session which outlives the
     //hibernate session. However, this wastes space and may lead to memory issues during high usage. Fix it.
@@ -217,6 +222,14 @@ public class User implements UserDetails, Persistable<Long> {
 
     public KeystorePasswordHolder getKeystorePasswordHolder() {
         return keystorePasswordHolder;
+    }
+    
+    public void setRecoverableKeystorePasswordHolder(KeystorePasswordHolder recoverableKeystorePasswordHolder) {
+        this.recoverableKeystorePasswordHolder = recoverableKeystorePasswordHolder;
+    }
+    
+    public KeystorePasswordHolder getRecoverableKeystorePasswordHolder() {
+        return recoverableKeystorePasswordHolder;
     }
   
   /*

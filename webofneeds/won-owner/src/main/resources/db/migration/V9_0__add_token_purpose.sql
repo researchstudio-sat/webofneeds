@@ -1,0 +1,5 @@
+BEGIN;
+
+ALTER TABLE verificationtoken ADD COLUMN purpose VARCHAR(100);
+
+COMMIT;

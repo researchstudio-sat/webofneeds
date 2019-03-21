@@ -180,7 +180,6 @@ public class FileBasedKeyStoreService extends AbstractKeyStoreService {
 	 */
 	@Override
 	public synchronized void putCertificate(String alias, Certificate certificate, boolean replace) throws IOException {
-
 		putEntry(alias, null, null, certificate, replace);
 	}
 
