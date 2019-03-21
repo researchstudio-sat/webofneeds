@@ -67,13 +67,13 @@ function genComponentConf() {
               connection-uri="self.connectionUri">
             </won-post-content-message>
             <div class="gpm__content__loadspinner"
-                ng-if="self.isProcessingLoadingMessages">
+                ng-if="self.isProcessingLoadingMessages || self.isConnectionLoading">
                 <svg class="hspinner">
                   <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
                 </svg>
             </div>
             <button class="gpm__content__loadbutton won-button--outlined thin red"
-                ng-if="!self.isSuggested && !self.isProcessingLoadingMessages && self.hasConnectionMessagesToLoad"
+                ng-if="!self.isSuggested && !self.isProcessingLoadingMessages && !self.isConnectionLoading && self.hasConnectionMessagesToLoad"
                 ng-click="self.loadPreviousMessages()">
                 Load previous messages
             </button>
@@ -239,6 +239,10 @@ function genComponentConf() {
             processUtils.isNeedLoading(process, ownedNeed.get("uri")) ||
             processUtils.isNeedLoading(process, remoteNeedUri) ||
             processUtils.isConnectionLoading(process, connectionUri),
+          isConnectionLoading: processUtils.isConnectionLoading(
+            process,
+            connectionUri
+          ),
         };
       };
 
@@ -272,6 +276,7 @@ function genComponentConf() {
         const INITIAL_MESSAGECOUNT = 15;
         if (
           this.connection &&
+          !this.isConnectionLoading &&
           !this.isProcessingLoadingMessages &&
           this.connection.get("messages").size < INITIAL_MESSAGECOUNT &&
           this.hasConnectionMessagesToLoad
@@ -287,7 +292,11 @@ function genComponentConf() {
     loadPreviousMessages() {
       delay(0).then(() => {
         const MORE_MESSAGECOUNT = 5;
-        if (this.connection && !this.isProcessingLoadingMessages) {
+        if (
+          this.connection &&
+          !this.isProcessingLoadingMessages &&
+          !this.isConnectionLoading
+        ) {
           this.connections__showMoreMessages(
             this.connection.get("uri"),
             MORE_MESSAGECOUNT
