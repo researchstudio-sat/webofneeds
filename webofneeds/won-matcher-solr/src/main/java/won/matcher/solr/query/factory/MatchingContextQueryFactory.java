@@ -15,13 +15,15 @@ public class MatchingContextQueryFactory extends SolrQueryFactory {
     this.matchingContexts = matchingContexts;
   }
 
-  @Override protected String makeQueryString() {
+  @Override
+  protected String makeQueryString() {
 
     if (matchingContexts == null) {
       return "";
     }
 
-    // Matching Context query is a boolean OR query of exact field queries for each context
+    // Matching Context query is a boolean OR query of exact field queries for each
+    // context
     List<ExactMatchFieldQueryFactory> contextFactories = new LinkedList<>();
     Iterator<String> contextIterator = matchingContexts.iterator();
     while (contextIterator.hasNext()) {

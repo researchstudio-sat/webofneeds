@@ -45,8 +45,8 @@ import won.protocol.vocabulary.WON;
 import java.net.URI;
 
 /**
- * Creates a need with the specified facets.
- * If no facet is specified, the chatFacet will be used.
+ * Creates a need with the specified facets. If no facet is specified, the
+ * chatFacet will be used.
  */
 public class CreateDebugNeedWithFacetsAction extends AbstractCreateNeedAction {
   private Counter counter = new CounterImpl("DebugNeedsCounter");
@@ -60,7 +60,8 @@ public class CreateDebugNeedWithFacetsAction extends AbstractCreateNeedAction {
         doNotMatch, facets);
   }
 
-  @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
+  @Override
+  protected void doRun(Event event, EventListener executingListener) throws Exception {
     String replyText = "";
     URI reactingToNeedUriTmp = null;
     Dataset needDataset = null;
@@ -93,7 +94,7 @@ public class CreateDebugNeedWithFacetsAction extends AbstractCreateNeedAction {
     }
 
     if (!createNeed)
-      return; //if create need is false do not continue the debug need creation
+      return; // if create need is false do not continue the debug need creation
 
     if (titleString != null) {
       if (isInitialForConnect) {
@@ -131,11 +132,12 @@ public class CreateDebugNeedWithFacetsAction extends AbstractCreateNeedAction {
         StringUtils.abbreviate(RdfUtils.toString(debugNeedDataset), 150));
 
     WonMessage createNeedMessage = createWonMessage(wonNodeInformationService, needURI, wonNodeUri, debugNeedDataset);
-    //remember the need URI so we can react to success/failure responses
+    // remember the need URI so we can react to success/failure responses
     EventBotActionUtils.rememberInList(ctx, needURI, uriListName);
 
     EventListener successCallback = new EventListener() {
-      @Override public void onEvent(Event event) throws Exception {
+      @Override
+      public void onEvent(Event event) throws Exception {
         logger.debug("need creation successful, new need URI is {}", needURI);
 
         // save the mapping between the original and the reaction in to the context.
@@ -152,7 +154,8 @@ public class CreateDebugNeedWithFacetsAction extends AbstractCreateNeedAction {
     };
 
     EventListener failureCallback = new EventListener() {
-      @Override public void onEvent(Event event) throws Exception {
+      @Override
+      public void onEvent(Event event) throws Exception {
         String textMessage = WonRdfUtils.MessageUtils
             .getTextMessage(((FailureResponseEvent) event).getFailureMessage());
         logger.debug("need creation failed for need URI {}, original message URI {}: {}",

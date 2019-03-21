@@ -39,11 +39,14 @@ import java.net.URI;
 /**
  * Reacts to a CREATE message, informing matchers of the newly created need.
  */
-@Service @FixedMessageReactionProcessor(direction = WONMSG.TYPE_FROM_OWNER_STRING, messageType = WONMSG.TYPE_CREATE_STRING) public class CreateNeedMessageReactionProcessor
-    extends AbstractCamelProcessor {
-  @Autowired NeedRepository needRepository;
+@Service
+@FixedMessageReactionProcessor(direction = WONMSG.TYPE_FROM_OWNER_STRING, messageType = WONMSG.TYPE_CREATE_STRING)
+public class CreateNeedMessageReactionProcessor extends AbstractCamelProcessor {
+  @Autowired
+  NeedRepository needRepository;
 
-  @Override public void process(final Exchange exchange) throws Exception {
+  @Override
+  public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
     WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
     Dataset needContent = wonMessage.getMessageContent();
@@ -64,7 +67,8 @@ import java.net.URI;
   private WonMessage makeNeedCreatedMessageForMatcher(final Need need) throws NoSuchNeedException {
     return WonMessageBuilder
         .setMessagePropertiesForNeedCreatedNotification(wonNodeInformationService.generateEventURI(), need.getNeedURI(),
-            need.getWonNodeURI()).setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL).build();
+            need.getWonNodeURI())
+        .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL).build();
   }
 
   private URI getNeedURIFromWonMessage(final Dataset wonMessage) {

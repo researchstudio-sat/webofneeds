@@ -49,10 +49,11 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * User: t.kozel
- * Date: 11/12/13
+ * User: t.kozel Date: 11/12/13
  */
-@Controller @RequestMapping("/rest/users") public class RestUserController {
+@Controller
+@RequestMapping("/rest/users")
+public class RestUserController {
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -68,19 +69,26 @@ import java.util.Optional;
 
   private UserNeedRepository userNeedRepository;
 
-  @Autowired private UserService userService;
+  @Autowired
+  private UserService userService;
 
-  @Autowired private KeystoreEnabledPersistentRememberMeServices keystoreEnabledPersistentRememberMeServices;
+  @Autowired
+  private KeystoreEnabledPersistentRememberMeServices keystoreEnabledPersistentRememberMeServices;
 
-  @Autowired private ApplicationEventPublisher eventPublisher;
+  @Autowired
+  private ApplicationEventPublisher eventPublisher;
 
-  @Autowired private WonOwnerMailSender emailSender;
+  @Autowired
+  private WonOwnerMailSender emailSender;
 
-  @Autowired ServletContext context;
+  @Autowired
+  ServletContext context;
 
-  @Autowired RememberMeServices rememberMeServices = new NullRememberMeServices();
+  @Autowired
+  RememberMeServices rememberMeServices = new NullRememberMeServices();
 
-  @Autowired public RestUserController(final AuthenticationManager authenticationManager,
+  @Autowired
+  public RestUserController(final AuthenticationManager authenticationManager,
       final SecurityContextRepository securityContextRepository, final UserRegisterValidator userRegisterValidator,
       final PasswordChangeValidator passwordChangeValidator, final ResetPasswordValidator resetPasswordValidator,
       final UserNeedRepository userNeedRepository) {
@@ -99,13 +107,11 @@ import java.util.Optional;
    * @param errors
    * @return ResponseEntity with Http Status Code
    */
-  @ResponseBody @RequestMapping(
-      value = "/",
-      produces = MediaType.APPLICATION_JSON_VALUE,
-      method = RequestMethod.POST)
-  //TODO: move transactionality annotation into the service layer
-  @Transactional(propagation = Propagation.REQUIRED) public ResponseEntity registerUser(@RequestBody UserPojo user,
-      Errors errors, WebRequest request) {
+  @ResponseBody
+  @RequestMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+  // TODO: move transactionality annotation into the service layer
+  @Transactional(propagation = Propagation.REQUIRED)
+  public ResponseEntity registerUser(@RequestBody UserPojo user, Errors errors, WebRequest request) {
     try {
       userRegisterValidator.validate(user, errors);
       if (errors.hasErrors()) {
@@ -147,14 +153,12 @@ import java.util.Optional;
    * @param errors
    * @return ResponseEntity with Http Status Code
    */
-  @ResponseBody @RequestMapping(
-      value = "/changePassword",
-      produces = MediaType.APPLICATION_JSON_VALUE,
-      method = RequestMethod.POST)
-  //TODO: move transactionality annotation into the service layer
-  @Transactional(propagation = Propagation.REQUIRED) public ResponseEntity changePassword(
-      @RequestBody ChangePasswordPojo changePasswordPojo, Errors errors, HttpServletRequest request,
-      HttpServletResponse response) {
+  @ResponseBody
+  @RequestMapping(value = "/changePassword", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+  // TODO: move transactionality annotation into the service layer
+  @Transactional(propagation = Propagation.REQUIRED)
+  public ResponseEntity changePassword(@RequestBody ChangePasswordPojo changePasswordPojo, Errors errors,
+      HttpServletRequest request, HttpServletResponse response) {
     String username = SecurityContextHolder.getContext().getAuthentication().getName();
     if (username == null) {
       return generateStatusResponse(RestStatusResponse.USER_NOT_SIGNED_IN);
@@ -175,8 +179,8 @@ import java.util.Optional;
       User user = userService.changePassword(changePasswordPojo.getUsername(), changePasswordPojo.getNewPassword(),
           changePasswordPojo.getOldPassword());
       eventPublisher.publishEvent(new OnPasswordChangedEvent(user, request.getLocale(), request.getContextPath()));
-      String recoveryKey = userService
-          .generateRecoveryKey(changePasswordPojo.getUsername(), changePasswordPojo.getNewPassword());
+      String recoveryKey = userService.generateRecoveryKey(changePasswordPojo.getUsername(),
+          changePasswordPojo.getNewPassword());
       eventPublisher.publishEvent(new OnRecoveryKeyGeneratedEvent(user, recoveryKey));
       return generateUserResponse(user);
     } catch (IncorrectPasswordException e) {
@@ -195,14 +199,12 @@ import java.util.Optional;
    * @param errors
    * @return ResponseEntity with Http Status Code
    */
-  @ResponseBody @RequestMapping(
-      value = "/resetPassword",
-      produces = MediaType.APPLICATION_JSON_VALUE,
-      method = RequestMethod.POST)
-  //TODO: move transactionality annotation into the service layer
-  @Transactional(propagation = Propagation.REQUIRED) public ResponseEntity resetPassword(
-      @RequestBody ResetPasswordPojo resetPasswordPojo, Errors errors, HttpServletRequest request,
-      HttpServletResponse response) {
+  @ResponseBody
+  @RequestMapping(value = "/resetPassword", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+  // TODO: move transactionality annotation into the service layer
+  @Transactional(propagation = Propagation.REQUIRED)
+  public ResponseEntity resetPassword(@RequestBody ResetPasswordPojo resetPasswordPojo, Errors errors,
+      HttpServletRequest request, HttpServletResponse response) {
     String username = SecurityContextHolder.getContext().getAuthentication().getName();
     if (username == null) {
       return generateStatusResponse(RestStatusResponse.USER_NOT_SIGNED_IN);
@@ -223,8 +225,8 @@ import java.util.Optional;
       User user = userService.useRecoveryKey(resetPasswordPojo.getUsername(), resetPasswordPojo.getNewPassword(),
           resetPasswordPojo.getRecoveryKey());
       eventPublisher.publishEvent(new OnPasswordChangedEvent(user, request.getLocale(), request.getContextPath()));
-      String recoveryKey = userService
-          .generateRecoveryKey(resetPasswordPojo.getUsername(), resetPasswordPojo.getNewPassword());
+      String recoveryKey = userService.generateRecoveryKey(resetPasswordPojo.getUsername(),
+          resetPasswordPojo.getNewPassword());
       eventPublisher.publishEvent(new OnRecoveryKeyGeneratedEvent(user, recoveryKey));
       return generateUserResponse(user);
     } catch (IncorrectPasswordException e) {
@@ -242,13 +244,14 @@ import java.util.Optional;
    * @param errors
    * @return ResponseEntity with Http Status Code
    */
-  @ResponseBody @RequestMapping(
-      value = "/transfer",
-      produces = MediaType.APPLICATION_JSON_VALUE,
-      method = RequestMethod.POST) @Transactional(propagation = Propagation.REQUIRED) public ResponseEntity transferUser(
-      @RequestBody TransferUserPojo transferUserPojo, Errors errors, WebRequest request) {
+  @ResponseBody
+  @RequestMapping(value = "/transfer", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+  @Transactional(propagation = Propagation.REQUIRED)
+  public ResponseEntity transferUser(@RequestBody TransferUserPojo transferUserPojo, Errors errors,
+      WebRequest request) {
     String username = SecurityContextHolder.getContext().getAuthentication().getName();
-    // cannot use user object from context since hw doesn't know about created in this session need,
+    // cannot use user object from context since hw doesn't know about created in
+    // this session need,
     // therefore, we have to retrieve the user object from the user repository
     User user = userService.getByUsername(username);
     if (user == null && !transferUserPojo.getPrivateUsername().equals(user.getUsername())) {
@@ -291,13 +294,13 @@ import java.util.Optional;
     return generateStatusResponse(RestStatusResponse.USER_TRANSFERRED);
   }
 
-  @ResponseBody @RequestMapping(
-      value = "/settings",
-      produces = MediaType.APPLICATION_JSON_VALUE,
-      method = RequestMethod.GET) public UserSettingsPojo getUserSettings(@RequestParam("uri") String uri) {
+  @ResponseBody
+  @RequestMapping(value = "/settings", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+  public UserSettingsPojo getUserSettings(@RequestParam("uri") String uri) {
 
     String username = SecurityContextHolder.getContext().getAuthentication().getName();
-    // cannot use user object from context since hw doesn't know about created in this session need,
+    // cannot use user object from context since hw doesn't know about created in
+    // this session need,
     // therefore, we have to retrieve the user object from the user repository
     User user = userService.getByUsername(username);
     UserSettingsPojo userSettingsPojo = new UserSettingsPojo(user.getUsername(), user.getEmail());
@@ -308,7 +311,7 @@ import java.util.Optional;
       for (UserNeed userNeed : user.getUserNeeds()) {
         if (userNeed.getUri().equals(needUri)) {
           userSettingsPojo.setNotify(userNeed.isMatches(), userNeed.isRequests(), userNeed.isConversations());
-          //userSettingsPojo.setEmail(user.getEmail());
+          // userSettingsPojo.setEmail(user.getEmail());
           break;
         }
       }
@@ -319,16 +322,15 @@ import java.util.Optional;
     return userSettingsPojo;
   }
 
-  @ResponseBody @RequestMapping(
-      value = "/settings",
-      produces = MediaType.APPLICATION_JSON_VALUE,
-      method = RequestMethod.POST)
-  //TODO: move transactionality annotation into the service layer
-  @Transactional(propagation = Propagation.SUPPORTS) public ResponseEntity setUserSettings(
-      @RequestBody UserSettingsPojo userSettingsPojo) {
+  @ResponseBody
+  @RequestMapping(value = "/settings", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+  // TODO: move transactionality annotation into the service layer
+  @Transactional(propagation = Propagation.SUPPORTS)
+  public ResponseEntity setUserSettings(@RequestBody UserSettingsPojo userSettingsPojo) {
 
     String username = SecurityContextHolder.getContext().getAuthentication().getName();
-    // cannot use user object from context since hw doesn't know about created in this session need,
+    // cannot use user object from context since hw doesn't know about created in
+    // this session need,
     // therefore, we have to retrieve the user object from the user repository
     User user = userService.getByUsername(username);
     if (!user.getUsername().equals(userSettingsPojo.getUsername())) {
@@ -336,12 +338,12 @@ import java.util.Optional;
     }
 
     if (user.getEmail() == null) {
-      //TODO validate email server-side?
+      // TODO validate email server-side?
       // set email:
       user.setEmail(userSettingsPojo.getEmail());
       userService.save(user);
     } else if (!user.getEmail().equals(userSettingsPojo.getEmail())) {
-      //TODO validate email server-side?
+      // TODO validate email server-side?
       // change email:
       user.setEmail(userSettingsPojo.getEmail());
       userService.save(user);
@@ -375,13 +377,11 @@ import java.util.Optional;
    * @param response
    * @return
    */
-  @ResponseBody @RequestMapping(
-      value = "/signin",
-      produces = MediaType.APPLICATION_JSON_VALUE,
-      method = RequestMethod.POST)
-  //TODO: move transactionality annotation into the service layer
-  @Transactional(propagation = Propagation.SUPPORTS) public ResponseEntity logIn(
-      @RequestParam("username") String username, @RequestParam("password") String password,
+  @ResponseBody
+  @RequestMapping(value = "/signin", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+  // TODO: move transactionality annotation into the service layer
+  @Transactional(propagation = Propagation.SUPPORTS)
+  public ResponseEntity logIn(@RequestParam("username") String username, @RequestParam("password") String password,
       @RequestParam(name = "privateId", required = false) String privateId, HttpServletRequest request,
       HttpServletResponse response) {
     Optional<User> user = Optional.empty();
@@ -412,20 +412,21 @@ import java.util.Optional;
   }
 
   /**
-   * Method only accessible if the user's still signed in / the session's still valid -> Use it to check the session cookie.
+   * Method only accessible if the user's still signed in / the session's still
+   * valid -> Use it to check the session cookie.
    */
-  //* @param user user object
-  //* @param request
-  //* @param response
-  //* @return
+  // * @param user user object
+  // * @param request
+  // * @param response
+  // * @return
   //
-  @ResponseBody @RequestMapping(
-      value = "/isSignedIn",
-      produces = MediaType.APPLICATION_JSON_VALUE,
-      method = RequestMethod.GET) @Transactional(propagation = Propagation.REQUIRED)
-  //TODO: move transactionality annotation into the service layer
+  @ResponseBody
+  @RequestMapping(value = "/isSignedIn", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+  @Transactional(propagation = Propagation.REQUIRED)
+  // TODO: move transactionality annotation into the service layer
   public ResponseEntity isSignedIn(HttpServletRequest request, HttpServletResponse response) {
-    // Execution will only get here, if the session is still valid, so sending OK here is enough. Spring sends an error
+    // Execution will only get here, if the session is still valid, so sending OK
+    // here is enough. Spring sends an error
     // code by itself if the session isn't valid any more
     SecurityContext context = SecurityContextHolder.getContext();
     Authentication authentication = null;
@@ -435,7 +436,7 @@ import java.util.Optional;
     if (authentication == null) {
       authentication = rememberMeServices.autoLogin(request, response);
     } else if (authentication instanceof AnonymousAuthenticationToken) {
-      //if we're anonymous, try to see if we can reactivate a remember-me session
+      // if we're anonymous, try to see if we can reactivate a remember-me session
       Authentication anonAuth = authentication;
       authentication = rememberMeServices.autoLogin(request, response);
       if (authentication == null) {
@@ -452,10 +453,8 @@ import java.util.Optional;
     }
   }
 
-  @RequestMapping(
-      value = "/signout",
-      method = RequestMethod.POST) public ResponseEntity logOut(HttpServletRequest request,
-      HttpServletResponse response) {
+  @RequestMapping(value = "/signout", method = RequestMethod.POST)
+  public ResponseEntity logOut(HttpServletRequest request, HttpServletResponse response) {
     SecurityContext context = SecurityContextHolder.getContext();
     if (context.getAuthentication() == null) {
       return new ResponseEntity("\"No user is signed in, ignoring this request.\"", HttpStatus.NOT_MODIFIED);
@@ -466,16 +465,16 @@ import java.util.Optional;
     return generateStatusResponse(RestStatusResponse.USER_SIGNED_OUT);
   }
 
-  @RequestMapping(
-      value = "/{userId}/favourites",
-      method = RequestMethod.POST) @Transactional(propagation = Propagation.SUPPORTS) public ResponseEntity saveAsFavourite() {
+  @RequestMapping(value = "/{userId}/favourites", method = RequestMethod.POST)
+  @Transactional(propagation = Propagation.SUPPORTS)
+  public ResponseEntity saveAsFavourite() {
     return null;
   }
 
-  @ResponseBody @RequestMapping(
-      value = "/confirmRegistration",
-      method = RequestMethod.POST) @Transactional(propagation = Propagation.SUPPORTS) public ResponseEntity confirmRegistration(
-      @RequestBody VerificationTokenPojo token) {
+  @ResponseBody
+  @RequestMapping(value = "/confirmRegistration", method = RequestMethod.POST)
+  @Transactional(propagation = Propagation.SUPPORTS)
+  public ResponseEntity confirmRegistration(@RequestBody VerificationTokenPojo token) {
     EmailVerificationToken verificationToken = userService.getEmailVerificationToken(token.getToken());
 
     if (verificationToken == null) {
@@ -499,9 +498,9 @@ import java.util.Optional;
     return generateStatusResponse(RestStatusResponse.TOKEN_VERIFICATION_SUCCESS);
   }
 
-  @ResponseBody @RequestMapping(
-      value = "/exportAccount",
-      method = RequestMethod.POST) public ResponseEntity exportAccount(
+  @ResponseBody
+  @RequestMapping(value = "/exportAccount", method = RequestMethod.POST)
+  public ResponseEntity exportAccount(
       @RequestParam(name = "keyStorePassword", required = false) String keyStorePassword) {
 
     SecurityContext securityContext = SecurityContextHolder.getContext();
@@ -520,12 +519,13 @@ import java.util.Optional;
     return generateStatusResponse(RestStatusResponse.EXPORT_SUCCESS);
   }
 
-  @ResponseBody @RequestMapping(
-      value = "/acceptTermsOfService",
-      produces = MediaType.APPLICATION_JSON_VALUE,
-      method = RequestMethod.POST) @Transactional(propagation = Propagation.SUPPORTS) public ResponseEntity acceptTermsOfService() {
+  @ResponseBody
+  @RequestMapping(value = "/acceptTermsOfService", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+  @Transactional(propagation = Propagation.SUPPORTS)
+  public ResponseEntity acceptTermsOfService() {
     String username = SecurityContextHolder.getContext().getAuthentication().getName();
-    // cannot use user object from context since hw doesn't know about created in this session need,
+    // cannot use user object from context since hw doesn't know about created in
+    // this session need,
     // therefore, we have to retrieve the user object from the user repository
     User user = userService.getByUsername(username);
     if (user == null) {
@@ -541,10 +541,10 @@ import java.util.Optional;
     }
   }
 
-  @ResponseBody @RequestMapping(
-      value = "/resendVerificationEmail",
-      method = RequestMethod.POST) @Transactional(propagation = Propagation.SUPPORTS) public ResponseEntity resendVerificationEmail(
-      @RequestBody UsernamePojo usernamePojo) {
+  @ResponseBody
+  @RequestMapping(value = "/resendVerificationEmail", method = RequestMethod.POST)
+  @Transactional(propagation = Propagation.SUPPORTS)
+  public ResponseEntity resendVerificationEmail(@RequestBody UsernamePojo usernamePojo) {
     User user = userService.getByUsername(usernamePojo.getUsername());
 
     if (user == null) {
@@ -572,10 +572,10 @@ import java.util.Optional;
     return generateStatusResponse(RestStatusResponse.TOKEN_RESEND_SUCCESS);
   }
 
-  @ResponseBody @RequestMapping(
-      value = "/sendAnonymousLinkEmail",
-      method = RequestMethod.POST) @Transactional(propagation = Propagation.SUPPORTS) public ResponseEntity sendAnonymousEmail(
-      @RequestBody AnonymousLinkPojo anonymousLinkPojo) {
+  @ResponseBody
+  @RequestMapping(value = "/sendAnonymousLinkEmail", method = RequestMethod.POST)
+  @Transactional(propagation = Propagation.SUPPORTS)
+  public ResponseEntity sendAnonymousEmail(@RequestBody AnonymousLinkPojo anonymousLinkPojo) {
     emailSender.sendAnonymousLinkMessage(anonymousLinkPojo.getEmail(), anonymousLinkPojo.getPrivateId());
     return generateStatusResponse(RestStatusResponse.USER_ANONYMOUSLINK_SENT);
   }
@@ -585,7 +585,7 @@ import java.util.Optional;
   }
 
   private static ResponseEntity generateStatusResponse(RestStatusResponse restStatusResponse) {
-    //TODO: Maybe change to return a pojo
+    // TODO: Maybe change to return a pojo
     Map values = new HashMap<String, String>();
     values.put("code", restStatusResponse.getCode());
     values.put("message", restStatusResponse.getMessage());
@@ -594,7 +594,7 @@ import java.util.Optional;
   }
 
   private static ResponseEntity generateUserResponse(User user) {
-    //TODO: Maybe change to return a pojo
+    // TODO: Maybe change to return a pojo
     Map values = new HashMap<String, String>();
     values.put("username", user.getUsername());
     values.put("authorities", user.getAuthorities());

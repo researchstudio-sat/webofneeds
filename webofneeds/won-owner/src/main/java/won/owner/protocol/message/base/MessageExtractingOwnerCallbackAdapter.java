@@ -26,11 +26,10 @@ import won.protocol.util.WonRdfUtils;
 
 /**
  * Simple implementation of the WonMessageHandlerAdapter that extracts the
- * information needed to create the Connection and Match objects directly
- * from the available message without using additional storage. This means
- * that the Connection's state and type properties are never available, as they
- * are not part of messages.
- * Use with care.
+ * information needed to create the Connection and Match objects directly from
+ * the available message without using additional storage. This means that the
+ * Connection's state and type properties are never available, as they are not
+ * part of messages. Use with care.
  */
 public class MessageExtractingOwnerCallbackAdapter extends OwnerCallbackAdapter {
 
@@ -41,21 +40,22 @@ public class MessageExtractingOwnerCallbackAdapter extends OwnerCallbackAdapter 
   public MessageExtractingOwnerCallbackAdapter() {
   }
 
-  @Override protected Connection makeConnection(WonMessage wonMessage) {
+  @Override
+  protected Connection makeConnection(WonMessage wonMessage) {
     return toConnection(wonMessage);
   }
 
-  @Override protected Match makeMatch(WonMessage wonMessage) {
+  @Override
+  protected Match makeMatch(WonMessage wonMessage) {
     return WonRdfUtils.MessageUtils.toMatch(wonMessage);
   }
 
   /**
-   * Creates a connection object representing the connection
-   * that the wonMessage is addressed at, if any.
-   * The resulting Connection object will not have a state or type property set.
+   * Creates a connection object representing the connection that the wonMessage
+   * is addressed at, if any. The resulting Connection object will not have a
+   * state or type property set.
    *
-   * @param wonMessage or null if the message is not directed at
-   *                   a connection
+   * @param wonMessage or null if the message is not directed at a connection
    */
   private Connection toConnection(WonMessage wonMessage) {
     Connection con = new Connection();
@@ -66,7 +66,9 @@ public class MessageExtractingOwnerCallbackAdapter extends OwnerCallbackAdapter 
     return con;
   }
 
-  @Autowired(required = false) @Qualifier("default") public void setAdaptee(OwnerCallback adaptee) {
+  @Autowired(required = false)
+  @Qualifier("default")
+  public void setAdaptee(OwnerCallback adaptee) {
     super.setAdaptee(adaptee);
   }
 }

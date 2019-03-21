@@ -31,7 +31,7 @@ public class HokifyMessageGenerator {
     String description = needModelWrapper.getSomeDescription("en", "de");
 
     SendMessage sendMessage = new SendMessage();
-    //sendMessage.setJobURL(jobURL);
+    // sendMessage.setJobURL(jobURL);
     String text = "<b>We found a Match for you!\n\n</b><a href='" + remoteNeedUri + "'>" + title + "\n\n</a>";
 
     if (description != null) {
@@ -52,7 +52,7 @@ public class HokifyMessageGenerator {
     String description = needModelWrapper.getSomeDescription("en", "de");
 
     SendMessage sendMessage = new SendMessage();
-    //sendMessage.setChatId(chatId);
+    // sendMessage.setChatId(chatId);
 
     String text = "<b>Someone wants to connect with you!\n\n</b><a href='" + remoteNeedUri + "'>" + title + "\n\n</a>";
 
@@ -68,7 +68,7 @@ public class HokifyMessageGenerator {
 
   public SendMessage getConnectionTextMessage(URI remoteNeedUri, URI yourNeedUri, WonMessage message) {
     SendMessage sendMessage = new SendMessage();
-    //sendMessage.setChatId(chatId);
+    // sendMessage.setChatId(chatId);
 
     sendMessage.setText("<a href='" + remoteNeedUri + "'>URI</a>: " + extractTextMessageFromWonMessage(message));
     sendMessage.enableHtml(true);

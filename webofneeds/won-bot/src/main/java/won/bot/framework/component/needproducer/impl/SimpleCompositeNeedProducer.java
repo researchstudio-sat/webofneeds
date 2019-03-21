@@ -21,7 +21,8 @@ import won.bot.framework.component.needproducer.NeedProducer;
 import java.util.Set;
 
 public class SimpleCompositeNeedProducer extends AbstractCompositeNeedProducer {
-  @Override protected NeedProducer selectActiveNeedFactory() {
+  @Override
+  protected NeedProducer selectActiveNeedFactory() {
     Set<NeedProducer> factories = getNeedFactories();
     if (factories.size() > 0)
       return factories.iterator().next();

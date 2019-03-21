@@ -24,27 +24,42 @@ public class HokifyJob {
   private static final String STATS = "stats";
   private static final String PRIORIZE = "priorize";
 
-  @JsonProperty(TITLE) private String title;
+  @JsonProperty(TITLE)
+  private String title;
   // TODO Change to right date format
-  @JsonProperty(DATE) private String date;
-  @JsonProperty(REFERENCENUMBER) private String referencenumber;
-  @JsonProperty(IMAGE) private String image;
-  @JsonProperty(URL) private String url;
-  @JsonProperty(COMPANY) private String company;
-  @JsonProperty(CITY) private String city;
-  @JsonProperty(COUNTRY) private String country;
-  @JsonProperty(DESCRIPTION) private String description;
-  @JsonProperty(SALARY) private String salary;
-  @JsonProperty(JOBTYPE) private String jobtype;
-  @JsonProperty(FIELD) private List field;
-  @JsonProperty(STATS) private Stats stats;
-  @JsonProperty(PRIORIZE) private String priorize;
+  @JsonProperty(DATE)
+  private String date;
+  @JsonProperty(REFERENCENUMBER)
+  private String referencenumber;
+  @JsonProperty(IMAGE)
+  private String image;
+  @JsonProperty(URL)
+  private String url;
+  @JsonProperty(COMPANY)
+  private String company;
+  @JsonProperty(CITY)
+  private String city;
+  @JsonProperty(COUNTRY)
+  private String country;
+  @JsonProperty(DESCRIPTION)
+  private String description;
+  @JsonProperty(SALARY)
+  private String salary;
+  @JsonProperty(JOBTYPE)
+  private String jobtype;
+  @JsonProperty(FIELD)
+  private List field;
+  @JsonProperty(STATS)
+  private Stats stats;
+  @JsonProperty(PRIORIZE)
+  private String priorize;
 
   public HokifyJob() {
 
   }
 
-  @Override public String toString() {
+  @Override
+  public String toString() {
     if (this.stats != null) {
       return "HokifyJob [title=" + title + ", date=" + date + ", referencenumber=" + referencenumber + ", image="
           + image + ", url=" + url + ", company=" + company + ", city=" + city + ", country=" + country
@@ -179,17 +194,24 @@ public class HokifyJob {
     private static final String APPLIEDLAST30DAYS = "appliedLast30Days";
     private static final String SMSLINK = "smslink";
 
-    @JsonProperty(VIEWS) private Views views;
-    @JsonProperty(DISCARDED) private int discarded;
-    @JsonProperty(SAVED) private int saved;
-    @JsonProperty(APPLIED) private int applied;
-    @JsonProperty(APPLIEDLAST30DAYS) private int appliedLast30Days;
-    @JsonProperty(SMSLINK) private int smslink;
+    @JsonProperty(VIEWS)
+    private Views views;
+    @JsonProperty(DISCARDED)
+    private int discarded;
+    @JsonProperty(SAVED)
+    private int saved;
+    @JsonProperty(APPLIED)
+    private int applied;
+    @JsonProperty(APPLIEDLAST30DAYS)
+    private int appliedLast30Days;
+    @JsonProperty(SMSLINK)
+    private int smslink;
 
     public Stats() {
     }
 
-    @Override public String toString() {
+    @Override
+    public String toString() {
       return "Stats [views=" + views.toString() + ", discarded=" + discarded + ", saved=" + saved + ", applied="
           + applied + ", appliedLast30Days=" + appliedLast30Days + ", smslink=" + smslink + "]";
     }
@@ -247,14 +269,18 @@ public class HokifyJob {
       private static final String APP = "app";
       private static final String EXTERNAL = "external";
 
-      @JsonProperty(WEB) private int web;
-      @JsonProperty(APP) private int app;
-      @JsonProperty(EXTERNAL) private int external;
+      @JsonProperty(WEB)
+      private int web;
+      @JsonProperty(APP)
+      private int app;
+      @JsonProperty(EXTERNAL)
+      private int external;
 
       public Views() {
       }
 
-      @Override public String toString() {
+      @Override
+      public String toString() {
         return "Views [web=" + web + ", app=" + app + ", external=" + external + "]";
       }
 

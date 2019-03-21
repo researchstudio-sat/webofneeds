@@ -48,11 +48,11 @@ public class MatcherProtocolTestBot extends EventBot {
 
   private static final int NO_OF_NEEDS = 2;
 
-  //we use protected members so we can extend the class and
-  //access the listeners for unit test assertions and stats
+  // we use protected members so we can extend the class and
+  // access the listeners for unit test assertions and stats
   //
-  //we use BaseEventListener as their types so we can access the generic
-  //functionality offered by that class
+  // we use BaseEventListener as their types so we can access the generic
+  // functionality offered by that class
   protected BaseEventListener matcherRegistrator;
   protected BaseEventListener needCreator;
   protected BaseEventListener matcher;
@@ -65,11 +65,12 @@ public class MatcherProtocolTestBot extends EventBot {
     this.registrationMatcherRetryInterval = registrationMatcherRetryInterval;
   }
 
-  @Override protected void initializeEventListeners() {
+  @Override
+  protected void initializeEventListeners() {
     EventListenerContext ctx = getEventListenerContext();
     EventBus bus = getEventBus();
 
-    //subscribe this bot with the WoN nodes' 'new need' topic
+    // subscribe this bot with the WoN nodes' 'new need' topic
     RegisterMatcherAction registerMatcherAction = new RegisterMatcherAction(ctx);
     this.matcherRegistrator = new ActionOnEventListener(ctx, registerMatcherAction, 1);
     bus.subscribe(ActEvent.class, this.matcherRegistrator);
@@ -78,12 +79,13 @@ public class MatcherProtocolTestBot extends EventBot {
     ActionOnEventListener matcherRetryRegistrator = new ActionOnEventListener(ctx, delayedRegistration);
     bus.subscribe(MatcherRegisterFailedEvent.class, matcherRetryRegistrator);
 
-    //create needs every trigger execution until 2 needs are created
+    // create needs every trigger execution until 2 needs are created
     this.needCreator = new ActionOnEventListener(ctx,
         new CreateNeedWithFacetsAction(ctx, getBotContextWrapper().getNeedCreateListName()), NO_OF_NEEDS);
 
     bus.subscribe(MatcherRegisteredEvent.class, new ActionOnEventListener(ctx, new BaseEventBotAction(ctx) {
-      @Override protected void doRun(final Event event, EventListener executingListener) throws Exception {
+      @Override
+      protected void doRun(final Event event, EventListener executingListener) throws Exception {
         getEventListenerContext().getEventBus().subscribe(ActEvent.class, needCreator);
       }
     }, 1));
@@ -94,7 +96,7 @@ public class MatcherProtocolTestBot extends EventBot {
     bus.subscribe(NeedCreatedEvent.class, matcherNotifier);
 
     this.matcher = new ActionOnceAfterNEventsListener(ctx, NO_OF_NEEDS, new MatchNeedsAction(ctx));
-    //count until 1 need is created, then create a comment facet
+    // count until 1 need is created, then create a comment facet
     bus.subscribe(NeedCreatedEvent.class, this.matcher);
 
     this.allNeedsDeactivator = new ActionOnEventListener(ctx, new DeactivateAllNeedsAction(ctx), 1);

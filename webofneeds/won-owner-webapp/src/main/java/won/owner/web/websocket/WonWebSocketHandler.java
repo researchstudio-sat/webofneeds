@@ -66,25 +66,34 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
 
   private OwnerApplicationService ownerApplicationService;
 
-  @Autowired private WebSocketSessionService webSocketSessionService;
+  @Autowired
+  private WebSocketSessionService webSocketSessionService;
 
-  @Autowired private UserRepository userRepository;
+  @Autowired
+  private UserRepository userRepository;
 
-  @Autowired private UserNeedRepository userNeedRepository;
+  @Autowired
+  private UserNeedRepository userNeedRepository;
 
-  @Autowired SessionRepository sessionRepository;
+  @Autowired
+  SessionRepository sessionRepository;
 
-  @Autowired private WonOwnerMailSender emailSender;
+  @Autowired
+  private WonOwnerMailSender emailSender;
 
-  @Autowired private EagerlyCachePopulatingMessageProcessor eagerlyCachePopulatingProcessor;
+  @Autowired
+  private EagerlyCachePopulatingMessageProcessor eagerlyCachePopulatingProcessor;
 
-  @Autowired private ServerSideActionService serverSideActionService;
+  @Autowired
+  private ServerSideActionService serverSideActionService;
 
-  @Override public void afterPropertiesSet() throws Exception {
+  @Override
+  public void afterPropertiesSet() throws Exception {
     this.ownerApplicationService.setMessageProcessorDelegate(this);
   }
 
-  @Override public void afterConnectionEstablished(final WebSocketSession session) throws Exception {
+  @Override
+  public void afterConnectionEstablished(final WebSocketSession session) throws Exception {
     super.afterConnectionEstablished(session);
     // remember which user or (if not logged in) which needUri the session is bound
     // to
@@ -97,8 +106,8 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
     }
   }
 
-  @Override public void afterConnectionClosed(final WebSocketSession session, final CloseStatus status)
-      throws Exception {
+  @Override
+  public void afterConnectionClosed(final WebSocketSession session, final CloseStatus status) throws Exception {
     super.afterConnectionClosed(session, status);
     User user = getUserForSession(session);
     if (user != null) {
@@ -127,8 +136,9 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
    * headers = new HttpHeaders(); headers.setLocation(need.getNeedURI()); return
    * new ResponseEntity<NeedPojo>(createdNeedPojo, headers, HttpStatus.CREATED);
    */
-  @Override @Transactional(propagation = Propagation.SUPPORTS, isolation = Isolation.READ_COMMITTED) public void handleTextMessage(
-      WebSocketSession session, TextMessage message) throws IOException {
+  @Override
+  @Transactional(propagation = Propagation.SUPPORTS, isolation = Isolation.READ_COMMITTED)
+  public void handleTextMessage(WebSocketSession session, TextMessage message) throws IOException {
     logger.debug("OA Server - WebSocket message received: {}", message.getPayload());
     updateSession(session);
 
@@ -185,19 +195,16 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
         // TODO: Set in STATE "inDeletion" and delete after it's deleted in the node
         // (receiving success response for delete msg)
         try {
-          //Get the need from owner application db
+          // Get the need from owner application db
           UserNeed userNeed = userNeedRepository.findByNeedUri(needUri);
           userNeed.setState(NeedState.DELETED);
           userNeedRepository.save(userNeed);
-                    /*
-                    //Get the user from owner application db
-                    user = userRepository.findOne(user.getId());
-                    //Delete need in users need list and save changes
-                    user.deleteNeedUri(userNeed);
-                    userRepository.save(user);
-                    //Delete need in need repository
-                    userNeedRepository.delete(userNeed.getId());
-                    */
+          /*
+           * //Get the user from owner application db user =
+           * userRepository.findOne(user.getId()); //Delete need in users need list and
+           * save changes user.deleteNeedUri(userNeed); userRepository.save(user);
+           * //Delete need in need repository userNeedRepository.delete(userNeed.getId());
+           */
         } catch (Exception e) {
           logger.debug("Could not delete need with  uri {} because of {}", needUri, e);
         }
@@ -231,12 +238,14 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
    * but still be able to receive large messages. Hence, we have to be able to
    * handle partial messages here.
    */
-  @Override public boolean supportsPartialMessages() {
+  @Override
+  public boolean supportsPartialMessages() {
     return true;
   }
 
-  @Override @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED) public WonMessage process(
-      final WonMessage wonMessage) {
+  @Override
+  @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
+  public WonMessage process(final WonMessage wonMessage) {
 
     try {
       String wonMessageJsonLdString = WonMessageEncoder.encodeAsJsonLd(wonMessage);
@@ -263,7 +272,7 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
         successfullySent += sendMessageForSession(wonMessage, webSocketMessage, session, needUri, user) ? 1 : 0;
       }
       if (successfullySent == 0) {
-        //we did not manage to send the message via the websocket, send it by email.
+        // we did not manage to send the message via the websocket, send it by email.
         logger.debug(
             "cannot deliver message of type {} for need {}, receiver {}: none of the associated websocket sessions worked. Trying to send message by email.",
             new Object[] { wonMessage.getMessageType(), wonMessage.getReceiverNeedURI(), wonMessage.getReceiverURI() });
@@ -271,7 +280,8 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
       }
       return wonMessage;
     } finally {
-      //in any case, let the serversideactionservice do its work, if there is any to do:
+      // in any case, let the serversideactionservice do its work, if there is any to
+      // do:
       serverSideActionService.process(wonMessage);
     }
   }
@@ -279,7 +289,8 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
   private void notifyPerEmail(final User user, final URI needUri, final WonMessage wonMessage) {
 
     if (wonMessage.getEnvelopeType() == WonMessageDirection.FROM_OWNER) {
-      //we assume that this message, coming from the server here, can only be an echoed message. don't send by email.
+      // we assume that this message, coming from the server here, can only be an
+      // echoed message. don't send by email.
       logger.debug("not sending email to user: message {} looks like an echo from the server",
           wonMessage.getMessageURI());
       return;
@@ -376,7 +387,7 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
   }
 
   private void removeClosedSessions(final Set<WebSocketSession> webSocketSessions, final URI needUri) {
-    for (Iterator<WebSocketSession> it = webSocketSessions.iterator(); it.hasNext(); ) {
+    for (Iterator<WebSocketSession> it = webSocketSessions.iterator(); it.hasNext();) {
       WebSocketSession session = it.next();
       if (!session.isOpen()) {
         logger.debug("removing closed websocket session {} of need {}", session.getId(), needUri);
@@ -387,7 +398,7 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
   }
 
   private void removeClosedSessions(final Set<WebSocketSession> webSocketSessions, final User user) {
-    for (Iterator<WebSocketSession> it = webSocketSessions.iterator(); it.hasNext(); ) {
+    for (Iterator<WebSocketSession> it = webSocketSessions.iterator(); it.hasNext();) {
       WebSocketSession session = it.next();
       if (!session.isOpen()) {
         logger.debug("removing closed websocket session {} of user {}", session.getId(), user.getId());
@@ -413,15 +424,16 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
   }
 
   /**
-   * Sends the specified message over the socket unless it is a successresponse to create, deactivate, activate.
+   * Sends the specified message over the socket unless it is a successresponse to
+   * create, deactivate, activate.
    *
    * @param wonMessage
    * @param webSocketMessage
    * @param session
    * @param needUri
    * @param user
-   * @return true if a message was sent (or suppressed as planned), false if something went wrong and the message
-   * could not be sent
+   * @return true if a message was sent (or suppressed as planned), false if
+   *         something went wrong and the message could not be sent
    */
   private synchronized boolean sendMessageForSession(final WonMessage wonMessage,
       final WebSocketMessage<String> webSocketMessage, final WebSocketSession session, URI needUri, User user) {
@@ -489,9 +501,10 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
       logger.debug("OA Server - sending WebSocket message: {}", webSocketMessage);
       session.sendMessage(webSocketMessage);
     } catch (Exception e) {
-      logger.warn(MessageFormat
-          .format("caught exception while trying to send on session {1} for needUri {2}, " + "user {3}",
-              session.getId(), needUri, user), e);
+      logger.warn(
+          MessageFormat.format("caught exception while trying to send on session {1} for needUri {2}, " + "user {3}",
+              session.getId(), needUri, user),
+          e);
       if (user != null) {
         webSocketSessionService.removeMapping(user, session);
       }
@@ -535,16 +548,16 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
   private void deleteNeedUri(final WonMessage wonMessage, final WebSocketSession session) {
     User user = getUserForSession(session);
     URI needUri = getOwnedNeedURI(wonMessage);
-    //Get the need from owner application db
+    // Get the need from owner application db
     UserNeed userNeed = userNeedRepository.findByNeedUri(needUri);
 
     if (userNeed.getState() == NeedState.DELETED) {
-      //Get the user from owner application db
+      // Get the user from owner application db
       user = userRepository.findOne(user.getId());
-      //Delete need in users need list and save changes
+      // Delete need in users need list and save changes
       user.deleteNeedUri(userNeed);
       userRepository.save(user);
-      //Delete need in need repository
+      // Delete need in need repository
       userNeedRepository.delete(userNeed.getId());
     } else {
       throw new IllegalStateException("need not in state deleted");
@@ -579,9 +592,8 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
   }
 
   private URI getOwnedNeedURI(WonMessage message) {
-    return message.getEnvelopeType() == WonMessageDirection.FROM_SYSTEM ?
-        message.getSenderNeedURI() :
-        message.getReceiverNeedURI();
+    return message.getEnvelopeType() == WonMessageDirection.FROM_SYSTEM ? message.getSenderNeedURI()
+        : message.getReceiverNeedURI();
   }
 
 }

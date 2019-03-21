@@ -19,17 +19,20 @@ import won.protocol.util.linkeddata.LinkedDataSource;
 import java.net.URI;
 import java.util.Set;
 
-@Controller @RequestMapping("/rest/petrinet") public class PetriNetController {
+@Controller
+@RequestMapping("/rest/petrinet")
+public class PetriNetController {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Autowired private LinkedDataSource linkedDataSourceOnBehalfOfNeed;
+  @Autowired
+  private LinkedDataSource linkedDataSourceOnBehalfOfNeed;
 
   public void setLinkedDataSource(LinkedDataSource linkedDataSource) {
     this.linkedDataSourceOnBehalfOfNeed = linkedDataSource;
   }
 
-  @RequestMapping(value = "/getPetriNetUris", method = RequestMethod.GET) public ResponseEntity<Set<PetriNetUris>> getPetriNetUris(
-      URI connectionUri) {
+  @RequestMapping(value = "/getPetriNetUris", method = RequestMethod.GET)
+  public ResponseEntity<Set<PetriNetUris>> getPetriNetUris(URI connectionUri) {
     return new ResponseEntity<Set<PetriNetUris>>(
         PetriNetStates.of(getAgreementProtocolState(connectionUri)).getPetriNetUris(), HttpStatus.OK);
   }

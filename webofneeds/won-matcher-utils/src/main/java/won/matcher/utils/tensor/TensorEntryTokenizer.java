@@ -22,7 +22,8 @@ public class TensorEntryTokenizer implements TensorEntryGenerator {
     tokenizer = new OpenNlpTokenExtraction();
   }
 
-  @Override public Collection<TensorEntry> generateTensorEntries() throws IOException {
+  @Override
+  public Collection<TensorEntry> generateTensorEntries() throws IOException {
 
     Collection<TensorEntry> tokenEntries = new LinkedList<>();
     for (TensorEntry entry : tensorEntries) {

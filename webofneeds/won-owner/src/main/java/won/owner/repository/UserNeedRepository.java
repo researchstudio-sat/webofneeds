@@ -23,9 +23,9 @@ import won.protocol.repository.WonRepository;
 import java.net.URI;
 
 /**
- * User: fkleedorfer
- * Date: 15.10.2014
+ * User: fkleedorfer Date: 15.10.2014
  */
 public interface UserNeedRepository extends WonRepository<UserNeed> {
-  @Query(value = "SELECT n from UserNeed n where n.uri = ?1") public UserNeed findByNeedUri(URI needUri);
+  @Query(value = "SELECT n from UserNeed n where n.uri = ?1")
+  public UserNeed findByNeedUri(URI needUri);
 }

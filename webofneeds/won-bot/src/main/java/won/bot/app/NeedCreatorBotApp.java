@@ -20,7 +20,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.stereotype.Component;
 
-@Component public class NeedCreatorBotApp implements CommandLineRunner {
+@Component
+public class NeedCreatorBotApp implements CommandLineRunner {
 
   public static void main(String[] args) {
     SpringApplication app = new SpringApplication(new Object[] { "classpath:/spring/app/needCreatorBotApp.xml" });
@@ -28,7 +29,8 @@ import org.springframework.stereotype.Component;
     app.run(args);
   }
 
-  @Override public void run(final String... strings) throws Exception {
+  @Override
+  public void run(final String... strings) throws Exception {
 
   }
 }

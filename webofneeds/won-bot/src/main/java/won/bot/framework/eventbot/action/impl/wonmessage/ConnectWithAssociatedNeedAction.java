@@ -34,9 +34,10 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * BaseEventBotAction connecting two needs on the specified facets or on their default facets.
- * Requires a NeedSpecificEvent to run and expeects the needURI from the event
- * to be associated with another need URI via the botContext.saveToObjectMap method.
+ * BaseEventBotAction connecting two needs on the specified facets or on their
+ * default facets. Requires a NeedSpecificEvent to run and expeects the needURI
+ * from the event to be associated with another need URI via the
+ * botContext.saveToObjectMap method.
  */
 public class ConnectWithAssociatedNeedAction extends BaseEventBotAction {
   private Optional<URI> remoteFacetType = Optional.empty();
@@ -58,7 +59,8 @@ public class ConnectWithAssociatedNeedAction extends BaseEventBotAction {
     this.welcomeMessage = welcomeMessage;
   }
 
-  @Override public void doRun(Event event, EventListener executingListener) {
+  @Override
+  public void doRun(Event event, EventListener executingListener) {
     if (!(event instanceof NeedSpecificEvent)) {
       logger.error("ConnectWithAssociatedNeedAction can only handle NeedSpecificEvents");
       return;
@@ -85,9 +87,12 @@ public class ConnectWithAssociatedNeedAction extends BaseEventBotAction {
     return WonMessageBuilder.setMessagePropertiesForConnect(wonNodeInformationService.generateEventURI(localWonNode),
         localFacetType.map(facetType -> WonLinkedDataUtils
             .getFacetsOfType(fromUri, facetType, getEventListenerContext().getLinkedDataSource()).stream().findFirst()
-            .orElse(null)), fromUri, localWonNode, remoteFacetType.map(facetType -> WonLinkedDataUtils
+            .orElse(null)),
+        fromUri, localWonNode,
+        remoteFacetType.map(facetType -> WonLinkedDataUtils
             .getFacetsOfType(toUri, facetType, getEventListenerContext().getLinkedDataSource()).stream().findFirst()
-            .orElse(null)), toUri, remoteWonNode, welcomeMessage).build();
+            .orElse(null)),
+        toUri, remoteWonNode, welcomeMessage).build();
   }
 
 }

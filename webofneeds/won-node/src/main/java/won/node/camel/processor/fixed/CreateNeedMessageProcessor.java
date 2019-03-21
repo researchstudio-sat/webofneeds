@@ -22,13 +22,14 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * User: syim
- * Date: 02.03.2015
+ * User: syim Date: 02.03.2015
  */
-@Service @FixedMessageProcessor(direction = WONMSG.TYPE_FROM_OWNER_STRING, messageType = WONMSG.TYPE_CREATE_STRING) public class CreateNeedMessageProcessor
-    extends AbstractCamelProcessor {
+@Service
+@FixedMessageProcessor(direction = WONMSG.TYPE_FROM_OWNER_STRING, messageType = WONMSG.TYPE_CREATE_STRING)
+public class CreateNeedMessageProcessor extends AbstractCamelProcessor {
 
-  @Override public void process(final Exchange exchange) throws Exception {
+  @Override
+  public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
     WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
     Need need = storeNeed(wonMessage);
@@ -38,7 +39,7 @@ import java.util.stream.Collectors;
   private Need storeNeed(final WonMessage wonMessage) {
     Dataset needContent = wonMessage.getMessageContent();
     List<WonMessage.AttachmentHolder> attachmentHolders = wonMessage.getAttachments();
-    //remove attachment and its signature from the needContent
+    // remove attachment and its signature from the needContent
     removeAttachmentsFromNeedContent(needContent, attachmentHolders);
     URI needURI = getNeedURIFromWonMessage(needContent);
     if (!needURI.equals(wonMessage.getSenderNeedURI()))
@@ -49,7 +50,8 @@ import java.util.stream.Collectors;
     need.setState(NeedState.ACTIVE);
     need.setNeedURI(needURI);
 
-    // ToDo (FS) check if the WON node URI corresponds with the WON node (maybe earlier in the message layer)
+    // ToDo (FS) check if the WON node URI corresponds with the WON node (maybe
+    // earlier in the message layer)
     NeedEventContainer needEventContainer = needEventContainerRepository.findOneByParentUri(needURI);
     if (needEventContainer == null) {
       needEventContainer = new NeedEventContainer(need, need.getNeedURI());
@@ -62,9 +64,9 @@ import java.util.stream.Collectors;
     need.setConnectionContainer(connectionContainer);
     need.setEventContainer(needEventContainer);
 
-    //store the need content
+    // store the need content
     DatasetHolder datasetHolder = new DatasetHolder(needURI, needContent);
-    //store attachments
+    // store attachments
     List<DatasetHolder> attachments = new ArrayList<>(attachmentHolders.size());
     for (WonMessage.AttachmentHolder attachmentHolder : attachmentHolders) {
       datasetHolder = new DatasetHolder(attachmentHolder.getDestinationUri(), attachmentHolder.getAttachmentDataset());
@@ -92,7 +94,7 @@ import java.util.stream.Collectors;
       return f;
     }).collect(Collectors.toSet());
 
-    //add everything to the need model class and save it
+    // add everything to the need model class and save it
     need.setDatatsetHolder(datasetHolder);
     need.setAttachmentDatasetHolders(attachments);
     need = needRepository.save(need);
@@ -104,7 +106,7 @@ import java.util.stream.Collectors;
   private void removeAttachmentsFromNeedContent(Dataset needContent,
       List<WonMessage.AttachmentHolder> attachmentHolders) {
     for (WonMessage.AttachmentHolder attachmentHolder : attachmentHolders) {
-      for (Iterator<String> it = attachmentHolder.getAttachmentDataset().listNames(); it.hasNext(); ) {
+      for (Iterator<String> it = attachmentHolder.getAttachmentDataset().listNames(); it.hasNext();) {
         String modelName = it.next();
         needContent.removeNamedModel(modelName);
       }

@@ -49,7 +49,8 @@ public class Proposes extends MessageEffect {
     return ProposalType.NONE;
   }
 
-  @Override public String toString() {
+  @Override
+  public String toString() {
     return "Proposes [proposes=" + proposes + ", proposesToCancel=" + proposesToCancel + "]";
   }
 

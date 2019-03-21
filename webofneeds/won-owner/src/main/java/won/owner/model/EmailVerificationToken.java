@@ -6,19 +6,28 @@ import java.util.Calendar;
 import java.util.Date;
 
 /**
- * Entity that holds a verificationToken for Users so we enable the EmailVerification Process
+ * Entity that holds a verificationToken for Users so we enable the
+ * EmailVerification Process
  */
-@Entity @Table(name = "verificationtoken") public class EmailVerificationToken {
-  private static final int EXPIRATION = 60 * 24; //Token will expire after a day
+@Entity
+@Table(name = "verificationtoken")
+public class EmailVerificationToken {
+  private static final int EXPIRATION = 60 * 24; // Token will expire after a day
   private static final TokenPurpose DEFAULT_PURPOSE = TokenPurpose.INITIAL_EMAIL_VERIFICATION;
 
-  @Id @GeneratedValue private Long id;
+  @Id
+  @GeneratedValue
+  private Long id;
 
   private String token;
 
-  @OneToOne(targetEntity = User.class, fetch = FetchType.EAGER) @JoinColumn(nullable = false, name = "user_id") private User user;
+  @OneToOne(targetEntity = User.class, fetch = FetchType.EAGER)
+  @JoinColumn(nullable = false, name = "user_id")
+  private User user;
 
-  @Column(name = "purpose") @Enumerated(EnumType.STRING) private TokenPurpose purpose;
+  @Column(name = "purpose")
+  @Enumerated(EnumType.STRING)
+  private TokenPurpose purpose;
 
   private Date expiryDate;
 
@@ -46,7 +55,7 @@ import java.util.Date;
     return new Date(cal.getTime().getTime());
   }
 
-  //Getter & Setter
+  // Getter & Setter
   public Long getId() {
     return id;
   }

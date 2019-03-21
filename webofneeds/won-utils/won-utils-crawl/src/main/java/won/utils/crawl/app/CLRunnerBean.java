@@ -31,11 +31,13 @@ import java.util.List;
 /**
  * Created by fsuda on 04.03.2015.
  */
-@Component public class CLRunnerBean implements CommandLineRunner {
+@Component
+public class CLRunnerBean implements CommandLineRunner {
   private static final Logger logger = LoggerFactory.getLogger(CLRunnerBean.class);
   private LinkedDataSource linkedDataSource;
 
-  @Override public void run(String... args) throws Exception {
+  @Override
+  public void run(String... args) throws Exception {
     if (args == null && args.length == 0) {
       logger.warn("arguments: [space-separated list of uris to crawl]");
       return;
@@ -69,7 +71,8 @@ import java.util.List;
           Query query = QueryFactory.create(WonQueries.SPARQL_ALL_GRAPHS);
           QuerySolutionMap initialBinding = new QuerySolutionMap();
           // InitialBindings are used to set filters on the resultset
-          //initialBinding.add("need", needDataset.getDefaultModel().createResource(uri.toString()));
+          // initialBinding.add("need",
+          // needDataset.getDefaultModel().createResource(uri.toString()));
 
           try (QueryExecution qExec = QueryExecutionFactory.create(query, needDataset, initialBinding)) {
             qExec.getContext().set(TDB.symUnionDefaultGraph, true);
@@ -86,7 +89,8 @@ import java.util.List;
           Query query = QueryFactory.create(WonQueries.SPARQL_ALL_NEEDS);
           QuerySolutionMap initialBinding = new QuerySolutionMap();
           // InitialBindings are used to set filters on the resultset
-          //initialBinding.add("need", needDataset.getDefaultModel().createResource(uri.toString()));
+          // initialBinding.add("need",
+          // needDataset.getDefaultModel().createResource(uri.toString()));
 
           try (QueryExecution qExec = QueryExecutionFactory.create(query, needDataset, initialBinding)) {
             qExec.getContext().set(TDB.symUnionDefaultGraph, true);
@@ -115,7 +119,8 @@ import java.util.List;
           Query query = QueryFactory.create(queryString);
           QuerySolutionMap initialBinding = new QuerySolutionMap();
           // InitialBindings are used to set filters on the resultset
-          //initialBinding.add("need", needDataset.getDefaultModel().createResource(uri.toString()));
+          // initialBinding.add("need",
+          // needDataset.getDefaultModel().createResource(uri.toString()));
 
           try (QueryExecution qExec = QueryExecutionFactory.create(query, needDataset, initialBinding)) {
             qExec.getContext().set(TDB.symUnionDefaultGraph, true);
@@ -129,7 +134,7 @@ import java.util.List;
         }
       }
 
-      //            System.out.println(RdfUtils.setSparqlVars(WonQueries.SPARQL_CONNECTIONS_FILTERED_BY_NEED_URI,"need",URI.create("http://rsa021.researchstudio.at:8080/won/resource/need/4871438545203495000")));
+      // System.out.println(RdfUtils.setSparqlVars(WonQueries.SPARQL_CONNECTIONS_FILTERED_BY_NEED_URI,"need",URI.create("http://rsa021.researchstudio.at:8080/won/resource/need/4871438545203495000")));
     }
   }
 
@@ -171,9 +176,8 @@ import java.util.List;
         "<" + WON.HAS_CONNECTIONS + ">" + "/" + "rdfs:member" + "/<" + WON.HAS_REMOTE_CONNECTION + ">");
     addPropertyPath(propertyPaths,
         "<" + WON.HAS_CONNECTIONS + ">" + "/" + "rdfs:member" + "/<" + WON.HAS_EVENT_CONTAINER + ">/rdfs:member");
-    addPropertyPath(propertyPaths,
-        "<" + WON.HAS_CONNECTIONS + ">" + "/" + "rdfs:member" + "/<" + WON.HAS_REMOTE_CONNECTION + ">/<"
-            + WON.BELONGS_TO_NEED + ">");
+    addPropertyPath(propertyPaths, "<" + WON.HAS_CONNECTIONS + ">" + "/" + "rdfs:member" + "/<"
+        + WON.HAS_REMOTE_CONNECTION + ">/<" + WON.BELONGS_TO_NEED + ">");
     return propertyPaths;
   }
 
@@ -182,15 +186,12 @@ import java.util.List;
     addPropertyPath(propertyPaths, "rdfs:member");
     addPropertyPath(propertyPaths, "rdfs:member/" + "<" + WON.HAS_CONNECTIONS + ">");
     addPropertyPath(propertyPaths, "rdfs:member/" + "<" + WON.HAS_CONNECTIONS + ">" + "/" + "rdfs:member");
-    addPropertyPath(propertyPaths,
-        "rdfs:member/" + "<" + WON.HAS_CONNECTIONS + ">" + "/" + "rdfs:member" + "/<" + WON.HAS_REMOTE_CONNECTION
-            + ">");
-    addPropertyPath(propertyPaths,
-        "rdfs:member/" + "<" + WON.HAS_CONNECTIONS + ">" + "/" + "rdfs:member" + "/<" + WON.HAS_EVENT_CONTAINER
-            + ">/rdfs:member");
-    addPropertyPath(propertyPaths,
-        "rdfs:member/" + "<" + WON.HAS_CONNECTIONS + ">" + "/" + "rdfs:member" + "/<" + WON.HAS_REMOTE_CONNECTION
-            + ">/<" + WON.BELONGS_TO_NEED + ">");
+    addPropertyPath(propertyPaths, "rdfs:member/" + "<" + WON.HAS_CONNECTIONS + ">" + "/" + "rdfs:member" + "/<"
+        + WON.HAS_REMOTE_CONNECTION + ">");
+    addPropertyPath(propertyPaths, "rdfs:member/" + "<" + WON.HAS_CONNECTIONS + ">" + "/" + "rdfs:member" + "/<"
+        + WON.HAS_EVENT_CONTAINER + ">/rdfs:member");
+    addPropertyPath(propertyPaths, "rdfs:member/" + "<" + WON.HAS_CONNECTIONS + ">" + "/" + "rdfs:member" + "/<"
+        + WON.HAS_REMOTE_CONNECTION + ">/<" + WON.BELONGS_TO_NEED + ">");
     return propertyPaths;
   }
 
@@ -199,8 +200,8 @@ import java.util.List;
     propertyPaths.add(path);
   }
 
-  @Autowired public void setLinkedDataSource(final LinkedDataSource linkedDataSource) {
+  @Autowired
+  public void setLinkedDataSource(final LinkedDataSource linkedDataSource) {
     this.linkedDataSource = linkedDataSource;
   }
 }
-

@@ -20,9 +20,9 @@ import java.util.LinkedList;
 import java.util.function.Function;
 
 /**
- * Class supports in producing goal instantiations that can be used to create proposals for instance.
- * Goal instantiations are data models that evaluate successfully against defined shacl shapes taken from
- * two goals of two needs.
+ * Class supports in producing goal instantiations that can be used to create
+ * proposals for instance. Goal instantiations are data models that evaluate
+ * successfully against defined shacl shapes taken from two goals of two needs.
  */
 public class GoalInstantiationProducer {
 
@@ -38,8 +38,10 @@ public class GoalInstantiationProducer {
    * @param need1             Dataset of need 1
    * @param need2             Dataset of need 2
    * @param conversation      Dataset of the conversation between two needs
-   * @param variableUriPrefix uri prefix defines which resource URIs are considered for blending
-   * @param blendingUriPrefix uri prefix that is used to generate the result URIs of blended resources
+   * @param variableUriPrefix uri prefix defines which resource URIs are
+   *                          considered for blending
+   * @param blendingUriPrefix uri prefix that is used to generate the result URIs
+   *                          of blended resources
    */
   public GoalInstantiationProducer(Dataset need1, Dataset need2, Dataset conversation, String variableUriPrefix,
       String blendingUriPrefix) {
@@ -54,23 +56,17 @@ public class GoalInstantiationProducer {
     Model strippedNeed1 = getNeedContentModelWithoutGoals(need1);
     Model strippedNeed2 = getNeedContentModelWithoutGoals(need2);
 
-    // create the combined dataset with the rest of the data of the two needs and the whole conversation
+    // create the combined dataset with the rest of the data of the two needs and
+    // the whole conversation
     Dataset combinedDataset = DatasetFactory.create();
     combinedDataset.addNamedModel("need1", strippedNeed1);
     combinedDataset.addNamedModel("need2", strippedNeed2);
     if (conversation != null) {
-      String sparqlQuery = "PREFIX msg: <http://purl.org/webofneeds/message#> \n" +
-          "DELETE { \n" +
-          "    GRAPH ?g {?s ?p ?o} \n" +
-          "} \n" +
-          "WHERE { \n" +
-          "    GRAPH ?g { ?s ?p ?o } \n" +
-          "    { SELECT (GROUP_CONCAT(?content; separator=\" \") as ?contentGraphs) \n" +
-          "            WHERE { GRAPH <urn:x-arq:UnionGraph> { ?msg msg:hasContent ?content } \n" +
-          "    }\n" +
-          "} \n" +
-          "FILTER (!contains(?contentGraphs,str(?g))) \n" +
-          "} \n";
+      String sparqlQuery = "PREFIX msg: <http://purl.org/webofneeds/message#> \n" + "DELETE { \n"
+          + "    GRAPH ?g {?s ?p ?o} \n" + "} \n" + "WHERE { \n" + "    GRAPH ?g { ?s ?p ?o } \n"
+          + "    { SELECT (GROUP_CONCAT(?content; separator=\" \") as ?contentGraphs) \n"
+          + "            WHERE { GRAPH <urn:x-arq:UnionGraph> { ?msg msg:hasContent ?content } \n" + "    }\n" + "} \n"
+          + "FILTER (!contains(?contentGraphs,str(?g))) \n" + "} \n";
 
       UpdateRequest update = UpdateFactory.create(sparqlQuery);
 
@@ -92,15 +88,17 @@ public class GoalInstantiationProducer {
   }
 
   /**
-   * Create a goal instantiation result from the attempt to instantiate two goals of two needs using all
-   * the need data, the conversation data and the data and shapes of the two goals.
-   * If a model can be found that conforms to the shacl shapes of both needs this model is chosen to be returned
-   * in the GoalInstantiationResult. If no conforming model can be found, the model with the least
-   * shacl validation results (validation errors) is used.
+   * Create a goal instantiation result from the attempt to instantiate two goals
+   * of two needs using all the need data, the conversation data and the data and
+   * shapes of the two goals. If a model can be found that conforms to the shacl
+   * shapes of both needs this model is chosen to be returned in the
+   * GoalInstantiationResult. If no conforming model can be found, the model with
+   * the least shacl validation results (validation errors) is used.
    *
    * @param goal1 resource referencing goal from need1
    * @param goal2 resource referencing goal from need2
-   * @return a goal instantiation result whose input model can either conform to its shacl shapes or not
+   * @return a goal instantiation result whose input model can either conform to
+   *         its shacl shapes or not
    */
   private GoalInstantiationResult findInstantiationForGoals(Resource goal1, Resource goal2) {
 
@@ -115,7 +113,8 @@ public class GoalInstantiationProducer {
       throw new IllegalArgumentException("shapes model for goal not found");
     }
 
-    // create the combined model with need content, conversation data and the data of the two goals
+    // create the combined model with need content, conversation data and the data
+    // of the two goals
     Model combinedModelWithGoalData = ModelFactory.createDefaultModel();
     combinedModelWithGoalData.add(combinedModelWithoutGoals);
     if (dataModel1 != null) {
@@ -143,20 +142,24 @@ public class GoalInstantiationProducer {
     while (blendingIterator.hasNext()) {
       Model blendedModel = blendingIterator.next();
 
-      // check if the blended model conforms to the combined shacl shapes of both needs
+      // check if the blended model conforms to the combined shacl shapes of both
+      // needs
       Resource report = ValidationUtil.validateModel(blendedModel, combinedShapesModel, false);
       ShaclReportWrapper shaclReportWrapper = new ShaclReportWrapper(report);
       if (shaclReportWrapper.isConform()) {
 
-        // if we found a blended model that is conform to the shacl shapes lets try to condense it
-        // as far as possible to get the minimum model that is still conform to the shapes
-        Function<Model, Boolean> modelTestingFunction = param -> GoalUtils
-            .validateModelShaclConformity(param, combinedShapesModel);
+        // if we found a blended model that is conform to the shacl shapes lets try to
+        // condense it
+        // as far as possible to get the minimum model that is still conform to the
+        // shapes
+        Function<Model, Boolean> modelTestingFunction = param -> GoalUtils.validateModelShaclConformity(param,
+            combinedShapesModel);
         Model condensedModel = RdfUtils.condenseModelByIterativeTesting(blendedModel, modelTestingFunction);
         bestGoalInstantiationResult = new GoalInstantiationResult(condensedModel, combinedShapesModel);
       } else {
 
-        // if the model is not conform save it if it has the least validation results found so far
+        // if the model is not conform save it if it has the least validation results
+        // found so far
         if (shaclReportWrapper.getValidationResults().size() < minValidationResults) {
           minValidationResults = shaclReportWrapper.getValidationResults().size();
           bestGoalInstantiationResult = new GoalInstantiationResult(blendedModel, combinedShapesModel);
@@ -168,12 +171,14 @@ public class GoalInstantiationProducer {
   }
 
   /**
-   * Create a goal instantiation result from the attempt to instantiate one goal with data of two needs using all
-   * the need data, the conversation data and the shapes data of the goal. The data is extracted and validated
-   * against the shacl shape of the goal.
+   * Create a goal instantiation result from the attempt to instantiate one goal
+   * with data of two needs using all the need data, the conversation data and the
+   * shapes data of the goal. The data is extracted and validated against the
+   * shacl shape of the goal.
    *
    * @param goal resource referencing goal from need1 or need2
-   * @return a goal instantiation result whose input model can either conform to its shacl shapes or not
+   * @return a goal instantiation result whose input model can either conform to
+   *         its shacl shapes or not
    */
   public GoalInstantiationResult findInstantiationForGoal(Resource goal) {
 
@@ -207,13 +212,15 @@ public class GoalInstantiationProducer {
   }
 
   /**
-   * Create a goal instantiation result from the attempt to instantiate one goal with data given in the dataset
-   * The data is extracted and validated against the shacl shape of the goal.
+   * Create a goal instantiation result from the attempt to instantiate one goal
+   * with data given in the dataset The data is extracted and validated against
+   * the shacl shape of the goal.
    *
    * @param need  Dataset of the need to retrieve the goalShapesModel from
    * @param goal  resource referencing goal from need1 or need2
    * @param model Model that should be checked for goal validity
-   * @return a goal instantiation result whose input model can either conform to its shacl shapes or not
+   * @return a goal instantiation result whose input model can either conform to
+   *         its shacl shapes or not
    */
   public static GoalInstantiationResult findInstantiationForGoalInDataset(Dataset need, Resource goal, Model model) {
     NeedModelWrapper needWrapper = new NeedModelWrapper(need);
@@ -234,8 +241,8 @@ public class GoalInstantiationProducer {
   }
 
   /**
-   * create all possible goal instantiations between two needs.
-   * That means trying to combine each two goals of the two needs.
+   * create all possible goal instantiations between two needs. That means trying
+   * to combine each two goals of the two needs.
    *
    * @return
    */
@@ -255,8 +262,8 @@ public class GoalInstantiationProducer {
   }
 
   /**
-   * create all possible goal instantiations between two needs.
-   * Including the separate goals of each need as well.
+   * create all possible goal instantiations between two needs. Including the
+   * separate goals of each need as well.
    *
    * @return
    */

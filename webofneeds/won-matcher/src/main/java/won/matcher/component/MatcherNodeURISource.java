@@ -23,7 +23,8 @@ import java.util.Iterator;
  */
 public interface MatcherNodeURISource {
   /**
-   * Returns a WON_BA node's URI. Must point to the URI that, when dereferenced, yields the RDF description of the WON_BA node.
+   * Returns a WON_BA node's URI. Must point to the URI that, when dereferenced,
+   * yields the RDF description of the WON_BA node.
    *
    * @return
    */

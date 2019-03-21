@@ -36,7 +36,8 @@ public class LogAction extends BaseEventBotAction {
     this.message = message;
   }
 
-  @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
+  @Override
+  protected void doRun(Event event, EventListener executingListener) throws Exception {
     logger.info(message);
   }
 

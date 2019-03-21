@@ -25,31 +25,39 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 import org.springframework.web.socket.server.standard.ServletServerContainerFactoryBean;
 
 /**
- * User: LEIH-NB
- * Date: 06.08.14
+ * User: LEIH-NB Date: 06.08.14
  */
-@Configuration @EnableWebSocket public class WebSocketConfig
-    implements WebSocketConfigurer//extends AbstractWebSocketMessageBrokerConfigurer
+@Configuration
+@EnableWebSocket
+public class WebSocketConfig implements WebSocketConfigurer// extends AbstractWebSocketMessageBrokerConfigurer
 {
   private WonWebSocketHandler wonWebSocketHandler;
 
-  @Override public void registerWebSocketHandlers(final WebSocketHandlerRegistry registry) {
+  @Override
+  public void registerWebSocketHandlers(final WebSocketHandlerRegistry registry) {
     registry.addHandler(this.wonWebSocketHandler, "/msg").addInterceptors(new WonHandshakeInterceptor()).withSockJS();
   }
 
-  @Autowired public void setWonWebSocketHandler(WonWebSocketHandler wonWebSocketHandler) {
+  @Autowired
+  public void setWonWebSocketHandler(WonWebSocketHandler wonWebSocketHandler) {
     this.wonWebSocketHandler = wonWebSocketHandler;
   }
 
-  @Bean public ServletServerContainerFactoryBean createWebSocketContainer() {
+  @Bean
+  public ServletServerContainerFactoryBean createWebSocketContainer() {
     ServletServerContainerFactoryBean container = new ServletServerContainerFactoryBean();
-    //here, we set the buffer size of each websocket. This means that we will allocate the
-    // specified amount of memory for each browser session. Of course we would like to pre-allocate as little as
-    // possible, but we haven't figured out a way to do that yet. We use websockets via spring's sockjs
-    // implementation, and they do not allow partial messages, and there doesn't seem to be another way.
-    int bufferSize = 4 * 1024 * 1024; //4MB, so we can have attachments (images)
+    // here, we set the buffer size of each websocket. This means that we will
+    // allocate the
+    // specified amount of memory for each browser session. Of course we would like
+    // to pre-allocate as little as
+    // possible, but we haven't figured out a way to do that yet. We use websockets
+    // via spring's sockjs
+    // implementation, and they do not allow partial messages, and there doesn't
+    // seem to be another way.
+    int bufferSize = 4 * 1024 * 1024; // 4MB, so we can have attachments (images)
     container.setMaxTextMessageBufferSize(bufferSize);
-    //don't need a binary buffer - or so we think: beware, if this is too small, our application fails - silently. How
+    // don't need a binary buffer - or so we think: beware, if this is too small,
+    // our application fails - silently. How
     // great is that?
     container.setMaxBinaryMessageBufferSize(bufferSize);
 
@@ -57,4 +65,3 @@ import org.springframework.web.socket.server.standard.ServletServerContainerFact
   }
 
 }
-

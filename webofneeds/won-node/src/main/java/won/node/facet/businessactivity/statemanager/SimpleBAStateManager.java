@@ -4,8 +4,7 @@ import java.net.URI;
 import java.util.HashMap;
 
 /**
- * User: Danijel
- * Date: 22.5.14.
+ * User: Danijel Date: 22.5.14.
  */
 public abstract class SimpleBAStateManager implements BAStateManager {
   private HashMap<String, URI> map = new HashMap();
@@ -19,4 +18,3 @@ public abstract class SimpleBAStateManager implements BAStateManager {
   }
 
 }
-

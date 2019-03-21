@@ -29,8 +29,7 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * User: fkleedorfer
- * Date: 29.08.2017
+ * User: fkleedorfer Date: 29.08.2017
  */
 public class BehaviourBarrier extends BotBehaviour {
   private Set<BotBehaviour> behavioursToWaitFor = Collections.synchronizedSet(new HashSet<>());
@@ -52,24 +51,27 @@ public class BehaviourBarrier extends BotBehaviour {
     this.behavioursToStart.add(botBehaviour);
   }
 
-  @Override protected void onActivate(Optional<Object> message) {
+  @Override
+  protected void onActivate(Optional<Object> message) {
     Set<BotBehaviour> deactivatedBehaviours = Collections.synchronizedSet(new HashSet<>());
     subscribeWithAutoCleanup(BotBehaviourDeactivatedEvent.class, new ActionOnEventListener(context, new EventFilter() {
-          @Override public boolean accept(Event event) {
-            if (!(event instanceof BotBehaviourDeactivatedEvent))
-              return false;
-            return behavioursToWaitFor.contains(((BotBehaviourDeactivatedEvent) event).getBehaviour());
+      @Override
+      public boolean accept(Event event) {
+        if (!(event instanceof BotBehaviourDeactivatedEvent))
+          return false;
+        return behavioursToWaitFor.contains(((BotBehaviourDeactivatedEvent) event).getBehaviour());
+      }
+    }, new BaseEventBotAction(context) {
+      @Override
+      protected void doRun(Event event, EventListener executingListener) throws Exception {
+        synchronized (behavioursToWaitFor) {
+          deactivatedBehaviours.add(((BotBehaviourDeactivatedEvent) event).getBehaviour());
+          if (deactivatedBehaviours.containsAll(behavioursToWaitFor)) {
+            behavioursToStart.forEach(behaviour -> behaviour.activate());
+            deactivate();
           }
-        }, new BaseEventBotAction(context) {
-          @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
-            synchronized (behavioursToWaitFor) {
-              deactivatedBehaviours.add(((BotBehaviourDeactivatedEvent) event).getBehaviour());
-              if (deactivatedBehaviours.containsAll(behavioursToWaitFor)) {
-                behavioursToStart.forEach(behaviour -> behaviour.activate());
-                deactivate();
-              }
-            }
-          }
-        }));
+        }
+      }
+    }));
   }
 }

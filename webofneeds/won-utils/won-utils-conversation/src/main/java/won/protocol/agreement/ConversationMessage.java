@@ -70,7 +70,8 @@ public class ConversationMessage implements Comparable<ConversationMessage> {
   }
 
   /**
-   * Removes all proposes, claims, rejects, accepts, proposesToCancel, contentGraphs
+   * Removes all proposes, claims, rejects, accepts, proposesToCancel,
+   * contentGraphs
    */
   public void removeHighlevelProtocolProperties() {
     removeProposes();
@@ -146,8 +147,8 @@ public class ConversationMessage implements Comparable<ConversationMessage> {
   }
 
   public boolean isForwardedOrRemoteMessageOfForwarded() {
-    return isForwardedMessage() || hasCorrespondingRemoteMessage() && correspondingRemoteMessageRef
-        .isForwardedMessage();
+    return isForwardedMessage()
+        || hasCorrespondingRemoteMessage() && correspondingRemoteMessageRef.isForwardedMessage();
   }
 
   public ConversationMessage getRootOfDeliveryChain() {
@@ -155,10 +156,10 @@ public class ConversationMessage implements Comparable<ConversationMessage> {
   }
 
   public boolean isHeadOfDeliveryChain() {
-    return isFromOwner() || //owner initiated message
-        (isFromSystem() && !isResponse()) || //system initiated Message
-        (!hasCorrespondingRemoteMessage() && !isResponse()) || //message not going to remote need
-        (isFromSystem() && isResponse() && !getIsResponseToOption().isPresent()); //failure without original
+    return isFromOwner() || // owner initiated message
+        (isFromSystem() && !isResponse()) || // system initiated Message
+        (!hasCorrespondingRemoteMessage() && !isResponse()) || // message not going to remote need
+        (isFromSystem() && isResponse() && !getIsResponseToOption().isPresent()); // failure without original
   }
 
   public boolean isEndOfDeliveryChain() {
@@ -265,7 +266,8 @@ public class ConversationMessage implements Comparable<ConversationMessage> {
   }
 
   /**
-   * Compares messages for sorting them temporally, using the URI as tie breaker so as to ensure a stable ordering.
+   * Compares messages for sorting them temporally, using the URI as tie breaker
+   * so as to ensure a stable ordering.
    *
    * @param other
    * @return
@@ -293,7 +295,7 @@ public class ConversationMessage implements Comparable<ConversationMessage> {
       }
     }
 
-    //if we get to here, we should check if one of the delivery chains is earlier
+    // if we get to here, we should check if one of the delivery chains is earlier
     return this.getMessageURI().compareTo(other.getMessageURI());
 
   }
@@ -357,7 +359,8 @@ public class ConversationMessage implements Comparable<ConversationMessage> {
     if (this == other)
       return true;
     if (this.getOrder() < other.getOrder()) {
-      //if this is the case, it's impossible that the other message is on the path to root
+      // if this is the case, it's impossible that the other message is on the path to
+      // root
       return false;
     }
     if (this.knownMessagesOnPathToRoot.contains(other)) {
@@ -380,8 +383,8 @@ public class ConversationMessage implements Comparable<ConversationMessage> {
   }
 
   public boolean isAgreementProtocolMessage() {
-    return this.isRetractsMessage() || this.isProposesMessage() || this.isProposesToCancelMessage() || this
-        .isAcceptsMessage() || this.isRejectsMessage() || this.isClaimsMessage();
+    return this.isRetractsMessage() || this.isProposesMessage() || this.isProposesToCancelMessage()
+        || this.isAcceptsMessage() || this.isRejectsMessage() || this.isClaimsMessage();
   }
 
   public boolean isFromOwner() {
@@ -618,8 +621,8 @@ public class ConversationMessage implements Comparable<ConversationMessage> {
   }
 
   /**
-   * Return an optional conversation message here - it's possible that we only have the response, not the
-   * original one.
+   * Return an optional conversation message here - it's possible that we only
+   * have the response, not the original one.
    *
    * @return
    */
@@ -759,21 +762,23 @@ public class ConversationMessage implements Comparable<ConversationMessage> {
     return effects;
   }
 
-  @Override public String toString() {
+  @Override
+  public String toString() {
     return "ConversationMessage [messageURI=" + messageURI + ", order=" + getOrder() + ", direction=" + direction
-        + ", messageType=" + messageType + ", deliveryChainPosition:" + (this == getDeliveryChain().getHead() ?
-        "head" :
-        this == getDeliveryChain().getEnd() ? "end" : "middle") + ", deliveryChainHead:" + getDeliveryChain()
-        .getHeadURI() + ", senderNeedURI=" + senderNeedURI + ", proposes=" + proposes + ", proposesRefs:" + proposesRefs
-        .size() + ", claims=" + claims + ", claimsRefs:" + claimsRefs.size() + ", rejects=" + rejects + ", rejectsRefs:"
-        + rejectsRefs.size() + ", previous=" + previous + ", previousRefs:" + previousRefs.size() + ", accepts="
-        + accepts + ", acceptsRefs:" + acceptsRefs.size() + ", retracts=" + retracts + ", retractsRefs:" + retractsRefs
-        .size() + ", proposesToCancel=" + proposesToCancel + ", proposesToCancelRefs:" + proposesToCancelRefs.size()
-        + ", correspondingRemoteMessageURI=" + correspondingRemoteMessageURI + ", correspondingRemoteMessageRef="
+        + ", messageType=" + messageType + ", deliveryChainPosition:"
+        + (this == getDeliveryChain().getHead() ? "head" : this == getDeliveryChain().getEnd() ? "end" : "middle")
+        + ", deliveryChainHead:" + getDeliveryChain().getHeadURI() + ", senderNeedURI=" + senderNeedURI + ", proposes="
+        + proposes + ", proposesRefs:" + proposesRefs.size() + ", claims=" + claims + ", claimsRefs:"
+        + claimsRefs.size() + ", rejects=" + rejects + ", rejectsRefs:" + rejectsRefs.size() + ", previous=" + previous
+        + ", previousRefs:" + previousRefs.size() + ", accepts=" + accepts + ", acceptsRefs:" + acceptsRefs.size()
+        + ", retracts=" + retracts + ", retractsRefs:" + retractsRefs.size() + ", proposesToCancel=" + proposesToCancel
+        + ", proposesToCancelRefs:" + proposesToCancelRefs.size() + ", correspondingRemoteMessageURI="
+        + correspondingRemoteMessageURI + ", correspondingRemoteMessageRef="
         + messageUriOrNullString(correspondingRemoteMessageRef) + ", isResponseTo= " + isResponseTo
-        + ", isRemoteResponseTo=" + isRemoteResponseTo + ", isResponseToRef: " + messageUriOrNullString(
-        isResponseToOption) + ", isRemoteResponseToRef:" + messageUriOrNullString(isRemoteResponseToRef)
-        + ", isResponseToInverse: " + messageUriOrNullString(isResponseToInverseRef) + ", isRemoteResponseToInverse: "
+        + ", isRemoteResponseTo=" + isRemoteResponseTo + ", isResponseToRef: "
+        + messageUriOrNullString(isResponseToOption) + ", isRemoteResponseToRef:"
+        + messageUriOrNullString(isRemoteResponseToRef) + ", isResponseToInverse: "
+        + messageUriOrNullString(isResponseToInverseRef) + ", isRemoteResponseToInverse: "
         + messageUriOrNullString(isRemoteResponseToInverseRef) + ", isForwarded: " + isForwardedMessage() + "]";
   }
 
@@ -785,14 +790,16 @@ public class ConversationMessage implements Comparable<ConversationMessage> {
     return (messageOpt.isPresent()) ? messageOpt.get().getMessageURI() : "null";
   }
 
-  @Override public int hashCode() {
+  @Override
+  public int hashCode() {
     final int prime = 31;
     int result = 1;
     result = prime * result + ((messageURI == null) ? 0 : messageURI.hashCode());
     return result;
   }
 
-  @Override public boolean equals(Object obj) {
+  @Override
+  public boolean equals(Object obj) {
     if (this == obj)
       return true;
     if (obj == null)

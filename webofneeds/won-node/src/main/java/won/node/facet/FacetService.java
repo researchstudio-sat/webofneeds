@@ -17,15 +17,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Service that is informed of a state change of a connection and performs
- * data derivation work, changing the data of the need owning the connection.
+ * Service that is informed of a state change of a connection and performs data
+ * derivation work, changing the data of the need owning the connection.
  */
 
-@Component public class FacetService {
+@Component
+public class FacetService {
 
   Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Autowired NeedRepository needRepository;
+  @Autowired
+  NeedRepository needRepository;
 
   Map<URI, FacetConfig> hardcodedConfigs = new HashMap<>();
 

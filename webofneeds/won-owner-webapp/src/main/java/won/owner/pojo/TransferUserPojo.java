@@ -6,9 +6,11 @@ import org.hibernate.validator.constraints.NotEmpty;
  * Created by fsuda on 25.05.2018.
  */
 public class TransferUserPojo extends UserPojo {
-  @NotEmpty private String privatePassword;
+  @NotEmpty
+  private String privatePassword;
 
-  @NotEmpty private String privateUsername;
+  @NotEmpty
+  private String privateUsername;
 
   public String getPrivateUsername() {
     return privateUsername;

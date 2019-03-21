@@ -26,7 +26,8 @@ public class CreationDateQueryFactory extends NeedDatasetQueryFactory {
     endDate = creationDate.plus(timeWindow, unit);
   }
 
-  @Override protected String makeQueryString() {
+  @Override
+  protected String makeQueryString() {
     return new DateIntervalQueryFactory(CREATION_DATE_SOLR_FIELD, startDate, endDate).createQuery();
   }
 }

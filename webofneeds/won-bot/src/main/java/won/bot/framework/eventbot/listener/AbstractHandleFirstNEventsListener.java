@@ -21,7 +21,8 @@ import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.filter.EventFilter;
 
 /**
- * Counts how often it is called, offers to call a callback when a certain number is reached.
+ * Counts how often it is called, offers to call a callback when a certain
+ * number is reached.
  */
 public abstract class AbstractHandleFirstNEventsListener extends BaseEventListener implements CountingListener {
   private int targetCount;
@@ -52,7 +53,8 @@ public abstract class AbstractHandleFirstNEventsListener extends BaseEventListen
     this.targetCount = targetCount;
   }
 
-  @Override public void doOnEvent(final Event event) throws Exception {
+  @Override
+  public void doOnEvent(final Event event) throws Exception {
     boolean doRun = false;
     synchronized (monitor) {
       if (finished) {
@@ -76,7 +78,8 @@ public abstract class AbstractHandleFirstNEventsListener extends BaseEventListen
         }
       }
     } else {
-      //make sure we decrement the count if we didn't get to run - we only want to count the first N events here.
+      // make sure we decrement the count if we didn't get to run - we only want to
+      // count the first N events here.
       synchronized (monitor) {
         count--;
       }
@@ -96,24 +99,24 @@ public abstract class AbstractHandleFirstNEventsListener extends BaseEventListen
    */
   protected abstract void handleFirstNTimes(final Event event) throws Exception;
 
-  @Override public int getTargetCount() {
+  @Override
+  public int getTargetCount() {
     return targetCount;
   }
 
-  @Override public int getCount() {
+  @Override
+  public int getCount() {
     return count;
   }
 
-  @Override public boolean isFinished() {
+  @Override
+  public boolean isFinished() {
     return finished;
   }
 
-  @Override public String toString() {
-    return getClass().getSimpleName() +
-        "{name='" + name +
-        ", count=" + count +
-        ",targetCount=" + targetCount +
-        ", finished=" + finished +
-        '}';
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{name='" + name + ", count=" + count + ",targetCount=" + targetCount
+        + ", finished=" + finished + '}';
   }
 }

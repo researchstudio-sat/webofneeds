@@ -29,8 +29,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * User: fkleedorfer
- * Date: 28.03.14
+ * User: fkleedorfer Date: 28.03.14
  */
 public class RegisterMatcherAction extends BaseEventBotAction {
   private List<URI> registeredNodes = new LinkedList<>();
@@ -39,7 +38,8 @@ public class RegisterMatcherAction extends BaseEventBotAction {
     super(eventListenerContext);
   }
 
-  @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
+  @Override
+  protected void doRun(Event event, EventListener executingListener) throws Exception {
     final Iterator wonNodeUriIterator = getEventListenerContext().getMatcherNodeURISource().getNodeURIIterator();
     while (wonNodeUriIterator.hasNext()) {
       URI wonNodeUri = (URI) wonNodeUriIterator.next();

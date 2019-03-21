@@ -20,13 +20,13 @@ import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
 
 /**
- * User: LEIH-NB
- * Date: 10.10.13
+ * User: LEIH-NB Date: 10.10.13
  */
 
 //TODO: change to asyncronous processing maybe
 public class AmqpToJms extends RouteBuilder {
-  @Override public void configure() {
+  @Override
+  public void configure() {
     from("seda:outgoingMessages?concurrentConsumers=5").routeId("Owner2NodeRoute").choice()
         .when(header("remoteBrokerEndpoint").isNull())
         .log(LoggingLevel.ERROR, "could not route message: remoteBrokerEndpoint is null")

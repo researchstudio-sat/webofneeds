@@ -15,13 +15,11 @@ import won.protocol.vocabulary.WONMSG;
 import java.net.URI;
 
 /**
- * User: syim
- * Date: 02.03.2015
+ * User: syim Date: 02.03.2015
  */
-@Component @FixedMessageProcessor(
-    direction = WONMSG.TYPE_FROM_OWNER_STRING,
-    messageType = WONMSG.TYPE_ACTIVATE_STRING) public class ActivateNeedMessageProcessor
-    extends AbstractCamelProcessor {
+@Component
+@FixedMessageProcessor(direction = WONMSG.TYPE_FROM_OWNER_STRING, messageType = WONMSG.TYPE_ACTIVATE_STRING)
+public class ActivateNeedMessageProcessor extends AbstractCamelProcessor {
 
   public void process(Exchange exchange) throws Exception {
     Message message = exchange.getIn();

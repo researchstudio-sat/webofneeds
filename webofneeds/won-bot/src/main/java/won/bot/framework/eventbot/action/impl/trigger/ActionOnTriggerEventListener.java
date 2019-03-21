@@ -21,7 +21,8 @@ import won.bot.framework.eventbot.action.EventBotAction;
 import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
 
 /**
- * Executes the action each time the specified trigger publishes its BotTriggerEvent.
+ * Executes the action each time the specified trigger publishes its
+ * BotTriggerEvent.
  */
 public class ActionOnTriggerEventListener extends ActionOnEventListener {
   public ActionOnTriggerEventListener(EventListenerContext context, BotTrigger botTrigger, EventBotAction task) {

@@ -20,11 +20,11 @@ import java.net.URI;
 import java.util.Optional;
 
 /**
- * User: syim
- * Date: 02.03.2015
+ * User: syim Date: 02.03.2015
  */
-@Component @FixedMessageProcessor(direction = WONMSG.TYPE_FROM_OWNER_STRING, messageType = WONMSG.TYPE_CONNECT_STRING) public class ConnectMessageFromOwnerProcessor
-    extends AbstractFromOwnerCamelProcessor {
+@Component
+@FixedMessageProcessor(direction = WONMSG.TYPE_FROM_OWNER_STRING, messageType = WONMSG.TYPE_CONNECT_STRING)
+public class ConnectMessageFromOwnerProcessor extends AbstractFromOwnerCamelProcessor {
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
     WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
@@ -38,35 +38,39 @@ import java.util.Optional;
     failIfIsNotFacetOfNeed(userDefinedFacetURI, Optional.of(senderNeedURI));
     Optional<URI> userDefinedRemoteFacetURI = Optional.ofNullable(WonRdfUtils.FacetUtils.getRemoteFacet(wonMessage));
     failIfIsNotFacetOfNeed(userDefinedRemoteFacetURI, Optional.of(receiverNeedURI));
-    Optional<URI> connectionURI = Optional
-        .ofNullable(wonMessage.getSenderURI()); //if the uri is known already, we can load the connection!
+    Optional<URI> connectionURI = Optional.ofNullable(wonMessage.getSenderURI()); // if the uri is known already, we can
+                                                                                  // load the connection!
 
     Optional<Connection> con = Optional.empty();
     if (connectionURI.isPresent()) {
-      //we know the connection: load it
+      // we know the connection: load it
       con = connectionRepository.findOneByConnectionURIForUpdate(connectionURI.get());
       if (!con.isPresent())
         throw new NoSuchConnectionException(connectionURI.get());
-      //however, if the facets don't match, we report an error:
+      // however, if the facets don't match, we report an error:
       if (userDefinedFacetURI.isPresent() && !userDefinedFacetURI.equals(con.get().getFacetURI())) {
         throw new IllegalStateException(
             "Cannot process CONNECT message FROM_OWNER. Specified facet uri conflicts with existing connection data");
       }
-      // remote facet uri: may be set on the connection, in which case we may have a conflict
-      if (con.get().getRemoteFacetURI() != null && userDefinedRemoteFacetURI != null && !con.get().getRemoteFacetURI()
-          .equals(userDefinedRemoteFacetURI)) {
+      // remote facet uri: may be set on the connection, in which case we may have a
+      // conflict
+      if (con.get().getRemoteFacetURI() != null && userDefinedRemoteFacetURI != null
+          && !con.get().getRemoteFacetURI().equals(userDefinedRemoteFacetURI)) {
         throw new IllegalStateException(
             "Cannot process CONNECT message FROM_OWNER. Specified remote facet uri conflicts with existing connection data");
       }
-      //if the remote facet is not yet set on the connection, we have to set it now.
+      // if the remote facet is not yet set on the connection, we have to set it now.
       if (con.get().getRemoteFacetURI() == null) {
         con.get().setRemoteFacetURI(userDefinedRemoteFacetURI.orElse(lookupDefaultFacet(con.get().getRemoteNeedURI())));
       }
       // facets are set in the connection now.
     } else {
-      // we did not know about this connection. try to find out if one exists that we can use
-      // the effect of connect should not be surprising. either use specified facets (if they are) or use default facets.
-      // don't try to be clever and look for suggested connections with other facets because that leads
+      // we did not know about this connection. try to find out if one exists that we
+      // can use
+      // the effect of connect should not be surprising. either use specified facets
+      // (if they are) or use default facets.
+      // don't try to be clever and look for suggested connections with other facets
+      // because that leads
       // consecutive connects opening connections between different facets
       //
       // hence, we can determine our facets now, before looking at what's there.
@@ -76,87 +80,94 @@ import java.util.Optional;
       Optional<URI> actualRemoteFacetURI = Optional
           .of(userDefinedRemoteFacetURI.orElse(lookupDefaultFacet(receiverNeedURI)));
 
-      con = connectionRepository
-          .findOneByNeedURIAndRemoteNeedURIAndFacetURIAndRemoteFacetURIForUpdate(senderNeedURI, receiverNeedURI,
-              actualFacetURI.get(), actualRemoteFacetURI.get());
+      con = connectionRepository.findOneByNeedURIAndRemoteNeedURIAndFacetURIAndRemoteFacetURIForUpdate(senderNeedURI,
+          receiverNeedURI, actualFacetURI.get(), actualRemoteFacetURI.get());
       if (con.isPresent()) {
         // found a connection. use it.
       } else {
-        //did not find such a connection. It could be the connection exists, but without a remote facet
-        con = connectionRepository
-            .findOneByNeedURIAndRemoteNeedURIAndFacetURIAndNullRemoteFacetForUpdate(senderNeedURI, receiverNeedURI,
-                actualFacetURI.get());
+        // did not find such a connection. It could be the connection exists, but
+        // without a remote facet
+        con = connectionRepository.findOneByNeedURIAndRemoteNeedURIAndFacetURIAndNullRemoteFacetForUpdate(senderNeedURI,
+            receiverNeedURI, actualFacetURI.get());
         if (con.isPresent()) {
-          // we found a connection without a remote facet uri. we use this one and we'll have to set the remote facet uri.
+          // we found a connection without a remote facet uri. we use this one and we'll
+          // have to set the remote facet uri.
           con.get().setRemoteFacetURI(actualRemoteFacetURI.get());
         } else {
           // did not find such a connection either. We can safely create a new one
           // create Connection in Database
           URI connectionUri = wonNodeInformationService.generateConnectionURI(senderNodeURI);
-          con = Optional.of(dataService
-              .createConnection(connectionUri, senderNeedURI, receiverNeedURI, null, actualFacet.getFacetURI(),
-                  actualFacet.getTypeURI(), actualRemoteFacetURI.get(), ConnectionState.REQUEST_SENT,
-                  ConnectionEventType.OWNER_OPEN));
+          con = Optional.of(dataService.createConnection(connectionUri, senderNeedURI, receiverNeedURI, null,
+              actualFacet.getFacetURI(), actualFacet.getTypeURI(), actualRemoteFacetURI.get(),
+              ConnectionState.REQUEST_SENT, ConnectionEventType.OWNER_OPEN));
         }
       }
     }
     failForIncompatibleFacets(con.get().getFacetURI(), con.get().getTypeURI(), con.get().getRemoteFacetURI());
-    //state transiation
+    // state transiation
     con.get().setState(con.get().getState().transit(ConnectionEventType.OWNER_OPEN));
     connectionRepository.save(con.get());
-    //prepare the message to pass to the remote node
+    // prepare the message to pass to the remote node
     URI remoteMessageUri = wonNodeInformationService.generateEventURI(wonMessage.getReceiverNodeURI());
 
-    //set the sender uri in the envelope TODO: TwoMsgs: do not set sender here
+    // set the sender uri in the envelope TODO: TwoMsgs: do not set sender here
     wonMessage.addMessageProperty(WONMSG.SENDER_PROPERTY, con.get().getConnectionURI());
-    //add the information about the new local connection to the original message
+    // add the information about the new local connection to the original message
     wonMessage.addMessageProperty(WONMSG.HAS_CORRESPONDING_REMOTE_MESSAGE, remoteMessageUri);
-    //the persister will pick it up later
+    // the persister will pick it up later
 
-    //add the facets to the message if necessary
+    // add the facets to the message if necessary
     if (!userDefinedFacetURI.isPresent()) {
-      //the user did not specify a facet uri. we have to add it
+      // the user did not specify a facet uri. we have to add it
       wonMessage.addMessageProperty(WONMSG.HAS_SENDER_FACET, con.get().getFacetURI());
     }
 
     if (!userDefinedRemoteFacetURI.isPresent()) {
-      //the user did not specify a remote uri. we have to add it
+      // the user did not specify a remote uri. we have to add it
       wonMessage.addMessageProperty(WONMSG.HAS_RECEIVER_FACET, con.get().getRemoteFacetURI());
     }
 
-    //put the factory into the outbound message factory header. It will be used to generate the outbound message
-    //after the wonMessage has been processed and saved, to make sure that the outbound message contains
-    //all the data that we also store locally
+    // put the factory into the outbound message factory header. It will be used to
+    // generate the outbound message
+    // after the wonMessage has been processed and saved, to make sure that the
+    // outbound message contains
+    // all the data that we also store locally
     OutboundMessageFactory outboundMessageFactory = new OutboundMessageFactory(remoteMessageUri, con.get());
     message.setHeader(WonCamelConstants.OUTBOUND_MESSAGE_FACTORY_HEADER, outboundMessageFactory);
   }
 
   private WonMessage createMessageToSendToRemoteNode(WonMessage wonMessage, Connection con) {
-    //create the message to send to the remote node
-    return WonMessageBuilder.setPropertiesForPassingMessageToRemoteNode(wonMessage,
-        wonNodeInformationService.generateEventURI(wonMessage.getReceiverNodeURI()))
+    // create the message to send to the remote node
+    return WonMessageBuilder
+        .setPropertiesForPassingMessageToRemoteNode(wonMessage,
+            wonNodeInformationService.generateEventURI(wonMessage.getReceiverNodeURI()))
         .setSenderURI(con.getConnectionURI()).build();
   }
 
-  @Override public void onSuccessResponse(final Exchange exchange) throws Exception {
+  @Override
+  public void onSuccessResponse(final Exchange exchange) throws Exception {
     WonMessage responseMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
     MessageEventPlaceholder mep = this.messageEventRepository
         .findOneByCorrespondingRemoteMessageURI(responseMessage.getIsResponseToMessageURI());
-    //update the connection database: set the remote connection URI just obtained from the response
+    // update the connection database: set the remote connection URI just obtained
+    // from the response
     Optional<Connection> con = this.connectionRepository.findOneByConnectionURIForUpdate(mep.getSenderURI());
     con.get().setRemoteConnectionURI(responseMessage.getSenderURI());
     this.connectionRepository.save(con.get());
   }
 
-  @Override public void onFailureResponse(final Exchange exchange) throws Exception {
-    //TODO: define what to do if the connect fails remotely option: create a system message of type CLOSE,
-    // and forward it only to the owner. Add an explanation (a reference to the failure response and some
+  @Override
+  public void onFailureResponse(final Exchange exchange) throws Exception {
+    // TODO: define what to do if the connect fails remotely option: create a system
+    // message of type CLOSE,
+    // and forward it only to the owner. Add an explanation (a reference to the
+    // failure response and some
     // expplanation text.
     logger.warn("The remote end responded with a failure message. Our behaviour is now undefined.");
   }
 
   private URI lookupDefaultFacet(URI needURI) {
-    //look up the default facet and use that one
+    // look up the default facet and use that one
     return WonLinkedDataUtils.getDefaultFacet(needURI, true, linkedDataSource)
         .orElseThrow(() -> new IllegalStateException("No default facet found on " + needURI));
   }
@@ -169,7 +180,8 @@ import java.util.Optional;
       this.connection = connection;
     }
 
-    @Override public WonMessage process(WonMessage message) throws WonMessageProcessingException {
+    @Override
+    public WonMessage process(WonMessage message) throws WonMessageProcessingException {
       return WonMessageBuilder.setPropertiesForPassingMessageToRemoteNode(message, getMessageURI())
           .setSenderURI(connection.getConnectionURI()).build();
     }

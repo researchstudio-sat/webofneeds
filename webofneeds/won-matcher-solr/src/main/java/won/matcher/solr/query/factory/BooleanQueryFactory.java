@@ -8,9 +8,7 @@ public class BooleanQueryFactory extends SolrQueryFactory {
   private BooleanOperator operator;
 
   public enum BooleanOperator {
-    AND,
-    OR,
-    NOT
+    AND, OR, NOT
   }
 
   public BooleanQueryFactory(BooleanOperator op, SolrQueryFactory... factories) {
@@ -18,7 +16,8 @@ public class BooleanQueryFactory extends SolrQueryFactory {
     this.factories = factories;
   }
 
-  @Override protected String makeQueryString() {
+  @Override
+  protected String makeQueryString() {
 
     StringBuilder queryBuilder = new StringBuilder();
 

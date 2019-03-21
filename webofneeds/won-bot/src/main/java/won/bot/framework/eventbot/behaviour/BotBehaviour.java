@@ -83,8 +83,9 @@ public abstract class BotBehaviour {
   }
 
   /**
-   * Activates the behaviour by registering listeners. If the onActivate method of the subclass throws an Exception,
-   * the deactivate method is called. The specified optional message is passed to subclasses.
+   * Activates the behaviour by registering listeners. If the onActivate method of
+   * the subclass throws an Exception, the deactivate method is called. The
+   * specified optional message is passed to subclasses.
    */
   public final synchronized void activate(Optional<Object> message) {
     coordinationBehaviours.stream().forEach(b -> b.activate(message));
@@ -113,8 +114,10 @@ public abstract class BotBehaviour {
   }
 
   /**
-   * Deactivates the behaviour. Automatically unsubscribes every EventListener Instance that has been created.
-   * No traces of it must be left in the Event Bus after this method has finished. The specified optional message is passed to subclasses.
+   * Deactivates the behaviour. Automatically unsubscribes every EventListener
+   * Instance that has been created. No traces of it must be left in the Event Bus
+   * after this method has finished. The specified optional message is passed to
+   * subclasses.
    */
   public final synchronized void deactivate(Optional<Object> message) {
     try {
@@ -135,8 +138,8 @@ public abstract class BotBehaviour {
   }
 
   /**
-   * Subscribes an Event/EventListener Pair, that will be automatically cleaned within the deactivate process of this
-   * behaviour.
+   * Subscribes an Event/EventListener Pair, that will be automatically cleaned
+   * within the deactivate process of this behaviour.
    */
   protected <T extends Event> void subscribeWithAutoCleanup(Class<T> eventClazz, EventListener listener) {
     activeListeners.add(listener);
@@ -144,8 +147,9 @@ public abstract class BotBehaviour {
   }
 
   /**
-   * Deactivates the behaviour. No traces of it must be left in the Event Bus after this method has finished.
-   * No Implementation required if EventListeners are added with the subscribeWithAutoCleanup method.
+   * Deactivates the behaviour. No traces of it must be left in the Event Bus
+   * after this method has finished. No Implementation required if EventListeners
+   * are added with the subscribeWithAutoCleanup method.
    */
   protected void onCleanup() {
 
@@ -154,8 +158,9 @@ public abstract class BotBehaviour {
   ;
 
   /**
-   * Activates the behaviour by registering listeners, if you addListeners with the subscribeWithAutoCleanup method, you
-   * do not have to clean them within the onCleanup method.
+   * Activates the behaviour by registering listeners, if you addListeners with
+   * the subscribeWithAutoCleanup method, you do not have to clean them within the
+   * onCleanup method.
    */
   protected abstract void onActivate(Optional<Object> message);
 

@@ -15,23 +15,27 @@ import won.owner.pojo.ResetPasswordPojo;
 import won.owner.pojo.UserPojo;
 import won.owner.service.impl.WONUserDetailService;
 
-@Component public class ResetPasswordValidator implements Validator {
+@Component
+public class ResetPasswordValidator implements Validator {
   private final static Logger log = LoggerFactory.getLogger(ResetPasswordValidator.class);
 
   private final Validator validator;
 
   private final WONUserDetailService wonUserDetailService;
 
-  @Autowired public ResetPasswordValidator(final Validator validator, final WONUserDetailService wonUserDetailService) {
+  @Autowired
+  public ResetPasswordValidator(final Validator validator, final WONUserDetailService wonUserDetailService) {
     this.validator = validator;
     this.wonUserDetailService = wonUserDetailService;
   }
 
-  @Override public boolean supports(final Class<?> clazz) {
+  @Override
+  public boolean supports(final Class<?> clazz) {
     return clazz.equals(UserPojo.class);
   }
 
-  @Override public void validate(final Object target, final Errors errors) {
+  @Override
+  public void validate(final Object target, final Errors errors) {
     ResetPasswordPojo changePasswordPojo = (ResetPasswordPojo) target;
 
     validator.validate(target, errors);

@@ -6,8 +6,7 @@ import java.net.URI;
 import java.util.HashMap;
 
 /**
- * User: Danijel
- * Date: 20.3.14.
+ * User: Danijel Date: 20.3.14.
  */
 public class SimpleATBAConnectionStateManager implements ATBAConnectionStateManager {
 
@@ -17,11 +16,13 @@ public class SimpleATBAConnectionStateManager implements ATBAConnectionStateMana
     return map;
   }
 
-  @Override public ATConnectionState getStateForConnection(Connection con) {
+  @Override
+  public ATConnectionState getStateForConnection(Connection con) {
     return map.get(con.getConnectionURI().toString());
   }
 
-  @Override public void setStateForConnection(URI stateUri, Connection con) {
+  @Override
+  public void setStateForConnection(URI stateUri, Connection con) {
     map.put(con.getConnectionURI().toString(), new ATConnectionState(con, stateUri));
   }
 

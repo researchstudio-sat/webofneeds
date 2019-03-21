@@ -35,16 +35,21 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-@Component public class ExportListener implements ApplicationListener<OnExportUserEvent> {
+@Component
+public class ExportListener implements ApplicationListener<OnExportUserEvent> {
   private static final Logger logger = LoggerFactory.getLogger(ExportListener.class);
 
-  @Autowired private LinkedDataSource linkedDataSourceOnBehalfOfNeed;
+  @Autowired
+  private LinkedDataSource linkedDataSourceOnBehalfOfNeed;
 
-  @Autowired private WonOwnerMailSender emailSender;
+  @Autowired
+  private WonOwnerMailSender emailSender;
 
-  @Autowired private UserService userService;
+  @Autowired
+  private UserService userService;
 
-  @Override public void onApplicationEvent(OnExportUserEvent onExportUserEvent) {
+  @Override
+  public void onApplicationEvent(OnExportUserEvent onExportUserEvent) {
     Authentication authentication = onExportUserEvent.getAuthentication();
     KeystoreEnabledUserDetails userDetails = ((KeystoreEnabledUserDetails) authentication.getPrincipal());
     String password = onExportUserEvent.getKeyStorePassword();
@@ -139,11 +144,11 @@ import java.util.zip.ZipOutputStream;
   }
 
   public Dataset fetchNeedData(Authentication authentication, URI needUri) {
-    //allow each resource to be re-crawled once for each reason
+    // allow each resource to be re-crawled once for each reason
     Set<URI> recrawledForFailedFetch = new HashSet<>();
     AuthenticationThreadLocal.setAuthentication(authentication);
     while (true) {
-      //we leave the loop either with a runtime exception or with the result
+      // we leave the loop either with a runtime exception or with the result
       try {
         Dataset needDataset = WonLinkedDataUtils.getFullNeedDataset(needUri, linkedDataSourceOnBehalfOfNeed);
         return needDataset;

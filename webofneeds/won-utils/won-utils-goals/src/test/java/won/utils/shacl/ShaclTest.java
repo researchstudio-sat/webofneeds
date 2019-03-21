@@ -28,7 +28,8 @@ public class ShaclTest {
   protected Model p2DataModel;
   protected Model p2ShapeModel;
 
-  @Before public void init() throws IOException {
+  @Before
+  public void init() throws IOException {
 
     p1Ds = loadDataset("/won/utils/shacl/p1.trig");
     p1NeedModel = p1Ds.getNamedModel("http://example.org/1/p1-data");
@@ -58,7 +59,8 @@ public class ShaclTest {
     return dataset;
   }
 
-  @Test public void validateP1DataWithP1Shape() {
+  @Test
+  public void validateP1DataWithP1Shape() {
 
     Resource report = ValidationUtil.validateModel(p1DataModel, p1ShapeModel, false);
     System.out.println(ModelPrinter.get().print(report.getModel()));
@@ -73,7 +75,8 @@ public class ShaclTest {
     }
   }
 
-  @Test public void validateP2DataWithP2Shape() {
+  @Test
+  public void validateP2DataWithP2Shape() {
 
     Resource report = ValidationUtil.validateModel(p2DataModel, p2ShapeModel, false);
     System.out.println(ModelPrinter.get().print(report.getModel()));

@@ -21,8 +21,7 @@ import org.apache.jena.query.Dataset;
 import java.net.URI;
 
 /**
- * User: fkleedorfer
- * Date: 21.01.14
+ * User: fkleedorfer Date: 21.01.14
  */
 public interface MatcherProtocolMatcherServiceCallback {
   void onRegistered(URI wonNodeUri);

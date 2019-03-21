@@ -35,8 +35,8 @@ import java.util.Random;
 import java.util.Set;
 
 /**
- * Action to perform when the debug bot is set to be 'chatty' - that is,
- * sends messages via its connections spontaneously.
+ * Action to perform when the debug bot is set to be 'chatty' - that is, sends
+ * messages via its connections spontaneously.
  */
 public class SendChattyMessageAction extends BaseEventBotAction {
   private double probabilityOfSendingMessage = 0.1;
@@ -57,24 +57,24 @@ public class SendChattyMessageAction extends BaseEventBotAction {
     this.messagesForLongInactivity = messagesForLongInactivity;
   }
 
-  @Override protected void doRun(final Event event, EventListener executingListener) throws Exception {
+  @Override
+  protected void doRun(final Event event, EventListener executingListener) throws Exception {
     Set<URI> toRemove = null;
     Collection<Object> chattyConnections = getEventListenerContext().getBotContext()
         .loadObjectMap(KEY_CHATTY_CONNECTIONS).values();
 
     if (chattyConnections == null)
       return;
-    theloop:
-    for (Object o : chattyConnections) {
+    theloop: for (Object o : chattyConnections) {
       URI conURI = (URI) o;
       if (random.nextDouble() > probabilityOfSendingMessage) {
         continue;
       }
-      //determine which kind of message to send depending on inactivity of partner.
+      // determine which kind of message to send depending on inactivity of partner.
       MessageTimingManager.InactivityPeriod inactivityPeriod = messageTimingManager
           .getInactivityPeriodOfPartner(conURI);
 
-      //don't send a chatty message when we just sent one
+      // don't send a chatty message when we just sent one
       if (!this.messageTimingManager.isWaitedLongEnough(conURI)) {
         continue;
       }
@@ -82,7 +82,7 @@ public class SendChattyMessageAction extends BaseEventBotAction {
       String message = null;
       switch (inactivityPeriod) {
       case ACTIVE:
-        //do not send a message
+        // do not send a message
         continue theloop;
       case SHORT:
         message = getRandomMessage(this.messagesForShortInactivity);
@@ -99,7 +99,7 @@ public class SendChattyMessageAction extends BaseEventBotAction {
         break;
       }
 
-      //publish an event that causes the message to be sent
+      // publish an event that causes the message to be sent
       Dataset connectionRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(conURI);
       Connection con = RdfUtils.findFirst(connectionRDF, x -> new ConnectionModelMapper().fromModel(x));
       if (con != null) {

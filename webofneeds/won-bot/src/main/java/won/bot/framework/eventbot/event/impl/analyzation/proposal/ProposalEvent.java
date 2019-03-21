@@ -58,7 +58,8 @@ public abstract class ProposalEvent extends BaseNeedAndConnectionSpecificEvent {
   }
 
   /**
-   * @return true if there is a mixture between proposeToCancel and proposes triples in the MessageEvent
+   * @return true if there is a mixture between proposeToCancel and proposes
+   *         triples in the MessageEvent
    */
   public boolean isMixed() {
     return hasProposesToCancelEvents() && hasProposesEvents();

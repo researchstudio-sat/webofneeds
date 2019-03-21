@@ -19,8 +19,7 @@ package won.owner.service.impl;
 import java.net.URI;
 
 /**
- * User: fkleedorfer
- * Date: 12.02.13
+ * User: fkleedorfer Date: 12.02.13
  */
 public class URIService {
   private URI ownerProtocolOwnerServiceEndpointURI;

@@ -31,7 +31,8 @@ public class TargetCounterFilter implements EventFilter {
     this.targetCounterDecorator = targetCounterDecorator;
   }
 
-  @Override public boolean accept(Event event) {
+  @Override
+  public boolean accept(Event event) {
     if (!(event instanceof TargetCountReachedEvent))
       return false;
     return ((TargetCountReachedEvent) event).getCounter() == targetCounterDecorator;

@@ -36,8 +36,8 @@ import won.protocol.util.WonRdfUtils;
 import java.net.URI;
 
 /**
- * Creates a need with the specified facets.
- * If no facet is specified, the chatFacet will be used.
+ * Creates a need with the specified facets. If no facet is specified, the
+ * chatFacet will be used.
  */
 public class CreateNeedWithFacetsAction extends AbstractCreateNeedAction {
   public CreateNeedWithFacetsAction(EventListenerContext eventListenerContext, String uriListName, URI... facets) {
@@ -49,7 +49,8 @@ public class CreateNeedWithFacetsAction extends AbstractCreateNeedAction {
     super(eventListenerContext, uriListName, usedForTesting, doNotMatch, facets);
   }
 
-  @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
+  @Override
+  protected void doRun(Event event, EventListener executingListener) throws Exception {
     EventListenerContext ctx = getEventListenerContext();
 
     if (ctx.getNeedProducer().isExhausted()) {
@@ -87,11 +88,12 @@ public class CreateNeedWithFacetsAction extends AbstractCreateNeedAction {
     final URI needURI = wonNodeInformationService.generateNeedURI(wonNodeUri);
     WonMessage createNeedMessage = createWonMessage(wonNodeInformationService, needURI, wonNodeUri,
         needDatasetWithFacets);
-    //remember the need URI so we can react to success/failure responses
+    // remember the need URI so we can react to success/failure responses
     EventBotActionUtils.rememberInList(ctx, needURI, uriListName);
 
     EventListener successCallback = new EventListener() {
-      @Override public void onEvent(Event event) throws Exception {
+      @Override
+      public void onEvent(Event event) throws Exception {
         logger.debug("need creation successful, new need URI is {}", needURI);
         ctx.getEventBus()
             .publish(new NeedCreatedEvent(needURI, wonNodeUri, needDatasetWithFacets, null, needUriBeforeCreation));
@@ -99,7 +101,8 @@ public class CreateNeedWithFacetsAction extends AbstractCreateNeedAction {
     };
 
     EventListener failureCallback = new EventListener() {
-      @Override public void onEvent(Event event) throws Exception {
+      @Override
+      public void onEvent(Event event) throws Exception {
         String textMessage = WonRdfUtils.MessageUtils
             .getTextMessage(((FailureResponseEvent) event).getFailureMessage());
         logger.debug("need creation failed for need URI {}, original message URI {}: {}",

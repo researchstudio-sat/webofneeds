@@ -53,7 +53,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
- * Listener that reacts to incoming messages, creating internal bot events for them
+ * Listener that reacts to incoming messages, creating internal bot events for
+ * them
  */
 public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAction {
 
@@ -118,24 +119,22 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
   }
 
   public static final String[] USAGE_MESSAGES = {
-      "You are connected to the debug bot. You can issue commands that will cause interactions with your need.\n\n" +
-          "Usage:\n" +
-          "    `hint`:            create a new need and send hint to it\n" +
-          "    `connect`:         create a new need and send connection request to it\n" +
-          "    `close`:           close the current connection\n" +
-          "    `deactivate`:      deactivate remote need of the current connection\n" +
-          "    `chatty on|off`:   send chat messages spontaneously every now and then? (default: on)\n" +
-          "    `send N`:          send N messages, one per second. N must be an integer between 1 and 9\n" +
-          "    `validate'`:        download the connection data and validate it\n" +
-          "    `propose (my|any) (N)`:  propose one (N, max 9) of my(/your/any) messages for an agreement\n" +
-          "    `accept`:          accept the last proposal/claim made (including cancellation proposals)\n" +
-          "    `cancel`:           propose to cancel the newest agreement (that wasn't only a cancellation)\n" +
-          "    `retract (mine|proposal)`:  retract the last (proposal) message you sent, or the last message I sent\n" +
-          "    `reject (yours)`:  reject the last rejectable message I (you) sent\n" +
-          "    `cache eager|lazy`: use lazy or eager RDF cache\n" +
-          "    `inject`           send a message in this connection that will be forwarded to all other connections we have\n"
-          +
-          "    `usage`:           display this message\n" };
+      "You are connected to the debug bot. You can issue commands that will cause interactions with your need.\n\n"
+          + "Usage:\n" + "    `hint`:            create a new need and send hint to it\n"
+          + "    `connect`:         create a new need and send connection request to it\n"
+          + "    `close`:           close the current connection\n"
+          + "    `deactivate`:      deactivate remote need of the current connection\n"
+          + "    `chatty on|off`:   send chat messages spontaneously every now and then? (default: on)\n"
+          + "    `send N`:          send N messages, one per second. N must be an integer between 1 and 9\n"
+          + "    `validate'`:        download the connection data and validate it\n"
+          + "    `propose (my|any) (N)`:  propose one (N, max 9) of my(/your/any) messages for an agreement\n"
+          + "    `accept`:          accept the last proposal/claim made (including cancellation proposals)\n"
+          + "    `cancel`:           propose to cancel the newest agreement (that wasn't only a cancellation)\n"
+          + "    `retract (mine|proposal)`:  retract the last (proposal) message you sent, or the last message I sent\n"
+          + "    `reject (yours)`:  reject the last rejectable message I (you) sent\n"
+          + "    `cache eager|lazy`: use lazy or eager RDF cache\n"
+          + "    `inject`           send a message in this connection that will be forwarded to all other connections we have\n"
+          + "    `usage`:           display this message\n" };
 
   public static final String[] N_MESSAGES = { "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
       "ten" };
@@ -151,7 +150,8 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
     super(eventListenerContext);
   }
 
-  @Override protected void doRun(final Event event, EventListener executingListener) throws Exception {
+  @Override
+  protected void doRun(final Event event, EventListener executingListener) throws Exception {
     if (event instanceof BaseNeedAndConnectionSpecificEvent) {
       handleTextMessageEvent((ConnectionSpecificEvent) event);
     }
@@ -253,14 +253,13 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
         } else if (PATTERN_INJECT.matcher(message).matches()) {
           inject(ctx, bus, con);
         } else {
-          //default: answer with eliza.
+          // default: answer with eliza.
           bus.publish(new MessageToElizaEvent(con, message));
         }
       } catch (Exception e) {
-        //error: send an error message
-        Model messageModel = WonRdfUtils.MessageUtils.textMessage(
-            "Did not understand your command '" + message + "': " + e.getClass().getSimpleName() + ":" + e
-                .getMessage());
+        // error: send an error message
+        Model messageModel = WonRdfUtils.MessageUtils.textMessage("Did not understand your command '" + message + "': "
+            + e.getClass().getSimpleName() + ":" + e.getMessage());
         bus.publish(new ConnectionMessageCommandEvent(con, messageModel));
       }
     }
@@ -270,20 +269,22 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
     Model messageModel = WonRdfUtils.MessageUtils.textMessage(
         "Ok, I'll send you one message that will be injected into our other connections by your WoN node if the inject permission is granted");
     bus.publish(new ConnectionMessageCommandEvent(con, messageModel));
-    //build a message to be injected into all connections of the receiver need (not controlled by us)
+    // build a message to be injected into all connections of the receiver need (not
+    // controlled by us)
     messageModel = WonRdfUtils.MessageUtils.textMessage("This is the injected message.");
-    //the need whose connections we want to inject into
+    // the need whose connections we want to inject into
     URI remoteNeed = con.getRemoteNeedURI();
-    //we iterate over our needs and see which of them are connected to the remote need
+    // we iterate over our needs and see which of them are connected to the remote
+    // need
     List<URI> myneeds = ctx.getBotContextWrapper().getNeedCreateList();
     Set<URI> remoteConnections = myneeds.stream()
-        //don't inject into the current connection
+        // don't inject into the current connection
         .filter(uri -> !con.getNeedURI().equals(uri)).map(uri -> {
-          //for each of my (the bot's) needs, check if they are connected to the remote need of the current conversation
+          // for each of my (the bot's) needs, check if they are connected to the remote
+          // need of the current conversation
           Dataset needNetwork = WonLinkedDataUtils.getConnectionNetwork(uri, ctx.getLinkedDataSource());
-          return (Set<URI>) WonRdfUtils.NeedUtils
-              .getRemoteConnectionURIsForRemoteNeeds(needNetwork, Arrays.asList(remoteNeed),
-                  Optional.of(ConnectionState.CONNECTED));
+          return (Set<URI>) WonRdfUtils.NeedUtils.getRemoteConnectionURIsForRemoteNeeds(needNetwork,
+              Arrays.asList(remoteNeed), Optional.of(ConnectionState.CONNECTED));
         }).flatMap(set -> set.stream()).collect(Collectors.toSet());
     bus.publish(new ConnectionMessageCommandEvent(con, messageModel, remoteConnections));
   }
@@ -297,8 +298,8 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 
   /**
    * ********************************************************************************
-   * Mini framework for allowing the bot to refer to earlier messages
-   * while trying to avoid code duplication
+   * Mini framework for allowing the bot to refer to earlier messages while trying
+   * to avoid code duplication
    * *********************************************************************************
    */
 
@@ -325,13 +326,12 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
         Duration.ofSeconds(60));
     final StopWatch crawlStopWatch = new StopWatch();
     crawlStopWatch.start("crawl");
-    AgreementProtocolState state = WonConversationUtils
-        .getAgreementProtocolState(con.getConnectionURI(), ctx.getLinkedDataSource());
+    AgreementProtocolState state = WonConversationUtils.getAgreementProtocolState(con.getConnectionURI(),
+        ctx.getLinkedDataSource());
     crawlStopWatch.stop();
     Duration crawlDuration = Duration.ofMillis(crawlStopWatch.getLastTaskTimeMillis());
-    messageModel = WonRdfUtils.MessageUtils.textMessage(
-        "Finished crawl in " + getDurationString(crawlDuration) + " seconds. The dataset has " + state
-            .getConversationDataset().asDatasetGraph().size() + " rdf graphs.");
+    messageModel = WonRdfUtils.MessageUtils.textMessage("Finished crawl in " + getDurationString(crawlDuration)
+        + " seconds. The dataset has " + state.getConversationDataset().asDatasetGraph().size() + " rdf graphs.");
     getEventListenerContext().getEventBus().publish(new ConnectionMessageCommandEvent(con, messageModel));
     messageModel = makeReferringMessage(state, messageFinder, messageReferrer, textMessageMaker);
     getEventListenerContext().getEventBus().publish(new ConnectionMessageCommandEvent(con, messageModel));
@@ -359,13 +359,13 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
     String whose = useWrongSender ? "your" : "my";
     String which = onlyProposes ? "proposal " : "";
     referToEarlierMessages(ctx, bus, con, "ok, I'll retract " + whose + " latest " + which
-            + "message - but 'll need to crawl the connection data first, please be patient.", state -> {
-          URI uri = state.getNthLatestMessage(m -> onlyProposes ?
-              (m.isProposesMessage() || m.isProposesToCancelMessage()) && m.getEffects().stream()
-                  .anyMatch(e -> e.isProposes()) :
-              true && useWrongSender ?
-                  m.getSenderNeedURI().equals(con.getRemoteNeedURI()) :
-                  m.getSenderNeedURI().equals(con.getNeedURI()), 0);
+        + "message - but 'll need to crawl the connection data first, please be patient.", state -> {
+          URI uri = state.getNthLatestMessage(m -> onlyProposes
+              ? (m.isProposesMessage() || m.isProposesToCancelMessage())
+                  && m.getEffects().stream().anyMatch(e -> e.isProposes())
+              : true && useWrongSender ? m.getSenderNeedURI().equals(con.getRemoteNeedURI())
+                  : m.getSenderNeedURI().equals(con.getNeedURI()),
+              0);
           return uri == null ? Collections.EMPTY_LIST : Arrays.asList(uri);
         }, (messageModel, uris) -> WonRdfUtils.MessageUtils.addRetracts(messageModel, uris),
         (Duration queryDuration, AgreementProtocolState state, URI... uris) -> {
@@ -373,9 +373,8 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
             return "Sorry, I cannot retract any messages - I did not find any.";
           }
           Optional<String> retractedString = state.getTextMessage(uris[0]);
-          String finalRetractedString = (retractedString.isPresent()) ?
-              ", which read, '" + retractedString.get() + "'" :
-              ", which had no text message";
+          String finalRetractedString = (retractedString.isPresent()) ? ", which read, '" + retractedString.get() + "'"
+              : ", which had no text message";
           return "Ok, I am hereby retracting " + whose + " message" + finalRetractedString + " (uri: " + uris[0] + ")."
               + "\n The query for finding that message took " + getDurationString(queryDuration) + " seconds.";
         });
@@ -383,7 +382,8 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 
   private void reject(EventListenerContext ctx, EventBus bus, Connection con, boolean useWrongSender) {
     String whose = useWrongSender ? "my" : "your";
-    referToEarlierMessages(ctx, bus, con, "ok, I'll reject " + whose
+    referToEarlierMessages(ctx, bus, con,
+        "ok, I'll reject " + whose
             + " latest rejectable message - but I'll need to crawl the connection data first, please be patient.",
         state -> {
           URI uri = state
@@ -395,9 +395,8 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
             return "Sorry, I cannot reject any of " + whose + " messages - I did not find any suitable message.";
           }
           Optional<String> retractedString = state.getTextMessage(uris[0]);
-          String finalRetractedString = (retractedString.isPresent()) ?
-              ", which read, '" + retractedString.get() + "'" :
-              ", which had no text message";
+          String finalRetractedString = (retractedString.isPresent()) ? ", which read, '" + retractedString.get() + "'"
+              : ", which had no text message";
           return "Ok, I am hereby rejecting " + whose + " message" + finalRetractedString + " (uri: " + uris[0] + ")."
               + "\n The query for finding that message took " + getDurationString(queryDuration) + " seconds.";
         });
@@ -419,15 +418,16 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
     crawlStopWatch.start("crawl");
     crawlConnectionDataBehaviour.onResult(new SendMessageReportingCrawlResultAction(ctx, con, crawlStopWatch));
     crawlConnectionDataBehaviour.onResult(new SendMessageOnCrawlResultAction(ctx, con) {
-      @Override protected Model makeSuccessMessage(CrawlConnectionCommandSuccessEvent successEvent) {
+      @Override
+      protected Model makeSuccessMessage(CrawlConnectionCommandSuccessEvent successEvent) {
         try {
           logger.debug("validating data of connection {}", command.getConnectionURI());
-          //TODO: use one validator for all invocations
+          // TODO: use one validator for all invocations
           WonConnectionValidator validator = new WonConnectionValidator();
           StringBuilder message = new StringBuilder();
           boolean valid = validator.validate(successEvent.getCrawledData(), message);
-          String successMessage =
-              "Connection " + command.getConnectionURI() + " is valid: " + valid + " " + message.toString();
+          String successMessage = "Connection " + command.getConnectionURI() + " is valid: " + valid + " "
+              + message.toString();
           return WonRdfUtils.MessageUtils.textMessage(successMessage);
         } catch (Exception e) {
           return WonRdfUtils.MessageUtils.textMessage("Caught exception during validation: " + e);
@@ -439,10 +439,10 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 
   private void propose(EventListenerContext ctx, EventBus bus, Connection con, boolean allowOwnClauses,
       boolean allowCounterpartClauses, int count) {
-    String whose = allowOwnClauses ?
-        allowCounterpartClauses ? "our" : "my" :
-        allowCounterpartClauses ? "your" : " - sorry, don't know which ones to choose, actually - ";
-    referToEarlierMessages(ctx, bus, con, "ok, I'll make a proposal containing " + count + " of " + whose
+    String whose = allowOwnClauses ? allowCounterpartClauses ? "our" : "my"
+        : allowCounterpartClauses ? "your" : " - sorry, don't know which ones to choose, actually - ";
+    referToEarlierMessages(ctx, bus, con,
+        "ok, I'll make a proposal containing " + count + " of " + whose
             + " latest messages as clauses - but I'll need to crawl the connection data first, please be patient.",
         state -> {
           return state.getNLatestMessageUris(m -> {

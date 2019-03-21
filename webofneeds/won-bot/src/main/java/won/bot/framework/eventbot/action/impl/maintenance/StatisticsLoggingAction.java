@@ -35,7 +35,8 @@ public class StatisticsLoggingAction extends BaseEventBotAction {
     super(eventListenerContext);
   }
 
-  @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
+  @Override
+  protected void doRun(Event event, EventListener executingListener) throws Exception {
     EventBus bus = getEventListenerContext().getEventBus();
     EventBusStatistics statistics = bus.generateEventBusStatistics();
     StringBuilder sb = new StringBuilder();

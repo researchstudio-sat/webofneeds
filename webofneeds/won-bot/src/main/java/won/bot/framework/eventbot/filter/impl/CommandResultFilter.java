@@ -31,7 +31,8 @@ public class CommandResultFilter implements EventFilter {
     this.orginalCommand = orginalCommand;
   }
 
-  @Override public boolean accept(Event event) {
+  @Override
+  public boolean accept(Event event) {
     if (!(event instanceof CommandResultEvent))
       return false;
     return ((CommandResultEvent) event).getOriginalCommandEvent() == orginalCommand;

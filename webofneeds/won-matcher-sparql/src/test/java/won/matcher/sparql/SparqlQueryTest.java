@@ -47,7 +47,8 @@ public class SparqlQueryTest {
 
   }
 
-  @Test @Ignore // useful for trying things out, does not make so much sense as a unit test
+  @Test
+  @Ignore // useful for trying things out, does not make so much sense as a unit test
   public void testQuery() throws Exception {
     Dataset dataset = DatasetFactory.create();
     RDFDataMgr.read(dataset, getResourceAsStream("sparqlquerytest/need2.trig"), Lang.TRIG);
@@ -83,7 +84,8 @@ public class SparqlQueryTest {
     }
   }
 
-  @Test public void testAddGraphOp() throws Exception {
+  @Test
+  public void testAddGraphOp() throws Exception {
     String queryString = getResourceAsString("sparqlquerytest/query.rq");
     String queryWithGraphClauseString = getResourceAsString("sparqlquerytest/query-with-graph-clause.rq");
 
@@ -97,7 +99,8 @@ public class SparqlQueryTest {
         queryWithGraphClause);
   }
 
-  @Test public void testRemoveServiceOpNoName() throws Exception {
+  @Test
+  public void testRemoveServiceOpNoName() throws Exception {
     String queryString = getResourceAsString("sparqlquerytest/query2.rq");
     String queryWithGraphClauseString = getResourceAsString("sparqlquerytest/query2-without-service-clause.rq");
 
@@ -109,7 +112,8 @@ public class SparqlQueryTest {
     Assert.assertEquals("Adding graph op to query did not yield expected result", expectedOp, actualOp);
   }
 
-  @Test public void testRemoveServiceOpWithName() throws Exception {
+  @Test
+  public void testRemoveServiceOpWithName() throws Exception {
     String queryString = getResourceAsString("sparqlquerytest/query2.rq");
     String queryWithGraphClauseString = getResourceAsString("sparqlquerytest/query2-without-service-clause.rq");
 
@@ -117,12 +121,13 @@ public class SparqlQueryTest {
     Op queryOp = Algebra.compile(query);
     Query expectedQuery = QueryFactory.create(queryWithGraphClauseString);
     Op expectedOp = Algebra.compile(expectedQuery);
-    Op actualOp = SparqlMatcherUtils
-        .removeServiceOp(queryOp, Optional.of("http://www.bigdata.com/rdf/geospatial#search"));
+    Op actualOp = SparqlMatcherUtils.removeServiceOp(queryOp,
+        Optional.of("http://www.bigdata.com/rdf/geospatial#search"));
     Assert.assertEquals("Adding graph op to query did not yield expected result", expectedOp, actualOp);
   }
 
-  @Test public void testRemoveServiceOpWithOtherName() throws Exception {
+  @Test
+  public void testRemoveServiceOpWithOtherName() throws Exception {
     String queryString = getResourceAsString("sparqlquerytest/query2.rq");
     Query query = QueryFactory.create(queryString);
     Op queryOp = Algebra.compile(query);
@@ -132,10 +137,13 @@ public class SparqlQueryTest {
   }
 
   /**
-   * Test that reads a query from a file and repeatedly runs noHintForCounterpartQuery and hintForCounterpartQuery from
-   * SparqlMatcherUtils, checking that the desired result is obtained each time, i.e., the methods have no side effects.
+   * Test that reads a query from a file and repeatedly runs
+   * noHintForCounterpartQuery and hintForCounterpartQuery from
+   * SparqlMatcherUtils, checking that the desired result is obtained each time,
+   * i.e., the methods have no side effects.
    */
-  @Test public void testAddRequiredFlag_NoHintForCounterpart_Nosideeffects() throws Exception {
+  @Test
+  public void testAddRequiredFlag_NoHintForCounterpart_Nosideeffects() throws Exception {
     String queryString = getResourceAsString("sparqlquerytest/no-hint-for-counterpart/input.rq");
     String queryStringHintForCounterpartExpected = getResourceAsString(
         "sparqlquerytest/hint-for-counterpart/expected.rq");
@@ -170,7 +178,8 @@ public class SparqlQueryTest {
 
   }
 
-  @Test public void testAddRequiredFlag_NoHintForCounterpart() throws Exception {
+  @Test
+  public void testAddRequiredFlag_NoHintForCounterpart() throws Exception {
     String queryString = getResourceAsString("sparqlquerytest/no-hint-for-counterpart/input.rq");
     String expectedQueryString = getResourceAsString("sparqlquerytest/no-hint-for-counterpart/expected.rq");
     Var resultName = Var.alloc("result");
@@ -178,7 +187,8 @@ public class SparqlQueryTest {
     checkResult(queryString, expectedQueryString, op -> SparqlMatcherUtils.noHintForCounterpartQuery(op, resultName));
   }
 
-  @Test public void testAddRequiredFlag_hintForCounterpart() throws Exception {
+  @Test
+  public void testAddRequiredFlag_hintForCounterpart() throws Exception {
     String queryString = getResourceAsString("sparqlquerytest/hint-for-counterpart/input.rq");
     String expectedQueryString = getResourceAsString("sparqlquerytest/hint-for-counterpart/expected.rq");
     Var resultName = Var.alloc("result");
@@ -186,7 +196,8 @@ public class SparqlQueryTest {
     checkResult(queryString, expectedQueryString, op -> SparqlMatcherUtils.hintForCounterpartQuery(op, resultName));
   }
 
-  @Test public void testAddRequiredFlag_hintForCounterpart_complex1() throws Exception {
+  @Test
+  public void testAddRequiredFlag_hintForCounterpart_complex1() throws Exception {
     String queryString = getResourceAsString("sparqlquerytest/nhfc-complex-query1/input.rq");
     String expectedQueryString = getResourceAsString("sparqlquerytest/nhfc-complex-query1/expected.rq");
     Var resultName = Var.alloc("result");
@@ -194,7 +205,8 @@ public class SparqlQueryTest {
     checkResult(queryString, expectedQueryString, op -> SparqlMatcherUtils.noHintForCounterpartQuery(op, resultName));
   }
 
-  @Test public void testAddExcludedFlag_NoHintForCounterpart_Whatsaround() throws Exception {
+  @Test
+  public void testAddExcludedFlag_NoHintForCounterpart_Whatsaround() throws Exception {
     String queryString = getResourceAsString("sparqlquerytest/whatsaround_excludeflag_NHFC/input.rq");
     String expectedQueryString = getResourceAsString("sparqlquerytest/whatsaround_excludeflag_NHFC/expected.rq");
     Var resultName = Var.alloc("result");
@@ -202,7 +214,8 @@ public class SparqlQueryTest {
     checkResult(queryString, expectedQueryString, op -> SparqlMatcherUtils.hintForCounterpartQuery(op, resultName));
   }
 
-  @Test public void testSearchQuery() throws Exception {
+  @Test
+  public void testSearchQuery() throws Exception {
     String expectedQueryString = getResourceAsString("sparqlquerytest/searchstring-query/expected.rq");
     Var resultName = Var.alloc("result");
     Var scoreName = Var.alloc("score");
@@ -225,14 +238,11 @@ public class SparqlQueryTest {
     String actual = OpAsQuery.asQuery(actualOp).toString();
 
     String expected = OpAsQuery.asQuery(expectedOp).toString();
-        /*
-        System.out.println("expected:");
-        System.out.println(expectedOp);
-        System.out.println(expected);
-        System.out.println("actual:");
-        System.out.println(actualOp);
-        System.out.println(actual);
-        */
+    /*
+     * System.out.println("expected:"); System.out.println(expectedOp);
+     * System.out.println(expected); System.out.println("actual:");
+     * System.out.println(actualOp); System.out.println(actual);
+     */
     Assert.assertEquals(expected, actual);
   }
 }

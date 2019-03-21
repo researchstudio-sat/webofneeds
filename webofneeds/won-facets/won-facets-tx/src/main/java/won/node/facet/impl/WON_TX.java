@@ -22,8 +22,7 @@ import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 
 /**
- * User: Danijel
- * Date: 5.6.14.
+ * User: Danijel Date: 5.6.14.
  */
 public class WON_TX {
   // public static final String BASE_URI = "http://purl.org/webofneeds/tx/model#";
@@ -44,7 +43,7 @@ public class WON_TX {
   public static final Resource COORDINATION_MESSAGE_ABORT_AND_COMPENSATE = m
       .createResource(BASE_URI + "AbortAndCompensate");
 
-  //Business Activities
+  // Business Activities
   public static final Resource MESSAGE_CANCEL = m.createResource(BASE_URI + "MessageCancel");
   public static final Resource MESSAGE_CLOSE = m.createResource(BASE_URI + "MessageClose");
   public static final Resource MESSAGE_COMPENSATE = m.createResource(BASE_URI + "MessageCompensate");
@@ -69,7 +68,7 @@ public class WON_TX {
   public static final Resource STATE_CANCELING_ACTIVE = m.createResource(BASE_URI + "CancelingActive");
   public static final Resource STATE_CANCELING_COMPLETING = m.createResource(BASE_URI + "CancelingCompleting");
 
-  //from BOTS
+  // from BOTS
   public static final Resource MESSAGE_COMPLETE = m.createResource(BASE_URI + "MessageComplete");
   public static final Property STATE = m.createProperty(BASE_URI + "hasState");
   public static final Resource STATE_ENDED = m.createResource(BASE_URI + "Ended");

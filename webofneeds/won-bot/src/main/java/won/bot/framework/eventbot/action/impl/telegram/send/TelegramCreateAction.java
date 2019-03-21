@@ -42,7 +42,7 @@ public class TelegramCreateAction extends AbstractCreateNeedAction {
     this.telegramContentExtractor = telegramContentExtractor;
 
     if (facets == null || facets.length == 0) {
-      //add the default facet if none is present.
+      // add the default facet if none is present.
       this.facets = new ArrayList<URI>(1);
       this.facets.add(FacetType.ChatFacet.getURI());
     } else {
@@ -50,7 +50,8 @@ public class TelegramCreateAction extends AbstractCreateNeedAction {
     }
   }
 
-  @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
+  @Override
+  protected void doRun(Event event, EventListener executingListener) throws Exception {
     EventListenerContext ctx = getEventListenerContext();
     if (event instanceof TelegramCreateNeedEvent && ctx.getBotContextWrapper() instanceof TelegramBotContextWrapper) {
       TelegramBotContextWrapper botContextWrapper = (TelegramBotContextWrapper) ctx.getBotContextWrapper();
@@ -80,7 +81,7 @@ public class TelegramCreateAction extends AbstractCreateNeedAction {
           throw new InvalidParameterException("no valid title was given");
         }
 
-        //MAKE THOSE ATTRIBUTES DIFFERENT AND EDITABLE
+        // MAKE THOSE ATTRIBUTES DIFFERENT AND EDITABLE
         boolean isUsedForTesting = true;
         boolean isDoNotMatch = false;
 
@@ -120,7 +121,8 @@ public class TelegramCreateAction extends AbstractCreateNeedAction {
         botContextWrapper.addURIChatIdRelation(needURI, chatId);
 
         EventListener successCallback = new EventListener() {
-          @Override public void onEvent(Event event) throws Exception {
+          @Override
+          public void onEvent(Event event) throws Exception {
             logger.debug("need creation successful, new need URI is {}", needURI);
             logger.debug("created need was from sender: " + botContextWrapper.getChatIdForURI(needURI));
 
@@ -135,7 +137,8 @@ public class TelegramCreateAction extends AbstractCreateNeedAction {
         };
 
         EventListener failureCallback = new EventListener() {
-          @Override public void onEvent(Event event) throws Exception {
+          @Override
+          public void onEvent(Event event) throws Exception {
             String textMessage = WonRdfUtils.MessageUtils
                 .getTextMessage(((FailureResponseEvent) event).getFailureMessage());
             logger.error("need creation failed for need URI {}, original message URI {}: {}",

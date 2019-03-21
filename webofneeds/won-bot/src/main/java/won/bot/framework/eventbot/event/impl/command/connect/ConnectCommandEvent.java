@@ -26,7 +26,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Instructs the bot to connect to the specified remoteNeed on behalf of the need.
+ * Instructs the bot to connect to the specified remoteNeed on behalf of the
+ * need.
  */
 public class ConnectCommandEvent extends BaseNeedSpecificEvent implements MessageCommandEvent, RemoteNeedSpecificEvent {
   private URI remoteNeedURI;
@@ -54,7 +55,8 @@ public class ConnectCommandEvent extends BaseNeedSpecificEvent implements Messag
     this(needURI, remoteNeedURI, "Hello!");
   }
 
-  @Override public WonMessageType getWonMessageType() {
+  @Override
+  public WonMessageType getWonMessageType() {
     return WonMessageType.CONNECT;
   }
 

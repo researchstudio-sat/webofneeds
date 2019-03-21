@@ -25,8 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * User: syim
- * Date: 11.07.14
+ * User: syim Date: 11.07.14
  */
 public class PropertyPathConfigurator {
   public static List<Path> configurePropertyPaths() {
@@ -35,9 +34,8 @@ public class PropertyPathConfigurator {
     addPropertyPath(propertyPaths, "<" + WON.HAS_CONNECTIONS + ">" + "/" + "rdfs:member");
     addPropertyPath(propertyPaths,
         "<" + WON.HAS_CONNECTIONS + ">" + "/" + "rdfs:member" + "/<" + WON.HAS_REMOTE_CONNECTION + ">");
-    addPropertyPath(propertyPaths,
-        "<" + WON.HAS_CONNECTIONS + ">" + "/" + "rdfs:member" + "/<" + WON.HAS_REMOTE_CONNECTION + ">/<"
-            + WON.BELONGS_TO_NEED + ">");
+    addPropertyPath(propertyPaths, "<" + WON.HAS_CONNECTIONS + ">" + "/" + "rdfs:member" + "/<"
+        + WON.HAS_REMOTE_CONNECTION + ">/<" + WON.BELONGS_TO_NEED + ">");
     return propertyPaths;
   }
 

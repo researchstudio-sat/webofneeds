@@ -5,8 +5,7 @@ import won.protocol.model.Connection;
 import java.net.URI;
 
 /**
- * User: Danijel
- * Date: 20.3.14.
+ * User: Danijel Date: 20.3.14.
  */
 public interface ATBAConnectionStateManager {
 

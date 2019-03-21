@@ -47,11 +47,13 @@ public class WaitForNEventsListener extends AbstractDoOnceAfterNEventsListener {
     super(context, name, eventFilter, targetCount);
   }
 
-  @Override protected void unsubscribe() {
+  @Override
+  protected void unsubscribe() {
     getEventListenerContext().getEventBus().unsubscribe(this);
   }
 
-  @Override protected void doOnce(final Event event) throws Exception {
+  @Override
+  protected void doOnce(final Event event) throws Exception {
     logger.debug("Finished waiting for {} events", getTargetCount());
   }
 

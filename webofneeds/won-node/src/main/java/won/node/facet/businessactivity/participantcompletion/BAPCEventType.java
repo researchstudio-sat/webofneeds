@@ -7,81 +7,79 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
- * Created with IntelliJ IDEA.
- * User: Danijel
- * Date: 24.1.14.
- * Time: 16.08
- * To change this template use File | Settings | File Templates.
+ * Created with IntelliJ IDEA. User: Danijel Date: 24.1.14. Time: 16.08 To
+ * change this template use File | Settings | File Templates.
  */
 public enum BAPCEventType {
-  //in general, be permissive about messages where possible. Don't care about duplicate messages
+  // in general, be permissive about messages where possible. Don't care about
+  // duplicate messages
 
-  //close may always be called. It always closes the connection.
+  // close may always be called. It always closes the connection.
   ///
-  MESSAGE_CANCEL("MessageCancel", new ArrayList<BAPCState>(Arrays
-      .asList(BAPCState.ACTIVE, BAPCState.CANCELING, BAPCState.COMPLETED, BAPCState.CLOSING, BAPCState.COMPENSATING,
-          BAPCState.FAILING_ACTIVE_CANCELING, BAPCState.FAILING_COMPENSATING, BAPCState.NOT_COMPLETING,
-          BAPCState.EXITING, BAPCState.ENDED))),
+  MESSAGE_CANCEL("MessageCancel",
+      new ArrayList<BAPCState>(Arrays.asList(BAPCState.ACTIVE, BAPCState.CANCELING, BAPCState.COMPLETED,
+          BAPCState.CLOSING, BAPCState.COMPENSATING, BAPCState.FAILING_ACTIVE_CANCELING, BAPCState.FAILING_COMPENSATING,
+          BAPCState.NOT_COMPLETING, BAPCState.EXITING, BAPCState.ENDED))),
 
-  MESSAGE_CLOSE("MessageClose", new ArrayList<BAPCState>(Arrays
-      .asList(BAPCState.ACTIVE, BAPCState.CANCELING, BAPCState.COMPLETED, BAPCState.CLOSING, BAPCState.COMPENSATING,
-          BAPCState.FAILING_ACTIVE_CANCELING, BAPCState.FAILING_COMPENSATING, BAPCState.NOT_COMPLETING,
-          BAPCState.EXITING, BAPCState.ENDED))),
+  MESSAGE_CLOSE("MessageClose",
+      new ArrayList<BAPCState>(Arrays.asList(BAPCState.ACTIVE, BAPCState.CANCELING, BAPCState.COMPLETED,
+          BAPCState.CLOSING, BAPCState.COMPENSATING, BAPCState.FAILING_ACTIVE_CANCELING, BAPCState.FAILING_COMPENSATING,
+          BAPCState.NOT_COMPLETING, BAPCState.EXITING, BAPCState.ENDED))),
 
-  MESSAGE_COMPENSATE("MessageCompensate", new ArrayList<BAPCState>(Arrays
-      .asList(BAPCState.ACTIVE, BAPCState.CANCELING, BAPCState.COMPLETED, BAPCState.CLOSING, BAPCState.COMPENSATING,
-          BAPCState.FAILING_ACTIVE_CANCELING, BAPCState.FAILING_COMPENSATING, BAPCState.NOT_COMPLETING,
-          BAPCState.EXITING, BAPCState.ENDED))),
+  MESSAGE_COMPENSATE("MessageCompensate",
+      new ArrayList<BAPCState>(Arrays.asList(BAPCState.ACTIVE, BAPCState.CANCELING, BAPCState.COMPLETED,
+          BAPCState.CLOSING, BAPCState.COMPENSATING, BAPCState.FAILING_ACTIVE_CANCELING, BAPCState.FAILING_COMPENSATING,
+          BAPCState.NOT_COMPLETING, BAPCState.EXITING, BAPCState.ENDED))),
 
-  MESSAGE_FAILED("MessageFailed", new ArrayList<BAPCState>(Arrays
-      .asList(BAPCState.ACTIVE, BAPCState.CANCELING, BAPCState.COMPLETED, BAPCState.CLOSING, BAPCState.COMPENSATING,
-          BAPCState.FAILING_ACTIVE_CANCELING, BAPCState.FAILING_COMPENSATING, BAPCState.NOT_COMPLETING,
-          BAPCState.EXITING, BAPCState.ENDED))),
+  MESSAGE_FAILED("MessageFailed",
+      new ArrayList<BAPCState>(Arrays.asList(BAPCState.ACTIVE, BAPCState.CANCELING, BAPCState.COMPLETED,
+          BAPCState.CLOSING, BAPCState.COMPENSATING, BAPCState.FAILING_ACTIVE_CANCELING, BAPCState.FAILING_COMPENSATING,
+          BAPCState.NOT_COMPLETING, BAPCState.EXITING, BAPCState.ENDED))),
 
-  MESSAGE_EXITED("MessageExited", new ArrayList<BAPCState>(Arrays
-      .asList(BAPCState.ACTIVE, BAPCState.CANCELING, BAPCState.COMPLETED, BAPCState.CLOSING, BAPCState.COMPENSATING,
-          BAPCState.FAILING_ACTIVE_CANCELING, BAPCState.FAILING_COMPENSATING, BAPCState.NOT_COMPLETING,
-          BAPCState.EXITING, BAPCState.ENDED))),
+  MESSAGE_EXITED("MessageExited",
+      new ArrayList<BAPCState>(Arrays.asList(BAPCState.ACTIVE, BAPCState.CANCELING, BAPCState.COMPLETED,
+          BAPCState.CLOSING, BAPCState.COMPENSATING, BAPCState.FAILING_ACTIVE_CANCELING, BAPCState.FAILING_COMPENSATING,
+          BAPCState.NOT_COMPLETING, BAPCState.EXITING, BAPCState.ENDED))),
 
-  MESSAGE_NOTCOMPLETED("MessageNotCompleted", new ArrayList<BAPCState>(Arrays
-      .asList(BAPCState.ACTIVE, BAPCState.CANCELING, BAPCState.COMPLETED, BAPCState.CLOSING, BAPCState.COMPENSATING,
-          BAPCState.FAILING_ACTIVE_CANCELING, BAPCState.FAILING_COMPENSATING, BAPCState.NOT_COMPLETING,
-          BAPCState.EXITING, BAPCState.ENDED))),
+  MESSAGE_NOTCOMPLETED("MessageNotCompleted",
+      new ArrayList<BAPCState>(Arrays.asList(BAPCState.ACTIVE, BAPCState.CANCELING, BAPCState.COMPLETED,
+          BAPCState.CLOSING, BAPCState.COMPENSATING, BAPCState.FAILING_ACTIVE_CANCELING, BAPCState.FAILING_COMPENSATING,
+          BAPCState.NOT_COMPLETING, BAPCState.EXITING, BAPCState.ENDED))),
 
-  MESSAGE_EXIT("MessageExit", new ArrayList<BAPCState>(Arrays
-      .asList(BAPCState.ACTIVE, BAPCState.CANCELING, BAPCState.COMPLETED, BAPCState.CLOSING, BAPCState.COMPENSATING,
-          BAPCState.FAILING_ACTIVE_CANCELING, BAPCState.FAILING_COMPENSATING, BAPCState.NOT_COMPLETING,
-          BAPCState.EXITING, BAPCState.ENDED))),
+  MESSAGE_EXIT("MessageExit",
+      new ArrayList<BAPCState>(Arrays.asList(BAPCState.ACTIVE, BAPCState.CANCELING, BAPCState.COMPLETED,
+          BAPCState.CLOSING, BAPCState.COMPENSATING, BAPCState.FAILING_ACTIVE_CANCELING, BAPCState.FAILING_COMPENSATING,
+          BAPCState.NOT_COMPLETING, BAPCState.EXITING, BAPCState.ENDED))),
 
-  MESSAGE_COMPLETED("MessageCompleted", new ArrayList<BAPCState>(Arrays
-      .asList(BAPCState.ACTIVE, BAPCState.CANCELING, BAPCState.COMPLETED, BAPCState.CLOSING, BAPCState.COMPENSATING,
-          BAPCState.FAILING_ACTIVE_CANCELING, BAPCState.FAILING_COMPENSATING, BAPCState.NOT_COMPLETING,
-          BAPCState.EXITING, BAPCState.ENDED))),
+  MESSAGE_COMPLETED("MessageCompleted",
+      new ArrayList<BAPCState>(Arrays.asList(BAPCState.ACTIVE, BAPCState.CANCELING, BAPCState.COMPLETED,
+          BAPCState.CLOSING, BAPCState.COMPENSATING, BAPCState.FAILING_ACTIVE_CANCELING, BAPCState.FAILING_COMPENSATING,
+          BAPCState.NOT_COMPLETING, BAPCState.EXITING, BAPCState.ENDED))),
 
-  MESSAGE_FAIL("MessageFail", new ArrayList<BAPCState>(Arrays
-      .asList(BAPCState.ACTIVE, BAPCState.CANCELING, BAPCState.COMPLETED, BAPCState.CLOSING, BAPCState.COMPENSATING,
-          BAPCState.FAILING_ACTIVE_CANCELING, BAPCState.FAILING_COMPENSATING, BAPCState.NOT_COMPLETING,
-          BAPCState.EXITING, BAPCState.ENDED))),
+  MESSAGE_FAIL("MessageFail",
+      new ArrayList<BAPCState>(Arrays.asList(BAPCState.ACTIVE, BAPCState.CANCELING, BAPCState.COMPLETED,
+          BAPCState.CLOSING, BAPCState.COMPENSATING, BAPCState.FAILING_ACTIVE_CANCELING, BAPCState.FAILING_COMPENSATING,
+          BAPCState.NOT_COMPLETING, BAPCState.EXITING, BAPCState.ENDED))),
 
-  MESSAGE_CANNOTCOMPLETE("MessageCanNotComplete", new ArrayList<BAPCState>(Arrays
-      .asList(BAPCState.ACTIVE, BAPCState.CANCELING, BAPCState.COMPLETED, BAPCState.CLOSING, BAPCState.COMPENSATING,
-          BAPCState.FAILING_ACTIVE_CANCELING, BAPCState.FAILING_COMPENSATING, BAPCState.NOT_COMPLETING,
-          BAPCState.EXITING, BAPCState.ENDED))),
+  MESSAGE_CANNOTCOMPLETE("MessageCanNotComplete",
+      new ArrayList<BAPCState>(Arrays.asList(BAPCState.ACTIVE, BAPCState.CANCELING, BAPCState.COMPLETED,
+          BAPCState.CLOSING, BAPCState.COMPENSATING, BAPCState.FAILING_ACTIVE_CANCELING, BAPCState.FAILING_COMPENSATING,
+          BAPCState.NOT_COMPLETING, BAPCState.EXITING, BAPCState.ENDED))),
 
-  MESSAGE_CANCELED("MessageCanceled", new ArrayList<BAPCState>(Arrays
-      .asList(BAPCState.ACTIVE, BAPCState.CANCELING, BAPCState.COMPLETED, BAPCState.CLOSING, BAPCState.COMPENSATING,
-          BAPCState.FAILING_ACTIVE_CANCELING, BAPCState.FAILING_COMPENSATING, BAPCState.NOT_COMPLETING,
-          BAPCState.EXITING, BAPCState.ENDED))),
+  MESSAGE_CANCELED("MessageCanceled",
+      new ArrayList<BAPCState>(Arrays.asList(BAPCState.ACTIVE, BAPCState.CANCELING, BAPCState.COMPLETED,
+          BAPCState.CLOSING, BAPCState.COMPENSATING, BAPCState.FAILING_ACTIVE_CANCELING, BAPCState.FAILING_COMPENSATING,
+          BAPCState.NOT_COMPLETING, BAPCState.EXITING, BAPCState.ENDED))),
 
-  MESSAGE_CLOSED("MessageClosed", new ArrayList<BAPCState>(Arrays
-      .asList(BAPCState.ACTIVE, BAPCState.CANCELING, BAPCState.COMPLETED, BAPCState.CLOSING, BAPCState.COMPENSATING,
-          BAPCState.FAILING_ACTIVE_CANCELING, BAPCState.FAILING_COMPENSATING, BAPCState.NOT_COMPLETING,
-          BAPCState.EXITING, BAPCState.ENDED))),
+  MESSAGE_CLOSED("MessageClosed",
+      new ArrayList<BAPCState>(Arrays.asList(BAPCState.ACTIVE, BAPCState.CANCELING, BAPCState.COMPLETED,
+          BAPCState.CLOSING, BAPCState.COMPENSATING, BAPCState.FAILING_ACTIVE_CANCELING, BAPCState.FAILING_COMPENSATING,
+          BAPCState.NOT_COMPLETING, BAPCState.EXITING, BAPCState.ENDED))),
 
-  MESSAGE_COMPENSATED("MessageCompensated", new ArrayList<BAPCState>(Arrays
-      .asList(BAPCState.ACTIVE, BAPCState.CANCELING, BAPCState.COMPLETED, BAPCState.CLOSING, BAPCState.COMPENSATING,
-          BAPCState.FAILING_ACTIVE_CANCELING, BAPCState.FAILING_COMPENSATING, BAPCState.NOT_COMPLETING,
-          BAPCState.EXITING, BAPCState.ENDED)));
+  MESSAGE_COMPENSATED("MessageCompensated",
+      new ArrayList<BAPCState>(Arrays.asList(BAPCState.ACTIVE, BAPCState.CANCELING, BAPCState.COMPLETED,
+          BAPCState.CLOSING, BAPCState.COMPENSATING, BAPCState.FAILING_ACTIVE_CANCELING, BAPCState.FAILING_COMPENSATING,
+          BAPCState.NOT_COMPLETING, BAPCState.EXITING, BAPCState.ENDED)));
 
   private String name;
   private ArrayList<BAPCState> permittingPStates;
@@ -137,10 +135,10 @@ public enum BAPCEventType {
 
   public static boolean isBAPCParticipantEventType(final BAPCEventType event) {
     boolean ret = false;
-    if (event.equals(BAPCEventType.MESSAGE_COMPLETED) || event.equals(BAPCEventType.MESSAGE_EXIT) || event
-        .equals(BAPCEventType.MESSAGE_FAIL) || event.equals(BAPCEventType.MESSAGE_CANNOTCOMPLETE) || event
-        .equals(BAPCEventType.MESSAGE_CANCELED) || event.equals(BAPCEventType.MESSAGE_COMPENSATED) || event
-        .equals(BAPCEventType.MESSAGE_CLOSED))
+    if (event.equals(BAPCEventType.MESSAGE_COMPLETED) || event.equals(BAPCEventType.MESSAGE_EXIT)
+        || event.equals(BAPCEventType.MESSAGE_FAIL) || event.equals(BAPCEventType.MESSAGE_CANNOTCOMPLETE)
+        || event.equals(BAPCEventType.MESSAGE_CANCELED) || event.equals(BAPCEventType.MESSAGE_COMPENSATED)
+        || event.equals(BAPCEventType.MESSAGE_CLOSED))
       ret = true;
     return ret;
   }
@@ -150,5 +148,3 @@ public enum BAPCEventType {
   }
 
 }
-
-

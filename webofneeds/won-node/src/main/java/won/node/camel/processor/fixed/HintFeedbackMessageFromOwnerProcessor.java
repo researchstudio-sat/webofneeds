@@ -34,11 +34,11 @@ import won.protocol.vocabulary.WONMSG;
 import java.net.URI;
 
 /**
- * User: syim
- * Date: 02.03.2015
+ * User: syim Date: 02.03.2015
  */
-@Component @FixedMessageProcessor(direction = WONMSG.TYPE_FROM_OWNER_STRING, messageType = WONMSG.TYPE_HINT_FEEDBACK_STRING) public class HintFeedbackMessageFromOwnerProcessor
-    extends AbstractFromOwnerCamelProcessor {
+@Component
+@FixedMessageProcessor(direction = WONMSG.TYPE_FROM_OWNER_STRING, messageType = WONMSG.TYPE_HINT_FEEDBACK_STRING)
+public class HintFeedbackMessageFromOwnerProcessor extends AbstractFromOwnerCamelProcessor {
 
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
@@ -62,10 +62,11 @@ import java.net.URI;
     assert message != null : "message must not be null";
     final URI messageURI = message.getMessageURI();
     RdfUtils.visit(message.getMessageContent(), new RdfUtils.ModelVisitor<Object>() {
-      @Override public Model visit(final Model model) {
+      @Override
+      public Model visit(final Model model) {
         Resource baseResource = model.getResource(messageURI.toString());
         if (baseResource.hasProperty(WON.HAS_FEEDBACK)) {
-          //add the base resource as a feedback event to the connection
+          // add the base resource as a feedback event to the connection
           processFeedback(con, baseResource);
         }
         return null;

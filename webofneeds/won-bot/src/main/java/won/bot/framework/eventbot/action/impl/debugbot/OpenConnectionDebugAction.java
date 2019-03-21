@@ -55,7 +55,8 @@ public class OpenConnectionDebugAction extends BaseEventBotAction {
     this.welcomeHelpMessage = welcomeHelpMessage;
   }
 
-  @Override public void doRun(final Event event, EventListener executingListener) throws Exception {
+  @Override
+  public void doRun(final Event event, EventListener executingListener) throws Exception {
     if (!(event instanceof ConnectFromOtherNeedEvent)) {
       return;
     }
@@ -89,16 +90,14 @@ public class OpenConnectionDebugAction extends BaseEventBotAction {
 
       String finalWelcomeMessage = welcomeMessage;
       if (wait || deny) {
-        finalWelcomeMessage = welcomeMessage + " " + (deny ? "Denying" : "Accepting") + " your request " + (wait ?
-            " after a timeout of " + waitSeconds + " seconds" :
-            "");
+        finalWelcomeMessage = welcomeMessage + " " + (deny ? "Denying" : "Accepting") + " your request "
+            + (wait ? " after a timeout of " + waitSeconds + " seconds" : "");
       } else {
         finalWelcomeMessage = welcomeMessage + " " + welcomeHelpMessage;
       }
 
-      final WonMessage toSend = deny ?
-          createCloseWonMessage(connectionUri, finalWelcomeMessage) :
-          createOpenWonMessage(connectionUri, finalWelcomeMessage);
+      final WonMessage toSend = deny ? createCloseWonMessage(connectionUri, finalWelcomeMessage)
+          : createOpenWonMessage(connectionUri, finalWelcomeMessage);
 
       Runnable task = () -> {
         getEventListenerContext().getWonMessageSender().sendWonMessage(toSend);
@@ -126,7 +125,8 @@ public class OpenConnectionDebugAction extends BaseEventBotAction {
     return WonMessageBuilder
         .setMessagePropertiesForOpen(wonNodeInformationService.generateEventURI(wonNode), connectionURI, localNeed,
             wonNode, WonRdfUtils.ConnectionUtils.getRemoteConnectionURIFromConnection(connectionRDF, connectionURI),
-            remoteNeed, WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, remoteNeed), message).build();
+            remoteNeed, WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, remoteNeed), message)
+        .build();
   }
 
   private WonMessage createCloseWonMessage(URI connectionURI, String message) throws WonMessageBuilderException {
@@ -142,7 +142,8 @@ public class OpenConnectionDebugAction extends BaseEventBotAction {
     return WonMessageBuilder
         .setMessagePropertiesForClose(wonNodeInformationService.generateEventURI(wonNode), connectionURI, localNeed,
             wonNode, WonRdfUtils.ConnectionUtils.getRemoteConnectionURIFromConnection(connectionRDF, connectionURI),
-            remoteNeed, WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, remoteNeed), message).build();
+            remoteNeed, WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, remoteNeed), message)
+        .build();
   }
 
 }

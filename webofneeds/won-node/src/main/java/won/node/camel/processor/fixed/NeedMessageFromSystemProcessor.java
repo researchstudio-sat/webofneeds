@@ -32,9 +32,11 @@ import java.net.URI;
 /**
  * Processor for msg:FromSystem need messages
  */
-@Component @FixedMessageProcessor(direction = WONMSG.TYPE_FROM_SYSTEM_STRING, messageType = WONMSG.TYPE_NEED_MESSAGE_STRING) public class NeedMessageFromSystemProcessor
-    extends AbstractCamelProcessor {
-  @Override public void process(Exchange exchange) throws Exception {
+@Component
+@FixedMessageProcessor(direction = WONMSG.TYPE_FROM_SYSTEM_STRING, messageType = WONMSG.TYPE_NEED_MESSAGE_STRING)
+public class NeedMessageFromSystemProcessor extends AbstractCamelProcessor {
+  @Override
+  public void process(Exchange exchange) throws Exception {
     Message message = exchange.getIn();
     WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
     URI receiverNeedURI = wonMessage.getReceiverNeedURI();

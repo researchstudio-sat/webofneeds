@@ -24,13 +24,15 @@ import java.util.Map;
 /**
  * User: MS Date: 12.12.2018
  */
-@Component @FacetMessageProcessor(facetType = WON.REVIEW_FACET_STRING, direction = WONMSG.TYPE_FROM_EXTERNAL_STRING, messageType = WONMSG.TYPE_CONNECT_STRING) public class ConnectFromNodeReviewFacetImpl
-    extends AbstractCamelProcessor {
-  @Override public void process(final Exchange exchange) {
+@Component
+@FacetMessageProcessor(facetType = WON.REVIEW_FACET_STRING, direction = WONMSG.TYPE_FROM_EXTERNAL_STRING, messageType = WONMSG.TYPE_CONNECT_STRING)
+public class ConnectFromNodeReviewFacetImpl extends AbstractCamelProcessor {
+  @Override
+  public void process(final Exchange exchange) {
     Message message = exchange.getIn();
     WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
     URI connectionUri = wonMessage.getReceiverURI();
-    //Connection con = connectionRepository.findOneByConnectionURI(connectionUri);
+    // Connection con = connectionRepository.findOneByConnectionURI(connectionUri);
 
     try {
       Map<Property, String> reviewData = WonRdfUtils.MessageUtils.getReviewContent(wonMessage);
@@ -47,9 +49,9 @@ import java.util.Map;
   private void addReviewToNeed(Map<Property, String> reviewData, URI connectionUri) throws IllegalArgumentException {
 
     String aboutNeedURI = reviewData.get(SCHEMA.ABOUT);
-    Double rating = Double.parseDouble(reviewData.get(SCHEMA.RATING_VALUE)) > 0.0 ?
-        Double.parseDouble(reviewData.get(SCHEMA.RATING_VALUE)) :
-        0.0;
+    Double rating = Double.parseDouble(reviewData.get(SCHEMA.RATING_VALUE)) > 0.0
+        ? Double.parseDouble(reviewData.get(SCHEMA.RATING_VALUE))
+        : 0.0;
 
     Need aboutNeed = needRepository.findOneByNeedURI(URI.create(aboutNeedURI));
     Dataset needDataset = aboutNeed.getDatatsetHolder().getDataset();

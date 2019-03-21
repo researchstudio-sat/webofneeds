@@ -32,14 +32,16 @@ import java.util.Iterator;
 import java.util.Optional;
 
 /**
- * BaseEventBotAction that sends a hint message to the first need in the context to the second.
+ * BaseEventBotAction that sends a hint message to the first need in the context
+ * to the second.
  */
 public class MatchNeedsAction extends BaseEventBotAction {
   public MatchNeedsAction(final EventListenerContext eventListenerContext) {
     super(eventListenerContext);
   }
 
-  @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
+  @Override
+  protected void doRun(Event event, EventListener executingListener) throws Exception {
     Collection<URI> needs = getEventListenerContext().getBotContext().retrieveAllNeedUris();
     Iterator<URI> iter = needs.iterator();
     URI need1 = iter.next();
@@ -47,9 +49,9 @@ public class MatchNeedsAction extends BaseEventBotAction {
     logger.debug("matching needs {} and {}", need1, need2);
     logger.debug("getEventListnerContext():" + getEventListenerContext());
     logger.debug("getMatcherService(): " + getEventListenerContext().getMatcherProtocolNeedServiceClient());
-    getEventListenerContext().getMatcherProtocolNeedServiceClient()
-        .hint(need1, need2, 1.0, URI.create("http://example.com/matcher"), null,
-            createWonMessage(need1, need2, 1.0, URI.create("http://example.com/matcher")));
+    getEventListenerContext().getMatcherProtocolNeedServiceClient().hint(need1, need2, 1.0,
+        URI.create("http://example.com/matcher"), null,
+        createWonMessage(need1, need2, 1.0, URI.create("http://example.com/matcher")));
   }
 
   private WonMessage createWonMessage(URI needURI, URI otherNeedURI, double score, URI originator)
@@ -60,9 +62,8 @@ public class MatchNeedsAction extends BaseEventBotAction {
     URI localWonNode = WonRdfUtils.NeedUtils
         .getWonNodeURIFromNeed(getEventListenerContext().getLinkedDataSource().getDataForResource(needURI), needURI);
 
-    return WonMessageBuilder
-        .setMessagePropertiesForHint(wonNodeInformationService.generateEventURI(localWonNode), needURI,
-            Optional.empty(), localWonNode, otherNeedURI, Optional.empty(), originator, score).build();
+    return WonMessageBuilder.setMessagePropertiesForHint(wonNodeInformationService.generateEventURI(localWonNode),
+        needURI, Optional.empty(), localWonNode, otherNeedURI, Optional.empty(), originator, score).build();
   }
 
 }

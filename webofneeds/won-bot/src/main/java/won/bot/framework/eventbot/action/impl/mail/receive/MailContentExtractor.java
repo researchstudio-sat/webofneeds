@@ -16,8 +16,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Extracts need properties like title, description, need type, etc from mails. Configurable via regular expression
- * patterns in spring xml
+ * Extracts need properties like title, description, need type, etc from mails.
+ * Configurable via regular expression patterns in spring xml
  */
 public class MailContentExtractor {
   // check if mail is of type demand/supply/doTogether/critique?
@@ -29,7 +29,8 @@ public class MailContentExtractor {
   // extract array of tags from the content
   private Pattern tagExtractionPattern;
 
-  // extract text message from the mail (e.g. excluding the quoted parts of earlier mails)
+  // extract text message from the mail (e.g. excluding the quoted parts of
+  // earlier mails)
   private Pattern textMessageExtractionPattern;
 
   // extract title from mail subject
@@ -41,7 +42,8 @@ public class MailContentExtractor {
   // check if the need created from the mail should is used for testing only
   private Pattern usedForTestingPattern;
 
-  // check if the need created from the mail should be not matched with other needs
+  // check if the need created from the mail should be not matched with other
+  // needs
   private Pattern doNotMatchPattern;
 
   // check if this is a command mail of different action types
@@ -53,14 +55,16 @@ public class MailContentExtractor {
 
   public static String getMailReference(MimeMessage message) throws MessagingException {
 
-    // first search the mail reference is in the in-reply-to header in case user answered a mail
+    // first search the mail reference is in the in-reply-to header in case user
+    // answered a mail
     // e.g. in case of messages, implicit connect
     String[] replyTo = message.getHeader("In-Reply-To");
     if (replyTo != null && replyTo.length > 0) {
       return replyTo[0];
     }
 
-    // second search the mail reference in the subject written by predefined mailto links
+    // second search the mail reference in the subject written by predefined mailto
+    // links
     // e.g. in case of close need
     Pattern referenceMailPattern = Pattern.compile("Message-Id_(.+)");
     Matcher m = referenceMailPattern.matcher(message.getSubject());
@@ -181,10 +185,11 @@ public class MailContentExtractor {
   }
 
   public boolean isCommandMail(MimeMessage message) throws IOException, MessagingException {
-    // command mail is either an answer mail (with reference) to a previous mail (e.g. message, implicit connect) or an
+    // command mail is either an answer mail (with reference) to a previous mail
+    // (e.g. message, implicit connect) or an
     // explicitly set action command (e.g. subscribe, unsubscribe, close need)
-    return getMailReference(message) != null || (getMailAction(message) != null && !ActionType.NO_ACTION
-        .equals(getMailAction(message)));
+    return getMailReference(message) != null
+        || (getMailAction(message) != null && !ActionType.NO_ACTION.equals(getMailAction(message)));
   }
 
   public ActionType getMailAction(MimeMessage message) throws IOException, MessagingException {

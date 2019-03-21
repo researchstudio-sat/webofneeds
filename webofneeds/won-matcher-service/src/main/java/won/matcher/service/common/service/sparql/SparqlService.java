@@ -30,13 +30,13 @@ import java.util.Iterator;
 /**
  * Service to access of Sparql enpoint database to save or query linked data.
  * <p>
- * User: hfriedrich
- * Date: 15.04.2015
+ * User: hfriedrich Date: 15.04.2015
  */
-@Component public class SparqlService {
+@Component
+public class SparqlService {
   protected final Logger log = LoggerFactory.getLogger(getClass());
   protected String sparqlEndpoint;
-  //protected DatasetAccessor accessor;
+  // protected DatasetAccessor accessor;
 
   public static Dataset deserializeDataset(String serializedResource, Lang format) throws IOException {
     InputStream is = new ByteArrayInputStream(serializedResource.getBytes(StandardCharsets.UTF_8));
@@ -45,9 +45,10 @@ import java.util.Iterator;
     return ds;
   }
 
-  @Autowired public SparqlService(@Value("${uri.sparql.endpoint}") String sparqlEndpoint) {
+  @Autowired
+  public SparqlService(@Value("${uri.sparql.endpoint}") String sparqlEndpoint) {
     this.sparqlEndpoint = sparqlEndpoint;
-    //accessor = DatasetAccessorFactory.createHTTP(sparqlEndpoint);
+    // accessor = DatasetAccessorFactory.createHTTP(sparqlEndpoint);
   }
 
   public String getSparqlEndpoint() {
@@ -55,7 +56,8 @@ import java.util.Iterator;
   }
 
   /**
-   * Update named graph by first deleting it and afterwards inserting the triples of the new model.
+   * Update named graph by first deleting it and afterwards inserting the triples
+   * of the new model.
    *
    * @param graph named graph to be updated
    * @param model model that holds triples to set
@@ -72,7 +74,8 @@ import java.util.Iterator;
   }
 
   /**
-   * Update a dataset of names graphs first deleting them and afterwards inserting the triples of the new models.
+   * Update a dataset of names graphs first deleting them and afterwards inserting
+   * the triples of the new models.
    *
    * @param ds
    */

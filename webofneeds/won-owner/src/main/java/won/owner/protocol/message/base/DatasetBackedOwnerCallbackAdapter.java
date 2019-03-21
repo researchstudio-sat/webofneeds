@@ -39,31 +39,29 @@ import java.net.URI;
  * Implementation of the WonMessageHandlerAdapter that uses a Dataset for
  * creating the objects needed for invoking the adaptee's callback methods.
  * <p>
- * Sent and received messages are added to the dataset automatically. Missing data is
- * automatically loaded via linked data.
+ * Sent and received messages are added to the dataset automatically. Missing
+ * data is automatically loaded via linked data.
  */
 public class DatasetBackedOwnerCallbackAdapter extends OwnerCallbackAdapter {
-  //TODO move to the queries object!
-  private static final String QUERY_CONNECTION = "SELECT ?con ?need ?state ?remoteCon ?remoteNeed ?type where { " +
-      "  ?con won:belongsToNeed ?need; " +
-      "     won:isInState ?state; " +
-      "     won:hasFacet ?type; " +
-      "     won:hasRemoteNeed ?remoteNeed." +
-      "  OPTIONAL { " +
-      "    ?con won:hasRemoteConnection ?remoteCon" +
-      "  } " +
-      "} ";
+  // TODO move to the queries object!
+  private static final String QUERY_CONNECTION = "SELECT ?con ?need ?state ?remoteCon ?remoteNeed ?type where { "
+      + "  ?con won:belongsToNeed ?need; " + "     won:isInState ?state; " + "     won:hasFacet ?type; "
+      + "     won:hasRemoteNeed ?remoteNeed." + "  OPTIONAL { " + "    ?con won:hasRemoteConnection ?remoteCon" + "  } "
+      + "} ";
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Autowired private Dataset dataset;
+  @Autowired
+  private Dataset dataset;
 
-  @Autowired private LinkedDataSource linkedDataSource;
+  @Autowired
+  private LinkedDataSource linkedDataSource;
 
   public DatasetBackedOwnerCallbackAdapter(final OwnerCallback adaptee) {
     super(adaptee);
   }
 
-  @Override public WonMessage process(final WonMessage message) throws WonMessageProcessingException {
+  @Override
+  public WonMessage process(final WonMessage message) throws WonMessageProcessingException {
     RdfUtils.addDatasetToDataset(dataset, message.getCompleteDataset());
     return super.process(message);
   }
@@ -76,7 +74,8 @@ public class DatasetBackedOwnerCallbackAdapter extends OwnerCallbackAdapter {
     this.dataset = dataset;
   }
 
-  @Override protected Connection makeConnection(final WonMessage wonMessage) {
+  @Override
+  protected Connection makeConnection(final WonMessage wonMessage) {
     URI connUri = wonMessage.getReceiverURI();
     ParameterizedSparqlString pss = new ParameterizedSparqlString();
     pss.setNsPrefix("won", WON.BASE_URI);
@@ -108,7 +107,8 @@ public class DatasetBackedOwnerCallbackAdapter extends OwnerCallbackAdapter {
     return URI.create(soln.getResource(var).getURI().toString());
   }
 
-  @Override protected Match makeMatch(final WonMessage wonMessage) {
+  @Override
+  protected Match makeMatch(final WonMessage wonMessage) {
     return WonRdfUtils.MessageUtils.toMatch(wonMessage);
   }
 }

@@ -28,7 +28,8 @@ public class NotFilter extends AbstractDelegatingFilter {
     super(delegate);
   }
 
-  @Override public boolean accept(final Event event) {
+  @Override
+  public boolean accept(final Event event) {
     return !getDelegate().accept(event);
   }
 }

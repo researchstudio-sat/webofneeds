@@ -7,8 +7,9 @@ import won.protocol.exception.DataIntegrityException;
 import java.util.*;
 
 /**
- * Executes a sparql query on a sparql endpoint and returns the data as {@link TensorEntry} objects.
- * Expects that the sparql query returns the variables ?slice, ?need and ?value.
+ * Executes a sparql query on a sparql endpoint and returns the data as
+ * {@link TensorEntry} objects. Expects that the sparql query returns the
+ * variables ?slice, ?need and ?value.
  * <p>
  * Created by hfriedrich on 21.04.2017.
  */

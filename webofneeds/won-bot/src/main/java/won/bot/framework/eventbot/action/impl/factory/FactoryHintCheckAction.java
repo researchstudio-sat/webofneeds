@@ -36,9 +36,10 @@ public class FactoryHintCheckAction extends BaseEventBotAction {
     super(eventListenerContext);
   }
 
-  @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
-    if (!(event instanceof HintFromMatcherEvent) || !(getEventListenerContext()
-        .getBotContextWrapper() instanceof FactoryBotContextWrapper)) {
+  @Override
+  protected void doRun(Event event, EventListener executingListener) throws Exception {
+    if (!(event instanceof HintFromMatcherEvent)
+        || !(getEventListenerContext().getBotContextWrapper() instanceof FactoryBotContextWrapper)) {
       logger.error("FactoryHintCheckAction can only handle HintFromMatcherEvent with FactoryBotContextWrapper");
       return;
     }

@@ -13,7 +13,8 @@ public class ProcessCrawlResultAction extends BaseEventBotAction {
     super(eventListenerContext);
   }
 
-  @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
+  @Override
+  protected void doRun(Event event, EventListener executingListener) throws Exception {
     if (event instanceof CrawlConnectionCommandSuccessEvent) {
       CrawlConnectionCommandSuccessEvent successEvent = (CrawlConnectionCommandSuccessEvent) event;
       onCrawlSuccess(successEvent);
@@ -42,4 +43,3 @@ public class ProcessCrawlResultAction extends BaseEventBotAction {
   }
 
 }
-

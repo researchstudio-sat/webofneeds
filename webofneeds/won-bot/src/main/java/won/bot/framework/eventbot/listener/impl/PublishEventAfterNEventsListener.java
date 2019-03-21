@@ -27,7 +27,8 @@ import java.lang.reflect.InvocationTargetException;
 /**
  * EventListener that counts the events it is subscribed for and after having
  * seen a specified number of events, publishes a specified event. After that,
- * counters are reset and the listener will eventually publish another such event.
+ * counters are reset and the listener will eventually publish another such
+ * event.
  */
 public class PublishEventAfterNEventsListener<T extends Event> extends BaseEventListener {
   private int count = 0;
@@ -68,7 +69,8 @@ public class PublishEventAfterNEventsListener<T extends Event> extends BaseEvent
     this.eventClassToPublish = eventClassToPublish;
   }
 
-  @Override public void doOnEvent(final Event event) throws Exception {
+  @Override
+  public void doOnEvent(final Event event) throws Exception {
     synchronized (this.monitor) {
       this.count++;
       if (this.count >= targetCount) {
@@ -89,11 +91,8 @@ public class PublishEventAfterNEventsListener<T extends Event> extends BaseEvent
     getEventListenerContext().getEventBus().publish(event);
   }
 
-  @Override public String toString() {
-    return getClass().getSimpleName() +
-        "{name='" + name +
-        ", count=" + count +
-        ",targetCount=" + targetCount +
-        '}';
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{name='" + name + ", count=" + count + ",targetCount=" + targetCount + '}';
   }
 }

@@ -21,8 +21,9 @@ import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.filter.EventFilter;
 
 /**
- * Base class for listeners that eventually stop listening. When the decision is made to finish,
- * a FinishedEvent is published and the listener is unsubscribed from all further events.
+ * Base class for listeners that eventually stop listening. When the decision is
+ * made to finish, a FinishedEvent is published and the listener is unsubscribed
+ * from all further events.
  */
 public abstract class AbstractFinishingListener extends BaseEventListener implements FinishingListener {
   private Object monitor = new Object();
@@ -45,7 +46,8 @@ public abstract class AbstractFinishingListener extends BaseEventListener implem
     super(context, name, eventFilter);
   }
 
-  @Override public void doOnEvent(final Event event) throws Exception {
+  @Override
+  public void doOnEvent(final Event event) throws Exception {
     boolean doRun = true;
     synchronized (monitor) {
       if (finished) {
@@ -83,12 +85,11 @@ public abstract class AbstractFinishingListener extends BaseEventListener implem
 
   protected abstract void handleEvent(final Event event) throws Exception;
 
-  @Override public abstract boolean isFinished();
+  @Override
+  public abstract boolean isFinished();
 
-  @Override public String toString() {
-    return getClass().getSimpleName() +
-        "{name='" + name +
-        ", finished=" + finished +
-        '}';
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{name='" + name + ", finished=" + finished + '}';
   }
 }

@@ -8,10 +8,10 @@ import won.utils.shacl.ShaclReportWrapper;
 import java.io.StringWriter;
 
 /**
- * Class describes the outcome of a goal instantiation attempt.
- * Instance model represents the extracted instance data.
- * Shacl shapes model describes the shapes model that is evaluated against the instance model.
- * And Shacl report wrapper describes the shacl report outcome from the shacl evaluation.
+ * Class describes the outcome of a goal instantiation attempt. Instance model
+ * represents the extracted instance data. Shacl shapes model describes the
+ * shapes model that is evaluated against the instance model. And Shacl report
+ * wrapper describes the shacl report outcome from the shacl evaluation.
  */
 public class GoalInstantiationResult {
 
@@ -29,8 +29,8 @@ public class GoalInstantiationResult {
   /**
    * tells if the instance model conforms to the shacl shapes model
    *
-   * @return true if, there are no shacl validation errors in the evaluation of the instance model
-   * against the shacl shapes model. False otherwise.
+   * @return true if, there are no shacl validation errors in the evaluation of
+   *         the instance model against the shacl shapes model. False otherwise.
    */
   public boolean isConform() {
     return shaclReportWrapper.isConform();

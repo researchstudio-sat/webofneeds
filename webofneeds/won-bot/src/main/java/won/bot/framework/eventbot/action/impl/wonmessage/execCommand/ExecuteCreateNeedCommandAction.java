@@ -50,7 +50,8 @@ public class ExecuteCreateNeedCommandAction extends BaseEventBotAction {
     super(eventListenerContext);
   }
 
-  @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
+  @Override
+  protected void doRun(Event event, EventListener executingListener) throws Exception {
     if (!(event instanceof CreateNeedCommandEvent))
       return;
     CreateNeedCommandEvent createNeedCommandEvent = (CreateNeedCommandEvent) event;
@@ -91,11 +92,12 @@ public class ExecuteCreateNeedCommandAction extends BaseEventBotAction {
     RdfUtils.renameResourceWithPrefix(needDataset, needResource.getURI(), needURI.toString());
     WonMessage createNeedMessage = createWonMessage(wonNodeInformationService, needURI, wonNodeUri,
         needDatasetWithFacets, createNeedCommandEvent.isUsedForTesting(), createNeedCommandEvent.isDoNotMatch());
-    //remember the need URI so we can react to success/failure responses
+    // remember the need URI so we can react to success/failure responses
     EventBotActionUtils.rememberInList(getEventListenerContext(), needURI, createNeedCommandEvent.getUriListName());
 
     EventListener successCallback = new EventListener() {
-      @Override public void onEvent(Event event) throws Exception {
+      @Override
+      public void onEvent(Event event) throws Exception {
         logger.debug("need creation successful, new need URI is {}", needURI);
         getEventListenerContext().getEventBus()
             .publish(new CreateNeedCommandSuccessEvent(needURI, needUriBeforeCreation, createNeedCommandEvent));
@@ -103,7 +105,8 @@ public class ExecuteCreateNeedCommandAction extends BaseEventBotAction {
       }
     };
     EventListener failureCallback = new EventListener() {
-      @Override public void onEvent(Event event) throws Exception {
+      @Override
+      public void onEvent(Event event) throws Exception {
         String textMessage = WonRdfUtils.MessageUtils
             .getTextMessage(((FailureResponseEvent) event).getFailureMessage());
         logger.debug("need creation failed for need URI {}, original message URI {}: {}",

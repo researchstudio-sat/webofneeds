@@ -36,8 +36,8 @@ import java.net.URI;
 import java.time.Duration;
 
 /**
- * Action that creates all needs from the needproducer and publishes the InitFactoryFinishedEvent once it is
- * completed
+ * Action that creates all needs from the needproducer and publishes the
+ * InitFactoryFinishedEvent once it is completed
  */
 public class InitFactoryAction extends AbstractCreateNeedAction {
   private static int FACTORYNEEDCREATION_DURATION_INMILLIS = 250;
@@ -62,9 +62,10 @@ public class InitFactoryAction extends AbstractCreateNeedAction {
     this.maxInFlightCount = maxInFlightCount;
   }
 
-  @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
-    if (!(event instanceof InitializeEvent) || !(getEventListenerContext()
-        .getBotContextWrapper() instanceof FactoryBotContextWrapper)) {
+  @Override
+  protected void doRun(Event event, EventListener executingListener) throws Exception {
+    if (!(event instanceof InitializeEvent)
+        || !(getEventListenerContext().getBotContextWrapper() instanceof FactoryBotContextWrapper)) {
       logger.error("InitFactoryAction can only handle InitializeEvent with FactoryBotContextWrapper");
       return;
     }
@@ -76,8 +77,9 @@ public class InitFactoryAction extends AbstractCreateNeedAction {
     EventBus bus = ctx.getEventBus();
     FactoryBotContextWrapper botContextWrapper = (FactoryBotContextWrapper) ctx.getBotContextWrapper();
 
-    //create a targeted counter that will publish an event when the target is reached
-    //in this case, 0 unfinished need creations means that all needs were created
+    // create a targeted counter that will publish an event when the target is
+    // reached
+    // in this case, 0 unfinished need creations means that all needs were created
     final TargetCounterDecorator creationUnfinishedCounter = new TargetCounterDecorator(ctx,
         new CounterImpl("creationUnfinished"), 0);
 
@@ -87,12 +89,13 @@ public class InitFactoryAction extends AbstractCreateNeedAction {
         new PublishEventAction(ctx, new StartBotTriggerCommandEvent(createFactoryNeedTrigger))));
     bus.subscribe(BotTriggerEvent.class,
         new ActionOnTriggerEventListener(ctx, createFactoryNeedTrigger, new BaseEventBotAction(ctx) {
-          @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
+          @Override
+          protected void doRun(Event event, EventListener executingListener) throws Exception {
             if (isTooManyMessagesInFlight(messagesInFlightCounter)) {
               return;
             }
             adjustTriggerInterval(createFactoryNeedTrigger, messagesInFlightCounter);
-            NeedProducer needProducer = ctx.getNeedProducer(); //defined via spring
+            NeedProducer needProducer = ctx.getNeedProducer(); // defined via spring
             Dataset dataset = needProducer.create();
 
             if (dataset == null && needProducer.isExhausted()) {
@@ -120,12 +123,14 @@ public class InitFactoryAction extends AbstractCreateNeedAction {
           }
         }));
 
-    bus.subscribe(CreateNeedCommandSuccessEvent.class, new ActionOnEventListener(ctx,
+    bus.subscribe(CreateNeedCommandSuccessEvent.class,
+        new ActionOnEventListener(ctx,
             new MultipleActions(ctx, new DecrementCounterAction(ctx, creationUnfinishedCounter),
-                //decrease the creationUnfinishedCounter
-                new IncrementCounterAction(ctx, needCreationSuccessfulCounter), //count a successful need creation
+                // decrease the creationUnfinishedCounter
+                new IncrementCounterAction(ctx, needCreationSuccessfulCounter), // count a successful need creation
                 new BaseEventBotAction(ctx) {
-                  @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
+                  @Override
+                  protected void doRun(Event event, EventListener executingListener) throws Exception {
                     if (event instanceof CreateNeedCommandSuccessEvent) {
                       CreateNeedCommandSuccessEvent needCreatedEvent = (CreateNeedCommandSuccessEvent) event;
                       botContextWrapper.addInternalIdToUriReference(needCreatedEvent.getNeedUriBeforeCreation(),
@@ -134,67 +139,76 @@ public class InitFactoryAction extends AbstractCreateNeedAction {
                   }
                 })));
 
-    bus.subscribe(CreateNeedCommandEvent.class, new ActionOnEventListener(ctx,
-            new MultipleActions(ctx, new ExecuteCreateNeedCommandAction(ctx),
-                //execute the need creation for the need in the event
-                new IncrementCounterAction(ctx, needCreationStartedCounter),
-                //increase the needCreationStartedCounter to signal another pending creation
-                new IncrementCounterAction(ctx, creationUnfinishedCounter)
-                //increase the creationUnfinishedCounter to signal another pending creation
-            )));
+    bus.subscribe(CreateNeedCommandEvent.class,
+        new ActionOnEventListener(ctx, new MultipleActions(ctx, new ExecuteCreateNeedCommandAction(ctx),
+            // execute the need creation for the need in the event
+            new IncrementCounterAction(ctx, needCreationStartedCounter),
+            // increase the needCreationStartedCounter to signal another pending creation
+            new IncrementCounterAction(ctx, creationUnfinishedCounter)
+        // increase the creationUnfinishedCounter to signal another pending creation
+        )));
 
-    //if a need is already created we skip the recreation of it and increase the needCreationSkippedCounter
+    // if a need is already created we skip the recreation of it and increase the
+    // needCreationSkippedCounter
     bus.subscribe(FactoryNeedCreationSkippedEvent.class,
         new ActionOnEventListener(ctx, new IncrementCounterAction(ctx, needCreationSkippedCounter)));
 
-    //if a creation failed, we don't want to keep us from keeping the correct count
-    bus.subscribe(CreateNeedCommandFailureEvent.class, new ActionOnEventListener(ctx,
+    // if a creation failed, we don't want to keep us from keeping the correct count
+    bus.subscribe(CreateNeedCommandFailureEvent.class,
+        new ActionOnEventListener(ctx,
             new MultipleActions(ctx, new DecrementCounterAction(ctx, creationUnfinishedCounter),
-                //decrease the creationUnfinishedCounter
-                new IncrementCounterAction(ctx, needCreationFailedCounter) //count an unsuccessful need creation
+                // decrease the creationUnfinishedCounter
+                new IncrementCounterAction(ctx, needCreationFailedCounter) // count an unsuccessful need creation
             )));
 
-    //when the needproducer is exhausted, we stop the creator (trigger) and we have to wait until all unfinished need creations finish
-    //when they do, the InitFactoryFinishedEvent is published
-    bus.subscribe(NeedProducerExhaustedEvent.class, new ActionOnFirstEventListener(ctx, new MultipleActions(ctx,
-            new PublishEventAction(ctx, new StopBotTriggerCommandEvent(createFactoryNeedTrigger)),
-            new BaseEventBotAction(ctx) {
-              @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
-                //when we're called, there probably are need creations unfinished, but there may not be
-                //a)
-                //first, prepare for the case when there are unfinished need creations:
-                //we register a listener, waiting for the unfinished counter to reach 0
-                EventListener waitForUnfinishedNeedsListener = new ActionOnFirstEventListener(ctx,
-                    new TargetCounterFilter(creationUnfinishedCounter),
-                    new PublishEventAction(ctx, new InitFactoryFinishedEvent()));
-                bus.subscribe(TargetCountReachedEvent.class, waitForUnfinishedNeedsListener);
-                //now, we can check if we've already reached the target
-                if (creationUnfinishedCounter.getCount() <= 0) {
-                  //ok, turned out we didn't need that listener
-                  bus.unsubscribe(waitForUnfinishedNeedsListener);
-                  bus.publish(new InitFactoryFinishedEvent());
-                }
-              }
-            })));
+    // when the needproducer is exhausted, we stop the creator (trigger) and we have
+    // to wait until all unfinished need creations finish
+    // when they do, the InitFactoryFinishedEvent is published
+    bus.subscribe(NeedProducerExhaustedEvent.class,
+        new ActionOnFirstEventListener(ctx,
+            new MultipleActions(ctx,
+                new PublishEventAction(ctx, new StopBotTriggerCommandEvent(createFactoryNeedTrigger)),
+                new BaseEventBotAction(ctx) {
+                  @Override
+                  protected void doRun(Event event, EventListener executingListener) throws Exception {
+                    // when we're called, there probably are need creations unfinished, but there
+                    // may not be
+                    // a)
+                    // first, prepare for the case when there are unfinished need creations:
+                    // we register a listener, waiting for the unfinished counter to reach 0
+                    EventListener waitForUnfinishedNeedsListener = new ActionOnFirstEventListener(ctx,
+                        new TargetCounterFilter(creationUnfinishedCounter),
+                        new PublishEventAction(ctx, new InitFactoryFinishedEvent()));
+                    bus.subscribe(TargetCountReachedEvent.class, waitForUnfinishedNeedsListener);
+                    // now, we can check if we've already reached the target
+                    if (creationUnfinishedCounter.getCount() <= 0) {
+                      // ok, turned out we didn't need that listener
+                      bus.unsubscribe(waitForUnfinishedNeedsListener);
+                      bus.publish(new InitFactoryFinishedEvent());
+                    }
+                  }
+                })));
     bus.subscribe(InitFactoryFinishedEvent.class,
         new ActionOnFirstEventListener(ctx, "factoryCreateStatsLogger", new BaseEventBotAction(ctx) {
-          @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
+          @Override
+          protected void doRun(Event event, EventListener executingListener) throws Exception {
             logger.info("FactoryNeedCreation finished: total:{}, successful: {}, failed: {}, skipped: {}",
                 new Object[] { needCreationStartedCounter.getCount(), needCreationSuccessfulCounter.getCount(),
                     needCreationFailedCounter.getCount(), needCreationSkippedCounter.getCount() });
           }
         }));
 
-    //MessageInFlight counter handling *************************
+    // MessageInFlight counter handling *************************
     bus.subscribe(MessageCommandEvent.class,
         new ActionOnEventListener(ctx, new IncrementCounterAction(ctx, messagesInFlightCounter)));
     bus.subscribe(MessageCommandResultEvent.class,
         new ActionOnEventListener(ctx, new DecrementCounterAction(ctx, messagesInFlightCounter)));
 
-    bus.subscribe(MessageCommandFailureEvent.class, new ActionOnEventListener(ctx,
-        new LogMessageCommandFailureAction(ctx))); //if we receive a message command failure, log it
+    bus.subscribe(MessageCommandFailureEvent.class,
+        new ActionOnEventListener(ctx, new LogMessageCommandFailureAction(ctx))); // if we receive a message command
+                                                                                  // failure, log it
 
-    //Start the need creation stuff
+    // Start the need creation stuff
     bus.publish(new StartFactoryNeedCreationEvent());
   }
 
@@ -203,7 +217,7 @@ public class InitFactoryAction extends AbstractCreateNeedAction {
   }
 
   private void adjustTriggerInterval(BotTrigger createConnectionsTrigger, Counter targetCounter) {
-    //change interval to achieve desired inflight count
+    // change interval to achieve desired inflight count
     int desiredInFlightCount = targetInFlightCount;
     int inFlightCountDiff = targetCounter.getCount() - desiredInFlightCount;
     double factor = (double) inFlightCountDiff / (double) desiredInFlightCount;

@@ -15,10 +15,11 @@ public class SpringExtension extends AbstractExtensionId<SpringExtension.SpringE
   public static SpringExtension SpringExtProvider = new SpringExtension();
 
   /**
-   * Is used by Akka to instantiate the Extension identified by this
-   * ExtensionId, internal use only.
+   * Is used by Akka to instantiate the Extension identified by this ExtensionId,
+   * internal use only.
    */
-  @Override public SpringExt createExtension(ExtendedActorSystem system) {
+  @Override
+  public SpringExt createExtension(ExtendedActorSystem system) {
     return new SpringExt();
   }
 
@@ -38,8 +39,8 @@ public class SpringExtension extends AbstractExtensionId<SpringExtension.SpringE
     }
 
     /**
-     * Create a Props for the specified actorClass using the
-     * SpringActorProducer class.
+     * Create a Props for the specified actorClass using the SpringActorProducer
+     * class.
      *
      * @param actorClass class of an actor
      * @return a Props that will create the named actor bean using Spring
@@ -49,8 +50,8 @@ public class SpringExtension extends AbstractExtensionId<SpringExtension.SpringE
     }
 
     /**
-     * Create a Props for the specified actorClass and additional parameters using the
-     * SpringActorProducer class.
+     * Create a Props for the specified actorClass and additional parameters using
+     * the SpringActorProducer class.
      *
      * @param actorClass class of an actor
      * @param params     additional parameters for actor creation
@@ -61,8 +62,8 @@ public class SpringExtension extends AbstractExtensionId<SpringExtension.SpringE
     }
 
     /**
-     * Create Props from the configuration file for the specified actorClass using the
-     * SpringActorProducer class.
+     * Create Props from the configuration file for the specified actorClass using
+     * the SpringActorProducer class.
      *
      * @param actorClass class of an actor
      * @return a Props that will create the named actor bean using Spring
@@ -72,8 +73,8 @@ public class SpringExtension extends AbstractExtensionId<SpringExtension.SpringE
     }
 
     /**
-     * Create Props from the configuration file  for the specified actorClass and additional parameters using the
-     * SpringActorProducer class.
+     * Create Props from the configuration file for the specified actorClass and
+     * additional parameters using the SpringActorProducer class.
      *
      * @param actorClass class of an actor
      * @param params     additional parameters for actor creation

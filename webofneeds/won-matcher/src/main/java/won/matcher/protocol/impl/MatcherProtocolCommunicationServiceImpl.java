@@ -12,8 +12,7 @@ import java.net.URI;
 import java.util.Set;
 
 /**
- * User: ypanchenko
- * Date: 02.09.2015
+ * User: ypanchenko Date: 02.09.2015
  */
 public class MatcherProtocolCommunicationServiceImpl implements MatcherProtocolCommunicationService {
 
@@ -29,8 +28,8 @@ public class MatcherProtocolCommunicationServiceImpl implements MatcherProtocolC
     this.registrationClient = registrationClient;
   }
 
-  @Override public synchronized CamelConfiguration configureCamelEndpoint(URI nodeUri, String startingEndpoint)
-      throws Exception {
+  @Override
+  public synchronized CamelConfiguration configureCamelEndpoint(URI nodeUri, String startingEndpoint) throws Exception {
     String matcherProtocolQueueName;
     CamelConfiguration camelConfiguration = new CamelConfiguration();
 
@@ -45,10 +44,11 @@ public class MatcherProtocolCommunicationServiceImpl implements MatcherProtocolC
         matcherProtocolQueueName = activeMQService.getProtocolQueueNameWithResource(nodeUri);
 
         // register with remote node. If at some point the same trust strategy will
-        // be used when doing GET on won resource, we don't need this separate register step for node
+        // be used when doing GET on won resource, we don't need this separate register
+        // step for node
         registrationClient.register(nodeUri.toString());
-        endpoint = matcherProtocolCamelConfigurator
-            .configureCamelEndpointForNeedUri(nodeUri, needBrokerUri, matcherProtocolQueueName);
+        endpoint = matcherProtocolCamelConfigurator.configureCamelEndpointForNeedUri(nodeUri, needBrokerUri,
+            matcherProtocolQueueName);
         camelConfiguration.setEndpoint(endpoint);
       }
       camelConfiguration
@@ -60,8 +60,8 @@ public class MatcherProtocolCommunicationServiceImpl implements MatcherProtocolC
       URI brokerUri = needBrokerUri;
 
       matcherProtocolQueueName = activeMQService.getProtocolQueueNameWithResource(resourceUri);
-      camelConfiguration.setEndpoint(matcherProtocolCamelConfigurator
-          .configureCamelEndpointForNeedUri(resourceUri, brokerUri, matcherProtocolQueueName));
+      camelConfiguration.setEndpoint(matcherProtocolCamelConfigurator.configureCamelEndpointForNeedUri(resourceUri,
+          brokerUri, matcherProtocolQueueName));
       matcherProtocolCamelConfigurator.addRouteForEndpoint(startingEndpoint, brokerUri);
       camelConfiguration
           .setBrokerComponentName(matcherProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(brokerUri));
@@ -73,13 +73,15 @@ public class MatcherProtocolCommunicationServiceImpl implements MatcherProtocolC
     return camelConfiguration;
   }
 
-  @Override public synchronized Set<String> getMatcherProtocolOutTopics(URI wonNodeURI) {
+  @Override
+  public synchronized Set<String> getMatcherProtocolOutTopics(URI wonNodeURI) {
     Set<String> matcherProtocolTopics = ((MatcherActiveMQService) activeMQService)
         .getMatcherProtocolTopicNamesWithResource(wonNodeURI);
     return matcherProtocolTopics;
   }
 
-  @Override public synchronized void addRemoteTopicListeners(final Set<String> endpoints, final URI wonNodeUri)
+  @Override
+  public synchronized void addRemoteTopicListeners(final Set<String> endpoints, final URI wonNodeUri)
       throws CamelConfigurationFailedException {
 
     try {
@@ -98,19 +100,23 @@ public class MatcherProtocolCommunicationServiceImpl implements MatcherProtocolC
 
   }
 
-  @Override public URI getBrokerUri(URI resourceUri) throws NoSuchConnectionException {
+  @Override
+  public URI getBrokerUri(URI resourceUri) throws NoSuchConnectionException {
     return activeMQService.getBrokerEndpoint(resourceUri);
   }
 
-  @Override public ActiveMQService getActiveMQService() {
+  @Override
+  public ActiveMQService getActiveMQService() {
     return activeMQService;
   }
 
-  @Override public void setActiveMQService(ActiveMQService activeMQService) {
+  @Override
+  public void setActiveMQService(ActiveMQService activeMQService) {
     this.activeMQService = (MatcherActiveMQService) activeMQService;
   }
 
-  @Override public CamelConfigurator getProtocolCamelConfigurator() {
+  @Override
+  public CamelConfigurator getProtocolCamelConfigurator() {
     return this.matcherProtocolCamelConfigurator;
 
   }

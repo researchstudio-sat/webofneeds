@@ -19,11 +19,11 @@ import won.protocol.vocabulary.WONMSG;
 import java.net.URI;
 
 /**
- * User: syim
- * Date: 02.03.2015
+ * User: syim Date: 02.03.2015
  */
-@Component @FixedMessageProcessor(direction = WONMSG.TYPE_FROM_OWNER_STRING, messageType = WONMSG.TYPE_CONNECTION_MESSAGE_STRING) public class SendMessageFromOwnerProcessor
-    extends AbstractFromOwnerCamelProcessor {
+@Component
+@FixedMessageProcessor(direction = WONMSG.TYPE_FROM_OWNER_STRING, messageType = WONMSG.TYPE_CONNECTION_MESSAGE_STRING)
+public class SendMessageFromOwnerProcessor extends AbstractFromOwnerCamelProcessor {
 
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
@@ -39,16 +39,18 @@ import java.net.URI;
     URI remoteMessageUri = wonNodeInformationService.generateEventURI(wonMessage.getReceiverNodeURI());
 
     if (wonMessage.getReceiverURI() == null) {
-      //set the sender uri in the envelope TODO: TwoMsgs: do not set sender here
+      // set the sender uri in the envelope TODO: TwoMsgs: do not set sender here
       wonMessage.addMessageProperty(WONMSG.RECEIVER_PROPERTY, con.getRemoteConnectionURI());
     }
-    //add the information about the remote message to the locally stored one
+    // add the information about the remote message to the locally stored one
     wonMessage.addMessageProperty(WONMSG.HAS_CORRESPONDING_REMOTE_MESSAGE, remoteMessageUri);
-    //the persister will pick it up later
+    // the persister will pick it up later
 
-    //put the factory into the outbound message factory header. It will be used to generate the outbound message
-    //after the wonMessage has been processed and saved, to make sure that the outbound message contains
-    //all the data that we also store locally
+    // put the factory into the outbound message factory header. It will be used to
+    // generate the outbound message
+    // after the wonMessage has been processed and saved, to make sure that the
+    // outbound message contains
+    // all the data that we also store locally
     OutboundMessageFactory outboundMessageFactory = new OutboundMessageFactory(remoteMessageUri, con);
     exchange.getIn().setHeader(WonCamelConstants.OUTBOUND_MESSAGE_FACTORY_HEADER, outboundMessageFactory);
   }
@@ -61,7 +63,8 @@ import java.net.URI;
       this.connection = connection;
     }
 
-    @Override public WonMessage process(WonMessage message) throws WonMessageProcessingException {
+    @Override
+    public WonMessage process(WonMessage message) throws WonMessageProcessingException {
       return WonMessageBuilder.setPropertiesForPassingMessageToRemoteNode(message, getMessageURI()).build();
     }
   }

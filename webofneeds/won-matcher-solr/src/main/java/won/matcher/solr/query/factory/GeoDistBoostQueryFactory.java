@@ -15,7 +15,8 @@ public class GeoDistBoostQueryFactory extends SolrQueryFactory {
     this.solrLocationField = solrLocationField;
   }
 
-  @Override protected String makeQueryString() {
+  @Override
+  protected String makeQueryString() {
 
     // calculate the inverse of the distance as a distance measure
     StringBuilder sb = new StringBuilder();

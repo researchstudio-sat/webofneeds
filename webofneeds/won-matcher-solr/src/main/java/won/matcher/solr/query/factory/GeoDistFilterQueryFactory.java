@@ -19,7 +19,8 @@ public class GeoDistFilterQueryFactory extends SolrQueryFactory {
     distance = distanceInKilometers;
   }
 
-  @Override protected String makeQueryString() {
+  @Override
+  protected String makeQueryString() {
 
     // create a geographical distance filter with radius "distance" (in kilometers)
     StringBuilder sb = new StringBuilder();

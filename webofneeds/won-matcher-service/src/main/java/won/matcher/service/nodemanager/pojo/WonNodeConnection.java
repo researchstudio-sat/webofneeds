@@ -4,10 +4,10 @@ import akka.actor.ActorRef;
 import won.protocol.service.WonNodeInfo;
 
 /**
- * Class represents all data needed to connect with a won node, receive need updates and send hints
+ * Class represents all data needed to connect with a won node, receive need
+ * updates and send hints
  * <p>
- * User: hfriedrich
- * Date: 18.05.2015
+ * User: hfriedrich Date: 18.05.2015
  */
 public class WonNodeConnection {
   private WonNodeInfo wonNodeInfo;

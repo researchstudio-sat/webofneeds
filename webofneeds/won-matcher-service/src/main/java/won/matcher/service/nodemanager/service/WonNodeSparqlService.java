@@ -19,17 +19,19 @@ import java.util.Set;
 /**
  * Sparql service extended with methods for won node controller
  * <p>
- * User: hfriedrich
- * Date: 04.05.2015
+ * User: hfriedrich Date: 04.05.2015
  */
-@Component public class WonNodeSparqlService extends SparqlService {
+@Component
+public class WonNodeSparqlService extends SparqlService {
 
-  @Autowired public WonNodeSparqlService(@Value("${uri.sparql.endpoint}") final String sparqlEndpoint) {
+  @Autowired
+  public WonNodeSparqlService(@Value("${uri.sparql.endpoint}") final String sparqlEndpoint) {
     super(sparqlEndpoint);
   }
 
   /**
-   * Retrieve resource data of all known won nodes that are saved in the Sparql endpoint.
+   * Retrieve resource data of all known won nodes that are saved in the Sparql
+   * endpoint.
    *
    * @return Set of all known won node resource data
    */
@@ -62,7 +64,8 @@ import java.util.Set;
   }
 
   /**
-   * Get the {@link won.protocol.service.WonNodeInfo} as an object from a {@link Dataset}
+   * Get the {@link won.protocol.service.WonNodeInfo} as an object from a
+   * {@link Dataset}
    *
    * @param ds Dataset which holds won node information
    * @return

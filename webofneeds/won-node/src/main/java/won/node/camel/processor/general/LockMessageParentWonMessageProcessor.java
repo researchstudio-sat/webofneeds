@@ -39,12 +39,17 @@ public class LockMessageParentWonMessageProcessor implements WonMessageProcessor
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Autowired ConnectionRepository connectionRepository;
-  @Autowired NeedRepository needRepository;
-  @Autowired ConnectionEventContainerRepository connectionEventContainerRepository;
-  @Autowired NeedEventContainerRepository needEventContainerRepository;
+  @Autowired
+  ConnectionRepository connectionRepository;
+  @Autowired
+  NeedRepository needRepository;
+  @Autowired
+  ConnectionEventContainerRepository connectionEventContainerRepository;
+  @Autowired
+  NeedEventContainerRepository needEventContainerRepository;
 
-  @Override public WonMessage process(WonMessage message) throws WonMessageProcessingException {
+  @Override
+  public WonMessage process(WonMessage message) throws WonMessageProcessingException {
     try {
       lockParent(message);
     } catch (Exception e) {
@@ -61,9 +66,9 @@ public class LockMessageParentWonMessageProcessor implements WonMessageProcessor
   }
 
   private void lockParent(WonMessage message) {
-    //get the parent's URI (either a connection or a need
+    // get the parent's URI (either a connection or a need
     URI parentURI = WonMessageUtils.getParentEntityUri(message);
-    //try a connection:
+    // try a connection:
     Optional<Connection> con = connectionRepository.findOneByConnectionURIForUpdate(parentURI);
     if (con.isPresent()) {
       connectionEventContainerRepository.findOneByParentUriForUpdate(parentURI);

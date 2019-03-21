@@ -8,13 +8,18 @@ import org.springframework.context.annotation.PropertySource;
 /**
  * Created by hfriedrich on 15.09.2015.
  */
-@Configuration @ImportResource({
-    "classpath:/spring/component/scheduling/matcher-service-scheduling.xml" }) @PropertySource("file:${WON_CONFIG_DIR}/matcher-sparql.properties") public class SparqlMatcherConfig {
-  @Value("${matcher.sparql.uri.sparql.endpoint}") private String sparqlEndpoint;
+@Configuration
+@ImportResource({ "classpath:/spring/component/scheduling/matcher-service-scheduling.xml" })
+@PropertySource("file:${WON_CONFIG_DIR}/matcher-sparql.properties")
+public class SparqlMatcherConfig {
+  @Value("${matcher.sparql.uri.sparql.endpoint}")
+  private String sparqlEndpoint;
 
-  @Value("${matcher.uri}") private String matcherUri;
+  @Value("${matcher.uri}")
+  private String matcherUri;
 
-  @Value("${matcher.sparql.limitResults}") private long limitResults;
+  @Value("${matcher.sparql.limitResults}")
+  private long limitResults;
 
   public long getLimitResults() {
     return limitResults;

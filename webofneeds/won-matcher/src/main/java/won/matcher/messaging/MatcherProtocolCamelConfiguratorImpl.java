@@ -33,15 +33,15 @@ import java.util.Set;
 //import won.node.camel.routes.NeedProtocolDynamicRoutes;
 
 /**
- * User: LEIH-NB
- * Date: 26.02.14
+ * User: LEIH-NB Date: 26.02.14
  */
 public class MatcherProtocolCamelConfiguratorImpl extends NeedBasedCamelConfiguratorImpl
     implements MatcherProtocolCamelConfigurator {
 
   private Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Override public synchronized void addRemoteTopicListeners(final Set<String> endpoints, final URI remoteEndpoint)
+  @Override
+  public synchronized void addRemoteTopicListeners(final Set<String> endpoints, final URI remoteEndpoint)
       throws CamelConfigurationFailedException {
     logger.info("length of endpoints {}", endpoints.size());
     MatcherApplicationListenerRouteBuilder matcherApplicationListenerRouteBuilder = new MatcherApplicationListenerRouteBuilder(
@@ -59,8 +59,8 @@ public class MatcherProtocolCamelConfiguratorImpl extends NeedBasedCamelConfigur
 
     ActiveMQComponent activeMQComponent;
     if (getCamelContext().getComponent(brokerComponentName) == null) {
-      activeMQComponent = (ActiveMQComponent) brokerComponentFactory
-          .getBrokerComponent(brokerUri, MessagingType.Topic, getMessagingContext());
+      activeMQComponent = (ActiveMQComponent) brokerComponentFactory.getBrokerComponent(brokerUri, MessagingType.Topic,
+          getMessagingContext());
       logger.info("adding activemqComponent for brokerUri {} with brokerComponentName {}", brokerUri,
           brokerComponentName);
       getCamelContext().addComponent(brokerComponentName, activeMQComponent);
@@ -73,7 +73,8 @@ public class MatcherProtocolCamelConfiguratorImpl extends NeedBasedCamelConfigur
     brokerComponentMap.put(brokerUri, brokerComponentName);
   }
 
-  @Override protected RoutesBuilder createRoutesBuilder(final String startingEndpoint, final URI brokerUri) {
+  @Override
+  protected RoutesBuilder createRoutesBuilder(final String startingEndpoint, final URI brokerUri) {
     return new Matcher2NodeDynamicRoutes(getCamelContext(), startingEndpoint);
 
   }

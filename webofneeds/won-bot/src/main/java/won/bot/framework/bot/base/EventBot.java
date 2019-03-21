@@ -57,51 +57,60 @@ import java.util.concurrent.Executor;
 /**
  * Base class for bots that define their behaviour through event listeners.
  * <p>
- * Once the bot's work is done, the workIsDone() method should be called to allow the
- * framework to shut down the bot gracefully.
+ * Once the bot's work is done, the workIsDone() method should be called to
+ * allow the framework to shut down the bot gracefully.
  * <p>
  * All methods from the Bot interface are converted to Events by the EventBot.
- * Subclasses should implement the initializeEventListeners() method to register their
- * event listeners. The corresponding shutdownEventListeners() is called when the bot's
- * shutdown method is called an may be used to perform shutdown work for listeners.
+ * Subclasses should implement the initializeEventListeners() method to register
+ * their event listeners. The corresponding shutdownEventListeners() is called
+ * when the bot's shutdown method is called an may be used to perform shutdown
+ * work for listeners.
  * <p>
- * An event bot implementation should take care not to do long or blocking work in event
- * listeners. Whenever a long computation or a blocking call is done, it should be
- * done in a Runnable, executed in the Executor (see below).
+ * An event bot implementation should take care not to do long or blocking work
+ * in event listeners. Whenever a long computation or a blocking call is done,
+ * it should be done in a Runnable, executed in the Executor (see below).
  * <p>
- * The bot's services and other environment can be accessed in listeners through the
- * instance of EventListenerContext.
+ * The bot's services and other environment can be accessed in listeners through
+ * the instance of EventListenerContext.
  * <p>
  * these services include:
  * <p>
  * <ul>
- * <li>the event bus - for subscribing for/unsubscribing for/publishing event</li>
- * <li>the task scheduler - for scheduling tasks (Runnables) to be run after a timeout</li>
- * <li>the executor - for running tasks (Runnables) immediately in the task scheduler's thread pool</li>
+ * <li>the event bus - for subscribing for/unsubscribing for/publishing
+ * event</li>
+ * <li>the task scheduler - for scheduling tasks (Runnables) to be run after a
+ * timeout</li>
+ * <li>the executor - for running tasks (Runnables) immediately in the task
+ * scheduler's thread pool</li>
  * <li>the node uri source - for obtaining a won node URI for need creation</li>
- * <li>the need producer - for obtaining a valid need content in RDF that can be used to create a need</li>
- * <li>the owner service - for sending messages to won nodes (create needs, connect, open, message, close) </li>
- * <li>shutting down the trigger - an event bot may have a trigger that calls the bot's act() method regularly.</li>
+ * <li>the need producer - for obtaining a valid need content in RDF that can be
+ * used to create a need</li>
+ * <li>the owner service - for sending messages to won nodes (create needs,
+ * connect, open, message, close)</li>
+ * <li>shutting down the trigger - an event bot may have a trigger that calls
+ * the bot's act() method regularly.</li>
  * </ul>
  * <p>
- * The bot will only react to onXX methods (i.e., create events and publish them on the internal event bus) if it is in lifecycle phase ACTIVE.
+ * The bot will only react to onXX methods (i.e., create events and publish them
+ * on the internal event bus) if it is in lifecycle phase ACTIVE.
  */
 public abstract class EventBot extends TriggeredBot {
   private EventBus eventBus;
   private EventListenerContext eventListenerContext = new MyEventListenerContext();
   private EventGeneratingWonMessageSenderWrapper wonMessageSenderWrapper;
 
-  @Override public final void act() throws Exception {
+  @Override
+  public final void act() throws Exception {
     if (getLifecyclePhase().isActive()) {
       eventBus.publish(new ActEvent());
     } else {
-      logger
-          .info("not publishing event for call to act() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE,
-              getLifecyclePhase());
+      logger.info("not publishing event for call to act() as the bot is not in state {} but {}",
+          BotLifecyclePhase.ACTIVE, getLifecyclePhase());
     }
   }
 
-  @Override public final void onMessageFromOtherNeed(final Connection con, final WonMessage wonMessage) {
+  @Override
+  public final void onMessageFromOtherNeed(final Connection con, final WonMessage wonMessage) {
     if (getLifecyclePhase().isActive()) {
       eventBus.publish(new MessageFromOtherNeedEvent(con, wonMessage));
     } else {
@@ -110,7 +119,8 @@ public abstract class EventBot extends TriggeredBot {
     }
   }
 
-  @Override public final void onHintFromMatcher(final Match match, final WonMessage wonMessage) {
+  @Override
+  public final void onHintFromMatcher(final Match match, final WonMessage wonMessage) {
     if (getLifecyclePhase().isActive()) {
       eventBus.publish(new HintFromMatcherEvent(match, wonMessage));
     } else {
@@ -119,7 +129,8 @@ public abstract class EventBot extends TriggeredBot {
     }
   }
 
-  @Override public final void onCloseFromOtherNeed(final Connection con, final WonMessage wonMessage) {
+  @Override
+  public final void onCloseFromOtherNeed(final Connection con, final WonMessage wonMessage) {
     if (getLifecyclePhase().isActive()) {
       eventBus.publish(new CloseFromOtherNeedEvent(con, wonMessage));
     } else {
@@ -128,7 +139,8 @@ public abstract class EventBot extends TriggeredBot {
     }
   }
 
-  @Override public final void onOpenFromOtherNeed(final Connection con, final WonMessage wonMessage) {
+  @Override
+  public final void onOpenFromOtherNeed(final Connection con, final WonMessage wonMessage) {
     if (getLifecyclePhase().isActive()) {
       eventBus.publish(new OpenFromOtherNeedEvent(con, wonMessage));
     } else {
@@ -137,7 +149,8 @@ public abstract class EventBot extends TriggeredBot {
     }
   }
 
-  @Override public void onConnectFromOtherNeed(final Connection con, final WonMessage wonMessage) {
+  @Override
+  public void onConnectFromOtherNeed(final Connection con, final WonMessage wonMessage) {
     if (getLifecyclePhase().isActive()) {
       eventBus.publish(new ConnectFromOtherNeedEvent(con, wonMessage));
     } else {
@@ -146,7 +159,8 @@ public abstract class EventBot extends TriggeredBot {
     }
   }
 
-  @Override public final void onNewNeedCreated(final URI needUri, final URI wonNodeUri, final Dataset needDataset)
+  @Override
+  public final void onNewNeedCreated(final URI needUri, final URI wonNodeUri, final Dataset needDataset)
       throws Exception {
     if (getLifecyclePhase().isActive()) {
       eventBus.publish(new NeedCreatedEvent(needUri, wonNodeUri, needDataset, FacetType.ChatFacet));
@@ -156,7 +170,8 @@ public abstract class EventBot extends TriggeredBot {
     }
   }
 
-  @Override public final void onNewNeedCreatedNotificationForMatcher(final URI wonNodeURI, final URI needUri,
+  @Override
+  public final void onNewNeedCreatedNotificationForMatcher(final URI wonNodeURI, final URI needUri,
       final Dataset wonMessageDataset) {
     if (getLifecyclePhase().isActive()) {
       Dataset dataset = getEventListenerContext().getLinkedDataSource().getDataForResource(needUri);
@@ -167,9 +182,10 @@ public abstract class EventBot extends TriggeredBot {
     }
   }
 
-  @Override public final void onMatcherRegistered(final URI wonNodeUri) {
+  @Override
+  public final void onMatcherRegistered(final URI wonNodeUri) {
     if (getLifecyclePhase().isActive()) {
-      //EventBotActionUtils.rememberInNodeListIfNamePresent(getEventListenerContext(),wonNodeUri);
+      // EventBotActionUtils.rememberInNodeListIfNamePresent(getEventListenerContext(),wonNodeUri);
       eventBus.publish(new MatcherRegisteredEvent(wonNodeUri));
     } else {
       logger.info("not publishing event for call to onNewNeedCreated() as the bot is not in state {} but {}",
@@ -177,7 +193,8 @@ public abstract class EventBot extends TriggeredBot {
     }
   }
 
-  @Override public final void onNeedActivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI) {
+  @Override
+  public final void onNeedActivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI) {
     if (getLifecyclePhase().isActive()) {
       eventBus.publish(new NeedActivatedEventForMatcher(needURI));
     } else {
@@ -186,7 +203,8 @@ public abstract class EventBot extends TriggeredBot {
     }
   }
 
-  @Override public final void onNeedDeactivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI) {
+  @Override
+  public final void onNeedDeactivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI) {
     if (getLifecyclePhase().isActive()) {
       eventBus.publish(new NeedDeactivatedEventForMatcher(needURI));
     } else {
@@ -195,7 +213,8 @@ public abstract class EventBot extends TriggeredBot {
     }
   }
 
-  @Override public final void onFailureResponse(final URI failedMessageUri, final WonMessage wonMessage) {
+  @Override
+  public final void onFailureResponse(final URI failedMessageUri, final WonMessage wonMessage) {
     if (getLifecyclePhase().isActive()) {
       eventBus.publish(new FailureResponseEvent(failedMessageUri, wonMessage));
     } else {
@@ -204,7 +223,8 @@ public abstract class EventBot extends TriggeredBot {
     }
   }
 
-  @Override public final void onSuccessResponse(final URI successfulMessageUri, final WonMessage wonMessage) {
+  @Override
+  public final void onSuccessResponse(final URI successfulMessageUri, final WonMessage wonMessage) {
     if (getLifecyclePhase().isActive()) {
       eventBus.publish(new SuccessResponseEvent(successfulMessageUri, wonMessage));
     } else {
@@ -214,16 +234,16 @@ public abstract class EventBot extends TriggeredBot {
   }
 
   /*
-  * Override this method to initialize your event listeners. Will be called before
-  * the first event is published.
-  */
+   * Override this method to initialize your event listeners. Will be called
+   * before the first event is published.
+   */
   protected abstract void initializeEventListeners();
 
   /*
-  * Override this method to shut down your event listeners. Will be called after
-  * the last event is published. Event listeners may receive delayed events after
-  * this method is called.
-  */
+   * Override this method to shut down your event listeners. Will be called after
+   * the last event is published. Event listeners may receive delayed events after
+   * this method is called.
+   */
   protected void shutdownEventListeners() {
     logger.info("shutdownEventListeners was not overridden by the subclass");
   }
@@ -231,22 +251,24 @@ public abstract class EventBot extends TriggeredBot {
   ;
 
   /**
-   * Init method used to create the event bus and allow event listeners to register. Do not override!
-   * It not final to allow for CGLIB autoproxying.
+   * Init method used to create the event bus and allow event listeners to
+   * register. Do not override! It not final to allow for CGLIB autoproxying.
    */
-  @Override protected void doInitializeCustom() {
+  @Override
+  protected void doInitializeCustom() {
     this.eventBus = new AsyncEventBusImpl(getExecutor());
-    //add an eventhandler that reacts to errors
+    // add an eventhandler that reacts to errors
     this.getEventBus().subscribe(ErrorEvent.class, new ErrorEventListener(getEventListenerContext()));
     initializeEventListeners();
     this.eventBus.publish(new InitializeEvent());
   }
 
   /**
-   * Init method used to shut down the event bus and allow event listeners shut down. Do not override!
-   * It not final to allow for CGLIB autoproxying.
+   * Init method used to shut down the event bus and allow event listeners shut
+   * down. Do not override! It not final to allow for CGLIB autoproxying.
    */
-  @Override protected void doShutdownCustom() {
+  @Override
+  protected void doShutdownCustom() {
     eventBus.publish(new ShutdownEvent());
     shutdownEventListeners();
   }
@@ -260,8 +282,8 @@ public abstract class EventBot extends TriggeredBot {
   }
 
   /**
-   * Class holding references to all important services that EventListeners inside bots need to
-   * access.
+   * Class holding references to all important services that EventListeners inside
+   * bots need to access.
    */
   public class MyEventListenerContext implements EventListenerContext {
     public TaskScheduler getTaskScheduler() {
@@ -276,7 +298,8 @@ public abstract class EventBot extends TriggeredBot {
       return EventBot.this.getSolrServerURI();
     }
 
-    @Override public MatcherNodeURISource getMatcherNodeURISource() {
+    @Override
+    public MatcherNodeURISource getMatcherNodeURISource() {
       return EventBot.this.getMatcheNodeURISource();
     }
 
@@ -288,7 +311,8 @@ public abstract class EventBot extends TriggeredBot {
       return EventBot.this.getMatcherProtocolNeedServiceClient();
     }
 
-    @Override public MatcherProtocolMatcherServiceImplJMSBased getMatcherProtocolMatcherService() {
+    @Override
+    public MatcherProtocolMatcherServiceImplJMSBased getMatcherProtocolMatcherService() {
       return EventBot.this.getMatcherProtocolMatcherService();
     }
 
@@ -300,7 +324,8 @@ public abstract class EventBot extends TriggeredBot {
       EventBot.this.cancelTrigger();
     }
 
-    @Override public void workIsDone() {
+    @Override
+    public void workIsDone() {
       EventBot.this.workIsDone();
     }
 
@@ -308,16 +333,19 @@ public abstract class EventBot extends TriggeredBot {
       return EventBot.this.getEventBus();
     }
 
-    @Override public BotContext getBotContext() {
+    @Override
+    public BotContext getBotContext() {
       return EventBot.this.getBotContextWrapper().getBotContext();
     }
 
-    @Override public BotContextWrapper getBotContextWrapper() {
+    @Override
+    public BotContextWrapper getBotContextWrapper() {
       return EventBot.this.getBotContextWrapper();
     }
 
     /**
-     * Returns an executor that passes the tasks to the TaskScheduler for immediate execution.
+     * Returns an executor that passes the tasks to the TaskScheduler for immediate
+     * execution.
      *
      * @return
      */
@@ -325,11 +353,13 @@ public abstract class EventBot extends TriggeredBot {
       return EventBot.this.getExecutor();
     }
 
-    @Override public LinkedDataSource getLinkedDataSource() {
+    @Override
+    public LinkedDataSource getLinkedDataSource() {
       return EventBot.this.getLinkedDataSource();
     }
 
-    @Override public WonNodeInformationService getWonNodeInformationService() {
+    @Override
+    public WonNodeInformationService getWonNodeInformationService() {
       return EventBot.this.getWonNodeInformationService();
     }
   }
@@ -342,15 +372,17 @@ public abstract class EventBot extends TriggeredBot {
   }
 
   /**
-   * Event listener that will stop the bot by publishing a WorkDoneEvent if an ErrorEvent is seen.
-   * Expects to be registered for WorkDoneEvents and ErrorEvents and will not react to a WorkDoneEvent.
+   * Event listener that will stop the bot by publishing a WorkDoneEvent if an
+   * ErrorEvent is seen. Expects to be registered for WorkDoneEvents and
+   * ErrorEvents and will not react to a WorkDoneEvent.
    */
   private class ErrorEventListener extends BaseEventListener {
     public ErrorEventListener(EventListenerContext context) {
       super(context);
     }
 
-    @Override protected void doOnEvent(final won.bot.framework.eventbot.event.Event event) throws Exception {
+    @Override
+    protected void doOnEvent(final won.bot.framework.eventbot.event.Event event) throws Exception {
       if (event instanceof ErrorEvent) {
         Throwable t = ((ErrorEvent) event).getThrowable();
         logger.info("Encountered an error:", t);
@@ -359,7 +391,8 @@ public abstract class EventBot extends TriggeredBot {
   }
 
   /**
-   * Wraps a WonMessageSender so a WonMessageSentEvent can be published after a message has been sent.
+   * Wraps a WonMessageSender so a WonMessageSentEvent can be published after a
+   * message has been sent.
    */
   private class EventGeneratingWonMessageSenderWrapper implements WonMessageSender {
     private final WonMessageSender delegate;
@@ -368,12 +401,13 @@ public abstract class EventBot extends TriggeredBot {
       this.delegate = delegate;
     }
 
-    @Override public void sendWonMessage(final WonMessage message) throws WonMessageSenderException {
+    @Override
+    public void sendWonMessage(final WonMessage message) throws WonMessageSenderException {
       delegate.sendWonMessage(message);
-      //publish the WonMessageSent event if no exception was raised
+      // publish the WonMessageSent event if no exception was raised
       WonMessageType type = message.getMessageType();
       Event event = null;
-      //if the event is connection specific, raise a more specialized event
+      // if the event is connection specific, raise a more specialized event
       switch (type) {
       case CLOSE:
       case CONNECT:

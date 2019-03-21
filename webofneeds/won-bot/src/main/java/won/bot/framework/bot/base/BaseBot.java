@@ -38,17 +38,21 @@ public abstract class BaseBot implements Bot {
   private BotLifecyclePhase lifecyclePhase = BotLifecyclePhase.DOWN;
   private boolean workDone = false;
 
-  @Autowired private BotContextWrapper botContextWrapper;
+  @Autowired
+  private BotContextWrapper botContextWrapper;
 
-  @Override public boolean knowsNeedURI(final URI needURI) {
+  @Override
+  public boolean knowsNeedURI(final URI needURI) {
     return this.botContextWrapper.getBotContext().isNeedKnown(needURI);
   }
 
-  @Override public boolean knowsNodeURI(final URI wonNodeURI) {
+  @Override
+  public boolean knowsNodeURI(final URI wonNodeURI) {
     return this.botContextWrapper.getBotContext().isNodeKnown(wonNodeURI);
   }
 
-  @Override public synchronized void initialize() throws Exception {
+  @Override
+  public synchronized void initialize() throws Exception {
     if (!this.lifecyclePhase.isDown())
       return;
     this.lifecyclePhase = BotLifecyclePhase.STARTING_UP;
@@ -67,7 +71,8 @@ public abstract class BaseBot implements Bot {
     this.lifecyclePhase = BotLifecyclePhase.ACTIVE;
   }
 
-  @Override public synchronized void shutdown() throws Exception {
+  @Override
+  public synchronized void shutdown() throws Exception {
     if (!this.lifecyclePhase.isActive())
       return;
     this.lifecyclePhase = BotLifecyclePhase.SHUTTING_DOWN;
@@ -92,11 +97,13 @@ public abstract class BaseBot implements Bot {
     this.workDone = true;
   }
 
-  @Override public boolean isWorkDone() {
+  @Override
+  public boolean isWorkDone() {
     return this.workDone;
   }
 
-  @Override public BotLifecyclePhase getLifecyclePhase() {
+  @Override
+  public BotLifecyclePhase getLifecyclePhase() {
     return this.lifecyclePhase;
   }
 
@@ -108,31 +115,44 @@ public abstract class BaseBot implements Bot {
     return botContextWrapper;
   }
 
-  @Override public abstract void onNewNeedCreated(final URI needUri, final URI wonNodeUri, final Dataset needDataset)
+  @Override
+  public abstract void onNewNeedCreated(final URI needUri, final URI wonNodeUri, final Dataset needDataset)
       throws Exception;
 
-  @Override public abstract void onConnectFromOtherNeed(Connection con, final WonMessage wonMessage);
+  @Override
+  public abstract void onConnectFromOtherNeed(Connection con, final WonMessage wonMessage);
 
-  @Override public abstract void onOpenFromOtherNeed(Connection con, final WonMessage wonMessage);
+  @Override
+  public abstract void onOpenFromOtherNeed(Connection con, final WonMessage wonMessage);
 
-  @Override public abstract void onCloseFromOtherNeed(Connection con, final WonMessage wonMessage);
+  @Override
+  public abstract void onCloseFromOtherNeed(Connection con, final WonMessage wonMessage);
 
-  @Override public abstract void onHintFromMatcher(Match match, final WonMessage wonMessage);
+  @Override
+  public abstract void onHintFromMatcher(Match match, final WonMessage wonMessage);
 
-  @Override public abstract void onMessageFromOtherNeed(Connection con, final WonMessage wonMessage);
+  @Override
+  public abstract void onMessageFromOtherNeed(Connection con, final WonMessage wonMessage);
 
-  @Override public abstract void onFailureResponse(final URI failedMessageUri, final WonMessage wonMessage);
+  @Override
+  public abstract void onFailureResponse(final URI failedMessageUri, final WonMessage wonMessage);
 
-  @Override public abstract void onSuccessResponse(final URI successfulMessageUri, final WonMessage wonMessage);
+  @Override
+  public abstract void onSuccessResponse(final URI successfulMessageUri, final WonMessage wonMessage);
 
-  @Override public abstract void onMatcherRegistered(final URI wonNodeUri);
+  @Override
+  public abstract void onMatcherRegistered(final URI wonNodeUri);
 
-  @Override public abstract void onNewNeedCreatedNotificationForMatcher(final URI wonNodeURI, final URI needURI,
+  @Override
+  public abstract void onNewNeedCreatedNotificationForMatcher(final URI wonNodeURI, final URI needURI,
       final Dataset needDataset);
 
-  @Override public abstract void onNeedActivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI);
+  @Override
+  public abstract void onNeedActivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI);
 
-  @Override public abstract void onNeedDeactivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI);
+  @Override
+  public abstract void onNeedDeactivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI);
 
-  @Override public abstract void act() throws Exception;
+  @Override
+  public abstract void act() throws Exception;
 }

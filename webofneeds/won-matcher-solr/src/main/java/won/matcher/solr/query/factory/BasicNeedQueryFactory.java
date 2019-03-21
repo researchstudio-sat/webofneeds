@@ -133,7 +133,8 @@ public class BasicNeedQueryFactory extends NeedDatasetQueryFactory {
     return text;
   }
 
-  @Override protected String makeQueryString() {
+  @Override
+  protected String makeQueryString() {
 
     // return null if there is no content to search for
     if (contentFactories.size() == 0) {
@@ -141,7 +142,8 @@ public class BasicNeedQueryFactory extends NeedDatasetQueryFactory {
     }
 
     // boost the query with a location distance factor
-    // add up all the reverse query boost components and add 1 so that the multiplicative boost factor is at least 1
+    // add up all the reverse query boost components and add 1 so that the
+    // multiplicative boost factor is at least 1
     String boostQueryString = "";
     if (locationFactories.size() > 0) {
       StringBuilder sb = new StringBuilder();

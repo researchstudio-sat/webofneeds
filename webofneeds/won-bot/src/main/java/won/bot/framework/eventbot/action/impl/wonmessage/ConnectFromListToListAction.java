@@ -35,8 +35,9 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * BaseEventBotAction connecting two needs on the specified facets. The need's URIs are obtained from
- * the bot context. The first two URIs found there are used.
+ * BaseEventBotAction connecting two needs on the specified facets. The need's
+ * URIs are obtained from the bot context. The first two URIs found there are
+ * used.
  */
 public class ConnectFromListToListAction extends BaseEventBotAction {
   private String fromListName;
@@ -94,7 +95,8 @@ public class ConnectFromListToListAction extends BaseEventBotAction {
     this.welcomeMessage = welcomeMessage;
   }
 
-  @Override public void doRun(Event event, EventListener executingListener) {
+  @Override
+  public void doRun(Event event, EventListener executingListener) {
 
     List<URI> fromNeeds = getEventListenerContext().getBotContext().getNamedNeedUriList(fromListName);
     List<URI> toNeeds = getEventListenerContext().getBotContext().getNamedNeedUriList(toListName);
@@ -103,7 +105,7 @@ public class ConnectFromListToListAction extends BaseEventBotAction {
     long start = System.currentTimeMillis();
     long count = 0;
     if (fromListName.equals(toListName)) {
-      //only one connection per pair if from-list is to-list
+      // only one connection per pair if from-list is to-list
       for (int i = 0; i < fromNeeds.size(); i++) {
         URI fromUri = fromNeeds.get(i);
         for (int j = i + 1; j < fromNeeds.size(); j++) {
@@ -144,7 +146,7 @@ public class ConnectFromListToListAction extends BaseEventBotAction {
           WonMessage connMessage = createWonMessage(fromUri, toUri);
           getEventListenerContext().getWonMessageSender().sendWonMessage(connMessage);
         } catch (Exception e) {
-          logger.warn("could not connect {} and {}", fromUri, toUri);  //throws
+          logger.warn("could not connect {} and {}", fromUri, toUri); // throws
           logger.warn("caught exception", e);
         }
       }
@@ -164,9 +166,12 @@ public class ConnectFromListToListAction extends BaseEventBotAction {
     return WonMessageBuilder.setMessagePropertiesForConnect(wonNodeInformationService.generateEventURI(localWonNode),
         fromFacetType.map(facetType -> WonLinkedDataUtils
             .getFacetsOfType(fromUri, facetType, getEventListenerContext().getLinkedDataSource()).stream().findFirst()
-            .orElse(null)), fromUri, localWonNode, toFacetType.map(facetType -> WonLinkedDataUtils
+            .orElse(null)),
+        fromUri, localWonNode,
+        toFacetType.map(facetType -> WonLinkedDataUtils
             .getFacetsOfType(toUri, facetType, getEventListenerContext().getLinkedDataSource()).stream().findFirst()
-            .orElse(null)), toUri, remoteWonNode, welcomeMessage).build();
+            .orElse(null)),
+        toUri, remoteWonNode, welcomeMessage).build();
   }
 
   public static abstract class ConnectHook {

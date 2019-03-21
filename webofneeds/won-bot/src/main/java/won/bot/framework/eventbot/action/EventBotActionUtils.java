@@ -31,8 +31,7 @@ import won.protocol.message.WonMessage;
 import java.net.URI;
 
 /**
- * User: fkleedorfer
- * Date: 02.02.14
+ * User: fkleedorfer Date: 02.02.14
  */
 public class EventBotActionUtils {
   private static final Logger logger = LoggerFactory.getLogger(EventBotActionUtils.class);
@@ -59,11 +58,13 @@ public class EventBotActionUtils {
     }
   }
 
-  //************************************************ EventListener ***************************************************
+  // ************************************************ EventListener
+  // ***************************************************
 
   /**
-   * Creates a listener that waits for the response to the specified message. If a SuccessResponse is received,
-   * the successCallback is executed, if a FailureResponse is received, the failureCallback is executed.
+   * Creates a listener that waits for the response to the specified message. If a
+   * SuccessResponse is received, the successCallback is executed, if a
+   * FailureResponse is received, the failureCallback is executed.
    *
    * @param outgoingMessage
    * @param successCallback
@@ -74,25 +75,28 @@ public class EventBotActionUtils {
   public static EventListener makeAndSubscribeResponseListener(final WonMessage outgoingMessage,
       final EventListener successCallback, final EventListener failureCallback, EventListenerContext context) {
 
-    //create an event listener that processes the response to the wonMessage we're about to send
+    // create an event listener that processes the response to the wonMessage we're
+    // about to send
     EventListener listener = new ActionOnFirstEventListener(context,
         OriginalMessageUriResponseEventFilter.forWonMessage(outgoingMessage), new BaseEventBotAction(context) {
-      @Override protected void doRun(final Event event, EventListener executingListener) throws Exception {
-        if (event instanceof SuccessResponseEvent) {
-          successCallback.onEvent(event);
-        } else if (event instanceof FailureResponseEvent) {
-          failureCallback.onEvent(event);
-        }
-      }
-    });
+          @Override
+          protected void doRun(final Event event, EventListener executingListener) throws Exception {
+            if (event instanceof SuccessResponseEvent) {
+              successCallback.onEvent(event);
+            } else if (event instanceof FailureResponseEvent) {
+              failureCallback.onEvent(event);
+            }
+          }
+        });
     context.getEventBus().subscribe(SuccessResponseEvent.class, listener);
     context.getEventBus().subscribe(FailureResponseEvent.class, listener);
     return listener;
   }
 
   /**
-   * Creates a listener that waits for the remote response to the specified message. If a SuccessResponse is received,
-   * the successCallback is executed, if a FailureResponse is received, the failureCallback is executed.
+   * Creates a listener that waits for the remote response to the specified
+   * message. If a SuccessResponse is received, the successCallback is executed,
+   * if a FailureResponse is received, the failureCallback is executed.
    *
    * @param outgoingMessage
    * @param successCallback
@@ -103,17 +107,19 @@ public class EventBotActionUtils {
   public static EventListener makeAndSubscribeRemoteResponseListener(final WonMessage outgoingMessage,
       final EventListener successCallback, final EventListener failureCallback, EventListenerContext context) {
 
-    //create an event listener that processes the remote response to the wonMessage we're about to send
+    // create an event listener that processes the remote response to the wonMessage
+    // we're about to send
     EventListener listener = new ActionOnFirstEventListener(context,
         OriginalMessageUriRemoteResponseEventFilter.forWonMessage(outgoingMessage), new BaseEventBotAction(context) {
-      @Override protected void doRun(final Event event, EventListener executingListener) throws Exception {
-        if (event instanceof SuccessResponseEvent) {
-          successCallback.onEvent(event);
-        } else if (event instanceof FailureResponseEvent) {
-          failureCallback.onEvent(event);
-        }
-      }
-    });
+          @Override
+          protected void doRun(final Event event, EventListener executingListener) throws Exception {
+            if (event instanceof SuccessResponseEvent) {
+              successCallback.onEvent(event);
+            } else if (event instanceof FailureResponseEvent) {
+              failureCallback.onEvent(event);
+            }
+          }
+        });
     context.getEventBus().subscribe(SuccessResponseEvent.class, listener);
     context.getEventBus().subscribe(FailureResponseEvent.class, listener);
     return listener;

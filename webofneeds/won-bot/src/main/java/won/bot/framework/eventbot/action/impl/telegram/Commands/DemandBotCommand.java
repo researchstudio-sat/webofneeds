@@ -22,7 +22,8 @@ public class DemandBotCommand extends BotCommand {
     this.bus = bus;
   }
 
-  @Override public void execute(AbsSender absSender, User user, Chat chat, String[] strings) {
+  @Override
+  public void execute(AbsSender absSender, User user, Chat chat, String[] strings) {
     strings = ArrayUtils.add(strings, 0, "[WANT]");
     bus.publish(new TelegramCreateNeedEvent(absSender, user, chat, strings));
   }

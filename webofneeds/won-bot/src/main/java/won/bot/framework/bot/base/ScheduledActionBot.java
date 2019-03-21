@@ -42,7 +42,8 @@ public abstract class ScheduledActionBot extends BasicServiceBot {
   }
 
   /**
-   * Returns an executor that passes the tasks to the TaskScheduler for immediate execution.
+   * Returns an executor that passes the tasks to the TaskScheduler for immediate
+   * execution.
    *
    * @return
    */
@@ -51,7 +52,8 @@ public abstract class ScheduledActionBot extends BasicServiceBot {
   }
 
   private class InsideSchedulerExecutor implements Executor {
-    @Override public void execute(final Runnable command) {
+    @Override
+    public void execute(final Runnable command) {
       getTaskScheduler().schedule(command, new Date());
     }
   }

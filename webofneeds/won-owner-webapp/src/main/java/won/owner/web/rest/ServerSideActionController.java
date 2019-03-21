@@ -21,23 +21,27 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-@Controller @RequestMapping("/rest/action") public class ServerSideActionController {
+@Controller
+@RequestMapping("/rest/action")
+public class ServerSideActionController {
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Autowired private UserNeedRepository userNeedRepository;
+  @Autowired
+  private UserNeedRepository userNeedRepository;
 
-  @Autowired private UserService userService;
+  @Autowired
+  private UserService userService;
 
-  @Autowired private ServerSideActionService serverSideActionService;
+  @Autowired
+  private ServerSideActionService serverSideActionService;
 
-  //rsponses: 204 (no content) or 409 (conflict)
-  @RequestMapping(
-      value = "/connect",
-      method = RequestMethod.POST) public ResponseEntity connectFacets(
-      @RequestBody(required = true) FacetToConnect[] connectAction) {
+  // rsponses: 204 (no content) or 409 (conflict)
+  @RequestMapping(value = "/connect", method = RequestMethod.POST)
+  public ResponseEntity connectFacets(@RequestBody(required = true) FacetToConnect[] connectAction) {
     String username = SecurityContextHolder.getContext().getAuthentication().getName();
-    // cannot use user object from context since hw doesn't know about created in this session need,
+    // cannot use user object from context since hw doesn't know about created in
+    // this session need,
     // therefore, we have to retrieve the user object from the user repository
     User user = userService.getByUsername(username);
     if (user == null) {
@@ -53,14 +57,15 @@ import java.util.Optional;
           HttpStatus.CONFLICT);
     }
     List<UserNeed> needs = user.getUserNeeds();
-    //keep facets we can't process:
+    // keep facets we can't process:
 
     Optional<FacetToConnect> problematicFacet = facets.stream().filter(facet -> {
-      //return false (not problematic) if the facet is pending (i.e., the need it belongs to is expected to be created shortly)
+      // return false (not problematic) if the facet is pending (i.e., the need it
+      // belongs to is expected to be created shortly)
       if (facet.isPending()) {
         return false;
       }
-      //return true (=problematic) if we don't find a need the facet belongs to
+      // return true (=problematic) if we don't find a need the facet belongs to
       return !needs.stream().anyMatch(need -> facet.getFacet().startsWith(need.getUri().toString()));
     }).findFirst();
     if (problematicFacet.isPresent()) {
@@ -83,4 +88,3 @@ import java.util.Optional;
     this.userService = userService;
   }
 }
-

@@ -37,8 +37,7 @@ import java.net.URI;
 import java.util.Optional;
 
 /**
- * User: fkleedorfer
- * Date: 30.01.14
+ * User: fkleedorfer Date: 30.01.14
  */
 public class OpenConnectionAction extends BaseEventBotAction {
 
@@ -49,7 +48,8 @@ public class OpenConnectionAction extends BaseEventBotAction {
     this.welcomeMessage = welcomeMessage;
   }
 
-  @Override public void doRun(final Event event, EventListener executingListener) throws Exception {
+  @Override
+  public void doRun(final Event event, EventListener executingListener) throws Exception {
     if (event instanceof ConnectFromOtherNeedEvent) {
       ConnectionSpecificEvent connectEvent = (ConnectionSpecificEvent) event;
       logger.debug("auto-replying to connect for connection {}", connectEvent.getConnectionURI());
@@ -71,13 +71,13 @@ public class OpenConnectionAction extends BaseEventBotAction {
       }
       return;
     } else if (event instanceof HintFromMatcherEvent) {
-      //TODO: the hint with a match object is not really suitable here. Would be better to
+      // TODO: the hint with a match object is not really suitable here. Would be
+      // better to
       // use connection object instead
       HintFromMatcherEvent hintEvent = (HintFromMatcherEvent) event;
       logger.debug("opening connection based on hint {}", event);
-      getEventListenerContext().getWonMessageSender().sendWonMessage(
-          createConnectWonMessage(hintEvent.getMatch().getFromNeed(), hintEvent.getMatch().getToNeed(),
-              Optional.empty(), Optional.empty()));
+      getEventListenerContext().getWonMessageSender().sendWonMessage(createConnectWonMessage(
+          hintEvent.getMatch().getFromNeed(), hintEvent.getMatch().getToNeed(), Optional.empty(), Optional.empty()));
     }
   }
 
@@ -94,7 +94,8 @@ public class OpenConnectionAction extends BaseEventBotAction {
     return WonMessageBuilder
         .setMessagePropertiesForOpen(wonNodeInformationService.generateEventURI(wonNode), connectionURI, localNeed,
             wonNode, WonRdfUtils.ConnectionUtils.getRemoteConnectionURIFromConnection(connectionRDF, connectionURI),
-            remoteNeed, WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, remoteNeed), welcomeMessage).build();
+            remoteNeed, WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, remoteNeed), welcomeMessage)
+        .build();
   }
 
   private WonMessage createConnectWonMessage(URI fromUri, URI toUri, Optional<URI> localFacet,
@@ -108,8 +109,7 @@ public class OpenConnectionAction extends BaseEventBotAction {
     URI localWonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(localNeedRDF, fromUri);
     URI remoteWonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, toUri);
 
-    return WonMessageBuilder
-        .setMessagePropertiesForConnect(wonNodeInformationService.generateEventURI(localWonNode), localFacet, fromUri,
-            localWonNode, remoteFacet, toUri, remoteWonNode, welcomeMessage).build();
+    return WonMessageBuilder.setMessagePropertiesForConnect(wonNodeInformationService.generateEventURI(localWonNode),
+        localFacet, fromUri, localWonNode, remoteFacet, toUri, remoteWonNode, welcomeMessage).build();
   }
 }

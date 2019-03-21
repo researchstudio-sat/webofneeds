@@ -22,8 +22,7 @@ import org.apache.camel.builder.RouteBuilder;
 import java.util.List;
 
 /**
- * User: LEIH-NB
- * Date: 10.10.13
+ * User: LEIH-NB Date: 10.10.13
  */
 
 public class Matcher2NodeDynamicRoutes extends RouteBuilder {
@@ -37,7 +36,8 @@ public class Matcher2NodeDynamicRoutes extends RouteBuilder {
 
   }
 
-  @Override public void configure() {
+  @Override
+  public void configure() {
     from("seda:MatcherProtocol.Out.Hint?concurrentConsumers=2").routeId("Matcher2NodeRoute")
         .recipientList(header("remoteBrokerEndpoint"));
 

@@ -19,21 +19,24 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Spring context aware bot registry that adds all beans of type Bot defined in the application context.
+ * Spring context aware bot registry that adds all beans of type Bot defined in
+ * the application context.
  * <p>
- * If the checkWorkDoneTrigger is not null, all bots will regularly be checked if all work is done. If so, the
- * spring context will be shut down.
+ * If the checkWorkDoneTrigger is not null, all bots will regularly be checked
+ * if all work is done. If so, the spring context will be shut down.
  */
 public class SpringAwareBotManagerImpl extends BotManagerImpl
     implements ApplicationContextAware, DisposableBean, ApplicationListener {
 
   private ApplicationContext applicationContext;
   private Trigger checkWorkDoneTrigger = null;
-  @Autowired private TaskScheduler taskScheduler;
+  @Autowired
+  private TaskScheduler taskScheduler;
 
   private boolean shutdownApplicationContextIfWorkDone = false;
 
-  @Override public void onApplicationEvent(final ApplicationEvent event) {
+  @Override
+  public void onApplicationEvent(final ApplicationEvent event) {
     logger.debug("processing application event {}", event);
     if (event instanceof ContextRefreshedEvent) {
       logger.info("context started or refreshed: searching for bots in spring context");
@@ -51,16 +54,18 @@ public class SpringAwareBotManagerImpl extends BotManagerImpl
     }
   }
 
-  @Override public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+  @Override
+  public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
     this.applicationContext = applicationContext;
   }
 
-  @Override public void destroy() throws Exception {
+  @Override
+  public void destroy() throws Exception {
     logger.info("shutting down bot manager");
     synchronized (getMonitor()) {
       List<Bot> bots = getBots();
       Bot bot;
-      for (Iterator<Bot> it = bots.iterator(); it.hasNext(); ) {
+      for (Iterator<Bot> it = bots.iterator(); it.hasNext();) {
         bot = it.next();
         if (bot.getLifecyclePhase().isActive()) {
           try {
@@ -106,7 +111,8 @@ public class SpringAwareBotManagerImpl extends BotManagerImpl
       return;
     }
     this.taskScheduler.schedule(new Runnable() {
-      @Override public void run() {
+      @Override
+      public void run() {
         boolean workDone = isWorkDone();
         if (!shutdownApplicationContextIfWorkDone) {
           logger.debug("botmanager will not shutdown spring context when work is done. (workDone:{})", workDone);

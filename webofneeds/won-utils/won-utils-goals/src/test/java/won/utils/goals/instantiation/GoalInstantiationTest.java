@@ -29,12 +29,14 @@ public class GoalInstantiationTest {
 
   private static final String baseFolder = "/won/utils/goals/instantiation/";
 
-  @BeforeClass public static void setLogLevel() {
+  @BeforeClass
+  public static void setLogLevel() {
     Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
     root.setLevel(Level.INFO);
   }
 
-  @Test public void example1_allInfoInTwoGoals() throws IOException {
+  @Test
+  public void example1_allInfoInTwoGoals() throws IOException {
 
     Dataset need1 = loadDataset(baseFolder + "ex1_need.trig");
     Dataset need2 = loadDataset(baseFolder + "ex1_need_debug.trig");
@@ -58,7 +60,8 @@ public class GoalInstantiationTest {
     Assert.assertEquals("hasDriver",
         result.getShaclReportWrapper().getValidationResults().iterator().next().getResultPath().getLocalName());
 
-    // instantiation of goal of need2 fails cause 3 attributes are missing: location, time, client
+    // instantiation of goal of need2 fails cause 3 attributes are missing:
+    // location, time, client
     NeedModelWrapper needWrapper2 = new NeedModelWrapper(need2);
     goal = needWrapper2.getGoals().iterator().next();
     result = goalInstantiation.findInstantiationForGoal(goal);
@@ -67,14 +70,16 @@ public class GoalInstantiationTest {
     Assert.assertEquals(3, result.getShaclReportWrapper().getValidationResults().size());
   }
 
-  @Test public void example2_allInfoInTwoGoalsAndMessage() throws IOException {
+  @Test
+  public void example2_allInfoInTwoGoalsAndMessage() throws IOException {
 
     Dataset need1 = loadDataset(baseFolder + "ex2_need.trig");
     Dataset need2 = loadDataset(baseFolder + "ex2_need_debug.trig");
     Dataset conversationWithoutPickupTime = loadDataset(baseFolder + "ex1_conversation.trig");
     Dataset conversationWithPickupTime = loadDataset(baseFolder + "ex2_conversation.trig");
 
-    // this conversation doas not contain the missing pickup time info so the goals cannot be fulfilled
+    // this conversation doas not contain the missing pickup time info so the goals
+    // cannot be fulfilled
     GoalInstantiationProducer goalInstantiation = new GoalInstantiationProducer(need1, need2,
         conversationWithoutPickupTime, "http://example.org/", "http://example.org/blended/");
     Collection<GoalInstantiationResult> results = goalInstantiation.createAllGoalCombinationInstantiationResults();
@@ -82,7 +87,8 @@ public class GoalInstantiationTest {
     System.out.println(results.iterator().next().toString());
     Assert.assertFalse(results.iterator().next().isConform());
 
-    // this conversation contains the missing pickup info so the goals can be fulfilled
+    // this conversation contains the missing pickup info so the goals can be
+    // fulfilled
     goalInstantiation = new GoalInstantiationProducer(need1, need2, conversationWithPickupTime, "http://example.org/",
         "http://example.org/blended/");
     results = goalInstantiation.createAllGoalCombinationInstantiationResults();
@@ -99,7 +105,8 @@ public class GoalInstantiationTest {
     Assert.assertEquals("hasDriver",
         result.getShaclReportWrapper().getValidationResults().iterator().next().getResultPath().getLocalName());
 
-    // instantiation of goal of need2 fails cause 3 attributes are missing: location, time, client
+    // instantiation of goal of need2 fails cause 3 attributes are missing:
+    // location, time, client
     NeedModelWrapper needWrapper2 = new NeedModelWrapper(need2);
     goal = needWrapper2.getGoals().iterator().next();
     result = goalInstantiation.findInstantiationForGoal(goal);
@@ -108,7 +115,8 @@ public class GoalInstantiationTest {
     Assert.assertEquals(3, result.getShaclReportWrapper().getValidationResults().size());
   }
 
-  @Test public void example3_multipleGoalsFulfilled() throws IOException {
+  @Test
+  public void example3_multipleGoalsFulfilled() throws IOException {
 
     Dataset need1 = loadDataset(baseFolder + "ex3_need.trig");
     Dataset need2 = loadDataset(baseFolder + "ex3_need_debug.trig");
@@ -135,7 +143,8 @@ public class GoalInstantiationTest {
     Assert.assertEquals(3, validResults.size());
   }
 
-  @Test public void example4_geoCoordinatesFulfilled() throws IOException {
+  @Test
+  public void example4_geoCoordinatesFulfilled() throws IOException {
 
     Dataset need1 = loadDataset(baseFolder + "ex4_need.trig");
     Dataset need2 = loadDataset(baseFolder + "ex4_need_debug.trig");
@@ -161,9 +170,11 @@ public class GoalInstantiationTest {
     }
   }
 
-  @Test public void example5_singleGoalsValidity() throws IOException {
+  @Test
+  public void example5_singleGoalsValidity() throws IOException {
 
-    // check that the goals from each need can be validated successfully without each other
+    // check that the goals from each need can be validated successfully without
+    // each other
     Dataset need1 = loadDataset(baseFolder + "ex5_need.trig");
     Dataset need2 = loadDataset(baseFolder + "ex5_need_debug.trig");
     Dataset conversation = loadDataset(baseFolder + "ex5_conversation.trig");
@@ -195,7 +206,8 @@ public class GoalInstantiationTest {
     return null;
   }
 
-  @Test public void exampleCorrectTaxi_validity() throws IOException {
+  @Test
+  public void exampleCorrectTaxi_validity() throws IOException {
     Dataset taxiOffer = loadDataset(baseFolder + "exCorrect_taxioffer.trig");
     Dataset taxiDemand = loadDataset(baseFolder + "exCorrect_taxi.trig");
 
@@ -216,8 +228,8 @@ public class GoalInstantiationTest {
         String destinationName = getName(loadSparqlQuery("/won/utils/goals/extraction/address/toLocationQuery.rq"),
             res.getInstanceModel());
 
-        //Assert.assertEquals(departureAddress, new Coordinate(10.0f, 11.0f));
-        //Assert.assertEquals(destinationAddress, new Coordinate(12.0f, 13.0f));
+        // Assert.assertEquals(departureAddress, new Coordinate(10.0f, 11.0f));
+        // Assert.assertEquals(destinationAddress, new Coordinate(12.0f, 13.0f));
       }
     }
 
@@ -226,12 +238,13 @@ public class GoalInstantiationTest {
     GoalInstantiationResult result = goalInstantiation.findInstantiationForGoal(goal);
     Assert.assertTrue(result.isConform());
 
-    GoalInstantiationResult recheckResultModel = GoalInstantiationProducer
-        .findInstantiationForGoalInDataset(taxiOffer, goal, result.getInstanceModel());
+    GoalInstantiationResult recheckResultModel = GoalInstantiationProducer.findInstantiationForGoalInDataset(taxiOffer,
+        goal, result.getInstanceModel());
     Assert.assertTrue(recheckResultModel.isConform());
   }
 
-  @Test public void exampleTaxi_validity() throws IOException {
+  @Test
+  public void exampleTaxi_validity() throws IOException {
     Dataset taxiOffer = loadDataset(baseFolder + "ex6_taxioffer.trig");
     Dataset taxiDemand = loadDataset(baseFolder + "ex6_taxi.trig");
     Dataset taxiDemandNoLoc = loadDataset(baseFolder + "ex6_taxi_noloc.trig");
@@ -260,8 +273,8 @@ public class GoalInstantiationTest {
     GoalInstantiationResult result = goalInstantiation.findInstantiationForGoal(goal);
     Assert.assertTrue(result.isConform());
 
-    GoalInstantiationResult recheckResultModel = GoalInstantiationProducer
-        .findInstantiationForGoalInDataset(taxiOffer, goal, result.getInstanceModel());
+    GoalInstantiationResult recheckResultModel = GoalInstantiationProducer.findInstantiationForGoalInDataset(taxiOffer,
+        goal, result.getInstanceModel());
     Assert.assertTrue(recheckResultModel.isConform());
 
     goalInstantiation = new GoalInstantiationProducer(taxiOffer, taxiDemandNoLoc, null, "http://example.org/",
@@ -281,7 +294,8 @@ public class GoalInstantiationTest {
     }
   }
 
-  @Test public void exampleTaxiFakeLocation_validity() throws IOException {
+  @Test
+  public void exampleTaxiFakeLocation_validity() throws IOException {
     Dataset taxiOffer = loadDataset(baseFolder + "ex7_taxioffer.trig");
     Dataset taxiDemand = loadDataset(baseFolder + "ex7_taxi.trig");
 
@@ -307,8 +321,8 @@ public class GoalInstantiationTest {
     GoalInstantiationResult result = goalInstantiation.findInstantiationForGoal(goal);
     Assert.assertTrue(result.isConform());
 
-    GoalInstantiationResult recheckResultModel = GoalInstantiationProducer
-        .findInstantiationForGoalInDataset(taxiOffer, goal, result.getInstanceModel());
+    GoalInstantiationResult recheckResultModel = GoalInstantiationProducer.findInstantiationForGoalInDataset(taxiOffer,
+        goal, result.getInstanceModel());
     Assert.assertTrue(recheckResultModel.isConform());
   }
 

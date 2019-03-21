@@ -27,7 +27,8 @@ public class Hint2TelegramAction extends BaseEventBotAction {
     this.wonTelegramBotHandler = wonTelegramBotHandler;
   }
 
-  @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
+  @Override
+  protected void doRun(Event event, EventListener executingListener) throws Exception {
     EventListenerContext ctx = getEventListenerContext();
 
     if (event instanceof HintFromMatcherEvent && ctx.getBotContextWrapper() instanceof TelegramBotContextWrapper) {

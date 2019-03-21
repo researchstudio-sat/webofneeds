@@ -4,10 +4,16 @@ import won.owner.service.impl.KeystorePasswordUtils;
 
 import javax.persistence.*;
 
-@Entity @Table(name = "keystore_password") public class KeystorePasswordHolder {
-  @Id @GeneratedValue @Column(name = "id") private Long id;
+@Entity
+@Table(name = "keystore_password")
+public class KeystorePasswordHolder {
+  @Id
+  @GeneratedValue
+  @Column(name = "id")
+  private Long id;
 
-  @Column(name = "encrypted_password") private String encryptedPassword;
+  @Column(name = "encrypted_password")
+  private String encryptedPassword;
 
   public Long getId() {
     return id;

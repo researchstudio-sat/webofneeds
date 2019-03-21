@@ -32,15 +32,17 @@ import java.net.URI;
 import java.util.*;
 
 /**
- * Actor that knows all won nodes the matching service is communicating with. It gets informed about new won nodes over
- * the event stream (e.g. by he crawler) and decides which won nodes to crawl and to register with for receiving need
- * events.
- * There should only exist a single instance of this actor that has the global view of all connected won nodes.
+ * Actor that knows all won nodes the matching service is communicating with. It
+ * gets informed about new won nodes over the event stream (e.g. by he crawler)
+ * and decides which won nodes to crawl and to register with for receiving need
+ * events. There should only exist a single instance of this actor that has the
+ * global view of all connected won nodes.
  * <p>
- * User: hfriedrich
- * Date: 27.04.2015
+ * User: hfriedrich Date: 27.04.2015
  */
-@Component @Scope("prototype") public class WonNodeControllerActor extends UntypedActor {
+@Component
+@Scope("prototype")
+public class WonNodeControllerActor extends UntypedActor {
   private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
   private ActorRef pubSubMediator;
   private ActorRef crawler;
@@ -50,26 +52,33 @@ import java.util.*;
   private Set<String> failedWonNodeUris = new HashSet<>();
   private static final String LIFE_CHECK_TICK = "life_check_tick";
 
-  @Autowired private WonNodeSparqlService sparqlService;
+  @Autowired
+  private WonNodeSparqlService sparqlService;
 
-  @Autowired private WonNodeControllerConfig config;
+  @Autowired
+  private WonNodeControllerConfig config;
 
-  @Autowired private WonNodeInformationService wonNodeInformationService;
+  @Autowired
+  private WonNodeInformationService wonNodeInformationService;
 
-  @Autowired private RegistrationClient registrationClient;
+  @Autowired
+  private RegistrationClient registrationClient;
 
-  @Autowired LinkedDataSource linkedDataSource;
+  @Autowired
+  LinkedDataSource linkedDataSource;
 
-  @Autowired private MessagingContext messagingContext;
+  @Autowired
+  private MessagingContext messagingContext;
 
-  @Autowired private HintDBService hintDatabase;
+  @Autowired
+  private HintDBService hintDatabase;
 
-  @Override public void preStart() {
+  @Override
+  public void preStart() {
 
     // Create a scheduler to execute the life check for each won node regularly
-    getContext().system().scheduler()
-        .schedule(config.getLifeCheckDuration(), config.getLifeCheckDuration(), getSelf(), LIFE_CHECK_TICK,
-            getContext().dispatcher(), null);
+    getContext().system().scheduler().schedule(config.getLifeCheckDuration(), config.getLifeCheckDuration(), getSelf(),
+        LIFE_CHECK_TICK, getContext().dispatcher(), null);
 
     // Subscribe for won node events
     pubSubMediator = DistributedPubSub.get(getContext().system()).mediator();
@@ -94,7 +103,8 @@ import java.util.*;
       System.exit(-1);
     }
 
-    // Treat the known won nodes as newly discovered won nodes to register them again at startup of matcher service
+    // Treat the known won nodes as newly discovered won nodes to register them
+    // again at startup of matcher service
     for (WonNodeInfo nodeInfo : wonNodeInfo) {
       if (!config.getCrawlWonNodes().contains(nodeInfo.getWonNodeURI())) {
         WonNodeEvent e = new WonNodeEvent(nodeInfo.getWonNodeURI(), WonNodeEvent.STATUS.NEW_WON_NODE_DISCOVERED);
@@ -113,14 +123,14 @@ import java.util.*;
     }
 
     // initialize the crawler
-    crawler = getContext()
-        .actorOf(SpringExtension.SpringExtProvider.get(getContext().system()).props(MasterCrawlerActor.class),
-            "MasterCrawlerActor");
+    crawler = getContext().actorOf(
+        SpringExtension.SpringExtProvider.get(getContext().system()).props(MasterCrawlerActor.class),
+        "MasterCrawlerActor");
 
     // initialize the need event save actor
-    saveNeedActor = getContext()
-        .actorOf(SpringExtension.SpringExtProvider.get(getContext().system()).props(SaveNeedEventActor.class),
-            "SaveNeedEventActor");
+    saveNeedActor = getContext().actorOf(
+        SpringExtension.SpringExtProvider.get(getContext().system()).props(SaveNeedEventActor.class),
+        "SaveNeedEventActor");
   }
 
   /**
@@ -130,7 +140,8 @@ import java.util.*;
    * @param message
    * @throws Exception
    */
-  @Override public void onReceive(final Object message) {
+  @Override
+  public void onReceive(final Object message) {
 
     if (message instanceof Terminated) {
 
@@ -147,9 +158,9 @@ import java.util.*;
     if (message instanceof WonNodeEvent) {
       WonNodeEvent event = (WonNodeEvent) message;
 
-      if (event.getStatus().equals(WonNodeEvent.STATUS.NEW_WON_NODE_DISCOVERED) ||
-          event.getStatus().equals(WonNodeEvent.STATUS.GET_WON_NODE_INFO_FOR_CRAWLING) ||
-          event.getStatus().equals(WonNodeEvent.STATUS.RETRY_REGISTER_FAILED_WON_NODE)) {
+      if (event.getStatus().equals(WonNodeEvent.STATUS.NEW_WON_NODE_DISCOVERED)
+          || event.getStatus().equals(WonNodeEvent.STATUS.GET_WON_NODE_INFO_FOR_CRAWLING)
+          || event.getStatus().equals(WonNodeEvent.STATUS.RETRY_REGISTER_FAILED_WON_NODE)) {
 
         // won node has already been discovered and connected
         if (crawlWonNodes.containsKey(event.getWonNodeUri())) {
@@ -227,7 +238,8 @@ import java.util.*;
       return;
     }
 
-    // save the hint and send it to the won node controller which sends it to the responsible won node
+    // save the hint and send it to the won node controller which sends it to the
+    // responsible won node
     hintDatabase.saveHint(hint);
     sendHint(hint);
   }
@@ -257,7 +269,9 @@ import java.util.*;
    * Try to register at won nodes and add them for crawling
    *
    * @param wonNodeUri                URI of the won node meta data resource
-   * @param logWonNodeRegisterWarning if true then log the failed register attempts as warning, otherwise as debug level
+   * @param logWonNodeRegisterWarning if true then log the failed register
+   *                                  attempts as warning, otherwise as debug
+   *                                  level
    * @return won node connection if successfully connected, otherwise null
    */
   private WonNodeConnection addWonNodeForCrawling(String wonNodeUri, boolean logWonNodeRegisterWarning) {
@@ -348,9 +362,11 @@ import java.util.*;
   }
 
   /**
-   * Handles connections errors that occur when the need consumer actors are terminated.
+   * Handles connections errors that occur when the need consumer actors are
+   * terminated.
    *
-   * @param t messages that holds a reference to consumer actor that was terminated
+   * @param t messages that holds a reference to consumer actor that was
+   *          terminated
    */
   private void handleConnectionErrors(Terminated t) {
     for (String uri : crawlWonNodes.keySet()) {
@@ -373,12 +389,14 @@ import java.util.*;
     }
   }
 
-  @Override public SupervisorStrategy supervisorStrategy() {
+  @Override
+  public SupervisorStrategy supervisorStrategy() {
 
     SupervisorStrategy supervisorStrategy = new OneForOneStrategy(0, Duration.Zero(),
         new Function<Throwable, SupervisorStrategy.Directive>() {
 
-          @Override public SupervisorStrategy.Directive apply(Throwable t) throws Exception {
+          @Override
+          public SupervisorStrategy.Directive apply(Throwable t) throws Exception {
 
             log.warning("Actor encountered error: {}", t);
             // default behaviour
@@ -389,5 +407,3 @@ import java.util.*;
     return supervisorStrategy;
   }
 }
-
-

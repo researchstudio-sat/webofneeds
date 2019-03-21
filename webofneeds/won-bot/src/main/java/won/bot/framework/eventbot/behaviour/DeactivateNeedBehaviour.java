@@ -19,7 +19,8 @@ public class DeactivateNeedBehaviour extends BotBehaviour {
     super(context, name);
   }
 
-  @Override protected void onActivate(Optional<Object> message) {
+  @Override
+  protected void onActivate(Optional<Object> message) {
     this.subscribeWithAutoCleanup(DeactivateNeedCommandEvent.class,
         new ActionOnEventListener(context, new ExecuteDeactivateNeedCommandAction(context)));
   }

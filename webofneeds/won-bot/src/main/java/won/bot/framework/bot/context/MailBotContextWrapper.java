@@ -30,7 +30,7 @@ public class MailBotContextWrapper extends BotContextWrapper {
     super(botContext, botName);
   }
 
-  //Util Methods to Get/Remove/Add Uri -> MimeMessage Relation
+  // Util Methods to Get/Remove/Add Uri -> MimeMessage Relation
   public void removeUriMimeMessageRelation(URI needURI) {
     getBotContext().removeFromObjectMap(uriMimeMessageName, needURI.toString());
   }
@@ -49,7 +49,7 @@ public class MailBotContextWrapper extends BotContextWrapper {
     getBotContext().saveToObjectMap(uriMimeMessageName, needURI.toString(), os.toByteArray());
   }
 
-  //Util Methods to Get/Remove/Add MailId -> URI Relation
+  // Util Methods to Get/Remove/Add MailId -> URI Relation
   public void removeMailIdWonURIRelation(String mailId) {
     getBotContext().removeFromObjectMap(mailIdUriName, mailId);
   }
@@ -62,7 +62,7 @@ public class MailBotContextWrapper extends BotContextWrapper {
     getBotContext().saveToObjectMap(mailIdUriName, mailId, uri);
   }
 
-  //Util Methods to Get/Remove/Add MailId -> URI Relation
+  // Util Methods to Get/Remove/Add MailId -> URI Relation
   public List<WonURI> getWonURIsForMailAddress(String mailAddress) {
     List<WonURI> uriList = new LinkedList<>();
     List<Object> objectList = getBotContext().loadFromListMap(mailAddressUriName, mailAddress);
@@ -81,8 +81,8 @@ public class MailBotContextWrapper extends BotContextWrapper {
   public void addCachedMailsForMailAddress(MimeMessage mimeMessage) throws IOException, MessagingException {
     ByteArrayOutputStream os = new ByteArrayOutputStream();
     mimeMessage.writeTo(os);
-    getBotContext()
-        .addToListMap(userCachedMailsName, MailContentExtractor.getMailSender(mimeMessage), os.toByteArray());
+    getBotContext().addToListMap(userCachedMailsName, MailContentExtractor.getMailSender(mimeMessage),
+        os.toByteArray());
   }
 
   public Collection<MimeMessage> loadCachedMailsForMailAddress(String mailAddress) throws MessagingException {

@@ -8,8 +8,8 @@ import java.net.URI;
  * Created by fsuda on 27.11.2017.
  */
 public class AgreementCancellationRequestedEvent extends AgreementEvent {
-  //Uri of the message that contains the agreementUri as proposeToCancel
-  //if null then this event is regarding an already Accepted Cancellation
+  // Uri of the message that contains the agreementUri as proposeToCancel
+  // if null then this event is regarding an already Accepted Cancellation
   private URI messageUri;
 
   public AgreementCancellationRequestedEvent(Connection con, URI agreementUri) {

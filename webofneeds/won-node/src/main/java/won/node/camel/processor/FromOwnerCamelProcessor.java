@@ -20,9 +20,9 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 
 /**
- * Implementations are responsible for messages sent by the owner.
- * The message from the owner is routed the the process method. Responses
- * are routed to the successResponse and failureResponse methods, respectively.
+ * Implementations are responsible for messages sent by the owner. The message
+ * from the owner is routed the the process method. Responses are routed to the
+ * successResponse and failureResponse methods, respectively.
  */
 public interface FromOwnerCamelProcessor extends Processor {
   /**

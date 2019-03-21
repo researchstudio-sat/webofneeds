@@ -21,8 +21,7 @@ import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.filter.EventFilter;
 
 /**
- * User: fkleedorfer
- * Date: 30.04.14
+ * User: fkleedorfer Date: 30.04.14
  */
 public class TargetCounterDecorator implements Counter {
   private Counter delegate;
@@ -35,7 +34,8 @@ public class TargetCounterDecorator implements Counter {
     this.context = context;
   }
 
-  @Override public int getCount() {
+  @Override
+  public int getCount() {
     return delegate.getCount();
   }
 
@@ -43,7 +43,8 @@ public class TargetCounterDecorator implements Counter {
     return targetCount;
   }
 
-  @Override public int increment() {
+  @Override
+  public int increment() {
     boolean publishEvent = false;
     int cnt = 0;
     synchronized (this) {
@@ -57,7 +58,8 @@ public class TargetCounterDecorator implements Counter {
 
   }
 
-  @Override public int decrement() {
+  @Override
+  public int decrement() {
     boolean publishEvent = false;
     int cnt = 0;
     synchronized (this) {
@@ -70,7 +72,8 @@ public class TargetCounterDecorator implements Counter {
     return cnt;
   }
 
-  @Override public String getName() {
+  @Override
+  public String getName() {
     return delegate.getName();
   }
 
@@ -84,7 +87,8 @@ public class TargetCounterDecorator implements Counter {
 
   public EventFilter makeEventFilter() {
     return new EventFilter() {
-      @Override public boolean accept(Event event) {
+      @Override
+      public boolean accept(Event event) {
         if (!(event instanceof TargetCountReachedEvent)) {
           return false;
         }

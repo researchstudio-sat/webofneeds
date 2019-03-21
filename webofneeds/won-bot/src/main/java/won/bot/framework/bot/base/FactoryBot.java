@@ -10,7 +10,8 @@ import won.bot.framework.eventbot.behaviour.FactoryBotInitBehaviour;
 import java.util.Optional;
 
 public abstract class FactoryBot extends EventBot {
-  @Override protected final void initializeEventListeners() {
+  @Override
+  protected final void initializeEventListeners() {
     if (!(super.getBotContextWrapper() instanceof FactoryBotContextWrapper)) {
       logger.error("FactoryBot does not work without a FactoryBotContextWrapper");
       throw new IllegalStateException("FactoryBot does not work without a FactoryBotContextWrapper");
@@ -28,7 +29,8 @@ public abstract class FactoryBot extends EventBot {
     BotBehaviour messageCommandBehaviour = new ExecuteWonMessageCommandBehaviour(ctx);
 
     BotBehaviour runningBehaviour = new BotBehaviour(ctx) {
-      @Override protected void onActivate(Optional<Object> message) {
+      @Override
+      protected void onActivate(Optional<Object> message) {
         initializeFactoryEventListeners();
       }
     };
@@ -39,10 +41,9 @@ public abstract class FactoryBot extends EventBot {
   }
 
   /*
-  * Override this method to initialize your remaining event listeners. Will be called after InitFactoryFinishedEvent
-  * is called
-  * the first event is published.
-  */
+   * Override this method to initialize your remaining event listeners. Will be
+   * called after InitFactoryFinishedEvent is called the first event is published.
+   */
   protected abstract void initializeFactoryEventListeners();
 
   public final FactoryBotContextWrapper getBotContextWrapper() {

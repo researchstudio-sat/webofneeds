@@ -27,8 +27,7 @@ import java.net.URI;
 import java.util.List;
 
 /**
- * User: syim
- * Date: 11/7/13
+ * User: syim Date: 11/7/13
  */
 public interface DraftRepository extends WonRepository<Draft> {
 

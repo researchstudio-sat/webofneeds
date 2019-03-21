@@ -33,12 +33,13 @@ import java.net.URI;
 import java.util.concurrent.Executor;
 
 /**
- * Class holding references to all important services that EventListeners inside bots need to
- * access.
+ * Class holding references to all important services that EventListeners inside
+ * bots need to access.
  */
 public interface EventListenerContext {
   /**
-   * Returns the bot's taskScheduler. Used to schedule actions later without blocking other work.
+   * Returns the bot's taskScheduler. Used to schedule actions later without
+   * blocking other work.
    *
    * @return
    */
@@ -65,18 +66,20 @@ public interface EventListenerContext {
    */
   public MatcherProtocolNeedServiceClientSide getMatcherProtocolNeedServiceClient();
 
-  //TODO: change this to an interface
+  // TODO: change this to an interface
   public MatcherProtocolMatcherServiceImplJMSBased getMatcherProtocolMatcherService();
 
   /**
-   * Returns the bot's needProducer. Used to obtain an RDF model that can be sent to a WON_BA node to create a new need.
+   * Returns the bot's needProducer. Used to obtain an RDF model that can be sent
+   * to a WON_BA node to create a new need.
    *
    * @return
    */
   public NeedProducer getNeedProducer();
 
   /**
-   * The bot may have a trigger attached that causes ActEvents to be created regularly. This call stops the trigger.
+   * The bot may have a trigger attached that causes ActEvents to be created
+   * regularly. This call stops the trigger.
    */
   public void cancelTrigger();
 
@@ -107,7 +110,8 @@ public interface EventListenerContext {
   public BotContextWrapper getBotContextWrapper();
 
   /**
-   * Returns an executor that passes the tasks to the TaskScheduler for immediate execution.
+   * Returns an executor that passes the tasks to the TaskScheduler for immediate
+   * execution.
    *
    * @return
    */

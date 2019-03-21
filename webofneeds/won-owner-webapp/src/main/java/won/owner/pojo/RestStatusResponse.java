@@ -6,8 +6,7 @@ import org.springframework.http.HttpStatus;
  * Created by fsuda on 28.11.2018.
  */
 public enum RestStatusResponse {
-  USER_CREATED(1200, "User created", HttpStatus.CREATED),
-  USER_TRANSFERRED(1201, "User Transfered", HttpStatus.CREATED),
+  USER_CREATED(1200, "User created", HttpStatus.CREATED), USER_TRANSFERRED(1201, "User Transfered", HttpStatus.CREATED),
   USER_SIGNED_OUT(1202, "User signed out", HttpStatus.OK),
   USER_ANONYMOUSLINK_SENT(1203, "Anonymous Link sent successfully", HttpStatus.OK),
 

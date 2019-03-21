@@ -13,7 +13,8 @@ public class NeedStateQueryFactory extends NeedDatasetQueryFactory {
     super(need);
   }
 
-  @Override protected String makeQueryString() {
+  @Override
+  protected String makeQueryString() {
     return new ExactMatchFieldQueryFactory(NEED_STATE_SOLR_FIELD, WON.NEED_STATE_ACTIVE.toString()).createQuery();
   }
 }

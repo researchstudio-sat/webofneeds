@@ -58,14 +58,15 @@ public class LastSeenNeedsMatcherBot extends EventBot {
     this.matcherUri = matcherUri;
   }
 
-  //we remember the need uri each time a new need is encountered
+  // we remember the need uri each time a new need is encountered
   private AtomicReference<URI> lastNeedUriReference = new AtomicReference<>();
 
-  @Override protected void initializeEventListeners() {
+  @Override
+  protected void initializeEventListeners() {
     EventListenerContext ctx = getEventListenerContext();
     EventBus bus = getEventBus();
 
-    //subscribe this bot with the WoN nodes' 'new need' topic
+    // subscribe this bot with the WoN nodes' 'new need' topic
     RegisterMatcherAction registerMatcherAction = new RegisterMatcherAction(ctx);
     this.matcherRegistrator = new ActionOnEventListener(ctx, registerMatcherAction, 1);
     bus.subscribe(ActEvent.class, this.matcherRegistrator);
@@ -76,7 +77,8 @@ public class LastSeenNeedsMatcherBot extends EventBot {
 
     bus.subscribe(NeedCreatedEventForMatcher.class,
         new ActionOnEventListener(ctx, "lastSeenNeedsMatcher", new BaseEventBotAction(ctx) {
-          @Override protected void doRun(final Event event, EventListener executingListener) throws Exception {
+          @Override
+          protected void doRun(final Event event, EventListener executingListener) throws Exception {
             NeedCreatedEventForMatcher needCreatedEvent = (NeedCreatedEventForMatcher) event;
             URI currentNeedURI = needCreatedEvent.getNeedURI();
             URI lastNeedURI = lastNeedUriReference.getAndSet(currentNeedURI);
@@ -103,8 +105,7 @@ public class LastSeenNeedsMatcherBot extends EventBot {
     URI localWonNode = WonRdfUtils.NeedUtils
         .getWonNodeURIFromNeed(getEventListenerContext().getLinkedDataSource().getDataForResource(needURI), needURI);
 
-    return WonMessageBuilder
-        .setMessagePropertiesForHint(wonNodeInformationService.generateEventURI(localWonNode), needURI,
-            Optional.empty(), localWonNode, otherNeedURI, Optional.empty(), originator, score).build();
+    return WonMessageBuilder.setMessagePropertiesForHint(wonNodeInformationService.generateEventURI(localWonNode),
+        needURI, Optional.empty(), localWonNode, otherNeedURI, Optional.empty(), originator, score).build();
   }
 }

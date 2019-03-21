@@ -30,9 +30,11 @@ import won.protocol.vocabulary.WONMSG;
 
 import java.net.URI;
 
-@Component @FixedMessageProcessor(direction = WONMSG.TYPE_FROM_SYSTEM_STRING, messageType = WONMSG.TYPE_DEACTIVATE_STRING) public class DeactivateMessageFromSystemProcessor
-    extends AbstractCamelProcessor {
-  @Override public void process(Exchange exchange) throws Exception {
+@Component
+@FixedMessageProcessor(direction = WONMSG.TYPE_FROM_SYSTEM_STRING, messageType = WONMSG.TYPE_DEACTIVATE_STRING)
+public class DeactivateMessageFromSystemProcessor extends AbstractCamelProcessor {
+  @Override
+  public void process(Exchange exchange) throws Exception {
     WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
     URI receiverNeedURI = wonMessage.getReceiverNeedURI();
     URI senderNeedURI = wonMessage.getSenderNeedURI();

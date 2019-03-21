@@ -18,20 +18,23 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 
 /**
- * User: ypanchenko
- * Date: 17.02.2015
+ * User: ypanchenko Date: 17.02.2015
  */
 
-@RunWith(SpringJUnit4ClassRunner.class) @ContextConfiguration(locations = {
-    "classpath:/mail-sender.xml" }) public class WonMailSenderTest {
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = { "classpath:/mail-sender.xml" })
+public class WonMailSenderTest {
 
   private GreenMail testSmtp;
 
-  @Autowired private WonMailSender wonEmailSender;
+  @Autowired
+  private WonMailSender wonEmailSender;
 
-  @Autowired private JavaMailSenderImpl baseMailSender;
+  @Autowired
+  private JavaMailSenderImpl baseMailSender;
 
-  @Test public void sendTextMessage() throws MessagingException {
+  @Test
+  public void sendTextMessage() throws MessagingException {
     SimpleMailMessage message = new SimpleMailMessage();
 
     // replace sender specified in mail-sender.xml with the test sender
@@ -46,17 +49,20 @@ import javax.mail.MessagingException;
     Assert.assertEquals("test message", body);
   }
 
-  @Before public void testSmtpInit() {
+  @Before
+  public void testSmtpInit() {
 
     testSmtp = new GreenMail(ServerSetupTest.SMTP);
     testSmtp.start();
 
-    // replace port and host specified in mail-sender.xml with the test port and host
+    // replace port and host specified in mail-sender.xml with the test port and
+    // host
     baseMailSender.setPort(3025);
     baseMailSender.setHost("localhost");
   }
 
-  @After public void cleanup() {
+  @After
+  public void cleanup() {
     testSmtp.stop();
   }
 

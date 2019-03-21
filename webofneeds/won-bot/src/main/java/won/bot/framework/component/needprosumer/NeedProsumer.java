@@ -20,8 +20,7 @@ import won.bot.framework.component.needconsumer.NeedConsumer;
 import won.bot.framework.component.needproducer.NeedProducer;
 
 /**
- * User: fkleedorfer
- * Date: 18.12.13
+ * User: fkleedorfer Date: 18.12.13
  */
 public class NeedProsumer {
   private NeedProducer needProducer;

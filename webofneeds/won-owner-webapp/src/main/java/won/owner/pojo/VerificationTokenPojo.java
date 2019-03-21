@@ -3,7 +3,8 @@ package won.owner.pojo;
 import org.hibernate.validator.constraints.NotEmpty;
 
 public class VerificationTokenPojo {
-  @NotEmpty private String token;
+  @NotEmpty
+  private String token;
 
   public String getToken() {
     return token;

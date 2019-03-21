@@ -12,11 +12,13 @@ public class HolderFacetConfig extends HardcodedFacetConfig {
     this.derivationProperties.add(WON.HOLDS);
   }
 
-  @Override public boolean isConnectionAllowedToType(URI remoteFacetType) {
+  @Override
+  public boolean isConnectionAllowedToType(URI remoteFacetType) {
     return FacetType.HoldableFacet.getURI().equals(remoteFacetType);
   }
 
-  @Override public boolean isAutoOpen(URI remoteFacetType) {
+  @Override
+  public boolean isAutoOpen(URI remoteFacetType) {
     return false;
   }
 }

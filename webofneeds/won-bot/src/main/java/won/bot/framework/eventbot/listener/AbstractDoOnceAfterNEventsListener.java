@@ -21,8 +21,9 @@ import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.filter.EventFilter;
 
 /**
- * Counts how often it is called, offers to call a callback when a certain number is reached.
- * After the target count of events is reached, a FinishedEvent is published. This allows for chaining listeners.
+ * Counts how often it is called, offers to call a callback when a certain
+ * number is reached. After the target count of events is reached, a
+ * FinishedEvent is published. This allows for chaining listeners.
  */
 public abstract class AbstractDoOnceAfterNEventsListener extends BaseEventListener implements CountingListener {
   private int targetCount;
@@ -53,7 +54,8 @@ public abstract class AbstractDoOnceAfterNEventsListener extends BaseEventListen
     this.targetCount = targetCount;
   }
 
-  @Override public void doOnEvent(final Event event) throws Exception {
+  @Override
+  public void doOnEvent(final Event event) throws Exception {
     boolean doRun = false;
     synchronized (monitor) {
       if (finished) {
@@ -87,16 +89,14 @@ public abstract class AbstractDoOnceAfterNEventsListener extends BaseEventListen
     return count;
   }
 
-  @Override public boolean isFinished() {
+  @Override
+  public boolean isFinished() {
     return finished;
   }
 
-  @Override public String toString() {
-    return getClass().getSimpleName() +
-        "{name='" + name +
-        ", count=" + count +
-        ",targetCount=" + targetCount +
-        ", finished=" + finished +
-        '}';
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{name='" + name + ", count=" + count + ",targetCount=" + targetCount
+        + ", finished=" + finished + '}';
   }
 }

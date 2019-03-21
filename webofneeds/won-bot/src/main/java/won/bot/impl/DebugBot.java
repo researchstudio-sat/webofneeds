@@ -46,9 +46,11 @@ import won.protocol.model.FacetType;
 import java.net.URI;
 
 /**
- * Bot that reacts to each new need that is created in the system by creating two needs, it sends a connect message from
- * one of these needs, and a hint message for original need offering match to another of these needs. Additionally,
- * it reacts to certain commands send via text messages on the connections with the created by the bot needs.
+ * Bot that reacts to each new need that is created in the system by creating
+ * two needs, it sends a connect message from one of these needs, and a hint
+ * message for original need offering match to another of these needs.
+ * Additionally, it reacts to certain commands send via text messages on the
+ * connections with the created by the bot needs.
  */
 public class DebugBot extends EventBot {
 
@@ -75,22 +77,24 @@ public class DebugBot extends EventBot {
     this.matcherUri = matcherUri;
   }
 
-  @Override protected void initializeEventListeners() {
-    String welcomeMessage = "Greetings! I am the DebugBot. I " +
-        "can simulate multiple other users so you can test things. I understand a few commands. To see which ones, " +
-        "type 'usage'.";
+  @Override
+  protected void initializeEventListeners() {
+    String welcomeMessage = "Greetings! I am the DebugBot. I "
+        + "can simulate multiple other users so you can test things. I understand a few commands. To see which ones, "
+        + "type 'usage'.";
     String welcomeHelpMessage = "When connecting with me, you can say 'ignore', or 'deny' to make me ignore or deny requests, and 'wait N' to make me wait N seconds (max 99) before reacting.";
 
     EventListenerContext ctx = getEventListenerContext();
     EventBus bus = getEventBus();
 
-    //eagerly cache RDF data
+    // eagerly cache RDF data
     BotBehaviour eagerlyCacheBehaviour = new EagerlyPopulateCacheBehaviour(ctx);
     eagerlyCacheBehaviour.activate();
 
-    //react to a bot command activating/deactivating eager caching
+    // react to a bot command activating/deactivating eager caching
     bus.subscribe(SetCacheEagernessCommandEvent.class, new ActionOnEventListener(ctx, new BaseEventBotAction(ctx) {
-      @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
+      @Override
+      protected void doRun(Event event, EventListener executingListener) throws Exception {
         if (event instanceof SetCacheEagernessCommandEvent) {
           if (((SetCacheEagernessCommandEvent) event).isEager()) {
             eagerlyCacheBehaviour.activate();
@@ -101,19 +105,19 @@ public class DebugBot extends EventBot {
       }
     }));
 
-    //react to a message that was not identified as a debug command
+    // react to a message that was not identified as a debug command
     BotBehaviour connectionMessageBehaviour = new ConnectionMessageBehaviour(ctx);
     connectionMessageBehaviour.activate();
 
-    //react to the debug deactivate command (deactivate my need)
+    // react to the debug deactivate command (deactivate my need)
     BotBehaviour deactivateNeedBehaviour = new DeactivateNeedBehaviour(ctx);
     deactivateNeedBehaviour.activate();
 
-    //react to the close behaviour
+    // react to the close behaviour
     BotBehaviour closeBehaviour = new CloseBevahiour(ctx);
     closeBehaviour.activate();
 
-    //register with WoN nodes, be notified when new needs are created
+    // register with WoN nodes, be notified when new needs are created
     RegisterMatcherAction registerMatcherAction = new RegisterMatcherAction(ctx);
     this.matcherRegistrator = new ActionOnEventListener(ctx, registerMatcherAction, 1);
     bus.subscribe(ActEvent.class, this.matcherRegistrator);
@@ -122,7 +126,8 @@ public class DebugBot extends EventBot {
     ActionOnEventListener matcherRetryRegistrator = new ActionOnEventListener(ctx, delayedRegistration);
     bus.subscribe(MatcherRegisterFailedEvent.class, matcherRetryRegistrator);
 
-    //create the echo need for debug initial connect - if we're not reacting to the creation of our own echo need.
+    // create the echo need for debug initial connect - if we're not reacting to the
+    // creation of our own echo need.
     CreateDebugNeedWithFacetsAction needForInitialConnectAction = new CreateDebugNeedWithFacetsAction(ctx, true, true);
     needForInitialConnectAction.setIsInitialForConnect(true);
 
@@ -131,7 +136,8 @@ public class DebugBot extends EventBot {
         needForInitialConnectAction);
     bus.subscribe(NeedCreatedEventForMatcher.class, initialConnector);
 
-    //create the echo need for debug initial hint - if we're not reacting to the creation of our own echo need.
+    // create the echo need for debug initial hint - if we're not reacting to the
+    // creation of our own echo need.
     CreateDebugNeedWithFacetsAction initialHinter = new CreateDebugNeedWithFacetsAction(ctx, true, true);
     initialHinter.setIsInitialForHint(true);
     ActionOnEventListener needForInitialHintListener = new ActionOnEventListener(ctx,
@@ -139,20 +145,21 @@ public class DebugBot extends EventBot {
         initialHinter);
     bus.subscribe(NeedCreatedEventForMatcher.class, needForInitialHintListener);
 
-    //as soon as the echo need triggered by debug connect created, connect to original
+    // as soon as the echo need triggered by debug connect created, connect to
+    // original
     this.needConnector = new ActionOnEventListener(ctx, "needConnector",
         new RandomDelayedAction(ctx, CONNECT_DELAY_MILLIS, CONNECT_DELAY_MILLIS, 1,
             new ConnectWithAssociatedNeedAction(ctx, FacetType.ChatFacet.getURI(), FacetType.ChatFacet.getURI(),
                 welcomeMessage + " " + welcomeHelpMessage)));
     bus.subscribe(NeedCreatedEventForDebugConnect.class, this.needConnector);
 
-    //as soon as the echo need triggered by debug hint command created, hint to original
-    this.needHinter = new ActionOnEventListener(ctx, "needHinter",
-        new RandomDelayedAction(ctx, CONNECT_DELAY_MILLIS, CONNECT_DELAY_MILLIS, 1,
-            new HintAssociatedNeedAction(ctx, matcherUri)));
+    // as soon as the echo need triggered by debug hint command created, hint to
+    // original
+    this.needHinter = new ActionOnEventListener(ctx, "needHinter", new RandomDelayedAction(ctx, CONNECT_DELAY_MILLIS,
+        CONNECT_DELAY_MILLIS, 1, new HintAssociatedNeedAction(ctx, matcherUri)));
     bus.subscribe(NeedCreatedEventForDebugHint.class, this.needHinter);
 
-    //if the original need wants to connect - always open
+    // if the original need wants to connect - always open
     this.autoOpener = new ActionOnEventListener(ctx,
         new MultipleActions(ctx, new OpenConnectionDebugAction(ctx, welcomeMessage, welcomeHelpMessage),
             new PublishSetChattinessEventAction(ctx, true)));
@@ -160,16 +167,17 @@ public class DebugBot extends EventBot {
 
     EventBotAction userCommandAction = new DebugBotIncomingMessageToEventMappingAction(ctx);
 
-    //if the remote side opens, send a greeting and set to chatty.
+    // if the remote side opens, send a greeting and set to chatty.
     bus.subscribe(OpenFromOtherNeedEvent.class, new ActionOnEventListener(ctx,
-            new MultipleActions(ctx, userCommandAction, new PublishSetChattinessEventAction(ctx, true))));
+        new MultipleActions(ctx, userCommandAction, new PublishSetChattinessEventAction(ctx, true))));
 
-    //if the bot receives a text message - try to map the command of the text message to a DebugEvent
+    // if the bot receives a text message - try to map the command of the text
+    // message to a DebugEvent
     messageFromOtherNeedListener = new ActionOnEventListener(ctx, userCommandAction);
 
     bus.subscribe(MessageFromOtherNeedEvent.class, messageFromOtherNeedListener);
 
-    //react to usage command event
+    // react to usage command event
     this.usageMessageSender = new ActionOnEventListener(ctx,
         new SendMultipleMessagesAction(ctx, DebugBotIncomingMessageToEventMappingAction.USAGE_MESSAGES));
     bus.subscribe(UsageDebugCommandEvent.class, usageMessageSender);
@@ -177,43 +185,44 @@ public class DebugBot extends EventBot {
     bus.subscribe(CloseCommandSuccessEvent.class,
         new ActionOnEventListener(ctx, "chattiness off", new PublishSetChattinessEventAction(ctx, false)));
 
-    //react to close event: set connection to not chatty
+    // react to close event: set connection to not chatty
     bus.subscribe(CloseFromOtherNeedEvent.class,
         new ActionOnEventListener(ctx, new PublishSetChattinessEventAction(ctx, false)));
 
-    // react to the hint and connect commands by creating a need (it will fire correct need created for connect/hint
+    // react to the hint and connect commands by creating a need (it will fire
+    // correct need created for connect/hint
     // events)
     needCreator = new ActionOnEventListener(ctx, new CreateDebugNeedWithFacetsAction(ctx, true, true));
     bus.subscribe(HintDebugCommandEvent.class, needCreator);
     bus.subscribe(ConnectDebugCommandEvent.class, needCreator);
 
-    bus.subscribe(SendNDebugCommandEvent.class, new ActionOnEventListener(ctx,
-            new SendNDebugMessagesAction(ctx, DELAY_BETWEEN_N_MESSAGES,
-                DebugBotIncomingMessageToEventMappingAction.N_MESSAGES)));
+    bus.subscribe(SendNDebugCommandEvent.class, new ActionOnEventListener(ctx, new SendNDebugMessagesAction(ctx,
+        DELAY_BETWEEN_N_MESSAGES, DebugBotIncomingMessageToEventMappingAction.N_MESSAGES)));
 
     MessageTimingManager timingManager = new MessageTimingManager(ctx, 20);
 
-    //on every actEvent there is a chance we send a chatty message
-    bus.subscribe(ActEvent.class, new ActionOnEventListener(ctx,
-        new SendChattyMessageAction(ctx, CHATTY_MESSAGE_PROBABILITY, timingManager,
-            DebugBotIncomingMessageToEventMappingAction.RANDOM_MESSAGES,
-            DebugBotIncomingMessageToEventMappingAction.LAST_MESSAGES)));
-    //set the chattiness of the connection
+    // on every actEvent there is a chance we send a chatty message
+    bus.subscribe(ActEvent.class,
+        new ActionOnEventListener(ctx,
+            new SendChattyMessageAction(ctx, CHATTY_MESSAGE_PROBABILITY, timingManager,
+                DebugBotIncomingMessageToEventMappingAction.RANDOM_MESSAGES,
+                DebugBotIncomingMessageToEventMappingAction.LAST_MESSAGES)));
+    // set the chattiness of the connection
     bus.subscribe(SetChattinessDebugCommandEvent.class, new ActionOnEventListener(ctx, new SetChattinessAction(ctx)));
 
-    //process eliza messages with eliza
+    // process eliza messages with eliza
     bus.subscribe(MessageToElizaEvent.class, new ActionOnEventListener(ctx, new AnswerWithElizaAction(ctx, 20)));
 
-    //remember when we sent the last message
+    // remember when we sent the last message
     bus.subscribe(WonMessageSentOnConnectionEvent.class,
         new ActionOnEventListener(ctx, new RecordMessageSentTimeAction(ctx, timingManager)));
-    //remember when we got the last message
+    // remember when we got the last message
     bus.subscribe(WonMessageReceivedOnConnectionEvent.class,
         new ActionOnEventListener(ctx, new RecordMessageReceivedTimeAction(ctx, timingManager)));
-    //initialize the sent timestamp when the open message is received
+    // initialize the sent timestamp when the open message is received
     bus.subscribe(OpenFromOtherNeedEvent.class,
         new ActionOnEventListener(ctx, new RecordMessageSentTimeAction(ctx, timingManager)));
-    //initialize the sent timestamp when the connect message is received
+    // initialize the sent timestamp when the connect message is received
     bus.subscribe(ConnectFromOtherNeedEvent.class,
         new ActionOnEventListener(ctx, new RecordMessageSentTimeAction(ctx, timingManager)));
 

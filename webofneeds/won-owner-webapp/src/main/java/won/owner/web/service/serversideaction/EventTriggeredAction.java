@@ -13,15 +13,16 @@ import java.util.function.Predicate;
 public class EventTriggeredAction<E> {
 
   private Predicate<Optional<E>> triggerPredicate;
-  //a function accepting one event of type T, and produces zero or more EventTriggeredActions
+  // a function accepting one event of type T, and produces zero or more
+  // EventTriggeredActions
   private Function<Optional<E>, Collection<EventTriggeredAction<E>>> action;
   private final Logger logger = LoggerFactory.getLogger(getClass());
   private String name;
   private Date created = new Date();
 
   /**
-   * Constructor to use if the action is to be executed when the event is an empty optional,
-   * which is the case when first adding the action to the container.
+   * Constructor to use if the action is to be executed when the event is an empty
+   * optional, which is the case when first adding the action to the container.
    */
   public EventTriggeredAction(String name, Function<Optional<E>, Collection<EventTriggeredAction<E>>> action) {
     this(name, e -> !e.isPresent(), action);

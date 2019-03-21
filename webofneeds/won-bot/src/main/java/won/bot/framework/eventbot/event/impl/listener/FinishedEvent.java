@@ -33,9 +33,8 @@ public class FinishedEvent implements Event {
     return listener;
   }
 
-  @Override public String toString() {
-    return "FinishedEvent{" +
-        "listener=" + listener +
-        '}';
+  @Override
+  public String toString() {
+    return "FinishedEvent{" + "listener=" + listener + '}';
   }
 }

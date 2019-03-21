@@ -11,11 +11,11 @@ import won.protocol.model.MessageEventPlaceholder;
 import java.net.URI;
 
 /**
- * User: ypanchenko
- * Date: 27.04.2015
+ * User: ypanchenko Date: 27.04.2015
  */
 public class ResponseResenderProcessor extends AbstractCamelProcessor {
-  @Override public void process(final Exchange exchange) throws Exception {
+  @Override
+  public void process(final Exchange exchange) throws Exception {
     WonMessage originalMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.ORIGINAL_MESSAGE_HEADER);
 
     if (originalMessage == null) {
@@ -46,7 +46,8 @@ public class ResponseResenderProcessor extends AbstractCamelProcessor {
     } else if (WonMessageDirection.FROM_EXTERNAL == originalMessage.getEnvelopeType()) {
       sendSystemMessage(responseMessage);
     } else {
-      logger.info(String.format("cannot resend response message for direction of original message, "
+      logger.info(String.format(
+          "cannot resend response message for direction of original message, "
               + "expected FROM_OWNER or FROM_EXTERNAL, but found %s. Original cause is logged.",
           originalMessage.getEnvelopeType()), e);
     }

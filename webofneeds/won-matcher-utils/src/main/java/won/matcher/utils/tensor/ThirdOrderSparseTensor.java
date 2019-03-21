@@ -31,12 +31,11 @@ import java.util.*;
 /**
  * Sparse third order tensor based on la4j implementation of sparse matrices.
  * <p>
- * User: hfriedrich
- * Date: 09.07.2014
+ * User: hfriedrich Date: 09.07.2014
  */
 public class ThirdOrderSparseTensor {
 
-  //private CCSMatrix[] slices;
+  // private CCSMatrix[] slices;
 
   private ArrayList<CCSMatrix> slices;
   private int[] dims;
@@ -83,7 +82,8 @@ public class ThirdOrderSparseTensor {
 
   public void writeSliceToFile(String fileName, int slice) throws IOException {
 
-    // write the mtx file (remove the column-major specification cause python mm does not read it)
+    // write the mtx file (remove the column-major specification cause python mm
+    // does not read it)
     OutputStream os = new FileOutputStream(new File(fileName));
     NumberFormat format = DecimalFormat.getInstance(Locale.US);
     os.write(slices.get(slice).toMatrixMarket(format).replace("column-major", "").getBytes());
@@ -107,7 +107,8 @@ public class ThirdOrderSparseTensor {
       nonZeroIndices = new LinkedList<>();
     }
 
-    @Override public void apply(final int i, final double value) {
+    @Override
+    public void apply(final int i, final double value) {
       nonZeroIndices.add(i);
     }
 

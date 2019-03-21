@@ -19,17 +19,18 @@ public class BotManagerImpl implements BotManager {
   private Map<URI, List<Bot>> botListByUri = new HashMap<URI, List<Bot>>();
   private Object monitor = new Object();
 
-  @Override public Bot getBotForNeedURI(URI needUri) {
-    //try the botByUri map
+  @Override
+  public Bot getBotForNeedURI(URI needUri) {
+    // try the botByUri map
     {
       Bot bot = botByUri.get(needUri);
       if (bot != null)
         return bot;
     }
-    //check each bot, return first that knows the needUri
+    // check each bot, return first that knows the needUri
     logger.debug("bots size:{} ", bots.size());
     for (Bot mybot : bots) {
-      //logger.debug("bot knows need: {}", mybot.knowsNeedURI(needUri));
+      // logger.debug("bot knows need: {}", mybot.knowsNeedURI(needUri));
       if (mybot.knowsNeedURI(needUri)) {
         synchronized (getMonitor()) {
           this.botByUri.put(needUri, mybot);
@@ -40,7 +41,8 @@ public class BotManagerImpl implements BotManager {
     return null;
   }
 
-  @Override public List<Bot> getBotsForNodeURI(final URI wonNodeUri) {
+  @Override
+  public List<Bot> getBotsForNodeURI(final URI wonNodeUri) {
     {
       List<Bot> botList = botListByUri.get(wonNodeUri);
       if (botList != null && botList.size() > 0)
@@ -58,7 +60,8 @@ public class BotManagerImpl implements BotManager {
     return botList;
   }
 
-  @Override public void addBot(Bot bot) {
+  @Override
+  public void addBot(Bot bot) {
     synchronized (getMonitor()) {
       if (bots.contains(bot))
         return;
@@ -67,7 +70,8 @@ public class BotManagerImpl implements BotManager {
     }
   }
 
-  @Override public void setBots(Collection<Bot> bots) {
+  @Override
+  public void setBots(Collection<Bot> bots) {
     synchronized (getMonitor()) {
       this.bots.clear();
       this.bots.addAll(bots);
@@ -75,7 +79,8 @@ public class BotManagerImpl implements BotManager {
     }
   }
 
-  @Override public boolean isWorkDone() {
+  @Override
+  public boolean isWorkDone() {
     logger.debug("checking if the bots' work is all done");
     synchronized (getMonitor()) {
       for (Bot bot : getBots()) {

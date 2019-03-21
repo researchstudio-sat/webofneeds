@@ -18,11 +18,13 @@ public abstract class HardcodedFacetConfig implements FacetConfig {
     this.facetType = facetType;
   }
 
-  @Override public final URI getFacetType() {
+  @Override
+  public final URI getFacetType() {
     return facetType;
   }
 
-  @Override final public Set<Property> getDerivationProperties() {
+  @Override
+  final public Set<Property> getDerivationProperties() {
     return derivationProperties;
   }
 }

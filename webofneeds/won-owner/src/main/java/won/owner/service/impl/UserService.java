@@ -25,17 +25,22 @@ import java.util.UUID;
 /**
  * Created by fsuda on 28.05.2018.
  */
-@Service public class UserService {
+@Service
+public class UserService {
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Autowired private UserRepository userRepository;
+  @Autowired
+  private UserRepository userRepository;
 
-  @Autowired private EmailVerificationRepository emailVerificationRepository;
+  @Autowired
+  private EmailVerificationRepository emailVerificationRepository;
 
-  @Autowired private PersistentLoginRepository persistentLoginRepository;
+  @Autowired
+  private PersistentLoginRepository persistentLoginRepository;
 
-  @Autowired private KeystorePasswordRepository keystorePasswordRepository;
+  @Autowired
+  private KeystorePasswordRepository keystorePasswordRepository;
 
   private ExpensiveSecureRandomString randomStringGenerator = new ExpensiveSecureRandomString();
 
@@ -46,8 +51,9 @@ import java.util.UUID;
    * @param newPassword
    * @param privateUsername
    * @param privatePassword
-   * @throws UserAlreadyExistsException                   when the new User already exists
-   * @throws won.owner.service.impl.UserNotFoundException when the private User is not found
+   * @throws UserAlreadyExistsException when the new User already exists
+   * @throws                            won.owner.service.impl.UserNotFoundException
+   *                                    when the private User is not found
    */
   public User transferUser(String newEmail, String newPassword, String privateUsername, String privatePassword)
       throws UserAlreadyExistsException, UserNotFoundException {
@@ -55,15 +61,17 @@ import java.util.UUID;
   }
 
   /**
-   * Transfers the specific user to a non existant new user with password and an optional role.
+   * Transfers the specific user to a non existant new user with password and an
+   * optional role.
    *
    * @param newEmail
    * @param newPassword
    * @param privateUsername
    * @param privatePassword
    * @param role
-   * @throws UserAlreadyExistsException                   when the new User already exists
-   * @throws won.owner.service.impl.UserNotFoundException when the private User is not found
+   * @throws UserAlreadyExistsException when the new User already exists
+   * @throws                            won.owner.service.impl.UserNotFoundException
+   *                                    when the private User is not found
    */
   public User transferUser(String newEmail, String newPassword, String privateUsername, String privatePassword,
       String role) throws UserAlreadyExistsException, UserNotFoundException {
@@ -79,14 +87,14 @@ import java.util.UUID;
         throw new UserNotFoundException();
       }
 
-      //change the username/email and keystorpw holder
+      // change the username/email and keystorpw holder
       privateUser.setUsername(newEmail);
       privateUser.setPassword(passwordEncoder.encode(newPassword));
       privateUser.setEmail(newEmail);
       privateUser.setEmailVerified(false);
       privateUser.setPrivateId(null);
-      privateUser.setAcceptedTermsOfService(
-          true); //transfer only available when flag is set therefore we can just set this to true (i think)
+      privateUser.setAcceptedTermsOfService(true); // transfer only available when flag is set therefore we can just set
+                                                   // this to true (i think)
       if (role != null) {
         privateUser.setRole(role);
       }
@@ -95,10 +103,11 @@ import java.util.UUID;
 
       String keystorePassword = privateKeystorePassword.getPassword(privatePassword);
 
-      //************************************************
+      // ************************************************
       KeystorePasswordHolder newKeystorePassword = new KeystorePasswordHolder();
-      //generate a newPassword for the keystore and save it in the database, encrypted with a symmetric key
-      //derived from the user's new password
+      // generate a newPassword for the keystore and save it in the database,
+      // encrypted with a symmetric key
+      // derived from the user's new password
       newKeystorePassword.setPassword(keystorePassword, newPassword);
 
       privateUser.setKeystorePasswordHolder(newKeystorePassword);
@@ -114,17 +123,21 @@ import java.util.UUID;
   }
 
   /**
-   * Changes the specified user's password from old to new, changes user's key store password and invalidates all persistent logins.
+   * Changes the specified user's password from old to new, changes user's key
+   * store password and invalidates all persistent logins.
    *
    * @param username
    * @param newPassword
    * @param oldPassword
    * @throws UserNotFoundException      when the private User is not found
-   * @throws KeyStoreIOException        if something goes wrong loading or saving the keystore
-   * @throws IncorrectPasswordException if the old password is not the actual old password of the user
+   * @throws KeyStoreIOException        if something goes wrong loading or saving
+   *                                    the keystore
+   * @throws IncorrectPasswordException if the old password is not the actual old
+   *                                    password of the user
    */
-  @Transactional(propagation = Propagation.REQUIRED) public User changePassword(String username, String newPassword,
-      String oldPassword) throws UserNotFoundException, KeyStoreIOException, IncorrectPasswordException {
+  @Transactional(propagation = Propagation.REQUIRED)
+  public User changePassword(String username, String newPassword, String oldPassword)
+      throws UserNotFoundException, KeyStoreIOException, IncorrectPasswordException {
     logger.debug("changing password for user {}", username);
     PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     User user = getByUsernameWithKeystorePassword(username);
@@ -150,7 +163,8 @@ import java.util.UUID;
 
     save(user);
     logger.debug("password changed for user {}", username);
-    // persistent logins won't work any more as we changed the keystore password, so let's delete them
+    // persistent logins won't work any more as we changed the keystore password, so
+    // let's delete them
     persistentLoginRepository.deleteByUsername(username);
     return user;
   }
@@ -158,7 +172,8 @@ import java.util.UUID;
   /**
    * Generates a new recovery key for the user
    */
-  @Transactional(propagation = Propagation.REQUIRED) public String generateRecoveryKey(String email, String password)
+  @Transactional(propagation = Propagation.REQUIRED)
+  public String generateRecoveryKey(String email, String password)
       throws UserNotFoundException, IncorrectPasswordException {
     logger.debug("changing password for user {}", email);
     User user = getByUsernameWithKeystorePassword(email);
@@ -187,10 +202,13 @@ import java.util.UUID;
   }
 
   /**
-   * Uses the recoveryKey to unlock the keystore password, then generates a new keystore password and if that all works, changes the user's password and deletes the recovery key.
+   * Uses the recoveryKey to unlock the keystore password, then generates a new
+   * keystore password and if that all works, changes the user's password and
+   * deletes the recovery key.
    */
-  @Transactional(propagation = Propagation.REQUIRED) public User useRecoveryKey(String username, String newPassword,
-      String recoveryKey) throws UserNotFoundException, KeyStoreIOException, IncorrectPasswordException {
+  @Transactional(propagation = Propagation.REQUIRED)
+  public User useRecoveryKey(String username, String newPassword, String recoveryKey)
+      throws UserNotFoundException, KeyStoreIOException, IncorrectPasswordException {
     logger.debug("using recoery key to reset password for user {}", username);
     PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     User user = getByUsernameWithKeystorePassword(username);
@@ -213,20 +231,22 @@ import java.util.UUID;
     user.setRecoverableKeystorePasswordHolder(null);
     save(user);
     logger.debug("password changed for user {}", username);
-    // persistent logins won't work any more as we changed the keystore password, so let's delete them
+    // persistent logins won't work any more as we changed the keystore password, so
+    // let's delete them
     persistentLoginRepository.deleteByUsername(username);
     return user;
   }
 
   /**
-   * Changes the keystore password, re-encrypting the private keys with the new password.
+   * Changes the keystore password, re-encrypting the private keys with the new
+   * password.
    *
    * @return the new keystore password
    */
   private String changeKeystorePassword(User user, String oldKeystorePassword) throws KeyStoreIOException {
     String newKeystorePassword = KeystorePasswordUtils.generatePassword(KeystorePasswordUtils.KEYSTORE_PASSWORD_BYTES);
     KeyStore keyStore = user.getKeystoreHolder().getKeystore(oldKeystorePassword);
-    //re-encrypt all private keys with the new password
+    // re-encrypt all private keys with the new password
     try {
       Enumeration aliases = keyStore.aliases();
       try {
@@ -237,7 +257,7 @@ import java.util.UUID;
             Certificate[] chain = keyStore.getCertificateChain(alias);
             keyStore.setKeyEntry(alias, key, newKeystorePassword.toCharArray(), chain);
           } else if (keyStore.isCertificateEntry(alias)) {
-            //ignore - certificates are not encrypted with a key
+            // ignore - certificates are not encrypted with a key
           }
           logger.debug("re-encrypted key for alias: {} ", alias);
         }
@@ -254,8 +274,8 @@ import java.util.UUID;
   }
 
   /**
-   * Registers the specified user with password and an optional role.
-   * Assumes values have already been checked for syntactic validity.
+   * Registers the specified user with password and an optional role. Assumes
+   * values have already been checked for syntactic validity.
    *
    * @param email
    * @param password
@@ -268,8 +288,8 @@ import java.util.UUID;
   }
 
   /**
-   * Registers the specified user with password and an optional role.
-   * Assumes values have already been checked for syntactic validity.
+   * Registers the specified user with password and an optional role. Assumes
+   * values have already been checked for syntactic validity.
    *
    * @param email
    * @param password
@@ -293,15 +313,16 @@ import java.util.UUID;
         user.setPrivateId(privateId);
       }
 
-      user.setAcceptedTermsOfService(
-          true); //transfer only available when flag is set therefore we can just set this to true (i think)
+      user.setAcceptedTermsOfService(true); // transfer only available when flag is set therefore we can just set this
+                                            // to true (i think)
       KeystorePasswordHolder keystorePassword = new KeystorePasswordHolder();
-      //generate a password for the keystore and save it in the database, encrypted with a symmetric key
-      //derived from the user's password
+      // generate a password for the keystore and save it in the database, encrypted
+      // with a symmetric key
+      // derived from the user's password
       keystorePassword
           .setPassword(KeystorePasswordUtils.generatePassword(KeystorePasswordUtils.KEYSTORE_PASSWORD_BYTES), password);
-      //keystorePassword = keystorePasswordRepository.save(keystorePassword);
-      //generate the keystore for the user
+      // keystorePassword = keystorePasswordRepository.save(keystorePassword);
+      // generate the keystore for the user
       KeystoreHolder keystoreHolder = new KeystoreHolder();
       try {
         // create the keystore if it doesnt exist yet
@@ -309,7 +330,7 @@ import java.util.UUID;
       } catch (Exception e) {
         throw new IllegalStateException("could not create keystore for user " + email);
       }
-      //keystoreHolder = keystoreHolderRepository.save(keystoreHolder);
+      // keystoreHolder = keystoreHolderRepository.save(keystoreHolder);
       user.setKeystorePasswordHolder(keystorePassword);
       user.setKeystoreHolder(keystoreHolder);
       save(user);

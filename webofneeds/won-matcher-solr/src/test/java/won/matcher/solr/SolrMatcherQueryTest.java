@@ -28,13 +28,15 @@ public class SolrMatcherQueryTest {
     AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(SolrTestAppConfiguration.class);
 
     HintBuilder hintBuilder = ctx.getBean(HintBuilder.class);
-    //DefaultMatcherQueryExecuter queryExecutor = ctx.getBean(DefaultMatcherQueryExecuter.class);
+    // DefaultMatcherQueryExecuter queryExecutor =
+    // ctx.getBean(DefaultMatcherQueryExecuter.class);
     TestMatcherQueryExecutor queryExecutor = ctx.getBean(TestMatcherQueryExecutor.class);
 
-    // set the options of the need producer (e.g. if it should exhaust) in the SolrNeedIndexerAppConfiguration file
+    // set the options of the need producer (e.g. if it should exhaust) in the
+    // SolrNeedIndexerAppConfiguration file
     NeedProducer needProducer = ctx.getBean(RoundRobinCompositeNeedProducer.class);
 
-    while (!needProducer.isExhausted()) { //&& needs < 20) {
+    while (!needProducer.isExhausted()) { // && needs < 20) {
 
       Dataset ds = needProducer.create();
 
@@ -45,13 +47,11 @@ public class SolrMatcherQueryTest {
         String query = needQuery.createQuery();
         System.out.println("execute query: " + query);
 
-        SolrDocumentList docs = queryExecutor
-            .executeNeedQuery(query, 20, null, new BasicNeedQueryFactory(ds).createQuery());
+        SolrDocumentList docs = queryExecutor.executeNeedQuery(query, 20, null,
+            new BasicNeedQueryFactory(ds).createQuery());
         SolrDocumentList matchedDocs = hintBuilder.calculateMatchingResults(docs);
-        System.out.println(
-            "Found docs: " + ((docs != null) ? docs.size() : 0) + ", keep docs: " + ((matchedDocs != null) ?
-                matchedDocs.size() :
-                0));
+        System.out.println("Found docs: " + ((docs != null) ? docs.size() : 0) + ", keep docs: "
+            + ((matchedDocs != null) ? matchedDocs.size() : 0));
         if (docs == null) {
           continue;
         }

@@ -31,8 +31,9 @@ import won.protocol.model.Match;
 import won.protocol.util.RdfUtils;
 
 /**
- * Maps incoming messages from the WonMessageProcessor interface to the WonEventCallback interface.
- * Outgoing messages sent by calling the adaptee's send(msg) method are delegated to the
+ * Maps incoming messages from the WonMessageProcessor interface to the
+ * WonEventCallback interface. Outgoing messages sent by calling the adaptee's
+ * send(msg) method are delegated to the
  */
 public abstract class OwnerCallbackAdapter implements WonMessageProcessor {
   private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -46,8 +47,8 @@ public abstract class OwnerCallbackAdapter implements WonMessageProcessor {
   }
 
   /**
-   * Creates a connection object representing the connection on which the message was
-   * received.
+   * Creates a connection object representing the connection on which the message
+   * was received.
    *
    * @param wonMessage
    * @return
@@ -62,7 +63,8 @@ public abstract class OwnerCallbackAdapter implements WonMessageProcessor {
    */
   protected abstract Match makeMatch(final WonMessage wonMessage);
 
-  @Override public WonMessage process(final WonMessage message) throws WonMessageProcessingException {
+  @Override
+  public WonMessage process(final WonMessage message) throws WonMessageProcessingException {
     assert adaptee != null : "adaptee is not set";
     logger.debug("processing message {} and calling appropriate method on adaptee", message.getMessageURI());
     WonMessageType messageType = message.getMessageType();
@@ -83,7 +85,7 @@ public abstract class OwnerCallbackAdapter implements WonMessageProcessor {
       adaptee.onCloseFromOtherNeed(makeConnection(message), message);
       break;
     case SUCCESS_RESPONSE:
-      //logger.info("Not handling successResponse for message {}", message);
+      // logger.info("Not handling successResponse for message {}", message);
       adaptee.onSuccessResponse(message.getIsResponseToMessageURI(), message);
       break;
     case FAILURE_RESPONSE:
@@ -98,11 +100,13 @@ public abstract class OwnerCallbackAdapter implements WonMessageProcessor {
         logger.debug("message: {}", RdfUtils.writeDatasetToString(message.getCompleteDataset(), Lang.TRIG));
       }
     }
-    //return the message for further processing
+    // return the message for further processing
     return message;
   }
 
-  @Autowired(required = false) @Qualifier("default") public void setAdaptee(OwnerCallback adaptee) {
+  @Autowired(required = false)
+  @Qualifier("default")
+  public void setAdaptee(OwnerCallback adaptee) {
     this.adaptee = adaptee;
   }
 }

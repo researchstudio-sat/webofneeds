@@ -32,20 +32,21 @@ import java.net.URI;
 import java.util.Random;
 
 /**
- * User: fkleedorfer
- * Date: 30.01.14
+ * User: fkleedorfer Date: 30.01.14
  */
 public class SendFeedbackForHintAction extends BaseEventBotAction {
-  //random number generator needed for random feedback value
+  // random number generator needed for random feedback value
   Random random = new Random(System.currentTimeMillis());
 
   public SendFeedbackForHintAction(final EventListenerContext context) {
     super(context);
   }
 
-  @Override public void doRun(final Event event, EventListener executingListener) throws Exception {
+  @Override
+  public void doRun(final Event event, EventListener executingListener) throws Exception {
     if (event instanceof HintFromMatcherEvent) {
-      //TODO: the hint with a match object is not really suitable here. Would be better to
+      // TODO: the hint with a match object is not really suitable here. Would be
+      // better to
       // use connection object instead
       HintFromMatcherEvent hintEvent = (HintFromMatcherEvent) event;
       hintEvent.getWonMessage().getReceiverURI();
@@ -66,9 +67,8 @@ public class SendFeedbackForHintAction extends BaseEventBotAction {
     URI localNeed = WonRdfUtils.ConnectionUtils.getLocalNeedURIFromConnection(connectionRDF, connectionURI);
     URI wonNode = WonRdfUtils.ConnectionUtils.getWonNodeURIFromConnection(connectionRDF, connectionURI);
 
-    return WonMessageBuilder
-        .setMessagePropertiesForHintFeedback(wonNodeInformationService.generateEventURI(wonNode), connectionURI,
-            localNeed, wonNode, booleanFeedbackValue).build();
+    return WonMessageBuilder.setMessagePropertiesForHintFeedback(wonNodeInformationService.generateEventURI(wonNode),
+        connectionURI, localNeed, wonNode, booleanFeedbackValue).build();
   }
 
 }

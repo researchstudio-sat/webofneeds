@@ -22,23 +22,29 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * T
- * User: gabriel
- * Date: 06/11/13
+ * T User: gabriel Date: 06/11/13
  */
 public class DataAccessServiceImpl implements won.node.service.DataAccessService {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
   private URIService URIService;
 
-  @Autowired private NeedRepository needRepository;
-  @Autowired private ConnectionRepository connectionRepository;
-  @Autowired private FacetRepository facetRepository;
-  @Autowired private WonNodeInformationService wonNodeInformationService;
-  @Autowired protected ConnectionContainerRepository connectionContainerRepository;
-  @Autowired protected NeedEventContainerRepository needEventContainerRepository;
-  @Autowired protected ConnectionEventContainerRepository connectionEventContainerRepository;
-  @Autowired protected DatasetHolderRepository datasetHolderRepository;
+  @Autowired
+  private NeedRepository needRepository;
+  @Autowired
+  private ConnectionRepository connectionRepository;
+  @Autowired
+  private FacetRepository facetRepository;
+  @Autowired
+  private WonNodeInformationService wonNodeInformationService;
+  @Autowired
+  protected ConnectionContainerRepository connectionContainerRepository;
+  @Autowired
+  protected NeedEventContainerRepository needEventContainerRepository;
+  @Autowired
+  protected ConnectionEventContainerRepository connectionEventContainerRepository;
+  @Autowired
+  protected DatasetHolderRepository datasetHolderRepository;
 
   /**
    * Creates a new Connection object.
@@ -73,17 +79,17 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
     if (facetTypeURI == null)
       throw new IllegalArgumentException("facetTypeURI is not set");
 
-    //Load need (throws exception if not found)
+    // Load need (throws exception if not found)
     Need need = DataAccessUtils.loadNeed(needRepository, needURI);
     if (!isNeedActive(need))
       throw new IllegalMessageForNeedStateException(needURI, connectionEventType.name(), need.getState());
 
-    //TODO: create a proper exception if a facet is not supported by a need
+    // TODO: create a proper exception if a facet is not supported by a need
     if (facetRepository.findByNeedURIAndTypeURI(needURI, facetTypeURI).isEmpty())
       throw new RuntimeException("Facet '" + facetTypeURI + "' is not supported by Need: '" + needURI + "'");
-  /* Create connection */
+    /* Create connection */
     Connection con = new Connection();
-    //create and set new uri
+    // create and set new uri
     con.setConnectionURI(connectionURI);
     con.setNeedURI(needURI);
     con.setState(connectionState);
@@ -100,17 +106,19 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
       con = connectionRepository.save(con);
       connectionEventContainerRepository.save(connectionEventContainer);
     } catch (Exception e) {
-      //we assume the unique key constraint on needURI, remoteNeedURI, typeURI was violated: we have to perform an
+      // we assume the unique key constraint on needURI, remoteNeedURI, typeURI was
+      // violated: we have to perform an
       // update, not an insert
-      logger.warn("caught exception, assuming unique key constraint on needURI, remoteNeedURI, typeURI was violated" +
-          ". Throwing a ConnectionAlreadyExistsException. TODO: think about handling this exception " +
-          "separately", e);
+      logger.warn("caught exception, assuming unique key constraint on needURI, remoteNeedURI, typeURI was violated"
+          + ". Throwing a ConnectionAlreadyExistsException. TODO: think about handling this exception " + "separately",
+          e);
       throw new ConnectionAlreadyExistsException(con.getConnectionURI(), needURI, otherNeedURI);
     }
     return con;
   }
 
-  @Override public Optional<Facet> getDefaultFacet(URI needUri) throws NoSuchNeedException {
+  @Override
+  public Optional<Facet> getDefaultFacet(URI needUri) throws NoSuchNeedException {
     List<Facet> facets = facetRepository.findByNeedURI(needUri);
     for (Facet facet : facets) {
       if (facet.isDefaultFacet())
@@ -129,57 +137,62 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
 
   }
 
-  @Override public Connection getConnection(List<Connection> connections, URI facetURI, ConnectionEventType eventType)
+  @Override
+  public Connection getConnection(List<Connection> connections, URI facetURI, ConnectionEventType eventType)
       throws ConnectionAlreadyExistsException {
     Connection con = null;
     for (Connection c : connections) {
-      //TODO: check remote need type as well
+      // TODO: check remote need type as well
       if (facetURI.equals(c.getTypeURI()))
         con = c;
     }
     return con;
   }
 
-  @Override public Connection nextConnectionState(URI connectionURI, ConnectionEventType connectionEventType)
+  @Override
+  public Connection nextConnectionState(URI connectionURI, ConnectionEventType connectionEventType)
       throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     if (connectionURI == null)
       throw new IllegalArgumentException("connectionURI is not set");
-    //load connection, checking if it exists
+    // load connection, checking if it exists
     Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
-    //perform state transit
+    // perform state transit
     ConnectionState nextState = performStateTransit(con, connectionEventType);
-    //set new state and save in the db
+    // set new state and save in the db
     con.setState(nextState);
-    //save in the db
+    // save in the db
     return connectionRepository.save(con);
   }
 
-  @Override public Connection nextConnectionState(Connection con, ConnectionEventType connectionEventType)
+  @Override
+  public Connection nextConnectionState(Connection con, ConnectionEventType connectionEventType)
       throws IllegalMessageForConnectionStateException {
-    //perform state transit
+    // perform state transit
     ConnectionState nextState = performStateTransit(con, connectionEventType);
-    //set new state and save in the db
+    // set new state and save in the db
     con.setState(nextState);
-    //save in the db
+    // save in the db
     return connectionRepository.save(con);
   }
 
   /**
-   * Adds feedback, represented by the subgraph reachable from feedback, to the RDF description of the
-   * item identified by forResource
+   * Adds feedback, represented by the subgraph reachable from feedback, to the
+   * RDF description of the item identified by forResource
    *
    * @param connection
    * @param feedback
    * @return true if feedback could be added false otherwise
    */
-  @Override public boolean addFeedback(final Connection connection, final Resource feedback) {
-    //TODO: concurrent modifications to the model for this resource result in side-effects.
-    //think about locking.
+  @Override
+  public boolean addFeedback(final Connection connection, final Resource feedback) {
+    // TODO: concurrent modifications to the model for this resource result in
+    // side-effects.
+    // think about locking.
     logger.debug("adding feedback to resource {}", connection);
     DatasetHolder datasetHolder = connection.getDatasetHolder();
     Dataset dataset = null;
     if (datasetHolder == null) {
-      //if no dataset is found, we create one.
+      // if no dataset is found, we create one.
       dataset = DatasetFactory.create();
       datasetHolder = new DatasetHolder(connection.getConnectionURI(), dataset);
       connection.setDatasetHolder(datasetHolder);
@@ -204,7 +217,8 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
     return true;
   }
 
-  @Override public void updateRemoteConnectionURI(Connection con, URI remoteConnectionURI) {
+  @Override
+  public void updateRemoteConnectionURI(Connection con, URI remoteConnectionURI) {
     if (logger.isDebugEnabled()) {
       logger.debug("updating remote connection URI of con {} to {}", con, remoteConnectionURI);
     }
@@ -217,13 +231,15 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
   }
 
   /**
-   * Calculates the ATConnectionState resulting from the message in the current connection state.
-   * Checks if the specified message is allowed in the connection's state and throws an exception if not.
+   * Calculates the ATConnectionState resulting from the message in the current
+   * connection state. Checks if the specified message is allowed in the
+   * connection's state and throws an exception if not.
    *
    * @param con
    * @param msg
    * @return
-   * @throws won.protocol.exception.IllegalMessageForConnectionStateException if the message is not allowed in the connection's current state
+   * @throws won.protocol.exception.IllegalMessageForConnectionStateException if
+   *         the message is not allowed in the connection's current state
    */
   private ConnectionState performStateTransit(Connection con, ConnectionEventType msg)
       throws IllegalMessageForConnectionStateException {
@@ -233,7 +249,8 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
     return con.getState().transit(msg);
   }
 
-  @Override public void setURIService(URIService URIService) {
+  @Override
+  public void setURIService(URIService URIService) {
     this.URIService = URIService;
   }
 

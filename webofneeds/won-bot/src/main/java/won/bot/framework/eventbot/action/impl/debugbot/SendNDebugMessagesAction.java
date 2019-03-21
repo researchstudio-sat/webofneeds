@@ -45,7 +45,8 @@ public class SendNDebugMessagesAction extends BaseEventBotAction {
     this.messages = messages;
   }
 
-  @Override protected void doRun(final Event event, EventListener executingListener) throws Exception {
+  @Override
+  protected void doRun(final Event event, EventListener executingListener) throws Exception {
     int n = this.messages.length;
     if (event instanceof SendNDebugCommandEvent) {
       SendNDebugCommandEvent sendNDebugCommandEvent = (SendNDebugCommandEvent) event;
@@ -55,15 +56,16 @@ public class SendNDebugMessagesAction extends BaseEventBotAction {
       for (int i = 0; i < n; i++) {
         delay += delayBetweenMessages;
         String messageText = this.messages[i];
-        getEventListenerContext().getTaskScheduler()
-            .schedule(createMessageTask(connUri, messageText), new Date(System.currentTimeMillis() + delay));
+        getEventListenerContext().getTaskScheduler().schedule(createMessageTask(connUri, messageText),
+            new Date(System.currentTimeMillis() + delay));
       }
     }
   }
 
   private Runnable createMessageTask(final URI connectionURI, final String messageText) {
     return new Runnable() {
-      @Override public void run() {
+      @Override
+      public void run() {
         getEventListenerContext().getWonMessageSender().sendWonMessage(createWonMessage(connectionURI, messageText));
       }
     };

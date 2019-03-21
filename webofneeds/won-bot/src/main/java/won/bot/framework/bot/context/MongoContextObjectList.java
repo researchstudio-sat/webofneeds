@@ -9,7 +9,8 @@ import java.util.List;
  * Created by hfriedrich on 21.11.2016.
  */
 public class MongoContextObjectList {
-  @Id private String id;
+  @Id
+  private String id;
 
   private List<Object> objectList;
 

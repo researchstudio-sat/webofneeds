@@ -21,7 +21,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
 /**
- * SpringTransactionPolicy implementation that allows for setting the isolation behaviour name.
+ * SpringTransactionPolicy implementation that allows for setting the isolation
+ * behaviour name.
  */
 public class SpringTransactionPolicyWithCustomIsolation extends SpringTransactionPolicy {
 
@@ -42,7 +43,8 @@ public class SpringTransactionPolicyWithCustomIsolation extends SpringTransactio
     this.isolationLevelName = isolationLevelName;
   }
 
-  @Override public TransactionTemplate getTransactionTemplate() {
+  @Override
+  public TransactionTemplate getTransactionTemplate() {
     TransactionTemplate answer = super.getTransactionTemplate();
     if (this.isolationLevelName != null) {
       answer.setIsolationLevelName(this.isolationLevelName);

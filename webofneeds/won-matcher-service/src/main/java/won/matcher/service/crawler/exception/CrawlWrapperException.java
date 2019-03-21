@@ -3,10 +3,10 @@ package won.matcher.service.crawler.exception;
 import won.matcher.service.crawler.msg.CrawlUriMessage;
 
 /**
- * Used to wrap an exception occurred during crawling to pass the breaking message additionally.
+ * Used to wrap an exception occurred during crawling to pass the breaking
+ * message additionally.
  * <p>
- * User: hfriedrich
- * Date: 15.04.2015
+ * User: hfriedrich Date: 15.04.2015
  */
 public class CrawlWrapperException extends RuntimeException {
   private Exception exception;

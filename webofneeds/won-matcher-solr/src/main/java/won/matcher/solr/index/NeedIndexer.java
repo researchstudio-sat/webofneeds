@@ -29,7 +29,9 @@ import java.util.Map;
 /**
  * Created by hfriedrich on 03.08.2016.
  */
-@Component @Scope("prototype") public class NeedIndexer {
+@Component
+@Scope("prototype")
+public class NeedIndexer {
 
   private final Logger log = LoggerFactory.getLogger(getClass());
 
@@ -37,14 +39,16 @@ import java.util.Map;
   public static final String SOLR_SEEKS_LOCATION_COORDINATES_FIELD = "seeks_need_location";
   public static final String SOLR_SEEKS_SEEKS_LOCATION_COORDINATES_FIELD = "seeksSeeks_need_location";
 
-  // SPARQL query to contruct a need object out of the dataset, use all graphs that reference "won:Need"
-  private static final String NEED_INDEX_QUERY =
-      "prefix won: <http://purl.org/webofneeds/model#> construct { ?a ?b ?c .} where { "
-          + "GRAPH ?graph { ?need a won:Need. ?a ?b ?c. } }";
+  // SPARQL query to contruct a need object out of the dataset, use all graphs
+  // that reference "won:Need"
+  private static final String NEED_INDEX_QUERY = "prefix won: <http://purl.org/webofneeds/model#> construct { ?a ?b ?c .} where { "
+      + "GRAPH ?graph { ?need a won:Need. ?a ?b ?c. } }";
 
-  @Autowired private SolrMatcherConfig config;
+  @Autowired
+  private SolrMatcherConfig config;
 
-  @Autowired private HttpService httpService;
+  @Autowired
+  private HttpService httpService;
 
   public void index(Dataset dataset) throws IOException, JsonLdError {
 
@@ -75,7 +79,8 @@ import java.util.Map;
     JsonLdOptions options = new JsonLdOptions();
     Map<String, Object> framed = JsonLdProcessor.frame(jsonObject, frame, options);
 
-    // add the uri of the need as id field to avoid multiple adding of needs but instead allow updates
+    // add the uri of the need as id field to avoid multiple adding of needs but
+    // instead allow updates
     framed.put("id", id);
 
     // add latitude and longitude values in one field for Solr spatial queries

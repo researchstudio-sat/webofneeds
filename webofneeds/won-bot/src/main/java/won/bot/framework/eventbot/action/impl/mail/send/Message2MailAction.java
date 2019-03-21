@@ -29,7 +29,8 @@ public class Message2MailAction extends BaseEventBotAction {
     this.mailGenerator = mailGenerator;
   }
 
-  @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
+  @Override
+  protected void doRun(Event event, EventListener executingListener) throws Exception {
     EventListenerContext ctx = getEventListenerContext();
     if (event instanceof MessageFromOtherNeedEvent && ctx.getBotContextWrapper() instanceof MailBotContextWrapper) {
       MailBotContextWrapper botContextWrapper = (MailBotContextWrapper) ctx.getBotContextWrapper();
@@ -39,12 +40,11 @@ public class Message2MailAction extends BaseEventBotAction {
       URI remoteNeedUri = con.getRemoteNeedURI();
 
       MimeMessage originalMail = botContextWrapper.getMimeMessageForURI(responseTo);
-      logger.debug(
-          "Someone sent a message for URI: " + responseTo + " sending a mail to the creator: " + MailContentExtractor
-              .getFromAddressString(originalMail));
+      logger.debug("Someone sent a message for URI: " + responseTo + " sending a mail to the creator: "
+          + MailContentExtractor.getFromAddressString(originalMail));
 
-      WonMimeMessage answerMessage = mailGenerator
-          .createMessageMail(originalMail, responseTo, remoteNeedUri, con.getConnectionURI());
+      WonMimeMessage answerMessage = mailGenerator.createMessageMail(originalMail, responseTo, remoteNeedUri,
+          con.getConnectionURI());
       botContextWrapper.addMailIdWonURIRelation(answerMessage.getMessageID(),
           new WonURI(con.getConnectionURI(), UriType.CONNECTION));
 

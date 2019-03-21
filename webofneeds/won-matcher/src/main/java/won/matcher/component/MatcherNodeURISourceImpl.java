@@ -24,14 +24,14 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * User: LEIH-NB
- * Date: 11.04.14
+ * User: LEIH-NB Date: 11.04.14
  */
 public class MatcherNodeURISourceImpl implements MatcherNodeURISource {
   private final Logger logger = LoggerFactory.getLogger(getClass());
   private List<URI> nodeURIs = null;
 
-  @Override public Iterator getNodeURIIterator() {
+  @Override
+  public Iterator getNodeURIIterator() {
     return this.nodeURIs.iterator();
   }
 

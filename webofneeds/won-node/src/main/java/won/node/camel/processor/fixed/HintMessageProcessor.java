@@ -23,15 +23,17 @@ import java.net.URI;
 import java.util.Optional;
 
 /**
- * User: syim
- * Date: 02.03.2015
+ * User: syim Date: 02.03.2015
  */
-@Component @FixedMessageProcessor(direction = WONMSG.TYPE_FROM_EXTERNAL_STRING, messageType = WONMSG.TYPE_HINT_STRING) public class HintMessageProcessor
-    extends AbstractCamelProcessor {
+@Component
+@FixedMessageProcessor(direction = WONMSG.TYPE_FROM_EXTERNAL_STRING, messageType = WONMSG.TYPE_HINT_STRING)
+public class HintMessageProcessor extends AbstractCamelProcessor {
 
-  @Autowired private ConnectionRepository connectionRepository;
+  @Autowired
+  private ConnectionRepository connectionRepository;
 
-  @Value("${ignore.hints.suggested.connection.count.max}") private Long maxSuggestedConnectionCount = 100L;
+  @Value("${ignore.hints.suggested.connection.count.max}")
+  private Long maxSuggestedConnectionCount = 100L;
 
   public void process(Exchange exchange) throws Exception {
     Message message = exchange.getIn();
@@ -46,9 +48,8 @@ import java.util.Optional;
     }
 
     URI wonNodeFromWonMessage = wonMessage.getReceiverNodeURI();
-    URI otherNeedURIFromWonMessage = URI.create(RdfUtils
-        .findOnePropertyFromResource(wonMessage.getMessageContent(), wonMessage.getMessageURI(),
-            WON.HAS_MATCH_COUNTERPART).asResource().getURI());
+    URI otherNeedURIFromWonMessage = URI.create(RdfUtils.findOnePropertyFromResource(wonMessage.getMessageContent(),
+        wonMessage.getMessageURI(), WON.HAS_MATCH_COUNTERPART).asResource().getURI());
 
     double wmScore = RdfUtils
         .findOnePropertyFromResource(wonMessage.getMessageContent(), wonMessage.getMessageURI(), WON.HAS_MATCH_SCORE)
@@ -59,33 +60,30 @@ import java.util.Optional;
     if (wmOriginator == null)
       throw new IllegalArgumentException("originator is not set");
 
-    //facet: either specified or default
+    // facet: either specified or default
     URI facetURI = WonRdfUtils.FacetUtils.getFacet(wonMessage);
-    //remote facet: either specified or null
+    // remote facet: either specified or null
     Optional<URI> remoteFacetURI = Optional.ofNullable(WonRdfUtils.FacetUtils.getRemoteFacet(wonMessage));
-    Facet facet = dataService
-        .getFacet(needURIFromWonMessage, facetURI == null ? Optional.empty() : Optional.of(facetURI));
+    Facet facet = dataService.getFacet(needURIFromWonMessage,
+        facetURI == null ? Optional.empty() : Optional.of(facetURI));
 
-    //create Connection in Database
+    // create Connection in Database
     Optional<Connection> con = Optional.empty();
     if (remoteFacetURI.isPresent()) {
-      con = connectionRepository
-          .findOneByNeedURIAndRemoteNeedURIAndFacetURIAndRemoteFacetURIForUpdate(needURIFromWonMessage,
-              otherNeedURIFromWonMessage, facet.getFacetURI(), remoteFacetURI.get());
+      con = connectionRepository.findOneByNeedURIAndRemoteNeedURIAndFacetURIAndRemoteFacetURIForUpdate(
+          needURIFromWonMessage, otherNeedURIFromWonMessage, facet.getFacetURI(), remoteFacetURI.get());
     } else {
-      con = connectionRepository
-          .findOneByNeedURIAndRemoteNeedURIAndFacetURIAndNullRemoteFacetForUpdate(needURIFromWonMessage,
-              otherNeedURIFromWonMessage, facet.getFacetURI());
+      con = connectionRepository.findOneByNeedURIAndRemoteNeedURIAndFacetURIAndNullRemoteFacetForUpdate(
+          needURIFromWonMessage, otherNeedURIFromWonMessage, facet.getFacetURI());
     }
     if (!con.isPresent()) {
       URI connectionUri = wonNodeInformationService.generateConnectionURI(wonNodeFromWonMessage);
-      con = Optional.of(dataService
-          .createConnection(connectionUri, needURIFromWonMessage, otherNeedURIFromWonMessage, null, facet.getFacetURI(),
-              facet.getTypeURI(), remoteFacetURI.orElse(null), ConnectionState.SUGGESTED,
-              ConnectionEventType.MATCHER_HINT));
+      con = Optional.of(dataService.createConnection(connectionUri, needURIFromWonMessage, otherNeedURIFromWonMessage,
+          null, facet.getFacetURI(), facet.getTypeURI(), remoteFacetURI.orElse(null), ConnectionState.SUGGESTED,
+          ConnectionEventType.MATCHER_HINT));
     }
-    //build message to send to owner, put in header
-    //set the receiver to the newly generated connection uri
+    // build message to send to owner, put in header
+    // set the receiver to the newly generated connection uri
     wonMessage.addMessageProperty(WONMSG.RECEIVER_PROPERTY, con.get().getConnectionURI());
   }
 

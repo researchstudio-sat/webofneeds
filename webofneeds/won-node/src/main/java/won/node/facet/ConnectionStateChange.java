@@ -21,8 +21,8 @@ public class ConnectionStateChange {
   }
 
   /**
-   * Creates a ConnectionStatChange object for situations in which the connection is new and there is no
-   * prior state.
+   * Creates a ConnectionStatChange object for situations in which the connection
+   * is new and there is no prior state.
    */
   public ConnectionStateChange(ConnectionState newState) {
     super();

@@ -33,11 +33,13 @@ import java.io.StringWriter;
 import java.net.URI;
 
 /**
- * Sends a error response message back to the sender of the original message, if that message was sent on
- * behalf of a specified need (i.e. its senderNeedURI is set).
+ * Sends a error response message back to the sender of the original message, if
+ * that message was sent on behalf of a specified need (i.e. its senderNeedURI
+ * is set).
  */
 public class FailResponder extends AbstractCamelProcessor {
-  @Override public void process(final Exchange exchange) throws Exception {
+  @Override
+  public void process(final Exchange exchange) throws Exception {
     Exception exception = null;
     WonMessage originalMessage = null;
     try {
@@ -49,8 +51,8 @@ public class FailResponder extends AbstractCamelProcessor {
         originalMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
       }
       if (originalMessage == null) {
-        //we didn't find the original message, so we can't send a response.
-        //Log all we can so that we can start debugging the problem
+        // we didn't find the original message, so we can't send a response.
+        // Log all we can so that we can start debugging the problem
         logger.warn("Could not obtain original message from camel headers {} or {} for error {}",
             new Object[] { WonCamelConstants.ORIGINAL_MESSAGE_HEADER, WonCamelConstants.MESSAGE_HEADER,
                 exchange.getProperty(Exchange.EXCEPTION_CAUGHT) });
@@ -65,8 +67,9 @@ public class FailResponder extends AbstractCamelProcessor {
         errormessage = String.format("An error occurred while processing message %s", originalMessage.getMessageURI());
       }
       if (originalMessage.getMessageType() == WonMessageType.HINT_MESSAGE) {
-        //we don't want to send a FailureResponse for a hint message as matchers
-        //are not fully compatible messaging agents (needs), so sending this message will fail.
+        // we don't want to send a FailureResponse for a hint message as matchers
+        // are not fully compatible messaging agents (needs), so sending this message
+        // will fail.
         logger.debug("suppressing failure response for HINT message", exception);
         return;
       }
@@ -80,8 +83,9 @@ public class FailResponder extends AbstractCamelProcessor {
 
       if (WonMessageType.FAILURE_RESPONSE == originalMessage.getMessageType()
           && WonMessageType.FAILURE_RESPONSE == originalMessage.getIsResponseToMessageType()) {
-        //do not throw failures back and forth. If the original message is already a failure message
-        //that indicates a problem processing a failure message, log this and stop.
+        // do not throw failures back and forth. If the original message is already a
+        // failure message
+        // that indicates a problem processing a failure message, log this and stop.
         logger.info("Encountered an error processing a FailureResponse for a FailureResponse. The FailureResponse is "
             + "logged at log level DEBUG. Its message URI is {}", originalMessage.getMessageURI(), exception);
 
@@ -104,14 +108,15 @@ public class FailResponder extends AbstractCamelProcessor {
       } else if (WonMessageDirection.FROM_EXTERNAL == originalMessage.getEnvelopeType()) {
         sendSystemMessage(responseMessage);
       } else {
-        logger.info(String.format("cannot route failure message for direction of original message, "
+        logger.info(String.format(
+            "cannot route failure message for direction of original message, "
                 + "expected FROM_OWNER or FROM_EXTERNAL, but found %s. Original cause is logged on log level DEBUG.",
             originalMessage.getEnvelopeType()));
         logger.debug("original cause", exception);
       }
     } catch (Throwable t) {
-      //something went wrong - we can't inform the sender of the message.
-      //now:
+      // something went wrong - we can't inform the sender of the message.
+      // now:
       // 1. log the error we had here
       // 2. log the original error, otherwise it is swallowed completely
       logger.warn("Error in failure response handling!");

@@ -23,8 +23,7 @@ import won.bot.framework.eventbot.filter.EventFilter;
 import won.bot.framework.eventbot.listener.AbstractHandleFirstNEventsListener;
 
 /**
- * User: fkleedorfer
- * Date: 06.04.14
+ * User: fkleedorfer Date: 06.04.14
  */
 public class ActionOnFirstNEventsListener extends AbstractHandleFirstNEventsListener {
   private EventBotAction action;
@@ -53,11 +52,13 @@ public class ActionOnFirstNEventsListener extends AbstractHandleFirstNEventsList
     this.action = action;
   }
 
-  @Override protected void unsubscribe() {
+  @Override
+  protected void unsubscribe() {
     getEventListenerContext().getEventBus().unsubscribe(this);
   }
 
-  @Override protected void handleFirstNTimes(final Event event) throws Exception {
+  @Override
+  protected void handleFirstNTimes(final Event event) throws Exception {
     getEventListenerContext().getExecutor().execute(action.getActionTask(event, this));
   }
 }

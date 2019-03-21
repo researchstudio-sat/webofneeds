@@ -32,24 +32,24 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * Created with IntelliJ IDEA.
- * User: Gabriel
- * Date: 03.12.12
- * Time: 14:12
+ * Created with IntelliJ IDEA. User: Gabriel Date: 03.12.12 Time: 14:12
  */
 //TODO copied from OwnerProtocolOwnerService... refactoring needed
 //TODO: refactor service interfaces.
-public class MatcherProtocolMatcherServiceImplJMSBased {//implements MatcherProtocolMatcherService {
+public class MatcherProtocolMatcherServiceImplJMSBased {// implements MatcherProtocolMatcherService {
 
   final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Autowired private MatcherNodeURISource matcherNodeURISource;
+  @Autowired
+  private MatcherNodeURISource matcherNodeURISource;
 
-  @Autowired MatcherProtocolMatcherService delegate;
+  @Autowired
+  MatcherProtocolMatcherService delegate;
 
   private MatcherProtocolCommunicationServiceImpl matcherProtocolCommunicationService;
 
-  //TODO: [msg-refactoring] process only WonMessage, don't send additional headers
+  // TODO: [msg-refactoring] process only WonMessage, don't send additional
+  // headers
 
   public void needCreated(@Header("wonNodeURI") final String wonNodeURI, @Header("needURI") final String needURI,
       @Body final String content) {
@@ -86,7 +86,8 @@ public class MatcherProtocolMatcherServiceImplJMSBased {//implements MatcherProt
     logger.debug("registering owner application on application event");
     try {
       new Thread() {
-        @Override public void run() {
+        @Override
+        public void run() {
           Iterator iter = matcherNodeURISource.getNodeURIIterator();
           while (iter.hasNext()) {
             URI wonNodeUri = (URI) iter.next();

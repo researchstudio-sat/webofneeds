@@ -26,14 +26,16 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * NodeUriSource that is given a list of URIs and returns each element in a round robin fashion.
+ * NodeUriSource that is given a list of URIs and returns each element in a
+ * round robin fashion.
  */
 public class RoundRobinMultiNodeUriSource implements NodeURISource {
   private final Logger logger = LoggerFactory.getLogger(getClass());
   private List<URI> nodeURIs = null;
   private int lastIndex = -1;
 
-  @Override public URI getNodeURI() {
+  @Override
+  public URI getNodeURI() {
     if (this.nodeURIs == null || this.nodeURIs.isEmpty())
       return null;
     int index = lastIndex + 1;

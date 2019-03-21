@@ -40,8 +40,9 @@ import java.util.Collection;
 /**
  * user: MS 01.12.2018
  */
-@Component @FixedMessageProcessor(direction = WONMSG.TYPE_FROM_OWNER_STRING, messageType = WONMSG.TYPE_DELETE_STRING) public class DeleteNeedMessageFromOwnerReactionProcessor
-    extends AbstractCamelProcessor {
+@Component
+@FixedMessageProcessor(direction = WONMSG.TYPE_FROM_OWNER_STRING, messageType = WONMSG.TYPE_DELETE_STRING)
+public class DeleteNeedMessageFromOwnerReactionProcessor extends AbstractCamelProcessor {
   Logger logger = LoggerFactory.getLogger(this.getClass());
 
   public void process(final Exchange exchange) throws Exception {
@@ -56,16 +57,16 @@ import java.util.Collection;
 
     // Check if need already in State DELETED
     if (need.getState() == NeedState.DELETED) {
-      //Get all connections of this need
+      // Get all connections of this need
       Collection<Connection> conns = connectionRepository
           .getConnectionsByNeedURIAndNotInStateForUpdate(need.getNeedURI(), ConnectionState.DELETED);
       for (Connection con : conns) {
-        //Delete all connection data
+        // Delete all connection data
         messageEventRepository.deleteByParentURI(con.getConnectionURI());
         connectionRepository.delete(con);
       }
     } else {
-      //Get only not closed connections of this need to close them
+      // Get only not closed connections of this need to close them
       Collection<Connection> conns = connectionRepository
           .getConnectionsByNeedURIAndNotInStateForUpdate(need.getNeedURI(), ConnectionState.CLOSED);
       // Close open connections
@@ -81,10 +82,9 @@ import java.util.Collection;
     // the close message is directed at our local connection. It will
     // be routed to the owner and forwarded to to remote connection
     URI messageURI = wonNodeInformationService.generateEventURI();
-    WonMessage message = WonMessageBuilder
-        .setMessagePropertiesForClose(messageURI, WonMessageDirection.FROM_SYSTEM, con.getConnectionURI(),
-            con.getNeedURI(), need.getWonNodeURI(), con.getConnectionURI(), con.getNeedURI(), need.getWonNodeURI(),
-            "Closed because Need was deleted").build();
+    WonMessage message = WonMessageBuilder.setMessagePropertiesForClose(messageURI, WonMessageDirection.FROM_SYSTEM,
+        con.getConnectionURI(), con.getNeedURI(), need.getWonNodeURI(), con.getConnectionURI(), con.getNeedURI(),
+        need.getWonNodeURI(), "Closed because Need was deleted").build();
 
     sendSystemMessage(message);
 

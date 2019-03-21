@@ -24,7 +24,8 @@ import won.protocol.model.Connection;
 import java.net.URI;
 
 /**
- * Indicates that the bot has successfully sent a connect message, thereby creating a connection.
+ * Indicates that the bot has successfully sent a connect message, thereby
+ * creating a connection.
  */
 public class OpenCommandSuccessEvent extends AbstractMessageCommandResultEvent
     implements MessageCommandSuccessEvent, OpenCommandResultEvent {
@@ -46,7 +47,8 @@ public class OpenCommandSuccessEvent extends AbstractMessageCommandResultEvent
     super(originalCommandEvent, con, message);
   }
 
-  @Override public boolean isSuccess() {
+  @Override
+  public boolean isSuccess() {
     return true;
   }
 }

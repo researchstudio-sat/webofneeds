@@ -38,12 +38,13 @@ public class TelegramMessageReceivedAction extends BaseEventBotAction {
     this.telegramContentExtractor = telegramContentExtractor;
   }
 
-  @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
+  @Override
+  protected void doRun(Event event, EventListener executingListener) throws Exception {
     EventBus bus = getEventListenerContext().getEventBus();
     EventListenerContext ctx = getEventListenerContext();
 
-    if (event instanceof TelegramMessageReceivedEvent && ctx
-        .getBotContextWrapper() instanceof TelegramBotContextWrapper) {
+    if (event instanceof TelegramMessageReceivedEvent
+        && ctx.getBotContextWrapper() instanceof TelegramBotContextWrapper) {
       TelegramBotContextWrapper botContextWrapper = (TelegramBotContextWrapper) ctx.getBotContextWrapper();
 
       Update update = ((TelegramMessageReceivedEvent) event).getUpdate();
@@ -64,20 +65,20 @@ public class TelegramMessageReceivedAction extends BaseEventBotAction {
         case NEED:
           break;
         case CONNECTION:
-          if ("0".equals(data)) { //CLOSE CONNECTION
+          if ("0".equals(data)) { // CLOSE CONNECTION
             Dataset connectionRDF = getEventListenerContext().getLinkedDataSource()
                 .getDataForResource(correspondingURI.getUri());
             Connection con = RdfUtils.findFirst(connectionRDF, x -> new ConnectionModelMapper().fromModel(x));
             bus.publish(new CloseCommandEvent(con));
 
             answerCallbackQuery.setText("Closed Connection");
-          } else if ("1".equals(data)) { //ACCEPT CONNECTION
+          } else if ("1".equals(data)) { // ACCEPT CONNECTION
             Dataset connectionRDF = getEventListenerContext().getLinkedDataSource()
                 .getDataForResource(correspondingURI.getUri());
-            URI remoteNeed = WonRdfUtils.ConnectionUtils
-                .getRemoteNeedURIFromConnection(connectionRDF, correspondingURI.getUri());
-            URI localNeed = WonRdfUtils.ConnectionUtils
-                .getLocalNeedURIFromConnection(connectionRDF, correspondingURI.getUri());
+            URI remoteNeed = WonRdfUtils.ConnectionUtils.getRemoteNeedURIFromConnection(connectionRDF,
+                correspondingURI.getUri());
+            URI localNeed = WonRdfUtils.ConnectionUtils.getLocalNeedURIFromConnection(connectionRDF,
+                correspondingURI.getUri());
 
             bus.publish(new ConnectCommandEvent(localNeed, remoteNeed));
             answerCallbackQuery.setText("Opened Connection");

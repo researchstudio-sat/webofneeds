@@ -29,7 +29,8 @@ public class BotTriggerFilter implements EventFilter {
     this.botTrigger = botTrigger;
   }
 
-  @Override public boolean accept(Event event) {
+  @Override
+  public boolean accept(Event event) {
     if (!(BaseBotTriggerEvent.class.isAssignableFrom(event.getClass())))
       return false;
     return ((BaseBotTriggerEvent) event).getBotTrigger() == this.botTrigger;

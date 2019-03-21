@@ -5,8 +5,8 @@ import java.io.Serializable;
 /**
  * Created by hfriedrich on 17.10.2016.
  * <p>
- * Event is used to aks the crawler to load events that were either the last X needs seen or saved during a given date
- * interval.
+ * Event is used to aks the crawler to load events that were either the last X
+ * needs seen or saved during a given date interval.
  */
 public class LoadNeedEvent implements Serializable {
   private long fromDate;
@@ -14,7 +14,8 @@ public class LoadNeedEvent implements Serializable {
   private int lastXNeedEvents;
 
   /**
-   * Request all need events between fromDate and toDate (matcher service timestamp)
+   * Request all need events between fromDate and toDate (matcher service
+   * timestamp)
    *
    * @param fromDate
    * @param toDate
@@ -48,7 +49,8 @@ public class LoadNeedEvent implements Serializable {
     return lastXNeedEvents;
   }
 
-  @Override public String toString() {
+  @Override
+  public String toString() {
 
     if (lastXNeedEvents != -1) {
       return "[last " + lastXNeedEvents + " need events]";

@@ -21,7 +21,8 @@ import won.protocol.message.WonMessage;
 import java.net.URI;
 
 /**
- * Event published whenever a WonMessage is received that indicates the failure of a previous message.
+ * Event published whenever a WonMessage is received that indicates the failure
+ * of a previous message.
  */
 public class FailureResponseEvent extends DeliveryResponseEvent {
 

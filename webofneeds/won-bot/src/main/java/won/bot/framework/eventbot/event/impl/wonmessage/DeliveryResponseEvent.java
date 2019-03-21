@@ -23,7 +23,8 @@ import won.protocol.message.WonMessage;
 import java.net.URI;
 
 /**
- * Event published whenever a WonMessage is received that indicates the failure of a previous message.
+ * Event published whenever a WonMessage is received that indicates the failure
+ * of a previous message.
  */
 public class DeliveryResponseEvent extends BaseEvent implements ResponseEvent {
   private URI originalMessageURI;
@@ -54,15 +55,18 @@ public class DeliveryResponseEvent extends BaseEvent implements ResponseEvent {
     return remoteResponseToMessageURI != null;
   }
 
-  @Override public URI getConnectionURI() {
+  @Override
+  public URI getConnectionURI() {
     return message.getReceiverURI();
   }
 
-  @Override public URI getRemoteNeedURI() {
+  @Override
+  public URI getRemoteNeedURI() {
     return message.getSenderNeedURI();
   }
 
-  @Override public URI getNeedURI() {
+  @Override
+  public URI getNeedURI() {
     return message.getReceiverNeedURI();
   }
 }

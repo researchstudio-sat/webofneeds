@@ -27,9 +27,8 @@ public class MessageFromOtherNeedEvent extends WonMessageReceivedOnConnectionEve
     super(con, wonMessage);
   }
 
-  @Override public String toString() {
-    return "MessageFromOtherNeedEvent{" +
-        "wonMessage=" + getWonMessage() +
-        '}';
+  @Override
+  public String toString() {
+    return "MessageFromOtherNeedEvent{" + "wonMessage=" + getWonMessage() + '}';
   }
 }

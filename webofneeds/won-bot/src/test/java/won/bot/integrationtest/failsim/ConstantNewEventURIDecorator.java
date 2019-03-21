@@ -23,8 +23,8 @@ import won.protocol.service.impl.WonNodeInformationServiceDecorator;
 import java.net.URI;
 
 /**
- * Decorates the EventListenerContext such that event URIs generated through the WonNodeInformationService
- * are always the same.
+ * Decorates the EventListenerContext such that event URIs generated through the
+ * WonNodeInformationService are always the same.
  */
 public class ConstantNewEventURIDecorator extends BaseEventListenerContextDecorator {
   public ConstantNewEventURIDecorator(EventListenerContext delegate, String eventURISuffix) {
@@ -34,15 +34,18 @@ public class ConstantNewEventURIDecorator extends BaseEventListenerContextDecora
 
   private String eventURISuffix;
 
-  @Override public WonNodeInformationService getWonNodeInformationService() {
+  @Override
+  public WonNodeInformationService getWonNodeInformationService() {
     WonNodeInformationService delegate = super.getWonNodeInformationService();
     return new WonNodeInformationServiceDecorator(delegate) {
-      @Override public URI generateEventURI() {
+      @Override
+      public URI generateEventURI() {
         return URI.create(
             getDelegate().getWonNodeInformation(getDefaultWonNodeURI()).getEventURIPrefix() + "/" + eventURISuffix);
       }
 
-      @Override public URI generateEventURI(URI wonNodeURI) {
+      @Override
+      public URI generateEventURI(URI wonNodeURI) {
         return URI.create(getDelegate().getWonNodeInformation(wonNodeURI).getEventURIPrefix() + "/" + eventURISuffix);
       }
 

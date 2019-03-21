@@ -34,8 +34,9 @@ import java.util.Iterator;
 import java.util.Optional;
 
 /**
- * BaseEventBotAction connecting two needs on the specified facets. The need's URIs are obtained from
- * the bot context. The first two URIs found there are used.
+ * BaseEventBotAction connecting two needs on the specified facets. The need's
+ * URIs are obtained from the bot context. The first two URIs found there are
+ * used.
  */
 public class ConnectTwoNeedsAction extends BaseEventBotAction {
   private Optional<URI> remoteFacetType = Optional.empty();
@@ -50,7 +51,8 @@ public class ConnectTwoNeedsAction extends BaseEventBotAction {
     this.welcomeMessage = welcomeMessage;
   }
 
-  @Override public void doRun(Event event, EventListener executingListener) {
+  @Override
+  public void doRun(Event event, EventListener executingListener) {
     Collection<URI> needs = getEventListenerContext().getBotContext().retrieveAllNeedUris();
     try {
       Iterator iter = needs.iterator();
@@ -74,9 +76,12 @@ public class ConnectTwoNeedsAction extends BaseEventBotAction {
     return WonMessageBuilder.setMessagePropertiesForConnect(wonNodeInformationService.generateEventURI(localWonNode),
         localFacetType.map(facetType -> WonLinkedDataUtils
             .getFacetsOfType(fromUri, facetType, getEventListenerContext().getLinkedDataSource()).stream().findFirst()
-            .orElse(null)), fromUri, localWonNode, remoteFacetType.map(facetType -> WonLinkedDataUtils
+            .orElse(null)),
+        fromUri, localWonNode,
+        remoteFacetType.map(facetType -> WonLinkedDataUtils
             .getFacetsOfType(toUri, facetType, getEventListenerContext().getLinkedDataSource()).stream().findFirst()
-            .orElse(null)), toUri, remoteWonNode, welcomeMessage).build();
+            .orElse(null)),
+        toUri, remoteWonNode, welcomeMessage).build();
   }
 
 }

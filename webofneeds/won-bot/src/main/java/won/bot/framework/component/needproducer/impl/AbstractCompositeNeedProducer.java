@@ -25,24 +25,26 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * NeedProducer that needFactories to a list of need factories. Order of delegate request is not guaranteed.
- * Not thread safe.
+ * NeedProducer that needFactories to a list of need factories. Order of
+ * delegate request is not guaranteed. Not thread safe.
  */
 public abstract class AbstractCompositeNeedProducer implements NeedProducer {
   private Set<NeedProducer> needFactories = new HashSet<NeedProducer>();
   protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Override public synchronized Dataset create() {
+  @Override
+  public synchronized Dataset create() {
     logger.debug("starting to produce a need model");
     NeedProducer delegate = selectNonExhaustedNeedFactory();
     if (delegate == null) {
       logger.warn("cannot produce a need model - all need factories are exhausted");
-      return null; //we're exhausted
+      return null; // we're exhausted
     }
     return delegate.create();
   }
 
-  @Override public synchronized boolean isExhausted() {
+  @Override
+  public synchronized boolean isExhausted() {
     for (NeedProducer delegate : this.needFactories) {
       if (!delegate.isExhausted())
         return false;
@@ -52,19 +54,20 @@ public abstract class AbstractCompositeNeedProducer implements NeedProducer {
 
   private NeedProducer selectNonExhaustedNeedFactory() {
     NeedProducer delegate = null;
-    //keep fetching delegates, and remove them from the list if they are exhausted
+    // keep fetching delegates, and remove them from the list if they are exhausted
     while ((delegate = selectActiveNeedFactory()) != null && delegate.isExhausted()) {
-      //here we have a non-null delegate that is exhausted. Remove it
+      // here we have a non-null delegate that is exhausted. Remove it
       this.needFactories.remove(delegate);
       delegate = null;
     }
-    //here, a non-null delegate will not be exhausted. If it is null, we're completely exhausted
+    // here, a non-null delegate will not be exhausted. If it is null, we're
+    // completely exhausted
     return delegate;
   }
 
   /**
-   * Returns one of the NeedProducer objects found in the needFactories set, or null if no
-   * factories are elegible (in which case the factory is exhausted).
+   * Returns one of the NeedProducer objects found in the needFactories set, or
+   * null if no factories are elegible (in which case the factory is exhausted).
    *
    * @return
    */

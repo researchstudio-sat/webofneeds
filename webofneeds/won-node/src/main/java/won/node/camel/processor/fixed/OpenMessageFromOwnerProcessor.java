@@ -21,11 +21,11 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * User: syim
- * Date: 02.03.2015
+ * User: syim Date: 02.03.2015
  */
-@Component @FixedMessageProcessor(direction = WONMSG.TYPE_FROM_OWNER_STRING, messageType = WONMSG.TYPE_OPEN_STRING) public class OpenMessageFromOwnerProcessor
-    extends AbstractFromOwnerCamelProcessor {
+@Component
+@FixedMessageProcessor(direction = WONMSG.TYPE_FROM_OWNER_STRING, messageType = WONMSG.TYPE_OPEN_STRING)
+public class OpenMessageFromOwnerProcessor extends AbstractFromOwnerCamelProcessor {
 
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
@@ -49,7 +49,7 @@ import java.util.Optional;
       if (!wonMessage.getReceiverURI().equals(con.getRemoteConnectionURI()))
         throw new IllegalStateException("remote connection uri must be equal to receiver uri");
       if (con.getRemoteConnectionURI() == null) {
-        //we didn't have it before, now we do:
+        // we didn't have it before, now we do:
         con.setRemoteConnectionURI(wonMessage.getReceiverURI());
       }
     } else {
@@ -57,7 +57,7 @@ import java.util.Optional;
       // TODO: refactor connection state and open/connect
     }
 
-    // facets: the remote facet in the connection may be null before the open. 
+    // facets: the remote facet in the connection may be null before the open.
     // check if the owner sent a remote facet. there must not be a clash
     Optional<URI> userDefinedRemoteFacetURI = Optional.ofNullable(WonRdfUtils.FacetUtils.getRemoteFacet(wonMessage));
     Optional<URI> userDefinedFacetURI = Optional.ofNullable(WonRdfUtils.FacetUtils.getFacet(wonMessage));
@@ -89,31 +89,33 @@ import java.util.Optional;
 
     URI remoteMessageUri = wonNodeInformationService.generateEventURI(wonMessage.getReceiverNodeURI());
 
-    //add the facets to the message if necessary
+    // add the facets to the message if necessary
     if (!userDefinedFacetURI.isPresent()) {
-      //the user did not specify a facet uri. we have to add it
+      // the user did not specify a facet uri. we have to add it
       wonMessage.addMessageProperty(WONMSG.HAS_SENDER_FACET, con.getFacetURI());
     }
 
     if (!userDefinedRemoteFacetURI.isPresent()) {
-      //the user did not specify a remote uri. we have to add it
+      // the user did not specify a remote uri. we have to add it
       wonMessage.addMessageProperty(WONMSG.HAS_RECEIVER_FACET, con.getRemoteFacetURI());
     }
 
-    //add the information about the corresponding message to the local one
+    // add the information about the corresponding message to the local one
     wonMessage.addMessageProperty(WONMSG.HAS_CORRESPONDING_REMOTE_MESSAGE, remoteMessageUri);
-    //the persister will pick it up later
+    // the persister will pick it up later
 
-    //put the factory into the outbound message factory header. It will be used to generate the outbound message
-    //after the wonMessage has been processed and saved, to make sure that the outbound message contains
-    //all the data that we also store locally
+    // put the factory into the outbound message factory header. It will be used to
+    // generate the outbound message
+    // after the wonMessage has been processed and saved, to make sure that the
+    // outbound message contains
+    // all the data that we also store locally
     OutboundMessageFactory outboundMessageFactory = new OutboundMessageFactory(remoteMessageUri, con);
     exchange.getIn().setHeader(WonCamelConstants.OUTBOUND_MESSAGE_FACTORY_HEADER, outboundMessageFactory);
 
   }
 
   private URI lookupDefaultFacet(URI needURI) {
-    //look up the default facet and use that one
+    // look up the default facet and use that one
     return WonLinkedDataUtils.getDefaultFacet(needURI, true, linkedDataSource)
         .orElseThrow(() -> new IllegalStateException("No default facet found on " + needURI));
   }
@@ -126,8 +128,9 @@ import java.util.Optional;
       this.connection = connection;
     }
 
-    @Override public WonMessage process(WonMessage message) throws WonMessageProcessingException {
-      //create the message to send to the remote node
+    @Override
+    public WonMessage process(WonMessage message) throws WonMessageProcessingException {
+      // create the message to send to the remote node
       return WonMessageBuilder.setPropertiesForPassingMessageToRemoteNode(message, getMessageURI()).build();
     }
   }

@@ -12,8 +12,9 @@ import java.util.LinkedList;
 import java.util.stream.Collectors;
 
 /**
- * Loads all SPARQL "*.rq" files from a specified directory and executes them (using time range parameters) on a
- * SPARQL endpoint. The result {@link TensorEntry} objects from all queries are returned.
+ * Loads all SPARQL "*.rq" files from a specified directory and executes them
+ * (using time range parameters) on a SPARQL endpoint. The result
+ * {@link TensorEntry} objects from all queries are returned.
  * <p>
  * Created by hfriedrich on 21.04.2017.
  */
@@ -32,12 +33,14 @@ public class TensorEntryAllGenerator implements TensorEntryGenerator {
     to = toDate;
   }
 
-  @Override public Collection<TensorEntry> generateTensorEntries() throws IOException {
+  @Override
+  public Collection<TensorEntry> generateTensorEntries() throws IOException {
 
     Collection<TensorEntry> tensorEntries = new LinkedList<>();
     Collection<TensorEntrySparqlGenerator> queryGenerators = new LinkedList<>();
 
-    // read all sparql queries from target directory and configure them with variable bindings
+    // read all sparql queries from target directory and configure them with
+    // variable bindings
     PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
     Resource[] resources = resolver.getResources("classpath:" + queryDirectory + "/*.rq");
 

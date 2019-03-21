@@ -33,7 +33,8 @@ public class LinkedDataCacheInvalidator implements WonMessageProcessor {
 
   private CachingLinkedDataSource linkedDataSourceOnBehalfOfNeed;
 
-  @Override public WonMessage process(final WonMessage message) throws WonMessageProcessingException {
+  @Override
+  public WonMessage process(final WonMessage message) throws WonMessageProcessingException {
 
     WonMessageType type = message.getMessageType();
     if (type == WonMessageType.SUCCESS_RESPONSE) {
@@ -47,10 +48,10 @@ public class LinkedDataCacheInvalidator implements WonMessageProcessor {
       // should be invalidated, since one more
       // message was created
 
-      logger.debug("invalidating events list for need " + message.getReceiverNeedURI() + " for connection " + message
-          .getReceiverURI());
-      URI eventContainerUri = WonLinkedDataUtils
-          .getEventContainerURIforConnectionURI(message.getReceiverURI(), linkedDataSource);
+      logger.debug("invalidating events list for need " + message.getReceiverNeedURI() + " for connection "
+          + message.getReceiverURI());
+      URI eventContainerUri = WonLinkedDataUtils.getEventContainerURIforConnectionURI(message.getReceiverURI(),
+          linkedDataSource);
       invalidate(eventContainerUri, webId);
 
       if (type.causesConnectionStateChange()) {

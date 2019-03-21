@@ -52,11 +52,13 @@ public abstract class AbstractMessageCommandResultEvent extends BaseNeedAndConne
     this.message = message;
   }
 
-  @Override public MessageCommandEvent getOriginalCommandEvent() {
+  @Override
+  public MessageCommandEvent getOriginalCommandEvent() {
     return originalCommandEvent;
   }
 
-  @Override public String getMessage() {
+  @Override
+  public String getMessage() {
     return null;
   }
 

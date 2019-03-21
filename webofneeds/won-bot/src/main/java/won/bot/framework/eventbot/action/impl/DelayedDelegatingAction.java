@@ -32,7 +32,8 @@ public abstract class DelayedDelegatingAction extends AbstractDelegatingAction {
 
   protected abstract long getDelay();
 
-  @Override protected void doRun(final Event event, EventListener executingListener) throws Exception {
+  @Override
+  protected void doRun(final Event event, EventListener executingListener) throws Exception {
     long delay = getDelay();
     assert delay >= 0 : "delay must not be negative";
     delegateDelayed(event, delay, executingListener);

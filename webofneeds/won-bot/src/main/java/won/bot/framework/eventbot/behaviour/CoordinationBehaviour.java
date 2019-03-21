@@ -19,7 +19,9 @@ public final class CoordinationBehaviour extends BotBehaviour {
   private CoordinationType typeA;
   private CoordinationType typeB;
 
-  public static enum CoordinationType {ACTIVATE, DEACTIVATE}
+  public static enum CoordinationType {
+    ACTIVATE, DEACTIVATE
+  }
 
   private CoordinationBehaviour(EventListenerContext context) {
     super(context);
@@ -62,11 +64,13 @@ public final class CoordinationBehaviour extends BotBehaviour {
         CoordinationType.DEACTIVATE);
   }
 
-  @Override protected void onActivate(Optional<Object> message) {
+  @Override
+  protected void onActivate(Optional<Object> message) {
     EventBotAction actionToExecute = null;
     if (typeB == CoordinationType.ACTIVATE) {
       actionToExecute = new BaseEventBotAction(context) {
-        @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
+        @Override
+        protected void doRun(Event event, EventListener executingListener) throws Exception {
           BotBehaviourEvent botBehaviourEvent = (BotBehaviourEvent) event;
           behaviourB.activate(botBehaviourEvent.getMessage());
           deactivate(botBehaviourEvent.getMessage());
@@ -74,7 +78,8 @@ public final class CoordinationBehaviour extends BotBehaviour {
       };
     } else {
       actionToExecute = new BaseEventBotAction(context) {
-        @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
+        @Override
+        protected void doRun(Event event, EventListener executingListener) throws Exception {
           BotBehaviourEvent botBehaviourEvent = (BotBehaviourEvent) event;
           behaviourB.deactivate(botBehaviourEvent.getMessage());
           deactivate(botBehaviourEvent.getMessage());
@@ -88,7 +93,8 @@ public final class CoordinationBehaviour extends BotBehaviour {
       eventClazz = BotBehaviourDeactivatedEvent.class;
     }
     subscribeWithAutoCleanup(eventClazz, new ActionOnEventListener(context, new EventFilter() {
-      @Override public boolean accept(Event event) {
+      @Override
+      public boolean accept(Event event) {
         return ((BotBehaviourEvent) event).getBehaviour() == behaviourA;
       }
     }, actionToExecute));

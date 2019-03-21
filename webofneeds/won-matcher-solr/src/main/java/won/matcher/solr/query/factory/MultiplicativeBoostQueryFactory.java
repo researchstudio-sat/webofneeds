@@ -10,7 +10,8 @@ public class MultiplicativeBoostQueryFactory extends SolrQueryFactory {
     this.boostQuery = boostQuery;
   }
 
-  @Override protected String makeQueryString() {
+  @Override
+  protected String makeQueryString() {
     return "{!boost b=" + boostQuery + "}";
   }
 }

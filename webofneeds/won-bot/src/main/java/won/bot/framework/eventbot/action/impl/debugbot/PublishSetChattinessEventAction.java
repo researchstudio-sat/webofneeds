@@ -36,7 +36,8 @@ public class PublishSetChattinessEventAction extends BaseEventBotAction {
     this.isChatty = isChatty;
   }
 
-  @Override protected void doRun(final Event event, EventListener executingListener) throws Exception {
+  @Override
+  protected void doRun(final Event event, EventListener executingListener) throws Exception {
     if (event instanceof BaseNeedAndConnectionSpecificEvent) {
       Connection con = ((BaseNeedAndConnectionSpecificEvent) event).getCon();
       getEventListenerContext().getEventBus().publish(new SetChattinessDebugCommandEvent(con, isChatty));

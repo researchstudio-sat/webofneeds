@@ -13,18 +13,22 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Writer;
 
-@Controller @RequestMapping("/") public class SitemapController {
+@Controller
+@RequestMapping("/")
+public class SitemapController {
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Autowired private SitemapService sitemapService;
+  @Autowired
+  private SitemapService sitemapService;
 
   /**
    * Fetches the full sitemap.
    *
    * @return ResponseEntity the xml sitemap.
    */
-  @ResponseBody @RequestMapping(value = "sitemap.xml", method = RequestMethod.GET)
+  @ResponseBody
+  @RequestMapping(value = "sitemap.xml", method = RequestMethod.GET)
 
   public void getFullSitemap(HttpServletResponse response) {
     response.setContentType(MediaType.APPLICATION_XML_VALUE);

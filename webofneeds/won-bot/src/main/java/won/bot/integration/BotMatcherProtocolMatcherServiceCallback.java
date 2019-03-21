@@ -50,9 +50,8 @@ public class BotMatcherProtocolMatcherServiceCallback implements MatcherProtocol
     if (bot == null)
       throw new IllegalStateException("No bot registered for uri " + needUri);
     if (!bot.getLifecyclePhase().isActive()) {
-      throw new IllegalStateException(
-          "bot responsible for need " + needUri + " is not active (lifecycle phase is: " + bot.getLifecyclePhase()
-              + ")");
+      throw new IllegalStateException("bot responsible for need " + needUri + " is not active (lifecycle phase is: "
+          + bot.getLifecyclePhase() + ")");
     }
     return bot;
   }
@@ -73,7 +72,8 @@ public class BotMatcherProtocolMatcherServiceCallback implements MatcherProtocol
 
   }
 
-  @Override public void onRegistered(final URI wonNodeUri) {
+  @Override
+  public void onRegistered(final URI wonNodeUri) {
     taskScheduler.schedule(new Runnable() {
       public void run() {
         try {
@@ -89,7 +89,8 @@ public class BotMatcherProtocolMatcherServiceCallback implements MatcherProtocol
     }, new Date());
   }
 
-  @Override public void onNewNeed(final URI wonNodeURI, final URI needURI, final Dataset content) {
+  @Override
+  public void onNewNeed(final URI wonNodeURI, final URI needURI, final Dataset content) {
     taskScheduler.schedule(new Runnable() {
       public void run() {
         try {
@@ -105,13 +106,15 @@ public class BotMatcherProtocolMatcherServiceCallback implements MatcherProtocol
     }, new Date());
   }
 
-  @Override public void onNeedActivated(final URI wonNodeURI, final URI needURI) {
+  @Override
+  public void onNeedActivated(final URI wonNodeURI, final URI needURI) {
     taskScheduler.schedule(new Runnable() {
       public void run() {
         try {
           logger.debug("onNeedActivated for need {} ", needURI.toString());
           getBotForNeedUri(needURI).onNeedActivatedNotificationForMatcher(wonNodeURI, needURI);
-          //    getBotForNeedUri(needURI.getNeedURI()).onMessageFromOtherNeed(con, message, content);
+          // getBotForNeedUri(needURI.getNeedURI()).onMessageFromOtherNeed(con, message,
+          // content);
         } catch (Exception e) {
           logger.warn("error while handling onNeedActivated()", e);
         }
@@ -119,13 +122,15 @@ public class BotMatcherProtocolMatcherServiceCallback implements MatcherProtocol
     }, new Date());
   }
 
-  @Override public void onNeedDeactivated(final URI wonNodeURI, final URI needURI) {
+  @Override
+  public void onNeedDeactivated(final URI wonNodeURI, final URI needURI) {
     taskScheduler.schedule(new Runnable() {
       public void run() {
         try {
           logger.debug("onNeedDeactivated for need {} ", needURI.toString());
           getBotForNeedUri(needURI).onNeedDeactivatedNotificationForMatcher(wonNodeURI, needURI);
-          //    getBotForNeedUri(needURI.getNeedURI()).onMessageFromOtherNeed(con, message, content);
+          // getBotForNeedUri(needURI.getNeedURI()).onMessageFromOtherNeed(con, message,
+          // content);
         } catch (Exception e) {
           logger.warn("error while handling onNeedDeactivated()", e);
         }

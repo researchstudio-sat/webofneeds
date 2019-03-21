@@ -10,4 +10,3 @@ public class TestNeedQueryFactory extends DefaultNeedQueryFactory {
     super(need);
   }
 }
-

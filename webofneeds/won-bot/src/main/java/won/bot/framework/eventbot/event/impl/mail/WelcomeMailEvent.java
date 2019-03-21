@@ -18,4 +18,3 @@ public class WelcomeMailEvent extends BaseEvent {
     return message;
   }
 }
-

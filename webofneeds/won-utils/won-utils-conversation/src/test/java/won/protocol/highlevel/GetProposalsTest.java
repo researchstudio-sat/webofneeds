@@ -33,14 +33,16 @@ public class GetProposalsTest {
   private static final String getAGinputFolder = "/won/utils/getagreements/input/";
   private static final String getAGexpectedOutputFolder = "/won/utils/getagreements/expected/";
 
-  @BeforeClass public static void setLogLevel() {
+  @BeforeClass
+  public static void setLogLevel() {
     Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
     root.setLevel(Level.INFO);
   }
 
   // This is the case where there are no agreements, that is no predicates from
   // the agreement protocol. The output should be nothing...
-  @Test public void noAgreementsTest() throws IOException {
+  @Test
+  public void noAgreementsTest() throws IOException {
     Dataset input = loadDataset(inputFolder + "no-agreements.trig");
     Dataset expectedOutput = loadDataset(expectedOutputFolder + "no-agreements.trig");
     test(input, expectedOutput);
@@ -48,26 +50,30 @@ public class GetProposalsTest {
 
   // This is the case where there is one agreement. That is one proposal and one
   // accept making one agreement. The output should be an agreement.
-  @Test public void oneAgreementTest() throws IOException {
+  @Test
+  public void oneAgreementTest() throws IOException {
     Dataset input = loadDataset(inputFolder + "one-agreement.trig");
     Dataset expectedOutput = loadDataset(expectedOutputFolder + "one-agreement.trig");
     test(input, expectedOutput);
   }
 
-  @Test public void oneAgreementProposalToCancelRetractedTest() throws IOException {
+  @Test
+  public void oneAgreementProposalToCancelRetractedTest() throws IOException {
     Dataset input = loadDataset(inputFolder + "one-agreement-proposaltocancel-retracted.trig");
     Dataset expectedOutput = loadDataset(expectedOutputFolder + "one-agreement-proposaltocancel-retracted.trig");
     test(input, expectedOutput);
   }
 
-  @Test public void oneAgreementProposalToCancelRetractedBeforeAcceptTest() throws IOException {
+  @Test
+  public void oneAgreementProposalToCancelRetractedBeforeAcceptTest() throws IOException {
     Dataset input = loadDataset(inputFolder + "one-agreement-proposaltocancel-retracted-b4-accept.trig");
     Dataset expectedOutput = loadDataset(
         expectedOutputFolder + "one-agreement-proposaltocancel-retracted-b4-accept.trig");
     test(input, expectedOutput);
   }
 
-  @Test public void oneAgreementProposalToCancelRejectedBeforeAcceptTest() throws IOException {
+  @Test
+  public void oneAgreementProposalToCancelRejectedBeforeAcceptTest() throws IOException {
     Dataset input = loadDataset(inputFolder + "one-agreement-proposaltocancel-rejected-b4-accept.trig");
     Dataset expectedOutput = loadDataset(
         expectedOutputFolder + "one-agreement-proposaltocancel-rejected-b4-accept.trig");

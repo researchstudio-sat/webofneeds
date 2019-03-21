@@ -29,11 +29,13 @@ public class ConnectionMessageCommandEvent extends BaseNeedAndConnectionSpecific
     this(con, messageModel, null);
   }
 
-  @Override public URI getConnectionURI() {
+  @Override
+  public URI getConnectionURI() {
     return this.getCon().getConnectionURI();
   }
 
-  @Override public WonMessageType getWonMessageType() {
+  @Override
+  public WonMessageType getWonMessageType() {
     return WonMessageType.CONNECTION_MESSAGE;
   }
 

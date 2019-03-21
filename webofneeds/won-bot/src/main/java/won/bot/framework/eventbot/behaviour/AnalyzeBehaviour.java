@@ -78,7 +78,8 @@ public class AnalyzeBehaviour extends BotBehaviour {
     this.connectionPreconditionListMapName = botName + ":connectionPreconditionListMap";
   }
 
-  @Override protected void onActivate(Optional<Object> message) {
+  @Override
+  protected void onActivate(Optional<Object> message) {
     ActionOnEventListener analyzeAction = new ActionOnEventListener(context, new AnalyzeAction(context));
 
     this.subscribeWithAutoCleanup(MessageFromOtherNeedEvent.class, analyzeAction);
@@ -91,7 +92,8 @@ public class AnalyzeBehaviour extends BotBehaviour {
       super(eventListenerContext);
     }
 
-    @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
+    @Override
+    protected void doRun(Event event, EventListener executingListener) throws Exception {
       logger.trace("################################## ANALYZING MESSAGE #########################################");
       EventListenerContext ctx = getEventListenerContext();
       EventBus bus = ctx.getEventBus();
@@ -145,8 +147,9 @@ public class AnalyzeBehaviour extends BotBehaviour {
       Collection<Resource> goalsInNeed = new NeedModelWrapper(needDataset).getGoals();
       logger.trace("Preconditions in Need: " + goalsInNeed.size());
 
-      AgreementProtocolState agreementProtocolState = AgreementProtocolState.of(connectionUri, getEventListenerContext()
-          .getLinkedDataSource()); //Initialize with null, to ensure some form of lazy init for the agreementProtocolState
+      AgreementProtocolState agreementProtocolState = AgreementProtocolState.of(connectionUri,
+          getEventListenerContext().getLinkedDataSource()); // Initialize with null, to ensure some form of lazy init
+                                                            // for the agreementProtocolState
       Set<MessageEffect> messageEffects = agreementProtocolState.getEffects(wonMessage.getMessageURI());
 
       logger.trace("MessageEffects in Message: " + messageEffects.size());
@@ -166,8 +169,8 @@ public class AnalyzeBehaviour extends BotBehaviour {
                 .getAgreement(messageEffect.asAccepts().getAcceptedMessageUri());
 
             if (!agreementPayload.isEmpty()) {
-              logger.trace("\t\tPublish ProposalAcceptedEvent for agreementUri: " + messageEffect.asAccepts()
-                  .getAcceptedMessageUri());
+              logger.trace("\t\tPublish ProposalAcceptedEvent for agreementUri: "
+                  + messageEffect.asAccepts().getAcceptedMessageUri());
               bus.publish(new ProposalAcceptedEvent(connection, messageEffect.asAccepts().getAcceptedMessageUri(),
                   agreementPayload));
             }
@@ -177,8 +180,10 @@ public class AnalyzeBehaviour extends BotBehaviour {
         case PROPOSES:
           logger.trace("\tMessageEffect 'Proposes':");
           Proposal proposal = new Proposal(messageEffect.getMessageUri(), ProposalState.SUGGESTED);
-          Model proposalModel = agreementProtocolState.getPendingProposal(
-              proposal.getUri()); //TODO: IT COULD BE THAT WE HAVE TO ADD THIS WHOLE SHABANG FOR AGREEMENTS AS WELL
+          Model proposalModel = agreementProtocolState.getPendingProposal(proposal.getUri()); // TODO: IT COULD BE THAT
+                                                                                              // WE HAVE TO ADD THIS
+                                                                                              // WHOLE SHABANG FOR
+                                                                                              // AGREEMENTS AS WELL
 
           if (!proposalModel.isEmpty()) {
             logger.trace("\t\tProposal: " + proposal);
@@ -186,15 +191,16 @@ public class AnalyzeBehaviour extends BotBehaviour {
               String preconditionUri = getUniqueGoalId(goal, needDataset);
               logger.trace("\t\t\tPreconditionUri: " + preconditionUri);
 
-              if (!AnalyzeBehaviour.this
-                  .hasPreconditionProposalRelation(preconditionUri, proposal.getUri().toString())) {
+              if (!AnalyzeBehaviour.this.hasPreconditionProposalRelation(preconditionUri,
+                  proposal.getUri().toString())) {
                 GoalInstantiationResult result = GoalInstantiationProducer
                     .findInstantiationForGoalInDataset(needDataset, goal, proposalModel);
                 Precondition precondition = new Precondition(preconditionUri, result.isConform());
 
                 logger.trace("\t\t\tPrecondition: " + precondition);
 
-                //TODO: WE MIGHT NEED TO CHECK WHETHER THE PRECONDITION IS ACTUALLY FULFILLED OR NOT BEFORE WE REMOVE THE TEMP STATUS
+                // TODO: WE MIGHT NEED TO CHECK WHETHER THE PRECONDITION IS ACTUALLY FULFILLED
+                // OR NOT BEFORE WE REMOVE THE TEMP STATUS
                 if (AnalyzeBehaviour.this.isPreconditionMetPending(preconditionUri)) {
                   logger.trace("\t\t\tRemove PreconditionMetPending Entry");
                   AnalyzeBehaviour.this.removePreconditionMetPending(preconditionUri);
@@ -239,9 +245,11 @@ public class AnalyzeBehaviour extends BotBehaviour {
       });
       logger.trace("--------------------------");
 
-      //Things to do for each individual message regardless of it being received or sent
+      // Things to do for each individual message regardless of it being received or
+      // sent
       Dataset remoteNeedDataset = ctx.getLinkedDataSource().getDataForResource(remoteNeedUri);
-      Dataset conversationDataset = null;  //Initialize with null, to ensure some form of lazy init for the conversationDataset
+      Dataset conversationDataset = null; // Initialize with null, to ensure some form of lazy init for the
+                                          // conversationDataset
       GoalInstantiationProducer goalInstantiationProducer = null;
       logger.trace("Conversation Information ------");
 
@@ -258,7 +266,10 @@ public class AnalyzeBehaviour extends BotBehaviour {
           logger.trace("\t\tPrecondition is met but creating a proposal was not possible");
         } else {
           logger.trace("\t\tPrecondition not yet met in a proposal/agreement");
-          //conversationDataset = WonConversationUtils.getAgreementProtocolState(connectionUri, linkedDataSource).getConversationDataset(); //TODO: I DONT KNOW WHY THIS CHANGE HAPPENED
+          // conversationDataset =
+          // WonConversationUtils.getAgreementProtocolState(connectionUri,
+          // linkedDataSource).getConversationDataset(); //TODO: I DONT KNOW WHY THIS
+          // CHANGE HAPPENED
           conversationDataset = getConversationDatasetLazyInit(conversationDataset, connectionUri);
           goalInstantiationProducer = getGoalInstantiationProducerLazyInit(goalInstantiationProducer, needDataset,
               remoteNeedDataset, conversationDataset);
@@ -289,11 +300,11 @@ public class AnalyzeBehaviour extends BotBehaviour {
       logger.trace("################################## ANALYZING COMPLETE #########################################");
     }
 
-    //********* Helper Methods **********
+    // ********* Helper Methods **********
     private Dataset getConversationDatasetLazyInit(Dataset conversationDataset, URI connectionUri) {
       if (conversationDataset == null) {
-        return WonLinkedDataUtils
-            .getConversationDataset(connectionUri, getEventListenerContext().getLinkedDataSource());
+        return WonLinkedDataUtils.getConversationDataset(connectionUri,
+            getEventListenerContext().getLinkedDataSource());
       } else {
         return conversationDataset;
       }
@@ -340,7 +351,7 @@ public class AnalyzeBehaviour extends BotBehaviour {
       String[] statements = strGraphs.split("\n");
       Arrays.sort(statements);
       String strStatements = Arrays.toString(statements);
-      //java.security.MessageDigest -> SHA256
+      // java.security.MessageDigest -> SHA256
 
       try {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -382,15 +393,16 @@ public class AnalyzeBehaviour extends BotBehaviour {
 
   /**
    * @param preconditionURI to retrieve the state from
-   * @return the saved state of the precondition, null if the state was never saved before (undeterminable)
+   * @return the saved state of the precondition, null if the state was never
+   *         saved before (undeterminable)
    */
   public Boolean getPreconditionConversationState(String preconditionURI) {
     return (Boolean) botContext.loadFromObjectMap(preconditionConversationStateMapName, preconditionURI);
   }
 
   /**
-   * Removes the stored state of a given Precondition, in order to reset that there was ever a state present
-   * for the precondition
+   * Removes the stored state of a given Precondition, in order to reset that
+   * there was ever a state present for the precondition
    *
    * @param preconditionURI
    */
@@ -418,10 +430,11 @@ public class AnalyzeBehaviour extends BotBehaviour {
   }
 
   /**
-   * Removes the stored entry for a preconditionPending Uri
-   * This method is used so we can remove the pending precondition (e.g if a proposal can't be created)
+   * Removes the stored entry for a preconditionPending Uri This method is used so
+   * we can remove the pending precondition (e.g if a proposal can't be created)
    *
-   * @param preconditionPendingURI the string of the preconditionUri that is not pending anymore
+   * @param preconditionPendingURI the string of the preconditionUri that is not
+   *                               pending anymore
    */
   public void removePreconditionMetPending(String preconditionURI) {
     botContext.removeFromObjectMap(preconditionMetPending, preconditionURI);
@@ -432,7 +445,8 @@ public class AnalyzeBehaviour extends BotBehaviour {
   }
 
   /**
-   * Determines if a certain precondition is met but still pending for proposal creation
+   * Determines if a certain precondition is met but still pending for proposal
+   * creation
    *
    * @param preconditionURI the string of the preconditionUri
    */
@@ -469,8 +483,8 @@ public class AnalyzeBehaviour extends BotBehaviour {
    * @return
    */
   public boolean hasPreconditionConnectionRelation(String connectionURI, String preconditionURI) {
-    Precondition precondition = new Precondition(preconditionURI,
-        false); //Status of the Precondition is irrelevant (equals works on uri alone)
+    Precondition precondition = new Precondition(preconditionURI, false); // Status of the Precondition is irrelevant
+                                                                          // (equals works on uri alone)
     return hasPreconditionConnectionRelation(connectionURI, precondition);
   }
 
@@ -496,8 +510,14 @@ public class AnalyzeBehaviour extends BotBehaviour {
   }
 
   public boolean hasPreconditionProposalRelation(String preconditionURI, String proposalURI) {
-    return getPreconditionsForProposalUri(proposalURI).contains(new Precondition(preconditionURI,
-        false)); //Status of the Precondition is irrelevant (equals works on uri alone)
+    return getPreconditionsForProposalUri(proposalURI).contains(new Precondition(preconditionURI, false)); // Status of
+                                                                                                           // the
+                                                                                                           // Precondition
+                                                                                                           // is
+                                                                                                           // irrelevant
+                                                                                                           // (equals
+                                                                                                           // works on
+                                                                                                           // uri alone)
   }
 
   public List<Proposal> getProposalsForPreconditionUri(String preconditionURI) {
@@ -507,8 +527,10 @@ public class AnalyzeBehaviour extends BotBehaviour {
   /**
    * Returns a List of All saved Precondition URIS for the proposal
    *
-   * @param proposalURI string of the proposaluri to retrieve the preconditionList of
-   * @return List of all URI-Strings of preconditions save for the given connectionURI
+   * @param proposalURI string of the proposaluri to retrieve the preconditionList
+   *                    of
+   * @return List of all URI-Strings of preconditions save for the given
+   *         connectionURI
    */
   public List<Precondition> getPreconditionsForProposalUri(String proposalURI) {
     return (List<Precondition>) (List<?>) botContext.loadFromListMap(proposalToPreconditionListMapName, proposalURI);
@@ -545,7 +567,8 @@ public class AnalyzeBehaviour extends BotBehaviour {
   }
 
   /**
-   * Removes All the stored entries in all Maps Lists or MapList for the given ProposalURI
+   * Removes All the stored entries in all Maps Lists or MapList for the given
+   * ProposalURI
    *
    * @param proposalURI to be removed
    */
@@ -554,7 +577,8 @@ public class AnalyzeBehaviour extends BotBehaviour {
   }
 
   /**
-   * Removes All the stored entries in all Maps Lists or MapList for the given ProposalURI
+   * Removes All the stored entries in all Maps Lists or MapList for the given
+   * ProposalURI
    *
    * @param proposalURI the string of the proposalURI to be removed
    */

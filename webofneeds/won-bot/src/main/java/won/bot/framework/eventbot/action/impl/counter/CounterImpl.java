@@ -34,15 +34,18 @@ public class CounterImpl implements Counter {
     this(name, 0);
   }
 
-  @Override public int getCount() {
+  @Override
+  public int getCount() {
     return count.get();
   }
 
-  @Override public int increment() {
+  @Override
+  public int increment() {
     return count.incrementAndGet();
   }
 
-  @Override public int decrement() {
+  @Override
+  public int decrement() {
     return count.decrementAndGet();
   }
 

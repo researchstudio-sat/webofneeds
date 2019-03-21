@@ -11,20 +11,29 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by hfriedrich on 15.09.2015.
  */
-@Configuration @PropertySource("file:${WON_CONFIG_DIR}/matcher-rescal.properties") public class RescalMatcherConfig {
-  @Value("${matcher.rescal.uri.sparql.endpoint}") private String sparqlEndpoint;
+@Configuration
+@PropertySource("file:${WON_CONFIG_DIR}/matcher-rescal.properties")
+public class RescalMatcherConfig {
+  @Value("${matcher.rescal.uri.sparql.endpoint}")
+  private String sparqlEndpoint;
 
-  @Value("${matcher.rescal.uri.public}") private String publicMatcherUri;
+  @Value("${matcher.rescal.uri.public}")
+  private String publicMatcherUri;
 
-  @Value("${matcher.rescal.executionDir}") private String executionDirectory;
+  @Value("${matcher.rescal.executionDir}")
+  private String executionDirectory;
 
-  @Value("${matcher.rescal.pythonScriptDir}") private String pythonScriptDirectory;
+  @Value("${matcher.rescal.pythonScriptDir}")
+  private String pythonScriptDirectory;
 
-  @Value("${matcher.rescal.executionDurationMinutes}") private long executionDuration;
+  @Value("${matcher.rescal.executionDurationMinutes}")
+  private long executionDuration;
 
-  @Value("${matcher.rescal.threshold}") private double rescalThreshold;
+  @Value("${matcher.rescal.threshold}")
+  private double rescalThreshold;
 
-  @Value("${matcher.rescal.rank}") private long rescalRank;
+  @Value("${matcher.rescal.rank}")
+  private long rescalRank;
 
   public String getSparqlEndpoint() {
     return sparqlEndpoint;

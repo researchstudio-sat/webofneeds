@@ -21,40 +21,44 @@ import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.listener.EventListener;
 
 /**
- * Simple event bus interface. Allows registering for events and publishing events.
+ * Simple event bus interface. Allows registering for events and publishing
+ * events.
  */
 public interface EventBus {
   /**
    * Publishes an event. All listeners subscribed for the event will be notified.
    *
    * @param event
-   * @param <T>
+   * @param       <T>
    */
   public <T extends Event> void publish(T event);
 
   /**
-   * Subscribes a listener to an event type. If the listener implements the SubscriptionAware interface,
-   * its onSubscribe() method will be called before the bot is subscribed.
+   * Subscribes a listener to an event type. If the listener implements the
+   * SubscriptionAware interface, its onSubscribe() method will be called before
+   * the bot is subscribed.
    *
    * @param eventClazz
    * @param listener
-   * @param <T>
+   * @param            <T>
    */
   public <T extends Event> void subscribe(Class<T> eventClazz, EventListener listener);
 
   /**
-   * Unsubscribes a listener from an event type. If the listener implements the SubscriptionAware interface,
-   * its onUnsubscribe() method will be called after the bot is unsubscribed.
+   * Unsubscribes a listener from an event type. If the listener implements the
+   * SubscriptionAware interface, its onUnsubscribe() method will be called after
+   * the bot is unsubscribed.
    *
    * @param eventClazz
    * @param listener
-   * @param <T>
+   * @param            <T>
    */
   public <T extends Event> void unsubscribe(Class<T> eventClazz, EventListener listener);
 
   /**
-   * Unsubscribes a listener from all event types it is currently subscribed to. If the listener implements the SubscriptionAware interface,
-   * its onUnsubscribe() method will be called after the bot is unsubscribed.
+   * Unsubscribes a listener from all event types it is currently subscribed to.
+   * If the listener implements the SubscriptionAware interface, its
+   * onUnsubscribe() method will be called after the bot is unsubscribed.
    *
    * @param listener
    */

@@ -26,8 +26,8 @@ public class KeystorePasswordUtils {
       SecretKeySpec secretKey = new SecretKeySpec(encryptionKey, "AES");
       Cipher cipher = Cipher.getInstance(secretKey.getAlgorithm() + "/CFB8/NoPadding");
       cipher.init(Cipher.ENCRYPT_MODE, secretKey, new IvParameterSpec(iv));
-      return CURRENT_VERSION + ":" + iterations + ":" + toHex(salt) + ":" + toHex(iv) + ":" + toHex(
-          cipher.doFinal(password.getBytes()));
+      return CURRENT_VERSION + ":" + iterations + ":" + toHex(salt) + ":" + toHex(iv) + ":"
+          + toHex(cipher.doFinal(password.getBytes()));
     } catch (Exception e) {
       throw new IllegalArgumentException("cannot encrypt password", e);
     }
@@ -85,7 +85,8 @@ public class KeystorePasswordUtils {
   }
 
   /**
-   * Generates a random byte array of length passwordBytes, encoded as Base64 string.
+   * Generates a random byte array of length passwordBytes, encoded as Base64
+   * string.
    *
    * @param passwordBytes
    * @return

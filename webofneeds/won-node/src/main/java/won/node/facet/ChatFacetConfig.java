@@ -13,14 +13,16 @@ public class ChatFacetConfig extends HardcodedFacetConfig {
   }
 
   /**
-   * For now, we treat the chat facet as the default facet that
-   * is itself allowed to connect to all.
+   * For now, we treat the chat facet as the default facet that is itself allowed
+   * to connect to all.
    */
-  @Override public boolean isConnectionAllowedToType(URI remoteFacetType) {
+  @Override
+  public boolean isConnectionAllowedToType(URI remoteFacetType) {
     return true;
   }
 
-  @Override public boolean isAutoOpen(URI remoteFacetType) {
+  @Override
+  public boolean isAutoOpen(URI remoteFacetType) {
     return false;
   }
 }

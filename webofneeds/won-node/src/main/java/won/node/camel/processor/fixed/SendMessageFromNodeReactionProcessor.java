@@ -21,14 +21,17 @@ import java.net.URI;
 import java.util.List;
 import java.util.Objects;
 
-@Component @FixedMessageReactionProcessor(direction = WONMSG.TYPE_FROM_EXTERNAL_STRING, messageType = WONMSG.TYPE_CONNECTION_MESSAGE_STRING)
+@Component
+@FixedMessageReactionProcessor(direction = WONMSG.TYPE_FROM_EXTERNAL_STRING, messageType = WONMSG.TYPE_CONNECTION_MESSAGE_STRING)
 /**
  * If the message has a msg:hasInjectIntoConnection property, try to forward it.
- */ public class SendMessageFromNodeReactionProcessor extends AbstractCamelProcessor {
+ */
+public class SendMessageFromNodeReactionProcessor extends AbstractCamelProcessor {
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Override public void process(Exchange exchange) throws Exception {
+  @Override
+  public void process(Exchange exchange) throws Exception {
     Message message = exchange.getIn();
     Objects.nonNull(message);
     WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
@@ -67,12 +70,11 @@ import java.util.Objects;
           new Object[] { wonMessage.getMessageURI(), wonMessage.getSenderNeedURI(), conToSendTo.getConnectionURI() });
     }
     URI injectedMessageURI = wonNodeInformationService.generateEventURI(wonMessage.getReceiverNodeURI());
-    URI remoteWonNodeUri = WonLinkedDataUtils
-        .getWonNodeURIForNeedOrConnectionURI(conToSendTo.getRemoteConnectionURI(), linkedDataSource);
-    WonMessage newWonMessage = WonMessageBuilder
-        .forwardReceivedNodeToNodeMessageAsNodeToNodeMessage(injectedMessageURI, wonMessage,
-            conToSendTo.getConnectionURI(), conToSendTo.getNeedURI(), wonMessage.getReceiverNodeURI(),
-            conToSendTo.getRemoteConnectionURI(), conToSendTo.getRemoteNeedURI(), remoteWonNodeUri);
+    URI remoteWonNodeUri = WonLinkedDataUtils.getWonNodeURIForNeedOrConnectionURI(conToSendTo.getRemoteConnectionURI(),
+        linkedDataSource);
+    WonMessage newWonMessage = WonMessageBuilder.forwardReceivedNodeToNodeMessageAsNodeToNodeMessage(injectedMessageURI,
+        wonMessage, conToSendTo.getConnectionURI(), conToSendTo.getNeedURI(), wonMessage.getReceiverNodeURI(),
+        conToSendTo.getRemoteConnectionURI(), conToSendTo.getRemoteNeedURI(), remoteWonNodeUri);
     if (logger.isDebugEnabled()) {
       logger.debug("injecting this message: {} ", RdfUtils.toString(newWonMessage.getCompleteDataset()));
     }

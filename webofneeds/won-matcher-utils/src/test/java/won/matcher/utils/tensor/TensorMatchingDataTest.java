@@ -1,18 +1,18 @@
 package won.matcher.utils.tensor;/*
- * Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
+                                 * Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
+                                 *
+                                 *    Licensed under the Apache License, Version 2.0 (the "License");
+                                 *    you may not use this file except in compliance with the License.
+                                 *    You may obtain a copy of the License at
+                                 *
+                                 *        http://www.apache.org/licenses/LICENSE-2.0
+                                 *
+                                 *    Unless required by applicable law or agreed to in writing, software
+                                 *    distributed under the License is distributed on an "AS IS" BASIS,
+                                 *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+                                 *    See the License for the specific language governing permissions and
+                                 *    limitations under the License.
+                                 */
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -23,24 +23,26 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * User: hfriedrich
- * Date: 18.07.2014
+ * User: hfriedrich Date: 18.07.2014
  */
 public class TensorMatchingDataTest {
   private static final double DELTA = 0.001d;
 
   private TensorMatchingData data;
 
-  @Before public void initData() {
+  @Before
+  public void initData() {
     data = new TensorMatchingData();
   }
 
-  @Test public void dataInitialized() {
+  @Test
+  public void dataInitialized() {
     Assert.assertEquals(data.getAttributes().size(), 0);
     Assert.assertEquals(data.getNeeds().size(), 0);
   }
 
-  @Test public void addNeedConnection() {
+  @Test
+  public void addNeedConnection() {
 
     data.addNeedConnection("Need1", "Need2", false);
     Assert.assertEquals(data.getNeeds().size(), 2);
@@ -56,7 +58,8 @@ public class TensorMatchingDataTest {
     Assert.assertTrue(data.getNeeds().contains("Need3"));
   }
 
-  @Test public void addNeedAttribute() {
+  @Test
+  public void addNeedAttribute() {
 
     data.addNeedAttribute("title", "Need1", "Attr1");
     Assert.assertEquals(data.getNeeds().size(), 1);
@@ -80,7 +83,8 @@ public class TensorMatchingDataTest {
     Assert.assertTrue(data.getAttributes().contains("Attr2"));
   }
 
-  @Test public void checkTensor() throws IOException {
+  @Test
+  public void checkTensor() throws IOException {
 
     data.addNeedAttribute("needType", "Need1", "OFFER");
     data.addNeedAttribute("title", "Need1", "Couch");
@@ -111,10 +115,10 @@ public class TensorMatchingDataTest {
     Assert.assertEquals(1.0d, tensor.getEntry(5, 7, data.getSliceIndex("title")), DELTA);
     Assert.assertEquals(1.0d, tensor.getEntry(5, 2, data.getSliceIndex("title")), DELTA);
     Assert.assertEquals(1.0d, tensor.getEntry(5, 3, data.getSliceIndex("description")), DELTA);
-    Assert
-        .assertEquals(1.0d, tensor.getEntry(0, 5, data.getSliceIndex(TensorMatchingData.CONNECTION_SLICE_NAME)), DELTA);
-    Assert
-        .assertEquals(1.0d, tensor.getEntry(5, 0, data.getSliceIndex(TensorMatchingData.CONNECTION_SLICE_NAME)), DELTA);
+    Assert.assertEquals(1.0d, tensor.getEntry(0, 5, data.getSliceIndex(TensorMatchingData.CONNECTION_SLICE_NAME)),
+        DELTA);
+    Assert.assertEquals(1.0d, tensor.getEntry(5, 0, data.getSliceIndex(TensorMatchingData.CONNECTION_SLICE_NAME)),
+        DELTA);
     Assert.assertEquals(1.0d, tensor.getEntry(8, 6, data.getSliceIndex("needType")), DELTA);
 
     // 1 connection (symmentric entries) => 2 NZ entries
@@ -129,7 +133,8 @@ public class TensorMatchingDataTest {
     Assert.assertEquals(2, tensor.getNonZeroEntries(data.getSliceIndex("tag")));
   }
 
-  @Test public void checkCleanedTensor() throws IOException {
+  @Test
+  public void checkCleanedTensor() throws IOException {
 
     data.addNeedAttribute("needType", "Need1", "OFFER");
     data.addNeedAttribute("title", "Need1", "Couch");
@@ -148,7 +153,8 @@ public class TensorMatchingDataTest {
     data.addNeedConnection("Need1", "NeedWithoutAttributes2", false);
 
     // number of original different name entries in the tensor header => 14,
-    // by cleaning the tensor the two Needs "NeedWithoutAttributes" should be removed
+    // by cleaning the tensor the two Needs "NeedWithoutAttributes" should be
+    // removed
     // together with their connections
     data = data.removeEmptyNeedsAndConnections();
     ThirdOrderSparseTensor tensor = data.createFinalTensor();

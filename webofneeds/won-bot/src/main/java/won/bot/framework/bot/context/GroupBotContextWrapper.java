@@ -14,7 +14,8 @@ public class GroupBotContextWrapper extends BotContextWrapper {
     super(botContext, botName);
   }
 
-  @Override public String getNeedCreateListName() {
+  @Override
+  public String getNeedCreateListName() {
     throw new UnsupportedOperationException("This List is not available for this BotContextWrapper");
   }
 

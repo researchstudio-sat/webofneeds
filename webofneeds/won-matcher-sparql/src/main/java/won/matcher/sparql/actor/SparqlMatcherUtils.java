@@ -25,16 +25,17 @@ public class SparqlMatcherUtils {
    * executing a query in an in-memory Dataset.
    *
    * @param queryOp
-   * @param graphVarName optional graph name. If not specified, a random variable name is
-   *                     generated. Can be a variable (starting with '?') or an URI (NOT
-   *                     enclosed by '<' and '>')
+   * @param graphVarName optional graph name. If not specified, a random variable
+   *                     name is generated. Can be a variable (starting with '?')
+   *                     or an URI (NOT enclosed by '<' and '>')
    * @return
    */
   public static Op addGraphOp(Op queryOp, Optional<String> graphVarName) {
     Random rnd = new Random();
     String graphVariable = graphVarName.orElse(new String("graph" + Long.toHexString(rnd.nextLong())));
     Op queryWithGraphClause = Transformer.transform(new TransformCopy(true) {
-      @Override public Op transform(OpProject opProject, Op subOp) {
+      @Override
+      public Op transform(OpProject opProject, Op subOp) {
         if (graphVariable.startsWith("?")) {
           return opProject.copy(new OpGraph(Var.alloc(graphVariable.substring(1)), subOp));
         } else {
@@ -62,23 +63,28 @@ public class SparqlMatcherUtils {
     // now transform
     return Transformer.transform(new TransformCopy(true) {
 
-      @Override public Op transform(OpJoin opJoin, Op left, Op right) {
+      @Override
+      public Op transform(OpJoin opJoin, Op left, Op right) {
         return selectSubOpIfOtherIsService(opJoin, left, right, serviceURI);
       }
 
-      @Override public Op transform(OpConditional opCond, Op left, Op right) {
+      @Override
+      public Op transform(OpConditional opCond, Op left, Op right) {
         return selectSubOpIfOtherIsService(opCond, left, right, serviceURI);
       }
 
-      @Override public Op transform(OpLeftJoin opLeftJoin, Op left, Op right) {
+      @Override
+      public Op transform(OpLeftJoin opLeftJoin, Op left, Op right) {
         return selectSubOpIfOtherIsService(opLeftJoin, left, right, serviceURI);
       }
 
-      @Override public Op transform(OpMinus opMinus, Op left, Op right) {
+      @Override
+      public Op transform(OpMinus opMinus, Op left, Op right) {
         return selectSubOpIfOtherIsService(opMinus, left, right, serviceURI);
       }
 
-      @Override public Op transform(OpUnion opUnion, Op left, Op right) {
+      @Override
+      public Op transform(OpUnion opUnion, Op left, Op right) {
         return selectSubOpIfOtherIsService(opUnion, left, right, serviceURI);
       }
 
@@ -93,8 +99,8 @@ public class SparqlMatcherUtils {
       }
 
       private boolean isSelectedServiceOp(Op op, Optional<String> serviceURI) {
-        return op instanceof OpService && (!serviceURI.isPresent() || serviceURI.get()
-            .equals(((OpService) op).getService().toString()));
+        return op instanceof OpService
+            && (!serviceURI.isPresent() || serviceURI.get().equals(((OpService) op).getService().toString()));
       }
 
     }, queryOp);
@@ -111,7 +117,8 @@ public class SparqlMatcherUtils {
     // use a final array to obtain the result of the visit
     final Op[] toplevelOpProject = new Op[] { null };
     Walker.walk(op, new OpVisitorByTypeBase() {
-      @Override public void visit(OpProject opProject) {
+      @Override
+      public void visit(OpProject opProject) {
         // the visitor is called after returning from the recursion, so
         // we have to replace any project op we found deeper in the tree
         // to end up with the toplevel one in the end
@@ -144,14 +151,14 @@ public class SparqlMatcherUtils {
 
     Optional<Op> union = IntStream.range(1, hops + 1)
         .mapToObj(hopCount -> makePathBGPPattern(resultName, textSearchTarget, hopCount, op -> {
-              Expr filterExpression = Arrays.stream(
-                  tokenize ? searchString.toLowerCase().split(" ") : new String[] { searchString.toLowerCase() })
-                  .<Expr>map(searchPart -> new E_StrContains(new E_StrLowerCase(new ExprVar(textSearchTarget)),
-                          new NodeValueString(searchPart)))
-                  .reduce((left, right) -> disjunctive ? new E_LogicalOr(left, right) : new E_LogicalAnd(left, right))
-                  .orElse(new NodeValueBoolean(true));
-              return OpFilter.filterBy(new ExprList(filterExpression), op);
-            })).reduce((op1, op2) -> new OpUnion(op1, op2));
+          Expr filterExpression = Arrays
+              .stream(tokenize ? searchString.toLowerCase().split(" ") : new String[] { searchString.toLowerCase() })
+              .<Expr>map(searchPart -> new E_StrContains(new E_StrLowerCase(new ExprVar(textSearchTarget)),
+                  new NodeValueString(searchPart)))
+              .reduce((left, right) -> disjunctive ? new E_LogicalOr(left, right) : new E_LogicalAnd(left, right))
+              .orElse(new NodeValueBoolean(true));
+          return OpFilter.filterBy(new ExprList(filterExpression), op);
+        })).reduce((op1, op2) -> new OpUnion(op1, op2));
 
     Op maintriple = new OpTriple(new Triple(resultName, RDF.type.asNode(), WON.NEED.asNode()));
     Op mainOp = union.isPresent() ? OpJoin.create(maintriple, union.get()) : maintriple;
@@ -182,7 +189,8 @@ public class SparqlMatcherUtils {
     private Optional<InsertionInfo> highestCompleteInfo = Optional.empty();
     private InsertionInfo collectingInfo = new InsertionInfo();
 
-    @Override public void visit(OpProject op) {
+    @Override
+    public void visit(OpProject op) {
       rememberTreePositionIfFirst(op);
       highestCompleteInfo = Optional.of(collectingInfo);
       collectingInfo = new InsertionInfo();
@@ -194,23 +202,28 @@ public class SparqlMatcherUtils {
       collectingInfo.targetOp = Optional.of(mod);
     }
 
-    @Override public void visit(OpOrder op) {
+    @Override
+    public void visit(OpOrder op) {
       rememberTreePositionIfFirst(op);
     }
 
-    @Override public void visit(OpDistinct op) {
+    @Override
+    public void visit(OpDistinct op) {
       rememberTreePositionIfFirst(op);
     }
 
-    @Override public void visit(OpReduced op) {
+    @Override
+    public void visit(OpReduced op) {
       rememberTreePositionIfFirst(op);
     }
 
-    @Override public void visit(OpList op) {
+    @Override
+    public void visit(OpList op) {
       rememberTreePositionIfFirst(op);
     }
 
-    @Override public void visit(OpSlice op) {
+    @Override
+    public void visit(OpSlice op) {
       rememberTreePositionIfFirst(op);
     }
 
@@ -247,8 +260,8 @@ public class SparqlMatcherUtils {
     }
 
     private boolean isTargetOp(Op op) {
-      return insertionInfo.isPresent() && insertionInfo.get().targetOp.isPresent() && insertionInfo.get().targetOp.get()
-          .equals(op);
+      return insertionInfo.isPresent() && insertionInfo.get().targetOp.isPresent()
+          && insertionInfo.get().targetOp.get().equals(op);
     }
 
     public Op performInsertIfAtTarget(OpModifier op, Op subOp) {
@@ -263,27 +276,33 @@ public class SparqlMatcherUtils {
       return op.copy(subOp);
     }
 
-    @Override public Op transform(OpOrder op, Op subOp) {
+    @Override
+    public Op transform(OpOrder op, Op subOp) {
       return performInsertIfAtTarget(op, subOp);
     }
 
-    @Override public Op transform(OpDistinct op, Op subOp) {
+    @Override
+    public Op transform(OpDistinct op, Op subOp) {
       return performInsertIfAtTarget(op, subOp);
     }
 
-    @Override public Op transform(OpReduced op, Op subOp) {
+    @Override
+    public Op transform(OpReduced op, Op subOp) {
       return performInsertIfAtTarget(op, subOp);
     }
 
-    @Override public Op transform(OpList op, Op subOp) {
+    @Override
+    public Op transform(OpList op, Op subOp) {
       return performInsertIfAtTarget(op, subOp);
     }
 
-    @Override public Op transform(OpSlice op, Op subOp) {
+    @Override
+    public Op transform(OpSlice op, Op subOp) {
       return performInsertIfAtTarget(op, subOp);
     }
 
-    @Override public Op transform(OpProject op, Op subOp) {
+    @Override
+    public Op transform(OpProject op, Op subOp) {
       return performInsertIfAtTarget(op, subOp);
     }
 

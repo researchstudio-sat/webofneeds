@@ -7,11 +7,11 @@ package won.owner.pojo;
 import org.hibernate.validator.constraints.NotEmpty;
 
 /**
- * User: t.kozel
- * Date: 11/12/13
+ * User: t.kozel Date: 11/12/13
  */
 public class UserPojo extends UsernamePojo {
-  @NotEmpty private String password;
+  @NotEmpty
+  private String password;
 
   private String privateId;
 

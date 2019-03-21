@@ -20,8 +20,7 @@ import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 
 /**
- * User: fkleedorfer
- * Date: 30.04.14
+ * User: fkleedorfer Date: 30.04.14
  */
 public abstract class BaseCounterAction extends BaseEventBotAction {
   private Counter counter;

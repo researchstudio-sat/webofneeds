@@ -28,15 +28,16 @@ import won.protocol.jms.*;
 import java.net.URI;
 
 /**
- * User: syim
- * Date: 27.01.14
+ * User: syim Date: 27.01.14
  */
 
 public class NeedProtocolCommunicationServiceImpl implements NeedProtocolCommunicationService {
 
-  @Autowired private NeedProtocolCamelConfigurator needProtocolCamelConfigurator;
+  @Autowired
+  private NeedProtocolCamelConfigurator needProtocolCamelConfigurator;
 
-  @Autowired private ActiveMQService activeMQService;
+  @Autowired
+  private ActiveMQService activeMQService;
 
   private RegistrationClient registrationClient;
 
@@ -59,7 +60,8 @@ public class NeedProtocolCommunicationServiceImpl implements NeedProtocolCommuni
       camelConfiguration.setEndpoint(needProtocolCamelConfigurator.getEndpoint(wonNodeUri));
       camelConfiguration.setBrokerComponentName(
           needProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(remoteNodeBrokerUri));
-      //HINT: we may have to handle routes that were shut down automatically after a timeout here...
+      // HINT: we may have to handle routes that were shut down automatically after a
+      // timeout here...
     } else {
       logger.debug("broker component name unknown - setting up a new component for the remote broker");
       URI resourceUri;
@@ -71,8 +73,8 @@ public class NeedProtocolCommunicationServiceImpl implements NeedProtocolCommuni
       needProtocolQueueName = activeMQService.getProtocolQueueNameWithResource(resourceUri);
 
       registrationClient.register(wonNodeUri.toString());
-      String endpoint = needProtocolCamelConfigurator
-          .configureCamelEndpointForNeedUri(resourceUri, brokerUri, needProtocolQueueName);
+      String endpoint = needProtocolCamelConfigurator.configureCamelEndpointForNeedUri(resourceUri, brokerUri,
+          needProtocolQueueName);
       camelConfiguration.setEndpoint(endpoint);
       camelConfiguration
           .setBrokerComponentName(needProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(brokerUri));
@@ -84,19 +86,23 @@ public class NeedProtocolCommunicationServiceImpl implements NeedProtocolCommuni
     return camelConfiguration;
   }
 
-  @Override public URI getBrokerUri(URI resourceUri) throws NoSuchConnectionException {
+  @Override
+  public URI getBrokerUri(URI resourceUri) throws NoSuchConnectionException {
     return activeMQService.getBrokerEndpoint(resourceUri);
   }
 
-  @Override public ActiveMQService getActiveMQService() {
+  @Override
+  public ActiveMQService getActiveMQService() {
     return activeMQService;
   }
 
-  @Override public void setActiveMQService(ActiveMQService activeMQService) {
+  @Override
+  public void setActiveMQService(ActiveMQService activeMQService) {
     this.activeMQService = activeMQService;
   }
 
-  @Override public CamelConfigurator getProtocolCamelConfigurator() {
+  @Override
+  public CamelConfigurator getProtocolCamelConfigurator() {
     return needProtocolCamelConfigurator;
   }
 

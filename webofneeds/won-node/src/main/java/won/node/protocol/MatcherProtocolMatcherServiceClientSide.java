@@ -22,8 +22,7 @@ import won.protocol.message.WonMessage;
 import java.net.URI;
 
 /**
- * User: LEIH-NB
- * Date: 10.04.14
+ * User: LEIH-NB Date: 10.04.14
  */
 public interface MatcherProtocolMatcherServiceClientSide {
 

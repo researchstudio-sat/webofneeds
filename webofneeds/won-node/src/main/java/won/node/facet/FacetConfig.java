@@ -17,12 +17,14 @@ public interface FacetConfig {
   public Set<Property> getDerivationProperties();
 
   /**
-   * Indicates if a connection between this facet and the specified facet is allowed.
+   * Indicates if a connection between this facet and the specified facet is
+   * allowed.
    */
   public boolean isConnectionAllowedToType(URI remoteFacetType);
 
   /**
-   * Indicates if a connection to the specified remote facet reacts to a connect automatically with an open.
+   * Indicates if a connection to the specified remote facet reacts to a connect
+   * automatically with an open.
    */
   public boolean isAutoOpen(URI remoteFacetType);
 }

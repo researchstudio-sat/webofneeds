@@ -43,33 +43,34 @@ public class PetriNetStates {
   }
 
   private void calculate() {
-    // use only agreements and claims, process them in chronological order, leaving out
+    // use only agreements and claims, process them in chronological order, leaving
+    // out
     // those that have been cancelled (agreements) or rejected (claims)
-    // 1. when we find a petrinet definition: "x wf:hasInlinePetrinetDefinition [base64string]"
-    //  1.1. read petrinet definition
-    //  1.2 initialize petrinet state from file
+    // 1. when we find a petrinet definition: "x wf:hasInlinePetrinetDefinition
+    // [base64string]"
+    // 1.1. read petrinet definition
+    // 1.2 initialize petrinet state from file
     // 2.when we find a transition-firing triple: "x wf:firesTransition [eventURI]"
-    //     (transitions are annotated with unique event URIs that fire them)
-    //  1. find the transition annotated with the event URI and fire it
-    //  2. update the petrinet state
+    // (transitions are annotated with unique event URIs that fire them)
+    // 1. find the transition annotated with the event URI and fire it
+    // 2. update the petrinet state
 
-    //get agreement uris in chronological order
+    // get agreement uris in chronological order
     List<URI> uris = agreementProtocolState.getAgreementsAndClaimsInChronologicalOrder(true);
 
-    //walk over agreements
+    // walk over agreements
     uris.forEach(uri -> {
       boolean isAgreement = agreementProtocolState.isAgreement(uri);
       if (!isAgreement && !agreementProtocolState.isClaim(uri)) {
         throw new IllegalStateException(uri + " was reported as agreement or claim but is neither");
       }
-      Model agreementOrClaim = isAgreement ?
-          agreementProtocolState.getAgreement(uri) :
-          agreementProtocolState.getClaim(uri);
+      Model agreementOrClaim = isAgreement ? agreementProtocolState.getAgreement(uri)
+          : agreementProtocolState.getClaim(uri);
       logger.info("processing petri net data in {} {}", isAgreement ? "agreement" : "claim", uri);
-      //first, find petri net in current agreement
+      // first, find petri net in current agreement
       loadPetrinetsForAgreement(agreementOrClaim, uri, isAgreement);
 
-      //now see if there are events and execute them as transition firings
+      // now see if there are events and execute them as transition firings
       executePetriNetEventsForAgreement(agreementOrClaim, uri, isAgreement);
     });
 

@@ -11,8 +11,7 @@ import javax.mail.internet.MimeMessage;
 import java.io.File;
 
 /**
- * User: ypanchenko
- * Date: 23.02.2015
+ * User: ypanchenko Date: 23.02.2015
  */
 public class WonMailSender {
 

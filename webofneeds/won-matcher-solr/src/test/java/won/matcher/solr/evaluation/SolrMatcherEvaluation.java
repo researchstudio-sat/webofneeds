@@ -30,27 +30,35 @@ import java.util.Map;
 /**
  * Created by hfriedrich on 05.08.2016.
  * <p>
- * This class can be used to do evaluation of the quality of matching of Solr querying.
- * It reads needs mail files from supply and demand directories on the hard drive. Subject will be
- * mapped to title and content will be mapped to description. These needs can be written to the Solr index and queried.
- * The class uses a solr query executor that defines the Solr query to test for matching.
- * The class can build to tensors that can be used by the "wonpreprocessing" project to evaluate the quality of the
- * matching.
- * The connection tensor has all ground truth connections between all needs (read from the connections file).
- * The prediction tensor has all computed matches between all needs using the solr querying.
- * These tensor slices can be compared by the "wonpreprocessing" project to compute statistical evaluation measures
- * like precision, recall, accuracy and f-score.
+ * This class can be used to do evaluation of the quality of matching of Solr
+ * querying. It reads needs mail files from supply and demand directories on the
+ * hard drive. Subject will be mapped to title and content will be mapped to
+ * description. These needs can be written to the Solr index and queried. The
+ * class uses a solr query executor that defines the Solr query to test for
+ * matching. The class can build to tensors that can be used by the
+ * "wonpreprocessing" project to evaluate the quality of the matching. The
+ * connection tensor has all ground truth connections between all needs (read
+ * from the connections file). The prediction tensor has all computed matches
+ * between all needs using the solr querying. These tensor slices can be
+ * compared by the "wonpreprocessing" project to compute statistical evaluation
+ * measures like precision, recall, accuracy and f-score.
  */
-@Component public class SolrMatcherEvaluation {
-  @Autowired TestMatcherQueryExecutor queryExecutor;
+@Component
+public class SolrMatcherEvaluation {
+  @Autowired
+  TestMatcherQueryExecutor queryExecutor;
 
-  @Autowired NeedIndexer needIndexer;
+  @Autowired
+  NeedIndexer needIndexer;
 
-  @Autowired private MailDirNeedProducer seeksNeedProducer;
+  @Autowired
+  private MailDirNeedProducer seeksNeedProducer;
 
-  @Autowired private MailDirNeedProducer isNeedProducer;
+  @Autowired
+  private MailDirNeedProducer isNeedProducer;
 
-  @Autowired HintBuilder hintBuilder;
+  @Autowired
+  HintBuilder hintBuilder;
 
   private String outputDir;
   private String connectionsFile;
@@ -99,7 +107,8 @@ import java.util.Map;
     needFileDatasetMap = new HashMap<>();
   }
 
-  @PostConstruct public void init() throws IOException {
+  @PostConstruct
+  public void init() throws IOException {
 
     initNeedDir(seeksNeedProducer);
     initNeedDir(isNeedProducer);
@@ -109,9 +118,8 @@ import java.util.Map;
 
     // read the need files and add needs to the tensor
     if (needProducer.getDirectory() == null || !needProducer.getDirectory().isDirectory()) {
-      throw new IOException("Input folder not a directory: " + ((needProducer.getDirectory() != null) ?
-          needProducer.getDirectory().toString() :
-          null));
+      throw new IOException("Input folder not a directory: "
+          + ((needProducer.getDirectory() != null) ? needProducer.getDirectory().toString() : null));
     }
 
     while (!needProducer.isExhausted()) {
@@ -148,7 +156,8 @@ import java.util.Map;
 
     while ((line = reader.readLine()) != null) {
       if (line.length() == 0) {
-        // add a connection between the first need and all following needs until empty line
+        // add a connection between the first need and all following needs until empty
+        // line
         addConnection(needs, false);
         needs = new LinkedList<String>();
       } else {
@@ -175,10 +184,10 @@ import java.util.Map;
 
     for (Dataset need : needFileDatasetMap.values()) {
       for (String match : computeMatchingNeeds(need)) {
-        if (!matchingDataPredictions.getNeeds().contains(createNeedId(need)) || !matchingDataPredictions.getNeeds()
-            .contains(match)) {
-          throw new IOException("No need found in input directory for connection specified in connection file:  \n" +
-              createNeedId(need) + "\n" + match);
+        if (!matchingDataPredictions.getNeeds().contains(createNeedId(need))
+            || !matchingDataPredictions.getNeeds().contains(match)) {
+          throw new IOException("No need found in input directory for connection specified in connection file:  \n"
+              + createNeedId(need) + "\n" + match);
         }
         matchingDataPredictions.addNeedConnection(createNeedId(need), match, false);
       }
@@ -192,8 +201,8 @@ import java.util.Map;
 
     TestNeedQueryFactory needQuery = new TestNeedQueryFactory(need);
 
-    SolrDocumentList docs = queryExecutor
-        .executeNeedQuery(needQuery.createQuery(), 20, null, new BasicNeedQueryFactory(need).createQuery());
+    SolrDocumentList docs = queryExecutor.executeNeedQuery(needQuery.createQuery(), 20, null,
+        new BasicNeedQueryFactory(need).createQuery());
 
     SolrDocumentList matchedDocs = hintBuilder.calculateMatchingResults(docs);
 
@@ -220,8 +229,8 @@ import java.util.Map;
       String need2 = needs.get(i);
       if (!matchingDataConnections.getNeeds().contains(need1) || !matchingDataConnections.getNeeds().contains(need2)) {
         if (!ignoreNeedsNotFound) {
-          throw new IOException("No need found in input directory for connection specified in connection file:  \n" +
-              need1 + "\n" + need2);
+          throw new IOException("No need found in input directory for connection specified in connection file:  \n"
+              + need1 + "\n" + need2);
         }
       }
       matchingDataConnections.addNeedConnection(need1, need2, false);
@@ -229,5 +238,3 @@ import java.util.Map;
   }
 
 }
-
-

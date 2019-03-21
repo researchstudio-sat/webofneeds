@@ -24,7 +24,8 @@ public class Accepts extends MessageEffect {
     return cancelledAgreementURIs;
   }
 
-  @Override public String toString() {
+  @Override
+  public String toString() {
     return "Accepts [acceptedProposalUri=" + acceptedProposalUri + ", cancelledAgreementURIs=" + cancelledAgreementURIs
         + "]";
   }

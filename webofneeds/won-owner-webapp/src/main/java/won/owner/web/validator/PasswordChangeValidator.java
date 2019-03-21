@@ -15,24 +15,27 @@ import won.owner.pojo.ChangePasswordPojo;
 import won.owner.pojo.UserPojo;
 import won.owner.service.impl.WONUserDetailService;
 
-@Component public class PasswordChangeValidator implements Validator {
+@Component
+public class PasswordChangeValidator implements Validator {
   private final static Logger log = LoggerFactory.getLogger(PasswordChangeValidator.class);
 
   private final Validator validator;
 
   private final WONUserDetailService wonUserDetailService;
 
-  @Autowired public PasswordChangeValidator(final Validator validator,
-      final WONUserDetailService wonUserDetailService) {
+  @Autowired
+  public PasswordChangeValidator(final Validator validator, final WONUserDetailService wonUserDetailService) {
     this.validator = validator;
     this.wonUserDetailService = wonUserDetailService;
   }
 
-  @Override public boolean supports(final Class<?> clazz) {
+  @Override
+  public boolean supports(final Class<?> clazz) {
     return clazz.equals(UserPojo.class);
   }
 
-  @Override public void validate(final Object target, final Errors errors) {
+  @Override
+  public void validate(final Object target, final Errors errors) {
     ChangePasswordPojo changePasswordPojo = (ChangePasswordPojo) target;
 
     validator.validate(target, errors);

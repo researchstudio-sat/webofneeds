@@ -8,8 +8,8 @@ import java.util.Optional;
 
 /**
  * Simple helper class that creates a ConnectionStateChange object in two steps:
- * First, set the old state (or none if there is no connection yet), second set the
- * new state.
+ * First, set the old state (or none if there is no connection yet), second set
+ * the new state.
  */
 public class ConnectionStateChangeBuilder {
   private Optional<ConnectionState> oldState = Optional.empty();
@@ -22,7 +22,8 @@ public class ConnectionStateChangeBuilder {
   }
 
   /**
-   * Set the old connection state. If this method is not used, we'll assume there was no old connection.
+   * Set the old connection state. If this method is not used, we'll assume there
+   * was no old connection.
    */
   public ConnectionStateChangeBuilder oldState(ConnectionState oldState) {
     Objects.nonNull(oldState);

@@ -37,25 +37,26 @@ import java.net.URI;
 import java.util.Collection;
 
 /**
- * User: Danijel
- * Date: 21.5.14.
+ * User: Danijel Date: 21.5.14.
  */
 public class TwoPhaseCommitNoVoteDeactivateAllNeedsAction extends BaseEventBotAction {
   public TwoPhaseCommitNoVoteDeactivateAllNeedsAction(EventListenerContext eventListenerContext) {
     super(eventListenerContext);
   }
 
-  @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
+  @Override
+  protected void doRun(Event event, EventListener executingListener) throws Exception {
 
-    //check the global COORDINATION_MESSAGE (must be ABORT)
+    // check the global COORDINATION_MESSAGE (must be ABORT)
     if (event instanceof CloseFromOtherNeedEvent) {
       WonMessage wonMessage = ((CloseFromOtherNeedEvent) event).getWonMessage();
-      NodeIterator ni = RdfUtils
-          .visitFlattenedToNodeIterator(wonMessage.getMessageContent(), new RdfUtils.ModelVisitor<NodeIterator>() {
-                @Override public NodeIterator visit(final Model model) {
-                  return model.listObjectsOfProperty(model.createProperty(WON_TX.COORDINATION_MESSAGE.getURI()));
-                }
-              });
+      NodeIterator ni = RdfUtils.visitFlattenedToNodeIterator(wonMessage.getMessageContent(),
+          new RdfUtils.ModelVisitor<NodeIterator>() {
+            @Override
+            public NodeIterator visit(final Model model) {
+              return model.listObjectsOfProperty(model.createProperty(WON_TX.COORDINATION_MESSAGE.getURI()));
+            }
+          });
       if (ni.hasNext()) {
         String coordinationMessageUri = ni.toList().get(0).asResource().getURI().toString();
         if (coordinationMessageUri.equals(WON_TX.COORDINATION_MESSAGE_ABORT.getURI().toString()))
@@ -79,9 +80,8 @@ public class TwoPhaseCommitNoVoteDeactivateAllNeedsAction extends BaseEventBotAc
     Dataset ds = getEventListenerContext().getLinkedDataSource().getDataForResource(needURI);
     URI localWonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(ds, needURI);
 
-    return WonMessageBuilder
-        .setMessagePropertiesForDeactivateFromOwner(wonNodeInformationService.generateEventURI(localWonNode), needURI,
-            localWonNode).build();
+    return WonMessageBuilder.setMessagePropertiesForDeactivateFromOwner(
+        wonNodeInformationService.generateEventURI(localWonNode), needURI, localWonNode).build();
   }
 
 }

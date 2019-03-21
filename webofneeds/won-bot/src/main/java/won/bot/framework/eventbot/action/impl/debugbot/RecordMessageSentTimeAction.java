@@ -36,7 +36,8 @@ public class RecordMessageSentTimeAction extends BaseEventBotAction {
     this.timingManager = timingManager;
   }
 
-  @Override protected void doRun(final Event event, EventListener executingListener) throws Exception {
+  @Override
+  protected void doRun(final Event event, EventListener executingListener) throws Exception {
     if (event instanceof ConnectionSpecificEvent) {
       URI connectionUri = ((ConnectionSpecificEvent) event).getConnectionURI();
       if (connectionUri != null) {

@@ -6,7 +6,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * In memory context implementation using nested maps. This is the default implementation of the bot context.
+ * In memory context implementation using nested maps. This is the default
+ * implementation of the bot context.
  */
 public class MemoryBotContext implements BotContext {
   private Map<String, Map<String, Object>> contextObjectMap = new HashMap<>();
@@ -15,22 +16,26 @@ public class MemoryBotContext implements BotContext {
   private Set<URI> nodeUris = new HashSet<>();
   private Map<String, List<URI>> namedNeedUriLists = new HashMap();
 
-  @Override public Set<URI> retrieveAllNeedUris() {
+  @Override
+  public Set<URI> retrieveAllNeedUris() {
     Set<URI> ret = new HashSet<>();
     ret.addAll(namedNeedUriLists.values().stream().flatMap(List::stream).collect(Collectors.toSet()));
     return ret;
   }
 
-  @Override public synchronized boolean isNeedKnown(final URI needURI) {
+  @Override
+  public synchronized boolean isNeedKnown(final URI needURI) {
     return retrieveAllNeedUris().contains(needURI);
   }
 
-  @Override public synchronized void removeNeedUriFromNamedNeedUriList(URI uri, String name) {
+  @Override
+  public synchronized void removeNeedUriFromNamedNeedUriList(URI uri, String name) {
     List<URI> uris = namedNeedUriLists.get(name);
     uris.remove(uri);
   }
 
-  @Override public synchronized void appendToNamedNeedUriList(final URI uri, final String name) {
+  @Override
+  public synchronized void appendToNamedNeedUriList(final URI uri, final String name) {
 
     List<URI> uris = this.namedNeedUriLists.get(name);
     if (uris == null) {
@@ -40,7 +45,8 @@ public class MemoryBotContext implements BotContext {
     this.namedNeedUriLists.put(name, uris);
   }
 
-  @Override public synchronized boolean isInNamedNeedUriList(URI uri, String name) {
+  @Override
+  public synchronized boolean isInNamedNeedUriList(URI uri, String name) {
     List<URI> uris = getNamedNeedUriList(name);
 
     for (URI tmpUri : uris) {
@@ -51,7 +57,8 @@ public class MemoryBotContext implements BotContext {
     return false;
   }
 
-  @Override public synchronized List<URI> getNamedNeedUriList(final String name) {
+  @Override
+  public synchronized List<URI> getNamedNeedUriList(final String name) {
 
     List<URI> ret = new LinkedList<>();
     List<URI> namedList = this.namedNeedUriLists.get(name);
@@ -62,15 +69,18 @@ public class MemoryBotContext implements BotContext {
     return ret;
   }
 
-  @Override public synchronized boolean isNodeKnown(final URI wonNodeURI) {
+  @Override
+  public synchronized boolean isNodeKnown(final URI wonNodeURI) {
     return nodeUris.contains(wonNodeURI);
   }
 
-  @Override public synchronized void rememberNodeUri(final URI uri) {
+  @Override
+  public synchronized void rememberNodeUri(final URI uri) {
     nodeUris.add(uri);
   }
 
-  @Override public synchronized void removeNodeUri(final URI uri) {
+  @Override
+  public synchronized void removeNodeUri(final URI uri) {
     nodeUris.remove(uri);
   }
 
@@ -84,23 +94,28 @@ public class MemoryBotContext implements BotContext {
     return collection;
   }
 
-  @Override public void dropCollection(String collectionName) {
+  @Override
+  public void dropCollection(String collectionName) {
     contextObjectMap.remove(collectionName);
   }
 
-  @Override public synchronized void saveToObjectMap(String collectionName, String key, final Serializable value) {
+  @Override
+  public synchronized void saveToObjectMap(String collectionName, String key, final Serializable value) {
     getObjectMap(collectionName).put(key, value);
   }
 
-  @Override public synchronized final Object loadFromObjectMap(String collectionName, String key) {
+  @Override
+  public synchronized final Object loadFromObjectMap(String collectionName, String key) {
     return getObjectMap(collectionName).get(key);
   }
 
-  @Override public Map<String, Object> loadObjectMap(final String collectionName) {
+  @Override
+  public Map<String, Object> loadObjectMap(final String collectionName) {
     return new HashMap<String, Object>(getObjectMap(collectionName));
   }
 
-  @Override public synchronized final void removeFromObjectMap(String collectionName, String key) {
+  @Override
+  public synchronized final void removeFromObjectMap(String collectionName, String key) {
     getObjectMap(collectionName).remove(key);
   }
 
@@ -124,29 +139,35 @@ public class MemoryBotContext implements BotContext {
     return objectList;
   }
 
-  @Override public void addToListMap(final String collectionName, final String key, final Serializable... value) {
+  @Override
+  public void addToListMap(final String collectionName, final String key, final Serializable... value) {
     getList(collectionName, key).addAll(Arrays.asList(value));
   }
 
-  @Override public void removeFromListMap(final String collectionName, final String key, final Serializable... values) {
+  @Override
+  public void removeFromListMap(final String collectionName, final String key, final Serializable... values) {
     getList(collectionName, key).removeAll(Arrays.asList(values));
   }
 
-  @Override public void removeLeavesFromListMap(String collectionName, final Serializable... values) {
+  @Override
+  public void removeLeavesFromListMap(String collectionName, final Serializable... values) {
     for (String key : getListMap(collectionName).keySet()) {
       removeFromListMap(collectionName, key, values);
     }
   }
 
-  @Override public List<Object> loadFromListMap(final String collectionName, final String key) {
+  @Override
+  public List<Object> loadFromListMap(final String collectionName, final String key) {
     return new LinkedList<>(getList(collectionName, key));
   }
 
-  @Override public Map<String, List<Object>> loadListMap(final String collectionName) {
+  @Override
+  public Map<String, List<Object>> loadListMap(final String collectionName) {
     return new HashMap<>(getListMap(collectionName));
   }
 
-  @Override public void removeFromListMap(final String collectionName, final String key) {
+  @Override
+  public void removeFromListMap(final String collectionName, final String key) {
     getListMap(collectionName).remove(key);
   }
 }

@@ -8,8 +8,10 @@ import javax.annotation.PostConstruct;
 /**
  * Created by hfriedrich on 12.08.2016.
  */
-@Component public class TestMatcherQueryExecutor extends DefaultMatcherQueryExecuter {
-  @PostConstruct private void init() {
+@Component
+public class TestMatcherQueryExecutor extends DefaultMatcherQueryExecuter {
+  @PostConstruct
+  private void init() {
     solrClient = new HttpSolrClient.Builder(config.getSolrEndpointUri(true)).build();
   }
 }

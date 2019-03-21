@@ -15,26 +15,29 @@ import won.owner.pojo.UserPojo;
 import won.owner.service.impl.WONUserDetailService;
 
 /**
- * User: t.kozel
- * Date: 11/12/13
+ * User: t.kozel Date: 11/12/13
  */
-@Component public class UserRegisterValidator implements Validator {
+@Component
+public class UserRegisterValidator implements Validator {
   private final static Logger log = LoggerFactory.getLogger(UserRegisterValidator.class);
 
   private final Validator validator;
 
   private final WONUserDetailService wonUserDetailService;
 
-  @Autowired public UserRegisterValidator(final Validator validator, final WONUserDetailService wonUserDetailService) {
+  @Autowired
+  public UserRegisterValidator(final Validator validator, final WONUserDetailService wonUserDetailService) {
     this.validator = validator;
     this.wonUserDetailService = wonUserDetailService;
   }
 
-  @Override public boolean supports(final Class<?> clazz) {
+  @Override
+  public boolean supports(final Class<?> clazz) {
     return clazz.equals(UserPojo.class);
   }
 
-  @Override public void validate(final Object target, final Errors errors) {
+  @Override
+  public void validate(final Object target, final Errors errors) {
     UserPojo user = (UserPojo) target;
 
     validator.validate(target, errors);

@@ -39,25 +39,27 @@ import java.net.URI;
 /**
  * Checks whether the event or need URI is already used.
  * <p>
- * It is possible that while this check succeeds for the uri, when the time comes
- * to save this uri into the repository, this uri by that time will be used.
- * TODO Therefore, the UriAlreadyInUseException or EventAlreadyProcessedException has
- * to also be thrown from there.
- * Nevertheless, to have such a separate check for the uri-is-use problems is useful,
- * because it can detect and react to the problem on the early stage, before the whole
- * message processing logic is at work.
+ * It is possible that while this check succeeds for the uri, when the time
+ * comes to save this uri into the repository, this uri by that time will be
+ * used. TODO Therefore, the UriAlreadyInUseException or
+ * EventAlreadyProcessedException has to also be thrown from there.
+ * Nevertheless, to have such a separate check for the uri-is-use problems is
+ * useful, because it can detect and react to the problem on the early stage,
+ * before the whole message processing logic is at work.
  * <p>
- * User: ypanchenko
- * Date: 23.04.2015
+ * User: ypanchenko Date: 23.04.2015
  */
 public class UriAlreadyUsedCheckingWonMessageProcessor implements WonMessageProcessor {
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Autowired private MessageEventRepository messageEventRepository;
-  @Autowired protected NeedRepository needRepository;
+  @Autowired
+  private MessageEventRepository messageEventRepository;
+  @Autowired
+  protected NeedRepository needRepository;
 
-  @Override public WonMessage process(final WonMessage message) throws UriAlreadyInUseException {
+  @Override
+  public WonMessage process(final WonMessage message) throws UriAlreadyInUseException {
     checkEventURI(message);
     checkNeedURI(message);
     return message;
@@ -100,10 +102,14 @@ public class UriAlreadyUsedCheckingWonMessageProcessor implements WonMessageProc
     Dataset processedDataset = event.getDatasetHolder().getDataset();
 
     // compare with received message
-    // TODO ideally, here, only signatures of the corresponding envelopes have to be compared.
-    // But as of now, before saving, the receiving side can add any number of envelopes.
-    // Therefore, temporarily, before we know better how to retrieve the right envelope,
-    // we compare here the main envelope data and the contents, without envelope signatures.
+    // TODO ideally, here, only signatures of the corresponding envelopes have to be
+    // compared.
+    // But as of now, before saving, the receiving side can add any number of
+    // envelopes.
+    // Therefore, temporarily, before we know better how to retrieve the right
+    // envelope,
+    // we compare here the main envelope data and the contents, without envelope
+    // signatures.
 
     WonMessage processedMessage = new WonMessage(processedDataset);
 
@@ -122,8 +128,8 @@ public class UriAlreadyUsedCheckingWonMessageProcessor implements WonMessageProc
     Dataset processedContent = processedMessage.getMessageContent();
     for (String name : RdfUtils.getModelNames(processedContent)) {
       Model model = processedContent.getNamedModel(name);
-      if (WonRdfUtils.SignatureUtils.isSignatureGraph(name, model) && !RdfUtils.getModelNames(messageContent)
-          .contains(name)) {
+      if (WonRdfUtils.SignatureUtils.isSignatureGraph(name, model)
+          && !RdfUtils.getModelNames(messageContent).contains(name)) {
         processedContent.removeNamedModel(name);
       }
     }
@@ -134,25 +140,23 @@ public class UriAlreadyUsedCheckingWonMessageProcessor implements WonMessageProc
   }
 
   private boolean hasSameEnvelopeData(final WonMessage processedMessage, final WonMessage message) {
-    if (equalsOrBothNull(processedMessage.getSenderNeedURI(), message.getSenderNeedURI()) &&
-        equalsOrBothNull(processedMessage.getReceiverNeedURI(), message.getReceiverNeedURI())
-        //the receiving side can add this info
-        //&&
-        //equalsOrBothNull(processedMessage.getSenderURI(), message.getSenderURI())
-        &&
-        equalsOrBothNull(processedMessage.getReceiverURI(), message.getReceiverURI()) &&
-        equalsOrBothNull(processedMessage.getSenderNodeURI(), message.getSenderNodeURI()) &&
-        equalsOrBothNull(processedMessage.getReceiverNodeURI(), message.getReceiverNodeURI())
-        //the receiving side can add this info
-        //&&
-        //equalsOrBothNull(processedMessage.getCorrespondingRemoteMessageURI(),
-        //                  message.getCorrespondingRemoteMessageURI())
-        &&
-        equalsOrBothNull(processedMessage.getIsResponseToMessageURI(), message.getIsResponseToMessageURI()) &&
-        processedMessage.getContentGraphURIs().containsAll(message.getContentGraphURIs()) &&
-        equalsOrBothNull(processedMessage.getMessageType(), message.getMessageType()) &&
-        processedMessage.getRefersTo().containsAll(message.getRefersTo()) &&
-        equalsOrBothNull(processedMessage.getEnvelopeType(), message.getEnvelopeType())) {
+    if (equalsOrBothNull(processedMessage.getSenderNeedURI(), message.getSenderNeedURI())
+        && equalsOrBothNull(processedMessage.getReceiverNeedURI(), message.getReceiverNeedURI())
+        // the receiving side can add this info
+        // &&
+        // equalsOrBothNull(processedMessage.getSenderURI(), message.getSenderURI())
+        && equalsOrBothNull(processedMessage.getReceiverURI(), message.getReceiverURI())
+        && equalsOrBothNull(processedMessage.getSenderNodeURI(), message.getSenderNodeURI())
+        && equalsOrBothNull(processedMessage.getReceiverNodeURI(), message.getReceiverNodeURI())
+        // the receiving side can add this info
+        // &&
+        // equalsOrBothNull(processedMessage.getCorrespondingRemoteMessageURI(),
+        // message.getCorrespondingRemoteMessageURI())
+        && equalsOrBothNull(processedMessage.getIsResponseToMessageURI(), message.getIsResponseToMessageURI())
+        && processedMessage.getContentGraphURIs().containsAll(message.getContentGraphURIs())
+        && equalsOrBothNull(processedMessage.getMessageType(), message.getMessageType())
+        && processedMessage.getRefersTo().containsAll(message.getRefersTo())
+        && equalsOrBothNull(processedMessage.getEnvelopeType(), message.getEnvelopeType())) {
       return true;
     }
     return false;

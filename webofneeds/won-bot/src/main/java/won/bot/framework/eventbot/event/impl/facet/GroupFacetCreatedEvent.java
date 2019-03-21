@@ -23,8 +23,7 @@ import won.protocol.model.FacetType;
 import java.net.URI;
 
 /**
- * User: LEIH-NB
- * Date: 05.02.14
+ * User: LEIH-NB Date: 05.02.14
  */
 public class GroupFacetCreatedEvent extends BaseEvent {
   private URI groupFacetURI;
@@ -52,5 +51,3 @@ public class GroupFacetCreatedEvent extends BaseEvent {
   }
 
 }
-
-

@@ -24,7 +24,8 @@ import java.util.Collection;
 public class DeleteNeedMessageProcessor extends AbstractCamelProcessor {
   Logger logger = LoggerFactory.getLogger(this.getClass());
 
-  @Override public void process(final Exchange exchange) throws Exception {
+  @Override
+  public void process(final Exchange exchange) throws Exception {
     WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
     if (wonMessage.getMessageType() == WonMessageType.SUCCESS_RESPONSE
         && wonMessage.getIsResponseToMessageType() == WonMessageType.DELETE) {
@@ -40,16 +41,17 @@ public class DeleteNeedMessageProcessor extends AbstractCamelProcessor {
         Collection<Connection> conns = connectionRepository
             .getConnectionsByNeedURIAndNotInStateForUpdate(need.getNeedURI(), ConnectionState.CLOSED);
         if (conns.size() > 0) {
-          //Still not closed connections
+          // Still not closed connections
           logger.debug("Still open connections for need. needURI{}", receiverNeedURI);
-          //TODO: Handle!
+          // TODO: Handle!
 
         }
 
         messageEventRepository.deleteByParentURI(need.getNeedURI());
         need.resetAllNeedData();
       } else {
-        // First Step: Delete message to set need in DELETED state and start delete process
+        // First Step: Delete message to set need in DELETED state and start delete
+        // process
         logger.debug("DELETING need. needURI:{}", receiverNeedURI);
         need.setState(NeedState.DELETED);
       }

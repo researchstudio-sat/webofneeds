@@ -12,7 +12,8 @@ public class ExactMatchFieldQueryFactory extends SolrQueryFactory {
     this.fieldName = fieldName;
   }
 
-  @Override protected String makeQueryString() {
+  @Override
+  protected String makeQueryString() {
 
     if (fieldName == null || value == null) {
       throw new NullPointerException("fieldName or value may not be null");

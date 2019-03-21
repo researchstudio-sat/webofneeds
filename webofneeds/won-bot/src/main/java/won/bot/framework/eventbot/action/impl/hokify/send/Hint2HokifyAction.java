@@ -22,7 +22,8 @@ public class Hint2HokifyAction extends BaseEventBotAction {
     super(ctx);
   }
 
-  @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
+  @Override
+  protected void doRun(Event event, EventListener executingListener) throws Exception {
 
     logger.info("HintEvent received");
 
@@ -43,8 +44,11 @@ public class Hint2HokifyAction extends BaseEventBotAction {
       }
 
       try {
-        //Message message = wonHokifyJobBotHandler.sendMessage(wonHokifyJobBotHandler.getHokifyMessageGenerator().getHintMessage(remoteNeedUri, yourNeedUri));
-        //botContextWrapper.addMessageIdWonURIRelation(wonMessage.getMessageURI(), new WonURI(wonMessage.getReceiverURI(), UriType.CONNECTION));
+        // Message message =
+        // wonHokifyJobBotHandler.sendMessage(wonHokifyJobBotHandler.getHokifyMessageGenerator().getHintMessage(remoteNeedUri,
+        // yourNeedUri));
+        // botContextWrapper.addMessageIdWonURIRelation(wonMessage.getMessageURI(), new
+        // WonURI(wonMessage.getReceiverURI(), UriType.CONNECTION));
       } catch (Exception te) {
         logger.error("HERE is the Hint Exception" + te.getMessage());
       }

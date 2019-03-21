@@ -24,7 +24,8 @@ import won.bot.framework.eventbot.listener.EventListener;
 import java.util.concurrent.CyclicBarrier;
 
 /**
- * Action that trips the specified barrier. Used to synchronize test execution with bot execution.
+ * Action that trips the specified barrier. Used to synchronize test execution
+ * with bot execution.
  */
 public class TripBarrierAction extends BaseEventBotAction {
   private CyclicBarrier barrier;
@@ -34,10 +35,12 @@ public class TripBarrierAction extends BaseEventBotAction {
     this.barrier = barrier;
   }
 
-  @Override protected void doRun(final Event event, EventListener executingListener) throws Exception {
+  @Override
+  protected void doRun(final Event event, EventListener executingListener) throws Exception {
     try {
-      //together with the barrier.await() in the @TestD method, this trips the barrier
-      //and both threads continue.
+      // together with the barrier.await() in the @TestD method, this trips the
+      // barrier
+      // and both threads continue.
       barrier.await();
     } catch (Exception e) {
       logger.warn("caught exception while waiting on barrier", e);

@@ -23,13 +23,14 @@ import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.camel.WonCamelConstants;
 
 /**
- * Determines if a given WonMessageType of a 'FromOwner' message
- * is to be processed by logic that is responsible for a connection.
- * If yes, facet implementations are executed and the message is
- * passed to the remote won node.
+ * Determines if a given WonMessageType of a 'FromOwner' message is to be
+ * processed by logic that is responsible for a connection. If yes, facet
+ * implementations are executed and the message is passed to the remote won
+ * node.
  */
 public class ShouldCallFacetImplForMessagePredicate implements Predicate {
-  @Override public boolean matches(final Exchange exchange) {
+  @Override
+  public boolean matches(final Exchange exchange) {
     WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
     WonMessageType messageType = wonMessage.getMessageType();
     switch (messageType) {

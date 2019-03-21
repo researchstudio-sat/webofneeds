@@ -25,23 +25,23 @@ public class Message2HokifyAction extends BaseEventBotAction {
     super(ctx);
   }
 
-  @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
+  @Override
+  protected void doRun(Event event, EventListener executingListener) throws Exception {
 
     logger.info("MessageEvent received");
 
     EventListenerContext ctx = getEventListenerContext();
 
-    if (event instanceof MessageFromOtherNeedEvent && ctx
-        .getBotContextWrapper() instanceof HokifyJobBotContextWrapper) {
+    if (event instanceof MessageFromOtherNeedEvent
+        && ctx.getBotContextWrapper() instanceof HokifyJobBotContextWrapper) {
       HokifyJobBotContextWrapper botContextWrapper = (HokifyJobBotContextWrapper) ctx.getBotContextWrapper();
 
       Connection con = ((MessageFromOtherNeedEvent) event).getCon();
 
       URI yourNeedUri = con.getNeedURI();
       String jobUrl = botContextWrapper.getJobURLForURI(yourNeedUri);
-      String respondWith = jobUrl != null ?
-          "You need more information?\n Just follow this link: " + jobUrl :
-          "The job is no longer available, sorry!";
+      String respondWith = jobUrl != null ? "You need more information?\n Just follow this link: " + jobUrl
+          : "The job is no longer available, sorry!";
 
       try {
         Model messageModel = WonRdfUtils.MessageUtils.textMessage(respondWith);

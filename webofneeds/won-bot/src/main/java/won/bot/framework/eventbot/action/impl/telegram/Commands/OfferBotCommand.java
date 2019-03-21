@@ -23,7 +23,8 @@ public class OfferBotCommand extends BotCommand {
     this.bus = bus;
   }
 
-  @Override public void execute(AbsSender absSender, User user, Chat chat, String[] strings) {
+  @Override
+  public void execute(AbsSender absSender, User user, Chat chat, String[] strings) {
     strings = ArrayUtils.add(strings, 0, "[OFFER]");
     bus.publish(new TelegramCreateNeedEvent(absSender, user, chat, strings));
   }

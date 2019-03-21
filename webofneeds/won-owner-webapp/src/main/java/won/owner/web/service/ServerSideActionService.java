@@ -24,23 +24,27 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
-@Component public class ServerSideActionService implements WonMessageProcessor {
+@Component
+public class ServerSideActionService implements WonMessageProcessor {
 
   EventTriggeredActionContainer<WonMessage> actionContainer = new EventTriggeredActionContainer<WonMessage>();
 
-  @Autowired WonNodeInformationService wonNodeInformationService;
+  @Autowired
+  WonNodeInformationService wonNodeInformationService;
 
-  @Autowired private LinkedDataSource linkedDataSourceOnBehalfOfNeed;
+  @Autowired
+  private LinkedDataSource linkedDataSourceOnBehalfOfNeed;
 
-  @Autowired private LinkedDataSource linkedDataSource;
+  @Autowired
+  private LinkedDataSource linkedDataSource;
 
   // ownerApplicationService for sending messages from the owner to the node
   private OwnerApplicationService ownerApplicationService;
 
   /**
-   * Connect the specified facets, optionally waiting until the respective needs have
-   * been created. Use the specified authentication for sending messages on behalf
-   * of the user the authentication was obtained from.
+   * Connect the specified facets, optionally waiting until the respective needs
+   * have been created. Use the specified authentication for sending messages on
+   * behalf of the user the authentication was obtained from.
    */
   public void connect(List<FacetToConnect> facets, Authentication authentication) {
     // a little bit of shared state for the actions we are creating:
@@ -53,41 +57,47 @@ import java.util.function.Function;
     final URI fromFacet = URI.create(facets.get(0).getFacet());
     final URI toFacet = URI.create(facets.get(1).getFacet());
 
-    //count the pending facets
+    // count the pending facets
     int needs = (int) facets.stream().filter(f -> !f.isPending()).count();
     needCounter.set(needs);
 
     final Function<Optional<WonMessage>, Collection<EventTriggeredAction<WonMessage>>> action = new Function<Optional<WonMessage>, Collection<EventTriggeredAction<WonMessage>>>() {
-      @Override public Collection<EventTriggeredAction<WonMessage>> apply(Optional<WonMessage> msg) {
-        //process success responses for create
+      @Override
+      public Collection<EventTriggeredAction<WonMessage>> apply(Optional<WonMessage> msg) {
+        // process success responses for create
         if (msg.isPresent() && needCounter.get() < 2 && isResponseToCreateOfFacets(msg.get(), facets)
             && isSuccessResponse(msg.get())) {
-          //we're processing a response event for the creation of one of our needs.
+          // we're processing a response event for the creation of one of our needs.
           needCounter.incrementAndGet();
         }
-        // maybe we're processing a response to create, maybe we're processing an empty event:
+        // maybe we're processing a response to create, maybe we're processing an empty
+        // event:
         if (needCounter.get() >= 2) {
-          //we have all the needs we need for the connect.
+          // we have all the needs we need for the connect.
           if (connectSent.compareAndSet(false, true)) {
             // we haven't sent the connect yet, do it now and register a new action
             // waiting for the connect on the receiving end.
             sendConnect(fromFacet, toFacet, authentication);
-            return Arrays.asList(new EventTriggeredAction<WonMessage>(String
-                    .format("Connect %s and %s: Expecting incoming connect from %s for %s", fromFacet, toFacet,
-                        fromFacet, toFacet), m -> isConnectFromFacetForFacet(m.get(), fromFacet, toFacet), this));
+            return Arrays
+                .asList(
+                    new EventTriggeredAction<WonMessage>(
+                        String.format("Connect %s and %s: Expecting incoming connect from %s for %s", fromFacet,
+                            toFacet, fromFacet, toFacet),
+                        m -> isConnectFromFacetForFacet(m.get(), fromFacet, toFacet), this));
           } else {
             // we have sent the connect, check if we're processing the connect on the
             // receiving end. If so, send an open.
             if (isConnectFromFacetForFacet(msg.get(), fromFacet, toFacet)) {
               sendOpen(msg.get(), authentication);
-              //that's it - don't register any more actions
+              // that's it - don't register any more actions
             }
           }
         } else {
-          //we are still waiting for need creation to finish. return this action waiting for another create response
+          // we are still waiting for need creation to finish. return this action waiting
+          // for another create response
           return Arrays.asList(new EventTriggeredAction<>(
-                  String.format("Connect %s and %s: Expecting response for create", fromFacet, toFacet),
-                  m -> m.isPresent() && isResponseToCreateOfFacets(m.get(), facets), this));
+              String.format("Connect %s and %s: Expecting response for create", fromFacet, toFacet),
+              m -> m.isPresent() && isResponseToCreateOfFacets(m.get(), facets), this));
 
         }
         // none of the above - this is the last execution of this action.
@@ -95,7 +105,8 @@ import java.util.function.Function;
       }
     };
 
-    // add the action in such a way that it is triggered on add (with an empty Optional<WonMessage>)
+    // add the action in such a way that it is triggered on add (with an empty
+    // Optional<WonMessage>)
     this.actionContainer.addAction(
         new EventTriggeredAction<WonMessage>(String.format("Connect %s and %s", fromFacet, toFacet), action));
 
@@ -111,8 +122,8 @@ import java.util.function.Function;
 
   private boolean isResponseToCreateOfFacet(WonMessage msg, FacetToConnect facet) {
     return msg.getIsResponseToMessageType() == WonMessageType.CREATE_NEED
-        && msg.getEnvelopeType() == WonMessageDirection.FROM_SYSTEM && facet.getFacet()
-        .startsWith(msg.getReceiverNeedURI().toString() + "#");
+        && msg.getEnvelopeType() == WonMessageDirection.FROM_SYSTEM
+        && facet.getFacet().startsWith(msg.getReceiverNeedURI().toString() + "#");
   }
 
   private boolean isConnectFromFacetForFacet(WonMessage msg, URI sender, URI receiver) {
@@ -154,7 +165,8 @@ import java.util.function.Function;
     }
   }
 
-  @Override public WonMessage process(WonMessage message) throws WonMessageProcessingException {
+  @Override
+  public WonMessage process(WonMessage message) throws WonMessageProcessingException {
     actionContainer.executeFor(Optional.of(message));
     return message;
   }

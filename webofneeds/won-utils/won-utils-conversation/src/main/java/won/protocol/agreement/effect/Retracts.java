@@ -15,7 +15,8 @@ public class Retracts extends MessageEffect {
     return retractedMessageUri;
   }
 
-  @Override public String toString() {
+  @Override
+  public String toString() {
     return "Retracts [retractedMessageUri=" + retractedMessageUri + "]";
   }
 

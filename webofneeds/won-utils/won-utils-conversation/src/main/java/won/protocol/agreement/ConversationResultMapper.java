@@ -21,7 +21,8 @@ public class ConversationResultMapper implements Function<QuerySolution, Convers
     return this.knownMessages;
   }
 
-  @Override public ConversationMessage apply(QuerySolution solution) {
+  @Override
+  public ConversationMessage apply(QuerySolution solution) {
     URI messageUri = getUriVar(solution, "msg");
     ConversationMessage ret = knownMessages.get(messageUri);
     if (ret == null) {

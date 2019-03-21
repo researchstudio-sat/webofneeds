@@ -38,20 +38,24 @@ import java.util.List;
 public class DefaultWoNAccessDecisionVoter implements AccessDecisionVoter {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Autowired AccessControlRules defaultAccessControlRules;
+  @Autowired
+  AccessControlRules defaultAccessControlRules;
 
   public DefaultWoNAccessDecisionVoter() {
   }
 
-  @Override public boolean supports(final ConfigAttribute attribute) {
+  @Override
+  public boolean supports(final ConfigAttribute attribute) {
     return true;
   }
 
-  @Override public boolean supports(final Class clazz) {
+  @Override
+  public boolean supports(final Class clazz) {
     return FilterInvocation.class.equals(clazz);
   }
 
-  @Override public int vote(final Authentication authentication, final Object object, final Collection collection) {
+  @Override
+  public int vote(final Authentication authentication, final Object object, final Collection collection) {
     StopWatch stopWatch = new StopWatch();
     stopWatch.start();
     if (!(authentication instanceof PreAuthenticatedAuthenticationToken))
@@ -66,7 +70,7 @@ public class DefaultWoNAccessDecisionVoter implements AccessDecisionVoter {
     String resource = ((FilterInvocation) object).getRequest().getRequestURL().toString();
     if (authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).filter(r -> "ROLE_WEBID".equals(r))
         .findAny().isPresent()) {
-      //perform our hard coded access control checks
+      // perform our hard coded access control checks
       List<String> webIDs = new ArrayList<>(1);
       webIDs.add(webId);
       if (defaultAccessControlRules.isAccessPermitted(resource, webIDs)) {

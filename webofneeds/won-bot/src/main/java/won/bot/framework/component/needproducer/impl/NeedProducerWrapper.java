@@ -19,8 +19,7 @@ package won.bot.framework.component.needproducer.impl;
 import won.bot.framework.component.needproducer.NeedProducer;
 
 /**
- * User: fkleedorfer
- * Date: 17.12.13
+ * User: fkleedorfer Date: 17.12.13
  */
 public interface NeedProducerWrapper extends NeedProducer {
   public void setWrappedProducer(final NeedProducer wrappedProducer);

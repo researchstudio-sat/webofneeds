@@ -18,11 +18,14 @@ import won.protocol.vocabulary.WONMSG;
 import java.net.URI;
 import java.util.Optional;
 
-@Component @FixedMessageReactionProcessor(direction = WONMSG.TYPE_FROM_EXTERNAL_STRING, messageType = WONMSG.TYPE_OPEN_STRING) public class OpenMessageFromNodeReactionProcessor
-    extends AbstractCamelProcessor {
+@Component
+@FixedMessageReactionProcessor(direction = WONMSG.TYPE_FROM_EXTERNAL_STRING, messageType = WONMSG.TYPE_OPEN_STRING)
+public class OpenMessageFromNodeReactionProcessor extends AbstractCamelProcessor {
 
-  @Override public void process(Exchange exchange) throws Exception {
-    //if the connection's facet isAutoOpen and the connection state is REQUEST_RECEIVED
+  @Override
+  public void process(Exchange exchange) throws Exception {
+    // if the connection's facet isAutoOpen and the connection state is
+    // REQUEST_RECEIVED
     Message message = exchange.getIn();
     WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
     Optional<URI> needURI = Optional.of(wonMessage.getReceiverNeedURI());
@@ -43,8 +46,9 @@ import java.util.Optional;
   private void sendAutoOpenForOpen(WonMessage connectMessageToReactTo) {
     URI fromWonNodeURI = connectMessageToReactTo.getReceiverNodeURI();
     URI messageURI = wonNodeInformationService.generateEventURI(fromWonNodeURI);
-    WonMessage msg = WonMessageBuilder.setMessagePropertiesForOpen(messageURI, connectMessageToReactTo,
-        "This is an automatic OPEN message sent by the WoN node")
+    WonMessage msg = WonMessageBuilder
+        .setMessagePropertiesForOpen(messageURI, connectMessageToReactTo,
+            "This is an automatic OPEN message sent by the WoN node")
         .setWonMessageDirection(WonMessageDirection.FROM_SYSTEM).build();
     logger.info("sending auto-open for connection {}, reacting to open", msg.getSenderURI());
     super.sendSystemMessage(msg);

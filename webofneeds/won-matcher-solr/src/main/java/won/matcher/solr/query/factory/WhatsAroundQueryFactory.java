@@ -30,8 +30,10 @@ public class WhatsAroundQueryFactory extends BasicNeedQueryFactory {
       addLocationFilters(contentNode, MatcherNeedContentPropertyType.SEEKS);
     }
 
-    // create a dummy query, this is the minimal part of a query that has no search term content
-    // so that we at least create some valid query, in this case we just search for "all other needs"
+    // create a dummy query, this is the minimal part of a query that has no search
+    // term content
+    // so that we at least create some valid query, in this case we just search for
+    // "all other needs"
     MatchFieldQueryFactory dummyQuery = new MatchFieldQueryFactory(NEED_TYPE_DUMMY_FIELD,
         NEED_TYPE_DUMMY_FIELD_CONTENT);
     contentFactories.add(dummyQuery);

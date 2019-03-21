@@ -24,7 +24,8 @@ import won.protocol.model.Connection;
 import java.net.URI;
 
 /**
- * Indicates that the bot has failed to send a close message, thereby closing a connection.
+ * Indicates that the bot has failed to send a close message, thereby closing a
+ * connection.
  */
 public class CloseCommandFailureEvent extends AbstractMessageCommandResultEvent
     implements MessageCommandFailureEvent, CloseCommandResultEvent {
@@ -46,7 +47,8 @@ public class CloseCommandFailureEvent extends AbstractMessageCommandResultEvent
     super(originalCommandEvent, con, message);
   }
 
-  @Override public boolean isSuccess() {
+  @Override
+  public boolean isSuccess() {
     return false;
   }
 }

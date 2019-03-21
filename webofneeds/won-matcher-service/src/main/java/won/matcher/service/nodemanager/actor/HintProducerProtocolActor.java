@@ -32,8 +32,11 @@ import java.util.Optional;
  * <p>
  * Created by hfriedrich on 27.08.2015.
  */
-@Component @Scope("prototype") public class HintProducerProtocolActor extends UntypedProducerActor {
-  @Autowired private MonitoringService monitoringService;
+@Component
+@Scope("prototype")
+public class HintProducerProtocolActor extends UntypedProducerActor {
+  @Autowired
+  private MonitoringService monitoringService;
 
   private String endpoint;
   private String localBrokerUri;
@@ -46,7 +49,8 @@ import java.util.Optional;
     pubSubMediator = DistributedPubSub.get(getContext().system()).mediator();
   }
 
-  @Override public String getEndpointUri() {
+  @Override
+  public String getEndpointUri() {
     return endpoint;
   }
 
@@ -56,7 +60,8 @@ import java.util.Optional;
    * @param message supposed to be a {@link HintEvent}
    * @return
    */
-  @Override public Object onTransformOutgoingMessage(Object message) {
+  @Override
+  public Object onTransformOutgoingMessage(Object message) {
 
     HintEvent hint = (HintEvent) message;
     Map<String, Object> headers = new HashMap<>();
@@ -64,8 +69,9 @@ import java.util.Optional;
     headers.put("otherNeedURI", hint.getToNeedUri());
     headers.put("score", String.valueOf(hint.getScore()));
     headers.put("originator", hint.getMatcherUri());
-    //headers.put("content", RdfUtils.toString(hint.deserializeExplanationModel()));
-    //headers.put("remoteBrokerEndpoint", localBrokerUri);
+    // headers.put("content",
+    // RdfUtils.toString(hint.deserializeExplanationModel()));
+    // headers.put("remoteBrokerEndpoint", localBrokerUri);
     headers.put("methodName", "hint");
 
     WonMessage wonMessage = createHintWonMessage(hint);
@@ -89,18 +95,19 @@ import java.util.Optional;
   private WonMessage createHintWonMessage(HintEvent hint) throws WonMessageBuilderException {
 
     URI wonNode = URI.create(hint.getFromWonNodeUri());
-    return WonMessageBuilder
-        .setMessagePropertiesForHint(hint.getGeneratedEventUri(), URI.create(hint.getFromNeedUri()), Optional.empty(),
-            wonNode, URI.create(hint.getToNeedUri()), Optional.empty(), URI.create(hint.getMatcherUri()),
-            hint.getScore()).setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL).build();
+    return WonMessageBuilder.setMessagePropertiesForHint(hint.getGeneratedEventUri(), URI.create(hint.getFromNeedUri()),
+        Optional.empty(), wonNode, URI.create(hint.getToNeedUri()), Optional.empty(), URI.create(hint.getMatcherUri()),
+        hint.getScore()).setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL).build();
   }
 
-  @Override public SupervisorStrategy supervisorStrategy() {
+  @Override
+  public SupervisorStrategy supervisorStrategy() {
 
     SupervisorStrategy supervisorStrategy = new OneForOneStrategy(0, Duration.Zero(),
         new Function<Throwable, SupervisorStrategy.Directive>() {
 
-          @Override public SupervisorStrategy.Directive apply(Throwable t) throws Exception {
+          @Override
+          public SupervisorStrategy.Directive apply(Throwable t) throws Exception {
 
             log.warning("Actor encountered error: {}", t);
             // default behaviour

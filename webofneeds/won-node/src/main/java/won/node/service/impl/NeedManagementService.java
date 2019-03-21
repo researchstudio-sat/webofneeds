@@ -35,14 +35,18 @@ import java.util.Map;
 /**
  * Manipulates needs from the system side by generating msg:FromSystem messages.
  */
-@Component public class NeedManagementService {
+@Component
+public class NeedManagementService {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Autowired private MessagingService messagingService;
+  @Autowired
+  private MessagingService messagingService;
 
-  @Autowired private WonNodeInformationService wonNodeInformationService;
+  @Autowired
+  private WonNodeInformationService wonNodeInformationService;
 
-  @Autowired private NeedRepository needRepository;
+  @Autowired
+  private NeedRepository needRepository;
 
   public void sendTextMessageToOwner(URI needURI, String message) {
     if (needURI == null) {
@@ -55,7 +59,8 @@ import java.util.Map;
     }
     logger.debug("Sending FromSystem text message to need {}", needURI);
 
-    //check if we have that need (e.g. it's not a need living on another node, or does not exist at all)
+    // check if we have that need (e.g. it's not a need living on another node, or
+    // does not exist at all)
     Need need = needRepository.findOneByNeedURI(needURI);
     if (need == null) {
       logger.debug("deactivateNeed called for need {} but that need was not found in the repository - doing nothing");
@@ -70,8 +75,8 @@ import java.util.Map;
     }
 
     URI messageURI = wonNodeInformationService.generateEventURI(wonNodeURI);
-    WonMessageBuilder builder = WonMessageBuilder
-        .setMessagePropertiesForNeedMessageFromSystem(messageURI, needURI, wonNodeURI);
+    WonMessageBuilder builder = WonMessageBuilder.setMessagePropertiesForNeedMessageFromSystem(messageURI, needURI,
+        wonNodeURI);
     builder.setTextMessage(message);
     sendSystemMessage(builder.build());
   }
@@ -83,7 +88,8 @@ import java.util.Map;
     }
     logger.debug("Deactivating need {}", needURI);
 
-    //check if we have that need (e.g. it's not a need living on another node, or does not exist at all)
+    // check if we have that need (e.g. it's not a need living on another node, or
+    // does not exist at all)
     Need need = needRepository.findOneByNeedURI(needURI);
     if (need == null) {
       logger.debug("deactivateNeed called for need {} but that need was not found in the repository - doing nothing");
@@ -97,8 +103,8 @@ import java.util.Map;
     }
     URI messageURI = wonNodeInformationService.generateEventURI(wonNodeURI);
 
-    WonMessageBuilder builder = WonMessageBuilder
-        .setMessagePropertiesForDeactivateFromSystem(messageURI, needURI, wonNodeURI);
+    WonMessageBuilder builder = WonMessageBuilder.setMessagePropertiesForDeactivateFromSystem(messageURI, needURI,
+        wonNodeURI);
     if (optionalMessage != null && optionalMessage.trim().length() > 0) {
       builder.setTextMessage(optionalMessage);
     }
@@ -106,7 +112,8 @@ import java.util.Map;
   }
 
   /**
-   * Processes the system message (allowing facet implementations) and delivers it, depending on its receiver settings.
+   * Processes the system message (allowing facet implementations) and delivers
+   * it, depending on its receiver settings.
    *
    * @param message
    */

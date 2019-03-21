@@ -25,8 +25,9 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * Computes a message slip for message processors that are annotated with appropriate marker annotations.
- * The annotation class to look for has to be passed to this slip in the constructor.
+ * Computes a message slip for message processors that are annotated with
+ * appropriate marker annotations. The annotation class to look for has to be
+ * passed to this slip in the constructor.
  */
 public class MessageTypeSlipComputer implements InitializingBean, ApplicationContextAware, Expression {
   Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -49,12 +50,14 @@ public class MessageTypeSlipComputer implements InitializingBean, ApplicationCon
     this.applicationContext = applicationContext;
   }
 
-  @Override public void afterPropertiesSet() throws Exception {
+  @Override
+  public void afterPropertiesSet() throws Exception {
     fixedMessageProcessorsMap = (HashMap) applicationContext.getBeansWithAnnotation(this.annotationClazz);
 
   }
 
-  @Override public <T> T evaluate(final Exchange exchange, final Class<T> type) {
+  @Override
+  public <T> T evaluate(final Exchange exchange, final Class<T> type) {
     WonMessage message = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
     assert message != null : "wonMessage header must not be null";
     String slip = "";
@@ -65,11 +68,11 @@ public class MessageTypeSlipComputer implements InitializingBean, ApplicationCon
     assert direction != null : "direction header must not be null";
     String method = "process";
     if (WonMessageDirection.FROM_EXTERNAL.isIdentifiedBy(direction)) {
-      //check if we're handling a response. If so, do special routing
-      //the response comes from the remote node, but the handler we need is the
-      //one that sent the original message, so we have to switch direction
-      //and we have to set the type to the type of the original message that
-      //we are now handling the response to
+      // check if we're handling a response. If so, do special routing
+      // the response comes from the remote node, but the handler we need is the
+      // one that sent the original message, so we have to switch direction
+      // and we have to set the type to the type of the original message that
+      // we are now handling the response to
       if (WonMessageType.SUCCESS_RESPONSE.isIdentifiedBy(messageType)) {
         method = "onSuccessResponse";
         direction = URI.create(WonMessageDirection.FROM_OWNER.getResource().toString());
@@ -83,7 +86,7 @@ public class MessageTypeSlipComputer implements InitializingBean, ApplicationCon
         WonMessageType isResponseToType = message.getIsResponseToMessageType();
         if (WonMessageType.FAILURE_RESPONSE == isResponseToType
             || WonMessageType.SUCCESS_RESPONSE == isResponseToType) {
-          //exception from the exception: if we're handling a FailureResponse
+          // exception from the exception: if we're handling a FailureResponse
           // to a response - in that case, don't compute a slip value - no bean
           // will specially process this.
           return null;
@@ -129,7 +132,7 @@ public class MessageTypeSlipComputer implements InitializingBean, ApplicationCon
       return null;
     }
     logger.debug("unexpected combination of messageType {} and direction {} encountered "
-            + "- this causes an exception,which triggers a FailureResponse", messageType, direction);
+        + "- this causes an exception,which triggers a FailureResponse", messageType, direction);
     throw new WonMessageProcessingException(String
         .format("unexpected combination of messageType %s " + "and direction %s encountered", messageType, direction));
   }

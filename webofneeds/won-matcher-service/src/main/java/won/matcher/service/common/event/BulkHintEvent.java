@@ -8,8 +8,7 @@ import java.util.LinkedList;
 /**
  * Event can hold multiple {@link HintEvent} objects
  * <p>
- * User: hfriedrich
- * Date: 23.06.2015
+ * User: hfriedrich Date: 23.06.2015
  */
 public class BulkHintEvent implements Serializable {
   private Collection<HintEvent> hintEvents;

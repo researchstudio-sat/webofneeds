@@ -21,7 +21,8 @@ public class WelcomeMailAction extends BaseEventBotAction {
     this.mailGenerator = mailGenerator;
   }
 
-  @Override protected void doRun(final Event event, EventListener executingListener) throws Exception {
+  @Override
+  protected void doRun(final Event event, EventListener executingListener) throws Exception {
     if (event instanceof WelcomeMailEvent) {
       WonMimeMessage welcomeMessage = mailGenerator.createWelcomeMail(((WelcomeMailEvent) event).getMessage());
       sendChannel.send(new GenericMessage<>(welcomeMessage));

@@ -35,22 +35,32 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Siren/Solr based abstract matcher with all implementations for querying as well as indexing needs.
+ * Siren/Solr based abstract matcher with all implementations for querying as
+ * well as indexing needs.
  */
-@Component @Scope("prototype") public class SolrMatcherActor extends UntypedActor {
+@Component
+@Scope("prototype")
+public class SolrMatcherActor extends UntypedActor {
   private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
 
-  @Autowired private SolrMatcherConfig config;
+  @Autowired
+  private SolrMatcherConfig config;
 
-  @Autowired private HintBuilder hintBuilder;
+  @Autowired
+  private HintBuilder hintBuilder;
 
-  @Autowired private NeedIndexer needIndexer;
+  @Autowired
+  private NeedIndexer needIndexer;
 
-  @Autowired @Qualifier("defaultMatcherQueryExecuter") DefaultMatcherQueryExecuter defaultQueryExecuter;
+  @Autowired
+  @Qualifier("defaultMatcherQueryExecuter")
+  DefaultMatcherQueryExecuter defaultQueryExecuter;
 
-  @Autowired TestMatcherQueryExecutor testQueryExecuter;
+  @Autowired
+  TestMatcherQueryExecutor testQueryExecuter;
 
-  @Override public void onReceive(final Object o) throws Exception {
+  @Override
+  public void onReceive(final Object o) throws Exception {
     String eventTypeForLogging = "unknown";
     Optional<String> uriForLogging = Optional.empty();
     try {
@@ -76,9 +86,8 @@ import java.util.Optional;
         unhandled(o);
       }
     } catch (Exception e) {
-      log.info(String
-          .format("Caught exception when processing %s event %s. More info on loglevel 'debug'", eventTypeForLogging,
-              uriForLogging.orElse("[no uri available]")));
+      log.info(String.format("Caught exception when processing %s event %s. More info on loglevel 'debug'",
+          eventTypeForLogging, uriForLogging.orElse("[no uri available]")));
       log.debug("caught exception", e);
     }
   }
@@ -92,7 +101,8 @@ import java.util.Optional;
 
     log.info("Start processing active need event {}", needEvent);
 
-    // check if the need has doNotMatch flag, then do not use it for querying or indexing
+    // check if the need has doNotMatch flag, then do not use it for querying or
+    // indexing
     Dataset dataset = needEvent.deserializeNeedDataset();
     NeedModelWrapper needModelWrapper = new NeedModelWrapper(dataset);
     if (needModelWrapper.hasFlag(WON.NO_HINT_FOR_ME) && needModelWrapper.hasFlag(WON.NO_HINT_FOR_COUNTERPART)) {
@@ -110,17 +120,20 @@ import java.util.Optional;
     boolean usedForTesting = needModelWrapper.hasFlag(WON.USED_FOR_TESTING);
     SolrMatcherQueryExecutor queryExecutor = (usedForTesting ? testQueryExecuter : defaultQueryExecuter);
 
-    // create another query depending if the current need is "WhatsAround" or a default need
+    // create another query depending if the current need is "WhatsAround" or a
+    // default need
     String queryString = null;
     if (needModelWrapper.hasFlag(WON.WHATS_AROUND)) {
-      // WhatsAround doesnt match on terms only other needs in close location are boosted
+      // WhatsAround doesnt match on terms only other needs in close location are
+      // boosted
       WhatsAroundQueryFactory qf = new WhatsAroundQueryFactory(dataset);
       queryString = qf.createQuery();
     } else if (needModelWrapper.hasFlag(WON.WHATS_NEW)) {
       WhatsNewQueryFactory qf = new WhatsNewQueryFactory(dataset);
       queryString = qf.createQuery();
     } else {
-      // default query matches content terms (of fields title, description and tags) with different weights
+      // default query matches content terms (of fields title, description and tags)
+      // with different weights
       // and gives an additional multiplicative boost for geographically closer needs
       DefaultNeedQueryFactory qf = new DefaultNeedQueryFactory(dataset);
       queryString = qf.createQuery();
@@ -133,8 +146,10 @@ import java.util.Optional;
 
     // now create three slightly different queries for different lists of needs:
     // 1) needs without NoHintForCounterpart => hints for current need
-    // 2) needs without NoHintForSelf, excluding WhatsAround needs => hints for needs in index that are not WhatsAround
-    // 3) needs without NoHintForSelf that are only WhatsAround needs => hints for needs in index that are WhatsAround
+    // 2) needs without NoHintForSelf, excluding WhatsAround needs => hints for
+    // needs in index that are not WhatsAround
+    // 3) needs without NoHintForSelf that are only WhatsAround needs => hints for
+    // needs in index that are WhatsAround
     // to achieve this use a different filters for these queries
 
     // case 1) needs without NoHintForCounterpart => hints for current need
@@ -155,13 +170,16 @@ import java.util.Optional;
           filterQueries.toArray(new String[filterQueries.size()]));
       if (docs != null) {
 
-        // perform knee detection depending on current need is WhatsAround/WhatsNew or not)
-        boolean kneeDetection =
-            needModelWrapper.hasFlag(WON.WHATS_NEW) || needModelWrapper.hasFlag(WON.WHATS_AROUND) ? false : true;
+        // perform knee detection depending on current need is WhatsAround/WhatsNew or
+        // not)
+        boolean kneeDetection = needModelWrapper.hasFlag(WON.WHATS_NEW) || needModelWrapper.hasFlag(WON.WHATS_AROUND)
+            ? false
+            : true;
 
-        // generate hints for current need (only generate hints for current need, suppress hints for matched needs,
-        BulkHintEvent events = hintBuilder
-            .generateHintsFromSearchResult(docs, needEvent, needModelWrapper, false, true, kneeDetection);
+        // generate hints for current need (only generate hints for current need,
+        // suppress hints for matched needs,
+        BulkHintEvent events = hintBuilder.generateHintsFromSearchResult(docs, needEvent, needModelWrapper, false, true,
+            kneeDetection);
 
         log.info("Create {} hints for need {} and need list 1 (without NoHintForCounterpart)",
             events.getHintEvents().size(), needEvent);
@@ -175,7 +193,8 @@ import java.util.Optional;
       }
     }
 
-    // case 2) needs without NoHintForSelf, excluding WhatsAround needs => hints for needs in index that are not WhatsAround
+    // case 2) needs without NoHintForSelf, excluding WhatsAround needs => hints for
+    // needs in index that are not WhatsAround
     filterQueries = new LinkedList<>();
     filterQueries.add(new NeedStateQueryFactory(dataset).createQuery());
     filterQueries.add(new CreationDateQueryFactory(dataset, 1, ChronoUnit.MONTHS).createQuery());
@@ -198,9 +217,10 @@ import java.util.Optional;
           filterQueries.toArray(new String[filterQueries.size()]));
       if (docs != null) {
 
-        // generate hints for matched needs (suppress hints for current need, only generate hints for matched needs, perform knee detection)
-        BulkHintEvent events = hintBuilder
-            .generateHintsFromSearchResult(docs, needEvent, needModelWrapper, true, false, true);
+        // generate hints for matched needs (suppress hints for current need, only
+        // generate hints for matched needs, perform knee detection)
+        BulkHintEvent events = hintBuilder.generateHintsFromSearchResult(docs, needEvent, needModelWrapper, true, false,
+            true);
         log.info("Create {} hints for need {} and need list 2 (without NoHintForSelf, excluding WhatsAround needs)",
             events.getHintEvents().size(), needEvent);
 
@@ -215,23 +235,26 @@ import java.util.Optional;
       }
     }
 
-    // case 3) needs without NoHintForSelf that are only WhatsAround needs => hints for needs in index that are WhatsAround
+    // case 3) needs without NoHintForSelf that are only WhatsAround needs => hints
+    // for needs in index that are WhatsAround
     filterQueries = new LinkedList<>();
     filterQueries.add(new NeedStateQueryFactory(dataset).createQuery());
     filterQueries.add(new CreationDateQueryFactory(dataset, 1, ChronoUnit.MONTHS).createQuery());
     filterQueries.add(new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.NOT,
         new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.NO_HINT_FOR_ME)).createQuery());
     filterQueries.add(new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.OR,
-            new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.WHATS_AROUND),
-            new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.WHATS_NEW)).createQuery());
+        new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.WHATS_AROUND),
+        new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.WHATS_NEW)).createQuery());
     if (needModelWrapper.getMatchingContexts() != null && needModelWrapper.getMatchingContexts().size() > 0) {
       filterQueries.add(new MatchingContextQueryFactory(needModelWrapper.getMatchingContexts()).createQuery());
     }
     if (!needModelWrapper.hasFlag(WON.NO_HINT_FOR_COUNTERPART)) {
 
-      // hints for WhatsAround Needs should not have the keywords from title, description, tags etc.
+      // hints for WhatsAround Needs should not have the keywords from title,
+      // description, tags etc.
       // this can prevent to actually find WhatsAround needs.
-      // Instead create a WhatsAround query (query without keywords, just location) to find other WhatsAround needs
+      // Instead create a WhatsAround query (query without keywords, just location) to
+      // find other WhatsAround needs
       queryString = (new WhatsAroundQueryFactory(dataset)).createQuery();
 
       // execute the query
@@ -242,9 +265,10 @@ import java.util.Optional;
           filterQueries.toArray(new String[filterQueries.size()]));
       if (docs != null) {
 
-        // generate hints for matched needs (suppress hints for current need, only generate hints for matched needs, do not perform knee detection)
-        BulkHintEvent events = hintBuilder
-            .generateHintsFromSearchResult(docs, needEvent, needModelWrapper, true, false, false);
+        // generate hints for matched needs (suppress hints for current need, only
+        // generate hints for matched needs, do not perform knee detection)
+        BulkHintEvent events = hintBuilder.generateHintsFromSearchResult(docs, needEvent, needModelWrapper, true, false,
+            false);
         log.info("Create {} hints for need {} and need list 3 (without NoHintForSelf that are only WhatsAround needs)",
             events.getHintEvents().size(), needEvent);
 
@@ -264,12 +288,14 @@ import java.util.Optional;
     needIndexer.index(dataset);
   }
 
-  @Override public SupervisorStrategy supervisorStrategy() {
+  @Override
+  public SupervisorStrategy supervisorStrategy() {
 
     SupervisorStrategy supervisorStrategy = new OneForOneStrategy(0, Duration.Zero(),
         new Function<Throwable, SupervisorStrategy.Directive>() {
 
-          @Override public SupervisorStrategy.Directive apply(Throwable t) throws Exception {
+          @Override
+          public SupervisorStrategy.Directive apply(Throwable t) throws Exception {
 
             log.warning("Actor encountered error: {}", t);
             // default behaviour

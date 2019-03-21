@@ -16,10 +16,11 @@ import java.nio.charset.Charset;
 /**
  * Service to use HTTP to request resources
  * <p>
- * User: hfriedrich
- * Date: 04.05.2015
+ * User: hfriedrich Date: 04.05.2015
  */
-@Component @Scope("prototype") public class HttpService {
+@Component
+@Scope("prototype")
+public class HttpService {
   private final Logger log = LoggerFactory.getLogger(getClass());
   private RestTemplate restTemplate;
   private HttpHeaders jsonHeaders;

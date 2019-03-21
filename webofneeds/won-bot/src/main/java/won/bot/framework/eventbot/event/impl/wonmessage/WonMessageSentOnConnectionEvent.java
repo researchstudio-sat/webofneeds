@@ -32,15 +32,18 @@ public class WonMessageSentOnConnectionEvent extends WonMessageSentEvent
     super(message);
   }
 
-  @Override public URI getConnectionURI() {
+  @Override
+  public URI getConnectionURI() {
     return getWonMessage().getSenderURI();
   }
 
-  @Override public URI getNeedURI() {
+  @Override
+  public URI getNeedURI() {
     return getWonMessage().getSenderNeedURI();
   }
 
-  @Override public URI getRemoteNeedURI() {
+  @Override
+  public URI getRemoteNeedURI() {
     return getWonMessage().getReceiverNeedURI();
   }
 }

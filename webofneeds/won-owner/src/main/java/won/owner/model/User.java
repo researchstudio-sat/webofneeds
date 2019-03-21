@@ -15,58 +15,80 @@ import java.net.URI;
 import java.util.*;
 
 /**
- * 'wonuser' used as table name because 'user' is a Postgres keyword
- * see http://www.postgresql.org/message-id/Pine.NEB.4.10.10008291649550.4357-100000@scimitar.caravan.com
+ * 'wonuser' used as table name because 'user' is a Postgres keyword see
+ * http://www.postgresql.org/message-id/Pine.NEB.4.10.10008291649550.4357-100000@scimitar.caravan.com
  */
-@Entity @Table(
-    name = "wonuser", //don't use 'user' - see above
-    uniqueConstraints = @UniqueConstraint(columnNames = {
-        "username" })) @JsonIgnoreProperties(ignoreUnknown = true) public class User
-    implements UserDetails, Persistable<Long> {
-  public static final int GRACEPERIOD_INHOURS =
-      24 * 3; //Grace Period after registration in which a login is still allowed
+@Entity
+@Table(name = "wonuser", // don't use 'user' - see above
+    uniqueConstraints = @UniqueConstraint(columnNames = { "username" }))
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class User implements UserDetails, Persistable<Long> {
+  public static final int GRACEPERIOD_INHOURS = 24 * 3; // Grace Period after registration in which a login is still
+                                                        // allowed
   private static final int GRACEPERIOD = GRACEPERIOD_INHOURS * 60;
 
-  @Id @GeneratedValue @Column(name = "id") private Long id;
+  @Id
+  @GeneratedValue
+  @Column(name = "id")
+  private Long id;
 
-  @Column(name = "username") private String username;
+  @Column(name = "username")
+  private String username;
 
-  @Column(name = "password") private String password;
+  @Column(name = "password")
+  private String password;
 
-  @Column(name = "email_verified") private boolean emailVerified;
+  @Column(name = "email_verified")
+  private boolean emailVerified;
 
-  @Column(name = "accepted_tos") private boolean acceptedTermsOfService;
+  @Column(name = "accepted_tos")
+  private boolean acceptedTermsOfService;
 
   /* The creation date of the (as observed by the owner app) */
-  @Temporal(TemporalType.TIMESTAMP) @Column(name = "registrationDate", nullable = false) private Date registrationDate;
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name = "registrationDate", nullable = false)
+  private Date registrationDate;
 
-  @PrePersist protected void onCreate() {
+  @PrePersist
+  protected void onCreate() {
     registrationDate = new Date();
   }
 
-  @OneToMany(fetch = FetchType.EAGER) @OrderBy("creationDate desc") @JoinTable(name = "wonuser_userneed", joinColumns = {
-      @JoinColumn(name = "wonuser_id") }) private List<UserNeed> userNeeds;
+  @OneToMany(fetch = FetchType.EAGER)
+  @OrderBy("creationDate desc")
+  @JoinTable(name = "wonuser_userneed", joinColumns = { @JoinColumn(name = "wonuser_id") })
+  private List<UserNeed> userNeeds;
 
-  @Column(name = "role") private String role;
+  @Column(name = "role")
+  private String role;
 
-  @Column(name = "email") private String email;
+  @Column(name = "email")
+  private String email;
 
-  @Column(name = "private_id") private String privateId;
+  @Column(name = "private_id")
+  private String privateId;
 
-  @JoinColumn(name = "keystore_id") @OneToOne(cascade = CascadeType.ALL,
-      fetch = FetchType.LAZY, optional = false) private KeystoreHolder keystoreHolder;
+  @JoinColumn(name = "keystore_id")
+  @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
+  private KeystoreHolder keystoreHolder;
 
-  @JoinColumn(name = "keystore_password_id") @OneToOne(cascade = CascadeType.ALL,
-      fetch = FetchType.LAZY, optional = false) private KeystorePasswordHolder keystorePasswordHolder;
+  @JoinColumn(name = "keystore_password_id")
+  @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
+  private KeystorePasswordHolder keystorePasswordHolder;
 
-  @JoinColumn(name = "recoverable_keystore_password_id") @OneToOne(cascade = CascadeType.ALL,
-      fetch = FetchType.LAZY, optional = true) private KeystorePasswordHolder recoverableKeystorePasswordHolder;
+  @JoinColumn(name = "recoverable_keystore_password_id")
+  @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = true)
+  private KeystorePasswordHolder recoverableKeystorePasswordHolder;
 
-  //TODO: eager is dangerous here, but we need it as the User object is kept in the http session which outlives the
-  //hibernate session. However, this wastes space and may lead to memory issues during high usage. Fix it.
-  @ElementCollection(fetch = FetchType.EAGER) private Set<URI> draftURIs;
+  // TODO: eager is dangerous here, but we need it as the User object is kept in
+  // the http session which outlives the
+  // hibernate session. However, this wastes space and may lead to memory issues
+  // during high usage. Fix it.
+  @ElementCollection(fetch = FetchType.EAGER)
+  private Set<URI> draftURIs;
 
-  @Transient private Collection<SimpleGrantedAuthority> authorities;
+  @Transient
+  private Collection<SimpleGrantedAuthority> authorities;
 
   public User() {
   }
@@ -88,17 +110,15 @@ import java.util.*;
     }
   }
 
-  @Override public boolean isNew() {
+  @Override
+  public boolean isNew() {
     return this.id == null;
   }
 
-  @Override public String toString() {
-    return "User{" +
-        "id=" + id +
-        ", username='" + username + '\'' +
-        ", password='" + password + '\'' +
-        ", role='" + role + '\'' +
-        '}';
+  @Override
+  public String toString() {
+    return "User{" + "id=" + id + ", username='" + username + '\'' + ", password='" + password + '\'' + ", role='"
+        + role + '\'' + '}';
   }
 
   public Long getId() {
@@ -109,15 +129,18 @@ import java.util.*;
     this.id = id;
   }
 
-  @Override public boolean isAccountNonExpired() {
+  @Override
+  public boolean isAccountNonExpired() {
     return true;
   }
 
-  @Override public boolean isAccountNonLocked() {
+  @Override
+  public boolean isAccountNonLocked() {
     return true;
   }
 
-  @Override public boolean isCredentialsNonExpired() {
+  @Override
+  public boolean isCredentialsNonExpired() {
     return this.isAnonymous() || this.emailVerified || isWithinGracePeriod();
   }
 
@@ -125,21 +148,25 @@ import java.util.*;
     return this.privateId != null;
   }
 
-  @Override public boolean isEnabled() {
+  @Override
+  public boolean isEnabled() {
     return true;
   }
 
-  @Override public Collection<? extends GrantedAuthority> getAuthorities() {
+  @Override
+  public Collection<? extends GrantedAuthority> getAuthorities() {
     authorities = new ArrayList<SimpleGrantedAuthority>(1);
     authorities.add(new SimpleGrantedAuthority(role));
     return authorities;
   }
 
-  @Override public String getPassword() {
+  @Override
+  public String getPassword() {
     return password;
   }
 
-  @Override public String getUsername() {
+  @Override
+  public String getUsername() {
     return username;
   }
 
@@ -174,11 +201,10 @@ import java.util.*;
   public KeystorePasswordHolder getRecoverableKeystorePasswordHolder() {
     return recoverableKeystorePasswordHolder;
   }
-  
+
   /*
-    public List<Need> getNeeds() {
-		return needs;
-	}          */
+   * public List<Need> getNeeds() { return needs; }
+   */
 
   public void addNeedUri(UserNeed userNeed) {
     this.userNeeds.add(userNeed);
@@ -220,9 +246,9 @@ import java.util.*;
     return draftURIs;
   }
 
-  /*public void setNeeds(final List<Need> needs) {
-      this.needs = needs;
-  }     */
+  /*
+   * public void setNeeds(final List<Need> needs) { this.needs = needs; }
+   */
   public void setDrafts(final Set<URI> draftURIs) {
     this.draftURIs = draftURIs;
   }
@@ -273,7 +299,8 @@ import java.util.*;
     return gracePeriodThreshold.getTime().getTime() - current.getTime().getTime() >= 0;
   }
 
-  @Override public boolean equals(final Object o) {
+  @Override
+  public boolean equals(final Object o) {
     if (this == o)
       return true;
     if (o == null || getClass() != o.getClass())
@@ -297,7 +324,8 @@ import java.util.*;
     return true;
   }
 
-  @Override public int hashCode() {
+  @Override
+  public int hashCode() {
     int result = id != null ? id.hashCode() : 0;
     result = 31 * result + (username != null ? username.hashCode() : 0);
     result = 31 * result + (password != null ? password.hashCode() : 0);

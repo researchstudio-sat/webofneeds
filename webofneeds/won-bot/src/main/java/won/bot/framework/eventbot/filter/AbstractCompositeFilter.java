@@ -36,7 +36,8 @@ public abstract class AbstractCompositeFilter implements CompositeFilter {
     this.filters = Collections.synchronizedList(Arrays.asList(filters));
   }
 
-  @Override public synchronized void addFilter(EventFilter filter) {
+  @Override
+  public synchronized void addFilter(EventFilter filter) {
     this.filters.add(filter);
   }
 
@@ -51,8 +52,10 @@ public abstract class AbstractCompositeFilter implements CompositeFilter {
 
   @Override
   /**
-   * Replaces the filters by the specified ones, wrapping them in a synchronized list.
-   */ public synchronized void setFilters(final List<EventFilter> filters) {
+   * Replaces the filters by the specified ones, wrapping them in a synchronized
+   * list.
+   */
+  public synchronized void setFilters(final List<EventFilter> filters) {
     this.filters = Collections.synchronizedList(filters);
   }
 }

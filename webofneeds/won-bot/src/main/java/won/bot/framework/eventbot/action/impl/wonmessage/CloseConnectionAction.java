@@ -31,8 +31,8 @@ import won.protocol.util.WonRdfUtils;
 import java.net.URI;
 
 /**
- * Listener that will try to obtain a connectionURI from any event
- * passed to it and close that connection.
+ * Listener that will try to obtain a connectionURI from any event passed to it
+ * and close that connection.
  */
 public class CloseConnectionAction extends BaseEventBotAction {
 
@@ -43,7 +43,8 @@ public class CloseConnectionAction extends BaseEventBotAction {
     this.farewellMessage = farewellMessage;
   }
 
-  @Override protected void doRun(final Event event, EventListener executingListener) throws Exception {
+  @Override
+  protected void doRun(final Event event, EventListener executingListener) throws Exception {
     if (event instanceof ConnectionSpecificEvent) {
       ConnectionSpecificEvent connectionSpecificEvent = (ConnectionSpecificEvent) event;
       logger.debug("trying to close connection related to event {}", connectionSpecificEvent);

@@ -38,7 +38,8 @@ public class FeedbackCommandEvent extends BaseNeedAndConnectionSpecificEvent imp
     this.value = value;
   }
 
-  @Override public WonMessageType getWonMessageType() {
+  @Override
+  public WonMessageType getWonMessageType() {
     return WonMessageType.HINT_FEEDBACK_MESSAGE;
   }
 

@@ -21,7 +21,8 @@ import won.bot.framework.eventbot.action.EventBotAction;
 import won.bot.framework.eventbot.filter.EventFilter;
 
 /**
- * Executes its action exactly once, only when the first event is seen, then unregisters.
+ * Executes its action exactly once, only when the first event is seen, then
+ * unregisters.
  */
 public class ActionOnFirstEventListener extends ActionOnceAfterNEventsListener {
   public ActionOnFirstEventListener(EventListenerContext context, EventBotAction task) {

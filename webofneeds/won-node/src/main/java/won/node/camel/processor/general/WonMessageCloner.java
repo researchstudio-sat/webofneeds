@@ -22,10 +22,12 @@ import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
 
 /**
- * Replaces the WonMessage found in the exchange's in (in the 'wonMessage' header) with its clone.
+ * Replaces the WonMessage found in the exchange's in (in the 'wonMessage'
+ * header) with its clone.
  */
 public class WonMessageCloner extends AbstractCamelProcessor {
-  @Override public void process(final Exchange exchange) throws Exception {
+  @Override
+  public void process(final Exchange exchange) throws Exception {
     WonMessage message = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
     exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER, WonMessage.deepCopy(message));
   }

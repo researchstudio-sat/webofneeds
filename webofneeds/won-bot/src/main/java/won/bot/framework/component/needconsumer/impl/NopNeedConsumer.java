@@ -20,15 +20,16 @@ import org.apache.jena.query.Dataset;
 import won.bot.framework.component.needconsumer.NeedConsumer;
 
 /**
- * User: fkleedorfer
- * Date: 19.12.13
+ * User: fkleedorfer Date: 19.12.13
  */
 public class NopNeedConsumer implements NeedConsumer {
-  @Override public void consume(final Dataset need) {
-    //don't do anything
+  @Override
+  public void consume(final Dataset need) {
+    // don't do anything
   }
 
-  @Override public boolean isExhausted() {
+  @Override
+  public boolean isExhausted() {
     return true;
   }
 }

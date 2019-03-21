@@ -39,7 +39,8 @@ public class HintFromMatcherEvent extends BaseEvent implements MessageEvent {
     return wonMessage;
   }
 
-  @Override public WonMessageType getWonMessageType() {
+  @Override
+  public WonMessageType getWonMessageType() {
     return this.wonMessage.getMessageType();
   }
 }

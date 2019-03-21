@@ -27,8 +27,8 @@ import java.net.URI;
 import java.util.Date;
 
 /**
- * Listener that responds to a message with automatic messages.
- * Can be configured to apply a timeout (non-blocking) before sending messages.
+ * Listener that responds to a message with automatic messages. Can be
+ * configured to apply a timeout (non-blocking) before sending messages.
  */
 public class RespondToMessageAction extends BaseEventBotAction {
   private long millisTimeoutBeforeReply = 0;
@@ -55,7 +55,8 @@ public class RespondToMessageAction extends BaseEventBotAction {
     this.message = message;
   }
 
-  @Override protected void doRun(final Event event, EventListener executingListener) throws Exception {
+  @Override
+  protected void doRun(final Event event, EventListener executingListener) throws Exception {
     if (event instanceof ConnectionSpecificEvent) {
       handleMessageEvent((ConnectionSpecificEvent) event);
     }
@@ -63,7 +64,8 @@ public class RespondToMessageAction extends BaseEventBotAction {
 
   private void handleMessageEvent(final ConnectionSpecificEvent messageEvent) {
     getEventListenerContext().getTaskScheduler().schedule(new Runnable() {
-      @Override public void run() {
+      @Override
+      public void run() {
         String message = createMessage();
         URI connectionUri = messageEvent.getConnectionURI();
         if (logger.isDebugEnabled()) {

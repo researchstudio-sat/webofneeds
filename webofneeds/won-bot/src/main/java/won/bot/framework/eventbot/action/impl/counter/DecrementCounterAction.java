@@ -28,7 +28,8 @@ public class DecrementCounterAction extends BaseCounterAction {
     super(eventListenerContext, counter);
   }
 
-  @Override protected void doRun(final Event event, EventListener executingListener) throws Exception {
+  @Override
+  protected void doRun(final Event event, EventListener executingListener) throws Exception {
     getCounter().decrement();
   }
 }

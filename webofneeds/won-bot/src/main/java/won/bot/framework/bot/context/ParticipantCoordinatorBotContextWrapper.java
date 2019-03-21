@@ -22,7 +22,8 @@ public class ParticipantCoordinatorBotContextWrapper extends BotContextWrapper {
     return coordinatorListName;
   }
 
-  @Override public String getNeedCreateListName() {
+  @Override
+  public String getNeedCreateListName() {
     throw new UnsupportedOperationException("This List is not available for this BotContextWrapper");
   }
 

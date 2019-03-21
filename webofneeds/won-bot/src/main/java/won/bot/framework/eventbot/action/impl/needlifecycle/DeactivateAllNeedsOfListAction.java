@@ -31,8 +31,7 @@ import java.net.URI;
 import java.util.Collection;
 
 /**
- * User: fkleedorfer
- * Date: 28.03.14
+ * User: fkleedorfer Date: 28.03.14
  */
 public class DeactivateAllNeedsOfListAction extends BaseEventBotAction {
   private String uriListName;
@@ -42,7 +41,8 @@ public class DeactivateAllNeedsOfListAction extends BaseEventBotAction {
     this.uriListName = uriListName;
   }
 
-  @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
+  @Override
+  protected void doRun(Event event, EventListener executingListener) throws Exception {
     EventListenerContext ctx = getEventListenerContext();
 
     Collection<URI> toDeactivate = ctx.getBotContext().getNamedNeedUriList(uriListName);
@@ -58,8 +58,7 @@ public class DeactivateAllNeedsOfListAction extends BaseEventBotAction {
     URI localWonNode = WonRdfUtils.NeedUtils
         .getWonNodeURIFromNeed(getEventListenerContext().getLinkedDataSource().getDataForResource(needURI), needURI);
 
-    return WonMessageBuilder
-        .setMessagePropertiesForDeactivateFromOwner(wonNodeInformationService.generateEventURI(localWonNode), needURI,
-            localWonNode).build();
+    return WonMessageBuilder.setMessagePropertiesForDeactivateFromOwner(
+        wonNodeInformationService.generateEventURI(localWonNode), needURI, localWonNode).build();
   }
 }

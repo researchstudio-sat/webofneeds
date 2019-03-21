@@ -37,7 +37,8 @@ public class OriginalMessageUriResponseEventFilter implements EventFilter {
     return new OriginalMessageUriResponseEventFilter(wonMessage.getMessageURI());
   }
 
-  @Override public boolean accept(final Event event) {
+  @Override
+  public boolean accept(final Event event) {
     if (event instanceof ResponseEvent) {
       URI messageURI = ((ResponseEvent) event).getOriginalMessageURI();
       if (this.originalMessageURI.equals(messageURI))

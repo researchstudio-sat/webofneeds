@@ -49,7 +49,8 @@ public class HokifyJobBot extends EventBot {
   // @Autowired
   private HokifyMessageGenerator hokifyMessageGenerator;
 
-  @Override protected void initializeEventListeners() {
+  @Override
+  protected void initializeEventListeners() {
     EventListenerContext ctx = getEventListenerContext();
     this.hokifyMessageGenerator = new HokifyMessageGenerator();
     this.hokifyMessageGenerator.setEventListenerContext(ctx);
@@ -75,20 +76,22 @@ public class HokifyJobBot extends EventBot {
           new PublishEventAction(ctx, new StartBotTriggerCommandEvent(createHokifyJobBotTrigger))));
       bus.subscribe(BotTriggerEvent.class,
           new ActionOnTriggerEventListener(ctx, createHokifyJobBotTrigger, new BaseEventBotAction(ctx) {
-            @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
+            @Override
+            protected void doRun(Event event, EventListener executingListener) throws Exception {
 
               bus.publish(new CreateNeedFromJobEvent(hokifyJobsList, hokifyBotsApi));
             }
           }));
 
-      //Get Hokify data
+      // Get Hokify data
       BotTrigger fetchHokifyJobDataTrigger = new BotTrigger(ctx, Duration.ofMinutes(updateTime));
       fetchHokifyJobDataTrigger.activate();
       bus.subscribe(FetchHokifyJobDataEvent.class, new ActionOnFirstEventListener(ctx,
           new PublishEventAction(ctx, new StartBotTriggerCommandEvent(fetchHokifyJobDataTrigger))));
       bus.subscribe(BotTriggerEvent.class,
           new ActionOnTriggerEventListener(ctx, fetchHokifyJobDataTrigger, new BaseEventBotAction(ctx) {
-            @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
+            @Override
+            protected void doRun(Event event, EventListener executingListener) throws Exception {
               logger.info("Update Hokify Job Data");
               hokifyJobsList = hokifyBotsApi.fetchHokifyData();
 
@@ -96,10 +99,10 @@ public class HokifyJobBot extends EventBot {
           }));
       // WON initiated Events
 
-            /*
-             * bus.subscribe(HintFromMatcherEvent.class, new ActionOnEventListener(ctx,
-             * "HintReceived", new Hint2HokifyAction(ctx)));
-             */
+      /*
+       * bus.subscribe(HintFromMatcherEvent.class, new ActionOnEventListener(ctx,
+       * "HintReceived", new Hint2HokifyAction(ctx)));
+       */
       bus.subscribe(ConnectFromOtherNeedEvent.class,
           new ActionOnEventListener(ctx, "ConnectReceived", new Connect2HokifyAction(ctx)));
 

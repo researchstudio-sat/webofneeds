@@ -67,19 +67,22 @@ public class PetriNetTest {
     }
   }
 
-  @BeforeClass public static void setLogLevel() {
+  @BeforeClass
+  public static void setLogLevel() {
     Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
     root.setLevel(Level.INFO);
   }
 
-  @Test public void testLoadFromString() {
+  @Test
+  public void testLoadFromString() {
     String pnml = getResourceAsString("won/protocol/petrinet/petrinet-taxi.xml");
     PetriNet net = new PetriNetLoader().readPNML(pnml);
     Assert.assertTrue(net.getPlaces().stream()
         .anyMatch(place -> place.getId().equals("http://purl.org/webofneeds/process/taxi#PassengerReady")));
   }
 
-  @Test public void testLoadFromBase64String() {
+  @Test
+  public void testLoadFromBase64String() {
     String pnml = getResourceAsString("won/protocol/petrinet/petrinet-taxi-base64.txt");
     PetriNet net = new PetriNetLoader().readBase64EncodedPNML(pnml);
     Assert.assertTrue(net.getPlaces().stream()
@@ -91,8 +94,9 @@ public class PetriNetTest {
     return new PetriNetLoader().readPNML(pnml);
   }
 
-  //just test that the correct transitions are enabled upon startup
-  @Test public void testEnabledTransitions() {
+  // just test that the correct transitions are enabled upon startup
+  @Test
+  public void testEnabledTransitions() {
     PetriNet net = getTaxiNet();
     PetriNetAnimator animator = new PetriNetAnimator(net);
     Set<Transition> transitions = animator.getEnabledTransitions();
@@ -106,52 +110,52 @@ public class PetriNetTest {
     return net.getPlaces().stream().filter(p -> p.getNumberOfTokensStored() > 0).collect(Collectors.toSet());
   }
 
-  @Test public void testSuccessfulTransation() {
+  @Test
+  public void testSuccessfulTransation() {
     PetriNet net = getTaxiNet();
     PetriNetAnimator animator = new PetriNetAnimator(net);
     Set<Transition> transitions = animator.getEnabledTransitions();
-    //expected enabled transitions:
+    // expected enabled transitions:
     Assert.assertTrue(transitions.stream()
         .anyMatch(t -> t.getId().equals("http://purl.org/webofneeds/process/taxi#PassengerArrivedAtPickupLocation")));
     Assert.assertTrue(transitions.stream()
         .anyMatch(t -> t.getId().equals("http://purl.org/webofneeds/process/taxi#DriverArrivedAtPickupLocation")));
     Assert.assertEquals(2, transitions.size());
 
-    //actual transition: passenger arrives
+    // actual transition: passenger arrives
     animator.fireTransition(transitions.stream()
         .filter(t -> t.getId().equals("http://purl.org/webofneeds/process/taxi#PassengerArrivedAtPickupLocation"))
         .findFirst().get());
     transitions = animator.getEnabledTransitions();
-    //expected enabled transitions:
+    // expected enabled transitions:
     Assert.assertTrue(transitions.stream()
         .anyMatch(t -> t.getId().equals("http://purl.org/webofneeds/process/taxi#PassengerStoppedWaiting")));
     Assert.assertTrue(transitions.stream()
         .anyMatch(t -> t.getId().equals("http://purl.org/webofneeds/process/taxi#DriverArrivedAtPickupLocation")));
     Assert.assertEquals(2, transitions.size());
-    //actual transition: driver arrives
+    // actual transition: driver arrives
     animator.fireTransition(transitions.stream()
         .filter(t -> t.getId().equals("http://purl.org/webofneeds/process/taxi#DriverArrivedAtPickupLocation"))
         .findFirst().get());
     transitions = animator.getEnabledTransitions();
-    //expected enabled transitions:
+    // expected enabled transitions:
     Assert.assertTrue(transitions.stream()
         .anyMatch(t -> t.getId().equals("http://purl.org/webofneeds/process/taxi#ArrivedAtDestination")));
     Assert.assertEquals(1, transitions.size());
-    //actual transition: arrive at destination
+    // actual transition: arrive at destination
     animator.fireTransition(transitions.stream()
         .filter(t -> t.getId().equals("http://purl.org/webofneeds/process/taxi#ArrivedAtDestination")).findFirst()
         .get());
     transitions = animator.getEnabledTransitions();
-    //expected enabled transitions:
+    // expected enabled transitions:
     Assert.assertTrue(
         transitions.stream().anyMatch(t -> t.getId().equals("http://purl.org/webofneeds/process/taxi#PaymentMade")));
     Assert.assertEquals(1, transitions.size());
-    //actual transition: payment is made
-    animator.fireTransition(
-        transitions.stream().filter(t -> t.getId().equals("http://purl.org/webofneeds/process/taxi#PaymentMade"))
-            .findFirst().get());
+    // actual transition: payment is made
+    animator.fireTransition(transitions.stream()
+        .filter(t -> t.getId().equals("http://purl.org/webofneeds/process/taxi#PaymentMade")).findFirst().get());
     transitions = animator.getEnabledTransitions();
-    //expected enabled transitions:
+    // expected enabled transitions:
     Assert.assertTrue(transitions.stream()
         .anyMatch(t -> t.getId().equals("http://purl.org/webofneeds/process/taxi#PassengerReviewedDriver")));
     Assert.assertTrue(transitions.stream()
@@ -159,7 +163,8 @@ public class PetriNetTest {
     Assert.assertEquals(2, transitions.size());
   }
 
-  @Test public void testConversationPetriNets() {
+  @Test
+  public void testConversationPetriNets() {
 
     Dataset conversation = loadDataset("won/protocol/petrinet/conversations/simple-petri-net-one-event.trig");
     PetriNetStates nets = PetriNetStates.of(conversation);
@@ -173,7 +178,8 @@ public class PetriNetTest {
     Assert.assertEquals(URI.create("http://example.com/state/end"), marked.iterator().next());
   }
 
-  @Test public void testTaxiNoShowPetriNet() {
+  @Test
+  public void testTaxiNoShowPetriNet() {
 
     Dataset conversation = loadDataset("won/protocol/petrinet/conversations/taxi-no-show.trig");
     PetriNetStates nets = PetriNetStates.of(conversation);

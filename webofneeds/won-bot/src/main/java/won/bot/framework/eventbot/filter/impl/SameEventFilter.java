@@ -29,7 +29,8 @@ public class SameEventFilter implements EventFilter {
     this.onlyAcceptableEvent = onlyAcceptableEvent;
   }
 
-  @Override public boolean accept(Event event) {
+  @Override
+  public boolean accept(Event event) {
     return event == this.onlyAcceptableEvent;
   }
 }

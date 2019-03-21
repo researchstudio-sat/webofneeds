@@ -23,7 +23,8 @@ import won.bot.framework.eventbot.filter.EventFilter;
 import won.bot.framework.eventbot.listener.AbstractDoOnceAfterNEventsListener;
 
 /**
- * Counts how often it is called, offers to call a callback when a certain number is reached.
+ * Counts how often it is called, offers to call a callback when a certain
+ * number is reached.
  */
 public class ActionOnceAfterNEventsListener extends AbstractDoOnceAfterNEventsListener {
   private EventBotAction task;
@@ -51,11 +52,13 @@ public class ActionOnceAfterNEventsListener extends AbstractDoOnceAfterNEventsLi
     this.task = task;
   }
 
-  @Override protected void unsubscribe() {
+  @Override
+  protected void unsubscribe() {
     getEventListenerContext().getEventBus().unsubscribe(this);
   }
 
-  @Override protected void doOnce(Event event) {
+  @Override
+  protected void doOnce(Event event) {
     getEventListenerContext().getExecutor().execute(task.getActionTask(event, this));
   }
 }

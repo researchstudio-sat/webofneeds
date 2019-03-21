@@ -22,12 +22,14 @@ public class GoalDataExtractionTest {
 
   private static final String baseFolder = "/won/utils/goals/extraction/";
 
-  @BeforeClass public static void setLogLevel() {
+  @BeforeClass
+  public static void setLogLevel() {
     Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
     root.setLevel(Level.INFO);
   }
 
-  @Test public void additionalNodeNotCoveredByShape() throws IOException {
+  @Test
+  public void additionalNodeNotCoveredByShape() throws IOException {
     Dataset ds = loadDataset(baseFolder + "additional-node-not-covered-by-shape.trig");
     Model dataModel = ds.getNamedModel("http://example.org/ns#data");
     Model shapesModel = ds.getNamedModel("http://example.org/ns#shapes");
@@ -37,7 +39,8 @@ public class GoalDataExtractionTest {
     Assert.assertTrue(actual.isIsomorphicWith(expected));
   }
 
-  @Test public void additionalNodeNotCoveredByShapePersonClosed() throws IOException {
+  @Test
+  public void additionalNodeNotCoveredByShapePersonClosed() throws IOException {
     Dataset ds = loadDataset(baseFolder + "additional-node-not-covered-by-shape-person-closed.trig");
     Model dataModel = ds.getNamedModel("http://example.org/ns#data");
     Model shapesModel = ds.getNamedModel("http://example.org/ns#shapes");
@@ -47,7 +50,8 @@ public class GoalDataExtractionTest {
     Assert.assertTrue(actual.isIsomorphicWith(expected));
   }
 
-  @Test public void sequencePath() throws IOException {
+  @Test
+  public void sequencePath() throws IOException {
     Dataset ds = loadDataset(baseFolder + "SequencePath.trig");
     Model dataModel = ds.getNamedModel("http://example.org/ns#data");
     Model shapesModel = ds.getNamedModel("http://example.org/ns#shapes");

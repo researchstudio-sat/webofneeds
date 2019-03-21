@@ -10,18 +10,26 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
 
-@Entity @Table(name = "keystore") public class KeystoreHolder {
+@Entity
+@Table(name = "keystore")
+public class KeystoreHolder {
   private static final int DEFAULT_BYTE_ARRAY_SIZE = 500;
 
   private static final String PROVIDER_BC = org.bouncycastle.jce.provider.BouncyCastleProvider.PROVIDER_NAME;
   private static final String KEY_STORE_TYPE = "UBER";
 
-  @Id @GeneratedValue @Column(name = "id") private Long id;
+  @Id
+  @GeneratedValue
+  @Column(name = "id")
+  private Long id;
 
-  @Transient private final Logger logger = LoggerFactory.getLogger(getClass());
+  @Transient
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  //the keystore as a byte array
-  @Lob @Column(name = "keystore_data", nullable = false, length = 10000000) private byte[] keystoreBytes;
+  // the keystore as a byte array
+  @Lob
+  @Column(name = "keystore_data", nullable = false, length = 10000000)
+  private byte[] keystoreBytes;
 
   public KeystoreHolder() {
     super();
@@ -76,11 +84,12 @@ import java.security.KeyStore;
     InputStream inputStream = null;
     byte[] keystoreData = getKeystoreBytes();
     if (keystoreData == null || keystoreData.length == 0) {
-      //return a new, empty key store if there is no key store yet.
+      // return a new, empty key store if there is no key store yet.
       try {
         store = java.security.KeyStore.getInstance(KEY_STORE_TYPE, PROVIDER_BC);
         store.load(null, password.toCharArray());
-        //also set this key store so we can save it to db. (hence the synchronized methods)
+        // also set this key store so we can save it to db. (hence the synchronized
+        // methods)
         setKeystore(store, password);
         return store;
       } catch (Exception e) {

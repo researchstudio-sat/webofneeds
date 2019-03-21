@@ -22,16 +22,20 @@ import java.util.Optional;
  */
 public class FacetDerivationProcessor implements Processor {
 
-  @Autowired ConnectionRepository connectionRepository;
+  @Autowired
+  ConnectionRepository connectionRepository;
 
-  @Autowired NeedRepository needRepository;
+  @Autowired
+  NeedRepository needRepository;
 
-  @Autowired FacetService derivationService;
+  @Autowired
+  FacetService derivationService;
 
   public FacetDerivationProcessor() {
   }
 
-  @Override public void process(Exchange exchange) throws Exception {
+  @Override
+  public void process(Exchange exchange) throws Exception {
     Optional<Connection> con = Optional.empty();
     ConnectionStateChangeBuilder stateChangeBuilder = (ConnectionStateChangeBuilder) exchange.getIn()
         .getHeader(WonCamelConstants.CONNECTION_STATE_CHANGE_BUILDER_HEADER);
@@ -44,9 +48,8 @@ public class FacetDerivationProcessor implements Processor {
     if (conUri == null) {
       // not found. get it from the message and put it in the header
       WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
-      conUri = wonMessage.getEnvelopeType() == WonMessageDirection.FROM_EXTERNAL ?
-          wonMessage.getReceiverURI() :
-          wonMessage.getSenderURI();
+      conUri = wonMessage.getEnvelopeType() == WonMessageDirection.FROM_EXTERNAL ? wonMessage.getReceiverURI()
+          : wonMessage.getSenderURI();
     }
     if (conUri != null) {
       // found a connection. Put its URI in the header and load it
@@ -56,7 +59,8 @@ public class FacetDerivationProcessor implements Processor {
       // found no connection. don't modify the builder
     }
 
-    // only if there is enough data to make a connectionStateChange object, make it and pass it to the data
+    // only if there is enough data to make a connectionStateChange object, make it
+    // and pass it to the data
     // derivation service.
     if (stateChangeBuilder.canBuild()) {
       ConnectionStateChange connectionStateChange = stateChangeBuilder.build();

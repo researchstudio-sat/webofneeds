@@ -12,11 +12,13 @@ public class ReviewFacetConfig extends HardcodedFacetConfig {
     this.derivationProperties.add(WON.REVIEWS);
   }
 
-  @Override public boolean isConnectionAllowedToType(URI remoteFacetType) {
+  @Override
+  public boolean isConnectionAllowedToType(URI remoteFacetType) {
     return FacetType.ReviewFacet.getURI().equals(remoteFacetType);
   }
 
-  @Override public boolean isAutoOpen(URI remoteFacetType) {
+  @Override
+  public boolean isAutoOpen(URI remoteFacetType) {
     return true;
   }
 }

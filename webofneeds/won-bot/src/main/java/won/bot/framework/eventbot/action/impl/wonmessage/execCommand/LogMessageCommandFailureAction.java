@@ -34,7 +34,8 @@ public class LogMessageCommandFailureAction extends BaseEventBotAction {
     super(eventListenerContext);
   }
 
-  @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
+  @Override
+  protected void doRun(Event event, EventListener executingListener) throws Exception {
     MessageCommandFailureEvent failureEvent = (MessageCommandFailureEvent) event;
     String command = failureEvent.getOriginalCommandEvent().getClass().getSimpleName();
     String message = failureEvent.getMessage();

@@ -25,26 +25,25 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * User: fkleedorfer
- * Date: 06.11.12
+ * User: fkleedorfer Date: 06.11.12
  */
 public class URIService implements InitializingBean {
 
-  //prefix of any URI
+  // prefix of any URI
   private String generalURIPrefix;
-  //prefix of a need resource
+  // prefix of a need resource
   private String needResourceURIPrefix;
-  //prefix of a connection resource
+  // prefix of a connection resource
   private String connectionResourceURIPrefix;
-  //prefix of an event resource
+  // prefix of an event resource
   private String eventResourceURIPrefix;
-  //prefix of an attachment resource
+  // prefix of an attachment resource
   private String attachmentResourceURIPrefix;
-  //prefix for URISs of RDF data
+  // prefix for URISs of RDF data
   private String dataURIPrefix;
-  //prefix for URIs referring to real-world things
+  // prefix for URIs referring to real-world things
   private String resourceURIPrefix;
-  //prefix for human readable pages
+  // prefix for human readable pages
   private String pageURIPrefix;
 
   private Pattern connectionEventsPattern;
@@ -53,7 +52,8 @@ public class URIService implements InitializingBean {
   private Pattern needUnreadPattern;
   private Pattern needUriPattern;
 
-  @Override public void afterPropertiesSet() throws Exception {
+  @Override
+  public void afterPropertiesSet() throws Exception {
     this.connectionEventsPattern = Pattern.compile(connectionResourceURIPrefix + "/[a-zA-Z0-9]+/events");
     this.connectionUriPattern = Pattern.compile(connectionResourceURIPrefix + "/[a-zA-Z0-9]+");
     this.needEventsPattern = Pattern.compile(needResourceURIPrefix + "/[a-zA-Z0-9]+/events");
@@ -125,8 +125,9 @@ public class URIService implements InitializingBean {
   }
 
   /**
-   * Transforms the specified URI, which may be a resource URI or a page URI, to a data URI.
-   * If the specified URI doesn't start with the right prefix, it's returned unchanged.
+   * Transforms the specified URI, which may be a resource URI or a page URI, to a
+   * data URI. If the specified URI doesn't start with the right prefix, it's
+   * returned unchanged.
    *
    * @param pageOrResourceURI
    * @return
@@ -143,8 +144,9 @@ public class URIService implements InitializingBean {
   }
 
   /**
-   * Transforms the specified URI, which may be a resource URI or a page URI, to a page URI.
-   * If the specified URI doesn't start with the right prefix, it's returned unchanged.
+   * Transforms the specified URI, which may be a resource URI or a page URI, to a
+   * page URI. If the specified URI doesn't start with the right prefix, it's
+   * returned unchanged.
    *
    * @param dataOrResourceURI
    * @return
@@ -161,8 +163,9 @@ public class URIService implements InitializingBean {
   }
 
   /**
-   * Transforms the specified URI, which may be a resource URI or a page URI, to a page URI.
-   * If the specified URI doesn't start with the right prefix, it's returned unchanged.
+   * Transforms the specified URI, which may be a resource URI or a page URI, to a
+   * page URI. If the specified URI doesn't start with the right prefix, it's
+   * returned unchanged.
    *
    * @param pageOrDataURI
    * @return
@@ -249,13 +252,15 @@ public class URIService implements InitializingBean {
   }
 
   public URI createNeedSysInfoGraphURI(final URI needURI) {
-    //TODO: [SECURITY] it's possible to submit need data that clashes with this name,
+    // TODO: [SECURITY] it's possible to submit need data that clashes with this
+    // name,
     // which may lead to undefined behavior
     return URI.create(needURI.toString() + "#sysinfo");
   }
 
   /**
-   * Assumes the specified uri to be of the form [connectionURI]/event/[long event id].
+   * Assumes the specified uri to be of the form [connectionURI]/event/[long event
+   * id].
    *
    * @param eventURI
    * @return

@@ -29,7 +29,8 @@ public class ConnectionMessageCommandFailureEvent extends AbstractMessageCommand
     super(originalCommandEvent, originalCommandEvent.getCon());
   }
 
-  @Override public boolean isSuccess() {
+  @Override
+  public boolean isSuccess() {
     return false;
   }
 }

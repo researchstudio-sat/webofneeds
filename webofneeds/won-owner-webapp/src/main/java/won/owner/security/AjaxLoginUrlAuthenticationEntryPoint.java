@@ -11,8 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * User: t.kozel
- * Date: 11/8/13
+ * User: t.kozel Date: 11/8/13
  */
 public class AjaxLoginUrlAuthenticationEntryPoint extends LoginUrlAuthenticationEntryPoint {
 
@@ -23,7 +22,8 @@ public class AjaxLoginUrlAuthenticationEntryPoint extends LoginUrlAuthentication
     super(loginFormUrl);
   }
 
-  @Override public void commence(final HttpServletRequest request, final HttpServletResponse response,
+  @Override
+  public void commence(final HttpServletRequest request, final HttpServletResponse response,
       final AuthenticationException authException) throws IOException, ServletException {
     if (requestMatcher.matches(request)) {
       response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");

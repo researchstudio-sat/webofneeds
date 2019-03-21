@@ -12,13 +12,12 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * This class builds up the relations between needs and attributes.
- * It to builds an internal tensor data structure (RESCAL three-way-tensor).
- * The data structure can be build incrementally and when finished written to file system
+ * This class builds up the relations between needs and attributes. It to builds
+ * an internal tensor data structure (RESCAL three-way-tensor). The data
+ * structure can be build incrementally and when finished written to file system
  * for further processing by the RESCAL algorithm or evaluation algorithms.
  * <p>
- * User: hfriedrich
- * Date: 17.07.2014
+ * User: hfriedrich Date: 17.07.2014
  */
 public class TensorMatchingData {
   private static final Logger logger = LoggerFactory.getLogger(TensorMatchingData.class);
@@ -49,8 +48,7 @@ public class TensorMatchingData {
     checkAttributeOrNeedName(need1);
     checkAttributeOrNeedName(need2);
 
-    if (!addOnlyIfNeedsExist || (addOnlyIfNeedsExist &&
-        needs.contains(need1) && needs.contains(need2))) {
+    if (!addOnlyIfNeedsExist || (addOnlyIfNeedsExist && needs.contains(need1) && needs.contains(need2))) {
 
       int x1 = addNeed(need1);
       int x2 = addNeed(need2);
@@ -103,8 +101,9 @@ public class TensorMatchingData {
   }
 
   /**
-   * remove empty needs without attributes and their connections by building up a new
-   * matching data object and add only non-empty needs and connections between those
+   * remove empty needs without attributes and their connections by building up a
+   * new matching data object and add only non-empty needs and connections between
+   * those
    */
   protected TensorMatchingData removeEmptyNeedsAndConnections() {
 
@@ -193,8 +192,8 @@ public class TensorMatchingData {
       throw new IllegalArgumentException("Slice is not allowed to be null or empty");
     }
 
-    if ((connectionSlice && !name.equals(CONNECTION_SLICE_NAME)) || (!connectionSlice && name
-        .equals(CONNECTION_SLICE_NAME))) {
+    if ((connectionSlice && !name.equals(CONNECTION_SLICE_NAME))
+        || (!connectionSlice && name.equals(CONNECTION_SLICE_NAME))) {
       throw new IllegalArgumentException("Only connection slice is allowed the name: '" + CONNECTION_SLICE_NAME + "' ");
     }
   }
@@ -209,9 +208,10 @@ public class TensorMatchingData {
   }
 
   /**
-   * After all the needs, connections and attributes have been added, this method is used
-   * before writing the tensor out to disk, to resize it to the right dimensions and
-   * remove connections of empty needs that do not have any attributes.
+   * After all the needs, connections and attributes have been added, this method
+   * is used before writing the tensor out to disk, to resize it to the right
+   * dimensions and remove connections of empty needs that do not have any
+   * attributes.
    *
    * @return
    */
@@ -279,8 +279,8 @@ public class TensorMatchingData {
   }
 
   /**
-   * Same as {@link #writeCleanedOutputFiles(String)}  but removes empty needs and their connections before writing
-   * the tensor
+   * Same as {@link #writeCleanedOutputFiles(String)} but removes empty needs and
+   * their connections before writing the tensor
    *
    * @param folder
    * @return cleaned tensor data
@@ -307,10 +307,10 @@ public class TensorMatchingData {
   }
 
   /**
-   * Write the tensor out to the file system for further processing.
-   * Create the following files:
-   * - header.txt file with the need/attribute names that correspond to the index in the tensor.
-   * - <Slice>.mtx files for the different slices e.g. connections, need type, title and other attributes
+   * Write the tensor out to the file system for further processing. Create the
+   * following files: - header.txt file with the need/attribute names that
+   * correspond to the index in the tensor. - <Slice>.mtx files for the different
+   * slices e.g. connections, need type, title and other attributes
    *
    * @param folder
    * @throws IOException

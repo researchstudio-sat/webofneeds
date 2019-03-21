@@ -22,8 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * User: LEIH-NB
- * Date: 25.11.13
+ * User: LEIH-NB Date: 25.11.13
  */
 
 public class NeedProtocolDynamicRoutes extends RouteBuilder {
@@ -37,7 +36,8 @@ public class NeedProtocolDynamicRoutes extends RouteBuilder {
 
   }
 
-  @Override public void configure() throws Exception {
+  @Override
+  public void configure() throws Exception {
     logger.info("adding dynamic route from({}) to the recipient found in the header 'remoteBrokerEndpoint'", from);
     from(from).routeId(from).recipientList(header("remoteBrokerEndpoint"));
   }

@@ -49,7 +49,8 @@ public class RespondWithEchoToMessageAction extends BaseEventBotAction {
     this.millisTimeoutBeforeReply = millisTimeoutBeforeReply;
   }
 
-  @Override protected void doRun(final Event event, EventListener executingListener) throws Exception {
+  @Override
+  protected void doRun(final Event event, EventListener executingListener) throws Exception {
     if (event instanceof ConnectionSpecificEvent) {
       handleMessageEvent((ConnectionSpecificEvent) event);
     }
@@ -57,7 +58,8 @@ public class RespondWithEchoToMessageAction extends BaseEventBotAction {
 
   private void handleMessageEvent(final ConnectionSpecificEvent messageEvent) {
     getEventListenerContext().getTaskScheduler().schedule(new Runnable() {
-      @Override public void run() {
+      @Override
+      public void run() {
         String message = null;
         if (messageEvent instanceof MessageEvent) {
           message = createMessage(extractTextMessageFromWonMessage(((MessageEvent) messageEvent).getWonMessage()));

@@ -25,36 +25,42 @@ import java.io.InputStreamReader;
 import java.util.Collection;
 
 /**
- * Main actor that controls the rescal matching process. It loads the needs and connection data from the rdf
- * store, preprocess the data and save it to file system for the actual rescal processing in python.
- * After the rescal algorithm finished execution the generated hints are loaded and send back for saving and further
- * processing.
+ * Main actor that controls the rescal matching process. It loads the needs and
+ * connection data from the rdf store, preprocess the data and save it to file
+ * system for the actual rescal processing in python. After the rescal algorithm
+ * finished execution the generated hints are loaded and send back for saving
+ * and further processing.
  * <p>
  * Created by hfriedrich on 02.07.2015.
  */
-@Component @Scope("prototype") public class RescalMatcherActor extends UntypedActor {
+@Component
+@Scope("prototype")
+public class RescalMatcherActor extends UntypedActor {
   private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
   private long lastQueryDate = Long.MIN_VALUE;
   private TensorMatchingData rescalInputData = new TensorMatchingData();
   private static final String TICK = "tick";
   private ActorRef pubSubMediator;
 
-  @Autowired private HintReader hintReader;
+  @Autowired
+  private HintReader hintReader;
 
-  @Autowired private RescalMatcherConfig config;
+  @Autowired
+  private RescalMatcherConfig config;
 
-  @Override public void preStart() throws IOException {
+  @Override
+  public void preStart() throws IOException {
 
     // subscribe to need events
     pubSubMediator = DistributedPubSub.get(getContext().system()).mediator();
 
     // Execute the rescal algorithm regularly
-    getContext().system().scheduler()
-        .schedule(FiniteDuration.Zero(), config.getExecutionDuration(), getSelf(), TICK, getContext().dispatcher(),
-            null);
+    getContext().system().scheduler().schedule(FiniteDuration.Zero(), config.getExecutionDuration(), getSelf(), TICK,
+        getContext().dispatcher(), null);
   }
 
-  @Override public void onReceive(final Object o) throws Exception {
+  @Override
+  public void onReceive(final Object o) throws Exception {
 
     if (o.equals(TICK)) {
       executeRescalAlgorithm();
@@ -64,9 +70,10 @@ import java.util.Collection;
   }
 
   /**
-   * Load the need and connection data from the sparql endpoint, preprocess the data and write it to some directory
-   * to be processed by the rescal python algorithm that produces hints. The hints are then loaded and send to
-   * the event bus.
+   * Load the need and connection data from the sparql endpoint, preprocess the
+   * data and write it to some directory to be processed by the rescal python
+   * algorithm that produces hints. The hints are then loaded and send to the
+   * event bus.
    *
    * @throws IOException
    * @throws InterruptedException
@@ -117,10 +124,9 @@ import java.util.Collection;
     }
 
     // execute the rescal algorithm in python
-    String pythonCall = "python " + config.getPythonScriptDirectory() +
-        "/rescal-matcher.py -inputfolder " + config.getExecutionDirectory() +
-        " -outputfolder " + config.getExecutionDirectory() + "/output" +
-        " -rank " + config.getRescalRank() + " -threshold " + config.getRescalThreshold();
+    String pythonCall = "python " + config.getPythonScriptDirectory() + "/rescal-matcher.py -inputfolder "
+        + config.getExecutionDirectory() + " -outputfolder " + config.getExecutionDirectory() + "/output" + " -rank "
+        + config.getRescalRank() + " -threshold " + config.getRescalThreshold();
     log.info("execute python script: " + pythonCall);
     Process pythonProcess = Runtime.getRuntime().exec(pythonCall);
 
@@ -143,7 +149,8 @@ import java.util.Collection;
       return;
     }
 
-    // load the predicted hints and send the to the event bus of the matching service
+    // load the predicted hints and send the to the event bus of the matching
+    // service
     BulkHintEvent hintsEvent = hintReader.readHints(rescalInputData);
 
     int numHints = (hintsEvent == null || hintsEvent.getHintEvents() == null) ? 0 : hintsEvent.getHintEvents().size();
@@ -155,8 +162,8 @@ import java.util.Collection;
         builder.append("\n- " + hint);
       }
       log.info(builder.toString());
-      pubSubMediator
-          .tell(new DistributedPubSubMediator.Publish(hintsEvent.getClass().getName(), hintsEvent), getSelf());
+      pubSubMediator.tell(new DistributedPubSubMediator.Publish(hintsEvent.getClass().getName(), hintsEvent),
+          getSelf());
     }
 
     lastQueryDate = queryDate;

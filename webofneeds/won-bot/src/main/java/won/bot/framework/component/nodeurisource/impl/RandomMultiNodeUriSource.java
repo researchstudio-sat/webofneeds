@@ -27,8 +27,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * User: fkleedorfer
- * Date: 19.12.13
+ * User: fkleedorfer Date: 19.12.13
  */
 public class RandomMultiNodeUriSource implements NodeURISource {
   private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -36,7 +35,8 @@ public class RandomMultiNodeUriSource implements NodeURISource {
   private long seed = System.currentTimeMillis();
   private Random random = new Random(seed);
 
-  @Override public URI getNodeURI() {
+  @Override
+  public URI getNodeURI() {
     if (this.nodeURIs == null || this.nodeURIs.isEmpty())
       return null;
     URI nodeUri = this.nodeURIs.get(this.random.nextInt(this.nodeURIs.size()));

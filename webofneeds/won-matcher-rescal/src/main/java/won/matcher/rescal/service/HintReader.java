@@ -19,15 +19,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Used to read a hint matrix mtx file and create (bulk) hint event objects from it.
+ * Used to read a hint matrix mtx file and create (bulk) hint event objects from
+ * it.
  * <p>
- * User: hfriedrich
- * Date: 23.06.2015
+ * User: hfriedrich Date: 23.06.2015
  */
-@Component public class HintReader {
+@Component
+public class HintReader {
   private static final Logger log = LoggerFactory.getLogger(HintReader.class);
 
-  @Autowired private RescalMatcherConfig config;
+  @Autowired
+  private RescalMatcherConfig config;
 
   public BulkHintEvent readHints(TensorMatchingData matchingData) throws IOException {
 
@@ -43,7 +45,8 @@ import java.util.List;
     }
     br.close();
 
-    // read the hint matrix (supposed to contain new hints only, without the connection entries)
+    // read the hint matrix (supposed to contain new hints only, without the
+    // connection entries)
     fis = new FileInputStream(config.getExecutionDirectory() + "/output/hints.mtx");
     BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fis, "UTF-8"));
     StringBuffer stringBuffer = new StringBuffer();
@@ -65,7 +68,8 @@ import java.util.List;
     try {
       hintMatrix = SparseMatrix.fromMatrixMarket(hintMatrixString);
     } catch (Exception e) {
-      // IllegalArgumentException can occur here if we have no needs and thus now hints, catch this case and return
+      // IllegalArgumentException can occur here if we have no needs and thus now
+      // hints, catch this case and return
       // null to indicate no hints were found
       log.warn("Cannot load hint matrix file. This can happen if no hints were created");
       log.debug("Exception was: ", e);
@@ -89,15 +93,16 @@ import java.util.List;
       this.matchingData = matchingData;
     }
 
-    @Override public void apply(final int i, final int j, final double value) {
+    @Override
+    public void apply(final int i, final int j, final double value) {
 
       String needUri1 = needUris.get(i);
       String needUri2 = needUris.get(j);
 
       List<String> matchingDataNeeds = matchingData.getNeeds();
 
-      if (needUri1 != null && needUri2 != null && matchingDataNeeds.contains(needUri1) && matchingDataNeeds
-          .contains(needUri2)) {
+      if (needUri1 != null && needUri2 != null && matchingDataNeeds.contains(needUri1)
+          && matchingDataNeeds.contains(needUri2)) {
 
         // wonNodeUri must have been set as attribute before to be able to read it here
         String fromWonNodeUri = matchingData.getFirstAttributeOfNeed(needUri1, "wonNodeUri");

@@ -37,7 +37,7 @@ public class TaxiDemandNeedGenerator {
       setPrefixes();
 
       Resource need = model.createResource(needURI);
-      //Resource isPart = model.createResource();
+      // Resource isPart = model.createResource();
       Resource seeksPart = model.createResource();
       Resource won_Need = model.createResource("http://purl.org/webofneeds/model#Need");
 

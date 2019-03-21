@@ -22,17 +22,20 @@ import won.protocol.message.sender.WonMessageSender;
 import won.protocol.message.sender.exception.WonMessageSenderException;
 
 /**
- * Decorates the EventListenerContext such that the bot sends each message twice.
+ * Decorates the EventListenerContext such that the bot sends each message
+ * twice.
  */
 public class DuplicateMessageSenderDecorator extends BaseEventListenerContextDecorator {
   public DuplicateMessageSenderDecorator(EventListenerContext delegate) {
     super(delegate);
   }
 
-  @Override public WonMessageSender getWonMessageSender() {
+  @Override
+  public WonMessageSender getWonMessageSender() {
     final WonMessageSender delegate = super.getWonMessageSender();
     return new WonMessageSender() {
-      @Override public void sendWonMessage(WonMessage message) throws WonMessageSenderException {
+      @Override
+      public void sendWonMessage(WonMessage message) throws WonMessageSenderException {
         delegate.sendWonMessage(message);
         delegate.sendWonMessage(message);
       }

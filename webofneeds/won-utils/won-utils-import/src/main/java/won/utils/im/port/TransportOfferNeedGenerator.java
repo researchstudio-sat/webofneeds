@@ -90,7 +90,8 @@ public class TransportOfferNeedGenerator {
       return resource;
     }
 
-    // pick a location and change it by a random amount so that the locations are scattered around a point
+    // pick a location and change it by a random amount so that the locations are
+    // scattered around a point
     int locNr = (int) (Math.random() * 10);
     double rndlat = 0.05 * Math.random();
     double rndlng = 0.05 * Math.random();
@@ -121,7 +122,8 @@ public class TransportOfferNeedGenerator {
     geoResource.addProperty(RDF.type, schema_GeoCoordinates);
     geoResource.addProperty(SCHEMA.LATITUDE, lat);
     geoResource.addProperty(SCHEMA.LONGITUDE, lng);
-    // add bigdata specific value: "<subj> won:geoSpatial  "48.225073#16.358398"^^<http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon>"
+    // add bigdata specific value: "<subj> won:geoSpatial
+    // "48.225073#16.358398"^^<http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon>"
     geoResource.addProperty(WON.GEO_SPATIAL, lat + "#" + lng, bigdata_geoSpatialDatatype);
     locationResource.addProperty(WON.HAS_BOUNDING_BOX, boundingBoxResource);
     boundingBoxResource.addProperty(WON.HAS_NORTH_WEST_CORNER, nwCornerResource);

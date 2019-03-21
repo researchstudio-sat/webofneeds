@@ -33,21 +33,22 @@ import java.net.URI;
  */
 public class ConnectionStateChangeBuilderCamelProcessor implements Processor {
 
-  @Autowired ConnectionRepository connectionRepository;
+  @Autowired
+  ConnectionRepository connectionRepository;
 
   public ConnectionStateChangeBuilderCamelProcessor() {
   }
 
-  @Override public void process(Exchange exchange) throws Exception {
+  @Override
+  public void process(Exchange exchange) throws Exception {
     ConnectionStateChangeBuilder stateChangeBuilder = new ConnectionStateChangeBuilder();
     // first, try to find the connection uri in the header:
     URI conUri = (URI) exchange.getIn().getHeader(WonCamelConstants.CONNECTION_URI_HEADER);
     if (conUri == null) {
       // not found. get it from the message and put it in the header
       WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
-      conUri = wonMessage.getEnvelopeType() == WonMessageDirection.FROM_EXTERNAL ?
-          wonMessage.getReceiverURI() :
-          wonMessage.getSenderURI();
+      conUri = wonMessage.getEnvelopeType() == WonMessageDirection.FROM_EXTERNAL ? wonMessage.getReceiverURI()
+          : wonMessage.getSenderURI();
     }
     if (conUri != null) {
       // found a connection. Put its URI in the header and load it
@@ -57,7 +58,7 @@ public class ConnectionStateChangeBuilderCamelProcessor implements Processor {
       // found no connection. don't modify the builder
     }
 
-    //put the state change builder in the header
+    // put the state change builder in the header
     exchange.getIn().setHeader(WonCamelConstants.CONNECTION_STATE_CHANGE_BUILDER_HEADER, stateChangeBuilder);
   }
 }

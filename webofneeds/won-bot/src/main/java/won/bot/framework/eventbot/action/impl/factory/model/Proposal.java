@@ -28,7 +28,8 @@ public class Proposal implements Serializable {
     return state;
   }
 
-  @Override public boolean equals(Object o) {
+  @Override
+  public boolean equals(Object o) {
     if (this == o)
       return true;
     if (o == null || getClass() != o.getClass())
@@ -39,14 +40,13 @@ public class Proposal implements Serializable {
     return uri.equals(proposal.uri);
   }
 
-  @Override public int hashCode() {
+  @Override
+  public int hashCode() {
     return uri.hashCode();
   }
 
-  @Override public String toString() {
-    return "Proposal{" +
-        "uri=" + uri +
-        ", state=" + state +
-        '}';
+  @Override
+  public String toString() {
+    return "Proposal{" + "uri=" + uri + ", state=" + state + '}';
   }
 }

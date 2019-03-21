@@ -21,12 +21,12 @@ import won.bot.integrationtest.failsim.BaseEventListenerContextDecorator;
 import won.bot.integrationtest.failsim.DelayedDuplicateMessageSenderDecorator;
 
 /**
- * User: fkleedorfer
- * Date: 03.05.15
+ * User: fkleedorfer Date: 03.05.15
  */
 public class DelayedDuplicateMessageSendingConversationBot extends DuplicateMessageSendingConversationBot {
 
-  @Override protected BaseEventListenerContextDecorator getDuplicateMessageSenderDecorator(
+  @Override
+  protected BaseEventListenerContextDecorator getDuplicateMessageSenderDecorator(
       EventListenerContext eventListenerContext) {
     return new DelayedDuplicateMessageSenderDecorator(eventListenerContext, 1000);
   }

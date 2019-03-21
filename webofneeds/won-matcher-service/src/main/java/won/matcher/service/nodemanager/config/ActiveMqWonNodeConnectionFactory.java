@@ -24,17 +24,19 @@ import javax.net.ssl.TrustManager;
 import java.util.UUID;
 
 /**
- * Factory for creating a {@link won.matcher.service.nodemanager.pojo.WonNodeConnection} with ActiveMq endpoint of a won node
+ * Factory for creating a
+ * {@link won.matcher.service.nodemanager.pojo.WonNodeConnection} with ActiveMq
+ * endpoint of a won node
  * <p>
- * User: hfriedrich
- * Date: 18.05.2015
+ * User: hfriedrich Date: 18.05.2015
  */
 //TODO reuse BrokerComponentFactory
 public class ActiveMqWonNodeConnectionFactory {
   protected static final Logger log = LoggerFactory.getLogger(ActiveMqWonNodeConnectionFactory.class);
 
   /**
-   * Create a {@link won.matcher.service.nodemanager.pojo.WonNodeConnection} for active mq
+   * Create a {@link won.matcher.service.nodemanager.pojo.WonNodeConnection} for
+   * active mq
    *
    * @param context     actor context to create the message consuming actors in
    * @param wonNodeInfo info about the won node (e.g. topics to subscribe)
@@ -53,8 +55,8 @@ public class ActiveMqWonNodeConnectionFactory {
         WON.HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_NEED_ACTIVATED_TOPIC_NAME.toString());
     String deactivatedTopic = wonNodeInfo.getSupportedProtocolImplParamValue(activeMq,
         WON.HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_NEED_DEACTIVATED_TOPIC_NAME.toString());
-    String hintQueue = wonNodeInfo
-        .getSupportedProtocolImplParamValue(activeMq, WON.HAS_ACTIVEMQ_MATCHER_PROTOCOL_QUEUE_NAME.toString());
+    String hintQueue = wonNodeInfo.getSupportedProtocolImplParamValue(activeMq,
+        WON.HAS_ACTIVEMQ_MATCHER_PROTOCOL_QUEUE_NAME.toString());
 
     // create the activemq component for this won node
     String uuid = UUID.randomUUID().toString();
@@ -66,8 +68,8 @@ public class ActiveMqWonNodeConnectionFactory {
 
     // create the actors that receive the messages (need events)
     String createdComponent = componentName + ":topic:" + createdTopic + "?testConnectionOnStartup=false";
-    Props createdProps = SpringExtension.SpringExtProvider.get(context.system())
-        .props(NeedConsumerProtocolActor.class, createdComponent);
+    Props createdProps = SpringExtension.SpringExtProvider.get(context.system()).props(NeedConsumerProtocolActor.class,
+        createdComponent);
     ActorRef created = context.actorOf(createdProps, "ActiveMqNeedCreatedConsumerProtocolActor-" + uuid);
     log.info("Create camel component JMS listener {} for won node {}", createdComponent, wonNodeInfo.getWonNodeURI());
 
@@ -97,13 +99,14 @@ public class ActiveMqWonNodeConnectionFactory {
 
     // create the actor that sends messages (hint events)
     String hintComponent = componentName + ":queue:" + hintQueue;
-    Props hintProps = SpringExtension.SpringExtProvider.get(context.system())
-        .props(HintProducerProtocolActor.class, hintComponent, null);
+    Props hintProps = SpringExtension.SpringExtProvider.get(context.system()).props(HintProducerProtocolActor.class,
+        hintComponent, null);
     ActorRef hintProducer = context.actorOf(hintProps, "ActiveMqHintProducerProtocolActor-" + uuid);
 
     log.info("Create camel component JMS listener {} for won node {}", hintComponent, wonNodeInfo.getWonNodeURI());
 
-    // watch the created consumers from the context to get informed when they are terminated
+    // watch the created consumers from the context to get informed when they are
+    // terminated
     context.watch(created);
     context.watch(activated);
     context.watch(deactivated);
@@ -128,21 +131,24 @@ public class ActiveMqWonNodeConnectionFactory {
       }
     }
 
-    // jms.prefetchPolicy parameter is added to prevent matcher-consumer death due to overflowing with messages,
+    // jms.prefetchPolicy parameter is added to prevent matcher-consumer death due
+    // to overflowing with messages,
     // see http://activemq.apache.org/what-is-the-prefetch-limit-for.html
     ActiveMQSslConnectionFactory connectionFactory = new ActiveMQSslConnectionFactory(
         brokerUri + "?jms.prefetchPolicy.all=10?");
 
-    // for non-persistent messages setting "AlwaysSyncSend" to true makes it slow, but ensures that a producer is immediately informed
-    // about the memory issues on broker (is blocked or gets exception depending on <systemUsage> config)
+    // for non-persistent messages setting "AlwaysSyncSend" to true makes it slow,
+    // but ensures that a producer is immediately informed
+    // about the memory issues on broker (is blocked or gets exception depending on
+    // <systemUsage> config)
     // see more info http://activemq.apache.org/producer-flow-control.html
     connectionFactory.setAlwaysSyncSend(false);
     connectionFactory.setUseAsyncSend(true);
     connectionFactory.setDispatchAsync(true);
 
     if (keyManager != null && trustManager != null) {
-      connectionFactory
-          .setKeyAndTrustManagers(new KeyManager[] { keyManager }, new TrustManager[] { trustManager }, null);
+      connectionFactory.setKeyAndTrustManagers(new KeyManager[] { keyManager }, new TrustManager[] { trustManager },
+          null);
     } else {
       log.warn("key or trust manager was null, therefore do not set them in connection factory");
     }

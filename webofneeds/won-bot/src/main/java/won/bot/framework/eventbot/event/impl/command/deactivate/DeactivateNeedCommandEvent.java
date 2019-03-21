@@ -31,7 +31,8 @@ public class DeactivateNeedCommandEvent implements MessageCommandEvent {
     this.needUri = needUri;
   }
 
-  @Override public WonMessageType getWonMessageType() {
+  @Override
+  public WonMessageType getWonMessageType() {
     return WonMessageType.DEACTIVATE;
   }
 

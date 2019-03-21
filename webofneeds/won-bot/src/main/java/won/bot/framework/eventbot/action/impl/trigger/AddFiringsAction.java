@@ -16,7 +16,8 @@ public class AddFiringsAction extends BaseEventBotAction {
     this.numFirings = numFirings;
   }
 
-  @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
+  @Override
+  protected void doRun(Event event, EventListener executingListener) throws Exception {
     this.trigger.addFirings(numFirings);
   }
 }

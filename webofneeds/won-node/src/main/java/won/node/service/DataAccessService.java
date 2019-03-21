@@ -29,14 +29,14 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * User: fkleedorfer
- * Date: 18.04.14
+ * User: fkleedorfer Date: 18.04.14
  */
 public interface DataAccessService {
   public Optional<Facet> getDefaultFacet(URI needUri) throws NoSuchNeedException;
 
   /**
-   * Get the specified facet or the default facet, or any of the facets, or throw a runtime exception.
+   * Get the specified facet or the default facet, or any of the facets, or throw
+   * a runtime exception.
    *
    * @param needURI
    * @param facetUri
@@ -61,8 +61,8 @@ public interface DataAccessService {
       throws IllegalMessageForConnectionStateException;
 
   /**
-   * Adds feedback, represented by the subgraph reachable from feedback, to the RDF description of the
-   * item identified by forResource
+   * Adds feedback, represented by the subgraph reachable from feedback, to the
+   * RDF description of the item identified by forResource
    *
    * @param connection
    * @param feedback

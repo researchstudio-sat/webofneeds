@@ -33,7 +33,8 @@ public class PublishEventAction extends BaseEventBotAction {
     this.event = event;
   }
 
-  @Override protected void doRun(Event e, EventListener executingListener) throws Exception {
+  @Override
+  protected void doRun(Event e, EventListener executingListener) throws Exception {
     getEventListenerContext().getEventBus().publish(event);
   }
 }

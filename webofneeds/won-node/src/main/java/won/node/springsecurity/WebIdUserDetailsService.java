@@ -36,16 +36,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Assumes that the provided username is a linked data URI that contains WebID information.
- * The URI is accessed and the RDF is downloaded and added to the UserDetails for future reference.
+ * Assumes that the provided username is a linked data URI that contains WebID
+ * information. The URI is accessed and the RDF is downloaded and added to the
+ * UserDetails for future reference.
  */
 public class WebIdUserDetailsService implements AuthenticationUserDetailsService<PreAuthenticatedAuthenticationToken> {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Autowired private WebIDVerificationAgent webIDVerificationAgent;
+  @Autowired
+  private WebIDVerificationAgent webIDVerificationAgent;
 
-  @Override public UserDetails loadUserDetails(final PreAuthenticatedAuthenticationToken token)
-      throws UsernameNotFoundException {
+  @Override
+  public UserDetails loadUserDetails(final PreAuthenticatedAuthenticationToken token) throws UsernameNotFoundException {
     StopWatch stopWatch = new StopWatch();
     stopWatch.start();
     String principal = (String) token.getPrincipal();
@@ -56,11 +58,12 @@ public class WebIdUserDetailsService implements AuthenticationUserDetailsService
     try {
       webID = new URI(principal);
     } catch (URISyntaxException e) {
-      throw new BadCredentialsException("Principal of X.509 Certificate must be a WebId URI. Actual value: '" +
-          principal + "'");
+      throw new BadCredentialsException(
+          "Principal of X.509 Certificate must be a WebId URI. Actual value: '" + principal + "'");
     }
 
-    //at this point, we know that a client certificate was presented. Grant this role:
+    // at this point, we know that a client certificate was presented. Grant this
+    // role:
     List<GrantedAuthority> authorities = new ArrayList<>(3);
     authorities.add(new SimpleGrantedAuthority("ROLE_CLIENT_CERTIFICATE_PRESENTED"));
 
@@ -73,12 +76,11 @@ public class WebIdUserDetailsService implements AuthenticationUserDetailsService
         logger.debug("could not verify webId '" + principal + "'. ROLE_WEBID not granted");
       }
     } catch (Exception e) {
-      logger.debug("could not verify webId '" + principal + "' because of an error during verification. ROLE_WEBID " +
-          "not granted. Cause is logged", e);
+      logger.debug("could not verify webId '" + principal + "' because of an error during verification. ROLE_WEBID "
+          + "not granted. Cause is logged", e);
     }
     stopWatch.stop();
     logger.debug("webID check took " + stopWatch.getLastTaskTimeMillis() + " millis");
     return new WebIdUserDetails(webID, authorities);
   }
 }
-

@@ -14,13 +14,16 @@ import won.protocol.util.AuthenticationThreadLocal;
 
 import java.security.KeyStore;
 
-@Component public class PerUserKeystoreService extends AbstractKeyStoreService {
+@Component
+public class PerUserKeystoreService extends AbstractKeyStoreService {
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Autowired private AuthenticationManager authenticationManager;
+  @Autowired
+  private AuthenticationManager authenticationManager;
 
-  @Autowired private KeystoreHolderRepository keystoreHolderRepository;
+  @Autowired
+  private KeystoreHolderRepository keystoreHolderRepository;
 
   private String getUsername() {
     return (String) SecurityContextHolder.getContext().getAuthentication().getName();
@@ -41,18 +44,21 @@ import java.security.KeyStore;
     return ((KeystoreEnabledUserDetails) getAuthentication().getPrincipal()).getUser();
   }
 
-  @Override public String getPassword() {
+  @Override
+  public String getPassword() {
     return getKeystoreUserDetails().getKeystorePassword();
   }
 
-  @Override public KeyStore getUnderlyingKeyStore() {
+  @Override
+  public KeyStore getUnderlyingKeyStore() {
     return getKeystoreUserDetails().getKeyStore();
   }
 
-  @Override protected void persistStore() throws Exception {
-    //fetch keystore and password from details in the authentication object
+  @Override
+  protected void persistStore() throws Exception {
+    // fetch keystore and password from details in the authentication object
     KeystoreEnabledUserDetails keystoreUserDetails = getKeystoreUserDetails();
-    //write it back to the db
+    // write it back to the db
     User user = getUser();
     user.getKeystoreHolder().setKeystore(keystoreUserDetails.getKeyStore(), keystoreUserDetails.getKeystorePassword());
     keystoreHolderRepository.save(user.getKeystoreHolder());

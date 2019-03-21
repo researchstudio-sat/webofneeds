@@ -38,7 +38,8 @@ public class DirectoryBasedNeedProducer implements NeedProducer {
   private final Logger logger = LoggerFactory.getLogger(getClass());
   private File directory;
 
-  // true if the factory should keep creating needs after having used each file, false if the factory should use each file only once.
+  // true if the factory should keep creating needs after having used each file,
+  // false if the factory should use each file only once.
   private boolean repeat;
 
   // Java Regex for filtering filenames in the directory
@@ -52,13 +53,14 @@ public class DirectoryBasedNeedProducer implements NeedProducer {
 
   private FileBasedNeedProducer fileBasedNeedProducer;
 
-  @Override public synchronized Dataset create() {
-    //lazy init
+  @Override
+  public synchronized Dataset create() {
+    // lazy init
     initializeLazily();
-    //init failed?
+    // init failed?
     if (isInitFailed())
       return null;
-    //at and of file list?
+    // at and of file list?
     if (isAfterLastFile()) {
       if (this.isRepeat()) {
         rewind();
@@ -67,15 +69,15 @@ public class DirectoryBasedNeedProducer implements NeedProducer {
       }
     }
 
-    //loop until we find a readable file
+    // loop until we find a readable file
     while (this.fileIndex < this.files.length) {
       if (isCurrentFileReadable())
         break;
       this.fileIndex++;
     }
-    int fileIndexToUse = this.fileIndex; //remember the current index
+    int fileIndexToUse = this.fileIndex; // remember the current index
 
-    //advance the index for next time, reset it if we've been told to repeat
+    // advance the index for next time, reset it if we've been told to repeat
     this.fileIndex++;
     rewindIfNecessary();
 
@@ -92,7 +94,7 @@ public class DirectoryBasedNeedProducer implements NeedProducer {
 
   private Dataset readDatasetFromFileWithIndex(final int fileIndexToUse) {
     try {
-      //make a need from it
+      // make a need from it
       if (fileIndexToUse >= this.files.length)
         return null;
       return this.fileBasedNeedProducer.readNeedFromFile(this.files[fileIndexToUse]);
@@ -135,7 +137,8 @@ public class DirectoryBasedNeedProducer implements NeedProducer {
     }
   }
 
-  @Override public boolean isExhausted() {
+  @Override
+  public boolean isExhausted() {
     initializeLazily();
     if (isRepeat() && files != null && files.length > 0)
       return false;

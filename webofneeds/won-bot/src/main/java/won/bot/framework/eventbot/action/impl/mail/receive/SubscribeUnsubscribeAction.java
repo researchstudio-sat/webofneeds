@@ -21,7 +21,8 @@ public class SubscribeUnsubscribeAction extends BaseEventBotAction {
     super(eventListenerContext);
   }
 
-  @Override protected void doRun(final Event event, EventListener executingListener) throws Exception {
+  @Override
+  protected void doRun(final Event event, EventListener executingListener) throws Exception {
     EventListenerContext ctx = getEventListenerContext();
     if (event instanceof SubscribeUnsubscribeEvent && ctx.getBotContextWrapper() instanceof MailBotContextWrapper) {
       MailBotContextWrapper botContextWrapper = (MailBotContextWrapper) ctx.getBotContextWrapper();
@@ -32,7 +33,8 @@ public class SubscribeUnsubscribeAction extends BaseEventBotAction {
       String senderMailAddress = MailContentExtractor.getMailSender(subscribeEvent.getMessage());
       botContextWrapper.setSubscribeStatusForMailAddress(senderMailAddress, subscribeStatus);
 
-      // depending on the new subscribe status of the user publish his cached mails as needs or delete the cache
+      // depending on the new subscribe status of the user publish his cached mails as
+      // needs or delete the cache
       if (SubscribeStatus.SUBSCRIBED.equals(subscribeStatus)) {
 
         EventBus bus = getEventListenerContext().getEventBus();

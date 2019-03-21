@@ -33,7 +33,8 @@ public class LogErrorAction extends LogAction {
     super(eventListenerContext, message);
   }
 
-  @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
+  @Override
+  protected void doRun(Event event, EventListener executingListener) throws Exception {
     logger.error(message);
   }
 

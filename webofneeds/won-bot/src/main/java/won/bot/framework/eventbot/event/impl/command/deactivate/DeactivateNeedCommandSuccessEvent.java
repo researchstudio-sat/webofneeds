@@ -26,15 +26,18 @@ public class DeactivateNeedCommandSuccessEvent extends BaseNeedSpecificEvent
     this.deactivateNeedCommandEvent = deactivateNeedCommandEvent;
   }
 
-  @Override public MessageCommandEvent getOriginalCommandEvent() {
+  @Override
+  public MessageCommandEvent getOriginalCommandEvent() {
     return deactivateNeedCommandEvent;
   }
 
-  @Override public String getMessage() {
+  @Override
+  public String getMessage() {
     return message;
   }
 
-  @Override public boolean isSuccess() {
+  @Override
+  public boolean isSuccess() {
     return true;
   }
 }

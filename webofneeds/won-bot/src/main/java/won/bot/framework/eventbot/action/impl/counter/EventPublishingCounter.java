@@ -37,7 +37,8 @@ public class EventPublishingCounter extends CounterImpl {
     this.eventBus = context.getEventBus();
   }
 
-  @Override public int increment() {
+  @Override
+  public int increment() {
     int count = super.increment();
     if (eventBus != null) {
       eventBus.publish(new CountEvent(this, count));
@@ -45,7 +46,8 @@ public class EventPublishingCounter extends CounterImpl {
     return count;
   }
 
-  @Override public int decrement() {
+  @Override
+  public int decrement() {
     int count = super.decrement();
     if (eventBus != null) {
       eventBus.publish(new CountEvent(this, count));
@@ -55,7 +57,8 @@ public class EventPublishingCounter extends CounterImpl {
 
   public EventFilter makeEventFilter() {
     return new EventFilter() {
-      @Override public boolean accept(Event event) {
+      @Override
+      public boolean accept(Event event) {
         if (!(event instanceof CountEvent)) {
           return false;
         }

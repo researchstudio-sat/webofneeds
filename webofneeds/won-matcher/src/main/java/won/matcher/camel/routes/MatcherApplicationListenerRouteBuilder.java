@@ -28,10 +28,9 @@ import java.util.Set;
 //TODO: This route builder should not be loaded on startup, but it's being loaded..
 
 /**
- * User: sbyim
- * Date: 14.11.13
- * Each Won Node provides queues for owner applications that are registered on the node.
- * Owner Application shall generate routes dynamically in runtime that listen to those queues.
+ * User: sbyim Date: 14.11.13 Each Won Node provides queues for owner
+ * applications that are registered on the node. Owner Application shall
+ * generate routes dynamically in runtime that listen to those queues.
  */
 public class MatcherApplicationListenerRouteBuilder extends RouteBuilder {
 
@@ -55,7 +54,8 @@ public class MatcherApplicationListenerRouteBuilder extends RouteBuilder {
    * @throws Exception
    */
 
-  @Override public void configure() throws Exception {
+  @Override
+  public void configure() throws Exception {
     for (int i = 0; i < endpoints.size(); i++) {
       from(endpoints.get(i)).routeId("Node2MatcherRoute" + brokerUri + i).choice()
           .when(header("methodName").isEqualTo("needCreated"))

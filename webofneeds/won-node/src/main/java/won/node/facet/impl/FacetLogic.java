@@ -25,8 +25,7 @@ import won.protocol.model.FacetType;
 import java.net.URI;
 
 /**
- * User: fkleedorfer
- * Date: 25.03.14
+ * User: fkleedorfer Date: 25.03.14
  */
 public interface FacetLogic {
 

@@ -20,21 +20,24 @@ import java.util.*;
 /**
  * Sparql service extended with methods for crawling
  * <p>
- * User: hfriedrich
- * Date: 04.05.2015
+ * User: hfriedrich Date: 04.05.2015
  */
-@Component public class CrawlSparqlService extends SparqlService {
+@Component
+public class CrawlSparqlService extends SparqlService {
 
   private static final String HTTP_HEADER_SEPARATOR = ", ";
 
-  @Autowired public CrawlSparqlService(@Value("${uri.sparql.endpoint}") final String sparqlEndpoint) {
+  @Autowired
+  public CrawlSparqlService(@Value("${uri.sparql.endpoint}") final String sparqlEndpoint) {
     super(sparqlEndpoint);
   }
 
-  @Autowired private CrawlConfig config;
+  @Autowired
+  private CrawlConfig config;
 
   /**
-   * Update the message meta data about the crawling process using a separate graph.
+   * Update the message meta data about the crawling process using a separate
+   * graph.
    *
    * @param msg message that describe crawling meta data to update
    */
@@ -43,7 +46,8 @@ import java.util.*;
   }
 
   /**
-   * Bulk update of several meta data messages about the crawling process using a separate graph.
+   * Bulk update of several meta data messages about the crawling process using a
+   * separate graph.
    *
    * @param msgs multiple messages that describe crawling meta data to update
    */
@@ -130,13 +134,9 @@ import java.util.*;
     Set<CrawlUriMessage> msgs = new LinkedHashSet<>();
 
     String queryString = "SELECT ?uri ?base ?wonNode (group_concat(distinct ?etag;separator=\"" + HTTP_HEADER_SEPARATOR
-        + "\") as ?etags)" +
-        " WHERE { GRAPH won:crawlMetadata {\n" +
-        " ?uri ?p ?status.\n" +
-        " ?uri won:crawlBaseUri ?base.\n" +
-        " OPTIONAL { ?uri won:wonNodeUri ?wonNode }\n" +
-        " OPTIONAL { ?uri won:resourceETagValue ?etag }}}\n" +
-        " GROUP BY ?uri ?base ?wonNode\n";
+        + "\") as ?etags)" + " WHERE { GRAPH won:crawlMetadata {\n" + " ?uri ?p ?status.\n"
+        + " ?uri won:crawlBaseUri ?base.\n" + " OPTIONAL { ?uri won:wonNodeUri ?wonNode }\n"
+        + " OPTIONAL { ?uri won:resourceETagValue ?etag }}}\n" + " GROUP BY ?uri ?base ?wonNode\n";
 
     ParameterizedSparqlString pps = new ParameterizedSparqlString();
     pps.setNsPrefix("won", "http://purl.org/webofneeds/model#");
@@ -176,8 +176,9 @@ import java.util.*;
   }
 
   /**
-   * Extract linked URIs of resource URI and create new CrawlUriMessages out of it for crawling.
-   * Uses base and non-base property paths for the extraction of uris and creation of new crawling messages.
+   * Extract linked URIs of resource URI and create new CrawlUriMessages out of it
+   * for crawling. Uses base and non-base property paths for the extraction of
+   * uris and creation of new crawling messages.
    *
    * @param baseUri    base uri of the current processed resource uri message
    * @param wonNodeUri won node rui of the current processed resource uri message
@@ -207,15 +208,20 @@ import java.util.*;
   }
 
   /**
-   * Extract linked URIs of resource URI and create new CrawlUriMessages for a certain property path and a base Uri.
-   * Also extract ETag values if they are available for certain uri resources so that they can be used
-   * to make crawling more efficient. Use specified property paths to construct the query.
+   * Extract linked URIs of resource URI and create new CrawlUriMessages for a
+   * certain property path and a base Uri. Also extract ETag values if they are
+   * available for certain uri resources so that they can be used to make crawling
+   * more efficient. Use specified property paths to construct the query.
    *
    * @param baseUri      base uri of the current processed resource uri message
-   * @param wonNodeUri   won node rui of the current processed resource uri message
-   * @param propertyPath property path used to extract new uris in conjunction with base uri
-   * @param baseProperty base uri used to extract new uris in conjunction property path
-   * @return set of CrawlUriMessages extracted using a certain base uri and property path
+   * @param wonNodeUri   won node rui of the current processed resource uri
+   *                     message
+   * @param propertyPath property path used to extract new uris in conjunction
+   *                     with base uri
+   * @param baseProperty base uri used to extract new uris in conjunction property
+   *                     path
+   * @return set of CrawlUriMessages extracted using a certain base uri and
+   *         property path
    */
   private Set<CrawlUriMessage> extractCrawlUriMessagesForPropertyPath(String baseUri, String wonNodeUri,
       String propertyPath, boolean baseProperty) {
@@ -228,18 +234,21 @@ import java.util.*;
     Set<CrawlUriMessage> newCrawlMessages = new HashSet<CrawlUriMessage>();
     long crawlDate = System.currentTimeMillis();
 
-    // we have to query the baseUri with and without trailing slahes cause we don't know how the RDF data
-    // is described in detail. Usually the "need" prefix ends with a trailing "slash" but we don't assume
-    // here that is always the case, so we query both variants: with and without trailing slashes.
+    // we have to query the baseUri with and without trailing slahes cause we don't
+    // know how the RDF data
+    // is described in detail. Usually the "need" prefix ends with a trailing
+    // "slash" but we don't assume
+    // here that is always the case, so we query both variants: with and without
+    // trailing slashes.
     // Check the need list with its need: rdfs:member entries for example
-    String queryString =
-        "SELECT ?uri (group_concat(distinct ?etag;separator=\"" + HTTP_HEADER_SEPARATOR + "\") as ?etags) WHERE {\n" +
-            "{ ?baseUriWithTrailingSlash " + propertyPath + " ?uri. } \n" +
-            // propertyPath has to be appended manually because it contains ">" character and ParameterizedSparqlString cause of injection risk
-            "UNION { ?baseUriWithoutTrailingSlash " + propertyPath + " ?uri. } \n" +
-            // propertyPath has to be appended manually because it contains ">" character and ParameterizedSparqlString cause of injection risk
-            " OPTIONAL {?uri won:resourceETagValue ?etag. }}\n" +
-            " GROUP BY ?uri\n";
+    String queryString = "SELECT ?uri (group_concat(distinct ?etag;separator=\"" + HTTP_HEADER_SEPARATOR
+        + "\") as ?etags) WHERE {\n" + "{ ?baseUriWithTrailingSlash " + propertyPath + " ?uri. } \n" +
+        // propertyPath has to be appended manually because it contains ">" character
+        // and ParameterizedSparqlString cause of injection risk
+        "UNION { ?baseUriWithoutTrailingSlash " + propertyPath + " ?uri. } \n" +
+        // propertyPath has to be appended manually because it contains ">" character
+        // and ParameterizedSparqlString cause of injection risk
+        " OPTIONAL {?uri won:resourceETagValue ?etag. }}\n" + " GROUP BY ?uri\n";
 
     ParameterizedSparqlString pps = new ParameterizedSparqlString();
     pps.setNsPrefix("won", "http://purl.org/webofneeds/model#");
@@ -284,21 +293,19 @@ import java.util.*;
   }
 
   /**
-   * To start crawling (http modification query) from a certain point in time, take last
-   * modification date from a need known in the database that is in status 'DONE' which means
-   * it has been crawled.
+   * To start crawling (http modification query) from a certain point in time,
+   * take last modification date from a need known in the database that is in
+   * status 'DONE' which means it has been crawled.
    *
-   * @param wonNodeUri won node uri for which need modification dates should be retrieved
+   * @param wonNodeUri won node uri for which need modification dates should be
+   *                   retrieved
    * @return modification date to start crawling from or null if none exists
    */
   public String retrieveNeedModificationDateForCrawling(String wonNodeUri) {
 
-    String queryString = "SELECT ?modificationDate WHERE {\n" +
-        " ?needUri a won:Need.\n" +
-        " ?needUri won:hasWonNode ?wonNodeUri. \n" +
-        " ?needUri dcterms:modified ?modificationDate. \n" +
-        " ?needUri won:crawlStatus 'DONE'. \n" +
-        "} ORDER BY DESC(?modificationDate) LIMIT 1\n";
+    String queryString = "SELECT ?modificationDate WHERE {\n" + " ?needUri a won:Need.\n"
+        + " ?needUri won:hasWonNode ?wonNodeUri. \n" + " ?needUri dcterms:modified ?modificationDate. \n"
+        + " ?needUri won:crawlStatus 'DONE'. \n" + "} ORDER BY DESC(?modificationDate) LIMIT 1\n";
 
     ParameterizedSparqlString pps = new ParameterizedSparqlString();
     pps.setNsPrefix("won", "http://purl.org/webofneeds/model#");
@@ -318,21 +325,19 @@ import java.util.*;
   }
 
   /**
-   * To start crawling (http modification query) from a certain point in time, take last
-   * modification date from a connection known in the database that is in status 'DONE' which means
-   * it has been crawled.
+   * To start crawling (http modification query) from a certain point in time,
+   * take last modification date from a connection known in the database that is
+   * in status 'DONE' which means it has been crawled.
    *
-   * @param wonNodeUri won node uri for which connection modification dates should be retrieved
+   * @param wonNodeUri won node uri for which connection modification dates should
+   *                   be retrieved
    * @return modification date to start crawling from or null if none exists
    */
   public String retrieveConnectionModificationDateForCrawling(String wonNodeUri) {
 
-    String queryString = "SELECT ?modificationDate WHERE {\n" +
-        " ?connectionUri a won:Connection.\n" +
-        " ?connectionUri won:hasWonNode ?wonNodeUri. \n" +
-        " ?connectionUri dcterms:modified ?modificationDate. \n" +
-        " ?connectionUri won:crawlStatus 'DONE'. \n" +
-        "} ORDER BY DESC(?modificationDate) LIMIT 1\n";
+    String queryString = "SELECT ?modificationDate WHERE {\n" + " ?connectionUri a won:Connection.\n"
+        + " ?connectionUri won:hasWonNode ?wonNodeUri. \n" + " ?connectionUri dcterms:modified ?modificationDate. \n"
+        + " ?connectionUri won:crawlStatus 'DONE'. \n" + "} ORDER BY DESC(?modificationDate) LIMIT 1\n";
 
     ParameterizedSparqlString pps = new ParameterizedSparqlString();
     pps.setNsPrefix("won", "http://purl.org/webofneeds/model#");
@@ -354,20 +359,17 @@ import java.util.*;
   public BulkNeedEvent retrieveActiveNeedEvents(long fromDate, long toDate, int offset, int limit,
       boolean sortAscending) {
 
-    // query template to retrieve all alctive cralwed/saved needs in a certain date range
+    // query template to retrieve all alctive cralwed/saved needs in a certain date
+    // range
     String orderClause = sortAscending ? "ORDER BY ?date\n" : "ORDER BY DESC(?date)\n";
     log.debug("bulk load need data from sparql endpoint in date range: [{},{}]", fromDate, toDate);
 
-    String queryTemplate = "SELECT ?needUri ?wonNodeUri ?date WHERE {  \n" +
-        "  ?needUri a won:Need. \n" +
-        "  ?needUri won:crawlDate ?date.  \n" +
-        "  ?needUri won:isInState won:Active. \n" +
-        "  ?needUri won:hasWonNode ?wonNodeUri. \n" +
-        "  {?needUri won:crawlStatus 'SAVE'.} UNION {?needUri won:crawlStatus 'DONE'.}\n" +
-        "  FILTER (?date >= ?fromDate && ?date < ?toDate ) \n" +
-        "} " + orderClause +
-        " OFFSET ?offset\n" +
-        " LIMIT ?limit";
+    String queryTemplate = "SELECT ?needUri ?wonNodeUri ?date WHERE {  \n" + "  ?needUri a won:Need. \n"
+        + "  ?needUri won:crawlDate ?date.  \n" + "  ?needUri won:isInState won:Active. \n"
+        + "  ?needUri won:hasWonNode ?wonNodeUri. \n"
+        + "  {?needUri won:crawlStatus 'SAVE'.} UNION {?needUri won:crawlStatus 'DONE'.}\n"
+        + "  FILTER (?date >= ?fromDate && ?date < ?toDate ) \n" + "} " + orderClause + " OFFSET ?offset\n"
+        + " LIMIT ?limit";
 
     ParameterizedSparqlString pps = new ParameterizedSparqlString();
     pps.setNsPrefix("won", "http://purl.org/webofneeds/model#");

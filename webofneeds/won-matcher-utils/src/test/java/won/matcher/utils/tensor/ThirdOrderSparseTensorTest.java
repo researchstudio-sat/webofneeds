@@ -1,18 +1,18 @@
 package won.matcher.utils.tensor;/*
- * Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
+                                 * Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
+                                 *
+                                 *    Licensed under the Apache License, Version 2.0 (the "License");
+                                 *    you may not use this file except in compliance with the License.
+                                 *    You may obtain a copy of the License at
+                                 *
+                                 *        http://www.apache.org/licenses/LICENSE-2.0
+                                 *
+                                 *    Unless required by applicable law or agreed to in writing, software
+                                 *    distributed under the License is distributed on an "AS IS" BASIS,
+                                 *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+                                 *    See the License for the specific language governing permissions and
+                                 *    limitations under the License.
+                                 */
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -22,19 +22,20 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * User: hfriedrich
- * Date: 09.07.2014
+ * User: hfriedrich Date: 09.07.2014
  */
 public class ThirdOrderSparseTensorTest {
   private static final double DELTA = 0.001d;
 
   private ThirdOrderSparseTensor testTensor1;
 
-  @Before public void initTestTensor() {
+  @Before
+  public void initTestTensor() {
     testTensor1 = new ThirdOrderSparseTensor(4, 4);
   }
 
-  @Test public void tensorCreation() {
+  @Test
+  public void tensorCreation() {
 
     ThirdOrderSparseTensor tensor = new ThirdOrderSparseTensor(4, 3);
     int[] dim = { 4, 3, 0 };
@@ -48,7 +49,8 @@ public class ThirdOrderSparseTensorTest {
     }
   }
 
-  @Test public void setGetEntry() {
+  @Test
+  public void setGetEntry() {
 
     testTensor1.setEntry(0.5d, 0, 0, 0);
     testTensor1.setEntry(1.0d, 0, 0, 0);
@@ -65,7 +67,8 @@ public class ThirdOrderSparseTensorTest {
     Assert.assertEquals(0.0d, testTensor1.getEntry(3, 3, 2), DELTA);
   }
 
-  @Test public void resizeUp() {
+  @Test
+  public void resizeUp() {
 
     int[] dim = testTensor1.getDimensions();
     testTensor1.setEntry(1.0d, 3, 1, 2);
@@ -85,7 +88,8 @@ public class ThirdOrderSparseTensorTest {
     }
   }
 
-  @Test public void resizeDown() {
+  @Test
+  public void resizeDown() {
 
     int[] dim = testTensor1.getDimensions();
     testTensor1.setEntry(1.0d, 3, 1, 2);
@@ -102,7 +106,8 @@ public class ThirdOrderSparseTensorTest {
     }
   }
 
-  @Test public void scaleSlicesDynamically() {
+  @Test
+  public void scaleSlicesDynamically() {
 
     Assert.assertEquals(0, testTensor1.getDimensions()[2]);
     testTensor1.setEntry(1.0, 1, 1, 0);
@@ -121,7 +126,8 @@ public class ThirdOrderSparseTensorTest {
     Assert.assertEquals(4, testTensor1.getDimensions()[2]);
   }
 
-  @Test public void getNonZeroIndicesOfRow() {
+  @Test
+  public void getNonZeroIndicesOfRow() {
 
     testTensor1.setEntry(0.5d, 0, 0, 0);
     testTensor1.setEntry(1.0d, 0, 1, 0);
@@ -138,7 +144,8 @@ public class ThirdOrderSparseTensorTest {
     Assert.assertEquals(indices, testTensor1.getNonZeroIndicesOfRow(1, 0));
   }
 
-  @Test public void hasNonZeroEntryInRow() {
+  @Test
+  public void hasNonZeroEntryInRow() {
 
     testTensor1.setEntry(0.5d, 0, 0, 0);
     testTensor1.setEntry(1.0d, 0, 0, 0);

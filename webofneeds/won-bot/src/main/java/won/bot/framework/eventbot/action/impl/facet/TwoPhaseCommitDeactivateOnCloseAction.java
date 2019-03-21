@@ -36,30 +36,33 @@ import won.protocol.util.WonRdfUtils;
 import java.net.URI;
 
 /**
- * Expects a CloseFromOtherNeed event from a and closes the local need.
- * If the additional message content of the event ss not a WON_TX.COORDINATION_MESSAGE_COMMIT, an exception is thrown.
+ * Expects a CloseFromOtherNeed event from a and closes the local need. If the
+ * additional message content of the event ss not a
+ * WON_TX.COORDINATION_MESSAGE_COMMIT, an exception is thrown.
  */
 public class TwoPhaseCommitDeactivateOnCloseAction extends BaseEventBotAction {
   public TwoPhaseCommitDeactivateOnCloseAction(EventListenerContext eventListenerContext) {
     super(eventListenerContext);
   }
 
-  @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
+  @Override
+  protected void doRun(Event event, EventListener executingListener) throws Exception {
 
-    //If we receive a close event, it must carry a commit message.
+    // If we receive a close event, it must carry a commit message.
     if (event instanceof CloseFromOtherNeedEvent) {
       URI needURI = ((CloseFromOtherNeedEvent) event).getNeedURI();
       WonMessage wonMessage = ((CloseFromOtherNeedEvent) event).getWonMessage();
-      NodeIterator ni = RdfUtils
-          .visitFlattenedToNodeIterator(wonMessage.getMessageContent(), new RdfUtils.ModelVisitor<NodeIterator>() {
-                @Override public NodeIterator visit(final Model model) {
-                  return model.listObjectsOfProperty(model.createProperty(WON_TX.COORDINATION_MESSAGE.getURI()));
-                }
-              });
+      NodeIterator ni = RdfUtils.visitFlattenedToNodeIterator(wonMessage.getMessageContent(),
+          new RdfUtils.ModelVisitor<NodeIterator>() {
+            @Override
+            public NodeIterator visit(final Model model) {
+              return model.listObjectsOfProperty(model.createProperty(WON_TX.COORDINATION_MESSAGE.getURI()));
+            }
+          });
       assert ni.hasNext() : "no additional content found in close message, expected a commit";
       String coordinationMessageUri = ni.toList().get(0).asResource().getURI().toString();
-      assert coordinationMessageUri.equals(WON_TX.COORDINATION_MESSAGE_COMMIT.getURI().toString()) :
-          "expected a " + "Commmit message";
+      assert coordinationMessageUri.equals(WON_TX.COORDINATION_MESSAGE_COMMIT.getURI().toString()) : "expected a "
+          + "Commmit message";
       getEventListenerContext().getWonMessageSender().sendWonMessage(createWonMessage(needURI));
       getEventListenerContext().getEventBus().publish(new NeedDeactivatedEvent(needURI));
     }
@@ -72,9 +75,8 @@ public class TwoPhaseCommitDeactivateOnCloseAction extends BaseEventBotAction {
     Dataset ds = getEventListenerContext().getLinkedDataSource().getDataForResource(needURI);
     URI localWonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(ds, needURI);
 
-    return WonMessageBuilder
-        .setMessagePropertiesForDeactivateFromOwner(wonNodeInformationService.generateEventURI(localWonNode), needURI,
-            localWonNode).build();
+    return WonMessageBuilder.setMessagePropertiesForDeactivateFromOwner(
+        wonNodeInformationService.generateEventURI(localWonNode), needURI, localWonNode).build();
   }
 
 }

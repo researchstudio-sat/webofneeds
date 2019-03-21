@@ -7,11 +7,8 @@ import won.node.facet.impl.WON_TX;
 import java.net.URI;
 
 /**
- * Created with IntelliJ IDEA.
- * User: Danijel
- * Date: 30.1.14.
- * Time: 18.33
- * To change this template use File | Settings | File Templates.
+ * Created with IntelliJ IDEA. User: Danijel Date: 30.1.14. Time: 18.33 To
+ * change this template use File | Settings | File Templates.
  */
 public enum BAPCState {
   ACTIVE("Active", Phase.FIRST) {
@@ -232,7 +229,9 @@ public enum BAPCState {
   private Phase phase;
   private static BAPCEventType resendEvent = null;
 
-  public static enum Phase {FIRST, SECOND, CANCELED_FROM_COORDINATOR}
+  public static enum Phase {
+    FIRST, SECOND, CANCELED_FROM_COORDINATOR
+  }
 
   ;
 
@@ -325,5 +324,3 @@ public enum BAPCState {
   }
 
 }
-
-

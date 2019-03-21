@@ -33,9 +33,10 @@ import java.net.URI;
 import java.util.Optional;
 
 /**
- * BaseEventBotAction connecting two needs on the specified facets, or on their default facets if none are specified.
- * Requires a NeedSpecificEvent to run and expeects the needURI from the event
- * to be associated with another need URI via the botContext.saveToObjectMap method.
+ * BaseEventBotAction connecting two needs on the specified facets, or on their
+ * default facets if none are specified. Requires a NeedSpecificEvent to run and
+ * expeects the needURI from the event to be associated with another need URI
+ * via the botContext.saveToObjectMap method.
  */
 public class HintAssociatedNeedAction extends BaseEventBotAction {
   private Optional<URI> remoteFacetType = Optional.empty();
@@ -59,7 +60,8 @@ public class HintAssociatedNeedAction extends BaseEventBotAction {
     this.matcherURI = matcherURI;
   }
 
-  @Override public void doRun(Event event, EventListener executingListener) {
+  @Override
+  public void doRun(Event event, EventListener executingListener) {
     if (!(event instanceof NeedSpecificEvent)) {
       logger.error("HintAssociatedNeedAction can only handle NeedSpecificEvents");
       return;
@@ -70,9 +72,8 @@ public class HintAssociatedNeedAction extends BaseEventBotAction {
     try {
       logger.info("Sending hint for {} and {}", myNeedUri, remoteNeedUri);
 
-      getEventListenerContext().getMatcherProtocolNeedServiceClient()
-          .hint(remoteNeedUri, myNeedUri, 0.9, matcherURI, null,
-              createWonMessage(remoteNeedUri, myNeedUri, 0.9, matcherURI));
+      getEventListenerContext().getMatcherProtocolNeedServiceClient().hint(remoteNeedUri, myNeedUri, 0.9, matcherURI,
+          null, createWonMessage(remoteNeedUri, myNeedUri, 0.9, matcherURI));
 
     } catch (Exception e) {
       logger.warn("could not send hint for " + myNeedUri + " to " + remoteNeedUri, e);
@@ -86,15 +87,18 @@ public class HintAssociatedNeedAction extends BaseEventBotAction {
 
     WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
 
-    URI localWonNode = WonRdfUtils.NeedUtils
-        .getWonNodeURIFromNeed(linkedDataSource.getDataForResource(needURI), needURI);
+    URI localWonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(linkedDataSource.getDataForResource(needURI),
+        needURI);
 
     return WonMessageBuilder
-        .setMessagePropertiesForHint(wonNodeInformationService.generateEventURI(localWonNode), needURI, localFacetType
-                .map(facetType -> WonLinkedDataUtils.getFacetsOfType(needURI, facetType, linkedDataSource).stream()
-                    .findFirst().orElse(null)), localWonNode, otherNeedURI, remoteFacetType.map(
-                facetType -> WonLinkedDataUtils.getFacetsOfType(otherNeedURI, facetType, linkedDataSource).stream()
-                    .findFirst().orElse(null)), originator, score).build();
+        .setMessagePropertiesForHint(wonNodeInformationService.generateEventURI(localWonNode), needURI,
+            localFacetType.map(facetType -> WonLinkedDataUtils
+                .getFacetsOfType(needURI, facetType, linkedDataSource).stream().findFirst().orElse(null)),
+            localWonNode, otherNeedURI,
+            remoteFacetType.map(facetType -> WonLinkedDataUtils
+                .getFacetsOfType(otherNeedURI, facetType, linkedDataSource).stream().findFirst().orElse(null)),
+            originator, score)
+        .build();
   }
 
 }

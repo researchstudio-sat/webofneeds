@@ -52,21 +52,27 @@ import java.util.stream.StreamSupport;
  * Siren/Solr based abstract matcher with all implementations for querying as
  * well as indexing needs.
  */
-@Component @Scope("prototype") public class SparqlMatcherActor extends UntypedActor {
+@Component
+@Scope("prototype")
+public class SparqlMatcherActor extends UntypedActor {
   private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
 
   private ActorRef pubSubMediator;
 
-  @Autowired private SparqlMatcherConfig config;
+  @Autowired
+  private SparqlMatcherConfig config;
 
-  @Autowired private LinkedDataSource linkedDataSource;
+  @Autowired
+  private LinkedDataSource linkedDataSource;
 
-  @Override public void preStart() throws IOException {
+  @Override
+  public void preStart() throws IOException {
     // subscribe to need events
     pubSubMediator = DistributedPubSub.get(getContext().system()).mediator();
   }
 
-  @Override public void onReceive(final Object o) throws Exception {
+  @Override
+  public void onReceive(final Object o) throws Exception {
     String eventTypeForLogging = "unknown";
     Optional<String> uriForLogging = Optional.empty();
     try {
@@ -92,9 +98,8 @@ import java.util.stream.StreamSupport;
         unhandled(o);
       }
     } catch (Exception e) {
-      log.info(String
-          .format("Caught exception when processing %s event %s. More info on loglevel 'debug'", eventTypeForLogging,
-              uriForLogging.orElse("[no uri available]")));
+      log.info(String.format("Caught exception when processing %s event %s. More info on loglevel 'debug'",
+          eventTypeForLogging, uriForLogging.orElse("[no uri available]")));
       log.debug("caught exception", e);
       if (log.isDebugEnabled()) {
         e.printStackTrace();
@@ -157,13 +162,15 @@ import java.util.stream.StreamSupport;
   }
 
   /**
-   * Produces hints for the need and possibly also 'inverse' hints. Inverse hints are hints sent to the needs
-   * we find as matches for the original need.
+   * Produces hints for the need and possibly also 'inverse' hints. Inverse hints
+   * are hints sent to the needs we find as matches for the original need.
    * <p>
-   * The score is calculated as a function of scores provided by the embedded sparql queries: the range of those
-   * scores is projected on a range of 0-1. For inverse matches, the score is always 100%, because there is
-   * only one possible match - the original need. Note: this could be improved by remembering reported match scores
-   * in the matcher and using historic scores for normalization, but that's a lot more work.
+   * The score is calculated as a function of scores provided by the embedded
+   * sparql queries: the range of those scores is projected on a range of 0-1. For
+   * inverse matches, the score is always 100%, because there is only one possible
+   * match - the original need. Note: this could be improved by remembering
+   * reported match scores in the matcher and using historic scores for
+   * normalization, but that's a lot more work.
    */
   protected void processActiveNeedEvent(NeedEvent needEvent) throws IOException {
 
@@ -173,27 +180,31 @@ import java.util.stream.StreamSupport;
     List<ScoredNeed> matches = queryNeed(need);
     log.debug("found {} match candidates", matches.size());
 
-    //produce hints after post-filtering the matches we found:
-    Collection<HintEvent> hintEvents = produceHints(need, matches.stream().filter(
-            foundNeed -> foundNeed.need.getNeedState()
-                == NeedState.ACTIVE) //we may not have updated our need state in the database. re-check!
+    // produce hints after post-filtering the matches we found:
+    Collection<HintEvent> hintEvents = produceHints(need,
+        matches.stream().filter(foundNeed -> foundNeed.need.getNeedState() == NeedState.ACTIVE) // we may not have
+                                                                                                // updated our need
+                                                                                                // state in the
+                                                                                                // database. re-check!
             .filter(foundNeed -> postFilter(need, foundNeed.need)).collect(Collectors.toList()));
     publishHintEvents(hintEvents, need.getNeedUri(), false);
-    //but use the whole list of matches for inverse matching
+    // but use the whole list of matches for inverse matching
 
     final boolean noHintForCounterpart = need.hasFlag(WON.NO_HINT_FOR_COUNTERPART);
 
     if (!noHintForCounterpart) {
-      //we want do do inverse matching:
+      // we want do do inverse matching:
       // 1. check if the inverse match is appropriate
       // 2. do post-filtering
       // 3. produce hints
       // 4. collect all inverse hints and publish in one event
       Dataset needDataset = need.copyDataset();
       List<HintEvent> inverseHintEvents = matches.stream().filter(n -> n.need.getNeedState() == NeedState.ACTIVE)
-          .filter(matchedNeed -> !matchedNeed.need.hasFlag(WON.NO_HINT_FOR_ME) && !need.getNeedUri()
-              .equals(matchedNeed.need.getNeedUri())).map(matchedNeed -> {
-            // query for the matched need - but only in the dataset containing the original need. If we have a match, it means
+          .filter(matchedNeed -> !matchedNeed.need.hasFlag(WON.NO_HINT_FOR_ME)
+              && !need.getNeedUri().equals(matchedNeed.need.getNeedUri()))
+          .map(matchedNeed -> {
+            // query for the matched need - but only in the dataset containing the original
+            // need. If we have a match, it means
             // that the matched need should also get a hint, otherwise it should not.
             if (log.isDebugEnabled()) {
               log.debug("checking if match {} of {} should get a hint by inverse matching it in need's dataset: \n{}",
@@ -211,27 +222,27 @@ import java.util.stream.StreamSupport;
                     .collect(Collectors.toList()));
           }).map(entry -> produceHints(entry.getKey(), entry.getValue())).flatMap(hints -> hints.stream())
           .collect(Collectors.toList());
-      //now that we've collected all inverse hints, publish them
+      // now that we've collected all inverse hints, publish them
       publishHintEvents(inverseHintEvents, need.getNeedUri(), true);
     }
     log.debug("finished sparql-based matching for need {}", need.getNeedUri());
   }
 
   private Collection<HintEvent> produceHints(NeedModelWrapper need, List<ScoredNeed> matches) {
-    //find max score
+    // find max score
     Optional<Double> maxScore = matches.stream().map(n -> n.score).max((x, y) -> (int) Math.signum(x - y));
     if (!maxScore.isPresent()) {
-      //this should not happen
+      // this should not happen
       return Collections.EMPTY_LIST;
     }
-    //find min score
+    // find min score
     Optional<Double> minScore = matches.stream().map(n -> n.score).min((x, y) -> (int) Math.signum(x - y));
     if (!maxScore.isPresent()) {
-      //this should not happen
+      // this should not happen
       return Collections.EMPTY_LIST;
     }
     double range = (maxScore.get() - minScore.get());
-    return matches.stream().sorted((hint1, hint2) -> (int) Math.signum(hint2.score - hint1.score)) //sort descending
+    return matches.stream().sorted((hint1, hint2) -> (int) Math.signum(hint2.score - hint1.score)) // sort descending
         .limit(config.getLimitResults()).map(hint -> {
           double score = range == 0 ? 1.0 : (hint.score - minScore.get()) / range;
           return new HintEvent(need.getWonNodeUri(), need.getNeedUri(), hint.need.getWonNodeUri(),
@@ -249,8 +260,8 @@ import java.util.stream.StreamSupport;
   private void publishHintEvents(Collection<HintEvent> hintEvents, String needURI, boolean inverse) {
     BulkHintEvent bulkHintEvent = new BulkHintEvent();
     bulkHintEvent.addHintEvents(hintEvents);
-    pubSubMediator
-        .tell(new DistributedPubSubMediator.Publish(bulkHintEvent.getClass().getName(), bulkHintEvent), getSelf());
+    pubSubMediator.tell(new DistributedPubSubMediator.Publish(bulkHintEvent.getClass().getName(), bulkHintEvent),
+        getSelf());
     log.debug("sparql-based " + (inverse ? "inverse " : "") + "matching for need {} (found {} matches)", needURI,
         bulkHintEvent.getHintEvents().size());
   }
@@ -275,8 +286,8 @@ import java.util.stream.StreamSupport;
 
     ArrayList<Op> queries = new ArrayList<>(3);
 
-    Statement seeks = model
-        .getProperty(model.createResource(needURI), model.createProperty("http://purl.org/webofneeds/model#seeks"));
+    Statement seeks = model.getProperty(model.createResource(needURI),
+        model.createProperty("http://purl.org/webofneeds/model#seeks"));
 
     if (seeks != null) {
       Op seeksQuery = createNeedQuery(model, seeks);
@@ -301,9 +312,10 @@ import java.util.stream.StreamSupport;
   }
 
   /**
-   * Query for matches to the need, optionally the needToCheck is used to search in. If needToCheck is passed,
-   * it is used as the result data iff the needToCheck is a match for need. This saves us a linked data lookup for
-   * data we already have.
+   * Query for matches to the need, optionally the needToCheck is used to search
+   * in. If needToCheck is passed, it is used as the result data iff the
+   * needToCheck is a match for need. This saves us a linked data lookup for data
+   * we already have.
    *
    * @param need
    * @param needToCheck
@@ -354,12 +366,12 @@ import java.util.stream.StreamSupport;
     // if we were given a needToCheck, restrict the query result to that uri so that
     // we get exactly one result if that uri is found for the need
     if (needToCheck.isPresent()) {
-      Binding binding = BindingFactory
-          .binding(resultName, new ResourceImpl(needToCheck.get().needModelWrapper.getNeedUri()).asNode());
+      Binding binding = BindingFactory.binding(resultName,
+          new ResourceImpl(needToCheck.get().needModelWrapper.getNeedUri()).asNode());
       compiledQuery.setValuesDataBlock(Collections.singletonList(resultName), Collections.singletonList(binding));
     }
 
-    //make sure we order by score, if present, and we limit the results
+    // make sure we order by score, if present, and we limit the results
     if (compiledQuery.getProjectVars().contains(scoreName)) {
       compiledQuery.addOrderBy(scoreName, Query.ORDER_DESCENDING);
     }
@@ -374,8 +386,7 @@ import java.util.stream.StreamSupport;
     }
     List<ScoredNeedUri> foundUris = new LinkedList<>();
     // process query results iteratively
-    try (QueryExecution execution = QueryExecutionFactory.sparqlService(config.getSparqlEndpoint(), compiledQuery)
-    ) {
+    try (QueryExecution execution = QueryExecutionFactory.sparqlService(config.getSparqlEndpoint(), compiledQuery)) {
 
       ResultSet result = execution.execSelect();
       while (result.hasNext()) {
@@ -392,7 +403,7 @@ import java.util.stream.StreamSupport;
             try {
               score = scoreNode.asLiteral().getDouble();
             } catch (NumberFormatException e) {
-              //if the score is not interpretable as double, ignore it
+              // if the score is not interpretable as double, ignore it
             }
           }
         }
@@ -406,23 +417,25 @@ import java.util.stream.StreamSupport;
       return Stream.empty();
     }
 
-    //load data in parallel
+    // load data in parallel
     return foundUris.parallelStream().map(foundNeedUri -> {
       try {
-        //if we have a needToCheck, return it if the URI we found actually is its URI, otherwise null
+        // if we have a needToCheck, return it if the URI we found actually is its URI,
+        // otherwise null
         if ((needToCheck.isPresent())) {
-          NeedModelWrapper result = needToCheck.get().needModelWrapper.getNeedUri().equals(foundNeedUri.uri) ?
-              needToCheck.get().needModelWrapper :
-              null;
+          NeedModelWrapper result = needToCheck.get().needModelWrapper.getNeedUri().equals(foundNeedUri.uri)
+              ? needToCheck.get().needModelWrapper
+              : null;
           if (result == null) {
             return null;
           }
           return new ScoredNeed(result, foundNeedUri.score);
         } else {
-          // no needToCheck, which happens when we first look for matches in the graph store:
+          // no needToCheck, which happens when we first look for matches in the graph
+          // store:
           // download the linked data and return a new NeedModelWrapper
           Dataset ds = linkedDataSource.getDataForResource(URI.create(foundNeedUri.uri));
-          //make sure we don't accidentally use empty or faulty results
+          // make sure we don't accidentally use empty or faulty results
           if (!NeedModelWrapper.isANeed(ds)) {
             return null;
           }
@@ -444,9 +457,8 @@ import java.util.stream.StreamSupport;
     Resource needURI = model.createResource(need.getNeedUri());
     Property matchingContextProperty = model.createProperty("http://purl.org/webofneeds/model#hasMatchingContext");
 
-    Stream<RDFNode> stream = StreamSupport.stream(Spliterators
-        .spliteratorUnknownSize(model.listObjectsOfProperty(needURI, matchingContextProperty), Spliterator.CONCURRENT),
-        false);
+    Stream<RDFNode> stream = StreamSupport.stream(Spliterators.spliteratorUnknownSize(
+        model.listObjectsOfProperty(needURI, matchingContextProperty), Spliterator.CONCURRENT), false);
 
     return stream.map(node -> node.asLiteral().getString()).collect(Collectors.toSet());
 
@@ -486,12 +498,14 @@ import java.util.stream.StreamSupport;
     return false;
   }
 
-  @Override public SupervisorStrategy supervisorStrategy() {
+  @Override
+  public SupervisorStrategy supervisorStrategy() {
 
     SupervisorStrategy supervisorStrategy = new OneForOneStrategy(0, Duration.Zero(),
         new Function<Throwable, SupervisorStrategy.Directive>() {
 
-          @Override public SupervisorStrategy.Directive apply(Throwable t) throws Exception {
+          @Override
+          public SupervisorStrategy.Directive apply(Throwable t) throws Exception {
 
             log.warning("Actor encountered error: {}", t);
             // default behaviour

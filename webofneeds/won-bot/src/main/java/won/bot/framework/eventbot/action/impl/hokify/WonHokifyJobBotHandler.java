@@ -37,12 +37,17 @@ public class WonHokifyJobBotHandler implements ICommandRegistry {
 
     this.commandRegistry = new CommandRegistry(true, botName);
 
-    //BotCommand offerBotCommand = new OfferBotCommand("offer", "create a offer need", bus);
-    //BotCommand demandBotCommand = new DemandBotCommand("demand", "create a demand need", bus);
-    //BotCommand critiqueBotCommand = new CritiqueBotCommand("critique", "create a critique need", bus);
-    //BotCommand togetherBotCommand = new TogetherBotCommand("together", "create a together need", bus);
+    // BotCommand offerBotCommand = new OfferBotCommand("offer", "create a offer
+    // need", bus);
+    // BotCommand demandBotCommand = new DemandBotCommand("demand", "create a demand
+    // need", bus);
+    // BotCommand critiqueBotCommand = new CritiqueBotCommand("critique", "create a
+    // critique need", bus);
+    // BotCommand togetherBotCommand = new TogetherBotCommand("together", "create a
+    // together need", bus);
     BotCommand helpBotCommand = new HelpBotCommand("help", "list help", bus);
-    //commandRegistry.registerAll(helpBotCommand, offerBotCommand, demandBotCommand, critiqueBotCommand, togetherBotCommand);
+    // commandRegistry.registerAll(helpBotCommand, offerBotCommand,
+    // demandBotCommand, critiqueBotCommand, togetherBotCommand);
     commandRegistry.registerAll(helpBotCommand);
   }
 
@@ -58,31 +63,38 @@ public class WonHokifyJobBotHandler implements ICommandRegistry {
     this.hokifyMessageGenerator = hokifyMessageGenerator;
   }
 
-  @Override public void registerDefaultAction(BiConsumer<AbsSender, Message> biConsumer) {
+  @Override
+  public void registerDefaultAction(BiConsumer<AbsSender, Message> biConsumer) {
     BotCommand helpBotCommand = new HelpBotCommand("help", "list help", bus);
   }
 
-  @Override public boolean register(BotCommand botCommand) {
+  @Override
+  public boolean register(BotCommand botCommand) {
     return commandRegistry.register(botCommand);
   }
 
-  @Override public Map<BotCommand, Boolean> registerAll(BotCommand... botCommands) {
+  @Override
+  public Map<BotCommand, Boolean> registerAll(BotCommand... botCommands) {
     return commandRegistry.registerAll(botCommands);
   }
 
-  @Override public boolean deregister(BotCommand botCommand) {
+  @Override
+  public boolean deregister(BotCommand botCommand) {
     return commandRegistry.deregister(botCommand);
   }
 
-  @Override public Map<BotCommand, Boolean> deregisterAll(BotCommand... botCommands) {
+  @Override
+  public Map<BotCommand, Boolean> deregisterAll(BotCommand... botCommands) {
     return commandRegistry.deregisterAll(botCommands);
   }
 
-  @Override public Collection<BotCommand> getRegisteredCommands() {
+  @Override
+  public Collection<BotCommand> getRegisteredCommands() {
     return commandRegistry.getRegisteredCommands();
   }
 
-  @Override public BotCommand getRegisteredCommand(String s) {
+  @Override
+  public BotCommand getRegisteredCommand(String s) {
     return commandRegistry.getRegisteredCommand(s);
   }
 

@@ -35,15 +35,18 @@ public abstract class BaseCommandSuccessEvent<C extends CommandEvent> implements
     this.originalCommandEvent = originalCommandEvent;
   }
 
-  @Override public String getMessage() {
+  @Override
+  public String getMessage() {
     return message;
   }
 
-  @Override public C getOriginalCommandEvent() {
+  @Override
+  public C getOriginalCommandEvent() {
     return originalCommandEvent;
   }
 
-  @Override public boolean isSuccess() {
+  @Override
+  public boolean isSuccess() {
     return true;
   }
 }

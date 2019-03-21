@@ -37,7 +37,8 @@ public class OriginalMessageUriRemoteResponseEventFilter implements EventFilter 
     return new OriginalMessageUriRemoteResponseEventFilter(wonMessage.getMessageURI());
   }
 
-  @Override public boolean accept(final Event event) {
+  @Override
+  public boolean accept(final Event event) {
     if (event instanceof ResponseEvent) {
       URI messageURI = ((ResponseEvent) event).getRemoteResponseToMessageURI();
       if (this.originalMessageURI.equals(messageURI))

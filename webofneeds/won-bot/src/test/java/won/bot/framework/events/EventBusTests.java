@@ -29,22 +29,24 @@ import won.bot.framework.eventbot.listener.EventListener;
 import java.util.concurrent.CountDownLatch;
 
 /**
- * User: fkleedorfer
- * Date: 30.01.14
+ * User: fkleedorfer Date: 30.01.14
  */
 public class EventBusTests {
   private Logger logger = LoggerFactory.getLogger(getClass());
   private ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
 
-  @Before public void setup() {
+  @Before
+  public void setup() {
     taskScheduler.initialize();
   }
 
-  @After public void tearDown() {
+  @After
+  public void tearDown() {
     taskScheduler.shutdown();
   }
 
-  @Test public void testEventBusSimpleCase() throws InterruptedException {
+  @Test
+  public void testEventBusSimpleCase() throws InterruptedException {
     AsyncEventBusImpl bus = new AsyncEventBusImpl(this.taskScheduler);
     CountDownLatch countDownLatch = new CountDownLatch(9);
     bus.subscribe(TestEventA.class, new ListenerA(countDownLatch));
@@ -60,13 +62,15 @@ public class EventBusTests {
   }
 
   private class TestEventA implements Event {
-    @Override public String toString() {
+    @Override
+    public String toString() {
       return "TestEventA";
     }
   }
 
   private class TestEventB implements Event {
-    @Override public String toString() {
+    @Override
+    public String toString() {
       return "TestEventB";
     }
   }
@@ -78,7 +82,8 @@ public class EventBusTests {
       this.countDownLatch = countDownLatch;
     }
 
-    @Override public void onEvent(final Event event) throws Exception {
+    @Override
+    public void onEvent(final Event event) throws Exception {
       logger.debug("ListenerA: processing event {}", event);
       countDownLatch.countDown();
     }
@@ -91,7 +96,8 @@ public class EventBusTests {
       this.countDownLatch = countDownLatch;
     }
 
-    @Override public void onEvent(final Event event) throws Exception {
+    @Override
+    public void onEvent(final Event event) throws Exception {
       logger.debug("ListenerB: processing event {}", event);
       countDownLatch.countDown();
     }

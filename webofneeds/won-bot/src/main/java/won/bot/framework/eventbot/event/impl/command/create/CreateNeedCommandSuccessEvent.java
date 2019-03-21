@@ -46,7 +46,8 @@ public class CreateNeedCommandSuccessEvent extends BaseNeedSpecificEvent
     this.createNeedCommandEvent = createNeedCommandEvent;
   }
 
-  @Override public MessageCommandEvent getOriginalCommandEvent() {
+  @Override
+  public MessageCommandEvent getOriginalCommandEvent() {
     return createNeedCommandEvent;
   }
 
@@ -54,11 +55,13 @@ public class CreateNeedCommandSuccessEvent extends BaseNeedSpecificEvent
     return needUriBeforeCreation;
   }
 
-  @Override public String getMessage() {
+  @Override
+  public String getMessage() {
     return message;
   }
 
-  @Override public boolean isSuccess() {
+  @Override
+  public boolean isSuccess() {
     return true;
   }
 }

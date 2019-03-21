@@ -17,8 +17,7 @@
 package won.owner.pojo;
 
 /**
- * User: fkleedorfer
- * Date: 30.07.2014
+ * User: fkleedorfer Date: 30.07.2014
  */
 public class MatchPojo {
   private double score;

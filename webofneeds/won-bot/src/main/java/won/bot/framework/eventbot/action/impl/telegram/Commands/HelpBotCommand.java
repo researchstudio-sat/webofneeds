@@ -22,7 +22,8 @@ public class HelpBotCommand extends BotCommand {
     this.bus = bus;
   }
 
-  @Override public void execute(AbsSender absSender, User user, Chat chat, String[] strings) {
+  @Override
+  public void execute(AbsSender absSender, User user, Chat chat, String[] strings) {
     bus.publish(new SendHelpEvent(absSender, user, chat, strings));
   }
 }

@@ -23,8 +23,8 @@ import won.bot.framework.eventbot.filter.EventFilter;
 import won.bot.framework.eventbot.listener.BaseEventListener;
 
 /**
- * Executes a task when an event is seen.
- * If the property timesToRun > 0, will unregister after that number of events.
+ * Executes a task when an event is seen. If the property timesToRun > 0, will
+ * unregister after that number of events.
  */
 public class ActionOnEventListener extends BaseEventListener {
   private EventBotAction task;
@@ -57,7 +57,8 @@ public class ActionOnEventListener extends BaseEventListener {
   /**
    * @param context
    * @param task
-   * @param timesToRun if > 0, listener will unsubscribe from any events after the specified number of executions.
+   * @param timesToRun if > 0, listener will unsubscribe from any events after the
+   *                   specified number of executions.
    */
   public ActionOnEventListener(final EventListenerContext context, EventBotAction task, int timesToRun) {
     super(context);
@@ -86,7 +87,8 @@ public class ActionOnEventListener extends BaseEventListener {
     this.timesToRun = timesToRun;
   }
 
-  @Override public void doOnEvent(final Event event) throws Exception {
+  @Override
+  public void doOnEvent(final Event event) throws Exception {
     synchronized (monitor) {
       timesRun++;
       if (timesToRun <= 0) {
@@ -103,11 +105,13 @@ public class ActionOnEventListener extends BaseEventListener {
     }
   }
 
-  @Override public boolean equals(Object o) {
+  @Override
+  public boolean equals(Object o) {
     return this == o;
   }
 
-  @Override public int hashCode() {
+  @Override
+  public int hashCode() {
     int result = task.hashCode();
     result = 31 * result + timesToRun;
     return result;

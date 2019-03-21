@@ -24,54 +24,63 @@ public class GraphBlendingTest {
 
   private static final String baseFolder = "/won/utils/goals/blending/";
 
-  @BeforeClass public static void setLogLevel() {
+  @BeforeClass
+  public static void setLogLevel() {
     Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
     root.setLevel(Level.INFO);
   }
 
-  @Test public void blendSameTriples() throws IOException {
+  @Test
+  public void blendSameTriples() throws IOException {
     Dataset ds = loadDataset(baseFolder + "same.trig");
     test(ds);
   }
 
-  @Test public void blendLiterals() throws IOException {
+  @Test
+  public void blendLiterals() throws IOException {
     Dataset ds = loadDataset(baseFolder + "literals.trig");
     test(ds);
   }
 
-  @Test public void blendDouble() throws IOException {
+  @Test
+  public void blendDouble() throws IOException {
     Dataset ds = loadDataset(baseFolder + "double.trig");
     test(ds);
   }
 
-  @Test public void blendURIs() throws IOException {
+  @Test
+  public void blendURIs() throws IOException {
     Dataset ds = loadDataset(baseFolder + "/uris.trig");
     test(ds);
   }
 
   // Recursive blending is not implemented yet
-  //    @Test
-  //    public void blendRecursive() throws IOException {
-  //        Dataset ds = loadDataset(baseFolder + "recursive.trig");
-  //        test(ds);
-  //    }
+  // @Test
+  // public void blendRecursive() throws IOException {
+  // Dataset ds = loadDataset(baseFolder + "recursive.trig");
+  // test(ds);
+  // }
 
-  @Test public void blendDifferentLiterals() throws IOException {
+  @Test
+  public void blendDifferentLiterals() throws IOException {
     Dataset ds = loadDataset(baseFolder + "differentLiterals.trig");
     test(ds);
   }
 
-  @Test public void blendDifferentURIs() throws IOException {
+  @Test
+  public void blendDifferentURIs() throws IOException {
     Dataset ds = loadDataset(baseFolder + "differentUris.trig");
     test(ds);
   }
 
-  @Test public void blendDifferentProperties() throws IOException {
+  @Test
+  public void blendDifferentProperties() throws IOException {
     Dataset ds = loadDataset(baseFolder + "differentProperties.trig");
     test(ds);
   }
 
-  @Test public void blendEmpty() throws IOException {
+  @Test
+  public void blendEmpty() throws IOException {
 
     GraphBlendingIterator blendingIterator = new GraphBlendingIterator(ModelFactory.createDefaultModel(),
         ModelFactory.createDefaultModel(), "http://example.org/test", "http://example.org/test/blended");
@@ -81,22 +90,26 @@ public class GraphBlendingTest {
     Assert.assertFalse(blendingIterator.hasNext());
   }
 
-  @Test public void blendPreserve() throws IOException {
+  @Test
+  public void blendPreserve() throws IOException {
     Dataset ds = loadDataset(baseFolder + "preserve.trig");
     test(ds);
   }
 
-  @Test public void blendVariables() throws IOException {
+  @Test
+  public void blendVariables() throws IOException {
     Dataset ds = loadDataset(baseFolder + "variables.trig");
     test(ds);
   }
 
-  @Test public void blendMultiple1() throws IOException {
+  @Test
+  public void blendMultiple1() throws IOException {
     Dataset ds = loadDataset(baseFolder + "multiple1.trig");
     test(ds);
   }
 
-  @Test public void blendMultiple2() throws IOException {
+  @Test
+  public void blendMultiple2() throws IOException {
     Dataset ds = loadDataset(baseFolder + "multiple2.trig");
     test(ds);
   }
@@ -158,7 +171,8 @@ public class GraphBlendingTest {
   }
 
   /**
-   * Model wrapper class for easier comparison of expected and actual blending models.
+   * Model wrapper class for easier comparison of expected and actual blending
+   * models.
    */
   class BlendingTestModelWrapper {
 

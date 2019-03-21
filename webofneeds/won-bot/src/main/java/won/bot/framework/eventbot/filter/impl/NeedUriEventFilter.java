@@ -23,7 +23,8 @@ import won.bot.framework.eventbot.filter.EventFilter;
 import java.net.URI;
 
 /**
- * Abstract base class for filters that will only accept events (need specific or connection specific) with the specified need URI.
+ * Abstract base class for filters that will only accept events (need specific
+ * or connection specific) with the specified need URI.
  */
 public class NeedUriEventFilter implements EventFilter {
   private URI needURI;
@@ -45,7 +46,8 @@ public class NeedUriEventFilter implements EventFilter {
     return new NeedUriEventFilter(needUri);
   }
 
-  @Override public boolean accept(final Event event) {
+  @Override
+  public boolean accept(final Event event) {
     URI needUriOfEvent = getNeedUriFromEvent(event);
     if (needUriOfEvent == null)
       return false;

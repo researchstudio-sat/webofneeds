@@ -23,9 +23,8 @@ import org.apache.camel.builder.RouteBuilder;
 import java.util.List;
 
 /**
- * User: sbyim
- * Date: 25.11.13
- * This class is used to dynamically generate routes for outgoing messages from owner application.
+ * User: sbyim Date: 25.11.13 This class is used to dynamically generate routes
+ * for outgoing messages from owner application.
  */
 //TODO: check if this class is really needed.
 public class OwnerProtocolDynamicRoutes extends RouteBuilder {
@@ -36,11 +35,12 @@ public class OwnerProtocolDynamicRoutes extends RouteBuilder {
 
   /**
    * @param camelContext the camelContext where the routes are added
-   * @param from         each route has the starting consuming endpoint per node it wants to send the messages to.
+   * @param from         each route has the starting consuming endpoint per node
+   *                     it wants to send the messages to.
    */
   public OwnerProtocolDynamicRoutes(CamelContext camelContext, String from) {
     super(camelContext);
-    //TODO: consider if we need these variables.
+    // TODO: consider if we need these variables.
     this.from = from;
 
   }
@@ -50,7 +50,8 @@ public class OwnerProtocolDynamicRoutes extends RouteBuilder {
    *
    * @throws Exception
    */
-  @Override public void configure() throws Exception {
+  @Override
+  public void configure() throws Exception {
     from(from).routeId(from).to("log:Dynamic Route FROM Owner").choice().when(header("remoteBrokerEndpoint").isNull())
         .log(LoggingLevel.ERROR, "could not route message: remoteBrokerEndpoint is null")
         .throwException(new IllegalArgumentException("could not route message: remoteBrokerEndpoint is null"))

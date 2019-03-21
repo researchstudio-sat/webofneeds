@@ -24,12 +24,14 @@ public class FactoryBotInitBehaviour extends BotBehaviour {
     super(context, name);
   }
 
-  @Override protected void onActivate(Optional<Object> message) {
+  @Override
+  protected void onActivate(Optional<Object> message) {
     subscribeWithAutoCleanup(InitializeEvent.class, new ActionOnEventListener(context, new InitFactoryAction(context)));
 
     subscribeWithAutoCleanup(InitFactoryFinishedEvent.class,
         new ActionOnFirstEventListener(context, new BaseEventBotAction(context) {
-          @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
+          @Override
+          protected void doRun(Event event, EventListener executingListener) throws Exception {
             FactoryBotInitBehaviour.this.deactivate();
           }
         }));

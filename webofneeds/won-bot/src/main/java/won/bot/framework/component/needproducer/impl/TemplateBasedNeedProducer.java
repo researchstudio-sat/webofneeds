@@ -30,8 +30,8 @@ import won.protocol.util.RdfUtils;
 import java.io.IOException;
 
 /**
- * NeedProducer that reads a need model at startup time and overlays it
- * with the data retrieved from the need factory it wraps.
+ * NeedProducer that reads a need model at startup time and overlays it with the
+ * data retrieved from the need factory it wraps.
  */
 public class TemplateBasedNeedProducer extends AbstractNeedProducerWrapper {
   private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -39,14 +39,15 @@ public class TemplateBasedNeedProducer extends AbstractNeedProducerWrapper {
   private Resource template;
   private boolean initialized = false;
 
-  @Override public synchronized Dataset create() {
+  @Override
+  public synchronized Dataset create() {
     initializeLazily();
     return wrapModel(getWrappedProducer().create());
   }
 
   private Dataset wrapModel(final Dataset wrappedDataset) {
     if (this.templateModel != null) {
-      //TODO: TEMPLATE BASED PRODUCER IS WEIRD NOW
+      // TODO: TEMPLATE BASED PRODUCER IS WEIRD NOW
       NeedModelWrapper needModelWrapper = new NeedModelWrapper(wrappedDataset);
       Model needModel = needModelWrapper.copyNeedModel(NeedGraphType.NEED);
       Model wrappedModel = RdfUtils.mergeModelsCombiningBaseResource(needModel, this.templateModel);

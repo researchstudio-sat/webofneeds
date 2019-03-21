@@ -23,7 +23,8 @@ public class Precondition implements Serializable {
     return met;
   }
 
-  @Override public boolean equals(Object o) {
+  @Override
+  public boolean equals(Object o) {
     if (this == o)
       return true;
     if (o == null || getClass() != o.getClass())
@@ -34,14 +35,13 @@ public class Precondition implements Serializable {
     return uri.equals(precondition.uri);
   }
 
-  @Override public int hashCode() {
+  @Override
+  public int hashCode() {
     return uri.hashCode();
   }
 
-  @Override public String toString() {
-    return "Precondition{" +
-        "uri='" + uri + '\'' +
-        ", met=" + met +
-        '}';
+  @Override
+  public String toString() {
+    return "Precondition{" + "uri='" + uri + '\'' + ", met=" + met + '}';
   }
 }

@@ -42,7 +42,8 @@ public class MatchingLoadTestMonitorAction extends BaseEventBotAction {
     super(eventListenerContext);
   }
 
-  @Override protected void doRun(final Event event, EventListener executingListener) throws Exception {
+  @Override
+  protected void doRun(final Event event, EventListener executingListener) throws Exception {
 
     Stopwatch stopwatch = SimonManager.getStopwatch("needHintFullRoundtrip");
     if (event instanceof NeedCreatedEvent) {

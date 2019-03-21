@@ -41,10 +41,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Uses a timer to check needs for inactivity and send them warnings or deactivate
- * them if they have been inactive for too long.
+ * Uses a timer to check needs for inactivity and send them warnings or
+ * deactivate them if they have been inactive for too long.
  */
-@Component public class NeedInactivityChecker implements InitializingBean, DisposableBean {
+@Component
+public class NeedInactivityChecker implements InitializingBean, DisposableBean {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
   private Trigger trigger;
@@ -61,11 +62,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 
   private InactivityCheckTask inactivityCheckTask = null;
 
-  @Autowired private NeedRepository needRepository;
+  @Autowired
+  private NeedRepository needRepository;
 
-  @Autowired private NeedManagementService needManagementService;
+  @Autowired
+  private NeedManagementService needManagementService;
 
-  @Override public void afterPropertiesSet() throws Exception {
+  @Override
+  public void afterPropertiesSet() throws Exception {
     if (this.taskScheduler == null)
       throw new IllegalStateException("taskScheduler must be set");
     if (this.inactivityCheckInterval <= 0) {
@@ -83,7 +87,8 @@ import java.util.concurrent.atomic.AtomicInteger;
     }
   }
 
-  @Override public void destroy() throws Exception {
+  @Override
+  public void destroy() throws Exception {
     if (this.inactivityCheckTask != null) {
       this.inactivityCheckTask.cancel();
     }
@@ -112,7 +117,8 @@ import java.util.concurrent.atomic.AtomicInteger;
   private class InactivityCheckTask implements Runnable {
     private AtomicBoolean cancelled = new AtomicBoolean(false);
 
-    @Override public void run() {
+    @Override
+    public void run() {
       try {
         logger.debug("starting inactivity check");
         Date now = new Date();
@@ -133,7 +139,7 @@ import java.util.concurrent.atomic.AtomicInteger;
         calendar.add(Calendar.SECOND, -deactivateTimeoutDespiteEstablishedConnections);
         Date deactivateThresholdDespiteEstablishedConnections = calendar.getTime();
 
-        //select needs that match our criteria:
+        // select needs that match our criteria:
         Pageable firstPage = new PageRequest(0, 100);
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
@@ -141,27 +147,26 @@ import java.util.concurrent.atomic.AtomicInteger;
             new Object[] { simpleDateFormat.format(startWarningThreshold),
                 simpleDateFormat.format(stopWarningThreshold), simpleDateFormat.format(deactivateThreshold) });
 
-        String warningMessage = "This posting does not have active connections, nor has it seen any activity " +
-            "from your side in the last " + getTimeString(warnTimeout) + ". It will be deactivated if there continues "
-            +
-            "to be no activity for more than " + getTimeString(deactivateTimeout - warnTimeout)
-            + ". Automatic deactivation is " +
-            "done to clean up abandoned postings. You can reactivate your posting at any time.";
+        String warningMessage = "This posting does not have active connections, nor has it seen any activity "
+            + "from your side in the last " + getTimeString(warnTimeout)
+            + ". It will be deactivated if there continues " + "to be no activity for more than "
+            + getTimeString(deactivateTimeout - warnTimeout) + ". Automatic deactivation is "
+            + "done to clean up abandoned postings. You can reactivate your posting at any time.";
 
-        String deactivateMessage = "This posting is deactivated because it has no active connections, nor has " +
-            "there been any activity from your side in the last " + getTimeString(deactivateTimeout)
-            + ". Automatic deactivation is done to " +
-            "clean up abandoned postings. You can reactivate your posting at any time.";
+        String deactivateMessage = "This posting is deactivated because it has no active connections, nor has "
+            + "there been any activity from your side in the last " + getTimeString(deactivateTimeout)
+            + ". Automatic deactivation is done to "
+            + "clean up abandoned postings. You can reactivate your posting at any time.";
 
-        String deactivateDespiteEstablishedConnectionsMessage = "This posting is deactivated because there " +
-            "has not been any activity from your side in the last " + getTimeString(
-            deactivateTimeoutDespiteEstablishedConnections) + ". Automatic deactivation is done to " +
-            "clean up abandoned postings. You can reactivate your posting at any time.";
+        String deactivateDespiteEstablishedConnectionsMessage = "This posting is deactivated because there "
+            + "has not been any activity from your side in the last "
+            + getTimeString(deactivateTimeoutDespiteEstablishedConnections) + ". Automatic deactivation is done to "
+            + "clean up abandoned postings. You can reactivate your posting at any time.";
 
         final AtomicInteger warned = new AtomicInteger(0);
         final AtomicInteger deactivated = new AtomicInteger(0);
-        Slice<Need> needsToWarn = needRepository
-            .findNeedsInactiveBetweenAndNotConnected(startWarningThreshold, stopWarningThreshold, firstPage);
+        Slice<Need> needsToWarn = needRepository.findNeedsInactiveBetweenAndNotConnected(startWarningThreshold,
+            stopWarningThreshold, firstPage);
         do {
           if (cancelled.get()) {
             return;
@@ -183,15 +188,15 @@ import java.util.concurrent.atomic.AtomicInteger;
           }
           if (needsToWarn.hasNext()) {
             Pageable pageable = needsToWarn.nextPageable();
-            needsToWarn = needRepository
-                .findNeedsInactiveBetweenAndNotConnected(startWarningThreshold, stopWarningThreshold, pageable);
+            needsToWarn = needRepository.findNeedsInactiveBetweenAndNotConnected(startWarningThreshold,
+                stopWarningThreshold, pageable);
           } else {
             needsToWarn = null;
           }
         } while (needsToWarn != null && needsToWarn.hasContent());
 
-        Slice<Need> needsToDeactivate = needRepository
-            .findNeedsInactiveSinceAndNotConnected(deactivateThreshold, firstPage);
+        Slice<Need> needsToDeactivate = needRepository.findNeedsInactiveSinceAndNotConnected(deactivateThreshold,
+            firstPage);
         do {
           if (cancelled.get()) {
             return;
@@ -219,8 +224,8 @@ import java.util.concurrent.atomic.AtomicInteger;
           }
         } while (needsToDeactivate != null && needsToDeactivate.hasContent());
 
-        needsToDeactivate = needRepository
-            .findNeedsInactiveSince(deactivateThresholdDespiteEstablishedConnections, firstPage);
+        needsToDeactivate = needRepository.findNeedsInactiveSince(deactivateThresholdDespiteEstablishedConnections,
+            firstPage);
         do {
           if (cancelled.get()) {
             return;
@@ -242,8 +247,8 @@ import java.util.concurrent.atomic.AtomicInteger;
           }
           if (needsToDeactivate.hasNext()) {
             Pageable pageable = needsToDeactivate.nextPageable();
-            needsToDeactivate = needRepository
-                .findNeedsInactiveSince(deactivateThresholdDespiteEstablishedConnections, pageable);
+            needsToDeactivate = needRepository.findNeedsInactiveSince(deactivateThresholdDespiteEstablishedConnections,
+                pageable);
           } else {
             needsToDeactivate = null;
           }
@@ -282,4 +287,3 @@ import java.util.concurrent.atomic.AtomicInteger;
   }
 
 }
-

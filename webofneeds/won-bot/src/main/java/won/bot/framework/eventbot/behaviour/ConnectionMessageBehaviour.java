@@ -24,7 +24,8 @@ import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
 import java.util.Optional;
 
 /**
- * Behaviour that responds to a ConnectionMessageCommand by executing the ExecuteConnectionMessageCommandAction
+ * Behaviour that responds to a ConnectionMessageCommand by executing the
+ * ExecuteConnectionMessageCommandAction
  */
 public class ConnectionMessageBehaviour extends BotBehaviour {
   public ConnectionMessageBehaviour(EventListenerContext context) {
@@ -35,7 +36,8 @@ public class ConnectionMessageBehaviour extends BotBehaviour {
     super(context, name);
   }
 
-  @Override protected void onActivate(Optional<Object> message) {
+  @Override
+  protected void onActivate(Optional<Object> message) {
     this.subscribeWithAutoCleanup(ConnectionMessageCommandEvent.class,
         new ActionOnEventListener(context, new ExecuteConnectionMessageCommandAction(context)));
   }

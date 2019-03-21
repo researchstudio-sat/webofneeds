@@ -38,7 +38,8 @@ public abstract class BaseEventListener implements EventListener {
   protected String name = getClass().getSimpleName();
 
   /**
-   * Constructor is private so that subclasses must implement the one-arg constructor.
+   * Constructor is private so that subclasses must implement the one-arg
+   * constructor.
    */
   private BaseEventListener() {
   }
@@ -62,9 +63,10 @@ public abstract class BaseEventListener implements EventListener {
     this.name = name;
   }
 
-  @Override public final void onEvent(final Event event) throws Exception {
+  @Override
+  public final void onEvent(final Event event) throws Exception {
     if (!shouldHandleEvent(event)) {
-      //allow for ignoring events. Such event are not counted.
+      // allow for ignoring events. Such event are not counted.
       return;
     }
     if (logger.isDebugEnabled()) {
@@ -89,8 +91,8 @@ public abstract class BaseEventListener implements EventListener {
   }
 
   /**
-   * Publishes an event indicating that the listener is finished. Useful for chaining listeners.
-   * Only use when this is really the case.
+   * Publishes an event indicating that the listener is finished. Useful for
+   * chaining listeners. Only use when this is really the case.
    */
   protected void publishFinishedEvent() {
     getEventListenerContext().getEventBus().publish(new FinishedEvent(this));
@@ -135,9 +137,9 @@ public abstract class BaseEventListener implements EventListener {
   }
 
   /**
-   * Determines whether the given event should be processed or ignored. If it is ignored,
-   * it is not counted and does not influence the listener's behavior. The default implementation
-   * accepts all events.
+   * Determines whether the given event should be processed or ignored. If it is
+   * ignored, it is not counted and does not influence the listener's behavior.
+   * The default implementation accepts all events.
    *
    * @param event
    * @return
@@ -146,10 +148,8 @@ public abstract class BaseEventListener implements EventListener {
     return eventFilter == null ? true : eventFilter.accept(event);
   }
 
-  @Override public String toString() {
-    return getClass().getSimpleName() + "{" +
-        "name='" + name + '\'' +
-        ", eventCount=" + eventCount +
-        '}';
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{" + "name='" + name + '\'' + ", eventCount=" + eventCount + '}';
   }
 }

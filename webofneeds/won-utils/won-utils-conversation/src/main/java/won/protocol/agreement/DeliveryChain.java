@@ -5,7 +5,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Group of messages that represent the delivery of one message, including the responses.
+ * Group of messages that represent the delivery of one message, including the
+ * responses.
  *
  * @author fkleedorfer
  */
@@ -37,7 +38,7 @@ public class DeliveryChain {
     if (this.head == null)
       return false;
     switch (this.head.getMessageType()) {
-    //cases in which there is no remote message:
+    // cases in which there is no remote message:
     case CREATE_NEED:
     case DEACTIVATE:
     case ACTIVATE:
@@ -46,11 +47,10 @@ public class DeliveryChain {
     case NEED_CREATED_NOTIFICATION:
       return head.hasResponse();
     default:
-      //all other message types have remote messages and responses
-      return head.hasResponse() &&
-          head.hasCorrespondingRemoteMessage() &&
-          head.getCorrespondingRemoteMessageRef().hasResponse() &&
-          head.getCorrespondingRemoteMessageRef().getIsResponseToInverseRef().hasCorrespondingRemoteMessage();
+      // all other message types have remote messages and responses
+      return head.hasResponse() && head.hasCorrespondingRemoteMessage()
+          && head.getCorrespondingRemoteMessageRef().hasResponse()
+          && head.getCorrespondingRemoteMessageRef().getIsResponseToInverseRef().hasCorrespondingRemoteMessage();
     }
   }
 
@@ -58,7 +58,7 @@ public class DeliveryChain {
     if (this.head == null)
       return null;
     switch (this.head.getMessageType()) {
-    //cases in which there is no remote message:
+    // cases in which there is no remote message:
     case CREATE_NEED:
     case DEACTIVATE:
     case ACTIVATE:
@@ -67,10 +67,9 @@ public class DeliveryChain {
     case NEED_CREATED_NOTIFICATION:
       return head.getIsResponseToInverseRef();
     default:
-      //all other message types have remote messages and responses
-      if (head.hasResponse() &&
-          head.hasCorrespondingRemoteMessage() &&
-          head.getCorrespondingRemoteMessageRef().hasResponse()) {
+      // all other message types have remote messages and responses
+      if (head.hasResponse() && head.hasCorrespondingRemoteMessage()
+          && head.getCorrespondingRemoteMessageRef().hasResponse()) {
         return head.getCorrespondingRemoteMessageRef().getIsResponseToInverseRef().getCorrespondingRemoteMessageRef();
       } else {
         return null;
@@ -88,11 +87,11 @@ public class DeliveryChain {
 
   public boolean isAfter(DeliveryChain other) {
     return other.getMessages().stream().anyMatch(msg ->
-            //is the head before msg?
-            this.getHead().isMessageOnPathToRoot(msg)
-                //is the remote message of head before msg?
-                || (this.getHead().hasCorrespondingRemoteMessage() && this.getHead().getCorrespondingRemoteMessageRef()
-                .isMessageOnPathToRoot(msg)));
+    // is the head before msg?
+    this.getHead().isMessageOnPathToRoot(msg)
+        // is the remote message of head before msg?
+        || (this.getHead().hasCorrespondingRemoteMessage()
+            && this.getHead().getCorrespondingRemoteMessageRef().isMessageOnPathToRoot(msg)));
   }
 
   /**
@@ -109,22 +108,21 @@ public class DeliveryChain {
       return false;
     }
     return other.getMessages().stream().allMatch(msg -> {
-          //is the head before and the end after msg?
-          boolean isHeadBeforeAllOtherMsgs =
-              msg.isMessageOnPathToRoot(this.getHead()) || (getHead().hasCorrespondingRemoteMessage() && msg
-                  .isMessageOnPathToRoot(getHead().getCorrespondingRemoteMessageRef()));
+      // is the head before and the end after msg?
+      boolean isHeadBeforeAllOtherMsgs = msg.isMessageOnPathToRoot(this.getHead())
+          || (getHead().hasCorrespondingRemoteMessage()
+              && msg.isMessageOnPathToRoot(getHead().getCorrespondingRemoteMessageRef()));
 
-          boolean isEndAfterAllOtherMsgs =
-              getEnd().isMessageOnPathToRoot(msg) || (getEnd().hasCorrespondingRemoteMessage() && getEnd()
-                  .getCorrespondingRemoteMessageRef().isMessageOnPathToRoot(msg));
+      boolean isEndAfterAllOtherMsgs = getEnd().isMessageOnPathToRoot(msg) || (getEnd().hasCorrespondingRemoteMessage()
+          && getEnd().getCorrespondingRemoteMessageRef().isMessageOnPathToRoot(msg));
 
-          return isHeadBeforeAllOtherMsgs && isEndAfterAllOtherMsgs;
-        });
+      return isHeadBeforeAllOtherMsgs && isEndAfterAllOtherMsgs;
+    });
   }
 
   /**
-   * Another delivery chain is interleaved with this one both head
-   * messages are before either chain.
+   * Another delivery chain is interleaved with this one both head messages are
+   * before either chain.
    *
    * @param other
    * @return
@@ -150,11 +148,11 @@ public class DeliveryChain {
     if (this == other)
       return;
     if (this.interleavedDeliveryChains.contains(other)) {
-      //checked that earlier
+      // checked that earlier
       return;
     }
     if (this.containedDeliveryChains.contains(other)) {
-      //checked that earlier
+      // checked that earlier
       return;
     }
     if (_contains(other)) {
@@ -173,13 +171,14 @@ public class DeliveryChain {
     return this.interleavedDeliveryChains;
   }
 
-  @Override public String toString() {
-    return "DeliveryChain [" + "head=" + head.getMessageURI() + ", isTerminated():" + isTerminated() + ", end:" + ((
-        getEnd() != null) ? getEnd().getMessageURI() : "null") + ", interleaved with: " + (
-        this.interleavedDeliveryChains.size() == 0 ?
-            "none" :
-            this.interleavedDeliveryChains.stream().map(x -> x.getHead())) + ", contains : " + (
-        this.containedDeliveryChains.size() == 0 ? "none" : this.containedDeliveryChains.stream().map(x -> x.getHead()))
+  @Override
+  public String toString() {
+    return "DeliveryChain [" + "head=" + head.getMessageURI() + ", isTerminated():" + isTerminated() + ", end:"
+        + ((getEnd() != null) ? getEnd().getMessageURI() : "null") + ", interleaved with: "
+        + (this.interleavedDeliveryChains.size() == 0 ? "none"
+            : this.interleavedDeliveryChains.stream().map(x -> x.getHead()))
+        + ", contains : " + (this.containedDeliveryChains.size() == 0 ? "none"
+            : this.containedDeliveryChains.stream().map(x -> x.getHead()))
         + "]";
   }
 

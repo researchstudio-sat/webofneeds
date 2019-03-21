@@ -36,7 +36,8 @@ import java.util.Date;
 /**
  * Listener that responds to open and message events with automatic messages.
  * Can be configured to apply a timeout (non-blocking) before sending messages.
- * Can be configured to send a fixed number of messages and then unsubscribe from events.
+ * Can be configured to send a fixed number of messages and then unsubscribe
+ * from events.
  */
 public class AutomaticMonitoredMessageResponderListener extends AbstractHandleFirstNEventsListener {
   private long millisTimeoutBeforeReply = 1000;
@@ -65,7 +66,8 @@ public class AutomaticMonitoredMessageResponderListener extends AbstractHandleFi
     this.millisTimeoutBeforeReply = millisTimeoutBeforeReply;
   }
 
-  @Override protected void handleFirstNTimes(final Event event) throws Exception {
+  @Override
+  protected void handleFirstNTimes(final Event event) throws Exception {
     if (event instanceof ConnectionSpecificEvent) {
       handleMessageEvent((ConnectionSpecificEvent) event);
     }
@@ -73,7 +75,8 @@ public class AutomaticMonitoredMessageResponderListener extends AbstractHandleFi
 
   private void handleMessageEvent(final ConnectionSpecificEvent messageEvent) {
     getEventListenerContext().getTaskScheduler().schedule(new Runnable() {
-      @Override public void run() {
+      @Override
+      public void run() {
 
         EventListenerContext ctx = getEventListenerContext();
         String message = createMessage();
@@ -102,7 +105,8 @@ public class AutomaticMonitoredMessageResponderListener extends AbstractHandleFi
     return message;
   }
 
-  @Override protected void unsubscribe() {
+  @Override
+  protected void unsubscribe() {
     logger.debug("unsubscribing from all events");
     getEventListenerContext().getEventBus().unsubscribe(this);
   }

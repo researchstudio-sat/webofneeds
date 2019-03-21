@@ -39,7 +39,7 @@ public class CreateNeedFromMailAction extends AbstractCreateNeedAction {
     this.mailContentExtractor = mailContentExtractor;
 
     if (facets == null || facets.length == 0) {
-      //add the default facet if none is present.
+      // add the default facet if none is present.
       this.facets = new ArrayList<URI>(1);
       this.facets.add(FacetType.ChatFacet.getURI());
     } else {
@@ -112,7 +112,8 @@ public class CreateNeedFromMailAction extends AbstractCreateNeedAction {
         botContextWrapper.addUriMimeMessageRelation(needURI, message);
 
         EventListener successCallback = new EventListener() {
-          @Override public void onEvent(Event event) throws Exception {
+          @Override
+          public void onEvent(Event event) throws Exception {
             logger.debug("need creation successful, new need URI is {}", needURI);
             String sender = MailContentExtractor.getFromAddressString(botContextWrapper.getMimeMessageForURI(needURI));
             botContextWrapper.addMailAddressWonURIRelation(sender, new WonURI(needURI, UriType.NEED));
@@ -121,7 +122,8 @@ public class CreateNeedFromMailAction extends AbstractCreateNeedAction {
         };
 
         EventListener failureCallback = new EventListener() {
-          @Override public void onEvent(Event event) throws Exception {
+          @Override
+          public void onEvent(Event event) throws Exception {
             String textMessage = WonRdfUtils.MessageUtils
                 .getTextMessage(((FailureResponseEvent) event).getFailureMessage());
             logger.debug("need creation failed for need URI {}, original message URI {}: {}",

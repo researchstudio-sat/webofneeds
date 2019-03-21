@@ -19,7 +19,8 @@ public class FactoryBotHintBehaviour extends BotBehaviour {
     super(context, name);
   }
 
-  @Override protected void onActivate(Optional<Object> message) {
+  @Override
+  protected void onActivate(Optional<Object> message) {
     subscribeWithAutoCleanup(HintFromMatcherEvent.class,
         new ActionOnEventListener(context, new FactoryHintCheckAction(context)));
   }

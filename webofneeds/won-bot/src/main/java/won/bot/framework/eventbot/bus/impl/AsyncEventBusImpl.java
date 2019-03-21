@@ -41,22 +41,25 @@ public class AsyncEventBusImpl implements EventBus {
     this.executor = executor;
   }
 
-  @Override public <T extends Event> void publish(final T event) {
+  @Override
+  public <T extends Event> void publish(final T event) {
     logger.debug("publishing event {}", event);
-    //get the list of listeners registered for the event
+    // get the list of listeners registered for the event
     List<EventListener> listeners = getEventListenersForEvent(event);
     if (listeners == null || listeners.size() == 0) {
       logger.debug("no listeners registered for event {}, ignoring", event);
       return;
     }
-    //execute asynchronously: call the event listeners one after another
+    // execute asynchronously: call the event listeners one after another
     callEventListeners(listeners, event);
   }
 
-  @Override public <T extends Event> void subscribe(Class<T> clazz, final EventListener listener) {
+  @Override
+  public <T extends Event> void subscribe(Class<T> clazz, final EventListener listener) {
     logger.debug("subscribing listener {} for type {}", listener, clazz);
     synchronized (monitor) {
-      //we want to synchronize so we don't accidentally add or remove listeners at the same time
+      // we want to synchronize so we don't accidentally add or remove listeners at
+      // the same time
       List<EventListener> newListenerList = copyOrCreateList(this.listenerMap.get(clazz));
       newListenerList.add(listener);
       this.listenerMap.put(clazz, Collections.unmodifiableList(newListenerList));
@@ -64,10 +67,12 @@ public class AsyncEventBusImpl implements EventBus {
     }
   }
 
-  @Override public <T extends Event> void unsubscribe(Class<T> clazz, final EventListener listener) {
+  @Override
+  public <T extends Event> void unsubscribe(Class<T> clazz, final EventListener listener) {
     logger.debug("unsubscribing listener {} for type {}", listener, clazz);
     synchronized (monitor) {
-      //we want to synchronize so we don't accidentally add or remove listeners at the same time
+      // we want to synchronize so we don't accidentally add or remove listeners at
+      // the same time
       List<EventListener> newListenerList = copyOrCreateList(this.listenerMap.get(clazz));
       newListenerList.remove(listener);
       this.listenerMap.put(clazz, Collections.unmodifiableList(newListenerList));
@@ -75,11 +80,12 @@ public class AsyncEventBusImpl implements EventBus {
     }
   }
 
-  @Override public void unsubscribe(final EventListener listener) {
+  @Override
+  public void unsubscribe(final EventListener listener) {
     logger.debug("unsubscribing listener {} from all events", listener);
     synchronized (monitor) {
       for (Map.Entry<Class<? extends Event>, List<EventListener>> entry : listenerMap.entrySet()) {
-        boolean unsubscribed = false; //remember if we had to unsubscribe the listener for the current event type
+        boolean unsubscribed = false; // remember if we had to unsubscribe the listener for the current event type
         List<EventListener> listeners = entry.getValue();
         if (listeners == null)
           continue;
@@ -94,7 +100,8 @@ public class AsyncEventBusImpl implements EventBus {
         }
         entry.setValue(listeners);
         if (unsubscribed) {
-          //if we had to unssubscribe the listener, we may have to call its onUnsubscribe method
+          // if we had to unssubscribe the listener, we may have to call its onUnsubscribe
+          // method
           callOnUnsubscribeIfApplicable(listener, entry.getKey());
         }
       }
@@ -105,7 +112,8 @@ public class AsyncEventBusImpl implements EventBus {
     if (listeners == null || listeners.isEmpty())
       return;
     this.executor.execute(new Runnable() {
-      @Override public void run() {
+      @Override
+      public void run() {
         logger.debug("processing event {} with {} listeners", event, listeners.size());
         for (EventListener listener : listeners) {
           try {
@@ -120,7 +128,8 @@ public class AsyncEventBusImpl implements EventBus {
   }
 
   private List<EventListener> getEventListenersForEvent(final Event event) {
-    //the map is secured against concurrent modification, the list inside is unmodifiable
+    // the map is secured against concurrent modification, the list inside is
+    // unmodifiable
     Set<Class<? extends Event>> classes = getEventTypes(event.getClass(), new HashSet<>());
     return listenerMap.entrySet().stream().filter(entry -> classes.contains(entry.getKey()))
         .flatMap(e -> e.getValue().stream()).collect(Collectors.toList());
@@ -131,7 +140,7 @@ public class AsyncEventBusImpl implements EventBus {
     if (eventTypes == null)
       eventTypes = new HashSet<>();
     final Set<Class<? extends Event>> finalEventTypes = eventTypes;
-    //add interfaces and recurse for interfaces
+    // add interfaces and recurse for interfaces
     Arrays.stream(clazz.getInterfaces()).forEach(c -> {
       if (Event.class.isAssignableFrom(c)) {
         getEventTypes((Class<? extends Event>) c, finalEventTypes);
@@ -165,7 +174,8 @@ public class AsyncEventBusImpl implements EventBus {
     }
   }
 
-  @Override public EventBusStatistics generateEventBusStatistics() {
+  @Override
+  public EventBusStatistics generateEventBusStatistics() {
     EventBusStatistics statistics = new EventBusStatistics();
     statistics.setListenerCount(listenerMap.values().stream().flatMap(l -> l.stream()).distinct().count());
     statistics.setListenerCountPerEvent(listenerMap.entrySet().stream()

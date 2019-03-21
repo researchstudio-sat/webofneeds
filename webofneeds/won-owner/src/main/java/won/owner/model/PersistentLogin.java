@@ -3,19 +3,26 @@ package won.owner.model;
 import javax.persistence.*;
 import java.util.Date;
 
-@Entity @Table(name = "persistent_logins") public class PersistentLogin {
+@Entity
+@Table(name = "persistent_logins")
+public class PersistentLogin {
 
-  @Column(name = "username") private String username;
+  @Column(name = "username")
+  private String username;
 
-  @Column(name = "series") @Id private String series;
+  @Column(name = "series")
+  @Id
+  private String series;
 
-  @Column(name = "token") private String token;
+  @Column(name = "token")
+  private String token;
 
-  @Column(name = "last_used") private Date lastUsed;
+  @Column(name = "last_used")
+  private Date lastUsed;
 
-  @JoinColumn(name = "keystore_password_id") @OneToOne(cascade = CascadeType.ALL,
-      fetch = FetchType.LAZY,
-      optional = true) private KeystorePasswordHolder keystorePasswordHolder;
+  @JoinColumn(name = "keystore_password_id")
+  @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = true)
+  private KeystorePasswordHolder keystorePasswordHolder;
 
   public String getUsername() {
     return username;

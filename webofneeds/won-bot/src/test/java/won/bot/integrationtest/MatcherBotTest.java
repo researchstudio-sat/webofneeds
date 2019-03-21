@@ -39,8 +39,9 @@ import java.util.concurrent.TimeUnit;
 /**
  * Integration test.
  */
-@RunWith(SpringJUnit4ClassRunner.class) @ContextConfiguration(locations = {
-    "classpath:/spring/app/simpleMatcherTest.xml" }) public class MatcherBotTest {
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = { "classpath:/spring/app/simpleMatcherTest.xml" })
+public class MatcherBotTest {
   private final Logger logger = LoggerFactory.getLogger(getClass());
   private static final int RUN_ONCE = 1;
   private static final long ACT_LOOP_TIMEOUT_MILLIS = 1000;
@@ -48,18 +49,21 @@ import java.util.concurrent.TimeUnit;
 
   MyBot bot;
 
-  @Autowired ApplicationContext applicationContext;
+  @Autowired
+  ApplicationContext applicationContext;
 
-  @Autowired SpringAwareBotManagerImpl botManager;
+  @Autowired
+  SpringAwareBotManagerImpl botManager;
 
   /**
    * This is run before each @TestD method.
    */
-  @Before public void before() {
-    //create a bot instance and auto-wire it
-    this.bot = (MyBot) applicationContext.getAutowireCapableBeanFactory()
-        .autowire(MyBot.class, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
-    //the bot also needs a trigger so its act() method is called regularly.
+  @Before
+  public void before() {
+    // create a bot instance and auto-wire it
+    this.bot = (MyBot) applicationContext.getAutowireCapableBeanFactory().autowire(MyBot.class,
+        AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
+    // the bot also needs a trigger so its act() method is called regularly.
     // (there is no trigger bean in the context)
     PeriodicTrigger trigger = new PeriodicTrigger(ACT_LOOP_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
     trigger.setInitialDelay(ACT_LOOP_INITIAL_DELAY_MILLIS);
@@ -71,25 +75,27 @@ import java.util.concurrent.TimeUnit;
    *
    * @throws Exception
    */
-  @Test public void testMatcherBot() throws Exception {
+  @Test
+  public void testMatcherBot() throws Exception {
     logger.info("starting test case testMatcherBot");
-    //adding the bot to the bot manager will cause it to be initialized.
-    //at that point, the trigger starts.
+    // adding the bot to the bot manager will cause it to be initialized.
+    // at that point, the trigger starts.
     botManager.addBot(this.bot);
-    //the bot should now be running. We have to wait for it to finish before we
-    //can check the results:
-    //Together with the barrier.await() in the bot's listener, this trips the barrier
-    //and both threads continue.
+    // the bot should now be running. We have to wait for it to finish before we
+    // can check the results:
+    // Together with the barrier.await() in the bot's listener, this trips the
+    // barrier
+    // and both threads continue.
     this.bot.getBarrier().await();
-    //now check the results!
+    // now check the results!
     this.bot.executeAsserts();
     logger.info("finishing test case testCommentBot");
   }
 
   /**
-   * We create a subclass of the bot we want to test here so that we can
-   * add a listener to its internal event bus and to access its listeners, which
-   * record information during the run that we later check with asserts.
+   * We create a subclass of the bot we want to test here so that we can add a
+   * listener to its internal event bus and to access its listeners, which record
+   * information during the run that we later check with asserts.
    */
   public static class MyBot extends MatcherProtocolTestBot {
     /**
@@ -104,14 +110,15 @@ import java.util.concurrent.TimeUnit;
     public MyBot() {
     }
 
-    @Override protected void initializeEventListeners() {
-      //of course, let the real bot implementation initialize itself
+    @Override
+    protected void initializeEventListeners() {
+      // of course, let the real bot implementation initialize itself
       super.initializeEventListeners();
-      //now, add a listener to the WorkDoneEvent.
-      //its only purpose is to trip the CyclicBarrier instance that
+      // now, add a listener to the WorkDoneEvent.
+      // its only purpose is to trip the CyclicBarrier instance that
       // the test method is waiting on
       getEventBus().subscribe(WorkDoneEvent.class, new ActionOnEventListener(getEventListenerContext(),
-              new TripBarrierAction(getEventListenerContext(), barrier)));
+          new TripBarrierAction(getEventListenerContext(), barrier)));
     }
 
     public CyclicBarrier getBarrier() {
@@ -124,28 +131,28 @@ import java.util.concurrent.TimeUnit;
     public void executeAsserts() {
       Assert.assertEquals(1, this.matcherRegistrator.getEventCount());
       Assert.assertEquals(0, this.matcherRegistrator.getExceptionCount());
-      //1 act events
+      // 1 act events
       Assert.assertEquals(2, this.needCreator.getEventCount());
       Assert.assertEquals(0, this.needCreator.getExceptionCount());
 
       Assert.assertEquals(4, this.matcherNotifier.getEventCount());
       Assert.assertEquals(0, this.matcherNotifier.getExceptionCount());
 
-      //1 create need events
+      // 1 create need events
       Assert.assertEquals(2, this.matcher.getEventCount());
       Assert.assertEquals(0, this.matcher.getExceptionCount());
 
       Assert.assertEquals(1, this.allNeedsDeactivator.getEventCount());
       Assert.assertEquals(0, this.allNeedsDeactivator.getExceptionCount());
 
-      //4 NeedDeactivated events
+      // 4 NeedDeactivated events
       Assert.assertEquals(4, this.workDoneSignaller.getEventCount());
       Assert.assertEquals(0, this.workDoneSignaller.getExceptionCount());
 
-      //TODO: there is more to check:
-      //* what does the RDF look like?
+      // TODO: there is more to check:
+      // * what does the RDF look like?
       // --> pull it from the needURI/ConnectionURI and check contents
-      //* what does the database look like?      */
+      // * what does the database look like? */
     }
 
   }

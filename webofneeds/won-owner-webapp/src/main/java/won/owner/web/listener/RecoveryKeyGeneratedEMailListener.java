@@ -8,12 +8,16 @@ import won.owner.service.impl.UserService;
 import won.owner.web.WonOwnerMailSender;
 import won.owner.web.events.OnRecoveryKeyGeneratedEvent;
 
-@Component public class RecoveryKeyGeneratedEMailListener implements ApplicationListener<OnRecoveryKeyGeneratedEvent> {
-  @Autowired private UserService userService;
+@Component
+public class RecoveryKeyGeneratedEMailListener implements ApplicationListener<OnRecoveryKeyGeneratedEvent> {
+  @Autowired
+  private UserService userService;
 
-  @Autowired private WonOwnerMailSender emailSender;
+  @Autowired
+  private WonOwnerMailSender emailSender;
 
-  @Override public void onApplicationEvent(OnRecoveryKeyGeneratedEvent event) {
+  @Override
+  public void onApplicationEvent(OnRecoveryKeyGeneratedEvent event) {
     User user = event.getUser();
     String recoveryKey = event.getRecoveryKey();
     emailSender.sendRecoveryKeyGeneratedMessage(user, recoveryKey);

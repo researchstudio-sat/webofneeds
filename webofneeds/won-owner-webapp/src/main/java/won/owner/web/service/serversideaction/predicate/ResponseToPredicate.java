@@ -16,7 +16,8 @@ public class ResponseToPredicate implements Predicate<WonMessage> {
     this.messageURI = messageURI;
   }
 
-  @Override public boolean test(WonMessage t) {
+  @Override
+  public boolean test(WonMessage t) {
     return this.messageURI.equals(t.getIsResponseToMessageURI());
   }
 }

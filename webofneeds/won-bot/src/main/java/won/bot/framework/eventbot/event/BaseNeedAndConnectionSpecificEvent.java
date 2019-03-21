@@ -35,23 +35,25 @@ public abstract class BaseNeedAndConnectionSpecificEvent extends BaseEvent
     return con;
   }
 
-  @Override public URI getConnectionURI() {
+  @Override
+  public URI getConnectionURI() {
     return con.getConnectionURI();
   }
 
-  @Override public URI getNeedURI() {
+  @Override
+  public URI getNeedURI() {
     return con.getNeedURI();
   }
 
-  @Override public URI getRemoteNeedURI() {
+  @Override
+  public URI getRemoteNeedURI() {
     return con.getRemoteNeedURI();
   }
 
-  @Override public String toString() {
-    return getClass().getSimpleName() + "@" + Integer.toHexString(hashCode()) + "{" +
-        "needURI=" + getNeedURI() +
-        ", connectionURI=" + getConnectionURI() +
-        '}';
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "@" + Integer.toHexString(hashCode()) + "{" + "needURI=" + getNeedURI()
+        + ", connectionURI=" + getConnectionURI() + '}';
   }
 
   protected static Connection makeConnection(URI needURI, URI remoteNeedURI, URI connectionURI) {

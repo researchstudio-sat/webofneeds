@@ -20,18 +20,21 @@ public class EagerlyCachePopulatingMessageProcessor implements WonMessageProcess
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Autowired private LinkedDataSource linkedDataSourceOnBehalfOfNeed;
+  @Autowired
+  private LinkedDataSource linkedDataSourceOnBehalfOfNeed;
 
-  @Autowired private ThreadPoolExecutor parallelRequestsThreadpool;
+  @Autowired
+  private ThreadPoolExecutor parallelRequestsThreadpool;
 
-  @Override public WonMessage process(WonMessage message) throws WonMessageProcessingException {
+  @Override
+  public WonMessage process(WonMessage message) throws WonMessageProcessingException {
     if (this.linkedDataSourceOnBehalfOfNeed != null
         && this.linkedDataSourceOnBehalfOfNeed instanceof CachingLinkedDataSource) {
       logger.debug("eagerly fetching delivery chain for mesasge {} into cache", message.getMessageURI());
       URI requester = message.getReceiverNeedURI();
-      ((CachingLinkedDataSource) linkedDataSourceOnBehalfOfNeed)
-          .addToCache(message.getCompleteDataset(), message.getMessageURI(), requester);
-      //load the original message(s) into cache, too
+      ((CachingLinkedDataSource) linkedDataSourceOnBehalfOfNeed).addToCache(message.getCompleteDataset(),
+          message.getMessageURI(), requester);
+      // load the original message(s) into cache, too
       Set<URI> toLoad = new HashSet<URI>();
       addIfNotNull(toLoad, message.getIsRemoteResponseToMessageURI());
       addIfNotNull(toLoad, message.getIsResponseToMessageURI());

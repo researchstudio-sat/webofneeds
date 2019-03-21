@@ -24,7 +24,7 @@ import won.bot.framework.eventbot.event.impl.lifecycle.WorkDoneEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 
 /**
- * BaseEventBotAction telling the framework that the bot's work  is done.
+ * BaseEventBotAction telling the framework that the bot's work is done.
  */
 public class SignalWorkDoneAction extends BaseEventBotAction {
   private Bot bot;
@@ -38,7 +38,8 @@ public class SignalWorkDoneAction extends BaseEventBotAction {
     super(eventListenerContext);
   }
 
-  @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
+  @Override
+  protected void doRun(Event event, EventListener executingListener) throws Exception {
     logger.info("signaling that the bot's work is done");
     getEventListenerContext().workIsDone();
     getEventListenerContext().getEventBus().publish(new WorkDoneEvent(this.bot));

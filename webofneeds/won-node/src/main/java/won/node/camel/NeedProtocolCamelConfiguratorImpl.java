@@ -25,12 +25,12 @@ import java.net.URI;
 //import won.node.camel.routes.NeedProtocolDynamicRoutes;
 
 /**
- * User: LEIH-NB
- * Date: 26.02.14
+ * User: LEIH-NB Date: 26.02.14
  */
 public class NeedProtocolCamelConfiguratorImpl extends NeedBasedCamelConfiguratorImpl {
 
-  @Override protected RoutesBuilder createRoutesBuilder(final String startingEndpoint, final URI brokerUri) {
+  @Override
+  protected RoutesBuilder createRoutesBuilder(final String startingEndpoint, final URI brokerUri) {
     return new NeedProtocolDynamicRoutes(getCamelContext(), startingEndpoint);
   }
 }

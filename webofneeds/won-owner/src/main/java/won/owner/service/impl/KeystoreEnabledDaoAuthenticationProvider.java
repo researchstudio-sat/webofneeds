@@ -19,29 +19,36 @@ import java.security.KeyStore;
 public class KeystoreEnabledDaoAuthenticationProvider extends DaoAuthenticationProvider {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Autowired UserRepository userRepository;
+  @Autowired
+  UserRepository userRepository;
 
-  @Autowired KeystoreHolderRepository keystoreHolderRepository;
+  @Autowired
+  KeystoreHolderRepository keystoreHolderRepository;
 
-  @Autowired KeystorePasswordRepository keystorePasswordRepository;
+  @Autowired
+  KeystorePasswordRepository keystorePasswordRepository;
 
-  @Override @Transactional public Authentication authenticate(Authentication authentication) {
+  @Override
+  @Transactional
+  public Authentication authenticate(Authentication authentication) {
     String password = (String) authentication.getCredentials();
     String username = (String) authentication.getPrincipal();
     UsernamePasswordAuthenticationToken auth = (UsernamePasswordAuthenticationToken) super.authenticate(authentication);
     User user = (User) auth.getPrincipal();
-    //can't use that object as it's detached. load the user again:
+    // can't use that object as it's detached. load the user again:
     user = userRepository.findOne(user.getId());
     KeystorePasswordHolder keystorePasswordHolder = user.getKeystorePasswordHolder();
     if (keystorePasswordHolder == null || keystorePasswordHolder.getEncryptedPassword() == null
         || keystorePasswordHolder.getEncryptedPassword().length() == 0) {
       keystorePasswordHolder = new KeystorePasswordHolder();
-      //generate a password for the keystore and save it in the database, encrypted with a symmetric key
-      //derived from the user's password
+      // generate a password for the keystore and save it in the database, encrypted
+      // with a symmetric key
+      // derived from the user's password
       keystorePasswordHolder
           .setPassword(KeystorePasswordUtils.generatePassword(KeystorePasswordUtils.KEYSTORE_PASSWORD_BYTES), password);
-      //keystorePasswordHolder = keystorePasswordRepository.save(keystorePasswordHolder);
-      //generate the keystore for the user
+      // keystorePasswordHolder =
+      // keystorePasswordRepository.save(keystorePasswordHolder);
+      // generate the keystore for the user
       user.setKeystorePasswordHolder(keystorePasswordHolder);
     }
     String keystorePassword = keystorePasswordHolder.getPassword(password);
@@ -49,10 +56,10 @@ public class KeystoreEnabledDaoAuthenticationProvider extends DaoAuthenticationP
     KeyStore keystore = null;
     if (keystoreHolder == null || keystoreHolder.getKeystoreBytes() == null
         || keystoreHolder.getKeystoreBytes().length == 0) {
-      //new user or legacy user that has no keystore yet: create keystoreHolder
+      // new user or legacy user that has no keystore yet: create keystoreHolder
       keystoreHolder = new KeystoreHolder();
       keystore = openOrCreateKeyStore(keystorePassword, auth.getName(), keystoreHolder);
-      //keystoreHolder = keystoreHolderRepository.save(keystoreHolder);
+      // keystoreHolder = keystoreHolderRepository.save(keystoreHolder);
       user.setKeystoreHolder(keystoreHolder);
     } else {
       try {

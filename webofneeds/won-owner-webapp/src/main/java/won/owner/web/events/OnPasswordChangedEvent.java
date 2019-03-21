@@ -6,8 +6,8 @@ import won.owner.model.User;
 import java.util.Locale;
 
 /**
- * Created by fsuda on 27.11.2018.
- * This Event is used/published as a Result of a successful password change.
+ * Created by fsuda on 27.11.2018. This Event is used/published as a Result of a
+ * successful password change.
  */
 public class OnPasswordChangedEvent extends ApplicationEvent {
   private String appUrl;

@@ -10,9 +10,7 @@ import won.protocol.message.WonMessage;
 import java.net.URI;
 
 /**
- * User: gabriel
- * Date: 12.02.13
- * Time: 17:26
+ * User: gabriel Date: 12.02.13 Time: 17:26
  */
 public class MatcherProtocolNeedServiceClient implements MatcherProtocolNeedServiceClientSide {
   private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -28,7 +26,7 @@ public class MatcherProtocolNeedServiceClient implements MatcherProtocolNeedServ
   }
 
   public void initializeDefault() {
-    //   delegate = new MatcherProtocolNeedServiceClientJMSBased();
+    // delegate = new MatcherProtocolNeedServiceClientJMSBased();
     delegate.initializeDefault();
   }
 

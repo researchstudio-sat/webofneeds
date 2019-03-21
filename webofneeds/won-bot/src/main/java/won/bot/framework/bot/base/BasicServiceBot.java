@@ -52,12 +52,15 @@ public abstract class BasicServiceBot extends BaseBot {
     return matcherNodeURISource;
   }
 
-  @Qualifier("default") @Autowired(required = true) public void setMatcherNodeURISource(
-      final MatcherNodeURISource matcherNodeURISource) {
+  @Qualifier("default")
+  @Autowired(required = true)
+  public void setMatcherNodeURISource(final MatcherNodeURISource matcherNodeURISource) {
     this.matcherNodeURISource = matcherNodeURISource;
   }
 
-  @Qualifier("default") @Autowired(required = true) public void setNodeURISource(final NodeURISource nodeURISource) {
+  @Qualifier("default")
+  @Autowired(required = true)
+  public void setNodeURISource(final NodeURISource nodeURISource) {
     this.nodeURISource = nodeURISource;
   }
 
@@ -81,17 +84,22 @@ public abstract class BasicServiceBot extends BaseBot {
     this.solrServerURI = solrServerURI;
   }
 
-  @Qualifier("default") @Autowired(required = true) public void setWonMessageSender(
-      final WonMessageSender wonMessageSender) {
+  @Qualifier("default")
+  @Autowired(required = true)
+  public void setWonMessageSender(final WonMessageSender wonMessageSender) {
     this.wonMessageSender = wonMessageSender;
   }
 
-  @Qualifier("default") @Autowired(required = true) public void setMatcherProtocolNeedServiceClient(
+  @Qualifier("default")
+  @Autowired(required = true)
+  public void setMatcherProtocolNeedServiceClient(
       final MatcherProtocolNeedServiceClientSide matcherProtocolNeedServiceClient) {
     this.matcherProtocolNeedServiceClient = matcherProtocolNeedServiceClient;
   }
 
-  @Qualifier("default") @Autowired(required = true) public void setMatcherProtocolMatcherService(
+  @Qualifier("default")
+  @Autowired(required = true)
+  public void setMatcherProtocolMatcherService(
       final MatcherProtocolMatcherServiceImplJMSBased matcherProtocolMatcherService) {
     this.matcherProtocolMatcherService = matcherProtocolMatcherService;
   }
@@ -100,7 +108,9 @@ public abstract class BasicServiceBot extends BaseBot {
     return needProducer;
   }
 
-  @Qualifier("default") @Autowired(required = true) public void setNeedProducer(final NeedProducer needProducer) {
+  @Qualifier("default")
+  @Autowired(required = true)
+  public void setNeedProducer(final NeedProducer needProducer) {
     this.needProducer = needProducer;
   }
 
@@ -108,8 +118,9 @@ public abstract class BasicServiceBot extends BaseBot {
     return linkedDataSource;
   }
 
-  @Qualifier("default") @Autowired(required = true) public void setLinkedDataSource(
-      final LinkedDataSource linkedDataSource) {
+  @Qualifier("default")
+  @Autowired(required = true)
+  public void setLinkedDataSource(final LinkedDataSource linkedDataSource) {
     this.linkedDataSource = linkedDataSource;
   }
 
@@ -117,8 +128,8 @@ public abstract class BasicServiceBot extends BaseBot {
     return wonNodeInformationService;
   }
 
-  @Autowired(required = true) public void setWonNodeInformationService(
-      final WonNodeInformationService wonNodeInformationService) {
+  @Autowired(required = true)
+  public void setWonNodeInformationService(final WonNodeInformationService wonNodeInformationService) {
     this.wonNodeInformationService = wonNodeInformationService;
   }
 

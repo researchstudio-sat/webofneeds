@@ -23,8 +23,7 @@ import java.net.URI;
 import java.util.Properties;
 
 /**
- * User: ypanchenko
- * Date: 23.02.2015
+ * User: ypanchenko Date: 23.02.2015
  */
 public class WonOwnerMailSender {
 
@@ -55,11 +54,14 @@ public class WonOwnerMailSender {
 
   private WonMailSender wonMailSender;
 
-  @Value(value = "${uri.prefix}") private URI ownerWebappUri;
+  @Value(value = "${uri.prefix}")
+  private URI ownerWebappUri;
 
-  @Autowired LinkedDataSource linkedDataSource;
+  @Autowired
+  LinkedDataSource linkedDataSource;
 
-  @Autowired private URIService uriService;
+  @Autowired
+  private URIService uriService;
 
   private VelocityEngine velocityEngine;
   private Template conversationNotificationTemplate;
@@ -321,30 +323,28 @@ public class WonOwnerMailSender {
     this.wonMailSender.sendTextMessage(user.getEmail(), SUBJECT_RECOVERY_KEY_GENERATED, writer.toString());
   }
 
-/*
-  Dead main method code. Useful for trying out velocity stuff when needed.
-
-  public static void main(String... args){
-    VelocityEngine velocityEngine = new VelocityEngine();
-    Properties properties = new Properties();
-    properties.setProperty("resource.loader", "file");
-    properties.setProperty("file.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
-    velocityEngine.init(properties);
-    Template template = velocityEngine.getTemplate("mail-templates/conversation-notification.vm");
-    StringWriter writer = new StringWriter();
-    VelocityContext context = new VelocityContext();
-    EventCartridge ec = new EventCartridge();
-    ec.addEventHandler(new EscapeHtmlReference());
-    ec.attachToContext( context );
-
-    context.put("linkRemoteNeed", "https://satvm02.researchstudio.at/owner/#!/post/?postUri=https:%2F%2Fsatvm02.researchstudio.at%2Fwon%2Fresource%2Fneed%2F8772930375045372000");
-    context.put("remoteNeedTitle", "höhöhö");
-    context.put("linkLocalNeed", "https://satvm02.researchstudio.at/owner/#!/post/?postUri=https:%2F%2Fsatvm02.researchstudio.at%2Fwon%2Fresource%2Fneed%2F8772930375045372000");
-    context.put("localNeedTitle", "Ich & ich");
-    context.put("linkConnection", "https://satvm02.researchstudio.at/owner/#!/post/?postUri=https:%2F%2Fsatvm02.researchstudio.at%2Fwon%2Fresource%2Fneed%2F8772930375045372000");
-    context.put("textMsg", "Hä? & was soll das jetzt? <script language=\"JavaScript\"> alert('hi') </script>");
-    template.merge(context, writer);
-    System.out.println(writer.toString());
-  }
-  */
+  /*
+   * Dead main method code. Useful for trying out velocity stuff when needed.
+   * 
+   * public static void main(String... args){ VelocityEngine velocityEngine = new
+   * VelocityEngine(); Properties properties = new Properties();
+   * properties.setProperty("resource.loader", "file");
+   * properties.setProperty("file.resource.loader.class",
+   * "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
+   * velocityEngine.init(properties); Template template =
+   * velocityEngine.getTemplate("mail-templates/conversation-notification.vm");
+   * StringWriter writer = new StringWriter(); VelocityContext context = new
+   * VelocityContext(); EventCartridge ec = new EventCartridge();
+   * ec.addEventHandler(new EscapeHtmlReference()); ec.attachToContext( context );
+   * 
+   * context.put("linkRemoteNeed",
+   * "https://satvm02.researchstudio.at/owner/#!/post/?postUri=https:%2F%2Fsatvm02.researchstudio.at%2Fwon%2Fresource%2Fneed%2F8772930375045372000"
+   * ); context.put("remoteNeedTitle", "höhöhö"); context.put("linkLocalNeed",
+   * "https://satvm02.researchstudio.at/owner/#!/post/?postUri=https:%2F%2Fsatvm02.researchstudio.at%2Fwon%2Fresource%2Fneed%2F8772930375045372000"
+   * ); context.put("localNeedTitle", "Ich & ich"); context.put("linkConnection",
+   * "https://satvm02.researchstudio.at/owner/#!/post/?postUri=https:%2F%2Fsatvm02.researchstudio.at%2Fwon%2Fresource%2Fneed%2F8772930375045372000"
+   * ); context.put("textMsg",
+   * "Hä? & was soll das jetzt? <script language=\"JavaScript\"> alert('hi') </script>"
+   * ); template.merge(context, writer); System.out.println(writer.toString()); }
+   */
 }

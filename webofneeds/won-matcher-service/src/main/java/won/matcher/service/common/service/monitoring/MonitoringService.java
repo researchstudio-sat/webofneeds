@@ -15,14 +15,17 @@ import java.util.Map;
 /**
  * Created by hfriedrich on 09.10.2015.
  */
-@Component @Scope("singleton") public class MonitoringService {
+@Component
+@Scope("singleton")
+public class MonitoringService {
   private final Logger log = LoggerFactory.getLogger(getClass());
 
   public static final String NEED_HINT_STOPWATCH = "NeedReceivedUntilFirstHintSent";
 
   private Map<String, Map<String, Split>> stopWatchSplits = new HashMap<>();
 
-  @Value("${matcher.service.monitoring}") private boolean monitoringEnabled;
+  @Value("${matcher.service.monitoring}")
+  private boolean monitoringEnabled;
 
   public boolean isMonitoringEnabled() {
     return monitoringEnabled;
@@ -64,7 +67,7 @@ import java.util.Map;
       }
 
       split.stop();
-      //splits.remove(monitoringEvent.getSplitName());
+      // splits.remove(monitoringEvent.getSplitName());
     }
   }
 }

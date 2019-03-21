@@ -33,9 +33,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * User: gabriel
- * Date: 12.02.13
- * Time: 17:26
+ * User: gabriel Date: 12.02.13 Time: 17:26
  */
 public class MatcherProtocolNeedServiceClientJMSBased implements MatcherProtocolNeedServiceClientSide {
   private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -44,8 +42,9 @@ public class MatcherProtocolNeedServiceClientJMSBased implements MatcherProtocol
   private MatcherProtocolCommunicationService matcherProtocolCommunicationService;
   private String startingEndpoint;
 
-  @Override public void hint(URI needURI, URI otherNeed, double score, URI originator, Model content,
-      WonMessage wonMessage) throws Exception {
+  @Override
+  public void hint(URI needURI, URI otherNeed, double score, URI originator, Model content, WonMessage wonMessage)
+      throws Exception {
     logger.info("need-facing: HINT called for needURI {} and otherNeed {} " + "with score {} from originator {}.",
         new Object[] { needURI, otherNeed, score, originator });
 
@@ -62,11 +61,12 @@ public class MatcherProtocolNeedServiceClientJMSBased implements MatcherProtocol
 
     headerMap.put("remoteBrokerEndpoint", endpoint);
     headerMap.put("methodName", "hint");
-    messagingService
-        .sendInOnlyMessage(null, headerMap, WonMessageEncoder.encode(wonMessage, Lang.TRIG), startingEndpoint);
+    messagingService.sendInOnlyMessage(null, headerMap, WonMessageEncoder.encode(wonMessage, Lang.TRIG),
+        startingEndpoint);
   }
 
-  @Override public void initializeDefault() {
+  @Override
+  public void initializeDefault() {
     // matcherProtocolCommunicationService =
   }
 

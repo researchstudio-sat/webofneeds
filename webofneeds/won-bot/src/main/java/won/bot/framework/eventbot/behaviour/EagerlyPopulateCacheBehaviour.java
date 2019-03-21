@@ -32,7 +32,8 @@ public class EagerlyPopulateCacheBehaviour extends BotBehaviour {
     super(context, name);
   }
 
-  @Override protected void onActivate(Optional<Object> message) {
+  @Override
+  protected void onActivate(Optional<Object> message) {
     logger.debug("activating EagerlyPopulateCacheBehaviour");
     ProcessResponseAction processResponseAction = new ProcessResponseAction(context);
     ProcessIncomingMessageAction processIncomingMessageAction = new ProcessIncomingMessageAction(context);
@@ -44,7 +45,8 @@ public class EagerlyPopulateCacheBehaviour extends BotBehaviour {
         new ActionOnEventListener(context, processResponseAction));
   }
 
-  @Override protected void onCleanup() {
+  @Override
+  protected void onCleanup() {
     logger.debug("deactivating EagerlyPopulateCacheBehaviour");
   }
 
@@ -53,24 +55,25 @@ public class EagerlyPopulateCacheBehaviour extends BotBehaviour {
       super(context);
     }
 
-    @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
+    @Override
+    protected void doRun(Event event, EventListener executingListener) throws Exception {
       WonMessage responseWonMessage = null;
       if (event instanceof SuccessResponseEvent) {
         responseWonMessage = ((SuccessResponseEvent) event).getMessage();
       } else if (event instanceof FailureResponseEvent) {
         responseWonMessage = ((FailureResponseEvent) event).getMessage();
       } else {
-        //can't process any other events
+        // can't process any other events
         return;
       }
       logger.debug("eagerly caching data in reaction to event {}", event);
-      //put received message into cache
+      // put received message into cache
       LinkedDataSource linkedDataSource = context.getLinkedDataSource();
       if (linkedDataSource instanceof CachingLinkedDataSource) {
         URI requester = responseWonMessage.getReceiverNeedURI();
-        ((CachingLinkedDataSource) linkedDataSource)
-            .addToCache(responseWonMessage.getCompleteDataset(), responseWonMessage.getMessageURI(), requester);
-        //load the original message(s) into cache, too
+        ((CachingLinkedDataSource) linkedDataSource).addToCache(responseWonMessage.getCompleteDataset(),
+            responseWonMessage.getMessageURI(), requester);
+        // load the original message(s) into cache, too
         Set<URI> toLoad = new HashSet<URI>();
         addIfNotNull(toLoad, responseWonMessage.getIsRemoteResponseToMessageURI());
         addIfNotNull(toLoad, responseWonMessage.getIsResponseToMessageURI());
@@ -88,7 +91,8 @@ public class EagerlyPopulateCacheBehaviour extends BotBehaviour {
       super(context);
     }
 
-    @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
+    @Override
+    protected void doRun(Event event, EventListener executingListener) throws Exception {
       if (!(event instanceof MessageFromOtherNeedEvent)) {
         return;
       }
@@ -98,8 +102,8 @@ public class EagerlyPopulateCacheBehaviour extends BotBehaviour {
 
       LinkedDataSource linkedDataSource = context.getLinkedDataSource();
       if (linkedDataSource instanceof CachingLinkedDataSource) {
-        ((CachingLinkedDataSource) linkedDataSource)
-            .addToCache(wonMessage.getCompleteDataset(), wonMessage.getMessageURI(), wonMessage.getReceiverNeedURI());
+        ((CachingLinkedDataSource) linkedDataSource).addToCache(wonMessage.getCompleteDataset(),
+            wonMessage.getMessageURI(), wonMessage.getReceiverNeedURI());
         URI requester = wonMessage.getReceiverNeedURI();
         Set<URI> toLoad = new HashSet<URI>();
         addIfNotNull(toLoad, wonMessage.getCorrespondingRemoteMessageURI());
@@ -125,4 +129,3 @@ public class EagerlyPopulateCacheBehaviour extends BotBehaviour {
     }
   }
 }
-

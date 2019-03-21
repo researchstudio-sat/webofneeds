@@ -13,10 +13,10 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 /**
- * Class uses OpenNLP to extract tokens from a text. Used for pre-processing the need attribute content.
+ * Class uses OpenNLP to extract tokens from a text. Used for pre-processing the
+ * need attribute content.
  * <p>
- * User: hfriedrich
- * Date: 13.06.2015
+ * User: hfriedrich Date: 13.06.2015
  */
 public class OpenNlpTokenExtraction {
   Tokenizer tokenizer = SimpleTokenizer.INSTANCE;
@@ -40,14 +40,16 @@ public class OpenNlpTokenExtraction {
     text = text.toLowerCase();
     String[] tokens = tokenizer.tokenize(text);
 
-    // filter out tokens with length 1, tokens that start with non-word characters or numbers
+    // filter out tokens with length 1, tokens that start with non-word characters
+    // or numbers
     Pattern filter = Pattern.compile(".{1}+|\\W.*|\\d.*");
     return filterTokens(Arrays.asList(tokens), filter);
   }
 
   /**
-   * Extract tokens that are words of type nouns, adjectives or forgein words and have length > 1 from a text.
-   * NOTE: This method uses pos-tagger and is supposed to be slower than the extractWordTokens()
+   * Extract tokens that are words of type nouns, adjectives or forgein words and
+   * have length > 1 from a text. NOTE: This method uses pos-tagger and is
+   * supposed to be slower than the extractWordTokens()
    *
    * @param text
    * @return
@@ -66,7 +68,8 @@ public class OpenNlpTokenExtraction {
       }
     }
 
-    // filter out tokens with length 1, tokens that start with non-word characters or numbers
+    // filter out tokens with length 1, tokens that start with non-word characters
+    // or numbers
     Pattern filter = Pattern.compile(".{1}+|\\W.*|\\d.*");
     return filterTokens(extracted, filter);
   }

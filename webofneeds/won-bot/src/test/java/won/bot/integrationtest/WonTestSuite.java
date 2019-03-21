@@ -22,7 +22,9 @@ import org.junit.runners.Suite;
 /**
  * Integration test.
  */
-@RunWith(Suite.class) @Suite.SuiteClasses({ ConversationBotTest.class, GroupingBotTest.class, CommentBotTest.class,
-    MatcherBotTest.class, StandardTwoPhaseCommitBotTest.class, }) public class WonTestSuite {
+@RunWith(Suite.class)
+@Suite.SuiteClasses({ ConversationBotTest.class, GroupingBotTest.class, CommentBotTest.class, MatcherBotTest.class,
+    StandardTwoPhaseCommitBotTest.class, })
+public class WonTestSuite {
 
 }

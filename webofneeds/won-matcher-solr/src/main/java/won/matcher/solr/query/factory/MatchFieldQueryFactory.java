@@ -17,12 +17,14 @@ public class MatchFieldQueryFactory extends SolrQueryFactory {
     this.fieldName = fieldName;
   }
 
-  @Override protected String makeQueryString() {
+  @Override
+  protected String makeQueryString() {
 
     if (fieldName == null || value == null) {
       throw new NullPointerException("fieldName or value may not be null");
     }
-    // these surrounding brackets are important to really search for all terms (that the value field may contain)
+    // these surrounding brackets are important to really search for all terms (that
+    // the value field may contain)
     // in the specified in the field
     return String.join("", fieldName, " : (", value, ")");
   }

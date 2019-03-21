@@ -39,19 +39,22 @@ public class WonTelegramBotHandler extends TelegramLongPollingBot implements ICo
     BotCommand critiqueBotCommand = new CritiqueBotCommand("critique", "create a critique need", bus);
     BotCommand togetherBotCommand = new TogetherBotCommand("together", "create a together need", bus);
     BotCommand helpBotCommand = new HelpBotCommand("help", "list help", bus);
-    commandRegistry
-        .registerAll(helpBotCommand, offerBotCommand, demandBotCommand, critiqueBotCommand, togetherBotCommand);
+    commandRegistry.registerAll(helpBotCommand, offerBotCommand, demandBotCommand, critiqueBotCommand,
+        togetherBotCommand);
   }
 
-  @Override public void onUpdateReceived(Update update) {
+  @Override
+  public void onUpdateReceived(Update update) {
     bus.publish(new TelegramMessageReceivedEvent(update));
   }
 
-  @Override public String getBotToken() {
+  @Override
+  public String getBotToken() {
     return token;
   }
 
-  @Override public String getBotUsername() {
+  @Override
+  public String getBotUsername() {
     return botName;
   }
 
@@ -67,31 +70,38 @@ public class WonTelegramBotHandler extends TelegramLongPollingBot implements ICo
     this.telegramMessageGenerator = telegramMessageGenerator;
   }
 
-  @Override public void registerDefaultAction(BiConsumer<AbsSender, Message> biConsumer) {
+  @Override
+  public void registerDefaultAction(BiConsumer<AbsSender, Message> biConsumer) {
     BotCommand helpBotCommand = new HelpBotCommand("help", "list help", bus);
   }
 
-  @Override public boolean register(BotCommand botCommand) {
+  @Override
+  public boolean register(BotCommand botCommand) {
     return commandRegistry.register(botCommand);
   }
 
-  @Override public Map<BotCommand, Boolean> registerAll(BotCommand... botCommands) {
+  @Override
+  public Map<BotCommand, Boolean> registerAll(BotCommand... botCommands) {
     return commandRegistry.registerAll(botCommands);
   }
 
-  @Override public boolean deregister(BotCommand botCommand) {
+  @Override
+  public boolean deregister(BotCommand botCommand) {
     return commandRegistry.deregister(botCommand);
   }
 
-  @Override public Map<BotCommand, Boolean> deregisterAll(BotCommand... botCommands) {
+  @Override
+  public Map<BotCommand, Boolean> deregisterAll(BotCommand... botCommands) {
     return commandRegistry.deregisterAll(botCommands);
   }
 
-  @Override public Collection<BotCommand> getRegisteredCommands() {
+  @Override
+  public Collection<BotCommand> getRegisteredCommands() {
     return commandRegistry.getRegisteredCommands();
   }
 
-  @Override public BotCommand getRegisteredCommand(String s) {
+  @Override
+  public BotCommand getRegisteredCommand(String s) {
     return commandRegistry.getRegisteredCommand(s);
   }
 }

@@ -46,7 +46,8 @@ public class CloseCommandEvent extends BaseNeedAndConnectionSpecificEvent implem
     this(needURI, remoteNeedURI, connectionURI, "Hello!");
   }
 
-  @Override public WonMessageType getWonMessageType() {
+  @Override
+  public WonMessageType getWonMessageType() {
     return WonMessageType.OPEN;
   }
 

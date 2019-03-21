@@ -28,10 +28,10 @@ import won.protocol.util.RdfUtils;
 import java.net.URI;
 
 /**
- * User: fkleedorfer
- * Date: 02.11.12
+ * User: fkleedorfer Date: 02.11.12
  */
-@Service public class MatcherProtocolNeedServiceImplJMSBased// implements MatcherProtocolNeedService
+@Service
+public class MatcherProtocolNeedServiceImplJMSBased// implements MatcherProtocolNeedService
 {
   private Logger logger = LoggerFactory.getLogger(this.getClass());
   private MatcherProtocolNeedService delegate;

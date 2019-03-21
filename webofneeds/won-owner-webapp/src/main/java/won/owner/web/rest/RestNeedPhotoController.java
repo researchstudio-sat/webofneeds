@@ -31,16 +31,18 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-@Controller @RequestMapping("/rest/needphoto") public class RestNeedPhotoController {
+@Controller
+@RequestMapping("/rest/needphoto")
+public class RestNeedPhotoController {
 
   final Logger logger = LoggerFactory.getLogger(getClass());
 
   public RestNeedPhotoController() {
   }
 
-  @ResponseBody @RequestMapping(
-      value = "/",
-      method = RequestMethod.POST) public ResponseEntity uploadPhoto(@RequestParam("photo") MultipartFile photo,
+  @ResponseBody
+  @RequestMapping(value = "/", method = RequestMethod.POST)
+  public ResponseEntity uploadPhoto(@RequestParam("photo") MultipartFile photo,
       @RequestParam("unique") String uniqueKey, @RequestParam("selected") String selected) {
     File tempDir = new File(uniqueKey);
     if (!tempDir.exists())
@@ -52,15 +54,14 @@ import java.io.IOException;
       return new ResponseEntity(HttpStatus.OK);
     } catch (IOException e) {
       return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
-      //log.error("An error occurred.", e);
+      // log.error("An error occurred.", e);
     }
   }
 
-  @ResponseBody @RequestMapping(
-      value = "/{unique}/{photoNum}/",
-      method = RequestMethod.GET,
-      produces = { MediaType.IMAGE_JPEG_VALUE }) public byte[] getImage(@PathVariable("unique") String unique,
-      @PathVariable("photoNum") String photoNum) {
+  @ResponseBody
+  @RequestMapping(value = "/{unique}/{photoNum}/", method = RequestMethod.GET, produces = {
+      MediaType.IMAGE_JPEG_VALUE })
+  public byte[] getImage(@PathVariable("unique") String unique, @PathVariable("photoNum") String photoNum) {
     File photoFile = new File(unique + File.separator + photoNum);
     if (photoFile.exists()) {
       try {

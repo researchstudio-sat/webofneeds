@@ -111,7 +111,9 @@ import java.util.regex.Pattern;
  * <p>
  * 5.3.7 ordering
  */
-@Controller @RequestMapping("/") public class LinkedDataWebController {
+@Controller
+@RequestMapping("/")
+public class LinkedDataWebController {
   private final Logger logger = LoggerFactory.getLogger(getClass());
   // full prefix of a need resource
   private String needResourceURIPrefix;
@@ -129,9 +131,11 @@ import java.util.regex.Pattern;
   private String pageURIPrefix;
   private String nodeResourceURIPrefix;
 
-  @Autowired private LinkedDataService linkedDataService;
+  @Autowired
+  private LinkedDataService linkedDataService;
 
-  @Autowired private RegistrationServer registrationServer;
+  @Autowired
+  private RegistrationServer registrationServer;
 
   // date format for Expires header (rfc 1123)
   private static final String DATE_FORMAT_RFC_1123 = "EEE, dd MMM yyyy HH:mm:ss z";
@@ -139,15 +143,17 @@ import java.util.regex.Pattern;
   // timeout for resources that clients may cache for a short term
   private static final int SHORT_TERM_CACHE_TIMEOUT_SECONDS = 600;
 
-  @Autowired private URIService uriService;
+  @Autowired
+  private URIService uriService;
 
-  @RequestMapping(value = "/", method = RequestMethod.GET) public String showIndexPage() {
+  @RequestMapping(value = "/", method = RequestMethod.GET)
+  public String showIndexPage() {
     return "index";
   }
 
   // webmvc controller method
-  @RequestMapping("${uri.path.page.need}/{identifier}") public String showNeedPage(@PathVariable String identifier,
-      Model model, HttpServletResponse response) {
+  @RequestMapping("${uri.path.page.need}/{identifier}")
+  public String showNeedPage(@PathVariable String identifier, Model model, HttpServletResponse response) {
 
     URI needURI = uriService.createNeedURIForId(identifier);
     Dataset rdfDataset = linkedDataService.getNeedDataset(needURI, null).getData();
@@ -174,8 +180,8 @@ import java.util.regex.Pattern;
    * @return
    */
   // webmvc controller method
-  @RequestMapping("${uri.path.page.need}/{identifier}/deep") public String showDeepNeedPage(
-      @PathVariable String identifier, Model model, HttpServletResponse response,
+  @RequestMapping("${uri.path.page.need}/{identifier}/deep")
+  public String showDeepNeedPage(@PathVariable String identifier, Model model, HttpServletResponse response,
       @RequestParam(value = "layer-size", required = false) Integer layerSize) {
     try {
       URI needURI = uriService.createNeedURIForId(identifier);
@@ -191,8 +197,8 @@ import java.util.regex.Pattern;
   }
 
   // webmvc controller method
-  @RequestMapping("${uri.path.page.connection}/{identifier}") public String showConnectionPage(
-      @PathVariable String identifier, Model model, HttpServletResponse response) {
+  @RequestMapping("${uri.path.page.connection}/{identifier}")
+  public String showConnectionPage(@PathVariable String identifier, Model model, HttpServletResponse response) {
     URI connectionURI = uriService.createConnectionURIForId(identifier);
     DataWithEtag<Dataset> rdfDataset = linkedDataService.getConnectionDataset(connectionURI, true, null);
     if (rdfDataset.isNotFound()) {
@@ -206,8 +212,9 @@ import java.util.regex.Pattern;
   }
 
   // webmvc controller method
-  @RequestMapping("${uri.path.page.connection}/{identifier}/events") public String showConnectionEventsPage(
-      @PathVariable String identifier, @RequestParam(value = "p", required = false) Integer page,
+  @RequestMapping("${uri.path.page.connection}/{identifier}/events")
+  public String showConnectionEventsPage(@PathVariable String identifier,
+      @RequestParam(value = "p", required = false) Integer page,
       @RequestParam(value = "resumebefore", required = false) String beforeId,
       @RequestParam(value = "resumeafter", required = false) String afterId,
       @RequestParam(value = "type", required = false) String type,
@@ -270,8 +277,9 @@ import java.util.regex.Pattern;
    * @return
    */
   // webmvc controller method
-  @RequestMapping("${uri.path.page.event}/{identifier}") public String showEventPage(
-      @PathVariable(value = "identifier") String identifier, Model model, HttpServletResponse response) {
+  @RequestMapping("${uri.path.page.event}/{identifier}")
+  public String showEventPage(@PathVariable(value = "identifier") String identifier, Model model,
+      HttpServletResponse response) {
     URI eventURI = uriService.createEventURIForId(identifier);
 
     DataWithEtag<Dataset> data = linkedDataService.getDatasetForUri(eventURI, null);
@@ -287,8 +295,9 @@ import java.util.regex.Pattern;
   }
 
   // webmvc controller method
-  @RequestMapping("${uri.path.page.attachment}/{identifier}") public String showAttachmentPage(
-      @PathVariable(value = "identifier") String identifier, Model model, HttpServletResponse response) {
+  @RequestMapping("${uri.path.page.attachment}/{identifier}")
+  public String showAttachmentPage(@PathVariable(value = "identifier") String identifier, Model model,
+      HttpServletResponse response) {
     URI attachmentURI = uriService.createAttachmentURIForId(identifier);
     DataWithEtag<Dataset> data = linkedDataService.getDatasetForUri(attachmentURI, null);
     if (model != null && !data.isNotFound()) {
@@ -303,8 +312,8 @@ import java.util.regex.Pattern;
   }
 
   // webmvc controller method
-  @RequestMapping("${uri.path.page.need}") public String showNeedURIListPage(
-      @RequestParam(value = "p", required = false) Integer page,
+  @RequestMapping("${uri.path.page.need}")
+  public String showNeedURIListPage(@RequestParam(value = "p", required = false) Integer page,
       @RequestParam(value = "resumebefore", required = false) String beforeId,
       @RequestParam(value = "resumeafter", required = false) String afterId,
       @RequestParam(value = "state", required = false) String state, HttpServletRequest request, Model model,
@@ -318,19 +327,19 @@ import java.util.regex.Pattern;
       // support paging
       rdfDataset = linkedDataService.listNeedURIs();
     } else if (page != null) {
-      NeedInformationService.PagedResource<Dataset, URI> resource = linkedDataService
-          .listNeedURIs(page, null, needState);
+      NeedInformationService.PagedResource<Dataset, URI> resource = linkedDataService.listNeedURIs(page, null,
+          needState);
       rdfDataset = resource.getContent();
     } else if (beforeId != null) {
 
       URI referenceNeed = URI.create(this.needResourceURIPrefix + "/" + beforeId);
-      NeedInformationService.PagedResource<Dataset, URI> resource = linkedDataService
-          .listNeedURIsBefore(referenceNeed, null, needState);
+      NeedInformationService.PagedResource<Dataset, URI> resource = linkedDataService.listNeedURIsBefore(referenceNeed,
+          null, needState);
       rdfDataset = resource.getContent();
     } else { // afterId != null
       URI referenceNeed = URI.create(this.needResourceURIPrefix + "/" + afterId);
-      NeedInformationService.PagedResource<Dataset, URI> resource = linkedDataService
-          .listNeedURIsAfter(referenceNeed, null, needState);
+      NeedInformationService.PagedResource<Dataset, URI> resource = linkedDataService.listNeedURIsAfter(referenceNeed,
+          null, needState);
       rdfDataset = resource.getContent();
     }
 
@@ -342,8 +351,8 @@ import java.util.regex.Pattern;
 
   }
 
-  @RequestMapping("${uri.path.page}") public String showNodeInformationPage(HttpServletRequest request, Model model,
-      HttpServletResponse response) {
+  @RequestMapping("${uri.path.page}")
+  public String showNodeInformationPage(HttpServletRequest request, Model model, HttpServletResponse response) {
     Dataset rdfDataset = linkedDataService.getNodeDataset();
     model.addAttribute("rdfDataset", rdfDataset);
     model.addAttribute("resourceURI",
@@ -353,8 +362,8 @@ import java.util.regex.Pattern;
   }
 
   // webmvc controller method
-  @RequestMapping("${uri.path.page.connection}") public String showConnectionURIListPage(
-      @RequestParam(value = "p", required = false) Integer page,
+  @RequestMapping("${uri.path.page.connection}")
+  public String showConnectionURIListPage(@RequestParam(value = "p", required = false) Integer page,
       @RequestParam(value = "deep", defaultValue = "false") boolean deep,
       @RequestParam(value = "resumebefore", required = false) String beforeId,
       @RequestParam(value = "resumeafter", required = false) String afterId,
@@ -392,8 +401,9 @@ import java.util.regex.Pattern;
   }
 
   // webmvc controller method
-  @RequestMapping("${uri.path.page.need}/{identifier}/connections") public String showConnectionURIListPage(
-      @PathVariable String identifier, @RequestParam(value = "p", required = false) Integer page,
+  @RequestMapping("${uri.path.page.need}/{identifier}/connections")
+  public String showConnectionURIListPage(@PathVariable String identifier,
+      @RequestParam(value = "p", required = false) Integer page,
       @RequestParam(value = "deep", defaultValue = "false") boolean deep,
       @RequestParam(value = "resumebefore", required = false) String beforeId,
       @RequestParam(value = "resumeafter", required = false) String afterId,
@@ -435,8 +445,8 @@ import java.util.regex.Pattern;
       response.setStatus(HttpServletResponse.SC_NOT_FOUND);
       return "notFoundView";
     } catch (NoSuchConnectionException e) {
-      logger
-          .warn("did not find connection that should be connected to need. connection:{}", e.getUnknownConnectionURI());
+      logger.warn("did not find connection that should be connected to need. connection:{}",
+          e.getUnknownConnectionURI());
       return "notFoundView"; // TODO: should display an error view
     }
   }
@@ -449,8 +459,9 @@ import java.util.regex.Pattern;
    * @return
    */
   @RequestMapping(value = "${uri.path.resource}/**", method = RequestMethod.GET, produces = { "application/ld+json",
-      "application/trig", "application/n-quads", "*/*" }) public ResponseEntity<String> redirectToData(
-      HttpServletRequest request, HttpServletResponse response) throws IOException {
+      "application/trig", "application/n-quads", "*/*" })
+  public ResponseEntity<String> redirectToData(HttpServletRequest request, HttpServletResponse response)
+      throws IOException {
     URI resourceUriPrefix = URI.create(this.resourceURIPrefix);
     URI dataUri = URI.create(this.dataURIPrefix);
     String requestUri = getRequestUriWithQueryString(request);
@@ -496,8 +507,9 @@ import java.util.regex.Pattern;
    * @param request
    * @return
    */
-  @RequestMapping(value = "${uri.path.resource}/**", method = RequestMethod.GET, produces = "text/html") public ResponseEntity<String> redirectToPage(
-      HttpServletRequest request, HttpServletResponse response) throws IOException {
+  @RequestMapping(value = "${uri.path.resource}/**", method = RequestMethod.GET, produces = "text/html")
+  public ResponseEntity<String> redirectToPage(HttpServletRequest request, HttpServletResponse response)
+      throws IOException {
     URI resourceUriPrefix = URI.create(this.resourceURIPrefix);
     URI pageUriPrefix = URI.create(this.pageURIPrefix);
     String requestUri = getRequestUriWithQueryString(request);
@@ -521,8 +533,9 @@ import java.util.regex.Pattern;
 
   /**
    * If the request URI is the URI of a list page (list of needs, list of
-   * connections), or a need uri, it gets the header that says 'already expired' so that crawlers
-   * re-download these data. For other URIs, the 'never expires' header is added.
+   * connections), or a need uri, it gets the header that says 'already expired'
+   * so that crawlers re-download these data. For other URIs, the 'never expires'
+   * header is added.
    *
    * @param headers
    * @param requestUri
@@ -534,8 +547,8 @@ import java.util.regex.Pattern;
     // these data
     URI requestUriAsURI = URI.create(requestUri);
     String requestPath = requestUriAsURI.getPath();
-    if (uriService.isConnectionEventsURI(requestUriAsURI) || uriService.isNeedEventsURI(requestUriAsURI) || uriService
-        .isNeedURI(requestUriAsURI)) {
+    if (uriService.isConnectionEventsURI(requestUriAsURI) || uriService.isNeedEventsURI(requestUriAsURI)
+        || uriService.isNeedURI(requestUriAsURI)) {
       addMutableResourceHeaders(headers);
     } else {
       addImmutableResourceHeaders(headers);
@@ -544,8 +557,8 @@ import java.util.regex.Pattern;
   }
 
   @RequestMapping(value = "${uri.path.data.need}", method = RequestMethod.GET, produces = { "application/ld+json",
-      "application/trig", "application/n-quads" }) public ResponseEntity<Dataset> listNeedURIs(
-      HttpServletRequest request, HttpServletResponse response,
+      "application/trig", "application/n-quads" })
+  public ResponseEntity<Dataset> listNeedURIs(HttpServletRequest request, HttpServletResponse response,
       @RequestParam(value = "p", required = false) Integer page,
       @RequestParam(value = "resumebefore", required = false) String beforeId,
       @RequestParam(value = "resumeafter", required = false) String afterId,
@@ -567,8 +580,8 @@ import java.util.regex.Pattern;
 
     } else if (page == null && beforeId == null && afterId == null && modifiedAfter == null) {
       // return latest needs
-      NeedInformationService.PagedResource<Dataset, URI> resource = linkedDataService
-          .listNeedURIs(1, preferedSize, needState);
+      NeedInformationService.PagedResource<Dataset, URI> resource = linkedDataService.listNeedURIs(1, preferedSize,
+          needState);
       rdfDataset = resource.getContent();
       addPagedResourceInSequenceHeader(headers, URI.create(this.needResourceURIPrefix), resource, passableQuery);
 
@@ -576,23 +589,23 @@ import java.util.regex.Pattern;
       // before the specified event id
     } else if (page != null) {
 
-      NeedInformationService.PagedResource<Dataset, URI> resource = linkedDataService
-          .listNeedURIs(page, preferedSize, needState);
+      NeedInformationService.PagedResource<Dataset, URI> resource = linkedDataService.listNeedURIs(page, preferedSize,
+          needState);
       rdfDataset = resource.getContent();
       addPagedResourceInSequenceHeader(headers, URI.create(this.needResourceURIPrefix), resource, page, passableQuery);
 
     } else if (beforeId != null) {
 
       URI referenceNeed = URI.create(this.needResourceURIPrefix + "/" + beforeId);
-      NeedInformationService.PagedResource<Dataset, URI> resource = linkedDataService
-          .listNeedURIsBefore(referenceNeed, preferedSize, needState);
+      NeedInformationService.PagedResource<Dataset, URI> resource = linkedDataService.listNeedURIsBefore(referenceNeed,
+          preferedSize, needState);
       rdfDataset = resource.getContent();
       addPagedResourceInSequenceHeader(headers, URI.create(this.needResourceURIPrefix), resource, passableQuery);
     } else if (afterId != null) {
 
       URI referenceNeed = URI.create(this.needResourceURIPrefix + "/" + afterId);
-      NeedInformationService.PagedResource<Dataset, URI> resource = linkedDataService
-          .listNeedURIsAfter(referenceNeed, preferedSize, needState);
+      NeedInformationService.PagedResource<Dataset, URI> resource = linkedDataService.listNeedURIsAfter(referenceNeed,
+          preferedSize, needState);
       rdfDataset = resource.getContent();
       addPagedResourceInSequenceHeader(headers, URI.create(this.needResourceURIPrefix), resource, passableQuery);
     } else { // modifiedafter != null
@@ -639,8 +652,9 @@ import java.util.regex.Pattern;
   }
 
   @RequestMapping(value = "${uri.path.data.connection}", method = RequestMethod.GET, produces = { "application/ld+json",
-      "application/trig", "application/n-quads" }) public ResponseEntity<Dataset> listConnectionURIs(
-      HttpServletRequest request, @RequestParam(value = "p", required = false) Integer page,
+      "application/trig", "application/n-quads" })
+  public ResponseEntity<Dataset> listConnectionURIs(HttpServletRequest request,
+      @RequestParam(value = "p", required = false) Integer page,
       @RequestParam(value = "resumebefore", required = false) String beforeId,
       @RequestParam(value = "resumeafter", required = false) String afterId,
       @RequestParam(value = "timeof", required = false) String timestamp,
@@ -669,8 +683,8 @@ import java.util.regex.Pattern;
             .getContent();
       } else if (page != null) {
         // return latest by the given timestamp
-        NeedInformationService.PagedResource<Dataset, Connection> resource = linkedDataService
-            .listConnections(page, preferedSize, dateParam.getDate(), deep);
+        NeedInformationService.PagedResource<Dataset, Connection> resource = linkedDataService.listConnections(page,
+            preferedSize, dateParam.getDate(), deep);
         rdfDataset = resource.getContent();
         addPagedConnectionResourceInSequenceHeader(headers, URI.create(this.connectionResourceURIPrefix), resource,
             page, passableMap);
@@ -679,8 +693,8 @@ import java.util.regex.Pattern;
         // before the specified event id
       } else if (beforeId == null && afterId == null) {
         // return latest by the given timestamp
-        NeedInformationService.PagedResource<Dataset, Connection> resource = linkedDataService
-            .listConnections(1, preferedSize, dateParam.getDate(), deep);
+        NeedInformationService.PagedResource<Dataset, Connection> resource = linkedDataService.listConnections(1,
+            preferedSize, dateParam.getDate(), deep);
         rdfDataset = resource.getContent();
         addPagedConnectionResourceInSequenceHeader(headers, URI.create(this.connectionResourceURIPrefix), resource,
             passableMap);
@@ -712,8 +726,8 @@ import java.util.regex.Pattern;
       logger.warn("could not parse timestamp into Date:{}", timestamp);
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     } catch (NoSuchConnectionException e) {
-      logger
-          .warn("did not find connection that should be connected to need. connection:{}", e.getUnknownConnectionURI());
+      logger.warn("did not find connection that should be connected to need. connection:{}",
+          e.getUnknownConnectionURI());
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
     addLocationHeaderIfNecessary(headers, URI.create(request.getRequestURI()),
@@ -724,20 +738,24 @@ import java.util.regex.Pattern;
   }
 
   @RequestMapping(value = "${uri.path.data.need}/{identifier}", method = RequestMethod.GET, produces = {
-      "application/ld+json", "application/trig", "application/n-quads" }) public ResponseEntity<Dataset> readNeed(
-      HttpServletRequest request, @PathVariable(value = "identifier") String identifier) {
+      "application/ld+json", "application/trig", "application/n-quads" })
+  public ResponseEntity<Dataset> readNeed(HttpServletRequest request,
+      @PathVariable(value = "identifier") String identifier) {
 
     logger.debug("readNeed() called");
     return getResponseEntity(identifier, request, new EtagSupportingDataLoader<Dataset>() {
-      @Override public URI createUriForIdentifier(final String identifier) {
+      @Override
+      public URI createUriForIdentifier(final String identifier) {
         return URI.create(needResourceURIPrefix + "/" + identifier);
       }
 
-      @Override public DataWithEtag<Dataset> loadDataWithEtag(final URI uri, final String etag) {
+      @Override
+      public DataWithEtag<Dataset> loadDataWithEtag(final URI uri, final String etag) {
         return linkedDataService.getNeedDataset(uri, etag);
       }
 
-      @Override public void addHeaders(final HttpHeaders headers) {
+      @Override
+      public void addHeaders(final HttpHeaders headers) {
         addCORSHeader(headers);
         addPublicHeaders(headers);
       }
@@ -745,35 +763,35 @@ import java.util.regex.Pattern;
   }
 
   @RequestMapping(value = "${uri.path.data.need}/{identifier}/unread", method = RequestMethod.POST, produces = {
-      "application/ld+json", "application/trig",
-      "application/n-quads" }) public ResponseEntity<org.apache.jena.rdf.model.Model> readUnreadInformationPost(
+      "application/ld+json", "application/trig", "application/n-quads" })
+  public ResponseEntity<org.apache.jena.rdf.model.Model> readUnreadInformationPost(
       @PathVariable(value = "identifier") String identifier,
       @RequestParam(value = "lastSeenMessageUris", required = false) List<URI> lastSeenMessageUris) {
-        /*
-         * information we want: need-level: unread count, date of first unread, date of
-		 * last unread per connection: connection uri, unread count, date of first
-		 * unread, date of last unread
-		 */
+    /*
+     * information we want: need-level: unread count, date of first unread, date of
+     * last unread per connection: connection uri, unread count, date of first
+     * unread, date of last unread
+     */
     URI needURI = URI.create(needResourceURIPrefix + "/" + identifier);
-    org.apache.jena.rdf.model.Model unreadInfo = this.linkedDataService
-        .getUnreadInformationForNeed(needURI, lastSeenMessageUris);
+    org.apache.jena.rdf.model.Model unreadInfo = this.linkedDataService.getUnreadInformationForNeed(needURI,
+        lastSeenMessageUris);
     return new ResponseEntity<>(unreadInfo, HttpStatus.OK);
 
   }
 
   @RequestMapping(value = "${uri.path.data.need}/{identifier}/unread", method = RequestMethod.GET, produces = {
-      "application/ld+json", "application/trig",
-      "application/n-quads" }) public ResponseEntity<org.apache.jena.rdf.model.Model> readUnreadInformationGet(
+      "application/ld+json", "application/trig", "application/n-quads" })
+  public ResponseEntity<org.apache.jena.rdf.model.Model> readUnreadInformationGet(
       @PathVariable(value = "identifier") String identifier,
       @RequestParam(value = "lastSeenMessageUris", required = false) List<URI> lastSeenMessageUris) {
-        /*
-         * information we want: need-level: unread count, date of first unread, date of
-		 * last unread per connection: connection uri, unread count, date of first
-		 * unread, date of last unread
-		 */
+    /*
+     * information we want: need-level: unread count, date of first unread, date of
+     * last unread per connection: connection uri, unread count, date of first
+     * unread, date of last unread
+     */
     URI needURI = URI.create(needResourceURIPrefix + "/" + identifier);
-    org.apache.jena.rdf.model.Model unreadInfo = this.linkedDataService
-        .getUnreadInformationForNeed(needURI, lastSeenMessageUris);
+    org.apache.jena.rdf.model.Model unreadInfo = this.linkedDataService.getUnreadInformationForNeed(needURI,
+        lastSeenMessageUris);
     return new ResponseEntity<>(unreadInfo, HttpStatus.OK);
 
   }
@@ -788,8 +806,9 @@ import java.util.regex.Pattern;
    * @return
    */
   @RequestMapping(value = "${uri.path.data.need}/{identifier}/deep", method = RequestMethod.GET, produces = {
-      "application/ld+json", "application/trig", "application/n-quads" }) public ResponseEntity<Dataset> readNeedDeep(
-      HttpServletRequest request, @PathVariable(value = "identifier") String identifier,
+      "application/ld+json", "application/trig", "application/n-quads" })
+  public ResponseEntity<Dataset> readNeedDeep(HttpServletRequest request,
+      @PathVariable(value = "identifier") String identifier,
       @RequestParam(value = "layer-size", required = false) Integer layerSize) {
     logger.debug("readNeed() called");
     URI needUri = URI.create(this.needResourceURIPrefix + "/" + identifier);
@@ -807,7 +826,8 @@ import java.util.regex.Pattern;
   }
 
   @RequestMapping(value = "${uri.path.data}", method = RequestMethod.GET, produces = { "application/ld+json",
-      "application/trig", "application/n-quads" }) public ResponseEntity<Dataset> readNode(HttpServletRequest request) {
+      "application/trig", "application/n-quads" })
+  public ResponseEntity<Dataset> readNode(HttpServletRequest request) {
     logger.debug("readNode() called");
     // URI nodeUri = URI.create(this.nodeResourceURIPrefix);
     Dataset model = linkedDataService.getNodeDataset();
@@ -821,19 +841,23 @@ import java.util.regex.Pattern;
   }
 
   @RequestMapping(value = "${uri.path.data.connection}/{identifier}", method = RequestMethod.GET, produces = {
-      "application/ld+json", "application/trig", "application/n-quads" }) public ResponseEntity<Dataset> readConnection(
-      HttpServletRequest request, @PathVariable(value = "identifier") String identifier) {
+      "application/ld+json", "application/trig", "application/n-quads" })
+  public ResponseEntity<Dataset> readConnection(HttpServletRequest request,
+      @PathVariable(value = "identifier") String identifier) {
     logger.debug("readConnection() called");
     return getResponseEntity(identifier, request, new EtagSupportingDataLoader<Dataset>() {
-      @Override public URI createUriForIdentifier(final String identifier) {
+      @Override
+      public URI createUriForIdentifier(final String identifier) {
         return URI.create(connectionResourceURIPrefix + "/" + identifier);
       }
 
-      @Override public DataWithEtag<Dataset> loadDataWithEtag(final URI uri, final String etag) {
+      @Override
+      public DataWithEtag<Dataset> loadDataWithEtag(final URI uri, final String etag) {
         return linkedDataService.getConnectionDataset(uri, true, etag);
       }
 
-      @Override public void addHeaders(final HttpHeaders headers) {
+      @Override
+      public void addHeaders(final HttpHeaders headers) {
         addCORSHeader(headers);
         addPublicHeaders(headers);
       }
@@ -841,8 +865,8 @@ import java.util.regex.Pattern;
   }
 
   @RequestMapping(value = "${uri.path.data.connection}/{identifier}/events", method = RequestMethod.GET, produces = {
-      "application/ld+json", "application/trig",
-      "application/n-quads" }) public ResponseEntity<Dataset> readConnectionEvents(HttpServletRequest request,
+      "application/ld+json", "application/trig", "application/n-quads" })
+  public ResponseEntity<Dataset> readConnectionEvents(HttpServletRequest request,
       @PathVariable(value = "identifier") String identifier, @RequestParam(value = "p", required = false) Integer page,
       @RequestParam(value = "resumebefore", required = false) String beforeId,
       @RequestParam(value = "resumeafter", required = false) String afterId,
@@ -867,10 +891,14 @@ import java.util.regex.Pattern;
         // not support paging
         rdfDataset = linkedDataService.listConnectionEventURIs(connectionUri, deep);
       } else if (beforeId == null && afterId == null) {
-        //if page == null -> return page with latest events
+        // if page == null -> return page with latest events
         NeedInformationService.PagedResource<Dataset, URI> resource = linkedDataService
-            .listConnectionEventURIs(connectionUri, page != null ? page : 1, preferedSize, msgType,
-                deep); //FIXME: does not respect preferredSize if deep is used
+            .listConnectionEventURIs(connectionUri, page != null ? page : 1, preferedSize, msgType, deep); // FIXME:
+                                                                                                           // does not
+                                                                                                           // respect
+                                                                                                           // preferredSize
+                                                                                                           // if deep is
+                                                                                                           // used
         rdfDataset = resource.getContent();
         if (page == null) {
           addPagedResourceInSequenceHeader(headers, connectionEventsURI, resource, passableMap);
@@ -933,20 +961,24 @@ import java.util.regex.Pattern;
    * @return
    */
   @RequestMapping(value = "${uri.path.data.event}/{identifier}", method = RequestMethod.GET, produces = {
-      "application/ld+json", "application/trig", "application/n-quads" }) public ResponseEntity<Dataset> readEvent(
-      @PathVariable(value = "identifier") String identifier, HttpServletRequest request, HttpServletResponse response) {
+      "application/ld+json", "application/trig", "application/n-quads" })
+  public ResponseEntity<Dataset> readEvent(@PathVariable(value = "identifier") String identifier,
+      HttpServletRequest request, HttpServletResponse response) {
     // get etag from headers, extract version identifier
     logger.debug("readConnectionEvent() called");
     return getResponseEntity(identifier, request, new EtagSupportingDataLoader<Dataset>() {
-      @Override public URI createUriForIdentifier(final String identifier) {
+      @Override
+      public URI createUriForIdentifier(final String identifier) {
         return uriService.createEventURIForId(identifier);
       }
 
-      @Override public DataWithEtag<Dataset> loadDataWithEtag(final URI uri, final String etag) {
+      @Override
+      public DataWithEtag<Dataset> loadDataWithEtag(final URI uri, final String etag) {
         return linkedDataService.getDatasetForUri(uri, etag);
       }
 
-      @Override public void addHeaders(final HttpHeaders headers) {
+      @Override
+      public void addHeaders(final HttpHeaders headers) {
         addCORSHeader(headers);
         addPrivateHeaders(headers);
         addImmutableResourceHeaders(headers);
@@ -976,8 +1008,8 @@ import java.util.regex.Pattern;
   }
 
   @RequestMapping(value = "${uri.path.data.attachment}/{identifier}", method = RequestMethod.GET, produces = {
-      "application/ld+json", "application/trig", "application/n-quads",
-      "*/*" }) public ResponseEntity<Dataset> readAttachment(HttpServletRequest request,
+      "application/ld+json", "application/trig", "application/n-quads", "*/*" })
+  public ResponseEntity<Dataset> readAttachment(HttpServletRequest request,
       @PathVariable(value = "identifier") String identifier) {
     logger.debug("readAttachment() called");
 
@@ -1024,24 +1056,25 @@ import java.util.regex.Pattern;
    * @param identifier
    * @param deep       If true, connection data is added to the model (not only
    *                   connection URIs). Default: false.
-   * @param page       taken into account only if client supports paging; in that case
-   *                   the specified page is returned
-   * @param beforeId   taken into account only if client supports paging; in that case
-   *                   the page with connections URIs that precede the connection having
-   *                   beforeId is returned
-   * @param afterId    taken into account only if client supports paging; in that case
-   *                   the page with connections URIs that follow the connection having
-   *                   afterId are returned
-   * @param type       only connection events of the given type are considered when
-   *                   ordering returned connections. Default: all event types.
-   * @param timestamp  only connection events that where created before the given time
-   *                   are considered when ordering returned connections. Default:
-   *                   current time.
+   * @param page       taken into account only if client supports paging; in that
+   *                   case the specified page is returned
+   * @param beforeId   taken into account only if client supports paging; in that
+   *                   case the page with connections URIs that precede the
+   *                   connection having beforeId is returned
+   * @param afterId    taken into account only if client supports paging; in that
+   *                   case the page with connections URIs that follow the
+   *                   connection having afterId are returned
+   * @param type       only connection events of the given type are considered
+   *                   when ordering returned connections. Default: all event
+   *                   types.
+   * @param timestamp  only connection events that where created before the given
+   *                   time are considered when ordering returned connections.
+   *                   Default: current time.
    * @return
    */
   @RequestMapping(value = "${uri.path.data.need}/{identifier}/connections", method = RequestMethod.GET, produces = {
-      "application/ld+json", "application/trig",
-      "application/n-quads" }) public ResponseEntity<Dataset> readConnectionsOfNeed(HttpServletRequest request,
+      "application/ld+json", "application/trig", "application/n-quads" })
+  public ResponseEntity<Dataset> readConnectionsOfNeed(HttpServletRequest request,
       @PathVariable(value = "identifier") String identifier,
       @RequestParam(value = "deep", defaultValue = "false") boolean deep,
       @RequestParam(value = "p", required = false) Integer page,
@@ -1070,13 +1103,13 @@ import java.util.regex.Pattern;
         rdfDataset = linkedDataService.listConnections(needUri, deep, true).getContent();
         // if no page or resume parameter is specified, display the latest connections:
       } else if (page == null && beforeId == null && afterId == null) {
-        NeedInformationService.PagedResource<Dataset, Connection> resource = linkedDataService
-            .listConnections(1, needUri, preferedSize, eventsType, dateParam.getDate(), deep, true);
+        NeedInformationService.PagedResource<Dataset, Connection> resource = linkedDataService.listConnections(1,
+            needUri, preferedSize, eventsType, dateParam.getDate(), deep, true);
         rdfDataset = resource.getContent();
         addPagedConnectionResourceInSequenceHeader(headers, connectionsURI, resource, passableQuery);
       } else if (page != null) {
-        NeedInformationService.PagedResource<Dataset, Connection> resource = linkedDataService
-            .listConnections(page, needUri, preferedSize, eventsType, dateParam.getDate(), deep, true);
+        NeedInformationService.PagedResource<Dataset, Connection> resource = linkedDataService.listConnections(page,
+            needUri, preferedSize, eventsType, dateParam.getDate(), deep, true);
         rdfDataset = resource.getContent();
         addPagedConnectionResourceInSequenceHeader(headers, connectionsURI, resource, page, passableQuery);
       } else {
@@ -1113,8 +1146,8 @@ import java.util.regex.Pattern;
       logger.warn("did not find need {}", e.getUnknownNeedURI());
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     } catch (NoSuchConnectionException e) {
-      logger
-          .warn("did not find connection that should be connected to need. connection:{}", e.getUnknownConnectionURI());
+      logger.warn("did not find connection that should be connected to need. connection:{}",
+          e.getUnknownConnectionURI());
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -1427,9 +1460,9 @@ import java.util.regex.Pattern;
     this.connectionResourceURIPath = connectionResourceURIPath;
   }
 
-  @RequestMapping(value = "${uri.path.resource}", method = RequestMethod.POST, produces = {
-      "text/plain" }) public ResponseEntity<String> register(@RequestParam("register") String registeredType,
-      HttpServletRequest request) throws CertificateException, UnsupportedEncodingException {
+  @RequestMapping(value = "${uri.path.resource}", method = RequestMethod.POST, produces = { "text/plain" })
+  public ResponseEntity<String> register(@RequestParam("register") String registeredType, HttpServletRequest request)
+      throws CertificateException, UnsupportedEncodingException {
     logger.debug("REGISTERING " + registeredType);
     PreAuthenticatedAuthenticationToken authentication = (PreAuthenticatedAuthenticationToken) SecurityContextHolder
         .getContext().getAuthentication();

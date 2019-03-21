@@ -17,13 +17,15 @@ import java.util.Date;
 /**
  * OwnerProtocolOwnerServiceCallback that dispatches the calls to the bots.
  */
-@Qualifier("default") public class BotOwnerCallback implements OwnerCallback {
+@Qualifier("default")
+public class BotOwnerCallback implements OwnerCallback {
   private final Logger logger = LoggerFactory.getLogger(getClass());
   BotManager botManager;
 
   TaskScheduler taskScheduler;
 
-  @Override public void onCloseFromOtherNeed(final Connection con, final WonMessage wonMessage) {
+  @Override
+  public void onCloseFromOtherNeed(final Connection con, final WonMessage wonMessage) {
     taskScheduler.schedule(new Runnable() {
       public void run() {
         try {
@@ -37,7 +39,8 @@ import java.util.Date;
     }, new Date());
   }
 
-  @Override public void onHintFromMatcher(final Match match, final WonMessage wonMessage) {
+  @Override
+  public void onHintFromMatcher(final Match match, final WonMessage wonMessage) {
     taskScheduler.schedule(new Runnable() {
       public void run() {
         try {
@@ -49,7 +52,8 @@ import java.util.Date;
     }, new Date());
   }
 
-  @Override public void onConnectFromOtherNeed(final Connection con, final WonMessage wonMessage) {
+  @Override
+  public void onConnectFromOtherNeed(final Connection con, final WonMessage wonMessage) {
     taskScheduler.schedule(new Runnable() {
       public void run() {
         try {
@@ -63,7 +67,8 @@ import java.util.Date;
     }, new Date());
   }
 
-  @Override public void onOpenFromOtherNeed(final Connection con, final WonMessage wonMessage) {
+  @Override
+  public void onOpenFromOtherNeed(final Connection con, final WonMessage wonMessage) {
     taskScheduler.schedule(new Runnable() {
       public void run() {
         try {
@@ -75,7 +80,8 @@ import java.util.Date;
     }, new Date());
   }
 
-  @Override public void onMessageFromOtherNeed(final Connection con, final WonMessage wonMessage) {
+  @Override
+  public void onMessageFromOtherNeed(final Connection con, final WonMessage wonMessage) {
     taskScheduler.schedule(new Runnable() {
       public void run() {
         try {
@@ -89,7 +95,8 @@ import java.util.Date;
     }, new Date());
   }
 
-  @Override public void onSuccessResponse(final URI successfulMessageUri, final WonMessage wonMessage) {
+  @Override
+  public void onSuccessResponse(final URI successfulMessageUri, final WonMessage wonMessage) {
     taskScheduler.schedule(new Runnable() {
       public void run() {
         try {
@@ -103,7 +110,8 @@ import java.util.Date;
     }, new Date());
   }
 
-  @Override public void onFailureResponse(final URI failedMessageUri, final WonMessage wonMessage) {
+  @Override
+  public void onFailureResponse(final URI failedMessageUri, final WonMessage wonMessage) {
     taskScheduler.schedule(new Runnable() {
       public void run() {
         try {
@@ -130,9 +138,8 @@ import java.util.Date;
     if (bot == null)
       throw new IllegalStateException("No bot registered for uri " + needUri);
     if (!bot.getLifecyclePhase().isActive()) {
-      throw new IllegalStateException(
-          "bot responsible for need " + needUri + " is not active (lifecycle phase is: " + bot.getLifecyclePhase()
-              + ")");
+      throw new IllegalStateException("bot responsible for need " + needUri + " is not active (lifecycle phase is: "
+          + bot.getLifecyclePhase() + ")");
     }
     return bot;
   }

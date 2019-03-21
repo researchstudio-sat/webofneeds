@@ -28,7 +28,8 @@ public class Message2TelegramAction extends BaseEventBotAction {
     this.wonTelegramBotHandler = wonTelegramBotHandler;
   }
 
-  @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
+  @Override
+  protected void doRun(Event event, EventListener executingListener) throws Exception {
     EventListenerContext ctx = getEventListenerContext();
 
     if (event instanceof MessageFromOtherNeedEvent && ctx.getBotContextWrapper() instanceof TelegramBotContextWrapper) {
@@ -49,8 +50,8 @@ public class Message2TelegramAction extends BaseEventBotAction {
       try {
         Message message = wonTelegramBotHandler.sendMessage(wonTelegramBotHandler.getTelegramMessageGenerator()
             .getConnectionTextMessage(chatId, remoteNeedUri, yourNeedUri, wonMessage));
-        botContextWrapper
-            .addMessageIdWonURIRelation(message.getMessageId(), new WonURI(con.getConnectionURI(), UriType.CONNECTION));
+        botContextWrapper.addMessageIdWonURIRelation(message.getMessageId(),
+            new WonURI(con.getConnectionURI(), UriType.CONNECTION));
       } catch (TelegramApiException te) {
         logger.error(te.getMessage());
       }

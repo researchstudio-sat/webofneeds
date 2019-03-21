@@ -57,8 +57,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Crawls the complete connection data.
- * This behaviour is transient, it is only active once for a specific activity and then deactivates itself.
+ * Crawls the complete connection data. This behaviour is transient, it is only
+ * active once for a specific activity and then deactivates itself.
  */
 public class CrawlConnectionDataBehaviour extends BotBehaviour {
   private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -79,26 +79,28 @@ public class CrawlConnectionDataBehaviour extends BotBehaviour {
     this.abortTimeout = abortTimeout;
   }
 
-  @Override protected void onActivate(Optional<Object> message) {
+  @Override
+  protected void onActivate(Optional<Object> message) {
     logger.debug("activating crawling connection data for connection {}", command.getConnectionURI());
     logger.debug("will deactivate autmatically after " + abortTimeout);
     LinkedDataSource linkedDataSource = context.getLinkedDataSource();
     if (linkedDataSource instanceof CachingLinkedDataSource) {
-      URI toInvalidate = WonLinkedDataUtils
-          .getEventContainerURIforConnectionURI(command.getConnectionURI(), linkedDataSource);
+      URI toInvalidate = WonLinkedDataUtils.getEventContainerURIforConnectionURI(command.getConnectionURI(),
+          linkedDataSource);
       ((CachingLinkedDataSource) linkedDataSource).invalidate(toInvalidate);
       ((CachingLinkedDataSource) linkedDataSource).invalidate(toInvalidate, command.getNeedURI());
-      URI remoteConnectionUri = WonLinkedDataUtils
-          .getRemoteConnectionURIforConnectionURI(command.getConnectionURI(), linkedDataSource);
+      URI remoteConnectionUri = WonLinkedDataUtils.getRemoteConnectionURIforConnectionURI(command.getConnectionURI(),
+          linkedDataSource);
       toInvalidate = WonLinkedDataUtils.getEventContainerURIforConnectionURI(remoteConnectionUri, linkedDataSource);
       ((CachingLinkedDataSource) linkedDataSource).invalidate(toInvalidate);
       ((CachingLinkedDataSource) linkedDataSource).invalidate(toInvalidate, command.getNeedURI());
     }
     context.getTaskScheduler().schedule(new Runnable() {
-          @Override public void run() {
-            deactivate();
-          }
-        }, new Date(System.currentTimeMillis() + abortTimeout.toMillis()));
+      @Override
+      public void run() {
+        deactivate();
+      }
+    }, new Date(System.currentTimeMillis() + abortTimeout.toMillis()));
     ;
 
     List<Path> propertyPaths = new ArrayList<>();
@@ -128,50 +130,54 @@ public class CrawlConnectionDataBehaviour extends BotBehaviour {
 
     Dataset crawledData = DatasetFactory.createGeneral();
 
-    //add crawlcommand listener
-    this.subscribeWithAutoCleanup(CrawlCommandEvent.class, new ActionOnEventListener(context,
+    // add crawlcommand listener
+    this.subscribeWithAutoCleanup(CrawlCommandEvent.class,
+        new ActionOnEventListener(context,
             new OrFilter(new SameEventFilter(crawlNeedCommandEvent), new SameEventFilter(crawlConnectionCommandEvent)),
             new CrawlAction(context)));
 
-    //when the first crawl succeeds, start the second
-    this.subscribeWithAutoCleanup(CrawlCommandSuccessEvent.class,
-        new ActionOnEventListener(context, new CommandResultFilter(crawlNeedCommandEvent),
-            new BaseEventBotAction(context) {
-              @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
-                logger.debug("finished crawling need data. ");
-                Dataset dataset = ((CrawlCommandSuccessEvent) event).getCrawledData();
-                RdfUtils.addDatasetToDataset(crawledData, dataset);
-                //now crawl connection data
-                context.getEventBus().publish(crawlConnectionCommandEvent);
-              }
-            }));
+    // when the first crawl succeeds, start the second
+    this.subscribeWithAutoCleanup(CrawlCommandSuccessEvent.class, new ActionOnEventListener(context,
+        new CommandResultFilter(crawlNeedCommandEvent), new BaseEventBotAction(context) {
+          @Override
+          protected void doRun(Event event, EventListener executingListener) throws Exception {
+            logger.debug("finished crawling need data. ");
+            Dataset dataset = ((CrawlCommandSuccessEvent) event).getCrawledData();
+            RdfUtils.addDatasetToDataset(crawledData, dataset);
+            // now crawl connection data
+            context.getEventBus().publish(crawlConnectionCommandEvent);
+          }
+        }));
 
-    //when we're done crawling, validate:
-    this.subscribeWithAutoCleanup(CrawlCommandSuccessEvent.class,
-        new ActionOnEventListener(context, new CommandResultFilter(crawlConnectionCommandEvent),
-            new BaseEventBotAction(context) {
-              @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
-                logger.debug("finished crawling need data for connection {}", command.getConnectionURI());
-                Dataset dataset = ((CrawlCommandSuccessEvent) event).getCrawledData();
-                RdfUtils.addDatasetToDataset(crawledData, dataset);
-                context.getEventBus().publish(new CrawlConnectionCommandSuccessEvent(command, crawledData));
-                deactivate();
-              }
-            }));
-
-    //when something goes wrong, abort
-    this.subscribeWithAutoCleanup(CrawlCommandFailureEvent.class, new ActionOnFirstEventListener(context,
-            new OrFilter(new CommandResultFilter(crawlConnectionCommandEvent),
-                new CommandResultFilter(crawlNeedCommandEvent)), new BaseEventBotAction(context) {
-          @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
-            CrawlCommandFailureEvent failureEvent = (CrawlCommandFailureEvent) event;
-            logger.debug("crawling failed for connection {}, message: {}", command.getConnectionURI(),
-                failureEvent.getMessage());
-            context.getEventBus().publish(new CrawlConnectionCommandFailureEvent(failureEvent.getMessage(), command));
+    // when we're done crawling, validate:
+    this.subscribeWithAutoCleanup(CrawlCommandSuccessEvent.class, new ActionOnEventListener(context,
+        new CommandResultFilter(crawlConnectionCommandEvent), new BaseEventBotAction(context) {
+          @Override
+          protected void doRun(Event event, EventListener executingListener) throws Exception {
+            logger.debug("finished crawling need data for connection {}", command.getConnectionURI());
+            Dataset dataset = ((CrawlCommandSuccessEvent) event).getCrawledData();
+            RdfUtils.addDatasetToDataset(crawledData, dataset);
+            context.getEventBus().publish(new CrawlConnectionCommandSuccessEvent(command, crawledData));
             deactivate();
           }
         }));
-    //start crawling the need  - connection will be crawled when need crawling is done
+
+    // when something goes wrong, abort
+    this.subscribeWithAutoCleanup(CrawlCommandFailureEvent.class,
+        new ActionOnFirstEventListener(context, new OrFilter(new CommandResultFilter(crawlConnectionCommandEvent),
+            new CommandResultFilter(crawlNeedCommandEvent)), new BaseEventBotAction(context) {
+              @Override
+              protected void doRun(Event event, EventListener executingListener) throws Exception {
+                CrawlCommandFailureEvent failureEvent = (CrawlCommandFailureEvent) event;
+                logger.debug("crawling failed for connection {}, message: {}", command.getConnectionURI(),
+                    failureEvent.getMessage());
+                context.getEventBus()
+                    .publish(new CrawlConnectionCommandFailureEvent(failureEvent.getMessage(), command));
+                deactivate();
+              }
+            }));
+    // start crawling the need - connection will be crawled when need crawling is
+    // done
     context.getEventBus().publish(crawlNeedCommandEvent);
   }
 

@@ -20,8 +20,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
 /**
- * User: LEIH-NB
- * Date: 20.03.14
+ * User: LEIH-NB Date: 20.03.14
  */
 public class SimpleMatcherTestApp {
   public static void main(String[] args) throws Exception {

@@ -20,7 +20,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 
-@Component public class SimpleLoadTest {
+@Component
+public class SimpleLoadTest {
 
   public static void main(String[] args) throws Exception {
     SpringApplication app = new SpringApplication(

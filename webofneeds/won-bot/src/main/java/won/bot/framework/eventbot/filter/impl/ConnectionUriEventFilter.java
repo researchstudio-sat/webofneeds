@@ -23,7 +23,8 @@ import won.bot.framework.eventbot.filter.EventFilter;
 import java.net.URI;
 
 /**
- * Abstract base class for filters that will only accept events (connection specific or connection specific) with the specified connection URI.
+ * Abstract base class for filters that will only accept events (connection
+ * specific or connection specific) with the specified connection URI.
  */
 public class ConnectionUriEventFilter implements EventFilter {
   private URI connectionURI;
@@ -33,10 +34,12 @@ public class ConnectionUriEventFilter implements EventFilter {
   }
 
   /**
-   * Factory method for creating a filter from an event by using its connection URI.
+   * Factory method for creating a filter from an event by using its connection
+   * URI.
    *
    * @param event
-   * @return the filter or null if no connection URI could be obtained from the event.
+   * @return the filter or null if no connection URI could be obtained from the
+   *         event.
    */
   public static ConnectionUriEventFilter forEvent(Event event) {
     URI connectionUri = getConnectionUriFromEvent(event);
@@ -45,7 +48,8 @@ public class ConnectionUriEventFilter implements EventFilter {
     return new ConnectionUriEventFilter(connectionUri);
   }
 
-  @Override public boolean accept(final Event event) {
+  @Override
+  public boolean accept(final Event event) {
     URI connectionUriOfEvent = getConnectionUriFromEvent(event);
     if (connectionUriOfEvent == null)
       return false;

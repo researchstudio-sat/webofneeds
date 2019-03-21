@@ -27,12 +27,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * User: LEIH-NB
- * Date: 13.11.13
+ * User: LEIH-NB Date: 13.11.13
  */
 public class QueueManagementServiceImpl implements QueueManagementService {
 
-  @Autowired private OwnerApplicationRepository ownerApplicationRepository;
+  @Autowired
+  private OwnerApplicationRepository ownerApplicationRepository;
 
   final Logger logger = LoggerFactory.getLogger(getClass());
   private String defaultUriScheme;
@@ -46,29 +46,40 @@ public class QueueManagementServiceImpl implements QueueManagementService {
 
   private List<String> queueNames;
 
-  @Override public List<String> generateQueueNamesForOwnerApplication(OwnerApplication ownerApplication) {
+  @Override
+  public List<String> generateQueueNamesForOwnerApplication(OwnerApplication ownerApplication) {
 
     logger.debug(ownerApplication.getOwnerApplicationId());
     List<String> queueNames = new ArrayList<>();
-    //queueNames.add("activemq"+ownerApplication.getOwnerApplicationId()+":queue:OwnerProtocol.Out" +
-    //                  "."+ownerApplication.getOwnerApplicationId());
+    // queueNames.add("activemq"+ownerApplication.getOwnerApplicationId()+":queue:OwnerProtocol.Out"
+    // +
+    // "."+ownerApplication.getOwnerApplicationId());
     queueNames.add("activemq" + ":queue:OwnerProtocol.Out." + ownerApplication.getOwnerApplicationId());
 
-
-        /*queueNames.add("activemq"+ownerApplication.getOwnerApplicationId()+":queue:OwnerProtocol."+"connect"+".Out."+ownerApplication.getOwnerApplicationId());
-        queueNames.add("activemq"+ownerApplication.getOwnerApplicationId()+":queue:OwnerProtocol."+"hint"+".Out."+ownerApplication.getOwnerApplicationId());
-        queueNames.add("activemq"+ownerApplication.getOwnerApplicationId()+":queue:OwnerProtocol."+"textMessage"+".Out."+ownerApplication.getOwnerApplicationId());
-        queueNames.add("activemq"+ownerApplication.getOwnerApplicationId()+":queue:OwnerProtocol."+"open"+".Out."+ownerApplication.getOwnerApplicationId());
-        queueNames.add("activemq"+ownerApplication.getOwnerApplicationId()+":queue:OwnerProtocol."+"close"+".Out."+ownerApplication.getOwnerApplicationId());
-        */
+    /*
+     * queueNames.add("activemq"+ownerApplication.getOwnerApplicationId()+
+     * ":queue:OwnerProtocol."+"connect"+".Out."+ownerApplication.
+     * getOwnerApplicationId());
+     * queueNames.add("activemq"+ownerApplication.getOwnerApplicationId()+
+     * ":queue:OwnerProtocol."+"hint"+".Out."+ownerApplication.getOwnerApplicationId
+     * ()); queueNames.add("activemq"+ownerApplication.getOwnerApplicationId()+
+     * ":queue:OwnerProtocol."+"textMessage"+".Out."+ownerApplication.
+     * getOwnerApplicationId());
+     * queueNames.add("activemq"+ownerApplication.getOwnerApplicationId()+
+     * ":queue:OwnerProtocol."+"open"+".Out."+ownerApplication.getOwnerApplicationId
+     * ()); queueNames.add("activemq"+ownerApplication.getOwnerApplicationId()+
+     * ":queue:OwnerProtocol."+"close"+".Out."+ownerApplication.
+     * getOwnerApplicationId());
+     */
     ownerApplication.setQueueNames(queueNames);
-    //logger.debug(ownerApplication.getQueueNames().get(0));
-    //logger.debug(ownerApplication.getQueueNames().get(1));
+    // logger.debug(ownerApplication.getQueueNames().get(0));
+    // logger.debug(ownerApplication.getQueueNames().get(1));
 
     return ownerApplication.getQueueNames();
   }
 
-  @Override public String getEndpointForMessage(String methodName, String ownerApplicationID) {
+  @Override
+  public String getEndpointForMessage(String methodName, String ownerApplicationID) {
     OwnerApplication ownerApplication = ownerApplicationRepository.findByOwnerApplicationId(ownerApplicationID).get(0);
     List<String> queueNames = ownerApplication.getQueueNames();
     String endpoint = "";

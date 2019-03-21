@@ -26,23 +26,26 @@ import java.util.Calendar;
 import java.util.Date;
 
 /**
- * Servlet filter that adds response headers indicating that the response never expires.
+ * Servlet filter that adds response headers indicating that the response never
+ * expires.
  */
 public class NeverExpiresFilter implements Filter {
-  //date format for Expires header (rfc 1123)
+  // date format for Expires header (rfc 1123)
   private static final String DATE_FORMAT_RFC_1123 = "EEE, dd MMM yyyy HH:mm:ss z";
 
-  @Override public void init(final FilterConfig filterConfig) throws ServletException {
+  @Override
+  public void init(final FilterConfig filterConfig) throws ServletException {
 
   }
 
   /**
-   * Sets the Date and Expires header fields such that the response will be treated as 'never expires'
-   * (and will therefore be cached forever)
+   * Sets the Date and Expires header fields such that the response will be
+   * treated as 'never expires' (and will therefore be cached forever)
    *
    * @return the headers map with added header values
    */
-  @Override public void doFilter(final ServletRequest servletRequest, final ServletResponse servletResponse,
+  @Override
+  public void doFilter(final ServletRequest servletRequest, final ServletResponse servletResponse,
       final FilterChain filterChain) throws IOException, ServletException {
     HttpServletResponse response = (HttpServletResponse) servletResponse;
     SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_RFC_1123);
@@ -51,12 +54,13 @@ public class NeverExpiresFilter implements Filter {
     filterChain.doFilter(servletRequest, response);
   }
 
-  @Override public void destroy() {
+  @Override
+  public void destroy() {
 
   }
 
-  //Calculates a date that, according to http spec, means 'never expires'
-  //See http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
+  // Calculates a date that, according to http spec, means 'never expires'
+  // See http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
   private Date getNeverExpiresDate() {
     Calendar cal = Calendar.getInstance();
     cal.setTime(new Date());

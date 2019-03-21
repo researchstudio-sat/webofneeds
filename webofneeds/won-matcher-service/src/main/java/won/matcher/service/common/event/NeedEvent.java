@@ -12,11 +12,11 @@ import java.io.Serializable;
 import java.io.StringWriter;
 
 /**
- * This event is used in the matching service to indicate that a new need has been found.
- * It includes the URIs of the need and the won node and optionally the serialized resource
+ * This event is used in the matching service to indicate that a new need has
+ * been found. It includes the URIs of the need and the won node and optionally
+ * the serialized resource
  * <p>
- * User: hfriedrich
- * Date: 04.06.2015
+ * User: hfriedrich Date: 04.06.2015
  */
 public class NeedEvent implements Serializable {
   private String uri;
@@ -83,13 +83,15 @@ public class NeedEvent implements Serializable {
     return SparqlService.deserializeDataset(serializedNeedResource, getSerializationFormat());
   }
 
-  @Override public NeedEvent clone() {
+  @Override
+  public NeedEvent clone() {
     NeedEvent e = new NeedEvent(uri, wonNodeUri, eventType, crawlDate, serializedNeedResource,
         getSerializationFormat());
     return e;
   }
 
-  @Override public String toString() {
+  @Override
+  public String toString() {
     return getUri();
   }
 

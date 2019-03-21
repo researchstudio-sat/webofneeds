@@ -15,7 +15,8 @@ public class Claims extends MessageEffect {
     return claimedMessageUri;
   }
 
-  @Override public String toString() {
+  @Override
+  public String toString() {
     return "Claims [claimedMessageUri=" + claimedMessageUri + "]";
   }
 

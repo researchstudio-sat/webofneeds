@@ -27,8 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * User: LEIH-NB
- * Date: 23.07.14
+ * User: LEIH-NB Date: 23.07.14
  */
 public class ConnectionPojo {
 

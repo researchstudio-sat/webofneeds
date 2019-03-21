@@ -44,7 +44,8 @@ public class MailCommandAction extends BaseEventBotAction {
     this.mailContentExtractor = mailContentExtractor;
   }
 
-  @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
+  @Override
+  protected void doRun(Event event, EventListener executingListener) throws Exception {
     EventListenerContext ctx = getEventListenerContext();
     if (event instanceof MailCommandEvent && ctx.getBotContextWrapper() instanceof MailBotContextWrapper) {
       MailBotContextWrapper botContextWrapper = (MailBotContextWrapper) ctx.getBotContextWrapper();
@@ -77,8 +78,10 @@ public class MailCommandAction extends BaseEventBotAction {
       bus.publish(new SubscribeUnsubscribeEvent(message, SubscribeStatus.UNSUBSCRIBED));
       break;
     case CLOSE_NEED:
-                /*A need can be closed with a mail that matches the takenCmdPattern in its subject and has the same title
-                 as a previously created need by the user*/
+      /*
+       * A need can be closed with a mail that matches the takenCmdPattern in its
+       * subject and has the same title as a previously created need by the user
+       */
       URI needUri = retrieveCorrespondingNeedUriFromMailByTitle(message);
       if (needUri != null) {
         bus.publish(new DeactivateNeedCommandEvent(needUri));
@@ -86,7 +89,7 @@ public class MailCommandAction extends BaseEventBotAction {
       break;
     case NO_ACTION:
     default:
-      //INVALID COMMAND
+      // INVALID COMMAND
       logger.error("No command was given or assumed");
       break;
     }
@@ -162,7 +165,7 @@ public class MailCommandAction extends BaseEventBotAction {
         break;
       case NO_ACTION:
       default:
-        //INVALID COMMAND
+        // INVALID COMMAND
         logger.error("No command was given or assumed");
         break;
       }
@@ -174,8 +177,9 @@ public class MailCommandAction extends BaseEventBotAction {
   }
 
   /**
-   * This Method tries to find a corresponding open need uri from a user(given by the from adress) and returns the
-   * corresponding need uri if there was an open need with the same title
+   * This Method tries to find a corresponding open need uri from a user(given by
+   * the from adress) and returns the corresponding need uri if there was an open
+   * need with the same title
    *
    * @param message used to extract sender adress and subject(title)
    * @return
@@ -225,7 +229,8 @@ public class MailCommandAction extends BaseEventBotAction {
         } else if (ActionType.CLOSE_NEED.equals(mailAction)) {
           return ActionType.CLOSE_NEED;
         } else {
-          //if the connection is not connected yet and we do not parse any command we assume that the mailsender wants to establish a connection
+          // if the connection is not connected yet and we do not parse any command we
+          // assume that the mailsender wants to establish a connection
           return ActionType.IMPLICIT_OPEN_CONNECTION;
         }
       case NEED:

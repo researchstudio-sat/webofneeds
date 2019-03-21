@@ -17,8 +17,7 @@
 package won.bot.framework.eventbot.action.impl.counter;
 
 /**
- * User: fkleedorfer
- * Date: 30.04.14
+ * User: fkleedorfer Date: 30.04.14
  */
 public interface Counter {
   int getCount();

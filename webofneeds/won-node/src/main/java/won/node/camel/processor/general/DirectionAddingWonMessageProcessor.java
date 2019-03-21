@@ -33,7 +33,8 @@ public class DirectionAddingWonMessageProcessor implements WonMessageProcessor {
     this.direction = direction;
   }
 
-  @Override public WonMessage process(WonMessage message) throws WonMessageProcessingException {
+  @Override
+  public WonMessage process(WonMessage message) throws WonMessageProcessingException {
     message.addMessageProperty(RDF.type, direction.getResource());
     return message;
   }

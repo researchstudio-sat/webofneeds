@@ -29,12 +29,14 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * This Class is used to generate all Mails that are going to be sent via the Mail2WonBot
+ * This Class is used to generate all Mails that are going to be sent via the
+ * Mail2WonBot
  */
 public class WonMimeMessageGenerator {
   private static final Logger logger = LoggerFactory.getLogger(WonMimeMessageGenerator.class);
 
-  @Autowired private VelocityEngine velocityEngine;
+  @Autowired
+  private VelocityEngine velocityEngine;
 
   private int MAX_CONVERSATION_DEPTH = 3;
   private char QUOTE_CHAR = '>';
@@ -55,7 +57,8 @@ public class WonMimeMessageGenerator {
   }
 
   /**
-   * Creates Response Message that is sent when a need tries to connect with another need
+   * Creates Response Message that is sent when a need tries to connect with
+   * another need
    */
   public WonMimeMessage createConnectMail(MimeMessage msgToRespondTo, URI remoteNeedUri)
       throws MessagingException, IOException {
@@ -101,9 +104,11 @@ public class WonMimeMessageGenerator {
   }
 
   /**
-   * Creates the DefaultContext and fills in all relevant Infos which are used in every Mail, in our Case this is the NeedInfo and the quoted Original Message
+   * Creates the DefaultContext and fills in all relevant Infos which are used in
+   * every Mail, in our Case this is the NeedInfo and the quoted Original Message
    *
-   * @param msgToRespondTo Message that the new Mail is in ResponseTo (to extract the mailtext)
+   * @param msgToRespondTo Message that the new Mail is in ResponseTo (to extract
+   *                       the mailtext)
    * @param remoteNeedUri  To extract the corresponding Need Data
    * @return VelocityContext that has prefilled all the necessary Data
    * @throws IOException
@@ -131,12 +136,14 @@ public class WonMimeMessageGenerator {
     answerMessage.setSubject(
         answerMessage.getSubject() + " <-> " + StringUtils.trim(needModelWrapper.getSomeTitleFromIsOrAll("en", "de")));
 
-    //We need to create an instance of our own MimeMessage Implementation in order to have the Unique Message Id set before sending
+    // We need to create an instance of our own MimeMessage Implementation in order
+    // to have the Unique Message Id set before sending
     WonMimeMessage wonAnswerMessage = new WonMimeMessage(answerMessage);
     wonAnswerMessage.updateMessageID();
     String messageId = wonAnswerMessage.getMessageID();
 
-    // put variables (e.g. Message-Id) for the footer into the context and create mail body using the template
+    // put variables (e.g. Message-Id) for the footer into the context and create
+    // mail body using the template
     putCommandFooter(velocityContext, wonAnswerMessage);
     StringWriter writer = new StringWriter();
     template.merge(velocityContext, writer);
@@ -210,7 +217,8 @@ public class WonMimeMessageGenerator {
    *
    * @param velocityContext context to put template-vars in
    * @param connectionUri   connectionUri to retrieve events from
-   * @param requesterUri    determines your need uri (to know which messages are from you)
+   * @param requesterUri    determines your need uri (to know which messages are
+   *                        from you)
    */
   private void putMessages(VelocityContext velocityContext, URI connectionUri, URI requesterUri) {
     logger.debug("getting the messages for connectionuri: {}", connectionUri);
@@ -227,7 +235,8 @@ public class WonMimeMessageGenerator {
         qExec.getContext().set(TDB.symUnionDefaultGraph, true);
         ResultSet results = qExec.execSelect();
 
-        Boolean lastSource = null; //must be undefined since we do not know who the source of the last retrieved message is
+        Boolean lastSource = null; // must be undefined since we do not know who the source of the last retrieved
+                                   // message is
         String quote = "";
 
         List<String> messages = new ArrayList<>();
@@ -235,19 +244,19 @@ public class WonMimeMessageGenerator {
 
         while (results.hasNext()) {
           QuerySolution soln = results.nextSolution();
-          boolean msgSource = isYourMessage(soln, requesterUri); //Determine the source of this message
+          boolean msgSource = isYourMessage(soln, requesterUri); // Determine the source of this message
 
           if (lastSource != null && msgSource != lastSource && messageBlock.size() > 0) {
             messages.add(getMsgSourceString(quote, lastSource));
             Collections.reverse(messageBlock);
             messages.addAll(messageBlock);
-            messages.add(quote); //ADD EMPTY LINE TO MAKE THIS MORE READABLE
+            messages.add(quote); // ADD EMPTY LINE TO MAKE THIS MORE READABLE
             messageBlock.clear();
             quote += QUOTE_CHAR;
           }
 
-          if (MAX_CONVERSATION_DEPTH != -1
-              && quote.length() > MAX_CONVERSATION_DEPTH) { //+1 so you always retrieve the newest messages anyway
+          if (MAX_CONVERSATION_DEPTH != -1 && quote.length() > MAX_CONVERSATION_DEPTH) { // +1 so you always retrieve
+                                                                                         // the newest messages anyway
             messages.add(getMsgSourceString(quote, msgSource));
             messages.add(quote + "[...]");
             break;
@@ -289,8 +298,10 @@ public class WonMimeMessageGenerator {
    * Determines the Source of the Message
    *
    * @param soln         to retrieve the needUri
-   * @param requesterUri determines your need uri (to know which messages are from you)
-   * @return true if the message came from you, false if the message did not come from you
+   * @param requesterUri determines your need uri (to know which messages are from
+   *                     you)
+   * @return true if the message came from you, false if the message did not come
+   *         from you
    */
   private static boolean isYourMessage(QuerySolution soln, URI requesterUri) {
     return requesterUri.toString().equals(soln.get("needUri").asResource().getURI());

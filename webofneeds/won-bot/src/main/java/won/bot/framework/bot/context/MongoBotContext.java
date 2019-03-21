@@ -20,13 +20,15 @@ public class MongoBotContext implements BotContext {
   protected static final String NEED_URI_COLLECTION = "need_uris";
   protected static final String NODE_URI_COLLECTION = "node_uris";
 
-  @Autowired private MongoTemplate template;
+  @Autowired
+  private MongoTemplate template;
 
   public void setTemplate(final MongoTemplate template) {
     this.template = template;
   }
 
-  @Override public Set<URI> retrieveAllNeedUris() {
+  @Override
+  public Set<URI> retrieveAllNeedUris() {
 
     Set<URI> uris = new HashSet<>();
     List<MongoContextObjectList> contextObjects = template.findAll(MongoContextObjectList.class, NEED_URI_COLLECTION);
@@ -42,26 +44,32 @@ public class MongoBotContext implements BotContext {
     return uris;
   }
 
-  @Override public boolean isNeedKnown(final URI needURI) {
+  @Override
+  public boolean isNeedKnown(final URI needURI) {
 
-    // query the field "objectList" since this is the name of the member variable of MongoContextObjectList
+    // query the field "objectList" since this is the name of the member variable of
+    // MongoContextObjectList
     Query query = new Query(Criteria.where("objectList.string").is(needURI.toString()));
     return null != template.find(query, String.class, NEED_URI_COLLECTION);
   }
 
-  @Override public void removeNeedUriFromNamedNeedUriList(final URI uri, final String name) {
+  @Override
+  public void removeNeedUriFromNamedNeedUriList(final URI uri, final String name) {
     template.remove(uri, name);
   }
 
-  @Override public void appendToNamedNeedUriList(final URI uri, final String name) {
+  @Override
+  public void appendToNamedNeedUriList(final URI uri, final String name) {
     template.insert(uri, name);
   }
 
-  @Override public List<URI> getNamedNeedUriList(final String name) {
+  @Override
+  public List<URI> getNamedNeedUriList(final String name) {
     return template.findAll(URI.class, name);
   }
 
-  @Override public boolean isInNamedNeedUriList(URI uri, String name) {
+  @Override
+  public boolean isInNamedNeedUriList(URI uri, String name) {
     List<URI> uris = getNamedNeedUriList(name);
 
     for (URI tmpUri : uris) {
@@ -72,38 +80,43 @@ public class MongoBotContext implements BotContext {
     return false;
   }
 
-  @Override public boolean isNodeKnown(final URI wonNodeURI) {
+  @Override
+  public boolean isNodeKnown(final URI wonNodeURI) {
     return null != get(NODE_URI_COLLECTION, wonNodeURI.toString());
   }
 
-  @Override public void rememberNodeUri(final URI uri) {
+  @Override
+  public void rememberNodeUri(final URI uri) {
     save(NODE_URI_COLLECTION, uri.toString(), uri);
   }
 
-  @Override public void removeNodeUri(final URI uri) {
+  @Override
+  public void removeNodeUri(final URI uri) {
     remove(NODE_URI_COLLECTION, uri.toString());
   }
 
   /**
-   * Use this method to make sure that certain collections (need and node uris) are only accessed with non-generic
-   * methods
+   * Use this method to make sure that certain collections (need and node uris)
+   * are only accessed with non-generic methods
    *
    * @param collectionName
    */
   private void checkValidCollectionName(String collectionName) {
 
-    if (collectionName == null || collectionName.equals(NEED_URI_COLLECTION) || collectionName
-        .equals(NODE_URI_COLLECTION) || collectionName.trim().isEmpty()) {
-      throw new IllegalArgumentException("Generic collection name must be valid and not one of the following:" +
-          " " + NODE_URI_COLLECTION + ", " + NEED_URI_COLLECTION);
+    if (collectionName == null || collectionName.equals(NEED_URI_COLLECTION)
+        || collectionName.equals(NODE_URI_COLLECTION) || collectionName.trim().isEmpty()) {
+      throw new IllegalArgumentException("Generic collection name must be valid and not one of the following:" + " "
+          + NODE_URI_COLLECTION + ", " + NEED_URI_COLLECTION);
     }
   }
 
-  @Override public void dropCollection(String collectionName) {
+  @Override
+  public void dropCollection(String collectionName) {
     template.dropCollection(collectionName);
   }
 
-  @Override public void saveToObjectMap(String collectionName, String key, final Serializable value) {
+  @Override
+  public void saveToObjectMap(String collectionName, String key, final Serializable value) {
 
     checkValidCollectionName(collectionName);
     save(collectionName, key, value);
@@ -114,7 +127,8 @@ public class MongoBotContext implements BotContext {
     template.save(mco, collectionName);
   }
 
-  @Override public final Object loadFromObjectMap(String collectionName, String key) {
+  @Override
+  public final Object loadFromObjectMap(String collectionName, String key) {
 
     checkValidCollectionName(collectionName);
     return get(collectionName, key);
@@ -129,7 +143,8 @@ public class MongoBotContext implements BotContext {
     return null;
   }
 
-  @Override public Map<String, Object> loadObjectMap(String collectionName) {
+  @Override
+  public Map<String, Object> loadObjectMap(String collectionName) {
 
     checkValidCollectionName(collectionName);
     List<MongoContextObject> contextObjects = template.findAll(MongoContextObject.class, collectionName);
@@ -141,7 +156,8 @@ public class MongoBotContext implements BotContext {
     return objectMap;
   }
 
-  @Override public final void removeFromObjectMap(String collectionName, String key) {
+  @Override
+  public final void removeFromObjectMap(String collectionName, String key) {
 
     checkValidCollectionName(collectionName);
     remove(collectionName, key);
@@ -153,14 +169,16 @@ public class MongoBotContext implements BotContext {
     template.remove(mco, collectionName);
   }
 
-  @Override public List<Object> loadFromListMap(final String collectionName, final String key) {
+  @Override
+  public List<Object> loadFromListMap(final String collectionName, final String key) {
 
     checkValidCollectionName(collectionName);
     MongoContextObjectList mco = template.findById(key, MongoContextObjectList.class, collectionName);
     return mco == null ? new LinkedList<>() : mco.getList();
   }
 
-  @Override public void addToListMap(final String collectionName, final String key, final Serializable... value) {
+  @Override
+  public void addToListMap(final String collectionName, final String key, final Serializable... value) {
 
     checkValidCollectionName(collectionName);
     push(collectionName, key, value);
@@ -171,12 +189,14 @@ public class MongoBotContext implements BotContext {
     Update update = new Update();
     Query query = new Query(Criteria.where("_id").is(key));
 
-    // push values to the field "objectList" since this is the name of the member variable of MongoContextObjectList
+    // push values to the field "objectList" since this is the name of the member
+    // variable of MongoContextObjectList
     // from there we can easily access it again for loading
     template.upsert(query, update.pushAll("objectList", value), collectionName);
   }
 
-  @Override public void removeFromListMap(final String collectionName, final String key, final Serializable... values) {
+  @Override
+  public void removeFromListMap(final String collectionName, final String key, final Serializable... values) {
 
     checkValidCollectionName(collectionName);
     pull(collectionName, key, values);
@@ -195,11 +215,13 @@ public class MongoBotContext implements BotContext {
     Update update = new Update();
     Query query = new Query(Criteria.where("_id").is(key));
 
-    // pull values of the field "objectList" since this is the name of the member variable of MongoContextObjectList
+    // pull values of the field "objectList" since this is the name of the member
+    // variable of MongoContextObjectList
     template.upsert(query, update.pullAll("objectList", values), collectionName);
   }
 
-  @Override public Map<String, List<Object>> loadListMap(final String collectionName) {
+  @Override
+  public Map<String, List<Object>> loadListMap(final String collectionName) {
 
     checkValidCollectionName(collectionName);
     List<MongoContextObjectList> contextObjects = template.findAll(MongoContextObjectList.class, collectionName);
@@ -211,7 +233,8 @@ public class MongoBotContext implements BotContext {
     return objectMap;
   }
 
-  @Override public void removeFromListMap(final String collectionName, final String key) {
+  @Override
+  public void removeFromListMap(final String collectionName, final String key) {
 
     checkValidCollectionName(collectionName);
     MongoContextObjectList mco = new MongoContextObjectList(key);

@@ -16,14 +16,16 @@ import won.protocol.model.FacetType;
 public class ReviewFacetImpl extends AbstractFacet {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Override public FacetType getFacetType() {
+  @Override
+  public FacetType getFacetType() {
     return FacetType.ReviewFacet;
   }
 
-  @Override public void connectFromNeed(final Connection con, final Model content, final WonMessage wonMessage)
+  @Override
+  public void connectFromNeed(final Connection con, final Model content, final WonMessage wonMessage)
       throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
 
     super.connectFromNeed(con, content, wonMessage);
-    /* when connected change linked data*/
+    /* when connected change linked data */
   }
 }

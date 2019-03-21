@@ -32,7 +32,8 @@ public class UnsubscribeListenerAction extends BaseEventBotAction {
     this.listener = listener;
   }
 
-  @Override protected void doRun(final Event event, EventListener executingListener) throws Exception {
+  @Override
+  protected void doRun(final Event event, EventListener executingListener) throws Exception {
     getEventListenerContext().getEventBus().unsubscribe(listener);
   }
 }

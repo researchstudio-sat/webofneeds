@@ -8,6 +8,6 @@ import won.owner.model.PersistentLogin;
 public interface PersistentLoginRepository extends CrudRepository<PersistentLogin, String> {
   public void deleteByUsername(String username);
 
-  @Query("SELECT pl FROM PersistentLogin pl JOIN FETCH pl.keystorePasswordHolder WHERE pl.id = (:id)") public PersistentLogin findOneEagerly(
-      @Param("id") String id);
+  @Query("SELECT pl FROM PersistentLogin pl JOIN FETCH pl.keystorePasswordHolder WHERE pl.id = (:id)")
+  public PersistentLogin findOneEagerly(@Param("id") String id);
 }

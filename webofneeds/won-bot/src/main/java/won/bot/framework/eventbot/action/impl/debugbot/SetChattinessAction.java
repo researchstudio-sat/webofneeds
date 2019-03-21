@@ -27,7 +27,8 @@ import java.net.URI;
 import static won.bot.framework.eventbot.action.impl.debugbot.SendChattyMessageAction.KEY_CHATTY_CONNECTIONS;
 
 /**
- * Expects a SetChattinessDebugCommandEvent and sets the chattiness for the connection of the event.
+ * Expects a SetChattinessDebugCommandEvent and sets the chattiness for the
+ * connection of the event.
  */
 public class SetChattinessAction extends BaseEventBotAction {
 
@@ -35,7 +36,8 @@ public class SetChattinessAction extends BaseEventBotAction {
     super(eventListenerContext);
   }
 
-  @Override protected void doRun(final Event event, EventListener executingListener) throws Exception {
+  @Override
+  protected void doRun(final Event event, EventListener executingListener) throws Exception {
     if (event instanceof SetChattinessDebugCommandEvent) {
       SetChattinessDebugCommandEvent chattinessDebugCommandEvent = (SetChattinessDebugCommandEvent) event;
 

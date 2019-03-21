@@ -46,11 +46,11 @@ public class CommentBot extends EventBot {
   private static final int NO_OF_NEEDS = 1;
   private static final long MILLIS_BETWEEN_MESSAGES = 10;
 
-  //we use protected members so we can extend the class and
-  //access the listeners for unit test assertions and stats
+  // we use protected members so we can extend the class and
+  // access the listeners for unit test assertions and stats
   //
-  //we use BaseEventListener as their types so we can access the generic
-  //functionality offered by that class
+  // we use BaseEventListener as their types so we can access the generic
+  // functionality offered by that class
   protected BaseEventListener needCreator;
   protected BaseEventListener commentFacetCreator;
   protected BaseEventListener needConnector;
@@ -61,18 +61,19 @@ public class CommentBot extends EventBot {
   protected BaseEventListener needDeactivator;
   protected BaseEventListener workDoneSignaller;
 
-  @Override protected void initializeEventListeners() {
+  @Override
+  protected void initializeEventListeners() {
     EventListenerContext ctx = getEventListenerContext();
     final EventBus bus = getEventBus();
 
     CommentBotContextWrapper botContextWrapper = (CommentBotContextWrapper) getBotContextWrapper();
 
-    //create needs every trigger execution until 2 needs are created
+    // create needs every trigger execution until 2 needs are created
     this.needCreator = new ActionOnEventListener(ctx,
         new CreateNeedWithFacetsAction(ctx, botContextWrapper.getNeedCreateListName()), NO_OF_NEEDS);
     bus.subscribe(ActEvent.class, this.needCreator);
 
-    //count until 1 need is created, then create a comment facet
+    // count until 1 need is created, then create a comment facet
     this.commentFacetCreator = new ActionOnEventListener(ctx,
         new CreateNeedWithFacetsAction(ctx, botContextWrapper.getCommentListName(), FacetType.CommentFacet.getURI()),
         1);
@@ -89,19 +90,20 @@ public class CommentBot extends EventBot {
     bus.subscribe(ConnectFromOtherNeedEvent.class, this.autoOpener);
 
     BaseEventListener assertionRunner = new ActionOnceAfterNEventsListener(ctx, 1, new BaseEventBotAction(ctx) {
-      @Override protected void doRun(final Event event, EventListener executingListener) throws Exception {
+      @Override
+      protected void doRun(final Event event, EventListener executingListener) throws Exception {
         executeAssertionsForEstablishedConnectionInternal(bus);
       }
     });
 
     bus.subscribe(OpenFromOtherNeedEvent.class, assertionRunner);
 
-    //deactivate all needs when the assertion was executed
+    // deactivate all needs when the assertion was executed
     this.allNeedsDeactivator = new ActionOnEventListener(ctx, new DeactivateAllNeedsAction(ctx), 1);
     bus.subscribe(AssertionsExecutedEvent.class, this.allNeedsDeactivator);
 
-    //add a listener that counts two NeedDeactivatedEvents and then tells the
-    //framework that the bot's work is done
+    // add a listener that counts two NeedDeactivatedEvents and then tells the
+    // framework that the bot's work is done
     this.workDoneSignaller = new ActionOnceAfterNEventsListener(ctx, 2, new SignalWorkDoneAction(ctx));
     bus.subscribe(NeedDeactivatedEvent.class, this.workDoneSignaller);
 

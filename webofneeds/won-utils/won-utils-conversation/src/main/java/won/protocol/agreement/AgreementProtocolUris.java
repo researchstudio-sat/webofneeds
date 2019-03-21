@@ -109,7 +109,8 @@ public class AgreementProtocolUris {
     return pendingProposals;
   }
 
-  @Override public String toString() {
+  @Override
+  public String toString() {
     return "AgreementProtocolUris [retracted=" + retractedUris + ", rejected=" + rejectedUris + ", claimed="
         + claimedUris + ", agreements=" + agreementUris + ", pendingProposals=" + pendingProposalUris
         + ", cancelledAgreements=" + cancelledAgreementUris + ", cancellationPendingAgreements="

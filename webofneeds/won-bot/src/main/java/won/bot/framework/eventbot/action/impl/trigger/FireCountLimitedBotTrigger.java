@@ -6,11 +6,11 @@ import java.time.Duration;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * A BotTrigger that will fire in specified intervals until its fireCount is reached.
- * Additional firings can be added using addFirings().
+ * A BotTrigger that will fire in specified intervals until its fireCount is
+ * reached. Additional firings can be added using addFirings().
  * <p>
- * The trigger tries to speed up and slow down in order to fire as often as possible, but
- * only when it is allowed to.
+ * The trigger tries to speed up and slow down in order to fire as often as
+ * possible, but only when it is allowed to.
  *
  * @author fkleedorfer
  */
@@ -26,7 +26,8 @@ public class FireCountLimitedBotTrigger extends BotTrigger {
     this.firings.addAndGet(delta);
   }
 
-  @Override protected void fire() {
+  @Override
+  protected void fire() {
     if (this.firings.getAndDecrement() > 0) {
       super.fire();
       changeIntervalByFactor(0.99);

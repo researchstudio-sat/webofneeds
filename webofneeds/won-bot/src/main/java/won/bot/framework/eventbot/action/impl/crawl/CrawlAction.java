@@ -29,8 +29,9 @@ import won.bot.framework.eventbot.event.impl.crawl.CrawlCommandSuccessEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 
 /**
- * Expects a CrawlCommandEvent to contain the required crawl information. Crawls the data using
- * the LinkedDataSource and publishes a CrawlSuccessEvent when done.
+ * Expects a CrawlCommandEvent to contain the required crawl information. Crawls
+ * the data using the LinkedDataSource and publishes a CrawlSuccessEvent when
+ * done.
  */
 public class CrawlAction extends BaseEventBotAction {
   private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -39,7 +40,8 @@ public class CrawlAction extends BaseEventBotAction {
     super(eventListenerContext);
   }
 
-  @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
+  @Override
+  protected void doRun(Event event, EventListener executingListener) throws Exception {
     if (!(event instanceof CrawlCommandEvent))
       return;
     CrawlCommandEvent crawlCommandEvent = (CrawlCommandEvent) event;
@@ -49,22 +51,18 @@ public class CrawlAction extends BaseEventBotAction {
     stopWatch.start();
     Dataset crawledData = null;
     try {
-      crawledData = ctx.getLinkedDataSource()
-          .getDataForResourceWithPropertyPath(crawlCommandEvent.getStartURI(), crawlCommandEvent.getNeedURI(),
-              crawlCommandEvent.getPropertyPaths(), crawlCommandEvent.getGetMaxRequest(),
-              crawlCommandEvent.getMaxDepth());
+      crawledData = ctx.getLinkedDataSource().getDataForResourceWithPropertyPath(crawlCommandEvent.getStartURI(),
+          crawlCommandEvent.getNeedURI(), crawlCommandEvent.getPropertyPaths(), crawlCommandEvent.getGetMaxRequest(),
+          crawlCommandEvent.getMaxDepth());
     } catch (Exception e) {
       logger.debug("caught exeption during crawl for {}", crawlCommandEvent.getStartURI(), e);
-      ctx.getEventBus().publish(
-          new CrawlCommandFailureEvent(crawlCommandEvent, "Could not crawl " + crawlCommandEvent.getStartURI() +
-              " with WebID " + crawlCommandEvent.getNeedURI() +
-              ": caught " + e));
+      ctx.getEventBus().publish(new CrawlCommandFailureEvent(crawlCommandEvent, "Could not crawl "
+          + crawlCommandEvent.getStartURI() + " with WebID " + crawlCommandEvent.getNeedURI() + ": caught " + e));
       return;
     }
     stopWatch.stop();
     logger.debug("finished crawl for {} in {} millis", crawlCommandEvent.getStartURI(), stopWatch.getTotalTimeMillis());
     ctx.getEventBus().publish(new CrawlCommandSuccessEvent(crawlCommandEvent, crawledData,
-            "Finished crawling " + crawlCommandEvent.getStartURI() +
-                " in " + stopWatch.getTotalTimeMillis()));
+        "Finished crawling " + crawlCommandEvent.getStartURI() + " in " + stopWatch.getTotalTimeMillis()));
   }
 }

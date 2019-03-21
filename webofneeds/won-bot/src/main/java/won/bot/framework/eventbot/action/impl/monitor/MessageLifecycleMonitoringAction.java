@@ -52,7 +52,8 @@ public class MessageLifecycleMonitoringAction extends BaseEventBotAction {
     super(eventListenerContext);
   }
 
-  @Override protected void doRun(final Event event, EventListener executingListener) throws Exception {
+  @Override
+  protected void doRun(final Event event, EventListener executingListener) throws Exception {
 
     Stopwatch stopwatchB = SimonManager.getStopwatch("messageTripB");
     Stopwatch stopwatchBC = SimonManager.getStopwatch("messageTripBC");
@@ -86,12 +87,12 @@ public class MessageLifecycleMonitoringAction extends BaseEventBotAction {
 
       DeliveryResponseEvent responseEvent = (DeliveryResponseEvent) event;
 
-      if (connectionMsgUris.keySet().contains(responseEvent.getOriginalMessageURI()) || connectionMsgUris.keySet()
-          .contains(responseEvent.getRemoteResponseToMessageURI())) {
+      if (connectionMsgUris.keySet().contains(responseEvent.getOriginalMessageURI())
+          || connectionMsgUris.keySet().contains(responseEvent.getRemoteResponseToMessageURI())) {
         responseMsgUris.put(responseEvent.getMessage().getMessageURI(), responseEvent.getNeedURI());
         if (responseEvent.isRemoteResponse()) {
-          responseMsgUris
-              .put(responseEvent.getMessage().getCorrespondingRemoteMessageURI(), responseEvent.getRemoteNeedURI());
+          responseMsgUris.put(responseEvent.getMessage().getCorrespondingRemoteMessageURI(),
+              responseEvent.getRemoteNeedURI());
         }
       }
 
@@ -127,9 +128,8 @@ public class MessageLifecycleMonitoringAction extends BaseEventBotAction {
       Dataset dataset = getEventListenerContext().getLinkedDataSource().getDataForResource(uri, msgUris.get(uri));
       record(dataset, counter);
     }
-    String sizeInfo = "\nSIZES for " + name + ":\n" +
-        "messages=" + counter[0] + ", named-graphs=" + counter[1] + ", " +
-        "quads=" + counter[2] + ", bytes-in-Trig-UTF8=" + counter[3];
+    String sizeInfo = "\nSIZES for " + name + ":\n" + "messages=" + counter[0] + ", named-graphs=" + counter[1] + ", "
+        + "quads=" + counter[2] + ", bytes-in-Trig-UTF8=" + counter[3];
     logger.info(sizeInfo);
   }
 

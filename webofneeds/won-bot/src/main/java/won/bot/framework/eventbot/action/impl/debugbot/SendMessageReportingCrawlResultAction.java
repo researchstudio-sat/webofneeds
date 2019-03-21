@@ -22,7 +22,8 @@ public class SendMessageReportingCrawlResultAction extends SendMessageOnCrawlRes
     this.crawlStopWatch = crawlStopWatch;
   }
 
-  @Override protected Model makeFailureMessage(CrawlConnectionCommandFailureEvent failureEvent) {
+  @Override
+  protected Model makeFailureMessage(CrawlConnectionCommandFailureEvent failureEvent) {
     String message = failureEvent.getMessage();
     if (message == null || message.trim().length() == 0) {
       message = "[no message available]";
@@ -30,13 +31,13 @@ public class SendMessageReportingCrawlResultAction extends SendMessageOnCrawlRes
     return WonRdfUtils.MessageUtils.textMessage("Could not crawl connection data. Problem: " + message);
   }
 
-  @Override protected Model makeSuccessMessage(CrawlConnectionCommandSuccessEvent successEvent) {
+  @Override
+  protected Model makeSuccessMessage(CrawlConnectionCommandSuccessEvent successEvent) {
     crawlStopWatch.stop();
     Duration crawlDuration = Duration.ofMillis(crawlStopWatch.getLastTaskTimeMillis());
     Dataset conversation = successEvent.getCrawledData();
-    return WonRdfUtils.MessageUtils.textMessage(
-        "Finished crawl in " + getDurationString(crawlDuration) + " seconds. The dataset has " + conversation
-            .asDatasetGraph().size() + " rdf graphs.");
+    return WonRdfUtils.MessageUtils.textMessage("Finished crawl in " + getDurationString(crawlDuration)
+        + " seconds. The dataset has " + conversation.asDatasetGraph().size() + " rdf graphs.");
   }
 
   private String getDurationString(Duration queryDuration) {

@@ -24,7 +24,8 @@ import won.protocol.message.sender.WonMessageSender;
 import won.protocol.message.sender.exception.WonMessageSenderException;
 
 /**
- * Decorates the EventListenerContext such that the bot sends each message twice.
+ * Decorates the EventListenerContext such that the bot sends each message
+ * twice.
  */
 public class DelayedDuplicateMessageSenderDecorator extends BaseEventListenerContextDecorator {
   private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -39,10 +40,12 @@ public class DelayedDuplicateMessageSenderDecorator extends BaseEventListenerCon
     this.delay = delay;
   }
 
-  @Override public WonMessageSender getWonMessageSender() {
+  @Override
+  public WonMessageSender getWonMessageSender() {
     final WonMessageSender delegate = super.getWonMessageSender();
     return new WonMessageSender() {
-      @Override public void sendWonMessage(WonMessage message) throws WonMessageSenderException {
+      @Override
+      public void sendWonMessage(WonMessage message) throws WonMessageSenderException {
         delegate.sendWonMessage(message);
         try {
           Thread.sleep(delay);

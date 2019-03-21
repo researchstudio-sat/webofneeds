@@ -30,15 +30,15 @@ import java.util.List;
  * Instructs the bot to create a need.
  */
 public class CreateNeedCommandEvent implements MessageCommandEvent {
-  //the model of the need's content
+  // the model of the need's content
   private Dataset needDataset;
-  //the facets the new need should have
+  // the facets the new need should have
   private List<URI> facets;
-  //the name of the need uri list to save the need uri to
+  // the name of the need uri list to save the need uri to
   private String uriListName = BotContext.DEFAULT_NEED_LIST_NAME;
-  //sets the UsedForTesting flag
+  // sets the UsedForTesting flag
   private boolean usedForTesting = false;
-  //sets the do not match flag
+  // sets the do not match flag
   private boolean doNotMatch = false;
 
   public CreateNeedCommandEvent(Dataset needDataset, String uriListName, boolean usedForTesting, boolean doNotMatch,
@@ -72,7 +72,8 @@ public class CreateNeedCommandEvent implements MessageCommandEvent {
     this(needDataset, uriListName, null);
   }
 
-  @Override public WonMessageType getWonMessageType() {
+  @Override
+  public WonMessageType getWonMessageType() {
     return WonMessageType.CREATE_NEED;
   }
 

@@ -30,23 +30,24 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * User: sbyim
- * Date: 13.11.13
+ * User: sbyim Date: 13.11.13
  */
 public class OwnerProtocolOutgoingMessagesProcessor implements Processor {
   private final org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
 
   private QueueManagementService queueManagementService;
-  @Autowired private OwnerApplicationRepository ownerApplicationRepository;
+  @Autowired
+  private OwnerApplicationRepository ownerApplicationRepository;
 
-  @Override public void process(Exchange exchange) throws Exception {
+  @Override
+  public void process(Exchange exchange) throws Exception {
     logger.debug("processing messages for dynamic recipients generation");
     Map headers = exchange.getIn().getHeaders();
     Map properties = exchange.getProperties();
     List<String> ownerApplications = (List<String>) headers.get(WonCamelConstants.OWNER_APPLICATIONS);
-    //       String methodName =headers.get("methodName").toString();
-    logger
-        .debug("number of registered owner applications: {}", ownerApplications == null ? 0 : ownerApplications.size());
+    // String methodName =headers.get("methodName").toString();
+    logger.debug("number of registered owner applications: {}",
+        ownerApplications == null ? 0 : ownerApplications.size());
     List<String> queueNames = convertToQueueName(ownerApplications, "wonMessage", exchange);
     exchange.getIn().setHeader("ownerApplicationIDs", queueNames);
   }
@@ -58,8 +59,8 @@ public class OwnerProtocolOutgoingMessagesProcessor implements Processor {
       OwnerApplication ownerApplication = ownerApplicationRepository.findByOwnerApplicationId(ownerApplications.get(i))
           .get(i);
       logger.debug("ownerApplicationID: " + ownerApplications.get(i));
-      ownerApplicationQueueNames
-          .add(i, queueManagementService.getEndpointForMessage(methodName, ownerApplication.getOwnerApplicationId()));
+      ownerApplicationQueueNames.add(i,
+          queueManagementService.getEndpointForMessage(methodName, ownerApplication.getOwnerApplicationId()));
 
     }
     return ownerApplicationQueueNames;

@@ -43,9 +43,8 @@ public class MailParserAction extends BaseEventBotAction {
           bus.publish(new MailCommandEvent(message));
 
         } else {
-          logger
-              .warn("unknown mail from user '{}' with subject '{}', no further processing required", senderMailAddress,
-                  message.getSubject());
+          logger.warn("unknown mail from user '{}' with subject '{}', no further processing required",
+              senderMailAddress, message.getSubject());
         }
       } catch (MessagingException me) {
         logger.error("Messaging exception occurred while processing MimeMessage: {}", me);
@@ -63,7 +62,8 @@ public class MailParserAction extends BaseEventBotAction {
     MailBotContextWrapper botContextWrapper = ((MailBotContextWrapper) ctx.getBotContextWrapper());
     SubscribeStatus subscribeStatus = botContextWrapper.getSubscribeStatusForMailAddress(senderMailAddress);
 
-    // depending of the user has subscribed/unsubscribed (via mailto links) his mails will be
+    // depending of the user has subscribed/unsubscribed (via mailto links) his
+    // mails will be
     // published as needs, discarded or cached
     if (SubscribeStatus.SUBSCRIBED.equals(subscribeStatus)) {
       logger.info("received a create mail from subscribed user '{}' with subject '{}' so publish as need",

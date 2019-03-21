@@ -18,33 +18,38 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 /**
- * Actor that updates the meta data of the crawling of URIs (baseUri, date, status) in a Sparql endpoint.
- * This is used to know which URIs have already been crawled and for which URIs the
- * crawling is still running or failed.
- * Also the actor collects a certain number of messages before it updates the meta data in
- * a single query bulk update for all of them.
+ * Actor that updates the meta data of the crawling of URIs (baseUri, date,
+ * status) in a Sparql endpoint. This is used to know which URIs have already
+ * been crawled and for which URIs the crawling is still running or failed. Also
+ * the actor collects a certain number of messages before it updates the meta
+ * data in a single query bulk update for all of them.
  * <p>
- * User: hfriedrich
- * Date: 17.04.2015
+ * User: hfriedrich Date: 17.04.2015
  */
-@Component @Scope("prototype") public class UpdateMetadataActor extends UntypedActor {
+@Component
+@Scope("prototype")
+public class UpdateMetadataActor extends UntypedActor {
   private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
   private Collection<CrawlUriMessage> bulkMessages = new LinkedList<>();
   private static final String TICK = "tick";
 
-  @Autowired private CrawlConfig config;
+  @Autowired
+  private CrawlConfig config;
 
-  @Autowired private CrawlSparqlService endpoint;
+  @Autowired
+  private CrawlSparqlService endpoint;
 
-  @Override public void preStart() {
+  @Override
+  public void preStart() {
 
-    // Execute the bulk update at least once a while even if not enough messages are there
-    getContext().system().scheduler()
-        .schedule(config.getMetaDataUpdateMaxDuration(), config.getMetaDataUpdateMaxDuration(), getSelf(), TICK,
-            getContext().dispatcher(), null);
+    // Execute the bulk update at least once a while even if not enough messages are
+    // there
+    getContext().system().scheduler().schedule(config.getMetaDataUpdateMaxDuration(),
+        config.getMetaDataUpdateMaxDuration(), getSelf(), TICK, getContext().dispatcher(), null);
   }
 
-  @Override public void postStop() {
+  @Override
+  public void postStop() {
 
     // execute update for the remaining messages before stop
     update();
@@ -56,7 +61,8 @@ import java.util.LinkedList;
    *
    * @param message
    */
-  @Override public void onReceive(final Object message) {
+  @Override
+  public void onReceive(final Object message) {
     if (message instanceof CrawlUriMessage) {
       CrawlUriMessage uriMsg = (CrawlUriMessage) message;
       log.debug("Add message to bulk update list: {}", uriMsg);
@@ -83,12 +89,14 @@ import java.util.LinkedList;
     }
   }
 
-  @Override public SupervisorStrategy supervisorStrategy() {
+  @Override
+  public SupervisorStrategy supervisorStrategy() {
 
     SupervisorStrategy supervisorStrategy = new OneForOneStrategy(0, Duration.Zero(),
         new Function<Throwable, SupervisorStrategy.Directive>() {
 
-          @Override public SupervisorStrategy.Directive apply(Throwable t) throws Exception {
+          @Override
+          public SupervisorStrategy.Directive apply(Throwable t) throws Exception {
 
             log.warning("Actor encountered error: {}", t);
             // default behaviour

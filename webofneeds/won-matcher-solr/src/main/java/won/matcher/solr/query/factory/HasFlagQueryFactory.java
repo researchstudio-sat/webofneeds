@@ -10,10 +10,7 @@ import java.util.Map;
 public class HasFlagQueryFactory extends SolrQueryFactory {
 
   public enum FLAGS {
-    WHATS_AROUND,
-    WHATS_NEW,
-    NO_HINT_FOR_COUNTERPART,
-    NO_HINT_FOR_ME
+    WHATS_AROUND, WHATS_NEW, NO_HINT_FOR_COUNTERPART, NO_HINT_FOR_ME
   }
 
   private static final Map<FLAGS, String> flagMap;
@@ -33,7 +30,8 @@ public class HasFlagQueryFactory extends SolrQueryFactory {
     this.flag = flag;
   }
 
-  @Override protected String makeQueryString() {
+  @Override
+  protected String makeQueryString() {
     return new ExactMatchFieldQueryFactory("_graph.http___purl.org_webofneeds_model_hasFlag._id", flagMap.get(flag))
         .createQuery();
   }

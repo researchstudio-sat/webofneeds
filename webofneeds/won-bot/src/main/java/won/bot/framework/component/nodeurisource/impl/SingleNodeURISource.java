@@ -19,8 +19,7 @@ package won.bot.framework.component.nodeurisource.impl;
 import java.net.URI;
 
 /**
- * User: fkleedorfer
- * Date: 19.12.13
+ * User: fkleedorfer Date: 19.12.13
  */
 public class SingleNodeURISource {
   private URI nodeURI;

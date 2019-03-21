@@ -33,15 +33,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Assumes that the provided username is a linked data URI that contains WebID information.
- * The URI is accessed and the RDF is downloaded and added to the UserDetails for future reference.
+ * Assumes that the provided username is a linked data URI that contains WebID
+ * information. The URI is accessed and the RDF is downloaded and added to the
+ * UserDetails for future reference.
  */
 public class ClientCertificateNoWebIdUserDetailsService
     implements AuthenticationUserDetailsService<PreAuthenticatedAuthenticationToken> {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Override public UserDetails loadUserDetails(final PreAuthenticatedAuthenticationToken token)
-      throws UsernameNotFoundException {
+  @Override
+  public UserDetails loadUserDetails(final PreAuthenticatedAuthenticationToken token) throws UsernameNotFoundException {
     String principal = (String) token.getPrincipal();
     Certificate certificate = (Certificate) token.getCredentials();
 
@@ -50,14 +51,14 @@ public class ClientCertificateNoWebIdUserDetailsService
     try {
       commonName = new URI(principal);
     } catch (URISyntaxException e) {
-      throw new BadCredentialsException("Principal of X.509 Certificate must be a WebId URI. Actual value: '" +
-          principal + "'");
+      throw new BadCredentialsException(
+          "Principal of X.509 Certificate must be a WebId URI. Actual value: '" + principal + "'");
     }
 
-    //at this point, we know that a client certificate was presented. Grant this role:
+    // at this point, we know that a client certificate was presented. Grant this
+    // role:
     List<GrantedAuthority> authorities = new ArrayList<>(3);
     authorities.add(new SimpleGrantedAuthority("ROLE_CLIENT_CERTIFICATE_PRESENTED"));
     return new ClientCertificateNoWebIdUserDetails(commonName, authorities);
   }
 }
-

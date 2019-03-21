@@ -26,10 +26,14 @@ import won.protocol.service.WonNodeInformationService;
 
 import java.net.URI;
 
-@Controller @RequestMapping("/appConfig") public class AppConfigController {
-  @Autowired private WonNodeInformationService wonNodeInformationService;
+@Controller
+@RequestMapping("/appConfig")
+public class AppConfigController {
+  @Autowired
+  private WonNodeInformationService wonNodeInformationService;
 
-  @RequestMapping(value = "/getDefaultWonNodeUri", method = RequestMethod.GET) public ResponseEntity<URI> getDefaultWonNodeUri() {
+  @RequestMapping(value = "/getDefaultWonNodeUri", method = RequestMethod.GET)
+  public ResponseEntity<URI> getDefaultWonNodeUri() {
     return new ResponseEntity(this.wonNodeInformationService.getDefaultWonNodeURI().toString(), HttpStatus.OK);
   }
 

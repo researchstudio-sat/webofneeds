@@ -36,9 +36,8 @@ public class EventTriggeredActionContainer<E> {
     try {
       this.actionsToAdd.addAll(action.executeFor(Optional.empty()));
     } catch (Exception e) {
-      LoggingUtils
-          .logMessageAsInfoAndStacktraceAsDebug(logger, e, "Error running server side action {} for empty event",
-              action.getName());
+      LoggingUtils.logMessageAsInfoAndStacktraceAsDebug(logger, e,
+          "Error running server side action {} for empty event", action.getName());
     }
   }
 
@@ -47,7 +46,8 @@ public class EventTriggeredActionContainer<E> {
       Objects.nonNull(event);
       // handle the event in a single-threaded executor
       executor.execute(new Runnable() {
-        @Override public void run() {
+        @Override
+        public void run() {
           // add all new actions that may have accumulated during executions
           synchronized (EventTriggeredActionContainer.this) {
             actions.addAll(actionsToAdd);
@@ -79,8 +79,8 @@ public class EventTriggeredActionContainer<E> {
         }
       });
     } catch (Exception e) {
-      LoggingUtils
-          .logMessageAsInfoAndStacktraceAsDebug(logger, e, "Error running server side actions for event {}", event);
+      LoggingUtils.logMessageAsInfoAndStacktraceAsDebug(logger, e, "Error running server side actions for event {}",
+          event);
     }
   }
 }

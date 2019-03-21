@@ -4,8 +4,8 @@ import java.net.URI;
 
 /**
  * Indicates that the conversation data analyzed is incomplete. This is
- * discovered if a message refers to another one, but that message is not contained in the
- * dataset. The URIs of both messages are set in the exception.
+ * discovered if a message refers to another one, but that message is not
+ * contained in the dataset. The URIs of both messages are set in the exception.
  *
  * @author fkleedorfer
  */

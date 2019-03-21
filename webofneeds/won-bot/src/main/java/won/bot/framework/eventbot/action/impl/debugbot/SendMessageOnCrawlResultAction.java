@@ -16,7 +16,8 @@ public abstract class SendMessageOnCrawlResultAction extends ProcessCrawlResultA
     this.con = con;
   }
 
-  @Override protected final void onCrawlFailure(CrawlConnectionCommandFailureEvent failureEvent) {
+  @Override
+  protected final void onCrawlFailure(CrawlConnectionCommandFailureEvent failureEvent) {
     Model messageModel = makeFailureMessage(failureEvent);
     if (messageModel == null)
       return;
@@ -27,7 +28,8 @@ public abstract class SendMessageOnCrawlResultAction extends ProcessCrawlResultA
     return null;
   }
 
-  @Override protected final void onCrawlSuccess(CrawlConnectionCommandSuccessEvent successEvent) {
+  @Override
+  protected final void onCrawlSuccess(CrawlConnectionCommandSuccessEvent successEvent) {
     Model messageModel = makeSuccessMessage(successEvent);
     if (messageModel == null)
       return;

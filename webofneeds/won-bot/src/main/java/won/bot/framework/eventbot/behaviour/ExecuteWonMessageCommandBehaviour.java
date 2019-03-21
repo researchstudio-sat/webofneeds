@@ -44,7 +44,8 @@ public class ExecuteWonMessageCommandBehaviour extends BotBehaviour {
     super(context, name);
   }
 
-  @Override protected void onActivate(Optional<Object> message) {
+  @Override
+  protected void onActivate(Optional<Object> message) {
     linkEventToActionWithAutoCleanup(CreateNeedCommandEvent.class, new ExecuteCreateNeedCommandAction(context));
     linkEventToActionWithAutoCleanup(ConnectCommandEvent.class, new ExecuteConnectCommandAction(context));
     linkEventToActionWithAutoCleanup(OpenCommandEvent.class, new ExecuteOpenCommandAction(context));
@@ -53,7 +54,7 @@ public class ExecuteWonMessageCommandBehaviour extends BotBehaviour {
     linkEventToActionWithAutoCleanup(CloseCommandEvent.class, new ExecuteCloseCommandAction(context));
     linkEventToActionWithAutoCleanup(DeactivateNeedCommandEvent.class, new ExecuteDeactivateNeedCommandAction(context));
     linkEventToActionWithAutoCleanup(FeedbackCommandEvent.class, new ExecuteFeedbackCommandAction(context));
-    //if we receive a message command failure, log it
+    // if we receive a message command failure, log it
     linkEventToActionWithAutoCleanup(MessageCommandFailureEvent.class, new LogMessageCommandFailureAction(context));
   }
 
@@ -61,4 +62,3 @@ public class ExecuteWonMessageCommandBehaviour extends BotBehaviour {
     this.subscribeWithAutoCleanup(clazz, new ActionOnEventListener(context, action));
   }
 }
-

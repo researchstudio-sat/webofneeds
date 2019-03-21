@@ -22,19 +22,23 @@ import java.io.IOException;
 /**
  * Created by hfriedrich on 12.08.2016.
  */
-@Component public class DefaultMatcherQueryExecuter implements SolrMatcherQueryExecutor {
+@Component
+public class DefaultMatcherQueryExecuter implements SolrMatcherQueryExecutor {
   private final Logger log = LoggerFactory.getLogger(getClass());
 
-  @Autowired SolrMatcherConfig config;
+  @Autowired
+  SolrMatcherConfig config;
 
   SolrClient solrClient;
 
-  @PostConstruct private void init() {
+  @PostConstruct
+  private void init() {
     solrClient = new HttpSolrClient.Builder(config.getSolrEndpointUri(false)).build();
   }
 
-  @Override public SolrDocumentList executeNeedQuery(String queryString, int maxHints, SolrParams params,
-      String... filterQueries) throws IOException, SolrServerException {
+  @Override
+  public SolrDocumentList executeNeedQuery(String queryString, int maxHints, SolrParams params, String... filterQueries)
+      throws IOException, SolrServerException {
 
     if (queryString == null) {
       log.debug("query string is null, do execute any query!");
@@ -59,8 +63,9 @@ import java.io.IOException;
     try {
       QueryResponse response = solrClient.query(query);
       SolrDocumentList results = response.getResults();
-      //handle special case: if all results have the same score, the rows parameter does not properly restrict the size
-      //in order to enforce the restriction, we are doing it here.
+      // handle special case: if all results have the same score, the rows parameter
+      // does not properly restrict the size
+      // in order to enforce the restriction, we are doing it here.
       if (results.size() > maxHints) {
         SolrDocumentList cappedResults = new SolrDocumentList();
         for (int i = 0; i < maxHints; i++) {

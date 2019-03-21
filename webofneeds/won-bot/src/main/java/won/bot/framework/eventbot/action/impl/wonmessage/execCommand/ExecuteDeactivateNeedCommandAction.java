@@ -28,7 +28,8 @@ public class ExecuteDeactivateNeedCommandAction extends BaseEventBotAction {
     super(eventListenerContext);
   }
 
-  @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
+  @Override
+  protected void doRun(Event event, EventListener executingListener) throws Exception {
     if (!(event instanceof DeactivateNeedCommandEvent))
       return;
     DeactivateNeedCommandEvent deactivateNeedCommandEvent = (DeactivateNeedCommandEvent) event;
@@ -42,7 +43,8 @@ public class ExecuteDeactivateNeedCommandAction extends BaseEventBotAction {
     WonMessage deactivateNeedMessage = createWonMessage(wonNodeInformationService, needUri, wonNodeUri);
 
     EventListener successCallback = new EventListener() {
-      @Override public void onEvent(Event event) throws Exception {
+      @Override
+      public void onEvent(Event event) throws Exception {
         logger.debug("need creation successful, new need URI is {}", needUri);
         bus.publish(new DeactivateNeedCommandSuccessEvent(needUri, deactivateNeedCommandEvent));
 
@@ -50,7 +52,8 @@ public class ExecuteDeactivateNeedCommandAction extends BaseEventBotAction {
     };
 
     EventListener failureCallback = new EventListener() {
-      @Override public void onEvent(Event event) throws Exception {
+      @Override
+      public void onEvent(Event event) throws Exception {
         String textMessage = WonRdfUtils.MessageUtils
             .getTextMessage(((FailureResponseEvent) event).getFailureMessage());
         logger.debug("need creation failed for need URI {}, original message URI {}: {}",
@@ -67,8 +70,7 @@ public class ExecuteDeactivateNeedCommandAction extends BaseEventBotAction {
 
   private WonMessage createWonMessage(WonNodeInformationService wonNodeInformationService, URI needURI, URI wonNodeURI)
       throws WonMessageBuilderException {
-    return WonMessageBuilder
-        .setMessagePropertiesForDeactivateFromOwner(wonNodeInformationService.generateEventURI(wonNodeURI), needURI,
-            wonNodeURI).build();
+    return WonMessageBuilder.setMessagePropertiesForDeactivateFromOwner(
+        wonNodeInformationService.generateEventURI(wonNodeURI), needURI, wonNodeURI).build();
   }
 }

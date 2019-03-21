@@ -10,17 +10,19 @@ import won.protocol.service.ApplicationManagementService;
 import java.util.List;
 
 /**
- * User: sbyim
- * Date: 11.11.13
+ * User: sbyim Date: 11.11.13
  */
 public class OwnerManagementServiceImpl implements ApplicationManagementService {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Autowired private OwnerApplicationRepository ownerApplicatonRepository;
+  @Autowired
+  private OwnerApplicationRepository ownerApplicatonRepository;
 
-  @Autowired private QueueManagementServiceImpl queueManagementService;
+  @Autowired
+  private QueueManagementServiceImpl queueManagementService;
 
-  @Override public String registerOwnerApplication(String ownerApplicationId) {
+  @Override
+  public String registerOwnerApplication(String ownerApplicationId) {
 
     logger.debug("ownerApplicationId: " + ownerApplicationId.toString());
 

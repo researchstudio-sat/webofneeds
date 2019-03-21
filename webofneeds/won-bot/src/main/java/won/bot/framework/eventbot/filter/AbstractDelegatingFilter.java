@@ -30,7 +30,8 @@ public abstract class AbstractDelegatingFilter implements DelegatingFilter {
     return delegate;
   }
 
-  @Override public void setDelegate(final EventFilter delegate) {
+  @Override
+  public void setDelegate(final EventFilter delegate) {
     this.delegate = delegate;
   }
 

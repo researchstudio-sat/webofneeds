@@ -13,28 +13,32 @@ import java.net.URI;
 import java.util.List;
 
 /**
- * User: ypanchenko
- * Date: 28.07.2015
+ * User: ypanchenko Date: 28.07.2015
  */
 public class WonDefaultAccessControlRules implements AccessControlRules {
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  //TODO this is tepmorary, untill the acl source is defined
-  @Autowired protected MessageEventRepository messageEventRepository;
+  // TODO this is tepmorary, untill the acl source is defined
+  @Autowired
+  protected MessageEventRepository messageEventRepository;
 
-  @Autowired protected NeedEventContainerRepository needEventContainerRepository;
+  @Autowired
+  protected NeedEventContainerRepository needEventContainerRepository;
 
-  @Autowired protected ConnectionEventContainerRepository connectionEventContainerRepository;
+  @Autowired
+  protected ConnectionEventContainerRepository connectionEventContainerRepository;
 
-  @Autowired protected URIService uriService;
+  @Autowired
+  protected URIService uriService;
 
   public WonDefaultAccessControlRules() {
   }
 
   public boolean isAccessPermitted(String resourceUriString, List<String> requesterWebIDs) {
-    //TODO retrieve from an acl source for a resource instead of this temporary approach
-    //specific for the message event resources
+    // TODO retrieve from an acl source for a resource instead of this temporary
+    // approach
+    // specific for the message event resources
 
     URI resourceUri = uriService.toResourceURIIfPossible(URI.create(resourceUriString));
     String firstWebId = requesterWebIDs.get(0);
@@ -67,7 +71,7 @@ public class WonDefaultAccessControlRules implements AccessControlRules {
         logger.debug("checking access for unreadEventsRequest {} with webID {} ({} of {})",
             new Object[] { resourceUri, firstWebId, 1, requesterWebIDs.size() });
       }
-      //only the need itself can get unread events
+      // only the need itself can get unread events
       return webId.equals(uriService.getNeedURIofNeedUnreadURI(resourceUri));
     }
     if (logger.isDebugEnabled()) {

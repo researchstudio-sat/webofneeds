@@ -17,22 +17,28 @@ import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
 import javax.mail.internet.MimeMessage;
 
 /**
- * This Bot checks the E-Mails from a given set of configured E-Mail Adresses and creates Needs that represent these E-Mails
- * In Future Implementations it will support the bidirectional communication between the node content and the email sender?!
- * Created by fsuda on 27.09.2016.
+ * This Bot checks the E-Mails from a given set of configured E-Mail Adresses
+ * and creates Needs that represent these E-Mails In Future Implementations it
+ * will support the bidirectional communication between the node content and the
+ * email sender?! Created by fsuda on 27.09.2016.
  */
 public class Mail2WonBot extends EventBot {
-  @Autowired private MessageChannel receiveEmailChannel;
+  @Autowired
+  private MessageChannel receiveEmailChannel;
 
-  @Autowired private MessageChannel sendEmailChannel;
+  @Autowired
+  private MessageChannel sendEmailChannel;
 
-  @Autowired MailContentExtractor mailContentExtractor;
+  @Autowired
+  MailContentExtractor mailContentExtractor;
 
-  @Autowired WonMimeMessageGenerator mailGenerator;
+  @Autowired
+  WonMimeMessageGenerator mailGenerator;
 
   private EventBus bus;
 
-  @Override protected void initializeEventListeners() {
+  @Override
+  protected void initializeEventListeners() {
     EventListenerContext ctx = getEventListenerContext();
     mailGenerator.setEventListenerContext(ctx);
 
@@ -50,14 +56,14 @@ public class Mail2WonBot extends EventBot {
     BotBehaviour deactivateNeedBehaviour = new DeactivateNeedBehaviour(ctx);
     deactivateNeedBehaviour.activate();
 
-    //Mail initiated events
+    // Mail initiated events
     bus.subscribe(MailReceivedEvent.class,
         new ActionOnEventListener(ctx, "MailReceived", new MailParserAction(ctx, mailContentExtractor)));
 
     bus.subscribe(CreateNeedFromMailEvent.class, new ActionOnEventListener(ctx, "CreateNeedFromMailEvent",
-            new CreateNeedFromMailAction(ctx, mailContentExtractor)
+        new CreateNeedFromMailAction(ctx, mailContentExtractor)
 
-        ));
+    ));
 
     bus.subscribe(WelcomeMailEvent.class,
         new ActionOnEventListener(ctx, "WelcomeMailAction", new WelcomeMailAction(mailGenerator, sendEmailChannel)
@@ -70,12 +76,12 @@ public class Mail2WonBot extends EventBot {
     bus.subscribe(SubscribeUnsubscribeEvent.class,
         new ActionOnEventListener(ctx, "SubscribeUnsubscribeEvent", new SubscribeUnsubscribeAction(ctx)));
 
-    //WON initiated Events
+    // WON initiated Events
     bus.subscribe(HintFromMatcherEvent.class,
         new ActionOnEventListener(ctx, "HintReceived", new Hint2MailParserAction(mailGenerator, sendEmailChannel)));
 
     bus.subscribe(ConnectFromOtherNeedEvent.class, new ActionOnEventListener(ctx, "ConnectReceived",
-            new Connect2MailParserAction(mailGenerator, sendEmailChannel)));
+        new Connect2MailParserAction(mailGenerator, sendEmailChannel)));
 
     bus.subscribe(MessageFromOtherNeedEvent.class,
         new ActionOnEventListener(ctx, "ReceivedTextMessage", new Message2MailAction(mailGenerator, sendEmailChannel)));

@@ -24,7 +24,8 @@ import java.net.URI;
 import java.util.List;
 
 /**
- * Initiates the crawling of linked data. The WebID of the specified need is used.
+ * Initiates the crawling of linked data. The WebID of the specified need is
+ * used.
  */
 public class CrawlCommandEvent extends BaseNeedSpecificEvent implements CommandEvent {
   private List<Path> propertyPaths;

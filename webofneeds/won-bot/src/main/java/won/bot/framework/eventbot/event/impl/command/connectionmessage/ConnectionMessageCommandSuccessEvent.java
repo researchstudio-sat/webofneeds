@@ -33,7 +33,8 @@ public class ConnectionMessageCommandSuccessEvent extends AbstractMessageCommand
     this.wonMessage = wonMessage;
   }
 
-  @Override public boolean isSuccess() {
+  @Override
+  public boolean isSuccess() {
     return true;
   }
 

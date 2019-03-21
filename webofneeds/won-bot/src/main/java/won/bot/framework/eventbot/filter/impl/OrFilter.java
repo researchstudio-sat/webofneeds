@@ -23,8 +23,7 @@ import won.bot.framework.eventbot.filter.EventFilter;
 import java.util.List;
 
 /**
- * User: fkleedorfer
- * Date: 25.03.14
+ * User: fkleedorfer Date: 25.03.14
  */
 public class OrFilter extends AbstractCompositeFilter {
 
@@ -39,7 +38,8 @@ public class OrFilter extends AbstractCompositeFilter {
     super(filters);
   }
 
-  @Override public synchronized boolean accept(final Event event) {
+  @Override
+  public synchronized boolean accept(final Event event) {
     for (EventFilter filter : getFilters()) {
       if (filter.accept(event))
         return true;

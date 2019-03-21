@@ -27,4 +27,3 @@ public class ConnectFromOtherNeedEvent extends WonMessageReceivedOnConnectionEve
     super(con, wonMessage);
   }
 }
-

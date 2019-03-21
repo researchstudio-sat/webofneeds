@@ -18,13 +18,14 @@ import java.net.URI;
 import java.util.*;
 
 /**
- * Tests for bot context.
- * For the mongo db implementation you have to make manually sure that the connection toi the mongo db server exists
- * and that the database in empty on test start.
+ * Tests for bot context. For the mongo db implementation you have to make
+ * manually sure that the connection toi the mongo db server exists and that the
+ * database in empty on test start.
  * <p>
  * Created by hfriedrich on 24.10.2016.
  */
-@RunWith(value = Parameterized.class) public class BotContextTests {
+@RunWith(value = Parameterized.class)
+public class BotContextTests {
   private static final URI URI1 = URI.create("http://test.uri/number#1");
   private static final URI URI2 = URI.create("http://test.uri/number#2");
   private static final URI URI3 = URI.create("http://test.uri/number#3");
@@ -39,20 +40,23 @@ import java.util.*;
     botContextClass = cl;
   }
 
-  @Before public void setup() throws IllegalAccessException, InstantiationException {
+  @Before
+  public void setup() throws IllegalAccessException, InstantiationException {
 
     ApplicationContext ctx = new ClassPathXmlApplicationContext("/botContext.xml");
     botContext = (BotContext) ctx.getBean(botContextClass);
   }
 
-  @Parameterized.Parameters public static Iterable<Class[]> getTestParameters() {
+  @Parameterized.Parameters
+  public static Iterable<Class[]> getTestParameters() {
     LinkedList<Class[]> linkedList = new LinkedList<>();
     linkedList.add(new Class[] { MemoryBotContext.class });
     linkedList.add(new Class[] { MongoBotContext.class });
     return linkedList;
   }
 
-  @Test public void testNamedNeedUriMethods() {
+  @Test
+  public void testNamedNeedUriMethods() {
 
     botContext.dropCollection(MongoBotContext.NEED_URI_COLLECTION);
     botContext.dropCollection(MongoBotContext.NODE_URI_COLLECTION);
@@ -93,8 +97,8 @@ import java.util.*;
     botContext.removeNeedUriFromNamedNeedUriList(URI2, "uri1");
     botContext.removeNeedUriFromNamedNeedUriList(URI3, "uri1");
 
-    Assert.assertEquals(2,
-        botContext.retrieveAllNeedUris().size()); // URI1 and URI2 should still be there in the general list
+    Assert.assertEquals(2, botContext.retrieveAllNeedUris().size()); // URI1 and URI2 should still be there in the
+                                                                     // general list
     Assert.assertEquals(1, botContext.getNamedNeedUriList("uri1").size());
     Assert.assertTrue(botContext.getNamedNeedUriList("uri1").contains(URI1));
     Assert.assertEquals(1, botContext.getNamedNeedUriList("uri2").size());
@@ -108,7 +112,8 @@ import java.util.*;
     Assert.assertEquals(0, botContext.retrieveAllNeedUris().size());
   }
 
-  @Test public void testNodeUriMethods() {
+  @Test
+  public void testNodeUriMethods() {
 
     Assert.assertFalse(botContext.isNodeKnown(URI1));
 
@@ -139,7 +144,8 @@ import java.util.*;
     Assert.assertFalse(botContext.isNodeKnown(URI2));
   }
 
-  @Test public void testObjectMapMethods() {
+  @Test
+  public void testObjectMapMethods() {
 
     botContext.dropCollection("col1");
     botContext.dropCollection("col2");
@@ -151,7 +157,7 @@ import java.util.*;
     botContext.saveToObjectMap("col1", "uri1", URI1);
     botContext.saveToObjectMap("col1", "uri1", URI1);
     botContext.saveToObjectMap("col1", "uri2", URI1);
-    botContext.saveToObjectMap("col1", "uri2", URI2);  // overwrite
+    botContext.saveToObjectMap("col1", "uri2", URI2); // overwrite
     botContext.saveToObjectMap("col2", "uri1", URI2);
     botContext.saveToObjectMap("col2", "uri2", URI2);
     botContext.saveToObjectMap("col2", "uri3", URI3);
@@ -178,7 +184,8 @@ import java.util.*;
     Assert.assertEquals(0, botContext.loadObjectMap("col2").size());
   }
 
-  @Test public void testListMapMethods() {
+  @Test
+  public void testListMapMethods() {
 
     botContext.dropCollection("addCol1");
     botContext.dropCollection("addCol2");
@@ -214,7 +221,8 @@ import java.util.*;
     Assert.assertEquals(URI2, botContext.loadFromListMap("addCol2", "list1").get(0));
   }
 
-  @Test public void useEmailAddressAsKey() {
+  @Test
+  public void useEmailAddressAsKey() {
 
     botContext.dropCollection("mail");
     botContext.dropCollection("mailList");
@@ -227,7 +235,8 @@ import java.util.*;
     Assert.assertEquals(3, botContext.loadFromListMap("mailList", mailAddress).size());
   }
 
-  @Test public void testPutAndRetrieveGenericObjects() throws MessagingException, IOException, ClassNotFoundException {
+  @Test
+  public void testPutAndRetrieveGenericObjects() throws MessagingException, IOException, ClassNotFoundException {
 
     // List
     botContext.dropCollection("uriList");
@@ -240,7 +249,8 @@ import java.util.*;
     List<URI> uriListCopy = (List<URI>) botContext.loadFromObjectMap("uriList", "list1");
     Assert.assertEquals(uriList, uriListCopy);
 
-    // HashMap needs to be serialized (here only non-complex keys are allowed in maps)
+    // HashMap needs to be serialized (here only non-complex keys are allowed in
+    // maps)
     botContext.dropCollection("uriMap");
     HashMap<String, URI> uriHashMap = new HashMap<>();
     uriHashMap.put(URI1.toString(), URI1);
@@ -265,11 +275,12 @@ import java.util.*;
     uriTreeMap.put(URI1.toString(), URI2);
     uriTreeMap.put(URI2.toString(), URI3);
     uriTreeMap.put(URI3.toString(), URI1);
-    botContext.saveToObjectMap("uriMap", "map1", uriTreeMap);  // overwrite the HashMap entry from the previous step
+    botContext.saveToObjectMap("uriMap", "map1", uriTreeMap); // overwrite the HashMap entry from the previous step
     Map<String, URI> uriTreeMapCopy = (Map<String, URI>) botContext.loadFromObjectMap("uriMap", "map1");
     Assert.assertEquals(uriTreeMap, uriTreeMapCopy);
 
-    // MimeMessage cannot be serialized directly => has to be serialized manually first
+    // MimeMessage cannot be serialized directly => has to be serialized manually
+    // first
     botContext.dropCollection("mime");
     Properties props = new Properties();
     MimeMessage message = new MimeMessage(Session.getDefaultInstance(props, null));

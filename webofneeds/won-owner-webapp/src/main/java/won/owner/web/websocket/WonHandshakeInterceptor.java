@@ -31,8 +31,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * User: LEIH-NB
- * Date: 09.10.2014
+ * User: LEIH-NB Date: 09.10.2014
  */
 public class WonHandshakeInterceptor extends HttpSessionHandshakeInterceptor {
 
@@ -52,8 +51,9 @@ public class WonHandshakeInterceptor extends HttpSessionHandshakeInterceptor {
     super(ATTRIBUTE_NAMES);
   }
 
-  @Override public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response,
-      WebSocketHandler wsHandler, Map<String, Object> attributes) throws Exception {
+  @Override
+  public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler,
+      Map<String, Object> attributes) throws Exception {
 
     addSessionIdAttribute(request, attributes);
     attributes.put(USERNAME_ATTR, SecurityContextHolder.getContext().getAuthentication().getName());
@@ -62,10 +62,12 @@ public class WonHandshakeInterceptor extends HttpSessionHandshakeInterceptor {
     return super.beforeHandshake(request, response, wsHandler, attributes);
   }
 
-  /* added for integrating spring-session, which we added to synchronize
-    http sessions with websocket sessions.
-    see: http://spring.io/blog/2014/09/16/preview-spring-security-websocket-support-sessions
-    */
+  /*
+   * added for integrating spring-session, which we added to synchronize http
+   * sessions with websocket sessions. see:
+   * http://spring.io/blog/2014/09/16/preview-spring-security-websocket-support-
+   * sessions
+   */
   private void addSessionIdAttribute(final ServerHttpRequest request, final Map<String, Object> attributes) {
     if (request instanceof ServletServerHttpRequest) {
       ServletServerHttpRequest servletRequest = (ServletServerHttpRequest) request;
@@ -79,9 +81,9 @@ public class WonHandshakeInterceptor extends HttpSessionHandshakeInterceptor {
     }
   }
 
-  @Override public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response,
-      WebSocketHandler wsHandler, Exception ex) {
+  @Override
+  public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler,
+      Exception ex) {
     super.afterHandshake(request, response, wsHandler, ex);
   }
 }
-

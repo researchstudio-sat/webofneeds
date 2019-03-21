@@ -28,13 +28,13 @@ public abstract class BaseNodeSpecificEvent extends BaseEvent implements NodeSpe
     this.nodeURI = nodeURI;
   }
 
-  @Override public URI getNodeURI() {
+  @Override
+  public URI getNodeURI() {
     return nodeURI;
   }
 
-  @Override public String toString() {
-    return getClass().getSimpleName() + "{" +
-        "nodeURI=" + getNodeURI() +
-        '}';
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{" + "nodeURI=" + getNodeURI() + '}';
   }
 }

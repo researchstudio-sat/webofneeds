@@ -27,14 +27,15 @@ public class Connect2HokifyAction extends BaseEventBotAction {
 
   }
 
-  @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
+  @Override
+  protected void doRun(Event event, EventListener executingListener) throws Exception {
 
     logger.info("ConnectionEvent received");
 
     EventListenerContext ctx = getEventListenerContext();
 
-    if (event instanceof ConnectFromOtherNeedEvent && ctx
-        .getBotContextWrapper() instanceof HokifyJobBotContextWrapper) {
+    if (event instanceof ConnectFromOtherNeedEvent
+        && ctx.getBotContextWrapper() instanceof HokifyJobBotContextWrapper) {
       HokifyJobBotContextWrapper botContextWrapper = (HokifyJobBotContextWrapper) ctx.getBotContextWrapper();
 
       Connection con = ((ConnectFromOtherNeedEvent) event).getCon();
@@ -47,13 +48,13 @@ public class Connect2HokifyAction extends BaseEventBotAction {
         final OpenCommandEvent openCommandEvent = new OpenCommandEvent(con, message);
         ctx.getEventBus().subscribe(OpenCommandResultEvent.class,
             new ActionOnFirstEventListener(ctx, new CommandResultFilter(openCommandEvent), new BaseEventBotAction(ctx) {
-              @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
+              @Override
+              protected void doRun(Event event, EventListener executingListener) throws Exception {
                 OpenCommandResultEvent connectionMessageCommandResultEvent = (OpenCommandResultEvent) event;
                 if (connectionMessageCommandResultEvent.isSuccess()) {
                   String jobUrl = botContextWrapper.getJobURLForURI(yourNeedUri);
-                  String respondWith = jobUrl != null ?
-                      "You need more information?\n Just follow this link: " + jobUrl :
-                      "The job is no longer available, sorry!";
+                  String respondWith = jobUrl != null ? "You need more information?\n Just follow this link: " + jobUrl
+                      : "The job is no longer available, sorry!";
 
                   Model messageModel = WonRdfUtils.MessageUtils.textMessage(respondWith);
                   ctx.getEventBus().publish(new ConnectionMessageCommandEvent(con, messageModel));

@@ -17,4 +17,5 @@
 /**
  * Deprecated package, needs to be refactored.
  */
-@Deprecated package won.node.facet;
+@Deprecated
+package won.node.facet;

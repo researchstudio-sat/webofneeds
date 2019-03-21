@@ -59,18 +59,23 @@ import java.util.Set;
  * side to query Node for it, instead of querying directly from Owner
  * client-side.
  */
-@Controller @RequestMapping("/rest/linked-data") public class BridgeForLinkedDataController
-    implements InitializingBean {
+@Controller
+@RequestMapping("/rest/linked-data")
+public class BridgeForLinkedDataController implements InitializingBean {
 
   private String filterQuery;
 
-  @Autowired private WONUserDetailService wonUserDetailService;
+  @Autowired
+  private WONUserDetailService wonUserDetailService;
 
-  @Autowired private LinkedDataRestBridge linkedDataRestBridgeOnBehalfOfNeed;
+  @Autowired
+  private LinkedDataRestBridge linkedDataRestBridgeOnBehalfOfNeed;
 
-  @Autowired private LinkedDataRestBridge linkedDataRestBridge;
+  @Autowired
+  private LinkedDataRestBridge linkedDataRestBridge;
 
-  @Override public void afterPropertiesSet() throws Exception {
+  @Override
+  public void afterPropertiesSet() throws Exception {
     InputStream is = this.getClass().getResourceAsStream("/linkeddatabridge/filter-query.rq");
     StringWriter writer = new StringWriter();
     try {
@@ -83,17 +88,17 @@ import java.util.Set;
 
   final Logger logger = LoggerFactory.getLogger(getClass());
 
-	/*
+  /*
    * //for some reason this cannot be used as parameter in restTemplate.execute()
-	 * private final ResponseExtractor httpResponseResponseExtractor = new
-	 * ResponseExtractor<ClientHttpResponse>() {
-	 * 
-	 * @Override public ClientHttpResponse extractData(final ClientHttpResponse
-	 * response) throws IOException { return response; } };
-	 */
+   * private final ResponseExtractor httpResponseResponseExtractor = new
+   * ResponseExtractor<ClientHttpResponse>() {
+   * 
+   * @Override public ClientHttpResponse extractData(final ClientHttpResponse
+   * response) throws IOException { return response; } };
+   */
 
-  @RequestMapping(value = { "/", "" }, method = RequestMethod.GET, produces = { "*/*" }) public void fetchResource(
-      @RequestParam("uri") String resourceUri,
+  @RequestMapping(value = { "/", "" }, method = RequestMethod.GET, produces = { "*/*" })
+  public void fetchResource(@RequestParam("uri") String resourceUri,
       @RequestParam(value = "requester", required = false) String requesterWebId, final HttpServletResponse response,
       final HttpServletRequest request) throws IOException {
 
@@ -124,11 +129,13 @@ import java.util.Set;
     final HttpHeaders requestHeaders = extractLinkedDataRequestRelevantHeaders(request);
 
     restTemplate.execute(URI.create(resourceUri), HttpMethod.valueOf(request.getMethod()), new RequestCallback() {
-      @Override public void doWithRequest(final ClientHttpRequest request) throws IOException {
+      @Override
+      public void doWithRequest(final ClientHttpRequest request) throws IOException {
         request.getHeaders().setAll(requestHeaders.toSingleValueMap());
       }
     }, new ResponseExtractor<Object>() {
-      @Override public ClientHttpResponse extractData(final ClientHttpResponse originalResponse) throws IOException {
+      @Override
+      public ClientHttpResponse extractData(final ClientHttpResponse originalResponse) throws IOException {
         prepareBridgeResponseOutputStream(originalResponse, response);
         // we don't really need to return anything, so we don't
         return null;
@@ -165,12 +172,12 @@ import java.util.Set;
         // the BAD GATEWAY response status
         copyResponseBody(originalResponse, response);
         response.setStatus(HttpStatus.SC_BAD_GATEWAY);
-				/*
-				 * response.getOutputStream().print("The nodes' response was of type " +
-				 * originalResponseMediaType +
-				 * ". For security reasons the owner-server only forwards responses of the following types "
-				 * + RDFMediaType.rdfMediaTypes.toString());
-				 */
+        /*
+         * response.getOutputStream().print("The nodes' response was of type " +
+         * originalResponseMediaType +
+         * ". For security reasons the owner-server only forwards responses of the following types "
+         * + RDFMediaType.rdfMediaTypes.toString());
+         */
       }
     }
     response.getOutputStream().flush();
@@ -229,8 +236,8 @@ import java.util.Set;
     for (String headerName : fromHeaders.keySet()) {
       for (String headerValue : fromHeaders.get(headerName)) {
 
-        if ((headerName != "Transfer-Encoding") || (headerValue != "chunked") && !toResponse
-            .containsHeader(headerName)) {
+        if ((headerName != "Transfer-Encoding")
+            || (headerValue != "chunked") && !toResponse.containsHeader(headerName)) {
           // we allow all transfer codings except chunked, because we don't do chunking
           // here!
           toResponse.setHeader(headerName, headerValue);

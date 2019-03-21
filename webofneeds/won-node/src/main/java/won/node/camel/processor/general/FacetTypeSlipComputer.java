@@ -41,8 +41,7 @@ import java.util.HashMap;
 import java.util.Optional;
 
 /**
- * User: syim
- * Date: 11.03.2015
+ * User: syim Date: 11.03.2015
  */
 public class FacetTypeSlipComputer implements InitializingBean, ApplicationContextAware, Expression {
   Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -53,12 +52,14 @@ public class FacetTypeSlipComputer implements InitializingBean, ApplicationConte
     this.applicationContext = applicationContext;
   }
 
-  @Override public void afterPropertiesSet() throws Exception {
+  @Override
+  public void afterPropertiesSet() throws Exception {
     facetMessageProcessorsMap = (HashMap) applicationContext.getBeansWithAnnotation(FacetMessageProcessor.class);
 
   }
 
-  @Override public <T> T evaluate(final Exchange exchange, final Class<T> type) {
+  @Override
+  public <T> T evaluate(final Exchange exchange, final Class<T> type) {
     WonMessage message = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
     assert message != null : "wonMessage header must not be null";
     String slip = "";
@@ -68,15 +69,15 @@ public class FacetTypeSlipComputer implements InitializingBean, ApplicationConte
     URI direction = (URI) exchange.getIn().getHeader(WonCamelConstants.DIRECTION_HEADER);
     assert direction != null : "direction header must not be null";
     URI facetType = (URI) exchange.getIn().getHeader(WonCamelConstants.FACET_TYPE_HEADER);
-    //for ordinary messages, the process method is called
-    //for responses, the on[Failure|Success]Response is called.
+    // for ordinary messages, the process method is called
+    // for responses, the on[Failure|Success]Response is called.
     String method = "process";
     if (WonMessageDirection.FROM_EXTERNAL.isIdentifiedBy(direction)) {
-      //check if we're handling a response. If so, do special routing
-      //the response comes from the remote node, but the handler we need is the
-      //one that sent the original message, so we have to switch direction
-      //and we have to set the type to the type of the original message that
-      //we are now handling the response to
+      // check if we're handling a response. If so, do special routing
+      // the response comes from the remote node, but the handler we need is the
+      // one that sent the original message, so we have to switch direction
+      // and we have to set the type to the type of the original message that
+      // we are now handling the response to
       if (WonMessageType.SUCCESS_RESPONSE.isIdentifiedBy(messageType)) {
         method = "onSuccessResponse";
         direction = URI.create(WonMessageDirection.FROM_OWNER.getResource().toString());
@@ -90,7 +91,7 @@ public class FacetTypeSlipComputer implements InitializingBean, ApplicationConte
         WonMessageType isResponseToType = message.getIsResponseToMessageType();
         if (WonMessageType.FAILURE_RESPONSE == isResponseToType
             || WonMessageType.SUCCESS_RESPONSE == isResponseToType) {
-          //exception from the exception: if we're handling a FailureResponse
+          // exception from the exception: if we're handling a FailureResponse
           // to a response - in that case, don't compute a slip value - no bean
           // will specially process this.
           return null;
@@ -134,9 +135,9 @@ public class FacetTypeSlipComputer implements InitializingBean, ApplicationConte
       return processorName.get();
     }
 
-    throw new WonMessageProcessingException(String
-        .format("unexpected combination of messageType %s, " + "facetType %s and direction %s encountered", messageType,
-            facetType, direction));
+    throw new WonMessageProcessingException(
+        String.format("unexpected combination of messageType %s, " + "facetType %s and direction %s encountered",
+            messageType, facetType, direction));
   }
 
   private boolean matches(Annotation annotation, URI messageType, URI direction, URI facetType) {

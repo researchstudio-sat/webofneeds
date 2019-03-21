@@ -15,20 +15,21 @@ import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.SIOC;
 
 /**
- * User: gabriel
- * Date: 17/01/14
+ * User: gabriel Date: 17/01/14
  */
 public class CommentModeratedFacet extends AbstractFacet {
   private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-  @Override public FacetType getFacetType() {
+  @Override
+  public FacetType getFacetType() {
     return FacetType.CommentModeratedFacet;
   }
 
-  @Override public void connectFromOwner(Connection con, Model content, WonMessage wonMessage)
+  @Override
+  public void connectFromOwner(Connection con, Model content, WonMessage wonMessage)
       throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
     super.connectFromOwner(con, content, wonMessage);
-    /* when connected change linked data*/
+    /* when connected change linked data */
     PrefixMapping prefixMapping = PrefixMapping.Factory.create();
     prefixMapping.setNsPrefix(SIOC.getURI(), "sioc");
     content.withDefaultMappings(prefixMapping);

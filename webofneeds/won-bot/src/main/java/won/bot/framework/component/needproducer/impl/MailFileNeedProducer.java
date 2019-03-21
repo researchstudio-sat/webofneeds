@@ -32,13 +32,13 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 /**
- * User: fkleedorfer
- * Date: 17.12.13
+ * User: fkleedorfer Date: 17.12.13
  */
 public class MailFileNeedProducer implements FileBasedNeedProducer {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Override public synchronized Dataset readNeedFromFile(final File file) throws IOException {
+  @Override
+  public synchronized Dataset readNeedFromFile(final File file) throws IOException {
     logger.debug("processing as mail file: {} ", file);
     FileInputStream fis = new FileInputStream(file);
     DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper("no:uri");

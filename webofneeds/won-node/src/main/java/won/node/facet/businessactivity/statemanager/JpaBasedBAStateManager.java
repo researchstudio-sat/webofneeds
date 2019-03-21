@@ -13,15 +13,16 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * User: Danijel
- * Date: 28.5.14.
+ * User: Danijel Date: 28.5.14.
  */
 public class JpaBasedBAStateManager implements BAStateManager {
-  @Autowired BAStateRepository stateRepository;
+  @Autowired
+  BAStateRepository stateRepository;
 
-  @Override public URI getStateForNeedUri(final URI coordinatorURI, final URI participantURI, final URI facetURI) {
-    List<BAState> states = stateRepository
-        .findByCoordinatorURIAndParticipantURIAndFacetTypeURI(coordinatorURI, participantURI, facetURI);
+  @Override
+  public URI getStateForNeedUri(final URI coordinatorURI, final URI participantURI, final URI facetURI) {
+    List<BAState> states = stateRepository.findByCoordinatorURIAndParticipantURIAndFacetTypeURI(coordinatorURI,
+        participantURI, facetURI);
     Iterator<BAState> stateIterator = states.iterator();
     if (stateIterator.hasNext()) {
       return stateIterator.next().getBaStateURI();
@@ -30,12 +31,13 @@ public class JpaBasedBAStateManager implements BAStateManager {
     }
   }
 
-  @Override @Transactional(propagation = Propagation.SUPPORTS, isolation = Isolation.REPEATABLE_READ) public void setStateForNeedUri(
-      final URI stateUri, final URI statePhaseURI, final URI coordinatorURI, final URI participantURI,
-      final URI facetURI) {
+  @Override
+  @Transactional(propagation = Propagation.SUPPORTS, isolation = Isolation.REPEATABLE_READ)
+  public void setStateForNeedUri(final URI stateUri, final URI statePhaseURI, final URI coordinatorURI,
+      final URI participantURI, final URI facetURI) {
     BAState state = null;
-    List<BAState> states = stateRepository
-        .findByCoordinatorURIAndParticipantURIAndFacetTypeURI(coordinatorURI, participantURI, facetURI);
+    List<BAState> states = stateRepository.findByCoordinatorURIAndParticipantURIAndFacetTypeURI(coordinatorURI,
+        participantURI, facetURI);
     Iterator<BAState> stateIterator = states.iterator();
     if (stateIterator.hasNext()) {
       state = stateIterator.next();
@@ -53,14 +55,17 @@ public class JpaBasedBAStateManager implements BAStateManager {
     stateRepository.save(state);
   }
 
-  @Override @Transactional(propagation = Propagation.SUPPORTS, isolation = Isolation.REPEATABLE_READ) public void setStateForNeedUri(
-      final URI stateUri, final URI coordinatorURI, final URI participantURI, final URI facetURI) {
+  @Override
+  @Transactional(propagation = Propagation.SUPPORTS, isolation = Isolation.REPEATABLE_READ)
+  public void setStateForNeedUri(final URI stateUri, final URI coordinatorURI, final URI participantURI,
+      final URI facetURI) {
     setStateForNeedUri(stateUri, URI.create(WON_TX.PHASE_NONE.getURI()), coordinatorURI, participantURI, facetURI);
   }
 
-  @Override public URI getStatePhaseForNeedUri(final URI coordinatorURI, final URI participantURI, final URI facetURI) {
-    List<BAState> states = stateRepository
-        .findByCoordinatorURIAndParticipantURIAndFacetTypeURI(coordinatorURI, participantURI, facetURI);
+  @Override
+  public URI getStatePhaseForNeedUri(final URI coordinatorURI, final URI participantURI, final URI facetURI) {
+    List<BAState> states = stateRepository.findByCoordinatorURIAndParticipantURIAndFacetTypeURI(coordinatorURI,
+        participantURI, facetURI);
     Iterator<BAState> stateIterator = states.iterator();
     if (stateIterator.hasNext()) {
       return stateIterator.next().getBaPhaseURI();

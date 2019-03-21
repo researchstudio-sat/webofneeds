@@ -33,13 +33,17 @@ public class KeystoreEnabledPersistentRememberMeServices extends PersistentToken
 
   private static final String UNLOCK_COOKIE_NAME = "won.unlock";
 
-  @Autowired private PersistentLoginRepository persistentLoginRepository;
+  @Autowired
+  private PersistentLoginRepository persistentLoginRepository;
 
-  @Autowired private KeystorePasswordRepository keystorePasswordRepository;
+  @Autowired
+  private KeystorePasswordRepository keystorePasswordRepository;
 
-  @Autowired private PlatformTransactionManager platformTransactionManager;
+  @Autowired
+  private PlatformTransactionManager platformTransactionManager;
 
-  @Transactional protected UserDetails processAutoLoginCookie(String[] cookieTokens, HttpServletRequest request,
+  @Transactional
+  protected UserDetails processAutoLoginCookie(String[] cookieTokens, HttpServletRequest request,
       HttpServletResponse response) {
 
     if (cookieTokens.length != 2) {
@@ -52,7 +56,8 @@ public class KeystoreEnabledPersistentRememberMeServices extends PersistentToken
 
     TransactionTemplate transactionTemplate = new TransactionTemplate(platformTransactionManager);
     return transactionTemplate.execute(new TransactionCallback<UserDetails>() {
-      @Override public UserDetails doInTransaction(TransactionStatus status) {
+      @Override
+      public UserDetails doInTransaction(TransactionStatus status) {
         PersistentLogin persistentLogin = persistentLoginRepository.findOne(presentedSeries);
 
         if (persistentLogin == null) {
@@ -81,7 +86,7 @@ public class KeystoreEnabledPersistentRememberMeServices extends PersistentToken
               + persistentLogin.getSeries() + "'");
         }
 
-        // ------------- begin: added for WoN  -----------------------
+        // ------------- begin: added for WoN -----------------------
         // fetch the password from the keystore_password table
         // using the value of the 'wonUnlock' coookie as key
 
@@ -94,7 +99,8 @@ public class KeystoreEnabledPersistentRememberMeServices extends PersistentToken
         KeystorePasswordHolder keystorePasswordHolder = persistentLogin.getKeystorePasswordHolder();
         String keystorePassword = keystorePasswordHolder.getPassword(unlockKey);
 
-        // update the persistent login: new date, new token, and change unlock key for keystore password
+        // update the persistent login: new date, new token, and change unlock key for
+        // keystore password
         persistentLogin.setLastUsed(new Date());
         persistentLogin.setToken(generateTokenData());
         persistentLogin.setKeystorePasswordHolder(keystorePasswordHolder);
@@ -130,10 +136,12 @@ public class KeystoreEnabledPersistentRememberMeServices extends PersistentToken
   }
 
   /**
-   * Creates a new persistent login token with a new series number, stores the data in
-   * the persistent token repository and adds the corresponding cookie to the response.
+   * Creates a new persistent login token with a new series number, stores the
+   * data in the persistent token repository and adds the corresponding cookie to
+   * the response.
    */
-  @Transactional protected void onLoginSuccess(HttpServletRequest request, HttpServletResponse response,
+  @Transactional
+  protected void onLoginSuccess(HttpServletRequest request, HttpServletResponse response,
       Authentication successfulAuthentication) {
     String username = successfulAuthentication.getName();
 
@@ -166,7 +174,7 @@ public class KeystoreEnabledPersistentRememberMeServices extends PersistentToken
       HttpServletResponse response) {
     int validity = getTokenValiditySeconds();
     setCookie(new String[] { persistentLogin.getSeries(), persistentLogin.getToken() }, validity, request, response);
-    //set the unlock cookie
+    // set the unlock cookie
     setUnlockCookie(key, validity, request, response);
   }
 

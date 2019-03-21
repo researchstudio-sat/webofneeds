@@ -15,7 +15,8 @@ public class Rejects extends MessageEffect {
     return rejectedMessageUri;
   }
 
-  @Override public String toString() {
+  @Override
+  public String toString() {
     return "Rejects [rejectedMessageUri=" + rejectedMessageUri + "]";
   }
 

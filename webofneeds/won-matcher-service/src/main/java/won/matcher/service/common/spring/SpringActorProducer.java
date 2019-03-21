@@ -26,7 +26,8 @@ public final class SpringActorProducer implements IndirectActorProducer {
     this.params = params;
   }
 
-  @Override public Actor produce() {
+  @Override
+  public Actor produce() {
 
     if (params != null) {
       return applicationContext.getBean(actorClass, params);
@@ -34,7 +35,8 @@ public final class SpringActorProducer implements IndirectActorProducer {
     return applicationContext.getBean(actorClass);
   }
 
-  @Override public Class<? extends Actor> actorClass() {
+  @Override
+  public Class<? extends Actor> actorClass() {
     return actorClass;
   }
 }

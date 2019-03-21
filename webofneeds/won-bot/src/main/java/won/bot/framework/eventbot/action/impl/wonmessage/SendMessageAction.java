@@ -41,7 +41,8 @@ public class SendMessageAction extends BaseEventBotAction {
     this.message = message;
   }
 
-  @Override protected void doRun(final Event event, EventListener executingListener) throws Exception {
+  @Override
+  protected void doRun(final Event event, EventListener executingListener) throws Exception {
     if (event instanceof ConnectionSpecificEvent) {
       sendMessage((ConnectionSpecificEvent) event, message);
     }

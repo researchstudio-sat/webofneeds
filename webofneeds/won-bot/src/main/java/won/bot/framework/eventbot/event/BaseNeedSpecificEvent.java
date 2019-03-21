@@ -28,13 +28,13 @@ public abstract class BaseNeedSpecificEvent extends BaseEvent implements NeedSpe
     this.needURI = needURI;
   }
 
-  @Override public URI getNeedURI() {
+  @Override
+  public URI getNeedURI() {
     return needURI;
   }
 
-  @Override public String toString() {
-    return getClass().getSimpleName() + "{" +
-        "needURI=" + getNeedURI() +
-        '}';
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{" + "needURI=" + getNeedURI() + '}';
   }
 }

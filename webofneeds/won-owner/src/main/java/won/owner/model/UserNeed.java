@@ -26,26 +26,40 @@ import java.util.Date;
 /**
  * Entity wrapping a uri identifying a user's need.
  */
-@Entity public class UserNeed {
-  @Id @GeneratedValue @Column(name = "id") private Long id;
+@Entity
+public class UserNeed {
+  @Id
+  @GeneratedValue
+  @Column(name = "id")
+  private Long id;
 
-  @Column(name = "uri", unique = true) @Convert(converter = URIConverter.class) private URI uri;
+  @Column(name = "uri", unique = true)
+  @Convert(converter = URIConverter.class)
+  private URI uri;
 
-  @Column(name = "matches") private boolean matches;
+  @Column(name = "matches")
+  private boolean matches;
 
-  @Column(name = "requests") private boolean requests = true;
+  @Column(name = "requests")
+  private boolean requests = true;
 
-  @Column(name = "conversations") private boolean conversations = true;
+  @Column(name = "conversations")
+  private boolean conversations = true;
 
   /* The creation date of the (as observed by the owner app) */
-  @Temporal(TemporalType.TIMESTAMP) @Column(name = "creationDate", nullable = false) private Date creationDate;
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name = "creationDate", nullable = false)
+  private Date creationDate;
 
-  @Enumerated(EnumType.STRING) @Column(name = "state") private NeedState state;
+  @Enumerated(EnumType.STRING)
+  @Column(name = "state")
+  private NeedState state;
 
   public UserNeed() {
   }
 
-  @PrePersist protected void onCreate() {
+  @PrePersist
+  protected void onCreate() {
     creationDate = new Date();
     state = NeedState.ACTIVE;
   }

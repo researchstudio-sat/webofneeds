@@ -30,7 +30,8 @@ public class Hint2MailParserAction extends BaseEventBotAction {
     this.mailGenerator = mailGenerator;
   }
 
-  @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
+  @Override
+  protected void doRun(Event event, EventListener executingListener) throws Exception {
     EventListenerContext ctx = getEventListenerContext();
     if (event instanceof HintFromMatcherEvent && ctx.getBotContextWrapper() instanceof MailBotContextWrapper) {
       MailBotContextWrapper botContextWrapper = (MailBotContextWrapper) ctx.getBotContextWrapper();
@@ -41,8 +42,8 @@ public class Hint2MailParserAction extends BaseEventBotAction {
       URI remoteNeedUri = match.getToNeed();
 
       MimeMessage originalMail = botContextWrapper.getMimeMessageForURI(responseTo);
-      logger.debug("Found a hint for URI: " + responseTo + " sending a mail to the creator: " + MailContentExtractor
-              .getFromAddressString(originalMail));
+      logger.debug("Found a hint for URI: " + responseTo + " sending a mail to the creator: "
+          + MailContentExtractor.getFromAddressString(originalMail));
 
       WonMimeMessage answerMessage = mailGenerator.createHintMail(originalMail, remoteNeedUri);
       botContextWrapper.addMailIdWonURIRelation(answerMessage.getMessageID(),

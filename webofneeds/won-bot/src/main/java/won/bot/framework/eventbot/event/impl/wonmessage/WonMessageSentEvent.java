@@ -31,11 +31,13 @@ public class WonMessageSentEvent extends BaseEvent implements MessageEvent {
     this.message = message;
   }
 
-  @Override public WonMessage getWonMessage() {
+  @Override
+  public WonMessage getWonMessage() {
     return this.message;
   }
 
-  @Override public WonMessageType getWonMessageType() {
+  @Override
+  public WonMessageType getWonMessageType() {
     return this.message.getMessageType();
   }
 }

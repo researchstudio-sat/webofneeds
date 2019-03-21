@@ -8,8 +8,7 @@ import java.net.URI;
 /**
  * Event is used to generate hints inside the matcher-service
  * <p>
- * User: hfriedrich
- * Date: 23.06.2015
+ * User: hfriedrich Date: 23.06.2015
  */
 public class HintEvent implements Serializable {
   private String fromNeedUri;
@@ -85,7 +84,8 @@ public class HintEvent implements Serializable {
     this.serializationLangContentType = serializationLangContentType;
   }
 
-  @Override public HintEvent clone() {
+  @Override
+  public HintEvent clone() {
     HintEvent e = new HintEvent(fromWonNodeUri, fromNeedUri, toWonNodeUri, toNeedUri, matcherUri, score);
     e.setGeneratedEventUri(this.getGeneratedEventUri());
     e.setSerializationLangContentType(this.serializationLangContentType);
@@ -94,8 +94,9 @@ public class HintEvent implements Serializable {
     return e;
   }
 
-  @Override public String toString() {
-    return "HintEvent: (" + getFromWonNodeUri() + ", " + getFromNeedUri() + ", " + getToWonNodeUri() + ", " +
-        getToNeedUri() + ", " + getMatcherUri() + ", " + getScore() + ")";
+  @Override
+  public String toString() {
+    return "HintEvent: (" + getFromWonNodeUri() + ", " + getFromNeedUri() + ", " + getToWonNodeUri() + ", "
+        + getToNeedUri() + ", " + getMatcherUri() + ", " + getScore() + ")";
   }
 }

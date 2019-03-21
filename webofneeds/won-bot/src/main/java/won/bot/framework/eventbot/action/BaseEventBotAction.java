@@ -42,7 +42,8 @@ public abstract class BaseEventBotAction implements won.bot.framework.eventbot.a
     this.eventListenerContext = eventListenerContext;
   }
 
-  @Override public Runnable getActionTask(final Event event, final EventListener eventListener) {
+  @Override
+  public Runnable getActionTask(final Event event, final EventListener eventListener) {
     return new Runnable() {
       public void run() {
         Stopwatch stopwatch = SimonManager.getStopwatch(stopwatchName);

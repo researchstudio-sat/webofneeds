@@ -15,7 +15,7 @@ public class DateIntervalQueryFactory extends MatchFieldQueryFactory {
       final ZonedDateTime dateTime2) {
 
     this.fieldName = fieldName;
-    this.value = "[" + dateTime1.format(DateTimeFormatter.ISO_DATE_TIME) + " TO " +
-        dateTime2.format(DateTimeFormatter.ISO_DATE_TIME) + "]";
+    this.value = "[" + dateTime1.format(DateTimeFormatter.ISO_DATE_TIME) + " TO "
+        + dateTime2.format(DateTimeFormatter.ISO_DATE_TIME) + "]";
   }
 }

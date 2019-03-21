@@ -26,15 +26,16 @@ import won.protocol.util.linkeddata.LinkedDataSource;
 import java.net.URI;
 
 /**
- * Camel actor represents the need consumer protocol to a won node.
- * It is used to listen at the WoN node for events about new created needs,
- * activated needs and deactivated needs. Depending on the endpoint it
- * might be used with different protocols (e.g. JMS over activemq).
+ * Camel actor represents the need consumer protocol to a won node. It is used
+ * to listen at the WoN node for events about new created needs, activated needs
+ * and deactivated needs. Depending on the endpoint it might be used with
+ * different protocols (e.g. JMS over activemq).
  * <p>
- * User: hfriedrich
- * Date: 28.04.2015
+ * User: hfriedrich Date: 28.04.2015
  */
-@Component @Scope("prototype") public class NeedConsumerProtocolActor extends UntypedConsumerActor {
+@Component
+@Scope("prototype")
+public class NeedConsumerProtocolActor extends UntypedConsumerActor {
   private static final String MSG_HEADER_METHODNAME = "methodName";
   private static final String MSG_HEADER_METHODNAME_NEEDCREATED = "needCreated";
   private static final String MSG_HEADER_METHODNAME_NEEDACTIVATED = "needActivated";
@@ -45,20 +46,24 @@ import java.net.URI;
   private ActorRef pubSubMediator;
   private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
 
-  @Autowired private MonitoringService monitoringService;
+  @Autowired
+  private MonitoringService monitoringService;
 
-  @Autowired private LinkedDataSource linkedDataSource;
+  @Autowired
+  private LinkedDataSource linkedDataSource;
 
   public NeedConsumerProtocolActor(String endpoint) {
     this.endpoint = endpoint;
     pubSubMediator = DistributedPubSub.get(getContext().system()).mediator();
   }
 
-  @Override public String getEndpointUri() {
+  @Override
+  public String getEndpointUri() {
     return endpoint;
   }
 
-  @Override public void onReceive(final Object message) throws Exception {
+  @Override
+  public void onReceive(final Object message) throws Exception {
 
     if (message instanceof CamelMessage) {
       CamelMessage camelMsg = (CamelMessage) message;
@@ -112,12 +117,14 @@ import java.net.URI;
     unhandled(message);
   }
 
-  @Override public SupervisorStrategy supervisorStrategy() {
+  @Override
+  public SupervisorStrategy supervisorStrategy() {
 
     SupervisorStrategy supervisorStrategy = new OneForOneStrategy(0, Duration.Zero(),
         new Function<Throwable, SupervisorStrategy.Directive>() {
 
-          @Override public SupervisorStrategy.Directive apply(Throwable t) throws Exception {
+          @Override
+          public SupervisorStrategy.Directive apply(Throwable t) throws Exception {
 
             log.warning("Actor encountered error: {}", t);
             // default behaviour

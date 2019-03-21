@@ -27,18 +27,25 @@ import javax.persistence.*;
 import java.net.URI;
 
 /**
- * I used wonuser as table name because user is Postgres keyword - http://www.postgresql.org/message-id/Pine.NEB.4.10.10008291649550.4357-100000@scimitar.caravan.com
+ * I used wonuser as table name because user is Postgres keyword -
+ * http://www.postgresql.org/message-id/Pine.NEB.4.10.10008291649550.4357-100000@scimitar.caravan.com
  */
-@Entity @Table(
-    name = "needDraft",
-    uniqueConstraints = @UniqueConstraint(columnNames = { "id",
-        "draftURI" })) @JsonIgnoreProperties(ignoreUnknown = true) public class Draft {
+@Entity
+@Table(name = "needDraft", uniqueConstraints = @UniqueConstraint(columnNames = { "id", "draftURI" }))
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class Draft {
 
-  @Id @GeneratedValue @Column(name = "id") private Long id;
+  @Id
+  @GeneratedValue
+  @Column(name = "id")
+  private Long id;
 
-  @Column(name = "draftURI", unique = true) @Convert(converter = URIConverter.class) private URI draftURI;
+  @Column(name = "draftURI", unique = true)
+  @Convert(converter = URIConverter.class)
+  private URI draftURI;
 
-  @Column(length = 10000) private String content;
+  @Column(length = 10000)
+  private String content;
 
   public Draft() {
   }
