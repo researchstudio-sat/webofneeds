@@ -144,6 +144,16 @@ export function isConnectionLoading(process, connUri, includeSubData = false) {
 }
 
 /**
+ * Return true if given needUri has failedToLoad
+ * @param process (full process from state)
+ * @param needUri
+ * @returns {*}
+ */
+export function hasConnectionFailedToLoad(process, connUri) {
+  return connUri && getIn(process, ["connections", connUri, "failedToLoad"]);
+}
+
+/**
  * Return true if any connUri is currently loading, if includeSubData is true, we also check the petriNetData and agreementData
  * @param process
  * @param includeSubData (default=false, determines if the loading state should be checked for agreementData and petriNetData as well
