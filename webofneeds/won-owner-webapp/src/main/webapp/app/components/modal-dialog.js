@@ -23,7 +23,7 @@ function genComponentConf() {
              <span class="md__dialog__content__text" ng-if="self.showTerms">
                 You are about to create an anoymous Account.
                 <br/>
-                This is only possible if you accept the <a target="_blank" href="{{ self.absHRef(self.$state, 'about', {'#': 'aboutTermsOfService'}) }}">Terms Of Service</a>.
+                This is only possible if you accept the <a target="_blank" href="{{ self.absHRef(self.$state, 'about', {'aboutSection': 'aboutTermsOfService'}) }}">Terms Of Service</a>.
                 <br/>
                 <br/>
                 Do you want to want to proceed and thus also accept the Terms of Service?
