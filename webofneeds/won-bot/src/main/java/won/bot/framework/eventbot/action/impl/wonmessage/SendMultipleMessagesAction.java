@@ -24,10 +24,12 @@ import won.bot.framework.eventbot.listener.EventListener;
 /**
  * Created by fkleedorfer on 09.06.2016.
  */
-public class SendMultipleMessagesAction extends SendMessageAction {
-  String[] messages = { "Message One", "Message Two", "Message Three" };
+public class SendMultipleMessagesAction extends SendMessageAction
+{
+  String[] messages = {"Message One", "Message Two", "Message Three"};
 
-  public SendMultipleMessagesAction(final EventListenerContext eventListenerContext, final String... messages) {
+  public SendMultipleMessagesAction(final EventListenerContext eventListenerContext, final String...
+    messages) {
     super(eventListenerContext);
     this.messages = messages;
   }

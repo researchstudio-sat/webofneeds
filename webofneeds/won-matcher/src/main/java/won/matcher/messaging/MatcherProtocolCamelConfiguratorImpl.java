@@ -16,10 +16,14 @@
 
 package won.matcher.messaging;
 
+import java.net.URI;
+import java.util.Set;
+
 import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.apache.camel.RoutesBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import won.matcher.camel.routes.Matcher2NodeDynamicRoutes;
 import won.matcher.camel.routes.MatcherApplicationListenerRouteBuilder;
 import won.protocol.exception.CamelConfigurationFailedException;
@@ -27,55 +31,53 @@ import won.protocol.jms.MatcherProtocolCamelConfigurator;
 import won.protocol.jms.NeedBasedCamelConfiguratorImpl;
 import won.protocol.model.MessagingType;
 
-import java.net.URI;
-import java.util.Set;
-
 //import won.node.camel.routes.NeedProtocolDynamicRoutes;
 
 /**
- * User: LEIH-NB Date: 26.02.14
+ * User: LEIH-NB
+ * Date: 26.02.14
  */
-public class MatcherProtocolCamelConfiguratorImpl extends NeedBasedCamelConfiguratorImpl
-    implements MatcherProtocolCamelConfigurator {
+public class MatcherProtocolCamelConfiguratorImpl extends NeedBasedCamelConfiguratorImpl implements
+  MatcherProtocolCamelConfigurator{
 
   private Logger logger = LoggerFactory.getLogger(getClass());
 
   @Override
   public synchronized void addRemoteTopicListeners(final Set<String> endpoints, final URI remoteEndpoint)
-      throws CamelConfigurationFailedException {
+    throws CamelConfigurationFailedException {
     logger.info("length of endpoints {}", endpoints.size());
-    MatcherApplicationListenerRouteBuilder matcherApplicationListenerRouteBuilder = new MatcherApplicationListenerRouteBuilder(
-        getCamelContext(), endpoints, remoteEndpoint);
+    MatcherApplicationListenerRouteBuilder matcherApplicationListenerRouteBuilder = new
+    MatcherApplicationListenerRouteBuilder(getCamelContext(),endpoints, remoteEndpoint);
 
     try {
       getCamelContext().addRoutes(matcherApplicationListenerRouteBuilder);
     } catch (Exception e) {
       logger.debug("adding route to camel context failed", e);
-      throw new CamelConfigurationFailedException("adding route to camel context failed", e);
+      throw new CamelConfigurationFailedException("adding route to camel context failed",e);
     }
   }
 
-  public synchronized void addCamelComponentForWonNodeBrokerForTopics(URI brokerUri, String brokerComponentName) {
+  public synchronized void addCamelComponentForWonNodeBrokerForTopics(URI brokerUri,String brokerComponentName){
 
     ActiveMQComponent activeMQComponent;
-    if (getCamelContext().getComponent(brokerComponentName) == null) {
-      activeMQComponent = (ActiveMQComponent) brokerComponentFactory.getBrokerComponent(brokerUri, MessagingType.Topic,
-          getMessagingContext());
-      logger.info("adding activemqComponent for brokerUri {} with brokerComponentName {}", brokerUri,
-          brokerComponentName);
-      getCamelContext().addComponent(brokerComponentName, activeMQComponent);
+    if (getCamelContext().getComponent(brokerComponentName)==null){
+      activeMQComponent = (ActiveMQComponent) brokerComponentFactory.getBrokerComponent(brokerUri,
+                                                                                        MessagingType.Topic,
+                                                                                        getMessagingContext());
+      logger.info("adding activemqComponent for brokerUri {} with brokerComponentName {}",brokerUri, brokerComponentName);
+      getCamelContext().addComponent(brokerComponentName,activeMQComponent);
       try {
         activeMQComponent.start();
       } catch (Exception e) {
         logger.warn("could not start activemq", e);
       }
     }
-    brokerComponentMap.put(brokerUri, brokerComponentName);
+    brokerComponentMap.put(brokerUri,brokerComponentName);
   }
 
   @Override
   protected RoutesBuilder createRoutesBuilder(final String startingEndpoint, final URI brokerUri) {
-    return new Matcher2NodeDynamicRoutes(getCamelContext(), startingEndpoint);
+    return new Matcher2NodeDynamicRoutes(getCamelContext(),startingEndpoint);
 
   }
 }

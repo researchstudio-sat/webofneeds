@@ -16,6 +16,10 @@
 
 package won.bot.integrationtest;
 
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.TimeUnit;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,6 +32,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.support.PeriodicTrigger;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
 import won.bot.framework.eventbot.event.impl.lifecycle.WorkDoneEvent;
 import won.bot.framework.eventbot.listener.BaseEventListener;
 import won.bot.framework.eventbot.listener.CountingListener;
@@ -35,16 +40,13 @@ import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
 import won.bot.framework.manager.impl.SpringAwareBotManagerImpl;
 import won.bot.impl.GroupingBot;
 
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.TimeUnit;
-
 /**
  * Integration test.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "classpath:/spring/app/simple2NeedGroupingTest.xml" })
-public class GroupingBotTest {
+@ContextConfiguration(locations = {"classpath:/spring/app/simple2NeedGroupingTest.xml"})
+public class GroupingBotTest
+{
   private final Logger logger = LoggerFactory.getLogger(getClass());
   private static final int RUN_ONCE = 1;
   private static final long ACT_LOOP_TIMEOUT_MILLIS = 100;
@@ -63,33 +65,33 @@ public class GroupingBotTest {
    * This is run before each @TestD method.
    */
   @Before
-  public void before() {
-    if (!run) {
+  public void before(){
+    if (!run)
+    {
       AutowireCapableBeanFactory beanFactory = applicationContext.getAutowireCapableBeanFactory();
       bot = (MyBot) beanFactory.autowire(MyBot.class, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
       Object botBean = beanFactory.initializeBean(bot, "mybot");
       bot = (MyBot) botBean;
-      // the bot also needs a trigger so its act() method is called regularly.
+      //the bot also needs a trigger so its act() method is called regularly.
       // (there is no trigger bean in the context)
       PeriodicTrigger trigger = new PeriodicTrigger(ACT_LOOP_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
       trigger.setInitialDelay(ACT_LOOP_INITIAL_DELAY_MILLIS);
       bot.setTrigger(trigger);
       logger.info("starting test case testGroupBot");
-      // adding the bot to the bot manager will cause it to be initialized.
-      // at that point, the trigger starts.
+      //adding the bot to the bot manager will cause it to be initialized.
+      //at that point, the trigger starts.
       botManager.addBot(bot);
 
-      // the bot should now be running. We have to wait for it to finish before we
-      // can check the results:
-      // Together with the barrier.await() in the bot's listener, this trips the
-      // barrier
-      // and both threads continue.
+      //the bot should now be running. We have to wait for it to finish before we
+      //can check the results:
+      //Together with the barrier.await() in the bot's listener, this trips the barrier
+      //and both threads continue.
       try {
         bot.getBarrier().await();
       } catch (InterruptedException e) {
-        e.printStackTrace(); // To change body of catch statement use File | Settings | File Templates.
+        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
       } catch (BrokenBarrierException e) {
-        e.printStackTrace(); // To change body of catch statement use File | Settings | File Templates.
+        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
       }
       run = true;
     }
@@ -97,101 +99,110 @@ public class GroupingBotTest {
 
   /**
    * The main test method.
-   *
    * @throws Exception
    */
   @Test
-  public void testGroupingBot() throws Exception {
+  public void testGroupingBot() throws Exception
+  {
     logger.info("starting test case testCreate2NeedsGroupingBot");
     this.bot.executeAsserts();
     logger.info("finishing test case testCreate2NeedsGroupingBot");
   }
 
-  /*
-   * @Test public void testGroupRDFBot() throws Exception {
-   * logger.info("starting test case testCreate2NeedsGroupingBot");
-   * this.bot.executeGroupRDFValidationAssert();
-   * logger.info("finishing test case testCreate2NeedsGroupingBot"); }
-   */
+  /*@Test
+  public void testGroupRDFBot() throws Exception
+  {
+    logger.info("starting test case testCreate2NeedsGroupingBot");
+    this.bot.executeGroupRDFValidationAssert();
+    logger.info("finishing test case testCreate2NeedsGroupingBot");
+  }   */
+
 
   /**
-   * We create a subclass of the bot we want to test here so that we can add a
-   * listener to its internal event bus and to access its listeners, which record
-   * information during the run that we later check with asserts.
+   * We create a subclass of the bot we want to test here so that we can
+   * add a listener to its internal event bus and to access its listeners, which
+   * record information during the run that we later check with asserts.
    */
-  public static class MyBot extends GroupingBot {
+  public static class MyBot extends GroupingBot
+  {
     /**
      * Used for synchronization with the @TestD method: it should wait at the
      * barrier until our bot is done, then execute the asserts.
      */
     CyclicBarrier barrier = new CyclicBarrier(2);
 
-    private static final String sparqlPrefix = "PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>"
-        + "PREFIX geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#>"
-        + "PREFIX xsd:   <http://www.w3.org/2001/XMLSchema#>"
-        + "PREFIX rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
-        + "PREFIX won:   <http://purl.org/webofneeds/model#>" + "PREFIX gr:    <http://purl.org/goodrelations/v1#>"
-        + "PREFIX ldp:   <http://www.w3.org/ns/ldp#>";
-
+    private static final String sparqlPrefix =
+      "PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>"+
+        "PREFIX geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#>"+
+        "PREFIX xsd:   <http://www.w3.org/2001/XMLSchema#>"+
+        "PREFIX rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>"+
+        "PREFIX won:   <http://purl.org/webofneeds/model#>"+
+        "PREFIX gr:    <http://purl.org/goodrelations/v1#>"+
+        "PREFIX ldp:   <http://www.w3.org/ns/ldp#>";
     /**
      * Default constructor is required for instantiation through Spring.
      */
 
-    public MyBot() {
+    public MyBot(){
     }
 
     @Override
-    protected void initializeEventListeners() {
-      // of course, let the real bot implementation initialize itself
+    protected void initializeEventListeners()
+    {
+      //of course, let the real bot implementation initialize itself
       super.initializeEventListeners();
-      // now, add a listener to the WorkDoneEvent.
-      // its only purpose is to trip the CyclicBarrier instance that
+      //now, add a listener to the WorkDoneEvent.
+      //its only purpose is to trip the CyclicBarrier instance that
       // the test method is waiting on
-      getEventBus().subscribe(WorkDoneEvent.class, new ActionOnEventListener(getEventListenerContext(),
+      getEventBus().subscribe(WorkDoneEvent.class,
+        new ActionOnEventListener(
+          getEventListenerContext(),
           new TripBarrierAction(getEventListenerContext(), barrier)));
     }
 
-    public CyclicBarrier getBarrier() {
+    public CyclicBarrier getBarrier()
+    {
       return barrier;
     }
 
     /**
      * Here we check the results of the bot's execution.
      */
-    public void executeAsserts() {
-      // 2 act events
+    public void executeAsserts()
+    {
+      //2 act events
       Assert.assertEquals(NO_OF_GROUPMEMBERS, this.groupMemberCreator.getEventCount());
       Assert.assertEquals(0, this.groupMemberCreator.getExceptionCount());
-      // 2 create need events
+      //2 create need events
       Assert.assertEquals(NO_OF_GROUPMEMBERS, this.groupCreator.getEventCount());
       Assert.assertEquals(0, this.groupCreator.getExceptionCount());
-      // 1 create group events
-      Assert.assertEquals(NO_OF_GROUPMEMBERS + 1, this.needConnector.getEventCount());
+      //1 create group events
+      Assert.assertEquals(NO_OF_GROUPMEMBERS+1, this.needConnector.getEventCount());
       Assert.assertEquals(0, this.needConnector.getExceptionCount());
-      // 2 connect, 2 open
+      //2 connect, 2 open
       Assert.assertEquals(NO_OF_GROUPMEMBERS, this.autoOpener.getEventCount());
       Assert.assertEquals(0, this.autoOpener.getExceptionCount());
-      // 41 messages
-      Assert.assertEquals(NO_OF_GROUPMEMBERS * 2, this.messagesDoneListener.getEventCount());
+      //41 messages
+      Assert.assertEquals(NO_OF_GROUPMEMBERS*2, this.messagesDoneListener.getEventCount());
       Assert.assertEquals(0, this.messagesDoneListener.getExceptionCount());
-      // check that the autoresponder creator was called
+      //check that the autoresponder creator was called
       Assert.assertEquals(NO_OF_GROUPMEMBERS, this.autoResponderCreator.getEventCount());
       Assert.assertEquals(0, this.autoResponderCreator.getExceptionCount());
-      // check that the autoresponders were created
+      //check that the autoresponders were created
       Assert.assertEquals(NO_OF_GROUPMEMBERS, this.autoResponders.size());
-      // check that the autoresponders responded as they should
-      for (BaseEventListener autoResponder : this.autoResponders) {
+      //check that the autoresponders responded as they should
+      for (BaseEventListener autoResponder: this.autoResponders){
         Assert.assertEquals(NO_OF_MESSAGES, ((CountingListener) autoResponder).getCount());
         Assert.assertEquals(0, autoResponder.getExceptionCount());
       }
-      // 4 NeedDeactivated events
+      //4 NeedDeactivated events
       Assert.assertEquals(NO_OF_GROUPMEMBERS, this.workDoneSignaller.getEventCount());
       Assert.assertEquals(0, this.workDoneSignaller.getExceptionCount());
 
-      // TODO: there is more to check:
-      // * what does the RDF look like?
+      //TODO: there is more to check:
+      //* what does the RDF look like?
       // --> pull it from the needURI/ConnectionURI and check contents
-      // * what does the database look like? */
+      //* what does the database look like?      */
     }
   }
 }

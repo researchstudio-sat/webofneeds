@@ -1,60 +1,74 @@
 package won.protocol.message;
 
-import org.apache.jena.rdf.model.Resource;
-import won.protocol.vocabulary.WONMSG;
-
 import java.net.URI;
 
+import org.apache.jena.rdf.model.Resource;
+
+import won.protocol.vocabulary.WONMSG;
+
 /**
- * User: ypanchenko Date: 13.08.2014
+ * User: ypanchenko
+ * Date: 13.08.2014
  */
-public enum WonMessageType {
+public enum WonMessageType
+{
   // main messages
-  CREATE_NEED(WONMSG.TYPE_CREATE), CONNECT(WONMSG.TYPE_CONNECT), DEACTIVATE(WONMSG.TYPE_DEACTIVATE),
-  ACTIVATE(WONMSG.TYPE_ACTIVATE), CLOSE(WONMSG.TYPE_CLOSE), DELETE(WONMSG.TYPE_DELETE), OPEN(WONMSG.TYPE_OPEN),
-  CONNECTION_MESSAGE(WONMSG.TYPE_CONNECTION_MESSAGE), NEED_MESSAGE(WONMSG.TYPE_NEED_MESSAGE),
-  HINT_MESSAGE(WONMSG.TYPE_HINT), HINT_FEEDBACK_MESSAGE(WONMSG.TYPE_HINT_FEEDBACK),
+  CREATE_NEED(WONMSG.TYPE_CREATE),
+  CONNECT(WONMSG.TYPE_CONNECT),
+  DEACTIVATE(WONMSG.TYPE_DEACTIVATE),
+  ACTIVATE(WONMSG.TYPE_ACTIVATE),
+  CLOSE(WONMSG.TYPE_CLOSE),
+  DELETE(WONMSG.TYPE_DELETE),
+  OPEN(WONMSG.TYPE_OPEN),
+  CONNECTION_MESSAGE(WONMSG.TYPE_CONNECTION_MESSAGE),
+  NEED_MESSAGE(WONMSG.TYPE_NEED_MESSAGE),
+  HINT_MESSAGE(WONMSG.TYPE_HINT),
+  HINT_FEEDBACK_MESSAGE(WONMSG.TYPE_HINT_FEEDBACK),
 
   // notification messages
-  HINT_NOTIFICATION(WONMSG.TYPE_HINT_NOTIFICATION), NEED_CREATED_NOTIFICATION(WONMSG.TYPE_NEED_CREATED_NOTIFICATION),
+  HINT_NOTIFICATION(WONMSG.TYPE_HINT_NOTIFICATION),
+  NEED_CREATED_NOTIFICATION(WONMSG.TYPE_NEED_CREATED_NOTIFICATION),
 
   // response messages
-  SUCCESS_RESPONSE(WONMSG.TYPE_SUCCESS_RESPONSE), FAILURE_RESPONSE(WONMSG.TYPE_FAILURE_RESPONSE);
+  SUCCESS_RESPONSE(WONMSG.TYPE_SUCCESS_RESPONSE),
+  FAILURE_RESPONSE(WONMSG.TYPE_FAILURE_RESPONSE);
+
 
   private Resource resource;
 
-  private WonMessageType(Resource resource) {
+  private WonMessageType(Resource resource)
+  {
     this.resource = resource;
   }
 
-  public Resource getResource() {
+  public Resource getResource()
+  {
     return resource;
   }
 
-  public URI getURI() {
+  public URI getURI(){
     return URI.create(getResource().getURI().toString());
   }
 
-  public static WonMessageType getWonMessageType(URI uri) {
+  public static WonMessageType getWonMessageType(URI uri){
     return getWonMessageType(WONMSG.toResource(uri));
   }
 
-  public boolean isIdentifiedBy(URI uri) {
-    if (uri == null)
-      return false;
+  public boolean isIdentifiedBy(URI uri){
+    if (uri == null) return false;
     return getResource().getURI().toString().equals(uri.toString());
   }
-
+  
   public boolean causesConnectionStateChange() {
-    return this == CLOSE || this == CONNECT || this == OPEN;
+	  return this == CLOSE || this == CONNECT || this == OPEN;
   }
-
+  
   public boolean causesNeedStateChange() {
-    return this == ACTIVATE || this == DEACTIVATE;
+	  return this == ACTIVATE || this == DEACTIVATE;
   }
 
   public boolean causesNewConnection() {
-    return this == CONNECT || this == HINT_MESSAGE;
+	  return this == CONNECT || this == HINT_MESSAGE;
   }
 
   public static WonMessageType getWonMessageType(Resource resource) {
@@ -88,7 +102,8 @@ public enum WonMessageType {
     if (WONMSG.TYPE_FAILURE_RESPONSE.equals(resource))
       return FAILURE_RESPONSE;
 
-    // notification classes
+
+    //notification classes
     if (WONMSG.TYPE_HINT_NOTIFICATION.equals(resource))
       return HINT_NOTIFICATION;
     if (WONMSG.TYPE_NEED_CREATED_NOTIFICATION.equals(resource))

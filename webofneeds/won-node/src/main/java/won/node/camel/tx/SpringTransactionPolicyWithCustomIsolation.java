@@ -21,34 +21,33 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
 /**
- * SpringTransactionPolicy implementation that allows for setting the isolation
- * behaviour name.
+ * SpringTransactionPolicy implementation that allows for setting the isolation behaviour name.
  */
 public class SpringTransactionPolicyWithCustomIsolation extends SpringTransactionPolicy {
 
-  private String isolationLevelName;
+    private String isolationLevelName;
 
-  public SpringTransactionPolicyWithCustomIsolation() {
-  }
-
-  public SpringTransactionPolicyWithCustomIsolation(TransactionTemplate template) {
-    super(template);
-  }
-
-  public SpringTransactionPolicyWithCustomIsolation(PlatformTransactionManager transactionManager) {
-    super(transactionManager);
-  }
-
-  public void setIsolationLevelName(String isolationLevelName) {
-    this.isolationLevelName = isolationLevelName;
-  }
-
-  @Override
-  public TransactionTemplate getTransactionTemplate() {
-    TransactionTemplate answer = super.getTransactionTemplate();
-    if (this.isolationLevelName != null) {
-      answer.setIsolationLevelName(this.isolationLevelName);
+    public SpringTransactionPolicyWithCustomIsolation() {
     }
-    return answer;
-  }
+
+    public SpringTransactionPolicyWithCustomIsolation(TransactionTemplate template) {
+        super(template);
+    }
+
+    public SpringTransactionPolicyWithCustomIsolation(PlatformTransactionManager transactionManager) {
+        super(transactionManager);
+    }
+
+    public void setIsolationLevelName(String isolationLevelName) {
+        this.isolationLevelName = isolationLevelName;
+    }
+
+    @Override
+    public TransactionTemplate getTransactionTemplate() {
+        TransactionTemplate answer = super.getTransactionTemplate();
+        if (this.isolationLevelName != null){
+            answer.setIsolationLevelName(this.isolationLevelName);
+        }
+        return answer;
+    }
 }

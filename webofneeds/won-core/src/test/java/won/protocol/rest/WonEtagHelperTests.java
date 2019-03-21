@@ -16,55 +16,57 @@
 
 package won.protocol.rest;
 
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class WonEtagHelperTests {
+public class WonEtagHelperTests
+{
   @Test
-  public void testForVersion() {
+  public void testForVersion(){
     WonEtagHelper helper = WonEtagHelper.forVersion("1");
     Assert.assertNotNull(helper);
     Assert.assertNull(helper.getMediaType());
-    Assert.assertEquals("1", helper.getVersion());
+    Assert.assertEquals("1",helper.getVersion());
     String etagValue = helper.getEtagString();
-    Assert.assertEquals("\"1\"", etagValue);
+    Assert.assertEquals("\"1\"",etagValue);
   }
 
   @Test
-  public void testFromEtagValueNoQuotes() {
+  public void testFromEtagValueNoQuotes(){
     WonEtagHelper helper = WonEtagHelper.fromEtagValue("1");
     Assert.assertNull(helper);
   }
 
   @Test
-  public void testFromEtagValueWeak() {
+  public void testFromEtagValueWeak(){
     WonEtagHelper helper = WonEtagHelper.fromEtagValue("W/\"1\"");
     Assert.assertNull(helper);
   }
 
   @Test
-  public void testFromEtagValueNoMediaType() {
+  public void testFromEtagValueNoMediaType(){
     WonEtagHelper helper = WonEtagHelper.fromEtagValue("\"1\"");
     Assert.assertNull(helper.getMediaType());
     Assert.assertEquals("1", helper.getVersion());
   }
 
   @Test
-  public void testFromEtagValueInvalidMediaType() {
+  public void testFromEtagValueInvalidMediaType(){
     WonEtagHelper helper = WonEtagHelper.fromEtagValue("\"1 /\"");
     Assert.assertNull(helper);
   }
 
   @Test
-  public void testFromEtagValueValidMediaType() {
+  public void testFromEtagValueValidMediaType(){
     WonEtagHelper helper = WonEtagHelper.fromEtagValue("\"1 application/trig\"");
     Assert.assertEquals("1", helper.getVersion());
-    Assert.assertEquals(new MediaType("application", "trig"), helper.getMediaType());
+    Assert.assertEquals(new MediaType("application","trig"), helper.getMediaType());
   }
 
   @Test

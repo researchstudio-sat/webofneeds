@@ -21,5 +21,5 @@ import won.bot.framework.eventbot.event.impl.command.MessageCommandResultEvent;
 /**
  * Tags a result event of an CloseCommand.
  */
-public interface CloseCommandResultEvent extends MessageCommandResultEvent {
+public interface CloseCommandResultEvent extends MessageCommandResultEvent{
 }

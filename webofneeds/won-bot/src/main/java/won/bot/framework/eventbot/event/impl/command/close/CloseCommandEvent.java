@@ -16,43 +16,43 @@
 
 package won.bot.framework.eventbot.event.impl.command.close;
 
+import java.net.URI;
+
 import won.bot.framework.eventbot.event.BaseNeedAndConnectionSpecificEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandEvent;
 import won.protocol.message.WonMessageType;
 import won.protocol.model.Connection;
 
-import java.net.URI;
-
 /**
  * Instructs the bot to close the specified connection behalf of the need.
  */
 public class CloseCommandEvent extends BaseNeedAndConnectionSpecificEvent implements MessageCommandEvent {
-  private String closeMessage;
+    private String closeMessage;
 
-  public CloseCommandEvent(Connection con, String closeMessage) {
-    super(con);
-    this.closeMessage = closeMessage;
-  }
+    public CloseCommandEvent(Connection con, String closeMessage){
+        super(con);
+        this.closeMessage = closeMessage;
+    }
 
-  public CloseCommandEvent(Connection con) {
-    this(con, "Hello!");
-  }
+    public CloseCommandEvent(Connection con){
+        this(con, "Hello!");
+    }
 
-  public CloseCommandEvent(URI needURI, URI remoteNeedURI, URI connectionURI, String closeMessage) {
-    this(makeConnection(needURI, remoteNeedURI, connectionURI), closeMessage);
-  }
+    public CloseCommandEvent(URI needURI, URI remoteNeedURI, URI connectionURI, String closeMessage) {
+        this(makeConnection(needURI, remoteNeedURI, connectionURI), closeMessage);
+    }
 
-  public CloseCommandEvent(URI needURI, URI remoteNeedURI, URI connectionURI) {
-    this(needURI, remoteNeedURI, connectionURI, "Hello!");
-  }
+    public CloseCommandEvent(URI needURI, URI remoteNeedURI, URI connectionURI) {
+        this(needURI, remoteNeedURI, connectionURI, "Hello!");
+    }
 
-  @Override
-  public WonMessageType getWonMessageType() {
-    return WonMessageType.OPEN;
-  }
+    @Override
+    public WonMessageType getWonMessageType() {
+        return WonMessageType.OPEN;
+    }
 
-  public String getCloseMessage() {
-    return closeMessage;
-  }
+    public String getCloseMessage() {
+        return closeMessage;
+    }
 
 }

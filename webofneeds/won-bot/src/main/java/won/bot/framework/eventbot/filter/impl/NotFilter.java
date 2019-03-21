@@ -23,13 +23,14 @@ import won.bot.framework.eventbot.filter.EventFilter;
 /**
  * Delegating filter that inverts its delegate's result.
  */
-public class NotFilter extends AbstractDelegatingFilter {
+public class NotFilter extends AbstractDelegatingFilter
+{
   public NotFilter(final EventFilter delegate) {
     super(delegate);
   }
 
   @Override
   public boolean accept(final Event event) {
-    return !getDelegate().accept(event);
+    return ! getDelegate().accept(event);
   }
 }

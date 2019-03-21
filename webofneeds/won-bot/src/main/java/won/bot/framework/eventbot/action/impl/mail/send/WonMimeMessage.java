@@ -9,31 +9,31 @@ import javax.mail.internet.MimeMessage;
  */
 public class WonMimeMessage extends MimeMessage {
 
-  public WonMimeMessage(Session session) {
-    super(session);
-  }
-
-  public WonMimeMessage(MimeMessage mimeMessage) throws MessagingException {
-    super(mimeMessage);
-  }
-
-  public void setMessageId(String messageId) throws MessagingException {
-
-    if (messageId.startsWith("<") && messageId.endsWith(">")) {
-      this.setHeader("Message-ID", messageId);
-    } else {
-      this.setHeader("Message-ID", "<" + messageId + ">");
+    public WonMimeMessage(Session session) {
+        super(session);
     }
-  }
 
-  public String getMessageIdHeader() throws MessagingException {
-    return getHeader("Message-Id")[0];
-  }
-
-  @Override
-  public void updateMessageID() throws MessagingException {
-    if (getHeader("Message-Id") == null) {
-      super.updateMessageID();
+    public WonMimeMessage(MimeMessage mimeMessage) throws MessagingException {
+        super(mimeMessage);
     }
-  }
+
+    public void setMessageId(String messageId) throws MessagingException {
+
+        if (messageId.startsWith("<") && messageId.endsWith(">")) {
+            this.setHeader("Message-ID", messageId);
+        } else {
+            this.setHeader("Message-ID", "<" + messageId + ">");
+        }
+    }
+
+    public String getMessageIdHeader() throws MessagingException {
+        return getHeader("Message-Id")[0];
+    }
+
+    @Override
+    public void updateMessageID() throws MessagingException {
+        if(getHeader("Message-Id") == null) {
+            super.updateMessageID();
+        }
+    }
 }

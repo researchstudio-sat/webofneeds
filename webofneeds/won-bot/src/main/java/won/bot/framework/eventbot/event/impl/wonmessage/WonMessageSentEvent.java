@@ -24,7 +24,8 @@ import won.protocol.message.WonMessageType;
 /**
  * Created by fkleedorfer on 14.06.2016.
  */
-public class WonMessageSentEvent extends BaseEvent implements MessageEvent {
+public class WonMessageSentEvent extends BaseEvent implements MessageEvent
+{
   private final WonMessage message;
 
   public WonMessageSentEvent(WonMessage message) {

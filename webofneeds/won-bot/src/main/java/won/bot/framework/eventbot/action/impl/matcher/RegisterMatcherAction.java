@@ -16,6 +16,11 @@
 
 package won.bot.framework.eventbot.action.impl.matcher;
 
+import java.net.URI;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
@@ -23,26 +28,25 @@ import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.matcher.MatcherRegisterFailedEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 
-import java.net.URI;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-
 /**
- * User: fkleedorfer Date: 28.03.14
- */
-public class RegisterMatcherAction extends BaseEventBotAction {
+* User: fkleedorfer
+* Date: 28.03.14
+*/
+public class RegisterMatcherAction extends BaseEventBotAction
+{
   private List<URI> registeredNodes = new LinkedList<>();
 
-  public RegisterMatcherAction(final EventListenerContext eventListenerContext) {
+  public RegisterMatcherAction(final EventListenerContext eventListenerContext)
+  {
     super(eventListenerContext);
   }
 
   @Override
-  protected void doRun(Event event, EventListener executingListener) throws Exception {
+  protected void doRun(Event event, EventListener executingListener) throws Exception
+  {
     final Iterator wonNodeUriIterator = getEventListenerContext().getMatcherNodeURISource().getNodeURIIterator();
-    while (wonNodeUriIterator.hasNext()) {
-      URI wonNodeUri = (URI) wonNodeUriIterator.next();
+    while (wonNodeUriIterator.hasNext()){
+      URI wonNodeUri = (URI)wonNodeUriIterator.next();
       try {
         if (!registeredNodes.contains(wonNodeUri)) {
           logger.debug("registering matcher on won node {}", wonNodeUri);

@@ -1,13 +1,15 @@
 package won.protocol.message.processor.exception;
 
 /**
- * Indicates that the uri (of event or need) is malformed from the point of view
- * of the node that is supposed to store it. (e.g. the domain if the message
- * event uri does not correspond to the node domain, etc.)
- * <p>
- * User: ypanchenko Date: 24.04.2015
+ * Indicates that the uri (of event or need) is malformed from the point
+ * of view of the node that is supposed to store it. (e.g. the domain
+ * if the message event uri does not correspond to the node domain, etc.)
+ *
+ * User: ypanchenko
+ * Date: 24.04.2015
  */
-public class UriNodePathException extends WonMessageProcessingException {
+public class UriNodePathException extends WonMessageProcessingException
+{
   public UriNodePathException() {
   }
 

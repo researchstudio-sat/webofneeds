@@ -16,6 +16,10 @@
 
 package won.bot.impl;
 
+import java.net.URI;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
+
 import won.bot.framework.bot.base.EventBot;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
@@ -35,14 +39,11 @@ import won.protocol.message.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 
-import java.net.URI;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
-
 /**
  * Bot that connects the two last seen needs using a hint.
  */
-public class LastSeenNeedsMatcherBot extends EventBot {
+public class LastSeenNeedsMatcherBot extends EventBot
+{
 
   private BaseEventListener matcherRegistrator;
   private BaseEventListener matcherIndexer;
@@ -58,54 +59,69 @@ public class LastSeenNeedsMatcherBot extends EventBot {
     this.matcherUri = matcherUri;
   }
 
-  // we remember the need uri each time a new need is encountered
+  //we remember the need uri each time a new need is encountered
   private AtomicReference<URI> lastNeedUriReference = new AtomicReference<>();
-
   @Override
-  protected void initializeEventListeners() {
+  protected void initializeEventListeners()
+  {
     EventListenerContext ctx = getEventListenerContext();
     EventBus bus = getEventBus();
 
-    // subscribe this bot with the WoN nodes' 'new need' topic
+    //subscribe this bot with the WoN nodes' 'new need' topic
     RegisterMatcherAction registerMatcherAction = new RegisterMatcherAction(ctx);
     this.matcherRegistrator = new ActionOnEventListener(ctx, registerMatcherAction, 1);
     bus.subscribe(ActEvent.class, this.matcherRegistrator);
-    RandomDelayedAction delayedRegistration = new RandomDelayedAction(ctx, registrationMatcherRetryInterval,
-        registrationMatcherRetryInterval, 0, registerMatcherAction);
+    RandomDelayedAction delayedRegistration = new RandomDelayedAction(ctx, registrationMatcherRetryInterval, registrationMatcherRetryInterval, 0, registerMatcherAction);
     ActionOnEventListener matcherRetryRegistrator = new ActionOnEventListener(ctx, delayedRegistration);
     bus.subscribe(MatcherRegisterFailedEvent.class, matcherRetryRegistrator);
 
     bus.subscribe(NeedCreatedEventForMatcher.class,
-        new ActionOnEventListener(ctx, "lastSeenNeedsMatcher", new BaseEventBotAction(ctx) {
-          @Override
-          protected void doRun(final Event event, EventListener executingListener) throws Exception {
-            NeedCreatedEventForMatcher needCreatedEvent = (NeedCreatedEventForMatcher) event;
-            URI currentNeedURI = needCreatedEvent.getNeedURI();
-            URI lastNeedURI = lastNeedUriReference.getAndSet(currentNeedURI);
-            URI originator = matcherUri;
-            if (lastNeedURI == null) {
-              logger.info("First invocation. Remembering {} for matching it later", currentNeedURI);
-              return;
-            } else {
-              logger.info("Sending hint for {} and {}", currentNeedURI, lastNeedURI);
-            }
-            ctx.getMatcherProtocolNeedServiceClient().hint(currentNeedURI, lastNeedURI, 0.5, originator, null,
-                createWonMessage(currentNeedURI, lastNeedURI, 0.5, originator));
-            ctx.getMatcherProtocolNeedServiceClient().hint(lastNeedURI, currentNeedURI, 0.5, originator, null,
-                createWonMessage(lastNeedURI, currentNeedURI, 0.5, originator));
-          }
-        }));
+          new ActionOnEventListener(ctx, "lastSeenNeedsMatcher",
+            new BaseEventBotAction(ctx)
+            {
+              @Override
+              protected void doRun(final Event event, EventListener executingListener)
+                throws Exception {
+                NeedCreatedEventForMatcher needCreatedEvent = (NeedCreatedEventForMatcher) event;
+                URI currentNeedURI = needCreatedEvent.getNeedURI();
+                URI lastNeedURI = lastNeedUriReference.getAndSet(currentNeedURI);
+                URI originator = matcherUri;
+                if (lastNeedURI == null){
+                  logger.info("First invocation. Remembering {} for matching it later", currentNeedURI);
+                  return;
+                } else {
+                  logger.info("Sending hint for {} and {}", currentNeedURI, lastNeedURI);
+                }
+                ctx.getMatcherProtocolNeedServiceClient().hint(currentNeedURI, lastNeedURI, 0.5, originator,
+                                                               null, createWonMessage(
+                    currentNeedURI, lastNeedURI, 0.5, originator));
+                ctx.getMatcherProtocolNeedServiceClient().hint(lastNeedURI, currentNeedURI, 0.5, originator,
+                        null, createWonMessage(
+                                lastNeedURI, currentNeedURI, 0.5, originator));
+              }
+            }));
   }
 
   private WonMessage createWonMessage(URI needURI, URI otherNeedURI, double score, URI originator)
-      throws WonMessageBuilderException {
+    throws WonMessageBuilderException {
 
-    WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
+    WonNodeInformationService wonNodeInformationService =
+      getEventListenerContext().getWonNodeInformationService();
 
-    URI localWonNode = WonRdfUtils.NeedUtils
-        .getWonNodeURIFromNeed(getEventListenerContext().getLinkedDataSource().getDataForResource(needURI), needURI);
+    URI localWonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(
+      getEventListenerContext().getLinkedDataSource().getDataForResource(needURI), needURI);
 
-    return WonMessageBuilder.setMessagePropertiesForHint(wonNodeInformationService.generateEventURI(localWonNode),
-        needURI, Optional.empty(), localWonNode, otherNeedURI, Optional.empty(), originator, score).build();
+    return WonMessageBuilder
+      .setMessagePropertiesForHint(
+        wonNodeInformationService.generateEventURI(
+          localWonNode),
+        needURI,
+        Optional.empty(),
+        localWonNode,
+        otherNeedURI,
+        Optional.empty(),
+        originator,
+        score)
+      .build();
   }
 }

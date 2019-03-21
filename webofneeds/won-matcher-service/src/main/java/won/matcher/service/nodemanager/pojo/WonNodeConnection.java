@@ -4,20 +4,21 @@ import akka.actor.ActorRef;
 import won.protocol.service.WonNodeInfo;
 
 /**
- * Class represents all data needed to connect with a won node, receive need
- * updates and send hints
- * <p>
- * User: hfriedrich Date: 18.05.2015
+ * Class represents all data needed to connect with a won node, receive need updates and send hints
+ *
+ * User: hfriedrich
+ * Date: 18.05.2015
  */
-public class WonNodeConnection {
+public class WonNodeConnection
+{
   private WonNodeInfo wonNodeInfo;
   private ActorRef needCreatedConsumer;
   private ActorRef needActivatedConsumer;
   private ActorRef needDeactivatedConsumer;
   private ActorRef hintProducer;
 
-  public WonNodeConnection(WonNodeInfo info, ActorRef needCreatedConsumer, ActorRef needActivatedConsumer,
-      ActorRef needDeactivatedConsumer, ActorRef hintProducer) {
+  public WonNodeConnection(WonNodeInfo info, ActorRef needCreatedConsumer,
+                           ActorRef needActivatedConsumer, ActorRef needDeactivatedConsumer, ActorRef hintProducer) {
 
     wonNodeInfo = info;
     this.needCreatedConsumer = needCreatedConsumer;

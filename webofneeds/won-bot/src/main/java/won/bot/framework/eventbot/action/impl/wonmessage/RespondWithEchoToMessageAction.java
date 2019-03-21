@@ -16,7 +16,11 @@
 
 package won.bot.framework.eventbot.action.impl.wonmessage;
 
+import java.net.URI;
+import java.util.Date;
+
 import org.apache.jena.query.Dataset;
+
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.ConnectionSpecificEvent;
@@ -29,40 +33,40 @@ import won.protocol.message.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 
-import java.net.URI;
-import java.util.Date;
-
 /**
  * Listener that responds to open and message events with automatic messages.
  * Can be configured to apply a timeout (non-blocking) before sending messages.
  */
-public class RespondWithEchoToMessageAction extends BaseEventBotAction {
+public class RespondWithEchoToMessageAction extends BaseEventBotAction
+{
   private long millisTimeoutBeforeReply = 0;
 
   public RespondWithEchoToMessageAction(EventListenerContext eventListenerContext) {
     super(eventListenerContext);
   }
 
-  public RespondWithEchoToMessageAction(final EventListenerContext eventListenerContext,
-      final long millisTimeoutBeforeReply) {
+  public RespondWithEchoToMessageAction(final EventListenerContext eventListenerContext, final long millisTimeoutBeforeReply) {
     super(eventListenerContext);
     this.millisTimeoutBeforeReply = millisTimeoutBeforeReply;
   }
 
   @Override
-  protected void doRun(final Event event, EventListener executingListener) throws Exception {
-    if (event instanceof ConnectionSpecificEvent) {
+  protected void doRun(final Event event, EventListener executingListener) throws Exception
+  {
+    if (event instanceof ConnectionSpecificEvent){
       handleMessageEvent((ConnectionSpecificEvent) event);
     }
   }
 
-  private void handleMessageEvent(final ConnectionSpecificEvent messageEvent) {
-    getEventListenerContext().getTaskScheduler().schedule(new Runnable() {
+  private void handleMessageEvent(final ConnectionSpecificEvent messageEvent){
+    getEventListenerContext().getTaskScheduler().schedule(new Runnable()
+    {
       @Override
-      public void run() {
+      public void run()
+      {
         String message = null;
-        if (messageEvent instanceof MessageEvent) {
-          message = createMessage(extractTextMessageFromWonMessage(((MessageEvent) messageEvent).getWonMessage()));
+        if (messageEvent instanceof  MessageEvent) {
+          message = createMessage(extractTextMessageFromWonMessage(((MessageEvent)messageEvent).getWonMessage()));
         } else {
           message = createMessage(null);
         }
@@ -77,35 +81,46 @@ public class RespondWithEchoToMessageAction extends BaseEventBotAction {
     }, new Date(System.currentTimeMillis() + this.millisTimeoutBeforeReply));
   }
 
-  private String extractTextMessageFromWonMessage(WonMessage wonMessage) {
-    if (wonMessage == null)
-      return null;
+  private String extractTextMessageFromWonMessage(WonMessage wonMessage){
+    if (wonMessage == null) return null;
     return WonRdfUtils.MessageUtils.getTextMessage(wonMessage);
   }
 
-  private String createMessage(String toEcho) {
+  private String createMessage(String toEcho)
+  {
     if (toEcho == null) {
-      return "auto reply (delay: " + millisTimeoutBeforeReply + " millis)";
+      return "auto reply (delay: "+ millisTimeoutBeforeReply + " millis)";
     } else {
-      return "You said: '" + toEcho + "' (delay: " + millisTimeoutBeforeReply + " millis)";
+      return "You said: '" + toEcho + "' (delay: "+ millisTimeoutBeforeReply + " millis)";
     }
   }
 
   private WonMessage createWonMessage(URI connectionURI, String textMessage) throws WonMessageBuilderException {
 
-    WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
+    WonNodeInformationService wonNodeInformationService =
+      getEventListenerContext().getWonNodeInformationService();
 
-    Dataset connectionRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(connectionURI);
+    Dataset connectionRDF =
+      getEventListenerContext().getLinkedDataSource().getDataForResource(connectionURI);
     URI remoteNeed = WonRdfUtils.ConnectionUtils.getRemoteNeedURIFromConnection(connectionRDF, connectionURI);
     URI localNeed = WonRdfUtils.ConnectionUtils.getLocalNeedURIFromConnection(connectionRDF, connectionURI);
     URI wonNode = WonRdfUtils.ConnectionUtils.getWonNodeURIFromConnection(connectionRDF, connectionURI);
-    Dataset remoteNeedRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(remoteNeed);
+    Dataset remoteNeedRDF =
+      getEventListenerContext().getLinkedDataSource().getDataForResource(remoteNeed);
 
     URI messageURI = wonNodeInformationService.generateEventURI(wonNode);
 
-    return WonMessageBuilder.setMessagePropertiesForConnectionMessage(messageURI, connectionURI, localNeed, wonNode,
-        WonRdfUtils.ConnectionUtils.getRemoteConnectionURIFromConnection(connectionRDF, connectionURI), remoteNeed,
-        WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, remoteNeed), textMessage).build();
+    return WonMessageBuilder
+      .setMessagePropertiesForConnectionMessage(
+        messageURI,
+        connectionURI,
+        localNeed,
+        wonNode,
+        WonRdfUtils.ConnectionUtils.getRemoteConnectionURIFromConnection(connectionRDF, connectionURI),
+        remoteNeed,
+        WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, remoteNeed),
+        textMessage)
+      .build();
   }
 
 }

@@ -16,15 +16,20 @@
 
 package won.protocol.exception;
 
+
 /**
- * User: fkleedorfer Date: 02.11.12
+ * User: fkleedorfer
+ * Date: 02.11.12
  */
-public class IllegalNeedContentException extends WonProtocolException {
-  public IllegalNeedContentException(final String message) {
+public class IllegalNeedContentException extends WonProtocolException
+{
+  public IllegalNeedContentException(final String message)
+  {
     super(message);
   }
 
-  public IllegalNeedContentException(final String message, final Throwable cause) {
+  public IllegalNeedContentException(final String message, final Throwable cause)
+  {
     super(message, cause);
   }
 }

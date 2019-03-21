@@ -1,9 +1,11 @@
 package won.protocol.exception;
 
 /**
- * User: fsalcher Date: 27.08.2014
+ * User: fsalcher
+ * Date: 27.08.2014
  */
-public class WonMessageBuilderException extends RuntimeException {
+public class WonMessageBuilderException extends RuntimeException
+{
 
   public WonMessageBuilderException() {
   }
@@ -20,8 +22,7 @@ public class WonMessageBuilderException extends RuntimeException {
     super(cause);
   }
 
-  public WonMessageBuilderException(final String message, final Throwable cause, final boolean enableSuppression,
-      final boolean writableStackTrace) {
+  public WonMessageBuilderException(final String message, final Throwable cause, final boolean enableSuppression, final boolean writableStackTrace) {
     super(message, cause, enableSuppression, writableStackTrace);
   }
 }

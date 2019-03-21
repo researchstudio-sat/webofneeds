@@ -25,7 +25,8 @@ import won.bot.framework.eventbot.listener.EventListener;
 /**
  * Executes the specified actions.
  */
-public class MultipleActions extends BaseEventBotAction {
+public class MultipleActions extends BaseEventBotAction
+{
   private EventBotAction[] actions;
 
   public MultipleActions(final EventListenerContext eventListenerContext, final EventBotAction... actions) {
@@ -35,7 +36,7 @@ public class MultipleActions extends BaseEventBotAction {
 
   @Override
   protected void doRun(final Event event, EventListener executingListener) throws Exception {
-    for (int i = 0; i < actions.length; i++) {
+    for(int i = 0; i < actions.length; i++) {
       getEventListenerContext().getExecutor().execute(actions[i].getActionTask(event, executingListener));
     }
   }

@@ -1,14 +1,17 @@
 package won.owner.pojo;
 
 /**
- * User: ypanchenko Date: 23.02.2015
+ * User: ypanchenko
+ * Date: 23.02.2015
  */
-public class UserSettingsPojo extends UsernamePojo {
+public class UserSettingsPojo extends UsernamePojo
+{
   private String email;
   private String needUri;
   private boolean notifyMatches;
   private boolean notifyRequests;
   private boolean notifyConversations;
+
 
   public UserSettingsPojo() {
   }

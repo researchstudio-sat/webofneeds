@@ -20,16 +20,15 @@ import org.apache.jena.query.Dataset;
 import org.springframework.http.HttpHeaders;
 
 /**
- * Simple structure to hold a dataset and the response headers that were sent
- * along with the dataset.
+ * Simple structure to hold a dataset and the response headers that were sent along with the dataset.
  */
-public class DatasetResponseWithStatusCodeAndHeaders {
+public class DatasetResponseWithStatusCodeAndHeaders
+{
   private Dataset dataset;
   private int statusCode;
   private HttpHeaders responseHeaders;
 
-  public DatasetResponseWithStatusCodeAndHeaders(final Dataset dataset, final int statusCode,
-      final HttpHeaders responseHeaders) {
+  public DatasetResponseWithStatusCodeAndHeaders(final Dataset dataset, final int statusCode, final HttpHeaders responseHeaders) {
     this.dataset = dataset;
     this.statusCode = statusCode;
     this.responseHeaders = responseHeaders;

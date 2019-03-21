@@ -16,25 +16,26 @@
 
 package won.matcher.component;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.net.URI;
 import java.util.Iterator;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
- * User: LEIH-NB Date: 11.04.14
+ * User: LEIH-NB
+ * Date: 11.04.14
  */
-public class MatcherNodeURISourceImpl implements MatcherNodeURISource {
+public class MatcherNodeURISourceImpl implements MatcherNodeURISource
+{
   private final Logger logger = LoggerFactory.getLogger(getClass());
   private List<URI> nodeURIs = null;
 
   @Override
   public Iterator getNodeURIIterator() {
-    return this.nodeURIs.iterator();
+   return this.nodeURIs.iterator();
   }
-
   public void setNodeURIs(final List<URI> nodeURIs) {
     this.nodeURIs = nodeURIs;
   }

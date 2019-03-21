@@ -1,10 +1,12 @@
 package won.cryptography.rdfsign;
 
-import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.GraphCollection;
-import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.NamedGraph;
-import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.Prefix;
-import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.Triple;
-import de.uni_koblenz.aggrimm.icp.crypto.sign.trigplus.TriGPlusWriter;
+import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStreamWriter;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
@@ -14,34 +16,34 @@ import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 
-import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStreamWriter;
-import java.util.List;
-import java.util.Map;
+import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.GraphCollection;
+import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.NamedGraph;
+import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.Prefix;
+import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.Triple;
+import de.uni_koblenz.aggrimm.icp.crypto.sign.trigplus.TriGPlusWriter;
 
 /**
  * Created by ypanchenko on 09.07.2014.
  */
-public class ModelConverter {
+public class ModelConverter
+{
+
 
   /**
-   * Converts Signingframework's NamedGraph into Jena's Model.
-   * <p>
-   * It is required, that GraphCollection stores the prefixes (if present), but
-   * that they are not applied (i.e. its applyPrefixes() method should not be
-   * called). Otherwise there could be errors when converting, since
-   * Signingframework when applying prefixes just looks whether the resource uri
-   * starts with that prefix uri, which would be true in both cases below:
+   *  Converts Signingframework's NamedGraph into Jena's Model.
    *
-   * @prefix : <http://www.example.com/resource/need/12#> .
-   * @prefix need: <http://www.example.com/resource/need/12> . Also, applying
-   *         prefixes in NamedGraph in cases like
-   * @prefix : <http://www.example.com/resource/need/12/>
-   *         <http://www.example.com/resource/need/12/connections/> a
-   *         ldp:Container . would result in a wrong RDF triple: :connections/ a
-   *         ldp:Container .
+   *  It is required, that GraphCollection stores the prefixes (if present),
+   *  but that they are not applied (i.e. its applyPrefixes() method should not
+   *  be called). Otherwise there could be errors when converting, since
+   *  Signingframework when applying prefixes just looks whether the resource
+   *  uri starts with that prefix uri, which would be true in both cases below:
+   *  @prefix :    <http://www.example.com/resource/need/12#> .
+   *  @prefix need:    <http://www.example.com/resource/need/12> .
+   *  Also, applying prefixes in NamedGraph in cases like
+   *  @prefix :    <http://www.example.com/resource/need/12/>
+   *  <http://www.example.com/resource/need/12/connections/> a   ldp:Container .
+   *  would result in a wrong RDF triple:
+   *  :connections/ a ldp:Container .
    */
   public static Model namedGraphToModel(String graphName, GraphCollection gc) throws Exception {
     NamedGraph graph = null;
@@ -54,13 +56,14 @@ public class ModelConverter {
     return namedGraphToModel(graph, gc.getPrefixes());
   }
 
+
   /**
    * Converts Jena's Model into Signingframework's NamedGraph of GraphCollection.
-   * <p>
-   * Resulting GraphCollection contains exactly one NamedGraph that corresponds to
-   * the provided Model (modelURI) from the provided Dataset. The resulting
-   * GraphCollection stores the prefixes (if were present in the Datastore), but
-   * they are not applied (for reasons, see namedGraphToModel() doc).
+   *
+   *  Resulting GraphCollection contains exactly one NamedGraph that corresponds to
+   *  the provided Model (modelURI) from the provided Dataset. The resulting
+   *  GraphCollection stores the prefixes (if were present in the Datastore),
+   *  but they are not applied (for reasons, see namedGraphToModel() doc).
    */
   public static GraphCollection modelToGraphCollection(String modelURI, Dataset modelDataset) {
 
@@ -73,7 +76,7 @@ public class ModelConverter {
   private static Model namedGraphToModel(NamedGraph graph, List<Prefix> prefixes) throws Exception {
 
     // Here, the simplest, but probably not the most efficient, approach is
-    // applied: Signingframework's reader and Jena's writer are used to
+    // applied:  Signingframework's reader and Jena's writer are used to
     // transform data from one data structure to another. Works fine.
 
     ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -116,13 +119,14 @@ public class ModelConverter {
     }
   }
 
+
   private static GraphCollection modelToGraphCollection(String name, Model model, Map<String, String> pm) {
 
     // Convert each subj pred obj in Jena Statement into String and add to
     // SigningFramework's NamedGraph.
-    // The simpler approach with just using Jena's writer and Signingframework's
-    // reader to transform data between data structures won't work since
-    // Signingframework has problems with recognizing the [] structure
+    //The simpler approach with just using Jena's writer and Signingframework's
+    //reader to transform data between data structures won't work since
+    //Signingframework has problems with recognizing the [] structure
 
     GraphCollection graphc = new GraphCollection();
     NamedGraph namedGraph = new NamedGraph(enclose(name, "<", ">"), 0, null);
@@ -144,12 +148,13 @@ public class ModelConverter {
     // pref:/connections/, and also the collision on the prefix uris
     // that starts the same. E.g. having prefixes below in need rdf
     // would cause errors
-    // @prefix : <http://www.example.com/resource/need/12#> .
-    // @prefix need: <http://www.example.com/resource/need/12> .
-    // graphc.applyPrefixes();
+    // @prefix :    <http://www.example.com/resource/need/12#> .
+    // @prefix need:    <http://www.example.com/resource/need/12> .
+    //graphc.applyPrefixes();
 
     return graphc;
   }
+
 
   private static String rdfNodeAsString(final RDFNode rdfNode) {
     String result = null;
@@ -166,13 +171,13 @@ public class ModelConverter {
     } else if (rdfNode.isAnon()) {
       result = enclose(rdfNode.asResource().getId().getLabelString(), "_:", "");
     } else {
-      // TODO It might need to be improved as some syntax cases might not be covered
-      // so far
+      // TODO It might need to be improved as some syntax cases might not be covered so far
       // a collection??
       throw new UnsupportedOperationException("support missing for converting: " + rdfNode.toString());
     }
     return result;
   }
+
 
   private static String enclose(String string, String start, String end) {
     return start + string + end;

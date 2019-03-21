@@ -7,12 +7,13 @@ import org.springframework.context.event.ContextRefreshedEvent;
 
 /**
  * Created by hfriedrich on 04.10.2016.
- * <p>
- * creates events to signal the need to register at default won nodes. This is
- * done either at context refresh or every X seconds (see xml config)
+ *
+ * creates events to signal the need to register at default won nodes.
+ * This is done either at context refresh or every X seconds (see xml config)
  */
-public class WonNodeRegistrationEventPublisher
-    implements ApplicationEventPublisherAware, ApplicationListener<ContextRefreshedEvent> {
+public class WonNodeRegistrationEventPublisher implements ApplicationEventPublisherAware,
+  ApplicationListener<ContextRefreshedEvent>
+{
   protected ApplicationEventPublisher eventPublisher;
 
   public void publishScheduledEvent() {

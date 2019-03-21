@@ -22,6 +22,7 @@ import won.protocol.message.sender.exception.WonMessageSenderException;
 /**
  * Interface for sending messages.
  */
-public interface WonMessageSender {
+public interface WonMessageSender
+{
   public void sendWonMessage(WonMessage message) throws WonMessageSenderException;
 }

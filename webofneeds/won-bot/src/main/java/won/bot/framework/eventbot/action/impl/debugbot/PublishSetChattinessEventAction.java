@@ -28,7 +28,8 @@ import won.protocol.model.Connection;
  * Action to set the chattiness of the debug bot. Executing the action will
  * publish a SetChattinessDebugCommandEvent.
  */
-public class PublishSetChattinessEventAction extends BaseEventBotAction {
+public class PublishSetChattinessEventAction extends BaseEventBotAction
+{
   private boolean isChatty;
 
   public PublishSetChattinessEventAction(final EventListenerContext eventListenerContext, final boolean isChatty) {
@@ -38,9 +39,9 @@ public class PublishSetChattinessEventAction extends BaseEventBotAction {
 
   @Override
   protected void doRun(final Event event, EventListener executingListener) throws Exception {
-    if (event instanceof BaseNeedAndConnectionSpecificEvent) {
+    if (event instanceof BaseNeedAndConnectionSpecificEvent){
       Connection con = ((BaseNeedAndConnectionSpecificEvent) event).getCon();
-      getEventListenerContext().getEventBus().publish(new SetChattinessDebugCommandEvent(con, isChatty));
+      getEventListenerContext().getEventBus().publish( new SetChattinessDebugCommandEvent(con, isChatty));
     }
   }
 }

@@ -16,61 +16,61 @@
 
 package won.protocol.validation;
 
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryFactory;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryFactory;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+
 /**
  * Groups utility functions for validating WoN RDF structures.
  */
 public class ValidationUtils {
-  public static List<WonSparqlValidator> loadResources(PathMatchingResourcePatternResolver resolver, String dirString)
-      throws IOException {
-    List validators = new ArrayList<WonSparqlValidator>();
-    Resource[] resources = resolver.getResources("classpath:" + dirString + "*.rq");
-    for (Resource resource : resources) {
-      try {
-        String queryString = loadQueryFromResource(resource);
-        Query constraint = QueryFactory.create(queryString);
-        WonSparqlValidator validator = new WonSparqlValidator(constraint, resource.getFilename());
-        validators.add(validator);
-      } catch (Exception e) {
-        throw new IllegalStateException(
-            "Error loading query from resource " + resource.toString() + ": " + e.getMessage(), e);
-      }
-    }
-    return validators;
-  }
-
-  private static String loadQueryFromResource(final Resource resource) {
-    BufferedReader reader = null;
-    StringBuilder sb = new StringBuilder();
-    String line;
-    try {
-      reader = new BufferedReader(new InputStreamReader(resource.getInputStream(), "UTF-8"));
-      while ((line = reader.readLine()) != null) {
-        sb.append(line);
-        sb.append("\n");
-      }
-
-    } catch (IOException e) {
-      e.printStackTrace();
-    } finally {
-      if (reader != null) {
-        try {
-          reader.close();
-        } catch (IOException e) {
-          e.printStackTrace();
+    public static List<WonSparqlValidator> loadResources(PathMatchingResourcePatternResolver resolver, String dirString)
+            throws IOException {
+        List validators = new ArrayList<WonSparqlValidator>();
+        Resource[] resources = resolver.getResources("classpath:" + dirString + "*.rq");
+        for (Resource resource : resources) {
+            try {
+                String queryString = loadQueryFromResource(resource);
+                Query constraint = QueryFactory.create(queryString);
+                WonSparqlValidator validator = new WonSparqlValidator(constraint, resource.getFilename());
+                validators.add(validator);
+            } catch (Exception e){
+                throw new IllegalStateException("Error loading query from resource " + resource.toString()  + ": " + e.getMessage(), e);
+            }
         }
-      }
+        return validators;
     }
-    return sb.toString();
-  }
+
+    private static String loadQueryFromResource(final Resource resource) {
+        BufferedReader reader = null;
+        StringBuilder sb = new StringBuilder();
+        String line;
+        try {
+            reader = new BufferedReader(new InputStreamReader(resource.getInputStream(),
+                    "UTF-8"));
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
+                sb.append("\n");
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return sb.toString();
+    }
 }

@@ -21,10 +21,9 @@ import java.util.List;
 /**
  * Interface for composite filters.
  */
-public interface CompositeFilter extends EventFilter {
+public interface CompositeFilter extends EventFilter
+{
   void addFilter(EventFilter filter);
-
   List<EventFilter> getFilters();
-
   void setFilters(List<EventFilter> filters);
 }

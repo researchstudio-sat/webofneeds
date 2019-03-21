@@ -16,7 +16,13 @@
 
 package won.bot.framework.eventbot.action.impl.debugbot;
 
+import java.net.URI;
+import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.jena.query.Dataset;
+
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.ConnectionSpecificEvent;
@@ -30,120 +36,117 @@ import won.protocol.message.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 
-import java.net.URI;
-import java.util.Date;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 /**
  * User: fkleedorfer Date: 30.01.14
  */
 public class OpenConnectionDebugAction extends BaseEventBotAction {
 
-  private String welcomeMessage;
+	private String welcomeMessage;
 
-  private Pattern PATTERN_WAIT = Pattern.compile("wait(\\s+([0-9]{1,2}))?");
-  private Pattern PATTERN_DENY = Pattern.compile("deny");
-  private Pattern PATTERN_IGNORE = Pattern.compile("ignore");
+	private Pattern PATTERN_WAIT = Pattern.compile("wait(\\s+([0-9]{1,2}))?");
+	private Pattern PATTERN_DENY = Pattern.compile("deny");
+	private Pattern PATTERN_IGNORE = Pattern.compile("ignore");
 
-  private String welcomeHelpMessage;
+	private String welcomeHelpMessage;
 
-  public OpenConnectionDebugAction(final EventListenerContext context, final String welcomeMessage,
-      final String welcomeHelpMessage) {
-    super(context);
-    this.welcomeMessage = welcomeMessage;
-    this.welcomeHelpMessage = welcomeHelpMessage;
-  }
+	public OpenConnectionDebugAction(final EventListenerContext context, final String welcomeMessage, final String welcomeHelpMessage) {
+		super(context);
+		this.welcomeMessage = welcomeMessage;
+		this.welcomeHelpMessage = welcomeHelpMessage;
+	}
 
-  @Override
-  public void doRun(final Event event, EventListener executingListener) throws Exception {
-    if (!(event instanceof ConnectFromOtherNeedEvent)) {
-      return;
-    }
-    if (event instanceof WonMessageReceivedOnConnectionEvent) {
-      WonMessage msg = ((WonMessageReceivedOnConnectionEvent) event).getWonMessage();
-      String message = WonRdfUtils.MessageUtils.getTextMessage(msg);
-      if (message == null) {
-        message = "";
-      }
+	@Override
+	public void doRun(final Event event, EventListener executingListener) throws Exception {
+		if (!(event instanceof ConnectFromOtherNeedEvent)) {
+			return;
+		}
+		if (event instanceof WonMessageReceivedOnConnectionEvent) {
+			WonMessage msg = ((WonMessageReceivedOnConnectionEvent) event).getWonMessage();
+			String message = WonRdfUtils.MessageUtils.getTextMessage(msg);
+			if (message == null) {
+				message = "";
+			}
+			
+			
+			Matcher ignoreMatcher = PATTERN_IGNORE.matcher(message);
+			if (ignoreMatcher.find()) {
+				logger.debug("not reacting to incoming message of type {} as the welcome message contained 'ignore'",
+						msg.getMessageType());
+				return;
+			}
 
-      Matcher ignoreMatcher = PATTERN_IGNORE.matcher(message);
-      if (ignoreMatcher.find()) {
-        logger.debug("not reacting to incoming message of type {} as the welcome message contained 'ignore'",
-            msg.getMessageType());
-        return;
-      }
+			Matcher waitMatcher = PATTERN_WAIT.matcher(message);
+			final boolean wait = waitMatcher.find();
+			int waitSeconds = 15;
+			if (wait && waitMatcher.groupCount() == 2) {
+				waitSeconds = Integer.parseInt(waitMatcher.group(2));
+			}
 
-      Matcher waitMatcher = PATTERN_WAIT.matcher(message);
-      final boolean wait = waitMatcher.find();
-      int waitSeconds = 15;
-      if (wait && waitMatcher.groupCount() == 2) {
-        waitSeconds = Integer.parseInt(waitMatcher.group(2));
-      }
+			Matcher denyMatcher = PATTERN_DENY.matcher(message);
+			final boolean deny = denyMatcher.find();
 
-      Matcher denyMatcher = PATTERN_DENY.matcher(message);
-      final boolean deny = denyMatcher.find();
+			ConnectionSpecificEvent connectEvent = (ConnectionSpecificEvent) event;
+			logger.debug("auto-replying to connect for connection {}", connectEvent.getConnectionURI());
+			URI connectionUri = connectEvent.getConnectionURI();
 
-      ConnectionSpecificEvent connectEvent = (ConnectionSpecificEvent) event;
-      logger.debug("auto-replying to connect for connection {}", connectEvent.getConnectionURI());
-      URI connectionUri = connectEvent.getConnectionURI();
+			String finalWelcomeMessage = welcomeMessage;
+			if (wait || deny) {
+				finalWelcomeMessage = welcomeMessage + " " +(deny ? "Denying" : "Accepting") + " your request "
+						+ (wait ? " after a timeout of " + waitSeconds + " seconds" : "");
+			} else {
+				finalWelcomeMessage = welcomeMessage + " "+ welcomeHelpMessage;
+			}
 
-      String finalWelcomeMessage = welcomeMessage;
-      if (wait || deny) {
-        finalWelcomeMessage = welcomeMessage + " " + (deny ? "Denying" : "Accepting") + " your request "
-            + (wait ? " after a timeout of " + waitSeconds + " seconds" : "");
-      } else {
-        finalWelcomeMessage = welcomeMessage + " " + welcomeHelpMessage;
-      }
+			final WonMessage toSend = deny ? createCloseWonMessage(connectionUri, finalWelcomeMessage)
+					: createOpenWonMessage(connectionUri, finalWelcomeMessage);
 
-      final WonMessage toSend = deny ? createCloseWonMessage(connectionUri, finalWelcomeMessage)
-          : createOpenWonMessage(connectionUri, finalWelcomeMessage);
+			Runnable task = () -> {
+				getEventListenerContext().getWonMessageSender().sendWonMessage(toSend);
+			};
 
-      Runnable task = () -> {
-        getEventListenerContext().getWonMessageSender().sendWonMessage(toSend);
-      };
+			if (wait) {
+				Date when = new Date(System.currentTimeMillis() + waitSeconds * 1000);
+				getEventListenerContext().getTaskScheduler().schedule(task, when);
+			} else {
+				task.run();
+			}
+		}
+	}
 
-      if (wait) {
-        Date when = new Date(System.currentTimeMillis() + waitSeconds * 1000);
-        getEventListenerContext().getTaskScheduler().schedule(task, when);
-      } else {
-        task.run();
-      }
-    }
-  }
+	private WonMessage createOpenWonMessage(URI connectionURI, String message) throws WonMessageBuilderException {
 
-  private WonMessage createOpenWonMessage(URI connectionURI, String message) throws WonMessageBuilderException {
+		WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
 
-    WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
+		Dataset connectionRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(connectionURI);
+		URI remoteNeed = WonRdfUtils.ConnectionUtils.getRemoteNeedURIFromConnection(connectionRDF, connectionURI);
+		URI localNeed = WonRdfUtils.ConnectionUtils.getLocalNeedURIFromConnection(connectionRDF, connectionURI);
+		URI wonNode = WonRdfUtils.ConnectionUtils.getWonNodeURIFromConnection(connectionRDF, connectionURI);
+		Dataset remoteNeedRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(remoteNeed);
 
-    Dataset connectionRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(connectionURI);
-    URI remoteNeed = WonRdfUtils.ConnectionUtils.getRemoteNeedURIFromConnection(connectionRDF, connectionURI);
-    URI localNeed = WonRdfUtils.ConnectionUtils.getLocalNeedURIFromConnection(connectionRDF, connectionURI);
-    URI wonNode = WonRdfUtils.ConnectionUtils.getWonNodeURIFromConnection(connectionRDF, connectionURI);
-    Dataset remoteNeedRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(remoteNeed);
+		return WonMessageBuilder
+				.setMessagePropertiesForOpen(wonNodeInformationService.generateEventURI(wonNode), connectionURI,
+						localNeed, wonNode,
+						WonRdfUtils.ConnectionUtils.getRemoteConnectionURIFromConnection(connectionRDF, connectionURI),
+						remoteNeed, WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, remoteNeed), message)
+				.build();
+	}
 
-    return WonMessageBuilder
-        .setMessagePropertiesForOpen(wonNodeInformationService.generateEventURI(wonNode), connectionURI, localNeed,
-            wonNode, WonRdfUtils.ConnectionUtils.getRemoteConnectionURIFromConnection(connectionRDF, connectionURI),
-            remoteNeed, WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, remoteNeed), message)
-        .build();
-  }
+	private WonMessage createCloseWonMessage(URI connectionURI, String message) throws WonMessageBuilderException {
 
-  private WonMessage createCloseWonMessage(URI connectionURI, String message) throws WonMessageBuilderException {
+		WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
 
-    WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
+		Dataset connectionRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(connectionURI);
+		URI remoteNeed = WonRdfUtils.ConnectionUtils.getRemoteNeedURIFromConnection(connectionRDF, connectionURI);
+		URI localNeed = WonRdfUtils.ConnectionUtils.getLocalNeedURIFromConnection(connectionRDF, connectionURI);
+		URI wonNode = WonRdfUtils.ConnectionUtils.getWonNodeURIFromConnection(connectionRDF, connectionURI);
+		Dataset remoteNeedRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(remoteNeed);
 
-    Dataset connectionRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(connectionURI);
-    URI remoteNeed = WonRdfUtils.ConnectionUtils.getRemoteNeedURIFromConnection(connectionRDF, connectionURI);
-    URI localNeed = WonRdfUtils.ConnectionUtils.getLocalNeedURIFromConnection(connectionRDF, connectionURI);
-    URI wonNode = WonRdfUtils.ConnectionUtils.getWonNodeURIFromConnection(connectionRDF, connectionURI);
-    Dataset remoteNeedRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(remoteNeed);
-
-    return WonMessageBuilder
-        .setMessagePropertiesForClose(wonNodeInformationService.generateEventURI(wonNode), connectionURI, localNeed,
-            wonNode, WonRdfUtils.ConnectionUtils.getRemoteConnectionURIFromConnection(connectionRDF, connectionURI),
-            remoteNeed, WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, remoteNeed), message)
-        .build();
-  }
+		return WonMessageBuilder
+				.setMessagePropertiesForClose(wonNodeInformationService.generateEventURI(wonNode), connectionURI,
+						localNeed, wonNode,
+						WonRdfUtils.ConnectionUtils.getRemoteConnectionURIFromConnection(connectionRDF, connectionURI),
+						remoteNeed, WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, remoteNeed), message)
+				.build();
+	}
 
 }

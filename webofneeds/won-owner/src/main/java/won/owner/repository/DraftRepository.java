@@ -20,21 +20,22 @@
 
 package won.owner.repository;
 
-import won.owner.model.Draft;
-import won.protocol.repository.WonRepository;
-
 import java.net.URI;
 import java.util.List;
 
+import won.owner.model.Draft;
+import won.protocol.repository.WonRepository;
+
 /**
- * User: syim Date: 11/7/13
+ * User: syim
+ * Date: 11/7/13
  */
 public interface DraftRepository extends WonRepository<Draft> {
 
-  public List<Draft> findById(long id);
+	public List<Draft> findById(long id);
 
-  public Draft findOneByDraftURI(URI draftURI);
-
-  public List<Draft> findByDraftURI(URI draftURI);
+	public Draft findOneByDraftURI(URI draftURI);
+  
+    public List<Draft> findByDraftURI(URI draftURI);
 
 }

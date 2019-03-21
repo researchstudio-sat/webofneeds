@@ -19,5 +19,5 @@ package won.bot.framework.eventbot.event.impl.cmd;
 /**
  * Event indicating that the command of type C failed.
  */
-public interface CommandFailureEvent<C extends CommandEvent> extends CommandResultEvent<C> {
+public interface CommandFailureEvent<C extends CommandEvent> extends CommandResultEvent<C>{
 }

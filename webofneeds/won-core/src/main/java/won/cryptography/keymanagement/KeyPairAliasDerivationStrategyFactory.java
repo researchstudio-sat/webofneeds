@@ -16,6 +16,7 @@
 
 package won.cryptography.keymanagement;
 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,22 +24,20 @@ import org.slf4j.LoggerFactory;
  * Created by fkleedorfer on 22.03.2017.
  */
 public class KeyPairAliasDerivationStrategyFactory {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-  private String predefinedAlias = null;
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private String predefinedAlias = null;
 
-  public KeyPairAliasDerivationStrategy create() {
-    if (this.predefinedAlias == null || this.predefinedAlias.trim().length() == 0) {
-      logger.info(
-          "There is no predefined alias specified for the key pairs that will be used for needs. This causes each need to be created with a new key pair, which is slow and may not be intended. To set the predefined alias and thus only use one key pair for all needs, use the property key 'owner.fixedPrivateKeyAlias=your-key-alias'");
-      return new NeedUriAsAliasStrategy();
-    } else {
-      logger.info(
-          "There is a predefined alias specified for the key pair that will be used for needs. This is fast, but each need created will have the same public key, which might be a privacy risk and may not be intended. To remove the predefined alias and thus use a new key pair for each need, set the property key 'owner.fixedPrivateKeyAlias=' (i.e., set it to an emptyv alue )");
-      return new PredefinedAliasStrategy(this.predefinedAlias);
+    public KeyPairAliasDerivationStrategy create(){
+        if (this.predefinedAlias == null || this.predefinedAlias.trim().length() == 0){
+            logger.info("There is no predefined alias specified for the key pairs that will be used for needs. This causes each need to be created with a new key pair, which is slow and may not be intended. To set the predefined alias and thus only use one key pair for all needs, use the property key 'owner.fixedPrivateKeyAlias=your-key-alias'");
+            return new NeedUriAsAliasStrategy();
+        } else {
+            logger.info("There is a predefined alias specified for the key pair that will be used for needs. This is fast, but each need created will have the same public key, which might be a privacy risk and may not be intended. To remove the predefined alias and thus use a new key pair for each need, set the property key 'owner.fixedPrivateKeyAlias=' (i.e., set it to an emptyv alue )");
+            return new PredefinedAliasStrategy(this.predefinedAlias);
+        }
     }
-  }
 
-  public void setPredefinedAlias(String predefinedAlias) {
-    this.predefinedAlias = predefinedAlias;
-  }
+    public void setPredefinedAlias(String predefinedAlias) {
+        this.predefinedAlias = predefinedAlias;
+    }
 }

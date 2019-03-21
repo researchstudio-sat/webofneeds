@@ -21,5 +21,5 @@ import won.bot.framework.eventbot.event.impl.command.MessageCommandResultEvent;
 /**
  * Tags a result of a ConnectionMessageCommand.
  */
-public interface ConnectionMessageCommandResultEvent extends MessageCommandResultEvent {
+public interface ConnectionMessageCommandResultEvent extends MessageCommandResultEvent{
 }

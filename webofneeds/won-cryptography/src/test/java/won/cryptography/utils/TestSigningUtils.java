@@ -1,23 +1,12 @@
 package won.cryptography.utils;
 
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
-import org.apache.jena.rdf.model.*;
-import org.apache.jena.riot.RDFDataMgr;
-import org.apache.jena.riot.RDFFormat;
-import org.bouncycastle.cert.X509CertificateHolder;
-import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.openssl.PEMParser;
-import org.bouncycastle.openssl.PEMWriter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import won.cryptography.service.CertificateService;
-import won.cryptography.service.KeyPairService;
-import won.cryptography.service.keystore.FileBasedKeyStoreService;
-import won.cryptography.service.keystore.KeyStoreService;
-
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.Security;
@@ -27,16 +16,40 @@ import java.security.cert.X509Certificate;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.NodeIterator;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.RDFFormat;
+import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.openssl.PEMParser;
+import org.bouncycastle.openssl.PEMWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import won.cryptography.service.CertificateService;
+import won.cryptography.service.KeyPairService;
+import won.cryptography.service.keystore.FileBasedKeyStoreService;
+import won.cryptography.service.keystore.KeyStoreService;
+
 /**
- * User: ypanchenko Date: 24.03.2015
+ * User: ypanchenko
+ * Date: 24.03.2015
  */
 public class TestSigningUtils {
 
   private final static Logger LOGGER = LoggerFactory.getLogger(TestSigningUtils.class);
 
-  public static final String KEYS_FILE = "/won-signed-messages/test-keys.jks";
+  public static final String KEYS_FILE =
+    "/won-signed-messages/test-keys.jks";
 
-  // theoretically can be a public key WebID...
+  //theoretically can be a public key WebID...
   public static String needCertUri = "http://localhost:8080/won/resource/need/3144709509622353000";
   public static String ownerCertUri = "http://localhost:8080/owner/certificate";
   public static String nodeCertUri = "http://localhost:8080/node/certificate";
@@ -59,9 +72,8 @@ public class TestSigningUtils {
     }
     return value;
   }
-
-  public static Dataset prepareTestDatasetFromNamedGraphs(String resourceFile, final String[] graphNames)
-      throws IOException {
+  public static Dataset prepareTestDatasetFromNamedGraphs(String resourceFile, final String[] graphNames) throws
+    IOException {
     // read dataset with created need
     InputStream is = TestSigningUtils.class.getResourceAsStream(resourceFile);
     Dataset dataset = DatasetFactory.createGeneral();
@@ -75,7 +87,8 @@ public class TestSigningUtils {
     return testDataset;
   }
 
-  public static Dataset prepareTestDataset(String resourceFile) throws IOException {
+  public static Dataset prepareTestDataset(String resourceFile) throws
+    IOException {
     // read dataset with created need
     InputStream is = TestSigningUtils.class.getResourceAsStream(resourceFile);
     Dataset dataset = DatasetFactory.createGeneral();
@@ -108,12 +121,13 @@ public class TestSigningUtils {
     return objs;
   }
 
+
   /**
    * Not a test - but sometimes can be useful for generating test keys.
    *
    * @throws Exception
    */
-  // @Test
+  //@Test
   public void generateTestKeystore() throws Exception {
     Security.addProvider(new BouncyCastleProvider());
 
@@ -135,37 +149,37 @@ public class TestSigningUtils {
    *
    * @throws Exception
    */
-  // @Test
+  //@Test
   public void generateKeystoreForNodeAndOwner() throws Exception {
 
     Security.addProvider(new BouncyCastleProvider());
-    // KeyStoreService storeServiceOnNode = new KeyStoreService(new
-    // File("node-keys.jks"));
+    //KeyStoreService storeServiceOnNode = new KeyStoreService(new File("node-keys.jks"));
     FileBasedKeyStoreService storeServiceOnOwner = new FileBasedKeyStoreService(new File("owner-keys.jks"), "temp");
     storeServiceOnOwner.init();
-    // KeyStoreService storeServiceOnMatcher = new KeyStoreService(new
-    // File("matcher-keys.jks"));
+    //KeyStoreService storeServiceOnMatcher = new KeyStoreService(new File("matcher-keys.jks"));
     KeyPairService keyPairService = new KeyPairService();
     CertificateService certificateService = new CertificateService();
 
-    // addKeyByUris(new String[]{
-    // "http://rsa021.researchstudio.at:8080/won/resource",
-    // "http://sat016.researchstudio.at:8080/won/resource",
-    // "http://localhost:8080/won/resource"},
-    // keyPairService, certificateService, storeServiceOnNode);
-    addKeyByUris(
-        new String[] { "http://rsa021.researchstudio.at:8080/owner/rest/keys",
-            "http://sat016.researchstudio.at:8080/owner/rest/keys", "http://localhost:8080/owner/rest/keys" },
-        keyPairService, certificateService, storeServiceOnOwner);
-    // addKeyByUris(new String[]{
-    // "http://sat001.researchstudio.at:8080/matcher/resource",
-    // "http://localhost:8080/matcher/resource"},
-    // keyPairService, certificateService, storeServiceOnMatcher);
+//    addKeyByUris(new String[]{
+//                   "http://rsa021.researchstudio.at:8080/won/resource",
+//                   "http://sat016.researchstudio.at:8080/won/resource",
+//                   "http://localhost:8080/won/resource"},
+//                 keyPairService, certificateService, storeServiceOnNode);
+    addKeyByUris(new String[]{
+                   "http://rsa021.researchstudio.at:8080/owner/rest/keys",
+                   "http://sat016.researchstudio.at:8080/owner/rest/keys",
+                   "http://localhost:8080/owner/rest/keys"},
+                 keyPairService, certificateService, storeServiceOnOwner);
+//    addKeyByUris(new String[]{
+//                   "http://sat001.researchstudio.at:8080/matcher/resource",
+//                   "http://localhost:8080/matcher/resource"},
+//                 keyPairService, certificateService, storeServiceOnMatcher);
 
   }
 
+
   public void printCerts() throws IOException, CertificateException {
-    // load public keys:
+    //load public  keys:
     File keysFile = new File(this.getClass().getResource(TestSigningUtils.KEYS_FILE).getFile());
     KeyStoreService storeService = new FileBasedKeyStoreService(keysFile, "temp");
 
@@ -173,10 +187,12 @@ public class TestSigningUtils {
     printCerificate(storeService, ownerCertUri, ownerCertUri);
     printCerificate(storeService, ownerCertUri, nodeCertUri);
 
+
+
   }
 
   private void printCerificate(final KeyStoreService storeService, final String keyName, final String certUri)
-      throws IOException, CertificateException {
+    throws IOException, CertificateException {
 
     System.out.println(keyName);
     System.out.println(certUri);
@@ -192,30 +208,32 @@ public class TestSigningUtils {
 
     PEMParser pemParser = new PEMParser(new StringReader(sw.toString()));
     X509CertificateHolder certHolder = (X509CertificateHolder) pemParser.readObject();
-    X509Certificate certRead = new JcaX509CertificateConverter().setProvider("BC").getCertificate(certHolder);
+    X509Certificate certRead = new JcaX509CertificateConverter().setProvider("BC")
+                                     .getCertificate(certHolder);
     System.out.println(certRead.toString());
 
   }
 
   private static void addKeyByUri(String certUri, final KeyPairService keyPairService,
-      final CertificateService certificateService, final KeyStoreService storeService) throws IOException {
+                      final CertificateService certificateService, final KeyStoreService storeService)
+    throws IOException {
     KeyPair keyPair = keyPairService.generateNewKeyPairInBrainpoolp384r1();
     BigInteger serialNumber = BigInteger.valueOf(1);
     Certificate cert = certificateService.createSelfSignedCertificate(serialNumber, keyPair, certUri, certUri);
-    storeService.putKey(certUri, keyPair.getPrivate(), new Certificate[] { cert }, false);
+    storeService.putKey(certUri, keyPair.getPrivate(), new Certificate[]{cert}, false);
 
     LOGGER.debug("Adding for uri {} certificate {}", certUri, cert);
-    // KeyInformationExtractorBouncyCastle extractor = new
-    // KeyInformationExtractorBouncyCastle();
+    //KeyInformationExtractorBouncyCastle extractor = new KeyInformationExtractorBouncyCastle();
   }
 
   private static void addKeyByUris(final String[] aliasUris, final KeyPairService keyPairService,
-      final CertificateService certificateService, final KeyStoreService storeService) throws IOException {
+                             final CertificateService certificateService, final KeyStoreService storeService)
+    throws IOException {
     KeyPair keyPair = keyPairService.generateNewKeyPairInBrainpoolp384r1();
     BigInteger serialNumber = BigInteger.valueOf(1);
     for (String aliasUri : aliasUris) {
       Certificate cert = certificateService.createSelfSignedCertificate(serialNumber, keyPair, aliasUri, aliasUri);
-      storeService.putKey(aliasUri, keyPair.getPrivate(), new Certificate[] { cert }, false);
+      storeService.putKey(aliasUri, keyPair.getPrivate(), new Certificate[]{cert}, false);
     }
   }
 
@@ -227,14 +245,15 @@ public class TestSigningUtils {
     os.close();
   }
 
+
   // generate key pair
-  // CryptographyService crypService = new CryptographyService();
-  // KeyPair keyPair = crypService.createNewNeedKeyPair(URI.create(NEED_URI));
+  //CryptographyService crypService = new CryptographyService();
+  //KeyPair keyPair = crypService.createNewNeedKeyPair(URI.create(NEED_URI));
 
-  // KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
-  // kpg.initialize(2048);
-  // KeyPair keyPair = kpg.genKeyPair();
+  //KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
+  //kpg.initialize(2048);
+  //KeyPair keyPair = kpg.genKeyPair();
 
-  // PrivateKey privateKey = keyPair.getPrivate();
-  // PublicKey publicKey = keyPair.getPublic();
+  //PrivateKey privateKey = keyPair.getPrivate();
+  //PublicKey publicKey = keyPair.getPublic();
 }

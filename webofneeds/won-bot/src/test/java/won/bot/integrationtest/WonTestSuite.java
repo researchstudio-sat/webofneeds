@@ -24,7 +24,7 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({ ConversationBotTest.class, GroupingBotTest.class, CommentBotTest.class, MatcherBotTest.class,
-    StandardTwoPhaseCommitBotTest.class, })
+                StandardTwoPhaseCommitBotTest.class, })
 public class WonTestSuite {
 
 }

@@ -1,30 +1,35 @@
 package won.cryptography.ssl;
 
-import org.apache.http.ssl.TrustStrategy;
-
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
-import javax.net.ssl.X509TrustManager;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
+
+import org.apache.http.ssl.TrustStrategy;
+
 /**
- * User: ypanchenko Date: 13.08.2015
+ * User: ypanchenko
+ * Date: 13.08.2015
  */
-public class TrustManagerWrapperWithStrategy implements X509TrustManager {
+public class TrustManagerWrapperWithStrategy implements X509TrustManager
+{
+
 
   private TrustStrategy trustStrategy;
+
 
   public TrustManagerWrapperWithStrategy(TrustStrategy trustStrategy) {
     this.trustStrategy = trustStrategy;
   }
 
   @Override
-  public void checkClientTrusted(final X509Certificate[] x509Certificates, final String authType)
-      throws CertificateException {
+  public void checkClientTrusted(final X509Certificate[] x509Certificates, final String authType) throws
+    CertificateException {
     X509TrustManager tm = null;
     try {
       tm = getDefaultTrustManager();
@@ -43,8 +48,7 @@ public class TrustManagerWrapperWithStrategy implements X509TrustManager {
   }
 
   @Override
-  public void checkServerTrusted(final X509Certificate[] x509Certificates, final String authType)
-      throws CertificateException {
+  public void checkServerTrusted(final X509Certificate[] x509Certificates, final String authType) throws CertificateException {
     X509TrustManager tm = null;
     try {
       tm = getDefaultTrustManager();
@@ -76,16 +80,16 @@ public class TrustManagerWrapperWithStrategy implements X509TrustManager {
     return tm.getAcceptedIssuers();
   }
 
-  private static X509TrustManager getDefaultTrustManager() throws NoSuchAlgorithmException, KeyStoreException {
+  private static X509TrustManager getDefaultTrustManager() throws NoSuchAlgorithmException,
+    KeyStoreException {
 
     TrustManagerFactory tmf = TrustManagerFactory.getInstance("X509");
-    // initializing with null loads the system default keystore, will work only for
-    // the client
+    // initializing with null loads the system default keystore, will work only for the client
     KeyStore ts = null;
     tmf.init(ts);
     for (TrustManager t : tmf.getTrustManagers()) {
       if (t instanceof X509TrustManager) {
-        return (X509TrustManager) t;
+        return (X509TrustManager)t;
       }
     }
     return null;

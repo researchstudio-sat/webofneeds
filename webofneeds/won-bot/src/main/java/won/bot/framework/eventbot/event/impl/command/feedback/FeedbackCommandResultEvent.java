@@ -21,5 +21,5 @@ import won.bot.framework.eventbot.event.impl.command.MessageCommandResultEvent;
 /**
  * Tags a result event for a FeedbackCommandResult.
  */
-public interface FeedbackCommandResultEvent extends MessageCommandResultEvent {
+public interface FeedbackCommandResultEvent extends MessageCommandResultEvent{
 }

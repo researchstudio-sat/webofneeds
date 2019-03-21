@@ -16,6 +16,11 @@
 
 package won.monitoring.simon;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.javasimon.Sample;
 import org.javasimon.Simon;
 import org.javasimon.SimonManager;
@@ -26,61 +31,61 @@ import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.io.CsvMapWriter;
 import org.supercsv.io.ICsvMapWriter;
 import org.supercsv.prefs.CsvPreference;
-import won.monitoring.AbstractFileOutputRecorder;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import won.monitoring.AbstractFileOutputRecorder;
 
 /**
  * Recorder that writes the Simon stats to a csv file.
  */
-public class SimonCsvStatisticsRecorder extends AbstractFileOutputRecorder {
+public class SimonCsvStatisticsRecorder extends AbstractFileOutputRecorder
+{
 
   /**
    * Sets up the processors used.
-   *
    * @return the cell processors
    */
   private static CellProcessor[] getProcessors() {
 
-    final CellProcessor[] processors = new CellProcessor[] { new NotNull(), // name
-        new NotNull(), // type
-        new Optional(), // counter
-        new Optional(), // total
-        new Optional(), // min
-        new Optional(), // max
-        new Optional(), // mean
-        new Optional(), // std dev
-        new NotNull(), // first usage
-        new NotNull(), // last usage
-        new NotNull(), // last reset
-        new Optional() // note
+    final CellProcessor[] processors = new CellProcessor[] {
+        new NotNull(), //name
+        new NotNull(), //type
+        new Optional(), //counter
+        new Optional(), //total
+        new Optional(), //min
+        new Optional(), //max
+        new Optional(), //mean
+        new Optional(), //std dev
+        new NotNull(), //first usage
+        new NotNull(), //last usage
+        new NotNull(), //last reset
+        new Optional() //note
     };
 
     return processors;
   }
 
-  private static String[] header = new String[] { "Name", "Type", "Counter", "Total", "Min", "Max", "Mean", "StdDev",
-      "FirstUsage", "LastUsage", "LastReset", "Note" };
+  private static String[] header = new String[] { "Name", "Type", "Counter", "Total", "Min",
+    "Max", "Mean", "StdDev", "FirstUsage", "LastUsage","LastReset", "Note" };
+
 
   @Override
-  public void recordMonitoringStatistics() {
+  public void recordMonitoringStatistics()
+  {
     ICsvMapWriter mapWriter = null;
     try {
-      mapWriter = new CsvMapWriter(new FileWriter(createOutFileObject()), CsvPreference.STANDARD_PREFERENCE);
+      mapWriter = new CsvMapWriter(new FileWriter(createOutFileObject()),
+          CsvPreference.STANDARD_PREFERENCE);
       final CellProcessor[] processors = getProcessors();
       // write the header
       mapWriter.writeHeader(header);
-      // create a simon visitor that writes each line
+      //create a simon visitor that writes each line
       SimonVisitor visitor = new CsvSimonVisitor(mapWriter);
       // write the customer maps
-      SimonVisitors.visitTree(SimonManager.getRootSimon(), visitor);
+      SimonVisitors.visitTree(SimonManager.getRootSimon(),visitor);
     } catch (IOException e) {
       logger.warn("could not write simon statistics", e);
     } finally {
-      if (mapWriter != null) {
+      if( mapWriter != null ) {
         try {
           mapWriter.close();
         } catch (IOException e) {
@@ -90,20 +95,23 @@ public class SimonCsvStatisticsRecorder extends AbstractFileOutputRecorder {
     }
   }
 
-  private class CsvSimonVisitor implements SimonVisitor {
+  private class CsvSimonVisitor implements SimonVisitor
+  {
     private ICsvMapWriter mapWriter;
 
-    public CsvSimonVisitor(final ICsvMapWriter mapWriter) {
+    public CsvSimonVisitor(final ICsvMapWriter mapWriter)
+    {
       this.mapWriter = mapWriter;
     }
 
     @Override
-    public void visit(final Simon simon) throws IOException {
+    public void visit(final Simon simon) throws IOException
+    {
       Map<String, Object> values = new HashMap<String, Object>(header.length);
       Sample sample = simon.sample();
       values.put(header[0], sample.getName());
       values.put(header[1], simon.getClass().getName());
-      if (simon instanceof Stopwatch) {
+      if (simon instanceof Stopwatch){
         Stopwatch stopwatch = (Stopwatch) simon;
         values.put(header[2], stopwatch.getCounter());
         values.put(header[3], stopwatch.getTotal());
@@ -116,7 +124,7 @@ public class SimonCsvStatisticsRecorder extends AbstractFileOutputRecorder {
       values.put(header[9], simon.getLastUsage());
       values.put(header[10], simon.getLastReset());
       values.put(header[11], simon.getNote());
-      this.mapWriter.write(values, header, getProcessors());
+      this.mapWriter.write(values,header,getProcessors());
     }
   }
 }

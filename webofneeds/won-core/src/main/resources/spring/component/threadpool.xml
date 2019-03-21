@@ -15,23 +15,18 @@
             http://www.springframework.org/schema/beans/spring-beans-4.1.xsd">
 
 
-    <bean id="workqueue" class="java.util.concurrent.ArrayBlockingQueue">
-        <constructor-arg value="30" type="int" index="0"/>
-    </bean>
+	<bean id="workqueue" class="java.util.concurrent.ArrayBlockingQueue">
+		<constructor-arg value="30" type="int" index="0" />
+	</bean>
 
-    <bean id="parallelRequestsThreadpool" class="java.util.concurrent.ThreadPoolExecutor"
-          destroy-method="shutdown">
-        <constructor-arg value="5" index="0"/>
-        <!-- core pool size -->
-        <constructor-arg value="10" index="1"/>
-        <!-- max pool size -->
-        <constructor-arg value="1" index="2"/>
-        <!-- keepalive time for unused threads -->
-        <constructor-arg value="MINUTES" index="3"/>
-        <!-- time unit -->
-        <constructor-arg ref="workqueue" index="4"/>
-        <!-- worker queue -->
-    </bean>
+	<bean id="parallelRequestsThreadpool" class="java.util.concurrent.ThreadPoolExecutor"
+		destroy-method="shutdown">
+		<constructor-arg value="5" index="0" /> <!-- core pool size -->
+		<constructor-arg value="10" index="1" /> <!-- max pool size -->
+		<constructor-arg value="1" index="2" /> <!-- keepalive time for unused threads -->
+		<constructor-arg value="MINUTES" index="3" /> <!-- time unit -->
+		<constructor-arg ref="workqueue" index="4" /> <!-- worker queue -->
+	</bean>
 
 </beans>
 

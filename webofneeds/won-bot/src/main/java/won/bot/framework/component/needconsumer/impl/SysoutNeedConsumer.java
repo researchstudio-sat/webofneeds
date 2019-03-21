@@ -19,19 +19,23 @@ package won.bot.framework.component.needconsumer.impl;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
+
 import won.bot.framework.component.needconsumer.NeedConsumer;
 
 /**
  * Prints needs to sysout.
  */
-public class SysoutNeedConsumer implements NeedConsumer {
+public class SysoutNeedConsumer implements NeedConsumer
+{
   @Override
-  public void consume(final Dataset need) {
+  public void consume(final Dataset need)
+  {
     RDFDataMgr.write(System.out, need, Lang.TTL);
   }
 
   @Override
-  public boolean isExhausted() {
+  public boolean isExhausted()
+  {
     return true;
   }
 }

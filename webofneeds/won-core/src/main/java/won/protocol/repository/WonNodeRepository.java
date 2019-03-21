@@ -16,16 +16,16 @@
 
 package won.protocol.repository;
 
-import won.protocol.model.WonNode;
-
 import java.net.URI;
 import java.util.List;
 
+import won.protocol.model.WonNode;
+
 /**
- * User: sbyim Date: 12.11.13
+ * User: sbyim
+ * Date: 12.11.13
  */
 public interface WonNodeRepository extends WonRepository<WonNode> {
-  List<WonNode> findByWonNodeURI(URI wonNodeURI);
-
-  WonNode findOneByWonNodeURIAndOwnerApplicationID(URI wonNodeURI, String ownerApplicationId);
+    List<WonNode> findByWonNodeURI(URI wonNodeURI);
+    WonNode findOneByWonNodeURIAndOwnerApplicationID(URI wonNodeURI, String ownerApplicationId);
 }

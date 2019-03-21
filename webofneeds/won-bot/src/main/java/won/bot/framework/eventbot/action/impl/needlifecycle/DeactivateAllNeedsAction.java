@@ -16,7 +16,11 @@
 
 package won.bot.framework.eventbot.action.impl.needlifecycle;
 
+import java.net.URI;
+import java.util.Collection;
+
 import org.apache.jena.query.Dataset;
+
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
@@ -28,13 +32,12 @@ import won.protocol.message.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 
-import java.net.URI;
-import java.util.Collection;
-
 /**
- * User: fkleedorfer Date: 28.03.14
+ * User: fkleedorfer
+ * Date: 28.03.14
  */
-public class DeactivateAllNeedsAction extends BaseEventBotAction {
+public class DeactivateAllNeedsAction extends BaseEventBotAction
+{
   public DeactivateAllNeedsAction(EventListenerContext eventListenerContext) {
     super(eventListenerContext);
   }
@@ -43,7 +46,7 @@ public class DeactivateAllNeedsAction extends BaseEventBotAction {
   protected void doRun(Event event, EventListener executingListener) throws Exception {
 
     Collection<URI> toDeactivate = getEventListenerContext().getBotContext().retrieveAllNeedUris();
-    for (URI uri : toDeactivate) {
+    for (URI uri: toDeactivate){
 
       getEventListenerContext().getWonMessageSender().sendWonMessage(createWonMessage(uri));
       getEventListenerContext().getEventBus().publish(new NeedDeactivatedEvent(uri));
@@ -52,13 +55,19 @@ public class DeactivateAllNeedsAction extends BaseEventBotAction {
 
   private WonMessage createWonMessage(URI needURI) throws WonMessageBuilderException {
 
-    WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
+    WonNodeInformationService wonNodeInformationService =
+            getEventListenerContext().getWonNodeInformationService();
 
     Dataset ds = getEventListenerContext().getLinkedDataSource().getDataForResource(needURI);
     URI localWonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(ds, needURI);
 
-    return WonMessageBuilder.setMessagePropertiesForDeactivateFromOwner(
-        wonNodeInformationService.generateEventURI(localWonNode), needURI, localWonNode).build();
+    return WonMessageBuilder
+            .setMessagePropertiesForDeactivateFromOwner(
+                    wonNodeInformationService.generateEventURI(
+                            localWonNode),
+                    needURI,
+                    localWonNode)
+            .build();
   }
 
 }

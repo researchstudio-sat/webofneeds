@@ -16,19 +16,20 @@
 
 package won.protocol.repository;
 
-import org.springframework.data.domain.Sort;
-import won.protocol.model.Match;
-
 import java.net.URI;
 import java.util.List;
 
+import org.springframework.data.domain.Sort;
+
+import won.protocol.model.Match;
+
 /**
- * User: fkleedorfer Date: 05.11.12
+ * User: fkleedorfer
+ * Date: 05.11.12
  */
-public interface MatchRepository extends WonRepository<Match> {
+public interface MatchRepository extends WonRepository<Match>
+{
   public List<Match> findByFromNeed(URI fromNeed);
-
-  public List<Match> findByFromNeed(URI fromNeed, Sort sort);
-
+  public List<Match> findByFromNeed(URI fromNeed,Sort sort);
   public List<Match> findByFromNeedAndToNeedAndOriginator(URI fromNeed, URI toNeed, URI originator);
 }

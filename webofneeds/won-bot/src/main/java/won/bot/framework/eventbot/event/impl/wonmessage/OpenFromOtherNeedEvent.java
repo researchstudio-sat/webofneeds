@@ -22,7 +22,8 @@ import won.protocol.model.Connection;
 /**
  *
  */
-public class OpenFromOtherNeedEvent extends WonMessageReceivedOnConnectionEvent {
+public class OpenFromOtherNeedEvent extends WonMessageReceivedOnConnectionEvent
+{
   public OpenFromOtherNeedEvent(final Connection con, final WonMessage wonMessage) {
     super(con, wonMessage);
   }

@@ -20,5 +20,5 @@ package won.bot.framework.eventbot.event.impl.cmd;
  * Event indicating that the command of type C succeeded.
  */
 public interface CommandSuccessEvent<C extends CommandEvent> extends CommandResultEvent<C> {
-
+    
 }

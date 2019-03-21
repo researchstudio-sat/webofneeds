@@ -19,27 +19,27 @@ package won.owner.pojo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
- * User: LEIH-NB Date: 09.10.2014
+ * User: LEIH-NB
+ * Date: 09.10.2014
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CreateDraftPojo {
+public class CreateDraftPojo
+{
   private String draftURI;
   private String draft;
 
-  public CreateDraftPojo() {
+  public CreateDraftPojo(){
 
   }
-
-  public CreateDraftPojo(String draftURI, String draft) {
+  public CreateDraftPojo(String draftURI, String draft){
     this.draftURI = draftURI;
     this.draft = draft;
   }
-
-  /*
-   * public DraftPojo(URI draftURI, Model content, Draft draftState ){
-   * super(draftURI, content); this.setCurrentStep(draftState.getCurrentStep());
-   * this.setUserName(draftState.getUserName()); }
-   */
+  /*public DraftPojo(URI draftURI, Model content, Draft draftState ){
+    super(draftURI, content);
+    this.setCurrentStep(draftState.getCurrentStep());
+    this.setUserName(draftState.getUserName());
+  }      */
   public String getDraftURI() {
     return draftURI;
   }

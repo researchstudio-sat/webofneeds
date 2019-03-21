@@ -16,23 +16,23 @@
 
 package won.bot.framework.eventbot.event.impl.crawlconnection;
 
+import java.net.URI;
+
 import won.bot.framework.eventbot.event.BaseNeedSpecificEvent;
 import won.bot.framework.eventbot.event.impl.cmd.CommandEvent;
-
-import java.net.URI;
 
 /**
  * Initiates the validation of the data of a given connection.
  */
 public class CrawlConnectionCommandEvent extends BaseNeedSpecificEvent implements CommandEvent {
-  private URI connectionURI;
+    private URI connectionURI;
 
-  public CrawlConnectionCommandEvent(URI needURI, URI connectionURI) {
-    super(needURI);
-    this.connectionURI = connectionURI;
-  }
+    public CrawlConnectionCommandEvent(URI needURI, URI connectionURI) {
+        super(needURI);
+        this.connectionURI = connectionURI;
+    }
 
-  public URI getConnectionURI() {
-    return connectionURI;
-  }
+    public URI getConnectionURI() {
+        return connectionURI;
+    }
 }

@@ -21,9 +21,11 @@ import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.filter.EventFilter;
 
 /**
- * User: fkleedorfer Date: 30.04.14
+ * User: fkleedorfer
+ * Date: 30.04.14
  */
-public class TargetCounterDecorator implements Counter {
+public class TargetCounterDecorator implements Counter
+{
   private Counter delegate;
   private int targetCount;
   private EventListenerContext context;
@@ -39,9 +41,7 @@ public class TargetCounterDecorator implements Counter {
     return delegate.getCount();
   }
 
-  public int getTargetCount() {
-    return targetCount;
-  }
+  public int getTargetCount() { return targetCount; }
 
   @Override
   public int increment() {
@@ -51,7 +51,7 @@ public class TargetCounterDecorator implements Counter {
       cnt = delegate.increment();
       publishEvent = checkCount(cnt);
     }
-    if (publishEvent) {
+    if (publishEvent){
       publishEvent();
     }
     return cnt;
@@ -66,7 +66,7 @@ public class TargetCounterDecorator implements Counter {
       cnt = delegate.decrement();
       publishEvent = checkCount(cnt);
     }
-    if (publishEvent) {
+    if (publishEvent){
       publishEvent();
     }
     return cnt;
@@ -81,20 +81,20 @@ public class TargetCounterDecorator implements Counter {
     return cnt == targetCount;
   }
 
-  private void publishEvent() {
+  private void publishEvent(){
     this.context.getEventBus().publish(new TargetCountReachedEvent(this));
   }
 
-  public EventFilter makeEventFilter() {
-    return new EventFilter() {
-      @Override
-      public boolean accept(Event event) {
-        if (!(event instanceof TargetCountReachedEvent)) {
-          return false;
-        }
-        return ((TargetCountReachedEvent) event).getCounter() == TargetCounterDecorator.this;
-      }
-    };
+  public EventFilter makeEventFilter(){
+      return new EventFilter() {
+          @Override
+          public boolean accept(Event event) {
+              if (! (event instanceof TargetCountReachedEvent)) {
+                  return false;
+              }
+              return ((TargetCountReachedEvent)event).getCounter() == TargetCounterDecorator.this;
+          }
+      };
   }
 
 }

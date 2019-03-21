@@ -23,12 +23,14 @@ import org.apache.jena.rdf.model.Resource;
 
 /**
  * LDP vocabulary.
- * <p>
- * User: fkleedorfer Date: 25.02.13
+ *
+ * User: fkleedorfer
+ * Date: 25.02.13
  */
-public class LDP {
+public class LDP
+{
   public static final String BASE_URI = "http://www.w3.org/ns/ldp#";
-  public static final String DEFAULT_PREFIX = "ldp";
+  public static final String DEFAULT_PREFIX= "ldp";
 
   private static Model m = ModelFactory.createDefaultModel();
 
@@ -37,12 +39,10 @@ public class LDP {
   public static final Property NEXT_PAGE = m.createProperty(BASE_URI + "nextPage");
   public static final Resource PAGE = m.createResource(BASE_URI + "Page");
 
-  /**
-   * returns the URI for this schema
-   *
+  /** returns the URI for this schema
    * @return the URI for this schema
    */
   public static String getURI() {
-    return BASE_URI;
+      return BASE_URI;
   }
 }

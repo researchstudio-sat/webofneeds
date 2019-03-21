@@ -23,12 +23,14 @@ import org.apache.jena.rdf.model.Resource;
 
 /**
  * LDP vocabulary.
- * <p>
- * User: fkleedorfer Date: 25.02.13
+ *
+ * User: fkleedorfer
+ * Date: 25.02.13
  */
-public class MAONT {
+public class MAONT
+{
   public static final String BASE_URI = "http://www.w3.org/ns/ma-ont#";
-  public static final String DEFAULT_PREFIX = "ma";
+  public static final String DEFAULT_PREFIX= "ma";
 
   private static Model m = ModelFactory.createDefaultModel();
 
@@ -40,12 +42,11 @@ public class MAONT {
 
   public static final Resource IMAGE = m.createResource(BASE_URI + "Image");
 
-  /**
-   * returns the URI for this schema
-   *
+
+  /** returns the URI for this schema
    * @return the URI for this schema
    */
   public static String getURI() {
-    return BASE_URI;
+      return BASE_URI;
   }
 }

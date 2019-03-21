@@ -1,19 +1,20 @@
 package won.matcher.service.common.config;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
-import java.util.List;
-
 /**
  * Basic cluster configuration of a component in the akka matcher service
- * <p>
+ *
  * Created by hfriedrich on 07.09.2015.
  */
 @Configuration
 @PropertySource("file:${WON_CONFIG_DIR}/cluster-node.properties")
-public class ClusterConfig {
+public class ClusterConfig
+{
   @Value("${node.host}")
   private String nodeHost;
 
@@ -25,6 +26,7 @@ public class ClusterConfig {
 
   @Value("#{'${cluster.seedNodes}'.split(',')}")
   private List<String> seedNodes;
+
 
   public String getNodeHost() {
     return nodeHost;

@@ -21,5 +21,6 @@ import won.protocol.model.ConnectionContainer;
 /**
  * Created by fkleedorfer on 05.12.2016.
  */
-public interface ConnectionContainerRepository extends WonRepository<ConnectionContainer> {
+public interface ConnectionContainerRepository extends WonRepository<ConnectionContainer>
+{
 }

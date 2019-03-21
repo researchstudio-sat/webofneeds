@@ -20,12 +20,13 @@ import won.bot.framework.bot.Bot;
 import won.bot.framework.eventbot.event.BaseEvent;
 
 /**
- * Event indicating that the bot's work is done. This event is informative only
- * and has no effect on the bot framework. It is used for testing, though:
- * integration tests subscribe to this event and run their asserts after seeing
- * it.
+ * Event indicating that the bot's work is done.
+ * This event is informative only and has no effect on the bot
+ * framework. It is used for testing, though: integration tests
+ * subscribe to this event and run their asserts after seeing it.
  */
-public class WorkDoneEvent extends BaseEvent {
+public class WorkDoneEvent extends BaseEvent
+{
   private Bot bot;
 
   public Bot getBot() {
@@ -35,5 +36,6 @@ public class WorkDoneEvent extends BaseEvent {
   public WorkDoneEvent(Bot bot) {
     this.bot = bot;
   }
+
 
 }

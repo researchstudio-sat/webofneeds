@@ -16,38 +16,44 @@
 
 package won.bot.framework.eventbot.event.impl.facet;
 
+import java.net.URI;
+
 import org.apache.jena.rdf.model.Model;
+
 import won.bot.framework.eventbot.event.BaseEvent;
 import won.protocol.model.FacetType;
 
-import java.net.URI;
-
 /**
- * User: LEIH-NB Date: 05.02.14
+ * User: LEIH-NB
+ * Date: 05.02.14
  */
-public class CommentFacetCreatedEvent extends BaseEvent {
-  private URI commentFacetURI;
-  private URI wonNodeURI;
-  private Model model;
-  private final FacetType facetType = FacetType.CommentFacet;
+public class CommentFacetCreatedEvent extends BaseEvent
+{
+    private URI commentFacetURI;
+    private URI wonNodeURI;
+    private Model model;
+    private final FacetType facetType = FacetType.CommentFacet;
 
-  public CommentFacetCreatedEvent(URI groupFacetURI, URI wonNodeURI, Model model) {
-    this.commentFacetURI = groupFacetURI;
-    this.wonNodeURI = wonNodeURI;
-    this.model = model;
+    public CommentFacetCreatedEvent(URI groupFacetURI, URI wonNodeURI, Model model) {
+        this.commentFacetURI = groupFacetURI;
+        this.wonNodeURI = wonNodeURI;
+        this.model = model;
 
-  }
+    }
 
-  public URI getGroupFacetURI() {
-    return commentFacetURI;
-  }
+    public URI getGroupFacetURI() {
+        return commentFacetURI;
+    }
 
-  public URI getWonNodeURI() {
-    return wonNodeURI;
-  }
+    public URI getWonNodeURI() {
+        return wonNodeURI;
+    }
 
-  public Model getModel() {
-    return model;
-  }
+    public Model getModel() {
+        return model;
+    }
+
 
 }
+
+
