@@ -11,7 +11,7 @@ import {
 } from "../selectors/general-selectors.js";
 import { getOwnedConnectionByUri } from "../selectors/connection-selectors.js";
 
-import { getIn, urisToLookupSuccessAndFailedMap } from "../utils.js";
+import { get, getIn, urisToLookupSuccessAndFailedMap } from "../utils.js";
 
 import { ensureLoggedIn } from "./account-actions";
 
@@ -25,6 +25,8 @@ import {
   buildRateMessage,
   buildConnectMessage,
 } from "../won-message-utils.js";
+
+import * as processUtils from "../process-utils.js";
 
 export function connectionsChatMessageClaimOnSuccess(
   chatMessage,
@@ -678,12 +680,14 @@ export function showLatestMessages(connectionUriParam, numberOfEvents) {
     const needUri = need && need.get("uri");
     const connection =
       connectionUri && getOwnedConnectionByUri(state, connectionUri);
+    const processState = get(state, "process");
     if (
       !connectionUri ||
       !connection ||
-      getIn(state, ["process", "connections", connectionUri, "loadingMessages"]) // only start loading once.
+      processUtils.isConnectionLoading(processState, connectionUri) ||
+      processUtils.isConnectionLoadingMessages(processState, connectionUri)
     ) {
-      return Promise.resolve();
+      return Promise.resolve(); //only load if not already started and connection itself not loading
     }
 
     dispatch({
@@ -738,12 +742,14 @@ export function loadLatestMessagesOfConnection({
   const needUri = need && need.get("uri");
   const connection =
     connectionUri && getOwnedConnectionByUri(state, connectionUri);
+  const processState = get(state, "process");
   if (
     !connectionUri ||
     !connection ||
-    getIn(state, ["process", "connections", connectionUri, "loadingMessages"]) // only start loading once.
+    processUtils.isConnectionLoading(processState, connectionUri) ||
+    processUtils.isConnectionLoadingMessages(processState, connectionUri)
   ) {
-    return Promise.resolve();
+    return Promise.resolve(); //only load if not already started and connection itself not loading
   }
 
   dispatch({
@@ -808,12 +814,14 @@ export function showMoreMessages(connectionUriParam, numberOfEvents) {
     const needUri = need && need.get("uri");
     const connection = need && need.getIn(["connections", connectionUri]);
     const connectionMessages = connection && connection.get("messages");
-
+    const processState = get(state, "process");
     if (
       !connection ||
-      getIn(state, ["process", "connections", connectionUri, "loadingMessages"])
-    )
-      return; // only start loading once, or not if no connection was found
+      processUtils.isConnectionLoading(processState, connectionUri) ||
+      processUtils.isConnectionLoadingMessages(processState, connectionUri)
+    ) {
+      return; //only load if not already started and connection itself not loading
+    }
 
     // determine the oldest loaded event
     const sortedConnectionMessages = connectionMessages
