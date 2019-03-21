@@ -89,6 +89,10 @@ won-usecase-picker {
 
     &__labelledhr {
       grid-column: 1 / -1;
+
+      & .wlh__label .wlh__label__text {
+        background: white;
+      }
     }
   }
 

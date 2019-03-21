@@ -45,10 +45,10 @@ export function failedCloseNeed(event) {
         */
     won
       .invalidateCacheForNeed(needUri) // mark need and it's connection container dirty
-      .then(() => won.getConnectionUrisWithStateOfNeed(needUri))
-      .then(connectionsWithStateOfNeed =>
+      .then(() => won.getConnectionUrisWithStateByNeedUri(needUri))
+      .then(connectionsWithStateAndFacet =>
         Promise.all(
-          connectionsWithStateOfNeed.map(
+          connectionsWithStateAndFacet.map(
             conn => won.invalidateCacheForNewMessage(conn.connectionUri) // mark connections dirty
           )
         )

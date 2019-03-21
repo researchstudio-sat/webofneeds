@@ -118,6 +118,7 @@ const actionHierarchy = {
     showLatestMessages: cnct.showLatestMessages,
     showMoreMessages: cnct.showMoreMessages,
     fetchMessagesStart: INJ_DEFAULT,
+    fetchMessagesEnd: INJ_DEFAULT,
     messageUrisInLoading: INJ_DEFAULT,
     fetchMessagesFailed: INJ_DEFAULT,
     fetchMessagesSuccess: INJ_DEFAULT,
@@ -131,6 +132,7 @@ const actionHierarchy = {
     updatePetriNetData: INJ_DEFAULT,
 
     storeActiveUrisInLoading: INJ_DEFAULT,
+    storeUrisToLoad: INJ_DEFAULT,
     storeActive: INJ_DEFAULT,
 
     storeUriFailed: INJ_DEFAULT,

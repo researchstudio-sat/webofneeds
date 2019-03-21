@@ -11,7 +11,7 @@ import {
 } from "../selectors/general-selectors.js";
 import { getOwnedConnectionByUri } from "../selectors/connection-selectors.js";
 
-import { getIn, urisToLookupSuccessAndFailedMap } from "../utils.js";
+import { get, getIn, urisToLookupSuccessAndFailedMap } from "../utils.js";
 
 import { ensureLoggedIn } from "./account-actions";
 
@@ -25,6 +25,8 @@ import {
   buildRateMessage,
   buildConnectMessage,
 } from "../won-message-utils.js";
+
+import * as processUtils from "../process-utils.js";
 
 export function connectionsChatMessageClaimOnSuccess(
   chatMessage,
@@ -678,12 +680,14 @@ export function showLatestMessages(connectionUriParam, numberOfEvents) {
     const needUri = need && need.get("uri");
     const connection =
       connectionUri && getOwnedConnectionByUri(state, connectionUri);
+    const processState = get(state, "process");
     if (
       !connectionUri ||
       !connection ||
-      getIn(state, ["process", "connections", connectionUri, "loadingMessages"]) // only start loading once.
+      processUtils.isConnectionLoading(processState, connectionUri) ||
+      processUtils.isConnectionLoadingMessages(processState, connectionUri)
     ) {
-      return Promise.resolve();
+      return Promise.resolve(); //only load if not already started and connection itself not loading
     }
 
     dispatch({
@@ -723,31 +727,7 @@ export function showLatestMessages(connectionUriParam, numberOfEvents) {
           []
         );
       })
-      .then(events => {
-        if (events) {
-          const eventsImm = Immutable.fromJS(events);
-
-          if (eventsImm.get("success").size > 0) {
-            dispatch({
-              type: actionTypes.connections.fetchMessagesSuccess,
-              payload: Immutable.fromJS({
-                connectionUri: connectionUri,
-                events: eventsImm.get("success"),
-              }),
-            });
-          }
-
-          if (eventsImm.get("failed").size > 0) {
-            dispatch({
-              type: actionTypes.connections.fetchMessagesFailed,
-              payload: Immutable.fromJS({
-                connectionUri: connectionUri,
-                events: eventsImm.get("failed"),
-              }),
-            });
-          }
-        }
-      });
+      .then(events => storeMessages(dispatch, events, connectionUri));
   };
 }
 
@@ -757,23 +737,24 @@ export function loadLatestMessagesOfConnection({
   state,
   dispatch,
 }) {
-  const connectionUri_ = connectionUri || getConnectionUriFromRoute(state);
   const need =
-    connectionUri_ && getOwnedNeedByConnectionUri(state, connectionUri_);
+    connectionUri && getOwnedNeedByConnectionUri(state, connectionUri);
   const needUri = need && need.get("uri");
   const connection =
-    connectionUri_ && getOwnedConnectionByUri(state, connectionUri_);
+    connectionUri && getOwnedConnectionByUri(state, connectionUri);
+  const processState = get(state, "process");
   if (
-    !connectionUri_ ||
+    !connectionUri ||
     !connection ||
-    getIn(state, ["process", "connections", connectionUri_, "loadingMessages"]) // only start loading once.
+    processUtils.isConnectionLoading(processState, connectionUri) ||
+    processUtils.isConnectionLoadingMessages(processState, connectionUri)
   ) {
-    return Promise.resolve();
+    return Promise.resolve(); //only load if not already started and connection itself not loading
   }
 
   dispatch({
     type: actionTypes.connections.fetchMessagesStart,
-    payload: Immutable.fromJS({ connectionUri: connectionUri_ }),
+    payload: Immutable.fromJS({ connectionUri: connectionUri }),
   });
 
   const fetchParams = {
@@ -783,7 +764,7 @@ export function loadLatestMessagesOfConnection({
   };
 
   return won
-    .getConnectionWithEventUris(connectionUri_, fetchParams)
+    .getConnectionWithEventUris(connectionUri, fetchParams)
     .then(connection => {
       const messagesToFetch = limitNumberOfEventsToFetchInConnection(
         state,
@@ -795,7 +776,7 @@ export function loadLatestMessagesOfConnection({
       dispatch({
         type: actionTypes.connections.messageUrisInLoading,
         payload: Immutable.fromJS({
-          connectionUri: connectionUri_,
+          connectionUri: connectionUri,
           uris: messagesToFetch,
         }),
       });
@@ -809,31 +790,7 @@ export function loadLatestMessagesOfConnection({
         []
       );
     })
-    .then(events => {
-      if (events) {
-        const eventsImm = Immutable.fromJS(events);
-
-        if (eventsImm.get("success").size > 0) {
-          dispatch({
-            type: actionTypes.connections.fetchMessagesSuccess,
-            payload: Immutable.fromJS({
-              connectionUri: connectionUri_,
-              events: eventsImm.get("success"),
-            }),
-          });
-        }
-
-        if (eventsImm.get("failed").size > 0) {
-          dispatch({
-            type: actionTypes.connections.fetchMessagesFailed,
-            payload: Immutable.fromJS({
-              connectionUri: connectionUri_,
-              events: eventsImm.get("failed"),
-            }),
-          });
-        }
-      }
-    });
+    .then(events => storeMessages(dispatch, events, connectionUri));
 }
 
 /**
@@ -857,12 +814,14 @@ export function showMoreMessages(connectionUriParam, numberOfEvents) {
     const needUri = need && need.get("uri");
     const connection = need && need.getIn(["connections", connectionUri]);
     const connectionMessages = connection && connection.get("messages");
-
+    const processState = get(state, "process");
     if (
       !connection ||
-      getIn(state, ["process", "connections", connectionUri, "loadingMessages"])
-    )
-      return; // only start loading once, or not if no connection was found
+      processUtils.isConnectionLoading(processState, connectionUri) ||
+      processUtils.isConnectionLoadingMessages(processState, connectionUri)
+    ) {
+      return; //only load if not already started and connection itself not loading
+    }
 
     // determine the oldest loaded event
     const sortedConnectionMessages = connectionMessages
@@ -912,32 +871,53 @@ export function showMoreMessages(connectionUriParam, numberOfEvents) {
           []
         );
       })
-      .then(events => {
-        if (events) {
-          const eventsImm = Immutable.fromJS(events);
-
-          if (eventsImm.get("success").size > 0) {
-            dispatch({
-              type: actionTypes.connections.fetchMessagesSuccess,
-              payload: Immutable.fromJS({
-                connectionUri: connectionUri,
-                events: eventsImm.get("success"),
-              }),
-            });
-          }
-
-          if (eventsImm.get("failed").size > 0) {
-            dispatch({
-              type: actionTypes.connections.fetchMessagesFailed,
-              payload: Immutable.fromJS({
-                connectionUri: connectionUri,
-                events: eventsImm.get("failed"),
-              }),
-            });
-          }
-        }
-      });
+      .then(events => storeMessages(dispatch, events, connectionUri));
   };
+}
+
+/**
+ * Helper function that stores dispatches the success and failed actions for a given set of messages
+ * @param messages
+ * @param connectionUri
+ */
+function storeMessages(dispatch, messages, connectionUri) {
+  if (messages) {
+    const messagesImm = Immutable.fromJS(messages);
+
+    if (messagesImm.get("success").size > 0) {
+      dispatch({
+        type: actionTypes.connections.fetchMessagesSuccess,
+        payload: Immutable.fromJS({
+          connectionUri: connectionUri,
+          events: messagesImm.get("success"),
+        }),
+      });
+    }
+
+    if (messagesImm.get("failed").size > 0) {
+      dispatch({
+        type: actionTypes.connections.fetchMessagesFailed,
+        payload: Immutable.fromJS({
+          connectionUri: connectionUri,
+          events: messagesImm.get("failed"),
+        }),
+      });
+    }
+
+    /*If neither succes nor failed has any elements we simply say that fetching Ended, that way
+    we can ensure that there is not going to be a lock on the connection because loadingMessages was complete but never
+    reset its status
+    */
+    if (
+      messagesImm.get("success").size == 0 &&
+      messagesImm.get("failed").size == 0
+    ) {
+      dispatch({
+        type: actionTypes.connections.fetchMessagesEnd,
+        payload: Immutable.fromJS({ connectionUri: connectionUri }),
+      });
+    }
+  }
 }
 
 function numOfEvts2pageSize(numberOfEvents) {

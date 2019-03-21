@@ -28,6 +28,7 @@ export const emptyNeedProcess = Immutable.fromJS({
 });
 
 export const emptyConnectionProcess = Immutable.fromJS({
+  toLoad: false,
   loading: false,
   loadingMessages: false,
   failedToLoad: false,
@@ -201,6 +202,15 @@ export default function(processState = initialState, action = {}) {
       });
     }
 
+    case actionTypes.connections.fetchMessagesEnd: {
+      const connUri = action.payload.get("connectionUri");
+
+      return updateConnectionProcess(processState, connUri, {
+        loadingMessages: false,
+        failedToLoad: false,
+      });
+    }
+
     case actionTypes.connections.messageUrisInLoading: {
       const connUri = action.payload.get("connectionUri");
       const messageUris = action.payload.get("uris");
@@ -318,12 +328,29 @@ export default function(processState = initialState, action = {}) {
       });
     }
 
+    case actionTypes.connections.storeUrisToLoad: {
+      const connections = action.payload.get("connections");
+
+      connections &&
+        connections.map(conn => {
+          processState = updateConnectionProcess(
+            processState,
+            conn.get("connectionUri"),
+            {
+              toLoad: true,
+            }
+          );
+        });
+      return processState;
+    }
+
     case actionTypes.connections.storeActiveUrisInLoading: {
       const connUris = action.payload.get("connUris");
 
       connUris &&
         connUris.forEach(connUri => {
           processState = updateConnectionProcess(processState, connUri, {
+            toLoad: false,
             loading: true,
           });
         });
@@ -349,6 +376,7 @@ export default function(processState = initialState, action = {}) {
       connections &&
         connections.map((conn, connUri) => {
           processState = updateConnectionProcess(processState, connUri, {
+            toLoad: false,
             loading: false,
           });
 

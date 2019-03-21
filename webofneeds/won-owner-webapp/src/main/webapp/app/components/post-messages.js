@@ -124,7 +124,7 @@ function genComponentConf() {
               connection-uri="self.selectedConnectionUri">
             </won-post-content-message>
             <div class="pm__content__loadspinner"
-                ng-if="self.isProcessingLoadingMessages || (self.showAgreementData && self.isProcessingLoadingAgreementData) || (self.showPetriNetData && self.isProcessingLoadingPetriNetData && !self.hasPetriNetData)">
+                ng-if="self.isConnectionLoading || self.isProcessingLoadingMessages || (self.showAgreementData && self.isProcessingLoadingAgreementData) || (self.showPetriNetData && self.isProcessingLoadingPetriNetData && !self.hasPetriNetData)">
                 <svg class="hspinner">
                   <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
                 </svg>
@@ -136,7 +136,7 @@ function genComponentConf() {
               Calculating PetriNet Status
             </div>
             <button class="pm__content__loadbutton won-button--outlined thin red"
-                ng-if="!self.isSuggested && self.showChatData && !self.isProcessingLoadingMessages && self.hasConnectionMessagesToLoad"
+                ng-if="!self.isSuggested && self.showChatData && !self.isConnectionLoading && !self.isProcessingLoadingMessages && self.hasConnectionMessagesToLoad"
                 ng-click="self.loadPreviousMessages()">
                 Load previous messages
             </button>
@@ -385,14 +385,14 @@ function genComponentConf() {
         const reactionUseCases =
           remoteNeed &&
           !needUtils.isOwned(remoteNeed) &&
-          getIn(remoteNeed, ["matchedUseCase", "reactionUseCases"]);
+          needUtils.getReactionUseCases(remoteNeed);
         const hasReactionUseCases =
           reactionUseCases && reactionUseCases.size > 0;
 
         const enabledUseCases =
           remoteNeed &&
           needUtils.isOwned(remoteNeed) &&
-          getIn(remoteNeed, ["matchedUseCase", "enabledUseCases"]);
+          needUtils.getEnabledUseCases(remoteNeed);
         const hasEnabledUseCases = enabledUseCases && enabledUseCases.size > 0;
 
         return {
@@ -475,6 +475,10 @@ function genComponentConf() {
             processUtils.isNeedLoading(process, ownedNeed.get("uri")) ||
             processUtils.isNeedLoading(process, remoteNeedUri) ||
             processUtils.isConnectionLoading(process, selectedConnectionUri),
+          isConnectionLoading: processUtils.isConnectionLoading(
+            process,
+            selectedConnectionUri
+          ),
           showPostContentMessage:
             showChatData && !multiSelectType && remoteNeedUri,
           showOverlayConnection: !!this.connectionUri,
@@ -527,6 +531,7 @@ function genComponentConf() {
         const INITIAL_MESSAGECOUNT = 15;
         if (
           this.connection &&
+          !this.isConnectionLoading &&
           !this.isProcessingLoadingMessages &&
           this.connection.get("messages").size < INITIAL_MESSAGECOUNT &&
           this.hasConnectionMessagesToLoad
@@ -661,6 +666,7 @@ function genComponentConf() {
       delay(0).then(() => {
         if (
           this.isConnected &&
+          !this.isConnectionLoading &&
           !this.isProcessingLoadingAgreementData &&
           !this.isProcessingLoadingMessages &&
           this.agreementDataLoaded &&
@@ -760,7 +766,11 @@ function genComponentConf() {
     loadPreviousMessages() {
       delay(0).then(() => {
         const MORE_MESSAGECOUNT = 5;
-        if (this.connection && !this.isProcessingLoadingMessages) {
+        if (
+          this.connection &&
+          !this.isConnectionLoading &&
+          !this.isProcessingLoadingMessages
+        ) {
           this.connections__showMoreMessages(
             this.connection.get("uri"),
             MORE_MESSAGECOUNT

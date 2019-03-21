@@ -365,25 +365,48 @@ export function setMultiSelectType(
   return state;
 }
 
-export function addActiveConnectionsToNeedInLoading(state, needUri, connUris) {
+export function addConnectionsToLoad(state, needUri, connections) {
   let newState = state;
   needUri &&
-    connUris &&
-    connUris.forEach(connUri => {
-      newState = addActiveConnectionToNeed(newState, needUri, connUri);
+    connections &&
+    connections.forEach(conn => {
+      newState = addConnectionToLoad(newState, needUri, conn);
     });
   return newState;
 }
 
-function addActiveConnectionToNeed(state, needUri, connUri) {
+export function addConnectionToLoad(state, needUri, conn) {
   const storedNeed = state.get(needUri);
   const isConnectionPresent =
-    storedNeed && !!storedNeed.getIn(["connections", connUri]);
+    storedNeed &&
+    !!storedNeed.getIn(["connections", conn.get("connectionUri")]);
+
+  const facetTypeToCompacted = facetType => {
+    if (facetType === won.WON.ChatFacet) {
+      return won.WON.ChatFacetCompacted;
+    } else if (facetType === won.WON.GroupFacet) {
+      return won.WON.GroupFacetCompacted;
+    } else if (facetType === won.WON.ReviewFacet) {
+      return won.WON.ReviewFacetCompacted;
+    } else if (facetType === won.WON.HolderFacet) {
+      return won.WON.HolderFacetCompacted;
+    } else if (facetType === won.WON.HoldableFacet) {
+      return won.WON.HoldableFacetCompacted;
+    } else {
+      console.warn(
+        "Unknown facetType: ",
+        facetType,
+        " - can't compact, return as is"
+      );
+      return facetType;
+    }
+  };
 
   if (storedNeed && !isConnectionPresent) {
     const connection = Immutable.fromJS({
-      uri: connUri,
-      state: undefined,
+      uri: conn.get("connectionUri"),
+      state: conn.get("connectionState"),
+      facet: facetTypeToCompacted(conn.get("facetType")),
       messages: Immutable.Map(),
       agreementData: undefined,
       remoteNeedUri: undefined,
@@ -395,7 +418,10 @@ function addActiveConnectionToNeed(state, needUri, connUri) {
       showAgreementData: false,
     });
 
-    return state.mergeDeepIn([needUri, "connections", connUri], connection);
+    return state.mergeDeepIn(
+      [needUri, "connections", conn.get("connectionUri")],
+      connection
+    );
   }
 
   return state;

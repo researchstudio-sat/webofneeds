@@ -1153,7 +1153,7 @@ import won from "./won.js";
     return Promise.resolve(ret);
   };
 
-  won.getConnectionUrisWithStateOfNeed = (needUri, requesterWebId) => {
+  won.getConnectionUrisWithStateByNeedUri = (needUri, requesterWebId) => {
     return won
       .executeCrawlableQuery(
         won.queries["getAllConnectionUrisOfNeed"],
@@ -1165,6 +1165,7 @@ import won from "./won.js";
           return {
             connectionUri: x.connectionUri.value,
             connectionState: x.connectionState.value,
+            facetType: x.facetType.value,
           };
         })
       );
@@ -1679,12 +1680,14 @@ import won from "./won.js";
       query:
         "prefix won: <http://purl.org/webofneeds/model#> \n" +
         "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n" +
-        "select ?connectionUri ?connectionState \n" +
+        "select ?connectionUri ?connectionState ?facetType \n" +
         " where { \n" +
         " <::baseUri::> a won:Need; \n" +
         "           won:hasConnections ?connections.\n" +
         "  ?connections rdfs:member ?connectionUri. \n" +
         "  ?connectionUri won:hasConnectionState ?connectionState. \n" +
+        "  ?connectionUri won:hasFacet ?facetUri. \n" +
+        "  ?facetUri a ?facetType. \n" +
         "} \n",
     },
   };
