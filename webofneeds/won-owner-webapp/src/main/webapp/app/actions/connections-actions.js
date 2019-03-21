@@ -746,6 +746,15 @@ export function showLatestMessages(connectionUriParam, numberOfEvents) {
               }),
             });
           }
+
+          if (
+            eventsImm.get("success").size == 0 &&
+            eventsImm.get("failed").size == 0
+          ) {
+            console.warn(
+              "NO MESSAGES RETRIEVED AT ALL, MIGHT BE SOME WEIRD COINCIDINK"
+            );
+          }
         }
       });
   };
@@ -757,23 +766,22 @@ export function loadLatestMessagesOfConnection({
   state,
   dispatch,
 }) {
-  const connectionUri_ = connectionUri || getConnectionUriFromRoute(state);
   const need =
-    connectionUri_ && getOwnedNeedByConnectionUri(state, connectionUri_);
+    connectionUri && getOwnedNeedByConnectionUri(state, connectionUri);
   const needUri = need && need.get("uri");
   const connection =
-    connectionUri_ && getOwnedConnectionByUri(state, connectionUri_);
+    connectionUri && getOwnedConnectionByUri(state, connectionUri);
   if (
-    !connectionUri_ ||
+    !connectionUri ||
     !connection ||
-    getIn(state, ["process", "connections", connectionUri_, "loadingMessages"]) // only start loading once.
+    getIn(state, ["process", "connections", connectionUri, "loadingMessages"]) // only start loading once.
   ) {
     return Promise.resolve();
   }
 
   dispatch({
     type: actionTypes.connections.fetchMessagesStart,
-    payload: Immutable.fromJS({ connectionUri: connectionUri_ }),
+    payload: Immutable.fromJS({ connectionUri: connectionUri }),
   });
 
   const fetchParams = {
@@ -783,7 +791,7 @@ export function loadLatestMessagesOfConnection({
   };
 
   return won
-    .getConnectionWithEventUris(connectionUri_, fetchParams)
+    .getConnectionWithEventUris(connectionUri, fetchParams)
     .then(connection => {
       const messagesToFetch = limitNumberOfEventsToFetchInConnection(
         state,
@@ -795,7 +803,7 @@ export function loadLatestMessagesOfConnection({
       dispatch({
         type: actionTypes.connections.messageUrisInLoading,
         payload: Immutable.fromJS({
-          connectionUri: connectionUri_,
+          connectionUri: connectionUri,
           uris: messagesToFetch,
         }),
       });
@@ -817,7 +825,7 @@ export function loadLatestMessagesOfConnection({
           dispatch({
             type: actionTypes.connections.fetchMessagesSuccess,
             payload: Immutable.fromJS({
-              connectionUri: connectionUri_,
+              connectionUri: connectionUri,
               events: eventsImm.get("success"),
             }),
           });
@@ -827,10 +835,19 @@ export function loadLatestMessagesOfConnection({
           dispatch({
             type: actionTypes.connections.fetchMessagesFailed,
             payload: Immutable.fromJS({
-              connectionUri: connectionUri_,
+              connectionUri: connectionUri,
               events: eventsImm.get("failed"),
             }),
           });
+        }
+
+        if (
+          eventsImm.get("success").size == 0 &&
+          eventsImm.get("failed").size == 0
+        ) {
+          console.warn(
+            "NO MESSAGES RETRIEVED AT ALL, MIGHT BE SOME WEIRD COINCIDINK"
+          );
         }
       }
     });
@@ -934,6 +951,15 @@ export function showMoreMessages(connectionUriParam, numberOfEvents) {
                 events: eventsImm.get("failed"),
               }),
             });
+          }
+
+          if (
+            eventsImm.get("success").size == 0 &&
+            eventsImm.get("failed").size == 0
+          ) {
+            console.warn(
+              "NO MESSAGES RETRIEVED AT ALL, MIGHT BE SOME WEIRD COINCIDINK"
+            );
           }
         }
       });
