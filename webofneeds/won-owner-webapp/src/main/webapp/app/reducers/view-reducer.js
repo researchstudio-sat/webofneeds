@@ -104,11 +104,11 @@ export default function(viewState = initialState, action = {}) {
         showTerms: true,
         buttons: [
           {
-            caption: "Yes",
+            caption: "Yes, I accept ToS",
             callback: acceptCallback,
           },
           {
-            caption: "No",
+            caption: "No, cancel",
             callback: cancelCallback,
           },
         ],

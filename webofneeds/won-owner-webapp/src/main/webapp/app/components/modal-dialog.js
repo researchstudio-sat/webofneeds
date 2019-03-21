@@ -16,17 +16,14 @@ function genComponentConf() {
       <div class="md__dialog">
           <div class="md__dialog__header">
              <span class="md__dialog__header__caption" ng-if="!self.showTerms">{{self.modalDialogCaption}}</span>
-             <span class="md__dialog__header__caption" ng-if="self.showTerms">Attention</span>
+             <span class="md__dialog__header__caption" ng-if="self.showTerms">Important Note</span>
           </div>
           <div class="md__dialog__content">
              <span class="md__dialog__content__text" ng-if="!self.showTerms">{{self.modalDialogText}}</span>
              <span class="md__dialog__content__text" ng-if="self.showTerms">
-                You are about to create an anoymous Account.
+                This action requires an account. If you want to proceed, we will create an anonymous account for you.
                 <br/>
-                This is only possible if you accept the <a target="_blank" href="{{ self.absHRef(self.$state, 'about', {'aboutSection': 'aboutTermsOfService'}) }}">Terms Of Service</a>.
-                <br/>
-                <br/>
-                Do you want to want to proceed and thus also accept the Terms of Service?
+                By clicking 'Yes', you accept the <a target="_blank" href="{{ self.absHRef(self.$state, 'about', {'aboutSection': 'aboutTermsOfService'}) }}">Terms Of Service(ToS)</a> and anonymous account will be created. Clicking 'No' will just cancel the action.
               </span>
           </div>
           <div class="md__dialog__footer">
