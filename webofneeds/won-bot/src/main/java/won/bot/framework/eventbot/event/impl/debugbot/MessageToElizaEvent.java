@@ -21,8 +21,7 @@ import won.protocol.model.Connection;
 /**
  * Message to be processed by a connection-specific eliza instance.
  */
-public class MessageToElizaEvent extends DebugCommandEvent
-{
+public class MessageToElizaEvent extends DebugCommandEvent {
   String message;
 
   public MessageToElizaEvent(final Connection con, final String message) {

@@ -8,7 +8,11 @@ import java.net.URI;
  */
 public interface BAStateManager {
   public URI getStateForNeedUri(URI coordinatorURI, URI participantURI, final URI facetURI);
-  public void setStateForNeedUri(URI stateUri, URI statePhaseURI, URI coordinatorURI, URI participantURI, final URI facetURI);
+
+  public void setStateForNeedUri(URI stateUri, URI statePhaseURI, URI coordinatorURI, URI participantURI,
+      final URI facetURI);
+
   public void setStateForNeedUri(URI stateUri, URI coordinatorURI, URI participantURI, final URI facetURI);
+
   public URI getStatePhaseForNeedUri(URI coordinatorURI, URI participantURI, final URI facetURI);
 }

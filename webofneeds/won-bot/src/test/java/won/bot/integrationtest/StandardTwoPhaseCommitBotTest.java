@@ -1,8 +1,5 @@
 package won.bot.integrationtest;
 
-import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.TimeUnit;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,36 +10,34 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.support.PeriodicTrigger;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
 import won.bot.framework.eventbot.event.impl.lifecycle.WorkDoneEvent;
 import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
 import won.bot.framework.manager.impl.SpringAwareBotManagerImpl;
 import won.bot.impl.StandardTwoPhaseCommitBot;
 
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.TimeUnit;
+
 /**
  * User: Danijel
  * Date: 14.5.14.
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:/spring/app/standardTwoPhaseCommitTest.xml"})
-public class StandardTwoPhaseCommitBotTest {
+@RunWith(SpringJUnit4ClassRunner.class) @ContextConfiguration(locations = {
+    "classpath:/spring/app/standardTwoPhaseCommitTest.xml" }) public class StandardTwoPhaseCommitBotTest {
   private static final int RUN_ONCE = 1;
   private static final long ACT_LOOP_TIMEOUT_MILLIS = 100;
   private static final long ACT_LOOP_INITIAL_DELAY_MILLIS = 100;
 
   MyBot bot;
 
-  @Autowired
-  ApplicationContext applicationContext;
+  @Autowired ApplicationContext applicationContext;
 
-  @Autowired
-  SpringAwareBotManagerImpl botManager;
+  @Autowired SpringAwareBotManagerImpl botManager;
 
   /**
    * This is run before each @TestD method.
    */
-  @Before
-  public void before(){
+  @Before public void before() {
     //create a bot instance and auto-wire it
     //create a bot instance and auto-wire it
     AutowireCapableBeanFactory beanFactory = applicationContext.getAutowireCapableBeanFactory();
@@ -58,11 +53,10 @@ public class StandardTwoPhaseCommitBotTest {
 
   /**
    * The main test method.
+   *
    * @throws Exception
    */
-  @Test
-  public void testStandardTwoPhaseCommitBot() throws Exception
-  {
+  @Test public void testStandardTwoPhaseCommitBot() throws Exception {
     //adding the bot to the bot manager will cause it to be initialized.
     //at that point, the trigger starts.
     botManager.addBot(this.bot);
@@ -80,8 +74,7 @@ public class StandardTwoPhaseCommitBotTest {
    * add a listener to its internal event bus and to access its listeners, which
    * record information during the run that we later check with asserts.
    */
-  public static class MyBot extends StandardTwoPhaseCommitBot
-  {
+  public static class MyBot extends StandardTwoPhaseCommitBot {
     /**
      * Used for synchronization with the @TestD method: it should wait at the
      * barrier until our bot is done, then execute the asserts.
@@ -91,38 +84,32 @@ public class StandardTwoPhaseCommitBotTest {
     /**
      * Default constructor is required for instantiation through Spring.
      */
-    public MyBot(){
+    public MyBot() {
     }
 
-    @Override
-    protected void initializeEventListeners()
-    {
+    @Override protected void initializeEventListeners() {
       //of course, let the real bot implementation initialize itself
       super.initializeEventListeners();
       //now, add a listener to the WorkDoneEvent.
       //its only purpose is to trip the CyclicBarrier instance that
       // the test method is waiting on
-      getEventBus().subscribe(WorkDoneEvent.class,
-        new ActionOnEventListener(
-          getEventListenerContext(),
-          new TripBarrierAction(getEventListenerContext(), barrier)));
+      getEventBus().subscribe(WorkDoneEvent.class, new ActionOnEventListener(getEventListenerContext(),
+              new TripBarrierAction(getEventListenerContext(), barrier)));
     }
 
-    public CyclicBarrier getBarrier()
-    {
+    public CyclicBarrier getBarrier() {
       return barrier;
     }
 
     /**
      * Here we check the results of the bot's execution.
      */
-    public void executeAsserts()
-    {
+    public void executeAsserts() {
       //Coordinator creator
       Assert.assertEquals(1, this.coordinatorNeedCreator.getEventCount());
       Assert.assertEquals(0, this.coordinatorNeedCreator.getExceptionCount());
       //28 Participants creator
-      Assert.assertEquals(noOfNeeds-1, this.participantNeedCreator.getEventCount());
+      Assert.assertEquals(noOfNeeds - 1, this.participantNeedCreator.getEventCount());
       Assert.assertEquals(0, this.participantNeedCreator.getExceptionCount());
       //creation waiter
       Assert.assertEquals(noOfNeeds, this.creationWaiter.getEventCount());
@@ -131,7 +118,7 @@ public class StandardTwoPhaseCommitBotTest {
       Assert.assertEquals(1, this.needConnector.getEventCount());
       Assert.assertEquals(0, this.needConnector.getExceptionCount());
       //Participants deactivator
-      Assert.assertEquals(noOfNeeds-1, this.participantDeactivator.getEventCount());
+      Assert.assertEquals(noOfNeeds - 1, this.participantDeactivator.getEventCount());
       Assert.assertEquals(0, this.participantDeactivator.getExceptionCount());
       //Coordinator deactivator
       Assert.assertEquals(1, this.coordinatorDeactivator.getEventCount());

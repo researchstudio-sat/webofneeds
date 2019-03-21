@@ -1,5 +1,10 @@
 package won.matcher.utils.preprocessing;
 
+import opennlp.tools.postag.POSModel;
+import opennlp.tools.postag.POSTaggerME;
+import opennlp.tools.tokenize.SimpleTokenizer;
+import opennlp.tools.tokenize.Tokenizer;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -7,19 +12,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import opennlp.tools.postag.POSModel;
-import opennlp.tools.postag.POSTaggerME;
-import opennlp.tools.tokenize.SimpleTokenizer;
-import opennlp.tools.tokenize.Tokenizer;
-
 /**
  * Class uses OpenNLP to extract tokens from a text. Used for pre-processing the need attribute content.
- *
+ * <p>
  * User: hfriedrich
  * Date: 13.06.2015
  */
-public class OpenNlpTokenExtraction
-{
+public class OpenNlpTokenExtraction {
   Tokenizer tokenizer = SimpleTokenizer.INSTANCE;
   POSTaggerME posTagger = null;
 

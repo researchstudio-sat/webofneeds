@@ -16,14 +16,11 @@
 
 package won.bot.framework.bot.base;
 
-import java.net.URI;
-
 import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
-
 import won.bot.framework.bot.Bot;
 import won.bot.framework.bot.BotLifecyclePhase;
 import won.bot.framework.bot.context.BotContextWrapper;
@@ -31,33 +28,29 @@ import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.Match;
 
+import java.net.URI;
+
 /**
  * Basic Bot implementation intended to be extended. Does nothing.
  */
-public abstract class BaseBot implements Bot
-{
+public abstract class BaseBot implements Bot {
   protected final Logger logger = LoggerFactory.getLogger(getClass());
   private BotLifecyclePhase lifecyclePhase = BotLifecyclePhase.DOWN;
   private boolean workDone = false;
 
-  @Autowired
-  private BotContextWrapper botContextWrapper;
+  @Autowired private BotContextWrapper botContextWrapper;
 
-  @Override
-  public boolean knowsNeedURI(final URI needURI)
-  {
+  @Override public boolean knowsNeedURI(final URI needURI) {
     return this.botContextWrapper.getBotContext().isNeedKnown(needURI);
   }
 
-  @Override
-  public boolean knowsNodeURI(final URI wonNodeURI) {
+  @Override public boolean knowsNodeURI(final URI wonNodeURI) {
     return this.botContextWrapper.getBotContext().isNodeKnown(wonNodeURI);
   }
 
-  @Override
-  public synchronized void initialize() throws Exception
-  {
-    if (!this.lifecyclePhase.isDown()) return;
+  @Override public synchronized void initialize() throws Exception {
+    if (!this.lifecyclePhase.isDown())
+      return;
     this.lifecyclePhase = BotLifecyclePhase.STARTING_UP;
 
     // try the connection with the bot context
@@ -74,10 +67,9 @@ public abstract class BaseBot implements Bot
     this.lifecyclePhase = BotLifecyclePhase.ACTIVE;
   }
 
-  @Override
-  public synchronized void shutdown() throws Exception
-  {
-    if (!this.lifecyclePhase.isActive()) return;
+  @Override public synchronized void shutdown() throws Exception {
+    if (!this.lifecyclePhase.isActive())
+      return;
     this.lifecyclePhase = BotLifecyclePhase.SHUTTING_DOWN;
     doShutdown();
     this.lifecyclePhase = BotLifecyclePhase.DOWN;
@@ -96,19 +88,15 @@ public abstract class BaseBot implements Bot
   /**
    * Sets the workDone flag to true.
    */
-  protected void workIsDone(){
+  protected void workIsDone() {
     this.workDone = true;
   }
 
-  @Override
-  public boolean isWorkDone()
-  {
+  @Override public boolean isWorkDone() {
     return this.workDone;
   }
 
-  @Override
-  public BotLifecyclePhase getLifecyclePhase()
-  {
+  @Override public BotLifecyclePhase getLifecyclePhase() {
     return this.lifecyclePhase;
   }
 
@@ -120,42 +108,31 @@ public abstract class BaseBot implements Bot
     return botContextWrapper;
   }
 
-  @Override
-  public abstract void onNewNeedCreated(final URI needUri, final URI wonNodeUri, final Dataset needDataset) throws Exception;
+  @Override public abstract void onNewNeedCreated(final URI needUri, final URI wonNodeUri, final Dataset needDataset)
+      throws Exception;
 
-  @Override
-  public abstract void onConnectFromOtherNeed(Connection con, final WonMessage wonMessage);
+  @Override public abstract void onConnectFromOtherNeed(Connection con, final WonMessage wonMessage);
 
-  @Override
-  public abstract void onOpenFromOtherNeed(Connection con, final WonMessage wonMessage);
+  @Override public abstract void onOpenFromOtherNeed(Connection con, final WonMessage wonMessage);
 
-  @Override
-  public abstract void onCloseFromOtherNeed(Connection con, final WonMessage wonMessage);
+  @Override public abstract void onCloseFromOtherNeed(Connection con, final WonMessage wonMessage);
 
-  @Override
-  public abstract void onHintFromMatcher(Match match, final WonMessage wonMessage);
+  @Override public abstract void onHintFromMatcher(Match match, final WonMessage wonMessage);
 
-  @Override
-  public abstract void onMessageFromOtherNeed(Connection con, final WonMessage wonMessage);
+  @Override public abstract void onMessageFromOtherNeed(Connection con, final WonMessage wonMessage);
 
-  @Override
-  public abstract void onFailureResponse(final URI failedMessageUri, final WonMessage wonMessage);
+  @Override public abstract void onFailureResponse(final URI failedMessageUri, final WonMessage wonMessage);
 
-  @Override
-  public abstract void onSuccessResponse(final URI successfulMessageUri, final WonMessage wonMessage);
+  @Override public abstract void onSuccessResponse(final URI successfulMessageUri, final WonMessage wonMessage);
 
-  @Override
-  public abstract void onMatcherRegistered(final URI wonNodeUri);
+  @Override public abstract void onMatcherRegistered(final URI wonNodeUri);
 
-  @Override
-  public abstract void onNewNeedCreatedNotificationForMatcher(final URI wonNodeURI, final URI needURI, final Dataset needDataset);
+  @Override public abstract void onNewNeedCreatedNotificationForMatcher(final URI wonNodeURI, final URI needURI,
+      final Dataset needDataset);
 
-  @Override
-  public abstract void onNeedActivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI);
+  @Override public abstract void onNeedActivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI);
 
-  @Override
-  public abstract void onNeedDeactivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI);
+  @Override public abstract void onNeedDeactivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI);
 
-  @Override
-  public abstract void act() throws Exception;
+  @Override public abstract void act() throws Exception;
 }

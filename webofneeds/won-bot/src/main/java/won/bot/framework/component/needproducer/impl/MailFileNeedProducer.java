@@ -16,12 +16,6 @@
 
 package won.bot.framework.component.needproducer.impl;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-
-import javax.mail.internet.MimeMessage;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.mail.util.MimeMessageParser;
 import org.apache.jena.query.Dataset;
@@ -29,21 +23,22 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.bot.framework.component.needproducer.FileBasedNeedProducer;
 import won.protocol.util.DefaultNeedModelWrapper;
+
+import javax.mail.internet.MimeMessage;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 
 /**
  * User: fkleedorfer
  * Date: 17.12.13
  */
-public class MailFileNeedProducer implements FileBasedNeedProducer
-{
+public class MailFileNeedProducer implements FileBasedNeedProducer {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Override
-  public  synchronized Dataset readNeedFromFile(final File file) throws IOException
-  {
+  @Override public synchronized Dataset readNeedFromFile(final File file) throws IOException {
     logger.debug("processing as mail file: {} ", file);
     FileInputStream fis = new FileInputStream(file);
     DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper("no:uri");
@@ -53,9 +48,9 @@ public class MailFileNeedProducer implements FileBasedNeedProducer
       parser.parse();
       needModelWrapper.setTitle(parser.getSubject());
       String content = null;
-      if (parser.hasPlainContent()){
+      if (parser.hasPlainContent()) {
         content = parser.getPlainContent();
-      } else if (parser.hasHtmlContent()){
+      } else if (parser.hasHtmlContent()) {
         Document doc = Jsoup.parse(parser.getHtmlContent());
         content = doc.text();
       }
@@ -72,10 +67,10 @@ public class MailFileNeedProducer implements FileBasedNeedProducer
     } catch (Exception e) {
       logger.error("could not parse email from file {} ", file, e);
     } finally {
-      if (fis != null) fis.close();
+      if (fis != null)
+        fis.close();
     }
     return null;
   }
-
 
 }

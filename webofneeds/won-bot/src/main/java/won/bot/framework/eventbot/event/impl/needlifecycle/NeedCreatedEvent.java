@@ -16,24 +16,23 @@
 
 package won.bot.framework.eventbot.event.impl.needlifecycle;
 
-import java.net.URI;
-
 import org.apache.jena.query.Dataset;
-
 import won.bot.framework.eventbot.event.BaseNeedSpecificEvent;
 import won.protocol.model.FacetType;
+
+import java.net.URI;
 
 /**
  *
  */
-public class NeedCreatedEvent extends BaseNeedSpecificEvent
-{
+public class NeedCreatedEvent extends BaseNeedSpecificEvent {
   private final URI needUriBeforeCreation;
   private final URI wonNodeUri;
   private final Dataset needDataset;
   private final FacetType facetType;
 
-  public NeedCreatedEvent(final URI needURI, final URI wonNodeUri, final Dataset needDataset, final FacetType facetType, final URI needUriBeforeCreation) {
+  public NeedCreatedEvent(final URI needURI, final URI wonNodeUri, final Dataset needDataset, final FacetType facetType,
+      final URI needUriBeforeCreation) {
     super(needURI);
     this.wonNodeUri = wonNodeUri;
     this.needDataset = needDataset;
@@ -41,12 +40,12 @@ public class NeedCreatedEvent extends BaseNeedSpecificEvent
     this.needUriBeforeCreation = needUriBeforeCreation;
   }
 
-  public NeedCreatedEvent(final URI needURI, final URI wonNodeUri, final Dataset needDataset, final FacetType facetType) {
+  public NeedCreatedEvent(final URI needURI, final URI wonNodeUri, final Dataset needDataset,
+      final FacetType facetType) {
     this(needURI, wonNodeUri, needDataset, facetType, null);
   }
 
-  public URI getWonNodeUri()
-  {
+  public URI getWonNodeUri() {
     return wonNodeUri;
   }
 

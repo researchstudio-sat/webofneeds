@@ -1,24 +1,5 @@
 package won.bot.framework.bot.context;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.URI;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.TreeMap;
-
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
-
 import org.apache.xbean.spring.context.ClassPathXmlApplicationContext;
 import org.junit.Assert;
 import org.junit.Before;
@@ -28,16 +9,22 @@ import org.junit.runners.Parameterized;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.TestContextManager;
 
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.internet.MimeMessage;
+import java.io.*;
+import java.net.URI;
+import java.util.*;
+
 /**
  * Tests for bot context.
  * For the mongo db implementation you have to make manually sure that the connection toi the mongo db server exists
  * and that the database in empty on test start.
- *
+ * <p>
  * Created by hfriedrich on 24.10.2016.
  */
-@RunWith(value = Parameterized.class)
-public class BotContextTests
-{
+@RunWith(value = Parameterized.class) public class BotContextTests {
   private static final URI URI1 = URI.create("http://test.uri/number#1");
   private static final URI URI2 = URI.create("http://test.uri/number#2");
   private static final URI URI3 = URI.create("http://test.uri/number#3");
@@ -52,23 +39,20 @@ public class BotContextTests
     botContextClass = cl;
   }
 
-  @Before
-  public void setup() throws IllegalAccessException, InstantiationException {
+  @Before public void setup() throws IllegalAccessException, InstantiationException {
 
     ApplicationContext ctx = new ClassPathXmlApplicationContext("/botContext.xml");
     botContext = (BotContext) ctx.getBean(botContextClass);
   }
 
-  @Parameterized.Parameters
-  public static Iterable<Class[]> getTestParameters() {
+  @Parameterized.Parameters public static Iterable<Class[]> getTestParameters() {
     LinkedList<Class[]> linkedList = new LinkedList<>();
-    linkedList.add(new Class[] {MemoryBotContext.class});
-    linkedList.add(new Class[] {MongoBotContext.class});
+    linkedList.add(new Class[] { MemoryBotContext.class });
+    linkedList.add(new Class[] { MongoBotContext.class });
     return linkedList;
   }
 
-  @Test
-  public void testNamedNeedUriMethods() {
+  @Test public void testNamedNeedUriMethods() {
 
     botContext.dropCollection(MongoBotContext.NEED_URI_COLLECTION);
     botContext.dropCollection(MongoBotContext.NODE_URI_COLLECTION);
@@ -109,7 +93,8 @@ public class BotContextTests
     botContext.removeNeedUriFromNamedNeedUriList(URI2, "uri1");
     botContext.removeNeedUriFromNamedNeedUriList(URI3, "uri1");
 
-    Assert.assertEquals(2, botContext.retrieveAllNeedUris().size()); // URI1 and URI2 should still be there in the general list
+    Assert.assertEquals(2,
+        botContext.retrieveAllNeedUris().size()); // URI1 and URI2 should still be there in the general list
     Assert.assertEquals(1, botContext.getNamedNeedUriList("uri1").size());
     Assert.assertTrue(botContext.getNamedNeedUriList("uri1").contains(URI1));
     Assert.assertEquals(1, botContext.getNamedNeedUriList("uri2").size());
@@ -123,8 +108,7 @@ public class BotContextTests
     Assert.assertEquals(0, botContext.retrieveAllNeedUris().size());
   }
 
-  @Test
-  public void testNodeUriMethods() {
+  @Test public void testNodeUriMethods() {
 
     Assert.assertFalse(botContext.isNodeKnown(URI1));
 
@@ -155,8 +139,7 @@ public class BotContextTests
     Assert.assertFalse(botContext.isNodeKnown(URI2));
   }
 
-  @Test
-  public void testObjectMapMethods() {
+  @Test public void testObjectMapMethods() {
 
     botContext.dropCollection("col1");
     botContext.dropCollection("col2");
@@ -195,8 +178,7 @@ public class BotContextTests
     Assert.assertEquals(0, botContext.loadObjectMap("col2").size());
   }
 
-  @Test
-  public void testListMapMethods() {
+  @Test public void testListMapMethods() {
 
     botContext.dropCollection("addCol1");
     botContext.dropCollection("addCol2");
@@ -232,8 +214,7 @@ public class BotContextTests
     Assert.assertEquals(URI2, botContext.loadFromListMap("addCol2", "list1").get(0));
   }
 
-  @Test
-  public void useEmailAddressAsKey() {
+  @Test public void useEmailAddressAsKey() {
 
     botContext.dropCollection("mail");
     botContext.dropCollection("mailList");
@@ -246,8 +227,7 @@ public class BotContextTests
     Assert.assertEquals(3, botContext.loadFromListMap("mailList", mailAddress).size());
   }
 
-  @Test
-  public void testPutAndRetrieveGenericObjects() throws MessagingException, IOException, ClassNotFoundException {
+  @Test public void testPutAndRetrieveGenericObjects() throws MessagingException, IOException, ClassNotFoundException {
 
     // List
     botContext.dropCollection("uriList");
@@ -270,7 +250,7 @@ public class BotContextTests
     ObjectOutputStream oos = new ObjectOutputStream(os);
     oos.writeObject(uriHashMap);
     botContext.saveToObjectMap("uriMap", "map1", os.toByteArray());
-    byte[] byteMsg  = (byte[]) botContext.loadFromObjectMap("uriMap", "map1");
+    byte[] byteMsg = (byte[]) botContext.loadFromObjectMap("uriMap", "map1");
     ByteArrayInputStream is = new ByteArrayInputStream(byteMsg);
     ObjectInputStream ois = new ObjectInputStream(is);
     HashMap<String, URI> uriHashMapCopy = (HashMap<String, URI>) ois.readObject();
@@ -286,7 +266,7 @@ public class BotContextTests
     uriTreeMap.put(URI2.toString(), URI3);
     uriTreeMap.put(URI3.toString(), URI1);
     botContext.saveToObjectMap("uriMap", "map1", uriTreeMap);  // overwrite the HashMap entry from the previous step
-    Map<String, URI> uriTreeMapCopy  = (Map<String, URI>) botContext.loadFromObjectMap("uriMap", "map1");
+    Map<String, URI> uriTreeMapCopy = (Map<String, URI>) botContext.loadFromObjectMap("uriMap", "map1");
     Assert.assertEquals(uriTreeMap, uriTreeMapCopy);
 
     // MimeMessage cannot be serialized directly => has to be serialized manually first
@@ -309,7 +289,7 @@ public class BotContextTests
     Assert.assertEquals(message.getHeader("test1")[0], messageCopy.getHeader("test1")[0]);
     Assert.assertEquals(message.getAllHeaderLines().nextElement(), messageCopy.getAllHeaderLines().nextElement());
     Assert.assertEquals(message.getRecipients(Message.RecipientType.TO)[0],
-                        messageCopy.getRecipients(Message.RecipientType.TO)[0]);
+        messageCopy.getRecipients(Message.RecipientType.TO)[0]);
     Assert.assertEquals(message.getSubject(), messageCopy.getSubject());
     Assert.assertEquals(message.getDescription(), messageCopy.getDescription());
     Assert.assertEquals(message.getSentDate(), messageCopy.getSentDate());
@@ -318,7 +298,5 @@ public class BotContextTests
     ois.close();
     is.close();
   }
-
-
 
 }

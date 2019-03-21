@@ -16,18 +16,19 @@
 
 package won.protocol.jms;
 
-import java.net.URI;
-
 import won.protocol.exception.NoSuchConnectionException;
 
+import java.net.URI;
+
 /**
- * User: LEIH-NB
- * Date: 25.02.14
+ * User: LEIH-NB Date: 25.02.14
  */
 public interface OwnerProtocolCommunicationService extends ProtocolCommunicationService {
-    
-    public CamelConfiguration configureCamelEndpoint(URI wonNodeUri, String ownerId) throws Exception;
-    public URI  getWonNodeUriWithConnectionUri(URI connectionUri) throws NoSuchConnectionException;
-    public URI  getWonNodeUriWithNeedUri(URI needUri) throws NoSuchConnectionException;
+
+  public CamelConfiguration configureCamelEndpoint(URI wonNodeUri, String ownerId) throws Exception;
+
+  public URI getWonNodeUriWithConnectionUri(URI connectionUri) throws NoSuchConnectionException;
+
+  public URI getWonNodeUriWithNeedUri(URI needUri) throws NoSuchConnectionException;
 
 }

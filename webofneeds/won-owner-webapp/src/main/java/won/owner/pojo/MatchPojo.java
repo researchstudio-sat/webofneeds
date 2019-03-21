@@ -20,8 +20,7 @@ package won.owner.pojo;
  * User: fkleedorfer
  * Date: 30.07.2014
  */
-public class MatchPojo
-{
+public class MatchPojo {
   private double score;
   private String originator;
   private String needURI;

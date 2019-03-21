@@ -59,9 +59,7 @@ public class EchoBot extends EventBot {
     this.registrationMatcherRetryInterval = registrationMatcherRetryInterval;
   }
 
-  @Override
-  protected void initializeEventListeners()
-  {
+  @Override protected void initializeEventListeners() {
     EventListenerContext ctx = getEventListenerContext();
     EventBus bus = getEventBus();
 
@@ -69,29 +67,23 @@ public class EchoBot extends EventBot {
     RegisterMatcherAction registerMatcherAction = new RegisterMatcherAction(ctx);
     this.matcherRegistrator = new ActionOnEventListener(ctx, registerMatcherAction, 1);
     bus.subscribe(ActEvent.class, this.matcherRegistrator);
-    RandomDelayedAction delayedRegistration = new RandomDelayedAction(ctx, registrationMatcherRetryInterval, registrationMatcherRetryInterval, 0, registerMatcherAction);
+    RandomDelayedAction delayedRegistration = new RandomDelayedAction(ctx, registrationMatcherRetryInterval,
+        registrationMatcherRetryInterval, 0, registerMatcherAction);
     ActionOnEventListener matcherRetryRegistrator = new ActionOnEventListener(ctx, delayedRegistration);
     bus.subscribe(MatcherRegisterFailedEvent.class, matcherRetryRegistrator);
 
     //create the echo need - if we're not reacting to the creation of our own echo need.
-    this.needCreator = new ActionOnEventListener(
-            ctx,
-            new NotFilter(new NeedUriInNamedListFilter(ctx, ctx.getBotContextWrapper().getNeedCreateListName())),
-            prepareCreateNeedAction(ctx)
-            );
+    this.needCreator = new ActionOnEventListener(ctx,
+        new NotFilter(new NeedUriInNamedListFilter(ctx, ctx.getBotContextWrapper().getNeedCreateListName())),
+        prepareCreateNeedAction(ctx));
     bus.subscribe(NeedCreatedEventForMatcher.class, this.needCreator);
 
     //as soon as the echo need is created, connect to original
-    this.needConnector =
-            new ActionOnEventListener(
-                    ctx,
-                    "needConnector",
-                    new RandomDelayedAction(ctx, 5000,5000,1,
-                        new ConnectWithAssociatedNeedAction(ctx, FacetType.ChatFacet.getURI(), FacetType.ChatFacet
-                          .getURI(), "Greetings! I am the EchoBot! I will repeat everything you say, which you might " +
-                          "find useful for testing purposes.")));
+    this.needConnector = new ActionOnEventListener(ctx, "needConnector", new RandomDelayedAction(ctx, 5000, 5000, 1,
+        new ConnectWithAssociatedNeedAction(ctx, FacetType.ChatFacet.getURI(), FacetType.ChatFacet.getURI(),
+            "Greetings! I am the EchoBot! I will repeat everything you say, which you might "
+                + "find useful for testing purposes.")));
     bus.subscribe(NeedCreatedEvent.class, this.needConnector);
-
 
     //add a listener that auto-responds to messages by a message
     //after 10 messages, it unsubscribes from all events
@@ -103,7 +95,7 @@ public class EchoBot extends EventBot {
     bus.subscribe(MessageFromOtherNeedEvent.class, this.autoResponder);
 
     bus.subscribe(CloseFromOtherNeedEvent.class,
-                  new ActionOnEventListener(ctx, new LogAction(ctx,"received close message from remote need.")));
+        new ActionOnEventListener(ctx, new LogAction(ctx, "received close message from remote need.")));
   }
 
   private EventBotAction prepareCreateNeedAction(final EventListenerContext ctx) {

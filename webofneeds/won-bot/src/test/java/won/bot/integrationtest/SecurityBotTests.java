@@ -16,9 +16,6 @@
 
 package won.bot.integrationtest;
 
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,7 +28,6 @@ import org.springframework.scheduling.support.PeriodicTrigger;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.concurrent.SettableListenableFuture;
-
 import won.bot.IntegrationtestBot;
 import won.bot.framework.bot.base.TriggeredBot;
 import won.bot.framework.eventbot.EventListenerContext;
@@ -50,41 +46,35 @@ import won.bot.integrationtest.security.DuplicateMessageSendingConversationBot;
 import won.bot.integrationtest.security.DuplicateMessageURIFailureBot;
 import won.bot.integrationtest.security.DuplicateNeedURIFailureBot;
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+
 /**
  * Integration test.
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:/spring/app/securityBotTest.xml"})
-public class SecurityBotTests
-{
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+@RunWith(SpringJUnit4ClassRunner.class) @ContextConfiguration(locations = {
+    "classpath:/spring/app/securityBotTest.xml" }) public class SecurityBotTests {
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
+  @Autowired private BotManager botManager;
 
-    @Autowired
-    private BotManager botManager;
+  @Autowired ApplicationContext applicationContext;
 
-    @Autowired
-    ApplicationContext applicationContext;
+  @Test public void testDuplicateNeedUri() throws Exception {
+    runBot(DuplicateNeedURIFailureBot.class);
+  }
 
-    @Test
-    public void testDuplicateNeedUri() throws Exception {
-      runBot(DuplicateNeedURIFailureBot.class);
-    }
+  @Test public void testDuplicateMessageUriInCreate() throws Exception {
+    runBot(DuplicateMessageURIFailureBot.class);
+  }
 
-    @Test
-    public void testDuplicateMessageUriInCreate() throws Exception {
-      runBot(DuplicateMessageURIFailureBot.class);
-    }
+  @Test public void testDuplicateMessageSendingConversationBot() throws Exception {
+    runBot(DuplicateMessageSendingConversationBot.class);
+  }
 
-    @Test
-    public void testDuplicateMessageSendingConversationBot() throws Exception{
-      runBot(DuplicateMessageSendingConversationBot.class);
-    }
-
-    @Test
-    public void testDelayedDuplicateMessageSendingConversationBot() throws Exception{
-      runBot(DelayedDuplicateMessageSendingConversationBot.class);
-    }
+  @Test public void testDelayedDuplicateMessageSendingConversationBot() throws Exception {
+    runBot(DelayedDuplicateMessageSendingConversationBot.class);
+  }
 
   private void runBot(Class botClass) throws ExecutionException, InterruptedException {
     IntegrationtestBot bot = null;
@@ -95,9 +85,9 @@ public class SecurityBotTests
     bot = (IntegrationtestBot) botBean;
     //the bot also needs a trigger so its act() method is called regularly.
     // (there is no trigger bean in the context)
-      PeriodicTrigger trigger = new PeriodicTrigger(500, TimeUnit.MILLISECONDS);
-      trigger.setInitialDelay(100);
-      ((TriggeredBot) bot).setTrigger(trigger);
+    PeriodicTrigger trigger = new PeriodicTrigger(500, TimeUnit.MILLISECONDS);
+    trigger.setInitialDelay(100);
+    ((TriggeredBot) bot).setTrigger(trigger);
 
     //adding the bot to the bot manager will cause it to be initialized.
     //at that point, the trigger starts.
@@ -119,23 +109,21 @@ public class SecurityBotTests
 
     //wait for the result
     TestFinishedEvent result = futureTestResult.get();
-    if (result instanceof TestFailedEvent){
+    if (result instanceof TestFailedEvent) {
       Assert.fail(((TestFailedEvent) result).getMessage());
     }
   }
 
-
-  private class SetFutureAction extends BaseEventBotAction
-  {
+  private class SetFutureAction extends BaseEventBotAction {
     private SettableListenableFuture<TestFinishedEvent> futureTestResult;
 
-    private SetFutureAction(EventListenerContext eventListenerContext, SettableListenableFuture<TestFinishedEvent> futureTestResult) {
+    private SetFutureAction(EventListenerContext eventListenerContext,
+        SettableListenableFuture<TestFinishedEvent> futureTestResult) {
       super(eventListenerContext);
       this.futureTestResult = futureTestResult;
     }
 
-    @Override
-    protected void doRun(Event event, EventListener executingListener) throws Exception {
+    @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
       if (event instanceof TestFinishedEvent) {
         futureTestResult.set((TestFinishedEvent) event);
       } else {
@@ -145,35 +133,35 @@ public class SecurityBotTests
 
   }
 
-  private class SetFutureFromErrorEventAction extends BaseEventBotAction
-  {
+  private class SetFutureFromErrorEventAction extends BaseEventBotAction {
     private SettableListenableFuture<TestFinishedEvent> futureTestResult;
     private IntegrationtestBot bot;
 
-    private SetFutureFromErrorEventAction(EventListenerContext eventListenerContext, SettableListenableFuture<TestFinishedEvent> futureTestResult, IntegrationtestBot bot) {
+    private SetFutureFromErrorEventAction(EventListenerContext eventListenerContext,
+        SettableListenableFuture<TestFinishedEvent> futureTestResult, IntegrationtestBot bot) {
       super(eventListenerContext);
       this.futureTestResult = futureTestResult;
       this.bot = bot;
     }
 
-    @Override
-    protected void doRun(Event event, EventListener executingListener) throws Exception {
+    @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
       if (event instanceof ErrorEvent) {
 
         StringBuilder message = new StringBuilder();
         getMessageFromCauses(message, ((ErrorEvent) event).getThrowable());
-        futureTestResult.set(new TestFailedEvent(bot,message.toString()));
+        futureTestResult.set(new TestFailedEvent(bot, message.toString()));
       } else {
         logger.warn("cannot handle event {}", event);
       }
     }
   }
 
-  private void getMessageFromCauses(StringBuilder stringBuilder, Throwable throwable){
-    if (throwable == null) return;
+  private void getMessageFromCauses(StringBuilder stringBuilder, Throwable throwable) {
+    if (throwable == null)
+      return;
     stringBuilder.append(throwable.getMessage());
     Throwable cause = throwable.getCause();
-    if (cause != null){
+    if (cause != null) {
       stringBuilder.append(" -- Cause: ");
       getMessageFromCauses(stringBuilder, cause);
     }

@@ -1,11 +1,8 @@
 package won.node.camel.processor.fixed;
 
-import java.net.URI;
-
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.springframework.stereotype.Component;
-
 import won.node.camel.processor.AbstractFromOwnerCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.node.camel.processor.general.OutboundMessageFactoryProcessor;
@@ -19,30 +16,29 @@ import won.protocol.model.Connection;
 import won.protocol.model.ConnectionState;
 import won.protocol.vocabulary.WONMSG;
 
+import java.net.URI;
+
 /**
  * User: syim
  * Date: 02.03.2015
  */
-@Component
-@FixedMessageProcessor(direction= WONMSG.TYPE_FROM_OWNER_STRING,messageType = WONMSG.TYPE_CONNECTION_MESSAGE_STRING)
-public class SendMessageFromOwnerProcessor extends AbstractFromOwnerCamelProcessor
-{
+@Component @FixedMessageProcessor(direction = WONMSG.TYPE_FROM_OWNER_STRING, messageType = WONMSG.TYPE_CONNECTION_MESSAGE_STRING) public class SendMessageFromOwnerProcessor
+    extends AbstractFromOwnerCamelProcessor {
 
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
     WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
     URI connectionUri = wonMessage.getSenderURI();
-    if (connectionUri == null){
+    if (connectionUri == null) {
       throw new MissingMessagePropertyException(URI.create(WONMSG.SENDER_PROPERTY.toString()));
     }
     Connection con = connectionRepository.findOneByConnectionURIForUpdate(connectionUri).get();
     if (con.getState() != ConnectionState.CONNECTED) {
       throw new IllegalMessageForConnectionStateException(connectionUri, "CONNECTION_MESSAGE", con.getState());
     }
-    URI remoteMessageUri = wonNodeInformationService
-            .generateEventURI(wonMessage.getReceiverNodeURI());
+    URI remoteMessageUri = wonNodeInformationService.generateEventURI(wonMessage.getReceiverNodeURI());
 
-    if (wonMessage.getReceiverURI() == null){
+    if (wonMessage.getReceiverURI() == null) {
       //set the sender uri in the envelope TODO: TwoMsgs: do not set sender here
       wonMessage.addMessageProperty(WONMSG.RECEIVER_PROPERTY, con.getRemoteConnectionURI());
     }
@@ -57,9 +53,7 @@ public class SendMessageFromOwnerProcessor extends AbstractFromOwnerCamelProcess
     exchange.getIn().setHeader(WonCamelConstants.OUTBOUND_MESSAGE_FACTORY_HEADER, outboundMessageFactory);
   }
 
-
-  private class OutboundMessageFactory extends OutboundMessageFactoryProcessor
-  {
+  private class OutboundMessageFactory extends OutboundMessageFactoryProcessor {
     private Connection connection;
 
     public OutboundMessageFactory(URI messageURI, Connection connection) {
@@ -67,13 +61,8 @@ public class SendMessageFromOwnerProcessor extends AbstractFromOwnerCamelProcess
       this.connection = connection;
     }
 
-    @Override
-    public WonMessage process(WonMessage message) throws WonMessageProcessingException {
-      return WonMessageBuilder
-              .setPropertiesForPassingMessageToRemoteNode(
-                      message,
-                      getMessageURI())
-              .build();
+    @Override public WonMessage process(WonMessage message) throws WonMessageProcessingException {
+      return WonMessageBuilder.setPropertiesForPassingMessageToRemoteNode(message, getMessageURI()).build();
     }
   }
 

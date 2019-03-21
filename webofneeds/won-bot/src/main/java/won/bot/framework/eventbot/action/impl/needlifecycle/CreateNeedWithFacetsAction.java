@@ -16,12 +16,9 @@
 
 package won.bot.framework.eventbot.action.impl.needlifecycle;
 
-import java.net.URI;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Resource;
-
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
 import won.bot.framework.eventbot.event.Event;
@@ -36,85 +33,86 @@ import won.protocol.util.NeedModelWrapper;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 
+import java.net.URI;
+
 /**
  * Creates a need with the specified facets.
  * If no facet is specified, the chatFacet will be used.
  */
 public class CreateNeedWithFacetsAction extends AbstractCreateNeedAction {
-    public CreateNeedWithFacetsAction(EventListenerContext eventListenerContext, String uriListName, URI... facets) {
-        this(eventListenerContext, uriListName, true, false, facets);
+  public CreateNeedWithFacetsAction(EventListenerContext eventListenerContext, String uriListName, URI... facets) {
+    this(eventListenerContext, uriListName, true, false, facets);
+  }
+
+  public CreateNeedWithFacetsAction(final EventListenerContext eventListenerContext, String uriListName,
+      final boolean usedForTesting, final boolean doNotMatch, final URI... facets) {
+    super(eventListenerContext, uriListName, usedForTesting, doNotMatch, facets);
+  }
+
+  @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
+    EventListenerContext ctx = getEventListenerContext();
+
+    if (ctx.getNeedProducer().isExhausted()) {
+      logger.info("the bot's need producer is exhausted.");
+      ctx.getEventBus().publish(new NeedProducerExhaustedEvent());
+      return;
     }
-
-    public CreateNeedWithFacetsAction(final EventListenerContext eventListenerContext, String uriListName, final boolean usedForTesting, final boolean doNotMatch, final URI... facets) {
-        super(eventListenerContext, uriListName, usedForTesting, doNotMatch, facets);
+    final Dataset needDataset = ctx.getNeedProducer().create();
+    if (needDataset == null) {
+      logger.warn("needproducer failed to produce a need model, aborting need creation");
+      return;
     }
-
-    @Override
-    protected void doRun(Event event, EventListener executingListener) throws Exception {
-        EventListenerContext ctx = getEventListenerContext();
-
-        if (ctx.getNeedProducer().isExhausted()) {
-            logger.info("the bot's need producer is exhausted.");
-            ctx.getEventBus().publish(new NeedProducerExhaustedEvent());
-            return;
-        }
-        final Dataset needDataset = ctx.getNeedProducer().create();
-        if (needDataset == null) {
-            logger.warn("needproducer failed to produce a need model, aborting need creation");
-            return;
-        }
-        URI needUriFromProducer = null;
-        Resource needResource = WonRdfUtils.NeedUtils.getNeedResource(needDataset);
-        if (needResource.isURIResource()) {
-            needUriFromProducer = URI.create(needResource.getURI().toString());
-            RdfUtils.replaceBaseURI(needDataset, needResource.getURI(), true);
-        } else {
-            RdfUtils.replaceBaseResource(needDataset, needResource, true);
-        }
-        final URI needUriBeforeCreation = needUriFromProducer;
-
-        NeedModelWrapper needModelWrapper = new NeedModelWrapper(needDataset);
-
-        int i = 1;
-        for (URI facet : facets) {
-            needModelWrapper.addFacet(needUriBeforeCreation.toString()+"#facet"+i, facet.toString());
-            i++;
-        }
-        final Dataset needDatasetWithFacets = needModelWrapper.copyDataset();
-        final URI wonNodeUri = ctx.getNodeURISource().getNodeURI();
-        logger.debug("creating need on won node {} with content {} ", wonNodeUri, StringUtils.abbreviate(RdfUtils.toString(needDatasetWithFacets), 150));
-        WonNodeInformationService wonNodeInformationService =
-                ctx.getWonNodeInformationService();
-        final URI needURI = wonNodeInformationService.generateNeedURI(wonNodeUri);
-        WonMessage createNeedMessage = createWonMessage(wonNodeInformationService,
-                needURI, wonNodeUri, needDatasetWithFacets);
-        //remember the need URI so we can react to success/failure responses
-        EventBotActionUtils.rememberInList(ctx, needURI, uriListName);
-
-        EventListener successCallback = new EventListener() {
-            @Override
-            public void onEvent(Event event) throws Exception {
-                logger.debug("need creation successful, new need URI is {}", needURI);
-                ctx.getEventBus().publish(new NeedCreatedEvent(needURI, wonNodeUri, needDatasetWithFacets, null, needUriBeforeCreation));
-            }
-        };
-
-        EventListener failureCallback = new EventListener() {
-            @Override
-            public void onEvent(Event event) throws Exception {
-                String textMessage = WonRdfUtils.MessageUtils.getTextMessage(((FailureResponseEvent) event).getFailureMessage());
-                logger.debug("need creation failed for need URI {}, original message URI {}: {}", new Object[]{needURI, ((FailureResponseEvent) event).getOriginalMessageURI(), textMessage});
-                EventBotActionUtils.removeFromList(ctx, needURI, uriListName);
-                ctx.getEventBus().publish(new NeedCreationFailedEvent(wonNodeUri, needUriBeforeCreation));
-            }
-        };
-        EventBotActionUtils.makeAndSubscribeResponseListener(
-                createNeedMessage, successCallback, failureCallback, ctx);
-
-        logger.debug("registered listeners for response to message URI {}", createNeedMessage.getMessageURI());
-        ctx.getWonMessageSender().sendWonMessage(createNeedMessage);
-        logger.debug("need creation message sent with message URI {}", createNeedMessage.getMessageURI());
+    URI needUriFromProducer = null;
+    Resource needResource = WonRdfUtils.NeedUtils.getNeedResource(needDataset);
+    if (needResource.isURIResource()) {
+      needUriFromProducer = URI.create(needResource.getURI().toString());
+      RdfUtils.replaceBaseURI(needDataset, needResource.getURI(), true);
+    } else {
+      RdfUtils.replaceBaseResource(needDataset, needResource, true);
     }
+    final URI needUriBeforeCreation = needUriFromProducer;
 
+    NeedModelWrapper needModelWrapper = new NeedModelWrapper(needDataset);
+
+    int i = 1;
+    for (URI facet : facets) {
+      needModelWrapper.addFacet(needUriBeforeCreation.toString() + "#facet" + i, facet.toString());
+      i++;
+    }
+    final Dataset needDatasetWithFacets = needModelWrapper.copyDataset();
+    final URI wonNodeUri = ctx.getNodeURISource().getNodeURI();
+    logger.debug("creating need on won node {} with content {} ", wonNodeUri,
+        StringUtils.abbreviate(RdfUtils.toString(needDatasetWithFacets), 150));
+    WonNodeInformationService wonNodeInformationService = ctx.getWonNodeInformationService();
+    final URI needURI = wonNodeInformationService.generateNeedURI(wonNodeUri);
+    WonMessage createNeedMessage = createWonMessage(wonNodeInformationService, needURI, wonNodeUri,
+        needDatasetWithFacets);
+    //remember the need URI so we can react to success/failure responses
+    EventBotActionUtils.rememberInList(ctx, needURI, uriListName);
+
+    EventListener successCallback = new EventListener() {
+      @Override public void onEvent(Event event) throws Exception {
+        logger.debug("need creation successful, new need URI is {}", needURI);
+        ctx.getEventBus()
+            .publish(new NeedCreatedEvent(needURI, wonNodeUri, needDatasetWithFacets, null, needUriBeforeCreation));
+      }
+    };
+
+    EventListener failureCallback = new EventListener() {
+      @Override public void onEvent(Event event) throws Exception {
+        String textMessage = WonRdfUtils.MessageUtils
+            .getTextMessage(((FailureResponseEvent) event).getFailureMessage());
+        logger.debug("need creation failed for need URI {}, original message URI {}: {}",
+            new Object[] { needURI, ((FailureResponseEvent) event).getOriginalMessageURI(), textMessage });
+        EventBotActionUtils.removeFromList(ctx, needURI, uriListName);
+        ctx.getEventBus().publish(new NeedCreationFailedEvent(wonNodeUri, needUriBeforeCreation));
+      }
+    };
+    EventBotActionUtils.makeAndSubscribeResponseListener(createNeedMessage, successCallback, failureCallback, ctx);
+
+    logger.debug("registered listeners for response to message URI {}", createNeedMessage.getMessageURI());
+    ctx.getWonMessageSender().sendWonMessage(createNeedMessage);
+    logger.debug("need creation message sent with message URI {}", createNeedMessage.getMessageURI());
+  }
 
 }

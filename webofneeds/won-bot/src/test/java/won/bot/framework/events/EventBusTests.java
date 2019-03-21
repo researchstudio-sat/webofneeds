@@ -16,42 +16,35 @@
 
 package won.bot.framework.events;
 
-import java.util.concurrent.CountDownLatch;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-
 import won.bot.framework.eventbot.bus.impl.AsyncEventBusImpl;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.listener.EventListener;
+
+import java.util.concurrent.CountDownLatch;
 
 /**
  * User: fkleedorfer
  * Date: 30.01.14
  */
-public class EventBusTests
-{
+public class EventBusTests {
   private Logger logger = LoggerFactory.getLogger(getClass());
   private ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
 
-  @Before
-  public void setup(){
+  @Before public void setup() {
     taskScheduler.initialize();
   }
 
-  @After
-  public void tearDown(){
+  @After public void tearDown() {
     taskScheduler.shutdown();
   }
 
-
-  @Test
-  public void testEventBusSimpleCase() throws InterruptedException
-  {
+  @Test public void testEventBusSimpleCase() throws InterruptedException {
     AsyncEventBusImpl bus = new AsyncEventBusImpl(this.taskScheduler);
     CountDownLatch countDownLatch = new CountDownLatch(9);
     bus.subscribe(TestEventA.class, new ListenerA(countDownLatch));
@@ -66,50 +59,39 @@ public class EventBusTests
     countDownLatch.await();
   }
 
-  private class TestEventA implements Event
-  {
-    @Override
-    public String toString()
-    {
+  private class TestEventA implements Event {
+    @Override public String toString() {
       return "TestEventA";
     }
   }
 
-  private class TestEventB implements Event{
-    @Override
-    public String toString()
-    {
+  private class TestEventB implements Event {
+    @Override public String toString() {
       return "TestEventB";
     }
   }
 
-  private class ListenerA implements EventListener
-  {
+  private class ListenerA implements EventListener {
     private final CountDownLatch countDownLatch;
 
-    public ListenerA(final CountDownLatch countDownLatch)
-    {
+    public ListenerA(final CountDownLatch countDownLatch) {
       this.countDownLatch = countDownLatch;
     }
-    @Override
-    public void onEvent(final Event event) throws Exception
-    {
+
+    @Override public void onEvent(final Event event) throws Exception {
       logger.debug("ListenerA: processing event {}", event);
       countDownLatch.countDown();
     }
   }
 
-  private class ListenerB implements EventListener{
+  private class ListenerB implements EventListener {
     private final CountDownLatch countDownLatch;
 
-    public ListenerB(final CountDownLatch countDownLatch)
-    {
+    public ListenerB(final CountDownLatch countDownLatch) {
       this.countDownLatch = countDownLatch;
     }
 
-    @Override
-    public void onEvent(final Event event) throws Exception
-    {
+    @Override public void onEvent(final Event event) throws Exception {
       logger.debug("ListenerB: processing event {}", event);
       countDownLatch.countDown();
     }

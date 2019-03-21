@@ -19,25 +19,19 @@ package won.bot.framework.eventbot.filter;
 /**
  * Abstract base class for delegating filters.
  */
-public abstract class AbstractDelegatingFilter implements DelegatingFilter
-{
+public abstract class AbstractDelegatingFilter implements DelegatingFilter {
   private EventFilter delegate;
 
-  protected AbstractDelegatingFilter(final EventFilter delegate)
-  {
+  protected AbstractDelegatingFilter(final EventFilter delegate) {
     this.delegate = delegate;
   }
 
-  public EventFilter getDelegate()
-  {
+  public EventFilter getDelegate() {
     return delegate;
   }
 
-  @Override
-  public void setDelegate(final EventFilter delegate)
-  {
+  @Override public void setDelegate(final EventFilter delegate) {
     this.delegate = delegate;
   }
-
 
 }

@@ -22,16 +22,14 @@ import won.protocol.model.Connection;
 /**
  *
  */
-public class MessageFromOtherNeedEvent extends WonMessageReceivedOnConnectionEvent
-{
+public class MessageFromOtherNeedEvent extends WonMessageReceivedOnConnectionEvent {
   public MessageFromOtherNeedEvent(final Connection con, final WonMessage wonMessage) {
     super(con, wonMessage);
   }
 
-  @Override
-  public String toString() {
+  @Override public String toString() {
     return "MessageFromOtherNeedEvent{" +
-      "wonMessage=" + getWonMessage() +
-      '}';
+        "wonMessage=" + getWonMessage() +
+        '}';
   }
 }

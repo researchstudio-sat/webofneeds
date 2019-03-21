@@ -16,51 +16,36 @@
 
 package won.protocol.model;
 
+import won.protocol.model.parentaware.VersionedEntity;
+
+import javax.persistence.*;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.Convert;
-import javax.persistence.DiscriminatorColumn;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.OneToMany;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-
-import won.protocol.model.parentaware.VersionedEntity;
-
 @Entity
 @Inheritance
-@DiscriminatorColumn(name="parent_type")
-@Table(name="event_container")
-public abstract class EventContainer implements VersionedEntity
-{
+@DiscriminatorColumn(name = "parent_type")
+@Table(name = "event_container")
+public abstract class EventContainer implements VersionedEntity {
   @Id
   @GeneratedValue
-  @Column( name = "id" )
+  @Column(name = "id")
   protected Long id;
 
   @Column(name = "parent_uri", nullable = false, unique = true, updatable = false)
-  @Convert( converter = URIConverter.class)
+  @Convert(converter = URIConverter.class)
   private URI parentUri;
 
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "eventContainer")
   private Collection<MessageEventPlaceholder> events = new ArrayList<>(1);
 
-  @Column(name="version", columnDefinition = "integer DEFAULT 0", nullable = false)
+  @Column(name = "version", columnDefinition = "integer DEFAULT 0", nullable = false)
   private int version = 0;
 
   @Temporal(TemporalType.TIMESTAMP)
-  @Column(name="last_update", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+  @Column(name = "last_update", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
   private Date lastUpdate = new Date();
 
   public EventContainer() {

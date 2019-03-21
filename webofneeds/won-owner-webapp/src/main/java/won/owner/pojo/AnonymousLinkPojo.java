@@ -12,25 +12,23 @@ import org.hibernate.validator.constraints.NotEmpty;
  */
 public class AnonymousLinkPojo {
 
-	@NotEmpty
-	private String email;
+  @NotEmpty private String email;
 
-    @NotEmpty
-    private String privateId;
+  @NotEmpty private String privateId;
 
-    public String getEmail() {
-        return email;
-    }
+  public String getEmail() {
+    return email;
+  }
 
-    public String getPrivateId() {
-        return privateId;
-    }
+  public String getPrivateId() {
+    return privateId;
+  }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+  public void setEmail(String email) {
+    this.email = email;
+  }
 
-    public void setPrivateId(String privateId) {
-        this.privateId = privateId;
-    }
+  public void setPrivateId(String privateId) {
+    this.privateId = privateId;
+  }
 }

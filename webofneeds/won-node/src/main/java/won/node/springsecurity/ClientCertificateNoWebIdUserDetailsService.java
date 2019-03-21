@@ -16,12 +16,6 @@
 
 package won.node.springsecurity;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.security.cert.Certificate;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -32,26 +26,32 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.security.cert.Certificate;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Assumes that the provided username is a linked data URI that contains WebID information.
  * The URI is accessed and the RDF is downloaded and added to the UserDetails for future reference.
  */
-public class ClientCertificateNoWebIdUserDetailsService implements AuthenticationUserDetailsService<PreAuthenticatedAuthenticationToken>
-{
+public class ClientCertificateNoWebIdUserDetailsService
+    implements AuthenticationUserDetailsService<PreAuthenticatedAuthenticationToken> {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Override
-  public UserDetails loadUserDetails(final PreAuthenticatedAuthenticationToken token) throws UsernameNotFoundException {
+  @Override public UserDetails loadUserDetails(final PreAuthenticatedAuthenticationToken token)
+      throws UsernameNotFoundException {
     String principal = (String) token.getPrincipal();
     Certificate certificate = (Certificate) token.getCredentials();
 
-    logger.debug("Adding userDetails for '" + principal +"'");
+    logger.debug("Adding userDetails for '" + principal + "'");
     URI commonName = null;
     try {
       commonName = new URI(principal);
-    } catch (URISyntaxException e){
+    } catch (URISyntaxException e) {
       throw new BadCredentialsException("Principal of X.509 Certificate must be a WebId URI. Actual value: '" +
-                                          principal+"'");
+          principal + "'");
     }
 
     //at this point, we know that a client certificate was presented. Grant this role:

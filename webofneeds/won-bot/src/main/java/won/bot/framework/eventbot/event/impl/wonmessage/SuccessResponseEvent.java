@@ -16,15 +16,14 @@
 
 package won.bot.framework.eventbot.event.impl.wonmessage;
 
-import java.net.URI;
-
 import won.protocol.message.WonMessage;
+
+import java.net.URI;
 
 /**
  * Event published whenever a WonMessage is received that indicates the failure of a previous message.
  */
-public class SuccessResponseEvent extends DeliveryResponseEvent
-{
+public class SuccessResponseEvent extends DeliveryResponseEvent {
 
   public SuccessResponseEvent(URI originalMessageURI, WonMessage successMessage) {
     super(originalMessageURI, successMessage);

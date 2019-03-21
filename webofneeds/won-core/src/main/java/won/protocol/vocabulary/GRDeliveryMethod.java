@@ -1,33 +1,27 @@
 package won.protocol.vocabulary;
 
-import java.net.URI;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.URI;
+
 /**
- * User: atus
- * Date: 23.04.13
+ * User: atus Date: 23.04.13
  */
-public enum GRDeliveryMethod
-{
-  DELIVERY_MODE_DIRECT_DOWNLOAD("DeliveryModeDirectDownload"),
-  DELIVERY_MODE_FREIGHT("DeliveryModeFreight"),
-  DELIVERY_MODE_MAIL("DeliveryModeMail"),
-  DELIVERY_MODE_OWN_FLEET("DeliveryModeOwnFleet"),
+public enum GRDeliveryMethod {
+  DELIVERY_MODE_DIRECT_DOWNLOAD("DeliveryModeDirectDownload"), DELIVERY_MODE_FREIGHT("DeliveryModeFreight"),
+  DELIVERY_MODE_MAIL("DeliveryModeMail"), DELIVERY_MODE_OWN_FLEET("DeliveryModeOwnFleet"),
   DELIVERY_MODE_PICK_UP("DeliveryModePickUp");
 
   private static final Logger logger = LoggerFactory.getLogger(GRDeliveryMethod.class);
 
   private String name;
 
-  private GRDeliveryMethod(String name)
-  {
+  private GRDeliveryMethod(String name) {
     this.name = name;
   }
 
-  public URI getURI()
-  {
+  public URI getURI() {
     return URI.create(GR.BASE_URI + name);
   }
 
@@ -37,10 +31,9 @@ public enum GRDeliveryMethod
    * @param fragment string to match
    * @return matched enum, null otherwise
    */
-  public static GRDeliveryMethod parseString(final String fragment)
-  {
-    for(GRDeliveryMethod state : values())
-      if(state.name.equals(fragment))
+  public static GRDeliveryMethod parseString(final String fragment) {
+    for (GRDeliveryMethod state : values())
+      if (state.name.equals(fragment))
         return state;
 
     logger.warn("No enum could be matched for: {}", fragment);

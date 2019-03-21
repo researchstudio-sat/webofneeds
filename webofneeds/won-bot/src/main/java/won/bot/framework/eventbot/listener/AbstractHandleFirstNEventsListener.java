@@ -23,48 +23,44 @@ import won.bot.framework.eventbot.filter.EventFilter;
 /**
  * Counts how often it is called, offers to call a callback when a certain number is reached.
  */
-public abstract class AbstractHandleFirstNEventsListener extends BaseEventListener implements CountingListener
-{
+public abstract class AbstractHandleFirstNEventsListener extends BaseEventListener implements CountingListener {
   private int targetCount;
   private int count = 0;
   private Object monitor = new Object();
   private boolean finished = false;
 
-  public AbstractHandleFirstNEventsListener(final EventListenerContext context, int targetCount)
-  {
+  public AbstractHandleFirstNEventsListener(final EventListenerContext context, int targetCount) {
     super(context);
     this.targetCount = targetCount;
   }
 
-  protected AbstractHandleFirstNEventsListener(final EventListenerContext context, final EventFilter eventFilter, final int targetCount)
-  {
+  protected AbstractHandleFirstNEventsListener(final EventListenerContext context, final EventFilter eventFilter,
+      final int targetCount) {
     super(context, eventFilter);
     this.targetCount = targetCount;
   }
 
-  protected AbstractHandleFirstNEventsListener(final EventListenerContext context, final String name, final int targetCount)
-  {
+  protected AbstractHandleFirstNEventsListener(final EventListenerContext context, final String name,
+      final int targetCount) {
     super(context, name);
     this.targetCount = targetCount;
   }
 
-  protected AbstractHandleFirstNEventsListener(final EventListenerContext context, final String name, final EventFilter eventFilter, final int targetCount)
-  {
+  protected AbstractHandleFirstNEventsListener(final EventListenerContext context, final String name,
+      final EventFilter eventFilter, final int targetCount) {
     super(context, name, eventFilter);
     this.targetCount = targetCount;
   }
 
-  @Override
-  public void doOnEvent(final Event event) throws Exception
-  {
+  @Override public void doOnEvent(final Event event) throws Exception {
     boolean doRun = false;
-    synchronized (monitor){
+    synchronized (monitor) {
       if (finished) {
         return;
       }
       count++;
       if (count <= targetCount) {
-        logger.debug("processing event {} of {} (event: {})", new Object[]{count, targetCount, event});
+        logger.debug("processing event {} of {} (event: {})", new Object[] { count, targetCount, event });
         logger.debug("calling handleFirstNTimes");
         doRun = true;
       }
@@ -72,7 +68,7 @@ public abstract class AbstractHandleFirstNEventsListener extends BaseEventListen
     if (doRun) {
       handleFirstNTimes(event);
       synchronized (monitor) {
-        if (! finished && count >= targetCount) {
+        if (!finished && count >= targetCount) {
           logger.debug("unsubscribing from event");
           unsubscribe();
           publishFinishedEvent();
@@ -94,33 +90,25 @@ public abstract class AbstractHandleFirstNEventsListener extends BaseEventListen
 
   /**
    * Implementation handle the event here.
+   *
    * @param event
    * @throws Exception
    */
   protected abstract void handleFirstNTimes(final Event event) throws Exception;
 
-
-  @Override
-  public int getTargetCount()
-  {
+  @Override public int getTargetCount() {
     return targetCount;
   }
 
-  @Override
-  public int getCount()
-  {
+  @Override public int getCount() {
     return count;
   }
 
-  @Override
-  public boolean isFinished()
-  {
+  @Override public boolean isFinished() {
     return finished;
   }
 
-  @Override
-  public String toString()
-  {
+  @Override public String toString() {
     return getClass().getSimpleName() +
         "{name='" + name +
         ", count=" + count +

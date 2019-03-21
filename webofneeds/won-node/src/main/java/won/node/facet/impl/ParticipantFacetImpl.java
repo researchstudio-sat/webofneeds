@@ -7,12 +7,7 @@ import org.apache.jena.rdf.model.StmtIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import won.protocol.exception.ConnectionAlreadyExistsException;
-import won.protocol.exception.IllegalMessageForConnectionStateException;
-import won.protocol.exception.IllegalMessageForNeedStateException;
-import won.protocol.exception.NoSuchConnectionException;
-import won.protocol.exception.NoSuchNeedException;
+import won.protocol.exception.*;
 import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.FacetType;
@@ -26,44 +21,38 @@ import won.protocol.vocabulary.WON;
  * Time: 19.19
  * To change this template use File | Settings | File Templates.
  */
-public class ParticipantFacetImpl extends AbstractFacet
-{
+public class ParticipantFacetImpl extends AbstractFacet {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Autowired
-  private ConnectionRepository connectionRepository;
+  @Autowired private ConnectionRepository connectionRepository;
 
-
-  @Override
-  public FacetType getFacetType() {
+  @Override public FacetType getFacetType() {
     return FacetType.ParticipantFacet;
   }
 
-  public void connectFromNeed(final Connection con, final Model content, final WonMessage wonMessage) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
+  public void connectFromNeed(final Connection con, final Model content, final WonMessage wonMessage)
+      throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
     final Connection connectionForRunnable = con;
     logger.debug("Participant: ConnectFromNeed");
 
     executorService.execute(new Runnable() {
-      @Override
-      public void run() {
-          //TODO: use new system
-          // ownerProtocolOwnerService.connect(
-          //        con.getNeedURI(), con.getRemoteNeedURI(),
-          //        connectionForRunnable.getConnectionURI(), content, wonMessage);
+      @Override public void run() {
+        //TODO: use new system
+        // ownerProtocolOwnerService.connect(
+        //        con.getNeedURI(), con.getRemoteNeedURI(),
+        //        connectionForRunnable.getConnectionURI(), content, wonMessage);
 
       }
     });
   }
 
-  @Override
-  public void openFromOwner(final Connection con, final Model content, final WonMessage wonMessage)
-          throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+  @Override public void openFromOwner(final Connection con, final Model content, final WonMessage wonMessage)
+      throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     //inform the other side
     logger.debug("Participant: OpenFromOwner");
     if (con.getRemoteConnectionURI() != null) {
       executorService.execute(new Runnable() {
-        @Override
-        public void run() {
+        @Override public void run() {
           try {
             //TODO: use new system
             // needFacingConnectionClient.open(con, content, wonMessage);
@@ -75,17 +64,13 @@ public class ParticipantFacetImpl extends AbstractFacet
     }
   }
 
-  @Override
-  public void closeFromOwner(final Connection con, final Model content, final WonMessage wonMessage)
-          throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+  @Override public void closeFromOwner(final Connection con, final Model content, final WonMessage wonMessage)
+      throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     //inform the other side
     logger.debug("Participant: CloseFromOwner");
     if (con.getRemoteConnectionURI() != null) {
-      executorService.execute(new Runnable()
-      {
-        @Override
-        public void run()
-        {
+      executorService.execute(new Runnable() {
+        @Override public void run() {
           try {
             //TODO: use new system
             // needFacingConnectionClient.close(con, content, wonMessage);
@@ -98,7 +83,7 @@ public class ParticipantFacetImpl extends AbstractFacet
   }
 
   public void closeFromNeed(final Connection con, final Model content, final WonMessage wonMessage)
-          throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+      throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     //inform the need side
     logger.debug("Participant: CloseFromNeed");
     //TODO: create utilities for accessing addtional content
@@ -112,19 +97,19 @@ public class ParticipantFacetImpl extends AbstractFacet
     message = res.getPropertyResourceValue(WON_TX.COORDINATION_MESSAGE);
     final Resource msgForRunnable = message;
 
-    executorService.execute(new Runnable()
-    {
-      @Override
-      public void run()
-      {
+    executorService.execute(new Runnable() {
+      @Override public void run() {
         try {
           //if (msgForRunnable == WON_TX.COORDINATION_MESSAGE_ABORT){
-          if(msgForRunnable!=null){
-            if (msgForRunnable.equals(WON_TX.COORDINATION_MESSAGE_ABORT)){
-              logger.debug("Abort the following connection: "+con.getConnectionURI()+" "+con.getNeedURI()+" "+con.getRemoteNeedURI() +" "+con.getState()+ " "+con.getTypeURI());
-            }
-            else {
-              logger.debug("Committed: "+con.getConnectionURI()+" "+con.getNeedURI()+" "+con.getRemoteNeedURI() +" "+con.getState()+ " "+con.getTypeURI());
+          if (msgForRunnable != null) {
+            if (msgForRunnable.equals(WON_TX.COORDINATION_MESSAGE_ABORT)) {
+              logger.debug(
+                  "Abort the following connection: " + con.getConnectionURI() + " " + con.getNeedURI() + " " + con
+                      .getRemoteNeedURI() + " " + con.getState() + " " + con.getTypeURI());
+            } else {
+              logger.debug(
+                  "Committed: " + con.getConnectionURI() + " " + con.getNeedURI() + " " + con.getRemoteNeedURI() + " "
+                      + con.getState() + " " + con.getTypeURI());
             }
             //TODO: use new system
             // ownerFacingConnectionClient.close(con.getConnectionURI(), content, wonMessage);
@@ -137,8 +122,8 @@ public class ParticipantFacetImpl extends AbstractFacet
     });
   }
 
-  public void compensate(Connection con , Model content){  //todo
-//TODO: create utilities for accessing addtional content
+  public void compensate(Connection con, Model content) {  //todo
+    //TODO: create utilities for accessing addtional content
        /* Resource res = content.getResource(content.getNsPrefixURI(""));
         if (res == null) {
             logger.debug("no default prexif specified in model, could not obtain additional content, using ABORTED message");
@@ -146,13 +131,13 @@ public class ParticipantFacetImpl extends AbstractFacet
         res.removeAll(WON_TX.COORDINATION_MESSAGE);
         res.addProperty(WON_TX.COORDINATION_MESSAGE, WON_TX.COORDINATION_MESSAGE_ABORT_AND_COMPENSATE);*/
 
-    logger.debug("Compensated:   "+con.getConnectionURI()+" "+con.getNeedURI()+" "+con.getRemoteNeedURI() +" "+con.getState()+ " "+con.getTypeURI());
+    logger.debug(
+        "Compensated:   " + con.getConnectionURI() + " " + con.getNeedURI() + " " + con.getRemoteNeedURI() + " " + con
+            .getState() + " " + con.getTypeURI());
   }
 
-
-  @Override
-  public void connectFromOwner(final Connection con, final Model content, final WonMessage wonMessage)
-          throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
+  @Override public void connectFromOwner(final Connection con, final Model content, final WonMessage wonMessage)
+      throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
     logger.debug("Participant: ConntectFromOwner");
 
     Resource baseRes = content.getResource(content.getNsPrefixURI(""));
@@ -173,8 +158,7 @@ public class ParticipantFacetImpl extends AbstractFacet
     final Connection connectionForRunnable = con;
     //send to need
     executorService.execute(new Runnable() {
-      @Override
-      public void run() {
+      @Override public void run() {
 
         try {
           //TODO: use new system
@@ -188,20 +172,18 @@ public class ParticipantFacetImpl extends AbstractFacet
           // TODO should we introduce a new protocol method connectionFailed (because it's not an owner deny but some protocol-level error)?
           // For now, we call the close method as if it had been called from the remote side
           // TODO: even with this workaround, it would be good to send a content along with the close (so we can explain what happened).
-//          try {
-//            needFacingConnectionCommunicationService.close(
-//                    connectionForRunnable.getConnectionURI(), content, wonMessage);
-//          } catch (NoSuchConnectionException e1) {
-//            logger.warn("caught NoSuchConnectionException:", e1);
-//          } catch (IllegalMessageForConnectionStateException e1) {
-//            logger.warn("caught IllegalMessageForConnectionStateException:", e1);
-//          }
+          //          try {
+          //            needFacingConnectionCommunicationService.close(
+          //                    connectionForRunnable.getConnectionURI(), content, wonMessage);
+          //          } catch (NoSuchConnectionException e1) {
+          //            logger.warn("caught NoSuchConnectionException:", e1);
+          //          } catch (IllegalMessageForConnectionStateException e1) {
+          //            logger.warn("caught IllegalMessageForConnectionStateException:", e1);
+          //          }
         }
       }
     });
 
   }
-
-
 
 }

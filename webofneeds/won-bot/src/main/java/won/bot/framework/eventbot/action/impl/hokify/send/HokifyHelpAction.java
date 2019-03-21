@@ -11,18 +11,17 @@ import won.bot.framework.eventbot.listener.EventListener;
  * Created by MS on 24.09.2018.
  */
 public class HokifyHelpAction extends BaseEventBotAction {
-    private WonHokifyJobBotHandler wonHokifyJobBotHandler;
-    
-    public HokifyHelpAction(EventListenerContext eventListenerContext, WonHokifyJobBotHandler wonHokifyJobBotHandler) {
-        super(eventListenerContext);
-        this.wonHokifyJobBotHandler = wonHokifyJobBotHandler;
-    }
+  private WonHokifyJobBotHandler wonHokifyJobBotHandler;
 
-    @Override
-    protected void doRun(Event event, EventListener executingListener) throws Exception {
-        if(event instanceof SendHelpEvent){
+  public HokifyHelpAction(EventListenerContext eventListenerContext, WonHokifyJobBotHandler wonHokifyJobBotHandler) {
+    super(eventListenerContext);
+    this.wonHokifyJobBotHandler = wonHokifyJobBotHandler;
+  }
 
-            logger.info("HelpEvent received");
+  @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
+    if (event instanceof SendHelpEvent) {
+
+      logger.info("HelpEvent received");
             /*Update update = ((SendHelpEvent) event).getUpdate();
 
             Message message = update.getMessage();
@@ -53,6 +52,6 @@ public class HokifyHelpAction extends BaseEventBotAction {
             }catch (TelegramApiException e){
                 logger.error(e.getMessage());
             }*/
-        }
     }
+  }
 }

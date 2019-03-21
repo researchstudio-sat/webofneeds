@@ -16,29 +16,29 @@
 
 package won.bot.framework.bot;
 
-import java.net.URI;
-
 import org.apache.jena.query.Dataset;
-
 import won.owner.protocol.message.OwnerCallback;
+
+import java.net.URI;
 
 /**
  * A bot that manipulates needs.
- *
+ * <p>
  * Note: Methods may throw runtime exceptions, which will be handled by the execution framework.
  */
-public interface Bot extends OwnerCallback
-{
+public interface Bot extends OwnerCallback {
   public boolean knowsNeedURI(URI needURI);
 
   public boolean knowsNodeURI(URI wonNodeURI);
 
-
   public void onNewNeedCreated(final URI needUri, final URI wonNodeUri, final Dataset needModel) throws Exception;
 
   public void onMatcherRegistered(URI wonNodeUri);
+
   public void onNewNeedCreatedNotificationForMatcher(final URI wonNodeURI, final URI needURI, final Dataset needModel);
+
   public void onNeedActivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI);
+
   public void onNeedDeactivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI);
 
   /**
@@ -46,6 +46,7 @@ public interface Bot extends OwnerCallback
    * The callee must make sure this call is thread-safe, e.g. by explicit synchronizing.
    */
   public void initialize() throws Exception;
+
   /**
    * Called by the framework to execute non-reactive tasks.
    * The callee must make sure this call is thread-safe, but explicit synchronization is strongly discouraged.
@@ -60,6 +61,7 @@ public interface Bot extends OwnerCallback
 
   /**
    * The lifecycle phase the bot is currently in.
+   *
    * @return
    */
   public BotLifecyclePhase getLifecyclePhase();

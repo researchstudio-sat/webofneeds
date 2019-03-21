@@ -16,35 +16,31 @@
 
 package won.bot.framework.eventbot.event.impl.wonmessage;
 
-import java.net.URI;
-
 import won.bot.framework.eventbot.event.ConnectionSpecificEvent;
 import won.bot.framework.eventbot.event.NeedSpecificEvent;
 import won.bot.framework.eventbot.event.RemoteNeedSpecificEvent;
 import won.protocol.message.WonMessage;
 
+import java.net.URI;
+
 /**
  * Created by fkleedorfer on 14.06.2016.
  */
-public class WonMessageSentOnConnectionEvent extends WonMessageSentEvent implements ConnectionSpecificEvent,
-  NeedSpecificEvent, RemoteNeedSpecificEvent
-{
+public class WonMessageSentOnConnectionEvent extends WonMessageSentEvent
+    implements ConnectionSpecificEvent, NeedSpecificEvent, RemoteNeedSpecificEvent {
   public WonMessageSentOnConnectionEvent(final WonMessage message) {
     super(message);
   }
 
-  @Override
-  public URI getConnectionURI() {
+  @Override public URI getConnectionURI() {
     return getWonMessage().getSenderURI();
   }
 
-  @Override
-  public URI getNeedURI() {
+  @Override public URI getNeedURI() {
     return getWonMessage().getSenderNeedURI();
   }
 
-  @Override
-  public URI getRemoteNeedURI() {
+  @Override public URI getRemoteNeedURI() {
     return getWonMessage().getReceiverNeedURI();
   }
 }

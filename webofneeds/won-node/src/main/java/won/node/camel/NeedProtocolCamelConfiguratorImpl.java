@@ -16,12 +16,11 @@
 
 package won.node.camel;
 
-import java.net.URI;
-
 import org.apache.camel.RoutesBuilder;
-
 import won.node.camel.route.NeedProtocolDynamicRoutes;
 import won.protocol.jms.NeedBasedCamelConfiguratorImpl;
+
+import java.net.URI;
 
 //import won.node.camel.routes.NeedProtocolDynamicRoutes;
 
@@ -31,8 +30,7 @@ import won.protocol.jms.NeedBasedCamelConfiguratorImpl;
  */
 public class NeedProtocolCamelConfiguratorImpl extends NeedBasedCamelConfiguratorImpl {
 
-  @Override
-  protected RoutesBuilder createRoutesBuilder(final String startingEndpoint, final URI brokerUri) {
+  @Override protected RoutesBuilder createRoutesBuilder(final String startingEndpoint, final URI brokerUri) {
     return new NeedProtocolDynamicRoutes(getCamelContext(), startingEndpoint);
   }
 }

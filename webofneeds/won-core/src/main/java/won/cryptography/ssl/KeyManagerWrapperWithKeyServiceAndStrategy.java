@@ -1,5 +1,14 @@
 package won.cryptography.ssl;
 
+import org.apache.http.ssl.PrivateKeyDetails;
+import org.apache.http.ssl.PrivateKeyStrategy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import won.cryptography.service.keystore.KeyStoreService;
+
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.X509KeyManager;
 import java.net.Socket;
 import java.security.Principal;
 import java.security.PrivateKey;
@@ -7,40 +16,26 @@ import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.net.ssl.KeyManager;
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.X509KeyManager;
-
-import org.apache.http.ssl.PrivateKeyDetails;
-import org.apache.http.ssl.PrivateKeyStrategy;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import won.cryptography.service.keystore.KeyStoreService;
-
 /**
- * User: ypanchenko
- * Date: 12.08.2015
- *
- * This class is similar to the implementation of class TrustManagerDelegate of org.apache.http.conn.ssl
- * .SSLContextBuilder Unfortunately, they don't provide it as public class. It is useful when the default implementation
- * of X509KeyManager is used but additionally the strategy of how to choose the key when the key store contains many
- * keys is applied.
- *
+ * User: ypanchenko Date: 12.08.2015
+ * <p>
+ * This class is similar to the implementation of class TrustManagerDelegate of
+ * org.apache.http.conn.ssl .SSLContextBuilder Unfortunately, they don't provide
+ * it as public class. It is useful when the default implementation of
+ * X509KeyManager is used but additionally the strategy of how to choose the key
+ * when the key store contains many keys is applied.
+ * <p>
  * For original see:
  * https://hc.apache.org/httpcomponents-client-4.4.x/httpclient/xref/org/apache/http/conn/ssl/SSLContextBuilder.html
- *
  */
-public class KeyManagerWrapperWithKeyServiceAndStrategy implements X509KeyManager
-{
+public class KeyManagerWrapperWithKeyServiceAndStrategy implements X509KeyManager {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
   private final X509KeyManager keyManager;
   private final PrivateKeyStrategy aliasStrategy;
 
-
-  public KeyManagerWrapperWithKeyServiceAndStrategy(final KeyStoreService keyStoreService, final PrivateKeyStrategy
-    aliasStrategy) {
+  public KeyManagerWrapperWithKeyServiceAndStrategy(final KeyStoreService keyStoreService,
+      final PrivateKeyStrategy aliasStrategy) {
     super();
     this.aliasStrategy = aliasStrategy;
     KeyManagerFactory kmf = null;
@@ -52,7 +47,7 @@ public class KeyManagerWrapperWithKeyServiceAndStrategy implements X509KeyManage
       throw new RuntimeException("KeyManager could not be initialized", e);
     }
 
-    KeyManager[] kms =  kmf.getKeyManagers();
+    KeyManager[] kms = kmf.getKeyManagers();
     if (kms != null) {
       if (aliasStrategy != null) {
         for (int i = 0; i < kms.length; i++) {
@@ -77,10 +72,10 @@ public class KeyManagerWrapperWithKeyServiceAndStrategy implements X509KeyManage
   @Override
   public String chooseClientAlias(final String[] keyTypes, final Principal[] issuers, final Socket socket) {
     final Map<String, PrivateKeyDetails> validAliases = new HashMap<String, PrivateKeyDetails>();
-    for (final String keyType: keyTypes) {
+    for (final String keyType : keyTypes) {
       final String[] aliases = this.keyManager.getClientAliases(keyType, issuers);
       if (aliases != null) {
-        for (final String alias: aliases) {
+        for (final String alias : aliases) {
           validAliases.put(alias, new PrivateKeyDetails(keyType, this.keyManager.getCertificateChain(alias)));
         }
       }
@@ -98,7 +93,7 @@ public class KeyManagerWrapperWithKeyServiceAndStrategy implements X509KeyManage
     final Map<String, PrivateKeyDetails> validAliases = new HashMap<String, PrivateKeyDetails>();
     final String[] aliases = this.keyManager.getServerAliases(keyType, issuers);
     if (aliases != null) {
-      for (final String alias: aliases) {
+      for (final String alias : aliases) {
         validAliases.put(alias, new PrivateKeyDetails(keyType, this.keyManager.getCertificateChain(alias)));
       }
     }

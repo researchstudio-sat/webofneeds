@@ -11,10 +11,8 @@ import java.lang.annotation.Target;
  * This implementation is always executed after the corresponding FixedMessageProcessor, if
  * no corresponding FacetMessageProcessor is found.
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface DefaultFacetMessageProcessor
-{
+@Retention(RetentionPolicy.RUNTIME) @Target(ElementType.TYPE) public @interface DefaultFacetMessageProcessor {
   String direction();
+
   String messageType();
 }

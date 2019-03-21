@@ -16,18 +16,17 @@
 
 package won.node.springsecurity;
 
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
 /**
  * Created by fkleedorfer on 24.11.2016.
  */
-public class ClientCertificateNoWebIdUserDetails implements UserDetails
-{
+public class ClientCertificateNoWebIdUserDetails implements UserDetails {
   private URI commonName;
   Collection<GrantedAuthority> authorities = new ArrayList<>(3);
 
@@ -36,14 +35,11 @@ public class ClientCertificateNoWebIdUserDetails implements UserDetails
     this.authorities = grantedAuthorities;
   }
 
-  @Override
-  public Collection<? extends GrantedAuthority> getAuthorities() {
+  @Override public Collection<? extends GrantedAuthority> getAuthorities() {
     return authorities;
   }
 
-
-  @Override
-  public String getPassword() {
+  @Override public String getPassword() {
     return "";
   }
 
@@ -52,32 +48,23 @@ public class ClientCertificateNoWebIdUserDetails implements UserDetails
    *
    * @return
    */
-  @Override
-  public String getUsername() {
+  @Override public String getUsername() {
     return commonName.toString();
   }
 
-
-  @Override
-  public boolean isAccountNonExpired() {
+  @Override public boolean isAccountNonExpired() {
     return true;
   }
 
-
-  @Override
-  public boolean isAccountNonLocked() {
+  @Override public boolean isAccountNonLocked() {
     return true;
   }
 
-
-  @Override
-  public boolean isCredentialsNonExpired() {
+  @Override public boolean isCredentialsNonExpired() {
     return true;
   }
 
-
-  @Override
-  public boolean isEnabled() {
+  @Override public boolean isEnabled() {
     return true;
   }
 

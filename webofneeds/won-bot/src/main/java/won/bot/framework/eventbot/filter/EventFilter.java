@@ -21,7 +21,6 @@ import won.bot.framework.eventbot.event.Event;
 /**
  * Interface for filtering Events.
  */
-public interface EventFilter
-{
+public interface EventFilter {
   public boolean accept(Event event);
 }

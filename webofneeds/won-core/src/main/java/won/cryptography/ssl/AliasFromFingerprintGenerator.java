@@ -6,11 +6,9 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
 /**
- * User: ypanchenko
- * Date: 19.10.2015
+ * User: ypanchenko Date: 19.10.2015
  */
-public class AliasFromFingerprintGenerator implements AliasGenerator
-{
+public class AliasFromFingerprintGenerator implements AliasGenerator {
   public AliasFromFingerprintGenerator() {
   }
 
@@ -31,13 +29,14 @@ public class AliasFromFingerprintGenerator implements AliasGenerator
     StringBuffer hexString = new StringBuffer();
     for (int i = 0; i < hash.length; i++) {
       String hex = Integer.toHexString(0xff & hash[i]);
-      if(hex.length() == 1) hexString.append('0');
+      if (hex.length() == 1)
+        hexString.append('0');
       hexString.append(hex);
     }
     return hexString.toString();
   }
 
-  public static void main (String... args) throws Exception{
+  public static void main(String... args) throws Exception {
     System.out.println("digest:" + new AliasFromFingerprintGenerator().digest("digest".getBytes()));
   }
 }

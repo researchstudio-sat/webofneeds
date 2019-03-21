@@ -18,7 +18,6 @@ package won.node.camel.predicate;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Predicate;
-
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.camel.WonCamelConstants;
@@ -29,21 +28,25 @@ import won.protocol.message.processor.camel.WonCamelConstants;
  * If yes, facet implementations are executed and the message is
  * passed to the remote won node.
  */
-public class ShouldCallFacetImplForMessagePredicate implements Predicate
-{
-  @Override
-  public boolean matches(final Exchange exchange) {
+public class ShouldCallFacetImplForMessagePredicate implements Predicate {
+  @Override public boolean matches(final Exchange exchange) {
     WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
     WonMessageType messageType = wonMessage.getMessageType();
-    switch (messageType){
-      case DEACTIVATE: return false;
-      case ACTIVATE: return false;
-      case DELETE: return false;
-      case CREATE_NEED: return false;
-      case SUCCESS_RESPONSE: return false;
-      case FAILURE_RESPONSE: return false;
+    switch (messageType) {
+    case DEACTIVATE:
+      return false;
+    case ACTIVATE:
+      return false;
+    case DELETE:
+      return false;
+    case CREATE_NEED:
+      return false;
+    case SUCCESS_RESPONSE:
+      return false;
+    case FAILURE_RESPONSE:
+      return false;
     default:
-        break;
+      break;
     }
     return true;
   }

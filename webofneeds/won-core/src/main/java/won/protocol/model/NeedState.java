@@ -16,34 +16,26 @@
 
 package won.protocol.model;
 
-import java.net.URI;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.protocol.vocabulary.WON;
 
+import java.net.URI;
+
 /**
- * User: fsalcher
- * Date: 10.10.12
- * Time: 14:13
+ * User: fsalcher Date: 10.10.12 Time: 14:13
  */
-public enum NeedState
-{
-  INACTIVE("Inactive"),
-  ACTIVE("Active"),
-  DELETED("Deleted");
+public enum NeedState {
+  INACTIVE("Inactive"), ACTIVE("Active"), DELETED("Deleted");
 
   private static final Logger logger = LoggerFactory.getLogger(NeedState.class);
   private String name;
 
-  private NeedState(String name)
-  {
+  private NeedState(String name) {
     this.name = name;
   }
 
-  public URI getURI()
-  {
+  public URI getURI() {
     return URI.create(WON.BASE_URI + name);
   }
 
@@ -53,10 +45,9 @@ public enum NeedState
    * @param fragment string to match
    * @return matched enum, null otherwise
    */
-  public static NeedState parseString(final String fragment)
-  {
-    for(NeedState state : values())
-      if(state.name.equals(fragment))
+  public static NeedState parseString(final String fragment) {
+    for (NeedState state : values())
+      if (state.name.equals(fragment))
         return state;
 
     logger.warn("No enum could be matched for: {}", fragment);
@@ -69,8 +60,7 @@ public enum NeedState
    * @param uri URI to match
    * @return matched enum, null otherwise
    */
-  public static NeedState fromURI(final URI uri)
-  {
+  public static NeedState fromURI(final URI uri) {
     for (NeedState state : values())
       if (state.getURI().equals(uri))
         return state;

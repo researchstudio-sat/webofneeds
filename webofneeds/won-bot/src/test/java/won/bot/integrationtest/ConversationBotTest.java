@@ -16,9 +16,6 @@
 
 package won.bot.integrationtest;
 
-import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.TimeUnit;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,19 +28,19 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.support.PeriodicTrigger;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
 import won.bot.framework.eventbot.event.impl.lifecycle.WorkDoneEvent;
 import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
 import won.bot.framework.manager.impl.SpringAwareBotManagerImpl;
 import won.bot.impl.ConversationBot;
 
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.TimeUnit;
+
 /**
  * Integration test.
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:/spring/app/simple2NeedConversationTest.xml"})
-public class ConversationBotTest
-{
+@RunWith(SpringJUnit4ClassRunner.class) @ContextConfiguration(locations = {
+    "classpath:/spring/app/simple2NeedConversationTest.xml" }) public class ConversationBotTest {
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -53,17 +50,14 @@ public class ConversationBotTest
 
   MyBot bot;
 
-  @Autowired
-  ApplicationContext applicationContext;
+  @Autowired ApplicationContext applicationContext;
 
-  @Autowired
-  SpringAwareBotManagerImpl botManager;
+  @Autowired SpringAwareBotManagerImpl botManager;
 
   /**
    * This is run before each @TestD method.
    */
-  @Before
-  public void before(){
+  @Before public void before() {
     //create a bot instance and auto-wire it
     AutowireCapableBeanFactory beanFactory = applicationContext.getAutowireCapableBeanFactory();
     this.bot = (MyBot) beanFactory.autowire(MyBot.class, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
@@ -78,11 +72,10 @@ public class ConversationBotTest
 
   /**
    * The main test method.
+   *
    * @throws Exception
    */
-  @Test
-  public void testConversationBot() throws Exception
-  {
+  @Test public void testConversationBot() throws Exception {
     logger.info("starting test case testCreate2NeedsShortConversationBot");
     //adding the bot to the bot manager will cause it to be initialized.
     //at that point, the trigger starts.
@@ -97,14 +90,12 @@ public class ConversationBotTest
     logger.info("finishing test case testCreate2NeedsShortConversationBot");
   }
 
-
   /**
    * We create a subclass of the bot we want to test here so that we can
    * add a listener to its internal event bus and to access its listeners, which
    * record information during the run that we later check with asserts.
    */
-  public static class MyBot extends ConversationBot
-  {
+  public static class MyBot extends ConversationBot {
     /**
      * Used for synchronization with the @TestD method: it should wait at the
      * barrier until our bot is done, then execute the asserts.
@@ -114,33 +105,27 @@ public class ConversationBotTest
     /**
      * Default constructor is required for instantiation through Spring.
      */
-    public MyBot(){
+    public MyBot() {
     }
 
-    @Override
-    protected void initializeEventListeners()
-    {
+    @Override protected void initializeEventListeners() {
       //of course, let the real bot implementation initialize itself
       super.initializeEventListeners();
       //now, add a listener to the WorkDoneEvent.
       //its only purpose is to trip the CyclicBarrier instance that
       // the test method is waiting on
-      getEventBus().subscribe(WorkDoneEvent.class,
-        new ActionOnEventListener(
-          getEventListenerContext(),
-          new TripBarrierAction(getEventListenerContext(), barrier)));
+      getEventBus().subscribe(WorkDoneEvent.class, new ActionOnEventListener(getEventListenerContext(),
+              new TripBarrierAction(getEventListenerContext(), barrier)));
     }
 
-    public CyclicBarrier getBarrier()
-    {
+    public CyclicBarrier getBarrier() {
       return barrier;
     }
 
     /**
      * Here we check the results of the bot's execution.
      */
-    public void executeAsserts()
-    {
+    public void executeAsserts() {
       //2 act events
       Assert.assertEquals(2, this.needCreator.getEventCount());
       Assert.assertEquals(0, this.needCreator.getExceptionCount());

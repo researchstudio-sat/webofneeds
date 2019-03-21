@@ -9,10 +9,9 @@ import java.util.Set;
 /**
  * Used by a bot to remember which needs and nodes and it knows. Additionally generic Java objects can be saved and
  * retrieved.
- *
  */
 public interface BotContext {
-  String DEFAULT_NEED_LIST_NAME="need_uris";
+  String DEFAULT_NEED_LIST_NAME = "need_uris";
 
   // ===============================
   // application specific methods
@@ -34,7 +33,7 @@ public interface BotContext {
   boolean isNeedKnown(final URI needURI);
 
   /**
-   *  removeFromObjectMap a need uri from a named need uri list
+   * removeFromObjectMap a need uri from a named need uri list
    *
    * @param uri
    * @param name
@@ -80,8 +79,6 @@ public interface BotContext {
    * @param uri
    */
   void removeNodeUri(final URI uri);
-
-
 
   // ===============================
   // generic methods
@@ -146,13 +143,13 @@ public interface BotContext {
    */
   void removeFromListMap(String collectionName, String key, final Serializable... values);
 
-    /**
-     * Remove one or more arbitrary objects from the list for all keys in the collection.
-     *
-     * @param collectionName
-     * @param values
-     */
-    void removeLeavesFromListMap(String collectionName, final Serializable... values);
+  /**
+   * Remove one or more arbitrary objects from the list for all keys in the collection.
+   *
+   * @param collectionName
+   * @param values
+   */
+  void removeLeavesFromListMap(String collectionName, final Serializable... values);
 
   /**
    * Retrieve all objects from one collection at one key previously added using addToListMap().

@@ -16,15 +16,14 @@
 
 package won.bot.framework.eventbot.event.impl.matcher;
 
-import java.net.URI;
-
 import won.bot.framework.eventbot.event.BaseNodeSpecificEvent;
+
+import java.net.URI;
 
 /**
  *
  */
-public class MatcherRegisteredEvent extends BaseNodeSpecificEvent
-{
+public class MatcherRegisteredEvent extends BaseNodeSpecificEvent {
   public MatcherRegisteredEvent(final URI wonNodeURI) {
     super(wonNodeURI);
   }

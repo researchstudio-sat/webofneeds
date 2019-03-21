@@ -26,37 +26,38 @@ import won.bot.framework.eventbot.listener.AbstractHandleFirstNEventsListener;
  * User: fkleedorfer
  * Date: 06.04.14
  */
-public class ActionOnFirstNEventsListener extends AbstractHandleFirstNEventsListener
-{
+public class ActionOnFirstNEventsListener extends AbstractHandleFirstNEventsListener {
   private EventBotAction action;
 
-  public ActionOnFirstNEventsListener(final EventListenerContext context, final int targetCount, final EventBotAction action) {
+  public ActionOnFirstNEventsListener(final EventListenerContext context, final int targetCount,
+      final EventBotAction action) {
     super(context, targetCount);
     this.action = action;
   }
 
-  public ActionOnFirstNEventsListener(final EventListenerContext context, final EventFilter eventFilter, final int targetCount, final EventBotAction action) {
+  public ActionOnFirstNEventsListener(final EventListenerContext context, final EventFilter eventFilter,
+      final int targetCount, final EventBotAction action) {
     super(context, eventFilter, targetCount);
     this.action = action;
   }
 
-  public ActionOnFirstNEventsListener(final EventListenerContext context, final String name, final int targetCount, final EventBotAction action) {
+  public ActionOnFirstNEventsListener(final EventListenerContext context, final String name, final int targetCount,
+      final EventBotAction action) {
     super(context, name, targetCount);
     this.action = action;
   }
 
-  public ActionOnFirstNEventsListener(final EventListenerContext context, final String name, final EventFilter eventFilter, final int targetCount, final EventBotAction action) {
+  public ActionOnFirstNEventsListener(final EventListenerContext context, final String name,
+      final EventFilter eventFilter, final int targetCount, final EventBotAction action) {
     super(context, name, eventFilter, targetCount);
     this.action = action;
   }
 
-  @Override
-  protected void unsubscribe() {
+  @Override protected void unsubscribe() {
     getEventListenerContext().getEventBus().unsubscribe(this);
   }
 
-  @Override
-  protected void handleFirstNTimes(final Event event) throws Exception {
+  @Override protected void handleFirstNTimes(final Event event) throws Exception {
     getEventListenerContext().getExecutor().execute(action.getActionTask(event, this));
   }
 }

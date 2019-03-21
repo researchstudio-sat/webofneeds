@@ -17,7 +17,6 @@
 package won.node.camel.processor.general;
 
 import org.apache.jena.vocabulary.RDF;
-
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.processor.WonMessageProcessor;
@@ -34,8 +33,7 @@ public class DirectionAddingWonMessageProcessor implements WonMessageProcessor {
     this.direction = direction;
   }
 
-  @Override
-  public WonMessage process(WonMessage message) throws WonMessageProcessingException {
+  @Override public WonMessage process(WonMessage message) throws WonMessageProcessingException {
     message.addMessageProperty(RDF.type, direction.getResource());
     return message;
   }

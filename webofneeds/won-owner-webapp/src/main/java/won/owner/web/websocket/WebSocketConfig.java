@@ -28,27 +28,20 @@ import org.springframework.web.socket.server.standard.ServletServerContainerFact
  * User: LEIH-NB
  * Date: 06.08.14
  */
-@Configuration
-@EnableWebSocket
-public class WebSocketConfig   implements WebSocketConfigurer//extends AbstractWebSocketMessageBrokerConfigurer
+@Configuration @EnableWebSocket public class WebSocketConfig
+    implements WebSocketConfigurer//extends AbstractWebSocketMessageBrokerConfigurer
 {
   private WonWebSocketHandler wonWebSocketHandler;
 
-  @Override
-  public void registerWebSocketHandlers(final WebSocketHandlerRegistry registry) {
-    registry
-      .addHandler(this.wonWebSocketHandler,"/msg")
-      .addInterceptors(new WonHandshakeInterceptor())
-      .withSockJS();
+  @Override public void registerWebSocketHandlers(final WebSocketHandlerRegistry registry) {
+    registry.addHandler(this.wonWebSocketHandler, "/msg").addInterceptors(new WonHandshakeInterceptor()).withSockJS();
   }
 
-  @Autowired
-  public void setWonWebSocketHandler(WonWebSocketHandler wonWebSocketHandler ){
+  @Autowired public void setWonWebSocketHandler(WonWebSocketHandler wonWebSocketHandler) {
     this.wonWebSocketHandler = wonWebSocketHandler;
   }
 
-  @Bean
-  public ServletServerContainerFactoryBean createWebSocketContainer() {
+  @Bean public ServletServerContainerFactoryBean createWebSocketContainer() {
     ServletServerContainerFactoryBean container = new ServletServerContainerFactoryBean();
     //here, we set the buffer size of each websocket. This means that we will allocate the
     // specified amount of memory for each browser session. Of course we would like to pre-allocate as little as

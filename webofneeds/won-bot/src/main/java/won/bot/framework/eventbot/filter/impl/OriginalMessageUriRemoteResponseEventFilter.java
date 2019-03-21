@@ -16,33 +16,32 @@
 
 package won.bot.framework.eventbot.filter.impl;
 
-import java.net.URI;
-
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.ResponseEvent;
 import won.bot.framework.eventbot.filter.EventFilter;
 import won.protocol.message.WonMessage;
 
+import java.net.URI;
+
 /**
  * Accepts only ResponseEvents with the specified originalMessageURI.
  */
-public class OriginalMessageUriRemoteResponseEventFilter implements EventFilter
-{
+public class OriginalMessageUriRemoteResponseEventFilter implements EventFilter {
   private URI originalMessageURI;
 
   public OriginalMessageUriRemoteResponseEventFilter(final URI originalMessageURI) {
     this.originalMessageURI = originalMessageURI;
   }
 
-  public static OriginalMessageUriRemoteResponseEventFilter forWonMessage(WonMessage wonMessage){
+  public static OriginalMessageUriRemoteResponseEventFilter forWonMessage(WonMessage wonMessage) {
     return new OriginalMessageUriRemoteResponseEventFilter(wonMessage.getMessageURI());
   }
 
-  @Override
-  public boolean accept(final Event event) {
-    if (event instanceof ResponseEvent){
-      URI messageURI = ((ResponseEvent)event).getRemoteResponseToMessageURI();
-      if (this.originalMessageURI.equals(messageURI)) return true;
+  @Override public boolean accept(final Event event) {
+    if (event instanceof ResponseEvent) {
+      URI messageURI = ((ResponseEvent) event).getRemoteResponseToMessageURI();
+      if (this.originalMessageURI.equals(messageURI))
+        return true;
     }
     return false;
   }

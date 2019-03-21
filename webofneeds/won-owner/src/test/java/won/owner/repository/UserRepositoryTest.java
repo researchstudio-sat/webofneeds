@@ -16,7 +16,6 @@
 
 package won.owner.repository;
 
-
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,16 +23,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:/spring/owner-jmsonly.xml"})
-public class UserRepositoryTest
-{
-  @Autowired
-  private UserRepository userRepository;
+@RunWith(SpringJUnit4ClassRunner.class) @ContextConfiguration(locations = {
+    "classpath:/spring/owner-jmsonly.xml" }) public class UserRepositoryTest {
+  @Autowired private UserRepository userRepository;
 
-  @Test
-  @Ignore
-  public void dummyTest(){
+  @Test @Ignore public void dummyTest() {
     //only there to have a quick way of instantiating the context.
   }
 

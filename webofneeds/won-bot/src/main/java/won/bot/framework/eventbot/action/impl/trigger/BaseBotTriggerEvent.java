@@ -21,14 +21,14 @@ import won.bot.framework.eventbot.event.BaseEvent;
 /**
  * Events specific to a BotTrigger.
  */
-public abstract class BaseBotTriggerEvent extends BaseEvent{
-    private BotTrigger botTrigger;
+public abstract class BaseBotTriggerEvent extends BaseEvent {
+  private BotTrigger botTrigger;
 
-    public BaseBotTriggerEvent(BotTrigger botTrigger) {
-        this.botTrigger = botTrigger;
-    }
+  public BaseBotTriggerEvent(BotTrigger botTrigger) {
+    this.botTrigger = botTrigger;
+  }
 
-    public BotTrigger getBotTrigger() {
-        return botTrigger;
-    }
+  public BotTrigger getBotTrigger() {
+    return botTrigger;
+  }
 }

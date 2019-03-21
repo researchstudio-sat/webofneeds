@@ -23,8 +23,8 @@ import won.bot.framework.eventbot.event.Event;
  * are subscribed to. The onSubscribe method will be called before the subscription, the onUnscubscribe
  * methods will be called after the listener is unsubscribed.
  */
-public interface SubscriptionAware
-{
+public interface SubscriptionAware {
   public <T extends Event> void onSubscribe(Class<T> event);
+
   public <T extends Event> void onUnsubscribe(Class<T> event);
 }

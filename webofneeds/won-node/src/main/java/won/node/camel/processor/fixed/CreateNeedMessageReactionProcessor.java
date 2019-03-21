@@ -16,15 +16,12 @@
 
 package won.node.camel.processor.fixed;
 
-import java.net.URI;
-
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageReactionProcessor;
 import won.protocol.exception.NoSuchNeedException;
@@ -37,44 +34,37 @@ import won.protocol.repository.NeedRepository;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WONMSG;
 
+import java.net.URI;
+
 /**
  * Reacts to a CREATE message, informing matchers of the newly created need.
  */
-@Service
-@FixedMessageReactionProcessor(direction= WONMSG.TYPE_FROM_OWNER_STRING,messageType = WONMSG.TYPE_CREATE_STRING)
-public class CreateNeedMessageReactionProcessor extends AbstractCamelProcessor
-{
-    @Autowired
-    NeedRepository needRepository;
+@Service @FixedMessageReactionProcessor(direction = WONMSG.TYPE_FROM_OWNER_STRING, messageType = WONMSG.TYPE_CREATE_STRING) public class CreateNeedMessageReactionProcessor
+    extends AbstractCamelProcessor {
+  @Autowired NeedRepository needRepository;
 
-
-  @Override
-  public void process(final Exchange exchange) throws Exception {
+  @Override public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
     WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
     Dataset needContent = wonMessage.getMessageContent();
     URI needUri = getNeedURIFromWonMessage(needContent);
-    if (needUri == null){
+    if (needUri == null) {
       logger.warn("could not obtain needURI from message " + wonMessage.getMessageURI());
       return;
     }
     Need need = needRepository.findOneByNeedURI(needUri);
     try {
       WonMessage newNeedNotificationMessage = makeNeedCreatedMessageForMatcher(need);
-      matcherProtocolMatcherClient.needCreated(needUri, ModelFactory.createDefaultModel(),
-      newNeedNotificationMessage);
+      matcherProtocolMatcherClient.needCreated(needUri, ModelFactory.createDefaultModel(), newNeedNotificationMessage);
     } catch (Exception e) {
       logger.warn("could not create NeedCreatedNotification", e);
     }
   }
 
-
   private WonMessage makeNeedCreatedMessageForMatcher(final Need need) throws NoSuchNeedException {
     return WonMessageBuilder
-      .setMessagePropertiesForNeedCreatedNotification(wonNodeInformationService.generateEventURI(),
-                                                      need.getNeedURI(), need.getWonNodeURI())
-      .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL)
-      .build();
+        .setMessagePropertiesForNeedCreatedNotification(wonNodeInformationService.generateEventURI(), need.getNeedURI(),
+            need.getWonNodeURI()).setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL).build();
   }
 
   private URI getNeedURIFromWonMessage(final Dataset wonMessage) {

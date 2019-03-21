@@ -6,6 +6,5 @@ import won.bot.framework.eventbot.event.BaseEvent;
  * User: ypanchenko
  * Date: 23.03.2016
  */
-public class CrawlReadyEvent extends BaseEvent
-{
+public class CrawlReadyEvent extends BaseEvent {
 }

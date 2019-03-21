@@ -16,86 +16,83 @@
 
 package won.bot.framework.eventbot.event.impl.command.create;
 
-import java.net.URI;
-import java.util.Arrays;
-import java.util.List;
-
 import org.apache.jena.query.Dataset;
-
 import won.bot.framework.bot.context.BotContext;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandEvent;
 import won.protocol.message.WonMessageType;
 import won.protocol.model.FacetType;
 
+import java.net.URI;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Instructs the bot to create a need.
  */
 public class CreateNeedCommandEvent implements MessageCommandEvent {
-    //the model of the need's content
-    private Dataset needDataset;
-    //the facets the new need should have
-    private List<URI> facets;
-    //the name of the need uri list to save the need uri to
-    private String uriListName = BotContext.DEFAULT_NEED_LIST_NAME;
-    //sets the UsedForTesting flag
-    private boolean usedForTesting = false;
-    //sets the do not match flag
-    private boolean doNotMatch = false;
+  //the model of the need's content
+  private Dataset needDataset;
+  //the facets the new need should have
+  private List<URI> facets;
+  //the name of the need uri list to save the need uri to
+  private String uriListName = BotContext.DEFAULT_NEED_LIST_NAME;
+  //sets the UsedForTesting flag
+  private boolean usedForTesting = false;
+  //sets the do not match flag
+  private boolean doNotMatch = false;
 
-    public CreateNeedCommandEvent(Dataset needDataset, String uriListName, boolean usedForTesting, boolean doNotMatch, URI... facets) {
-        this.needDataset = needDataset;
-        if (this.uriListName != null) {
-            this.uriListName = uriListName;
-        }
-        if (facets != null && facets.length > 0) {
-            this.facets = Arrays.asList(facets);
-        } else {
-            this.facets = Arrays.asList(new URI[]{FacetType.ChatFacet.getURI()});
-        }
-        this.usedForTesting = usedForTesting;
-        this.doNotMatch = doNotMatch;
+  public CreateNeedCommandEvent(Dataset needDataset, String uriListName, boolean usedForTesting, boolean doNotMatch,
+      URI... facets) {
+    this.needDataset = needDataset;
+    if (this.uriListName != null) {
+      this.uriListName = uriListName;
     }
-    public CreateNeedCommandEvent(Dataset needDataset, String uriListName, URI... facets) {
-        this(needDataset, uriListName, false, false, facets);
+    if (facets != null && facets.length > 0) {
+      this.facets = Arrays.asList(facets);
+    } else {
+      this.facets = Arrays.asList(new URI[] { FacetType.ChatFacet.getURI() });
     }
+    this.usedForTesting = usedForTesting;
+    this.doNotMatch = doNotMatch;
+  }
 
-    public CreateNeedCommandEvent(Dataset needDataset) {
-        this(needDataset, null, null);
-    }
+  public CreateNeedCommandEvent(Dataset needDataset, String uriListName, URI... facets) {
+    this(needDataset, uriListName, false, false, facets);
+  }
 
-    public CreateNeedCommandEvent(Dataset needDataset, URI... facets) {
-        this(needDataset, null, facets);
-    }
+  public CreateNeedCommandEvent(Dataset needDataset) {
+    this(needDataset, null, null);
+  }
 
-    public CreateNeedCommandEvent(Dataset needDataset, String uriListName) {
-        this(needDataset, uriListName, null);
-    }
+  public CreateNeedCommandEvent(Dataset needDataset, URI... facets) {
+    this(needDataset, null, facets);
+  }
 
-    @Override
-    public WonMessageType getWonMessageType() {
-        return WonMessageType.CREATE_NEED;
-    }
+  public CreateNeedCommandEvent(Dataset needDataset, String uriListName) {
+    this(needDataset, uriListName, null);
+  }
 
+  @Override public WonMessageType getWonMessageType() {
+    return WonMessageType.CREATE_NEED;
+  }
 
+  public Dataset getNeedDataset() {
+    return needDataset;
+  }
 
-    public Dataset getNeedDataset() {
-        return needDataset;
-    }
+  public String getUriListName() {
+    return uriListName;
+  }
 
-    public String getUriListName() {
-        return uriListName;
-    }
+  public List<URI> getFacets() {
+    return facets;
+  }
 
-    public List<URI> getFacets() {
-        return facets;
-    }
+  public boolean isUsedForTesting() {
+    return usedForTesting;
+  }
 
-    public boolean isUsedForTesting() {
-        return usedForTesting;
-    }
-
-    public boolean isDoNotMatch() {
-        return doNotMatch;
-    }
+  public boolean isDoNotMatch() {
+    return doNotMatch;
+  }
 }

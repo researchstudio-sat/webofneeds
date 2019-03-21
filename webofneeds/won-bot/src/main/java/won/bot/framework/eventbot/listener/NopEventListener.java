@@ -22,8 +22,7 @@ import won.bot.framework.eventbot.event.Event;
  * EventListener that does nothing.
  */
 public class NopEventListener implements EventListener {
-    @Override
-    public void onEvent(Event event) throws Exception {
-        //do nothing
-    }
+  @Override public void onEvent(Event event) throws Exception {
+    //do nothing
+  }
 }

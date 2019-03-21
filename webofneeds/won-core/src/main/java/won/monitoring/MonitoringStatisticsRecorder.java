@@ -20,10 +20,10 @@ package won.monitoring;
  * Interface for classes that take a snapshot of current monitoring statistics
  * and store them in some way.
  */
-public interface MonitoringStatisticsRecorder
-{
+public interface MonitoringStatisticsRecorder {
   /**
    * Name of the recorder used in logging statements.
+   *
    * @return
    */
   public String getRecorderName();

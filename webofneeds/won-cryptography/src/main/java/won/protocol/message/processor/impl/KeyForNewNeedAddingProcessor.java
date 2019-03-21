@@ -1,12 +1,9 @@
 package won.protocol.message.processor.impl;
 
-import java.security.PublicKey;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.cryptography.keymanagement.KeyPairAliasDerivationStrategy;
 import won.cryptography.rdfsign.WonKeysReaderWriter;
 import won.cryptography.service.CryptographyService;
@@ -16,22 +13,25 @@ import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
 
+import java.security.PublicKey;
+
 /**
- *  This processor is intended for use in owners (bot or webapp).
- *
- *  If the message type is CREATE, the processor adds the appropriate public key to the need's RDF content.
- *
- *  If the <code>fixedPrivateKeyAlias</code> property is set, the processor generates at most one key pair with that alias
- *  and uses that key pair for all need it processes.
- *
- *  If the <code>fixedPrivateKeyAlias</code> property is not set, the processor generates one keypair per need, using
- *  the need URI as the keypair's alias.
- *
- *  This processor should be removed when user's/need's key management and signing happens in
- *  the Owner Client (browser).
- *
- * User: ypanchenko
- * Date: 10.04.2015
+ * This processor is intended for use in owners (bot or webapp).
+ * <p>
+ * If the message type is CREATE, the processor adds the appropriate public key
+ * to the need's RDF content.
+ * <p>
+ * If the <code>fixedPrivateKeyAlias</code> property is set, the processor
+ * generates at most one key pair with that alias and uses that key pair for all
+ * need it processes.
+ * <p>
+ * If the <code>fixedPrivateKeyAlias</code> property is not set, the processor
+ * generates one keypair per need, using the need URI as the keypair's alias.
+ * <p>
+ * This processor should be removed when user's/need's key management and
+ * signing happens in the Owner Client (browser).
+ * <p>
+ * User: ypanchenko Date: 10.04.2015
  */
 public class KeyForNewNeedAddingProcessor implements WonMessageProcessor {
   private static final Logger logger = LoggerFactory.getLogger(KeyForNewNeedAddingProcessor.class);
@@ -52,7 +52,7 @@ public class KeyForNewNeedAddingProcessor implements WonMessageProcessor {
     try {
       if (message.getMessageType() == WonMessageType.CREATE_NEED) {
         String needUri = message.getSenderNeedURI().toString();
-        Dataset msgDataset =  WonMessageEncoder.encodeAsDataset(message);
+        Dataset msgDataset = WonMessageEncoder.encodeAsDataset(message);
         // generate and add need's public key to the need content
 
         String alias = keyPairAliasDerivationStrategy.getAliasForNeedUri(needUri);
@@ -69,7 +69,8 @@ public class KeyForNewNeedAddingProcessor implements WonMessageProcessor {
       }
     } catch (Exception e) {
       logger.error("Failed to add key", e);
-      throw new WonMessageProcessingException("Failed to add key for need in message " + message.getMessageURI().toString());
+      throw new WonMessageProcessingException(
+          "Failed to add key for need in message " + message.getMessageURI().toString());
     }
     return message;
   }

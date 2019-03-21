@@ -26,8 +26,8 @@ import won.bot.integrationtest.failsim.DelayedDuplicateMessageSenderDecorator;
  */
 public class DelayedDuplicateMessageSendingConversationBot extends DuplicateMessageSendingConversationBot {
 
-  @Override
-  protected BaseEventListenerContextDecorator getDuplicateMessageSenderDecorator(EventListenerContext eventListenerContext) {
+  @Override protected BaseEventListenerContextDecorator getDuplicateMessageSenderDecorator(
+      EventListenerContext eventListenerContext) {
     return new DelayedDuplicateMessageSenderDecorator(eventListenerContext, 1000);
   }
 }

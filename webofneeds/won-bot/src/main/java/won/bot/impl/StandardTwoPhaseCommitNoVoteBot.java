@@ -27,11 +27,10 @@ import won.protocol.model.FacetType;
  * User: Danijel
  * Date: 15.5.14.
  */
-public class StandardTwoPhaseCommitNoVoteBot extends EventBot{
+public class StandardTwoPhaseCommitNoVoteBot extends EventBot {
 
   protected final int noOfNeeds = 10;
   private static final long MILLIS_BETWEEN_MESSAGES = 100;
-
 
   //we use protected members so we can extend the class and
   //access the listeners for unit test assertions and stats
@@ -47,35 +46,30 @@ public class StandardTwoPhaseCommitNoVoteBot extends EventBot{
   protected BaseEventListener participantNeedCreator;
   protected BaseEventListener coordinatorNeedCreator;
 
-  @Override
-  protected void initializeEventListeners()
-  {
+  @Override protected void initializeEventListeners() {
     EventListenerContext ctx = getEventListenerContext();
     EventBus bus = getEventBus();
 
     ParticipantCoordinatorBotContextWrapper botContextWrapper = (ParticipantCoordinatorBotContextWrapper) getBotContextWrapper();
 
     //create needs every trigger execution until noOfNeeds are created
-    this.participantNeedCreator = new ActionOnEventListener(
-      ctx, "participantCreator",
-      new CreateNeedWithFacetsAction(ctx, botContextWrapper.getParticipantListName(), FacetType.ParticipantFacet.getURI()),
-      noOfNeeds - 1
-    );
+    this.participantNeedCreator = new ActionOnEventListener(ctx, "participantCreator",
+        new CreateNeedWithFacetsAction(ctx, botContextWrapper.getParticipantListName(),
+            FacetType.ParticipantFacet.getURI()), noOfNeeds - 1);
     bus.subscribe(ActEvent.class, this.participantNeedCreator);
 
     //when done, create one coordinator need
-    this.coordinatorNeedCreator = new ActionOnEventListener(
-      ctx, "coordinatorCreator", new FinishedEventFilter(participantNeedCreator),
-      new CreateNeedWithFacetsAction(ctx, botContextWrapper.getCoordinatorListName(), FacetType.CoordinatorFacet.getURI()),
-      1
-    );
+    this.coordinatorNeedCreator = new ActionOnEventListener(ctx, "coordinatorCreator",
+        new FinishedEventFilter(participantNeedCreator),
+        new CreateNeedWithFacetsAction(ctx, botContextWrapper.getCoordinatorListName(),
+            FacetType.CoordinatorFacet.getURI()), 1);
     bus.subscribe(FinishedEvent.class, this.coordinatorNeedCreator);
 
     //when done, connect the participants to the coordinator
-    this.needConnector = new ActionOnceAfterNEventsListener(
-      ctx, "needConnector", noOfNeeds,
-      new ConnectFromListToListAction(ctx, botContextWrapper.getCoordinatorListName(), botContextWrapper.getParticipantListName(),
-                                      FacetType.CoordinatorFacet.getURI(), FacetType.ParticipantFacet.getURI(), MILLIS_BETWEEN_MESSAGES, "Hi!"));
+    this.needConnector = new ActionOnceAfterNEventsListener(ctx, "needConnector", noOfNeeds,
+        new ConnectFromListToListAction(ctx, botContextWrapper.getCoordinatorListName(),
+            botContextWrapper.getParticipantListName(), FacetType.CoordinatorFacet.getURI(),
+            FacetType.ParticipantFacet.getURI(), MILLIS_BETWEEN_MESSAGES, "Hi!"));
     bus.subscribe(NeedCreatedEvent.class, this.needConnector);
 
     //add a listener that is informed of the connect/open events and that auto-opens
@@ -86,10 +80,8 @@ public class StandardTwoPhaseCommitNoVoteBot extends EventBot{
     bus.subscribe(OpenFromOtherNeedEvent.class, this.autoOpener);
     bus.subscribe(ConnectFromOtherNeedEvent.class, this.autoOpener);
 
-    this.autoCloser = new ActionOnceAfterNEventsListener(
-      ctx, "autoCloser",
-      noOfNeeds-3, new CloseConnectionAction(ctx, "Bye!")
-    );
+    this.autoCloser = new ActionOnceAfterNEventsListener(ctx, "autoCloser", noOfNeeds - 3,
+        new CloseConnectionAction(ctx, "Bye!"));
     bus.subscribe(ConnectFromOtherNeedEvent.class, this.autoCloser);
 
     //after the last connect event, all connections are closed!
@@ -98,12 +90,8 @@ public class StandardTwoPhaseCommitNoVoteBot extends EventBot{
 
     //add a listener that counts two NeedDeactivatedEvents and then tells the
     //framework that the bot's work is done
-    this.workDoneSignaller = new ActionOnceAfterNEventsListener(
-      ctx,
-      noOfNeeds, new SignalWorkDoneAction(ctx)
-    );
+    this.workDoneSignaller = new ActionOnceAfterNEventsListener(ctx, noOfNeeds, new SignalWorkDoneAction(ctx));
     bus.subscribe(NeedDeactivatedEvent.class, this.workDoneSignaller);
   }
-
 
 }

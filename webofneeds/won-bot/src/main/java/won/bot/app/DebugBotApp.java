@@ -22,16 +22,13 @@ import org.springframework.context.ConfigurableApplicationContext;
 /**
  * App for EchoBot
  */
-public class DebugBotApp
-{
-    public static void main(String[] args) throws Exception {
-        SpringApplication app = new SpringApplication(
-                new Object[]{"classpath:/spring/app/debugBotApp.xml"}
-        );
-        app.setWebEnvironment(false);
-        ConfigurableApplicationContext applicationContext =  app.run(args);
-        //Thread.sleep(5*60*1000);
-        //app.exit(applicationContext);
-    }
+public class DebugBotApp {
+  public static void main(String[] args) throws Exception {
+    SpringApplication app = new SpringApplication(new Object[] { "classpath:/spring/app/debugBotApp.xml" });
+    app.setWebEnvironment(false);
+    ConfigurableApplicationContext applicationContext = app.run(args);
+    //Thread.sleep(5*60*1000);
+    //app.exit(applicationContext);
+  }
 
 }

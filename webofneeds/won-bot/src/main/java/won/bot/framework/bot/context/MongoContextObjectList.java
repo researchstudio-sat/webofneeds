@@ -1,17 +1,15 @@
 package won.bot.framework.bot.context;
 
+import org.springframework.data.annotation.Id;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import org.springframework.data.annotation.Id;
 
 /**
  * Created by hfriedrich on 21.11.2016.
  */
-public class MongoContextObjectList
-{
-  @Id
-  private String id;
+public class MongoContextObjectList {
+  @Id private String id;
 
   private List<Object> objectList;
 

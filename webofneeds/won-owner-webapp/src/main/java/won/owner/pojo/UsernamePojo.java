@@ -12,14 +12,13 @@ import org.hibernate.validator.constraints.NotEmpty;
  */
 public class UsernamePojo {
 
-	@NotEmpty
-	private String username;
+  @NotEmpty private String username;
 
-	public String getUsername() {
-		return username;
-	}
+  public String getUsername() {
+    return username;
+  }
 
-	public void setUsername(final String username) {
-		this.username = username;
-	}
+  public void setUsername(final String username) {
+    this.username = username;
+  }
 }

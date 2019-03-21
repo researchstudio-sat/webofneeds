@@ -10,11 +10,10 @@ import java.lang.annotation.Target;
  * facet behavior for the specified type and direction.
  * This implementation is always executed after the corresponding FixedMessageProcessor.
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface FacetMessageProcessor
-{
+@Retention(RetentionPolicy.RUNTIME) @Target(ElementType.TYPE) public @interface FacetMessageProcessor {
   String facetType();
+
   String direction();
+
   String messageType();
 }

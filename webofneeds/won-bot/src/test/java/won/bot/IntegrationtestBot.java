@@ -23,18 +23,15 @@ import won.bot.framework.eventbot.EventListenerContext;
  * Base bot for integration tests.
  */
 public class IntegrationtestBot extends EventBot implements ContextExposingBot {
-  @Override
-  public EventListenerContext getExposedEventListenerContext() {
+  @Override public EventListenerContext getExposedEventListenerContext() {
     return getEventListenerContext();
   }
 
-  @Override
-  protected void initializeEventListeners() {
+  @Override protected void initializeEventListeners() {
 
   }
 
-  @Override
-  protected void shutdownEventListeners() {
+  @Override protected void shutdownEventListeners() {
 
   }
 }

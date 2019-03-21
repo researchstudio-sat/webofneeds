@@ -1,9 +1,5 @@
 package won.bot.framework.eventbot.action.impl.mail.receive;
 
-import java.util.Collection;
-
-import javax.mail.internet.MimeMessage;
-
 import won.bot.framework.bot.context.MailBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
@@ -14,19 +10,20 @@ import won.bot.framework.eventbot.event.impl.mail.CreateNeedFromMailEvent;
 import won.bot.framework.eventbot.event.impl.mail.SubscribeUnsubscribeEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 
+import javax.mail.internet.MimeMessage;
+import java.util.Collection;
+
 /**
  * Created by hfriedrich on 16.11.2016.
  */
-public class SubscribeUnsubscribeAction extends BaseEventBotAction
-{
+public class SubscribeUnsubscribeAction extends BaseEventBotAction {
   public SubscribeUnsubscribeAction(EventListenerContext eventListenerContext) {
     super(eventListenerContext);
   }
 
-  @Override
-  protected void doRun(final Event event, EventListener executingListener) throws Exception {
+  @Override protected void doRun(final Event event, EventListener executingListener) throws Exception {
     EventListenerContext ctx = getEventListenerContext();
-    if (event instanceof SubscribeUnsubscribeEvent && ctx.getBotContextWrapper() instanceof MailBotContextWrapper){
+    if (event instanceof SubscribeUnsubscribeEvent && ctx.getBotContextWrapper() instanceof MailBotContextWrapper) {
       MailBotContextWrapper botContextWrapper = (MailBotContextWrapper) ctx.getBotContextWrapper();
 
       // save the new subscription status of the user to the bot context

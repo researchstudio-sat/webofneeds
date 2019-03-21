@@ -1,22 +1,22 @@
 package won.protocol.util.linkeddata;
 
-import java.net.URI;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * User: ypanchenko
- * Date: 06.11.2015
- */
-public class CachingAllButListsLinkedDataSource extends CachingLinkedDataSource
-{
-  //TODO instead of predefined resources should look into RDF and decide whether it is a list or not
+import java.net.URI;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-  //TODO actually the connection itself should also not be cached - i.e. status can be updated
+/**
+ * User: ypanchenko Date: 06.11.2015
+ */
+public class CachingAllButListsLinkedDataSource extends CachingLinkedDataSource {
+  // TODO instead of predefined resources should look into RDF and decide whether
+  // it is a list or not
+
+  // TODO actually the connection itself should also not be cached - i.e. status
+  // can be updated
 
   private Pattern pattern_connections_list_uri = Pattern.compile("(.+)/connections(/)?");
 
@@ -28,7 +28,7 @@ public class CachingAllButListsLinkedDataSource extends CachingLinkedDataSource
       return super.getDataForResource(resource);
     } else {
       Dataset dataset = linkedDataRestClient.readResourceData(resource);
-      //TODO debug log level
+      // TODO debug log level
       logger.info("connections list uri request performed");
       return dataset;
     }

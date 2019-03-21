@@ -4,12 +4,11 @@ import java.io.Serializable;
 
 /**
  * Created by hfriedrich on 17.10.2016.
- *
+ * <p>
  * Event is used to aks the crawler to load events that were either the last X needs seen or saved during a given date
  * interval.
  */
-public class LoadNeedEvent implements Serializable
-{
+public class LoadNeedEvent implements Serializable {
   private long fromDate;
   private long toDate;
   private int lastXNeedEvents;
@@ -45,13 +44,11 @@ public class LoadNeedEvent implements Serializable
     return toDate;
   }
 
-
   public int getLastXNeedEvents() {
     return lastXNeedEvents;
   }
 
-  @Override
-  public String toString() {
+  @Override public String toString() {
 
     if (lastXNeedEvents != -1) {
       return "[last " + lastXNeedEvents + " need events]";

@@ -16,10 +16,8 @@
 
 package won.node.camel.predicate;
 
-
 import org.apache.camel.Exchange;
 import org.apache.camel.Predicate;
-
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageType;
@@ -32,17 +30,18 @@ import won.protocol.message.processor.camel.WonCamelConstants;
  */
 public class ShouldEchoToOwnerPredicate implements Predicate {
 
-    @Override
-    public boolean matches(Exchange exchange) {
-        WonMessage message = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.ORIGINAL_MESSAGE_HEADER);
-        if (message == null) return false;
-        if (message.getEnvelopeType() == WonMessageDirection.FROM_EXTERNAL) return false;        
-        if (
-            (message.getMessageType() == WonMessageType.SUCCESS_RESPONSE || message.getMessageType() == WonMessageType.FAILURE_RESPONSE) 
-            && (message.getSenderNeedURI() != null && ! message.getSenderNeedURI().equals(message.getReceiverNeedURI()))) {
-            //responses directed at remote needs are not to be echoed to the owner
-            return false;
-        }
-        return true;
+  @Override public boolean matches(Exchange exchange) {
+    WonMessage message = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.ORIGINAL_MESSAGE_HEADER);
+    if (message == null)
+      return false;
+    if (message.getEnvelopeType() == WonMessageDirection.FROM_EXTERNAL)
+      return false;
+    if ((message.getMessageType() == WonMessageType.SUCCESS_RESPONSE
+        || message.getMessageType() == WonMessageType.FAILURE_RESPONSE) && (message.getSenderNeedURI() != null
+        && !message.getSenderNeedURI().equals(message.getReceiverNeedURI()))) {
+      //responses directed at remote needs are not to be echoed to the owner
+      return false;
     }
+    return true;
+  }
 }

@@ -22,7 +22,9 @@ import java.util.Date;
  * Created by fkleedorfer on 28.03.2017.
  */
 public interface VersionedEntity {
-    public int getVersion();
-    public void incrementVersion();
-    public Date getLastUpdate();
+  public int getVersion();
+
+  public void incrementVersion();
+
+  public Date getLastUpdate();
 }

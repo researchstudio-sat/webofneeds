@@ -18,7 +18,6 @@ package won.owner.protocol.message.base;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-
 import won.owner.protocol.message.OwnerCallback;
 import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
@@ -33,8 +32,7 @@ import won.protocol.util.WonRdfUtils;
  * are not part of messages.
  * Use with care.
  */
-public class MessageExtractingOwnerCallbackAdapter extends OwnerCallbackAdapter
-{
+public class MessageExtractingOwnerCallbackAdapter extends OwnerCallbackAdapter {
 
   public MessageExtractingOwnerCallbackAdapter(OwnerCallback adaptee) {
     super(adaptee);
@@ -43,13 +41,11 @@ public class MessageExtractingOwnerCallbackAdapter extends OwnerCallbackAdapter
   public MessageExtractingOwnerCallbackAdapter() {
   }
 
-  @Override
-  protected Connection makeConnection(WonMessage wonMessage) {
+  @Override protected Connection makeConnection(WonMessage wonMessage) {
     return toConnection(wonMessage);
   }
 
-  @Override
-  protected Match makeMatch(WonMessage wonMessage) {
+  @Override protected Match makeMatch(WonMessage wonMessage) {
     return WonRdfUtils.MessageUtils.toMatch(wonMessage);
   }
 
@@ -57,6 +53,7 @@ public class MessageExtractingOwnerCallbackAdapter extends OwnerCallbackAdapter
    * Creates a connection object representing the connection
    * that the wonMessage is addressed at, if any.
    * The resulting Connection object will not have a state or type property set.
+   *
    * @param wonMessage or null if the message is not directed at
    *                   a connection
    */
@@ -69,9 +66,7 @@ public class MessageExtractingOwnerCallbackAdapter extends OwnerCallbackAdapter
     return con;
   }
 
-  @Autowired(required = false)
-  @Qualifier("default")
-  public void setAdaptee(OwnerCallback adaptee) {
+  @Autowired(required = false) @Qualifier("default") public void setAdaptee(OwnerCallback adaptee) {
     super.setAdaptee(adaptee);
   }
 }

@@ -16,16 +16,15 @@
 
 package won.bot.framework.component.needproducer;
 
+import org.apache.jena.query.Dataset;
+
 import java.io.File;
 import java.io.IOException;
-
-import org.apache.jena.query.Dataset;
 
 /**
  * User: fkleedorfer
  * Date: 17.12.13
  */
-public interface FileBasedNeedProducer
-{
+public interface FileBasedNeedProducer {
   public Dataset readNeedFromFile(File file) throws IOException;
 }

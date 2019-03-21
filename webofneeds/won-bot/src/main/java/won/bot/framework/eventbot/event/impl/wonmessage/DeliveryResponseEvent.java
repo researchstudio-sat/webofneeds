@@ -16,17 +16,16 @@
 
 package won.bot.framework.eventbot.event.impl.wonmessage;
 
-import java.net.URI;
-
 import won.bot.framework.eventbot.event.BaseEvent;
 import won.bot.framework.eventbot.event.ResponseEvent;
 import won.protocol.message.WonMessage;
 
+import java.net.URI;
+
 /**
  * Event published whenever a WonMessage is received that indicates the failure of a previous message.
  */
-public class DeliveryResponseEvent extends BaseEvent implements ResponseEvent
-{
+public class DeliveryResponseEvent extends BaseEvent implements ResponseEvent {
   private URI originalMessageURI;
   private WonMessage message;
   private URI remoteResponseToMessageURI;
@@ -55,18 +54,15 @@ public class DeliveryResponseEvent extends BaseEvent implements ResponseEvent
     return remoteResponseToMessageURI != null;
   }
 
-  @Override
-  public URI getConnectionURI() {
+  @Override public URI getConnectionURI() {
     return message.getReceiverURI();
   }
 
-  @Override
-  public URI getRemoteNeedURI() {
+  @Override public URI getRemoteNeedURI() {
     return message.getSenderNeedURI();
   }
 
-  @Override
-  public URI getNeedURI() {
+  @Override public URI getNeedURI() {
     return message.getReceiverNeedURI();
   }
 }

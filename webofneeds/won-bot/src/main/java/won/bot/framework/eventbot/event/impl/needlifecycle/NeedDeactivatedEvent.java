@@ -16,15 +16,14 @@
 
 package won.bot.framework.eventbot.event.impl.needlifecycle;
 
-import java.net.URI;
-
 import won.bot.framework.eventbot.event.BaseNeedSpecificEvent;
+
+import java.net.URI;
 
 /**
  *
  */
-public class NeedDeactivatedEvent extends BaseNeedSpecificEvent
-{
+public class NeedDeactivatedEvent extends BaseNeedSpecificEvent {
   public NeedDeactivatedEvent(final URI needURI) {
     super(needURI);
   }

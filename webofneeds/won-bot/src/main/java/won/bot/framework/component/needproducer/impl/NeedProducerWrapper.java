@@ -22,7 +22,6 @@ import won.bot.framework.component.needproducer.NeedProducer;
  * User: fkleedorfer
  * Date: 17.12.13
  */
-public interface NeedProducerWrapper extends NeedProducer
-{
+public interface NeedProducerWrapper extends NeedProducer {
   public void setWrappedProducer(final NeedProducer wrappedProducer);
 }

@@ -12,13 +12,13 @@ package won.owner.pojo;
  * To change this template use File | Settings | File Templates.
  */
 public class ImagePojo {
-    private String uri;
+  private String uri;
 
-    public String getUri() {
-        return uri;
-    }
+  public String getUri() {
+    return uri;
+  }
 
-    public void setUri(String uri) {
-        this.uri = uri;
-    }
+  public void setUri(String uri) {
+    this.uri = uri;
+  }
 }

@@ -23,14 +23,13 @@ import won.bot.framework.eventbot.filter.EventFilter;
  * Only accepts the event specified at filter creation.
  */
 public class SameEventFilter implements EventFilter {
-    final Event onlyAcceptableEvent;
+  final Event onlyAcceptableEvent;
 
-    public SameEventFilter(Event onlyAcceptableEvent) {
-        this.onlyAcceptableEvent = onlyAcceptableEvent;
-    }
+  public SameEventFilter(Event onlyAcceptableEvent) {
+    this.onlyAcceptableEvent = onlyAcceptableEvent;
+  }
 
-    @Override
-    public boolean accept(Event event) {
-        return event == this.onlyAcceptableEvent;
-    }
+  @Override public boolean accept(Event event) {
+    return event == this.onlyAcceptableEvent;
+  }
 }

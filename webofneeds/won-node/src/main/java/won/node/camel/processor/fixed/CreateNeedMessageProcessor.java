@@ -1,14 +1,5 @@
 package won.node.camel.processor.fixed;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.jena.query.Dataset;
@@ -16,35 +7,28 @@ import org.javasimon.SimonManager;
 import org.javasimon.Split;
 import org.javasimon.Stopwatch;
 import org.springframework.stereotype.Service;
-
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.message.processor.exception.UriAlreadyInUseException;
-import won.protocol.model.ConnectionContainer;
-import won.protocol.model.DatasetHolder;
-import won.protocol.model.Facet;
-import won.protocol.model.Need;
-import won.protocol.model.NeedEventContainer;
-import won.protocol.model.NeedState;
-import won.protocol.model.OwnerApplication;
+import won.protocol.model.*;
 import won.protocol.util.NeedModelWrapper;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WONMSG;
+
+import java.net.URI;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * User: syim
  * Date: 02.03.2015
  */
-@Service
-@FixedMessageProcessor(direction= WONMSG.TYPE_FROM_OWNER_STRING,messageType = WONMSG.TYPE_CREATE_STRING)
-public class CreateNeedMessageProcessor extends AbstractCamelProcessor
-{
+@Service @FixedMessageProcessor(direction = WONMSG.TYPE_FROM_OWNER_STRING, messageType = WONMSG.TYPE_CREATE_STRING) public class CreateNeedMessageProcessor
+    extends AbstractCamelProcessor {
 
-
-  @Override
-  public void process(final Exchange exchange) throws Exception {
+  @Override public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
     WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
     Need need = storeNeed(wonMessage);
@@ -70,7 +54,8 @@ public class CreateNeedMessageProcessor extends AbstractCamelProcessor
     if (needEventContainer == null) {
       needEventContainer = new NeedEventContainer(need, need.getNeedURI());
     } else {
-      throw new UriAlreadyInUseException("Found a NeedEventContainer for the need we're about to create (" + needURI + ") - aborting");
+      throw new UriAlreadyInUseException(
+          "Found a NeedEventContainer for the need we're about to create (" + needURI + ") - aborting");
     }
     need.setWonNodeURI(wonMessage.getReceiverNodeURI());
     ConnectionContainer connectionContainer = new ConnectionContainer(need);
@@ -81,11 +66,11 @@ public class CreateNeedMessageProcessor extends AbstractCamelProcessor
     DatasetHolder datasetHolder = new DatasetHolder(needURI, needContent);
     //store attachments
     List<DatasetHolder> attachments = new ArrayList<>(attachmentHolders.size());
-    for(WonMessage.AttachmentHolder attachmentHolder: attachmentHolders){
+    for (WonMessage.AttachmentHolder attachmentHolder : attachmentHolders) {
       datasetHolder = new DatasetHolder(attachmentHolder.getDestinationUri(), attachmentHolder.getAttachmentDataset());
       attachments.add(datasetHolder);
     }
-    
+
     NeedModelWrapper needModelWrapper = new NeedModelWrapper(needContent);
     Collection<String> facets = needModelWrapper.getFacetUris();
     Optional<String> defaultFacet = needModelWrapper.getDefaultFacet();
@@ -93,20 +78,20 @@ public class CreateNeedMessageProcessor extends AbstractCamelProcessor
       throw new IllegalArgumentException("at least one property won:hasFacet required ");
 
     Set<Facet> facetEntities = facets.stream().map(facetUri -> {
-        Optional<String> facetType = needModelWrapper.getFacetType(facetUri);
-        if (!facetType.isPresent()) {
-          throw new IllegalArgumentException("cannot determine type of facet " + facetUri);
-        }
-        Facet f = new Facet();
-        f.setNeedURI(needURI);
-        f.setFacetURI(URI.create(facetUri));
-        f.setTypeURI(URI.create(facetType.get()));
-        if (defaultFacet.isPresent() && facetUri.equals(defaultFacet.get())) {
-            f.setDefaultFacet(true);
-        }
-        return f;
+      Optional<String> facetType = needModelWrapper.getFacetType(facetUri);
+      if (!facetType.isPresent()) {
+        throw new IllegalArgumentException("cannot determine type of facet " + facetUri);
+      }
+      Facet f = new Facet();
+      f.setNeedURI(needURI);
+      f.setFacetURI(URI.create(facetUri));
+      f.setTypeURI(URI.create(facetType.get()));
+      if (defaultFacet.isPresent() && facetUri.equals(defaultFacet.get())) {
+        f.setDefaultFacet(true);
+      }
+      return f;
     }).collect(Collectors.toSet());
-    
+
     //add everything to the need model class and save it
     need.setDatatsetHolder(datasetHolder);
     need.setAttachmentDatasetHolders(attachments);
@@ -116,10 +101,11 @@ public class CreateNeedMessageProcessor extends AbstractCamelProcessor
     return need;
   }
 
-  private void removeAttachmentsFromNeedContent(Dataset needContent, List<WonMessage.AttachmentHolder> attachmentHolders) {
-    for (WonMessage.AttachmentHolder attachmentHolder: attachmentHolders){
-      for (Iterator<String> it = attachmentHolder.getAttachmentDataset().listNames(); it.hasNext(); ){
-        String modelName =it.next();
+  private void removeAttachmentsFromNeedContent(Dataset needContent,
+      List<WonMessage.AttachmentHolder> attachmentHolders) {
+    for (WonMessage.AttachmentHolder attachmentHolder : attachmentHolders) {
+      for (Iterator<String> it = attachmentHolder.getAttachmentDataset().listNames(); it.hasNext(); ) {
+        String modelName = it.next();
         needContent.removeNamedModel(modelName);
       }
     }
@@ -130,8 +116,6 @@ public class CreateNeedMessageProcessor extends AbstractCamelProcessor
     authorizeOwnerApplicationForNeed(ownerApplicationID, need);
   }
 
-
-
   private URI getNeedURIFromWonMessage(final Dataset wonMessage) {
     URI needURI;
     needURI = WonRdfUtils.NeedUtils.getNeedURI(wonMessage);
@@ -140,8 +124,6 @@ public class CreateNeedMessageProcessor extends AbstractCamelProcessor
     }
     return needURI;
   }
-
-
 
   private void authorizeOwnerApplicationForNeed(final String ownerApplicationID, Need need) {
     String stopwatchName = getClass().getName() + ".authorizeOwnerApplicationForNeed";

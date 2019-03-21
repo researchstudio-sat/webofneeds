@@ -16,9 +16,6 @@
 
 package won.bot.integrationtest;
 
-import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.TimeUnit;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,19 +28,19 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.support.PeriodicTrigger;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
 import won.bot.framework.eventbot.event.impl.lifecycle.WorkDoneEvent;
 import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
 import won.bot.framework.manager.impl.SpringAwareBotManagerImpl;
 import won.bot.impl.MatcherProtocolTestBot;
 
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.TimeUnit;
+
 /**
  * Integration test.
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:/spring/app/simpleMatcherTest.xml"})
-public class MatcherBotTest
-{
+@RunWith(SpringJUnit4ClassRunner.class) @ContextConfiguration(locations = {
+    "classpath:/spring/app/simpleMatcherTest.xml" }) public class MatcherBotTest {
   private final Logger logger = LoggerFactory.getLogger(getClass());
   private static final int RUN_ONCE = 1;
   private static final long ACT_LOOP_TIMEOUT_MILLIS = 1000;
@@ -51,19 +48,17 @@ public class MatcherBotTest
 
   MyBot bot;
 
-  @Autowired
-  ApplicationContext applicationContext;
+  @Autowired ApplicationContext applicationContext;
 
-  @Autowired
-  SpringAwareBotManagerImpl botManager;
+  @Autowired SpringAwareBotManagerImpl botManager;
 
   /**
    * This is run before each @TestD method.
    */
-  @Before
-  public void before(){
+  @Before public void before() {
     //create a bot instance and auto-wire it
-    this.bot = (MyBot) applicationContext.getAutowireCapableBeanFactory().autowire(MyBot.class, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
+    this.bot = (MyBot) applicationContext.getAutowireCapableBeanFactory()
+        .autowire(MyBot.class, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
     //the bot also needs a trigger so its act() method is called regularly.
     // (there is no trigger bean in the context)
     PeriodicTrigger trigger = new PeriodicTrigger(ACT_LOOP_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
@@ -73,11 +68,10 @@ public class MatcherBotTest
 
   /**
    * The main test method.
+   *
    * @throws Exception
    */
-  @Test
-  public void testMatcherBot() throws Exception
-  {
+  @Test public void testMatcherBot() throws Exception {
     logger.info("starting test case testMatcherBot");
     //adding the bot to the bot manager will cause it to be initialized.
     //at that point, the trigger starts.
@@ -92,14 +86,12 @@ public class MatcherBotTest
     logger.info("finishing test case testCommentBot");
   }
 
-
   /**
    * We create a subclass of the bot we want to test here so that we can
    * add a listener to its internal event bus and to access its listeners, which
    * record information during the run that we later check with asserts.
    */
-  public static class MyBot extends MatcherProtocolTestBot
-  {
+  public static class MyBot extends MatcherProtocolTestBot {
     /**
      * Used for synchronization with the @TestD method: it should wait at the
      * barrier until our bot is done, then execute the asserts.
@@ -109,33 +101,27 @@ public class MatcherBotTest
     /**
      * Default constructor is required for instantiation through Spring.
      */
-    public MyBot(){
+    public MyBot() {
     }
 
-    @Override
-    protected void initializeEventListeners()
-    {
+    @Override protected void initializeEventListeners() {
       //of course, let the real bot implementation initialize itself
       super.initializeEventListeners();
       //now, add a listener to the WorkDoneEvent.
       //its only purpose is to trip the CyclicBarrier instance that
       // the test method is waiting on
-      getEventBus().subscribe(WorkDoneEvent.class,
-        new ActionOnEventListener(
-          getEventListenerContext(),
-          new TripBarrierAction(getEventListenerContext(), barrier)));
+      getEventBus().subscribe(WorkDoneEvent.class, new ActionOnEventListener(getEventListenerContext(),
+              new TripBarrierAction(getEventListenerContext(), barrier)));
     }
 
-    public CyclicBarrier getBarrier()
-    {
+    public CyclicBarrier getBarrier() {
       return barrier;
     }
 
     /**
      * Here we check the results of the bot's execution.
      */
-    public void executeAsserts()
-    {
+    public void executeAsserts() {
       Assert.assertEquals(1, this.matcherRegistrator.getEventCount());
       Assert.assertEquals(0, this.matcherRegistrator.getExceptionCount());
       //1 act events
@@ -149,9 +135,7 @@ public class MatcherBotTest
       Assert.assertEquals(2, this.matcher.getEventCount());
       Assert.assertEquals(0, this.matcher.getExceptionCount());
 
-
-
-      Assert.assertEquals(1,this.allNeedsDeactivator.getEventCount());
+      Assert.assertEquals(1, this.allNeedsDeactivator.getEventCount());
       Assert.assertEquals(0, this.allNeedsDeactivator.getExceptionCount());
 
       //4 NeedDeactivated events

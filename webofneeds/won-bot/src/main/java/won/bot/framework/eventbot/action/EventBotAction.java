@@ -24,7 +24,6 @@ import won.bot.framework.eventbot.listener.EventListener;
  * when created and decide when to obtain a runnable from them and schedule them for
  * execution.
  */
-public interface EventBotAction
-{
+public interface EventBotAction {
   public Runnable getActionTask(Event event, EventListener eventListener);
 }

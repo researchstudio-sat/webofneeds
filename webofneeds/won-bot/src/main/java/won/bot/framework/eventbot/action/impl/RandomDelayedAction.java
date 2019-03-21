@@ -16,24 +16,24 @@
 
 package won.bot.framework.eventbot.action.impl;
 
-import java.util.Random;
-
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.EventBotAction;
+
+import java.util.Random;
 
 /**
  * Action that delegates to another action after a delay that is chosen at random between a specified minimum and
  * maximum.
  */
-public class RandomDelayedAction extends DelayedDelegatingAction
-{
+public class RandomDelayedAction extends DelayedDelegatingAction {
   private long minDelay;
   private long maxDelay;
   private long intervalLength;
   private long salt;
   private Random random;
 
-  public RandomDelayedAction(final EventListenerContext eventListenerContext, final long minDelay, final long maxDelay, final long salt, final EventBotAction delegate) {
+  public RandomDelayedAction(final EventListenerContext eventListenerContext, final long minDelay, final long maxDelay,
+      final long salt, final EventBotAction delegate) {
     super(eventListenerContext, delegate);
     this.minDelay = minDelay;
     this.maxDelay = maxDelay;
@@ -45,9 +45,8 @@ public class RandomDelayedAction extends DelayedDelegatingAction
     this.intervalLength = maxDelay - minDelay;
   }
 
-  @Override
-  protected long getDelay() {
+  @Override protected long getDelay() {
     double outcome = random.nextDouble();
-    return minDelay + ((long) ((double)intervalLength * outcome));
+    return minDelay + ((long) ((double) intervalLength * outcome));
   }
 }

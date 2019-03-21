@@ -16,16 +16,9 @@
 
 package won.bot.framework.eventbot.action.impl.monitor;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
 import org.javasimon.SimonManager;
 import org.javasimon.Split;
 import org.javasimon.Stopwatch;
-
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
@@ -33,11 +26,12 @@ import won.bot.framework.eventbot.event.impl.needlifecycle.NeedCreatedEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.HintFromMatcherEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 
+import java.util.*;
+
 /**
  * Created by hfriedrich on 02.10.2015.
  */
-public class MatchingLoadTestMonitorAction extends BaseEventBotAction
-{
+public class MatchingLoadTestMonitorAction extends BaseEventBotAction {
   Map<String, Long> needEventStartTime = Collections.synchronizedMap(new HashMap<>());
   Map<String, List<Long>> hintEventReceivedTime = Collections.synchronizedMap(new HashMap<>());
   Map<String, Split> needSplits = Collections.synchronizedMap(new HashMap<>());
@@ -48,8 +42,7 @@ public class MatchingLoadTestMonitorAction extends BaseEventBotAction
     super(eventListenerContext);
   }
 
-  @Override
-  protected void doRun(final Event event, EventListener executingListener) throws Exception {
+  @Override protected void doRun(final Event event, EventListener executingListener) throws Exception {
 
     Stopwatch stopwatch = SimonManager.getStopwatch("needHintFullRoundtrip");
     if (event instanceof NeedCreatedEvent) {
@@ -64,7 +57,8 @@ public class MatchingLoadTestMonitorAction extends BaseEventBotAction
 
     } else if (event instanceof HintFromMatcherEvent) {
 
-      logger.info("RECEIVED EVENT {} for uri {}", event, ((HintFromMatcherEvent) event).getMatch().getFromNeed().toString());
+      logger.info("RECEIVED EVENT {} for uri {}", event,
+          ((HintFromMatcherEvent) event).getMatch().getFromNeed().toString());
       long hintReceivedTime = System.currentTimeMillis();
       String needUri = ((HintFromMatcherEvent) event).getMatch().getFromNeed().toString();
       needSplits.get(((HintFromMatcherEvent) event).getMatch().getFromNeed().toString()).stop();
@@ -162,7 +156,7 @@ public class MatchingLoadTestMonitorAction extends BaseEventBotAction
 
   private float getNeedsWithNeedsPerSecond(long startTime) {
     long duration = System.currentTimeMillis() - startTime;
-    return ((float)getNeedsWithHints() * 1000) / duration;
+    return ((float) getNeedsWithHints() * 1000) / duration;
   }
 
 }

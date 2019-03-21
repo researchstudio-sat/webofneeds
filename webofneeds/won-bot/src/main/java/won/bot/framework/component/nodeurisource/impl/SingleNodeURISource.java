@@ -22,17 +22,14 @@ import java.net.URI;
  * User: fkleedorfer
  * Date: 19.12.13
  */
-public class SingleNodeURISource
-{
+public class SingleNodeURISource {
   private URI nodeURI;
 
-  public URI getNodeURI()
-  {
+  public URI getNodeURI() {
     return nodeURI;
   }
 
-  public void setNodeURI(final URI nodeURI)
-  {
+  public void setNodeURI(final URI nodeURI) {
     this.nodeURI = nodeURI;
   }
 }

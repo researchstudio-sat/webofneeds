@@ -16,44 +16,45 @@
 
 package won.protocol.util.linkeddata;
 
-import java.net.URI;
-import java.util.List;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.sparql.path.Path;
+
+import java.net.URI;
+import java.util.List;
 
 /**
  * Interface for fetching linked data as a jena Model.
  */
 public interface LinkedDataSource {
-    /**
-     * Obtains resource description of the resource identified by the given URI
-     *
-     * @param resourceURI
-     * @return resource description as Dataset, or empty Dataset if not a valid URI or not found
-     */
-    public Dataset getDataForResource(URI resourceURI);
+  /**
+   * Obtains resource description of the resource identified by the given URI
+   *
+   * @param resourceURI
+   * @return resource description as Dataset, or empty Dataset if not a valid URI
+   *         or not found
+   */
+  public Dataset getDataForResource(URI resourceURI);
 
-    /**
-     * Obtains resource description of the resource identified by the given URI
-     * for the requester identified by the given WebID. Used in case access
-     * to the resource is restricted by WebAccessControl (WebID-based access control).
-     *
-     * @param resourceURI    URI of the resource
-     * @param requesterWebID WebID of the entity requesting the resource
-     * @return resource description as Dataset, or empty Dataset if not a valid URI or not found or access not granted
-     */
-    public Dataset getDataForResource(URI resourceURI, URI requesterWebID);
+  /**
+   * Obtains resource description of the resource identified by the given URI for
+   * the requester identified by the given WebID. Used in case access to the
+   * resource is restricted by WebAccessControl (WebID-based access control).
+   *
+   * @param resourceURI    URI of the resource
+   * @param requesterWebID WebID of the entity requesting the resource
+   * @return resource description as Dataset, or empty Dataset if not a valid URI
+   *         or not found or access not granted
+   */
+  public Dataset getDataForResource(URI resourceURI, URI requesterWebID);
 
-    public Dataset getDataForResource(final URI resourceURI, List<URI> properties,
-                                      int maxRequest, int maxDepth);
+  public Dataset getDataForResource(final URI resourceURI, List<URI> properties, int maxRequest, int maxDepth);
 
-    public Dataset getDataForResource(final URI resourceURI, URI requesterWebID, List<URI> properties,
-                                      int maxRequest, int maxDepth);
+  public Dataset getDataForResource(final URI resourceURI, URI requesterWebID, List<URI> properties, int maxRequest,
+      int maxDepth);
 
-    public Dataset getDataForResourceWithPropertyPath(final URI resourceURI, final List<Path> properties, int maxRequest,
-                                                      int maxDepth, final boolean moveAllTriplesInDefaultGraph);
+  public Dataset getDataForResourceWithPropertyPath(final URI resourceURI, final List<Path> properties, int maxRequest,
+      int maxDepth, final boolean moveAllTriplesInDefaultGraph);
 
-    public Dataset getDataForResourceWithPropertyPath(final URI resourceURI, URI requesterWebID, final List<Path>
-            properties, int maxRequest, int maxDepth);
+  public Dataset getDataForResourceWithPropertyPath(final URI resourceURI, URI requesterWebID,
+      final List<Path> properties, int maxRequest, int maxDepth);
 }

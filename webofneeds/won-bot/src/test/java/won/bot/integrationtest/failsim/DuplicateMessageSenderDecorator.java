@@ -29,12 +29,10 @@ public class DuplicateMessageSenderDecorator extends BaseEventListenerContextDec
     super(delegate);
   }
 
-  @Override
-  public WonMessageSender getWonMessageSender() {
+  @Override public WonMessageSender getWonMessageSender() {
     final WonMessageSender delegate = super.getWonMessageSender();
     return new WonMessageSender() {
-      @Override
-      public void sendWonMessage(WonMessage message) throws WonMessageSenderException {
+      @Override public void sendWonMessage(WonMessage message) throws WonMessageSenderException {
         delegate.sendWonMessage(message);
         delegate.sendWonMessage(message);
       }

@@ -1,10 +1,7 @@
 package won.bot.framework.eventbot.action.impl.mail.receive;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import won.bot.framework.eventbot.action.impl.mail.model.ActionType;
+import won.bot.framework.eventbot.action.impl.mail.model.MailPropertyType;
 
 import javax.mail.Address;
 import javax.mail.BodyPart;
@@ -12,16 +9,17 @@ import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
-
-import won.bot.framework.eventbot.action.impl.mail.model.ActionType;
-import won.bot.framework.eventbot.action.impl.mail.model.MailPropertyType;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Extracts need properties like title, description, need type, etc from mails. Configurable via regular expression
  * patterns in spring xml
  */
-public class MailContentExtractor
-{
+public class MailContentExtractor {
   // check if mail is of type demand/supply/doTogether/critique?
   private Pattern demandTypePattern;
   private Pattern supplyTypePattern;
@@ -185,7 +183,8 @@ public class MailContentExtractor
   public boolean isCommandMail(MimeMessage message) throws IOException, MessagingException {
     // command mail is either an answer mail (with reference) to a previous mail (e.g. message, implicit connect) or an
     // explicitly set action command (e.g. subscribe, unsubscribe, close need)
-    return getMailReference(message) != null || (getMailAction(message) != null && !ActionType.NO_ACTION.equals(getMailAction(message)));
+    return getMailReference(message) != null || (getMailAction(message) != null && !ActionType.NO_ACTION
+        .equals(getMailAction(message)));
   }
 
   public ActionType getMailAction(MimeMessage message) throws IOException, MessagingException {
@@ -198,7 +197,7 @@ public class MailContentExtractor
       return ActionType.CLOSE_CONNECTION;
     } else if (cmdConnectPattern.matcher(message.getSubject()).matches()) {
       return ActionType.OPEN_CONNECTION;
-    } else if(cmdTakenPattern.matcher(message.getSubject()).matches()){
+    } else if (cmdTakenPattern.matcher(message.getSubject()).matches()) {
       return ActionType.CLOSE_NEED;
     } else {
       return ActionType.NO_ACTION;
@@ -247,9 +246,10 @@ public class MailContentExtractor
   public String[] getTags(MimeMessage message) throws MessagingException, IOException {
 
     HashSet<String> tags = new HashSet<>();
-    Matcher m = tagExtractionPattern.matcher(new StringBuilder(message.getSubject()).append(" ").append(message.getContent()).toString());
+    Matcher m = tagExtractionPattern
+        .matcher(new StringBuilder(message.getSubject()).append(" ").append(message.getContent()).toString());
 
-    while(m.find()) {
+    while (m.find()) {
       tags.add(m.group());
     }
 
@@ -260,7 +260,7 @@ public class MailContentExtractor
     return tagArray;
   }
 
-  public static String getFromAddressString(MimeMessage message) throws MessagingException{
+  public static String getFromAddressString(MimeMessage message) throws MessagingException {
 
     Address[] froms = message.getFrom();
     return (froms == null) ? null : ((InternetAddress) froms[0]).getAddress();

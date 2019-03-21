@@ -1,40 +1,34 @@
 package won.owner.web.sitemap;
 
-import java.net.MalformedURLException;
-
+import com.redfin.sitemapgenerator.WebSitemapGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.redfin.sitemapgenerator.WebSitemapGenerator;
-
 import won.owner.model.UserNeed;
 import won.owner.repository.UserNeedRepository;
 import won.owner.service.impl.URIService;
 
-@Service
-public final class SitemapService {
-	@Autowired
-    private URIService uriService;
+import java.net.MalformedURLException;
 
-	@Autowired
-	private UserNeedRepository userNeedRepository;
+@Service public final class SitemapService {
+  @Autowired private URIService uriService;
 
-	public void setUriService(URIService uriService) {
-		this.uriService = uriService;
-	}
+  @Autowired private UserNeedRepository userNeedRepository;
 
-	public void setUserNeedRepository(UserNeedRepository userNeedRepository) {
-		this.userNeedRepository = userNeedRepository;
-	}
+  public void setUriService(URIService uriService) {
+    this.uriService = uriService;
+  }
 
-	@Transactional(propagation = Propagation.SUPPORTS)
-	public String createSitemap() throws MalformedURLException {
-		WebSitemapGenerator sitemap = new WebSitemapGenerator(uriService.getOwnerProtocolOwnerURI().toString());
-		for (UserNeed need :  userNeedRepository.findAll()) {
-			sitemap.addUrl(uriService.getOwnerProtocolOwnerURI() + "/#!post/?postUri=" + need.getUri());
-		}
-		return String.join("", sitemap.writeAsStrings()); 
-	}
+  public void setUserNeedRepository(UserNeedRepository userNeedRepository) {
+    this.userNeedRepository = userNeedRepository;
+  }
+
+  @Transactional(propagation = Propagation.SUPPORTS) public String createSitemap() throws MalformedURLException {
+    WebSitemapGenerator sitemap = new WebSitemapGenerator(uriService.getOwnerProtocolOwnerURI().toString());
+    for (UserNeed need : userNeedRepository.findAll()) {
+      sitemap.addUrl(uriService.getOwnerProtocolOwnerURI() + "/#!post/?postUri=" + need.getUri());
+    }
+    return String.join("", sitemap.writeAsStrings());
+  }
 }

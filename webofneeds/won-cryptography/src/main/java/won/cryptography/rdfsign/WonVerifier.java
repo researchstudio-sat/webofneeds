@@ -1,7 +1,21 @@
 package won.cryptography.rdfsign;
 
-import static won.cryptography.rdfsign.WonSigner.ENV_HASH_ALGORITHM;
-import static won.cryptography.rdfsign.WonSigner.SIGNING_ALGORITHM_PROVIDER;
+import de.uni_koblenz.aggrimm.icp.crypto.sign.algorithm.SignatureAlgorithmInterface;
+import de.uni_koblenz.aggrimm.icp.crypto.sign.algorithm.algorithm.SignatureAlgorithmFisteus2010;
+import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.GraphCollection;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import won.protocol.message.WonSignatureData;
+import won.protocol.util.RdfUtils;
+import won.protocol.util.WonRdfUtils;
+import won.protocol.vocabulary.WONMSG;
 
 import java.io.StringWriter;
 import java.math.BigInteger;
@@ -12,30 +26,13 @@ import java.security.Signature;
 import java.util.Base64;
 import java.util.Map;
 
-import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.StmtIterator;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import de.uni_koblenz.aggrimm.icp.crypto.sign.algorithm.SignatureAlgorithmInterface;
-import de.uni_koblenz.aggrimm.icp.crypto.sign.algorithm.algorithm.SignatureAlgorithmFisteus2010;
-import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.GraphCollection;
-import won.protocol.message.WonSignatureData;
-import won.protocol.util.RdfUtils;
-import won.protocol.util.WonRdfUtils;
-import won.protocol.vocabulary.WONMSG;
+import static won.cryptography.rdfsign.WonSigner.ENV_HASH_ALGORITHM;
+import static won.cryptography.rdfsign.WonSigner.SIGNING_ALGORITHM_PROVIDER;
 
 /**
- * User: ypanchenko
- * Date: 15.07.2014
+ * User: ypanchenko Date: 15.07.2014
  */
-public class WonVerifier
-{
+public class WonVerifier {
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -69,8 +66,8 @@ public class WonVerifier
     return verificationState;
   }
 
-  //TODO exceptions
-  public boolean verify(Map<String,PublicKey> publicKeys) throws Exception {
+  // TODO exceptions
+  public boolean verify(Map<String, PublicKey> publicKeys) throws Exception {
     // check if there are any signatures at all
     if (verificationState.getSignatures().size() == 0) {
       verificationState.verificationFailed("No signatures found");
@@ -88,53 +85,57 @@ public class WonVerifier
     MessageDigest messageDigest = MessageDigest.getInstance(ENV_HASH_ALGORITHM, SIGNING_ALGORITHM_PROVIDER);
 
     // verify each signature's graph
-    for (WonSignatureData wonSignatureData: verificationState.getSignatures()) {
+    for (WonSignatureData wonSignatureData : verificationState.getSignatures()) {
       // extract signature graph, signature data and corresponding signed graph
       if (logger.isDebugEnabled()) {
-          String loaded = publicKeys.containsKey(wonSignatureData.getVerificationCertificateUri()) ? "loaded" : "NOT LOADED";
-          logger.debug("checking signature {} by certificate {}, which is {}", new Object[] {wonSignatureData.getSignatureUri(), wonSignatureData.getVerificationCertificateUri(), loaded});
+        String loaded = publicKeys.containsKey(wonSignatureData.getVerificationCertificateUri()) ? "loaded"
+            : "NOT LOADED";
+        logger.debug("checking signature {} by certificate {}, which is {}", new Object[] {
+            wonSignatureData.getSignatureUri(), wonSignatureData.getVerificationCertificateUri(), loaded });
       }
       // make sure the signed graph specified in signature exists in the message
       if (!dataset.containsNamedModel(wonSignatureData.getSignedGraphUri())) {
-        logger.debug("cannot verify signature {} as it is not part of this message ", wonSignatureData.getSignatureUri());
+        logger.debug("cannot verify signature {} as it is not part of this message ",
+            wonSignatureData.getSignatureUri());
         continue;
-        //TODO: fetch the external reference and check it here
-        //verificationState.setVerificationFailed(wonSignatureData.getSignatureUri(), "No signed graph found for " +
-        //   "signature " + wonSignatureData.getSignatureUri());
-        //return verificationState.isVerificationPassed();
+        // TODO: fetch the external reference and check it here
+        // verificationState.setVerificationFailed(wonSignatureData.getSignatureUri(),
+        // "No signed graph found for " +
+        // "signature " + wonSignatureData.getSignatureUri());
+        // return verificationState.isVerificationPassed();
       }
 
-      //is the signature there?
+      // is the signature there?
       String sigString = wonSignatureData.getSignatureValue();
       if (sigString == null) {
-        verificationState
-          .setVerificationFailed(wonSignatureData.getSignatureUri(), "Failed to compute a signature value " +
-          wonSignatureData.getSignatureUri());
+        verificationState.setVerificationFailed(wonSignatureData.getSignatureUri(),
+            "Failed to compute a signature value " + wonSignatureData.getSignatureUri());
         return verificationState.isVerificationPassed();
       }
       if (sigString.length() == 0) {
-        verificationState.setVerificationFailed(wonSignatureData.getSignatureUri(), "Computed an empty signature value " +
-          wonSignatureData.getSignatureUri());
+        verificationState.setVerificationFailed(wonSignatureData.getSignatureUri(),
+            "Computed an empty signature value " + wonSignatureData.getSignatureUri());
         return verificationState.isVerificationPassed();
       }
 
-      //do we have the public key?
+      // do we have the public key?
       PublicKey publicKey = publicKeys.get(wonSignatureData.getVerificationCertificateUri());
       if (publicKey == null) {
-        verificationState
-          .setVerificationFailed(wonSignatureData.getSignatureUri(), "No public key found for " + wonSignatureData.getSignatureUri());
+        verificationState.setVerificationFailed(wonSignatureData.getSignatureUri(),
+            "No public key found for " + wonSignatureData.getSignatureUri());
         if (logger.isDebugEnabled()) {
-            logger.debug("offending message:\n" + RdfUtils.toString(dataset));
+          logger.debug("offending message:\n" + RdfUtils.toString(dataset));
         }
         return verificationState.isVerificationPassed();
       }
 
-      //check if its fingerprint matches the fingerprint in the signature
+      // check if its fingerprint matches the fingerprint in the signature
       String fingerprint = Base64.getEncoder().encodeToString(messageDigest.digest(publicKey.getEncoded()));
-      if (!wonSignatureData.getPublicKeyFingerprint().equals(fingerprint)){
-        verificationState.setVerificationFailed(wonSignatureData.getSignatureUri(), "Fingerprint computed for the " +
-          "specified public key " + wonSignatureData.getVerificationCertificateUri() + " is " + fingerprint + ", " +
-          "which differs from the value found in signature " + wonSignatureData.getSignatureUri());
+      if (!wonSignatureData.getPublicKeyFingerprint().equals(fingerprint)) {
+        verificationState.setVerificationFailed(wonSignatureData.getSignatureUri(),
+            "Fingerprint computed for the " + "specified public key " + wonSignatureData.getVerificationCertificateUri()
+                + " is " + fingerprint + ", " + "which differs from the value found in signature "
+                + wonSignatureData.getSignatureUri());
         return verificationState.isVerificationPassed();
       }
       // normalize, hash and post-hash signed graph data
@@ -144,33 +145,33 @@ public class WonVerifier
       hashingAlgorithm.hash(inputGraph, ENV_HASH_ALGORITHM);
       hashingAlgorithm.postHash(inputGraph);
 
-      //check the hash of the data. It must be identical to the hash in the signature
+      // check the hash of the data. It must be identical to the hash in the signature
       BigInteger hashValue = inputGraph.getSignature().getHash();
       String hashString = Base64.getEncoder().encodeToString(hashValue.toByteArray());
-      if (!wonSignatureData.getHash().equals(hashString)){
-        verificationState.setVerificationFailed(wonSignatureData.getSignatureUri(), "Computed hash value " +
-          hashString + " differs from value " + wonSignatureData.getHash() +
-          " found in signature " + wonSignatureData.getSignatureUri());
+      if (!wonSignatureData.getHash().equals(hashString)) {
+        verificationState.setVerificationFailed(wonSignatureData.getSignatureUri(),
+            "Computed hash value " + hashString + " differs from value " + wonSignatureData.getHash()
+                + " found in signature " + wonSignatureData.getSignatureUri());
         if (logger.isDebugEnabled()) {
           StringWriter sw = new StringWriter();
           RDFDataMgr.write(sw, dataset.getNamedModel(wonSignatureData.getSignedGraphUri()), Lang.TRIG);
-          logger.debug("wrong signature hash for graph {} with content: {}",
-                       wonSignatureData.getSignedGraphUri(), sw.toString());
+          logger.debug("wrong signature hash for graph {} with content: {}", wonSignatureData.getSignedGraphUri(),
+              sw.toString());
         }
         return verificationState.isVerificationPassed();
       }
 
-      //verify the signature
-      Signature sig = Signature.getInstance(WonSigner.SIGNING_ALGORITHM_NAME,
-                                            SIGNING_ALGORITHM_PROVIDER);
+      // verify the signature
+      Signature sig = Signature.getInstance(WonSigner.SIGNING_ALGORITHM_NAME, SIGNING_ALGORITHM_PROVIDER);
 
       sig.initVerify(publicKey);
       sig.update(hashValue.toByteArray());
       // Verify
       byte[] sigBytes = Base64.getDecoder().decode(sigString);
       if (!sig.verify(sigBytes)) {
-        verificationState.setVerificationFailed(wonSignatureData.getSignatureUri(), "Failed to verify " + wonSignatureData
-          .getSignatureUri() + " with public key " + wonSignatureData.getVerificationCertificateUri());
+        verificationState.setVerificationFailed(wonSignatureData.getSignatureUri(),
+            "Failed to verify " + wonSignatureData.getSignatureUri() + " with public key "
+                + wonSignatureData.getVerificationCertificateUri());
         // interrupt verification process if one of the graph's verification fails
         return verificationState.isVerificationPassed();
       }
@@ -179,7 +180,6 @@ public class WonVerifier
     return verificationState.isVerificationPassed();
   }
 
-
   private void addSignatureToResult(final String graphUri, final Model model) {
     WonSignatureData wonSignatureData = WonRdfUtils.SignatureUtils.extractWonSignatureData(graphUri, model);
     if (wonSignatureData != null && wonSignatureData.getSignatureValue() != null) {
@@ -187,19 +187,16 @@ public class WonVerifier
     }
   }
 
-
   private void addSignatureReferenceToResult(final String graphURI, final Model model) {
 
     RDFNode tempNode = null;
     StmtIterator si = model.listStatements(null, WONMSG.CONTAINS_SIGNATURE_PROPERTY, tempNode);
     while (si.hasNext()) {
-      WonSignatureData sigRef = WonRdfUtils.SignatureUtils.extractWonSignatureData(si.nextStatement().getObject()
-                                                                                     .asResource());
+      WonSignatureData sigRef = WonRdfUtils.SignatureUtils
+          .extractWonSignatureData(si.nextStatement().getObject().asResource());
       verificationState.addSignatureData(sigRef);
     }
 
   }
-
-
 
 }

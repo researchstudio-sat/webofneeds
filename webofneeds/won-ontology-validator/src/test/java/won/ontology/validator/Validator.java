@@ -16,26 +16,18 @@
 
 package won.ontology.validator;
 
-import static org.hamcrest.CoreMatchers.hasItems;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.hamcrest.CoreMatchers.hasItems;
+import static org.junit.Assert.*;
 
 /**
  * JUnit tests to check the WoN ontology against the competency questions.
@@ -45,8 +37,7 @@ import org.junit.Test;
  * @version 2013/04
  */
 
-public class Validator
-{
+public class Validator {
 
   private final static String WON_ONTOLOGY_FILE = "/won_ontology_v0.11.rdf";
   private final static String EXAMPLE_ONTOLOGY_FILE = "/won_ontology_example_1.rdf";
@@ -54,13 +45,10 @@ public class Validator
   private final static String WON_ONTOLOGY_URI = "http://purl.org/webofneeds/model#";
   private final static String EXAMPLE_ONTOLOGY_URI = "http://purl.org/webofneeds/example#";
 
-
   private static OntModel ontModel;
   private static String sparqlPreface;
 
-  @BeforeClass
-  public static void loadOntologies()
-  {
+  @BeforeClass public static void loadOntologies() {
     ontModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_LITE_MEM_RULES_INF);
 
     System.out.println("loading ontologies... ");
@@ -75,9 +63,7 @@ public class Validator
         "PREFIX gr: <http://purl.org/goodrelations/v1#>";
   }
 
-  @Test
-  public void testCQEvent1()
-  {
+  @Test public void testCQEvent1() {
     System.out.println("executing queries...");
     String queryString = sparqlPreface +
         "SELECT ?event ?time WHERE {?event rdf:type won:Hint. " +
@@ -99,9 +85,7 @@ public class Validator
     assertThat(actualList, hasItems(expectedTime));
   }
 
-  @Test
-  public void testCQEvent2()
-  {
+  @Test public void testCQEvent2() {
     System.out.println("executing queries...");
     String queryString = sparqlPreface +
         "SELECT ?event ?eventType WHERE {" +
@@ -123,14 +107,14 @@ public class Validator
       qExec.close();
     }
     assertTrue("wrong number of results", actualList.size() >= 1);
-    String expected1 = "( ?event = <" + EXAMPLE_ONTOLOGY_URI + "Open_01_1> ) ( ?eventType = <" + WON_ONTOLOGY_URI + "Open> )";
-    String expected2 = "( ?event = <" + EXAMPLE_ONTOLOGY_URI + "Hint_01_1> ) ( ?eventType = <" + WON_ONTOLOGY_URI + "Hint> )";
+    String expected1 =
+        "( ?event = <" + EXAMPLE_ONTOLOGY_URI + "Open_01_1> ) ( ?eventType = <" + WON_ONTOLOGY_URI + "Open> )";
+    String expected2 =
+        "( ?event = <" + EXAMPLE_ONTOLOGY_URI + "Hint_01_1> ) ( ?eventType = <" + WON_ONTOLOGY_URI + "Hint> )";
     assertThat(actualList, hasItems(expected1, expected2));
   }
 
-  @Test
-  public void testCQEvent3()
-  {
+  @Test public void testCQEvent3() {
     System.out.println("executing queries...");
     String queryString = sparqlPreface +
         "SELECT ?event ?originator WHERE {" +
@@ -151,14 +135,14 @@ public class Validator
       qExec.close();
     }
     assertEquals("wrong number of results", 2, actualList.size());
-    String expected1 = "( ?event = <" + EXAMPLE_ONTOLOGY_URI + "Open_01_1> ) ( ?originator = <" + EXAMPLE_ONTOLOGY_URI + "NeedOwner_1> )";
-    String expected2 = "( ?event = <" + EXAMPLE_ONTOLOGY_URI + "Hint_01_1> ) ( ?originator = <" + EXAMPLE_ONTOLOGY_URI + "Matcher_01> )";
+    String expected1 = "( ?event = <" + EXAMPLE_ONTOLOGY_URI + "Open_01_1> ) ( ?originator = <" + EXAMPLE_ONTOLOGY_URI
+        + "NeedOwner_1> )";
+    String expected2 = "( ?event = <" + EXAMPLE_ONTOLOGY_URI + "Hint_01_1> ) ( ?originator = <" + EXAMPLE_ONTOLOGY_URI
+        + "Matcher_01> )";
     assertThat(actualList, hasItems(expected1, expected2));
   }
 
-  @Test
-  public void testCQHow1()
-  {
+  @Test public void testCQHow1() {
     System.out.println("executing queries...");
     String queryString = sparqlPreface +
         "SELECT ?need ?needModality ?price ?currency ?lowerPrice ?upperPrice WHERE {" +
@@ -195,9 +179,7 @@ public class Validator
     assertThat(actualList, hasItems(expected1, expected2));
   }
 
-  @Test
-  public void testCQWhat1()
-  {
+  @Test public void testCQWhat1() {
     System.out.println("executing queries...");
     String queryString = sparqlPreface +
         "SELECT ?need ?text ?description WHERE {" +
@@ -225,9 +207,7 @@ public class Validator
     assertThat(actualList, hasItems(expected));
   }
 
-  @Test
-  public void testCQWhat2()
-  {
+  @Test public void testCQWhat2() {
     System.out.println("executing queries...");
     String queryString = sparqlPreface +
         "SELECT ?need ?descType WHERE {" +
@@ -253,9 +233,7 @@ public class Validator
     assertThat(actualList, hasItems(expected));
   }
 
-  @Test
-  public void testCQWhat4()
-  {
+  @Test public void testCQWhat4() {
     System.out.println("executing queries...");
     String queryString = sparqlPreface +
         "SELECT ?need ?height ?heightV ?heightM ?width ?widthV ?widthM " +
@@ -298,9 +276,7 @@ public class Validator
     assertThat(actualList, hasItems(expected));
   }
 
-  @Test
-  public void testCQWhat6()
-  {
+  @Test public void testCQWhat6() {
     System.out.println("executing queries...");
     String queryString = sparqlPreface +
         "SELECT ?need ?height ?width ?depth ?weight WHERE {" +
@@ -332,9 +308,7 @@ public class Validator
     assertThat(actualList, hasItems(expected));
   }
 
-  @Test
-  public void testCQWhen1()
-  {
+  @Test public void testCQWhen1() {
     System.out.println("executing queries...");
     String queryString = sparqlPreface +
         "SELECT ?need ?creationDate WHERE {" +
@@ -361,9 +335,7 @@ public class Validator
     assertThat(actualList, hasItems(expected1, expected2));
   }
 
-  @Test
-  public void testCQWhen3()
-  {
+  @Test public void testCQWhen3() {
     System.out.println("executing queries...");
     String queryString = sparqlPreface +
         "SELECT ?need ?needModality ?timeConstraint ?p ?o WHERE {" +
@@ -424,13 +396,12 @@ public class Validator
         "( ?needModality = <" + EXAMPLE_ONTOLOGY_URI + "NeedModality_01_2> ) " +
         "( ?timeConstraint = <" + EXAMPLE_ONTOLOGY_URI + "TimeConstraint_01_2> ) " +
         "( ?p = <" + WON_ONTOLOGY_URI + "startTime> ) ( ?o = \"2013-04-04T09:00:00+02:00\"^^xsd:dateTimeStamp )";
-    assertThat(actualList, hasItems(expected1, expected2, expected3, expected4, expected5, expected6, expected7,
-        expected8, expected9, expected10));
+    assertThat(actualList,
+        hasItems(expected1, expected2, expected3, expected4, expected5, expected6, expected7, expected8, expected9,
+            expected10));
   }
 
-  @Test
-  public void testCQWhere1()
-  {
+  @Test public void testCQWhere1() {
     System.out.println("executing queries...");
     String queryString = sparqlPreface +
         "SELECT ?need ?needModality ?location ?p ?o WHERE {" +
@@ -468,9 +439,7 @@ public class Validator
     assertThat(actualList, hasItems(expected1, expected2, expected3));
   }
 
-  @Test
-  public void testCQWhere2()
-  {
+  @Test public void testCQWhere2() {
     System.out.println("executing queries...");
     String queryString = sparqlPreface +
         "SELECT ?need ?location ?concealed WHERE {" +
@@ -499,9 +468,7 @@ public class Validator
     assertThat(actualList, hasItems(expected1, expected2));
   }
 
-  @Test
-  public void testCQWho1()
-  {
+  @Test public void testCQWho1() {
     System.out.println("executing queries...");
     String queryString = sparqlPreface +
         "SELECT ?need ?owner WHERE {" +
@@ -526,9 +493,7 @@ public class Validator
     assertThat(actualList, hasItems(expected));
   }
 
-  @Test
-  public void testCQState1()
-  {
+  @Test public void testCQState1() {
     System.out.println("executing queries...");
     String queryString = sparqlPreface +
         "SELECT ?need ?state WHERE {" +
@@ -556,9 +521,7 @@ public class Validator
     assertEquals("wrong number of results", 2, actualList.size());
   }
 
-  @Test
-  public void testCQEventStatement1()
-  {
+  @Test public void testCQEventStatement1() {
     System.out.println("executing queries...");
     String queryString = sparqlPreface +
         "SELECT ?event ?additionalInfo WHERE {?event rdf:type won:Event. " +
@@ -576,15 +539,13 @@ public class Validator
     } finally {
       qExec.close();
     }
-    String expected1 = "( ?event = <http://purl.org/webofneeds/example#Hint_01_1> ) " +
-        "( ?additionalInfo = <http://purl.org/webofneeds/example#MatchExplanation_01> )";
+    String expected1 = "( ?event = <http://purl.org/webofneeds/example#Hint_01_1> ) "
+        + "( ?additionalInfo = <http://purl.org/webofneeds/example#MatchExplanation_01> )";
     assertThat(actualList, hasItems(expected1));
     assertEquals("wrong number of results", 1, actualList.size());
   }
 
-  @Test
-  public void testCQConstraint1()
-  {
+  @Test public void testCQConstraint1() {
     System.out.println("executing queries...");
     String queryString = sparqlPreface +
         "SELECT ?need ?constraint WHERE {?need rdf:type won:Need. " +
@@ -607,9 +568,7 @@ public class Validator
     assertEquals("wrong number of results", 1, actualList.size());
   }
 
-  @Test
-  public void testCQTag1()
-  {
+  @Test public void testCQTag1() {
     System.out.println("executing queries...");
     String queryString = sparqlPreface +
         "SELECT ?need ?tag WHERE {?need rdf:type won:Need. " +
@@ -628,10 +587,10 @@ public class Validator
     } finally {
       qExec.close();
     }
-    String expected1 = "( ?need = <http://purl.org/webofneeds/example#Need_01> ) " +
-        "( ?tag = <http://www.dmoz.org/Shopping/Home_and_Garden/Furniture/Recycled_Materials/> )";
-    String expected2 = "( ?need = <http://purl.org/webofneeds/example#Need_01> ) " +
-        "( ?tag = <http://www.dmoz.org/Shopping/Home_and_Garden/Furniture/> )";
+    String expected1 = "( ?need = <http://purl.org/webofneeds/example#Need_01> ) "
+        + "( ?tag = <http://www.dmoz.org/Shopping/Home_and_Garden/Furniture/Recycled_Materials/> )";
+    String expected2 = "( ?need = <http://purl.org/webofneeds/example#Need_01> ) "
+        + "( ?tag = <http://www.dmoz.org/Shopping/Home_and_Garden/Furniture/> )";
     assertThat(actualList, hasItems(expected1, expected2));
     assertEquals("wrong number of results", 2, actualList.size());
   }
@@ -641,8 +600,7 @@ public class Validator
    *
    * @param args
    */
-  public static void mainDeactivated (String[] args)
-  {
+  public static void mainDeactivated(String[] args) {
     loadOntologies();
     System.out.println("executing queries...");
 

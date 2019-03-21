@@ -20,50 +20,31 @@
 
 package won.owner.model;
 
-import java.net.URI;
-
-import javax.persistence.Column;
-import javax.persistence.Convert;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import won.protocol.model.URIConverter;
+
+import javax.persistence.*;
+import java.net.URI;
 
 /**
  * I used wonuser as table name because user is Postgres keyword - http://www.postgresql.org/message-id/Pine.NEB.4.10.10008291649550.4357-100000@scimitar.caravan.com
- *
  */
-@Entity
-@Table(
-		name = "needDraft",
-		uniqueConstraints = @UniqueConstraint(columnNames = {"id","draftURI"})
-)
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class Draft
-{
+@Entity @Table(
+    name = "needDraft",
+    uniqueConstraints = @UniqueConstraint(columnNames = { "id",
+        "draftURI" })) @JsonIgnoreProperties(ignoreUnknown = true) public class Draft {
 
-  @Id
-	@GeneratedValue
-	@Column(name = "id")
-	private Long id;
+  @Id @GeneratedValue @Column(name = "id") private Long id;
 
-  @Column( name = "draftURI", unique = true)
-  @Convert( converter = URIConverter.class)
-  private URI draftURI;
+  @Column(name = "draftURI", unique = true) @Convert(converter = URIConverter.class) private URI draftURI;
 
-  @Column( length=10000)
-  private String content;
+  @Column(length = 10000) private String content;
 
-  public Draft(){
+  public Draft() {
   }
 
-  public Draft(URI draftURI, String content){
-       this.draftURI = draftURI;
+  public Draft(URI draftURI, String content) {
+    this.draftURI = draftURI;
     this.content = content;
   }
 
@@ -71,12 +52,9 @@ public class Draft
     return id;
   }
 
-
   public URI getDraftURI() {
     return draftURI;
   }
-
-
 
   public void setDraftURI(final URI draftURI) {
     this.draftURI = draftURI;
@@ -85,6 +63,7 @@ public class Draft
   public void setId(final Long id) {
     this.id = id;
   }
+
   public String getContent() {
     return content;
   }
@@ -92,6 +71,5 @@ public class Draft
   public void setContent(final String content) {
     this.content = content;
   }
-
 
 }

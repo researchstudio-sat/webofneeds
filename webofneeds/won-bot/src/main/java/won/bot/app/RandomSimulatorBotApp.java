@@ -20,20 +20,14 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.stereotype.Component;
 
-@Component
-public class RandomSimulatorBotApp implements CommandLineRunner
-{
+@Component public class RandomSimulatorBotApp implements CommandLineRunner {
 
   public static void main(String[] args) {
-    SpringApplication app = new SpringApplication(
-        new Object[]{"classpath:/spring/app/randomSimulatorBotApp.xml"}
-    );
+    SpringApplication app = new SpringApplication(new Object[] { "classpath:/spring/app/randomSimulatorBotApp.xml" });
     app.setWebEnvironment(false);
     app.run(args);
   }
 
-  @Override
-  public void run(final String... strings) throws Exception
-  {
+  @Override public void run(final String... strings) throws Exception {
   }
 }

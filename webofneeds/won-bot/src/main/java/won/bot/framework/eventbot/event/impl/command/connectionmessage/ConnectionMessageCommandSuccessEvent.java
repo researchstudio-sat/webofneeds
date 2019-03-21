@@ -23,19 +23,21 @@ import won.protocol.message.WonMessage;
 /**
  * Indicates that the bot has successfully sent a connection message.
  */
-public class ConnectionMessageCommandSuccessEvent extends AbstractMessageCommandResultEvent implements MessageCommandSuccessEvent, ConnectionMessageCommandResultEvent {
-    private WonMessage wonMessage;
-    public ConnectionMessageCommandSuccessEvent(ConnectionMessageCommandEvent originalCommandEvent, WonMessage wonMessage) {
-        super(originalCommandEvent, originalCommandEvent.getCon());
-        this.wonMessage = wonMessage;
-    }
+public class ConnectionMessageCommandSuccessEvent extends AbstractMessageCommandResultEvent
+    implements MessageCommandSuccessEvent, ConnectionMessageCommandResultEvent {
+  private WonMessage wonMessage;
 
-    @Override
-    public boolean isSuccess() {
-        return true;
-    }
+  public ConnectionMessageCommandSuccessEvent(ConnectionMessageCommandEvent originalCommandEvent,
+      WonMessage wonMessage) {
+    super(originalCommandEvent, originalCommandEvent.getCon());
+    this.wonMessage = wonMessage;
+  }
 
-    public WonMessage getWonMessage() {
-        return wonMessage;
-    }
+  @Override public boolean isSuccess() {
+    return true;
+  }
+
+  public WonMessage getWonMessage() {
+    return wonMessage;
+  }
 }

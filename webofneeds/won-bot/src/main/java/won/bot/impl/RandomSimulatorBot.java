@@ -51,121 +51,99 @@ import won.bot.framework.eventbot.listener.impl.ActionOnceAfterNEventsListener;
  *
  */
 public class RandomSimulatorBot extends EventBot {
-    private static final double PROB_OPEN_ON_HINT = 0.3;
-    private static final double PROB_MESSAGE_ON_OPEN = 0.5;
-    private static final double PROB_MESSAGE_ON_MESSAGE = 0.5;
-    private static final long MIN_RECATION_TIMEOUT_MILLIS = 1 * 1000;
-    private static final long MAX_REACTION_TIMEOUT_MILLIS = 3 * 1000;
-    private static final long MIN_NEXT_CREATION_TIMEOUT_MILLIS = 1 * 1000;
-    private static final long MAX_NEXT_CREATION_TIMEOUT_MILLIS = 3 * 1000;
+  private static final double PROB_OPEN_ON_HINT = 0.3;
+  private static final double PROB_MESSAGE_ON_OPEN = 0.5;
+  private static final double PROB_MESSAGE_ON_MESSAGE = 0.5;
+  private static final long MIN_RECATION_TIMEOUT_MILLIS = 1 * 1000;
+  private static final long MAX_REACTION_TIMEOUT_MILLIS = 3 * 1000;
+  private static final long MIN_NEXT_CREATION_TIMEOUT_MILLIS = 1 * 1000;
+  private static final long MAX_NEXT_CREATION_TIMEOUT_MILLIS = 3 * 1000;
 
-    protected BaseEventListener groupMemberCreator;
-    protected BaseEventListener workDoneSignaller;
+  protected BaseEventListener groupMemberCreator;
+  protected BaseEventListener workDoneSignaller;
 
-    @Override
-    protected void initializeEventListeners() {
-        final EventListenerContext ctx = getEventListenerContext();
+  @Override protected void initializeEventListeners() {
+    final EventListenerContext ctx = getEventListenerContext();
 
-        EventBus bus = getEventBus();
+    EventBus bus = getEventBus();
 
-        final Counter needCreationSuccessfulCounter = new CounterImpl("needsCreated");
-        final Counter needCreationFailedCounter = new CounterImpl("needCreationFailed");
-        final Counter needCreationStartedCounter = new CounterImpl("creationStarted");
-        final Counter creationUnfinishedCounter = new CounterImpl("creationUnfinished");
+    final Counter needCreationSuccessfulCounter = new CounterImpl("needsCreated");
+    final Counter needCreationFailedCounter = new CounterImpl("needCreationFailed");
+    final Counter needCreationStartedCounter = new CounterImpl("creationStarted");
+    final Counter creationUnfinishedCounter = new CounterImpl("creationUnfinished");
 
-        //create the first need when the first actEvent happens
-        this.groupMemberCreator = new ActionOnceAfterNEventsListener(
-                ctx, "groupMemberCreator", 1,
-                new MultipleActions(ctx,
-                        new IncrementCounterAction(ctx, needCreationStartedCounter),
-                        new IncrementCounterAction(ctx, creationUnfinishedCounter),
-                        new CreateNeedWithFacetsAction(ctx, getBotContextWrapper().getNeedCreateListName())
-                )
-        );
-        bus.subscribe(ActEvent.class, this.groupMemberCreator);
+    //create the first need when the first actEvent happens
+    this.groupMemberCreator = new ActionOnceAfterNEventsListener(ctx, "groupMemberCreator", 1,
+        new MultipleActions(ctx, new IncrementCounterAction(ctx, needCreationStartedCounter),
+            new IncrementCounterAction(ctx, creationUnfinishedCounter),
+            new CreateNeedWithFacetsAction(ctx, getBotContextWrapper().getNeedCreateListName())));
+    bus.subscribe(ActEvent.class, this.groupMemberCreator);
 
-        //when a need is created (or it failed), decrement the creationUnfinishedCounter
-        EventListener downCounter = new ActionOnEventListener(ctx, "downCounter",
-                new DecrementCounterAction(ctx, creationUnfinishedCounter));
-        //count a successful need creation
-        bus.subscribe(NeedCreatedEvent.class, downCounter);
-        //if a creation failed, we don't want to keep us from keeping the correct count
-        bus.subscribe(NeedCreationFailedEvent.class, downCounter);
-        //we count the one execution when the creator realizes that the producer is exhausted, we have to count down
-        //once for that, too.
-        bus.subscribe(NeedProducerExhaustedEvent.class, downCounter);
+    //when a need is created (or it failed), decrement the creationUnfinishedCounter
+    EventListener downCounter = new ActionOnEventListener(ctx, "downCounter",
+        new DecrementCounterAction(ctx, creationUnfinishedCounter));
+    //count a successful need creation
+    bus.subscribe(NeedCreatedEvent.class, downCounter);
+    //if a creation failed, we don't want to keep us from keeping the correct count
+    bus.subscribe(NeedCreationFailedEvent.class, downCounter);
+    //we count the one execution when the creator realizes that the producer is exhausted, we have to count down
+    //once for that, too.
+    bus.subscribe(NeedProducerExhaustedEvent.class, downCounter);
 
-        //also, keep track of what worked and what didn't
-        bus.subscribe(NeedCreationFailedEvent.class, new ActionOnEventListener(ctx, new IncrementCounterAction(ctx, needCreationFailedCounter)));
-        bus.subscribe(NeedCreatedEvent.class, new ActionOnEventListener(ctx, new IncrementCounterAction(ctx, needCreationSuccessfulCounter)));
+    //also, keep track of what worked and what didn't
+    bus.subscribe(NeedCreationFailedEvent.class,
+        new ActionOnEventListener(ctx, new IncrementCounterAction(ctx, needCreationFailedCounter)));
+    bus.subscribe(NeedCreatedEvent.class,
+        new ActionOnEventListener(ctx, new IncrementCounterAction(ctx, needCreationSuccessfulCounter)));
 
+    //print a logging message every N needs
+    bus.subscribe(NeedCreatedEvent.class, new ActionOnEventListener(ctx, "logger", new BaseEventBotAction(ctx) {
+      int lastOutput = 0;
 
-        //print a logging message every N needs
-        bus.subscribe(NeedCreatedEvent.class, new ActionOnEventListener(ctx, "logger", new BaseEventBotAction(ctx) {
-            int lastOutput = 0;
+      @Override protected void doRun(final Event event, EventListener executingListener) throws Exception {
+        int cnt = needCreationStartedCounter.getCount();
+        int unfinishedCount = creationUnfinishedCounter.getCount();
+        int successCnt = needCreationSuccessfulCounter.getCount();
+        int failedCnt = needCreationFailedCounter.getCount();
+        if (cnt - lastOutput >= 200) {
+          logger.info("started creation of {} needs, creation not yet finished for {}. Successful: {}, failed: {}",
+              new Object[] { cnt, unfinishedCount, successCnt, failedCnt });
+          lastOutput = cnt;
+        }
+      }
+    }));
 
-            @Override
-            protected void doRun(final Event event, EventListener executingListener) throws Exception {
-                int cnt = needCreationStartedCounter.getCount();
-                int unfinishedCount = creationUnfinishedCounter.getCount();
-                int successCnt = needCreationSuccessfulCounter.getCount();
-                int failedCnt = needCreationFailedCounter.getCount();
-                if (cnt - lastOutput >= 200) {
-                    logger.info("started creation of {} needs, creation not yet finished for {}. Successful: {}, failed: {}",
-                            new Object[]{cnt,
-                                    unfinishedCount,
-                                    successCnt,
-                                    failedCnt});
-                    lastOutput = cnt;
-                }
-            }
-        }));
+    //each time a need was created, wait for a random interval, then create another one
+    bus.subscribe(NeedCreatedEvent.class, new ActionOnEventListener(ctx,
+            new RandomDelayedAction(ctx, MIN_NEXT_CREATION_TIMEOUT_MILLIS, MAX_NEXT_CREATION_TIMEOUT_MILLIS,
+                this.hashCode(), new CreateNeedWithFacetsAction(ctx, getBotContextWrapper().getNeedCreateListName()))));
 
+    //when a hint is received, connect fraction of the cases after a random timeout
+    bus.subscribe(HintFromMatcherEvent.class, new ActionOnEventListener(ctx, "hint-reactor",
+            new RandomDelayedAction(ctx, MIN_RECATION_TIMEOUT_MILLIS, MAX_REACTION_TIMEOUT_MILLIS,
+                (long) this.hashCode(), new MultipleActions(ctx, new SendFeedbackForHintAction(ctx),
+                new ProbabilisticSelectionAction(ctx, PROB_OPEN_ON_HINT, (long) this.hashCode(),
+                    new OpenConnectionAction(ctx, "Hi!"), new CloseConnectionAction(ctx, "Bye!"))))));
 
-        //each time a need was created, wait for a random interval, then create another one
-        bus.subscribe(NeedCreatedEvent.class, new ActionOnEventListener(ctx,
-                new RandomDelayedAction(ctx, MIN_NEXT_CREATION_TIMEOUT_MILLIS, MAX_NEXT_CREATION_TIMEOUT_MILLIS, this.hashCode(),
-                        new CreateNeedWithFacetsAction(ctx, getBotContextWrapper().getNeedCreateListName())))
-        );
+    //when an open or connect is received, send message or close randomly after a random timeout
+    EventListener opener = new ActionOnEventListener(ctx, "open-reactor",
+        new RandomDelayedAction(ctx, MIN_RECATION_TIMEOUT_MILLIS, MAX_REACTION_TIMEOUT_MILLIS, (long) this.hashCode(),
+            new ProbabilisticSelectionAction(ctx, PROB_MESSAGE_ON_OPEN, (long) this.hashCode(),
+                new OpenConnectionAction(ctx, "Hi!"), new CloseConnectionAction(ctx, "Bye!"))));
+    bus.subscribe(OpenFromOtherNeedEvent.class, opener);
+    bus.subscribe(ConnectFromOtherNeedEvent.class, opener);
 
-        //when a hint is received, connect fraction of the cases after a random timeout
-        bus.subscribe(HintFromMatcherEvent.class,
-                new ActionOnEventListener(ctx, "hint-reactor",
-                        new RandomDelayedAction(ctx, MIN_RECATION_TIMEOUT_MILLIS, MAX_REACTION_TIMEOUT_MILLIS, (long) this.hashCode(),
-                                new MultipleActions(ctx,
-                                        new SendFeedbackForHintAction(ctx),
-                                        new ProbabilisticSelectionAction(ctx, PROB_OPEN_ON_HINT, (long) this.hashCode(),
-                                                new OpenConnectionAction(ctx, "Hi!"),
-                                                new CloseConnectionAction(ctx, "Bye!")))
-                        )));
+    //when an open is received, send message or close randomly after a random timeout
+    EventListener replyer = new ActionOnEventListener(ctx, "message-reactor",
+        new RandomDelayedAction(ctx, MIN_RECATION_TIMEOUT_MILLIS, MAX_REACTION_TIMEOUT_MILLIS, (long) this.hashCode(),
+            new ProbabilisticSelectionAction(ctx, PROB_MESSAGE_ON_MESSAGE, (long) this.hashCode(),
+                new SendMessageAction(ctx), new CloseConnectionAction(ctx, "Bye!"))));
+    bus.subscribe(MessageFromOtherNeedEvent.class, replyer);
+    bus.subscribe(OpenFromOtherNeedEvent.class, replyer);
 
-        //when an open or connect is received, send message or close randomly after a random timeout
-        EventListener opener =
-                new ActionOnEventListener(ctx, "open-reactor",
-                        new RandomDelayedAction(ctx, MIN_RECATION_TIMEOUT_MILLIS, MAX_REACTION_TIMEOUT_MILLIS, (long) this.hashCode(),
-                                new ProbabilisticSelectionAction(ctx, PROB_MESSAGE_ON_OPEN, (long) this.hashCode(),
-                                        new OpenConnectionAction(ctx, "Hi!"),
-                                        new CloseConnectionAction(ctx, "Bye!"))));
-        bus.subscribe(OpenFromOtherNeedEvent.class, opener);
-        bus.subscribe(ConnectFromOtherNeedEvent.class, opener);
-
-        //when an open is received, send message or close randomly after a random timeout
-        EventListener replyer = new ActionOnEventListener(ctx, "message-reactor",
-                new RandomDelayedAction(ctx, MIN_RECATION_TIMEOUT_MILLIS, MAX_REACTION_TIMEOUT_MILLIS, (long) this.hashCode(),
-                        new ProbabilisticSelectionAction(ctx, PROB_MESSAGE_ON_MESSAGE, (long) this.hashCode(),
-                                new SendMessageAction(ctx),
-                                new CloseConnectionAction(ctx, "Bye!"))));
-        bus.subscribe(MessageFromOtherNeedEvent.class, replyer);
-        bus.subscribe(OpenFromOtherNeedEvent.class, replyer);
-
-
-        //When the needproducer is exhausted, stop.
-        this.workDoneSignaller = new ActionOnEventListener(
-                ctx, "workDoneSignaller",
-                new SignalWorkDoneAction(ctx),
-                1
-        );
-        bus.subscribe(NeedProducerExhaustedEvent.class, this.workDoneSignaller);
-    }
+    //When the needproducer is exhausted, stop.
+    this.workDoneSignaller = new ActionOnEventListener(ctx, "workDoneSignaller", new SignalWorkDoneAction(ctx), 1);
+    bus.subscribe(NeedProducerExhaustedEvent.class, this.workDoneSignaller);
+  }
 
 }

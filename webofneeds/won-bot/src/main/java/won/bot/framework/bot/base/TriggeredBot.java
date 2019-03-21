@@ -16,26 +16,22 @@
 
 package won.bot.framework.bot.base;
 
-import java.util.concurrent.ScheduledFuture;
-
 import org.springframework.scheduling.Trigger;
+
+import java.util.concurrent.ScheduledFuture;
 
 /**
  * Bot base class that expects a trigger to be injected that will cause the act() method to be called according to the trigger's specification.
  */
-public abstract class TriggeredBot extends ScheduledActionBot
-{
+public abstract class TriggeredBot extends ScheduledActionBot {
   private Trigger trigger;
   private ScheduledFuture scheduledExecution;
 
-  @Override
-  protected void doInitialize()
-  {
+  @Override protected void doInitialize() {
     doInitializeCustom();
     if (trigger != null) {
       this.scheduledExecution = getTaskScheduler().schedule(new Runnable() {
-        @Override
-        public void run() {
+        @Override public void run() {
           try {
             TriggeredBot.this.act();
           } catch (Exception e) {
@@ -50,9 +46,10 @@ public abstract class TriggeredBot extends ScheduledActionBot
 
   /**
    * Returns true if the trigger won't cause any more executions (and none are currently running).
+   *
    * @return
    */
-  protected boolean isTriggerDone(){
+  protected boolean isTriggerDone() {
     return this.scheduledExecution.isDone();
   }
 
@@ -61,9 +58,7 @@ public abstract class TriggeredBot extends ScheduledActionBot
    */
   protected abstract void doInitializeCustom();
 
-  @Override
-  protected void doShutdown()
-  {
+  @Override protected void doShutdown() {
     logger.info("bot is shutting down");
     this.scheduledExecution.cancel(true);
     doShutdownCustom();
@@ -78,27 +73,22 @@ public abstract class TriggeredBot extends ScheduledActionBot
    * Overrides the inherited method so as to also cancel the trigger when
    * indicating that the bot's work is done.
    */
-  @Override
-  protected void workIsDone()
-  {
+  @Override protected void workIsDone() {
     logger.info("triggered bot signalling workIsDone");
     this.cancelTrigger();
     super.workIsDone();
   }
 
-  protected void cancelTrigger()
-  {
+  protected void cancelTrigger() {
     logger.info("canceling trigger");
     scheduledExecution.cancel(true);
   }
 
-  protected ScheduledFuture getScheduledExecution()
-  {
+  protected ScheduledFuture getScheduledExecution() {
     return scheduledExecution;
   }
 
-  public void setTrigger(final Trigger trigger)
-  {
+  public void setTrigger(final Trigger trigger) {
     this.trigger = trigger;
   }
 }

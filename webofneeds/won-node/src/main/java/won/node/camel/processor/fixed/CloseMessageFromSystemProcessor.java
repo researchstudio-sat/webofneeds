@@ -16,12 +16,9 @@
 
 package won.node.camel.processor.fixed;
 
-import java.net.URI;
-
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.springframework.stereotype.Component;
-
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.node.camel.processor.general.OutboundMessageFactoryProcessor;
@@ -34,23 +31,21 @@ import won.protocol.model.ConnectionEventType;
 import won.protocol.model.ConnectionState;
 import won.protocol.vocabulary.WONMSG;
 
+import java.net.URI;
 
 /**
  * Processes a CLOSE message coming from the FROM_SYSTEM direction.
  * The effects are:
  * <ul>
- *   <li>the connection is closed</li>
- *   <li>a CLOSE message is sent to the remote end the connection</li>
- *   <li>the message is forwarded to the owner (so the owner notices the CLOSE)</li>
+ * <li>the connection is closed</li>
+ * <li>a CLOSE message is sent to the remote end the connection</li>
+ * <li>the message is forwarded to the owner (so the owner notices the CLOSE)</li>
  * </ul>
- *
  */
-@Component
-@FixedMessageProcessor(
-        direction= WONMSG.TYPE_FROM_SYSTEM_STRING,
-        messageType = WONMSG.TYPE_CLOSE_STRING)
-public class CloseMessageFromSystemProcessor extends AbstractCamelProcessor
-{
+@Component @FixedMessageProcessor(
+    direction = WONMSG.TYPE_FROM_SYSTEM_STRING,
+    messageType = WONMSG.TYPE_CLOSE_STRING) public class CloseMessageFromSystemProcessor
+    extends AbstractCamelProcessor {
 
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
@@ -60,7 +55,7 @@ public class CloseMessageFromSystemProcessor extends AbstractCamelProcessor
 
     Connection con = connectionRepository.findOneByConnectionURIForUpdate(wonMessage.getSenderURI()).get();
     ConnectionState originalState = con.getState();
-      //TODO: we could introduce SYSTEM_CLOSE here
+    //TODO: we could introduce SYSTEM_CLOSE here
     con = dataService.nextConnectionState(con, ConnectionEventType.OWNER_CLOSE);
     //if we know the remote connection, send a close message to the remote connection
     if (con.getRemoteConnectionURI() != null) {
@@ -87,8 +82,7 @@ public class CloseMessageFromSystemProcessor extends AbstractCamelProcessor
     // sent to the remote connection.
   }
 
-  private class OutboundMessageFactory extends OutboundMessageFactoryProcessor
-  {
+  private class OutboundMessageFactory extends OutboundMessageFactoryProcessor {
     private Connection connection;
 
     public OutboundMessageFactory(URI messageURI, Connection connection) {
@@ -96,26 +90,19 @@ public class CloseMessageFromSystemProcessor extends AbstractCamelProcessor
       this.connection = connection;
     }
 
-    @Override
-    public WonMessage process(WonMessage message) throws WonMessageProcessingException {
+    @Override public WonMessage process(WonMessage message) throws WonMessageProcessingException {
       //there need not be a remote connection. Don't create a message if this is the case.
-      if (connection.getRemoteConnectionURI() == null) return null;
+      if (connection.getRemoteConnectionURI() == null)
+        return null;
       URI remoteNodeURI = wonNodeInformationService.getWonNodeUri(connection.getRemoteConnectionURI());
       URI localNodeURI = wonNodeInformationService.getWonNodeUri(connection.getConnectionURI());
       //create the message to send to the remote node
-      return WonMessageBuilder
-              .setPropertiesForPassingMessageToRemoteNode(
-                      message,
-                      getMessageURI())
-              .setSenderNodeURI(localNodeURI)
-              .setSenderURI(connection.getConnectionURI())
-              .setSenderNeedURI(connection.getNeedURI())
-              .setReceiverNodeURI(remoteNodeURI)
-              .setReceiverURI(connection.getRemoteConnectionURI())
-              .setReceiverNeedURI(connection.getRemoteNeedURI())
-              .build();
+      return WonMessageBuilder.setPropertiesForPassingMessageToRemoteNode(message, getMessageURI())
+          .setSenderNodeURI(localNodeURI).setSenderURI(connection.getConnectionURI())
+          .setSenderNeedURI(connection.getNeedURI()).setReceiverNodeURI(remoteNodeURI)
+          .setReceiverURI(connection.getRemoteConnectionURI()).setReceiverNeedURI(connection.getRemoteNeedURI())
+          .build();
     }
   }
-
 
 }

@@ -1,15 +1,14 @@
 package won.node.facet.impl;
 
-import java.net.URI;
-import java.util.HashMap;
-
 import org.springframework.beans.factory.annotation.Autowired;
-
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.model.Connection;
 import won.protocol.model.FacetType;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.util.DataAccessUtils;
+
+import java.net.URI;
+import java.util.HashMap;
 
 /**
  * Created with IntelliJ IDEA.
@@ -19,18 +18,17 @@ import won.protocol.util.DataAccessUtils;
  * To change this template use File | Settings | File Templates.
  */
 public class FacetRegistry {
-  @Autowired
-  private ConnectionRepository connectionRepository;
+  @Autowired private ConnectionRepository connectionRepository;
 
   private HashMap<FacetType, FacetLogic> map;
 
-  public FacetLogic get(Connection con)  {
+  public FacetLogic get(Connection con) {
     return get(FacetType.getFacetType(con.getTypeURI()));
   }
 
   public FacetLogic get(URI connectionURI) throws NoSuchConnectionException {
-    return get(FacetType.getFacetType(
-        DataAccessUtils.loadConnection(connectionRepository, connectionURI).getTypeURI()));
+    return get(
+        FacetType.getFacetType(DataAccessUtils.loadConnection(connectionRepository, connectionURI).getTypeURI()));
   }
 
   public FacetLogic get(FacetType ft) {

@@ -16,54 +16,45 @@
 
 package won.bot.framework.eventbot.event;
 
-import java.net.URI;
-
 import won.protocol.model.Connection;
+
+import java.net.URI;
 
 /**
  *
  */
-public abstract class BaseNeedAndConnectionSpecificEvent extends BaseEvent implements NeedSpecificEvent,
-  ConnectionSpecificEvent, RemoteNeedSpecificEvent
-{
+public abstract class BaseNeedAndConnectionSpecificEvent extends BaseEvent
+    implements NeedSpecificEvent, ConnectionSpecificEvent, RemoteNeedSpecificEvent {
   private final Connection con;
 
-  public BaseNeedAndConnectionSpecificEvent(final Connection con)
-  {
+  public BaseNeedAndConnectionSpecificEvent(final Connection con) {
     this.con = con;
   }
 
-  public Connection getCon()
-  {
+  public Connection getCon() {
     return con;
   }
 
-  @Override
-  public URI getConnectionURI()
-  {
+  @Override public URI getConnectionURI() {
     return con.getConnectionURI();
   }
 
-  @Override
-  public URI getNeedURI()
-  {
+  @Override public URI getNeedURI() {
     return con.getNeedURI();
   }
 
-  @Override
-  public URI getRemoteNeedURI() {
+  @Override public URI getRemoteNeedURI() {
     return con.getRemoteNeedURI();
   }
 
-  @Override
-  public String toString() {
-    return getClass().getSimpleName()+"@"+Integer.toHexString(hashCode())+ "{" +
-      "needURI=" + getNeedURI() +
-      ", connectionURI=" + getConnectionURI() +
-      '}';
+  @Override public String toString() {
+    return getClass().getSimpleName() + "@" + Integer.toHexString(hashCode()) + "{" +
+        "needURI=" + getNeedURI() +
+        ", connectionURI=" + getConnectionURI() +
+        '}';
   }
 
-  protected static Connection makeConnection(URI needURI, URI remoteNeedURI, URI connectionURI){
+  protected static Connection makeConnection(URI needURI, URI remoteNeedURI, URI connectionURI) {
     Connection con = new Connection();
     con.setConnectionURI(connectionURI);
     con.setNeedURI(needURI);

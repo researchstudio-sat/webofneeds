@@ -16,22 +16,18 @@
 
 package won.bot.framework.eventbot.event.impl.matcher;
 
-import java.net.URI;
-
 import won.bot.framework.eventbot.event.BaseNeedSpecificEvent;
+
+import java.net.URI;
 
 /**
  *
  */
-public class NeedDeactivatedEventForMatcher extends BaseNeedSpecificEvent
-{
-
+public class NeedDeactivatedEventForMatcher extends BaseNeedSpecificEvent {
 
   public NeedDeactivatedEventForMatcher(final URI needURI) {
     super(needURI);
 
   }
-
-
 
 }

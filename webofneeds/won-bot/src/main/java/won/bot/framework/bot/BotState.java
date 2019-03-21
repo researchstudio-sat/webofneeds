@@ -19,10 +19,13 @@ package won.bot.framework.bot;
 /**
  * States a bot can be in when it is in lifecycle phase ACTIVE.
  */
-public enum BotState
-{
-  /** IDLE: the bot is not requesting to be scheduled for execution */
+public enum BotState {
+  /**
+   * IDLE: the bot is not requesting to be scheduled for execution
+   */
   IDLE,
-  /** RUNNING: the bot is requesting to be scheduled for execution */
+  /**
+   * RUNNING: the bot is requesting to be scheduled for execution
+   */
   RUNNING
 }

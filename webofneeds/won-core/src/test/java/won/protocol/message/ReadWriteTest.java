@@ -5,24 +5,21 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.sparql.util.IsoMatcher;
 import org.junit.Assert;
 import org.junit.Test;
-
 import won.protocol.util.RdfUtils;
 
 /**
  * Created by yanapanchenko on 05.08.14.
  */
-public class ReadWriteTest
-{
+public class ReadWriteTest {
 
-  //"/01_OA_to_WN1.trig";
-  //"/02_WN1.trig";
-  //"/01_WN2_to_WN1.trig";
-  private static final String RESOURCE_FILE = "/need-lifecycle_with_message_02adj/04_deactivate_(by_owner)" +
-    "/02_WN1.trig";
-
+  // "/01_OA_to_WN1.trig";
+  // "/02_WN1.trig";
+  // "/01_WN2_to_WN1.trig";
+  private static final String RESOURCE_FILE = "/need-lifecycle_with_message_02adj/04_deactivate_(by_owner)"
+      + "/02_WN1.trig";
 
   @Test
-  //@Ignore
+  // @Ignore
   public void testTrigRoundTrip() throws Exception {
 
     Dataset datasetIn = Utils.createTestDataset(RESOURCE_FILE);

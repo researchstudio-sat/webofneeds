@@ -11,15 +11,15 @@ import won.bot.framework.eventbot.listener.EventListener;
  * Created by fsuda on 15.12.2016.
  */
 public class TelegramHelpAction extends BaseEventBotAction {
-    private WonTelegramBotHandler wonTelegramBotHandler;
-    public TelegramHelpAction(EventListenerContext eventListenerContext, WonTelegramBotHandler wonTelegramBotHandler) {
-        super(eventListenerContext);
-        this.wonTelegramBotHandler = wonTelegramBotHandler;
-    }
+  private WonTelegramBotHandler wonTelegramBotHandler;
 
-    @Override
-    protected void doRun(Event event, EventListener executingListener) throws Exception {
-        if(event instanceof SendHelpEvent){
+  public TelegramHelpAction(EventListenerContext eventListenerContext, WonTelegramBotHandler wonTelegramBotHandler) {
+    super(eventListenerContext);
+    this.wonTelegramBotHandler = wonTelegramBotHandler;
+  }
+
+  @Override protected void doRun(Event event, EventListener executingListener) throws Exception {
+    if (event instanceof SendHelpEvent) {
 
 
             /*Update update = ((SendHelpEvent) event).getUpdate();
@@ -52,6 +52,6 @@ public class TelegramHelpAction extends BaseEventBotAction {
             }catch (TelegramApiException e){
                 logger.error(e.getMessage());
             }*/
-        }
     }
+  }
 }

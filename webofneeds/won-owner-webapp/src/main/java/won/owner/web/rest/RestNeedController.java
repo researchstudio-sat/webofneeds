@@ -16,15 +16,6 @@
 
 package won.owner.web.rest;
 
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,12 +27,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-
+import org.springframework.web.bind.annotation.*;
 import won.owner.model.Draft;
 import won.owner.model.User;
 import won.owner.model.UserNeed;
@@ -52,70 +38,72 @@ import won.owner.service.impl.URIService;
 import won.owner.service.impl.WONUserDetailService;
 import won.protocol.model.NeedState;
 
-@Controller
-@RequestMapping("/rest/needs")
-public class RestNeedController {
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
+@Controller @RequestMapping("/rest/needs") public class RestNeedController {
 
   final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Autowired
-  private DraftRepository draftRepository;
+  @Autowired private DraftRepository draftRepository;
 
-  @Autowired
-  private URIService uriService;
+  @Autowired private URIService uriService;
 
-  @Autowired
-  private WONUserDetailService wonUserDetailService;
+  @Autowired private WONUserDetailService wonUserDetailService;
 
   @Autowired UserRepository userRepository;
 
   /**
    * returns a List containing needs belonging to the user
+   *
    * @return JSON List of need objects
    */
-  @ResponseBody
-  @RequestMapping(
-    value = {"/",""},
-    produces = MediaType.APPLICATION_JSON_VALUE,
-    method = RequestMethod.GET
-  )
-  public List<URI> getAllNeedsOfUser(@RequestParam(value = "state", required = false) NeedState state) {
+  @ResponseBody @RequestMapping(
+      value = { "/", "" },
+      produces = MediaType.APPLICATION_JSON_VALUE,
+      method = RequestMethod.GET) public List<URI> getAllNeedsOfUser(
+      @RequestParam(value = "state", required = false) NeedState state) {
     User user = getCurrentUser();
     List<UserNeed> userNeeds = user.getUserNeeds();
     List<URI> needUris = new ArrayList(userNeeds.size());
 
-    if(state == null) {
-        logger.debug("Getting all needuris of user: " + user.getUsername());
-        for (UserNeed userNeed : userNeeds) {
-            needUris.add(userNeed.getUri());
-        }
+    if (state == null) {
+      logger.debug("Getting all needuris of user: " + user.getUsername());
+      for (UserNeed userNeed : userNeeds) {
+        needUris.add(userNeed.getUri());
+      }
     } else {
-        logger.debug("Getting all needuris of user: " + user.getUsername() + "filtered by state: " + state);
-        for (UserNeed userNeed : userNeeds) {
-            if(state.equals(userNeed.getState())) {
-                needUris.add(userNeed.getUri());
-            }
+      logger.debug("Getting all needuris of user: " + user.getUsername() + "filtered by state: " + state);
+      for (UserNeed userNeed : userNeeds) {
+        if (state.equals(userNeed.getState())) {
+          needUris.add(userNeed.getUri());
         }
+      }
     }
     return needUris;
   }
 
   /**
    * Gets the current user. If no user is authenticated, an Exception is thrown
+   *
    * @return
    */
   public User getCurrentUser() {
     String username = SecurityContextHolder.getContext().getAuthentication().getName();
-    if (username == null) throw new AccessDeniedException("client is not authenticated");
+    if (username == null)
+      throw new AccessDeniedException("client is not authenticated");
     return (User) userRepository.findByUsername(username);
   }
 
-  @ResponseBody
-  @RequestMapping(
-    value = "/drafts",
-    produces = MediaType.APPLICATION_JSON_VALUE,
-    method = RequestMethod.GET
-  )
+  @ResponseBody @RequestMapping(
+      value = "/drafts",
+      produces = MediaType.APPLICATION_JSON_VALUE,
+      method = RequestMethod.GET)
   //TODO: move transactionality annotation into the service layer
   public List<CreateDraftPojo> getAllDrafts() {
     User user = getCurrentUser();
@@ -123,30 +111,30 @@ public class RestNeedController {
     List<CreateDraftPojo> createDraftPojos = new ArrayList<>();
     Set<URI> draftURIs = user.getDraftURIs();
     Iterator<URI> draftURIIterator = draftURIs.iterator();
-    while(draftURIIterator.hasNext()){
+    while (draftURIIterator.hasNext()) {
       URI draftURI = draftURIIterator.next();
       Draft draft = draftRepository.findByDraftURI(draftURI).get(0);
       CreateDraftPojo createDraftPojo = new CreateDraftPojo(draftURI.toString(), draft.getContent());
       createDraftPojos.add(createDraftPojo);
     }
-    return createDraftPojos ;
+    return createDraftPojos;
 
   }
+
   /**
    * saves draft of a draft
+   *
    * @param createDraftObject an object containing information of the need draft
    * @return a JSON object of the draft with its temprory id.
    */
-  @ResponseBody
-  @RequestMapping(
-    value = "/drafts",
-    consumes = MediaType.APPLICATION_JSON_VALUE,
-    produces = MediaType.APPLICATION_JSON_VALUE,
-    method = RequestMethod.POST
-  )
+  @ResponseBody @RequestMapping(
+      value = "/drafts",
+      consumes = MediaType.APPLICATION_JSON_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE,
+      method = RequestMethod.POST)
   //TODO: move transactionality annotation into the service layer
-  @Transactional(propagation = Propagation.SUPPORTS)
-  public CreateDraftPojo createDraft(@RequestBody CreateDraftPojo createDraftObject) throws ParseException {
+  @Transactional(propagation = Propagation.SUPPORTS) public CreateDraftPojo createDraft(
+      @RequestBody CreateDraftPojo createDraftObject) throws ParseException {
 
     User user = getCurrentUser();
     URI draftURI = URI.create(createDraftObject.getDraftURI());
@@ -154,7 +142,7 @@ public class RestNeedController {
     wonUserDetailService.save(user);
     Draft draft = null;
     draft = draftRepository.findOneByDraftURI(draftURI);
-    if(draft==null){
+    if (draft == null) {
       draft = new Draft(draftURI, createDraftObject.getDraft());
     }
     draft.setContent(createDraftObject.getDraft());
@@ -164,15 +152,12 @@ public class RestNeedController {
     return createDraftObject;
   }
 
-  @ResponseBody
-  @RequestMapping(
-    value = "/drafts",
-    method = RequestMethod.DELETE
-  )
+  @ResponseBody @RequestMapping(
+      value = "/drafts",
+      method = RequestMethod.DELETE)
   //TODO: move transactionality annotation into the service layer
-  @Transactional(propagation = Propagation.SUPPORTS)
-  public ResponseEntity deleteDrafts() {
-    try{
+  @Transactional(propagation = Propagation.SUPPORTS) public ResponseEntity deleteDrafts() {
+    try {
      /* User user = getCurrentUser();
       List<Draft> draftStates = draftRepository.findByUserName(user.getUsername());
       Iterator<Draft> draftIterator =  draftStates.iterator();
@@ -180,20 +165,17 @@ public class RestNeedController {
       while(draftIterator.hasNext()){
         draftURIs.add(draftIterator.next().getDraftURI());
       }         */
-    }catch (Exception e){
+    } catch (Exception e) {
       return new ResponseEntity(HttpStatus.CONFLICT);
     }
     return new ResponseEntity(HttpStatus.OK);
   }
 
-  @ResponseBody
-  @RequestMapping(
-    value ="/drafts/draft",
-    produces = MediaType.APPLICATION_JSON_VALUE,
-    method = RequestMethod.GET
-  )
-  public CreateDraftPojo getDraft(@RequestParam("uri") String uri) {
-    logger.debug("getting draft: "+ uri);
+  @ResponseBody @RequestMapping(
+      value = "/drafts/draft",
+      produces = MediaType.APPLICATION_JSON_VALUE,
+      method = RequestMethod.GET) public CreateDraftPojo getDraft(@RequestParam("uri") String uri) {
+    logger.debug("getting draft: " + uri);
     URI draftURI = null;
     CreateDraftPojo draftPojo = null;
     try {
@@ -210,14 +192,11 @@ public class RestNeedController {
     return draftPojo;
   }
 
-  @ResponseBody
-  @RequestMapping(
-    value ="/drafts/draft",
-    method = RequestMethod.DELETE
-  )
-  public ResponseEntity<String> deleteDraft(@RequestParam("uri") String uri) {
+  @ResponseBody @RequestMapping(
+      value = "/drafts/draft",
+      method = RequestMethod.DELETE) public ResponseEntity<String> deleteDraft(@RequestParam("uri") String uri) {
 
-    logger.debug("deleting draft: "+ uri);
+    logger.debug("deleting draft: " + uri);
     URI draftURI = null;
     CreateDraftPojo draftPojo = null;
     User user = getCurrentUser();
@@ -238,7 +217,5 @@ public class RestNeedController {
       return ResponseEntity.badRequest().body("draft uri problem");
     }
   }
-
-
 
 }

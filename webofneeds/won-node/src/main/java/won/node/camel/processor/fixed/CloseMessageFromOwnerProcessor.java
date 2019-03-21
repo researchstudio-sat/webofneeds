@@ -1,11 +1,8 @@
 package won.node.camel.processor.fixed;
 
-import java.net.URI;
-
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.springframework.stereotype.Component;
-
 import won.node.camel.processor.AbstractFromOwnerCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.node.camel.processor.general.OutboundMessageFactoryProcessor;
@@ -18,16 +15,16 @@ import won.protocol.model.ConnectionEventType;
 import won.protocol.model.ConnectionState;
 import won.protocol.vocabulary.WONMSG;
 
+import java.net.URI;
+
 /**
  * User: syim
  * Date: 02.03.2015
  */
-@Component
-@FixedMessageProcessor(
-        direction= WONMSG.TYPE_FROM_OWNER_STRING,
-        messageType = WONMSG.TYPE_CLOSE_STRING)
-public class CloseMessageFromOwnerProcessor extends AbstractFromOwnerCamelProcessor
-{
+@Component @FixedMessageProcessor(
+    direction = WONMSG.TYPE_FROM_OWNER_STRING,
+    messageType = WONMSG.TYPE_CLOSE_STRING) public class CloseMessageFromOwnerProcessor
+    extends AbstractFromOwnerCamelProcessor {
 
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
@@ -42,8 +39,7 @@ public class CloseMessageFromOwnerProcessor extends AbstractFromOwnerCamelProces
     if (originalState != ConnectionState.SUGGESTED) {
       //prepare the message to pass to the remote node
       //create the message to send to the remote node
-      URI remoteMessageURI = wonNodeInformationService
-                              .generateEventURI(wonMessage.getReceiverNodeURI());
+      URI remoteMessageURI = wonNodeInformationService.generateEventURI(wonMessage.getReceiverNodeURI());
 
       OutboundMessageCreator outboundMessageCreator = new OutboundMessageCreator(remoteMessageURI);
       //put it into the 'outbound message' header (so the persister doesn't pick up the wrong one).
@@ -56,21 +52,15 @@ public class CloseMessageFromOwnerProcessor extends AbstractFromOwnerCamelProces
     }
   }
 
-  private class OutboundMessageCreator extends OutboundMessageFactoryProcessor
-  {
+  private class OutboundMessageCreator extends OutboundMessageFactoryProcessor {
 
     public OutboundMessageCreator(URI messageURI) {
       super(messageURI);
     }
 
-    @Override
-    public WonMessage process(WonMessage message) throws WonMessageProcessingException {
+    @Override public WonMessage process(WonMessage message) throws WonMessageProcessingException {
       //create the message to send to the remote node
-      return WonMessageBuilder
-              .setPropertiesForPassingMessageToRemoteNode(
-                      message,
-                      getMessageURI())
-              .build();
+      return WonMessageBuilder.setPropertiesForPassingMessageToRemoteNode(message, getMessageURI()).build();
     }
   }
 

@@ -16,38 +16,34 @@
 
 package won.bot.framework.eventbot.filter.impl;
 
-import java.net.URI;
-import java.util.Collection;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.event.Event;
+
+import java.net.URI;
+import java.util.Collection;
 
 /**
  * Event filter that accepts need specific events the URI of which is found in the specified named URI list.
  */
-public abstract class AbstractNamedUriListFilter extends EventListenerContextAwareFilter
-{
+public abstract class AbstractNamedUriListFilter extends EventListenerContextAwareFilter {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
   private String listname;
 
-  public AbstractNamedUriListFilter(final EventListenerContext context, final String listname)
-  {
+  public AbstractNamedUriListFilter(final EventListenerContext context, final String listname) {
     super(context);
     this.listname = listname;
   }
 
-  @Override
-  public boolean accept(final Event event)
-  {
+  @Override public boolean accept(final Event event) {
     URI uri = getURIFromEvent(event);
-    if (uri == null) return false;
+    if (uri == null)
+      return false;
     Collection<URI> uris = getContext().getBotContext().getNamedNeedUriList(listname);
     if (uris == null) {
-      logger.debug("filtering by named need uri list, but no list found with name '{}'", listname );
+      logger.debug("filtering by named need uri list, but no list found with name '{}'", listname);
       return false;
     }
     return uris.contains(uri);

@@ -7,7 +7,7 @@ import won.protocol.model.Connection;
  * Created by fsuda on 08.03.2018.
  */
 public class ProposalSentEvent extends ProposalEvent {
-    public ProposalSentEvent(Connection con, WonMessageSentOnConnectionEvent proposalEvent) {
-        super(con, proposalEvent);
-    }
+  public ProposalSentEvent(Connection con, WonMessageSentOnConnectionEvent proposalEvent) {
+    super(con, proposalEvent);
+  }
 }

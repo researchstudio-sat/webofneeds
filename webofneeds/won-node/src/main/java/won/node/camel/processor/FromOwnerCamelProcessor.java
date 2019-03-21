@@ -24,10 +24,10 @@ import org.apache.camel.Processor;
  * The message from the owner is routed the the process method. Responses
  * are routed to the successResponse and failureResponse methods, respectively.
  */
-public interface FromOwnerCamelProcessor extends Processor
-{
+public interface FromOwnerCamelProcessor extends Processor {
   /**
    * Called when a success response is received from the remote node.
+   *
    * @param exchange
    * @throws Exception
    */
@@ -35,6 +35,7 @@ public interface FromOwnerCamelProcessor extends Processor
 
   /**
    * Called when a failure response is received from the remote node.
+   *
    * @param exchange
    * @throws Exception
    */

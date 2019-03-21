@@ -21,11 +21,11 @@ import org.apache.jena.query.Dataset;
 /**
  *
  */
-public interface NeedConsumer
-{
+public interface NeedConsumer {
   /**
    * Consumes the specified need object. Implementations must take care not to modify the object as it
    * may be passed to multiple consumers.
+   *
    * @param need
    */
   public void consume(Dataset need);
@@ -33,6 +33,7 @@ public interface NeedConsumer
   /**
    * Returns true if the consumer is prepared to consume another need object.
    * Returns false if not, in which case the consume(..) method may throw an IllegalStateException.
+   *
    * @return
    */
   public boolean isExhausted();

@@ -24,11 +24,9 @@ import won.protocol.message.processor.exception.WonMessageProcessingException;
  * Handler implementation that does nothing. Useful for extending as well as pull-only cases
  * such as a simple Web application.
  */
-public class NopOwnerApplicationServiceCallback implements WonMessageProcessor
-{
+public class NopOwnerApplicationServiceCallback implements WonMessageProcessor {
 
-  @Override
-  public WonMessage process(WonMessage message) throws WonMessageProcessingException {
+  @Override public WonMessage process(WonMessage message) throws WonMessageProcessingException {
     return message;
   }
 }

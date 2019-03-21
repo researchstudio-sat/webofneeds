@@ -1,31 +1,24 @@
 package won.protocol.message;
 
-import java.io.IOException;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.Query;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
 import won.protocol.validation.WonSparqlValidator;
 
+import java.io.IOException;
+
 /**
- * User: ypanchenko
- * Date: 02.06.2015
+ * User: ypanchenko Date: 02.06.2015
  */
-public class WonSparqlValidatorTest
-{
-  private static final String RESOURCE_FILE_CREATE_MSG_VALID =
-    "/validation/valid/create_msg.trig";
-  private static final String RESOURCE_FILE_CREATE_MSG_INVALID =
-    "/validation/invalid/create_msg_invalid.trig";
+public class WonSparqlValidatorTest {
+  private static final String RESOURCE_FILE_CREATE_MSG_VALID = "/validation/valid/create_msg.trig";
+  private static final String RESOURCE_FILE_CREATE_MSG_INVALID = "/validation/invalid/create_msg_invalid.trig";
 
-  private static final String RESOURCE_FILE_ASK_CONSTRAINT =
-    "/validation/query/query_ask_missing_type.rq";
+  private static final String RESOURCE_FILE_ASK_CONSTRAINT = "/validation/query/query_ask_missing_type.rq";
 
-  private static final String RESOURCE_FILE_SELECT_CONSTRAINT =
-    "/validation/query/query_select_invalid_envelope_chain.rq";
+  private static final String RESOURCE_FILE_SELECT_CONSTRAINT = "/validation/query/query_select_invalid_envelope_chain.rq";
 
   private Dataset createMessageDataset;
   private Dataset createMessageDatasetInvalid;

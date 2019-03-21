@@ -16,27 +16,23 @@
 
 package won.bot.framework.component.needproducer.impl;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.bot.framework.component.needproducer.NeedProducer;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * NeedProducer that needFactories to a list of need factories. Order of delegate request is not guaranteed.
  * Not thread safe.
  */
-public abstract class AbstractCompositeNeedProducer implements NeedProducer
-{
+public abstract class AbstractCompositeNeedProducer implements NeedProducer {
   private Set<NeedProducer> needFactories = new HashSet<NeedProducer>();
   protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Override
-  public synchronized Dataset create()
-  {
+  @Override public synchronized Dataset create() {
     logger.debug("starting to produce a need model");
     NeedProducer delegate = selectNonExhaustedNeedFactory();
     if (delegate == null) {
@@ -46,19 +42,18 @@ public abstract class AbstractCompositeNeedProducer implements NeedProducer
     return delegate.create();
   }
 
-  @Override
-  public synchronized boolean isExhausted()
-  {
-    for (NeedProducer delegate: this.needFactories){
-      if (!delegate.isExhausted()) return false;
+  @Override public synchronized boolean isExhausted() {
+    for (NeedProducer delegate : this.needFactories) {
+      if (!delegate.isExhausted())
+        return false;
     }
     return true;
   }
 
-  private NeedProducer selectNonExhaustedNeedFactory(){
+  private NeedProducer selectNonExhaustedNeedFactory() {
     NeedProducer delegate = null;
     //keep fetching delegates, and remove them from the list if they are exhausted
-    while ((delegate = selectActiveNeedFactory()) != null && delegate.isExhausted()){
+    while ((delegate = selectActiveNeedFactory()) != null && delegate.isExhausted()) {
       //here we have a non-null delegate that is exhausted. Remove it
       this.needFactories.remove(delegate);
       delegate = null;
@@ -70,21 +65,21 @@ public abstract class AbstractCompositeNeedProducer implements NeedProducer
   /**
    * Returns one of the NeedProducer objects found in the needFactories set, or null if no
    * factories are elegible (in which case the factory is exhausted).
+   *
    * @return
    */
   protected abstract NeedProducer selectActiveNeedFactory();
 
-  protected Set<NeedProducer> getNeedFactories(){
+  protected Set<NeedProducer> getNeedFactories() {
     return needFactories;
   }
 
-  public void setNeedFactories(final Set<NeedProducer> delegates)
-  {
+  public void setNeedFactories(final Set<NeedProducer> delegates) {
 
     this.needFactories = delegates;
   }
 
-  public void addNeedFactory(NeedProducer needProducer){
+  public void addNeedFactory(NeedProducer needProducer) {
     this.needFactories.add(needProducer);
   }
 

@@ -1,7 +1,6 @@
 package won.bot.framework.component.needproducer.impl;
 
 import org.apache.jena.query.Dataset;
-
 import won.bot.framework.component.needproducer.NeedProducer;
 
 /**
@@ -9,17 +8,14 @@ import won.bot.framework.component.needproducer.NeedProducer;
  */
 public class NopNeedProducer implements NeedProducer {
 
-    public NopNeedProducer() {
-    }
+  public NopNeedProducer() {
+  }
 
+  @Override public Dataset create() {
+    throw new UnsupportedOperationException("This NeedProducer implementation does not expect to be used");
+  }
 
-    @Override
-    public Dataset create() {
-        throw new UnsupportedOperationException("This NeedProducer implementation does not expect to be used");
-    }
-
-    @Override
-    public boolean isExhausted() {
-        throw new UnsupportedOperationException("This NeedProducer implementation does not expect to be used");
-    }
+  @Override public boolean isExhausted() {
+    throw new UnsupportedOperationException("This NeedProducer implementation does not expect to be used");
+  }
 }

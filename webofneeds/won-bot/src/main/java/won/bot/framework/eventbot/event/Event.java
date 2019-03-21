@@ -21,12 +21,10 @@ package won.bot.framework.eventbot.event;
  * <p>
  * Implementations should:
  * <ul>
- *   <li>be immutable</li>
- *   <li>implement equals() and hashCode() to reflect reference equality (==)</li>
+ * <li>be immutable</li>
+ * <li>implement equals() and hashCode() to reflect reference equality (==)</li>
  * </ul>
  * </p>
- *
  */
-public interface Event
-{
+public interface Event {
 }

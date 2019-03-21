@@ -24,19 +24,22 @@ import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
  * Executes the action each time the specified trigger publishes its BotTriggerEvent.
  */
 public class ActionOnTriggerEventListener extends ActionOnEventListener {
-    public ActionOnTriggerEventListener(EventListenerContext context, BotTrigger botTrigger, EventBotAction task) {
-        super(context, new BotTriggerFilter(botTrigger), task);
-    }
+  public ActionOnTriggerEventListener(EventListenerContext context, BotTrigger botTrigger, EventBotAction task) {
+    super(context, new BotTriggerFilter(botTrigger), task);
+  }
 
-    public ActionOnTriggerEventListener(EventListenerContext context, String name, BotTrigger botTrigger, EventBotAction task) {
-        super(context, name, new BotTriggerFilter(botTrigger), task);
-    }
+  public ActionOnTriggerEventListener(EventListenerContext context, String name, BotTrigger botTrigger,
+      EventBotAction task) {
+    super(context, name, new BotTriggerFilter(botTrigger), task);
+  }
 
-    public ActionOnTriggerEventListener(EventListenerContext context, BotTrigger botTrigger, EventBotAction task, int timesToRun) {
-        super(context, new BotTriggerFilter(botTrigger), task, timesToRun);
-    }
+  public ActionOnTriggerEventListener(EventListenerContext context, BotTrigger botTrigger, EventBotAction task,
+      int timesToRun) {
+    super(context, new BotTriggerFilter(botTrigger), task, timesToRun);
+  }
 
-    public ActionOnTriggerEventListener(EventListenerContext context, String name, BotTrigger botTrigger, EventBotAction task, int timesToRun) {
-        super(context, name, new BotTriggerFilter(botTrigger), task, timesToRun);
-    }
+  public ActionOnTriggerEventListener(EventListenerContext context, String name, BotTrigger botTrigger,
+      EventBotAction task, int timesToRun) {
+    super(context, name, new BotTriggerFilter(botTrigger), task, timesToRun);
+  }
 }

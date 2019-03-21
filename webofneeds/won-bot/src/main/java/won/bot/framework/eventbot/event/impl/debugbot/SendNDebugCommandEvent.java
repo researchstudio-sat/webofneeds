@@ -22,11 +22,12 @@ import won.protocol.model.Connection;
  * User: ypanchenko
  * Date: 26.02.2016
  */
-public class SendNDebugCommandEvent extends DebugCommandEvent
-{
+public class SendNDebugCommandEvent extends DebugCommandEvent {
   private int numberOfMessagesToSend;
+
   public SendNDebugCommandEvent(final Connection con, int n) {
-    super(con); this.numberOfMessagesToSend = n;
+    super(con);
+    this.numberOfMessagesToSend = n;
   }
 
   public int getNumberOfMessagesToSend() {

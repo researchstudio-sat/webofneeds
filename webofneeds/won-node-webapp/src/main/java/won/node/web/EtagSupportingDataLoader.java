@@ -16,17 +16,15 @@
 
 package won.node.web;
 
-import java.net.URI;
-
 import org.springframework.http.HttpHeaders;
-
 import won.protocol.model.DataWithEtag;
+
+import java.net.URI;
 
 /**
  * Created by fkleedorfer on 01.12.2016.
  */
-public interface EtagSupportingDataLoader<T>
-{
+public interface EtagSupportingDataLoader<T> {
   public URI createUriForIdentifier(String identifier);
 
   public DataWithEtag<T> loadDataWithEtag(URI uri, String etag);

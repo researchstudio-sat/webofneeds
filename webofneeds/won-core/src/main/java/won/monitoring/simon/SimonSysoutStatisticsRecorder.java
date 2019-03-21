@@ -19,20 +19,18 @@ package won.monitoring.simon;
 import org.javasimon.Simon;
 import org.javasimon.SimonManager;
 import org.javasimon.utils.SimonUtils;
-
 import won.monitoring.AbstractRecorder;
 
 /**
- * MonitoringStatisticsRecorder that prints the statistics via the logger with loglevel 'debug'.
+ * MonitoringStatisticsRecorder that prints the statistics via the logger with
+ * loglevel 'debug'.
  */
-public class SimonSysoutStatisticsRecorder extends AbstractRecorder
-{
+public class SimonSysoutStatisticsRecorder extends AbstractRecorder {
 
   @Override
-  public void recordMonitoringStatistics()
-  {
+  public void recordMonitoringStatistics() {
     Simon rootSimon = SimonManager.getRootSimon();
-    if (logger.isDebugEnabled()){
+    if (logger.isDebugEnabled()) {
       logger.debug("Monitoring statistics: \n" + SimonUtils.simonTreeString(rootSimon));
     }
   }

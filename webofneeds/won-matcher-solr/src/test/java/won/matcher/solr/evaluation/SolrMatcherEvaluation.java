@@ -1,15 +1,6 @@
 package won.matcher.solr.evaluation;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.PostConstruct;
-
+import com.github.jsonldjava.core.JsonLdError;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
@@ -18,9 +9,6 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import com.github.jsonldjava.core.JsonLdError;
-
 import won.matcher.solr.hints.HintBuilder;
 import won.matcher.solr.index.NeedIndexer;
 import won.matcher.solr.query.TestMatcherQueryExecutor;
@@ -30,9 +18,18 @@ import won.matcher.utils.tensor.TensorMatchingData;
 import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.util.DefaultNeedModelWrapper;
 
+import javax.annotation.PostConstruct;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 /**
  * Created by hfriedrich on 05.08.2016.
- *
+ * <p>
  * This class can be used to do evaluation of the quality of matching of Solr querying.
  * It reads needs mail files from supply and demand directories on the hard drive. Subject will be
  * mapped to title and content will be mapped to description. These needs can be written to the Solr index and queried.
@@ -44,23 +41,16 @@ import won.protocol.util.DefaultNeedModelWrapper;
  * These tensor slices can be compared by the "wonpreprocessing" project to compute statistical evaluation measures
  * like precision, recall, accuracy and f-score.
  */
-@Component
-public class SolrMatcherEvaluation
-{
-  @Autowired
-  TestMatcherQueryExecutor queryExecutor;
+@Component public class SolrMatcherEvaluation {
+  @Autowired TestMatcherQueryExecutor queryExecutor;
 
-  @Autowired
-  NeedIndexer needIndexer;
+  @Autowired NeedIndexer needIndexer;
 
-  @Autowired
-  private MailDirNeedProducer seeksNeedProducer;
+  @Autowired private MailDirNeedProducer seeksNeedProducer;
 
-  @Autowired
-  private MailDirNeedProducer isNeedProducer;
+  @Autowired private MailDirNeedProducer isNeedProducer;
 
-  @Autowired
-  HintBuilder hintBuilder;
+  @Autowired HintBuilder hintBuilder;
 
   private String outputDir;
   private String connectionsFile;
@@ -68,7 +58,6 @@ public class SolrMatcherEvaluation
   private Map<String, Dataset> needFileDatasetMap;
   private TensorMatchingData matchingDataConnections;
   private TensorMatchingData matchingDataPredictions;
-
 
   public void setSeeksNeedProducer(final MailDirNeedProducer seeksNeedProducer) {
     this.seeksNeedProducer = seeksNeedProducer;
@@ -110,8 +99,7 @@ public class SolrMatcherEvaluation
     needFileDatasetMap = new HashMap<>();
   }
 
-  @PostConstruct
-  public void init() throws IOException {
+  @PostConstruct public void init() throws IOException {
 
     initNeedDir(seeksNeedProducer);
     initNeedDir(isNeedProducer);
@@ -121,20 +109,21 @@ public class SolrMatcherEvaluation
 
     // read the need files and add needs to the tensor
     if (needProducer.getDirectory() == null || !needProducer.getDirectory().isDirectory()) {
-      throw new IOException("Input folder not a directory: " + ((needProducer.getDirectory() != null) ? needProducer.getDirectory().toString() : null));
+      throw new IOException("Input folder not a directory: " + ((needProducer.getDirectory() != null) ?
+          needProducer.getDirectory().toString() :
+          null));
     }
 
-    while(!needProducer.isExhausted()) {
+    while (!needProducer.isExhausted()) {
       String needFileName = needProducer.getCurrentFileName();
 
       Dataset ds = needProducer.create();
       String needId = createNeedId(ds);
 
-
       if (needProducer == seeksNeedProducer) {
         matchingDataConnections.addNeedAttribute("needtype", needId, "WANT");
         matchingDataPredictions.addNeedAttribute("needtype", needId, "WANT");
-      } else if (needProducer == isNeedProducer ) {
+      } else if (needProducer == isNeedProducer) {
         matchingDataConnections.addNeedAttribute("needtype", needId, "OFFER");
         matchingDataPredictions.addNeedAttribute("needtype", needId, "OFFER");
       }
@@ -186,10 +175,10 @@ public class SolrMatcherEvaluation
 
     for (Dataset need : needFileDatasetMap.values()) {
       for (String match : computeMatchingNeeds(need)) {
-        if (!matchingDataPredictions.getNeeds().contains(createNeedId(need)) ||
-          !matchingDataPredictions.getNeeds().contains(match)) {
-            throw new IOException("No need found in input directory for connection specified in connection file:  \n" +
-                                    createNeedId(need) + "\n" + match);
+        if (!matchingDataPredictions.getNeeds().contains(createNeedId(need)) || !matchingDataPredictions.getNeeds()
+            .contains(match)) {
+          throw new IOException("No need found in input directory for connection specified in connection file:  \n" +
+              createNeedId(need) + "\n" + match);
         }
         matchingDataPredictions.addNeedConnection(createNeedId(need), match, false);
       }
@@ -203,8 +192,8 @@ public class SolrMatcherEvaluation
 
     TestNeedQueryFactory needQuery = new TestNeedQueryFactory(need);
 
-    SolrDocumentList docs = queryExecutor.executeNeedQuery(
-      needQuery.createQuery(), 20 ,null, new BasicNeedQueryFactory(need).createQuery());
+    SolrDocumentList docs = queryExecutor
+        .executeNeedQuery(needQuery.createQuery(), 20, null, new BasicNeedQueryFactory(need).createQuery());
 
     SolrDocumentList matchedDocs = hintBuilder.calculateMatchingResults(docs);
 
@@ -225,15 +214,14 @@ public class SolrMatcherEvaluation
     this.connectionsFile = connectionsFile;
   }
 
-  private void addConnection(List<String> needs, boolean ignoreNeedsNotFound)
-    throws IOException {
+  private void addConnection(List<String> needs, boolean ignoreNeedsNotFound) throws IOException {
     for (int i = 1; i < needs.size(); i++) {
       String need1 = needs.get(0);
       String need2 = needs.get(i);
       if (!matchingDataConnections.getNeeds().contains(need1) || !matchingDataConnections.getNeeds().contains(need2)) {
         if (!ignoreNeedsNotFound) {
           throw new IOException("No need found in input directory for connection specified in connection file:  \n" +
-                                need1 + "\n" + need2);
+              need1 + "\n" + need2);
         }
       }
       matchingDataConnections.addNeedConnection(need1, need2, false);

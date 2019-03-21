@@ -24,21 +24,18 @@ import won.protocol.message.WonMessageType;
 /**
  * Created by fkleedorfer on 14.06.2016.
  */
-public class WonMessageSentEvent extends BaseEvent implements MessageEvent
-{
+public class WonMessageSentEvent extends BaseEvent implements MessageEvent {
   private final WonMessage message;
 
   public WonMessageSentEvent(WonMessage message) {
     this.message = message;
   }
 
-  @Override
-  public WonMessage getWonMessage() {
+  @Override public WonMessage getWonMessage() {
     return this.message;
   }
 
-  @Override
-  public WonMessageType getWonMessageType() {
+  @Override public WonMessageType getWonMessageType() {
     return this.message.getMessageType();
   }
 }

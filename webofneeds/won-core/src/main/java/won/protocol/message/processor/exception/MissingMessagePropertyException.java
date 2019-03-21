@@ -24,7 +24,7 @@ import java.net.URI;
 public class MissingMessagePropertyException extends WonMessageNotWellFormedException {
   private URI missingProperty;
 
-  private static String createExceptionMessage(URI missingProperty){
+  private static String createExceptionMessage(URI missingProperty) {
     return String.format("Missing message property: %s", missingProperty);
   }
 
@@ -38,7 +38,8 @@ public class MissingMessagePropertyException extends WonMessageNotWellFormedExce
     this.missingProperty = missingProperty;
   }
 
-  public MissingMessagePropertyException(Throwable cause, boolean enableSuppression, boolean writableStackTrace, URI missingProperty) {
+  public MissingMessagePropertyException(Throwable cause, boolean enableSuppression, boolean writableStackTrace,
+      URI missingProperty) {
     super(createExceptionMessage(missingProperty), cause, enableSuppression, writableStackTrace);
     this.missingProperty = missingProperty;
   }

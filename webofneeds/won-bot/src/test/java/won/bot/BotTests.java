@@ -16,6 +16,11 @@
 
 package won.bot;
 
+import org.junit.Assert;
+import org.junit.Test;
+import won.bot.framework.bot.Bot;
+import won.bot.impl.DebugBot;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Random;
@@ -23,20 +28,12 @@ import java.util.Set;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
-import org.junit.Assert;
-import org.junit.Test;
-
-import won.bot.framework.bot.Bot;
-import won.bot.impl.DebugBot;
-
 /**
  * User: fkleedorfer
  * Date: 17.01.14
  */
-public class BotTests
-{
-  @Test
-  public void testIsInitialized(){
+public class BotTests {
+  @Test public void testIsInitialized() {
     Bot bot = new DebugBot();
     try {
       bot.initialize();
@@ -49,18 +46,14 @@ public class BotTests
   /**
    * Makes sure that the initialize cannot be entered by more than one thread.
    */
-  @Test
-  public void testIsInitializedMultiThreaded() throws BrokenBarrierException, InterruptedException
-  {
+  @Test public void testIsInitializedMultiThreaded() throws BrokenBarrierException, InterruptedException {
 
     //set of threads that managed to enter the initialize method
     final Set<Thread> threadsInInit = Collections.synchronizedSet(new HashSet<Thread>());
 
     //bot impl that remembers which thread entered the initialize method
-    final Bot bot = new DebugBot(){
-      @Override
-      protected void doInitialize()
-      {
+    final Bot bot = new DebugBot() {
+      @Override protected void doInitialize() {
         try {
           Thread.sleep(100);
         } catch (InterruptedException e) {
@@ -73,12 +66,10 @@ public class BotTests
     //start 10 threads that initialize the bot
     int numThreads = 10;
     final Random rnd = new Random(System.currentTimeMillis());
-    final CyclicBarrier barrier = new CyclicBarrier(numThreads+1);
-    for (int i = 0; i < numThreads; i++){
-      Thread thread = new Thread(){
-        @Override
-        public void run()
-        {
+    final CyclicBarrier barrier = new CyclicBarrier(numThreads + 1);
+    for (int i = 0; i < numThreads; i++) {
+      Thread thread = new Thread() {
+        @Override public void run() {
           try {
             Thread.sleep(rnd.nextInt(100));
           } catch (InterruptedException e) {
@@ -108,10 +99,7 @@ public class BotTests
     Assert.assertTrue(threadsInInit.size() == 1);
   }
 
-
-
-  @Test
-  public void testIsShutdown(){
+  @Test public void testIsShutdown() {
     Bot bot = new DebugBot();
     try {
       bot.shutdown();
@@ -124,18 +112,14 @@ public class BotTests
   /**
    * Makes sure that the shutdown cannot be entered by more than one thread.
    */
-  @Test
-  public void testIsShutdownMultiThreaded() throws BrokenBarrierException, InterruptedException
-  {
+  @Test public void testIsShutdownMultiThreaded() throws BrokenBarrierException, InterruptedException {
 
     //set of threads that managed to enter the shutdown method
     final Set<Thread> threadsInShutdown = Collections.synchronizedSet(new HashSet<Thread>());
 
     //bot impl that remembers which thread entered the shutdown method
-    final Bot bot = new DebugBot(){
-      @Override
-      protected void doShutdown()
-      {
+    final Bot bot = new DebugBot() {
+      @Override protected void doShutdown() {
         try {
           Thread.sleep(100);
         } catch (InterruptedException e) {
@@ -148,12 +132,10 @@ public class BotTests
     //start 10 threads that shut down the bot
     int numThreads = 10;
     final Random rnd = new Random(System.currentTimeMillis());
-    final CyclicBarrier barrier = new CyclicBarrier(numThreads+1);
-    for (int i = 0; i < numThreads; i++){
-      Thread thread = new Thread(){
-        @Override
-        public void run()
-        {
+    final CyclicBarrier barrier = new CyclicBarrier(numThreads + 1);
+    for (int i = 0; i < numThreads; i++) {
+      Thread thread = new Thread() {
+        @Override public void run() {
           try {
             Thread.sleep(rnd.nextInt(100));
           } catch (InterruptedException e) {

@@ -21,20 +21,18 @@ import java.util.Map;
 import java.util.Set;
 
 /**
-* User: fkleedorfer
-* Date: 27.10.2014
-*/
-public class WonNodeInfo
-{
+ * User: fkleedorfer Date: 27.10.2014
+ */
+public class WonNodeInfo {
   private String wonNodeURI;
   private String eventURIPrefix;
   private String connectionURIPrefix;
   private String needURIPrefix;
   private String needListURI;
-  private Map<String, Map <String, String>> supportedProtocolImpl;
+  private Map<String, Map<String, String>> supportedProtocolImpl;
 
   protected WonNodeInfo(String wonNodeURI, String eventURIPrefix, String connectionURIPattern, String needURIPattern,
-                     String needListURI, Map<String, Map <String, String>> supportedProtocolImpl ) {
+      String needListURI, Map<String, Map<String, String>> supportedProtocolImpl) {
 
     this.wonNodeURI = wonNodeURI;
     this.eventURIPrefix = eventURIPrefix;
@@ -53,7 +51,7 @@ public class WonNodeInfo
   }
 
   public String getSupportedProtocolImplParamValue(String protocol, String paramName) {
-    Map<String,String> protocolMap = supportedProtocolImpl.get(protocol);
+    Map<String, String> protocolMap = supportedProtocolImpl.get(protocol);
     if (protocolMap != null) {
       return protocolMap.get(paramName);
     }
@@ -69,7 +67,7 @@ public class WonNodeInfo
   public Set<String> getSupportedProtocolImplParams(String protocol) {
 
     Set<String> protocols = new HashSet<>();
-    Map<String,String> protocolMap = supportedProtocolImpl.get(protocol);
+    Map<String, String> protocolMap = supportedProtocolImpl.get(protocol);
     if (protocolMap != null) {
       protocols.addAll(protocolMap.keySet());
     }

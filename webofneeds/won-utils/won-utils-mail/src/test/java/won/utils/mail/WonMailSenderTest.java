@@ -1,8 +1,8 @@
 package won.utils.mail;
 
-import javax.mail.Message;
-import javax.mail.MessagingException;
-
+import com.icegreen.greenmail.util.GreenMail;
+import com.icegreen.greenmail.util.GreenMailUtil;
+import com.icegreen.greenmail.util.ServerSetupTest;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -14,29 +14,24 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.icegreen.greenmail.util.GreenMail;
-import com.icegreen.greenmail.util.GreenMailUtil;
-import com.icegreen.greenmail.util.ServerSetupTest;
+import javax.mail.Message;
+import javax.mail.MessagingException;
 
 /**
  * User: ypanchenko
  * Date: 17.02.2015
  */
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:/mail-sender.xml"})
-public class WonMailSenderTest {
+@RunWith(SpringJUnit4ClassRunner.class) @ContextConfiguration(locations = {
+    "classpath:/mail-sender.xml" }) public class WonMailSenderTest {
 
   private GreenMail testSmtp;
 
-  @Autowired
-  private WonMailSender wonEmailSender;
+  @Autowired private WonMailSender wonEmailSender;
 
-  @Autowired
-  private JavaMailSenderImpl baseMailSender;
+  @Autowired private JavaMailSenderImpl baseMailSender;
 
-  @Test
-  public void sendTextMessage() throws MessagingException {
+  @Test public void sendTextMessage() throws MessagingException {
     SimpleMailMessage message = new SimpleMailMessage();
 
     // replace sender specified in mail-sender.xml with the test sender
@@ -51,8 +46,7 @@ public class WonMailSenderTest {
     Assert.assertEquals("test message", body);
   }
 
-  @Before
-  public void testSmtpInit(){
+  @Before public void testSmtpInit() {
 
     testSmtp = new GreenMail(ServerSetupTest.SMTP);
     testSmtp.start();
@@ -62,8 +56,7 @@ public class WonMailSenderTest {
     baseMailSender.setHost("localhost");
   }
 
-  @After
-  public void cleanup(){
+  @After public void cleanup() {
     testSmtp.stop();
   }
 
