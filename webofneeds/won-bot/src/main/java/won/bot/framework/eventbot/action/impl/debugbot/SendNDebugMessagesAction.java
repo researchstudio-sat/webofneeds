@@ -16,11 +16,7 @@
 
 package won.bot.framework.eventbot.action.impl.debugbot;
 
-import java.net.URI;
-import java.util.Date;
-
 import org.apache.jena.query.Dataset;
-
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
@@ -32,15 +28,18 @@ import won.protocol.message.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 
+import java.net.URI;
+import java.util.Date;
+
 /**
  * Created by fkleedorfer on 09.06.2016.
  */
-public class SendNDebugMessagesAction extends BaseEventBotAction
-{
-  String[] messages = {"one", "two"};
+public class SendNDebugMessagesAction extends BaseEventBotAction {
+  String[] messages = { "one", "two" };
   private long delayBetweenMessages = 1000;
+
   public SendNDebugMessagesAction(final EventListenerContext eventListenerContext, long delayBetweenMessages,
-                                  String... messages) {
+      String... messages) {
     super(eventListenerContext);
     this.delayBetweenMessages = delayBetweenMessages;
     this.messages = messages;
@@ -49,23 +48,22 @@ public class SendNDebugMessagesAction extends BaseEventBotAction
   @Override
   protected void doRun(final Event event, EventListener executingListener) throws Exception {
     int n = this.messages.length;
-    if (event instanceof SendNDebugCommandEvent){
+    if (event instanceof SendNDebugCommandEvent) {
       SendNDebugCommandEvent sendNDebugCommandEvent = (SendNDebugCommandEvent) event;
-      n = Math.min(n,((SendNDebugCommandEvent)event).getNumberOfMessagesToSend());
+      n = Math.min(n, ((SendNDebugCommandEvent) event).getNumberOfMessagesToSend());
       long delay = 0;
       URI connUri = sendNDebugCommandEvent.getConnectionURI();
-      for (int i = 0; i < n; i++){
+      for (int i = 0; i < n; i++) {
         delay += delayBetweenMessages;
         String messageText = this.messages[i];
-        getEventListenerContext().getTaskScheduler().schedule(createMessageTask(connUri, messageText),new Date(System
-          .currentTimeMillis()+delay));
+        getEventListenerContext().getTaskScheduler().schedule(createMessageTask(connUri, messageText),
+            new Date(System.currentTimeMillis() + delay));
       }
     }
   }
 
   private Runnable createMessageTask(final URI connectionURI, final String messageText) {
-    return new Runnable()
-    {
+    return new Runnable() {
       @Override
       public void run() {
         getEventListenerContext().getWonMessageSender().sendWonMessage(createWonMessage(connectionURI, messageText));
@@ -73,32 +71,20 @@ public class SendNDebugMessagesAction extends BaseEventBotAction
     };
   }
 
-
   private WonMessage createWonMessage(URI connectionURI, String message) throws WonMessageBuilderException {
 
-    WonNodeInformationService wonNodeInformationService =
-      getEventListenerContext().getWonNodeInformationService();
+    WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
 
-    Dataset connectionRDF =
-      getEventListenerContext().getLinkedDataSource().getDataForResource(connectionURI);
+    Dataset connectionRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(connectionURI);
     URI remoteNeed = WonRdfUtils.ConnectionUtils.getRemoteNeedURIFromConnection(connectionRDF, connectionURI);
     URI localNeed = WonRdfUtils.ConnectionUtils.getLocalNeedURIFromConnection(connectionRDF, connectionURI);
     URI wonNode = WonRdfUtils.ConnectionUtils.getWonNodeURIFromConnection(connectionRDF, connectionURI);
-    Dataset remoteNeedRDF =
-      getEventListenerContext().getLinkedDataSource().getDataForResource(remoteNeed);
+    Dataset remoteNeedRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(remoteNeed);
 
     URI messageURI = wonNodeInformationService.generateEventURI(wonNode);
 
-    return WonMessageBuilder
-      .setMessagePropertiesForConnectionMessage(
-        messageURI,
-        connectionURI,
-        localNeed,
-        wonNode,
-        WonRdfUtils.ConnectionUtils.getRemoteConnectionURIFromConnection(connectionRDF, connectionURI),
-        remoteNeed,
-        WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, remoteNeed),
-        message)
-      .build();
+    return WonMessageBuilder.setMessagePropertiesForConnectionMessage(messageURI, connectionURI, localNeed, wonNode,
+        WonRdfUtils.ConnectionUtils.getRemoteConnectionURIFromConnection(connectionRDF, connectionURI), remoteNeed,
+        WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, remoteNeed), message).build();
   }
 }

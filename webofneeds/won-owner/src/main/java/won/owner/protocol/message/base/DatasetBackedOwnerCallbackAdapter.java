@@ -16,20 +16,11 @@
 
 package won.owner.protocol.message.base;
 
-import java.net.URI;
-
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.ParameterizedSparqlString;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.*;
 import org.apache.jena.tdb.TDB;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import won.owner.protocol.message.OwnerCallback;
 import won.protocol.exception.DataIntegrityException;
 import won.protocol.message.WonMessage;
@@ -42,26 +33,21 @@ import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.vocabulary.WON;
 
+import java.net.URI;
+
 /**
  * Implementation of the WonMessageHandlerAdapter that uses a Dataset for
  * creating the objects needed for invoking the adaptee's callback methods.
- * <p/>
- * Sent and received messages are added to the dataset automatically. Missing data is
- * automatically loaded via linked data.
+ * <p>
+ * Sent and received messages are added to the dataset automatically. Missing
+ * data is automatically loaded via linked data.
  */
-public class DatasetBackedOwnerCallbackAdapter extends OwnerCallbackAdapter
-{
-  //TODO move to the queries object!
-  private static final String QUERY_CONNECTION =
-    "SELECT ?con ?need ?state ?remoteCon ?remoteNeed ?type where { " +
-      "  ?con won:belongsToNeed ?need; " +
-      "     won:isInState ?state; " +
-      "     won:hasFacet ?type; " +
-      "     won:hasRemoteNeed ?remoteNeed." +
-      "  OPTIONAL { " +
-      "    ?con won:hasRemoteConnection ?remoteCon" +
-      "  } " +
-      "} ";
+public class DatasetBackedOwnerCallbackAdapter extends OwnerCallbackAdapter {
+  // TODO move to the queries object!
+  private static final String QUERY_CONNECTION = "SELECT ?con ?need ?state ?remoteCon ?remoteNeed ?type where { "
+      + "  ?con won:belongsToNeed ?need; " + "     won:isInState ?state; " + "     won:hasFacet ?type; "
+      + "     won:hasRemoteNeed ?remoteNeed." + "  OPTIONAL { " + "    ?con won:hasRemoteConnection ?remoteCon" + "  } "
+      + "} ";
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
   @Autowired
@@ -69,7 +55,6 @@ public class DatasetBackedOwnerCallbackAdapter extends OwnerCallbackAdapter
 
   @Autowired
   private LinkedDataSource linkedDataSource;
-
 
   public DatasetBackedOwnerCallbackAdapter(final OwnerCallback adaptee) {
     super(adaptee);
@@ -98,14 +83,14 @@ public class DatasetBackedOwnerCallbackAdapter extends OwnerCallbackAdapter
     pss.setIri("con", connUri.toString());
     Query query = pss.asQuery();
     try (QueryExecution qExec = QueryExecutionFactory.create(query, dataset)) {
-        qExec.getContext().set(TDB.symUnionDefaultGraph, true);
-        Connection con = null;
-        final ResultSet results = qExec.execSelect();
+      qExec.getContext().set(TDB.symUnionDefaultGraph, true);
+      Connection con = null;
+      final ResultSet results = qExec.execSelect();
+      if (results.hasNext()) {
+        QuerySolution soln = results.next();
         if (results.hasNext()) {
-            QuerySolution soln = results.next();
-            if (results.hasNext()){
-              throw new DataIntegrityException("Query must not yield multiple solutions");
-            }
+          throw new DataIntegrityException("Query must not yield multiple solutions");
+        }
         con = new Connection();
         con.setConnectionURI(getURIFromSolution(soln, "con"));
         con.setTypeURI(getURIFromSolution(soln, "type"));

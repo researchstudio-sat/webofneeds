@@ -21,8 +21,7 @@ import java.net.URI;
 /**
  *
  */
-public abstract class BaseNeedSpecificEvent extends BaseEvent implements NeedSpecificEvent
-{
+public abstract class BaseNeedSpecificEvent extends BaseEvent implements NeedSpecificEvent {
   private final URI needURI;
 
   protected BaseNeedSpecificEvent(final URI needURI) {
@@ -36,8 +35,6 @@ public abstract class BaseNeedSpecificEvent extends BaseEvent implements NeedSpe
 
   @Override
   public String toString() {
-    return getClass().getSimpleName()+ "{" +
-      "needURI=" + getNeedURI() +
-      '}';
+    return getClass().getSimpleName() + "{" + "needURI=" + getNeedURI() + '}';
   }
 }

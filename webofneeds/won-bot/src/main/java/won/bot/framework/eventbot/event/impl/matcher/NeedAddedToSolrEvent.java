@@ -16,16 +16,15 @@
 
 package won.bot.framework.eventbot.event.impl.matcher;
 
-import java.net.URI;
-
 import won.bot.framework.eventbot.event.BaseNeedSpecificEvent;
+
+import java.net.URI;
 
 /**
  *
  */
-public class NeedAddedToSolrEvent extends BaseNeedSpecificEvent
-{
-   public NeedAddedToSolrEvent(final URI needURI) {
+public class NeedAddedToSolrEvent extends BaseNeedSpecificEvent {
+  public NeedAddedToSolrEvent(final URI needURI) {
     super(needURI);
   }
 

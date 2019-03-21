@@ -22,11 +22,11 @@ import won.bot.framework.eventbot.event.impl.cmd.BaseCommandFailureEvent;
  * Indicates that a ValidateConnectionCommandEvent failed.
  */
 public class CrawlConnectionCommandFailureEvent extends BaseCommandFailureEvent<CrawlConnectionCommandEvent> {
-    public CrawlConnectionCommandFailureEvent(String message, CrawlConnectionCommandEvent originalCommandEvent) {
-        super(message, originalCommandEvent);
-    }
+  public CrawlConnectionCommandFailureEvent(String message, CrawlConnectionCommandEvent originalCommandEvent) {
+    super(message, originalCommandEvent);
+  }
 
-    public CrawlConnectionCommandFailureEvent(CrawlConnectionCommandEvent originalCommandEvent) {
-        super(originalCommandEvent);
-    }
+  public CrawlConnectionCommandFailureEvent(CrawlConnectionCommandEvent originalCommandEvent) {
+    super(originalCommandEvent);
+  }
 }

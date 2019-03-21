@@ -16,18 +16,19 @@
 
 package won.matcher.protocol;
 
-import java.net.URI;
-
 import org.apache.jena.query.Dataset;
 
+import java.net.URI;
+
 /**
- * User: fkleedorfer
- * Date: 21.01.14
+ * User: fkleedorfer Date: 21.01.14
  */
-public interface MatcherProtocolMatcherServiceCallback
-{
+public interface MatcherProtocolMatcherServiceCallback {
   void onRegistered(URI wonNodeUri);
+
   void onNewNeed(final URI wonNodeURI, URI needURI, Dataset content);
+
   void onNeedActivated(final URI wonNodeURI, URI needURI);
+
   void onNeedDeactivated(final URI wonNodeURI, URI needURI);
 }

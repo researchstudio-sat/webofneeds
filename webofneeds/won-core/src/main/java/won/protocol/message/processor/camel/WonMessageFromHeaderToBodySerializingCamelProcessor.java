@@ -16,36 +16,36 @@
 
 package won.protocol.message.processor.camel;
 
-import java.io.StringWriter;
-import java.util.Map;
-
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
 
+import java.io.StringWriter;
+import java.util.Map;
+
 /**
- * Last processor for outgoing messages. It expects a WonMessage object in the exchange's in, in the header 'wonMessgage'.
- * The message is serialized as TRIG and put in the in's body.
+ * Last processor for outgoing messages. It expects a WonMessage object in the
+ * exchange's in, in the header 'wonMessgage'. The message is serialized as TRIG
+ * and put in the in's body.
  */
-public class WonMessageFromHeaderToBodySerializingCamelProcessor implements Processor
-{
+public class WonMessageFromHeaderToBodySerializingCamelProcessor implements Processor {
   Logger logger = LoggerFactory.getLogger(this.getClass());
 
   @Override
   public void process(final Exchange exchange) throws Exception {
     logger.debug("processing won message");
     Map headers = exchange.getIn().getHeaders();
-    //if the wonMessage header is there, don't change it - that way we can re-route internal messages
+    // if the wonMessage header is there, don't change it - that way we can re-route
+    // internal messages
     WonMessage wonMessage = (WonMessage) headers.get(WonCamelConstants.MESSAGE_HEADER);
     if (wonMessage == null) {
-      throw new WonMessageProcessingException("No WonMessage found in header '" +
-                                                WonCamelConstants.MESSAGE_HEADER+"'");
+      throw new WonMessageProcessingException(
+          "No WonMessage found in header '" + WonCamelConstants.MESSAGE_HEADER + "'");
     }
     StringWriter writer = new StringWriter();
     RDFDataMgr.write(writer, wonMessage.getCompleteDataset(), Lang.TRIG);

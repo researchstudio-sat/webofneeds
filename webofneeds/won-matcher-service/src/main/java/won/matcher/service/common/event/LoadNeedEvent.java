@@ -4,18 +4,18 @@ import java.io.Serializable;
 
 /**
  * Created by hfriedrich on 17.10.2016.
- *
- * Event is used to aks the crawler to load events that were either the last X needs seen or saved during a given date
- * interval.
+ * <p>
+ * Event is used to aks the crawler to load events that were either the last X
+ * needs seen or saved during a given date interval.
  */
-public class LoadNeedEvent implements Serializable
-{
+public class LoadNeedEvent implements Serializable {
   private long fromDate;
   private long toDate;
   private int lastXNeedEvents;
 
   /**
-   * Request all need events between fromDate and toDate (matcher service timestamp)
+   * Request all need events between fromDate and toDate (matcher service
+   * timestamp)
    *
    * @param fromDate
    * @param toDate
@@ -44,7 +44,6 @@ public class LoadNeedEvent implements Serializable
   public long getToDate() {
     return toDate;
   }
-
 
   public int getLastXNeedEvents() {
     return lastXNeedEvents;

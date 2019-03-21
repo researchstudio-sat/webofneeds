@@ -22,28 +22,24 @@ import org.springframework.scheduling.Trigger;
 /**
  *
  */
-public class MonitoringRecorder
-{
+public class MonitoringRecorder {
   private TaskScheduler taskScheduler;
   private Trigger trigger;
   private MonitoringStatisticsRecorderTask task;
 
-  public void setup(){
+  public void setup() {
     taskScheduler.schedule(task, trigger);
   }
 
-  public void setTaskScheduler(final TaskScheduler taskScheduler)
-  {
+  public void setTaskScheduler(final TaskScheduler taskScheduler) {
     this.taskScheduler = taskScheduler;
   }
 
-  public void setTrigger(final Trigger trigger)
-  {
+  public void setTrigger(final Trigger trigger) {
     this.trigger = trigger;
   }
 
-  public void setTask(final MonitoringStatisticsRecorderTask task)
-  {
+  public void setTask(final MonitoringStatisticsRecorderTask task) {
     this.task = task;
   }
 }

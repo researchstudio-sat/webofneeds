@@ -1,44 +1,44 @@
 package won.owner.pojo;
 
 public class ResetPasswordPojo {
-    private String username;
-    private String newPassword;
-    private String recoveryKey;
-    private String verificationToken;
-    
-    public ResetPasswordPojo() {
-    }
+  private String username;
+  private String newPassword;
+  private String recoveryKey;
+  private String verificationToken;
 
-    public String getUsername() {
-        return username;
-    }
+  public ResetPasswordPojo() {
+  }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
+  public String getUsername() {
+    return username;
+  }
 
-    public String getNewPassword() {
-        return newPassword;
-    }
+  public void setUsername(String username) {
+    this.username = username;
+  }
 
-    public void setNewPassword(String newPassword) {
-        this.newPassword = newPassword;
-    }
+  public String getNewPassword() {
+    return newPassword;
+  }
 
-    public String getRecoveryKey() {
-        return recoveryKey;
-    }
+  public void setNewPassword(String newPassword) {
+    this.newPassword = newPassword;
+  }
 
-    public void setRecoveryKey(String recoveryKey) {
-        this.recoveryKey = recoveryKey;
-    }
+  public String getRecoveryKey() {
+    return recoveryKey;
+  }
 
-    public String getVerificationToken() {
-        return verificationToken;
-    }
+  public void setRecoveryKey(String recoveryKey) {
+    this.recoveryKey = recoveryKey;
+  }
 
-    public void setVerificationToken(String verificationToken) {
-        this.verificationToken = verificationToken;
-    }
+  public String getVerificationToken() {
+    return verificationToken;
+  }
+
+  public void setVerificationToken(String verificationToken) {
+    this.verificationToken = verificationToken;
+  }
 
 }

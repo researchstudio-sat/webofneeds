@@ -4,12 +4,12 @@ import org.springframework.data.annotation.Id;
 
 /**
  * Wrapper object for storing generic java objects in the mongo db database.
- * This objects allows to specify the the id and the value (java object) to store.
- *
+ * This objects allows to specify the the id and the value (java object) to
+ * store.
+ * <p>
  * Created by hfriedrich on 24.10.2016.
  */
-public class MongoContextObject
-{
+public class MongoContextObject {
   @Id
   private String id;
 

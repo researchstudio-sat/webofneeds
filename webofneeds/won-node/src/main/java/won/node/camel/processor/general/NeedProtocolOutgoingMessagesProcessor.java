@@ -20,7 +20,6 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import won.protocol.jms.MessagingService;
 import won.protocol.jms.NeedProtocolCommunicationService;
 import won.protocol.message.WonMessage;
@@ -31,34 +30,36 @@ import won.protocol.util.RdfUtils;
  * Processor responsible for routing messages to
  */
 public class NeedProtocolOutgoingMessagesProcessor implements Processor {
-    private final org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
+  private final org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Autowired
-    private NeedProtocolCommunicationService needProtocolCommunicationService;
+  @Autowired
+  private NeedProtocolCommunicationService needProtocolCommunicationService;
 
-    @Autowired
-    private MessagingService messageService;
+  @Autowired
+  private MessagingService messageService;
 
-    @Override
-    public void process(Exchange exchange) throws Exception {
-        logger.debug("processing message for sending to remote node");
-      WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
-      if (wonMessage.getSenderNeedURI() != null && wonMessage.getSenderNodeURI().equals(wonMessage.getReceiverNodeURI
-        ())){
-        //sending locally, directly put message into the incoming need protocol
-        messageService.sendInOnlyMessage(null, null, RdfUtils
-          .writeDatasetToString(wonMessage.getCompleteDataset(), WonCamelConstants.RDF_LANGUAGE_FOR_MESSAGE),
+  @Override
+  public void process(Exchange exchange) throws Exception {
+    logger.debug("processing message for sending to remote node");
+    WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
+    if (wonMessage.getSenderNeedURI() != null
+        && wonMessage.getSenderNodeURI().equals(wonMessage.getReceiverNodeURI())) {
+      // sending locally, directly put message into the incoming need protocol
+      messageService.sendInOnlyMessage(null, null,
+          RdfUtils.writeDatasetToString(wonMessage.getCompleteDataset(), WonCamelConstants.RDF_LANGUAGE_FOR_MESSAGE),
           "activemq:queue:NeedProtocol.in");
-        return;
-      }
-      //add a camel endpoint for the remote won node
-      needProtocolCommunicationService.configureCamelEndpoint(wonMessage.getReceiverNodeURI());
-      //send the message to that endpoint
-      String ep = needProtocolCommunicationService.getProtocolCamelConfigurator().getEndpoint(wonMessage
-                                                                                              .getReceiverNodeURI());
-      //messageService.sendInOnlyMessage(null, null, wonMessage, wonMessage.getReceiverNodeURI().toString());
-      String msgBody = RdfUtils.writeDatasetToString(wonMessage.getCompleteDataset(), WonCamelConstants.RDF_LANGUAGE_FOR_MESSAGE);
-      messageService.sendInOnlyMessage(null, null, msgBody, ep);
+      return;
     }
+    // add a camel endpoint for the remote won node
+    needProtocolCommunicationService.configureCamelEndpoint(wonMessage.getReceiverNodeURI());
+    // send the message to that endpoint
+    String ep = needProtocolCommunicationService.getProtocolCamelConfigurator()
+        .getEndpoint(wonMessage.getReceiverNodeURI());
+    // messageService.sendInOnlyMessage(null, null, wonMessage,
+    // wonMessage.getReceiverNodeURI().toString());
+    String msgBody = RdfUtils.writeDatasetToString(wonMessage.getCompleteDataset(),
+        WonCamelConstants.RDF_LANGUAGE_FOR_MESSAGE);
+    messageService.sendInOnlyMessage(null, null, msgBody, ep);
+  }
 
 }

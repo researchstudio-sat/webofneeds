@@ -7,19 +7,18 @@ package won.owner.pojo;
 import org.hibernate.validator.constraints.NotEmpty;
 
 /**
- * User: t.kozel
- * Date: 11/12/13
+ * User: t.kozel Date: 11/12/13
  */
 public class UsernamePojo {
 
-	@NotEmpty
-	private String username;
+  @NotEmpty
+  private String username;
 
-	public String getUsername() {
-		return username;
-	}
+  public String getUsername() {
+    return username;
+  }
 
-	public void setUsername(final String username) {
-		this.username = username;
-	}
+  public void setUsername(final String username) {
+    this.username = username;
+  }
 }

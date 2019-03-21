@@ -1,27 +1,26 @@
 package won.matcher.solr.utils;
 
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-
 /**
  * Created by hfriedrich on 19.07.2016.
- *
- * Detect knee points in a curve using the "Kneedle" algorithm as described in the paper "Finding a" Kneedle" in a
- * Haystack: Detecting Knee Points in System Behavior".
- *
- * NOTE: This implementation does not check the concavity of the curve.
- * Also no smoothing of the curve is applied by this method.
- *
- * Kneedle algorithm described in:
- * Satopaa, V., Albrecht, J., Irwin, D., & Raghavan, B. (2011, June).
- * Finding a" Kneedle" in a Haystack: Detecting Knee Points in System Behavior.
- * In 2011 31st International Conference on Distributed Computing Systems Workshops (pp. 166-171). IEEE.
- *
+ * <p>
+ * Detect knee points in a curve using the "Kneedle" algorithm as described in
+ * the paper "Finding a" Kneedle" in a Haystack: Detecting Knee Points in System
+ * Behavior".
+ * <p>
+ * NOTE: This implementation does not check the concavity of the curve. Also no
+ * smoothing of the curve is applied by this method.
+ * <p>
+ * Kneedle algorithm described in: Satopaa, V., Albrecht, J., Irwin, D., &
+ * Raghavan, B. (2011, June). Finding a" Kneedle" in a Haystack: Detecting Knee
+ * Points in System Behavior. In 2011 31st International Conference on
+ * Distributed Computing Systems Workshops (pp. 166-171). IEEE.
  */
-public class Kneedle
-{
+public class Kneedle {
   private double sensitivity = 1.0;
 
   public Kneedle() {
@@ -44,9 +43,10 @@ public class Kneedle
    * Detect all knee points in a curve according to "Kneedle" algorithm.
    * Alternatively this method can detect elbow points instead of knee points.
    *
-   * @param x x-coordintes of curve, must be increasing in value
-   * @param y y-coordinates of curve
-   * @param detectElbows if true detects elbow points, if false detects knee points
+   * @param x            x-coordintes of curve, must be increasing in value
+   * @param y            y-coordinates of curve
+   * @param detectElbows if true detects elbow points, if false detects knee
+   *                     points
    * @return array of indices of knee (or elbow) points in the curve
    */
   private int[] detectKneeOrElbowPoints(final double[] x, final double[] y, boolean detectElbows) {
@@ -66,8 +66,10 @@ public class Kneedle
       yDiff[i] = yn[i] - xn[i];
     }
 
-    // if we want to detect elbow points instead of knees do not compute local maxima but local minima instead.
-    // Therefore we invert the yDiff values which means we actually find local minima instead of maxima in the
+    // if we want to detect elbow points instead of knees do not compute local
+    // maxima but local minima instead.
+    // Therefore we invert the yDiff values which means we actually find local
+    // minima instead of maxima in the
     // original yDiff curve
     if (detectElbows) {
       DescriptiveStatistics stats = new DescriptiveStatistics(yDiff);
@@ -88,8 +90,10 @@ public class Kneedle
         lmxIndices.add(i);
 
         // compute the threshold value for this local maximum
-        // NOTE: As stated in the paper the threshold Tlmx is computed. Since the mean distance of all consecutive
-        // x-values summed together for a normalized function is always (1 / (n -1)) we do not have to compute the
+        // NOTE: As stated in the paper the threshold Tlmx is computed. Since the mean
+        // distance of all consecutive
+        // x-values summed together for a normalized function is always (1 / (n -1)) we
+        // do not have to compute the
         // whole sum here as stated in the paper.
         double tlmx = yDiff[i] - sensitivity / (xn.length - 1);
         lmxThresholds.add(tlmx);

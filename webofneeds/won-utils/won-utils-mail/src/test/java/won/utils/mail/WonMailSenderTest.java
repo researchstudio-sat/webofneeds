@@ -1,8 +1,8 @@
 package won.utils.mail;
 
-import javax.mail.Message;
-import javax.mail.MessagingException;
-
+import com.icegreen.greenmail.util.GreenMail;
+import com.icegreen.greenmail.util.GreenMailUtil;
+import com.icegreen.greenmail.util.ServerSetupTest;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -14,17 +14,15 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.icegreen.greenmail.util.GreenMail;
-import com.icegreen.greenmail.util.GreenMailUtil;
-import com.icegreen.greenmail.util.ServerSetupTest;
+import javax.mail.Message;
+import javax.mail.MessagingException;
 
 /**
- * User: ypanchenko
- * Date: 17.02.2015
+ * User: ypanchenko Date: 17.02.2015
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:/mail-sender.xml"})
+@ContextConfiguration(locations = { "classpath:/mail-sender.xml" })
 public class WonMailSenderTest {
 
   private GreenMail testSmtp;
@@ -52,18 +50,19 @@ public class WonMailSenderTest {
   }
 
   @Before
-  public void testSmtpInit(){
+  public void testSmtpInit() {
 
     testSmtp = new GreenMail(ServerSetupTest.SMTP);
     testSmtp.start();
 
-    // replace port and host specified in mail-sender.xml with the test port and host
+    // replace port and host specified in mail-sender.xml with the test port and
+    // host
     baseMailSender.setPort(3025);
     baseMailSender.setHost("localhost");
   }
 
   @After
-  public void cleanup(){
+  public void cleanup() {
     testSmtp.stop();
   }
 

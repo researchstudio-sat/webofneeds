@@ -23,8 +23,7 @@ import won.bot.framework.eventbot.listener.EventListener;
 /**
  * Action that increments the specified counter.
  */
-public class IncrementCounterAction extends BaseCounterAction
-{
+public class IncrementCounterAction extends BaseCounterAction {
   public IncrementCounterAction(final EventListenerContext eventListenerContext, final Counter counter) {
     super(eventListenerContext, counter);
   }

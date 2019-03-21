@@ -17,18 +17,18 @@
 package won.node.camel.processor.general;
 
 import org.apache.camel.Exchange;
-
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
 
 /**
- * Replaces the WonMessage found in the exchange's in (in the 'wonMessage' header) with its clone.
+ * Replaces the WonMessage found in the exchange's in (in the 'wonMessage'
+ * header) with its clone.
  */
 public class WonMessageCloner extends AbstractCamelProcessor {
-    @Override
-    public void process(final Exchange exchange) throws Exception {
-        WonMessage message = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
-        exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER, WonMessage.deepCopy(message));
-    }
+  @Override
+  public void process(final Exchange exchange) throws Exception {
+    WonMessage message = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
+    exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER, WonMessage.deepCopy(message));
+  }
 }

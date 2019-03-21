@@ -16,14 +16,10 @@
 
 package won.node.camel.processor.fixed;
 
-import java.net.URI;
-import java.util.Collection;
-
 import org.apache.camel.Exchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageReactionProcessor;
 import won.protocol.message.WonMessage;
@@ -37,45 +33,42 @@ import won.protocol.model.Need;
 import won.protocol.util.DataAccessUtils;
 import won.protocol.vocabulary.WONMSG;
 
+import java.net.URI;
+import java.util.Collection;
+
 /**
  *
  */
 @Component
-@FixedMessageReactionProcessor(direction= WONMSG.TYPE_FROM_SYSTEM_STRING,messageType = WONMSG.TYPE_DEACTIVATE_STRING)
-public class DeactivateNeedMessageFromSystemReactionProcessor extends AbstractCamelProcessor
-{
+@FixedMessageReactionProcessor(direction = WONMSG.TYPE_FROM_SYSTEM_STRING, messageType = WONMSG.TYPE_DEACTIVATE_STRING)
+public class DeactivateNeedMessageFromSystemReactionProcessor extends AbstractCamelProcessor {
   Logger logger = LoggerFactory.getLogger(this.getClass());
 
   public void process(final Exchange exchange) throws Exception {
     WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
     URI receiverNeedURI = wonMessage.getReceiverNeedURI();
     logger.debug("DEACTIVATING need. needURI:{}", receiverNeedURI);
-    if (receiverNeedURI == null) throw new WonMessageProcessingException("receiverNeedURI is not set");
+    if (receiverNeedURI == null)
+      throw new WonMessageProcessingException("receiverNeedURI is not set");
     Need need = DataAccessUtils.loadNeed(needRepository, receiverNeedURI);
     matcherProtocolMatcherClient.needDeactivated(need.getNeedURI(), wonMessage);
-    //close all connections
-    Collection<Connection> conns = connectionRepository.getConnectionsByNeedURIAndNotInStateForUpdate(need.getNeedURI
-      (), ConnectionState.CLOSED);
-    for (Connection con: conns) {
+    // close all connections
+    Collection<Connection> conns = connectionRepository.getConnectionsByNeedURIAndNotInStateForUpdate(need.getNeedURI(),
+        ConnectionState.CLOSED);
+    for (Connection con : conns) {
       closeConnection(need, con);
     }
 
   }
 
   public void closeConnection(final Need need, final Connection con) {
-    //send close from system to each connection
-    //the close message is directed at our local connection. It will
-    //be routed to the owner and forwarded to to remote connection
+    // send close from system to each connection
+    // the close message is directed at our local connection. It will
+    // be routed to the owner and forwarded to to remote connection
     URI messageURI = wonNodeInformationService.generateEventURI();
-    WonMessage message = WonMessageBuilder
-      .setMessagePropertiesForClose(messageURI,
-                                    WonMessageDirection.FROM_SYSTEM,
-                                    con.getConnectionURI(),
-                                    con.getNeedURI(),
-                                    need.getWonNodeURI(),
-                                    con.getConnectionURI(),
-                                    con.getNeedURI(),
-                                    need.getWonNodeURI(), "Closed because Need was deactivated").build();
+    WonMessage message = WonMessageBuilder.setMessagePropertiesForClose(messageURI, WonMessageDirection.FROM_SYSTEM,
+        con.getConnectionURI(), con.getNeedURI(), need.getWonNodeURI(), con.getConnectionURI(), con.getNeedURI(),
+        need.getWonNodeURI(), "Closed because Need was deactivated").build();
 
     sendSystemMessage(message);
   }

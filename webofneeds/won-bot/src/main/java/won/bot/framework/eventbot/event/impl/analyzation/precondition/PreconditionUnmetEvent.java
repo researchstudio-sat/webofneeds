@@ -7,7 +7,7 @@ import won.utils.goals.GoalInstantiationResult;
  * Created by fsuda on 27.11.2017.
  */
 public class PreconditionUnmetEvent extends PreconditionEvent {
-    public PreconditionUnmetEvent(Connection con, String preconditionUri, GoalInstantiationResult payload) {
-        super(con, preconditionUri, payload);
-    }
+  public PreconditionUnmetEvent(Connection con, String preconditionUri, GoalInstantiationResult payload) {
+    super(con, preconditionUri, payload);
+  }
 }

@@ -2,179 +2,172 @@ package won.bot.framework.bot.context;
 
 import java.io.Serializable;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * In memory context implementation using nested maps. This is the default implementation of the bot context.
+ * In memory context implementation using nested maps. This is the default
+ * implementation of the bot context.
  */
 public class MemoryBotContext implements BotContext {
-    private Map<String, Map<String, Object>> contextObjectMap = new HashMap<>();
-    private Map<String, Map<String, List<Object>>> contextListMap = new HashMap<>();
+  private Map<String, Map<String, Object>> contextObjectMap = new HashMap<>();
+  private Map<String, Map<String, List<Object>>> contextListMap = new HashMap<>();
 
-    private Set<URI> nodeUris = new HashSet<>();
-    private Map<String, List<URI>> namedNeedUriLists = new HashMap();
+  private Set<URI> nodeUris = new HashSet<>();
+  private Map<String, List<URI>> namedNeedUriLists = new HashMap();
 
-    @Override
-    public Set<URI> retrieveAllNeedUris() {
-        Set<URI> ret = new HashSet<>();
-        ret.addAll(namedNeedUriLists.values().stream().flatMap(List::stream).collect(Collectors.toSet()));
-        return ret;
+  @Override
+  public Set<URI> retrieveAllNeedUris() {
+    Set<URI> ret = new HashSet<>();
+    ret.addAll(namedNeedUriLists.values().stream().flatMap(List::stream).collect(Collectors.toSet()));
+    return ret;
+  }
+
+  @Override
+  public synchronized boolean isNeedKnown(final URI needURI) {
+    return retrieveAllNeedUris().contains(needURI);
+  }
+
+  @Override
+  public synchronized void removeNeedUriFromNamedNeedUriList(URI uri, String name) {
+    List<URI> uris = namedNeedUriLists.get(name);
+    uris.remove(uri);
+  }
+
+  @Override
+  public synchronized void appendToNamedNeedUriList(final URI uri, final String name) {
+
+    List<URI> uris = this.namedNeedUriLists.get(name);
+    if (uris == null) {
+      uris = new ArrayList();
+    }
+    uris.add(uri);
+    this.namedNeedUriLists.put(name, uris);
+  }
+
+  @Override
+  public synchronized boolean isInNamedNeedUriList(URI uri, String name) {
+    List<URI> uris = getNamedNeedUriList(name);
+
+    for (URI tmpUri : uris) {
+      if (tmpUri.equals(uri)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @Override
+  public synchronized List<URI> getNamedNeedUriList(final String name) {
+
+    List<URI> ret = new LinkedList<>();
+    List<URI> namedList = this.namedNeedUriLists.get(name);
+    if (namedList != null) {
+      ret.addAll(namedList);
     }
 
-    @Override
-    public synchronized boolean isNeedKnown(final URI needURI) {
-        return retrieveAllNeedUris().contains(needURI);
+    return ret;
+  }
+
+  @Override
+  public synchronized boolean isNodeKnown(final URI wonNodeURI) {
+    return nodeUris.contains(wonNodeURI);
+  }
+
+  @Override
+  public synchronized void rememberNodeUri(final URI uri) {
+    nodeUris.add(uri);
+  }
+
+  @Override
+  public synchronized void removeNodeUri(final URI uri) {
+    nodeUris.remove(uri);
+  }
+
+  private Map<String, Object> getObjectMap(String collectionName) {
+
+    Map<String, Object> collection = contextObjectMap.get(collectionName);
+    if (collection == null) {
+      collection = new HashMap<>();
+      contextObjectMap.put(collectionName, collection);
     }
+    return collection;
+  }
 
-    @Override
-    public synchronized void removeNeedUriFromNamedNeedUriList(URI uri, String name) {
-        List<URI> uris = namedNeedUriLists.get(name);
-        uris.remove(uri);
+  @Override
+  public void dropCollection(String collectionName) {
+    contextObjectMap.remove(collectionName);
+  }
+
+  @Override
+  public synchronized void saveToObjectMap(String collectionName, String key, final Serializable value) {
+    getObjectMap(collectionName).put(key, value);
+  }
+
+  @Override
+  public synchronized final Object loadFromObjectMap(String collectionName, String key) {
+    return getObjectMap(collectionName).get(key);
+  }
+
+  @Override
+  public Map<String, Object> loadObjectMap(final String collectionName) {
+    return new HashMap<String, Object>(getObjectMap(collectionName));
+  }
+
+  @Override
+  public synchronized final void removeFromObjectMap(String collectionName, String key) {
+    getObjectMap(collectionName).remove(key);
+  }
+
+  private Map<String, List<Object>> getListMap(String collectionName) {
+
+    Map<String, List<Object>> collection = contextListMap.get(collectionName);
+    if (collection == null) {
+      collection = new HashMap<>();
+      contextListMap.put(collectionName, collection);
     }
+    return collection;
+  }
 
-    @Override
-    public synchronized void appendToNamedNeedUriList(final URI uri, final String name) {
+  private List<Object> getList(String collectionName, String key) {
 
-        List<URI> uris = this.namedNeedUriLists.get(name);
-        if (uris == null) {
-            uris = new ArrayList();
-        }
-        uris.add(uri);
-        this.namedNeedUriLists.put(name, uris);
+    List<Object> objectList = getListMap(collectionName).get(key);
+    if (objectList == null) {
+      objectList = new LinkedList<>();
+      getListMap(collectionName).put(key, objectList);
     }
+    return objectList;
+  }
 
-    @Override
-    public synchronized boolean isInNamedNeedUriList(URI uri, String name) {
-        List<URI> uris = getNamedNeedUriList(name);
+  @Override
+  public void addToListMap(final String collectionName, final String key, final Serializable... value) {
+    getList(collectionName, key).addAll(Arrays.asList(value));
+  }
 
-        for (URI tmpUri : uris) {
-            if (tmpUri.equals(uri)) {
-                return true;
-            }
-        }
-        return false;
+  @Override
+  public void removeFromListMap(final String collectionName, final String key, final Serializable... values) {
+    getList(collectionName, key).removeAll(Arrays.asList(values));
+  }
+
+  @Override
+  public void removeLeavesFromListMap(String collectionName, final Serializable... values) {
+    for (String key : getListMap(collectionName).keySet()) {
+      removeFromListMap(collectionName, key, values);
     }
+  }
 
-    @Override
-    public synchronized List<URI> getNamedNeedUriList(final String name) {
+  @Override
+  public List<Object> loadFromListMap(final String collectionName, final String key) {
+    return new LinkedList<>(getList(collectionName, key));
+  }
 
-        List<URI> ret = new LinkedList<>();
-        List<URI> namedList = this.namedNeedUriLists.get(name);
-        if (namedList != null) {
-            ret.addAll(namedList);
-        }
+  @Override
+  public Map<String, List<Object>> loadListMap(final String collectionName) {
+    return new HashMap<>(getListMap(collectionName));
+  }
 
-        return ret;
-    }
-
-    @Override
-    public synchronized boolean isNodeKnown(final URI wonNodeURI) {
-        return nodeUris.contains(wonNodeURI);
-    }
-
-
-    @Override
-    public synchronized void rememberNodeUri(final URI uri) {
-        nodeUris.add(uri);
-    }
-
-    @Override
-    public synchronized void removeNodeUri(final URI uri) {
-        nodeUris.remove(uri);
-    }
-
-    private Map<String, Object> getObjectMap(String collectionName) {
-
-        Map<String, Object> collection = contextObjectMap.get(collectionName);
-        if (collection == null) {
-            collection = new HashMap<>();
-            contextObjectMap.put(collectionName, collection);
-        }
-        return collection;
-    }
-
-    @Override
-    public void dropCollection(String collectionName) {
-        contextObjectMap.remove(collectionName);
-    }
-
-    @Override
-    public synchronized void saveToObjectMap(String collectionName, String key, final Serializable value) {
-        getObjectMap(collectionName).put(key, value);
-    }
-
-    @Override
-    public synchronized final Object loadFromObjectMap(String collectionName, String key) {
-        return getObjectMap(collectionName).get(key);
-    }
-
-    @Override
-    public Map<String, Object> loadObjectMap(final String collectionName) {
-        return new HashMap<String, Object>(getObjectMap(collectionName));
-    }
-
-    @Override
-    public synchronized final void removeFromObjectMap(String collectionName, String key) {
-        getObjectMap(collectionName).remove(key);
-    }
-
-    private Map<String, List<Object>> getListMap(String collectionName) {
-
-        Map<String, List<Object>> collection = contextListMap.get(collectionName);
-        if (collection == null) {
-            collection = new HashMap<>();
-            contextListMap.put(collectionName, collection);
-        }
-        return collection;
-    }
-
-    private List<Object> getList(String collectionName, String key) {
-
-        List<Object> objectList = getListMap(collectionName).get(key);
-        if (objectList == null) {
-            objectList = new LinkedList<>();
-            getListMap(collectionName).put(key, objectList);
-        }
-        return objectList;
-    }
-
-    @Override
-    public void addToListMap(final String collectionName, final String key, final Serializable... value) {
-        getList(collectionName, key).addAll(Arrays.asList(value));
-    }
-
-    @Override
-    public void removeFromListMap(final String collectionName, final String key, final Serializable... values) {
-        getList(collectionName, key).removeAll(Arrays.asList(values));
-    }
-
-    @Override
-    public void removeLeavesFromListMap(String collectionName, final Serializable... values) {
-        for(String key : getListMap(collectionName).keySet()){
-            removeFromListMap(collectionName, key, values);
-        }
-    }
-
-    @Override
-    public List<Object> loadFromListMap(final String collectionName, final String key) {
-        return new LinkedList<>(getList(collectionName, key));
-    }
-
-    @Override
-    public Map<String, List<Object>> loadListMap(final String collectionName) {
-        return new HashMap<>(getListMap(collectionName));
-    }
-
-    @Override
-    public void removeFromListMap(final String collectionName, final String key) {
-        getListMap(collectionName).remove(key);
-    }
+  @Override
+  public void removeFromListMap(final String collectionName, final String key) {
+    getListMap(collectionName).remove(key);
+  }
 }

@@ -16,44 +16,44 @@
 
 package won.bot.framework.eventbot.event.impl.crawl;
 
-import java.net.URI;
-import java.util.List;
-
 import org.apache.jena.sparql.path.Path;
-
 import won.bot.framework.eventbot.event.BaseNeedSpecificEvent;
 import won.bot.framework.eventbot.event.impl.cmd.CommandEvent;
 
+import java.net.URI;
+import java.util.List;
+
 /**
- * Initiates the crawling of linked data. The WebID of the specified need is used.
+ * Initiates the crawling of linked data. The WebID of the specified need is
+ * used.
  */
 public class CrawlCommandEvent extends BaseNeedSpecificEvent implements CommandEvent {
-    private List<Path> propertyPaths;
-    private URI startURI;
-    private int getMaxRequest=1000;
-    private int maxDepth = 5;
+  private List<Path> propertyPaths;
+  private URI startURI;
+  private int getMaxRequest = 1000;
+  private int maxDepth = 5;
 
-    public CrawlCommandEvent(URI needURI, URI startURI, List<Path> propertyPaths, int getMaxRequest, int maxDepth) {
-        super(needURI);
-        this.propertyPaths = propertyPaths;
-        this.startURI = startURI;
-        this.getMaxRequest = getMaxRequest;
-        this.maxDepth = maxDepth;
-    }
+  public CrawlCommandEvent(URI needURI, URI startURI, List<Path> propertyPaths, int getMaxRequest, int maxDepth) {
+    super(needURI);
+    this.propertyPaths = propertyPaths;
+    this.startURI = startURI;
+    this.getMaxRequest = getMaxRequest;
+    this.maxDepth = maxDepth;
+  }
 
-    public URI getStartURI() {
-        return startURI;
-    }
+  public URI getStartURI() {
+    return startURI;
+  }
 
-    public List<Path> getPropertyPaths() {
-        return propertyPaths;
-    }
+  public List<Path> getPropertyPaths() {
+    return propertyPaths;
+  }
 
-    public int getGetMaxRequest() {
-        return getMaxRequest;
-    }
+  public int getGetMaxRequest() {
+    return getMaxRequest;
+  }
 
-    public int getMaxDepth() {
-        return maxDepth;
-    }
+  public int getMaxDepth() {
+    return maxDepth;
+  }
 }

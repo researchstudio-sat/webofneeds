@@ -16,35 +16,30 @@
 
 package won.node.camel.processor.fixed;
 
-import java.net.URI;
-
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.springframework.stereotype.Component;
-
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageReactionProcessor;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.vocabulary.WONMSG;
 
+import java.net.URI;
+
 /**
- * User: syim
- * Date: 02.03.2015
+ * User: syim Date: 02.03.2015
  */
 @Component
-@FixedMessageReactionProcessor(
-        direction = WONMSG.TYPE_FROM_OWNER_STRING,
-        messageType = WONMSG.TYPE_ACTIVATE_STRING)
-public class ActivateNeedMessageReactionProcessor extends AbstractCamelProcessor
-{
-
+@FixedMessageReactionProcessor(direction = WONMSG.TYPE_FROM_OWNER_STRING, messageType = WONMSG.TYPE_ACTIVATE_STRING)
+public class ActivateNeedMessageReactionProcessor extends AbstractCamelProcessor {
 
   public void process(Exchange exchange) throws Exception {
     Message message = exchange.getIn();
     WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
     URI receiverNeedURI = wonMessage.getReceiverNeedURI();
-    if (receiverNeedURI == null) throw new IllegalArgumentException("receiverNeedURI is not set");
+    if (receiverNeedURI == null)
+      throw new IllegalArgumentException("receiverNeedURI is not set");
     matcherProtocolMatcherClient.needActivated(receiverNeedURI, wonMessage);
   }
 

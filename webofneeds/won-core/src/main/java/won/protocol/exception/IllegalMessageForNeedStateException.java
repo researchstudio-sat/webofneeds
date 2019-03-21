@@ -16,43 +16,37 @@
 
 package won.protocol.exception;
 
+import won.protocol.model.NeedState;
+
 import java.net.URI;
 import java.text.MessageFormat;
 
-import won.protocol.model.NeedState;
-
 /**
- * User: fkleedorfer
- * Date: 02.11.12
+ * User: fkleedorfer Date: 02.11.12
  */
-public class IllegalMessageForNeedStateException extends WonProtocolException
-{
+public class IllegalMessageForNeedStateException extends WonProtocolException {
   private String methodName;
   private NeedState needState;
   private URI needURI;
 
-  public IllegalMessageForNeedStateException(final URI needURI, final String methodName, final NeedState needState)
-  {
-    super(MessageFormat.format("It is not allowed to call method {0} on need {1}, as it is currently in state {2}.", methodName, needURI, needState));
+  public IllegalMessageForNeedStateException(final URI needURI, final String methodName, final NeedState needState) {
+    super(MessageFormat.format("It is not allowed to call method {0} on need {1}, as it is currently in state {2}.",
+        methodName, needURI, needState));
     this.methodName = methodName;
     this.needState = needState;
     this.needURI = needURI;
   }
 
-  public URI getNeedURI()
-  {
+  public URI getNeedURI() {
     return needURI;
   }
 
-  public String getMethodName()
-  {
+  public String getMethodName() {
     return methodName;
   }
 
-  public NeedState getNeedState()
-  {
+  public NeedState getNeedState() {
     return needState;
   }
-
 
 }

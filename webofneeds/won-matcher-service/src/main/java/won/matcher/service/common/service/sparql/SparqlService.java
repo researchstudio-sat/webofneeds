@@ -1,21 +1,6 @@
 package won.matcher.service.common.service.sparql;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
-import java.util.Iterator;
-
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
-import org.apache.jena.query.ParameterizedSparqlString;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
@@ -33,21 +18,25 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
 import won.protocol.util.RdfUtils;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
+import java.util.Iterator;
 
 /**
  * Service to access of Sparql enpoint database to save or query linked data.
- *
- * User: hfriedrich
- * Date: 15.04.2015
+ * <p>
+ * User: hfriedrich Date: 15.04.2015
  */
 @Component
-public class SparqlService
-{
+public class SparqlService {
   protected final Logger log = LoggerFactory.getLogger(getClass());
   protected String sparqlEndpoint;
-  //protected DatasetAccessor accessor;
+  // protected DatasetAccessor accessor;
 
   public static Dataset deserializeDataset(String serializedResource, Lang format) throws IOException {
     InputStream is = new ByteArrayInputStream(serializedResource.getBytes(StandardCharsets.UTF_8));
@@ -57,9 +46,9 @@ public class SparqlService
   }
 
   @Autowired
-  public SparqlService(@Value("${uri.sparql.endpoint}")  String sparqlEndpoint) {
+  public SparqlService(@Value("${uri.sparql.endpoint}") String sparqlEndpoint) {
     this.sparqlEndpoint = sparqlEndpoint;
-    //accessor = DatasetAccessorFactory.createHTTP(sparqlEndpoint);
+    // accessor = DatasetAccessorFactory.createHTTP(sparqlEndpoint);
   }
 
   public String getSparqlEndpoint() {
@@ -67,7 +56,8 @@ public class SparqlService
   }
 
   /**
-   * Update named graph by first deleting it and afterwards inserting the triples of the new model.
+   * Update named graph by first deleting it and afterwards inserting the triples
+   * of the new model.
    *
    * @param graph named graph to be updated
    * @param model model that holds triples to set
@@ -84,7 +74,8 @@ public class SparqlService
   }
 
   /**
-   * Update a dataset of names graphs first deleting them and afterwards inserting the triples of the new models.
+   * Update a dataset of names graphs first deleting them and afterwards inserting
+   * the triples of the new models.
    *
    * @param ds
    */
@@ -116,9 +107,9 @@ public class SparqlService
     pps.setCommandText(queryTemplate);
     pps.setIri("g", graphName);
     Query query = QueryFactory.create(pps.toString());
-    try(QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query)){
-        Model model = qexec.execConstruct();
-        return model;
+    try (QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query)) {
+      Model model = qexec.execConstruct();
+      return model;
     }
   }
 
@@ -134,8 +125,8 @@ public class SparqlService
 
   public Dataset retrieveNeedDataset(String uri) {
 
-    String queryString = "prefix won: <http://purl.org/webofneeds/model#> select distinct ?g where { " +
-      "GRAPH ?g { ?uri a won:Need. ?a ?b ?c. } }";
+    String queryString = "prefix won: <http://purl.org/webofneeds/model#> select distinct ?g where { "
+        + "GRAPH ?g { ?uri a won:Need. ?a ?b ?c. } }";
 
     ParameterizedSparqlString pps = new ParameterizedSparqlString();
     pps.setCommandText(queryString);
@@ -143,18 +134,17 @@ public class SparqlService
 
     Query query = QueryFactory.create(pps.toString());
     try (QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query)) {
-        ResultSet results = qexec.execSelect();
-        Dataset ds = DatasetFactory.createGeneral();
-        while (results.hasNext()) {
-          QuerySolution qs = results.next();
-          String graphUri = qs.getResource("g").getURI();
-          Model model = retrieveModel(graphUri);
-          ds.addNamedModel(graphUri, model);
-        }
-        return ds;
+      ResultSet results = qexec.execSelect();
+      Dataset ds = DatasetFactory.createGeneral();
+      while (results.hasNext()) {
+        QuerySolution qs = results.next();
+        String graphUri = qs.getResource("g").getURI();
+        Model model = retrieveModel(graphUri);
+        ds.addNamedModel(graphUri, model);
+      }
+      return ds;
     }
   }
-    
 
   /**
    * Execute a SPARQL Update query.
@@ -166,8 +156,7 @@ public class SparqlService
     log.debug("Update SPARQL Endpoint: {}", sparqlEndpoint);
     log.debug("Execute query: {}", updateQuery);
     UpdateRequest query = UpdateFactory.create(updateQuery);
-    UpdateProcessRemote riStore = (UpdateProcessRemote)
-      UpdateExecutionFactory.createRemote(query, sparqlEndpoint);
+    UpdateProcessRemote riStore = (UpdateProcessRemote) UpdateExecutionFactory.createRemote(query, sparqlEndpoint);
     riStore.execute();
   }
 

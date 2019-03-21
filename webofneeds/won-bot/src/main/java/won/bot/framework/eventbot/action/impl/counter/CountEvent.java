@@ -21,20 +21,20 @@ import won.bot.framework.eventbot.event.BaseEvent;
 /**
  * Indicates that a counter changed its count.
  */
-public class CountEvent extends BaseEvent{
-    private final EventPublishingCounter counter;
-    private final int count;
+public class CountEvent extends BaseEvent {
+  private final EventPublishingCounter counter;
+  private final int count;
 
-    public CountEvent(EventPublishingCounter counter, int count) {
-        this.counter = counter;
-        this.count = count;
-    }
+  public CountEvent(EventPublishingCounter counter, int count) {
+    this.counter = counter;
+    this.count = count;
+  }
 
-    public EventPublishingCounter getCounter() {
-        return counter;
-    }
+  public EventPublishingCounter getCounter() {
+    return counter;
+  }
 
-    public int getCount() {
-        return count;
-    }
+  public int getCount() {
+    return count;
+  }
 }

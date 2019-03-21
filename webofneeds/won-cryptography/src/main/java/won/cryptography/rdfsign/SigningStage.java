@@ -1,17 +1,9 @@
 package won.cryptography.rdfsign;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.StmtIterator;
-
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonSignatureData;
 import won.protocol.util.RdfUtils;
@@ -19,29 +11,29 @@ import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.RDFG;
 import won.protocol.vocabulary.WONMSG;
 
+import java.util.*;
+
 /**
- * A helper class to represent the won message information such
- * as which content and envelope graphs are unsigned, signatures
- * unreferenced, envelopes hierarchical order, etc., necessary
- * for the signing component to make decisions on what parts of
- * message should be signed and referenced.
- *
- * User: ypanchenko
- * Date: 09.04.2015
+ * A helper class to represent the won message information such as which content
+ * and envelope graphs are unsigned, signatures unreferenced, envelopes
+ * hierarchical order, etc., necessary for the signing component to make
+ * decisions on what parts of message should be signed and referenced.
+ * <p>
+ * User: ypanchenko Date: 09.04.2015
  */
 
 public class SigningStage {
 
   private Set<String> envUris = new HashSet<>();
   private Set<String> contentUris = new HashSet<>();
-  private Map<String,String> contentUriToContainingItEnvUri = new HashMap<>();
-  private Map<String,String> envUriToContainedInItEnvUri = new HashMap<>();
-  private Map<String,String> graphUriToSigUri = new HashMap<>();
-  private Map<String,WonSignatureData> sigUriToSigReference = new HashMap<>();
+  private Map<String, String> contentUriToContainingItEnvUri = new HashMap<>();
+  private Map<String, String> envUriToContainedInItEnvUri = new HashMap<>();
+  private Map<String, String> graphUriToSigUri = new HashMap<>();
+  private Map<String, WonSignatureData> sigUriToSigReference = new HashMap<>();
 
   private List<String> envOrderedByContainment = new ArrayList<>();
   private String messageUri;
-  private Map<String,String> graphUriToItsMessageUri = new HashMap<>();
+  private Map<String, String> graphUriToItsMessageUri = new HashMap<>();
   private String outermostSignatureUri = null;
 
   public SigningStage(WonMessage message) {
@@ -64,7 +56,7 @@ public class SigningStage {
       if (message.isEnvelopeGraph(uri, model)) {
         extractEnvelopeData(uri, model, message);
       } else if (WonRdfUtils.SignatureUtils.isSignature(model, uri)) {
-        if (outermostSignatureUri != null){
+        if (outermostSignatureUri != null) {
           throw new IllegalStateException("Found more than one signature graph");
         }
         outermostSignatureUri = uri;
@@ -73,7 +65,7 @@ public class SigningStage {
         extractContentData(uri);
       }
     }
-    //created ordered env list
+    // created ordered env list
     orderEnvelopes(message);
   }
 
@@ -94,7 +86,7 @@ public class SigningStage {
   }
 
   private void extractSignatureData(final String uri, final Model model) {
-    WonSignatureData wonSignatureData = WonRdfUtils.SignatureUtils.extractWonSignatureData(uri,model);
+    WonSignatureData wonSignatureData = WonRdfUtils.SignatureUtils.extractWonSignatureData(uri, model);
     if (wonSignatureData != null && wonSignatureData.getSignatureValue() != null) {
       graphUriToSigUri.put(wonSignatureData.getSignedGraphUri(), uri);
       sigUriToSigReference.put(uri, wonSignatureData);
@@ -108,8 +100,11 @@ public class SigningStage {
 
     // find if it contains has_content
 
-    //TODO this duplicates private findmessageuri method from wonmessage, refactor to avoid code repetition
-    String envMessageUri = RdfUtils.findOnePropertyFromResource(envelopeGraph, envelopeGraph.getResource(envelopeGraphUri), RDFG.SUBGRAPH_OF).asResource().getURI();
+    // TODO this duplicates private findmessageuri method from wonmessage, refactor
+    // to avoid code repetition
+    String envMessageUri = RdfUtils
+        .findOnePropertyFromResource(envelopeGraph, envelopeGraph.getResource(envelopeGraphUri), RDFG.SUBGRAPH_OF)
+        .asResource().getURI();
     graphUriToItsMessageUri.put(envelopeGraphUri, envMessageUri);
     Resource msgEventResource = envelopeGraph.getResource(envMessageUri);
     Resource msgEnvelopeResource = envelopeGraph.getResource(envelopeGraphUri);
@@ -158,13 +153,11 @@ public class SigningStage {
     return unsigned;
   }
 
-
   public String getEnvelopeUriContainingContent(String contentUri) {
     return contentUriToContainingItEnvUri.get(contentUri);
   }
 
-
   public WonSignatureData getOutermostSignature() {
-   return sigUriToSigReference.get(outermostSignatureUri);
+    return sigUriToSigReference.get(outermostSignatureUri);
   }
 }

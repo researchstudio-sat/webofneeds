@@ -16,21 +16,22 @@
 
 package won.bot.integrationtest.failsim;
 
-import java.net.URI;
-
 import won.bot.framework.eventbot.EventListenerContext;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.service.impl.WonNodeInformationServiceDecorator;
 
+import java.net.URI;
+
 /**
- * Decorates the EventListenerContext such that event URIs generated through the WonNodeInformationService
- * are always the same.
+ * Decorates the EventListenerContext such that event URIs generated through the
+ * WonNodeInformationService are always the same.
  */
 public class ConstantNewEventURIDecorator extends BaseEventListenerContextDecorator {
   public ConstantNewEventURIDecorator(EventListenerContext delegate, String eventURISuffix) {
     super(delegate);
     this.eventURISuffix = eventURISuffix;
   }
+
   private String eventURISuffix;
 
   @Override
@@ -39,12 +40,13 @@ public class ConstantNewEventURIDecorator extends BaseEventListenerContextDecora
     return new WonNodeInformationServiceDecorator(delegate) {
       @Override
       public URI generateEventURI() {
-        return URI.create(getDelegate().getWonNodeInformation(getDefaultWonNodeURI()).getEventURIPrefix() +"/"+ eventURISuffix);
+        return URI.create(
+            getDelegate().getWonNodeInformation(getDefaultWonNodeURI()).getEventURIPrefix() + "/" + eventURISuffix);
       }
 
       @Override
       public URI generateEventURI(URI wonNodeURI) {
-        return URI.create(getDelegate().getWonNodeInformation(wonNodeURI).getEventURIPrefix()  +"/"+ eventURISuffix);
+        return URI.create(getDelegate().getWonNodeInformation(wonNodeURI).getEventURIPrefix() + "/" + eventURISuffix);
       }
 
     };

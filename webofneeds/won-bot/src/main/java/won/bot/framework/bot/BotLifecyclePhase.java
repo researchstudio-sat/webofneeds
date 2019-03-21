@@ -19,20 +19,31 @@ package won.bot.framework.bot;
 /**
  * Lifecycle phases of a bot.
  */
-public enum BotLifecyclePhase
-{
-  //not initialized, changes to STARTING_UP through a call to bot.initialize(). May have been reached through a call to bot.shutdown().
+public enum BotLifecyclePhase {
+  // not initialized, changes to STARTING_UP through a call to bot.initialize().
+  // May have been reached through a call to bot.shutdown().
   DOWN,
-  //bot.initialize() is being executed
+  // bot.initialize() is being executed
   STARTING_UP,
-  //bot.initialize() is done
+  // bot.initialize() is done
   ACTIVE,
-  //bot.shutdown() is being executed. Next state is DOWN.
+  // bot.shutdown() is being executed. Next state is DOWN.
   SHUTTING_DOWN;
 
-  public boolean isDown(){ return this == DOWN;}
-  public boolean isStartingUp(){ return this == STARTING_UP;}
-  public boolean isActive(){ return this == ACTIVE;}
-  public boolean isShuttingDown(){ return this == SHUTTING_DOWN;}
+  public boolean isDown() {
+    return this == DOWN;
+  }
+
+  public boolean isStartingUp() {
+    return this == STARTING_UP;
+  }
+
+  public boolean isActive() {
+    return this == ACTIVE;
+  }
+
+  public boolean isShuttingDown() {
+    return this == SHUTTING_DOWN;
+  }
 
 }

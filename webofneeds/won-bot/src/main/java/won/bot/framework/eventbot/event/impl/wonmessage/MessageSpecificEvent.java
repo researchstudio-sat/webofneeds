@@ -16,17 +16,15 @@
 
 package won.bot.framework.eventbot.event.impl.wonmessage;
 
-import java.net.URI;
-
 import won.bot.framework.eventbot.event.BaseEvent;
 import won.protocol.message.WonMessage;
 
+import java.net.URI;
+
 /**
- * User: ypanchenko
- * Date: 04.03.2016
+ * User: ypanchenko Date: 04.03.2016
  */
-public abstract class MessageSpecificEvent extends BaseEvent
-{
+public abstract class MessageSpecificEvent extends BaseEvent {
 
   private WonMessage message;
 

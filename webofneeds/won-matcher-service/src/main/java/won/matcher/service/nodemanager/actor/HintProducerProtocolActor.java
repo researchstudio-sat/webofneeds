@@ -1,15 +1,5 @@
 package won.matcher.service.nodemanager.actor;
 
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-
-import org.apache.jena.riot.Lang;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 import akka.actor.ActorRef;
 import akka.actor.OneForOneStrategy;
 import akka.actor.SupervisorStrategy;
@@ -19,6 +9,10 @@ import akka.cluster.pubsub.DistributedPubSub;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.japi.Function;
+import org.apache.jena.riot.Lang;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import scala.concurrent.duration.Duration;
 import won.matcher.service.common.event.HintEvent;
 import won.matcher.service.common.service.monitoring.MonitoringService;
@@ -28,15 +22,19 @@ import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageEncoder;
 
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
 /**
  * Akka camel actor used to send out hints to won nodes
- *
+ * <p>
  * Created by hfriedrich on 27.08.2015.
  */
 @Component
 @Scope("prototype")
-public class HintProducerProtocolActor extends UntypedProducerActor
-{
+public class HintProducerProtocolActor extends UntypedProducerActor {
   @Autowired
   private MonitoringService monitoringService;
 
@@ -71,8 +69,9 @@ public class HintProducerProtocolActor extends UntypedProducerActor
     headers.put("otherNeedURI", hint.getToNeedUri());
     headers.put("score", String.valueOf(hint.getScore()));
     headers.put("originator", hint.getMatcherUri());
-    //headers.put("content", RdfUtils.toString(hint.deserializeExplanationModel()));
-    //headers.put("remoteBrokerEndpoint", localBrokerUri);
+    // headers.put("content",
+    // RdfUtils.toString(hint.deserializeExplanationModel()));
+    // headers.put("remoteBrokerEndpoint", localBrokerUri);
     headers.put("methodName", "hint");
 
     WonMessage wonMessage = createHintWonMessage(hint);
@@ -93,40 +92,28 @@ public class HintProducerProtocolActor extends UntypedProducerActor
    * @return
    * @throws WonMessageBuilderException
    */
-  private WonMessage createHintWonMessage(HintEvent hint)
-    throws WonMessageBuilderException {
+  private WonMessage createHintWonMessage(HintEvent hint) throws WonMessageBuilderException {
 
     URI wonNode = URI.create(hint.getFromWonNodeUri());
-    return WonMessageBuilder
-      .setMessagePropertiesForHint(
-        hint.getGeneratedEventUri(),
-        URI.create(hint.getFromNeedUri()),
-        Optional.empty(),
-        wonNode,
-        URI.create(hint.getToNeedUri()),
-        Optional.empty(),        
-        URI.create(hint.getMatcherUri()),
-        hint.getScore())
-      .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL)
-      .build();
+    return WonMessageBuilder.setMessagePropertiesForHint(hint.getGeneratedEventUri(), URI.create(hint.getFromNeedUri()),
+        Optional.empty(), wonNode, URI.create(hint.getToNeedUri()), Optional.empty(), URI.create(hint.getMatcherUri()),
+        hint.getScore()).setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL).build();
   }
-
 
   @Override
   public SupervisorStrategy supervisorStrategy() {
 
-    SupervisorStrategy supervisorStrategy = new OneForOneStrategy(
-      0, Duration.Zero(), new Function<Throwable, SupervisorStrategy.Directive>()
-    {
+    SupervisorStrategy supervisorStrategy = new OneForOneStrategy(0, Duration.Zero(),
+        new Function<Throwable, SupervisorStrategy.Directive>() {
 
-      @Override
-      public SupervisorStrategy.Directive apply(Throwable t) throws Exception {
+          @Override
+          public SupervisorStrategy.Directive apply(Throwable t) throws Exception {
 
-        log.warning("Actor encountered error: {}", t);
-        // default behaviour
-        return SupervisorStrategy.escalate();
-      }
-    });
+            log.warning("Actor encountered error: {}", t);
+            // default behaviour
+            return SupervisorStrategy.escalate();
+          }
+        });
 
     return supervisorStrategy;
   }

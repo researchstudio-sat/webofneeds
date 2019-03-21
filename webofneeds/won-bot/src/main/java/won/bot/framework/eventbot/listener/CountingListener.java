@@ -17,11 +17,9 @@
 package won.bot.framework.eventbot.listener;
 
 /**
- * User: fkleedorfer
- * Date: 24.03.14
+ * User: fkleedorfer Date: 24.03.14
  */
-public interface CountingListener extends FinishingListener
-{
+public interface CountingListener extends FinishingListener {
 
   int getTargetCount();
 

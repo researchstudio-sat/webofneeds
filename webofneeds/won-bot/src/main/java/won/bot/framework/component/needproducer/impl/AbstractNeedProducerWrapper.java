@@ -17,36 +17,30 @@
 package won.bot.framework.component.needproducer.impl;
 
 import org.apache.jena.query.Dataset;
-
 import won.bot.framework.component.needproducer.NeedProducer;
 
 /**
- * User: fkleedorfer
- * Date: 17.12.13
+ * User: fkleedorfer Date: 17.12.13
  */
-public abstract class AbstractNeedProducerWrapper implements NeedProducerWrapper
-{
+public abstract class AbstractNeedProducerWrapper implements NeedProducerWrapper {
   private NeedProducer wrappedProducer;
 
   @Override
-  public void setWrappedProducer(final NeedProducer wrappedProducer)
-  {
+  public void setWrappedProducer(final NeedProducer wrappedProducer) {
     this.wrappedProducer = wrappedProducer;
   }
 
   @Override
-  public synchronized boolean isExhausted()
-  {
+  public synchronized boolean isExhausted() {
     return wrappedProducer.isExhausted();
   }
 
   @Override
-  public synchronized Dataset create()
-  {
+  public synchronized Dataset create() {
     return wrappedProducer.create();
   }
 
-  protected NeedProducer getWrappedProducer(){
+  protected NeedProducer getWrappedProducer() {
     return wrappedProducer;
   }
 }

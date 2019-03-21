@@ -21,10 +21,11 @@ import java.util.Iterator;
 /**
  * Interface that is used to obtain a WON_BA node URI.
  */
-public interface MatcherNodeURISource
-{
+public interface MatcherNodeURISource {
   /**
-   * Returns a WON_BA node's URI. Must point to the URI that, when dereferenced, yields the RDF description of the WON_BA node.
+   * Returns a WON_BA node's URI. Must point to the URI that, when dereferenced,
+   * yields the RDF description of the WON_BA node.
+   *
    * @return
    */
   public Iterator getNodeURIIterator();

@@ -1,36 +1,28 @@
 package won.matcher.service.nodemanager.service;
 
-import java.net.URI;
-import java.util.HashSet;
-import java.util.Set;
-
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.ParameterizedSparqlString;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
 import won.matcher.service.common.service.sparql.SparqlService;
 import won.protocol.exception.DataIntegrityException;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WON;
 
+import java.net.URI;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Sparql service extended with methods for won node controller
- *
- * User: hfriedrich
- * Date: 04.05.2015
+ * <p>
+ * User: hfriedrich Date: 04.05.2015
  */
 @Component
-public class WonNodeSparqlService extends SparqlService
-{
+public class WonNodeSparqlService extends SparqlService {
 
   @Autowired
   public WonNodeSparqlService(@Value("${uri.sparql.endpoint}") final String sparqlEndpoint) {
@@ -38,7 +30,8 @@ public class WonNodeSparqlService extends SparqlService
   }
 
   /**
-   * Retrieve resource data of all known won nodes that are saved in the Sparql endpoint.
+   * Retrieve resource data of all known won nodes that are saved in the Sparql
+   * endpoint.
    *
    * @return Set of all known won node resource data
    */
@@ -53,25 +46,26 @@ public class WonNodeSparqlService extends SparqlService
     log.debug("Query SPARQL Endpoint: {}", sparqlEndpoint);
     log.debug("Execute query: {}", pps.toString());
     try (QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, pps.asQuery())) {
-        ResultSet results = qexec.execSelect();
-    
-        while (results.hasNext()) {
-    
-          QuerySolution qs = results.nextSolution();
-          RDFNode rdfNode = qs.get("graphUri");
-          if (rdfNode != null) {
-            String graphUri = rdfNode.asResource().getURI();
-            Dataset ds = retrieveDataset(graphUri);
-            WonNodeInfo nodeInfo = getWonNodeInfoFromDataset(ds);
-            wonNodeInfos.add(nodeInfo);
-          }
+      ResultSet results = qexec.execSelect();
+
+      while (results.hasNext()) {
+
+        QuerySolution qs = results.nextSolution();
+        RDFNode rdfNode = qs.get("graphUri");
+        if (rdfNode != null) {
+          String graphUri = rdfNode.asResource().getURI();
+          Dataset ds = retrieveDataset(graphUri);
+          WonNodeInfo nodeInfo = getWonNodeInfoFromDataset(ds);
+          wonNodeInfos.add(nodeInfo);
         }
-        return wonNodeInfos;
+      }
+      return wonNodeInfos;
     }
   }
 
   /**
-   * Get the {@link won.protocol.service.WonNodeInfo} as an object from a {@link Dataset}
+   * Get the {@link won.protocol.service.WonNodeInfo} as an object from a
+   * {@link Dataset}
    *
    * @param ds Dataset which holds won node information
    * @return
@@ -81,8 +75,7 @@ public class WonNodeSparqlService extends SparqlService
     String dsWonNodeUri = getWonNodeUriFromDataset(ds);
     WonNodeInfo nodeInfo = WonRdfUtils.WonNodeUtils.getWonNodeInfo(URI.create(dsWonNodeUri), ds);
     if (nodeInfo == null) {
-      throw new DataIntegrityException(
-        "Could not load won node info from dataset with URI: " + dsWonNodeUri);
+      throw new DataIntegrityException("Could not load won node info from dataset with URI: " + dsWonNodeUri);
     }
 
     return nodeInfo;

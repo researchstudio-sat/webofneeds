@@ -16,10 +16,7 @@
 
 package won.bot.framework.eventbot.action.impl.wonmessage.execCommand;
 
-import java.net.URI;
-
 import org.apache.jena.query.Dataset;
-
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandFailureEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandNotSentEvent;
@@ -35,68 +32,65 @@ import won.protocol.message.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 
+import java.net.URI;
+
 /**
- * Action executing a ConnectCommandEvent, connecting to the remoteNeed on behalf of the need.
+ * Action executing a ConnectCommandEvent, connecting to the remoteNeed on
+ * behalf of the need.
  */
 public class ExecuteOpenCommandAction extends ExecuteSendMessageCommandAction<OpenCommandEvent> {
 
-    public ExecuteOpenCommandAction(final EventListenerContext eventListenerContext) {
-        super(eventListenerContext);
-    }
+  public ExecuteOpenCommandAction(final EventListenerContext eventListenerContext) {
+    super(eventListenerContext);
+  }
 
+  @Override
+  protected MessageCommandFailureEvent createRemoteNodeFailureEvent(OpenCommandEvent originalCommand,
+      WonMessage messageSent, FailureResponseEvent failureResponseEvent) {
+    return new OpenCommandFailureEvent(originalCommand, failureResponseEvent.getNeedURI(),
+        failureResponseEvent.getRemoteNeedURI(), failureResponseEvent.getConnectionURI());
+  }
 
-    @Override
-    protected MessageCommandFailureEvent createRemoteNodeFailureEvent(OpenCommandEvent originalCommand, WonMessage messageSent, FailureResponseEvent failureResponseEvent) {
-        return new OpenCommandFailureEvent(originalCommand, failureResponseEvent.getNeedURI(), failureResponseEvent.getRemoteNeedURI(), failureResponseEvent.getConnectionURI());
-    }
+  @Override
+  protected MessageCommandSuccessEvent createRemoteNodeSuccessEvent(OpenCommandEvent originalCommand,
+      WonMessage messageSent, SuccessResponseEvent successResponseEvent) {
+    return new OpenCommandSuccessEvent(originalCommand, successResponseEvent.getNeedURI(),
+        successResponseEvent.getRemoteNeedURI(), successResponseEvent.getConnectionURI());
+  }
 
-    @Override
-    protected MessageCommandSuccessEvent createRemoteNodeSuccessEvent(OpenCommandEvent originalCommand, WonMessage messageSent, SuccessResponseEvent successResponseEvent) {
-        return new OpenCommandSuccessEvent(originalCommand, successResponseEvent.getNeedURI(), successResponseEvent.getRemoteNeedURI(), successResponseEvent.getConnectionURI());
-    }
+  @Override
+  protected MessageCommandFailureEvent createLocalNodeFailureEvent(OpenCommandEvent originalCommand,
+      WonMessage messageSent, FailureResponseEvent failureResponseEvent) {
+    return new OpenCommandFailureEvent(originalCommand, failureResponseEvent.getNeedURI(),
+        failureResponseEvent.getRemoteNeedURI(), failureResponseEvent.getConnectionURI());
+  }
 
-    @Override
-    protected MessageCommandFailureEvent createLocalNodeFailureEvent(OpenCommandEvent originalCommand, WonMessage messageSent, FailureResponseEvent failureResponseEvent) {
-        return new OpenCommandFailureEvent(originalCommand, failureResponseEvent.getNeedURI(), failureResponseEvent.getRemoteNeedURI(), failureResponseEvent.getConnectionURI());
-    }
+  @Override
+  protected MessageCommandSuccessEvent createLocalNodeSuccessEvent(OpenCommandEvent originalCommand,
+      WonMessage messageSent, SuccessResponseEvent successResponseEvent) {
+    return null;
+  }
 
-    @Override
-    protected MessageCommandSuccessEvent createLocalNodeSuccessEvent(OpenCommandEvent originalCommand, WonMessage messageSent, SuccessResponseEvent successResponseEvent) {
-        return null;
-    }
+  @Override
+  protected MessageCommandNotSentEvent createMessageNotSentEvent(OpenCommandEvent originalCommand, String message) {
+    return new MessageCommandNotSentEvent<OpenCommandEvent>(message, originalCommand);
+  }
 
-    @Override
-    protected MessageCommandNotSentEvent createMessageNotSentEvent(OpenCommandEvent originalCommand, String message) {
-        return new MessageCommandNotSentEvent<OpenCommandEvent>(message, originalCommand);
-    }
+  protected WonMessage createWonMessage(OpenCommandEvent connectCommandEvent) throws WonMessageBuilderException {
+    URI connectionURI = connectCommandEvent.getConnectionURI();
+    WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
 
+    Dataset connectionRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(connectionURI);
+    URI remoteNeed = WonRdfUtils.ConnectionUtils.getRemoteNeedURIFromConnection(connectionRDF, connectionURI);
+    URI localNeed = WonRdfUtils.ConnectionUtils.getLocalNeedURIFromConnection(connectionRDF, connectionURI);
+    URI wonNode = WonRdfUtils.ConnectionUtils.getWonNodeURIFromConnection(connectionRDF, connectionURI);
+    Dataset remoteNeedRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(remoteNeed);
 
-    protected WonMessage createWonMessage(OpenCommandEvent connectCommandEvent)
-            throws WonMessageBuilderException {
-        URI connectionURI = connectCommandEvent.getConnectionURI();
-        WonNodeInformationService wonNodeInformationService =
-                getEventListenerContext().getWonNodeInformationService();
-
-        Dataset connectionRDF =
-                getEventListenerContext().getLinkedDataSource().getDataForResource(connectionURI);
-        URI remoteNeed = WonRdfUtils.ConnectionUtils.getRemoteNeedURIFromConnection(connectionRDF, connectionURI);
-        URI localNeed = WonRdfUtils.ConnectionUtils.getLocalNeedURIFromConnection(connectionRDF, connectionURI);
-        URI wonNode = WonRdfUtils.ConnectionUtils.getWonNodeURIFromConnection(connectionRDF, connectionURI);
-        Dataset remoteNeedRDF =
-                getEventListenerContext().getLinkedDataSource().getDataForResource(remoteNeed);
-
-        return WonMessageBuilder
-                .setMessagePropertiesForOpen(
-                        wonNodeInformationService.generateEventURI(
-                                wonNode),
-                        connectionURI,
-                        localNeed,
-                        wonNode,
-                        WonRdfUtils.ConnectionUtils.getRemoteConnectionURIFromConnection(connectionRDF, connectionURI),
-                        remoteNeed,
-                        WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, remoteNeed), connectCommandEvent.getWelcomeMessage()
-                )
-                .build();
-    }
+    return WonMessageBuilder.setMessagePropertiesForOpen(wonNodeInformationService.generateEventURI(wonNode),
+        connectionURI, localNeed, wonNode,
+        WonRdfUtils.ConnectionUtils.getRemoteConnectionURIFromConnection(connectionRDF, connectionURI), remoteNeed,
+        WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, remoteNeed), connectCommandEvent.getWelcomeMessage())
+        .build();
+  }
 
 }

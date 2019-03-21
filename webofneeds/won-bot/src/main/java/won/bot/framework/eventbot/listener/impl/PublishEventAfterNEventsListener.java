@@ -16,21 +16,21 @@
 
 package won.bot.framework.eventbot.listener.impl;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.filter.EventFilter;
 import won.bot.framework.eventbot.listener.BaseEventListener;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
 /**
  * EventListener that counts the events it is subscribed for and after having
  * seen a specified number of events, publishes a specified event. After that,
- * counters are reset and the listener will eventually publish another such event.
+ * counters are reset and the listener will eventually publish another such
+ * event.
  */
-public class PublishEventAfterNEventsListener<T extends Event> extends BaseEventListener
-{
+public class PublishEventAfterNEventsListener<T extends Event> extends BaseEventListener {
   private int count = 0;
   private int targetCount;
   private Class<T> eventClassToPublish;
@@ -41,37 +41,36 @@ public class PublishEventAfterNEventsListener<T extends Event> extends BaseEvent
    * @param eventClassToPublish must be a subclass of Event
    * @param targetCount
    */
-  public PublishEventAfterNEventsListener(EventListenerContext context, final Class<T> eventClassToPublish, final int targetCount)
-  {
+  public PublishEventAfterNEventsListener(EventListenerContext context, final Class<T> eventClassToPublish,
+      final int targetCount) {
     super(context);
     this.targetCount = targetCount;
     this.eventClassToPublish = eventClassToPublish;
   }
 
-  public PublishEventAfterNEventsListener(final EventListenerContext context, final EventFilter eventFilter, final Class<T> eventClassToPublish, final int targetCount)
-  {
+  public PublishEventAfterNEventsListener(final EventListenerContext context, final EventFilter eventFilter,
+      final Class<T> eventClassToPublish, final int targetCount) {
     super(context, eventFilter);
     this.eventClassToPublish = eventClassToPublish;
     this.targetCount = targetCount;
   }
 
-  public PublishEventAfterNEventsListener(final EventListenerContext context, final String name, final int targetCount, final Class<T> eventClassToPublish)
-  {
+  public PublishEventAfterNEventsListener(final EventListenerContext context, final String name, final int targetCount,
+      final Class<T> eventClassToPublish) {
     super(context, name);
     this.targetCount = targetCount;
     this.eventClassToPublish = eventClassToPublish;
   }
 
-  public PublishEventAfterNEventsListener(final EventListenerContext context, final String name, final EventFilter eventFilter, final int targetCount, final Class<T> eventClassToPublish)
-  {
+  public PublishEventAfterNEventsListener(final EventListenerContext context, final String name,
+      final EventFilter eventFilter, final int targetCount, final Class<T> eventClassToPublish) {
     super(context, name, eventFilter);
     this.targetCount = targetCount;
     this.eventClassToPublish = eventClassToPublish;
   }
 
   @Override
-  public void doOnEvent(final Event event) throws Exception
-  {
+  public void doOnEvent(final Event event) throws Exception {
     synchronized (this.monitor) {
       this.count++;
       if (this.count >= targetCount) {
@@ -81,25 +80,19 @@ public class PublishEventAfterNEventsListener<T extends Event> extends BaseEvent
     }
   }
 
-  private void rewind()
-  {
+  private void rewind() {
     this.count = 0;
   }
 
-  private void publishEvent() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException
-  {
+  private void publishEvent()
+      throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
     Constructor<T> constructor = this.eventClassToPublish.getConstructor(EventListenerContext.class);
     T event = constructor.newInstance(getEventListenerContext());
     getEventListenerContext().getEventBus().publish(event);
   }
 
   @Override
-  public String toString()
-  {
-    return getClass().getSimpleName() +
-        "{name='" + name +
-        ", count=" + count +
-        ",targetCount=" + targetCount +
-        '}';
+  public String toString() {
+    return getClass().getSimpleName() + "{name='" + name + ", count=" + count + ",targetCount=" + targetCount + '}';
   }
 }

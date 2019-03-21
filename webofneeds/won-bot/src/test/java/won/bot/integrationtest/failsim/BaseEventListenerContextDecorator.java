@@ -16,11 +16,7 @@
 
 package won.bot.integrationtest.failsim;
 
-import java.net.URI;
-import java.util.concurrent.Executor;
-
 import org.springframework.scheduling.TaskScheduler;
-
 import won.bot.framework.bot.context.BotContext;
 import won.bot.framework.bot.context.BotContextWrapper;
 import won.bot.framework.component.needproducer.NeedProducer;
@@ -34,11 +30,14 @@ import won.protocol.message.sender.WonMessageSender;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.linkeddata.LinkedDataSource;
 
+import java.net.URI;
+import java.util.concurrent.Executor;
+
 /**
- * Delegates calls to another EventListenerContext, allowing to
- * set proxies for some of the services offered by the ELC.
+ * Delegates calls to another EventListenerContext, allowing to set proxies for
+ * some of the services offered by the ELC.
  */
-public abstract class BaseEventListenerContextDecorator implements EventListenerContext{
+public abstract class BaseEventListenerContextDecorator implements EventListenerContext {
   protected EventListenerContext delegate;
 
   public BaseEventListenerContextDecorator(EventListenerContext delegate) {
@@ -106,7 +105,9 @@ public abstract class BaseEventListenerContextDecorator implements EventListener
   }
 
   @Override
-  public BotContextWrapper getBotContextWrapper() {return delegate.getBotContextWrapper(); }
+  public BotContextWrapper getBotContextWrapper() {
+    return delegate.getBotContextWrapper();
+  }
 
   @Override
   public Executor getExecutor() {

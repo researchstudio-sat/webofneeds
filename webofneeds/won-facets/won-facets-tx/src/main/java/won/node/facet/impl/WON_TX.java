@@ -22,17 +22,13 @@ import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 
 /**
- * User: Danijel
- * Date: 5.6.14.
+ * User: Danijel Date: 5.6.14.
  */
-public class WON_TX
-{
+public class WON_TX {
   // public static final String BASE_URI = "http://purl.org/webofneeds/tx/model#";
   public static final String BASE_URI = "http://purl.org/webofneeds/tx/model#";
 
-
-  public static final String DEFAULT_PREFIX= "won-tx";
-
+  public static final String DEFAULT_PREFIX = "won-tx";
 
   private static Model m = ModelFactory.createDefaultModel();
 
@@ -44,9 +40,10 @@ public class WON_TX
   public static final Resource PARTICIPANT = m.createResource(BASE_URI + "Participant");
   public static final Resource COORDINATION_MESSAGE_ABORT = m.createResource(BASE_URI + "Abort");
   public static final Resource COORDINATION_MESSAGE_COMMIT = m.createResource(BASE_URI + "Commit");
-  public static final Resource COORDINATION_MESSAGE_ABORT_AND_COMPENSATE = m.createResource(BASE_URI + "AbortAndCompensate");
+  public static final Resource COORDINATION_MESSAGE_ABORT_AND_COMPENSATE = m
+      .createResource(BASE_URI + "AbortAndCompensate");
 
-  //Business Activities
+  // Business Activities
   public static final Resource MESSAGE_CANCEL = m.createResource(BASE_URI + "MessageCancel");
   public static final Resource MESSAGE_CLOSE = m.createResource(BASE_URI + "MessageClose");
   public static final Resource MESSAGE_COMPENSATE = m.createResource(BASE_URI + "MessageCompensate");
@@ -57,7 +54,7 @@ public class WON_TX
   public static final Resource MESSAGE_EXIT = m.createResource(BASE_URI + "MessageExit");
   public static final Resource MESSAGE_COMPLETED = m.createResource(BASE_URI + "MessageCompleted");
   public static final Resource MESSAGE_FAIL = m.createResource(BASE_URI + "MessageFail");
-  public static final Resource MESSAGE_CANNOTCOMPLETE= m.createResource(BASE_URI + "MessageCanNotComplete");
+  public static final Resource MESSAGE_CANNOTCOMPLETE = m.createResource(BASE_URI + "MessageCanNotComplete");
   public static final Resource MESSAGE_CANCELED = m.createResource(BASE_URI + "MessageCanceled");
   public static final Resource MESSAGE_CLOSED = m.createResource(BASE_URI + "MessageClosed");
   public static final Resource MESSAGE_COMPENSATED = m.createResource(BASE_URI + "MessageCompensated");
@@ -71,14 +68,15 @@ public class WON_TX
   public static final Resource STATE_CANCELING_ACTIVE = m.createResource(BASE_URI + "CancelingActive");
   public static final Resource STATE_CANCELING_COMPLETING = m.createResource(BASE_URI + "CancelingCompleting");
 
-  //from BOTS
+  // from BOTS
   public static final Resource MESSAGE_COMPLETE = m.createResource(BASE_URI + "MessageComplete");
   public static final Property STATE = m.createProperty(BASE_URI + "hasState");
   public static final Resource STATE_ENDED = m.createResource(BASE_URI + "Ended");
   public static final Resource STATE_EXITING = m.createResource(BASE_URI + "Exiting");
   public static final Resource STATE_NOT_COMPLETING = m.createResource(BASE_URI + "NotCompleting");
   public static final Resource STATE_FAILING_COMPENSATING = m.createResource(BASE_URI + "FailingCompensating");
-  public static final Resource STATE_FAILING_ACTIVE_CANCELING_COMPLETING = m.createResource(BASE_URI + "FailingActiveCancelingCompleting");
+  public static final Resource STATE_FAILING_ACTIVE_CANCELING_COMPLETING = m
+      .createResource(BASE_URI + "FailingActiveCancelingCompleting");
   public static final Resource STATE_FAILING_ACTIVE_CANCELING = m.createResource(BASE_URI + "FailingActiveCanceling");
 
   public static final Property HAS_TEXT_MESSAGE = m.createProperty(BASE_URI + "hasTextMessage");
@@ -86,12 +84,12 @@ public class WON_TX
   public static final Property PHASE_FIRST = m.createProperty(BASE_URI + "baPhaseFIRST");
   public static final Property PHASE_SECOND = m.createProperty(BASE_URI + "baPhaseSECOND");
   public static final Property PHASE_NONE = m.createProperty(BASE_URI + "baPhaseNONE");
-  public static final Property PHASE_CANCELED_FROM_COORDINATOR = m.createProperty(BASE_URI + "baPhaseCANCELED_FROM_COORDINATOR");
+  public static final Property PHASE_CANCELED_FROM_COORDINATOR = m
+      .createProperty(BASE_URI + "baPhaseCANCELED_FROM_COORDINATOR");
 
-
-
-
-  /** returns the URI for this schema
+  /**
+   * returns the URI for this schema
+   *
    * @return the URI for this schema
    */
   public static String getURI() {

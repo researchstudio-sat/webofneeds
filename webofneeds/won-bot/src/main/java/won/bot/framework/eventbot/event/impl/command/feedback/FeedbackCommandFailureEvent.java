@@ -16,36 +16,39 @@
 
 package won.bot.framework.eventbot.event.impl.command.feedback;
 
-import java.net.URI;
-
 import won.bot.framework.eventbot.event.impl.command.MessageCommandEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandFailureEvent;
 import won.bot.framework.eventbot.event.impl.command.base.AbstractMessageCommandResultEvent;
 import won.protocol.model.Connection;
 
+import java.net.URI;
 
 /**
- * Indicates that the bot has successfully sent a connect message, thereby creating a connection.
+ * Indicates that the bot has successfully sent a connect message, thereby
+ * creating a connection.
  */
-public class FeedbackCommandFailureEvent extends AbstractMessageCommandResultEvent implements MessageCommandFailureEvent, FeedbackCommandResultEvent {
-    public FeedbackCommandFailureEvent(MessageCommandEvent originalCommandEvent, Connection con) {
-        super(originalCommandEvent, con);
-    }
+public class FeedbackCommandFailureEvent extends AbstractMessageCommandResultEvent
+    implements MessageCommandFailureEvent, FeedbackCommandResultEvent {
+  public FeedbackCommandFailureEvent(MessageCommandEvent originalCommandEvent, Connection con) {
+    super(originalCommandEvent, con);
+  }
 
-    public FeedbackCommandFailureEvent(MessageCommandEvent originalCommandEvent, URI needURI, URI remoteNeedURI, URI connectionURI) {
-        super(originalCommandEvent, needURI, remoteNeedURI, connectionURI);
-    }
+  public FeedbackCommandFailureEvent(MessageCommandEvent originalCommandEvent, URI needURI, URI remoteNeedURI,
+      URI connectionURI) {
+    super(originalCommandEvent, needURI, remoteNeedURI, connectionURI);
+  }
 
-    public FeedbackCommandFailureEvent(MessageCommandEvent originalCommandEvent, URI needURI, URI remoteNeedURI, URI connectionURI, String message) {
-        super(originalCommandEvent, needURI, remoteNeedURI, connectionURI, message);
-    }
+  public FeedbackCommandFailureEvent(MessageCommandEvent originalCommandEvent, URI needURI, URI remoteNeedURI,
+      URI connectionURI, String message) {
+    super(originalCommandEvent, needURI, remoteNeedURI, connectionURI, message);
+  }
 
-    public FeedbackCommandFailureEvent(MessageCommandEvent originalCommandEvent, Connection con, String message) {
-        super(originalCommandEvent, con, message);
-    }
+  public FeedbackCommandFailureEvent(MessageCommandEvent originalCommandEvent, Connection con, String message) {
+    super(originalCommandEvent, con, message);
+  }
 
-    @Override
-    public boolean isSuccess() {
-        return false;
-    }
+  @Override
+  public boolean isSuccess() {
+    return false;
+  }
 }

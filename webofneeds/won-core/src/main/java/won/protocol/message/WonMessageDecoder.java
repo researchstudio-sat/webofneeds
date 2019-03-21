@@ -1,7 +1,5 @@
 package won.protocol.message;
 
-import java.io.StringReader;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.riot.Lang;
@@ -9,13 +7,13 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.StringReader;
+
 /**
- * User: ypanchenko
- * Date: 04.08.2014
+ * User: ypanchenko Date: 04.08.2014
  */
 
-public class WonMessageDecoder
-{
+public class WonMessageDecoder {
 
   private static final Logger logger = LoggerFactory.getLogger(WonMessageDecoder.class);
 
@@ -37,6 +35,5 @@ public class WonMessageDecoder
   public static WonMessage decodeFromDataset(Dataset message) {
     return new WonMessage(message);
   }
-
 
 }

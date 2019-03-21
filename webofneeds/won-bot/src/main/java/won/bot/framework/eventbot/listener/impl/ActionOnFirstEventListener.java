@@ -21,22 +21,24 @@ import won.bot.framework.eventbot.action.EventBotAction;
 import won.bot.framework.eventbot.filter.EventFilter;
 
 /**
- * Executes its action exactly once, only when the first event is seen, then unregisters.
+ * Executes its action exactly once, only when the first event is seen, then
+ * unregisters.
  */
 public class ActionOnFirstEventListener extends ActionOnceAfterNEventsListener {
-    public ActionOnFirstEventListener(EventListenerContext context, EventBotAction task) {
-        super(context, 1, task);
-    }
+  public ActionOnFirstEventListener(EventListenerContext context, EventBotAction task) {
+    super(context, 1, task);
+  }
 
-    public ActionOnFirstEventListener(EventListenerContext context, EventFilter eventFilter, EventBotAction task) {
-        super(context, eventFilter, 1, task);
-    }
+  public ActionOnFirstEventListener(EventListenerContext context, EventFilter eventFilter, EventBotAction task) {
+    super(context, eventFilter, 1, task);
+  }
 
-    public ActionOnFirstEventListener(EventListenerContext context, String name, EventBotAction task) {
-        super(context, name, 1, task);
-    }
+  public ActionOnFirstEventListener(EventListenerContext context, String name, EventBotAction task) {
+    super(context, name, 1, task);
+  }
 
-    public ActionOnFirstEventListener(EventListenerContext context, String name, EventFilter eventFilter, EventBotAction task) {
-        super(context, name, eventFilter, 1, task);
-    }
+  public ActionOnFirstEventListener(EventListenerContext context, String name, EventFilter eventFilter,
+      EventBotAction task) {
+    super(context, name, eventFilter, 1, task);
+  }
 }

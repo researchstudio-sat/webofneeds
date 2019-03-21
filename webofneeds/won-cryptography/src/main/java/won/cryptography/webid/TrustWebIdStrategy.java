@@ -1,5 +1,11 @@
 package won.cryptography.webid;
 
+import org.apache.http.ssl.TrustStrategy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import won.cryptography.service.CertificateService;
+import won.protocol.util.linkeddata.LinkedDataSource;
+
 import java.net.URI;
 import java.security.PublicKey;
 import java.security.cert.CertificateException;
@@ -7,20 +13,13 @@ import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
-import org.apache.http.ssl.TrustStrategy;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import won.cryptography.service.CertificateService;
-import won.protocol.util.linkeddata.LinkedDataSource;
-
 /**
- * Trust all the certificates that contains at least one verified webID in certificate's subject alternative names.
- * Verified webID means that the WebID URI is resolved and the public key fetched from there corresponds to the public
- * key of the presented certificate.
- *
- * User: ypanchenko
- * Date: 23.10.2015
+ * Trust all the certificates that contains at least one verified webID in
+ * certificate's subject alternative names. Verified webID means that the WebID
+ * URI is resolved and the public key fetched from there corresponds to the
+ * public key of the presented certificate.
+ * <p>
+ * User: ypanchenko Date: 23.10.2015
  */
 public class TrustWebIdStrategy implements TrustStrategy {
 
@@ -34,14 +33,12 @@ public class TrustWebIdStrategy implements TrustStrategy {
 
   }
 
-
-  public boolean isTrusted(final X509Certificate[] x509Certificates, final String authType) throws
-    CertificateException {
+  public boolean isTrusted(final X509Certificate[] x509Certificates, final String authType)
+      throws CertificateException {
 
     if (x509Certificates == null || x509Certificates.length < 1) {
       return false;
     }
-
 
     // extract certificate and key
     X509Certificate cert = x509Certificates[0];

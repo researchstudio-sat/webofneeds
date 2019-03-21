@@ -16,54 +16,43 @@
 
 package won.owner.model;
 
-import java.net.URI;
-import java.util.Date;
-
-import javax.persistence.Column;
-import javax.persistence.Convert;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.PrePersist;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-
 import won.protocol.model.NeedState;
 import won.protocol.model.URIConverter;
+
+import javax.persistence.*;
+import java.net.URI;
+import java.util.Date;
 
 /**
  * Entity wrapping a uri identifying a user's need.
  */
 @Entity
-public class UserNeed
-{
+public class UserNeed {
   @Id
   @GeneratedValue
   @Column(name = "id")
   private Long id;
 
-  @Column( name = "uri", unique = true)
-  @Convert( converter = URIConverter.class)
+  @Column(name = "uri", unique = true)
+  @Convert(converter = URIConverter.class)
   private URI uri;
 
-  @Column( name = "matches")
+  @Column(name = "matches")
   private boolean matches;
 
-  @Column( name = "requests")
+  @Column(name = "requests")
   private boolean requests = true;
 
-  @Column( name = "conversations")
+  @Column(name = "conversations")
   private boolean conversations = true;
 
   /* The creation date of the (as observed by the owner app) */
   @Temporal(TemporalType.TIMESTAMP)
-  @Column( name = "creationDate", nullable = false)
+  @Column(name = "creationDate", nullable = false)
   private Date creationDate;
 
   @Enumerated(EnumType.STRING)
-  @Column( name = "state" )
+  @Column(name = "state")
   private NeedState state;
 
   public UserNeed() {
@@ -71,8 +60,8 @@ public class UserNeed
 
   @PrePersist
   protected void onCreate() {
-      creationDate = new Date();
-      state = NeedState.ACTIVE;
+    creationDate = new Date();
+    state = NeedState.ACTIVE;
   }
 
   public UserNeed(URI uri) {

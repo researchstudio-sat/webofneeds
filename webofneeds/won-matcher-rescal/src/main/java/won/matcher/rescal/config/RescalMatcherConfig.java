@@ -1,21 +1,19 @@
 package won.matcher.rescal.config;
 
-import java.util.concurrent.TimeUnit;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
-
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by hfriedrich on 15.09.2015.
  */
 @Configuration
 @PropertySource("file:${WON_CONFIG_DIR}/matcher-rescal.properties")
-public class RescalMatcherConfig
-{
+public class RescalMatcherConfig {
   @Value("${matcher.rescal.uri.sparql.endpoint}")
   private String sparqlEndpoint;
 
@@ -52,7 +50,6 @@ public class RescalMatcherConfig
   public void setPublicMatcherUri(final String publicMatcherUri) {
     this.publicMatcherUri = publicMatcherUri;
   }
-
 
   public String getExecutionDirectory() {
     return executionDirectory;

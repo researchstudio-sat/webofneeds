@@ -16,40 +16,37 @@
 
 package won.node.protocol.impl;
 
-import java.net.URI;
-
-import javax.jws.WebMethod;
-
 import org.apache.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
 import won.protocol.matcher.MatcherProtocolNeedService;
 import won.protocol.message.WonMessage;
 import won.protocol.service.MatcherFacingNeedCommunicationService;
 
+import javax.jws.WebMethod;
+import java.net.URI;
+
 /**
- * User: fkleedorfer
- * Date: 02.11.12
+ * User: fkleedorfer Date: 02.11.12
  */
 @Service
-public class MatcherProtocolNeedServiceImpl implements MatcherProtocolNeedService
-{
+public class MatcherProtocolNeedServiceImpl implements MatcherProtocolNeedService {
   private final Logger logger = LoggerFactory.getLogger(getClass());
   private MatcherFacingNeedCommunicationService matcherFacingNeedCommunicationService;
 
   @Override
-  public void hint(final URI needURI, final URI otherNeed,
-                   final double score, final URI originator,
-                   Model content, WonMessage wonMessage) throws Exception {
-    logger.debug("need from matcher: HINT received for need {} referring to need {} with score {} from originator {} and content {}", new Object[]{needURI, otherNeed, score, originator, content});
+  public void hint(final URI needURI, final URI otherNeed, final double score, final URI originator, Model content,
+      WonMessage wonMessage) throws Exception {
+    logger.debug(
+        "need from matcher: HINT received for need {} referring to need {} with score {} from originator {} and content {}",
+        new Object[] { needURI, otherNeed, score, originator, content });
     matcherFacingNeedCommunicationService.hint(needURI, otherNeed, score, originator, content, wonMessage);
   }
 
   @WebMethod(exclude = true)
-  public void setMatcherFacingNeedCommunicationService(final MatcherFacingNeedCommunicationService matcherFacingNeedCommunicationService)
-  {
+  public void setMatcherFacingNeedCommunicationService(
+      final MatcherFacingNeedCommunicationService matcherFacingNeedCommunicationService) {
     this.matcherFacingNeedCommunicationService = matcherFacingNeedCommunicationService;
   }
 

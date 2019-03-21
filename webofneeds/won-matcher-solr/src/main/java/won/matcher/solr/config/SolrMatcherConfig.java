@@ -9,10 +9,9 @@ import org.springframework.context.annotation.PropertySource;
  * Created by hfriedrich on 15.09.2015.
  */
 @Configuration
-@ImportResource({"classpath:/spring/component/scheduling/matcher-service-scheduling.xml"})
+@ImportResource({ "classpath:/spring/component/scheduling/matcher-service-scheduling.xml" })
 @PropertySource("file:${WON_CONFIG_DIR}/matcher-solr.properties")
-public class SolrMatcherConfig
-{
+public class SolrMatcherConfig {
   @Value("${matcher.solr.uri.solr.server}")
   private String solrServerUri;
 
@@ -55,9 +54,9 @@ public class SolrMatcherConfig
     return maxHints;
   }
 
-    public int getMaxHintsForCounterparts() {
-        return maxHintsForCounterparts;
-    }
+  public int getMaxHintsForCounterparts() {
+    return maxHintsForCounterparts;
+  }
 
   public boolean isCommitIndexedNeedImmediately() {
     return commitIndexedNeedImmediately;

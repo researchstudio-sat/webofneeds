@@ -16,14 +16,13 @@
 
 package won.protocol.util.linkeddata;
 
-import java.net.URI;
-
 import org.apache.jena.query.Dataset;
+
+import java.net.URI;
 
 /**
  * Callback that is informed of each Dataset downloaded.
  */
-public interface CrawlerCallback
-{
+public interface CrawlerCallback {
   public void onDatasetCrawled(URI uri, Dataset dataset);
 }

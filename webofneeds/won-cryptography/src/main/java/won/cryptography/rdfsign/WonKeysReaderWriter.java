@@ -1,28 +1,7 @@
 package won.cryptography.rdfsign;
 
-import java.math.BigInteger;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.PublicKey;
-import java.security.spec.InvalidKeySpecException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.transaction.NotSupportedException;
-
 import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.NodeIterator;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.rdf.model.*;
 import org.apache.jena.vocabulary.RDF;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.interfaces.ECPublicKey;
@@ -30,7 +9,6 @@ import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
 import org.bouncycastle.jce.spec.ECPublicKeySpec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.cryptography.exception.KeyNotSupportedException;
 import won.cryptography.key.KeyInformationExtractor;
 import won.cryptography.key.KeyInformationExtractorBouncyCastle;
@@ -39,13 +17,20 @@ import won.protocol.vocabulary.CERT;
 import won.protocol.vocabulary.SFSIG;
 import won.protocol.vocabulary.WONCRYPT;
 
+import javax.transaction.NotSupportedException;
+import java.math.BigInteger;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.util.*;
 
 /**
- * A helper class to read from/write to RDF EC public key won representation, as well
- * read as key uri referenced in the signature.
- *
- * User: ypanchenko
- * Date: 27.03.2015
+ * A helper class to read from/write to RDF EC public key won representation, as
+ * well read as key uri referenced in the signature.
+ * <p>
+ * User: ypanchenko Date: 27.03.2015
  */
 public class WonKeysReaderWriter {
   private static final Logger logger = LoggerFactory.getLogger(WonKeysReaderWriter.class);
@@ -54,7 +39,7 @@ public class WonKeysReaderWriter {
   }
 
   public Map<String, PublicKey> readFromDataset(Dataset dataset)
-    throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
+      throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
     Map<String, PublicKey> keys = new HashMap<>();
     readFromModel(dataset.getDefaultModel(), keys);
     for (String name : RdfUtils.getModelNames(dataset)) {
@@ -64,7 +49,7 @@ public class WonKeysReaderWriter {
   }
 
   public Set<PublicKey> readFromDataset(Dataset dataset, String keyUri)
-    throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
+      throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
     PublicKey key = readFromModel(dataset.getDefaultModel(), keyUri);
     Set<PublicKey> keys = new HashSet<>();
     if (key != null) {
@@ -80,14 +65,14 @@ public class WonKeysReaderWriter {
   }
 
   public Map<String, PublicKey> readFromModel(Model model)
-    throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
+      throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
     Map<String, PublicKey> keys = new HashMap<>();
     readFromModel(model, keys);
     return keys;
   }
 
   public PublicKey readFromModel(Model model, String keyUri)
-    throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
+      throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
     Map<String, PublicKey> keys = new HashMap<>();
     Resource keyRes = model.createResource(keyUri);
     readFromModel(model, keys, keyRes);
@@ -95,12 +80,12 @@ public class WonKeysReaderWriter {
   }
 
   private void readFromModel(final Model model, final Map<String, PublicKey> keys)
-    throws NoSuchProviderException, NoSuchAlgorithmException, InvalidKeySpecException {
+      throws NoSuchProviderException, NoSuchAlgorithmException, InvalidKeySpecException {
     readFromModel(model, keys, null);
   }
 
   private void readFromModel(final Model model, final Map<String, PublicKey> keys, Resource keyAgent)
-    throws NoSuchProviderException, NoSuchAlgorithmException, InvalidKeySpecException {
+      throws NoSuchProviderException, NoSuchAlgorithmException, InvalidKeySpecException {
 
     StmtIterator keyStmts = model.listStatements(keyAgent, CERT.KEY, RdfUtils.EMPTY_RDF_NODE);
     // TODO replace if with while if we allow multiple keys
@@ -147,8 +132,8 @@ public class WonKeysReaderWriter {
           }
 
           ECNamedCurveParameterSpec ecSpec = ECNamedCurveTable.getParameterSpec(curveId);
-          org.bouncycastle.math.ec.ECPoint ecPoint = ecSpec.getCurve()
-                                                           .createPoint(new BigInteger(qx, 16), new BigInteger(qy, 16));
+          org.bouncycastle.math.ec.ECPoint ecPoint = ecSpec.getCurve().createPoint(new BigInteger(qx, 16),
+              new BigInteger(qy, 16));
           ECPublicKeySpec pubKeySpec = new ECPublicKeySpec(ecPoint, ecSpec);
           // TODO add provider to RDF triples?
           KeyFactory keyFactory = KeyFactory.getInstance(algName, "BC");
@@ -160,24 +145,24 @@ public class WonKeysReaderWriter {
 
   }
 
-    public Set<String> readKeyReferences(Dataset dataset) {
-        List<String> keyRefs = RdfUtils.visitFlattenedToList(dataset, new RdfUtils.ModelVisitor<List<String>>() {
-            @Override
-            public List<String> visit(Model model) {
-                StmtIterator it = model.listStatements((Resource) null, SFSIG.HAS_VERIFICATION_CERT, (RDFNode) null);
-                List<String> ret = new ArrayList<>();
-                while (it.hasNext()) {
-                    ret.add(it.next().getObject().toString());
-                }
-                return ret;
-            }
-        });
-        Set<String> ret = new HashSet<>();
-        ret.addAll(keyRefs);
+  public Set<String> readKeyReferences(Dataset dataset) {
+    List<String> keyRefs = RdfUtils.visitFlattenedToList(dataset, new RdfUtils.ModelVisitor<List<String>>() {
+      @Override
+      public List<String> visit(Model model) {
+        StmtIterator it = model.listStatements((Resource) null, SFSIG.HAS_VERIFICATION_CERT, (RDFNode) null);
+        List<String> ret = new ArrayList<>();
+        while (it.hasNext()) {
+          ret.add(it.next().getObject().toString());
+        }
         return ret;
-    }
+      }
+    });
+    Set<String> ret = new HashSet<>();
+    ret.addAll(keyRefs);
+    return ret;
+  }
 
-    public void writeToModel(Model model, Resource keySubject, WonEccPublicKey pubKey) {
+  public void writeToModel(Model model, Resource keySubject, WonEccPublicKey pubKey) {
 
     // EC public key triples
     Resource bn = model.createResource();
@@ -211,14 +196,14 @@ public class WonKeysReaderWriter {
 
   }
 
-  public void writeToModel(Model model, Resource keySubject, PublicKey publicKey) throws NotSupportedException, KeyNotSupportedException {
+  public void writeToModel(Model model, Resource keySubject, PublicKey publicKey)
+      throws NotSupportedException, KeyNotSupportedException {
     if (publicKey instanceof ECPublicKey) {
       KeyInformationExtractor info = new KeyInformationExtractorBouncyCastle();
       writeToModel(model, keySubject, new WonEccPublicKey(info.getCurveID(publicKey), info.getAlgorithm(publicKey),
-                                                          info.getQX(publicKey),
-                                                          info.getQY(publicKey)));
+          info.getQX(publicKey), info.getQY(publicKey)));
     } else {
-        throw new NotSupportedException("Not supported key: " + publicKey.getClass().getName());
+      throw new NotSupportedException("Not supported key: " + publicKey.getClass().getName());
     }
   }
 }

@@ -22,19 +22,20 @@ import won.bot.framework.eventbot.event.impl.cmd.BaseCommandSuccessEvent;
  * Indicates that a ValidateConnectionCommandEvent succeeded.
  */
 public class ValidateConnectionCommandSuccessEvent extends BaseCommandSuccessEvent<ValidateConnectionCommandEvent> {
-    private boolean valid;
+  private boolean valid;
 
-    public ValidateConnectionCommandSuccessEvent(ValidateConnectionCommandEvent originalCommandEvent, boolean valid, String message) {
-        super(message, originalCommandEvent);
-        this.valid = valid;
-    }
+  public ValidateConnectionCommandSuccessEvent(ValidateConnectionCommandEvent originalCommandEvent, boolean valid,
+      String message) {
+    super(message, originalCommandEvent);
+    this.valid = valid;
+  }
 
-    public ValidateConnectionCommandSuccessEvent(ValidateConnectionCommandEvent originalCommandEvent, boolean valid) {
-        super(originalCommandEvent);
-        this.valid = valid;
-    }
+  public ValidateConnectionCommandSuccessEvent(ValidateConnectionCommandEvent originalCommandEvent, boolean valid) {
+    super(originalCommandEvent);
+    this.valid = valid;
+  }
 
-    public boolean isValid() {
-        return valid;
-    }
+  public boolean isValid() {
+    return valid;
+  }
 }

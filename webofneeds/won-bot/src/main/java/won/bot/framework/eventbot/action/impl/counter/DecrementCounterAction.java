@@ -23,8 +23,7 @@ import won.bot.framework.eventbot.listener.EventListener;
 /**
  * Action that decrements the specified counter.
  */
-public class DecrementCounterAction extends BaseCounterAction
-{
+public class DecrementCounterAction extends BaseCounterAction {
   public DecrementCounterAction(final EventListenerContext eventListenerContext, final Counter counter) {
     super(eventListenerContext, counter);
   }

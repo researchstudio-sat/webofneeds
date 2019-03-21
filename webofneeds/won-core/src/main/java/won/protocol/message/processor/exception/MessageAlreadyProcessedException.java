@@ -2,12 +2,10 @@ package won.protocol.message.processor.exception;
 
 /**
  * Indicates that the message event has already been received and processed.
- *
- * User: ypanchenko
- * Date: 24.04.2015
+ * <p>
+ * User: ypanchenko Date: 24.04.2015
  */
-public class MessageAlreadyProcessedException extends WonMessageProcessingException
-{
+public class MessageAlreadyProcessedException extends WonMessageProcessingException {
   public MessageAlreadyProcessedException() {
   }
 
@@ -20,7 +18,7 @@ public class MessageAlreadyProcessedException extends WonMessageProcessingExcept
   }
 
   public MessageAlreadyProcessedException(final String uri, final Throwable cause, final boolean enableSuppression,
-                                          final boolean writableStackTrace) {
+      final boolean writableStackTrace) {
     super(uri, cause, enableSuppression, writableStackTrace);
   }
 }

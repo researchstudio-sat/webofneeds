@@ -16,12 +16,6 @@
 
 package won.node.springsecurity;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.security.cert.Certificate;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,15 +27,20 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.util.StopWatch;
-
 import won.cryptography.webid.WebIDVerificationAgent;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.security.cert.Certificate;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * Assumes that the provided username is a linked data URI that contains WebID information.
- * The URI is accessed and the RDF is downloaded and added to the UserDetails for future reference.
+ * Assumes that the provided username is a linked data URI that contains WebID
+ * information. The URI is accessed and the RDF is downloaded and added to the
+ * UserDetails for future reference.
  */
-public class WebIdUserDetailsService implements AuthenticationUserDetailsService<PreAuthenticatedAuthenticationToken>
-{
+public class WebIdUserDetailsService implements AuthenticationUserDetailsService<PreAuthenticatedAuthenticationToken> {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
   @Autowired
@@ -54,20 +53,21 @@ public class WebIdUserDetailsService implements AuthenticationUserDetailsService
     String principal = (String) token.getPrincipal();
     Certificate certificate = (Certificate) token.getCredentials();
 
-    logger.debug("Adding userDetails for '" + principal +"'");
+    logger.debug("Adding userDetails for '" + principal + "'");
     URI webID = null;
     try {
       webID = new URI(principal);
-    } catch (URISyntaxException e){
-      throw new BadCredentialsException("Principal of X.509 Certificate must be a WebId URI. Actual value: '" +
-                                          principal+"'");
+    } catch (URISyntaxException e) {
+      throw new BadCredentialsException(
+          "Principal of X.509 Certificate must be a WebId URI. Actual value: '" + principal + "'");
     }
 
-    //at this point, we know that a client certificate was presented. Grant this role:
+    // at this point, we know that a client certificate was presented. Grant this
+    // role:
     List<GrantedAuthority> authorities = new ArrayList<>(3);
     authorities.add(new SimpleGrantedAuthority("ROLE_CLIENT_CERTIFICATE_PRESENTED"));
 
-    logger.debug("verifying webId '" + principal +"'");
+    logger.debug("verifying webId '" + principal + "'");
     try {
       if (webIDVerificationAgent.verify(certificate.getPublicKey(), webID)) {
         authorities.add(new SimpleGrantedAuthority("ROLE_WEBID"));
@@ -75,13 +75,12 @@ public class WebIdUserDetailsService implements AuthenticationUserDetailsService
       } else {
         logger.debug("could not verify webId '" + principal + "'. ROLE_WEBID not granted");
       }
-    } catch (Exception e){
-      logger.debug("could not verify webId '" + principal + "' because of an error during verification. ROLE_WEBID " +
-                     "not granted. Cause is logged",e);
+    } catch (Exception e) {
+      logger.debug("could not verify webId '" + principal + "' because of an error during verification. ROLE_WEBID "
+          + "not granted. Cause is logged", e);
     }
     stopWatch.stop();
     logger.debug("webID check took " + stopWatch.getLastTaskTimeMillis() + " millis");
     return new WebIdUserDetails(webID, authorities);
   }
 }
-

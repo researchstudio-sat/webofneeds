@@ -1,68 +1,63 @@
 package won.protocol.model;
 
+import javax.persistence.*;
 import java.net.URI;
 
-import javax.persistence.Column;
-import javax.persistence.Convert;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
-
 /**
- * User: Danijel
- * Date: 28.5.14.
+ * User: Danijel Date: 28.5.14.
  */
 
 @Entity
-@Table(name = "bastate",
-  uniqueConstraints = @UniqueConstraint(columnNames={"coordinatorURI", "participantURI"})
-)
-public class BAState
-{
+@Table(name = "bastate", uniqueConstraints = @UniqueConstraint(columnNames = { "coordinatorURI", "participantURI" }))
+public class BAState {
   @Id
   @GeneratedValue
-  @Column( name = "id" )
+  @Column(name = "id")
   private Long id;
   /* The URI of the coordinator */
-  @Column( name = "coordinatorURI" )
-  @Convert( converter = URIConverter.class )
+  @Column(name = "coordinatorURI")
+  @Convert(converter = URIConverter.class)
   private URI coordinatorURI;
 
   /* The URI of the participant */
-  @Column( name = "participantURI")
-  @Convert( converter = URIConverter.class )
+  @Column(name = "participantURI")
+  @Convert(converter = URIConverter.class)
   private URI participantURI;
 
   /* The state of the need */
-  @Column( name = "baStateURI")
-  @Convert( converter = URIConverter.class )
+  @Column(name = "baStateURI")
+  @Convert(converter = URIConverter.class)
   private URI baStateURI;
 
-  @Column( name = "facetTypeURI")
-  @Convert( converter = URIConverter.class )
+  @Column(name = "facetTypeURI")
+  @Convert(converter = URIConverter.class)
   private URI facetTypeURI;
 
-  @Column( name = "baPhase")
-  @Convert( converter = URIConverter.class )
+  @Column(name = "baPhase")
+  @Convert(converter = URIConverter.class)
   private URI baPhaseURI;
 
   @Override
   public boolean equals(final Object o) {
-    if (this == o) return true;
-    if (!(o instanceof BAState)) return false;
+    if (this == o)
+      return true;
+    if (!(o instanceof BAState))
+      return false;
 
     final BAState baState = (BAState) o;
 
-    if (baStateURI != null ? !baStateURI.equals(baState.baStateURI) : baState.baStateURI != null) return false;
+    if (baStateURI != null ? !baStateURI.equals(baState.baStateURI) : baState.baStateURI != null)
+      return false;
     if (coordinatorURI != null ? !coordinatorURI.equals(baState.coordinatorURI) : baState.coordinatorURI != null)
       return false;
-    if (facetTypeURI != null ? !facetTypeURI.equals(baState.facetTypeURI) : baState.facetTypeURI != null) return false;
-    if (id != null ? !id.equals(baState.id) : baState.id != null) return false;
+    if (facetTypeURI != null ? !facetTypeURI.equals(baState.facetTypeURI) : baState.facetTypeURI != null)
+      return false;
+    if (id != null ? !id.equals(baState.id) : baState.id != null)
+      return false;
     if (participantURI != null ? !participantURI.equals(baState.participantURI) : baState.participantURI != null)
       return false;
-    if (baPhaseURI != null ? !baPhaseURI.equals(baState.baPhaseURI) : baState.baPhaseURI != null) return false;
+    if (baPhaseURI != null ? !baPhaseURI.equals(baState.baPhaseURI) : baState.baPhaseURI != null)
+      return false;
 
     return true;
   }

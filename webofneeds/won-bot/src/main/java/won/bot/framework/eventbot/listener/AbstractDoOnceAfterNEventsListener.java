@@ -21,50 +21,48 @@ import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.filter.EventFilter;
 
 /**
- * Counts how often it is called, offers to call a callback when a certain number is reached.
- * After the target count of events is reached, a FinishedEvent is published. This allows for chaining listeners.
+ * Counts how often it is called, offers to call a callback when a certain
+ * number is reached. After the target count of events is reached, a
+ * FinishedEvent is published. This allows for chaining listeners.
  */
-public abstract class AbstractDoOnceAfterNEventsListener extends BaseEventListener implements CountingListener
-{
+public abstract class AbstractDoOnceAfterNEventsListener extends BaseEventListener implements CountingListener {
   private int targetCount;
   private int count = 0;
   private Object monitor = new Object();
   private boolean finished = false;
 
-  public AbstractDoOnceAfterNEventsListener(final EventListenerContext context, int targetCount)
-  {
+  public AbstractDoOnceAfterNEventsListener(final EventListenerContext context, int targetCount) {
     super(context);
     this.targetCount = targetCount;
   }
 
-  protected AbstractDoOnceAfterNEventsListener(final EventListenerContext context, final EventFilter eventFilter, final int targetCount)
-  {
+  protected AbstractDoOnceAfterNEventsListener(final EventListenerContext context, final EventFilter eventFilter,
+      final int targetCount) {
     super(context, eventFilter);
     this.targetCount = targetCount;
   }
 
-  protected AbstractDoOnceAfterNEventsListener(final EventListenerContext context, final String name, final int targetCount)
-  {
+  protected AbstractDoOnceAfterNEventsListener(final EventListenerContext context, final String name,
+      final int targetCount) {
     super(context, name);
     this.targetCount = targetCount;
   }
 
-  protected AbstractDoOnceAfterNEventsListener(final EventListenerContext context, final String name, final EventFilter eventFilter, final int targetCount)
-  {
+  protected AbstractDoOnceAfterNEventsListener(final EventListenerContext context, final String name,
+      final EventFilter eventFilter, final int targetCount) {
     super(context, name, eventFilter);
     this.targetCount = targetCount;
   }
 
   @Override
-  public void doOnEvent(final Event event) throws Exception
-  {
+  public void doOnEvent(final Event event) throws Exception {
     boolean doRun = false;
-    synchronized (monitor){
-      if (finished){
+    synchronized (monitor) {
+      if (finished) {
         return;
       }
       count++;
-      logger.debug("processing event {} of {} (event: {})", new Object[]{count, targetCount, event});
+      logger.debug("processing event {} of {} (event: {})", new Object[] { count, targetCount, event });
       if (count >= targetCount) {
         logger.debug("calling doOnce");
         doRun = true;
@@ -83,31 +81,22 @@ public abstract class AbstractDoOnceAfterNEventsListener extends BaseEventListen
 
   protected abstract void doOnce(final Event event) throws Exception;
 
-
-  public int getTargetCount()
-  {
+  public int getTargetCount() {
     return targetCount;
   }
 
-  public int getCount()
-  {
+  public int getCount() {
     return count;
   }
 
   @Override
-  public boolean isFinished()
-  {
+  public boolean isFinished() {
     return finished;
   }
 
   @Override
-  public String toString()
-  {
-    return getClass().getSimpleName() +
-        "{name='" + name +
-        ", count=" + count +
-        ",targetCount=" + targetCount +
-        ", finished=" + finished +
-        '}';
+  public String toString() {
+    return getClass().getSimpleName() + "{name='" + name + ", count=" + count + ",targetCount=" + targetCount
+        + ", finished=" + finished + '}';
   }
 }

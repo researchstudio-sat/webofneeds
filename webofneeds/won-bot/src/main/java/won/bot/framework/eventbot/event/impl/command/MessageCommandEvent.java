@@ -20,8 +20,9 @@ import won.bot.framework.eventbot.event.impl.cmd.CommandEvent;
 import won.protocol.message.WonMessageType;
 
 /**
- * Interface for events that are intended to make the bot send a specific message.
+ * Interface for events that are intended to make the bot send a specific
+ * message.
  */
 public interface MessageCommandEvent extends CommandEvent {
-    public WonMessageType getWonMessageType();
+  public WonMessageType getWonMessageType();
 }

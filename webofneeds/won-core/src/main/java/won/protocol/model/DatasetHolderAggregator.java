@@ -16,13 +16,6 @@
 
 package won.protocol.model;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.SequenceInputStream;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.riot.Lang;
@@ -31,13 +24,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StopWatch;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.SequenceInputStream;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+
 /**
- * Aggregates the datasets wrapped by a number of dataset holders. As soon as the aggregate() function is called,
- * all datasetHolders added so far are read (via their getDatasetBytes() method) and an aggregated dataset is created.
+ * Aggregates the datasets wrapped by a number of dataset holders. As soon as
+ * the aggregate() function is called, all datasetHolders added so far are read
+ * (via their getDatasetBytes() method) and an aggregated dataset is created.
  * All subsequent calls to aggregate just yield the already aggregated dataset.
  */
-public class DatasetHolderAggregator
-{
+public class DatasetHolderAggregator {
   private final Logger logger = LoggerFactory.getLogger(getClass());
   private List<InputStream> inputStreams = null;
   private Lang rdfLanguage = null;
@@ -49,7 +49,7 @@ public class DatasetHolderAggregator
   }
 
   public DatasetHolderAggregator(final List<InputStream> inputStreams, final Lang rdfLanguage) {
-    this.inputStreams = inputStreams == null ?  new LinkedList<>() : inputStreams;
+    this.inputStreams = inputStreams == null ? new LinkedList<>() : inputStreams;
     this.rdfLanguage = rdfLanguage == null ? DEFAULT_RDF_LANGUAGE : rdfLanguage;
   }
 
@@ -61,18 +61,19 @@ public class DatasetHolderAggregator
     this(inputStreams, null);
   }
 
-  public void appendDataset(DatasetHolder datasetHolder){
-    if (this.aggregatedDataset != null) throw new IllegalStateException("Cannot append a dataset after the aggregate" +
-                                                                          "() function was called");
+  public void appendDataset(DatasetHolder datasetHolder) {
+    if (this.aggregatedDataset != null)
+      throw new IllegalStateException("Cannot append a dataset after the aggregate" + "() function was called");
     this.inputStreams.add(new ByteArrayInputStream(datasetHolder.getDatasetBytes()));
   }
 
-  public Dataset aggregate(){
-    if (this.aggregatedDataset != null){
+  public Dataset aggregate() {
+    if (this.aggregatedDataset != null) {
       return this.aggregatedDataset;
     }
     synchronized (this) {
-      if (this.aggregatedDataset != null) return this.aggregatedDataset;
+      if (this.aggregatedDataset != null)
+        return this.aggregatedDataset;
       StopWatch stopWatch = new StopWatch();
       stopWatch.start();
       Dataset result = DatasetFactory.createGeneral();
@@ -83,9 +84,9 @@ public class DatasetHolderAggregator
       if (this.inputStreams == null || this.inputStreams.size() == 0) {
         return this.aggregatedDataset;
       }
-      RDFDataMgr.read(result, new SequenceInputStream(Collections.enumeration(Collections.unmodifiableCollection(this
-                                                                                                                   .inputStreams))),
-                      this.rdfLanguage);
+      RDFDataMgr.read(result,
+          new SequenceInputStream(Collections.enumeration(Collections.unmodifiableCollection(this.inputStreams))),
+          this.rdfLanguage);
       stopWatch.stop();
       logger.debug("read dataset: " + stopWatch.getLastTaskTimeMillis());
       return this.aggregatedDataset;

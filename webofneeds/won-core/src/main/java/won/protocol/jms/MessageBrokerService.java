@@ -15,23 +15,23 @@
  */
 
 package won.protocol.jms;
+
 import java.net.URI;
 
 /**
  * Interface responsible for extracting the ActiveMQ broker endpoint for
- * connecting to a need via ActiveMQ from the linked data description
- * of a need or WON node.
+ * connecting to a need via ActiveMQ from the linked data description of a need
+ * or WON node.
  */
 public interface MessageBrokerService {
 
-    /**
-     * Extracts the ActiveMQ broker endpoint for connecting via ActiveMQ to
-     * the need or WON node identified by the specified resourceUri.
-     * @param resourceUri
-     * @return
-     */
-    public URI getBrokerEndpoint(URI resourceUri);
-
+  /**
+   * Extracts the ActiveMQ broker endpoint for connecting via ActiveMQ to the need
+   * or WON node identified by the specified resourceUri.
+   *
+   * @param resourceUri
+   * @return
+   */
+  public URI getBrokerEndpoint(URI resourceUri);
 
 }
-

@@ -16,6 +16,11 @@
 
 package won.bot;
 
+import org.junit.Assert;
+import org.junit.Test;
+import won.bot.framework.bot.Bot;
+import won.bot.impl.DebugBot;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Random;
@@ -23,20 +28,12 @@ import java.util.Set;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
-import org.junit.Assert;
-import org.junit.Test;
-
-import won.bot.framework.bot.Bot;
-import won.bot.impl.DebugBot;
-
 /**
- * User: fkleedorfer
- * Date: 17.01.14
+ * User: fkleedorfer Date: 17.01.14
  */
-public class BotTests
-{
+public class BotTests {
   @Test
-  public void testIsInitialized(){
+  public void testIsInitialized() {
     Bot bot = new DebugBot();
     try {
       bot.initialize();
@@ -50,17 +47,15 @@ public class BotTests
    * Makes sure that the initialize cannot be entered by more than one thread.
    */
   @Test
-  public void testIsInitializedMultiThreaded() throws BrokenBarrierException, InterruptedException
-  {
+  public void testIsInitializedMultiThreaded() throws BrokenBarrierException, InterruptedException {
 
-    //set of threads that managed to enter the initialize method
+    // set of threads that managed to enter the initialize method
     final Set<Thread> threadsInInit = Collections.synchronizedSet(new HashSet<Thread>());
 
-    //bot impl that remembers which thread entered the initialize method
-    final Bot bot = new DebugBot(){
+    // bot impl that remembers which thread entered the initialize method
+    final Bot bot = new DebugBot() {
       @Override
-      protected void doInitialize()
-      {
+      protected void doInitialize() {
         try {
           Thread.sleep(100);
         } catch (InterruptedException e) {
@@ -70,15 +65,14 @@ public class BotTests
       }
     };
 
-    //start 10 threads that initialize the bot
+    // start 10 threads that initialize the bot
     int numThreads = 10;
     final Random rnd = new Random(System.currentTimeMillis());
-    final CyclicBarrier barrier = new CyclicBarrier(numThreads+1);
-    for (int i = 0; i < numThreads; i++){
-      Thread thread = new Thread(){
+    final CyclicBarrier barrier = new CyclicBarrier(numThreads + 1);
+    for (int i = 0; i < numThreads; i++) {
+      Thread thread = new Thread() {
         @Override
-        public void run()
-        {
+        public void run() {
           try {
             Thread.sleep(rnd.nextInt(100));
           } catch (InterruptedException e) {
@@ -102,16 +96,14 @@ public class BotTests
     }
     barrier.await();
 
-    //make sure the bot is initialized
+    // make sure the bot is initialized
     Assert.assertTrue(bot.getLifecyclePhase().isActive());
-    //make sure it was initialized only once
+    // make sure it was initialized only once
     Assert.assertTrue(threadsInInit.size() == 1);
   }
 
-
-
   @Test
-  public void testIsShutdown(){
+  public void testIsShutdown() {
     Bot bot = new DebugBot();
     try {
       bot.shutdown();
@@ -125,17 +117,15 @@ public class BotTests
    * Makes sure that the shutdown cannot be entered by more than one thread.
    */
   @Test
-  public void testIsShutdownMultiThreaded() throws BrokenBarrierException, InterruptedException
-  {
+  public void testIsShutdownMultiThreaded() throws BrokenBarrierException, InterruptedException {
 
-    //set of threads that managed to enter the shutdown method
+    // set of threads that managed to enter the shutdown method
     final Set<Thread> threadsInShutdown = Collections.synchronizedSet(new HashSet<Thread>());
 
-    //bot impl that remembers which thread entered the shutdown method
-    final Bot bot = new DebugBot(){
+    // bot impl that remembers which thread entered the shutdown method
+    final Bot bot = new DebugBot() {
       @Override
-      protected void doShutdown()
-      {
+      protected void doShutdown() {
         try {
           Thread.sleep(100);
         } catch (InterruptedException e) {
@@ -145,15 +135,14 @@ public class BotTests
       }
     };
 
-    //start 10 threads that shut down the bot
+    // start 10 threads that shut down the bot
     int numThreads = 10;
     final Random rnd = new Random(System.currentTimeMillis());
-    final CyclicBarrier barrier = new CyclicBarrier(numThreads+1);
-    for (int i = 0; i < numThreads; i++){
-      Thread thread = new Thread(){
+    final CyclicBarrier barrier = new CyclicBarrier(numThreads + 1);
+    for (int i = 0; i < numThreads; i++) {
+      Thread thread = new Thread() {
         @Override
-        public void run()
-        {
+        public void run() {
           try {
             Thread.sleep(rnd.nextInt(100));
           } catch (InterruptedException e) {
@@ -177,9 +166,9 @@ public class BotTests
     }
     barrier.await();
 
-    //make sure the bot is shutdownd
+    // make sure the bot is shutdownd
     Assert.assertTrue(bot.getLifecyclePhase().isDown());
-    //make sure it was shutdownd only once
+    // make sure it was shutdownd only once
     Assert.assertTrue(threadsInShutdown.size() == 1);
   }
 }

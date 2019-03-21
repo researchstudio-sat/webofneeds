@@ -16,18 +16,16 @@
 
 package won.bot.framework.component.needproducer.impl;
 
+import won.bot.framework.component.needproducer.NeedProducer;
 
 import java.util.Set;
 
-import won.bot.framework.component.needproducer.NeedProducer;
-
-public class SimpleCompositeNeedProducer extends AbstractCompositeNeedProducer
-{
+public class SimpleCompositeNeedProducer extends AbstractCompositeNeedProducer {
   @Override
-  protected NeedProducer selectActiveNeedFactory()
-  {
+  protected NeedProducer selectActiveNeedFactory() {
     Set<NeedProducer> factories = getNeedFactories();
-    if (factories.size() > 0) return factories.iterator().next();
+    if (factories.size() > 0)
+      return factories.iterator().next();
     return null;
   }
 

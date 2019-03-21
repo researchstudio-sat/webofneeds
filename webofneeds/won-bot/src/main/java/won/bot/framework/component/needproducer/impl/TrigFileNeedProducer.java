@@ -16,42 +16,38 @@
 
 package won.bot.framework.component.needproducer.impl;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.bot.framework.component.needproducer.FileBasedNeedProducer;
 import won.protocol.util.NeedModelWrapper;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+
 /**
- * User: fkleedorfer
- * Date: 17.12.13
+ * User: fkleedorfer Date: 17.12.13
  */
-public class TrigFileNeedProducer implements FileBasedNeedProducer
-{
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+public class TrigFileNeedProducer implements FileBasedNeedProducer {
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Override
-    public  synchronized Dataset readNeedFromFile(final File file) throws IOException {
-        logger.debug("processing as turtle file: {} ", file);
-        try (FileInputStream fis = new FileInputStream(file)) {
-            Dataset dataset = DatasetFactory.createGeneral();
-            RDFDataMgr.read(dataset, fis, RDFFormat.TRIG.getLang());
-            NeedModelWrapper needModelWrapper = new NeedModelWrapper(dataset);
+  @Override
+  public synchronized Dataset readNeedFromFile(final File file) throws IOException {
+    logger.debug("processing as turtle file: {} ", file);
+    try (FileInputStream fis = new FileInputStream(file)) {
+      Dataset dataset = DatasetFactory.createGeneral();
+      RDFDataMgr.read(dataset, fis, RDFFormat.TRIG.getLang());
+      NeedModelWrapper needModelWrapper = new NeedModelWrapper(dataset);
 
-            return needModelWrapper.copyDataset();
-        } catch (Exception e) {
-            logger.error("could not parse trig from file {} ", file, e);
-            throw e;
-        }
+      return needModelWrapper.copyDataset();
+    } catch (Exception e) {
+      logger.error("could not parse trig from file {} ", file, e);
+      throw e;
     }
-
+  }
 
 }

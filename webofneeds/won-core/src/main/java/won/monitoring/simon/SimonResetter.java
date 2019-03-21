@@ -20,18 +20,16 @@ import org.javasimon.SimonManager;
 import org.javasimon.utils.SimonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.monitoring.MonitoringResetter;
 
 /**
  * Resetter for the Simon monitoring framework.
  */
-public class SimonResetter implements MonitoringResetter
-{
+public class SimonResetter implements MonitoringResetter {
   private final Logger logger = LoggerFactory.getLogger(getClass());
+
   @Override
-  public void resetMonitoringStatistics()
-  {
+  public void resetMonitoringStatistics() {
     logger.debug("resetting Simons recursively");
     SimonUtils.recursiveReset(SimonManager.getRootSimon());
   }

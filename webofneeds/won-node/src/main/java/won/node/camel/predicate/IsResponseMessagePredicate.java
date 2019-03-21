@@ -18,7 +18,6 @@ package won.node.camel.predicate;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Predicate;
-
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.camel.WonCamelConstants;
@@ -26,15 +25,16 @@ import won.protocol.message.processor.camel.WonCamelConstants;
 /**
  * Predicate to check if the wonMessage is a response message.
  */
-public class IsResponseMessagePredicate implements Predicate
-{
+public class IsResponseMessagePredicate implements Predicate {
   @Override
   public boolean matches(final Exchange exchange) {
     WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
     WonMessageType messageType = wonMessage.getMessageType();
-    switch (messageType){
-      case SUCCESS_RESPONSE: return true;
-      case FAILURE_RESPONSE: return true;
+    switch (messageType) {
+    case SUCCESS_RESPONSE:
+      return true;
+    case FAILURE_RESPONSE:
+      return true;
     }
     return false;
   }

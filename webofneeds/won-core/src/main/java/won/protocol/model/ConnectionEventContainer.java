@@ -16,19 +16,17 @@
 
 package won.protocol.model;
 
-import java.net.URI;
+import won.protocol.model.parentaware.ParentAware;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.OneToOne;
-
-import won.protocol.model.parentaware.ParentAware;
+import java.net.URI;
 
 @Entity
 @DiscriminatorValue("Connection")
-public class ConnectionEventContainer extends EventContainer implements ParentAware<Connection>
-{
+public class ConnectionEventContainer extends EventContainer implements ParentAware<Connection> {
   @OneToOne(fetch = FetchType.LAZY, mappedBy = "eventContainer", optional = false)
   private Connection connection;
 

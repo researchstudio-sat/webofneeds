@@ -9,31 +9,30 @@ import java.util.Map;
  */
 public class HasFlagQueryFactory extends SolrQueryFactory {
 
-    public enum FLAGS {
-        WHATS_AROUND,
-        WHATS_NEW,
-        NO_HINT_FOR_COUNTERPART,
-        NO_HINT_FOR_ME
-    }
+  public enum FLAGS {
+    WHATS_AROUND, WHATS_NEW, NO_HINT_FOR_COUNTERPART, NO_HINT_FOR_ME
+  }
 
-    private static final Map<FLAGS, String> flagMap;
-    static {
-        Map<FLAGS, String> myMap = new HashMap<>();
-        myMap.put(FLAGS.WHATS_AROUND, "http\\://purl.org/webofneeds/model#WhatsAround");
-        myMap.put(FLAGS.WHATS_NEW, "http\\://purl.org/webofneeds/model#WhatsNew");
-        myMap.put(FLAGS.NO_HINT_FOR_COUNTERPART, "http\\://purl.org/webofneeds/model#NoHintForCounterpart");
-        myMap.put(FLAGS.NO_HINT_FOR_ME, "http\\://purl.org/webofneeds/model#NoHintForMe");
-        flagMap = Collections.unmodifiableMap(myMap);
-    }
+  private static final Map<FLAGS, String> flagMap;
 
-    private FLAGS flag;
+  static {
+    Map<FLAGS, String> myMap = new HashMap<>();
+    myMap.put(FLAGS.WHATS_AROUND, "http\\://purl.org/webofneeds/model#WhatsAround");
+    myMap.put(FLAGS.WHATS_NEW, "http\\://purl.org/webofneeds/model#WhatsNew");
+    myMap.put(FLAGS.NO_HINT_FOR_COUNTERPART, "http\\://purl.org/webofneeds/model#NoHintForCounterpart");
+    myMap.put(FLAGS.NO_HINT_FOR_ME, "http\\://purl.org/webofneeds/model#NoHintForMe");
+    flagMap = Collections.unmodifiableMap(myMap);
+  }
 
-    public HasFlagQueryFactory(FLAGS flag) {
-        this.flag = flag;
-    }
+  private FLAGS flag;
 
-    @Override
-    protected String makeQueryString() {
-        return new ExactMatchFieldQueryFactory("_graph.http___purl.org_webofneeds_model_hasFlag._id", flagMap.get(flag)).createQuery();
-    }
+  public HasFlagQueryFactory(FLAGS flag) {
+    this.flag = flag;
+  }
+
+  @Override
+  protected String makeQueryString() {
+    return new ExactMatchFieldQueryFactory("_graph.http___purl.org_webofneeds_model_hasFlag._id", flagMap.get(flag))
+        .createQuery();
+  }
 }

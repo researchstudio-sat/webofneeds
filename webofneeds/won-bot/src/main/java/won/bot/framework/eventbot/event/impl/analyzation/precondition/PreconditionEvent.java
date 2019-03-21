@@ -8,20 +8,20 @@ import won.utils.goals.GoalInstantiationResult;
  * Created by fsuda on 27.11.2017.
  */
 public abstract class PreconditionEvent extends BaseNeedAndConnectionSpecificEvent {
-    private final GoalInstantiationResult payload;
-    private final String preconditionUri;
+  private final GoalInstantiationResult payload;
+  private final String preconditionUri;
 
-    public PreconditionEvent(Connection con, String preconditionUri, GoalInstantiationResult payload) {
-        super(con);
-        this.preconditionUri = preconditionUri;
-        this.payload = payload;
-    }
+  public PreconditionEvent(Connection con, String preconditionUri, GoalInstantiationResult payload) {
+    super(con);
+    this.preconditionUri = preconditionUri;
+    this.payload = payload;
+  }
 
-    public GoalInstantiationResult getPayload() {
-        return payload;
-    }
+  public GoalInstantiationResult getPayload() {
+    return payload;
+  }
 
-    public String getPreconditionUri() {
-        return preconditionUri;
-    }
+  public String getPreconditionUri() {
+    return preconditionUri;
+  }
 }
