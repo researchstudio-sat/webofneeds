@@ -118,6 +118,7 @@ const actionHierarchy = {
     showLatestMessages: cnct.showLatestMessages,
     showMoreMessages: cnct.showMoreMessages,
     fetchMessagesStart: INJ_DEFAULT,
+    fetchMessagesEnd: INJ_DEFAULT,
     messageUrisInLoading: INJ_DEFAULT,
     fetchMessagesFailed: INJ_DEFAULT,
     fetchMessagesSuccess: INJ_DEFAULT,

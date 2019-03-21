@@ -202,6 +202,15 @@ export default function(processState = initialState, action = {}) {
       });
     }
 
+    case actionTypes.connections.fetchMessagesEnd: {
+      const connUri = action.payload.get("connectionUri");
+
+      return updateConnectionProcess(processState, connUri, {
+        loadingMessages: false,
+        failedToLoad: false,
+      });
+    }
+
     case actionTypes.connections.messageUrisInLoading: {
       const connUri = action.payload.get("connectionUri");
       const messageUris = action.payload.get("uris");
