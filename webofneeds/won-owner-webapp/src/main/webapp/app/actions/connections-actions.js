@@ -723,40 +723,7 @@ export function showLatestMessages(connectionUriParam, numberOfEvents) {
           []
         );
       })
-      .then(events => {
-        if (events) {
-          const eventsImm = Immutable.fromJS(events);
-
-          if (eventsImm.get("success").size > 0) {
-            dispatch({
-              type: actionTypes.connections.fetchMessagesSuccess,
-              payload: Immutable.fromJS({
-                connectionUri: connectionUri,
-                events: eventsImm.get("success"),
-              }),
-            });
-          }
-
-          if (eventsImm.get("failed").size > 0) {
-            dispatch({
-              type: actionTypes.connections.fetchMessagesFailed,
-              payload: Immutable.fromJS({
-                connectionUri: connectionUri,
-                events: eventsImm.get("failed"),
-              }),
-            });
-          }
-
-          if (
-            eventsImm.get("success").size == 0 &&
-            eventsImm.get("failed").size == 0
-          ) {
-            console.warn(
-              "NO MESSAGES RETRIEVED AT ALL, MIGHT BE SOME WEIRD COINCIDINK"
-            );
-          }
-        }
-      });
+      .then(events => storeMessages(dispatch, events, connectionUri));
   };
 }
 
@@ -817,40 +784,7 @@ export function loadLatestMessagesOfConnection({
         []
       );
     })
-    .then(events => {
-      if (events) {
-        const eventsImm = Immutable.fromJS(events);
-
-        if (eventsImm.get("success").size > 0) {
-          dispatch({
-            type: actionTypes.connections.fetchMessagesSuccess,
-            payload: Immutable.fromJS({
-              connectionUri: connectionUri,
-              events: eventsImm.get("success"),
-            }),
-          });
-        }
-
-        if (eventsImm.get("failed").size > 0) {
-          dispatch({
-            type: actionTypes.connections.fetchMessagesFailed,
-            payload: Immutable.fromJS({
-              connectionUri: connectionUri,
-              events: eventsImm.get("failed"),
-            }),
-          });
-        }
-
-        if (
-          eventsImm.get("success").size == 0 &&
-          eventsImm.get("failed").size == 0
-        ) {
-          console.warn(
-            "NO MESSAGES RETRIEVED AT ALL, MIGHT BE SOME WEIRD COINCIDINK"
-          );
-        }
-      }
-    });
+    .then(events => storeMessages(dispatch, events, connectionUri));
 }
 
 /**
@@ -929,41 +863,53 @@ export function showMoreMessages(connectionUriParam, numberOfEvents) {
           []
         );
       })
-      .then(events => {
-        if (events) {
-          const eventsImm = Immutable.fromJS(events);
-
-          if (eventsImm.get("success").size > 0) {
-            dispatch({
-              type: actionTypes.connections.fetchMessagesSuccess,
-              payload: Immutable.fromJS({
-                connectionUri: connectionUri,
-                events: eventsImm.get("success"),
-              }),
-            });
-          }
-
-          if (eventsImm.get("failed").size > 0) {
-            dispatch({
-              type: actionTypes.connections.fetchMessagesFailed,
-              payload: Immutable.fromJS({
-                connectionUri: connectionUri,
-                events: eventsImm.get("failed"),
-              }),
-            });
-          }
-
-          if (
-            eventsImm.get("success").size == 0 &&
-            eventsImm.get("failed").size == 0
-          ) {
-            console.warn(
-              "NO MESSAGES RETRIEVED AT ALL, MIGHT BE SOME WEIRD COINCIDINK"
-            );
-          }
-        }
-      });
+      .then(events => storeMessages(dispatch, events, connectionUri));
   };
+}
+
+/**
+ * Helper function that stores dispatches the success and failed actions for a given set of messages
+ * @param messages
+ * @param connectionUri
+ */
+function storeMessages(dispatch, messages, connectionUri) {
+  if (messages) {
+    const messagesImm = Immutable.fromJS(messages);
+
+    if (messagesImm.get("success").size > 0) {
+      dispatch({
+        type: actionTypes.connections.fetchMessagesSuccess,
+        payload: Immutable.fromJS({
+          connectionUri: connectionUri,
+          events: messagesImm.get("success"),
+        }),
+      });
+    }
+
+    if (messagesImm.get("failed").size > 0) {
+      dispatch({
+        type: actionTypes.connections.fetchMessagesFailed,
+        payload: Immutable.fromJS({
+          connectionUri: connectionUri,
+          events: messagesImm.get("failed"),
+        }),
+      });
+    }
+
+    /*If neither succes nor failed has any elements we simply say that fetching Ended, that way
+    we can ensure that there is not going to be a lock on the connection because loadingMessages was complete but never
+    reset its status
+    */
+    if (
+      messagesImm.get("success").size == 0 &&
+      messagesImm.get("failed").size == 0
+    ) {
+      dispatch({
+        type: actionTypes.connections.fetchMessagesEnd,
+        payload: Immutable.fromJS({ connectionUri: connectionUri }),
+      });
+    }
+  }
 }
 
 function numOfEvts2pageSize(numberOfEvents) {
