@@ -181,7 +181,9 @@ public class WON {
             "hasConnectedCount");
     public static final Property HAS_CLOSED_COUNT = m.createProperty(BASE_URI,
             "hasClosedCount");
-    
+    public static final Property HAS_DELETED_COUNT = m.createProperty(BASE_URI,
+            "hasDeletedCount");
+
     //adds a flag to a need
     public static final Property HAS_FLAG = m.createProperty(BASE_URI + "hasFlag");
 

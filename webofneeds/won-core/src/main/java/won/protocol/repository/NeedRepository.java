@@ -63,6 +63,9 @@ public interface NeedRepository extends WonRepository<Need> {
     @Query("select state, count(*) from Connection where needURI = :need group by state")
     List<Object[]> getCountsPerConnectionState(@Param("need") URI needURI);
 
+    @Query("select state, connectionURI from Connection where needURI = :need")
+    List<Object[]> getConnectionUrisAndState(@Param("need") URI needUri);
+
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select need from Need need where needURI= :uri")
     Need findOneByNeedURIForUpdate(@Param("uri") URI uri);

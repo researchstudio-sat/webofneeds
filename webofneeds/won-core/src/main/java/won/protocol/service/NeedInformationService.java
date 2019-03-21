@@ -96,12 +96,19 @@ public interface NeedInformationService {
     public Collection<URI> listConnectionURIs();
 
     /**
-     * Retrieves all connection URIs that were modified (by adding events) after a certain date
+     * Retrieves all connections (regardless of state).
+     *
+     * @return a collection of connections.
+     */
+    public Collection<Connection> listConnections();
+
+    /**
+     * Retrieves all connections that were modified (by adding events) after a certain date
      *
      * @param modifiedAfter modification date
      * @return
      */
-    public Collection<URI> listModifiedConnectionURIsAfter(Date modifiedAfter);
+    public Collection<Connection> listModifiedConnectionsAfter(Date modifiedAfter);
 
     /**
      * Retrieves slice of the connection URIs list for a given page number
@@ -115,7 +122,18 @@ public interface NeedInformationService {
     public Slice<URI> listConnectionURIs(int page, Integer preferredSize, Date timeSpot);
 
     /**
-     * Retrieves slice of the connection URIs that precede the given connection URI from the point of view of their
+     * Retrieves slice of the connection URIs list for a given page number
+     *
+     * @param page the page number
+     * @param preferredSize preferred number of members per page or null; null => use default
+     * @param timeSpot time at which we want the list state to be fixed, if null - current state
+     *
+     * @return a slice connection URIs.
+     */
+    public Slice<Connection> listConnections(int page, Integer preferredSize, Date timeSpot);
+
+    /**
+     * Retrieves slice of the connections that precede the given connection URI from the point of view of their
      * latest events.
      *
      * @param resumeConnURI the returned slice connections precede (in time of their latest events) this connection uri
@@ -124,11 +142,11 @@ public interface NeedInformationService {
      *
      * @return a slice of connection URIs.
      */
-    public Slice<URI> listConnectionURIsBefore(
-      final URI resumeConnURI, final Integer preferredPageSize, final Date timeSpot);
+    public Slice<Connection> listConnectionsBefore(
+            final URI resumeConnURI, final Integer preferredPageSize, final Date timeSpot);
 
     /**
-     * Retrieves slice of the connection URIs that follows the given connection URI from the point of view of their
+     * Retrieves slice of the connections that follows the given connection URI from the point of view of their
      * latest events.
      *
      * @param resumeConnURI the returned slice connections follow (in time of their latest events) this connection uri
@@ -137,9 +155,8 @@ public interface NeedInformationService {
      *
      * @return a slice of connection URIs.
      */
-    public Slice<URI> listConnectionURIsAfter(
-      final URI resumeConnURI, final Integer preferredPageSize, final Date timeSpot);
-
+    public Slice<Connection> listConnectionsAfter(
+            final URI resumeConnURI, final Integer preferredPageSize, final Date timeSpot);
 
     /**
      * Retrieves all connection URIs (regardless of state) for the specified local need URI.
@@ -150,6 +167,16 @@ public interface NeedInformationService {
      *          if needURI is not a known need URI
      */
     public Collection<URI> listConnectionURIs(URI needURI) throws NoSuchNeedException;
+
+    /**
+     * Retrieves all connections (regardless of state) for the specified local need URI.
+     *
+     * @param needURI the URI of the need
+     * @return a collection of connections.
+     * @throws won.protocol.exception.NoSuchNeedException
+     *          if needURI is not a known need URI
+     */
+    public Collection<Connection> listConnections(URI needURI) throws NoSuchNeedException;
 
     /**
      * Retrieves slice of the list of connection URIs for the specified local need URI.
@@ -168,7 +195,23 @@ public interface NeedInformationService {
       URI needURI, int page, Integer preferredSize, WonMessageType messageType, Date timeSpot);
 
     /**
-     * Retrieves slice of the connection URIs  for the specified local need URI that precede the given connection URI
+     * Retrieves slice of the list of connections for the specified local need URI.
+     *
+     * @param needURI the URI of the need
+     * @param page the page number
+     * @param preferredSize preferred number of members per page or null; null => use default
+     * @param messageType event type that should be used for defining connection latest activity; null => all event
+     *                    types
+     * @param timeSpot time at which we want the list state to be fixed, if null - current state
+     * @return a collection of connections.
+     * @throws won.protocol.exception.NoSuchNeedException
+     *          if needURI is not a known need URI
+     */
+    public Slice<Connection> listConnections(
+            URI needURI, int page, Integer preferredSize, WonMessageType messageType, Date timeSpot);
+
+    /**
+     * Retrieves slice of the connections  for the specified local need URI that precede the given connection URI
      * from the point of view of their latest events.
      *
      * @param resumeConnURI the returned slice connections precede (in time of their latest events) this connection uri
@@ -179,11 +222,11 @@ public interface NeedInformationService {
      *
      * @return a slice of connection URIs.
      */
-    public Slice listConnectionURIsBefore(
-      URI needURI, URI resumeConnURI, Integer preferredPageSize, WonMessageType messageType, Date timeSpot);
+    public Slice listConnectionsBefore(
+            URI needURI, URI resumeConnURI, Integer preferredPageSize, WonMessageType messageType, Date timeSpot);
 
     /**
-     * Retrieves slice of the connection URIs that follows the given connection URI from the point of view of their
+     * Retrieves slice of the connections that follows the given connection URI from the point of view of their
      * latest events.
      *
      * @param resumeConnURI the returned slice connections follow (in time of their latest events) this connection uri
@@ -194,8 +237,8 @@ public interface NeedInformationService {
      *
      * @return a slice of connection URIs.
      */
-    public Slice  listConnectionURIsAfter(
-      URI needURI, URI resumeConnURI, Integer preferredPageSize, WonMessageType messageType, Date timeSpot);
+    public Slice  listConnectionsAfter(
+            URI needURI, URI resumeConnURI, Integer preferredPageSize, WonMessageType messageType, Date timeSpot);
 
     /**
      * Read general information about the need.
@@ -261,78 +304,11 @@ public interface NeedInformationService {
   public Slice<MessageEventPlaceholder> listConnectionEvents(
     URI connectionUri, int page, Integer preferredPageSize, WonMessageType messageType);
 
-
-  /**
-   * Retrieves list of event uris of the specified connection that where created earlier than the given
-   * event (specified by event message uri) and  that have a given message type, with number of uris per page
-   * preference.
-   *
-   * @param connectionUri
-   * @param msgURI before which the messages should be returned (created before this message msgURI)
-   * @param preferredPageSize preferred number of members per page, null => use default
-   * @param msgType null => all types
-   * @return a collection of all event URIs.
-   */
-  @Deprecated
-  public Slice<URI> listConnectionEventURIsBefore(
-      URI connectionUri, URI msgURI, Integer preferredPageSize, WonMessageType msgType);
-
   public Slice<MessageEventPlaceholder> listConnectionEventsBefore(
-    URI connectionUri, URI msgURI, Integer preferredPageSize, WonMessageType msgType);
-
-
-  /**
-   * Retrieves list of event uris of the specified connection that where created later than the given
-   * event (specified by event message uri) and  that have a given message type, with number of uris per page
-   * preference.
-   *
-   * @param connectionUri
-   * @param msgURI after which the messages should be returned (created after this message msgURI)
-   * @param preferredPageSize preferred number of members per page, null => use default
-   * @param msgType null => all types
-   * @return a collection of all event URIs.
-   */
-  @Deprecated
-    public Slice<URI> listConnectionEventURIsAfter(
     URI connectionUri, URI msgURI, Integer preferredPageSize, WonMessageType msgType);
 
   public Slice<MessageEventPlaceholder> listConnectionEventsAfter(
     URI connectionUri, URI msgURI, Integer preferredPageSize, WonMessageType msgType);
-
-
-  @Deprecated
-  public static class Page<T>{
-    private Collection<T> content;
-    private boolean hasNext;
-    private T resumeBefore = null;
-    private T resumeAfter = null;
-
-    public Page(final Collection<T> content, final T resumeBefore, final T resumeAfter) {
-      this.content = content;
-      this.resumeBefore = resumeBefore;
-      this.resumeAfter = resumeAfter;
-    }
-
-    public Collection<T> getContent() {
-      return content;
-    }
-
-    public boolean hasNext() {
-      return resumeAfter != null;
-    }
-
-    public T getResumeAfter() {
-      return this.resumeAfter;
-    }
-
-    public boolean hasPrevious() {
-      return resumeBefore != null;
-    }
-
-    public T getResumeBefore() {
-      return resumeBefore;
-    }
-  }
 
 
   public static class PagedResource<T,E>{

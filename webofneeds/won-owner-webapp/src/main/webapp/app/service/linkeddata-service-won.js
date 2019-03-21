@@ -1153,31 +1153,21 @@ import won from "./won.js";
     return Promise.resolve(ret);
   };
 
-  /*
-     * Loads all URIs of a need's connections.
-     */
-  won.getConnectionUrisOfNeed = (
-    needUri,
-    requesterWebId,
-    includeClosed = false
-  ) => {
-    if (includeClosed) {
-      return won
-        .executeCrawlableQuery(
-          won.queries["getAllConnectionUrisOfNeed"],
-          needUri,
-          requesterWebId
-        )
-        .then(result => result.map(x => x.connectionUri.value));
-    } else {
-      return won
-        .executeCrawlableQuery(
-          won.queries["getUnclosedConnectionUrisOfActiveNeed"],
-          needUri,
-          requesterWebId
-        )
-        .then(result => result.map(x => x.connectionUri.value));
-    }
+  won.getConnectionUrisWithStateOfNeed = (needUri, requesterWebId) => {
+    return won
+      .executeCrawlableQuery(
+        won.queries["getAllConnectionUrisOfNeed"],
+        needUri,
+        requesterWebId
+      )
+      .then(result =>
+        result.map(x => {
+          return {
+            connectionUri: x.connectionUri.value,
+            connectionState: x.connectionState.value,
+          };
+        })
+      );
   };
 
   /**
@@ -1689,49 +1679,12 @@ import won from "./won.js";
       query:
         "prefix won: <http://purl.org/webofneeds/model#> \n" +
         "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n" +
-        "select ?connectionUri \n" +
+        "select ?connectionUri ?connectionState \n" +
         " where { \n" +
         " <::baseUri::> a won:Need; \n" +
         "           won:hasConnections ?connections.\n" +
         "  ?connections rdfs:member ?connectionUri. \n" +
-        "} \n",
-    },
-    getUnclosedConnectionUrisOfActiveNeed: {
-      propertyPaths: [
-        {
-          prefixes:
-            "prefix " +
-            won.WON.prefix +
-            ": <" +
-            won.WON.baseUri +
-            "> " +
-            "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> ",
-          propertyPath: "won:hasConnections",
-          fragment: " filter exists {<::baseUri::> won:isInState won:Active} ",
-        },
-        {
-          prefixes:
-            "prefix " +
-            won.WON.prefix +
-            ": <" +
-            won.WON.baseUri +
-            "> " +
-            "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> ",
-          propertyPath: "won:hasConnections/rdfs:member",
-          fragment: " filter exists {<::baseUri::> won:isInState won:Active} ",
-        },
-      ],
-      query:
-        "prefix won: <http://purl.org/webofneeds/model#> \n" +
-        "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n" +
-        "select ?connectionUri \n" +
-        " where { \n" +
-        " <::baseUri::> a won:Need; \n" +
-        "           won:hasConnections ?connections; \n" +
-        "           won:isInState ?needState.\n " +
-        "  ?connections rdfs:member ?connectionUri. \n" +
         "  ?connectionUri won:hasConnectionState ?connectionState. \n" +
-        "  filter ( ?connectionState != won:Closed && ?needState = won:Active) \n" +
         "} \n",
     },
   };

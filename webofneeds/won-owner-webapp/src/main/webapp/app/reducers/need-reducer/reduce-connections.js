@@ -1,7 +1,7 @@
 import won from "../../won-es6.js";
 import Immutable from "immutable";
 import { parseConnection } from "./parse-connection.js";
-import { markUriAsRead, markConnUriAsClosed } from "../../won-localstorage.js";
+import { markUriAsRead } from "../../won-localstorage.js";
 
 import { markNeedAsRead } from "./reduce-needs.js";
 import { getIn } from "../../utils.js";
@@ -98,10 +98,6 @@ function addConnectionFull(state, connection) {
         state = state.setIn([needUri, "unread"], true);
       }
 
-      if (parsedConnection.getIn(["data", "state"]) === won.WON.Closed) {
-        markConnUriAsClosed(connectionUri);
-      }
-
       return state.mergeDeepIn(
         [needUri, "connections", connectionUri],
         parsedConnection.get("data")
@@ -195,10 +191,6 @@ export function changeConnectionState(state, connectionUri, newState) {
   }
 
   const needUri = need.get("uri");
-
-  if (newState === won.WON.Closed) {
-    markConnUriAsClosed(connectionUri);
-  }
 
   const connection = getIn(need, ["connections", connectionUri]);
   if (
