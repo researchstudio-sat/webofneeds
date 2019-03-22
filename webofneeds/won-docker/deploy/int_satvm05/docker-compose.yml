@@ -31,6 +31,8 @@ services:
     environment:
       - "uri.host=satvm05.researchstudio.at"
       - "http.port=8888"
+      - "uri.prefix=https://satvm05.researchstudio.at:8888/won"
+      - "client.authentication.behind.proxy=true"
       - "db.sql.jdbcDriverClass=org.postgresql.Driver"
       - "db.sql.jdbcUrl=jdbc:postgresql://satvm05.researchstudio.at:5432/won_node"
       - "db.ddl.strategy=validate"
