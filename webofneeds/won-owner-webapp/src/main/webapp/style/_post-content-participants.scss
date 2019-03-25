@@ -1,0 +1,64 @@
+@import "won-config";
+@import "sizing-utils";
+@import "animate";
+
+won-post-content-participants {
+  & .pc-participants__empty {
+    color: $won-line-gray;
+    padding: 0.5rem;
+    text-align: center;
+  }
+
+  & .pc-participants__participant {
+    border: $thinGrayBorder;
+    border-left: 0;
+    background: $won-light-gray;
+    display: grid;
+    grid-template-areas: "participant_indicator participant_info participant_actions";
+    grid-template-columns: min-content 1fr min-content;
+    align-items: center;
+    margin-top: 0.5rem;
+
+    &:first-of-type {
+      margin-top: 0;
+    }
+
+    &:hover {
+      background: white;
+    }
+
+    won-post-header {
+      padding: 0.5rem 0.25rem;
+      font-size: $normalFontSize;
+      grid-area: participant_info;
+    }
+
+    & > .pc-participants__participant__indicator {
+      grid-area: participant_indicator;
+      box-sizing: border-box;
+      width: 0.25rem;
+      height: 100%;
+    }
+
+    &.won-unread > .pc-participants__participant__indicator {
+      border-left: 0.25rem solid $won-unread-attention;
+    }
+
+    &:not(.won-unread) > .pc-participants__participant__indicator {
+      border-left: $thinGrayBorder;
+    }
+
+    &__actions {
+      padding-right: 0.5rem;
+      display: grid;
+      grid-auto-flow: column;
+      grid-gap: 0.25rem;
+      grid-area: participant_actions;
+
+      &__button.won-button--outlined.red.thin {
+        font-size: $smallFontSize;
+        padding: 0.5rem;
+      }
+    }
+  }
+}
