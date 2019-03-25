@@ -132,10 +132,6 @@ won-slide-in {
   .si__anonymous {
     @include slide-in();
 
-    & > .si__title {
-      min-width: 18rem;
-    }
-
     &--expanded {
       grid-template-areas:
         "siIcon siTitle siTitle siButton"

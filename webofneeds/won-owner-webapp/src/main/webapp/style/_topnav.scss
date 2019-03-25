@@ -100,5 +100,7 @@
   .topnav__signupbtn {
     @include won-button--filled(white, $won-primary-color);
     @extend .topnav__button;
+    padding-left: 1rem;
+    padding-right: 1rem;
   }
 }

@@ -46,7 +46,7 @@ won-footer {
       font-size: $smallFontSize;
     }
 
-    .footer__links {
+    .footer__linksdesktop {
       grid-area: footerLinks;
       display: flex;
       font-size: $smallFontSize;
@@ -57,6 +57,25 @@ won-footer {
         user-select: none;
         padding: 0 0.5rem;
       }
+
+      &__link:visited,
+      &__link {
+        cursor: pointer;
+        color: $won-subtitle-gray;
+        text-decoration: none;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+
+    .footer__linksmobile {
+      grid-area: footerLinks;
+      display: flex;
+      font-size: $smallFontSize;
+      align-items: center;
+      flex-direction: column;
 
       &__link:visited,
       &__link {
