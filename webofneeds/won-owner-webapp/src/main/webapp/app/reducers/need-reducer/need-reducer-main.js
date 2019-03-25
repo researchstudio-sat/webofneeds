@@ -256,7 +256,7 @@ export default function(allNeedsInState = initialState, action = {}) {
         return addMessage(stateUpdated, optimisticEvent);
       } else {
         const tmpConnectionUri = "connectionFrom:" + eventUri;
-
+        //TODO: FIGURE OUT A WAY TO INCLUDE THE CORRECT FACET FOR ALL POSSIBLE CASES (e.g hasSenderFacet -> get Facet from need -> store said facet)
         let connSenderFacet = won.WON.ChatFacetCompacted; //Default add optimistic Connection as ChatConnection
         const ownedNeed = get(allNeedsInState, ownedNeedUri);
         if (
