@@ -67,7 +67,7 @@ function genComponentConf() {
           <won-post-is-or-seeks-info branch="::'content'" ng-if="self.isSelectedTab('DETAIL') && self.hasContent" post-uri="self.postUri"></won-post-is-or-seeks-info>
           <won-labelled-hr label="::'Search'" class="cp__labelledhr" ng-show="self.isSelectedTab('DETAIL') && self.hasContent && self.hasSeeksBranch"></won-labelled-hr>
           <won-post-is-or-seeks-info branch="::'seeks'" ng-if="self.isSelectedTab('DETAIL') && self.hasSeeksBranch" post-uri="self.postUri"></won-post-is-or-seeks-info>
-          <won-elm module="self.editNeedModule" ng-if="self.isOwned && self.isSelectedTab('DETAIL') && !self.post.get('heldBy')" attributes="self.post.get('uri')"></won-elm>
+          <won-elm module="self.editNeedModule" ng-if="self.isOwned && self.hasHoldableFacet && self.isSelectedTab('DETAIL') && !self.post.get('heldBy')" attributes="self.post.get('uri')"></won-elm>
 
           <!-- PERSONA INFORMATION -->
           <won-post-content-persona ng-if="self.isSelectedTab('HELDBY')" holds-uri="self.postUri"></won-post-content-persona>
@@ -277,6 +277,7 @@ function genComponentConf() {
           heldPostsArray: isPersona && heldPosts && heldPosts.toArray(),
           hasGroupFacet,
           hasChatFacet: needUtils.hasChatFacet(post),
+          hasHoldableFacet: needUtils.hasHoldableFacet(post),
           hasGroupMembers: groupMembers && groupMembers.size > 0,
           hasGroupChatConnections:
             groupChatConnections && groupChatConnections.size > 0,
