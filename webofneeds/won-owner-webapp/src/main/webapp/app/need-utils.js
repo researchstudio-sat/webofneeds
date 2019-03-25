@@ -115,37 +115,29 @@ export function isNeed(need) {
 }
 
 export function hasChatFacet(need) {
-  return (
-    getIn(need, ["content", "facets"]) &&
-    getIn(need, ["content", "facets"]).contains(won.WON.ChatFacetCompacted)
-  );
+  return hasFacet(need, won.WON.ChatFacetCompacted);
 }
 
 export function hasGroupFacet(need) {
-  return (
-    getIn(need, ["content", "facets"]) &&
-    getIn(need, ["content", "facets"]).contains(won.WON.GroupFacetCompacted)
-  );
+  return hasFacet(need, won.WON.GroupFacetCompacted);
 }
 
 export function hasHoldableFacet(need) {
-  return (
-    getIn(need, ["content", "facets"]) &&
-    getIn(need, ["content", "facets"]).contains(won.WON.HoldableFacetCompacted)
-  );
+  return hasFacet(need, won.WON.HoldableFacetCompacted);
 }
 
 export function hasHolderFacet(need) {
-  return (
-    getIn(need, ["content", "facets"]) &&
-    getIn(need, ["content", "facets"]).contains(won.WON.HolderFacetCompacted)
-  );
+  return hasFacet(need, won.WON.HolderFacetCompacted);
 }
 
 export function hasReviewFacet(need) {
+  return hasFacet(need, won.WON.ReviewFacetCompacted);
+}
+
+export function hasFacet(need, facet) {
   return (
     getIn(need, ["content", "facets"]) &&
-    getIn(need, ["content", "facets"]).contains(won.WON.ReviewFacetCompacted)
+    getIn(need, ["content", "facets"]).contains(facet)
   );
 }
 
