@@ -88,7 +88,9 @@ function genComponentConf() {
           initial-value="undefined"
           on-update="self.inviteParticipant(value)"
           detail="::{placeholder: 'Insert NeedUri to invite'}"
+          excluded-uris="self.excludedFromInviteUris"
           allowed-facets="::[self.won.WON.ChatFacetCompacted, self.won.WON.GroupFacetCompacted]"
+          excluded-text="::'Invitation does not work for needs that are already part of the Group, or the group itself'"
           not-allowed-facet-text="::'Invitation does not work on needs without Group or Chat Facet'"
           no-suggestions-text="::'No Participants available to invite'"
       ></won-suggestpost-picker>
@@ -115,6 +117,14 @@ function genComponentConf() {
             this.postUri
           );
 
+        let excludedFromInviteUris = [this.postUri];
+
+        if (groupChatConnections) {
+          groupChatConnections.map(conn =>
+            excludedFromInviteUris.push(get(conn, "remoteNeedUri"))
+          );
+        }
+
         return {
           post,
           isOwned,
@@ -124,6 +134,7 @@ function genComponentConf() {
             groupChatConnections && groupChatConnections.size > 0,
           groupChatConnectionsArray:
             groupChatConnections && groupChatConnections.toArray(),
+          excludedFromInviteUris: [this.postUri],
           groupMembersArray: groupMembers && groupMembers.toArray(),
         };
       };
