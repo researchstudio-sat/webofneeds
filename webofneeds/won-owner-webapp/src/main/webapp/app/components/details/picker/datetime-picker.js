@@ -24,7 +24,7 @@ function genComponentConf() {
           <input
               type="date"
               class="datetimep__input__inner"
-              id="datetimep__input__date"
+              ng-attr-id="{{::self.getUniqueDateId()}}"
               placeholder="{{self.detail.placeholder}}"
               ng-model="self.date_value"
               ng-change="::self.updateDatetime()"/>
@@ -41,7 +41,7 @@ function genComponentConf() {
           <input
               type="time"
               class="datetimep__input__inner"
-              id="datetimep__input__time"
+              ng-attr-id="{{::self.getUniqueTimeId()}}"
               placeholder="{{self.detail.placeholder}}"
               ng-model="self.time_value"
               ng-change="::self.updateDatetime()"
@@ -66,6 +66,14 @@ function genComponentConf() {
       this.showResetButton = false;
 
       delay(0).then(() => this.showInitialDatetime());
+    }
+
+    getUniqueDateId() {
+      return "datetime-date-" + this.$scope.$id;
+    }
+
+    getUniqueTimeId() {
+      return "datetime-time-" + this.$scope.$id;
     }
 
     /**
@@ -159,7 +167,7 @@ function genComponentConf() {
     datefield() {
       if (!this._dateInput) {
         this._dateInput = this.$element[0].querySelector(
-          "#datetimep__input__date"
+          "#" + this.getUniqueDateId()
         );
       }
       return this._dateInput;
@@ -171,7 +179,7 @@ function genComponentConf() {
     timefield() {
       if (!this._timeInput) {
         this._timeInput = this.$element[0].querySelector(
-          "#datetimep__input__time"
+          "#" + this.getUniqueTimeId()
         );
       }
       return this._timeInput;
