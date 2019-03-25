@@ -114,9 +114,11 @@ function genComponentConf() {
         const uriToFetchIsWhatsAround = needUtils.isWhatsAroundNeed(
           get(allForbiddenNeeds, this.uriToFetch)
         );
-        const uriToFetchIsNotAllowed = !this.hasAtLeastOneAllowedFacet(
-          get(allForbiddenNeeds, this.uriToFetch)
-        );
+        const uriToFetchIsNotAllowed =
+          !!get(allForbiddenNeeds, this.uriToFetch) &&
+          !this.hasAtLeastOneAllowedFacet(
+            get(allForbiddenNeeds, this.uriToFetch)
+          );
         const uriToFetchIsExcluded = this.isExcludedNeed(
           get(allForbiddenNeeds, this.uriToFetch)
         );
