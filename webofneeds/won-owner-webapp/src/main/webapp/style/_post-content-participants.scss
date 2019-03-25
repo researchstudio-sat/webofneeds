@@ -9,6 +9,12 @@ won-post-content-participants {
     text-align: center;
   }
 
+  & won-suggestpost-picker {
+    background: var(--won-light-gray);
+    padding: 0.5rem;
+    border: 0.01rem solid var(--won-line-gray);
+  }
+
   & .pc-participants__participant {
     border: $thinGrayBorder;
     border-left: 0;

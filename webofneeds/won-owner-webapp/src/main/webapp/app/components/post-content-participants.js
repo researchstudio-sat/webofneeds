@@ -6,6 +6,7 @@ import angular from "angular";
 import inviewModule from "angular-inview";
 import labelledHrModule from "./labelled-hr.js";
 import postHeaderModule from "./post-header.js";
+import suggestPostPickerModule from "./details/picker/suggestpost-picker.js";
 import { attach, getIn, get } from "../utils.js";
 import won from "../won-es6.js";
 import { connect2Redux } from "../won-utils.js";
@@ -81,6 +82,16 @@ function genComponentConf() {
           ng-if="(!self.isOwned && !self.hasGroupMembers) || (self.isOwned && !self.hasGroupChatConnections)">
           No Groupmembers present.
       </div>
+      <won-labelled-hr label="::'Invite'" class="pc-participants__labelledhr" ng-if="self.isOwned"></won-labelled-hr>
+      <won-suggestpost-picker
+          ng-if="self.isOwned"
+          initial-value="undefined"
+          on-update="self.inviteParticipant(value)"
+          detail="::{placeholder: 'Insert NeedUri to invite'}"
+          allowed-facets="::[self.won.WON.ChatFacetCompacted, self.won.WON.GroupFacetCompacted]"
+          not-allowed-facet-text="::'Invitation does not work on needs without Group or Chat Facet'"
+          no-suggestions-text="::'No Participants available to invite'"
+      ></won-suggestpost-picker>
     `;
 
   class Controller {
@@ -176,6 +187,15 @@ function genComponentConf() {
       this.needs__connect(this.postUri, connUri, remoteNeedUri, message);
     }
 
+    inviteParticipant(needUri) {
+      if (!this.isOwned || !this.hasGroupFacet) {
+        console.warn("Trying to invite to a non-owned or non groupFacet need");
+        return;
+      }
+      console.debug("Trying to invite: ", needUri);
+      console.debug("TODO IMPL");
+    }
+
     markAsRead(conn) {
       if (conn && conn.get("unread")) {
         const payload = {
@@ -210,6 +230,7 @@ export default angular
     ngAnimate,
     labelledHrModule,
     postHeaderModule,
+    suggestPostPickerModule,
     inviewModule.name,
   ])
   .directive("wonPostContentParticipants", genComponentConf).name;
