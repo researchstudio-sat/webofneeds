@@ -12,6 +12,7 @@ import won from "../won-es6.js";
 import { connect2Redux } from "../won-utils.js";
 import * as needUtils from "../need-utils.js";
 import * as connectionSelectors from "../selectors/connection-selectors.js";
+import * as connectionUtils from "../connection-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import ngAnimate from "angular-animate";
 
@@ -120,9 +121,11 @@ function genComponentConf() {
         let excludedFromInviteUris = [this.postUri];
 
         if (groupChatConnections) {
-          groupChatConnections.map(conn =>
-            excludedFromInviteUris.push(get(conn, "remoteNeedUri"))
-          );
+          groupChatConnections
+            .filter(conn => !connectionUtils.isClosed(conn))
+            .map(conn =>
+              excludedFromInviteUris.push(get(conn, "remoteNeedUri"))
+            );
         }
 
         return {
