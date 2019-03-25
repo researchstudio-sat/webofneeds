@@ -4,7 +4,7 @@
 import { actionTypes } from "../../actions/actions.js";
 import Immutable from "immutable";
 import won from "../../won-es6.js";
-import { msStringToDate, getIn } from "../../utils.js";
+import { msStringToDate, get, getIn } from "../../utils.js";
 import {
   addOwnActiveNeedsInLoading,
   addOwnInactiveNeedsInLoading,
@@ -44,6 +44,7 @@ import {
   setShowPetriNetData,
   setMultiSelectType,
 } from "./reduce-connections.js";
+import * as needUtils from "../../need-utils.js";
 
 const initialState = Immutable.fromJS({});
 
@@ -252,9 +253,19 @@ export default function(allNeedsInState = initialState, action = {}) {
           won.WON.RequestSent
         );
         //because we have a connection uri, we can add the message
-        return addMessage(stateUpdated, action.payload.optimisticEvent);
+        return addMessage(stateUpdated, optimisticEvent);
       } else {
         const tmpConnectionUri = "connectionFrom:" + eventUri;
+
+        let connSenderFacet = won.WON.ChatFacetCompacted; //Default add optimistic Connection as ChatConnection
+        const ownedNeed = get(allNeedsInState, ownedNeedUri);
+        if (
+          !needUtils.hasChatFacet(ownedNeed) &&
+          needUtils.hasGroupFacet(ownedNeed)
+        ) {
+          connSenderFacet = won.WON.GroupFacetCompacted; //assume the connection is from group to x if the need has the group but not the chat facet
+        }
+
         //need to wait for success-response to set that
         const optimisticConnection = Immutable.fromJS({
           uri: tmpConnectionUri,
@@ -263,7 +274,7 @@ export default function(allNeedsInState = initialState, action = {}) {
           remoteNeedUri: theirNeedUri,
           remoteConnectionUri: undefined,
           unread: false,
-          facet: won.WON.ChatFacetCompacted, //TODO: INSERT CORRECT FACET FROM NEEDS
+          facet: connSenderFacet,
           agreementData: {
             agreementUris: Immutable.Set(),
             pendingProposalUris: Immutable.Set(),
