@@ -16,7 +16,8 @@
     <module>won-utils-crawl</module>   
     <module>won-utils-goals</module> 
     <module>won-utils-conversation</module>
-</modules>
+    <module>won-utils-tls</module>
+  </modules>
 <packaging>pom</packaging>
 
 </project>
