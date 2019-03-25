@@ -198,13 +198,12 @@ function genComponentConf() {
       this.needs__connect(this.postUri, connUri, remoteNeedUri, message);
     }
 
-    inviteParticipant(needUri) {
+    inviteParticipant(needUri, message = "") {
       if (!this.isOwned || !this.hasGroupFacet) {
         console.warn("Trying to invite to a non-owned or non groupFacet need");
         return;
       }
-      console.debug("Trying to invite: ", needUri);
-      console.debug("TODO IMPL");
+      this.needs__connect(this.postUri, undefined, needUri, message);
     }
 
     markAsRead(conn) {
