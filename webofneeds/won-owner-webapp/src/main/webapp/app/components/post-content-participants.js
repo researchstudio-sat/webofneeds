@@ -134,7 +134,7 @@ function genComponentConf() {
             groupChatConnections && groupChatConnections.size > 0,
           groupChatConnectionsArray:
             groupChatConnections && groupChatConnections.toArray(),
-          excludedFromInviteUris: [this.postUri],
+          excludedFromInviteUris,
           groupMembersArray: groupMembers && groupMembers.toArray(),
         };
       };
