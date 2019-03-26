@@ -19,21 +19,24 @@ package won.bot.framework.component.needproducer;
 import org.apache.jena.query.Dataset;
 
 /**
- * Interface for producing needs. The needs produced must be suitable as the 'model'
- * argument to the createNeed protocol method (i.e., don't have a URI, and only contain user-definable data).
+ * Interface for producing needs. The needs produced must be suitable as the
+ * 'model' argument to the createNeed protocol method (i.e., don't have a URI,
+ * and only contain user-definable data).
  *
  * Note: Implementations must be thread-safe.
  */
-public interface NeedProducer
-{
+public interface NeedProducer {
   /**
-   * Returns a new Model that represents the created need or null if no more needs can be created.
+   * Returns a new Model that represents the created need or null if no more needs
+   * can be created.
+   * 
    * @return a dataset or null
    */
   public Dataset create();
 
   /**
    * Indicates that no more needs will be created by this factory.
+   * 
    * @return
    */
   public boolean isExhausted();

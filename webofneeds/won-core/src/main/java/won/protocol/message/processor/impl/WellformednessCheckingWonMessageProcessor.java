@@ -30,6 +30,7 @@ import won.protocol.validation.WonMessageValidator;
 
 /**
  * Checks WonMessages for integrity. The following steps are performed:
+ * 
  * <pre>
  *   <ul>
  *     <li>No default graph may be present</li>
@@ -39,8 +40,7 @@ import won.protocol.validation.WonMessageValidator;
  * </pre>
  *
  */
-public class WellformednessCheckingWonMessageProcessor implements WonMessageProcessor
-{
+public class WellformednessCheckingWonMessageProcessor implements WonMessageProcessor {
   private final Logger logger = LoggerFactory.getLogger(getClass());
   WonMessageValidator validator = new WonMessageValidator();
 
@@ -51,21 +51,19 @@ public class WellformednessCheckingWonMessageProcessor implements WonMessageProc
     StringBuilder errorMessage = new StringBuilder("Message is not valid, failed at check ");
     boolean valid = false;
     try {
-        dataset.getLock().enterCriticalSection(true);
-        valid = validator.validate(dataset, errorMessage);
+      dataset.getLock().enterCriticalSection(true);
+      valid = validator.validate(dataset, errorMessage);
     } finally {
-        dataset.getLock().leaveCriticalSection();
+      dataset.getLock().leaveCriticalSection();
     }
     if (!valid) {
-      logger.info(errorMessage.toString() +". More info on loglevel 'debug'", message.getMessageURI());
+      logger.info(errorMessage.toString() + ". More info on loglevel 'debug'", message.getMessageURI());
       if (logger.isDebugEnabled()) {
-          logger.debug("Offending message:\n" + RdfUtils.writeDatasetToString(dataset, Lang.TRIG));
+        logger.debug("Offending message:\n" + RdfUtils.writeDatasetToString(dataset, Lang.TRIG));
       }
       throw new WonMessageNotWellFormedException(errorMessage.toString());
     }
     return message;
   }
-
-
 
 }

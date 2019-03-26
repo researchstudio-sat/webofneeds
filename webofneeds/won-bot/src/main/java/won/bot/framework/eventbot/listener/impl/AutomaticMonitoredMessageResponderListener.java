@@ -37,50 +37,47 @@ import won.protocol.util.WonRdfUtils;
 /**
  * Listener that responds to open and message events with automatic messages.
  * Can be configured to apply a timeout (non-blocking) before sending messages.
- * Can be configured to send a fixed number of messages and then unsubscribe from events.
+ * Can be configured to send a fixed number of messages and then unsubscribe
+ * from events.
  */
-public class AutomaticMonitoredMessageResponderListener extends AbstractHandleFirstNEventsListener
-{
+public class AutomaticMonitoredMessageResponderListener extends AbstractHandleFirstNEventsListener {
   private long millisTimeoutBeforeReply = 1000;
 
-  public AutomaticMonitoredMessageResponderListener(final EventListenerContext context, final int targetNumberOfMessages, final long millisTimeoutBeforeReply)
-  {
+  public AutomaticMonitoredMessageResponderListener(final EventListenerContext context,
+      final int targetNumberOfMessages, final long millisTimeoutBeforeReply) {
     super(context, targetNumberOfMessages);
     this.millisTimeoutBeforeReply = millisTimeoutBeforeReply;
   }
 
-  public AutomaticMonitoredMessageResponderListener(final EventListenerContext context, final EventFilter eventFilter, final int targetCount, final long millisTimeoutBeforeReply)
-  {
+  public AutomaticMonitoredMessageResponderListener(final EventListenerContext context, final EventFilter eventFilter,
+      final int targetCount, final long millisTimeoutBeforeReply) {
     super(context, eventFilter, targetCount);
     this.millisTimeoutBeforeReply = millisTimeoutBeforeReply;
   }
 
-  public AutomaticMonitoredMessageResponderListener(final EventListenerContext context, final String name, final int targetCount, final long millisTimeoutBeforeReply)
-  {
+  public AutomaticMonitoredMessageResponderListener(final EventListenerContext context, final String name,
+      final int targetCount, final long millisTimeoutBeforeReply) {
     super(context, name, targetCount);
     this.millisTimeoutBeforeReply = millisTimeoutBeforeReply;
   }
 
-  public AutomaticMonitoredMessageResponderListener(final EventListenerContext context, final String name, final EventFilter eventFilter, final int targetCount, final long millisTimeoutBeforeReply)
-  {
+  public AutomaticMonitoredMessageResponderListener(final EventListenerContext context, final String name,
+      final EventFilter eventFilter, final int targetCount, final long millisTimeoutBeforeReply) {
     super(context, name, eventFilter, targetCount);
     this.millisTimeoutBeforeReply = millisTimeoutBeforeReply;
   }
 
   @Override
-  protected void handleFirstNTimes(final Event event) throws Exception
-  {
-    if (event instanceof ConnectionSpecificEvent){
+  protected void handleFirstNTimes(final Event event) throws Exception {
+    if (event instanceof ConnectionSpecificEvent) {
       handleMessageEvent((ConnectionSpecificEvent) event);
     }
   }
 
-  private void handleMessageEvent(final ConnectionSpecificEvent messageEvent){
-    getEventListenerContext().getTaskScheduler().schedule(new Runnable()
-    {
+  private void handleMessageEvent(final ConnectionSpecificEvent messageEvent) {
+    getEventListenerContext().getTaskScheduler().schedule(new Runnable() {
       @Override
-      public void run()
-      {
+      public void run() {
 
         EventListenerContext ctx = getEventListenerContext();
         String message = createMessage();
@@ -100,50 +97,36 @@ public class AutomaticMonitoredMessageResponderListener extends AbstractHandleFi
     }, new Date(System.currentTimeMillis() + this.millisTimeoutBeforeReply));
   }
 
-  private String createMessage()
-  {
+  private String createMessage() {
     String message = "auto reply no " + (getCount());
-    if (getTargetCount() > 0){
+    if (getTargetCount() > 0) {
       message += " of " + getTargetCount();
     }
-    message +=  "(delay: "+ millisTimeoutBeforeReply + " millis)";
+    message += "(delay: " + millisTimeoutBeforeReply + " millis)";
     return message;
   }
 
   @Override
-  protected void unsubscribe()
-  {
+  protected void unsubscribe() {
     logger.debug("unsubscribing from all events");
     getEventListenerContext().getEventBus().unsubscribe(this);
   }
 
-  private WonMessage createWonMessage(URI connectionURI, String message ) throws WonMessageBuilderException {
+  private WonMessage createWonMessage(URI connectionURI, String message) throws WonMessageBuilderException {
 
-    WonNodeInformationService wonNodeInformationService =
-      getEventListenerContext().getWonNodeInformationService();
+    WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
 
-
-    Dataset connectionRDF =
-      getEventListenerContext().getLinkedDataSource().getDataForResource(connectionURI);
+    Dataset connectionRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(connectionURI);
     URI remoteNeed = WonRdfUtils.ConnectionUtils.getRemoteNeedURIFromConnection(connectionRDF, connectionURI);
     URI localNeed = WonRdfUtils.ConnectionUtils.getLocalNeedURIFromConnection(connectionRDF, connectionURI);
     URI wonNode = WonRdfUtils.ConnectionUtils.getWonNodeURIFromConnection(connectionRDF, connectionURI);
-    Dataset remoteNeedRDF =
-      getEventListenerContext().getLinkedDataSource().getDataForResource(remoteNeed);
+    Dataset remoteNeedRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(remoteNeed);
 
     URI messageURI = wonNodeInformationService.generateEventURI(wonNode);
 
-    return WonMessageBuilder
-      .setMessagePropertiesForConnectionMessage(
-        messageURI,
-        connectionURI,
-        localNeed,
-        wonNode,
-        WonRdfUtils.ConnectionUtils.getRemoteConnectionURIFromConnection(connectionRDF, connectionURI),
-        remoteNeed,
-        WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, remoteNeed),
-        message)
-      .build();
+    return WonMessageBuilder.setMessagePropertiesForConnectionMessage(messageURI, connectionURI, localNeed, wonNode,
+        WonRdfUtils.ConnectionUtils.getRemoteConnectionURIFromConnection(connectionRDF, connectionURI), remoteNeed,
+        WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, remoteNeed), message).build();
   }
 
 }

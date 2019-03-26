@@ -34,25 +34,25 @@ import won.protocol.vocabulary.WONMSG;
  * the connection in the db
  */
 public class FacetTypeExtractingCamelProcessor implements Processor {
-    @Autowired
-    ConnectionRepository connectionRepository;
+  @Autowired
+  ConnectionRepository connectionRepository;
 
-    @Override
-    public void process(Exchange exchange) throws Exception {
-        URI facetType = null;
-        WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
+  @Override
+  public void process(Exchange exchange) throws Exception {
+    URI facetType = null;
+    WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
 
-        URI conUri = (URI) exchange.getIn().getHeader(WonCamelConstants.CONNECTION_URI_HEADER);
-        if (conUri == null) {
-            throw new MissingMessagePropertyException(URI.create(WONMSG.RECEIVER_PROPERTY.getURI().toString()));
-        }
-        Connection con = connectionRepository.findOneByConnectionURI(conUri);
-        facetType = con.getTypeURI();
-
-        if (facetType == null) {
-            throw new WonMessageProcessingException(String
-                    .format("Failed to determine connection " + "facet for message %s", wonMessage.getMessageURI()));
-        }
-        exchange.getIn().setHeader(WonCamelConstants.FACET_TYPE_HEADER, facetType);
+    URI conUri = (URI) exchange.getIn().getHeader(WonCamelConstants.CONNECTION_URI_HEADER);
+    if (conUri == null) {
+      throw new MissingMessagePropertyException(URI.create(WONMSG.RECEIVER_PROPERTY.getURI().toString()));
     }
+    Connection con = connectionRepository.findOneByConnectionURI(conUri);
+    facetType = con.getTypeURI();
+
+    if (facetType == null) {
+      throw new WonMessageProcessingException(
+          String.format("Failed to determine connection " + "facet for message %s", wonMessage.getMessageURI()));
+    }
+    exchange.getIn().setHeader(WonCamelConstants.FACET_TYPE_HEADER, facetType);
+  }
 }

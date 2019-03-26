@@ -19,13 +19,14 @@ package won.cryptography.keymanagement;
 /**
  * Encapsulates the derivation of an alias for a given Need URI.
  */
-public interface KeyPairAliasDerivationStrategy
-{
-    /**
-     * Returns an Alias usable in a KeyStore.
-     * @param needURI
-     * @return always a valid alias string
-     * @throws IllegalArgumentException if the argument cannot be converted to an alias.
-     */
-    public String getAliasForNeedUri(String needURI);
+public interface KeyPairAliasDerivationStrategy {
+  /**
+   * Returns an Alias usable in a KeyStore.
+   * 
+   * @param needURI
+   * @return always a valid alias string
+   * @throws IllegalArgumentException if the argument cannot be converted to an
+   *                                  alias.
+   */
+  public String getAliasForNeedUri(String needURI);
 }

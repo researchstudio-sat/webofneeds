@@ -21,17 +21,17 @@ import java.net.URI;
 import won.protocol.message.processor.WonMessageProcessor;
 
 /**
- * WonMessageProcessor that can be used exactly once to generate an outbound message based on a
- * local message.
+ * WonMessageProcessor that can be used exactly once to generate an outbound
+ * message based on a local message.
  */
 public abstract class OutboundMessageFactoryProcessor implements WonMessageProcessor {
-    private URI messageURI;
+  private URI messageURI;
 
-    public OutboundMessageFactoryProcessor(URI messageURI) {
-        this.messageURI = messageURI;
-    }
+  public OutboundMessageFactoryProcessor(URI messageURI) {
+    this.messageURI = messageURI;
+  }
 
-    public URI getMessageURI() {
-        return messageURI;
-    }
+  public URI getMessageURI() {
+    return messageURI;
+  }
 }

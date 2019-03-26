@@ -19,8 +19,7 @@ package won.protocol.vocabulary;
 /**
  * Some HTTP constants.
  */
-public class HTTP
-{
+public class HTTP {
   public static final String HEADER_LOCATION = "Location";
   public static final String HEADER_DATE = "Date";
   public static final String HEADER_EXPIRES = "Expires";

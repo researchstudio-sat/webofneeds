@@ -10,11 +10,10 @@ import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.message.sender.WonMessageSender;
 
 /**
- * Service that connects client-side logic (e.g. the WonWebSocketHandler in won-owner-webapp)
- * with facilities for sending and receiving messages.
+ * Service that connects client-side logic (e.g. the WonWebSocketHandler in
+ * won-owner-webapp) with facilities for sending and receiving messages.
  */
-public class OwnerApplicationService implements WonMessageProcessor, WonMessageSender
-{
+public class OwnerApplicationService implements WonMessageProcessor, WonMessageSender {
 
   private static final Logger logger = LoggerFactory.getLogger(OwnerApplicationService.class);
 
@@ -22,13 +21,14 @@ public class OwnerApplicationService implements WonMessageProcessor, WonMessageS
   @Qualifier("default")
   private WonMessageSender wonMessageSenderDelegate;
 
-  //when the callback is a bean in a child context, it sets itself as a dependency here
-  //we don't do autowiring.
-  private WonMessageProcessor messageProcessorDelegate =
-    new NopOwnerApplicationServiceCallback();
+  // when the callback is a bean in a child context, it sets itself as a
+  // dependency here
+  // we don't do autowiring.
+  private WonMessageProcessor messageProcessorDelegate = new NopOwnerApplicationServiceCallback();
 
   /**
    * Sends a message to the won node.
+   * 
    * @param wonMessage
    */
   public void sendWonMessage(WonMessage wonMessage) {
@@ -36,17 +36,18 @@ public class OwnerApplicationService implements WonMessageProcessor, WonMessageS
       // send to node:
       wonMessageSenderDelegate.sendWonMessage(wonMessage);
     } catch (Exception e) {
-      //TODO: send error message back to client!
+      // TODO: send error message back to client!
       logger.info("could not send WonMessage", e);
     }
   }
 
   /**
    * Sends a message to the owner.
+   * 
    * @param wonMessage
    */
   @Override
-  public WonMessage process(final WonMessage wonMessage){
+  public WonMessage process(final WonMessage wonMessage) {
     return messageProcessorDelegate.process(wonMessage);
   }
 

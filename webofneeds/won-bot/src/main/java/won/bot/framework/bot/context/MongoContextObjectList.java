@@ -8,8 +8,7 @@ import org.springframework.data.annotation.Id;
 /**
  * Created by hfriedrich on 21.11.2016.
  */
-public class MongoContextObjectList
-{
+public class MongoContextObjectList {
   @Id
   private String id;
 

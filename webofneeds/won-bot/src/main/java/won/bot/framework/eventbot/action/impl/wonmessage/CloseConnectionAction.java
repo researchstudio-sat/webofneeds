@@ -32,13 +32,13 @@ import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 
 /**
- * Listener that will try to obtain a connectionURI from any event
- * passed to it and close that connection.
+ * Listener that will try to obtain a connectionURI from any event passed to it
+ * and close that connection.
  */
-public class CloseConnectionAction extends BaseEventBotAction
-{
+public class CloseConnectionAction extends BaseEventBotAction {
 
   private String farewellMessage;
+
   public CloseConnectionAction(final EventListenerContext context, String farewellMessage) {
     super(context);
     this.farewellMessage = farewellMessage;
@@ -70,28 +70,18 @@ public class CloseConnectionAction extends BaseEventBotAction
 
   private WonMessage createWonMessage(URI connectionURI) throws WonMessageBuilderException {
 
-    WonNodeInformationService wonNodeInformationService =
-      getEventListenerContext().getWonNodeInformationService();
+    WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
 
-    Dataset connectionRDF =
-      getEventListenerContext().getLinkedDataSource().getDataForResource(connectionURI);
+    Dataset connectionRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(connectionURI);
     URI remoteNeed = WonRdfUtils.ConnectionUtils.getRemoteNeedURIFromConnection(connectionRDF, connectionURI);
     URI localNeed = WonRdfUtils.ConnectionUtils.getLocalNeedURIFromConnection(connectionRDF, connectionURI);
     URI wonNode = WonRdfUtils.ConnectionUtils.getWonNodeURIFromConnection(connectionRDF, connectionURI);
-    Dataset remoteNeedRDF =
-      getEventListenerContext().getLinkedDataSource().getDataForResource(remoteNeed);
+    Dataset remoteNeedRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(remoteNeed);
 
-    return WonMessageBuilder.setMessagePropertiesForClose(
-        wonNodeInformationService.generateEventURI(
-          wonNode),
-        connectionURI,
-        localNeed,
-        wonNode,
-        WonRdfUtils.ConnectionUtils.getRemoteConnectionURIFromConnection(connectionRDF, connectionURI),
-        remoteNeed,
-        WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, remoteNeed),
-        farewellMessage
-      )
-      .build();
+    return WonMessageBuilder
+        .setMessagePropertiesForClose(wonNodeInformationService.generateEventURI(wonNode), connectionURI, localNeed,
+            wonNode, WonRdfUtils.ConnectionUtils.getRemoteConnectionURIFromConnection(connectionRDF, connectionURI),
+            remoteNeed, WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, remoteNeed), farewellMessage)
+        .build();
   }
 }

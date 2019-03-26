@@ -17,8 +17,7 @@ import won.bot.framework.eventbot.listener.EventListener;
 /**
  * Created by hfriedrich on 16.11.2016.
  */
-public class SubscribeUnsubscribeAction extends BaseEventBotAction
-{
+public class SubscribeUnsubscribeAction extends BaseEventBotAction {
   public SubscribeUnsubscribeAction(EventListenerContext eventListenerContext) {
     super(eventListenerContext);
   }
@@ -26,7 +25,7 @@ public class SubscribeUnsubscribeAction extends BaseEventBotAction
   @Override
   protected void doRun(final Event event, EventListener executingListener) throws Exception {
     EventListenerContext ctx = getEventListenerContext();
-    if (event instanceof SubscribeUnsubscribeEvent && ctx.getBotContextWrapper() instanceof MailBotContextWrapper){
+    if (event instanceof SubscribeUnsubscribeEvent && ctx.getBotContextWrapper() instanceof MailBotContextWrapper) {
       MailBotContextWrapper botContextWrapper = (MailBotContextWrapper) ctx.getBotContextWrapper();
 
       // save the new subscription status of the user to the bot context
@@ -35,7 +34,8 @@ public class SubscribeUnsubscribeAction extends BaseEventBotAction
       String senderMailAddress = MailContentExtractor.getMailSender(subscribeEvent.getMessage());
       botContextWrapper.setSubscribeStatusForMailAddress(senderMailAddress, subscribeStatus);
 
-      // depending on the new subscribe status of the user publish his cached mails as needs or delete the cache
+      // depending on the new subscribe status of the user publish his cached mails as
+      // needs or delete the cache
       if (SubscribeStatus.SUBSCRIBED.equals(subscribeStatus)) {
 
         EventBus bus = getEventListenerContext().getEventBus();

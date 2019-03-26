@@ -32,24 +32,21 @@ import won.bot.framework.eventbot.listener.EventListener;
 /**
  *
  */
-public abstract class BaseEventBotAction implements won.bot.framework.eventbot.action.EventBotAction
-{
+public abstract class BaseEventBotAction implements won.bot.framework.eventbot.action.EventBotAction {
   protected final Logger logger = LoggerFactory.getLogger(getClass());
   private EventListenerContext eventListenerContext;
   private static final String EXCEPTION_TAG = "failed";
   private final String stopwatchName = getClass().getName();
 
-  protected BaseEventBotAction(final EventListenerContext eventListenerContext)
-  {
+  protected BaseEventBotAction(final EventListenerContext eventListenerContext) {
     Objects.requireNonNull(eventListenerContext);
     this.eventListenerContext = eventListenerContext;
   }
 
   @Override
   public Runnable getActionTask(final Event event, final EventListener eventListener) {
-    return new Runnable(){
-      public void run()
-      {
+    return new Runnable() {
+      public void run() {
         Stopwatch stopwatch = SimonManager.getStopwatch(stopwatchName);
         Split split = stopwatch.start();
         try {
@@ -67,14 +64,10 @@ public abstract class BaseEventBotAction implements won.bot.framework.eventbot.a
     };
   }
 
-
-
-  protected EventListenerContext getEventListenerContext()
-  {
+  protected EventListenerContext getEventListenerContext() {
     return eventListenerContext;
   }
 
   protected abstract void doRun(Event event, EventListener executingListener) throws Exception;
-
 
 }

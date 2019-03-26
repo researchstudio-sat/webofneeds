@@ -16,11 +16,9 @@ import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.SIOC;
 
 /**
- * User: gabriel
- * Date: 17/01/14
+ * User: gabriel Date: 17/01/14
  */
-public class CommentModeratedFacet extends AbstractFacet
-{
+public class CommentModeratedFacet extends AbstractFacet {
   private Logger logger = LoggerFactory.getLogger(this.getClass());
 
   @Override
@@ -29,16 +27,17 @@ public class CommentModeratedFacet extends AbstractFacet
   }
 
   @Override
-  public void connectFromOwner(Connection con, Model content, WonMessage wonMessage) throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
+  public void connectFromOwner(Connection con, Model content, WonMessage wonMessage)
+      throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
     super.connectFromOwner(con, content, wonMessage);
-    /* when connected change linked data*/
+    /* when connected change linked data */
     PrefixMapping prefixMapping = PrefixMapping.Factory.create();
-    prefixMapping.setNsPrefix(SIOC.getURI(),"sioc");
+    prefixMapping.setNsPrefix(SIOC.getURI(), "sioc");
     content.withDefaultMappings(prefixMapping);
-    content.setNsPrefix("sioc",SIOC.getURI());
+    content.setNsPrefix("sioc", SIOC.getURI());
     Resource post = content.createResource(con.getConnectionURI() + "/p/", SIOC.POST);
     content.add(content.createStatement(content.getResource(con.getConnectionURI().toString()), SIOC.HAS_REPLY,
-                                        content.getResource(con.getRemoteConnectionURI().toString())));
+        content.getResource(con.getRemoteConnectionURI().toString())));
     logger.debug(RdfUtils.toString(content));
     con.getDatasetHolder().getDataset().setDefaultModel(content);
     datasetHolderRepository.save(con.getDatasetHolder());

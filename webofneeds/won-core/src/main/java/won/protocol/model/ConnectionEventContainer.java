@@ -27,8 +27,7 @@ import won.protocol.model.parentaware.ParentAware;
 
 @Entity
 @DiscriminatorValue("Connection")
-public class ConnectionEventContainer extends EventContainer implements ParentAware<Connection>
-{
+public class ConnectionEventContainer extends EventContainer implements ParentAware<Connection> {
   @OneToOne(fetch = FetchType.LAZY, mappedBy = "eventContainer", optional = false)
   private Connection connection;
 

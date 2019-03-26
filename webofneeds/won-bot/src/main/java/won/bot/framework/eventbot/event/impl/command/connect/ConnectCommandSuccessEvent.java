@@ -23,29 +23,32 @@ import won.bot.framework.eventbot.event.impl.command.MessageCommandSuccessEvent;
 import won.bot.framework.eventbot.event.impl.command.base.AbstractMessageCommandResultEvent;
 import won.protocol.model.Connection;
 
-
 /**
- * Indicates that the bot has successfully sent a connect message, thereby creating a connection.
+ * Indicates that the bot has successfully sent a connect message, thereby
+ * creating a connection.
  */
-public class ConnectCommandSuccessEvent extends AbstractMessageCommandResultEvent implements MessageCommandSuccessEvent, ConnectCommandResultEvent {
-    public ConnectCommandSuccessEvent(MessageCommandEvent originalCommandEvent, Connection con) {
-        super(originalCommandEvent, con);
-    }
+public class ConnectCommandSuccessEvent extends AbstractMessageCommandResultEvent
+    implements MessageCommandSuccessEvent, ConnectCommandResultEvent {
+  public ConnectCommandSuccessEvent(MessageCommandEvent originalCommandEvent, Connection con) {
+    super(originalCommandEvent, con);
+  }
 
-    public ConnectCommandSuccessEvent(MessageCommandEvent originalCommandEvent, URI needURI, URI remoteNeedURI, URI connectionURI) {
-        super(originalCommandEvent, needURI, remoteNeedURI, connectionURI);
-    }
+  public ConnectCommandSuccessEvent(MessageCommandEvent originalCommandEvent, URI needURI, URI remoteNeedURI,
+      URI connectionURI) {
+    super(originalCommandEvent, needURI, remoteNeedURI, connectionURI);
+  }
 
-    public ConnectCommandSuccessEvent(MessageCommandEvent originalCommandEvent, URI needURI, URI remoteNeedURI, URI connectionURI, String message) {
-        super(originalCommandEvent, needURI, remoteNeedURI, connectionURI, message);
-    }
+  public ConnectCommandSuccessEvent(MessageCommandEvent originalCommandEvent, URI needURI, URI remoteNeedURI,
+      URI connectionURI, String message) {
+    super(originalCommandEvent, needURI, remoteNeedURI, connectionURI, message);
+  }
 
-    public ConnectCommandSuccessEvent(MessageCommandEvent originalCommandEvent, Connection con, String message) {
-        super(originalCommandEvent, con, message);
-    }
+  public ConnectCommandSuccessEvent(MessageCommandEvent originalCommandEvent, Connection con, String message) {
+    super(originalCommandEvent, con, message);
+  }
 
-    @Override
-    public boolean isSuccess() {
-        return true;
-    }
+  @Override
+  public boolean isSuccess() {
+    return true;
+  }
 }

@@ -8,8 +8,7 @@ import won.bot.framework.component.needproducer.impl.TemplateBasedNeedProducer;
 /**
  * Created by hfriedrich on 08.08.2016.
  */
-public class MailDirNeedProducer extends TemplateBasedNeedProducer
-{
+public class MailDirNeedProducer extends TemplateBasedNeedProducer {
   public String getCurrentFileName() {
     return ((DirectoryBasedNeedProducer) getWrappedProducer()).getCurrentFileName();
   }

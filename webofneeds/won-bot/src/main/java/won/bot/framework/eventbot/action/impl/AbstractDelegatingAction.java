@@ -27,8 +27,7 @@ import won.bot.framework.eventbot.listener.EventListener;
 /**
  * Base action with capabilities for delegating to another action
  */
-public abstract class AbstractDelegatingAction extends BaseEventBotAction
-{
+public abstract class AbstractDelegatingAction extends BaseEventBotAction {
 
   private EventBotAction delegate;
 

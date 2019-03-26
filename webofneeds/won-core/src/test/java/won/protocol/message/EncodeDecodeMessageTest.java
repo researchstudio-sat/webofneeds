@@ -9,26 +9,21 @@ import org.junit.Test;
 import won.protocol.util.RdfUtils;
 
 /**
- * User: ypanchenko
- * Date: 05.08.2014
+ * User: ypanchenko Date: 05.08.2014
  */
-public class EncodeDecodeMessageTest
-{
+public class EncodeDecodeMessageTest {
 
-  private static final Lang LANG =  Lang.JSONLD;
-  //private static final Lang LANG =  Lang.TRIG;
+  private static final Lang LANG = Lang.JSONLD;
+  // private static final Lang LANG = Lang.TRIG;
 
   private static final String RESOURCE_DIR = "/need-lifecycle_with_message_02adj/";
-  private static final String RESOURCE_FILE =
-    RESOURCE_DIR + "01_create_need/01_OA_to_WN1-without-sig.trig";
+  private static final String RESOURCE_FILE = RESOURCE_DIR + "01_create_need/01_OA_to_WN1-without-sig.trig";
 
   private static final String[] RESOURCE_FILES_WITHOUT_SIG = new String[] {
-    RESOURCE_DIR + "01_create_need/01_OA_to_WN1-without-sig.trig",
-    RESOURCE_DIR + "02_connect/01_OA_to_WN1-without-sig.trig",
-    RESOURCE_DIR + "03_receive_connect/01_WN2_to_WN1-without-sig.trig",
-    RESOURCE_DIR + "04_deactivate_(by_owner)/01_WN2_to_WN1-without-sig.trig"
-  };
-
+      RESOURCE_DIR + "01_create_need/01_OA_to_WN1-without-sig.trig",
+      RESOURCE_DIR + "02_connect/01_OA_to_WN1-without-sig.trig",
+      RESOURCE_DIR + "03_receive_connect/01_WN2_to_WN1-without-sig.trig",
+      RESOURCE_DIR + "04_deactivate_(by_owner)/01_WN2_to_WN1-without-sig.trig" };
 
   @Test
   public void testEncodeDecodeOneMessage() throws Exception {

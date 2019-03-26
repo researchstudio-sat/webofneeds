@@ -12,11 +12,9 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 
 /**
- * User: ypanchenko
- * Date: 23.02.2015
+ * User: ypanchenko Date: 23.02.2015
  */
-public class WonMailSender
-{
+public class WonMailSender {
 
   private JavaMailSender mailSender;
   private SimpleMailMessage templateMessage;
@@ -36,7 +34,7 @@ public class WonMailSender
     msg.setSubject(subject);
     msg.setTo(toEmail);
     msg.setText(text);
-    try{
+    try {
       mailSender.send(msg);
     } catch (MailException ex) {
       logger.warn(ex.getMessage());
@@ -46,7 +44,7 @@ public class WonMailSender
   public void sendHtmlMessage(String toEmail, String subject, String htmlBody) {
 
     MimeMessage msg = mailSender.createMimeMessage();
-    try{
+    try {
       MimeMessageHelper helper = new MimeMessageHelper(msg, true);
       helper.setFrom(this.templateMessage.getFrom());
       helper.setSubject(subject);
@@ -61,7 +59,7 @@ public class WonMailSender
   public void sendFileMessage(String toEmail, String subject, String body, String fileName, File file) {
 
     MimeMessage msg = mailSender.createMimeMessage();
-    try{
+    try {
       MimeMessageHelper helper = new MimeMessageHelper(msg, true);
       helper.setFrom(this.templateMessage.getFrom());
       helper.setSubject(subject);

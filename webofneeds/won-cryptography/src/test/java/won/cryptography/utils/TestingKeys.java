@@ -12,12 +12,9 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import won.cryptography.service.keystore.FileBasedKeyStoreService;
 
 /**
- * User: ypanchenko
- * Date: 12.04.2015
+ * User: ypanchenko Date: 12.04.2015
  */
-public class TestingKeys
-{
-
+public class TestingKeys {
 
   private Map<String, PublicKey> publicKeys = new HashMap<>();
   private Map<String, PrivateKey> privateKeys = new HashMap<>();
@@ -26,7 +23,7 @@ public class TestingKeys
 
     Security.addProvider(new BouncyCastleProvider());
 
-    //load keys:
+    // load keys:
     File keysFile = new File(this.getClass().getResource(TestSigningUtils.KEYS_FILE).getFile());
     FileBasedKeyStoreService storeService = new FileBasedKeyStoreService(keysFile, "temp");
     storeService.init();
@@ -35,12 +32,12 @@ public class TestingKeys
     privateKeys.put(TestSigningUtils.ownerCertUri, storeService.getPrivateKey(TestSigningUtils.ownerCertUri));
     privateKeys.put(TestSigningUtils.nodeCertUri, storeService.getPrivateKey(TestSigningUtils.nodeCertUri));
 
-    publicKeys.put(TestSigningUtils.needCertUri, storeService
-      .getCertificate(TestSigningUtils.needCertUri).getPublicKey());
-    publicKeys.put(TestSigningUtils.ownerCertUri, storeService
-      .getCertificate(TestSigningUtils.ownerCertUri).getPublicKey());
-    publicKeys.put(TestSigningUtils.nodeCertUri, storeService
-      .getCertificate(TestSigningUtils.nodeCertUri).getPublicKey());
+    publicKeys.put(TestSigningUtils.needCertUri,
+        storeService.getCertificate(TestSigningUtils.needCertUri).getPublicKey());
+    publicKeys.put(TestSigningUtils.ownerCertUri,
+        storeService.getCertificate(TestSigningUtils.ownerCertUri).getPublicKey());
+    publicKeys.put(TestSigningUtils.nodeCertUri,
+        storeService.getCertificate(TestSigningUtils.nodeCertUri).getPublicKey());
   }
 
   public Map<String, PublicKey> getPublicKeys() {

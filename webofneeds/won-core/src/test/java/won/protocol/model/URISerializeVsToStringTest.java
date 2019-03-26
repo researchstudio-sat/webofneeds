@@ -29,8 +29,7 @@ import org.apache.commons.lang3.time.StopWatch;
 /**
  * Created by fkleedorfer on 24.08.2016.
  */
-public class URISerializeVsToStringTest
-{
+public class URISerializeVsToStringTest {
   public static void main(String[] args) throws IOException, ClassNotFoundException {
     StopWatch readWatch = new StopWatch();
     StopWatch writeWatch = new StopWatch();
@@ -47,7 +46,7 @@ public class URISerializeVsToStringTest
 
     stopWatch.start();
     stopWatch.suspend();
-    for (int i = 0; i < 1000 * 1000;i++){
+    for (int i = 0; i < 1000 * 1000; i++) {
       String toParse = myuri + RandomStringUtils.randomAlphanumeric(10);
       stopWatch.resume();
       readWatch.resume();
@@ -62,7 +61,6 @@ public class URISerializeVsToStringTest
     System.out.println("write test2 took " + writeWatch.getTime() + " millis");
     System.out.println("read test2 took " + readWatch.getTime() + " millis");
 
-
     readWatch.reset();
     readWatch.start();
     readWatch.suspend();
@@ -74,8 +72,8 @@ public class URISerializeVsToStringTest
     stopWatch.reset();
     stopWatch.start();
     stopWatch.suspend();
-    for (int i = 0; i < 1000 * 1000;i++){
-      URI theURI= URI.create(myuri + RandomStringUtils.randomAlphanumeric(10));
+    for (int i = 0; i < 1000 * 1000; i++) {
+      URI theURI = URI.create(myuri + RandomStringUtils.randomAlphanumeric(10));
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       ObjectOutputStream oos = new ObjectOutputStream(baos);
       stopWatch.resume();

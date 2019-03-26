@@ -19,11 +19,9 @@ import org.apache.jena.riot.RDFFormat;
 import won.protocol.util.RdfUtils;
 
 /**
- * User: ypanchenko
- * Date: 05.08.2014
+ * User: ypanchenko Date: 05.08.2014
  */
-public class Utils
-{
+public class Utils {
 
   public static Dataset createTestDataset(String resourceName) throws IOException {
 
@@ -42,7 +40,7 @@ public class Utils
     InputStream is = Utils.class.getResourceAsStream(resourceName);
     Model model = ModelFactory.createDefaultModel();
     RDFDataMgr.read(model, is, RDFFormat.TURTLE.getLang());
-    //model1.read(new InputStreamReader(is1), RESOURCE_URI, FileUtils.langTurtle);
+    // model1.read(new InputStreamReader(is1), RESOURCE_URI, FileUtils.langTurtle);
     is.close();
     return model;
 
@@ -59,8 +57,7 @@ public class Utils
     String line;
     try {
 
-      reader = new BufferedReader(new InputStreamReader(Utils.class.getResourceAsStream(path),
-                                                        "UTF-8"));
+      reader = new BufferedReader(new InputStreamReader(Utils.class.getResourceAsStream(path), "UTF-8"));
       while ((line = reader.readLine()) != null) {
         sb.append(line);
         sb.append("\n");

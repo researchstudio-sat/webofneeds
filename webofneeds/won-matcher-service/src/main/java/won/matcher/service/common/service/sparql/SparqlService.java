@@ -39,15 +39,13 @@ import won.protocol.util.RdfUtils;
 /**
  * Service to access of Sparql enpoint database to save or query linked data.
  *
- * User: hfriedrich
- * Date: 15.04.2015
+ * User: hfriedrich Date: 15.04.2015
  */
 @Component
-public class SparqlService
-{
+public class SparqlService {
   protected final Logger log = LoggerFactory.getLogger(getClass());
   protected String sparqlEndpoint;
-  //protected DatasetAccessor accessor;
+  // protected DatasetAccessor accessor;
 
   public static Dataset deserializeDataset(String serializedResource, Lang format) throws IOException {
     InputStream is = new ByteArrayInputStream(serializedResource.getBytes(StandardCharsets.UTF_8));
@@ -57,9 +55,9 @@ public class SparqlService
   }
 
   @Autowired
-  public SparqlService(@Value("${uri.sparql.endpoint}")  String sparqlEndpoint) {
+  public SparqlService(@Value("${uri.sparql.endpoint}") String sparqlEndpoint) {
     this.sparqlEndpoint = sparqlEndpoint;
-    //accessor = DatasetAccessorFactory.createHTTP(sparqlEndpoint);
+    // accessor = DatasetAccessorFactory.createHTTP(sparqlEndpoint);
   }
 
   public String getSparqlEndpoint() {
@@ -67,7 +65,8 @@ public class SparqlService
   }
 
   /**
-   * Update named graph by first deleting it and afterwards inserting the triples of the new model.
+   * Update named graph by first deleting it and afterwards inserting the triples
+   * of the new model.
    *
    * @param graph named graph to be updated
    * @param model model that holds triples to set
@@ -84,7 +83,8 @@ public class SparqlService
   }
 
   /**
-   * Update a dataset of names graphs first deleting them and afterwards inserting the triples of the new models.
+   * Update a dataset of names graphs first deleting them and afterwards inserting
+   * the triples of the new models.
    *
    * @param ds
    */
@@ -116,9 +116,9 @@ public class SparqlService
     pps.setCommandText(queryTemplate);
     pps.setIri("g", graphName);
     Query query = QueryFactory.create(pps.toString());
-    try(QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query)){
-        Model model = qexec.execConstruct();
-        return model;
+    try (QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query)) {
+      Model model = qexec.execConstruct();
+      return model;
     }
   }
 
@@ -134,8 +134,8 @@ public class SparqlService
 
   public Dataset retrieveNeedDataset(String uri) {
 
-    String queryString = "prefix won: <http://purl.org/webofneeds/model#> select distinct ?g where { " +
-      "GRAPH ?g { ?uri a won:Need. ?a ?b ?c. } }";
+    String queryString = "prefix won: <http://purl.org/webofneeds/model#> select distinct ?g where { "
+        + "GRAPH ?g { ?uri a won:Need. ?a ?b ?c. } }";
 
     ParameterizedSparqlString pps = new ParameterizedSparqlString();
     pps.setCommandText(queryString);
@@ -143,18 +143,17 @@ public class SparqlService
 
     Query query = QueryFactory.create(pps.toString());
     try (QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query)) {
-        ResultSet results = qexec.execSelect();
-        Dataset ds = DatasetFactory.createGeneral();
-        while (results.hasNext()) {
-          QuerySolution qs = results.next();
-          String graphUri = qs.getResource("g").getURI();
-          Model model = retrieveModel(graphUri);
-          ds.addNamedModel(graphUri, model);
-        }
-        return ds;
+      ResultSet results = qexec.execSelect();
+      Dataset ds = DatasetFactory.createGeneral();
+      while (results.hasNext()) {
+        QuerySolution qs = results.next();
+        String graphUri = qs.getResource("g").getURI();
+        Model model = retrieveModel(graphUri);
+        ds.addNamedModel(graphUri, model);
+      }
+      return ds;
     }
   }
-    
 
   /**
    * Execute a SPARQL Update query.
@@ -166,8 +165,7 @@ public class SparqlService
     log.debug("Update SPARQL Endpoint: {}", sparqlEndpoint);
     log.debug("Execute query: {}", updateQuery);
     UpdateRequest query = UpdateFactory.create(updateQuery);
-    UpdateProcessRemote riStore = (UpdateProcessRemote)
-      UpdateExecutionFactory.createRemote(query, sparqlEndpoint);
+    UpdateProcessRemote riStore = (UpdateProcessRemote) UpdateExecutionFactory.createRemote(query, sparqlEndpoint);
     riStore.execute();
   }
 

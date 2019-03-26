@@ -34,14 +34,11 @@ import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WONMSG;
 
 /**
- * User: syim
- * Date: 02.03.2015
+ * User: syim Date: 02.03.2015
  */
 @Service
-@FixedMessageProcessor(direction= WONMSG.TYPE_FROM_OWNER_STRING,messageType = WONMSG.TYPE_CREATE_STRING)
-public class CreateNeedMessageProcessor extends AbstractCamelProcessor
-{
-
+@FixedMessageProcessor(direction = WONMSG.TYPE_FROM_OWNER_STRING, messageType = WONMSG.TYPE_CREATE_STRING)
+public class CreateNeedMessageProcessor extends AbstractCamelProcessor {
 
   @Override
   public void process(final Exchange exchange) throws Exception {
@@ -54,7 +51,7 @@ public class CreateNeedMessageProcessor extends AbstractCamelProcessor
   private Need storeNeed(final WonMessage wonMessage) {
     Dataset needContent = wonMessage.getMessageContent();
     List<WonMessage.AttachmentHolder> attachmentHolders = wonMessage.getAttachments();
-    //remove attachment and its signature from the needContent
+    // remove attachment and its signature from the needContent
     removeAttachmentsFromNeedContent(needContent, attachmentHolders);
     URI needURI = getNeedURIFromWonMessage(needContent);
     if (!needURI.equals(wonMessage.getSenderNeedURI()))
@@ -65,27 +62,29 @@ public class CreateNeedMessageProcessor extends AbstractCamelProcessor
     need.setState(NeedState.ACTIVE);
     need.setNeedURI(needURI);
 
-    // ToDo (FS) check if the WON node URI corresponds with the WON node (maybe earlier in the message layer)
+    // ToDo (FS) check if the WON node URI corresponds with the WON node (maybe
+    // earlier in the message layer)
     NeedEventContainer needEventContainer = needEventContainerRepository.findOneByParentUri(needURI);
     if (needEventContainer == null) {
       needEventContainer = new NeedEventContainer(need, need.getNeedURI());
     } else {
-      throw new UriAlreadyInUseException("Found a NeedEventContainer for the need we're about to create (" + needURI + ") - aborting");
+      throw new UriAlreadyInUseException(
+          "Found a NeedEventContainer for the need we're about to create (" + needURI + ") - aborting");
     }
     need.setWonNodeURI(wonMessage.getReceiverNodeURI());
     ConnectionContainer connectionContainer = new ConnectionContainer(need);
     need.setConnectionContainer(connectionContainer);
     need.setEventContainer(needEventContainer);
 
-    //store the need content
+    // store the need content
     DatasetHolder datasetHolder = new DatasetHolder(needURI, needContent);
-    //store attachments
+    // store attachments
     List<DatasetHolder> attachments = new ArrayList<>(attachmentHolders.size());
-    for(WonMessage.AttachmentHolder attachmentHolder: attachmentHolders){
+    for (WonMessage.AttachmentHolder attachmentHolder : attachmentHolders) {
       datasetHolder = new DatasetHolder(attachmentHolder.getDestinationUri(), attachmentHolder.getAttachmentDataset());
       attachments.add(datasetHolder);
     }
-    
+
     NeedModelWrapper needModelWrapper = new NeedModelWrapper(needContent);
     Collection<String> facets = needModelWrapper.getFacetUris();
     Optional<String> defaultFacet = needModelWrapper.getDefaultFacet();
@@ -93,21 +92,21 @@ public class CreateNeedMessageProcessor extends AbstractCamelProcessor
       throw new IllegalArgumentException("at least one property won:hasFacet required ");
 
     Set<Facet> facetEntities = facets.stream().map(facetUri -> {
-        Optional<String> facetType = needModelWrapper.getFacetType(facetUri);
-        if (!facetType.isPresent()) {
-          throw new IllegalArgumentException("cannot determine type of facet " + facetUri);
-        }
-        Facet f = new Facet();
-        f.setNeedURI(needURI);
-        f.setFacetURI(URI.create(facetUri));
-        f.setTypeURI(URI.create(facetType.get()));
-        if (defaultFacet.isPresent() && facetUri.equals(defaultFacet.get())) {
-            f.setDefaultFacet(true);
-        }
-        return f;
+      Optional<String> facetType = needModelWrapper.getFacetType(facetUri);
+      if (!facetType.isPresent()) {
+        throw new IllegalArgumentException("cannot determine type of facet " + facetUri);
+      }
+      Facet f = new Facet();
+      f.setNeedURI(needURI);
+      f.setFacetURI(URI.create(facetUri));
+      f.setTypeURI(URI.create(facetType.get()));
+      if (defaultFacet.isPresent() && facetUri.equals(defaultFacet.get())) {
+        f.setDefaultFacet(true);
+      }
+      return f;
     }).collect(Collectors.toSet());
-    
-    //add everything to the need model class and save it
+
+    // add everything to the need model class and save it
     need.setDatatsetHolder(datasetHolder);
     need.setAttachmentDatasetHolders(attachments);
     need = needRepository.save(need);
@@ -116,10 +115,11 @@ public class CreateNeedMessageProcessor extends AbstractCamelProcessor
     return need;
   }
 
-  private void removeAttachmentsFromNeedContent(Dataset needContent, List<WonMessage.AttachmentHolder> attachmentHolders) {
-    for (WonMessage.AttachmentHolder attachmentHolder: attachmentHolders){
-      for (Iterator<String> it = attachmentHolder.getAttachmentDataset().listNames(); it.hasNext(); ){
-        String modelName =it.next();
+  private void removeAttachmentsFromNeedContent(Dataset needContent,
+      List<WonMessage.AttachmentHolder> attachmentHolders) {
+    for (WonMessage.AttachmentHolder attachmentHolder : attachmentHolders) {
+      for (Iterator<String> it = attachmentHolder.getAttachmentDataset().listNames(); it.hasNext();) {
+        String modelName = it.next();
         needContent.removeNamedModel(modelName);
       }
     }
@@ -130,8 +130,6 @@ public class CreateNeedMessageProcessor extends AbstractCamelProcessor
     authorizeOwnerApplicationForNeed(ownerApplicationID, need);
   }
 
-
-
   private URI getNeedURIFromWonMessage(final Dataset wonMessage) {
     URI needURI;
     needURI = WonRdfUtils.NeedUtils.getNeedURI(wonMessage);
@@ -140,8 +138,6 @@ public class CreateNeedMessageProcessor extends AbstractCamelProcessor
     }
     return needURI;
   }
-
-
 
   private void authorizeOwnerApplicationForNeed(final String ownerApplicationID, Need need) {
     String stopwatchName = getClass().getName() + ".authorizeOwnerApplicationForNeed";

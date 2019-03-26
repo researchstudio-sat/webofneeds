@@ -18,53 +18,48 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
 /**
- * User: sbyim
- * Date: 11.11.13
+ * User: sbyim Date: 11.11.13
  */
 @Entity
 @Table(name = "ownerApplication")
 public class OwnerApplication {
 
+  @Id
+  @GeneratedValue
+  @Column(name = "id")
+  private Long id;
 
-    @Id
-    @GeneratedValue
-    @Column( name = "id" )
-    private Long id;
+  @ManyToMany(mappedBy = "authorizedApplications", targetEntity = Need.class, fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
+  private List<Need> needs;
 
+  @ElementCollection(fetch = FetchType.EAGER) // required eager as the object is passed out of a hibernate session in
+  // OwnerProtocolOutgoingMessagesProcessor
+  @Fetch(value = FetchMode.SUBSELECT)
+  @CollectionTable(name = "QueueNames", joinColumns = @JoinColumn(name = "owner_application_id"))
+  @Column(name = "queueName")
+  private List<String> queueNames;
 
-    @ManyToMany(mappedBy = "authorizedApplications", targetEntity = Need.class,fetch = FetchType.LAZY,
-      cascade = CascadeType.DETACH)
-     private List<Need> needs;
+  @Column(name = "incomingEndpoint")
+  private String incomingEndpoint;
 
+  @Column(name = "ownerApplicationId", unique = true)
+  private String ownerApplicationId;
 
-    @ElementCollection(fetch = FetchType.EAGER) //required eager as the object is passed out of a hibernate session in
-    // OwnerProtocolOutgoingMessagesProcessor
-    @Fetch(value = FetchMode.SUBSELECT)
-    @CollectionTable(name="QueueNames", joinColumns = @JoinColumn(name="owner_application_id"))
-    @Column(name="queueName")
-    private List<String> queueNames;
+  public Long getId() {
+    return id;
+  }
 
-    @Column(name="incomingEndpoint")
-    private String incomingEndpoint;
+  public void setId(Long id) {
+    this.id = id;
+  }
 
-    @Column( name = "ownerApplicationId", unique = true )
-    private String ownerApplicationId;
+  public String getOwnerApplicationId() {
+    return ownerApplicationId;
+  }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getOwnerApplicationId() {
-        return ownerApplicationId;
-    }
-
-    public void setOwnerApplicationId(String ownerApplicationId) {
-        this.ownerApplicationId = ownerApplicationId;
-    }
+  public void setOwnerApplicationId(String ownerApplicationId) {
+    this.ownerApplicationId = ownerApplicationId;
+  }
 
 //    public List<Need> getNeeds() {
 //        return needs;
@@ -74,15 +69,15 @@ public class OwnerApplication {
 //        this.needs = needs;
 //    }
 
-    public List<String> getQueueNames() {
-        return queueNames;
-    }
+  public List<String> getQueueNames() {
+    return queueNames;
+  }
 
-    public void setQueueNames(List<String> queueNames) {
-        this.queueNames = queueNames;
-    }
-    public void setIncomingEndpoint(String incomingEndpoint){
+  public void setQueueNames(List<String> queueNames) {
+    this.queueNames = queueNames;
+  }
 
-    }
+  public void setIncomingEndpoint(String incomingEndpoint) {
+
+  }
 }
-

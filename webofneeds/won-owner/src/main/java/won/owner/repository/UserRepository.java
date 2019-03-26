@@ -12,14 +12,14 @@ import won.owner.model.User;
 import won.protocol.repository.WonRepository;
 
 /**
- * User: t.kozel
- * Date: 11/7/13
+ * User: t.kozel Date: 11/7/13
  */
 public interface UserRepository extends WonRepository<User> {
 
-	public User findByUsername(String username);
+  public User findByUsername(String username);
 
-  //for the syntax, this helps: http://en.wikibooks.org/wiki/Java_Persistence/Querying#JPQL
+  // for the syntax, this helps:
+  // http://en.wikibooks.org/wiki/Java_Persistence/Querying#JPQL
   @Query(value = "SELECT u from User u JOIN u.userNeeds n where n.uri = ?1")
   public User findByNeedUri(URI needUri);
 

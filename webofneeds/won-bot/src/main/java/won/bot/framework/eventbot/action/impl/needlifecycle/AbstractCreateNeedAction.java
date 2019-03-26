@@ -38,92 +38,89 @@ import won.protocol.vocabulary.WON;
  * Base class for actions that create needs.
  */
 public abstract class AbstractCreateNeedAction extends BaseEventBotAction {
-    protected List<URI> facets;
-    protected String uriListName;
-    //indicates if the won:DoNotMatch flag is to be set
-    protected boolean usedForTesting;
-    protected boolean doNotMatch;
+  protected List<URI> facets;
+  protected String uriListName;
+  // indicates if the won:DoNotMatch flag is to be set
+  protected boolean usedForTesting;
+  protected boolean doNotMatch;
 
-    /**
-     * Creates a need with the specified facets.
-     * If no facet is specified, the chatFacet will be used, Flag 'UsedForTesting' will be set.
-     * uriListName is used from the set botcontextwrapper getNeedCreateListName
-     */
-    public AbstractCreateNeedAction(EventListenerContext eventListenerContext, URI... facets) {
-        this(eventListenerContext, eventListenerContext.getBotContextWrapper().getNeedCreateListName(), facets);
+  /**
+   * Creates a need with the specified facets. If no facet is specified, the
+   * chatFacet will be used, Flag 'UsedForTesting' will be set. uriListName is
+   * used from the set botcontextwrapper getNeedCreateListName
+   */
+  public AbstractCreateNeedAction(EventListenerContext eventListenerContext, URI... facets) {
+    this(eventListenerContext, eventListenerContext.getBotContextWrapper().getNeedCreateListName(), facets);
+  }
+
+  /**
+   * Creates a need with the specified facets. If no facet is specified, the
+   * chatFacet will be used, Flag 'UsedForTesting' will be set.
+   */
+  public AbstractCreateNeedAction(EventListenerContext eventListenerContext, String uriListName, URI... facets) {
+    this(eventListenerContext, uriListName, true, false, facets);
+  }
+
+  /**
+   * Creates a need with the specified facets. If no facet is specified, the
+   * chatFacet will be used.
+   */
+  public AbstractCreateNeedAction(EventListenerContext eventListenerContext, String uriListName,
+      final boolean usedForTesting, final boolean doNotMatch, URI... facets) {
+    super(eventListenerContext);
+    if (facets == null || facets.length == 0) {
+      // add the default facet if none is present.
+      this.facets = new ArrayList<URI>(1);
+      this.facets.add(FacetType.ChatFacet.getURI());
+    } else {
+      this.facets = Arrays.asList(facets);
     }
+    this.doNotMatch = doNotMatch;
+    this.usedForTesting = usedForTesting;
+    this.uriListName = uriListName;
+  }
 
-    /**
-    * Creates a need with the specified facets.
-    * If no facet is specified, the chatFacet will be used, Flag 'UsedForTesting' will be set.
-    */
-    public AbstractCreateNeedAction(EventListenerContext eventListenerContext, String uriListName, URI... facets) {
-        this(eventListenerContext, uriListName, true, false, facets);
-    }
+  protected WonMessage createWonMessage(WonNodeInformationService wonNodeInformationService, URI needURI,
+      URI wonNodeURI, Dataset needDataset) throws WonMessageBuilderException {
+    return createWonMessage(wonNodeInformationService, needURI, wonNodeURI, needDataset, usedForTesting, doNotMatch);
+  }
 
-    /**
-    * Creates a need with the specified facets.
-    * If no facet is specified, the chatFacet will be used.
-    */
-    public AbstractCreateNeedAction(EventListenerContext eventListenerContext, String uriListName, final boolean usedForTesting, final boolean doNotMatch, URI... facets) {
-        super(eventListenerContext);
-        if (facets == null || facets.length == 0) {
-            //add the default facet if none is present.
-            this.facets = new ArrayList<URI>(1);
-            this.facets.add(FacetType.ChatFacet.getURI());
-        } else {
-            this.facets = Arrays.asList(facets);
-        }
-        this.doNotMatch = doNotMatch;
-        this.usedForTesting = usedForTesting;
-        this.uriListName = uriListName;
-    }
-
-    protected WonMessage createWonMessage(WonNodeInformationService wonNodeInformationService, URI needURI, URI wonNodeURI, Dataset needDataset) throws WonMessageBuilderException {
-        return createWonMessage(wonNodeInformationService, needURI, wonNodeURI, needDataset, usedForTesting, doNotMatch);
-    }
-
-    protected WonMessage createWonMessage(WonNodeInformationService wonNodeInformationService,
-                                          URI needURI,
-                                          URI wonNodeURI,
-                                          Dataset needDataset,
-                                          final boolean usedForTesting,
-                                          final boolean doNotMatch ) throws WonMessageBuilderException {
+  protected WonMessage createWonMessage(WonNodeInformationService wonNodeInformationService, URI needURI,
+      URI wonNodeURI, Dataset needDataset, final boolean usedForTesting, final boolean doNotMatch)
+      throws WonMessageBuilderException {
 
     NeedModelWrapper needModelWrapper = new NeedModelWrapper(needDataset);
 
-
-    if (doNotMatch){
+    if (doNotMatch) {
       needModelWrapper.addFlag(WON.NO_HINT_FOR_ME);
       needModelWrapper.addFlag(WON.NO_HINT_FOR_COUNTERPART);
     }
 
-    if (usedForTesting){
-      needModelWrapper.addFlag( WON.USED_FOR_TESTING);
+    if (usedForTesting) {
+      needModelWrapper.addFlag(WON.USED_FOR_TESTING);
     }
 
-        RdfUtils.replaceBaseURI(needDataset, needURI.toString(), true);
+    RdfUtils.replaceBaseURI(needDataset, needURI.toString(), true);
 
-        return WonMessageBuilder.setMessagePropertiesForCreate(
-            wonNodeInformationService.generateEventURI(wonNodeURI),
-            needURI,
-            wonNodeURI).addContent(needModelWrapper.copyDataset()).build();
-    }
+    return WonMessageBuilder
+        .setMessagePropertiesForCreate(wonNodeInformationService.generateEventURI(wonNodeURI), needURI, wonNodeURI)
+        .addContent(needModelWrapper.copyDataset()).build();
+  }
 
-    public void setUsedForTesting(final boolean usedForTesting) {
-        this.usedForTesting = usedForTesting;
-    }
+  public void setUsedForTesting(final boolean usedForTesting) {
+    this.usedForTesting = usedForTesting;
+  }
 
-    public void setDoNotMatch(final boolean doNotMatch) {
-        this.doNotMatch = doNotMatch;
-    }
+  public void setDoNotMatch(final boolean doNotMatch) {
+    this.doNotMatch = doNotMatch;
+  }
 
-    private boolean hasFacet(FacetType facetToCheck){
-        for(URI facet : facets){
-            if(facet.equals(facetToCheck.getURI())) {
-                return true;
-            }
-        }
-        return false;
+  private boolean hasFacet(FacetType facetToCheck) {
+    for (URI facet : facets) {
+      if (facet.equals(facetToCheck.getURI())) {
+        return true;
+      }
     }
+    return false;
+  }
 }

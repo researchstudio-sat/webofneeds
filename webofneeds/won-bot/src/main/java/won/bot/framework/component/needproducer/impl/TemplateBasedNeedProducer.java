@@ -31,36 +31,32 @@ import won.protocol.util.NeedModelWrapper;
 import won.protocol.util.RdfUtils;
 
 /**
- * NeedProducer that reads a need model at startup time and overlays it
- * with the data retrieved from the need factory it wraps.
+ * NeedProducer that reads a need model at startup time and overlays it with the
+ * data retrieved from the need factory it wraps.
  */
-public class TemplateBasedNeedProducer extends AbstractNeedProducerWrapper
-{
+public class TemplateBasedNeedProducer extends AbstractNeedProducerWrapper {
   private final Logger logger = LoggerFactory.getLogger(getClass());
   private Model templateModel;
   private Resource template;
   private boolean initialized = false;
 
   @Override
-  public synchronized Dataset create()
-  {
+  public synchronized Dataset create() {
     initializeLazily();
     return wrapModel(getWrappedProducer().create());
   }
 
-  private Dataset wrapModel(final Dataset wrappedDataset)
-  {
+  private Dataset wrapModel(final Dataset wrappedDataset) {
     if (this.templateModel != null) {
-        //TODO: TEMPLATE BASED PRODUCER IS WEIRD NOW
-        NeedModelWrapper needModelWrapper = new NeedModelWrapper(wrappedDataset);
-        Model needModel = needModelWrapper.copyNeedModel(NeedGraphType.NEED);
-        Model wrappedModel = RdfUtils.mergeModelsCombiningBaseResource(needModel, this.templateModel);
+      // TODO: TEMPLATE BASED PRODUCER IS WEIRD NOW
+      NeedModelWrapper needModelWrapper = new NeedModelWrapper(wrappedDataset);
+      Model needModel = needModelWrapper.copyNeedModel(NeedGraphType.NEED);
+      Model wrappedModel = RdfUtils.mergeModelsCombiningBaseResource(needModel, this.templateModel);
     }
     return wrappedDataset;
   }
 
-  private void initializeLazily()
-  {
+  private void initializeLazily() {
     if (!initialized) {
       initialize();
     }
@@ -70,13 +66,13 @@ public class TemplateBasedNeedProducer extends AbstractNeedProducerWrapper
    * Opens the template and tries to read a jena Model from it.
    */
   public void initialize() {
-    if (this.initialized) return;
+    if (this.initialized)
+      return;
     this.initialized = true;
     loadTemplateModel();
   }
 
-  private void loadTemplateModel()
-  {
+  private void loadTemplateModel() {
     logger.info("loading need templateModel model from resource " + this.template);
     Lang lang = RDFLanguages.filenameToLang(this.template.getFilename());
     try {
@@ -84,19 +80,18 @@ public class TemplateBasedNeedProducer extends AbstractNeedProducerWrapper
     } catch (IOException e) {
       throw new IllegalArgumentException("Could not read data from resource " + template);
     }
-    if (this.templateModel == null){
-      logger.warn("reading RDF data from template {} resulted in a null or empty model. Wrapped models will not be modified", this.template);
+    if (this.templateModel == null) {
+      logger.warn(
+          "reading RDF data from template {} resulted in a null or empty model. Wrapped models will not be modified",
+          this.template);
     }
   }
 
-
-  public Resource getTemplate()
-  {
+  public Resource getTemplate() {
     return template;
   }
 
-  public void setTemplate(final Resource template)
-  {
+  public void setTemplate(final Resource template) {
     this.template = template;
   }
 }

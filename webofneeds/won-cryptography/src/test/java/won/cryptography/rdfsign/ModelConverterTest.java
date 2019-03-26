@@ -25,28 +25,22 @@ import de.uni_koblenz.aggrimm.icp.crypto.sign.trigplus.TriGPlusWriter;
 /**
  * Created by ypanchenko on 09.07.2014.
  */
-public class ModelConverterTest
-{
+public class ModelConverterTest {
 
   @Rule
   public TemporaryFolder testFolder = new TemporaryFolder();
 
-  private static final String[] RESOURCE_FILES =
-    new String[]{
-    "/test_1_cupboard.trig",
-    "/test_1_graph.trig",
-    "/test_1_cupboard_no_pref.trig"};
-
+  private static final String[] RESOURCE_FILES = new String[] { "/test_1_cupboard.trig", "/test_1_graph.trig",
+      "/test_1_cupboard_no_pref.trig" };
 
   @Test
   @Ignore
   /**
-   * Reads from TRIG with Jena API into Dataset 1, transforms one
-   * named graph from that Dataset into Signingframework's API
-   * GraphCollection and writes it with Signingframework's API,
-   * reads the result with Jena API into Dataset 2, and checks
-   * if the specified named graph model from Dataset 1 is
-   * isomorphic with the same named graph model from Dataset 2.
+   * Reads from TRIG with Jena API into Dataset 1, transforms one named graph from
+   * that Dataset into Signingframework's API GraphCollection and writes it with
+   * Signingframework's API, reads the result with Jena API into Dataset 2, and
+   * checks if the specified named graph model from Dataset 1 is isomorphic with
+   * the same named graph model from Dataset 2.
    */
   public void modelToGraphCollectionTest() throws Exception {
 
@@ -56,8 +50,8 @@ public class ModelConverterTest
       InputStream is = this.getClass().getResourceAsStream(resourceFile);
       File outFile = testFolder.newFile();
       // use this when debugging:
-      //File outFile = File.createTempFile("won", ".trig");
-      //System.out.println(outFile);
+      // File outFile = File.createTempFile("won", ".trig");
+      // System.out.println(outFile);
       Dataset dataset = DatasetFactory.createGeneral();
       RDFDataMgr.read(dataset, is, RDFFormat.TRIG.getLang());
       is.close();
@@ -79,8 +73,8 @@ public class ModelConverterTest
       Model model2 = dataset2.getNamedModel(modelName);
       File outFile2 = testFolder.newFile();
       // use this when debugging:
-      //File outFile2 = File.createTempFile("won", ".trig");
-      //System.out.println(outFile2);
+      // File outFile2 = File.createTempFile("won", ".trig");
+      // System.out.println(outFile2);
       OutputStream os = new FileOutputStream(outFile2);
       RDFDataMgr.write(os, dataset2, RDFFormat.TRIG.getLang());
       os.close();
@@ -92,15 +86,13 @@ public class ModelConverterTest
     }
   }
 
-
   @Test
   @Ignore
   /**
-   * Reads from TRIG with Jena API into Dataset 1, transforms one
-   * named Model from that Dataset into Signingframework's API
-   * GraphCollection with one NamedGraph, transforms (converts)
-   * that NamedGraph into Jena's Model, and checks
-   * if the resulting Model is the same as original Model.
+   * Reads from TRIG with Jena API into Dataset 1, transforms one named Model from
+   * that Dataset into Signingframework's API GraphCollection with one NamedGraph,
+   * transforms (converts) that NamedGraph into Jena's Model, and checks if the
+   * resulting Model is the same as original Model.
    */
   public void namedGraphToModelTest() throws Exception {
 
@@ -126,25 +118,25 @@ public class ModelConverterTest
         }
       }
       // use this when debugging:
-      //File outFile0 = File.createTempFile("won", ".trig");
-      //System.out.println(outFile0);
-      //OutputStream os0 = new FileOutputStream(outFile0);
-      //TriGPlusWriter.writeFile(gc, outFile0.getAbsolutePath(), false);
-      //os0.close();
-
+      // File outFile0 = File.createTempFile("won", ".trig");
+      // System.out.println(outFile0);
+      // OutputStream os0 = new FileOutputStream(outFile0);
+      // TriGPlusWriter.writeFile(gc, outFile0.getAbsolutePath(), false);
+      // os0.close();
 
       // test convert from NamedGraph of GraphCollection into Model
       Model model2 = ModelConverter.namedGraphToModel(graphName, gc);
       Dataset dataset2 = DatasetFactory.createGeneral();
       dataset2.addNamedModel(modelName, model2);
-      //TODO maybe chng the API so that the prefix map is taken care of in the converter:
+      // TODO maybe chng the API so that the prefix map is taken care of in the
+      // converter:
       // if it makes sense from the the usage of this in Assembler point of view
       dataset2.getDefaultModel().setNsPrefixes(dataset2.getNamedModel(modelName).getNsPrefixMap());
 
       File outFile = testFolder.newFile();
       // use this when debugging:
-      //File outFile = File.createTempFile("won", ".trig");
-      //System.out.println(outFile);
+      // File outFile = File.createTempFile("won", ".trig");
+      // System.out.println(outFile);
       OutputStream os = new FileOutputStream(outFile);
       RDFDataMgr.write(os, dataset2, RDFFormat.TRIG.getLang());
       os.close();

@@ -34,17 +34,17 @@ import won.protocol.exception.DataIntegrityException;
 /**
  * NeedProducer that is configured to read needs from a directory.
  */
-public class DirectoryBasedNeedProducer implements NeedProducer
-{
+public class DirectoryBasedNeedProducer implements NeedProducer {
   private static final int NOT_INITIALIZED = -1;
   private final Logger logger = LoggerFactory.getLogger(getClass());
   private File directory;
 
-  // true if the factory should keep creating needs after having used each file, false if the factory should use each file only once.
+  // true if the factory should keep creating needs after having used each file,
+  // false if the factory should use each file only once.
   private boolean repeat;
 
   // Java Regex for filtering filenames in the directory
-  private String filenameFilterRegex=null;
+  private String filenameFilterRegex = null;
 
   private File[] files;
 
@@ -54,16 +54,14 @@ public class DirectoryBasedNeedProducer implements NeedProducer
 
   private FileBasedNeedProducer fileBasedNeedProducer;
 
-
-
   @Override
-  public synchronized Dataset create()
-  {
-    //lazy init
+  public synchronized Dataset create() {
+    // lazy init
     initializeLazily();
-    //init failed?
-    if (isInitFailed()) return null;
-    //at and of file list?
+    // init failed?
+    if (isInitFailed())
+      return null;
+    // at and of file list?
     if (isAfterLastFile()) {
       if (this.isRepeat()) {
         rewind();
@@ -72,14 +70,15 @@ public class DirectoryBasedNeedProducer implements NeedProducer
       }
     }
 
-    //loop until we find a readable file
-    while (this.fileIndex < this.files.length){
-      if (isCurrentFileReadable()) break;
+    // loop until we find a readable file
+    while (this.fileIndex < this.files.length) {
+      if (isCurrentFileReadable())
+        break;
       this.fileIndex++;
     }
-    int fileIndexToUse = this.fileIndex; //remember the current index
+    int fileIndexToUse = this.fileIndex; // remember the current index
 
-    //advance the index for next time, reset it if we've been told to repeat
+    // advance the index for next time, reset it if we've been told to repeat
     this.fileIndex++;
     rewindIfNecessary();
 
@@ -90,73 +89,67 @@ public class DirectoryBasedNeedProducer implements NeedProducer
     return files[fileIndex].getName();
   }
 
-  private boolean isCurrentFileReadable()
-  {
+  private boolean isCurrentFileReadable() {
     return this.files[this.fileIndex].isFile() && this.files[this.fileIndex].canRead();
   }
 
-  private Dataset readDatasetFromFileWithIndex(final int fileIndexToUse)
-  {
+  private Dataset readDatasetFromFileWithIndex(final int fileIndexToUse) {
     try {
-      //make a need from it
-      if (fileIndexToUse >= this.files.length) return null;
+      // make a need from it
+      if (fileIndexToUse >= this.files.length)
+        return null;
       return this.fileBasedNeedProducer.readNeedFromFile(this.files[fileIndexToUse]);
     } catch (IOException e) {
       logger.error("could not read need from file {}", this.files[fileIndexToUse]);
-    } catch (DataIntegrityException e){
+    } catch (DataIntegrityException e) {
       logger.error("DataIntegrityException(need and sysinfo models must contain a resource of type won:Need");
     }
     return null;
   }
 
-  private void rewindIfNecessary()
-  {
+  private void rewindIfNecessary() {
     if (shouldRewind()) {
       rewind();
     }
   }
 
-  private boolean shouldRewind()
-  {
+  private boolean shouldRewind() {
     return this.fileIndex >= this.files.length && this.repeat;
   }
 
-  private void rewind()
-  {
+  private void rewind() {
     this.fileIndex = 0;
   }
 
-  private boolean isAfterLastFile()
-  {
+  private boolean isAfterLastFile() {
     return fileIndex > files.length;
   }
 
-  private boolean isInitFailed()
-  {
-    if (this.fileIndex == NOT_INITIALIZED){
+  private boolean isInitFailed() {
+    if (this.fileIndex == NOT_INITIALIZED) {
       return true;
     }
     return false;
   }
 
-  private synchronized void initializeLazily()
-  {
-    if (!initialized.get()){
+  private synchronized void initializeLazily() {
+    if (!initialized.get()) {
       init();
     }
   }
 
   @Override
-  public boolean isExhausted()
-  {
+  public boolean isExhausted() {
     initializeLazily();
-    if (isRepeat() && files != null && files.length > 0) return false;
+    if (isRepeat() && files != null && files.length > 0)
+      return false;
     return this.fileIndex == NOT_INITIALIZED || this.files == null || this.fileIndex >= this.files.length;
   }
 
-  private synchronized void init(){
-    if (this.initialized.get()) return;
-    if (this.directory == null){
+  private synchronized void init() {
+    if (this.initialized.get())
+      return;
+    if (this.directory == null) {
       logger.warn("No directory specified for DirectoryBasedNeedProducer, not reading any data.");
       return;
     }
@@ -165,50 +158,48 @@ public class DirectoryBasedNeedProducer implements NeedProducer
     if (this.files == null || this.files.length == 0) {
       logger.info("no files found in directory {} with regex {}", this.directory, this.filenameFilterRegex);
     } else {
-      logger.debug("found {} files in directory {} with regex {}", new Object[]{files.length, this.directory, this.filenameFilterRegex});
+      logger.debug("found {} files in directory {} with regex {}",
+          new Object[] { files.length, this.directory, this.filenameFilterRegex });
     }
     rewind();
     this.initialized.set(true);
   }
 
-  private FileFilter createFileFilter()
-  {
-    if (this.filenameFilterRegex == null) return TrueFileFilter.TRUE;
+  private FileFilter createFileFilter() {
+    if (this.filenameFilterRegex == null)
+      return TrueFileFilter.TRUE;
     return new RegexFileFilter(this.filenameFilterRegex);
   }
 
-
-  public File getDirectory()
-  {
+  public File getDirectory() {
     return directory;
   }
 
-  public void setDirectory(final File directory)
-  {
+  public void setDirectory(final File directory) {
     this.directory = directory;
   }
 
-  public boolean isRepeat()
-  {
+  public boolean isRepeat() {
     return repeat;
   }
 
-  public void setRepeat(final boolean repeat)
-  {
+  public void setRepeat(final boolean repeat) {
     this.repeat = repeat;
   }
 
-  public FileBasedNeedProducer getFileBasedNeedProducer()
-  {
+  public FileBasedNeedProducer getFileBasedNeedProducer() {
     return fileBasedNeedProducer;
   }
 
-  public void setFileBasedNeedProducer(final FileBasedNeedProducer fileBasedNeedProducer)
-  {
+  public void setFileBasedNeedProducer(final FileBasedNeedProducer fileBasedNeedProducer) {
     this.fileBasedNeedProducer = fileBasedNeedProducer;
   }
 
-  public String getFilenameFilterRegex()  {    return filenameFilterRegex;  }
+  public String getFilenameFilterRegex() {
+    return filenameFilterRegex;
+  }
 
-  public void setFilenameFilterRegex(final String filenameFilterRegex)      {    this.filenameFilterRegex = filenameFilterRegex;  }
+  public void setFilenameFilterRegex(final String filenameFilterRegex) {
+    this.filenameFilterRegex = filenameFilterRegex;
+  }
 }

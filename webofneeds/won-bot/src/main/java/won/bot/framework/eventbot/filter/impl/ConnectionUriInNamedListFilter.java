@@ -24,20 +24,18 @@ import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.NeedSpecificEvent;
 
 /**
- * Filter that accepts ConnectionSpecificEvents if their needURI is in the specified named list.
+ * Filter that accepts ConnectionSpecificEvents if their needURI is in the
+ * specified named list.
  */
-public class ConnectionUriInNamedListFilter extends AbstractNamedUriListFilter
-{
-  public ConnectionUriInNamedListFilter(final EventListenerContext context, final String listname)
-  {
+public class ConnectionUriInNamedListFilter extends AbstractNamedUriListFilter {
+  public ConnectionUriInNamedListFilter(final EventListenerContext context, final String listname) {
     super(context, listname);
   }
 
   @Override
-  protected URI getURIFromEvent(final Event event)
-  {
-    if (event instanceof NeedSpecificEvent){
-      return ((ConnectionSpecificEvent)event).getConnectionURI();
+  protected URI getURIFromEvent(final Event event) {
+    if (event instanceof NeedSpecificEvent) {
+      return ((ConnectionSpecificEvent) event).getConnectionURI();
     }
     return null;
   }

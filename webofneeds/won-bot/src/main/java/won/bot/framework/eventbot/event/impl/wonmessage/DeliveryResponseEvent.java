@@ -23,10 +23,10 @@ import won.bot.framework.eventbot.event.ResponseEvent;
 import won.protocol.message.WonMessage;
 
 /**
- * Event published whenever a WonMessage is received that indicates the failure of a previous message.
+ * Event published whenever a WonMessage is received that indicates the failure
+ * of a previous message.
  */
-public class DeliveryResponseEvent extends BaseEvent implements ResponseEvent
-{
+public class DeliveryResponseEvent extends BaseEvent implements ResponseEvent {
   private URI originalMessageURI;
   private WonMessage message;
   private URI remoteResponseToMessageURI;

@@ -35,35 +35,32 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import won.protocol.model.URIConverter;
 
 /**
- * I used wonuser as table name because user is Postgres keyword - http://www.postgresql.org/message-id/Pine.NEB.4.10.10008291649550.4357-100000@scimitar.caravan.com
+ * I used wonuser as table name because user is Postgres keyword -
+ * http://www.postgresql.org/message-id/Pine.NEB.4.10.10008291649550.4357-100000@scimitar.caravan.com
  *
  */
 @Entity
-@Table(
-		name = "needDraft",
-		uniqueConstraints = @UniqueConstraint(columnNames = {"id","draftURI"})
-)
+@Table(name = "needDraft", uniqueConstraints = @UniqueConstraint(columnNames = { "id", "draftURI" }))
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Draft
-{
+public class Draft {
 
   @Id
-	@GeneratedValue
-	@Column(name = "id")
-	private Long id;
+  @GeneratedValue
+  @Column(name = "id")
+  private Long id;
 
-  @Column( name = "draftURI", unique = true)
-  @Convert( converter = URIConverter.class)
+  @Column(name = "draftURI", unique = true)
+  @Convert(converter = URIConverter.class)
   private URI draftURI;
 
-  @Column( length=10000)
+  @Column(length = 10000)
   private String content;
 
-  public Draft(){
+  public Draft() {
   }
 
-  public Draft(URI draftURI, String content){
-       this.draftURI = draftURI;
+  public Draft(URI draftURI, String content) {
+    this.draftURI = draftURI;
     this.content = content;
   }
 
@@ -71,12 +68,9 @@ public class Draft
     return id;
   }
 
-
   public URI getDraftURI() {
     return draftURI;
   }
-
-
 
   public void setDraftURI(final URI draftURI) {
     this.draftURI = draftURI;
@@ -85,6 +79,7 @@ public class Draft
   public void setId(final Long id) {
     this.id = id;
   }
+
   public String getContent() {
     return content;
   }
@@ -92,6 +87,5 @@ public class Draft
   public void setContent(final String content) {
     this.content = content;
   }
-
 
 }

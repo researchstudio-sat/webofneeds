@@ -25,26 +25,25 @@ import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandFailureEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 
-
 /**
  * Logs type and optional message of a MessageCommandFailureEvent.
  */
-public class LogMessageCommandFailureAction extends BaseEventBotAction{
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+public class LogMessageCommandFailureAction extends BaseEventBotAction {
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    public LogMessageCommandFailureAction(EventListenerContext eventListenerContext) {
-        super(eventListenerContext);
-    }
+  public LogMessageCommandFailureAction(EventListenerContext eventListenerContext) {
+    super(eventListenerContext);
+  }
 
-    @Override
-    protected void doRun(Event event, EventListener executingListener) throws Exception {
-        MessageCommandFailureEvent failureEvent = (MessageCommandFailureEvent) event;
-        String command = failureEvent.getOriginalCommandEvent().getClass().getSimpleName();
-        String message = failureEvent.getMessage();
-        if (message != null) {
-            logger.error("Message command {} failed", command);
-        } else {
-            logger.error("Message command {} failed. Message: ", command, message);
-        }
+  @Override
+  protected void doRun(Event event, EventListener executingListener) throws Exception {
+    MessageCommandFailureEvent failureEvent = (MessageCommandFailureEvent) event;
+    String command = failureEvent.getOriginalCommandEvent().getClass().getSimpleName();
+    String message = failureEvent.getMessage();
+    if (message != null) {
+      logger.error("Message command {} failed", command);
+    } else {
+      logger.error("Message command {} failed. Message: ", command, message);
     }
+  }
 }

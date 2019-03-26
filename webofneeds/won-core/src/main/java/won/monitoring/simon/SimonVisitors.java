@@ -21,19 +21,18 @@ import java.io.IOException;
 import org.javasimon.Simon;
 
 /**
- * Helper methods for visiting simon structures. Copied from the simon-console-embed module.
+ * Helper methods for visiting simon structures. Copied from the
+ * simon-console-embed module.
  */
-public class SimonVisitors
-{
+public class SimonVisitors {
   /**
    * Visit Simons recursively as a tree starting from the specified Simon.
    *
-   * @param simon Parent simon
+   * @param simon   Parent simon
    * @param visitor Visitor
    * @throws java.io.IOException
    */
-  public static void visitTree(Simon simon, SimonVisitor visitor) throws IOException
-  {
+  public static void visitTree(Simon simon, SimonVisitor visitor) throws IOException {
     visitor.visit(simon);
     for (Simon childSimon : simon.getChildren()) {
       visitTree(childSimon, visitor);

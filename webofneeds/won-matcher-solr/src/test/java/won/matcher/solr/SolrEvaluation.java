@@ -13,12 +13,10 @@ import won.matcher.solr.spring.SolrTestAppConfiguration;
 /**
  * Created by hfriedrich on 08.08.2016.
  */
-public class SolrEvaluation
-{
+public class SolrEvaluation {
   public static void main(String[] args) throws IOException, InterruptedException, JsonLdError, SolrServerException {
 
-    AnnotationConfigApplicationContext ctx =
-      new AnnotationConfigApplicationContext(SolrTestAppConfiguration.class);
+    AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(SolrTestAppConfiguration.class);
 
     System.out.println("initialize ...");
     SolrMatcherEvaluation eval = ctx.getBean(SolrMatcherEvaluation.class);

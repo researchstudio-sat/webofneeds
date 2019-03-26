@@ -26,12 +26,11 @@ import won.monitoring.MonitoringResetter;
 /**
  * Resetter for the Simon monitoring framework.
  */
-public class SimonResetter implements MonitoringResetter
-{
+public class SimonResetter implements MonitoringResetter {
   private final Logger logger = LoggerFactory.getLogger(getClass());
+
   @Override
-  public void resetMonitoringStatistics()
-  {
+  public void resetMonitoringStatistics() {
     logger.debug("resetting Simons recursively");
     SimonUtils.recursiveReset(SimonManager.getRootSimon());
   }

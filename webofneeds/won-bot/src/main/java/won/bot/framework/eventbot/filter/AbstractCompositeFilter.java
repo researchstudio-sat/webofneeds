@@ -25,22 +25,19 @@ import java.util.List;
 /**
  * Composite filter.
  */
-public abstract class AbstractCompositeFilter implements CompositeFilter
-{
+public abstract class AbstractCompositeFilter implements CompositeFilter {
   private List<EventFilter> filters;
 
-  public AbstractCompositeFilter()
-  {
+  public AbstractCompositeFilter() {
     this(new LinkedList<EventFilter>());
   }
 
-  public AbstractCompositeFilter(final List<EventFilter> filters)
-  {
+  public AbstractCompositeFilter(final List<EventFilter> filters) {
     this.filters = Collections.synchronizedList(filters);
   }
 
   public AbstractCompositeFilter(final EventFilter... filters) {
-      this.filters = Collections.synchronizedList(Arrays.asList(filters));
+    this.filters = Collections.synchronizedList(Arrays.asList(filters));
   }
 
   @Override
@@ -51,8 +48,7 @@ public abstract class AbstractCompositeFilter implements CompositeFilter
   /**
    * Returns a shallow copy of the filters.
    */
-  public synchronized List<EventFilter> getFilters()
-  {
+  public synchronized List<EventFilter> getFilters() {
     ArrayList<EventFilter> copy = new ArrayList<>(filters.size());
     copy.addAll(filters);
     return copy;
@@ -60,7 +56,8 @@ public abstract class AbstractCompositeFilter implements CompositeFilter
 
   @Override
   /**
-   * Replaces the filters by the specified ones, wrapping them in a synchronized list.
+   * Replaces the filters by the specified ones, wrapping them in a synchronized
+   * list.
    */
   public synchronized void setFilters(final List<EventFilter> filters) {
     this.filters = Collections.synchronizedList(filters);

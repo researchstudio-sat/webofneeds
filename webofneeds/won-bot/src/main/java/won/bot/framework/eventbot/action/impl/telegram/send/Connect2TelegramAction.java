@@ -20,37 +20,39 @@ import won.protocol.model.Connection;
  * Created by fsuda on 03.10.2016.
  */
 public class Connect2TelegramAction extends BaseEventBotAction {
-    WonTelegramBotHandler wonTelegramBotHandler;
+  WonTelegramBotHandler wonTelegramBotHandler;
 
-    public Connect2TelegramAction(EventListenerContext ctx, WonTelegramBotHandler wonTelegramBotHandler) {
-        super(ctx);
-        this.wonTelegramBotHandler = wonTelegramBotHandler;
+  public Connect2TelegramAction(EventListenerContext ctx, WonTelegramBotHandler wonTelegramBotHandler) {
+    super(ctx);
+    this.wonTelegramBotHandler = wonTelegramBotHandler;
+  }
+
+  @Override
+  protected void doRun(Event event, EventListener executingListener) throws Exception {
+    EventListenerContext ctx = getEventListenerContext();
+
+    if (event instanceof ConnectFromOtherNeedEvent && ctx.getBotContextWrapper() instanceof TelegramBotContextWrapper) {
+      TelegramBotContextWrapper botContextWrapper = (TelegramBotContextWrapper) ctx.getBotContextWrapper();
+
+      Connection con = ((ConnectFromOtherNeedEvent) event).getCon();
+
+      URI yourNeedUri = con.getNeedURI();
+      URI remoteNeedUri = con.getRemoteNeedURI();
+
+      Long chatId = botContextWrapper.getChatIdForURI(yourNeedUri);
+      if (chatId == null) {
+        logger.error("No chatId found for the specified needUri");
+        return;
+      }
+
+      try {
+        Message message = wonTelegramBotHandler.sendMessage(
+            wonTelegramBotHandler.getTelegramMessageGenerator().getConnectMessage(chatId, remoteNeedUri, yourNeedUri));
+        botContextWrapper.addMessageIdWonURIRelation(message.getMessageId(),
+            new WonURI(con.getConnectionURI(), UriType.CONNECTION));
+      } catch (TelegramApiException te) {
+        logger.error(te.getMessage());
+      }
     }
-
-    @Override
-    protected void doRun(Event event, EventListener executingListener) throws Exception {
-        EventListenerContext ctx = getEventListenerContext();
-
-        if (event instanceof ConnectFromOtherNeedEvent && ctx.getBotContextWrapper() instanceof TelegramBotContextWrapper) {
-            TelegramBotContextWrapper botContextWrapper = (TelegramBotContextWrapper) ctx.getBotContextWrapper();
-
-            Connection con = ((ConnectFromOtherNeedEvent) event).getCon();
-
-            URI yourNeedUri = con.getNeedURI();
-            URI remoteNeedUri = con.getRemoteNeedURI();
-
-            Long chatId = botContextWrapper.getChatIdForURI(yourNeedUri);
-            if(chatId == null) {
-                logger.error("No chatId found for the specified needUri");
-                return;
-            }
-
-            try{
-                Message message = wonTelegramBotHandler.sendMessage(wonTelegramBotHandler.getTelegramMessageGenerator().getConnectMessage(chatId, remoteNeedUri, yourNeedUri));
-                botContextWrapper.addMessageIdWonURIRelation(message.getMessageId(), new WonURI(con.getConnectionURI(), UriType.CONNECTION));
-            }catch (TelegramApiException te){
-                logger.error(te.getMessage());
-            }
-        }
-    }
+  }
 }

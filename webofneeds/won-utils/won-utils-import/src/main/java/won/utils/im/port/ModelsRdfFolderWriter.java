@@ -6,16 +6,14 @@ import java.io.IOException;
 import org.apache.jena.rdf.model.Model;
 
 /**
- * User: ypanchenko
- * Date: 04.09.2014
+ * User: ypanchenko Date: 04.09.2014
  */
-public class ModelsRdfFolderWriter implements NeedDataWriter<Model>
-{
+public class ModelsRdfFolderWriter implements NeedDataWriter<Model> {
   private File outputFolder;
   private ModelRdfFileWriter fileWriter;
   private int counter;
 
-  public ModelsRdfFolderWriter(final String outputFolderPath)  throws IOException {
+  public ModelsRdfFolderWriter(final String outputFolderPath) throws IOException {
     outputFolder = new File(outputFolderPath);
     counter = 0;
   }

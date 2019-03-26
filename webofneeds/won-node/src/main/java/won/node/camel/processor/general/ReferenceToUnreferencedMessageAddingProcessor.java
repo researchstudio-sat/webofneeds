@@ -27,18 +27,17 @@ import won.protocol.message.processor.exception.WonMessageProcessingException;
 /**
  * Created by fkleedorfer on 22.07.2016.
  */
-public class ReferenceToUnreferencedMessageAddingProcessor implements WonMessageProcessor
-{
+public class ReferenceToUnreferencedMessageAddingProcessor implements WonMessageProcessor {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
   @Autowired
   private MessageReferencer messageReferencer;
 
   @Override
-  //we use READ_COMMITTED because we want to wait for an exclusive lock will accept data written by a concurrent transaction that commits before we read
+  // we use READ_COMMITTED because we want to wait for an exclusive lock will
+  // accept data written by a concurrent transaction that commits before we read
   public WonMessage process(final WonMessage message) throws WonMessageProcessingException {
     return messageReferencer.addMessageReferences(message);
   }
-
 
 }

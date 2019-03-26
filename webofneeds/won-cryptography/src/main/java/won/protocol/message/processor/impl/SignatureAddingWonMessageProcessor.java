@@ -15,11 +15,9 @@ import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
 
 /**
- * User: ypanchenko
- * Date: 03.04.2015
+ * User: ypanchenko Date: 03.04.2015
  */
-public class SignatureAddingWonMessageProcessor implements WonMessageProcessor
-{
+public class SignatureAddingWonMessageProcessor implements WonMessageProcessor {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
   private CryptographyService cryptographyService;
@@ -56,7 +54,7 @@ public class SignatureAddingWonMessageProcessor implements WonMessageProcessor
   }
 
   private WonMessage processWithKey(final WonMessage wonMessage, final String privateKeyUri,
-                                    final PrivateKey privateKey, final PublicKey publicKey) throws Exception {
+      final PrivateKey privateKey, final PublicKey publicKey) throws Exception {
     WonMessage signed = WonMessageSignerVerifier.sign(privateKey, publicKey, privateKeyUri, wonMessage);
     logger.debug("SIGNED with key " + privateKeyUri + ":\n" + WonMessageEncoder.encode(signed, Lang.TRIG));
     return signed;

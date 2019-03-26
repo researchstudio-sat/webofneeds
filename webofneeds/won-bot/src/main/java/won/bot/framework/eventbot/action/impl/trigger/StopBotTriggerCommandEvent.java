@@ -20,7 +20,7 @@ package won.bot.framework.eventbot.action.impl.trigger;
  * Stops the BotTrigger.
  */
 public class StopBotTriggerCommandEvent extends BaseBotTriggerEvent {
-    public StopBotTriggerCommandEvent(BotTrigger botTrigger) {
-        super(botTrigger);
-    }
+  public StopBotTriggerCommandEvent(BotTrigger botTrigger) {
+    super(botTrigger);
+  }
 }

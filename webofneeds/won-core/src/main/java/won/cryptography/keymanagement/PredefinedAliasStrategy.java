@@ -19,18 +19,18 @@ package won.cryptography.keymanagement;
 /**
  * Always uses the predefined alias
  */
-public class PredefinedAliasStrategy implements KeyPairAliasDerivationStrategy{
-    private String predefinedAlias = null;
+public class PredefinedAliasStrategy implements KeyPairAliasDerivationStrategy {
+  private String predefinedAlias = null;
 
-    public PredefinedAliasStrategy(String predefinedAlias) {
-        this.predefinedAlias = predefinedAlias;
-        if (this.predefinedAlias == null || this.predefinedAlias.trim().length() == 0) {
-            throw new IllegalArgumentException("Cannot use null or empty string as predefined alias");
-        }
+  public PredefinedAliasStrategy(String predefinedAlias) {
+    this.predefinedAlias = predefinedAlias;
+    if (this.predefinedAlias == null || this.predefinedAlias.trim().length() == 0) {
+      throw new IllegalArgumentException("Cannot use null or empty string as predefined alias");
     }
+  }
 
-    @Override
-    public String getAliasForNeedUri(String needURI) {
-        return predefinedAlias;
-    }
+  @Override
+  public String getAliasForNeedUri(String needURI) {
+    return predefinedAlias;
+  }
 }

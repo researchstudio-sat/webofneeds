@@ -17,8 +17,7 @@ import scala.concurrent.duration.FiniteDuration;
  */
 @Configuration
 @PropertySource("file:${WON_CONFIG_DIR}/matcher-service.properties")
-public class WonNodeControllerConfig
-{
+public class WonNodeControllerConfig {
   @Value("#{'${wonNodeController.wonNode.crawl}'.split(',')}")
   private List<String> crawlWonNodes;
 

@@ -1,6 +1,5 @@
 package won.matcher.service.common.event;
 
-
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringWriter;
@@ -14,14 +13,13 @@ import org.apache.jena.riot.RDFFormat;
 import won.matcher.service.common.service.sparql.SparqlService;
 
 /**
- * This event is used in the matching service to indicate that a new need has been found.
- * It includes the URIs of the need and the won node and optionally the serialized resource
+ * This event is used in the matching service to indicate that a new need has
+ * been found. It includes the URIs of the need and the won node and optionally
+ * the serialized resource
  *
- * User: hfriedrich
- * Date: 04.06.2015
+ * User: hfriedrich Date: 04.06.2015
  */
-public class NeedEvent implements Serializable
-{
+public class NeedEvent implements Serializable {
   private String uri;
   private String wonNodeUri;
   private String serializedNeedResource;
@@ -31,9 +29,8 @@ public class NeedEvent implements Serializable
 
   private TYPE eventType;
 
-  public static enum TYPE
-  {
-      ACTIVE, INACTIVE
+  public static enum TYPE {
+    ACTIVE, INACTIVE
   }
 
   public NeedEvent(String uri, String wonNodeUri, TYPE eventType, long crawlDate, String resource, Lang format) {
@@ -90,7 +87,7 @@ public class NeedEvent implements Serializable
   @Override
   public NeedEvent clone() {
     NeedEvent e = new NeedEvent(uri, wonNodeUri, eventType, crawlDate, serializedNeedResource,
-                                getSerializationFormat());
+        getSerializationFormat());
     return e;
   }
 

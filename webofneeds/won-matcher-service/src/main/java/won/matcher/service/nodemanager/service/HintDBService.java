@@ -12,14 +12,14 @@ import won.matcher.service.common.event.HintEvent;
 /**
  * Created by hfriedrich on 06.07.2016.
  *
- * Currently the hint "database" is just implemented as an in memory bloom filter so that (best guess) duplicate
- * checks are possible to avoid sending duplicate hints. In a future version this might be changed to a persistent
+ * Currently the hint "database" is just implemented as an in memory bloom
+ * filter so that (best guess) duplicate checks are possible to avoid sending
+ * duplicate hints. In a future version this might be changed to a persistent
  * hint database.
  */
 @Component
 @Scope("singleton")
-public class HintDBService
-{
+public class HintDBService {
   private BloomFilter savedHints;
 
   public HintDBService() {

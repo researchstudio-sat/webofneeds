@@ -35,10 +35,10 @@ import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.linkeddata.LinkedDataSource;
 
 /**
- * Delegates calls to another EventListenerContext, allowing to
- * set proxies for some of the services offered by the ELC.
+ * Delegates calls to another EventListenerContext, allowing to set proxies for
+ * some of the services offered by the ELC.
  */
-public abstract class BaseEventListenerContextDecorator implements EventListenerContext{
+public abstract class BaseEventListenerContextDecorator implements EventListenerContext {
   protected EventListenerContext delegate;
 
   public BaseEventListenerContextDecorator(EventListenerContext delegate) {
@@ -106,7 +106,9 @@ public abstract class BaseEventListenerContextDecorator implements EventListener
   }
 
   @Override
-  public BotContextWrapper getBotContextWrapper() {return delegate.getBotContextWrapper(); }
+  public BotContextWrapper getBotContextWrapper() {
+    return delegate.getBotContextWrapper();
+  }
 
   @Override
   public Executor getExecutor() {

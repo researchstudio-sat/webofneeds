@@ -22,29 +22,29 @@ import won.cryptography.ssl.MessagingContext;
 import won.protocol.exception.CamelConfigurationFailedException;
 
 /**
- * User: LEIH-NB
- * Date: 24.02.14
+ * User: LEIH-NB Date: 24.02.14
  */
 //TODO maybe can extend needconfigurator...
 public interface OwnerProtocolCamelConfigurator extends CamelConfigurator {
-    String configureCamelEndpointForNodeURI(URI wonNodeURI, URI brokerURI, String ownerProtocolQueueName) throws CamelConfigurationFailedException;
+  String configureCamelEndpointForNodeURI(URI wonNodeURI, URI brokerURI, String ownerProtocolQueueName)
+      throws CamelConfigurationFailedException;
 
-    void addRemoteQueueListener(String endpoint, URI remoteEndpoint) throws CamelConfigurationFailedException;
+  void addRemoteQueueListener(String endpoint, URI remoteEndpoint) throws CamelConfigurationFailedException;
 
-    String getStartingEndpoint(URI wonNodeURI);
+  String getStartingEndpoint(URI wonNodeURI);
 
-    void setStartingEndpoint(URI wonNodeURI, String startingEndpoint);
+  void setStartingEndpoint(URI wonNodeURI, String startingEndpoint);
 
-    void setStartingComponent(String startingComponent);
+  void setStartingComponent(String startingComponent);
 
-    String getBrokerComponentName(URI resourceUri);
+  String getBrokerComponentName(URI resourceUri);
 
-    void setDefaultNodeURI(String defaultNodeURI);
+  void setDefaultNodeURI(String defaultNodeURI);
 
-    void setComponentName(String componentName);
+  void setComponentName(String componentName);
 
-    void addCamelComponentForWonNodeBroker(URI wonNodeURI, String brokerComponentName);
+  void addCamelComponentForWonNodeBroker(URI wonNodeURI, String brokerComponentName);
 
-    void setMessagingContext(MessagingContext messagingContext);
+  void setMessagingContext(MessagingContext messagingContext);
 
 }

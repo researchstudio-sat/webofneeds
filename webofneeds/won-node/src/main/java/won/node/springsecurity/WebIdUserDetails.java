@@ -26,8 +26,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 /**
  * Created by fkleedorfer on 24.11.2016.
  */
-public class WebIdUserDetails implements UserDetails
-{
+public class WebIdUserDetails implements UserDetails {
   private URI webId;
   Collection<GrantedAuthority> authorities = new ArrayList<>(3);
 
@@ -40,7 +39,6 @@ public class WebIdUserDetails implements UserDetails
   public Collection<? extends GrantedAuthority> getAuthorities() {
     return authorities;
   }
-
 
   @Override
   public String getPassword() {
@@ -57,24 +55,20 @@ public class WebIdUserDetails implements UserDetails
     return webId.toString();
   }
 
-
   @Override
   public boolean isAccountNonExpired() {
     return true;
   }
-
 
   @Override
   public boolean isAccountNonLocked() {
     return true;
   }
 
-
   @Override
   public boolean isCredentialsNonExpired() {
     return true;
   }
-
 
   @Override
   public boolean isEnabled() {

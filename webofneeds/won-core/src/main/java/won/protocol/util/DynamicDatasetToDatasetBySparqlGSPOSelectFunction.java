@@ -26,71 +26,63 @@ import org.apache.jena.rdf.model.impl.StatementImpl;
  */
 public class DynamicDatasetToDatasetBySparqlGSPOSelectFunction extends SparqlFunction<Dataset, Dataset> {
 
-	QuerySolutionMap initialBinding = new QuerySolutionMap();
-	
-	public DynamicDatasetToDatasetBySparqlGSPOSelectFunction(String sparqlFile) {
-		super(sparqlFile);
-	}
-	
-	
+  QuerySolutionMap initialBinding = new QuerySolutionMap();
 
-	public DynamicDatasetToDatasetBySparqlGSPOSelectFunction(String sparqlFile, QuerySolutionMap initialBinding) {
-		super(sparqlFile);
-		this.initialBinding = initialBinding;
-	}
+  public DynamicDatasetToDatasetBySparqlGSPOSelectFunction(String sparqlFile) {
+    super(sparqlFile);
+  }
 
+  public DynamicDatasetToDatasetBySparqlGSPOSelectFunction(String sparqlFile, QuerySolutionMap initialBinding) {
+    super(sparqlFile);
+    this.initialBinding = initialBinding;
+  }
 
+  @Override
+  public Dataset apply(Dataset dataset) {
+    dataset.begin(ReadWrite.READ);
+    Dataset result = DatasetFactory.createGeneral();
+    result.begin(ReadWrite.WRITE);
+    Query query = QueryFactory.create(sparql);
 
-	@Override
-	public Dataset apply(Dataset dataset) {
-		dataset.begin(ReadWrite.READ);
-		Dataset result = DatasetFactory.createGeneral();
-		result.begin(ReadWrite.WRITE);
-		Query query = QueryFactory.create(sparql);
-				
-		try (QueryExecution queryExecution = QueryExecutionFactory.create(query, dataset, initialBinding)) {
-			ResultSet resultSet = queryExecution.execSelect();
-			RDFNode currentProposal = null;
-			Model currentProposalContent = ModelFactory.createDefaultModel();
-			
-			while (resultSet.hasNext()) {
-				QuerySolution solution = resultSet.next();
-				RDFNode proposalNode = solution.get("g");
-				if (currentProposal == null) {
-					// first solution: remember uri of first proposal
-					currentProposal = proposalNode;
-				} else {
-					// at least 2nd solution: if the proposal uri has changed, our current proposal
-					// has been
-					// processed. add the model containing its triples to the dataset under
-					// the currentProposal URI and prepare a new empty model for the next proposal
-					if (!currentProposal.equals(proposalNode)) {
-						// we have seen all triples of currentProposal
-						result.addNamedModel(currentProposal.asResource().getURI(), currentProposalContent);
-						currentProposalContent = ModelFactory.createDefaultModel();
-					}
-					currentProposal = proposalNode;
-				}
-				// add current triple into currentAgreementModel
-				RDFNode s = solution.get("s");
-				RDFNode p = solution.get("p");
-				RDFNode o = solution.get("o");
-				Statement newStatement = 
-						new StatementImpl(
-								s.asResource(), 
-								new PropertyImpl(p.asResource().getURI()),
-								o);
-				currentProposalContent.add(newStatement);
-			}
-			// add the last model
-			if (currentProposal != null) {
-				result.addNamedModel(currentProposal.asResource().getURI(), currentProposalContent);
-			}
-			return result;
-		} finally {
-			dataset.commit();
-			result.commit();
-		}
-	}
+    try (QueryExecution queryExecution = QueryExecutionFactory.create(query, dataset, initialBinding)) {
+      ResultSet resultSet = queryExecution.execSelect();
+      RDFNode currentProposal = null;
+      Model currentProposalContent = ModelFactory.createDefaultModel();
+
+      while (resultSet.hasNext()) {
+        QuerySolution solution = resultSet.next();
+        RDFNode proposalNode = solution.get("g");
+        if (currentProposal == null) {
+          // first solution: remember uri of first proposal
+          currentProposal = proposalNode;
+        } else {
+          // at least 2nd solution: if the proposal uri has changed, our current proposal
+          // has been
+          // processed. add the model containing its triples to the dataset under
+          // the currentProposal URI and prepare a new empty model for the next proposal
+          if (!currentProposal.equals(proposalNode)) {
+            // we have seen all triples of currentProposal
+            result.addNamedModel(currentProposal.asResource().getURI(), currentProposalContent);
+            currentProposalContent = ModelFactory.createDefaultModel();
+          }
+          currentProposal = proposalNode;
+        }
+        // add current triple into currentAgreementModel
+        RDFNode s = solution.get("s");
+        RDFNode p = solution.get("p");
+        RDFNode o = solution.get("o");
+        Statement newStatement = new StatementImpl(s.asResource(), new PropertyImpl(p.asResource().getURI()), o);
+        currentProposalContent.add(newStatement);
+      }
+      // add the last model
+      if (currentProposal != null) {
+        result.addNamedModel(currentProposal.asResource().getURI(), currentProposalContent);
+      }
+      return result;
+    } finally {
+      dataset.commit();
+      result.commit();
+    }
+  }
 
 }

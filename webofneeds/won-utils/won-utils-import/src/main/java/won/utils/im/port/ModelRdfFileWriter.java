@@ -10,11 +10,9 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 
 /**
- * User: ypanchenko
- * Date: 04.09.2014
+ * User: ypanchenko Date: 04.09.2014
  */
-public class ModelRdfFileWriter implements NeedDataWriter<Model>
-{
+public class ModelRdfFileWriter implements NeedDataWriter<Model> {
   private OutputStream out;
 
   public ModelRdfFileWriter(final File outputFile) throws IOException {

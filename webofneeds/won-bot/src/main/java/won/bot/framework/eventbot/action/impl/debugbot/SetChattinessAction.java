@@ -27,10 +27,10 @@ import won.bot.framework.eventbot.event.impl.debugbot.SetChattinessDebugCommandE
 import won.bot.framework.eventbot.listener.EventListener;
 
 /**
- * Expects a SetChattinessDebugCommandEvent and sets the chattiness for the connection of the event.
+ * Expects a SetChattinessDebugCommandEvent and sets the chattiness for the
+ * connection of the event.
  */
-public class SetChattinessAction extends BaseEventBotAction
-{
+public class SetChattinessAction extends BaseEventBotAction {
 
   public SetChattinessAction(final EventListenerContext eventListenerContext) {
     super(eventListenerContext);
@@ -38,11 +38,11 @@ public class SetChattinessAction extends BaseEventBotAction
 
   @Override
   protected void doRun(final Event event, EventListener executingListener) throws Exception {
-    if (event instanceof SetChattinessDebugCommandEvent){
-      SetChattinessDebugCommandEvent chattinessDebugCommandEvent = (SetChattinessDebugCommandEvent)event;
+    if (event instanceof SetChattinessDebugCommandEvent) {
+      SetChattinessDebugCommandEvent chattinessDebugCommandEvent = (SetChattinessDebugCommandEvent) event;
 
       URI uri = chattinessDebugCommandEvent.getConnectionURI();
-      if (chattinessDebugCommandEvent.isChatty()){
+      if (chattinessDebugCommandEvent.isChatty()) {
         getEventListenerContext().getBotContext().saveToObjectMap(KEY_CHATTY_CONNECTIONS, uri.toString(), uri);
       } else {
         getEventListenerContext().getBotContext().removeFromObjectMap(KEY_CHATTY_CONNECTIONS, uri.toString());

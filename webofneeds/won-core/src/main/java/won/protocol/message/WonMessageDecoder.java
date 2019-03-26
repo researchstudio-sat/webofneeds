@@ -10,12 +10,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * User: ypanchenko
- * Date: 04.08.2014
+ * User: ypanchenko Date: 04.08.2014
  */
 
-public class WonMessageDecoder
-{
+public class WonMessageDecoder {
 
   private static final Logger logger = LoggerFactory.getLogger(WonMessageDecoder.class);
 
@@ -37,6 +35,5 @@ public class WonMessageDecoder
   public static WonMessage decodeFromDataset(Dataset message) {
     return new WonMessage(message);
   }
-
 
 }

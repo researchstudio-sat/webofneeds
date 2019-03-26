@@ -35,18 +35,17 @@ import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
 /**
- * BaseEventBotAction connecting two needs on the specified facets. The need's URIs are obtained from
- * the bot context. The first two URIs found there are used.
+ * BaseEventBotAction connecting two needs on the specified facets. The need's
+ * URIs are obtained from the bot context. The first two URIs found there are
+ * used.
  */
-public class ConnectTwoNeedsAction extends BaseEventBotAction
-{
+public class ConnectTwoNeedsAction extends BaseEventBotAction {
   private Optional<URI> remoteFacetType = Optional.empty();
   private Optional<URI> localFacetType = Optional.empty();
   private String welcomeMessage;
 
-  public ConnectTwoNeedsAction(final EventListenerContext eventListenerContext, final URI remoteFacetType, final URI
-    localFacetType, final String welcomeMessage)
-  {
+  public ConnectTwoNeedsAction(final EventListenerContext eventListenerContext, final URI remoteFacetType,
+      final URI localFacetType, final String welcomeMessage) {
     super(eventListenerContext);
     this.remoteFacetType = Optional.of(remoteFacetType);
     this.localFacetType = Optional.of(localFacetType);
@@ -54,46 +53,36 @@ public class ConnectTwoNeedsAction extends BaseEventBotAction
   }
 
   @Override
-  public void doRun(Event event, EventListener executingListener)
-  {
+  public void doRun(Event event, EventListener executingListener) {
     Collection<URI> needs = getEventListenerContext().getBotContext().retrieveAllNeedUris();
     try {
       Iterator iter = needs.iterator();
-      getEventListenerContext().getWonMessageSender().sendWonMessage(
-        createWonMessage((URI) iter.next(), (URI) iter.next()));
+      getEventListenerContext().getWonMessageSender()
+          .sendWonMessage(createWonMessage((URI) iter.next(), (URI) iter.next()));
     } catch (Exception e) {
       logger.warn("could not connect two need objects, exception was: ", e);
     }
   }
 
-  private WonMessage createWonMessage(URI fromUri, URI toUri)
-    throws WonMessageBuilderException {
+  private WonMessage createWonMessage(URI fromUri, URI toUri) throws WonMessageBuilderException {
 
-    WonNodeInformationService wonNodeInformationService =
-      getEventListenerContext().getWonNodeInformationService();
+    WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
 
-    Dataset localNeedRDF =
-      getEventListenerContext().getLinkedDataSource().getDataForResource(fromUri);
-    Dataset remoteNeedRDF =
-      getEventListenerContext().getLinkedDataSource().getDataForResource(toUri);
+    Dataset localNeedRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(fromUri);
+    Dataset remoteNeedRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(toUri);
 
     URI localWonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(localNeedRDF, fromUri);
     URI remoteWonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, toUri);
 
-
-
-    return
-      WonMessageBuilder.setMessagePropertiesForConnect(
-        wonNodeInformationService.generateEventURI(
-          localWonNode),
-        localFacetType.map(facetType -> WonLinkedDataUtils.getFacetsOfType(fromUri, facetType, getEventListenerContext().getLinkedDataSource()).stream().findFirst().orElse(null)),
-        fromUri,
-        localWonNode,
-        remoteFacetType.map(facetType -> WonLinkedDataUtils.getFacetsOfType(toUri, facetType, getEventListenerContext().getLinkedDataSource()).stream().findFirst().orElse(null)),
-        toUri,
-        remoteWonNode,
-        welcomeMessage)
-      .build();
+    return WonMessageBuilder.setMessagePropertiesForConnect(wonNodeInformationService.generateEventURI(localWonNode),
+        localFacetType.map(facetType -> WonLinkedDataUtils
+            .getFacetsOfType(fromUri, facetType, getEventListenerContext().getLinkedDataSource()).stream().findFirst()
+            .orElse(null)),
+        fromUri, localWonNode,
+        remoteFacetType.map(facetType -> WonLinkedDataUtils
+            .getFacetsOfType(toUri, facetType, getEventListenerContext().getLinkedDataSource()).stream().findFirst()
+            .orElse(null)),
+        toUri, remoteWonNode, welcomeMessage).build();
   }
 
 }

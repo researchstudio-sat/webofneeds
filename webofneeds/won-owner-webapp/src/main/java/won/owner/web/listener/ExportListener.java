@@ -38,137 +38,130 @@ import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
 @Component
 public class ExportListener implements ApplicationListener<OnExportUserEvent> {
-    private static final Logger logger = LoggerFactory.getLogger(ExportListener.class);
+  private static final Logger logger = LoggerFactory.getLogger(ExportListener.class);
 
+  @Autowired
+  private LinkedDataSource linkedDataSourceOnBehalfOfNeed;
 
-    @Autowired
-    private LinkedDataSource linkedDataSourceOnBehalfOfNeed;
+  @Autowired
+  private WonOwnerMailSender emailSender;
 
-    @Autowired
-    private WonOwnerMailSender emailSender;
+  @Autowired
+  private UserService userService;
 
-    @Autowired
-    private UserService userService;
+  @Override
+  public void onApplicationEvent(OnExportUserEvent onExportUserEvent) {
+    Authentication authentication = onExportUserEvent.getAuthentication();
+    KeystoreEnabledUserDetails userDetails = ((KeystoreEnabledUserDetails) authentication.getPrincipal());
+    String password = onExportUserEvent.getKeyStorePassword();
+    User user = userService.getByUsername(userDetails.getUsername());
+    String responseMail = onExportUserEvent.getResponseEmail();
 
+    File tmpFile = null;
+    try {
+      tmpFile = File.createTempFile("won", null);
+      tmpFile.deleteOnExit();
 
-    @Override
-    public void onApplicationEvent(OnExportUserEvent onExportUserEvent) {
-        Authentication authentication = onExportUserEvent.getAuthentication();
-        KeystoreEnabledUserDetails userDetails = ((KeystoreEnabledUserDetails) authentication.getPrincipal());
-        String password = onExportUserEvent.getKeyStorePassword();
-        User user = userService.getByUsername(userDetails.getUsername());
-        String responseMail = onExportUserEvent.getResponseEmail();
+      ZipOutputStream zip = new ZipOutputStream(new FileOutputStream(tmpFile), Charset.forName("UTF-8"));
 
-        File tmpFile = null;
-        try {
-            tmpFile = File.createTempFile("won", null);
-            tmpFile.deleteOnExit();
+      ZipEntry needsEntry = new ZipEntry("export.nq");
+      zip.putNextEntry(needsEntry);
+      user.getUserNeeds().stream().parallel().map(userNeed -> fetchNeedData(authentication, userNeed.getUri()))
+          .forEach(dataset -> {
+            RDFDataMgr.write(zip, dataset, RDFFormat.NQUADS_UTF8);
+          });
+      zip.closeEntry();
 
-            ZipOutputStream zip = new ZipOutputStream(new FileOutputStream(tmpFile), Charset.forName("UTF-8"));
+      ZipEntry keystoreEntry = new ZipEntry("keystore.jks");
+      zip.putNextEntry(keystoreEntry);
+      if (password != null && !password.isEmpty()) {
+        ByteArrayOutputStream tmpStream = new ByteArrayOutputStream();
+        userDetails.getKeyStore().store(tmpStream, password.toCharArray());
+        tmpStream.writeTo(zip);
+      } else {
+        zip.write("You need to supply a keyStorePassword to get your keystore for security reasons".getBytes());
+      }
+      zip.closeEntry();
 
-            ZipEntry needsEntry = new ZipEntry("export.nq");
-            zip.putNextEntry(needsEntry);
-            user.getUserNeeds()
-                    .stream()
-                    .parallel()
-                    .map(userNeed -> fetchNeedData(authentication, userNeed.getUri()))
-                    .forEach(dataset -> {
-                        RDFDataMgr.write(zip, dataset, RDFFormat.NQUADS_UTF8);
-                    });
-            zip.closeEntry();
-
-            ZipEntry keystoreEntry = new ZipEntry("keystore.jks");
-            zip.putNextEntry(keystoreEntry);
-            if(password != null && !password.isEmpty()) {
-                ByteArrayOutputStream tmpStream = new ByteArrayOutputStream();
-                userDetails.getKeyStore().store(tmpStream, password.toCharArray());
-                tmpStream.writeTo(zip);
-            } else {
-                zip.write("You need to supply a keyStorePassword to get your keystore for security reasons".getBytes());
-            }
-            zip.closeEntry();
-
-            zip.close();
-            emailSender.sendExportMessage(onExportUserEvent.getResponseEmail(), tmpFile);
-        } catch (LinkedDataFetchingException e) {
-            logger.warn(e.getMessage());
-            emailSender.sendExportFailedMessage(responseMail);
-        } catch(KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException e) {
-            emailSender.sendExportFailedMessage(responseMail);
-            throw new RuntimeException(e);
-        } catch (Exception e) {
-            emailSender.sendExportFailedMessage(responseMail);
-            throw e;
-        } finally {
-            if (tmpFile != null) {
-                tmpFile.delete();
-            }
-        }
+      zip.close();
+      emailSender.sendExportMessage(onExportUserEvent.getResponseEmail(), tmpFile);
+    } catch (LinkedDataFetchingException e) {
+      logger.warn(e.getMessage());
+      emailSender.sendExportFailedMessage(responseMail);
+    } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException e) {
+      emailSender.sendExportFailedMessage(responseMail);
+      throw new RuntimeException(e);
+    } catch (Exception e) {
+      emailSender.sendExportFailedMessage(responseMail);
+      throw e;
+    } finally {
+      if (tmpFile != null) {
+        tmpFile.delete();
+      }
     }
+  }
 
-    private static void invalidate(URI uri, URI webId, LinkedDataSource linkedDataSource) {
-        if (!(linkedDataSource instanceof CachingLinkedDataSource)) {
-            return;
-        }
-        if (uri != null) {
-            ((CachingLinkedDataSource)linkedDataSource).invalidate(uri);
-            if (webId != null) {
-                ((CachingLinkedDataSource)linkedDataSource).invalidate(uri, webId);
-            }
-        }
+  private static void invalidate(URI uri, URI webId, LinkedDataSource linkedDataSource) {
+    if (!(linkedDataSource instanceof CachingLinkedDataSource)) {
+      return;
     }
+    if (uri != null) {
+      ((CachingLinkedDataSource) linkedDataSource).invalidate(uri);
+      if (webId != null) {
+        ((CachingLinkedDataSource) linkedDataSource).invalidate(uri, webId);
+      }
+    }
+  }
 
-    private static void refreshData(URI needUri, LinkedDataSource linkedDataSource){
+  private static void refreshData(URI needUri, LinkedDataSource linkedDataSource) {
+    // we may have tried to crawl a conversation dataset of which messages
+    // were still in-flight. we allow one re-crawl attempt per exception before
+    // we throw the exception on:
+    if (!(linkedDataSource instanceof CachingLinkedDataSource)) {
+      return;
+    }
+    invalidate(needUri, needUri, linkedDataSource);
+  }
+
+  private static boolean recrawl(Set<URI> recrawled, URI needUri, LinkedDataSource linkedDataSource, URI... uris) {
+    Set<URI> urisToCrawl = new HashSet<URI>();
+    Arrays.stream(uris).filter(x -> !recrawled.contains(x)).forEach(urisToCrawl::add);
+    if (urisToCrawl.isEmpty()) {
+      if (logger.isDebugEnabled()) {
+        logger.debug("need {}: not recrawling again: {}", needUri, Arrays.toString(uris));
+      }
+      return false;
+    }
+    if (logger.isDebugEnabled()) {
+      logger.debug("need {}, recrawling: {}", needUri, urisToCrawl);
+    }
+    if (linkedDataSource instanceof CachingLinkedDataSource) {
+      urisToCrawl.stream().forEach(uri -> {
+        invalidate(uri, needUri, linkedDataSource);
+      });
+    }
+    recrawled.addAll(urisToCrawl);
+    return true;
+  }
+
+  public Dataset fetchNeedData(Authentication authentication, URI needUri) {
+    // allow each resource to be re-crawled once for each reason
+    Set<URI> recrawledForFailedFetch = new HashSet<>();
+    AuthenticationThreadLocal.setAuthentication(authentication);
+    while (true) {
+      // we leave the loop either with a runtime exception or with the result
+      try {
+        Dataset needDataset = WonLinkedDataUtils.getFullNeedDataset(needUri, linkedDataSourceOnBehalfOfNeed);
+        return needDataset;
+      } catch (LinkedDataFetchingException e) {
         // we may have tried to crawl a conversation dataset of which messages
         // were still in-flight. we allow one re-crawl attempt per exception before
         // we throw the exception on:
-        if (!(linkedDataSource instanceof CachingLinkedDataSource)) {
-            return;
+        refreshData(needUri, linkedDataSourceOnBehalfOfNeed);
+        if (!recrawl(recrawledForFailedFetch, needUri, linkedDataSourceOnBehalfOfNeed, e.getResourceUri())) {
+          throw e;
         }
-        invalidate(needUri, needUri, linkedDataSource);
+      }
     }
-
-    private static boolean recrawl(Set<URI> recrawled, URI needUri, LinkedDataSource linkedDataSource, URI... uris) {
-        Set<URI> urisToCrawl = new HashSet<URI>();
-        Arrays.stream(uris)
-                .filter(x -> ! recrawled.contains(x))
-                .forEach(urisToCrawl::add);
-        if (urisToCrawl.isEmpty()) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("need {}: not recrawling again: {}", needUri, Arrays.toString(uris));
-            }
-            return false;
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("need {}, recrawling: {}", needUri, urisToCrawl);
-        }
-        if (linkedDataSource instanceof CachingLinkedDataSource) {
-            urisToCrawl.stream().forEach(uri -> {
-                invalidate(uri, needUri, linkedDataSource);
-            });
-        }
-        recrawled.addAll(urisToCrawl);
-        return true;
-    }
-
-    public Dataset fetchNeedData(Authentication authentication, URI needUri) {
-        //allow each resource to be re-crawled once for each reason
-        Set<URI> recrawledForFailedFetch = new HashSet<>();
-        AuthenticationThreadLocal.setAuthentication(authentication);
-        while(true) {
-            //we leave the loop either with a runtime exception or with the result
-            try {
-                Dataset needDataset= WonLinkedDataUtils.getFullNeedDataset(needUri, linkedDataSourceOnBehalfOfNeed);
-                return needDataset;
-            } catch (LinkedDataFetchingException e) {
-                // we may have tried to crawl a conversation dataset of which messages
-                // were still in-flight. we allow one re-crawl attempt per exception before
-                // we throw the exception on:
-                refreshData(needUri, linkedDataSourceOnBehalfOfNeed);
-                if (!recrawl(recrawledForFailedFetch, needUri, linkedDataSourceOnBehalfOfNeed, e.getResourceUri())){
-                    throw e;
-                }
-            }
-        }
-    }
+  }
 }

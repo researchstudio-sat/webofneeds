@@ -27,31 +27,31 @@ import won.protocol.model.Connection;
  * Instructs the bot to open the specified connection behalf of the need.
  */
 public class FeedbackCommandEvent extends BaseNeedAndConnectionSpecificEvent implements MessageCommandEvent {
-    private URI forResource;
-    private URI feedbackProperty;
-    private URI value;
+  private URI forResource;
+  private URI feedbackProperty;
+  private URI value;
 
-    public FeedbackCommandEvent(Connection con, URI forResource, URI feedbackProperty, URI value) {
-        super(con);
-        this.forResource = forResource;
-        this.feedbackProperty = feedbackProperty;
-        this.value = value;
-    }
+  public FeedbackCommandEvent(Connection con, URI forResource, URI feedbackProperty, URI value) {
+    super(con);
+    this.forResource = forResource;
+    this.feedbackProperty = feedbackProperty;
+    this.value = value;
+  }
 
-    @Override
-    public WonMessageType getWonMessageType() {
-        return WonMessageType.HINT_FEEDBACK_MESSAGE;
-    }
+  @Override
+  public WonMessageType getWonMessageType() {
+    return WonMessageType.HINT_FEEDBACK_MESSAGE;
+  }
 
-    public URI getForResource() {
-        return forResource;
-    }
+  public URI getForResource() {
+    return forResource;
+  }
 
-    public URI getFeedbackProperty() {
-        return feedbackProperty;
-    }
+  public URI getFeedbackProperty() {
+    return feedbackProperty;
+  }
 
-    public URI getValue() {
-        return value;
-    }
+  public URI getValue() {
+    return value;
+  }
 }

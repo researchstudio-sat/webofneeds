@@ -26,23 +26,23 @@ import won.protocol.message.WonMessage;
 /**
  * Accepts only ResponseEvents with the specified originalMessageURI.
  */
-public class OriginalMessageUriResponseEventFilter implements EventFilter
-{
+public class OriginalMessageUriResponseEventFilter implements EventFilter {
   private URI originalMessageURI;
 
   public OriginalMessageUriResponseEventFilter(final URI originalMessageURI) {
     this.originalMessageURI = originalMessageURI;
   }
 
-  public static OriginalMessageUriResponseEventFilter forWonMessage(WonMessage wonMessage){
+  public static OriginalMessageUriResponseEventFilter forWonMessage(WonMessage wonMessage) {
     return new OriginalMessageUriResponseEventFilter(wonMessage.getMessageURI());
   }
 
   @Override
   public boolean accept(final Event event) {
-    if (event instanceof ResponseEvent){
-      URI messageURI = ((ResponseEvent)event).getOriginalMessageURI();
-      if (this.originalMessageURI.equals(messageURI)) return true;
+    if (event instanceof ResponseEvent) {
+      URI messageURI = ((ResponseEvent) event).getOriginalMessageURI();
+      if (this.originalMessageURI.equals(messageURI))
+        return true;
     }
     return false;
   }

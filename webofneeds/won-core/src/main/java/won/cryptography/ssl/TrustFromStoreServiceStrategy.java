@@ -8,18 +8,15 @@ import org.apache.http.ssl.TrustStrategy;
 import won.cryptography.service.TrustStoreService;
 
 /**
- * User: ypanchenko
- * Date: 07.10.2015
+ * User: ypanchenko Date: 07.10.2015
  */
-public class TrustFromStoreServiceStrategy implements TrustStrategy
-{
+public class TrustFromStoreServiceStrategy implements TrustStrategy {
 
   private TrustStoreService trustStoreService;
 
   public void setTrustStoreService(final TrustStoreService trustStoreService) {
     this.trustStoreService = trustStoreService;
   }
-
 
   @Override
   public boolean isTrusted(final X509Certificate[] chain, final String authType) throws CertificateException {

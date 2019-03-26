@@ -33,11 +33,12 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 
 /**
- * Assumes that the provided username is a linked data URI that contains WebID information.
- * The URI is accessed and the RDF is downloaded and added to the UserDetails for future reference.
+ * Assumes that the provided username is a linked data URI that contains WebID
+ * information. The URI is accessed and the RDF is downloaded and added to the
+ * UserDetails for future reference.
  */
-public class ClientCertificateNoWebIdUserDetailsService implements AuthenticationUserDetailsService<PreAuthenticatedAuthenticationToken>
-{
+public class ClientCertificateNoWebIdUserDetailsService
+    implements AuthenticationUserDetailsService<PreAuthenticatedAuthenticationToken> {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
   @Override
@@ -45,19 +46,19 @@ public class ClientCertificateNoWebIdUserDetailsService implements Authenticatio
     String principal = (String) token.getPrincipal();
     Certificate certificate = (Certificate) token.getCredentials();
 
-    logger.debug("Adding userDetails for '" + principal +"'");
+    logger.debug("Adding userDetails for '" + principal + "'");
     URI commonName = null;
     try {
       commonName = new URI(principal);
-    } catch (URISyntaxException e){
-      throw new BadCredentialsException("Principal of X.509 Certificate must be a WebId URI. Actual value: '" +
-                                          principal+"'");
+    } catch (URISyntaxException e) {
+      throw new BadCredentialsException(
+          "Principal of X.509 Certificate must be a WebId URI. Actual value: '" + principal + "'");
     }
 
-    //at this point, we know that a client certificate was presented. Grant this role:
+    // at this point, we know that a client certificate was presented. Grant this
+    // role:
     List<GrantedAuthority> authorities = new ArrayList<>(3);
     authorities.add(new SimpleGrantedAuthority("ROLE_CLIENT_CERTIFICATE_PRESENTED"));
     return new ClientCertificateNoWebIdUserDetails(commonName, authorities);
   }
 }
-

@@ -13,19 +13,17 @@ import org.slf4j.LoggerFactory;
 import won.protocol.message.WonSignatureData;
 
 /**
- * User: ypanchenko
- * Date: 24.03.2015
+ * User: ypanchenko Date: 24.03.2015
  */
-public class SignatureVerificationState
-{
+public class SignatureVerificationState {
 
   private Boolean verificationPassed = null;
   private String message = "";
 
-  private Map<String,List<String>> signedGraphNameToSignatureGraphName = new LinkedHashMap<>();
-  private Map<String,Boolean> signatureGraphNameToVerified = new HashMap<>();
-  private Map<String,String> signatureGraphNameToSignedGraphName = new HashMap<>();
-  private Map<String,String> signatureGraphNameToSignatureValue = new HashMap<>();
+  private Map<String, List<String>> signedGraphNameToSignatureGraphName = new LinkedHashMap<>();
+  private Map<String, Boolean> signatureGraphNameToVerified = new HashMap<>();
+  private Map<String, String> signatureGraphNameToSignedGraphName = new HashMap<>();
+  private Map<String, String> signatureGraphNameToSignatureValue = new HashMap<>();
 
   private List<WonSignatureData> signatures = new ArrayList<>();
   private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -42,7 +40,8 @@ public class SignatureVerificationState
       signedGraphNameToSignatureGraphName.put(wonSignatureData.getSignedGraphUri(), new ArrayList<String>());
     }
     signatureGraphNameToSignedGraphName.put(wonSignatureData.getSignatureUri(), wonSignatureData.getSignedGraphUri());
-    signedGraphNameToSignatureGraphName.get(wonSignatureData.getSignedGraphUri()).add(wonSignatureData.getSignatureUri());
+    signedGraphNameToSignatureGraphName.get(wonSignatureData.getSignedGraphUri())
+        .add(wonSignatureData.getSignatureUri());
     signatureGraphNameToSignatureValue.put(wonSignatureData.getSignatureUri(), wonSignatureData.getSignatureValue());
   }
 
@@ -78,7 +77,6 @@ public class SignatureVerificationState
   public String getMessage() {
     return message;
   }
-
 
   public List<WonSignatureData> getSignatures() {
     return signatures;

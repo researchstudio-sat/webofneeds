@@ -19,15 +19,16 @@ package won.protocol.jms;
 import java.net.URI;
 
 /**
- * User: LEIH-NB
- * Date: 25.02.14
+ * User: LEIH-NB Date: 25.02.14
  */
 public interface NeedProtocolCommunicationService extends ProtocolCommunicationService {
   /**
-   * Checks if there is a camel component configured that allows the specified needs to communicate and sets it up
-   * if necessary. The data required to send messages is encapsulated in the newly created CamelConfiguration.
+   * Checks if there is a camel component configured that allows the specified
+   * needs to communicate and sets it up if necessary. The data required to send
+   * messages is encapsulated in the newly created CamelConfiguration.
+   * 
    * @return
    * @throws Exception
    */
-    CamelConfiguration configureCamelEndpoint(URI wonNodeUri) throws Exception;
+  CamelConfiguration configureCamelEndpoint(URI wonNodeUri) throws Exception;
 }

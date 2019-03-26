@@ -13,8 +13,7 @@ import org.springframework.context.annotation.PropertySource;
  */
 @Configuration
 @PropertySource("file:${WON_CONFIG_DIR}/cluster-node.properties")
-public class ClusterConfig
-{
+public class ClusterConfig {
   @Value("${node.host}")
   private String nodeHost;
 
@@ -26,7 +25,6 @@ public class ClusterConfig
 
   @Value("#{'${cluster.seedNodes}'.split(',')}")
   private List<String> seedNodes;
-
 
   public String getNodeHost() {
     return nodeHost;

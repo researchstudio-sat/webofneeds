@@ -19,15 +19,14 @@ import won.matcher.service.common.event.NeedEvent;
 import won.matcher.service.common.service.sparql.SparqlService;
 
 /**
- * Actor that listens to the publish subscribe topic and saves the body (rdf graphs) of a need event to the defined
- * sparql endpoint.
+ * Actor that listens to the publish subscribe topic and saves the body (rdf
+ * graphs) of a need event to the defined sparql endpoint.
  *
  * Created by hfriedrich on 12.10.2015.
  */
 @Component
 @Scope("prototype")
-public class SaveNeedEventActor extends UntypedActor
-{
+public class SaveNeedEventActor extends UntypedActor {
   private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
   private ActorRef pubSubMediator;
 
@@ -58,22 +57,20 @@ public class SaveNeedEventActor extends UntypedActor
     }
   }
 
-
   @Override
   public SupervisorStrategy supervisorStrategy() {
 
-    SupervisorStrategy supervisorStrategy = new OneForOneStrategy(
-      0, Duration.Zero(), new Function<Throwable, SupervisorStrategy.Directive>()
-    {
+    SupervisorStrategy supervisorStrategy = new OneForOneStrategy(0, Duration.Zero(),
+        new Function<Throwable, SupervisorStrategy.Directive>() {
 
-      @Override
-      public SupervisorStrategy.Directive apply(Throwable t) throws Exception {
+          @Override
+          public SupervisorStrategy.Directive apply(Throwable t) throws Exception {
 
-        log.warning("Actor encountered error: {}", t);
-        // default behaviour
-        return SupervisorStrategy.escalate();
-      }
-    });
+            log.warning("Actor encountered error: {}", t);
+            // default behaviour
+            return SupervisorStrategy.escalate();
+          }
+        });
 
     return supervisorStrategy;
   }

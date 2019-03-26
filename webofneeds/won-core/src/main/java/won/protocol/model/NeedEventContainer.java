@@ -27,8 +27,7 @@ import won.protocol.model.parentaware.ParentAware;
 
 @Entity
 @DiscriminatorValue("Need")
-public class NeedEventContainer extends EventContainer implements ParentAware<Need>
-{
+public class NeedEventContainer extends EventContainer implements ParentAware<Need> {
   @OneToOne(fetch = FetchType.LAZY, mappedBy = "eventContainer", optional = false)
   private Need need;
 

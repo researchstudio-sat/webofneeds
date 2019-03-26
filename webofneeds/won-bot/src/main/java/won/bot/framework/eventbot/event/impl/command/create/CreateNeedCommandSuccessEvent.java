@@ -25,40 +25,43 @@ import won.bot.framework.eventbot.event.impl.command.MessageCommandSuccessEvent;
 /**
  * Indicates that creating a need succeeded.
  */
-public class CreateNeedCommandSuccessEvent extends BaseNeedSpecificEvent implements MessageCommandSuccessEvent,  CreateNeedCommandResultEvent {
-    private final URI needUriBeforeCreation;
-    private CreateNeedCommandEvent createNeedCommandEvent;
-    private String message;
+public class CreateNeedCommandSuccessEvent extends BaseNeedSpecificEvent
+    implements MessageCommandSuccessEvent, CreateNeedCommandResultEvent {
+  private final URI needUriBeforeCreation;
+  private CreateNeedCommandEvent createNeedCommandEvent;
+  private String message;
 
-    public CreateNeedCommandSuccessEvent(URI needURI, URI needUriBeforeCreation, CreateNeedCommandEvent createNeedCommandEvent, String message) {
-        super(needURI);
-        this.needUriBeforeCreation = needUriBeforeCreation;
-        this.createNeedCommandEvent = createNeedCommandEvent;
-        this.message = message;
-    }
+  public CreateNeedCommandSuccessEvent(URI needURI, URI needUriBeforeCreation,
+      CreateNeedCommandEvent createNeedCommandEvent, String message) {
+    super(needURI);
+    this.needUriBeforeCreation = needUriBeforeCreation;
+    this.createNeedCommandEvent = createNeedCommandEvent;
+    this.message = message;
+  }
 
-    public CreateNeedCommandSuccessEvent(URI needURI, URI needUriBeforeCreation, CreateNeedCommandEvent createNeedCommandEvent) {
-        super(needURI);
-        this.needUriBeforeCreation = needUriBeforeCreation;
-        this.createNeedCommandEvent = createNeedCommandEvent;
-    }
+  public CreateNeedCommandSuccessEvent(URI needURI, URI needUriBeforeCreation,
+      CreateNeedCommandEvent createNeedCommandEvent) {
+    super(needURI);
+    this.needUriBeforeCreation = needUriBeforeCreation;
+    this.createNeedCommandEvent = createNeedCommandEvent;
+  }
 
-    @Override
-    public MessageCommandEvent getOriginalCommandEvent() {
-        return createNeedCommandEvent;
-    }
+  @Override
+  public MessageCommandEvent getOriginalCommandEvent() {
+    return createNeedCommandEvent;
+  }
 
-    public URI getNeedUriBeforeCreation() {
-        return needUriBeforeCreation;
-    }
+  public URI getNeedUriBeforeCreation() {
+    return needUriBeforeCreation;
+  }
 
-    @Override
-    public String getMessage() {
-        return message;
-    }
+  @Override
+  public String getMessage() {
+    return message;
+  }
 
-    @Override
-    public boolean isSuccess() {
-        return true;
-    }
+  @Override
+  public boolean isSuccess() {
+    return true;
+  }
 }

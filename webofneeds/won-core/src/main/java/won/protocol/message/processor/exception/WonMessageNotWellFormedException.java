@@ -19,8 +19,7 @@ package won.protocol.message.processor.exception;
 /**
  * Indicates that a WonMessage is not well-formed.
  */
-public class WonMessageNotWellFormedException extends WonMessageProcessingException
-{
+public class WonMessageNotWellFormedException extends WonMessageProcessingException {
   public WonMessageNotWellFormedException() {
   }
 
@@ -36,7 +35,8 @@ public class WonMessageNotWellFormedException extends WonMessageProcessingExcept
     super(cause);
   }
 
-  public WonMessageNotWellFormedException(final String message, final Throwable cause, final boolean enableSuppression, final boolean writableStackTrace) {
+  public WonMessageNotWellFormedException(final String message, final Throwable cause, final boolean enableSuppression,
+      final boolean writableStackTrace) {
     super(message, cause, enableSuppression, writableStackTrace);
   }
 }

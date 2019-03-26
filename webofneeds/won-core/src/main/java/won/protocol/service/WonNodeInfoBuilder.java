@@ -8,8 +8,7 @@ import java.util.Map;
  *
  * Created by hfriedrich on 21.02.2017.
  */
-public class WonNodeInfoBuilder
-{
+public class WonNodeInfoBuilder {
   private String wonNodeURI;
   private String eventURIPrefix;
   private String connectionURIPrefix;
@@ -47,7 +46,7 @@ public class WonNodeInfoBuilder
   }
 
   public WonNodeInfoBuilder addSupportedProtocolImplParamValue(String protocol, String paramName, String paramValue) {
-    Map<String,String> protocolMap = supportedProtocolImpl.get(protocol);
+    Map<String, String> protocolMap = supportedProtocolImpl.get(protocol);
     if (protocolMap == null) {
       protocolMap = new HashMap<>();
       supportedProtocolImpl.put(protocol, protocolMap);
@@ -58,6 +57,6 @@ public class WonNodeInfoBuilder
 
   public WonNodeInfo build() {
     return new WonNodeInfo(wonNodeURI, eventURIPrefix, connectionURIPrefix, needURIPrefix, needListURI,
-                           supportedProtocolImpl);
+        supportedProtocolImpl);
   }
 }

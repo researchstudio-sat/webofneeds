@@ -21,29 +21,28 @@ import java.net.URI;
 import org.apache.jena.query.Dataset;
 
 /**
- * Handler implementation that does nothing. Useful for extending as well as pull-only cases
- * such as a simple Web application.
+ * Handler implementation that does nothing. Useful for extending as well as
+ * pull-only cases such as a simple Web application.
  */
-public class NopMatcherProtocolMatcherServiceCallback implements MatcherProtocolMatcherServiceCallback
-{
+public class NopMatcherProtocolMatcherServiceCallback implements MatcherProtocolMatcherServiceCallback {
 
   @Override
   public void onRegistered(final URI wonNodeUri) {
-    //To change body of implemented methods use File | Settings | File Templates.
+    // To change body of implemented methods use File | Settings | File Templates.
   }
 
   @Override
   public void onNewNeed(final URI wonNodeURI, URI needURI, Dataset content) {
-      //To change body of implemented methods use File | Settings | File Templates.
+    // To change body of implemented methods use File | Settings | File Templates.
   }
 
   @Override
   public void onNeedActivated(final URI wonNodeURI, final URI needURI) {
-    //To change body of implemented methods use File | Settings | File Templates.
+    // To change body of implemented methods use File | Settings | File Templates.
   }
 
   @Override
   public void onNeedDeactivated(final URI wonNodeURI, final URI needURI) {
-    //To change body of implemented methods use File | Settings | File Templates.
+    // To change body of implemented methods use File | Settings | File Templates.
   }
 }

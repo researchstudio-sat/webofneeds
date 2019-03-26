@@ -12,11 +12,8 @@ import won.protocol.repository.ConnectionRepository;
 import won.protocol.util.DataAccessUtils;
 
 /**
- * Created with IntelliJ IDEA.
- * User: gabriel
- * Date: 16.09.13
- * Time: 18:43
- * To change this template use File | Settings | File Templates.
+ * Created with IntelliJ IDEA. User: gabriel Date: 16.09.13 Time: 18:43 To
+ * change this template use File | Settings | File Templates.
  */
 public class FacetRegistry {
   @Autowired
@@ -24,13 +21,13 @@ public class FacetRegistry {
 
   private HashMap<FacetType, FacetLogic> map;
 
-  public FacetLogic get(Connection con)  {
+  public FacetLogic get(Connection con) {
     return get(FacetType.getFacetType(con.getTypeURI()));
   }
 
   public FacetLogic get(URI connectionURI) throws NoSuchConnectionException {
-    return get(FacetType.getFacetType(
-        DataAccessUtils.loadConnection(connectionRepository, connectionURI).getTypeURI()));
+    return get(
+        FacetType.getFacetType(DataAccessUtils.loadConnection(connectionRepository, connectionURI).getTypeURI()));
   }
 
   public FacetLogic get(FacetType ft) {

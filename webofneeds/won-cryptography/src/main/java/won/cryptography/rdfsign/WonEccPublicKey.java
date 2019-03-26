@@ -1,11 +1,9 @@
 package won.cryptography.rdfsign;
 
 /**
- * User: ypanchenko
- * Date: 30.03.2015
+ * User: ypanchenko Date: 30.03.2015
  */
-public class WonEccPublicKey
-{
+public class WonEccPublicKey {
 
   private String curveId;
   private String algorithm;

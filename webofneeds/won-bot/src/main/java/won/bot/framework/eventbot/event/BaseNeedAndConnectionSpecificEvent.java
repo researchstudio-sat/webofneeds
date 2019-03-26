@@ -23,30 +23,25 @@ import won.protocol.model.Connection;
 /**
  *
  */
-public abstract class BaseNeedAndConnectionSpecificEvent extends BaseEvent implements NeedSpecificEvent,
-  ConnectionSpecificEvent, RemoteNeedSpecificEvent
-{
+public abstract class BaseNeedAndConnectionSpecificEvent extends BaseEvent
+    implements NeedSpecificEvent, ConnectionSpecificEvent, RemoteNeedSpecificEvent {
   private final Connection con;
 
-  public BaseNeedAndConnectionSpecificEvent(final Connection con)
-  {
+  public BaseNeedAndConnectionSpecificEvent(final Connection con) {
     this.con = con;
   }
 
-  public Connection getCon()
-  {
+  public Connection getCon() {
     return con;
   }
 
   @Override
-  public URI getConnectionURI()
-  {
+  public URI getConnectionURI() {
     return con.getConnectionURI();
   }
 
   @Override
-  public URI getNeedURI()
-  {
+  public URI getNeedURI() {
     return con.getNeedURI();
   }
 
@@ -57,13 +52,11 @@ public abstract class BaseNeedAndConnectionSpecificEvent extends BaseEvent imple
 
   @Override
   public String toString() {
-    return getClass().getSimpleName()+"@"+Integer.toHexString(hashCode())+ "{" +
-      "needURI=" + getNeedURI() +
-      ", connectionURI=" + getConnectionURI() +
-      '}';
+    return getClass().getSimpleName() + "@" + Integer.toHexString(hashCode()) + "{" + "needURI=" + getNeedURI()
+        + ", connectionURI=" + getConnectionURI() + '}';
   }
 
-  protected static Connection makeConnection(URI needURI, URI remoteNeedURI, URI connectionURI){
+  protected static Connection makeConnection(URI needURI, URI remoteNeedURI, URI connectionURI) {
     Connection con = new Connection();
     con.setConnectionURI(connectionURI);
     con.setNeedURI(needURI);

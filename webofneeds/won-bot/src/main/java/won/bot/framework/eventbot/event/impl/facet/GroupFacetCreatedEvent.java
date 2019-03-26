@@ -24,36 +24,31 @@ import won.bot.framework.eventbot.event.BaseEvent;
 import won.protocol.model.FacetType;
 
 /**
- * User: LEIH-NB
- * Date: 05.02.14
+ * User: LEIH-NB Date: 05.02.14
  */
-public class GroupFacetCreatedEvent extends BaseEvent
-{
-    private URI groupFacetURI;
-    private URI wonNodeURI;
-    private Model model;
-    private final FacetType facetType = FacetType.GroupFacet;
+public class GroupFacetCreatedEvent extends BaseEvent {
+  private URI groupFacetURI;
+  private URI wonNodeURI;
+  private Model model;
+  private final FacetType facetType = FacetType.GroupFacet;
 
-    public GroupFacetCreatedEvent(URI groupFacetURI, URI wonNodeURI, Model model) {
-        this.groupFacetURI = groupFacetURI;
-        this.wonNodeURI = wonNodeURI;
-        this.model = model;
+  public GroupFacetCreatedEvent(URI groupFacetURI, URI wonNodeURI, Model model) {
+    this.groupFacetURI = groupFacetURI;
+    this.wonNodeURI = wonNodeURI;
+    this.model = model;
 
-    }
+  }
 
-    public URI getGroupFacetURI() {
-        return groupFacetURI;
-    }
+  public URI getGroupFacetURI() {
+    return groupFacetURI;
+  }
 
-    public URI getWonNodeURI() {
-        return wonNodeURI;
-    }
+  public URI getWonNodeURI() {
+    return wonNodeURI;
+  }
 
-    public Model getModel() {
-        return model;
-    }
-
+  public Model getModel() {
+    return model;
+  }
 
 }
-
-

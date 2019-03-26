@@ -28,8 +28,7 @@ import won.bot.framework.eventbot.listener.EventListener;
 /**
  * Action that sends a generic message.
  */
-public class SendMessageAction extends BaseEventBotAction
-{
+public class SendMessageAction extends BaseEventBotAction {
 
   private String message = "Hello World";
 
@@ -53,13 +52,11 @@ public class SendMessageAction extends BaseEventBotAction
     URI connectionUri = messageEvent.getConnectionURI();
     logger.debug("sending message ");
     try {
-      getEventListenerContext().getWonMessageSender().sendWonMessage(BotActionUtils.createWonMessage
-        (getEventListenerContext(), connectionUri, message));
+      getEventListenerContext().getWonMessageSender()
+          .sendWonMessage(BotActionUtils.createWonMessage(getEventListenerContext(), connectionUri, message));
     } catch (Exception e) {
       logger.warn("could not send message via connection {}", connectionUri, e);
     }
   }
-
-
 
 }

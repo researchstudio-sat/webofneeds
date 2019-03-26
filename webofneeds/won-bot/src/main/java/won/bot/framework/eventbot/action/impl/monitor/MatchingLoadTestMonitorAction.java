@@ -36,8 +36,7 @@ import won.bot.framework.eventbot.listener.EventListener;
 /**
  * Created by hfriedrich on 02.10.2015.
  */
-public class MatchingLoadTestMonitorAction extends BaseEventBotAction
-{
+public class MatchingLoadTestMonitorAction extends BaseEventBotAction {
   Map<String, Long> needEventStartTime = Collections.synchronizedMap(new HashMap<>());
   Map<String, List<Long>> hintEventReceivedTime = Collections.synchronizedMap(new HashMap<>());
   Map<String, Split> needSplits = Collections.synchronizedMap(new HashMap<>());
@@ -64,7 +63,8 @@ public class MatchingLoadTestMonitorAction extends BaseEventBotAction
 
     } else if (event instanceof HintFromMatcherEvent) {
 
-      logger.info("RECEIVED EVENT {} for uri {}", event, ((HintFromMatcherEvent) event).getMatch().getFromNeed().toString());
+      logger.info("RECEIVED EVENT {} for uri {}", event,
+          ((HintFromMatcherEvent) event).getMatch().getFromNeed().toString());
       long hintReceivedTime = System.currentTimeMillis();
       String needUri = ((HintFromMatcherEvent) event).getMatch().getFromNeed().toString();
       needSplits.get(((HintFromMatcherEvent) event).getMatch().getFromNeed().toString()).stop();
@@ -162,7 +162,7 @@ public class MatchingLoadTestMonitorAction extends BaseEventBotAction
 
   private float getNeedsWithNeedsPerSecond(long startTime) {
     long duration = System.currentTimeMillis() - startTime;
-    return ((float)getNeedsWithHints() * 1000) / duration;
+    return ((float) getNeedsWithHints() * 1000) / duration;
   }
 
 }

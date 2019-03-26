@@ -13,27 +13,27 @@ import won.matcher.utils.preprocessing.OpenNlpTokenExtraction;
  */
 public class TensorEntryTokenizer implements TensorEntryGenerator {
 
-    private OpenNlpTokenExtraction tokenizer;
-    private Collection<TensorEntry> tensorEntries;
+  private OpenNlpTokenExtraction tokenizer;
+  private Collection<TensorEntry> tensorEntries;
 
-    public TensorEntryTokenizer(Collection<TensorEntry> tensorEntries) throws IOException {
+  public TensorEntryTokenizer(Collection<TensorEntry> tensorEntries) throws IOException {
 
-        this.tensorEntries = tensorEntries;
-        tokenizer = new OpenNlpTokenExtraction();
+    this.tensorEntries = tensorEntries;
+    tokenizer = new OpenNlpTokenExtraction();
+  }
+
+  @Override
+  public Collection<TensorEntry> generateTensorEntries() throws IOException {
+
+    Collection<TensorEntry> tokenEntries = new LinkedList<>();
+    for (TensorEntry entry : tensorEntries) {
+      String tokens[] = tokenizer.extractWordTokens(entry.getValue());
+      for (String token : tokens) {
+        TensorEntry newEntry = new TensorEntry(entry.getSliceName(), entry.getNeedUri(), token);
+        tokenEntries.add(newEntry);
+      }
     }
 
-    @Override
-    public Collection<TensorEntry> generateTensorEntries() throws IOException {
-
-        Collection<TensorEntry> tokenEntries = new LinkedList<>();
-        for (TensorEntry entry : tensorEntries) {
-            String tokens[] = tokenizer.extractWordTokens(entry.getValue());
-            for (String token : tokens) {
-                TensorEntry newEntry = new TensorEntry(entry.getSliceName(), entry.getNeedUri(), token);
-                tokenEntries.add(newEntry);
-            }
-        }
-
-        return tokenEntries;
-    }
+    return tokenEntries;
+  }
 }

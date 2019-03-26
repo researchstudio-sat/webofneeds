@@ -24,24 +24,21 @@ import won.bot.framework.eventbot.event.impl.command.connectionmessage.Connectio
 import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
 
 /**
- * Behaviour that responds to a ConnectionMessageCommand by executing the ExecuteConnectionMessageCommandAction
+ * Behaviour that responds to a ConnectionMessageCommand by executing the
+ * ExecuteConnectionMessageCommandAction
  */
 public class ConnectionMessageBehaviour extends BotBehaviour {
-    public ConnectionMessageBehaviour(EventListenerContext context) {
-        super(context);
-    }
+  public ConnectionMessageBehaviour(EventListenerContext context) {
+    super(context);
+  }
 
-    public ConnectionMessageBehaviour(EventListenerContext context, String name) {
-        super(context, name);
-    }
+  public ConnectionMessageBehaviour(EventListenerContext context, String name) {
+    super(context, name);
+  }
 
-    @Override
-    protected void onActivate(Optional<Object> message) {
-        this.subscribeWithAutoCleanup(ConnectionMessageCommandEvent.class,
-            new ActionOnEventListener(
-                context,
-                new ExecuteConnectionMessageCommandAction(context)
-            )
-        );
-    }
+  @Override
+  protected void onActivate(Optional<Object> message) {
+    this.subscribeWithAutoCleanup(ConnectionMessageCommandEvent.class,
+        new ActionOnEventListener(context, new ExecuteConnectionMessageCommandAction(context)));
+  }
 }

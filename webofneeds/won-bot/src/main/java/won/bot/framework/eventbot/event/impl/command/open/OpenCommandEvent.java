@@ -27,32 +27,32 @@ import won.protocol.model.Connection;
  * Instructs the bot to open the specified connection behalf of the need.
  */
 public class OpenCommandEvent extends BaseNeedAndConnectionSpecificEvent implements MessageCommandEvent {
-    private String welcomeMessage;
+  private String welcomeMessage;
 
-    public OpenCommandEvent(Connection con, String welcomeMessage){
-        super(con);
-        this.welcomeMessage = welcomeMessage;
-    }
+  public OpenCommandEvent(Connection con, String welcomeMessage) {
+    super(con);
+    this.welcomeMessage = welcomeMessage;
+  }
 
-    public OpenCommandEvent(Connection con){
-        this(con, "Hello!");
-    }
+  public OpenCommandEvent(Connection con) {
+    this(con, "Hello!");
+  }
 
-    public OpenCommandEvent(URI needURI, URI remoteNeedURI, URI connectionURI, String welcomeMessage) {
-        this(makeConnection(needURI, remoteNeedURI, connectionURI), welcomeMessage);
-    }
+  public OpenCommandEvent(URI needURI, URI remoteNeedURI, URI connectionURI, String welcomeMessage) {
+    this(makeConnection(needURI, remoteNeedURI, connectionURI), welcomeMessage);
+  }
 
-    public OpenCommandEvent(URI needURI, URI remoteNeedURI, URI connectionURI) {
-        this(needURI, remoteNeedURI, connectionURI, "Hello!");
-    }
+  public OpenCommandEvent(URI needURI, URI remoteNeedURI, URI connectionURI) {
+    this(needURI, remoteNeedURI, connectionURI, "Hello!");
+  }
 
-    @Override
-    public WonMessageType getWonMessageType() {
-        return WonMessageType.OPEN;
-    }
+  @Override
+  public WonMessageType getWonMessageType() {
+    return WonMessageType.OPEN;
+  }
 
-    public String getWelcomeMessage() {
-        return welcomeMessage;
-    }
+  public String getWelcomeMessage() {
+    return welcomeMessage;
+  }
 
 }

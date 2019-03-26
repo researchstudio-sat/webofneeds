@@ -24,19 +24,20 @@ import won.bot.framework.eventbot.event.impl.cmd.BaseCommandSuccessEvent;
  * Indicates that a ValidateConnectionCommandEvent succeeded.
  */
 public class CrawlConnectionCommandSuccessEvent extends BaseCommandSuccessEvent<CrawlConnectionCommandEvent> {
-    private Dataset crawledData;
+  private Dataset crawledData;
 
-    public CrawlConnectionCommandSuccessEvent(CrawlConnectionCommandEvent originalCommandEvent, Dataset crawledData, String message) {
-        super(message, originalCommandEvent);
-        this.crawledData = crawledData;
-    }
+  public CrawlConnectionCommandSuccessEvent(CrawlConnectionCommandEvent originalCommandEvent, Dataset crawledData,
+      String message) {
+    super(message, originalCommandEvent);
+    this.crawledData = crawledData;
+  }
 
-    public CrawlConnectionCommandSuccessEvent(CrawlConnectionCommandEvent originalCommandEvent, Dataset crawledData) {
-        super(originalCommandEvent);
-        this.crawledData = crawledData;
-    }
+  public CrawlConnectionCommandSuccessEvent(CrawlConnectionCommandEvent originalCommandEvent, Dataset crawledData) {
+    super(originalCommandEvent);
+    this.crawledData = crawledData;
+  }
 
-    public Dataset getCrawledData() {
-        return this.crawledData;
-    }
+  public Dataset getCrawledData() {
+    return this.crawledData;
+  }
 }

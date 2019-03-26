@@ -20,7 +20,8 @@ import java.util.Random;
 
 /**
  * Generates a random string of specified length cheaply, but not securely.
- * Taken from: http://stackoverflow.com/questions/41107/how-to-generate-a-random-alpha-numeric-string
+ * Taken from:
+ * http://stackoverflow.com/questions/41107/how-to-generate-a-random-alpha-numeric-string
  */
 public class CheapInsecureRandomString {
 
@@ -36,7 +37,6 @@ public class CheapInsecureRandomString {
   }
 
   private final Random random = new Random(System.currentTimeMillis());
-
 
   public CheapInsecureRandomString() {
 

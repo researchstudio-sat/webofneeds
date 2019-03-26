@@ -21,21 +21,20 @@ import java.net.URI;
 import won.protocol.exception.NoSuchConnectionException;
 
 /**
- * User: LEIH-NB
- * Date: 25.02.14
+ * User: LEIH-NB Date: 25.02.14
  */
 public interface ProtocolCommunicationService {
-    /**
-     *
-     * @param resourceUri is either wonNodeUri or needUri
-     * @return
-     * @throws NoSuchConnectionException
-     */
-    URI getBrokerUri(URI resourceUri) throws NoSuchConnectionException;
+  /**
+   *
+   * @param resourceUri is either wonNodeUri or needUri
+   * @return
+   * @throws NoSuchConnectionException
+   */
+  URI getBrokerUri(URI resourceUri) throws NoSuchConnectionException;
 
-    ActiveMQService getActiveMQService();
+  ActiveMQService getActiveMQService();
 
-    void setActiveMQService(ActiveMQService activeMQService);
+  void setActiveMQService(ActiveMQService activeMQService);
 
-    CamelConfigurator getProtocolCamelConfigurator();
+  CamelConfigurator getProtocolCamelConfigurator();
 }

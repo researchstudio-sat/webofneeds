@@ -15,18 +15,18 @@ import won.bot.framework.eventbot.event.impl.telegram.TelegramCreateNeedEvent;
  * Created by fsuda on 15.12.2016.
  */
 public class OfferBotCommand extends BotCommand {
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+  protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private EventBus bus;
+  private EventBus bus;
 
-    public OfferBotCommand(String commandIdentifier, String description, EventBus bus) {
-        super(commandIdentifier, description);
-        this.bus = bus;
-    }
+  public OfferBotCommand(String commandIdentifier, String description, EventBus bus) {
+    super(commandIdentifier, description);
+    this.bus = bus;
+  }
 
-    @Override
-    public void execute(AbsSender absSender, User user, Chat chat, String[] strings) {
-        strings = ArrayUtils.add(strings, 0, "[OFFER]");
-        bus.publish(new TelegramCreateNeedEvent(absSender, user, chat, strings));
-    }
+  @Override
+  public void execute(AbsSender absSender, User user, Chat chat, String[] strings) {
+    strings = ArrayUtils.add(strings, 0, "[OFFER]");
+    bus.publish(new TelegramCreateNeedEvent(absSender, user, chat, strings));
+  }
 }

@@ -50,11 +50,9 @@ import won.protocol.util.DataAccessUtils;
 import won.protocol.util.LoggingUtils;
 
 /**
- * User: syim
- * Date: 27.01.14
+ * User: syim Date: 27.01.14
  */
-public class OwnerProtocolCommunicationServiceImpl implements OwnerProtocolCommunicationService
-{
+public class OwnerProtocolCommunicationServiceImpl implements OwnerProtocolCommunicationService {
 
   @Autowired
   private OwnerProtocolCamelConfiguratorImpl ownerProtocolCamelConfigurator;
@@ -72,34 +70,33 @@ public class OwnerProtocolCommunicationServiceImpl implements OwnerProtocolCommu
   private KeyStoreService keyStoreService;
   private AliasGenerator aliasGenerator = new AliasFromFingerprintGenerator();
 
-  //can also be autowired
+  // can also be autowired
   private RegistrationClient registrationClient;
 
   public static final String REMOTE_INCOMING_QUEUE_PREFIX = ":queue:OwnerProtocol.Out.";
 
   Logger logger = LoggerFactory.getLogger(this.getClass());
 
-
-
   public void setRegistrationClient(final RegistrationRestClientHttps registrationClient) {
     this.registrationClient = registrationClient;
   }
 
   public synchronized boolean isRegisteredWithWonNode(URI wonNodeURI) {
-      try {
-          String ownerApplicationId = calculateOwnerApplicationIdFromOwnerCertificate();
-          logger.debug("using ownerApplicationId: {}", ownerApplicationId );
-          WonNode wonNode = wonNodeRepository.findOneByWonNodeURIAndOwnerApplicationID(wonNodeURI, ownerApplicationId);
-          return ownerProtocolCamelConfigurator.getCamelContext().getComponent(wonNode.getBrokerComponent()) != null;
-      } catch (Exception e) {
-          logger.info("error while checking if we are registered with WoN node " + wonNodeURI, e);
-      }
-      return false;
+    try {
+      String ownerApplicationId = calculateOwnerApplicationIdFromOwnerCertificate();
+      logger.debug("using ownerApplicationId: {}", ownerApplicationId);
+      WonNode wonNode = wonNodeRepository.findOneByWonNodeURIAndOwnerApplicationID(wonNodeURI, ownerApplicationId);
+      return ownerProtocolCamelConfigurator.getCamelContext().getComponent(wonNode.getBrokerComponent()) != null;
+    } catch (Exception e) {
+      logger.info("error while checking if we are registered with WoN node " + wonNodeURI, e);
+    }
+    return false;
   }
-  
+
   /**
-   * Registers the owner application at a won node. Owner Id is typically his Key ID (lower 64 bits of the owner public
-   * key fingerprint). Unless there is a collision of owner ids on the node - then the owner can assign another id...
+   * Registers the owner application at a won node. Owner Id is typically his Key
+   * ID (lower 64 bits of the owner public key fingerprint). Unless there is a
+   * collision of owner ids on the node - then the owner can assign another id...
    *
    * @return ownerApplicationId
    * @throws Exception
@@ -109,37 +106,42 @@ public class OwnerProtocolCommunicationServiceImpl implements OwnerProtocolCommu
     logger.debug("setting up communication with won node {} ", wonNodeURI);
 
     String ownerApplicationId = calculateOwnerApplicationIdFromOwnerCertificate();
-    logger.debug("using ownerApplicationId: {}", ownerApplicationId );
+    logger.debug("using ownerApplicationId: {}", ownerApplicationId);
     WonNode wonNode = wonNodeRepository.findOneByWonNodeURIAndOwnerApplicationID(wonNodeURI, ownerApplicationId);
 
     if (wonNode != null) {
-      //we think we are registered. Try to connect. If that fails, we'll try to re register further below
+      // we think we are registered. Try to connect. If that fails, we'll try to re
+      // register further below
       try {
-          logger.debug("we're already registered. Connecting with WoN node: " + wonNodeURI);
-          configureCamelEndpoint(wonNodeURI, ownerApplicationId);
-          configureRemoteEndpointForOwnerApplication(ownerApplicationId, getProtocolCamelConfigurator().getEndpoint
-            (wonNodeURI));
-          logger.debug("connected with WoN node: " + wonNodeURI);
-          return;
-        } catch (Exception e){
-          LoggingUtils.logMessageAsInfoAndStacktraceAsDebug(logger, e, "We thought we were already registerd, but connecting to {} failed With an exception. Trying to re-register. ", wonNodeURI);
-        }
-      //we'll try to re-register now, see below. This is necessary if the WoN node forgets about us for whatever
-      //reason.
+        logger.debug("we're already registered. Connecting with WoN node: " + wonNodeURI);
+        configureCamelEndpoint(wonNodeURI, ownerApplicationId);
+        configureRemoteEndpointForOwnerApplication(ownerApplicationId,
+            getProtocolCamelConfigurator().getEndpoint(wonNodeURI));
+        logger.debug("connected with WoN node: " + wonNodeURI);
+        return;
+      } catch (Exception e) {
+        LoggingUtils.logMessageAsInfoAndStacktraceAsDebug(logger, e,
+            "We thought we were already registerd, but connecting to {} failed With an exception. Trying to re-register. ",
+            wonNodeURI);
+      }
+      // we'll try to re-register now, see below. This is necessary if the WoN node
+      // forgets about us for whatever
+      // reason.
     }
 
-    logger.info("we're not yet registered. Registering with WoN node {} under ownerApplicationId {}", wonNodeURI, ownerApplicationId);
+    logger.info("we're not yet registered. Registering with WoN node {} under ownerApplicationId {}", wonNodeURI,
+        ownerApplicationId);
     String nodeGeneratedOwnerApplicationId = registrationClient.register(wonNodeURI.toString());
-    if (!ownerApplicationId.equals(nodeGeneratedOwnerApplicationId) ){
-      throw new java.lang.IllegalStateException("WoN node " + wonNodeURI +" generated an ownerApplicationId that differs from" +
-                                        " ours. Node generated: " + nodeGeneratedOwnerApplicationId + ", we " +
-                                        "generated: " + ownerApplicationId);
+    if (!ownerApplicationId.equals(nodeGeneratedOwnerApplicationId)) {
+      throw new java.lang.IllegalStateException(
+          "WoN node " + wonNodeURI + " generated an ownerApplicationId that differs from" + " ours. Node generated: "
+              + nodeGeneratedOwnerApplicationId + ", we " + "generated: " + ownerApplicationId);
     }
-    logger.debug("registered with WoN node: " + wonNodeURI +",  ownerappID: " + ownerApplicationId);
+    logger.debug("registered with WoN node: " + wonNodeURI + ",  ownerappID: " + ownerApplicationId);
     camelConfiguration = configureCamelEndpoint(wonNodeURI, ownerApplicationId);
     storeWonNode(ownerApplicationId, camelConfiguration, wonNodeURI);
-    configureRemoteEndpointForOwnerApplication(ownerApplicationId, getProtocolCamelConfigurator().getEndpoint
-      (wonNodeURI));
+    configureRemoteEndpointForOwnerApplication(ownerApplicationId,
+        getProtocolCamelConfigurator().getEndpoint(wonNodeURI));
     logger.info("connected with WoN node: : " + wonNodeURI);
 
   }
@@ -149,14 +151,18 @@ public class OwnerProtocolCommunicationServiceImpl implements OwnerProtocolCommu
     return aliasGenerator.generateAlias((X509Certificate) cert);
   }
 
-  // TODO this is messy, has to be improved, maybe endpoints should be obtained in the same step as registration,
-  // e.g. the register call returns not only application id, but also the endpoints...
+  // TODO this is messy, has to be improved, maybe endpoints should be obtained in
+  // the same step as registration,
+  // e.g. the register call returns not only application id, but also the
+  // endpoints...
   private void configureRemoteEndpointForOwnerApplication(String ownerApplicationID, String remoteEndpoint)
-    throws CamelConfigurationFailedException, ExecutionException, InterruptedException {
-    
-    getProtocolCamelConfigurator().addRemoteQueueListener(REMOTE_INCOMING_QUEUE_PREFIX + ownerApplicationID, URI.create(remoteEndpoint));
-    //TODO: some checks needed to assure that the application is configured correctly.
-    //todo this method should return routes
+      throws CamelConfigurationFailedException, ExecutionException, InterruptedException {
+
+    getProtocolCamelConfigurator().addRemoteQueueListener(REMOTE_INCOMING_QUEUE_PREFIX + ownerApplicationID,
+        URI.create(remoteEndpoint));
+    // TODO: some checks needed to assure that the application is configured
+    // correctly.
+    // todo this method should return routes
   }
 
   /**
@@ -169,7 +175,7 @@ public class OwnerProtocolCommunicationServiceImpl implements OwnerProtocolCommu
    * @throws NoSuchConnectionException
    */
   public WonNode storeWonNode(String ownerApplicationId, CamelConfiguration camelConfiguration, URI wonNodeURI)
-    throws NoSuchConnectionException {
+      throws NoSuchConnectionException {
     WonNode wonNode = DataAccessUtils.loadWonNode(wonNodeRepository, wonNodeURI);
     if (wonNode == null) {
       wonNode = new WonNode();
@@ -185,40 +191,42 @@ public class OwnerProtocolCommunicationServiceImpl implements OwnerProtocolCommu
     return wonNode;
   }
 
-  public final synchronized CamelConfiguration configureCamelEndpoint(URI wonNodeUri, String ownerId) throws
-    Exception {
+  public final synchronized CamelConfiguration configureCamelEndpoint(URI wonNodeUri, String ownerId) throws Exception {
 
     CamelConfiguration camelConfiguration = new CamelConfiguration();
     URI brokerURI = activeMQService.getBrokerEndpoint(wonNodeUri);
     String ownerProtocolQueueName;
     List<WonNode> wonNodeList = wonNodeRepository.findByWonNodeURI(wonNodeUri);
-    //OwnerProtocolCamelConfigurator ownerProtocolCamelConfigurator = camelConfiguratorFactory.createCamelConfigurator(methodName);
+    // OwnerProtocolCamelConfigurator ownerProtocolCamelConfigurator =
+    // camelConfiguratorFactory.createCamelConfigurator(methodName);
     logger.debug("configuring camel endpoint");
-    if (ownerProtocolCamelConfigurator.getBrokerComponentName(brokerURI)!=null &&
-      ownerProtocolCamelConfigurator
-        .getEndpoint(wonNodeUri)!=null){
+    if (ownerProtocolCamelConfigurator.getBrokerComponentName(brokerURI) != null
+        && ownerProtocolCamelConfigurator.getEndpoint(wonNodeUri) != null) {
       logger.debug("wonNode known");
       WonNode wonNode = wonNodeList.get(0);
-      //brokerURI = wonNode.getBrokerURI();
+      // brokerURI = wonNode.getBrokerURI();
       camelConfiguration.setEndpoint(wonNode.getOwnerProtocolEndpoint());
-      if (ownerProtocolCamelConfigurator.getCamelContext().getComponent(wonNodeList.get(0).getBrokerComponent())==null){
-        //camelConfiguration.setBrokerComponentName(ownerProtocolCamelConfigurator.addCamelComponentForWonNodeBroker
-        //  (wonNode.getWonNodeURI(),brokerURI,wonNode.getOwnerApplicationID()));
+      if (ownerProtocolCamelConfigurator.getCamelContext()
+          .getComponent(wonNodeList.get(0).getBrokerComponent()) == null) {
+        // camelConfiguration.setBrokerComponentName(ownerProtocolCamelConfigurator.addCamelComponentForWonNodeBroker
+        // (wonNode.getWonNodeURI(),brokerURI,wonNode.getOwnerApplicationID()));
         ownerProtocolQueueName = activeMQService.getProtocolQueueNameWithResource(wonNodeUri);
         String endpoint = ownerProtocolCamelConfigurator.configureCamelEndpointForNodeURI(wonNodeUri, brokerURI,
-                                                                                          ownerProtocolQueueName);
+            ownerProtocolQueueName);
         camelConfiguration.setBrokerComponentName(ownerProtocolCamelConfigurator.getBrokerComponentName(brokerURI));
 
-        ownerProtocolCamelConfigurator.getCamelContext().getComponent(camelConfiguration.getBrokerComponentName()).createEndpoint(camelConfiguration.getEndpoint());
-        if(ownerProtocolCamelConfigurator.getCamelContext().getRoute(wonNode.getStartingComponent())==null)
+        ownerProtocolCamelConfigurator.getCamelContext().getComponent(camelConfiguration.getBrokerComponentName())
+            .createEndpoint(camelConfiguration.getEndpoint());
+        if (ownerProtocolCamelConfigurator.getCamelContext().getRoute(wonNode.getStartingComponent()) == null)
           ownerProtocolCamelConfigurator.addRouteForEndpoint(null, wonNode.getWonNodeURI());
       }
-    } else {  //if unknown wonNode
+    } else { // if unknown wonNode
       logger.debug("wonNode unknown");
-      //TODO: brokerURI gets the node information already. so requesting node information again for queuename would be duplicate
+      // TODO: brokerURI gets the node information already. so requesting node
+      // information again for queuename would be duplicate
       ownerProtocolQueueName = activeMQService.getProtocolQueueNameWithResource(wonNodeUri);
       String endpoint = ownerProtocolCamelConfigurator.configureCamelEndpointForNodeURI(wonNodeUri, brokerURI,
-                                                                                        ownerProtocolQueueName);
+          ownerProtocolQueueName);
       camelConfiguration.setEndpoint(endpoint);
       camelConfiguration.setBrokerComponentName(ownerProtocolCamelConfigurator.getBrokerComponentName(brokerURI));
       ownerProtocolCamelConfigurator.addRouteForEndpoint(null, wonNodeUri);
@@ -227,18 +235,17 @@ public class OwnerProtocolCommunicationServiceImpl implements OwnerProtocolCommu
     return camelConfiguration;
   }
 
-
-
   @Override
-  public synchronized URI  getWonNodeUriWithConnectionUri(URI connectionUri) throws NoSuchConnectionException {
-    //TODO: make this more efficient
+  public synchronized URI getWonNodeUriWithConnectionUri(URI connectionUri) throws NoSuchConnectionException {
+    // TODO: make this more efficient
     Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionUri);
     URI needURI = con.getNeedURI();
     Need need = needRepository.findByNeedURI(needURI).get(0);
     return need.getWonNodeURI();
   }
+
   @Override
-  public synchronized URI  getWonNodeUriWithNeedUri(URI needUri) throws NoSuchConnectionException {
+  public synchronized URI getWonNodeUriWithNeedUri(URI needUri) throws NoSuchConnectionException {
     Need need = needRepository.findByNeedURI(needUri).get(0);
     return need.getWonNodeURI();
   }
@@ -247,6 +254,7 @@ public class OwnerProtocolCommunicationServiceImpl implements OwnerProtocolCommu
   public URI getBrokerUri(URI resourceUri) throws NoSuchConnectionException {
     return activeMQService.getBrokerEndpoint(resourceUri);
   }
+
   @Override
   public ActiveMQService getActiveMQService() {
     return activeMQService;
@@ -256,6 +264,7 @@ public class OwnerProtocolCommunicationServiceImpl implements OwnerProtocolCommu
   public void setActiveMQService(ActiveMQService activeMQService) {
     this.activeMQService = activeMQService;
   }
+
   @Override
   public OwnerProtocolCamelConfigurator getProtocolCamelConfigurator() {
     return ownerProtocolCamelConfigurator;

@@ -19,10 +19,10 @@ package won.cryptography.keymanagement;
 /**
  * Uses the NeedURI as alias.
  */
-public class NeedUriAsAliasStrategy implements KeyPairAliasDerivationStrategy{
-    @Override
-    public String getAliasForNeedUri(String needURI) {
-    	// we allow null to be passed here so clients can check for a default alias
-        return needURI;
-    }
+public class NeedUriAsAliasStrategy implements KeyPairAliasDerivationStrategy {
+  @Override
+  public String getAliasForNeedUri(String needURI) {
+    // we allow null to be passed here so clients can check for a default alias
+    return needURI;
+  }
 }

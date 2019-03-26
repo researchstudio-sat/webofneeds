@@ -19,8 +19,7 @@ package won.protocol.exception;
 /**
  * Unchecked excecption for all problems regarding data integrity.
  */
-public class DataIntegrityException extends RuntimeException
-{
+public class DataIntegrityException extends RuntimeException {
   public DataIntegrityException() {
   }
 
@@ -36,7 +35,8 @@ public class DataIntegrityException extends RuntimeException
     super(cause);
   }
 
-  public DataIntegrityException(final String message, final Throwable cause, final boolean enableSuppression, final boolean writableStackTrace) {
+  public DataIntegrityException(final String message, final Throwable cause, final boolean enableSuppression,
+      final boolean writableStackTrace) {
     super(message, cause, enableSuppression, writableStackTrace);
   }
 }

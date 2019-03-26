@@ -21,13 +21,12 @@ import won.matcher.service.common.spring.SpringExtension;
  * The main application configuration.
  */
 @Configuration
-@PropertySource({"file:${WON_CONFIG_DIR}/matcher-rescal.properties",
-                 "file:${WON_CONFIG_DIR}/cluster-node.properties"})
-@ComponentScan({"won.matcher.service.common.config", "won.matcher.service.common.service.http",
-                "won.matcher.rescal.spring", "won.matcher.rescal.actor", "won.matcher.rescal.config",
-                "won.matcher.rescal.service"})
-public class MatcherRescalAppConfiguration
-{
+@PropertySource({ "file:${WON_CONFIG_DIR}/matcher-rescal.properties",
+    "file:${WON_CONFIG_DIR}/cluster-node.properties" })
+@ComponentScan({ "won.matcher.service.common.config", "won.matcher.service.common.service.http",
+    "won.matcher.rescal.spring", "won.matcher.rescal.actor", "won.matcher.rescal.config",
+    "won.matcher.rescal.service" })
+public class MatcherRescalAppConfiguration {
   @Autowired
   private ApplicationContext applicationContext;
 
@@ -48,12 +47,12 @@ public class MatcherRescalAppConfiguration
     seedNodes += "]";
 
     final Config applicationConf = ConfigFactory.load();
-    final Config config = ConfigFactory.parseString("akka.cluster.seed-nodes=" + seedNodes).
-      withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.bind-port=" + clusterConfig.getLocalPort())).
-                                         withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.hostname=" + clusterConfig.getNodeHost())).
-                                         withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.port=" + clusterConfig.getLocalPort())).
-                                         withFallback(ConfigFactory.parseString("akka.cluster.roles=[matcher]")).
-                                         withFallback(ConfigFactory.load(applicationConf));
+    final Config config = ConfigFactory.parseString("akka.cluster.seed-nodes=" + seedNodes)
+        .withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.bind-port=" + clusterConfig.getLocalPort()))
+        .withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.hostname=" + clusterConfig.getNodeHost()))
+        .withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.port=" + clusterConfig.getLocalPort()))
+        .withFallback(ConfigFactory.parseString("akka.cluster.roles=[matcher]"))
+        .withFallback(ConfigFactory.load(applicationConf));
 
     ActorSystem system = ActorSystem.create(clusterConfig.getName(), config);
     LoggingAdapter log = Logging.getLogger(system, this);
@@ -64,8 +63,8 @@ public class MatcherRescalAppConfiguration
     return system;
   }
 
-  //To resolve ${} in @Value
-  //found in http://www.mkyong.com/spring/spring-propertysources-example/
+  // To resolve ${} in @Value
+  // found in http://www.mkyong.com/spring/spring-propertysources-example/
   @Bean
   public static PropertySourcesPlaceholderConfigurer propertyConfigInDev() {
     return new PropertySourcesPlaceholderConfigurer();

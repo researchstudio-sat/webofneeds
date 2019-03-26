@@ -14,8 +14,7 @@ import scala.concurrent.duration.FiniteDuration;
  */
 @Configuration
 @PropertySource("file:${WON_CONFIG_DIR}/matcher-rescal.properties")
-public class RescalMatcherConfig
-{
+public class RescalMatcherConfig {
   @Value("${matcher.rescal.uri.sparql.endpoint}")
   private String sparqlEndpoint;
 
@@ -52,7 +51,6 @@ public class RescalMatcherConfig
   public void setPublicMatcherUri(final String publicMatcherUri) {
     this.publicMatcherUri = publicMatcherUri;
   }
-
 
   public String getExecutionDirectory() {
     return executionDirectory;

@@ -29,14 +29,12 @@ import org.slf4j.LoggerFactory;
 import won.cryptography.ssl.AliasFromFingerprintGenerator;
 import won.cryptography.ssl.AliasGenerator;
 
-
 /**
- * BrokerFilter implementation that authorizes consumers if their TLS certificate digest matches
- * the suffix of the queue name they want to listen to.
+ * BrokerFilter implementation that authorizes consumers if their TLS
+ * certificate digest matches the suffix of the queue name they want to listen
+ * to.
  */
-public class CertificateCheckingBrokerFilter extends BrokerFilter
-{
-
+public class CertificateCheckingBrokerFilter extends BrokerFilter {
 
   private String queueNamePrefixToCheck;
   private AliasGenerator aliasGenerator = new AliasFromFingerprintGenerator();
@@ -51,25 +49,28 @@ public class CertificateCheckingBrokerFilter extends BrokerFilter
   public Subscription addConsumer(final ConnectionContext context, final ConsumerInfo info) throws Exception {
     assert info != null : "ConsumerInfo must not be null";
     assert context != null : "ConnectionContext must not be null";
-    if (shouldCheck(info)){
+    if (shouldCheck(info)) {
       boolean checkPassed = false;
-        try {
-          checkPassed = isOwnerAllowedToConsume(context, info);
-        } catch (Exception e){
-          throw new SecurityException("could not perform access control check for consumer " + info.getConsumerId()
-                                        +" and destination "+ info.getDestination());
-        }
-      if (!checkPassed) throw new SecurityException("consumer " + info.getConsumerId()
-        +" not allowed to consume from destination "+ info.getDestination());
+      try {
+        checkPassed = isOwnerAllowedToConsume(context, info);
+      } catch (Exception e) {
+        throw new SecurityException("could not perform access control check for consumer " + info.getConsumerId()
+            + " and destination " + info.getDestination());
+      }
+      if (!checkPassed)
+        throw new SecurityException(
+            "consumer " + info.getConsumerId() + " not allowed to consume from destination " + info.getDestination());
     }
     logger.debug("consumer added. destination: {}, consumerId: {}", info.getDestination(), info.getConsumerId());
     return super.addConsumer(context, info);
   }
 
   /**
-   * Owner id is defined as a sha3-224 digest of the owner's certificate , based on the results of
-   * comparing the owner id in queue name and the provided certificate fingerprint, the access
-   * to read from that queue can be granted or denied.
+   * Owner id is defined as a sha3-224 digest of the owner's certificate , based
+   * on the results of comparing the owner id in queue name and the provided
+   * certificate fingerprint, the access to read from that queue can be granted or
+   * denied.
+   * 
    * @param context
    * @param info
    * @return
@@ -82,7 +83,7 @@ public class CertificateCheckingBrokerFilter extends BrokerFilter
       try {
         certificateDigest = aliasGenerator.generateAlias(ownerCert);
         logger.debug("digest value of certificate: {}", certificateDigest);
-      } catch (Exception  e) {
+      } catch (Exception e) {
         new IllegalArgumentException("Could not calculate sha-1 of owner certificate", e);
       }
       String forOwnerId = info.getDestination().getPhysicalName().substring(queueNamePrefixToCheck.length());

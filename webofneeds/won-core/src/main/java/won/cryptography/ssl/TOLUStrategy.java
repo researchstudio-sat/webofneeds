@@ -10,14 +10,13 @@ import org.slf4j.LoggerFactory;
 import won.cryptography.service.TrustStoreService;
 
 /**
- * Can be useful for development: a certificate will become trusted after application of this strategy, while if
- * already a certificated under the same alias is stored, it will be replaced by this latest certificate.
+ * Can be useful for development: a certificate will become trusted after
+ * application of this strategy, while if already a certificated under the same
+ * alias is stored, it will be replaced by this latest certificate.
  *
- * User: ypanchenko
- * Date: 05.08.2015
+ * User: ypanchenko Date: 05.08.2015
  */
-public class TOLUStrategy implements TrustStrategy
-{
+public class TOLUStrategy implements TrustStrategy {
   private TrustStoreService trustStoreService;
   private AliasGenerator aliasGenerator;
 
@@ -31,10 +30,8 @@ public class TOLUStrategy implements TrustStrategy
     this.aliasGenerator = aliasGenerator;
   }
 
-
-
-  public boolean isTrusted(final X509Certificate[] x509Certificates, final String authType) throws
-    CertificateException {
+  public boolean isTrusted(final X509Certificate[] x509Certificates, final String authType)
+      throws CertificateException {
 
     if (x509Certificates == null || x509Certificates.length < 1) {
       return false;
@@ -42,7 +39,7 @@ public class TOLUStrategy implements TrustStrategy
     // extract certificate
     X509Certificate cert = x509Certificates[0];
     // prepare alias
-    String alias =  aliasGenerator.generateAlias(cert);
+    String alias = aliasGenerator.generateAlias(cert);
 
     if (trustStoreService.isCertKnown(cert)) {
       return true;
@@ -57,6 +54,5 @@ public class TOLUStrategy implements TrustStrategy
       return false;
     }
   }
-
 
 }

@@ -21,11 +21,9 @@ import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.SIOC;
 
 /**
- * User: gabriel
- * Date: 17/01/14
+ * User: gabriel Date: 17/01/14
  */
-public class CommentFacet extends AbstractFacet
-{
+public class CommentFacet extends AbstractFacet {
   private Logger logger = LoggerFactory.getLogger(this.getClass());
 
   @Override
@@ -33,39 +31,37 @@ public class CommentFacet extends AbstractFacet
     return FacetType.CommentFacet;
   }
 
-
-
   @Override
   public void closeFromNeed(final Connection con, final Model content, final WonMessage wonMessage)
-    throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+      throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     super.closeFromNeed(con, content, wonMessage);
     removeDataManagedByFacet(con);
   }
 
   @Override
   public void closeFromOwner(final Connection con, final Model content, final WonMessage wonMessage)
-    throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+      throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     super.closeFromOwner(con, content, wonMessage);
     removeDataManagedByFacet(con);
   }
 
   @Override
   public void openFromOwner(final Connection con, final Model content, final WonMessage wonMessage)
-    throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+      throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     super.openFromOwner(con, content, wonMessage);
     addDataManagedByFacet(con);
   }
 
   @Override
   public void openFromNeed(final Connection con, final Model content, final WonMessage wonMessage)
-    throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+      throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
     super.openFromNeed(con, content, wonMessage);
     addDataManagedByFacet(con);
   }
 
-  private void addDataManagedByFacet(final Connection con){
+  private void addDataManagedByFacet(final Connection con) {
     Need need = needRepository.findOneByNeedURI(con.getNeedURI());
-    Dataset needContent =  need.getDatatsetHolder().getDataset();
+    Dataset needContent = need.getDatatsetHolder().getDataset();
 
     Model facetManagedGraph = getFacetManagedGraph(con.getNeedURI(), needContent);
 
@@ -76,20 +72,19 @@ public class CommentFacet extends AbstractFacet
     facetManagedGraph.withDefaultMappings(prefixMapping);
     facetManagedGraph.setNsPrefix("sioc", SIOC.getURI());
     Resource post = facetManagedGraph.createResource(con.getNeedURI().toString(), SIOC.POST);
-    Resource reply = facetManagedGraph.createResource(con.getRemoteNeedURI().toString(),SIOC.POST);
-    facetManagedGraph.add(facetManagedGraph
-      .createStatement(facetManagedGraph.getResource(con.getNeedURI().toString()), SIOC.HAS_REPLY,
-        facetManagedGraph.getResource(con.getRemoteNeedURI().toString())));
+    Resource reply = facetManagedGraph.createResource(con.getRemoteNeedURI().toString(), SIOC.POST);
+    facetManagedGraph.add(facetManagedGraph.createStatement(facetManagedGraph.getResource(con.getNeedURI().toString()),
+        SIOC.HAS_REPLY, facetManagedGraph.getResource(con.getRemoteNeedURI().toString())));
 
     // add WON node link
-    logger.debug("linked data:"+ RdfUtils.toString(facetManagedGraph));
+    logger.debug("linked data:" + RdfUtils.toString(facetManagedGraph));
     need.getDatatsetHolder().setDataset(needContent);
     needRepository.save(need);
   }
 
-  private void removeDataManagedByFacet(final Connection con){
+  private void removeDataManagedByFacet(final Connection con) {
     Need need = needRepository.findOneByNeedURI(con.getNeedURI());
-    Dataset needContent =  need.getDatatsetHolder().getDataset();
+    Dataset needContent = need.getDatatsetHolder().getDataset();
     removeFacetManagedGraph(con.getNeedURI(), needContent);
     need.getDatatsetHolder().setDataset(needContent);
     needRepository.save(need);

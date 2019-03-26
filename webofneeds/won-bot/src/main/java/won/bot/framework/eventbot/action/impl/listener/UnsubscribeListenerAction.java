@@ -24,8 +24,7 @@ import won.bot.framework.eventbot.listener.EventListener;
 /**
  * Action that unsubscribes the specified listener from all events.
  */
-public class UnsubscribeListenerAction extends BaseEventBotAction
-{
+public class UnsubscribeListenerAction extends BaseEventBotAction {
   private EventListener listener;
 
   public UnsubscribeListenerAction(final EventListenerContext eventListenerContext, final EventListener listener) {

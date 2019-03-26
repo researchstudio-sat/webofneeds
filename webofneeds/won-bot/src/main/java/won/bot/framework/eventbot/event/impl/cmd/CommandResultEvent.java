@@ -22,11 +22,14 @@ import won.bot.framework.eventbot.event.Event;
  * Communicates the result of a command of type C.
  */
 public interface CommandResultEvent<C extends CommandEvent> extends Event {
-    /**
-     * An optional message for diagnostic purposes.
-     * @return the message or null;
-     */
-    String getMessage();
-    C getOriginalCommandEvent();
-    boolean isSuccess();
+  /**
+   * An optional message for diagnostic purposes.
+   * 
+   * @return the message or null;
+   */
+  String getMessage();
+
+  C getOriginalCommandEvent();
+
+  boolean isSuccess();
 }

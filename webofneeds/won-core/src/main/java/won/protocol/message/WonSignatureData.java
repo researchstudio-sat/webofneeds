@@ -1,11 +1,9 @@
 package won.protocol.message;
 
 /**
- * User: ypanchenko
- * Date: 24.03.2015
+ * User: ypanchenko Date: 24.03.2015
  */
-public class WonSignatureData
-{
+public class WonSignatureData {
 
   private String signedGraphUri;
   private String signatureUri;
@@ -14,7 +12,8 @@ public class WonSignatureData
   private String publicKeyFingerprint;
   private String verificationCertificateUri;
 
-  public WonSignatureData(final String signedGraphUri, final String signatureUri, final String signatureValue, final String hash, final String publicKeyFingerprint, final String verificationCertificateUri) {
+  public WonSignatureData(final String signedGraphUri, final String signatureUri, final String signatureValue,
+      final String hash, final String publicKeyFingerprint, final String verificationCertificateUri) {
     this.signedGraphUri = signedGraphUri;
     this.signatureUri = signatureUri;
     this.signatureValue = signatureValue;

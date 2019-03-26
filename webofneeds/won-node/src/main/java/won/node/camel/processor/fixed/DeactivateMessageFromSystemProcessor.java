@@ -30,27 +30,30 @@ import won.protocol.model.Need;
 import won.protocol.model.NeedState;
 import won.protocol.util.DataAccessUtils;
 import won.protocol.vocabulary.WONMSG;
+
 @Component
 @FixedMessageProcessor(direction = WONMSG.TYPE_FROM_SYSTEM_STRING, messageType = WONMSG.TYPE_DEACTIVATE_STRING)
 public class DeactivateMessageFromSystemProcessor extends AbstractCamelProcessor {
-    @Override
-    public void process(Exchange exchange) throws Exception {
-        WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
-        URI receiverNeedURI = wonMessage.getReceiverNeedURI();
-        URI senderNeedURI = wonMessage.getSenderNeedURI();
-        if (receiverNeedURI== null){
-            throw new MissingMessagePropertyException(URI.create(WONMSG.RECEIVER_NEED_PROPERTY.toString()));
-        }
-        if (senderNeedURI == null){
-            throw new MissingMessagePropertyException(URI.create(WONMSG.SENDER_NEED_PROPERTY.toString()));
-        }
-        if (!receiverNeedURI.equals(senderNeedURI)) {
-            throw new IllegalArgumentException("sender need uri " + senderNeedURI +" does not equal receiver need uri " + receiverNeedURI);
-        }
-        logger.debug("DEACTIVATING need. needURI:{}", receiverNeedURI);
-        Need need = DataAccessUtils.loadNeed(needRepository, receiverNeedURI);
-        need.getEventContainer().getEvents().add(messageEventRepository.findOneByMessageURIforUpdate(wonMessage.getMessageURI()));
-        need.setState(NeedState.INACTIVE);
-        need = needRepository.save(need);
+  @Override
+  public void process(Exchange exchange) throws Exception {
+    WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
+    URI receiverNeedURI = wonMessage.getReceiverNeedURI();
+    URI senderNeedURI = wonMessage.getSenderNeedURI();
+    if (receiverNeedURI == null) {
+      throw new MissingMessagePropertyException(URI.create(WONMSG.RECEIVER_NEED_PROPERTY.toString()));
     }
+    if (senderNeedURI == null) {
+      throw new MissingMessagePropertyException(URI.create(WONMSG.SENDER_NEED_PROPERTY.toString()));
+    }
+    if (!receiverNeedURI.equals(senderNeedURI)) {
+      throw new IllegalArgumentException(
+          "sender need uri " + senderNeedURI + " does not equal receiver need uri " + receiverNeedURI);
+    }
+    logger.debug("DEACTIVATING need. needURI:{}", receiverNeedURI);
+    Need need = DataAccessUtils.loadNeed(needRepository, receiverNeedURI);
+    need.getEventContainer().getEvents()
+        .add(messageEventRepository.findOneByMessageURIforUpdate(wonMessage.getMessageURI()));
+    need.setState(NeedState.INACTIVE);
+    need = needRepository.save(need);
+  }
 }

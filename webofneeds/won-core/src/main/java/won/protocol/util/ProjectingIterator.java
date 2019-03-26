@@ -21,8 +21,7 @@ import java.util.Iterator;
 /**
  * Iterator that converts from type F (from) to type T (to).
  */
-public abstract class ProjectingIterator<F, T> implements Iterator<T>
-{
+public abstract class ProjectingIterator<F, T> implements Iterator<T> {
   protected Iterator<F> baseIterator;
 
   protected ProjectingIterator(final Iterator<F> baseIterator) {

@@ -33,84 +33,82 @@ import won.protocol.jms.NeedProtocolCamelConfigurator;
 import won.protocol.jms.NeedProtocolCommunicationService;
 
 /**
- * User: syim
- * Date: 27.01.14
+ * User: syim Date: 27.01.14
  */
 
 public class NeedProtocolCommunicationServiceImpl implements NeedProtocolCommunicationService {
 
-    @Autowired
-    private NeedProtocolCamelConfigurator needProtocolCamelConfigurator;
+  @Autowired
+  private NeedProtocolCamelConfigurator needProtocolCamelConfigurator;
 
-    @Autowired
-    private ActiveMQService activeMQService;
+  @Autowired
+  private ActiveMQService activeMQService;
 
-    private RegistrationClient registrationClient;
+  private RegistrationClient registrationClient;
 
-    public void setRegistrationClient(final RegistrationRestClientHttps registrationClient) {
-        this.registrationClient = registrationClient;
+  public void setRegistrationClient(final RegistrationRestClientHttps registrationClient) {
+    this.registrationClient = registrationClient;
+  }
+
+  private Logger logger = LoggerFactory.getLogger(this.getClass());
+
+  public synchronized CamelConfiguration configureCamelEndpoint(URI wonNodeUri) throws Exception {
+
+    String needProtocolQueueName;
+    CamelConfiguration camelConfiguration = new CamelConfiguration();
+    logger.debug("ensuring camel is configured for remote wonNodeUri", new Object[] { wonNodeUri });
+
+    URI remoteNodeBrokerUri = activeMQService.getBrokerEndpoint(wonNodeUri);
+
+    if (needProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(remoteNodeBrokerUri) != null) {
+      logger.debug("broker component name is already known");
+      camelConfiguration.setEndpoint(needProtocolCamelConfigurator.getEndpoint(wonNodeUri));
+      camelConfiguration.setBrokerComponentName(
+          needProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(remoteNodeBrokerUri));
+      // HINT: we may have to handle routes that were shut down automatically after a
+      // timeout here...
+    } else {
+      logger.debug("broker component name unknown - setting up a new component for the remote broker");
+      URI resourceUri;
+      URI brokerUri;
+
+      resourceUri = wonNodeUri;
+      brokerUri = remoteNodeBrokerUri;
+
+      needProtocolQueueName = activeMQService.getProtocolQueueNameWithResource(resourceUri);
+
+      registrationClient.register(wonNodeUri.toString());
+      String endpoint = needProtocolCamelConfigurator.configureCamelEndpointForNeedUri(resourceUri, brokerUri,
+          needProtocolQueueName);
+      camelConfiguration.setEndpoint(endpoint);
+      camelConfiguration
+          .setBrokerComponentName(needProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(brokerUri));
+      ActiveMQComponent activeMQComponent = (ActiveMQComponent) needProtocolCamelConfigurator.getCamelContext()
+          .getComponent(needProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(brokerUri));
+      logger.info("ActiveMQ Service Status : {}", activeMQComponent.getStatus().toString());
+      activeMQComponent.start();
     }
+    return camelConfiguration;
+  }
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+  @Override
+  public URI getBrokerUri(URI resourceUri) throws NoSuchConnectionException {
+    return activeMQService.getBrokerEndpoint(resourceUri);
+  }
 
+  @Override
+  public ActiveMQService getActiveMQService() {
+    return activeMQService;
+  }
 
-    public synchronized CamelConfiguration configureCamelEndpoint(URI wonNodeUri) throws Exception {
+  @Override
+  public void setActiveMQService(ActiveMQService activeMQService) {
+    this.activeMQService = activeMQService;
+  }
 
-        String needProtocolQueueName;
-        CamelConfiguration camelConfiguration = new CamelConfiguration();
-        logger.debug("ensuring camel is configured for remote wonNodeUri", new Object[]{wonNodeUri});
-
-        URI remoteNodeBrokerUri = activeMQService.getBrokerEndpoint(wonNodeUri);
-
-        if (needProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(remoteNodeBrokerUri)!=null){
-            logger.debug("broker component name is already known");
-            camelConfiguration.setEndpoint(needProtocolCamelConfigurator.getEndpoint(wonNodeUri));
-            camelConfiguration.setBrokerComponentName(needProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(remoteNodeBrokerUri));
-            //HINT: we may have to handle routes that were shut down automatically after a timeout here...
-        } else{
-            logger.debug("broker component name unknown - setting up a new component for the remote broker");
-            URI resourceUri;
-            URI brokerUri;
-
-            resourceUri = wonNodeUri;
-            brokerUri = remoteNodeBrokerUri;
-
-            needProtocolQueueName = activeMQService.getProtocolQueueNameWithResource(resourceUri);
-
-            registrationClient.register(wonNodeUri.toString());
-            String endpoint = needProtocolCamelConfigurator.configureCamelEndpointForNeedUri(resourceUri, brokerUri,
-                                                                                             needProtocolQueueName);
-            camelConfiguration.setEndpoint(endpoint);
-            camelConfiguration.setBrokerComponentName(needProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(brokerUri));
-            ActiveMQComponent activeMQComponent = (ActiveMQComponent)needProtocolCamelConfigurator.getCamelContext().getComponent(needProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(brokerUri));
-            logger.info("ActiveMQ Service Status : {}",activeMQComponent.getStatus().toString());
-            activeMQComponent.start();
-        }
-        return camelConfiguration;
-    }
-
-
-    @Override
-    public URI getBrokerUri(URI resourceUri) throws NoSuchConnectionException {
-        return activeMQService.getBrokerEndpoint(resourceUri);
-    }
-
-    @Override
-    public ActiveMQService getActiveMQService() {
-        return activeMQService;
-    }
-
-
-    @Override
-    public void setActiveMQService(ActiveMQService activeMQService) {
-        this.activeMQService = activeMQService;
-    }
-
-
-    @Override
-    public CamelConfigurator getProtocolCamelConfigurator() {
-        return needProtocolCamelConfigurator;
-    }
-
+  @Override
+  public CamelConfigurator getProtocolCamelConfigurator() {
+    return needProtocolCamelConfigurator;
+  }
 
 }

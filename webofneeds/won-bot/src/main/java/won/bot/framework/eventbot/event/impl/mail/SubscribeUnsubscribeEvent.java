@@ -8,8 +8,7 @@ import won.bot.framework.eventbot.event.BaseEvent;
 /**
  * Created by hfriedrich on 16.11.2016.
  */
-public class SubscribeUnsubscribeEvent extends BaseEvent
-{
+public class SubscribeUnsubscribeEvent extends BaseEvent {
   private final MimeMessage message;
   private final SubscribeStatus subscribeStatus;
 

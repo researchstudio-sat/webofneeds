@@ -43,34 +43,29 @@ import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
  * Behaviour that causes all WonMessageCommand events to be executed.
  */
 public class ExecuteWonMessageCommandBehaviour extends BotBehaviour {
-    public ExecuteWonMessageCommandBehaviour(EventListenerContext context) {
-        super(context, "ExecuteWonMessageCommandBehaviour");
-    }
+  public ExecuteWonMessageCommandBehaviour(EventListenerContext context) {
+    super(context, "ExecuteWonMessageCommandBehaviour");
+  }
 
-    public ExecuteWonMessageCommandBehaviour(EventListenerContext context, String name) {
-        super(context, name);
-    }
+  public ExecuteWonMessageCommandBehaviour(EventListenerContext context, String name) {
+    super(context, name);
+  }
 
-    @Override
-    protected void onActivate(Optional<Object> message) {
-        linkEventToActionWithAutoCleanup(CreateNeedCommandEvent.class, new ExecuteCreateNeedCommandAction(context));
-        linkEventToActionWithAutoCleanup(ConnectCommandEvent.class, new ExecuteConnectCommandAction(context));
-        linkEventToActionWithAutoCleanup(OpenCommandEvent.class, new ExecuteOpenCommandAction(context));
-        linkEventToActionWithAutoCleanup(ConnectionMessageCommandEvent.class, new ExecuteConnectionMessageCommandAction(context));
-        linkEventToActionWithAutoCleanup(CloseCommandEvent.class, new ExecuteCloseCommandAction(context));
-        linkEventToActionWithAutoCleanup(DeactivateNeedCommandEvent.class, new ExecuteDeactivateNeedCommandAction(context));
-        linkEventToActionWithAutoCleanup(FeedbackCommandEvent.class, new ExecuteFeedbackCommandAction(context));
-        //if we receive a message command failure, log it
-        linkEventToActionWithAutoCleanup(MessageCommandFailureEvent.class, new LogMessageCommandFailureAction(context));
-    }
+  @Override
+  protected void onActivate(Optional<Object> message) {
+    linkEventToActionWithAutoCleanup(CreateNeedCommandEvent.class, new ExecuteCreateNeedCommandAction(context));
+    linkEventToActionWithAutoCleanup(ConnectCommandEvent.class, new ExecuteConnectCommandAction(context));
+    linkEventToActionWithAutoCleanup(OpenCommandEvent.class, new ExecuteOpenCommandAction(context));
+    linkEventToActionWithAutoCleanup(ConnectionMessageCommandEvent.class,
+        new ExecuteConnectionMessageCommandAction(context));
+    linkEventToActionWithAutoCleanup(CloseCommandEvent.class, new ExecuteCloseCommandAction(context));
+    linkEventToActionWithAutoCleanup(DeactivateNeedCommandEvent.class, new ExecuteDeactivateNeedCommandAction(context));
+    linkEventToActionWithAutoCleanup(FeedbackCommandEvent.class, new ExecuteFeedbackCommandAction(context));
+    // if we receive a message command failure, log it
+    linkEventToActionWithAutoCleanup(MessageCommandFailureEvent.class, new LogMessageCommandFailureAction(context));
+  }
 
-    private void linkEventToActionWithAutoCleanup(Class<? extends Event> clazz, EventBotAction action) {
-        this.subscribeWithAutoCleanup(clazz,
-                new ActionOnEventListener(
-                        context,
-                        action
-                )
-        );
-    }
+  private void linkEventToActionWithAutoCleanup(Class<? extends Event> clazz, EventBotAction action) {
+    this.subscribeWithAutoCleanup(clazz, new ActionOnEventListener(context, action));
+  }
 }
-

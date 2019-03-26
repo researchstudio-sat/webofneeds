@@ -13,15 +13,13 @@ import won.matcher.solr.spring.MatcherSolrAppConfiguration;
 /**
  * Created by hfriedrich on 24.08.2015.
  */
-public class AkkaSolrMain
-{
+public class AkkaSolrMain {
 
   public static void main(String[] args) throws IOException {
 
-    AnnotationConfigApplicationContext ctx =
-      new AnnotationConfigApplicationContext(MatcherSolrAppConfiguration.class);
+    AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(MatcherSolrAppConfiguration.class);
     ActorSystem system = ctx.getBean(ActorSystem.class);
-    ActorRef matcherPubSubActor = system.actorOf(
-      SpringExtension.SpringExtProvider.get(system).props(MatcherPubSubActor.class), "MatcherPubSubActor");
+    ActorRef matcherPubSubActor = system
+        .actorOf(SpringExtension.SpringExtProvider.get(system).props(MatcherPubSubActor.class), "MatcherPubSubActor");
   }
 }

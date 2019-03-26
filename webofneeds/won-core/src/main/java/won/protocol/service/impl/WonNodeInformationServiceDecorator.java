@@ -80,33 +80,33 @@ public class WonNodeInformationServiceDecorator implements WonNodeInformationSer
     return delegate.getWonNodeUri(resourceURI);
   }
 
-    @Override
-    public boolean isValidEventURI(URI eventURI) {
-        return delegate.isValidNeedURI(eventURI);
-    }
+  @Override
+  public boolean isValidEventURI(URI eventURI) {
+    return delegate.isValidNeedURI(eventURI);
+  }
 
-    @Override
-    public boolean isValidEventURI(URI eventURI, URI wonNodeURI) {
-        return delegate.isValidEventURI(eventURI, wonNodeURI);
-    }
+  @Override
+  public boolean isValidEventURI(URI eventURI, URI wonNodeURI) {
+    return delegate.isValidEventURI(eventURI, wonNodeURI);
+  }
 
-    @Override
-    public boolean isValidConnectionURI(URI connectionURI) {
-        return delegate.isValidConnectionURI(connectionURI);
-    }
+  @Override
+  public boolean isValidConnectionURI(URI connectionURI) {
+    return delegate.isValidConnectionURI(connectionURI);
+  }
 
-    @Override
-    public boolean isValidConnectionURI(URI connectionURI, URI wonNodeURI) {
-        return delegate.isValidConnectionURI(connectionURI, wonNodeURI);
-    }
+  @Override
+  public boolean isValidConnectionURI(URI connectionURI, URI wonNodeURI) {
+    return delegate.isValidConnectionURI(connectionURI, wonNodeURI);
+  }
 
-    @Override
-    public boolean isValidNeedURI(URI needURI) {
-        return delegate.isValidNeedURI(needURI);
-    }
+  @Override
+  public boolean isValidNeedURI(URI needURI) {
+    return delegate.isValidNeedURI(needURI);
+  }
 
-    @Override
-    public boolean isValidNeedURI(URI needURI, URI wonNodeURI) {
-        return delegate.isValidNeedURI(needURI, wonNodeURI);
-    }
+  @Override
+  public boolean isValidNeedURI(URI needURI, URI wonNodeURI) {
+    return delegate.isValidNeedURI(needURI, wonNodeURI);
+  }
 }

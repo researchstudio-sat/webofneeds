@@ -26,9 +26,8 @@ import won.protocol.message.WonMessage;
 /**
  * Created by fkleedorfer on 14.06.2016.
  */
-public class WonMessageSentOnConnectionEvent extends WonMessageSentEvent implements ConnectionSpecificEvent,
-  NeedSpecificEvent, RemoteNeedSpecificEvent
-{
+public class WonMessageSentOnConnectionEvent extends WonMessageSentEvent
+    implements ConnectionSpecificEvent, NeedSpecificEvent, RemoteNeedSpecificEvent {
   public WonMessageSentOnConnectionEvent(final WonMessage message) {
     super(message);
   }

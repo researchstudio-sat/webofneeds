@@ -39,9 +39,7 @@ import org.junit.Test;
 
 import won.protocol.util.RdfUtils;
 
-
-public class RdfIoSpeedTest
-{
+public class RdfIoSpeedTest {
 
   @Test
   @Ignore
@@ -57,10 +55,9 @@ public class RdfIoSpeedTest
     infile = Paths.get("won-core/src/test/resources/speedtest/dataset.nq");
     byte[] dataRdfq = Files.readAllBytes(infile);
 
-
     StopWatch watch = new StopWatch();
     watch.start();
-    for (int i = 0; i < 10000; i++){
+    for (int i = 0; i < 10000; i++) {
       RDFDataMgr.read(dataset, new ByteArrayInputStream(dataTrig), Lang.TRIG);
     }
     watch.stop();
@@ -68,7 +65,7 @@ public class RdfIoSpeedTest
 
     watch = new StopWatch();
     watch.start();
-    for (int i = 0; i < 10000; i++){
+    for (int i = 0; i < 10000; i++) {
       RDFDataMgr.write(new ByteArrayOutputStream(), dataset, Lang.TRIG);
     }
     watch.stop();
@@ -76,7 +73,7 @@ public class RdfIoSpeedTest
 
     watch = new StopWatch();
     watch.start();
-    for (int i = 0; i < 10000; i++){
+    for (int i = 0; i < 10000; i++) {
       RDFDataMgr.read(dataset, new ByteArrayInputStream(dataRdfq), Lang.NQUADS);
     }
     watch.stop();
@@ -84,7 +81,7 @@ public class RdfIoSpeedTest
 
     watch = new StopWatch();
     watch.start();
-    for (int i = 0; i < 10000; i++){
+    for (int i = 0; i < 10000; i++) {
       RDFDataMgr.write(new ByteArrayOutputStream(), dataset, Lang.NQUADS);
     }
     watch.stop();
@@ -92,7 +89,7 @@ public class RdfIoSpeedTest
 
     watch = new StopWatch();
     watch.start();
-    for (int i = 0; i < 10000; i++){
+    for (int i = 0; i < 10000; i++) {
       RDFDataMgr.read(dataset, new ByteArrayInputStream(dataRdft), Lang.RDFTHRIFT);
     }
     watch.stop();
@@ -100,8 +97,8 @@ public class RdfIoSpeedTest
 
     watch = new StopWatch();
     watch.start();
-    for (int i = 0; i < 10000; i++){
-      RDFDataMgr.write(new ByteArrayOutputStream(), dataset,  Lang.RDFTHRIFT);
+    for (int i = 0; i < 10000; i++) {
+      RDFDataMgr.write(new ByteArrayOutputStream(), dataset, Lang.RDFTHRIFT);
     }
     watch.stop();
     System.out.println("rdf-thrift writing took: " + watch.getTime());
@@ -120,11 +117,10 @@ public class RdfIoSpeedTest
     infile = Paths.get("won-core/src/test/resources/speedtest/dataset.nq");
     byte[] dataRdfq = Files.readAllBytes(infile);
 
-
     StopWatch watch = new StopWatch();
     watch.start();
 
-    for (int i = 0; i < 10000; i++){
+    for (int i = 0; i < 10000; i++) {
       Dataset additionalDataset = DatasetFactory.createGeneral();
       RDFDataMgr.read(additionalDataset, new ByteArrayInputStream(dataRdfq), Lang.NQUADS);
       RdfUtils.addDatasetToDataset(dataset, additionalDataset);
@@ -136,7 +132,7 @@ public class RdfIoSpeedTest
     watch.start();
 
     ByteArrayOutputStream out = new ByteArrayOutputStream();
-    for (int i = 0; i < 10000; i++){
+    for (int i = 0; i < 10000; i++) {
       out.write(dataRdfq);
     }
     Dataset additionalDataset = DatasetFactory.createGeneral();
@@ -148,7 +144,7 @@ public class RdfIoSpeedTest
     watch.start();
 
     Vector<InputStream> streams = new Vector<>(10000);
-    for (int i = 0; i < 10000; i++){
+    for (int i = 0; i < 10000; i++) {
       streams.add(new ByteArrayInputStream(dataRdfq));
     }
     additionalDataset = DatasetFactory.createGeneral();
@@ -160,7 +156,7 @@ public class RdfIoSpeedTest
     watch.start();
 
     ArrayList<InputStream> streamsList = new ArrayList<>(10000);
-    for (int i = 0; i < 10000; i++){
+    for (int i = 0; i < 10000; i++) {
       streamsList.add(new ByteArrayInputStream(dataRdfq));
     }
     additionalDataset = DatasetFactory.createGeneral();
@@ -172,12 +168,13 @@ public class RdfIoSpeedTest
     watch = new StopWatch();
     watch.start();
     InputStream[] streamsArr = new InputStream[10000];
-    for (int i = 0; i < 10000; i++){
+    for (int i = 0; i < 10000; i++) {
       streamsArr[i] = new ByteArrayInputStream(dataRdfq);
     }
     additionalDataset = DatasetFactory.createGeneral();
-    RDFDataMgr.read(additionalDataset, new SequenceInputStream(new Enumeration(){
+    RDFDataMgr.read(additionalDataset, new SequenceInputStream(new Enumeration() {
       int index = 0;
+
       @Override
       public boolean hasMoreElements() {
         return index < streamsArr.length;

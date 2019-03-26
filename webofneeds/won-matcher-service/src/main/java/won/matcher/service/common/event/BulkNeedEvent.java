@@ -8,8 +8,7 @@ import java.util.LinkedList;
 /**
  * Event can hold multiple {@link NeedEvent} objects
  */
-public class BulkNeedEvent implements Serializable
-{
+public class BulkNeedEvent implements Serializable {
   private Collection<NeedEvent> needEvents;
 
   public BulkNeedEvent() {

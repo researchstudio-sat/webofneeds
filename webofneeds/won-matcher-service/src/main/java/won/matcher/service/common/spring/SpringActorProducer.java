@@ -20,7 +20,8 @@ public final class SpringActorProducer implements IndirectActorProducer {
     this.params = null;
   }
 
-  public SpringActorProducer(final ApplicationContext applicationContext, final Class<? extends Actor> actorClass, Object... params) {
+  public SpringActorProducer(final ApplicationContext applicationContext, final Class<? extends Actor> actorClass,
+      Object... params) {
     this.applicationContext = applicationContext;
     this.actorClass = actorClass;
     this.params = params;

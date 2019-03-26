@@ -24,39 +24,37 @@ import org.springframework.scheduling.TaskScheduler;
 /**
  * Bot that has access to a scheduler for performing recurring or deferred work
  */
-public abstract class ScheduledActionBot extends BasicServiceBot
-{
+public abstract class ScheduledActionBot extends BasicServiceBot {
   private TaskScheduler taskScheduler;
   private Executor insideSchedulerExecutor = new InsideSchedulerExecutor();
 
-
-
-  public void setTaskScheduler(final TaskScheduler taskScheduler)
-  {
+  public void setTaskScheduler(final TaskScheduler taskScheduler) {
     this.taskScheduler = taskScheduler;
   }
 
   /**
    * Returns the TaskScheduler.
+   * 
    * @return
    */
-  protected TaskScheduler getTaskScheduler()
-  {
+  protected TaskScheduler getTaskScheduler() {
     return taskScheduler;
   }
 
   /**
-   * Returns an executor that passes the tasks to the TaskScheduler for immediate execution.
+   * Returns an executor that passes the tasks to the TaskScheduler for immediate
+   * execution.
+   * 
    * @return
    */
-  protected Executor getExecutor(){ return this.insideSchedulerExecutor;  }
+  protected Executor getExecutor() {
+    return this.insideSchedulerExecutor;
+  }
 
-  private class InsideSchedulerExecutor implements Executor
-  {
+  private class InsideSchedulerExecutor implements Executor {
     @Override
-    public void execute(final Runnable command)
-    {
-      getTaskScheduler().schedule(command,new Date());
+    public void execute(final Runnable command) {
+      getTaskScheduler().schedule(command, new Date());
     }
   }
 }

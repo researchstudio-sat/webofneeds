@@ -10,58 +10,55 @@ import won.owner.model.User;
 
 public class KeystoreEnabledUserDetails implements UserDetails {
 
-	private User delegate;
-	private KeyStore keyStore;
-	private String password;
-	
-	
-	
-	public KeystoreEnabledUserDetails(User delegate, KeyStore keyStore, String password) {
-		super();
-		this.delegate = delegate;
-		this.keyStore = keyStore;
-		this.password = password;
-	}
+  private User delegate;
+  private KeyStore keyStore;
+  private String password;
 
-	public KeyStore getKeyStore() {
-		return keyStore;
-	}
-	
-	public String getKeystorePassword() {
-		return password;
-	}
-	
-	public User getUser() {
-		return delegate;
-	}
+  public KeystoreEnabledUserDetails(User delegate, KeyStore keyStore, String password) {
+    super();
+    this.delegate = delegate;
+    this.keyStore = keyStore;
+    this.password = password;
+  }
 
-	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return delegate.getAuthorities();
-	}
+  public KeyStore getKeyStore() {
+    return keyStore;
+  }
 
-	public String getPassword() {
-		return delegate.getPassword();
-	}
+  public String getKeystorePassword() {
+    return password;
+  }
 
-	public String getUsername() {
-		return delegate.getUsername();
-	}
+  public User getUser() {
+    return delegate;
+  }
 
-	public boolean isAccountNonExpired() {
-		return delegate.isAccountNonExpired();
-	}
+  public Collection<? extends GrantedAuthority> getAuthorities() {
+    return delegate.getAuthorities();
+  }
 
-	public boolean isAccountNonLocked() {
-		return delegate.isAccountNonLocked();
-	}
+  public String getPassword() {
+    return delegate.getPassword();
+  }
 
-	public boolean isCredentialsNonExpired() {
-		return delegate.isCredentialsNonExpired();
-	}
+  public String getUsername() {
+    return delegate.getUsername();
+  }
 
-	public boolean isEnabled() {
-		return delegate.isEnabled();
-	}
-	
-	
+  public boolean isAccountNonExpired() {
+    return delegate.isAccountNonExpired();
+  }
+
+  public boolean isAccountNonLocked() {
+    return delegate.isAccountNonLocked();
+  }
+
+  public boolean isCredentialsNonExpired() {
+    return delegate.isCredentialsNonExpired();
+  }
+
+  public boolean isEnabled() {
+    return delegate.isEnabled();
+  }
+
 }

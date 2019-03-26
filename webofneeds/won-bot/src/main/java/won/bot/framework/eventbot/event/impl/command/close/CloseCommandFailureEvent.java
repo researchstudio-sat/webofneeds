@@ -23,29 +23,32 @@ import won.bot.framework.eventbot.event.impl.command.MessageCommandFailureEvent;
 import won.bot.framework.eventbot.event.impl.command.base.AbstractMessageCommandResultEvent;
 import won.protocol.model.Connection;
 
-
 /**
- * Indicates that the bot has failed to send a close message, thereby closing a connection.
+ * Indicates that the bot has failed to send a close message, thereby closing a
+ * connection.
  */
-public class CloseCommandFailureEvent extends AbstractMessageCommandResultEvent implements MessageCommandFailureEvent, CloseCommandResultEvent {
-    public CloseCommandFailureEvent(MessageCommandEvent originalCommandEvent, Connection con) {
-        super(originalCommandEvent, con);
-    }
+public class CloseCommandFailureEvent extends AbstractMessageCommandResultEvent
+    implements MessageCommandFailureEvent, CloseCommandResultEvent {
+  public CloseCommandFailureEvent(MessageCommandEvent originalCommandEvent, Connection con) {
+    super(originalCommandEvent, con);
+  }
 
-    public CloseCommandFailureEvent(MessageCommandEvent originalCommandEvent, URI needURI, URI remoteNeedURI, URI connectionURI) {
-        super(originalCommandEvent, needURI, remoteNeedURI, connectionURI);
-    }
+  public CloseCommandFailureEvent(MessageCommandEvent originalCommandEvent, URI needURI, URI remoteNeedURI,
+      URI connectionURI) {
+    super(originalCommandEvent, needURI, remoteNeedURI, connectionURI);
+  }
 
-    public CloseCommandFailureEvent(MessageCommandEvent originalCommandEvent, URI needURI, URI remoteNeedURI, URI connectionURI, String message) {
-        super(originalCommandEvent, needURI, remoteNeedURI, connectionURI, message);
-    }
+  public CloseCommandFailureEvent(MessageCommandEvent originalCommandEvent, URI needURI, URI remoteNeedURI,
+      URI connectionURI, String message) {
+    super(originalCommandEvent, needURI, remoteNeedURI, connectionURI, message);
+  }
 
-    public CloseCommandFailureEvent(MessageCommandEvent originalCommandEvent, Connection con, String message) {
-        super(originalCommandEvent, con, message);
-    }
+  public CloseCommandFailureEvent(MessageCommandEvent originalCommandEvent, Connection con, String message) {
+    super(originalCommandEvent, con, message);
+  }
 
-    @Override
-    public boolean isSuccess() {
-        return false;
-    }
+  @Override
+  public boolean isSuccess() {
+    return false;
+  }
 }

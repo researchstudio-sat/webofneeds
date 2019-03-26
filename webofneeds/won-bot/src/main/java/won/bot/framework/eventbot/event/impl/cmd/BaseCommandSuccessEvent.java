@@ -20,32 +20,33 @@ package won.bot.framework.eventbot.event.impl.cmd;
  * Base class for success events.
  */
 public abstract class BaseCommandSuccessEvent<C extends CommandEvent> implements CommandSuccessEvent<C> {
-    private String message;
-    private C originalCommandEvent;
+  private String message;
+  private C originalCommandEvent;
 
-    private BaseCommandSuccessEvent(){}
+  private BaseCommandSuccessEvent() {
+  }
 
-    public BaseCommandSuccessEvent(String message, C originalCommandEvent) {
-        this.message = message;
-        this.originalCommandEvent = originalCommandEvent;
-    }
+  public BaseCommandSuccessEvent(String message, C originalCommandEvent) {
+    this.message = message;
+    this.originalCommandEvent = originalCommandEvent;
+  }
 
-    public BaseCommandSuccessEvent(C originalCommandEvent) {
-        this.originalCommandEvent = originalCommandEvent;
-    }
+  public BaseCommandSuccessEvent(C originalCommandEvent) {
+    this.originalCommandEvent = originalCommandEvent;
+  }
 
-    @Override
-    public String getMessage() {
-        return message;
-    }
+  @Override
+  public String getMessage() {
+    return message;
+  }
 
-    @Override
-    public C getOriginalCommandEvent() {
-        return originalCommandEvent;
-    }
+  @Override
+  public C getOriginalCommandEvent() {
+    return originalCommandEvent;
+  }
 
-    @Override
-    public boolean isSuccess() {
-        return true;
-    }
+  @Override
+  public boolean isSuccess() {
+    return true;
+  }
 }

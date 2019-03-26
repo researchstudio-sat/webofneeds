@@ -30,8 +30,7 @@ import won.protocol.model.DatasetHolder;
 /**
  * Repository for jena datasets (wrapped in DatasetHolders)
  */
-public interface DatasetHolderRepository extends CrudRepository<DatasetHolder, URI>
-{
+public interface DatasetHolderRepository extends CrudRepository<DatasetHolder, URI> {
   public DatasetHolder findOneByUriAndVersionNot(URI uri, Integer version);
 
   public DatasetHolder findOneByUri(URI uri);

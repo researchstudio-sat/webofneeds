@@ -23,11 +23,10 @@ import javax.persistence.AttributeConverter;
 /**
  * Created by fkleedorfer on 24.08.2016.
  */
-public class URIConverter implements AttributeConverter<URI, String>
-{
+public class URIConverter implements AttributeConverter<URI, String> {
   @Override
   public String convertToDatabaseColumn(final URI uri) {
-    return uri == null ? null: uri.toString();
+    return uri == null ? null : uri.toString();
   }
 
   @Override

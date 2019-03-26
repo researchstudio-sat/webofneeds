@@ -19,8 +19,8 @@ package won.bot.framework.eventbot.event.impl.test;
 import won.bot.framework.eventbot.event.BaseEvent;
 
 /**
- * Indicates that something worked. What exactly that
- * was is indicated by the specified object.
+ * Indicates that something worked. What exactly that was is indicated by the
+ * specified object.
  */
 public class SuccessEvent extends BaseEvent {
   Object identifier;

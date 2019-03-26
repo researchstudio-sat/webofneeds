@@ -47,15 +47,13 @@ import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.message.WonMessage;
 import won.protocol.util.RdfUtils;
 
-
-public class MessageLifecycleMonitoringAction extends BaseEventBotAction
-{
+public class MessageLifecycleMonitoringAction extends BaseEventBotAction {
   Map<String, Split> msgSplitsB = Collections.synchronizedMap(new HashMap<>());
   Map<String, Split> msgSplitsBC = Collections.synchronizedMap(new HashMap<>());
   Map<String, Split> msgSplitsBCD = Collections.synchronizedMap(new HashMap<>());
   Map<String, Split> msgSplitsBCDE = Collections.synchronizedMap(new HashMap<>());
-  Map<URI,URI> connectionMsgUris = Collections.synchronizedMap(new HashMap<>());
-  Map<URI,URI> responseMsgUris = Collections.synchronizedMap(new HashMap<>());
+  Map<URI, URI> connectionMsgUris = Collections.synchronizedMap(new HashMap<>());
+  Map<URI, URI> responseMsgUris = Collections.synchronizedMap(new HashMap<>());
 
   private long startTestTime = -1;
 
@@ -70,7 +68,6 @@ public class MessageLifecycleMonitoringAction extends BaseEventBotAction
     Stopwatch stopwatchBC = SimonManager.getStopwatch("messageTripBC");
     Stopwatch stopwatchBCD = SimonManager.getStopwatch("messageTripBCD");
     Stopwatch stopwatchBCDE = SimonManager.getStopwatch("messageTripBCDE");
-
 
     if (event instanceof MessageSpecificEvent) {
 
@@ -95,24 +92,23 @@ public class MessageLifecycleMonitoringAction extends BaseEventBotAction
         msgSplitsB.get(msgURI.toString()).stop();
       }
 
-
     } else if (event instanceof SuccessResponseEvent || event instanceof FailureResponseEvent) {
 
       DeliveryResponseEvent responseEvent = (DeliveryResponseEvent) event;
 
-      if (connectionMsgUris.keySet().contains(responseEvent.getOriginalMessageURI()) ||
-        connectionMsgUris.keySet().contains(responseEvent.getRemoteResponseToMessageURI())) {
+      if (connectionMsgUris.keySet().contains(responseEvent.getOriginalMessageURI())
+          || connectionMsgUris.keySet().contains(responseEvent.getRemoteResponseToMessageURI())) {
         responseMsgUris.put(responseEvent.getMessage().getMessageURI(), responseEvent.getNeedURI());
         if (responseEvent.isRemoteResponse()) {
-          responseMsgUris.put(responseEvent.getMessage().getCorrespondingRemoteMessageURI(), responseEvent.getRemoteNeedURI());
+          responseMsgUris.put(responseEvent.getMessage().getCorrespondingRemoteMessageURI(),
+              responseEvent.getRemoteNeedURI());
         }
       }
 
-
       if (responseEvent.isRemoteResponse()) {
         if (msgSplitsBC.get(responseEvent.getRemoteResponseToMessageURI().toString()) != null) {
-          logger.debug("RECEIVED REMOTE RESPONSE EVENT {} for uri {}", event, responseEvent.getRemoteResponseToMessageURI
-            ());
+          logger.debug("RECEIVED REMOTE RESPONSE EVENT {} for uri {}", event,
+              responseEvent.getRemoteResponseToMessageURI());
           msgSplitsBCDE.get(responseEvent.getRemoteResponseToMessageURI().toString()).stop();
         }
       } else if (msgSplitsBC.get(responseEvent.getOriginalMessageURI().toString()) != null) {
@@ -132,7 +128,6 @@ public class MessageLifecycleMonitoringAction extends BaseEventBotAction
       getEventListenerContext().getEventBus().publish(new CrawlDoneEvent());
     }
 
-
   }
 
   private void reportMessageSizes(final Map<URI, URI> msgUris, String name) {
@@ -142,14 +137,12 @@ public class MessageLifecycleMonitoringAction extends BaseEventBotAction
       Dataset dataset = getEventListenerContext().getLinkedDataSource().getDataForResource(uri, msgUris.get(uri));
       record(dataset, counter);
     }
-    String sizeInfo = "\nSIZES for " + name  + ":\n" +
-      "messages=" + counter[0] + ", named-graphs=" + counter[1] + ", " +
-      "quads=" + counter[2] + ", bytes-in-Trig-UTF8=" + counter[3];
+    String sizeInfo = "\nSIZES for " + name + ":\n" + "messages=" + counter[0] + ", named-graphs=" + counter[1] + ", "
+        + "quads=" + counter[2] + ", bytes-in-Trig-UTF8=" + counter[3];
     logger.info(sizeInfo);
   }
 
   private void record(final Dataset dataset, final int[] counter) {
-
 
     counter[0]++;
     counter[1] = counter[1] + RdfUtils.getModelNames(dataset).size();

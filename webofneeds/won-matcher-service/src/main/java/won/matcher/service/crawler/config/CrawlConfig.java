@@ -17,8 +17,7 @@ import scala.concurrent.duration.FiniteDuration;
  */
 @Configuration
 @PropertySource("file:${WON_CONFIG_DIR}/matcher-service.properties")
-public class CrawlConfig
-{
+public class CrawlConfig {
   @Value("#{'${crawler.propertyPaths.base}'.split(',')}")
   private List<String> crawlBasePropertyPaths;
 

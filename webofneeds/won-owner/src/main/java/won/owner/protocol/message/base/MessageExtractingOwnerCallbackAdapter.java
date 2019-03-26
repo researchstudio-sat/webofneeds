@@ -27,14 +27,12 @@ import won.protocol.util.WonRdfUtils;
 
 /**
  * Simple implementation of the WonMessageHandlerAdapter that extracts the
- * information needed to create the Connection and Match objects directly
- * from the available message without using additional storage. This means
- * that the Connection's state and type properties are never available, as they
- * are not part of messages.
- * Use with care.
+ * information needed to create the Connection and Match objects directly from
+ * the available message without using additional storage. This means that the
+ * Connection's state and type properties are never available, as they are not
+ * part of messages. Use with care.
  */
-public class MessageExtractingOwnerCallbackAdapter extends OwnerCallbackAdapter
-{
+public class MessageExtractingOwnerCallbackAdapter extends OwnerCallbackAdapter {
 
   public MessageExtractingOwnerCallbackAdapter(OwnerCallback adaptee) {
     super(adaptee);
@@ -54,11 +52,11 @@ public class MessageExtractingOwnerCallbackAdapter extends OwnerCallbackAdapter
   }
 
   /**
-   * Creates a connection object representing the connection
-   * that the wonMessage is addressed at, if any.
-   * The resulting Connection object will not have a state or type property set.
-   * @param wonMessage or null if the message is not directed at
-   *                   a connection
+   * Creates a connection object representing the connection that the wonMessage
+   * is addressed at, if any. The resulting Connection object will not have a
+   * state or type property set.
+   * 
+   * @param wonMessage or null if the message is not directed at a connection
    */
   private Connection toConnection(WonMessage wonMessage) {
     Connection con = new Connection();

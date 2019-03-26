@@ -46,22 +46,15 @@ import won.protocol.vocabulary.WON;
  * Implementation of the WonMessageHandlerAdapter that uses a Dataset for
  * creating the objects needed for invoking the adaptee's callback methods.
  * <p/>
- * Sent and received messages are added to the dataset automatically. Missing data is
- * automatically loaded via linked data.
+ * Sent and received messages are added to the dataset automatically. Missing
+ * data is automatically loaded via linked data.
  */
-public class DatasetBackedOwnerCallbackAdapter extends OwnerCallbackAdapter
-{
-  //TODO move to the queries object!
-  private static final String QUERY_CONNECTION =
-    "SELECT ?con ?need ?state ?remoteCon ?remoteNeed ?type where { " +
-      "  ?con won:belongsToNeed ?need; " +
-      "     won:isInState ?state; " +
-      "     won:hasFacet ?type; " +
-      "     won:hasRemoteNeed ?remoteNeed." +
-      "  OPTIONAL { " +
-      "    ?con won:hasRemoteConnection ?remoteCon" +
-      "  } " +
-      "} ";
+public class DatasetBackedOwnerCallbackAdapter extends OwnerCallbackAdapter {
+  // TODO move to the queries object!
+  private static final String QUERY_CONNECTION = "SELECT ?con ?need ?state ?remoteCon ?remoteNeed ?type where { "
+      + "  ?con won:belongsToNeed ?need; " + "     won:isInState ?state; " + "     won:hasFacet ?type; "
+      + "     won:hasRemoteNeed ?remoteNeed." + "  OPTIONAL { " + "    ?con won:hasRemoteConnection ?remoteCon" + "  } "
+      + "} ";
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
   @Autowired
@@ -69,7 +62,6 @@ public class DatasetBackedOwnerCallbackAdapter extends OwnerCallbackAdapter
 
   @Autowired
   private LinkedDataSource linkedDataSource;
-
 
   public DatasetBackedOwnerCallbackAdapter(final OwnerCallback adaptee) {
     super(adaptee);
@@ -98,14 +90,14 @@ public class DatasetBackedOwnerCallbackAdapter extends OwnerCallbackAdapter
     pss.setIri("con", connUri.toString());
     Query query = pss.asQuery();
     try (QueryExecution qExec = QueryExecutionFactory.create(query, dataset)) {
-        qExec.getContext().set(TDB.symUnionDefaultGraph, true);
-        Connection con = null;
-        final ResultSet results = qExec.execSelect();
+      qExec.getContext().set(TDB.symUnionDefaultGraph, true);
+      Connection con = null;
+      final ResultSet results = qExec.execSelect();
+      if (results.hasNext()) {
+        QuerySolution soln = results.next();
         if (results.hasNext()) {
-            QuerySolution soln = results.next();
-            if (results.hasNext()){
-              throw new DataIntegrityException("Query must not yield multiple solutions");
-            }
+          throw new DataIntegrityException("Query must not yield multiple solutions");
+        }
         con = new Connection();
         con.setConnectionURI(getURIFromSolution(soln, "con"));
         con.setTypeURI(getURIFromSolution(soln, "type"));

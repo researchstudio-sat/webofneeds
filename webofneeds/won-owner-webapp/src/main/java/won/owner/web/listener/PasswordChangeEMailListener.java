@@ -11,18 +11,17 @@ import won.owner.web.WonOwnerMailSender;
 import won.owner.web.events.OnPasswordChangedEvent;
 import won.owner.web.events.OnRegistrationCompleteEvent;
 
-
 @Component
 public class PasswordChangeEMailListener implements ApplicationListener<OnPasswordChangedEvent> {
-    @Autowired
-    private UserService userService;
+  @Autowired
+  private UserService userService;
 
-    @Autowired
-    private WonOwnerMailSender emailSender;
+  @Autowired
+  private WonOwnerMailSender emailSender;
 
-    @Override
-    public void onApplicationEvent(OnPasswordChangedEvent event) {
-        User user = event.getUser();
-        emailSender.sendPasswordChangedMessage(user);
-    }
+  @Override
+  public void onApplicationEvent(OnPasswordChangedEvent event) {
+    User user = event.getUser();
+    emailSender.sendPasswordChangedMessage(user);
+  }
 }

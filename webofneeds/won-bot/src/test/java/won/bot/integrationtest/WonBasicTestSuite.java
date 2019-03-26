@@ -19,14 +19,8 @@ package won.bot.integrationtest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
-
 @RunWith(Suite.class)
-@Suite.SuiteClasses(
-  {ConversationBotTest.class,
-   GroupingBotTest.class,
-   CommentBotTest.class,
-   MatcherBotTest.class})
+@Suite.SuiteClasses({ ConversationBotTest.class, GroupingBotTest.class, CommentBotTest.class, MatcherBotTest.class })
 
-public class WonBasicTestSuite
-{
+public class WonBasicTestSuite {
 }

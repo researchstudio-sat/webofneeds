@@ -17,63 +17,60 @@ import won.protocol.util.AuthenticationThreadLocal;
 
 @Component
 public class PerUserKeystoreService extends AbstractKeyStoreService {
-	
-	private final Logger logger = LoggerFactory.getLogger(getClass());
 
-	@Autowired
-	private AuthenticationManager authenticationManager;
-	
-	@Autowired
-	private KeystoreHolderRepository keystoreHolderRepository;
-	
-	private String getUsername() {
-		 return (String) SecurityContextHolder.getContext().getAuthentication().getName();
-	}
-	
-	private Authentication getAuthentication() {
-		if (AuthenticationThreadLocal.hasValue()) {
-			return  (Authentication) AuthenticationThreadLocal.getAuthentication();
-		} 
-		return SecurityContextHolder.getContext().getAuthentication();
-	}
-	
-	private KeystoreEnabledUserDetails getKeystoreUserDetails() {
-		return (KeystoreEnabledUserDetails) getAuthentication().getPrincipal();
-	}
-	
-	private User getUser() {
-		return   ((KeystoreEnabledUserDetails) getAuthentication().getPrincipal()).getUser();
-	}
-	
-	@Override
-	public String getPassword() {
-		 return getKeystoreUserDetails().getKeystorePassword();
-	}
-	
-	
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
-	@Override
-	public KeyStore getUnderlyingKeyStore() {
-		return getKeystoreUserDetails().getKeyStore();
-	}
+  @Autowired
+  private AuthenticationManager authenticationManager;
 
-	@Override
-	protected void persistStore() throws Exception {
-		//fetch keystore and password from details in the authentication object 
-		KeystoreEnabledUserDetails keystoreUserDetails = getKeystoreUserDetails();
-		//write it back to the db
-		User user = getUser();
-		user.getKeystoreHolder().setKeystore(keystoreUserDetails.getKeyStore(), keystoreUserDetails.getKeystorePassword());
-		keystoreHolderRepository.save(user.getKeystoreHolder());
-	}
-	
-    
-    public void setAuthenticationManager(AuthenticationManager authenticationManager) {
-		this.authenticationManager = authenticationManager;
-	}
-    
-    public void setKeystoreHolderRepository(KeystoreHolderRepository keystoreHolderRepository) {
-		this.keystoreHolderRepository = keystoreHolderRepository;
-	}
+  @Autowired
+  private KeystoreHolderRepository keystoreHolderRepository;
+
+  private String getUsername() {
+    return (String) SecurityContextHolder.getContext().getAuthentication().getName();
+  }
+
+  private Authentication getAuthentication() {
+    if (AuthenticationThreadLocal.hasValue()) {
+      return (Authentication) AuthenticationThreadLocal.getAuthentication();
+    }
+    return SecurityContextHolder.getContext().getAuthentication();
+  }
+
+  private KeystoreEnabledUserDetails getKeystoreUserDetails() {
+    return (KeystoreEnabledUserDetails) getAuthentication().getPrincipal();
+  }
+
+  private User getUser() {
+    return ((KeystoreEnabledUserDetails) getAuthentication().getPrincipal()).getUser();
+  }
+
+  @Override
+  public String getPassword() {
+    return getKeystoreUserDetails().getKeystorePassword();
+  }
+
+  @Override
+  public KeyStore getUnderlyingKeyStore() {
+    return getKeystoreUserDetails().getKeyStore();
+  }
+
+  @Override
+  protected void persistStore() throws Exception {
+    // fetch keystore and password from details in the authentication object
+    KeystoreEnabledUserDetails keystoreUserDetails = getKeystoreUserDetails();
+    // write it back to the db
+    User user = getUser();
+    user.getKeystoreHolder().setKeystore(keystoreUserDetails.getKeyStore(), keystoreUserDetails.getKeystorePassword());
+    keystoreHolderRepository.save(user.getKeystoreHolder());
+  }
+
+  public void setAuthenticationManager(AuthenticationManager authenticationManager) {
+    this.authenticationManager = authenticationManager;
+  }
+
+  public void setKeystoreHolderRepository(KeystoreHolderRepository keystoreHolderRepository) {
+    this.keystoreHolderRepository = keystoreHolderRepository;
+  }
 
 }

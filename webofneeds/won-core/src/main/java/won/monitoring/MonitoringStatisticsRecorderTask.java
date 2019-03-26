@@ -22,51 +22,46 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Task intended to be scheduled regularly. In each execution it triggers all MonitoringStatisticsRecorders
- * it has been provided.
+ * Task intended to be scheduled regularly. In each execution it triggers all
+ * MonitoringStatisticsRecorders it has been provided.
  */
-public class MonitoringStatisticsRecorderTask implements Runnable
-{
+public class MonitoringStatisticsRecorderTask implements Runnable {
   private final Logger logger = LoggerFactory.getLogger(getClass());
   private List<MonitoringStatisticsRecorder> monitoringStatisticsRecorders;
   private boolean resetMonitorAfterRecording;
   private MonitoringResetter monitoringResetter;
 
   @Override
-  public void run()
-  {
-    if (this.monitoringStatisticsRecorders == null || this.monitoringStatisticsRecorders.isEmpty()){
+  public void run() {
+    if (this.monitoringStatisticsRecorders == null || this.monitoringStatisticsRecorders.isEmpty()) {
       logger.debug("No recorders configured, not recording any monitoring statistics, ");
       return;
     }
-    for(MonitoringStatisticsRecorder recorder: this.monitoringStatisticsRecorders){
+    for (MonitoringStatisticsRecorder recorder : this.monitoringStatisticsRecorders) {
       logger.debug("running monitoring stats recorder '{}'", recorder.getRecorderName());
       recorder.recordMonitoringStatistics();
       logger.debug("done monitoring stats recorder '{}'", recorder.getRecorderName());
     }
-    if (this.resetMonitorAfterRecording){
-      if (this.monitoringResetter != null){
+    if (this.resetMonitorAfterRecording) {
+      if (this.monitoringResetter != null) {
         logger.debug("resetting the monitor");
         this.monitoringResetter.resetMonitoringStatistics();
       } else {
-        logger.warn("MonitoringStatisticsRecorderTask is configured to reset the monitor after recording, but no MonitoringResetter has been configured");
+        logger.warn(
+            "MonitoringStatisticsRecorderTask is configured to reset the monitor after recording, but no MonitoringResetter has been configured");
       }
     }
   }
 
-  public void setMonitoringStatisticsRecorders(final List<MonitoringStatisticsRecorder> monitoringStatisticsRecorders)
-  {
+  public void setMonitoringStatisticsRecorders(final List<MonitoringStatisticsRecorder> monitoringStatisticsRecorders) {
     this.monitoringStatisticsRecorders = monitoringStatisticsRecorders;
   }
 
-  public void setResetMonitorAfterRecording(final boolean resetMonitorAfterRecording)
-  {
+  public void setResetMonitorAfterRecording(final boolean resetMonitorAfterRecording) {
     this.resetMonitorAfterRecording = resetMonitorAfterRecording;
   }
 
-  public void setMonitoringResetter(final MonitoringResetter monitoringResetter)
-  {
+  public void setMonitoringResetter(final MonitoringResetter monitoringResetter) {
     this.monitoringResetter = monitoringResetter;
   }
 }
-

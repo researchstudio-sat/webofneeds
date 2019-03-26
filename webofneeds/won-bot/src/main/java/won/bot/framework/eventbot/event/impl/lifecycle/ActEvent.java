@@ -19,9 +19,9 @@ package won.bot.framework.eventbot.event.impl.lifecycle;
 import won.bot.framework.eventbot.event.BaseEvent;
 
 /**
- * The Act event informs listeners that the bot was asked to perform a custom action.
+ * The Act event informs listeners that the bot was asked to perform a custom
+ * action.
  */
-public class ActEvent extends BaseEvent
-{
+public class ActEvent extends BaseEvent {
 
 }

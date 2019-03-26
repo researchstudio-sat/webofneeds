@@ -36,8 +36,7 @@ import won.cryptography.webid.AccessControlRules;
 /**
  * Created by fkleedorfer on 28.11.2016.
  */
-public class DefaultWoNAccessDecisionVoter implements AccessDecisionVoter
-{
+public class DefaultWoNAccessDecisionVoter implements AccessDecisionVoter {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
   @Autowired
@@ -60,21 +59,22 @@ public class DefaultWoNAccessDecisionVoter implements AccessDecisionVoter
   public int vote(final Authentication authentication, final Object object, final Collection collection) {
     StopWatch stopWatch = new StopWatch();
     stopWatch.start();
-    if (! (authentication instanceof PreAuthenticatedAuthenticationToken)) return ACCESS_ABSTAIN;
+    if (!(authentication instanceof PreAuthenticatedAuthenticationToken))
+      return ACCESS_ABSTAIN;
     Object principal = authentication.getPrincipal();
-    if (! (principal instanceof WebIdUserDetails)) return ACCESS_ABSTAIN;
+    if (!(principal instanceof WebIdUserDetails))
+      return ACCESS_ABSTAIN;
     WebIdUserDetails userDetails = (WebIdUserDetails) principal;
-    if (! (object instanceof FilterInvocation)) return ACCESS_ABSTAIN;
+    if (!(object instanceof FilterInvocation))
+      return ACCESS_ABSTAIN;
     String webId = userDetails.getUsername();
-    String resource = ((FilterInvocation)object).getRequest().getRequestURL().toString();
-    if (authentication.getAuthorities().stream()
-                      .map(GrantedAuthority::getAuthority)
-                      .filter(r -> "ROLE_WEBID".equals(r))
-                      .findAny().isPresent()) {
-      //perform our hard coded access control checks
+    String resource = ((FilterInvocation) object).getRequest().getRequestURL().toString();
+    if (authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).filter(r -> "ROLE_WEBID".equals(r))
+        .findAny().isPresent()) {
+      // perform our hard coded access control checks
       List<String> webIDs = new ArrayList<>(1);
       webIDs.add(webId);
-      if (defaultAccessControlRules.isAccessPermitted(resource, webIDs)){
+      if (defaultAccessControlRules.isAccessPermitted(resource, webIDs)) {
         stopWatch.stop();
         logger.debug("access control check took " + stopWatch.getLastTaskTimeMillis() + " millis");
         return ACCESS_GRANTED;

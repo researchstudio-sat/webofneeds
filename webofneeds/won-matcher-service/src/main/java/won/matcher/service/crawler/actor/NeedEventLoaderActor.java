@@ -17,12 +17,12 @@ import won.matcher.service.crawler.service.CrawlSparqlService;
 /**
  * Created by hfriedrich on 17.10.2016.
  *
- * Actor that loads crawled and saved need events from the rdf store the and sends them back to the actor requesting it
+ * Actor that loads crawled and saved need events from the rdf store the and
+ * sends them back to the actor requesting it
  */
 @Component
 @Scope("prototype")
-public class NeedEventLoaderActor extends UntypedActor
-{
+public class NeedEventLoaderActor extends UntypedActor {
   private static int MAX_BULK_SIZE = 10;
 
   private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
@@ -53,11 +53,11 @@ public class NeedEventLoaderActor extends UntypedActor
 
         // check if need event should be returned in time interval or last X need events
         if (msg.getLastXNeedEvents() == -1) {
-          bulkNeedEvent = sparqlService.retrieveActiveNeedEvents(
-            msg.getFromDate(), msg.getToDate(), offset, MAX_BULK_SIZE, true);
+          bulkNeedEvent = sparqlService.retrieveActiveNeedEvents(msg.getFromDate(), msg.getToDate(), offset,
+              MAX_BULK_SIZE, true);
         } else {
-          bulkNeedEvent = sparqlService.retrieveActiveNeedEvents(
-            0, Long.MAX_VALUE, offset, Math.min(MAX_BULK_SIZE, msg.getLastXNeedEvents() - offset), false);
+          bulkNeedEvent = sparqlService.retrieveActiveNeedEvents(0, Long.MAX_VALUE, offset,
+              Math.min(MAX_BULK_SIZE, msg.getLastXNeedEvents() - offset), false);
         }
 
         if (bulkNeedEvent.getNeedEvents().size() > 0) {

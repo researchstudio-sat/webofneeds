@@ -17,8 +17,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Scope("singleton")
-public class MonitoringService
-{
+public class MonitoringService {
   private final Logger log = LoggerFactory.getLogger(getClass());
 
   public static final String NEED_HINT_STOPWATCH = "NeedReceivedUntilFirstHintSent";
@@ -68,7 +67,7 @@ public class MonitoringService
       }
 
       split.stop();
-      //splits.remove(monitoringEvent.getSplitName());
+      // splits.remove(monitoringEvent.getSplitName());
     }
   }
 }

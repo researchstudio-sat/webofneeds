@@ -24,54 +24,54 @@ import won.protocol.repository.NeedRepository;
  */
 public class FacetDerivationProcessor implements Processor {
 
-    @Autowired
-    ConnectionRepository connectionRepository;
-    
-    @Autowired
-    NeedRepository needRepository;
+  @Autowired
+  ConnectionRepository connectionRepository;
 
-    @Autowired
-    FacetService derivationService;
+  @Autowired
+  NeedRepository needRepository;
 
+  @Autowired
+  FacetService derivationService;
 
-    public FacetDerivationProcessor() {
+  public FacetDerivationProcessor() {
+  }
+
+  @Override
+  public void process(Exchange exchange) throws Exception {
+    Optional<Connection> con = Optional.empty();
+    ConnectionStateChangeBuilder stateChangeBuilder = (ConnectionStateChangeBuilder) exchange.getIn()
+        .getHeader(WonCamelConstants.CONNECTION_STATE_CHANGE_BUILDER_HEADER);
+    if (stateChangeBuilder == null) {
+      throw new IllegalStateException("expecting to find a ConnectionStateBuilder in 'in' header '"
+          + WonCamelConstants.CONNECTION_STATE_CHANGE_BUILDER_HEADER + "'");
+    }
+    // first, try to find the connection uri in the header:
+    URI conUri = (URI) exchange.getIn().getHeader(WonCamelConstants.CONNECTION_URI_HEADER);
+    if (conUri == null) {
+      // not found. get it from the message and put it in the header
+      WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
+      conUri = wonMessage.getEnvelopeType() == WonMessageDirection.FROM_EXTERNAL ? wonMessage.getReceiverURI()
+          : wonMessage.getSenderURI();
+    }
+    if (conUri != null) {
+      // found a connection. Put its URI in the header and load it
+      con = Optional.of(connectionRepository.findOneByConnectionURI(conUri));
+      stateChangeBuilder.newState(con.get().getState());
+    } else {
+      // found no connection. don't modify the builder
     }
 
-    @Override
-    public void process(Exchange exchange) throws Exception {
-        Optional<Connection> con = Optional.empty();
-        ConnectionStateChangeBuilder stateChangeBuilder = (ConnectionStateChangeBuilder) exchange.getIn()
-                .getHeader(WonCamelConstants.CONNECTION_STATE_CHANGE_BUILDER_HEADER);
-        if (stateChangeBuilder == null) {
-            throw new IllegalStateException("expecting to find a ConnectionStateBuilder in 'in' header '"
-                    + WonCamelConstants.CONNECTION_STATE_CHANGE_BUILDER_HEADER + "'");
-        }
-        // first, try to find the connection uri in the header:
-        URI conUri = (URI) exchange.getIn().getHeader(WonCamelConstants.CONNECTION_URI_HEADER);
-        if (conUri == null) {
-            // not found. get it from the message and put it in the header
-            WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
-            conUri = wonMessage.getEnvelopeType() == WonMessageDirection.FROM_EXTERNAL ? wonMessage.getReceiverURI()
-                    : wonMessage.getSenderURI();
-        }
-        if (conUri != null) {
-            // found a connection. Put its URI in the header and load it
-            con = Optional.of(connectionRepository.findOneByConnectionURI(conUri));
-            stateChangeBuilder.newState(con.get().getState());
-        } else {
-            // found no connection. don't modify the builder
-        }
-        
-        // only if there is enough data to make a connectionStateChange object, make it and pass it to the data
-        // derivation service.
-        if (stateChangeBuilder.canBuild()) {
-            ConnectionStateChange connectionStateChange = stateChangeBuilder.build();
-            if (!con.isPresent()) {
-                con = Optional.of(connectionRepository.findOneByConnectionURI(conUri));
-            }
-            Need need = needRepository.findOneByNeedURI(con.get().getNeedURI());
-            derivationService.deriveDataForStateChange(connectionStateChange, need, con.get());
-        }
+    // only if there is enough data to make a connectionStateChange object, make it
+    // and pass it to the data
+    // derivation service.
+    if (stateChangeBuilder.canBuild()) {
+      ConnectionStateChange connectionStateChange = stateChangeBuilder.build();
+      if (!con.isPresent()) {
+        con = Optional.of(connectionRepository.findOneByConnectionURI(conUri));
+      }
+      Need need = needRepository.findOneByNeedURI(con.get().getNeedURI());
+      derivationService.deriveDataForStateChange(connectionStateChange, need, con.get());
     }
+  }
 
 }

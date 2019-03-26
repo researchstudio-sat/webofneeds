@@ -20,7 +20,7 @@ package won.bot.framework.eventbot.action.impl.trigger;
  * Starts the trigger if it has been activated.
  */
 public class StartBotTriggerCommandEvent extends BaseBotTriggerEvent {
-    public StartBotTriggerCommandEvent(BotTrigger botTrigger) {
-        super(botTrigger);
-    }
+  public StartBotTriggerCommandEvent(BotTrigger botTrigger) {
+    super(botTrigger);
+  }
 }

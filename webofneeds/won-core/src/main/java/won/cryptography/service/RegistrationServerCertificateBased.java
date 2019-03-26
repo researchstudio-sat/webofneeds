@@ -16,11 +16,9 @@ import won.protocol.exception.WonProtocolException;
 import won.protocol.service.ApplicationManagementService;
 
 /**
- * User: ypanchenko
- * Date: 08.10.2015
+ * User: ypanchenko Date: 08.10.2015
  */
-public class RegistrationServerCertificateBased implements RegistrationServer
-{
+public class RegistrationServerCertificateBased implements RegistrationServer {
 
   final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -29,20 +27,18 @@ public class RegistrationServerCertificateBased implements RegistrationServer
   private TrustStrategy trustStrategy;
   private AliasGenerator aliasGenerator = new AliasFromFingerprintGenerator();
 
-
-
   public RegistrationServerCertificateBased(final TrustStrategy trustStrategy) {
-    //this.trustStoreService = trustStoreService;
+    // this.trustStoreService = trustStoreService;
     this.trustStrategy = trustStrategy;
   }
 
   @Transactional
   public String registerOwner(Object certificateChainObj) throws WonProtocolException {
     String alias = null;
-    X509Certificate[] ownerCertChain = new X509Certificate[]{(X509Certificate) certificateChainObj};
+    X509Certificate[] ownerCertChain = new X509Certificate[] { (X509Certificate) certificateChainObj };
     checkTrusted(ownerCertChain);
     try {
-      alias  = aliasGenerator.generateAlias(ownerCertChain[0]);
+      alias = aliasGenerator.generateAlias(ownerCertChain[0]);
       logger.info("Public key hash to be used as ownerApplicationId: {}", alias);
       alias = ownerManagementService.registerOwnerApplication(alias);
     } catch (Exception e) {
@@ -54,7 +50,7 @@ public class RegistrationServerCertificateBased implements RegistrationServer
 
   public String registerNode(Object certificateChainObj) throws WonProtocolException {
 
-    X509Certificate[] nodeCertChain = new X509Certificate[]{(X509Certificate) certificateChainObj};
+    X509Certificate[] nodeCertChain = new X509Certificate[] { (X509Certificate) certificateChainObj };
     checkTrusted(nodeCertChain);
     return null;
   }
@@ -68,6 +64,5 @@ public class RegistrationServerCertificateBased implements RegistrationServer
       new WonProtocolException(e);
     }
   }
-
 
 }

@@ -17,21 +17,22 @@ import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
 
 /**
- *  This processor is intended for use in owners (bot or webapp).
+ * This processor is intended for use in owners (bot or webapp).
  *
- *  If the message type is CREATE, the processor adds the appropriate public key to the need's RDF content.
+ * If the message type is CREATE, the processor adds the appropriate public key
+ * to the need's RDF content.
  *
- *  If the <code>fixedPrivateKeyAlias</code> property is set, the processor generates at most one key pair with that alias
- *  and uses that key pair for all need it processes.
+ * If the <code>fixedPrivateKeyAlias</code> property is set, the processor
+ * generates at most one key pair with that alias and uses that key pair for all
+ * need it processes.
  *
- *  If the <code>fixedPrivateKeyAlias</code> property is not set, the processor generates one keypair per need, using
- *  the need URI as the keypair's alias.
+ * If the <code>fixedPrivateKeyAlias</code> property is not set, the processor
+ * generates one keypair per need, using the need URI as the keypair's alias.
  *
- *  This processor should be removed when user's/need's key management and signing happens in
- *  the Owner Client (browser).
+ * This processor should be removed when user's/need's key management and
+ * signing happens in the Owner Client (browser).
  *
- * User: ypanchenko
- * Date: 10.04.2015
+ * User: ypanchenko Date: 10.04.2015
  */
 public class KeyForNewNeedAddingProcessor implements WonMessageProcessor {
   private static final Logger logger = LoggerFactory.getLogger(KeyForNewNeedAddingProcessor.class);
@@ -52,7 +53,7 @@ public class KeyForNewNeedAddingProcessor implements WonMessageProcessor {
     try {
       if (message.getMessageType() == WonMessageType.CREATE_NEED) {
         String needUri = message.getSenderNeedURI().toString();
-        Dataset msgDataset =  WonMessageEncoder.encodeAsDataset(message);
+        Dataset msgDataset = WonMessageEncoder.encodeAsDataset(message);
         // generate and add need's public key to the need content
 
         String alias = keyPairAliasDerivationStrategy.getAliasForNeedUri(needUri);
@@ -69,7 +70,8 @@ public class KeyForNewNeedAddingProcessor implements WonMessageProcessor {
       }
     } catch (Exception e) {
       logger.error("Failed to add key", e);
-      throw new WonMessageProcessingException("Failed to add key for need in message " + message.getMessageURI().toString());
+      throw new WonMessageProcessingException(
+          "Failed to add key for need in message " + message.getMessageURI().toString());
     }
     return message;
   }

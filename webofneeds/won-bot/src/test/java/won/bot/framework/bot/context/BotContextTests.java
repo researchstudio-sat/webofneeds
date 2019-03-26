@@ -29,15 +29,14 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.TestContextManager;
 
 /**
- * Tests for bot context.
- * For the mongo db implementation you have to make manually sure that the connection toi the mongo db server exists
- * and that the database in empty on test start.
+ * Tests for bot context. For the mongo db implementation you have to make
+ * manually sure that the connection toi the mongo db server exists and that the
+ * database in empty on test start.
  *
  * Created by hfriedrich on 24.10.2016.
  */
 @RunWith(value = Parameterized.class)
-public class BotContextTests
-{
+public class BotContextTests {
   private static final URI URI1 = URI.create("http://test.uri/number#1");
   private static final URI URI2 = URI.create("http://test.uri/number#2");
   private static final URI URI3 = URI.create("http://test.uri/number#3");
@@ -62,8 +61,8 @@ public class BotContextTests
   @Parameterized.Parameters
   public static Iterable<Class[]> getTestParameters() {
     LinkedList<Class[]> linkedList = new LinkedList<>();
-    linkedList.add(new Class[] {MemoryBotContext.class});
-    linkedList.add(new Class[] {MongoBotContext.class});
+    linkedList.add(new Class[] { MemoryBotContext.class });
+    linkedList.add(new Class[] { MongoBotContext.class });
     return linkedList;
   }
 
@@ -109,7 +108,8 @@ public class BotContextTests
     botContext.removeNeedUriFromNamedNeedUriList(URI2, "uri1");
     botContext.removeNeedUriFromNamedNeedUriList(URI3, "uri1");
 
-    Assert.assertEquals(2, botContext.retrieveAllNeedUris().size()); // URI1 and URI2 should still be there in the general list
+    Assert.assertEquals(2, botContext.retrieveAllNeedUris().size()); // URI1 and URI2 should still be there in the
+                                                                     // general list
     Assert.assertEquals(1, botContext.getNamedNeedUriList("uri1").size());
     Assert.assertTrue(botContext.getNamedNeedUriList("uri1").contains(URI1));
     Assert.assertEquals(1, botContext.getNamedNeedUriList("uri2").size());
@@ -168,7 +168,7 @@ public class BotContextTests
     botContext.saveToObjectMap("col1", "uri1", URI1);
     botContext.saveToObjectMap("col1", "uri1", URI1);
     botContext.saveToObjectMap("col1", "uri2", URI1);
-    botContext.saveToObjectMap("col1", "uri2", URI2);  // overwrite
+    botContext.saveToObjectMap("col1", "uri2", URI2); // overwrite
     botContext.saveToObjectMap("col2", "uri1", URI2);
     botContext.saveToObjectMap("col2", "uri2", URI2);
     botContext.saveToObjectMap("col2", "uri3", URI3);
@@ -260,7 +260,8 @@ public class BotContextTests
     List<URI> uriListCopy = (List<URI>) botContext.loadFromObjectMap("uriList", "list1");
     Assert.assertEquals(uriList, uriListCopy);
 
-    // HashMap needs to be serialized (here only non-complex keys are allowed in maps)
+    // HashMap needs to be serialized (here only non-complex keys are allowed in
+    // maps)
     botContext.dropCollection("uriMap");
     HashMap<String, URI> uriHashMap = new HashMap<>();
     uriHashMap.put(URI1.toString(), URI1);
@@ -270,7 +271,7 @@ public class BotContextTests
     ObjectOutputStream oos = new ObjectOutputStream(os);
     oos.writeObject(uriHashMap);
     botContext.saveToObjectMap("uriMap", "map1", os.toByteArray());
-    byte[] byteMsg  = (byte[]) botContext.loadFromObjectMap("uriMap", "map1");
+    byte[] byteMsg = (byte[]) botContext.loadFromObjectMap("uriMap", "map1");
     ByteArrayInputStream is = new ByteArrayInputStream(byteMsg);
     ObjectInputStream ois = new ObjectInputStream(is);
     HashMap<String, URI> uriHashMapCopy = (HashMap<String, URI>) ois.readObject();
@@ -285,11 +286,12 @@ public class BotContextTests
     uriTreeMap.put(URI1.toString(), URI2);
     uriTreeMap.put(URI2.toString(), URI3);
     uriTreeMap.put(URI3.toString(), URI1);
-    botContext.saveToObjectMap("uriMap", "map1", uriTreeMap);  // overwrite the HashMap entry from the previous step
-    Map<String, URI> uriTreeMapCopy  = (Map<String, URI>) botContext.loadFromObjectMap("uriMap", "map1");
+    botContext.saveToObjectMap("uriMap", "map1", uriTreeMap); // overwrite the HashMap entry from the previous step
+    Map<String, URI> uriTreeMapCopy = (Map<String, URI>) botContext.loadFromObjectMap("uriMap", "map1");
     Assert.assertEquals(uriTreeMap, uriTreeMapCopy);
 
-    // MimeMessage cannot be serialized directly => has to be serialized manually first
+    // MimeMessage cannot be serialized directly => has to be serialized manually
+    // first
     botContext.dropCollection("mime");
     Properties props = new Properties();
     MimeMessage message = new MimeMessage(Session.getDefaultInstance(props, null));
@@ -309,7 +311,7 @@ public class BotContextTests
     Assert.assertEquals(message.getHeader("test1")[0], messageCopy.getHeader("test1")[0]);
     Assert.assertEquals(message.getAllHeaderLines().nextElement(), messageCopy.getAllHeaderLines().nextElement());
     Assert.assertEquals(message.getRecipients(Message.RecipientType.TO)[0],
-                        messageCopy.getRecipients(Message.RecipientType.TO)[0]);
+        messageCopy.getRecipients(Message.RecipientType.TO)[0]);
     Assert.assertEquals(message.getSubject(), messageCopy.getSubject());
     Assert.assertEquals(message.getDescription(), messageCopy.getDescription());
     Assert.assertEquals(message.getSentDate(), messageCopy.getSentDate());
@@ -318,7 +320,5 @@ public class BotContextTests
     ois.close();
     is.close();
   }
-
-
 
 }

@@ -11,8 +11,7 @@ import won.bot.framework.eventbot.listener.EventListener;
 /**
  * Created by hfriedrich on 16.11.2016.
  */
-public class WelcomeMailAction extends BaseEventBotAction
-{
+public class WelcomeMailAction extends BaseEventBotAction {
   private MessageChannel sendChannel;
   private WonMimeMessageGenerator mailGenerator;
 
@@ -25,7 +24,7 @@ public class WelcomeMailAction extends BaseEventBotAction
 
   @Override
   protected void doRun(final Event event, EventListener executingListener) throws Exception {
-    if(event instanceof WelcomeMailEvent){
+    if (event instanceof WelcomeMailEvent) {
       WonMimeMessage welcomeMessage = mailGenerator.createWelcomeMail(((WelcomeMailEvent) event).getMessage());
       sendChannel.send(new GenericMessage<>(welcomeMessage));
     }

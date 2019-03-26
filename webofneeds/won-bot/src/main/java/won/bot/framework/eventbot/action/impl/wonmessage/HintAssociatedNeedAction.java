@@ -33,26 +33,24 @@ import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
 /**
- * BaseEventBotAction connecting two needs on the specified facets, or on their default facets if none are specified.
- * Requires a NeedSpecificEvent to run and expeects the needURI from the event
- * to be associated with another need URI via the botContext.saveToObjectMap method.
+ * BaseEventBotAction connecting two needs on the specified facets, or on their
+ * default facets if none are specified. Requires a NeedSpecificEvent to run and
+ * expeects the needURI from the event to be associated with another need URI
+ * via the botContext.saveToObjectMap method.
  */
-public class HintAssociatedNeedAction extends BaseEventBotAction
-{
+public class HintAssociatedNeedAction extends BaseEventBotAction {
   private Optional<URI> remoteFacetType = Optional.empty();
   private Optional<URI> localFacetType = Optional.empty();
   private URI matcherURI;
 
-  public HintAssociatedNeedAction(final EventListenerContext eventListenerContext, final URI remoteFacetType, final URI
-    localFacetType, final URI matcherURI)
-  {
+  public HintAssociatedNeedAction(final EventListenerContext eventListenerContext, final URI remoteFacetType,
+      final URI localFacetType, final URI matcherURI) {
     super(eventListenerContext);
     this.remoteFacetType = Optional.of(remoteFacetType);
     this.localFacetType = Optional.of(localFacetType);
     this.matcherURI = matcherURI;
   }
-  
-  
+
   /**
    * 
    * @param eventListenerContext
@@ -61,14 +59,11 @@ public class HintAssociatedNeedAction extends BaseEventBotAction
   public HintAssociatedNeedAction(EventListenerContext eventListenerContext, URI matcherURI) {
     super(eventListenerContext);
     this.matcherURI = matcherURI;
-}
+  }
 
-
-
-@Override
-  public void doRun(Event event, EventListener executingListener)
-  {
-    if (! (event instanceof NeedSpecificEvent)){
+  @Override
+  public void doRun(Event event, EventListener executingListener) {
+    if (!(event instanceof NeedSpecificEvent)) {
       logger.error("HintAssociatedNeedAction can only handle NeedSpecificEvents");
       return;
     }
@@ -78,38 +73,33 @@ public class HintAssociatedNeedAction extends BaseEventBotAction
     try {
       logger.info("Sending hint for {} and {}", myNeedUri, remoteNeedUri);
 
-      getEventListenerContext().getMatcherProtocolNeedServiceClient().hint(
-        remoteNeedUri, myNeedUri, 0.9, matcherURI, null, createWonMessage(
-          remoteNeedUri, myNeedUri, 0.9, matcherURI));
+      getEventListenerContext().getMatcherProtocolNeedServiceClient().hint(remoteNeedUri, myNeedUri, 0.9, matcherURI,
+          null, createWonMessage(remoteNeedUri, myNeedUri, 0.9, matcherURI));
 
     } catch (Exception e) {
-      logger.warn("could not send hint for " +myNeedUri+ " to " + remoteNeedUri, e);
+      logger.warn("could not send hint for " + myNeedUri + " to " + remoteNeedUri, e);
     }
   }
 
   private WonMessage createWonMessage(URI needURI, URI otherNeedURI, double score, URI originator)
-    throws WonMessageBuilderException {
+      throws WonMessageBuilderException {
 
     LinkedDataSource linkedDataSource = getEventListenerContext().getLinkedDataSource();
 
-    WonNodeInformationService wonNodeInformationService =
-      getEventListenerContext().getWonNodeInformationService();
+    WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
 
-    URI localWonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(
-            linkedDataSource.getDataForResource(needURI), needURI);
+    URI localWonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(linkedDataSource.getDataForResource(needURI),
+        needURI);
 
     return WonMessageBuilder
-      .setMessagePropertiesForHint(
-        wonNodeInformationService.generateEventURI(
-          localWonNode),
-        needURI,
-        localFacetType.map(facetType -> WonLinkedDataUtils.getFacetsOfType(needURI, facetType, linkedDataSource).stream().findFirst().orElse(null)),
-        localWonNode,
-        otherNeedURI,
-        remoteFacetType.map(facetType -> WonLinkedDataUtils.getFacetsOfType(otherNeedURI, facetType, linkedDataSource).stream().findFirst().orElse(null)),
-        originator,
-        score)
-      .build();
+        .setMessagePropertiesForHint(wonNodeInformationService.generateEventURI(localWonNode), needURI,
+            localFacetType.map(facetType -> WonLinkedDataUtils
+                .getFacetsOfType(needURI, facetType, linkedDataSource).stream().findFirst().orElse(null)),
+            localWonNode, otherNeedURI,
+            remoteFacetType.map(facetType -> WonLinkedDataUtils
+                .getFacetsOfType(otherNeedURI, facetType, linkedDataSource).stream().findFirst().orElse(null)),
+            originator, score)
+        .build();
   }
 
 }

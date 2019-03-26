@@ -25,18 +25,18 @@ import won.protocol.message.WonMessageType;
  * Instructs the bot to deactivate a need.
  */
 public class DeactivateNeedCommandEvent implements MessageCommandEvent {
-    private URI needUri;
+  private URI needUri;
 
-    public DeactivateNeedCommandEvent(URI needUri) {
-        this.needUri = needUri;
-    }
+  public DeactivateNeedCommandEvent(URI needUri) {
+    this.needUri = needUri;
+  }
 
-    @Override
-    public WonMessageType getWonMessageType() {
-        return WonMessageType.DEACTIVATE;
-    }
+  @Override
+  public WonMessageType getWonMessageType() {
+    return WonMessageType.DEACTIVATE;
+  }
 
-    public URI getNeedUri() {
-        return needUri;
-    }
+  public URI getNeedUri() {
+    return needUri;
+  }
 }

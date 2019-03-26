@@ -25,14 +25,14 @@ import won.bot.framework.eventbot.event.impl.cmd.CommandEvent;
  * Initiates the validation of the data of a given connection.
  */
 public class ValidateConnectionCommandEvent extends BaseNeedSpecificEvent implements CommandEvent {
-    private URI connectionURI;
+  private URI connectionURI;
 
-    public ValidateConnectionCommandEvent(URI needURI, URI connectionURI) {
-        super(needURI);
-        this.connectionURI = connectionURI;
-    }
+  public ValidateConnectionCommandEvent(URI needURI, URI connectionURI) {
+    super(needURI);
+    this.connectionURI = connectionURI;
+  }
 
-    public URI getConnectionURI() {
-        return connectionURI;
-    }
+  public URI getConnectionURI() {
+    return connectionURI;
+  }
 }

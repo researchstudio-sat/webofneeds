@@ -25,45 +25,45 @@ import won.bot.framework.eventbot.filter.EventFilter;
  * Counter that publishes a CountEvent each time it counts.
  */
 public class EventPublishingCounter extends CounterImpl {
-    private EventBus eventBus;
+  private EventBus eventBus;
 
-    public EventPublishingCounter(String name, int initialCount, EventListenerContext context) {
-        super(name, initialCount);
-        this.eventBus = context.getEventBus();
+  public EventPublishingCounter(String name, int initialCount, EventListenerContext context) {
+    super(name, initialCount);
+    this.eventBus = context.getEventBus();
+  }
+
+  public EventPublishingCounter(String name, EventListenerContext context) {
+    super(name);
+    this.eventBus = context.getEventBus();
+  }
+
+  @Override
+  public int increment() {
+    int count = super.increment();
+    if (eventBus != null) {
+      eventBus.publish(new CountEvent(this, count));
     }
+    return count;
+  }
 
-    public EventPublishingCounter(String name, EventListenerContext context) {
-        super(name);
-        this.eventBus = context.getEventBus();
+  @Override
+  public int decrement() {
+    int count = super.decrement();
+    if (eventBus != null) {
+      eventBus.publish(new CountEvent(this, count));
     }
+    return count;
+  }
 
-    @Override
-    public int increment() {
-        int count = super.increment();
-        if (eventBus != null) {
-            eventBus.publish(new CountEvent(this, count));
+  public EventFilter makeEventFilter() {
+    return new EventFilter() {
+      @Override
+      public boolean accept(Event event) {
+        if (!(event instanceof CountEvent)) {
+          return false;
         }
-        return count;
-    }
-
-    @Override
-    public int decrement() {
-        int count = super.decrement();
-        if (eventBus != null) {
-            eventBus.publish(new CountEvent(this, count));
-        }
-        return count;
-    }
-
-    public EventFilter makeEventFilter(){
-        return new EventFilter() {
-            @Override
-            public boolean accept(Event event) {
-                if (! (event instanceof CountEvent)) {
-                    return false;
-                }
-                return ((CountEvent)event).getCounter() == EventPublishingCounter.this;
-            }
-        };
-    }
+        return ((CountEvent) event).getCounter() == EventPublishingCounter.this;
+      }
+    };
+  }
 }

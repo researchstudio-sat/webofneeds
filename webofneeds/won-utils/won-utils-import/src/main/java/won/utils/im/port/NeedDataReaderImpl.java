@@ -5,11 +5,9 @@ import java.io.IOException;
 import org.apache.jena.rdf.model.Model;
 
 /**
- * User: ypanchenko
- * Date: 04.09.2014
+ * User: ypanchenko Date: 04.09.2014
  */
-public class NeedDataReaderImpl implements NeedDataReader<Model>
-{
+public class NeedDataReaderImpl implements NeedDataReader<Model> {
   @Override
   public boolean hasNext() {
     // TODO implement

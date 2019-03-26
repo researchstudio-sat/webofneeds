@@ -41,28 +41,29 @@ import org.slf4j.LoggerFactory;
  */
 @Entity
 @Table(name = "rdf_models")
-public class ModelHolder
-{
+public class ModelHolder {
   private static final int DEFAULT_BYTE_ARRAY_SIZE = 500;
 
   @Transient
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  //the URI of the model
+  // the URI of the model
   @Id
-  @Column( name = "modelURI", unique = true)
-  @Convert( converter = URIConverter.class)
+  @Column(name = "modelURI", unique = true)
+  @Convert(converter = URIConverter.class)
   private URI uri;
 
-  //the model as a byte array
-  @Lob @Column( name = "model", nullable = false, length = 100000)
+  // the model as a byte array
+  @Lob
+  @Column(name = "model", nullable = false, length = 100000)
   private byte[] modelBytes;
 
-  //for multiple accesses to model, cache it.
+  // for multiple accesses to model, cache it.
   @Transient
   private Model cachedModel;
 
-  ModelHolder(){}
+  ModelHolder() {
+  }
 
   public ModelHolder(final URI uri, final Model model) {
     this.uri = uri;
@@ -89,16 +90,17 @@ public class ModelHolder
 
   /**
    * Careful, expensive operation: writes model to string.
+   * 
    * @param model
    */
   public void setModel(Model model) {
     assert this.uri != null : "uri must not be null";
     assert this.modelBytes != null : "model must not be null";
     ByteArrayOutputStream out = new ByteArrayOutputStream(DEFAULT_BYTE_ARRAY_SIZE);
-    synchronized(this){
+    synchronized (this) {
       RDFDataMgr.write(out, model, Lang.TTL);
       this.modelBytes = out.toByteArray();
-      if (logger.isDebugEnabled()){
+      if (logger.isDebugEnabled()) {
         logger.debug("wrote model {} to byte array of length {}", this.uri, this.modelBytes.length);
       }
     }
@@ -106,24 +108,24 @@ public class ModelHolder
 
   /**
    * Careful, expensive operation: reads model from string.
+   * 
    * @return
    */
-  public Model getModel(){
+  public Model getModel() {
     assert this.uri != null : "uri must not be null";
     assert this.modelBytes != null : "model must not be null";
-    if (this.cachedModel != null) return cachedModel;
+    if (this.cachedModel != null)
+      return cachedModel;
     synchronized (this) {
-      if (this.cachedModel != null) return cachedModel;
+      if (this.cachedModel != null)
+        return cachedModel;
       Model model = ModelFactory.createDefaultModel();
       InputStream is = new ByteArrayInputStream(this.modelBytes);
       try {
-        RDFDataMgr.read(model, is,  this.uri.toString(), Lang.TTL);
+        RDFDataMgr.read(model, is, this.uri.toString(), Lang.TTL);
       } catch (Exception e) {
         logger.warn("could not read model {} from byte array. Byte array is null: {}, has length {}",
-          new Object[]{this.uri,
-            this.modelBytes == null,
-            this.modelBytes == null ? -1 : this.modelBytes.length}
-        );
+            new Object[] { this.uri, this.modelBytes == null, this.modelBytes == null ? -1 : this.modelBytes.length });
         logger.warn("caught exception while reading model", e);
       }
       this.cachedModel = model;

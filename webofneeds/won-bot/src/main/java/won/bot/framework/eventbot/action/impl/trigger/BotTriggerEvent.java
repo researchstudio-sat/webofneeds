@@ -20,7 +20,7 @@ package won.bot.framework.eventbot.action.impl.trigger;
  * Published by the bot at configurable intervals.
  */
 public class BotTriggerEvent extends BaseBotTriggerEvent {
-    public BotTriggerEvent(BotTrigger botTrigger) {
-        super(botTrigger);
-    }
+  public BotTriggerEvent(BotTrigger botTrigger) {
+    super(botTrigger);
+  }
 }

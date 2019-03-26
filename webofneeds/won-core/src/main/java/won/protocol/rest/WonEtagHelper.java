@@ -16,7 +16,6 @@
 
 package won.protocol.rest;
 
-
 import java.util.List;
 
 import org.hibernate.annotations.common.util.impl.LoggerFactory;
@@ -27,10 +26,9 @@ import org.springframework.http.MediaType;
 /**
  * Utils for our very specific way of creating/parsing etags.
  */
-public class WonEtagHelper
-{
+public class WonEtagHelper {
   private static final Logger logger = LoggerFactory.logger(WonEtagHelper.class);
-  private static final char VERSION_MEDIATYPE_DELIMITER=' ';
+  private static final char VERSION_MEDIATYPE_DELIMITER = ' ';
   private String version = null;
   private MediaType mediaType = null;
 
@@ -39,8 +37,9 @@ public class WonEtagHelper
     this.mediaType = mediaType;
   }
 
-  public static WonEtagHelper forVersion(String version){
-    if (version == null) return null;
+  public static WonEtagHelper forVersion(String version) {
+    if (version == null)
+      return null;
     return new WonEtagHelper(version, null);
   }
 
@@ -48,91 +47,97 @@ public class WonEtagHelper
    * Returns a WonEtagHelper if the specified string is a valid ETAG, combining
    * [VERSION] {[DELIMITER] [MEDIA-TYPE]} (curly brackets inticate 'optional')
    * Returns null if the specified etagValue is null or not valid.
+   * 
    * @param etagValue
    * @return
    */
-  public static WonEtagHelper fromEtagValue(String etagValue){
-    if (etagValue == null) return null;
+  public static WonEtagHelper fromEtagValue(String etagValue) {
+    if (etagValue == null)
+      return null;
     etagValue = etagValue.trim();
     if (etagValue.startsWith("W/")) {
-      logger.debug("weak etag matching is not supported, cannot " +
-                                           "process: " +etagValue);
+      logger.debug("weak etag matching is not supported, cannot " + "process: " + etagValue);
       return null;
     }
     if (!etagValue.startsWith("\"")) {
-      logger.debug("etag must start with '\"', cannot process: " +etagValue);
+      logger.debug("etag must start with '\"', cannot process: " + etagValue);
       return null;
     }
     if (!etagValue.endsWith("\"")) {
-      logger.debug("etag must end with '\"', cannot process: " +etagValue);
+      logger.debug("etag must end with '\"', cannot process: " + etagValue);
       return null;
     }
     int index = etagValue.indexOf(VERSION_MEDIATYPE_DELIMITER);
-    if (index == -1){
-      //delimiter not found. Assume only version
-      return new WonEtagHelper(etagValue.substring(1,etagValue.length()-1), null);
+    if (index == -1) {
+      // delimiter not found. Assume only version
+      return new WonEtagHelper(etagValue.substring(1, etagValue.length() - 1), null);
     }
     MediaType mt = null;
     try {
-       mt = MediaType.parseMediaType(etagValue.substring(index,etagValue.length()-1));
-    } catch (Exception e){
+      mt = MediaType.parseMediaType(etagValue.substring(index, etagValue.length() - 1));
+    } catch (Exception e) {
       logger.debug("not a valid media type in etag value, cannot process: " + etagValue);
-      //not a valid media type
+      // not a valid media type
       return null;
     }
-    return new WonEtagHelper(etagValue.substring(1,index), mt);
+    return new WonEtagHelper(etagValue.substring(1, index), mt);
   }
 
   /**
-   * Returns a new WonEtagHelper object created from the specified headers if there is an ETAG header and the value
-   * parsed for the mediatype is actually compatible with the mediatypes listed in the accept header. We assume that
-   * if that is not the case, the server will have to produce a new result as the mediatype cached by the client is
-   * different from the one the server will produce now.
-   * If there is no Accept header, the helper object will be returned.
-   * If parsing the ETAG does not reveal a MediaType, the helperObject will not be returned.
+   * Returns a new WonEtagHelper object created from the specified headers if
+   * there is an ETAG header and the value parsed for the mediatype is actually
+   * compatible with the mediatypes listed in the accept header. We assume that if
+   * that is not the case, the server will have to produce a new result as the
+   * mediatype cached by the client is different from the one the server will
+   * produce now. If there is no Accept header, the helper object will be
+   * returned. If parsing the ETAG does not reveal a MediaType, the helperObject
+   * will not be returned.
+   * 
    * @param headers
    * @return
    */
-  public static WonEtagHelper fromHeaderIfCompatibleWithAcceptHeader(HttpHeaders headers){
+  public static WonEtagHelper fromHeaderIfCompatibleWithAcceptHeader(HttpHeaders headers) {
     WonEtagHelper helper = fromIfNoneMatchHeader(headers);
     if (helper == null || helper.getMediaType() == null) {
       return null;
     }
-    if (headers.getAccept().stream().anyMatch( m -> m.isCompatibleWith(helper.getMediaType()))){
+    if (headers.getAccept().stream().anyMatch(m -> m.isCompatibleWith(helper.getMediaType()))) {
       return helper;
     }
     return null;
   }
 
-  public static WonEtagHelper fromIfNoneMatchHeader(HttpHeaders headers){
+  public static WonEtagHelper fromIfNoneMatchHeader(HttpHeaders headers) {
     List<String> etags = headers.getIfNoneMatch();
-    if (etags.size() == 0) return null;
+    if (etags.size() == 0)
+      return null;
     if (etags.size() > 1) {
       logger.info("found more than one If-None-Match header values, only using first one");
-    };
+    }
+    ;
     return fromEtagValue(etags.get(0));
   }
 
-  public static WonEtagHelper fromEtagHeader(HttpHeaders headers){
+  public static WonEtagHelper fromEtagHeader(HttpHeaders headers) {
     return fromEtagValue(headers.getETag());
   }
 
-  public static void setMediaTypeForEtagHeaderIfPresent(MediaType mediaType, HttpHeaders headers){
+  public static void setMediaTypeForEtagHeaderIfPresent(MediaType mediaType, HttpHeaders headers) {
     WonEtagHelper wonEtagHelper = fromEtagHeader(headers);
-    if (wonEtagHelper != null){
+    if (wonEtagHelper != null) {
       wonEtagHelper.setMediaType(mediaType);
       setEtagHeader(wonEtagHelper, headers);
     }
   }
 
-  public static void setEtagHeader(WonEtagHelper wonEtagHelper, HttpHeaders headers){
+  public static void setEtagHeader(WonEtagHelper wonEtagHelper, HttpHeaders headers) {
     if (wonEtagHelper.isValid()) {
       headers.setETag(wonEtagHelper.getEtagString());
     }
   }
 
-  public static String getVersionIdentifier(WonEtagHelper wonEtagHelper){
-    if (wonEtagHelper != null){
+  public static String getVersionIdentifier(WonEtagHelper wonEtagHelper) {
+    if (wonEtagHelper != null) {
       return wonEtagHelper.getVersion();
     }
     return null;
@@ -158,10 +163,10 @@ public class WonEtagHelper
     return version != null;
   }
 
-  public String getEtagString(){
+  public String getEtagString() {
     StringBuilder stringBuilder = new StringBuilder();
     stringBuilder.append('"').append(version);
-    if (mediaType != null){
+    if (mediaType != null) {
       stringBuilder.append(VERSION_MEDIATYPE_DELIMITER);
       stringBuilder.append(mediaType.toString());
     }

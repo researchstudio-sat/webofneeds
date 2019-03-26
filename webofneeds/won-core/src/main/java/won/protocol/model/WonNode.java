@@ -26,87 +26,81 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 /**
- * User: sbyim
- * Date: 12.11.13
+ * User: sbyim Date: 12.11.13
  */
 @Entity
 @Table(name = "wonNode")
 public class WonNode {
 
-    @Id
-    @GeneratedValue
-    @Column(name="id")
-    private Long id;
+  @Id
+  @GeneratedValue
+  @Column(name = "id")
+  private Long id;
 
-    @Column( name = "wonNodeURI", unique = true )
-    @Convert( converter = URIConverter.class)
-    private URI wonNodeURI;
+  @Column(name = "wonNodeURI", unique = true)
+  @Convert(converter = URIConverter.class)
+  private URI wonNodeURI;
 
-    @Column( name = "brokerURI")
-    @Convert( converter = URIConverter.class)
-    private URI brokerURI;
+  @Column(name = "brokerURI")
+  @Convert(converter = URIConverter.class)
+  private URI brokerURI;
 
-    @Column(name = "ownerProtocolEndpoint")
-    private String ownerProtocolEndpoint;
+  @Column(name = "ownerProtocolEndpoint")
+  private String ownerProtocolEndpoint;
 
-    @Column(name = "startingComponent")
-    private String startingComponent;
+  @Column(name = "startingComponent")
+  private String startingComponent;
 
-    @Column(name = "brokerComponent")
-    private String brokerComponent;
+  @Column(name = "brokerComponent")
+  private String brokerComponent;
 
-    private String ownerApplicationID;
+  private String ownerApplicationID;
 
-    public String getOwnerProtocolEndpoint() {
-        return ownerProtocolEndpoint;
-    }
+  public String getOwnerProtocolEndpoint() {
+    return ownerProtocolEndpoint;
+  }
 
-    public void setOwnerProtocolEndpoint(String ownerProtocolEndpoint) {
-        this.ownerProtocolEndpoint = ownerProtocolEndpoint;
-    }
+  public void setOwnerProtocolEndpoint(String ownerProtocolEndpoint) {
+    this.ownerProtocolEndpoint = ownerProtocolEndpoint;
+  }
 
-    public URI getWonNodeURI() {
-        return wonNodeURI;
-    }
+  public URI getWonNodeURI() {
+    return wonNodeURI;
+  }
 
-    public void setWonNodeURI(URI wonNodeURI) {
-        this.wonNodeURI = wonNodeURI;
-    }
+  public void setWonNodeURI(URI wonNodeURI) {
+    this.wonNodeURI = wonNodeURI;
+  }
 
+  public String getOwnerApplicationID() {
+    return ownerApplicationID;
+  }
 
-    public String getOwnerApplicationID() {
-        return ownerApplicationID;
-    }
+  public void setOwnerApplicationID(String ownerApplicationID) {
+    this.ownerApplicationID = ownerApplicationID;
+  }
 
-    public void setOwnerApplicationID(String ownerApplicationID) {
-        this.ownerApplicationID = ownerApplicationID;
-    }
+  public URI getBrokerURI() {
+    return brokerURI;
+  }
 
-    public URI getBrokerURI() {
-        return brokerURI;
-    }
+  public void setBrokerURI(URI brokerURI) {
+    this.brokerURI = brokerURI;
+  }
 
-    public void setBrokerURI(URI brokerURI) {
-        this.brokerURI = brokerURI;
-    }
+  public String getStartingComponent() {
+    return startingComponent;
+  }
 
-    public String getStartingComponent() {
-        return startingComponent;
-    }
+  public void setStartingComponent(String startingComponent) {
+    this.startingComponent = startingComponent;
+  }
 
-    public void setStartingComponent(String startingComponent) {
-        this.startingComponent = startingComponent;
-    }
+  public String getBrokerComponent() {
+    return brokerComponent;
+  }
 
-    public String getBrokerComponent() {
-        return brokerComponent;
-    }
-
-    public void setBrokerComponent(String brokerComponent) {
-        this.brokerComponent = brokerComponent;
-    }
+  public void setBrokerComponent(String brokerComponent) {
+    this.brokerComponent = brokerComponent;
+  }
 }
-
-
-
-

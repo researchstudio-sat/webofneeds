@@ -21,23 +21,23 @@ import java.net.URI;
 import won.protocol.vocabulary.WON;
 
 /**
- * User: fkleedorfer
- * Date: 02.11.12
+ * User: fkleedorfer Date: 02.11.12
  */
-public enum ConnectionEventType
-{
-  //in general, be permissive about messages where possible. Don't care about duplicate messages
+public enum ConnectionEventType {
+  // in general, be permissive about messages where possible. Don't care about
+  // duplicate messages
 
-  //close may always be called. It always closes the connnection.
-  OWNER_CLOSE("OwnerClose", ConnectionState.SUGGESTED, ConnectionState.REQUEST_SENT,
-          ConnectionState.REQUEST_RECEIVED, ConnectionState.CONNECTED, ConnectionState.CLOSED),
+  // close may always be called. It always closes the connnection.
+  OWNER_CLOSE("OwnerClose", ConnectionState.SUGGESTED, ConnectionState.REQUEST_SENT, ConnectionState.REQUEST_RECEIVED,
+      ConnectionState.CONNECTED, ConnectionState.CLOSED),
   PARTNER_CLOSE("PartnerClose", ConnectionState.SUGGESTED, ConnectionState.REQUEST_SENT,
-          ConnectionState.REQUEST_RECEIVED, ConnectionState.CONNECTED, ConnectionState.CLOSED),
-    //open may always be called. It may re-open a connection, it does not change the state of connected connections
-  OWNER_OPEN("OwnerOpen", ConnectionState.SUGGESTED, ConnectionState.REQUEST_SENT,
-          ConnectionState.REQUEST_RECEIVED, ConnectionState.CONNECTED, ConnectionState.CLOSED),
-  PARTNER_OPEN("PartnerOpen", ConnectionState.SUGGESTED, ConnectionState.REQUEST_SENT,
-          ConnectionState.REQUEST_RECEIVED, ConnectionState.CONNECTED, ConnectionState.CLOSED),
+      ConnectionState.REQUEST_RECEIVED, ConnectionState.CONNECTED, ConnectionState.CLOSED),
+  // open may always be called. It may re-open a connection, it does not change
+  // the state of connected connections
+  OWNER_OPEN("OwnerOpen", ConnectionState.SUGGESTED, ConnectionState.REQUEST_SENT, ConnectionState.REQUEST_RECEIVED,
+      ConnectionState.CONNECTED, ConnectionState.CLOSED),
+  PARTNER_OPEN("PartnerOpen", ConnectionState.SUGGESTED, ConnectionState.REQUEST_SENT, ConnectionState.REQUEST_RECEIVED,
+      ConnectionState.CONNECTED, ConnectionState.CLOSED),
 
   OWNER_MESSAGE("OwnerMessage", ConnectionState.CONNECTED),
   PARTNER_MESSAGE("PartnerMessage", ConnectionState.CONNECTED),
@@ -52,9 +52,10 @@ public enum ConnectionEventType
     this.name = name;
   }
 
-  public boolean isMessageAllowed(ConnectionState stateToCheck){
-    for (ConnectionState st: this.permittingStates) {
-      if (st.equals(stateToCheck)) return true;
+  public boolean isMessageAllowed(ConnectionState stateToCheck) {
+    for (ConnectionState st : this.permittingStates) {
+      if (st.equals(stateToCheck))
+        return true;
     }
     return false;
   }
