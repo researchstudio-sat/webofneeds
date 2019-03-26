@@ -188,9 +188,7 @@
                         keyStorePassword="${activemq.broker.keystore.password}"
                         >
                     <trustManagers>
-                        <spring:bean class="won.cryptography.ssl.TrustManagerWrapperWithTrustService">
-                            <spring:constructor-arg ref="trustStoreService" />
-                        </spring:bean>
+                        <spring:bean class="won.utils.tls.AcceptAllCertsTrustManager" />
                     </trustManagers>
 
                 </sslContext>
