@@ -22,7 +22,7 @@
 Follow the [instructions for generating your keys](https://github.com/researchstudio-sat/webofneeds/blob/master/documentation/installation-cryptographic-keys-and-certificates.md). The result will be a `t-keystore.jks` file somewhere in your filesystem.
 
 ### Tomcat integration:
-0.  Download/Install the latest Tomcat 9 server
+0.  Download/Install the latest [Tomcat 9 server](https://tomcat.apache.org/download-90.cgi)
 1.  Create Server in Eclipse: File >> New >> Other >> Server
 2.  Choose Tomcat 9, then press "next" (not "finish")
 3.  Make sure you use a Java 8 JDK or JRE, not java 9, or tomcat will not start up and throw a JAXB-related exception.
