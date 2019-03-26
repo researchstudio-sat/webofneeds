@@ -18,6 +18,9 @@
 11. Set maven profiles: right-click the webofneeds project in the package explorer >> Maven >> Select Maven Profiles. check `skip-tests`
 12. If you develop on Windows you will need to setup `node`s `windows-build-tools` (see [this guide](./installation-setting-up-frontend-development-environment.md#installing-windows-build-tools-on-windows))
 
+### Preparation: generate cryptographic keys
+Follow the [instructions for generating your keys](https://github.com/researchstudio-sat/webofneeds/blob/master/documentation/installation-cryptographic-keys-and-certificates.md). The result will be a `t-keystore.jks` file somewhere in your filesystem.
+
 ### Tomcat integration:
 0.  Download/Install the latest Tomcat 9 server
 1.  Create Server in Eclipse: File >> New >> Other >> Server
@@ -28,7 +31,9 @@
             1. Maybe you did not install eclipse for Java EE. Check Help >> About Eclipse. If it does not say 'Eclipse Java EE IDE for Web Developers.', the easiest is to download and install Eclipse for Java EE.
             2. Maybe the import of the webofneeds maven project somehow did not work properly. Delete all imported projects (without deleting the sources), then import again (File >> Import... >> Maven >> Existing Maven Projects )
 5.  Add Server view: Window >> Show View >> Server
-6.  Change server.xml: In Project Explorer >> Server >> "Your Server" >> open `server.xml` and add
+6.  Change server.xml: In Project Explorer >> Server >> "Your Server" >> open `server.xml` and add the following xml snippet.
+
+**Note:** the keystore mentioned here is the one you generated earlier in the *Preparation* step.
 ```xml
         <Connector 
     port="8443"
@@ -58,8 +63,7 @@
         ...
         </Service>
   ```
-  
-**NOTE: replace with your own certificate path for server and client certificate locations if necessary**
+
         
 7.  Edit server configuration: DoubleClick the server in the "Server View" and select:
 	*  Open launch configuration >> (x)= Arguments >> VM arguments
@@ -71,7 +75,7 @@
 		* if you don't find it
 			* build the whole project with `mvn install -Dmaven.test.skip=true`
 			* try again   
-	* Add the `won-utils-tls-x.y-jar`, which is generated into webofneeds/target/required-libs to your tomcat's classpath libs 
+	* Like above, add another classpath entry: the `won-utils-tls-x.y-jar`, which is generated into `webofneeds/target/required-libs` by the maven build
 	*  Server Locations: Use Workspace Metadata
 	*  Server Options
 		* [x] Serve modules without publishing *(allows for instant effect of changes)*
@@ -91,8 +95,8 @@
 		*  In the eclipse navigator view, open Servers >> Tomcat 8.0 *(your server config)* 
 		*  edit `server.xml` 
 		*  find the xml element `<Host appBase="webapps" ...` and add the xml attribute `startStopThreads="2"` 
-8.  Follow the [instructions for generating your keys](https://github.com/researchstudio-sat/webofneeds/blob/master/documentation/installation-cryptographic-keys-and-certificates.md)
-9.  Install the bouncycaslte security provider: Locate the JRE you are using with eclipse (`Window -> Preferences -> Java -> Installed JREs`). 
+
+8.  Install the bouncycaslte security provider: Locate the JRE you are using with eclipse (`Window -> Preferences -> Java -> Installed JREs`). 
 	* Navigate to the `[JRE]/lib/security` folder
 	* edit the file `java.security`
 	* find the `List of providers and their preference orders`, which looks like this:
@@ -111,5 +115,5 @@
 	```
 
 	* copy `bcpkix-jdk15on-1.52.jar` and `bcprov-jdk15on-1.52.jar` from `[won-checkout-dir]/webofneeds/webofneeds/target/required-libs/` (which will be there after the first build) to the `[JRE]/lib/ext/` folder
-10.  Start server
-11.  Run the gulpfile outside eclipse: `npm run build` in `webofneeds/won-owner-webapp/src/main/webapp`, refresh the `won-owner-webapp` in eclipse (F5), click on the server –> "Publish"
+9.  Start server
+10.  Run the gulpfile outside eclipse: `npm run build` in `webofneeds/won-owner-webapp/src/main/webapp`, refresh the `won-owner-webapp` in eclipse (F5), click on the server –> "Publish"
