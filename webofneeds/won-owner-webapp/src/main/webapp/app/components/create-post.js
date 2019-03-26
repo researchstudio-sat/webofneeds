@@ -101,7 +101,15 @@ function genComponentConf() {
         </div>
         <div class="cp__footer" >
             <won-labelled-hr label="::'done?'" class="cp__footer__labelledhr"></won-labelled-hr>
-            <won-publish-button on-publish="self.publish(persona)" is-valid="self.isValid()" show-personas="self.isHoldable" ng-if="self.showCreateInput"></won-publish-button>
+            <won-publish-button on-publish="self.publish(persona)" is-valid="self.isValid()" show-personas="self.isHoldable" ng-if="self.showCreateInput && !self.isEditFromNeed"></won-publish-button>
+            <div class="cp__footer__edit" ng-if="self.loggedIn && self.showCreateInput && self.isEditFromNeed">
+              <button class="cp__footer__edit__save won-button--filled red" ng-click="self.save()">
+                  Save
+              </button>
+              <button class="cp__footer__edit__cancel won-button--outlined thin red" ng-click="self.router__back()">
+                  Cancel
+              </button>
+            </div>
         </div>
     `;
 
@@ -128,6 +136,7 @@ function genComponentConf() {
         let useCase;
 
         const isCreateFromNeed = !!(fromNeedUri && mode === "DUPLICATE");
+        const isEditFromNeed = !!(fromNeedUri && mode === "EDIT");
 
         let isFromNeedLoading = false;
         let isFromNeedToLoad = false;
@@ -135,7 +144,7 @@ function genComponentConf() {
 
         const connectToNeedUri = mode === "CONNECT" && fromNeedUri;
 
-        if (isCreateFromNeed) {
+        if (isCreateFromNeed || isEditFromNeed) {
           isFromNeedLoading = processSelectors.isNeedLoading(
             state,
             fromNeedUri
@@ -208,6 +217,7 @@ function genComponentConf() {
           fromNeed,
           fromNeedUri,
           isCreateFromNeed,
+          isEditFromNeed,
           isFromNeedLoading,
           isFromNeedToLoad,
           isHoldable: useCaseUtils.isHoldable(useCase),
@@ -216,6 +226,7 @@ function genComponentConf() {
             useCase &&
             !(
               isCreateFromNeed &&
+              isEditFromNeed &&
               (isFromNeedLoading || hasFromNeedFailedToLoad || isFromNeedToLoad)
             ),
         };
@@ -306,6 +317,31 @@ function genComponentConf() {
       }
 
       this.draftObject[branch] = updatedDraft;
+    }
+
+    save() {
+      if (this.loggedIn && needUtils.isOwned(this.fromNeed)) {
+        this.draftObject.useCase = get(this.useCase, "identifier");
+
+        if (!isBranchContentPresent(this.draftObject.content, true)) {
+          delete this.draftObject.content;
+        }
+        if (!isBranchContentPresent(this.draftObject.seeks, true)) {
+          delete this.draftObject.seeks;
+        }
+
+        /*const tempDefaultNodeUri = this.$ngRedux
+          .getState()
+          .getIn(["config", "defaultNodeUri"]);*/
+
+        //TODO: Impl this method this.needs__edit(tempDraft, this.fromNeedUri, tempDefaultNodeUri);
+        console.debug(
+          "Called edit for: ",
+          this.fromNeed,
+          "with new draft: ",
+          this.draftObject
+        );
+      }
     }
 
     publish(persona) {
