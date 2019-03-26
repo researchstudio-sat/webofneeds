@@ -8,24 +8,20 @@
 2.  Install/unzip eclipse to a folder (e.g. `C:\DATA\DEV\...`)
 6.  Add `-clean -Xms512m -Xmx1024m` to the `.exe` shortcut
 7.  Clone project with git (e.g. to `C:\DATA\DEV\workspace`). It’s easier not to do this in eclipse, but with the git bash or gui)
-8.  Import project in eclipse: File >> Import >> Existing Maven Project >> point to `pom.xml`
+8. Import project in eclipse: File >> Import >> Existing Maven Project >> point to `pom.xml`
 9. Deactivate "autobuild": Window >> Preferences >> General >> Workspace >> uncheck "Build automatically"
-10. Ideykeyscheme: https://code.google.com/archive/p/ideakeyscheme/
-    *  Add jar file to `eclipse\plugins` folder. 
-    *  Restart Eclipse. 
-    *  Open Window >> Preferences >> General >> Keys and select the scheme "Intellij Idea".
-11. Change "spaces for tabs" settings: 
+10. Change "spaces for tabs" settings: 
     * General: Window >> Preferences >> General >> Editors >> Text Editors >> Check `Insert spaces for tabs`
     * JavaScript: Window >> Preferences >> Javascript >> Code Style >> Formatter >> Edit >> Indentation >> Tab policy >> choose `spaces only`
         * Set `Indentation size` + `Tab size`: `4`
         * Rename the formatter settings profile to save it
-12. Set maven profiles: right-click the webofneeds project in the package explorer >> Maven >> Select Maven Profiles. check `skip-tests`
-13. If you develop on Windows you will need to setup `node`s `windows-build-tools` (see [this guide](./installation-setting-up-frontend-development-environment.md#installing-windows-build-tools-on-windows))
+11. Set maven profiles: right-click the webofneeds project in the package explorer >> Maven >> Select Maven Profiles. check `skip-tests`
+12. If you develop on Windows you will need to setup `node`s `windows-build-tools` (see [this guide](./installation-setting-up-frontend-development-environment.md#installing-windows-build-tools-on-windows))
 
 ### Tomcat integration:
-0.  Download/Install the latest Tomcat 8.5 server
+0.  Download/Install the latest Tomcat 9 server
 1.  Create Server in Eclipse: File >> New >> Other >> Server
-2.  Choose Tomcat 8.5, then press "next" (not "finish")
+2.  Choose Tomcat 9, then press "next" (not "finish")
 3.  Make sure you use a Java 8 JDK or JRE, not java 9, or tomcat will not start up and throw a JAXB-related exception.
 4.  Add node and owner and click finish 
       1. If you do not have the options to add the owner and node application to the tomcat (also accessible via Server >> [your tomcat server] >> Add and Remove), something went wrong.
@@ -34,34 +30,31 @@
 5.  Add Server view: Window >> Show View >> Server
 6.  Change server.xml: In Project Explorer >> Server >> "Your Server" >> open `server.xml` and add
 ```xml
-        <Service name="Catalina">
-        ...
-		
-		
         <Connector 
-		port="8443"
-		protocol="org.apache.coyote.http11.Http11AprProtocol"
-		SSLEnabled="true"
-		maxThreads="200"
-		compressibleMimeType="text/html, text/xml, text/plain, text/css, text/javascript, application/javascript, application/x-font-ttf, image/svg+xml, text/turtle, application/rdf+xml, application/x-turtle, text/rdf+n3, application/json, application/trig, application/ld+json, application/n-quads"
-		compression="on" 
-		disableUploadTimeout="true" 
-		enableLookups="true"
-		maxPostSize="5242880000" 
-		maxSpareThreads="75"
-		minSpareThreads="5"  
-		scheme="https"
-		secure="true">
-		<SSLHostConfig 
-			certificateVerification="optionalNoCA"
+    port="8443"
+    protocol="org.apache.coyote.http11.Http11Nio2Protocol"
+    SSLEnabled="true"
+    maxThreads="200"
+    compressibleMimeType="text/html, text/xml, text/plain, text/css, text/javascript, application/javascript, application/x-font-ttf, image/svg+xml, text/turtle, application/rdf+xml, application/x-turtle, text/rdf+n3, application/json, application/trig, application/ld+json, application/n-quads"
+    compression="on" 
+    disableUploadTimeout="true" 
+    enableLookups="true"
+    maxPostSize="5242880000" 
+    maxSpareThreads="75"
+    minSpareThreads="5"  
+    scheme="https"
+    secure="true">
+    <SSLHostConfig 
+            certificateVerification="optionalNoCA"
             certificateVerificationDepth="2"
+            trustManagerClassName="won.utils.tls.AcceptAllCertsTrustManager"
             protocols="all">
-            <Certificate certificateKeyFile="<PATH_TO_SERVER_CERTS>/t-key.pem"
-                         certificateFile="<PATH_TO_SERVER_CERTS>/t-cert.pem"
-                         certificateKeyPassword="changeit"/>
-        </SSLHostConfig>	
-        <UpgradeProtocol className="org.apache.coyote.http2.Http2Protocol" /> 	
-	</Connector>
+            <Certificate 
+                         certificateKeystoreFile="c:/certs/t-keystore.jks"
+                         certificateKeystorePassword="changeit"/>
+        </SSLHostConfig>
+        
+  </Connector>
         ...
         </Service>
   ```
@@ -77,7 +70,8 @@
 		* find javax\servlet\jstl\1.2\jstl-1.2.jar
 		* if you don't find it
 			* build the whole project with `mvn install -Dmaven.test.skip=true`
-			* try again      
+			* try again   
+	* Add the `won-utils-tls-x.y-jar`, which is generated into webofneeds/target/required-libs to your tomcat's classpath libs 
 	*  Server Locations: Use Workspace Metadata
 	*  Server Options
 		* [x] Serve modules without publishing *(allows for instant effect of changes)*
