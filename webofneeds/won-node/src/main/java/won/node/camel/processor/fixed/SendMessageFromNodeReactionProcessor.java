@@ -28,7 +28,6 @@ import won.protocol.vocabulary.WONMSG;
  * If the message has a msg:hasInjectIntoConnection property, try to forward it.
  */
 public class SendMessageFromNodeReactionProcessor extends AbstractCamelProcessor {
-
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
@@ -37,10 +36,10 @@ public class SendMessageFromNodeReactionProcessor extends AbstractCamelProcessor
         Objects.nonNull(message);
         WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
         Objects.nonNull(wonMessage);
-        logger.debug("reacting to ConnectionMessage {}", wonMessage.getMessageURI());        
+        logger.debug("reacting to ConnectionMessage {}", wonMessage.getMessageURI());
         List<URI> injectTargets = wonMessage.getInjectIntoConnectionURIs();
         if (injectTargets.isEmpty()) {
-            logger.debug("no injection attempted - nothing to do for us here");            
+            logger.debug("no injection attempted - nothing to do for us here");
             return;
         }
         injectTargets.forEach(target -> {
@@ -56,7 +55,8 @@ public class SendMessageFromNodeReactionProcessor extends AbstractCamelProcessor
                     forward(wonMessage, con);
                 }
             } catch (Exception e) {
-              LoggingUtils.logMessageAsInfoAndStacktraceAsDebug(logger, e, "Could not forward message {}", wonMessage.getMessageURI());
+                LoggingUtils.logMessageAsInfoAndStacktraceAsDebug(logger, e, "Could not forward message {}",
+                                wonMessage.getMessageURI());
             }
         });
     }
@@ -67,19 +67,19 @@ public class SendMessageFromNodeReactionProcessor extends AbstractCamelProcessor
         }
         if (logger.isDebugEnabled()) {
             logger.debug("injecting message {} received from need {} to connection {}",
-                    new Object[] { wonMessage.getMessageURI(), wonMessage.getSenderNeedURI(), conToSendTo.getConnectionURI() });
+                            new Object[] { wonMessage.getMessageURI(), wonMessage.getSenderNeedURI(),
+                                            conToSendTo.getConnectionURI() });
         }
         URI injectedMessageURI = wonNodeInformationService.generateEventURI(wonMessage.getReceiverNodeURI());
         URI remoteWonNodeUri = WonLinkedDataUtils
-                .getWonNodeURIForNeedOrConnectionURI(conToSendTo.getRemoteConnectionURI(), linkedDataSource);
+                        .getWonNodeURIForNeedOrConnectionURI(conToSendTo.getRemoteConnectionURI(), linkedDataSource);
         WonMessage newWonMessage = WonMessageBuilder.forwardReceivedNodeToNodeMessageAsNodeToNodeMessage(
-                injectedMessageURI, wonMessage, conToSendTo.getConnectionURI(), conToSendTo.getNeedURI(),
-                wonMessage.getReceiverNodeURI(), conToSendTo.getRemoteConnectionURI(), conToSendTo.getRemoteNeedURI(),
-                remoteWonNodeUri);
+                        injectedMessageURI, wonMessage, conToSendTo.getConnectionURI(), conToSendTo.getNeedURI(),
+                        wonMessage.getReceiverNodeURI(), conToSendTo.getRemoteConnectionURI(),
+                        conToSendTo.getRemoteNeedURI(), remoteWonNodeUri);
         if (logger.isDebugEnabled()) {
             logger.debug("injecting this message: {} ", RdfUtils.toString(newWonMessage.getCompleteDataset()));
         }
         sendSystemMessage(newWonMessage);
     }
-
 }

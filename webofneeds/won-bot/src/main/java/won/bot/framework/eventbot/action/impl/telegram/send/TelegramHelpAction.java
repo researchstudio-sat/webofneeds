@@ -12,6 +12,7 @@ import won.bot.framework.eventbot.listener.EventListener;
  */
 public class TelegramHelpAction extends BaseEventBotAction {
     private WonTelegramBotHandler wonTelegramBotHandler;
+
     public TelegramHelpAction(EventListenerContext eventListenerContext, WonTelegramBotHandler wonTelegramBotHandler) {
         super(eventListenerContext);
         this.wonTelegramBotHandler = wonTelegramBotHandler;
@@ -19,39 +20,22 @@ public class TelegramHelpAction extends BaseEventBotAction {
 
     @Override
     protected void doRun(Event event, EventListener executingListener) throws Exception {
-        if(event instanceof SendHelpEvent){
-
-
-            /*Update update = ((SendHelpEvent) event).getUpdate();
-
-            Message message = update.getMessage();
-            Long chatId = message.getChatId();
-
-            ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
-            List<KeyboardRow> commands = new ArrayList<>();
-            KeyboardRow kb = new KeyboardRow();
-
-            kb.add("create need");
-            KeyboardRow kb1 = new KeyboardRow();
-            kb1.add("list your needs");
-
-            commands.add(kb);
-            commands.add(kb1);
-
-            replyKeyboardMarkup.setResizeKeyboard(true);
-            replyKeyboardMarkup.setKeyboard(commands);
-
-
-            SendMessage sendMessage = new SendMessage();
-            sendMessage.setChatId(chatId);
-            sendMessage.setText("how can i help you?"+message.getText());
-            sendMessage.setReplyMarkup(replyKeyboardMarkup);
-
-            try{
-                wonTelegramBotHandler.sendMessage(sendMessage);
-            }catch (TelegramApiException e){
-                logger.error(e.getMessage());
-            }*/
+        if (event instanceof SendHelpEvent) {
+            /*
+             * Update update = ((SendHelpEvent) event).getUpdate(); Message message =
+             * update.getMessage(); Long chatId = message.getChatId(); ReplyKeyboardMarkup
+             * replyKeyboardMarkup = new ReplyKeyboardMarkup(); List<KeyboardRow> commands =
+             * new ArrayList<>(); KeyboardRow kb = new KeyboardRow(); kb.add("create need");
+             * KeyboardRow kb1 = new KeyboardRow(); kb1.add("list your needs");
+             * commands.add(kb); commands.add(kb1);
+             * replyKeyboardMarkup.setResizeKeyboard(true);
+             * replyKeyboardMarkup.setKeyboard(commands); SendMessage sendMessage = new
+             * SendMessage(); sendMessage.setChatId(chatId);
+             * sendMessage.setText("how can i help you?"+message.getText());
+             * sendMessage.setReplyMarkup(replyKeyboardMarkup); try{
+             * wonTelegramBotHandler.sendMessage(sendMessage); }catch (TelegramApiException
+             * e){ logger.error(e.getMessage()); }
+             */
         }
     }
 }

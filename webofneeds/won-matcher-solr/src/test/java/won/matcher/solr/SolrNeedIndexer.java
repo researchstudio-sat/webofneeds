@@ -20,32 +20,26 @@ import won.protocol.util.NeedModelWrapper;
 /**
  * Created by hfriedrich on 11.09.2015.
  * <p>
- * Utility app to write needs from mail directories into the Solr index for testing queries directly on the index etc.
+ * Utility app to write needs from mail directories into the Solr index for
+ * testing queries directly on the index etc.
  */
 public class SolrNeedIndexer {
     public static void main(String[] args) throws IOException, InterruptedException, JsonLdError {
-
-        AnnotationConfigApplicationContext ctx =
-                new AnnotationConfigApplicationContext(SolrTestAppConfiguration.class);
-
+        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(SolrTestAppConfiguration.class);
         NeedIndexer indexer = ctx.getBean(NeedIndexer.class);
-
-        // set the options of the need producer (e.g. if it should exhaust) in the SolrNeedIndexerAppConfiguration file
+        // set the options of the need producer (e.g. if it should exhaust) in the
+        // SolrNeedIndexerAppConfiguration file
         NeedProducer needProducer = ctx.getBean(RoundRobinCompositeNeedProducer.class);
         Model needModel = new NeedModelWrapper(needProducer.create()).copyNeedModel(NeedGraphType.NEED);
-
         int needs = 0;
         while (!needProducer.isExhausted()) {
-            //indexer.indexNeedModel(needModel, UUID.randomUUID().toString(), true);
+            // indexer.indexNeedModel(needModel, UUID.randomUUID().toString(), true);
             Dataset ds = DatasetFactory.createTxnMem();
             ds.addNamedModel("https://node.matchat.org/won/resource/need/test#need", needModel);
-
             NeedModelWrapper needModelWrapper = new NeedModelWrapper(needModel, null);
             needModel = needModelWrapper.normalizeNeedModel();
-
             indexer.indexNeedModel(needModel, SolrMatcherEvaluation.createNeedId(ds), true);
             needs++;
-
             if (needs % 100 == 0) {
                 System.out.println("Indexed " + needs + " needs.");
             }

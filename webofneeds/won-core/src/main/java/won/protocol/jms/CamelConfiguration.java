@@ -1,14 +1,10 @@
 package won.protocol.jms;
 
 /**
- * User: LEIH-NB
- * Date: 18.02.14
+ * User: LEIH-NB Date: 18.02.14
  */
 public class CamelConfiguration {
-
-
     private String endpoint;
-
     private String brokerComponentName;
 
     public String getBrokerComponentName() {
@@ -26,5 +22,4 @@ public class CamelConfiguration {
     public void setEndpoint(String endpoint) {
         this.endpoint = endpoint;
     }
-
 }

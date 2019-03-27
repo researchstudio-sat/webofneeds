@@ -9,52 +9,48 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * User: ypanchenko
- * Date: 06.11.2015
+ * User: ypanchenko Date: 06.11.2015
  */
-public class CachingAllButListsLinkedDataSource extends CachingLinkedDataSource
-{
-  //TODO instead of predefined resources should look into RDF and decide whether it is a list or not
+public class CachingAllButListsLinkedDataSource extends CachingLinkedDataSource {
+    // TODO instead of predefined resources should look into RDF and decide whether
+    // it is a list or not
+    // TODO actually the connection itself should also not be cached - i.e. status
+    // can be updated
+    private Pattern pattern_connections_list_uri = Pattern.compile("(.+)/connections(/)?");
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  //TODO actually the connection itself should also not be cached - i.e. status can be updated
-
-  private Pattern pattern_connections_list_uri = Pattern.compile("(.+)/connections(/)?");
-
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-
-  @Override
-  public Dataset getDataForResource(URI resource) {
-    if (isCachingAllowed(resource)) {
-      return super.getDataForResource(resource);
-    } else {
-      Dataset dataset = linkedDataRestClient.readResourceData(resource);
-      //TODO debug log level
-      logger.info("connections list uri request performed");
-      return dataset;
+    @Override
+    public Dataset getDataForResource(URI resource) {
+        if (isCachingAllowed(resource)) {
+            return super.getDataForResource(resource);
+        } else {
+            Dataset dataset = linkedDataRestClient.readResourceData(resource);
+            // TODO debug log level
+            logger.info("connections list uri request performed");
+            return dataset;
+        }
     }
-  }
 
-  @Override
-  public Dataset getDataForResource(URI resource, URI requesterWebID) {
-    if (isCachingAllowed(resource)) {
-      return super.getDataForResource(resource, requesterWebID);
-    } else {
-      Dataset dataset = linkedDataRestClient.readResourceData(resource, requesterWebID);
-      logger.info("connections list uri request performed");
-      return dataset;
+    @Override
+    public Dataset getDataForResource(URI resource, URI requesterWebID) {
+        if (isCachingAllowed(resource)) {
+            return super.getDataForResource(resource, requesterWebID);
+        } else {
+            Dataset dataset = linkedDataRestClient.readResourceData(resource, requesterWebID);
+            logger.info("connections list uri request performed");
+            return dataset;
+        }
     }
-  }
 
-  private boolean isCachingAllowed(final Pattern noCachePattern, final URI resource) {
-    Matcher matcher = noCachePattern.matcher(resource.toString());
-    if (matcher.matches()) {
-      return false;
+    private boolean isCachingAllowed(final Pattern noCachePattern, final URI resource) {
+        Matcher matcher = noCachePattern.matcher(resource.toString());
+        if (matcher.matches()) {
+            return false;
+        }
+        return true;
     }
-    return true;
-  }
 
-  private boolean isCachingAllowed(final URI resource) {
-    return isCachingAllowed(pattern_connections_list_uri, resource);
-  }
-
+    private boolean isCachingAllowed(final URI resource) {
+        return isCachingAllowed(pattern_connections_list_uri, resource);
+    }
 }

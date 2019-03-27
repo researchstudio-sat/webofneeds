@@ -19,12 +19,9 @@ import won.cryptography.key.KeyInformationExtractor;
  * @version 2014-07
  */
 public class KeyPairService {
-
     private final Logger logger = LoggerFactory.getLogger(getClass());
-
     private KeyPairGenerator keyPairGeneratorBrainpoolp384r1 = new KeyPairGeneratorSpi.ECDSA();
-    private org.bouncycastle.jcajce.provider.asymmetric.ec.KeyPairGeneratorSpi keyPairGeneratorSecp384r1 = new org.bouncycastle
-      .jcajce.provider.asymmetric.ec.KeyPairGeneratorSpi.ECDSA();
+    private org.bouncycastle.jcajce.provider.asymmetric.ec.KeyPairGeneratorSpi keyPairGeneratorSecp384r1 = new org.bouncycastle.jcajce.provider.asymmetric.ec.KeyPairGeneratorSpi.ECDSA();
 
     public KeyPairService(KeyInformationExtractor keyInformationExtractor) {
         this();
@@ -38,12 +35,10 @@ public class KeyPairService {
             // use the predefined curves
             ECGenParameterSpec ecGenSpec = new ECGenParameterSpec("brainpoolp384r1");
             keyPairGeneratorBrainpoolp384r1.initialize(ecGenSpec, new SecureRandom());
-
         } catch (Exception e) {
             logger.error("Could not initialize bouncycastle key pair generator for ECDSA brainpoolp384r1");
             throw new IllegalArgumentException(e);
         }
-
         try {
             ECGenParameterSpec ecGenSpec = new ECGenParameterSpec("secp384r1");
             keyPairGeneratorSecp384r1.initialize(ecGenSpec, new SecureRandom());
@@ -53,13 +48,11 @@ public class KeyPairService {
         }
     }
 
-
-    //TODO make better api for curve support, and ideally also add RSA support...
+    // TODO make better api for curve support, and ideally also add RSA support...
     public KeyPair generateNewKeyPairInSecp384r1() {
-        KeyPair pair =  keyPairGeneratorSecp384r1.generateKeyPair();
+        KeyPair pair = keyPairGeneratorSecp384r1.generateKeyPair();
         return pair;
     }
-
 
     public KeyPair generateNewKeyPairInBrainpoolp384r1() {
         KeyPair pair = keyPairGeneratorBrainpoolp384r1.generateKeyPair();

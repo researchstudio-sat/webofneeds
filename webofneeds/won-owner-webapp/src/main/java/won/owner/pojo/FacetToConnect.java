@@ -3,8 +3,9 @@ package won.owner.pojo;
 public class FacetToConnect {
     String facet;
     boolean pending = false;
-    
-    public FacetToConnect(){}
+
+    public FacetToConnect() {
+    }
 
     public String getFacet() {
         return facet;
@@ -21,6 +22,4 @@ public class FacetToConnect {
     public void setPending(boolean pending) {
         this.pending = pending;
     }
-    
-    
 }

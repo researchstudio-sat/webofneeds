@@ -1,19 +1,13 @@
 /*
- * Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Copyright 2012 Research Studios Austria Forschungsges.m.b.H. Licensed under
+ * the Apache License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable
+ * law or agreed to in writing, software distributed under the License is
+ * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
  */
-
 package won.node.camel.processor.general;
 
 import java.net.URI;
@@ -36,10 +30,8 @@ import won.protocol.repository.NeedRepository;
 /**
  * Acquires a pessimistic read lock on the message's parent.
  */
-public class LockMessageParentWonMessageProcessor implements WonMessageProcessor{
-
+public class LockMessageParentWonMessageProcessor implements WonMessageProcessor {
     private final Logger logger = LoggerFactory.getLogger(getClass());
-
     @Autowired
     ConnectionRepository connectionRepository;
     @Autowired
@@ -48,7 +40,7 @@ public class LockMessageParentWonMessageProcessor implements WonMessageProcessor
     ConnectionEventContainerRepository connectionEventContainerRepository;
     @Autowired
     NeedEventContainerRepository needEventContainerRepository;
-            
+
     @Override
     public WonMessage process(WonMessage message) throws WonMessageProcessingException {
         try {
@@ -67,9 +59,9 @@ public class LockMessageParentWonMessageProcessor implements WonMessageProcessor
     }
 
     private void lockParent(WonMessage message) {
-        //get the parent's URI (either a connection or a need
+        // get the parent's URI (either a connection or a need
         URI parentURI = WonMessageUtils.getParentEntityUri(message);
-        //try a connection:
+        // try a connection:
         Optional<Connection> con = connectionRepository.findOneByConnectionURIForUpdate(parentURI);
         if (con.isPresent()) {
             connectionEventContainerRepository.findOneByParentUriForUpdate(parentURI);

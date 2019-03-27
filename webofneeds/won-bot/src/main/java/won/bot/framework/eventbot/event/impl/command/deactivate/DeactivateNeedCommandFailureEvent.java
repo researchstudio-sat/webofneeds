@@ -9,11 +9,13 @@ import won.bot.framework.eventbot.event.impl.command.MessageCommandFailureEvent;
 /**
  * Created by fsuda on 17.05.2017.
  */
-public class DeactivateNeedCommandFailureEvent extends BaseNeedSpecificEvent implements MessageCommandFailureEvent, DeactivateNeedCommandResultEvent {
+public class DeactivateNeedCommandFailureEvent extends BaseNeedSpecificEvent
+                implements MessageCommandFailureEvent, DeactivateNeedCommandResultEvent {
     private DeactivateNeedCommandEvent deactivateNeedCommandEvent;
     private String message;
 
-    public DeactivateNeedCommandFailureEvent(URI needURI, DeactivateNeedCommandEvent deactivateNeedCommandEvent, String message) {
+    public DeactivateNeedCommandFailureEvent(URI needURI, DeactivateNeedCommandEvent deactivateNeedCommandEvent,
+                    String message) {
         super(needURI);
         this.deactivateNeedCommandEvent = deactivateNeedCommandEvent;
         this.message = message;

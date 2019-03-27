@@ -6,15 +6,15 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Identifies the annotated class as a message processor used to implement the specified
- * facet behavior for the specified type and direction.
- * This implementation is always executed after the corresponding FixedMessageProcessor, if
- * no corresponding FacetMessageProcessor is found.
+ * Identifies the annotated class as a message processor used to implement the
+ * specified facet behavior for the specified type and direction. This
+ * implementation is always executed after the corresponding
+ * FixedMessageProcessor, if no corresponding FacetMessageProcessor is found.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface DefaultFacetMessageProcessor
-{
-  String direction();
-  String messageType();
+public @interface DefaultFacetMessageProcessor {
+    String direction();
+
+    String messageType();
 }

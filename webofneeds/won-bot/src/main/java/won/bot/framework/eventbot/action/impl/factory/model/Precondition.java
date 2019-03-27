@@ -2,7 +2,7 @@ package won.bot.framework.eventbot.action.impl.factory.model;
 
 import java.io.Serializable;
 
-public class Precondition implements Serializable{
+public class Precondition implements Serializable {
     private String uri;
     private boolean met;
 
@@ -25,11 +25,11 @@ public class Precondition implements Serializable{
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         Precondition precondition = (Precondition) o;
-
         return uri.equals(precondition.uri);
     }
 
@@ -40,9 +40,6 @@ public class Precondition implements Serializable{
 
     @Override
     public String toString() {
-        return "Precondition{" +
-                "uri='" + uri + '\'' +
-                ", met=" + met +
-                '}';
+        return "Precondition{" + "uri='" + uri + '\'' + ", met=" + met + '}';
     }
 }

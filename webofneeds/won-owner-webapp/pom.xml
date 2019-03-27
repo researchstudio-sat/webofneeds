@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>webofneeds</artifactId>
         <groupId>at.researchstudio.sat</groupId>
@@ -11,10 +13,8 @@
     <artifactId>won-owner-webapp</artifactId>
 
     <repositories>
-        <!--<repository>
-            <id>spring-snapshot</id>
-            <url>https://repo.spring.io/libs-milestone</url>
-        </repository>-->
+        <!--<repository> <id>spring-snapshot</id> <url>https://repo.spring.io/libs-milestone</url> 
+            </repository> -->
         <repository>
             <id>spring-snapshot</id>
             <url>https://repo.spring.io/libs-snapshot</url>
@@ -22,13 +22,9 @@
     </repositories>
 
 
-	<dependencies>
-        <!--
-
-                 Warning! Only to be used in connection with the
-                 <dependencyManagement> section in the parent pom!
-
-        -->
+    <dependencies>
+        <!-- Warning! Only to be used in connection with the <dependencyManagement> 
+            section in the parent pom! -->
         <dependency>
             <groupId>at.researchstudio.sat</groupId>
             <artifactId>won-owner</artifactId>
@@ -49,20 +45,20 @@
         </dependency>
         <dependency>
             <groupId>at.researchstudio.sat</groupId>
-            <artifactId>won-utils-goals</artifactId>            
+            <artifactId>won-utils-goals</artifactId>
             <version>${project.version}</version>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>at.researchstudio.sat</groupId>
-            <artifactId>won-utils-conversation</artifactId>            
+            <artifactId>won-utils-conversation</artifactId>
             <version>${project.version}</version>
         </dependency>
 
-        <!-- JSTL/Servlet-->
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-		</dependency>
+        <!-- JSTL/Servlet -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+        </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>jstl</artifactId>
@@ -78,16 +74,16 @@
             <groupId>oro</groupId>
             <artifactId>oro</artifactId>
         </dependency>
-        
+
         <!-- sitemaps -->
         <dependency>
-          <groupId>com.github.dfabulich</groupId>
-          <artifactId>sitemapgen4j</artifactId>
-          <version>1.0.6</version>
+            <groupId>com.github.dfabulich</groupId>
+            <artifactId>sitemapgen4j</artifactId>
+            <version>1.0.6</version>
         </dependency>
 
         <!-- Spring -->
-	    <dependency>
+        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
             <scope>${dependencies.scope}</scope>
@@ -102,32 +98,32 @@
             <scope>${dependencies.scope}</scope>
         </dependency>
 
-	    <dependency>
-		    <groupId>org.springframework.security</groupId>
-		    <artifactId>spring-security-web</artifactId>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-web</artifactId>
             <scope>${dependencies.scope}</scope>
-	    </dependency>
-	    <dependency>
-		    <groupId>org.springframework.security</groupId>
-		    <artifactId>spring-security-config</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-config</artifactId>
             <scope>${dependencies.scope}</scope>
-	    </dependency>
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-taglibs</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-taglibs</artifactId>
             <scope>${dependencies.scope}</scope>
-		</dependency>
+        </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-websocket</artifactId>
             <scope>${dependencies.scope}</scope>
         </dependency>
         <!-- Hibernate Validator -->
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-validator</artifactId>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
             <scope>${dependencies.scope}</scope>
-		</dependency>
+        </dependency>
 
         <dependency>
             <groupId>javax.validation</groupId>
@@ -138,16 +134,16 @@
 
 
         <dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
             <scope>${dependencies.scope}</scope>
-		</dependency>
+        </dependency>
 
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
             <scope>${dependencies.scope}</scope>
-		</dependency>
+        </dependency>
 
         <!-- spring-session -->
         <dependency>
@@ -182,6 +178,10 @@
             </testResource>
         </testResources>
         <plugins>
+            <plugin>
+                <groupId>net.revelc.code.formatter</groupId>
+                <artifactId>formatter-maven-plugin</artifactId>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
@@ -224,8 +224,8 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <!-- optional: you don't really need execution ids,
-                        but it looks nice in your build log. -->
+                        <!-- optional: you don't really need execution ids, 
+                            but it looks nice in your build log. -->
                         <id>install-node-and-npm</id>
                         <goals>
                             <goal>install-node-and-npm</goal>
@@ -240,7 +240,8 @@
                     <execution>
                         <id>npm-install</id>
                         <goals>
-                            <!-- everything else is executed by the postinstall hook in package.json -->
+                            <!-- everything else is executed by the postinstall 
+                                hook in package.json -->
                             <goal>npm</goal>
                         </goals>
                     </execution>
@@ -264,10 +265,9 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <!-- 
-                          Configuration that starts the watch task. This causes a build when resources change.  
-                          Not run during any phase, must be started explicitly using 'mvn frontend:npm@watch' 
-                        -->
+                        <!-- Configuration that starts the watch task. This 
+                            causes a build when resources change. Not run during any phase, must be started 
+                            explicitly using 'mvn frontend:npm@watch' -->
                         <id>watch</id>
                         <goals>
                             <goal>npm</goal>
@@ -297,12 +297,20 @@
                                     <goal>echo</goal>
                                 </goals>
                                 <configuration>
-                                    <message>Note: building the won-owner-webapp war file is skipped. This is done because the profile 'skip-owner-webapp-war' is active ('-P skip-owner-webapp-war' on the command line)</message>
+                                    <message>Note: building the
+                                        won-owner-webapp war file is
+                                        skipped. This is done because
+                                        the profile
+                                        'skip-owner-webapp-war' is
+                                        active ('-P
+                                        skip-owner-webapp-war' on the
+                                        command line)</message>
                                 </configuration>
                             </execution>
                         </executions>
                     </plugin>
-                    <!-- use the same config as above but set the phase to 'none' -->
+                    <!-- use the same config as above but set the phase to 
+                        'none' -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-war-plugin</artifactId>
@@ -341,12 +349,21 @@
                                     <goal>echo</goal>
                                 </goals>
                                 <configuration>
-                                    <message>Note: building the won-owner-webapp war file is skipped, but the webapp is built in 'exploded' mode. This is done because the profile 'skip-owner-webapp-war-but-explode' is active ('-P skip-owner-webapp-war-but-explode' on the command line)</message>
+                                    <message>Note: building the
+                                        won-owner-webapp war file is
+                                        skipped, but the webapp is built
+                                        in 'exploded' mode. This is done
+                                        because the profile
+                                        'skip-owner-webapp-war-but-explode'
+                                        is active ('-P
+                                        skip-owner-webapp-war-but-explode'
+                                        on the command line)</message>
                                 </configuration>
                             </execution>
                         </executions>
                     </plugin>
-                    <!-- use the same config as above but set the phase to 'none' -->
+                    <!-- use the same config as above but set the phase to 
+                        'none' -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-war-plugin</artifactId>
@@ -361,7 +378,9 @@
                                     <warSourceExcludes>bower_components/**,jspm_packages/**,node_modules/**,node/**,scripts/**</warSourceExcludes>
                                 </configuration>
                                 <phase>package</phase>
-                                <goals><goal>exploded</goal></goals>
+                                <goals>
+                                    <goal>exploded</goal>
+                                </goals>
                             </execution>
                         </executions>
                     </plugin>
@@ -383,12 +402,19 @@
                                     <goal>echo</goal>
                                 </goals>
                                 <configuration>
-                                    <message>Note: the install and build process for the javascript frontend is skipped completely. This is done because the profile 'skip-frontend' is active ('-P skip-frontend' on the command line)</message>
+                                    <message>Note: the install and build
+                                        process for the javascript
+                                        frontend is skipped completely.
+                                        This is done because the profile
+                                        'skip-frontend' is active ('-P
+                                        skip-frontend' on the command
+                                        line)</message>
                                 </configuration>
                             </execution>
                         </executions>
                     </plugin>
-                    <!-- use the same config as above but set the phase to 'none' -->
+                    <!-- use the same config as above but set the phase to 
+                        'none' -->
                     <plugin>
                         <groupId>com.github.eirslett</groupId>
                         <artifactId>frontend-maven-plugin</artifactId>
@@ -429,12 +455,21 @@
                                     <goal>echo</goal>
                                 </goals>
                                 <configuration>
-                                    <message>Note: the install process for the javascript frontend is skipped but 'gulp build' and 'gulp clean' are still executed. This is done because the profile 'skip-frontend-all-but-gulp' is active ('-P skip-frontend-all-but-gulp' on the command line)</message>
+                                    <message>Note: the install process
+                                        for the javascript frontend is
+                                        skipped but 'gulp build' and
+                                        'gulp clean' are still executed.
+                                        This is done because the profile
+                                        'skip-frontend-all-but-gulp' is
+                                        active ('-P
+                                        skip-frontend-all-but-gulp' on
+                                        the command line)</message>
                                 </configuration>
                             </execution>
                         </executions>
                     </plugin>
-                    <!-- use the same config as above but set the phase to 'none' -->
+                    <!-- use the same config as above but set the phase to 
+                        'none' -->
                     <plugin>
                         <groupId>com.github.eirslett</groupId>
                         <artifactId>frontend-maven-plugin</artifactId>
@@ -472,7 +507,12 @@
                                     <goal>echo</goal>
                                 </goals>
                                 <configuration>
-                                    <message>Note: the profile 'suppress-npm-clean' is active because the local installation of nodejs was not found in 'src/main/webapp/node'. 'npm run clean' will not be executed.</message>
+                                    <message>Note: the profile
+                                        'suppress-npm-clean' is active
+                                        because the local installation
+                                        of nodejs was not found in
+                                        'src/main/webapp/node'. 'npm run
+                                        clean' will not be executed.</message>
                                 </configuration>
                             </execution>
                         </executions>

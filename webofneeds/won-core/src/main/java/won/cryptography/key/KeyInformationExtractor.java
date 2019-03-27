@@ -6,16 +6,16 @@ import java.security.PublicKey;
 import won.cryptography.exception.KeyNotSupportedException;
 
 /**
- * Helper interface for extracting information out of a (public key).
- * Has to be implemented for specific formats (e.g. Bouncy Castle).
+ * Helper interface for extracting information out of a (public key). Has to be
+ * implemented for specific formats (e.g. Bouncy Castle).
  *
  * @author Fabian Salcher
  * @version 2014-07
  */
 public interface KeyInformationExtractor {
-
     /**
      * returns the name of the algorithm the key will be used for
+     * 
      * @param key <code>Key</code> representing a private or public key
      * @return <code>String</code> with the name of the algorithm
      */
@@ -23,26 +23,29 @@ public interface KeyInformationExtractor {
 
     /**
      * returns the ID of the elliptic curve the key will be used for
+     * 
      * @param key <code>Key</code> representing a private or public key
      * @return <code>String</code> with the ID of the curve
      */
-    public String getCurveID(Key key)
-            throws KeyNotSupportedException;
+    public String getCurveID(Key key) throws KeyNotSupportedException;
 
     /**
-     * returns the x coordinate of the public point Q (also named W) of the public key
+     * returns the x coordinate of the public point Q (also named W) of the public
+     * key
+     * 
      * @param publicKey <code>PublicKey</code> representing the public key
-     * @return <code>String</code> with base 16 notated number representing the x coordinate
+     * @return <code>String</code> with base 16 notated number representing the x
+     * coordinate
      */
-    public String getQX(PublicKey publicKey)
-            throws KeyNotSupportedException;
+    public String getQX(PublicKey publicKey) throws KeyNotSupportedException;
 
     /**
-     * returns the y coordinate of the public point Q (also named W) of the public key
+     * returns the y coordinate of the public point Q (also named W) of the public
+     * key
+     * 
      * @param publicKey <code>PublicKey</code> representing the public key
-     * @return <code>String</code> with base 16 notated number representing the y coordinate
+     * @return <code>String</code> with base 16 notated number representing the y
+     * coordinate
      */
-    public String getQY(PublicKey publicKey)
-            throws KeyNotSupportedException;
-
+    public String getQY(PublicKey publicKey) throws KeyNotSupportedException;
 }

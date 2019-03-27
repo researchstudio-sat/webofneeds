@@ -7,9 +7,9 @@ import org.springframework.context.ApplicationEvent;
 import won.owner.model.User;
 
 /**
- * Created by fsuda on 27.11.2018.
- * This Event is used/published as a Result of a successful signup/transfer of a User, and will be used to send
- * a verification mail to activate the account
+ * Created by fsuda on 27.11.2018. This Event is used/published as a Result of a
+ * successful signup/transfer of a User, and will be used to send a verification
+ * mail to activate the account
  */
 public class OnRegistrationCompleteEvent extends ApplicationEvent {
     private String appUrl;

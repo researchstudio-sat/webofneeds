@@ -8,9 +8,7 @@ public class BooleanQueryFactory extends SolrQueryFactory {
     private BooleanOperator operator;
 
     public enum BooleanOperator {
-        AND,
-        OR,
-        NOT
+        AND, OR, NOT
     }
 
     public BooleanQueryFactory(BooleanOperator op, SolrQueryFactory... factories) {
@@ -20,15 +18,12 @@ public class BooleanQueryFactory extends SolrQueryFactory {
 
     @Override
     protected String makeQueryString() {
-
         StringBuilder queryBuilder = new StringBuilder();
-
         if (operator.equals(BooleanOperator.NOT) && factories.length > 0) {
             queryBuilder.append(" NOT (");
             queryBuilder.append(factories[0].createQuery());
             queryBuilder.append(") ");
         } else {
-
             // boolean operator is AND or OR
             for (int i = 0; i < factories.length; i++) {
                 queryBuilder.append(" (");
@@ -40,7 +35,6 @@ public class BooleanQueryFactory extends SolrQueryFactory {
                 }
             }
         }
-
         return queryBuilder.toString();
     }
 }

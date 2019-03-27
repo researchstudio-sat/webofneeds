@@ -26,74 +26,60 @@ public class TelegramMessageGenerator {
 
     public SendMessage getHintMessage(Long chatId, URI remoteNeedUri, URI yourNeedUri) {
         Dataset remoteNeedRDF = eventListenerContext.getLinkedDataSource().getDataForResource(remoteNeedUri);
-
         DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(remoteNeedRDF);
-        String title = needModelWrapper.getSomeTitleFromIsOrAll("en","de");
-        String description = needModelWrapper.getSomeDescription("en","de");
-
+        String title = needModelWrapper.getSomeTitleFromIsOrAll("en", "de");
+        String description = needModelWrapper.getSomeDescription("en", "de");
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
-        String text = "<b>We found a Match for you!\n\n</b><a href='"+remoteNeedUri+"'>"+title+"\n\n</a>";
-
-        if(description != null){
-            text = text+"<em>"+description+"</em>";
+        String text = "<b>We found a Match for you!\n\n</b><a href='" + remoteNeedUri + "'>" + title + "\n\n</a>";
+        if (description != null) {
+            text = text + "<em>" + description + "</em>";
         }
         sendMessage.setText(text);
         sendMessage.setReplyMarkup(getConnectionActionKeyboard("Request", "Close"));
         sendMessage.enableHtml(true);
-
         return sendMessage;
     }
 
     public SendMessage getConnectMessage(Long chatId, URI remoteNeedUri, URI yourNeedUri) {
         Dataset remoteNeedRDF = eventListenerContext.getLinkedDataSource().getDataForResource(remoteNeedUri);
-
         DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(remoteNeedRDF);
-        String title = needModelWrapper.getSomeTitleFromIsOrAll("en","de");
-        String description = needModelWrapper.getSomeDescription("en","de");
-
+        String title = needModelWrapper.getSomeTitleFromIsOrAll("en", "de");
+        String description = needModelWrapper.getSomeDescription("en", "de");
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
-
-        String text = "<b>Someone wants to connect with you!\n\n</b><a href='"+remoteNeedUri+"'>"+title+"\n\n</a>";
-
-        if(description != null){
-            text = text+"<em>"+description+"</em>";
+        String text = "<b>Someone wants to connect with you!\n\n</b><a href='" + remoteNeedUri + "'>" + title
+                        + "\n\n</a>";
+        if (description != null) {
+            text = text + "<em>" + description + "</em>";
         }
         sendMessage.setText(text);
         sendMessage.setReplyMarkup(getConnectionActionKeyboard("Accept", "Deny"));
         sendMessage.enableHtml(true);
-
         return sendMessage;
     }
 
     public SendMessage getConnectionTextMessage(Long chatId, URI remoteNeedUri, URI yourNeedUri, WonMessage message) {
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
-
-        sendMessage.setText("<a href='" + remoteNeedUri + "'>URI</a>: "+ extractTextMessageFromWonMessage(message));
+        sendMessage.setText("<a href='" + remoteNeedUri + "'>URI</a>: " + extractTextMessageFromWonMessage(message));
         sendMessage.enableHtml(true);
-
         return sendMessage;
     }
 
     public SendMessage getCreatedNeedMessage(Long chatId, URI needURI) {
         Dataset createdNeedRDF = eventListenerContext.getLinkedDataSource().getDataForResource(needURI);
-
         DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(createdNeedRDF);
-        String title = needModelWrapper.getSomeTitleFromIsOrAll("en","de");
-        String description = needModelWrapper.getSomeDescription("en","de");
-
+        String title = needModelWrapper.getSomeTitleFromIsOrAll("en", "de");
+        String description = needModelWrapper.getSomeDescription("en", "de");
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
-        String text = "<b>We created a Need for you!\n\n</b><a href='"+needURI+"'>"+title+"\n\n</a>";
-
-        if(description != null){
-            text = text+"<em>"+description+"</em>";
+        String text = "<b>We created a Need for you!\n\n</b><a href='" + needURI + "'>" + title + "\n\n</a>";
+        if (description != null) {
+            text = text + "<em>" + description + "</em>";
         }
         sendMessage.setText(text);
         sendMessage.enableHtml(true);
-
         return sendMessage;
     }
 
@@ -101,19 +87,18 @@ public class TelegramMessageGenerator {
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
         sendMessage.setText("could not create need wrong syntax");
-
         return sendMessage;
     }
 
-    private static String extractTextMessageFromWonMessage(WonMessage wonMessage){
-        if (wonMessage == null) return null;
+    private static String extractTextMessageFromWonMessage(WonMessage wonMessage) {
+        if (wonMessage == null)
+            return null;
         String message = WonRdfUtils.MessageUtils.getTextMessage(wonMessage);
         return StringUtils.trim(message);
     }
 
     private InlineKeyboardMarkup getConnectionActionKeyboard(String acceptText, String denyText) {
         InlineKeyboardMarkup connectionActionKeyboard = new InlineKeyboardMarkup();
-
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
         List<InlineKeyboardButton> row = new ArrayList<>();
         InlineKeyboardButton denyButton = new InlineKeyboardButton();
@@ -122,12 +107,10 @@ public class TelegramMessageGenerator {
         InlineKeyboardButton acceptButton = new InlineKeyboardButton();
         acceptButton.setText(acceptText);
         acceptButton.setCallbackData("1");
-
         row.add(acceptButton);
         row.add(denyButton);
         rows.add(row);
         connectionActionKeyboard.setKeyboard(rows);
-
         return connectionActionKeyboard;
     }
 

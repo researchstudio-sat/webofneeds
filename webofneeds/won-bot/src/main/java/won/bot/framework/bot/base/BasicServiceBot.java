@@ -1,19 +1,13 @@
 /*
- * Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Copyright 2012 Research Studios Austria Forschungsges.m.b.H. Licensed under
+ * the Apache License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable
+ * law or agreed to in writing, software distributed under the License is
+ * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
  */
-
 package won.bot.framework.bot.base;
 
 import java.net.URI;
@@ -33,109 +27,103 @@ import won.protocol.util.linkeddata.LinkedDataSource;
 /**
  * Base class for bots containing basic services.
  */
-public abstract class BasicServiceBot extends BaseBot
-{
-  private NodeURISource nodeURISource;
-  private MatcherNodeURISource matcherNodeURISource;
-  private URI solrServerURI;
-  private NeedProducer needProducer;
-  private WonMessageSender wonMessageSender;
-  private MatcherProtocolNeedServiceClientSide matcherProtocolNeedServiceClient;
-  private MatcherProtocolMatcherServiceImplJMSBased matcherProtocolMatcherService;
+public abstract class BasicServiceBot extends BaseBot {
+    private NodeURISource nodeURISource;
+    private MatcherNodeURISource matcherNodeURISource;
+    private URI solrServerURI;
+    private NeedProducer needProducer;
+    private WonMessageSender wonMessageSender;
+    private MatcherProtocolNeedServiceClientSide matcherProtocolNeedServiceClient;
+    private MatcherProtocolMatcherServiceImplJMSBased matcherProtocolMatcherService;
+    private LinkedDataSource linkedDataSource;
+    private WonNodeInformationService wonNodeInformationService;
 
+    protected NodeURISource getNodeURISource() {
+        return nodeURISource;
+    }
 
+    protected MatcherNodeURISource getMatcheNodeURISource() {
+        return matcherNodeURISource;
+    }
 
-  private LinkedDataSource linkedDataSource;
-  private WonNodeInformationService wonNodeInformationService;
+    @Qualifier("default")
+    @Autowired(required = true)
+    public void setMatcherNodeURISource(final MatcherNodeURISource matcherNodeURISource) {
+        this.matcherNodeURISource = matcherNodeURISource;
+    }
 
-  protected NodeURISource getNodeURISource()
-  {
-    return nodeURISource;
-  }
+    @Qualifier("default")
+    @Autowired(required = true)
+    public void setNodeURISource(final NodeURISource nodeURISource) {
+        this.nodeURISource = nodeURISource;
+    }
 
-  protected MatcherNodeURISource getMatcheNodeURISource(){
-    return matcherNodeURISource;
-  }
+    protected WonMessageSender getWonMessageSender() {
+        return wonMessageSender;
+    }
 
-  @Qualifier("default")
-  @Autowired(required = true)
-  public void setMatcherNodeURISource(final MatcherNodeURISource matcherNodeURISource) {
-    this.matcherNodeURISource = matcherNodeURISource;
-  }
+    protected MatcherProtocolNeedServiceClientSide getMatcherProtocolNeedServiceClient() {
+        return matcherProtocolNeedServiceClient;
+    }
 
-  @Qualifier("default")
-  @Autowired(required = true)
-  public void setNodeURISource(final NodeURISource nodeURISource)
-  {
-    this.nodeURISource = nodeURISource;
-  }
+    protected MatcherProtocolMatcherServiceImplJMSBased getMatcherProtocolMatcherService() {
+        return matcherProtocolMatcherService;
+    }
 
-  protected WonMessageSender getWonMessageSender()
-  {
-    return wonMessageSender;
-  }
+    public URI getSolrServerURI() {
+        return solrServerURI;
+    }
 
-  protected MatcherProtocolNeedServiceClientSide getMatcherProtocolNeedServiceClient(){
-      return matcherProtocolNeedServiceClient;
-  }
+    public void setSolrServerURI(final URI solrServerURI) {
+        this.solrServerURI = solrServerURI;
+    }
 
-  protected MatcherProtocolMatcherServiceImplJMSBased getMatcherProtocolMatcherService(){
-    return matcherProtocolMatcherService;
-  }
-  public URI getSolrServerURI() {
-    return solrServerURI;
-  }
+    @Qualifier("default")
+    @Autowired(required = true)
+    public void setWonMessageSender(final WonMessageSender wonMessageSender) {
+        this.wonMessageSender = wonMessageSender;
+    }
 
-  public void setSolrServerURI(final URI solrServerURI) {
-    this.solrServerURI = solrServerURI;
-  }
+    @Qualifier("default")
+    @Autowired(required = true)
+    public void setMatcherProtocolNeedServiceClient(
+                    final MatcherProtocolNeedServiceClientSide matcherProtocolNeedServiceClient) {
+        this.matcherProtocolNeedServiceClient = matcherProtocolNeedServiceClient;
+    }
 
+    @Qualifier("default")
+    @Autowired(required = true)
+    public void setMatcherProtocolMatcherService(
+                    final MatcherProtocolMatcherServiceImplJMSBased matcherProtocolMatcherService) {
+        this.matcherProtocolMatcherService = matcherProtocolMatcherService;
+    }
 
-  @Qualifier("default")
-  @Autowired(required = true)
-  public void setWonMessageSender(final WonMessageSender wonMessageSender)
-  {
-    this.wonMessageSender = wonMessageSender;
-  }
+    protected NeedProducer getNeedProducer() {
+        return needProducer;
+    }
 
-  @Qualifier("default")
-  @Autowired(required = true)
-  public void setMatcherProtocolNeedServiceClient(final MatcherProtocolNeedServiceClientSide matcherProtocolNeedServiceClient){
-      this.matcherProtocolNeedServiceClient = matcherProtocolNeedServiceClient;
-  }
+    @Qualifier("default")
+    @Autowired(required = true)
+    public void setNeedProducer(final NeedProducer needProducer) {
+        this.needProducer = needProducer;
+    }
 
-  @Qualifier("default")
-  @Autowired(required = true)
-  public void setMatcherProtocolMatcherService(final MatcherProtocolMatcherServiceImplJMSBased
-                                                 matcherProtocolMatcherService){
-    this.matcherProtocolMatcherService = matcherProtocolMatcherService;
-  }
+    public LinkedDataSource getLinkedDataSource() {
+        return linkedDataSource;
+    }
 
-  protected NeedProducer getNeedProducer()
-  {
-    return needProducer;
-  }
+    @Qualifier("default")
+    @Autowired(required = true)
+    public void setLinkedDataSource(final LinkedDataSource linkedDataSource) {
+        this.linkedDataSource = linkedDataSource;
+    }
 
-  @Qualifier("default")
-  @Autowired(required = true)
-  public void setNeedProducer(final NeedProducer needProducer)
-  {
-    this.needProducer = needProducer;
-  }
+    public WonNodeInformationService getWonNodeInformationService() {
+        return wonNodeInformationService;
+    }
 
-  public LinkedDataSource getLinkedDataSource() { return linkedDataSource; }
-
-  @Qualifier("default")
-  @Autowired(required = true)
-  public void setLinkedDataSource(final LinkedDataSource linkedDataSource) { this.linkedDataSource = linkedDataSource; }
-
-  public WonNodeInformationService getWonNodeInformationService() {
-    return wonNodeInformationService;
-  }
-
-  @Autowired(required = true)
-  public void setWonNodeInformationService(final WonNodeInformationService wonNodeInformationService) {
-    this.wonNodeInformationService = wonNodeInformationService;
-  }
-
+    @Autowired(required = true)
+    public void setWonNodeInformationService(final WonNodeInformationService wonNodeInformationService) {
+        this.wonNodeInformationService = wonNodeInformationService;
+    }
 }

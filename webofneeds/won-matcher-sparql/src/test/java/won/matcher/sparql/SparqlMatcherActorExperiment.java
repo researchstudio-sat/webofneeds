@@ -22,25 +22,21 @@ import won.protocol.util.WonRdfUtils;
  */
 public class SparqlMatcherActorExperiment {
     public static void main(String[] args) throws IOException, InterruptedException {
-
         // init basic Akka
-        AnnotationConfigApplicationContext ctx =
-                new AnnotationConfigApplicationContext(MatcherSparqlAppConfiguration.class);
+        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(
+                        MatcherSparqlAppConfiguration.class);
         ActorSystem system = ctx.getBean(ActorSystem.class);
         ActorRef solrMatcherActor = system.actorOf(
-                SpringExtension.SpringExtProvider.get(system).props(SparqlMatcherActor.class), "SolrMatcherActor");
-
-
+                        SpringExtension.SpringExtProvider.get(system).props(SparqlMatcherActor.class),
+                        "SolrMatcherActor");
         NeedEvent ne1 = createNeedEvent("/needmodel/need1.trig");
         NeedEvent ne2 = createNeedEvent("/needmodel/need2.trig");
-
         solrMatcherActor.tell(ne1, null);
         Thread.sleep(5000);
         solrMatcherActor.tell(ne2, null);
     }
 
     private static NeedEvent createNeedEvent(String path) throws IOException {
-
         InputStream is = null;
         Dataset dataset = null;
         try {
@@ -57,10 +53,7 @@ public class SparqlMatcherActorExperiment {
             System.err.println(e);
             return null;
         }
-
         String needUri = WonRdfUtils.NeedUtils.getNeedURI(dataset).toString();
         return new NeedEvent(needUri, "no_uri", NeedEvent.TYPE.ACTIVE, System.currentTimeMillis(), dataset);
     }
-    
-    
 }

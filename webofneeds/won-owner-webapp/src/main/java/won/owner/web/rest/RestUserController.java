@@ -1,8 +1,7 @@
-
 /*
- * This file is subject to the terms and conditions defined in file 'LICENSE.txt', which is part of this source code package.
+ * This file is subject to the terms and conditions defined in file
+ * 'LICENSE.txt', which is part of this source code package.
  */
-
 package won.owner.web.rest;
 
 import java.net.URI;
@@ -77,52 +76,37 @@ import won.owner.web.validator.ResetPasswordValidator;
 import won.owner.web.validator.UserRegisterValidator;
 
 /**
- * User: t.kozel
- * Date: 11/12/13
+ * User: t.kozel Date: 11/12/13
  */
 @Controller
 @RequestMapping("/rest/users")
 public class RestUserController {
-
     private final Logger logger = LoggerFactory.getLogger(getClass());
-
     private AuthenticationManager authenticationManager;
-
     private SecurityContextRepository securityContextRepository;
-
     private UserRegisterValidator userRegisterValidator;
-    
     private PasswordChangeValidator passwordChangeValidator;
-    
     private ResetPasswordValidator resetPasswordValidator;
-
     private UserNeedRepository userNeedRepository;
-
     @Autowired
     private UserService userService;
-
     @Autowired
     private KeystoreEnabledPersistentRememberMeServices keystoreEnabledPersistentRememberMeServices;
-
     @Autowired
     private ApplicationEventPublisher eventPublisher;
-
     @Autowired
     private WonOwnerMailSender emailSender;
-
     @Autowired
     ServletContext context;
-
     @Autowired
     RememberMeServices rememberMeServices = new NullRememberMeServices();
 
     @Autowired
     public RestUserController(final AuthenticationManager authenticationManager,
-                              final SecurityContextRepository securityContextRepository,
-                              final UserRegisterValidator userRegisterValidator,
-                              final PasswordChangeValidator passwordChangeValidator,
-                              final ResetPasswordValidator resetPasswordValidator,
-                              final UserNeedRepository userNeedRepository) {
+                    final SecurityContextRepository securityContextRepository,
+                    final UserRegisterValidator userRegisterValidator,
+                    final PasswordChangeValidator passwordChangeValidator,
+                    final ResetPasswordValidator resetPasswordValidator, final UserNeedRepository userNeedRepository) {
         this.authenticationManager = authenticationManager;
         this.securityContextRepository = securityContextRepository;
         this.userRegisterValidator = userRegisterValidator;
@@ -134,17 +118,13 @@ public class RestUserController {
     /**
      * registers user
      *
-     * @param user   registration data of a user
+     * @param user registration data of a user
      * @param errors
      * @return ResponseEntity with Http Status Code
      */
     @ResponseBody
-    @RequestMapping(
-            value = "/",
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            method = RequestMethod.POST
-    )
-    //TODO: move transactionality annotation into the service layer
+    @RequestMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+    // TODO: move transactionality annotation into the service layer
     @Transactional(propagation = Propagation.REQUIRED)
     public ResponseEntity registerUser(@RequestBody UserPojo user, Errors errors, WebRequest request) {
         try {
@@ -158,16 +138,17 @@ public class RestUserController {
                     return generateStatusResponse(RestStatusResponse.USER_ALREADY_EXISTS);
                 }
             }
-            User createdUser = userService.registerUser(user.getUsername(), user.getPassword(), null, user.getPrivateId());
-
-            if(!createdUser.isAnonymous() && !createdUser.isEmailVerified()) {
-                eventPublisher.publishEvent(new OnRegistrationCompleteEvent(createdUser, request.getLocale(), request.getContextPath()));
+            User createdUser = userService.registerUser(user.getUsername(), user.getPassword(), null,
+                            user.getPrivateId());
+            if (!createdUser.isAnonymous() && !createdUser.isEmailVerified()) {
+                eventPublisher.publishEvent(new OnRegistrationCompleteEvent(createdUser, request.getLocale(),
+                                request.getContextPath()));
                 String recoveryKey;
                 try {
                     recoveryKey = userService.generateRecoveryKey(user.getUsername(), user.getPassword());
                     eventPublisher.publishEvent(new OnRecoveryKeyGeneratedEvent(createdUser, recoveryKey));
                 } catch (UserNotFoundException e) {
-                    return generateStatusResponse(RestStatusResponse.RECOVERY_KEYGEN_USER_NOT_FOUND);        
+                    return generateStatusResponse(RestStatusResponse.RECOVERY_KEYGEN_USER_NOT_FOUND);
                 } catch (IncorrectPasswordException e) {
                     return generateStatusResponse(RestStatusResponse.RECOVERY_KEYGEN_WRONG_PASSWORD);
                 }
@@ -175,27 +156,23 @@ public class RestUserController {
         } catch (UserAlreadyExistsException e) {
             // username is already in database
             return generateStatusResponse(RestStatusResponse.USER_ALREADY_EXISTS);
-        } 
-
+        }
         return generateStatusResponse(RestStatusResponse.USER_CREATED);
     }
 
     /**
      * Changes the user's password
      *
-     * @param changePasswordPojo    password changing data
+     * @param changePasswordPojo password changing data
      * @param errors
      * @return ResponseEntity with Http Status Code
      */
     @ResponseBody
-    @RequestMapping(
-            value = "/changePassword",
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            method = RequestMethod.POST
-    )
-    //TODO: move transactionality annotation into the service layer
+    @RequestMapping(value = "/changePassword", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+    // TODO: move transactionality annotation into the service layer
     @Transactional(propagation = Propagation.REQUIRED)
-    public ResponseEntity changePassword(@RequestBody ChangePasswordPojo changePasswordPojo, Errors errors, HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity changePassword(@RequestBody ChangePasswordPojo changePasswordPojo, Errors errors,
+                    HttpServletRequest request, HttpServletResponse response) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         if (username == null) {
             return generateStatusResponse(RestStatusResponse.USER_NOT_SIGNED_IN);
@@ -213,9 +190,12 @@ public class RestUserController {
                     return generateStatusResponse(RestStatusResponse.PASSWORDCHANGE_USER_NOT_FOUND);
                 }
             }
-            User user = userService.changePassword(changePasswordPojo.getUsername(), changePasswordPojo.getNewPassword(), changePasswordPojo.getOldPassword());
-            eventPublisher.publishEvent(new OnPasswordChangedEvent(user, request.getLocale(), request.getContextPath()));
-            String recoveryKey = userService.generateRecoveryKey(changePasswordPojo.getUsername(), changePasswordPojo.getNewPassword());
+            User user = userService.changePassword(changePasswordPojo.getUsername(),
+                            changePasswordPojo.getNewPassword(), changePasswordPojo.getOldPassword());
+            eventPublisher.publishEvent(
+                            new OnPasswordChangedEvent(user, request.getLocale(), request.getContextPath()));
+            String recoveryKey = userService.generateRecoveryKey(changePasswordPojo.getUsername(),
+                            changePasswordPojo.getNewPassword());
             eventPublisher.publishEvent(new OnRecoveryKeyGeneratedEvent(user, recoveryKey));
             return generateUserResponse(user);
         } catch (IncorrectPasswordException e) {
@@ -224,25 +204,22 @@ public class RestUserController {
             return generateStatusResponse(RestStatusResponse.USER_NOT_FOUND);
         } catch (KeyStoreIOException e) {
             return generateStatusResponse(RestStatusResponse.PASSWORDCHANGE_KEYSTORE_PROBLEM);
-        } 
+        }
     }
-    
+
     /**
      * Resets the user's password using the recovery key.
      *
-     * @param resetPasswordPojo    password changing data
+     * @param resetPasswordPojo password changing data
      * @param errors
      * @return ResponseEntity with Http Status Code
      */
     @ResponseBody
-    @RequestMapping(
-            value = "/resetPassword",
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            method = RequestMethod.POST
-    )
-    //TODO: move transactionality annotation into the service layer
+    @RequestMapping(value = "/resetPassword", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+    // TODO: move transactionality annotation into the service layer
     @Transactional(propagation = Propagation.REQUIRED)
-    public ResponseEntity resetPassword(@RequestBody ResetPasswordPojo resetPasswordPojo, Errors errors, HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity resetPassword(@RequestBody ResetPasswordPojo resetPasswordPojo, Errors errors,
+                    HttpServletRequest request, HttpServletResponse response) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         if (username == null) {
             return generateStatusResponse(RestStatusResponse.USER_NOT_SIGNED_IN);
@@ -260,9 +237,12 @@ public class RestUserController {
                     return generateStatusResponse(RestStatusResponse.PASSWORDCHANGE_USER_NOT_FOUND);
                 }
             }
-            User user = userService.useRecoveryKey(resetPasswordPojo.getUsername(), resetPasswordPojo.getNewPassword(), resetPasswordPojo.getRecoveryKey());
-            eventPublisher.publishEvent(new OnPasswordChangedEvent(user, request.getLocale(), request.getContextPath()));
-            String recoveryKey = userService.generateRecoveryKey(resetPasswordPojo.getUsername(), resetPasswordPojo.getNewPassword());
+            User user = userService.useRecoveryKey(resetPasswordPojo.getUsername(), resetPasswordPojo.getNewPassword(),
+                            resetPasswordPojo.getRecoveryKey());
+            eventPublisher.publishEvent(
+                            new OnPasswordChangedEvent(user, request.getLocale(), request.getContextPath()));
+            String recoveryKey = userService.generateRecoveryKey(resetPasswordPojo.getUsername(),
+                            resetPasswordPojo.getNewPassword());
             eventPublisher.publishEvent(new OnRecoveryKeyGeneratedEvent(user, recoveryKey));
             return generateUserResponse(user);
         } catch (IncorrectPasswordException e) {
@@ -271,9 +251,9 @@ public class RestUserController {
             return generateStatusResponse(RestStatusResponse.USER_NOT_FOUND);
         } catch (KeyStoreIOException e) {
             return generateStatusResponse(RestStatusResponse.PASSWORDCHANGE_KEYSTORE_PROBLEM);
-        } 
+        }
     }
-    
+
     /**
      * transfers a privateId user to a registered user
      *
@@ -281,21 +261,18 @@ public class RestUserController {
      * @return ResponseEntity with Http Status Code
      */
     @ResponseBody
-    @RequestMapping(
-            value = "/transfer",
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            method = RequestMethod.POST
-    )
+    @RequestMapping(value = "/transfer", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
     @Transactional(propagation = Propagation.REQUIRED)
-    public ResponseEntity transferUser(@RequestBody TransferUserPojo transferUserPojo, Errors errors, WebRequest request) {
+    public ResponseEntity transferUser(@RequestBody TransferUserPojo transferUserPojo, Errors errors,
+                    WebRequest request) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        // cannot use user object from context since hw doesn't know about created in this session need,
+        // cannot use user object from context since hw doesn't know about created in
+        // this session need,
         // therefore, we have to retrieve the user object from the user repository
         User user = userService.getByUsername(username);
         if (user == null && !transferUserPojo.getPrivateUsername().equals(user.getUsername())) {
             return generateStatusResponse(RestStatusResponse.USERNAME_MISMATCH);
         }
-
         try {
             userRegisterValidator.validate(transferUserPojo, errors);
             if (errors.hasErrors()) {
@@ -307,16 +284,18 @@ public class RestUserController {
                     return generateStatusResponse(RestStatusResponse.USER_ALREADY_EXISTS);
                 }
             }
-            User transferUser = userService.transferUser(transferUserPojo.getUsername(), transferUserPojo.getPassword(), transferUserPojo.getPrivateUsername(), transferUserPojo.getPrivatePassword());
-
-            if(!transferUser.isEmailVerified()) {
-                eventPublisher.publishEvent(new OnRegistrationCompleteEvent(transferUser, request.getLocale(), request.getContextPath()));
+            User transferUser = userService.transferUser(transferUserPojo.getUsername(), transferUserPojo.getPassword(),
+                            transferUserPojo.getPrivateUsername(), transferUserPojo.getPrivatePassword());
+            if (!transferUser.isEmailVerified()) {
+                eventPublisher.publishEvent(new OnRegistrationCompleteEvent(transferUser, request.getLocale(),
+                                request.getContextPath()));
                 String recoveryKey;
                 try {
-                    recoveryKey = userService.generateRecoveryKey(transferUserPojo.getUsername(), transferUserPojo.getPassword());
+                    recoveryKey = userService.generateRecoveryKey(transferUserPojo.getUsername(),
+                                    transferUserPojo.getPassword());
                     eventPublisher.publishEvent(new OnRecoveryKeyGeneratedEvent(transferUser, recoveryKey));
                 } catch (UserNotFoundException e) {
-                    return generateStatusResponse(RestStatusResponse.RECOVERY_KEYGEN_USER_NOT_FOUND);        
+                    return generateStatusResponse(RestStatusResponse.RECOVERY_KEYGEN_USER_NOT_FOUND);
                 } catch (IncorrectPasswordException e) {
                     return generateStatusResponse(RestStatusResponse.RECOVERY_KEYGEN_WRONG_PASSWORD);
                 }
@@ -331,15 +310,11 @@ public class RestUserController {
     }
 
     @ResponseBody
-    @RequestMapping(
-            value = "/settings",
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            method = RequestMethod.GET
-    )
+    @RequestMapping(value = "/settings", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
     public UserSettingsPojo getUserSettings(@RequestParam("uri") String uri) {
-
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        // cannot use user object from context since hw doesn't know about created in this session need,
+        // cannot use user object from context since hw doesn't know about created in
+        // this session need,
         // therefore, we have to retrieve the user object from the user repository
         User user = userService.getByUsername(username);
         UserSettingsPojo userSettingsPojo = new UserSettingsPojo(user.getUsername(), user.getEmail());
@@ -350,7 +325,7 @@ public class RestUserController {
             for (UserNeed userNeed : user.getUserNeeds()) {
                 if (userNeed.getUri().equals(needUri)) {
                     userSettingsPojo.setNotify(userNeed.isMatches(), userNeed.isRequests(), userNeed.isConversations());
-                    //userSettingsPojo.setEmail(user.getEmail());
+                    // userSettingsPojo.setEmail(user.getEmail());
                     break;
                 }
             }
@@ -362,36 +337,30 @@ public class RestUserController {
     }
 
     @ResponseBody
-    @RequestMapping(
-            value = "/settings",
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            method = RequestMethod.POST
-    )
-    //TODO: move transactionality annotation into the service layer
+    @RequestMapping(value = "/settings", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+    // TODO: move transactionality annotation into the service layer
     @Transactional(propagation = Propagation.SUPPORTS)
     public ResponseEntity setUserSettings(@RequestBody UserSettingsPojo userSettingsPojo) {
-
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        // cannot use user object from context since hw doesn't know about created in this session need,
+        // cannot use user object from context since hw doesn't know about created in
+        // this session need,
         // therefore, we have to retrieve the user object from the user repository
         User user = userService.getByUsername(username);
         if (!user.getUsername().equals(userSettingsPojo.getUsername())) {
             return generateStatusResponse(RestStatusResponse.USERNAME_MISMATCH);
         }
-
         if (user.getEmail() == null) {
-            //TODO validate email server-side?
+            // TODO validate email server-side?
             // set email:
             user.setEmail(userSettingsPojo.getEmail());
             userService.save(user);
         } else if (!user.getEmail().equals(userSettingsPojo.getEmail())) {
-            //TODO validate email server-side?
+            // TODO validate email server-side?
             // change email:
             user.setEmail(userSettingsPojo.getEmail());
             userService.save(user);
             logger.info("change email requested - email changed");
         }
-
         // retrieve UserNeed
         URI needUri = null;
         try {
@@ -407,7 +376,8 @@ public class RestUserController {
             }
         } catch (URISyntaxException e) {
             logger.warn(userSettingsPojo.getNeedUri() + " need uri problem.", e);
-            return new ResponseEntity("\"" + userSettingsPojo.getNeedUri() + " need uri problem.\"", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity("\"" + userSettingsPojo.getNeedUri() + " need uri problem.\"",
+                            HttpStatus.BAD_REQUEST);
         }
         return generateStatusResponse(RestStatusResponse.SETTINGS_CREATED);
     }
@@ -420,19 +390,12 @@ public class RestUserController {
      * @return
      */
     @ResponseBody
-    @RequestMapping(
-            value = "/signin",
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            method = RequestMethod.POST
-    )
-    //TODO: move transactionality annotation into the service layer
+    @RequestMapping(value = "/signin", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+    // TODO: move transactionality annotation into the service layer
     @Transactional(propagation = Propagation.SUPPORTS)
-    public ResponseEntity logIn(
-            @RequestParam("username") String username,
-            @RequestParam("password") String password,
-            @RequestParam(name="privateId", required = false) String privateId,
-            HttpServletRequest request,
-            HttpServletResponse response) {
+    public ResponseEntity logIn(@RequestParam("username") String username, @RequestParam("password") String password,
+                    @RequestParam(name = "privateId", required = false) String privateId, HttpServletRequest request,
+                    HttpServletResponse response) {
         Optional<User> user = Optional.empty();
         try {
             user = Optional.of(performLoginForUser(username, password, request, response));
@@ -445,15 +408,14 @@ public class RestUserController {
         }
         if (user.isPresent()) {
             return generateUserResponse(user.get());
-        } 
+        }
         return generateStatusResponse(RestStatusResponse.USER_NOT_SIGNED_IN);
     }
 
     private User performLoginForUser(String username, String password, HttpServletRequest request,
-            HttpServletResponse response) throws BadCredentialsException, CredentialsExpiredException {
+                    HttpServletResponse response) throws BadCredentialsException, CredentialsExpiredException {
         SecurityContext context = SecurityContextHolder.getContext();
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username,
-            password);
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, password);
         Authentication auth = authenticationManager.authenticate(token);
         SecurityContextHolder.getContext().setAuthentication(auth);
         securityContextRepository.saveContext(SecurityContextHolder.getContext(), request, response);
@@ -462,23 +424,21 @@ public class RestUserController {
     }
 
     /**
-     * Method only accessible if the user's still signed in / the session's still valid -> Use it to check the session cookie.
+     * Method only accessible if the user's still signed in / the session's still
+     * valid -> Use it to check the session cookie.
      */
-    //* @param user user object
-    //* @param request
-    //* @param response
-    //* @return
+    // * @param user user object
+    // * @param request
+    // * @param response
+    // * @return
     //
     @ResponseBody
-    @RequestMapping(
-            value = "/isSignedIn",
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            method = RequestMethod.GET
-    )
+    @RequestMapping(value = "/isSignedIn", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
     @Transactional(propagation = Propagation.REQUIRED)
-    //TODO: move transactionality annotation into the service layer
+    // TODO: move transactionality annotation into the service layer
     public ResponseEntity isSignedIn(HttpServletRequest request, HttpServletResponse response) {
-        // Execution will only get here, if the session is still valid, so sending OK here is enough. Spring sends an error
+        // Execution will only get here, if the session is still valid, so sending OK
+        // here is enough. Spring sends an error
         // code by itself if the session isn't valid any more
         SecurityContext context = SecurityContextHolder.getContext();
         Authentication authentication = null;
@@ -488,7 +448,7 @@ public class RestUserController {
         if (authentication == null) {
             authentication = rememberMeServices.autoLogin(request, response);
         } else if (authentication instanceof AnonymousAuthenticationToken) {
-            //if we're anonymous, try to see if we can reactivate a remember-me session
+            // if we're anonymous, try to see if we can reactivate a remember-me session
             Authentication anonAuth = authentication;
             authentication = rememberMeServices.autoLogin(request, response);
             if (authentication == null) {
@@ -500,15 +460,11 @@ public class RestUserController {
         } else {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             User authUser = ((KeystoreEnabledUserDetails) authentication.getPrincipal()).getUser();
-
             return generateUserResponse(userService.getByUsername(authUser.getUsername()));
         }
     }
 
-    @RequestMapping(
-            value = "/signout",
-            method = RequestMethod.POST
-    )
+    @RequestMapping(value = "/signout", method = RequestMethod.POST)
     public ResponseEntity logOut(HttpServletRequest request, HttpServletResponse response) {
         SecurityContext context = SecurityContextHolder.getContext();
         if (context.getAuthentication() == null) {
@@ -520,85 +476,64 @@ public class RestUserController {
         return generateStatusResponse(RestStatusResponse.USER_SIGNED_OUT);
     }
 
-
-    @RequestMapping(
-            value = "/{userId}/favourites",
-            method = RequestMethod.POST
-    )
+    @RequestMapping(value = "/{userId}/favourites", method = RequestMethod.POST)
     @Transactional(propagation = Propagation.SUPPORTS)
     public ResponseEntity saveAsFavourite() {
         return null;
     }
 
     @ResponseBody
-    @RequestMapping(
-            value = "/confirmRegistration",
-            method = RequestMethod.POST
-    )
+    @RequestMapping(value = "/confirmRegistration", method = RequestMethod.POST)
     @Transactional(propagation = Propagation.SUPPORTS)
     public ResponseEntity confirmRegistration(@RequestBody VerificationTokenPojo token) {
         EmailVerificationToken verificationToken = userService.getEmailVerificationToken(token.getToken());
-        
-        if(verificationToken == null) {
+        if (verificationToken == null) {
             return generateStatusResponse(RestStatusResponse.TOKEN_NOT_FOUND);
         }
-        
         if (verificationToken.getPurpose() != TokenPurpose.INITIAL_EMAIL_VERIFICATION) {
             return generateStatusResponse(RestStatusResponse.TOKEN_PURPOSE_MISMATCH);
         }
-
         User user = verificationToken.getUser();
         Calendar cal = Calendar.getInstance();
-
-        if((verificationToken.getExpiryDate().getTime() - cal.getTime().getTime()) <= 0) {
+        if ((verificationToken.getExpiryDate().getTime() - cal.getTime().getTime()) <= 0) {
             return generateStatusResponse(RestStatusResponse.TOKEN_EXPIRED);
         }
-
         user.setEmailVerified(true);
         userService.save(user);
-
         return generateStatusResponse(RestStatusResponse.TOKEN_VERIFICATION_SUCCESS);
     }
 
     @ResponseBody
-    @RequestMapping(
-            value = "/exportAccount",
-            method = RequestMethod.POST
-    )
-    public ResponseEntity exportAccount(@RequestParam(name="keyStorePassword", required = false) String keyStorePassword) {
-
+    @RequestMapping(value = "/exportAccount", method = RequestMethod.POST)
+    public ResponseEntity exportAccount(
+                    @RequestParam(name = "keyStorePassword", required = false) String keyStorePassword) {
         SecurityContext securityContext = SecurityContextHolder.getContext();
         User authUser = ((KeystoreEnabledUserDetails) securityContext.getAuthentication().getPrincipal()).getUser();
         User user = userService.getByUsername(authUser.getUsername());
         String responseEmail = null;
-        if(user.isEmailVerified()) {
+        if (user.isEmailVerified()) {
             responseEmail = user.getEmail();
         } else {
             return generateStatusResponse(RestStatusResponse.EXPORT_NOT_VERIFIED);
         }
-
-        eventPublisher.publishEvent(new OnExportUserEvent(securityContext.getAuthentication(), keyStorePassword, responseEmail));
-
+        eventPublisher.publishEvent(
+                        new OnExportUserEvent(securityContext.getAuthentication(), keyStorePassword, responseEmail));
         return generateStatusResponse(RestStatusResponse.EXPORT_SUCCESS);
     }
 
     @ResponseBody
-    @RequestMapping(
-            value = "/acceptTermsOfService",
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            method = RequestMethod.POST
-    )
+    @RequestMapping(value = "/acceptTermsOfService", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
     @Transactional(propagation = Propagation.SUPPORTS)
     public ResponseEntity acceptTermsOfService() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        // cannot use user object from context since hw doesn't know about created in this session need,
+        // cannot use user object from context since hw doesn't know about created in
+        // this session need,
         // therefore, we have to retrieve the user object from the user repository
         User user = userService.getByUsername(username);
         if (user == null) {
             return generateStatusResponse(RestStatusResponse.USER_NOT_FOUND);
         }
-
-        if(user.isAcceptedTermsOfService()){
+        if (user.isAcceptedTermsOfService()) {
             return generateStatusResponse(RestStatusResponse.TOS_ACCEPT_SUCCESS);
         } else {
             user.setAcceptedTermsOfService(true);
@@ -608,44 +543,32 @@ public class RestUserController {
     }
 
     @ResponseBody
-    @RequestMapping(
-            value = "/resendVerificationEmail",
-            method = RequestMethod.POST
-    )
+    @RequestMapping(value = "/resendVerificationEmail", method = RequestMethod.POST)
     @Transactional(propagation = Propagation.SUPPORTS)
     public ResponseEntity resendVerificationEmail(@RequestBody UsernamePojo usernamePojo) {
         User user = userService.getByUsername(usernamePojo.getUsername());
-
-        if(user == null) {
+        if (user == null) {
             return generateStatusResponse(RestStatusResponse.USER_NOT_FOUND);
         }
-
-        if(user.isAnonymous()) {
+        if (user.isAnonymous()) {
             return generateStatusResponse(RestStatusResponse.TOKEN_RESEND_FAILED_USER_ANONYMOUS);
         }
-
-        if(user.isEmailVerified()) {
+        if (user.isEmailVerified()) {
             return generateStatusResponse(RestStatusResponse.TOKEN_RESEND_FAILED_ALREADY_VERIFIED);
         }
-
         EmailVerificationToken verificationToken = userService.getEmailVerificationToken(user);
-
-        if(verificationToken == null || verificationToken.isExpired()) {
+        if (verificationToken == null || verificationToken.isExpired()) {
             verificationToken = userService.createEmailVerificationToken(user);
         }
-        if(verificationToken == null) {
+        if (verificationToken == null) {
             return generateStatusResponse(RestStatusResponse.TOKEN_CREATION_FAILED);
         }
-
         emailSender.sendVerificationMessage(user, verificationToken);
         return generateStatusResponse(RestStatusResponse.TOKEN_RESEND_SUCCESS);
     }
 
     @ResponseBody
-    @RequestMapping(
-            value = "/sendAnonymousLinkEmail",
-            method = RequestMethod.POST
-    )
+    @RequestMapping(value = "/sendAnonymousLinkEmail", method = RequestMethod.POST)
     @Transactional(propagation = Propagation.SUPPORTS)
     public ResponseEntity sendAnonymousEmail(@RequestBody AnonymousLinkPojo anonymousLinkPojo) {
         emailSender.sendAnonymousLinkMessage(anonymousLinkPojo.getEmail(), anonymousLinkPojo.getPrivateId());
@@ -657,16 +580,15 @@ public class RestUserController {
     }
 
     private static ResponseEntity generateStatusResponse(RestStatusResponse restStatusResponse) {
-        //TODO: Maybe change to return a pojo
+        // TODO: Maybe change to return a pojo
         Map values = new HashMap<String, String>();
         values.put("code", restStatusResponse.getCode());
         values.put("message", restStatusResponse.getMessage());
-
         return new ResponseEntity(values, restStatusResponse.getHttpStatus());
     }
 
     private static ResponseEntity generateUserResponse(User user) {
-        //TODO: Maybe change to return a pojo
+        // TODO: Maybe change to return a pojo
         Map values = new HashMap<String, String>();
         values.put("username", user.getUsername());
         values.put("authorities", user.getAuthorities());
@@ -675,7 +597,6 @@ public class RestUserController {
         values.put("acceptedTermsOfService", user.isAcceptedTermsOfService());
         values.put("privateId", user.getPrivateId());
         values.put("isAnonymous", user.isAnonymous());
-
         return new ResponseEntity<Map>(values, HttpStatus.OK);
     }
 }

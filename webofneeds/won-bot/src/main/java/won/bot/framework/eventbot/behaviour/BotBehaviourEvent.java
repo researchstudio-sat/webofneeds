@@ -11,9 +11,10 @@ public class BotBehaviourEvent extends BaseEvent {
     private BotBehaviour behaviour;
     private Optional<Object> message;
 
-    public BotBehaviourEvent(BotBehaviour behaviour){
+    public BotBehaviourEvent(BotBehaviour behaviour) {
         this(behaviour, Optional.empty());
     }
+
     public BotBehaviourEvent(BotBehaviour behaviour, Optional<Object> message) {
         this.behaviour = behaviour;
         this.message = message;
@@ -23,5 +24,7 @@ public class BotBehaviourEvent extends BaseEvent {
         return behaviour;
     }
 
-    public Optional<Object> getMessage(){ return message;};
+    public Optional<Object> getMessage() {
+        return message;
+    };
 }

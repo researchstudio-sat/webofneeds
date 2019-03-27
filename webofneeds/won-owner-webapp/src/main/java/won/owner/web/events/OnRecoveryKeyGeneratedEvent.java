@@ -7,8 +7,8 @@ import org.springframework.context.ApplicationEvent;
 import won.owner.model.User;
 
 /**
- * Created by fsuda on 27.11.2018.
- * This Event is used/published as a Result of a successful password change.
+ * Created by fsuda on 27.11.2018. This Event is used/published as a Result of a
+ * successful password change.
  */
 public class OnRecoveryKeyGeneratedEvent extends ApplicationEvent {
     private User user;
@@ -27,11 +27,11 @@ public class OnRecoveryKeyGeneratedEvent extends ApplicationEvent {
     public void setUser(User user) {
         this.user = user;
     }
-    
+
     public String getRecoveryKey() {
         return recoveryKey;
     }
-    
+
     public void setRecoveryKey(String recoveryKey) {
         this.recoveryKey = recoveryKey;
     }

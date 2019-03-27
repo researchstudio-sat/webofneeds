@@ -42,10 +42,8 @@ public class HokifyJobBot extends EventBot {
     private int publishTime;
     private boolean createAllInOne;
     private ArrayList<HokifyJob> hokifyJobsList;
-
     private EventBus bus;
     // private WonHokifyJobBotHandler wonHokifyJobBotHandler;
-
     // @Autowired
     private HokifyMessageGenerator hokifyMessageGenerator;
 
@@ -55,62 +53,49 @@ public class HokifyJobBot extends EventBot {
         this.hokifyMessageGenerator = new HokifyMessageGenerator();
         this.hokifyMessageGenerator.setEventListenerContext(ctx);
         bus = getEventBus();
-
-        
         HokifyBotsApi hokifyBotsApi = new HokifyBotsApi(this.jsonURL, this.geoURL);
         hokifyJobsList = hokifyBotsApi.fetchHokifyData();
-        
         logger.info("Register JobBot with update time {}", updateTime);
         try {
             bus = getEventBus();
-
             BotBehaviour executeWonMessageCommandBehaviour = new ExecuteWonMessageCommandBehaviour(ctx);
             executeWonMessageCommandBehaviour.activate();
-
             bus.subscribe(CreateNeedFromJobEvent.class, new ActionOnEventListener(ctx, "CreateNeedFromJobEvent",
-                    new CreateNeedFromJobAction(ctx, this.createAllInOne)));
-
+                            new CreateNeedFromJobAction(ctx, this.createAllInOne)));
             // Create the needs
             BotTrigger createHokifyJobBotTrigger = new BotTrigger(ctx, Duration.ofMinutes(publishTime));
             createHokifyJobBotTrigger.activate();
             bus.subscribe(StartHokifyFetchEvent.class, new ActionOnFirstEventListener(ctx,
-                    new PublishEventAction(ctx, new StartBotTriggerCommandEvent(createHokifyJobBotTrigger))));
-            bus.subscribe(BotTriggerEvent.class,
-                    new ActionOnTriggerEventListener(ctx, createHokifyJobBotTrigger, new BaseEventBotAction(ctx) {
-                        @Override
-                        protected void doRun(Event event, EventListener executingListener) throws Exception {
-                            
-                            bus.publish(new CreateNeedFromJobEvent(hokifyJobsList, hokifyBotsApi));
-                        }
-                    }));
-
-            
-            //Get Hokify data
+                            new PublishEventAction(ctx, new StartBotTriggerCommandEvent(createHokifyJobBotTrigger))));
+            bus.subscribe(BotTriggerEvent.class, new ActionOnTriggerEventListener(ctx, createHokifyJobBotTrigger,
+                            new BaseEventBotAction(ctx) {
+                                @Override
+                                protected void doRun(Event event, EventListener executingListener) throws Exception {
+                                    bus.publish(new CreateNeedFromJobEvent(hokifyJobsList, hokifyBotsApi));
+                                }
+                            }));
+            // Get Hokify data
             BotTrigger fetchHokifyJobDataTrigger = new BotTrigger(ctx, Duration.ofMinutes(updateTime));
             fetchHokifyJobDataTrigger.activate();
             bus.subscribe(FetchHokifyJobDataEvent.class, new ActionOnFirstEventListener(ctx,
-                    new PublishEventAction(ctx, new StartBotTriggerCommandEvent(fetchHokifyJobDataTrigger))));
-            bus.subscribe(BotTriggerEvent.class,
-                    new ActionOnTriggerEventListener(ctx, fetchHokifyJobDataTrigger, new BaseEventBotAction(ctx) {
-                        @Override
-                        protected void doRun(Event event, EventListener executingListener) throws Exception {
-                            logger.info("Update Hokify Job Data");
-                            hokifyJobsList = hokifyBotsApi.fetchHokifyData();
-                            
-                        }
-                    }));
+                            new PublishEventAction(ctx, new StartBotTriggerCommandEvent(fetchHokifyJobDataTrigger))));
+            bus.subscribe(BotTriggerEvent.class, new ActionOnTriggerEventListener(ctx, fetchHokifyJobDataTrigger,
+                            new BaseEventBotAction(ctx) {
+                                @Override
+                                protected void doRun(Event event, EventListener executingListener) throws Exception {
+                                    logger.info("Update Hokify Job Data");
+                                    hokifyJobsList = hokifyBotsApi.fetchHokifyData();
+                                }
+                            }));
             // WON initiated Events
-
             /*
              * bus.subscribe(HintFromMatcherEvent.class, new ActionOnEventListener(ctx,
              * "HintReceived", new Hint2HokifyAction(ctx)));
              */
             bus.subscribe(ConnectFromOtherNeedEvent.class,
-                    new ActionOnEventListener(ctx, "ConnectReceived", new Connect2HokifyAction(ctx)));
-
+                            new ActionOnEventListener(ctx, "ConnectReceived", new Connect2HokifyAction(ctx)));
             bus.subscribe(MessageFromOtherNeedEvent.class,
-                    new ActionOnEventListener(ctx, "ReceivedTextMessage", new Message2HokifyAction(ctx)));
-
+                            new ActionOnEventListener(ctx, "ReceivedTextMessage", new Message2HokifyAction(ctx)));
             bus.publish(new StartHokifyFetchEvent());
             bus.publish(new FetchHokifyJobDataEvent());
         } catch (Exception e) {
@@ -169,5 +154,4 @@ public class HokifyJobBot extends EventBot {
     public void setCreateAllInOne(boolean createAllInOne) {
         this.createAllInOne = createAllInOne;
     }
-
 }

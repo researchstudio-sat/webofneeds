@@ -33,8 +33,7 @@ public class ConnectFromNodeReviewFacetImpl extends AbstractCamelProcessor {
         Message message = exchange.getIn();
         WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
         URI connectionUri = wonMessage.getReceiverURI();
-        //Connection con = connectionRepository.findOneByConnectionURI(connectionUri);
-
+        // Connection con = connectionRepository.findOneByConnectionURI(connectionUri);
         try {
             Map<Property, String> reviewData = WonRdfUtils.MessageUtils.getReviewContent(wonMessage);
             if (reviewData != null) {
@@ -48,18 +47,15 @@ public class ConnectFromNodeReviewFacetImpl extends AbstractCamelProcessor {
     }
 
     private void addReviewToNeed(Map<Property, String> reviewData, URI connectionUri) throws IllegalArgumentException {
-
         String aboutNeedURI = reviewData.get(SCHEMA.ABOUT);
         Double rating = Double.parseDouble(reviewData.get(SCHEMA.RATING_VALUE)) > 0.0
-                ? Double.parseDouble(reviewData.get(SCHEMA.RATING_VALUE))
-                : 0.0;
-
+                        ? Double.parseDouble(reviewData.get(SCHEMA.RATING_VALUE))
+                        : 0.0;
         Need aboutNeed = needRepository.findOneByNeedURI(URI.create(aboutNeedURI));
         Dataset needDataset = aboutNeed.getDatatsetHolder().getDataset();
         Model derivationModel = needDataset.getNamedModel(aboutNeed.getNeedURI() + "#derivedData");
         Resource aboutNeedResource = derivationModel.getResource(aboutNeedURI);
         Resource conRes = derivationModel.getResource(connectionUri.toString());
-
         Statement reviewdConnectionsProperty = derivationModel.getProperty(aboutNeedResource, WON.REVIEWED_CONNECTION);
         if (reviewdConnectionsProperty == null) {
             derivationModel.add(aboutNeedResource, WON.REVIEWED_CONNECTION, conRes);
@@ -73,13 +69,11 @@ public class ConnectFromNodeReviewFacetImpl extends AbstractCamelProcessor {
                 derivationModel.add(aboutNeedResource, ratedConnections, conRes);
             }
         }
-
         Statement aggregateRatingProperty = derivationModel.getProperty(aboutNeedResource, SCHEMA.AGGREGATE_RATING);
         if (aggregateRatingProperty == null) {
             derivationModel.addLiteral(aboutNeedResource, SCHEMA.AGGREGATE_RATING, rating);
             aggregateRatingProperty = derivationModel.getProperty(aboutNeedResource, SCHEMA.AGGREGATE_RATING);
         }
-
         int ratingCount = 0;
         Statement reviewCountProperty = derivationModel.getProperty(aboutNeedResource, SCHEMA.REVIEW_COUNT);
         if (reviewCountProperty != null) {
@@ -88,7 +82,6 @@ public class ConnectFromNodeReviewFacetImpl extends AbstractCamelProcessor {
             derivationModel.addLiteral(aboutNeedResource, SCHEMA.REVIEW_COUNT, 0.0);
             reviewCountProperty = derivationModel.getProperty(aboutNeedResource, SCHEMA.REVIEW_COUNT);
         }
-
         Double aggregateRating = aggregateRatingProperty.getDouble();
         Double ratingSum = 0.0;
         if (ratingCount < 1) {
@@ -96,13 +89,10 @@ public class ConnectFromNodeReviewFacetImpl extends AbstractCamelProcessor {
         } else {
             ratingSum = (aggregateRating * ratingCount) + rating;
         }
-
         ratingCount++;
         Double newAggregateRating = ratingSum / ratingCount;
-
         aggregateRatingProperty.changeLiteralObject(newAggregateRating);
         reviewCountProperty.changeLiteralObject(ratingCount);
-
         aboutNeed.getDatatsetHolder().setDataset(needDataset);
         needRepository.save(aboutNeed);
     }

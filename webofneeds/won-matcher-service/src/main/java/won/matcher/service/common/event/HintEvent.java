@@ -6,97 +6,92 @@ import java.net.URI;
 import org.apache.jena.rdf.model.Model;
 
 /**
- * Event is used to generate hints inside the matcher-service
- *
- * User: hfriedrich
+ * Event is used to generate hints inside the matcher-service User: hfriedrich
  * Date: 23.06.2015
  */
-public class HintEvent implements Serializable
-{
-  private String fromNeedUri;
-  private String fromWonNodeUri;
-  private String toNeedUri;
-  private String toWonNodeUri;
+public class HintEvent implements Serializable {
+    private String fromNeedUri;
+    private String fromWonNodeUri;
+    private String toNeedUri;
+    private String toWonNodeUri;
+    private String matcherUri;
+    private double score;
+    private URI generatedEventUri;
+    private String serializedExplanationModel;
+    private String serializationLangName;
+    private String serializationLangContentType;
 
-  private String matcherUri;
-  private double score;
+    public HintEvent(String fromWonNodeUri, String fromNeedUri, String toWonNodeUri, String toNeedUri,
+                    String matcherUri, double score) {
+        this.fromWonNodeUri = fromWonNodeUri;
+        this.fromNeedUri = fromNeedUri;
+        this.toWonNodeUri = toWonNodeUri;
+        this.toNeedUri = toNeedUri;
+        this.matcherUri = matcherUri;
+        this.score = score;
+    }
 
-  private URI generatedEventUri;
+    public String getFromNeedUri() {
+        return fromNeedUri;
+    }
 
-  private String serializedExplanationModel;
-  private String serializationLangName;
-  private String serializationLangContentType;
+    public String getToNeedUri() {
+        return toNeedUri;
+    }
 
-  public HintEvent(String fromWonNodeUri, String fromNeedUri, String toWonNodeUri,
-                   String toNeedUri, String matcherUri, double score) {
+    public String getFromWonNodeUri() {
+        return fromWonNodeUri;
+    }
 
-    this.fromWonNodeUri = fromWonNodeUri;
-    this.fromNeedUri = fromNeedUri;
-    this.toWonNodeUri = toWonNodeUri;
-    this.toNeedUri = toNeedUri;
-    this.matcherUri = matcherUri;
-    this.score = score;
-  }
+    public String getToWonNodeUri() {
+        return toWonNodeUri;
+    }
 
-  public String getFromNeedUri() {
-    return fromNeedUri;
-  }
+    public String getMatcherUri() {
+        return matcherUri;
+    }
 
-  public String getToNeedUri() {
-    return toNeedUri;
-  }
+    public double getScore() {
+        return score;
+    }
 
-  public String getFromWonNodeUri() {
-    return fromWonNodeUri;
-  }
+    public Model deserializeExplanationModel() {
+        throw new UnsupportedOperationException();
+    }
 
-  public String getToWonNodeUri() {
-    return toWonNodeUri;
-  }
+    public URI getGeneratedEventUri() {
+        return generatedEventUri;
+    }
 
-  public String getMatcherUri() {
-    return matcherUri;
-  }
+    public void setGeneratedEventUri(final URI generatedEventUri) {
+        this.generatedEventUri = generatedEventUri;
+    }
 
-  public double getScore() {
-    return score;
-  }
+    public void setSerializedExplanationModel(final String serializedExplanationModel) {
+        this.serializedExplanationModel = serializedExplanationModel;
+    }
 
-  public Model deserializeExplanationModel() { throw new UnsupportedOperationException(); }
+    public void setSerializationLangName(final String serializationLangName) {
+        this.serializationLangName = serializationLangName;
+    }
 
-  public URI getGeneratedEventUri() {
-    return generatedEventUri;
-  }
+    public void setSerializationLangContentType(final String serializationLangContentType) {
+        this.serializationLangContentType = serializationLangContentType;
+    }
 
-  public void setGeneratedEventUri(final URI generatedEventUri) {
-    this.generatedEventUri = generatedEventUri;
-  }
+    @Override
+    public HintEvent clone() {
+        HintEvent e = new HintEvent(fromWonNodeUri, fromNeedUri, toWonNodeUri, toNeedUri, matcherUri, score);
+        e.setGeneratedEventUri(this.getGeneratedEventUri());
+        e.setSerializationLangContentType(this.serializationLangContentType);
+        e.setSerializationLangName(this.serializationLangName);
+        e.setSerializedExplanationModel(this.serializedExplanationModel);
+        return e;
+    }
 
-  public void setSerializedExplanationModel(final String serializedExplanationModel) {
-    this.serializedExplanationModel = serializedExplanationModel;
-  }
-
-  public void setSerializationLangName(final String serializationLangName) {
-    this.serializationLangName = serializationLangName;
-  }
-
-  public void setSerializationLangContentType(final String serializationLangContentType) {
-    this.serializationLangContentType = serializationLangContentType;
-  }
-
-  @Override
-  public HintEvent clone() {
-    HintEvent e = new HintEvent(fromWonNodeUri, fromNeedUri, toWonNodeUri, toNeedUri, matcherUri, score);
-    e.setGeneratedEventUri(this.getGeneratedEventUri());
-    e.setSerializationLangContentType(this.serializationLangContentType);
-    e.setSerializationLangName(this.serializationLangName);
-    e.setSerializedExplanationModel(this.serializedExplanationModel);
-    return e;
-  }
-
-  @Override
-  public String toString() {
-    return "HintEvent: (" + getFromWonNodeUri() + ", " + getFromNeedUri() + ", " + getToWonNodeUri() + ", "+
-      getToNeedUri() + ", " + getMatcherUri() + ", " + getScore() + ")";
-  }
+    @Override
+    public String toString() {
+        return "HintEvent: (" + getFromWonNodeUri() + ", " + getFromNeedUri() + ", " + getToWonNodeUri() + ", "
+                        + getToNeedUri() + ", " + getMatcherUri() + ", " + getScore() + ")";
+    }
 }

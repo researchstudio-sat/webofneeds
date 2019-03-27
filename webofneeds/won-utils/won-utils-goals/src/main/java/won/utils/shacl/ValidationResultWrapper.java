@@ -6,11 +6,9 @@ import org.apache.jena.vocabulary.RDF;
 import org.topbraid.shacl.vocabulary.SH;
 
 public class ValidationResultWrapper {
-
     private Resource validationResult;
 
     public ValidationResultWrapper(Resource validationResult) {
-
         this.validationResult = validationResult;
         if (!validationResult.getPropertyResourceValue(RDF.type).equals(SH.ValidationResult)) {
             throw new IllegalArgumentException("Resource is not of type " + SH.ValidationResult.toString());
@@ -30,7 +28,7 @@ public class ValidationResultWrapper {
     }
 
     public Resource getResultPath() {
-       return validationResult.getPropertyResourceValue(SH.resultPath);
+        return validationResult.getPropertyResourceValue(SH.resultPath);
     }
 
     public String getResultMessage() {

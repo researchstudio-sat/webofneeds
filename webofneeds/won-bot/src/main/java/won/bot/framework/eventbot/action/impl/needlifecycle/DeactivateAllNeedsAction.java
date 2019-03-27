@@ -1,19 +1,13 @@
 /*
- * Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Copyright 2012 Research Studios Austria Forschungsges.m.b.H. Licensed under
+ * the Apache License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable
+ * law or agreed to in writing, software distributed under the License is
+ * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
  */
-
 package won.bot.framework.eventbot.action.impl.needlifecycle;
 
 import java.net.URI;
@@ -33,41 +27,29 @@ import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 
 /**
- * User: fkleedorfer
- * Date: 28.03.14
+ * User: fkleedorfer Date: 28.03.14
  */
-public class DeactivateAllNeedsAction extends BaseEventBotAction
-{
-  public DeactivateAllNeedsAction(EventListenerContext eventListenerContext) {
-    super(eventListenerContext);
-  }
-
-  @Override
-  protected void doRun(Event event, EventListener executingListener) throws Exception {
-
-    Collection<URI> toDeactivate = getEventListenerContext().getBotContext().retrieveAllNeedUris();
-    for (URI uri: toDeactivate){
-
-      getEventListenerContext().getWonMessageSender().sendWonMessage(createWonMessage(uri));
-      getEventListenerContext().getEventBus().publish(new NeedDeactivatedEvent(uri));
+public class DeactivateAllNeedsAction extends BaseEventBotAction {
+    public DeactivateAllNeedsAction(EventListenerContext eventListenerContext) {
+        super(eventListenerContext);
     }
-  }
 
-  private WonMessage createWonMessage(URI needURI) throws WonMessageBuilderException {
+    @Override
+    protected void doRun(Event event, EventListener executingListener) throws Exception {
+        Collection<URI> toDeactivate = getEventListenerContext().getBotContext().retrieveAllNeedUris();
+        for (URI uri : toDeactivate) {
+            getEventListenerContext().getWonMessageSender().sendWonMessage(createWonMessage(uri));
+            getEventListenerContext().getEventBus().publish(new NeedDeactivatedEvent(uri));
+        }
+    }
 
-    WonNodeInformationService wonNodeInformationService =
-            getEventListenerContext().getWonNodeInformationService();
-
-    Dataset ds = getEventListenerContext().getLinkedDataSource().getDataForResource(needURI);
-    URI localWonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(ds, needURI);
-
-    return WonMessageBuilder
-            .setMessagePropertiesForDeactivateFromOwner(
-                    wonNodeInformationService.generateEventURI(
-                            localWonNode),
-                    needURI,
-                    localWonNode)
-            .build();
-  }
-
+    private WonMessage createWonMessage(URI needURI) throws WonMessageBuilderException {
+        WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
+        Dataset ds = getEventListenerContext().getLinkedDataSource().getDataForResource(needURI);
+        URI localWonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(ds, needURI);
+        return WonMessageBuilder
+                        .setMessagePropertiesForDeactivateFromOwner(
+                                        wonNodeInformationService.generateEventURI(localWonNode), needURI, localWonNode)
+                        .build();
+    }
 }

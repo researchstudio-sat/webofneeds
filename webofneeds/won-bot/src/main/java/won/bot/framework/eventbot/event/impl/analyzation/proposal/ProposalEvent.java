@@ -20,12 +20,13 @@ public abstract class ProposalEvent extends BaseNeedAndConnectionSpecificEvent {
     public ProposalEvent(Connection con, MessageEvent proposalEvent) {
         super(con);
         this.proposalEvent = proposalEvent;
-        if(proposalEvent instanceof WonMessageReceivedOnConnectionEvent){
+        if (proposalEvent instanceof WonMessageReceivedOnConnectionEvent) {
             this.proposalUri = proposalEvent.getWonMessage().getCorrespondingRemoteMessageURI();
-        } else if(proposalEvent instanceof WonMessageSentOnConnectionEvent){
+        } else if (proposalEvent instanceof WonMessageSentOnConnectionEvent) {
             this.proposalUri = proposalEvent.getWonMessage().getMessageURI();
         } else {
-            throw new IllegalArgumentException("MessageEvent can only be of the instance WonMessageReceivedOnConnectionEvent or WonMessageSentOnConnectionEvent");
+            throw new IllegalArgumentException(
+                            "MessageEvent can only be of the instance WonMessageReceivedOnConnectionEvent or WonMessageSentOnConnectionEvent");
         }
     }
 
@@ -57,7 +58,8 @@ public abstract class ProposalEvent extends BaseNeedAndConnectionSpecificEvent {
     }
 
     /**
-     * @return true if there is a mixture between proposeToCancel and proposes triples in the MessageEvent
+     * @return true if there is a mixture between proposeToCancel and proposes
+     * triples in the MessageEvent
      */
     public boolean isMixed() {
         return hasProposesToCancelEvents() && hasProposesEvents();

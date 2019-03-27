@@ -30,11 +30,11 @@ public class Proposal implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         Proposal proposal = (Proposal) o;
-
         return uri.equals(proposal.uri);
     }
 
@@ -45,9 +45,6 @@ public class Proposal implements Serializable {
 
     @Override
     public String toString() {
-        return "Proposal{" +
-                "uri=" + uri +
-                ", state=" + state +
-                '}';
+        return "Proposal{" + "uri=" + uri + ", state=" + state + '}';
     }
 }

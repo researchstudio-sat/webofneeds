@@ -11,55 +11,48 @@ import org.slf4j.LoggerFactory;
 import won.cryptography.service.keystore.FileBasedKeyStoreService;
 
 /**
- * User: ypanchenko
- * Date: 05.08.2015
+ * User: ypanchenko Date: 05.08.2015
  */
-public class TrustStoreService
-{
+public class TrustStoreService {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private FileBasedKeyStoreService serviceImpl;
 
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+    public TrustStoreService(String filePath, String storePW) {
+        serviceImpl = new FileBasedKeyStoreService(filePath, storePW);
+    }
 
-  private FileBasedKeyStoreService serviceImpl;
+    public TrustStoreService(File storeFile, String storePW) {
+        serviceImpl = new FileBasedKeyStoreService(storeFile, storePW);
+    }
 
-  public TrustStoreService(String filePath, String storePW) {
-    serviceImpl = new FileBasedKeyStoreService(filePath, storePW);
-  }
+    public void init() throws Exception {
+        serviceImpl.init();
+    }
 
-  public TrustStoreService(File storeFile, String storePW) {
-    serviceImpl = new FileBasedKeyStoreService(storeFile, storePW);
-  }
+    public Certificate getCertificate(String alias) {
+        logger.debug("Fetching certificate for alias {}", alias);
+        return serviceImpl.getCertificate(alias);
+    }
 
-  public void init() throws Exception {
-    serviceImpl.init();
-  }
+    public boolean isCertKnown(Certificate cert) {
+        boolean isKnown = serviceImpl.getCertificateAlias(cert) != null;
+        logger.debug("Presented certificate is known: {}", isKnown);
+        return isKnown;
+    }
 
-  public Certificate getCertificate(String alias) {
-    logger.debug("Fetching certificate for alias {}", alias);
-    return serviceImpl.getCertificate(alias);
-  }
+    // public boolean isAliasKnown(String alias) {
+    // return serviceImpl.getCertificate(alias) != null;
+    // }
+    //
+    // public String getCertificateAlias(Certificate cert) {
+    // return serviceImpl.getCertificateAlias(cert);
+    // }
+    public void addCertificate(String alias, Certificate cert, boolean replace) throws IOException {
+        logger.debug("adding certificate for alias {}, replace: {}", alias, replace);
+        serviceImpl.putCertificate(alias, cert, replace);
+    }
 
-  public boolean isCertKnown(Certificate cert) {
-    boolean isKnown =  serviceImpl.getCertificateAlias(cert) != null;
-    logger.debug("Presented certificate is known: {}", isKnown );
-    return isKnown;
-  }
-
-//  public boolean isAliasKnown(String alias) {
-//    return serviceImpl.getCertificate(alias) != null;
-//  }
-//
-//  public String getCertificateAlias(Certificate cert) {
-//    return serviceImpl.getCertificateAlias(cert);
-//  }
-
-  public void addCertificate(String alias, Certificate cert, boolean replace) throws IOException {
-    logger.debug("adding certificate for alias {}, replace: {}", alias, replace);
-    serviceImpl.putCertificate(alias, cert, replace);
-  }
-
-  public KeyStore getUnderlyingKeyStore() {
-    return serviceImpl.getUnderlyingKeyStore();
-
-  }
-
+    public KeyStore getUnderlyingKeyStore() {
+        return serviceImpl.getUnderlyingKeyStore();
+    }
 }

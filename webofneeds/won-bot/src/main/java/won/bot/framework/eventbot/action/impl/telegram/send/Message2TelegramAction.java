@@ -21,7 +21,6 @@ import won.protocol.model.Connection;
  * Created by fsuda on 18.10.2016.
  */
 public class Message2TelegramAction extends BaseEventBotAction {
-
     WonTelegramBotHandler wonTelegramBotHandler;
 
     public Message2TelegramAction(EventListenerContext ctx, WonTelegramBotHandler wonTelegramBotHandler) {
@@ -32,26 +31,24 @@ public class Message2TelegramAction extends BaseEventBotAction {
     @Override
     protected void doRun(Event event, EventListener executingListener) throws Exception {
         EventListenerContext ctx = getEventListenerContext();
-
-        if(event instanceof MessageFromOtherNeedEvent && ctx.getBotContextWrapper() instanceof TelegramBotContextWrapper) {
+        if (event instanceof MessageFromOtherNeedEvent
+                        && ctx.getBotContextWrapper() instanceof TelegramBotContextWrapper) {
             TelegramBotContextWrapper botContextWrapper = (TelegramBotContextWrapper) ctx.getBotContextWrapper();
-
             Connection con = ((MessageFromOtherNeedEvent) event).getCon();
-            WonMessage wonMessage =((MessageFromOtherNeedEvent) event).getWonMessage();
-
+            WonMessage wonMessage = ((MessageFromOtherNeedEvent) event).getWonMessage();
             URI yourNeedUri = con.getNeedURI();
             URI remoteNeedUri = con.getRemoteNeedURI();
-
             Long chatId = botContextWrapper.getChatIdForURI(yourNeedUri);
-            if(chatId == null) {
+            if (chatId == null) {
                 logger.error("No chatId found for the specified needUri");
                 return;
             }
-
-            try{
-                Message message = wonTelegramBotHandler.sendMessage(wonTelegramBotHandler.getTelegramMessageGenerator().getConnectionTextMessage(chatId, remoteNeedUri, yourNeedUri, wonMessage));
-                botContextWrapper.addMessageIdWonURIRelation(message.getMessageId(), new WonURI(con.getConnectionURI(), UriType.CONNECTION));
-            }catch (TelegramApiException te){
+            try {
+                Message message = wonTelegramBotHandler.sendMessage(wonTelegramBotHandler.getTelegramMessageGenerator()
+                                .getConnectionTextMessage(chatId, remoteNeedUri, yourNeedUri, wonMessage));
+                botContextWrapper.addMessageIdWonURIRelation(message.getMessageId(),
+                                new WonURI(con.getConnectionURI(), UriType.CONNECTION));
+            } catch (TelegramApiException te) {
                 logger.error(te.getMessage());
             }
         }

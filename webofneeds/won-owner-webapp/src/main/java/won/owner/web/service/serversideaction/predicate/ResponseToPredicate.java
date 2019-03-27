@@ -7,9 +7,8 @@ import java.util.function.Predicate;
 import won.protocol.message.WonMessage;
 
 public class ResponseToPredicate implements Predicate<WonMessage> {
-    
     private URI messageURI;
-    
+
     public ResponseToPredicate(URI messageURI) {
         super();
         Objects.nonNull(messageURI);

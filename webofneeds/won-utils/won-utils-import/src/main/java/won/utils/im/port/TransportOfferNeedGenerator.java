@@ -22,14 +22,12 @@ import won.protocol.vocabulary.SCHEMA;
 import won.protocol.vocabulary.WON;
 
 public class TransportOfferNeedGenerator {
-
     static Model model = ModelFactory.createDefaultModel();
-
-    static RDFDatatype bigdata_geoSpatialDatatype = new BaseDatatype("http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon");
-    
+    static RDFDatatype bigdata_geoSpatialDatatype = new BaseDatatype(
+                    "http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon");
     static HashMap<String, String>[] locations = new HashMap[10];
     static String[] tags = { "quick", "<10kg", "long-distance", "cooled", "pets", "furniture", "short-distance",
-            "small", "non-living", "produce", "time-sensitive" };
+                    "small", "non-living", "produce", "time-sensitive" };
 
     public static void main(String[] args) {
         initializeLocations();
@@ -41,25 +39,19 @@ public class TransportOfferNeedGenerator {
         Random random = new Random();
         for (int i = 0; i < N; i++) {
             String rnd = Long.toHexString(random.nextLong());
-            String needURI = "https://localhost:8443/won/resource/event/" + "transport_offer_need_" + rnd ;
-
+            String needURI = "https://localhost:8443/won/resource/event/" + "transport_offer_need_" + rnd;
             model = ModelFactory.createDefaultModel();
-
             setPrefixes();
-
             Resource need = model.createResource(needURI);
             Resource seeksPart = model.createResource();
             Resource won_Need = model.createResource("http://purl.org/webofneeds/model#Need");
-
             // method signatures: branch, probability that detail is added, min, max
             need = addTitle(need, 1.0, i);
             need = addLocation(need, 1.0);
             seeksPart = addDescription(seeksPart, 1.0);
             seeksPart = addTags(seeksPart, 0.8, 1, 3);
-
             need.addProperty(RDF.type, won_Need);
             need.addProperty(WON.SEEKS, seeksPart);
-
             try {
                 FileOutputStream out = new FileOutputStream("sample_needs/transport_offer_need_" + rnd + ".trig");
                 model.write(out, "TURTLE");
@@ -75,7 +67,6 @@ public class TransportOfferNeedGenerator {
         if (Math.random() < (1.0 - probability)) {
             return resource;
         }
-
         resource.addProperty(DC.title, "Sample Transport Offer " + counter);
         return resource;
     }
@@ -84,7 +75,6 @@ public class TransportOfferNeedGenerator {
         if (Math.random() < (1.0 - probability)) {
             return resource;
         }
-
         resource.addProperty(DC.description, "This is a sample offer that was automatically generated.");
         return resource;
     }
@@ -93,24 +83,21 @@ public class TransportOfferNeedGenerator {
         if (Math.random() < (1.0 - probability)) {
             return resource;
         }
-
-     // pick a location and change it by a random amount so that the locations are scattered around a point
+        // pick a location and change it by a random amount so that the locations are
+        // scattered around a point
         int locNr = (int) (Math.random() * 10);
-        double rndlat = 0.05 * Math.random(); 
-        double rndlng = 0.05 * Math.random();                
+        double rndlat = 0.05 * Math.random();
+        double rndlng = 0.05 * Math.random();
         DecimalFormat df = new DecimalFormat("##.######");
         df.setRoundingMode(RoundingMode.HALF_UP);
         df.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
-        
-        String nwlat =  df.format(Double.parseDouble(locations[locNr].get("nwlat")) + rndlat);
+        String nwlat = df.format(Double.parseDouble(locations[locNr].get("nwlat")) + rndlat);
         String nwlng = df.format(Double.parseDouble(locations[locNr].get("nwlng")) + rndlng);
         String selat = df.format(Double.parseDouble(locations[locNr].get("selat")) + rndlat);
         String selng = df.format(Double.parseDouble(locations[locNr].get("selng")) + rndlng);
         String lat = df.format(Double.parseDouble(locations[locNr].get("lat")) + rndlat);
         String lng = df.format(Double.parseDouble(locations[locNr].get("lng")) + rndlng);
         String name = locations[locNr].get("name");
-
-
         Resource locationResource = model.createResource();
         Resource boundingBoxResource = model.createResource();
         Resource nwCornerResource = model.createResource();
@@ -118,7 +105,6 @@ public class TransportOfferNeedGenerator {
         Resource geoResource = model.createResource();
         Resource schema_Place = model.createResource("http://schema.org/Place");
         Resource schema_GeoCoordinates = model.createResource("http://schema.org/GeoCoordinates");
-
         resource.addProperty(SCHEMA.LOCATION, locationResource);
         locationResource.addProperty(RDF.type, schema_Place);
         locationResource.addProperty(SCHEMA.NAME, name);
@@ -126,8 +112,9 @@ public class TransportOfferNeedGenerator {
         geoResource.addProperty(RDF.type, schema_GeoCoordinates);
         geoResource.addProperty(SCHEMA.LATITUDE, lat);
         geoResource.addProperty(SCHEMA.LONGITUDE, lng);
-        // add bigdata specific value: "<subj> won:geoSpatial  "48.225073#16.358398"^^<http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon>" 
-        geoResource.addProperty(WON.GEO_SPATIAL, lat+"#"+lng, bigdata_geoSpatialDatatype);
+        // add bigdata specific value: "<subj> won:geoSpatial
+        // "48.225073#16.358398"^^<http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon>"
+        geoResource.addProperty(WON.GEO_SPATIAL, lat + "#" + lng, bigdata_geoSpatialDatatype);
         locationResource.addProperty(WON.HAS_BOUNDING_BOX, boundingBoxResource);
         boundingBoxResource.addProperty(WON.HAS_NORTH_WEST_CORNER, nwCornerResource);
         nwCornerResource.addProperty(RDF.type, schema_GeoCoordinates);
@@ -144,10 +131,8 @@ public class TransportOfferNeedGenerator {
         if (Math.random() < (1.0 - probability)) {
             return resource;
         }
-
         int numberOfTags = (int) (Math.random() * Math.abs(max - min + 1) + min);
         Collections.shuffle(Arrays.asList(tags));
-
         for (int j = 0; j < numberOfTags; j++) {
             resource.addProperty(WON.HAS_TAG, tags[j]);
         }
@@ -164,7 +149,6 @@ public class TransportOfferNeedGenerator {
         loc0.put("lng", "16.705195");
         loc0.put("name", "Gemeinde Weikendorf, Bezirk Gänserndorf, Lower Austria, 2253, Austria");
         locations[0] = loc0;
-
         HashMap<String, String> loc1 = new HashMap<String, String>();
         loc1.put("nwlat", "48.213814");
         loc1.put("nwlng", "16.340870");
@@ -174,7 +158,6 @@ public class TransportOfferNeedGenerator {
         loc1.put("lng", "16.358398");
         loc1.put("name", "Vienna, Austria");
         locations[1] = loc1;
-
         HashMap<String, String> loc2 = new HashMap<String, String>();
         loc2.put("nwlat", "48.145908");
         loc2.put("nwlng", "14.126198");
@@ -184,7 +167,6 @@ public class TransportOfferNeedGenerator {
         loc2.put("lng", "14.286198");
         loc2.put("name", "Linz, Upper Austria, 4010, Austria");
         locations[2] = loc2;
-
         HashMap<String, String> loc3 = new HashMap<String, String>();
         loc3.put("nwlat", "46.910256");
         loc3.put("nwlng", "15.278572");
@@ -194,7 +176,6 @@ public class TransportOfferNeedGenerator {
         loc3.put("lng", "15.438572");
         loc3.put("name", "Graz, Styria, 8011, Austria");
         locations[3] = loc3;
-
         HashMap<String, String> loc4 = new HashMap<String, String>();
         loc4.put("nwlat", "47.638135");
         loc4.put("nwlng", "12.886481");
@@ -204,7 +185,6 @@ public class TransportOfferNeedGenerator {
         loc4.put("lng", "13.046481");
         loc4.put("name", "Salzburg, 5020, Austria");
         locations[4] = loc4;
-
         HashMap<String, String> loc5 = new HashMap<String, String>();
         loc5.put("nwlat", "48.164398");
         loc5.put("nwlng", "15.582912");
@@ -214,7 +194,6 @@ public class TransportOfferNeedGenerator {
         loc5.put("lng", "15.622912");
         loc5.put("name", "St. Pölten, Lower Austria, 3102, Austria");
         locations[5] = loc5;
-
         HashMap<String, String> loc6 = new HashMap<String, String>();
         loc6.put("nwlat", "47.480016");
         loc6.put("nwlng", "9.654882");
@@ -224,7 +203,6 @@ public class TransportOfferNeedGenerator {
         loc6.put("lng", "9.747292");
         loc6.put("name", "Bregenz, Vorarlberg, Austria");
         locations[6] = loc6;
-
         HashMap<String, String> loc7 = new HashMap<String, String>();
         loc7.put("nwlat", "46.782816");
         loc7.put("nwlng", "14.467960");
@@ -234,7 +212,6 @@ public class TransportOfferNeedGenerator {
         loc7.put("lng", "14.307960");
         loc7.put("name", "Klagenfurt, Klagenfurt am Wörthersee, Carinthia, 9020, Austria");
         locations[7] = loc7;
-
         HashMap<String, String> loc8 = new HashMap<String, String>();
         loc8.put("nwlat", "47.425430");
         loc8.put("nwlng", "11.552769");
@@ -244,7 +221,6 @@ public class TransportOfferNeedGenerator {
         loc8.put("lng", "11.392769");
         loc8.put("name", "Innsbruck, Tyrol, 6020, Austria");
         locations[8] = loc8;
-
         HashMap<String, String> loc9 = new HashMap<String, String>();
         loc9.put("nwlat", "48.145711");
         loc9.put("nwlng", "16.560306");

@@ -1,19 +1,13 @@
 /*
- * Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2012 Research Studios Austria Forschungsges.m.b.H. Licensed under
+ * the Apache License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable
+ * law or agreed to in writing, software distributed under the License is
+ * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
  */
-
 package won.node.web;
 
 import org.apache.jena.query.Dataset;
@@ -130,19 +124,14 @@ public class LinkedDataWebController {
     // prefix for human readable pages
     private String pageURIPrefix;
     private String nodeResourceURIPrefix;
-
     @Autowired
     private LinkedDataService linkedDataService;
-
     @Autowired
     private RegistrationServer registrationServer;
-
     // date format for Expires header (rfc 1123)
     private static final String DATE_FORMAT_RFC_1123 = "EEE, dd MMM yyyy HH:mm:ss z";
-
     // timeout for resources that clients may cache for a short term
     private static final int SHORT_TERM_CACHE_TIMEOUT_SECONDS = 600;
-
     @Autowired
     private URIService uriService;
 
@@ -154,15 +143,12 @@ public class LinkedDataWebController {
     // webmvc controller method
     @RequestMapping("${uri.path.page.need}/{identifier}")
     public String showNeedPage(@PathVariable String identifier, Model model, HttpServletResponse response) {
-
         URI needURI = uriService.createNeedURIForId(identifier);
         Dataset rdfDataset = linkedDataService.getNeedDataset(needURI, null).getData();
-
         if (rdfDataset == null) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return "notFoundView";
         }
-
         model.addAttribute("rdfDataset", rdfDataset);
         model.addAttribute("resourceURI", needURI.toString());
         model.addAttribute("dataURI", uriService.toDataURIIfPossible(needURI).toString());
@@ -182,7 +168,7 @@ public class LinkedDataWebController {
     // webmvc controller method
     @RequestMapping("${uri.path.page.need}/{identifier}/deep")
     public String showDeepNeedPage(@PathVariable String identifier, Model model, HttpServletResponse response,
-                                   @RequestParam(value = "layer-size", required = false) Integer layerSize) {
+                    @RequestParam(value = "layer-size", required = false) Integer layerSize) {
         try {
             URI needURI = uriService.createNeedURIForId(identifier);
             Dataset rdfDataset = linkedDataService.getNeedDataset(needURI, true, layerSize);
@@ -214,47 +200,38 @@ public class LinkedDataWebController {
     // webmvc controller method
     @RequestMapping("${uri.path.page.connection}/{identifier}/events")
     public String showConnectionEventsPage(@PathVariable String identifier,
-                                           @RequestParam(value = "p", required = false) Integer page,
-                                           @RequestParam(value = "resumebefore", required = false) String beforeId,
-                                           @RequestParam(value = "resumeafter", required = false) String afterId,
-                                           @RequestParam(value = "type", required = false) String type,
-                                           @RequestParam(value = "deep", required = false, defaultValue = "false") boolean deep, Model model,
-                                           HttpServletResponse response) {
-
+                    @RequestParam(value = "p", required = false) Integer page,
+                    @RequestParam(value = "resumebefore", required = false) String beforeId,
+                    @RequestParam(value = "resumeafter", required = false) String afterId,
+                    @RequestParam(value = "type", required = false) String type,
+                    @RequestParam(value = "deep", required = false, defaultValue = "false") boolean deep, Model model,
+                    HttpServletResponse response) {
         try {
-
             URI connectionURI = uriService.createConnectionURIForId(identifier);
             String eventsURI = connectionURI.toString() + "/events";
             Dataset rdfDataset;
             WonMessageType msgType = getMessageType(type);
-
             if (page == null && beforeId == null && afterId == null) {
                 // all events, does not support type filtering for clients that do not support
                 // paging
                 rdfDataset = linkedDataService.listConnectionEventURIs(connectionURI, deep);
-
             } else if (page != null) {
                 // a page having particular page number is requested
                 NeedInformationService.PagedResource<Dataset, URI> resource = linkedDataService
-                        .listConnectionEventURIs(connectionURI, page, null, msgType, deep);
+                                .listConnectionEventURIs(connectionURI, page, null, msgType, deep);
                 rdfDataset = resource.getContent();
-
             } else if (beforeId != null) {
                 // a page that precedes the item identified by the beforeId is requested
-
                 URI referenceEvent = uriService.createEventURIForId(beforeId);
                 NeedInformationService.PagedResource<Dataset, URI> resource = linkedDataService
-                        .listConnectionEventURIsBefore(connectionURI, referenceEvent, null, msgType, deep);
+                                .listConnectionEventURIsBefore(connectionURI, referenceEvent, null, msgType, deep);
                 rdfDataset = resource.getContent();
-
             } else {
                 // a page that follows the item identified by the afterId is requested
-
                 URI referenceEvent = uriService.createEventURIForId(afterId);
                 NeedInformationService.PagedResource<Dataset, URI> resource = linkedDataService
-                        .listConnectionEventURIsAfter(connectionURI, referenceEvent, null, msgType, deep);
+                                .listConnectionEventURIsAfter(connectionURI, referenceEvent, null, msgType, deep);
                 rdfDataset = resource.getContent();
-
             }
             model.addAttribute("rdfDataset", rdfDataset);
             model.addAttribute("resourceURI", eventsURI);
@@ -279,9 +256,8 @@ public class LinkedDataWebController {
     // webmvc controller method
     @RequestMapping("${uri.path.page.event}/{identifier}")
     public String showEventPage(@PathVariable(value = "identifier") String identifier, Model model,
-                                HttpServletResponse response) {
+                    HttpServletResponse response) {
         URI eventURI = uriService.createEventURIForId(identifier);
-
         DataWithEtag<Dataset> data = linkedDataService.getDatasetForUri(eventURI, null);
         if (model != null && !data.isNotFound()) {
             model.addAttribute("rdfDataset", data.getData());
@@ -297,7 +273,7 @@ public class LinkedDataWebController {
     // webmvc controller method
     @RequestMapping("${uri.path.page.attachment}/{identifier}")
     public String showAttachmentPage(@PathVariable(value = "identifier") String identifier, Model model,
-                                     HttpServletResponse response) {
+                    HttpServletResponse response) {
         URI attachmentURI = uriService.createAttachmentURIForId(identifier);
         DataWithEtag<Dataset> data = linkedDataService.getDatasetForUri(attachmentURI, null);
         if (model != null && !data.isNotFound()) {
@@ -314,41 +290,36 @@ public class LinkedDataWebController {
     // webmvc controller method
     @RequestMapping("${uri.path.page.need}")
     public String showNeedURIListPage(@RequestParam(value = "p", required = false) Integer page,
-                                      @RequestParam(value = "resumebefore", required = false) String beforeId,
-                                      @RequestParam(value = "resumeafter", required = false) String afterId,
-                                      @RequestParam(value = "state", required = false) String state, HttpServletRequest request, Model model,
-                                      HttpServletResponse response) throws IOException {
-
+                    @RequestParam(value = "resumebefore", required = false) String beforeId,
+                    @RequestParam(value = "resumeafter", required = false) String afterId,
+                    @RequestParam(value = "state", required = false) String state, HttpServletRequest request,
+                    Model model, HttpServletResponse response) throws IOException {
         Dataset rdfDataset;
         NeedState needState = getNeedState(state);
-
         if (page == null && beforeId == null && afterId == null) {
             // all needs, does not support need state filtering for clients that do not
             // support paging
             rdfDataset = linkedDataService.listNeedURIs();
         } else if (page != null) {
             NeedInformationService.PagedResource<Dataset, URI> resource = linkedDataService.listNeedURIs(page, null,
-                    needState);
+                            needState);
             rdfDataset = resource.getContent();
         } else if (beforeId != null) {
-
             URI referenceNeed = URI.create(this.needResourceURIPrefix + "/" + beforeId);
             NeedInformationService.PagedResource<Dataset, URI> resource = linkedDataService
-                    .listNeedURIsBefore(referenceNeed, null, needState);
+                            .listNeedURIsBefore(referenceNeed, null, needState);
             rdfDataset = resource.getContent();
         } else { // afterId != null
             URI referenceNeed = URI.create(this.needResourceURIPrefix + "/" + afterId);
             NeedInformationService.PagedResource<Dataset, URI> resource = linkedDataService
-                    .listNeedURIsAfter(referenceNeed, null, needState);
+                            .listNeedURIsAfter(referenceNeed, null, needState);
             rdfDataset = resource.getContent();
         }
-
         model.addAttribute("rdfDataset", rdfDataset);
         model.addAttribute("resourceURI",
-                uriService.toResourceURIIfPossible(URI.create(request.getRequestURI())).toString());
+                        uriService.toResourceURIIfPossible(URI.create(request.getRequestURI())).toString());
         model.addAttribute("dataURI", uriService.toDataURIIfPossible(URI.create(request.getRequestURI())).toString());
         return "rdfDatasetView";
-
     }
 
     @RequestMapping("${uri.path.page}")
@@ -356,7 +327,7 @@ public class LinkedDataWebController {
         Dataset rdfDataset = linkedDataService.getNodeDataset();
         model.addAttribute("rdfDataset", rdfDataset);
         model.addAttribute("resourceURI",
-                uriService.toResourceURIIfPossible(URI.create(request.getRequestURI())).toString());
+                        uriService.toResourceURIIfPossible(URI.create(request.getRequestURI())).toString());
         model.addAttribute("dataURI", uriService.toDataURIIfPossible(URI.create(request.getRequestURI())).toString());
         return "rdfDatasetView";
     }
@@ -364,12 +335,11 @@ public class LinkedDataWebController {
     // webmvc controller method
     @RequestMapping("${uri.path.page.connection}")
     public String showConnectionURIListPage(@RequestParam(value = "p", required = false) Integer page,
-                                            @RequestParam(value = "deep", defaultValue = "false") boolean deep,
-                                            @RequestParam(value = "resumebefore", required = false) String beforeId,
-                                            @RequestParam(value = "resumeafter", required = false) String afterId,
-                                            @RequestParam(value = "timeof", required = false) String timestamp, HttpServletRequest request, Model model,
-                                            HttpServletResponse response) {
-
+                    @RequestParam(value = "deep", defaultValue = "false") boolean deep,
+                    @RequestParam(value = "resumebefore", required = false) String beforeId,
+                    @RequestParam(value = "resumeafter", required = false) String afterId,
+                    @RequestParam(value = "timeof", required = false) String timestamp, HttpServletRequest request,
+                    Model model, HttpServletResponse response) {
         try {
             DateParameter dateParam = new DateParameter(timestamp);
             Dataset rdfDataset;
@@ -378,11 +348,11 @@ public class LinkedDataWebController {
             } else if (beforeId != null) {
                 URI connURI = uriService.createConnectionURIForId(beforeId);
                 rdfDataset = linkedDataService.listConnectionsBefore(connURI, null, dateParam.getDate(), deep)
-                        .getContent();
+                                .getContent();
             } else if (afterId != null) {
                 URI connURI = uriService.createConnectionURIForId(afterId);
                 rdfDataset = linkedDataService.listConnectionsAfter(connURI, null, dateParam.getDate(), deep)
-                        .getContent();
+                                .getContent();
             } else {
                 // all the connections; does not support date filtering for clients that do not
                 // support paging
@@ -390,9 +360,9 @@ public class LinkedDataWebController {
             }
             model.addAttribute("rdfDataset", rdfDataset);
             model.addAttribute("resourceURI",
-                    uriService.toResourceURIIfPossible(URI.create(request.getRequestURI())).toString());
+                            uriService.toResourceURIIfPossible(URI.create(request.getRequestURI())).toString());
             model.addAttribute("dataURI",
-                    uriService.toDataURIIfPossible(URI.create(request.getRequestURI())).toString());
+                            uriService.toDataURIIfPossible(URI.create(request.getRequestURI())).toString());
             return "rdfDatasetView";
         } catch (ParseException e) {
             model.addAttribute("error", "could not parse timestamp parameter");
@@ -406,14 +376,13 @@ public class LinkedDataWebController {
     // webmvc controller method
     @RequestMapping("${uri.path.page.need}/{identifier}/connections")
     public String showConnectionURIListPage(@PathVariable String identifier,
-                                            @RequestParam(value = "p", required = false) Integer page,
-                                            @RequestParam(value = "deep", defaultValue = "false") boolean deep,
-                                            @RequestParam(value = "resumebefore", required = false) String beforeId,
-                                            @RequestParam(value = "resumeafter", required = false) String afterId,
-                                            @RequestParam(value = "type", required = false) String type,
-                                            @RequestParam(value = "timeof", required = false) String timestamp, HttpServletRequest request, Model model,
-                                            HttpServletResponse response) {
-
+                    @RequestParam(value = "p", required = false) Integer page,
+                    @RequestParam(value = "deep", defaultValue = "false") boolean deep,
+                    @RequestParam(value = "resumebefore", required = false) String beforeId,
+                    @RequestParam(value = "resumeafter", required = false) String afterId,
+                    @RequestParam(value = "type", required = false) String type,
+                    @RequestParam(value = "timeof", required = false) String timestamp, HttpServletRequest request,
+                    Model model, HttpServletResponse response) {
         URI needURI = uriService.createNeedURIForId(identifier);
         try {
             DateParameter dateParam = new DateParameter(timestamp);
@@ -421,29 +390,27 @@ public class LinkedDataWebController {
             Dataset rdfDataset;
             if (page != null) {
                 rdfDataset = linkedDataService
-                        .listConnections(page, needURI, null, eventsType, dateParam.getDate(), deep, true)
-                        .getContent();
+                                .listConnections(page, needURI, null, eventsType, dateParam.getDate(), deep, true)
+                                .getContent();
             } else if (beforeId != null) {
                 URI connURI = uriService.createConnectionURIForId(beforeId);
-                rdfDataset = linkedDataService
-                        .listConnectionsBefore(needURI, connURI, null, eventsType, dateParam.getDate(), deep, true)
-                        .getContent();
+                rdfDataset = linkedDataService.listConnectionsBefore(needURI, connURI, null, eventsType,
+                                dateParam.getDate(), deep, true).getContent();
             } else if (afterId != null) {
                 URI connURI = uriService.createConnectionURIForId(afterId);
-                rdfDataset = linkedDataService
-                        .listConnectionsAfter(needURI, connURI, null, eventsType, dateParam.getDate(), deep, true)
-                        .getContent();
+                rdfDataset = linkedDataService.listConnectionsAfter(needURI, connURI, null, eventsType,
+                                dateParam.getDate(), deep, true).getContent();
             } else {
                 // all the connections of the need; does not support type and date filtering for
                 // clients that do not support
                 // paging
-                rdfDataset = linkedDataService
-                        .listConnections(needURI, deep, true)
-                        .getContent();
+                rdfDataset = linkedDataService.listConnections(needURI, deep, true).getContent();
             }
             model.addAttribute("rdfDataset", rdfDataset);
-            model.addAttribute("resourceURI", uriService.toResourceURIIfPossible(URI.create(request.getRequestURI())).toString());
-            model.addAttribute("dataURI", uriService.toDataURIIfPossible(URI.create(request.getRequestURI())).toString());
+            model.addAttribute("resourceURI",
+                            uriService.toResourceURIIfPossible(URI.create(request.getRequestURI())).toString());
+            model.addAttribute("dataURI",
+                            uriService.toDataURIIfPossible(URI.create(request.getRequestURI())).toString());
             return "rdfDatasetView";
         } catch (ParseException e) {
             model.addAttribute("error", "could not parse timestamp parameter");
@@ -453,7 +420,7 @@ public class LinkedDataWebController {
             return "notFoundView";
         } catch (NoSuchConnectionException e) {
             logger.warn("did not find connection that should be connected to need. connection:{}",
-                    e.getUnknownConnectionURI());
+                            e.getUnknownConnectionURI());
             return "notFoundView"; // TODO: should display an error view
         }
     }
@@ -465,21 +432,20 @@ public class LinkedDataWebController {
      * @param request
      * @return
      */
-    @RequestMapping(value = "${uri.path.resource}/**", method = RequestMethod.GET, produces = {"application/ld+json",
-            "application/trig", "application/n-quads", "*/*"})
+    @RequestMapping(value = "${uri.path.resource}/**", method = RequestMethod.GET, produces = { "application/ld+json",
+                    "application/trig", "application/n-quads", "*/*" })
     public ResponseEntity<String> redirectToData(HttpServletRequest request, HttpServletResponse response)
-            throws IOException {
+                    throws IOException {
         URI resourceUriPrefix = URI.create(this.resourceURIPrefix);
         URI dataUri = URI.create(this.dataURIPrefix);
         String requestUri = getRequestUriWithQueryString(request);
         String redirectToURI = requestUri.replaceFirst(resourceUriPrefix.getPath(), dataUri.getPath());
         logger.debug("resource URI requested with data mime type. redirecting from {} to {}", requestUri,
-                redirectToURI);
+                        redirectToURI);
         if (redirectToURI.equals(requestUri)) {
             logger.debug("redirecting to same URI avoided, sending status 500 instead");
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
         // TODO: actually the expiry information should be the same as that of the
         // resource that is redirected to
         HttpHeaders headers = new HttpHeaders();
@@ -517,13 +483,13 @@ public class LinkedDataWebController {
      */
     @RequestMapping(value = "${uri.path.resource}/**", method = RequestMethod.GET, produces = "text/html")
     public ResponseEntity<String> redirectToPage(HttpServletRequest request, HttpServletResponse response)
-            throws IOException {
+                    throws IOException {
         URI resourceUriPrefix = URI.create(this.resourceURIPrefix);
         URI pageUriPrefix = URI.create(this.pageURIPrefix);
         String requestUri = getRequestUriWithQueryString(request);
         String redirectToURI = requestUri.replaceFirst(resourceUriPrefix.getPath(), pageUriPrefix.getPath());
         logger.debug("resource URI requested with page mime type. redirecting from {} to {}", requestUri,
-                redirectToURI);
+                        redirectToURI);
         if (redirectToURI.equals(requestUri)) {
             logger.debug("redirecting to same URI avoided, sending status 500 instead");
             return new ResponseEntity<>("\"Could not redirect to linked data page\"", HttpStatus.INTERNAL_SERVER_ERROR);
@@ -542,8 +508,9 @@ public class LinkedDataWebController {
 
     /**
      * If the request URI is the URI of a list page (list of needs, list of
-     * connections), or a need uri, it gets the header that says 'already expired' so that crawlers
-     * re-download these data. For other URIs, the 'never expires' header is added.
+     * connections), or a need uri, it gets the header that says 'already expired'
+     * so that crawlers re-download these data. For other URIs, the 'never expires'
+     * header is added.
      *
      * @param headers
      * @param requestUri
@@ -555,7 +522,8 @@ public class LinkedDataWebController {
         // these data
         URI requestUriAsURI = URI.create(requestUri);
         String requestPath = requestUriAsURI.getPath();
-        if (uriService.isConnectionEventsURI(requestUriAsURI) || uriService.isNeedEventsURI(requestUriAsURI) || uriService.isNeedURI(requestUriAsURI)) {
+        if (uriService.isConnectionEventsURI(requestUriAsURI) || uriService.isNeedEventsURI(requestUriAsURI)
+                        || uriService.isNeedURI(requestUriAsURI)) {
             addMutableResourceHeaders(headers);
         } else {
             addImmutableResourceHeaders(headers);
@@ -563,71 +531,60 @@ public class LinkedDataWebController {
         return headers;
     }
 
-    @RequestMapping(value = "${uri.path.data.need}", method = RequestMethod.GET, produces = {"application/ld+json",
-            "application/trig", "application/n-quads"})
+    @RequestMapping(value = "${uri.path.data.need}", method = RequestMethod.GET, produces = { "application/ld+json",
+                    "application/trig", "application/n-quads" })
     public ResponseEntity<Dataset> listNeedURIs(HttpServletRequest request, HttpServletResponse response,
-                                                @RequestParam(value = "p", required = false) Integer page,
-                                                @RequestParam(value = "resumebefore", required = false) String beforeId,
-                                                @RequestParam(value = "resumeafter", required = false) String afterId,
-                                                @RequestParam(value = "modifiedafter", required = false) String modifiedAfter,
-                                                @RequestParam(value = "state", required = false) String state) throws IOException, ParseException {
+                    @RequestParam(value = "p", required = false) Integer page,
+                    @RequestParam(value = "resumebefore", required = false) String beforeId,
+                    @RequestParam(value = "resumeafter", required = false) String afterId,
+                    @RequestParam(value = "modifiedafter", required = false) String modifiedAfter,
+                    @RequestParam(value = "state", required = false) String state) throws IOException, ParseException {
         logger.debug("listNeedURIs() for page " + page + " called");
-
         Dataset rdfDataset;
         HttpHeaders headers = new HttpHeaders();
         Integer preferedSize = getPreferredSize(request);
         String passableQuery = getPassableQueryMap("state", state);
         NeedState needState = getNeedState(state);
-
         if (preferedSize == null && modifiedAfter == null) {
             // client doesn not support paging - return all needs; does not support need
             // state filtering for clients that do
             // not support paging
             rdfDataset = linkedDataService.listNeedURIs();
-
         } else if (page == null && beforeId == null && afterId == null && modifiedAfter == null) {
             // return latest needs
             NeedInformationService.PagedResource<Dataset, URI> resource = linkedDataService.listNeedURIs(1,
-                    preferedSize, needState);
+                            preferedSize, needState);
             rdfDataset = resource.getContent();
             addPagedResourceInSequenceHeader(headers, URI.create(this.needResourceURIPrefix), resource, passableQuery);
-
             // resume before parameter specified - display the connections with activities
             // before the specified event id
         } else if (page != null) {
-
             NeedInformationService.PagedResource<Dataset, URI> resource = linkedDataService.listNeedURIs(page,
-                    preferedSize, needState);
+                            preferedSize, needState);
             rdfDataset = resource.getContent();
             addPagedResourceInSequenceHeader(headers, URI.create(this.needResourceURIPrefix), resource, page,
-                    passableQuery);
-
+                            passableQuery);
         } else if (beforeId != null) {
-
             URI referenceNeed = URI.create(this.needResourceURIPrefix + "/" + beforeId);
             NeedInformationService.PagedResource<Dataset, URI> resource = linkedDataService
-                    .listNeedURIsBefore(referenceNeed, preferedSize, needState);
+                            .listNeedURIsBefore(referenceNeed, preferedSize, needState);
             rdfDataset = resource.getContent();
             addPagedResourceInSequenceHeader(headers, URI.create(this.needResourceURIPrefix), resource, passableQuery);
         } else if (afterId != null) {
-
             URI referenceNeed = URI.create(this.needResourceURIPrefix + "/" + afterId);
             NeedInformationService.PagedResource<Dataset, URI> resource = linkedDataService
-                    .listNeedURIsAfter(referenceNeed, preferedSize, needState);
+                            .listNeedURIsAfter(referenceNeed, preferedSize, needState);
             rdfDataset = resource.getContent();
             addPagedResourceInSequenceHeader(headers, URI.create(this.needResourceURIPrefix), resource, passableQuery);
         } else { // modifiedafter != null
-
             // do not support paging for modified needs for now
             DateParameter modifiedDate = new DateParameter(modifiedAfter);
             rdfDataset = linkedDataService.listModifiedNeedURIsAfter(modifiedDate.getDate());
         }
-
         addLocationHeaderIfNecessary(headers, URI.create(request.getRequestURI()),
-                URI.create(this.needResourceURIPrefix));
+                        URI.create(this.needResourceURIPrefix));
         addMutableResourceHeaders(headers);
         addCORSHeader(headers);
-
         return new ResponseEntity<>(rdfDataset, headers, HttpStatus.OK);
     }
 
@@ -640,7 +597,6 @@ public class LinkedDataWebController {
     }
 
     private Integer getPreferredSize(final HttpServletRequest request) {
-
         Integer preferedSize = null;
         Enumeration<String> preferValue = request.getHeaders("Prefer");
         if (preferValue != null) {
@@ -661,18 +617,17 @@ public class LinkedDataWebController {
     }
 
     @RequestMapping(value = "${uri.path.data.connection}", method = RequestMethod.GET, produces = {
-            "application/ld+json", "application/trig", "application/n-quads"})
+                    "application/ld+json", "application/trig", "application/n-quads" })
     public ResponseEntity<Dataset> listConnectionURIs(HttpServletRequest request,
-                                                      @RequestParam(value = "p", required = false) Integer page,
-                                                      @RequestParam(value = "resumebefore", required = false) String beforeId,
-                                                      @RequestParam(value = "resumeafter", required = false) String afterId,
-                                                      @RequestParam(value = "timeof", required = false) String timestamp,
-                                                      @RequestParam(value = "modifiedafter", required = false) String modifiedAfter,
-                                                      @RequestParam(value = "deep", defaultValue = "false") boolean deep) {
+                    @RequestParam(value = "p", required = false) Integer page,
+                    @RequestParam(value = "resumebefore", required = false) String beforeId,
+                    @RequestParam(value = "resumeafter", required = false) String afterId,
+                    @RequestParam(value = "timeof", required = false) String timestamp,
+                    @RequestParam(value = "modifiedafter", required = false) String modifiedAfter,
+                    @RequestParam(value = "deep", defaultValue = "false") boolean deep) {
         Dataset rdfDataset;
         HttpHeaders headers = new HttpHeaders();
         Integer preferedSize = getPreferredSize(request);
-
         try {
             // even when the timestamp is not provided (null), we need to fix the time (if
             // null, then to current),
@@ -680,7 +635,7 @@ public class LinkedDataWebController {
             // fixed
             DateParameter dateParam = new DateParameter(timestamp);
             String passableMap = getPassableQueryMap("timeof", dateParam.getTimestamp(), "deep",
-                    Boolean.toString(deep));
+                            Boolean.toString(deep));
             // if no preferred size provided by the client => the client does not support
             // paging, return everything:
             if (preferedSize == null && modifiedAfter == null) {
@@ -690,46 +645,43 @@ public class LinkedDataWebController {
             } else if (modifiedAfter != null) {
                 // paging is not implemented for modified connections for now!
                 rdfDataset = linkedDataService
-                        .listModifiedConnectionsAfter(new DateParameter(modifiedAfter).getDate(), deep).getContent();
+                                .listModifiedConnectionsAfter(new DateParameter(modifiedAfter).getDate(), deep)
+                                .getContent();
             } else if (page != null) {
                 // return latest by the given timestamp
-                NeedInformationService.PagedResource<Dataset, Connection> resource = linkedDataService.listConnections(page,
-                        preferedSize, dateParam.getDate(), deep);
+                NeedInformationService.PagedResource<Dataset, Connection> resource = linkedDataService
+                                .listConnections(page, preferedSize, dateParam.getDate(), deep);
                 rdfDataset = resource.getContent();
-                addPagedConnectionResourceInSequenceHeader(headers, URI.create(this.connectionResourceURIPrefix), resource, page,
-                        passableMap);
-
+                addPagedConnectionResourceInSequenceHeader(headers, URI.create(this.connectionResourceURIPrefix),
+                                resource, page, passableMap);
                 // resume before parameter specified - display the connections with activities
                 // before the specified event id
             } else if (beforeId == null && afterId == null) {
                 // return latest by the given timestamp
-                NeedInformationService.PagedResource<Dataset, Connection> resource = linkedDataService.listConnections(1,
-                        preferedSize, dateParam.getDate(), deep);
+                NeedInformationService.PagedResource<Dataset, Connection> resource = linkedDataService
+                                .listConnections(1, preferedSize, dateParam.getDate(), deep);
                 rdfDataset = resource.getContent();
-                addPagedConnectionResourceInSequenceHeader(headers, URI.create(this.connectionResourceURIPrefix), resource,
-                        passableMap);
-
+                addPagedConnectionResourceInSequenceHeader(headers, URI.create(this.connectionResourceURIPrefix),
+                                resource, passableMap);
                 // resume before parameter specified - display the connections with activities
                 // before the specified event id
             } else {
                 if (beforeId != null) {
                     URI resumeConnURI = uriService.createConnectionURIForId(beforeId);
                     NeedInformationService.PagedResource<Dataset, Connection> resource = linkedDataService
-                            .listConnectionsBefore(resumeConnURI, preferedSize, dateParam.getDate(), deep);
+                                    .listConnectionsBefore(resumeConnURI, preferedSize, dateParam.getDate(), deep);
                     rdfDataset = resource.getContent();
-                    addPagedConnectionResourceInSequenceHeader(headers, URI.create(this.connectionResourceURIPrefix), resource,
-                            passableMap);
-
+                    addPagedConnectionResourceInSequenceHeader(headers, URI.create(this.connectionResourceURIPrefix),
+                                    resource, passableMap);
                     // resume after parameter specified - display the connections with activities
                     // after the specified event id:
                 } else { // if (afterId != null)
                     URI resumeConnURI = uriService.createConnectionURIForId(afterId);
                     NeedInformationService.PagedResource<Dataset, Connection> resource = linkedDataService
-                            .listConnectionsAfter(resumeConnURI, preferedSize, dateParam.getDate(), deep);
+                                    .listConnectionsAfter(resumeConnURI, preferedSize, dateParam.getDate(), deep);
                     rdfDataset = resource.getContent();
-                    addPagedConnectionResourceInSequenceHeader(headers, URI.create(this.connectionResourceURIPrefix), resource,
-                            passableMap);
-
+                    addPagedConnectionResourceInSequenceHeader(headers, URI.create(this.connectionResourceURIPrefix),
+                                    resource, passableMap);
                 }
             }
         } catch (ParseException e) {
@@ -737,21 +689,20 @@ public class LinkedDataWebController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (NoSuchConnectionException e) {
             logger.warn("did not find connection that should be connected to need. connection:{}",
-                    e.getUnknownConnectionURI());
+                            e.getUnknownConnectionURI());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
         addLocationHeaderIfNecessary(headers, URI.create(request.getRequestURI()),
-                URI.create(this.connectionResourceURIPrefix));
+                        URI.create(this.connectionResourceURIPrefix));
         addMutableResourceHeaders(headers);
         addCORSHeader(headers);
         return new ResponseEntity<>(rdfDataset, headers, HttpStatus.OK);
     }
 
     @RequestMapping(value = "${uri.path.data.need}/{identifier}", method = RequestMethod.GET, produces = {
-            "application/ld+json", "application/trig", "application/n-quads"})
+                    "application/ld+json", "application/trig", "application/n-quads" })
     public ResponseEntity<Dataset> readNeed(HttpServletRequest request,
-                                            @PathVariable(value = "identifier") String identifier) {
-
+                    @PathVariable(value = "identifier") String identifier) {
         logger.debug("readNeed() called");
         return getResponseEntity(identifier, request, new EtagSupportingDataLoader<Dataset>() {
             @Override
@@ -773,37 +724,35 @@ public class LinkedDataWebController {
     }
 
     @RequestMapping(value = "${uri.path.data.need}/{identifier}/unread", method = RequestMethod.POST, produces = {
-            "application/ld+json", "application/trig", "application/n-quads"})
+                    "application/ld+json", "application/trig", "application/n-quads" })
     public ResponseEntity<org.apache.jena.rdf.model.Model> readUnreadInformationPost(
-            @PathVariable(value = "identifier") String identifier,
-            @RequestParam(value = "lastSeenMessageUris", required = false) List<URI> lastSeenMessageUris) {
+                    @PathVariable(value = "identifier") String identifier,
+                    @RequestParam(value = "lastSeenMessageUris", required = false) List<URI> lastSeenMessageUris) {
         /*
          * information we want: need-level: unread count, date of first unread, date of
-		 * last unread per connection: connection uri, unread count, date of first
-		 * unread, date of last unread
-		 */
+         * last unread per connection: connection uri, unread count, date of first
+         * unread, date of last unread
+         */
         URI needURI = URI.create(needResourceURIPrefix + "/" + identifier);
         org.apache.jena.rdf.model.Model unreadInfo = this.linkedDataService.getUnreadInformationForNeed(needURI,
-                lastSeenMessageUris);
+                        lastSeenMessageUris);
         return new ResponseEntity<>(unreadInfo, HttpStatus.OK);
-
     }
 
     @RequestMapping(value = "${uri.path.data.need}/{identifier}/unread", method = RequestMethod.GET, produces = {
-            "application/ld+json", "application/trig", "application/n-quads"})
+                    "application/ld+json", "application/trig", "application/n-quads" })
     public ResponseEntity<org.apache.jena.rdf.model.Model> readUnreadInformationGet(
-            @PathVariable(value = "identifier") String identifier,
-            @RequestParam(value = "lastSeenMessageUris", required = false) List<URI> lastSeenMessageUris) {
+                    @PathVariable(value = "identifier") String identifier,
+                    @RequestParam(value = "lastSeenMessageUris", required = false) List<URI> lastSeenMessageUris) {
         /*
          * information we want: need-level: unread count, date of first unread, date of
-		 * last unread per connection: connection uri, unread count, date of first
-		 * unread, date of last unread
-		 */
+         * last unread per connection: connection uri, unread count, date of first
+         * unread, date of last unread
+         */
         URI needURI = URI.create(needResourceURIPrefix + "/" + identifier);
         org.apache.jena.rdf.model.Model unreadInfo = this.linkedDataService.getUnreadInformationForNeed(needURI,
-                lastSeenMessageUris);
+                        lastSeenMessageUris);
         return new ResponseEntity<>(unreadInfo, HttpStatus.OK);
-
     }
 
     /**
@@ -816,10 +765,10 @@ public class LinkedDataWebController {
      * @return
      */
     @RequestMapping(value = "${uri.path.data.need}/{identifier}/deep", method = RequestMethod.GET, produces = {
-            "application/ld+json", "application/trig", "application/n-quads"})
+                    "application/ld+json", "application/trig", "application/n-quads" })
     public ResponseEntity<Dataset> readNeedDeep(HttpServletRequest request,
-                                                @PathVariable(value = "identifier") String identifier,
-                                                @RequestParam(value = "layer-size", required = false) Integer layerSize) {
+                    @PathVariable(value = "identifier") String identifier,
+                    @RequestParam(value = "layer-size", required = false) Integer layerSize) {
         logger.debug("readNeed() called");
         URI needUri = URI.create(this.needResourceURIPrefix + "/" + identifier);
         try {
@@ -832,11 +781,10 @@ public class LinkedDataWebController {
         } catch (NoSuchNeedException | NoSuchConnectionException | NoSuchMessageException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-
     }
 
-    @RequestMapping(value = "${uri.path.data}", method = RequestMethod.GET, produces = {"application/ld+json",
-            "application/trig", "application/n-quads"})
+    @RequestMapping(value = "${uri.path.data}", method = RequestMethod.GET, produces = { "application/ld+json",
+                    "application/trig", "application/n-quads" })
     public ResponseEntity<Dataset> readNode(HttpServletRequest request) {
         logger.debug("readNode() called");
         // URI nodeUri = URI.create(this.nodeResourceURIPrefix);
@@ -851,9 +799,9 @@ public class LinkedDataWebController {
     }
 
     @RequestMapping(value = "${uri.path.data.connection}/{identifier}", method = RequestMethod.GET, produces = {
-            "application/ld+json", "application/trig", "application/n-quads"})
+                    "application/ld+json", "application/trig", "application/n-quads" })
     public ResponseEntity<Dataset> readConnection(HttpServletRequest request,
-                                                  @PathVariable(value = "identifier") String identifier) {
+                    @PathVariable(value = "identifier") String identifier) {
         logger.debug("readConnection() called");
         return getResponseEntity(identifier, request, new EtagSupportingDataLoader<Dataset>() {
             @Override
@@ -875,14 +823,14 @@ public class LinkedDataWebController {
     }
 
     @RequestMapping(value = "${uri.path.data.connection}/{identifier}/events", method = RequestMethod.GET, produces = {
-            "application/ld+json", "application/trig", "application/n-quads"})
+                    "application/ld+json", "application/trig", "application/n-quads" })
     public ResponseEntity<Dataset> readConnectionEvents(HttpServletRequest request,
-                                                        @PathVariable(value = "identifier") String identifier,
-                                                        @RequestParam(value = "p", required = false) Integer page,
-                                                        @RequestParam(value = "resumebefore", required = false) String beforeId,
-                                                        @RequestParam(value = "resumeafter", required = false) String afterId,
-                                                        @RequestParam(value = "type", required = false) String type,
-                                                        @RequestParam(value = "deep", required = false, defaultValue = "false") boolean deep) {
+                    @PathVariable(value = "identifier") String identifier,
+                    @RequestParam(value = "p", required = false) Integer page,
+                    @RequestParam(value = "resumebefore", required = false) String beforeId,
+                    @RequestParam(value = "resumeafter", required = false) String afterId,
+                    @RequestParam(value = "type", required = false) String type,
+                    @RequestParam(value = "deep", required = false, defaultValue = "false") boolean deep) {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         logger.debug("readConnection() called");
@@ -892,19 +840,22 @@ public class LinkedDataWebController {
         URI connectionUri = URI.create(this.connectionResourceURIPrefix + "/" + identifier);
         URI connectionEventsURI = URI.create(connectionUri.toString() + "/" + "events");
         WonMessageType msgType = getMessageType(type);
-
         try {
             String passableMap = getPassableQueryMap("type", type);
-
             if (preferedSize == null) {
                 // client doesn't not support paging - return all members; does not support type
                 // filtering for clients that do
                 // not support paging
                 rdfDataset = linkedDataService.listConnectionEventURIs(connectionUri, deep);
             } else if (beforeId == null && afterId == null) {
-                //if page == null -> return page with latest events
-                NeedInformationService.PagedResource<Dataset, URI> resource = linkedDataService
-                        .listConnectionEventURIs(connectionUri, page != null ? page : 1, preferedSize, msgType, deep); //FIXME: does not respect preferredSize if deep is used
+                // if page == null -> return page with latest events
+                NeedInformationService.PagedResource<Dataset, URI> resource = linkedDataService.listConnectionEventURIs(
+                                connectionUri, page != null ? page : 1, preferedSize, msgType, deep); // FIXME:
+                                                                                                      // does not
+                                                                                                      // respect
+                                                                                                      // preferredSize
+                                                                                                      // if deep is
+                                                                                                      // used
                 rdfDataset = resource.getContent();
                 if (page == null) {
                     addPagedResourceInSequenceHeader(headers, connectionEventsURI, resource, passableMap);
@@ -913,40 +864,35 @@ public class LinkedDataWebController {
                 }
             } else if (beforeId != null) {
                 // a page that precedes the item identified by the beforeId is requested
-
                 URI referenceEvent = uriService.createEventURIForId(beforeId);
                 NeedInformationService.PagedResource<Dataset, URI> resource = linkedDataService
-                        .listConnectionEventURIsBefore(connectionUri, referenceEvent, preferedSize, msgType, deep);
+                                .listConnectionEventURIsBefore(connectionUri, referenceEvent, preferedSize, msgType,
+                                                deep);
                 rdfDataset = resource.getContent();
                 addPagedResourceInSequenceHeader(headers, connectionEventsURI, resource, passableMap);
-
             } else {
                 // a page that follows the item identified by the afterId is requested
-
                 URI referenceEvent = uriService.createEventURIForId(afterId);
                 NeedInformationService.PagedResource<Dataset, URI> resource = linkedDataService
-                        .listConnectionEventURIsAfter(connectionUri, referenceEvent, preferedSize, msgType, deep);
+                                .listConnectionEventURIsAfter(connectionUri, referenceEvent, preferedSize, msgType,
+                                                deep);
                 rdfDataset = resource.getContent();
                 addPagedResourceInSequenceHeader(headers, connectionEventsURI, resource, passableMap);
-
             }
-
         } catch (NoSuchConnectionException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-
         // TODO: events list information does change over time, unless the connection is
         // closed and cannot be reopened.
         // The events list of immutable connection information should never expire, the
         // mutable should
         addLocationHeaderIfNecessary(headers, URI.create(request.getRequestURI()),
-                URI.create(this.connectionResourceURIPrefix));
+                        URI.create(this.connectionResourceURIPrefix));
         addMutableResourceHeaders(headers);
         addCORSHeader(headers);
         stopWatch.stop();
         logger.debug("readConnectionEvents took " + stopWatch.getLastTaskTimeMillis() + " millis");
         return new ResponseEntity<>(rdfDataset, headers, HttpStatus.OK);
-
     }
 
     private WonMessageType getMessageType(final String type) {
@@ -967,9 +913,9 @@ public class LinkedDataWebController {
      * @return
      */
     @RequestMapping(value = "${uri.path.data.event}/{identifier}", method = RequestMethod.GET, produces = {
-            "application/ld+json", "application/trig", "application/n-quads"})
+                    "application/ld+json", "application/trig", "application/n-quads" })
     public ResponseEntity<Dataset> readEvent(@PathVariable(value = "identifier") String identifier,
-                                             HttpServletRequest request, HttpServletResponse response) {
+                    HttpServletRequest request, HttpServletResponse response) {
         // get etag from headers, extract version identifier
         logger.debug("readConnectionEvent() called");
         return getResponseEntity(identifier, request, new EtagSupportingDataLoader<Dataset>() {
@@ -993,32 +939,28 @@ public class LinkedDataWebController {
     }
 
     private <T> ResponseEntity<T> getResponseEntity(String identifier, final HttpServletRequest request,
-                                                    EtagSupportingDataLoader<T> loader) {
+                    EtagSupportingDataLoader<T> loader) {
         HttpHeaders requestHeaders = getHttpHeaders(request);
         WonEtagHelper requestEtagHelper = WonEtagHelper.fromHeaderIfCompatibleWithAcceptHeader(requestHeaders);
-
         String versionIdentifier = WonEtagHelper.getVersionIdentifier(requestEtagHelper);
         // fetch the data if required
         logger.debug("using version identifier {}", versionIdentifier);
         URI entityUri = loader.createUriForIdentifier(identifier);
         DataWithEtag<T> dataWithEtag = loader.loadDataWithEtag(entityUri, versionIdentifier);
-
         // prepare the response headers
         HttpHeaders headers = new HttpHeaders();
         loader.addHeaders(headers);
         // set the etag headers
         setEtagHeaderForResponse(headers, dataWithEtag, requestEtagHelper);
-
         // return the response
         return getResponseEntityForPossiblyNotModifiedResult(dataWithEtag, headers);
     }
 
     @RequestMapping(value = "${uri.path.data.attachment}/{identifier}", method = RequestMethod.GET, produces = {
-            "application/ld+json", "application/trig", "application/n-quads", "*/*"})
+                    "application/ld+json", "application/trig", "application/n-quads", "*/*" })
     public ResponseEntity<Dataset> readAttachment(HttpServletRequest request,
-                                                  @PathVariable(value = "identifier") String identifier) {
+                    @PathVariable(value = "identifier") String identifier) {
         logger.debug("readAttachment() called");
-
         URI attachmentURI = uriService.createAttachmentURIForId(identifier);
         DataWithEtag<Dataset> data = linkedDataService.getDatasetForUri(attachmentURI, null);
         if (!data.isNotFound()) {
@@ -1060,63 +1002,59 @@ public class LinkedDataWebController {
      *
      * @param request
      * @param identifier
-     * @param deep       If true, connection data is added to the model (not only
-     *                   connection URIs). Default: false.
-     * @param page       taken into account only if client supports paging; in that case
-     *                   the specified page is returned
-     * @param beforeId   taken into account only if client supports paging; in that case
-     *                   the page with connections URIs that precede the connection having
-     *                   beforeId is returned
-     * @param afterId    taken into account only if client supports paging; in that case
-     *                   the page with connections URIs that follow the connection having
-     *                   afterId are returned
-     * @param type       only connection events of the given type are considered when
-     *                   ordering returned connections. Default: all event types.
-     * @param timestamp  only connection events that where created before the given time
-     *                   are considered when ordering returned connections. Default:
-     *                   current time.
+     * @param deep If true, connection data is added to the model (not only
+     * connection URIs). Default: false.
+     * @param page taken into account only if client supports paging; in that case
+     * the specified page is returned
+     * @param beforeId taken into account only if client supports paging; in that
+     * case the page with connections URIs that precede the connection having
+     * beforeId is returned
+     * @param afterId taken into account only if client supports paging; in that
+     * case the page with connections URIs that follow the connection having afterId
+     * are returned
+     * @param type only connection events of the given type are considered when
+     * ordering returned connections. Default: all event types.
+     * @param timestamp only connection events that where created before the given
+     * time are considered when ordering returned connections. Default: current
+     * time.
      * @return
      */
     @RequestMapping(value = "${uri.path.data.need}/{identifier}/connections", method = RequestMethod.GET, produces = {
-            "application/ld+json", "application/trig", "application/n-quads"})
+                    "application/ld+json", "application/trig", "application/n-quads" })
     public ResponseEntity<Dataset> readConnectionsOfNeed(HttpServletRequest request,
-                                                         @PathVariable(value = "identifier") String identifier,
-                                                         @RequestParam(value = "deep", defaultValue = "false") boolean deep,
-                                                         @RequestParam(value = "p", required = false) Integer page,
-                                                         @RequestParam(value = "resumebefore", required = false) String beforeId,
-                                                         @RequestParam(value = "resumeafter", required = false) String afterId,
-                                                         @RequestParam(value = "type", required = false) String type,
-                                                         @RequestParam(value = "timeof", required = false) String timestamp) {
-
+                    @PathVariable(value = "identifier") String identifier,
+                    @RequestParam(value = "deep", defaultValue = "false") boolean deep,
+                    @RequestParam(value = "p", required = false) Integer page,
+                    @RequestParam(value = "resumebefore", required = false) String beforeId,
+                    @RequestParam(value = "resumeafter", required = false) String afterId,
+                    @RequestParam(value = "type", required = false) String type,
+                    @RequestParam(value = "timeof", required = false) String timestamp) {
         logger.debug("readConnectionsOfNeed() called");
         URI needUri = URI.create(this.needResourceURIPrefix + "/" + identifier);
         Dataset rdfDataset;
         HttpHeaders headers = new HttpHeaders();
         Integer preferedSize = getPreferredSize(request);
         URI connectionsURI = URI.create(needUri.toString() + "/connections");
-
         try {
             WonMessageType eventsType = getMessageType(type);
             DateParameter dateParam = new DateParameter(timestamp);
             String passableQuery = getPassableQueryMap("type", type, "timeof", dateParam.getTimestamp(), "deep",
-                    Boolean.toString(deep));
+                            Boolean.toString(deep));
             // if no preferred size provided by the client => the client does not support
             // paging, return everything:
             if (preferedSize == null) {
                 // does not support date and type filtering for clients that do not support
                 // paging
-                rdfDataset = linkedDataService
-                        .listConnections(needUri, deep, true)
-                        .getContent();
+                rdfDataset = linkedDataService.listConnections(needUri, deep, true).getContent();
                 // if no page or resume parameter is specified, display the latest connections:
             } else if (page == null && beforeId == null && afterId == null) {
-                NeedInformationService.PagedResource<Dataset, Connection> resource = linkedDataService.listConnections(1,
-                        needUri, preferedSize, eventsType, dateParam.getDate(), deep, true);
+                NeedInformationService.PagedResource<Dataset, Connection> resource = linkedDataService
+                                .listConnections(1, needUri, preferedSize, eventsType, dateParam.getDate(), deep, true);
                 rdfDataset = resource.getContent();
                 addPagedConnectionResourceInSequenceHeader(headers, connectionsURI, resource, passableQuery);
             } else if (page != null) {
-                NeedInformationService.PagedResource<Dataset, Connection> resource = linkedDataService.listConnections(page,
-                        needUri, preferedSize, eventsType, dateParam.getDate(), deep, true);
+                NeedInformationService.PagedResource<Dataset, Connection> resource = linkedDataService.listConnections(
+                                page, needUri, preferedSize, eventsType, dateParam.getDate(), deep, true);
                 rdfDataset = resource.getContent();
                 addPagedConnectionResourceInSequenceHeader(headers, connectionsURI, resource, page, passableQuery);
             } else {
@@ -1125,29 +1063,26 @@ public class LinkedDataWebController {
                 if (beforeId != null) {
                     URI resumeConnURI = uriService.createConnectionURIForId(beforeId);
                     NeedInformationService.PagedResource<Dataset, Connection> resource = linkedDataService
-                            .listConnectionsBefore(needUri, resumeConnURI, preferedSize, eventsType,
-                                    dateParam.getDate(), deep, true);
+                                    .listConnectionsBefore(needUri, resumeConnURI, preferedSize, eventsType,
+                                                    dateParam.getDate(), deep, true);
                     rdfDataset = resource.getContent();
                     addPagedConnectionResourceInSequenceHeader(headers, connectionsURI, resource, passableQuery);
-
                     // resume after parameter specified - display the connections with activities
                     // after the specified event id:
                 } else { // if (afterId != null)
                     URI resumeConnURI = uriService.createConnectionURIForId(afterId);
                     NeedInformationService.PagedResource<Dataset, Connection> resource = linkedDataService
-                            .listConnectionsAfter(needUri, resumeConnURI, preferedSize, eventsType,
-                                    dateParam.getDate(), deep, true);
+                                    .listConnectionsAfter(needUri, resumeConnURI, preferedSize, eventsType,
+                                                    dateParam.getDate(), deep, true);
                     rdfDataset = resource.getContent();
                     addPagedConnectionResourceInSequenceHeader(headers, connectionsURI, resource, passableQuery);
                 }
             }
-
             // append the required headers
             addMutableResourceHeaders(headers);
             addLocationHeaderIfNecessary(headers, URI.create(request.getRequestURI()), connectionsURI);
             addCORSHeader(headers);
             return new ResponseEntity<>(rdfDataset, headers, HttpStatus.OK);
-
         } catch (ParseException e) {
             logger.warn("could not parse timestamp into Date:{}", timestamp);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -1156,7 +1091,7 @@ public class LinkedDataWebController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (NoSuchConnectionException e) {
             logger.warn("did not find connection that should be connected to need. connection:{}",
-                    e.getUnknownConnectionURI());
+                            e.getUnknownConnectionURI());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -1193,16 +1128,16 @@ public class LinkedDataWebController {
      * (should be Container in our case?) Link: <uri?p=x>; rel="next" - that the
      * next in-sequence page resource exists and is retrievable at the given uri
      *
-     * @param headers      headers to which paged resource headers should be added
+     * @param headers headers to which paged resource headers should be added
      * @param canonicalURI uri of the LDP Resource
-     * @param page         page of the Paged LDP Resource
+     * @param page page of the Paged LDP Resource
      * @return the headers map with added header values
      */
     private void addPagedResourceInSequenceHeader(final HttpHeaders headers, final URI canonicalURI,
-                                                  final NeedInformationService.PagedResource<Dataset, URI> resource, final int page, String queryPart) {
-
+                    final NeedInformationService.PagedResource<Dataset, URI> resource, final int page,
+                    String queryPart) {
         headers.add("Link",
-                "<http://www.w3.org/ns/ldp#Resource>; rel=\"type\", <http://www.w3.org/ns/ldp#Page>; rel=\"type\"");
+                        "<http://www.w3.org/ns/ldp#Resource>; rel=\"type\", <http://www.w3.org/ns/ldp#Page>; rel=\"type\"");
         // Link: <http://example.org/customer-relations?p=2>; rel="next"
         if (resource.hasNext()) {
             int nextPage = page + 1;
@@ -1216,10 +1151,9 @@ public class LinkedDataWebController {
     }
 
     private void addPagedResourceInSequenceHeader(final HttpHeaders headers, final URI canonicalURI,
-                                                  final NeedInformationService.PagedResource<Dataset, URI> resource, String queryPart) {
-
+                    final NeedInformationService.PagedResource<Dataset, URI> resource, String queryPart) {
         headers.add("Link",
-                "<http://www.w3.org/ns/ldp#Resource>; rel=\"type\", <http://www.w3.org/ns/ldp#Page>; rel=\"type\"");
+                        "<http://www.w3.org/ns/ldp#Resource>; rel=\"type\", <http://www.w3.org/ns/ldp#Page>; rel=\"type\"");
         if (resource.hasNext()) {
             String id = extractResourceLocalId(resource.getResumeAfter());
             headers.add("Link", "<" + canonicalURI.toString() + "?resumeafter=" + id + queryPart + ">; rel=\"next\"");
@@ -1229,7 +1163,6 @@ public class LinkedDataWebController {
             headers.add("Link", "<" + canonicalURI.toString() + "?resumebefore=" + id + queryPart + ">; rel=\"prev\"");
         }
         headers.add("Link", "<" + canonicalURI.toString() + ">; rel=\"canonical\"");
-
     }
 
     /**
@@ -1245,16 +1178,16 @@ public class LinkedDataWebController {
      * (should be Container in our case?) Link: <uri?p=x>; rel="next" - that the
      * next in-sequence page resource exists and is retrievable at the given uri
      *
-     * @param headers      headers to which paged resource headers should be added
+     * @param headers headers to which paged resource headers should be added
      * @param canonicalURI uri of the LDP Resource
-     * @param page         page of the Paged LDP Resource
+     * @param page page of the Paged LDP Resource
      * @return the headers map with added header values
      */
     private void addPagedConnectionResourceInSequenceHeader(final HttpHeaders headers, final URI canonicalURI,
-                                                  final NeedInformationService.PagedResource<Dataset, Connection> resource, final int page, String queryPart) {
-
+                    final NeedInformationService.PagedResource<Dataset, Connection> resource, final int page,
+                    String queryPart) {
         headers.add("Link",
-                "<http://www.w3.org/ns/ldp#Resource>; rel=\"type\", <http://www.w3.org/ns/ldp#Page>; rel=\"type\"");
+                        "<http://www.w3.org/ns/ldp#Resource>; rel=\"type\", <http://www.w3.org/ns/ldp#Page>; rel=\"type\"");
         // Link: <http://example.org/customer-relations?p=2>; rel="next"
         if (resource.hasNext()) {
             int nextPage = page + 1;
@@ -1268,10 +1201,9 @@ public class LinkedDataWebController {
     }
 
     private void addPagedConnectionResourceInSequenceHeader(final HttpHeaders headers, final URI canonicalURI,
-                                                  final NeedInformationService.PagedResource<Dataset, Connection> resource, String queryPart) {
-
+                    final NeedInformationService.PagedResource<Dataset, Connection> resource, String queryPart) {
         headers.add("Link",
-                "<http://www.w3.org/ns/ldp#Resource>; rel=\"type\", <http://www.w3.org/ns/ldp#Page>; rel=\"type\"");
+                        "<http://www.w3.org/ns/ldp#Resource>; rel=\"type\", <http://www.w3.org/ns/ldp#Page>; rel=\"type\"");
         if (resource.hasNext()) {
             String id = extractResourceLocalId(resource.getResumeAfter().getConnectionURI());
             headers.add("Link", "<" + canonicalURI.toString() + "?resumeafter=" + id + queryPart + ">; rel=\"next\"");
@@ -1281,7 +1213,6 @@ public class LinkedDataWebController {
             headers.add("Link", "<" + canonicalURI.toString() + "?resumebefore=" + id + queryPart + ">; rel=\"prev\"");
         }
         headers.add("Link", "<" + canonicalURI.toString() + ">; rel=\"canonical\"");
-
     }
 
     private String getPassableQueryMap(String... nameValue) {
@@ -1305,7 +1236,6 @@ public class LinkedDataWebController {
      * immutable * private mutable * public short-term cacheable * privet short-term
      * cacheable
      */
-
     private void addPrivateHeaders(HttpHeaders headers) {
         headers.add(HttpHeaders.CACHE_CONTROL, "private");
         // with no-store, the items don't survive a browser reload - but if the browser
@@ -1381,8 +1311,7 @@ public class LinkedDataWebController {
     }
 
     private <T> ResponseEntity<T> getResponseEntityForPossiblyNotModifiedResult(final DataWithEtag<T> datasetWithEtag,
-                                                                                final HttpHeaders headers) {
-
+                    final HttpHeaders headers) {
         if (datasetWithEtag != null) {
             if (datasetWithEtag.isDeleted()) {
                 return new ResponseEntity<>(headers, HttpStatus.GONE);
@@ -1391,7 +1320,6 @@ public class LinkedDataWebController {
             } else {
                 return new ResponseEntity<>(headers, HttpStatus.NOT_MODIFIED);
             }
-
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -1406,7 +1334,7 @@ public class LinkedDataWebController {
      * @param requestEtagHelper
      */
     private <T> void setEtagHeaderForResponse(final HttpHeaders headers, final DataWithEtag<T> datasetWithEtag,
-                                              final WonEtagHelper requestEtagHelper) {
+                    final WonEtagHelper requestEtagHelper) {
         // check if the data has changed
         if (datasetWithEtag.isChanged()) {
             logger.debug("ETAG comparison shows that data has changed or no etag was present");
@@ -1469,18 +1397,16 @@ public class LinkedDataWebController {
         this.connectionResourceURIPath = connectionResourceURIPath;
     }
 
-    @RequestMapping(value = "${uri.path.resource}", method = RequestMethod.POST, produces = {"text/plain"})
+    @RequestMapping(value = "${uri.path.resource}", method = RequestMethod.POST, produces = { "text/plain" })
     public ResponseEntity<String> register(@RequestParam("register") String registeredType, HttpServletRequest request)
-            throws CertificateException, UnsupportedEncodingException {
+                    throws CertificateException, UnsupportedEncodingException {
         logger.debug("REGISTERING " + registeredType);
         PreAuthenticatedAuthenticationToken authentication = (PreAuthenticatedAuthenticationToken) SecurityContextHolder
-                .getContext().getAuthentication();
-
+                        .getContext().getAuthentication();
         if (!(authentication instanceof PreAuthenticatedAuthenticationToken)) {
             throw new BadCredentialsException("Could not register: PreAuthenticatedAuthenticationToken expected");
         }
         // Object principal = authentication.getPrincipal();
-
         Object credentials = authentication.getCredentials();
         X509Certificate cert;
         if (credentials instanceof X509Certificate) {
@@ -1520,7 +1446,6 @@ public class LinkedDataWebController {
          * @param timestamp
          */
         public DateParameter(final String timestamp) throws ParseException {
-
             // timestamp string is expected in ISO 8601 format (UTC)
             DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
             format.setTimeZone(TimeZone.getTimeZone("UTC"));

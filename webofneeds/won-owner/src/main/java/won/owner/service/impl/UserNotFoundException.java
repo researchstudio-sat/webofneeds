@@ -1,13 +1,12 @@
 package won.owner.service.impl;
 
 public class UserNotFoundException extends Exception {
-
-	public UserNotFoundException() {
-		super();
-	}
+    public UserNotFoundException() {
+        super();
+    }
 
     public UserNotFoundException(String message, Throwable cause, boolean enableSuppression,
-            boolean writableStackTrace) {
+                    boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
         // TODO Auto-generated constructor stub
     }
@@ -26,8 +25,4 @@ public class UserNotFoundException extends Exception {
         super(cause);
         // TODO Auto-generated constructor stub
     }
-
-	
-	
-	
 }

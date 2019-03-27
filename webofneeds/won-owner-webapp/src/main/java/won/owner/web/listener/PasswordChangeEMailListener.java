@@ -11,12 +11,10 @@ import won.owner.web.WonOwnerMailSender;
 import won.owner.web.events.OnPasswordChangedEvent;
 import won.owner.web.events.OnRegistrationCompleteEvent;
 
-
 @Component
 public class PasswordChangeEMailListener implements ApplicationListener<OnPasswordChangedEvent> {
     @Autowired
     private UserService userService;
-
     @Autowired
     private WonOwnerMailSender emailSender;
 

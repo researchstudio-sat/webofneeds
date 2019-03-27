@@ -39,25 +39,21 @@ import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.RDFG;
 import won.protocol.vocabulary.WONMSG;
 
-
 /**
  * Wraps an RDF dataset representing a WoN message.
  * <p>
  * Note: this implementation is not thread-safe.
  */
 public class WonMessage implements Serializable {
-
     final Logger logger = LoggerFactory.getLogger(getClass());
-
     private Dataset messageContent;
     private Dataset completeDataset;
-    //private Model messageMetadata;
-    //private URI messageEventURI;
+    // private Model messageMetadata;
+    // private URI messageEventURI;
     private List<Model> envelopeGraphs;
     private List<String> envelopeGraphNames;
     private URI outerEnvelopeGraphURI;
     private Model outerEnvelopeGraph;
-
     private URI messageURI;
     private WonMessageType messageType; // ConnectMessage, CreateMessage, NeedStateMessage
     private WonMessageDirection envelopeType;
@@ -71,7 +67,7 @@ public class WonMessage implements Serializable {
     private URI receiverFacetURI;
     private List<URI> refersTo = null;
     private List<URI> previousMessages = null;
-    private List<URI> injectIntoConnections = null;    
+    private List<URI> injectIntoConnections = null;
     private URI isResponseToMessageURI;
     private URI isRemoteResponseToMessageURI;
     private List<String> contentGraphNames;
@@ -81,10 +77,8 @@ public class WonMessage implements Serializable {
     private URI innermostMessageURI;
     private List<AttachmentHolder> attachmentHolders;
 
-    //private Resource msgBnode;
+    // private Resource msgBnode;
     // private Signature signature;
-
-
     public WonMessage(Dataset completeDataset) {
         this.completeDataset = completeDataset;
     }
@@ -106,7 +100,7 @@ public class WonMessage implements Serializable {
     public synchronized void addMessageProperty(Property property, RDFNode value) {
         if (logger.isDebugEnabled()) {
             logger.debug("adding property {}, value {}, to message {} in envelope {}",
-                    new Object[]{property, value, getMessageURI(), getOuterEnvelopeGraphURI()});
+                            new Object[] { property, value, getMessageURI(), getOuterEnvelopeGraphURI() });
         }
         getOuterEnvelopeGraph().getResource(getMessageURI().toString()).addProperty(property, value);
     }
@@ -115,7 +109,7 @@ public class WonMessage implements Serializable {
      * Adds a property to the message resource in the outermost envelope.
      *
      * @param property
-     * @param uri      the object of the property, assumed to be an uri
+     * @param uri the object of the property, assumed to be an uri
      */
     public synchronized void addMessageProperty(Property property, String uri) {
         RDFNode valueAsRdfNode = getOuterEnvelopeGraph().createResource(uri);
@@ -183,8 +177,8 @@ public class WonMessage implements Serializable {
     }
 
     /**
-     * Creates a copy of the message dataset where all traces
-     * of the envelope graph are deleted.
+     * Creates a copy of the message dataset where all traces of the envelope graph
+     * are deleted.
      *
      * @return
      */
@@ -195,7 +189,7 @@ public class WonMessage implements Serializable {
             Dataset newMsgContent = DatasetFactory.createGeneral();
             Iterator<String> modelNames = this.completeDataset.listNames();
             List<String> envelopeGraphNames = getEnvelopeGraphURIs();
-            //add all models that are not envelope graphs to the messageContent
+            // add all models that are not envelope graphs to the messageContent
             while (modelNames.hasNext()) {
                 String modelName = modelNames.next();
                 if (envelopeGraphNames.contains(modelName)) {
@@ -203,8 +197,9 @@ public class WonMessage implements Serializable {
                 }
                 newMsgContent.addNamedModel(modelName, this.completeDataset.getNamedModel(modelName));
             }
-            //copy the default model, but delete the triples referencing the envelope graphs
-            //TODO: this deletion is no longer necessary, right?
+            // copy the default model, but delete the triples referencing the envelope
+            // graphs
+            // TODO: this deletion is no longer necessary, right?
             Model newDefaultModel = ModelFactory.createDefaultModel();
             newDefaultModel.add(this.completeDataset.getDefaultModel());
             StmtIterator it = newDefaultModel.listStatements(null, RDF.type, WONMSG.ENVELOPE_GRAPH);
@@ -222,7 +217,8 @@ public class WonMessage implements Serializable {
     }
 
     /**
-     * Returns all content graphs that are attachments, including their signature graphs.
+     * Returns all content graphs that are attachments, including their signature
+     * graphs.
      *
      * @return
      */
@@ -232,36 +228,31 @@ public class WonMessage implements Serializable {
         }
         final List<String> envelopeGraphUris = getEnvelopeGraphURIs();
         List<AttachmentHolder> newAttachmentHolders = new ArrayList<>();
-        String queryString = "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>\n" +
-                "prefix xsd:   <http://www.w3.org/2001/XMLSchema#>\n" +
-                "prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
-                "prefix won:   <http://purl.org/webofneeds/model#>\n" +
-                "prefix msg:   <http://purl.org/webofneeds/message#>\n" +
-                "prefix sig:   <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#>\n" +
-                "\n" +
-                "select ?attachmentSigGraphUri ?attachmentGraphUri ?envelopeGraphUri ?attachmentDestinationUri where { \n" +
-                "graph ?attachmentSigGraphUri {?attachmentSigGraphUri " +
-                "              a sig:Signature; \n" +
-                "              msg:hasSignedGraph ?attachmentGraphUri.\n" +
-                "}\n" +
-                "graph ?envelopeGraphUri {?envelopeGraphUri rdf:type msg:EnvelopeGraph.  \n" +
-                "    ?messageUri msg:hasAttachment ?attachmentData. \n" +
-                "?attachmentData msg:hasDestinationUri ?attachmentDestinationUri; \n" +
-                "                msg:hasAttachmentGraphUri ?attachmentGraphUri.\n" +
-                "}\n" +
-                "}";
+        String queryString = "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>\n"
+                        + "prefix xsd:   <http://www.w3.org/2001/XMLSchema#>\n"
+                        + "prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
+                        + "prefix won:   <http://purl.org/webofneeds/model#>\n"
+                        + "prefix msg:   <http://purl.org/webofneeds/message#>\n"
+                        + "prefix sig:   <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#>\n" + "\n"
+                        + "select ?attachmentSigGraphUri ?attachmentGraphUri ?envelopeGraphUri ?attachmentDestinationUri where { \n"
+                        + "graph ?attachmentSigGraphUri {?attachmentSigGraphUri " + "              a sig:Signature; \n"
+                        + "              msg:hasSignedGraph ?attachmentGraphUri.\n" + "}\n"
+                        + "graph ?envelopeGraphUri {?envelopeGraphUri rdf:type msg:EnvelopeGraph.  \n"
+                        + "    ?messageUri msg:hasAttachment ?attachmentData. \n"
+                        + "?attachmentData msg:hasDestinationUri ?attachmentDestinationUri; \n"
+                        + "                msg:hasAttachmentGraphUri ?attachmentGraphUri.\n" + "}\n" + "}";
         Query query = QueryFactory.create(queryString);
         QuerySolutionMap initialBinding = new QuerySolutionMap();
         initialBinding.add("messageUri", new ResourceImpl(getMessageURI().toString()));
         try (QueryExecution queryExecution = QueryExecutionFactory.create(query, completeDataset)) {
             queryExecution.getContext().set(TDB.symUnionDefaultGraph, true);
-
             ResultSet result = queryExecution.execSelect();
             while (result.hasNext()) {
                 QuerySolution solution = result.nextSolution();
                 String envelopeGraphUri = solution.getResource("envelopeGraphUri").getURI();
                 if (!envelopeGraphUris.contains(envelopeGraphUri)) {
-                    logger.warn("found resource {} of type msg:EnvelopeGraph that is not the URI of an envelope graph in message {}", envelopeGraphUri, this.messageURI);
+                    logger.warn("found resource {} of type msg:EnvelopeGraph that is not the URI of an envelope graph in message {}",
+                                    envelopeGraphUri, this.messageURI);
                     continue;
                 }
                 String sigGraphUri = solution.getResource("attachmentSigGraphUri").getURI().toString();
@@ -269,9 +260,12 @@ public class WonMessage implements Serializable {
                 String attachmentSigGraphUri = solution.getResource("attachmentSigGraphUri").getURI();
                 String attachmentDestinationUri = solution.getResource("attachmentDestinationUri").getURI();
                 Dataset attachmentDataset = DatasetFactory.createGeneral();
-                attachmentDataset.addNamedModel(attachmentGraphUri, this.completeDataset.getNamedModel(attachmentGraphUri));
-                attachmentDataset.addNamedModel(attachmentSigGraphUri, this.completeDataset.getNamedModel(attachmentSigGraphUri));
-                AttachmentHolder attachmentHolder = new AttachmentHolder(URI.create(attachmentDestinationUri), attachmentDataset);
+                attachmentDataset.addNamedModel(attachmentGraphUri,
+                                this.completeDataset.getNamedModel(attachmentGraphUri));
+                attachmentDataset.addNamedModel(attachmentSigGraphUri,
+                                this.completeDataset.getNamedModel(attachmentSigGraphUri));
+                AttachmentHolder attachmentHolder = new AttachmentHolder(URI.create(attachmentDestinationUri),
+                                attachmentDataset);
                 newAttachmentHolders.add(attachmentHolder);
             }
         } catch (Exception e) {
@@ -293,22 +287,24 @@ public class WonMessage implements Serializable {
         if (this.outerEnvelopeGraphURI != null) {
             return this.outerEnvelopeGraphURI;
         }
-        getEnvelopeGraphs(); //also sets the outerEnvelopeUri
+        getEnvelopeGraphs(); // also sets the outerEnvelopeUri
         return this.outerEnvelopeGraphURI;
     }
 
     /**
      * Returns all envelope graphs found in the message.
      * <p>
-     * Not that this method has side effects: all intermediate results are cached for re-use. This
-     * concerns the envelopeGraphNames, contentGraphNames and messageURI members.
+     * Not that this method has side effects: all intermediate results are cached
+     * for re-use. This concerns the envelopeGraphNames, contentGraphNames and
+     * messageURI members.
      *
      * @return
      */
     public synchronized List<Model> getEnvelopeGraphs() {
-        //return cached instance if we have it
-        if (this.envelopeGraphs != null) return this.envelopeGraphs;
-        //initialize
+        // return cached instance if we have it
+        if (this.envelopeGraphs != null)
+            return this.envelopeGraphs;
+        // initialize
         List<Model> allEnvelopes = new ArrayList<Model>();
         this.envelopeGraphNames = new ArrayList<String>();
         this.contentGraphNames = new ArrayList<String>();
@@ -316,29 +312,31 @@ public class WonMessage implements Serializable {
         this.outerEnvelopeGraph = null;
         Set<String> envelopesContainedInOthers = new HashSet<String>();
         Set<String> allEnvelopeGraphNames = new HashSet<String>();
-        //iterate over named graphs
+        // iterate over named graphs
         Iterator<String> modelUriIterator = this.completeDataset.listNames();
         while (modelUriIterator.hasNext()) {
             String envelopeGraphUri = modelUriIterator.next();
             Model envelopeGraph = this.completeDataset.getNamedModel(envelopeGraphUri);
-            //check if the current named graph is an envelope graph (G rdf:type wonmsg:EnvelopeGraph)
+            // check if the current named graph is an envelope graph (G rdf:type
+            // wonmsg:EnvelopeGraph)
             if (isEnvelopeGraph(envelopeGraphUri, envelopeGraph)) {
                 this.envelopeGraphNames.add(envelopeGraphUri);
                 allEnvelopeGraphNames.add(envelopeGraphUri);
                 allEnvelopes.add(envelopeGraph);
                 currentMessageURI = findMessageUri(envelopeGraph, envelopeGraphUri);
-                //check if the envelope contains references to 'contained' envelopes and remember their names
+                // check if the envelope contains references to 'contained' envelopes and
+                // remember their names
                 List<String> containedEnvelopes = findContainedEnvelopeUris(envelopeGraph, envelopeGraphUri);
-                if (containedEnvelopes.isEmpty()){
-                    //we found the innermost envelope. Remember the respective innermost message uri
+                if (containedEnvelopes.isEmpty()) {
+                    // we found the innermost envelope. Remember the respective innermost message
+                    // uri
                     this.innermostMessageURI = currentMessageURI;
                 } else {
                     envelopesContainedInOthers.addAll(containedEnvelopes);
                 }
                 if (currentMessageURI != null) {
                     for (NodeIterator it = getContentGraphReferences(envelopeGraph,
-                            envelopeGraph.getResource(currentMessageURI.toString())); it
-                                 .hasNext(); ) {
+                                    envelopeGraph.getResource(currentMessageURI.toString())); it.hasNext();) {
                         RDFNode node = it.next();
                         this.contentGraphNames.add(node.asResource().toString());
                     }
@@ -346,27 +344,30 @@ public class WonMessage implements Serializable {
             }
         }
         Set<String> candidatesForOuterEnvelope = Sets.symmetricDifference(allEnvelopeGraphNames,
-                envelopesContainedInOthers);
-        //we've now visited all named graphs. We should now have exactly one candidate for the outer envelope
+                        envelopesContainedInOthers);
+        // we've now visited all named graphs. We should now have exactly one candidate
+        // for the outer envelope
         if (candidatesForOuterEnvelope.size() != 1) {
-            throw new IllegalStateException(String.format("Message dataset must contain exactly one envelope graph that is " +
-                    "not included " +
-                    "in another one, but found %d", candidatesForOuterEnvelope.size()));
+            throw new IllegalStateException(String
+                            .format("Message dataset must contain exactly one envelope graph that is " + "not included "
+                                            + "in another one, but found %d", candidatesForOuterEnvelope.size()));
         }
         String outerEnvelopeUri = candidatesForOuterEnvelope.iterator().next();
         this.outerEnvelopeGraphURI = URI.create(outerEnvelopeUri);
         this.outerEnvelopeGraph = this.completeDataset.getNamedModel(outerEnvelopeUri);
         this.envelopeGraphs = allEnvelopes;
-        return Collections.unmodifiableList(allEnvelopes.stream().map(m -> RdfUtils.cloneModel(m)).collect(Collectors.toList()));
+        return Collections.unmodifiableList(
+                        allEnvelopes.stream().map(m -> RdfUtils.cloneModel(m)).collect(Collectors.toList()));
     }
 
-
     private synchronized URI findMessageUri(final Model model, final String modelUri) {
-        RDFNode messageUriNode = RdfUtils.findOnePropertyFromResource(model, model.getResource(modelUri), RDFG.SUBGRAPH_OF);
+        RDFNode messageUriNode = RdfUtils.findOnePropertyFromResource(model, model.getResource(modelUri),
+                        RDFG.SUBGRAPH_OF);
         return URI.create(messageUriNode.asResource().getURI());
     }
 
-    private synchronized List<String> findContainedEnvelopeUris(final Model envelopeGraph, final String envelopeGraphUri) {
+    private synchronized List<String> findContainedEnvelopeUris(final Model envelopeGraph,
+                    final String envelopeGraphUri) {
         Resource envelopeGraphResource = envelopeGraph.getResource(envelopeGraphUri);
         StmtIterator it = envelopeGraphResource.listProperties(WONMSG.CONTAINS_ENVELOPE);
         if (it.hasNext()) {
@@ -383,20 +384,19 @@ public class WonMessage implements Serializable {
         return model.contains(model.getResource(modelUri), RDF.type, WONMSG.ENVELOPE_GRAPH);
     }
 
-
     public synchronized List<String> getEnvelopeGraphURIs() {
         if (this.envelopeGraphs == null) {
-            getEnvelopeGraphs(); //also sets envelopeGraphNames
+            getEnvelopeGraphs(); // also sets envelopeGraphNames
         }
         return Collections.unmodifiableList(this.envelopeGraphNames);
     }
 
     public synchronized List<String> getContentGraphURIs() {
-        //since there may not be any content graphs, we can't check
-        //if this.contentGraphNames == null. We instead have to check
-        //if we ran the detection of the envelope graphs at least once.
+        // since there may not be any content graphs, we can't check
+        // if this.contentGraphNames == null. We instead have to check
+        // if we ran the detection of the envelope graphs at least once.
         if (this.envelopeGraphs == null) {
-            getEnvelopeGraphs(); //also sets envelopeGraphNames
+            getEnvelopeGraphs(); // also sets envelopeGraphNames
         }
         return Collections.unmodifiableList(this.contentGraphNames);
     }
@@ -437,7 +437,6 @@ public class WonMessage implements Serializable {
         return this.senderURI;
     }
 
-
     public synchronized URI getSenderNeedURI() {
         if (this.senderNeedURI == null) {
             this.senderNeedURI = getEnvelopePropertyURIValue(WONMSG.SENDER_NEED_PROPERTY);
@@ -451,7 +450,7 @@ public class WonMessage implements Serializable {
         }
         return this.senderNodeURI;
     }
-    
+
     public synchronized URI getSenderFacetURI() {
         if (this.senderFacetURI == null) {
             this.senderFacetURI = getEnvelopePropertyURIValue(WONMSG.HAS_SENDER_FACET);
@@ -459,15 +458,13 @@ public class WonMessage implements Serializable {
         return this.senderFacetURI;
     }
 
-
     public synchronized URI getReceiverURI() {
         if (this.receiverURI == null) {
             this.receiverURI = getEnvelopePropertyURIValue(WONMSG.RECEIVER_PROPERTY);
         }
         return this.receiverURI;
     }
-    
-   
+
     public synchronized URI getReceiverNeedURI() {
         if (this.receiverNeedURI == null) {
             this.receiverNeedURI = getEnvelopePropertyURIValue(WONMSG.RECEIVER_NEED_PROPERTY);
@@ -475,14 +472,13 @@ public class WonMessage implements Serializable {
         return this.receiverNeedURI;
     }
 
-
     public synchronized URI getReceiverNodeURI() {
         if (this.receiverNodeURI == null) {
             this.receiverNodeURI = getEnvelopePropertyURIValue(WONMSG.RECEIVER_NODE_PROPERTY);
         }
         return this.receiverNodeURI;
     }
-    
+
     public synchronized URI getReceiverFacetURI() {
         if (this.receiverFacetURI == null) {
             this.receiverFacetURI = getEnvelopePropertyURIValue(WONMSG.HAS_RECEIVER_FACET);
@@ -496,7 +492,7 @@ public class WonMessage implements Serializable {
         }
         return this.refersTo;
     }
-    
+
     public synchronized List<URI> getInjectIntoConnectionURIs() {
         if (this.injectIntoConnections == null) {
             this.injectIntoConnections = getEnvelopePropertyURIValues(WONMSG.HAS_INJECT_INTO_CONNECTION);
@@ -504,15 +500,12 @@ public class WonMessage implements Serializable {
         return this.injectIntoConnections;
     }
 
-
-    
     public synchronized List<URI> getPreviousMessageURIs() {
         if (this.previousMessages == null) {
             this.previousMessages = getEnvelopePropertyURIValues(WONMSG.HAS_PREVIOUS_MESSAGE_PROPERTY);
         }
         return this.previousMessages;
     }
-
 
     public synchronized URI getIsResponseToMessageURI() {
         if (this.isResponseToMessageURI == null) {
@@ -543,8 +536,8 @@ public class WonMessage implements Serializable {
     }
 
     public synchronized URI getInnermostMessageURI() {
-        if (this.innermostMessageURI == null){
-            //also sets the innermostMessageURI
+        if (this.innermostMessageURI == null) {
+            // also sets the innermostMessageURI
             getEnvelopeGraphs();
         }
         return this.innermostMessageURI;
@@ -568,19 +561,21 @@ public class WonMessage implements Serializable {
     public synchronized URI getEnvelopePropertyURIValue(Property property) {
         Model currentEnvelope = getOuterEnvelopeGraph();
         URI currentEnvelopeUri = getOuterEnvelopeGraphURI();
-        //TODO would make sense to order envelope graphs in order from container to containee in the first place,
-        //if proper done, we should avoid ending up in infinite loop if someone sends us malformed envelopes that
+        // TODO would make sense to order envelope graphs in order from container to
+        // containee in the first place,
+        // if proper done, we should avoid ending up in infinite loop if someone sends
+        // us malformed envelopes that
         // contain-in-other circular...
         while (currentEnvelope != null) {
             URI currentMessageURI = findMessageUri(currentEnvelope, currentEnvelopeUri.toString());
             StmtIterator it = currentEnvelope.listStatements(currentEnvelope.getResource(currentMessageURI.toString()),
-                    property,
-                    (RDFNode) null);
+                            property, (RDFNode) null);
             if (it.hasNext()) {
                 return URI.create(it.nextStatement().getObject().asResource().toString());
             }
             // move to the next envelope
-            currentEnvelopeUri = RdfUtils.findFirstObjectUri(currentEnvelope, WONMSG.CONTAINS_ENVELOPE, null, true, true);
+            currentEnvelopeUri = RdfUtils.findFirstObjectUri(currentEnvelope, WONMSG.CONTAINS_ENVELOPE, null, true,
+                            true);
             currentEnvelope = null;
             if (currentEnvelopeUri != null) {
                 currentEnvelope = this.completeDataset.getNamedModel(currentEnvelopeUri.toString());
@@ -603,16 +598,17 @@ public class WonMessage implements Serializable {
         List<URI> values = new ArrayList<URI>();
         Model currentEnvelope = getOuterEnvelopeGraph();
         URI currentEnvelopeUri = getOuterEnvelopeGraphURI();
-        //TODO would make sense to order envelope graphs in order from container to containee in the first place
+        // TODO would make sense to order envelope graphs in order from container to
+        // containee in the first place
         while (currentEnvelope != null) {
             URI currentMessageURI = findMessageUri(currentEnvelope, currentEnvelopeUri.toString());
             StmtIterator it = currentEnvelope.listStatements(currentEnvelope.getResource(currentMessageURI.toString()),
-                    property,
-                    (RDFNode) null);
+                            property, (RDFNode) null);
             while (it.hasNext()) {
                 values.add(URI.create(it.nextStatement().getObject().asResource().toString()));
             }
-            currentEnvelopeUri = RdfUtils.findFirstObjectUri(currentEnvelope, WONMSG.CONTAINS_ENVELOPE, null, true, true);
+            currentEnvelopeUri = RdfUtils.findFirstObjectUri(currentEnvelope, WONMSG.CONTAINS_ENVELOPE, null, true,
+                            true);
             currentEnvelope = null;
             if (currentEnvelopeUri != null) {
                 currentEnvelope = this.completeDataset.getNamedModel(currentEnvelopeUri.toString());
@@ -621,7 +617,8 @@ public class WonMessage implements Serializable {
         return values;
     }
 
-    //Used to remember attachment graph uri and destination uri during the process of extracting attachments.
+    // Used to remember attachment graph uri and destination uri during the process
+    // of extracting attachments.
     public class AttachmentMetaData {
         URI attachmentGraphUri;
         URI destinationUri;
@@ -642,7 +639,7 @@ public class WonMessage implements Serializable {
 
     public static class AttachmentHolder {
         private URI destinationUri;
-        //holds the attachment graph and the signature graph
+        // holds the attachment graph and the signature graph
         private Dataset attachmentDataset;
 
         public AttachmentHolder(URI destinationUri, Dataset attachmentDataset) {

@@ -12,12 +12,10 @@ import won.owner.web.events.OnPasswordChangedEvent;
 import won.owner.web.events.OnRecoveryKeyGeneratedEvent;
 import won.owner.web.events.OnRegistrationCompleteEvent;
 
-
 @Component
 public class RecoveryKeyGeneratedEMailListener implements ApplicationListener<OnRecoveryKeyGeneratedEvent> {
     @Autowired
     private UserService userService;
-
     @Autowired
     private WonOwnerMailSender emailSender;
 

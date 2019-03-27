@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>webofneeds</artifactId>
         <groupId>at.researchstudio.sat</groupId>
@@ -80,6 +82,10 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>net.revelc.code.formatter</groupId>
+                <artifactId>formatter-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
                 <groupId>com.github.ekryd.echo-maven-plugin</groupId>
                 <artifactId>echo-maven-plugin</artifactId>
                 <executions>
@@ -90,7 +96,11 @@
                             <goal>echo</goal>
                         </goals>
                         <configuration>
-                            <message>Note: this build is slow because a shaded jar is created. If you don't need that (you will know if you do), you can skip it by using the profile 'skip-matcher-rescal-uberjar'</message>
+                            <message>Note: this build is slow because a
+                                shaded jar is created. If you don't need
+                                that (you will know if you do), you can
+                                skip it by using the profile
+                                'skip-matcher-rescal-uberjar'</message>
                         </configuration>
                     </execution>
                 </executions>
@@ -103,7 +113,9 @@
                     <execution>
                         <id>build-matcher-rescal-uberjar</id>
                         <phase>package</phase>
-                        <goals><goal>shade</goal></goals>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
                         <configuration>
                             <finalName>won-matcher-rescal</finalName>
                             <shadedArtifactAttached>true</shadedArtifactAttached>
@@ -113,17 +125,22 @@
                                 </includes>
                             </artifactSet>
                             <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                <transformer
+                                    implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+                                <transformer
+                                    implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
                                     <resource>reference.conf</resource>
                                 </transformer>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <transformer
+                                    implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>won.matcher.rescal.AkkaRescalMain</mainClass>
                                 </transformer>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                <transformer
+                                    implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
                                     <resource>META-INF/spring.handlers</resource>
                                 </transformer>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                <transformer
+                                    implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
                                     <resource>META-INF/spring.schemas</resource>
                                 </transformer>
                             </transformers>
@@ -149,7 +166,14 @@
                                     <goal>echo</goal>
                                 </goals>
                                 <configuration>
-                                    <message>Note: building the shaded jar for the matcher-rescal is skipped completely. This is done because the profile 'skip-matcher-rescal-uberjar' is active ('-P skip-matcher-rescal-uberjar' on the command line)</message>
+                                    <message>Note: building the shaded
+                                        jar for the matcher-rescal is
+                                        skipped completely. This is done
+                                        because the profile
+                                        'skip-matcher-rescal-uberjar' is
+                                        active ('-P
+                                        skip-matcher-rescal-uberjar' on
+                                        the command line)</message>
                                 </configuration>
                             </execution>
                             <execution>
@@ -158,7 +182,8 @@
                             </execution>
                         </executions>
                     </plugin>
-                    <!-- use the same config as above but set the phase to 'none' -->
+                    <!-- use the same config as above but set the phase to 
+                        'none' -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-shade-plugin</artifactId>

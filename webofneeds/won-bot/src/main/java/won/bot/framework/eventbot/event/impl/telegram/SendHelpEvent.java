@@ -6,7 +6,7 @@ import org.telegram.telegrambots.bots.AbsSender;
 
 import won.bot.framework.eventbot.event.BaseEvent;
 
-public class SendHelpEvent extends BaseEvent{
+public class SendHelpEvent extends BaseEvent {
     private AbsSender absSender;
     private User user;
     private Chat chat;

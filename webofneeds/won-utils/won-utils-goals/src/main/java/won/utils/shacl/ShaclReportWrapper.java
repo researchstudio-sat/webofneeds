@@ -12,12 +12,10 @@ import org.topbraid.shacl.vocabulary.SH;
 import won.protocol.util.RdfUtils;
 
 public class ShaclReportWrapper {
-
     private Resource report;
     private Resource reportResource;
 
     public ShaclReportWrapper(Resource report) {
-
         this.report = report;
         reportResource = RdfUtils.findOneSubjectResource(report.getModel(), RDF.type, SH.ValidationReport);
     }
@@ -31,13 +29,12 @@ public class ShaclReportWrapper {
         if (node != null && node.asLiteral() != null) {
             return node.asLiteral().getBoolean();
         }
-
         return false;
     }
 
     public Collection<ValidationResultWrapper> getValidationResults() {
         Collection<ValidationResultWrapper> validationResults = new LinkedList<>();
-        for(Statement statement : reportResource.listProperties(SH.result).toList()) {
+        for (Statement statement : reportResource.listProperties(SH.result).toList()) {
             if (statement.getResource().getPropertyResourceValue(RDF.type).equals(SH.ValidationResult)) {
                 validationResults.add(new ValidationResultWrapper(statement.getResource()));
             }

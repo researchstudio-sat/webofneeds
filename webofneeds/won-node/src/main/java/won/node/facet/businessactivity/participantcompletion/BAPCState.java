@@ -8,15 +8,12 @@ import org.slf4j.LoggerFactory;
 import won.node.facet.impl.WON_TX;
 
 /**
- * Created with IntelliJ IDEA.
- * User: Danijel
- * Date: 30.1.14.
- * Time: 18.33
- * To change this template use File | Settings | File Templates.
+ * Created with IntelliJ IDEA. User: Danijel Date: 30.1.14. Time: 18.33 To
+ * change this template use File | Settings | File Templates.
  */
 public enum BAPCState {
-    ACTIVE("Active", Phase.FIRST){
-        public BAPCState transit(BAPCEventType msg){
+    ACTIVE("Active", Phase.FIRST) {
+        public BAPCState transit(BAPCEventType msg) {
             resendEvent = null;
             switch (msg) {
                 case MESSAGE_CANCEL:
@@ -34,8 +31,8 @@ public enum BAPCState {
             }
         }
     },
-    CANCELING("Canceling", Phase.FIRST){
-        public BAPCState transit(BAPCEventType msg){
+    CANCELING("Canceling", Phase.FIRST) {
+        public BAPCState transit(BAPCEventType msg) {
             resendEvent = null;
             switch (msg) {
                 case MESSAGE_CANCEL:
@@ -55,8 +52,8 @@ public enum BAPCState {
             }
         }
     },
-    COMPLETED("Completed", Phase.FIRST){
-        public BAPCState transit(BAPCEventType msg){
+    COMPLETED("Completed", Phase.FIRST) {
+        public BAPCState transit(BAPCEventType msg) {
             resendEvent = null;
             switch (msg) {
                 case MESSAGE_CANCEL:
@@ -74,7 +71,7 @@ public enum BAPCState {
         }
     },
     CLOSING("Closing", Phase.FIRST) {
-        public BAPCState transit (BAPCEventType msg){
+        public BAPCState transit(BAPCEventType msg) {
             resendEvent = null;
             switch (msg) {
                 case MESSAGE_CANCEL:
@@ -91,8 +88,8 @@ public enum BAPCState {
             }
         }
     },
-    COMPENSATING("Compensating", Phase.FIRST){
-        public BAPCState transit (BAPCEventType msg){
+    COMPENSATING("Compensating", Phase.FIRST) {
+        public BAPCState transit(BAPCEventType msg) {
             resendEvent = null;
             switch (msg) {
                 case MESSAGE_CANCEL:
@@ -112,7 +109,7 @@ public enum BAPCState {
         }
     },
     FAILING_ACTIVE_CANCELING("FailingActiveCanceling", Phase.FIRST) {
-        public BAPCState transit (BAPCEventType msg){
+        public BAPCState transit(BAPCEventType msg) {
             resendEvent = null;
             switch (msg) {
                 case MESSAGE_CANCEL:
@@ -128,7 +125,7 @@ public enum BAPCState {
         }
     },
     FAILING_COMPENSATING("FailingCompensating", Phase.FIRST) {
-        public BAPCState transit (BAPCEventType msg) {
+        public BAPCState transit(BAPCEventType msg) {
             resendEvent = null;
             switch (msg) {
                 case MESSAGE_CANCEL:
@@ -147,8 +144,8 @@ public enum BAPCState {
             }
         }
     },
-    NOT_COMPLETING("NotCompleting", Phase.FIRST){
-        public BAPCState transit (BAPCEventType msg) {
+    NOT_COMPLETING("NotCompleting", Phase.FIRST) {
+        public BAPCState transit(BAPCEventType msg) {
             resendEvent = null;
             switch (msg) {
                 case MESSAGE_CANCEL:
@@ -164,7 +161,7 @@ public enum BAPCState {
         }
     },
     EXITING("Exiting", Phase.FIRST) {
-        public BAPCState transit (BAPCEventType msg) {
+        public BAPCState transit(BAPCEventType msg) {
             resendEvent = null;
             switch (msg) {
                 case MESSAGE_CANCEL:
@@ -180,7 +177,7 @@ public enum BAPCState {
         }
     },
     ENDED("Ended", Phase.FIRST) {
-        public BAPCState transit (BAPCEventType msg){
+        public BAPCState transit(BAPCEventType msg) {
             resendEvent = null;
             switch (msg) {
                 case MESSAGE_CANCEL:
@@ -220,39 +217,35 @@ public enum BAPCState {
             }
         }
     },
-    CLOSED("Closed", Phase.FIRST){
-        public BAPCState transit(BAPCEventType msg){
+    CLOSED("Closed", Phase.FIRST) {
+        public BAPCState transit(BAPCEventType msg) {
             resendEvent = null;
             return null;
         }
     };
-
     private static final Logger logger = LoggerFactory.getLogger(BAPCState.class);
-
     private String name;
     private Phase phase;
     private static BAPCEventType resendEvent = null;
-    public static enum Phase{FIRST, SECOND, CANCELED_FROM_COORDINATOR};
 
-    private BAPCState(String name, Phase phase)
-    {
-      this.name = name;
-      this.phase = phase;
+    public static enum Phase {
+        FIRST, SECOND, CANCELED_FROM_COORDINATOR
+    };
+
+    private BAPCState(String name, Phase phase) {
+        this.name = name;
+        this.phase = phase;
     }
 
-    private BAPCState(String name)
-    {
-      this(name, Phase.FIRST);
+    private BAPCState(String name) {
+        this(name, Phase.FIRST);
     }
 
-
-    public BAPCEventType getResendEvent(){
-        return  resendEvent;
+    public BAPCEventType getResendEvent() {
+        return resendEvent;
     }
 
-
-    public static BAPCState create(BAPCEventType msg)
-    {
+    public static BAPCState create(BAPCEventType msg) {
         switch (msg) {
             case MESSAGE_CANCEL:
                 return CANCELING;
@@ -284,21 +277,19 @@ public enum BAPCState {
         throw new IllegalArgumentException("The received message is not allowed.");
     }
 
-    public abstract BAPCState transit (BAPCEventType msg);
+    public abstract BAPCState transit(BAPCEventType msg);
 
-    public URI getURI()
-    {
+    public URI getURI() {
         return URI.create(WON_TX.BASE_URI + name);
     }
 
     public Phase getPhase() {
-      return phase;
+        return phase;
     }
 
     public void setPhase(Phase phase) {
-      this.phase = phase;
+        this.phase = phase;
     }
-
 
     /**
      * Tries to match the given string against all enum values.
@@ -306,39 +297,26 @@ public enum BAPCState {
      * @param fragment string to match
      * @return matched enum, null otherwise
      */
-    public static BAPCState parseString(final String fragment)
-    {
+    public static BAPCState parseString(final String fragment) {
         for (BAPCState state : values())
-          if (state.getURI().toString().equals(fragment))
+            if (state.getURI().toString().equals(fragment))
                 return state;
         logger.debug("2No enum could be matched for: {}", fragment);
         return null;
     }
 
-    public static Phase parsePhase(final String fragment)
-    {
-      String comparedString = fragment;
-      comparedString = fragment.substring(fragment.lastIndexOf("#baPhase")+8);
-      for(Phase phase : Phase.values())
-      {
-        if (phase.toString().equals(comparedString))
-          return phase;
-      }
-      logger.debug("1No enum could be matched for: {}", fragment);
-      return null;
+    public static Phase parsePhase(final String fragment) {
+        String comparedString = fragment;
+        comparedString = fragment.substring(fragment.lastIndexOf("#baPhase") + 8);
+        for (Phase phase : Phase.values()) {
+            if (phase.toString().equals(comparedString))
+                return phase;
+        }
+        logger.debug("1No enum could be matched for: {}", fragment);
+        return null;
     }
 
-  public static URI getPhaseURI(Phase phase)
-  {
-    return URI.create(WON_TX.BASE_URI + "baPhase"+phase.toString());
-  }
-
-
-
-
-
-
-
+    public static URI getPhaseURI(Phase phase) {
+        return URI.create(WON_TX.BASE_URI + "baPhase" + phase.toString());
+    }
 }
-
-

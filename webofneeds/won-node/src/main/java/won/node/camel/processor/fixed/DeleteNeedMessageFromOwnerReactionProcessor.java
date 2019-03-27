@@ -1,19 +1,13 @@
 /*
- * Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Copyright 2012 Research Studios Austria Forschungsges.m.b.H. Licensed under
+ * the Apache License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable
+ * law or agreed to in writing, software distributed under the License is
+ * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
  */
-
 package won.node.camel.processor.fixed;
 
 import java.net.URI;
@@ -55,27 +49,25 @@ public class DeleteNeedMessageFromOwnerReactionProcessor extends AbstractCamelPr
         }
         Need need = DataAccessUtils.loadNeed(needRepository, receiverNeedURI);
         matcherProtocolMatcherClient.needDeleted(need.getNeedURI(), wonMessage);
-
         // Check if need already in State DELETED
         if (need.getState() == NeedState.DELETED) {
-            //Get all connections of this need
+            // Get all connections of this need
             Collection<Connection> conns = connectionRepository
-                    .getConnectionsByNeedURIAndNotInStateForUpdate(need.getNeedURI(), ConnectionState.DELETED);
+                            .getConnectionsByNeedURIAndNotInStateForUpdate(need.getNeedURI(), ConnectionState.DELETED);
             for (Connection con : conns) {
-                //Delete all connection data
+                // Delete all connection data
                 messageEventRepository.deleteByParentURI(con.getConnectionURI());
                 connectionRepository.delete(con);
             }
         } else {
-            //Get only not closed connections of this need to close them
+            // Get only not closed connections of this need to close them
             Collection<Connection> conns = connectionRepository
-                    .getConnectionsByNeedURIAndNotInStateForUpdate(need.getNeedURI(), ConnectionState.CLOSED);
+                            .getConnectionsByNeedURIAndNotInStateForUpdate(need.getNeedURI(), ConnectionState.CLOSED);
             // Close open connections
             for (Connection con : conns) {
                 closeConnection(need, con);
             }
         }
-
     }
 
     public void closeConnection(final Need need, final Connection con) {
@@ -83,18 +75,9 @@ public class DeleteNeedMessageFromOwnerReactionProcessor extends AbstractCamelPr
         // the close message is directed at our local connection. It will
         // be routed to the owner and forwarded to to remote connection
         URI messageURI = wonNodeInformationService.generateEventURI();
-        WonMessage message = WonMessageBuilder.setMessagePropertiesForClose(
-                messageURI, 
-                WonMessageDirection.FROM_SYSTEM,
-                con.getConnectionURI(), 
-                con.getNeedURI(),
-                need.getWonNodeURI(), 
-                con.getConnectionURI(),
-                con.getNeedURI(), 
-                need.getWonNodeURI(), 
-                "Closed because Need was deleted").build();
-
+        WonMessage message = WonMessageBuilder.setMessagePropertiesForClose(messageURI, WonMessageDirection.FROM_SYSTEM,
+                        con.getConnectionURI(), con.getNeedURI(), need.getWonNodeURI(), con.getConnectionURI(),
+                        con.getNeedURI(), need.getWonNodeURI(), "Closed because Need was deleted").build();
         sendSystemMessage(message);
-        
     }
 }

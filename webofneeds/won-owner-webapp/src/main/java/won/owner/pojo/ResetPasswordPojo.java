@@ -5,7 +5,7 @@ public class ResetPasswordPojo {
     private String newPassword;
     private String recoveryKey;
     private String verificationToken;
-    
+
     public ResetPasswordPojo() {
     }
 
@@ -40,5 +40,4 @@ public class ResetPasswordPojo {
     public void setVerificationToken(String verificationToken) {
         this.verificationToken = verificationToken;
     }
-
 }

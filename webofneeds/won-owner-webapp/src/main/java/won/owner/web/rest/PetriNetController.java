@@ -24,7 +24,6 @@ import won.protocol.util.linkeddata.LinkedDataSource;
 @RequestMapping("/rest/petrinet")
 public class PetriNetController {
     private final Logger logger = LoggerFactory.getLogger(getClass());
-
     @Autowired
     private LinkedDataSource linkedDataSourceOnBehalfOfNeed;
 
@@ -35,9 +34,8 @@ public class PetriNetController {
     @RequestMapping(value = "/getPetriNetUris", method = RequestMethod.GET)
     public ResponseEntity<Set<PetriNetUris>> getPetriNetUris(URI connectionUri) {
         return new ResponseEntity<Set<PetriNetUris>>(
-                PetriNetStates.of(getAgreementProtocolState(connectionUri)).getPetriNetUris(), HttpStatus.OK);
+                        PetriNetStates.of(getAgreementProtocolState(connectionUri)).getPetriNetUris(), HttpStatus.OK);
     }
-    
 
     private AgreementProtocolState getAgreementProtocolState(URI connectionUri) {
         try {
@@ -48,5 +46,4 @@ public class PetriNetController {
             AuthenticationThreadLocal.remove();
         }
     }
-
 }

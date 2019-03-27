@@ -54,10 +54,9 @@ public class SparqlMatcherUtils {
      * executing a query in an in-memory Dataset.
      * 
      * @param queryOp
-     * @param graphVarName
-     *            optional graph name. If not specified, a random variable name is
-     *            generated. Can be a variable (starting with '?') or an URI (NOT
-     *            enclosed by '<' and '>')
+     * @param graphVarName optional graph name. If not specified, a random variable
+     * name is generated. Can be a variable (starting with '?') or an URI (NOT
+     * enclosed by '<' and '>')
      * @return
      */
     public static Op addGraphOp(Op queryOp, Optional<String> graphVarName) {
@@ -87,12 +86,10 @@ public class SparqlMatcherUtils {
      * @return
      */
     public static Op removeServiceOp(Op queryOp, Optional<String> serviceURI) {
-
         // first, copy the whole op so we don't change the specified one
         // Op queryCopy = Transformer.transform(new TransformCopy(),queryOp);
         // now transform
         return Transformer.transform(new TransformCopy(true) {
-
             @Override
             public Op transform(OpJoin opJoin, Op left, Op right) {
                 return selectSubOpIfOtherIsService(opJoin, left, right, serviceURI);
@@ -130,9 +127,8 @@ public class SparqlMatcherUtils {
 
             private boolean isSelectedServiceOp(Op op, Optional<String> serviceURI) {
                 return op instanceof OpService && (!serviceURI.isPresent()
-                        || serviceURI.get().equals(((OpService) op).getService().toString()));
+                                || serviceURI.get().equals(((OpService) op).getService().toString()));
             }
-
         }, queryOp);
     }
 
@@ -159,64 +155,48 @@ public class SparqlMatcherUtils {
     }
 
     private static Op makePathBGPPattern(Var start, Var end, int hops, Function<Op, Op> postprocess) {
-        String tmpPropName="tmpProp";
-        String tmpObjName="tmpObj";
+        String tmpPropName = "tmpProp";
+        String tmpObjName = "tmpObj";
         Var curSubj = null;
         Var curPred = null;
         Var curObj = start;
         BasicPattern pattern = new BasicPattern();
         for (int i = 0; i < hops; i++) {
             curSubj = curObj;
-            curPred = Var.alloc(tmpPropName+"_" + i);
-            curObj = (i == hops - 1) ? end : Var.alloc(tmpObjName+"_" + i);
-            pattern.add( new Triple(curSubj, curPred, curObj));
+            curPred = Var.alloc(tmpPropName + "_" + i);
+            curObj = (i == hops - 1) ? end : Var.alloc(tmpObjName + "_" + i);
+            pattern.add(new Triple(curSubj, curPred, curObj));
         }
         return postprocess.apply(new OpBGP(pattern));
     }
-    
-    public static Op createSearchQuery(String searchString, Var resultName, int hops, boolean disjunctive, boolean tokenize) {
 
+    public static Op createSearchQuery(String searchString, Var resultName, int hops, boolean disjunctive,
+                    boolean tokenize) {
         Var textSearchTarget = Var.alloc("textSearchTarget");
-        
-        Optional<Op> union = IntStream.range(1, hops+1).mapToObj(hopCount ->  
-             makePathBGPPattern(
-                            resultName, 
-                            textSearchTarget, 
-                            hopCount, 
-                            op -> {
-                                Expr filterExpression = Arrays.stream( tokenize ? searchString.toLowerCase().split(" ") : new String[] {searchString.toLowerCase()})
-                                        .<Expr>map(searchPart ->
-                                                new E_StrContains(
-                                                        new E_StrLowerCase(new ExprVar(textSearchTarget)),
-                                                        new NodeValueString(searchPart)
-                                                )
-                                        )
-                                        .reduce((left, right) -> disjunctive ? new E_LogicalOr(left, right) : new E_LogicalAnd(left, right))
-                                        .orElse(new NodeValueBoolean(true));
-                                return OpFilter.filterBy(
-                                        new ExprList(filterExpression),
-                                        op);
-                            }))
-        .reduce((op1, op2) -> new OpUnion(op1, op2));
-        
-        Op maintriple = new OpTriple(
-                new Triple(
-                        resultName,
-                        RDF.type.asNode(),
-                        WON.NEED.asNode()
-                )
-        );
-        Op mainOp = union.isPresent() ? OpJoin.create(maintriple , union.get()) : maintriple;
+        Optional<Op> union = IntStream.range(1, hops + 1)
+                        .mapToObj(hopCount -> makePathBGPPattern(resultName, textSearchTarget, hopCount, op -> {
+                            Expr filterExpression = Arrays
+                                            .stream(tokenize ? searchString.toLowerCase().split(" ")
+                                                            : new String[] { searchString.toLowerCase() })
+                                            .<Expr>map(searchPart -> new E_StrContains(
+                                                            new E_StrLowerCase(new ExprVar(textSearchTarget)),
+                                                            new NodeValueString(searchPart)))
+                                            .reduce((left, right) -> disjunctive ? new E_LogicalOr(left, right)
+                                                            : new E_LogicalAnd(left, right))
+                                            .orElse(new NodeValueBoolean(true));
+                            return OpFilter.filterBy(new ExprList(filterExpression), op);
+                        })).reduce((op1, op2) -> new OpUnion(op1, op2));
+        Op maintriple = new OpTriple(new Triple(resultName, RDF.type.asNode(), WON.NEED.asNode()));
+        Op mainOp = union.isPresent() ? OpJoin.create(maintriple, union.get()) : maintriple;
         return mainOp;
     }
 
-    
     public static Op hintForCounterpartQuery(Op q, Var resultName) {
         InsertionTargetFindingVisitor targetFinder = new InsertionTargetFindingVisitor();
         Walker.walk(q, targetFinder);
         OpInserter inserter = targetFinder.getInserter();
         inserter.setNotExistsTriple(
-                new Triple(resultName, WON.HAS_FLAG.asNode(), WON.NO_HINT_FOR_COUNTERPART.asNode()));
+                        new Triple(resultName, WON.HAS_FLAG.asNode(), WON.NO_HINT_FOR_COUNTERPART.asNode()));
         return Transformer.transform(inserter, q);
     }
 
@@ -277,7 +257,6 @@ public class SparqlMatcherUtils {
         public OpInserter getInserter() {
             return new OpInserter(highestCompleteInfo);
         }
-
     }
 
     private static class OpInserter extends TransformCopy {
@@ -308,7 +287,7 @@ public class SparqlMatcherUtils {
 
         private boolean isTargetOp(Op op) {
             return insertionInfo.isPresent() && insertionInfo.get().targetOp.isPresent()
-                    && insertionInfo.get().targetOp.get().equals(op);
+                            && insertionInfo.get().targetOp.get().equals(op);
         }
 
         public Op performInsertIfAtTarget(OpModifier op, Op subOp) {
@@ -352,7 +331,5 @@ public class SparqlMatcherUtils {
         public Op transform(OpProject op, Op subOp) {
             return performInsertIfAtTarget(op, subOp);
         }
-        
     }
-   
 }

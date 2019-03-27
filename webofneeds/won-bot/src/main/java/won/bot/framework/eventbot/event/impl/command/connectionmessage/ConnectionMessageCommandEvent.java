@@ -13,7 +13,8 @@ import won.bot.framework.eventbot.event.impl.command.MessageCommandEvent;
 import won.protocol.message.WonMessageType;
 import won.protocol.model.Connection;
 
-public class ConnectionMessageCommandEvent extends BaseNeedAndConnectionSpecificEvent implements MessageCommandEvent, ConnectionSpecificEvent {
+public class ConnectionMessageCommandEvent extends BaseNeedAndConnectionSpecificEvent
+                implements MessageCommandEvent, ConnectionSpecificEvent {
     private Model messageModel;
     private Set<URI> injectIntoConnections = new HashSet<>();
 
@@ -24,7 +25,7 @@ public class ConnectionMessageCommandEvent extends BaseNeedAndConnectionSpecific
             this.injectIntoConnections.addAll(injectionTargets);
         }
     }
-    
+
     public ConnectionMessageCommandEvent(Connection con, Model messageModel) {
         this(con, messageModel, null);
     }
@@ -38,7 +39,7 @@ public class ConnectionMessageCommandEvent extends BaseNeedAndConnectionSpecific
     public WonMessageType getWonMessageType() {
         return WonMessageType.CONNECTION_MESSAGE;
     }
-    
+
     public Set<URI> getInjectIntoConnections() {
         return injectIntoConnections;
     }

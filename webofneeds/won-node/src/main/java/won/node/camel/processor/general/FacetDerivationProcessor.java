@@ -20,19 +20,14 @@ import won.protocol.repository.NeedRepository;
 /**
  * Compares the connection state found in the header of the 'in' message with
  * the state the connection is in now and triggers the data derivation.
- * 
  */
 public class FacetDerivationProcessor implements Processor {
-
     @Autowired
     ConnectionRepository connectionRepository;
-    
     @Autowired
     NeedRepository needRepository;
-
     @Autowired
     FacetService derivationService;
-
 
     public FacetDerivationProcessor() {
     }
@@ -41,10 +36,10 @@ public class FacetDerivationProcessor implements Processor {
     public void process(Exchange exchange) throws Exception {
         Optional<Connection> con = Optional.empty();
         ConnectionStateChangeBuilder stateChangeBuilder = (ConnectionStateChangeBuilder) exchange.getIn()
-                .getHeader(WonCamelConstants.CONNECTION_STATE_CHANGE_BUILDER_HEADER);
+                        .getHeader(WonCamelConstants.CONNECTION_STATE_CHANGE_BUILDER_HEADER);
         if (stateChangeBuilder == null) {
             throw new IllegalStateException("expecting to find a ConnectionStateBuilder in 'in' header '"
-                    + WonCamelConstants.CONNECTION_STATE_CHANGE_BUILDER_HEADER + "'");
+                            + WonCamelConstants.CONNECTION_STATE_CHANGE_BUILDER_HEADER + "'");
         }
         // first, try to find the connection uri in the header:
         URI conUri = (URI) exchange.getIn().getHeader(WonCamelConstants.CONNECTION_URI_HEADER);
@@ -52,7 +47,7 @@ public class FacetDerivationProcessor implements Processor {
             // not found. get it from the message and put it in the header
             WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
             conUri = wonMessage.getEnvelopeType() == WonMessageDirection.FROM_EXTERNAL ? wonMessage.getReceiverURI()
-                    : wonMessage.getSenderURI();
+                            : wonMessage.getSenderURI();
         }
         if (conUri != null) {
             // found a connection. Put its URI in the header and load it
@@ -61,8 +56,8 @@ public class FacetDerivationProcessor implements Processor {
         } else {
             // found no connection. don't modify the builder
         }
-        
-        // only if there is enough data to make a connectionStateChange object, make it and pass it to the data
+        // only if there is enough data to make a connectionStateChange object, make it
+        // and pass it to the data
         // derivation service.
         if (stateChangeBuilder.canBuild()) {
             ConnectionStateChange connectionStateChange = stateChangeBuilder.build();
@@ -73,5 +68,4 @@ public class FacetDerivationProcessor implements Processor {
             derivationService.deriveDataForStateChange(connectionStateChange, need, con.get());
         }
     }
-
 }

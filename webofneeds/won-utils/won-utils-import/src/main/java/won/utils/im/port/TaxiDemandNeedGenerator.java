@@ -16,9 +16,7 @@ import won.protocol.vocabulary.SCHEMA;
 import won.protocol.vocabulary.WON;
 
 public class TaxiDemandNeedGenerator {
-
     static Model model = ModelFactory.createDefaultModel();
-
     static HashMap<String, String>[] locations = new HashMap[10];
 
     public static void main(String[] args) {
@@ -28,32 +26,25 @@ public class TaxiDemandNeedGenerator {
 
     private static void generateNeeds() {
         final int N = 100;
-        Random random = new Random();        
+        Random random = new Random();
         for (int i = 0; i < N; i++) {
             String rnd = Long.toHexString(random.nextLong());
-            String needURI = "https://localhost:8443/won/resource/event/" + "taxi_demand_need_" + rnd ;
-
+            String needURI = "https://localhost:8443/won/resource/event/" + "taxi_demand_need_" + rnd;
             model = ModelFactory.createDefaultModel();
-
             setPrefixes();
-
             Resource need = model.createResource(needURI);
-            //Resource isPart = model.createResource();
+            // Resource isPart = model.createResource();
             Resource seeksPart = model.createResource();
             Resource won_Need = model.createResource("http://purl.org/webofneeds/model#Need");
-
             // method signatures: branch, probability that detail is added, min, max
             need = addTitle(need, 1.0, i);
             need = addDescription(need, 1.0);
             need.addProperty(WON.HAS_TAG, "search-lift");
-
             seeksPart = addDate(seeksPart, 0.9);
             // seeksPart = addTime(seeksPart, 0.9);
             seeksPart = addTravelAction(seeksPart, 0.9);
-
             need.addProperty(RDF.type, won_Need);
             need.addProperty(WON.SEEKS, seeksPart);
-
             try {
                 FileOutputStream out = new FileOutputStream("sample_needs/taxi_demand_need_" + rnd + ".trig");
                 model.write(out, "TURTLE");
@@ -69,7 +60,6 @@ public class TaxiDemandNeedGenerator {
         if (Math.random() < (1.0 - probability)) {
             return resource;
         }
-
         resource.addProperty(DC.title, "Sample Taxi Demand Need " + counter);
         return resource;
     }
@@ -78,7 +68,6 @@ public class TaxiDemandNeedGenerator {
         if (Math.random() < (1.0 - probability)) {
             return resource;
         }
-
         resource.addProperty(DC.description, "This is a sample offer that was automatically generated.");
         return resource;
     }
@@ -88,39 +77,31 @@ public class TaxiDemandNeedGenerator {
         if (Math.random() < (1.0 - probability)) {
             return resource;
         }
-
         int year = (int) (Math.random() * 2100 - 1989 + 1990);
         int month = (int) (Math.random() * 13);
         int day = (int) (Math.random() * 29);
-
         resource.addProperty(DC.date, year + "-" + month + "-" + day);
-
         return resource;
     }
-
     // TODO: comment this back in once we have a good rdf representation of time
     // private static Resource addTime(Resource resource, double probability) {
     // if (Math.random() < (1.0 - probability)) {
     // return resource;
     // }
-
     // int hours = (int) (Math.random() * 24);
     // int minutes = (int) (Math.random() * 60);
 
     // return resource;
     // }
-
     private static Resource addTravelAction(Resource resource, double probability) {
         if (Math.random() < (1.0 - probability)) {
             return resource;
         }
-
         Collections.shuffle(Arrays.asList(locations));
         Resource fromLocationResource = model.createResource();
         Resource fromGeoResource = model.createResource();
         Resource fromSchema_Place = model.createResource("http://schema.org/Place");
         Resource fromSchema_GeoCoordinates = model.createResource("http://schema.org/GeoCoordinates");
-
         resource.addProperty(WON.TRAVEL_ACTION, fromLocationResource);
         fromLocationResource.addProperty(RDF.type, fromSchema_Place);
         fromLocationResource.addProperty(SCHEMA.NAME, locations[0].get("name"));
@@ -128,7 +109,6 @@ public class TaxiDemandNeedGenerator {
         fromGeoResource.addProperty(RDF.type, fromSchema_GeoCoordinates);
         fromGeoResource.addProperty(SCHEMA.LATITUDE, locations[0].get("lat"));
         fromGeoResource.addProperty(SCHEMA.LONGITUDE, locations[0].get("lng"));
-
         if (Math.random() < (1.0 - probability)) {
             return resource;
         }
@@ -136,7 +116,6 @@ public class TaxiDemandNeedGenerator {
         Resource toGeoResource = model.createResource();
         Resource toSchema_Place = model.createResource("http://schema.org/Place");
         Resource toSchema_GeoCoordinates = model.createResource("http://schema.org/GeoCoordinates");
-
         resource.addProperty(WON.TRAVEL_ACTION, toLocationResource);
         toLocationResource.addProperty(RDF.type, toSchema_Place);
         toLocationResource.addProperty(SCHEMA.NAME, locations[1].get("name"));
@@ -144,9 +123,7 @@ public class TaxiDemandNeedGenerator {
         toGeoResource.addProperty(RDF.type, toSchema_GeoCoordinates);
         toGeoResource.addProperty(SCHEMA.LATITUDE, locations[1].get("lat"));
         toGeoResource.addProperty(SCHEMA.LONGITUDE, locations[1].get("lng"));
-
         return resource;
-
     }
 
     private static void initializeLocations() {
@@ -159,7 +136,6 @@ public class TaxiDemandNeedGenerator {
         loc0.put("lng", "16.705195");
         loc0.put("name", "Gemeinde Weikendorf, Bezirk Gänserndorf, Lower Austria, 2253, Austria");
         locations[0] = loc0;
-
         HashMap<String, String> loc1 = new HashMap<String, String>();
         loc1.put("nwlat", "48.213814");
         loc1.put("nwlng", "16.340870");
@@ -169,7 +145,6 @@ public class TaxiDemandNeedGenerator {
         loc1.put("lng", "16.358398");
         loc1.put("name", "Vienna, Austria");
         locations[1] = loc1;
-
         HashMap<String, String> loc2 = new HashMap<String, String>();
         loc2.put("nwlat", "48.145908");
         loc2.put("nwlng", "14.126198");
@@ -179,7 +154,6 @@ public class TaxiDemandNeedGenerator {
         loc2.put("lng", "14.286198");
         loc2.put("name", "Linz, Upper Austria, 4010, Austria");
         locations[2] = loc2;
-
         HashMap<String, String> loc3 = new HashMap<String, String>();
         loc3.put("nwlat", "46.910256");
         loc3.put("nwlng", "15.278572");
@@ -189,7 +163,6 @@ public class TaxiDemandNeedGenerator {
         loc3.put("lng", "15.438572");
         loc3.put("name", "Graz, Styria, 8011, Austria");
         locations[3] = loc3;
-
         HashMap<String, String> loc4 = new HashMap<String, String>();
         loc4.put("nwlat", "47.638135");
         loc4.put("nwlng", "12.886481");
@@ -199,7 +172,6 @@ public class TaxiDemandNeedGenerator {
         loc4.put("lng", "13.046481");
         loc4.put("name", "Salzburg, 5020, Austria");
         locations[4] = loc4;
-
         HashMap<String, String> loc5 = new HashMap<String, String>();
         loc5.put("nwlat", "48.164398");
         loc5.put("nwlng", "15.582912");
@@ -209,7 +181,6 @@ public class TaxiDemandNeedGenerator {
         loc5.put("lng", "15.622912");
         loc5.put("name", "St. Pölten, Lower Austria, 3102, Austria");
         locations[5] = loc5;
-
         HashMap<String, String> loc6 = new HashMap<String, String>();
         loc6.put("nwlat", "47.480016");
         loc6.put("nwlng", "9.654882");
@@ -219,7 +190,6 @@ public class TaxiDemandNeedGenerator {
         loc6.put("lng", "9.747292");
         loc6.put("name", "Bregenz, Vorarlberg, Austria");
         locations[6] = loc6;
-
         HashMap<String, String> loc7 = new HashMap<String, String>();
         loc7.put("nwlat", "46.782816");
         loc7.put("nwlng", "14.467960");
@@ -229,7 +199,6 @@ public class TaxiDemandNeedGenerator {
         loc7.put("lng", "14.307960");
         loc7.put("name", "Klagenfurt, Klagenfurt am Wörthersee, Carinthia, 9020, Austria");
         locations[7] = loc7;
-
         HashMap<String, String> loc8 = new HashMap<String, String>();
         loc8.put("nwlat", "47.425430");
         loc8.put("nwlng", "11.552769");
@@ -239,7 +208,6 @@ public class TaxiDemandNeedGenerator {
         loc8.put("lng", "11.392769");
         loc8.put("name", "Innsbruck, Tyrol, 6020, Austria");
         locations[8] = loc8;
-
         HashMap<String, String> loc9 = new HashMap<String, String>();
         loc9.put("nwlat", "48.145711");
         loc9.put("nwlng", "16.560306");

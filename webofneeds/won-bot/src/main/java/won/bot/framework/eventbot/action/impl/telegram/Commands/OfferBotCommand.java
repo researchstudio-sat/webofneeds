@@ -16,7 +16,6 @@ import won.bot.framework.eventbot.event.impl.telegram.TelegramCreateNeedEvent;
  */
 public class OfferBotCommand extends BotCommand {
     protected final Logger logger = LoggerFactory.getLogger(getClass());
-
     private EventBus bus;
 
     public OfferBotCommand(String commandIdentifier, String description, EventBus bus) {

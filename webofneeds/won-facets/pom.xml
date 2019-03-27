@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>webofneeds</artifactId>
         <groupId>at.researchstudio.sat</groupId>
@@ -21,12 +23,8 @@
     </properties>
 
     <dependencies>
-        <!--
-
-                 Warning! Only to be used in connection with the
-                 <dependencyManagement> section in the parent pom!
-
-        -->
+        <!-- Warning! Only to be used in connection with the <dependencyManagement> 
+            section in the parent pom! -->
         <dependency>
             <groupId>at.researchstudio.sat</groupId>
             <artifactId>won-core</artifactId>
@@ -147,43 +145,23 @@
                 <directory>src/test/resources</directory>
             </testResource>
         </testResources>
-        <!--plugins>
+        <plugins>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>jaxws-maven-plugin</artifactId>
-                <version>1.9</version>
-                <executions>
-                    <!- -execution>
-                        <id>generate-wsdl</id>
-                        <phase>process-classes</phase>
-                        <goals>
-                            <goal>wsgen</goal>
-                        </goals>
-                        <configuration>
-                            <sei>won.protocol.ws.NeedProtocolNeedWebServiceEndpoint</sei>
-                            <genWsdl>true</genWsdl>
-                            <verbose>true</verbose>
-                            <protocol>soap1.1</protocol>
-                        </configuration>
-                    </execution- ->
-                    <execution>
-                        <id>generate-stubs</id>
-                        <phase>process-classes</phase>
-                        <goals>
-                            <goal>wsimport</goal>
-                        </goals>
-                        <configuration>
-                            <wsdlDirectory>target/jaxws/wsgen/wsdl</wsdlDirectory>
-                            <wsdlFiles>
-                                <wsdlFile>NeedProtocolNeedWebServiceEndpointService.wsdl</wsdlFile>
-                            </wsdlFiles>
-                            <! - - *** you need the next line to set the wsdlLocation in the generated stubs *** - ->
-                                <wsdlLocation>http://localhost:8080/won/needProtocol/?wsdl </wsdlLocation>
-                        </configuration>
-                    </execution>
-                </executions>
+                <groupId>net.revelc.code.formatter</groupId>
+                <artifactId>formatter-maven-plugin</artifactId>
             </plugin>
-        </plugins-->
+        </plugins>
+        <!--plugins> <plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>jaxws-maven-plugin</artifactId> 
+            <version>1.9</version> <executions> <!- -execution> <id>generate-wsdl</id> 
+            <phase>process-classes</phase> <goals> <goal>wsgen</goal> </goals> <configuration> 
+            <sei>won.protocol.ws.NeedProtocolNeedWebServiceEndpoint</sei> <genWsdl>true</genWsdl> 
+            <verbose>true</verbose> <protocol>soap1.1</protocol> </configuration> </execution- 
+            -> <execution> <id>generate-stubs</id> <phase>process-classes</phase> <goals> 
+            <goal>wsimport</goal> </goals> <configuration> <wsdlDirectory>target/jaxws/wsgen/wsdl</wsdlDirectory> 
+            <wsdlFiles> <wsdlFile>NeedProtocolNeedWebServiceEndpointService.wsdl</wsdlFile> 
+            </wsdlFiles> <! - - *** you need the next line to set the wsdlLocation in 
+            the generated stubs *** - -> <wsdlLocation>http://localhost:8080/won/needProtocol/?wsdl 
+            </wsdlLocation> </configuration> </execution> </executions> </plugin> </plugins -->
     </build>
 </project>
 

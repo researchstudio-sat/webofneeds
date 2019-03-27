@@ -20,14 +20,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import won.bot.framework.eventbot.action.impl.hokify.HokifyJob;
 
 /**
- * 
- * @author MS
- * 
- *         Handles all needed webrequests
- *
+ * @author MS Handles all needed webrequests
  */
 public class HokifyBotsApi {
-
     private String jsonURL;
     private String geoURL;
 
@@ -38,19 +33,15 @@ public class HokifyBotsApi {
 
     public ArrayList<HokifyJob> fetchHokifyData() {
         ArrayList<HokifyJob> jobsList = new ArrayList<HokifyJob>();
-        CloseableHttpResponse  response = null;
-        try(CloseableHttpClient httpClient = HttpClients.createDefault()) {
+        CloseableHttpResponse response = null;
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpGet getRequest = new HttpGet(jsonURL);
             getRequest.addHeader("accept", "application/json");
-
             response = httpClient.execute(getRequest);
-
             if (response.getStatusLine().getStatusCode() != 200) {
                 throw new RuntimeException("Failed : HTTP error code : " + response.getStatusLine().getStatusCode());
             }
-
             BufferedReader br = new BufferedReader(new InputStreamReader((response.getEntity().getContent())));
-
             StringBuilder sb = new StringBuilder();
             String line;
             while ((line = br.readLine()) != null) {
@@ -59,12 +50,10 @@ public class HokifyBotsApi {
             JSONObject json = new JSONObject(sb.toString());
             JSONArray jobArray = new JSONArray(json.getString("jobs"));
             ObjectMapper objectMapper = new ObjectMapper();
-
             for (int count = 0; count < jobArray.length(); count++) {
                 try {
-
                     HokifyJob tmpJob = objectMapper.readValue(jobArray.getJSONObject(count).toString(),
-                            HokifyJob.class);
+                                    HokifyJob.class);
                     jobsList.add(tmpJob);
                 } catch (JsonParseException e) {
                     e.printStackTrace();
@@ -73,7 +62,6 @@ public class HokifyBotsApi {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -86,45 +74,32 @@ public class HokifyBotsApi {
                 }
             }
         }
-
         return jobsList;
     }
 
     public HashMap<String, String> fetchGeoLocation(String city, String country) {
         HashMap<String, String> loc = new HashMap<String, String>();
-
         String cityString = city != null ? city.replace(" ", "+") : "";
         String countrySting = country != null ? country.replace(" ", "+") : "";
-
         String searchString = geoURL + "?city=" + cityString + "&country=" + countrySting + "&format=json";
-
-        
         HttpGet getRequest = new HttpGet(searchString);
         getRequest.addHeader("accept", "application/json");
-
         CloseableHttpResponse response = null;
-        try(CloseableHttpClient httpClient = HttpClients.createDefault()) {
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             response = httpClient.execute(getRequest);
-
             if (response.getStatusLine().getStatusCode() != 200) {
                 throw new RuntimeException("Failed : HTTP error code : " + response.getStatusLine().getStatusCode());
             }
-
             BufferedReader br = new BufferedReader(new InputStreamReader((response.getEntity().getContent())));
-
             StringBuilder sb = new StringBuilder();
             String line;
             while ((line = br.readLine()) != null) {
                 sb.append(line);
             }
-
-             JSONArray jsonArray = new JSONArray(sb.toString());
-
+            JSONArray jsonArray = new JSONArray(sb.toString());
             if (jsonArray.length() > 0) {
                 JSONObject obj = jsonArray.getJSONObject(0);
-
                 JSONArray bBox = (JSONArray) obj.get("boundingbox");
-
                 loc.put("nwlat", (String) bBox.get(1));
                 loc.put("nwlng", (String) bBox.get(3));
                 loc.put("selat", (String) bBox.get(0));
@@ -143,7 +118,6 @@ public class HokifyBotsApi {
             }
             httpClient.close();
             response.getEntity().getContent().close();
-
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -157,5 +131,4 @@ public class HokifyBotsApi {
         }
         return loc;
     }
-
 }

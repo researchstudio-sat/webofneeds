@@ -20,14 +20,12 @@ import ch.qos.logback.classic.Logger;
 import won.utils.goals.GoalUtils;
 
 public class GoalDataExtractionTest {
-
     private static final String baseFolder = "/won/utils/goals/extraction/";
-    
 
     @BeforeClass
     public static void setLogLevel() {
-        Logger root = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
-        root.setLevel(Level.INFO);  
+        Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+        root.setLevel(Level.INFO);
     }
 
     @Test
@@ -47,7 +45,8 @@ public class GoalDataExtractionTest {
         Model dataModel = ds.getNamedModel("http://example.org/ns#data");
         Model shapesModel = ds.getNamedModel("http://example.org/ns#shapes");
         Model actual = GoalUtils.extractGoalData(dataModel, shapesModel);
-        Model expected = loadModel(baseFolder + "additional-node-not-covered-by-shape-person-closed-expected-result.trig");
+        Model expected = loadModel(
+                        baseFolder + "additional-node-not-covered-by-shape-person-closed-expected-result.trig");
         RDFDataMgr.write(System.out, actual, Lang.TRIG);
         Assert.assertTrue(actual.isIsomorphicWith(expected));
     }
@@ -60,7 +59,6 @@ public class GoalDataExtractionTest {
         Model actual = GoalUtils.extractGoalData(dataModel, shapesModel);
         Model expected = loadModel(baseFolder + "SequencePath-expected-result.trig");
         RDFDataMgr.write(System.out, actual, Lang.TRIG);
-
         RDFDataMgr.write(System.out, expected, Lang.TRIG);
         Assert.assertTrue(actual.isIsomorphicWith(expected));
     }
@@ -77,12 +75,10 @@ public class GoalDataExtractionTest {
                 is.close();
             }
         }
-
         return model;
     }
 
     private Dataset loadDataset(String path) throws IOException {
-
         InputStream is = null;
         Dataset dataset = null;
         try {
@@ -94,7 +90,6 @@ public class GoalDataExtractionTest {
                 is.close();
             }
         }
-
         return dataset;
     }
 }

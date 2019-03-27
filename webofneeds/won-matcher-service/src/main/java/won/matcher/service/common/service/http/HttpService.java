@@ -20,8 +20,7 @@ import org.springframework.web.client.RestTemplate;
 /**
  * Service to use HTTP to request resources
  * <p/>
- * User: hfriedrich
- * Date: 04.05.2015
+ * User: hfriedrich Date: 04.05.2015
  */
 @Component
 @Scope("prototype")
@@ -31,13 +30,11 @@ public class HttpService {
     private HttpHeaders jsonHeaders;
 
     public HttpService() {
-
         HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
         init(factory);
     }
 
     public HttpService(int readTimeout, int connectionTimeout) {
-
         HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
         factory.setReadTimeout(readTimeout);
         factory.setConnectTimeout(connectionTimeout);
@@ -53,12 +50,10 @@ public class HttpService {
     }
 
     public void postJsonRequest(String uri, String body) {
-
         ResponseEntity<String> response = null;
         log.debug("POST URI: {}", uri);
         HttpEntity<String> jsonEntity = new HttpEntity(body, jsonHeaders);
         response = restTemplate.exchange(uri, HttpMethod.POST, jsonEntity, String.class);
-
         if (response.getStatusCode() != HttpStatus.OK) {
             log.warn("HTTP POST request returned status code: {}", response.getStatusCode());
             throw new HttpClientErrorException(response.getStatusCode());

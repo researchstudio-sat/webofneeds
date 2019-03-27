@@ -11,24 +11,19 @@ import won.matcher.solr.utils.MatcherNeedContentPropertyType;
  * Created by hfriedrich on 03.08.2016.
  */
 public class DefaultNeedQueryFactory extends BasicNeedQueryFactory {
-
     public DefaultNeedQueryFactory(final Dataset need) {
         super(need);
-
         // add "is" terms/location to "seeks" part of the query and vice versa
         // add "seeks" terms to the "seeks/seeks" part of the query and vice versa
-
         Resource needContentNode = needModelWrapper.getNeedContentNode();
         addTermsToQuery(needContentNode, MatcherNeedContentPropertyType.SEEKS);
         addLocationFilters(needContentNode, MatcherNeedContentPropertyType.SEEKS);
-
         for (Resource contentNode : needModelWrapper.getSeeksNodes()) {
             addTermsToQuery(contentNode, MatcherNeedContentPropertyType.IS);
             addTermsToQuery(contentNode, MatcherNeedContentPropertyType.SEEKS_SEEKS);
             addLocationFilters(contentNode, MatcherNeedContentPropertyType.IS);
             addLocationFilters(contentNode, MatcherNeedContentPropertyType.SEEKS_SEEKS);
         }
-
         for (Resource contentNode : needModelWrapper.getSeeksSeeksNodes()) {
             addTermsToQuery(contentNode, MatcherNeedContentPropertyType.SEEKS);
             addLocationFilters(contentNode, MatcherNeedContentPropertyType.SEEKS);
@@ -36,7 +31,6 @@ public class DefaultNeedQueryFactory extends BasicNeedQueryFactory {
     }
 
     private void addTermsToQuery(Resource contentNode, MatcherNeedContentPropertyType fieldType) {
-
         Collection<String> titles = needModelWrapper.getTitles(contentNode);
         Collection<String> descriptions = needModelWrapper.getDescriptions(contentNode);
         Collection<String> tags = needModelWrapper.getTags(contentNode);
