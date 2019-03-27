@@ -106,6 +106,10 @@ function updateMessageProcess(processState, connUri, messageUri, payload) {
 
 export default function(processState = initialState, action = {}) {
   switch (action.type) {
+    case actionTypes.needs.edit:
+      //TODO: IMPL
+      return processState;
+
     case actionTypes.personas.create:
     case actionTypes.needs.create:
     case actionTypes.needs.whatsNew:
@@ -114,6 +118,14 @@ export default function(processState = initialState, action = {}) {
 
     case actionTypes.failedToGetLocation:
       return processState.set("processingPublish", false);
+
+    case actionTypes.needs.editFailure:
+      //TODO: IMPL
+      return processState;
+
+    case actionTypes.needs.editSuccessful:
+      //TODO: IMPL
+      return processState;
 
     case actionTypes.needs.createSuccessful: {
       const needUri =

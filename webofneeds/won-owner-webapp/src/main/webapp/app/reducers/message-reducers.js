@@ -15,6 +15,10 @@ const initialState = Immutable.fromJS({
 });
 export function messagesReducer(messages = initialState, action = {}) {
   switch (action.type) {
+    case actionTypes.needs.edit:
+      //TODO: IMPL
+      return messages;
+
     case actionTypes.needs.connect:
     case actionTypes.personas.create:
     case actionTypes.needs.create:
@@ -22,6 +26,14 @@ export function messagesReducer(messages = initialState, action = {}) {
         ["enqueued", action.payload.eventUri],
         action.payload.message
       );
+
+    case actionTypes.needs.editFailure:
+      //TODO: IMPL
+      return messages;
+
+    case actionTypes.needs.editSuccessful:
+      //TODO: IMPL
+      return messages;
 
     case actionTypes.needs.createSuccessful:
       return messages.removeIn([
