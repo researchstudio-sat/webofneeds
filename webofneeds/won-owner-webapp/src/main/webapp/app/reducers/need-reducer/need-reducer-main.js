@@ -192,12 +192,24 @@ export default function(allNeedsInState = initialState, action = {}) {
       );
     }
 
+    case actionTypes.needs.edit:
+      //TODO: IMPL Optimistic change
+      return allNeedsInState;
+
     case actionTypes.needs.create: // optimistic need adding
       return addNeedInCreation(
         allNeedsInState,
         action.payload.need,
         action.payload.needUri
       );
+
+    case actionTypes.needs.editFailure:
+      //TODO: IMPL change
+      return allNeedsInState;
+
+    case actionTypes.needs.editSuccessful:
+      //TODO: IMPL change
+      return allNeedsInState;
 
     case actionTypes.needs.createSuccessful:
       return addNeed(allNeedsInState, action.payload.need, true);
