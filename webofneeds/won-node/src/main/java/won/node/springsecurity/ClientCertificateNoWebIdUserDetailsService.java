@@ -1,19 +1,13 @@
 /*
- * Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Copyright 2012 Research Studios Austria Forschungsges.m.b.H. Licensed under
+ * the Apache License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable
+ * law or agreed to in writing, software distributed under the License is
+ * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
  */
-
 package won.node.springsecurity;
 
 import java.net.URI;
@@ -38,27 +32,26 @@ import org.springframework.security.web.authentication.preauth.PreAuthenticatedA
  * UserDetails for future reference.
  */
 public class ClientCertificateNoWebIdUserDetailsService
-    implements AuthenticationUserDetailsService<PreAuthenticatedAuthenticationToken> {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+                implements AuthenticationUserDetailsService<PreAuthenticatedAuthenticationToken> {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Override
-  public UserDetails loadUserDetails(final PreAuthenticatedAuthenticationToken token) throws UsernameNotFoundException {
-    String principal = (String) token.getPrincipal();
-    Certificate certificate = (Certificate) token.getCredentials();
-
-    logger.debug("Adding userDetails for '" + principal + "'");
-    URI commonName = null;
-    try {
-      commonName = new URI(principal);
-    } catch (URISyntaxException e) {
-      throw new BadCredentialsException(
-          "Principal of X.509 Certificate must be a WebId URI. Actual value: '" + principal + "'");
+    @Override
+    public UserDetails loadUserDetails(final PreAuthenticatedAuthenticationToken token)
+                    throws UsernameNotFoundException {
+        String principal = (String) token.getPrincipal();
+        Certificate certificate = (Certificate) token.getCredentials();
+        logger.debug("Adding userDetails for '" + principal + "'");
+        URI commonName = null;
+        try {
+            commonName = new URI(principal);
+        } catch (URISyntaxException e) {
+            throw new BadCredentialsException(
+                            "Principal of X.509 Certificate must be a WebId URI. Actual value: '" + principal + "'");
+        }
+        // at this point, we know that a client certificate was presented. Grant this
+        // role:
+        List<GrantedAuthority> authorities = new ArrayList<>(3);
+        authorities.add(new SimpleGrantedAuthority("ROLE_CLIENT_CERTIFICATE_PRESENTED"));
+        return new ClientCertificateNoWebIdUserDetails(commonName, authorities);
     }
-
-    // at this point, we know that a client certificate was presented. Grant this
-    // role:
-    List<GrantedAuthority> authorities = new ArrayList<>(3);
-    authorities.add(new SimpleGrantedAuthority("ROLE_CLIENT_CERTIFICATE_PRESENTED"));
-    return new ClientCertificateNoWebIdUserDetails(commonName, authorities);
-  }
 }

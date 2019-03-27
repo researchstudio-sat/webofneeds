@@ -20,12 +20,11 @@ import won.protocol.vocabulary.WONMSG;
 @Component
 @FixedMessageProcessor(direction = WONMSG.TYPE_FROM_EXTERNAL_STRING, messageType = WONMSG.TYPE_CLOSE_STRING)
 public class CloseMessageFromNodeProcessor extends AbstractCamelProcessor {
-
-  public void process(final Exchange exchange) throws Exception {
-    Message message = exchange.getIn();
-    WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
-    URI connectionURIFromWonMessage = wonMessage.getReceiverURI();
-    Connection con = dataService.nextConnectionState(connectionURIFromWonMessage, ConnectionEventType.PARTNER_CLOSE);
-  }
-
+    public void process(final Exchange exchange) throws Exception {
+        Message message = exchange.getIn();
+        WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
+        URI connectionURIFromWonMessage = wonMessage.getReceiverURI();
+        Connection con = dataService.nextConnectionState(connectionURIFromWonMessage,
+                        ConnectionEventType.PARTNER_CLOSE);
+    }
 }

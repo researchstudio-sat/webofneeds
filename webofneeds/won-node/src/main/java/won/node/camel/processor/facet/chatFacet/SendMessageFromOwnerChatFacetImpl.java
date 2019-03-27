@@ -18,10 +18,10 @@ import won.protocol.vocabulary.WONMSG;
 @DefaultFacetMessageProcessor(direction = WONMSG.TYPE_FROM_OWNER_STRING, messageType = WONMSG.TYPE_CONNECTION_MESSAGE_STRING)
 @FacetMessageProcessor(facetType = WON.CHAT_FACET_STRING, direction = WONMSG.TYPE_FROM_OWNER_STRING, messageType = WONMSG.TYPE_CONNECTION_MESSAGE_STRING)
 public class SendMessageFromOwnerChatFacetImpl extends AbstractFromOwnerCamelProcessor {
-  @Override
-  public void process(final Exchange exchange) {
-    logger.debug("default facet implementation, not doing anything");
-    final WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
-    logger.debug("message with facet {}", wonMessage.getSenderFacetURI());
-  }
+    @Override
+    public void process(final Exchange exchange) {
+        logger.debug("default facet implementation, not doing anything");
+        final WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
+        logger.debug("message with facet {}", wonMessage.getSenderFacetURI());
+    }
 }

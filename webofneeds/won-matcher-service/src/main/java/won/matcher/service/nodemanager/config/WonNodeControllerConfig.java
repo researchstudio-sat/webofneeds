@@ -11,32 +11,28 @@ import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
 
 /**
- * Configuration for the won node controller
- *
- * Created by hfriedrich on 07.09.2015.
+ * Configuration for the won node controller Created by hfriedrich on
+ * 07.09.2015.
  */
 @Configuration
 @PropertySource("file:${WON_CONFIG_DIR}/matcher-service.properties")
 public class WonNodeControllerConfig {
-  @Value("#{'${wonNodeController.wonNode.crawl}'.split(',')}")
-  private List<String> crawlWonNodes;
+    @Value("#{'${wonNodeController.wonNode.crawl}'.split(',')}")
+    private List<String> crawlWonNodes;
+    @Value("#{'${wonNodeController.wonNode.skip}'.split(',')}")
+    private List<String> skipWonNodes;
+    @Value("${wonNodeController.wonNode.lifeCheckDuration}")
+    private long lifeCheckDuration;
 
-  @Value("#{'${wonNodeController.wonNode.skip}'.split(',')}")
-  private List<String> skipWonNodes;
+    public FiniteDuration getLifeCheckDuration() {
+        return Duration.create(lifeCheckDuration, TimeUnit.MILLISECONDS);
+    }
 
-  @Value("${wonNodeController.wonNode.lifeCheckDuration}")
-  private long lifeCheckDuration;
+    public List<String> getSkipWonNodes() {
+        return skipWonNodes;
+    }
 
-  public FiniteDuration getLifeCheckDuration() {
-    return Duration.create(lifeCheckDuration, TimeUnit.MILLISECONDS);
-  }
-
-  public List<String> getSkipWonNodes() {
-    return skipWonNodes;
-  }
-
-  public List<String> getCrawlWonNodes() {
-    return crawlWonNodes;
-  }
-
+    public List<String> getCrawlWonNodes() {
+        return crawlWonNodes;
+    }
 }

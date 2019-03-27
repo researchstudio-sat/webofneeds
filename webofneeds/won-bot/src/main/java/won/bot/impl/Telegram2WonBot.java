@@ -35,81 +35,66 @@ import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
  * 14.12.2016.
  */
 public class Telegram2WonBot extends EventBot {
-  private String botName;
-  private String token;
+    private String botName;
+    private String token;
+    private EventBus bus;
+    private WonTelegramBotHandler wonTelegramBotHandler;
+    @Autowired
+    private TelegramContentExtractor telegramContentExtractor;
+    @Autowired
+    private TelegramMessageGenerator telegramMessageGenerator;
 
-  private EventBus bus;
-  private WonTelegramBotHandler wonTelegramBotHandler;
-
-  @Autowired
-  private TelegramContentExtractor telegramContentExtractor;
-
-  @Autowired
-  private TelegramMessageGenerator telegramMessageGenerator;
-
-  @Override
-  protected void initializeEventListeners() {
-    EventListenerContext ctx = getEventListenerContext();
-    telegramMessageGenerator.setEventListenerContext(ctx);
-    bus = getEventBus();
-
-    // Initiate Telegram Bot Handler
-    ApiContextInitializer.init();
-
-    TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
-    try {
-      wonTelegramBotHandler = new WonTelegramBotHandler(bus, telegramMessageGenerator, botName, token);
-      logger.debug("botName: " + wonTelegramBotHandler.getBotUsername());
-      logger.debug("botTokn: " + wonTelegramBotHandler.getBotToken());
-      telegramBotsApi.registerBot(wonTelegramBotHandler);
-
-      BotBehaviour connectBehaviour = new ConnectBehaviour(ctx);
-      connectBehaviour.activate();
-
-      BotBehaviour closeBehaviour = new CloseBevahiour(ctx);
-      closeBehaviour.activate();
-
-      BotBehaviour connectionMessageBehaviour = new ConnectionMessageBehaviour(ctx);
-      connectionMessageBehaviour.activate();
-
-      // Telegram initiated Events
-      bus.subscribe(TelegramMessageReceivedEvent.class, new ActionOnEventListener(ctx, "TelegramMessageReceived",
-          new TelegramMessageReceivedAction(ctx, wonTelegramBotHandler, telegramContentExtractor)));
-
-      bus.subscribe(SendHelpEvent.class,
-          new ActionOnEventListener(ctx, "TelegramHelpAction", new TelegramHelpAction(ctx, wonTelegramBotHandler)));
-
-      bus.subscribe(TelegramCreateNeedEvent.class, new ActionOnEventListener(ctx, "TelegramCreateAction",
-          new TelegramCreateAction(ctx, wonTelegramBotHandler, telegramContentExtractor)));
-
-      // WON initiated Events
-      bus.subscribe(HintFromMatcherEvent.class,
-          new ActionOnEventListener(ctx, "HintReceived", new Hint2TelegramAction(ctx, wonTelegramBotHandler)));
-
-      bus.subscribe(ConnectFromOtherNeedEvent.class,
-          new ActionOnEventListener(ctx, "ConnectReceived", new Connect2TelegramAction(ctx, wonTelegramBotHandler)));
-
-      bus.subscribe(MessageFromOtherNeedEvent.class, new ActionOnEventListener(ctx, "ReceivedTextMessage",
-          new Message2TelegramAction(ctx, wonTelegramBotHandler)));
-
-    } catch (TelegramApiRequestException e) {
-      logger.error(e.getMessage());
+    @Override
+    protected void initializeEventListeners() {
+        EventListenerContext ctx = getEventListenerContext();
+        telegramMessageGenerator.setEventListenerContext(ctx);
+        bus = getEventBus();
+        // Initiate Telegram Bot Handler
+        ApiContextInitializer.init();
+        TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
+        try {
+            wonTelegramBotHandler = new WonTelegramBotHandler(bus, telegramMessageGenerator, botName, token);
+            logger.debug("botName: " + wonTelegramBotHandler.getBotUsername());
+            logger.debug("botTokn: " + wonTelegramBotHandler.getBotToken());
+            telegramBotsApi.registerBot(wonTelegramBotHandler);
+            BotBehaviour connectBehaviour = new ConnectBehaviour(ctx);
+            connectBehaviour.activate();
+            BotBehaviour closeBehaviour = new CloseBevahiour(ctx);
+            closeBehaviour.activate();
+            BotBehaviour connectionMessageBehaviour = new ConnectionMessageBehaviour(ctx);
+            connectionMessageBehaviour.activate();
+            // Telegram initiated Events
+            bus.subscribe(TelegramMessageReceivedEvent.class, new ActionOnEventListener(ctx, "TelegramMessageReceived",
+                            new TelegramMessageReceivedAction(ctx, wonTelegramBotHandler, telegramContentExtractor)));
+            bus.subscribe(SendHelpEvent.class, new ActionOnEventListener(ctx, "TelegramHelpAction",
+                            new TelegramHelpAction(ctx, wonTelegramBotHandler)));
+            bus.subscribe(TelegramCreateNeedEvent.class, new ActionOnEventListener(ctx, "TelegramCreateAction",
+                            new TelegramCreateAction(ctx, wonTelegramBotHandler, telegramContentExtractor)));
+            // WON initiated Events
+            bus.subscribe(HintFromMatcherEvent.class, new ActionOnEventListener(ctx, "HintReceived",
+                            new Hint2TelegramAction(ctx, wonTelegramBotHandler)));
+            bus.subscribe(ConnectFromOtherNeedEvent.class, new ActionOnEventListener(ctx, "ConnectReceived",
+                            new Connect2TelegramAction(ctx, wonTelegramBotHandler)));
+            bus.subscribe(MessageFromOtherNeedEvent.class, new ActionOnEventListener(ctx, "ReceivedTextMessage",
+                            new Message2TelegramAction(ctx, wonTelegramBotHandler)));
+        } catch (TelegramApiRequestException e) {
+            logger.error(e.getMessage());
+        }
     }
-  }
 
-  public void setBotName(final String botName) {
-    this.botName = botName;
-  }
+    public void setBotName(final String botName) {
+        this.botName = botName;
+    }
 
-  public void setToken(final String token) {
-    this.token = token;
-  }
+    public void setToken(final String token) {
+        this.token = token;
+    }
 
-  public void setTelegramContentExtractor(TelegramContentExtractor telegramContentExtractor) {
-    this.telegramContentExtractor = telegramContentExtractor;
-  }
+    public void setTelegramContentExtractor(TelegramContentExtractor telegramContentExtractor) {
+        this.telegramContentExtractor = telegramContentExtractor;
+    }
 
-  public void setTelegramMessageGenerator(TelegramMessageGenerator telegramMessageGenerator) {
-    this.telegramMessageGenerator = telegramMessageGenerator;
-  }
+    public void setTelegramMessageGenerator(TelegramMessageGenerator telegramMessageGenerator) {
+        this.telegramMessageGenerator = telegramMessageGenerator;
+    }
 }

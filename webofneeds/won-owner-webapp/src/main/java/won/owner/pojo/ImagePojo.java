@@ -1,7 +1,7 @@
 /*
- * This file is subject to the terms and conditions defined in file 'LICENSE.txt', which is part of this source code package.
+ * This file is subject to the terms and conditions defined in file
+ * 'LICENSE.txt', which is part of this source code package.
  */
-
 package won.owner.pojo;
 
 /**
@@ -9,13 +9,13 @@ package won.owner.pojo;
  * change this template use File | Settings | File Templates.
  */
 public class ImagePojo {
-  private String uri;
+    private String uri;
 
-  public String getUri() {
-    return uri;
-  }
+    public String getUri() {
+        return uri;
+    }
 
-  public void setUri(String uri) {
-    this.uri = uri;
-  }
+    public void setUri(String uri) {
+        this.uri = uri;
+    }
 }

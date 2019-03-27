@@ -9,34 +9,34 @@ import java.security.cert.X509Certificate;
  * User: ypanchenko Date: 19.10.2015
  */
 public class AliasFromFingerprintGenerator implements AliasGenerator {
-  public AliasFromFingerprintGenerator() {
-  }
-
-  @Override
-  public String generateAlias(final X509Certificate certificate) throws CertificateException {
-    String fingerprint = null;
-    try {
-      fingerprint = digest(certificate.getPublicKey().getEncoded());
-    } catch (Exception e) {
-      new CertificateException("Alias generation from certificate fingerprint failed", e);
+    public AliasFromFingerprintGenerator() {
     }
-    return fingerprint;
-  }
 
-  public String digest(final byte[] data) throws NoSuchAlgorithmException {
-    MessageDigest md = MessageDigest.getInstance("SHA3-224");
-    byte[] hash = md.digest(data);
-    StringBuffer hexString = new StringBuffer();
-    for (int i = 0; i < hash.length; i++) {
-      String hex = Integer.toHexString(0xff & hash[i]);
-      if (hex.length() == 1)
-        hexString.append('0');
-      hexString.append(hex);
+    @Override
+    public String generateAlias(final X509Certificate certificate) throws CertificateException {
+        String fingerprint = null;
+        try {
+            fingerprint = digest(certificate.getPublicKey().getEncoded());
+        } catch (Exception e) {
+            new CertificateException("Alias generation from certificate fingerprint failed", e);
+        }
+        return fingerprint;
     }
-    return hexString.toString();
-  }
 
-  public static void main(String... args) throws Exception {
-    System.out.println("digest:" + new AliasFromFingerprintGenerator().digest("digest".getBytes()));
-  }
+    public String digest(final byte[] data) throws NoSuchAlgorithmException {
+        MessageDigest md = MessageDigest.getInstance("SHA3-224");
+        byte[] hash = md.digest(data);
+        StringBuffer hexString = new StringBuffer();
+        for (int i = 0; i < hash.length; i++) {
+            String hex = Integer.toHexString(0xff & hash[i]);
+            if (hex.length() == 1)
+                hexString.append('0');
+            hexString.append(hex);
+        }
+        return hexString.toString();
+    }
+
+    public static void main(String... args) throws Exception {
+        System.out.println("digest:" + new AliasFromFingerprintGenerator().digest("digest".getBytes()));
+    }
 }

@@ -16,25 +16,23 @@ import org.slf4j.LoggerFactory;
  * certificates in the keystore, and we want to do a request with a specific one
  * out of all of them, we should provide it when asked. It can be done by using
  * for each request this private key strategy, that would serve the certificate
- * with specified alias from the keystore, when asked.
- *
- * User: ypanchenko Date: 27.07.2015
+ * with specified alias from the keystore, when asked. User: ypanchenko Date:
+ * 27.07.2015
  */
 public class PredefinedAliasPrivateKeyStrategy implements PrivateKeyStrategy {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private String alias;
 
-  private String alias;
+    public PredefinedAliasPrivateKeyStrategy(String alias) {
+        this.alias = alias;
+    }
 
-  public PredefinedAliasPrivateKeyStrategy(String alias) {
-    this.alias = alias;
-  }
+    public String chooseAlias(final Map<String, PrivateKeyDetails> map, final Socket socket) {
+        logger.debug("Choosen alias: " + alias);
+        return alias;
+    }
 
-  public String chooseAlias(final Map<String, PrivateKeyDetails> map, final Socket socket) {
-    logger.debug("Choosen alias: " + alias);
-    return alias;
-  }
-
-  public String getAlias() {
-    return alias;
-  }
+    public String getAlias() {
+        return alias;
+    }
 }

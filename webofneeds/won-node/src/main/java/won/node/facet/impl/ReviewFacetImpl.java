@@ -15,18 +15,17 @@ import won.protocol.model.FacetType;
  * created by MS on 12.12.2018
  */
 public class ReviewFacetImpl extends AbstractFacet {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Override
-  public FacetType getFacetType() {
-    return FacetType.ReviewFacet;
-  }
+    @Override
+    public FacetType getFacetType() {
+        return FacetType.ReviewFacet;
+    }
 
-  @Override
-  public void connectFromNeed(final Connection con, final Model content, final WonMessage wonMessage)
-      throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
-
-    super.connectFromNeed(con, content, wonMessage);
-    /* when connected change linked data */
-  }
+    @Override
+    public void connectFromNeed(final Connection con, final Model content, final WonMessage wonMessage)
+                    throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
+        super.connectFromNeed(con, content, wonMessage);
+        /* when connected change linked data */
+    }
 }

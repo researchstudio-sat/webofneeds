@@ -15,17 +15,15 @@ import won.owner.web.events.OnRegistrationCompleteEvent;
  */
 @Component
 public class RegistrationListener implements ApplicationListener<OnRegistrationCompleteEvent> {
-  @Autowired
-  private UserService userService;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private WonOwnerMailSender emailSender;
 
-  @Autowired
-  private WonOwnerMailSender emailSender;
-
-  @Override
-  public void onApplicationEvent(OnRegistrationCompleteEvent event) {
-    User user = event.getUser();
-    EmailVerificationToken emailVerificationToken = userService.createEmailVerificationToken(user);
-
-    emailSender.sendVerificationMessage(user, emailVerificationToken);
-  }
+    @Override
+    public void onApplicationEvent(OnRegistrationCompleteEvent event) {
+        User user = event.getUser();
+        EmailVerificationToken emailVerificationToken = userService.createEmailVerificationToken(user);
+        emailSender.sendVerificationMessage(user, emailVerificationToken);
+    }
 }

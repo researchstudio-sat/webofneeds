@@ -37,136 +37,118 @@ import won.matcher.utils.tensor.TensorMatchingData;
 @Component
 @Scope("prototype")
 public class RescalMatcherActor extends UntypedActor {
-  private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
-  private long lastQueryDate = Long.MIN_VALUE;
-  private TensorMatchingData rescalInputData = new TensorMatchingData();
-  private static final String TICK = "tick";
-  private ActorRef pubSubMediator;
+    private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
+    private long lastQueryDate = Long.MIN_VALUE;
+    private TensorMatchingData rescalInputData = new TensorMatchingData();
+    private static final String TICK = "tick";
+    private ActorRef pubSubMediator;
+    @Autowired
+    private HintReader hintReader;
+    @Autowired
+    private RescalMatcherConfig config;
 
-  @Autowired
-  private HintReader hintReader;
-
-  @Autowired
-  private RescalMatcherConfig config;
-
-  @Override
-  public void preStart() throws IOException {
-
-    // subscribe to need events
-    pubSubMediator = DistributedPubSub.get(getContext().system()).mediator();
-
-    // Execute the rescal algorithm regularly
-    getContext().system().scheduler().schedule(FiniteDuration.Zero(), config.getExecutionDuration(), getSelf(), TICK,
-        getContext().dispatcher(), null);
-  }
-
-  @Override
-  public void onReceive(final Object o) throws Exception {
-
-    if (o.equals(TICK)) {
-      executeRescalAlgorithm();
-    } else {
-      unhandled(o);
-    }
-  }
-
-  /**
-   * Load the need and connection data from the sparql endpoint, preprocess the
-   * data and write it to some directory to be processed by the rescal python
-   * algorithm that produces hints. The hints are then loaded and send to the
-   * event bus.
-   *
-   * @throws IOException
-   * @throws InterruptedException
-   */
-  private void executeRescalAlgorithm() throws IOException, InterruptedException {
-
-    // load the needs and connections from the rdf store
-    log.info("start processing (every {} minutes) ...", config.getExecutionDuration());
-    long queryDate = System.currentTimeMillis();
-    log.info("query needs and connections from rdf store '{}' from date '{}' to date '{}'", config.getSparqlEndpoint(),
-        lastQueryDate, queryDate);
-
-    // add the attributes of the needs to the rescal tensor
-    TensorEntryAllGenerator tensorEntryAllGenerator = new TensorEntryAllGenerator("queries/attribute",
-        config.getSparqlEndpoint(), lastQueryDate, queryDate);
-    TensorEntryTokenizer tokenizer = new TensorEntryTokenizer(tensorEntryAllGenerator.generateTensorEntries());
-    Collection<TensorEntry> tensorEntries = tokenizer.generateTensorEntries();
-    for (TensorEntry entry : tensorEntries) {
-      rescalInputData.addNeedAttribute(entry);
+    @Override
+    public void preStart() throws IOException {
+        // subscribe to need events
+        pubSubMediator = DistributedPubSub.get(getContext().system()).mediator();
+        // Execute the rescal algorithm regularly
+        getContext().system().scheduler().schedule(FiniteDuration.Zero(), config.getExecutionDuration(), getSelf(),
+                        TICK, getContext().dispatcher(), null);
     }
 
-    // add the connections between the needs to the rescal tensor
-    tensorEntryAllGenerator = new TensorEntryAllGenerator("queries/connection", config.getSparqlEndpoint(),
-        lastQueryDate, queryDate);
-    tensorEntries = tensorEntryAllGenerator.generateTensorEntries();
-    for (TensorEntry entry : tensorEntries) {
-      rescalInputData.addNeedConnection(entry.getNeedUri(), entry.getValue(), true);
+    @Override
+    public void onReceive(final Object o) throws Exception {
+        if (o.equals(TICK)) {
+            executeRescalAlgorithm();
+        } else {
+            unhandled(o);
+        }
     }
 
-    log.info("number of needs in tensor: {}", rescalInputData.getNeeds().size());
-    log.info("number of attributes in tensor: {}", rescalInputData.getAttributes().size());
-    log.info("number of connections in tensor: {}", rescalInputData.getNumberOfConnections());
-    log.info("number of slices in tensor: {}", rescalInputData.getSlices().size());
-    if (!rescalInputData.isValidTensor()) {
-      log.info("not enough tensor data available for execution yet, wait for next execution!");
-      return;
+    /**
+     * Load the need and connection data from the sparql endpoint, preprocess the
+     * data and write it to some directory to be processed by the rescal python
+     * algorithm that produces hints. The hints are then loaded and send to the
+     * event bus.
+     *
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    private void executeRescalAlgorithm() throws IOException, InterruptedException {
+        // load the needs and connections from the rdf store
+        log.info("start processing (every {} minutes) ...", config.getExecutionDuration());
+        long queryDate = System.currentTimeMillis();
+        log.info("query needs and connections from rdf store '{}' from date '{}' to date '{}'",
+                        config.getSparqlEndpoint(), lastQueryDate, queryDate);
+        // add the attributes of the needs to the rescal tensor
+        TensorEntryAllGenerator tensorEntryAllGenerator = new TensorEntryAllGenerator("queries/attribute",
+                        config.getSparqlEndpoint(), lastQueryDate, queryDate);
+        TensorEntryTokenizer tokenizer = new TensorEntryTokenizer(tensorEntryAllGenerator.generateTensorEntries());
+        Collection<TensorEntry> tensorEntries = tokenizer.generateTensorEntries();
+        for (TensorEntry entry : tensorEntries) {
+            rescalInputData.addNeedAttribute(entry);
+        }
+        // add the connections between the needs to the rescal tensor
+        tensorEntryAllGenerator = new TensorEntryAllGenerator("queries/connection", config.getSparqlEndpoint(),
+                        lastQueryDate, queryDate);
+        tensorEntries = tensorEntryAllGenerator.generateTensorEntries();
+        for (TensorEntry entry : tensorEntries) {
+            rescalInputData.addNeedConnection(entry.getNeedUri(), entry.getValue(), true);
+        }
+        log.info("number of needs in tensor: {}", rescalInputData.getNeeds().size());
+        log.info("number of attributes in tensor: {}", rescalInputData.getAttributes().size());
+        log.info("number of connections in tensor: {}", rescalInputData.getNumberOfConnections());
+        log.info("number of slices in tensor: {}", rescalInputData.getSlices().size());
+        if (!rescalInputData.isValidTensor()) {
+            log.info("not enough tensor data available for execution yet, wait for next execution!");
+            return;
+        }
+        // write the files for rescal algorithm
+        log.info("write rescal input data to folder: {}", config.getExecutionDirectory());
+        TensorMatchingData cleanedTensorData = rescalInputData.writeCleanedOutputFiles(config.getExecutionDirectory());
+        int tensorSize = cleanedTensorData.getTensorDimensions()[0];
+        if (rescalInputData.getNeeds().size() + rescalInputData.getAttributes().size() < config.getRescalRank()) {
+            log.info("Do not start rescal algorithm since tensor size (number of needs + number of attributes) = {} is "
+                            + "smaller than rank parameter {}.", tensorSize, config.getRescalRank());
+            return;
+        }
+        // execute the rescal algorithm in python
+        String pythonCall = "python " + config.getPythonScriptDirectory() + "/rescal-matcher.py -inputfolder "
+                        + config.getExecutionDirectory() + " -outputfolder " + config.getExecutionDirectory()
+                        + "/output" + " -rank " + config.getRescalRank() + " -threshold " + config.getRescalThreshold();
+        log.info("execute python script: " + pythonCall);
+        Process pythonProcess = Runtime.getRuntime().exec(pythonCall);
+        BufferedReader in = new BufferedReader(new InputStreamReader(pythonProcess.getInputStream()));
+        String line;
+        while ((line = in.readLine()) != null) {
+            log.info(line);
+        }
+        in.close();
+        BufferedReader err = new BufferedReader(new InputStreamReader(pythonProcess.getErrorStream()));
+        while ((line = err.readLine()) != null) {
+            log.warning(line);
+        }
+        err.close();
+        int returnCode = pythonProcess.waitFor();
+        if (returnCode != 0) {
+            log.error("rescal python call returned error code: " + returnCode);
+            return;
+        }
+        // load the predicted hints and send the to the event bus of the matching
+        // service
+        BulkHintEvent hintsEvent = hintReader.readHints(rescalInputData);
+        int numHints = (hintsEvent == null || hintsEvent.getHintEvents() == null) ? 0
+                        : hintsEvent.getHintEvents().size();
+        log.info("loaded {} hints into bulk hint event and publish", numHints);
+        if (numHints > 0) {
+            StringBuilder builder = new StringBuilder();
+            for (HintEvent hint : hintsEvent.getHintEvents()) {
+                builder.append("\n- " + hint);
+            }
+            log.info(builder.toString());
+            pubSubMediator.tell(new DistributedPubSubMediator.Publish(hintsEvent.getClass().getName(), hintsEvent),
+                            getSelf());
+        }
+        lastQueryDate = queryDate;
     }
-
-    // write the files for rescal algorithm
-    log.info("write rescal input data to folder: {}", config.getExecutionDirectory());
-    TensorMatchingData cleanedTensorData = rescalInputData.writeCleanedOutputFiles(config.getExecutionDirectory());
-
-    int tensorSize = cleanedTensorData.getTensorDimensions()[0];
-    if (rescalInputData.getNeeds().size() + rescalInputData.getAttributes().size() < config.getRescalRank()) {
-      log.info("Do not start rescal algorithm since tensor size (number of needs + number of attributes) = {} is "
-          + "smaller than rank parameter {}.", tensorSize, config.getRescalRank());
-      return;
-    }
-
-    // execute the rescal algorithm in python
-    String pythonCall = "python " + config.getPythonScriptDirectory() + "/rescal-matcher.py -inputfolder "
-        + config.getExecutionDirectory() + " -outputfolder " + config.getExecutionDirectory() + "/output" + " -rank "
-        + config.getRescalRank() + " -threshold " + config.getRescalThreshold();
-    log.info("execute python script: " + pythonCall);
-    Process pythonProcess = Runtime.getRuntime().exec(pythonCall);
-
-    BufferedReader in = new BufferedReader(new InputStreamReader(pythonProcess.getInputStream()));
-    String line;
-    while ((line = in.readLine()) != null) {
-      log.info(line);
-    }
-    in.close();
-
-    BufferedReader err = new BufferedReader(new InputStreamReader(pythonProcess.getErrorStream()));
-    while ((line = err.readLine()) != null) {
-      log.warning(line);
-    }
-    err.close();
-
-    int returnCode = pythonProcess.waitFor();
-    if (returnCode != 0) {
-      log.error("rescal python call returned error code: " + returnCode);
-      return;
-    }
-
-    // load the predicted hints and send the to the event bus of the matching
-    // service
-    BulkHintEvent hintsEvent = hintReader.readHints(rescalInputData);
-
-    int numHints = (hintsEvent == null || hintsEvent.getHintEvents() == null) ? 0 : hintsEvent.getHintEvents().size();
-    log.info("loaded {} hints into bulk hint event and publish", numHints);
-
-    if (numHints > 0) {
-      StringBuilder builder = new StringBuilder();
-      for (HintEvent hint : hintsEvent.getHintEvents()) {
-        builder.append("\n- " + hint);
-      }
-      log.info(builder.toString());
-      pubSubMediator.tell(new DistributedPubSubMediator.Publish(hintsEvent.getClass().getName(), hintsEvent),
-          getSelf());
-    }
-
-    lastQueryDate = queryDate;
-  }
 }

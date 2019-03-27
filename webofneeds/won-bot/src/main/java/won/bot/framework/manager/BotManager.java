@@ -10,21 +10,21 @@ import won.bot.framework.bot.Bot;
  *
  */
 public interface BotManager {
-  public Bot getBotForNeedURI(URI needUri);
+    public Bot getBotForNeedURI(URI needUri);
 
-  public List<Bot> getBotsForNodeURI(URI nodeUri);
+    public List<Bot> getBotsForNodeURI(URI nodeUri);
 
-  public void addBot(Bot bot);
+    public void addBot(Bot bot);
 
-  /**
-   * Drops all registered bots and uses the specified ones.
-   * 
-   * @param bots
-   */
-  public void setBots(Collection<Bot> bots);
+    /**
+     * Drops all registered bots and uses the specified ones.
+     * 
+     * @param bots
+     */
+    public void setBots(Collection<Bot> bots);
 
-  /**
-   * Indicates if all managed bots' work is done.
-   */
-  public boolean isWorkDone();
+    /**
+     * Indicates if all managed bots' work is done.
+     */
+    public boolean isWorkDone();
 }

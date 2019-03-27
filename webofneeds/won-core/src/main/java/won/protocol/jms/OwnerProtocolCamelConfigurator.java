@@ -1,19 +1,13 @@
 /*
- * Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Copyright 2012 Research Studios Austria Forschungsges.m.b.H. Licensed under
+ * the Apache License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable
+ * law or agreed to in writing, software distributed under the License is
+ * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
  */
-
 package won.protocol.jms;
 
 import java.net.URI;
@@ -24,27 +18,26 @@ import won.protocol.exception.CamelConfigurationFailedException;
 /**
  * User: LEIH-NB Date: 24.02.14
  */
-//TODO maybe can extend needconfigurator...
+// TODO maybe can extend needconfigurator...
 public interface OwnerProtocolCamelConfigurator extends CamelConfigurator {
-  String configureCamelEndpointForNodeURI(URI wonNodeURI, URI brokerURI, String ownerProtocolQueueName)
-      throws CamelConfigurationFailedException;
+    String configureCamelEndpointForNodeURI(URI wonNodeURI, URI brokerURI, String ownerProtocolQueueName)
+                    throws CamelConfigurationFailedException;
 
-  void addRemoteQueueListener(String endpoint, URI remoteEndpoint) throws CamelConfigurationFailedException;
+    void addRemoteQueueListener(String endpoint, URI remoteEndpoint) throws CamelConfigurationFailedException;
 
-  String getStartingEndpoint(URI wonNodeURI);
+    String getStartingEndpoint(URI wonNodeURI);
 
-  void setStartingEndpoint(URI wonNodeURI, String startingEndpoint);
+    void setStartingEndpoint(URI wonNodeURI, String startingEndpoint);
 
-  void setStartingComponent(String startingComponent);
+    void setStartingComponent(String startingComponent);
 
-  String getBrokerComponentName(URI resourceUri);
+    String getBrokerComponentName(URI resourceUri);
 
-  void setDefaultNodeURI(String defaultNodeURI);
+    void setDefaultNodeURI(String defaultNodeURI);
 
-  void setComponentName(String componentName);
+    void setComponentName(String componentName);
 
-  void addCamelComponentForWonNodeBroker(URI wonNodeURI, String brokerComponentName);
+    void addCamelComponentForWonNodeBroker(URI wonNodeURI, String brokerComponentName);
 
-  void setMessagingContext(MessagingContext messagingContext);
-
+    void setMessagingContext(MessagingContext messagingContext);
 }

@@ -15,21 +15,20 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
  * User: t.kozel Date: 11/8/13
  */
 public class AjaxLoginUrlAuthenticationEntryPoint extends LoginUrlAuthenticationEntryPoint {
+    private static final RequestMatcher requestMatcher = new ELRequestMatcher(
+                    "hasHeader('X-Requested-With','XMLHttpRequest')");
 
-  private static final RequestMatcher requestMatcher = new ELRequestMatcher(
-      "hasHeader('X-Requested-With','XMLHttpRequest')");
-
-  public AjaxLoginUrlAuthenticationEntryPoint(final String loginFormUrl) {
-    super(loginFormUrl);
-  }
-
-  @Override
-  public void commence(final HttpServletRequest request, final HttpServletResponse response,
-      final AuthenticationException authException) throws IOException, ServletException {
-    if (requestMatcher.matches(request)) {
-      response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
-    } else {
-      super.commence(request, response, authException);
+    public AjaxLoginUrlAuthenticationEntryPoint(final String loginFormUrl) {
+        super(loginFormUrl);
     }
-  }
+
+    @Override
+    public void commence(final HttpServletRequest request, final HttpServletResponse response,
+                    final AuthenticationException authException) throws IOException, ServletException {
+        if (requestMatcher.matches(request)) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+        } else {
+            super.commence(request, response, authException);
+        }
+    }
 }

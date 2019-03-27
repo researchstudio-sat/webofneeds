@@ -14,9 +14,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface FacetMessageProcessor {
-  String facetType();
+    String facetType();
 
-  String direction();
+    String direction();
 
-  String messageType();
+    String messageType();
 }

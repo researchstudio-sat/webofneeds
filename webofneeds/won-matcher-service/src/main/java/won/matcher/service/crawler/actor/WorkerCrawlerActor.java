@@ -51,193 +51,171 @@ import won.protocol.vocabulary.WON;
 @Component
 @Scope("prototype")
 public class WorkerCrawlerActor extends UntypedActor {
-  private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
+    private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
+    @Autowired
+    private LinkedDataSourceBase linkedDataSource;
+    @Autowired
+    private CrawlSparqlService sparqlService;
+    @Autowired
+    private CrawlConfig config;
+    private ActorRef pubSubMediator;
 
-  @Autowired
-  private LinkedDataSourceBase linkedDataSource;
-
-  @Autowired
-  private CrawlSparqlService sparqlService;
-
-  @Autowired
-  private CrawlConfig config;
-
-  private ActorRef pubSubMediator;
-
-  @Override
-  public void preStart() {
-
-    // initialize the distributed event bus to send need events to the matchers
-    pubSubMediator = DistributedPubSub.get(getContext().system()).mediator();
-  }
-
-  /**
-   * Receives messages with an URI and processes them by requesting the resource,
-   * saving it to a triple store, extracting URIs from content and answering the
-   * sender.
-   *
-   * @param msg if type is {@link CrawlUriMessage} then process it
-   */
-  @Override
-  public void onReceive(Object msg) throws RestClientException {
-
-    if (!(msg instanceof CrawlUriMessage)) {
-      unhandled(msg);
-      return;
+    @Override
+    public void preStart() {
+        // initialize the distributed event bus to send need events to the matchers
+        pubSubMediator = DistributedPubSub.get(getContext().system()).mediator();
     }
 
-    CrawlUriMessage uriMsg = (CrawlUriMessage) msg;
-    if (!uriMsg.getStatus().equals(CrawlUriMessage.STATUS.PROCESS)
-        && !uriMsg.getStatus().equals(CrawlUriMessage.STATUS.SAVE)) {
-      unhandled(msg);
-      return;
+    /**
+     * Receives messages with an URI and processes them by requesting the resource,
+     * saving it to a triple store, extracting URIs from content and answering the
+     * sender.
+     *
+     * @param msg if type is {@link CrawlUriMessage} then process it
+     */
+    @Override
+    public void onReceive(Object msg) throws RestClientException {
+        if (!(msg instanceof CrawlUriMessage)) {
+            unhandled(msg);
+            return;
+        }
+        CrawlUriMessage uriMsg = (CrawlUriMessage) msg;
+        if (!uriMsg.getStatus().equals(CrawlUriMessage.STATUS.PROCESS)
+                        && !uriMsg.getStatus().equals(CrawlUriMessage.STATUS.SAVE)) {
+            unhandled(msg);
+            return;
+        }
+        crawlUri(uriMsg);
     }
 
-    crawlUri(uriMsg);
-  }
-
-  private void crawlUri(CrawlUriMessage uriMsg) {
-
-    Dataset ds = null;
-    List<String> etags = null;
-    Lock lock = null;
-
-    try {
-
-      // check if resource is already downloaded
-      if (uriMsg instanceof ResourceCrawlUriMessage) {
-        ResourceCrawlUriMessage resMsg = ((ResourceCrawlUriMessage) uriMsg);
-        if (resMsg.getSerializedResource() != null && resMsg.getSerializationFormat() != null) {
-          // TODO: this should be optimized, why deserialize the resource here when we
-          // just want to save it in the RDF
-          // store? How to insert this serialized resource into the SPARQL endpoint?
-          ds = SparqlService.deserializeDataset(resMsg.getSerializedResource(), resMsg.getSerializationFormat());
+    private void crawlUri(CrawlUriMessage uriMsg) {
+        Dataset ds = null;
+        List<String> etags = null;
+        Lock lock = null;
+        try {
+            // check if resource is already downloaded
+            if (uriMsg instanceof ResourceCrawlUriMessage) {
+                ResourceCrawlUriMessage resMsg = ((ResourceCrawlUriMessage) uriMsg);
+                if (resMsg.getSerializedResource() != null && resMsg.getSerializationFormat() != null) {
+                    // TODO: this should be optimized, why deserialize the resource here when we
+                    // just want to save it in the RDF
+                    // store? How to insert this serialized resource into the SPARQL endpoint?
+                    ds = SparqlService.deserializeDataset(resMsg.getSerializedResource(),
+                                    resMsg.getSerializationFormat());
+                }
+            }
+            // download resource if not already downloaded
+            if (ds == null) {
+                // use ETag/If-None-Match Headers to make the process more efficient
+                HttpHeaders httpHeaders = new HttpHeaders();
+                if (uriMsg.getResourceETagHeaderValues() != null && !uriMsg.getResourceETagHeaderValues().isEmpty()) {
+                    String ifNoneMatchHeaderValue = StringUtils
+                                    .collectionToDelimitedString(uriMsg.getResourceETagHeaderValues(), ", ");
+                    httpHeaders.add("If-None-Match", ifNoneMatchHeaderValue);
+                }
+                DatasetResponseWithStatusCodeAndHeaders datasetWithHeaders = linkedDataSource
+                                .getDatasetWithHeadersForResource(URI.create(uriMsg.getUri()), httpHeaders);
+                ds = datasetWithHeaders.getDataset();
+                etags = datasetWithHeaders.getResponseHeaders().get("ETag");
+                // if dataset was not modified (304) we can treat the current crawl uri as done
+                if (ds == null && datasetWithHeaders.getStatusCode() == 304) {
+                    sendDoneUriMessage(uriMsg, uriMsg.getWonNodeUri(), etags);
+                    return;
+                }
+                // if there is paging activated and the won node tells us that there is more
+                // data (previous link)
+                // to be downloaded, then we add this link to the crawling process too
+                String prevLink = linkedDataSource.getPreviousLinkFromDatasetWithHeaders(datasetWithHeaders);
+                if (prevLink != null) {
+                    CrawlUriMessage newUriMsg = new CrawlUriMessage(uriMsg.getBaseUri(), prevLink,
+                                    uriMsg.getWonNodeUri(), CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis(),
+                                    null);
+                    getSender().tell(newUriMsg, getSelf());
+                }
+            }
+            lock = ds == null ? null : ds.getLock();
+            lock.enterCriticalSection(true);
+            // Save dataset to triple store
+            sparqlService.updateNamedGraphsOfDataset(ds);
+            String wonNodeUri = extractWonNodeUri(ds, uriMsg.getUri());
+            if (wonNodeUri == null) {
+                wonNodeUri = uriMsg.getWonNodeUri();
+            }
+            // do nothing more here if the STATUS of the message was SAVE
+            if (uriMsg.getStatus().equals(CrawlUriMessage.STATUS.SAVE)) {
+                log.debug("processed crawl uri event {} with status 'SAVE'", uriMsg);
+                return;
+            }
+            // extract URIs from current resource and send extracted URI messages back to
+            // sender
+            log.debug("Extract URIs from message {}", uriMsg);
+            Set<CrawlUriMessage> newCrawlMessages = sparqlService.extractCrawlUriMessages(uriMsg.getBaseUri(),
+                            wonNodeUri);
+            for (CrawlUriMessage newMsg : newCrawlMessages) {
+                getSender().tell(newMsg, getSelf());
+            }
+            // signal sender that this URI is processed and save meta data about crawling
+            // the URI.
+            // This needs to be done after all extracted URI messages have been sent to
+            // guarantee consistency
+            // in case of failure
+            sendDoneUriMessage(uriMsg, wonNodeUri, etags);
+            // if this URI/dataset was a need then send an event to the distributed event bu
+            if (NeedModelWrapper.isANeed(ds)) {
+                NeedModelWrapper needModelWrapper = new NeedModelWrapper(ds, false);
+                NeedState state = needModelWrapper.getNeedState();
+                NeedEvent.TYPE type = state.equals(NeedState.ACTIVE) ? NeedEvent.TYPE.ACTIVE : NeedEvent.TYPE.INACTIVE;
+                log.debug("Created need event for need uri {}", uriMsg.getUri());
+                long crawlDate = System.currentTimeMillis();
+                NeedEvent needEvent = new NeedEvent(uriMsg.getUri(), wonNodeUri, type, crawlDate, ds);
+                pubSubMediator.tell(new DistributedPubSubMediator.Publish(needEvent.getClass().getName(), needEvent),
+                                getSelf());
+            }
+        } catch (RestClientException e1) {
+            // usually happens if the fetch of the dataset fails e.g.
+            // HttpServerErrorException, HttpClientErrorException
+            log.debug("Exception during crawling: " + e1);
+            throw new CrawlWrapperException(e1, uriMsg);
+        } catch (Exception e) {
+            log.debug("Exception during crawling: " + e);
+            throw new CrawlWrapperException(e, uriMsg);
+        } finally {
+            if (lock != null) {
+                lock.leaveCriticalSection();
+            }
         }
-      }
+    }
 
-      // download resource if not already downloaded
-      if (ds == null) {
-
-        // use ETag/If-None-Match Headers to make the process more efficient
-        HttpHeaders httpHeaders = new HttpHeaders();
-        if (uriMsg.getResourceETagHeaderValues() != null && !uriMsg.getResourceETagHeaderValues().isEmpty()) {
-          String ifNoneMatchHeaderValue = StringUtils.collectionToDelimitedString(uriMsg.getResourceETagHeaderValues(),
-              ", ");
-          httpHeaders.add("If-None-Match", ifNoneMatchHeaderValue);
+    /**
+     * Extract won node uri from a won resource
+     *
+     * @param ds resource as dataset
+     * @param uri uri that represents resource
+     * @return won node uri or null if link to won node is not linked in the
+     * resource
+     */
+    private String extractWonNodeUri(Dataset ds, String uri) {
+        try {
+            return RdfUtils.findOnePropertyFromResource(ds, URI.create(uri), WON.HAS_WON_NODE).asResource().getURI();
+        } catch (IncorrectPropertyCountException e) {
+            return null;
         }
+    }
 
-        DatasetResponseWithStatusCodeAndHeaders datasetWithHeaders = linkedDataSource
-            .getDatasetWithHeadersForResource(URI.create(uriMsg.getUri()), httpHeaders);
-        ds = datasetWithHeaders.getDataset();
-        etags = datasetWithHeaders.getResponseHeaders().get("ETag");
-
-        // if dataset was not modified (304) we can treat the current crawl uri as done
-        if (ds == null && datasetWithHeaders.getStatusCode() == 304) {
-          sendDoneUriMessage(uriMsg, uriMsg.getWonNodeUri(), etags);
-          return;
-        }
-
-        // if there is paging activated and the won node tells us that there is more
-        // data (previous link)
-        // to be downloaded, then we add this link to the crawling process too
-        String prevLink = linkedDataSource.getPreviousLinkFromDatasetWithHeaders(datasetWithHeaders);
-        if (prevLink != null) {
-          CrawlUriMessage newUriMsg = new CrawlUriMessage(uriMsg.getBaseUri(), prevLink, uriMsg.getWonNodeUri(),
-              CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis(), null);
-          getSender().tell(newUriMsg, getSelf());
-        }
-      }
-
-      lock = ds == null ? null : ds.getLock();
-      lock.enterCriticalSection(true);
-
-      // Save dataset to triple store
-      sparqlService.updateNamedGraphsOfDataset(ds);
-      String wonNodeUri = extractWonNodeUri(ds, uriMsg.getUri());
-      if (wonNodeUri == null) {
-        wonNodeUri = uriMsg.getWonNodeUri();
-      }
-
-      // do nothing more here if the STATUS of the message was SAVE
-      if (uriMsg.getStatus().equals(CrawlUriMessage.STATUS.SAVE)) {
-        log.debug("processed crawl uri event {} with status 'SAVE'", uriMsg);
-        return;
-      }
-
-      // extract URIs from current resource and send extracted URI messages back to
-      // sender
-      log.debug("Extract URIs from message {}", uriMsg);
-      Set<CrawlUriMessage> newCrawlMessages = sparqlService.extractCrawlUriMessages(uriMsg.getBaseUri(), wonNodeUri);
-      for (CrawlUriMessage newMsg : newCrawlMessages) {
-        getSender().tell(newMsg, getSelf());
-      }
-
-      // signal sender that this URI is processed and save meta data about crawling
-      // the URI.
-      // This needs to be done after all extracted URI messages have been sent to
-      // guarantee consistency
-      // in case of failure
-      sendDoneUriMessage(uriMsg, wonNodeUri, etags);
-
-      // if this URI/dataset was a need then send an event to the distributed event bu
-      if (NeedModelWrapper.isANeed(ds)) {
-        NeedModelWrapper needModelWrapper = new NeedModelWrapper(ds, false);
-        NeedState state = needModelWrapper.getNeedState();
-
-        NeedEvent.TYPE type = state.equals(NeedState.ACTIVE) ? NeedEvent.TYPE.ACTIVE : NeedEvent.TYPE.INACTIVE;
-        log.debug("Created need event for need uri {}", uriMsg.getUri());
+    private void sendDoneUriMessage(CrawlUriMessage sourceUriMessage, String wonNodeUri, Collection<String> etags) {
         long crawlDate = System.currentTimeMillis();
-        NeedEvent needEvent = new NeedEvent(uriMsg.getUri(), wonNodeUri, type, crawlDate, ds);
-        pubSubMediator.tell(new DistributedPubSubMediator.Publish(needEvent.getClass().getName(), needEvent),
-            getSelf());
-      }
-
-    } catch (RestClientException e1) {
-      // usually happens if the fetch of the dataset fails e.g.
-      // HttpServerErrorException, HttpClientErrorException
-      log.debug("Exception during crawling: " + e1);
-      throw new CrawlWrapperException(e1, uriMsg);
-    } catch (Exception e) {
-      log.debug("Exception during crawling: " + e);
-      throw new CrawlWrapperException(e, uriMsg);
-    } finally {
-      if (lock != null) {
-        lock.leaveCriticalSection();
-      }
+        CrawlUriMessage uriDoneMsg = new CrawlUriMessage(sourceUriMessage.getUri(), sourceUriMessage.getBaseUri(),
+                        wonNodeUri, CrawlUriMessage.STATUS.DONE, crawlDate, etags);
+        String ifNoneMatch = sourceUriMessage.getResourceETagHeaderValues() != null
+                        ? String.join(", ", sourceUriMessage.getResourceETagHeaderValues())
+                        : "<None>";
+        String responseETags = etags != null ? String.join(", ", etags) : "<None>";
+        log.debug("Crawling done for URI {} with ETag Header Values {} (If-None-Match request value: {})",
+                        uriDoneMsg.getUri(), responseETags, ifNoneMatch);
+        getSender().tell(uriDoneMsg, getSelf());
     }
-  }
 
-  /**
-   * Extract won node uri from a won resource
-   *
-   * @param ds  resource as dataset
-   * @param uri uri that represents resource
-   * @return won node uri or null if link to won node is not linked in the
-   *         resource
-   */
-  private String extractWonNodeUri(Dataset ds, String uri) {
-    try {
-      return RdfUtils.findOnePropertyFromResource(ds, URI.create(uri), WON.HAS_WON_NODE).asResource().getURI();
-    } catch (IncorrectPropertyCountException e) {
-      return null;
+    public void setSparqlService(final CrawlSparqlService sparqlService) {
+        this.sparqlService = sparqlService;
     }
-  }
-
-  private void sendDoneUriMessage(CrawlUriMessage sourceUriMessage, String wonNodeUri, Collection<String> etags) {
-
-    long crawlDate = System.currentTimeMillis();
-    CrawlUriMessage uriDoneMsg = new CrawlUriMessage(sourceUriMessage.getUri(), sourceUriMessage.getBaseUri(),
-        wonNodeUri, CrawlUriMessage.STATUS.DONE, crawlDate, etags);
-    String ifNoneMatch = sourceUriMessage.getResourceETagHeaderValues() != null
-        ? String.join(", ", sourceUriMessage.getResourceETagHeaderValues())
-        : "<None>";
-    String responseETags = etags != null ? String.join(", ", etags) : "<None>";
-    log.debug("Crawling done for URI {} with ETag Header Values {} (If-None-Match request value: {})",
-        uriDoneMsg.getUri(), responseETags, ifNoneMatch);
-    getSender().tell(uriDoneMsg, getSelf());
-  }
-
-  public void setSparqlService(final CrawlSparqlService sparqlService) {
-    this.sparqlService = sparqlService;
-  }
 }

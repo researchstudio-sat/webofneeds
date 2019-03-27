@@ -1,19 +1,13 @@
 /*
- * Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Copyright 2012 Research Studios Austria Forschungsges.m.b.H. Licensed under
+ * the Apache License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable
+ * law or agreed to in writing, software distributed under the License is
+ * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
  */
-
 package won.node.camel.processor.fixed;
 
 import java.net.URI;
@@ -43,35 +37,32 @@ import won.protocol.vocabulary.WONMSG;
 @Component
 @FixedMessageReactionProcessor(direction = WONMSG.TYPE_FROM_OWNER_STRING, messageType = WONMSG.TYPE_DEACTIVATE_STRING)
 public class DeactivateNeedMessageFromOwnerReactionProcessor extends AbstractCamelProcessor {
-  Logger logger = LoggerFactory.getLogger(this.getClass());
+    Logger logger = LoggerFactory.getLogger(this.getClass());
 
-  public void process(final Exchange exchange) throws Exception {
-    WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
-    URI receiverNeedURI = wonMessage.getReceiverNeedURI();
-    logger.debug("DEACTIVATING need. needURI:{}", receiverNeedURI);
-    if (receiverNeedURI == null)
-      throw new WonMessageProcessingException("receiverNeedURI is not set");
-    Need need = DataAccessUtils.loadNeed(needRepository, receiverNeedURI);
-    matcherProtocolMatcherClient.needDeactivated(need.getNeedURI(), wonMessage);
-    // close all connections
-    Collection<Connection> conns = connectionRepository.getConnectionsByNeedURIAndNotInStateForUpdate(need.getNeedURI(),
-        ConnectionState.CLOSED);
-    for (Connection con : conns) {
-      closeConnection(need, con);
+    public void process(final Exchange exchange) throws Exception {
+        WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
+        URI receiverNeedURI = wonMessage.getReceiverNeedURI();
+        logger.debug("DEACTIVATING need. needURI:{}", receiverNeedURI);
+        if (receiverNeedURI == null)
+            throw new WonMessageProcessingException("receiverNeedURI is not set");
+        Need need = DataAccessUtils.loadNeed(needRepository, receiverNeedURI);
+        matcherProtocolMatcherClient.needDeactivated(need.getNeedURI(), wonMessage);
+        // close all connections
+        Collection<Connection> conns = connectionRepository
+                        .getConnectionsByNeedURIAndNotInStateForUpdate(need.getNeedURI(), ConnectionState.CLOSED);
+        for (Connection con : conns) {
+            closeConnection(need, con);
+        }
     }
 
-  }
-
-  public void closeConnection(final Need need, final Connection con) {
-    // send close from system to each connection
-    // the close message is directed at our local connection. It will
-    // be routed to the owner and forwarded to to remote connection
-    URI messageURI = wonNodeInformationService.generateEventURI();
-    WonMessage message = WonMessageBuilder.setMessagePropertiesForClose(messageURI, WonMessageDirection.FROM_SYSTEM,
-        con.getConnectionURI(), con.getNeedURI(), need.getWonNodeURI(), con.getConnectionURI(), con.getNeedURI(),
-        need.getWonNodeURI(), "Closed because Need was deactivated").build();
-
-    sendSystemMessage(message);
-  }
-
+    public void closeConnection(final Need need, final Connection con) {
+        // send close from system to each connection
+        // the close message is directed at our local connection. It will
+        // be routed to the owner and forwarded to to remote connection
+        URI messageURI = wonNodeInformationService.generateEventURI();
+        WonMessage message = WonMessageBuilder.setMessagePropertiesForClose(messageURI, WonMessageDirection.FROM_SYSTEM,
+                        con.getConnectionURI(), con.getNeedURI(), need.getWonNodeURI(), con.getConnectionURI(),
+                        con.getNeedURI(), need.getWonNodeURI(), "Closed because Need was deactivated").build();
+        sendSystemMessage(message);
+    }
 }

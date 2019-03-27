@@ -19,19 +19,18 @@ import won.protocol.vocabulary.WONMSG;
 @Component
 @FixedMessageProcessor(direction = WONMSG.TYPE_FROM_SYSTEM_STRING, messageType = WONMSG.TYPE_OPEN_STRING)
 public class OpenMessageFromSystemProcessor extends AbstractFromOwnerCamelProcessor {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+    @Autowired
+    private OpenMessageFromOwnerProcessor openFromOwnerProcessor;
 
-  @Autowired
-  private OpenMessageFromOwnerProcessor openFromOwnerProcessor;
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        logger.info("processing OPEN message from system for {} as if it was sent from owner",
+                        ((WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER)).getSenderURI());
+        openFromOwnerProcessor.process(exchange);
+    }
 
-  @Override
-  public void process(Exchange exchange) throws Exception {
-    logger.info("processing OPEN message from system for {} as if it was sent from owner",
-        ((WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER)).getSenderURI());
-    openFromOwnerProcessor.process(exchange);
-  }
-
-  public void setOpenFromOwnerProcessor(OpenMessageFromOwnerProcessor openFromOwnerProcessor) {
-    this.openFromOwnerProcessor = openFromOwnerProcessor;
-  }
+    public void setOpenFromOwnerProcessor(OpenMessageFromOwnerProcessor openFromOwnerProcessor) {
+        this.openFromOwnerProcessor = openFromOwnerProcessor;
+    }
 }

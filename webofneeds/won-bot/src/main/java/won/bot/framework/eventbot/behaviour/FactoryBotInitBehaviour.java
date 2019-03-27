@@ -16,25 +16,24 @@ import won.bot.framework.eventbot.listener.impl.ActionOnFirstEventListener;
  * InitFactoryBotBehaviour
  */
 public class FactoryBotInitBehaviour extends BotBehaviour {
-  public FactoryBotInitBehaviour(EventListenerContext context) {
-    super(context);
-  }
+    public FactoryBotInitBehaviour(EventListenerContext context) {
+        super(context);
+    }
 
-  public FactoryBotInitBehaviour(EventListenerContext context, String name) {
-    super(context, name);
-  }
+    public FactoryBotInitBehaviour(EventListenerContext context, String name) {
+        super(context, name);
+    }
 
-  @Override
-  protected void onActivate(Optional<Object> message) {
-    subscribeWithAutoCleanup(InitializeEvent.class, new ActionOnEventListener(context, new InitFactoryAction(context)));
-
-    subscribeWithAutoCleanup(InitFactoryFinishedEvent.class,
-        new ActionOnFirstEventListener(context, new BaseEventBotAction(context) {
-          @Override
-          protected void doRun(Event event, EventListener executingListener) throws Exception {
-            FactoryBotInitBehaviour.this.deactivate();
-          }
-        }));
-
-  }
+    @Override
+    protected void onActivate(Optional<Object> message) {
+        subscribeWithAutoCleanup(InitializeEvent.class,
+                        new ActionOnEventListener(context, new InitFactoryAction(context)));
+        subscribeWithAutoCleanup(InitFactoryFinishedEvent.class,
+                        new ActionOnFirstEventListener(context, new BaseEventBotAction(context) {
+                            @Override
+                            protected void doRun(Event event, EventListener executingListener) throws Exception {
+                                FactoryBotInitBehaviour.this.deactivate();
+                            }
+                        }));
+    }
 }

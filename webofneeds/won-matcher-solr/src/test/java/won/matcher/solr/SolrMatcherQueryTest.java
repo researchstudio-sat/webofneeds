@@ -25,60 +25,47 @@ import won.matcher.solr.spring.SolrTestAppConfiguration;
  * Utility test app to query an Solr index and check what results it returns.
  */
 public class SolrMatcherQueryTest {
-  public static void main(String[] args) throws IOException, InterruptedException, JsonLdError, SolrServerException {
-
-    AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(SolrTestAppConfiguration.class);
-
-    HintBuilder hintBuilder = ctx.getBean(HintBuilder.class);
-    // DefaultMatcherQueryExecuter queryExecutor =
-    // ctx.getBean(DefaultMatcherQueryExecuter.class);
-    TestMatcherQueryExecutor queryExecutor = ctx.getBean(TestMatcherQueryExecutor.class);
-
-    // set the options of the need producer (e.g. if it should exhaust) in the
-    // SolrNeedIndexerAppConfiguration file
-    NeedProducer needProducer = ctx.getBean(RoundRobinCompositeNeedProducer.class);
-
-    while (!needProducer.isExhausted()) { // && needs < 20) {
-
-      Dataset ds = needProducer.create();
-
-      try {
-
-        TestNeedQueryFactory needQuery = new TestNeedQueryFactory(ds);
-
-        String query = needQuery.createQuery();
-        System.out.println("execute query: " + query);
-
-        SolrDocumentList docs = queryExecutor.executeNeedQuery(query, 20, null,
-            new BasicNeedQueryFactory(ds).createQuery());
-        SolrDocumentList matchedDocs = hintBuilder.calculateMatchingResults(docs);
-        System.out.println("Found docs: " + ((docs != null) ? docs.size() : 0) + ", keep docs: "
-            + ((matchedDocs != null) ? matchedDocs.size() : 0));
-        if (docs == null) {
-          continue;
+    public static void main(String[] args) throws IOException, InterruptedException, JsonLdError, SolrServerException {
+        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(SolrTestAppConfiguration.class);
+        HintBuilder hintBuilder = ctx.getBean(HintBuilder.class);
+        // DefaultMatcherQueryExecuter queryExecutor =
+        // ctx.getBean(DefaultMatcherQueryExecuter.class);
+        TestMatcherQueryExecutor queryExecutor = ctx.getBean(TestMatcherQueryExecutor.class);
+        // set the options of the need producer (e.g. if it should exhaust) in the
+        // SolrNeedIndexerAppConfiguration file
+        NeedProducer needProducer = ctx.getBean(RoundRobinCompositeNeedProducer.class);
+        while (!needProducer.isExhausted()) { // && needs < 20) {
+            Dataset ds = needProducer.create();
+            try {
+                TestNeedQueryFactory needQuery = new TestNeedQueryFactory(ds);
+                String query = needQuery.createQuery();
+                System.out.println("execute query: " + query);
+                SolrDocumentList docs = queryExecutor.executeNeedQuery(query, 20, null,
+                                new BasicNeedQueryFactory(ds).createQuery());
+                SolrDocumentList matchedDocs = hintBuilder.calculateMatchingResults(docs);
+                System.out.println("Found docs: " + ((docs != null) ? docs.size() : 0) + ", keep docs: "
+                                + ((matchedDocs != null) ? matchedDocs.size() : 0));
+                if (docs == null) {
+                    continue;
+                }
+                System.out.println("Keep docs: ");
+                System.out.println("======================");
+                for (SolrDocument doc : matchedDocs) {
+                    String score = doc.getFieldValue("score").toString();
+                    String matchedNeedId = doc.getFieldValue("id").toString();
+                    System.out.println("Score: " + score + ", Id: " + matchedNeedId);
+                }
+                System.out.println("All docs: ");
+                System.out.println("======================");
+                for (SolrDocument doc : docs) {
+                    String score = doc.getFieldValue("score").toString();
+                    String matchedNeedId = doc.getFieldValue("id").toString();
+                    System.out.println("Score: " + score + ", Id: " + matchedNeedId);
+                }
+            } catch (SolrException e) {
+                System.err.println(e);
+            }
         }
-
-        System.out.println("Keep docs: ");
-        System.out.println("======================");
-        for (SolrDocument doc : matchedDocs) {
-          String score = doc.getFieldValue("score").toString();
-          String matchedNeedId = doc.getFieldValue("id").toString();
-          System.out.println("Score: " + score + ", Id: " + matchedNeedId);
-        }
-
-        System.out.println("All docs: ");
-        System.out.println("======================");
-        for (SolrDocument doc : docs) {
-          String score = doc.getFieldValue("score").toString();
-          String matchedNeedId = doc.getFieldValue("id").toString();
-          System.out.println("Score: " + score + ", Id: " + matchedNeedId);
-        }
-
-      } catch (SolrException e) {
-        System.err.println(e);
-      }
+        System.exit(0);
     }
-
-    System.exit(0);
-  }
 }

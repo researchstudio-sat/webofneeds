@@ -1,19 +1,13 @@
 /*
- * Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Copyright 2012 Research Studios Austria Forschungsges.m.b.H. Licensed under
+ * the Apache License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable
+ * law or agreed to in writing, software distributed under the License is
+ * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
  */
-
 package won.bot.framework.eventbot.listener;
 
 import won.bot.framework.eventbot.EventListenerContext;
@@ -26,70 +20,70 @@ import won.bot.framework.eventbot.filter.EventFilter;
  * from all further events.
  */
 public abstract class AbstractFinishingListener extends BaseEventListener implements FinishingListener {
-  private Object monitor = new Object();
-  private boolean finished = false;
+    private Object monitor = new Object();
+    private boolean finished = false;
 
-  protected AbstractFinishingListener(final EventListenerContext context) {
-    super(context);
-  }
-
-  protected AbstractFinishingListener(final EventListenerContext context, final EventFilter eventFilter) {
-    super(context, eventFilter);
-  }
-
-  protected AbstractFinishingListener(final EventListenerContext context, final String name) {
-    super(context, name);
-  }
-
-  protected AbstractFinishingListener(final EventListenerContext context, final String name,
-      final EventFilter eventFilter) {
-    super(context, name, eventFilter);
-  }
-
-  @Override
-  public void doOnEvent(final Event event) throws Exception {
-    boolean doRun = true;
-    synchronized (monitor) {
-      if (finished) {
-        logger.debug("not executing handleEvent() as listener is finished: {}", this);
-        return;
-      }
-      if (isFinished()) {
-        logger.debug("not executing handleEvent() as listener's finishing condition is met: {}", this);
-        doRun = false;
-      }
+    protected AbstractFinishingListener(final EventListenerContext context) {
+        super(context);
     }
-    if (doRun) {
-      handleEvent(event);
+
+    protected AbstractFinishingListener(final EventListenerContext context, final EventFilter eventFilter) {
+        super(context, eventFilter);
     }
-    if (isFinished()) {
-      logger.debug("performing finishing actions for listener: {}", this);
-      performFinish();
+
+    protected AbstractFinishingListener(final EventListenerContext context, final String name) {
+        super(context, name);
     }
-  }
 
-  /**
-   * Performs all finishing actions and sets the finished flag
-   */
-  protected void performFinish() {
-    synchronized (monitor) {
-      if (finished)
-        return;
-      unsubscribe();
-      publishFinishedEvent();
-      finished = true;
+    protected AbstractFinishingListener(final EventListenerContext context, final String name,
+                    final EventFilter eventFilter) {
+        super(context, name, eventFilter);
     }
-  }
 
-  protected abstract void unsubscribe();
+    @Override
+    public void doOnEvent(final Event event) throws Exception {
+        boolean doRun = true;
+        synchronized (monitor) {
+            if (finished) {
+                logger.debug("not executing handleEvent() as listener is finished: {}", this);
+                return;
+            }
+            if (isFinished()) {
+                logger.debug("not executing handleEvent() as listener's finishing condition is met: {}", this);
+                doRun = false;
+            }
+        }
+        if (doRun) {
+            handleEvent(event);
+        }
+        if (isFinished()) {
+            logger.debug("performing finishing actions for listener: {}", this);
+            performFinish();
+        }
+    }
 
-  protected abstract void handleEvent(final Event event) throws Exception;
+    /**
+     * Performs all finishing actions and sets the finished flag
+     */
+    protected void performFinish() {
+        synchronized (monitor) {
+            if (finished)
+                return;
+            unsubscribe();
+            publishFinishedEvent();
+            finished = true;
+        }
+    }
 
-  @Override
-  public abstract boolean isFinished();
+    protected abstract void unsubscribe();
 
-  @Override
-  public String toString() {
-    return getClass().getSimpleName() + "{name='" + name + ", finished=" + finished + '}';
-  }
+    protected abstract void handleEvent(final Event event) throws Exception;
+
+    @Override
+    public abstract boolean isFinished();
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "{name='" + name + ", finished=" + finished + '}';
+    }
 }

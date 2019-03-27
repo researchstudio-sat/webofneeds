@@ -7,8 +7,8 @@ import won.protocol.model.FacetType;
  * change this template use File | Settings | File Templates.
  */
 public class ControlFacetImpl extends AbstractFacet {
-  @Override
-  public FacetType getFacetType() {
-    return FacetType.ControlFacet;
-  }
+    @Override
+    public FacetType getFacetType() {
+        return FacetType.ControlFacet;
+    }
 }

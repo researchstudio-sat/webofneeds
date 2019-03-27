@@ -23,106 +23,101 @@ import javax.xml.crypto.KeySelector.Purpose;
 @Entity
 @Table(name = "verificationtoken")
 public class EmailVerificationToken {
-  private static final int EXPIRATION = 60 * 24; // Token will expire after a day
-  private static final TokenPurpose DEFAULT_PURPOSE = TokenPurpose.INITIAL_EMAIL_VERIFICATION;
+    private static final int EXPIRATION = 60 * 24; // Token will expire after a day
+    private static final TokenPurpose DEFAULT_PURPOSE = TokenPurpose.INITIAL_EMAIL_VERIFICATION;
+    @Id
+    @GeneratedValue
+    private Long id;
+    private String token;
+    @OneToOne(targetEntity = User.class, fetch = FetchType.EAGER)
+    @JoinColumn(nullable = false, name = "user_id")
+    private User user;
+    @Column(name = "purpose")
+    @Enumerated(EnumType.STRING)
+    private TokenPurpose purpose;
+    private Date expiryDate;
 
-  @Id
-  @GeneratedValue
-  private Long id;
+    public EmailVerificationToken() {
+    }
 
-  private String token;
+    public EmailVerificationToken(User user, String token, Date expiryDate, TokenPurpose purpose) {
+        this.user = user;
+        this.token = token;
+        this.expiryDate = expiryDate;
+        this.purpose = purpose;
+    }
 
-  @OneToOne(targetEntity = User.class, fetch = FetchType.EAGER)
-  @JoinColumn(nullable = false, name = "user_id")
-  private User user;
+    public EmailVerificationToken(User user, String token) {
+        this.user = user;
+        this.token = token;
+        this.expiryDate = calculateExpiryDate(EXPIRATION);
+        this.purpose = TokenPurpose.INITIAL_EMAIL_VERIFICATION;
+    }
 
-  @Column(name = "purpose")
-  @Enumerated(EnumType.STRING)
-  private TokenPurpose purpose;
+    private Date calculateExpiryDate(int expiryTimeInMinutes) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Timestamp(cal.getTime().getTime()));
+        cal.add(Calendar.MINUTE, expiryTimeInMinutes);
+        return new Date(cal.getTime().getTime());
+    }
 
-  private Date expiryDate;
+    // Getter & Setter
+    public Long getId() {
+        return id;
+    }
 
-  public EmailVerificationToken() {
-  }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-  public EmailVerificationToken(User user, String token, Date expiryDate, TokenPurpose purpose) {
-    this.user = user;
-    this.token = token;
-    this.expiryDate = expiryDate;
-    this.purpose = purpose;
-  }
+    public String getToken() {
+        return token;
+    }
 
-  public EmailVerificationToken(User user, String token) {
-    this.user = user;
-    this.token = token;
-    this.expiryDate = calculateExpiryDate(EXPIRATION);
-    this.purpose = TokenPurpose.INITIAL_EMAIL_VERIFICATION;
-  }
+    public void setToken(String token) {
+        this.token = token;
+    }
 
-  private Date calculateExpiryDate(int expiryTimeInMinutes) {
-    Calendar cal = Calendar.getInstance();
-    cal.setTime(new Timestamp(cal.getTime().getTime()));
-    cal.add(Calendar.MINUTE, expiryTimeInMinutes);
-    return new Date(cal.getTime().getTime());
-  }
+    public User getUser() {
+        return user;
+    }
 
-  // Getter & Setter
-  public Long getId() {
-    return id;
-  }
+    public void setUser(User user) {
+        this.user = user;
+    }
 
-  public void setId(Long id) {
-    this.id = id;
-  }
+    public Date getExpiryDate() {
+        return expiryDate;
+    }
 
-  public String getToken() {
-    return token;
-  }
+    public void setExpiryDate(Date expiryDate) {
+        this.expiryDate = expiryDate;
+    }
 
-  public void setToken(String token) {
-    this.token = token;
-  }
+    public void setPurpose(TokenPurpose purpose) {
+        this.purpose = purpose;
+    }
 
-  public User getUser() {
-    return user;
-  }
+    public TokenPurpose getPurpose() {
+        return purpose;
+    }
 
-  public void setUser(User user) {
-    this.user = user;
-  }
+    /**
+     * Method that checks if the token is expired based on the current datetime
+     * 
+     * @return true if the token is expired, false if it is still valid
+     */
+    public boolean isExpired() {
+        return isExpired(Calendar.getInstance());
+    }
 
-  public Date getExpiryDate() {
-    return expiryDate;
-  }
-
-  public void setExpiryDate(Date expiryDate) {
-    this.expiryDate = expiryDate;
-  }
-
-  public void setPurpose(TokenPurpose purpose) {
-    this.purpose = purpose;
-  }
-
-  public TokenPurpose getPurpose() {
-    return purpose;
-  }
-
-  /**
-   * Method that checks if the token is expired based on the current datetime
-   * 
-   * @return true if the token is expired, false if it is still valid
-   */
-  public boolean isExpired() {
-    return isExpired(Calendar.getInstance());
-  }
-
-  /**
-   * Method that checks if the token is expired based on the given datetime
-   * 
-   * @param cal date to check the expiryDate with
-   * @return true if the token is expired, false if it is still valid
-   */
-  public boolean isExpired(Calendar cal) {
-    return (this.getExpiryDate().getTime() - cal.getTime().getTime()) <= 0;
-  }
+    /**
+     * Method that checks if the token is expired based on the given datetime
+     * 
+     * @param cal date to check the expiryDate with
+     * @return true if the token is expired, false if it is still valid
+     */
+    public boolean isExpired(Calendar cal) {
+        return (this.getExpiryDate().getTime() - cal.getTime().getTime()) <= 0;
+    }
 }

@@ -12,36 +12,33 @@ import org.topbraid.shacl.vocabulary.SH;
 import won.protocol.util.RdfUtils;
 
 public class ShaclReportWrapper {
+    private Resource report;
+    private Resource reportResource;
 
-  private Resource report;
-  private Resource reportResource;
-
-  public ShaclReportWrapper(Resource report) {
-
-    this.report = report;
-    reportResource = RdfUtils.findOneSubjectResource(report.getModel(), RDF.type, SH.ValidationReport);
-  }
-
-  public Resource getReport() {
-    return report;
-  }
-
-  public boolean isConform() {
-    RDFNode node = RdfUtils.findOnePropertyFromResource(report.getModel(), reportResource, SH.conforms);
-    if (node != null && node.asLiteral() != null) {
-      return node.asLiteral().getBoolean();
+    public ShaclReportWrapper(Resource report) {
+        this.report = report;
+        reportResource = RdfUtils.findOneSubjectResource(report.getModel(), RDF.type, SH.ValidationReport);
     }
 
-    return false;
-  }
-
-  public Collection<ValidationResultWrapper> getValidationResults() {
-    Collection<ValidationResultWrapper> validationResults = new LinkedList<>();
-    for (Statement statement : reportResource.listProperties(SH.result).toList()) {
-      if (statement.getResource().getPropertyResourceValue(RDF.type).equals(SH.ValidationResult)) {
-        validationResults.add(new ValidationResultWrapper(statement.getResource()));
-      }
+    public Resource getReport() {
+        return report;
     }
-    return validationResults;
-  }
+
+    public boolean isConform() {
+        RDFNode node = RdfUtils.findOnePropertyFromResource(report.getModel(), reportResource, SH.conforms);
+        if (node != null && node.asLiteral() != null) {
+            return node.asLiteral().getBoolean();
+        }
+        return false;
+    }
+
+    public Collection<ValidationResultWrapper> getValidationResults() {
+        Collection<ValidationResultWrapper> validationResults = new LinkedList<>();
+        for (Statement statement : reportResource.listProperties(SH.result).toList()) {
+            if (statement.getResource().getPropertyResourceValue(RDF.type).equals(SH.ValidationResult)) {
+                validationResults.add(new ValidationResultWrapper(statement.getResource()));
+            }
+        }
+        return validationResults;
+    }
 }

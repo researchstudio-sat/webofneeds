@@ -11,28 +11,28 @@ import won.owner.model.User;
  * successful password change.
  */
 public class OnRecoveryKeyGeneratedEvent extends ApplicationEvent {
-  private User user;
-  private String recoveryKey;
+    private User user;
+    private String recoveryKey;
 
-  public OnRecoveryKeyGeneratedEvent(User user, String recoveryKey) {
-    super(user);
-    this.user = user;
-    this.recoveryKey = recoveryKey;
-  }
+    public OnRecoveryKeyGeneratedEvent(User user, String recoveryKey) {
+        super(user);
+        this.user = user;
+        this.recoveryKey = recoveryKey;
+    }
 
-  public User getUser() {
-    return user;
-  }
+    public User getUser() {
+        return user;
+    }
 
-  public void setUser(User user) {
-    this.user = user;
-  }
+    public void setUser(User user) {
+        this.user = user;
+    }
 
-  public String getRecoveryKey() {
-    return recoveryKey;
-  }
+    public String getRecoveryKey() {
+        return recoveryKey;
+    }
 
-  public void setRecoveryKey(String recoveryKey) {
-    this.recoveryKey = recoveryKey;
-  }
+    public void setRecoveryKey(String recoveryKey) {
+        this.recoveryKey = recoveryKey;
+    }
 }

@@ -10,6 +10,6 @@ import org.apache.solr.common.params.SolrParams;
  * Created by hfriedrich on 12.08.2016.
  */
 public interface SolrMatcherQueryExecutor {
-  SolrDocumentList executeNeedQuery(String queryString, int maxHints, SolrParams params, String... filterQueries)
-      throws IOException, SolrServerException;
+    SolrDocumentList executeNeedQuery(String queryString, int maxHints, SolrParams params, String... filterQueries)
+                    throws IOException, SolrServerException;
 }

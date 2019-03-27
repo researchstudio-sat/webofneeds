@@ -24,66 +24,64 @@ import won.protocol.util.linkeddata.LinkedDataSource;
  * User: ypanchenko Date: 12.04.2015
  */
 public class TestingDataSource implements LinkedDataSource {
+    Map<String, PublicKey> pubKeysMap = new HashMap<String, PublicKey>();
 
-  Map<String, PublicKey> pubKeysMap = new HashMap<String, PublicKey>();
-
-  public TestingDataSource() throws Exception {
-
-    // load public keys:
-    Security.addProvider(new BouncyCastleProvider());
-    File keysFile = new File(this.getClass().getResource(TestSigningUtils.KEYS_FILE).getFile());
-    FileBasedKeyStoreService storeService = new FileBasedKeyStoreService(keysFile, "temp");
-    storeService.init();
-    pubKeysMap.put(TestSigningUtils.needCertUri,
-        storeService.getCertificate(TestSigningUtils.needCertUri).getPublicKey());
-    pubKeysMap.put(TestSigningUtils.ownerCertUri,
-        storeService.getCertificate(TestSigningUtils.ownerCertUri).getPublicKey());
-    pubKeysMap.put(TestSigningUtils.nodeCertUri,
-        storeService.getCertificate(TestSigningUtils.nodeCertUri).getPublicKey());
-  }
-
-  @Override
-  public Dataset getDataForResource(final URI resourceURI) {
-    Dataset dataset = DatasetFactory.createGeneral();
-    DefaultPrefixUtils.setDefaultPrefixes(dataset.getDefaultModel());
-    WonKeysReaderWriter keyWriter = new WonKeysReaderWriter();
-    Model model = dataset.getDefaultModel();
-    Resource subj = model.createResource(resourceURI.toString());
-    try {
-      keyWriter.writeToModel(model, subj, pubKeysMap.get(resourceURI.toString()));
-    } catch (Exception e) {
-      e.printStackTrace();
-      return null;
+    public TestingDataSource() throws Exception {
+        // load public keys:
+        Security.addProvider(new BouncyCastleProvider());
+        File keysFile = new File(this.getClass().getResource(TestSigningUtils.KEYS_FILE).getFile());
+        FileBasedKeyStoreService storeService = new FileBasedKeyStoreService(keysFile, "temp");
+        storeService.init();
+        pubKeysMap.put(TestSigningUtils.needCertUri,
+                        storeService.getCertificate(TestSigningUtils.needCertUri).getPublicKey());
+        pubKeysMap.put(TestSigningUtils.ownerCertUri,
+                        storeService.getCertificate(TestSigningUtils.ownerCertUri).getPublicKey());
+        pubKeysMap.put(TestSigningUtils.nodeCertUri,
+                        storeService.getCertificate(TestSigningUtils.nodeCertUri).getPublicKey());
     }
-    return dataset;
-  }
 
-  @Override
-  public Dataset getDataForResource(final URI resourceURI, final URI requesterWebID) {
-    throw new UnsupportedOperationException();
-  }
+    @Override
+    public Dataset getDataForResource(final URI resourceURI) {
+        Dataset dataset = DatasetFactory.createGeneral();
+        DefaultPrefixUtils.setDefaultPrefixes(dataset.getDefaultModel());
+        WonKeysReaderWriter keyWriter = new WonKeysReaderWriter();
+        Model model = dataset.getDefaultModel();
+        Resource subj = model.createResource(resourceURI.toString());
+        try {
+            keyWriter.writeToModel(model, subj, pubKeysMap.get(resourceURI.toString()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        return dataset;
+    }
 
-  @Override
-  public Dataset getDataForResource(final URI resourceURI, final List<URI> properties, final int maxRequest,
-      final int maxDepth) {
-    throw new UnsupportedOperationException();
-  }
+    @Override
+    public Dataset getDataForResource(final URI resourceURI, final URI requesterWebID) {
+        throw new UnsupportedOperationException();
+    }
 
-  @Override
-  public Dataset getDataForResource(final URI resourceURI, final URI requesterWebID, final List<URI> properties,
-      final int maxRequest, final int maxDepth) {
-    throw new UnsupportedOperationException();
-  }
+    @Override
+    public Dataset getDataForResource(final URI resourceURI, final List<URI> properties, final int maxRequest,
+                    final int maxDepth) {
+        throw new UnsupportedOperationException();
+    }
 
-  @Override
-  public Dataset getDataForResourceWithPropertyPath(final URI resourceURI, final List<Path> properties,
-      final int maxRequest, final int maxDepth, final boolean moveAllTriplesInDefaultGraph) {
-    throw new UnsupportedOperationException();
-  }
+    @Override
+    public Dataset getDataForResource(final URI resourceURI, final URI requesterWebID, final List<URI> properties,
+                    final int maxRequest, final int maxDepth) {
+        throw new UnsupportedOperationException();
+    }
 
-  @Override
-  public Dataset getDataForResourceWithPropertyPath(URI resourceURI, URI requesterWebID, List<Path> properties,
-      int maxRequest, int maxDepth) {
-    throw new UnsupportedOperationException();
-  }
+    @Override
+    public Dataset getDataForResourceWithPropertyPath(final URI resourceURI, final List<Path> properties,
+                    final int maxRequest, final int maxDepth, final boolean moveAllTriplesInDefaultGraph) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Dataset getDataForResourceWithPropertyPath(URI resourceURI, URI requesterWebID, List<Path> properties,
+                    int maxRequest, int maxDepth) {
+        throw new UnsupportedOperationException();
+    }
 }

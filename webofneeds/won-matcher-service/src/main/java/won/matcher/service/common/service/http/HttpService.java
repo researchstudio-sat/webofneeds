@@ -25,42 +25,38 @@ import org.springframework.web.client.RestTemplate;
 @Component
 @Scope("prototype")
 public class HttpService {
-  private final Logger log = LoggerFactory.getLogger(getClass());
-  private RestTemplate restTemplate;
-  private HttpHeaders jsonHeaders;
+    private final Logger log = LoggerFactory.getLogger(getClass());
+    private RestTemplate restTemplate;
+    private HttpHeaders jsonHeaders;
 
-  public HttpService() {
-
-    HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-    init(factory);
-  }
-
-  public HttpService(int readTimeout, int connectionTimeout) {
-
-    HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-    factory.setReadTimeout(readTimeout);
-    factory.setConnectTimeout(connectionTimeout);
-    init(factory);
-  }
-
-  private void init(ClientHttpRequestFactory factory) {
-    restTemplate = new RestTemplate(factory);
-    restTemplate.getMessageConverters().add(new StringHttpMessageConverter(Charset.forName("UTF-8")));
-    jsonHeaders = new HttpHeaders();
-    jsonHeaders.add("Content-Type", "application/json");
-    jsonHeaders.add("Accept", "*/*");
-  }
-
-  public void postJsonRequest(String uri, String body) {
-
-    ResponseEntity<String> response = null;
-    log.debug("POST URI: {}", uri);
-    HttpEntity<String> jsonEntity = new HttpEntity(body, jsonHeaders);
-    response = restTemplate.exchange(uri, HttpMethod.POST, jsonEntity, String.class);
-
-    if (response.getStatusCode() != HttpStatus.OK) {
-      log.warn("HTTP POST request returned status code: {}", response.getStatusCode());
-      throw new HttpClientErrorException(response.getStatusCode());
+    public HttpService() {
+        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
+        init(factory);
     }
-  }
+
+    public HttpService(int readTimeout, int connectionTimeout) {
+        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
+        factory.setReadTimeout(readTimeout);
+        factory.setConnectTimeout(connectionTimeout);
+        init(factory);
+    }
+
+    private void init(ClientHttpRequestFactory factory) {
+        restTemplate = new RestTemplate(factory);
+        restTemplate.getMessageConverters().add(new StringHttpMessageConverter(Charset.forName("UTF-8")));
+        jsonHeaders = new HttpHeaders();
+        jsonHeaders.add("Content-Type", "application/json");
+        jsonHeaders.add("Accept", "*/*");
+    }
+
+    public void postJsonRequest(String uri, String body) {
+        ResponseEntity<String> response = null;
+        log.debug("POST URI: {}", uri);
+        HttpEntity<String> jsonEntity = new HttpEntity(body, jsonHeaders);
+        response = restTemplate.exchange(uri, HttpMethod.POST, jsonEntity, String.class);
+        if (response.getStatusCode() != HttpStatus.OK) {
+            log.warn("HTTP POST request returned status code: {}", response.getStatusCode());
+            throw new HttpClientErrorException(response.getStatusCode());
+        }
+    }
 }

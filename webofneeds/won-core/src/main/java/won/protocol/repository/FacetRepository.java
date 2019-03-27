@@ -10,15 +10,15 @@ import won.protocol.model.Facet;
  * change this template use File | Settings | File Templates.
  */
 public interface FacetRepository extends WonRepository<Facet> {
-  List<Facet> findByNeedURI(URI needURI);
+    List<Facet> findByNeedURI(URI needURI);
 
-  List<Facet> findByNeedURIAndTypeURI(URI needURI, URI typeURI);
+    List<Facet> findByNeedURIAndTypeURI(URI needURI, URI typeURI);
 
-  List<Facet> findByNeedURIAndFacetURI(URI needURI, URI facetURI);
+    List<Facet> findByNeedURIAndFacetURI(URI needURI, URI facetURI);
 
-  Facet findOneByNeedURIAndTypeURI(URI needURI, URI typeURI);
+    Facet findOneByNeedURIAndTypeURI(URI needURI, URI typeURI);
 
-  Facet findOneByNeedURIAndFacetURI(URI needURI, URI facetURI);
+    Facet findOneByNeedURIAndFacetURI(URI needURI, URI facetURI);
 
-  Facet findOneByFacetURI(URI facetURI);
+    Facet findOneByFacetURI(URI facetURI);
 }

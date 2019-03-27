@@ -14,9 +14,8 @@ import won.protocol.vocabulary.WONMSG;
 @Component
 @FacetMessageProcessor(facetType = WON.REVIEW_FACET_STRING, direction = WONMSG.TYPE_FROM_OWNER_STRING, messageType = WONMSG.TYPE_CONNECT_STRING)
 public class ConnectFromOwnerReviewFacetImpl extends AbstractFromOwnerCamelProcessor {
-
-  @Override
-  public void process(final Exchange exchange) {
-    logger.debug("default facet implementation, not doing anything");
-  }
+    @Override
+    public void process(final Exchange exchange) {
+        logger.debug("default facet implementation, not doing anything");
+    }
 }

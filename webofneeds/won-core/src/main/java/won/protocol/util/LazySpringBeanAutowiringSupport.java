@@ -7,14 +7,14 @@ import org.springframework.web.context.support.SpringBeanAutowiringSupport;
  * change this template use File | Settings | File Templates.
  */
 public abstract class LazySpringBeanAutowiringSupport extends SpringBeanAutowiringSupport {
-  /**
-   * Lazy wiring for spring-managed dependencies. TODO: figure out the proper way
-   * to connect spring and jaxws/metro or switch to spring-webservices entirely
-   */
-  protected void wireDependenciesLazily() {
-    if (!isWired())
-      processInjectionBasedOnCurrentContext(this);
-  }
+    /**
+     * Lazy wiring for spring-managed dependencies. TODO: figure out the proper way
+     * to connect spring and jaxws/metro or switch to spring-webservices entirely
+     */
+    protected void wireDependenciesLazily() {
+        if (!isWired())
+            processInjectionBasedOnCurrentContext(this);
+    }
 
-  protected abstract boolean isWired();
+    protected abstract boolean isWired();
 }

@@ -5,12 +5,10 @@ package won.protocol.model;
  * change this template use File | Settings | File Templates.
  */
 public enum MessagingType {
-  Queue("Queue"), Topic("Topic");
+    Queue("Queue"), Topic("Topic");
+    private String type;
 
-  private String type;
-
-  private MessagingType(String type) {
-    this.type = type;
-  }
-
+    private MessagingType(String type) {
+        this.type = type;
+    }
 }

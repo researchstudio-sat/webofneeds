@@ -17,29 +17,25 @@ import won.protocol.util.linkeddata.LinkedDataSource;
  * complete) messages into the linked data cache.
  * 
  * @author fkleedorfer
- *
  */
 public class LinkedDataCacheUpdater implements WonMessageProcessor {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+    @Autowired
+    private LinkedDataSource linkedDataSourceOnBehalfOfNeed;
 
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-
-  @Autowired
-  private LinkedDataSource linkedDataSourceOnBehalfOfNeed;
-
-  @Override
-  public WonMessage process(WonMessage message) throws WonMessageProcessingException {
-    if (this.linkedDataSourceOnBehalfOfNeed != null
-        && this.linkedDataSourceOnBehalfOfNeed instanceof CachingLinkedDataSource) {
-      logger.debug("putting message {} into cache", message.getMessageURI());
-      URI requester = message.getReceiverNeedURI();
-      ((CachingLinkedDataSource) linkedDataSourceOnBehalfOfNeed).addToCache(message.getCompleteDataset(),
-          message.getMessageURI(), requester);
+    @Override
+    public WonMessage process(WonMessage message) throws WonMessageProcessingException {
+        if (this.linkedDataSourceOnBehalfOfNeed != null
+                        && this.linkedDataSourceOnBehalfOfNeed instanceof CachingLinkedDataSource) {
+            logger.debug("putting message {} into cache", message.getMessageURI());
+            URI requester = message.getReceiverNeedURI();
+            ((CachingLinkedDataSource) linkedDataSourceOnBehalfOfNeed).addToCache(message.getCompleteDataset(),
+                            message.getMessageURI(), requester);
+        }
+        return message;
     }
-    return message;
-  }
 
-  public void setLinkedDataSourceOnBehalfOfNeed(LinkedDataSource linkedDataSourceOnBehalfOfNeed) {
-    this.linkedDataSourceOnBehalfOfNeed = linkedDataSourceOnBehalfOfNeed;
-  }
-
+    public void setLinkedDataSourceOnBehalfOfNeed(LinkedDataSource linkedDataSourceOnBehalfOfNeed) {
+        this.linkedDataSourceOnBehalfOfNeed = linkedDataSourceOnBehalfOfNeed;
+    }
 }

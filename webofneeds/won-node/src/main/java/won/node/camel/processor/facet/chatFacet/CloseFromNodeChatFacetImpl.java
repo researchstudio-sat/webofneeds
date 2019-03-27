@@ -16,9 +16,8 @@ import won.protocol.vocabulary.WONMSG;
 @DefaultFacetMessageProcessor(direction = WONMSG.TYPE_FROM_EXTERNAL_STRING, messageType = WONMSG.TYPE_CLOSE_STRING)
 @FacetMessageProcessor(facetType = WON.CHAT_FACET_STRING, direction = WONMSG.TYPE_FROM_EXTERNAL_STRING, messageType = WONMSG.TYPE_CLOSE_STRING)
 public class CloseFromNodeChatFacetImpl extends AbstractCamelProcessor {
-
-  @Override
-  public void process(final Exchange exchange) {
-    logger.debug("default facet implementation, not doing anything");
-  }
+    @Override
+    public void process(final Exchange exchange) {
+        logger.debug("default facet implementation, not doing anything");
+    }
 }

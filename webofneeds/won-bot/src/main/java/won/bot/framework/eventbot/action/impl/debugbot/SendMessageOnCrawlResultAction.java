@@ -9,36 +9,34 @@ import won.bot.framework.eventbot.event.impl.crawlconnection.CrawlConnectionComm
 import won.protocol.model.Connection;
 
 public abstract class SendMessageOnCrawlResultAction extends ProcessCrawlResultAction {
+    private Connection con;
 
-  private Connection con;
+    public SendMessageOnCrawlResultAction(EventListenerContext eventListenerContext, Connection con) {
+        super(eventListenerContext);
+        this.con = con;
+    }
 
-  public SendMessageOnCrawlResultAction(EventListenerContext eventListenerContext, Connection con) {
-    super(eventListenerContext);
-    this.con = con;
-  }
+    @Override
+    protected final void onCrawlFailure(CrawlConnectionCommandFailureEvent failureEvent) {
+        Model messageModel = makeFailureMessage(failureEvent);
+        if (messageModel == null)
+            return;
+        getEventListenerContext().getEventBus().publish(new ConnectionMessageCommandEvent(con, messageModel));
+    }
 
-  @Override
-  protected final void onCrawlFailure(CrawlConnectionCommandFailureEvent failureEvent) {
-    Model messageModel = makeFailureMessage(failureEvent);
-    if (messageModel == null)
-      return;
-    getEventListenerContext().getEventBus().publish(new ConnectionMessageCommandEvent(con, messageModel));
-  }
+    protected Model makeFailureMessage(CrawlConnectionCommandFailureEvent failureEvent) {
+        return null;
+    }
 
-  protected Model makeFailureMessage(CrawlConnectionCommandFailureEvent failureEvent) {
-    return null;
-  }
+    @Override
+    protected final void onCrawlSuccess(CrawlConnectionCommandSuccessEvent successEvent) {
+        Model messageModel = makeSuccessMessage(successEvent);
+        if (messageModel == null)
+            return;
+        getEventListenerContext().getEventBus().publish(new ConnectionMessageCommandEvent(con, messageModel));
+    }
 
-  @Override
-  protected final void onCrawlSuccess(CrawlConnectionCommandSuccessEvent successEvent) {
-    Model messageModel = makeSuccessMessage(successEvent);
-    if (messageModel == null)
-      return;
-    getEventListenerContext().getEventBus().publish(new ConnectionMessageCommandEvent(con, messageModel));
-  }
-
-  protected Model makeSuccessMessage(CrawlConnectionCommandSuccessEvent successEvent) {
-    return null;
-  }
-
+    protected Model makeSuccessMessage(CrawlConnectionCommandSuccessEvent successEvent) {
+        return null;
+    }
 }

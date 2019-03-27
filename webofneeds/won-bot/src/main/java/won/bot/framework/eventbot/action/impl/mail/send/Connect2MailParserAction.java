@@ -22,34 +22,30 @@ import won.protocol.model.Connection;
  * Created by fsuda on 03.10.2016.
  */
 public class Connect2MailParserAction extends BaseEventBotAction {
-  private MessageChannel sendChannel;
-  private WonMimeMessageGenerator mailGenerator;
+    private MessageChannel sendChannel;
+    private WonMimeMessageGenerator mailGenerator;
 
-  public Connect2MailParserAction(WonMimeMessageGenerator mailGenerator, MessageChannel sendChannel) {
-    super(mailGenerator.getEventListenerContext());
-    this.sendChannel = sendChannel;
-    this.mailGenerator = mailGenerator;
-  }
-
-  @Override
-  protected void doRun(Event event, EventListener executingListener) throws Exception {
-    EventListenerContext ctx = getEventListenerContext();
-    if (event instanceof ConnectFromOtherNeedEvent && ctx.getBotContextWrapper() instanceof MailBotContextWrapper) {
-      MailBotContextWrapper botContextWrapper = (MailBotContextWrapper) ctx.getBotContextWrapper();
-      Connection con = ((ConnectFromOtherNeedEvent) event).getCon();
-
-      URI responseTo = con.getNeedURI();
-      URI remoteNeedUri = con.getRemoteNeedURI();
-
-      MimeMessage originalMail = botContextWrapper.getMimeMessageForURI(responseTo);
-      logger.debug("Someone issued a connect for URI: " + responseTo + " sending a mail to the creator: "
-          + MailContentExtractor.getFromAddressString(originalMail));
-
-      WonMimeMessage answerMessage = mailGenerator.createConnectMail(originalMail, remoteNeedUri);
-      botContextWrapper.addMailIdWonURIRelation(answerMessage.getMessageID(),
-          new WonURI(con.getConnectionURI(), UriType.CONNECTION));
-
-      sendChannel.send(new GenericMessage<>(answerMessage));
+    public Connect2MailParserAction(WonMimeMessageGenerator mailGenerator, MessageChannel sendChannel) {
+        super(mailGenerator.getEventListenerContext());
+        this.sendChannel = sendChannel;
+        this.mailGenerator = mailGenerator;
     }
-  }
+
+    @Override
+    protected void doRun(Event event, EventListener executingListener) throws Exception {
+        EventListenerContext ctx = getEventListenerContext();
+        if (event instanceof ConnectFromOtherNeedEvent && ctx.getBotContextWrapper() instanceof MailBotContextWrapper) {
+            MailBotContextWrapper botContextWrapper = (MailBotContextWrapper) ctx.getBotContextWrapper();
+            Connection con = ((ConnectFromOtherNeedEvent) event).getCon();
+            URI responseTo = con.getNeedURI();
+            URI remoteNeedUri = con.getRemoteNeedURI();
+            MimeMessage originalMail = botContextWrapper.getMimeMessageForURI(responseTo);
+            logger.debug("Someone issued a connect for URI: " + responseTo + " sending a mail to the creator: "
+                            + MailContentExtractor.getFromAddressString(originalMail));
+            WonMimeMessage answerMessage = mailGenerator.createConnectMail(originalMail, remoteNeedUri);
+            botContextWrapper.addMailIdWonURIRelation(answerMessage.getMessageID(),
+                            new WonURI(con.getConnectionURI(), UriType.CONNECTION));
+            sendChannel.send(new GenericMessage<>(answerMessage));
+        }
+    }
 }

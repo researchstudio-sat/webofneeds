@@ -7,17 +7,16 @@ import java.util.function.Predicate;
 import won.protocol.message.WonMessage;
 
 public class ResponseToPredicate implements Predicate<WonMessage> {
+    private URI messageURI;
 
-  private URI messageURI;
+    public ResponseToPredicate(URI messageURI) {
+        super();
+        Objects.nonNull(messageURI);
+        this.messageURI = messageURI;
+    }
 
-  public ResponseToPredicate(URI messageURI) {
-    super();
-    Objects.nonNull(messageURI);
-    this.messageURI = messageURI;
-  }
-
-  @Override
-  public boolean test(WonMessage t) {
-    return this.messageURI.equals(t.getIsResponseToMessageURI());
-  }
+    @Override
+    public boolean test(WonMessage t) {
+        return this.messageURI.equals(t.getIsResponseToMessageURI());
+    }
 }

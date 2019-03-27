@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class TestMatcherQueryExecutor extends DefaultMatcherQueryExecuter {
-  @PostConstruct
-  private void init() {
-    solrClient = new HttpSolrClient.Builder(config.getSolrEndpointUri(true)).build();
-  }
+    @PostConstruct
+    private void init() {
+        solrClient = new HttpSolrClient.Builder(config.getSolrEndpointUri(true)).build();
+    }
 }

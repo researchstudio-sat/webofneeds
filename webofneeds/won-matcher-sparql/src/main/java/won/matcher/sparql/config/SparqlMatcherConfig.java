@@ -12,24 +12,22 @@ import org.springframework.context.annotation.PropertySource;
 @ImportResource({ "classpath:/spring/component/scheduling/matcher-service-scheduling.xml" })
 @PropertySource("file:${WON_CONFIG_DIR}/matcher-sparql.properties")
 public class SparqlMatcherConfig {
-  @Value("${matcher.sparql.uri.sparql.endpoint}")
-  private String sparqlEndpoint;
+    @Value("${matcher.sparql.uri.sparql.endpoint}")
+    private String sparqlEndpoint;
+    @Value("${matcher.uri}")
+    private String matcherUri;
+    @Value("${matcher.sparql.limitResults}")
+    private long limitResults;
 
-  @Value("${matcher.uri}")
-  private String matcherUri;
+    public long getLimitResults() {
+        return limitResults;
+    }
 
-  @Value("${matcher.sparql.limitResults}")
-  private long limitResults;
+    public String getSparqlEndpoint() {
+        return sparqlEndpoint;
+    }
 
-  public long getLimitResults() {
-    return limitResults;
-  }
-
-  public String getSparqlEndpoint() {
-    return sparqlEndpoint;
-  }
-
-  public String getMatcherUri() {
-    return matcherUri;
-  }
+    public String getMatcherUri() {
+        return matcherUri;
+    }
 }

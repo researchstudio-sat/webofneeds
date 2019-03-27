@@ -22,91 +22,87 @@ import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.impl.telegram.TelegramMessageReceivedEvent;
 
 public class WonTelegramBotHandler extends TelegramLongPollingBot implements ICommandRegistry {
-  private String token;
-  private String botName;
-  private EventBus bus;
+    private String token;
+    private String botName;
+    private EventBus bus;
+    private CommandRegistry commandRegistry;
+    private TelegramMessageGenerator telegramMessageGenerator;
 
-  private CommandRegistry commandRegistry;
+    public WonTelegramBotHandler(EventBus bus, TelegramMessageGenerator telegramMessageGenerator, String botName,
+                    String token) {
+        this.bus = bus;
+        this.token = token;
+        this.botName = botName;
+        this.telegramMessageGenerator = telegramMessageGenerator;
+        this.commandRegistry = new CommandRegistry(true, botName);
+        BotCommand offerBotCommand = new OfferBotCommand("offer", "create a offer need", bus);
+        BotCommand demandBotCommand = new DemandBotCommand("demand", "create a demand need", bus);
+        BotCommand critiqueBotCommand = new CritiqueBotCommand("critique", "create a critique need", bus);
+        BotCommand togetherBotCommand = new TogetherBotCommand("together", "create a together need", bus);
+        BotCommand helpBotCommand = new HelpBotCommand("help", "list help", bus);
+        commandRegistry.registerAll(helpBotCommand, offerBotCommand, demandBotCommand, critiqueBotCommand,
+                        togetherBotCommand);
+    }
 
-  private TelegramMessageGenerator telegramMessageGenerator;
+    @Override
+    public void onUpdateReceived(Update update) {
+        bus.publish(new TelegramMessageReceivedEvent(update));
+    }
 
-  public WonTelegramBotHandler(EventBus bus, TelegramMessageGenerator telegramMessageGenerator, String botName,
-      String token) {
-    this.bus = bus;
-    this.token = token;
-    this.botName = botName;
-    this.telegramMessageGenerator = telegramMessageGenerator;
+    @Override
+    public String getBotToken() {
+        return token;
+    }
 
-    this.commandRegistry = new CommandRegistry(true, botName);
+    @Override
+    public String getBotUsername() {
+        return botName;
+    }
 
-    BotCommand offerBotCommand = new OfferBotCommand("offer", "create a offer need", bus);
-    BotCommand demandBotCommand = new DemandBotCommand("demand", "create a demand need", bus);
-    BotCommand critiqueBotCommand = new CritiqueBotCommand("critique", "create a critique need", bus);
-    BotCommand togetherBotCommand = new TogetherBotCommand("together", "create a together need", bus);
-    BotCommand helpBotCommand = new HelpBotCommand("help", "list help", bus);
-    commandRegistry.registerAll(helpBotCommand, offerBotCommand, demandBotCommand, critiqueBotCommand,
-        togetherBotCommand);
-  }
+    public CommandRegistry getCommandRegistry() {
+        return commandRegistry;
+    }
 
-  @Override
-  public void onUpdateReceived(Update update) {
-    bus.publish(new TelegramMessageReceivedEvent(update));
-  }
+    public TelegramMessageGenerator getTelegramMessageGenerator() {
+        return telegramMessageGenerator;
+    }
 
-  @Override
-  public String getBotToken() {
-    return token;
-  }
+    public void setTelegramMessageGenerator(TelegramMessageGenerator telegramMessageGenerator) {
+        this.telegramMessageGenerator = telegramMessageGenerator;
+    }
 
-  @Override
-  public String getBotUsername() {
-    return botName;
-  }
+    @Override
+    public void registerDefaultAction(BiConsumer<AbsSender, Message> biConsumer) {
+        BotCommand helpBotCommand = new HelpBotCommand("help", "list help", bus);
+    }
 
-  public CommandRegistry getCommandRegistry() {
-    return commandRegistry;
-  }
+    @Override
+    public boolean register(BotCommand botCommand) {
+        return commandRegistry.register(botCommand);
+    }
 
-  public TelegramMessageGenerator getTelegramMessageGenerator() {
-    return telegramMessageGenerator;
-  }
+    @Override
+    public Map<BotCommand, Boolean> registerAll(BotCommand... botCommands) {
+        return commandRegistry.registerAll(botCommands);
+    }
 
-  public void setTelegramMessageGenerator(TelegramMessageGenerator telegramMessageGenerator) {
-    this.telegramMessageGenerator = telegramMessageGenerator;
-  }
+    @Override
+    public boolean deregister(BotCommand botCommand) {
+        return commandRegistry.deregister(botCommand);
+    }
 
-  @Override
-  public void registerDefaultAction(BiConsumer<AbsSender, Message> biConsumer) {
-    BotCommand helpBotCommand = new HelpBotCommand("help", "list help", bus);
-  }
+    @Override
+    public Map<BotCommand, Boolean> deregisterAll(BotCommand... botCommands) {
+        return commandRegistry.deregisterAll(botCommands);
+    }
 
-  @Override
-  public boolean register(BotCommand botCommand) {
-    return commandRegistry.register(botCommand);
-  }
+    @Override
+    public Collection<BotCommand> getRegisteredCommands() {
+        return commandRegistry.getRegisteredCommands();
+    }
 
-  @Override
-  public Map<BotCommand, Boolean> registerAll(BotCommand... botCommands) {
-    return commandRegistry.registerAll(botCommands);
-  }
-
-  @Override
-  public boolean deregister(BotCommand botCommand) {
-    return commandRegistry.deregister(botCommand);
-  }
-
-  @Override
-  public Map<BotCommand, Boolean> deregisterAll(BotCommand... botCommands) {
-    return commandRegistry.deregisterAll(botCommands);
-  }
-
-  @Override
-  public Collection<BotCommand> getRegisteredCommands() {
-    return commandRegistry.getRegisteredCommands();
-  }
-
-  @Override
-  public BotCommand getRegisteredCommand(String s) {
-    return commandRegistry.getRegisteredCommand(s);
-  }
+    @Override
+    public BotCommand getRegisteredCommand(String s) {
+        return commandRegistry.getRegisteredCommand(s);
+    }
 }

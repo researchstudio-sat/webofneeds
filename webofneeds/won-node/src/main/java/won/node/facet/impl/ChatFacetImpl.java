@@ -16,20 +16,17 @@ import won.protocol.model.FacetType;
  * change this template use File | Settings | File Templates.
  */
 public class ChatFacetImpl extends AbstractFacet {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Override
-  public FacetType getFacetType() {
-    return FacetType.ChatFacet;
-  }
+    @Override
+    public FacetType getFacetType() {
+        return FacetType.ChatFacet;
+    }
 
-  @Override
-  public void connectFromNeed(final Connection con, final Model content, final WonMessage wonMessage)
-      throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
-
-    super.connectFromNeed(con, content, wonMessage);
-    /* when connected change linked data */
-
-  }
-
+    @Override
+    public void connectFromNeed(final Connection con, final Model content, final WonMessage wonMessage)
+                    throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
+        super.connectFromNeed(con, content, wonMessage);
+        /* when connected change linked data */
+    }
 }

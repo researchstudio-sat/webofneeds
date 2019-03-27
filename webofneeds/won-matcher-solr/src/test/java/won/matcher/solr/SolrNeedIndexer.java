@@ -24,35 +24,28 @@ import won.protocol.util.NeedModelWrapper;
  * testing queries directly on the index etc.
  */
 public class SolrNeedIndexer {
-  public static void main(String[] args) throws IOException, InterruptedException, JsonLdError {
-
-    AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(SolrTestAppConfiguration.class);
-
-    NeedIndexer indexer = ctx.getBean(NeedIndexer.class);
-
-    // set the options of the need producer (e.g. if it should exhaust) in the
-    // SolrNeedIndexerAppConfiguration file
-    NeedProducer needProducer = ctx.getBean(RoundRobinCompositeNeedProducer.class);
-    Model needModel = new NeedModelWrapper(needProducer.create()).copyNeedModel(NeedGraphType.NEED);
-
-    int needs = 0;
-    while (!needProducer.isExhausted()) {
-      // indexer.indexNeedModel(needModel, UUID.randomUUID().toString(), true);
-      Dataset ds = DatasetFactory.createTxnMem();
-      ds.addNamedModel("https://node.matchat.org/won/resource/need/test#need", needModel);
-
-      NeedModelWrapper needModelWrapper = new NeedModelWrapper(needModel, null);
-      needModel = needModelWrapper.normalizeNeedModel();
-
-      indexer.indexNeedModel(needModel, SolrMatcherEvaluation.createNeedId(ds), true);
-      needs++;
-
-      if (needs % 100 == 0) {
+    public static void main(String[] args) throws IOException, InterruptedException, JsonLdError {
+        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(SolrTestAppConfiguration.class);
+        NeedIndexer indexer = ctx.getBean(NeedIndexer.class);
+        // set the options of the need producer (e.g. if it should exhaust) in the
+        // SolrNeedIndexerAppConfiguration file
+        NeedProducer needProducer = ctx.getBean(RoundRobinCompositeNeedProducer.class);
+        Model needModel = new NeedModelWrapper(needProducer.create()).copyNeedModel(NeedGraphType.NEED);
+        int needs = 0;
+        while (!needProducer.isExhausted()) {
+            // indexer.indexNeedModel(needModel, UUID.randomUUID().toString(), true);
+            Dataset ds = DatasetFactory.createTxnMem();
+            ds.addNamedModel("https://node.matchat.org/won/resource/need/test#need", needModel);
+            NeedModelWrapper needModelWrapper = new NeedModelWrapper(needModel, null);
+            needModel = needModelWrapper.normalizeNeedModel();
+            indexer.indexNeedModel(needModel, SolrMatcherEvaluation.createNeedId(ds), true);
+            needs++;
+            if (needs % 100 == 0) {
+                System.out.println("Indexed " + needs + " needs.");
+            }
+            needModel = new NeedModelWrapper(needProducer.create()).copyNeedModel(NeedGraphType.NEED);
+        }
         System.out.println("Indexed " + needs + " needs.");
-      }
-      needModel = new NeedModelWrapper(needProducer.create()).copyNeedModel(NeedGraphType.NEED);
+        System.exit(0);
     }
-    System.out.println("Indexed " + needs + " needs.");
-    System.exit(0);
-  }
 }
