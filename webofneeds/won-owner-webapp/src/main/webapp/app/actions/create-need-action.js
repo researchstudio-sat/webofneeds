@@ -2,7 +2,7 @@
  * Created by ksinger on 04.08.2017.
  */
 
-import { buildCreateMessage } from "../won-message-utils.js";
+import { buildCreateMessage, buildEditMessage } from "../won-message-utils.js";
 
 import { actionCreators, actionTypes } from "./actions.js";
 
@@ -17,6 +17,56 @@ import {
 
 import { isWhatsAroundNeed, isWhatsNewNeed } from "../need-utils.js";
 import * as accountUtils from "../account-utils.js";
+
+export function needEdit(draft, oldNeed, nodeUri) {
+  return (dispatch, getState) => {
+    const state = getState();
+
+    if (!nodeUri) {
+      nodeUri = getIn(state, ["config", "defaultNodeUri"]);
+    }
+
+    let prevParams = getIn(state, ["router", "prevParams"]);
+
+    if (
+      !accountUtils.isLoggedIn(get(state, "account")) &&
+      prevParams.privateId
+    ) {
+      /*
+       * `ensureLoggedIn` will generate a new privateId. should
+       * there be a previous privateId, we don't want to change
+       * back to that later.
+       */
+      prevParams = Object.assign({}, prevParams);
+      delete prevParams.privateId;
+    }
+
+    return ensureLoggedIn(dispatch, getState)
+      .then(() => {
+        return dispatch(actionCreators.router__stateGoDefault()); //TODO: MIGHT NOT BE NECESSARY/FIND CORRECT REDIRECT ROUTE (maybe router__back would work) or dispatch edit in progress...
+      })
+      .then(async () => {
+        const { message, eventUri, needUri } = await buildEditMessage(
+          draft,
+          oldNeed,
+          nodeUri
+        );
+
+        dispatch({
+          type: actionTypes.needs.create, //CHANGE TYPE
+          payload: { eventUri, message, needUri, need: draft, oldNeed },
+        });
+
+        dispatch(
+          //TODO SET UP CORRECT REDIRECT (maybe router__back)
+          actionCreators.router__stateGoAbs("connections", {
+            postUri: undefined,
+            connectionUri: undefined,
+          })
+        );
+      });
+  };
+}
 
 export function needCreate(draft, persona, nodeUri) {
   return (dispatch, getState) => {
