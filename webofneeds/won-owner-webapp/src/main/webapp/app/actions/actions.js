@@ -41,6 +41,7 @@ import { hierarchy2Creators } from "./action-utils.js";
 
 import {
   needCreate,
+  needEdit,
   createWhatsNew,
   createWhatsAround,
 } from "./create-need-action.js";
@@ -142,6 +143,9 @@ const actionHierarchy = {
     connectionsReceived: INJ_DEFAULT,
     clean: INJ_DEFAULT,
     create: needCreate,
+    edit: needEdit,
+    editSuccessful: INJ_DEFAULT,
+    editFailure: INJ_DEFAULT,
     whatsNew: createWhatsNew,
     whatsAround: createWhatsAround,
     createSuccessful: INJ_DEFAULT,
