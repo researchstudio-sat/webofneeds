@@ -8,6 +8,7 @@ import postIsOrSeeksInfoModule from "./post-is-or-seeks-info.js";
 import labelledHrModule from "./labelled-hr.js";
 import postContentGeneral from "./post-content-general.js";
 import postContentPersona from "./post-content-persona.js";
+import postContentParticipants from "./post-content-participants.js";
 import postHeaderModule from "./post-header.js";
 import trigModule from "./trig.js";
 import { attach, getIn, get } from "../utils.js";
@@ -58,7 +59,7 @@ function genComponentConf() {
                 ng-click="self.tryReload()">
                 Try Reload
             </button>
-        </div>
+          </div>
         </div>
         <div class="post-content" ng-if="!self.postLoading && !self.postFailedToLoad">
           <!-- GENERAL INFORMATION -->
@@ -73,68 +74,7 @@ function genComponentConf() {
           <won-post-content-persona ng-if="self.isSelectedTab('HELDBY')" holds-uri="self.postUri"></won-post-content-persona>
           
           <!-- PARTICIPANT INFORMATION -->
-          <div class="post-content__members" ng-if="self.isSelectedTab('PARTICIPANTS')">
-            <div
-                class="post-content__members__member"
-                ng-if="!self.isOwned && self.hasGroupMembers"
-                ng-repeat="memberUri in self.groupMembersArray track by memberUri">
-                <div class="post-content__members__member__indicator"></div>
-                <won-post-header
-                  class="clickable"
-                  ng-click="self.router__stateGoCurrent({viewNeedUri: memberUri, viewConnUri: undefined})"
-                  need-uri="::memberUri">
-                </won-post-header>
-                <div class="post-content__members__member__actions"></div>
-            </div>
-            <div class="post-content__members__member"
-                ng-if="self.isOwned && self.hasGroupChatConnections && conn.get('state') !== self.won.WON.Closed"
-                ng-repeat="conn in self.groupChatConnectionsArray"
-                in-view="conn.get('unread') && $inview && self.markAsRead(conn)"
-                ng-class="{'won-unread': conn.get('unread')}">
-                <div class="post-content__members__member__indicator"></div>
-                <won-post-header
-                  class="clickable"
-                  ng-click="self.router__stateGoCurrent({viewNeedUri: conn.get('remoteNeedUri'), viewConnUri: undefined})"
-                  need-uri="::conn.get('remoteNeedUri')">
-                </won-post-header>
-                <div class="post-content__members__member__actions">
-                    <div
-                      class="post-content__members__member__actions__button red won-button--outlined thin"
-                      ng-click="self.openRequest(conn)"
-                      ng-if="conn.get('state') === self.won.WON.RequestReceived">
-                        Accept
-                    </div>
-                    <div
-                      class="post-content__members__member__actions__button red won-button--outlined thin"
-                      ng-click="self.closeConnection(conn)"
-                      ng-if="conn.get('state') === self.won.WON.RequestReceived">
-                        Reject
-                    </div>
-                    <div
-                      class="post-content__members__member__actions__button red won-button--outlined thin"
-                      ng-click="self.sendRequest(conn)"
-                      ng-if="conn.get('state') === self.won.WON.Suggested">
-                        Request
-                    </div>
-                    <div
-                      class="post-content__members__member__actions__button red won-button--outlined thin"
-                      ng-disabled="true"
-                      ng-if="conn.get('state') === self.won.WON.RequestSent">
-                        Waiting for Accept...
-                    </div>
-                    <div
-                      class="post-content__members__member__actions__button red won-button--outlined thin"
-                      ng-click="self.closeConnection(conn)"
-                      ng-if="conn.get('state') === self.won.WON.Suggested || conn.get('state') === self.won.WON.Connected">
-                        Remove
-                    </div>
-                </div>
-            </div>
-            <div class="post-content__members__empty"
-                ng-if="(!self.isOwned && !self.hasGroupMembers) || (self.isOwned && !self.hasGroupChatConnections)">
-                No Groupmembers present.
-            </div>
-          </div>
+          <won-post-content-participants ng-if="self.isSelectedTab('PARTICIPANTS')" post-uri="self.postUri"></won-post-content-participants>
 
           <!-- REVIEW INFORMATION -->
           <div class="post-content__reviews" ng-if="self.isSelectedTab('REVIEWS')">
@@ -241,17 +181,6 @@ function genComponentConf() {
         const hasContent = this.hasVisibleDetails(content);
         const hasSeeksBranch = this.hasVisibleDetails(seeks);
 
-        const hasGroupFacet = needUtils.hasGroupFacet(post);
-
-        const groupMembers = hasGroupFacet && get(post, "groupMembers");
-        const groupChatConnections =
-          isOwned &&
-          hasGroupFacet &&
-          connectionSelectors.getGroupChatConnectionsByNeedUri(
-            state,
-            this.postUri
-          );
-
         const heldPosts = isPersona && get(post, "holds");
 
         const suggestions = connectionSelectors.getSuggestedConnectionsByNeedUri(
@@ -275,15 +204,8 @@ function genComponentConf() {
           isOwned,
           hasHeldPosts: isPersona && heldPosts && heldPosts.size > 0,
           heldPostsArray: isPersona && heldPosts && heldPosts.toArray(),
-          hasGroupFacet,
           hasChatFacet: needUtils.hasChatFacet(post),
           hasHoldableFacet: needUtils.hasHoldableFacet(post),
-          hasGroupMembers: groupMembers && groupMembers.size > 0,
-          hasGroupChatConnections:
-            groupChatConnections && groupChatConnections.size > 0,
-          groupChatConnectionsArray:
-            groupChatConnections && groupChatConnections.toArray(),
-          groupMembersArray: groupMembers && groupMembers.toArray(),
           hasSuggestions: isOwned && suggestions && suggestions.size > 0,
           suggestionsArray: isOwned && suggestions && suggestions.toArray(),
           postLoading:
@@ -329,23 +251,6 @@ function genComponentConf() {
       this.connections__close(connUri);
     }
 
-    openRequest(conn, message = "") {
-      if (!conn || this.isOwnedNeedWhatsX) {
-        return;
-      }
-
-      const connUri = get(conn, "uri");
-
-      if (conn.get("unread")) {
-        this.connections__markAsRead({
-          connectionUri: connUri,
-          needUri: this.postUri,
-        });
-      }
-
-      this.connections__open(connUri, message);
-    }
-
     sendRequest(conn, message = "") {
       if (!conn) {
         return;
@@ -380,10 +285,6 @@ function genComponentConf() {
 
     canAttachPersona() {
       return this.post.get("isOwned") && !this.post.get("heldBy");
-    }
-
-    toggleShowGeneral() {
-      this.needs__toggleGeneralInfo(this.postUri);
     }
 
     isSelectedTab(tabName) {
@@ -461,6 +362,7 @@ export default angular
     labelledHrModule,
     postContentGeneral,
     postContentPersona,
+    postContentParticipants,
     postHeaderModule,
     trigModule,
     inviewModule.name,

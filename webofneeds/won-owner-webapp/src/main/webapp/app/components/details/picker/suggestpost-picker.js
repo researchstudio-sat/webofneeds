@@ -1,5 +1,6 @@
 import angular from "angular";
 import "ng-redux";
+import Immutable from "immutable";
 import { attach, sortBy, get, getIn, delay } from "../../../utils.js";
 import { DomCache } from "../../../cstm-ng-utils.js";
 import wonInput from "../../../directives/input.js";
@@ -8,7 +9,7 @@ import { actionCreators } from "../../../actions/actions.js";
 import postHeaderModule from "../../post-header.js";
 import labelledHrModule from "../../labelled-hr.js";
 import { getActiveNeeds } from "../../../selectors/general-selectors.js";
-import { isWhatsAroundNeed, isWhatsNewNeed } from "../../../need-utils.js";
+import * as needUtils from "../../../need-utils.js";
 
 import "style/_suggestpostpicker.scss";
 
@@ -26,7 +27,7 @@ function genComponentConf() {
         </div>
       </div>
       <div class="suggestpostp__noposts" ng-if="!self.suggestionsAvailable">
-        No Needs available to suggest
+        {{ self.noSuggestionsLabel }}
       </div>
       <won-labelled-hr label="::'Not happy with the options? Add a Need-URI below'" class="suggestpostp__labelledhr"></won-labelled-hr>
       <div class="suggestpostp__input">
@@ -60,6 +61,12 @@ function genComponentConf() {
       </div>
       <div class="suggestpostp__error" ng-if="self.uriToFetchIsWhatsAround && self.fetchNeedUriFieldHasText()">
           Suggestion invalid, you are trying to share a What's Around Need.
+      </div>
+      <div class="suggestpostp__error" ng-if="self.uriToFetchIsExcluded && self.fetchNeedUriFieldHasText()">
+          {{ self.excludedText }}
+      </div>
+      <div class="suggestpostp__error" ng-if="self.uriToFetchIsNotAllowed && self.fetchNeedUriFieldHasText()">
+          {{ self.notAllowedFacetText }}
       </div>
     `;
 
@@ -101,10 +108,18 @@ function genComponentConf() {
         ]);
         const uriToFetchLoading = !!get(uriToFetchProcess, "loading");
         const uriToFetchFailedToLoad = !!get(uriToFetchProcess, "failedToLoad");
-        const uriToFetchIsWhatsNew = isWhatsNewNeed(
+        const uriToFetchIsWhatsNew = needUtils.isWhatsNewNeed(
           get(allForbiddenNeeds, this.uriToFetch)
         );
-        const uriToFetchIsWhatsAround = isWhatsAroundNeed(
+        const uriToFetchIsWhatsAround = needUtils.isWhatsAroundNeed(
+          get(allForbiddenNeeds, this.uriToFetch)
+        );
+        const uriToFetchIsNotAllowed =
+          !!get(allForbiddenNeeds, this.uriToFetch) &&
+          !this.hasAtLeastOneAllowedFacet(
+            get(allForbiddenNeeds, this.uriToFetch)
+          );
+        const uriToFetchIsExcluded = this.isExcludedNeed(
           get(allForbiddenNeeds, this.uriToFetch)
         );
 
@@ -114,12 +129,16 @@ function genComponentConf() {
           uriToFetchFailedToLoad,
           uriToFetchIsWhatsNew,
           uriToFetchIsWhatsAround,
+          uriToFetchIsExcluded,
+          uriToFetchIsNotAllowed,
           allSuggestableNeeds,
           allForbiddenNeeds,
           suggestionsAvailable:
             allSuggestableNeeds && allSuggestableNeeds.size > 0,
           sortedActiveNeeds,
           suggestedNeed,
+          noSuggestionsLabel:
+            this.noSuggestionsText || "No Needs available to suggest",
           uriToFetchSuccess:
             this.uriToFetch &&
             !uriToFetchLoading &&
@@ -130,14 +149,25 @@ function genComponentConf() {
             !uriToFetchLoading &&
             (uriToFetchFailedToLoad ||
               uriToFetchIsWhatsAround ||
-              uriToFetchIsWhatsNew),
+              uriToFetchIsWhatsNew ||
+              uriToFetchIsExcluded ||
+              uriToFetchIsNotAllowed),
         };
       };
 
       connect2Redux(
         selectFromState,
         actionCreators,
-        ["self.initialValue", "self.detail", "self.uriToFetch"],
+        [
+          "self.initialValue",
+          "self.detail",
+          "self.uriToFetch",
+          "self.excludedUris",
+          "self.allowedFacets",
+          "self.notAllowedFacetText",
+          "self.excludedText",
+          "self.noSuggestionsText",
+        ],
         this
       );
 
@@ -153,8 +183,35 @@ function genComponentConf() {
       );
     }
 
+    hasAtLeastOneAllowedFacet(need) {
+      if (this.allowedFacets) {
+        const allowedFacetsImm = Immutable.fromJS(this.allowedFacets);
+        const needFacetsImm = need && need.getIn(["content", "facets"]);
+
+        return (
+          needFacetsImm &&
+          needFacetsImm.find(facet => allowedFacetsImm.contains(facet))
+        );
+      }
+      return true;
+    }
+
+    isExcludedNeed(need) {
+      if (this.excludedUris) {
+        const excludedUrisImm = Immutable.fromJS(this.excludedUris);
+
+        return excludedUrisImm.contains(get(need, "uri"));
+      }
+      return false;
+    }
+
     isSuggestable(need) {
-      return !isWhatsAroundNeed(need) && !isWhatsNewNeed(need);
+      return (
+        !needUtils.isWhatsAroundNeed(need) &&
+        !needUtils.isWhatsNewNeed(need) &&
+        !this.isExcludedNeed(need) &&
+        this.hasAtLeastOneAllowedFacet(need)
+      );
     }
 
     isSelected(need) {
@@ -248,6 +305,11 @@ function genComponentConf() {
       onUpdate: "&",
       initialValue: "=",
       detail: "=",
+      excludedUris: "=", //list of uris that should be excluded from the suggestions
+      allowedFacets: "=", //list of facets where at least one facet needs to be present in the need for it to be allowed as a suggestion
+      notAllowedFacetText: "=", //error message to display if need does not have any allowed facets
+      excludedText: "=", //error message to display when excluded need is added via the fetch input
+      noSuggestionsText: "=", //Text to display when no suggestions are available
     },
     template: template,
   };
