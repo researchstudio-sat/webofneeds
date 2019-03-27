@@ -440,6 +440,25 @@ export function buildOpenMessage(
   return messageP;
 }
 
+export async function buildEditMessage(editedNeedData, oldNeed, wonNodeUri) {
+  console.debug(
+    "TODO: IMPL buildEditMessage: ",
+    editedNeedData,
+    oldNeed,
+    wonNodeUri
+  );
+  const needUriToEdit = oldNeed && oldNeed.get("uri");
+
+  const msgJson = undefined;
+  const msgUri = undefined;
+  //TODO FIX ME ACCORDING TO THE spec:
+  return {
+    message: msgJson,
+    eventUri: msgUri,
+    needUri: needUriToEdit,
+  };
+}
+
 /**
  *
  * @param needData
