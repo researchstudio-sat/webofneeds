@@ -1,5 +1,5 @@
 import won from "../../app/won-es6.js";
-import { is, get } from "../../app/utils.js";
+import { is, get, getIn } from "../../app/utils.js";
 import { select } from "../details/abstract.js";
 import Immutable from "immutable";
 
@@ -180,9 +180,7 @@ export const suggestPost = {
     }
   },
   parseFromRDF: function(jsonLDImm) {
-    const suggestUriJsonLDImm =
-      jsonLDImm && jsonLDImm.get("won:suggestPostUri");
-    return suggestUriJsonLDImm && suggestUriJsonLDImm.get("@id");
+    return getIn(jsonLDImm, ["won:suggestPostUri", "@id"]);
   },
   generateHumanReadable: function({ value, includeLabel }) {
     if (value) {
@@ -212,9 +210,7 @@ export const responseToUri = {
     }
   },
   parseFromRDF: function(jsonLDImm) {
-    const responseToUriJsonLDImm =
-      jsonLDImm && jsonLDImm.get("won:responseToUri");
-    return responseToUriJsonLDImm && responseToUriJsonLDImm.get("@id");
+    return getIn(jsonLDImm, ["won:responseToUri", "@id"]);
   },
   generateHumanReadable: function({ value, includeLabel }) {
     if (value) {
@@ -428,9 +424,12 @@ export const defaultFacet = {
   },
 };
 
-export const sPlanAction = {
-  identifier: "sPlanAction",
-  label: "Plan",
+/*
+  Use this detail with the s:PlanAction type -> if you use this detail make sure you add the s:PlanAction type to the corresponding branch (content or seeks)
+*/
+export const eventObject = {
+  identifier: "eventObject",
+  label: "Event",
   icon: "#ico36_detail_title",
   placeholder: "What? (Short title shown in lists)",
   parseToRDF: function({ value }) {
@@ -439,20 +438,19 @@ export const sPlanAction = {
       return;
     }
     return {
-      "@type": "s:PlanAction",
       "s:object": {
         "@type": "s:Event",
-        "s:about": value,
+        "s:about": { "@id": value },
       },
     };
   },
   parseFromRDF: function(jsonLDImm) {
-    const types = jsonLDImm.getIn(["@type"]);
+    const types = get(jsonLDImm, "@type");
     if (
       (Immutable.List.isList(types) && types.includes("s:PlanAction")) ||
       types === "s:PlanAction"
     ) {
-      const planObjs = jsonLDImm.getIn(jsonLDImm, ["s:object"]);
+      const planObjs = get(jsonLDImm, "s:object");
       let plns = [];
 
       if (Immutable.List.isList(planObjs)) {

@@ -36,7 +36,7 @@ function genComponentConf() {
             </div>
             <!-- Reaction Use Cases -->
             <won-labelled-hr label="::'Or'" class="pm__footer__labelledhr"  ng-if="self.hasReactionUseCases"></won-labelled-hr>
-            <button class="won-button--filled red post-info__footer__button" style="margin: 0rem 0rem .3rem 0rem;
+            <button class="won-button--filled red post-info__footer__button" style="margin: 0rem 0rem .3rem 0rem;"
                     ng-if="self.hasReactionUseCases"
                     ng-repeat="ucIdentifier in self.reactionUseCasesArray"
                     ng-click="self.selectUseCase(ucIdentifier)">

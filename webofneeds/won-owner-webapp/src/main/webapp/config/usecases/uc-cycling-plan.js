@@ -18,9 +18,9 @@ export const cyclingPlan = {
   draft: {
     ...mergeInEmptyDraft({
       content: {
-        type: ["won:CyclingPlan"],
+        type: ["s:PlanAction"],
         title: "Let's go for a bike ride!",
-        sPlanAction: { "@id": "http://dbpedia.org/resource/Cycling" },
+        eventObject: "http://dbpedia.org/resource/Cycling",
         facets: {
           "#groupFacet": won.WON.GroupFacetCompacted,
           "#holdableFacet": won.WON.HoldableFacetCompacted,
