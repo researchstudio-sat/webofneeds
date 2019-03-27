@@ -47,8 +47,9 @@ function genComponentConf() {
                 style="--local-primary:var(--won-primary-color);">
                     <use xlink:href="{{self.useCase['icon']}}" href="{{self.useCase['icon']}}"></use>
             </svg>
-            <span class="cp__header__title" ng-if="!self.isCreateFromNeed">{{self.useCase.label}}</span>
+            <span class="cp__header__title" ng-if="!self.isCreateFromNeed && !self.isEditFromNeed">{{self.useCase.label}}</span>
             <span class="cp__header__title" ng-if="self.isCreateFromNeed">Duplicate from '{{self.useCase.label}}'</span>
+            <span class="cp__header__title" ng-if="self.isEditFromNeed">Edit Need</span>
         </div>
         <div class="cp__content">
             <div class="cp__content__loading" ng-if="!self.showCreateInput && self.isFromNeedLoading">
@@ -330,11 +331,7 @@ function genComponentConf() {
           delete this.draftObject.seeks;
         }
 
-        /*const tempDefaultNodeUri = this.$ngRedux
-          .getState()
-          .getIn(["config", "defaultNodeUri"]);*/
-
-        //TODO: Impl this method this.needs__edit(tempDraft, this.fromNeedUri, tempDefaultNodeUri);
+        //TODO: Impl this method this.needs__edit(tempDraft, this.fromNeedUri);
         console.debug(
           "Called edit for: ",
           this.fromNeed,
