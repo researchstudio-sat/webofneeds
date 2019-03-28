@@ -192,9 +192,17 @@ export default function(allNeedsInState = initialState, action = {}) {
       );
     }
 
-    case actionTypes.needs.edit:
+    case actionTypes.needs.edit: {
+      console.debug(
+        "payload = {eventUri, message, needUri, need: draft, oldNeed}"
+      );
+      console.debug(
+        "need-reducer-main actionTypes.needs.edit todo: impl / payload-> ",
+        action.payload
+      );
       //TODO: IMPL Optimistic change
       return allNeedsInState;
+    }
 
     case actionTypes.needs.create: // optimistic need adding
       return addNeedInCreation(

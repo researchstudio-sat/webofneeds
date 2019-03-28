@@ -15,9 +15,17 @@ const initialState = Immutable.fromJS({
 });
 export function messagesReducer(messages = initialState, action = {}) {
   switch (action.type) {
-    case actionTypes.needs.edit:
+    case actionTypes.needs.edit: {
+      console.debug(
+        "payload = {eventUri, message, needUri, need: draft, oldNeed}"
+      );
+      console.debug(
+        "message-reducer actionTypes.needs.edit todo: impl / payload-> ",
+        action.payload
+      );
       //TODO: IMPL
       return messages;
+    }
 
     case actionTypes.needs.connect:
     case actionTypes.personas.create:
