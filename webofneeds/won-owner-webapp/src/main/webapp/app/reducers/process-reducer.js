@@ -25,6 +25,7 @@ export const emptyNeedProcess = Immutable.fromJS({
   loading: false,
   toLoad: false,
   failedToLoad: false,
+  processUpdate: false,
 });
 
 export const emptyConnectionProcess = Immutable.fromJS({
@@ -106,9 +107,17 @@ function updateMessageProcess(processState, connUri, messageUri, payload) {
 
 export default function(processState = initialState, action = {}) {
   switch (action.type) {
-    case actionTypes.needs.edit:
-      //TODO: IMPL
+    case actionTypes.needs.edit: {
+      const needUri = action.payload.needUri;
+
+      if (needUri) {
+        processState = updateNeedProcess(processState, needUri, {
+          processUpdate: true,
+        });
+      }
+
       return processState;
+    }
 
     case actionTypes.personas.create:
     case actionTypes.needs.create:

@@ -62,6 +62,12 @@ function genComponentConf() {
           </div>
         </div>
         <div class="post-content" ng-if="!self.postLoading && !self.postFailedToLoad">
+          <div class="post-content__updateindicator" ng-if="self.postProcessingUpdate">
+            <svg class="hspinner post-content__updateindicator__spinner">
+              <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
+            </svg>
+            <span class="post-content__updateindicator__label">Processing changes...</span>
+          </div>
           <!-- GENERAL INFORMATION -->
           <won-post-content-general ng-if="self.isSelectedTab('DETAIL')" post-uri="self.postUri"></won-post-content-general>
           <!-- DETAIL INFORMATION -->
@@ -212,6 +218,8 @@ function genComponentConf() {
             !post || processUtils.isNeedLoading(process, this.postUri),
           postFailedToLoad:
             post && processUtils.hasNeedFailedToLoad(process, this.postUri),
+          postProcessingUpdate:
+            post && processUtils.isNeedProcessingUpdate(process, this.postUri),
           createdTimestamp: post && post.get("creationDate"),
           shouldShowRdf: viewUtils.showRdf(viewState),
           fromConnection: !!openConnectionUri,

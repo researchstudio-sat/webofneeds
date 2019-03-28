@@ -90,6 +90,17 @@ export function isProcessingSendAnonymousLinkEmail(process) {
 }
 
 /**
+ * Return true if given needUri is currently processing an update
+ * @param process (full process from state)
+ * @param needUri
+ * @returns {*}
+ */
+
+export function isNeedProcessingUpdate(process, needUri) {
+  return needUri && getIn(process, ["needs", needUri, "processUpdate"]);
+}
+
+/**
  * Return true if given needUri is currently loading
  * @param process (full process from state)
  * @param needUri

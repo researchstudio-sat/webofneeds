@@ -24,6 +24,22 @@ won-post-content {
       padding: 0.5rem;
     }
 
+    .post-content__updateindicator {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+
+      padding: 0.25rem;
+      background: $won-secondary-color-light;
+      color: $won-secondary-text-color;
+
+      &__label {
+        margin-left: 0.5rem;
+        white-space: nowrap;
+      }
+    }
+
     .post-content__reviews {
       &__empty {
         color: $won-line-gray;
