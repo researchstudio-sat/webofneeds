@@ -147,6 +147,12 @@ won-create-search {
       width: 100%;
       margin-top: 1rem;
     }
+
+    .cp__footer__edit {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-gap: 0.5rem;
+    }
   }
 }
 
