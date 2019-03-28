@@ -243,6 +243,8 @@ won.WONMSG.FromSystem = won.WONMSG.baseUri + "FromSystem";
 //message types
 won.WONMSG.createMessage = won.WONMSG.baseUri + "CreateMessage";
 won.WONMSG.createMessageCompacted = won.WONMSG.prefix + ":CreateMessage";
+won.WONMSG.replaceMessage = won.WONMSG.baseUri + "ReplaceMessage";
+won.WONMSG.replaceMessageCompacted = won.WONMSG.prefix + ":ReplaceMessage";
 won.WONMSG.activateNeedMessage = won.WONMSG.baseUri + "ActivateMessage";
 won.WONMSG.activateNeedMessageCompacted =
   won.WONMSG.prefix + ":ActivateMessage";
