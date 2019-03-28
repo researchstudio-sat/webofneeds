@@ -331,13 +331,7 @@ function genComponentConf() {
           delete this.draftObject.seeks;
         }
 
-        //TODO: Impl this method this.needs__edit(tempDraft, this.fromNeedUri);
-        console.debug(
-          "Called edit for: ",
-          this.fromNeed,
-          "with new draft: ",
-          this.draftObject
-        );
+        this.needs__edit(this.draftObject, this.fromNeed);
       }
     }
 
