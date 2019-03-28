@@ -41,30 +41,20 @@ export function needEdit(draft, oldNeed, nodeUri) {
       delete prevParams.privateId;
     }
 
-    return ensureLoggedIn(dispatch, getState)
-      .then(() => {
-        return dispatch(actionCreators.router__stateGoDefault()); //TODO: MIGHT NOT BE NECESSARY/FIND CORRECT REDIRECT ROUTE (maybe router__back would work) or dispatch edit in progress...
-      })
-      .then(async () => {
-        const { message, eventUri, needUri } = await buildEditMessage(
-          draft,
-          oldNeed,
-          nodeUri
-        );
+    return ensureLoggedIn(dispatch, getState).then(async () => {
+      const { message, eventUri, needUri } = await buildEditMessage(
+        draft,
+        oldNeed,
+        nodeUri
+      );
 
-        dispatch({
-          type: actionTypes.needs.create, //CHANGE TYPE
-          payload: { eventUri, message, needUri, need: draft, oldNeed },
-        });
-
-        dispatch(
-          //TODO SET UP CORRECT REDIRECT (maybe router__back)
-          actionCreators.router__stateGoAbs("connections", {
-            postUri: undefined,
-            connectionUri: undefined,
-          })
-        );
+      dispatch({
+        type: actionTypes.needs.edit,
+        payload: { eventUri, message, needUri, need: draft, oldNeed },
       });
+
+      dispatch(actionCreators.router__back());
+    });
   };
 }
 
