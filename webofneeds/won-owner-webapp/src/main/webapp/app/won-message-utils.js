@@ -486,17 +486,6 @@ export async function buildCreateMessage(needData, wonNodeUri) {
 
   const publishedContentUri = wonNodeUri + "/need/" + getRandomWonId();
 
-  const imgs = needData.images;
-  let attachmentUris = [];
-  if (imgs) {
-    imgs.forEach(function(img) {
-      img.uri = wonNodeUri + "/attachment/" + getRandomWonId();
-    });
-    attachmentUris = imgs.map(function(img) {
-      return img.uri;
-    });
-  }
-
   //if type  create -> use needBuilder as well
   const prepareContentNodeData = async needData => ({
     // Adds all fields from needDataIsOrSeeks:
@@ -504,8 +493,6 @@ export async function buildCreateMessage(needData, wonNodeUri) {
     ...needData,
 
     publishedContentUri: publishedContentUri, //mandatory
-    //TODO attach to either is or seeks?
-    attachmentUris: attachmentUris, //optional, should be same as in `attachments` below
     arbitraryJsonLd: needData.ttl ? await won.ttlToJsonLd(needData.ttl) : [],
   });
 
@@ -531,7 +518,6 @@ export async function buildCreateMessage(needData, wonNodeUri) {
     msgType: won.WONMSG.createMessage, //mandatory
     publishedContentUri: publishedContentUri, //mandatory
     msgUri: msgUri,
-    attachments: imgs, //optional, should be same as in `attachmentUris` above
   });
   //add the @base definition to the @context so we can use #fragments in the need structure
   msgJson["@context"]["@base"] = publishedContentUri;
