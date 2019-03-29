@@ -58,7 +58,11 @@ public interface ConnectionRepository extends WonRepository<Connection> {
 
     List<Connection> findByNeedURIAndStateAndTypeURI(URI needURI, ConnectionState connectionState, URI facetType);
 
+    List<Connection> findByNeedURIAndState(URI needURI, ConnectionState connectionState);
+
     List<Connection> findByFacetURIAndState(URI facetURI, ConnectionState connectionState);
+
+    List<Connection> findByNeedURIAndTypeURI(URI needURI, URI facetType);
 
     long countByNeedURIAndState(URI needURI, ConnectionState connectionState);
 
@@ -73,7 +77,18 @@ public interface ConnectionRepository extends WonRepository<Connection> {
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select c from Connection c where c.needURI = ?1 and c.state != ?2")
-    List<Connection> getConnectionsByNeedURIAndNotInStateForUpdate(URI needURI, ConnectionState connectionState);
+    List<Connection> findByNeedURIAndNotStateForUpdate(URI needURI, ConnectionState connectionState);
+
+    @Query("select c from Connection c where c.needURI = ?1 and c.state != ?2")
+    List<Connection> findByNeedURIAndNotState(URI needURI, ConnectionState connectionState);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select c from Connection c where c.needURI = ?1 and c.facetURI = ?2 and c.state != ?3")
+    List<Connection> findByNeedURIAndFacetURIAndNotStateForUpdate(URI needURI, URI facetURI,
+                    ConnectionState connectionState);
+
+    @Query("select c from Connection c where c.needURI = ?1 and c.facetURI = ?2 and c.state != ?3")
+    List<Connection> findByNeedURIAndFacetURIAndNotState(URI needURI, URI facetURI, ConnectionState connectionState);
 
     @Query("select conn from Connection conn where lastUpdate > :modifiedAfter")
     List<Connection> findModifiedConnectionsAfter(@Param("modifiedAfter") Date modifiedAfter);

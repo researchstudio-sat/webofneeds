@@ -21,6 +21,7 @@ ASK
     {
        ?subj msg:hasMessageType ?type
        FILTER (?type != msg:CreateMessage  &&  ?type != msg:ConnectMessage
+            && ?type != msg:ReplaceMessage 
             && ?type != msg:CloseMessage && ?type != msg:ConnectionMessage && ?type != msg:HintMessage
             && ?type != msg:DeleteMessage
             && ?type != msg:FailureResponse && ?type != msg:SuccessResponse
