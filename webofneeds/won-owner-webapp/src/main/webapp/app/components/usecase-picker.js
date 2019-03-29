@@ -73,24 +73,46 @@ function genComponentConf() {
         <div class="ucp__main">
 
         <!-- SEARCH FIELD -->
-        <input
-            type="text"
-            class="ucp__main__search"
-            placeholder="Search for use cases"
-            won-input="::self.updateSearch()" />
-
+        <div class="ucp__main__search">
+          <svg class="ucp__main__search__icon clickable"
+              style="--local-primary:var(--won-primary-color);"
+              ng-if="self.showResetButton"
+              ng-click="self.resetSearch()">
+              <use xlink:href="#ico36_close" href="#ico36_close"></use>
+          </svg>
+          <input
+              type="text"
+              class="ucp__main__search__input"
+              placeholder="Search for use cases"
+              won-input="::self.updateSearch()" />
+        </div>
         <!-- SEARCH RESULTS -->
         <div class="ucp__main__searchresult clickable"
           ng-repeat="useCase in self.searchResults"
+          ng-if="self.isSearching && self.searchResults"
           ng-click="self.startFrom(useCase)">
             <svg class="ucp__main__searchresult__icon"
                 ng-if="!!useCase.icon">
                 <use xlink:href="{{ useCase.icon }}" href="{{ useCase.icon }}"></use>
-              </svg>
-              <div class="ucp__main__searchresult__label"
+            </svg>
+            <div class="ucp__main__searchresult__label"
                 ng-if="!!useCase.label">
-                  {{ useCase.label }}
-              </div>
+                {{ useCase.label }}
+            </div>
+        </div>
+        <div class="ucp__main__noresults" ng-if="self.isSearching && !self.searchResults">
+          No Results found for '{{self.textfield().value}}'.
+        </div>
+        <div class="ucp__main__newcustom clickable" ng-if="self.isSearching && !self.searchResults && self.customUseCase"
+            ng-click="self.startFrom(self.customUseCase)">
+            <svg class="ucp__main__newcustom__icon"
+                ng-if="!!self.customUseCase.icon">
+                <use xlink:href="{{ self.customUseCase.icon }}" href="{{ self.customUseCase.icon }}"></use>
+            </svg>
+            <div class="ucp__main__newcustom__label"
+                ng-if="!!self.customUseCase.label">
+                {{ self.customUseCase.label }}
+            </div>
         </div>
 
 
@@ -134,6 +156,7 @@ function genComponentConf() {
 
       this.useCaseUtils = useCaseUtils;
       this.searchResults = undefined;
+      this.showResetButton = false;
 
       const selectFromState = state => {
         const showGroupsThreshold = 1; // only show groups with more than 1 use case(s) as groups
@@ -144,6 +167,7 @@ function genComponentConf() {
           processingPublish: state.getIn(["process", "processingPublish"]),
           connectionHasBeenLost: !selectIsConnected(state),
           useCaseGroups: useCaseUtils.getUseCaseGroups(),
+          customUseCase: useCaseUtils.getCustomUseCase(),
           showGroupsThreshold,
           ungroupedUseCases: useCaseUtils.getUnGroupedUseCases(
             showGroupsThreshold
@@ -237,28 +261,38 @@ function genComponentConf() {
 
     // redirects end
 
-    // search start
-
-    // TODO: deal with use cases that are in more than one group - they might show up repeatedly
-    // TODO: group search results by use case groups - only showing groups with results
     updateSearch() {
+      this.showResetButton = true;
       const query = this.textfield().value;
 
       if (query && query.trim().length > 1) {
         this.isSearching = true;
 
-        const results = useCaseUtils.filterUseCasesBySearchQuery(query);
+        const searchResults = useCaseUtils.filterUseCasesBySearchQuery(query);
 
-        if (!results) {
-          this.searchResults = undefined;
-          this.isSearching = false;
-        }
+        const sortByLabelAsc = (a, b) => {
+          const bValue = b && b.label && b.label.toLowerCase();
+          const aValue = a && a.label && a.label.toLowerCase();
 
-        this.searchResults = results;
+          if (aValue < bValue) return -1;
+          if (aValue > bValue) return 1;
+          return 0;
+        };
+
+        this.searchResults = searchResults
+          ? searchResults.sort(sortByLabelAsc)
+          : undefined;
       } else {
         this.searchResults = undefined;
         this.isSearching = false;
       }
+    }
+
+    resetSearch() {
+      this.isSearching = false;
+      this.searchResults = undefined;
+      this.textfield().value = "";
+      this.showResetButton = false;
     }
 
     // search end
@@ -269,7 +303,7 @@ function genComponentConf() {
     textfield() {
       if (!this._searchInput) {
         this._searchInput = this.$element[0].querySelector(
-          ".ucp__main__search"
+          ".ucp__main__search__input"
         );
       }
       return this._searchInput;

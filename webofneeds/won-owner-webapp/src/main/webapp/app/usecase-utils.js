@@ -211,6 +211,10 @@ export function getUnGroupedUseCases(threshold = 0) {
   return ungroupedUseCases;
 }
 
+export function getCustomUseCase() {
+  return getUseCase("customUseCase");
+}
+
 export function getUseCase(useCaseString) {
   if (useCaseString) {
     const useCases = useCaseDefinitions.getAllUseCases();
