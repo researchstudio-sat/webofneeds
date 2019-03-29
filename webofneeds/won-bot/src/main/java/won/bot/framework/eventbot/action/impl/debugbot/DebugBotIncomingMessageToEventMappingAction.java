@@ -43,6 +43,7 @@ import won.bot.framework.eventbot.event.impl.crawlconnection.CrawlConnectionComm
 import won.bot.framework.eventbot.event.impl.debugbot.ConnectDebugCommandEvent;
 import won.bot.framework.eventbot.event.impl.debugbot.HintDebugCommandEvent;
 import won.bot.framework.eventbot.event.impl.debugbot.MessageToElizaEvent;
+import won.bot.framework.eventbot.event.impl.debugbot.ReplaceDebugNeedContentCommandEvent;
 import won.bot.framework.eventbot.event.impl.debugbot.SendNDebugCommandEvent;
 import won.bot.framework.eventbot.event.impl.debugbot.SetCacheEagernessCommandEvent;
 import won.bot.framework.eventbot.event.impl.debugbot.SetChattinessDebugCommandEvent;
@@ -65,6 +66,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
     Pattern PATTERN_USAGE = Pattern.compile("^usage|\\?|help|debug$", Pattern.CASE_INSENSITIVE);
     Pattern PATTERN_HINT = Pattern.compile("^hint$", Pattern.CASE_INSENSITIVE);
     Pattern PATTERN_CLOSE = Pattern.compile("^close$", Pattern.CASE_INSENSITIVE);
+    Pattern PATTERN_MODIFY = Pattern.compile("^modify$", Pattern.CASE_INSENSITIVE);
     Pattern PATTERN_CONNECT = Pattern.compile("^connect$", Pattern.CASE_INSENSITIVE);
     Pattern PATTERN_DEACTIVATE = Pattern.compile("^deactivate$", Pattern.CASE_INSENSITIVE);
     Pattern PATTERN_CHATTY_ON = Pattern.compile("^chatty\\s+on$", Pattern.CASE_INSENSITIVE);
@@ -118,23 +120,23 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
         System.out.println("----");
     }
 
-    public static final String[] USAGE_MESSAGES = {
-                    "You are connected to the debug bot. You can issue commands that will cause interactions with your need.\n\n"
-                                    + "Usage:\n" + "    `hint`:            create a new need and send hint to it\n"
-                                    + "    `connect`:         create a new need and send connection request to it\n"
-                                    + "    `close`:           close the current connection\n"
-                                    + "    `deactivate`:      deactivate remote need of the current connection\n"
-                                    + "    `chatty on|off`:   send chat messages spontaneously every now and then? (default: on)\n"
-                                    + "    `send N`:          send N messages, one per second. N must be an integer between 1 and 9\n"
-                                    + "    `validate'`:        download the connection data and validate it\n"
-                                    + "    `propose (my|any) (N)`:  propose one (N, max 9) of my(/your/any) messages for an agreement\n"
-                                    + "    `accept`:          accept the last proposal/claim made (including cancellation proposals)\n"
-                                    + "    `cancel`:           propose to cancel the newest agreement (that wasn't only a cancellation)\n"
-                                    + "    `retract (mine|proposal)`:  retract the last (proposal) message you sent, or the last message I sent\n"
-                                    + "    `reject (yours)`:  reject the last rejectable message I (you) sent\n"
-                                    + "    `cache eager|lazy`: use lazy or eager RDF cache\n"
-                                    + "    `inject`           send a message in this connection that will be forwarded to all other connections we have\n"
-                                    + "    `usage`:           display this message\n" };
+    public static final String[] USAGE_MESSAGES = { "# Usage:\n"
+                    + "* `hint`:            create a new need and send hint to it\n"
+                    + "* `connect`:         create a new need and send connection request to it\n"
+                    + "* `close`:           close the current connection\n"
+                    + "* `modify`:          modify the need's description\n"
+                    + "* `deactivate`:      deactivate remote need of the current connection\n"
+                    + "* `chatty on|off`:   send chat messages spontaneously every now and then? (default: on)\n"
+                    + "* `send N`:          send N messages, one per second. N must be an integer between 1 and 9\n"
+                    + "* `validate'`:        download the connection data and validate it\n"
+                    + "* `propose (my|any) (N)`:  propose one (N, max 9) of my(/your/any) messages for an agreement\n"
+                    + "* `accept`:          accept the last proposal/claim made (including cancellation proposals)\n"
+                    + "* `cancel`:           propose to cancel the newest agreement (that wasn't only a cancellation)\n"
+                    + "* `retract (mine|proposal)`:  retract the last (proposal) message you sent, or the last message I sent\n"
+                    + "* `reject (yours)`:  reject the last rejectable message I (you) sent\n"
+                    + "* `cache eager|lazy`: use lazy or eager RDF cache\n"
+                    + "* `inject`           send a message in this connection that will be forwarded to all other connections we have\n"
+                    + "* `usage`:           display this message\n" };
     public static final String[] N_MESSAGES = { "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
                     "ten" };
     public static final String[] RANDOM_MESSAGES = { "Is there anything I can do for you?",
@@ -178,6 +180,10 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
                                     .textMessage("Ok, I'll create a new need and make it send a connect to you.");
                     bus.publish(new ConnectionMessageCommandEvent(con, messageModel));
                     bus.publish(new ConnectDebugCommandEvent(con));
+                } else if (PATTERN_MODIFY.matcher(message).matches()) {
+                    Model messageModel = WonRdfUtils.MessageUtils.textMessage("Ok, I'll change my need description.");
+                    bus.publish(new ConnectionMessageCommandEvent(con, messageModel));
+                    bus.publish(new ReplaceDebugNeedContentCommandEvent(con));
                 } else if (PATTERN_CLOSE.matcher(message).matches()) {
                     Model messageModel = WonRdfUtils.MessageUtils.textMessage("Ok, I'll close this connection");
                     bus.publish(new ConnectionMessageCommandEvent(con, messageModel));

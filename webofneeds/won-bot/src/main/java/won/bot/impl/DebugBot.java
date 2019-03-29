@@ -12,6 +12,8 @@ package won.bot.impl;
 
 import java.net.URI;
 
+import org.apache.wml.WMLAccessElement;
+
 import won.bot.framework.bot.base.EventBot;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
@@ -26,6 +28,7 @@ import won.bot.framework.eventbot.action.impl.debugbot.OpenConnectionDebugAction
 import won.bot.framework.eventbot.action.impl.debugbot.PublishSetChattinessEventAction;
 import won.bot.framework.eventbot.action.impl.debugbot.RecordMessageReceivedTimeAction;
 import won.bot.framework.eventbot.action.impl.debugbot.RecordMessageSentTimeAction;
+import won.bot.framework.eventbot.action.impl.debugbot.ReplaceDebugNeedContentAction;
 import won.bot.framework.eventbot.action.impl.debugbot.SendChattyMessageAction;
 import won.bot.framework.eventbot.action.impl.debugbot.SendNDebugMessagesAction;
 import won.bot.framework.eventbot.action.impl.debugbot.SetChattinessAction;
@@ -38,6 +41,7 @@ import won.bot.framework.eventbot.behaviour.CloseBevahiour;
 import won.bot.framework.eventbot.behaviour.ConnectionMessageBehaviour;
 import won.bot.framework.eventbot.behaviour.DeactivateNeedBehaviour;
 import won.bot.framework.eventbot.behaviour.EagerlyPopulateCacheBehaviour;
+import won.bot.framework.eventbot.behaviour.ExecuteWonMessageCommandBehaviour;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.command.close.CloseCommandSuccessEvent;
@@ -46,6 +50,7 @@ import won.bot.framework.eventbot.event.impl.debugbot.HintDebugCommandEvent;
 import won.bot.framework.eventbot.event.impl.debugbot.MessageToElizaEvent;
 import won.bot.framework.eventbot.event.impl.debugbot.NeedCreatedEventForDebugConnect;
 import won.bot.framework.eventbot.event.impl.debugbot.NeedCreatedEventForDebugHint;
+import won.bot.framework.eventbot.event.impl.debugbot.ReplaceDebugNeedContentCommandEvent;
 import won.bot.framework.eventbot.event.impl.debugbot.SendNDebugCommandEvent;
 import won.bot.framework.eventbot.event.impl.debugbot.SetCacheEagernessCommandEvent;
 import won.bot.framework.eventbot.event.impl.debugbot.SetChattinessDebugCommandEvent;
@@ -121,15 +126,10 @@ public class DebugBot extends EventBot {
                 }
             }
         }));
-        // react to a message that was not identified as a debug command
-        BotBehaviour connectionMessageBehaviour = new ConnectionMessageBehaviour(ctx);
-        connectionMessageBehaviour.activate();
-        // react to the debug deactivate command (deactivate my need)
-        BotBehaviour deactivateNeedBehaviour = new DeactivateNeedBehaviour(ctx);
-        deactivateNeedBehaviour.activate();
-        // react to the close behaviour
-        BotBehaviour closeBehaviour = new CloseBevahiour(ctx);
-        closeBehaviour.activate();
+        // register listeners for event.impl.command events used to tell the bot to send
+        // messages
+        ExecuteWonMessageCommandBehaviour wonMessageCommandBehaviour = new ExecuteWonMessageCommandBehaviour(ctx);
+        wonMessageCommandBehaviour.activate();
         // register with WoN nodes, be notified when new needs are created
         RegisterMatcherAction registerMatcherAction = new RegisterMatcherAction(ctx);
         this.matcherRegistrator = new ActionOnEventListener(ctx, registerMatcherAction, 1);
@@ -223,5 +223,18 @@ public class DebugBot extends EventBot {
         // initialize the sent timestamp when the connect message is received
         bus.subscribe(ConnectFromOtherNeedEvent.class,
                         new ActionOnEventListener(ctx, new RecordMessageSentTimeAction(ctx, timingManager)));
+        bus.subscribe(ReplaceDebugNeedContentCommandEvent.class,
+                        new ActionOnEventListener(ctx, new ReplaceDebugNeedContentAction(ctx)));
+    }
+
+    public static void main(String[] args) {
+        String str = "test";
+        System.out.println(str);
+        str = str.replaceFirst("( \\(edit #\\d+\\)|$)", " (edit #1)");
+        System.out.println(str);
+        str = str.replaceFirst("( \\(edit #\\d+\\)|$)", " (edit #2)");
+        System.out.println(str);
+        str = str.replaceFirst("( \\(edit #\\d+\\)|$)", " (edit #3)");
+        System.out.println(str);
     }
 }
