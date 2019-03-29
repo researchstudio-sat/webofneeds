@@ -32,6 +32,8 @@ public interface Bot extends OwnerCallback {
     public void onNewNeedCreatedNotificationForMatcher(final URI wonNodeURI, final URI needURI,
                     final Dataset needModel);
 
+    public void onNeedModifiedNotificationForMatcher(final URI wonNodeURI, final URI needURI);
+
     public void onNeedActivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI);
 
     public void onNeedDeactivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI);

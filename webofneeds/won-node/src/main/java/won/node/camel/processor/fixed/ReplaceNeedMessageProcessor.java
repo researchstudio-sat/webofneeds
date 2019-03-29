@@ -41,8 +41,8 @@ import won.protocol.vocabulary.WONMSG;
  * <li>Replaces facets. All connections of deleted or modified facets are
  * closed, unless they already are closed</li>
  * <li>Does not change the need state (ACTIVE/INACTIVE)</li>
- * <li>TODO: Triggers a FROM_SYSTEM message in each established connection (via
- * the respective Reaction processor)</li>
+ * <li>Triggers a FROM_SYSTEM message in each established connection (via the
+ * respective Reaction processor)</li>
  * </ul>
  */
 @Service

@@ -21,21 +21,26 @@ import org.apache.jena.query.Dataset;
 public class NopMatcherProtocolMatcherServiceCallback implements MatcherProtocolMatcherServiceCallback {
     @Override
     public void onRegistered(final URI wonNodeUri) {
-        // To change body of implemented methods use File | Settings | File Templates.
+        // empty implementation
     }
 
     @Override
     public void onNewNeed(final URI wonNodeURI, URI needURI, Dataset content) {
-        // To change body of implemented methods use File | Settings | File Templates.
+        // empty implementation
     }
 
     @Override
     public void onNeedActivated(final URI wonNodeURI, final URI needURI) {
-        // To change body of implemented methods use File | Settings | File Templates.
+        // empty implementation
     }
 
     @Override
     public void onNeedDeactivated(final URI wonNodeURI, final URI needURI) {
-        // To change body of implemented methods use File | Settings | File Templates.
+        // empty implementation
+    }
+
+    @Override
+    public void onNeedModified(URI wonNodeURI, URI needURI) {
+        // empty implementation
     }
 }

@@ -33,6 +33,7 @@ import won.bot.framework.eventbot.event.impl.matcher.MatcherRegisteredEvent;
 import won.bot.framework.eventbot.event.impl.matcher.NeedActivatedEventForMatcher;
 import won.bot.framework.eventbot.event.impl.matcher.NeedCreatedEventForMatcher;
 import won.bot.framework.eventbot.event.impl.matcher.NeedDeactivatedEventForMatcher;
+import won.bot.framework.eventbot.event.impl.matcher.NeedModifiedEventForMatcher;
 import won.bot.framework.eventbot.event.impl.needlifecycle.NeedCreatedEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.CloseFromOtherNeedEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.ConnectFromOtherNeedEvent;
@@ -181,6 +182,16 @@ public abstract class EventBot extends TriggeredBot {
         if (getLifecyclePhase().isActive()) {
             // EventBotActionUtils.rememberInNodeListIfNamePresent(getEventListenerContext(),wonNodeUri);
             eventBus.publish(new MatcherRegisteredEvent(wonNodeUri));
+        } else {
+            logger.info("not publishing event for call to onNewNeedCreated() as the bot is not in state {} but {}",
+                            BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+        }
+    }
+
+    @Override
+    public final void onNeedModifiedNotificationForMatcher(final URI wonNodeURI, final URI needURI) {
+        if (getLifecyclePhase().isActive()) {
+            eventBus.publish(new NeedModifiedEventForMatcher(needURI));
         } else {
             logger.info("not publishing event for call to onNewNeedCreated() as the bot is not in state {} but {}",
                             BotLifecyclePhase.ACTIVE, getLifecyclePhase());

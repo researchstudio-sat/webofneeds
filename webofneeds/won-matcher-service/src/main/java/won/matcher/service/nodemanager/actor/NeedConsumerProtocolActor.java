@@ -38,6 +38,7 @@ import won.protocol.util.linkeddata.LinkedDataSource;
 public class NeedConsumerProtocolActor extends UntypedConsumerActor {
     private static final String MSG_HEADER_METHODNAME = "methodName";
     private static final String MSG_HEADER_METHODNAME_NEEDCREATED = "needCreated";
+    private static final String MSG_HEADER_METHODNAME_NEEDMODIFIED = "needModified";
     private static final String MSG_HEADER_METHODNAME_NEEDACTIVATED = "needActivated";
     private static final String MSG_HEADER_METHODNAME_NEEDDEACTIVATED = "needDeactivated";
     private static final String MSG_HEADER_WON_NODE_URI = "wonNodeURI";
@@ -80,6 +81,11 @@ public class NeedConsumerProtocolActor extends UntypedConsumerActor {
                     Dataset ds = linkedDataSource.getDataForResource(URI.create(needUri));
                     if (NeedModelWrapper.isANeed(ds)) {
                         if (methodName.equals(MSG_HEADER_METHODNAME_NEEDCREATED)) {
+                            event = new NeedEvent(needUri, wonNodeUri, NeedEvent.TYPE.ACTIVE, crawlDate, ds);
+                            pubSubMediator.tell(
+                                            new DistributedPubSubMediator.Publish(event.getClass().getName(), event),
+                                            getSelf());
+                        } else if (methodName.equals(MSG_HEADER_METHODNAME_NEEDMODIFIED)) {
                             event = new NeedEvent(needUri, wonNodeUri, NeedEvent.TYPE.ACTIVE, crawlDate, ds);
                             pubSubMediator.tell(
                                             new DistributedPubSubMediator.Publish(event.getClass().getName(), event),

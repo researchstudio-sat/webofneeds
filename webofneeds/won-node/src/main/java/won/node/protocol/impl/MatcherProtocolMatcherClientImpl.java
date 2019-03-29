@@ -70,4 +70,10 @@ public class MatcherProtocolMatcherClientImpl implements MatcherProtocolMatcherS
     public void setMessagingService(MessagingService messagingService) {
         this.messagingService = messagingService;
     }
+
+    @Override
+    public void needModified(URI needURI, WonMessage wonMessage) {
+        logger.debug("calling needModified for needURI {}", needURI);
+        delegate.needModified(needURI, wonMessage);
+    }
 }

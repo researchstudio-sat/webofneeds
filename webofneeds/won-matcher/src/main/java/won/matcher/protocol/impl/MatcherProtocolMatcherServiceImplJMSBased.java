@@ -47,6 +47,11 @@ public class MatcherProtocolMatcherServiceImplJMSBased {// implements MatcherPro
         delegate.onNewNeed(URI.create(wonNodeURI), URI.create(needURI), RdfUtils.toDataset(content));
     }
 
+    public void needModified(@Header("wonNodeURI") final String wonNodeURI, @Header("needURI") final String needURI) {
+        logger.debug("need modified message received: {}", needURI);
+        delegate.onNeedModified(URI.create(wonNodeURI), URI.create(needURI));
+    }
+
     public void needActivated(@Header("wonNodeURI") final String wonNodeURI, @Header("needURI") final String needURI) {
         logger.debug("need activated message received: {}", needURI);
         delegate.onNeedActivated(URI.create(wonNodeURI), URI.create(needURI));

@@ -47,7 +47,7 @@ public class ReplaceNeedMessageFromOwnerReactionProcessor extends AbstractCamelP
         if (receiverNeedURI == null)
             throw new WonMessageProcessingException("receiverNeedURI is not set");
         Need need = DataAccessUtils.loadNeed(needRepository, receiverNeedURI);
-        // matcherProtocolMatcherClient.needModified(need.getNeedURI(), wonMessage);
+        matcherProtocolMatcherClient.needModified(need.getNeedURI(), wonMessage);
         // notify all connections
         Collection<Connection> conns = connectionRepository.findByNeedURIAndState(need.getNeedURI(),
                         ConnectionState.CONNECTED);
