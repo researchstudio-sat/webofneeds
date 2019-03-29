@@ -48,8 +48,8 @@ public class DeactivateNeedMessageFromSystemReactionProcessor extends AbstractCa
         Need need = DataAccessUtils.loadNeed(needRepository, receiverNeedURI);
         matcherProtocolMatcherClient.needDeactivated(need.getNeedURI(), wonMessage);
         // close all connections
-        Collection<Connection> conns = connectionRepository
-                        .getConnectionsByNeedURIAndNotInStateForUpdate(need.getNeedURI(), ConnectionState.CLOSED);
+        Collection<Connection> conns = connectionRepository.findByNeedURIAndNotStateForUpdate(need.getNeedURI(),
+                        ConnectionState.CLOSED);
         for (Connection con : conns) {
             closeConnection(need, con);
         }

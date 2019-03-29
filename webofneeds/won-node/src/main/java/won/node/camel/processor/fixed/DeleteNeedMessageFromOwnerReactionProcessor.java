@@ -52,8 +52,8 @@ public class DeleteNeedMessageFromOwnerReactionProcessor extends AbstractCamelPr
         // Check if need already in State DELETED
         if (need.getState() == NeedState.DELETED) {
             // Get all connections of this need
-            Collection<Connection> conns = connectionRepository
-                            .getConnectionsByNeedURIAndNotInStateForUpdate(need.getNeedURI(), ConnectionState.DELETED);
+            Collection<Connection> conns = connectionRepository.findByNeedURIAndNotStateForUpdate(need.getNeedURI(),
+                            ConnectionState.DELETED);
             for (Connection con : conns) {
                 // Delete all connection data
                 messageEventRepository.deleteByParentURI(con.getConnectionURI());
@@ -61,8 +61,8 @@ public class DeleteNeedMessageFromOwnerReactionProcessor extends AbstractCamelPr
             }
         } else {
             // Get only not closed connections of this need to close them
-            Collection<Connection> conns = connectionRepository
-                            .getConnectionsByNeedURIAndNotInStateForUpdate(need.getNeedURI(), ConnectionState.CLOSED);
+            Collection<Connection> conns = connectionRepository.findByNeedURIAndNotStateForUpdate(need.getNeedURI(),
+                            ConnectionState.CLOSED);
             // Close open connections
             for (Connection con : conns) {
                 closeConnection(need, con);
