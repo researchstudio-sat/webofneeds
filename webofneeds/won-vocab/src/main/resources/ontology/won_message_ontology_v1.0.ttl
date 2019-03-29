@@ -237,7 +237,17 @@
                
                rdfs:isDefinedBy <http://purl.org/webofneeds/message> .
 
+			   
+###  http://purl.org/webofneeds/message#ReplaceMessage
 
+:ReplaceMessage rdf:type owl:Class ;
+               
+               rdfs:subClassOf :MessageType ;
+               
+               rdfs:comment "Type of message sent to a WoN Node in order replace a Need's content."@en ;
+               
+               rdfs:isDefinedBy <http://purl.org/webofneeds/message> .
+			   
 
 ###  http://purl.org/webofneeds/message#DeactivateMessage
 
