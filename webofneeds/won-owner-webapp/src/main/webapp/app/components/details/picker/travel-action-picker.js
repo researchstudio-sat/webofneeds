@@ -54,7 +54,7 @@ function genComponentConf() {
         <div class="rp__searchbox">
             <input
                 type="text"
-                id="rp__from-searchbox__inner"
+                ng-attr-id="{{self.getUniqueFromId()}}"
                 class="rp__searchbox__inner"
                 placeholder="{{self.detail.placeholder.departure}}"
                 ng-class="{'rp__searchbox__inner--withreset' : self.fromShowResetButton}"/>
@@ -97,7 +97,7 @@ function genComponentConf() {
         <div class="rp__searchbox">
             <input
                 type="text"
-                id="rp__to-searchbox__inner"
+                ng-attr-id="{{self.getUniqueToId()}}"
                 class="rp__searchbox__inner"
                 placeholder="{{self.detail.placeholder.destination}}"
                 ng-class="{'rp__searchbox__inner--withreset' : self.toShowResetButton}"/>
@@ -125,8 +125,7 @@ function genComponentConf() {
             )}
         </ul>
 
-        <div class="rp__mapmount" 
-            id="rp__mapmount" 
+        <div class="rp__mapmount" ng-attr-id="{{ self.getUniqueMapMountId() }}"
             in-view="$inview && self.mapInView($inviewInfo)">
         </div>
             `;
@@ -228,6 +227,18 @@ function genComponentConf() {
 
         this.$scope.$apply();
       }
+    }
+
+    getUniqueFromId() {
+      return "ta-from-" + this.$scope.$id;
+    }
+
+    getUniqueToId() {
+      return "ta-to-" + this.$scope.$id;
+    }
+
+    getUniqueMapMountId() {
+      return "ta-mapmount-" + this.$scope.$id;
     }
 
     // TODO: implement
@@ -525,19 +536,19 @@ function genComponentConf() {
     }
 
     fromTextfieldNg() {
-      return this.domCache.ng("#rp__from-searchbox__inner");
+      return this.domCache.ng("#" + this.getUniqueFromId());
     }
 
     fromTextfield() {
-      return this.domCache.dom("#rp__from-searchbox__inner");
+      return this.domCache.dom("#" + this.getUniqueFromId());
     }
 
     toTextfieldNg() {
-      return this.domCache.ng("#rp__to-searchbox__inner");
+      return this.domCache.ng("#" + this.getUniqueToId());
     }
 
     toTextfield() {
-      return this.domCache.dom("#rp__to-searchbox__inner");
+      return this.domCache.dom("#" + this.getUniqueToId());
     }
 
     mapMountNg() {
