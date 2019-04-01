@@ -26,6 +26,8 @@ import { actionTypes, actionCreators } from "./actions/actions.js";
 //import './message-service.js'; //TODO still uses es5
 import SockJS from "sockjs-client";
 
+const ECHO_STRING = "e";
+
 export function runMessagingAgent(redux) {
   /**
    * The messageProcessingArray encapsulates all currently implemented message handlers with their respective redux dispatch
@@ -389,6 +391,16 @@ export function runMessagingAgent(redux) {
 
   let missedHeartbeats = 0; // deadman-switch variable. should count up every 30s and gets reset onHeartbeat
   setInterval(checkHeartbeat, 30000); // heartbeats should arrive roughly every 30s
+
+  document.addEventListener("visibilitychange", function() {
+    if (document.visibilityState == "visible") {
+      onVisible();
+    }
+  });
+
+  function onVisible() {
+    ws.send(ECHO_STRING);
+  }
 
   function newSock() {
     const ws = new SockJS(urljoin(ownerBaseUrl, "/msg"), null, { debug: true });

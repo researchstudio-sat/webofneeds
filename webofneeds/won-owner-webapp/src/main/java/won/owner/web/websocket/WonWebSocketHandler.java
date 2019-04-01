@@ -161,6 +161,10 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
                 return;
             }
         }
+        final String ECHO_STRING = "e";
+        if (completePayload.equals(ECHO_STRING)) {
+            return;
+        }
         WonMessage wonMessage = WonMessageDecoder.decodeFromJsonLd(completePayload);
         // remember which user or (if not logged in) which needUri the session is bound
         // to
