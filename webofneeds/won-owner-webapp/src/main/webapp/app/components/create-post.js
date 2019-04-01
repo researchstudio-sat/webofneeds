@@ -49,7 +49,7 @@ function genComponentConf() {
             </svg>
             <span class="cp__header__title" ng-if="!self.isCreateFromNeed && !self.isEditFromNeed">{{self.useCase.label}}</span>
             <span class="cp__header__title" ng-if="self.isCreateFromNeed">Duplicate from '{{self.useCase.label}}'</span>
-            <span class="cp__header__title" ng-if="self.isEditFromNeed">Edit Need</span>
+            <span class="cp__header__title" ng-if="self.isEditFromNeed">Edit Post</span>
         </div>
         <div class="cp__content">
             <div class="cp__content__loading" ng-if="!self.showCreateInput && self.isFromNeedLoading">
@@ -65,7 +65,7 @@ function genComponentConf() {
                     <use xlink:href="#ico16_indicator_error" href="#ico16_indicator_error"></use>
                 </svg>
                 <span class="cp__content__failed__label">
-                    Failed To Load - Need might have been deleted
+                    Failed To Load - Post might have been deleted
                 </span>
                 <div class="cp__content__failed__actions">
                     <button class="cp__content__failed__actions__button red won-button--outlined thin"
