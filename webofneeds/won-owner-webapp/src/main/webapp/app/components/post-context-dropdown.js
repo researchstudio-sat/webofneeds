@@ -56,7 +56,7 @@ function genComponentConf() {
                         class="won-button--outlined thin red"
                         ng-if="self.isEditable"
                         ng-click="self.router__stateGoAbs('connections', {fromNeedUri: self.needUri, mode: 'EDIT'})">
-                        Edit Need
+                        Edit Post
                     </button>
                     <a class="won-button--outlined thin red"
                         ng-if="self.adminEmail"
