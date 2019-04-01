@@ -24,7 +24,7 @@ won-connection-message {
     }
   }
 
-  &.won-is-multiSelect {
+  &.won-is-multiSelect:not(.won-change-notification) {
     padding-left: 3rem;
     cursor: pointer;
 
