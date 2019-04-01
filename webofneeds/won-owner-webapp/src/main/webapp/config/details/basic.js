@@ -451,15 +451,27 @@ export const eventObject = {
   placeholder: "What? (Short title shown in lists)",
   parseToRDF: function({ value }) {
     const val = value ? value : undefined;
+
     if (!val) {
       return;
+    } else if (is("Array", value)) {
+      const eventObjects = value.map(item => {
+        return {
+          "s:object": {
+            "@type": "s:Event",
+            "s:about": { "@id": item },
+          },
+        };
+      });
+      return eventObjects;
+    } else {
+      return {
+        "s:object": {
+          "@type": "s:Event",
+          "s:about": { "@id": value },
+        },
+      };
     }
-    return {
-      "s:object": {
-        "@type": "s:Event",
-        "s:about": { "@id": value },
-      },
-    };
   },
   parseFromRDF: function(jsonLDImm) {
     const types = get(jsonLDImm, "@type");
