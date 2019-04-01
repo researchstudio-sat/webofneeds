@@ -102,7 +102,7 @@ function genComponentConf() {
         </div>
         <div class="cp__footer" >
             <won-labelled-hr label="::'done?'" class="cp__footer__labelledhr"></won-labelled-hr>
-            <won-publish-button on-publish="self.publish(persona)" is-valid="self.isValid()" show-personas="self.isHoldable" ng-if="self.showCreateInput && !self.isEditFromNeed && self.isFromNeedUsableAsTemplate"></won-publish-button>
+            <won-publish-button on-publish="self.publish(persona)" is-valid="self.isValid()" show-personas="self.isHoldable" ng-if="self.showCreateInput && !self.isEditFromNeed"></won-publish-button>
             <div class="cp__footer__edit" ng-if="self.loggedIn && self.showCreateInput && self.isEditFromNeed && self.isFromNeedEditable">
               <button class="cp__footer__edit__save won-button--filled red" ng-click="self.save()">
                   Save

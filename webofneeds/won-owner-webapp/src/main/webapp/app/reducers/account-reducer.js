@@ -13,6 +13,7 @@ const initialState = Immutable.fromJS({
   isAnonymous: false,
   acceptedTermsOfService: false,
   acceptedDisclaimer: isDisclaimerAccepted(),
+  ownedNeedUris: Immutable.Set(),
 });
 
 export default function(userData = initialState, action = {}) {
@@ -33,6 +34,22 @@ export default function(userData = initialState, action = {}) {
         .set("acceptedTermsOfService", acceptedTermsOfService)
         .set("isAnonymous", isAnonymous)
         .set("privateId", privateId);
+    }
+    case actionTypes.needs.storeOwnedInactiveUris:
+    case actionTypes.needs.storeOwnedActiveUris: {
+      const ownedNeedUris = userData.get("ownedNeedUris");
+      return userData.set(
+        "ownedNeedUris",
+        ownedNeedUris.merge(action.payload.get("uris"))
+      );
+    }
+
+    case actionTypes.needs.createSuccessful: {
+      const ownedNeedUris = userData.get("ownedNeedUris");
+      return userData.set(
+        "ownedNeedUris",
+        ownedNeedUris.add(action.payload.needUri)
+      );
     }
 
     case actionTypes.account.resendVerificationEmailFailed:
