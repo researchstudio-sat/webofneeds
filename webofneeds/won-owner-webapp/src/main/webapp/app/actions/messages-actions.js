@@ -133,7 +133,26 @@ export function successfulCreate(event) {
     won.getNeed(needURI).then(need => {
       dispatch(
         actionCreators.needs__createSuccessful({
-          publishEventUri: event.getIsResponseTo(),
+          eventUri: event.getIsResponseTo(),
+          needUri: event.getSenderNeed(),
+          need: need,
+        })
+      );
+    });
+  };
+}
+
+export function successfulEdit(event) {
+  return dispatch => {
+    console.debug("Received success replace message:", event);
+    //const state = getState();
+    //load the edited data into the local rdf store and publish NeedEditEvent when done
+    const needURI = event.getReceiverNeed();
+    //TODO: invalidate cache for need
+    won.getNeed(needURI).then(need => {
+      dispatch(
+        actionCreators.needs__editSuccessful({
+          eventUri: event.getIsResponseTo(),
           needUri: event.getSenderNeed(),
           need: need,
         })

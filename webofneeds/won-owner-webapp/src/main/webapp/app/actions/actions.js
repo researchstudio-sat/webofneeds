@@ -210,6 +210,10 @@ const actionHierarchy = {
       success: messages.successfulCreate,
       //TODO failure: messages.failedCreate
     },
+    edit: {
+      success: messages.successfulEdit,
+      //TODO failure: messages.failedEdit
+    },
     open: {
       successRemote: INJ_DEFAULT, //2nd successResponse
       successOwn: INJ_DEFAULT, //1st successResponse
