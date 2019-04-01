@@ -8,9 +8,11 @@ import { get, getIn } from "../utils.js";
 
 import Immutable from "immutable";
 import { getOwnMessageUri } from "../message-utils.js";
+import * as needUtils from "../need-utils.js";
 
 import {
   fetchDataForOwnedNeeds,
+  fetchDataForNonOwnedNeedOnly,
   fetchMessageEffects,
   fetchPetriNetUris,
   isFetchMessageEffectsNeeded,
@@ -148,16 +150,20 @@ export function successfulEdit(event) {
     //const state = getState();
     //load the edited data into the local rdf store and publish NeedEditEvent when done
     const needURI = event.getReceiverNeed();
-    //TODO: invalidate cache for need
-    won.getNeed(needURI).then(need => {
-      dispatch(
-        actionCreators.needs__editSuccessful({
-          eventUri: event.getIsResponseTo(),
-          needUri: event.getSenderNeed(),
-          need: need,
-        })
-      );
-    });
+
+    won
+      //.invalidateCacheForNeed(needURI)
+      .clearStoreWithPromise()
+      .then(() => fetchDataForOwnedNeeds([needURI], dispatch))
+      .then(() => {
+        dispatch(
+          actionCreators.needs__editSuccessful({
+            eventUri: event.getIsResponseTo(),
+            needUri: event.getSenderNeed(),
+            //need: need,
+          })
+        );
+      });
   };
 }
 
@@ -279,6 +285,30 @@ export function processAgreementMessage(event) {
   return dispatch => {
     dispatch({
       type: actionTypes.messages.processAgreementMessage,
+      payload: event,
+    });
+  };
+}
+
+export function processChangeNotificationMessage(event) {
+  return (dispatch, getState) => {
+    console.debug("processChangeNotificationMessage for: ", event);
+    const needUriToLoad = event.getSenderNeed();
+    const needToLoad = getState().getIn(["needs", needUriToLoad]);
+
+    won
+      //.invalidateCacheForNeed(needURI)
+      .clearStoreWithPromise()
+      .then(() => {
+        if (needUtils.isOwned(needToLoad)) {
+          fetchDataForOwnedNeeds([needUriToLoad], dispatch);
+        } else {
+          fetchDataForNonOwnedNeedOnly(needUriToLoad, dispatch);
+        }
+      });
+
+    dispatch({
+      type: actionTypes.messages.processChangeNotificationMessage,
       payload: event,
     });
   };

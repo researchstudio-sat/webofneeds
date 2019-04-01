@@ -277,6 +277,10 @@ won.WONMSG.feedbackMessage = won.WONMSG.baseUri + "HintFeedbackMessage";
 won.WONMSG.openMessageCompacted = won.WONMSG.prefix + ":OpenMessage";
 won.WONMSG.openSentMessage = won.WONMSG.baseUri + "OpenSentMessage";
 won.WONMSG.openSentMessageCompacted = won.WONMSG.prefix + ":OpenSentMessage";
+won.WONMSG.changeNotificationMessage =
+  won.WONMSG.baseUri + "ChangeNotificationMessage";
+won.WONMSG.changeNotificationMessageCompacted =
+  won.WONMSG.prefix + ":ChangeNotificationMessage";
 won.WONMSG.connectionMessage = won.WONMSG.baseUri + "ConnectionMessage";
 won.WONMSG.connectionMessageCompacted =
   won.WONMSG.prefix + ":ConnectionMessage";
@@ -1340,9 +1344,18 @@ WonMessage.prototype = {
     return this.compactRawMessage;
   },
   getMessageType: function() {
-    return this.getProperty(
-      "http://purl.org/webofneeds/message#hasMessageType"
-    );
+    if (
+      this.getProperty("http://purl.org/webofneeds/message#hasMessageType") ===
+        "http://purl.org/webofneeds/message#ConnectionMessage" &&
+      this.getTextMessage() === "Note: need content was changed."
+    ) {
+      //TODO: REMOVE THIS HANDLER ONCE THE CHANGENOTIFICATIONMESSAGE TYPE HAS BEEN IMPLEMENTED IN THE BACKEND
+      return "http://purl.org/webofneeds/message#ChangeNotificationMessage";
+    } else {
+      return this.getProperty(
+        "http://purl.org/webofneeds/message#hasMessageType"
+      );
+    }
   },
   getInjectIntoConnectionUris: function() {
     return createArray(
@@ -1657,6 +1670,12 @@ WonMessage.prototype = {
     return (
       this.getIsResponseToMessageType() ===
       "http://purl.org/webofneeds/message#DeleteMessage"
+    );
+  },
+  isChangeNotificationMessage: function() {
+    return (
+      this.getMessageType() ===
+      "http://purl.org/webofneeds/message#ChangeNotificationMessage"
     );
   },
 

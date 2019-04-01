@@ -66,6 +66,15 @@ export function runMessagingAgent(redux) {
       return false;
     },
     function(message) {
+      if (message.isChangeNotificationMessage()) {
+        redux.dispatch(
+          actionCreators.messages__processChangeNotificationMessage(message)
+        );
+        return true;
+      }
+      return false;
+    },
+    function(message) {
       if (message.isFromExternal() && message.isCloseMessage()) {
         redux.dispatch(actionCreators.messages__close__success(message));
         return true;

@@ -263,6 +263,7 @@ const actionHierarchy = {
     },
     updateMessageStatus: messages.updateMessageStatus,
     processConnectionMessage: messages.processConnectionMessage,
+    processChangeNotificationMessage: messages.processChangeNotificationMessage,
     processAgreementMessage: messages.processAgreementMessage,
     needMessageReceived: messages.needMessageReceived,
     processConnectMessage: messages.processConnectMessage,
