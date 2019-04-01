@@ -16,6 +16,7 @@ export function isMessageProposable(msg) {
     msg &&
     msg.get("hasContent") &&
     msg.get("messageType") !== won.WONMSG.connectMessage &&
+    msg.get("messageType") !== won.WONMSG.changeNotificationMessage &&
     !msg.get("hasReferences")
   );
 }
@@ -31,6 +32,7 @@ export function isMessageClaimable(msg) {
     msg &&
     msg.get("hasContent") &&
     msg.get("messageType") !== won.WONMSG.connectMessage &&
+    msg.get("messageType") !== won.WONMSG.changeNotificationMessage &&
     !msg.get("hasReferences")
   );
 }
@@ -284,6 +286,18 @@ export function isMessageAgreement(msg) {
 
 export function isHintMessage(msg) {
   return get(msg, "messageType") === won.WONMSG.hintMessage;
+}
+
+export function isConnectionMessage(msg) {
+  return get(msg, "messageType") === won.WONMSG.connectionMessage;
+}
+
+export function isChangeNotificationMessage(msg) {
+  return get(msg, "messageType") === won.WONMSG.changeNotificationMessage;
+}
+
+export function isParsable(msg) {
+  return get(msg, "isParsable");
 }
 
 /**
