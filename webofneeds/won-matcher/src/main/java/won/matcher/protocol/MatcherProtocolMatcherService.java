@@ -12,6 +12,8 @@ public interface MatcherProtocolMatcherService {
 
     public void onNewNeed(final URI wonNodeURI, URI needURI, Dataset content);
 
+    public void onNeedModified(final URI wonNodeURI, URI needURI);
+
     public void onNeedActivated(final URI wonNodeURI, URI needURI);
 
     public void onNeedDeactivated(final URI wonNodeURI, URI needURI);

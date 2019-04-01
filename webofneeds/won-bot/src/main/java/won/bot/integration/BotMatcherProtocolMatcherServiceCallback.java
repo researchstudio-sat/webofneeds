@@ -100,6 +100,22 @@ public class BotMatcherProtocolMatcherServiceCallback implements MatcherProtocol
     }
 
     @Override
+    public void onNeedModified(final URI wonNodeURI, final URI needURI) {
+        taskScheduler.schedule(new Runnable() {
+            public void run() {
+                try {
+                    logger.debug("onNeedModified for need {} ", needURI.toString());
+                    getBotForNeedUri(needURI).onNeedModifiedNotificationForMatcher(wonNodeURI, needURI);
+                    // getBotForNeedUri(needURI.getNeedURI()).onMessageFromOtherNeed(con, message,
+                    // content);
+                } catch (Exception e) {
+                    logger.warn("error while handling onNeedModified()", e);
+                }
+            }
+        }, new Date());
+    }
+
+    @Override
     public void onNeedActivated(final URI wonNodeURI, final URI needURI) {
         taskScheduler.schedule(new Runnable() {
             public void run() {

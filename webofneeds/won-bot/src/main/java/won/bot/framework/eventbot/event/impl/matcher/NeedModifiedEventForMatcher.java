@@ -8,23 +8,17 @@
  * KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package won.matcher.protocol;
+package won.bot.framework.eventbot.event.impl.matcher;
 
 import java.net.URI;
 
-import org.apache.jena.query.Dataset;
+import won.bot.framework.eventbot.event.BaseNeedSpecificEvent;
 
 /**
- * User: fkleedorfer Date: 21.01.14
+ *
  */
-public interface MatcherProtocolMatcherServiceCallback {
-    void onRegistered(URI wonNodeUri);
-
-    void onNewNeed(final URI wonNodeURI, URI needURI, Dataset content);
-
-    void onNeedModified(final URI wonNodeURI, URI needURI);
-
-    void onNeedActivated(final URI wonNodeURI, URI needURI);
-
-    void onNeedDeactivated(final URI wonNodeURI, URI needURI);
+public class NeedModifiedEventForMatcher extends BaseNeedSpecificEvent {
+    public NeedModifiedEventForMatcher(final URI needURI) {
+        super(needURI);
+    }
 }

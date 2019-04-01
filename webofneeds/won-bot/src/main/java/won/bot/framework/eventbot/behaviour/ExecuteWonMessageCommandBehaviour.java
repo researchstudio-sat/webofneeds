@@ -21,6 +21,7 @@ import won.bot.framework.eventbot.action.impl.wonmessage.execCommand.ExecuteCrea
 import won.bot.framework.eventbot.action.impl.wonmessage.execCommand.ExecuteDeactivateNeedCommandAction;
 import won.bot.framework.eventbot.action.impl.wonmessage.execCommand.ExecuteFeedbackCommandAction;
 import won.bot.framework.eventbot.action.impl.wonmessage.execCommand.ExecuteOpenCommandAction;
+import won.bot.framework.eventbot.action.impl.wonmessage.execCommand.ExecuteReplaceCommandAction;
 import won.bot.framework.eventbot.action.impl.wonmessage.execCommand.LogMessageCommandFailureAction;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandFailureEvent;
@@ -31,6 +32,7 @@ import won.bot.framework.eventbot.event.impl.command.create.CreateNeedCommandEve
 import won.bot.framework.eventbot.event.impl.command.deactivate.DeactivateNeedCommandEvent;
 import won.bot.framework.eventbot.event.impl.command.feedback.FeedbackCommandEvent;
 import won.bot.framework.eventbot.event.impl.command.open.OpenCommandEvent;
+import won.bot.framework.eventbot.event.impl.command.replace.ReplaceCommandEvent;
 import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
 
 /**
@@ -48,6 +50,7 @@ public class ExecuteWonMessageCommandBehaviour extends BotBehaviour {
     @Override
     protected void onActivate(Optional<Object> message) {
         linkEventToActionWithAutoCleanup(CreateNeedCommandEvent.class, new ExecuteCreateNeedCommandAction(context));
+        linkEventToActionWithAutoCleanup(ReplaceCommandEvent.class, new ExecuteReplaceCommandAction(context));
         linkEventToActionWithAutoCleanup(ConnectCommandEvent.class, new ExecuteConnectCommandAction(context));
         linkEventToActionWithAutoCleanup(OpenCommandEvent.class, new ExecuteOpenCommandAction(context));
         linkEventToActionWithAutoCleanup(ConnectionMessageCommandEvent.class,

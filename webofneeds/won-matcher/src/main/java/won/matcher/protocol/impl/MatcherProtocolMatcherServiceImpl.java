@@ -37,6 +37,14 @@ public class MatcherProtocolMatcherServiceImpl implements MatcherProtocolMatcher
     }
 
     @Override
+    public void onNeedModified(final URI wonNodeURI, final URI needURI) {
+        logger.debug("matcher from need: need modified event for needURI {}", needURI);
+        if (needURI == null)
+            throw new IllegalArgumentException("needURI is not set");
+        matcherServiceCallback.onNeedModified(wonNodeURI, needURI);
+    }
+
+    @Override
     public void onNeedActivated(final URI wonNodeURI, final URI needURI) {
         logger.debug("matcher from need: need activated event for needURI {}", needURI);
         if (needURI == null)

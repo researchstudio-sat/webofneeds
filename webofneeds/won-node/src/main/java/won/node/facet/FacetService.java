@@ -70,11 +70,11 @@ public class FacetService {
                 Resource remoteNeedRes = derivationModel.getResource(con.getRemoteNeedURI().toString());
                 FacetConfig config = hardcodedConfigs.get(facetType);
                 if (stateChange.isConnect()) {
-                    logger.info("adding data for connection {}" + con.getConnectionURI());
+                    logger.info("adding data for connection {}", con.getConnectionURI());
                     config.getDerivationProperties().stream()
                                     .forEach(p -> modelToManipulate.add(needRes, p, remoteNeedRes));
                 } else {
-                    logger.info("removing data for connection {}" + con.getConnectionURI());
+                    logger.info("removing data for connection {}", con.getConnectionURI());
                     config.getDerivationProperties().stream()
                                     .forEach(p -> modelToManipulate.remove(needRes, p, remoteNeedRes));
                 }

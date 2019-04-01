@@ -8,23 +8,20 @@
  * KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package won.matcher.protocol;
+package won.bot.framework.eventbot.event.impl.command.replace;
 
 import java.net.URI;
 
-import org.apache.jena.query.Dataset;
-
 /**
- * User: fkleedorfer Date: 21.01.14
+ * Indicates that replacing the need content was aborted before sending a
+ * message to a WoN node.
  */
-public interface MatcherProtocolMatcherServiceCallback {
-    void onRegistered(URI wonNodeUri);
+public class ReplaceAbortedEvent extends ReplaceCommandFailureEvent {
+    public ReplaceAbortedEvent(URI needURI, ReplaceCommandEvent replaceCommandEvent, String message) {
+        super(needURI, replaceCommandEvent, message);
+    }
 
-    void onNewNeed(final URI wonNodeURI, URI needURI, Dataset content);
-
-    void onNeedModified(final URI wonNodeURI, URI needURI);
-
-    void onNeedActivated(final URI wonNodeURI, URI needURI);
-
-    void onNeedDeactivated(final URI wonNodeURI, URI needURI);
+    public ReplaceAbortedEvent(URI needURI, ReplaceCommandEvent replaceCommandEvent) {
+        super(needURI, replaceCommandEvent);
+    }
 }

@@ -370,6 +370,16 @@ public class WonMessageBuilder {
                         .setSenderNeedURI(localNeed).setSenderNodeURI(localWonNode).setSentTimestampToNow();
     }
 
+    public static WonMessageBuilder setMessagePropertiesForSystemMessageToRemoteNeed(URI messageURI,
+                    URI localConnection, URI localNeed, URI localWonNode, URI remoteConnection, URI remoteNeed,
+                    URI remoteNode, String textMessage) {
+        return new WonMessageBuilder(messageURI).setWonMessageDirection(WonMessageDirection.FROM_SYSTEM)
+                        .setWonMessageType(WonMessageType.CONNECTION_MESSAGE).setSenderURI(localConnection)
+                        .setSenderNeedURI(localNeed).setSenderNodeURI(localWonNode).setReceiverURI(remoteConnection)
+                        .setReceiverNeedURI(remoteNeed).setReceiverNodeURI(remoteNode).setTextMessage(textMessage)
+                        .setSentTimestampToNow();
+    }
+
     public static WonMessageBuilder setMessagePropertiesForDeactivateFromOwner(URI messageURI, URI localNeed,
                     URI localWonNode) {
         return new WonMessageBuilder(messageURI).setWonMessageDirection(WonMessageDirection.FROM_OWNER)
@@ -434,6 +444,13 @@ public class WonMessageBuilder {
         return new WonMessageBuilder(messageURI).setWonMessageDirection(WonMessageDirection.FROM_OWNER)
                         .setWonMessageType(WonMessageType.CREATE_NEED).setSenderNeedURI(needURI)
                         .setSenderNodeURI(wonNodeURI).setReceiverNodeURI(wonNodeURI).setSentTimestampToNow();
+    }
+
+    public static WonMessageBuilder setMessagePropertiesForReplace(URI messageURI, URI needURI, URI wonNodeURI) {
+        return new WonMessageBuilder(messageURI).setWonMessageDirection(WonMessageDirection.FROM_OWNER)
+                        .setWonMessageType(WonMessageType.REPLACE).setSenderNeedURI(needURI)
+                        .setSenderNodeURI(wonNodeURI).setReceiverNeedURI(needURI).setReceiverNodeURI(wonNodeURI)
+                        .setSentTimestampToNow();
     }
 
     public static WonMessageBuilder setMessagePropertiesForHint(URI messageURI, URI needURI, Optional<URI> needFacetURI,

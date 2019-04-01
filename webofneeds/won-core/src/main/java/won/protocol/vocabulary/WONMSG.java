@@ -26,6 +26,7 @@ public class WONMSG {
     public static final Resource TYPE_FROM_SYSTEM = m.createResource(BASE_URI + "FromSystem");
     public static final Resource TYPE_FROM_EXTERNAL = m.createResource(BASE_URI + "FromExternal");
     public static final String TYPE_CREATE_STRING = BASE_URI + "CreateMessage";
+    public static final String TYPE_REPLACE_STRING = BASE_URI + "ReplaceMessage";
     public static final String TYPE_CONNECT_STRING = BASE_URI + "ConnectMessage";
     public static final String TYPE_DEACTIVATE_STRING = BASE_URI + "DeactivateMessage";
     public static final String TYPE_ACTIVATE_STRING = BASE_URI + "ActivateMessage";
@@ -40,6 +41,7 @@ public class WONMSG {
     public static final String TYPE_SUCCESS_RESPONSE_STRING = BASE_URI + "SuccessResponse";
     // main types
     public static final Resource TYPE_CREATE = m.createResource(TYPE_CREATE_STRING);
+    public static final Resource TYPE_REPLACE = m.createResource(TYPE_REPLACE_STRING);
     public static final Resource TYPE_CONNECT = m.createResource(TYPE_CONNECT_STRING);
     public static final Resource TYPE_DEACTIVATE = m.createResource(TYPE_DEACTIVATE_STRING);
     public static final Resource TYPE_ACTIVATE = m.createResource(TYPE_ACTIVATE_STRING);

@@ -24,6 +24,8 @@ public interface MatcherProtocolMatcherServiceClientSide {
 
     public void needCreated(final URI needURI, final Model content, final WonMessage wonMessage);
 
+    public void needModified(final URI needURI, final WonMessage wonMessage);
+
     public void needActivated(final URI needURI, final WonMessage wonMessage);
 
     public void needDeactivated(final URI needURI, final WonMessage wonMessage);
