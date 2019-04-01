@@ -1593,7 +1593,12 @@ WonMessage.prototype = {
       "http://purl.org/webofneeds/message#FailureResponse"
     );
   },
-
+  isResponseToReplaceMessage: function() {
+    return (
+      this.getIsResponseToMessageType() ===
+      "http://purl.org/webofneeds/message#ReplaceMessage"
+    );
+  },
   isResponseToHintMessage: function() {
     return (
       this.getIsResponseToMessageType() ===

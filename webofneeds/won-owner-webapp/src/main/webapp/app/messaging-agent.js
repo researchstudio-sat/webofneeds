@@ -84,6 +84,17 @@ export function runMessagingAgent(redux) {
       return false;
     },
     function(message) {
+      if (
+        message.isFromSystem() &&
+        message.isSuccessResponse() &&
+        message.isResponseToReplaceMessage()
+      ) {
+        redux.dispatch(actionCreators.messages__edit__success(message));
+        return true;
+      }
+      return false;
+    },
+    function(message) {
       if (message.isResponseToConnectMessage()) {
         if (message.isSuccessResponse()) {
           if (message.isFromExternal()) {
