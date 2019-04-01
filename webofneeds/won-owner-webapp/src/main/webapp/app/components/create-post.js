@@ -102,14 +102,20 @@ function genComponentConf() {
         </div>
         <div class="cp__footer" >
             <won-labelled-hr label="::'done?'" class="cp__footer__labelledhr"></won-labelled-hr>
-            <won-publish-button on-publish="self.publish(persona)" is-valid="self.isValid()" show-personas="self.isHoldable" ng-if="self.showCreateInput && !self.isEditFromNeed"></won-publish-button>
-            <div class="cp__footer__edit" ng-if="self.loggedIn && self.showCreateInput && self.isEditFromNeed">
+            <won-publish-button on-publish="self.publish(persona)" is-valid="self.isValid()" show-personas="self.isHoldable" ng-if="self.showCreateInput && !self.isEditFromNeed && self.isFromNeedUsableAsTemplate"></won-publish-button>
+            <div class="cp__footer__edit" ng-if="self.loggedIn && self.showCreateInput && self.isEditFromNeed && self.isFromNeedEditable">
               <button class="cp__footer__edit__save won-button--filled red" ng-click="self.save()">
                   Save
               </button>
               <button class="cp__footer__edit__cancel won-button--outlined thin red" ng-click="self.router__back()">
                   Cancel
               </button>
+            </div>
+            <div class="cp__footer__error" ng-if="self.showCreateInput && self.isEditFromNeed && !self.isFromNeedEditable">
+              Can't edit this need (need not owned or doesn't have a matching usecase)
+            </div>
+            <div class="cp__footer__error" ng-if="self.showCreateInput && self.isCreateFromNeed && !self.isFromNeedUsableAsTemplate">
+              Can't use this need as a template (need is owned or doesn't have a matching usecase)
             </div>
         </div>
     `;
@@ -221,6 +227,8 @@ function genComponentConf() {
           isEditFromNeed,
           isFromNeedLoading,
           isFromNeedToLoad,
+          isFromNeedEditable: needUtils.isEditable(fromNeed),
+          isFromNeedUsableAsTemplate: needUtils.isUsableAsTemplate(fromNeed),
           isHoldable: useCaseUtils.isHoldable(useCase),
           hasFromNeedFailedToLoad,
           showCreateInput:
