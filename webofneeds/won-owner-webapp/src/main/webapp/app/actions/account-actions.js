@@ -340,7 +340,7 @@ export function reconnect() {
         )
       );
     } catch (e) {
-      if (e.message == "Unauthorized") {
+      if (e.status >= 400 && e.status < 500) {
         //FIXME: this seems weird and unintentional to me, the actionTypes.account.reset closes the main menu (see view-reducer.js) and the dispatch after opens it again, is this wanted that way?
         dispatch({ type: actionTypes.account.reset });
         dispatch({ type: actionTypes.view.showMainMenu });
