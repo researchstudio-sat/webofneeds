@@ -11,7 +11,20 @@ won-connection-message {
   display: grid;
   grid-template-areas: "icon content";
 
-  &.won-is-multiSelect {
+  &.won-change-notification {
+    grid-template-columns: 1fr;
+    grid-template-areas: "labelledhr";
+
+    won-labelled-hr.won-cm__modified {
+      grid-area: labelledhr;
+
+      .wlh__label__text {
+        background: white;
+      }
+    }
+  }
+
+  &.won-is-multiSelect:not(.won-change-notification) {
     padding-left: 3rem;
     cursor: pointer;
 

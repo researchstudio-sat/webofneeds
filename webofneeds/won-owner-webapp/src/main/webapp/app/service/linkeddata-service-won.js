@@ -120,6 +120,11 @@ import won from "./won.js";
     privateData.cacheStatus = {}; //uri -> {timestamp, cacheItemState}
     privateData.documentToGraph = {}; // document-uri -> Set<uris of contained graphs>
   };
+
+  won.clearStoreWithPromise = async function() {
+    won.clearStore();
+  };
+
   /**
    * OK: fully fetched
    * DIRTY: has changed

@@ -52,6 +52,12 @@ function genComponentConf() {
                         ng-click="self.router__stateGoAbs('connections', {fromNeedUri: self.needUri, mode: 'DUPLICATE'})">
                         Post this too!
                     </button>
+                    <button
+                        class="won-button--outlined thin red"
+                        ng-if="self.isEditable"
+                        ng-click="self.router__stateGoAbs('connections', {fromNeedUri: self.needUri, mode: 'EDIT'})">
+                        Edit Post
+                    </button>
                     <a class="won-button--outlined thin red"
                         ng-if="self.adminEmail"
                         href="mailto:{{ self.adminEmail }}?{{ self.generateReportPostMailParams()}}">
@@ -98,6 +104,7 @@ function genComponentConf() {
           isActive: needUtils.isActive(post),
           isInactive: needUtils.isInactive(post),
           isUsableAsTemplate: needUtils.isUsableAsTemplate(post),
+          isEditable: needUtils.isEditable(post),
           post,
           postLoading:
             !post || processUtils.isNeedLoading(process, post.get("uri")),

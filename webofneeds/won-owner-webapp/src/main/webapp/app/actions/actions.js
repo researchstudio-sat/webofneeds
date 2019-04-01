@@ -41,6 +41,7 @@ import { hierarchy2Creators } from "./action-utils.js";
 
 import {
   needCreate,
+  needEdit,
   createWhatsNew,
   createWhatsAround,
 } from "./create-need-action.js";
@@ -142,6 +143,9 @@ const actionHierarchy = {
     connectionsReceived: INJ_DEFAULT,
     clean: INJ_DEFAULT,
     create: needCreate,
+    edit: needEdit,
+    editSuccessful: INJ_DEFAULT,
+    editFailure: INJ_DEFAULT,
     whatsNew: createWhatsNew,
     whatsAround: createWhatsAround,
     createSuccessful: INJ_DEFAULT,
@@ -206,6 +210,10 @@ const actionHierarchy = {
       success: messages.successfulCreate,
       //TODO failure: messages.failedCreate
     },
+    edit: {
+      success: messages.successfulEdit,
+      //TODO failure: messages.failedEdit
+    },
     open: {
       successRemote: INJ_DEFAULT, //2nd successResponse
       successOwn: INJ_DEFAULT, //1st successResponse
@@ -255,6 +263,7 @@ const actionHierarchy = {
     },
     updateMessageStatus: messages.updateMessageStatus,
     processConnectionMessage: messages.processConnectionMessage,
+    processChangeNotificationMessage: messages.processChangeNotificationMessage,
     processAgreementMessage: messages.processAgreementMessage,
     needMessageReceived: messages.needMessageReceived,
     processConnectMessage: messages.processConnectMessage,

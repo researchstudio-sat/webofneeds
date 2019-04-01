@@ -44,6 +44,10 @@ export function getEnabledUseCases(need) {
   return getIn(need, ["matchedUseCase", "enabledUseCases"]);
 }
 
+export function hasMatchedUseCase(need) {
+  return !!getIn(need, ["matchedUseCase", "identifier"]);
+}
+
 /**
  * Determines if a given need is a Inactive
  * @param need
@@ -67,25 +71,22 @@ export function isWhatsAroundNeed(need) {
 
 /**
  * This checks if the need is allowed to be used as a template,
- * it is only allowed if the need exists, and if it is not one of the following:
- * - DirectResponseNeed
- * - WhatsAroundNeed
- * - WhatsNewNeed
- * - SearchNeed
+ * it is only allowed if the need exists, and if it has a matchedUseCase
  * @param need
  * @returns {*|boolean}
  */
 export function isUsableAsTemplate(need) {
-  return (
-    need &&
-    !(
-      isOwned(need) ||
-      isDirectResponseNeed(need) ||
-      isWhatsAroundNeed(need) ||
-      isWhatsNewNeed(need) ||
-      isSearchNeed(need)
-    )
-  );
+  return need && !isOwned(need) && hasMatchedUseCase(need);
+}
+
+/**
+ * This checks if the need is allowed to be edited,
+ * it is only allowed if the need exists, and if it is OWNED and has a matchedUseCase
+ * @param need
+ * @returns {*|boolean}
+ */
+export function isEditable(need) {
+  return need && isOwned(need) && hasMatchedUseCase(need);
 }
 
 /**

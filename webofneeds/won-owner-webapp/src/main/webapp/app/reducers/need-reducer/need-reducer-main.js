@@ -192,12 +192,42 @@ export default function(allNeedsInState = initialState, action = {}) {
       );
     }
 
+    case actionTypes.needs.edit: {
+      console.debug(
+        "payload = {eventUri, message, needUri, need: draft, oldNeed}"
+      );
+      console.debug(
+        "need-reducer-main actionTypes.needs.edit todo: impl / payload-> ",
+        action.payload
+      );
+      //TODO: IMPL Optimistic change
+      return allNeedsInState;
+    }
+
     case actionTypes.needs.create: // optimistic need adding
       return addNeedInCreation(
         allNeedsInState,
         action.payload.need,
         action.payload.needUri
       );
+
+    case actionTypes.needs.editFailure: {
+      console.debug(
+        "need-reducer-main actionTypes.needs.editFailure todo: impl / payload-> ",
+        action.payload
+      );
+      //TODO: IMPL change
+      return allNeedsInState;
+    }
+
+    case actionTypes.needs.editSuccessful: {
+      console.debug(
+        "need-reducer-main actionTypes.needs.editSuccessful todo: impl / payload-> ",
+        action.payload
+      );
+      //TODO: IMPL change
+      return allNeedsInState;
+    }
 
     case actionTypes.needs.createSuccessful:
       return addNeed(allNeedsInState, action.payload.need, true);
@@ -695,6 +725,8 @@ export default function(allNeedsInState = initialState, action = {}) {
       //add a message that has been already processed (so sent status is ommitted)
       return addMessage(allNeedsInState, action.payload, true);
     // NEW MESSAGE STATE UPDATES
+
+    case actionTypes.messages.processChangeNotificationMessage:
     case actionTypes.messages.processConnectionMessage:
       // ADD RECEIVED CHAT MESSAGES
       // payload; { events }

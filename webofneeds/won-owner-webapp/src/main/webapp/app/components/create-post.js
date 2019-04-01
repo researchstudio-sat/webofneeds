@@ -47,8 +47,9 @@ function genComponentConf() {
                 style="--local-primary:var(--won-primary-color);">
                     <use xlink:href="{{self.useCase['icon']}}" href="{{self.useCase['icon']}}"></use>
             </svg>
-            <span class="cp__header__title" ng-if="!self.isCreateFromNeed">{{self.useCase.label}}</span>
+            <span class="cp__header__title" ng-if="!self.isCreateFromNeed && !self.isEditFromNeed">{{self.useCase.label}}</span>
             <span class="cp__header__title" ng-if="self.isCreateFromNeed">Duplicate from '{{self.useCase.label}}'</span>
+            <span class="cp__header__title" ng-if="self.isEditFromNeed">Edit Post</span>
         </div>
         <div class="cp__content">
             <div class="cp__content__loading" ng-if="!self.showCreateInput && self.isFromNeedLoading">
@@ -64,7 +65,7 @@ function genComponentConf() {
                     <use xlink:href="#ico16_indicator_error" href="#ico16_indicator_error"></use>
                 </svg>
                 <span class="cp__content__failed__label">
-                    Failed To Load - Need might have been deleted
+                    Failed To Load - Post might have been deleted
                 </span>
                 <div class="cp__content__failed__actions">
                     <button class="cp__content__failed__actions__button red won-button--outlined thin"
@@ -101,7 +102,21 @@ function genComponentConf() {
         </div>
         <div class="cp__footer" >
             <won-labelled-hr label="::'done?'" class="cp__footer__labelledhr"></won-labelled-hr>
-            <won-publish-button on-publish="self.publish(persona)" is-valid="self.isValid()" show-personas="self.isHoldable" ng-if="self.showCreateInput"></won-publish-button>
+            <won-publish-button on-publish="self.publish(persona)" is-valid="self.isValid()" show-personas="self.isHoldable" ng-if="self.showCreateInput && !self.isEditFromNeed"></won-publish-button>
+            <div class="cp__footer__edit" ng-if="self.loggedIn && self.showCreateInput && self.isEditFromNeed && self.isFromNeedEditable">
+              <button class="cp__footer__edit__save won-button--filled red" ng-click="self.save()">
+                  Save
+              </button>
+              <button class="cp__footer__edit__cancel won-button--outlined thin red" ng-click="self.router__back()">
+                  Cancel
+              </button>
+            </div>
+            <div class="cp__footer__error" ng-if="self.showCreateInput && self.isEditFromNeed && !self.isFromNeedEditable">
+              Can't edit this need (need not owned or doesn't have a matching usecase)
+            </div>
+            <div class="cp__footer__error" ng-if="self.showCreateInput && self.isCreateFromNeed && !self.isFromNeedUsableAsTemplate">
+              Can't use this need as a template (need is owned or doesn't have a matching usecase)
+            </div>
         </div>
     `;
 
@@ -128,6 +143,7 @@ function genComponentConf() {
         let useCase;
 
         const isCreateFromNeed = !!(fromNeedUri && mode === "DUPLICATE");
+        const isEditFromNeed = !!(fromNeedUri && mode === "EDIT");
 
         let isFromNeedLoading = false;
         let isFromNeedToLoad = false;
@@ -135,7 +151,7 @@ function genComponentConf() {
 
         const connectToNeedUri = mode === "CONNECT" && fromNeedUri;
 
-        if (isCreateFromNeed) {
+        if (isCreateFromNeed || isEditFromNeed) {
           isFromNeedLoading = processSelectors.isNeedLoading(
             state,
             fromNeedUri
@@ -208,14 +224,18 @@ function genComponentConf() {
           fromNeed,
           fromNeedUri,
           isCreateFromNeed,
+          isEditFromNeed,
           isFromNeedLoading,
           isFromNeedToLoad,
+          isFromNeedEditable: needUtils.isEditable(fromNeed),
+          isFromNeedUsableAsTemplate: needUtils.isUsableAsTemplate(fromNeed),
           isHoldable: useCaseUtils.isHoldable(useCase),
           hasFromNeedFailedToLoad,
           showCreateInput:
             useCase &&
             !(
               isCreateFromNeed &&
+              isEditFromNeed &&
               (isFromNeedLoading || hasFromNeedFailedToLoad || isFromNeedToLoad)
             ),
         };
@@ -306,6 +326,21 @@ function genComponentConf() {
       }
 
       this.draftObject[branch] = updatedDraft;
+    }
+
+    save() {
+      if (this.loggedIn && needUtils.isOwned(this.fromNeed)) {
+        this.draftObject.useCase = get(this.useCase, "identifier");
+
+        if (!isBranchContentPresent(this.draftObject.content, true)) {
+          delete this.draftObject.content;
+        }
+        if (!isBranchContentPresent(this.draftObject.seeks, true)) {
+          delete this.draftObject.seeks;
+        }
+
+        this.needs__edit(this.draftObject, this.fromNeed);
+      }
     }
 
     publish(persona) {

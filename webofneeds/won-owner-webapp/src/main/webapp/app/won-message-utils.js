@@ -440,6 +440,54 @@ export function buildOpenMessage(
   return messageP;
 }
 
+export async function buildEditMessage(editedNeedData, oldNeed, wonNodeUri) {
+  const needUriToEdit = oldNeed && oldNeed.get("uri");
+
+  //if type  create -> use needBuilder as well
+  const prepareContentNodeData = async editedNeedData => ({
+    // Adds all fields from needDataIsOrSeeks:
+    // title, description, tags, matchingContext, location,...
+    ...editedNeedData,
+
+    publishedContentUri: needUriToEdit, //mandatory
+    arbitraryJsonLd: editedNeedData.ttl
+      ? await won.ttlToJsonLd(editedNeedData.ttl)
+      : [],
+  });
+
+  let contentRdf = won.buildNeedRdf({
+    content: editedNeedData.content
+      ? await prepareContentNodeData(editedNeedData.content)
+      : undefined,
+    seeks: editedNeedData.seeks
+      ? await prepareContentNodeData(editedNeedData.seeks)
+      : undefined,
+    useCase: editedNeedData.useCase ? editedNeedData.useCase : undefined, //only needed for need building
+    // FIXME: find a better way to include need details that are not part of is or seeks
+    matchingContext: editedNeedData.matchingContext
+      ? editedNeedData.matchingContext
+      : undefined,
+    facet: editedNeedData.facet,
+  });
+
+  const msgUri = wonNodeUri + "/event/" + getRandomWonId(); //mandatory
+  const msgJson = won.buildMessageRdf(contentRdf, {
+    receiverNode: wonNodeUri, //mandatory
+    senderNode: wonNodeUri, //mandatory
+    msgType: won.WONMSG.replaceMessage, //mandatory
+    publishedContentUri: needUriToEdit, //mandatory
+    msgUri: msgUri,
+  });
+  //add the @base definition to the @context so we can use #fragments in the need structure
+  msgJson["@context"]["@base"] = needUriToEdit;
+
+  return {
+    message: msgJson,
+    eventUri: msgUri,
+    needUri: needUriToEdit,
+  };
+}
+
 /**
  *
  * @param needData
@@ -467,17 +515,6 @@ export async function buildCreateMessage(needData, wonNodeUri) {
 
   const publishedContentUri = wonNodeUri + "/need/" + getRandomWonId();
 
-  const imgs = needData.images;
-  let attachmentUris = [];
-  if (imgs) {
-    imgs.forEach(function(img) {
-      img.uri = wonNodeUri + "/attachment/" + getRandomWonId();
-    });
-    attachmentUris = imgs.map(function(img) {
-      return img.uri;
-    });
-  }
-
   //if type  create -> use needBuilder as well
   const prepareContentNodeData = async needData => ({
     // Adds all fields from needDataIsOrSeeks:
@@ -485,8 +522,6 @@ export async function buildCreateMessage(needData, wonNodeUri) {
     ...needData,
 
     publishedContentUri: publishedContentUri, //mandatory
-    //TODO attach to either is or seeks?
-    attachmentUris: attachmentUris, //optional, should be same as in `attachments` below
     arbitraryJsonLd: needData.ttl ? await won.ttlToJsonLd(needData.ttl) : [],
   });
 
@@ -512,7 +547,6 @@ export async function buildCreateMessage(needData, wonNodeUri) {
     msgType: won.WONMSG.createMessage, //mandatory
     publishedContentUri: publishedContentUri, //mandatory
     msgUri: msgUri,
-    attachments: imgs, //optional, should be same as in `attachmentUris` above
   });
   //add the @base definition to the @context so we can use #fragments in the need structure
   msgJson["@context"]["@base"] = publishedContentUri;
