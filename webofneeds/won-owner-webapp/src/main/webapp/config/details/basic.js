@@ -457,13 +457,11 @@ export const eventObject = {
     } else if (is("Array", value)) {
       const eventObjects = value.map(item => {
         return {
-          "s:object": {
-            "@type": "s:Event",
-            "s:about": { "@id": item },
-          },
+          "@type": "s:Event",
+          "s:about": { "@id": item },
         };
       });
-      return eventObjects;
+      return { "s:object": eventObjects };
     } else {
       return {
         "s:object": {
