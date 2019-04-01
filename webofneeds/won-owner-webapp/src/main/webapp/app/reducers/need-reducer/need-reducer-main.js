@@ -211,13 +211,23 @@ export default function(allNeedsInState = initialState, action = {}) {
         action.payload.needUri
       );
 
-    case actionTypes.needs.editFailure:
+    case actionTypes.needs.editFailure: {
+      console.debug(
+        "need-reducer-main actionTypes.needs.editFailure todo: impl / payload-> ",
+        action.payload
+      );
       //TODO: IMPL change
       return allNeedsInState;
+    }
 
-    case actionTypes.needs.editSuccessful:
+    case actionTypes.needs.editSuccessful: {
+      console.debug(
+        "need-reducer-main actionTypes.needs.editSuccessful todo: impl / payload-> ",
+        action.payload
+      );
       //TODO: IMPL change
       return allNeedsInState;
+    }
 
     case actionTypes.needs.createSuccessful:
       return addNeed(allNeedsInState, action.payload.need, true);
