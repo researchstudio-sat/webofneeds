@@ -33,12 +33,20 @@ function genComponentConf() {
       <div class="pcg__columns">
       <!-- LEFT COLUMN -->
         <div class="pcg__columns__left">
-          <div class="pcg__columns__left__item" ng-if="self.friendlyTimestamp">
+          <div class="pcg__columns__left__item" ng-if="self.friendlyCreationDate">
             <div class="pcg__columns__left__item__label">
               Created
             </div>
             <div class="pcg__columns__left__item__value">
-              {{ self.friendlyTimestamp }}
+              {{ self.friendlyCreationDate }}
+            </div>
+          </div>
+          <div class="pcg__columns__left__item" ng-if="self.friendlyModifiedDate">
+            <div class="pcg__columns__left__item__label">
+              Modified
+            </div>
+            <div class="pcg__columns__left__item__value">
+              {{ self.friendlyModifiedDate }}
             </div>
           </div>
           <!-- TYPES - IF SHOW RDF IS TRUE -->
@@ -125,6 +133,9 @@ function genComponentConf() {
         const post = this.postUri && getIn(state, ["needs", this.postUri]);
         const viewState = get(state, "view");
 
+        const creationDate = get(post, "creationDate");
+        const modifiedDate = get(post, "modifiedDate");
+
         return {
           WON: won.WON,
           fullTypesLabel: post && generateFullNeedTypesLabel(post),
@@ -134,12 +145,13 @@ function genComponentConf() {
           shortFlags: post && generateShortNeedFlags(post),
           fullFacets: post && generateFullNeedFacets(post),
           shortFacets: post && generateShortNeedFacets(post),
-          friendlyTimestamp:
-            post &&
-            relativeTime(
-              selectLastUpdateTime(state),
-              get(post, "creationDate")
-            ),
+          friendlyCreationDate:
+            creationDate &&
+            relativeTime(selectLastUpdateTime(state), creationDate),
+          friendlyModifiedDate:
+            modifiedDate &&
+            modifiedDate != creationDate &&
+            relativeTime(selectLastUpdateTime(state), modifiedDate),
           ratingConnectionUri: ratingConnectionUri,
           shouldShowRdf: viewUtils.showRdf(viewState),
         };

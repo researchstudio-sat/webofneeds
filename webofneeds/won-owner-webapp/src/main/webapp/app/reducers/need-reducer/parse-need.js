@@ -34,7 +34,8 @@ export function parseNeed(jsonldNeed, isOwned) {
       content: generateContent(jsonldNeedImm, detailsToParse),
       seeks: generateContent(jsonldNeedImm.get("won:seeks"), detailsToParse),
       creationDate: extractCreationDate(jsonldNeedImm),
-      lastUpdateDate: extractCreationDate(jsonldNeedImm),
+      lastUpdateDate: extractCreationDate(jsonldNeedImm), //Used for sorting/updates (e.g. if connection comes in etc...)
+      modifiedDate: extractLastModifiedDate(jsonldNeedImm), //Used as a flag if the need itself has changed (e.g. need edit)
       humanReadable: undefined, //can only be determined after we generated The Content
       matchedUseCase: {
         identifier: undefined,
@@ -183,6 +184,16 @@ function extractCreationDate(needJsonLd) {
     needJsonLd.get("http://purl.org/dc/terms/created");
   if (creationDate) {
     return new Date(creationDate);
+  }
+  return undefined;
+}
+
+function extractLastModifiedDate(needJsonLd) {
+  const lastModifiedDate =
+    needJsonLd.get("dct:modified") ||
+    needJsonLd.get("http://purl.org/dc/terms/modified");
+  if (lastModifiedDate) {
+    return new Date(lastModifiedDate);
   }
   return undefined;
 }
