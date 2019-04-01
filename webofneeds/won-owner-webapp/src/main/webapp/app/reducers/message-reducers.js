@@ -15,18 +15,12 @@ const initialState = Immutable.fromJS({
 });
 export function messagesReducer(messages = initialState, action = {}) {
   switch (action.type) {
-    case actionTypes.needs.edit: {
-      console.debug(
-        "payload = {eventUri, message, needUri, need: draft, oldNeed}"
-      );
-      console.debug(
-        "message-reducer actionTypes.needs.edit todo: impl / payload-> ",
-        action.payload
-      );
-      //TODO: IMPL
-      return messages;
-    }
-
+    case actionTypes.connections.open:
+    case actionTypes.connections.sendChatMessage:
+    case actionTypes.connections.rate:
+    case actionTypes.connections.close:
+    case actionTypes.messages.send:
+    case actionTypes.needs.edit:
     case actionTypes.needs.connect:
     case actionTypes.personas.create:
     case actionTypes.needs.create:
@@ -60,16 +54,6 @@ export function messagesReducer(messages = initialState, action = {}) {
         .removeIn(["enqueued", pendingEventUri])
         .setIn(["waitingForAnswer", pendingEventUri], msg);
     }
-
-    case actionTypes.connections.open:
-    case actionTypes.connections.sendChatMessage:
-    case actionTypes.connections.rate:
-    case actionTypes.connections.close:
-    case actionTypes.messages.send:
-      return messages.setIn(
-        ["enqueued", action.payload.eventUri],
-        action.payload.message
-      );
 
     case actionTypes.connections.sendChatMessageRefreshDataOnSuccess:
       return messages
