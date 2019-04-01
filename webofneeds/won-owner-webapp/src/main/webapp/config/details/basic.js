@@ -410,9 +410,26 @@ export const defaultFacet = {
   },
   parseFromRDF: function(jsonLDImm) {
     const wonHasDefaultFacet = get(jsonLDImm, "won:hasDefaultFacet");
+    let defaultFacet = Immutable.Map();
 
     if (wonHasDefaultFacet && !Immutable.List.isList(wonHasDefaultFacet)) {
-      return wonHasDefaultFacet;
+      const defaultFacetId = get(wonHasDefaultFacet, "@id");
+
+      const wonHasFacets = get(jsonLDImm, "won:hasFacet");
+
+      if (wonHasFacets) {
+        if (Immutable.List.isList(wonHasFacets)) {
+          const foundDefaultFacet = wonHasFacets.find(
+            facet => get(facet, "@id") === defaultFacetId
+          );
+          return defaultFacet.set(
+            defaultFacetId,
+            get(foundDefaultFacet, "@type")
+          );
+        } else if (get(wonHasFacets, "@id") === defaultFacetId) {
+          return defaultFacet.set(defaultFacetId, get(wonHasFacets, "@type"));
+        }
+      }
     }
     return undefined;
   },
