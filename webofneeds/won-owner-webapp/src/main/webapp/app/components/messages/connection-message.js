@@ -96,7 +96,7 @@ function genComponentConf() {
         <won-labelled-hr
             ng-if="self.isChangeNotificationMessage"
             in-view="self.isUnread && $inview && self.markAsRead()"
-            label="::'Need has been modified'" class="won-cm__modified">
+            label="::'Post has been modified'" class="won-cm__modified">
         </won-labelled-hr>
     `;
 
