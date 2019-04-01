@@ -15,7 +15,7 @@ const serviceDependencies = ["$ngRedux", "$scope"];
 
 function genComponentConf() {
   let template = `
-      <div class="msg__text" ng-if="self.message && self.text" marked="self.text"></div>
+      <div class="msg__text markdown" ng-if="self.message && self.text" marked="self.text"></div>
       <div class="msg__content"
         ng-repeat="detail in self.allDetails"
         ng-if="self.message && detail.identifier && detail.viewerComponent && self.getDetailContent(detail.identifier)"

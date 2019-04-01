@@ -7,6 +7,7 @@ import { actionCreators } from "../actions/actions.js";
 import { connect2Redux, parseRestErrorMessage } from "../won-utils.js";
 import won from "../won-es6.js";
 import "angular-marked";
+import "style/_won-markdown.scss";
 
 import * as srefUtils from "../sref-utils.js";
 import * as accountUtils from "../account-utils.js";
@@ -25,7 +26,7 @@ function genLoginConf() {
                 required
                 autofocus
                 ng-keyup="self.formKeyUp($event)"/>
-            <span class="wl__errormsg" ng-if="self.loginError" marked="self.parseRestErrorMessage(self.loginError)">
+            <span class="wl__errormsg markdown" ng-if="self.loginError" marked="self.parseRestErrorMessage(self.loginError)">
             </span>
             <a class="wl__errormsg__resend"
                  ng-if="self.isNotVerified && !self.processingResendVerificationEmail"
