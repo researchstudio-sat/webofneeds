@@ -29,20 +29,17 @@ export function messagesReducer(messages = initialState, action = {}) {
         action.payload.message
       );
 
-    case actionTypes.needs.editFailure:
+    case actionTypes.needs.editFailure: {
       //TODO: IMPL
+      console.debug(
+        "message-reducer actionTypes.needs.editFailure todo: impl / payload-> ",
+        action.payload
+      );
       return messages;
+    }
 
     case actionTypes.needs.editSuccessful:
-      //TODO: IMPL
-      return messages;
-
     case actionTypes.needs.createSuccessful:
-      return messages.removeIn([
-        "waitingForAnswer",
-        action.payload.publishEventUri,
-      ]);
-
     case actionTypes.messages.chatMessage.failure:
     case actionTypes.messages.chatMessage.success:
       return messages.removeIn(["waitingForAnswer", action.payload.eventUri]);
