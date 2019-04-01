@@ -128,13 +128,26 @@ export default function(processState = initialState, action = {}) {
     case actionTypes.failedToGetLocation:
       return processState.set("processingPublish", false);
 
-    case actionTypes.needs.editFailure:
+    case actionTypes.needs.editFailure: {
+      console.debug(
+        "process-reducer actionTypes.needs.editFailure todo: impl / payload-> ",
+        action.payload
+      );
       //TODO: IMPL
       return processState;
+    }
 
-    case actionTypes.needs.editSuccessful:
-      //TODO: IMPL
+    case actionTypes.needs.editSuccessful: {
+      const needUri = action.payload.needUri;
+
+      if (needUri) {
+        processState = updateNeedProcess(processState, needUri, {
+          processUpdate: false,
+        });
+      }
+
       return processState;
+    }
 
     case actionTypes.needs.createSuccessful: {
       const needUri =
