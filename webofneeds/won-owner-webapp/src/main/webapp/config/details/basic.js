@@ -289,11 +289,12 @@ export const type = {
     const types = (rawTypes => {
       if (Immutable.List.isList(rawTypes)) {
         return Immutable.Set(rawTypes);
-      } else {
+      } else if (rawTypes) {
         return Immutable.Set([rawTypes]);
+      } else {
+        return undefined;
       }
     })(jsonLDImm.get("@type"));
-
     return types;
   },
   generateHumanReadable: function({ value, includeLabel }) {
