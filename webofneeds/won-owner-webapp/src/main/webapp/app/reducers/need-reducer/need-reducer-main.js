@@ -34,7 +34,7 @@ import {
   addConnectionsToLoad,
   markConnectionAsRated,
   markConnectionAsRead,
-  getOwnedNeedByConnectionUri,
+  getNeedByConnectionUri,
   changeConnectionState,
   changeConnectionStateByFun,
   storeConnectionsData,
@@ -177,7 +177,6 @@ export default function(allNeedsInState = initialState, action = {}) {
         action.payload.needUri,
         Immutable.fromJS({
           jsonld: action.payload.persona,
-          isOwned: true,
           isBeingCreated: true,
           uri: action.payload.needUri,
           creationDate: new Date(),
@@ -474,7 +473,7 @@ export default function(allNeedsInState = initialState, action = {}) {
       const connUri = wonMessage.getReceiver();
 
       const tmpConnUri = "connectionFrom:" + wonMessage.getIsResponseTo();
-      const tmpNeed = getOwnedNeedByConnectionUri(allNeedsInState, tmpConnUri);
+      const tmpNeed = getNeedByConnectionUri(allNeedsInState, tmpConnUri);
       const tmpConnection = getIn(tmpNeed, ["connections", tmpConnUri]);
 
       if (tmpConnection) {
@@ -509,7 +508,7 @@ export default function(allNeedsInState = initialState, action = {}) {
         }
         return allNeedsInState;
       } else {
-        const needByConnectionUri = getOwnedNeedByConnectionUri(
+        const needByConnectionUri = getNeedByConnectionUri(
           allNeedsInState,
           connUri
         );

@@ -285,7 +285,7 @@ $ngRedux.getState();
 As you can see in this State all "visible" Data is stored within the needs and the corresponding connections and messages are stored within this tree.
 Example: If you want to retrieve all present connections for a given need you will access it by `$ngRedux.getState().getIn(["needs", [needUri], "connections"])`.
 
-All The DataParsing happens within the `need-reducer.js` and should only be implemented here, in their respective Methods `parseNeed(jsonLdNeed, isOwned)`, `parseConnection(jsonLdConnection, unread)` and `parseMessage(jsonLdMessage, outgoingMessage, unread)`.
+All The DataParsing happens within the `need-reducer.js` and should only be implemented here, in their respective Methods `parseNeed(jsonLdNeed)`, `parseConnection(jsonLdConnection, unread)` and `parseMessage(jsonLdMessage, outgoingMessage, unread)`.
 It is very important to not parse needs/connections/messages in any other place or in any other way to make sure that the structure of the corresponding items is always the same, and so that the Views don't have to implement fail-safes when accessing elements, e.g. a Location is only present if the whole location data can be parsed/stored within the state, otherwise the location will stay empty.
 This is also true for every message connection and need, as soon as the data is in the state you can be certain that all the mandatory values are set correctly.
 

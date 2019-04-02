@@ -3,7 +3,7 @@
  */
 import { actionTypes } from "../actions/actions.js";
 import Immutable from "immutable";
-import { getIn, get } from "../utils.js";
+import { getIn } from "../utils.js";
 import { parseNeed } from "./need-reducer/parse-need.js";
 import { parseMessage } from "./need-reducer/parse-message.js";
 
@@ -150,10 +150,7 @@ export default function(processState = initialState, action = {}) {
     }
 
     case actionTypes.needs.createSuccessful: {
-      const needUri =
-        action.payload.need && get(parseNeed(action.payload.need), "uri");
-
-      processState = updateNeedProcess(processState, needUri, {
+      processState = updateNeedProcess(processState, action.payload.needUri, {
         toLoad: false,
         failedToLoad: false,
         loading: false,

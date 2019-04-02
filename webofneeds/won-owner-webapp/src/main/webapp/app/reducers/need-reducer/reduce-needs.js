@@ -4,7 +4,7 @@ import won from "../../won-es6.js";
 
 export function addNeed(needs, jsonldNeed, isOwned) {
   let newState;
-  let parsedNeed = parseNeed(jsonldNeed, isOwned);
+  let parsedNeed = parseNeed(jsonldNeed);
 
   if (parsedNeed && parsedNeed.get("uri")) {
     let existingNeed = needs.get(parsedNeed.get("uri"));
@@ -49,14 +49,13 @@ export function addNeed(needs, jsonldNeed, isOwned) {
   return newState;
 }
 
-function addNeedInLoading(needs, needUri, state, isOwned) {
+function addNeedInLoading(needs, needUri, state) {
   const oldNeed = needs.get(needUri);
   if (oldNeed) {
     return needs;
   } else {
     let need = Immutable.fromJS({
       uri: needUri,
-      isOwned: isOwned,
       state: state,
       connections: Immutable.Map(),
     });
@@ -71,7 +70,6 @@ function addTheirNeedInLoading(needs, needUri) {
   } else {
     let need = Immutable.fromJS({
       uri: needUri,
-      isOwned: false,
       connections: Immutable.Map(),
     });
     return needs.setIn([needUri], need);
@@ -85,7 +83,6 @@ export function addTheirNeedToLoad(needs, needUri) {
   } else {
     let need = Immutable.fromJS({
       uri: needUri,
-      isOwned: false,
       connections: Immutable.Map(),
     });
     return needs.setIn([needUri], need);
@@ -143,13 +140,12 @@ export function addOwnInactiveNeedsToLoad(needs, needUris) {
   return newState;
 }
 
-function addNeedToLoad(needs, needUri, state, isOwned) {
+function addNeedToLoad(needs, needUri, state) {
   if (needs.get(needUri)) {
     return needs;
   } else {
     let need = Immutable.fromJS({
       uri: needUri,
-      isOwned: isOwned,
       state: state,
       connections: Immutable.Map(),
     });

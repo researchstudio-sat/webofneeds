@@ -130,11 +130,7 @@ function deleteChatConnectionsBetweenOwnedNeeds(state) {
           //Any connection that is not of type chatFacet will be exempt from deletion
           if (isChatConnection(conn)) {
             //Any other connection will be checked if it would be connected to the ownedNeed, if so we remove it.
-            return !state.getIn([
-              "needs",
-              conn.get("remoteNeedUri"),
-              "isOwned",
-            ]);
+            return !generalSelectors.isNeedOwned(state, conn.get("remoteNeedUri"));
           }
           return true;
         });*/
