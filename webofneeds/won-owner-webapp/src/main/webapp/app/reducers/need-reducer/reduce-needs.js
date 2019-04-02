@@ -85,16 +85,24 @@ export function addTheirNeedToLoad(needs, needUri) {
   }
 }
 
+function addNeedToLoad(needs, needUri, state) {
+  if (needs.get(needUri)) {
+    return needs;
+  } else {
+    let need = Immutable.fromJS({
+      uri: needUri,
+      state: state,
+      connections: Immutable.Map(),
+    });
+    return needs.setIn([needUri], need);
+  }
+}
+
 export function addOwnActiveNeedsInLoading(needs, needUris) {
   let newState = needs;
   needUris &&
     needUris.forEach(needUri => {
-      newState = addNeedInLoading(
-        newState,
-        needUri,
-        won.WON.ActiveCompacted,
-        true
-      );
+      newState = addNeedInLoading(newState, needUri, won.WON.ActiveCompacted);
     });
   return newState;
 }
@@ -103,12 +111,7 @@ export function addOwnInactiveNeedsInLoading(needs, needUris) {
   let newState = needs;
   needUris &&
     needUris.forEach(needUri => {
-      newState = addNeedInLoading(
-        newState,
-        needUri,
-        won.WON.InactiveCompacted,
-        true
-      );
+      newState = addNeedInLoading(newState, needUri, won.WON.InactiveCompacted);
     });
   return newState;
 }
@@ -126,27 +129,9 @@ export function addOwnInactiveNeedsToLoad(needs, needUris) {
   let newState = needs;
   needUris &&
     needUris.forEach(needUri => {
-      newState = addNeedToLoad(
-        newState,
-        needUri,
-        won.WON.InactiveCompacted,
-        true
-      );
+      newState = addNeedToLoad(newState, needUri, won.WON.InactiveCompacted);
     });
   return newState;
-}
-
-function addNeedToLoad(needs, needUri, state) {
-  if (needs.get(needUri)) {
-    return needs;
-  } else {
-    let need = Immutable.fromJS({
-      uri: needUri,
-      state: state,
-      connections: Immutable.Map(),
-    });
-    return needs.setIn([needUri], need);
-  }
 }
 
 export function addNeedInCreation(needs, needInCreation, needUri) {
