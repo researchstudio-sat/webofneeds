@@ -54,8 +54,7 @@ function genComponentConf() {
         <div class="rp__searchbox">
             <input
                 type="text"
-                ng-attr-id="{{self.getUniqueFromId()}}"
-                class="rp__searchbox__inner"
+                class="rp__searchbox__inner departure-input"
                 placeholder="{{self.detail.placeholder.departure}}"
                 ng-class="{'rp__searchbox__inner--withreset' : self.fromShowResetButton}"/>
             <svg class="rp__searchbox__icon clickable" 
@@ -97,8 +96,7 @@ function genComponentConf() {
         <div class="rp__searchbox">
             <input
                 type="text"
-                ng-attr-id="{{self.getUniqueToId()}}"
-                class="rp__searchbox__inner"
+                class="rp__searchbox__inner destination-input"
                 placeholder="{{self.detail.placeholder.destination}}"
                 ng-class="{'rp__searchbox__inner--withreset' : self.toShowResetButton}"/>
             <svg class="rp__searchbox__icon clickable" 
@@ -125,7 +123,7 @@ function genComponentConf() {
             )}
         </ul>
 
-        <div class="rp__mapmount" ng-attr-id="{{ self.getUniqueMapMountId() }}"
+        <div class="rp__mapmount"
             in-view="$inview && self.mapInView($inviewInfo)">
         </div>
             `;
@@ -227,18 +225,6 @@ function genComponentConf() {
 
         this.$scope.$apply();
       }
-    }
-
-    getUniqueFromId() {
-      return "ta-from-" + this.$scope.$id;
-    }
-
-    getUniqueToId() {
-      return "ta-to-" + this.$scope.$id;
-    }
-
-    getUniqueMapMountId() {
-      return "ta-mapmount-" + this.$scope.$id;
     }
 
     // TODO: implement
@@ -536,19 +522,19 @@ function genComponentConf() {
     }
 
     fromTextfieldNg() {
-      return this.domCache.ng("#" + this.getUniqueFromId());
+      return this.domCache.ng(".departure-input");
     }
 
     fromTextfield() {
-      return this.domCache.dom("#" + this.getUniqueFromId());
+      return this.domCache.dom(".departure-input");
     }
 
     toTextfieldNg() {
-      return this.domCache.ng("#" + this.getUniqueToId());
+      return this.domCache.ng(".destination-input");
     }
 
     toTextfield() {
-      return this.domCache.dom("#" + this.getUniqueToId());
+      return this.domCache.dom(".destination-input");
     }
 
     mapMountNg() {
