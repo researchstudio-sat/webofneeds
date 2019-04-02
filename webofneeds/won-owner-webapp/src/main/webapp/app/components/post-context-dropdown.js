@@ -12,6 +12,7 @@ import {
 } from "../won-utils.js";
 import * as needUtils from "../need-utils.js";
 import * as processUtils from "../process-utils.js";
+import * as generalSelectors from "../selectors/general-selectors.js";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 
@@ -100,7 +101,7 @@ function genComponentConf() {
 
         return {
           adminEmail: getIn(state, ["config", "theme", "adminEmail"]),
-          isOwnPost: needUtils.isOwned(post),
+          isOwnPost: generalSelectors.isNeedOwned(state, this.needUri),
           isActive: needUtils.isActive(post),
           isInactive: needUtils.isInactive(post),
           isUsableAsTemplate: needUtils.isUsableAsTemplate(post),

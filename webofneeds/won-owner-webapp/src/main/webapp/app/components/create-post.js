@@ -223,6 +223,7 @@ function genComponentConf() {
           useCase,
           fromNeed,
           fromNeedUri,
+          isFromNeedOwned: generalSelectors.isNeedOwned(state, fromNeedUri),
           isCreateFromNeed,
           isEditFromNeed,
           isFromNeedLoading,
@@ -329,7 +330,7 @@ function genComponentConf() {
     }
 
     save() {
-      if (this.loggedIn && needUtils.isOwned(this.fromNeed)) {
+      if (this.loggedIn && this.isFromNeedOwned) {
         this.draftObject.useCase = get(this.useCase, "identifier");
 
         if (!isBranchContentPresent(this.draftObject.content, true)) {

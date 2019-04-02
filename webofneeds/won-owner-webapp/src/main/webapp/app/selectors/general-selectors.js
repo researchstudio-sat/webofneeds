@@ -14,10 +14,18 @@ export const getRouterParams = state =>
   getIn(state, ["router", "currentParams"]);
 
 export const getNeeds = state => state.get("needs");
-export const getOwnedNeeds = state =>
-  getNeeds(state).filter(need => need.get("isOwned"));
-export const getNonOwnedNeeds = state =>
-  getNeeds(state).filter(need => !need.get("isOwned"));
+export const getOwnedNeeds = state => {
+  const accountState = get(state, "account");
+  return getNeeds(state).filter(need =>
+    accountUtils.isNeedOwned(accountState, get(need, "uri"))
+  );
+};
+export const getNonOwnedNeeds = state => {
+  const accountState = get(state, "account");
+  return getNeeds(state).filter(
+    need => !accountUtils.isNeedOwned(accountState, get(need, "uri"))
+  );
+};
 
 export function getPosts(state) {
   const needs = getNeeds(state);
@@ -28,8 +36,12 @@ export function getPosts(state) {
   });
 }
 
-export const getOwnedPosts = state =>
-  getPosts(state).filter(need => need.get("isOwned"));
+export const getOwnedPosts = state => {
+  const accountState = get(state, "account");
+  return getPosts(state).filter(need =>
+    accountUtils.isNeedOwned(accountState, get(need, "uri"))
+  );
+};
 
 export function getOwnedOpenPosts(state) {
   const allOwnedNeeds = getOwnedPosts(state);

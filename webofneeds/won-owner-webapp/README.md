@@ -192,7 +192,6 @@ $ngRedux.getState();
        creationDate: Date, //creationDate of this need
        lastUpdateDate: date, //date of lastUpdate of this need (last date of the message or connection that was added)
        nodeUri: string, //identifier of this need's server
-       isOwned: true|false, //whether this need is owned or not
        isBeingCreated: true|false, //whether or not the creation of this need was successfully completed yet
        state: "won:Active" | "won:Inactive", //state of the need
        groupMembers: Immutable.List() // needUris of participants of this needs (won:hasGroupMember) -> usually only set for groupChatNeeds
