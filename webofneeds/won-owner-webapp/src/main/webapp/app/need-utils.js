@@ -16,10 +16,6 @@ export function isActive(need) {
   return get(need, "state") && get(need, "state") === won.WON.ActiveCompacted;
 }
 
-export function isOwned(need) {
-  return get(need, "isOwned");
-}
-
 export function getIdenticonSvg(need) {
   return get(need, "identiconSvg");
 }
