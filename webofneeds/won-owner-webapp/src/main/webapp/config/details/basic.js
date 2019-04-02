@@ -450,9 +450,7 @@ export const eventObject = {
   icon: "#ico36_detail_title",
   placeholder: "What? (Short title shown in lists)",
   parseToRDF: function({ value }) {
-    const val = value ? value : undefined;
-
-    if (!val) {
+    if (!value) {
       return;
     } else if (is("Array", value)) {
       const eventObjects = value.map(item => {
