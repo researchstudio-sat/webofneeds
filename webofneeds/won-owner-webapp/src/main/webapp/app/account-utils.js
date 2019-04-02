@@ -2,7 +2,7 @@
  * Created by fsuda on 19.03.2019.
  */
 
-import { get } from "./utils.js";
+import { get, getIn } from "./utils.js";
 
 /**
  * Determines if a there is currently a user logged in or not
@@ -97,4 +97,17 @@ export function isDisclaimerAccepted(accountState) {
  */
 export function isTermsOfServiceAccepted(accountState) {
   return !!get(accountState, "acceptedTermsOfService");
+}
+
+/**
+ * Returns true if the given needUri is owned by the loggedIn account
+ * @param accountState
+ * @param needUri
+ * @returns {*|boolean|boolean}
+ */
+export function isNeedOwned(accountState, needUri) {
+  return (
+    isLoggedIn(accountState) &&
+    !!getIn(accountState, ["ownedNeedUris", needUri])
+  );
 }

@@ -6,6 +6,7 @@ import { createSelector } from "reselect";
 
 import { decodeUriComponentProperly, getIn, get } from "../utils.js";
 import { isPersona, isNeed, isActive, isInactive } from "../need-utils.js";
+import * as accountUtils from "../account-utils.js";
 import Color from "color";
 
 export const selectLastUpdateTime = state => state.get("lastUpdateTime");
@@ -220,4 +221,16 @@ export function currentSkin() {
     lineGray: getColor("--won-line-gray"),
     subtitleGray: getColor("--won-subtitle-gray"),
   };
+}
+/**
+ * Returns true if the need is owned by the user who is currently logged in
+ * @param state FULL redux state, no substates allowed
+ * @param needUri needUri to check isOwned state
+ */
+export function isNeedOwned(state, needUri) {
+  if (needUri) {
+    const accountState = get(state, "account");
+    return accountUtils.isNeedOwned(accountState, needUri);
+  }
+  return false;
 }
