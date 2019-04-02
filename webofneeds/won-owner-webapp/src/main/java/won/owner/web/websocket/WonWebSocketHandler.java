@@ -51,6 +51,7 @@ import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.model.NeedState;
 import won.protocol.util.AuthenticationThreadLocal;
+import won.protocol.util.LoggingUtils;
 import won.protocol.util.WonRdfUtils;
 
 /**
@@ -165,19 +166,30 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
         if (completePayload.equals(ECHO_STRING)) {
             return;
         }
-        WonMessage wonMessage = WonMessageDecoder.decodeFromJsonLd(completePayload);
-        // remember which user or (if not logged in) which needUri the session is bound
-        // to
-        User user = getUserForSession(session);
-        if (user != null) {
-            logger.debug("binding session to user {}", user.getId());
-            this.webSocketSessionService.addMapping(user, session);
+        WonMessage wonMessage = null;
+        URI needUri = null;
+        try {
+            wonMessage = WonMessageDecoder.decodeFromJsonLd(completePayload);
+            // remember which user or (if not logged in) which needUri the session is bound
+            // to
+            User user = getUserForSession(session);
+            if (user != null) {
+                logger.debug("binding session to user {}", user.getId());
+                this.webSocketSessionService.addMapping(user, session);
+            }
+            // anyway, we have to bind the URI to the session, otherwise we can't handle
+            // incoming server->client messages
+            needUri = wonMessage.getSenderNeedURI();
+            logger.debug("binding session to need URI {}", needUri);
+            this.webSocketSessionService.addMapping(needUri, session);
+        } catch (Exception e) {
+            // ignore this message
+            LoggingUtils.logMessageAsInfoAndStacktraceAsDebug(logger, e,
+                            "Ignoring WonMessage received via Websocket that caused an Exception");
+            WebSocketMessage<String> wsMsg = new TextMessage(
+                            "{'error':'Error processing WonMessage: " + e.getMessage() + "'}");
+            return;
         }
-        // anyway, we have to bind the URI to the session, otherwise we can't handle
-        // incoming server->client messages
-        URI needUri = wonMessage.getSenderNeedURI();
-        logger.debug("binding session to need URI {}", needUri);
-        this.webSocketSessionService.addMapping(needUri, session);
         try {
             AuthenticationThreadLocal.setAuthentication((Authentication) session.getPrincipal());
             ownerApplicationService.sendWonMessage(wonMessage);
