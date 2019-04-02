@@ -1,6 +1,5 @@
 import { parseNeed } from "./parse-need.js";
 import Immutable from "immutable";
-import won from "../../won-es6.js";
 import { get } from "../../utils.js";
 
 export function addNeed(needs, jsonldNeed) {
@@ -21,7 +20,7 @@ export function addNeed(needs, jsonldNeed) {
       if (heldNeedUris.size > 0) {
         heldNeedUris.map(needUri => {
           if (!get(needs, needUri)) {
-            needs = addTheirNeedToLoad(needs, needUri);
+            needs = addNeedStub(needs, needUri);
           }
         });
       }
@@ -30,7 +29,7 @@ export function addNeed(needs, jsonldNeed) {
       if (groupMemberUris.size > 0) {
         groupMemberUris.map(needUri => {
           if (!get(needs, needUri)) {
-            needs = addTheirNeedToLoad(needs, needUri);
+            needs = addNeedStub(needs, needUri);
           }
         });
       }
@@ -45,91 +44,42 @@ export function addNeed(needs, jsonldNeed) {
   return newState;
 }
 
-function addNeedInLoading(needs, needUri, state) {
-  const oldNeed = needs.get(needUri);
-  if (oldNeed) {
+/**
+ * Adds a need-stub into the need-redux-state, needed to get Posts that are not loaded/loading to show up as skeletons
+ * Checks if stub/need already exists, if so do nothing
+ * @param needs redux need state
+ * @param needUri stub accessible under uri
+ * @param state not mandatory will be set undefined if not set, otherwise the needState is stored (e.g. Active/Inactive)
+ * @returns {*}
+ */
+export function addNeedStub(needs, needUri, state) {
+  if (get(needs, needUri)) {
     return needs;
   } else {
-    let need = Immutable.fromJS({
-      uri: needUri,
-      state: state,
-      connections: Immutable.Map(),
-    });
-    return needs.setIn([needUri], need);
+    return needs.setIn(
+      [needUri],
+      Immutable.fromJS({
+        uri: needUri,
+        state: state,
+        connections: Immutable.Map(),
+      })
+    );
   }
 }
 
-function addTheirNeedInLoading(needs, needUri) {
-  const oldNeed = needs.get(needUri);
-  if (oldNeed) {
-    return needs;
-  } else {
-    let need = Immutable.fromJS({
-      uri: needUri,
-      connections: Immutable.Map(),
-    });
-    return needs.setIn([needUri], need);
-  }
-}
-
-export function addTheirNeedToLoad(needs, needUri) {
-  const oldNeed = needs.get(needUri);
-  if (oldNeed) {
-    return needs;
-  } else {
-    let need = Immutable.fromJS({
-      uri: needUri,
-      connections: Immutable.Map(),
-    });
-    return needs.setIn([needUri], need);
-  }
-}
-
-function addNeedToLoad(needs, needUri, state) {
-  if (needs.get(needUri)) {
-    return needs;
-  } else {
-    let need = Immutable.fromJS({
-      uri: needUri,
-      state: state,
-      connections: Immutable.Map(),
-    });
-    return needs.setIn([needUri], need);
-  }
-}
-
-export function addOwnActiveNeedsInLoading(needs, needUris) {
+/**
+ * Adds need-stubs into the need-redux-state, needed to get Posts that are not loaded/loading to show up as skeletons
+ * Checks if stub/need already exists, if so do nothing
+ * @param needs redux need state
+ * @param needUris stub accessible under uris
+ * @param state not mandatory will be set undefined if not set, otherwise the needState is stored (e.g. Active/Inactive)
+ * @returns {*}
+ */
+export function addNeedStubs(needs, needUris, state) {
   let newState = needs;
   needUris &&
     needUris.forEach(needUri => {
-      newState = addNeedInLoading(newState, needUri, won.WON.ActiveCompacted);
-    });
-  return newState;
-}
-
-export function addOwnInactiveNeedsInLoading(needs, needUris) {
-  let newState = needs;
-  needUris &&
-    needUris.forEach(needUri => {
-      newState = addNeedInLoading(newState, needUri, won.WON.InactiveCompacted);
-    });
-  return newState;
-}
-
-export function addTheirNeedsInLoading(needs, needUris) {
-  let newState = needs;
-  needUris &&
-    needUris.forEach(needUri => {
-      newState = addTheirNeedInLoading(newState, needUri);
-    });
-  return newState;
-}
-
-export function addOwnInactiveNeedsToLoad(needs, needUris) {
-  let newState = needs;
-  needUris &&
-    needUris.forEach(needUri => {
-      newState = addNeedToLoad(newState, needUri, won.WON.InactiveCompacted);
+      newState = addNeedStub(newState, needUri, state);
     });
   return newState;
 }

@@ -5,14 +5,7 @@ import { actionTypes } from "../../actions/actions.js";
 import Immutable from "immutable";
 import won from "../../won-es6.js";
 import { msStringToDate, get, getIn } from "../../utils.js";
-import {
-  addOwnActiveNeedsInLoading,
-  addOwnInactiveNeedsInLoading,
-  addOwnInactiveNeedsToLoad,
-  addTheirNeedsInLoading,
-  addNeed,
-  addNeedInCreation,
-} from "./reduce-needs.js";
+import { addNeedStubs, addNeed, addNeedInCreation } from "./reduce-needs.js";
 import {
   addMessage,
   addExistingMessages,
@@ -63,35 +56,30 @@ export default function(allNeedsInState = initialState, action = {}) {
       );
 
     case actionTypes.needs.storeOwnedActiveUris: {
-      return addOwnActiveNeedsInLoading(
+      return addNeedStubs(
         allNeedsInState,
-        action.payload.get("uris")
+        action.payload.get("uris"),
+        won.WON.ActiveCompacted
       );
     }
 
+    case actionTypes.needs.storeOwnedInactiveUrisInLoading:
     case actionTypes.needs.storeOwnedInactiveUris: {
-      return addOwnInactiveNeedsToLoad(
+      return addNeedStubs(
         allNeedsInState,
-        action.payload.get("uris")
-      );
-    }
-
-    case actionTypes.needs.storeOwnedInactiveUrisInLoading: {
-      return addOwnInactiveNeedsInLoading(
-        allNeedsInState,
-        action.payload.get("uris")
+        action.payload.get("uris"),
+        won.WON.InactiveCompacted
       );
     }
 
     case actionTypes.personas.storeTheirUrisInLoading:
     case actionTypes.needs.storeTheirUrisInLoading: {
-      return addTheirNeedsInLoading(
-        allNeedsInState,
-        action.payload.get("uris")
-      );
+      return addNeedStubs(allNeedsInState, action.payload.get("uris"));
     }
 
-    case actionTypes.needs.storeOwned: {
+    case actionTypes.needs.storeOwned:
+    case actionTypes.needs.storeTheirs:
+    case actionTypes.personas.storeTheirs: {
       let needs = action.payload.get("needs");
       needs = needs ? needs : Immutable.Set();
 
@@ -113,17 +101,6 @@ export default function(allNeedsInState = initialState, action = {}) {
       return storeConnectionsData(
         allNeedsInState,
         action.payload.get("connections")
-      );
-    }
-
-    case actionTypes.needs.storeTheirs:
-    case actionTypes.personas.storeTheirs: {
-      let needs = action.payload.get("needs");
-      needs = needs ? needs : Immutable.Set();
-
-      return needs.reduce(
-        (updatedState, need) => addNeed(updatedState, need),
-        allNeedsInState
       );
     }
 
