@@ -19,7 +19,8 @@ public enum WonMessageType {
     // notification messages
     HINT_NOTIFICATION(WONMSG.TYPE_HINT_NOTIFICATION), NEED_CREATED_NOTIFICATION(WONMSG.TYPE_NEED_CREATED_NOTIFICATION),
     // response messages
-    SUCCESS_RESPONSE(WONMSG.TYPE_SUCCESS_RESPONSE), FAILURE_RESPONSE(WONMSG.TYPE_FAILURE_RESPONSE);
+    SUCCESS_RESPONSE(WONMSG.TYPE_SUCCESS_RESPONSE), FAILURE_RESPONSE(WONMSG.TYPE_FAILURE_RESPONSE),
+    CHANGE_NOTIFICATION(WONMSG.TYPE_CHANGE_NOTIFICATION);
     private Resource resource;
 
     private WonMessageType(Resource resource) {
@@ -49,7 +50,7 @@ public enum WonMessageType {
     }
 
     public boolean causesNeedStateChange() {
-        return this == ACTIVATE || this == DEACTIVATE;
+        return this == ACTIVATE || this == DEACTIVATE || this == REPLACE || this == DELETE;
     }
 
     public boolean causesNewConnection() {
@@ -84,6 +85,8 @@ public enum WonMessageType {
         // response classes
         if (WONMSG.TYPE_SUCCESS_RESPONSE.equals(resource))
             return SUCCESS_RESPONSE;
+        if (WONMSG.TYPE_CHANGE_NOTIFICATION.equals(resource))
+            return CHANGE_NOTIFICATION;
         if (WONMSG.TYPE_FAILURE_RESPONSE.equals(resource))
             return FAILURE_RESPONSE;
         // notification classes
