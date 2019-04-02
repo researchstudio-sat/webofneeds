@@ -22,10 +22,7 @@ import {
   fetchMessage,
 } from "../won-message-utils.js";
 import { actionCreators } from "../actions/actions.js";
-import {
-  getConnectionUriFromRoute,
-  getOwnedNeedByConnectionUri,
-} from "../selectors/general-selectors.js";
+import * as generalSelectors from "../selectors/general-selectors.js";
 import { hasMessagesToLoad } from "../selectors/connection-selectors.js";
 import {
   getAgreementMessagesByConnectionUri,
@@ -308,8 +305,8 @@ function genComponentConf() {
       const selectFromState = state => {
         const selectedConnectionUri = this.connectionUri
           ? this.connectionUri
-          : getConnectionUriFromRoute(state);
-        const ownedNeed = getOwnedNeedByConnectionUri(
+          : generalSelectors.getConnectionUriFromRoute(state);
+        const ownedNeed = generalSelectors.getOwnedNeedByConnectionUri(
           state,
           selectedConnectionUri
         );
@@ -382,16 +379,20 @@ function genComponentConf() {
 
         const process = get(state, "process");
 
+        const isRemoteNeedOwned = generalSelectors.isNeedOwned(
+          state,
+          remoteNeedUri
+        );
         const reactionUseCases =
           remoteNeed &&
-          !needUtils.isOwned(remoteNeed) &&
+          !isRemoteNeedOwned &&
           needUtils.getReactionUseCases(remoteNeed);
         const hasReactionUseCases =
           reactionUseCases && reactionUseCases.size > 0;
 
         const enabledUseCases =
           remoteNeed &&
-          needUtils.isOwned(remoteNeed) &&
+          isRemoteNeedOwned &&
           needUtils.getEnabledUseCases(remoteNeed);
         const hasEnabledUseCases = enabledUseCases && enabledUseCases.size > 0;
 

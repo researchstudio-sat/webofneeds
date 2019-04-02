@@ -16,10 +16,6 @@ export function isActive(need) {
   return get(need, "state") && get(need, "state") === won.WON.ActiveCompacted;
 }
 
-export function isOwned(need) {
-  return get(need, "isOwned");
-}
-
 export function getIdenticonSvg(need) {
   return get(need, "identiconSvg");
 }
@@ -67,26 +63,6 @@ export function isWhatsAroundNeed(need) {
     getIn(need, ["content", "flags"]) &&
     getIn(need, ["content", "flags"]).contains("won:WhatsAround")
   );
-}
-
-/**
- * This checks if the need is allowed to be used as a template,
- * it is only allowed if the need exists, and if it has a matchedUseCase
- * @param need
- * @returns {*|boolean}
- */
-export function isUsableAsTemplate(need) {
-  return need && !isOwned(need) && hasMatchedUseCase(need);
-}
-
-/**
- * This checks if the need is allowed to be edited,
- * it is only allowed if the need exists, and if it is OWNED and has a matchedUseCase
- * @param need
- * @returns {*|boolean}
- */
-export function isEditable(need) {
-  return need && isOwned(need) && hasMatchedUseCase(need);
 }
 
 /**

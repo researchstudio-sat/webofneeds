@@ -13,6 +13,7 @@ import { connect2Redux } from "../won-utils.js";
 import * as needUtils from "../need-utils.js";
 import * as connectionSelectors from "../selectors/connection-selectors.js";
 import * as connectionUtils from "../connection-utils.js";
+import * as generalSelectors from "../selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";
 import ngAnimate from "angular-animate";
 
@@ -105,7 +106,7 @@ function genComponentConf() {
 
       const selectFromState = state => {
         const post = getIn(state, ["needs", this.postUri]);
-        const isOwned = needUtils.isOwned(post);
+        const isOwned = generalSelectors.isNeedOwned(state, this.postUri);
 
         const hasGroupFacet = needUtils.hasGroupFacet(post);
 

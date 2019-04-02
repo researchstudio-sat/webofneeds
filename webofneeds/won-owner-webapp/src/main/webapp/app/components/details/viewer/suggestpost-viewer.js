@@ -5,10 +5,7 @@ import postHeaderModule from "../../post-header.js";
 import { attach, getIn, get } from "../../../utils.js";
 import { connect2Redux } from "../../../won-utils.js";
 import * as needUtils from "../../../need-utils.js";
-import {
-  getConnectionUriFromRoute,
-  getOwnedNeedByConnectionUri,
-} from "../../../selectors/general-selectors.js";
+import * as generalSelectors from "../../../selectors/general-selectors.js";
 
 import "style/_suggestpost-viewer.scss";
 
@@ -62,10 +59,15 @@ function genComponentConf() {
       window.suggestpostv4dbg = this;
 
       const selectFromState = state => {
-        const openedConnectionUri = getConnectionUriFromRoute(state);
+        const openedConnectionUri = generalSelectors.getConnectionUriFromRoute(
+          state
+        );
         const openedOwnPost =
           openedConnectionUri &&
-          getOwnedNeedByConnectionUri(state, openedConnectionUri);
+          generalSelectors.getOwnedNeedByConnectionUri(
+            state,
+            openedConnectionUri
+          );
         const connection = getIn(openedOwnPost, [
           "connections",
           openedConnectionUri,
@@ -105,12 +107,17 @@ function genComponentConf() {
         ]);
 
         const fetchedSuggestion = !isLoading && !toLoad && !failedToLoad;
+        const isSuggestedOwned = generalSelectors.isNeedOwned(
+          state,
+          suggestedPostUri
+        );
 
         return {
           suggestedPost,
           openedOwnPost,
           hasChatFacet: needUtils.hasChatFacet(suggestedPost),
           hasGroupFacet: needUtils.hasGroupFacet(suggestedPost),
+          isSuggestedOwned,
           showConnectAction:
             suggestedPost &&
             fetchedSuggestion &&
@@ -118,7 +125,7 @@ function genComponentConf() {
             !needUtils.hasGroupFacet(suggestedPost) &&
             needUtils.hasChatFacet(suggestedPost) &&
             !hasConnectionBetweenPosts &&
-            !needUtils.isOwned(suggestedPost) &&
+            !isSuggestedOwned &&
             openedOwnPost,
           showJoinAction:
             suggestedPost &&
@@ -127,7 +134,7 @@ function genComponentConf() {
             needUtils.hasGroupFacet(suggestedPost) &&
             !needUtils.hasChatFacet(suggestedPost) &&
             !hasConnectionBetweenPosts &&
-            !needUtils.isOwned(suggestedPost) &&
+            !isSuggestedOwned &&
             openedOwnPost,
           isLoading,
           toLoad,
@@ -166,12 +173,12 @@ function genComponentConf() {
       }
 
       if (needUtils.isPersona(this.suggestedPost)) {
-        return needUtils.isOwned(this.suggestedPost)
+        return this.isSuggestedOwned
           ? "This is one of your Personas"
           : "This is someone elses Persona";
       } else if (this.hasConnectionBetweenPosts) {
         return "Already established a Connection with this Suggestion";
-      } else if (needUtils.isOwned(this.suggestedPost)) {
+      } else if (this.isSuggestedOwned) {
         return "This is one of your own Needs";
       } else if (this.hasChatFacet && !this.hasGroupFacet) {
         return "Click 'Connect' to connect with this Need";

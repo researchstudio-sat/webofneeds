@@ -44,6 +44,8 @@ export default function(userData = initialState, action = {}) {
       );
     }
 
+    case actionTypes.needs.create: //for optimistic additions
+    case actionTypes.personas.create: //for optimistic additions
     case actionTypes.needs.createSuccessful: {
       const ownedNeedUris = userData.get("ownedNeedUris");
       return userData.set(

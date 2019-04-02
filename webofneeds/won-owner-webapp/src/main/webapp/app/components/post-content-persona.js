@@ -6,10 +6,7 @@ import angular from "angular";
 import Immutable from "immutable";
 import { attach, get, getIn } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
-import {
-  getConnectionUriFromRoute,
-  getOwnedNeedByConnectionUri,
-} from "../selectors/general-selectors.js";
+import * as generalSelectors from "../selectors/general-selectors.js";
 import * as needUtils from "../need-utils.js";
 import * as processUtils from "../process-utils.js";
 import { actionCreators } from "../actions/actions.js";
@@ -64,9 +61,12 @@ function genComponentConf() {
       this.editNeedModule = Elm.EditNeed;
 
       const selectFromState = state => {
-        const connectionUri = getConnectionUriFromRoute(state);
+        const connectionUri = generalSelectors.getConnectionUriFromRoute(state);
         const connection = getOwnedConnectionByUri(state, connectionUri);
-        const ownNeed = getOwnedNeedByConnectionUri(state, connectionUri);
+        const ownNeed = generalSelectors.getOwnedNeedByConnectionUri(
+          state,
+          connectionUri
+        );
 
         const ratingConnectionUri =
           get(connection, "remoteNeedUri") == this.holdsUri &&
@@ -93,7 +93,7 @@ function genComponentConf() {
         return {
           post,
           personaUri,
-          postIsOwned: needUtils.isOwned(post),
+          postIsOwned: generalSelectors.isNeedOwned(state, this.holdsUri),
           postHasHoldableFacet: needUtils.hasHoldableFacet(post),
           personaLoading:
             !persona || processUtils.isNeedLoading(process, personaUri),

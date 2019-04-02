@@ -11,7 +11,7 @@ import { generateHexColor, generateRgbColorArray, getIn } from "../../utils.js";
 import shajs from "sha.js";
 import Identicon from "identicon.js";
 
-export function parseNeed(jsonldNeed, isOwned) {
+export function parseNeed(jsonldNeed) {
   const jsonldNeedImm = Immutable.fromJS(jsonldNeed);
 
   if (jsonldNeedImm && jsonldNeedImm.get("@id")) {
@@ -45,7 +45,6 @@ export function parseNeed(jsonldNeed, isOwned) {
         reactionUseCases: undefined,
       },
       unread: false,
-      isOwned: !!isOwned,
       isBeingCreated: false,
       jsonld: jsonldNeed,
       connections: Immutable.Map(),

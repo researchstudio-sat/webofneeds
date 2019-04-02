@@ -5,14 +5,7 @@ import { actionTypes } from "../../actions/actions.js";
 import Immutable from "immutable";
 import won from "../../won-es6.js";
 import { msStringToDate, get, getIn } from "../../utils.js";
-import {
-  addOwnActiveNeedsInLoading,
-  addOwnInactiveNeedsInLoading,
-  addOwnInactiveNeedsToLoad,
-  addTheirNeedsInLoading,
-  addNeed,
-  addNeedInCreation,
-} from "./reduce-needs.js";
+import { addNeedStubs, addNeed, addNeedInCreation } from "./reduce-needs.js";
 import {
   addMessage,
   addExistingMessages,
@@ -34,7 +27,7 @@ import {
   addConnectionsToLoad,
   markConnectionAsRated,
   markConnectionAsRead,
-  getOwnedNeedByConnectionUri,
+  getNeedByConnectionUri,
   changeConnectionState,
   changeConnectionStateByFun,
   storeConnectionsData,
@@ -56,47 +49,42 @@ export default function(allNeedsInState = initialState, action = {}) {
 
     case actionTypes.account.loginStarted:
       // starting a new login process. this could mean switching
-      // to a different session. we need to mark any needs
-      // that are already loaded as non-owned.
+      // to a different session. we need to remove all connections
+      // that are already of loaded needs loaded.
       return allNeedsInState.map(need =>
-        need.set("isOwned", false).set("connections", Immutable.Map())
+        need.set("connections", Immutable.Map())
       );
 
     case actionTypes.needs.storeOwnedActiveUris: {
-      return addOwnActiveNeedsInLoading(
+      return addNeedStubs(
         allNeedsInState,
-        action.payload.get("uris")
+        action.payload.get("uris"),
+        won.WON.ActiveCompacted
       );
     }
 
+    case actionTypes.needs.storeOwnedInactiveUrisInLoading:
     case actionTypes.needs.storeOwnedInactiveUris: {
-      return addOwnInactiveNeedsToLoad(
+      return addNeedStubs(
         allNeedsInState,
-        action.payload.get("uris")
-      );
-    }
-
-    case actionTypes.needs.storeOwnedInactiveUrisInLoading: {
-      return addOwnInactiveNeedsInLoading(
-        allNeedsInState,
-        action.payload.get("uris")
+        action.payload.get("uris"),
+        won.WON.InactiveCompacted
       );
     }
 
     case actionTypes.personas.storeTheirUrisInLoading:
     case actionTypes.needs.storeTheirUrisInLoading: {
-      return addTheirNeedsInLoading(
-        allNeedsInState,
-        action.payload.get("uris")
-      );
+      return addNeedStubs(allNeedsInState, action.payload.get("uris"));
     }
 
-    case actionTypes.needs.storeOwned: {
+    case actionTypes.needs.storeOwned:
+    case actionTypes.needs.storeTheirs:
+    case actionTypes.personas.storeTheirs: {
       let needs = action.payload.get("needs");
       needs = needs ? needs : Immutable.Set();
 
       return needs.reduce(
-        (updatedState, need) => addNeed(updatedState, need, true),
+        (updatedState, need) => addNeed(updatedState, need),
         allNeedsInState
       );
     }
@@ -113,17 +101,6 @@ export default function(allNeedsInState = initialState, action = {}) {
       return storeConnectionsData(
         allNeedsInState,
         action.payload.get("connections")
-      );
-    }
-
-    case actionTypes.needs.storeTheirs:
-    case actionTypes.personas.storeTheirs: {
-      let needs = action.payload.get("needs");
-      needs = needs ? needs : Immutable.Set();
-
-      return needs.reduce(
-        (updatedState, need) => addNeed(updatedState, need, false),
-        allNeedsInState
       );
     }
 
@@ -177,7 +154,6 @@ export default function(allNeedsInState = initialState, action = {}) {
         action.payload.needUri,
         Immutable.fromJS({
           jsonld: action.payload.persona,
-          isOwned: true,
           isBeingCreated: true,
           uri: action.payload.needUri,
           creationDate: new Date(),
@@ -230,7 +206,7 @@ export default function(allNeedsInState = initialState, action = {}) {
     }
 
     case actionTypes.needs.createSuccessful:
-      return addNeed(allNeedsInState, action.payload.need, true);
+      return addNeed(allNeedsInState, action.payload.need);
 
     case actionTypes.messages.openMessageReceived:
     case actionTypes.messages.connectMessageReceived: {
@@ -474,7 +450,7 @@ export default function(allNeedsInState = initialState, action = {}) {
       const connUri = wonMessage.getReceiver();
 
       const tmpConnUri = "connectionFrom:" + wonMessage.getIsResponseTo();
-      const tmpNeed = getOwnedNeedByConnectionUri(allNeedsInState, tmpConnUri);
+      const tmpNeed = getNeedByConnectionUri(allNeedsInState, tmpConnUri);
       const tmpConnection = getIn(tmpNeed, ["connections", tmpConnUri]);
 
       if (tmpConnection) {
@@ -482,9 +458,6 @@ export default function(allNeedsInState = initialState, action = {}) {
         // connection uri. now that we have the uri, we can store it
         // (see connectAdHoc)
         const needUri = tmpNeed.get("uri");
-        if (!tmpNeed.get("isOwned")) {
-          throw new Error("Need not owned, can't alter connection.");
-        }
 
         const properConnection = tmpConnection
           .delete("usingTemporaryUri")
@@ -509,7 +482,7 @@ export default function(allNeedsInState = initialState, action = {}) {
         }
         return allNeedsInState;
       } else {
-        const needByConnectionUri = getOwnedNeedByConnectionUri(
+        const needByConnectionUri = getNeedByConnectionUri(
           allNeedsInState,
           connUri
         );

@@ -12,7 +12,7 @@ import { attach, get, getIn } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import * as processUtils from "../process-utils.js";
 import * as needUtils from "../need-utils.js";
-import { getPostUriFromRoute } from "../selectors/general-selectors.js";
+import * as generalSelectors from "../selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
@@ -103,7 +103,7 @@ function genComponentConf() {
         */
         const postUri = this.needUri
           ? this.needUri
-          : getPostUriFromRoute(state);
+          : generalSelectors.getPostUriFromRoute(state);
         const post = state.getIn(["needs", postUri]);
         const process = get(state, "process");
 
@@ -111,20 +111,19 @@ function genComponentConf() {
           !post || processUtils.isNeedLoading(process, postUri);
         const postFailedToLoad =
           post && processUtils.hasNeedFailedToLoad(process, postUri);
+        const isOwned = generalSelectors.isNeedOwned(state, postUri);
         const showCreateWhatsAround =
-          post && needUtils.isOwned(post) && needUtils.isWhatsNewNeed(post);
+          post && isOwned && needUtils.isWhatsNewNeed(post);
 
         const reactionUseCases =
           post &&
-          !needUtils.isOwned(post) &&
+          !isOwned &&
           getIn(post, ["matchedUseCase", "reactionUseCases"]);
         const hasReactionUseCases =
           reactionUseCases && reactionUseCases.size > 0;
 
         const enabledUseCases =
-          post &&
-          needUtils.isOwned(post) &&
-          getIn(post, ["matchedUseCase", "enabledUseCases"]);
+          post && isOwned && getIn(post, ["matchedUseCase", "enabledUseCases"]);
         const hasEnabledUseCases = enabledUseCases && enabledUseCases.size > 0;
         return {
           processingPublish: state.getIn(["process", "processingPublish"]),

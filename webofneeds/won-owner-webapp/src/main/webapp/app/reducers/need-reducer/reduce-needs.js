@@ -1,46 +1,41 @@
 import { parseNeed } from "./parse-need.js";
 import Immutable from "immutable";
-import won from "../../won-es6.js";
+import { get } from "../../utils.js";
 
-export function addNeed(needs, jsonldNeed, isOwned) {
+export function addNeed(needs, jsonldNeed) {
   let newState;
-  let parsedNeed = parseNeed(jsonldNeed, isOwned);
+  let parsedNeed = parseNeed(jsonldNeed);
+  const parsedNeedUri = get(parsedNeed, "uri");
 
-  if (parsedNeed && parsedNeed.get("uri")) {
-    let existingNeed = needs.get(parsedNeed.get("uri"));
-    const isExistingOwnedNeed = existingNeed && existingNeed.get("isOwned");
+  if (parsedNeedUri) {
+    let existingNeed = get(needs, parsedNeedUri);
 
     if (existingNeed) {
-      if (isOwned || isExistingOwnedNeed) {
-        parsedNeed = parsedNeed
-          .set("connections", existingNeed.get("connections"))
-          .set("isOwned", true);
-      } else if (!isOwned) {
-        parsedNeed = parsedNeed
-          .set("connections", existingNeed.get("connections"))
-          .set("isOwned", false);
-      }
+      parsedNeed = parsedNeed.set(
+        "connections",
+        get(existingNeed, "connections")
+      );
 
-      const heldNeedUris = parsedNeed.get("holds");
+      const heldNeedUris = get(parsedNeed, "holds");
       if (heldNeedUris.size > 0) {
         heldNeedUris.map(needUri => {
-          if (!needs.get(needUri) || !needs.getIn([needUri, "isOwned"])) {
-            needs = addTheirNeedToLoad(needs, needUri);
+          if (!get(needs, needUri)) {
+            needs = addNeedStub(needs, needUri);
           }
         });
       }
 
-      const groupMemberUris = parsedNeed.get("groupMembers");
+      const groupMemberUris = get(parsedNeed, "groupMembers");
       if (groupMemberUris.size > 0) {
         groupMemberUris.map(needUri => {
-          if (!needs.get(needUri) || !needs.getIn([needUri, "isOwned"])) {
-            needs = addTheirNeedToLoad(needs, needUri);
+          if (!get(needs, needUri)) {
+            needs = addNeedStub(needs, needUri);
           }
         });
       }
     }
 
-    return needs.set(parsedNeed.get("uri"), parsedNeed);
+    return needs.set(parsedNeedUri, parsedNeed);
   } else {
     console.error("Tried to add invalid need-object: ", jsonldNeed);
     newState = needs;
@@ -49,112 +44,44 @@ export function addNeed(needs, jsonldNeed, isOwned) {
   return newState;
 }
 
-function addNeedInLoading(needs, needUri, state, isOwned) {
-  const oldNeed = needs.get(needUri);
-  if (oldNeed) {
+/**
+ * Adds a need-stub into the need-redux-state, needed to get Posts that are not loaded/loading to show up as skeletons
+ * Checks if stub/need already exists, if so do nothing
+ * @param needs redux need state
+ * @param needUri stub accessible under uri
+ * @param state not mandatory will be set undefined if not set, otherwise the needState is stored (e.g. Active/Inactive)
+ * @returns {*}
+ */
+export function addNeedStub(needs, needUri, state) {
+  if (get(needs, needUri)) {
     return needs;
   } else {
-    let need = Immutable.fromJS({
-      uri: needUri,
-      isOwned: isOwned,
-      state: state,
-      connections: Immutable.Map(),
-    });
-    return needs.setIn([needUri], need);
+    return needs.setIn(
+      [needUri],
+      Immutable.fromJS({
+        uri: needUri,
+        state: state,
+        connections: Immutable.Map(),
+      })
+    );
   }
 }
 
-function addTheirNeedInLoading(needs, needUri) {
-  const oldNeed = needs.get(needUri);
-  if (oldNeed) {
-    return needs;
-  } else {
-    let need = Immutable.fromJS({
-      uri: needUri,
-      isOwned: false,
-      connections: Immutable.Map(),
-    });
-    return needs.setIn([needUri], need);
-  }
-}
-
-export function addTheirNeedToLoad(needs, needUri) {
-  const oldNeed = needs.get(needUri);
-  if (oldNeed) {
-    return needs;
-  } else {
-    let need = Immutable.fromJS({
-      uri: needUri,
-      isOwned: false,
-      connections: Immutable.Map(),
-    });
-    return needs.setIn([needUri], need);
-  }
-}
-
-export function addOwnActiveNeedsInLoading(needs, needUris) {
+/**
+ * Adds need-stubs into the need-redux-state, needed to get Posts that are not loaded/loading to show up as skeletons
+ * Checks if stub/need already exists, if so do nothing
+ * @param needs redux need state
+ * @param needUris stub accessible under uris
+ * @param state not mandatory will be set undefined if not set, otherwise the needState is stored (e.g. Active/Inactive)
+ * @returns {*}
+ */
+export function addNeedStubs(needs, needUris, state) {
   let newState = needs;
   needUris &&
     needUris.forEach(needUri => {
-      newState = addNeedInLoading(
-        newState,
-        needUri,
-        won.WON.ActiveCompacted,
-        true
-      );
+      newState = addNeedStub(newState, needUri, state);
     });
   return newState;
-}
-
-export function addOwnInactiveNeedsInLoading(needs, needUris) {
-  let newState = needs;
-  needUris &&
-    needUris.forEach(needUri => {
-      newState = addNeedInLoading(
-        newState,
-        needUri,
-        won.WON.InactiveCompacted,
-        true
-      );
-    });
-  return newState;
-}
-
-export function addTheirNeedsInLoading(needs, needUris) {
-  let newState = needs;
-  needUris &&
-    needUris.forEach(needUri => {
-      newState = addTheirNeedInLoading(newState, needUri);
-    });
-  return newState;
-}
-
-export function addOwnInactiveNeedsToLoad(needs, needUris) {
-  let newState = needs;
-  needUris &&
-    needUris.forEach(needUri => {
-      newState = addNeedToLoad(
-        newState,
-        needUri,
-        won.WON.InactiveCompacted,
-        true
-      );
-    });
-  return newState;
-}
-
-function addNeedToLoad(needs, needUri, state, isOwned) {
-  if (needs.get(needUri)) {
-    return needs;
-  } else {
-    let need = Immutable.fromJS({
-      uri: needUri,
-      isOwned: isOwned,
-      state: state,
-      connections: Immutable.Map(),
-    });
-    return needs.setIn([needUri], need);
-  }
 }
 
 export function addNeedInCreation(needs, needInCreation, needUri) {
@@ -163,7 +90,6 @@ export function addNeedInCreation(needs, needInCreation, needUri) {
 
   if (need) {
     need = need.set("uri", needUri);
-    need = need.set("isOwned", true);
     need = need.set("isBeingCreated", true);
     need = need.set("connections", Immutable.Map());
 

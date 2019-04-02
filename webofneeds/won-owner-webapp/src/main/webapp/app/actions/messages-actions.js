@@ -8,7 +8,7 @@ import { get, getIn } from "../utils.js";
 
 import Immutable from "immutable";
 import { getOwnMessageUri } from "../message-utils.js";
-import * as needUtils from "../need-utils.js";
+import * as generalSelectors from "../selectors/general-selectors.js";
 
 import {
   fetchDataForOwnedNeeds,
@@ -175,12 +175,15 @@ export function processOpenMessage(event) {
     const senderNeedUri = event.getSenderNeed();
     const senderConnectionUri = event.getSender();
 
-    const currentState = getState();
-    const senderNeed = getIn(currentState, ["needs", senderNeedUri]);
-    const receiverNeed = getIn(currentState, ["needs", receiverNeedUri]);
+    const state = getState();
+    const senderNeed = getIn(state, ["needs", senderNeedUri]);
+    const receiverNeed = getIn(state, ["needs", receiverNeedUri]);
 
-    const isOwnSenderNeed = get(senderNeed, "isOwned");
-    const isOwnReceiverNeed = get(receiverNeed, "isOwned");
+    const isOwnSenderNeed = generalSelectors.isNeedOwned(state, senderNeedUri);
+    const isOwnReceiverNeed = generalSelectors.isNeedOwned(
+      state,
+      receiverNeedUri
+    );
 
     //check if the two connections are relevant to be stored within the state (if connUri is present, and if Need belongs to self)
     const isSenderConnectionRelevant = senderConnectionUri && isOwnSenderNeed;
@@ -294,13 +297,12 @@ export function processChangeNotificationMessage(event) {
   return (dispatch, getState) => {
     console.debug("processChangeNotificationMessage for: ", event);
     const needUriToLoad = event.getSenderNeed();
-    const needToLoad = getState().getIn(["needs", needUriToLoad]);
 
     won
       //.invalidateCacheForNeed(needURI)
       .clearStoreWithPromise()
       .then(() => {
-        if (needUtils.isOwned(needToLoad)) {
+        if (generalSelectors.isNeedOwned(getState(), needUriToLoad)) {
           fetchDataForOwnedNeeds([needUriToLoad], dispatch);
         } else {
           fetchDataForNonOwnedNeedOnly(needUriToLoad, dispatch);
@@ -318,7 +320,7 @@ export function processConnectionMessage(event) {
   return (dispatch, getState) => {
     if (isFetchMessageEffectsNeeded(event)) {
       const _needUri = event.getSenderNeed();
-      const isSentEvent = getState().getIn(["needs", _needUri, "isOwned"]);
+      const isSentEvent = generalSelectors.isNeedOwned(getState(), _needUri);
 
       let connectionUri;
       let needUri;
@@ -562,11 +564,14 @@ export function processConnectMessage(event) {
     const senderNeedUri = event.getSenderNeed();
     const senderConnectionUri = event.getSender();
 
-    const currentState = getState();
-    const senderNeed = currentState.getIn(["needs", senderNeedUri]);
-    const receiverNeed = currentState.getIn(["needs", receiverNeedUri]);
-    const isOwnSenderNeed = senderNeed && senderNeed.get("isOwned");
-    const isOwnReceiverNeed = receiverNeed && receiverNeed.get("isOwned");
+    const state = getState();
+    const senderNeed = getIn(state, ["needs", senderNeedUri]);
+    const receiverNeed = getIn(state, ["needs", receiverNeedUri]);
+    const isOwnSenderNeed = generalSelectors.isNeedOwned(state, senderNeedUri);
+    const isOwnReceiverNeed = generalSelectors.isNeedOwned(
+      state,
+      receiverNeedUri
+    );
 
     let senderNeedP;
     if (isOwnSenderNeed) {

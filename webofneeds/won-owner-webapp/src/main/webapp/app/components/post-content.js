@@ -18,7 +18,7 @@ import * as needUtils from "../need-utils.js";
 import * as viewUtils from "../view-utils.js";
 import * as processUtils from "../process-utils.js";
 import * as connectionSelectors from "../selectors/connection-selectors.js";
-import { getConnectionUriFromRoute } from "../selectors/general-selectors.js";
+import * as generalSelectors from "../selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 import ngAnimate from "angular-animate";
@@ -175,10 +175,12 @@ function genComponentConf() {
       this.editNeedModule = Elm.EditNeed;
 
       const selectFromState = state => {
-        const openConnectionUri = getConnectionUriFromRoute(state);
+        const openConnectionUri = generalSelectors.getConnectionUriFromRoute(
+          state
+        );
         const post = getIn(state, ["needs", this.postUri]);
         const isPersona = needUtils.isPersona(post);
-        const isOwned = needUtils.isOwned(post);
+        const isOwned = generalSelectors.isNeedOwned(state, this.postUri);
         const content = get(post, "content");
 
         //TODO it will be possible to have more than one seeks
@@ -289,10 +291,6 @@ function genComponentConf() {
 
     addPersona(persona) {
       this.personas__connect(this.postUri, persona);
-    }
-
-    canAttachPersona() {
-      return this.post.get("isOwned") && !this.post.get("heldBy");
     }
 
     isSelectedTab(tabName) {
