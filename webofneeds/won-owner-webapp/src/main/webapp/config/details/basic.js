@@ -450,16 +450,24 @@ export const eventObject = {
   icon: "#ico36_detail_title",
   placeholder: "What? (Short title shown in lists)",
   parseToRDF: function({ value }) {
-    const val = value ? value : undefined;
-    if (!val) {
+    if (!value) {
       return;
+    } else if (is("Array", value)) {
+      const eventObjects = value.map(item => {
+        return {
+          "@type": "s:Event",
+          "s:about": { "@id": item },
+        };
+      });
+      return { "s:object": eventObjects };
+    } else {
+      return {
+        "s:object": {
+          "@type": "s:Event",
+          "s:about": { "@id": value },
+        },
+      };
     }
-    return {
-      "s:object": {
-        "@type": "s:Event",
-        "s:about": { "@id": value },
-      },
-    };
   },
   parseFromRDF: function(jsonLDImm) {
     const types = get(jsonLDImm, "@type");
